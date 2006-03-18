@@ -234,81 +234,81 @@ skins2_playtree_vlt_FILES = \
         skins2/playtree/vout_top_right.png
 
 DIST_http = \
+	http/.hosts \
+	http/dialogs/.hosts \
+	http/dialogs/browse \
+	http/dialogs/footer \
+	http/dialogs/input \
+	http/dialogs/main \
+	http/dialogs/mosaic \
+	http/dialogs/playlist \
+	http/dialogs/sout \
+	http/dialogs/vlm \
+	http/favicon.ico \
+	http/images/delete.png \
+	http/images/delete_small.png \
+	http/images/eject.png \
+	http/images/empty.png \
+	http/images/fullscreen.png \
+	http/images/help.png \
+	http/images/info.png \
+	http/images/loop.png \
+	http/images/minus.png \
+	http/images/next.png \
+	http/images/pause.png \
+	http/images/play.png \
+	http/images/playlist.png \
+	http/images/playlist_small.png \
+	http/images/plus.png \
+	http/images/prev.png \
+	http/images/refresh.png \
+	http/images/repeat.png \
+	http/images/sd.png \
+	http/images/shuffle.png \
+	http/images/slider_bar.png \
+	http/images/slider_left.png \
+	http/images/slider_point.png \
+	http/images/slider_right.png \
+	http/images/slow.png \
+	http/images/sort.png \
+	http/images/sout.png \
+	http/images/speaker.png \
+	http/images/speaker_mute.png \
+	http/images/stop.png \
+	http/images/vlc16x16.png \
+	http/images/volume_down.png \
+	http/images/volume_up.png \
+	http/images/white.png \
+	http/images/white_cross_small.png \
+	http/index.html \
 	http/js/functions.js \
 	http/js/mosaic.js \
 	http/js/vlm.js \
-	http/old/vlm/edit.html \
-	http/old/vlm/index.html \
-	http/old/vlm/show.html \
-	http/old/vlm/new.html \
-	http/old/webcam.html \
-	http/old/favicon.ico \
-	http/old/admin/dboxfiles.html \
+	http/mosaic.html \
+	http/old/.hosts \
 	http/old/admin/.access \
-	http/old/admin/index.html \
 	http/old/admin/browse.html \
-	http/old/style.css \
-	http/old/index.html \
+	http/old/admin/dboxfiles.html \
+	http/old/admin/index.html \
 	http/old/cone_minus.png \
 	http/old/cone_plus.png \
-	http/old/.hosts \
+	http/old/favicon.ico \
+	http/old/index.html \
 	http/old/info.html \
-	http/vlm_export.html \
-	http/favicon.ico \
-	http/dialogs/vlm \
-	http/dialogs/main \
-	http/dialogs/sout \
-	http/dialogs/input \
-	http/dialogs/browse \
-	http/dialogs/footer \
-	http/dialogs/mosaic \
-	http/dialogs/.hosts \
-	http/dialogs/playlist \
-	http/requests/vlm_cmd.xml \
+	http/old/style.css \
+	http/old/vlm/edit.html \
+	http/old/vlm/index.html \
+	http/old/vlm/new.html \
+	http/old/vlm/show.html \
+	http/old/webcam.html \
 	http/requests/browse.xml \
 	http/requests/playlist.xml \
-	http/requests/vlm.xml \
 	http/requests/status.xml \
+	http/requests/vlm.xml \
+	http/requests/vlm_cmd.xml \
 	http/style.css \
-	http/index.html \
 	http/vlm.html \
-	http/images/plus.png \
-	http/images/eject.png \
-	http/images/speaker_mute.png \
-	http/images/delete_small.png \
-	http/images/sort.png \
-	http/images/sout.png \
-	http/images/shuffle.png \
-	http/images/vlc16x16.png \
-	http/images/volume_up.png \
-	http/images/refresh.png \
-	http/images/slider_left.png \
-	http/images/slider_point.png \
-	http/images/minus.png \
-	http/images/pause.png \
-	http/images/fullscreen.png \
-	http/images/repeat.png \
-	http/images/slider_bar.png \
-	http/images/empty.png \
-	http/images/slider_right.png \
-	http/images/prev.png \
-	http/images/slow.png \
-	http/images/playlist.png \
-	http/images/next.png \
-	http/images/volume_down.png \
-	http/images/play.png \
-	http/images/delete.png \
-	http/images/speaker.png \
-	http/images/info.png \
-	http/images/loop.png \
-	http/images/stop.png \
-	http/images/help.png \
-	http/images/playlist_small.png \
-	http/images/white.png \
-	http/images/white_small_cross.png \
-	http/images/sd.png \
-	http/.hosts \
-	http/mosaic.html \
+	http/vlm_export.html \
 	$(NULL)
 
 DIST_osdmenu_default = \
