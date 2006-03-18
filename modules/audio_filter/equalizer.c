@@ -483,10 +483,13 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
                 p_sys->f_gamp *= pow( 10, eqz_preset_10b[i]->f_preamp / 20.0 );
                 for( j = 0; j < p_sys->i_band; j++ )
                 {
+                    lldiv_t div;
                     p_sys->f_amp[j] = EqzConvertdB(
                                         eqz_preset_10b[i]->f_amp[j] );
-                    sprintf( psz_newbands, "%s %f", psz_newbands,
-                                         eqz_preset_10b[i]->f_amp[j] );
+                    div = lldiv( eqz_preset_10b[i]->f_amp[j] * 10000000,
+                                 10000000 );
+                    sprintf( psz_newbands, "%s "I64Fd".%07u", psz_newbands,
+                                      div.quot, (unsigned int) div.rem );
                 }
                 if( p_sys->b_first == VLC_FALSE )
                 {
