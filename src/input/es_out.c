@@ -1570,6 +1570,7 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
     input_thread_t *p_input = p_sys->p_input;
     es_format_t    *fmt = &es->fmt;
     char           *psz_cat;
+    lldiv_t         div;
 
     /* Add stream info */
     asprintf( &psz_cat, _("Stream %d"), out->p_sys->i_id - 1 );
@@ -1622,11 +1623,15 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
                            fmt->video.i_visible_height);
        if( fmt->video.i_frame_rate > 0 &&
            fmt->video.i_frame_rate_base > 0 )
+       {
+           div = lldiv( (float)fmt->video.i_frame_rate /
+                               fmt->video.i_frame_rate_base * 1000000,
+                               1000000 );
            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                          _("Frame rate"), "%f",
-                          (float)fmt->video.i_frame_rate / 
-                          fmt->video.i_frame_rate_base );
-        break;
+                          _("Frame rate"), I64Fd".%06u",
+                          div.quot, (unsigned int )div.rem );
+       }
+       break;
 
     case SPU_ES:
         input_Control( p_input, INPUT_ADD_INFO, psz_cat,
