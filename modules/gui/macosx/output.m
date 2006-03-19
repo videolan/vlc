@@ -133,12 +133,12 @@
     NSArray *o_v_codecs = [NSArray arrayWithObjects: @"mp1v", @"mp2v", @"mp4v", @"DIV1",
         @"DIV2", @"DIV3", @"h263", @"h264", @"WMV1", @"WMV2", @"MJPG", @"theo", nil];
 
-    [o_output_ckbox setTitle: _NS("Advanced output:")];
+    [o_output_ckbox setTitle: _NS("Streaming/Saving:")];
     [o_output_settings setTitle: _NS("Settings...")];
     [o_btn_ok setTitle: _NS("OK")];
 
-    [o_options_lbl setTitle: _NS("Output Options")];
-    [o_display setTitle: _NS("Play locally")];
+    [o_options_lbl setTitle: _NS("Streaming and Transcoding Options")];
+    [o_display setTitle: _NS("Display the stream locally")];
     [[o_method cellAtRow:0 column:0] setTitle: _NS("File")];
     [[o_method cellAtRow:1 column:0] setTitle: _NS("Stream")];
     [o_dump_chkbox setTitle: _NS("Dump raw input")];
@@ -156,7 +156,7 @@
     [o_mux_selector removeAllItems];
     [o_mux_selector addItemsWithTitles: o_muxers];
 
-    [o_transcode_lbl setTitle: _NS("Transcode options")];
+    [o_transcode_lbl setTitle: _NS("Transcoding options")];
     [o_transcode_video_chkbox setTitle: _NS("Video")];
     [o_transcode_video_selector removeAllItems];
     [o_transcode_video_selector addItemsWithTitles: o_v_codecs];
