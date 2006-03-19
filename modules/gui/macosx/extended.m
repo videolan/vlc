@@ -88,16 +88,17 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_ckb_distortion setTitle: _NS("Distortion")];
     [o_ckb_distortion setToolTip: _NS("Adds distorsion effects")];
     [o_ckb_imgClone setTitle: _NS("Image clone")];
-    [o_ckb_imgClone setToolTip: _NS("Creates several clones of the image")];
+    [o_ckb_imgClone setToolTip: _NS("Creates several copies of the Video " \
+                                    "output window" )];
     [o_ckb_imgCrop setTitle: _NS("Image cropping")];
-    [o_ckb_imgCrop setToolTip: _NS("Crops the image")];
+    [o_ckb_imgCrop setToolTip: _NS("Crops a defined part of the image")];
     [o_ckb_imgInvers setTitle: _NS("Image inversion")];
     [o_ckb_imgInvers setToolTip: _NS("Inverts the image colors")];
     [o_ckb_trnsform setTitle: _NS("Transformation")];
     [o_ckb_trnsform setToolTip: _NS("Rotates or flips the image")];
     [o_ckb_vlme_norm setTitle: _NS("Volume normalization")];
     [o_ckb_vlme_norm setToolTip: _NS("This filters prevents the audio output " \
-        "power from going over a defined value.")];
+        "level from exceeding a defined value.")];
     [o_ckb_hdphnVirt setTitle: _NS("Headphone virtualization")];
     [o_ckb_hdphnVirt setToolTip: _NS("This filter gives the feeling of a " \
         "5.1 speaker set when using a headphone.")];
@@ -305,8 +306,7 @@ static VLCExtended *_o_sharedInstance = nil;
         {
             config_PutFloat( p_intf , "saturation" , [o_sld_saturation floatValue] / 100);
         } else {
-            msg_Warn( p_intf, "cannot find adjust-image-subfilter related to " \
-                "moved slider");
+            msg_Warn( p_intf, "the corresponding subfilter coundn't be found" );
         }
     } else {
         vlc_value_t val;
@@ -336,8 +336,7 @@ static VLCExtended *_o_sharedInstance = nil;
             var_Set( p_vout, "saturation", val );
             config_PutFloat( p_intf , "saturation" , [o_sld_saturation floatValue] / 100);
         } else {
-            msg_Warn( p_intf, "cannot find adjust-image-subfilter related to " \
-                "moved slider");
+            msg_Warn( p_intf, "the corresponding subfilter coundn't be found" );
         }
         vlc_object_release( p_vout );
     }
@@ -600,13 +599,12 @@ static VLCExtended *_o_sharedInstance = nil;
 {
     /* show info sheet */
     NSBeginInformationalAlertSheet(_NS("More information"), _NS("OK"), @"", @"", \
-        o_extended_window, nil, nil, nil, nil, _NS("Select the video effects " \
-        "filters to apply. You must restart the stream for these settings to " \
-        "take effect.\nTo configure the filters, go to the Preferences, and " \
-        "go to Modules/Video Filters. You can then configure each filter.\n" \
-        "If you want fine control over the filters ( to choose the order in " \
-        "which they are applied ), you need to enter manually a filters " \
-        "string (Preferences / Video / Filters)."));
+        o_extended_window, nil, nil, nil, nil, _NS("This panel allows to " \
+        "select video effects filters to apply.\n" \
+        "The filters can be configured indivudually in the Preferences, in " \
+        "the subsections of Video/Filters\n." \
+        "To choose the order in which the filter are applied, a filter " \
+        "option string can be set in the Preferences, Video / Filters section."));
 }
 
 
@@ -779,10 +777,9 @@ static VLCExtended *_o_sharedInstance = nil;
 
         if (returnedValue != 0)
         {
-            msg_Err(p_playlist, "VLCExtended: error while saving the " \
-            "preferences of '%s' (%i)", [[theModules objectAtIndex: x] \
-            UTF8String] , returnedValue);
-            
+            msg_Err(p_playlist, "Unable to save the preferences of the " \
+            "extended control attribute '%s' (%i)", 
+            [[theModules objectAtIndex: x] UTF8String] , returnedValue);
             [theModules release];
             vlc_object_release( p_playlist );
             

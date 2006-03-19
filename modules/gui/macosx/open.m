@@ -170,7 +170,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_disc_videots_btn_browse setTitle: _NS("Browse...")];
     [o_disc_dvd_menus setTitle: _NS("Use DVD menus")];
 
-    [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS folder")];
+    [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS directory")];
     [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD")];
     [[o_disc_type cellAtRow:2 column:0] setTitle: _NS("VCD")];
     [[o_disc_type cellAtRow:3 column:0] setTitle: _NS("Audio CD")];
@@ -240,7 +240,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_file_sub_ckbox setTitle: _NS("Load subtitles file:")];
     [o_file_sub_btn_settings setTitle: _NS("Settings...")];
     [o_file_sub_btn_browse setTitle: _NS("Browse...")];
-    [o_file_sub_override setTitle: _NS("Override")];
+    [o_file_sub_override setTitle: _NS("Override parametters")];
     [o_file_sub_delay_lbl setStringValue: _NS("delay")];
     [o_file_sub_delay_stp setEnabled: NO];
     [o_file_sub_fps_lbl setStringValue: _NS("fps")];
@@ -249,7 +249,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_file_sub_encoding_pop removeAllItems];
     [o_file_sub_size_lbl setStringValue: _NS("Font size")];
     [o_file_sub_size_pop removeAllItems];
-    [o_file_sub_align_lbl setStringValue: _NS("Subtitles justification")];
+    [o_file_sub_align_lbl setStringValue: _NS("Subtitles alignment")];
     [o_file_sub_align_pop removeAllItems];
     [o_file_sub_ok_btn setStringValue: _NS("OK")];
     [o_file_sub_font_box setTitle: _NS("Font Properties")];
@@ -475,7 +475,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     
     o_type = [[o_disc_type selectedCell] title];
 
-    if ( [o_type isEqualToString: _NS("VIDEO_TS folder")] )
+    if ( [o_type isEqualToString: _NS("VIDEO_TS directory")] )
     {
         b_device = 0; b_menus = 1;
     }

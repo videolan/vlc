@@ -47,14 +47,14 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define EMBEDDED_TEXT N_("Use embedded video output")
-#define EMBEDDED_LONGTEXT N_("Disable this if you want the video output to " \
-    "be opened in a separate window instead of in the control window.")
+#define EMBEDDED_TEXT N_("Embedded video output")
+#define EMBEDDED_LONGTEXT N_("If enabled the video output will " \
+    "be displayed in the controller window instead of a in separate window.")
 
 #define VDEV_TEXT N_("Video device")
-#define VDEV_LONGTEXT N_("Choose a number corresponding to " \
-    "a screen in you video device selection menu and this screen " \
-    "will be used by default as the screen for 'fullscreen'.")
+#define VDEV_LONGTEXT N_("Number of the screen to use by default to display " \
+    "videos in 'fullscreen'. The screen number correspondance can be found in "\
+    "the video device selection menu.")
 
 #define OPAQUENESS_TEXT N_("Opaqueness")
 #define OPAQUENESS_LONGTEXT N_( \
@@ -62,26 +62,26 @@ void E_(CloseVideoGL) ( vlc_object_t * );
     "0 is fully transparent.")
     
 #define STRETCH_TEXT N_("Stretch video to fill window")
-#define STRETCH_LONGTEXT N_("Instead of keeping the aspect ratio " \
-        "of the movie when resizing the video, stretch the video " \
-        "to fill the entire window." )
+#define STRETCH_LONGTEXT N_("Stretch the video to fill the entire window when "\
+        "resizing the video instead of keeping the aspect ratio and "\
+        "displaying black borders.")
 
-#define FILL_TEXT N_("Fill fullscreen")
+#define FILL_TEXT N_("Crop borders in fullscreen")
 #define FILL_LONGTEXT N_("In fullscreen mode, crop the picture if " \
         "necessary in order to fill the screen without black " \
         "borders (OpenGL only)." )
 
 #define BLACK_TEXT N_("Black screens in fullscreen")
-#define BLACK_LONGTEXT N_("In fullscreen mode, black non-video screens." )
+#define BLACK_LONGTEXT N_("In fullscreen mode, keep screen where there is no " \
+        "video displayed black" )
 
 #define BACKGROUND_TEXT N_("Use as Desktop Background")
 #define BACKGROUND_LONGTEXT N_("Use the video as the Desktop Background " \
-        "of the Finder. Desktop icons cannot be interacted with in this mode." )
+        "Desktop icons cannot be interacted with in this mode." )
         
-#define WIZARD_OPTIONS_SAVING_TEXT N_("Keep wizard selections")
-#define WIZARD_OPTIONS_SAVING_LONGTEXT N_("Keeps the selections in the " \
-        "wizard for one session of VLC, so you do not need to choose them " \
-        "over and over again for similar purposes.") 
+#define WIZARD_OPTIONS_SAVING_TEXT N_("Remember wizard options")
+#define WIZARD_OPTIONS_SAVING_LONGTEXT N_("Remember the options in the " \
+        "wizard during one session of VLC.") 
 
 vlc_module_begin();
     set_description( _("Mac OS X interface") );

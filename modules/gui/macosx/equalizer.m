@@ -139,11 +139,11 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
     int i;
     [o_btn_equalizer setToolTip: _NS("Equalizer")];
     [o_ckb_2pass setTitle: _NS("2 Pass")];
-    [o_ckb_2pass setToolTip: _NS("If you enable this settting, the "
-        "equalizer filter will be applied twice. The effect will be sharper.")];
+    [o_ckb_2pass setToolTip: _NS("Apply the"
+        "equalizer filter twice. The effect will be sharper.")];
     [o_ckb_enable setTitle: _NS("Enable")];
-    [o_ckb_enable setToolTip: _NS("Enable the equalizer. You can either "
-        "manually change the bands or use a preset.")];
+    [o_ckb_enable setToolTip: _NS("Enable the equalizer. Bands can be set "
+        "manually or using a preset.")];
     [o_fld_preamp setStringValue: _NS("Preamp")];
 
     [o_popup_presets removeAllItems];

@@ -98,16 +98,16 @@ static VLCBookmarks *_o_sharedInstance = nil;
     [[[o_tbl_dataTable tableColumnWithIdentifier:@"description"] headerCell] \
         setStringValue: _NS("Description")];
     [[[o_tbl_dataTable tableColumnWithIdentifier:@"size_offset"] headerCell] \
-        setStringValue: _NS("Size offset")];
+        setStringValue: _NS("Position")];
     [[[o_tbl_dataTable tableColumnWithIdentifier:@"time_offset"] headerCell] \
-        setStringValue: _NS("Time offset")];
+        setStringValue: _NS("Time")];
         
     /* edit window */
     [o_edit_btn_ok setTitle: _NS("OK")];
     [o_edit_btn_cancel setTitle: _NS("Cancel")];
     [o_edit_lbl_name setStringValue: _NS("Name")];
     [o_edit_lbl_time setStringValue: _NS("Time")];
-    [o_edit_lbl_bytes setStringValue: _NS("Bytes")];
+    [o_edit_lbl_bytes setStringValue: _NS("Position")];
 }
 
 - (void)showBookmarks
@@ -232,7 +232,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     {
         NSBeginCriticalAlertSheet(_NS("No input"), _NS("OK"), \
                 @"", @"", o_bookmarks_window, nil, nil, nil, nil, _NS("No " \
-                "input found. The stream must be playing or paused for " \
+                "input found. A stream must be playing or paused for " \
                 "bookmarks to work."));
         return;
     }
@@ -240,8 +240,9 @@ static VLCBookmarks *_o_sharedInstance = nil;
     {
         NSBeginCriticalAlertSheet(_NS("Input has changed"), _NS("OK"), \
             @"", @"", o_bookmarks_window, nil, nil, nil, nil, _NS("Input " \
-            "has changed, unable to save bookmark. Use \"Pause\" while " \
-            "editing bookmarks to keep the same input."));
+            "has changed, unable to save bookmark. Suspending playback with " \
+            "\"Pause\" while editing bookmarks to ensure to keep the same " \
+            "input."));
         vlc_object_release( p_input );
         return;
     }
@@ -267,7 +268,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     if( input_Control( p_input, INPUT_CHANGE_BOOKMARK, pp_bookmarks[i], i ) \
         != VLC_SUCCESS )
     {
-        msg_Warn( p_intf, "VLCBookmarks: changing bookmark failed");
+        msg_Warn( p_intf, "Unable to change the bookmark");
         vlc_object_release( p_input );
         return;
     }
@@ -290,7 +291,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     {
         NSBeginAlertSheet(_NS("Invalid selection"), _NS("OK"), \
             @"", @"", o_bookmarks_window, nil, nil, nil, nil, _NS("" \
-            "You have to select two bookmarks."));
+            "Two bookmarks have to be selected."));
         return;
     }
     input_thread_t *p_input =
@@ -334,7 +335,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
         &i_bookmarks ) != VLC_SUCCESS )
     {
         vlc_object_release( p_input );
-        msg_Err(p_intf, "bookmarks couldn't be retrieved from core");
+        msg_Err(p_intf, "already defined bookmarks couldn't be retrieved");
         return;
     }
     msg_Dbg(p_intf, "calling wizard");
@@ -473,8 +474,9 @@ static VLCBookmarks *_o_sharedInstance = nil;
         {
             /* may not happen, but just in case */
             vlc_object_release( p_input );
-            msg_Err(p_intf, "VLCBookmarks: unknown table column identifier " \
-                "(%s) while updating table", [[theTableColumn identifier] \
+            msg_Err(p_intf, "unknown table column identifier (%s) while" \
+                "updating the bookmark table", [[theTableColumn identifier] \
+
                 UTF8String] );
             return @"unknown identifier";
         }

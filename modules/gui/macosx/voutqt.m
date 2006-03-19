@@ -151,7 +151,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
 
     if( ( err = EnterMovies() ) != noErr )
     {
-        msg_Err( p_vout, "EnterMovies failed: %d", err );
+        msg_Err( p_vout, "QT initialization failed: EnterMovies failed: %d", err );
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
         free( p_vout->p_sys );
@@ -189,7 +189,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     }
     else
     {
-        msg_Err( p_vout, "failed to find an appropriate codec" );
+        msg_Err( p_vout, "QT doesn't support any appropriate chroma" );
     }
 
     if( p_vout->p_sys->img_dc == 0 )
@@ -294,7 +294,7 @@ static int InitVideo    ( vout_thread_t *p_vout )
 
     if( QTCreateSequence( p_vout ) )
     {
-        msg_Err( p_vout, "unable to create sequence" );
+        msg_Err( p_vout, "unable to initialize QT: QTCreateSequence failed" );
         return( 1 );
     }
 
@@ -433,7 +433,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                     p_pic->p_sys->i_size,
                     codecFlagUseImageBuffer, &flags, NULL, NULL ) != noErr ) )
     {
-        msg_Warn( p_vout, "DecompressSequenceFrameWhen failed: %d", err );
+        msg_Warn( p_vout, "QT failed to display the frame sequence: %d", err );
     }
     else
     {
@@ -524,7 +524,7 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 
     if( QTCreateSequence( p_vout ) )
     {
-        msg_Err( p_vout, "unable to create sequence" );
+        msg_Err( p_vout, "unable to initialize QT: QTCreateSequence failed" );
         return( 1 ); 
     } 
 
@@ -669,7 +669,7 @@ static int QTCreateSequence( vout_thread_t *p_vout )
                               codecLosslessQuality,
                               bestSpeedCodec ) ) )
     {
-        msg_Err( p_vout, "DecompressSequenceBeginS failed: %d", err );
+        msg_Err( p_vout, "Failed to initialize QT: DecompressSequenceBeginS failed: %d", err );
         return( 1 );
     }
 
@@ -777,7 +777,7 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         default:
             /* Unknown chroma, tell the guy to get lost */
             free( p_pic->p_sys );
-            msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
+            msg_Err( p_vout, "Unknown chroma format 0x%.8x (%4.4s)",
                      p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma );
             p_pic->i_planes = 0;
             return( -1 );

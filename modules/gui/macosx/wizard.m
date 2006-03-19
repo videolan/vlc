@@ -206,7 +206,7 @@ static VLCWizard *_o_sharedInstance = nil;
     o_s16l = [NSArray arrayWithObjects: @"Uncompressed, integer", @"s16l", \
         _NS("Uncompressed audio samples (useable with WAV)"), @"MUX_WAV", \
         @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", nil];
-    o_fl32 = [NSArray arrayWithObjects: @"Uncompressed, floating", @"fl32", \
+    o_fl32 = [NSArray arrayWithObjects: @"Uncompressed, floating point", @"fl32", \
         _NS("Uncompressed audio samples (useable with WAV)"), @"MUX_WAV", \
         @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", nil];
     o_dummyAud = [NSArray arrayWithObjects: @"Dummy", @"dummy", \
@@ -256,15 +256,15 @@ static VLCWizard *_o_sharedInstance = nil;
     NSArray * o_rtp_uni;
     NSArray * o_rtp_multi;
     o_http = [NSArray arrayWithObjects: @"http", @"HTTP", _NS("Enter the local " \
-        "addresses you want to listen to. Do not enter anything if you want to " \
-        "listen to all adresses or if you don't understand. This is generally " \
+        "addresses you want to listen requests on. Do not enter anything if " \
+        "you want to listen on all the network interfaces. This is generally " \
         "the best thing to do. Other computers can then access the stream at " \
         "http://yourip:8080 by default.") , _NS("Use this to stream to several " \
-        "computers. This method is less efficient, as the server needs to send " \
-        "the stream several times."), nil];
+        "computers. This method is not the most efficient, as the server needs "\
+        "to send the stream several times, but generally the most compatible"), nil];
     o_mms = [NSArray arrayWithObjects: @"mmsh", @"MMS", _NS("Enter the local " \
-        "addresses you want to listen to. Do not enter anything if you want to " \
-        "listen to all adresses or if you don't understand. This is generally " \
+        "addresses you want to listen requests on. Do not enter anything if " \
+        "you want to listen on all the network interfaces. This is generally " \
         "the best thing to do. Other computers can then access the stream at " \
         "mms://yourip:8080 by default."), _NS("Use this to stream to several " \
         "computers using the Microsoft MMS protocol. This protocol is used as " \
@@ -280,17 +280,17 @@ static VLCWizard *_o_sharedInstance = nil;
         "enter an address beginning with 239.255."), _NS("Use this to stream " \
         "to a dynamic group of computers on a multicast-enabled network. This " \
         "is the most efficient method to stream to several computers, but it " \
-        "does not work over Internet."), nil];
+        "won't work over the Internet."), nil];
     o_rtp_uni = [NSArray arrayWithObjects: @"rtp", @"RTP-Unicast", _NS("Enter the " \
         "address of the computer to stream to.") , _NS("Use this to stream " \
-        "to a single computer."), nil];
+        "to a single computer. RTP headers will be added to the stream"), nil];
     o_rtp_multi = [NSArray arrayWithObjects: @"rtp", @"RTP-Multicast", _NS("Enter " \
         "the multicast address to stream to in this field. This must be an IP " \
         "address between 224.0.0.0 and 239.255.255.255. For a private use, " \
         "enter an address beginning with 239.255."), _NS("Use this to stream " \
         "to a dynamic group of computers on a multicast-enabled network. This " \
         "is the most efficient method to stream to several computers, but it " \
-        "does not work over Internet."), nil];
+        "won't work over Internet. RTP headers will be added to the stream"), nil];
     o_strmgMthds = [[NSArray alloc] initWithObjects: o_http, o_mms, \
         o_udp_uni, o_udp_multi, o_rtp_uni, o_rtp_multi, nil];
 }
@@ -366,13 +366,14 @@ static VLCWizard *_o_sharedInstance = nil;
 
     /* page one ("Hello") */
     [o_t1_txt_title setStringValue: _NS("Streaming/Transcoding Wizard")];
-    [o_t1_txt_text setStringValue: _NS("This wizard helps you to stream, " \
-        "transcode or save a stream.")];
+    [o_t1_txt_text setStringValue: _NS("This wizard allows to configure " \
+        "simple streaming or transcoding setups.")];
     [o_t1_btn_mrInfo_strmg setTitle: _NS("More Info")];
     [o_t1_btn_mrInfo_trnscd setTitle: _NS("More Info")];
     [o_t1_txt_notice setStringValue: _NS("This wizard only gives access to " \
         "a small subset of VLC's streaming and transcoding capabilities. " \
-        "Use the Open and Stream Output dialogs to get all of them.")];
+        "The Open and 'Saving/Streaming' dialogs will give access to more " \
+        "features.")];
     [[o_t1_matrix_strmgOrTrnscd cellAtRow:0 column:0] setTitle: _NS("Stream " \
         "to network")];
     [[o_t1_matrix_strmgOrTrnscd cellAtRow:1 column:0] setTitle: _NS("" \
@@ -392,20 +393,20 @@ static VLCWizard *_o_sharedInstance = nil;
         setStringValue: _NS("Author")];
     [o_t2_box_prtExtrct setTitle: _NS("Partial Extract")];
     [o_t2_ckb_enblPartExtrct setTitle: _NS("Enable")];
-    [o_t2_ckb_enblPartExtrct setToolTip: _NS("Use this to read only a part of "\
-        "the stream. You must be able to control the incoming stream " \
-        "(for example, a file or a disc, but not an UDP network stream.) " \
-        "Enter the starting and ending times (in seconds).")];
+    [o_t2_ckb_enblPartExtrct setToolTip: _NS("This can be used to read only a "\
+        "part of the stream. It must be possible to control the incoming "\
+        "stream (for example, a file or a disc, but not an UDP network stream.) " \
+        "The starting and ending times can be given in seconds.")];
     [o_t2_txt_prtExtrctFrom setStringValue: _NS("From")];
     [o_t2_txt_prtExtrctTo setStringValue: _NS("To")];
 
     /* page three ("Streaming 1") */
     [o_t3_txt_title setStringValue: _NS("Streaming")];
-    [o_t3_txt_text setStringValue: _NS("In this page, you will select how " \
-        "your input stream will be sent.")];
+    [o_t3_txt_text setStringValue: _NS("This page allows to select how " \
+        "the input stream will be sent.")];
     [o_t3_box_dest setTitle: _NS("Destination")];
     [o_t3_box_strmgMthd setTitle: _NS("Streaming method")];
-    [o_t3_txt_destInfo setStringValue: _NS("Enter the address of the computer " \
+    [o_t3_txt_destInfo setStringValue: _NS("Address of the computer " \
         "to stream to.")];
     [[o_t3_matrix_stmgMhd cellAtRow:0 column:0] setTitle: _NS("UDP Unicast")];
     [[o_t3_matrix_stmgMhd cellAtRow:0 column:1] setTitle: _NS("UDP Multicast")];
@@ -414,30 +415,30 @@ static VLCWizard *_o_sharedInstance = nil;
 
     /* page four ("Transcode 1") */
     [o_t4_title setStringValue: _NS("Transcode")];
-    [o_t4_text setStringValue: _NS("If you want to change the compression " \
-        "format of the audio or video tracks, fill in this page. (If you only " \
-        "want to change the container format, proceed to next page.)")];
+    [o_t4_text setStringValue: _NS("This page allows to change the compression " \
+        "format of the audio or video tracks. To change only " \
+        "the container format, proceed to next page.")];
     [o_t4_box_audio setTitle: _NS("Audio")];
     [o_t4_box_video setTitle: _NS("Video")];
     [o_t4_ckb_audio setTitle: _NS("Transcode audio")];
     [o_t4_ckb_video setTitle: _NS("Transcode video")];
     [o_t4_txt_videoBitrate setStringValue: _NS("Bitrate (kb/s)")];
     [o_t4_txt_videoCodec setStringValue: _NS("Codec")];
-    [o_t4_txt_hintAudio setStringValue: _NS("If your stream has audio and you " \
-        "want to transcode it, enable this.")];
-    [o_t4_txt_hintVideo setStringValue: _NS("If your stream has video and you " \
-        "want to transcode it, enable this.")];
+    [o_t4_txt_hintAudio setStringValue: _NS("Enabling this allows to transcode "\
+    "the audio track if one is present in the stream.")];
+    [o_t4_txt_hintVideo setStringValue: _NS("Enabling this allows to transcode "\
+    "the video track if one is present in the stream.")];
 
     /* page five ("Encap") */
     [o_t5_title setStringValue: _NS("Encapsulation format")];
-    [o_t5_text setStringValue: _NS("In this page, you will select how the " \
-        "stream will be encapsulated. Depending on the choices you made, all " \
-                     "formats won't be available.")];
+    [o_t5_text setStringValue: _NS("This page allows to select how the " \
+        "stream will be encapsulated. Depending on previously chosen settings "
+        "all formats won't be available.")];
 
     /* page six ("Streaming 2") */
     [o_t6_title setStringValue: _NS("Additional streaming options")];
-    [o_t6_text setStringValue: _NS("In this page, you will define a few " \
-                              "additional parameters for your stream.")];
+    [o_t6_text setStringValue: _NS("In this page, a few " \
+                              "additional streaming parameters can be set.")];
     [o_t6_txt_ttl setStringValue: _NS("Time-To-Live (TTL)")];
     [o_t6_btn_mrInfo_ttl setTitle: _NS("More Info")];
     [o_t6_ckb_sap setTitle: _NS("SAP Announce")];
@@ -447,16 +448,16 @@ static VLCWizard *_o_sharedInstance = nil;
 
     /* page seven ("Transcode 2") */
     [o_t7_title setStringValue: _NS("Additional transcode options")];
-    [o_t7_text setStringValue: _NS("In this page, you will define a few " \
-                              "additional parameters for your transcoding.")];
+    [o_t7_text setStringValue: _NS("In this page, a few " \
+                              "additional transcoding parameters can be set.")];
     [o_t7_txt_saveFileTo setStringValue: _NS("Select the file to save to")];
     [o_t7_btn_chooseFile setTitle: _NS("Choose...")];
     [o_t7_ckb_local setTitle: _NS("Local playback")];
     [o_t7_btn_mrInfo_local setTitle: _NS("More Info")];
 
     /* page eight ("Summary") */
-    [o_t8_txt_text setStringValue: _NS("This page lists all your selections. " \
-        "Click \"Finish\" to start your streaming or transcoding.")];
+    [o_t8_txt_text setStringValue: _NS("This page lists all the settings." \
+        "Click \"Finish\" to start streaming or transcoding.")];
     [o_t8_txt_title setStringValue: _NS("Summary")];
     [o_t8_txt_destination setStringValue: [_NS("Destination") \
         stringByAppendingString: @":"]];
@@ -628,9 +629,8 @@ static VLCWizard *_o_sharedInstance = nil;
             /* show a sheet that the user didn't select a file */
             NSBeginInformationalAlertSheet(_NS("No input selected"), \
                 _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
-                _NS("You have selected neither a new stream nor a valid " \
-                "playlist item. VLC is unable to guess, which input you " \
-                "want use.\n\nChoose one before going to the next page."));
+                _NS("No new stream or valid playlist item has been selected.\n\n" \
+                "Choose one before going to the next page."));
         }
     }
     else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: \
@@ -694,8 +694,8 @@ static VLCWizard *_o_sharedInstance = nil;
                 /* complain to the user that "" is no valid dest. */
                 NSBeginInformationalAlertSheet(_NS("No valid destination"), \
                     _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
-                    _NS("You need to enter a valid destination you want to "\
-                    "stream to. Enter either a Unicast-IP or a Multicast-IP." \
+                    _NS("A valid destination has to be selected "\
+                    "Enter either a Unicast-IP or a Multicast-IP." \
                     "\n\nIf you don't know what this means, have a look at " \
                     "the VLC Streaming HOWTO and the help texts in this " \
                     "window."));
@@ -1086,9 +1086,9 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             /* show a sheet that the selected codecs are not compatible */
             NSBeginInformationalAlertSheet(_NS("Invalid selection"), _NS("OK"), \
-                @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("Your " \
+                @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("The " \
                 "chosen codecs are not compatible with each other. For example: " \
-                "you cannot mix uncompressed audio with any video codec.\n\n" \
+                "It is impossibleto  mix uncompressed audio with any video codec.\n\n" \
                 "Correct your selection and try again."));
         }
 
@@ -1113,7 +1113,7 @@ static VLCWizard *_o_sharedInstance = nil;
             if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
             {
                 [o_t7_txt_saveFileTo setStringValue: 
-                    _NS("Select the folder to save to")];
+                    _NS("Select the directory to save to")];
             }
             else
             {
@@ -1166,20 +1166,20 @@ static VLCWizard *_o_sharedInstance = nil;
             if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
                 NSBeginInformationalAlertSheet(_NS("No folder selected"), \
                     _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
-                    [NSString stringWithFormat: @"%@\n\n%@", _NS("You you " \
-                    "need to select a folder, you want to save your files to."),
-                    _NS("Enter either a valid path or choose a location " \
-                    "through the button's dialog-box.")]);
+                    [NSString stringWithFormat: @"%@\n\n%@", _NS("A directory "
+                    "where to save the files has to be selected"),
+                    _NS("Enter either a valid path or use the \"Choose...\" " \
+                    "button to select a location.")]);
             else
                 NSBeginInformationalAlertSheet(_NS("No file selected"), \
                     _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
-                    [NSString stringWithFormat: @"%@\n\n%@", _NS("You you " \
-                    "need to select a file, you want to save to."), 
-                    _NS("Enter either a valid path or choose a location " \
-                    "through the button's dialog-box.")]);
+                    [NSString stringWithFormat: @"%@\n\n%@", _NS("A file " \
+                    "where to save the stream has to be selected."), 
+                    _NS("Enter either a valid path or use the \"Choose\" " \
+                    "button to select a location")]);
         } else {
             /* create a string containing the requested suffix for later usage */
-            NSString * theEncapFormat = [[o_encapFormats objectAtIndex: \
+            NSString * theEncapFormat = [[o_encapFormats objectAtIndex: \ 
                 [[o_userSelections objectForKey:@"encapFormat"] intValue]] \
                 objectAtIndex:0];
             if( theEncapFormat == @"ps" )
@@ -1220,9 +1220,9 @@ static VLCWizard *_o_sharedInstance = nil;
                             additionalInt += 1;
                         }
                         if( additionalInt >= 100 )
-                            msg_Err( VLCIntf, "your destination folder is " \
-                                "cluttered with files with the same name. " \
-                                "clean up a bit and try again." );
+                            msg_Err( VLCIntf, "Files with the same name are " \
+                                "already present in the destination directory. " \
+                                "Delete these files or choose a different directory." );
                     }
                     [tempArray addObject: [tempString retain]];
                     x += 1;
@@ -1302,7 +1302,7 @@ static VLCWizard *_o_sharedInstance = nil;
 
             vlc_object_release(p_playlist);
         } else {
-            msg_Err( p_intf, "Uh Oh! Unable to find playlist!" );
+            msg_Err( p_intf, "unable to find playlist" );
         }
 
         /* close the window, since we are done */
@@ -1623,7 +1623,7 @@ static VLCWizard *_o_sharedInstance = nil;
     /* show a sheet for the help */
     NSBeginInformationalAlertSheet(_NS("Stream to network"), \
         _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
-        _NS("Use this to stream on a network."));
+        _NS("This allows to stream on a network."));
 }
 
 - (IBAction)t1_mrInfo_transcode:(id)sender
@@ -1631,11 +1631,11 @@ static VLCWizard *_o_sharedInstance = nil;
     /* show a sheet for the help */
     NSBeginInformationalAlertSheet(_NS("Transcode/Save to file"), \
         _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
-        _NS("Use this to save a stream to a file. You "\
-        "have the possibility to reencode the stream. You can save whatever "\
-        "VLC can read.\nPlease notice that VLC is not very suited " \
-        "for file to file transcoding. You should use its transcoding " \
-        "features to save network streams, for example."));
+        _NS("This allows to save a stream to a file. The "\
+        "can be reencoded on the fly. Whatever "\
+        "VLC can read can be saved.\nPlease note that VLC is not very suited " \
+        "for file to file transcoding. Its transcoding " \
+        "features are however useful to save network streams, for example."));
 }
 
 - (IBAction)t2_addNewStream:(id)sender
@@ -1756,7 +1756,7 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     /* enable/disable the respective items */
     if([o_t4_ckb_audio state] == NSOnState)
-    {
+   
         [o_t4_pop_audioCodec setEnabled:YES];
         [o_t4_pop_audioBitrate setEnabled:YES];
         [o_t4_txt_hintAudio setStringValue: _NS("Select your audio codec. "\
@@ -1764,8 +1764,8 @@ static VLCWizard *_o_sharedInstance = nil;
     } else {
         [o_t4_pop_audioCodec setEnabled:NO];
         [o_t4_pop_audioBitrate setEnabled:NO];
-        [o_t4_txt_hintAudio setStringValue: _NS("If your stream has audio " \
-        "and you want to transcode it, enable this.")];
+        [o_t4_txt_hintAudio setStringValue: _NS("Enabling this allows to transcode " \
+        "the audio track if one is present in the stream.")];
     }
 }
 
@@ -1781,8 +1781,9 @@ static VLCWizard *_o_sharedInstance = nil;
     } else {
         [o_t4_pop_videoCodec setEnabled:NO];
         [o_t4_pop_videoBitrate setEnabled:NO];
-        [o_t4_txt_hintVideo setStringValue: _NS("If your stream has video " \
-        "and you want to transcode it, enable this.")];
+        [o_t4_txt_hintVideo setStringValue: _NS("Enabling this allows to transcode " \
+        "the video track if one is present in the stream.")];
+
     }
 }
 
@@ -1810,7 +1811,7 @@ static VLCWizard *_o_sharedInstance = nil;
     /* show a sheet for the help */
     NSBeginInformationalAlertSheet(_NS("Time-To-Live (TTL)"), \
         _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
-        _NS("Define the TTL (Time-To-Live) of the stream. "\
+        _NS("This allows to define the TTL (Time-To-Live) of the stream. "\
             "This parameter is the maximum number of routers your stream can " \
             "go through. If you don't know what it means, or if you want to " \
             "stream on your local network only, leave this setting to 1."));
@@ -1821,8 +1822,8 @@ static VLCWizard *_o_sharedInstance = nil;
     /* show a sheet for the help */
     NSBeginInformationalAlertSheet(_NS("SAP Announce"), \
         _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
-        _NS("When streaming using UDP, you can " \
-        "announce your streams using the SAP/SDP announcing protocol. This " \
+        _NS("When streaming using UDP, the streams can be " \
+        "announced using the SAP/SDP announcing protocol. This " \
         "way, the clients won't have to type in the multicast address, it " \
         "will appear in their playlist if they enable the SAP extra " \
         "interface.\nIf you want to give a name to your stream, enter it " \

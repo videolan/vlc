@@ -142,7 +142,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     NSBeginInformationalAlertSheet(_NS("Reset Preferences"), _NS("Cancel"),
         _NS("Continue"), nil, o_prefs_window, self,
         @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil,
-        _NS("Beware this will reset your VLC media player preferences.\n"
+        _NS("Beware this will reset the VLC media player preferences.\n"
             "Are you sure you want to continue?") );
 }
 
@@ -293,7 +293,7 @@ static VLCTreeItem *o_root_item = nil;
             if( p_module == NULL )
             {
                 msg_Err( p_intf,
-                    "could not find the main module in our preferences" );
+                    "could not load the preferences" );
                 return nil;
             }
             if( i_index < p_list->i_count )
@@ -544,7 +544,7 @@ static VLCTreeItem *o_root_item = nil;
             {
                 if( !p_item )
                 {
-                    msg_Err( p_intf, "null item found" );
+                    msg_Err( p_intf, "invalid preference item found" );
                     break;
                 }
                 switch(p_item->i_type)
@@ -595,8 +595,7 @@ static VLCTreeItem *o_root_item = nil;
             }
             if( p_parser == NULL )
             {
-                msg_Err( p_intf, "could not find the main module in our "
-                                    "preferences" );
+                msg_Err( p_intf, "could not load preferences" );
                 return o_view;
             }
             p_item = (p_parser->p_config + i_object_category);
@@ -611,7 +610,7 @@ static VLCTreeItem *o_root_item = nil;
                 p_item++;
                 if( !p_item )
                 {
-                    msg_Err( p_intf, "null item found" );
+                    msg_Err( p_intf, "invalid preference item found" );
                     break;
                 }
                 switch( p_item->i_type )
@@ -702,8 +701,8 @@ static VLCTreeItem *o_root_item = nil;
             [o_label setBordered: NO];
             [o_label setEditable: NO];
             [o_label setSelectable: NO];
-            [o_label setStringValue: _NS("Some options are available but " \
-                                "hidden. Check \"Advanced\" to see them.")];
+            [o_label setStringValue: _NS("Some options are hidden. " \
+                                "Check \"Advanced\" to display them.")];
             [o_label setFont:[NSFont systemFontOfSize:10]];
             [o_label sizeToFit];
             [o_view addSubview:o_label];

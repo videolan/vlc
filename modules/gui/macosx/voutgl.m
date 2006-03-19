@@ -81,7 +81,8 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 
     if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
     {
-        msg_Warn( p_vout, "no hardware acceleration" );
+        msg_Warn( p_vout, "no OpenGL hardware acceleration found. "
+                          "Video display will be slow" );
         return( 1 );
     }
     msg_Dbg( p_vout, "display is Quartz Extreme accelerated" );
@@ -259,7 +260,7 @@ static void Unlock( vout_thread_t * p_vout )
 
     if( !fmt )
     {
-        msg_Warn( p_vout, "Cannot create NSOpenGLPixelFormat" );
+        msg_Warn( p_vout, "Could not create OpenGL video output" );
         return nil;
     }
 

@@ -81,7 +81,7 @@ static VLCUpdate *_o_sharedInstance = nil;
 - (void)initStrings
 {
     /* translate strings to the user's language */
-    [o_update_window setTitle: _NS("Check for Update")];
+    [o_update_window setTitle: _NS("Check for Updates")];
     [o_btn_DownloadNow setTitle: _NS("Download now")];
     [o_btn_okay setTitle: _NS("OK")];
 }
@@ -89,7 +89,7 @@ static VLCUpdate *_o_sharedInstance = nil;
 - (void)showUpdateWindow
 {
     /* show the window and check for a potential update */
-    [o_fld_status setStringValue: _NS("Checking for Update...")];
+    [o_fld_status setStringValue: _NS("Checking for Updates...")];
     [o_fld_currentVersionAndSize setStringValue: @""];
     [o_fld_releaseNote setString: @""];
 
@@ -177,7 +177,8 @@ static VLCUpdate *_o_sharedInstance = nil;
                         (int)((p_uit->file.l_size / 1024) / 1024) );
                     [o_fld_currentVersionAndSize setStringValue: [NSString \
                         stringWithFormat: \
-                        _NS("The current release is %s (%i MB to download)."), \
+                        _NS("The latest VLC media player release " \
+                            "is %s (%i MB to download)."), \
                         p_uit->release.psz_version, ((p_uit->file.l_size \
                         / 1024) / 1024)]];
                         
@@ -191,7 +192,7 @@ static VLCUpdate *_o_sharedInstance = nil;
                 {
                     /* our version is outdated, let the user download the new
                      * release */
-                    [o_fld_status setStringValue: _NS("Your version of VLC " \
+                    [o_fld_status setStringValue: _NS("This version of VLC " \
                         "is outdated.")];
                     [o_btn_DownloadNow setEnabled: YES];
                     msg_Dbg( p_intf, "this version of VLC is outdated" );
@@ -204,8 +205,8 @@ static VLCUpdate *_o_sharedInstance = nil;
                 }
                 else if(! releaseChecked )
                 {
-                    [o_fld_status setStringValue: _NS("Your version of VLC " \
-                        "is up-to-date.")];
+                    [o_fld_status setStringValue: _NS("This version of VLC " \
+                        "is latest available.")];
                     [o_btn_DownloadNow setEnabled: NO];
                     msg_Dbg( p_intf, "current version is up-to-date" );
                     releaseChecked = YES;

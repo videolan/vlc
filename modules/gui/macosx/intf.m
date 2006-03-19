@@ -596,12 +596,12 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* error panel */
     [o_error setTitle: _NS("Error")];
     [o_err_lbl setStringValue: _NS("An error has occurred which probably " \
-        "prevented the execution of your request:")];
+        "prevented the proper execution of the program:")];
     [o_err_bug_lbl setStringValue: _NS("If you believe that it is a bug, " \
         "please follow the instructions at:")];
     [o_err_btn_msgs setTitle: _NS("Open Messages Window")];
     [o_err_btn_dismiss setTitle: _NS("Dismiss")];
-    [o_err_ckbk_surpress setTitle: _NS("Suppress further errors")];
+    [o_err_ckbk_surpress setTitle: _NS("Do not display further errors")];
 
     [o_info_window setTitle: _NS("Information")];
 }
@@ -672,7 +672,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         psz_string = malloc( [o_data length] + 1 );
         [o_data getBytes: psz_string];
         psz_string[ [o_data length] ] = '\0';
-        msg_Err( VLCIntf, "cannot convert to wanted encoding: %s",
+        msg_Err( VLCIntf, "cannot convert to the requested encoding: %s",
                  psz_string );
     }
     else
@@ -1730,7 +1730,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     else
     {
-        NSBeginInformationalAlertSheet(_NS("No CrashLog found"), @"Continue", nil, nil, o_msgs_panel, self, NULL, NULL, nil, _NS("You haven't experienced any heavy crashes yet.") );
+        NSBeginInformationalAlertSheet(_NS("No CrashLog found"), @"Continue", nil, nil, o_msgs_panel, self, NULL, NULL, nil, _NS("Couldn't find any trace of a previous crash.") );
 
     }
 }

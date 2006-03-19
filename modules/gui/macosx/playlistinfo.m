@@ -356,7 +356,7 @@
     input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
 
-    if( [[o_mi title] isEqualToString: _NS("Info")] )
+    if( [[o_mi title] isEqualToString: _NS("Information")] )
     {
         if( p_input == NULL )
         {

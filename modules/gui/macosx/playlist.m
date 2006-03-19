@@ -481,7 +481,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_recursive_expand setTitle: _NS("Expand Node")];
     [o_mi_selectall setTitle: _NS("Select All")];
     [o_mi_info setTitle: _NS("Information")];
-    [o_mi_preparse setTitle: _NS("Preparse")];
+    [o_mi_preparse setTitle: _NS("Get Stream Information")];
     [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
     [o_mi_services setTitle: _NS("Services discovery")];
@@ -1481,7 +1481,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                                           FIND_ANYWHERE );
     if( !p_playlist )
     {
-        msg_Err( VLCIntf, "Uh Oh! Unable to find playlist!" );
         return;
     }
 
@@ -1489,7 +1488,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         _("Empty Folder"), p_playlist->p_general );
 
     if(! p_item )
-        msg_Warn( VLCIntf, "node creation failed, fix VLC!" );
+        msg_Warn( VLCIntf, "node creation failed" );
     
     playlist_ViewUpdate( p_playlist, VIEW_CATEGORY );
     
