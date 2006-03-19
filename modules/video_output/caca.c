@@ -273,7 +273,7 @@ static void End( vout_thread_t *p_vout )
 #ifdef CACA_API_VERSION_1
     cucul_free_bitmap( p_vout->p_sys->p_qq, p_vout->p_sys->p_bitmap );
 #else
-    cucul_free_bitmap( p_vout->p_sys->p_bitmap );
+    caca_free_bitmap( p_vout->p_sys->p_bitmap );
 #endif
 }
 
