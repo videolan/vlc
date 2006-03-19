@@ -307,6 +307,7 @@ DIST_http = \
 	http/requests/vlm.xml \
 	http/requests/vlm_cmd.xml \
 	http/style.css \
+	http/iehacks.css \
 	http/vlm.html \
 	http/vlm_export.html \
 	$(NULL)
