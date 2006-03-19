@@ -1272,7 +1272,16 @@ static void StreamRead( void *p_private, unsigned int i_size,
         msg_Warn( p_demux, "buffer overflow" );
     }
     /* FIXME could i_size be > buffer size ? */
-    if( tk->fmt.i_codec == VLC_FOURCC('H','2','6','1') )
+    if( tk->fmt.i_codec == VLC_FOURCC('s','a','m','r') ||
+        tk->fmt.i_codec == VLC_FOURCC('s','a','w','b') )
+    {
+        AMRAudioSource *amrSource = (AMRAudioSource*)tk->readSource;
+
+        p_block = block_New( p_demux, i_size + 1 );
+        p_block->p_buffer[0] = amrSource->lastFrameHeader();
+        memcpy( p_block->p_buffer + 1, tk->p_buffer, i_size );
+    }
+    else if( tk->fmt.i_codec == VLC_FOURCC('H','2','6','1') )
     {
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1081468800
         H261VideoRTPSource *h261Source = (H261VideoRTPSource*)tk->rtpSource;
