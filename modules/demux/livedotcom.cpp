@@ -446,7 +446,7 @@ static int  Open ( vlc_object_t *p_this )
         }
 
         /* Retrieve the timeout value and set up a timeout prevention thread */
-#ifdef LIVEMEDIA_LIBRARY_VERSION_INT > 1138250000
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1138250000
         p_sys->i_timeout = p_sys->rtsp->sessionTimeoutParameter();
 #endif
         if( p_sys->i_timeout > 0 )
