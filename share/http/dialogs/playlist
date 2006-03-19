@@ -51,7 +51,7 @@ This dialog needs the following dialogs to be fully functional: <none>
       <img src="images/repeat.png" alt="Repeat" />
       <span class="btn_text">Repeat</span>
     </button>
-    <button id="btn_sort" onmouseover="show_menu('menu_sort');" onmouseout="hide_menu('menu_sort');" title="Sort" >
+    <div id="btn_sort" class="menubtn" style="margin-left: 5px" onmouseover="show_menu('menu_sort');" onmouseout="hide_menu('menu_sort');" title="Sort" >
       <img src="images/sort.png" alt="Sort" />
       <span class="btn_text">Sort</span>
       <div id="menu_sort" class="menu" >
@@ -64,8 +64,8 @@ This dialog needs the following dialogs to be fully functional: <none>
         <button onclick="pl_sort(0,0);hide_menu('menu_sort');" onmouseover="button_over(this);" onmouseout="button_out_menu(this);" title="Sort by Id ascending" >Id</button><br/>
         <button onclick="pl_sort(0,1);hide_menu('menu_sort');" onmouseover="button_over(this);" onmouseout="button_out_menu(this);" title="Sort by Id descending" >Id reverse</button><br/>
       </div>
-    </button>
-    <button id="btn_sd" onmouseover="show_menu('menu_sd');" onmouseout="hide_menu('menu_sd');" title="Services Discovery" >
+    </div>
+    <div id="btn_sd" class="menubtn" style="margin-left: 30px" onmouseover="show_menu('menu_sd');" onmouseout="hide_menu('menu_sd');" title="Services Discovery" >
       <img src="images/sd.png" alt="Services Discovery" />
       <span class="btn_text">Services Discovery</span>
       <div id="menu_sd" class="menu" >
@@ -74,7 +74,7 @@ This dialog needs the following dialogs to be fully functional: <none>
         <button onclick="pl_sd('<vlc id="value" param1="sd" />');hide_menu('menu_sd');" onmouseover="button_over(this);" onmouseout="button_out_menu(this);" title="Toggle <vlc id="value" param1="sd.name" />" ><vlc id="value" param1="sd.name" /></button><br/>
         <vlc id="end" />
       </div>
-    </button>
+    </div>
   </div>
   <div id="playtree">
     (?)

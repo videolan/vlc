@@ -165,6 +165,8 @@ div#browser {
 div#mosaic_list {
 	width: 50%;
 	left: 25%;
+	background: url('images/white.png') repeat;
+	display: none;
 }
 
 .mosaic_bg {
@@ -219,11 +221,20 @@ div.controls button.off {
 	background-color: #fff;
 }
 
+div.menubtn {
+	display: inline;
+	position: absolute;
+	margin-top: 2px;
+	font-size: 0.70em;
+}
+
 div.menu {
 	position: absolute;
 	border: 1px solid #ccc;
 	padding: 5px;
+	margin-top: -5px;
 	background: url('images/white.png') repeat;
+	z-index: 2;
 	display: none;
 }
 

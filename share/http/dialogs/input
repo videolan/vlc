@@ -57,7 +57,7 @@ This dialog needs the following dialogs to be fully functional: browse
       Network
     </button>
   </div>
-  <div id="input" class="helper" >
+  <div id="input_helper" class="helper" >
     <div id="input_file" style="display: block">
       Open File
       <hr/>

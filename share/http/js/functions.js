@@ -130,12 +130,16 @@ function set_css( item, element, value )
 {
     for( var j = 0; j < document.styleSheets.length; j++ )
     {
-        cssRules = document.styleSheets[j].cssRules;
+        var cssRules = document.styleSheets[j].cssRules;
+        if( !cssRules ) cssRules = document.styleSheets[j].rules;
         for( var i = 0; i < cssRules.length; i++)
         {
             if( cssRules[i].selectorText == item )
             {
-                cssRules[i].style.setProperty( element, value, null );
+                if( cssRules[i].style.setProperty )
+                    cssRules[i].style.setProperty( element, value, null );
+                else
+                    cssRules[i].style.setAttribute( toCamelCase( element ), value );
                 return;
             }
         }
@@ -147,12 +151,16 @@ function get_css( item, element )
 {
     for( var j = 0; j < document.styleSheets.length; j++ )
     {
-        cssRules = document.styleSheets[j].cssRules;
+        var cssRules = document.styleSheets[j].cssRules;
+        if( !cssRules ) cssRules = document.styleSheets[j].rules;
         for( var i = 0; i < cssRules.length; i++)
         {
             if( cssRules[i].selectorText == item )
             {
-                return cssRules[i].style.getPropertyValue( element );
+                if( cssRules[i].style.getPropertyValue )
+                    return cssRules[i].style.getPropertyValue( element );
+                else
+                    return cssRules[i].style.getAttribute( toCamelCase( element ) );
             }
         }
     }
@@ -221,6 +229,15 @@ function check_and_replace_int( id, val )
 
 function addslashes( str ){ return str.replace(/\'/g, '\\\''); }
 function escapebackslashes( str ){ return str.replace(/\\[^']/g, '\\\\'); }
+
+function toCamelCase( str )
+{
+    str = str.split( '-' );
+    var cml = str[0];
+    for( var i=1; i<str.length; i++)
+        cml += str[i].charAt(0).toUpperCase()+str[i].substring(1);
+    return cml;
+}
 
 function disable( id ){ document.getElementById( id ).disabled = true; }
 
@@ -441,15 +458,20 @@ function parse_status()
                 document.getElementById( 'btn_pause' ).setAttribute( 'title', 'Play' );
             }
 
-            if( status.getElementsByTagName( 'random' )[0].firstChild.data == "1" )
+            var randomtag = status.getElementsByTagName( 'random' );
+            if( randomtag.length > 0 ? randomtag[0].firstChild.data == "1" : 0)
                 document.getElementById( 'btn_shuffle').setAttribute( 'class', 'on' );
             else
                 document.getElementById( 'btn_shuffle').setAttribute( 'class', 'off' );
-            if( status.getElementsByTagName( 'loop' )[0].firstChild.data == "1" )
+               
+            var looptag = status.getElementsByTagName( 'loop' );
+            if( looptag.length > 0 ? looptag[0].firstChild.data == "1" : 0)
                 document.getElementById( 'btn_loop').setAttribute( 'class', 'on' );
             else
                 document.getElementById( 'btn_loop').setAttribute( 'class', 'off' );
-            if( status.getElementsByTagName( 'repeat' )[0].firstChild.data == "1" )
+
+            var repeattag = status.getElementsByTagName( 'repeat' );
+            if( repeattag.length > 0 ? repeattag[0].firstChild.data == "1" : 0 )
                 document.getElementById( 'btn_repeat').setAttribute( 'class', 'on' );
             else
                 document.getElementById( 'btn_repeat').setAttribute( 'class', 'off' );

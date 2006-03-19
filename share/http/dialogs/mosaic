@@ -93,7 +93,7 @@ sout.
     <label for="mosaic_output">Output:</label> <input type="text" id="mosaic_output" value="" size="60" onvlur="mosaic_code_update();" /> <input type="button" value="Edit" onclick="vlm_output_edit( 'mosaic_output' );" /><br/>
     <div id="mosaic_feedback"></div>
   </div>
-  <div  id="mosaic_list" class="popup" style="display: none; background: url('images/white.png') repeat;">[<a href="javascript:hide('mosaic_list');">hide</a>] - Select a stream:<br/><div id="mosaic_list_content"></div></div>
+  <div  id="mosaic_list" class="popup">[<a href="javascript:hide('mosaic_list');">hide</a>] - Select a stream:<br/><div id="mosaic_list_content"></div></div>
   <div class="controls">
     Click on each of the cells to assign inputs. (<a href="javascript:document.getElementById('mosaic_list').value='';show('mosaic_list');">Show input list</a>)
   </div>
