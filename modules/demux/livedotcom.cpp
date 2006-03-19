@@ -815,7 +815,9 @@ static int Demux( demux_t *p_demux )
     if( p_sys->b_timeout_call && p_sys->rtsp && p_sys->ms )
     {
         char *psz_bye = NULL;
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1138089600
         p_sys->rtsp->getMediaSessionParameter( *p_sys->ms, NULL, psz_bye );
+#endif
         p_sys->b_timeout_call = VLC_FALSE;
     }
 
