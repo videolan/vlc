@@ -700,7 +700,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
     {
         if( p_sys->p_httpd_file )
         {
-            msg_Err( p_stream, "You can use sdp=http:// only once" );
+            msg_Err( p_stream, "you can use sdp=http:// only once" );
             return;
         }
 
@@ -713,7 +713,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
     {
         if( p_sys->p_rtsp_url )
         {
-            msg_Err( p_stream, "You can use sdp=rtsp:// only once" );
+            msg_Err( p_stream, "you can use sdp=rtsp:// only once" );
             return;
         }
 
@@ -733,7 +733,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
     {
         if( p_sys->b_export_sdp_file )
         {
-            msg_Err( p_stream, "You can use sdp=file:// only once" );
+            msg_Err( p_stream, "you can use sdp=file:// only once" );
             return;
         }
         p_sys->b_export_sdp_file = VLC_TRUE;

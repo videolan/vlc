@@ -112,13 +112,13 @@
 
 #define CANVAS_WIDTH_TEXT N_("Video canvas width")
 #define CANVAS_WIDTH_LONGTEXT N_( \
-    "Allows to padd or crop the frame to a specified width" )
+    "Allows to padd or crop the frame to a specified width." )
 #define CANVAS_HEIGHT_TEXT N_("Video canvas height")
 #define CANVAS_HEIGHT_LONGTEXT N_( \
-    "Allows to padd or crop the frame to a specified height" )
+    "Allows to padd or crop the frame to a specified height." )
 #define CANVAS_ASPECT_TEXT N_("Video canvas aspect ratio")
 #define CANVAS_ASPECT_LONGTEXT N_( \
-    "Set aspect (like 4:3) of video canvas and letterbox accordingly" )
+    "Set aspect (like 4:3) of video canvas and letterbox accordingly." )
 
 #define AENC_TEXT N_("Audio encoder")
 #define AENC_LONGTEXT N_( \
@@ -158,7 +158,7 @@
 #define OSD_TEXT N_("OSD menu")
 #define OSD_LONGTEXT N_(\
     "Enable streaming of the On Screen Display. It uses the osdmenu subfilter." )
-                  
+
 #define THREADS_TEXT N_("Number of threads")
 #define THREADS_LONGTEXT N_( \
     "Allows you to specify the number of threads used for the transcoding." )
@@ -512,7 +512,7 @@ static int Open( vlc_object_t *p_this )
             msg_Warn( p_stream, "%d channels invalid for mp3, forcing to 2",
                       p_sys->i_channels );
             p_sys->i_channels = 2;
-        }                    
+        }
         msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
                  (char *)&p_sys->i_acodec, p_sys->i_sample_rate,
                  p_sys->i_channels, p_sys->i_abitrate / 1000 );
@@ -1124,7 +1124,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         /* Transcode OSD menu pictures. */
         if( p_sys->b_es_osd )
         {
-            transcode_osd_process( p_stream, id, p_buffer, &p_out );                
+            transcode_osd_process( p_stream, id, p_buffer, &p_out );
         }
         return p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
     }
@@ -1758,7 +1758,7 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
              f_scale_height = f_scale_height * f_target_aspect / f_aspect;
          }
          f_aspect = f_target_aspect;
-         msg_Dbg( p_stream, "Canvas scaled pixel aspect is %f:1", f_aspect );
+         msg_Dbg( p_stream, "canvas scaled pixel aspect is %f:1", f_aspect );
      }
 
      /* f_scale_width and f_scale_height are now final */
@@ -1854,7 +1854,7 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
      id->p_encoder->fmt_in.video.i_width = i_dst_width;
      id->p_encoder->fmt_in.video.i_height = i_dst_height;
 
-     msg_Dbg( p_stream, "Source %ix%i, crop %ix%i, "
+     msg_Dbg( p_stream, "source %ix%i, crop %ix%i, "
                         "destination %ix%i, padding %ix%i",
          i_src_width, i_src_height,
          p_sys->i_crop_width, p_sys->i_crop_height,

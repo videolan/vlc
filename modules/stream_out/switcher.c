@@ -399,7 +399,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
         if ( i == MAX_AUDIO )
         {
-            msg_Err( p_stream, "too many audio streams !" );
+            msg_Err( p_stream, "too many audio streams!" );
             free( id );
             return NULL;
         }

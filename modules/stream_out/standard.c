@@ -44,25 +44,20 @@
 #define MUX_LONGTEXT N_( \
     "Allows you to specify the output muxer method used for the streaming " \
     "output." )
-#define URL_TEXT N_("Output URL (deprecated)")
-#define URL_LONGTEXT N_( \
-    "Allows you to specify the output URL used for the streaming output." \
-    "Deprecated, use dst instead." )
-
 #define DST_TEXT N_("Output destination")
 #define DST_LONGTEXT N_( \
     "Allows you to specify the output destination used for the streaming output." )
 
 #define NAME_TEXT N_("Session name")
 #define NAME_LONGTEXT N_( \
-    "Name of the session that will be announced with SAP" )
+    "Name of the session that will be announced with SAP." )
 
 #define GROUP_TEXT N_("Session groupname")
 #define GROUP_LONGTEXT N_( \
-    "Name of the group that will be announced for the session" )
+    "Name of the group that will be announced for the session." )
 
 #define SAP_TEXT N_("SAP announcing")
-#define SAP_LONGTEXT N_("Announce this session with SAP")
+#define SAP_LONGTEXT N_("Announce this session with SAP.")
 
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
