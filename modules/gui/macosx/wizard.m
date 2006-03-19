@@ -1174,12 +1174,12 @@ static VLCWizard *_o_sharedInstance = nil;
                 NSBeginInformationalAlertSheet(_NS("No file selected"), \
                     _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
                     [NSString stringWithFormat: @"%@\n\n%@", _NS("A file " \
-                    "where to save the stream has to be selected."), 
+                    "where to save the stream has to be selected."),
                     _NS("Enter either a valid path or use the \"Choose\" " \
                     "button to select a location")]);
         } else {
             /* create a string containing the requested suffix for later usage */
-            NSString * theEncapFormat = [[o_encapFormats objectAtIndex: \ 
+            NSString * theEncapFormat = [[o_encapFormats objectAtIndex:
                 [[o_userSelections objectForKey:@"encapFormat"] intValue]] \
                 objectAtIndex:0];
             if( theEncapFormat == @"ps" )
@@ -1756,10 +1756,10 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     /* enable/disable the respective items */
     if([o_t4_ckb_audio state] == NSOnState)
-   
+    {
         [o_t4_pop_audioCodec setEnabled:YES];
         [o_t4_pop_audioBitrate setEnabled:YES];
-        [o_t4_txt_hintAudio setStringValue: _NS("Select your audio codec. "\
+        [o_t4_txt_hintAudio setStringValue: _NS("Select your audio codec. " \
         "Click one to get more information.")];
     } else {
         [o_t4_pop_audioCodec setEnabled:NO];
