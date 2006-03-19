@@ -64,9 +64,9 @@ static void Close( vlc_object_t * );
     "value should be set in millisecond units." )
 
 #define KASENNA_TEXT N_( "Kasenna RTSP dialect")
-#define KASENNA_LONGTEXT N_( "Kasenna server speak an old and unstandard " \
+#define KASENNA_LONGTEXT N_( "Kasenna servers use an old and unstandard " \
     "dialect of RTSP. When you set this parameter, VLC will try this dialect "\
-    "for communication. In this mode you cannot talk to normal RTSP servers." )
+    "for communication. In this mode you cannot connect to normal RTSP servers." )
 
 vlc_module_begin();
     set_description( _("RTP/RTSP/SDP demuxer (using Live555.com)" ) );
@@ -115,6 +115,7 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+
 typedef struct
 {
     demux_t     *p_demux;
@@ -140,6 +141,14 @@ typedef struct
     mtime_t      i_pts;
 
 } live_track_t;
+
+struct timeout_thread_t
+{
+    VLC_COMMON_MEMBERS
+
+    int64_t      i_remain;
+    demux_sys_t  *p_sys;
+};
 
 struct demux_sys_t
 {
@@ -168,6 +177,11 @@ struct demux_sys_t
     mtime_t          i_length;
     mtime_t          i_start;
 
+    /* timeout thread information */
+    int              i_timeout;     /* session timeout value in seconds */
+    vlc_bool_t       b_timeout_call;/* mark to send an RTSP call to prevent server timeout */
+    timeout_thread_t *p_timeout;    /* the actual thread that makes sure we don't timeout */
+
     /* */
     vlc_bool_t       b_multicast;   /* true if one of the tracks is multicasted */
     vlc_bool_t       b_no_data;     /* true if we never receive any data */
@@ -180,13 +194,14 @@ static int Demux  ( demux_t * );
 static int Control( demux_t *, int, va_list );
 
 static int ParseASF( demux_t * );
-
 static int RollOverTcp( demux_t * );
 
 static void StreamRead( void *, unsigned int, unsigned int,
                         struct timeval, unsigned int );
 static void StreamClose( void * );
 static void TaskInterrupt( void * );
+
+static void TimeoutPrevention( timeout_thread_t * );
 
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1117756800
 static unsigned char* parseH264ConfigStr( char const* configStr,
@@ -251,6 +266,9 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->p_out_asf = NULL;
     p_sys->b_no_data = VLC_TRUE;
     p_sys->i_no_data_ti = 0;
+    p_sys->p_timeout = NULL;
+    p_sys->i_timeout = 0;
+    p_sys->b_timeout_call = VLC_FALSE;
     p_sys->b_multicast = VLC_FALSE;
     p_sys->psz_path = strdup(p_demux->psz_path);
 
@@ -425,6 +443,27 @@ static int  Open ( vlc_object_t *p_this )
             msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
             delete iter;
             goto error;
+        }
+
+        /* Retrieve the timeout value and set up a timeout prevention thread */
+#ifdef LIVEMEDIA_LIBRARY_VERSION_INT > 1138250000
+        p_sys->i_timeout = p_sys->rtsp->sessionTimeoutParameter();
+#endif
+        if( p_sys->i_timeout > 0 )
+        {
+            msg_Dbg( p_demux, "We have a timeout of %d seconds",  p_sys->i_timeout );
+            p_sys->p_timeout = (timeout_thread_t *)vlc_object_create( p_demux, sizeof(timeout_thread_t) );
+            p_sys->p_timeout->p_sys = p_demux->p_sys; /* lol, object recursion :D */
+            if( vlc_thread_create( p_sys->p_timeout, "liveMedia-timeout", TimeoutPrevention,
+                                   VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
+            {
+                msg_Err( p_demux, "cannot spawn liveMedia timeout thread" );
+                delete iter;
+                vlc_object_destroy( p_sys->p_timeout );
+                goto error;
+            }
+            msg_Dbg( p_demux, "spawned timeout thread" );
+            vlc_object_attach( p_sys->p_timeout, p_demux );
         }
     }
 
@@ -700,6 +739,13 @@ error:
     if( p_sys->ms ) Medium::close( p_sys->ms );
     if( p_sys->rtsp ) Medium::close( p_sys->rtsp );
     if( p_sys->env ) RECLAIM_ENV(p_sys->env);
+    if( p_sys->p_timeout )
+    {
+        p_sys->p_timeout->b_die = VLC_TRUE;
+        vlc_thread_join( p_sys->p_timeout );
+        vlc_object_detach( p_sys->p_timeout );
+        vlc_object_destroy( p_sys->p_timeout );
+    }
     if( p_sys->scheduler ) delete p_sys->scheduler;
     if( p_sys->p_sdp ) free( p_sys->p_sdp );
     if( p_sys->psz_path ) free( p_sys->psz_path );
@@ -737,6 +783,14 @@ static void Close( vlc_object_t *p_this )
 
     Medium::close( p_sys->ms );
 
+    if( p_sys->p_timeout )
+    {
+        p_sys->p_timeout->b_die = VLC_TRUE;
+        vlc_thread_join( p_sys->p_timeout );
+        vlc_object_detach( p_sys->p_timeout );
+        vlc_object_destroy( p_sys->p_timeout );
+    }
+
     if( p_sys->rtsp ) Medium::close( p_sys->rtsp );
     if( p_sys->env ) RECLAIM_ENV(p_sys->env);
     if( p_sys->scheduler ) delete p_sys->scheduler;
@@ -756,6 +810,14 @@ static int Demux( demux_t *p_demux )
     vlc_bool_t      b_send_pcr = VLC_TRUE;
     mtime_t         i_pcr = 0;
     int             i;
+
+    /* Check if we need to send the server a Keep-A-Live signal */
+    if( p_sys->b_timeout_call && p_sys->rtsp && p_sys->ms )
+    {
+        char *psz_bye = NULL;
+        p_sys->rtsp->getMediaSessionParameter( *p_sys->ms, NULL, psz_bye );
+        p_sys->b_timeout_call = VLC_FALSE;
+    }
 
     for( i = 0; i < p_sys->i_track; i++ )
     {
@@ -1312,6 +1374,32 @@ static void TaskInterrupt( void *p_private )
 
     /* Avoid lock */
     p_demux->p_sys->event = 0xff;
+}
+
+/*****************************************************************************
+ *  
+ *****************************************************************************/
+static void TimeoutPrevention( timeout_thread_t *p_timeout )
+{
+    p_timeout->b_die = VLC_FALSE;
+    p_timeout->i_remain = (int64_t)p_timeout->p_sys->i_timeout -2;
+    p_timeout->i_remain *= 1000000;
+
+    vlc_thread_ready( p_timeout );
+    
+    /* Avoid lock */
+    while( !p_timeout->b_die )
+    {
+        if( p_timeout->i_remain <= 0 )
+        {
+            p_timeout->i_remain = (int64_t)p_timeout->p_sys->i_timeout -2;
+            p_timeout->i_remain *= 1000000;
+            p_timeout->p_sys->b_timeout_call = VLC_TRUE;
+            msg_Dbg( p_timeout, "reset the timeout timer" );
+        }
+        p_timeout->i_remain -= 200000;
+        msleep( 200000 ); /* 200 ms */
+    }
 }
 
 /*****************************************************************************
