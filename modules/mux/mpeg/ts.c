@@ -101,8 +101,14 @@ static void    Close  ( vlc_object_t * );
 #define SDTDESC_TEXT N_("SDT Descriptors (requires --sout-ts-es-id-pid)")
 #define SDTDESC_LONGTEXT N_("Defines the descriptors of each SDT" )
 
-#define PID_TEXT N_("Set PID to id of ES")
-#define PID_LONGTEXT N_("set PID to id of es")
+#define PID_TEXT N_("Set PID to ID of ES")
+#define PID_LONGTEXT N_("Sets PID to the ID if the incoming ES. This is for " \
+  "use with --ts-es-id-pid, and allows to have the same PIDs in the input " \
+  "and output streams.")
+
+#define ALIGNMENT_TEXT N_("Data alignment")
+#define ALIGNMENT_LONGTEXT N_("Enforces alignment of all access units on " \
+  "PES boundaries. This is a waste of bandwidth.")
 
 #define SHAPING_TEXT N_("Shaping delay (ms)")
 #define SHAPING_LONGTEXT N_("If enabled, the TS muxer will cut the " \
@@ -186,6 +192,8 @@ vlc_module_begin();
 #ifdef HAVE_DVBPSI_SDT
     add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, VLC_TRUE );
 #endif
+    add_bool( SOUT_CFG_PREFIX "alignment", 0, NULL, ALIGNMENT_TEXT,
+              ALIGNMENT_LONGTEXT, VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL,SHAPING_TEXT,
                  SHAPING_LONGTEXT, VLC_TRUE );
@@ -220,7 +228,7 @@ static const char *ppsz_sout_options[] = {
     "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "netid",
     "es-id-pid", "shaping", "pcr", "bmin", "bmax", "use-key-frames",
     "dts-delay", "csa-ck", "csa-pkt", "crypt-audio", "crypt-video",
-    "muxpmt", "sdtdesc", "program-pmt",
+    "muxpmt", "sdtdesc", "program-pmt", "alignment",
     NULL
 };
 
@@ -359,6 +367,7 @@ struct sout_mux_sys_t
     pmt_map_t       pmtmap[MAX_PMT_PID];
     int             i_pmt_program_number[MAX_PMT];
     sdt_desc_t      sdt_descriptors[MAX_PMT];
+    vlc_bool_t      b_data_alignment;
 
     int             i_mpeg4_streams;
 
@@ -608,6 +617,9 @@ static int Open( vlc_object_t *p_this )
 #else
     p_sys->b_sdt = VLC_FALSE;
 #endif
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "alignment", &val );
+    p_sys->b_data_alignment = val.b_bool;
 
     var_Get( p_mux, SOUT_CFG_PREFIX "program-pmt", &val );
     if( val.psz_string && *val.psz_string )
@@ -1317,7 +1329,7 @@ static int Mux( sout_mux_t *p_mux )
                     }
                     b_ok = VLC_FALSE;
 
-                    if( p_stream == p_pcr_stream
+                    if( p_stream == p_pcr_stream || p_sys->b_data_alignment
                          || p_input->p_fmt->i_codec !=
                              VLC_FOURCC('m', 'p', 'g', 'a') )
                         p_data = block_FifoGet( p_input->p_fifo );
