@@ -197,6 +197,7 @@ function toggle_show_node( id )
 }
 
 function show( id ){ document.getElementById( id ).style.display = 'block'; }
+function showinline( id ){ document.getElementById( id ).style.display = 'inline'; }
 
 function hide( id ){ document.getElementById( id ).style.display = 'none'; }
 
