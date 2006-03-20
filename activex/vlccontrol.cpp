@@ -288,25 +288,14 @@ STDMETHODIMP VLCControl::get_Volume(int *volume)
     if( NULL == volume )
         return E_POINTER;
 
-    int i_vlc = _p_instance->getVLCObject();
-    if( i_vlc )
-    {
-        *volume  = VLC_VolumeGet(i_vlc);
-        return NOERROR;
-    }
-    *volume = 0;
-    return E_UNEXPECTED;
+    *volume  = _p_instance->getVolume();
+    return NOERROR;
 };
         
 STDMETHODIMP VLCControl::put_Volume(int volume)
 {
-    int i_vlc = _p_instance->getVLCObject();
-    if( i_vlc )
-    {
-        VLC_VolumeSet(i_vlc, volume);
-        return NOERROR;
-    }
-    return E_UNEXPECTED;
+    _p_instance->setVolume(volume);
+    return NOERROR;
 };
         
 STDMETHODIMP VLCControl::toggleMute(void)

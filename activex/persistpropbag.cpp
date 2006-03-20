@@ -161,11 +161,10 @@ STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErr
         }
     }
 
-    int i_vlc = _p_instance->getVLCObject();
     V_VT(&value) = VT_I4;
     if( S_OK == pPropBag->Read(OLESTR("volume"), &value, pErrorLog) )
     {
-        VLC_VolumeSet(i_vlc, V_I4(&value));
+        _p_instance->setVolume(V_I4(&value));
         VariantClear(&value);
     }
     return _p_instance->onLoad();
@@ -208,14 +207,10 @@ STDMETHODIMP VLCPersistPropertyBag::Save(LPPROPERTYBAG pPropBag, BOOL fClearDirt
     pPropBag->Write(OLESTR("Visible"), &value);
     VariantClear(&value);
 
-    int i_vlc = _p_instance->getVLCObject();
-    if( i_vlc )
-    {
-        V_VT(&value) = VT_I4;
-        V_I4(&value) = VLC_VolumeGet(i_vlc);
-        pPropBag->Write(OLESTR("Volume"), &value);
-        VariantClear(&value);
-    }
+    V_VT(&value) = VT_I4;
+    V_I4(&value) = _p_instance->getVolume();
+    pPropBag->Write(OLESTR("Volume"), &value);
+    VariantClear(&value);
 
     if( fClearDirty )
         _p_instance->setDirty(FALSE);

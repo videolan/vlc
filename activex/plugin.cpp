@@ -244,15 +244,11 @@ STDMETHODIMP VLCPluginClass::LockServer(BOOL fLock)
 
 VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
     _inplacewnd(NULL),
+    _videownd(NULL),
     _p_class(p_class),
     _i_ref(1UL),
     _i_codepage(CP_ACP),
     _b_usermode(TRUE),
-    _bstr_mrl(NULL),
-    _b_autoplay(TRUE),
-    _b_autoloop(FALSE),
-    _b_visible(TRUE),
-    _b_mute(FALSE),
     _i_vlc(0)
 {
     p_class->AddRef();
@@ -277,12 +273,8 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
     // default picure
     _p_pict = p_class->getInPlacePict();
 
-    // set default/preferred size (320x240) pixels in HIMETRIC
-    HDC hDC = CreateDevDC(NULL);
-    _extent.cx = 320;
-    _extent.cy = 240;
-    HimetricFromDP(hDC, (LPPOINT)&_extent, 1);
-    DeleteDC(hDC);
+    // make sure that persistable properties are initialized
+    onInit();
 };
 
 VLCPlugin::~VLCPlugin()
@@ -474,61 +466,20 @@ HRESULT VLCPlugin::onInit(void)
 {
     if( 0 == _i_vlc )
     {
-        _i_vlc = VLC_Create();
-        if( _i_vlc < 0 )
-        {
-            _i_vlc = 0;
-            return E_FAIL;
-        }
+        // initialize persistable properties
+        _bstr_mrl = NULL;
+        _b_autoplay = TRUE;
+        _b_autoloop = FALSE;
+        _b_visible = TRUE;
+        _b_mute = FALSE;
+        _i_volume = 50;
+        // set default/preferred size (320x240) pixels in HIMETRIC
+        HDC hDC = CreateDevDC(NULL);
+        _extent.cx = 320;
+        _extent.cy = 240;
+        HimetricFromDP(hDC, (LPPOINT)&_extent, 1);
+        DeleteDC(hDC);
 
-        /*
-        ** default initialization options
-        */
-        char *ppsz_argv[10] = { "vlc", "-vv" };
-        int   ppsz_argc = 2;
-
-        HKEY h_key;
-        DWORD i_type, i_data = MAX_PATH + 1;
-        char p_data[MAX_PATH + 1];
-        if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\\VideoLAN\\VLC",
-                          0, KEY_READ, &h_key ) == ERROR_SUCCESS )
-        {
-             if( RegQueryValueEx( h_key, "InstallDir", 0, &i_type,
-                                  (LPBYTE)p_data, &i_data ) == ERROR_SUCCESS )
-             {
-                 if( i_type == REG_SZ )
-                 {
-                     strcat( p_data, "\\vlc" );
-                     ppsz_argv[0] = p_data;
-                 }
-             }
-             RegCloseKey( h_key );
-        }
-
-#if 0
-        ppsz_argv[0] = "C:\\cygwin\\home\\Damien_Fouilleul\\dev\\videolan\\vlc-trunk\\vlc";
-#endif
-
-        if( IsDebuggerPresent() )
-        {
-            /*
-            ** VLC default threading mechanism is designed to be as compatible
-            ** with POSIX as possible, however when debugged on win32, threads
-            ** lose signals and eventually VLC get stuck during initialization.
-            ** threading support can be configured to be more debugging friendly
-            ** but it will be less compatible with POSIX.
-            ** This is done by initializing with the following options
-            */
-            ppsz_argv[ppsz_argc++] = "--fast-mutex";
-            ppsz_argv[ppsz_argc++] = "--win9x-cv-method=1";
-        }
-
-        if( VLC_Init(_i_vlc, ppsz_argc, ppsz_argv) )
-        {
-            VLC_Destroy(_i_vlc);
-            _i_vlc = 0;
-            return E_FAIL;
-        }
         return S_OK;
     }
     return CO_E_ALREADYINITIALIZED;
@@ -536,9 +487,6 @@ HRESULT VLCPlugin::onInit(void)
 
 HRESULT VLCPlugin::onLoad(void)
 {
-    if( _b_mute )
-        VLC_VolumeMute(_i_vlc);
-
     if( SysStringLen(_bstr_mrl) > 0 )
     {
         /*
@@ -585,23 +533,91 @@ HRESULT VLCPlugin::onLoad(void)
             }
             pClientSite->Release();
         }
+    }
+    setDirty(FALSE);
+    return S_OK;
+};
+
+HRESULT VLCPlugin::onRun(void)
+{
+    if( ! isRunning() )
+    {
+        _i_vlc = VLC_Create();
+        if( _i_vlc < 0 )
+        {
+            _i_vlc = 0;
+            return E_FAIL;
+        }
+
+        /*
+        ** default initialization options
+        */
+        char *ppsz_argv[10] = { "vlc", };
+        int   ppsz_argc = 1;
+
+        HKEY h_key;
+        DWORD i_type, i_data = MAX_PATH + 1;
+        char p_data[MAX_PATH + 1];
+        if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\\VideoLAN\\VLC",
+                          0, KEY_READ, &h_key ) == ERROR_SUCCESS )
+        {
+             if( RegQueryValueEx( h_key, "InstallDir", 0, &i_type,
+                                  (LPBYTE)p_data, &i_data ) == ERROR_SUCCESS )
+             {
+                 if( i_type == REG_SZ )
+                 {
+                     strcat( p_data, "\\vlc" );
+                     ppsz_argv[0] = p_data;
+                 }
+             }
+             RegCloseKey( h_key );
+        }
+
+#if 1
+        ppsz_argv[0] = "C:\\cygwin\\home\\Damien_Fouilleul\\dev\\videolan\\vlc-trunk\\vlc";
+#endif
+
+        // make sure plugin isn't affected with VLC single instance mode
+        ppsz_argv[ppsz_argc++] = "--no-one-instance";
+
+        // loop mode is a configuration option only
+        if( _b_autoloop )
+            ppsz_argv[ppsz_argc++] = "--loop";
+
+        if( IsDebuggerPresent() )
+        {
+            /*
+            ** VLC default threading mechanism is designed to be as compatible
+            ** with POSIX as possible, however when debugged on win32, threads
+            ** lose signals and eventually VLC get stuck during initialization.
+            ** threading support can be configured to be more debugging friendly
+            ** but it will be less compatible with POSIX.
+            ** This is done by initializing with the following options
+            */
+            ppsz_argv[ppsz_argc++] = "--fast-mutex";
+            ppsz_argv[ppsz_argc++] = "--win9x-cv-method=1";
+        }
+
+        if( VLC_Init(_i_vlc, ppsz_argc, ppsz_argv) )
+        {
+            VLC_Destroy(_i_vlc);
+            _i_vlc = 0;
+            return E_FAIL;
+        }
+
+        VLC_VolumeSet(_i_vlc, _i_volume);
+
+        if( _b_mute )
+            VLC_VolumeMute(_i_vlc);
 
         char *psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
         if( NULL != psz_mrl )
         {
             // add default target to playlist
-            char *cOptions[1];
-            int  cOptionsCount = 0;
-
-            if( _b_autoloop )
-            {
-                cOptions[cOptionsCount++] = "loop";
-            }
-            VLC_AddTarget(_i_vlc, psz_mrl, (const char **)&cOptions, cOptionsCount, PLAYLIST_APPEND, PLAYLIST_END);
+            VLC_AddTarget(_i_vlc, psz_mrl, NULL, 0, PLAYLIST_APPEND, PLAYLIST_END);
             CoTaskMemFree(psz_mrl);
         }
     }
-    setDirty(FALSE);
     return S_OK;
 };
 
@@ -665,9 +681,9 @@ HRESULT VLCPlugin::onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID)
         case DISPID_AMBIENT_TOPTOBOTTOM:
             break;
         case DISPID_UNKNOWN:
-        /*
-        ** multiple property change, look up the ones we are interested in
-        */
+            /*
+            ** multiple property change, look up the ones we are interested in
+            */
             VariantInit(&v);
             V_VT(&v) = VT_BOOL;
             if( SUCCEEDED(GetObjectProperty(pContainer, DISPID_AMBIENT_USERMODE, v)) )
@@ -687,15 +703,15 @@ HRESULT VLCPlugin::onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID)
 
 HRESULT VLCPlugin::onClose(DWORD dwSaveOption)
 {
-    if( _i_vlc )
+    if( isInPlaceActive() )
+    {
+        onInPlaceDeactivate();
+    }
+    if( isRunning() )
     {
         int i_vlc = _i_vlc;
 
         _i_vlc = 0;
-        if( isInPlaceActive() )
-        {
-            onInPlaceDeactivate();
-        }
         vlcDataObject->onClose();
 
         VLC_CleanUp(i_vlc);
@@ -778,30 +794,41 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
     if( getVisible() )
         ShowWindow(_inplacewnd, SW_SHOW);
 
-    /* set internal video width and height */
-    vlc_value_t val;
-    val.i_int = posRect.right-posRect.left;
-    VLC_VariableSet(_i_vlc, "conf::width", val);
-    val.i_int = posRect.bottom-posRect.top;
-    VLC_VariableSet(_i_vlc, "conf::height", val);
-
-    /* set internal video parent window */
-    /* horrible cast there */
-    val.i_int = reinterpret_cast<int>(_videownd);
-    VLC_VariableSet(_i_vlc, "drawable", val);
-
-    if( _b_usermode && _b_autoplay & (VLC_PlaylistNumberOfItems(_i_vlc) > 0) )
+    if( _b_usermode )
     {
-        VLC_Play(_i_vlc);
-        fireOnPlayEvent();
+        /* run vlc if not done already */
+        HRESULT result = onRun();
+        if( FAILED(result) )
+            return result;
+
+        /* set internal video width and height */
+        vlc_value_t val;
+        val.i_int = posRect.right-posRect.left;
+        VLC_VariableSet(_i_vlc, "conf::width", val);
+        val.i_int = posRect.bottom-posRect.top;
+        VLC_VariableSet(_i_vlc, "conf::height", val);
+
+        /* set internal video parent window */
+        /* horrible cast there */
+        val.i_int = reinterpret_cast<int>(_videownd);
+        VLC_VariableSet(_i_vlc, "drawable", val);
+
+        if( _b_autoplay & (VLC_PlaylistNumberOfItems(_i_vlc) > 0) )
+        {
+            VLC_Play(_i_vlc);
+            fireOnPlayEvent();
+        }
     }
     return S_OK;
 };
 
 HRESULT VLCPlugin::onInPlaceDeactivate(void)
 {
-    VLC_Stop(_i_vlc);
-    fireOnStopEvent();
+    if( isRunning() )
+    {
+        VLC_Stop(_i_vlc);
+        fireOnStopEvent();
+    }
 
     DestroyWindow(_videownd);
     _videownd = NULL;
@@ -819,8 +846,29 @@ void VLCPlugin::setVisible(BOOL fVisible)
         if( isInPlaceActive() )
         {
             ShowWindow(_inplacewnd, fVisible ? SW_SHOW : SW_HIDE);
+            if( fVisible )
+                InvalidateRect(_videownd, NULL, TRUE);
         }
+        setDirty(TRUE);
         firePropChangedEvent(DISPID_Visible);
+    }
+};
+
+void VLCPlugin::setVolume(int volume)
+{
+    if( volume < 0 )
+        volume = 0;
+    else if( volume > 200 )
+        volume = 200;
+
+    if( volume != _i_volume )
+    {
+        _i_volume = volume;
+        if( isRunning() )
+        {
+            VLC_VolumeSet(_i_vlc, _i_volume);
+        }
+        setDirty(TRUE);
     }
 };
 

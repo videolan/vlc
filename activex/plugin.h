@@ -109,6 +109,9 @@ public:
     };
     inline BOOL getAutoLoop(void) { return _b_autoloop;};
 
+    void setVolume(int volume);
+    BOOL getVolume(void) { return _i_volume; };
+
     void setVisible(BOOL fVisible);
     BOOL getVisible(void) { return _b_visible; };
 
@@ -172,6 +175,7 @@ public:
     */
     HRESULT onInit(void);
     HRESULT onLoad(void);
+    HRESULT onRun(void);
     HRESULT onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprcPosRect, LPCRECT lprcClipRect);
     HRESULT onInPlaceDeactivate(void);
     HRESULT onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID);
@@ -222,19 +226,21 @@ private:
     VLCPluginClass *_p_class;
     ULONG _i_ref;
 
-    LPPICTURE _p_pict;
     UINT _i_codepage;
     BOOL _b_usermode;
+    int  _i_vlc;
+    RECT _posRect;
+
+    // persistable properties
     BSTR _bstr_mrl;
     BOOL _b_autoplay;
     BOOL _b_autoloop;
     BOOL _b_visible;
     BOOL _b_mute;
     BOOL _b_dirty;
-    int  _i_vlc;
-
+    int  _i_volume;
     SIZEL _extent;
-    RECT _posRect;
+    LPPICTURE _p_pict;
 };
 
 #endif

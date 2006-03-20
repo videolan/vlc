@@ -11,12 +11,17 @@ MRL:
 <!--
 Insert VideoLAN.VLCPlugin.1 activex control
 -->
-<OBJECT classid="clsid:E23FE9C6-778E-49D4-B537-38FCDE4887D8" codebase="http://downloads.videolan.org/pub/videolan/vlc/latest/win32/axvlc.cab#Version=0,8,4,0"
-        width="640" height="480" id="vlc" events="True">
+<OBJECT classid="clsid:E23FE9C6-778E-49D4-B537-38FCDE4887D8"
+        codebase="http://downloads.videolan.org/pub/videolan/vlc/latest/win32/axvlc.cab#Version=0,8,4,0"
+        width="640"
+        height="480"
+        id="vlc"
+        events="True">
 <param name="MRL" value="" />
 <param name="ShowDisplay" value="True" />
 <param name="AutoLoop" value="False" />
 <param name="AutoPlay" value="False" />
+<param name="Volume" value="50" />
 </OBJECT>
 </TD></TR>
 <TR><TD>
@@ -24,7 +29,10 @@ Insert VideoLAN.VLCPlugin.1 activex control
 Insert MSComctlLib.Slider.2 activex control
 -->
 <OBJECT classid="clsid:F08DF954-8592-11D1-B16A-00C0F0283628"
-        width="540" height="20" id="slider" events="True">
+        width="540"
+        height="20"
+        id="slider"
+        events="True">
 <param name="TickStyle" value="3" />
 <param name="Min" value="0" />
 <param name="Max" value="0" />
@@ -37,19 +45,40 @@ Insert MSComctlLib.Slider.2 activex control
 <TR><TD colspan="2">
 <INPUT type=button id="PlayOrPause" value=" Play " onClick='doPlayOrPause()'>
 <INPUT type=button value="Stop" onClick='document.vlc.stop();'>
+&nbsp;
 <INPUT type=button value=" << " onClick='document.vlc.playSlower();'>
 <INPUT type=button value=" >> " onClick='document.vlc.playFaster();'>
-<INPUT type=button value="Mute" onClick='document.vlc.toggleMute();'>
+&nbsp;
 <INPUT type=button value="Show" onClick='document.vlc.Visible = true;'>
 <INPUT type=button value="Hide" onClick='document.vlc.Visible = false;'>
+&nbsp;
 <INPUT type=button value="Version" onClick='alert(document.vlc.VersionInfo);'>
-</TD></TR>
+<SPAN style="text-align:center">Volume:</SPAN>
+<INPUT type=button value=" - " onClick='updateVolume(-10)'>
+<SPAN id="volumeTextField" style="text-align: center">--</SPAN>
+<INPUT type=button value=" + " onClick='updateVolume(+10)'>
+<INPUT type=button value="Mute" onClick='document.vlc.toggleMute();'>
+</TD>
+</TR>
 </TABLE>
 <SCRIPT LANGUAGE="JScript">
 <!--
 var sliderTimerId = 0;
 var sliderScrolling = false;
 
+document.onreadystatechange=onVLCStateChange;
+function onVLCStateChange()
+{
+    if( document.readyState == 'complete' )
+    {
+        updateVolume(0);
+    }
+};
+function updateVolume(deltaVol)
+{
+    vlc.Volume += deltaVol;
+    volumeTextField.innerText = vlc.Volume+"%";
+};
 function formatTime(timeVal)
 {
     var timeHour = timeVal;
