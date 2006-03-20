@@ -49,7 +49,7 @@ function vlm_output_edit( dest )
 
 function vlm_output_change()
 {
-    document.getElementById( value( 'sout_dest' ) ).value = value( 'sout_mrl' ).substr(6); /* substr <-> remove :sout= */
+    document.getElementById( value( 'sout_dest' ) ).value = value( 'sout_mrl' ).substr(6).replace( /\ :/g, " option " ); /* substr <-> remove :sout= */
     hide( 'sout' );
     document.getElementById( value( 'sout_dest' ) ).focus();
 }
