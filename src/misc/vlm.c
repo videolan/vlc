@@ -260,19 +260,23 @@ int vlm_Load( vlm_t *p_vlm, const char *psz_file )
  *****************************************************************************/
 static const char *FindEndCommand( const char *psz_sent )
 {
+    vlc_bool_t b_escape = VLC_FALSE;
+
     switch( *psz_sent )
     {
     case '\"':
         psz_sent++;
-
         while( ( *psz_sent != '\"' ) && ( *psz_sent != '\0' ) )
         {
-            if( *psz_sent == '\'' )
+            if( *psz_sent == '\'' && b_escape == VLC_FALSE )
             {
                 psz_sent = FindEndCommand( psz_sent );
                 if( psz_sent == NULL ) return NULL;
             }
-            else psz_sent++;
+            else if( *psz_sent++ == '\\' && b_escape == VLC_FALSE )
+                b_escape = VLC_TRUE;
+            else
+                b_escape = VLC_FALSE;
         }
 
         if( *psz_sent == '\"' )
@@ -288,15 +292,17 @@ static const char *FindEndCommand( const char *psz_sent )
 
     case '\'':
         psz_sent++;
-
         while( ( *psz_sent != '\'' ) && ( *psz_sent != '\0' ) )
         {
-            if( *psz_sent == '\"' )
+            if( *psz_sent == '\"' && b_escape == VLC_FALSE )
             {
                 psz_sent = FindEndCommand( psz_sent );
                 if( psz_sent == NULL ) return NULL;
             }
-            else psz_sent++;
+            else if( *psz_sent++ == '\\' && b_escape == VLC_FALSE )
+                b_escape = VLC_TRUE;
+            else
+                b_escape = VLC_FALSE;
         }
 
         if( *psz_sent == '\'' )
@@ -313,12 +319,17 @@ static const char *FindEndCommand( const char *psz_sent )
     default: /* now we can look for spaces */
         while( ( *psz_sent != ' ' ) && ( *psz_sent != '\0' ) )
         {
-            if( ( *psz_sent == '\'' ) || ( *psz_sent == '\"' ) )
+            if( ( ( *psz_sent == '\'' ) || ( *psz_sent == '\"' ) )
+                && b_escape == VLC_FALSE )
             {
                 psz_sent = FindEndCommand( psz_sent );
                 if( psz_sent == NULL ) return NULL;
             }
-            else psz_sent++;
+            else if( *psz_sent++ == '\\' && b_escape == VLC_FALSE )
+                b_escape = VLC_TRUE;
+            else
+                b_escape = VLC_FALSE;
+
         }
 
         return psz_sent;
@@ -350,6 +361,9 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
         else
         {
             const char *psz_temp;
+            const char *psz_buf;
+            char *psz_dst;
+            vlc_bool_t b_escape = VLC_FALSE;
             int   i_temp;
 
             /* support for comments */
@@ -372,8 +386,23 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
             ppsz_command = realloc( ppsz_command, (i_command + 1) *
                                     sizeof(char*) );
             ppsz_command[ i_command ] = malloc( (i_temp + 1) * sizeof(char) );
-            strncpy( ppsz_command[ i_command ], psz_cmd, i_temp );
-            ppsz_command[ i_command ][ i_temp ] = '\0';
+
+            /* unescape ", ' and \ ... and everything else */
+            psz_buf = psz_cmd;
+            psz_dst = ppsz_command[ i_command ];
+            while( i_temp-- )
+            {
+                if( *psz_buf == '\\' && b_escape == VLC_FALSE )
+                    b_escape = VLC_TRUE;
+                else
+                {
+                    b_escape = VLC_FALSE;
+                    *psz_dst = *psz_buf;
+                    psz_dst++;
+                }
+                psz_buf++;
+            }
+            *psz_dst = '\0';
 
             i_command++;
 
