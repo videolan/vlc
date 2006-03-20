@@ -1,4 +1,3 @@
-import vlc
 import unittest
 
 import native_stats_test

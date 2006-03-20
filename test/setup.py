@@ -32,7 +32,7 @@ def get_ldflags():
 	ldflags = []
 	if os.sys.platform == 'darwin':
 	    ldflags = "-read_only_relocs warning".split()
-        ldflags.extend(os.popen('%s --libs vlc pic builtin' % vlcconfig, 'r').readline().rstrip().split())
+        ldflags.extend(os.popen('%s --libs vlc builtin' % vlcconfig, 'r').readline().rstrip().split())
 	if os.sys.platform == 'darwin':
 	    ldflags.append('-lstdc++')
         return ldflags
@@ -41,7 +41,7 @@ def get_ldflags():
 native_libvlc_test = Extension( 'native_libvlc_test',
                 sources = ['native/libvlc.c'],
                 include_dirs = ['../include', '../', '/usr/win32/include' ],
-                extra_objects = [ '../lib/libvlc_pic.a' ],
+                extra_objects = [ '../src/libvlc.a' ],
                 extra_compile_args = get_cflags(),
        		    extra_link_args = [ '-L../..' ]  + get_ldflags(),
                 )
@@ -49,7 +49,7 @@ native_libvlc_test = Extension( 'native_libvlc_test',
 native_stats_test = Extension( 'native_stats_test',
                 sources = ['native/stats.c'],
                 include_dirs = ['../include', '../', '/usr/win32/include' ],
-                extra_objects = [ '../lib/libvlc_pic.a' ],
+                extra_objects = [ '../src/libvlc.a' ],
                 extra_compile_args = get_cflags(),
        		    extra_link_args = [ '-L../..' ]  + get_ldflags(),
                 )
