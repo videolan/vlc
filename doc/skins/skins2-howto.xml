@@ -754,13 +754,13 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>dialogs.fileSimple()</emphasis>: Show the simple "Open File" dialog box.
   </para></listitem>
   <listitem><para>
-    <emphasis>dialog.file()</emphasis>: Show the "Open File" dialog box, with many options (stream output, subtitles, etc...).
+    <emphasis>dialogs.file()</emphasis>: Show the "Open File" dialog box, with many options (stream output, subtitles, etc...).
   </para></listitem>
   <listitem><para>
-    <emphasis>dialog.directory()</emphasis>: Show the "Open Directory" dialog box (new after VLC 0.8.2).
+    <emphasis>dialogs.directory()</emphasis>: Show the "Open Directory" dialog box (new after VLC 0.8.2).
   </para></listitem>
   <listitem><para>
-    <emphasis>dialog.disc()</emphasis>: Show the "Open Disc" dialog box.
+    <emphasis>dialogs.disc()</emphasis>: Show the "Open Disc" dialog box.
   </para></listitem>
   <listitem><para>
     <emphasis>dialogs.net()</emphasis>: Show the "Open Network Stream" dialog box.
