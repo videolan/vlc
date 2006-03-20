@@ -420,10 +420,36 @@ VLC-release.app: vlc
 	    $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/lib/`basename $${i}` ; \
 	  done ; \
 	fi
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http
-	for i in $(srcdir)/share/http/* ; do \
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/dialogs
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/admin
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/vlm
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/images
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests
+	for i in $(srcdir)/share/http/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/`basename $${i}` ; \
+	done ; \
+	for i in $(srcdir)/share/http/dialogs/* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/dialogs/`basename $${i}` ; \
+	done ; \
+	for i in $(srcdir)/share/http/js/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js/`basename $${i}` ; \
+	done ; \
+	for i in $(srcdir)/share/http/old/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/`basename $${i}` ; \
+	done ; \
+	for i in $(srcdir)/share/http/old/admin/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/admin/`basename $${i}` ; \
+	done ; \
+	for i in $(srcdir)/share/http/old/vlm/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/vlm/`basename $${i}` ; \
+	done ; \
+	for i in $(srcdir)/share/http/images/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/images/`basename $${i}` ; \
+	done ; \
+	for i in $(srcdir)/share/http/requests/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/`basename $${i}` ; \
 	done ; \
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/locale
 	for i in $(ALL_LINGUAS); do \
