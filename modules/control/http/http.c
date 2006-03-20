@@ -724,7 +724,7 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
         p = p_in;
         for ( ; ; )
         {
-            if( !strncmp( p, "Content-Type: ", strlen("Content-Type: ") ) )
+            if( !strncasecmp( p, "Content-Type: ", strlen("Content-Type: ") ) )
             {
                 char *end = strchr( p, '\r' );
                 if( end == NULL )
@@ -735,7 +735,8 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
                 TAB_APPEND( i_env, ppsz_env, psz_tmp );
                 *end = '\r';
             }
-            if( !strncmp( p, "Content-Length: ", strlen("Content-Length: ") ) )
+            if( !strncasecmp( p, "Content-Length: ",
+                              strlen("Content-Length: ") ) )
             {
                 char *end = strchr( p, '\r' );
                 if( end == NULL )
@@ -805,8 +806,8 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
         return VLC_SUCCESS;
     }
     p = p_buffer;
-    while( strncmp( p, "Content-Type: text/html",
-                    strlen("Content-Type: text/html") ) )
+    while( strncasecmp( p, "Content-Type: text/html",
+                        strlen("Content-Type: text/html") ) )
     {
         p = strchr( p, '\n' );
         if( p == NULL || p[1] == '\r' )

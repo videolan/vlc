@@ -30,6 +30,7 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
+#include <strings.h>
 #include <ctype.h>
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
