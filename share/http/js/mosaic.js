@@ -41,13 +41,18 @@ var mosaic_delay    = 0;
 var cell_width  = 0;
 var cell_height = 0;
 
-var streams = Object;
-var cells   = Object;
+var streams = Object();
+var cells   = Object();
 
 function mosaic_init()
 {
-    document.getElementById( 'sout_extra' ).value = ",sfilter=mosaic";
+    document.getElementById( 'sout_transcode_extra' ).value = ",sfilter=mosaic";
     mosaic_size_change();
+
+    /* Force usage of transcode in sout */
+    document.getElementById( 'sout_vcodec_s' ).checked = 'checked';
+    disable( 'sout_vcodec_s' );
+    update_sout();
 }
 
 function mosaic_size_change()

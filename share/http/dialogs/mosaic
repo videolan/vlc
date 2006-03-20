@@ -90,7 +90,7 @@ sout.
     <label for="mosaic_input_name">Name:</label> <input type="text" id="mosaic_input_name" value="" class="mosaic_itm" />
     <label for="mosaic_input">Input:</label> <input type="text" id="mosaic_input" value="" class="mosaic_itm" /> <input type="button" value="Edit" onclick="vlm_input_edit( 'mosaic_input' );" /> <input type="button" value="Add to input list" onclick="mosaic_add_input();" /><br/>
     <b>Stream:</b> (leave this empty to display locally)<br/>
-    <label for="mosaic_output">Output:</label> <input type="text" id="mosaic_output" value="" size="60" onvlur="mosaic_code_update();" /> <input type="button" value="Edit" onclick="vlm_output_edit( 'mosaic_output' );" /><br/>
+    <label for="mosaic_output">Output:</label> <input type="text" id="mosaic_output" value="" size="60" onblur="mosaic_code_update();" /> <input type="button" value="Edit" onclick="vlm_output_edit( 'mosaic_output' );" /><br/>
     <div id="mosaic_feedback"></div>
   </div>
   <div  id="mosaic_list" class="popup">[<a href="javascript:hide('mosaic_list');">hide</a>] - Select a stream:<br/><div id="mosaic_list_content"></div></div>

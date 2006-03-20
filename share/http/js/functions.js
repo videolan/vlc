@@ -688,6 +688,7 @@ function hide_input( )
     document.getElementById( 'input_file' ).style.display = 'none';
     document.getElementById( 'input_disc' ).style.display = 'none';
     document.getElementById( 'input_network' ).style.display = 'none';
+    document.getElementById( 'input_fake' ).style.display = 'none';
 }
 
 /* update the input MRL using data from the input file helper */
@@ -797,6 +798,22 @@ function update_input_net()
         mrl.value += " :access-filter=timeshift";
 }
 
+/* update the input MRL using data from the input fake helper */
+function update_input_fake()
+{
+    var mrl = document.getElementById( 'input_mrl' );
+
+    mrl.value = "fake:";
+    mrl.value += " :fake-file=" + value( "input_fake_filename" );
+
+    if( value( "input_fake_width" ) )
+        mrl.value += " :fake-width=" + value( "input_fake_width" );
+    if( value( "input_fake_height" ) )
+        mrl.value += " :fake-height=" + value( "input_fake_height" );
+    if( value( "input_fake_ar" ) )
+        mrl.value += " :fake-ar=" + value( "input_fake_ar" );
+}
+
 /**********************************************************************
  * Sout dialog functions
  *********************************************************************/
@@ -871,7 +888,7 @@ function update_sout()
             mrl.value += "scodec="+value( 'sout_scodec' );
             alot = true;
         }
-        mrl.value += value( 'sout_extra' );
+        mrl.value += value( 'sout_transcode_extra' );
             
         mrl.value += "}";
     }

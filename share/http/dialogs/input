@@ -56,6 +56,9 @@ This dialog needs the following dialogs to be fully functional: browse
     <button id="btn_network" onclick="hide_input();show('input_network');update_input_net();">
       Network
     </button>
+    <button id="btn_fake" onclick="hide_input();show('input_fake');update_input_fake();">
+      Fixed image
+    </button>
   </div>
   <div id="input_helper" class="helper" >
     <div id="input_file" style="display: block">
@@ -202,6 +205,20 @@ This dialog needs the following dialogs to be fully functional: browse
           <td></td>
         </tr>
       </table>
+    </div>
+    <div id="input_fake" style="display: none">
+      Fixed image stream (fake)
+      <hr/>
+      <label for="input_fake_filename">Image file name</label>
+      <input type="text" id="input_fake_filename" size="60" onchange="update_input_fake();" onfocus="update_input_fake();"/>
+      <input type="button" id="input_fake_browse" value="Browse" onclick="browse( 'input_fake_filename' );" />
+      <hr/>
+      <label for="input_fake_width">Width</label>
+      <input type="text" id="input_fake_width" size="8" onchange="update_input_fake();" />
+      <label for="input_fake_height">Height</label>
+      <input type="text" id="input_fake_height" size="8" onchange="update_input_fake();" />
+      <label for"input_fake_ar">Aspect ratio</label>
+      <input type="text" id="input_fake_ar" size="8" onchange="update_input_fake();" />
     </div>
   </div>
 </div>

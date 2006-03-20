@@ -157,6 +157,7 @@ Note that the sout chain is used and sent to VLC by the input dialog
     </div>
     <hr/>
     <div id="sout_transcode">
+      <input type="hidden" id="sout_transcode_extra" value="" />
       <table>
         <tr>
           <td>
@@ -289,6 +290,5 @@ Note that the sout chain is used and sent to VLC by the input dialog
       <label for="sout_ttl">Time-To-Live (TTL)</label>
       <input type="text" id="sout_ttl" onchange="update_sout()"/>
     </div>
-    <input type="hidden" id="sout_extra" value="" />
   </div>
 </div>

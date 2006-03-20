@@ -36,7 +36,7 @@ function vlm_input_edit( dest )
 
 function vlm_input_change()
 {
-    document.getElementById( value( 'input_dest' ) ).value = value( 'input_mrl' );
+    document.getElementById( value( 'input_dest' ) ).value = value( 'input_mrl' ).replace( /\ :/g, " option " );
     hide( 'input' );
     document.getElementById( value( 'input_dest' ) ).focus();
 }

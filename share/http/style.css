@@ -67,10 +67,11 @@ input, textarea {
 
 div.helper {
 	margin: 10px;
-	border: solid #ccc 2px;
+	padding: 10px 0px;
+	border: solid 1px #000;
 }
 div.helper hr {
-	border: solid #ccc 1px;
+	border: solid 1px #000;
 }
 
 div.title {
