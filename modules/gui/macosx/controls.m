@@ -605,7 +605,7 @@
 @end
 
 @implementation VLCControls (NSMenuValidation)
- 
+
 - (BOOL)validateMenuItem:(NSMenuItem *)o_mi
 {
     BOOL bEnabled = TRUE;
@@ -640,7 +640,7 @@
         {
             bEnabled = FALSE;
         }
-		[o_main setupMenus]; /* Make sure input menu is up to date */
+        [o_main setupMenus]; /* Make sure input menu is up to date */
     }
     else if( [[o_mi title] isEqualToString: _NS("Previous")] ||
              [[o_mi title] isEqualToString: _NS("Next")] )
@@ -669,18 +669,20 @@
         [o_mi setState: i_state];
     }
     else if( [[o_mi title] isEqualToString: _NS("Step Forward")] ||
-             [[o_mi title] isEqualToString: _NS("Step Backward")] )
+             [[o_mi title] isEqualToString: _NS("Step Backward")] ||
+             [[o_mi title] isEqualToString: _NS("Jump To Time")])
     {
         if( p_input != NULL )
         {
             var_Get( p_input, "seekable", &val);
             bEnabled = val.b_bool;
         }
+        else bEnabled = FALSE;
     }
-    else if( [[o_mi title] isEqualToString: _NS("Mute")] ) 
+    else if( [[o_mi title] isEqualToString: _NS("Mute")] )
     {
         [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
-		[o_main setupMenus]; /* Make sure audio menu is up to date */
+        [o_main setupMenus]; /* Make sure audio menu is up to date */
     }
     else if( [[o_mi title] isEqualToString: _NS("Half Size")] ||
                 [[o_mi title] isEqualToString: _NS("Normal Size")] ||
