@@ -112,7 +112,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOOBJ;
     }
 
+    /* Item's info changes */
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
+    /* We're playing a new item */
+    var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     vlc_object_release( p_playlist );
 
     p_intf->pf_run = Run;
@@ -135,6 +138,7 @@ static void Close( vlc_object_t *p_this )
 
     if( p_playlist )
     {
+        var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
         var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     }
 
