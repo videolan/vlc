@@ -1,10 +1,13 @@
 /*****************************************************************************
- * unicode.c: UTF8 <-> locale functions
+ * unicode.c: Unicode <-> locale functions
  *****************************************************************************
  * Copyright (C) 2005-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
+ *
+ * UTF16toUTF8() adapted from Perl 5 (also GPL'd)
+ * Copyright (C) 1998-2002, Larry Wall
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -655,9 +658,10 @@ error:
 }
 
 /**
- * UTF32toUTF8(): converts an array from UTF-32 to UTF-8.
+ * UTF32toUTF8(): converts an array from UTF-32 (host byte order)
+ * to UTF-8.
  *
- * @param src the UTF32 table to be converted
+ * @param src the UTF-32 table to be converted
  * @param len the number of code points to be converted from src
  * (ie. the number of uint32_t in the table pointed to by src)
  * @param newlen an optional pointer. If not NULL, *newlen will
@@ -666,7 +670,8 @@ error:
  * @return the result of the conversion (must be free'd())
  * or NULL on error (in that case, *newlen is undefined).
  */
-char *UTF32toUTF8( const uint32_t *src, size_t len, size_t *newlen )
+static char *
+UTF32toUTF8( const uint32_t *src, size_t len, size_t *newlen )
 {
     char *res, *out;
 
@@ -725,17 +730,111 @@ char *UTF32toUTF8( const uint32_t *src, size_t len, size_t *newlen )
 /**
  * FromUTF32(): converts an UTF-32 string to UTF-8.
  *
+ * @param src UTF-32 bytes sequence, aligned on a 32-bits boundary.
+ *
  * @return the result of the conversion (must be free()'d),
  * or NULL in case of error.
  */
 char *FromUTF32( const uint32_t *src )
 {
-    size_t len;
     const uint32_t *in;
+    size_t len;
 
     /* determine the size of the string */
-    for( len = 1, in = src; GetWBE( in ); len++ )
+    for( len = 1, in = src; *in; len++ )
         in++;
 
     return UTF32toUTF8( src, len, NULL );
+}
+
+/**
+ * UTF16toUTF8: converts UTF-16 (host byte order) to UTF-8
+ *
+ * @param src UTF-16 bytes sequence, aligned on a 16-bits boundary
+ * @param len number of uint16_t to convert
+ */
+static char *
+UTF16toUTF8( const uint16_t *in, size_t len, size_t *newlen )
+{
+    char *res, *out;
+
+    /* allocate memory */
+    out = res = (char *)malloc( 3 * len );
+    if( res == NULL )
+        return NULL;
+
+    while( len > 0 )
+    {
+        uint32_t uv = *in;
+
+        in++;
+        len--;
+
+        if( uv < 0x80 )
+        {
+            *out++ = uv;
+            continue;
+        }
+        if( uv < 0x800 )
+        {
+            *out++ = (( uv >>  6)         | 0xc0);
+            *out++ = (( uv        & 0x3f) | 0x80);
+            continue;
+        }
+        if( (uv >= 0xd800) && (uv < 0xdbff) )
+        {   /* surrogates */
+            uint16_t low = GetWBE( in );
+            in++;
+            len--;
+
+            if( (low < 0xdc00) || (low >= 0xdfff) )
+            {
+                *out++ = '?'; /* Malformed surrogate */
+                continue;
+            }
+            else
+                uv = ((uv - 0xd800) << 10) + (low - 0xdc00) + 0x10000;
+        }
+        if( uv < 0x10000 )
+        {
+            *out++ = (( uv >> 12)         | 0xe0);
+            *out++ = (((uv >>  6) & 0x3f) | 0x80);
+            *out++ = (( uv        & 0x3f) | 0x80);
+            continue;
+        }
+        else
+        {
+            *out++ = (( uv >> 18)         | 0xf0);
+            *out++ = (((uv >> 12) & 0x3f) | 0x80);
+            *out++ = (((uv >>  6) & 0x3f) | 0x80);
+            *out++ = (( uv        & 0x3f) | 0x80);
+            continue;
+        }
+    }
+    len = out - res;
+    res = realloc( res, len );
+    if( newlen != NULL )
+        *newlen = len;
+    return res;
+}
+
+
+/**
+ * FromUTF16(): converts an UTF-16 string to UTF-8.
+ *
+ * @param src UTF-16 bytes sequence, aligned on a 16-bits boundary.
+ *
+ * @return the result of the conversion (must be free()'d),
+ * or NULL in case of error.
+ */
+char *FromUTF16( const uint16_t *src )
+{
+    const uint16_t *in;
+    size_t len;
+
+    /* determine the size of the string */
+    for( len = 1, in = src; *in; len++ )
+        in += 2;
+
+    return UTF16toUTF8( src, len, NULL );
 }
