@@ -66,9 +66,9 @@ public:
     void Clear();
 
 private:
-    wxMenu *Menu::CreateDummyMenu();
-    void   Menu::CreateMenuItem( wxMenu *, char *, vlc_object_t * );
-    wxMenu *Menu::CreateChoicesMenu( char *, vlc_object_t *, bool );
+    wxMenu *CreateDummyMenu();
+    void   CreateMenuItem( wxMenu *, char *, vlc_object_t * );
+    wxMenu *CreateChoicesMenu( char *, vlc_object_t *, bool );
 
     DECLARE_EVENT_TABLE();
 
