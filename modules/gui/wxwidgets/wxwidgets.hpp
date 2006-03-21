@@ -69,26 +69,44 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
  * I18N macros
  ***************************************************************************/
 
-/* wxU is used to convert ansi/utf8 strings to unicode strings (wchar_t) */
-#if defined( ENABLE_NLS )
+/*
+ * wxU() is used to convert UTF-8 strings (typically from gettext)
+ * to unicode strings (wchar_t).
+ */
 #if wxUSE_UNICODE
 #   define wxU(utf8) wxString(utf8, wxConvUTF8)
 #else
 #   define wxU(utf8) wxString(wxConvUTF8.cMB2WC(utf8), *wxConvCurrent)
 #endif
-#else // ENABLE_NLS
-#if wxUSE_UNICODE
-#   define wxU(ansi) wxString(ansi, wxConvLocal)
-#else
-#   define wxU(ansi) (ansi)
-#endif
-#endif
 
-/* wxL2U (locale to unicode) is used to convert ansi strings to unicode
- * strings (wchar_t) */
-#define wxL2U(ansi) wxU(ansi)
+/*
+ * wxL2U() use to convert localized “data” strings (while wxU() would convert
+ * strings from gettext messages). Nowadays, the core use UTF-8 internally
+ * and wxL2U() is only an obsoloted name for wxU().
+ */
+#define wxL2U(utf8) wxU(utf8)
 
 #if wxUSE_UNICODE
+/*
+ * Whoops, we assume that wchar_t is 32-bits and wide character encoding is
+ * UTF-32 (ok, both assumptions should de identical). This is not true on all
+ * platforms.
+ *
+ * On Windows, and possibly some other operating systems wchar_t is 16-bits,
+ * which means code points outside the Basic Multilingual Plane are encoded
+ * with surrogates as two subsequent wchar_t.
+ */
+#   ifdef WIN32
+/*
+ * Removing this #error without fixing the underlying problem is stricly
+ * FORBIDDEN. It would result in a _really_ completely unusable wxWidgets
+ * interface: all string operations would fail.
+ *
+ * Corrolary: Think twice, if not more, before you compile wxWidgets with
+ * Unicode on Windows.
+ */
+#       error FIXME: this is not **REALLY** going to work at all.
+#   endif
 #   define wxFromLocale(wxstring) FromUTF32(wxstring.wc_str())
 #   define wxLocaleFree(string) free(string)
 #else
