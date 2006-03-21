@@ -262,10 +262,17 @@ function clear_vlm_add()
 
 function create_button( caption, action )
 {
-    var link = document.createElement( "input" );
-    link.setAttribute( 'type', 'button' );
-    link.setAttribute( 'onclick', action );
-    link.setAttribute( 'value', caption );
+/*    var link = document.createElement( "input" );
+    link.setAttribute( 'type', 'button' );*/
+    /* link.setAttribute( 'onclick', action ); */
+    /* Above doesn't work on ie. You need to use something like
+     * link.onclick = function() { alert( 'pouet' ); };
+     * instead ... conclusion: IE is crap */
+   /* link.setAttribute( 'value', caption );*/
+
+    var d = document.createElement( 'div' );
+    d.innerHTML = "<input type='button' onclick='"+action+"' value='"+caption+"' />"; /* other IE work around  ... still crap. Use double quotes only in action */
+    var link = d.firstChild;
     return link;
 }
 function create_option( caption, value )
@@ -327,7 +334,7 @@ function parse_vlm_elements()
                 if( elt.nodeName == "broadcast" || elt.nodeName == "vod" )
                 {
                     var nb = document.createElement( 'div' );
-                    nb.setAttribute( 'class', 'list_element' );
+                    setclass( nb, 'list_element' );
                     if( elt.nodeName == "broadcast" )
                     {
                         vlmb.appendChild( nb );
@@ -340,41 +347,31 @@ function parse_vlm_elements()
                     nbname.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                     nb.appendChild( nbname );
                     
-                    var link = document.createElement( 'input' );
-                    link.setAttribute( 'type', 'button' );
                     if( elt.getAttribute( 'enabled' ) == 'yes' )
                     {
                         nb.appendChild( document.createTextNode( " enabled " ) );
-                        link.setAttribute( 'onclick', 'vlm_disable("'+elt.getAttribute( 'name' ) + '");' );
-                        link.setAttribute( 'value', "Disable" );
+                        nb.appendChild( create_button( "Disable", 'vlm_disable("'+elt.getAttribute( 'name' ) + '");' ) );
                     }
                     else
                     {
                         nb.appendChild( document.createTextNode( " disabled " ) );
-                        link.setAttribute( 'onclick', 'vlm_enable("'+elt.getAttribute( 'name' ) + '");' );
-                        link.setAttribute( 'value', "Enable" );
+                        nb.appendChild( create_button( "Enable", 'vlm_enable("'+elt.getAttribute( 'name' ) + '");' ) );
                     }
-                    nb.appendChild( link );
                     
                     if( elt.nodeName == "broadcast" )
                     {
-                        link = document.createElement( 'input' );
-                        link.setAttribute( 'type', 'button' );
                         if( elt.getAttribute( 'loop' ) == 'yes' )
                         {
                             nb.appendChild( document.createTextNode( " loop " ) );
 
-                            link.setAttribute( 'onclick', 'vlm_unloop("'+elt.getAttribute( 'name' ) + '");' );
-                            link.setAttribute( 'value', "Un-loop" );
+                            nb.appendChild( create_button( 'Un-loop', 'vlm_unloop("'+elt.getAttribute( 'name' ) + '");' ) );
                         }
                         else
                         {
                             nb.appendChild( document.createTextNode( " play once " ) );
+                            nb.appendChild( create_button( 'Loop', 'vlm_loop("'+elt.getAttribute( 'name' ) + '");' ) );
                             
-                            link.setAttribute( 'onclick', 'vlm_loop("'+elt.getAttribute( 'name' ) + '");' );
-                            link.setAttribute( 'value', "Loop" );
                         }
-                        nb.appendChild( link );
 
                         if( elt.getAttribute( 'enabled' ) == 'yes' )
                         {
@@ -515,28 +512,23 @@ function parse_vlm_elements()
                 else if( elt.nodeName == "schedule" )
                 {
                     var nb = document.createElement( 'div' );
-                    nb.setAttribute( 'class', 'list_element' );
+                    setclass( nb, 'list_element' );
                     vlms.appendChild( nb );
 
                     var nbname = document.createElement( 'b' );
                     nbname.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                     nb.appendChild( nbname );
                     
-                    var link = document.createElement( 'input' );
-                    link.setAttribute( 'type', 'button' );
                     if( elt.getAttribute( 'enabled' ) == 'yes' )
                     {
                         nb.appendChild( document.createTextNode( " enabled " ) );
-                        link.setAttribute( 'onclick', 'vlm_disable("'+elt.getAttribute( 'name' ) + '");' );
-                        link.setAttribute( 'value', "Disable" );
+                        nb.appendChild( create_button( "Disable", 'vlm_disable("'+elt.getAttribute( 'name' ) + '");' ) );
                     }
                     else
                     {
                         nb.appendChild( document.createTextNode( " disabled " ) );
-                        link.setAttribute( 'onclick', 'vlm_enable("'+elt.getAttribute( 'name' ) + '");' );
-                        link.setAttribute( 'value', "Enable" );
+                        nb.appendChild( create_button( "Enable", 'vlm_enable("'+elt.getAttribute( 'name' ) + '");' ) );
                     }
-                    nb.appendChild( link );
 
                     nb.appendChild( document.createTextNode( " " ) );
                     nb.appendChild( create_button( "Delete", 'vlm_delete("'+elt.getAttribute( 'name' ) + '");' ) );

@@ -86,7 +86,7 @@ function mosaic_size_change()
     {
         var mdt = document.createElement( 'div' );
         mdt.setAttribute( 'id',    'mosaic_dt'  );
-        mdt.setAttribute( 'class', 'mosaic_tbl' );
+        setclass( mdt, 'mosaic_tbl' );
         
         mdt.style.width  = mosaic_width   + "px";
         mdt.style.height = mosaic_height  + "px";
@@ -108,19 +108,13 @@ function mosaic_size_change()
             for( x = 0; x < mosaic_cols; x++ )
             {
                 var mcell = document.createElement( 'td' );
-                mcell.setAttribute( 'class', 'mosaic_itm' );
+                setclass( mcell, 'mosaic_itm' );
                 mcell.style.width  = cell_width  + "px";
                 mcell.style.height = cell_height + "px";
                 
-                var melt = document.createElement( 'input' );
-                melt.setAttribute( 'type', 'button' );
                 var id = x+'_'+y;
+                var melt = create_button( cells[id] ? cells[id] : '?', 'mosaic_elt_choose(\"'+id+'\");' );
                 melt.setAttribute( 'id', id );
-                melt.setAttribute( 'onclick', 'mosaic_elt_choose(\''+id+'\');' );
-                if( cells[id] )
-                    melt.setAttribute( 'value', cells[id] );
-                else
-                    melt.setAttribute( 'value', '?' );
                 melt.setAttribute( 'title', 'Click to choose stream' );
                 
                 mcell.appendChild( melt );

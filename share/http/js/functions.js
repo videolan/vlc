@@ -205,6 +205,12 @@ function checked( id ){ return document.getElementById( id ).checked; }
 
 function value( id ){ return document.getElementById( id ).value; }
 
+function setclass( obj, value )
+{
+    obj.setAttribute( 'class', value ); /* Firefox */
+    obj.setAttribute( 'className', value ); /* IE */
+}
+
 function radio_value( name )
 {
     var radio = document.getElementsByName( name );
@@ -220,7 +226,7 @@ function radio_value( name )
 
 function check_and_replace_int( id, val )
 {
-    var objRegExp = /^\d\d*$/;
+    var objRegExp = /^\d+$/;
     if( value( id ) != ''
         && ( !objRegExp.test( value( id ) )
              || parseInt( value( id ) ) < 1 ) )
@@ -461,21 +467,21 @@ function parse_status()
 
             var randomtag = status.getElementsByTagName( 'random' );
             if( randomtag.length > 0 ? randomtag[0].firstChild.data == "1" : 0)
-                document.getElementById( 'btn_shuffle').setAttribute( 'class', 'on' );
+                setclass( document.getElementById( 'btn_shuffle'), 'on' );
             else
-                document.getElementById( 'btn_shuffle').setAttribute( 'class', 'off' );
+                setclass( document.getElementById( 'btn_shuffle'), 'off' );
                
             var looptag = status.getElementsByTagName( 'loop' );
             if( looptag.length > 0 ? looptag[0].firstChild.data == "1" : 0)
-                document.getElementById( 'btn_loop').setAttribute( 'class', 'on' );
+                setclass( document.getElementById( 'btn_loop'), 'on' );
             else
-                document.getElementById( 'btn_loop').setAttribute( 'class', 'off' );
+                setclass( document.getElementById( 'btn_loop'), 'off' );
 
             var repeattag = status.getElementsByTagName( 'repeat' );
             if( repeattag.length > 0 ? repeattag[0].firstChild.data == "1" : 0 )
-                document.getElementById( 'btn_repeat').setAttribute( 'class', 'on' );
+                setclass( document.getElementById( 'btn_repeat'), 'on' );
             else
-                document.getElementById( 'btn_repeat').setAttribute( 'class', 'off' );
+                setclass( document.getElementById( 'btn_repeat'), 'off' );
 
             var tree = document.createElement( "ul" );
             var categories = status.getElementsByTagName( 'category' );
@@ -558,7 +564,7 @@ function parse_playlist()
                     }
 
                     var nd = document.createElement( "div" );
-                    nd.setAttribute( 'class', 'pl_node' );
+                    setclass( nd, 'pl_node' );
                     nd.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
                     pos.appendChild( nd );
                 }
@@ -567,12 +573,12 @@ function parse_playlist()
                     if( pos.hasChildNodes() )
                     pos.appendChild( document.createElement( "br" ) );
                     var pl = document.createElement( "a" );
-                    pl.setAttribute( 'class', 'pl_leaf' );
+                    setclass( pl, 'pl_leaf' );
                     pl.setAttribute( 'href', 'javascript:pl_play('+elt.getAttribute( 'id' )+');' );
                     pl.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
                     if( elt.getAttribute( 'current' ) == 'current' )
                     {
-                        pl.setAttribute( 'style', 'font-weight: bold;' );
+                        pl.style.fontWeight = 'bold';
                         var nowplaying = document.getElementById( 'nowplaying' );
                         clear_children( nowplaying );
                         nowplaying.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
@@ -647,7 +653,7 @@ function parse_browse_dir( )
                 if( elt.nodeName == "element" )
                 {
                     var item = document.createElement( "a" );
-                    item.setAttribute( 'class', 'browser' );
+                    setclass( item, 'browser' );
                     if( elt.getAttribute( 'type' ) == 'directory' )
                     {
                         item.setAttribute( 'href', 'javascript:browse_dir(\''+escapebackslashes(addslashes(elt.getAttribute( 'path' )))+'\');');
@@ -662,7 +668,7 @@ function parse_browse_dir( )
                     {
                         pos.appendChild( document.createTextNode( ' ' ) );
                         var item = document.createElement( "a" );
-                        item.setAttribute( 'class', 'browser' );
+                        setclass( item, 'browser' );
                         item.setAttribute( 'href', 'javascript:browse_path(\''+escapebackslashes(addslashes(elt.getAttribute( 'path' )))+'\');');
                         item.appendChild( document.createTextNode( '(select)' ) );
                         pos.appendChild( item );
