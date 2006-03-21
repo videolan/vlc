@@ -750,6 +750,10 @@ package-win32-base-zip: package-win32-base
 # Create package 
 	zip -r vlc-${VERSION}-win32.zip vlc-${VERSION}
 
+package-win32-base-7zip: package-win32-base
+# Create package 
+	7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on vlc-${VERSION}-win32.7z vlc-${VERSION}
+
 package-win32-exe: package-win32-base package-win32-base-exe
 # Clean up
 	rm -Rf $(top_builddir)/vlc-${VERSION}
@@ -759,6 +763,10 @@ package-win32-exe-linux: package-win32-base package-win32-base-exe-linux
 	rm -Rf $(top_builddir)/vlc-${VERSION}
 
 package-win32-zip: package-win32-base-zip
+# Clean up
+	rm -Rf $(top_builddir)/vlc-${VERSION}
+
+package-win32-7zip: package-win32-base-7zip
 # Clean up
 	rm -Rf $(top_builddir)/vlc-${VERSION}
 
