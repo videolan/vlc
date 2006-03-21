@@ -43,6 +43,7 @@
     if( self != nil )
     {
         p_item = NULL;
+        o_statUpdateTimer = nil;
     }
     return( self );
 }
@@ -158,7 +159,6 @@
     /* check whether our item is valid, because we would crash if not */
     if(! [self isItemInPlaylist: p_item] )
         return;
-
     char *psz_temp;
     vlc_mutex_lock( &p_item->input.lock );
 
@@ -233,7 +233,7 @@
     if( [self isItemInPlaylist: p_item] )
     {
         /* we can only do that if there's a valid input around */
-        
+
         vlc_mutex_lock( &p_item->input.p_stats->lock );
 
         /* input */
@@ -324,7 +324,7 @@
 
     for( i = 0 ; i < p_playlist->i_size ; i++ )
     {
-        if( p_playlist->pp_items[i] == p_local_item )
+        if( p_playlist->pp_all_items[i] == p_local_item )
         {
             vlc_object_release( p_playlist );
             return YES;
