@@ -154,9 +154,15 @@ static char *MB2MB( const char *string, UINT fromCP, UINT toCP )
 }
 #endif
 
-/*****************************************************************************
+/**
  * FromLocale: converts a locale string to UTF-8
- *****************************************************************************/
+ *
+ * @param locale nul-terminated string to be converted
+ *
+ * @return a nul-terminated UTF-8 string, or NULL in case of error.
+ * To avoid memory leak, you have to pass the result to LocaleFree()
+ * when it is no longer needed.
+ */
 char *FromLocale( const char *locale )
 {
     if( locale == NULL )
@@ -166,21 +172,10 @@ char *FromLocale( const char *locale )
 # ifdef USE_ICONV
     if( from_locale.hd != (vlc_iconv_t)(-1) )
     {
-        char *iptr = (char *)locale, *output, *optr;
-        size_t inb, outb;
-
-        /*
-         * We are not allowed to modify the locale pointer, even if we cast it
-         * to non-const.
-         */
-        inb = strlen( locale );
-        /* FIXME: I'm not sure about the value for the multiplication
-         * (for western people, multiplication by 3 (Latin9) is needed).
-         * While UTF-8 could reach 6 bytes, no existing code point exceeds
-         * 4 bytes. */
-        outb = inb * 4 + 1;
-
-        optr = output = malloc( outb );
+        const char *iptr = locale;
+        size_t inb = strlen( locale );
+        size_t outb = inb * 6 + 1;
+        char output[outb], *optr = output;
 
         vlc_mutex_lock( &from_locale.lock );
         vlc_iconv( from_locale.hd, NULL, NULL, NULL, NULL );
@@ -201,7 +196,7 @@ char *FromLocale( const char *locale )
         assert (*iptr == '\0');
         assert (*optr == '\0');
         assert (strlen( output ) == (size_t)(optr - output));
-        return realloc( output, optr - output + 1 );
+        return strdup( output );
     }
 # endif /* USE_ICONV */
     return (char *)locale;
@@ -224,9 +219,15 @@ char *FromLocaleDup( const char *locale )
 }
 
 
-/*****************************************************************************
- * ToLocale: converts an UTF-8 string to locale
- *****************************************************************************/
+/**
+ * ToLocale: converts a UTF-8 string to local system encoding.
+ *
+ * @param utf8 nul-terminated string to be converted
+ *
+ * @return a nul-terminated string, or NULL in case of error.
+ * To avoid memory leak, you have to pass the result to LocaleFree()
+ * when it is no longer needed.
+ */
 char *ToLocale( const char *utf8 )
 {
     if( utf8 == NULL )
@@ -236,19 +237,14 @@ char *ToLocale( const char *utf8 )
 # ifdef USE_ICONV
     if( to_locale.hd != (vlc_iconv_t)(-1) )
     {
-        char *iptr = (char *)utf8, *output, *optr;
-        size_t inb, outb;
-
-        /*
-        * We are not allowed to modify the locale pointer, even if we cast it
-        * to non-const.
-        */
-        inb = strlen( utf8 );
+        const char *iptr = utf8;
+        size_t inb = strlen( utf8 );
         /* FIXME: I'm not sure about the value for the multiplication
         * (for western people, multiplication is not needed) */
-        outb = inb * 2 + 1;
+        size_t outb = inb * 2 + 1;
 
-        optr = output = malloc( outb );
+        char output[outb], *optr = output;
+
         vlc_mutex_lock( &to_locale.lock );
         vlc_iconv( to_locale.hd, NULL, NULL, NULL, NULL );
 
@@ -268,7 +264,7 @@ char *ToLocale( const char *utf8 )
         assert (*iptr == '\0');
         assert (*optr == '\0');
         assert (strlen( output ) == (size_t)(optr - output));
-        return realloc( output, optr - output + 1 );
+        return strdup( output );
     }
 # endif /* USE_ICONV */
     return (char *)utf8;
