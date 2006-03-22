@@ -122,7 +122,7 @@ static char *mode_list_text[] = { N_("Text"), "HTML"
   "syslog instead of file.")
 #else
 #define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are " \
-  \"text\" (default) and \"html\".")
+  "\"text\" (default) and \"html\".")
 #endif
 
 vlc_module_begin();
