@@ -62,6 +62,8 @@ static inline char *FromWide( const wchar_t *in )
 VLC_EXPORT( char *, __vlc_fix_readdir_charset, ( vlc_object_t *, const char * ) );
 #define vlc_fix_readdir_charset(a,b) __vlc_fix_readdir_charset(VLC_OBJECT(a),b)
 
+VLC_EXPORT( const char *, GetFallbackEncoding, ( void ) );
+
 extern double i18n_strtod( const char *, char ** );
 extern double i18n_atof( const char * );
 VLC_EXPORT( double, us_strtod, ( const char *, char ** ) );

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * subsdec.c : text subtitles decoder
  *****************************************************************************
- * Copyright (C) 2000-2001 the VideoLAN team
+ * Copyright (C) 2000-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -53,6 +53,7 @@ struct decoder_sys_t
     int                 i_original_width;
     int                 i_align;          /* Subtitles alignment on the vout */
     vlc_iconv_t         iconv_handle;            /* handle to iconv instance */
+    vlc_bool_t          b_autodetect_utf8;
 
     ssa_style_t         **pp_ssa_styles;
     int                 i_ssa_styles;
@@ -106,9 +107,12 @@ static char *ppsz_justification_text[] = {N_("Center"),N_("Left"),N_("Right")};
 #define ENCODING_LONGTEXT N_("Set the encoding used in text subtitles")
 #define ALIGN_TEXT N_("Subtitles justification")
 #define ALIGN_LONGTEXT N_("Set the justification of subtitles")
+#define AUTODETECT_UTF8_TEXT N_("UTF-8 subtitles autodetection")
+#define AUTODETECT_UTF8_LONGTEXT N_("This enables automatic detection of " \
+            "UTF-8 encoding within subtitles files.")
 #define FORMAT_TEXT N_("Formatted Subtitles")
-#define FORMAT_LONGTEXT N_("Some subtitle formats allow for text formatting.\
-             VLC partly implements this, but you can choose to disable all formatting.")
+#define FORMAT_LONGTEXT N_("Some subtitle formats allow for text formatting. " \
+             "VLC partly implements this, but you can choose to disable all formatting.")
 
 
 vlc_module_begin();
@@ -125,6 +129,8 @@ vlc_module_begin();
     add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
                 ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
         change_string_list( ppsz_encodings, 0, 0 );
+    add_bool( "subsdec-autodetect-utf8", VLC_TRUE, NULL,
+              AUTODETECT_UTF8_TEXT, AUTODETECT_UTF8_LONGTEXT, VLC_FALSE );
     add_bool( "subsdec-formatted", VLC_TRUE, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
                  VLC_FALSE );
 vlc_module_end();
@@ -160,6 +166,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* init of p_sys */
     p_sys->i_align = 0;
     p_sys->iconv_handle = (vlc_iconv_t)-1;
+    p_sys->b_autodetect_utf8 = VLC_FALSE;
     p_sys->b_ass = VLC_FALSE;
     p_sys->i_original_height = -1;
     p_sys->i_original_width = -1;
@@ -180,29 +187,13 @@ static int OpenDecoder( vlc_object_t *p_this )
         var_Get( p_dec, "subsdec-encoding", &val );
         if( !strcmp( val.psz_string, DEFAULT_NAME ) )
         {
-            char *psz_charset;
+            const char *psz_charset = GetFallbackEncoding();
 
-            if( vlc_current_charset( &psz_charset ) )
-            {
-                /*
-                 * Most subtitles are not in UTF-8.
-                 * FIXME: This is western-centric. We should use a fallback
-                 * charset depending on the locale language instead.
-                 */
-                if( psz_charset != NULL)
-                    free( psz_charset );
-                psz_charset = strdup( "CP1252" );
-            }
+            p_sys->b_autodetect_utf8 = var_CreateGetBool( p_dec,
+                    "subsdec-autodetect-utf8" );
 
-            if( psz_charset == NULL )
-            {
-                free( p_sys );
-                return VLC_ENOMEM;
-            }
-
-            p_sys->iconv_handle = vlc_iconv_open( "UTF-8", psz_charset );  
-            msg_Dbg( p_dec, "using default character encoding: %s", psz_charset );  
-            free( psz_charset );
+            p_sys->iconv_handle = vlc_iconv_open( "UTF-8", psz_charset );
+            msg_Dbg( p_dec, "using default character encoding: %s", psz_charset );
         }
         else if( !strcmp( val.psz_string, "UTF-8" ) )
         {
@@ -264,7 +255,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     {
         vlc_iconv_close( p_sys->iconv_handle );
     }
-    
+
     if( p_sys->pp_ssa_styles )
     {
         int i;
@@ -309,35 +300,51 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     /* Should be resiliant against bad subtitles */
     psz_subtitle = strndup( (const char *)p_block->p_buffer,
                             p_block->i_buffer );
+    if( psz_subtitle == NULL )
+        return NULL;
 
-    if( p_sys->iconv_handle != (vlc_iconv_t)-1 )
+    if( p_sys->iconv_handle == (vlc_iconv_t)-1 )
+        EnsureUTF8( psz_subtitle );
+    else
     {
-        char *psz_new_subtitle;
-        char *psz_convert_buffer_out;
-        char *psz_convert_buffer_in;
-        size_t ret, inbytes_left, outbytes_left;
 
-        psz_new_subtitle = malloc( 6 * strlen( psz_subtitle ) );
-        psz_convert_buffer_out = psz_new_subtitle;
-        psz_convert_buffer_in = psz_subtitle;
-        inbytes_left = strlen( psz_subtitle );
-        outbytes_left = 6 * inbytes_left;
-        ret = vlc_iconv( p_sys->iconv_handle, &psz_convert_buffer_in,
-                         &inbytes_left, &psz_convert_buffer_out,
-                         &outbytes_left );
-        *psz_convert_buffer_out = '\0';
-
-        if( psz_subtitle ) free( psz_subtitle );
-        psz_subtitle = NULL;
-
-        if( inbytes_left )
+        if( p_sys->b_autodetect_utf8 )
         {
-            msg_Err( p_dec, _("Failed to convert subtitle encoding.\n"
-                      "Try manually setting a character-encoding "
-                      "before you open the file.") );
-            return NULL;
+            if( IsUTF8( psz_subtitle ) == NULL )
+            {
+                msg_Dbg( p_dec, "Invalid UTF-8 sequence: "
+                         "disabling UTF-8 subtitles autodetection" );
+                p_sys->b_autodetect_utf8 = VLC_FALSE;
+            }
         }
-        psz_subtitle = psz_new_subtitle;
+
+        if( !p_sys->b_autodetect_utf8 )
+        {
+            size_t inbytes_left = strlen( psz_subtitle );
+            size_t outbytes_left = 6 * inbytes_left;
+            char *psz_new_subtitle = malloc( outbytes_left + 1 );
+            char *psz_convert_buffer_out = psz_new_subtitle;
+            const char *psz_convert_buffer_in = psz_subtitle;
+
+            size_t ret = vlc_iconv( p_sys->iconv_handle,
+                                    &psz_convert_buffer_in, &inbytes_left,
+                                    &psz_convert_buffer_out, &outbytes_left );
+
+            *psz_convert_buffer_out++ = '\0';
+            free( psz_subtitle );
+
+            if( ( ret == (size_t)(-1) ) || inbytes_left )
+            {
+                free( psz_new_subtitle );
+                msg_Err( p_dec, _("Failed to convert subtitle encoding.\n"
+                        "Try manually setting a character-encoding "
+                                "before you open the file.") );
+                return NULL;
+            }
+
+            psz_subtitle = realloc( psz_new_subtitle,
+                                    psz_convert_buffer_out - psz_new_subtitle );
+        }
     }
 
     /* Create the subpicture unit */
@@ -371,11 +378,11 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
         p_spu->i_x = p_sys->i_align ? 20 : 0;
         p_spu->i_y = 10;
-        
+
         /* Remove formatting from string */
         StripTags( psz_subtitle );
-        
-        p_spu->p_region->psz_text = psz_subtitle;        
+
+        p_spu->p_region->psz_text = psz_subtitle;
         p_spu->i_start = p_block->i_pts;
         p_spu->i_stop = p_block->i_pts + p_block->i_length;
         p_spu->b_ephemer = (p_block->i_length == 0);
@@ -510,7 +517,7 @@ static void ParseSSAString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
 static char* GotoNextLine( char *psz_text )
 {
     char *p_newline = psz_text;
-    
+
     while( p_newline[0] != '\0' )
     {
         if( p_newline[0] == '\n' || p_newline[0] == '\r' )
@@ -538,12 +545,12 @@ static void ParseColor( decoder_t *p_dec, char *psz_color, int *pi_color, int *p
         i_color = (int) strtol( psz_color+2, NULL, 16 );
     }
     else i_color = (int) strtol( psz_color, NULL, 0 );
-    
+
     *pi_color = 0;
     *pi_color |= ( ( i_color & 0x000000FF ) << 16 ); /* Red */
     *pi_color |= ( ( i_color & 0x0000FF00 ) );       /* Green */
     *pi_color |= ( ( i_color & 0x00FF0000 ) >> 16 ); /* Blue */
-    
+
     if( pi_alpha != NULL )
         *pi_alpha = ( i_color & 0xFF000000 ) >> 24;
 }
@@ -557,10 +564,10 @@ static void ParseSSAHeader( decoder_t *p_dec )
     char *psz_parser = NULL;
     char *psz_header = malloc( p_dec->fmt_in.i_extra+1 );
     int i_section_type = 1;
-    
+
     memcpy( psz_header, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
     psz_header[ p_dec->fmt_in.i_extra] = '\0';
-    
+
     /* Handle [Script Info] section */
     psz_parser = strcasestr( psz_header, "[Script Info]" );
     if( psz_parser == NULL ) goto eof;
@@ -571,7 +578,7 @@ static void ParseSSAHeader( decoder_t *p_dec )
     {
         int temp;
         char buffer_text[MAX_LINE + 1];
-        
+
         if( psz_parser[0] == '!' || psz_parser[0] == ';' ) /* comment */;
         else if( sscanf( psz_parser, "PlayResX: %d", &temp ) == 1 )
             p_sys->i_original_width = ( temp > 0 ) ? temp : -1;
@@ -622,7 +629,7 @@ static void ParseSSAHeader( decoder_t *p_dec )
                     p_style->font_style.i_style_flags = 0;
                     if( i_bold ) p_style->font_style.i_style_flags |= STYLE_BOLD;
                     if( i_italic ) p_style->font_style.i_style_flags |= STYLE_ITALIC;
-    
+
                     if( i_border == 1 ) p_style->font_style.i_style_flags |= (STYLE_ITALIC | STYLE_OUTLINE);
                     else if( i_border == 3 )
                     {
@@ -684,7 +691,7 @@ static void ParseSSAHeader( decoder_t *p_dec )
                     p_style->font_style.i_outline_width = ( i_border == 1 ) ? i_outline : 0;
                     p_style->font_style.i_spacing = i_spacing;
                     //p_style->font_style.f_angle = f_angle;
-                    
+
                     p_style->i_align = 0;
                     if( i_align == 0x1 || i_align == 0x4 || i_align == 0x1 ) p_style->i_align |= SUBPICTURE_ALIGN_LEFT;
                     if( i_align == 0x3 || i_align == 0x6 || i_align == 0x9 ) p_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
@@ -692,7 +699,7 @@ static void ParseSSAHeader( decoder_t *p_dec )
                     if( i_align == 0x1 || i_align == 0x2 || i_align == 0x3 ) p_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
                     p_style->i_margin_h = ( p_style->i_align & SUBPICTURE_ALIGN_RIGHT ) ? i_margin_r : i_margin_l;
                     p_style->i_margin_v = i_margin_v;
-                    
+
                     /*TODO: Ignored: angle i_scale_x|y (fontscaling), i_encoding */
                     TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_style );
                 }
