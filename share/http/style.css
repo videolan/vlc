@@ -224,9 +224,6 @@ div.controls button.off {
 
 div.menubtn {
 	display: inline;
-	position: absolute;
-	margin-top: 2px;
-	font-size: 0.70em;
 }
 
 div.menu {
@@ -241,7 +238,12 @@ div.menu {
 
 div.menu button {
 	background: transparent;
+}
+div.menu button.menuout {
 	border: 1px solid transparent;
+}
+div.menu button.menuover {
+        border: 1px solid #000;
 }
 
 div.popup img.close {

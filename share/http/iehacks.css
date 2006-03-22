@@ -26,6 +26,12 @@ div.menu {
 	margin-top: 15px;
 	background: #fff;
 }
+div.menu button {
+        background: #fff;
+}
+div.menu button.menuout {
+        border: 1px solid #fff;
+}
 
 div#mosaic_list {
 	background: #fff;
