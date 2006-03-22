@@ -117,9 +117,12 @@ static char *mode_list_text[] = { N_("Text"), "HTML"
 
 #define LOGMODE_TEXT N_("Log format")
 #ifdef HAVE_SYSLOG_H
-#define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are \"text\" (default), \"html\", and \"syslog\".")
+#define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are " \
+  "\"text\" (default), \"html\", and \"syslog\" (special mode to send to " \
+  "syslog instead of file.")
 #else
-#define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are \"text\" (default) and \"html\".")
+#define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are " \
+  \"text\" (default) and \"html\".")
 #endif
 
 vlc_module_begin();
@@ -180,7 +183,7 @@ static int Open( vlc_object_t *p_this )
 #endif
         else
         {
-            msg_Err( p_intf, "invalid log mode `%s', using `text'", psz_mode );
+            msg_Warn( p_intf, "invalid log mode `%s', using `text'", psz_mode );
             p_intf->p_sys->i_mode = MODE_TEXT;
         }
 
@@ -202,7 +205,7 @@ static int Open( vlc_object_t *p_this )
 
             if( !psz_homedir )
             {
-                msg_Err( p_this, "psz_homedir is null" );
+                msg_Err( p_this, "Unable to find home directory" );
                 return -1;
             }
             psz_file = (char *)malloc( sizeof("/" LOG_DIR "/" LOG_FILE_HTML) +

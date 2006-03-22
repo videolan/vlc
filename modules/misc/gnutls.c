@@ -66,27 +66,29 @@ static void Close( vlc_object_t * );
 
 #define DH_BITS_TEXT N_("Diffie-Hellman prime bits")
 #define DH_BITS_LONGTEXT N_( \
-    "Allows you to modify the Diffie-Hellman prime's number of bits " \
-    "(used for TLS or SSL-based server-side encryption)." )
+    "This allows you to modify the Diffie-Hellman prime's number of bits, " \
+    "used for TLS or SSL-based server-side encryption. This is generally " \
+    "not needed." )
 
 #define CACHE_EXPIRATION_TEXT N_("Expiration time for resumed TLS sessions")
 #define CACHE_EXPIRATION_LONGTEXT N_( \
-    "Defines the delay before resumed TLS sessions will be expired " \
-    "(in seconds)." )
+    "It is possible to cache the resumed TLS sessions. This is the expiration "\
+    "time of the sessions stored in this cache, in seconds." )
 
 #define CACHE_SIZE_TEXT N_("Number of resumed TLS sessions")
 #define CACHE_SIZE_LONGTEXT N_( \
-    "Allows you to modify the maximum number of resumed TLS sessions that " \
+    "This is the maximum number of resumed TLS sessions that " \
     "the cache will hold." )
 
 #define CHECK_CERT_TEXT N_("Check TLS/SSL server certificate validity")
 #define CHECK_CERT_LONGTEXT N_( \
-    "Ensures that server certificate is valid " \
-    "(i.e. signed by an approved Certificate Authority)." )
+    "This ensures that the server certificate is valid " \
+    "(i.e. signed by an approved Certification Authority)." )
 
 #define CHECK_HOSTNAME_TEXT N_("Check TLS/SSL server hostname in certificate")
 #define CHECK_HOSTNAME_LONGTEXT N_( \
-    "Ensures that server hostname in certificate match requested host name." )
+    "This ensures that the server hostname in certificate matches the " \
+    "requested host name." )
 
 vlc_module_begin();
     set_shortname( "GnuTLS" );

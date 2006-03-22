@@ -61,14 +61,14 @@ static int SendToMSN( char * psz_msg );
  *****************************************************************************/
 #define FORMAT_DEFAULT "{0} - {1}"
 #define FORMAT_TEXT N_("MSN Title format string")
-#define FORMAT_LONGTEXT N_("MSN Title format string. " \
-"{0} artist, {1} title, {2} album")
+#define FORMAT_LONGTEXT N_("Format of the string to send to MSN " \
+"{0} Artist, {1} Title, {2} Album. Defaults to \"Artist - Title\" ({0} - {1}).")
 
 vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_shortname( N_( "MSN" ) );
-    set_description( _("MSN Title Plugin") );
+    set_description( _("MSN Now-Playing") );
 
     add_string( "msn-format", FORMAT_DEFAULT, NULL,
                 FORMAT_TEXT, FORMAT_LONGTEXT, VLC_FALSE );

@@ -81,28 +81,35 @@ static int SetFontSize( filter_t *, int );
  * Module descriptor
  *****************************************************************************/
 #define FONT_TEXT N_("Font")
-#define FONT_LONGTEXT N_("Font filename")
+#define FONT_LONGTEXT N_("Filename for the font you want to use")
 #define FONTSIZE_TEXT N_("Font size in pixels")
-#define FONTSIZE_LONGTEXT N_("The size of the fonts used by the osd module. " \
+#define FONTSIZE_LONGTEXT N_("This is the default size of the fonts " \
+    "that will be rendered on the video. " \
     "If set to something different than 0 this option will override the " \
-    "relative font size " )
-#define OPACITY_TEXT N_("Opacity, 0..255")
-#define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of " \
-    "overlay text. 0 = transparent, 255 = totally opaque. " )
-#define COLOR_TEXT N_("Text Default Color")
-#define COLOR_LONGTEXT N_("The color of overlay text. 1 byte for each color, "\
-    "hexadecimal. #000000 = all colors off, 0xFF0000 = just Red, " \
-    "0xFFFFFF = all color on [White]" )
-#define FONTSIZER_TEXT N_("Font size")
-#define FONTSIZER_LONGTEXT N_("The size of the fonts used by the osd module" )
+    "relative font size. " )
+#define OPACITY_TEXT N_("Opacity")
+#define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of the " \
+    "text that will be rendered on the video. 0 = transparent, " \
+    "255 = totally opaque. " )
+#define COLOR_TEXT N_("Text default color")
+#define COLOR_LONGTEXT N_("The color of the text that will be rendered on "\
+    "the video. This must be an hexadecimal (like HTML colors). The first two "\
+    "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\
+    " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white" )
+#define FONTSIZER_TEXT N_("Relative font size")
+#define FONTSIZER_LONGTEXT N_("This is the relative default size of the " \
+    "fonts that will be rendered on the video. If absolute font size is set, "\
+    "relative size will be overriden." )
 
 static int   pi_sizes[] = { 20, 18, 16, 12, 6 };
 static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
                                    N_("Large"), N_("Larger") };
-#define YUVP_TEXT N_("Use yuvp renderer")
-#define YUVP_LONGTEXT N_("Render into paletized YUV. Needed to encode into dvbsubs")
+#define YUVP_TEXT N_("Use YUVP renderer")
+#define YUVP_LONGTEXT N_("This renders the font using \"paletized YUV\". " \
+  "This option is only needed if you want to encode into DVB subtitles" )
 #define EFFECT_TEXT N_("Font Effect")
-#define EFFECT_LONGTEXT N_("Select effects to apply to rendered text")
+#define EFFECT_LONGTEXT N_("It is possible to apply effects to the rendered" \
+  "text to improve rendering." )
 
 #define EFFECT_BACKGROUND  1 
 #define EFFECT_OUTLINE     2
@@ -279,7 +286,7 @@ static int Create( vlc_object_t *p_this )
     i_error = FT_Select_Charmap( p_sys->p_face, ft_encoding_unicode );
     if( i_error )
     {
-        msg_Err( p_filter, "Font has no unicode translation table" );
+        msg_Err( p_filter, "font has no unicode translation table" );
         goto error;
     }
 
@@ -873,13 +880,15 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         i_error = FT_Load_Glyph( face, i_glyph_index, FT_LOAD_DEFAULT );
         if( i_error )
         {
-            msg_Err( p_filter, "FT_Load_Glyph returned %d", i_error );
+            msg_Err( p_filter, "Unable to render text (FT_Load_Glyph returned"
+                               " %d", i_error );
             goto error;
         }
         i_error = FT_Get_Glyph( glyph, &tmp_glyph );
         if( i_error )
         {
-            msg_Err( p_filter, "FT_Get_Glyph returned %d", i_error );
+            msg_Err( p_filter, "Unable to render text (FT_Get_Glyph returned "
+                        %d", i_error );
             goto error;
         }
         FT_Glyph_Get_CBox( tmp_glyph, ft_glyph_bbox_pixels, &glyph_size );

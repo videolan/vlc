@@ -45,15 +45,16 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define HOST_TEXT N_( "Host address" )
+#define HOST_TEXT N_( "RTSP host address" )
 #define HOST_LONGTEXT N_( \
-    "You can set the address, port and path the rtsp interface will bind to." \
-    "\nSyntax is address:port/path. Default is to bind to any address "\
-    "on port 554, with no path." )
+    "This defines the address, port and path the RTSP VOD server will listen " \
+    "on.\nSyntax is address:port/path. The default is to listen on all "\
+    "interfaces (address 0.0.0.0), on port 554, with no path.\n To listen " \
+    "only on the local interface, use \"localhost\" as address." )
 
 #define THROTLE_TEXT N_( "Maximum number of connections" )
-#define THROTLE_LONGTEXT N_( "Limit the number of connections " \
-    "to a maximum. (0 = unlimited, N = maximum clients)" )
+#define THROTLE_LONGTEXT N_( "This limits the maximum number of clients " \
+    "that can connect to the RTSP VOD. 0 means no limit."  )
 
 vlc_module_begin();
     set_shortname( _("RTSP VoD" ) );
@@ -64,7 +65,8 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "rtsp" );
     add_string ( "rtsp-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
-    add_integer( "rtsp-throtle-users", 0, NULL, THROTLE_TEXT, THROTLE_LONGTEXT, VLC_TRUE );
+    add_integer( "rtsp-throttle-users", 0, NULL, THROTLE_TEXT,
+                                           THROTLE_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -160,7 +162,7 @@ struct vod_sys_t
     httpd_host_t *p_rtsp_host;
     char *psz_path;
     int i_port;
-    int i_throtle_users;
+    int i_throttle_users;
     int i_connections;
 
     /* List of media */
@@ -217,16 +219,16 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys ) goto error;
     p_sys->p_rtsp_host = 0;
 
-    var_Create( p_this, "rtsp-throtle-users", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    p_sys->i_throtle_users = var_GetInteger( p_this, "rtsp-throtle-users" );
-    msg_Dbg( p_this, "Allowing up to %d connections", p_sys->i_throtle_users );
+    var_Create( p_this, "rtsp-throttle-users", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    p_sys->i_throttle_users = var_GetInteger( p_this, "rtsp-throtle-users" );
+    msg_Dbg( p_this, "allowing up to %d connections", p_sys->i_throttle_users );
     p_sys->i_connections = 0;
 
     p_sys->p_rtsp_host =
         httpd_HostNew( VLC_OBJECT(p_vod), url.psz_host, url.i_port );
     if( !p_sys->p_rtsp_host )
     {
-        msg_Err( p_vod, "cannot create http server (%s:%i)",
+        msg_Err( p_vod, "cannot create RTSP server (%s:%i)",
                  url.psz_host, url.i_port );
         goto error;
     }
@@ -262,7 +264,7 @@ static void Close( vlc_object_t * p_this )
     vod_sys_t *p_sys = p_vod->p_sys;
 
     httpd_HostDelete( p_sys->p_rtsp_host );
-    var_Destroy( p_this, "rtsp-throtle-users" );
+    var_Destroy( p_this, "rtsp-throttle-users" );
 
     /* TODO delete medias */
     free( p_sys->psz_path );
@@ -298,13 +300,13 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
 
     if( !p_media->p_rtsp_url )
     {
-        msg_Err( p_vod, "cannot create http url (%s)", p_media->psz_rtsp_path);
+        msg_Err( p_vod, "cannot create RTSP url (%s)", p_media->psz_rtsp_path);
         free( p_media->psz_rtsp_path );
         free( p_media );
         return NULL;
     }
 
-    msg_Dbg( p_vod, "created rtsp url: %s", p_media->psz_rtsp_path );
+    msg_Dbg( p_vod, "created RTSP url: %s", p_media->psz_rtsp_path );
 
     asprintf( &p_media->psz_rtsp_control_v4,
                "a=control:rtsp://%%s:%d%s/trackID=%%d\r\n",
@@ -497,7 +499,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
 
     if( !p_es->p_rtsp_url )
     {
-        msg_Err( p_vod, "cannot create http url (%s)", psz_urlc );
+        msg_Err( p_vod, "cannot create RTSP url (%s)", psz_urlc );
         free( psz_urlc );
         free( p_es );
         return VLC_EGENERIC;
@@ -601,7 +603,7 @@ static rtsp_client_t *RtspClientNew( vod_media_t *p_media, char *psz_session )
 
     p_media->p_vod->p_sys->i_connections++;
     msg_Dbg( p_media->p_vod, "new session: %s, connections: %d",
-             psz_session, p_media->p_vod->p_sys->i_throtle_users );
+             psz_session, p_media->p_vod->p_sys->i_throttle_users );
 
     return p_rtsp;
 }
@@ -625,7 +627,7 @@ static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
 {
     p_media->p_vod->p_sys->i_connections--;
     msg_Dbg( p_media->p_vod, "closing session: %s, connections: %d",
-             p_rtsp->psz_session, p_media->p_vod->p_sys->i_throtle_users );
+             p_rtsp->psz_session, p_media->p_vod->p_sys->i_throttle_users );
 
     while( p_rtsp->i_es-- )
     {
@@ -699,8 +701,8 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 psz_session = httpd_MsgGet( query, "Session" );
                 if( !psz_session || !*psz_session )
                 {
-                    if( ( p_vod->p_sys->i_throtle_users > 0 ) &&
-                        ( p_vod->p_sys->i_connections >= p_vod->p_sys->i_throtle_users ) )
+                    if( ( p_vod->p_sys->i_throttle_users > 0 ) &&
+                        ( p_vod->p_sys->i_connections >= p_vod->p_sys->i_throttle_users ) )
                     {
                         answer->i_status = 503;
                         answer->psz_status = strdup( "Too many connections" );
@@ -956,8 +958,8 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 psz_session = httpd_MsgGet( query, "Session" );
                 if( !psz_session || !*psz_session )
                 {
-                    if( ( p_vod->p_sys->i_throtle_users > 0 ) &&
-                        ( p_vod->p_sys->i_connections >= p_vod->p_sys->i_throtle_users ) )
+                    if( ( p_vod->p_sys->i_throttle_users > 0 ) &&
+                        ( p_vod->p_sys->i_connections >= p_vod->p_sys->i_throttle_users ) )
                     {
                         answer->i_status = 503;
                         answer->psz_status = strdup( "Too many connections" );

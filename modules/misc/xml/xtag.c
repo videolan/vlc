@@ -85,8 +85,6 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_category( CAT_ADVANCED );
-    set_subcategory( SUBCAT_ADVANCED_XML );
     set_description( _("Simple XML Parser") );
     set_capability( "xml", 5 );
     set_callbacks( Open, Close );
@@ -172,7 +170,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
     /* Open and read file */
     p_buffer = malloc( i_buffer );
     if( p_buffer == NULL ) {
-        msg_Err( p_xml, "ENOMEM: alloc buffer" );
+        msg_Err( p_xml, "out of memory" );
         return NULL;
     }
 
@@ -182,7 +180,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
         i_buffer += i_size;
         p_new = realloc( p_buffer, i_buffer );
         if (!p_new) {
-            msg_Err( p_xml, "ENOMEM: realloc buffer" );
+            msg_Err( p_xml, "out of memory" );
             free( p_buffer );
             return NULL;
         }
@@ -192,7 +190,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
 
     if( i_pos + i_size == 0 )
     {
-        msg_Dbg( p_xml, "empty xml" );
+        msg_Dbg( p_xml, "empty XML" );
         free( p_buffer );
         return 0;
     }
@@ -200,7 +198,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
     p_root = xtag_new_parse( p_buffer, i_buffer );
     if( !p_root )
     {
-        msg_Warn( p_xml, "couldn't parse xml" );
+        msg_Warn( p_xml, "couldn't parse XML" );
         free( p_buffer );
         return 0;
     }

@@ -38,8 +38,6 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_category( CAT_ADVANCED );
-    set_subcategory( SUBCAT_ADVANCED_XML );
     set_description( _("XML Parser (using libxml2)") );
     set_capability( "xml", 10 );
     set_callbacks( Open, Close );
