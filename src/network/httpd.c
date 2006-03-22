@@ -367,6 +367,7 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
     httpd_file_t *file = (httpd_file_t*)p_sys;
     uint8_t *psz_args = query->psz_args;
     uint8_t **pp_body, *p_body;
+    char *psz_connection = NULL;
     int *pi_body, i_body;
 
     if( answer == NULL || query == NULL )
@@ -410,10 +411,10 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
     }
 
     /* We respect client request */
-    if( strcmp( httpd_MsgGet( &cl->query, "Connection" ), "" ) )
+    psz_connection = httpd_MsgGet( &cl->query, "Connection" );
+    if( psz_connection != NULL )
     {
-        httpd_MsgAdd( answer, "Connection",
-                      httpd_MsgGet( &cl->query, "Connection" ) );
+        httpd_MsgAdd( answer, "Connection", psz_connection );
     }
 
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
@@ -1342,7 +1343,7 @@ char *httpd_MsgGet( httpd_message_t *msg, char *name )
             return msg->value[i];
         }
     }
-    return "";
+    return NULL;
 }
 
 void httpd_MsgAdd( httpd_message_t *msg, char *name, char *psz_value, ... )
@@ -2052,6 +2053,7 @@ static void httpd_HostThread( httpd_host_t *host )
                 }
                 else if( i_msg == HTTPD_MSG_OPTIONS )
                 {
+                    char *psz_cseq = NULL;
                     int i_cseq;
 
                     /* unimplemented */
@@ -2064,7 +2066,11 @@ static void httpd_HostThread( httpd_host_t *host )
                     answer->i_body = 0;
                     answer->p_body = NULL;
 
-                    i_cseq = atoi( httpd_MsgGet( query, "Cseq" ) );
+                    psz_cseq = httpd_MsgGet( query, "Cseq" );
+                    if( psz_cseq )
+                        i_cseq = atoi( psz_cseq );
+                    else
+                        i_cseq = 0;
                     httpd_MsgAdd( answer, "Cseq", "%d", i_cseq );
                     httpd_MsgAdd( answer, "Server", "VLC Server" );
                     httpd_MsgAdd( answer, "Public", "DESCRIBE, SETUP, "
@@ -2157,7 +2163,8 @@ static void httpd_HostThread( httpd_host_t *host )
                                     char *id;
 
                                     asprintf( &id, "%s:%s", url->psz_user, url->psz_password );
-                                    auth = malloc( strlen(b64) + 1 );
+                                    if( b64 ) auth = malloc( strlen(b64) + 1 );
+                                    else auth = malloc( strlen("") + 1 );
 
                                     if( !strncasecmp( b64, "BASIC", 5 ) )
                                     {
@@ -2292,13 +2299,29 @@ static void httpd_HostThread( httpd_host_t *host )
             {
                 if( cl->i_mode == HTTPD_CLIENT_FILE || cl->answer.i_body_offset == 0 )
                 {
+                    char *psz_connection = httpd_MsgGet( &cl->answer, "Connection" );
+                    char *psz_query = httpd_MsgGet( &cl->query, "Connection" );
+                    vlc_bool_t b_connection = VLC_FALSE;
+                    vlc_bool_t b_keepalive = VLC_FALSE;
+                    vlc_bool_t b_query = VLC_FALSE;
+
                     cl->url = NULL;
-                    if( ( cl->query.i_proto == HTTPD_PROTO_HTTP &&
-                          ( ( cl->answer.i_version == 0 && !strcasecmp( httpd_MsgGet( &cl->answer, "Connection" ), "Keep-Alive" ) ) ||
-                            ( cl->answer.i_version == 1 &&  strcasecmp( httpd_MsgGet( &cl->answer, "Connection" ), "Close" ) ) ) ) ||
-                        ( cl->query.i_proto == HTTPD_PROTO_RTSP &&
-                          strcasecmp( httpd_MsgGet( &cl->query, "Connection" ), "Close" ) &&
-                          strcasecmp( httpd_MsgGet( &cl->answer, "Connection" ), "Close" ) ) )
+                    if( psz_connection )
+                    {
+                        b_connection = ( strcasecmp( psz_connection, "Close" ) == 0 );
+                        b_keepalive = ( strcasecmp( psz_connection, "Keep-Alive" ) == 0 );
+                    }
+
+                    if( psz_query )
+                    {
+                        b_query = ( strcasecmp( psz_query, "Close" ) == 0 );
+                    }
+
+                    if( ( ( cl->query.i_proto == HTTPD_PROTO_HTTP ) &&
+                          ( ( cl->answer.i_version == 0 && b_keepalive ) ||
+                            ( cl->answer.i_version == 1 && !b_connection ) ) ) ||
+                        ( ( cl->query.i_proto == HTTPD_PROTO_RTSP ) &&
+                          !b_query && !b_connection ) )
                     {
                         httpd_MsgClean( &cl->query );
                         httpd_MsgInit( &cl->query );

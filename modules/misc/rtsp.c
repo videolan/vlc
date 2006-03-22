@@ -651,8 +651,10 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     char *psz_transport = NULL;
     char *psz_playnow = NULL; /* support option: x-playNow */
     char *psz_session = NULL;
+    char *psz_cseq = NULL;
     rtsp_client_t *p_rtsp;
     int i_port = 0;
+    int i_cseq = 0;
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
 
@@ -756,7 +758,8 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->p_body = NULL;
             }
 
-            if( !psz_playnow || !*psz_playnow )
+            /* Intentional fall-through on x-playNow option in RTSP request */
+            if( !psz_playnow )
                 break;
         }
 
@@ -891,8 +894,9 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
     httpd_MsgAdd( answer, "Server", "VLC Server" );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
-    httpd_MsgAdd( answer, "Cseq", "%d",
-                  atoi( httpd_MsgGet( query, "Cseq" ) ) );
+    psz_cseq = httpd_MsgGet( query, "Cseq" );
+    psz_cseq ? i_cseq = atoi( psz_cseq ) : 0;
+    httpd_MsgAdd( answer, "Cseq", "%d", i_cseq );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
@@ -914,6 +918,8 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     char *psz_playnow = NULL; /* support option: x-playNow */
     char *psz_session = NULL;
     char *psz_position = NULL;
+    char *psz_cseq = NULL;
+    int i_cseq = 0;
     int i;
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
@@ -1021,7 +1027,8 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->p_body = NULL;
             }
 
-            if( !psz_playnow || !*psz_playnow )
+            /* Intentional fall-through on x-playNow option in RTSP request */
+            if( !psz_playnow )
                 break;
 
         case HTTPD_MSG_PLAY:
@@ -1116,8 +1123,12 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
     httpd_MsgAdd( answer, "Server", "VLC Server" );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
-    httpd_MsgAdd( answer, "Cseq", "%d",
-                  atoi( httpd_MsgGet( query, "Cseq" ) ) );
+    psz_cseq = httpd_MsgGet( query, "Cseq" );
+    if (psz_cseq)
+        i_cseq = atoi( psz_cseq );
+    else
+        i_cseq = 0;
+    httpd_MsgAdd( answer, "Cseq", "%d", i_cseq );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )

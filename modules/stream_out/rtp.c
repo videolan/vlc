@@ -770,7 +770,6 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
                           const char *psz_destination, vlc_bool_t b_rtsp )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_instance_t  *p_sout = p_stream->p_sout;
     int i_size;
     char *psz_sdp, *p, ipv;
     int i;
@@ -1497,6 +1496,9 @@ static rtsp_client_t *RtspClientNew( sout_stream_t *p_stream, char *psz_session 
 static rtsp_client_t *RtspClientGet( sout_stream_t *p_stream, char *psz_session )
 {
     int i;
+
+    if( psz_session ) return NULL;
+
     for( i = 0; i < p_stream->p_sys->i_rtsp; i++ )
     {
         if( !strcmp( p_stream->p_sys->rtsp[i]->psz_session, psz_session ) )
@@ -1559,8 +1561,10 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_args;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    char          *psz_destination = p_sys->psz_destination;
-    char          *psz_session = NULL;
+    char *psz_destination = p_sys->psz_destination;
+    char *psz_session = NULL;
+    char *psz_cseq = NULL;
+    int i_cseq = 0;
 
     if( answer == NULL || query == NULL )
     {
@@ -1673,7 +1677,12 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     }
     httpd_MsgAdd( answer, "Server", PACKAGE_STRING );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
-    httpd_MsgAdd( answer, "Cseq", "%d", atoi( httpd_MsgGet( query, "Cseq" ) ) );
+    psz_cseq = httpd_MsgGet( query, "Cseq" );
+    if( psz_cseq )
+        i_cseq = atoi( psz_cseq );
+    else
+        i_cseq = 0;
+    httpd_MsgAdd( answer, "Cseq", "%d", i_cseq );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
@@ -1683,15 +1692,17 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     return VLC_SUCCESS;
 }
 
-static int  RtspCallbackId( httpd_callback_sys_t *p_args,
+static int RtspCallbackId( httpd_callback_sys_t *p_args,
                           httpd_client_t *cl,
                           httpd_message_t *answer, httpd_message_t *query )
 {
     sout_stream_id_t *id = (sout_stream_id_t*)p_args;
     sout_stream_t    *p_stream = id->p_stream;
-    sout_instance_t    *p_sout = p_stream->p_sout;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    char          *psz_session = NULL;
+    char *psz_session = NULL;
+    char *psz_cseq = NULL;
+    int  i_cseq = 0;
+
 
     if( answer == NULL || query == NULL )
     {
@@ -1719,7 +1730,7 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
                 answer->i_body = 0;
                 answer->p_body = NULL;
                 psz_session = httpd_MsgGet( query, "Session" );
-                if( *psz_session == 0 )
+                if( !psz_session )
                 {
                     psz_session = malloc( 100 );
                     sprintf( psz_session, "%d", rand() );
@@ -1750,7 +1761,7 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
                 //fprintf( stderr, "HTTPD_MSG_SETUP: unicast ip=%s port=%d\n", ip, i_port );
 
                 psz_session = httpd_MsgGet( query, "Session" );
-                if( *psz_session == 0 )
+                if( !psz_session )
                 {
                     psz_session = malloc( 100 );
                     sprintf( psz_session, "%d", rand() );
@@ -1819,7 +1830,12 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
     }
     httpd_MsgAdd( answer, "Server", "VLC Server" );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
-    httpd_MsgAdd( answer, "Cseq", "%d", atoi( httpd_MsgGet( query, "Cseq" ) ) );
+    psz_cseq = httpd_MsgGet( query, "Cseq" );
+    if( psz_cseq )
+        i_cseq = atoi( psz_cseq );
+    else
+        i_cseq = 0;
+    httpd_MsgAdd( answer, "Cseq", "%d", i_cseq );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
