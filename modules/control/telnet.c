@@ -69,13 +69,18 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define TELNETHOST_TEXT N_( "Telnet Interface host" )
-#define TELNETHOST_LONGTEXT N_( "Default to listen on all network interfaces" )
-#define TELNETPORT_TEXT N_( "Telnet Interface port" )
-#define TELNETPORT_LONGTEXT N_( "Default to 4212" )
+#define TELNETHOST_TEXT N_( "Telnet interface listen host" )
+#define TELNETHOST_LONGTEXT N_( "This is the host on which the telnet " \
+    "interface will listen. It defaults to all network interfaces (0.0.0.0)." \
+    " I you want the telnet interface to be available only on the local " \
+    "machine, enter 127.0.0.1" )
+#define TELNETPORT_TEXT N_( "Telnet interface port" )
+#define TELNETPORT_LONGTEXT N_( "This is the TCP port on which the telnet " \
+    "interface will listen. It defaults to 4212" )
 #define TELNETPORT_DEFAULT 4212
-#define TELNETPWD_TEXT N_( "Telnet Interface password" )
-#define TELNETPWD_LONGTEXT N_( "Default to admin" )
+#define TELNETPWD_TEXT N_( "Telnet interface password" )
+#define TELNETPWD_LONGTEXT N_( "The telnet interface uses a single " \
+    "administration password. The default value is \"admin\"." )
 #define TELNETPWD_DEFAULT "admin"
 
 vlc_module_begin();
