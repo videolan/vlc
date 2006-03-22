@@ -1085,7 +1085,7 @@ VLC_EXPORT( char *, vlc_wraptext, ( const char *, int ) );
 /* iconv wrappers (defined in src/extras/libc.c) */
 typedef void *vlc_iconv_t;
 VLC_EXPORT( vlc_iconv_t, vlc_iconv_open, ( const char *, const char * ) );
-VLC_EXPORT( size_t, vlc_iconv, ( vlc_iconv_t, char **, size_t *, char **, size_t * ) );
+VLC_EXPORT( size_t, vlc_iconv, ( vlc_iconv_t, const char **, size_t *, char **, size_t * ) );
 VLC_EXPORT( int, vlc_iconv_close, ( vlc_iconv_t ) );
 
 /* execve wrapper (defined in src/extras/libc.c) */

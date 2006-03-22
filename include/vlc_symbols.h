@@ -188,7 +188,7 @@ struct module_symbols_t
     char ** (*vlc_parse_cmdline_inner) (const char *, int *);
     char * (*vlc_wraptext_inner) (const char *, int);
     vlc_iconv_t (*vlc_iconv_open_inner) (const char *, const char *);
-    size_t (*vlc_iconv_inner) (vlc_iconv_t, char **, size_t *, char **, size_t *);
+    size_t (*vlc_iconv_inner) (vlc_iconv_t, const char **, size_t *, char **, size_t *);
     int (*vlc_iconv_close_inner) (vlc_iconv_t);
     char * (*vlc_dgettext_inner) (const char *package, const char *msgid);
     demux_t * (*__demux2_New_inner) (vlc_object_t *p_obj, char *psz_access, char *psz_demux, char *psz_path, stream_t *s, es_out_t *out, vlc_bool_t);

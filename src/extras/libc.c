@@ -613,11 +613,12 @@ vlc_iconv_t vlc_iconv_open( const char *tocode, const char *fromcode )
 #endif
 }
 
-size_t vlc_iconv( vlc_iconv_t cd, char **inbuf, size_t *inbytesleft,
+size_t vlc_iconv( vlc_iconv_t cd, const char **inbuf, size_t *inbytesleft,
                   char **outbuf, size_t *outbytesleft )
 {
 #if defined(HAVE_ICONV)
-    return iconv( cd, inbuf, inbytesleft, outbuf, outbytesleft );
+    return iconv( cd, (ICONV_CONST char **)inbuf, inbytesleft,
+                  outbuf, outbytesleft );
 #else
     int i_bytes;
 
