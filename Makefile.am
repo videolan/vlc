@@ -655,6 +655,8 @@ endif
 	cp $(srcdir)/share/http/images/*.png $(top_builddir)/vlc-${VERSION}/http/images/
 	cp $(srcdir)/share/http/requests/*.xml $(top_builddir)/vlc-${VERSION}/http/requests/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/requests/*.xml ;
+	cp $(srcdir)/share/http/requests/readme $(top_builddir)/vlc-${VERSION}/http/requests/readme.txt ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/requests/readme.txt ;
 
 	cp $(srcdir)/share/http/old/*.html $(top_builddir)/vlc-${VERSION}/http/old/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/*.html ;
