@@ -888,7 +888,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         if( i_error )
         {
             msg_Err( p_filter, "Unable to render text (FT_Get_Glyph returned "
-                        %d", i_error );
+                               "%d", i_error );
             goto error;
         }
         FT_Glyph_Get_CBox( tmp_glyph, ft_glyph_bbox_pixels, &glyph_size );
