@@ -46,6 +46,8 @@ int utf8_fprintf( FILE *, const char *, ... );
 #endif
 
 VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
+VLC_EXPORT( const char *, IsUTF8, ( const char * ) );
+
 VLC_EXPORT( char *, FromUTF32, ( const uint32_t * ) );
 VLC_EXPORT( char *, FromUTF16, ( const uint16_t * ) );
 

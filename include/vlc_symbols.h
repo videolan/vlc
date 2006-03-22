@@ -485,6 +485,7 @@ struct module_symbols_t
     char * (*decode_encoded_URI_duplicate_inner) (const char *psz);
     void (*resolve_xml_special_chars_inner) (char *psz_value);
     char * (*FromUTF16_inner) (const uint16_t *);
+    const char * (*IsUTF8_inner) (const char *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -950,6 +951,7 @@ struct module_symbols_t
 #  define decode_encoded_URI_duplicate (p_symbols)->decode_encoded_URI_duplicate_inner
 #  define resolve_xml_special_chars (p_symbols)->resolve_xml_special_chars_inner
 #  define FromUTF16 (p_symbols)->FromUTF16_inner
+#  define IsUTF8 (p_symbols)->IsUTF8_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1418,6 +1420,7 @@ struct module_symbols_t
     ((p_symbols)->decode_encoded_URI_duplicate_inner) = decode_encoded_URI_duplicate; \
     ((p_symbols)->resolve_xml_special_chars_inner) = resolve_xml_special_chars; \
     ((p_symbols)->FromUTF16_inner) = FromUTF16; \
+    ((p_symbols)->IsUTF8_inner) = IsUTF8; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \

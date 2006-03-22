@@ -299,9 +299,9 @@ void LocaleFree( const char *str )
 #endif
 }
 
-/*****************************************************************************
+/**
  * utf8_fopen: Calls fopen() after conversion of file name to OS locale
- *****************************************************************************/
+ */
 FILE *utf8_fopen( const char *filename, const char *mode )
 {
 #if !(defined (WIN32) || defined (UNDER_CE))
@@ -337,9 +337,9 @@ FILE *utf8_fopen( const char *filename, const char *mode )
 #endif
 }
 
-/*****************************************************************************
+/**
  * utf8_mkdir: Calls mkdir() after conversion of file name to OS locale
- *****************************************************************************/
+ */
 int utf8_mkdir( const char *dirname )
 {
 #if defined (UNDER_CE) || defined (WIN32)
@@ -464,9 +464,9 @@ int utf8_lstat( const char *filename, void *buf)
     return utf8_statEx( filename, buf, VLC_FALSE );
 }
 
-/*****************************************************************************
+/**
  * utf8_*printf: *printf with conversion from UTF-8 to local encoding
- *****************************************************************************/
+ */
 static int utf8_vasprintf( char **str, const char *fmt, va_list ap )
 {
     char *utf8;
@@ -502,15 +502,9 @@ int utf8_fprintf( FILE *stream, const char *fmt, ... )
     return res;
 }
 
-/*****************************************************************************
- * EnsureUTF8: replaces invalid/overlong UTF-8 sequences with question marks
- *****************************************************************************
- * Not Todo : convert Latin1 to UTF-8 on the fly
- * It is not possible given UTF-8 needs more space
- * Returns str if it was valid UTF-8, NULL if not.
- *****************************************************************************/
+
+static char *CheckUTF8( char *str, char rep )
 #define isutf8cont( c ) (((c) >= 0x80) && ((c) <= 0xBF)) 
-char *EnsureUTF8( char *str )
 {
     unsigned char *ptr, c;
 
@@ -646,12 +640,40 @@ char *EnsureUTF8( char *str )
         continue;
 
 error:
+        if( rep == 0 )
+            return NULL;
         *ptr++ = '?';
         str = NULL;
     }
 
     return str;
 }
+
+/**
+ * EnsureUTF8: replaces invalid/overlong UTF-8 sequences with question marks
+ * Note that it is not possible to convert from Latin-1 to UTF-8 on the fly,
+ * so we don't try that, even though it would be less disruptive.
+ *
+ * @return str if it was valid UTF-8, NULL if not.
+ */
+char *EnsureUTF8( char *str )
+{
+    return CheckUTF8( str, '?' );
+}
+
+
+/**
+ * IsUTF8: checks whether a string is a valid UTF-8 byte sequence.
+ *
+ * @param str nul-terminated string to be checked
+ *
+ * @return str if it was valid UTF-8, NULL if not.
+ */
+const char *IsUTF8( const char *str )
+{
+    return CheckUTF8( (char *)str, 0 );
+}
+
 
 /**
  * UTF32toUTF8(): converts an array from UTF-32 (host byte order)
