@@ -306,6 +306,7 @@ DIST_http = \
 	http/requests/status.xml \
 	http/requests/vlm.xml \
 	http/requests/vlm_cmd.xml \
+	http/requests/readme \
 	http/style.css \
 	http/iehacks.css \
 	http/vlm.html \
