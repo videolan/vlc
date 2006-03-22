@@ -38,7 +38,7 @@
 #define ELIST_TEXT N_( "Effects list" )
 #define ELIST_LONGTEXT N_( \
       "A list of visual effect, separated by commas.\n"  \
-      "Current effects include: dummy, scope, spectrum" )
+      "Current effects include: dummy, scope, spectrum." )
 
 #define WIDTH_TEXT N_( "Video width" )
 #define WIDTH_LONGTEXT N_( \
@@ -261,7 +261,7 @@ static int Open( vlc_object_t *p_this )
 
                 if( ( psz_eoa = strchr( psz_parser, '}') ) == NULL )
                 {
-                   msg_Err( p_filter, "Unable to parse effect list. Aborting");
+                   msg_Err( p_filter, "unable to parse effect list. Aborting");
                    break;
                 }
                 p_effect->psz_args =
@@ -422,7 +422,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     /* restart this baby */
-    msg_Dbg( p_filter, "We should restart the visual filter" );
+    msg_Dbg( p_filter, "we should restart the visual filter" );
     return VLC_SUCCESS;
 }
 

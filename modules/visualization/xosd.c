@@ -62,24 +62,25 @@ static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
  *****************************************************************************/
 #define POSITION_TEXT N_("Flip vertical position")
 #define POSITION_LONGTEXT N_("Display xosd output on the bottom of the " \
-                             "screen instead of the top")
+                             "screen instead of the top.")
 
 #define TXT_OFS_TEXT N_("Vertical offset")
-#define TXT_OFS_LONGTEXT N_("Vertical offset in pixels of the displayed text")
+#define TXT_OFS_LONGTEXT N_("Vertical offset in pixels of the displayed " \
+                            "text (default 30 px).")
 
 #define SHD_OFS_TEXT N_("Shadow offset")
-#define SHD_OFS_LONGTEXT N_("Offset in pixels of the shadow")
+#define SHD_OFS_LONGTEXT N_("Offset in pixels of the shadow (default 2 px).")
 
 #define FONT_TEXT N_("Font")
-#define FONT_LONGTEXT N_("Font used to display text in the xosd output")
-/* FIXME FIXME FIXME: Gettextize */
-#define COLOUR_TEXT ("Colour")
-#define COLOUR_LONGTEXT ("Colour used to display text in the xosd output")
+#define FONT_LONGTEXT N_("Font used to display text in the xosd output.")
+#define COLOUR_TEXT N_("Color")
+#define COLOUR_LONGTEXT N_("Color used to display text in the xosd output.")
 
 vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_description( _("XOSD interface") );
+    set_shortname( "XOSD" );
     add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT, VLC_TRUE );
     add_integer( "xosd-text-offset", 30, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, VLC_TRUE );
     add_integer( "xosd-shadow-offset", 2, NULL,

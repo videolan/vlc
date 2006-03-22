@@ -136,7 +136,7 @@ static int Open( vlc_object_t *p_this )
     if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' )
          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
     {
-        msg_Warn( p_filter, "Bad input or output format" );
+        msg_Warn( p_filter, "bad input or output format" );
         return VLC_EGENERIC;
     }
     if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )

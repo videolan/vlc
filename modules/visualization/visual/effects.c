@@ -95,7 +95,7 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
     if( !p_s16_buff )
     {
-        msg_Err(p_aout,"Out of memory");
+        msg_Err(p_aout,"out of memory");
         return -1;
     }
 
@@ -120,7 +120,7 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         p_effect->p_data=(void *)malloc(i_nb_bands * sizeof(int) );
         if( !p_effect->p_data)
         {
-            msg_Err(p_aout,"Out of memory");
+            msg_Err(p_aout,"out of memory");
             return -1;
         }
         peaks = (int *)p_effect->p_data;
@@ -139,7 +139,7 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     height = (int *)malloc( i_nb_bands * sizeof(int) );
     if( !height)
     {
-        msg_Err(p_aout,"Out of memory");
+        msg_Err(p_aout,"out of memory");
         return -1;
     }
     /* Convert the buffer to int16_t  */
@@ -157,7 +157,7 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     p_state  = visual_fft_init();
     if( !p_state)
     {
-        msg_Err(p_aout,"Unable to initialize FFT transform");
+        msg_Err(p_aout,"unable to initialize FFT transform");
         return -1;
     }
     p_buffs = p_s16_buff;
@@ -391,7 +391,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
     if( !p_s16_buff )
     {
-        msg_Err(p_aout,"Out of memory");
+        msg_Err(p_aout,"out of memory");
         return -1;
     }
 
@@ -425,7 +425,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         p_effect->p_data=(void *)malloc(i_nb_bands * sizeof(int) );
         if( !p_effect->p_data)
         {
-            msg_Err(p_aout,"Out of memory");
+            msg_Err(p_aout,"out of memory");
             return -1;
         }
         peaks = (int *)p_effect->p_data;
@@ -442,7 +442,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     height = (int *)malloc( i_nb_bands * sizeof(int) );
     if( !height)
     {
-        msg_Err(p_aout,"Out of memory");
+        msg_Err(p_aout,"out of memory");
         return -1;
     }
 
@@ -461,7 +461,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     p_state  = visual_fft_init();
     if( !p_state)
     {
-        msg_Err(p_aout,"Unable to initialize FFT transform");
+        msg_Err(p_aout,"unable to initialize FFT transform");
         return -1;
     }
     p_buffs = p_s16_buff;
