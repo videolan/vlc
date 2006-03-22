@@ -149,7 +149,7 @@ static int Create( vlc_object_t *p_this )
     }
 
 #ifdef CACA_API_VERSION_1
-    p_vout->p_sys->p_qq = cucul_init();
+    p_vout->p_sys->p_qq = cucul_init(0, 0);
     if( !p_vout->p_sys->p_qq )
     {
         msg_Err( p_vout, "cannot initialize libcucul" );
@@ -210,22 +210,15 @@ static int Init( vout_thread_t *p_vout )
     /* Create the libcaca bitmap */
     p_vout->p_sys->p_bitmap =
 #ifdef CACA_API_VERSION_1
-        cucul_create_bitmap( p_vout->p_sys->p_qq, 32,
-                             p_vout->output.i_width, p_vout->output.i_height,
-                             4 * ((p_vout->output.i_width + 15) & ~15),
-                             p_vout->output.i_rmask,
-                             p_vout->output.i_gmask,
-                             p_vout->output.i_bmask,
-                             0x00000000 );
+        cucul_create_bitmap
 #else
-        caca_create_bitmap( 32,
-                            p_vout->output.i_width, p_vout->output.i_height,
-                            4 * ((p_vout->output.i_width + 15) & ~15),
-                            p_vout->output.i_rmask,
-                            p_vout->output.i_gmask,
-                            p_vout->output.i_bmask,
-                            0x00000000 );
+        caca_create_bitmap
 #endif
+                       ( 32, p_vout->output.i_width, p_vout->output.i_height,
+                         4 * ((p_vout->output.i_width + 15) & ~15),
+                         p_vout->output.i_rmask, p_vout->output.i_gmask,
+                         p_vout->output.i_bmask, 0x00000000 );
+
     if( !p_vout->p_sys->p_bitmap )
     {
         msg_Err( p_vout, "could not create libcaca bitmap" );
@@ -271,7 +264,7 @@ static int Init( vout_thread_t *p_vout )
 static void End( vout_thread_t *p_vout )
 {
 #ifdef CACA_API_VERSION_1
-    cucul_free_bitmap( p_vout->p_sys->p_qq, p_vout->p_sys->p_bitmap );
+    cucul_free_bitmap( p_vout->p_sys->p_bitmap );
 #else
     caca_free_bitmap( p_vout->p_sys->p_bitmap );
 #endif
