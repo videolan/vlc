@@ -427,6 +427,13 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     panel_sizer->Layout(); panel_sizer->Fit( main_panel );
     main_sizer->Layout(); main_sizer->Fit( this );
     main_min_size = GetSize();
+    /* FIXME HACK as far as i understan (i.e. not a lot) the toolbar
+     * doesn't take the labels into account when it returns its size */
+
+    if( config_GetInt(p_intf, "wx-labels") )
+    {
+        main_min_size.SetWidth(800);
+    }
     splitter->SetSizeHints( -1, -1 );
 
     /* Video window */
@@ -675,47 +682,59 @@ void Interface::CreateOurToolBar()
 #define HELP_SLOW N_("Play slower")
 #define HELP_FAST N_("Play faster")
 
+#define LABEL_OPEN N_("Open")
+#define LABEL_STOP N_("Stop")
+#define LABEL_PLAY N_("Play")
+#define LABEL_PAUSE N_("Pause")
+#define LABEL_PLO N_("Playlist")
+#define LABEL_SPLO N_("Small playlist")
+#define LABEL_PLP N_("Previous")
+#define LABEL_PLN N_("Next")
+#define LABEL_SLOW N_("Slower")
+#define LABEL_FAST N_("Faster")
     int minimal = config_GetInt( p_intf, "wx-minimal" );
+    bool label = config_GetInt( p_intf, "wx-labels" );
 
     wxLogNull LogDummy; /* Hack to suppress annoying log message on the win32
                          * version because we don't include wx.rc */
 
     wxToolBar *toolbar =
-        CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT );
+        CreateToolBar( label?wxTB_HORIZONTAL | wxTB_FLAT |wxTB_TEXT:
+                       wxTB_HORIZONTAL | wxTB_FLAT );
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
     if (!minimal)
     {
-    toolbar->AddTool( OpenFile_Event, wxT(""),
+    toolbar->AddTool( OpenFile_Event, wxU(LABEL_OPEN),
                       wxBitmap( eject_xpm ), wxU(_(HELP_OPEN)) );
     toolbar->AddSeparator();
     }
 
-    wxToolBarToolBase *p_tool = toolbar->AddTool( PlayStream_Event, wxT(""),
+    wxToolBarToolBase *p_tool = toolbar->AddTool( PlayStream_Event, wxU(LABEL_PLAY),
                       wxBitmap( play_xpm ), wxU(_(HELP_PLAY)), wxITEM_CHECK );
     p_tool->SetClientData( p_tool );
 
     if (!minimal)
     {
-    toolbar->AddTool( StopStream_Event, wxT(""), wxBitmap( stop_xpm ),
+    toolbar->AddTool( StopStream_Event, wxU(LABEL_STOP), wxBitmap( stop_xpm ),
                       wxU(_(HELP_STOP)) );
     toolbar->AddSeparator();
 
-    toolbar->AddTool( PrevStream_Event, wxT(""),
+    toolbar->AddTool( PrevStream_Event, wxU(LABEL_PLP),
                       wxBitmap( prev_xpm ), wxU(_(HELP_PLP)) );
-    toolbar->AddTool( SlowStream_Event, wxT(""),
+    toolbar->AddTool( SlowStream_Event, wxU(LABEL_SLOW),
                       wxBitmap( slow_xpm ), wxU(_(HELP_SLOW)) );
-    toolbar->AddTool( FastStream_Event, wxT(""),
+    toolbar->AddTool( FastStream_Event, wxU(LABEL_FAST),
                       wxBitmap( fast_xpm ), wxU(_(HELP_FAST)) );
-    toolbar->AddTool( NextStream_Event, wxT(""), wxBitmap( next_xpm ),
+    toolbar->AddTool( NextStream_Event, wxU(LABEL_PLN), wxBitmap( next_xpm ),
                       wxU(_(HELP_PLN)) );
     toolbar->AddSeparator();
     if( config_GetInt( p_intf, "wx-playlist-view" ) != 1 )
-        toolbar->AddTool( Playlist_Event, wxT(""), wxBitmap( playlist_xpm ),
-                          wxU(_(HELP_PLO)) );
+        toolbar->AddTool( Playlist_Event, wxU(LABEL_PLO),
+                          wxBitmap( playlist_xpm ), wxU(_(HELP_PLO)) );
     if( config_GetInt( p_intf, "wx-playlist-view" ) >= 1 )
-        toolbar->AddTool( PlaylistSmall_Event, wxT(""),
+        toolbar->AddTool( PlaylistSmall_Event, wxU(LABEL_SPLO),
                           wxBitmap( playlist_small_xpm ), wxU(_(HELP_SPLO)) );
     }
 
