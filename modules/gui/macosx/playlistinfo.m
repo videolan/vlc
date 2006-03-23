@@ -157,8 +157,8 @@
 - (void)initPanel:(id)sender
 {
     /* check whether our item is valid, because we would crash if not */
-    if(! [self isItemInPlaylist: p_item] )
-        return;
+    if(! [self isItemInPlaylist: p_item] ) return;
+
     char *psz_temp;
     vlc_mutex_lock( &p_item->input.lock );
 
@@ -214,7 +214,6 @@
     {
         [self updateStatistics: nil];
     }
-
     [o_info_window makeKeyAndOrderFront: sender];
 }
 
@@ -322,7 +321,7 @@
         return NO;
     }
 
-    for( i = 0 ; i < p_playlist->i_size ; i++ )
+    for( i = 0 ; i < p_playlist->i_all_size ; i++ )
     {
         if( p_playlist->pp_all_items[i] == p_local_item )
         {
