@@ -220,7 +220,7 @@ static int OpenAccess( vlc_object_t *p_this )
 
     if( p_sys->p_db == NULL || i_ret )
     {
-        msg_Err( p_access, "The DAAP services_discovery module must be enabled" );
+        msg_Err( p_access, "the DAAP services_discovery module must be enabled" );
         return VLC_EGENERIC;
     }
 
@@ -276,7 +276,7 @@ static int OpenAccess( vlc_object_t *p_this )
     }
 
 
-    msg_Dbg( p_access, "Downloading %s song %i (db %i)",
+    msg_Dbg( p_access, "downloading %s song %i (db %i)",
                            p_sys->songdata.songformat,
                            p_sys->i_song, p_sys->p_host->i_database_id );
 
@@ -287,7 +287,7 @@ static int OpenAccess( vlc_object_t *p_this )
                                           p_sys->songdata.songformat,
                                           &(p_sys->song) );
 
-    msg_Dbg( p_access, "Finished downloading, read %i bytes (ret %i)",
+    msg_Dbg( p_access, "finished downloading, read %i bytes (ret %i)",
                                           p_sys->song.size, i_ret );
 
     p_access->info.i_size = p_sys->song.size;

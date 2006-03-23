@@ -115,14 +115,14 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_ctx = libhal_ctx_new();
     if( !p_sys->p_ctx )
     {
-        msg_Err( p_sd, "Unable to create HAL context") ;
+        msg_Err( p_sd, "unable to create HAL context") ;
         free( p_sys );
         return VLC_EGENERIC;
     }
     p_connection = dbus_bus_get( DBUS_BUS_SYSTEM, &dbus_error );
     if( dbus_error_is_set( &dbus_error ) )
     {
-        msg_Err( p_sd, "Unable to connect to DBUS: %s", dbus_error.message );
+        msg_Err( p_sd, "unable to connect to DBUS: %s", dbus_error.message );
         dbus_error_free( &dbus_error );
         free( p_sys );
         return VLC_EGENERIC;

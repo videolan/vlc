@@ -76,8 +76,6 @@ static const char ipv6_scopes[] = "1456789ABCDE";
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define SAP_ADDR_TEXT N_( "SAP multicast address" )
-#define SAP_ADDR_LONGTEXT N_( "Listen for SAP announcements on another address" )
 #define SAP_IPV4_TEXT N_( "IPv4-SAP listening" )
 #define SAP_IPV4_LONGTEXT N_( \
       "Set this if you want the SAP module to listen to IPv4 announcements " \
@@ -123,8 +121,6 @@ vlc_module_begin();
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
-    add_string( "sap-addr", NULL, NULL,
-                SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
     add_bool( "sap-ipv4", 1 , NULL,
                SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE );
     add_bool( "sap-ipv6", 1 , NULL,
@@ -139,6 +135,7 @@ vlc_module_begin();
                SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, VLC_TRUE );
     add_bool( "sap-timeshift", 0 , NULL,
               SAP_TIMESHIFT_TEXT,SAP_TIMESHIFT_LONGTEXT, VLC_TRUE );
+    add_suppressed_string( "sap-addr" );
 
     set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );
@@ -418,7 +415,7 @@ error:
     free( psz_sdp );
     if( p_sdp ) FreeSDP( p_sdp );
     stream_Seek( p_demux->s, 0 );
-    return VLC_EGENERIC;    
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -501,12 +498,6 @@ static void Run( services_discovery_t *p_sd )
             psz_address[sizeof(SAP_V6_1) - 1] = *c_scope;
             InitSocket( p_sd, psz_address, SAP_PORT );
         }
-    }
-
-    psz_addr = var_CreateGetString( p_sd, "sap-addr" );
-    if( psz_addr && *psz_addr )
-    {
-        InitSocket( p_sd, psz_addr, SAP_PORT );
     }
 
     if( p_sd->p_sys->i_fd == 0 )
@@ -650,7 +641,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
         psz_sdp += 4;
         if( i_read <= 9 )
         {
-            msg_Warn( p_sd, "too short SAP packet\n" );
+            msg_Warn( p_sd, "too short SAP packet" );
             return VLC_EGENERIC;
         }
     }
@@ -659,7 +650,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
         psz_sdp += 16;
         if( i_read <= 21 )
         {
-            msg_Warn( p_sd, "too short SAP packet\n" );
+            msg_Warn( p_sd, "too short SAP packet" );
             return VLC_EGENERIC;
         }
     }
@@ -679,7 +670,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
             free( p_decompressed_buffer );
         }
 #else
-        msg_Warn( p_sd, "Ignoring compressed sap packet" );
+        msg_Warn( p_sd, "ignoring compressed sap packet" );
         return VLC_EGENERIC;
 #endif
     }
@@ -710,7 +701,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
     }
     if( ( psz_sdp != psz_foo ) && strcasecmp( psz_foo, "application/sdp" ) )
     {
-        msg_Dbg( p_sd, "unhandled content type: %s", psz_foo );        
+        msg_Dbg( p_sd, "unhandled content type: %s", psz_foo );
     }
     if( ( psz_sdp - (char *)p_buffer ) >= i_read )
     {
@@ -767,7 +758,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
     /* Add item */
     if( p_sdp->i_media > 1 )
     {
-        msg_Dbg( p_sd, "passing to LIVE.COM" );
+        msg_Dbg( p_sd, "passing to liveMedia" );
     }
 
     CreateAnnounce( p_sd, i_hash, p_sdp );
@@ -1064,7 +1055,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 
     if( psz_sdp[0] != 'v' || psz_sdp[1] != '=' )
     {
-        msg_Warn( p_obj, "Bad packet" );
+        msg_Warn( p_obj, "bad packet" );
         return NULL;
     }
 
@@ -1403,10 +1394,10 @@ static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 )
 
 static void CacheLoad( services_discovery_t *p_sd )
 {
-    msg_Warn( p_sd, "Cache not implemented") ;
+    msg_Warn( p_sd, "cache not implemented") ;
 }
 
 static void CacheSave( services_discovery_t *p_sd )
 {
-    msg_Warn( p_sd, "Cache not implemented") ;
+    msg_Warn( p_sd, "cache not implemented") ;
 }
