@@ -419,15 +419,11 @@ static void Run( intf_thread_t *p_intf )
         {
             if( p_sys->p_playlist )
             {
-                p_sys->p_input =
-                    vlc_object_find( p_sys->p_playlist,
-                                     VLC_OBJECT_INPUT,
-                                     FIND_CHILD );
+                p_sys->p_input = p_sys->p_playlist->p_input;
             }
         }
-        else if( p_sys->p_input->b_dead )
+        else if( p_sys->p_input->b_dead || p_sys->p_input->b_die )
         {
-            vlc_object_release( p_sys->p_input );
             p_sys->p_input = NULL;
         }
 
