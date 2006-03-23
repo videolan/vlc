@@ -877,31 +877,27 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         vlc_mutex_lock( &p_intf->change_lock );
 
-#define p_input p_intf->p_sys->p_input
 
-        if( p_input == NULL )
+        if( p_intf->p_sys->p_input == NULL )
         {
-            p_input = (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
+            p_intf->p_sys->p_input = p_playlist->p_input;
 
-            /* Refresh the interface */
-            if( p_input )
+                /* Refresh the interface */
+            if( p_intf->p_sys->p_input )
             {
                 msg_Dbg( p_intf, "input has changed, refreshing interface" );
                 p_intf->p_sys->b_input_update = VLC_TRUE;
             }
         }
-        else if( p_input->b_die || p_input->b_dead )
+        else if( p_intf->p_sys->p_input->b_die || p_intf->p_sys->p_input->b_dead )
         {
             /* input stopped */
             p_intf->p_sys->b_intf_update = VLC_TRUE;
             p_intf->p_sys->i_play_status = END_S;
             [self setScrollField: _NS("VLC media player") stopAfter:-1];
             msg_Dbg( p_intf, "input has stopped, refreshing interface" );
-            vlc_object_release( p_input );
-            p_input = NULL;
+            p_intf->p_sys->p_input = NULL;
         }
-#undef p_input
 
         /* Manage volume status */
         [self manageVolumeSlider];
