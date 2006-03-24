@@ -235,7 +235,7 @@ function check_and_replace_int( id, val )
 }
 
 function addslashes( str ){ return str.replace(/\'/g, '\\\''); }
-function escapebackslashes( str ){ return str.replace(/\\[^']/g, '\\\\'); }
+function escapebackslashes( str ){ return str.replace(/\\/g, '\\\\'); }
 
 function toCamelCase( str )
 {
@@ -656,11 +656,11 @@ function parse_browse_dir( )
                     setclass( item, 'browser' );
                     if( elt.getAttribute( 'type' ) == 'directory' )
                     {
-                        item.setAttribute( 'href', 'javascript:browse_dir(\''+escapebackslashes(addslashes(elt.getAttribute( 'path' )))+'\');');
+                        item.setAttribute( 'href', 'javascript:browse_dir(\''+addslashes(escapebackslashes(elt.getAttribute( 'path' )))+'\');');
                     }
                     else
                     {
-                        item.setAttribute( 'href', 'javascript:browse_path(\''+escapebackslashes(addslashes(elt.getAttribute( 'path' )))+'\');' );
+                        item.setAttribute( 'href', 'javascript:browse_path(\''+addslashes(escapebackslashes(elt.getAttribute( 'path' )))+'\');' );
                     }
                     item.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                     pos.appendChild( item );
@@ -669,7 +669,7 @@ function parse_browse_dir( )
                         pos.appendChild( document.createTextNode( ' ' ) );
                         var item = document.createElement( "a" );
                         setclass( item, 'browser' );
-                        item.setAttribute( 'href', 'javascript:browse_path(\''+escapebackslashes(addslashes(elt.getAttribute( 'path' )))+'\');');
+                        item.setAttribute( 'href', 'javascript:browse_path(\''+addslashes(escapebackslashes(elt.getAttribute( 'path' )))+'\');');
                         item.appendChild( document.createTextNode( '(select)' ) );
                         pos.appendChild( item );
                     }
