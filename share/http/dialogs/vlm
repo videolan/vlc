@@ -44,17 +44,22 @@ sout and vlmelements .
     <br />
     <span id="vlm_error"></span>
     <br />
-    <button id="btn_broadcast" onclick="hide_vlm_add();show('vlm_add_broadcast');update_vlm_add_broadcast();" onmouseover="button_over(this);" onmouseout="button_out(this);">
-      Broadcast
-    </button>
-    <button id="btn_vod" onclick="hide_vlm_add();show('vlm_add_vod');update_vlm_add_vod();" onmouseover="button_over(this);" onmouseout="button_out(this);">
-      Video on Demand
-    </button>
-    <button id="btn_schedule" onclick="hide_vlm_add();show('vlm_add_schedule');update_vlm_add_schedule();" onmouseover="button_over(this);" onmouseout="button_out(this);">
-      Schedule
-    </button>
-    <button id="btn_other" onclick="hide_vlm_add();show('vlm_add_other');update_vlm_add_other();" onmouseover="button_over(this);" onmouseout="button_out(this);">
-      Other
+    <span id="vlm_helper_controls">
+      <button id="btn_broadcast" onclick="hide_vlm_add();show('vlm_add_broadcast');update_vlm_add_broadcast();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+        Broadcast
+      </button>
+      <button id="btn_vod" onclick="hide_vlm_add();show('vlm_add_vod');update_vlm_add_vod();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+        Video on Demand
+      </button>
+      <button id="btn_schedule" onclick="hide_vlm_add();show('vlm_add_schedule');update_vlm_add_schedule();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+        Schedule
+      </button>
+      <button id="btn_other" onclick="hide_vlm_add();show('vlm_add_other');update_vlm_add_other();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+        Other
+      </button>
+    </span>
+    <button id="btn_vlm_helper_toggle" onclick="toggle_show_vlm_helper();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      Hide VLM helper
     </button>
   </div>
   <div id="vlm_helper" class="helper" >

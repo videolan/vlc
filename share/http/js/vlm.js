@@ -28,6 +28,27 @@ function addunderscores( str ){ return str.replace(/\'|\"| /g, '_'); }
  * Input dialog functions
  *********************************************************************/
 
+function toggle_show_vlm_helper()
+{
+    var vlmh = document.getElementById( "vlm_helper" );
+    var vlmhctrl = document.getElementById( "vlm_helper_controls" );
+    var btn = document.getElementById( "btn_vlm_helper_toggle" );
+    if( vlmh.style.display == 'block' || vlmh.style.display == '')
+    {
+        vlmh.style.display = 'none';
+        vlmhctrl.style.display = 'none';
+        btn.removeChild( btn.firstChild );
+        btn.appendChild( document.createTextNode( 'Show VLM helper' ) );
+    }
+    else
+    {
+        vlmh.style.display = 'block';
+        vlmhctrl.style.display = 'inline';
+        btn.removeChild( btn.firstChild );
+        btn.appendChild( document.createTextNode( 'Hide VLM helper' ) );
+    }
+}
+
 function vlm_input_edit( dest )
 {
     document.getElementById( 'input_dest' ).value = dest;
