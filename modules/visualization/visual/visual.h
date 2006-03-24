@@ -63,10 +63,6 @@ int spectrum_Run
         (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
 int spectrometer_Run
         (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
-#if 0
-int blur_Run
-        (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
-#endif
 
 /* Default vout size */
 #define VOUT_WIDTH 533

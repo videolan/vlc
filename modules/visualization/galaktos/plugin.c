@@ -219,7 +219,7 @@ static void Thread( vlc_object_t *p_this )
         module_Need( p_thread->p_opengl, "opengl provider", NULL, 0 );
     if( p_thread->p_module == NULL )
     {
-        msg_Err( p_thread, "no OpenGL provider found" );
+        msg_Err( p_thread, "unable to initialize OpenGL" );
         vlc_object_detach( p_thread->p_opengl );
         vlc_object_destroy( p_thread->p_opengl );
         return;

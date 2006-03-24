@@ -1,7 +1,7 @@
 /*****************************************************************************
  * visual.c : Visualisation system
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
@@ -64,15 +64,15 @@
 
 #define PEAKS_TEXT N_( "Enable peaks" )
 #define PEAKS_LONGTEXT N_( \
-        "Defines whether to draw peaks." )
+        "This will draw \"peaks\" in the spectrum analyzer" )
 
 #define ORIG_TEXT N_( "Enable original graphic spectrum" )
 #define ORIG_LONGTEXT N_( \
-        "Defines whether to draw the original spectrum graphic routine." )
+        "This enabled the \"flat\" spectrum analyzer in the spectrometer" )
 
 #define BANDS_TEXT N_( "Enable bands" )
 #define BANDS_LONGTEXT N_( \
-        "Defines whether to draw the bands." )
+        "This draws bands in the spectrometer." )
 
 #define BASE_TEXT N_( "Enable base" )
 #define BASE_LONGTEXT N_( \
@@ -100,7 +100,7 @@
 
 #define STARS_TEXT N_( "Number of stars" )
 #define STARS_LONGTEXT N_( \
-        "Defines the number of stars to draw with random effect." )
+        "This defines the number of stars to draw with random effect." )
 
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
@@ -319,7 +319,6 @@ static int Open( vlc_object_t *p_this )
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place= 1;
 
-    msg_Dbg( p_filter,"Visualizer initialized");
     return VLC_SUCCESS;
 }
 

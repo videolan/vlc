@@ -61,20 +61,22 @@ static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
  * Module descriptor
  *****************************************************************************/
 #define POSITION_TEXT N_("Flip vertical position")
-#define POSITION_LONGTEXT N_("Display xosd output on the bottom of the " \
+#define POSITION_LONGTEXT N_("Display XOSD output at the bottom of the " \
                              "screen instead of the top.")
 
 #define TXT_OFS_TEXT N_("Vertical offset")
-#define TXT_OFS_LONGTEXT N_("Vertical offset in pixels of the displayed " \
-                            "text (default 30 px).")
+#define TXT_OFS_LONGTEXT N_("Vertical offset between the border of the screen "\
+                            "and the displayed text (in pixels, defaults to "\
+                            "30 pixels)." )
 
 #define SHD_OFS_TEXT N_("Shadow offset")
-#define SHD_OFS_LONGTEXT N_("Offset in pixels of the shadow (default 2 px).")
+#define SHD_OFS_LONGTEXT N_("Offset between the text and the shadow (in " \
+                            "pixels, defaults to 2 pixels)." )
 
 #define FONT_TEXT N_("Font")
-#define FONT_LONGTEXT N_("Font used to display text in the xosd output.")
+#define FONT_LONGTEXT N_("Font used to display text in the XOSD output.")
 #define COLOUR_TEXT N_("Color")
-#define COLOUR_LONGTEXT N_("Color used to display text in the xosd output.")
+#define COLOUR_LONGTEXT N_("Color used to display text in the XOSD output.")
 
 vlc_module_begin();
     set_category( CAT_INTERFACE );
