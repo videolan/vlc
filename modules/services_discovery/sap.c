@@ -76,6 +76,10 @@ static const char ipv6_scopes[] = "1456789ABCDE";
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define SAP_ADDR_TEXT N_( "SAP multicast address" )
+#define SAP_ADDR_LONGTEXT N_( "The SAP module normally chooses itself the " \
+                              "good addresses to listen to. However, you can " \
+                              "specify a specific address" )
 #define SAP_IPV4_TEXT N_( "IPv4-SAP listening" )
 #define SAP_IPV4_LONGTEXT N_( \
       "Set this if you want the SAP module to listen to IPv4 announcements " \
@@ -121,6 +125,8 @@ vlc_module_begin();
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
+    add_string( "sap-addr", NULL, NULL,
+                SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
     add_bool( "sap-ipv4", 1 , NULL,
                SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE );
     add_bool( "sap-ipv6", 1 , NULL,
@@ -135,7 +141,6 @@ vlc_module_begin();
                SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, VLC_TRUE );
     add_bool( "sap-timeshift", 0 , NULL,
               SAP_TIMESHIFT_TEXT,SAP_TIMESHIFT_LONGTEXT, VLC_TRUE );
-    add_suppressed_string( "sap-addr" );
 
     set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );
@@ -498,6 +503,12 @@ static void Run( services_discovery_t *p_sd )
             psz_address[sizeof(SAP_V6_1) - 1] = *c_scope;
             InitSocket( p_sd, psz_address, SAP_PORT );
         }
+    }
+
+    psz_addr = var_CreateGetString( p_sd, "sap-addr" );
+    if( psz_addr && *psz_addr )
+    {
+        InitSocket( p_sd, psz_addr, SAP_PORT );
     }
 
     if( p_sd->p_sys->i_fd == 0 )
