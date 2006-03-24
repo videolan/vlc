@@ -99,6 +99,8 @@ private:
 #define SIZE_TO_VIDEO_LONGTEXT N_("Resize VLC to match the video resolution")
 #define SYSTRAY_TEXT N_("Show systray icon")
 #define SYSTRAY_LONGTEXT N_("Show systray icon")
+#define LABEL_TEXT N_("Show labels in toolbar")
+#define LABEL_LONGTEXT N_("Show labels below the icons in the toolbar.")
 
 #define PLAYLIST_TEXT N_("Playlist view" )
 #define PLAYLIST_LONGTEXT N_("There are two possible playlist views in the " \
@@ -157,6 +159,7 @@ vlc_module_begin();
     add_deprecated( "wxwin-systray", VLC_FALSE); /*Deprecated since 0.8.4*/
 #endif
 #endif
+    add_bool( "wx-labels", 0, NULL, LABEL_TEXT, LABEL_LONGTEXT, VLC_TRUE);
     add_string( "wx-config-last", NULL, NULL,
                 "last config", "last config", VLC_TRUE );
         change_autosave();
