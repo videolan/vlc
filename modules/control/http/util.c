@@ -262,12 +262,25 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 
             if( !f->b_handler )
             {
+                char *psz_type = strdup( p_sys->psz_html_type );
+                if( strstr( &dir[strlen( psz_root )], ".xml" ) )
+                {
+                    char *psz = strstr( psz_type, "html;" );
+                    if( psz )
+                    {
+                        psz[0] = 'x';
+                        psz[1] = 'm';
+                        psz[2] = 'l';
+                        psz[3] = ';';
+                        psz[4] = ' ';
+                    }
+                }
                 f->p_file = httpd_FileNew( p_sys->p_httpd_host,
                                            f->name,
-                                           f->b_html ? ( strstr( &dir[strlen( psz_root )], ".xml" ) ? "text/xml; charset=UTF-8" : p_sys->psz_html_type ) :
-                                            NULL,
+                                           f->b_html ? psz_type : NULL,
                                            user, password, p_acl,
                                            E_(HttpCallback), f );
+                free( psz_type );
                 if( f->p_file != NULL )
                 {
                     TAB_APPEND( p_sys->i_files, p_sys->pp_files, f );

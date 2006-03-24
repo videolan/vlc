@@ -185,7 +185,8 @@ static int Open( vlc_object_t *p_this )
         p_sys->iconv_from_utf8 = p_sys->iconv_to_utf8 = (vlc_iconv_t)-1;
     }
 
-    free( psz_src );
+    p_sys->psz_charset = strdup( psz_src );
+    psz_src = NULL;
 
     /* determine file handler associations */
     p_sys->i_handlers = 0;
@@ -333,7 +334,7 @@ failed:
     }
     httpd_HostDelete( p_sys->p_httpd_host );
     free( p_sys->psz_address );
-    free( p_sys->psz_html_type ); 
+    free( p_sys->psz_html_type );
     if( p_sys->iconv_from_utf8 != (vlc_iconv_t)-1 )
         vlc_iconv_close( p_sys->iconv_from_utf8 );
     if( p_sys->iconv_to_utf8 != (vlc_iconv_t)-1 )
@@ -542,6 +543,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     E_(mvar_AppendNewVar)( p_args->vars, "stream_length", length );
     E_(mvar_AppendNewVar)( p_args->vars, "volume", volume );
     E_(mvar_AppendNewVar)( p_args->vars, "stream_state", state );
+    E_(mvar_AppendNewVar)( p_args->vars, "charset", ((intf_sys_t *)p_args->p_intf->p_sys)->psz_charset );
 
     E_(SSInit)( &p_args->stack );
 
@@ -569,7 +571,7 @@ int  E_(HttpCallback)( httpd_file_sys_t *p_args,
     char **pp_data = (char **)_pp_data;
     FILE *f;
 
-    /* FIXME: do we need character encoding translation here ? */
+    /* FIXME: do we need character encoding translation here? */
     if( ( f = fopen( p_args->file, "r" ) ) == NULL )
     {
         Callback404( p_args, pp_data, pi_data );

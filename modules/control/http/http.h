@@ -385,6 +385,7 @@ struct intf_sys_t
     input_thread_t      *p_input;
     vlm_t               *p_vlm;
     char                *psz_html_type;
+    char                *psz_charset;
     vlc_iconv_t         iconv_from_utf8, iconv_to_utf8;
 
     char                *psz_address;
