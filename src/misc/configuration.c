@@ -63,6 +63,11 @@
 #include <tchar.h>
 #endif
 
+#if defined( WIN32 ) || defined( UNDER_CE )
+#   define DIR_SEP "\\"
+#else
+#   define DIR_SEP "/"
+#endif
 
 static int ConfigStringToKey( char * );
 static char *ConfigKeyToString( int );
@@ -775,7 +780,8 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         psz_filename = (char *)malloc( sizeof("/" CONFIG_DIR "/" CONFIG_FILE) +
                                        strlen(psz_homedir) );
         if( psz_filename )
-            sprintf( psz_filename, "%s/" CONFIG_DIR "/" CONFIG_FILE,
+            sprintf( psz_filename,
+                     "%s" DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE,
                      psz_homedir );
     }
     else
@@ -1019,7 +1025,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                                        strlen(psz_homedir) );
 
         if( psz_filename )
-            sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
+            sprintf( psz_filename, "%s" DIR_SEP CONFIG_DIR, psz_homedir );
 
         if( !psz_filename )
         {
@@ -1030,7 +1036,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
         config_CreateDir( p_this, psz_filename );
 
-        strcat( psz_filename, "/" CONFIG_FILE );
+        strcat( psz_filename, DIR_SEP CONFIG_FILE );
     }
     else
     {
