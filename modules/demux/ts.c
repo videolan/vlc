@@ -1828,9 +1828,7 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
         case 0x92:  /* DVD_SPU vls (sub) */
             es_format_Init( fmt, SPU_ES, VLC_FOURCC( 's', 'p', 'u', 'b' ) );
             break;
-        case 0x93:  /* LPCM vls (audio) */
-            es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'l', 'p', 'c', 'b' ) );
-            break;
+
         case 0x94:  /* SDDS (audio) */
             es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 's', 'd', 'd', 'b' ) );
             break;
