@@ -167,9 +167,7 @@ NS_IMETHODIMP VlcPeer::Get_int_variable( const char *psz_var, PRInt64 *result )
     vlc_value_t val;
     if( p_plugin )
     {
-        fprintf(stderr, "Choppage de %s\n", psz_var );
         VLC_VariableGet( p_plugin->i_vlc, psz_var, &val );
-        fprintf(stderr, "Valeur %i\n", val.i_int );
         *result = (PRInt64)val.i_int;
     }
     return NS_OK;
@@ -191,7 +189,6 @@ NS_IMETHODIMP VlcPeer::Get_str_variable( const char *psz_var, char **result )
     vlc_value_t val;
     if( p_plugin )
     {
-        fprintf(stderr, "Choppage de %s\n", psz_var );
         VLC_VariableGet( p_plugin->i_vlc, psz_var, &val );
         if( val.psz_string )
         {
