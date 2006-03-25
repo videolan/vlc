@@ -473,6 +473,7 @@ HRESULT VLCPlugin::onInit(void)
         _b_visible = TRUE;
         _b_mute = FALSE;
         _i_volume = 50;
+        _i_time   = 0;
         // set default/preferred size (320x240) pixels in HIMETRIC
         HDC hDC = CreateDevDC(NULL);
         _extent.cx = 320;
@@ -538,7 +539,7 @@ HRESULT VLCPlugin::onLoad(void)
     return S_OK;
 };
 
-HRESULT VLCPlugin::onRun(void)
+HRESULT VLCPlugin::getVLCObject(int *i_vlc)
 {
     if( ! isRunning() )
     {
@@ -613,11 +614,21 @@ HRESULT VLCPlugin::onRun(void)
         char *psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
         if( NULL != psz_mrl )
         {
+            char timeBuffer[32];
+            const char *options[1];
+            int   cOptions = 0;
+
+            if( _i_time )
+            {
+                snprintf(timeBuffer, sizeof(timeBuffer), ":start-time=%d", _i_time);
+                options[cOptions++] = timeBuffer;
+            }
             // add default target to playlist
-            VLC_AddTarget(_i_vlc, psz_mrl, NULL, 0, PLAYLIST_APPEND, PLAYLIST_END);
+            VLC_AddTarget(_i_vlc, psz_mrl, options, cOptions, PLAYLIST_APPEND, PLAYLIST_END);
             CoTaskMemFree(psz_mrl);
         }
     }
+    *i_vlc = _i_vlc;
     return S_OK;
 };
 
@@ -796,26 +807,27 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
 
     if( _b_usermode )
     {
-        /* run vlc if not done already */
-        HRESULT result = onRun();
+        /* will run vlc if not done already */
+        int i_vlc;
+        HRESULT result = getVLCObject(&i_vlc);
         if( FAILED(result) )
             return result;
 
         /* set internal video width and height */
         vlc_value_t val;
         val.i_int = posRect.right-posRect.left;
-        VLC_VariableSet(_i_vlc, "conf::width", val);
+        VLC_VariableSet(i_vlc, "conf::width", val);
         val.i_int = posRect.bottom-posRect.top;
-        VLC_VariableSet(_i_vlc, "conf::height", val);
+        VLC_VariableSet(i_vlc, "conf::height", val);
 
         /* set internal video parent window */
         /* horrible cast there */
         val.i_int = reinterpret_cast<int>(_videownd);
-        VLC_VariableSet(_i_vlc, "drawable", val);
+        VLC_VariableSet(i_vlc, "drawable", val);
 
-        if( _b_autoplay & (VLC_PlaylistNumberOfItems(_i_vlc) > 0) )
+        if( _b_autoplay & (VLC_PlaylistNumberOfItems(i_vlc) > 0) )
         {
-            VLC_Play(_i_vlc);
+            VLC_Play(i_vlc);
             fireOnPlayEvent();
         }
     }
@@ -867,6 +879,22 @@ void VLCPlugin::setVolume(int volume)
         if( isRunning() )
         {
             VLC_VolumeSet(_i_vlc, _i_volume);
+        }
+        setDirty(TRUE);
+    }
+};
+
+void VLCPlugin::setTime(int seconds)
+{
+    if( seconds < 0 )
+        seconds = 0;
+
+    if( seconds != _i_time )
+    {
+        _i_time = seconds;
+        if( isRunning() )
+        {
+            VLC_TimeSet(_i_vlc, seconds, VLC_FALSE);
         }
         setDirty(TRUE);
     }

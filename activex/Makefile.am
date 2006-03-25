@@ -81,7 +81,7 @@ libaxvlc_a_DEPENDENCIES = axvlc.def $(DATA_axvlc_rc)
 axvlc$(LIBEXT): $(libaxvlc_a_OBJECTS) \
 	              $(libaxvlc_a_DEPENDENCIES) stamp-pic
 	$(CXXLINK) $(libaxvlc_a_OBJECTS) $(DATA_axvlc_rc) \
-	-Wl,--enable-stdcall-fixup $(srcdir)/axvlc.def \
+	$(srcdir)/axvlc.def \
 	  $(LIBRARIES_libvlc) -shared $(LIBRARIES_libvlc) $(LDFLAGS_activex) \
 	  $(INCLUDED_LIBINTL)
 # Cygwin work-around

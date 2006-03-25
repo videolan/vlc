@@ -167,6 +167,14 @@ STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErr
         _p_instance->setVolume(V_I4(&value));
         VariantClear(&value);
     }
+
+    V_VT(&value) = VT_I4;
+    if( S_OK == pPropBag->Read(OLESTR("starttime"), &value, pErrorLog) )
+    {
+        _p_instance->setTime(V_I4(&value));
+        VariantClear(&value);
+    }
+
     return _p_instance->onLoad();
 };
 
@@ -210,6 +218,11 @@ STDMETHODIMP VLCPersistPropertyBag::Save(LPPROPERTYBAG pPropBag, BOOL fClearDirt
     V_VT(&value) = VT_I4;
     V_I4(&value) = _p_instance->getVolume();
     pPropBag->Write(OLESTR("Volume"), &value);
+    VariantClear(&value);
+
+    V_VT(&value) = VT_I4;
+    V_I4(&value) = _p_instance->getTime();
+    pPropBag->Write(OLESTR("StartTime"), &value);
     VariantClear(&value);
 
     if( fClearDirty )

@@ -1,8 +1,7 @@
 LIBRARY AXVLC.DLL
 EXPORTS
-    CLSID_VLCPlugin data
-    DllMain DllMain@12
-    DllCanUnloadNow DllCanUnloadNow@0
-    DllGetClassObject DllGetClassObject@12
-    DllRegisterServer DllRegisterServer@0
-    DllUnregisterServer DllUnregisterServer@0
+    DllMain = DllMain@12
+    DllCanUnloadNow = DllCanUnloadNow@0
+    DllGetClassObject = DllGetClassObject@12
+    DllRegisterServer = DllRegisterServer@0
+    DllUnregisterServer = DllUnregisterServer@0

@@ -115,6 +115,9 @@ public:
     void setVisible(BOOL fVisible);
     BOOL getVisible(void) { return _b_visible; };
 
+    void setTime(int time);
+    int  getTime(void) { return _i_time; };
+
     // control size in HIMETRIC
     inline void setExtent(const SIZEL& extent)
     {
@@ -162,20 +165,19 @@ public:
     inline void setDirty(BOOL dirty) { _b_dirty = dirty; };
 
     inline BOOL isRunning(void) { return 0 != _i_vlc; };
+    HRESULT getVLCObject(int *i_vlc);
+
 
     // control geometry within container
     RECT getPosRect(void) { return _posRect; }; 
     inline HWND getInPlaceWindow(void) const { return _inplacewnd; };
     BOOL isInPlaceActive(void);
 
-    inline int getVLCObject(void) const { return _i_vlc; };
-
     /*
     ** container events
     */
     HRESULT onInit(void);
     HRESULT onLoad(void);
-    HRESULT onRun(void);
     HRESULT onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprcPosRect, LPCRECT lprcClipRect);
     HRESULT onInPlaceDeactivate(void);
     HRESULT onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID);
@@ -237,10 +239,12 @@ private:
     BOOL _b_autoloop;
     BOOL _b_visible;
     BOOL _b_mute;
-    BOOL _b_dirty;
     int  _i_volume;
+    int  _i_time;
     SIZEL _extent;
     LPPICTURE _p_pict;
+    // indicates whether properties needs persisting
+    BOOL _b_dirty;
 };
 
 #endif
