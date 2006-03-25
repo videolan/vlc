@@ -973,6 +973,20 @@ static char *ppsz_clock_descriptions[] =
 #define SET_BOOKMARK8_KEY_TEXT N_("Set playlist bookmark 8")
 #define SET_BOOKMARK9_KEY_TEXT N_("Set playlist bookmark 9")
 #define SET_BOOKMARK10_KEY_TEXT N_("Set playlist bookmark 10")
+
+#define BOOKMARK1_TEXT N_("Playlist bookmark 1")
+#define BOOKMARK2_TEXT N_("Playlist bookmark 2")
+#define BOOKMARK3_TEXT N_("Playlist bookmark 3")
+#define BOOKMARK4_TEXT N_("Playlist bookmark 4")
+#define BOOKMARK5_TEXT N_("Playlist bookmark 5")
+#define BOOKMARK6_TEXT N_("Playlist bookmark 6")
+#define BOOKMARK7_TEXT N_("Playlist bookmark 7")
+#define BOOKMARK8_TEXT N_("Playlist bookmark 8")
+#define BOOKMARK9_TEXT N_("Playlist bookmark 9")
+#define BOOKMARK10_TEXT N_("Playlist bookmark 10")
+#define BOOKMARK_LONGTEXT N_( \
+      "This option allows you to define playlist bookmarks.")
+
 #define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this playlist bookmark.")
 
 #define HISTORY_BACK_TEXT N_("Go back in browsing history")
@@ -1328,6 +1342,12 @@ vlc_module_begin();
     add_bool( "sout-spu", 1, NULL, SOUT_SPU_TEXT,
                                 SOUT_SPU_LONGTEXT, VLC_TRUE );
 
+    set_section( N_("VLM"), NULL );
+    add_string( "vlm-conf", NULL, NULL, VLM_CONF_TEXT,
+                    VLM_CONF_LONGTEXT, VLC_TRUE );
+
+
+
     set_subcategory( SUBCAT_SOUT_STREAM );
     set_subcategory( SUBCAT_SOUT_MUX );
     add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT,
@@ -1407,17 +1427,6 @@ vlc_module_begin();
                   WIN9X_CV_LONGTEXT, VLC_TRUE );
 #endif
 
-    set_section( N_("Miscellaneous" ), NULL );
-    add_string( "vlm-conf", NULL, NULL, VLM_CONF_TEXT,
-                    VLM_CONF_LONGTEXT, VLC_TRUE );
-
-    add_bool ( "stats", VLC_TRUE, NULL, STATS_TEXT, STATS_LONGTEXT, VLC_TRUE );
-
-#if !defined(WIN32)
-    add_bool( "daemon", 0, NULL, DAEMON_TEXT, DAEMON_LONGTEXT, VLC_TRUE );
-        change_short('d');
-#endif
-
 /* Playlist options */
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_GENERAL );
@@ -1442,22 +1451,20 @@ vlc_module_begin();
 /* Interface options */
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
-    add_category_hint( N_("Interface"), INTF_CAT_LONGTEXT , VLC_FALSE );
-    set_section ( N_("Interfaces" ), NULL );
-    add_module_cat( "intf", SUBCAT_INTERFACE_GENERAL, NULL, NULL, INTF_TEXT,
-                INTF_LONGTEXT, VLC_FALSE );
-        change_short('I');
-
-    add_module_list_cat( "extraintf", SUBCAT_INTERFACE_GENERAL,
+        add_module_list_cat( "extraintf", SUBCAT_INTERFACE_GENERAL,
                          NULL, NULL, EXTRAINTF_TEXT,
                          EXTRAINTF_LONGTEXT, VLC_FALSE );
 
-    set_section ( N_("Miscellaneous"), NULL );
     add_integer( "verbose", 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT,
                  VLC_FALSE );
         change_short('v');
     add_bool( "quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_TRUE );
         change_short('q');
+
+#if !defined(WIN32)
+    add_bool( "daemon", 0, NULL, DAEMON_TEXT, DAEMON_LONGTEXT, VLC_TRUE );
+        change_short('d');
+#endif
 
     add_bool( "file-logging", VLC_FALSE, NULL, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
               VLC_TRUE );
@@ -1466,7 +1473,7 @@ vlc_module_begin();
                VLC_TRUE );
 #endif
 
-add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
+    add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
                 VLC_FALSE );
         change_string_list( ppsz_language, ppsz_language_text, 0 );
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
@@ -1475,6 +1482,13 @@ add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
 
     add_bool( "show-intf", VLC_FALSE, NULL, SHOWINTF_TEXT, SHOWINTF_LONGTEXT,
               VLC_FALSE );
+
+    add_bool ( "stats", VLC_TRUE, NULL, STATS_TEXT, STATS_LONGTEXT, VLC_TRUE );
+
+    set_subcategory( SUBCAT_INTERFACE_MAIN );
+    add_module_cat( "intf", SUBCAT_INTERFACE_GENERAL, NULL, NULL, INTF_TEXT,
+                INTF_LONGTEXT, VLC_FALSE );
+        change_short('I');
 
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_module_list_cat( "control", SUBCAT_INTERFACE_CONTROL, NULL, NULL,
@@ -1749,6 +1763,8 @@ add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
              HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
     add_key( "key-record", KEY_RECORD, NULL,
              RECORD_KEY_TEXT, RECORD_KEY_LONGTEXT, VLC_TRUE );
+
+    set_section ( N_("Jump sizes" ), NULL );
     add_integer( "extrashort-jump-size", 3, NULL, JIEXTRASHORT_TEXT,
                                     JIEXTRASHORT_LONGTEXT, VLC_FALSE );
     add_integer( "short-jump-size", 10, NULL, JISHORT_TEXT,
@@ -1801,6 +1817,28 @@ add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
              PLAY_BOOKMARK9_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-play-bookmark10", KEY_PLAY_BOOKMARK10, NULL,
              PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+
+
+    add_string( "bookmark1", NULL, NULL,
+             BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
+    add_string( "bookmark2", NULL, NULL,
+             BOOKMARK2_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
+    add_string( "bookmark3", NULL, NULL,
+             BOOKMARK3_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
+    add_string( "bookmark4", NULL, NULL,
+             BOOKMARK4_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
+    add_string( "bookmark5", NULL, NULL,
+             BOOKMARK5_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
+    add_string( "bookmark6", NULL, NULL,
+             BOOKMARK6_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
+    add_string( "bookmark7", NULL, NULL,
+             BOOKMARK7_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
+    add_string( "bookmark8", NULL, NULL,
+             BOOKMARK8_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
+    add_string( "bookmark9", NULL, NULL,
+             BOOKMARK9_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
+    add_string( "bookmark10", NULL, NULL,
+              BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
 
     /* Usage (mainly useful for cmd line stuff) */
     /* add_usage_hint( PLAYLIST_USAGE ); */

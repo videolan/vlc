@@ -41,6 +41,9 @@
 
 #define INTF_GENERAL_HELP N_( "General interface setttings" )
 
+#define INTF_MAIN_TITLE  N_( "Main interfaces" )
+#define INTF_MAIN_HELP N_( "Settings for the main interface" )
+
 #define INTF_CONTROL_TITLE N_( "Control interfaces" )
 #define INTF_CONTROL_HELP N_( "Settings for VLC's Control interfaces" )
 
@@ -183,7 +186,7 @@
 #define CPU_TITLE N_( "CPU features" )
 #define CPU_HELP N_( "You can choose to disable some CPU accelerations here. You should probably not touch that." )
 
-#define MISC_TITLE N_( "Other" )
+#define MISC_TITLE N_( "Advanced settings" )
 #define MISC_HELP N_( "Other advanced settings")
 
 #define NETWORK_TITLE N_( "Network" )
@@ -284,6 +287,7 @@ static struct config_category_t categories_array[] =
     /* Interface */
     { CAT_INTERFACE, INTF_TITLE, INTF_HELP },
     { SUBCAT_INTERFACE_GENERAL, GENERAL_TITLE, INTF_GENERAL_HELP },
+    { SUBCAT_INTERFACE_MAIN, INTF_MAIN_TITLE, INTF_MAIN_HELP },
     { SUBCAT_INTERFACE_CONTROL, INTF_CONTROL_TITLE, INTF_CONTROL_HELP },
     { SUBCAT_INTERFACE_HOTKEYS, INTF_HOTKEYS_TITLE, INTF_HOTKEYS_HELP },
 
@@ -299,7 +303,6 @@ static struct config_category_t categories_array[] =
     { SUBCAT_VIDEO_VOUT, _VOUT_TITLE, VOUT_HELP },
     { SUBCAT_VIDEO_VFILTER, VFILTER_TITLE, VFILTER_HELP },
     { SUBCAT_VIDEO_SUBPIC, SUBPIC_TITLE, SUBPIC_HELP },
-//    { SUBCAT_VIDEO_TEXT, TEXT_TITLE, TEXT_HELP },
 
     { CAT_INPUT, INPUT_TITLE, INPUT_HELP },
     { SUBCAT_INPUT_GENERAL, ADVANCED_TITLE, ADVANCED_HELP },
@@ -326,7 +329,6 @@ static struct config_category_t categories_array[] =
     { CAT_ADVANCED, AADVANCED_TITLE, AADVANCED_HELP },
     { SUBCAT_ADVANCED_CPU, CPU_TITLE, CPU_HELP },
     { SUBCAT_ADVANCED_MISC, MISC_TITLE, MISC_HELP },
-    { SUBCAT_ADVANCED_NETWORK, NETWORK_TITLE, NETWORK_HELP },
 
     { -1, NULL, NULL }
 };

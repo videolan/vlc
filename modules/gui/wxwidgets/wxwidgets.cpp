@@ -122,7 +122,7 @@ vlc_module_begin();
     set_shortname( (char*) "wxWidgets" );
     set_description( (char *) _("wxWidgets interface module") );
     set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_GENERAL );
+    set_subcategory( SUBCAT_INTERFACE_MAIN );
     set_capability( "interface", i_score );
     set_callbacks( Open, Close );
     add_shortcut( "wxwindows" );

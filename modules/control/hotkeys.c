@@ -97,30 +97,6 @@ static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 vlc_module_begin();
     set_shortname( _("Hotkeys") );
     set_description( _("Hotkeys management interface") );
-    set_category( CAT_INTERFACE );
-//    set_subcategory( SUBCAT_INTERFACE_GENERAL );
-
-    add_string( "bookmark1", NULL, NULL,
-                BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
-    add_string( "bookmark2", NULL, NULL,
-                BOOKMARK2_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
-    add_string( "bookmark3", NULL, NULL,
-                BOOKMARK3_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
-    add_string( "bookmark4", NULL, NULL,
-                BOOKMARK4_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
-    add_string( "bookmark5", NULL, NULL,
-                BOOKMARK5_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
-    add_string( "bookmark6", NULL, NULL,
-                BOOKMARK6_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
-    add_string( "bookmark7", NULL, NULL,
-                BOOKMARK7_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
-    add_string( "bookmark8", NULL, NULL,
-                BOOKMARK8_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
-    add_string( "bookmark9", NULL, NULL,
-                BOOKMARK9_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
-    add_string( "bookmark10", NULL, NULL,
-                BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
-
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();

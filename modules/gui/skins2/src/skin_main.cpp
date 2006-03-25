@@ -340,10 +340,12 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 //---------------------------------------------------------------------------
 // Module descriptor
 //---------------------------------------------------------------------------
-#define SKINS2_LAST      N_("Last skin used")
-#define SKINS2_LAST_LONG N_("Select the path to the last skin used.")
+#define SKINS2_LAST      N_("Skin to use")
+#define SKINS2_LAST_LONG N_("Path to the skin to use.")
 #define SKINS2_CONFIG      N_("Config of last used skin")
-#define SKINS2_CONFIG_LONG N_("Config of last used skin.")
+#define SKINS2_CONFIG_LONG N_("Windows configuration of the last used. " \
+        "This option is updated automatically by the skins module." )
+
 #define SKINS2_TRANSPARENCY      N_("Enable transparency effects")
 #define SKINS2_TRANSPARENCY_LONG N_("You can disable all transparency effects"\
     " if you want. This is mainly useful when moving windows does not behave" \
@@ -351,7 +353,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 
 vlc_module_begin();
     set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_GENERAL );
+    set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_string( "skins2-last", "", NULL, SKINS2_LAST, SKINS2_LAST_LONG,
                 VLC_TRUE );
         change_autosave();

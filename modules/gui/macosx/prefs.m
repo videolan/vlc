@@ -338,6 +338,10 @@ static VLCTreeItem *o_root_item = nil;
                             localizedString: config_CategoryHelpGet( p_item->i_value ) ];
                         if( p_item->i_value != SUBCAT_PLAYLIST_GENERAL &&
                             p_item->i_value != SUBCAT_VIDEO_GENERAL &&
+                            p_item->i_value != SUBCAT_INPUT_GENERAL &&
+                            p_item->i_value != SUBCAT_INTERFACE_GENERAL &&
+                            p_item->i_value != SUBCAT_SOUT_GENERAL &&
+                            p_item->i_value != SUBCAT_ADVANCED_MISC &&
                             p_item->i_value != SUBCAT_AUDIO_GENERAL )
                             [p_last_category->o_children
                                 addObject:[[VLCTreeItem alloc]

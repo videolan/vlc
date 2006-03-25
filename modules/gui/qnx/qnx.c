@@ -45,7 +45,7 @@ vlc_module_begin();
     set_capability( "video output", 100 );
     set_callbacks( E_(OpenVideo), E_(CloseVideo) );
     set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_GENERAL );
+    set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_submodule();
         set_capability( "audio output", 100 );
         set_callbacks( E_(OpenAudio), E_(CloseAudio) );

@@ -62,8 +62,9 @@
  *******************************************************************/
 #define CAT_INTERFACE 1
    #define SUBCAT_INTERFACE_GENERAL 101
-   #define SUBCAT_INTERFACE_CONTROL 102
-   #define SUBCAT_INTERFACE_HOTKEYS 103
+   #define SUBCAT_INTERFACE_MAIN 102
+   #define SUBCAT_INTERFACE_CONTROL 103
+   #define SUBCAT_INTERFACE_HOTKEYS 104
 
 #define CAT_AUDIO 2
    #define SUBCAT_AUDIO_GENERAL 201

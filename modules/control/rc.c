@@ -178,7 +178,7 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 vlc_module_begin();
     set_shortname( _("RC"));
     set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_GENERAL );
+    set_subcategory( SUBCAT_INTERFACE_MAIN );
     set_description( _("Remote control interface") );
     add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
 #ifdef HAVE_ISATTY

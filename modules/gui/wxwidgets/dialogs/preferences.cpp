@@ -415,7 +415,14 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 break;
             case CONFIG_SUBCATEGORY:
                 if( p_item->i_value == -1 ) break; // Don't display it
+                /* Special case: move the "general" subcategories to their
+                 * parent category */
                 if( p_item->i_value == SUBCAT_VIDEO_GENERAL ||
+                    p_item->i_value == SUBCAT_ADVANCED_MISC ||
+                    p_item->i_value == SUBCAT_INPUT_GENERAL ||
+                    p_item->i_value == SUBCAT_INTERFACE_GENERAL ||
+                    p_item->i_value == SUBCAT_SOUT_GENERAL||
+                    p_item->i_value == SUBCAT_PLAYLIST_GENERAL||
                     p_item->i_value == SUBCAT_AUDIO_GENERAL )
                 {
                     ConfigTreeData *cd = (ConfigTreeData *)
