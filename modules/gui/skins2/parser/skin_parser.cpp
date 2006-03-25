@@ -91,13 +91,13 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         RequireDefault( "id" );
         RequireDefault( "file" );
         RequireDefault( "alphacolor" );
-        CheckDefault( "nbFrames", "1" );
+        CheckDefault( "nbframes", "1" );
         CheckDefault( "fps", "4" );
 
         m_curBitmapId = uniqueId( attr["id"] );
         const BuilderData::Bitmap bitmap( m_curBitmapId,
                 attr["file"], convertColor( attr["alphacolor"] ),
-                atoi( attr["nbFrames"] ), atoi( attr["fps"] ) );
+                atoi( attr["nbframes"] ), atoi( attr["fps"] ) );
         m_pData->m_listBitmap.push_back( bitmap );
     }
 
@@ -108,13 +108,13 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         RequireDefault( "y" );
         RequireDefault( "width" );
         RequireDefault( "height" );
-        CheckDefault( "nbFrames", "1" );
+        CheckDefault( "nbframes", "1" );
         CheckDefault( "fps", "4" );
 
         const BuilderData::SubBitmap bitmap( attr["id"],
                 m_curBitmapId, atoi( attr["x"] ), atoi( attr["y"] ),
                 atoi( attr["width"] ), atoi( attr["height"] ),
-                atoi( attr["nbFrames"] ), atoi( attr["fps"] ) );
+                atoi( attr["nbframes"] ), atoi( attr["fps"] ) );
         m_pData->m_listSubBitmap.push_back( bitmap );
     }
 

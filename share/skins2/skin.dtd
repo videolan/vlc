@@ -21,7 +21,7 @@
         id          CDATA   #REQUIRED
         file        CDATA   #REQUIRED
         alphacolor  CDATA   #REQUIRED
-        nbFrames    CDATA   "1"
+        nbframes    CDATA   "1"
         fps         CDATA   "0"
     >
 <!ELEMENT SubBitmap EMPTY>
@@ -31,7 +31,7 @@
         y           CDATA   #REQUIRED
         width       CDATA   #REQUIRED
         height      CDATA   #REQUIRED
-        nbFrames    CDATA   "1"
+        nbframes    CDATA   "1"
         fps         CDATA   "0"
     >
 <!ELEMENT Font EMPTY>
