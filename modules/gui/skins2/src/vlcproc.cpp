@@ -102,6 +102,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     REGISTER_VAR( m_cVarEqPreamp, EqualizerPreamp, "equalizer.preamp" )
     REGISTER_VAR( m_cVarDvdActive, VarBoolImpl, "dvd.isActive" )
     REGISTER_VAR( m_cVarFullscreen, VarBoolImpl, "vlc.isFullscreen" )
+    REGISTER_VAR( m_cVarHasVout, VarBoolImpl, "vlc.hasVout" )
 #undef REGISTER_VAR
     m_cVarStreamName = VariablePtr( new VarText( getIntf(), false ) );
     pVarManager->registerVar( m_cVarStreamName, "streamName" );
@@ -237,6 +238,7 @@ void VlcProc::manage()
     VarBoolImpl *pVarRepeat = (VarBoolImpl*)m_cVarRepeat.get();
     VarBoolImpl *pVarDvdActive = (VarBoolImpl*)m_cVarDvdActive.get();
     VarBoolImpl *pVarFullscreen = (VarBoolImpl*)m_cVarFullscreen.get();
+    VarBoolImpl *pVarHasVout = (VarBoolImpl*)m_cVarHasVout.get();
 
     // Refresh audio variables
     refreshAudio();
@@ -282,6 +284,7 @@ void VlcProc::manage()
         // Refresh fullscreen status
         vout_thread_t *pVout = (vout_thread_t *)vlc_object_find( pInput,
                 VLC_OBJECT_VOUT, FIND_CHILD );
+        pVarHasVout->set( pVout != NULL );
         if( pVout )
         {
             pVarFullscreen->set( pVout->b_fullscreen );
@@ -297,6 +300,7 @@ void VlcProc::manage()
         pVarDvdActive->set( false );
         pTime->set( 0, false );
         pVarFullscreen->set( false );
+        pVarHasVout->set( false );
     }
 
     // Refresh the random variable

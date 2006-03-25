@@ -940,6 +940,9 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>equalizer.isEnabled</emphasis>: True if the equalizer audio filter is enabled (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
+    <emphasis>vlc.hasVout</emphasis>: True if a video is being played (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
     <emphasis>vlc.isFullscreen</emphasis>: True when the video is in fullscreen mode (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>

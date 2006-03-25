@@ -120,6 +120,7 @@ class VlcProc: public SkinObject
         /// Variables related to the vout
         VariablePtr m_cVarFullscreen;
         VarBox m_varVoutSize;
+        VariablePtr m_cVarHasVout;
         /// Equalizer variables
         EqualizerBands m_varEqBands;
         VariablePtr m_cVarEqPreamp;
