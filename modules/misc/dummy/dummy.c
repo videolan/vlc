@@ -42,8 +42,8 @@
 
 #define SAVE_TEXT N_("Save raw codec data")
 #define SAVE_LONGTEXT N_( \
-    "This option allows you to save the raw codec data if you have " \
-    "selected/forced the dummy decoder in the main options." )
+    "Save the raw codec data if you have selected/forced the dummy " \
+    "decoder in the main options." )
 
 #ifdef WIN32
 #define QUIET_TEXT N_("Do not open a DOS command box interface")
