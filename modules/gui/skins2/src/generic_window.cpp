@@ -25,6 +25,7 @@
 #include "generic_window.hpp"
 #include "os_window.hpp"
 #include "os_factory.hpp"
+#include "var_manager.hpp"
 #include "../events/evt_refresh.hpp"
 
 
@@ -32,7 +33,7 @@ GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
                               bool dragDrop, bool playOnDrop,
                               GenericWindow *pParent ):
     SkinObject( pIntf ), m_left( left ), m_top( top ), m_width( 0 ),
-    m_height( 0 ), m_varVisible( pIntf )
+    m_height( 0 ), m_pVarVisible( NULL )
 {
     // Get the OSFactory
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
@@ -48,14 +49,18 @@ GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
     m_pOsWindow = pOsFactory->createOSWindow( *this, dragDrop, playOnDrop,
                                               pOSParent );
 
+    // Create the visibility variable and register it in the manager
+    m_pVarVisible = new VarBoolImpl( pIntf );
+    VarManager::instance( pIntf )->registerVar( VariablePtr( m_pVarVisible ) );
+
     // Observe the visibility variable
-    m_varVisible.addObserver( this );
+    m_pVarVisible->addObserver( this );
 }
 
 
 GenericWindow::~GenericWindow()
 {
-    m_varVisible.delObserver( this );
+    m_pVarVisible->delObserver( this );
 
     if( m_pOsWindow )
     {
@@ -74,13 +79,13 @@ void GenericWindow::processEvent( EvtRefresh &rEvtRefresh )
 
 void GenericWindow::show() const
 {
-    m_varVisible.set( true );
+    m_pVarVisible->set( true );
 }
 
 
 void GenericWindow::hide() const
 {
-    m_varVisible.set( false );
+    m_pVarVisible->set( false );
 }
 
 
@@ -124,7 +129,7 @@ void GenericWindow::toggleOnTop( bool onTop ) const
 
 void GenericWindow::onUpdate( Subject<VarBool, void*> &rVariable, void*arg )
 {
-    if( m_varVisible.get() )
+    if( m_pVarVisible->get() )
     {
         innerShow();
     }

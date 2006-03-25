@@ -76,7 +76,7 @@ class GenericWindow: public SkinObject, public Observer<VarBool, void*>
         int getHeight() const { return m_height; }
 
         /// Give access to the visibility variable
-        VarBool &getVisibleVar() { return m_varVisible; }
+        VarBool &getVisibleVar() { return *m_pVarVisible; }
 
         /// Window type, mainly useful when overloaded (for VoutWindow)
         virtual string getType() const { return "Generic"; }
@@ -119,7 +119,7 @@ class GenericWindow: public SkinObject, public Observer<VarBool, void*>
         /// OS specific implementation
         OSWindow *m_pOsWindow;
         /// Variable for the visibility of the window
-        mutable VarBoolImpl m_varVisible;
+        mutable VarBoolImpl *m_pVarVisible;
 
         /// Method called when the observed variable is modified
         virtual void onUpdate( Subject<VarBool, void*> &rVariable , void*);
