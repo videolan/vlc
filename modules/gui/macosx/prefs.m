@@ -202,7 +202,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item {
     return (item == nil) ? [[VLCTreeItem rootItem] childAtIndex:index] :
-                            [item childAtIndex:index];
+                            (id)[item childAtIndex:index];
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView

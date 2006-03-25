@@ -226,7 +226,8 @@
     [[VLCInfoTreeItem rootItem] refresh];
     [o_outline_view reloadData];
 
-    /* updating the stats isn't our job, but is done by the timer if needed */
+    /* update the stats once to display p_item change faster */
+    [self updateStatistics: nil];
 }
 
 - (void)setMeta: (char *)meta forLabel: (id)theItem
@@ -394,7 +395,7 @@
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
 {
-    return (item == nil) ? [[VLCInfoTreeItem rootItem] childAtIndex:index] : [item childAtIndex:index];
+    return (item == nil) ? [[VLCInfoTreeItem rootItem] childAtIndex:index] : (id)[item childAtIndex:index];
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
