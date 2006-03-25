@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wav.c: wav muxer module for vlc
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -171,7 +171,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_mux, "adding input %i channels, %iHz",
+    msg_Dbg( p_mux, "adding %i input channels, %iHz",
              p_input->p_fmt->audio.i_channels,
              p_input->p_fmt->audio.i_rate );
 

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * h264.c: h264/avc video packetizer
  *****************************************************************************
- * Copyright (C) 2001, 2002 the VideoLAN team
+ * Copyright (C) 2001, 2002, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -44,7 +44,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_PACKETIZER );
-    set_description( _("H264 video packetizer") );
+    set_description( _("H.264 video packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -203,7 +203,7 @@ static int Open( vlc_object_t *p_this )
             ParseNALBlock( p_dec, p_pps );
             p += 2 + i_length;
         }
-        msg_Dbg( p_dec, "avcC length size=%d sps=%d pps=%d",
+        msg_Dbg( p_dec, "avcC length size=%d, sps=%d, pps=%d",
                  p_sys->i_avcC_length_size, i_sps, i_pps );
 
         /* Set callback */

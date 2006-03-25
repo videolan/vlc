@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mp4.c: mp4/mov muxer
  *****************************************************************************
- * Copyright (C) 2001, 2002, 2003 the VideoLAN team
+ * Copyright (C) 2001, 2002, 2003, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -42,10 +42,10 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define FASTSTART_TEXT N_("Create \"Fast start\" files")
+#define FASTSTART_TEXT N_("Create \"Fast Start\" files")
 #define FASTSTART_LONGTEXT N_( \
-    "When this option is turned on, \"Fast start\" files will be created. " \
-    "(\"Fast start\" files are optimized for download, allowing the user " \
+    "When this option is turned on, \"Fast Start\" files will be created. " \
+    "(\"Fast Start\" files are optimized for downloads and allow the user " \
     "to start previewing the file while it is downloading).")
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
@@ -302,7 +302,7 @@ static void Close( vlc_object_t * p_this )
                                 p_sys->i_mdat_pos + i_size - i_chunk );
             if( sout_AccessOutRead( p_mux->p_access, p_buf ) < i_chunk )
             {
-                msg_Warn( p_this, "read() not supported by acces output, "
+                msg_Warn( p_this, "read() not supported by access output, "
                           "won't create a fast start file" );
                 p_sys->b_fast_start = VLC_FALSE;
                 block_Release( p_buf );
@@ -627,7 +627,7 @@ static int Mux( sout_mux_t *p_mux )
             if( i_length != 0 )
             {
                 /* TODO */
-                msg_Dbg( p_mux, "writing a empty subs" ) ;
+                msg_Dbg( p_mux, "writing an empty sub" ) ;
 
                 /* Append a idx entry */
                 p_stream->entry[p_stream->i_entry_count].i_pos    = p_sys->i_pos;
@@ -686,7 +686,7 @@ static void ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
 
 
     /* Replace the 4 bytes start code with 4 bytes size,
-     * FIXME are all startcode 4 bytes ? (I don't think :( */
+     * FIXME are all startcodes 4 bytes ? (I don't think :( */
     while( dat < end )
     {
         int i_size;

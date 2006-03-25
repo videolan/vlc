@@ -1,7 +1,7 @@
 /*****************************************************************************
  * asf.c: asf muxer module for vlc
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright (C) 2003-2004, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -186,7 +186,7 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t    val;
     int i;
 
-    msg_Dbg( p_mux, "Asf muxer opened" );
+    msg_Dbg( p_mux, "asf muxer opened" );
     sout_CfgParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
     p_mux->pf_control   = Control;
@@ -241,8 +241,8 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_mux, SOUT_CFG_PREFIX "rating", &val );
     p_sys->psz_rating = val.psz_string;
 
-    msg_Dbg( p_mux, "meta data: title='%s' author='%s' copyright='%s' "
-             "comment='%s' rating='%s'",
+    msg_Dbg( p_mux, "meta data: title='%s', author='%s', copyright='%s', "
+             "comment='%s', rating='%s'",
              p_sys->psz_title, p_sys->psz_author, p_sys->psz_copyright,
              p_sys->psz_comment, p_sys->psz_rating );
 
@@ -334,7 +334,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     msg_Dbg( p_mux, "adding input" );
     if( p_sys->i_track >= MAX_ASF_TRACKS )
     {
-        msg_Dbg( p_mux, "cannot add this track (too much track)" );
+        msg_Dbg( p_mux, "cannot add this track (too much tracks)" );
         return VLC_EGENERIC;
     }
 

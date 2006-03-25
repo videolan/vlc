@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mpjpeg.c: mime multipart jpeg  muxer module for vlc
  *****************************************************************************
- * Copyright (C) 2001, 2002 the VideoLAN team
+ * Copyright (C) 2001, 2002, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -31,9 +31,9 @@
 
 #define SEPARATOR_TEXT N_( "Multipart separator string" )
 #define SEPARATOR_LONGTEXT N_( "Multipart strings like MPJPEG use a " \
-                               "separator string between content pieces. "\
-                               "You can select this string. Default is "\
-                               "--myboundary" )
+                               "specific string to separate its content " \
+                               "pieces. You can select this string. " \
+                               "Default is --myboundary" )
 
 
 #define CONTENT_TYPE "Content-Type: image/jpeg"
@@ -47,7 +47,7 @@ static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( "MPJPEG" );
-    set_description( _("Multipart jpeg muxer") );
+    set_description( _("Multipart JPEG muxer") );
     set_capability( "sout mux", 5 );
     add_string( SOUT_CFG_PREFIX "separator", "--myboundary", NULL,
                               SEPARATOR_TEXT, SEPARATOR_LONGTEXT, VLC_TRUE );

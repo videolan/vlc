@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mpegvideo.c: parse and packetize an MPEG1/2 video stream
  *****************************************************************************
- * Copyright (C) 2001-2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -49,10 +49,10 @@
 
 #include "vlc_block_helper.h"
 
-#define SYNC_INTRAFRAME_TEXT N_("Sync on intraframe")
+#define SYNC_INTRAFRAME_TEXT N_("Sync on Intra Frame")
 #define SYNC_INTRAFRAME_LONGTEXT N_("Normally the packetizer would " \
     "sync on the next full frame. This flags instructs the packetizer " \
-    "to sync on the first intraframe found.")
+    "to sync on the first Intra Frame found.")
 
 /*****************************************************************************
  * Module descriptor
@@ -189,7 +189,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_discontinuity = VLC_FALSE;
     p_sys->b_sync_on_intra_frame = var_CreateGetBool( p_dec, "packetizer-mpegvideo-sync-iframe" );
     if( p_sys->b_sync_on_intra_frame )
-        msg_Dbg( p_dec, "syncing happens on intraframe now." );
+        msg_Dbg( p_dec, "syncing on intra frame now" );
 
     return VLC_SUCCESS;
 }
@@ -322,13 +322,13 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             {
                 if( p_pic->i_flags & BLOCK_FLAG_TYPE_I )
                 {
-                    msg_Dbg( p_dec, "synced on Intra frame" );
+                    msg_Dbg( p_dec, "synced on intra frame" );
                     p_sys->b_discontinuity = VLC_FALSE;
                     p_pic->i_flags |= BLOCK_FLAG_DISCONTINUITY;
                 }
                 else
                 {
-                    msg_Dbg( p_dec, "waiting on Intra frame" );
+                    msg_Dbg( p_dec, "waiting on intra frame" );
                     p_sys->i_state = STATE_NOSYNC;
                     block_Release( p_pic );
                     break;
@@ -554,7 +554,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
         if ( !p_sys->b_inited )
         {
-            msg_Dbg( p_dec, "Size %dx%d fps=%.3f",
+            msg_Dbg( p_dec, "size %dx%d fps=%.3f",
                  p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height,
                  p_sys->i_frame_rate / (float)p_sys->i_frame_rate_base );
             p_sys->b_inited = 1;
