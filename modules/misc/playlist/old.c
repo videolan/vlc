@@ -48,7 +48,7 @@ int Export_Old( vlc_object_t *p_this )
     playlist_export_t *p_export = (playlist_export_t *)p_playlist->p_private;
     int i;
 
-    msg_Dbg(p_playlist, "Saving using old format");
+    msg_Dbg(p_playlist, "saving using old format");
 
     /* Write header */
     fprintf( p_export->p_file , PLAYLIST_FILE_HEADER "\n" );

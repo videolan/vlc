@@ -374,7 +374,7 @@ static int OpenUDP( vlc_object_t * p_this )
                 }
                 else
                 {
-                    msg_Err( p_this, "%s: bad IPv6 interface spefication",
+                    msg_Err( p_this, "%s: bad IPv6 interface specification",
                              psz_mif );
                     close( i_handle );
                     return 0;

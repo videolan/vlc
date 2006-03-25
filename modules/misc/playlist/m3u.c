@@ -46,7 +46,7 @@ int Export_M3U( vlc_object_t *p_this )
     playlist_export_t *p_export = (playlist_export_t *)p_playlist->p_private;
     int i, j;
 
-    msg_Dbg(p_playlist, "Saving using M3U format");
+    msg_Dbg(p_playlist, "saving using M3U format");
 
     /* Write header */
     fprintf( p_export->p_file, "#EXTM3U\n" );

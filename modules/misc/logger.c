@@ -138,8 +138,8 @@ vlc_module_begin();
                 VLC_FALSE );
         change_string_list( mode_list, mode_list_text, 0 );
 
-    add_string( "rrd-file", NULL, NULL, N_("RRD output file") ,
-                    N_("Output data for RRDTool in this file" ), VLC_TRUE );
+    add_file( "rrd-file", NULL, NULL, N_("RRD output file") ,
+                    N_("Output data for RRDTool in this file." ), VLC_TRUE );
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
@@ -154,7 +154,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_mode, *psz_file, *psz_rrd_file;
 
     CONSOLE_INTRO_MSG;
-    msg_Info( p_intf, "Using logger..." );
+    msg_Info( p_intf, "using logger..." );
 
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
@@ -205,7 +205,7 @@ static int Open( vlc_object_t *p_this )
 
             if( !psz_homedir )
             {
-                msg_Err( p_this, "Unable to find home directory" );
+                msg_Err( p_this, "unable to find home directory" );
                 return -1;
             }
             psz_file = (char *)malloc( sizeof("/" LOG_DIR "/" LOG_FILE_HTML) +

@@ -193,7 +193,7 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
             }
             else
             {
-                msg_Dbg( p_this, "Reading %ld bytes from template %s",
+                msg_Dbg( p_this, "reading %ld bytes from template %s",
                          (unsigned long)s.st_size, psz_filename );
 
                 psz_template = malloc( s.st_size + 42 );

@@ -109,7 +109,7 @@ static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
   "This option is only needed if you want to encode into DVB subtitles" )
 #define EFFECT_TEXT N_("Font Effect")
 #define EFFECT_LONGTEXT N_("It is possible to apply effects to the rendered" \
-  "text to improve rendering." )
+"text to improve its readability." )
 
 #define EFFECT_BACKGROUND  1 
 #define EFFECT_OUTLINE     2
@@ -880,14 +880,14 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         i_error = FT_Load_Glyph( face, i_glyph_index, FT_LOAD_DEFAULT );
         if( i_error )
         {
-            msg_Err( p_filter, "Unable to render text (FT_Load_Glyph returned"
+            msg_Err( p_filter, "unable to render text FT_Load_Glyph returned"
                                " %d", i_error );
             goto error;
         }
         i_error = FT_Get_Glyph( glyph, &tmp_glyph );
         if( i_error )
         {
-            msg_Err( p_filter, "Unable to render text (FT_Get_Glyph returned "
+            msg_Err( p_filter, "unable to render text FT_Get_Glyph returned "
                                "%d", i_error );
             goto error;
         }
@@ -1054,11 +1054,11 @@ static int SetFontSize( filter_t *p_filter, int i_size )
         }
         if( i_size <= 0 )
         {
-            msg_Warn( p_filter, "Invalid fontsize, using 12" );
+            msg_Warn( p_filter, "invalid fontsize, using 12" );
             i_size = 12;
         }
 
-        msg_Dbg( p_filter, "Using fontsize: %i", i_size );
+        msg_Dbg( p_filter, "using fontsize: %i", i_size );
     }
 
     p_sys->i_font_size = i_size;

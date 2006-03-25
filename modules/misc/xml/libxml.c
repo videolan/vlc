@@ -127,7 +127,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *p_stream )
                                       NULL, NULL, 0 );
     if( !p_libxml_reader )
     {
-        msg_Err( p_xml, "failed to create xml parser" );
+        msg_Err( p_xml, "failed to create XML parser" );
         return 0;
     }
 

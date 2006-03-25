@@ -114,7 +114,7 @@ static int BuildAddr( vlc_object_t *p_obj, struct sockaddr_in * p_socket,
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE;
 
-    msg_Dbg( p_obj, "Resolving %s:%d...", psz_address, i_port );
+    msg_Dbg( p_obj, "resolving %s:%d...", psz_address, i_port );
     i_val = vlc_getaddrinfo( p_obj, psz_address, i_port, &hints, &res );
     if( i_val )
     {

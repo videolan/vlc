@@ -448,7 +448,7 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
     dir = utf8_opendir( psz_dirname );
     if( dir == NULL )
     {
-        msg_Warn( p_this, "Cannot open directory (%s): %s", psz_dirname,
+        msg_Warn( p_this, "cannot open directory (%s): %s", psz_dirname,
                   strerror( errno ) );
         return VLC_EGENERIC;
     }
@@ -518,13 +518,13 @@ gnutls_Addx509File( vlc_object_t *p_this,
 
             if( i < 0 )
             {
-                msg_Warn( p_this, "Cannot add x509 credentials (%s): %s",
+                msg_Warn( p_this, "cannot add x509 credentials (%s): %s",
                           psz_path, gnutls_strerror( i ) );
                 return VLC_EGENERIC;
             }
             else
             {
-                msg_Dbg( p_this, "Added x509 credentials (%s)",
+                msg_Dbg( p_this, "added x509 credentials (%s)",
                          psz_path );
                 return VLC_SUCCESS;
             }
@@ -532,13 +532,13 @@ gnutls_Addx509File( vlc_object_t *p_this,
         else if( S_ISDIR( st.st_mode ) )
         {
             msg_Dbg( p_this,
-                     "Looking recursively for x509 credentials in %s",
+                     "looking recursively for x509 credentials in %s",
                      psz_path );
             return gnutls_Addx509Directory( p_this, cred, psz_path, b_priv);
         }
     }
     else
-        msg_Warn( p_this, "Cannot add x509 credentials (%s): %s",
+        msg_Warn( p_this, "cannot add x509 credentials (%s): %s",
                   psz_path, strerror( errno ) );
     return VLC_EGENERIC;
 }
@@ -587,7 +587,7 @@ gnutls_ClientCreate( tls_t *p_tls )
     i_val = gnutls_certificate_allocate_credentials( &p_sys->x509_cred );
     if( i_val != 0 )
     {
-        msg_Err( p_tls, "Cannot allocate X509 credentials: %s",
+        msg_Err( p_tls, "cannot allocate X509 credentials: %s",
                  gnutls_strerror( i_val ) );
         goto error;
     }
@@ -635,7 +635,7 @@ gnutls_ClientCreate( tls_t *p_tls )
     i_val = gnutls_init( &p_sys->session.session, GNUTLS_CLIENT );
     if( i_val != 0 )
     {
-        msg_Err( p_tls, "Cannot initialize TLS session: %s",
+        msg_Err( p_tls, "cannot initialize TLS session: %s",
                  gnutls_strerror( i_val ) );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
         goto error;
@@ -644,7 +644,7 @@ gnutls_ClientCreate( tls_t *p_tls )
     i_val = gnutls_set_default_priority( p_sys->session.session );
     if( i_val < 0 )
     {
-        msg_Err( p_tls, "Cannot set ciphers priorities: %s",
+        msg_Err( p_tls, "cannot set ciphers priorities: %s",
                  gnutls_strerror( i_val ) );
         gnutls_deinit( p_sys->session.session );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
@@ -655,7 +655,7 @@ gnutls_ClientCreate( tls_t *p_tls )
                                                   cert_type_priority );
     if( i_val < 0 )
     {
-        msg_Err( p_tls, "Cannot set certificate type priorities: %s",
+        msg_Err( p_tls, "cannot set certificate type priorities: %s",
                  gnutls_strerror( i_val ) );
         gnutls_deinit( p_sys->session.session );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
@@ -667,7 +667,7 @@ gnutls_ClientCreate( tls_t *p_tls )
                                     p_sys->x509_cred );
     if( i_val < 0 )
     {
-        msg_Err( p_tls, "Cannot set TLS session credentials: %s",
+        msg_Err( p_tls, "cannot set TLS session credentials: %s",
                  gnutls_strerror( i_val ) );
         gnutls_deinit( p_sys->session.session );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
@@ -823,7 +823,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     i_val = gnutls_init( &session, GNUTLS_SERVER );
     if( i_val != 0 )
     {
-        msg_Err( p_server, "Cannot initialize TLS session: %s",
+        msg_Err( p_server, "cannot initialize TLS session: %s",
                  gnutls_strerror( i_val ) );
         goto error;
     }
@@ -833,7 +833,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     i_val = gnutls_set_default_priority( session );
     if( i_val < 0 )
     {
-        msg_Err( p_server, "Cannot set ciphers priorities: %s",
+        msg_Err( p_server, "cannot set ciphers priorities: %s",
                  gnutls_strerror( i_val ) );
         gnutls_deinit( session );
         goto error;
@@ -843,7 +843,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
                                     p_server_sys->x509_cred );
     if( i_val < 0 )
     {
-        msg_Err( p_server, "Cannot set TLS session credentials: %s",
+        msg_Err( p_server, "cannot set TLS session credentials: %s",
                  gnutls_strerror( i_val ) );
         gnutls_deinit( session );
         goto error;
@@ -918,7 +918,7 @@ gnutls_ServerAddCA( tls_server_t *p_server, const char *psz_ca_path )
     LocaleFree( psz_local_path );
     if( val < 0 )
     {
-        msg_Err( p_server, "Cannot add trusted CA (%s): %s", psz_ca_path,
+        msg_Err( p_server, "cannot add trusted CA (%s): %s", psz_ca_path,
                  gnutls_strerror( val ) );
         return VLC_EGENERIC;
     }
@@ -950,7 +950,7 @@ gnutls_ServerAddCRL( tls_server_t *p_server, const char *psz_crl_path )
     LocaleFree( psz_crl_path );
     if( val < 0 )
     {
-        msg_Err( p_server, "Cannot add CRL (%s): %s", psz_crl_path,
+        msg_Err( p_server, "cannot add CRL (%s): %s", psz_crl_path,
                  gnutls_strerror( val ) );
         return VLC_EGENERIC;
     }
@@ -974,7 +974,7 @@ gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
     char *psz_local_key, *psz_local_cert;
     int val;
 
-    msg_Dbg( p_tls, "Creating TLS server" );
+    msg_Dbg( p_tls, "creating TLS server" );
 
     p_sys = (tls_server_sys_t *)malloc( sizeof(struct tls_server_sys_t) );
     if( p_sys == NULL )
@@ -1016,7 +1016,7 @@ gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
     val = gnutls_certificate_allocate_credentials( &p_sys->x509_cred );
     if( val != 0 )
     {
-        msg_Err( p_server, "Cannot allocate X509 credentials: %s",
+        msg_Err( p_server, "cannot allocate X509 credentials: %s",
                  gnutls_strerror( val ) );
         goto error;
     }
@@ -1030,7 +1030,7 @@ gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
     LocaleFree( psz_key_path );
     if( val < 0 )
     {
-        msg_Err( p_server, "Cannot set certificate chain or private key: %s",
+        msg_Err( p_server, "cannot set certificate chain or private key: %s",
                  gnutls_strerror( val ) );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
         goto error;
@@ -1043,18 +1043,18 @@ gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
     val = gnutls_dh_params_init( &p_sys->dh_params );
     if( val >= 0 )
     {
-        msg_Dbg( p_server, "Computing Diffie Hellman ciphers parameters" );
+        msg_Dbg( p_server, "computing Diffie Hellman ciphers parameters" );
         val = gnutls_dh_params_generate2( p_sys->dh_params,
                                           get_Int( p_tls, "gnutls-dh-bits" ) );
     }
     if( val < 0 )
     {
-        msg_Err( p_server, "Cannot initialize DH cipher suites: %s",
+        msg_Err( p_server, "cannot initialize DH cipher suites: %s",
                  gnutls_strerror( val ) );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
         goto error;
     }
-    msg_Dbg( p_server, "Ciphers parameters computed" );
+    msg_Dbg( p_server, "ciphers parameters computed" );
 
     gnutls_certificate_set_dh_params( p_sys->x509_cred, p_sys->dh_params);
 

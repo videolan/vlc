@@ -64,7 +64,9 @@ static int SetFont( filter_t *, int );
      "255 = totally opaque. " )
 #define COLOR_TEXT N_("Text default color")
 #define COLOR_LONGTEXT N_("The color of the text that will be rendered on "\
-  "the video. This must be an hexadecimal (like HTML colors). The first two "\    "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\    " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white" )
+  "the video. This must be an hexadecimal (like HTML colors). The first two "\
+  "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\
+  " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white" )
 #define FONTSIZER_TEXT N_("Relative font size")
 #define FONTSIZER_LONGTEXT N_("This is the relative default size of the " \
   "fonts that will be rendered on the video. If absolute font size is set, "\
@@ -410,11 +412,11 @@ static int SetFont( filter_t *p_filter, int i_size )
         }
         if( i_size <= 0 )
         {
-            msg_Warn( p_filter, "Invalid fontsize, using 12" );
+            msg_Warn( p_filter, "invalid fontsize, using 12" );
             i_size = 12;
         }
 
-        msg_Dbg( p_filter, "Using fontsize: %i", i_size );
+        msg_Dbg( p_filter, "using fontsize: %i", i_size );
     }
 
     p_sys->i_font_size = i_size;

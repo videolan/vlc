@@ -51,11 +51,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset );
 
 /*****************************************************************************
  * Module descriptor
- *****************************************************************************
- * This module should be used on windows with MSN (i think that you need to
- * have MSN 7 or newer) to "advertise" what you are playing in VLC.
- * You need to enable the "What I'm Listening To" option in MSN.
- *****************************************************************************/
+ ****************************************************************************/
 #define SERVER_DEFAULT "127.0.0.1"
 #define SERVER_TEXT N_("Growl server")
 #define SERVER_LONGTEXT N_("This is the host to which Growl notifications " \
@@ -69,7 +65,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset );
 vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_shortname( N_( "growl" ) );
+    set_shortname( N_( "Growl" ) );
     set_description( _("Growl Notification Plugin") );
 
     add_string( "growl-server", SERVER_DEFAULT, NULL,

@@ -49,7 +49,7 @@ int  E_(OpenIntf) ( vlc_object_t *p_this )
         CONSOLE_INTRO_MSG;
 #endif
 
-    msg_Info( p_intf, "Using the dummy interface module..." );
+    msg_Info( p_intf, "using the dummy interface module..." );
 
     p_intf->pf_run = Run;
 
