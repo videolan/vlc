@@ -84,7 +84,7 @@ static int vsscanf( const char *str, const char *format, va_list ap)
 }
 #endif
 
-char* def_path = WIN32_PATH;
+static char* def_path = WIN32_PATH;
 
 static void do_cpuid(unsigned int ax, unsigned int *regs)
 {

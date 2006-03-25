@@ -30,7 +30,7 @@
 #endif
 
 #ifndef WIN32_LOADER
-char* def_path=WIN32_PATH;
+static char* def_path=WIN32_PATH;
 #else
 extern char* def_path;
 #endif
