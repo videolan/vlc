@@ -504,10 +504,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
             p_spu->p_text->fmt_out.video.i_width =
                 p_spu->p_text->fmt_out.video.i_visible_width =
-                    p_fmt->i_width;
+                p_fmt->i_width;
             p_spu->p_text->fmt_out.video.i_height =
                 p_spu->p_text->fmt_out.video.i_visible_height =
-                    p_fmt->i_height;
+                p_fmt->i_height;
 
             p_spu->p_text->pf_sub_buffer_new = spu_new_buffer;
             p_spu->p_text->pf_sub_buffer_del = spu_del_buffer;
@@ -516,12 +516,25 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
         else if( p_region )
         {
-            p_spu->p_text->fmt_out.video.i_width =
-                p_spu->p_text->fmt_out.video.i_visible_width =
+            if( p_subpic->i_original_picture_height > 0 &&
+                p_subpic->i_original_picture_width  > 0 )
+            {
+                p_spu->p_text->fmt_out.video.i_width =
+                    p_spu->p_text->fmt_out.video.i_visible_width =
+                    p_subpic->i_original_picture_width;
+                p_spu->p_text->fmt_out.video.i_height =
+                    p_spu->p_text->fmt_out.video.i_visible_height =
+                    p_subpic->i_original_picture_height;
+            }
+            else
+            {
+                p_spu->p_text->fmt_out.video.i_width =
+                    p_spu->p_text->fmt_out.video.i_visible_width =
                     p_fmt->i_width;
-            p_spu->p_text->fmt_out.video.i_height =
-                p_spu->p_text->fmt_out.video.i_visible_height =
+                p_spu->p_text->fmt_out.video.i_height =
+                    p_spu->p_text->fmt_out.video.i_visible_height =
                     p_fmt->i_height;
+            }
         }
 
         i_scale_width = i_scale_width_orig;
