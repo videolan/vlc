@@ -154,6 +154,11 @@ static int Open( vlc_object_t *p_this )
     }
     else psz_name = strdup( p_access->psz_path );
 
+#ifdef WIN32
+    if( psz_name[0] && psz_name[1] == ':' &&
+        psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
+#endif
+
     /* Open CDDA */
     if( (vcddev = ioctl_Open( VLC_OBJECT(p_access), psz_name )) == NULL )
     {
