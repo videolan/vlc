@@ -335,6 +335,13 @@ static char *ppsz_align_descriptions[] =
     "This option enables framedropping on MPEG2 stream. Framedropping " \
     "occurs when your computer is not powerful enough" )
 
+#define DROP_LATE_FRAMES_TEXT N_("Drop late frames")
+#define DROP_LATE_FRAMES_LONGTEXT N_( \
+    "This drops frames that are late (arrive to the video output after " \
+    "their intended display date)." )
+
+
+
 #define QUIET_SYNCHRO_TEXT N_("Quiet synchro")
 #define QUIET_SYNCHRO_LONGTEXT N_( \
     "Enable this option to avoid flooding the message log with debug " \
@@ -1091,7 +1098,10 @@ vlc_module_begin();
     add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
               FULLSCREEN_LONGTEXT, VLC_FALSE );
         change_short('f');
-    add_bool( "skip-frames", 1, NULL, SKIP_FRAMES_TEXT,
+    add_bool( "drop-late-frames", 1, NULL, DROP_LATE_FRAMES_TEXT,
+              DROP_LATE_FRAMES_LONGTEXT, VLC_TRUE );
+    /* Used in vout_synchro */
+    add_bool( "skip-frames", 0, NULL, SKIP_FRAMES_TEXT,
               SKIP_FRAMES_LONGTEXT, VLC_TRUE );
     add_bool( "quiet-synchro", 0, NULL, QUIET_SYNCHRO_TEXT,
               QUIET_SYNCHRO_LONGTEXT, VLC_TRUE );

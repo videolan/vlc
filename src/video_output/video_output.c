@@ -796,7 +796,7 @@ static void RunThread( vout_thread_t *p_vout)
             if( !p_picture->b_force &&
                 p_picture != p_last_picture &&
                 display_date < current_date + p_vout->render_time &&
-                config_GetInt( p_vout, "skip-frames" ) )
+                config_GetInt( p_vout, "drop-late-frames" ) )
             {
                 /* Picture is late: it will be destroyed and the thread
                  * will directly choose the next picture */
