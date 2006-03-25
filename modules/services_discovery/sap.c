@@ -78,13 +78,13 @@ static const char ipv6_scopes[] = "1456789ABCDE";
  *****************************************************************************/
 #define SAP_ADDR_TEXT N_( "SAP multicast address" )
 #define SAP_ADDR_LONGTEXT N_( "The SAP module normally chooses itself the " \
-                              "good addresses to listen to. However, you can " \
-                              "specify a specific address" )
-#define SAP_IPV4_TEXT N_( "IPv4-SAP listening" )
+                              "right addresses to listen to. However, you " \
+                              "can specify a specific address" )
+#define SAP_IPV4_TEXT N_( "IPv4 SAP" )
 #define SAP_IPV4_LONGTEXT N_( \
       "Set this if you want the SAP module to listen to IPv4 announcements " \
       "on the standard address." )
-#define SAP_IPV6_TEXT N_( "IPv6-SAP listening" )
+#define SAP_IPV6_TEXT N_( "IPv6 SAP" )
 #define SAP_IPV6_LONGTEXT N_( \
       "Set this if you want the SAP module to listen to IPv6 announcements " \
       "on the standard address." )
@@ -97,21 +97,21 @@ static const char ipv6_scopes[] = "1456789ABCDE";
        "is received." )
 #define SAP_PARSE_TEXT N_( "Try to parse the SAP" )
 #define SAP_PARSE_LONGTEXT N_( \
-       "When SAP can it will try to parse the SAP. If you don't select " \
-       "this, all announcements will be parsed by the livedotcom module." )
+       "This enables actual parsing of the announces by the SAP module. " \
+       "Otherwise, all announcements are parsed by the \"livedotcom\" " \
+       "(RTP/RTSP) module." )
 #define SAP_STRICT_TEXT N_( "SAP Strict mode" )
 #define SAP_STRICT_LONGTEXT N_( \
        "When this is set, the SAP parser will discard some non-compliant " \
        "announcements." )
 #define SAP_CACHE_TEXT N_("Use SAP cache")
 #define SAP_CACHE_LONGTEXT N_( \
-       "If this option is selected, a SAP caching mechanism will be used. " \
+       "This enables a SAP caching mechanism. " \
        "This will result in lower SAP startup time, but you could end up " \
-        "with items corresponding to legacy streams." )
+       "with items corresponding to legacy streams." )
 #define SAP_TIMESHIFT_TEXT N_("Allow timeshifting")
-#define SAP_TIMESHIFT_LONGTEXT N_( \
-        "Enable timeshifting automatically for streams " \
-        "discovered through SAP announcements." )
+#define SAP_TIMESHIFT_LONGTEXT N_( "This automatically enables timeshifting " \
+        "for streams discovered through SAP announcements." )
 
 /* Callbacks */
     static int  Open ( vlc_object_t * );
@@ -137,8 +137,10 @@ vlc_module_begin();
                SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, VLC_TRUE );
     add_bool( "sap-strict", 0 , NULL,
                SAP_STRICT_TEXT,SAP_STRICT_LONGTEXT, VLC_TRUE );
+#if 0
     add_bool( "sap-cache", 0 , NULL,
                SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, VLC_TRUE );
+#endif
     add_bool( "sap-timeshift", 0 , NULL,
               SAP_TIMESHIFT_TEXT,SAP_TIMESHIFT_LONGTEXT, VLC_TRUE );
 
@@ -294,10 +296,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_strict = var_CreateGetInteger( p_sd, "sap-strict");
     p_sys->b_parse = var_CreateGetInteger( p_sd, "sap-parse" );
 
+#if 0
     if( var_CreateGetInteger( p_sd, "sap-cache" ) )
     {
         CacheLoad( p_sd );
     }
+#endif
 
     /* Cache sap_timeshift value */
     p_sys->b_timeshift = var_CreateGetInteger( p_sd, "sap-timeshift" )
@@ -439,10 +443,12 @@ static void Close( vlc_object_t *p_this )
     }
     FREE( p_sys->pi_fd );
 
+#if 0
     if( config_GetInt( p_sd, "sap-cache" ) )
     {
         CacheSave( p_sd );
     }
+#endif
 
     for( i = p_sys->i_announces  - 1;  i>= 0; i-- )
     {

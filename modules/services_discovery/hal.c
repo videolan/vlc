@@ -60,7 +60,7 @@
     static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("HAL device detection") );
+    set_description( _("HAL devices detection") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 

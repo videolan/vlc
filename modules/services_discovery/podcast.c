@@ -55,11 +55,12 @@
     static void Close( vlc_object_t * );
 
 #define URLS_TEXT N_("Podcast URLs list")
-#define URLS_LONGTEXT N_("Podcast '|' (pipe) seperated URLs list")
+#define URLS_LONGTEXT N_("Enter the list of podcasts to retrieve, " \
+                         "separated by '|' (pipe)." )
 
 vlc_module_begin();
     set_shortname( "Podcast");
-    set_description( _("Podcast Service Discovery") );
+    set_description( _("Podcasts") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
