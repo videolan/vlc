@@ -103,6 +103,7 @@
 - (IBAction)togglePlaylistInfoPanel:(id)sender;
 - (IBAction)toggleInfoPanel:(id)sender;
 - (void)initPanel:(id)sender;
+- (void)updatePanel;
 - (IBAction)infoCancel:(id)sender;
 - (IBAction)infoOk:(id)sender;
 - (playlist_item_t *)getItem;

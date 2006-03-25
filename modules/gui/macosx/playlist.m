@@ -47,6 +47,7 @@
 #include "intf.h"
 #import "wizard.h"
 #import "bookmarks.h"
+#import "playlistinfo.h"
 #include "playlist.h"
 #include "controls.h"
 #include "vlc_osd.h"
@@ -617,6 +618,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_outline_view scrollRowToVisible: i_row];
 
     vlc_object_release(p_playlist);
+
+    /* update our info-panel to reflect the new item */
+    [[[VLCMain sharedInstance] getInfo] updatePanel];
 }
 
 /* Check if p_item is a child of p_node recursively. We need to check the item

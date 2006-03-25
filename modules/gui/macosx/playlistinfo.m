@@ -101,7 +101,7 @@
 
 - (void)dealloc
 {
-    /* make that it is released in any case */
+    /* make sure that it is released in any case */
     if ( o_statUpdateTimer )
         [o_statUpdateTimer release];
     [super dealloc];
@@ -149,6 +149,11 @@
             [o_statUpdateTimer fire];
             [o_statUpdateTimer retain];
         }
+        else
+        {
+            if( [o_tab_view numberOfTabViewItems] > 2 )
+            [o_tab_view removeTabViewItem: [o_tab_view tabViewItemAtIndex: 2]];
+        }
 
         [self initPanel:sender];
     }
@@ -156,6 +161,23 @@
 
 - (void)initPanel:(id)sender
 {
+    [self updatePanel];
+    [o_info_window makeKeyAndOrderFront: sender];
+}
+
+- (void)updatePanel
+{
+    /* make sure that we got the current item and not an outdated one */
+    intf_thread_t * p_intf = VLCIntf;
+        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+
+    if( p_playlist )
+    {
+        p_item = p_playlist->status.p_item;
+        vlc_object_release( p_playlist );
+    }
+
     /* check whether our item is valid, because we would crash if not */
     if(! [self isItemInPlaylist: p_item] ) return;
 
@@ -204,17 +226,7 @@
     [[VLCInfoTreeItem rootItem] refresh];
     [o_outline_view reloadData];
 
-    BOOL b_stats = config_GetInt(VLCIntf, "stats");
-    if(! b_stats )
-    {
-        if( [o_tab_view numberOfTabViewItems] > 2 )
-            [o_tab_view removeTabViewItem: [o_tab_view tabViewItemAtIndex: 2]];
-    }
-    else
-    {
-        [self updateStatistics: nil];
-    }
-    [o_info_window makeKeyAndOrderFront: sender];
+    /* updating the stats isn't our job, but is done by the timer if needed */
 }
 
 - (void)setMeta: (char *)meta forLabel: (id)theItem
