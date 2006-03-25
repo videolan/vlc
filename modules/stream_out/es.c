@@ -36,38 +36,34 @@
  *****************************************************************************/
 #define ACCESS_TEXT N_("Output access method")
 #define ACCESS_LONGTEXT N_( \
-    "Allows you to specify the output access method used for the streaming " \
-    "output." )
+    "This is the default output access method that will be used." )
+
 #define ACCESSA_TEXT N_("Audio output access method")
 #define ACCESSA_LONGTEXT N_( \
-    "Allows you to specify the output access method used for the audio " \
-    "streaming output." )
+    "This is the output access method that will be used for audio." )
 #define ACCESSV_TEXT N_("Video output access method")
 #define ACCESSV_LONGTEXT N_( \
-    "Allows you to specify the output access method used for the video " \
-    "streaming output." )
+    "This is the output access method that will be used for video." )
 
 #define MUX_TEXT N_("Output muxer")
 #define MUX_LONGTEXT N_( \
-    "Allows you to specify the muxer used for the streaming output." )
+    "This is the default muxer method that will be used." )
 #define MUXA_TEXT N_("Audio output muxer")
 #define MUXA_LONGTEXT N_( \
-    "Allows you to specify the muxer used for the audio streaming output." )
+    "This is the muxer that will be used for audio." )
 #define MUXV_TEXT N_("Video output muxer")
 #define MUXV_LONGTEXT N_( \
-    "Allows you to specify the muxer used for the video streaming output." )
+    "This is the muxer that will be used for video." )
 
 #define DEST_TEXT N_("Output URL")
 #define DEST_LONGTEXT N_( \
-    "Allows you to specify the output URL used for the streaming output." )
+    "This is the default output URI." )
 #define DESTA_TEXT N_("Audio output URL")
 #define DESTA_LONGTEXT N_( \
-    "Allows you to specify the output URL used for the audio streaming " \
-    "output." )
+    "This is the output URI that will be used for audio." )
 #define DESTV_TEXT N_("Video output URL")
 #define DESTV_LONGTEXT N_( \
-    "Allows you to specify the output URL used for the video streaming " \
-    "output." )
+    "This is the output URI that will be used for video." )
 
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );

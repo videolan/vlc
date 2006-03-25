@@ -38,23 +38,22 @@
  *****************************************************************************/
 #define ACCESS_TEXT N_("Output access method")
 #define ACCESS_LONGTEXT N_( \
-    "Allows you to specify the output access method used for the streaming " \
-    "output." )
+    "This is the output access method that will be used." )
 #define MUX_TEXT N_("Output muxer")
 #define MUX_LONGTEXT N_( \
-    "Allows you to specify the output muxer method used for the streaming " \
-    "output." )
+    "This is the muxer that will be used." )
 #define DST_TEXT N_("Output destination")
 #define DST_LONGTEXT N_( \
-    "Allows you to specify the output destination used for the streaming output." )
-
+    "This is the destination (URL) that will be used for the stream." )
 #define NAME_TEXT N_("Session name")
 #define NAME_LONGTEXT N_( \
-    "Name of the session that will be announced with SAP." )
+  "This allows you to specify a name for the session, that will be announced "\
+  "if you choose to use SAP." )
 
 #define GROUP_TEXT N_("Session groupname")
 #define GROUP_LONGTEXT N_( \
-    "Name of the group that will be announced for the session." )
+  "This allows you to specify a group for the session, that will be announced "\
+  "if you choose to use SAP." )
 
 #define SAP_TEXT N_("SAP announcing")
 #define SAP_LONGTEXT N_("Announce this session with SAP.")

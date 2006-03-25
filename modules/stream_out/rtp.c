@@ -45,47 +45,52 @@
 
 #define DST_TEXT N_("Destination")
 #define DST_LONGTEXT N_( \
-    "Allows you to specify the output URL used for the streaming output." )
+    "This is the output URL that will be used." )
 #define SDP_TEXT N_("SDP")
 #define SDP_LONGTEXT N_( \
-    "Allows you to specify the SDP used for the streaming output. " \
-    "You must use an url: http://location to access the SDP via HTTP, " \
-    "rtsp://location for RTSP access, and sap:// for the SDP to be " \
-    "announced via SAP." )
+    "This allows you to specify how the SDP (Session Descriptor) for this RTP "\
+    "session will be made available. You must use an url: http://location to " \
+    "access the SDP via HTTP, rtsp://location for RTSP access, and sap:// " \
+    "for the SDP to be announced via SAP." )
 #define MUX_TEXT N_("Muxer")
 #define MUX_LONGTEXT N_( \
-    "Allows you to specify the muxer used for the streaming output." )
+    "This allows you to specify the muxer used for the streaming output. " \
+    "Default is to use no muxer (standard RTP stream)." )
 
 #define NAME_TEXT N_("Session name")
 #define NAME_LONGTEXT N_( \
-    "Allows you to specify the session name used for the streaming output." )
+    "This is the name of the session that will be announced in the SDP " \
+    "(Session Descriptor)." )
 #define DESC_TEXT N_("Session description")
 #define DESC_LONGTEXT N_( \
-    "Allows you to give a broader description of the stream." )
+    "This allows you to give a broader description of the stream, that will " \
+    "be announced in the SDP (Session Descriptor)." )
 #define URL_TEXT N_("Session URL")
 #define URL_LONGTEXT N_( \
-    "Allows you to specify a URL with additional information on the stream." )
+    "This allows you to give an URL with more details about the stream " \
+    "(often the website of the streaming organization), that will " \
+    "be announced in the SDP (Session Descriptor)." )
 #define EMAIL_TEXT N_("Session email")
 #define EMAIL_LONGTEXT N_( \
-    "Allows you to specify contact e-mail address for this session." )
-
+   "This allows you to give a contact mail address for the stream, that will " \
+   "be announced in the SDP (Session Descriptor)." )
 #define PORT_TEXT N_("Port")
 #define PORT_LONGTEXT N_( \
-    "Allows you to specify the base port used for the RTP streaming." )
+    "This allows you to specify the base port for the RTP streaming." )
 #define PORT_AUDIO_TEXT N_("Audio port")
 #define PORT_AUDIO_LONGTEXT N_( \
-    "Allows you to specify the default audio port used for the RTP streaming." )
+    "This allows you to specify the default audio port for the RTP streaming." )
 #define PORT_VIDEO_TEXT N_("Video port")
 #define PORT_VIDEO_LONGTEXT N_( \
-    "Allows you to specify the default video port used for the RTP streaming." )
+    "This allows you to specify the default video port for the RTP streaming." )
 
 #define TTL_TEXT N_("Time-To-Live (TTL)")
 #define TTL_LONGTEXT N_( \
-    "Allows you to specify the Time-To-Live for the output stream." )
+    "This allows you to specify the Time-To-Live for the output stream." )
 
 #define RFC3016_TEXT N_("MP4A LATM")
 #define RFC3016_LONGTEXT N_( \
-    "Allows you to specify using RFC3016 for MPEG4 LATM audio streaming." )
+    "This allows you to stream MPEG4 LATM audio streams (see RFC3016)." )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );

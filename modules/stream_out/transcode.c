@@ -45,123 +45,119 @@
  *****************************************************************************/
 #define VENC_TEXT N_("Video encoder")
 #define VENC_LONGTEXT N_( \
-    "Allows you to specify the video encoder to use and its associated " \
-    "options." )
+    "This is the video encoder module that will be used (and its associated "\
+    "options).")
 #define VCODEC_TEXT N_("Destination video codec")
 #define VCODEC_LONGTEXT N_( \
-    "Allows you to specify the destination video codec used for the " \
-    "streaming output." )
+    "This is the video codec that will be used.")
 #define VB_TEXT N_("Video bitrate")
 #define VB_LONGTEXT N_( \
-    "Allows you to specify the video bitrate used for the streaming " \
-    "output." )
+    "Target bitrate of the transcoded video stream." )
 #define SCALE_TEXT N_("Video scaling")
 #define SCALE_LONGTEXT N_( \
-    "Allows you to scale the video before encoding." )
+    "Scale factor to apply to the video while transcoding (eg: 0.25)")
 #define FPS_TEXT N_("Video frame-rate")
 #define FPS_LONGTEXT N_( \
-    "Allows you to specify an output frame rate for the video." )
+    "Target output frame rate for the video stream." )
 #define DEINTERLACE_TEXT N_("Deinterlace video")
 #define DEINTERLACE_LONGTEXT N_( \
-    "Allows you to deinterlace the video before encoding." )
+    "Deinterlace the video before encoding." )
 #define DEINTERLACE_MODULE_TEXT N_("Deinterlace module")
 #define DEINTERLACE_MODULE_LONGTEXT N_( \
-    "Specifies the deinterlace module to use." )
+    "Specify the deinterlace module to use." )
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
-    "Allows you to specify the output video width." )
+    "Output video width." )
 #define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_( \
-    "Allows you to specify the output video height." )
+    "Output video height." )
 #define MAXWIDTH_TEXT N_("Maximum video width")
 #define MAXWIDTH_LONGTEXT N_( \
-    "Allows you to specify a maximum output video width." )
+    "Maximum output video width." )
 #define MAXHEIGHT_TEXT N_("Maximum video height")
 #define MAXHEIGHT_LONGTEXT N_( \
-    "Allows you to specify a maximum output video height." )
+    "Maximum output video height." )
 #define VFILTER_TEXT N_("Video filter")
 #define VFILTER_LONGTEXT N_( \
-    "Allows you to specify video filters used after the video " \
-    "transcoding and subpictures overlaying." )
+    "Video filters will be applied to the video streams (after overlays " \
+    "are applied). You must enter a comma-separated list of filters." )
 
-#define CROPTOP_TEXT N_("Video crop top")
+#define CROPTOP_TEXT N_("Video crop (top)")
 #define CROPTOP_LONGTEXT N_( \
-    "Allows you to specify the top coordinate for the video cropping." )
-#define CROPLEFT_TEXT N_("Video crop left")
+    "Number of pixels to crop at the top of the video." )
+#define CROPLEFT_TEXT N_("Video crop (left)")
 #define CROPLEFT_LONGTEXT N_( \
-    "Allows you to specify the left coordinate for the video cropping." )
-#define CROPBOTTOM_TEXT N_("Video crop bottom")
+    "Number of pixels to crop at the left of the video." )
+#define CROPBOTTOM_TEXT N_("Video crop (bottom)")
 #define CROPBOTTOM_LONGTEXT N_( \
-    "Allows you to specify the bottom coordinate for the video cropping." )
-#define CROPRIGHT_TEXT N_("Video crop right")
+    "Number of pixels to crop at the bottom of the video." )
+#define CROPRIGHT_TEXT N_("Video crop (right)")
 #define CROPRIGHT_LONGTEXT N_( \
-    "Allows you to specify the right coordinate for the video cropping." )
+    "Number of pixels to crop at the right of the video." )
 
-#define PADDTOP_TEXT N_("Video padd top")
+#define PADDTOP_TEXT N_("Video padding (top)")
 #define PADDTOP_LONGTEXT N_( \
-    "Allows you to specify padding of black lines at the top." )
-#define PADDLEFT_TEXT N_("Video padd left")
+    "Size of the black border to add at the top of the video." )
+#define PADDLEFT_TEXT N_("Video padding (left)")
 #define PADDLEFT_LONGTEXT N_( \
-    "Allows you to specify padding of black lines on the left." )
-#define PADDBOTTOM_TEXT N_("Video padd bottom")
+    "Size of the black border to add at the left of the video." )
+#define PADDBOTTOM_TEXT N_("Video padding (bottom)")
 #define PADDBOTTOM_LONGTEXT N_( \
-    "Allows you to specify padding of black lines at the top." )
-#define PADDRIGHT_TEXT N_("Video padd right")
+    "Size of the black border to add at the bottom of the video." )
+#define PADDRIGHT_TEXT N_("Video padding (right)")
 #define PADDRIGHT_LONGTEXT N_( \
-    "Allows you to specify padding of black lines on the right." )
+    "Size of the black border to add at the right of the video." )
 
 #define CANVAS_WIDTH_TEXT N_("Video canvas width")
 #define CANVAS_WIDTH_LONGTEXT N_( \
-    "Allows to padd or crop the frame to a specified width." )
+    "This will automatically crod and pad the video to a specified width." )
 #define CANVAS_HEIGHT_TEXT N_("Video canvas height")
 #define CANVAS_HEIGHT_LONGTEXT N_( \
-    "Allows to padd or crop the frame to a specified height." )
+    "This will automatically crod and pad the video to a specified height." )
 #define CANVAS_ASPECT_TEXT N_("Video canvas aspect ratio")
 #define CANVAS_ASPECT_LONGTEXT N_( \
-    "Set aspect (like 4:3) of video canvas and letterbox accordingly." )
+    "This sets aspect (like 4:3) of the video canvas and letterbox the video "\
+    "accordingly." )
 
 #define AENC_TEXT N_("Audio encoder")
 #define AENC_LONGTEXT N_( \
-    "Allows you to specify the audio encoder to use and its associated " \
-    "options." )
+    "This is the audio encoder module that will be used (and its associated "\
+    "options).")
 #define ACODEC_TEXT N_("Destination audio codec")
 #define ACODEC_LONGTEXT N_( \
-    "Allows you to specify the destination audio codec used for the " \
-    "streaming output." )
+    "This is the audio codec that will be used.")
 #define AB_TEXT N_("Audio bitrate")
 #define AB_LONGTEXT N_( \
-    "Allows you to specify the audio bitrate used for the streaming " \
-    "output." )
+    "Target bitrate of the transcoded audio stream." )
 #define ARATE_TEXT N_("Audio sample rate")
 #define ARATE_LONGTEXT N_( \
-    "Allows you to specify the audio sample rate used for the streaming " \
-    "output." )
+ "Sample rate of the transcoded audio stream (11250, 22500, 44100 or 48000).")
 #define ACHANS_TEXT N_("Audio channels")
 #define ACHANS_LONGTEXT N_( \
-    "Allows you to specify the number of audio channels used for the " \
-    "streaming output." )
+    "Number of audio channels in the transcoded streams." )
 
 #define SENC_TEXT N_("Subtitles encoder")
 #define SENC_LONGTEXT N_( \
-    "Allows you to specify the subtitles encoder to use and its associated " \
-    "options." )
+    "This is the subtitles encoder module that will be used (and its " \
+    "associated options)." )
 #define SCODEC_TEXT N_("Destination subtitles codec")
 #define SCODEC_LONGTEXT N_( \
-    "Allows you to specify the destination subtitles codec used for the " \
-    "streaming output." )
-#define SFILTER_TEXT N_("Subpictures filter")
+    "This is the subtitles coded that will be used." )
+
+#define SFILTER_TEXT N_("Overlays")
 #define SFILTER_LONGTEXT N_( \
-    "Allows you to specify subpictures filters used during the video " \
-    "transcoding. The subpictures produced by the filters will be overlayed " \
-    "directly onto the video." )
+    "This allows you to add overlays (also known as \"subpictures\" on the "\
+    "transcoded video stream. The subpictures produced by the filters will "\
+    "be overlayed directly onto the video. You must specify a comma-separated "\
+    "list of subpicture modules" )
 
 #define OSD_TEXT N_("OSD menu")
 #define OSD_LONGTEXT N_(\
-    "Enable streaming of the On Screen Display. It uses the osdmenu subfilter." )
+    "Stream the On Screen Display menu (using the osdmenu subpicture module)." )
 
 #define THREADS_TEXT N_("Number of threads")
 #define THREADS_LONGTEXT N_( \
-    "Allows you to specify the number of threads used for the transcoding." )
+    "Number of threads used for the transcoding." )
 #define HP_TEXT N_("High priority")
 #define HP_LONGTEXT N_( \
     "Runs the optional encoder thread at the OUTPUT priority instead of " \
@@ -173,8 +169,8 @@
     "track on the audio track." )
 
 #define HURRYUP_TEXT N_( "Hurry up" )
-#define HURRYUP_LONGTEXT N_( "Allows you to specify if the transcoder " \
-  "should drop frames if your CPU can't keep up with the encoding rate." )
+#define HURRYUP_LONGTEXT N_( "The transcoder will drop frames if your CPU " \
+                "can't keep up with the encoding rate." )
 
 static char *ppsz_deinterlace_type[] =
 {

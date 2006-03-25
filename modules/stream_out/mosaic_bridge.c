@@ -106,10 +106,10 @@ static void video_unlink_picture_decoder( decoder_t *, picture_t * );
 
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
-    "Allows you to specify the output video width." )
+    "Output video width." )
 #define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_( \
-    "Allows you to specify the output video height." )
+    "Output video height." )
 #define RATIO_TEXT N_("Sample aspect ratio")
 #define RATIO_LONGTEXT N_( \
     "Sample aspect ratio of the destination (1:1, 3:4, 2:3)." )
