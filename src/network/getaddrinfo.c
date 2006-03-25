@@ -227,10 +227,8 @@ __getnameinfo( const struct sockaddr *sa, socklen_t salen,
                     solved = 1;
                 }
             }
-#else
-            sent = NULL;
-#endif
             if (sent == NULL)
+#endif
             {
                 snprintf (serv, servlen, "%u",
                           (unsigned int)ntohs (addr->sin_port));
@@ -342,6 +340,31 @@ __getaddrinfo (const char *node, const char *service,
     u_short port;
     int protocol = 0, flags = 0;
     const char *name = NULL;
+
+#ifdef WIN32
+    /*
+     * Maybe you knew already that Winsock does not handle TCP/RST packets
+     * properly, so that when a TCP connection fails, it will wait until it
+     * times out even if the remote host did return a TCP/RST. However, it
+     * still sees the TCP/RST as the error code is 10061 instead of 10060.
+     * Basically, we have the stupid brainfucked behavior with DNS queries...
+     * When the recursive DNS server returns an error, Winsock waits about
+     * 2 seconds before it returns to the callers, even though it should know
+     * that is pointless. I'd like to know how come this hasn't been fixed
+     * for the past decade, or maybe not.
+     *
+     * Anyway, this is causing a severe delay when the SAP listener tries
+     * to resolve more than ten IPv6 numeric addresses. Modern systems will
+     * eventually realize that it is an IPv6 address, and won't try to resolve
+     * it as a IPv4 address via the Domain Name Service. Old systems
+     * (including Windows XP without the IPv6 stack) will not. It is normally
+     * not an issue as the DNS server usually returns an error very quickly.
+     * But it IS a severe issue on Windows, given the bug explained above.
+     * So here comes one more bug-to-bug Windows compatibility fix.
+     */
+    if ((node != NULL) && (strchr (node, ':') != NULL))
+       return EAI_NONAME;
+#endif
 
     if (hints != NULL)
     {
