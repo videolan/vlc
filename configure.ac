@@ -4970,11 +4970,11 @@ AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
 AS_IF([test "${enable_loader}" = "yes"],
   [ VLC_ADD_PLUGINS([dmo quicktime])
     VLC_ADD_CPPFLAGS([dmo],[-I../../../@top_srcdir@/loader])
-    VLC_ADD_LDFLAGS([dmo],[../../../loader/libloader.a])
+    VLC_ADD_LDFLAGS([dmo],[../../../loader/libloader.la])
     VLC_ADD_CPPFLAGS([quicktime],[-I../../@top_srcdir@/loader])
-    VLC_ADD_LDFLAGS([quicktime],[../../loader/libloader.a])
+    VLC_ADD_LDFLAGS([quicktime],[../../loader/libloader.la])
     VLC_ADD_CPPFLAGS([realaudio],[-I../../@top_srcdir@/loader -DLOADER])
-    VLC_ADD_LDFLAGS([realaudio],[../../loader/libloader.a])
+    VLC_ADD_LDFLAGS([realaudio],[../../loader/libloader.la])
   ])
 
 dnl
