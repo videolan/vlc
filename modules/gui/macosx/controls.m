@@ -572,8 +572,30 @@
             VLC_OBJECT_INPUT, FIND_ANYWHERE );
         if( p_input )
         {
-            input_Control( p_input, INPUT_SET_TIME, \
-                (int64_t)([o_specificTime_enter_fld intValue] * 1000000));
+            unsigned int timeInSec = 0;
+            NSString * fieldContent = [o_specificTime_enter_fld stringValue];
+            if( [[fieldContent componentsSeparatedByString: @":"] count] > 1 && 
+                [[fieldContent componentsSeparatedByString: @":"] count] <= 3 )
+            {
+                NSArray * ourTempArray = \
+                    [fieldContent componentsSeparatedByString: @":"];
+
+                if( [[fieldContent componentsSeparatedByString: @":"] count] == 3 )
+                {
+                    timeInSec += ([[ourTempArray objectAtIndex: 0] intValue] * 3600); //h
+                    timeInSec += ([[ourTempArray objectAtIndex: 1] intValue] * 60); //m
+                    timeInSec += [[ourTempArray objectAtIndex: 2] intValue];        //s
+                }
+                else
+                {
+                    timeInSec += ([[ourTempArray objectAtIndex: 0] intValue] * 60); //m
+                    timeInSec += [[ourTempArray objectAtIndex: 1] intValue]; //s
+                }
+            }
+            else
+                timeInSec = [fieldContent intValue];
+
+            input_Control( p_input, INPUT_SET_TIME, (int64_t)(timeInSec * 1000000));
             vlc_object_release( p_input );
         }
     
