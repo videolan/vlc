@@ -167,10 +167,13 @@ static int Open( vlc_object_t *p_this )
 
     if( strcmp( psz_src, "UTF-8" ) )
     {
-        p_sys->iconv_from_utf8 = vlc_iconv_open( psz_src, "UTF-8" );
+        char psz_encoding[strlen( psz_src ) + sizeof( "//translit")];
+        sprintf( psz_encoding, "%s//translit", psz_src);
+
+        p_sys->iconv_from_utf8 = vlc_iconv_open( psz_encoding, "UTF-8" );
         if( p_sys->iconv_from_utf8 == (vlc_iconv_t)-1 )
             msg_Warn( p_intf, "unable to perform charset conversion to %s",
-                      psz_src );
+                      psz_encoding );
         else
         {
             p_sys->iconv_to_utf8 = vlc_iconv_open( "UTF-8", psz_src );
@@ -185,7 +188,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->iconv_from_utf8 = p_sys->iconv_to_utf8 = (vlc_iconv_t)-1;
     }
 
-    p_sys->psz_charset = strdup( psz_src );
+    p_sys->psz_charset = psz_src;
     psz_src = NULL;
 
     /* determine file handler associations */

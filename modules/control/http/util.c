@@ -357,26 +357,9 @@ char *E_(FromUTF8)( intf_thread_t *p_intf, char *psz_utf8 )
         char *psz_out = psz_local;
         size_t i_ret;
         char psz_tmp[i_in + 1];
-        char *psz_in = psz_tmp;
-        uint8_t *p = (uint8_t *)psz_tmp;
+        const char *psz_in = psz_tmp;
         strcpy( psz_tmp, psz_utf8 );
 
-        /* Fix Unicode quotes. If we are here we are probably converting
-         * to an inferior charset not understanding Unicode quotes. */
-        while( *p )
-        {
-            if( p[0] == 0xe2 && p[1] == 0x80 && p[2] == 0x99 )
-            {
-                *p = '\'';
-                memmove( &p[1], &p[3], strlen((char *)&p[3]) + 1 );
-            }
-            if( p[0] == 0xe2 && p[1] == 0x80 && p[2] == 0x9a )
-            {
-                *p = '"';
-                memmove( &p[1], &p[3], strlen((char *)&p[3]) + 1 );
-            }
-            p++;
-        }
         i_in = strlen( psz_tmp );
 
         i_ret = vlc_iconv( p_sys->iconv_from_utf8, &psz_in, &i_in,
@@ -403,7 +386,7 @@ char *E_(ToUTF8)( intf_thread_t *p_intf, char *psz_local )
 
     if ( p_sys->iconv_to_utf8 != (vlc_iconv_t)-1 )
     {
-        char *psz_in = psz_local;
+        const char *psz_in = psz_local;
         size_t i_in = strlen(psz_in);
         size_t i_out = i_in * 6;
         char *psz_utf8 = malloc(i_out + 1);
@@ -471,7 +454,7 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
                 E_(mvar_AppendNewVar)( itm, "ro", "rw" );
             }
 
-            sprintf( value, "%d", p_node->input.i_duration );
+            sprintf( value, "%ld", (long)p_node->input.i_duration );
             E_(mvar_AppendNewVar)( itm, "duration", value );
 
             E_(mvar_AppendVar)( s, itm );
