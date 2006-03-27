@@ -49,6 +49,11 @@ static char *ppsz_snap_formats[] =
  * macros.
  *****************************************************************************/
 
+/*****************************************************************************
+ * Intf
+ ****************************************************************************/
+
+// DEPRECATED
 #define INTF_CAT_LONGTEXT N_( \
     "These options allow you to configure the interfaces used by VLC. " \
     "You can select the main interface, additional " \
@@ -56,55 +61,61 @@ static char *ppsz_snap_formats[] =
 
 #define INTF_TEXT N_("Interface module")
 #define INTF_LONGTEXT N_( \
-    "This option allows you to select the interface used by VLC. " \
+    "This is the main interface used by VLC. " \
     "The default behavior is to automatically select the best module " \
     "available.")
 
 #define EXTRAINTF_TEXT N_("Extra interface modules")
 #define EXTRAINTF_LONGTEXT N_( \
-    "This option allows you to select additional interfaces used by VLC. " \
+    "You can select \"additional interfaces\" for VLC. " \
     "They will be launched in the background in addition to the default " \
     "interface. Use a comma separated list of interface modules. (common " \
-    "values are logger, gestures, sap, rc, http or screensaver)")
+    "values are \"rc\" (remote control), \"http\", \"gestures\" ...)")
 
 #define CONTROL_TEXT N_("Control interfaces")
 #define CONTROL_LONGTEXT N_( \
-    "This option allows you to select control interfaces. " )
+    "You can select control interfaces for VLC.")
 
 #define VERBOSE_TEXT N_("Verbosity (0,1,2)")
 #define VERBOSE_LONGTEXT N_( \
-    "This option sets the verbosity level (0=only errors and " \
+    "This is the verbosity level (0=only errors and " \
     "standard messages, 1=warnings, 2=debug).")
 
 #define QUIET_TEXT N_("Be quiet")
 #define QUIET_LONGTEXT N_( \
-    "This option turns off all warning and information messages.")
+    "Turn off all warning and information messages.")
 
 #define OPEN_TEXT N_("Default stream")
 #define OPEN_LONGTEXT N_( \
-    "This option allows you to always open a default stream on start-up." )
+    "This stream will always be opened at VLC startup." )
 
 #define LANGUAGE_TEXT N_("Language")
-#define LANGUAGE_LONGTEXT N_( "This option allows you to set the language " \
-    "of the interface. The system language is auto-detected if \"auto\" is " \
+#define LANGUAGE_LONGTEXT N_( "You can manually select a language for the " \
+    "interface. The system language is auto-detected if \"auto\" is " \
     "specified here." )
 
 #define COLOR_TEXT N_("Color messages")
 #define COLOR_LONGTEXT N_( \
-    "When this option is turned on, the messages sent to the console will " \
-    "be colorized. Your terminal needs Linux color support for this to work.")
+    "This enables colorization of the messages sent to the console " \
+    "Your terminal needs Linux color support for this to work.")
 
 #define ADVANCED_TEXT N_("Show advanced options")
 #define ADVANCED_LONGTEXT N_( \
-    "When this option is turned on, the preferences and/or interfaces  will " \
-    "show all the available options, including those that most users should " \
+    "When this is enabled, the preferences and/or interfaces will " \
+    "show all available options, including those that most users should " \
     "never touch.")
 
 #define SHOWINTF_TEXT N_("Show interface with mouse")
 #define SHOWINTF_LONGTEXT N_( \
-    "If this enabled, the interface will be shown when you move the mouse to "\
+    "When this is enabled, the interface is shown when you move the mouse to "\
     "the edge of the screen in fullscreen mode." )
 
+
+/*****************************************************************************
+ * Audio
+ ****************************************************************************/
+
+// DEPRECATED
 #define AOUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the audio " \
     "subsystem, and to add audio filters which can be used for " \
@@ -114,13 +125,13 @@ static char *ppsz_snap_formats[] =
 
 #define AOUT_TEXT N_("Audio output module")
 #define AOUT_LONGTEXT N_( \
-    "This option allows you to select the audio output method used by VLC. " \
+    "This is the audio output method used by VLC. " \
     "The default behavior is to automatically select the best method " \
     "available.")
 
 #define AUDIO_TEXT N_("Enable audio")
 #define AUDIO_LONGTEXT N_( \
-    "You can completely disable the audio output. In this case, the audio " \
+    "You can completely disable the audio output. The audio " \
     "decoding stage will not take place, thus saving some processing power.")
 
 #define MONO_TEXT N_("Force mono audio")
@@ -133,7 +144,8 @@ static char *ppsz_snap_formats[] =
 
 #define VOLUME_SAVE_TEXT N_("Audio output saved volume")
 #define VOLUME_SAVE_LONGTEXT N_( \
-    "This saves the audio output volume when you select mute.")
+    "This saves the audio output volume when you use the mute function. " \
+    "You should not change this option manually.")
 
 #define VOLUME_STEP_TEXT N_("Audio output volume step")
 #define VOLUME_STEP_LONGTEXT N_( \
@@ -155,25 +167,24 @@ static char *ppsz_snap_formats[] =
 
 #define DESYNC_TEXT N_("Audio desynchronization compensation")
 #define DESYNC_LONGTEXT N_( \
-    "This option allows you to delay the audio output. You must give a " \
-    "number of milliseconds. This can be handy if you notice a lag " \
-    "between the video and the audio.")
+    "This delays the audio output. The delay must be given in milliseconds." \
+    "This can be handy if you notice a lag between the video and the audio.")
 
-#define MULTICHA_TEXT N_("Preferred audio output channels mode")
+#define MULTICHA_TEXT N_("Audio output channels mode")
 #define MULTICHA_LONGTEXT N_( \
-    "This option allows you to set the audio output channels mode that will " \
+    "This sets the audio output channels mode that will " \
     "be used by default when possible (ie. if your hardware supports it as " \
     "well as the audio stream being played).")
 
-#define SPDIF_TEXT N_("Use the S/PDIF audio output when available")
+#define SPDIF_TEXT N_("Use S/PDIF when available")
 #define SPDIF_LONGTEXT N_( \
-    "This option allows you to use the S/PDIF audio output by default when " \
+    "S/PDIF can be used by default when " \
     "your hardware supports it as well as the audio stream being played.")
 
 #define FORCE_DOLBY_TEXT N_("Force detection of Dolby Surround")
 #define FORCE_DOLBY_LONGTEXT N_( \
     "Use this when you know your stream is (or is not) encoded with Dolby "\
-    "Surround but fails to be detected as such. And even if the stream is "\
+    "Surround but fails to be detected as such. Even if the stream is "\
     "not actually encoded with Dolby Surround, turning on this option might "\
     "enhance your experience, especially when combined with the Headphone "\
     "Channel Mixer." )
@@ -183,14 +194,18 @@ static char *ppsz_force_dolby_descriptions[] = { N_("Auto"), N_("On"), N_("Off")
 
 #define AUDIO_FILTER_TEXT N_("Audio filters")
 #define AUDIO_FILTER_LONGTEXT N_( \
-    "This allows you to add audio post processing filters, to modify " \
-    "the sound" )
+    "This adds audio post processing filters, to modify " \
+    "the sound rendering." )
 
 #define AUDIO_VISUAL_TEXT N_("Audio visualizations ")
 #define AUDIO_VISUAL_LONGTEXT N_( \
-    "This allows you to add visualization modules " \
-    "(spectrum analyzer, etc.).")
+    "This adds visualization modules (spectrum analyzer, etc.).")
 
+/*****************************************************************************
+ * Video
+ ****************************************************************************/
+
+// DEPRECATED
 #define VOUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the video output " \
     "subsystem. You can for example enable video filters (deinterlacing, " \
@@ -200,44 +215,44 @@ static char *ppsz_force_dolby_descriptions[] = { N_("Auto"), N_("On"), N_("Off")
 
 #define VOUT_TEXT N_("Video output module")
 #define VOUT_LONGTEXT N_( \
-    "This option allows you to select the video output method used by VLC. " \
-    "The default behavior is to automatically select the best " \
-    "method available.")
+    "This is the the video output method used by VLC. " \
+    "The default behavior is to automatically select the best method available.")
 
 #define VIDEO_TEXT N_("Enable video")
 #define VIDEO_LONGTEXT N_( \
-    "You can completely disable the video output. In this case, the video " \
+    "You can completely disable the video output. The video " \
     "decoding stage will not take place, thus saving some processing power.")
 
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
-    "You can enforce the video width here. By default (-1) VLC will " \
+    "You can enforce the video width. By default (-1) VLC will " \
     "adapt to the video characteristics.")
 
 #define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_( \
-    "You can enforce the video height here. By default (-1) VLC will " \
+    "You can enforce the video height. By default (-1) VLC will " \
     "adapt to the video characteristics.")
 
-#define VIDEOX_TEXT N_("Video x coordinate")
+#define VIDEOX_TEXT N_("Video X coordinate")
 #define VIDEOX_LONGTEXT N_( \
     "You can enforce the position of the top left corner of the video window "\
-    "here (x coordinate).")
+    "(X coordinate).")
 
-#define VIDEOY_TEXT N_("Video y coordinate")
+#define VIDEOY_TEXT N_("Video Y coordinate")
 #define VIDEOY_LONGTEXT N_( \
     "You can enforce the position of the top left corner of the video window "\
-    "here (y coordinate).")
+    "(Y coordinate).")
 
 #define VIDEO_TITLE_TEXT N_("Video title")
 #define VIDEO_TITLE_LONGTEXT N_( \
-    "You can specify a custom video window title here.")
+    "Custom title for the video window (in case the video is not embedded in "\
+    "the interface).")
 
 #define ALIGN_TEXT N_("Video alignment")
 #define ALIGN_LONGTEXT N_( \
-    "You can enforce the video alignment in its window. By default (0) it " \
+    "Enforce the alignment of the video in its window. By default (0) it " \
     "will be centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
-    "also use combinations of these values).")
+    "also use combinations of these values, like 6=4+2 meaning top-right).")
 static int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_align_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -249,68 +264,57 @@ static char *ppsz_align_descriptions[] =
 
 #define GRAYSCALE_TEXT N_("Grayscale video output")
 #define GRAYSCALE_LONGTEXT N_( \
-    "When enabled, the color information from the video won't be decoded " \
-    "(this can also allow you to save some processing power).")
+    "Output video in grayscale. As the color information aren't decoded, " \
+    "this can save some processing power." )
 
 #define FULLSCREEN_TEXT N_("Fullscreen video output")
 #define FULLSCREEN_LONGTEXT N_( \
-    "If this option is enabled, VLC will always start a video in fullscreen " \
-    "mode.")
+    "Start video in fullscreen mode" )
 
 #define OVERLAY_TEXT N_("Overlay video output")
 #define OVERLAY_LONGTEXT N_( \
-    "If enabled, VLC will try to take advantage of the overlay capabilities " \
-    "of your graphics card (hardware acceleration).")
+    "Overlay is the hardware acceleration capability of your video card " \
+    "(ability to render video directly). VLC will try to use it by default." )
 
 #define VIDEO_ON_TOP_TEXT N_("Always on top")
-#define VIDEO_ON_TOP_LONGTEXT N_("Always place the video window on top of " \
-    "other windows." )
+#define VIDEO_ON_TOP_LONGTEXT N_( \
+    "Always place the video window on top of other windows." )
 
 #define SS_TEXT N_("Disable screensaver")
 #define SS_LONGTEXT N_("Disable the screensaver during video playback." )
 
-#define FILE_LOG_TEXT N_( "Log to file" )
-#define FILE_LOG_LONGTEXT N_( "Log all VLC messages to a text file. Use the "\
-    "logfile option to set the file name." )
-
-#define SYSLOG_TEXT N_( "Log to syslog" )
-#define SYSLOG_LONGTEXT N_( "Log all VLC messages to syslog." )
-
 #define VIDEO_DECO_TEXT N_("Window decorations")
 #define VIDEO_DECO_LONGTEXT N_( \
-    "If this option is disabled, VLC will avoid creating window caption, " \
-    "frames, etc... around the video.")
+    "VLC can avoid creating window caption, frames, etc... around the video" \
+    ", giving a \"minimal\" window.")
 
 #define FILTER_TEXT N_("Video filter module")
 #define FILTER_LONGTEXT N_( \
-    "This will allow you to add a post-processing filter to enhance the " \
+    "This adds post-processing filters to enhance the " \
     "picture quality, for instance deinterlacing, or to clone or distort " \
     "the video window.")
 
 #define SNAP_PATH_TEXT N_("Video snapshot directory")
 #define SNAP_PATH_LONGTEXT N_( \
-    "Allows you to specify the directory where the video snapshots will " \
-    "be stored.")
+    "Directory where the video snapshots will be stored.")
 
 #define SNAP_FORMAT_TEXT N_("Video snapshot format")
 #define SNAP_FORMAT_LONGTEXT N_( \
-    "Allows you to specify the image format in which the video snapshots will " \
-    "be stored.")
+    "Image format which will be used to store the video snapshots" )
 
 #define SNAP_PREVIEW_TEXT N_("Display video snapshot preview")
 #define SNAP_PREVIEW_LONGTEXT N_( \
-    "Enable / disable displaying the snapshot preview in the screen's to " \
-    " left corner.")
+    "Display the snapshot preview in the screen's top-left corner.")
 
 #define CROP_TEXT N_("Video cropping")
 #define CROP_LONGTEXT N_( \
-    "This will force the cropping of the source video. " \
+    "This forces the cropping of the source video. " \
     "Accepted formats are x:y (4:3, 16:9, etc.) expressing the global image " \
     "aspect.")
 
 #define ASPECT_RATIO_TEXT N_("Source aspect ratio")
 #define ASPECT_RATIO_LONGTEXT N_( \
-    "This will force the source aspect ratio. For instance, some DVDs claim " \
+    "This forces the source aspect ratio. For instance, some DVDs claim " \
     "to be 16:9 while they are actually 4:3. This can also be used as a " \
     "hint for VLC when a movie does not have aspect ratio information. " \
     "Accepted formats are x:y (4:3, 16:9, etc.) expressing the global image " \
@@ -319,14 +323,14 @@ static char *ppsz_align_descriptions[] =
 
 #define HDTV_FIX_TEXT N_("Fix HDTV height")
 #define HDTV_FIX_LONGTEXT N_( \
-    "This option allows proper handling of HDTV-1080 video format " \
-    "even if broken encoder incorrectly set height to 1088 lines. " \
-    "Disable this option only if your video has non-standard format " \
-    "requiring all 1088 lines.")
+    "This allows proper handling of HDTV-1080 video format " \
+    "even if broken encoder incorrectly sets height to 1088 lines. " \
+    "You should only disable this option if your video has a " \
+    "non-standard format requiring all 1088 lines.")
 
 #define MASPECT_RATIO_TEXT N_("Monitor pixel aspect ratio")
 #define MASPECT_RATIO_LONGTEXT N_( \
-    "This will force the monitor aspect ratio. Most monitors have square " \
+    "This forces the monitor aspect ratio. Most monitors have square " \
     "pixels (1:1). If you have a 16:9 screen, you might need to change this " \
     "to 4:3 in order to keep proportions.")
 
@@ -340,13 +344,16 @@ static char *ppsz_align_descriptions[] =
     "This drops frames that are late (arrive to the video output after " \
     "their intended display date)." )
 
-
-
 #define QUIET_SYNCHRO_TEXT N_("Quiet synchro")
 #define QUIET_SYNCHRO_LONGTEXT N_( \
-    "Enable this option to avoid flooding the message log with debug " \
-    "output from the video output synchro.")
+    "This avoids flooding the message log with debug output from the " \
+    "video output synchronization mechanism.")
 
+/*****************************************************************************
+ * Input
+ ****************************************************************************/
+
+// Deprecated
 #define INPUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the input " \
     "subsystem, such as the DVD or VCD device, the network interface " \
@@ -359,13 +366,14 @@ static char *ppsz_align_descriptions[] =
 
 #define CLOCK_SYNCHRO_TEXT N_("Clock synchronisation")
 #define CLOCK_SYNCHRO_LONGTEXT N_( \
-    "Allows you to enable/disable the input clock synchronisation for " \
-    "real-time sources.")
+    "It is possible to disable the input clock synchronisation for " \
+    "real-time sources. Use this if you experience jerky playback of " \
+    "network streams.")
 
 #define NETSYNC_TEXT N_("Network synchronisation" )
 #define NETSYNC_LONGTEXT N_( "This allows you to remotely " \
         "synchronise clocks for server and client. The detailed settings " \
-        "are available in Advanced / Others / Network Sync" )
+        "are available in Advanced / Network Sync." )
 
 static int pi_clock_values[] = { -1, 0, 1 };
 static char *ppsz_clock_descriptions[] =
@@ -373,93 +381,101 @@ static char *ppsz_clock_descriptions[] =
 
 #define SERVER_PORT_TEXT N_("UDP port")
 #define SERVER_PORT_LONGTEXT N_( \
-    "This is the port used for UDP streams. 1234 by default.")
+    "This is the default port used for UDP streams. Default is 1234." )
 
 #define MTU_TEXT N_("MTU of the network interface")
 #define MTU_LONGTEXT N_( \
     "This is the maximum packet size that can be transmitted " \
-    "over network interface. On Ethernet it is usually 1500 bytes.")
+    "over the network interface. On Ethernet it is usually 1500 bytes.")
 
 #define TTL_TEXT N_("Hop limit (TTL)")
 #define TTL_LONGTEXT N_( \
-    "Specify the hop limit (TTL) of the multicast packets sent by " \
-    "the stream output (0 = use operating system built-in default).")
+    "This is the hop limit (also known as \"Time-To-Live\" or TTL) of " \
+    "the multicast packets sent by the stream output (0 = use operating "\
+    "system built-in default).")
 
 #define MIFACE_TEXT N_("IPv6 multicast output interface")
 #define MIFACE_LONGTEXT N_( \
-    "Indicate here the multicast output interface. " \
-    "This overrides the routing table.")
+    "Default IPv6 multicast interface. This overrides the routing table.")
 
 #define MIFACE_ADDR_TEXT N_("IPv4 multicast output interface address")
 #define MIFACE_ADDR_LONGTEXT N_( \
-    "Specify the IPv4 address of the networking interface. " \
-    "This overrides the routing table.")
+    "IPv4 adress for the default multicast interface. This overrides " \
+    "the routing table.")
 
-#define INPUT_PROGRAM_TEXT N_("Program to select")
+#define INPUT_PROGRAM_TEXT N_("Program")
 #define INPUT_PROGRAM_LONGTEXT N_( \
     "Choose the program to select by giving its Service ID. " \
     "Only use this option if you want to read a multi-program stream " \
     "(like DVB streams for example)." )
 
-#define INPUT_PROGRAMS_TEXT N_("Programs to select")
+#define INPUT_PROGRAMS_TEXT N_("Programs")
 #define INPUT_PROGRAMS_LONGTEXT N_( \
     "Choose the programs to select by giving a comma-separated list of " \
-    "SIDs. " \
+    "Service IDs (SIDs). " \
     "Only use this option if you want to read a multi-program stream " \
     "(like DVB streams for example)." )
 
+/// \todo Document how to find it
 #define INPUT_AUDIOTRACK_TEXT N_("Audio track")
 #define INPUT_AUDIOTRACK_LONGTEXT N_( \
-    "Give the stream number of the audio track you want to use " \
+    "Stream number of the audio track to use " \
     "(from 0 to n).")
 
 #define INPUT_SUBTRACK_TEXT N_("Subtitles track")
 #define INPUT_SUBTRACK_LONGTEXT N_( \
-    "Give the stream number of the subtitle track you want to use " \
+    "Stream number of the subtitle track to use " \
     "(from 0 to n).")
 
 #define INPUT_AUDIOTRACK_LANG_TEXT N_("Audio language")
 #define INPUT_AUDIOTRACK_LANG_LONGTEXT N_( \
-    "Give the language of the audio track you want to use " \
-    "(comma separted, two or three letter country code).")
+    "Language of the audio track you want to use " \
+    "(comma separated, two or three letter country code).")
 
 #define INPUT_SUBTRACK_LANG_TEXT N_("Subtitle language")
 #define INPUT_SUBTRACK_LANG_LONGTEXT N_( \
-    "Give the language of the subtitle track you want to use " \
-    "(comma separted, two or tree letter country code).")
+    "Language of the subtitle track you want to use " \
+    "(comma separated, two or tree letter country code).")
 
+/// \todo Document how to find it
 #define INPUT_AUDIOTRACK_ID_TEXT N_("Audio track ID")
 #define INPUT_AUDIOTRACK_ID_LONGTEXT N_( \
-    "Give the stream ID of the audio track you want to use.")
+    "Stream ID of the audio track to use.")
 
 #define INPUT_SUBTRACK_ID_TEXT N_("Subtitles track ID")
 #define INPUT_SUBTRACK_ID_LONGTEXT N_( \
-    "Give the stream ID of the subtitle track you want to use.")
+    "Stream ID of the subtitle track to use.")
 
 #define INPUT_REPEAT_TEXT N_("Input repetitions")
 #define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be " \
                                  "repeated")
 
-#define START_TIME_TEXT N_("Input start time (seconds)")
-#define START_TIME_LONGTEXT N_("Input start time (seconds)")
+#define START_TIME_TEXT N_("Start time")
+#define START_TIME_LONGTEXT N_("The stream will start at this position " \
+             "(in seconds)." )
 
-#define STOP_TIME_TEXT N_("Input stop time (seconds)")
-#define STOP_TIME_LONGTEXT N_("Input stop time (seconds)")
+#define STOP_TIME_TEXT N_("Stop time")
+#define STOP_TIME_LONGTEXT N_("The stream will stop at this position " \
+             "(in seconds)." )
 
 #define INPUT_LIST_TEXT N_("Input list")
-#define INPUT_LIST_LONGTEXT N_("Allows you to specify a comma-separated list " \
-    "of inputs that will be concatenated after the normal one.")
+#define INPUT_LIST_LONGTEXT N_( \
+    "You can give a comma-separated list " \
+    "of inputs that will be concatenated together after the normal one.")
 
 #define INPUT_SLAVE_TEXT N_("Input slave (experimental)")
-#define INPUT_SLAVE_LONGTEXT N_("Allows you to play from several streams at " \
+#define INPUT_SLAVE_LONGTEXT N_( \
+    "This allows you to play from several inputs at " \
     "the same time. This feature is experimental, not all formats " \
-    "are supported.")
+    "are supported. Use a '#' separated list of inputs.")
 
 #define BOOKMARKS_TEXT N_("Bookmarks list for a stream")
-#define BOOKMARKS_LONGTEXT N_("You can specify a list of bookmarks for a stream in " \
+#define BOOKMARKS_LONGTEXT N_( "You can manually give a list of "  \
+    "bookmarks for a stream in " \
     "the form \"{name=bookmark-name,time=optional-time-offset," \
     "bytes=optional-byte-offset},{...}\"")
 
+// DEPRECATED
 #define SUB_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the subpictures " \
     "subsystem. You can for example enable subpictures filters (logo, etc.). " \
@@ -479,17 +495,17 @@ static char *ppsz_clock_descriptions[] =
 #define OSD_TEXT N_("On Screen Display")
 #define OSD_LONGTEXT N_( \
     "VLC can display messages on the video. This is called OSD (On Screen " \
-    "Display). You can disable this feature here.")
+    "Display).")
 
 #define SUB_FILTER_TEXT N_("Subpictures filter module")
 #define SUB_FILTER_LONGTEXT N_( \
-    "This will allow you to add a subpictures filter for instance to overlay "\
-    "a logo.")
+    "This addds so-called \"subpicture filters\". These filters overlay " \
+    "some images or text over the video (like a logo, arbitraty text...)." )
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT \
     N_("Automatically detect a subtitle file, if no subtitle filename is " \
-    "specified.")
+    "specified (based on the filename of the movie).")
 
 #define SUB_FUZZY_TEXT N_("Subtitle autodetection fuzziness")
 #define SUB_FUZZY_LONGTEXT \
@@ -543,31 +559,28 @@ static char *ppsz_clock_descriptions[] =
 
 #define IPV6_TEXT N_("Force IPv6")
 #define IPV6_LONGTEXT N_( \
-    "If you check this box, IPv6 will be used by default for all UDP and " \
-    "HTTP connections.")
+    "IPv6 will be used by default for all connections.")
 
 #define IPV4_TEXT N_("Force IPv4")
 #define IPV4_LONGTEXT N_( \
-    "If you check this box, IPv4 will be used by default for all UDP and " \
-    "HTTP connections.")
+    " IPv4 will be used by default for all connections.")
 
-#define TIMEOUT_TEXT N_("TCP connection timeout in ms")
+#define TIMEOUT_TEXT N_("TCP connection timeout")
 #define TIMEOUT_LONGTEXT N_( \
-    "Allows you to modify the default TCP connection timeout. This " \
-    "value should be set in millisecond units." )
+    "Default TCP connection timeout (in milliseconds). " )
 
 #define SOCKS_SERVER_TEXT N_("SOCKS server")
 #define SOCKS_SERVER_LONGTEXT N_( \
-    "Allow you to specify a SOCKS server to use. It must be of the form " \
-    "address:port . It will be used for all TCP connections" )
+    "SOCKS proxy server to use. This must be of the form " \
+    "address:port. It will be used for all TCP connections" )
 
 #define SOCKS_USER_TEXT N_("SOCKS user name")
-#define SOCKS_USER_LONGTEXT N_("Allows you to modify the user name that will " \
-    "be used for the connection to the SOCKS server.")
+#define SOCKS_USER_LONGTEXT N_("User name to be used for connection to " \
+    "the SOCKS proxy." )
 
 #define SOCKS_PASS_TEXT N_("SOCKS password")
-#define SOCKS_PASS_LONGTEXT N_("Allows you to modify the password that will " \
-    "be used for the connection to the SOCKS server.")
+#define SOCKS_PASS_LONGTEXT N_("Password to be used for connection to "\
+    "the SOCKS proxy." )
 
 #define META_TITLE_TEXT N_("Title metadata")
 #define META_TITLE_LONGTEXT N_( \
@@ -601,22 +614,29 @@ static char *ppsz_clock_descriptions[] =
 #define META_URL_LONGTEXT N_( \
      "Allows you to specify a \"url\" metadata for an input.")
 
+// DEPRECATED
 #define CODEC_CAT_LONGTEXT N_( \
     "This option can be used to alter the way VLC selects " \
     "its codecs (decompression methods). Only advanced users should " \
     "alter this option as it can break playback of all your streams." )
 
-#define CODEC_TEXT N_("Preferred codecs list")
+#define CODEC_TEXT N_("Preferred decoders list")
 #define CODEC_LONGTEXT N_( \
-    "This allows you to select a list of codecs that VLC will use in " \
+    "List of codecs that VLC will use in " \
     "priority. For instance, 'dummy,a52' will try the dummy and a52 codecs " \
-    "before trying the other ones.")
+    "before trying the other ones. Only advanced users should " \
+    "alter this option as it can break playback of all your streams." )
 
 #define ENCODER_TEXT N_("Preferred encoders list")
 #define ENCODER_LONGTEXT N_( \
     "This allows you to select a list of encoders that VLC will use in " \
-    "priority")
+    "priority.")
 
+/*****************************************************************************
+ * Sout
+ ****************************************************************************/
+
+// DEPRECATED
 #define SOUT_CAT_LONGTEXT N_( \
     "These options allow you to set default global options for the " \
     "stream output subsystem." )
@@ -629,25 +649,25 @@ static char *ppsz_clock_descriptions[] =
 
 #define SOUT_ALL_TEXT N_("Enable streaming of all ES")
 #define SOUT_ALL_LONGTEXT N_( \
-    "This allows you to stream all ES (video, audio and subtitles)")
+    "Stream all ES (video, audio and subtitles)")
 
 #define SOUT_DISPLAY_TEXT N_("Display while streaming")
 #define SOUT_DISPLAY_LONGTEXT N_( \
-    "This allows you to play the stream while streaming it.")
+    "Play locally the stream while streaming it.")
 
 #define SOUT_VIDEO_TEXT N_("Enable video stream output")
 #define SOUT_VIDEO_LONGTEXT N_( \
-    "This allows you to choose if the video stream should be redirected to " \
+    "Choose whether the video stream should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
 #define SOUT_AUDIO_TEXT N_("Enable audio stream output")
 #define SOUT_AUDIO_LONGTEXT N_( \
-    "This allows you to choose if the audio stream should be redirected to " \
+    "Choose whether the audio stream should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
 #define SOUT_SPU_TEXT N_("Enable SPU stream output")
 #define SOUT_SPU_LONGTEXT N_( \
-    "This allows you to choose if the SPU streams should be redirected to " \
+    "Choose whether the SPU streams should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
 #define SOUT_KEEP_TEXT N_("Keep stream output open" )
@@ -672,12 +692,18 @@ static char *ppsz_clock_descriptions[] =
 #define ANN_SAPCTRL_TEXT N_("Control SAP flow")
 #define ANN_SAPCTRL_LONGTEXT N_("If this option is enabled, the flow on " \
     "the SAP multicast address will be controlled. This is needed if you " \
-    "want to make announcements on the MBone" )
+    "want to make announcements on the MBone." )
 
 #define ANN_SAPINTV_TEXT N_("SAP announcement interval")
 #define ANN_SAPINTV_LONGTEXT N_("When the SAP flow control is disabled, " \
-    "this lets you set the fixed interval between SAP announcements" )
+    "this lets you set the fixed interval between SAP announcements." )
 
+
+/*****************************************************************************
+ * Advanced
+ ****************************************************************************/
+
+// DEPRECATED
 #define CPU_CAT_LONGTEXT N_( \
     "These options allow you to enable special CPU optimizations. " \
     "You should always leave all these enabled." )
@@ -717,39 +743,7 @@ static char *ppsz_clock_descriptions[] =
     "If your processor supports the AltiVec instructions set, VLC can take " \
     "advantage of them.")
 
-#define PLAYLIST_CAT_LONGTEXT N_( \
-     "These options define the behavior of the playlist. Some " \
-     "of them can be overridden in the playlist dialog box." )
-
-#define PREPARSE_TEXT N_( "Automatically preparse files")
-#define PREPARSE_LONGTEXT N_( \
-    "This option enables automatic preparsing of files added to the playlist " \
-    "(to retrieve some metadata)." )
-
-#define SD_TEXT N_( "Services discovery modules")
-#define SD_LONGTEXT N_( \
-     "Specifies the services discovery modules to load, separated by " \
-     "semi-colons. Typical values are sap, hal, ..." )
-
-#define RANDOM_TEXT N_("Play files randomly forever")
-#define RANDOM_LONGTEXT N_( \
-    "When selected, VLC will randomly play files in the playlist until " \
-    "interrupted.")
-
-#define LOOP_TEXT N_("Repeat all")
-#define LOOP_LONGTEXT N_( \
-    "If you want VLC to keep playing the playlist indefinitely then enable " \
-    "this option.")
-
-#define REPEAT_TEXT N_("Repeat current item")
-#define REPEAT_LONGTEXT N_( \
-    "When this is active, VLC will keep playing the current playlist item " \
-    "over and over again.")
-
-#define PAS_TEXT N_("Play and stop")
-#define PAS_LONGTEXT N_( \
-    "Stop the playlist after each played playlist item. " )
-
+// DEPRECATED
 #define MISC_CAT_LONGTEXT N_( \
     "These options allow you to select default modules. Leave these " \
     "alone unless you really know what you are doing." )
@@ -767,11 +761,15 @@ static char *ppsz_clock_descriptions[] =
 
 #define ACCESS_FILTER_TEXT N_("Access filter module")
 #define ACCESS_FILTER_LONGTEXT N_( \
-    "This is a legacy entry to let you configure access filter modules.")
+    "Access filters are used to modify the stream that is being read. " \
+    "This is used for instance for timeshifting.")
 
 #define DEMUX_TEXT N_("Demux module")
 #define DEMUX_LONGTEXT N_( \
-    "This is a legacy entry to let you configure demux modules.")
+    "Demultiplexers are used to separate the \"elementary\" streams " \
+    "(like audio and video streams). You can use it if " \
+    "the correct demuxer is not automatically detected. You should not "\
+    "set this as a global option unless you really know what you are doing." )
 
 #define RT_PRIORITY_TEXT N_("Allow real-time priority")
 #define RT_PRIORITY_LONGTEXT N_( \
@@ -789,30 +787,33 @@ static char *ppsz_clock_descriptions[] =
 
 #define MINIMIZE_THREADS_TEXT N_("Minimize number of threads")
 #define MINIMIZE_THREADS_LONGTEXT N_( \
-     "This option minimizes the number of threads needed to run VLC")
+     "This option minimizes the number of threads needed to run VLC.")
 
 #define PLUGIN_PATH_TEXT N_("Modules search path")
 #define PLUGIN_PATH_LONGTEXT N_( \
-    "This option allows you to specify an additional path for VLC to look " \
-    "for its modules.")
+    "Additional path for VLC to look for its modules.")
 
 #define VLM_CONF_TEXT N_("VLM configuration file")
 #define VLM_CONF_LONGTEXT N_( \
-    "This option allows you to specify a VLM configuration file that will " \
-    "be read when VLM is launched.")
+    "Read a VLM configuration file as son as it is started." )
 
 #define PLUGINS_CACHE_TEXT N_("Use a plugins cache")
 #define PLUGINS_CACHE_LONGTEXT N_( \
-    "This option allows you to use a plugins cache which will greatly " \
-    "improve the start time of VLC.")
+    "Use a plugins cache which will greatly improve the startup time of VLC.")
 
 #define STATS_TEXT N_("Collect statistics")
 #define STATS_LONGTEXT N_( \
-     "This option allows you to collect miscellaneous statistics.")
+     "Collect miscellaneous statistics.")
 
 #define DAEMON_TEXT N_("Run as daemon process")
 #define DAEMON_LONGTEXT N_( \
      "Runs VLC as a background daemon process.")
+
+#define FILE_LOG_TEXT N_( "Log to file" )
+#define FILE_LOG_LONGTEXT N_( "Log all VLC messages to a text file." )
+
+#define SYSLOG_TEXT N_( "Log to syslog" )
+#define SYSLOG_LONGTEXT N_( "Log all VLC messages to syslog (UNIX systems)." )
 
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
 #define ONEINSTANCE_LONGTEXT N_( \
@@ -821,12 +822,6 @@ static char *ppsz_clock_descriptions[] =
     "don't want a new instance of VLC to be opened each time you " \
     "double-click on a file in the explorer. This option will allow you " \
     "to play the file with the already running instance or enqueue it.")
-
-#define PLAYLISTENQUEUE_TEXT N_( \
-    "Enqueue items to playlist when in one instance mode")
-#define PLAYLISTENQUEUE_LONGTEXT N_( \
-    "When using the one instance only option, enqueue items to playlist " \
-    "and keep playing current item.")
 
 #define HPRIORITY_TEXT N_("Increase the priority of the process")
 #define HPRIORITY_LONGTEXT N_( \
@@ -855,6 +850,52 @@ static char *ppsz_clock_descriptions[] =
     "Currently you can choose between implementation 0 (which is the " \
     "fastest but slightly incorrect), 1 (default) and 2.")
 
+#define PLAYLISTENQUEUE_TEXT N_( \
+    "Enqueue items to playlist when in one instance mode")
+#define PLAYLISTENQUEUE_LONGTEXT N_( \
+    "When using the one instance only option, enqueue items to playlist " \
+    "and keep playing current item.")
+
+/*****************************************************************************
+ * Playlist
+ ****************************************************************************/
+
+// DEPRECATED
+#define PLAYLIST_CAT_LONGTEXT N_( \
+     "These options define the behavior of the playlist. Some " \
+     "of them can be overridden in the playlist dialog box." )
+
+#define PREPARSE_TEXT N_( "Automatically preparse files")
+#define PREPARSE_LONGTEXT N_( \
+    "Automatically preparse files added to the playlist " \
+    "(to retrieve some metadata)." )
+
+#define SD_TEXT N_( "Services discovery modules")
+#define SD_LONGTEXT N_( \
+     "Specifies the services discovery modules to load, separated by " \
+     "semi-colons. Typical values are sap, hal, ..." )
+
+#define RANDOM_TEXT N_("Play files randomly forever")
+#define RANDOM_LONGTEXT N_( \
+    "VLC will randomly play files in the playlist until interrupted.")
+
+#define LOOP_TEXT N_("Repeat all")
+#define LOOP_LONGTEXT N_( \
+    "VLC will keep playing the playlist indefinitely." )
+
+#define REPEAT_TEXT N_("Repeat current item")
+#define REPEAT_LONGTEXT N_( \
+    "VLC will keep playing the current playlist item." )
+
+#define PAS_TEXT N_("Play and stop")
+#define PAS_LONGTEXT N_( \
+    "Stop the playlist after each played playlist item." )
+
+/*****************************************************************************
+ * Hotkeys
+ ****************************************************************************/
+
+// DEPRECATED
 #define HOTKEY_CAT_LONGTEXT N_( "These settings are the global VLC key " \
     "bindings, known as \"hotkeys\"." )
 
@@ -875,7 +916,7 @@ static char *ppsz_clock_descriptions[] =
 #define PREV_KEY_TEXT N_("Previous")
 #define PREV_KEY_LONGTEXT N_("Select the hotkey to use to skip to the previous item in the playlist.")
 #define STOP_KEY_TEXT N_("Stop")
-#define STOP_KEY_LONGTEXT N_("Select the hotkey to stop the playback.")
+#define STOP_KEY_LONGTEXT N_("Select the hotkey to stop playback.")
 #define POSITION_KEY_TEXT N_("Position")
 #define POSITION_KEY_LONGTEXT N_("Select the hotkey to display the position.")
 
@@ -885,7 +926,6 @@ static char *ppsz_clock_descriptions[] =
 #define JBSHORT_KEY_TEXT N_("Short backwards jump")
 #define JBSHORT_KEY_LONGTEXT \
     N_("Select the hotkey to make a short backwards jump.")
-
 #define JBMEDIUM_KEY_TEXT N_("Medium backwards jump")
 #define JBMEDIUM_KEY_LONGTEXT \
     N_("Select the hotkey to make a medium backwards jump.")
@@ -899,7 +939,6 @@ static char *ppsz_clock_descriptions[] =
 #define JFSHORT_KEY_TEXT N_("Short forward jump")
 #define JFSHORT_KEY_LONGTEXT \
     N_("Select the hotkey to make a short forward jump.")
-
 #define JFMEDIUM_KEY_TEXT N_("Medium forward jump")
 #define JFMEDIUM_KEY_LONGTEXT \
     N_("Select the hotkey to make a medium forward jump.")
@@ -907,14 +946,14 @@ static char *ppsz_clock_descriptions[] =
 #define JFLONG_KEY_LONGTEXT \
     N_("Select the hotkey to make a long forward jump.")
 
-#define JIEXTRASHORT_TEXT N_("Very short jump size")
-#define JIEXTRASHORT_LONGTEXT N_("Very short jump \"size\", in seconds")
-#define JISHORT_TEXT N_("Short jump size")
-#define JISHORT_LONGTEXT N_("Short jump \"size\", in seconds")
-#define JIMEDIUM_TEXT N_("Medium jump size")
-#define JIMEDIUM_LONGTEXT N_("Medium jump \"size\", in seconds")
-#define JILONG_TEXT N_("Long jump size")
-#define JILONG_LONGTEXT N_("Long jump \"size\", in seconds")
+#define JIEXTRASHORT_TEXT N_("Very short jump length")
+#define JIEXTRASHORT_LONGTEXT N_("Very short jump length, in seconds.")
+#define JISHORT_TEXT N_("Short jump length")
+#define JISHORT_LONGTEXT N_("Short jump length, in seconds.")
+#define JIMEDIUM_TEXT N_("Medium jump length")
+#define JIMEDIUM_LONGTEXT N_("Medium jump length, in seconds.")
+#define JILONG_TEXT N_("Long jump length")
+#define JILONG_LONGTEXT N_("Long jump length, in seconds.")
 
 #define QUIT_KEY_TEXT N_("Quit")
 #define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the application.")
@@ -943,7 +982,7 @@ static char *ppsz_clock_descriptions[] =
 #define VOL_DOWN_KEY_TEXT N_("Volume down")
 #define VOL_DOWN_KEY_LONGTEXT N_("Select the key to decrease audio volume.")
 #define VOL_MUTE_KEY_TEXT N_("Mute")
-#define VOL_MUTE_KEY_LONGTEXT N_("Select the key to turn off audio volume.")
+#define VOL_MUTE_KEY_LONGTEXT N_("Select the key to mute audio.")
 #define SUBDELAY_UP_KEY_TEXT N_("Subtitle delay up")
 #define SUBDELAY_UP_KEY_LONGTEXT N_("Select the key to increase the subtitle delay.")
 #define SUBDELAY_DOWN_KEY_TEXT N_("Subtitle delay down")
@@ -973,6 +1012,7 @@ static char *ppsz_clock_descriptions[] =
 #define SET_BOOKMARK8_KEY_TEXT N_("Set playlist bookmark 8")
 #define SET_BOOKMARK9_KEY_TEXT N_("Set playlist bookmark 9")
 #define SET_BOOKMARK10_KEY_TEXT N_("Set playlist bookmark 10")
+#define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this playlist bookmark.")
 
 #define BOOKMARK1_TEXT N_("Playlist bookmark 1")
 #define BOOKMARK2_TEXT N_("Playlist bookmark 2")
@@ -985,9 +1025,7 @@ static char *ppsz_clock_descriptions[] =
 #define BOOKMARK9_TEXT N_("Playlist bookmark 9")
 #define BOOKMARK10_TEXT N_("Playlist bookmark 10")
 #define BOOKMARK_LONGTEXT N_( \
-      "This option allows you to define playlist bookmarks.")
-
-#define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this playlist bookmark.")
+      "This allows you to define playlist bookmarks.")
 
 #define HISTORY_BACK_TEXT N_("Go back in browsing history")
 #define HISTORY_BACK_LONGTEXT N_("Select the key to go back (to the previous media item) in the browsing history.")
@@ -995,19 +1033,19 @@ static char *ppsz_clock_descriptions[] =
 #define HISTORY_FORWARD_LONGTEXT N_("Select the key to go forward (to the next media item) in the browsing history.")
 
 #define AUDIO_TRACK_KEY_TEXT N_("Cycle audio track")
-#define AUDIO_TRACK_KEY_LONGTEXT N_("Cycle through the available audio tracks(languages)")
+#define AUDIO_TRACK_KEY_LONGTEXT N_("Cycle through the available audio tracks(languages).")
 #define SUBTITLE_TRACK_KEY_TEXT N_("Cycle subtitle track")
-#define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks")
+#define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks.")
 #define ASPECT_RATIO_KEY_TEXT N_("Cycle source aspect ratio")
-#define ASPECT_RATIO_KEY_LONGTEXT N_("Cycle through a predefined list of source aspect ratios")
+#define ASPECT_RATIO_KEY_LONGTEXT N_("Cycle through a predefined list of source aspect ratios.")
 #define CROP_KEY_TEXT N_("Cycle video crop")
-#define CROP_KEY_LONGTEXT N_("Cycle through a predefined list of crop formats")
+#define CROP_KEY_LONGTEXT N_("Cycle through a predefined list of crop formats.")
 #define DEINTERLACE_KEY_TEXT N_("Cycle deinterlace modes")
-#define DEINTERLACE_KEY_LONGTEXT N_("Cycle through all the deinterlace modes")
+#define DEINTERLACE_KEY_LONGTEXT N_("Cycle through deinterlace modes.")
 #define INTF_SHOW_KEY_TEXT N_("Show interface")
-#define INTF_SHOW_KEY_LONGTEXT N_("Raise the interface above all other windows")
+#define INTF_SHOW_KEY_LONGTEXT N_("Raise the interface above all other windows.")
 #define INTF_HIDE_KEY_TEXT N_("Hide interface")
-#define INTF_HIDE_KEY_LONGTEXT N_("Lower the interface below all other windows")
+#define INTF_HIDE_KEY_LONGTEXT N_("Lower the interface below all other windows.")
 #define SNAP_KEY_TEXT N_("Take video snapshot")
 #define SNAP_KEY_LONGTEXT N_("Takes a video snapshot and writes it to disk.")
 
@@ -1016,17 +1054,17 @@ static char *ppsz_clock_descriptions[] =
 
 
 #define VLC_USAGE N_( \
-    "Usage: %s [options] [playlistitems] ..." \
-    "\nYou can specify multiple playlistitems on the commandline. They will be enqueued in the playlist." \
+    "Usage: %s [options] [stream] ..." \
+    "\nYou can specify multiple streams on the commandline. They will be enqueued in the playlist." \
     "\nThe first item specified will be played first." \
     "\n" \
     "\nOptions-styles:" \
     "\n  --option  A global option that is set for the duration of the program." \
     "\n   -option  A single letter version of a global --option." \
-    "\n   :option  An option that only applies to the playlistitem directly before it" \
+    "\n   :option  An option that only applies to the stream directly before it" \
     "\n            and that overrides previous settings." \
     "\n" \
-    "\nPlaylistitem MRL syntax:" \
+    "\nStream MRL syntax:" \
     "\n  [[access][/demux]://]URL[@[title][:chapter][-[title][:chapter]]] [:option=value ...]" \
     "\n" \
     "\n  Many of the global --options can also be used as MRL specific :options." \
@@ -1046,7 +1084,6 @@ static char *ppsz_clock_descriptions[] =
     "\n  vlc:pause:<seconds>            Special item to pause the playlist for a certain time" \
     "\n  vlc:quit                       Special item to quit VLC" \
     "\n")
-
 
 /*
  * Quick usage guide for the configuration options:
