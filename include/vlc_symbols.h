@@ -487,6 +487,7 @@ struct module_symbols_t
     char * (*FromUTF16_inner) (const uint16_t *);
     const char * (*IsUTF8_inner) (const char *);
     const char * (*GetFallbackEncoding_inner) (void);
+    int (*utf8_scandir_inner) (const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ));
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -954,6 +955,7 @@ struct module_symbols_t
 #  define FromUTF16 (p_symbols)->FromUTF16_inner
 #  define IsUTF8 (p_symbols)->IsUTF8_inner
 #  define GetFallbackEncoding (p_symbols)->GetFallbackEncoding_inner
+#  define utf8_scandir (p_symbols)->utf8_scandir_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1424,6 +1426,7 @@ struct module_symbols_t
     ((p_symbols)->FromUTF16_inner) = FromUTF16; \
     ((p_symbols)->IsUTF8_inner) = IsUTF8; \
     ((p_symbols)->GetFallbackEncoding_inner) = GetFallbackEncoding; \
+    ((p_symbols)->utf8_scandir_inner) = utf8_scandir; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \

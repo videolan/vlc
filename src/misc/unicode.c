@@ -34,6 +34,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
 #ifdef HAVE_DIRENT_H
@@ -418,6 +419,66 @@ const char *utf8_readdir( void *dir )
         return NULL;
 
     return FromLocale( ent->d_name );
+}
+
+static int dummy_select( const char *str )
+{
+    (void)str;
+    return 1;
+}
+
+int utf8_scandir( const char *dirname, char ***namelist,
+                  int (*select)( const char * ),
+                  int (*compar)( const char **, const char ** ) )
+{
+    DIR *dir = utf8_opendir( dirname );
+
+    if( select == NULL )
+        select = dummy_select;
+
+    if( dir == NULL )
+        return -1;
+    else
+    {
+        char **tab = NULL;
+        const char *entry;
+        unsigned num = 0;
+
+        while( ( entry = utf8_readdir( dir ) ) != NULL )
+        {
+            char **newtab;
+            char *utf_entry = strdup( entry );
+            LocaleFree( entry );
+            if( utf_entry == NULL )
+                goto error;
+
+            if( !select( utf_entry ) )
+                continue;
+
+            newtab = realloc( tab, sizeof( char * ) * (num + 1) );
+            if( newtab == NULL )
+                goto error;
+            tab = newtab;
+            tab[num++] = utf_entry;
+        }
+        closedir( dir );
+
+        if( compar != NULL )
+            qsort( tab, num, sizeof( tab[0] ),
+                   (int (*)( const void *, const void *))compar );
+
+        *namelist = tab;
+        return num;
+
+    error:{
+        unsigned i;
+
+        for( i = 0; i < num; i++ )
+            free( tab[i] );
+        if( tab != NULL )
+            free( tab );
+        return -1;}
+    }
 }
 
 
