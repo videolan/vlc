@@ -174,7 +174,6 @@ static inline int isurlsafe( int c )
     return ( (unsigned char)( c - 'a' ) < 26 )
         || ( (unsigned char)( c - 'A' ) < 26 )
         || ( (unsigned char)( c - '0' ) < 10 )
-        || ( (unsigned char)( c ) > 127 )
         /* Hmm, we should not encode character that are allowed in URLs
          * (even if they are not URL-safe), nor URL-safe characters.
          * We still encode some of them because of Microsoft's crap browser.
