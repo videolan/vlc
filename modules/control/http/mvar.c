@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mvar.c : Variables handling for the HTTP Interface
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -26,15 +26,15 @@
 #include "http.h"
 
 /* Utility function for scandir */
-static int Filter( const struct dirent *foo )
+static int Filter( const char *foo )
 {
-    return VLC_TRUE;
+    return strcmp( foo, "." );
 };
 
-static int InsensitiveAlphasort( const struct dirent **foo1,
-                                 const struct dirent **foo2 )
+static int InsensitiveAlphasort( const char **foo1,
+                                 const char **foo2 )
 {
-    return strcasecmp( (*foo1)->d_name, (*foo2)->d_name );
+    return strcasecmp( *foo1, *foo2 );
 };
 
 
@@ -526,25 +526,23 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
                              char *psz_dir )
 {
     mvar_t *s = E_(mvar_New)( name, "set" );
-    char          tmp[MAX_DIR_SIZE];
 #ifdef HAVE_SYS_STAT_H
     struct stat   stat_info;
 #endif
-    struct dirent **pp_dir_content;
+    char        **ppsz_dir_content;
     int           i_dir_content, i;
-    char          sep;
-
     /* convert all / to native separator */
 #if defined( WIN32 )
-    sep = '\\';
+    const char sep = '\\';
 #else
-    sep = '/';
+    const char sep = '/';
 #endif
 
     psz_dir = E_(RealPath)( p_intf, psz_dir );
 
 #ifdef HAVE_SYS_STAT_H
-    if( (stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ))
+    if( (utf8_stat( psz_dir, &stat_info ) == -1 )
+     || !S_ISDIR( stat_info.st_mode )
 #   if defined( WIN32 )
           && psz_dir[0] != '\0' && (psz_dir[0] != '\\' || psz_dir[1] != '\0')
 #   endif
@@ -556,8 +554,8 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
 #endif
 
     /* parse psz_src dir */
-    if( ( i_dir_content = scandir( psz_dir, &pp_dir_content, Filter,
-                                   InsensitiveAlphasort ) ) == -1 )
+    if( ( i_dir_content = utf8_scandir( psz_dir, &ppsz_dir_content, Filter,
+                                        InsensitiveAlphasort ) ) == -1 )
     {
         msg_Warn( p_intf, "scandir error on %s (%s)", psz_dir,
                   strerror(errno) );
@@ -567,56 +565,52 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
 
     for( i = 0; i < i_dir_content; i++ )
     {
-        struct dirent *p_dir_content = pp_dir_content[i];
+        char *psz_dir_content = ppsz_dir_content[i];
+        char psz_tmp[strlen( psz_dir ) + 1 + strlen( psz_dir_content ) + 1];
         mvar_t *f;
-        char *psz_name, *psz_tmp, *psz_ext;
-
-        if( !strcmp( p_dir_content->d_name, "." ) )
-        {
-            continue;
-        }
+        char *psz_name, *psz_ext, *psz_dummy;
 
 #if defined( WIN32 )
         if( psz_dir[0] == '\0' || (psz_dir[0] == '\\' && psz_dir[1] == '\0') )
         {
-            snprintf( tmp, sizeof(tmp), "%s", p_dir_content->d_name );
+            strcpy( psz_tmp, psz_dir_content );
         }
         else
 #endif
         {
-            snprintf( tmp, sizeof(tmp), "%s%c%s", psz_dir, sep,
-                      p_dir_content->d_name );
+            sprintf( psz_tmp, "%s%c%s", psz_dir, sep, psz_dir_content );
 
 #ifdef HAVE_SYS_STAT_H
-            if( stat( tmp, &stat_info ) == -1 )
+            if( utf8_stat( psz_tmp, &stat_info ) == -1 )
             {
+                free( psz_dir_content );
                 continue;
             }
 #endif
         }
         f = E_(mvar_New)( name, "set" );
 
-        psz_tmp = vlc_fix_readdir_charset( p_intf, p_dir_content->d_name );
-        psz_name = E_(FromUTF8)( p_intf, psz_tmp );
-        free( psz_tmp );
+        /* FIXME: merge vlc_fix_readdir_charset with utf8_readir */
+        psz_dummy = vlc_fix_readdir_charset( p_intf, psz_dir_content );
+        psz_name = E_(FromUTF8)( p_intf, psz_dummy );
+        free( psz_dummy );
 
         /* put lower-case file extension in 'ext' */
         psz_ext = strrchr( psz_name, '.' );
-        psz_tmp = psz_ext = strdup( psz_ext != NULL ? psz_ext + 1 : "" );
-        while ( *psz_tmp != '\0' )
-        {
-            *psz_tmp = tolower( *psz_tmp );
-            psz_tmp++;
-        }
+        psz_ext = strdup( psz_ext != NULL ? psz_ext + 1 : "" );
+        for( psz_dummy = psz_ext; *psz_dummy != '\0'; psz_dummy++ )
+            *psz_dummy = tolower( *psz_dummy );
+
         E_(mvar_AppendNewVar)( f, "ext", psz_ext );
         free( psz_ext );
 
 #if defined( WIN32 )
         if( psz_dir[0] == '\0' || (psz_dir[0] == '\\' && psz_dir[1] == '\0') )
         {
-            snprintf( tmp, sizeof(tmp), "%c:", psz_name[0] );
+            char psz_tmp[3];
+            sprintf( psz_tmp, "%c:", psz_name[0] );
             E_(mvar_AppendNewVar)( f, "name", psz_name );
-            E_(mvar_AppendNewVar)( f, "basename", tmp );
+            E_(mvar_AppendNewVar)( f, "basename", psz_tmp );
             E_(mvar_AppendNewVar)( f, "type", "directory" );
             E_(mvar_AppendNewVar)( f, "size", "unknown" );
             E_(mvar_AppendNewVar)( f, "date", "unknown" );
@@ -624,8 +618,11 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
         else
 #endif
         {
-            snprintf( tmp, sizeof(tmp), "%s%c%s", psz_dir, sep, psz_name );
-            E_(mvar_AppendNewVar)( f, "name", tmp );
+            char psz_ctime[26];
+            char psz_tmp[strlen( psz_dir ) + 1 + strlen( psz_name ) + 1];
+
+            sprintf( psz_tmp, "%s%c%s", psz_dir, sep, psz_name );
+            E_(mvar_AppendNewVar)( f, "name", psz_tmp );
             E_(mvar_AppendNewVar)( f, "basename", psz_name );
 
 #ifdef HAVE_SYS_STAT_H
@@ -642,13 +639,13 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
                 E_(mvar_AppendNewVar)( f, "type", "unknown" );
             }
 
-            sprintf( tmp, I64Fd, (int64_t)stat_info.st_size );
-            E_(mvar_AppendNewVar)( f, "size", tmp );
+            sprintf( psz_ctime, I64Fd, (int64_t)stat_info.st_size );
+            E_(mvar_AppendNewVar)( f, "size", psz_ctime );
 
             /* FIXME memory leak FIXME */
 #   ifdef HAVE_CTIME_R
-            ctime_r( &stat_info.st_mtime, tmp );
-            E_(mvar_AppendNewVar)( f, "date", tmp );
+            ctime_r( &stat_info.st_mtime, psz_ctime );
+            E_(mvar_AppendNewVar)( f, "date", psz_ctime );
 #   else
             E_(mvar_AppendNewVar)( f, "date", ctime( &stat_info.st_mtime ) );
 #   endif
@@ -663,12 +660,12 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
         E_(mvar_AppendVar)( s, f );
 
         free( psz_name );
+        free( psz_dir_content );
     }
 
     free( psz_dir );
-    for( i = 0; i < i_dir_content; i++ )
-        if( pp_dir_content[i] ) free( pp_dir_content[i] );
-    if( pp_dir_content) free( pp_dir_content );
+    if( ppsz_dir_content != NULL )
+        free( ppsz_dir_content );
     return s;
 }
 
