@@ -6,6 +6,7 @@
  *
  * Authors: Antoine Cellerier <dionoea at videolan dot org>
  *          Daniel Stranger <vlc at schmaller dot de>
+ *          Rémi Denis-Courmont <rem # videolan org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +26,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "vlc_strings.h"
 
@@ -48,38 +51,70 @@ char *decode_encoded_URI_duplicate( const char *psz )
  */
 void decode_encoded_URI( char *psz )
 {
-    char *dup = strdup( psz );
-    char *p = dup;
+    unsigned char *in = (unsigned char *)psz, *out = in, c;
 
-    while( *p )
+    while( ( c = *in++ ) != '\0' )
     {
-        if( *p == '%' )
+        switch( c )
         {
-            char val[3];
-            p++;
-            if( !*p )
+            case '%':
             {
+                char val[5], *pval = val;
+                unsigned long cp;
+
+                switch( c = *in++ )
+                {
+                    case '\0':
+                        return;
+
+                    case 'u':
+                    case 'U':
+                        if( ( *pval++ = *in++ ) == '\0' )
+                            return;
+                        if( ( *pval++ = *in++ ) == '\0' )
+                            return;
+                        c = *in++;
+
+                    default:
+                        *pval++ = c;
+                        if( ( *pval++ = *in++ ) == '\0' )
+                            return;
+                        *pval = '\0';
+                }
+
+                cp = strtoul( val, NULL, 0x10 );
+                if( cp < 0x80 )
+                    *out++ = cp;
+                else
+                if( cp < 0x800 )
+                {
+                    *out++ = (( cp >>  6)         | 0xc0);
+                    *out++ = (( cp        & 0x3f) | 0x80);
+                }
+                else
+                {
+                    assert( cp < 0x10000 );
+                    *out++ = (( cp >> 12)         | 0xe0);
+                    *out++ = (((cp >>  6) & 0x3f) | 0x80);
+                    *out++ = (( cp        & 0x3f) | 0x80);
+                }
                 break;
             }
 
-            val[0] = *p++;
-            val[1] = *p++;
-            val[2] = '\0';
+            case '+':
+                *out++ = ' ';
+                break;
 
-            *psz++ = strtol( val, NULL, 16 );
-        }
-        else if( *p == '+' )
-        {
-            *psz++ = ' ';
-            p++;
-        }
-        else
-        {
-            *psz++ = *p++;
+            default:
+                /* Inserting non-ASCII or non-printable characters is unsafe,
+                 * and no sane browser will send these unencoded */
+                if( ( c < 32 ) || ( c > 127 ) )
+                    *out++ = '?';
+                else
+                    *out++ = c;
         }
     }
-    *psz++ = '\0';
-    free( dup );
+    *out = '\0';
 }
 
 /**
