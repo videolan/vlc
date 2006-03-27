@@ -914,10 +914,8 @@ playlist_item_t *E_(MRLParse)( intf_thread_t *p_intf, char *psz,
     playlist_item_t * p_item = NULL;
 
     /* In case there is spaces before the mrl */
-    while( ( *s_mrl == ' ' ) && ( *s_mrl != '\0' ) )
-    {
+    while( *s_mrl == ' ' )
         s_mrl++;
-    }
 
     /* extract the mrl */
     s_temp = strstr( s_mrl , " :" );
