@@ -110,4 +110,7 @@ private:
     "video/x-ms-wmv:wmv:Windows Media;" \
     /* Google VLC mime */ \
     "application/x-google-vlc-plugin::Google VLC plugin" \
+    /* Misc */ \
+    "audio/wav::WAV audio" \
+    "audio/x-wav::WAV audio" \
 
