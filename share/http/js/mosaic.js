@@ -76,7 +76,6 @@ function mosaic_size_change()
     
     var mlayout = document.getElementById( "mosaic_layout" );
 
-    /* TODO: keep 'common' cells when resizing */
     while( mlayout.hasChildNodes() )
         mlayout.removeChild( mlayout.firstChild );
 
@@ -102,6 +101,8 @@ function mosaic_size_change()
         mtable.style.borderSpacing = mosaic_hborder + "px " +
                                      mosaic_vborder + "px";
 
+        var mtbody = document.createElement( 'tbody' );
+
         for( y = 0; y < mosaic_rows; y++ )
         {
             var mrow = document.createElement( 'tr' );
@@ -120,8 +121,9 @@ function mosaic_size_change()
                 mcell.appendChild( melt );
                 mrow.appendChild( mcell );
             }
-            mtable.appendChild( mrow );
+            mtbody.appendChild( mrow );
         }
+        mtable.appendChild( mtbody );
         mdt.appendChild( mtable );
         mlayout.appendChild( mdt );
     }
