@@ -619,10 +619,8 @@ package-win-common:
 # Copy relevant files
 	cp "$(top_builddir)/vlc$(EXEEXT)" "$(top_builddir)/vlc-${VERSION}/"
 	cp "$(top_srcdir)/vlc.exe.manifest" "$(top_builddir)/vlc-${VERSION}/"
-	$(STRIP) "$(top_builddir)/vlc-${VERSION}/vlc$(EXEEXT)"
 if BUILD_SHARED
 	cp "src/libvlc$(LIBEXT)" "vlc-${VERSION}/"
-	$(STRIP) "vlc-${VERSION}/libvlc$(LIBEXT)"
 endif
 
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
@@ -674,7 +672,6 @@ endif
 if BUILD_MOZILLA
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/mozilla"
 	cp $(top_builddir)/mozilla/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/mozilla/ ;
-	$(STRIP) $(top_builddir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
 	cp $(top_builddir)/mozilla/vlcintf.xpt  $(top_builddir)/vlc-${VERSION}/mozilla/ ;
 endif
 
@@ -685,7 +682,6 @@ if BUILD_ACTIVEX
 	unix2dos $(top_builddir)/vlc-${VERSION}/activex/* ;
 
 	cp $(top_builddir)/activex/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/activex/ ;
-	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
 endif
 # Rebase all those DLLs to speed up loading (need cygwin rebase)
 	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
@@ -725,8 +721,18 @@ package-win32-base-debug: package-win-common
 
 
 package-win32-base: package-win32-base-debug
+	$(STRIP) "$(top_builddir)/vlc-${VERSION}/vlc$(EXEEXT)"
+if BUILD_SHARED
+	$(STRIP) "vlc-${VERSION}/libvlc$(LIBEXT)"
+endif
 	for i in "" $(top_builddir)/vlc-${VERSION}/plugins/*$(LIBEXT) ; \
 	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
+if BUILD_MOZILLA
+	$(STRIP) $(top_builddir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
+endif
+if BUILD_ACTIVEX
+	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
+endif
 
 
 package-win32-base-exe: package-win32-base
