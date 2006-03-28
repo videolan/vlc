@@ -50,16 +50,20 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 #define PRESET_TEXT N_( "Equalizer preset" )
-#define PRESET_LONGTEXT PRESET_TEXT
+#define PRESET_LONGTEXT N_("Preset to use for the equalizer." )
 
 #define BANDS_TEXT N_( "Bands gain")
-#define BANDS_LONGTEXT N_( "Override preset bands gain in dB (-20 ... 20)" )
+#define BANDS_LONGTEXT N_( \
+         "Don't use presets, manually specify bands. You need to provide " \
+         "10 values between -20dB and 20dB, separated by spaces, like " \
+         "\"0 2 4 2 0 -2 -4 -2 0\"" )
 
 #define TWOPASS_TEXT N_( "Two pass" )
-#define TWOPASS_LONGTEXT N_( "Filter twice the audio" )
+#define TWOPASS_LONGTEXT N_( "Filter twice the audio. This provides a more"  \
+         "intense effect.")
 
 #define PREAMP_TEXT N_("Global gain" )
-#define PREAMP_LONGTEXT N_("Set the global gain in dB (-20 ... 20)" )
+#define PREAMP_LONGTEXT N_("Set the global gain in dB (-20 ... 20)." )
 
 vlc_module_begin();
     set_description( _("Equalizer 10 bands") );

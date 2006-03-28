@@ -69,8 +69,8 @@ typedef struct aout_filter_sys_t
 #define BUFF_TEXT N_("Number of audio buffers" )
 #define BUFF_LONGTEXT N_("This is the number of audio buffers on which the " \
                 "power measurement is made. A higher number of buffers will " \
-                "increase the response time of the filter to a high " \
-                "power but will make it less sensitive to short variations." )
+                "increase the response time of the filter to a spike " \
+                "but will make it less sensitive to short variations." )
 
 #define LEVEL_TEXT N_("Max level" )
 #define LEVEL_LONGTEXT N_("If the average power over the last N buffers " \

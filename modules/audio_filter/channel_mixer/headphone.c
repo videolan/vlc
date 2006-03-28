@@ -65,12 +65,11 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 
 #define HEADPHONE_DOLBY_TEXT N_("No decoding of Dolby Surround")
 #define HEADPHONE_DOLBY_LONGTEXT N_( \
-     "If this option is turned on (not recommended), Dolby Surround "\
-     "encoded streams won't be decoded before being processed by this "\
-     "filter.")
+     "Dolby Surround encoded streams won't be decoded before being " \
+     "processed by this filter. Enabling this setting is not recommended.")
 
 vlc_module_begin();
-    set_description( N_("Headphone channel mixer with virtual spatialization effect") );
+    set_description( N_("Headphone virtual spatialization effect") );
     set_shortname( _("Headphone effect") );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AFILTER );
