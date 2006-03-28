@@ -96,7 +96,8 @@ vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
     {
         double f_fps;
 
-	if( demux2_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
+        if( demux2_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) ||
+                                f_fps < 0.1 )
             return 0;
 
         if( to == mediacontrol_ByteCount )

@@ -505,7 +505,7 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
             p_counter->i_type != VLC_VAR_INTEGER &&
             p_counter->i_compute_type != STATS_LAST )
         {
-            msg_Err( p_handler, "Unable to compute MIN or MAX for this type");
+            msg_Err( p_handler, "unable to compute MIN or MAX for this type");
             return VLC_EGENERIC;
         }
 

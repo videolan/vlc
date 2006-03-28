@@ -36,8 +36,8 @@
 #   include <dirent.h>
 #endif
 
-#ifdef HAVE_LIMITS_H  
-#   include <limits.h>  
+#ifdef HAVE_LIMITS_H
+#   include <limits.h>
 #endif
 
 #ifdef HAVE_UNISTD_H
@@ -64,7 +64,7 @@
 /**
  * The possible extentions for subtitle files we support
  */
-static const char * sub_exts[] = {  "utf", "utf8", "utf-8", "sub", "srt", "smi", "txt", "ssa", "idx", NULL};
+static const char * sub_exts[] = {  "utf", "utf8", "utf-8", "sub", "srt", "smi", "txt", "ssa", "idx", NULL };
 /* extensions from unsupported types */
 /* rt, aqt, jss, js, ass */
 
@@ -161,7 +161,7 @@ static int compare_sub_priority( const void *a, const void *b )
 #endif
 }
 
-/* Utility function for scandir */  
+/* Utility function for scandir */
 static int Filter( const char *psz_dir_content )
 {
     /* does it end with a subtitle extension? */
@@ -229,7 +229,7 @@ static char **paths_to_list( char *psz_dir, char *psz_path )
                                            + strlen(psz_subdir) + 2 );
                 if( psz_temp )
                 {
-                    sprintf( psz_temp, "%s%s%c", 
+                    sprintf( psz_temp, "%s%s%c",
                              psz_subdir[0] == '.' ? psz_dir : "",
                              psz_subdir,
                              psz_subdir[strlen(psz_subdir) - 1] ==
@@ -343,8 +343,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     tmp_subdirs = paths_to_list( f_dir, psz_path );
     subdirs = tmp_subdirs;
 
-    for( j = -1; (j == -1) || ( (j >= 0) && (subdirs != NULL) && (*subdirs != NULL) );
-         j++)
+    for( j = -1; (j == -1) || ( (j >= 0) && (subdirs != NULL) &&
+        (*subdirs != NULL) ); j++)
     {
         const char *psz_dir = j < 0 ? f_dir : *subdirs;
         char **ppsz_dir_content;
@@ -364,7 +364,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             msg_Dbg( p_this, "looking for a subtitle file in %s", psz_dir );
             for( a = 0; a < i_dir_content; a++ )
             {
-                char *psz_name = vlc_fix_readdir_charset( p_this, ppsz_dir_content[a] );
+                char *psz_name = vlc_fix_readdir_charset( p_this,
+                                                          ppsz_dir_content[a] );
                 int i_prio = 0;
 
                 if( psz_name == NULL )
@@ -408,12 +409,16 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     char psz_path[strlen( psz_dir ) + strlen( psz_name ) + 1];
 
                     sprintf( psz_path, "%s%s", psz_dir, psz_name );
-                    msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", psz_path, i_prio );
+                    msg_Dbg( p_this,
+                                "autodetected subtitle: %s with priority %d",
+                                psz_path, i_prio );
                     /* FIXME: a portable wrapper for stat() or access() would be more suited */
                     if( ( f = utf8_fopen( psz_path, "rt" ) ) )
                     {
                         fclose( f );
-                        msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", psz_path, i_prio );
+                        msg_Dbg( p_this,
+                                "autodetected subtitle: %s with priority %d",
+                                psz_path, i_prio );
                         result[i_sub_count].priority = i_prio;
                         result[i_sub_count].psz_fname = psz_path;
                         result[i_sub_count].psz_ext = strdup(tmp_fname_ext);
@@ -456,7 +461,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             for( i = 0; i < i_sub_count; i++ )
             {
                 if( result[i].psz_fname && result[j].psz_fname &&
-                    !strncasecmp( result[j].psz_fname, result[i].psz_fname, sizeof( result[j].psz_fname) - 4 ) && 
+                    !strncasecmp( result[j].psz_fname, result[i].psz_fname,
+                                sizeof( result[j].psz_fname) - 4 ) &&
                     !strcasecmp( result[i].psz_ext, "idx" ) )
                     break;
             }

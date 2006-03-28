@@ -179,7 +179,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     if( p_sys->ppsz_audio_language )
     {
         for( i = 0; p_sys->ppsz_audio_language[i]; i++ )
-            msg_Dbg( p_input, "select audio in language[%d] %s",
+            msg_Dbg( p_input, "selected audio language[%d] %s",
                      i, p_sys->ppsz_audio_language[i] );
     }
     if( val.psz_string ) free( val.psz_string );
@@ -189,7 +189,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     if( p_sys->ppsz_sub_language )
     {
         for( i = 0; p_sys->ppsz_sub_language[i]; i++ )
-            msg_Dbg( p_input, "select subtitle in language[%d] %s",
+            msg_Dbg( p_input, "selected subtitle language[%d] %s",
                      i, p_sys->ppsz_sub_language[i] );
     }
     if( val.psz_string ) free( val.psz_string );
@@ -287,7 +287,7 @@ void input_EsOutDiscontinuity( es_out_t *out, vlc_bool_t b_audio )
     {
         es_out_id_t *es = p_sys->es[i];
         es->b_discontinuity = VLC_TRUE; /* signal discontinuity */
-        
+
         /* Send a dummy block to let decoder know that
          * there is a discontinuity */
         if( es->p_dec && ( !b_audio || es->fmt.i_cat == AUDIO_ES ) )
@@ -368,8 +368,10 @@ static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es,
     {
         if( es->psz_language && *es->psz_language )
         {
-            text.psz_string = malloc( strlen( es->fmt.psz_description) + strlen( es->psz_language ) + 10 );
-            sprintf( text.psz_string, "%s - [%s]", es->fmt.psz_description, es->psz_language );
+            text.psz_string = malloc( strlen( es->fmt.psz_description) +
+                                      strlen( es->psz_language ) + 10 );
+            sprintf( text.psz_string, "%s - [%s]", es->fmt.psz_description,
+                                                   es->psz_language );
         }
         else text.psz_string = strdup( es->fmt.psz_description );
     }
@@ -378,7 +380,8 @@ static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es,
         if( es->psz_language && *es->psz_language )
         {
             char *temp;
-            text.psz_string = malloc( strlen( _("Track %i") )+ strlen( es->psz_language ) + 30 );
+            text.psz_string = malloc( strlen( _("Track %i") )+
+                                      strlen( es->psz_language ) + 30 );
             asprintf( &temp,  _("Track %i"), val.i_int );
             sprintf( text.psz_string, "%s - [%s]", temp, es->psz_language );
             free( temp );
@@ -780,7 +783,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
             msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
                      es->i_id );
             return;
-	}
+        }
     }
 
     es->i_preroll_end = -1;

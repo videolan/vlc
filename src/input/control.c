@@ -533,7 +533,8 @@ static void NotifyPlaylist( input_thread_t *p_input )
                                        FIND_PARENT );
     if( p_playlist )
     {
-        var_SetInteger( p_playlist, "item-change", p_input->input.p_item->i_id );
+        var_SetInteger( p_playlist, "item-change",
+                        p_input->input.p_item->i_id );
         vlc_object_release( p_playlist );
     }
 }

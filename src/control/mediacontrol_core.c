@@ -123,7 +123,8 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
     if(  an_origin != mediacontrol_AbsolutePosition )
     {
         /* Relative or ModuloPosition make no sense */
-        RAISE( mediacontrol_PositionOriginNotSupported, "Only absolute position is valid." );
+        RAISE( mediacontrol_PositionOriginNotSupported,
+                                        "Only absolute position is valid." );
         return NULL;
     }
 
@@ -364,7 +365,8 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
     input_thread_t *p_input = self->p_playlist->p_input;
     vlc_value_t val;
 
-    retval = ( mediacontrol_StreamInformation* )malloc( sizeof( mediacontrol_StreamInformation ) );
+    retval = ( mediacontrol_StreamInformation* )
+                            malloc( sizeof( mediacontrol_StreamInformation ) );
     if( ! retval )
     {
         RAISE( mediacontrol_InternalException, "Out of memory" );
@@ -410,11 +412,11 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
         retval->length = val.i_time / 1000;
 
         retval->position = mediacontrol_unit_convert( p_input,
-                                                      mediacontrol_MediaTime, a_key,
-                                                      retval->position );
+                                         mediacontrol_MediaTime, a_key,
+                                         retval->position );
         retval->length   = mediacontrol_unit_convert( p_input,
-                                                      mediacontrol_MediaTime, a_key,
-                                                      retval->length );
+                                         mediacontrol_MediaTime, a_key,
+                                         retval->length );
     }
     return retval;
 }

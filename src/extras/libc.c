@@ -896,7 +896,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
 
         tv.tv_sec = 0;
         tv.tv_usec = 10000;
-        
+
         i_ret = select( pi_stdin[0] > pi_stdout[0] ? pi_stdin[0] + 1 :
                         pi_stdout[0] + 1, &readfds, &writefds, NULL, &tv );
         if ( i_ret > 0 )
@@ -958,10 +958,10 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
     }
 
 #elif defined( WIN32 ) && !defined( UNDER_CE )
-    SECURITY_ATTRIBUTES saAttr; 
-    PROCESS_INFORMATION piProcInfo; 
+    SECURITY_ATTRIBUTES saAttr;
+    PROCESS_INFORMATION piProcInfo;
     STARTUPINFO siStartInfo;
-    BOOL bFuncRetn = FALSE; 
+    BOOL bFuncRetn = FALSE;
     HANDLE hChildStdinRd, hChildStdinWr, hChildStdoutRd, hChildStdoutWr;
     DWORD i_status;
     char *psz_cmd, *p_env, *p;
@@ -969,14 +969,14 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
     int i_size;
 
     /* Set the bInheritHandle flag so pipe handles are inherited. */
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
-    saAttr.bInheritHandle = TRUE; 
-    saAttr.lpSecurityDescriptor = NULL; 
+    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.bInheritHandle = TRUE;
+    saAttr.lpSecurityDescriptor = NULL;
 
     /* Create a pipe for the child process's STDOUT. */
-    if ( !CreatePipe( &hChildStdoutRd, &hChildStdoutWr, &saAttr, 0 ) ) 
+    if ( !CreatePipe( &hChildStdoutRd, &hChildStdoutWr, &saAttr, 0 ) )
     {
-        msg_Err( p_object, "stdout pipe creation failed" ); 
+        msg_Err( p_object, "stdout pipe creation failed" );
         return -1;
     }
 
@@ -984,9 +984,9 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
     SetHandleInformation( hChildStdoutRd, HANDLE_FLAG_INHERIT, 0 );
 
     /* Create a pipe for the child process's STDIN. */
-    if ( !CreatePipe( &hChildStdinRd, &hChildStdinWr, &saAttr, 0 ) ) 
+    if ( !CreatePipe( &hChildStdinRd, &hChildStdinWr, &saAttr, 0 ) )
     {
-        msg_Err( p_object, "stdin pipe creation failed" ); 
+        msg_Err( p_object, "stdin pipe creation failed" );
         return -1;
     }
 
@@ -995,10 +995,10 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
 
     /* Set up members of the PROCESS_INFORMATION structure. */
     ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
- 
+
     /* Set up members of the STARTUPINFO structure. */
     ZeroMemory( &siStartInfo, sizeof(STARTUPINFO) );
-    siStartInfo.cb = sizeof(STARTUPINFO); 
+    siStartInfo.cb = sizeof(STARTUPINFO);
     siStartInfo.hStdError = hChildStdoutWr;
     siStartInfo.hStdOutput = hChildStdoutWr;
     siStartInfo.hStdInput = hChildStdinRd;
@@ -1045,25 +1045,25 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
         ppsz_parser++;
     }
     *p = '\0';
- 
+
     /* Create the child process. */
     bFuncRetn = CreateProcess( NULL,
-          psz_cmd,       // command line 
-          NULL,          // process security attributes 
-          NULL,          // primary thread security attributes 
-          TRUE,          // handles are inherited 
-          0,             // creation flags 
+          psz_cmd,       // command line
+          NULL,          // process security attributes
+          NULL,          // primary thread security attributes
+          TRUE,          // handles are inherited
+          0,             // creation flags
           p_env,
           psz_cwd,
-          &siStartInfo,  // STARTUPINFO pointer 
-          &piProcInfo ); // receives PROCESS_INFORMATION 
+          &siStartInfo,  // STARTUPINFO pointer
+          &piProcInfo ); // receives PROCESS_INFORMATION
 
     free( psz_cmd );
     free( p_env );
-   
-    if ( bFuncRetn == 0 ) 
+
+    if ( bFuncRetn == 0 )
     {
-        msg_Err( p_object, "child creation failed" ); 
+        msg_Err( p_object, "child creation failed" );
         return -1;
     }
 
@@ -1083,7 +1083,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
     /* Close the write end of the pipe before reading from the
      * read end of the pipe. */
     CloseHandle(hChildStdoutWr);
- 
+
     /* Read output from the child process. */
     *pi_data = 0;
     *pp_data = malloc( 1025 );  /* +1 for \0 */
@@ -1091,10 +1091,10 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
     while ( !p_object->b_die )
     {
         DWORD i_read;
-        if ( !ReadFile( hChildStdoutRd, &(*pp_data)[*pi_data], 1024, &i_read, 
+        if ( !ReadFile( hChildStdoutRd, &(*pp_data)[*pi_data], 1024, &i_read,
                         NULL )
               || i_read == 0 )
-            break; 
+            break;
         *pi_data += i_read;
         *pp_data = realloc( *pp_data, *pi_data + 1025 );
     }

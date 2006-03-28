@@ -119,7 +119,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
 
     if( p_intf->p_module == NULL )
     {
-        msg_Err( p_intf, "no suitable intf module" );
+        msg_Err( p_intf, "no suitable interface module" );
         vlc_object_destroy( p_intf );
         return NULL;
     }
@@ -160,7 +160,7 @@ int intf_RunThread( intf_thread_t *p_intf )
     {
         /* This is the primary intf */
         /* Run a manager thread, launch the interface, kill the manager */
-        if( vlc_thread_create( p_intf, "manager", Manager,
+        if( vlc_thread_create( p_intf, "manage", Manager,
                                VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
         {
             msg_Err( p_intf, "cannot spawn manager thread" );
@@ -189,7 +189,9 @@ int intf_RunThread( intf_thread_t *p_intf )
         /* Run the interface in a separate thread */
         if( !strcmp( p_intf->p_module->psz_object_name, "macosx" ) )
         {
-            msg_Err( p_intf, "You cannot run the MacOS X module as an extrainterface. Please read the README.MacOSX.rtf file");
+            msg_Err( p_intf, "You cannot run the MacOS X module as an "
+                             "extra interface. Please read the "
+                             "README.MacOSX.rtf file");
             return VLC_EGENERIC;
         }
         if( vlc_thread_create( p_intf, "interface", RunInterface,

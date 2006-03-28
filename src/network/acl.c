@@ -97,7 +97,7 @@ static int ACL_Resolve( vlc_object_t *p_this, uint8_t *p_bytes,
 #endif
 
         default:
-            msg_Err( p_this, "IMPOSSIBLE: unknown address family!" );
+            msg_Err( p_this, "unknown address family" );
             vlc_freeaddrinfo( res );
             return -1;
     }
@@ -283,7 +283,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
         {
             if( ferror( file ) )
             {
-                msg_Err( p_acl->p_owner, "Error reading %s : %s\n", psz_path,
+                msg_Err( p_acl->p_owner, "error reading %s : %s\n", psz_path,
                         strerror( errno ) );
                 goto error;
             }
@@ -303,14 +303,14 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
         ptr = strchr( psz_ip, '\n' );
         if( ptr == NULL )
         {
-            msg_Warn( p_acl->p_owner, "Skipping overly long line in %s\n",
+            msg_Warn( p_acl->p_owner, "skipping overly long line in %s\n",
                       psz_path);
             do
             {
                 fgets( line, sizeof( line ), file );
                 if( ferror( file ) || feof( file ) )
                 {
-                    msg_Err( p_acl->p_owner, "Error reading %s : %s\n",
+                    msg_Err( p_acl->p_owner, "error reading %s : %s\n",
                              psz_path, strerror( errno ) );
                     goto error;
                 }

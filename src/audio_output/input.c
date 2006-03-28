@@ -166,14 +166,14 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 
         if( psz_parser == NULL || !*psz_parser )
             continue;
-        
+
         while( psz_parser && *psz_parser )
         {
             aout_filter_t * p_filter = NULL;
 
             if( p_input->i_nb_filters >= AOUT_MAX_FILTERS )
             {
-                msg_Dbg( p_aout, "max filter reached (%d)", AOUT_MAX_FILTERS );
+                msg_Dbg( p_aout, "max filters reached (%d)", AOUT_MAX_FILTERS );
                 break;
             }
 
@@ -210,7 +210,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                         sizeof(audio_sample_format_t) );
                 memcpy( &p_filter->output, &chain_output_format,
                         sizeof(audio_sample_format_t) );
-                        
+
                 p_filter->p_module = module_Need( p_filter, "visualization",
                                                   psz_parser, VLC_TRUE );
             }
@@ -235,7 +235,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                     {
                         aout_FormatPrepare( &p_filter->input );
                         aout_FormatPrepare( &p_filter->output );
-                        p_filter->p_module = module_Need( p_filter, "audio filter",
+                        p_filter->p_module = module_Need( p_filter,
+                                                          "audio filter",
                                                           psz_parser, VLC_TRUE );
                     }
                     /* try visual filters */
@@ -245,7 +246,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                                 sizeof(audio_sample_format_t) );
                         memcpy( &p_filter->output, &chain_output_format,
                                 sizeof(audio_sample_format_t) );
-                        p_filter->p_module = module_Need( p_filter, "visualization",
+                        p_filter->p_module = module_Need( p_filter,
+                                                          "visualization",
                                                           psz_parser, VLC_TRUE );
                     }
                 }
@@ -460,8 +462,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   mdate() - p_buffer->start_date );
         if( p_input->p_input_thread )
         {
-            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS, 1,
-                                 NULL );
+            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS,
+                                 1, NULL );
         }
         aout_BufferFree( p_buffer );
         p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
@@ -502,8 +504,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         aout_BufferFree( p_buffer );
         if( p_input->p_input_thread )
         {
-            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS, 1,
-                                 NULL );
+            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS,
+                                 1, NULL );
         }
         return 0;
     }

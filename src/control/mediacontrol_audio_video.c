@@ -97,7 +97,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     {
         p_pic = _mediacontrol_createRGBPicture( p_snapshot->i_width,
                                                 p_snapshot->i_height,
-						VLC_FOURCC( 'p','n','g',' ' ),
+                                                VLC_FOURCC( 'p','n','g',' ' ),
                                                 p_snapshot->date,
                                                 p_snapshot->p_data,
                                                 p_snapshot->i_datasize );
@@ -199,10 +199,11 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         mtime_t i_duration = 0;
         mtime_t i_now = mdate();
 
-        i_duration = 1000 * mediacontrol_unit_convert( self->p_playlist->p_input,
-                                                       end->key,
-                                                       mediacontrol_MediaTime,
-                                                       end->value );
+        i_duration = 1000 * mediacontrol_unit_convert(
+                                                self->p_playlist->p_input,
+                                                end->key,
+                                                mediacontrol_MediaTime,
+                                                end->value );
 
         mediacontrol_showtext( p_vout, DEFAULT_CHAN, psz_message, NULL,
                                OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 0, 0,
@@ -225,11 +226,11 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         i_now = mdate();
 
         i_debut = mediacontrol_position2microsecond( p_input,
-                                                     ( mediacontrol_Position* ) begin );
+                                            ( mediacontrol_Position* ) begin );
         i_debut += i_now;
 
         i_fin = mediacontrol_position2microsecond( p_input,
-                                                   ( mediacontrol_Position * ) end );
+                                          ( mediacontrol_Position * ) end );
         i_fin += i_now;
 
         vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN, psz_message, NULL,

@@ -122,7 +122,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             break;
         case VLC_OBJECT_DIALOGS:
             i_size = sizeof(intf_thread_t);
-            psz_type = "dialogs provider";
+            psz_type = "dialogs";
             break;
         case VLC_OBJECT_PLAYLIST:
             i_size = sizeof(playlist_t);
@@ -170,7 +170,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             break;
         case VLC_OBJECT_SPU:
             i_size = sizeof(spu_t);
-            psz_type = "subpicture unit";
+            psz_type = "subpicture";
             break;
         case VLC_OBJECT_AOUT:
             i_size = sizeof(aout_instance_t);
@@ -206,11 +206,11 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             break;
         case VLC_OBJECT_OPENGL:
             i_size = sizeof( vout_thread_t );
-            psz_type = "opengl provider";
+            psz_type = "opengl";
             break;
         case VLC_OBJECT_ANNOUNCE:
             i_size = sizeof( announce_handler_t );
-            psz_type = "announce handler";
+            psz_type = "announce";
             break;
         case VLC_OBJECT_OSDMENU:
             i_size = sizeof( osd_menu_t );

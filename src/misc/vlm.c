@@ -82,7 +82,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
 
     if( !(p_vlm = vlc_object_find( p_this, VLC_OBJECT_VLM, FIND_ANYWHERE )) )
     {
-        msg_Info( p_this, "creating vlm" );
+        msg_Info( p_this, "creating VLM" );
         if( ( p_vlm = vlc_object_create( p_this, VLC_OBJECT_VLM ) ) == NULL )
         {
             vlc_mutex_unlock( lockval.p_address );
@@ -117,13 +117,13 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
         vlm_message_t *p_message = NULL;
         char *psz_buffer = NULL;
 
-        msg_Dbg( p_this, "loading vlm conf ..." );
+        msg_Dbg( p_this, "loading VLM configuration" );
         asprintf(&psz_buffer, "load %s", psz_vlmconf );
         if( psz_buffer )
         {
             msg_Dbg( p_this, psz_buffer);
             if( vlm_ExecuteCommand( p_vlm, psz_buffer, &p_message ) ){
-                msg_Warn( p_this, "error while loading the vlm conf file" );
+                msg_Warn( p_this, "error while loading the configuration file" );
             }
             vlm_MessageDelete(p_message);
             free(psz_buffer);

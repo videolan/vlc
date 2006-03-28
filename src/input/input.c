@@ -207,7 +207,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                      }
                      else if( !strncmp( psz_start, "time=", 5 ) )
                      {
-                         p_seekpoint->i_time_offset = atoll(psz_start + 5) * 1000000;
+                         p_seekpoint->i_time_offset = atoll(psz_start + 5) *
+                                                        1000000;
                      }
                      psz_start = psz_end + 1;
                 }
@@ -1576,7 +1577,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 {
                     input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
-                    
+
                     access2_Control( p_access, ACCESS_SET_TITLE, i_title );
                     stream_AccessReset( p_input->input.p_stream );
                 }
@@ -1617,7 +1618,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 {
                     input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
-                    
+
                     demux2_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
                 }
             }
@@ -1653,8 +1654,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 {
                     input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
-                    
-                    access2_Control( p_access, ACCESS_SET_SEEKPOINT, i_seekpoint );
+
+                    access2_Control( p_access, ACCESS_SET_SEEKPOINT,
+                                    i_seekpoint );
                     stream_AccessReset( p_input->input.p_stream );
                 }
             }
@@ -1971,7 +1973,7 @@ static void UpdateItemLength( input_thread_t *p_input, int64_t i_length,
 static input_source_t *InputSourceNew( input_thread_t *p_input )
 {
     input_source_t *in = (input_source_t*) malloc( sizeof( input_source_t ) );
-   
+
     if( !in )
     {
         msg_Err( p_input, "out of memory for new input source" );
@@ -2043,7 +2045,7 @@ static int InputSourceInit( input_thread_t *p_input,
             {
                 psz_demux = psz_var_demux;
 
-                msg_Dbg( p_input, "Enforce demux ` %s'", psz_demux );
+                msg_Dbg( p_input, "enforced demux ` %s'", psz_demux );
             }
             else if( psz_var_demux )
             {
@@ -2281,7 +2283,7 @@ static void SlaveDemux( input_thread_t *p_input )
 {
     int64_t i_time;
     int i;
-    
+ 
     if( demux2_Control( p_input->input.p_demux, DEMUX_GET_TIME, &i_time ) )
     {
         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );

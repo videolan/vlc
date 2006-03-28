@@ -46,7 +46,7 @@ int aout_MixerNew( aout_instance_t * p_aout )
     p_aout->mixer.p_module = module_Need( p_aout, "audio mixer", NULL, 0 );
     if ( p_aout->mixer.p_module == NULL )
     {
-        msg_Err( p_aout, "no suitable aout mixer" );
+        msg_Err( p_aout, "no suitable audio mixer" );
         return -1;
     }
     p_aout->mixer.b_error = 0;

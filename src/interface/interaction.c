@@ -513,8 +513,6 @@ static void intf_InteractionInit( playlist_t *p_playlist )
 {
     interaction_t *p_interaction;
 
-    msg_Dbg( p_playlist, "initializing interaction system" );
-
     p_interaction = vlc_object_create( VLC_OBJECT( p_playlist ),
                                        sizeof( interaction_t ) );
     if( !p_interaction )
@@ -544,7 +542,7 @@ static void intf_InteractionSearchInterface( interaction_t *p_interaction )
     p_list = vlc_list_find( p_interaction, VLC_OBJECT_INTF, FIND_ANYWHERE );
     if( !p_list )
     {
-        msg_Err( p_interaction, "Unable to create module list" );
+        msg_Err( p_interaction, "unable to create module list" );
         return;
     }
 

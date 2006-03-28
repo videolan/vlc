@@ -75,9 +75,10 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
 
     if( s && *psz_module == '\0' && strrchr( p_demux->psz_path, '.' ) )
     {
-        /* XXX: add only file without any problem here and with strong detection.
-         *  - no .mp3, .a52, ... (aac is added as it works only by file ext anyway
-         *  - wav can't be added 'cause of a52 and dts in them as raw audio
+       /* XXX: add only file without any problem here and with strong detection.
+        *  - no .mp3, .a52, ... (aac is added as it works only by file ext
+        *     anyway
+        *  - wav can't be added 'cause of a52 and dts in them as raw audio
          */
          static struct { char *ext; char *demux; } exttodemux[] =
          {
@@ -99,7 +100,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
             { NULL,  NULL },
         };
         /* Here, we don't mind if it does not work, it must be quick */
-        static struct { char *ext; char *demux; } exttodemux_quick[] = 
+        static struct { char *ext; char *demux; } exttodemux_quick[] =
         {
             { "mp3", "mpga" },
             { "ogg", "ogg" },
