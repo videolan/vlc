@@ -1488,10 +1488,6 @@ vlc_module_begin();
 /* Interface options */
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
-        add_module_list_cat( "extraintf", SUBCAT_INTERFACE_GENERAL,
-                         NULL, NULL, EXTRAINTF_TEXT,
-                         EXTRAINTF_LONGTEXT, VLC_FALSE );
-
     add_integer( "verbose", 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT,
                  VLC_FALSE );
         change_short('v');
@@ -1523,9 +1519,13 @@ vlc_module_begin();
     add_bool ( "stats", VLC_TRUE, NULL, STATS_TEXT, STATS_LONGTEXT, VLC_TRUE );
 
     set_subcategory( SUBCAT_INTERFACE_MAIN );
-    add_module_cat( "intf", SUBCAT_INTERFACE_GENERAL, NULL, NULL, INTF_TEXT,
+    add_module_cat( "intf", SUBCAT_INTERFACE_MAIN, NULL, NULL, INTF_TEXT,
                 INTF_LONGTEXT, VLC_FALSE );
         change_short('I');
+    add_module_list_cat( "extraintf", SUBCAT_INTERFACE_MAIN,
+                         NULL, NULL, EXTRAINTF_TEXT,
+                         EXTRAINTF_LONGTEXT, VLC_FALSE );
+
 
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_module_list_cat( "control", SUBCAT_INTERFACE_CONTROL, NULL, NULL,
