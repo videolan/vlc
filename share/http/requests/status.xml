@@ -118,4 +118,19 @@
       </category>
     <vlc id="end" />
   </information>
+  <stats>
+    <readbytes><vlc id="value" param1="read_bytes" /></readbytes>
+    <inputbitrate><vlc id="value" param1="input_bitrate" /></inputbitrate>
+    <demuxreadbytes><vlc id="value" param1="demux_read_bytes" /></demuxreadbytes>
+    <demuxbitrate><vlc id="value" param1="demux_bitrate" /></demuxbitrate>
+    <decodedvideo><vlc id="value" param1="decoded_video" /></decodedvideo>
+    <displayedpictures><vlc id="value" param1="displayed_pictures" /></displayedpictures>
+    <lostpictures><vlc id="value" param1="lost_pictures" /></lostpictures>
+    <decodedaudio><vlc id="value" param1="decoded_audio" /></decodedaudio>
+    <playedabuffers><vlc id="value" param1="played_abuffers" /></playedabuffers>
+    <lostabuffers><vlc id="value" param1="lost_abuffers" /></lostabuffers>
+    <sentpackets><vlc id="value" param1="sent_packets" /></sentpackets>
+    <sentbytes><vlc id="value" param1="sent_bytes" /></sentbytes>
+    <sendbitrate><vlc id="value" param1="send_bitrate" /></sendbitrate>
+  </stats>
 </root>

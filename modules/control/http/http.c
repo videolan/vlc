@@ -489,6 +489,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     audio_volume_t i_volume;
     char volume[5];
     char state[8];
+    char stats[20];
 
 #define p_sys p_args->p_intf->p_sys
     if( p_sys->p_input )
@@ -547,6 +548,38 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     E_(mvar_AppendNewVar)( p_args->vars, "volume", volume );
     E_(mvar_AppendNewVar)( p_args->vars, "stream_state", state );
     E_(mvar_AppendNewVar)( p_args->vars, "charset", ((intf_sys_t *)p_args->p_intf->p_sys)->psz_charset );
+
+    /* Stats */
+#define p_sys p_args->p_intf->p_sys
+    if( p_sys->p_input )
+    {
+        input_item_t *p_item = p_sys->p_input->input.p_item;
+        if( p_item )
+        {
+            vlc_mutex_lock( &p_item->p_stats->lock );
+#define STATS_INT( n ) sprintf( stats, "%d", p_item->p_stats->i_ ## n ); \
+                       E_(mvar_AppendNewVar)( p_args->vars, #n, stats );
+#define STATS_FLOAT( n ) sprintf( stats, "%f", p_item->p_stats->f_ ## n ); \
+                       E_(mvar_AppendNewVar)( p_args->vars, #n, stats );
+            STATS_INT( read_bytes )
+            STATS_FLOAT( input_bitrate )
+            STATS_INT( demux_read_bytes )
+            STATS_FLOAT( demux_bitrate )
+            STATS_INT( decoded_video )
+            STATS_INT( displayed_pictures )
+            STATS_INT( lost_pictures )
+            STATS_INT( decoded_audio )
+            STATS_INT( played_abuffers )
+            STATS_INT( lost_abuffers )
+            STATS_INT( sent_packets )
+            STATS_INT( sent_bytes )
+            STATS_FLOAT( send_bitrate )
+#undef STATS_INT
+#undef STATS_FLOAT
+            vlc_mutex_unlock( &p_item->p_stats->lock );
+        }
+    }
+#undef p_sys
 
     E_(SSInit)( &p_args->stack );
 
