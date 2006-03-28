@@ -688,6 +688,18 @@ endif
 		find $(top_builddir)/vlc-${VERSION} -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
 	fi
 
+package-win-common-strip:
+	$(STRIP) "$(top_builddir)/vlc-${VERSION}/vlc$(EXEEXT)"
+if BUILD_SHARED
+	$(STRIP) "vlc-${VERSION}/libvlc$(LIBEXT)"
+endif
+if BUILD_MOZILLA
+	$(STRIP) $(top_builddir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
+endif
+if BUILD_ACTIVEX
+	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
+endif
+
 package-win32-base-debug: package-win-common
 # Copy relevant files
 	cp "$(srcdir)/vlc.win32.nsi" "$(top_builddir)/vlc-${VERSION}/"
@@ -720,20 +732,9 @@ package-win32-base-debug: package-win-common
 	sed -i 's%/%\\%g' $(top_builddir)/vlc-${VERSION}/osdmenu/*.cfg 
 
 
-package-win32-base: package-win32-base-debug
-	$(STRIP) "$(top_builddir)/vlc-${VERSION}/vlc$(EXEEXT)"
-if BUILD_SHARED
-	$(STRIP) "vlc-${VERSION}/libvlc$(LIBEXT)"
-endif
+package-win32-base: package-win32-base-debug package-win-common-strip
 	for i in "" $(top_builddir)/vlc-${VERSION}/plugins/*$(LIBEXT) ; \
 	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
-if BUILD_MOZILLA
-	$(STRIP) $(top_builddir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
-endif
-if BUILD_ACTIVEX
-	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
-endif
-
 
 package-win32-base-exe: package-win32-base
 # Create package
@@ -783,7 +784,7 @@ package-win32: package-win32-base-exe package-win32-base-zip
 # Clean up
 	rm -Rf $(top_builddir)/vlc-${VERSION}
 
-package-wince-base: package-win-common
+package-wince-base: package-win-common package-win-common-strip
 
 package-wince-base-zip:
 # Create package 
