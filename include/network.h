@@ -251,7 +251,7 @@ static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, const c
                          &hints, &res );
     if( i )
     {
-        msg_Err( p_object, "Invalid node for net_AddressIsMulticast: %s : %s",
+        msg_Err( p_object, "invalid address for net_AddressIsMulticast: %s : %s",
                  psz_addr, vlc_gai_strerror( i ) );
         return VLC_FALSE;
     }

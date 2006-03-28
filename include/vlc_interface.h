@@ -135,9 +135,9 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
          } \
          msg_Info( p_intf, COPYRIGHT_MESSAGE ); \
          msg_Info( p_intf, _("\nWarning: if you can't access the GUI " \
-                             "anymore, open a dos command box, go to the " \
+                             "anymore, open a command-line window, go to the " \
                              "directory where you installed VLC and run " \
-                             "\"vlc -I wxwin\"\n") )
+                             "\"vlc -I wx\"\n") )
 #else
 #    define CONSOLE_INTRO_MSG
 #endif

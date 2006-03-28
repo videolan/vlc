@@ -294,12 +294,12 @@ static struct
 wave_format_tag_to_fourcc[] =
 {
     { WAVE_FORMAT_PCM,        VLC_FOURCC( 'a', 'r', 'a', 'w' ), "Raw audio" },
-    { WAVE_FORMAT_ADPCM,      VLC_FOURCC( 'm', 's', 0x00,0x02), "Adpcm" },
+    { WAVE_FORMAT_ADPCM,      VLC_FOURCC( 'm', 's', 0x00,0x02), "ADPCM" },
     { WAVE_FORMAT_IEEE_FLOAT, VLC_FOURCC( 'a', 'f', 'l', 't' ), "IEEE Float audio" },
     { WAVE_FORMAT_ALAW,       VLC_FOURCC( 'a', 'l', 'a', 'w' ), "A-Law" },
     { WAVE_FORMAT_MULAW,      VLC_FOURCC( 'm', 'l', 'a', 'w' ), "Mu-Law" },
-    { WAVE_FORMAT_IMA_ADPCM,  VLC_FOURCC( 'm', 's', 0x00,0x11), "Ima-Adpcm" },
-    { WAVE_FORMAT_G726,       VLC_FOURCC( 'g', '7', '2', '6' ), "G.726 Adpcm" },
+    { WAVE_FORMAT_IMA_ADPCM,  VLC_FOURCC( 'm', 's', 0x00,0x11), "Ima-ADPCM" },
+    { WAVE_FORMAT_G726,       VLC_FOURCC( 'g', '7', '2', '6' ), "G.726 ADPCM" },
     { WAVE_FORMAT_MPEGLAYER3, VLC_FOURCC( 'm', 'p', 'g', 'a' ), "Mpeg Audio" },
     { WAVE_FORMAT_MPEG,       VLC_FOURCC( 'm', 'p', 'g', 'a' ), "Mpeg Audio" },
     { WAVE_FORMAT_A52,        VLC_FOURCC( 'a', '5', '2', ' ' ), "A/52" },
