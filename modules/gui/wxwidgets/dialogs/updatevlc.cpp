@@ -64,7 +64,8 @@ END_EVENT_TABLE()
 UpdateVLC::UpdateVLC( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxFrame( p_parent, -1, wxU(_("VLC media player - Updates")),
              wxDefaultPosition, wxDefaultSize,
-         wxSYSTEM_MENU|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_TOOL_WINDOW)
+             wxSYSTEM_MENU|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT
+             |wxFRAME_TOOL_WINDOW|wxCAPTION )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -115,7 +116,7 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
         wxListCtrl *list =
             new wxListCtrl( this, ChooseItem_Event,
                             wxDefaultPosition, wxSize( 400, 300 ),
-                            wxLC_AUTOARRANGE|wxLC_SINGLE_SEL );
+                            wxLC_SINGLE_SEL|wxLC_LIST );
         wxImageList *images = new wxImageList( 32, 32, TRUE );
         images->Add( wxIcon( update_ascii_xpm ) );
         images->Add( wxIcon( update_info_xpm ) );
