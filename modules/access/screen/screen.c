@@ -36,16 +36,16 @@
  *****************************************************************************/
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for screen capture " \
-    "streams. This value should be set in millisecond units." )
+    "Default caching value for screen capture. "\
+    "This value should be set in milliseconds." )
 #define FPS_TEXT N_("Frame rate")
 #define FPS_LONGTEXT N_( \
-    "Allows you to set the desired frame rate for the capture." )
+    "Desired frame rate for the capture." )
 
 #ifdef WIN32
 #define FRAGS_TEXT N_("Capture fragment size")
 #define FRAGS_LONGTEXT N_( \
-    "Allows you optimize the capture by fragmenting the screen in chunks " \
+    "Optimize the capture by fragmenting the screen in chunks " \
     "of predefined height (16 might be a good value, and 0 means disabled)." )
 #endif
 

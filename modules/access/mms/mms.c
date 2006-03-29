@@ -45,15 +45,17 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for MMS streams. This " \
-    "value should be set in millisecond units." )
+    "Default caching value for MMS streams. This " \
+    "value should be set in milliseconds." )
 
 #define ALL_TEXT N_("Force selection of all streams")
+#define ALL_LONGTEXT N_( \
+    "MMS streams can contain several elementary streams, with different " \
+    "bitrates. You can choose to select all of them." )
 
 #define BITRATE_TEXT N_( "Maximum bitrate" )
 #define BITRATE_LONGTEXT N_( \
-    "If this is set, the stream with the maximum bitrate under that limit \
-     will be selected" )
+    "Select the stream with the maximum bitrate under that limit."  )
 
 vlc_module_begin();
     set_shortname( "MMS" );
@@ -65,7 +67,7 @@ vlc_module_begin();
     add_integer( "mms-caching", 19 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
 
-    add_bool( "mms-all", 0, NULL, ALL_TEXT, "", VLC_TRUE );
+    add_bool( "mms-all", 0, NULL, ALL_TEXT, ALL_LONGTEXT, VLC_TRUE );
     add_integer( "mms-maxbitrate", 0, NULL, BITRATE_TEXT, BITRATE_LONGTEXT ,
                  VLC_FALSE );
 

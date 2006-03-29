@@ -41,18 +41,18 @@
  *****************************************************************************/
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for UDP streams. This " \
-    "value should be set in millisecond units." )
+    "Default caching value for UDP streams. This " \
+    "value should be set in milliseconds." )
 
 #define AUTO_MTU_TEXT N_("Autodetection of MTU")
 #define AUTO_MTU_LONGTEXT N_( \
-    "Allows growing the MTU if truncated packets are found" )
+    "Automatically detect the line's MTU. This will increase the size if" \
+    " truncated packets are found" )
 
 #define RTP_LATE_TEXT N_("RTP reordering timeout in ms")
 #define RTP_LATE_LONGTEXT N_( \
-    "Allows you to modify the RTP reordering behaviour. " \
-    "RTP input will wait for late packets upto " \
-    "the specified timeout in milisecond units." )
+    "VLC reorders RTP packets. The input will wait for late packets at most "\
+    "the time specified here (in milliseconds)." )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );

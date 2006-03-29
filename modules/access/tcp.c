@@ -36,8 +36,8 @@
  *****************************************************************************/
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for TCP streams. This " \
-    "value should be set in millisecond units." )
+    "Default caching value for TCP streams. This " \
+    "value should be set in milliseconds." )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );

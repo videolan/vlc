@@ -77,11 +77,12 @@ static char *psz_recursive_list[] = { "none", "collapse", "expand" };
 static char *psz_recursive_list_text[] = { N_("none"), N_("collapse"),
                                            N_("expand") };
 
-#define IGNORE_TEXT N_("Ignore files with these extensions")
+#define IGNORE_TEXT N_("Ignored extensions")
 #define IGNORE_LONGTEXT N_( \
-        "Specify a comma seperated list of file extensions. " \
-        "Files with these extensions will not be added to playlist when opening a directory. " \
-        "This is useful if you add directories that contain mp3 albums for instance." )
+        "Files with these extensions will not be added to playlist when " \
+        "opening a directory.\n" \
+        "This is useful if you add directories that contain playlist files " \
+        "for instance. Use a comma-separated list of extensions." )
 
 vlc_module_begin();
     set_category( CAT_INPUT );

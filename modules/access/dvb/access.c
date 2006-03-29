@@ -70,8 +70,8 @@ static void Close( vlc_object_t *p_this );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for dvb streams. This " \
-    "value should be set in millisecond units." )
+    "Default caching value for DVB streams. This " \
+    "value should be set in milliseconds." )
 
 #define ADAPTER_TEXT N_("Adapter card to tune")
 #define ADAPTER_LONGTEXT N_("Adapter cards have a device file in directory named /dev/dvb/adapter[n] with n>=0.")
@@ -86,27 +86,27 @@ static void Close( vlc_object_t *p_this );
 #define INVERSION_LONGTEXT N_("Inversion mode [0=off, 1=on, 2=auto]")
 
 #define PROBE_TEXT N_("Probe DVB card for capabilities")
-#define PROBE_LONGTEXT N_("Some DVB cards do not like to be probed for their capabilities.")
+#define PROBE_LONGTEXT N_("Some DVB cards do not like to be probed for their capabilities, you can disable this feature if you experience some trouble.")
 
 #define BUDGET_TEXT N_("Budget mode")
-#define BUDGET_LONGTEXT N_("This allows you to stream an entire transponder with a budget card.")
+#define BUDGET_LONGTEXT N_("This allows you to stream an entire transponder with a \"budget\" card.")
 
 /* Satellite */
 #define SATNO_TEXT N_("Satellite number in the Diseqc system")
-#define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number]")
+#define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number].")
 
 #define VOLTAGE_TEXT N_("LNB voltage")
-#define VOLTAGE_LONGTEXT N_("In Volts [0, 13=vertical, 18=horizontal]")
+#define VOLTAGE_LONGTEXT N_("In Volts [0, 13=vertical, 18=horizontal].")
 
 #define HIGH_VOLTAGE_TEXT N_("High LNB voltage")
 #define HIGH_VOLTAGE_LONGTEXT N_("Enable high voltage if your cables are " \
     "particularly long. This is not supported by all frontends.")
 
 #define TONE_TEXT N_("22 kHz tone")
-#define TONE_LONGTEXT N_("[0=off, 1=on, -1=auto]")
+#define TONE_LONGTEXT N_("[0=off, 1=on, -1=auto].")
 
 #define FEC_TEXT N_("Transponder FEC")
-#define FEC_LONGTEXT N_("FEC=Forward Error Correction mode [9=auto]")
+#define FEC_LONGTEXT N_("FEC=Forward Error Correction mode [9=auto].")
 
 #define SRATE_TEXT N_("Transponder symbol rate in kHz")
 #define SRATE_LONGTEXT ""
@@ -149,17 +149,17 @@ static void Close( vlc_object_t *p_this );
 
 #define USER_TEXT N_( "HTTP user name" )
 #define USER_LONGTEXT N_( \
-    "You can set the user name the administrator will use to log into " \
+    "User name the administrator will use to log into " \
     "the internal HTTP server." )
 
 #define PASSWORD_TEXT N_( "HTTP password" )
 #define PASSWORD_LONGTEXT N_( \
-    "You can set the password the administrator will use to log into " \
+    "Password the administrator will use to log into " \
     "the internal HTTP server." )
 
 #define ACL_TEXT N_( "HTTP ACL" )
 #define ACL_LONGTEXT N_( \
-    "You can set the access control list (equivalent to .hosts) file path, " \
+    "Access control list (equivalent to .hosts) file path, " \
     "which will limit the range of IPs entitled to log into the internal " \
     "HTTP server." )
 

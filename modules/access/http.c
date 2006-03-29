@@ -46,25 +46,26 @@ static void Close( vlc_object_t * );
 
 #define PROXY_TEXT N_("HTTP proxy")
 #define PROXY_LONGTEXT N_( \
-    "You can specify an HTTP proxy to use. It must be of the form " \
+    "HTTP proxy to be usesd It must be of the form " \
     "http://[user[:pass]@]myproxy.mydomain:myport/ ; " \
     "if empty, the http_proxy environment variable will be tried." )
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for http streams. This " \
-    "value should be set in millisecond units." )
+    "Default caching value for HTTP streams. This " \
+    "value should be set in milliseconds." )
 
 #define AGENT_TEXT N_("HTTP user agent")
-#define AGENT_LONGTEXT N_("Allows you to modify the user agent that will be " \
+#define AGENT_LONGTEXT N_("User agent that will be " \
     "used for the connection.")
 
 #define RECONNECT_TEXT N_("Auto re-connect")
-#define RECONNECT_LONGTEXT N_("Will automatically attempt a re-connection " \
-    "in case it was untimely closed.")
+#define RECONNECT_LONGTEXT N_( \
+    "Automatically try to reconnect to the stream in case of a sudden " \
+    "disconnect." )
 
 #define CONTINUOUS_TEXT N_("Continuous stream")
-#define CONTINUOUS_LONGTEXT N_("This allows you to read a file that is " \
+#define CONTINUOUS_LONGTEXT N_("Read a file that is " \
     "being constantly updated (for example, a JPG file on a server)." \
     "You should not globally enable this option as it will break all other " \
     "types of HTTP streams." )

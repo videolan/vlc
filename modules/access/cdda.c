@@ -51,8 +51,8 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for cdda streams. This " \
-    "value should be set in milliseconds units." )
+    "Default caching value for Audio CDs. This " \
+    "value should be set in milliseconds." )
 
 vlc_module_begin();
     set_shortname( _("Audio CD"));
@@ -68,10 +68,10 @@ vlc_module_begin();
     add_bool( "cdda-separate-tracks", VLC_TRUE, NULL, NULL, NULL, VLC_TRUE );
     add_integer( "cdda-track", -1 , NULL, NULL, NULL, VLC_TRUE );
     add_string( "cddb-server", "freedb.freedb.org", NULL,
-                N_( "CDDB Server" ), N_( "Adress of the CDDB server to use" ),
+                N_( "CDDB Server" ), N_( "Adress of the CDDB server to use." ),
                 VLC_TRUE );
     add_integer( "cddb-port", 8880, NULL,
-                N_( "CDDB port" ), N_( "CDDB Server port to use" ),
+                N_( "CDDB port" ), N_( "CDDB Server port to use." ),
                 VLC_TRUE );
     add_shortcut( "cdda" );
     add_shortcut( "cddasimple" );

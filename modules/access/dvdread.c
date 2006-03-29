@@ -60,8 +60,8 @@
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for DVDread streams. " \
-    "This value should be set in millisecond units." )
+    "Default caching value for DVDs. " \
+    "This value should be set in milliseconds." )
 
 #define CSSMETHOD_TEXT N_("Method used by libdvdcss for decryption")
 #define CSSMETHOD_LONGTEXT N_( \

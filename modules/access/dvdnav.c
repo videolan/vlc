@@ -58,16 +58,16 @@
  *****************************************************************************/
 #define ANGLE_TEXT N_("DVD angle")
 #define ANGLE_LONGTEXT N_( \
-    "Allows you to select the default DVD angle." )
+     "Default DVD angle." )
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for DVDnav streams. This "\
-    "value should be set in millisecond units." )
+    "Default caching value for DVDs. This "\
+    "value should be set in milliseconds." )
 #define MENU_TEXT N_("Start directly in menu")
 #define MENU_LONGTEXT N_( \
-    "Allows you to start the DVD directly in the main menu. This "\
-    "will try to skip all the useless warnings introductions." )
+    "Start the DVD directly in the main menu. This "\
+    "will try to skip all the useless warning introductions." )
 
 #define LANGUAGE_DEFAULT ("en")
 

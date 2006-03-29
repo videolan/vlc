@@ -78,21 +78,21 @@ static char *ppsz_tuner_input_text[] =
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for DirectShow streams. " \
-    "This value should be set in milliseconds units." )
+    "Default caching value for DirectShow streams. " \
+    "This value should be set in millisecondss." )
 #define VDEV_TEXT N_("Video device name")
 #define VDEV_LONGTEXT N_( \
-    "You can specify the name of the video device that will be used by the " \
+    "Name of the video device that will be used by the " \
     "DirectShow plugin. If you don't specify anything, the default device " \
     "will be used.")
 #define ADEV_TEXT N_("Audio device name")
 #define ADEV_LONGTEXT N_( \
-    "You can specify the name of the audio device that will be used by the " \
+    "Name of the audio device that will be used by the " \
     "DirectShow plugin. If you don't specify anything, the default device " \
     "will be used.")
 #define SIZE_TEXT N_("Video size")
 #define SIZE_LONGTEXT N_( \
-    "You can specify the size of the video that will be displayed by the " \
+    "Size of the video that will be displayed by the " \
     "DirectShow plugin. If you don't specify anything the default size for " \
     "your device will be used.")
 #define CHROMA_TEXT N_("Video input chroma format")
@@ -112,30 +112,30 @@ static char *ppsz_tuner_input_text[] =
     "Show the tuner properties [channel selection] page." )
 #define CHANNEL_TEXT N_("Tuner TV Channel")
 #define CHANNEL_LONGTEXT N_( \
-    "Allows you to set the TV channel the tuner will set to " \
+    "Set the TV channel the tuner will set to " \
     "(0 means default)." )
 #define COUNTRY_TEXT N_("Tuner country code")
 #define COUNTRY_LONGTEXT N_( \
-    "Allows you to set the tuner country code that establishes the current " \
+    "Set the tuner country code that establishes the current " \
     "channel-to-frequency mapping (0 means default)." )
 #define TUNER_INPUT_TEXT N_("Tuner input type")
 #define TUNER_INPUT_LONGTEXT N_( \
-    "Allows you to select the tuner input type (Cable/Antenna)." )
+    "Select the tuner input type (Cable/Antenna)." )
 #define VIDEO_IN_TEXT N_("Video input pin")
 #define VIDEO_IN_LONGTEXT N_( \
-    "Allows you to select the video input source, such as composite, s-video, " \
-	"or tuner. Since these settings are hardware-specfic, you should find good " \
-	"settings in the \"Device config\" area, and use those numbers here. -1 " \
-	"means that settings will not be changed.")
+  "Select the video input source, such as composite, s-video, " \
+  "or tuner. Since these settings are hardware-specfic, you should find good " \
+  "settings in the \"Device config\" area, and use those numbers here. -1 " \
+  "means that settings will not be changed.")
 #define AUDIO_IN_TEXT N_("Audio input pin")
 #define AUDIO_IN_LONGTEXT N_( \
-    "Allows you to select the audio input source. See the \"video input\" option." )
+  "Select the audio input source. See the \"video input\" option." )
 #define VIDEO_OUT_TEXT N_("Video output pin")
 #define VIDEO_OUT_LONGTEXT N_( \
-    "Allows you to select the video output type. See the \"video input\" option." )
+  "Select the video output type. See the \"video input\" option." )
 #define AUDIO_OUT_TEXT N_("Audio output pin")
 #define AUDIO_OUT_LONGTEXT N_( \
-    "Allows you to select the audio output type. See the \"video input\" option." )
+  "Select the audio output type. See the \"video input\" option." )
 
 static int  CommonOpen ( vlc_object_t *, access_sys_t *, vlc_bool_t );
 static void CommonClose( vlc_object_t *, access_sys_t * );
@@ -345,7 +345,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
             {
                 i_height = strtol( psz_parser + 1, &psz_parser, 0 );
             }
-            msg_Dbg( p_this, "Width x Height %dx%d", i_width, i_height );
+            msg_Dbg( p_this, "width x height %dx%d", i_width, i_height );
         }
     }
     if( val.psz_string ) free( val.psz_string );
@@ -474,8 +474,8 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
         if( SUCCEEDED(pXbar->Route(VideoOutputIndex, VideoInputIndex)) )
         {
-            msg_Dbg( p_this, "Crossbar at depth %d, Routed video "
-                     "ouput %ld to video input %ld", i, VideoOutputIndex,
+            msg_Dbg( p_this, "crossbar at depth %d, routed video "
+                     "output %ld to video input %ld", i, VideoOutputIndex,
                      VideoInputIndex );
 
             if( AudioOutputIndex != -1 && AudioInputIndex != -1 )
@@ -483,8 +483,8 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                 if( SUCCEEDED( pXbar->Route(AudioOutputIndex,
                                             AudioInputIndex)) )
                 {
-                    msg_Dbg(p_this, "Crossbar at depth %d, Routed audio "
-                            "ouput %ld to audio input %ld", i,
+                    msg_Dbg(p_this, "crossbar at depth %d, routed audio "
+                            "output %ld to audio input %ld", i,
                             AudioOutputIndex, AudioInputIndex );
                 }
             }
@@ -661,7 +661,7 @@ static int AccessOpen( vlc_object_t *p_this )
  *****************************************************************************/
 static void CommonClose( vlc_object_t *p_this, access_sys_t *p_sys )
 {
-    msg_Dbg( p_this, "Releasing DirectShow");
+    msg_Dbg( p_this, "releasing DirectShow");
 
     DeleteDirectShowGraph( p_sys );
 

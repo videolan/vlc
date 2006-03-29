@@ -67,8 +67,8 @@ static int Control( access_t *, int, va_list );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for file streams. This " \
-    "value should be set in millisecond units." )
+    "Default caching value for DV streams. This" \
+    "value should be set in milliseconds." )
 
 vlc_module_begin();
     set_description( _("Digital Video (Firewire/ieee1394)  input") );

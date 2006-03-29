@@ -72,15 +72,15 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for v4l streams. This " \
-    "value should be set in millisecond units." )
+    "Default caching value for V4L captures. This " \
+    "value should be set in milliseconds." )
 #define VDEV_TEXT N_("Video device name")
 #define VDEV_LONGTEXT N_( \
-    "Specify the name of the video device that will be used. " \
+    "Name of the video device to use. " \
     "If you don't specify anything, no video device will be used.")
 #define ADEV_TEXT N_("Audio device name")
 #define ADEV_LONGTEXT N_( \
-    "Specify the name of the audio device that will be used. " \
+    "Name of the audio device to use. " \
     "If you don't specify anything, no audio device will be used.")
 #define CHROMA_TEXT N_("Video input chroma format")
 #define CHROMA_LONGTEXT N_( \
@@ -88,54 +88,54 @@ static void Close( vlc_object_t * );
     "(eg. I420 (default), RV24, etc.)")
 #define FREQUENCY_TEXT N_( "Frequency" )
 #define FREQUENCY_LONGTEXT N_( \
-    "Frequency to capture (in kHz), if applicable" )
+    "Frequency to capture (in kHz), if applicable." )
 #define CHANNEL_TEXT N_( "Channel" )
 #define CHANNEL_LONGTEXT N_( \
     "Channel of the card to use (Usually, 0 = tuner, " \
-    "1 = composite, 2 = svideo)" )
+    "1 = composite, 2 = svideo)." )
 #define NORM_TEXT N_( "Norm" )
 #define NORM_LONGTEXT N_( \
-    "Defines the norm of the stream (Automatic, SECAM, PAL, or NTSC)" )
+    "Norm of the stream (Automatic, SECAM, PAL, or NTSC)." )
 #define AUDIO_TEXT N_( "Audio Channel" )
 #define AUDIO_LONGTEXT N_( \
-    "Audio Channel to use, if there are several audio input" )
+    "Audio Channel to use, if there are several audio inputs." )
 #define WIDTH_TEXT N_( "Width" )
 #define WIDTH_LONGTEXT N_( "Width of the stream to capture " \
-    "(-1 for autodetect)" )
+    "(-1 for autodetect)." )
 #define HEIGHT_TEXT N_( "Height" )
 #define HEIGHT_LONGTEXT N_( "Height of the stream to capture " \
-    "(-1 for autodetect)" )
+    "(-1 for autodetect)." )
 #define BRIGHTNESS_TEXT N_( "Brightness" )
 #define BRIGHTNESS_LONGTEXT N_( \
-    "Set the Brightness of the video input" )
+    "Brightness of the video input." )
 #define HUE_TEXT N_( "Hue" )
 #define HUE_LONGTEXT N_( \
-    "Set the Hue of the video input" )
+    "Hue of the video input." )
 #define COLOUR_TEXT N_( "Color" )
 #define COLOUR_LONGTEXT N_( \
-    "Set the Color of the video input" )
+    "Color of the video input." )
 #define CONTRAST_TEXT N_( "Contrast" )
 #define CONTRAST_LONGTEXT N_( \
-    "Set the Contrast of the video input" )
+    "Contrast of the video input." )
 #define TUNER_TEXT N_( "Tuner" )
-#define TUNER_LONGTEXT N_( "Tuner to use, if there are several ones" )
+#define TUNER_LONGTEXT N_( "Tuner to use, if there are several ones." )
 #define SAMPLERATE_TEXT N_( "Samplerate" )
 #define SAMPLERATE_LONGTEXT N_( \
-    "Samplerate of the captures audio stream, in Hz" )
+    "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100)" )
 #define STEREO_TEXT N_( "Stereo" )
 #define STEREO_LONGTEXT N_( \
-    "If this option is set, the audio stream will be captured in stereo" )
+    "Capture the audio stream in stereo." )
 #define MJPEG_TEXT N_( "MJPEG" )
 #define MJPEG_LONGTEXT N_(  \
     "Set this option if the capture device outputs MJPEG" )
 #define DECIMATION_TEXT N_( "Decimation" )
 #define DECIMATION_LONGTEXT N_( \
-    "Set the Decimation level for MJPEG streams" )
+    "Decimation level for MJPEG streams" )
 #define QUALITY_TEXT N_( "Quality" )
-#define QUALITY_LONGTEXT N_( "Set the quality of the stream" )
+#define QUALITY_LONGTEXT N_( "Quality of the stream." )
 #define FPS_TEXT N_( "Framerate" )
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
-    "(-1 for autodetect)" )
+    "(-1 for autodetect)." )
 
 static int i_norm_list[] =
     { VIDEO_MODE_AUTO, VIDEO_MODE_SECAM, VIDEO_MODE_PAL, VIDEO_MODE_NTSC };

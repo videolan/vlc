@@ -58,16 +58,16 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for SMB streams. This " \
-    "value should be set in millisecond units." )
+    "Default caching value for SMB streams. This " \
+    "value should be set in milliseconds." )
 #define USER_TEXT N_("SMB user name")
-#define USER_LONGTEXT N_("Allows you to modify the user name that will " \
+#define USER_LONGTEXT N_("User name that will " \
     "be used for the connection.")
 #define PASS_TEXT N_("SMB password")
-#define PASS_LONGTEXT N_("Allows you to modify the password that will be " \
+#define PASS_LONGTEXT N_("Password that will be " \
     "used for the connection.")
 #define DOMAIN_TEXT N_("SMB domain")
-#define DOMAIN_LONGTEXT N_("Allows you to modify the domain/workgroup that " \
+#define DOMAIN_LONGTEXT N_("Domain/Workgroup that " \
     "will be used for the connection.")
 
 vlc_module_begin();

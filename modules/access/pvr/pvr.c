@@ -45,8 +45,8 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for pvr streams. This " \
-    "value should be set in millisecond units." )
+    "Default caching value for PVR streams. This " \
+    "value should be set in milliseconds." )
 
 #define DEVICE_TEXT N_( "Device" )
 #define DEVICE_LONGTEXT N_( "PVR video device" )
@@ -55,47 +55,46 @@ static void Close( vlc_object_t * );
 #define RADIO_DEVICE_LONGTEXT N_( "PVR radio device" )
 
 #define NORM_TEXT N_( "Norm" )
-#define NORM_LONGTEXT N_( "Defines the norm of the stream " \
-    "(Automatic, SECAM, PAL, or NTSC)" )
+#define NORM_LONGTEXT N_( "Norm of the stream " \
+    "(Automatic, SECAM, PAL, or NTSC)." )
 
 #define WIDTH_TEXT N_( "Width" )
 #define WIDTH_LONGTEXT N_( "Width of the stream to capture " \
-    "(-1 for autodetect)" )
+    "(-1 for autodetection)." )
 
 #define HEIGHT_TEXT N_( "Height" )
 #define HEIGHT_LONGTEXT N_( "Height of the stream to capture " \
-    "(-1 for autodetect)" )
+    "(-1 for autodetection)." )
 
 #define FREQUENCY_TEXT N_( "Frequency" )
-#define FREQUENCY_LONGTEXT N_( "Frequency to capture (in kHz), if applicable" )
+#define FREQUENCY_LONGTEXT N_( "Frequency to capture (in kHz), if applicable." )
 
 #define FRAMERATE_TEXT N_( "Framerate" )
 #define FRAMERATE_LONGTEXT N_( "Framerate to capture, if applicable " \
-    "(-1 for autodetect)" )
+    "(-1 for autodetect)." )
 
 #define KEYINT_TEXT N_( "Key interval" )
-#define KEYINT_LONGTEXT N_( "Interval between keyframes (-1 for autodetect)" )
+#define KEYINT_LONGTEXT N_( "Interval between keyframes (-1 for autodetect)." )
 
 #define BFRAMES_TEXT N_( "B Frames" )
 #define BFRAMES_LONGTEXT N_("If this option is set, B-Frames will be used. " \
     "Use this option to set the number of B-Frames.")
 
 #define BITRATE_TEXT N_( "Bitrate" )
-#define BITRATE_LONGTEXT N_( "Bitrate to use (-1 for default)" )
+#define BITRATE_LONGTEXT N_( "Bitrate to use (-1 for default)." )
 
 #define BITRATE_PEAK_TEXT N_( "Bitrate peak" )
-#define BITRATE_PEAK_LONGTEXT N_( "Peak bitrate in VBR mode" )
+#define BITRATE_PEAK_LONGTEXT N_( "Peak bitrate in VBR mode." )
 
-#define BITRATE_MODE_TEXT N_( "Bitrate mode (vbr or cbr)" )
-#define BITRATE_MODE_LONGTEXT N_( "Bitrate mode to use" )
+#define BITRATE_MODE_TEXT N_( "Bitrate mode)" )
+#define BITRATE_MODE_LONGTEXT N_( "Bitrate mode to use (VBR or CBR)." )
 
 #define BITMASK_TEXT N_( "Audio bitmask" )
-#define BITMASK_LONGTEXT N_("This option allows setting of bitmask that will "\
+#define BITMASK_LONGTEXT N_("Bitmask that will "\
     "get used by the audio part of the card." )
 
 #define VOLUME_TEXT N_( "Volume" )
-#define VOLUME_LONGTEXT N_("This option allows setting of the audio volume " \
-    "(0-65535)." )
+#define VOLUME_LONGTEXT N_("Audio volume (0-65535)." )
 
 #define CHAN_TEXT N_( "Channel" )
 #define CHAN_LONGTEXT N_( "Channel of the card to use (Usually, 0 = tuner, " \
@@ -113,7 +112,7 @@ static int pi_radio_range[2] = { 65000, 108000 };
 
 vlc_module_begin();
     set_shortname( _("PVR") );
-    set_description( _("MPEG Encoding cards input (with ivtv drivers)") );
+    set_description( _("IVTV MPEG Encoding cards input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     set_capability( "access2", 0 );
