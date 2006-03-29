@@ -46,7 +46,7 @@ var cells   = Object();
 
 function mosaic_init()
 {
-    document.getElementById( 'sout_transcode_extra' ).value = ",sfilter=mosaic";
+    document.getElementById( 'sout_transcode_extra' ).value = ",sfilter=mosaic}:bridge-in{offset=100";
     mosaic_size_change();
 
     /* Force usage of transcode in sout */
@@ -201,7 +201,8 @@ function mosaic_code_update()
     if(! o.test( value( 'mosaic_output' ) ) )
     {
         code.value +=
-"setup bg option    sub-filter=mosaic\n";
+"setup bg option    sub-filter=mosaic\n"+
+"setup bg output    #bridge-in{offset=100}:display\n";
     }
     code.value+=
 "\n"+
@@ -248,7 +249,7 @@ function mosaic_code_update()
                 code.value +=
 "new   " + s + " broadcast enabled\n"+
 "setup " + s + " input     " + sanitize_input( streams[s] ) + "\n"+
-"setup " + s + " output #duplicate{dst=mosaic-bridge{id=" + s + ",width="+cell_width+",height="+cell_height+"},select=video,dst=bridge-out,select=audio}\n"+
+"setup " + s + " output #duplicate{dst=mosaic-bridge{id=" + s + ",width="+cell_width+",height="+cell_height+"},select=video,dst=bridge-out{id="+(y*mosaic_cols+x)+"},select=audio}\n"+
 "\n";
             }
         }
