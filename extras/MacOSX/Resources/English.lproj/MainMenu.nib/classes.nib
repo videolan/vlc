@@ -229,6 +229,7 @@
                 "o_messages" = id; 
                 "o_mi_about" = id; 
                 "o_mi_add_intf" = id; 
+                "o_mi_aspect_ratio" = id; 
                 "o_mi_audiotrack" = id; 
                 "o_mi_bookmarks" = id; 
                 "o_mi_bring_atf" = id; 
@@ -300,6 +301,7 @@
                 "o_msgs_btn_crashlog" = id; 
                 "o_msgs_panel" = id; 
                 "o_mu_add_intf" = id; 
+                "o_mu_aspect_ratio" = id; 
                 "o_mu_audio" = id; 
                 "o_mu_audiotrack" = id; 
                 "o_mu_channels" = id; 

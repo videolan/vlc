@@ -61,6 +61,7 @@ struct vout_sys_t
     NSRect              s_frame;
     vlc_bool_t          b_got_frame;
     vlc_mutex_t         lock;
+    vlc_bool_t          b_vout_size_update;
 };
 
 /*****************************************************************************
@@ -74,6 +75,9 @@ static int  Control( vout_thread_t *, int, va_list );
 static void Swap   ( vout_thread_t * p_vout );
 static int  Lock   ( vout_thread_t * p_vout );
 static void Unlock ( vout_thread_t * p_vout );
+
+static int AspectCallback( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
 
 int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 {
@@ -140,12 +144,20 @@ void E_(CloseVideoGL) ( vlc_object_t * p_this )
 
 static int Init( vout_thread_t * p_vout )
 {
+    /* The variable is in fact changed on the parent vout */
+    if( !var_Type( p_vout->p_parent, "aspect-ratio" ) )
+    {
+        var_Create( p_vout->p_parent, "aspect-ratio",
+                                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    }
+    var_AddCallback( p_vout->p_parent, "aspect-ratio", AspectCallback, p_vout );
     [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
     return VLC_SUCCESS;
 }
 
 static void End( vout_thread_t * p_vout )
 {
+    var_DelCallback( p_vout->p_parent, "aspect-ratio", AspectCallback, p_vout );
     [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
 }
 
@@ -192,6 +204,20 @@ static int Manage( vout_thread_t * p_vout )
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
+
+    if( p_vout->p_sys->b_vout_size_update )
+    {
+        NSRect old_bounds = [p_vout->p_sys->o_glview bounds];
+        [p_vout->p_sys->o_glview reshape];
+        if( [p_vout->p_sys->o_glview bounds].size.height !=
+            old_bounds.size.height ||
+            [p_vout->p_sys->o_glview bounds].size.width !=
+            old_bounds.size.width);
+        {
+             p_vout->p_sys->b_vout_size_update = VLC_FALSE;
+        }
+    }
+
     [p_vout->p_sys->o_vout_view manage];
     return VLC_SUCCESS;
 }
@@ -233,6 +259,18 @@ static int Lock( vout_thread_t * p_vout )
 static void Unlock( vout_thread_t * p_vout )
 {
     vlc_mutex_unlock( &p_vout->p_sys->lock );
+}
+
+static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    /* Only update the vout size if the aspect ratio has actually been changed*/
+
+    if( strcmp( oldval.psz_string, newval.psz_string ) )
+    {
+        ((vout_thread_t *)p_data)->p_sys->b_vout_size_update = VLC_TRUE;
+    }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -295,16 +333,21 @@ static void Unlock( vout_thread_t * p_vout )
         x = bounds.size.width;
         y = bounds.size.height;
     }
-    else if( bounds.size.height * p_vout->render.i_aspect <
-             bounds.size.width * VOUT_ASPECT_FACTOR )
+    else if( bounds.size.height * p_vout->render.i_aspect *
+             p_vout->fmt_in.i_sar_num <
+             bounds.size.width * VOUT_ASPECT_FACTOR * p_vout->fmt_in.i_sar_den )
     {
-        x = bounds.size.height * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
+        x = bounds.size.height * p_vout->render.i_aspect *
+            p_vout->fmt_in.i_sar_num / ( VOUT_ASPECT_FACTOR *
+            p_vout->fmt_in.i_sar_den );
         y = bounds.size.height;
     }
     else
     {
         x = bounds.size.width;
-        y = bounds.size.width * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
+        y = bounds.size.width * p_vout->fmt_in.i_sar_den *
+            VOUT_ASPECT_FACTOR / ( p_vout->fmt_in.i_sar_num *
+            p_vout->render.i_aspect );
     }
 
     glViewport( ( bounds.size.width - x ) / 2,

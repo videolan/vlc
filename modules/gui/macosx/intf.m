@@ -555,6 +555,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_snapshot setTitle: _NS("Snapshot")];
     [o_mi_videotrack setTitle: _NS("Video Track")];
     [o_mu_videotrack setTitle: _NS("Video Track")];
+    [o_mi_aspect_ratio setTitle: _NS("Aspect-ratio")];
+    [o_mu_aspect_ratio setTitle: _NS("Aspect-ratio")];
     [o_mi_screen setTitle: _NS("Video Device")];
     [o_mu_screen setTitle: _NS("Video Device")];
     [o_mi_subtitle setTitle: _NS("Subtitles Track")];
@@ -1150,6 +1152,9 @@ static VLCMain *_o_sharedMainInstance = nil;
         {
             vlc_object_t * p_dec_obj;
 
+            [o_controls setupVarMenuItem: o_mi_aspect_ratio target: (vlc_object_t *)[VLCVoutView getRealVout: p_vout]
+                var: "aspect-ratio" selector: @selector(toggleVar:)];
+
             [o_controls setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout
                 var: "video-device" selector: @selector(toggleVar:)];
 
@@ -1325,6 +1330,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_ffmpeg_pp setEnabled: b_enabled];
     [o_mi_device setEnabled: b_enabled];
     [o_mi_screen setEnabled: b_enabled];
+    [o_mi_aspect_ratio setEnabled: b_enabled];
 }
 
 - (void)manageVolumeSlider
