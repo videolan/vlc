@@ -44,15 +44,15 @@ static void Close   ( vlc_object_t * );
     "If enabled the interface will uninstall the Service and exit." )
 #define NAME_TEXT N_( "Display name of the Service" )
 #define NAME_LONGTEXT N_( \
-    "This allows you to change the display name of the Service." )
+    "Change the display name of the Service." )
 #define OPTIONS_TEXT N_("Configuration options")
 #define OPTIONS_LONGTEXT N_( \
-    "This option allows you to specify configuration options that will be " \
+    "Specify configuration options that will be " \
     "used by the Service (eg. --foo=bar --no-foobar). It should be specified "\
     "at install time so the Service is properly configured.")
 #define EXTRAINTF_TEXT N_("Extra interface modules")
 #define EXTRAINTF_LONGTEXT N_( \
-    "This option allows you to select additional interfaces spawned by the " \
+    "Select additional interfaces spawned by the " \
     "Service. It should be specified at install time so the Service is " \
     "properly configured. Use a comma separated list of interface modules. " \
     "(common values are: logger, sap, rc, http)")
@@ -149,7 +149,7 @@ static void Run( intf_thread_t *p_intf )
 
     if( StartServiceCtrlDispatcher( dispatchTable ) == 0 )
     {
-        msg_Err( p_intf, "StartServiceCtrlDispatcher failed" );
+        msg_Err( p_intf, "StartServiceCtrlDispatcher failed" ); /* str review */
     }
 
     free( p_intf->p_sys->psz_service );
@@ -177,7 +177,8 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     SC_HANDLE handle = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
     if( handle == NULL )
     {
-        msg_Err( p_intf, "could not connect to SCM database" );
+        msg_Err( p_intf,
+                 "could not connect to Services Control Manager database" );
         return VLC_EGENERIC;
     }
 
@@ -241,7 +242,8 @@ static int NTServiceUninstall( intf_thread_t *p_intf )
     SC_HANDLE handle = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
     if( handle == NULL )
     {
-        msg_Err( p_intf, "could not connect to SCM database" );
+        msg_Err( p_intf,
+                 "could not connect to Services Control Manager database" );
         return VLC_EGENERIC;
     }
 

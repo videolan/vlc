@@ -81,18 +81,17 @@ static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define BOOKMARK1_TEXT N_("Playlist bookmark 1")
-#define BOOKMARK2_TEXT N_("Playlist bookmark 2")
-#define BOOKMARK3_TEXT N_("Playlist bookmark 3")
-#define BOOKMARK4_TEXT N_("Playlist bookmark 4")
-#define BOOKMARK5_TEXT N_("Playlist bookmark 5")
-#define BOOKMARK6_TEXT N_("Playlist bookmark 6")
-#define BOOKMARK7_TEXT N_("Playlist bookmark 7")
-#define BOOKMARK8_TEXT N_("Playlist bookmark 8")
-#define BOOKMARK9_TEXT N_("Playlist bookmark 9")
-#define BOOKMARK10_TEXT N_("Playlist bookmark 10")
-#define BOOKMARK_LONGTEXT N_( \
-    "This option allows you to define playlist bookmarks.")
+#define BOOKMARK1_TEXT    N_("Playlist bookmark 1")
+#define BOOKMARK2_TEXT    N_("Playlist bookmark 2")
+#define BOOKMARK3_TEXT    N_("Playlist bookmark 3")
+#define BOOKMARK4_TEXT    N_("Playlist bookmark 4")
+#define BOOKMARK5_TEXT    N_("Playlist bookmark 5")
+#define BOOKMARK6_TEXT    N_("Playlist bookmark 6")
+#define BOOKMARK7_TEXT    N_("Playlist bookmark 7")
+#define BOOKMARK8_TEXT    N_("Playlist bookmark 8")
+#define BOOKMARK9_TEXT    N_("Playlist bookmark 9")
+#define BOOKMARK10_TEXT   N_("Playlist bookmark 10")
+#define BOOKMARK_LONGTEXT N_("Define playlist bookmarks.")
 
 vlc_module_begin();
     set_shortname( _("Hotkeys") );
@@ -231,7 +230,8 @@ static void Run( intf_thread_t *p_intf )
             if( p_hotkeys[i].i_key == i_key )
             {
                 i_action = p_hotkeys[i].i_action;
-                i_times  = p_hotkeys[i].i_times; /* times key pressed within max. delta time */
+                i_times  = p_hotkeys[i].i_times;
+                /* times key pressed within max. delta time */
                 p_hotkeys[i].i_times = 0;
             }
         }
@@ -318,7 +318,8 @@ static void Run( intf_thread_t *p_intf )
         {
             if( p_vout )
             {
-                var_Get( p_vout, "fullscreen", &val ); val.b_bool = !val.b_bool;
+                var_Get( p_vout, "fullscreen", &val );
+                val.b_bool = !val.b_bool;
                 var_Set( p_vout, "fullscreen", val );
             }
             else
@@ -327,7 +328,8 @@ static void Run( intf_thread_t *p_intf )
                                           FIND_ANYWHERE );
                 if( p_playlist )
                 {
-                    var_Get( p_playlist, "fullscreen", &val ); val.b_bool = !val.b_bool;
+                    var_Get( p_playlist, "fullscreen", &val );
+                    val.b_bool = !val.b_bool;
                     var_Set( p_playlist, "fullscreen", val );
                     vlc_object_release( p_playlist );
                 }
@@ -379,7 +381,8 @@ static void Run( intf_thread_t *p_intf )
                 val.i_int = PAUSE_S;
                 var_Set( p_input, "state", val );
             }
-            else if( i_action == ACTIONID_JUMP_BACKWARD_EXTRASHORT && b_seekable )
+            else if( i_action == ACTIONID_JUMP_BACKWARD_EXTRASHORT
+                     && b_seekable )
             {
 #define SET_TIME( a, b ) \
     i_interval = config_GetInt( p_input, a "-jump-size" ); \
@@ -475,7 +478,8 @@ static void Run( intf_thread_t *p_intf )
                 i_count = list.p_list->i_count;
                 if( i_count <= 1 )
                 {
-                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Subtitle track: %s"), _("N/A") );
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                     _("Subtitle track: %s"), _("N/A") );
                     continue;
                 }
                 for( i = 0; i < i_count; i++ )
@@ -488,7 +492,8 @@ static void Run( intf_thread_t *p_intf )
                 /* value of spu-es was not in choices list */
                 if( i == i_count )
                 {
-                    msg_Warn( p_input, "invalid current subtitle track, selecting 0" );
+                    msg_Warn( p_input,
+                              "invalid current subtitle track, selecting 0" );
                     var_Set( p_input, "spu-es", list.p_list->p_values[0] );
                     i = 0;
                 }
@@ -590,7 +595,8 @@ static void Run( intf_thread_t *p_intf )
                                               FIND_ANYWHERE );
                 if( p_playlist )
                 {
-                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Next") );
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                     _("Next") );
                     playlist_Next( p_playlist );
                     vlc_object_release( p_playlist );
                 }
@@ -601,7 +607,8 @@ static void Run( intf_thread_t *p_intf )
                                               FIND_ANYWHERE );
                 if( p_playlist )
                 {
-                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Previous") );
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                     _("Previous") );
                     playlist_Prev( p_playlist );
                     vlc_object_release( p_playlist );
                 }
@@ -621,14 +628,16 @@ static void Run( intf_thread_t *p_intf )
                 vlc_value_t val;
                 val.b_bool = VLC_TRUE;
                 var_Set( p_input, "rate-faster", val );
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Faster") );
+                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                 _("Faster") );
             }
             else if( i_action == ACTIONID_SLOWER )
             {
                 vlc_value_t val;
                 val.b_bool = VLC_TRUE;
                 var_Set( p_input, "rate-slower", val );
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Slower") );
+                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                 _("Slower") );
             }
             else if( i_action == ACTIONID_POSITION && b_seekable )
             {
@@ -668,7 +677,6 @@ static void Run( intf_thread_t *p_intf )
             else if( i_action == ACTIONID_DISC_MENU )
             {
                 vlc_value_t val; val.i_int = 2;
-msg_Dbg( p_input, "set dvdmenu" );
                 var_Set( p_input, "title  0", val);
             }
             else if( i_action == ACTIONID_SUBDELAY_DOWN )
@@ -856,7 +864,7 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
                     VLC_VAR_STRING|VLC_VAR_DOINHERIT );
         if( p_playlist->status.p_item )
         {
-            config_PutPsz( p_intf, psz_bookmark_name, 
+            config_PutPsz( p_intf, psz_bookmark_name,
                            p_playlist->status.p_item->input.psz_uri);
             msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num,
                            p_playlist->status.p_item->input.psz_uri);

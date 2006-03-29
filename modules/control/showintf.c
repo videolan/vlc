@@ -111,7 +111,7 @@ static void RunIntf( intf_thread_t *p_intf )
 
     if( InitThread( p_intf ) < 0 )
     {
-        msg_Err( p_intf, "cannot initialize intf" );
+        msg_Err( p_intf, "cannot initialize interface" );
         return;
     }
 

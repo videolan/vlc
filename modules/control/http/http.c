@@ -33,16 +33,16 @@ static void Close( vlc_object_t * );
 
 #define HOST_TEXT N_( "Host address" )
 #define HOST_LONGTEXT N_( \
-    "You can set the address and port the http interface will bind to." )
+    "Address and port the http interface will bind to" )
 #define SRC_TEXT N_( "Source directory" )
 #define SRC_LONGTEXT N_( "Source directory" )
 #define CHARSET_TEXT N_( "Charset" )
 #define CHARSET_LONGTEXT N_( \
-        "Charset declared in Content-Type header (default UTF-8)." )
+        "Charset declared in Content-Type header (default UTF-8)" )
 #define HANDLERS_TEXT N_( "Handlers" )
 #define HANDLERS_LONGTEXT N_( \
-        "List of extensions and executable paths (for instance: " \
-        "php=/usr/bin/php,pl=/usr/bin/perl)." )
+        "List of handler extensions and executable paths (for instance: " \
+        "php=/usr/bin/php,pl=/usr/bin/perl)" )
 #define CERT_TEXT N_( "Certificate file" )
 #define CERT_LONGTEXT N_( "HTTP interface x509 PEM certificate file " \
                           "(enables SSL)" )
@@ -305,7 +305,7 @@ static int Open( vlc_object_t *p_this )
 
     if( !psz_src || *psz_src == '\0' )
     {
-        msg_Err( p_intf, "invalid src dir" );
+        msg_Err( p_intf, "invalid web interface source directory" );
         goto failed;
     }
 
@@ -321,7 +321,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_files <= 0 )
     {
-        msg_Err( p_intf, "cannot find any files (%s)", psz_src );
+        msg_Err( p_intf, "cannot find any file in directory %s", psz_src );
         goto failed;
     }
     p_intf->pf_run = Run;

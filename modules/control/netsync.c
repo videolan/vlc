@@ -57,11 +57,11 @@ static void Close   ( vlc_object_t * );
 static mtime_t GetClockRef( intf_thread_t *, mtime_t );
 
 #define NETSYNC_TEXT N_( "Act as master for network synchronisation" )
-#define NETSYNC_LONGTEXT N_( "Allows you to specify if this client should " \
+#define NETSYNC_LONGTEXT N_( "Specify if this client should " \
   "act as the master client for the network synchronisation." )
 
 #define MIP_TEXT N_( "Master client ip address" )
-#define MIP_LONGTEXT N_( "Allows you to specify the ip address of " \
+#define MIP_LONGTEXT N_( "Specify the ip address of " \
   "the master client used for the network synchronisation." )
 
 vlc_module_begin();
@@ -150,7 +150,7 @@ static void Run( intf_thread_t *p_intf )
 
     if( i_socket < 0 )
     {
-        msg_Err( p_intf, "failed opening UDP socket." );
+        msg_Err( p_intf, "failed opening UDP socket" ); /* str review: is this good enough? */
         return;
     }
 
@@ -211,7 +211,7 @@ static void Run( intf_thread_t *p_intf )
             /* We received something */
             i_struct_size = sizeof( from );
             i_read = recvfrom( i_socket, p_data, MAX_MSG_LENGTH, 0,
-                               (struct sockaddr*)&from, 
+                               (struct sockaddr*)&from,
                                (unsigned int *)&i_struct_size );
 
             i_clockref = ntoh64(*(int64_t *)p_data);
@@ -293,7 +293,7 @@ static void Run( intf_thread_t *p_intf )
 #if 0
             msg_Dbg( p_intf, "Slave clockref: "I64Fd" -> "I64Fd" -> "I64Fd", "
                      "clock diff: "I64Fd" drift: "I64Fd,
-                     i_clockref, i_master_clockref, 
+                     i_clockref, i_master_clockref,
                      i_client_clockref, i_diff_date, i_drift );
 #endif
 

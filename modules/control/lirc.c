@@ -81,7 +81,7 @@ static int Open( vlc_object_t *p_this )
     i_fd = lirc_init( "vlc", 1 );
     if( i_fd == -1 )
     {
-        msg_Err( p_intf, "lirc_init failed" );
+        msg_Err( p_intf, "lirc initialisation failed" );
         free( p_intf->p_sys );
         return 1;
     }
@@ -91,7 +91,7 @@ static int Open( vlc_object_t *p_this )
 
     if( lirc_readconfig( NULL, &p_intf->p_sys->config, NULL ) != 0 )
     {
-        msg_Err( p_intf, "lirc_readconfig failed" );
+        msg_Err( p_intf, "failure while reading lirc config" );
         lirc_deinit();
         free( p_intf->p_sys );
         return 1;
@@ -144,7 +144,7 @@ static void Run( intf_thread_t *p_intf )
 
             if( strncmp( "key-", c, 4 ) )
             {
-                msg_Err( p_intf, "This doesn't appear to be a valid keycombo lirc sent us. Please look at the doc/lirc/example.lirc file in VLC" );
+                msg_Err( p_intf, "this doesn't appear to be a valid keycombo lirc sent us. Please look at the doc/lirc/example.lirc file in VLC" );
                 break;
             }
             keyval.i_int = config_GetInt( p_intf, c );

@@ -135,14 +135,14 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 
     if( ( p_dir = utf8_opendir( psz_dir ) ) == NULL )
     {
-        msg_Err( p_intf, "cannot open dir (%s)", psz_dir );
+        msg_Err( p_intf, "cannot open directory (%s)", psz_dir );
         return VLC_EGENERIC;
     }
 
     i_dirlen = strlen( psz_dir );
     if( i_dirlen + 10 > MAX_DIR_SIZE )
     {
-        msg_Warn( p_intf, "skipping too deep dir (%s)", psz_dir );
+        msg_Warn( p_intf, "skipping too deep directory (%s)", psz_dir );
         return 0;
     }
 
@@ -566,8 +566,10 @@ void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value )
                 {
                     i_value += 3600 * i_stock;
                     i_stock = 0;
-                    /* other characters which are not numbers are not important */
-                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
+                    /* other characters which are not numbers are not
+                     * important */
+                    while( ((p_value[0] < '0') || (p_value[0] > '9'))
+                           && (p_value[0] != '\0') )
                     {
                         p_value++;
                     }
@@ -578,7 +580,8 @@ void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value )
                     i_value += 60 * i_stock;
                     i_stock = 0;
                     p_value++;
-                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
+                    while( ((p_value[0] < '0') || (p_value[0] > '9'))
+                           && (p_value[0] != '\0') )
                     {
                         p_value++;
                     }
@@ -588,7 +591,8 @@ void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value )
                 {
                     i_value += i_stock;
                     i_stock = 0;
-                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
+                    while( ((p_value[0] < '0') || (p_value[0] > '9'))
+                           && (p_value[0] != '\0') )
                     {
                         p_value++;
                     }
@@ -602,7 +606,8 @@ void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value )
             }
         }
 
-        /* if there is no known symbol, I consider it as seconds. Otherwise, i_stock = 0 */
+        /* if there is no known symbol, I consider it as seconds.
+         * Otherwise, i_stock = 0 */
         i_value += i_stock;
 
         switch(i_relative)
@@ -648,30 +653,35 @@ void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value )
             }
             case POSITION_ABSOLUTE:
             {
-                val.f_float = __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
+                val.f_float = __MIN( __MAX( ((float) i_value ) / 100.0 ,
+                                            0.0 ), 100.0 );
                 var_Set( p_sys->p_input, "position", val );
-                msg_Dbg( p_intf, "requested seek percent: %d", i_value );
+                msg_Dbg( p_intf, "requested seek percent: %d%%", i_value );
                 break;
             }
             case POSITION_REL_FOR:
             {
                 var_Get( p_sys->p_input, "position", &val );
-                val.f_float += __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
+                val.f_float += __MIN( __MAX( ((float) i_value ) / 100.0,
+                                             0.0 ) , 100.0 );
                 var_Set( p_sys->p_input, "position", val );
-                msg_Dbg( p_intf, "requested seek percent forward: %d", i_value );
+                msg_Dbg( p_intf, "requested seek percent forward: %d%%",
+                         i_value );
                 break;
             }
             case POSITION_REL_BACK:
             {
                 var_Get( p_sys->p_input, "position", &val );
-                val.f_float -= __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
+                val.f_float -= __MIN( __MAX( ((float) i_value ) / 100.0,
+                                             0.0 ) , 100.0 );
                 var_Set( p_sys->p_input, "position", val );
-                msg_Dbg( p_intf, "requested seek percent backward: %d", i_value );
+                msg_Dbg( p_intf, "requested seek percent backward: %d%%",
+                         i_value );
                 break;
             }
             default:
             {
-                msg_Dbg( p_intf, "requested seek: what the f*** is going on here ?" );
+                msg_Dbg( p_intf, "invalid seek request" );
                 break;
             }
         }
