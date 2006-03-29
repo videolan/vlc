@@ -191,7 +191,7 @@ function mosaic_code_update()
 "\n"+
 "# Background options\n"+
 "new   bg broadcast enabled\n"+
-"setup bg input     " + value( 'mosaic_bg_input' ) + "\n";
+"setup bg input     " + sanitize_input( value( 'mosaic_bg_input' ) ) + "\n";
     if( value( 'mosaic_output' ) )
     {
         code.value +=
@@ -247,7 +247,7 @@ function mosaic_code_update()
                 var s = cells[id];
                 code.value +=
 "new   " + s + " broadcast enabled\n"+
-"setup " + s + " input     " + streams[s] + "\n"+
+"setup " + s + " input     " + sanitize_input( streams[s] ) + "\n"+
 "setup " + s + " output #duplicate{dst=mosaic-bridge{id=" + s + ",width="+cell_width+",height="+cell_height+"},select=video,dst=bridge-out,select=audio}\n"+
 "\n";
             }

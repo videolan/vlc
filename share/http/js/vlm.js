@@ -151,6 +151,11 @@ function vlm_schedule_type_change( name )
     }
 }
 
+function sanitize_input( str )
+{
+    return str.replace( /\\/g, '\\\\').replace( /\'/g, '\\\'' ).replace( /\"/g, '\\\"' ).replace( /^/, '"' ).replace( /$/, '"' );
+}
+
 function update_vlm_add_broadcast()
 {
     var cmd = document.getElementById( 'vlm_command' );
@@ -172,7 +177,7 @@ function update_vlm_add_broadcast()
 
         if( value( 'vlm_broadcast_input' ) )
         {
-            cmd.value += " input " + value( 'vlm_broadcast_input' );
+            cmd.value += " input " + sanitize_input( value( 'vlm_broadcast_input' ) );
         }
 
         if( value( 'vlm_broadcast_output' ) )
@@ -202,7 +207,7 @@ function update_vlm_add_vod()
         
         if( value( 'vlm_vod_input' ) )
         {
-            cmd.value += " input " + value( 'vlm_vod_input' );
+            cmd.value += " input " + sanitize_input( value( 'vlm_vod_input' ) );
         }
 
         if( value( 'vlm_vod_output' ) )
@@ -696,7 +701,7 @@ function vlm_delete_input( name, num )
 
 function vlm_add_input( name, input )
 {
-    document.getElementById( 'vlm_command' ).value = "setup "+name+" input "+input;
+    document.getElementById( 'vlm_command' ).value = "setup "+name+" input "+sanitize_input( input );
     vlm_cmd( value( 'vlm_command' ) );
 }
 

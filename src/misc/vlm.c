@@ -266,7 +266,8 @@ static const char *FindEndCommand( const char *psz_sent )
     {
     case '\"':
         psz_sent++;
-        while( ( *psz_sent != '\"' ) && ( *psz_sent != '\0' ) )
+        while( ( *psz_sent != '\"' || b_escape == VLC_TRUE )
+               && ( *psz_sent != '\0' ) )
         {
             if( *psz_sent == '\'' && b_escape == VLC_FALSE )
             {
@@ -292,7 +293,8 @@ static const char *FindEndCommand( const char *psz_sent )
 
     case '\'':
         psz_sent++;
-        while( ( *psz_sent != '\'' ) && ( *psz_sent != '\0' ) )
+        while( ( *psz_sent != '\'' || b_escape == VLC_TRUE )
+                 && ( *psz_sent != '\0' ) )
         {
             if( *psz_sent == '\"' && b_escape == VLC_FALSE )
             {
