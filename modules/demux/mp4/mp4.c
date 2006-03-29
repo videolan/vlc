@@ -888,7 +888,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         default:
-            msg_Warn( p_demux, "control query unimplemented!" );
+            msg_Warn( p_demux, "control query %u unimplemented", i_query );
             return VLC_EGENERIC;
     }
 }
