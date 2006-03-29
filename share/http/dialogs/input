@@ -217,7 +217,7 @@ This dialog needs the following dialogs to be fully functional: browse
       <input type="text" id="input_fake_width" size="8" onchange="update_input_fake();" />
       <label for="input_fake_height">Height</label>
       <input type="text" id="input_fake_height" size="8" onchange="update_input_fake();" />
-      <label for"input_fake_ar">Aspect ratio</label>
+      <label for="input_fake_ar">Aspect ratio</label>
       <input type="text" id="input_fake_ar" size="8" onchange="update_input_fake();" />
     </div>
   </div>
