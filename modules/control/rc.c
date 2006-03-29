@@ -1925,7 +1925,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
 
     if ( !*newval.psz_string )
     {
-        msg_rc( _("Please provide one of the following paramaters:") );
+        msg_rc( _("Please provide one of the following parameters:") );
         msg_rc( "[on|off|up|down|left|right|select]" );
         return i_error;
     }
@@ -1964,7 +1964,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
         osd_MenuActivate( p_this );
     else
     {
-        msg_rc( _("Please provide one of the following paramaters:") );
+        msg_rc( _("Please provide one of the following parameters:") );
         msg_rc( "[on|off|up|down|left|right|select]" );
         if( val.psz_string ) free( val.psz_string );
             return i_error;
