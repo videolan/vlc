@@ -557,7 +557,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
     if( ( i_dir_content = utf8_scandir( psz_dir, &ppsz_dir_content, Filter,
                                         InsensitiveAlphasort ) ) == -1 )
     {
-        msg_Warn( p_intf, "error while scaning dir %s (%s)", psz_dir,
+        msg_Warn( p_intf, "error while scanning dir %s (%s)", psz_dir,
                   strerror(errno) );
         free( psz_dir );
         return s;
