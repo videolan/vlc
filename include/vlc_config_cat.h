@@ -31,7 +31,7 @@
  */
 #define MAIN_TITLE N_( "VLC preferences" )
 #define MAIN_HELP N_( \
-    "Click on \"Advanced Options\" to see all options." )
+    "Select \"Advanced Options\" to see all options." )
 
 #define GENERAL_TITLE N_("General")
 
@@ -88,15 +88,16 @@
 
 #define SUBPIC_TITLE N_( "Subtitles/OSD")
 #define SUBPIC_HELP N_( "Miscellaneous settings related to On-Screen-Display, subtitles and overlay subpictures")
-
+/*
 #define TEXT_TITLE N_("Text rendering")
 #define TEXT_HELP N_( \
     "Use the settings of the \"freetype\" module to choose the font you " \
     "want VLC to use for text rendering (to display subtitles for example).")
-
+*/
 /* Input */
 #define INPUT_TITLE N_( "Input / Codecs" )
-#define INPUT_HELP N_( "These are the settings for the input, demultiplexing and decoding parts of VLC. Encoder settings can also be found here." )
+#define INPUT_HELP N_( "These are the settings for the input, demultiplexing " \
+         "and decoding parts of VLC. Encoder settings can also be found here." )
 
 #define ACCESS_TITLE N_( "Access modules" )
 #define ACCESS_HELP N_( \
