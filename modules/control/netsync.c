@@ -211,7 +211,8 @@ static void Run( intf_thread_t *p_intf )
             /* We received something */
             i_struct_size = sizeof( from );
             i_read = recvfrom( i_socket, p_data, MAX_MSG_LENGTH, 0,
-                               (struct sockaddr*)&from, &i_struct_size );
+                               (struct sockaddr*)&from, 
+                               (unsigned int *)&i_struct_size );
 
             i_clockref = ntoh64(*(int64_t *)p_data);
 

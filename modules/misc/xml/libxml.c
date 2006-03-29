@@ -99,7 +99,8 @@ static void CatalogLoad( xml_t *p_xml, const char *psz_filename )
 static void CatalogAdd( xml_t *p_xml, const char *psz_arg1,
                           const char *psz_arg2, const char *psz_filename )
 {
-    xmlCatalogAdd( psz_arg1, psz_arg2, psz_filename );
+    xmlCatalogAdd( (unsigned char*)psz_arg1, (unsigned char*)psz_arg2, 
+        (unsigned char*)psz_filename );
 }
 
 /*****************************************************************************
