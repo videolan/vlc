@@ -401,7 +401,7 @@ void *utf8_opendir( const char *dirname )
 
     if( local_name != NULL )
     {
-        DIR *dir = opendir( local_name );
+        DIR *dir = vlc_opendir_wrapper( local_name );
         LocaleFree( local_name );
         return dir;
     }
@@ -414,7 +414,7 @@ const char *utf8_readdir( void *dir )
 {
     struct dirent *ent;
 
-    ent = readdir( (DIR *)dir );
+    ent = vlc_readdir_wrapper( (DIR *)dir );
     if( ent == NULL )
         return NULL;
 
@@ -461,7 +461,7 @@ int utf8_scandir( const char *dirname, char ***namelist,
             tab = newtab;
             tab[num++] = utf_entry;
         }
-        closedir( dir );
+        vlc_closedir_wrapper( dir );
 
         if( compar != NULL )
             qsort( tab, num, sizeof( tab[0] ),
