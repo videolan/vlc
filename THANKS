@@ -114,6 +114,7 @@ Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
 Steve Lhomme <steve dot lhomme at free dot fr> - MSVC fixes and Matroska enhancements
 Steve Brown <sbrown at cortland.com> - fix for optional PES size bug
 Steven M. Schultz <sms at TO.GD-ES.COM> - BSD/OS port
+Steven Sheehy - wxWidgets interface fix
 Tadashi Jokagi <elf2000 at users.sourceforge dot net> - Japanese translation
 Tim 'O Callaghan <tim.ocallaghan at limestudios dot com> - pvr input cleaning patch
 Thomas Graf <tgraf at europe.com> - gettext support, German translation

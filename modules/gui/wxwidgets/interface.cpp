@@ -1107,6 +1107,7 @@ void Interface::PlayStream()
         /* If the playlist is empty, open a file requester instead */
         vlc_object_release( p_playlist );
         OnShowDialog( dummy );
+        GetToolBar()->ToggleTool( PlayStream_Event, false );
     }
 }
 
