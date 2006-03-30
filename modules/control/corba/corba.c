@@ -693,7 +693,8 @@ add_category_hint( N_( "Corba control" ), NULL, VLC_FALSE );
 
 set_description( _( "corba control module" ) );
 set_capability( "interface", 10 );
-add_integer( "corba-reactivity", 5000, NULL, "Internal reactivity factor", "Internal reactivity factor ( gtk timeout is INTF_IDLE_SLEEP / factor )", VLC_TRUE );
+add_integer( "corba-reactivity", 5000, NULL, REACTIVITY_TEXT,
+              REACTIVITY_LONGTEXT, VLC_TRUE );
 set_callbacks( Open, Close );
 vlc_module_end();
 
