@@ -241,6 +241,7 @@
                 "o_mi_close_window" = id; 
                 "o_mi_controller" = id; 
                 "o_mi_copy" = id; 
+                "o_mi_crop" = id; 
                 "o_mi_cut" = id; 
                 "o_mi_deinterlace" = id; 
                 "o_mi_device" = id; 
@@ -307,6 +308,7 @@
                 "o_mu_channels" = id; 
                 "o_mu_chapter" = id; 
                 "o_mu_controls" = id; 
+                "o_mu_crop" = id; 
                 "o_mu_deinterlace" = id; 
                 "o_mu_device" = id; 
                 "o_mu_edit" = id; 

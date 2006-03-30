@@ -61,7 +61,8 @@ struct vout_sys_t
     NSRect              s_frame;
     vlc_bool_t          b_got_frame;
     vlc_mutex_t         lock;
-    vlc_bool_t          b_vout_size_update;
+    int                 i_vout_size_update_counter;
+    int                 i_x, i_y;
 };
 
 /*****************************************************************************
@@ -76,7 +77,7 @@ static void Swap   ( vout_thread_t * p_vout );
 static int  Lock   ( vout_thread_t * p_vout );
 static void Unlock ( vout_thread_t * p_vout );
 
-static int AspectCallback( vlc_object_t *, char const *,
+static int AspectCropCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
 int E_(OpenVideoGL)  ( vlc_object_t * p_this )
@@ -150,14 +151,21 @@ static int Init( vout_thread_t * p_vout )
         var_Create( p_vout->p_parent, "aspect-ratio",
                                 VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     }
-    var_AddCallback( p_vout->p_parent, "aspect-ratio", AspectCallback, p_vout );
+    var_AddCallback( p_vout->p_parent, "aspect-ratio", AspectCropCallback, p_vout );
+    if( !var_Type( p_vout->p_parent, "crop" ) )
+    {
+        var_Create( p_vout->p_parent, "crop",
+                                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    }
+    var_AddCallback( p_vout->p_parent, "crop", AspectCropCallback, p_vout );
     [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
     return VLC_SUCCESS;
 }
 
 static void End( vout_thread_t * p_vout )
 {
-    var_DelCallback( p_vout->p_parent, "aspect-ratio", AspectCallback, p_vout );
+    var_DelCallback( p_vout->p_parent, "aspect-ratio", AspectCropCallback, p_vout );
+    var_DelCallback( p_vout->p_parent, "crop", AspectCropCallback, p_vout );
     [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
 }
 
@@ -205,16 +213,17 @@ static int Manage( vout_thread_t * p_vout )
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
 
-    if( p_vout->p_sys->b_vout_size_update )
+    if( p_vout->p_sys->i_vout_size_update_counter )
     {
-        NSRect old_bounds = [p_vout->p_sys->o_glview bounds];
+        int i_old_x = p_vout->p_sys->i_x, i_old_y = p_vout->p_sys->i_y;
         [p_vout->p_sys->o_glview reshape];
-        if( [p_vout->p_sys->o_glview bounds].size.height !=
-            old_bounds.size.height ||
-            [p_vout->p_sys->o_glview bounds].size.width !=
-            old_bounds.size.width);
+        if( p_vout->p_sys->i_x != i_old_x || p_vout->p_sys->i_y != i_old_y )
         {
-             p_vout->p_sys->b_vout_size_update = VLC_FALSE;
+            p_vout->p_sys->i_vout_size_update_counter = 0;
+        }
+        else if( p_vout->p_sys->i_vout_size_update_counter > 0 )
+        {
+            p_vout->p_sys->i_vout_size_update_counter--;
         }
     }
 
@@ -261,14 +270,20 @@ static void Unlock( vout_thread_t * p_vout )
     vlc_mutex_unlock( &p_vout->p_sys->lock );
 }
 
-static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
+static int AspectCropCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     /* Only update the vout size if the aspect ratio has actually been changed*/
-
+    /* We cannot change the size directly in this callback, since fmt_in
+       hasn't been updated yet, so do it in Manage */
     if( strcmp( oldval.psz_string, newval.psz_string ) )
     {
-        ((vout_thread_t *)p_data)->p_sys->b_vout_size_update = VLC_TRUE;
+        /* khludge ! Here, we are not sure that the vout size will actually
+           change (for instance if we go from Predefined to 4:3 on a 4:3
+           stream). So, to to trigger reshape endlessly, we decrease that
+           counter each time we call reshape. We put it to 0 directly if
+           we actually change the vout size. */
+        ((vout_thread_t *)p_data)->p_sys->i_vout_size_update_counter = 2;
     }
     return VLC_SUCCESS;
 }
@@ -333,22 +348,27 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
         x = bounds.size.width;
         y = bounds.size.height;
     }
-    else if( bounds.size.height * p_vout->render.i_aspect *
+    else if( bounds.size.height * p_vout->fmt_in.i_visible_width *
              p_vout->fmt_in.i_sar_num <
-             bounds.size.width * VOUT_ASPECT_FACTOR * p_vout->fmt_in.i_sar_den )
+             bounds.size.width * p_vout->fmt_in.i_visible_height *
+             p_vout->fmt_in.i_sar_den )
     {
-        x = bounds.size.height * p_vout->render.i_aspect *
-            p_vout->fmt_in.i_sar_num / ( VOUT_ASPECT_FACTOR *
-            p_vout->fmt_in.i_sar_den );
+        x = ( bounds.size.height * p_vout->fmt_in.i_visible_width *
+              p_vout->fmt_in.i_sar_num ) /
+            ( p_vout->fmt_in.i_visible_height * p_vout->fmt_in.i_sar_den);
+
         y = bounds.size.height;
     }
     else
     {
         x = bounds.size.width;
-        y = bounds.size.width * p_vout->fmt_in.i_sar_den *
-            VOUT_ASPECT_FACTOR / ( p_vout->fmt_in.i_sar_num *
-            p_vout->render.i_aspect );
+        y = ( bounds.size.width * p_vout->fmt_in.i_visible_height *
+              p_vout->fmt_in.i_sar_den) /
+            ( p_vout->fmt_in.i_visible_width * p_vout->fmt_in.i_sar_num  );
     }
+
+    p_vout->p_sys->i_x = x;
+    p_vout->p_sys->i_y = y;
 
     glViewport( ( bounds.size.width - x ) / 2,
                 ( bounds.size.height - y ) / 2, x, y );

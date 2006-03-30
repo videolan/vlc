@@ -230,6 +230,8 @@ struct intf_sys_t
     IBOutlet id o_mu_screen;
     IBOutlet id o_mi_aspect_ratio;
     IBOutlet id o_mu_aspect_ratio;
+    IBOutlet id o_mi_crop;
+    IBOutlet id o_mu_crop;
     IBOutlet id o_mi_subtitle;
     IBOutlet id o_mu_subtitle;
     IBOutlet id o_mi_deinterlace;
