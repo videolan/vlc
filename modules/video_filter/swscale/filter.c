@@ -61,7 +61,7 @@ static int GetSwscaleChroma( vlc_fourcc_t );
  * Module descriptor
  *****************************************************************************/
 #define MODE_TEXT N_("Scaling mode")
-#define MODE_LONGTEXT N_("You can choose the default scaling mode.")
+#define MODE_LONGTEXT N_("Scaling mode to use.")
 
 static int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_mode_descriptions[] =

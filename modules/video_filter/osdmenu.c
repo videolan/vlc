@@ -39,38 +39,38 @@
  *****************************************************************************/
 
 /* FIXME: Future extension make the definition file in XML format. */
-#define OSD_FILE_TEXT N_("OSD menu configuration file")
+#define OSD_FILE_TEXT N_("Configuration file")
 #define OSD_FILE_LONGTEXT N_( \
-    "An OSD menu configuration file that menu actions with button images" )
-
+    "Configuration file for the OSD Menu" )
 #define OSD_PATH_TEXT N_("Path to OSD menu images")
 #define OSD_PATH_LONGTEXT N_( \
-    "Specify another path to the OSD menu images. This will override the path as defined in the " \
+    "Path to the OSD menu images. This will override the path defined in the " \
     "OSD configuration file." )
 
-#define POSX_TEXT N_("X coordinate of the OSD menu")
+#define POSX_TEXT N_("X coordinate")
 #define POSX_LONGTEXT N_("You can move the OSD menu by left-clicking on it." )
 
-#define POSY_TEXT N_("Y coordinate of the OSD menu")
+#define POSY_TEXT N_("Y coordinate")
 #define POSY_LONGTEXT N_("You can move the OSD menu by left-clicking on it." )
 
-#define POS_TEXT N_("OSD menu position")
+#define POS_TEXT N_("Menu position")
 #define POS_LONGTEXT N_( \
   "You can enforce the OSD menu position on the video " \
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
-  "also use combinations of these values).")
+  "also use combinations of these values, eg. 6 = top-right).")
 
-#define TIMEOUT_TEXT N_("Timeout of OSD menu")
+#define TIMEOUT_TEXT N_("Menu timeout")
 #define TIMEOUT_LONGTEXT N_( \
     "OSD menu pictures get a default timeout of 15 seconds added to their " \
     "remaining time. This will ensure that they are at least the specified " \
     "time visible.")
 
-#define OSD_UPDATE_TEXT N_("Update speed of OSD menu")
+#define OSD_UPDATE_TEXT N_("Menu update interval" )
 #define OSD_UPDATE_LONGTEXT N_( \
-    "Update the OSD menu picture every 200 ms (default). Shorten the update time for " \
-    "environments that experience transmissions errors. Be careful with this option " \
-    "because encoding OSD menu pictures is very computing intensive. The range is 0 - 1000 ms." )
+    "The default is to update the OSD menu picture every 200 ms. Shorten the" \
+    " update time for environments that experience transmissions errors. " \
+    "Be careful with this option as encoding OSD menu pictures is very " \
+    "computing intensive. The range is 0 - 1000 ms." )
 
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_pos_descriptions[] =

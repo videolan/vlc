@@ -65,10 +65,12 @@ static int  SendEvents   ( vlc_object_t *, char const *,
 #define MODE_LONGTEXT N_("Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough\" and \"psychedelic\"")
 
 #define GRADIENT_TEXT N_("Gradient image type")
-#define GRADIENT_LONGTEXT N_("Gradient image type (0 or 1)")
+#define GRADIENT_LONGTEXT N_("Gradient image type (0 or 1). 0 will " \
+        "turn the image to white while 1 will keep colors." )
 
 #define CARTOON_TEXT N_("Apply cartoon effect")
-#define CARTOON_LONGTEXT N_("Apply cartoon effect. Used by \"gradient\" and \"edge\".")
+#define CARTOON_LONGTEXT N_("Apply cartoon effect. Used by \"gradient\" " \
+                            "and \"edge\".")
 
 static char *mode_list[] = { "wave", "ripple", "gradient", "edge", "hough",
                              "psychedelic" };

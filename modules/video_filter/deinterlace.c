@@ -100,10 +100,10 @@ static int FilterCallback ( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define MODE_TEXT N_("Deinterlace mode")
-#define MODE_LONGTEXT N_("Default deinterlace method to use for local playback")
+#define MODE_LONGTEXT N_("Deinterlace method to use for local playback.")
 
-#define SOUT_MODE_TEXT N_("Deinterlace mode")
-#define SOUT_MODE_LONGTEXT N_("Default deinterlace methode to use for streaming")
+#define SOUT_MODE_TEXT N_("Streaming deinterlace mode")
+#define SOUT_MODE_LONGTEXT N_("Deinterlace method to use for streaming.")
 
 #define FILTER_CFG_PREFIX "sout-deinterlace-"
 

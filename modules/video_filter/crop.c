@@ -55,7 +55,7 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define GEOMETRY_LONGTEXT N_("Set the geometry of the zone to crop. This is set as <width> x <height> + <left offset> + <top offset>.")
 
 #define AUTOCROP_TEXT N_("Automatic cropping")
-#define AUTOCROP_LONGTEXT N_("Activate automatic black border cropping.")
+#define AUTOCROP_LONGTEXT N_("Automatic black border cropping.")
 
 vlc_module_begin();
     set_description( _("Crop video filter") );

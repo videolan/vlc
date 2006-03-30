@@ -46,18 +46,21 @@ static void Display   ( vout_thread_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 #define FORMAT_TEXT N_( "Image format" )
-#define FORMAT_LONGTEXT N_( "Set the format of the output image." )
+#define FORMAT_LONGTEXT N_( "Format of the output images (png or jpg)." )
 
 #define RATIO_TEXT N_( "Recording ratio" )
-#define RATIO_LONGTEXT N_( "Set the ratio of images that are recorded. "\
+#define RATIO_LONGTEXT N_( "Ratio of images to record. "\
                            "3 means that one image out of three is recorded." )
 
 #define PREFIX_TEXT N_( "Filename prefix" )
-#define PREFIX_LONGTEXT N_( "Set the prefix of the filename. Output filename "\
-                            "will have the form prefixNUMBER.format" )
+#define PREFIX_LONGTEXT N_( "Prefix of the output images filenames. Output " \
+                            "filenames will have the \"prefixNUMBER.format\" "\
+                            "form." )
 
 #define REPLACE_TEXT N_( "Always write to the same file" )
-#define REPLACE_LONGTEXT N_( "Always write to the same file" )
+#define REPLACE_LONGTEXT N_( "Always write to the same file instead of " \
+                            "creating one file per image. In this case, " \
+                             "the number is not appended to the filename." )
 
 static char *psz_format_list[] = { "png", "jpeg" };
 static char *psz_format_list_text[] = { "PNG", "JPEG" };

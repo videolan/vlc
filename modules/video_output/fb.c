@@ -66,8 +66,7 @@ static void GfxMode        ( int i_tty );
 
 #define DEVICE_TEXT N_("Framebuffer device")
 #define DEVICE_LONGTEXT N_( \
-    "You can select here the framebuffer device that will be used " \
-    "for rendering (usually /dev/fb0).")
+    "Framebuffer device to use for rendering (usually /dev/fb0).")
 
 vlc_module_begin();
     set_shortname( "Framebuffer" );

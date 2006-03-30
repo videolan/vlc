@@ -86,7 +86,7 @@ static void SwitchContext( vout_thread_t * );
  *****************************************************************************/
 #define ADAPTOR_TEXT N_("XVideo adaptor number")
 #define ADAPTOR_LONGTEXT N_( \
-    "If you graphics card provides several adaptors, this option allows you " \
+    "If you graphics card provides several adaptors, you have " \
     "to choose which one will be used (you shouldn't have to change this).")
 
 #define ALT_FS_TEXT N_("Alternate fullscreen method")
@@ -98,14 +98,14 @@ static void SwitchContext( vout_thread_t * );
     "2) Completely bypass the window manager, but then nothing will be able " \
     "to show on top of the video.")
 
-#define DISPLAY_TEXT N_("X11 display name")
+#define DISPLAY_TEXT N_("X11 display")
 #define DISPLAY_LONGTEXT N_( \
-    "Specify the X11 hardware display you want to use. By default VLC will " \
+    "X11 hardware display to use. By default VLC will " \
     "use the value of the DISPLAY environment variable.")
 
-#define SCREEN_TEXT N_("Screen to be used for fullscreen mode.")
+#define SCREEN_TEXT N_("Screen for fullscreen mode.")
 #define SCREEN_LONGTEXT N_( \
-    "Choose the screen you want to use in fullscreen mode. For instance " \
+    "Screen to use in fullscreen mode. For instance " \
     "set it to 0 for first screen, 1 for the second.")
 
 vlc_module_begin();

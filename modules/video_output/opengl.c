@@ -116,12 +116,11 @@ static int SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define SPEED_TEXT N_( "OpenGL cube rotation speed" )
-#define SPEED_LONGTEXT N_( "If the OpenGL cube effect is enabled, this " \
-                           "controls its rotation speed." )
+#define SPEED_LONGTEXT N_( "Rotation speed of the OpenGL cube effect, if "\                                "enabled." )
 
-#define EFFECT_TEXT N_("Select effect")
+#define EFFECT_TEXT N_("Effect")
 #define EFFECT_LONGTEXT N_( \
-    "Allows you to select different visual effects.")
+    "Several OpenGL visual effects are available." )
 
 static char *ppsz_effects[] = {
         "none", "cube", "transparent-cube" };

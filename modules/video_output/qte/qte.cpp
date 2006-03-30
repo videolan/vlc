@@ -76,9 +76,9 @@ extern "C"
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define DISPLAY_TEXT N_("QT Embedded display name")
+#define DISPLAY_TEXT N_("QT Embedded display")
 #define DISPLAY_LONGTEXT N_( \
-    "Specify the Qt Embedded hardware display you want to use. " \
+    "Qt Embedded hardware display to use. " \
     "By default VLC will use the value of the DISPLAY environment variable.")
 
 /*****************************************************************************

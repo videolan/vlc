@@ -57,18 +57,20 @@ static int  SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 
-#define THRES_TEXT N_("Enable brightness threshold")
-#define THRES_LONGTEXT N_("Show black and white pixels with brightness as threshold value")
+#define THRES_TEXT N_("Brightness threshold")
+#define THRES_LONGTEXT N_("When this mode is enabled, pixels will be " \
+        "shown as black or white. The treshold value will be the brighness " \
+        "defined below." )
 #define CONT_TEXT N_("Image contrast (0-2)")
-#define CONT_LONGTEXT N_("Set the image contrast, between 0 and 2. Defaults to 1")
+#define CONT_LONGTEXT N_("Set the image contrast, between 0 and 2. Defaults to 1.")
 #define HUE_TEXT N_("Image hue (0-360)")
-#define HUE_LONGTEXT N_("Set the image hue, between 0 and 360. Defaults to 0")
+#define HUE_LONGTEXT N_("Set the image hue, between 0 and 360. Defaults to 0.")
 #define SAT_TEXT N_("Image saturation (0-3)")
-#define SAT_LONGTEXT N_("Set the image saturation, between 0 and 3. Defaults to 1")
+#define SAT_LONGTEXT N_("Set the image saturation, between 0 and 3. Defaults to 1.")
 #define LUM_TEXT N_("Image brightness (0-2)")
-#define LUM_LONGTEXT N_("Set the image brightness, between 0 and 2. Defaults to 1")
+#define LUM_LONGTEXT N_("Set the image brightness, between 0 and 2. Defaults to 1.")
 #define GAMMA_TEXT N_("Image gamma (0-10)")
-#define GAMMA_LONGTEXT N_("Set the image gamma, between 0.01 and 10. Defaults to 1")
+#define GAMMA_LONGTEXT N_("Set the image gamma, between 0.01 and 10. Defaults to 1.")
 
 
 vlc_module_begin();

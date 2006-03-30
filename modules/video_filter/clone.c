@@ -53,11 +53,12 @@ static int  SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define COUNT_TEXT N_("Number of clones")
-#define COUNT_LONGTEXT N_("Select the number of video windows in which to "\
+#define COUNT_LONGTEXT N_("Number of video windows in which to "\
     "clone the video.")
 
-#define VOUTLIST_TEXT N_("List of video output modules")
-#define VOUTLIST_LONGTEXT N_("Select the specific video output modules that you want to activate.")
+#define VOUTLIST_TEXT N_("Video output modules")
+#define VOUTLIST_LONGTEXT N_("You can use specific video output modules " \
+        "for the clones. Use a comma-separated list of modules." )
 
 vlc_module_begin();
     set_description( _("Clone video filter") );

@@ -87,38 +87,80 @@ struct filter_sys_t
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ALPHA_TEXT N_("Alpha blending")
-#define ALPHA_LONGTEXT N_("Alpha blending (0 -> 255). Default is 255")
+#define ALPHA_TEXT N_("Transparency")
+#define ALPHA_LONGTEXT N_("Transparency of the mosaic foreground pictures. " \
+        "0 means transparent, 255 opaque (default)." )
 
-#define HEIGHT_TEXT N_("Height in pixels")
-#define WIDTH_TEXT N_("Width in pixels")
-#define XOFFSET_TEXT N_("Top left corner x coordinate")
-#define YOFFSET_TEXT N_("Top left corner y coordinate")
-#define VBORDER_TEXT N_("Vertical border width in pixels")
-#define HBORDER_TEXT N_("Horizontal border width in pixels")
-#define ALIGN_TEXT N_("Mosaic alignment")
+#define HEIGHT_TEXT N_("Height")
+#define HEIGHT_LONGTEXT N_( "Total height of the mosaic, in pixels." )
+#define WIDTH_TEXT N_("Width")
+#define WIDTH_LONGTEXT N_( "Total width of the mosaic, in pixels." )
+
+#define XOFFSET_TEXT N_("Top left corner X coordinate")
+#define XOFFSET_LONGTEXT N_("X Coordinate of the top-left corner of the mosaic.")
+#define YOFFSET_TEXT N_("Top left corner Y coordinate")
+#define YOFFSET_LONGTEXT N_("Y Coordinate of the top-left corner of the mosaic.")
+#define VBORDER_TEXT N_("Vertical border width")
+#define VBORDER_LONGTEXT N_( "With in pixels of the border than can be drawn " \
+        "vertically around the mosaic" )
+#define HBORDER_TEXT N_("Horizontal border width")
+#define HBORDER_LONGTEXT N_( "With in pixels of the border than can be drawn " \
+        "horizontally around the mosaic" )
+
+#define ALIGN_TEXT N_("Mosaic alignment" )
+#define ALIGN_LONGTEXT N_( \
+  "You can enforce the mosaic alignment on the video " \
+  "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
+  "also use combinations of these values, eg 6 = top-right).")
 
 #define POS_TEXT N_("Positioning method")
-#define POS_LONGTEXT N_("Positioning method. auto: automatically choose " \
-        "the best number of rows and columns. fixed: use the user-defined " \
-        "number of rows and columns.")
-#define ROWS_TEXT N_("Number of rows")
-#define COLS_TEXT N_("Number of columns")
-#define AR_TEXT N_("Keep aspect ratio when resizing")
-#define KEEP_TEXT N_("Keep original size")
+#define POS_LONGTEXT N_("Positioning method for the mosaic. auto: " \
+        "automatically choose the best number of rows and columns. " \
+        "fixed: use the user-defined number of rows and columns.")
 
-#define ORDER_TEXT N_("Order as a comma separated list of picture-id(s)")
+#define ROWS_TEXT N_("Number of rows")
+#define ROWS_LONGTEXT N_("Number of image rows in the mosaic (only used if "\
+        "positionning method is set to \"fixed\"." )
+#define COLS_TEXT N_("Number of columns")
+#define COLS_LONGTEXT N_("Number of image columns in the mosaic (only used if "\
+        "positionning method is set to \"fixed\"." )
+
+#define AR_TEXT N_("Keep aspect ratio")
+#define AR_LONGTEXT N_("Keep the original aspect ratio when resizing " \
+        "mosaic elements." )
+#define KEEP_TEXT N_("Keep original size")
+#define KEEP_LONGTEXT N_("Keep the original size of mosaic elements." )
+
+#define ORDER_TEXT N_("Elements order" )
+#define ORDER_LONGTEXT N_( "You can enforce the order of the elements on " \
+        "the mosaic. You must give a comma-separated list of picture ID(s)." \
+        "These IDs are assigned in the \"mosaic-bridge\" module." )
 
 #define DELAY_TEXT N_("Delay")
-#define DELAY_LONGTEXT N_("Pictures coming from the picture video outputs " \
-        "will be delayed accordingly (in milliseconds). For high " \
-        "values you will need to raise file-caching and others.")
+#define DELAY_LONGTEXT N_("Pictures coming from the mosaic elements " \
+        "will be delayed according to this value (in milliseconds). For high " \
+        "values you will need to raise caching at input.")
 
-#define BLUESCREEN_TEXT N_("Enable bluescreen (aka greenscreen or chroma key) video background replacing")
-#define BLUESCREENU_TEXT N_("Bluescreen chroma key U (0-255)")
-#define BLUESCREENV_TEXT N_("Bluescreen chroma key V (0-255)")
-#define BLUESCREENUTOL_TEXT N_("Bluescreen chroma key U tolerance")
-#define BLUESCREENVTOL_TEXT N_("Bluescreen chroma key V tolerance")
+#define BLUESCREEN_TEXT N_("Bluescreen" )
+#define BLUESCREEN_LONGTEXT N_( "This effect, also known as \"greenscreen\" "\
+   "or \"chroma key\" blends the \"blue parts\" of the foreground images of " \
+   "the mosaic on the background (like wheather forecast presenters). You " \
+   "can choose the \"key\" color for blending (blue by default)." )
+
+#define BLUESCREENU_TEXT N_("Bluescreen U value")
+#define BLUESCREENU_LONGTEXT N_("\"U\" value for the bluescreen key color " \
+        "(in YUV values). From 0 to 255. Defaults to 120 for blue." )
+#define BLUESCREENV_TEXT N_("Bluescreen V value")
+#define BLUESCREENV_LONGTEXT N_("\"V\" value for the bluescreen key color " \
+        "(in YUV values). From 0 to 255. Defaults to 90 for blue." )
+#define BLUESCREENUTOL_TEXT N_("Bluescreen U tolerance")
+#define BLUESCREENUTOL_LONGTEXT N_("Tolerance of the bluescreen blender " \
+        "on color variations for the U plane. A value between 10 and 20 " \
+        "seems sensible." )
+#define BLUESCREENVTOL_TEXT N_("Bluescreen V tolerance")
+#define BLUESCREENVTOL_LONGTEXT N_("Tolerance of the bluescreen blender " \
+        "on color variations for the V plane. A value between 10 and 20 " \
+        "seems sensible." )
 
 static int pi_pos_values[] = { 0, 1 };
 static char * ppsz_pos_descriptions[] =
@@ -139,36 +181,36 @@ vlc_module_begin();
     set_callbacks( CreateFilter, DestroyFilter );
 
     add_integer( "mosaic-alpha", 255, NULL, ALPHA_TEXT, ALPHA_LONGTEXT, VLC_FALSE );
-    add_integer( "mosaic-height", 100, NULL, HEIGHT_TEXT, HEIGHT_TEXT, VLC_FALSE );
-    add_integer( "mosaic-width", 100, NULL, WIDTH_TEXT, WIDTH_TEXT, VLC_FALSE );
-    add_integer( "mosaic-align", 5, NULL, ALIGN_TEXT, ALIGN_TEXT, VLC_TRUE);
+    add_integer( "mosaic-height", 100, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
+    add_integer( "mosaic-width", 100, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
+    add_integer( "mosaic-align", 5, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE);
         change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
-    add_integer( "mosaic-xoffset", 0, NULL, XOFFSET_TEXT, XOFFSET_TEXT, VLC_TRUE );
-    add_integer( "mosaic-yoffset", 0, NULL, YOFFSET_TEXT, YOFFSET_TEXT, VLC_TRUE );
-    add_integer( "mosaic-vborder", 0, NULL, VBORDER_TEXT, VBORDER_TEXT, VLC_TRUE );
-    add_integer( "mosaic-hborder", 0, NULL, HBORDER_TEXT, HBORDER_TEXT, VLC_TRUE );
+    add_integer( "mosaic-xoffset", 0, NULL, XOFFSET_TEXT, XOFFSET_LONGTEXT, VLC_TRUE );
+    add_integer( "mosaic-yoffset", 0, NULL, YOFFSET_TEXT, YOFFSET_LONGTEXT, VLC_TRUE );
+    add_integer( "mosaic-vborder", 0, NULL, VBORDER_TEXT, VBORDER_LONGTEXT, VLC_TRUE );
+    add_integer( "mosaic-hborder", 0, NULL, HBORDER_TEXT, HBORDER_LONGTEXT, VLC_TRUE );
 
     add_integer( "mosaic-position", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_integer( "mosaic-rows", 2, NULL, ROWS_TEXT, ROWS_TEXT, VLC_FALSE );
-    add_integer( "mosaic-cols", 2, NULL, COLS_TEXT, COLS_TEXT, VLC_FALSE );
-    add_bool( "mosaic-keep-aspect-ratio", 0, NULL, AR_TEXT, AR_TEXT, VLC_FALSE );
-    add_bool( "mosaic-keep-picture", 0, NULL, KEEP_TEXT, KEEP_TEXT, VLC_FALSE );
-    add_string( "mosaic-order", "", NULL, ORDER_TEXT, ORDER_TEXT, VLC_FALSE );
+    add_integer( "mosaic-rows", 2, NULL, ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
+    add_integer( "mosaic-cols", 2, NULL, COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
+    add_bool( "mosaic-keep-aspect-ratio", 0, NULL, AR_TEXT, AR_LONGTEXT, VLC_FALSE );
+    add_bool( "mosaic-keep-picture", 0, NULL, KEEP_TEXT, KEEP_LONGTEXT, VLC_FALSE );
+    add_string( "mosaic-order", "", NULL, ORDER_TEXT, ORDER_LONGTEXT, VLC_FALSE );
 
     add_integer( "mosaic-delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
                  VLC_FALSE );
 
     add_bool( "mosaic-bs", 0, NULL, BLUESCREEN_TEXT,
-              BLUESCREEN_TEXT, VLC_FALSE );
+              BLUESCREEN_LONGTEXT, VLC_FALSE );
     add_integer( "mosaic-bsu", 120, NULL, BLUESCREENU_TEXT,
-                 BLUESCREENU_TEXT, VLC_FALSE );
+                 BLUESCREENU_LONGTEXT, VLC_FALSE );
     add_integer( "mosaic-bsv", 90, NULL, BLUESCREENV_TEXT,
-                 BLUESCREENV_TEXT, VLC_FALSE );
+                 BLUESCREENV_LONGTEXT, VLC_FALSE );
     add_integer( "mosaic-bsut", 17, NULL, BLUESCREENUTOL_TEXT,
-                 BLUESCREENUTOL_TEXT, VLC_FALSE );
+                 BLUESCREENUTOL_LONGTEXT, VLC_FALSE );
     add_integer( "mosaic-bsvt", 17, NULL, BLUESCREENVTOL_TEXT,
-                 BLUESCREENVTOL_TEXT, VLC_FALSE );
+                 BLUESCREENVTOL_LONGTEXT, VLC_FALSE );
 
     var_Create( p_module->p_libvlc, "mosaic-lock", VLC_VAR_MUTEX );
 vlc_module_end();

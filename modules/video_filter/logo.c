@@ -66,24 +66,29 @@ static int LogoCallback( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define FILE_TEXT N_("Logo filenames")
-#define FILE_LONGTEXT N_("Full path of the image files to use. Format is <image>[,<delay in ms>[,<alpha>]][;<image>[,<delay>[,<alpha>]]][;...] .")
+#define FILE_LONGTEXT N_("Full path of the image files to use. Format is " \
+"<image>[,<delay in ms>[,<alpha>]][;<image>[,<delay>[,<alpha>]]][;...]. " \
+"If you only have one file, simply enter its filename.")
 #define REPEAT_TEXT N_("Logo animation # of loops")
-#define REPEAT_LONGTEXT N_("How many times to animate the logo images, -1 = continuous, 0 = disabled")
+#define REPEAT_LONGTEXT N_("Number of loops for the logo animation." \
+        "1 = continuous, 0 = disabled")
 #define DELAY_TEXT N_("Logo individual image time in ms")
-#define DELAY_LONGTEXT N_("Individual image display time of 0 - 60000 ms")
+#define DELAY_LONGTEXT N_("Individual image display time of 0 - 60000 ms.")
 
-#define POSX_TEXT N_("X coordinate of the logo")
-#define POSX_LONGTEXT N_("You can move the logo by left-clicking on it." )
-#define POSY_TEXT N_("Y coordinate of the logo")
-#define POSY_LONGTEXT N_("You can move the logo by left-clicking on it." )
+#define POSX_TEXT N_("X coordinate")
+#define POSX_LONGTEXT N_("X coordinate of the logo. You can move the logo " \
+                "by left-clicking it." )
+#define POSY_TEXT N_("Y coordinate")
+#define POSY_LONGTEXT N_("Y coordinate of the logo. You can move the logo " \
+                "by left-clicking it." )
 #define TRANS_TEXT N_("Transparency of the logo")
-#define TRANS_LONGTEXT N_("You can set the logo transparency value here " \
+#define TRANS_LONGTEXT N_("Logo transparency value " \
   "(from 0 for full transparency to 255 for full opacity)." )
 #define POS_TEXT N_("Logo position")
 #define POS_LONGTEXT N_( \
-  "You can enforce the logo position on the video " \
+  "Enforce the logo position on the video " \
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
-  "also use combinations of these values).")
+  "also use combinations of these values, eg 6 = top-right).")
 
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_pos_descriptions[] =

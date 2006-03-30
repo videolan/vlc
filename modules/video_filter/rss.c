@@ -118,38 +118,42 @@ struct filter_sys_t
     int i_cur_char;
 };
 
-#define MSG_TEXT N_("RSS/Atom feed URLs")
-#define MSG_LONGTEXT N_("RSS/Atom feed '|' (pipe) seperated URLs")
-#define SPEED_TEXT N_("RSS/Atom feed speed")
-#define SPEED_LONGTEXT N_("RSS/Atom feed speed (bigger is slower)")
-#define LENGTH_TEXT N_("RSS/Atom feed max number of chars displayed")
-#define LENGTH_LONGTEXT N_("RSS/Atom feed max number of chars displayed")
-#define TTL_TEXT N_("Number of seconds between each forced refresh of the feeds")
-#define TTL_LONGTEXT N_("Number of seconds between each forced refresh of the feeds. If 0, the feeds will never be updated.")
-#define IMAGE_TEXT N_("Display feed images if available")
-#define IMAGE_LONGTEXT N_("Display feed images if available")
+#define MSG_TEXT N_("Feed URLs")
+#define MSG_LONGTEXT N_("RSS/Atom feed '|' (pipe) seperated URLs.")
+#define SPEED_TEXT N_("Feeds speed")
+#define SPEED_LONGTEXT N_("RSS/Atom feeds speed (bigger is slower).")
+#define LENGTH_TEXT N_("Max length")
+#define LENGTH_LONGTEXT N_("Maximum number of characters displayed on the " \
+                "screen." )
+#define TTL_TEXT N_("Refresh time")
+#define TTL_LONGTEXT N_("Number of seconds between each forced refresh " \
+        "of the feeds. 0 means that the feeds are never updated." )
+#define IMAGE_TEXT N_("Feed images")
+#define IMAGE_LONGTEXT N_("Display feed images if available.")
 
-#define POSX_TEXT N_("X offset, from left")
-#define POSX_LONGTEXT N_("X offset, from the left screen edge" )
-#define POSY_TEXT N_("Y offset, from the top")
-#define POSY_LONGTEXT N_("Y offset, down from the top" )
+#define POSX_TEXT N_("X offset")
+#define POSX_LONGTEXT N_("X offset, from the left screen edge." )
+#define POSY_TEXT N_("Y offset")
+#define POSY_LONGTEXT N_("Y offset, down from the top." )
 #define OPACITY_TEXT N_("Opacity")
-#define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of " \
+#define OPACITY_LONGTEXT N_("Opacity (inverse of transparency) of " \
     "overlay text. 0 = transparent, 255 = totally opaque. " )
+
 #define SIZE_TEXT N_("Font size, pixels")
-#define SIZE_LONGTEXT N_("Specify the font size, in pixels, " \
-    "with -1 = use freetype-fontsize" )
+#define SIZE_LONGTEXT N_("Font size, in pixels. Default is -1 (use default " \
+    "font size)." )
 
-#define COLOR_TEXT N_("Text Default Color")
-#define COLOR_LONGTEXT N_("The color of overlay text. 1 byte for each color, hexadecimal. " \
-    "#000000 = all colors off, " \
-    "0xFF0000 = just Red, 0xFFFFFF = all color on [White]" )
+#define COLOR_TEXT N_("Color")
+#define COLOR_LONGTEXT N_("Color of the text that will be rendered on "\
+    "the video. This must be an hexadecimal (like HTML colors). The first two "\
+    "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\
+    " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white" )
 
-#define POS_TEXT N_("Marquee position")
+#define POS_TEXT N_("Text position")
 #define POS_LONGTEXT N_( \
-  "You can enforce the marquee position on the video " \
+  "You can enforce the text position on the video " \
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
-  "also use combinations of these values by adding them).")
+  "also use combinations of these values, eg 6 = top-right).")
 
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_pos_descriptions[] =

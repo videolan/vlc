@@ -51,19 +51,20 @@ static int  SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define COLS_TEXT N_("Number of columns")
-#define COLS_LONGTEXT N_("Select the number of horizontal video windows in " \
+#define COLS_LONGTEXT N_("Number of horizontal windows in " \
     "which to split the video.")
 
 #define ROWS_TEXT N_("Number of rows")
-#define ROWS_LONGTEXT N_("Select the number of vertical video windows in " \
+#define ROWS_LONGTEXT N_("Number of vertical windows in " \
     "which to split the video.")
 
 #define ACTIVE_TEXT N_("Active windows")
-#define ACTIVE_LONGTEXT N_("Comma separated list of active windows, " \
+#define ACTIVE_LONGTEXT N_("Comma-separated list of active windows, " \
     "defaults to all")
 
 #define ASPECT_TEXT N_("Element aspect ratio")
-#define ASPECT_LONGTEXT N_("The aspect ratio of the individual displays building the display wall")
+#define ASPECT_LONGTEXT N_("Aspect ratio of the individual displays " \
+   "building the wall.")
 
 vlc_module_begin();
     set_description( _("Wall video filter") );

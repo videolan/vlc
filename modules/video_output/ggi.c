@@ -53,9 +53,9 @@ static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t *
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define DISPLAY_TEXT N_("X11 display name")
+#define DISPLAY_TEXT N_("X11 display")
 #define DISPLAY_LONGTEXT N_( \
-            "Specify the X11 hardware display you want to use.\n" \
+            "X11 hardware display to use.\n" \
             "By default, VLC will use the value of the DISPLAY " \
             "environment variable.")
 
