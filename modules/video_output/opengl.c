@@ -116,7 +116,8 @@ static int SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define SPEED_TEXT N_( "OpenGL cube rotation speed" )
-#define SPEED_LONGTEXT N_( "Rotation speed of the OpenGL cube effect, if "\                                "enabled." )
+#define SPEED_LONGTEXT N_( "Rotation speed of the OpenGL cube effect, if " \
+        "enabled." )
 
 #define EFFECT_TEXT N_("Effect")
 #define EFFECT_LONGTEXT N_( \
