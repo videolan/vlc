@@ -98,6 +98,7 @@ Morten Brix Pedersen <morten at wtf.dk> - Danish translation
 Nilmoni Deb <ndeb at ece.cmu.edu> - autoconf and Makefile fixes
 Olivier Aubert <oaubert at bat710.univ-lyon1.fr> - clone list patch
 Olivier Pomel <pomel at via.ecp.fr> - original VLC code
+Ondrej Kuda aka Albert <kuda at natur dot cuni dot cz> - HTTP interface tips and fixes
 Øyvind Kolbu <oyvindk at world-online.no> - FreeBSD patches
 Patrick Horn <patrickd0thorn at mindspring d0t com> - DirectShow patch
 Paul Mackerras <paulus at linuxcare.com.au> - AltiVec IDCT and motion
