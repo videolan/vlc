@@ -110,10 +110,11 @@ public:
     inline BOOL getAutoLoop(void) { return _b_autoloop;};
 
     void setVolume(int volume);
-    BOOL getVolume(void) { return _i_volume; };
+    int getVolume(void) { return _i_volume; };
 
     void setVisible(BOOL fVisible);
     BOOL getVisible(void) { return _b_visible; };
+    BOOL isVisible(void) { return _b_visible || (! _b_usermode); };
 
     void setTime(int time);
     int  getTime(void) { return _i_time; };

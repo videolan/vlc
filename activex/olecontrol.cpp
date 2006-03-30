@@ -40,18 +40,18 @@ STDMETHODIMP VLCOleControl::GetControlInfo(CONTROLINFO *pCI)
 
 STDMETHODIMP VLCOleControl::OnMnemonic(LPMSG pMsg)
 {
-    return E_NOTIMPL;
+    return S_OK;
 };
 
 STDMETHODIMP VLCOleControl::OnAmbientPropertyChange(DISPID dispID)
 {
     HRESULT hr;
-    IOleObject *oleObj;
+    LPOLEOBJECT oleObj;
 
     hr = QueryInterface(IID_IOleObject, (LPVOID *)&oleObj);
     if( SUCCEEDED(hr) )
     {
-        IOleClientSite *clientSite;
+        LPOLECLIENTSITE clientSite;
 
         hr = oleObj->GetClientSite(&clientSite);
         if( SUCCEEDED(hr) && (NULL != clientSite) )

@@ -73,8 +73,7 @@ public:
 
 private:
 
-    HRESULT doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite, HWND hwndParent, LPCRECT lprcPosRect);
-    HRESULT doUIActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite, HWND hwndParent, LPCRECT lprcPosRect);
+    HRESULT doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite, HWND hwndParent, LPCRECT lprcPosRect, BOOL uiActivate);
 
     IOleAdviseHolder *_p_advise_holder;
     IOleClientSite *_p_clientsite;

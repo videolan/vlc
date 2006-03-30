@@ -802,9 +802,6 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
 
     SetWindowLongPtr(_videownd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
-    if( getVisible() )
-        ShowWindow(_inplacewnd, SW_SHOW);
-
     if( _b_usermode )
     {
         /* will run vlc if not done already */
@@ -831,6 +828,10 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
             fireOnPlayEvent();
         }
     }
+
+    if( isVisible() )
+        ShowWindow(_inplacewnd, SW_SHOW);
+
     return S_OK;
 };
 
@@ -914,7 +915,7 @@ BOOL VLCPlugin::hasFocus(void)
 void VLCPlugin::onDraw(DVTARGETDEVICE * ptd, HDC hicTargetDev,
         HDC hdcDraw, LPCRECTL lprcBounds, LPCRECTL lprcWBounds)
 {
-    if( getVisible() )
+    if( isVisible() )
     {
         long width = lprcBounds->right-lprcBounds->left;
         long height = lprcBounds->bottom-lprcBounds->top;
@@ -976,7 +977,7 @@ void VLCPlugin::onDraw(DVTARGETDEVICE * ptd, HDC hicTargetDev,
 
 void VLCPlugin::onPaint(HDC hdc, const RECT &bounds, const RECT &clipRect)
 {
-    if( getVisible() )
+    if( isVisible() )
     {
         /** if VLC is playing, it may not display any VIDEO content 
         ** hence, draw control logo*/
