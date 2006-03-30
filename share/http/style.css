@@ -37,7 +37,7 @@ div {
 }
 
 div.dialog {
-	width: 600px;
+	width: 440pt;
 	background: #fff;
 	border: solid #000 1px;
 	margin: 10px auto; /* Center on page - Firefox */
