@@ -204,7 +204,8 @@ static int DecoderOpen( vlc_object_t *p_this )
     if( p_dec->fmt_in.audio.i_channels <= 0 ||
         p_dec->fmt_in.audio.i_channels > 8 )
     {
-        msg_Err( p_dec, "bad channels count (1-8)" );
+        msg_Err( p_dec, "bad channels count (1-8): %i",
+                 p_dec->fmt_in.audio.i_channels );
         return VLC_EGENERIC;
     }
 

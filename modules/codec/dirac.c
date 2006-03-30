@@ -65,7 +65,7 @@ static const char *ppsz_enc_options[] = {
  *****************************************************************************/
 #define ENC_QUALITY_TEXT N_("Encoding quality")
 #define ENC_QUALITY_LONGTEXT N_( \
-  "Allows you to specify a quality between 1.0 (low) and 10.0 (high)." )
+  "Quality of the encoding between 1.0 (low) and 10.0 (high)." )
 
 vlc_module_begin();
     set_category( CAT_INPUT );

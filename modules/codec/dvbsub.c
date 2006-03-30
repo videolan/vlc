@@ -3,7 +3,7 @@
  *            DVB subtitles encoder (developed for Anevia, www.anevia.com)
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
- * Copyright (C) 2003-2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2003-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -52,7 +52,7 @@
 #define POS_LONGTEXT N_( \
   "You can enforce the subpicture position on the video " \
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
-  "also use combinations of these values).")
+  "also use combinations of these values (e.g. 6=top-right)).")
 
 #define ENC_POSX_TEXT N_("X coordinate of the encoded subpicture")
 #define ENC_POSX_LONGTEXT N_("You can reposition the subpicture by providing another value here." )
@@ -102,7 +102,7 @@ vlc_module_begin();
 
     add_integer( ENC_CFG_PREFIX "x", -1, NULL, ENC_POSX_TEXT, ENC_POSX_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "y", -1, NULL, ENC_POSY_TEXT, ENC_POSY_LONGTEXT, VLC_FALSE );
-    add_integer( ENC_CFG_PREFIX "timeout", 15, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT, VLC_FALSE );    
+    add_integer( ENC_CFG_PREFIX "timeout", 15, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
 static const char *ppsz_enc_options[] = { NULL };
@@ -922,7 +922,7 @@ static void decode_object( decoder_t *p_dec, bs_t *s )
 
     if( i_coding_method > 1 )
     {
-        msg_Dbg( p_dec, "Unknown DVB subtitling coding %d is not handled!", i_coding_method );
+        msg_Dbg( p_dec, "unknown DVB subtitling coding %d is not handled!", i_coding_method );
         bs_skip( s, 8 * (i_segment_length - 2) - 6 );
         return;
     }

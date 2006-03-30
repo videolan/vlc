@@ -13,6 +13,7 @@ SOURCES_speex = speex.c
 SOURCES_adpcm = adpcm.c
 SOURCES_mpeg_audio = mpeg_audio.c
 SOURCES_libmpeg2 = libmpeg2.c
+SOURCES_libvc1 = libvc1.c
 SOURCES_rawvideo = rawvideo.c
 SOURCES_quicktime = quicktime.c
 SOURCES_subsdec = subsdec.c

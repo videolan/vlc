@@ -98,7 +98,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_decode_sub = DecodeBlock;
 
 #ifdef CMML_DEBUG
-    msg_Dbg( p_dec, "I am at %p", p_dec );
+    msg_Dbg( p_dec, "i am at %p", p_dec );
 #endif
 
     /* Allocate the memory needed to store the decoder's structure */

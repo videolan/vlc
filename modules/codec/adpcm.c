@@ -147,7 +147,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( p_dec->fmt_in.audio.i_channels <= 0 ||
         p_dec->fmt_in.audio.i_channels > 5 )
     {
-        msg_Err( p_dec, "bad channels count(1-5)" );
+        msg_Err( p_dec, "invalid number of channel (not between 1 and 5): %i", 
+                 p_dec->fmt_in.audio.i_channels );
         return VLC_EGENERIC;
     }
 
@@ -236,7 +237,7 @@ static int OpenDecoder( vlc_object_t *p_this )
             p_dec->fmt_in.audio.i_channels;
     }
 
-    msg_Dbg( p_dec, "format: samplerate:%dHz channels:%d bits/sample:%d "
+    msg_Dbg( p_dec, "format: samplerate:%d Hz channels:%d bits/sample:%d "
              "blockalign:%d samplesperblock:%d",
              p_dec->fmt_in.audio.i_rate, p_dec->fmt_in.audio.i_channels,
              p_dec->fmt_in.audio.i_bitspersample, p_sys->i_block,
