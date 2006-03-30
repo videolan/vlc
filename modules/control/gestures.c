@@ -80,7 +80,7 @@ static void RunIntf        ( intf_thread_t *p_intf );
 
 #define BUTTON_TEXT N_( "Trigger button" )
 #define BUTTON_LONGTEXT N_( \
-    "You can set the trigger button for mouse gestures here." )
+    "Trigger button for mouse gestures." )
 
 static char *button_list[] = { "left", "middle", "right" };
 static char *button_list_text[] = { N_("Left"), N_("Middle"), N_("Right") };

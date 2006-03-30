@@ -33,26 +33,29 @@ static void Close( vlc_object_t * );
 
 #define HOST_TEXT N_( "Host address" )
 #define HOST_LONGTEXT N_( \
-    "Address and port the http interface will bind to" )
+    "Address and port the HTTP interface will listen on. It defaults to " \
+    "all network interfaces (0.0.0.0)." \
+    " If you want the telnet interface to be available only on the local " \
+    "machine, enter 127.0.0.1" )
 #define SRC_TEXT N_( "Source directory" )
 #define SRC_LONGTEXT N_( "Source directory" )
 #define CHARSET_TEXT N_( "Charset" )
 #define CHARSET_LONGTEXT N_( \
-        "Charset declared in Content-Type header (default UTF-8)" )
+        "Charset declared in Content-Type header (default UTF-8)." )
 #define HANDLERS_TEXT N_( "Handlers" )
 #define HANDLERS_LONGTEXT N_( \
         "List of handler extensions and executable paths (for instance: " \
-        "php=/usr/bin/php,pl=/usr/bin/perl)" )
+        "php=/usr/bin/php,pl=/usr/bin/perl)." )
 #define CERT_TEXT N_( "Certificate file" )
 #define CERT_LONGTEXT N_( "HTTP interface x509 PEM certificate file " \
-                          "(enables SSL)" )
+                          "(enables SSL)." )
 #define KEY_TEXT N_( "Private key file" )
-#define KEY_LONGTEXT N_( "HTTP interface x509 PEM private key file" )
+#define KEY_LONGTEXT N_( "HTTP interface x509 PEM private key file." )
 #define CA_TEXT N_( "Root CA file" )
 #define CA_LONGTEXT N_( "HTTP interface x509 PEM trusted root CA " \
-                        "certificates file" )
+                        "certificates file." )
 #define CRL_TEXT N_( "CRL file" )
-#define CRL_LONGTEXT N_( "HTTP interace Certificates Revocation List file" )
+#define CRL_LONGTEXT N_( "HTTP interace Certificates Revocation List file." )
 
 vlc_module_begin();
     set_shortname( _("HTTP"));

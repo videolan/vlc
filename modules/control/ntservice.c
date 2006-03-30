@@ -38,21 +38,21 @@ static void Close   ( vlc_object_t * );
 
 #define INSTALL_TEXT N_( "Install Windows Service" )
 #define INSTALL_LONGTEXT N_( \
-    "If enabled the interface will install the Service and exit." )
+    "Install the Service and exit." )
 #define UNINSTALL_TEXT N_( "Uninstall Windows Service" )
 #define UNINSTALL_LONGTEXT N_( \
-    "If enabled the interface will uninstall the Service and exit." )
+    "Uninstall the Service and exit." )
 #define NAME_TEXT N_( "Display name of the Service" )
 #define NAME_LONGTEXT N_( \
     "Change the display name of the Service." )
 #define OPTIONS_TEXT N_("Configuration options")
 #define OPTIONS_LONGTEXT N_( \
-    "Specify configuration options that will be " \
+    "Configuration options that will be " \
     "used by the Service (eg. --foo=bar --no-foobar). It should be specified "\
     "at install time so the Service is properly configured.")
 #define EXTRAINTF_TEXT N_("Extra interface modules")
 #define EXTRAINTF_LONGTEXT N_( \
-    "Select additional interfaces spawned by the " \
+    "Additional interfaces spawned by the " \
     "Service. It should be specified at install time so the Service is " \
     "properly configured. Use a comma separated list of interface modules. " \
     "(common values are: logger, sap, rc, http)")

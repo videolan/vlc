@@ -56,12 +56,12 @@ static void Close   ( vlc_object_t * );
 
 static mtime_t GetClockRef( intf_thread_t *, mtime_t );
 
-#define NETSYNC_TEXT N_( "Act as master for network synchronisation" )
-#define NETSYNC_LONGTEXT N_( "Specify if this client should " \
-  "act as the master client for the network synchronisation." )
+#define NETSYNC_TEXT N_( "Act as master" )
+#define NETSYNC_LONGTEXT N_( "Should " \
+  "act as the master client for the network synchronisation?" )
 
 #define MIP_TEXT N_( "Master client ip address" )
-#define MIP_LONGTEXT N_( "Specify the ip address of " \
+#define MIP_LONGTEXT N_( "IP address of " \
   "the master client used for the network synchronisation." )
 
 vlc_module_begin();

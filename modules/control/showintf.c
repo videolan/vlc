@@ -60,7 +60,7 @@ static int  MouseEvent( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define THRESHOLD_TEXT N_( "Threshold" )
-#define THRESHOLD_LONGTEXT N_( "Height of the zone triggering the interface" )
+#define THRESHOLD_LONGTEXT N_( "Height of the zone triggering the interface." )
 
 vlc_module_begin();
     set_shortname( "Showintf" );
