@@ -42,7 +42,7 @@
 
 #define RECORD_PATH_TXT N_("Record directory")
 #define RECORD_PATH_LONGTXT N_( \
-    "Allows you to specify the directory where the record will be stored" )
+    "Directory where the record will be stored." )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );

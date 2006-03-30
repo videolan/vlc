@@ -74,21 +74,21 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for UDP streams. This " \
-    "value should be set in millisecond units." )
+    "Default caching value for outbound UDP streams. This " \
+    "value should be set in milliseconds." )
 
 #define TTL_TEXT N_("Time-To-Live (TTL)")
-#define TTL_LONGTEXT N_("Allows you to define the Time-To-Live of the " \
+#define TTL_LONGTEXT N_("Time-To-Live of the " \
                         "outgoing stream.")
 
 #define GROUP_TEXT N_("Group packets")
 #define GROUP_LONGTEXT N_("Packets can be sent one by one at the right time " \
-                          "or by groups. This allows you to give the number " \
+                          "or by groups. You can choose the number " \
                           "of packets that will be sent at a time. It " \
                           "helps reducing the scheduling load on " \
                           "heavily-loaded systems." )
 #define RAW_TEXT N_("Raw write")
-#define RAW_LONGTEXT N_("If you enable this option, packets will be sent " \
+#define RAW_LONGTEXT N_("Packets will be sent " \
                        "directly, without trying to fill the MTU (ie, " \
                        "without trying to make the biggest possible packets " \
                        "in order to improve streaming)." )

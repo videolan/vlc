@@ -58,32 +58,33 @@ static void Close( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-http-"
 
 #define USER_TEXT N_("Username")
-#define USER_LONGTEXT N_("Allows you to give a user name that will be " \
+#define USER_LONGTEXT N_("User name that will be " \
                          "requested to access the stream." )
 #define PASS_TEXT N_("Password")
-#define PASS_LONGTEXT N_("Allows you to give a password that will be " \
+#define PASS_LONGTEXT N_("Password that will be " \
                          "requested to access the stream." )
 #define MIME_TEXT N_("Mime")
-#define MIME_LONGTEXT N_("Allows you to give the mime returned by the server." )
+#define MIME_LONGTEXT N_("MIME returned by the server (autodetected " \
+                        "if not specified." )
 
 #define CERT_TEXT N_( "Certificate file" )
 #define CERT_LONGTEXT N_( "Path to the x509 PEM certificate file that will "\
-                          "be used by the HTTP/SSL stream output" )
+                          "be used for HTTPS." )
 #define KEY_TEXT N_( "Private key file" )
 #define KEY_LONGTEXT N_( "Path to the x509 PEM private key file that will " \
-                         " be used by the HTTP/SSL stream output. Leave " \
+                         " be used for HTTPS. Leave " \
                          "empty if you don't have one." )
 #define CA_TEXT N_( "Root CA file" )
 #define CA_LONGTEXT N_( "Path to the x509 PEM trusted root CA certificates " \
-                        "(certificate authority) file that will be used by " \
-                        "the HTTP/SSL stream output. Leave empty if you " \
+                        "(certificate authority) file that will be used for" \
+                        "HTTPS. Leave empty if you " \
                         "don't have one." )
 #define CRL_TEXT N_( "CRL file" )
 #define CRL_LONGTEXT N_( "Path to the x509 PEM Certificates Revocation List " \
-                         "file that will be HTTP/SSL stream output. Leave " \
+                         "file that will be used for SSL. Leave " \
                          "empty if you don't have one." )
 #define BONJOUR_TEXT N_( "Advertise with Bonjour")
-#define BONJOUR_LONGTEXT N_( "Advertise the stream with the Bonjour protocol" )
+#define BONJOUR_LONGTEXT N_( "Advertise the stream with the Bonjour protocol." )
 
 
 vlc_module_begin();

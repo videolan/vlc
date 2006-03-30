@@ -55,28 +55,31 @@ static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-shout-"
 
-#define NAME_TEXT N_("Stream-name")
-#define NAME_LONGTEXT N_("The name this stream/channel will get on the icecast server." )
+#define NAME_TEXT N_("Stream name")
+#define NAME_LONGTEXT N_("Name to give to this stream/channel on the " \
+                         "icecast server." )
 
-#define DESCRIPTION_TEXT N_("Stream-description")
-#define DESCRIPTION_LONGTEXT N_("A description of the stream content. (Information about " \
-                         "your channel)." )
+#define DESCRIPTION_TEXT N_("Stream description")
+#define DESCRIPTION_LONGTEXT N_("Description of the stream content or " \
+                                "information about your channel." )
 
 #define MP3_TEXT N_("Stream MP3")
-#define MP3_LONGTEXT N_("Normally you have to feed the shoutcast module with Ogg streams. " \
-                         "This option allows you to feed MP3 streams instead, so you can " \
-                         "forward MP3 streams to the icecast server." )
+#define MP3_LONGTEXT N_("You normally have to feed the shoutcast module " \
+                        "with Ogg streams. It is also possible to stream " \
+                        "MP3 instead, so you can "\
+                        "forward MP3 streams to the icecast server." )
 
 vlc_module_begin();
-    set_description( _("libshout (icecast) output") );
-    set_shortname( "Shout" );
+    set_description( _("IceCAST output") );
+    set_shortname( "Shoutcast" );
     set_capability( "sout access", 50 );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );
     add_shortcut( "shout" );
     add_string( SOUT_CFG_PREFIX "name", "VLC media player - Live stream", NULL,
                 NAME_TEXT, NAME_LONGTEXT, VLC_FALSE );
-    add_string( SOUT_CFG_PREFIX "description", "Live stream from VLC media player. " \
+    add_string( SOUT_CFG_PREFIX "description",
+                 "Live stream from VLC media player. " \
                 "http://www.videolan.org/vlc", NULL,
                 DESCRIPTION_TEXT, DESCRIPTION_LONGTEXT, VLC_FALSE );
     add_bool(   SOUT_CFG_PREFIX "mp3", VLC_FALSE, NULL,
