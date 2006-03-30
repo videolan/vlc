@@ -686,6 +686,11 @@ set_category( CAT_INTERFACE );
 set_subcategory( SUBCAT_INTERFACE_CONTROL );
 add_category_hint( N_( "Corba control" ), NULL, VLC_FALSE );
 
+#define REACTIVITY_TEXT N_("Reactivity" )
+#define REACTIVITY_LONGTEXT N_( \
+        "The corba interface will handle events every 50ms/Reactivity. " \
+        "5000 appears to be a sensible value." )
+
 set_description( _( "corba control module" ) );
 set_capability( "interface", 10 );
 add_integer( "corba-reactivity", 5000, NULL, "Internal reactivity factor", "Internal reactivity factor ( gtk timeout is INTF_IDLE_SLEEP / factor )", VLC_TRUE );
