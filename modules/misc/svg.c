@@ -44,6 +44,7 @@
 #include "vlc_block.h"
 #include "vlc_filter.h"
 
+#include <glib-object.h>                                  /* g_object_unref( ) */
 #include <librsvg-2/librsvg/rsvg.h>
 
 typedef struct svg_rendition_t svg_rendition_t;
@@ -53,8 +54,8 @@ typedef struct svg_rendition_t svg_rendition_t;
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
-static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
-                       subpicture_region_t *p_region_in );
+static int  RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
+                        subpicture_region_t *p_region_in );
 
 
 /*****************************************************************************
@@ -196,7 +197,7 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
                 msg_Dbg( p_this, "reading %ld bytes from template %s",
                          (unsigned long)s.st_size, psz_filename );
 
-                psz_template = malloc( s.st_size + 42 );
+                psz_template = malloc( ( s.st_size + 42 ) * sizeof( char ) );
                 if( !psz_template )
                 {
                     msg_Err( p_filter, "out of memory" );
@@ -260,8 +261,11 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 
     if( p_svg->p_rendition == NULL ) {
         svg_RenderPicture( p_filter, p_svg );
-        /* FIXME: should do a check here to ensure that
-           the rendition went OK */
+        if( ! p_svg )
+        {
+            msg_Err( p_filter, "Cannot render SVG" );
+            return VLC_EGENERIC;
+        }
     }
     i_width = gdk_pixbuf_get_width( p_svg->p_rendition );
     i_height = gdk_pixbuf_get_height( p_svg->p_rendition );
@@ -331,24 +335,24 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     if( !alpha )
       memset( p_a, 0xFF, i_pitch * p_region->fmt.i_height );
     */
- 
+
 #define INDEX_IN( x, y ) ( y * rowstride_in + x * channels_in )
 #define INDEX_OUT( x, y ) ( y * i_pitch + x * p_pic->p[Y_PLANE].i_pixel_pitch )
-  
+
     for( y = 0; y < i_height; y++ )
     {
         for( x = 0; x < i_width; x++ )
         {
             guchar *p_in;
             int i_out;
- 
+
             p_in = &pixels_in[INDEX_IN( x, y )];
-            
+
 #define R( pixel ) *pixel
 #define G( pixel ) *( pixel+1 )
 #define B( pixel ) *( pixel+2 )
 #define ALPHA( pixel ) *( pixel+3 )
- 
+
             /* From http://www.geocrawler.com/archives/3/8263/2001/6/0/6020594/ :
                Y = 0.29900 * R + 0.58700 * G + 0.11400 * B
                U = -0.1687 * r  - 0.3313 * g + 0.5 * b + 128
@@ -356,13 +360,13 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
             */
             if ( alpha ) {
                 i_out = INDEX_OUT( x, y );
-                
-                p_pic->Y_PIXELS[i_out] = .299 * R( p_in ) + .587 * G( p_in ) + .114 * B( p_in );
-                
-		p_pic->U_PIXELS[i_out] = -.1687 * R( p_in ) - .3313 * G( p_in ) + .5 * B( p_in ) + 128;
-		p_pic->V_PIXELS[i_out] = .5 * R( p_in ) - .4187 * G( p_in ) - .0813 * B( p_in ) + 128;
 
-		p_pic->A_PIXELS[i_out] = ALPHA( p_in );
+                p_pic->Y_PIXELS[i_out] = .299 * R( p_in ) + .587 * G( p_in ) + .114 * B( p_in );
+
+                p_pic->U_PIXELS[i_out] = -.1687 * R( p_in ) - .3313 * G( p_in ) + .5 * B( p_in ) + 128;
+                p_pic->V_PIXELS[i_out] = .5 * R( p_in ) - .4187 * G( p_in ) - .0813 * B( p_in ) + 128;
+
+                p_pic->A_PIXELS[i_out] = ALPHA( p_in );
             }
         }
     }
@@ -450,10 +454,11 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     else
     {
         /* Data is text. Convert to SVG */
+        /* FIXME: handle p_style attributes */
         int length;
         char* psz_template = p_sys->psz_template;
         length = strlen( psz_string ) + strlen( psz_template ) + 42;
-        p_svg->psz_text = malloc( length + 1 );
+        p_svg->psz_text = malloc( ( length + 1 ) * sizeof( char ) );
         if( !p_svg->psz_text )
         {
             msg_Err( p_filter, "out of memory" );
@@ -480,7 +485,11 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
 static void FreeString( svg_rendition_t *p_svg )
 {
-    free( p_svg->psz_text );
-    free( p_svg->p_rendition );
+    if( p_svg->psz_text )
+        free( p_svg->psz_text );
+    /* p_svg->p_rendition is a GdkPixbuf, and its allocation is
+       managed through ref. counting */
+    if( p_svg->p_rendition )
+        g_object_unref( p_svg->p_rendition );
     free( p_svg );
 }
