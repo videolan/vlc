@@ -821,35 +821,35 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL;
                  p_0xa9xxx = p_0xa9xxx->p_next )
             {
+                char *psz_utf = strdup( p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                if( psz_utf == NULL )
+                    continue;
+                /* FIXME FIXME: should convert from whatever the character
+                 * encoding of MP4 meta data is to UTF-8. */
+                EnsureUTF8( psz_utf );
+
                 switch( p_0xa9xxx->i_type )
                 {
                 case FOURCC_0xa9nam: /* Full name */
-                    vlc_meta_Add( meta, VLC_META_TITLE,
-                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    vlc_meta_Add( meta, VLC_META_TITLE, psz_utf );
                     break;
                 case FOURCC_0xa9aut:
-                    vlc_meta_Add( meta, VLC_META_AUTHOR,
-                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    vlc_meta_Add( meta, VLC_META_AUTHOR, psz_utf );
                     break;
                 case FOURCC_0xa9ART:
-                    vlc_meta_Add( meta, VLC_META_ARTIST,
-                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    vlc_meta_Add( meta, VLC_META_ARTIST, psz_utf );
                     break;
                 case FOURCC_0xa9cpy:
-                    vlc_meta_Add( meta, VLC_META_COPYRIGHT,
-                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    vlc_meta_Add( meta, VLC_META_COPYRIGHT, psz_utf );
                     break;
                 case FOURCC_0xa9day: /* Creation Date */
-                    vlc_meta_Add( meta, VLC_META_DATE,
-                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    vlc_meta_Add( meta, VLC_META_DATE, psz_utf );
                     break;
                 case FOURCC_0xa9des: /* Description */
-                    vlc_meta_Add( meta, VLC_META_DESCRIPTION,
-                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    vlc_meta_Add( meta, VLC_META_DESCRIPTION, psz_utf );
                     break;
                 case FOURCC_0xa9gen: /* Genre */
-                    vlc_meta_Add( meta, VLC_META_GENRE,
-                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    vlc_meta_Add( meta, VLC_META_GENRE, psz_utf );
                     break;
 
                 case FOURCC_0xa9swr:
@@ -878,6 +878,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 default:
                     break;
                 }
+                free( psz_utf );
             }
             return VLC_SUCCESS;
         }
