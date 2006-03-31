@@ -209,6 +209,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     int i_size;
 
     p_stream = stream_UrlNew( p_image->p_parent, psz_url );
+
     if( !p_stream )
     {
         msg_Dbg( p_image->p_parent, "could not open %s for reading",
@@ -219,6 +220,13 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     i_size = stream_Size( p_stream );
 
     p_block = block_New( p_image->p_parent, i_size );
+
+    if( !p_block )
+    {
+        msg_Dbg( p_image->p_parent, "error while allocating memory to read %s",
+                 psz_url );
+        return NULL;
+    }
 
     stream_Read( p_stream, p_block->p_buffer, i_size );
     stream_Delete( p_stream );
