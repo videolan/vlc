@@ -362,14 +362,14 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             {
                 char *psz_name = vlc_fix_readdir_charset( p_this,
                                                           ppsz_dir_content[a] );
+                char tmp_fname_noext[strlen( psz_name ) + 1];
+                char tmp_fname_trim[strlen( psz_name ) + 1];
+                char tmp_fname_ext[strlen( psz_name ) + 1];
+
                 int i_prio = 0;
 
                 if( psz_name == NULL )
                     continue;
-
-                char tmp_fname_noext[strlen( psz_name ) + 1];
-                char tmp_fname_trim[strlen( psz_name ) + 1];
-                char tmp_fname_ext[strlen( psz_name ) + 1];
 
                 /* retrieve various parts of the filename */
                 strcpy_strip_ext( tmp_fname_noext, psz_name );
