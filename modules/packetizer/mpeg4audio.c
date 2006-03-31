@@ -153,7 +153,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     /* Set callback */
     p_dec->pf_packetize = PacketizeBlock;
 
-    msg_Info( p_dec, "running MPEG4 audio packetizer" );
+    msg_Dbg( p_dec, "running MPEG4 audio packetizer" );
 
     if( p_dec->fmt_in.i_extra > 0 )
     {
