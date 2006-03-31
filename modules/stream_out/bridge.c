@@ -35,12 +35,13 @@
  *****************************************************************************/
 #define ID_TEXT N_("ID")
 #define ID_LONGTEXT N_( \
-    "Specify an identifier for this elementary stream." )
+    "Integer identifier for this elementary stream. This will be used to " \
+    "\"find\" this stream later." )
 
 #define DELAY_TEXT N_("Delay")
 #define DELAY_LONGTEXT N_("Pictures coming from the picture video outputs " \
-        "will be delayed accordingly (in milliseconds, >= 100 ms). For high " \
-        "values, you will need to raise file-caching and others.")
+        "will be delayed accord to thi value (in milliseconds, should be "\
+        ">= 100 ms). For high values, you will need to raise caching values." )
 
 #define ID_OFFSET_TEXT N_("ID Offset")
 #define ID_OFFSET_LONGTEXT N_("Offset to add to the stream IDs specified in " \
