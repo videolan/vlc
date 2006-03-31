@@ -102,7 +102,7 @@ static char *ppsz_tuner_input_text[] =
 #define FPS_TEXT N_("Video input frame rate")
 #define FPS_LONGTEXT N_( \
     "Force the DirectShow video input to use a specific frame rate" \
-    "(eg. 0 means default, 25, 29.97, 50, 59.94, etc.)"
+    "(eg. 0 means default, 25, 29.97, 50, 59.94, etc.)")
 #define CONFIG_TEXT N_("Device properties")
 #define CONFIG_LONGTEXT N_( \
     "Show the properties dialog of the selected device before starting the " \
