@@ -4,18 +4,19 @@
 
 if BUILD_JAVA
 
-OBJECTS = org/videolan/jvlc/JVLCNoSuchVariableNameException.class org/videolan/jvlc/JVLCBoolVariable.class org/videolan/jvlc/JVLCIntVariable.class org/videolan/jvlc/JVLCTimeVariable.class org/videolan/jvlc/JVLCVarValue.class org/videolan/jvlc/JVLCVariable.class org/videolan/jvlc/JVLCFloatVariable.class org/videolan/jvlc/JVLCStringVariable.class org/videolan/jvlc/JVLCVarVariable.class org/videolan/jvlc/JVLC.class org/videolan/jvlc/JVLCCanvas.class
+JVLCOBJECTS = org/videolan/jvlc/JVLCCanvas.class org/videolan/jvlc/JVLCPanel.class org/videolan/jvlc/AudioIntf.class org/videolan/jvlc/InputIntf.class org/videolan/jvlc/PlaylistIntf.class org/videolan/jvlc/VideoIntf.class org/videolan/jvlc/VLMIntf.class org/videolan/jvlc/Playlist.class org/videolan/jvlc/JLibVLC.class org/videolan/jvlc/JVLC.class org/videolan/jvlc/SWTVideoWidget.class
 
-JNIHEADERS = org/videolan/jvlc/JVLCNoSuchVariableNameException.h org_videolan_jvlc_JVLCBoolVariable.h org_videolan_jvlc_JVLCFloatVariable.h org_videolan_jvlc_JVLC.h org_videolan_jvlc_JVLCIntVariable.h org_videolan_jvlc_JVLCStringVariable.h org_videolan_jvlc_JVLCTimeVariable.h org_videolan_jvlc_JVLCVariable.h org_videolan_jvlc_JVLCVarValue.h org_videolan_jvlc_JVLCVarVariable.h org_videolan_jvlc_JVLCCanvas.h
+JNIHEADERS = org_videolan_jvlc_JVLC.h org_videolan_jvlc_JVLCCanvas.h org_videolan_jvlc_JVLCPanel.h
 
 # Include some JAVA stuff
 PROCESSOR_FAMILY = `uname -m | sed -e 's/^i.86/i386/' | sed -e 's/^x86_64/amd64/'`
 JINCLUDES = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 LIBJINCLUDES = -L$(JAVA_HOME)/jre/lib/$(PROCESSOR_FAMILY) -ljawt
+SWT_PATH = /usr/share/java
 
 
 # Binaries
-JCC = gcj -g
+JCC = gcj -g -I${SWT_PATH}/swt-gtk.jar
 JCH = gcjh -jni
 
 # Compile flags
@@ -25,14 +26,14 @@ JAVALDFLAGS = -L../../lib -lvlc_pic `top_builddir=../.. ../../vlc-config --libs 
 # Build targets
 all: libjvlc.so VlcClient
 
-libjvlc.so: vlc-glue-jni.o vlc-graphics-jni.o
-	$(CXX) -shared vlc-glue-jni.o vlc-graphics-jni.o $(LIBJINCLUDES) $(LDFLAGS) $(JAVALDFLAGS) -o libjvlc.so
+libjvlc.so: vlc-libvlc-jni.o vlc-graphics-jni.o
+	$(CXX) -shared vlc-libvlc-jni.o vlc-graphics-jni.o $(LIBJINCLUDES) $(LDFLAGS) $(JAVALDFLAGS) -o libjvlc.so
 
 vlc-graphics-jni.o: VlcClient
 	$(CXX) -c vlc-graphics-jni.cc $(CXXFLAGS) $(JAVACXXFLAGS)
 
-vlc-glue-jni.o: VlcClient
-	$(CXX) -c vlc-glue-jni.cc $(CXXFLAGS) $(JAVACXXFLAGS)
+vlc-libvlc-jni.o: VlcClient
+	$(CXX) -c vlc-libvlc-jni.cc $(CXXFLAGS) $(JAVACXXFLAGS)
 
 VlcClient: $(OBJECTS)
 	$(JCC) -C VlcClient.java

@@ -1,4 +1,4 @@
-
+$Id$
             First of all, this is a *developers* only version
 
 
@@ -34,5 +34,12 @@ java -Djava.library.path=. VlcClient
 
  Be sure your ldconfig can find libjawt.so and libmawt.so or you will
 get linking errors when you run the program.
+
+ To try the SWT version of the player, issue:
+
+javac -cp /usr/share/java/swt-gtk.jar:. SWTUglyPlayer.java
+java -cp /usr/share/java/swt-gtk.jar:. -Djava.library.path=.:/usr/lib/jni SWTUglyPlayer
+
+ using the appropriate paths.
 
  Happy playing.
