@@ -447,16 +447,16 @@ static char *ppsz_clock_descriptions[] =
     "Stream ID of the subtitle track to use.")
 
 #define INPUT_REPEAT_TEXT N_("Input repetitions")
-#define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be " \
-                                 "repeated")
+#define INPUT_REPEAT_LONGTEXT N_( \
+    "Number of time the same input will be repeated")
 
 #define START_TIME_TEXT N_("Start time")
-#define START_TIME_LONGTEXT N_("The stream will start at this position " \
-             "(in seconds)." )
+#define START_TIME_LONGTEXT N_( \
+    "The stream will start at this position (in seconds)." )
 
 #define STOP_TIME_TEXT N_("Stop time")
-#define STOP_TIME_LONGTEXT N_("The stream will stop at this position " \
-             "(in seconds)." )
+#define STOP_TIME_LONGTEXT N_( \
+    "The stream will stop at this position (in seconds)." )
 
 #define INPUT_LIST_TEXT N_("Input list")
 #define INPUT_LIST_LONGTEXT N_( \
@@ -470,8 +470,8 @@ static char *ppsz_clock_descriptions[] =
     "are supported. Use a '#' separated list of inputs.")
 
 #define BOOKMARKS_TEXT N_("Bookmarks list for a stream")
-#define BOOKMARKS_LONGTEXT N_( "You can manually give a list of "  \
-    "bookmarks for a stream in " \
+#define BOOKMARKS_LONGTEXT N_( \
+    "You can manually give a list of bookmarks for a stream in " \
     "the form \"{name=bookmark-name,time=optional-time-offset," \
     "bytes=optional-byte-offset},{...}\"")
 
@@ -499,17 +499,17 @@ static char *ppsz_clock_descriptions[] =
 
 #define SUB_FILTER_TEXT N_("Subpictures filter module")
 #define SUB_FILTER_LONGTEXT N_( \
-    "This addds so-called \"subpicture filters\". These filters overlay " \
+    "This adds so-called \"subpicture filters\". These filters overlay " \
     "some images or text over the video (like a logo, arbitraty text...)." )
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
-#define SUB_AUTO_LONGTEXT \
-    N_("Automatically detect a subtitle file, if no subtitle filename is " \
+#define SUB_AUTO_LONGTEXT N_( \
+    "Automatically detect a subtitle file, if no subtitle filename is " \
     "specified (based on the filename of the movie).")
 
 #define SUB_FUZZY_TEXT N_("Subtitle autodetection fuzziness")
-#define SUB_FUZZY_LONGTEXT \
-    N_("This determines how fuzzy subtitle and movie filename matching " \
+#define SUB_FUZZY_LONGTEXT N_( \
+    "This determines how fuzzy subtitle and movie filename matching " \
     "will be. Options are:\n" \
     "0 = no subtitles autodetected\n" \
     "1 = any subtitle file\n" \
@@ -518,13 +518,13 @@ static char *ppsz_clock_descriptions[] =
     "4 = subtitle file matching the movie name exactly")
 
 #define SUB_PATH_TEXT N_("Subtitle autodetection paths")
-#define SUB_PATH_LONGTEXT \
-    N_("Look for a subtitle file in those paths too, if your subtitle " \
+#define SUB_PATH_LONGTEXT N_( \
+    "Look for a subtitle file in those paths too, if your subtitle " \
     "file was not found in the current directory.")
 
 #define SUB_FILE_TEXT N_("Use subtitle file")
-#define SUB_FILE_LONGTEXT \
-    N_("Load this subtitle file. To be used when autodetect cannot detect " \
+#define SUB_FILE_LONGTEXT N_( \
+    "Load this subtitle file. To be used when autodetect cannot detect " \
     "your subtitle file.")
 
 #define DVD_DEV_TEXT N_("DVD device")
@@ -563,7 +563,7 @@ static char *ppsz_clock_descriptions[] =
 
 #define IPV4_TEXT N_("Force IPv4")
 #define IPV4_LONGTEXT N_( \
-    " IPv4 will be used by default for all connections.")
+    "IPv4 will be used by default for all connections.")
 
 #define TIMEOUT_TEXT N_("TCP connection timeout")
 #define TIMEOUT_LONGTEXT N_( \
@@ -575,12 +575,12 @@ static char *ppsz_clock_descriptions[] =
     "address:port. It will be used for all TCP connections" )
 
 #define SOCKS_USER_TEXT N_("SOCKS user name")
-#define SOCKS_USER_LONGTEXT N_("User name to be used for connection to " \
-    "the SOCKS proxy." )
+#define SOCKS_USER_LONGTEXT N_( \
+    "User name to be used for connection to the SOCKS proxy." )
 
 #define SOCKS_PASS_TEXT N_("SOCKS password")
-#define SOCKS_PASS_LONGTEXT N_("Password to be used for connection to "\
-    "the SOCKS proxy." )
+#define SOCKS_PASS_LONGTEXT N_( \
+    "Password to be used for connection to the SOCKS proxy." )
 
 #define META_TITLE_TEXT N_("Title metadata")
 #define META_TITLE_LONGTEXT N_( \
@@ -649,7 +649,7 @@ static char *ppsz_clock_descriptions[] =
 
 #define SOUT_ALL_TEXT N_("Enable streaming of all ES")
 #define SOUT_ALL_LONGTEXT N_( \
-    "Stream all ES (video, audio and subtitles)")
+    "Stream all elementary streams (video, audio and subtitles)")
 
 #define SOUT_DISPLAY_TEXT N_("Display while streaming")
 #define SOUT_DISPLAY_LONGTEXT N_( \
@@ -690,12 +690,14 @@ static char *ppsz_clock_descriptions[] =
     "This is a legacy entry to let you configure access output modules")
 
 #define ANN_SAPCTRL_TEXT N_("Control SAP flow")
-#define ANN_SAPCTRL_LONGTEXT N_("If this option is enabled, the flow on " \
+#define ANN_SAPCTRL_LONGTEXT N_( \
+    "If this option is enabled, the flow on " \
     "the SAP multicast address will be controlled. This is needed if you " \
     "want to make announcements on the MBone." )
 
 #define ANN_SAPINTV_TEXT N_("SAP announcement interval")
-#define ANN_SAPINTV_LONGTEXT N_("When the SAP flow control is disabled, " \
+#define ANN_SAPINTV_LONGTEXT N_( \
+    "When the SAP flow control is disabled, " \
     "this lets you set the fixed interval between SAP announcements." )
 
 
@@ -795,7 +797,7 @@ static char *ppsz_clock_descriptions[] =
 
 #define VLM_CONF_TEXT N_("VLM configuration file")
 #define VLM_CONF_LONGTEXT N_( \
-    "Read a VLM configuration file as son as it is started." )
+    "Read a VLM configuration file as soon as VLM is started." )
 
 #define PLUGINS_CACHE_TEXT N_("Use a plugins cache")
 #define PLUGINS_CACHE_LONGTEXT N_( \
@@ -810,15 +812,17 @@ static char *ppsz_clock_descriptions[] =
      "Runs VLC as a background daemon process.")
 
 #define FILE_LOG_TEXT N_( "Log to file" )
-#define FILE_LOG_LONGTEXT N_( "Log all VLC messages to a text file." )
+#define FILE_LOG_LONGTEXT N_( \
+    "Log all VLC messages to a text file." )
 
 #define SYSLOG_TEXT N_( "Log to syslog" )
-#define SYSLOG_LONGTEXT N_( "Log all VLC messages to syslog (UNIX systems)." )
+#define SYSLOG_LONGTEXT N_( \
+    "Log all VLC messages to syslog (UNIX systems)." )
 
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
 #define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
-    "for instance if you associated VLC with some media types and you " \
+    "for example if you associated VLC with some media types and you " \
     "don't want a new instance of VLC to be opened each time you " \
     "double-click on a file in the explorer. This option will allow you " \
     "to play the file with the already running instance or enqueue it.")
