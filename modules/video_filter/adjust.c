@@ -59,7 +59,7 @@ static int  SendEvents( vlc_object_t *, char const *,
 
 #define THRES_TEXT N_("Brightness threshold")
 #define THRES_LONGTEXT N_("When this mode is enabled, pixels will be " \
-        "shown as black or white. The treshold value will be the brighness " \
+        "shown as black or white. The threshold value will be the brighness " \
         "defined below." )
 #define CONT_TEXT N_("Image contrast (0-2)")
 #define CONT_LONGTEXT N_("Set the image contrast, between 0 and 2. Defaults to 1.")

@@ -43,7 +43,7 @@ extern void E_(Deactivate) ( vlc_object_t * );
  *****************************************************************************/
 #define ADAPTOR_TEXT N_("XVideo adaptor number")
 #define ADAPTOR_LONGTEXT N_( \
-    "If you graphics card provides several adaptors, you need to choose " \
+    "If your graphics card provides several adaptors, you need to choose " \
     "which one will be used (you shouldn't have to change this).")
 
 #define ALT_FS_TEXT N_("Alternate fullscreen method")

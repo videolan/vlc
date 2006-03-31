@@ -86,7 +86,7 @@ static void SwitchContext( vout_thread_t * );
  *****************************************************************************/
 #define ADAPTOR_TEXT N_("XVideo adaptor number")
 #define ADAPTOR_LONGTEXT N_( \
-    "If you graphics card provides several adaptors, you have " \
+    "If your graphics card provides several adaptors, you have " \
     "to choose which one will be used (you shouldn't have to change this).")
 
 #define ALT_FS_TEXT N_("Alternate fullscreen method")
@@ -187,7 +187,7 @@ static int CheckGLX( vlc_object_t *p_this, vlc_bool_t *b_glx13 )
     p_display = XOpenDisplay( NULL );
     if( p_display == NULL )
     {
-        msg_Err( p_this, "Cannot open display" );
+        msg_Err( p_this, "cannot open display" );
         return VLC_EGENERIC;
     }
 
@@ -215,12 +215,12 @@ static int CheckGLX( vlc_object_t *p_this, vlc_bool_t *b_glx13 )
     if( i_maj <= 0 || ((i_maj == 1) && (i_min < 3)) )
     {
         *b_glx13 = VLC_FALSE;
-        msg_Dbg( p_this, "Using GLX 1.2 API" );
+        msg_Dbg( p_this, "using GLX 1.2 API" );
     }
     else
     {
         *b_glx13 = VLC_TRUE;
-        msg_Dbg( p_this, "Using GLX 1.3 API" );
+        msg_Dbg( p_this, "using GLX 1.3 API" );
     }
 
     XCloseDisplay( p_display );

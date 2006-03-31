@@ -820,9 +820,9 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
                     (LPVOID)p_vout );            /* send p_vout to WM_CREATE */
 
         if( !p_vout->p_sys->hvideownd )
-            msg_Warn( p_vout, "Can't create video sub-window" );
+            msg_Warn( p_vout, "can't create video sub-window" );
         else
-            msg_Dbg( p_vout, "Created video sub-window" );
+            msg_Dbg( p_vout, "created video sub-window" );
         break;
 
     case WM_PAINT:

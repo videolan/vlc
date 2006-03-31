@@ -121,7 +121,7 @@ static int SendEvents( vlc_object_t *, char const *,
 
 #define EFFECT_TEXT N_("Effect")
 #define EFFECT_LONGTEXT N_( \
-    "Several OpenGL visual effects are available." )
+    "Several visual OpenGL effects are available." )
 
 static char *ppsz_effects[] = {
         "none", "cube", "transparent-cube" };
@@ -314,14 +314,14 @@ static int Init( vout_thread_t *p_vout )
         malloc( p_sys->i_tex_width * p_sys->i_tex_height * i_pixel_pitch );
     if( !p_sys->pp_buffer[0] )
     {
-        msg_Err( p_vout, "Out of memory" );
+        msg_Err( p_vout, "out of memory" );
         return -1;
     }
     p_sys->pp_buffer[1] =
         malloc( p_sys->i_tex_width * p_sys->i_tex_height * i_pixel_pitch );
     if( !p_sys->pp_buffer[1] )
     {
-        msg_Err( p_vout, "Out of memory" );
+        msg_Err( p_vout, "out of memory" );
         return -1;
     }
 

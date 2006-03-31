@@ -72,7 +72,7 @@ static void Display   ( vout_thread_t *, picture_t * );
 
 
 vlc_module_begin( );
-    set_description( _( "snapshot module" ) );
+    set_description( _( "Snapshot module" ) );
     set_shortname( N_("Snapshot") );
 
     set_category( CAT_VIDEO );
@@ -150,7 +150,7 @@ static int Init( vout_thread_t *p_vout )
     {
         if( strlen( psz_chroma ) < 4 )
         {
-            msg_Err( p_vout, "snapshot-chroma should be 4 characters long." );
+            msg_Err( p_vout, "snapshot-chroma should be 4 characters long" );
             return VLC_EGENERIC;
         }
         i_chroma = VLC_FOURCC( psz_chroma[0], psz_chroma[1],

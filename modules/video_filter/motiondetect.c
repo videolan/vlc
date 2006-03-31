@@ -53,9 +53,9 @@ static int  SendEvents   ( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define DESC_TEXT N_("Description file")
-#define DESC_LONGTEXT N_("Description file, file containing simple playlist")
+#define DESC_LONGTEXT N_("A file containing a simple playlist")
 #define HISTORY_TEXT N_("History parameter")
-#define HISTORY_LONGTEXT N_("History parameter, number of frames used for detection")
+#define HISTORY_LONGTEXT N_("The umber of frames used for detection.")
 
 vlc_module_begin();
     set_description( _("Motion detect video filter") );
@@ -162,7 +162,7 @@ static int Create( vlc_object_t *p_this )
     p_file = utf8_fopen( psz_descfilename, "r" );
     if( !p_file )
     {
-        msg_Err( p_this, "Failed to open descritpion file %s",
+        msg_Err( p_this, "Failed to open description file %s",
                             psz_descfilename );
         free( psz_descfilename );
         free( p_vout->p_sys );

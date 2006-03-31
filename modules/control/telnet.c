@@ -1,7 +1,7 @@
 /*****************************************************************************
  * telnet.c: VLM interface plugin
  *****************************************************************************
- * Copyright (C) 2000-2005 the VideoLAN team
+ * Copyright (C) 2000-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Simon Latapie <garf@videolan.org>
@@ -69,18 +69,18 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define TELNETHOST_TEXT N_( "Telnet interface listen host" )
-#define TELNETHOST_LONGTEXT N_( "This is the host on which the telnet " \
+#define TELNETHOST_TEXT N_( "Host" )
+#define TELNETHOST_LONGTEXT N_( "This is the host on which the " \
     "interface will listen. It defaults to all network interfaces (0.0.0.0)." \
-    " If you want the telnet interface to be available only on the local " \
-    "machine, enter 127.0.0.1" )
-#define TELNETPORT_TEXT N_( "Telnet interface port" )
-#define TELNETPORT_LONGTEXT N_( "This is the TCP port on which the telnet " \
-    "interface will listen. It defaults to 4212" )
+    " If you want this interface to be available only on the local " \
+    "machine, enter \"127.0.0.1\"." )
+#define TELNETPORT_TEXT N_( "Port" )
+#define TELNETPORT_LONGTEXT N_( "This is the TCP port on which this " \
+    "interface will listen. It defaults to 4212." )
 #define TELNETPORT_DEFAULT 4212
-#define TELNETPWD_TEXT N_( "Telnet interface password" )
-#define TELNETPWD_LONGTEXT N_( "The telnet interface uses a single " \
-    "administration password. The default value is \"admin\"." )
+#define TELNETPWD_TEXT N_( "Password" )
+#define TELNETPWD_LONGTEXT N_( "A single administration password is used " \
+    "to protect this interface. The default value is \"admin\"." )
 #define TELNETPWD_DEFAULT "admin"
 
 vlc_module_begin();
@@ -175,7 +175,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    msg_Info( p_intf, "Using the VLM interface plugin..." );
+    msg_Info( p_intf, "using the VLM interface plugin..." );
 
     i_telnetport = config_GetInt( p_intf, "telnet-port" );
     psz_address  = config_GetPsz( p_intf, "telnet-host" );
@@ -197,7 +197,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     msg_Info( p_intf, 
-              "Telnet interface started on interface %s %d",
+              "telnet interface started on interface %s %d",
               url.psz_host, url.i_port );
 
     p_intf->p_sys->i_clients   = 0;

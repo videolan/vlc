@@ -120,8 +120,8 @@ struct filter_sys_t
 
 #define MSG_TEXT N_("Feed URLs")
 #define MSG_LONGTEXT N_("RSS/Atom feed '|' (pipe) seperated URLs.")
-#define SPEED_TEXT N_("Feeds speed")
-#define SPEED_LONGTEXT N_("RSS/Atom feeds speed (bigger is slower).")
+#define SPEED_TEXT N_("Speed of feeds")
+#define SPEED_LONGTEXT N_("Speed of the RSS/Atom feeds (bigger is slower).")
 #define LENGTH_TEXT N_("Max length")
 #define LENGTH_LONGTEXT N_("Maximum number of characters displayed on the " \
                 "screen." )
@@ -137,7 +137,7 @@ struct filter_sys_t
 #define POSY_LONGTEXT N_("Y offset, down from the top." )
 #define OPACITY_TEXT N_("Opacity")
 #define OPACITY_LONGTEXT N_("Opacity (inverse of transparency) of " \
-    "overlay text. 0 = transparent, 255 = totally opaque. " )
+    "overlay text. 0 = transparent, 255 = totally opaque." )
 
 #define SIZE_TEXT N_("Font size, pixels")
 #define SIZE_LONGTEXT N_("Font size, in pixels. Default is -1 (use default " \
@@ -152,7 +152,7 @@ struct filter_sys_t
 #define POS_TEXT N_("Text position")
 #define POS_LONGTEXT N_( \
   "You can enforce the text position on the video " \
-  "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
+  "(0=center, 1=left, 2=right, 4=top, 8=bottom; you can " \
   "also use combinations of these values, eg 6 = top-right).")
 
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
@@ -626,7 +626,7 @@ static int FetchRSS( filter_t *p_filter)
         p_feed->i_items = 0;
         p_feed->p_items = NULL;
 
-        msg_Dbg( p_filter, "Opening %s RSS/Atom feed ...", psz_feed );
+        msg_Dbg( p_filter, "opening %s RSS/Atom feed ...", psz_feed );
 
         p_stream = stream_UrlNew( p_filter, psz_feed );
         if( !p_stream )
@@ -666,7 +666,7 @@ static int FetchRSS( filter_t *p_filter)
                         return 1;
                     }
 #                   ifdef RSS_DEBUG
-                    msg_Dbg( p_filter, "element name : %s", psz_eltname );
+                    msg_Dbg( p_filter, "element name: %s", psz_eltname );
 #                   endif
                     if( !strcmp( psz_eltname, "item" ) /* rss */
                      || !strcmp( psz_eltname, "entry" ) ) /* atom */
@@ -862,7 +862,7 @@ static int FetchRSS( filter_t *p_filter)
 
         if( p_xml_reader && p_xml ) xml_ReaderDelete( p_xml, p_xml_reader );
         if( p_stream ) stream_Delete( p_stream );
-        msg_Dbg( p_filter, "Done with %s RSS/Atom feed.", psz_feed );
+        msg_Dbg( p_filter, "done with %s RSS/Atom feed", psz_feed );
     }
     free( psz_buffer_2 );
     if( p_xml ) xml_Delete( p_xml );

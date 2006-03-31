@@ -69,14 +69,14 @@ struct filter_sys_t
 };
 
 #define MSG_TEXT N_("Time format string (%Y%m%d %H%M%S)")
-#define MSG_LONGTEXT N_("Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = minute, %S = second")
+#define MSG_LONGTEXT N_("Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = minute, %S = second).")
 #define POSX_TEXT N_("X offset")
 #define POSX_LONGTEXT N_("X offset, from the left screen edge" )
 #define POSY_TEXT N_("Y offset")
 #define POSY_LONGTEXT N_("Y offset, down from the top" )
 #define OPACITY_TEXT N_("Opacity")
 #define OPACITY_LONGTEXT N_("Opacity (inverse of transparency) of " \
-    "overlay text. 0 = transparent, 255 = totally opaque. " )
+    "overlay text. 0 = transparent, 255 = totally opaque." )
 
 #define SIZE_TEXT N_("Font size, pixels")
 #define SIZE_LONGTEXT N_("Font size, in pixels. Default is -1 (use default " \
@@ -92,7 +92,7 @@ struct filter_sys_t
 #define POS_LONGTEXT N_( \
   "You can enforce the text position on the video " \
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
-  "also use combinations of these values, eg 6 = top-right).")
+  "also use combinations of these values, e.g. 6 = top-right).")
 
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_pos_descriptions[] =

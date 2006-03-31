@@ -62,15 +62,15 @@ static int  SendEvents   ( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define MODE_TEXT N_("Distort mode")
-#define MODE_LONGTEXT N_("Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough\" and \"psychedelic\"")
+#define MODE_LONGTEXT N_("Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough\" and \"psychedelic\".")
 
 #define GRADIENT_TEXT N_("Gradient image type")
 #define GRADIENT_LONGTEXT N_("Gradient image type (0 or 1). 0 will " \
         "turn the image to white while 1 will keep colors." )
 
 #define CARTOON_TEXT N_("Apply cartoon effect")
-#define CARTOON_LONGTEXT N_("Apply cartoon effect. Used by \"gradient\" " \
-                            "and \"edge\".")
+#define CARTOON_LONGTEXT N_("Apply cartoon effect. It is only used by " \
+    "\"gradient\" and \"edge\".")
 
 static char *mode_list[] = { "wave", "ripple", "gradient", "edge", "hough",
                              "psychedelic" };
@@ -205,8 +205,7 @@ static int Create( vlc_object_t *p_this )
         }
         else
         {
-            msg_Err( p_vout, "no valid distort mode provided, "
-                             "using wave" );
+            msg_Err( p_vout, "no valid distort mode provided, using wave" );
             p_vout->p_sys->i_mode = WAVE;
         }
     }

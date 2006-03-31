@@ -1314,7 +1314,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #ifdef HAVE_SYS_SHM_H
         if( p_pic->p_sys->p_image && p_vout->p_sys->b_shm )
         {
-            msg_Warn( p_vout, "couldn't create SHM image, disabling SHM." );
+            msg_Warn( p_vout, "couldn't create SHM image, disabling SHM" );
             p_vout->p_sys->b_shm = VLC_FALSE;
         }
 #endif /* HAVE_SYS_SHM_H */

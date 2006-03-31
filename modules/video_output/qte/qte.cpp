@@ -531,7 +531,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     p_vout->i_window_height = p_vout->p_sys->i_height;
 #endif
 
-    msg_Dbg( p_vout, "OpenDisplay (h=%d,w=%d)",p_vout->p_sys->i_height,p_vout->p_sys->i_width);
+    msg_Dbg( p_vout, "opening display (h=%d,w=%d)",p_vout->p_sys->i_height,p_vout->p_sys->i_width);
 
     /* create thread to exec the qpe application */
     if ( vlc_thread_create( p_vout->p_sys->p_event, "QT Embedded Thread",
@@ -589,7 +589,7 @@ static void CloseDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void RunQtThread(event_thread_t *p_event)
 {
-    msg_Dbg( p_event->p_vout, "RunQtThread Starting" );
+    msg_Dbg( p_event->p_vout, "RunQtThread starting" );
 
 #ifdef NEED_QTE_MAIN
     if (qApp)

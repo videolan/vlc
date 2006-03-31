@@ -222,7 +222,7 @@ static void CloseVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    msg_Dbg( p_vout, "CloseVideo" );
+    msg_Dbg( p_vout, "closing video" );
 
     if( p_vout->p_sys->p_event )
     {

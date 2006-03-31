@@ -930,7 +930,7 @@ static void SetPalette( vout_thread_t *p_vout,
     /* Set palette */
     if( SDL_SetColors( p_vout->p_sys->p_display, colors, 0, 256 ) == 0 )
     {
-        msg_Err( p_vout, "failed setting palette" );
+        msg_Err( p_vout, "failed to set palette" );
     }
 }
 

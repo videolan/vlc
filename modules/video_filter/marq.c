@@ -74,18 +74,18 @@ struct filter_sys_t
 };
 
 #define MSG_TEXT N_("Text")
-#define MSG_LONGTEXT N_("Marquee text to display")
+#define MSG_LONGTEXT N_("Marquee text to display.")
 #define POSX_TEXT N_("X offset")
-#define POSX_LONGTEXT N_("X offset, from the left screen edge" )
+#define POSX_LONGTEXT N_("X offset, from the left screen edge." )
 #define POSY_TEXT N_("Y offset")
-#define POSY_LONGTEXT N_("Y offset, down from the top" )
+#define POSY_LONGTEXT N_("Y offset, down from the top." )
 #define TIMEOUT_TEXT N_("Timeout")
 #define TIMEOUT_LONGTEXT N_("Number of milliseconds the marquee must remain " \
-                            "display. Default value is " \
+                            "displayed. Default value is " \
                             "0 (remains forever).")
 #define OPACITY_TEXT N_("Opacity")
 #define OPACITY_LONGTEXT N_("Opacity (inverse of transparency) of " \
-    "overlay text. 0 = transparent, 255 = totally opaque. " )
+    "overlayed text. 0 = transparent, 255 = totally opaque. " )
 #define SIZE_TEXT N_("Font size, pixels")
 #define SIZE_LONGTEXT N_("Font size, in pixels. Default is -1 (use default " \
     "font size)." )
@@ -138,7 +138,7 @@ vlc_module_begin();
     add_integer( "marq-timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
                  VLC_FALSE );
 
-    set_description( _("Marquee display sub filter") );
+    set_description( _("Marquee display") );
     add_shortcut( "marq" );
 vlc_module_end();
 

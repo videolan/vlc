@@ -237,7 +237,7 @@ void __LoadLogoList( vlc_object_t *p_this, logo_list_t *p_logo_list )
 
         if( !p_logo[i].p_pic )
         {
-            msg_Warn( p_this, "Error while loading logo %s. It will be skipped",
+            msg_Warn( p_this, "error while loading logo %s, will be skipped",
                       p_logo[i].psz_file );
         }
 

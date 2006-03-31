@@ -530,7 +530,7 @@ static void SetPalette( vout_thread_t *p_vout,
     /* Set palette */
     if( ggiSetPalette( p_vout->p_sys->p_display, 0, 256, colors ) < 0 )
     {
-        msg_Err( p_vout, "failed setting palette" );
+        msg_Err( p_vout, "failed to set palette" );
     }
 }
 

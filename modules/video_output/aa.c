@@ -52,7 +52,7 @@ static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t *
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_shortname( _("Ascii Art"));
+    set_shortname( _("ASCII Art"));
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     set_description( _("ASCII-art video output") );

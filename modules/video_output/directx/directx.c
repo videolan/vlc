@@ -907,7 +907,7 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
                 {
                     rect.left = monitor_info.rcWork.left;
                     rect.top = monitor_info.rcWork.top;
-                    msg_Dbg( p_vout, "DirectXEnumCallback: Setting window "
+                    msg_Dbg( p_vout, "DirectXEnumCallback: setting window "
                              "position to %d,%d", rect.left, rect.top );
                     SetWindowPos( p_vout->p_sys->hwnd, NULL,
                                   rect.left, rect.top, 0, 0,
