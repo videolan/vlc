@@ -37,7 +37,7 @@ const string EvtMouse::getAsString() const
     else if( m_button == kRight )
         event += ":right";
     else
-        msg_Warn( getIntf(), "Unknown button type" );
+        msg_Warn( getIntf(), "unknown button type" );
 
     // Add the action
     if( m_action == kDown )
@@ -47,7 +47,7 @@ const string EvtMouse::getAsString() const
     else if( m_action == kDblClick )
         event += ":dblclick";
     else
-        msg_Warn( getIntf(), "Unknown action type" );
+        msg_Warn( getIntf(), "unknown action type" );
 
     // Add the modifier
     addModifier( event );

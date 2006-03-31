@@ -54,7 +54,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 #define RequireDefault( a ) \
     if( attr.find(a) == attr.end() ) \
     { \
-        msg_Err( getIntf(), "Bad theme (element: %s, missing attribute: %s)", \
+        msg_Err( getIntf(), "bad theme (element: %s, missing attribute: %s)", \
                  rName.c_str(), a ); \
         m_errors = true; return; \
     }
@@ -65,7 +65,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
         OSFactory *pFactory = OSFactory::instance( getIntf() );
         string fullPath = m_path + pFactory->getDirSeparator() + attr["file"];
-        msg_Dbg( getIntf(), "Opening included XML file: %s", fullPath.c_str() );
+        msg_Dbg( getIntf(), "opening included XML file: %s", fullPath.c_str() );
         // FIXME: We do not use the DTD to validate the included XML file,
         // as the parser seems to dislike it otherwise...
         SkinParser subParser( getIntf(), fullPath.c_str(), false, m_pData );
@@ -484,7 +484,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         // Check the version
         if( strcmp( attr["version"], SKINS_DTD_VERSION ) )
         {
-            msg_Err( getIntf(), "Bad theme version : %s (you need version %s)",
+            msg_Err( getIntf(), "bad theme version : %s (you need version %s)",
                      attr["version"], SKINS_DTD_VERSION );
             m_errors = true;
             return;
@@ -592,14 +592,14 @@ int SkinParser::convertInRange( const char *value, int minValue, int maxValue,
 
     if( intValue < minValue )
     {
-        msg_Warn( getIntf(), "Value of \"%s\" attribute (%i) is out of the "
+        msg_Warn( getIntf(), "value of \"%s\" attribute (%i) is out of the "
                   "expected range [%i, %i], using %i instead",
                   rAttribute.c_str(), intValue, minValue, maxValue, minValue );
         return minValue;
     }
     else if( intValue > maxValue )
     {
-        msg_Warn( getIntf(), "Value of \"%s\" attribute (%i) is out of the "
+        msg_Warn( getIntf(), "value of \"%s\" attribute (%i) is out of the "
                   "expected range [%i, %i], using %i instead",
                   rAttribute.c_str(), intValue, minValue, maxValue, maxValue );
         return maxValue;
@@ -633,7 +633,7 @@ const string SkinParser::uniqueId( const string &id )
         // The id was already used
         if( id != "none" )
         {
-            msg_Warn( getIntf(), "Non unique id: %s", id.c_str() );
+            msg_Warn( getIntf(), "non-unique id: %s", id.c_str() );
         }
         newId = generateId();
     }

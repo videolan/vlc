@@ -40,12 +40,12 @@ Playtree::Playtree( intf_thread_t *pIntf ): VarTree( pIntf )
     char *pCharset;
     vlc_current_charset( &pCharset );
     iconvHandle = vlc_iconv_open( "UTF-8", pCharset );
-    msg_Dbg( pIntf, "Using character encoding: %s", pCharset );
+    msg_Dbg( pIntf, "using character encoding: %s", pCharset );
     free( pCharset );
 
     if( iconvHandle == (vlc_iconv_t) - 1 )
     {
-        msg_Warn( pIntf, "Unable to do requested conversion" );
+        msg_Warn( pIntf, "unable to do requested conversion" );
     }
 
     buildTree();
@@ -149,7 +149,7 @@ void Playtree::onUpdateItem( int id )
     }
     else
     {
-        msg_Warn(getIntf(), "Cannot find node with id %d", id );
+        msg_Warn(getIntf(), "cannot find node with id %d", id );
     }
     descr.i_type = 0;
     notify( &descr );

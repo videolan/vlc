@@ -68,7 +68,7 @@ bool FT2Font::init()
     // Initalise libfreetype
     if( FT_Init_FreeType( &m_lib ) )
     {
-        msg_Err( getIntf(), "Failed to initalize libfreetype" );
+        msg_Err( getIntf(), "failed to initalize freetype" );
         return false;
     }
 
@@ -76,11 +76,11 @@ bool FT2Font::init()
     FILE *file = fopen( m_name.c_str(), "rb" );
     if( file )
     {
-        msg_Dbg( getIntf(), "Loading font %s", m_name.c_str() );
+        msg_Dbg( getIntf(), "loading font %s", m_name.c_str() );
     }
     else
     {
-        msg_Dbg( getIntf(), "Unable to open the font %s", m_name.c_str() );
+        msg_Dbg( getIntf(), "unable to open the font %s", m_name.c_str() );
         return false;
     }
     // Get the file size
@@ -91,7 +91,7 @@ bool FT2Font::init()
     m_buffer = malloc( size );
     if( !m_buffer )
     {
-        msg_Err( getIntf(), "Not enough memory for the font %s",
+        msg_Err( getIntf(), "not enough memory for the font %s",
                  m_name.c_str() );
         return false;
     }
@@ -104,26 +104,26 @@ bool FT2Font::init()
                               &m_face );
     if ( err == FT_Err_Unknown_File_Format )
     {
-        msg_Err( getIntf(), "Unsupported font format (%s)", m_name.c_str() );
+        msg_Err( getIntf(), "unsupported font format (%s)", m_name.c_str() );
         return false;
     }
     else if ( err )
     {
-        msg_Err( getIntf(), "Error opening font (%s)", m_name.c_str() );
+        msg_Err( getIntf(), "error opening font (%s)", m_name.c_str() );
         return false;
     }
 
     // Select the charset
     if( FT_Select_Charmap( m_face, ft_encoding_unicode ) )
     {
-        msg_Err( getIntf(), "Font has no UNICODE table (%s)", m_name.c_str() );
+        msg_Err( getIntf(), "font has no UNICODE table (%s)", m_name.c_str() );
         return false;
     }
 
     // Set the pixel size
     if( FT_Set_Pixel_Sizes( m_face, 0, m_size ) )
     {
-        msg_Warn( getIntf(), "Cannot set a pixel size of %d (%s)", m_size,
+        msg_Warn( getIntf(), "cannot set a pixel size of %d (%s)", m_size,
                   m_name.c_str() );
     }
 

@@ -183,7 +183,7 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
             break;
 
         default:
-            msg_Err( getIntf(), "Unsupported depth: %d bpp\n", depth );
+            msg_Err( getIntf(), "unsupported depth: %d bpp\n", depth );
             m_pDisplay = NULL;
             break;
     }

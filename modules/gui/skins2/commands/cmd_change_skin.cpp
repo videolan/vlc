@@ -45,7 +45,7 @@ void CmdChangeSkin::execute()
     if( loader.load( m_file ) )
     {
         // Everything went well
-        msg_Dbg( getIntf(), "New theme successfully loaded (%s)",
+        msg_Info( getIntf(), "new theme successfully loaded (%s)",
                  m_file.c_str() );
         if( pOldTheme )
         {
@@ -54,14 +54,14 @@ void CmdChangeSkin::execute()
     }
     else if( pOldTheme )
     {
-        msg_Err( getIntf(), "A problem occurred when loading the new theme,"
+        msg_Warn( getIntf(), "a problem occurred when loading the new theme,"
                   " restoring the previous one" );
         getIntf()->p_sys->p_theme = pOldTheme;
         pOldTheme->getWindowManager().showAll();
     }
     else
     {
-        msg_Err( getIntf(), "Cannot load the theme, aborting" );
+        msg_Err( getIntf(), "cannot load the theme, aborting" );
         // Quit
         CmdQuit cmd( getIntf() );
         cmd.execute();

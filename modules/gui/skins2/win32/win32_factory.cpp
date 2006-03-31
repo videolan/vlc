@@ -120,7 +120,7 @@ bool Win32Factory::init()
         // then fine, otherwise return with an error.
         if( !GetClassInfo( m_hInst, _T("SkinWindowClass"), &wndclass ) )
         {
-            msg_Err( getIntf(), "Cannot register window class" );
+            msg_Err( getIntf(), "cannot register window class" );
             return false;
         }
     }
@@ -131,7 +131,7 @@ bool Win32Factory::init()
         -200, -200, 0, 0, 0, 0, m_hInst, 0 );
     if( m_hParentWindow == NULL )
     {
-        msg_Err( getIntf(), "Cannot create parent window" );
+        msg_Err( getIntf(), "cannot create parent window" );
         return false;
     }
 
@@ -157,7 +157,7 @@ bool Win32Factory::init()
             GetProcAddress( m_hMsimg32, _T("TransparentBlt") ) ) )
     {
         TransparentBlt = NULL;
-        msg_Dbg( getIntf(), "Couldn't find TransparentBlt(), "
+        msg_Dbg( getIntf(), "couldn't find TransparentBlt(), "
                  "falling back to BitBlt()" );
     }
     if( !m_hMsimg32 ||
@@ -167,7 +167,7 @@ bool Win32Factory::init()
             GetProcAddress( m_hMsimg32, _T("AlphaBlend") ) ) )
     {
         AlphaBlend = NULL;
-        msg_Dbg( getIntf(), "Couldn't find AlphaBlend()" );
+        msg_Dbg( getIntf(), "couldn't find AlphaBlend()" );
     }
 
     // Idem for user32.dll and SetLayeredWindowAttributes()
@@ -178,7 +178,7 @@ bool Win32Factory::init()
             GetProcAddress( m_hUser32, _T("SetLayeredWindowAttributes") ) ) )
     {
         SetLayeredWindowAttributes = NULL;
-        msg_Dbg( getIntf(), "Couldn't find SetLayeredWindowAttributes()" );
+        msg_Dbg( getIntf(), "couldn't find SetLayeredWindowAttributes()" );
     }
 
     // Initialize the resource path
@@ -267,7 +267,7 @@ OSPopup *Win32Factory::createOSPopup()
     // GenericWindow (we cannot eevn access the OSWindow).
     if( m_windowMap.begin() == m_windowMap.end() )
     {
-        msg_Err( getIntf(), "No window has been created before the popup!" );
+        msg_Err( getIntf(), "no window has been created before the popup!" );
         return NULL;
     }
 

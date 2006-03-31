@@ -41,7 +41,7 @@ Theme::~Theme()
 
 void Theme::loadConfig()
 {
-    msg_Dbg( getIntf(), "Loading theme configuration");
+    msg_Dbg( getIntf(), "loading theme configuration");
 
     // Get config from vlcrc file
     char *save = config_GetPsz( getIntf(), "skins2-config" );
@@ -88,7 +88,7 @@ void Theme::loadConfig()
 
 void Theme::saveConfig()
 {
-    msg_Dbg( getIntf(), "Saving theme configuration");
+    msg_Dbg( getIntf(), "saving theme configuration");
 
     // Initialize char where config is stored
     char *save  = new char[400];

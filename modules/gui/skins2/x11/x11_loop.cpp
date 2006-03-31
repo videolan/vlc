@@ -175,7 +175,7 @@ void X11Loop::handleX11Event()
 
     if( !pWin )
     {
-        msg_Dbg( getIntf(), "No associated generic window !!" );
+        msg_Warn( getIntf(), "no associated generic window" );
         return;
     }
 
@@ -370,7 +370,7 @@ void X11Loop::handleX11Event()
                 ((X11Factory*)pOsFactory)->m_dndMap[event.xany.window];
             if( !pDnd )
             {
-                msg_Err( getIntf(), "No associated D&D object !!" );
+                msg_Err( getIntf(), "no associated D&D object" );
                 return;
             }
 

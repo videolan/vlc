@@ -80,7 +80,7 @@ void Popup::handleEvent( const EvtMenu &rEvent )
     else
     {
         // Should never happen
-        msg_Warn( getIntf(), "Problem in the popup implementation" );
+        msg_Warn( getIntf(), "problem in the popup implementation" );
     }
 }
 

@@ -119,7 +119,7 @@ class CmdDialogs: public CmdGeneric
                     pDialogs->showStreamingWizard();
                     break;
                 default:
-                    msg_Warn( getIntf(), "Unknown dialog type" );
+                    msg_Warn( getIntf(), "unknown dialog type" );
                     break;
             }
         }

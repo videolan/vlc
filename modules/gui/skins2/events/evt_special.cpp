@@ -39,7 +39,7 @@ const string EvtSpecial::getAsString() const
     else if( m_action == kDisable )
         event += ":disable";
     else
-        msg_Warn( getIntf(), "Unknown action type" );
+        msg_Warn( getIntf(), "unknown action type" );
 
     return event;
 }

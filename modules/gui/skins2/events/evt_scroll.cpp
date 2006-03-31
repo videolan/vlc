@@ -35,7 +35,7 @@ const string EvtScroll::getAsString() const
     else if( m_direction == kDown )
         event += ":down";
     else
-        msg_Warn( getIntf(), "Unknown scrolling direction" );
+        msg_Warn( getIntf(), "unknown scrolling direction" );
 
     // Add the modifier
     addModifier( event );

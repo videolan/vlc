@@ -41,7 +41,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
     m_pXML = xml_Create( pIntf );
     if( !m_pXML )
     {
-        msg_Err( getIntf(), "Failed to open XML parser" );
+        msg_Err( getIntf(), "failed to open XML parser" );
         return;
     }
 
@@ -55,14 +55,14 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
     m_pStream = stream_UrlNew( pIntf, rFileName.c_str() );
     if( !m_pStream )
     {
-        msg_Err( getIntf(), "Failed to open %s for reading",
+        msg_Err( getIntf(), "failed to open %s for reading",
                  rFileName.c_str() );
         return;
     }
     m_pReader = xml_ReaderCreate( m_pXML, m_pStream );
     if( !m_pReader )
     {
-        msg_Err( getIntf(), "Failed to open %s for parsing",
+        msg_Err( getIntf(), "failed to open %s for parsing",
                  rFileName.c_str() );
         return;
     }
@@ -115,7 +115,7 @@ void XMLParser::LoadCatalog()
         if( !stat( path.c_str(), &statBuf ) )
         {
             // DTD found
-            msg_Dbg( getIntf(), "Using DTD %s", path.c_str() );
+            msg_Dbg( getIntf(), "using DTD %s", path.c_str() );
 
             // Add an entry in the default catalog
             xml_CatalogAdd( m_pXML, "public",
@@ -126,7 +126,7 @@ void XMLParser::LoadCatalog()
     }
     if( it == resPath.end() )
     {
-        msg_Err( getIntf(), "Cannot find the skins DTD !");
+        msg_Err( getIntf(), "cannot find the skins DTD");
     }
 #endif
 }

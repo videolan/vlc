@@ -98,7 +98,7 @@ void TopWindow::processEvent( EvtMenu &rEvtMenu )
     // We should never receive a menu event when there is no active popup!
     if( pPopup == NULL )
     {
-        msg_Warn( getIntf(), "Unexpected menu event, ignoring" );
+        msg_Warn( getIntf(), "unexpected menu event, ignoring" );
         return;
     }
 
@@ -380,7 +380,7 @@ void TopWindow::onControlRelease( const CtrlGeneric &rCtrl )
     }
     else
     {
-        msg_Dbg( getIntf(), "Control had not captured the mouse" );
+        msg_Dbg( getIntf(), "control had not captured the mouse" );
     }
 
     // Send an enter event to the control under the mouse, if it doesn't
@@ -451,7 +451,7 @@ CtrlGeneric *TopWindow::findHitControl( int xPos, int yPos )
         }
         else
         {
-            msg_Dbg( getIntf(), "Control at NULL position" );
+            msg_Dbg( getIntf(), "control at NULL position" );
         }
     }
 

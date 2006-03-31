@@ -115,7 +115,7 @@ Variable *VarManager::getVar( const string &rName, const string &rType )
         // Check the variable type
         if( pVar->getType() != rType )
         {
-            msg_Warn( getIntf(), "Variable %s has incorrect type (%s instead"
+            msg_Warn( getIntf(), "variable %s has incorrect type (%s instead"
                       " of (%s)", rName.c_str(), pVar->getType().c_str(),
                       rType.c_str() );
             return NULL;

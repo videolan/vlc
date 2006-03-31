@@ -109,7 +109,7 @@ void ThemeRepository::parseDirectory( const string &rDir )
     if( pDir == NULL )
     {
         // An error occurred
-        msg_Dbg( getIntf(), "Cannot open directory %s", rDir.c_str() );
+        msg_Dbg( getIntf(), "cannot open directory %s", rDir.c_str() );
         return;
     }
 

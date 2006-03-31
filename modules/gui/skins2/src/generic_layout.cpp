@@ -110,7 +110,7 @@ void GenericLayout::addControl( CtrlGeneric *pControl,
     }
     else
     {
-        msg_Dbg( getIntf(), "Adding NULL control in the layout" );
+        msg_Dbg( getIntf(), "adding NULL control in the layout" );
     }
 }
 

@@ -71,7 +71,7 @@ UString::UString( intf_thread_t *pIntf, const char *pString ):
     }
     if( !pCur || *pCur )
     {
-        msg_Err( pIntf, "Invalid UTF8 string: %s", pString );
+        msg_Err( pIntf, "invalid UTF8 string: %s", pString );
         m_length = 0;
         m_pString = NULL;
         return;
@@ -315,7 +315,7 @@ UString UString::substr( uint32_t position, uint32_t n) const
     UString tmp( getIntf(), "" );
     if( position > size() )
     {
-        msg_Err( getIntf(), "Invalid position in UString::substr()" );
+        msg_Err( getIntf(), "invalid position in UString::substr()" );
         return tmp;
     }
     tmp.m_length = (n < size() - position) ? n : size() - position;

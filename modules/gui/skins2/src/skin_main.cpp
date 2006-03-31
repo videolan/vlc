@@ -109,35 +109,35 @@ static int Open( vlc_object_t *p_this )
     // Initialize singletons
     if( OSFactory::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "Cannot initialize OSFactory" );
+        msg_Err( p_intf, "cannot initialize OSFactory" );
         vlc_object_release( p_intf->p_sys->p_playlist );
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
         return VLC_EGENERIC;
     }
     if( AsyncQueue::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "Cannot initialize AsyncQueue" );
+        msg_Err( p_intf, "cannot initialize AsyncQueue" );
         vlc_object_release( p_intf->p_sys->p_playlist );
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
         return VLC_EGENERIC;
     }
     if( Interpreter::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "Cannot instanciate Interpreter" );
+        msg_Err( p_intf, "cannot instanciate Interpreter" );
         vlc_object_release( p_intf->p_sys->p_playlist );
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
         return VLC_EGENERIC;
     }
     if( VarManager::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "Cannot instanciate VarManager" );
+        msg_Err( p_intf, "cannot instanciate VarManager" );
         vlc_object_release( p_intf->p_sys->p_playlist );
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
         return VLC_EGENERIC;
     }
     if( VlcProc::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "Cannot initialize VLCProc" );
+        msg_Err( p_intf, "cannot initialize VLCProc" );
         vlc_object_release( p_intf->p_sys->p_playlist );
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
         return VLC_EGENERIC;
@@ -223,7 +223,7 @@ static void Run( intf_thread_t *p_intf )
                 AsyncQueue *pQueue = AsyncQueue::instance( p_intf );
                 pQueue->push( CmdGenericPtr( pCmd ) );
                 msg_Err( p_intf,
-                         "Cannot show the \"open skin\" dialog: exiting...");
+                         "cannot show the \"open skin\" dialog: exiting...");
             }
         }
     }

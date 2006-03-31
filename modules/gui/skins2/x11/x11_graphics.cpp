@@ -49,7 +49,7 @@ X11Graphics::X11Graphics( intf_thread_t *pIntf, X11Display &rDisplay,
     {
         // Avoid a X11 Bad Value error
         width = height = 1;
-        msg_Err( getIntf(), "Invalid image size (null width or height)" );
+        msg_Err( getIntf(), "invalid image size (null width or height)" );
     }
 
     // Create a pixmap
@@ -138,7 +138,7 @@ void X11Graphics::drawBitmap( const GenericBitmap &rBitmap, int xSrc,
     }
     else if( width > rBitmap.getWidth() )
     {
-        msg_Dbg( getIntf(), "Bitmap width too small!" );
+        msg_Dbg( getIntf(), "bitmap width too small (%i)", rBitmap.getWidth() );
         width = rBitmap.getWidth();
     }
     if( height == -1 )
@@ -147,7 +147,8 @@ void X11Graphics::drawBitmap( const GenericBitmap &rBitmap, int xSrc,
     }
     else if( height > rBitmap.getHeight() )
     {
-        msg_Dbg( getIntf(), "Bitmap height too small!" );
+        msg_Dbg( getIntf(), "bitmap height too small (%i)", rBitmap.getHeight()
+                                 );
         height = rBitmap.getHeight();
     }
 
@@ -160,7 +161,7 @@ void X11Graphics::drawBitmap( const GenericBitmap &rBitmap, int xSrc,
     // Safety check for debugging purpose
     if( xDest + width > m_width || yDest + height > m_height )
     {
-        msg_Dbg( getIntf(), "Bitmap too large !" );
+        msg_Dbg( getIntf(), "bitmap too large" );
         return;
     }
 

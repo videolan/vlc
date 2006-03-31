@@ -147,7 +147,7 @@ void Builder::addTheme( const BuilderData::Theme &rData )
     }
     else
     {
-        msg_Warn( getIntf(), "Invalid tooltip font: %s",
+        msg_Warn( getIntf(), "invalid tooltip font: %s",
                   rData.m_tooltipfont.c_str() );
     }
 }
@@ -173,7 +173,7 @@ void Builder::addSubBitmap( const BuilderData::SubBitmap &rData )
 {
     if( m_pTheme->m_bitmaps.find( rData.m_id ) != m_pTheme->m_bitmaps.end() )
     {
-        msg_Dbg( getIntf(), "Bitmap %s already exists", rData.m_id.c_str() );
+        msg_Dbg( getIntf(), "bitmap %s already exists", rData.m_id.c_str() );
         return;
     }
 
@@ -191,7 +191,7 @@ void Builder::addSubBitmap( const BuilderData::SubBitmap &rData )
     {
         // Invalid sub-bitmap
         delete pBmp;
-        msg_Warn( getIntf(), "SubBitmap %s ignored", rData.m_id.c_str() );
+        msg_Warn( getIntf(), "sub-bitmap %s ignored", rData.m_id.c_str() );
         return;
     }
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
@@ -202,7 +202,7 @@ void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
 {
     if( m_pTheme->m_fonts.find( rData.m_id ) != m_pTheme->m_fonts.end() )
     {
-        msg_Dbg( getIntf(), "Font %s already exists", rData.m_id.c_str() );
+        msg_Dbg( getIntf(), "font %s already exists", rData.m_id.c_str() );
         return;
     }
 
@@ -282,14 +282,14 @@ void Builder::addMenuItem( const BuilderData::MenuItem &rData )
     Popup *pPopup = m_pTheme->getPopupById( rData.m_popupId );
     if( pPopup == NULL )
     {
-        msg_Err( getIntf(), "Unknown popup id: %s", rData.m_popupId.c_str() );
+        msg_Err( getIntf(), "unknown popup id: %s", rData.m_popupId.c_str() );
         return;
     }
 
     CmdGeneric *pCommand = parseAction( rData.m_action );
     if( pCommand == NULL )
     {
-        msg_Err( getIntf(), "Invalid action: %s", rData.m_action.c_str() );
+        msg_Err( getIntf(), "invalid action: %s", rData.m_action.c_str() );
         return;
     }
 
@@ -302,7 +302,7 @@ void Builder::addMenuSeparator( const BuilderData::MenuSeparator &rData )
     Popup *pPopup = m_pTheme->getPopupById( rData.m_popupId );
     if( pPopup == NULL )
     {
-        msg_Err( getIntf(), "Unknown popup id: %s", rData.m_popupId.c_str() );
+        msg_Err( getIntf(), "unknown popup id: %s", rData.m_popupId.c_str() );
         return;
     }
 
@@ -360,7 +360,7 @@ void Builder::addAnchor( const BuilderData::Anchor &rData )
     Bezier *pCurve = getPoints( rData.m_points.c_str() );
     if( pCurve == NULL )
     {
-        msg_Err( getIntf(), "Invalid format in tag points=\"%s\"",
+        msg_Err( getIntf(), "invalid format in tag points=\"%s\"",
                  rData.m_points.c_str() );
         return;
     }
@@ -395,7 +395,7 @@ void Builder::addButton( const BuilderData::Button &rData )
     CmdGeneric *pCommand = parseAction( rData.m_actionId );
     if( pCommand == NULL )
     {
-        msg_Err( getIntf(), "Invalid action: %s", rData.m_actionId.c_str() );
+        msg_Err( getIntf(), "invalid action: %s", rData.m_actionId.c_str() );
         return;
     }
 
@@ -452,14 +452,14 @@ void Builder::addCheckbox( const BuilderData::Checkbox &rData )
     CmdGeneric *pCommand1 = parseAction( rData.m_action1 );
     if( pCommand1 == NULL )
     {
-        msg_Err( getIntf(), "Invalid action: %s", rData.m_action1.c_str() );
+        msg_Err( getIntf(), "invalid action: %s", rData.m_action1.c_str() );
         return;
     }
 
     CmdGeneric *pCommand2 = parseAction( rData.m_action2 );
     if( pCommand2 == NULL )
     {
-        msg_Err( getIntf(), "Invalid action: %s", rData.m_action2.c_str() );
+        msg_Err( getIntf(), "invalid action: %s", rData.m_action2.c_str() );
         return;
     }
 
@@ -518,7 +518,7 @@ void Builder::addImage( const BuilderData::Image &rData )
     CmdGeneric *pCommand = parseAction( rData.m_action2Id );
     if( pCommand == NULL )
     {
-        msg_Err( getIntf(), "Invalid action: %s", rData.m_action2Id.c_str() );
+        msg_Err( getIntf(), "invalid action: %s", rData.m_action2Id.c_str() );
         return;
     }
 
@@ -588,7 +588,7 @@ void Builder::addText( const BuilderData::Text &rData )
     GenericFont *pFont = getFont( rData.m_fontId );
     if( pFont == NULL )
     {
-        msg_Err( getIntf(), "Unknown font id: %s", rData.m_fontId.c_str() );
+        msg_Err( getIntf(), "unknown font id: %s", rData.m_fontId.c_str() );
         return;
     }
 
@@ -602,7 +602,7 @@ void Builder::addText( const BuilderData::Text &rData )
         scrolling = CtrlText::kNone;
     else
     {
-        msg_Err( getIntf(), "Invalid scrolling mode: %s",
+        msg_Err( getIntf(), "invalid scrolling mode: %s",
                  rData.m_scrolling.c_str() );
         return;
     }
@@ -617,7 +617,7 @@ void Builder::addText( const BuilderData::Text &rData )
         alignment = CtrlText::kRight;
     else
     {
-        msg_Err( getIntf(), "Invalid alignment: %s",
+        msg_Err( getIntf(), "invalid alignment: %s",
                  rData.m_alignment.c_str() );
         return;
     }
@@ -671,7 +671,7 @@ void Builder::addRadialSlider( const BuilderData::RadialSlider &rData )
     VarPercent *pVar = pInterpreter->getVarPercent( rData.m_value, m_pTheme );
     if( pVar == NULL )
     {
-        msg_Err( getIntf(), "Unknown slider value: %s", rData.m_value.c_str() );
+        msg_Err( getIntf(), "unknown slider value: %s", rData.m_value.c_str() );
         return;
     }
 
@@ -723,7 +723,7 @@ void Builder::addSlider( const BuilderData::Slider &rData )
     Bezier *pCurve = getPoints( rData.m_points.c_str() );
     if( pCurve == NULL )
     {
-        msg_Err( getIntf(), "Invalid format in tag points=\"%s\"",
+        msg_Err( getIntf(), "invalid format in tag points=\"%s\"",
                  rData.m_points.c_str() );
         return;
     }
@@ -738,7 +738,7 @@ void Builder::addSlider( const BuilderData::Slider &rData )
     VarPercent *pVar = pInterpreter->getVarPercent( rData.m_value, m_pTheme );
     if( pVar == NULL )
     {
-        msg_Err( getIntf(), "Unknown slider value: %s", rData.m_value.c_str() );
+        msg_Err( getIntf(), "unknown slider value: %s", rData.m_value.c_str() );
         return;
     }
 
@@ -799,7 +799,7 @@ void Builder::addList( const BuilderData::List &rData )
     GenericFont *pFont = getFont( rData.m_fontId );
     if( pFont == NULL )
     {
-        msg_Err( getIntf(), "Unknown font id: %s", rData.m_fontId.c_str() );
+        msg_Err( getIntf(), "unknown font id: %s", rData.m_fontId.c_str() );
         return;
     }
 
@@ -808,7 +808,7 @@ void Builder::addList( const BuilderData::List &rData )
     VarList *pVar = pInterpreter->getVarList( rData.m_var, m_pTheme );
     if( pVar == NULL )
     {
-        msg_Err( getIntf(), "No such list variable: %s", rData.m_var.c_str() );
+        msg_Err( getIntf(), "no such list variable: %s", rData.m_var.c_str() );
         return;
     }
 
@@ -855,7 +855,7 @@ void Builder::addTree( const BuilderData::Tree &rData )
     GenericFont *pFont = getFont( rData.m_fontId );
     if( pFont == NULL )
     {
-        msg_Err( getIntf(), "Unknown font id: %s", rData.m_fontId.c_str() );
+        msg_Err( getIntf(), "unknown font id: %s", rData.m_fontId.c_str() );
         return;
     }
 
@@ -864,7 +864,7 @@ void Builder::addTree( const BuilderData::Tree &rData )
     VarTree *pVar = pInterpreter->getVarTree( rData.m_var, m_pTheme );
     if( pVar == NULL )
     {
-        msg_Err( getIntf(), "No such list variable: %s", rData.m_var.c_str() );
+        msg_Err( getIntf(), "no such list variable: %s", rData.m_var.c_str() );
         return;
     }
 
@@ -1019,7 +1019,7 @@ GenericFont *Builder::getFont( const string &fontId )
         }
         if( !pFont )
         {
-            msg_Err( getIntf(), "Failed to open the default font" );
+            msg_Err( getIntf(), "failed to open the default font" );
         }
     }
     return pFont;

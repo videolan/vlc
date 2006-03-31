@@ -163,7 +163,7 @@ bool ThemeLoader::extractZip( const string &zipFile, const string &rootDir )
     {
         if( !extractFileInZip( file, rootDir ) )
         {
-            msg_Warn( getIntf(), "Error while unzipping %s",
+            msg_Warn( getIntf(), "error while unzipping %s",
                       zipFile.c_str() );
             unzClose( file );
             return false;
@@ -174,7 +174,7 @@ bool ThemeLoader::extractZip( const string &zipFile, const string &rootDir )
             // Go the next file in the archive
             if( unzGoToNextFile( file ) !=UNZ_OK )
             {
-                msg_Warn( getIntf(), "Error while unzipping %s",
+                msg_Warn( getIntf(), "error while unzipping %s",
                           zipFile.c_str() );
                 unzClose( file );
                 return false;
@@ -209,7 +209,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
     void *pBuffer = malloc( ZIP_BUFFER_SIZE );
     if( !pBuffer )
     {
-        msg_Err( getIntf(), "Failed to allocate memory" );
+        msg_Err( getIntf(), "failed to allocate memory" );
         return false;
     }
 
@@ -232,7 +232,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
         FILE *fout = fopen( fullPath.c_str(), "wb" );
         if( fout == NULL )
         {
-            msg_Err( getIntf(), "Error opening %s", fullPath.c_str() );
+            msg_Err( getIntf(), "error opening %s", fullPath.c_str() );
             free( pBuffer );
             return false;
         }
@@ -244,7 +244,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
             n = unzReadCurrentFile( file, pBuffer, ZIP_BUFFER_SIZE );
             if( n < 0 )
             {
-                msg_Err( getIntf(), "Error while reading zip file" );
+                msg_Err( getIntf(), "error while reading zip file" );
                 free( pBuffer );
                 return false;
             }
@@ -252,7 +252,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
             {
                 if( fwrite( pBuffer, n , 1, fout) != 1 )
                 {
-                    msg_Err( getIntf(), "Error while writing %s",
+                    msg_Err( getIntf(), "error while writing %s",
                              fullPath.c_str() );
                     free( pBuffer );
                     return false;
@@ -303,7 +303,7 @@ bool ThemeLoader::extract( const string &fileName )
         string mainBmp;
         if( findFile( tempPath, "main.bmp", mainBmp ) )
         {
-            msg_Dbg( getIntf(), "Try to load a winamp2 skin" );
+            msg_Dbg( getIntf(), "trying to load a winamp2 skin" );
             path = getFilePath( mainBmp );
 
             // Look for winamp2.xml in the resource path
@@ -322,13 +322,13 @@ bool ThemeLoader::extract( const string &fileName )
         // Parse the XML file
         if (! parse( path, xmlFile ) )
         {
-            msg_Err( getIntf(), "Error while parsing %s", xmlFile.c_str() );
+            msg_Err( getIntf(), "error while parsing %s", xmlFile.c_str() );
             result = false;
         }
     }
     else
     {
-        msg_Err( getIntf(), "No XML found in theme %s", fileName.c_str() );
+        msg_Err( getIntf(), "no XML found in theme %s", fileName.c_str() );
         result = false;
     }
 
@@ -348,13 +348,13 @@ void ThemeLoader::deleteTempFiles( const string &path )
 bool ThemeLoader::parse( const string &path, const string &xmlFile )
 {
     // File loaded
-    msg_Dbg( getIntf(), "Using skin file: %s", xmlFile.c_str() );
+    msg_Dbg( getIntf(), "using skin file: %s", xmlFile.c_str() );
 
     // Start the parser
     SkinParser parser( getIntf(), xmlFile, path );
     if( ! parser.parse() )
     {
-        msg_Err( getIntf(), "Failed to parse %s", xmlFile.c_str() );
+        msg_Err( getIntf(), "failed to parse %s", xmlFile.c_str() );
         return false;
     }
 
@@ -418,7 +418,7 @@ bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
     if( pCurrDir == NULL )
     {
         // An error occurred
-        msg_Dbg( getIntf(), "Cannot open directory %s", rootDir.c_str() );
+        msg_Dbg( getIntf(), "cannot open directory %s", rootDir.c_str() );
         return false;
     }
 

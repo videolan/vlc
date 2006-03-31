@@ -193,16 +193,16 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         GenericLayout *pLayout = pTheme->getLayoutById( layoutId );
         if( !pWin )
         {
-            msg_Err( getIntf(), "Unknown window (%s)", windowId.c_str() );
+            msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
         }
         else if( !pLayout )
         {
-            msg_Err( getIntf(), "Unknown layout (%s)", layoutId.c_str() );
+            msg_Err( getIntf(), "unknown layout (%s)", layoutId.c_str() );
         }
         // Check that the layout doesn't correspond to another window
         else if( pWin != pLayout->getWindow() )
         {
-            msg_Err( getIntf(), "Layout %s is not associated to window %s",
+            msg_Err( getIntf(), "layout %s is not associated to window %s",
                      layoutId.c_str(), windowId.c_str() );
         }
         else
@@ -230,7 +230,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
             }
             else
             {
-                msg_Err( getIntf(), "Unknown window or popup (%s)",
+                msg_Err( getIntf(), "unknown window or popup (%s)",
                          windowId.c_str() );
             }
         }
@@ -247,7 +247,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         }
         else
         {
-            msg_Err( getIntf(), "Unknown window (%s)", windowId.c_str() );
+            msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
         }
     }
 
@@ -258,7 +258,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
     }
     else
     {
-        msg_Warn( getIntf(), "Unknown action: %s", rAction.c_str() );
+        msg_Warn( getIntf(), "unknown action: %s", rAction.c_str() );
     }
 
     return pCommand;
@@ -284,7 +284,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             // Get the 2 last variables on the stack
             if( varStack.empty() )
             {
-                msg_Err( getIntf(), "Invalid boolean expression: %s",
+                msg_Err( getIntf(), "invalid boolean expression: %s",
                          rName.c_str());
                 return NULL;
             }
@@ -292,7 +292,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             varStack.pop_back();
             if( varStack.empty() )
             {
-                msg_Err( getIntf(), "Invalid boolean expression: %s",
+                msg_Err( getIntf(), "invalid boolean expression: %s",
                          rName.c_str());
                 return NULL;
             }
@@ -310,7 +310,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             // Get the 2 last variables on the stack
             if( varStack.empty() )
             {
-                msg_Err( getIntf(), "Invalid boolean expression: %s",
+                msg_Err( getIntf(), "invalid boolean expression: %s",
                          rName.c_str());
                 return NULL;
             }
@@ -318,7 +318,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             varStack.pop_back();
             if( varStack.empty() )
             {
-                msg_Err( getIntf(), "Invalid boolean expression: %s",
+                msg_Err( getIntf(), "invalid boolean expression: %s",
                          rName.c_str());
                 return NULL;
             }
@@ -336,7 +336,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             // Get the last variable on the stack
             if( varStack.empty() )
             {
-                msg_Err( getIntf(), "Invalid boolean expression: %s",
+                msg_Err( getIntf(), "invalid boolean expression: %s",
                          rName.c_str());
                 return NULL;
             }
@@ -361,7 +361,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             }
             else
             {
-                msg_Err( getIntf(), "Unknown window (%s)", windowId.c_str() );
+                msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
                 return NULL;
             }
         }
@@ -371,7 +371,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             VarBool *pVar = (VarBool*)pVarManager->getVar( token, "bool" );
             if( !pVar )
             {
-                msg_Err( getIntf(), "Cannot resolve boolean variable: %s",
+                msg_Err( getIntf(), "cannot resolve boolean variable: %s",
                          token.c_str());
                 return NULL;
             }
@@ -384,7 +384,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
     // The stack should contain a single variable
     if( varStack.size() != 1 )
     {
-        msg_Err( getIntf(), "Invalid boolean expression: %s", rName.c_str() );
+        msg_Err( getIntf(), "invalid boolean expression: %s", rName.c_str() );
         return NULL;
     }
     return varStack.back();

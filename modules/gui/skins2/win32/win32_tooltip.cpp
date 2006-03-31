@@ -40,7 +40,7 @@ Win32Tooltip::Win32Tooltip( intf_thread_t *pIntf, HINSTANCE hInst,
 
     if( !m_hWnd )
     {
-        msg_Err( getIntf(), "CreateWindow failed" );
+        msg_Err( getIntf(), "createWindow failed" );
         return;
     }
 }

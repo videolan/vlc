@@ -381,7 +381,7 @@ void WindowManager::createTooltip( const GenericFont &rTipFont )
     }
     else
     {
-        msg_Warn( getIntf(), "Tooltip already created!");
+        msg_Warn( getIntf(), "tooltip already created!");
     }
 }
 
