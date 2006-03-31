@@ -86,19 +86,20 @@ private:
 #define EMBED_TEXT N_("Embed video in interface")
 #define EMBED_LONGTEXT N_("Embed the video inside the interface instead " \
     "of having it in a separate window.")
-#define BOOKMARKS_TEXT N_("Show bookmarks dialog")
-#define BOOKMARKS_LONGTEXT N_("Show bookmarks dialog when the interface " \
-    "starts.")
-#define EXTENDED_TEXT N_("Show extended GUI")
-#define EXTENDED_LONGTEXT N_("Show extended GUI")
-#define TASKBAR_TEXT N_("Show taskbar entry")
-#define TASKBAR_LONGTEXT N_("Show taskbar entry")
+#define BOOKMARKS_TEXT N_("Bookmarks dialog")
+#define BOOKMARKS_LONGTEXT N_("Show bookmarks dialog at startup" )
+#define EXTENDED_TEXT N_("Extended GUI")
+#define EXTENDED_LONGTEXT N_("Show extended GUI (equalizer, image adjust, "  \
+              "video filters...) at startup"  )
+#define TASKBAR_TEXT N_("Taskbar")
+#define TASKBAR_LONGTEXT N_("Show VLC on the taskbar")
 #define MINIMAL_TEXT N_("Minimal interface")
-#define MINIMAL_LONGTEXT N_("Use minimal interface, no toolbar, few menus")
+#define MINIMAL_LONGTEXT N_("Use minimal interface, with no toolbar and " \
+                "fewer menus.")
 #define SIZE_TO_VIDEO_TEXT N_("Size to video")
-#define SIZE_TO_VIDEO_LONGTEXT N_("Resize VLC to match the video resolution")
-#define SYSTRAY_TEXT N_("Show systray icon")
-#define SYSTRAY_LONGTEXT N_("Show systray icon")
+#define SIZE_TO_VIDEO_LONGTEXT N_("Resize VLC to match the video resolution.")
+#define SYSTRAY_TEXT N_("Systray icon")
+#define SYSTRAY_LONGTEXT N_("Show a systray icon for VLC")
 #define LABEL_TEXT N_("Show labels in toolbar")
 #define LABEL_LONGTEXT N_("Show labels below the icons in the toolbar.")
 

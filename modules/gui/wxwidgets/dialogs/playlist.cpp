@@ -235,7 +235,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxMenu *manage_menu = new wxMenu;
     manage_menu->Append( AddFile_Event, wxU(_("&Simple Add File...")) );
     manage_menu->Append( AddDir_Event, wxU(_("Add &Directory...")) );
-    manage_menu->Append( AddMRL_Event, wxU(_("&Add MRL...")) );
+    manage_menu->Append( AddMRL_Event, wxU(_("&Add URL...")) );
     manage_menu->AppendSeparator();
     manage_menu->Append( MenuDummy_Event, wxU(_("Services discovery")),
                          p_sd_menu );
@@ -250,7 +250,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     sort_menu->Append( SortTitle_Event, wxU(_("Sort by &title")) );
     sort_menu->Append( RSortTitle_Event, wxU(_("&Reverse sort by title")) );
     sort_menu->AppendSeparator();
-    sort_menu->Append( Randomize_Event, wxU(_("&Shuffle Playlist")) );
+    sort_menu->Append( Randomize_Event, wxU(_("&Shuffle")) );
 
     /* Create our "Selection" menu */
     wxMenu *selection_menu = new wxMenu;

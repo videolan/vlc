@@ -38,9 +38,7 @@
  * Local class declarations.
  *****************************************************************************/
 
-/* FIXME */
-#define SMOOTH_TIP N_( "If this setting is not zero, the bands will move " \
-                "together when you move one. The higher the value is, the " \
+#define SMOOTH_TIP N_( "Move bands together. The higher this value is, the " \
                 "more correlated their movement will be." )
 
 static int IntfBandsCallback( vlc_object_t *, char const *,
@@ -397,7 +395,7 @@ wxPanel *ExtraPanel::AudioPanel( wxWindow *parent )
     wxCheckBox * headphone_check = new wxCheckBox( panel, HeadPhone_Event,
                                     wxU(_("Headphone virtualization")));
     headphone_check->SetToolTip( wxU(_("This filter gives the feeling of a "
-             "5.1 speaker set when using a headphone." ) ) );
+             "5.1 speakers set when using a headphone." ) ) );
 
     wxCheckBox * normvol_check = new wxCheckBox( panel, NormVol_Event,
                                     wxU(_("Volume normalization")));
@@ -472,8 +470,8 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
     eq_2p_chkbox =  new wxCheckBox( panel, Eq2Pass_Event,
                             wxU(_("2 Pass") ) );
 
-    eq_2p_chkbox->SetToolTip( wxU(_("If you enable this setting, the "
-     "equalizer filter will be applied twice. The effect will be sharper.") ) );
+    eq_2p_chkbox->SetToolTip( wxU(_("Apply the equalizer twice. "
+               "The resulting effect will be sharper.") ) );
 
     top_sizer->Add( eq_2p_chkbox, 0, wxALL, 2 );
 
@@ -998,11 +996,11 @@ void ExtraPanel::OnSelectFilter(wxCommandEvent& event)
 
 void ExtraPanel::OnFiltersInfo(wxCommandEvent& event)
 {
-    wxMessageBox( wxU( _("Select the video effects filters to apply. "
+    wxMessageBox( wxU( _("Video effects filters to apply. "
                   "You must restart the stream for these settings to "
                   "take effect.\n"
                   "To configure the filters, go to the Preferences, "
-                  "and go to Modules/Video Filters. "
+                  "and go to Video/Filters. "
                   "You can then configure each filter.\n"
                   "If you want fine control over the filters ( to choose "
                   "the order in which they are applied ), you need to enter "

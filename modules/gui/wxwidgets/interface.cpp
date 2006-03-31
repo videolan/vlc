@@ -602,9 +602,9 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
-    help_menu->Append( About_Event, wxU(_("About VLC media player")) );
+    help_menu->Append( About_Event, wxU(_("About...")) );
     help_menu->AppendSeparator();
-    help_menu->Append( UpdateVLC_Event, wxU(_("Check for updates ...")) );
+    help_menu->Append( UpdateVLC_Event, wxU(_("Check for updates...")) );
 
     /* Append the freshly created menus to the menu bar... */
     wxMenuBar *menubar = new wxMenuBar();
@@ -685,7 +685,7 @@ void Interface::CreateOurToolBar()
 #define LABEL_PLAY N_("Play")
 #define LABEL_PAUSE N_("Pause")
 #define LABEL_PLO N_("Playlist")
-#define LABEL_SPLO N_("Small playlist")
+#define LABEL_SPLO N_("Embedded playlist")
 #define LABEL_PLP N_("Previous")
 #define LABEL_PLN N_("Next")
 #define LABEL_SLOW N_("Slower")

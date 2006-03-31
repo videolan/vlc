@@ -62,7 +62,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 UpdateVLC::UpdateVLC( intf_thread_t *_p_intf, wxWindow *p_parent ):
-    wxFrame( p_parent, -1, wxU(_("VLC media player - Updates")),
+    wxFrame( p_parent, -1, wxU(_("Updates")),
              wxDefaultPosition, wxDefaultSize,
              wxSYSTEM_MENU|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT
              |wxFRAME_TOOL_WINDOW|wxCAPTION )
@@ -75,7 +75,7 @@ UpdateVLC::UpdateVLC( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxButton *update_button =
         new wxButton( this, CheckForUpdate_Event,
-                      wxU(_("Check for updates now !")) );
+                      wxU(_("Check for updates")) );
     main_sizer->Add( update_button );
     SetSizerAndFit( main_sizer );
 
@@ -151,7 +151,9 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
                               i_image );
         }
 
-        main_sizer->Add( new wxStaticText( this, -1, wxU( _("\nAvailable updates and related downloads:\n(Double click on a file to download it)\n" ) ) ) );
+        main_sizer->Add( new wxStaticText( this, -1, wxU( _("\nAvailable " 
+                "updates and related downloads\n"
+                "(Double click on a file to download it)\n" ) ) ) );
         main_sizer->Add( list );
         SetSizerAndFit( main_sizer );
         Layout();

@@ -119,11 +119,11 @@ const struct codec acodecs_array[] =
 
 const struct method methods_array[] =
 {
-    {"rtp",N_("RTP Unicast"), N_("Use this to stream to a single computer."),
+    {"rtp",N_("RTP Unicast"), N_("Stream to a single computer."),
      N_("Enter the address of the computer to stream to."),
      { MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1 } },
     {"rtp",N_("RTP Multicast"),
-     N_("Use this to stream to a dynamic group of computers on a "
+     N_("Stream to a dynamic group of computers on a "
      "multicast-enabled network. This is the most efficient method "
      "to stream to several computers, but it does not work over Internet."),
      N_("Enter the multicast address to stream to in this field. "
@@ -131,7 +131,7 @@ const struct method methods_array[] =
      "For a private use, enter an address beginning with 239.255."),
      { MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1 } },
     {"http","HTTP",
-     N_("Use this to stream to several computers. This method is "
+     N_("Stream to several computers. This method is "
      "less efficient, as the server needs to send the "
      "stream several times."),
      N_("Enter the local addresses you want to listen to. Do not enter "

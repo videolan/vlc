@@ -923,8 +923,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
         {
         case 0: /* DVD with menus */
         case 1: /* DVD without menus */
-            disc_device->SetToolTip( wxU(_("Name of DVD device "
-            "to read from.")) );
+            disc_device->SetToolTip( wxU(_("DVD device to use" ) )  );
             if( i_disc_type_selection == 0 )
             {
                 mrltemp = wxT("dvd://") + disc_device->GetValue();
@@ -963,8 +962,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
                                   config_GetInt( p_intf, "vcdx-PBC"  )
                                   ? 'P' : 'E', i_disc_title );
 #else
-            disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
-            "to read Video CD from.")) );
+            disc_device->SetToolTip( wxU(_("CD-ROM device to use" ) ) );
             mrltemp = wxT("vcd://") + disc_device->GetValue();
             if( i_disc_title > 0 )
                 mrltemp += wxString::Format( wxT("@%d"), i_disc_title );
@@ -987,8 +985,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
             "for a CD-ROM with an audio CD in it." )) );
             mrltemp = wxT("cddax://")
 #else
-            disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
-            "to read audio CD from." )) );
+            disc_device->SetToolTip( wxU(_("CD-ROM device to use" ) ) ) ;
             mrltemp = wxT("cdda://")
 #endif
               + disc_device->GetValue();

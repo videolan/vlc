@@ -290,7 +290,7 @@ void PrefsDialog::OnSave( wxCommandEvent& WXUNUSED(event) )
 void PrefsDialog::OnResetAll( wxCommandEvent& WXUNUSED(event) )
 {
     wxMessageDialog dlg( this,
-        wxU(_("Beware this will reset your VLC media player preferences.\n"
+        wxU(_("This will reset your VLC media player preferences.\n"
               "Are you sure you want to continue?")),
         wxU(_("Reset Preferences")), wxYES_NO|wxNO_DEFAULT|wxCENTRE );
 
@@ -919,7 +919,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             }
             if( !p_module && !b_found )
             {
-                msg_Warn( p_intf, "ohoh, unable to find main module" );
+                msg_Warn( p_intf, "unable to create preferences "
+                                  "(main module not found)" );
                 return;
             }
         }

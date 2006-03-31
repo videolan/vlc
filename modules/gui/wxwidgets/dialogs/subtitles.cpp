@@ -94,7 +94,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     {
         wxBoxSizer *enc_sizer_sizer = new wxBoxSizer( wxHORIZONTAL );
         wxStaticBox *enc_box = new wxStaticBox( panel, -1,
-                                                wxU(_("Subtitles encoding")) );
+                                                wxU(_("Encoding")) );
         wxStaticBoxSizer *enc_sizer = new wxStaticBoxSizer( enc_box,
                                                             wxHORIZONTAL );
         wxStaticText *label =
@@ -126,7 +126,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     /* Misc Subtitles options */
     wxBoxSizer *misc_sizer_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticBox *misc_box = new wxStaticBox( panel, -1,
-                                             wxU(_("Subtitles options")) );
+                                             wxU(_("Options")) );
 
     wxStaticBoxSizer *misc_sizer = new wxStaticBoxSizer( misc_box,
                                                          wxVERTICAL );

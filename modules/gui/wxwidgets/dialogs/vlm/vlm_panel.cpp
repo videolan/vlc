@@ -520,7 +520,7 @@ BEGIN_EVENT_TABLE( VLMFrame, wxFrame )
 END_EVENT_TABLE()
 
 VLMFrame::VLMFrame( intf_thread_t *_p_intf, wxWindow *_p_parent ) :
-        wxFrame( _p_parent, -1, wxU( _("VLM configuration") ),
+        wxFrame( _p_parent, -1, wxU( _("VLM") ),
         wxDefaultPosition, wxSize( 640,480 ), wxDEFAULT_FRAME_STYLE )
 {
     SetIcon( *_p_intf->p_sys->p_icon );

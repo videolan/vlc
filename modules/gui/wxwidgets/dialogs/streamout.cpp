@@ -168,11 +168,11 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     wxStaticBoxSizer *mrl_sizer = new wxStaticBoxSizer( mrl_box,
                                                         wxHORIZONTAL );
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
-                                                wxU(_("Destination Target:")));
+                                                wxU(_("Target:")));
     mrl_combo = new wxComboBox( panel, MRL_Event, wxT(""),
                                 wxPoint(20,25), wxSize(120, -1) );
     mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
-        "the full MRL you want to open.\n""Alternatively, the field will be "
+        "the full MRL you want to stream to.\n""Alternatively, the field will be "
         "filled automatically when you use the controls below")) );
 
     mrl_sizer->Add( mrl_label, 0, wxALL | wxALIGN_CENTER, 5 );
@@ -459,7 +459,7 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
                                   wxSize(200, 200) );
 
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
-                                              wxU(_("Output methods")) );
+                                              wxU(_("Outputs")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
 
@@ -575,7 +575,7 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
                                   wxSize(200, 200) );
 
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
-                                   wxU(_("Miscellaneous options")) );
+                                   wxU(_("Miscellaneous")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
 

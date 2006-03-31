@@ -194,8 +194,8 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
                                 wxLC_REPORT | wxSUNKEN_BORDER );
     list_ctrl->InsertColumn( 0, wxU(_("Description")) );
     list_ctrl->SetColumnWidth( 0, 240 );
-    list_ctrl->InsertColumn( 1, wxU(_("Size offset")) );
-    list_ctrl->InsertColumn( 2, wxU(_("Time offset")) );
+    list_ctrl->InsertColumn( 1, wxU(_("Bytes")) );
+    list_ctrl->InsertColumn( 2, wxU(_("Time")) );
 
     sizer->Add( panel, 0, wxEXPAND | wxALL, 1 );
     sizer->Add( list_ctrl, 1, wxEXPAND | wxALL, 1 );

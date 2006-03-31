@@ -88,18 +88,23 @@ END_EVENT_TABLE()
 #define HELLO_STREAMING _("Stream to network")
 #define HELLO_STREAMING_DESC _("Use this to stream on a network.")
 #define HELLO_TRANSCODE _("Transcode/Save to file")
-#define HELLO_TRANSCODE_DESC _("Use this to re-encode a stream and save it to a file.")
-#define HELLO_NOTICE _("This wizard only gives access to a small subset of VLC's streaming and transcoding capabilities. Use the Open and Stream Output dialogs to get all of them.")
+#define HELLO_TRANSCODE_DESC _("Use this to re-encode a stream and save it "\
+        "to a file.")
+#define HELLO_NOTICE _("This wizard only gives access to a small subset " \
+        "of VLC's streaming and transcoding capabilities. Use the Open "\
+        "and Stream Output dialogs to get all of them.")
 
 #define MOREINFO_STREAM _("Use this to stream on a network")
 
-#define MOREINFO_TRANSCODE _("Use this to save a stream to a file. You have the possibility to reencode the stream. You can save whatever VLC can read.\nPlease notice that VLC is not very suited " \
-             "for file to file transcoding. You should use its transcoding " \
-             "features to save network streams, for example." )
+#define MOREINFO_TRANSCODE _("Use this to save a stream to a file. You have "\
+        "the ability to reencode the stream. You can save whatever " \
+        "VLC can read.\nPlease notice that VLC is not very suited " \
+        "for file to file transcoding. You should use its transcoding " \
+        "features to save network streams, for example." )
 
 /* Input page */
-#define INPUT_TITLE _("Choose input")
-#define INPUT_TEXT _("Choose here your input stream.")
+#define INPUT_TITLE _("Input")
+#define INPUT_TEXT _("Input stream")
 
 #define INPUT_OPEN _("Select a stream" )
 #define INPUT_PL _( "Existing playlist item" )
@@ -117,16 +122,17 @@ END_EVENT_TABLE()
 
 /* Transcode 1 */
 #define TRANSCODE1_TITLE _("Transcode")
-#define TRANSCODE1_TEXT _("If you want to change the compression format of the audio or video tracks, fill in this page. (If you only want to change the container format, proceed to next page.)")
+#define TRANSCODE1_TEXT _("If you want to change the compression format " \
+        "of the audio or video tracks, fill in this page. " \
+        "(If you only want to change the container format, proceed to next " \
+        " page.)")
 
-#define TR_VIDEO_TEXT0 _("If your stream has video and you want to " \
-                         "transcode it, enable this.")
-#define TR_VIDEO_TEXT _("Select your video codec. Click one to get more " \
+#define TR_VIDEO_TEXT0 _("Transcode video (if your stream has some)" )
+#define TR_VIDEO_TEXT _("Select the target video codec. Click one to get more " \
                         "information.")
 
-#define TR_AUDIO_TEXT0 _("If your stream has audio and you want to "\
-                         "transcode it, enable this.")
-#define TR_AUDIO_TEXT _("Select your audio codec. Click one to get more " \
+#define TR_AUDIO_TEXT0 _("Transcode audio (if your stream has some)"
+#define TR_AUDIO_TEXT _("Select the target audio codec. Click one to get more " \
                         "information.")
 
 /* Streaming 1 */
@@ -1545,9 +1551,9 @@ void WizardDialog::Run()
 
         if( i_action == ACTION_TRANSCODE )
         {
-            msg_Dbg( p_intf,"Starting transcode of %s to file %s",
+            msg_Dbg( p_intf,"starting transcode of %s to file %s",
                                   mrl, address);
-            msg_Dbg( p_intf,"Using %s (%i kbps) / %s (%i kbps),encap %s",
+            msg_Dbg( p_intf,"using %s (%i kbps) / %s (%i kbps),encap %s",
                                 vcodec,vb,acodec,ab,mux);
             char *psz_transcode;
 
@@ -1598,7 +1604,7 @@ void WizardDialog::Run()
             char *psz_sap_option = NULL;
             bool v6;
 
-            msg_Dbg( p_intf, "Starting stream of %s to %s using %s, encap %s",
+            msg_Dbg( p_intf, "starting stream of %s to %s using %s, encap %s",
                                mrl, address, method, mux );
             if( b_sap )
             {
