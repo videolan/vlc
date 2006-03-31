@@ -1419,8 +1419,15 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t8_fld_destination setStringValue: @"-"];
         [o_t8_fld_ttl setStringValue: @"-"];
         [o_t8_fld_sap setStringValue: @"-"];
-        [o_t8_fld_saveFileTo setStringValue: [o_userSelections objectForKey: \
-            @"trnscdFilePath"]];
+        /* do only show the destination of the first item and add a counter, if needed */
+        if( [[o_userSelections objectForKey: @"trnscdFilePath"] count] > 1 )
+            [o_t8_fld_saveFileTo setStringValue: \
+                [NSString stringWithFormat: @"%@ (+ %i)", \
+                [[o_userSelections objectForKey: @"trnscdFilePath"] objectAtIndex:0], \
+                ([[o_userSelections objectForKey: @"trnscdFilePath"] count] - 1)]];
+        else
+            [o_t8_fld_saveFileTo setStringValue: \
+                [[o_userSelections objectForKey: @"trnscdFilePath"] objectAtIndex:0]];
     }
     [o_t8_fld_encapFormat setStringValue: [[o_encapFormats objectAtIndex: \
         [[o_userSelections objectForKey:@"encapFormat"] intValue]] objectAtIndex:1]];
