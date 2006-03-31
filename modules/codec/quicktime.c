@@ -954,7 +954,7 @@ static int QTAudioInit( decoder_t *p_dec )
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_dec, "Standard init done" );
+    msg_Dbg( p_dec, "standard init done" );
 #endif /* else __APPLE__ */
 
     return VLC_SUCCESS;

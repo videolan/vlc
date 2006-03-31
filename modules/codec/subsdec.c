@@ -312,7 +312,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         {
             if( IsUTF8( psz_subtitle ) == NULL )
             {
-                msg_Dbg( p_dec, "Invalid UTF-8 sequence: "
+                msg_Dbg( p_dec, "invalid UTF-8 sequence: "
                          "disabling UTF-8 subtitles autodetection" );
                 p_sys->b_autodetect_utf8 = VLC_FALSE;
             }
@@ -336,7 +336,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
             if( ( ret == (size_t)(-1) ) || inbytes_left )
             {
                 free( psz_new_subtitle );
-                msg_Err( p_dec, _("Failed to convert subtitle encoding.\n"
+                msg_Err( p_dec, _("failed to convert subtitle encoding.\n"
                         "Try manually setting a character-encoding "
                                 "before you open the file.") );
                 return NULL;

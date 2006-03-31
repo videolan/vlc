@@ -56,22 +56,22 @@ static void Close( vlc_object_t * );
     "If scenecuts appear within this interval, they are still encoded as " \
     "I-frames, but do not start a new GOP." )
 
-#define SCENE_TEXT N_("How aggressively to insert extra I-frames (-1 to 100)")
+#define SCENE_TEXT N_("Extra I-Frames aggressivity" )
 #define SCENE_LONGTEXT N_( "Scene-cut detection. Controls how aggressively to " \
     "insert extra I-frames. With small values of scenecut, the codec often has " \
     "to force an I-frame when it would exceed keyint. Good values of scenecut " \
     "may find a better location for the I-frame. Large values use more I-frames " \
     "than necessary, thus wasting bits. -1 disables scene-cut detection, so " \
     "I-frames are be inserted only every other keyint frames, which probably " \
-    "leads to ugly encoding artifacts." )
+    "leads to ugly encoding artifacts. (1-100)." )
 
 #define BFRAMES_TEXT N_("Number of B-frames between I and P (1 to 16)")
 #define BFRAMES_LONGTEXT N_( "Number of consecutive B-frames between I and " \
     "P-frames." )
 
 #define B_ADAPT_TEXT N_("Adaptive B-frame decision")
-#define B_ADAPT_LONGTEXT N_( "If this is on, the specified number of " \
-    "consecutive B-frames will always be used, except possibly before an I-frame. " )
+#define B_ADAPT_LONGTEXT N_( "Force the specified number of " \
+    "consecutive B-frames to be used, except possibly before an I-frame. " )
 
 #define B_BIAS_TEXT N_("Influences how often B-frames are used")
 #define B_BIAS_LONGTEXT N_( "Bias the choice to use B-frames. Positive values " \
@@ -93,7 +93,7 @@ static void Close( vlc_object_t * );
     "live-action source material. Some decoders are unable to deal with " \
     "large frameref values." )
 
-#define NF_TEXT N_("No loop filter (enabling turns off the deblocking loop filter)")
+#define NF_TEXT N_("Loop filter")
 #define NF_LONGTEXT N_( "Deblocking loop filter (increases quality).")
 
 /* Ratecontrol */
@@ -116,16 +116,16 @@ static void Close( vlc_object_t * );
 #define QPSTEP_TEXT N_("Set max QP step")
 #define QPSTEP_LONGTEXT N_( "Max QP step between frames.")
 
-#define RATETOL_TEXT N_("Allowed variance of average bitrate")
-#define RATETOL_LONGTEXT N_( "Sets the allowed variance in average. " \
-    "bitrate.")
+#define RATETOL_TEXT N_("Average bitrate tolerance")
+#define RATETOL_LONGTEXT N_( "Allowed variance in average. " \
+    "bitrate (in kbits/s).")
 
 #define VBV_MAXRATE_TEXT N_("Max local bitrate")
 #define VBV_MAXRATE_LONGTEXT N_( "Sets a maximum local bitrate in kbits/s.")
 
-#define VBV_BUFSIZE_TEXT N_("Size of VBV buffer")
-#define VBV_BUFSIZE_LONGTEXT N_( "Sets an averaging period for the maximum " \
-    "local bitrate in kbits/s.")
+#define VBV_BUFSIZE_TEXT N_("VBV buffer")
+#define VBV_BUFSIZE_LONGTEXT N_( "Averaging period for the maximum " \
+    "local bitrate in kbits.")
 
 #define VBV_INIT_TEXT N_("Initial VBV buffer occupancy")
 #define VBV_INIT_LONGTEXT N_( "Sets the initial buffer occupancy as a " \
@@ -140,8 +140,8 @@ static void Close( vlc_object_t * );
 #define CHROMA_QP_OFFSET_TEXT N_("QP difference between chroma and luma")
 #define CHROMA_QP_OFFSET_LONGTEXT N_( "QP difference between chroma and luma.")
 
-#define QCOMP_TEXT N_("QP curve compression (0.0=CBR to 1.0=QCP)")
-#define QCOMP_LONGTEXT N_( "QP curve compression.")
+#define QCOMP_TEXT N_("QP curve compression")
+#define QCOMP_LONGTEXT N_( "QP curve compression. (0.0=CBR to 1.0=QCP)")
 
 #define CPLXBLUR_TEXT N_("Reduce fluctuations in QP (before curve compression)")
 #define CPLXBLUR_LONGTEXT N_( "Temporally blur complexity.")
@@ -215,7 +215,7 @@ static void Close( vlc_object_t * );
 /* Input/Output */
 
 #define ASM_TEXT N_("CPU optimizations")
-#define ASM_LONGTEXT N_( "CPU optimizations.")
+#define ASM_LONGTEXT N_( "Use assembler CPU optimizations.")
 
 #define PSNR_TEXT N_("PSNR calculation")
 #define PSNR_LONGTEXT N_( "This has no effect on actual encoding quality, "\
@@ -539,13 +539,13 @@ static int  Open ( vlc_object_t *p_this )
     if( val.i_int >= 0 && val.i_int <= 51 ) i_qmin = val.i_int;
     var_Get( p_enc, SOUT_CFG_PREFIX "qpmax", &val );
     if( val.i_int >= 0 && val.i_int <= 51 ) i_qmax = val.i_int;
-    
+
     var_Get( p_enc, SOUT_CFG_PREFIX "qp", &val );
     if( val.i_int >= 0 && val.i_int <= 51 )
     {
         if( i_qmin > val.i_int ) i_qmin = val.i_int;
         if( i_qmax < val.i_int ) i_qmax = val.i_int;
-        
+
 #if X264_BUILD >= 0x000a
         p_sys->param.rc.i_qp_constant = val.i_int;
         p_sys->param.rc.i_qp_min = i_qmin;
@@ -570,7 +570,7 @@ static int  Open ( vlc_object_t *p_this )
        on average bitrate. */
     if( !val.i_int )
         p_sys->param.rc.i_vbv_buffer_size = p_sys->param.rc.i_bitrate * 2;
- 
+
     /* max bitrate = average bitrate -> CBR */
     var_Get( p_enc, SOUT_CFG_PREFIX "vbv-maxrate", &val );
     p_sys->param.rc.i_vbv_max_bitrate = val.i_int;
@@ -582,7 +582,7 @@ static int  Open ( vlc_object_t *p_this )
 
     var_Get( p_enc, SOUT_CFG_PREFIX "cabac", &val );
     p_sys->param.b_cabac = val.b_bool;
-    
+
     /* disable deblocking when nf (no loop filter) is enabled */
     var_Get( p_enc, SOUT_CFG_PREFIX "nf", &val );
     p_sys->param.b_deblocking_filter = !val.b_bool;

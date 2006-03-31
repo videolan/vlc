@@ -344,7 +344,7 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
     if( p_header->speex_version_id > 1 )
     {
         msg_Err( p_dec, "this file was encoded with Speex bit-stream "
-                 "version %d, which I don't know how to decode.",
+                 "version %d which is not supported by this decoder.",
                  p_header->speex_version_id );
         return VLC_EGENERIC;
     }

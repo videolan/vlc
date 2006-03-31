@@ -160,7 +160,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( tarkin_synthesis_headerin( &p_sys->ti, &p_sys->tc, &oggpacket )
             < 0 )
         {
-            msg_Err( p_dec, "This bitstream does not contain Tarkin "
+            msg_Err( p_dec, "this bitstream does not contain Tarkin "
                      "video data.");
             block_Release( p_block );
             return NULL;

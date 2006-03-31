@@ -309,7 +309,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->i_headers == 0 && p_dec->fmt_in.i_extra )
     {
         /* Headers already available as extra data */
-        msg_Dbg( p_dec, "Headers already available as extra data" );
+        msg_Dbg( p_dec, "headers already available as extra data" );
         p_sys->i_headers = 3;
     }
     else if( oggpacket.bytes && p_sys->i_headers < 3 )
@@ -664,14 +664,14 @@ static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i
 
     if( b_decode )
         aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
-				  i_channel_mask & AOUT_CHAN_PHYSMASK,
-				  i_channels,
-				  pi_chan_table );
+                                  i_channel_mask & AOUT_CHAN_PHYSMASK,
+                                  i_channels,
+                                  pi_chan_table );
     else
         aout_CheckChannelReorder( pi_channels_out, pi_channels_in,
-				  i_channel_mask & AOUT_CHAN_PHYSMASK,
-				  i_channels,
-				  pi_chan_table );
+                                  i_channel_mask & AOUT_CHAN_PHYSMASK,
+                                  i_channels,
+                                  pi_chan_table );
 }
 
 /*****************************************************************************

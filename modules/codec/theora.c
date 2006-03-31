@@ -89,7 +89,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
  *****************************************************************************/
 #define ENC_QUALITY_TEXT N_("Encoding quality")
 #define ENC_QUALITY_LONGTEXT N_( \
-  "Enfore a quality between 1 (low) and 10 (high), instead " \
+  "Enforce a quality between 1 (low) and 10 (high), instead " \
   "of specifying a particular bitrate. This will produce a VBR stream." )
 
 vlc_module_begin();
@@ -278,7 +278,7 @@ static int ProcessHeaders( decoder_t *p_dec )
 
     if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
     {
-        msg_Err( p_dec, "This bitstream does not contain Theora video data" );
+        msg_Err( p_dec, "this bitstream does not contain Theora video data" );
         return VLC_EGENERIC;
     }
 

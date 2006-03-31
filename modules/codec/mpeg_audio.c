@@ -103,7 +103,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("MPEG audio layer I/II/III parser") );
+    set_description( _("MPEG audio layer I/II/III decoder") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
 #if defined(__APPLE__) || defined(UNDER_CE)
