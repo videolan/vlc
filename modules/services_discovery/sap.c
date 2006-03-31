@@ -79,23 +79,23 @@ static const char ipv6_scopes[] = "1456789ABCDE";
 #define SAP_ADDR_TEXT N_( "SAP multicast address" )
 #define SAP_ADDR_LONGTEXT N_( "The SAP module normally chooses itself the " \
                               "right addresses to listen to. However, you " \
-                              "can specify a specific address" )
+                              "can specify a specific address." )
 #define SAP_IPV4_TEXT N_( "IPv4 SAP" )
 #define SAP_IPV4_LONGTEXT N_( \
-      "Set this if you want the SAP module to listen to IPv4 announcements " \
+      "Listen to IPv4 announcements " \
       "on the standard address." )
 #define SAP_IPV6_TEXT N_( "IPv6 SAP" )
 #define SAP_IPV6_LONGTEXT N_( \
-      "Set this if you want the SAP module to listen to IPv6 announcements " \
-      "on the standard address." )
+      "Listen to IPv6 announcements " \
+      "on the standard addresses." )
 #define SAP_SCOPE_TEXT N_( "IPv6 SAP scope" )
 #define SAP_SCOPE_LONGTEXT N_( \
-       "Sets the scope for IPv6 announcements (default is 8)." )
+       "Scope for IPv6 announcements (default is 8)." )
 #define SAP_TIMEOUT_TEXT N_( "SAP timeout (seconds)" )
 #define SAP_TIMEOUT_LONGTEXT N_( \
-       "Sets the time before SAP items get deleted if no new announcement " \
+       "Delay after which SAP items get deleted if no new announcement " \
        "is received." )
-#define SAP_PARSE_TEXT N_( "Try to parse the SAP" )
+#define SAP_PARSE_TEXT N_( "Try to parse the announce" )
 #define SAP_PARSE_LONGTEXT N_( \
        "This enables actual parsing of the announces by the SAP module. " \
        "Otherwise, all announcements are parsed by the \"livedotcom\" " \
