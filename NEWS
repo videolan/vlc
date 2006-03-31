@@ -55,6 +55,7 @@ Interfaces:
  * OS X
     - Embedded Video output
     - new Go-To-Specific-Time feature
+    - Video cropping and aspect ratio changing while playing
     - Improved media information panel (shows statistics, metadata, ...)
     - support for processing multiple items with the wizard in a single run
     - option to save selections in the wizard for a session (default enabled)
