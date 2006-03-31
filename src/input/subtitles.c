@@ -272,10 +272,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     char *f_dir = NULL, *f_fname = NULL, *f_fname_noext = NULL, *f_fname_trim = NULL;
     char *tmp = NULL;
 
-    char tmp_fname_noext[PATH_MAX];
-    char tmp_fname_trim[PATH_MAX];
-    char tmp_fname_ext[PATH_MAX];
-
     char **tmp_subdirs, **subdirs; /* list of subdirectories to look in */
 
     subfn *result = NULL; /* unsorted results */
@@ -371,6 +367,10 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                 if( psz_name == NULL )
                     continue;
 
+                char tmp_fname_noext[strlen( psz_name ) + 1];
+                char tmp_fname_trim[strlen( psz_name ) + 1];
+                char tmp_fname_ext[strlen( psz_name ) + 1];
+
                 /* retrieve various parts of the filename */
                 strcpy_strip_ext( tmp_fname_noext, psz_name );
                 strcpy_get_ext( tmp_fname_ext, psz_name );
@@ -420,14 +420,13 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                                 "autodetected subtitle: %s with priority %d",
                                 psz_path, i_prio );
                         result[i_sub_count].priority = i_prio;
-                        result[i_sub_count].psz_fname = psz_path;
+                        result[i_sub_count].psz_fname = strdup( psz_path );
                         result[i_sub_count].psz_ext = strdup(tmp_fname_ext);
                         i_sub_count++;
                     }
                     else
                     {
                         msg_Dbg( p_this, "fopen failed" );
-                        free( psz_path );
                     }
                 }
                 if( i_sub_count >= MAX_SUBTITLE_FILES ) break;
