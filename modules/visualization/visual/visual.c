@@ -64,15 +64,15 @@
 
 #define PEAKS_TEXT N_( "Enable peaks" )
 #define PEAKS_LONGTEXT N_( \
-        "This will draw \"peaks\" in the spectrum analyzer" )
+        "Draw \"peaks\" in the spectrum analyzer." )
 
 #define ORIG_TEXT N_( "Enable original graphic spectrum" )
 #define ORIG_LONGTEXT N_( \
-        "This enabled the \"flat\" spectrum analyzer in the spectrometer" )
+        "Enable the \"flat\" spectrum analyzer in the spectrometer." )
 
 #define BANDS_TEXT N_( "Enable bands" )
 #define BANDS_LONGTEXT N_( \
-        "This draws bands in the spectrometer." )
+        "Draw bands in the spectrometer." )
 
 #define BASE_TEXT N_( "Enable base" )
 #define BASE_LONGTEXT N_( \
@@ -88,7 +88,7 @@
 
 #define PEAK_HEIGHT_TEXT N_( "Peak height" )
 #define PEAK_HEIGHT_LONGTEXT N_( \
-        "This is the total pixel height of the peak items." )
+        "Total pixel height of the peak items." )
 
 #define PEAK_WIDTH_TEXT N_( "Peak extra width" )
 #define PEAK_WIDTH_LONGTEXT N_( \
@@ -100,7 +100,7 @@
 
 #define STARS_TEXT N_( "Number of stars" )
 #define STARS_LONGTEXT N_( \
-        "This defines the number of stars to draw with random effect." )
+        "Number of stars to draw with random effect." )
 
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
