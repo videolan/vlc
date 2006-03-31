@@ -1,9 +1,9 @@
 /*****************************************************************************
  * dtstofloat32.c: DTS Coherent Acoustics decoder plugin for VLC.
- *   This plugin makes use of libdts to do the actual decoding
- *   (http://www.videolan.org/dtsdec/).
+ *   This plugin makes use of libdca to do the actual decoding
+ *   (http://developers.videolan.org/libdca.html).
  *****************************************************************************
- * Copyright (C) 2001, 2002 the VideoLAN team
+ * Copyright (C) 2001, 2002libdca the VideoLAN team
  * $Id$
  *
  * Author: Gildas Bazin <gbazin@videolan.org>
@@ -31,7 +31,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include <dts.h>                                       /* libdts header file */
+#include <dts.h>                                       /* libdca header file */
 
 #include <vlc/decoder.h>
 #include "aout_internal.h"
@@ -52,7 +52,7 @@ static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
 static block_t *Convert( filter_t *, block_t * );
 
-/* libdts channel order */
+/* libdca channel order */
 static const uint32_t pi_channels_in[] =
 { AOUT_CHAN_CENTER, AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
   AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_LFE, 0 };
@@ -66,9 +66,9 @@ static const uint32_t pi_channels_out[] =
  *****************************************************************************/
 struct filter_sys_t
 {
-    dts_state_t * p_libdts; /* libdts internal structure */
+    dts_state_t * p_libdts; /* libdca internal structure */
     vlc_bool_t b_dynrng; /* see below */
-    int i_flags; /* libdts flags, see dtsdec/doc/libdts.txt */
+    int i_flags; /* libdca flags, see dtsdec/doc/libdts.txt */
     vlc_bool_t b_dontwarn;
     int i_nb_channels; /* number of float32 per sample */
 
@@ -89,7 +89,7 @@ struct filter_sys_t
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
-    set_shortname( _("DTS" ) );
+    set_shortname( _("DCA" ) );
     set_description( _("DTS Coherent Acoustics audio decoder") );
     add_bool( "dts-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT, VLC_FALSE );
     set_capability( "audio filter", 100 );
@@ -215,11 +215,11 @@ static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
     }
     //p_sys->i_flags |= DTS_ADJUST_LEVEL;
 
-    /* Initialize libdts */
+    /* Initialize libdca */
     p_sys->p_libdts = dts_init( 0 );
     if( p_sys->p_libdts == NULL )
     {
-        msg_Err( p_this, "unable to initialize libdts" );
+        msg_Err( p_this, "unable to initialize libdca" );
         return VLC_EGENERIC;
     }
 
@@ -303,7 +303,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if( !dts_syncinfo( p_sys->p_libdts, p_in_buf->p_buffer, &i_flags,
                        &i_sample_rate, &i_bit_rate, &i_frame_length ) )
     {
-        msg_Warn( p_aout, "libdts couldn't sync on frame" );
+        msg_Warn( p_aout, "libdca couldn't sync on frame" );
         p_out_buf->i_nb_samples = p_out_buf->i_nb_bytes = 0;
         return;
     }
@@ -316,7 +316,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
           && !p_sys->b_dontwarn )
     {
         msg_Warn( p_aout,
-                  "libdts couldn't do the requested downmix 0x%x->0x%x",
+                  "libdca couldn't do the requested downmix 0x%x->0x%x",
                   p_sys->i_flags  & DTS_CHANNEL_MASK,
                   i_flags & DTS_CHANNEL_MASK );
 

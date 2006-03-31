@@ -1,7 +1,7 @@
 /*****************************************************************************
  * portaudio.c : portaudio (v19) audio output plugin
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Frederic Ruget <frederic.ruget@free.fr>
@@ -174,7 +174,7 @@ static int Open( vlc_object_t * p_this )
     vlc_value_t val;
     int i_err;
 
-    msg_Dbg( p_aout, "Entering Open()");
+    msg_Dbg( p_aout, "entering Open()");
 
     /* Allocate p_sys structure */
     p_sys = (aout_sys_t *)malloc( sizeof(aout_sys_t) );
@@ -207,7 +207,7 @@ static int Open( vlc_object_t * p_this )
         /* Close device for now. We'll re-open it later on */
         if( ( i_err = Pa_Terminate() ) != paNoError )
         {
-            msg_Err( p_aout, "Pa_Terminate returned %d", i_err );
+            msg_Err( p_aout, "closing the device returned %d", i_err );
         }
 
         b_init = VLC_TRUE;
@@ -432,7 +432,7 @@ static int PAOpenDevice( aout_instance_t *p_aout )
         if( p_sys->deviceInfo->maxOutputChannels >= 6 )
         {
             val.i_int = AOUT_VAR_5_1;
-            text.psz_string = N_("5.1");
+            text.psz_string = "5.1";
             var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE,
                         &val, &text );
             msg_Dbg( p_aout, "device supports 5.1 channels" );

@@ -1,7 +1,7 @@
 /*****************************************************************************
- * fixed32float32.c : converter from fixed32 to float32 bits integer
+ * fixed32float32.c: converter from fixed32 to float32 bits integer
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman _at_ videolan _dot_ org>
@@ -47,7 +47,7 @@ static void FloatToFixed ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );
-    set_description( _("audio filter for fixed32<->float32 conversion") );
+    set_description( _("Audio filter for fixed32<->float32 conversion") );
     set_capability( "audio filter", 10 );
     set_callbacks( Create, NULL );
 vlc_module_end();

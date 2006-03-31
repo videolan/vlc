@@ -201,7 +201,7 @@ static void Probe( aout_instance_t * p_aout,
                     break;
                 case 6:
                     val.i_int = AOUT_VAR_5_1;
-                    text.psz_string = N_("5.1");
+                    text.psz_string = "5.1";
                     var_Change( p_aout, "audio-device",
                                 VLC_VAR_ADDCHOICE, &val, &text );
                     break;
@@ -566,9 +566,9 @@ static int Open( vlc_object_t *p_this )
 #endif
         if( i_snd_rc < 0 || p_aout->output.output.i_rate != i_old_rate )
         {
-            msg_Warn( p_aout, "The rate %d Hz is not supported by your hardware. "
-                  "Using %d Hz instead.\n", i_old_rate,
-                  p_aout->output.output.i_rate );
+            msg_Warn( p_aout, "The rate %d Hz is not supported by your " \
+                "hardware. Using %d Hz instead.\n", i_old_rate, \
+                p_aout->output.output.i_rate );
         }
 
         /* Set buffer size. */

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * s16tofloat32.c : converter from signed 16 bits integer to float32
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -47,7 +47,7 @@ static void DoWork24  ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );
-    set_description( _("audio filter for s16->float32 conversion") );
+    set_description( _("Audio filter for s16->float32 conversion") );
     set_capability( "audio filter", 1 );
     set_callbacks( Create, NULL );
 vlc_module_end();

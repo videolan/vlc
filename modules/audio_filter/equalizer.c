@@ -1,7 +1,7 @@
 /*****************************************************************************
  * equalizer.c:
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -54,19 +54,19 @@ static void Close( vlc_object_t * );
 
 #define BANDS_TEXT N_( "Bands gain")
 #define BANDS_LONGTEXT N_( \
-         "Don't use presets, manually specify bands. You need to provide " \
-         "10 values between -20dB and 20dB, separated by spaces, like " \
-         "\"0 2 4 2 0 -2 -4 -2 0\"" )
+         "Don't use presets, but manually specified bands. You need to " \
+         "provide 10 values between -20dB and 20dB, separated by spaces, " \
+         "e.g. \"0 2 4 2 0 -2 -4 -2 0\"" )
 
 #define TWOPASS_TEXT N_( "Two pass" )
-#define TWOPASS_LONGTEXT N_( "Filter twice the audio. This provides a more"  \
+#define TWOPASS_LONGTEXT N_( "Filter the audio twice. This provides a more "  \
          "intense effect.")
 
 #define PREAMP_TEXT N_("Global gain" )
 #define PREAMP_LONGTEXT N_("Set the global gain in dB (-20 ... 20)." )
 
 vlc_module_begin();
-    set_description( _("Equalizer 10 bands") );
+    set_description( _("Equalizer with 10 bands") );
     set_shortname( N_("Equalizer" ) );
     set_capability( "audio filter", 0 );
     set_category( CAT_AUDIO );
@@ -148,7 +148,7 @@ static int Open( vlc_object_t *p_this )
         b_fit = VLC_FALSE;
         p_filter->input.i_format = VLC_FOURCC('f','l','3','2');
         p_filter->output.i_format = VLC_FOURCC('f','l','3','2');
-        msg_Warn( p_filter, "Bad input or output format" );
+        msg_Warn( p_filter, "bad input or output format" );
     }
     if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
     {
@@ -291,7 +291,7 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     else
     {
         /* TODO compute the coeffs on the fly */
-        msg_Err( p_filter, "unsupported rate" );
+        msg_Err( p_filter, "rate not supported" );
         return VLC_EGENERIC;
     }
 

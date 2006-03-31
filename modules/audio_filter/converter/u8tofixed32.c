@@ -1,7 +1,7 @@
 /*****************************************************************************
  * u8tofixed32.c : converter from unsigned 8 bits integer to fixed32.
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -45,7 +45,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );
-    set_description( _("audio filter for u8->fixed32 conversion") );
+    set_description( _("Audio filter for u8->fixed32 conversion") );
     set_capability( "audio filter", 1 );
     set_callbacks( Create, NULL );
 vlc_module_end();

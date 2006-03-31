@@ -2,7 +2,7 @@
  * s16tofloat32swab.c : converter from signed 16 bits integer to float32
  *                      with endianness change
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -59,7 +59,7 @@ vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );
     set_description(
-            _("audio filter for s16->float32 with endianness conversion") );
+            _("Audio filter for s16->float32 with endianness conversion") );
     set_capability( "audio filter", 1 );
     set_callbacks( Create, NULL );
 vlc_module_end();

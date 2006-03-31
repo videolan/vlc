@@ -412,7 +412,7 @@ static void Probe( aout_instance_t * p_aout )
             == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_5_1;
-            text.psz_string = N_("5.1");
+            text.psz_string = "5.1";
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
             msg_Dbg( p_aout, "device supports 5.1 channels" );
@@ -582,7 +582,7 @@ static void CloseAudio( vlc_object_t *p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     aout_sys_t *p_sys = p_aout->output.p_sys;
 
-    msg_Dbg( p_aout, "CloseAudio" );
+    msg_Dbg( p_aout, "closing audio device" );
 
     /* kill the position notification thread, if any */
     if( p_sys->p_notif )

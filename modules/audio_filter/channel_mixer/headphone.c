@@ -2,7 +2,7 @@
  * headphone.c : headphone virtual spatialization channel mixer module
  *               -> gives the feeling of a real room with a simple headphone
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Boris Dorès <babal@via.ecp.fr>
@@ -60,8 +60,8 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 #define HEADPHONE_COMPENSATE_TEXT N_("Compensate delay")
 #define HEADPHONE_COMPENSATE_LONGTEXT N_( \
      "The delay which is introduced by the physical algorithm may "\
-     "sometimes be disturbing for the lipsync. In that case, turn "\
-     "this on to compensate.")
+     "sometimes be disturbing for the synchronization between lips-movement "\
+     "and speech. In case, turn this on to compensate.")
 
 #define HEADPHONE_DOLBY_TEXT N_("No decoding of Dolby Surround")
 #define HEADPHONE_DOLBY_LONGTEXT N_( \
@@ -344,7 +344,7 @@ static int Create( vlc_object_t *p_this )
     if ( p_filter->output.i_physical_channels
             != (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
     {
-        msg_Dbg( p_filter, "Filter discarded (incompatible format)" );
+        msg_Dbg( p_filter, "filter discarded (incompatible format)" );
         return VLC_EGENERIC;
     }
 
@@ -380,7 +380,7 @@ static int Create( vlc_object_t *p_this )
     }
     if ( ! b_fit )
     {
-        msg_Dbg( p_filter, "Requesting specific format" );
+        msg_Dbg( p_filter, "requesting specific format" );
         return VLC_EGENERIC;
     }
 
@@ -388,7 +388,7 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
     if ( p_filter->p_sys == NULL )
     {
-        msg_Err( p_filter, "Out of memory" );
+        msg_Err( p_filter, "out of memory" );
         return VLC_EGENERIC;
     }
     p_filter->p_sys->i_overflow_buffer_size = 0;
@@ -446,8 +446,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     byte_t * p_overflow;
     byte_t * p_slide;
 
-    size_t i_overflow_size;/* in bytes */
-    size_t i_out_size;/* in bytes */
+    size_t i_overflow_size;     /* in bytes */
+    size_t i_out_size;          /* in bytes */
 
     unsigned int i, j;
 

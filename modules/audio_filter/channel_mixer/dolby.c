@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dolby.c : simple decoder for dolby surround encoded streams
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Boris Dorès <babal@via.ecp.fr>
@@ -44,8 +44,8 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( N_("Simple decoder for dolby surround encoded streams") );
-    set_shortname( _("Dolby surround decoder") );
+    set_description( N_("Simple decoder for Dolby Surround encoded streams") );
+    set_shortname( _("Dolby Surround decoder") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
     set_capability( "audio filter", 5 );
@@ -105,7 +105,7 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
     if ( p_filter->p_sys == NULL )
     {
-        msg_Err( p_filter, "Out of memory" );
+        msg_Err( p_filter, "out of memory" );
         return VLC_EGENERIC;
     }
     p_filter->p_sys->i_left = -1;

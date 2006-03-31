@@ -1,7 +1,7 @@
 /*****************************************************************************
  * a52tospdif.c : encapsulates A/52 frames into S/PDIF packets
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -50,7 +50,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );
-    set_description( _("audio filter for A/52->S/PDIF encapsulation") );
+    set_description( _("Audio filter for A/52->S/PDIF encapsulation") );
     set_capability( "audio filter", 10 );
     set_callbacks( Create, NULL );
 vlc_module_end();
@@ -82,8 +82,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     /* AC3 is natively big endian. Most SPDIF devices have the native
-     * endianness of the computersystem.
-     * On MAc OS X however, little endian devices are also common.
+     * endianness of the computer system.
+     * On Mac OS X however, little endian devices are also common.
      */
     static const uint8_t p_sync_le[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x01, 0x00 };
     static const uint8_t p_sync_be[6] = { 0xF8, 0x72, 0x4E, 0x1F, 0x00, 0x01 };

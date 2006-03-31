@@ -91,7 +91,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_jack_client = jack_client_new( "vlc" );
     if( p_sys->p_jack_client == NULL )
     {
-        msg_Err( p_aout, "Failed to connect to JACK server" );
+        msg_Err( p_aout, "failed to connect to JACK server" );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -120,7 +120,7 @@ static int Open( vlc_object_t *p_this )
 
         if( p_sys->p_jack_port[i] == NULL )
         {
-            msg_Err( p_aout, "Failed to register a JACK port" );
+            msg_Err( p_aout, "failed to register a JACK port" );
             jack_client_close( p_sys->p_jack_client );
             free( p_sys );
             return VLC_EGENERIC;
@@ -130,7 +130,7 @@ static int Open( vlc_object_t *p_this )
     /* Tell the JACK server we are ready */
     if( jack_activate( p_sys->p_jack_client ) )
     {
-        msg_Err( p_aout, "Failed to activate JACK client" );
+        msg_Err( p_aout, "failed to activate JACK client" );
         jack_client_close( p_sys->p_jack_client );
         free( p_sys );
         return VLC_EGENERIC;
@@ -156,14 +156,14 @@ static int Open( vlc_object_t *p_this )
                               jack_port_name( p_sys->p_jack_port[i] ),
                               pp_in_ports[i_in]) )
             {
-                msg_Err( p_aout, "Failed to connect port %s to port %s",
+                msg_Err( p_aout, "failed to connect port %s to port %s",
                          jack_port_name( p_sys->p_jack_port[i] ),
                          pp_in_ports[i_in] );
 
             }
             else
             {
-                msg_Dbg( p_aout, "Connecting port %s to port %s",
+                msg_Dbg( p_aout, "connecting port %s to port %s",
                          jack_port_name( p_sys->p_jack_port[i] ),
                          pp_in_ports[i_in] );
             }

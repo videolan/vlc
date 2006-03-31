@@ -415,7 +415,7 @@ static int OpenAnalog( aout_instance_t *p_aout )
                         p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARCENTER;
                         continue;
                     default:
-                        msg_Warn( p_aout, "Unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
+                        msg_Warn( p_aout, "unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
                 }
             }
             if( p_aout->output.output.i_physical_channels == 0 )
@@ -637,7 +637,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
     p_streams = (AudioStreamID *)malloc( i_param_size );
     if( p_streams == NULL )
     {
-        msg_Err( p_aout, "Out of memory" );
+        msg_Err( p_aout, "out of memory" );
         return VLC_FALSE;
     }
     
@@ -1012,7 +1012,7 @@ static void Probe( aout_instance_t * p_aout )
             var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
             if( p_sys->i_default_dev == p_devices[i] && config_GetInt( p_aout, "spdif" ) )
             {
-                /* I we selected to prefer SPDIF output if available
+                /* We selected to prefer SPDIF output if available
                  * then this "dummy" entry should be selected */
                 var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
                 var_Set( p_aout, "audio-device", val );
@@ -1088,7 +1088,7 @@ static int AudioDeviceSupportsDigital( aout_instance_t *p_aout, AudioDeviceID i_
     p_streams = (AudioStreamID *)malloc( i_param_size );
     if( p_streams == NULL )
     {
-        msg_Err( p_aout, "Out of memory" );
+        msg_Err( p_aout, "out of memory" );
         return VLC_ENOMEM;
     }
     

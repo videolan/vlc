@@ -82,13 +82,13 @@ static void    Play        ( aout_instance_t * );
 #define FORMAT_LONGTEXT N_("One of \"u8\", \"s8\", \"u16\", \"s16\", " \
     "\"u16_le\", \"s16_le\", \"u16_be\", \"s16_be\", \"fixed32\", " \
     "\"float32\" or \"spdif\"")
-#define CHANNELS_TEXT N_("Output channels number")
+#define CHANNELS_TEXT N_("Number of output channels")
 #define CHANNELS_LONGTEXT N_("By default, all the channels of the incoming " \
     "will be saved but you can restrict the number of channels here.")
 
-#define WAV_TEXT N_("Add wave header")
+#define WAV_TEXT N_("Add WAVE header")
 #define WAV_LONGTEXT N_("Instead of writing a raw file, you can add a WAV " \
-                        "header to the file")
+                        "header to the file.")
 
 static char *format_list[] = { "u8", "s8", "u16", "s16", "u16_le", "s16_le",
                                "u16_be", "s16_be", "fixed32", "float32",
@@ -105,7 +105,7 @@ static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
                             VLC_FOURCC('s','p','i','f') };
 
 #define FILE_TEXT N_("Output file")
-#define FILE_LONGTEXT N_("File to which the audio samples will be written to")
+#define FILE_LONGTEXT N_("File to which the audio samples will be written to.")
 
 vlc_module_begin();
     set_description( N_("File audio output") );

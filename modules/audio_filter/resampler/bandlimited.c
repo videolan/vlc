@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bandlimited.c : band-limited interpolation resampler
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -81,7 +81,7 @@ struct aout_filter_sys_t
 vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );
-    set_description( _("audio filter for band-limited interpolation resampling") );
+    set_description( _("Audio filter for band-limited interpolation resampling") );
     set_capability( "audio filter", 20 );
     set_callbacks( Create, Close );
 vlc_module_end();

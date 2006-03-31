@@ -1,7 +1,7 @@
 /*****************************************************************************
  * simple.c : simple channel mixer plug-in (only 7/7.1/5/5.1 -> Stereo for now)
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -43,7 +43,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("audio filter for simple channel mixing") );
+    set_description( _("Audio filter for simple channel mixing") );
     set_capability( "audio filter", 10 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );

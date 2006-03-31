@@ -155,7 +155,7 @@ static void Probe( aout_instance_t * p_aout )
         {
             if ( !(i_chanmask & DSP_BIND_FRONT) )
             {
-                msg_Err( p_aout, "No front channels ! (%x)",
+                msg_Err( p_aout, "no front channels! (%x)",
                          i_chanmask );
                 return;
             }
@@ -167,7 +167,7 @@ static void Probe( aout_instance_t * p_aout )
                          | AOUT_CHAN_LFE)) )
             {
                 val.i_int = AOUT_VAR_5_1;
-                text.psz_string = N_("5.1");
+                text.psz_string = "5.1";
                 var_Change( p_aout, "audio-device",
                             VLC_VAR_ADDCHOICE, &val, &text );
             }
@@ -254,7 +254,7 @@ static void Probe( aout_instance_t * p_aout )
         }
         else if( config_GetInt( p_aout, "spdif" ) )
         {
-            msg_Warn( p_aout, "s/pdif not supported by card" );
+            msg_Warn( p_aout, "S/PDIF not supported by card" );
         }
     }
 
