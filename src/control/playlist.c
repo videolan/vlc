@@ -75,6 +75,16 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
     }
 }
 
+void libvlc_playlist_pause( libvlc_instance_t *p_instance,
+                           libvlc_exception_t *p_exception )
+{
+    if( playlist_Pause( p_instance->p_playlist ) != VLC_SUCCESS )
+    {
+        libvlc_exception_raise( p_exception, "Empty playlist" );
+    }
+}
+
+
 void libvlc_playlist_stop( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_exception )
 {
