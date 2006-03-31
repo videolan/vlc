@@ -44,9 +44,10 @@
  *****************************************************************************/
 #define FASTSTART_TEXT N_("Create \"Fast Start\" files")
 #define FASTSTART_LONGTEXT N_( \
-    "When this option is turned on, \"Fast Start\" files will be created. " \
-    "(\"Fast Start\" files are optimized for downloads and allow the user " \
-    "to start previewing the file while it is downloading).")
+    "Create \"Fast Start\" files. " \
+    "\"Fast Start\" files are optimized for downloads and allow the user " \
+    "to start previewing the file while it is downloading.")
+
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
@@ -58,7 +59,8 @@ vlc_module_begin();
     set_subcategory( SUBCAT_SOUT_MUX );
     set_shortname( "MP4" );
 
-    add_bool( SOUT_CFG_PREFIX "faststart", 1, NULL, FASTSTART_TEXT, FASTSTART_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "faststart", 1, NULL,
+              FASTSTART_TEXT, FASTSTART_LONGTEXT,
               VLC_TRUE );
     set_capability( "sout mux", 5 );
     add_shortcut( "mp4" );

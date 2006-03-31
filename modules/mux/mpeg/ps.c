@@ -43,14 +43,14 @@
  * Module descriptor
  *****************************************************************************/
 #define DTS_TEXT N_("DTS delay (ms)")
-#define DTS_LONGTEXT N_("This option will delay the DTS (decoding time " \
+#define DTS_LONGTEXT N_("Delay the DTS (decoding time " \
   "stamps) and PTS (presentation timestamps) of the data in the " \
   "stream, compared to the SCRs. This allows for some buffering inside " \
   "the client decoder.")
 
 #define PES_SIZE_TEXT N_("PES maximum size")
-#define PES_SIZE_LONGTEXT N_("This option will set the maximum allowed PES "\
-  "size when producing the MPEG PS stream.")
+#define PES_SIZE_LONGTEXT N_("Set the maximum allowed PES "\
+  "size when producing the MPEG PS streams.")
 
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );

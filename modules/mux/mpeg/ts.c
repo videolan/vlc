@@ -81,25 +81,30 @@ static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
 #define VPID_TEXT N_("Video PID")
-#define VPID_LONGTEXT N_("Assigns a fixed PID to the video stream. The PCR " \
+#define VPID_LONGTEXT N_("Assign a fixed PID to the video stream. The PCR " \
   "PID will automatically be the video.")
 #define APID_TEXT N_("Audio PID")
-#define APID_LONGTEXT N_("Assigns a fixed PID to the audio stream.")
+#define APID_LONGTEXT N_("Assign a fixed PID to the audio stream.")
 #define SPUPID_TEXT N_("SPU PID")
-#define SPUPID_LONGTEXT N_("Assigns a fixed PID to the SPU.")
+#define SPUPID_LONGTEXT N_("Assign a fixed PID to the SPU.")
 #define PMTPID_TEXT N_("PMT PID")
-#define PMTPID_LONGTEXT N_("Assigns a fixed PID to the PMT")
+#define PMTPID_LONGTEXT N_("Assign a fixed PID to the PMT")
 #define TSID_TEXT N_("TS ID")
-#define TSID_LONGTEXT N_("Assigns a fixed Transport Stream ID.")
+#define TSID_LONGTEXT N_("Assign a fixed Transport Stream ID.")
 #define NETID_TEXT N_("NET ID")
-#define NETID_LONGTEXT N_("Assigns a fixed Network ID (for SDT table)")
-#define PMTPROG_TEXT N_("PMT Program numbers (requires --sout-ts-es-id-pid)")
-#define PMTPROG_LONGTEXT N_("Assigns a program number to each PMT")
+#define NETID_LONGTEXT N_("Assign a fixed Network ID (for SDT table)")
+
+#define PMTPROG_TEXT N_("PMT Program numbers")
+#define PMTPROG_LONGTEXT N_("Assign a program number to each PMT. This " \
+                            "requires \"Set PID to ID of ES\" to be enabled." )
+
 #define MUXPMT_TEXT N_("Mux PMT (requires --sout-ts-es-id-pid)")
-#define MUXPMT_LONGTEXT N_("Defines the pids to add to each pmt." )
+#define MUXPMT_LONGTEXT N_("Define the pids to add to each pmt. This " \
+                           "requires \"Set PID to ID of ES\" to be enabled." )
 
 #define SDTDESC_TEXT N_("SDT Descriptors (requires --sout-ts-es-id-pid)")
-#define SDTDESC_LONGTEXT N_("Defines the descriptors of each SDT" )
+#define SDTDESC_LONGTEXT N_("Defines the descriptors of each SDT. This" \
+                        "requires \"Set PID to ID of ES\" to be enabled." )
 
 #define PID_TEXT N_("Set PID to ID of ES")
 #define PID_LONGTEXT N_("Sets PID to the ID if the incoming ES. This is for " \
@@ -111,10 +116,11 @@ static void    Close  ( vlc_object_t * );
   "PES boundaries. This is a waste of bandwidth.")
 
 #define SHAPING_TEXT N_("Shaping delay (ms)")
-#define SHAPING_LONGTEXT N_("If enabled, the TS muxer will cut the " \
+#define SHAPING_LONGTEXT N_("Cut the " \
   "stream in slices of the given duration, and ensure a constant bitrate " \
-  "between the two boundaries. This avoids having huge bitrate peaks for " \
-  "reference frames, in particular.")
+  "between the two boundaries. This avoids having huge bitrate peaks, " \
+  "especially for reference frames." )
+
 #define KEYF_TEXT N_("Use keyframes")
 #define KEYF_LONGTEXT N_("If enabled, and shaping is specified, " \
   "the TS muxer will place the boundaries at the end of I pictures. In " \
@@ -124,9 +130,9 @@ static void    Close  ( vlc_object_t * );
   "frames in the stream.")
 
 #define PCR_TEXT N_("PCR delay (ms)")
-#define PCR_LONGTEXT N_("This option allows you to set at which interval " \
-  "PCRs (Program Clock Reference) will be sent. " \
-  "This value should be below 100ms. (default is 70)")
+#define PCR_LONGTEXT N_("Set at which interval " \
+  "PCRs (Program Clock Reference) will be sent (in milliseconds). " \
+  "This value should be below 100ms. (default is 70ms).")
 
 #define BMIN_TEXT N_( "Minimum B (deprecated)")
 #define BMIN_LONGTEXT N_( "This setting is deprecated and not used anymore" )
@@ -135,7 +141,7 @@ static void    Close  ( vlc_object_t * );
 #define BMAX_LONGTEXT N_( "This setting is deprecated and not used anymore")
 
 #define DTS_TEXT N_("DTS delay (ms)")
-#define DTS_LONGTEXT N_("This option will delay the DTS (decoding time " \
+#define DTS_LONGTEXT N_("Delay the DTS (decoding time " \
   "stamps) and PTS (presentation timestamps) of the data in the " \
   "stream, compared to the PCRs. This allows for some buffering inside " \
   "the client decoder.")
@@ -146,11 +152,11 @@ static void    Close  ( vlc_object_t * );
 #define VCRYPT_LONGTEXT N_("Crypt video using CSA")
 
 #define CK_TEXT N_("CSA Key")
-#define CK_LONGTEXT N_("Defines the CSA encryption key. This must be a " \
+#define CK_LONGTEXT N_("CSA encryption key. This must be a " \
   "16 char string (8 hexadecimal bytes).")
 
 #define CPKT_TEXT N_("Packet size in bytes to encrypt")
-#define CPKT_LONGTEXT N_("Specify the size of the TS packet to encrypt. " \
+#define CPKT_LONGTEXT N_("Size of the TS packet to encrypt. " \
     "The encryption routines subtract the TS-header from the value before " \
     "encrypting. " )
 

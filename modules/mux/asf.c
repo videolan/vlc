@@ -46,22 +46,17 @@ static void Close  ( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-asf-"
 
 #define TITLE_TEXT N_("Title")
-#define TITLE_LONGTEXT N_("Allows you to define the title that will be put " \
-                          "in ASF comments.")
+#define TITLE_LONGTEXT N_("Title to put in ASF comments." )
 #define AUTHOR_TEXT N_("Author")
-#define AUTHOR_LONGTEXT N_("Allows you to define the author that will be put "\
-                           "in ASF comments.")
+#define AUTHOR_LONGTEXT N_("Author to put in ASF comments." )
 #define COPYRIGHT_TEXT N_("Copyright")
-#define COPYRIGHT_LONGTEXT N_("Allows you to define the copyright string " \
-                              "that will be put in ASF comments.")
+#define COPYRIGHT_LONGTEXT N_("Copyright string to put in ASF comments." )
 #define COMMENT_TEXT N_("Comment")
-#define COMMENT_LONGTEXT N_("Allows you to define the comment that will be " \
-                            "put in ASF comments.")
+#define COMMENT_LONGTEXT N_("Comment to put in ASF comments." )
 #define RATING_TEXT N_("Rating")
-#define RATING_LONGTEXT N_("Allows you to define the \"rating\" that will " \
-                           "be put in ASF comments.")
+#define RATING_LONGTEXT N_("\"Rating\" to put in ASF comments." )
 #define PACKETSIZE_TEXT N_("Packet Size")
-#define PACKETSIZE_LONGTEXT N_("The ASF packet size -- default is 4096 bytes")
+#define PACKETSIZE_LONGTEXT N_("ASF packet size -- default is 4096 bytes")
 
 vlc_module_begin();
     set_description( _("ASF muxer") );
