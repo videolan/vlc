@@ -43,7 +43,7 @@ class FT2Font: public GenericFont
         FT2Font( intf_thread_t *pIntf, const string &rName, int size );
         virtual ~FT2Font();
 
-        /// Initalize the object. Returns false if it failed
+        /// Initialize the object. Returns false if it failed
         virtual bool init();
 
         /// Render a string on a bitmap.

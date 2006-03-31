@@ -65,10 +65,10 @@ bool FT2Font::init()
 {
     int err;
 
-    // Initalise libfreetype
+    // Initialize libfreetype
     if( FT_Init_FreeType( &m_lib ) )
     {
-        msg_Err( getIntf(), "failed to initalize freetype" );
+        msg_Err( getIntf(), "failed to initialize freetype" );
         return false;
     }
 
