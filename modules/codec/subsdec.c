@@ -112,7 +112,7 @@ static char *ppsz_justification_text[] = {N_("Center"),N_("Left"),N_("Right")};
             "UTF-8 encoding within subtitles files.")
 #define FORMAT_TEXT N_("Formatted Subtitles")
 #define FORMAT_LONGTEXT N_("Some subtitle formats allow for text formatting. " \
-             "VLC partly implements this, but you can choose to disable all formatting.")
+ "VLC partly implements this, but you can choose to disable all formatting.")
 
 
 vlc_module_begin();

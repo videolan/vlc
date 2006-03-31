@@ -104,7 +104,9 @@ void E_(ClosePostproc)( decoder_t *, void * );
     "8  ump4 \n" \
     "16 no padding\n" \
     "32 ac vlc\n" \
-    "64 Qpel chroma.")
+    "64 Qpel chroma.\n" \
+    "This must be the sum of the values. For example, to fix \"ac vlc\" and " \
+    "\"ump4\", enter 40.")
 
 #define HURRYUP_TEXT N_("Hurry up")
 #define HURRYUP_LONGTEXT N_( \
@@ -121,20 +123,24 @@ void E_(ClosePostproc)( decoder_t *, void * );
 #define DEBUG_TEXT N_( "Debug mask" )
 #define DEBUG_LONGTEXT N_( "Set ffmpeg debug mask" )
 
+/* TODO: Use a predefined list, with 0,1,2,4,7 */
 #define VISMV_TEXT N_( "Visualize motion vectors" )
-#define VISMV_LONGTEXT N_( "Set motion vectors visualization mask.\n" \
+#define VISMV_LONGTEXT N_( \
+    "You can overlay the motion vectors (arrows showing how the images move) "\
+    "on the image. This value is a mask, based on these values:\n"\
     "1 - visualize forward predicted MVs of P frames\n" \
     "2 - visualize forward predicted MVs of B frames\n" \
-    "4 - visualize backward predicted MVs of B frames" )
+    "4 - visualize backward predicted MVs of B frames\n" \
+    "To visualize all vectors, the value should be 7." )
 
 #define LOWRES_TEXT N_( "Low resolution decoding" )
-#define LOWRES_LONGTEXT N_( "Will only decode a low resolution version of " \
-    "the video." )
+#define LOWRES_LONGTEXT N_( "Only decode a low resolution version of " \
+    "the video. This requires less processing power" )
 
 #define SKIPLOOPF_TEXT N_( "Skip the loop filter for H.264 decoding" )
 #define SKIPLOOPF_LONGTEXT N_( "Skipping the loop filter (aka deblocking) " \
-    "usually has a detrimental effect on quality. However for HDTV streams " \
-    "this provides a big speedup." )
+    "usually has a detrimental effect on quality. However it provides a big " \
+    "speedup for high definition streams." )
 
 #define LIBAVCODEC_PP_TEXT N_("FFmpeg post processing filter chains")
 /* FIXME (cut/past from ffmpeg */
@@ -189,28 +195,29 @@ void E_(ClosePostproc)( decoder_t *, void * );
 #define ENC_VT_TEXT N_( "Video bitrate tolerance" )
 #define ENC_VT_LONGTEXT N_( "Video bitrate tolerance in kbit/s." )
 
-#define ENC_INTERLACE_TEXT N_( "Enable interlaced encoding" )
+#define ENC_INTERLACE_TEXT N_( "Interlaced encoding" )
 #define ENC_INTERLACE_LONGTEXT N_( "Enable dedicated " \
   "algorithms for interlaced frames." )
 
-#define ENC_INTERLACE_ME_TEXT N_( "Enable interlaced motion estimation" )
+#define ENC_INTERLACE_ME_TEXT N_( "Interlaced motion estimation" )
 #define ENC_INTERLACE_ME_LONGTEXT N_( "Enable interlaced " \
-  "motion estimation algorithms. It requires more CPU." )
+  "motion estimation algorithms. This requires more CPU." )
 
-#define ENC_PRE_ME_TEXT N_( "Enable pre-motion estimation" )
+#define ENC_PRE_ME_TEXT N_( "Pre-motion estimation" )
 #define ENC_PRE_ME_LONGTEXT N_( "Enable the pre-motion " \
   "estimation algorithm.")
 
-#define ENC_RC_STRICT_TEXT N_( "Enable strict rate control" )
+#define ENC_RC_STRICT_TEXT N_( "Strict rate control" )
 #define ENC_RC_STRICT_LONGTEXT N_( "Enable the strict rate " \
   "control algorithm." )
 
 #define ENC_RC_BUF_TEXT N_( "Rate control buffer size" )
 #define ENC_RC_BUF_LONGTEXT N_( "Rate control " \
-  "buffer size (in kbytes)." )
+  "buffer size (in kbytes). A bigger buffer will allow for better rate " \
+  "control, but will cause a delay in the stream." )
 
 #define ENC_RC_BUF_AGGR_TEXT N_( "Rate control buffer aggressiveness" )
-#define ENC_RC_BUF_AGGR_LONGTEXT N_( "Allows you to specify the rate control "\
+#define ENC_RC_BUF_AGGR_LONGTEXT N_( "Rate control "\
   "buffer aggressiveness." )
 
 #define ENC_IQUANT_FACTOR_TEXT N_( "I quantization factor" )
@@ -223,11 +230,11 @@ void E_(ClosePostproc)( decoder_t *, void * );
   "reduction algorithm to lower the encoding length and bitrate, at the " \
   "expense of lower quality frames." )
 
-#define ENC_MPEG4_MATRIX_TEXT N_( "Enable MPEG4 quantization matrix" )
-#define ENC_MPEG4_MATRIX_LONGTEXT N_( "Allows you to use the MPEG4 " \
-  "quantization matrix for mpeg2 encoding. This generally yields a " \
+#define ENC_MPEG4_MATRIX_TEXT N_( "MPEG4 quantization matrix" )
+#define ENC_MPEG4_MATRIX_LONGTEXT N_( "Use the MPEG4 " \
+  "quantization matrix for MPEG2 encoding. This generally yields a " \
   "better looking picture, while still retaining the compatibility with " \
-  "standard MPEG-2 decoders.")
+  "standard MPEG2 decoders.")
 
 #define ENC_HQ_TEXT N_( "Quality level" )
 #define ENC_HQ_LONGTEXT N_( "Quality level " \
@@ -242,18 +249,18 @@ void E_(ClosePostproc)( decoder_t *, void * );
   "threshold to ease the encoder's task." )
 
 #define ENC_QMIN_TEXT N_( "Minimum video quantizer scale" )
-#define ENC_QMIN_LONGTEXT N_( "Allows you to specify the minimum video " \
+#define ENC_QMIN_LONGTEXT N_( "Minimum video " \
   "quantizer scale." )
 
 #define ENC_QMAX_TEXT N_( "Maximum video quantizer scale" )
-#define ENC_QMAX_LONGTEXT N_( "Allows you to specify the maximum video " \
+#define ENC_QMAX_LONGTEXT N_( "Maximum video " \
   "quantizer scale." )
 
-#define ENC_TRELLIS_TEXT N_( "Enable trellis quantization" )
+#define ENC_TRELLIS_TEXT N_( "Trellis quantization" )
 #define ENC_TRELLIS_LONGTEXT N_( "Enable trellis " \
   "quantization (rate distortion for block coefficients)." )
 
-#define ENC_QSCALE_TEXT N_( "Use fixed video quantizer scale" )
+#define ENC_QSCALE_TEXT N_( "Fixed quantizer scale" )
 #define ENC_QSCALE_LONGTEXT N_( "A fixed video " \
   "quantizer scale for VBR encoding (accepted values: 0.01 to 255.0)." )
 

@@ -40,7 +40,7 @@ static int  PacketizerOpen( vlc_object_t * );
 static void DecoderClose  ( vlc_object_t * );
 
 #define DEBUG_TEXT \
-     "If nonzero, this gives additional debug information." \
+     "Enable debug"
 
 #define DEBUG_LONGTEXT \
     "This integer when viewed in binary is a debugging mask\n" \

@@ -154,19 +154,17 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
  *****************************************************************************/
 #define ENC_QUALITY_TEXT N_("Encoding quality")
 #define ENC_QUALITY_LONGTEXT N_( \
-  "Allows you to specify a quality between 1 (low) and 10 (high), instead " \
+  "Enforce a quality between 1 (low) and 10 (high), instead " \
   "of specifying a particular bitrate. This will produce a VBR stream." )
 #define ENC_MAXBR_TEXT N_("Maximum encoding bitrate")
 #define ENC_MAXBR_LONGTEXT N_( \
-  "Allows you to specify a maximum bitrate in kbps. " \
-  "Useful for streaming applications." )
+  "Maximum bitrate in kbps. This is useful for streaming applications." )
 #define ENC_MINBR_TEXT N_("Minimum encoding bitrate")
 #define ENC_MINBR_LONGTEXT N_( \
-  "Allows you to specify a minimum bitrate in kbps. " \
-  "Useful for encoding for a fixed-size channel." )
+  "Minimum bitrate in kbps. This is useful for encoding for a fixed-size channel." )
 #define ENC_CBR_TEXT N_("CBR encoding")
 #define ENC_CBR_LONGTEXT N_( \
-  "Allows you to force a constant bitrate encoding (CBR)." )
+  "Force a constant bitrate encoding (CBR)." )
 
 vlc_module_begin();
     set_shortname( "Vorbis" );

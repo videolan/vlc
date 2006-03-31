@@ -89,7 +89,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
  *****************************************************************************/
 #define ENC_QUALITY_TEXT N_("Encoding quality")
 #define ENC_QUALITY_LONGTEXT N_( \
-  "Allows you to specify a quality between 1 (low) and 10 (high), instead " \
+  "Enfore a quality between 1 (low) and 10 (high), instead " \
   "of specifying a particular bitrate. This will produce a VBR stream." )
 
 vlc_module_begin();

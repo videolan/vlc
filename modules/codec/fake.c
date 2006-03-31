@@ -44,25 +44,25 @@ static picture_t *DecodeBlock  ( decoder_t *, block_t ** );
  *****************************************************************************/
 #define FILE_TEXT N_("Image file")
 #define FILE_LONGTEXT N_( \
-    "Path of the image file when using the fake input." )
+    "Path of the image file for fake input." )
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
-    "Allows you to specify the output video width." )
+    "Output video width." )
 #define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_( \
-    "Allows you to specify the output video height." )
+    "Output video height." )
 #define KEEP_AR_TEXT N_("Keep aspect ratio")
 #define KEEP_AR_LONGTEXT N_( \
-    "If selected, width and height will be considered as maximum values." )
+    "Consider width and height as maximum values." )
 #define ASPECT_RATIO_TEXT N_("Background aspect ratio")
 #define ASPECT_RATIO_LONGTEXT N_( \
     "Aspect ratio of the image file (4:3, 16:9). Default is square pixels." )
 #define DEINTERLACE_TEXT N_("Deinterlace video")
 #define DEINTERLACE_LONGTEXT N_( \
-    "Allows you to deinterlace the image after loading." )
+    "Deinterlace the image after loading it." )
 #define DEINTERLACE_MODULE_TEXT N_("Deinterlace module")
 #define DEINTERLACE_MODULE_LONGTEXT N_( \
-    "Specifies the deinterlace module to use." )
+    "Deinterlace module to use." )
 
 static char *ppsz_deinterlace_type[] =
 {

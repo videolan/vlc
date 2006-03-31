@@ -42,27 +42,27 @@
 
 /* #define DEBUG_DVBSUB 1 */
 
-#define POSX_TEXT N_("X coordinate of the subpicture")
-#define POSX_LONGTEXT N_("You can reposition the subpicture by providing another value here." )
+#define POSX_TEXT N_("Decoding X coordinate")
+#define POSX_LONGTEXT N_("X coordinate of the rendered subtitle")
 
-#define POSY_TEXT N_("Y coordinate of the subpicture")
-#define POSY_LONGTEXT N_("You can reposition the subpicture by providing another value here." )
+#define POSY_TEXT N_("Decoding Y coordinate")
+#define POSY_LONGTEXT N_("Y coordinate of the rendered subtitle") 
 
 #define POS_TEXT N_("Subpicture position")
 #define POS_LONGTEXT N_( \
   "You can enforce the subpicture position on the video " \
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
-  "also use combinations of these values (e.g. 6=top-right)).")
+  "also use combinations of these values, e.g. 6=top-right).")
 
-#define ENC_POSX_TEXT N_("X coordinate of the encoded subpicture")
-#define ENC_POSX_LONGTEXT N_("You can reposition the subpicture by providing another value here." )
+#define ENC_POSX_TEXT N_("Encoding X coordinate")
+#define ENC_POSX_LONGTEXT N_("X coordinate of the encoded subtitle" )
+#define ENC_POSY_TEXT N_("Encoding Y coordinate")
+#define ENC_POSY_LONGTEXT N_("Y coordinate of the encoded subtitle" )
 
-#define ENC_POSY_TEXT N_("Y coordinate of encoded the subpicture")
-#define ENC_POSY_LONGTEXT N_("You can reposition the subpicture by providing another value here." )
-
-#define TIMEOUT_TEXT N_("Timeout of subpictures")
+#define TIMEOUT_TEXT N_("Timeout")
 #define TIMEOUT_LONGTEXT N_( \
-    "Subpictures get a default timeout of 15 seconds added to their remaining time." \
+    "Subpictures get a default timeout of 15 seconds added to their " \
+    "remaining time." \
     "This will ensure that they are at least the specified time visible.")
 
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };

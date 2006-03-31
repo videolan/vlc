@@ -49,14 +49,14 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
 
 #define ENC_QUALITY_TEXT N_("Encoding quality")
 #define ENC_QUALITY_LONGTEXT N_( \
-  "Allows you to specify a quality between 0.0 (high) and 50.0 (low), " \
+  "Force a specific encoding quality between 0.0 (high) and 50.0 (low), " \
   "instead of specifying a particular bitrate. " \
   "This will produce a VBR stream." )
 #define ENC_MODE_TEXT N_("Stereo mode")
-#define ENC_MODE_LONGTEXT N_( "Select how stereo streams will be handled" )
+#define ENC_MODE_LONGTEXT N_( "Handling mode for stereo streams" )
 #define ENC_VBR_TEXT N_("VBR mode")
 #define ENC_VBR_LONGTEXT N_( \
-  "By default the encoding is CBR." )
+  "Use Variable BitRate. Default is to use Constant BitRate (CBR)." )
 #define ENC_PSY_TEXT N_("Psycho-acoustic model")
 #define ENC_PSY_LONGTEXT N_( \
   "Integer from -1 (no model) to 4." )
