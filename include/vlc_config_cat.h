@@ -157,7 +157,7 @@
 
 #define SOUT_PACKET_TITLE N_( "Packetizers" )
 #define SOUT_PACKET_HELP N_( \
-`       "Packetizers are used to \"preprocess\" the elementary "\
+        "Packetizers are used to \"preprocess\" the elementary "\
         "streams before muxing. " \
         "This setting allows you to always force a packetizer. " \
         "You should probably not do that.\n" \
