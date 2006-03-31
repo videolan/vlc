@@ -36,7 +36,7 @@ CDDADebugCB   ( vlc_object_t *p_this, const char *psz_name,
 
     if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
     {
-        msg_Dbg( p_cdda_input, "Old debug (x%0x) %d, new debug (x%0x) %d",
+        msg_Dbg( p_cdda_input, "old debug (x%0x) %d, new debug (x%0x) %d",
                  p_cdda->i_debug, p_cdda->i_debug, val.i_int, val.i_int);
     }
     p_cdda->i_debug = val.i_int;
@@ -58,7 +58,7 @@ CDDBEnabledCB   ( vlc_object_t *p_this, const char *psz_name,
 #ifdef HAVE_LIBCDDB
     if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
     {
-        msg_Dbg( p_cdda_input, "Old CDDB Enabled (x%0x) %d, new (x%0x) %d",
+        msg_Dbg( p_cdda_input, "old CDDB Enabled (x%0x) %d, new (x%0x) %d",
                  p_cdda->b_cddb_enabled, p_cdda->b_cddb_enabled,
                  val.b_bool, val.b_bool);
     }
@@ -79,7 +79,7 @@ CDTextEnabledCB   ( vlc_object_t *p_this, const char *psz_name,
 
     if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
     {
-        msg_Dbg( p_cdda_input, "Old CDText Enabled %d, new %d",
+        msg_Dbg( p_cdda_input, "old CDText Enabled %d, new %d",
                  p_cdda->b_cdtext, val.b_bool);
     }
     p_cdda->b_cdtext = val.b_bool;
@@ -99,7 +99,7 @@ CDDANavModeCB( vlc_object_t *p_this, const char *psz_name,
     if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
     {
         msg_Dbg( p_cdda_input, 
-		 "Old Navigation Mode Enabled %d, new %d",
+		 "old Navigation Mode Enabled %d, new %d",
                  p_cdda->b_nav_mode, val.b_bool);
     }
     p_cdda->b_nav_mode = val.b_bool;
@@ -119,7 +119,7 @@ CDTextPreferCB   ( vlc_object_t *p_this, const char *psz_name,
 #ifdef HAVE_LIBCDDB
     if ( p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
     {
-        msg_Dbg( p_cdda_input, "Old CDText Prefer (x%0x) %d, new (x%0x) %d",
+        msg_Dbg( p_cdda_input, "old CDText Prefer (x%0x) %d, new (x%0x) %d",
                  p_cdda->b_cdtext_prefer, p_cdda->b_cdtext_prefer,
                  val.b_bool, val.b_bool);
     }
@@ -140,7 +140,7 @@ CDDABlocksPerReadCB ( vlc_object_t *p_this, const char *psz_name,
 
     if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
     {
-        msg_Dbg( p_cdda_input, "Old blocks per read: %d, new %d",
+        msg_Dbg( p_cdda_input, "old blocks per read: %d, new %d",
                  p_cdda->i_blocks_per_read, val.i_int);
     }
 
@@ -150,7 +150,7 @@ CDDABlocksPerReadCB ( vlc_object_t *p_this, const char *psz_name,
     else
     {
         msg_Warn( p_cdda_input,
-             "Number of blocks (%d) has to be between %d and %d. No change.",
+             "number of blocks (%d) has to be between %d and %d. No change.",
               val.i_int, MIN_BLOCKS_PER_READ, MAX_BLOCKS_PER_READ );
     }
     return VLC_SUCCESS;

@@ -39,7 +39,7 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for VCDs. This " \
+    "Caching value for VCDs. This " \
     "value should be set in milliseconds." )
 
 vlc_module_begin();
@@ -496,3 +496,4 @@ static int EntryPoints( access_t *p_access )
 
     return VLC_SUCCESS;
 }
+

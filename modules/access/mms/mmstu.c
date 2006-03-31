@@ -650,10 +650,10 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     switch( GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE ) )
     {
         case 0x0001:
-            msg_Dbg( p_access, "Media file name/path accepted" );
+            msg_Dbg( p_access, "media file name/path accepted" );
             break;
         case 0x0002:
-            msg_Dbg( p_access, "Authentication accepted" );
+            msg_Dbg( p_access, "authentication accepted" );
             break;
         case -1:
         default:
@@ -868,7 +868,7 @@ static int MMSStart( access_t  *p_access, uint32_t i_packet )
     {
         /* get a packet */
         mms_HeaderMediaRead( p_access, MMS_PACKET_MEDIA );
-        msg_Dbg( p_access, "Streaming started" );
+        msg_Dbg( p_access, "streaming started" );
         return( 0 );
     }
 }

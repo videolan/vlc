@@ -39,7 +39,7 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for fake streams. This " \
+    "Caching value for fake streams. This " \
     "value should be set in milliseconds." )
 #define FPS_TEXT N_("Framerate")
 #define FPS_LONGTEXT N_( \

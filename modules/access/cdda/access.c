@@ -100,7 +100,7 @@ cdio_log_handler (cdio_log_level_t level, const char message[])
     break;
   default:
     msg_Warn( p_cdda_input, message,
-            "The above message had unknown cdio log level",
+            "the above message had unknown cdio log level",
             level);
   }
   return;
@@ -284,7 +284,7 @@ static block_t * CDDAReadBlocks( access_t * p_access )
     p_block = block_New( p_access, i_blocks * CDIO_CD_FRAMESIZE_RAW );
     if( !p_block)
     {
-      msg_Err( p_access, "Cannot get a new block of size: %i",
+      msg_Err( p_access, "cannot get a new block of size: %i",
                i_blocks * CDIO_CD_FRAMESIZE_RAW );
       return NULL;
     }
@@ -679,7 +679,7 @@ CDDAOpen( vlc_object_t *p_this )
          || p_cdda->i_blocks_per_read > MAX_BLOCKS_PER_READ )
     {
         msg_Warn( p_cdda_input,
-                "Number of blocks (%d) has to be between %d and %d. "
+                "number of blocks (%d) has to be between %d and %d. "
                 "Using %d.",
                 p_cdda->i_blocks_per_read,
                 MIN_BLOCKS_PER_READ, MAX_BLOCKS_PER_READ,
@@ -753,7 +753,7 @@ CDDAOpen( vlc_object_t *p_this )
 	  cdio_cddap_verbose_set(p_cdda->paranoia_cd, CDDA_MESSAGE_PRINTIT, 
 				 CDDA_MESSAGE_PRINTIT);
 	  if ( 0 != cdio_cddap_open(p_cdda->paranoia_cd) ) {
-	    msg_Warn( p_cdda_input, "Unable to get paranoia support - "
+	    msg_Warn( p_cdda_input, "unable to get paranoia support - "
 		      "continuing without it." );
 	    p_cdda->e_paranoia = paranoia_none;
 	  } else {

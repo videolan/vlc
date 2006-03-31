@@ -41,7 +41,7 @@ static void    Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for FTP streams. This " \
+    "Caching value for FTP streams. This " \
     "value should be set in milliseconds." )
 #define USER_TEXT N_("FTP user name")
 #define USER_LONGTEXT N_("User name that will " \

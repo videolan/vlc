@@ -36,7 +36,7 @@
  *****************************************************************************/
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for TCP streams. This " \
+    "Caching value for TCP streams. This " \
     "value should be set in milliseconds." )
 
 static int  Open ( vlc_object_t * );

@@ -56,11 +56,11 @@
  *****************************************************************************/
 #define ANGLE_TEXT N_("DVD angle")
 #define ANGLE_LONGTEXT N_( \
-    "Allows you to select the default DVD angle." )
+    "Default DVD angle." )
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for DVDs. " \
+    "Caching value for DVDs. " \
     "This value should be set in milliseconds." )
 
 #define CSSMETHOD_TEXT N_("Method used by libdvdcss for decryption")

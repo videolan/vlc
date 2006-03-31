@@ -761,7 +761,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
         }
         else
         {
-            msg_Warn( p_access, "Next stream follow but not supported" );
+            msg_Warn( p_access, "next stream follow but not supported" );
             return VLC_EGENERIC;
         }
     }

@@ -78,7 +78,7 @@ static char *ppsz_tuner_input_text[] =
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for DirectShow streams. " \
+    "Caching value for DirectShow streams. " \
     "This value should be set in millisecondss." )
 #define VDEV_TEXT N_("Video device name")
 #define VDEV_LONGTEXT N_( \
@@ -89,7 +89,7 @@ static char *ppsz_tuner_input_text[] =
 #define ADEV_LONGTEXT N_( \
     "Name of the audio device that will be used by the " \
     "DirectShow plugin. If you don't specify anything, the default device " \
-    "will be used.")
+    "will be used. You can specify a standard size (cif, d1, ...) or <width>x<height>")
 #define SIZE_TEXT N_("Video size")
 #define SIZE_LONGTEXT N_( \
     "Size of the video that will be displayed by the " \
@@ -102,7 +102,7 @@ static char *ppsz_tuner_input_text[] =
 #define FPS_TEXT N_("Video input frame rate")
 #define FPS_LONGTEXT N_( \
     "Force the DirectShow video input to use a specific frame rate" \
-    "(eg. 0 means default, 25, 29.97, 50, 59.94, etc.)")
+    "(eg. 0 means default, 25, 29.97, 50, 59.94, etc.)"
 #define CONFIG_TEXT N_("Device properties")
 #define CONFIG_LONGTEXT N_( \
     "Show the properties dialog of the selected device before starting the " \
@@ -189,16 +189,16 @@ vlc_module_begin();
         change_integer_list( pi_tuner_input, ppsz_tuner_input_text, 0 );
 
     add_integer( "dshow-video-input",  -1, NULL, VIDEO_IN_TEXT,
-		VIDEO_IN_LONGTEXT, VLC_TRUE );
+                 VIDEO_IN_LONGTEXT, VLC_TRUE );
 
     add_integer( "dshow-audio-input",  -1, NULL, AUDIO_IN_TEXT,
-		AUDIO_IN_LONGTEXT, VLC_TRUE );
+                 AUDIO_IN_LONGTEXT, VLC_TRUE );
 
     add_integer( "dshow-video-output", -1, NULL, VIDEO_OUT_TEXT,
-		VIDEO_OUT_LONGTEXT, VLC_TRUE );
+                 VIDEO_OUT_LONGTEXT, VLC_TRUE );
 
     add_integer( "dshow-audio-output", -1, NULL, AUDIO_OUT_TEXT,
-		AUDIO_OUT_LONGTEXT, VLC_TRUE );
+                 AUDIO_OUT_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "dshow" );
     set_capability( "access_demux", 0 );
@@ -320,7 +320,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     static struct {char *psz_size; int  i_width; int  i_height;} size_table[] =
     { { "subqcif", 128, 96 }, { "qsif", 160, 120 }, { "qcif", 176, 144 },
-      { "sif", 320, 240 }, { "cif", 352, 288 }, { "cif", 640, 480 },
+      { "sif", 320, 240 }, { "cif", 352, 288 }, { "d1", 640, 480 },
       { 0, 0, 0 },
     };
 
@@ -1849,7 +1849,7 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
                                   vlc_bool_t b_audio )
 {
     HRESULT hr;
-    msg_Dbg( p_this, "Configuring Device Properties" );
+    msg_Dbg( p_this, "configuring Device Properties" );
 
     /*
      * Video or audio capture filter page
@@ -1863,7 +1863,7 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
     {
         IAMStreamConfig *p_SC;
 
-        msg_Dbg( p_this, "Showing WDM Audio Configuration Pages" );
+        msg_Dbg( p_this, "showing WDM Audio Configuration Pages" );
 
         hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                      &MEDIATYPE_Audio, p_device_filter,
@@ -1895,7 +1895,7 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
     {
         IAMStreamConfig *p_SC;
 
-        msg_Dbg( p_this, "Showing WDM Video Configuration Pages" );
+        msg_Dbg( p_this, "showing WDM Video Configuration Pages" );
 
         hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                      &MEDIATYPE_Interleaved, p_device_filter,
@@ -1928,7 +1928,7 @@ static void ShowTunerProperties( vlc_object_t *p_this,
                                  vlc_bool_t b_audio )
 {
     HRESULT hr;
-    msg_Dbg( p_this, "Configuring Tuner Properties" );
+    msg_Dbg( p_this, "configuring Tuner Properties" );
 
     if( !p_graph || b_audio ) return;
 

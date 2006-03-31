@@ -79,7 +79,7 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for files. This " \
+    "Caching value for files. This " \
     "value should be set in milliseconds." )
 #define CAT_TEXT N_("Concatenate with additional files")
 #define CAT_LONGTEXT N_( \

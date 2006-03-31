@@ -52,7 +52,7 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for HTTP streams. This " \
+    "Caching value for HTTP streams. This " \
     "value should be set in milliseconds." )
 
 #define AGENT_TEXT N_("HTTP user agent")
@@ -288,7 +288,7 @@ connect:
     {
         char *psz_login = NULL; char *psz_password = NULL;
         int i_ret;
-        msg_Dbg( p_access, "Authentication failed" );
+        msg_Dbg( p_access, "authentication failed" );
         i_ret = intf_UserLoginPassword( p_access, "HTTP authentication",
                          "Please enter a valid login and password.", &psz_login, &psz_password );
         if( i_ret == DIALOG_OK_YES )
@@ -364,7 +364,7 @@ connect:
 
     if( p_sys->b_mms )
     {
-        msg_Dbg( p_access, "This is actually a live mms server, BAIL" );
+        msg_Dbg( p_access, "this is actually a live mms server, BAIL" );
         goto error;
     }
 

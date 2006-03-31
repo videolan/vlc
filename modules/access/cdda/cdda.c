@@ -56,11 +56,11 @@ static char *psz_paranoia_list_text[] = { N_("none"), N_("overlap"),
     "libcddb  (0x100) 256\n" )
 
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for CDDA streams. This " \
+    "Caching value for CDDA streams. This " \
     "value should be set in millisecond units." )
 
 #define BLOCKS_PER_READ_LONGTEXT N_( \
-    "Allows you to specify how many CD blocks to get on a single CD read. " \
+    "How many CD blocks to get on a single CD read. " \
     "Generally on newer/faster CDs, this increases throughput at the " \
     "expense of a little more memory usage and initial delay. SCSI-MMC " \
     "limitations generally don't allow for more than 25 blocks per access.")
@@ -121,7 +121,7 @@ vlc_module_begin();
 
     /* Configuration options */
     add_integer ( MODULE_STRING "-debug", 0, CDDADebugCB,
-                  N_("If nonzero, this gives additional debug information."),
+                  N_("Additional debug"),
                   DEBUG_LONGTEXT, VLC_TRUE );
 
     add_integer( MODULE_STRING "-caching",
@@ -158,7 +158,7 @@ vlc_module_begin();
 	      NULL,
 #endif
               N_("Use Navigation-style playback?"),
-              N_("If set, tracks are navigated via Navagation rather than "
+              N_("Tracks are navigated via Navagation rather than "
 		 "a playlist entries"),
               VLC_FALSE );
 
@@ -178,7 +178,7 @@ vlc_module_begin();
                 CDDB_TITLE_FMT_LONGTEXT, VLC_TRUE );
 
     add_bool( MODULE_STRING "-cddb-enabled", VLC_TRUE, CDDBEnabledCB,
-              N_("Do CDDB lookups?"),
+              N_("CDDB lookups"),
               N_("If set, lookup CD-DA track information using the CDDB "
                  "protocol"),
               VLC_FALSE );

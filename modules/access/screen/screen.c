@@ -36,7 +36,7 @@
  *****************************************************************************/
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for screen capture. "\
+    "Caching value for screen capture. "\
     "This value should be set in milliseconds." )
 #define FPS_TEXT N_("Frame rate")
 #define FPS_LONGTEXT N_( \

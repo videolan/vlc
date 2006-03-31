@@ -68,7 +68,7 @@ vlc_module_begin();
     add_bool( "cdda-separate-tracks", VLC_TRUE, NULL, NULL, NULL, VLC_TRUE );
     add_integer( "cdda-track", -1 , NULL, NULL, NULL, VLC_TRUE );
     add_string( "cddb-server", "freedb.freedb.org", NULL,
-                N_( "CDDB Server" ), N_( "Adress of the CDDB server to use." ),
+                N_( "CDDB Server" ), N_( "Address of the CDDB server to use." ),
                 VLC_TRUE );
     add_integer( "cddb-port", 8880, NULL,
                 N_( "CDDB port" ), N_( "CDDB Server port to use." ),
@@ -205,7 +205,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_track = i_track - 1;
     }
 
-    msg_Dbg( p_access, "Separate items : %i - Single track : %i",
+    msg_Dbg( p_access, "separate items : %i - single track : %i",
                         p_sys->b_separate_items, p_sys->b_single_track );
 
     if( p_sys->b_separate_items )
@@ -698,7 +698,7 @@ static void GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
 
     if(! p_access->p_sys->p_disc )
     {
-        msg_Err( p_access, "Unable to create CDDB disc structure." );
+        msg_Err( p_access, "unable to create CDDB disc structure." );
         goto cddb_end;
     }
 
@@ -725,7 +725,7 @@ static void GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
     if (i_matches > 0)
     {
         if (i_matches > 1)
-             msg_Warn( p_access, "Found %d matches in CDDB. Using first one.",
+             msg_Warn( p_access, "found %d matches in CDDB. Using first one.",
                                  i_matches);
         cddb_read( p_cddb, p_access->p_sys->p_disc );
 

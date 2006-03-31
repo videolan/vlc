@@ -39,7 +39,7 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for RTSP streams. This " \
+    "Caching value for RTSP streams. This " \
     "value should be set in milliseconds." )
 
 vlc_module_begin();

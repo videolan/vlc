@@ -43,7 +43,7 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for GnomeVFS streams."\
+    "Caching value for GnomeVFS streams."\
     "This value should be set in milliseconds." )
 
 vlc_module_begin();

@@ -437,7 +437,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     i_dir_content = scandir( psz_name, &pp_dir_content, Filter, alphasort );
     if( i_dir_content == -1 )
     {
-        msg_Warn( p_playlist, "Failed to read directory" );
+        msg_Warn( p_playlist, "failed to read directory" );
         return VLC_EGENERIC;
     }
     else if( i_dir_content <= 0 )
@@ -479,7 +479,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                 if( lstat( psz_uri, &stat_data )
                  || S_ISLNK(stat_data.st_mode) )
                 {
-                    msg_Dbg( p_playlist, "Skipping directory symlink %s",
+                    msg_Dbg( p_playlist, "skipping directory symlink %s",
                              psz_uri );
                     free( psz_uri );
                     continue;
@@ -487,14 +487,14 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
 #endif
                 if( i_mode == MODE_NONE )
                 {
-                    msg_Dbg( p_playlist, "Skipping subdirectory %s", psz_uri );
+                    msg_Dbg( p_playlist, "skipping subdirectory %s", psz_uri );
                     free( psz_uri );
                     continue;
                 }
                 else if( i_mode == MODE_EXPAND )
                 {
                     char *psz_newname, *psz_tmp;
-                    msg_Dbg(p_playlist, "Reading subdirectory %s", psz_uri );
+                    msg_Dbg(p_playlist, "reading subdirectory %s", psz_uri );
 
                     psz_tmp = FromLocale( p_dir_content->d_name );
                     psz_newname = vlc_fix_readdir_charset(
@@ -537,7 +537,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                         }
                         if( a < i_extensions )
                         {
-                            msg_Dbg( p_playlist, "Ignoring file %s", psz_uri );
+                            msg_Dbg( p_playlist, "ignoring file %s", psz_uri );
                             free( psz_uri );
                             continue;
                         }

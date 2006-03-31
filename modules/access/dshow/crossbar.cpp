@@ -208,7 +208,7 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
                 // remember connector type
                 physicalType = inputPinPhysicalType;
                 
-                msg_Dbg( p_this, "Found Existing Route For ouput %ld (type %ld) to input %ld (type %ld)",
+                msg_Dbg( p_this, "found existing route for ouput %ld (type %ld) to input %ld (type %ld)",
                          outputPinIndex, outputPinPhysicalType, inputPinIndex,
                          inputPinPhysicalType );
                          
@@ -259,7 +259,7 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
             p_sys->crossbar_routes[depth].AudioInputIndex = inputPinIndexRelated;
             p_sys->crossbar_routes[depth].AudioOutputIndex = outputPinIndexRelated;
 
-            msg_Dbg( p_this, "Crossbar at depth %d, Found Route For "
+            msg_Dbg( p_this, "crossbar at depth %d, found route for "
                      "ouput %ld (type %ld) to input %ld (type %ld)", depth,
                      outputPinIndex, outputPinPhysicalType, inputPinIndex,
                      inputPinPhysicalType );

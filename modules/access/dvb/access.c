@@ -70,7 +70,7 @@ static void Close( vlc_object_t *p_this );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for DVB streams. This " \
+    "Caching value for DVB streams. This " \
     "value should be set in milliseconds." )
 
 #define ADAPTER_TEXT N_("Adapter card to tune")

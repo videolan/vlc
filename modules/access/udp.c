@@ -41,7 +41,7 @@
  *****************************************************************************/
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for UDP streams. This " \
+    "Caching value for UDP streams. This " \
     "value should be set in milliseconds." )
 
 #define AUTO_MTU_TEXT N_("Autodetection of MTU")
@@ -492,7 +492,7 @@ static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
         p = BlockParseRTP( p_access, BlockUDP( p_access ));
         if( !p && (i_date - i_first) > p_sys->i_rtp_late ) 
         {
-            msg_Err( p_access, "Error in RTP prebuffering!" );
+            msg_Err( p_access, "error in RTP prebuffering!" );
             break;
         }
     }

@@ -62,7 +62,7 @@
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for DVDs. This "\
+    "Caching value for DVDs. This "\
     "value should be set in milliseconds." )
 #define MENU_TEXT N_("Start directly in menu")
 #define MENU_LONGTEXT N_( \

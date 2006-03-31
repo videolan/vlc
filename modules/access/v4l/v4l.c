@@ -72,7 +72,7 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Default caching value for V4L captures. This " \
+    "Caching value for V4L captures. This " \
     "value should be set in milliseconds." )
 #define VDEV_TEXT N_("Video device name")
 #define VDEV_LONGTEXT N_( \
