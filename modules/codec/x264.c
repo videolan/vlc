@@ -43,8 +43,8 @@ static void Close( vlc_object_t * );
 
 #define KEYINT_TEXT N_("Maximum GOP size")
 #define KEYINT_LONGTEXT N_( "Sets maximum interval between IDR-frames." \
-    "Larger values save bits, thus improve quality for a given bitrate at " \
-    "the cost of seeking precision." )
+  "Larger values save bits, thus improving quality for a given bitrate at " \
+  "the cost of seeking precision." )
 
 #define MIN_KEYINT_TEXT N_("Minimum GOP size")
 #define MIN_KEYINT_LONGTEXT N_( "Sets minimum interval between IDR-frames. " \
@@ -57,23 +57,25 @@ static void Close( vlc_object_t * );
     "I-frames, but do not start a new GOP." )
 
 #define SCENE_TEXT N_("Extra I-Frames aggressivity" )
-#define SCENE_LONGTEXT N_( "Scene-cut detection. Controls how aggressively to " \
-    "insert extra I-frames. With small values of scenecut, the codec often has " \
-    "to force an I-frame when it would exceed keyint. Good values of scenecut " \
-    "may find a better location for the I-frame. Large values use more I-frames " \
+#define SCENE_LONGTEXT N_( "Scene-cut detection. Controls how " \
+    "aggressively to insert extra I-frames. With small values of " \
+    "scenecut, the codec often has " \
+    "to force an I-frame when it would exceed keyint. " \
+    "Good values of scenecut may find a better location for the " \
+    "I-frame. Large values use more I-frames " \
     "than necessary, thus wasting bits. -1 disables scene-cut detection, so " \
     "I-frames are be inserted only every other keyint frames, which probably " \
     "leads to ugly encoding artifacts. (1-100)." )
 
-#define BFRAMES_TEXT N_("Number of B-frames between I and P (1 to 16)")
+#define BFRAMES_TEXT N_("B-frames between I and P")
 #define BFRAMES_LONGTEXT N_( "Number of consecutive B-frames between I and " \
-    "P-frames." )
+    "P-frames. (1 to 16)" )
 
 #define B_ADAPT_TEXT N_("Adaptive B-frame decision")
 #define B_ADAPT_LONGTEXT N_( "Force the specified number of " \
     "consecutive B-frames to be used, except possibly before an I-frame. " )
 
-#define B_BIAS_TEXT N_("Influences how often B-frames are used")
+#define B_BIAS_TEXT N_("B-frames usage")
 #define B_BIAS_LONGTEXT N_( "Bias the choice to use B-frames. Positive values " \
     "cause more B-frames, negative values cause less B-frames. " )
 
@@ -87,33 +89,33 @@ static void Close( vlc_object_t * );
     "Coding). Slightly slows down encoding and decoding, but should save " \
     "10-15% bitrate." )
 
-#define REF_TEXT N_("Number of reference frames (1 to 16)")
+#define REF_TEXT N_("Number of reference frames")
 #define REF_LONGTEXT N_( "Number of previous frames used as predictors. " \
     "This is effective in Anime, but seems to make little difference in " \
     "live-action source material. Some decoders are unable to deal with " \
-    "large frameref values." )
+    "large frameref values. From 1 to 16" )
 
 #define NF_TEXT N_("Loop filter")
 #define NF_LONGTEXT N_( "Deblocking loop filter (increases quality).")
 
 /* Ratecontrol */
 
-#define QP_TEXT N_("Set QP (0=lossless) (0 to 51)")
+#define QP_TEXT N_("Set QP")
 #define QP_LONGTEXT N_( "This selects the quantizer to use. " \
     "Lower values result in better fidelity, but higher bitrates. 26 is a " \
-    "good default value." )
+    "good default value. From 0 to 51. 0 means lossless" )
 
-#define CRF_TEXT N_("Quality-based VBR (nominal QP) (0 to 51)")
-#define CRF_LONGTEXT N_( "1-pass Quality-based VBR." )
+#define CRF_TEXT N_("Quality-based VBR")
+#define CRF_LONGTEXT N_( "1-pass Quality-based VBR. From 0 to 51" )
 
-#define QPMIN_TEXT N_("Set min QP")
+#define QPMIN_TEXT N_("Min QP")
 #define QPMIN_LONGTEXT N_( "Minimum quantizer, 15/35 seems to be a useful " \
     "range." )
 
-#define QPMAX_TEXT N_("Set max QP")
+#define QPMAX_TEXT N_("ax QP")
 #define QPMAX_LONGTEXT N_( "Maximum quantizer parameter." )
 
-#define QPSTEP_TEXT N_("Set max QP step")
+#define QPSTEP_TEXT N_("ax QP step")
 #define QPSTEP_LONGTEXT N_( "Max QP step between frames.")
 
 #define RATETOL_TEXT N_("Average bitrate tolerance")
@@ -143,11 +145,13 @@ static void Close( vlc_object_t * );
 #define QCOMP_TEXT N_("QP curve compression")
 #define QCOMP_LONGTEXT N_( "QP curve compression. (0.0=CBR to 1.0=QCP)")
 
-#define CPLXBLUR_TEXT N_("Reduce fluctuations in QP (before curve compression)")
-#define CPLXBLUR_LONGTEXT N_( "Temporally blur complexity.")
+#define CPLXBLUR_TEXT N_("Reduce fluctuations in QP")
+#define CPLXBLUR_LONGTEXT N_( "This reduces the fluctuations in QP " \
+                "before curve compression. Temporally blurs complexity.")
 
-#define QBLUR_TEXT N_("Reduce fluctuations in QP (after curve compression)")
-#define QBLUR_LONGTEXT N_( "Temporally blur quants.")
+#define QBLUR_TEXT N_("Reduce fluctuations in QP")
+#define QBLUR_LONGTEXT N_( "This reduces the fluctations in QP " \
+                        "after curve compression. Temporally blurs quants.")
 
 /* Analysis */
 
@@ -162,7 +166,7 @@ static void Close( vlc_object_t * );
 
 #define DIRECT_PRED_TEXT N_("Direct MV prediction mode")
 #define DIRECT_PRED_LONGTEXT N_( "Direct MV prediction mode. ")
-     
+
 #define WEIGHTB_TEXT N_("Weighted prediction for B-frames")
 #define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
 
@@ -173,38 +177,45 @@ static void Close( vlc_object_t * );
     " - umh: uneven multi-hexagon search (better but slower)\n" \
     " - esa: exhaustive search (extremely slow, primarily for testing)\n" )
 
-#define MERANGE_TEXT N_("Maximum motion vector search range (0 to 64)")
-#define MERANGE_LONGTEXT N_( "Maximum distance to search for motion estimation, "\
-    "measured from predicted position(s). Default of 16 is good for most footage, "\
-    "high motion sequences may benefit from settings between 24-32." )
+#define MERANGE_TEXT N_("Maximum motion vector search range")
+#define MERANGE_LONGTEXT N_( "Maximum distance to search for " \
+    "motion estimation, measured from predicted position(s). " \
+    "Default of 16 is good for most footage, "\
+    "high motion sequences may benefit from settings between 24-32. " \
+    "From 0 to 64." )
 
 #define SUBME_TEXT N_("Subpixel motion estimation and partition decision " \
-    "quality (1 to 6)")
+    "quality")
 #define SUBME_LONGTEXT N_( "This parameter controls quality versus speed " \
     "tradeoffs involved in the motion estimation decision process " \
-    "(lower = quicker and higher = better quality)." )
+    "(lower = quicker and higher = better quality). From 1 to 6." )
 
-#define B_RDO_TEXT N_("RD based mode decision for B-frames. Requires subme 6")
-#define B_RDO_LONGTEXT N_( "RD based mode decision for B-frames. " )
+#define B_RDO_TEXT N_("RD based mode decision for B-frames.")
+#define B_RDO_LONGTEXT N_( "RD based mode decision for B-frames. This " \
+                        "requires subme 6.")
 
 #define MIXED_REFS_TEXT N_("Decide references on a per partition basis")
-#define MIXED_REFS_LONGTEXT N_( "Allows each 8x8 or 16x8 partition to independently " \
+#define MIXED_REFS_LONGTEXT N_( "Allows each 8x8 or 16x8 partition to " \
+     "independently " \
      "select a reference frame, as opposed to only one ref per macroblock." )
 
 #define CHROMA_ME_TEXT N_("Ignore chroma in motion estimation")
-#define CHROMA_ME_LONGTEXT N_( "Chroma ME for subpel and mode decision in P-frames.")
+#define CHROMA_ME_LONGTEXT N_( "Chroma ME for subpel and mode decision in " \
+                "P-frames.")
 
 #define BIME_TEXT N_("Jointly optimize both MVs in B-frames")
 #define BIME_LONGTEXT N_( "Joint bidirectional motion refinement.")
 
 #define TRANSFORM_8X8DCT_TEXT N_("Adaptive spatial transform size")
-#define TRANSFORM_8X8DCT_LONGTEXT N_( "SATD-based decision for 8x8 transform in inter-MBs.")
+#define TRANSFORM_8X8DCT_LONGTEXT N_( \
+        "SATD-based decision for 8x8 transform in inter-MBs.")
 
-#define TRELLIS_TEXT N_("Trellis RD quantization (0,1,2). Requires CABAC")
+#define TRELLIS_TEXT N_("Trellis RD quantization" )
 #define TRELLIS_LONGTEXT N_( "Trellis RD quantization: \n" \
      " - 0: disabled\n" \
      " - 1: enabled only on the final encode of a MB\n" \
-     " - 2: enabled on all mode decisions\n" )
+     " - 2: enabled on all mode decisions\n" \
+     "This requires CABAC." )
 
 #define FAST_PSKIP_TEXT N_("Early SKIP detection on P-frames")
 #define FAST_PSKIP_LONGTEXT N_( "Early SKIP detection on P-frames.")
@@ -221,7 +232,7 @@ static void Close( vlc_object_t * );
 #define PSNR_LONGTEXT N_( "This has no effect on actual encoding quality, "\
     "it just prevents the stats from being calculated (for speed)." )
 
-#define VERBOSE_TEXT N_("Print stats for each frame")
+#define VERBOSE_TEXT N_("Statistics")
 #define VERBOSE_LONGTEXT N_( "Print stats for each frame.")
 
 #if X264_BUILD >= 24
