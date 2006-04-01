@@ -28,7 +28,7 @@ exit 0
 @@ -603,8 +603,8 @@
      /* Create the "Help" menu */
      wxMenu *help_menu = new wxMenu;
-     help_menu->Append( About_Event, wxU(_("About VLC media player")) );
+     help_menu->Append( About_Event, wxU(_("About...")) );
 -    help_menu->AppendSeparator();
 -    help_menu->Append( UpdateVLC_Event, wxU(_("Check for updates ...")) );
 +//    help_menu->AppendSeparator();
