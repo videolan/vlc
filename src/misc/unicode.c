@@ -47,12 +47,6 @@
 # include <sys/stat.h>
 #endif
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
-/* stat() support for large files on win32 */
-#   define stat _stati64
-#   define fstat(a,b) _fstati64(a,b)
-#endif
-
 #ifndef HAVE_LSTAT
 # define lstat( a, b ) stat(a, b)
 #endif
@@ -516,7 +510,6 @@ static int utf8_statEx( const char *filename, void *buf,
     }
     wpath[MAX_PATH] = L'\0';
 
-    /* struct _stat is just a silly Microsoft alias for struct stat */
     return _wstati64( wpath, (struct _stati64 *)buf );
 #endif
 }
