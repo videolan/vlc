@@ -402,6 +402,13 @@ static int  Open ( vlc_object_t *p_this )
             bInit = sub->initiate( 4 ); /* Constant ? */
         else
             bInit = sub->initiate();
+        
+        if( strcasestr( sub->codecName(), "REAL" ) )
+        {
+            msg_Info( p_demux, "real codec detected, using real-RTSP instead" );
+            delete iter;
+            goto error; 
+        }   
 
         if( !bInit )
         {
@@ -440,8 +447,7 @@ static int  Open ( vlc_object_t *p_this )
         /* The PLAY */
         if( !p_sys->rtsp->playMediaSession( *p_sys->ms ) )
         {
-            //msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
-            msg_Warn( p_demux, "RTSP-stream doesn't have any timing info" );
+            msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
             delete iter;
             goto error;
         }
