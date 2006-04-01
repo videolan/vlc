@@ -1,7 +1,7 @@
 /*****************************************************************************
  * livedotcom.cpp : LIVE555 Streaming Media support.
  *****************************************************************************
- * Copyright (C) 2003-2005 the VideoLAN team
+ * Copyright (C) 2003-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -301,10 +301,10 @@ static int  Open ( vlc_object_t *p_this )
             i_http_port = var_CreateGetInteger( p_demux, "rtsp-http-port" );
 
         if( ( p_sys->rtsp = RTSPClient::createNew(*p_sys->env, 1/*verbose*/,
-              "VLC Media Player", i_http_port ) ) == NULL )
+              "VLC media player", i_http_port ) ) == NULL )
 #else
         if( ( p_sys->rtsp = RTSPClient::createNew(*p_sys->env, 1/*verbose*/,
-              "VLC Media Player" ) ) == NULL )
+              "VLC media player" ) ) == NULL )
 #endif
         {
             msg_Err( p_demux, "RTSPClient::createNew failed (%s)",
@@ -440,7 +440,8 @@ static int  Open ( vlc_object_t *p_this )
         /* The PLAY */
         if( !p_sys->rtsp->playMediaSession( *p_sys->ms ) )
         {
-            msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
+            //msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
+            msg_Warn( p_demux, "RTSP-stream doesn't have any timing info" );
             delete iter;
             goto error;
         }
@@ -998,7 +999,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 if( !p_sys->rtsp->playMediaSession( *p_sys->ms, time ) )
                 {
-                    msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
+                    msg_Err( p_demux, "PLAY failed %s",
+                        p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
                 }
                 p_sys->i_start = (mtime_t)(f * (double)p_sys->i_length);
@@ -1099,7 +1101,7 @@ static int RollOverTcp( demux_t *p_demux )
 
     /* Reopen rtsp client */
     if( ( p_sys->rtsp = RTSPClient::createNew(*p_sys->env, 1/*verbose*/,
-          "VLC Media Player" ) ) == NULL )
+          "VLC media player" ) ) == NULL )
     {
         msg_Err( p_demux, "RTSPClient::createNew failed (%s)",
                  p_sys->env->getResultMsg() );

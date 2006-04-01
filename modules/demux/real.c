@@ -1,7 +1,7 @@
 /*****************************************************************************
  * real.c: Real demuxer.
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004, 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -593,11 +593,14 @@ static int Demux( demux_t *p_demux )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+#if 0
     double f, *pf;
     int64_t i64, *pi64;
+#endif
 
     switch( i_query )
     {
+#if 0
         case DEMUX_GET_POSITION:
             pf = (double*) va_arg( args, double* );
             i64 = stream_Size( p_demux->s );
@@ -618,7 +621,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             return stream_Seek( p_demux->s, (int64_t)(i64 * f) );
 
-#if 0
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->i_mux_rate > 0 )
@@ -643,7 +645,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_META:
         {
             vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
-            vlc_meta_t *meta;
             *pp_meta = p_sys->p_meta;
             return VLC_SUCCESS;
         }
