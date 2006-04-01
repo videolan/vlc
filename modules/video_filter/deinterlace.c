@@ -72,13 +72,19 @@ static void MergeGeneric ( void *, const void *, const void *, size_t );
 static void MergeAltivec ( void *, const void *, const void *, size_t );
 #endif
 #if defined(CAN_COMPILE_MMXEXT)
-static void MergeMMX     ( void *, const void *, const void *, size_t );
+static void MergeMMXEXT  ( void *, const void *, const void *, size_t );
+#endif
+#if defined(CAN_COMPILE_3DNOW)
+static void Merge3DNow   ( void *, const void *, const void *, size_t );
 #endif
 #if defined(CAN_COMPILE_SSE)
 static void MergeSSE2    ( void *, const void *, const void *, size_t );
 #endif
 #if defined(CAN_COMPILE_MMXEXT) || defined(CAN_COMPILE_SSE)
 static void EndMMX       ( void );
+#endif
+#if defined(CAN_COMPILE_3DNOW)
+static void End3DNow     ( void );
 #endif
 
 static int  SendEvents   ( vlc_object_t *, char const *,
@@ -217,10 +223,18 @@ static int Create( vlc_object_t *p_this )
     else
 #endif
 #if defined(CAN_COMPILE_MMXEXT)
-    if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
+    if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT )
     {
-        p_vout->p_sys->pf_merge = MergeMMX;
+        p_vout->p_sys->pf_merge = MergeMMXEXT;
         p_vout->p_sys->pf_end_merge = EndMMX;
+    }
+    else
+#endif
+#if defined(CAN_COMPILE_3DNOW)
+    if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW )
+    {
+        p_vout->p_sys->pf_merge = Merge3DNow;
+        p_vout->p_sys->pf_end_merge = End3DNow;
     }
     else
 #endif
@@ -931,8 +945,8 @@ static void MergeGeneric( void *_p_dest, const void *_p_s1,
 }
 
 #if defined(CAN_COMPILE_MMXEXT)
-static void MergeMMX( void *_p_dest, const void *_p_s1, const void *_p_s2,
-                      size_t i_bytes )
+static void MergeMMXEXT( void *_p_dest, const void *_p_s1, const void *_p_s2,
+                         size_t i_bytes )
 {
     uint8_t* p_dest = (uint8_t*)_p_dest;
     const uint8_t *p_s1 = (const uint8_t *)_p_s1;
@@ -942,6 +956,35 @@ static void MergeMMX( void *_p_dest, const void *_p_s1, const void *_p_s2,
     {
         __asm__  __volatile__( "movq %2,%%mm1;"
                                "pavgb %1, %%mm1;"
+                               "movq %%mm1, %0" :"=m" (*p_dest):
+                                                 "m" (*p_s1),
+                                                 "m" (*p_s2) );
+        p_dest += 8;
+        p_s1 += 8;
+        p_s2 += 8;
+    }
+
+    p_end += 8;
+
+    while( p_dest < p_end )
+    {
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+    }
+}
+#endif
+
+#if defined(CAN_COMPILE_3DNOW)
+static void Merge3DNow( void *_p_dest, const void *_p_s1, const void *_p_s2,
+                        size_t i_bytes )
+{
+    uint8_t* p_dest = (uint8_t*)_p_dest;
+    const uint8_t *p_s1 = (const uint8_t *)_p_s1;
+    const uint8_t *p_s2 = (const uint8_t *)_p_s2;
+    uint8_t* p_end = p_dest + i_bytes - 8;
+    while( p_dest < p_end )
+    {
+        __asm__  __volatile__( "movq %2,%%mm1;"
+                               "pavgusb %1, %%mm1;"
                                "movq %%mm1, %0" :"=m" (*p_dest):
                                                  "m" (*p_s1),
                                                  "m" (*p_s2) );
@@ -997,6 +1040,13 @@ static void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
 static void EndMMX( void )
 {
     __asm__ __volatile__( "emms" :: );
+}
+#endif
+
+#if defined(CAN_COMPILE_3DNOW)
+static void End3DNow( void )
+{
+    __asm__ __volatile__( "femms" :: );
 }
 #endif
 
