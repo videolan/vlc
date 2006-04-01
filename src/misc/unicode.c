@@ -43,7 +43,6 @@
 #ifdef UNDER_CE
 #  include <tchar.h>
 #endif
-
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
@@ -52,10 +51,6 @@
 /* stat() support for large files on win32 */
 #   define stat _stati64
 #   define fstat(a,b) _fstati64(a,b)
-#   ifdef lseek
-#       undef lseek
-#   endif
-#   define lseek _lseeki64
 #endif
 
 #ifndef HAVE_LSTAT
