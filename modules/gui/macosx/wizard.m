@@ -1167,7 +1167,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 NSBeginInformationalAlertSheet(_NS("No folder selected"), \
                     _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
                     [NSString stringWithFormat: @"%@\n\n%@", _NS("A directory "
-                    "where to save the files has to be selected"),
+                    "where to save the files has to be selected."),
                     _NS("Enter either a valid path or use the \"Choose...\" " \
                     "button to select a location.")]);
             else
@@ -1176,7 +1176,7 @@ static VLCWizard *_o_sharedInstance = nil;
                     [NSString stringWithFormat: @"%@\n\n%@", _NS("A file " \
                     "where to save the stream has to be selected."),
                     _NS("Enter either a valid path or use the \"Choose\" " \
-                    "button to select a location")]);
+                    "button to select a location.")]);
         } else {
             /* create a string containing the requested suffix for later usage */
             NSString * theEncapFormat = [[o_encapFormats objectAtIndex:
@@ -1195,25 +1195,53 @@ static VLCWizard *_o_sharedInstance = nil;
                 NSMutableString * tempString = [[NSMutableString alloc] init];
                 while( x != y )
                 {
+                    NSString * fileNameToUse;
+                    /* check whether the extension is hidden or not. 
+                     * if not, remove it
+                     * we need the casting to make GCC4 happy */
+                    if( (int)[[[NSFileManager defaultManager] fileAttributesAtPath: \
+                        [[o_userSelections objectForKey:@"pathToStrm"] \
+                        objectAtIndex: x] traverseLink: NO] objectForKey: \
+                        NSFileExtensionHidden] == YES )
+                        fileNameToUse = [NSString stringWithString:
+                            [[NSFileManager defaultManager] displayNameAtPath:
+                            [[o_userSelections objectForKey:@"pathToStrm"]
+                            objectAtIndex: x]]];
+                    else
+                    {
+                        int z = 0;
+                        int count = [[[[NSFileManager defaultManager] \
+                            displayNameAtPath: \
+                            [[o_userSelections objectForKey:@"pathToStrm"] \
+                            objectAtIndex: x]] \
+                            componentsSeparatedByString: @"."] count];
+                        fileNameToUse = @"";
+                        while( z < (count - 1) )
+                        {
+                            fileNameToUse = [fileNameToUse stringByAppendingString:
+                                [[[[NSFileManager defaultManager] \
+                                displayNameAtPath: \
+                                [[o_userSelections objectForKey:@"pathToStrm"] \
+                                objectAtIndex: x]] \
+                                componentsSeparatedByString: @"."] \
+                                objectAtIndex: z]];
+                            z += 1;
+                        }
+                    }
                     tempString = [NSString stringWithFormat: @"%@%@.%@",
                         [o_t7_fld_filePath stringValue],
-                        [[NSFileManager defaultManager] displayNameAtPath:
-                        [[o_userSelections objectForKey:@"pathToStrm"]
-                        objectAtIndex: x]],theEncapFormat];
+                        fileNameToUse, theEncapFormat];
                     if( [[NSFileManager defaultManager] fileExistsAtPath: \
                         tempString] )
                     {
                         /* we don't wanna overwrite existing files, so add an
                          * int to the file-name */
-                        int additionalInt = 0;
+                        int additionalInt = 1;
                         while( additionalInt < 100 )
                         {
-                            tempString = [NSString stringWithFormat:@"%@%@.%i.%@",
+                            tempString = [NSString stringWithFormat:@"%@%@ %i.%@",
                                 [o_t7_fld_filePath stringValue],
-                                [[NSFileManager defaultManager] displayNameAtPath:
-                                [[o_userSelections objectForKey:@"pathToStrm"]
-                                objectAtIndex: x]], additionalInt,
-                                theEncapFormat];
+                                fileNameToUse, additionalInt, theEncapFormat];
                             if(! [[NSFileManager defaultManager] \
                                 fileExistsAtPath: tempString] )
                                 break;
@@ -1422,7 +1450,7 @@ static VLCWizard *_o_sharedInstance = nil;
         /* do only show the destination of the first item and add a counter, if needed */
         if( [[o_userSelections objectForKey: @"trnscdFilePath"] count] > 1 )
             [o_t8_fld_saveFileTo setStringValue: \
-                [NSString stringWithFormat: @"%@ (+ %i)", \
+                [NSString stringWithFormat: @"%@ (+%i)", \
                 [[o_userSelections objectForKey: @"trnscdFilePath"] objectAtIndex:0], \
                 ([[o_userSelections objectForKey: @"trnscdFilePath"] count] - 1)]];
         else
