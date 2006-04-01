@@ -1,7 +1,7 @@
 /*****************************************************************************
  * PlaylistIntf.java: The playlist interface
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2006 the VideoLAN team
  *
  * $Id$
  *

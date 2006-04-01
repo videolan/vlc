@@ -1,7 +1,7 @@
 /*****************************************************************************
  * JVLCPanel.java: Java Swing JPanel embedding VLC Video Output
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2006 the VideoLAN team
  *
  * $Id$
  *

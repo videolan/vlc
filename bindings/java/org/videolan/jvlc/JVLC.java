@@ -1,7 +1,7 @@
 /*****************************************************************************
  * JVLC.java: Main Java Class, represents a libvlc_instance_t object
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2006 the VideoLAN team
  *
  * $Id$
  *
