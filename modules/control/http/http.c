@@ -1,7 +1,7 @@
 /*****************************************************************************
  * http.c : HTTP/HTTPS Remote control interface
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -87,14 +87,15 @@ static void Run          ( intf_thread_t *p_intf );
  * Local functions
  *****************************************************************************/
 #if !defined(__APPLE__) && !defined(SYS_BEOS) && !defined(WIN32)
-static int DirectoryCheck( char *psz_dir )
+static int DirectoryCheck( const char *psz_dir )
 {
     DIR           *p_dir;
 
 #ifdef HAVE_SYS_STAT_H
     struct stat   stat_info;
 
-    if( utf8_stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
+    if( ( utf8_stat( psz_dir, &stat_info ) == -1 )
+      || !S_ISDIR( stat_info.st_mode ) )
     {
         return VLC_EGENERIC;
     }
@@ -293,16 +294,28 @@ static int Open( vlc_object_t *p_this )
 #else
     psz_src = config_GetPsz( p_intf, "http-src" );
 
-    if( !psz_src || *psz_src == '\0' )
+    if( ( psz_src == NULL ) || ( *psz_src == '\0' ) )
     {
-        if( !DirectoryCheck( "share/http" ) )
+        static char const* ppsz_paths[] = {
+            "share/http",
+            "../share/http",
+            DATA_PATH"/http",
+            NULL
+        };
+        unsigned i;
+
+        if( psz_src != NULL )
         {
-            psz_src = strdup( "share/http" );
+            free( psz_src );
+            psz_src = NULL;
         }
-        else if( !DirectoryCheck( DATA_PATH "/http" ) )
-        {
-            psz_src = strdup( DATA_PATH "/http" );
-        }
+
+        for( i = 0; ppsz_paths[i] != NULL; i++ )
+            if( !DirectoryCheck( ppsz_paths[i] ) )
+            {
+                psz_src = strdup( ppsz_paths[i] );
+                break;
+            }
     }
 #endif
 
