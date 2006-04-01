@@ -437,7 +437,7 @@ void __stats_TimerStop( vlc_object_t *p_obj, unsigned int i_id )
                                              i_id );
     if( !p_counter || p_counter->i_samples != 2 )
     {
-        msg_Err( p_obj, "timer does not exist" );
+        msg_Err( p_obj, "Timer does not exist" );
         return;
     }
     p_counter->pp_samples[0]->value.b_bool = VLC_FALSE;
@@ -680,7 +680,7 @@ static void TimerDump( vlc_object_t *p_obj, counter_t *p_counter,
     int i_total;
     if( !p_counter || p_counter->i_samples != 2 )
     {
-        msg_Err( p_obj, "timer %s does not exist", p_counter->psz_name );
+        msg_Err( p_obj, "Timer %s does not exist", p_counter->psz_name );
         return;
     }
     i_total = p_counter->pp_samples[1]->value.i_int;

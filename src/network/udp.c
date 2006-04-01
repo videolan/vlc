@@ -357,8 +357,8 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
         {
             if( sock.i_handle != -1 )
             {
-                msg_Warn( p_this, "net: lame IPv6/IPv4 dual-stack present. "
-                                  "Using only IPv4." );
+                msg_Warn( p_this, "net: lame IPv6/IPv4 dual-stack present, "
+                                  "using only IPv4." );
                 net_Close( fd6 );
             }
             else

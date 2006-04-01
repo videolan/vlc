@@ -672,11 +672,11 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                 p_message = vlm_MessageNew( "load", NULL );
                 goto success;
             case 2:
-                p_message = vlm_MessageNew( "load", "read file error" );
+                p_message = vlm_MessageNew( "load", "Read file error" );
                 goto error;
             case 3:
                 p_message =
-                    vlm_MessageNew( "load", "error while loading file" );
+                    vlm_MessageNew( "load", "Error while loading file" );
                 goto error;
             default:
                 p_message =

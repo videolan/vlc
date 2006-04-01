@@ -146,7 +146,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     p_module = module_Need( p_playlist, "playlist export", psz_type, VLC_TRUE);
     if( !p_module )
     {
-        msg_Warn( p_playlist, "failed to export playlist" );
+        msg_Warn( p_playlist, "exporting playlist failed" );
         vlc_mutex_unlock( &p_playlist->object_lock );
         return VLC_ENOOBJ;
     }

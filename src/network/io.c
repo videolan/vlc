@@ -339,7 +339,7 @@ int __net_Select( vlc_object_t *p_this, int *pi_fd, v_socket_t **pp_vs,
     }
     else if( i_ret < 0 )
     {
-        msg_Err( p_this, "network select error (%s)", strerror(errno) );
+        msg_Err( p_this, "network selection error (%s)", strerror(errno) );
         return -1;
     }
     else if( i_ret == 0 )
@@ -422,9 +422,9 @@ int __net_Write( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
         if( i_ret < 0 )
         {
 #if defined(WIN32) || defined(UNDER_CE)
-            msg_Err( p_this, "network select error (%d)", WSAGetLastError() );
+            msg_Err( p_this, "network selection error (%d)", WSAGetLastError() );
 #else
-            msg_Err( p_this, "network select error (%s)", strerror(errno) );
+            msg_Err( p_this, "network selection error (%s)", strerror(errno) );
 #endif
             return i_total > 0 ? i_total : -1;
         }

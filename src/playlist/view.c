@@ -684,7 +684,7 @@ playlist_item_t *playlist_FindNextFromParent( playlist_t *p_playlist,
         if( p_playlist->b_go_next )
         {
 #ifdef PLAYLIST_DEBUG
-            msg_Dbg( p_playlist, "Moving on to next node: search from %s",
+            msg_Dbg( p_playlist, "moving on to next node: search from %s",
                             p_root->input.psz_name );
 #endif
             p_next = playlist_RecursiveFindNext( p_playlist, i_view,
@@ -699,7 +699,7 @@ playlist_item_t *playlist_FindNextFromParent( playlist_t *p_playlist,
         else
         {
 #ifdef PLAYLIST_DEBUG
-            msg_Dbg( p_playlist, "Not moving on to next node: you loose" );
+            msg_Dbg( p_playlist, "not moving on to next node: you loose" );
 #endif
             return NULL;
         }
@@ -728,18 +728,18 @@ playlist_item_t *playlist_FindPrevFromParent( playlist_t *p_playlist,
 #ifdef PLAYLIST_DEBUG
     if( p_item != NULL )
     {
-        msg_Dbg( p_playlist, "Finding prev of %s within %s",
+        msg_Dbg( p_playlist, "finding prev of %s within %s",
                         p_item->input.psz_name, p_node->input.psz_name );
     }
     else
     {
-        msg_Dbg( p_playlist, "Finding prev from %s",p_node->input.psz_name );
+        msg_Dbg( p_playlist, "finding prev from %s",p_node->input.psz_name );
     }
 #endif
 
     if( !p_node  || p_node->i_children == -1 )
     {
-        msg_Err( p_playlist,"invalid arguments for FindPrevFromParent" );
+        msg_Err( p_playlist,"Invalid arguments for FindPrevFromParent" );
         return NULL;
     }
 
@@ -807,7 +807,7 @@ playlist_item_t *playlist_RecursiveFindNext( playlist_t *p_playlist,
                 i = -1;
             }
 #ifdef PLAYLIST_DEBUG
-            msg_Dbg( p_playlist,"Current item found, child %i of %s",
+            msg_Dbg( p_playlist,"current item found, child %i of %s",
                                 i , p_parent->input.psz_name );
 #endif
             /* We found our item */
@@ -815,13 +815,13 @@ playlist_item_t *playlist_RecursiveFindNext( playlist_t *p_playlist,
             {
                 /* Too far... */
 #ifdef PLAYLIST_DEBUG
-                msg_Dbg( p_playlist, "Going up the tree,at parent of %s",
+                msg_Dbg( p_playlist, "going up the tree, at parent of %s",
                                 p_parent->input.psz_name );
 #endif
                 if( p_parent == p_root )
                 {
 #ifdef PLAYLIST_DEBUG
-                    msg_Dbg( p_playlist, "At root item (%s)",
+                    msg_Dbg( p_playlist, "at root item (%s)",
                                          p_root->input.psz_name );
 #endif
                     /* Hmm, seems it's the end for you, guy ! */
@@ -833,7 +833,7 @@ playlist_item_t *playlist_RecursiveFindNext( playlist_t *p_playlist,
                                                              p_parent, i_view );
                 if( p_parent_parent == NULL )
                 {
-                    msg_Warn( p_playlist, "Unable to find parent !");
+                    msg_Warn( p_playlist, "unable to find parent!");
                     return NULL;
                 }
                 return playlist_RecursiveFindNext( p_playlist, i_view,p_root,
@@ -845,7 +845,7 @@ playlist_item_t *playlist_RecursiveFindNext( playlist_t *p_playlist,
                 {
                     /* Cool, we have found a real item to play */
 #ifdef PLAYLIST_DEBUG
-                    msg_Dbg( p_playlist, "Playing child %i of %s",
+                    msg_Dbg( p_playlist, "playing child %i of %s",
                                      i+1 , p_parent->input.psz_name );
 #endif
                     return p_parent->pp_children[i+1];
@@ -903,7 +903,7 @@ playlist_item_t *playlist_RecursiveFindPrev( playlist_t *p_playlist,
                 i = -1;
             }
 #ifdef PLAYLIST_DEBUG
-            msg_Dbg( p_playlist,"Current item found, child %i of %s",
+            msg_Dbg( p_playlist,"current item found, child %i of %s",
                              i , p_parent->input.psz_name );
 #endif
             /* We found our item */
@@ -911,13 +911,13 @@ playlist_item_t *playlist_RecursiveFindPrev( playlist_t *p_playlist,
             {
                 /* Too far... */
 #ifdef PLAYLIST_DEBUG
-                msg_Dbg( p_playlist, "Going up the tree,at parent of %s",
+                msg_Dbg( p_playlist, "going up the tree, at parent of %s",
                                      p_parent->input.psz_name );
 #endif
                 if( p_parent == p_root )
                 {
 #ifdef PLAYLIST_DEBUG
-                    msg_Dbg( p_playlist, "At root item (%s)",
+                    msg_Dbg( p_playlist, "at root item (%s)",
                                          p_root->input.psz_name );
 #endif
                     /* Hmm, seems it's the end for you, guy ! */
@@ -929,7 +929,7 @@ playlist_item_t *playlist_RecursiveFindPrev( playlist_t *p_playlist,
                 if( p_parent_parent == NULL )
                 {
 #ifdef PLAYLIST_DEBUG
-                    msg_Dbg( p_playlist, "Mmmh, couldn't find parent" );
+                    msg_Dbg( p_playlist, "mmmh, couldn't find parent" );
 #endif
                     return NULL;
                 }
@@ -942,7 +942,7 @@ playlist_item_t *playlist_RecursiveFindPrev( playlist_t *p_playlist,
                 {
                     /* Cool, we have found a real item to play */
 #ifdef PLAYLIST_DEBUG
-                    msg_Dbg( p_playlist, "Playing child %i of %s",
+                    msg_Dbg( p_playlist, "playing child %i of %s",
                                      i-1, p_parent->input.psz_name );
 #endif
                     return p_parent->pp_children[i-1];

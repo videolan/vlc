@@ -86,8 +86,8 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
         {
             if( !strcmp( p_sout->psz_sout, psz_dest ) )
             {
-                msg_Dbg( p_parent, "sout keep : reusing sout" );
-                msg_Dbg( p_parent, "sout keep : you probably want to use "
+                msg_Dbg( p_parent, "sout keep: reusing sout" );
+                msg_Dbg( p_parent, "sout keep: you probably want to use "
                           "gather stream_out" );
                 vlc_object_detach( p_sout );
                 vlc_object_attach( p_sout, p_parent );
@@ -96,7 +96,7 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
             }
             else
             {
-                msg_Dbg( p_parent, "sout keep : destroying unusable sout" );
+                msg_Dbg( p_parent, "sout keep: destroying unusable sout" );
                 vlc_object_release( p_sout );
                 sout_DeleteInstance( p_sout );
             }
@@ -107,7 +107,7 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
         while( ( p_sout = vlc_object_find( p_parent, VLC_OBJECT_SOUT,
                                            FIND_PARENT ) ) != NULL )
         {
-            msg_Dbg( p_parent, "sout keep : destroying old sout" );
+            msg_Dbg( p_parent, "sout keep: destroying old sout" );
             vlc_object_release( p_sout );
             sout_DeleteInstance( p_sout );
         }
@@ -157,7 +157,7 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
 
     if( p_sout->p_stream == NULL )
     {
-        msg_Err( p_sout, "stream chained failed for `%s'", p_sout->psz_chain );
+        msg_Err( p_sout, "stream chain failed for `%s'", p_sout->psz_chain );
 
         FREE( p_sout->psz_sout );
         FREE( p_sout->psz_chain );
@@ -474,8 +474,8 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
 
             if( b_answer )
             {
-                msg_Dbg( p_sout, "muxer prefers waiting for all ES before "
-                         "starting muxing" );
+                msg_Dbg( p_sout, "muxer prefers to wait for all ES before "
+                         "starting to mux" );
                 p_mux->b_waiting_stream = VLC_TRUE;
             }
         }
@@ -511,7 +511,7 @@ sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, es_format_t *p_fmt )
     if( !p_mux->b_add_stream_any_time && !p_mux->b_waiting_stream )
     {
         msg_Err( p_mux, "cannot add a new stream (unsupported while muxing "
-                        "for this format)" );
+                        "to this format)" );
         return NULL;
     }
 
@@ -557,7 +557,7 @@ void sout_MuxDeleteStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         if( p_mux->pf_delstream( p_mux, p_input ) < 0 )
         {
-            msg_Err( p_mux, "cannot del this stream from mux" );
+            msg_Err( p_mux, "cannot delete this stream from mux" );
         }
 
         /* remove the entry */
@@ -565,7 +565,7 @@ void sout_MuxDeleteStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
         if( p_mux->i_nb_inputs == 0 )
         {
-            msg_Warn( p_mux, "no more input stream for this mux" );
+            msg_Warn( p_mux, "no more input streams for this mux" );
         }
 
         block_FifoRelease( p_input->p_fifo );

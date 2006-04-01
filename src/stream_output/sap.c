@@ -123,7 +123,7 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
     if( vlc_thread_create( p_sap, "sap handler", RunThread,
                        VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
-        msg_Dbg( p_announce, "Unable to spawn SAP handler thread");
+        msg_Dbg( p_announce, "unable to spawn SAP handler thread");
         free( p_sap );
         return NULL;
     };
@@ -246,7 +246,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     if( p_session->psz_uri == NULL )
     {
         vlc_mutex_unlock( &p_sap->object_lock );
-        msg_Err( p_sap, "*FIXME* Unexpected NULL URI for SAP announce" );
+        msg_Err( p_sap, "*FIXME* unexpected NULL URI for SAP announce" );
         msg_Err( p_sap, "This should not happen. VLC needs fixing." );
         return VLC_EGENERIC;
     }
@@ -497,7 +497,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                  p_sap->i_sessions,
                  p_sap->i_sessions,
                  p_sap_session );
-    msg_Dbg( p_sap,"Addresses: %i  Sessions: %i",
+    msg_Dbg( p_sap,"%i addresses, %i sessions",
                    p_sap->i_addresses,p_sap->i_sessions);
 
     /* Remember the SAP session for later deletion */
@@ -560,7 +560,7 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
     if( p_session->i_next < mdate() )
     {
 #ifdef EXTRA_DEBUG
-        msg_Dbg( p_sap, "Sending announce");
+        msg_Dbg( p_sap, "sending announce");
 #endif
         i_ret = net_Write( p_sap, p_session->p_address->i_wfd, NULL,
                            p_session->psz_data,
@@ -687,7 +687,7 @@ static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
         p_address->i_interval = MAX_INTERVAL;
     }
 #ifdef EXTRA_DEBUG
-    msg_Dbg( p_sap,"%s:%i : Rate=%i, Interval = %i s",
+    msg_Dbg( p_sap,"%s:%i: rate=%i, interval = %i s",
              p_address->psz_address,SAP_PORT, i_rate, p_address->i_interval );
 #endif
 

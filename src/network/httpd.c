@@ -1135,7 +1135,7 @@ void httpd_HostDelete( httpd_host_t *host )
 
     for( i = 0; i < host->i_url; i++ )
     {
-        msg_Err( host, "url still registered:%s", host->url[i]->psz_url );
+        msg_Err( host, "url still registered: %s", host->url[i]->psz_url );
     }
     for( i = 0; i < host->i_client; i++ )
     {

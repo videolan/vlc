@@ -208,7 +208,7 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
     i_ret = ioctl( i_fd, CDROMEJECT, 0 );
 
 #else
-    msg_Warn( p_this, "CD-Rom ejection unsupported on this platform" );
+    msg_Warn( p_this, "CD-ROM ejection unsupported on this platform" );
     i_ret = -1;
 
 #endif

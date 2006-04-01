@@ -102,7 +102,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
                                                 p_snapshot->p_data,
                                                 p_snapshot->i_datasize );
         if( !p_pic )
-            RAISE( mediacontrol_InternalException, "Out of memory" );
+            RAISE( mediacontrol_InternalException, "out of memory" );
         free( p_snapshot->p_data );
         free( p_snapshot );
     }
@@ -119,7 +119,7 @@ mediacontrol_all_snapshots( mediacontrol_Instance *self,
 {
     exception=mediacontrol_exception_init( exception );
 
-    RAISE( mediacontrol_InternalException, "Unsupported method" );
+    RAISE( mediacontrol_InternalException, "unsupported method" );
     return NULL;
 }
 
@@ -181,14 +181,14 @@ mediacontrol_display_text( mediacontrol_Instance *self,
     psz_message = strdup( message );
     if( !psz_message )
     {
-        RAISE( mediacontrol_InternalException, "No more memory" );
+        RAISE( mediacontrol_InternalException, "no more memory" );
         return;
     }
 
     p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
     if( ! p_vout )
     {
-        RAISE( mediacontrol_InternalException, "No video output" );
+        RAISE( mediacontrol_InternalException, "no video output" );
         return;
     }
 

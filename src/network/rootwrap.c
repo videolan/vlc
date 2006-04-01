@@ -245,7 +245,7 @@ void rootwrap (void)
         exit (1);
     close (fd);
 
-    fputs ("Starting VLC root wrapper...", stderr);
+    fputs ("starting VLC root wrapper...", stderr);
 
     pw = guess_user ();
     if (pw == NULL)

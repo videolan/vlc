@@ -191,7 +191,7 @@ int intf_RunThread( intf_thread_t *p_intf )
         {
             msg_Err( p_intf, "You cannot run the MacOS X module as an "
                              "extra interface. Please read the "
-                             "README.MacOSX.rtf file");
+                             "README.MacOSX.rtf file.");
             return VLC_EGENERIC;
         }
         if( vlc_thread_create( p_intf, "interface", RunInterface,

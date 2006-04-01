@@ -1347,7 +1347,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
     p_this->p_vlc->ppsz_argv = ppsz_argv;
 
 #ifdef __APPLE__
-    /* When vlc.app is run by double clicking in Mac OS X, the 2nd arg
+    /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg
      * is the PSN - process serial number (a unique PID-ish thingie)
      * still ok for real Darwin & when run from command line */
     if ( (*pi_argc > 1) && (strncmp( ppsz_argv[ 1 ] , "-psn" , 4 ) == 0) )

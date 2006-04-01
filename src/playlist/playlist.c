@@ -559,7 +559,7 @@ static mtime_t ObjectGarbageCollector( playlist_t *p_playlist, int i_type,
             }
             if( i_type == VLC_OBJECT_VOUT )
             {
-                msg_Dbg( p_playlist, "garbage collector destroying 1 vout" );
+                msg_Dbg( p_playlist, "garbage collector destroys 1 vout" );
                 vlc_object_detach( p_obj );
                 vlc_object_release( p_obj );
                 vout_Destroy( (vout_thread_t *)p_obj );

@@ -247,7 +247,7 @@ next_ai: /* failure */
         if( SocksHandshakeTCP( p_this, i_handle, 5, psz_user, psz_pwd,
                                psz_host, i_port ) )
         {
-            msg_Err( p_this, "failed to use the SOCKS server" );
+            msg_Err( p_this, "Failed to use the SOCKS server" );
             net_Close( i_handle );
             i_handle = -1;
         }
@@ -281,7 +281,7 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
     i_val = vlc_getaddrinfo( p_this, psz_host, i_port, &hints, &res );
     if( i_val )
     {
-        msg_Err( p_this, "cannot resolve %s port %d : %s", psz_host, i_port,
+        msg_Err( p_this, "Cannot resolve %s port %d : %s", psz_host, i_port,
                  vlc_gai_strerror( i_val ) );
         return NULL;
     }

@@ -88,7 +88,7 @@ static osd_menu_t *osd_MenuNew( osd_menu_t *p_menu, const char *psz_path, int i_
 
     p_menu->p_state = (osd_menu_state_t *) malloc( sizeof( osd_menu_state_t ) );
     if( !p_menu->p_state )
-        msg_Err( p_menu, "memory allocation for OSD Menu state failed." );
+        msg_Err( p_menu, "Memory allocation for OSD Menu state failed" );
 
     if( psz_path != NULL )
         p_menu->psz_path = strdup( psz_path );
@@ -323,7 +323,7 @@ int osd_ConfigLoader( vlc_object_t *p_this, const char *psz_file,
     fd = utf8_fopen( psz_file, "r" );
     if( !fd )
     {
-        msg_Err( p_this, "failed opening osd definition file %s", psz_file );
+        msg_Err( p_this, "failed to open OSD definition file %s", psz_file );
         return VLC_EGENERIC;
     }
 

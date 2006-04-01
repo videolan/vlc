@@ -281,7 +281,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
         vlc_ureduce( &p_vout->i_par_num, &p_vout->i_par_den,
                      p_vout->i_par_num, p_vout->i_par_den, 0 );
 
-        msg_Dbg( p_vout, "monitor pixel aspect-ratio overriding: %i:%i",
+        msg_Dbg( p_vout, "overriding monitor pixel aspect-ratio: %i:%i",
                  p_vout->i_par_num, p_vout->i_par_den );
         b_force_par = VLC_TRUE;
     }

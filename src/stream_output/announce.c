@@ -69,7 +69,7 @@ int sout_AnnounceRegister( sout_instance_t *p_sout,
             return VLC_ENOMEM;
         }
         vlc_object_yield( p_announce );
-        msg_Dbg( p_sout,"Creation done" );
+        msg_Dbg( p_sout, "creation done" );
     }
 
     i_ret = announce_Register( p_announce, p_session, p_method );
@@ -110,7 +110,7 @@ session_descriptor_t *sout_AnnounceRegisterSDP( sout_instance_t *p_sout,
 
     if( p_method->i_type != METHOD_TYPE_SAP )
     {
-        msg_Warn( p_sout,"forcing SAP announcement");
+        msg_Warn( p_sout, "forcing SAP announcement");
     }
 
     p_session = sout_AnnounceSessionCreate();
@@ -139,7 +139,7 @@ int sout_AnnounceUnRegister( sout_instance_t *p_sout,
                                               FIND_ANYWHERE );
     if( !p_announce )
     {
-        msg_Dbg( p_sout, "Unable to remove announce: no announce handler" );
+        msg_Dbg( p_sout, "unable to remove announce: no announce handler" );
         return VLC_ENOOBJ;
     }
     i_ret  = announce_UnRegister( p_announce, p_session );
@@ -289,7 +289,7 @@ int announce_Register( announce_handler_t *p_announce,
     }
     else
     {
-        msg_Dbg( p_announce, "Announce type unsupported" );
+        msg_Dbg( p_announce, "announce type unsupported" );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;;

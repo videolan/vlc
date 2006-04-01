@@ -1307,7 +1307,7 @@ static int CallEntry( module_t * p_module )
     {
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
-        msg_Err( p_module, "failed calling symbol \"%s\" in file `%s'",
+        msg_Err( p_module, "Failed to call symbol \"%s\" in file `%s'",
                            psz_name, p_module->psz_filename );
         return -1;
     }

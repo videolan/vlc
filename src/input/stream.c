@@ -807,7 +807,7 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
 
         if( !b_aseek )
         {
-            msg_Err( s, "backward seek impossible (access non seekable)" );
+            msg_Err( s, "backward seeking impossible (access not seekable)" );
             return VLC_EGENERIC;
         }
 
@@ -1327,7 +1327,7 @@ static void AStreamPrebufferStream( stream_t *s )
         ( (p_access->info.i_title > 1 || p_access->info.i_seekpoint > 1) ?
           STREAM_CACHE_PREBUFFER_SIZE : STREAM_CACHE_TRACK_SIZE / 3 );
 
-    msg_Dbg( s, "pre buffering" );
+    msg_Dbg( s, "pre-buffering..." );
     i_start = mdate();
     for( ;; )
     {
@@ -1347,7 +1347,7 @@ static void AStreamPrebufferStream( stream_t *s )
             i_byterate = ( I64C(1000000) * p_sys->stat.i_bytes ) /
                          (p_sys->stat.i_read_time+1);
 
-            msg_Dbg( s, "prebuffering done "I64Fd" bytes in "I64Fd"s - "
+            msg_Dbg( s, "pre-buffering done "I64Fd" bytes in "I64Fd"s - "
                      I64Fd" kbytes/s",
                      p_sys->stat.i_bytes,
                      p_sys->stat.i_read_time / I64C(1000000),

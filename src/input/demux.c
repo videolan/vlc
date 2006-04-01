@@ -564,7 +564,7 @@ static void SkipID3Tag( demux_t *p_demux )
     /* Skip the entire tag */
     stream_Read( p_demux->s, NULL, i_size );
 
-    msg_Dbg( p_demux, "ID3v2.%d revision %d tag found, skiping %d bytes",
+    msg_Dbg( p_demux, "ID3v2.%d revision %d tag found, skipping %d bytes",
              version, revision, i_size );
 
     return;

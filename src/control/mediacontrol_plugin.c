@@ -5,7 +5,7 @@
 mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *exception )
 {
     exception->code = mediacontrol_InternalException;
-    exception->message = strdup( "The mediacontrol extension was compiled for plugin use only." );
+    exception->message = strdup( "The mediacontrol extension was compiled for plugin usage only." );
     return NULL;
 };
 

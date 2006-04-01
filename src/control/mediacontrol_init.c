@@ -22,7 +22,7 @@ mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *ex
     if( ! ppsz_argv )
     {
         exception->code = mediacontrol_InternalException;
-        exception->message = "Out of memory";
+        exception->message = "out of memory";
         return NULL;
     }
     ppsz_argv[0] = "vlc";
@@ -32,7 +32,7 @@ mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *ex
         if( ! ppsz_argv[i_index + 1] )
         {
             exception->code = mediacontrol_InternalException;
-            exception->message = "Out of memory";
+            exception->message = "out of memory";
             return NULL;
         }
     }
@@ -44,7 +44,7 @@ mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *ex
     if( p_vlc_id < 0 )
     {
         exception->code = mediacontrol_InternalException;
-        exception->message = strdup( "Unable to create VLC" );
+        exception->message = strdup( "unable to create VLC" );
         return NULL;        
     }
 
@@ -53,21 +53,21 @@ mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *ex
     if( ! p_vlc )
     {
         exception->code = mediacontrol_InternalException;
-        exception->message = strdup( "Unable to find VLC object" );
+        exception->message = strdup( "unable to find VLC object" );
         return NULL;
     }
     retval = ( mediacontrol_Instance* )malloc( sizeof( mediacontrol_Instance ) );
     if( ! retval )
     {
         exception->code = mediacontrol_InternalException;
-        exception->message = strdup( "Out of memory" );
+        exception->message = strdup( "out of memory" );
         return NULL;
     }
 
     if( VLC_Init( p_vlc_id, i_count + 1, ppsz_argv ) != VLC_SUCCESS )
     {
         exception->code = mediacontrol_InternalException;
-        exception->message = strdup( "Cannot initialize VLC" );
+        exception->message = strdup( "cannot initialize VLC" );
         return NULL;
     }
 
@@ -82,7 +82,7 @@ mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *ex
     if( ! retval->p_playlist || ! retval->p_intf )
     {
         exception->code = mediacontrol_InternalException;
-        exception->message = strdup( "No available interface" );
+        exception->message = strdup( "no interface available" );
         return NULL;
     }
 

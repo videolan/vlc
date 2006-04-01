@@ -132,7 +132,7 @@ playlist_item_t *__playlist_ItemCopy( vlc_object_t *p_obj,
 
     if( p_item->i_children != -1 )
     {
-        msg_Warn( p_obj, "not copying playlist items children" );
+        msg_Warn( p_obj, "not copying playlist-item's children" );
         p_res->i_children = -1;
         p_res->pp_children = NULL;
     }

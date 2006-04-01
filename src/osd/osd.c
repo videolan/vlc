@@ -69,7 +69,7 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
     {
         vlc_value_t val;
 
-        msg_Dbg( p_this, "creating osd menu object" );
+        msg_Dbg( p_this, "creating OSD menu object" );
         if( ( p_osd = vlc_object_create( p_this, VLC_OBJECT_OSDMENU ) ) == NULL )
         {
             msg_Err( p_this, "out of memory" );
@@ -112,7 +112,7 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
     return p_osd;
 
 error:
-    msg_Err( p_this, "creating osd menu object failed" );
+    msg_Err( p_this, "creating OSD menu object failed" );
     vlc_mutex_unlock( lockval.p_address );
     vlc_object_destroy( p_osd );
     return NULL;

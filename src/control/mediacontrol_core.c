@@ -67,14 +67,14 @@ mediacontrol_Instance* mediacontrol_new_from_object( int vlc_object_id,
     p_object = ( vlc_object_t* )vlc_current_object( vlc_object_id );
     if( ! p_object )
     {
-        RAISE( mediacontrol_InternalException, "Unable to find vlc object" );
+        RAISE( mediacontrol_InternalException, "unable to find vlc object" );
         return NULL;
     }
 
     p_vlc = vlc_object_find( p_object, VLC_OBJECT_ROOT, FIND_PARENT );
     if( ! p_vlc )
     {
-        RAISE( mediacontrol_InternalException, "Unable to initialize VLC" );
+        RAISE( mediacontrol_InternalException, "unable to initialize VLC" );
         return NULL;
     }
     retval = ( mediacontrol_Instance* )malloc( sizeof( mediacontrol_Instance ) );
@@ -88,7 +88,7 @@ mediacontrol_Instance* mediacontrol_new_from_object( int vlc_object_id,
 
     if( ! retval->p_playlist || ! retval->p_intf )
     {
-        RAISE( mediacontrol_InternalException, "No available interface" );
+        RAISE( mediacontrol_InternalException, "no interface available" );
         return NULL;
     }
     return retval;
