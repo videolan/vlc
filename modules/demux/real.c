@@ -85,6 +85,8 @@ struct demux_sys_t
     uint8_t buffer[65536];
 
     int64_t     i_pcr;
+    
+    vlc_meta_t *p_meta;
 };
 
 static int Demux( demux_t *p_demux );
@@ -590,7 +592,6 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-#if 0
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
     int64_t i64, *pi64;
@@ -617,6 +618,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             return stream_Seek( p_demux->s, (int64_t)(i64 * f) );
 
+#if 0
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->i_mux_rate > 0 )
@@ -636,13 +638,21 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             *pi64 = 0;
             return VLC_EGENERIC;
+#endif
+
+        case DEMUX_GET_META:
+        {
+            vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
+            vlc_meta_t *meta;
+            *pp_meta = p_sys->p_meta;
+            return VLC_SUCCESS;
+        }
 
         case DEMUX_SET_TIME:
         case DEMUX_GET_FPS:
         default:
             return VLC_EGENERIC;
     }
-#endif
     return VLC_EGENERIC;
 }
 
@@ -658,6 +668,8 @@ static int HeaderRead( demux_t *p_demux )
     uint32_t    i_size;
     int64_t     i_skip;
     int         i_version;
+    
+    p_sys->p_meta = vlc_meta_New();
 
     for( ;; )
     {
@@ -716,6 +728,9 @@ static int HeaderRead( demux_t *p_demux )
         {
             int i_len;
             char *psz;
+            
+            /* FIXME FIXME: should convert from whatever the character
+             * encoding of the input meta data is to UTF-8. */
 
             stream_Read( p_demux->s, header, 2 );
             if( ( i_len = GetWBE( header ) ) > 0 )
@@ -725,6 +740,8 @@ static int HeaderRead( demux_t *p_demux )
                 psz[i_len] = '\0';
 
                 msg_Dbg( p_demux, "    - title=`%s'", psz );
+                EnsureUTF8( psz );
+                vlc_meta_Add( p_sys->p_meta, VLC_META_TITLE, psz );
                 free( psz );
                 i_skip -= i_len;
             }
@@ -738,6 +755,8 @@ static int HeaderRead( demux_t *p_demux )
                 psz[i_len] = '\0';
 
                 msg_Dbg( p_demux, "    - author=`%s'", psz );
+                EnsureUTF8( psz );
+                vlc_meta_Add( p_sys->p_meta, VLC_META_AUTHOR, psz );
                 free( psz );
                 i_skip -= i_len;
             }
@@ -751,6 +770,8 @@ static int HeaderRead( demux_t *p_demux )
                 psz[i_len] = '\0';
 
                 msg_Dbg( p_demux, "    - copyright=`%s'", psz );
+                EnsureUTF8( psz );
+                vlc_meta_Add( p_sys->p_meta, VLC_META_COPYRIGHT, psz );
                 free( psz );
                 i_skip -= i_len;
             }
@@ -764,6 +785,8 @@ static int HeaderRead( demux_t *p_demux )
                 psz[i_len] = '\0';
 
                 msg_Dbg( p_demux, "    - comment=`%s'", psz );
+                EnsureUTF8( psz );
+                vlc_meta_Add( p_sys->p_meta, VLC_META_DESCRIPTION, psz );
                 free( psz );
                 i_skip -= i_len;
             }
