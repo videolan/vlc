@@ -1201,7 +1201,7 @@ AC_CACHE_CHECK([if \$CC groks SSE inline assembly],
     [CFLAGS="${CFLAGS_save}"
      AC_TRY_COMPILE(,[void *p;asm volatile("xorps %%xmm1,%%xmm2"::"r"(p));],
                     ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
-if test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "solaris"; then
+if test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "solaris"; then
   AC_DEFINE(CAN_COMPILE_SSE, 1, Define if \$CC groks SSE inline assembly.)
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
 fi
