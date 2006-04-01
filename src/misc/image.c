@@ -221,13 +221,6 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
 
     p_block = block_New( p_image->p_parent, i_size );
 
-    if( !p_block )
-    {
-        msg_Dbg( p_image->p_parent, "error while allocating memory to read %s",
-                 psz_url );
-        return NULL;
-    }
-
     stream_Read( p_stream, p_block->p_buffer, i_size );
     stream_Delete( p_stream );
 
