@@ -153,7 +153,7 @@ function vlm_schedule_type_change( name )
 
 function sanitize_input( str )
 {
-    return str.replace( /\\/g, '\\\\').replace( /\'/g, '\\\'' ).replace( /\"/g, '\\\"' ).replace( /^/, '"' ).replace( /$/, '"' );
+    return str.replace( /\\/g, '\\\\').replace( /\'/g, '\\\'' ).replace( /\"/g, '\\\"' ).replace( /^/, '"' ).replace( /$/, '"' ).replace( /\ option\ /g, '" option "' );
 }
 
 function update_vlm_add_broadcast()
