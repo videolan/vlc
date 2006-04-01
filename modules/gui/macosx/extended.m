@@ -777,7 +777,7 @@ static VLCExtended *_o_sharedInstance = nil;
 
         if (returnedValue != 0)
         {
-            msg_Err(p_playlist, "Unable to save the preferences of the " \
+            msg_Err(p_playlist, "unable to save the preferences of the " \
             "extended control attribute '%s' (%i)", 
             [[theModules objectAtIndex: x] UTF8String] , returnedValue);
             [theModules release];

@@ -313,7 +313,7 @@ static int AspectCropCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !fmt )
     {
-        msg_Warn( p_vout, "Could not create OpenGL video output" );
+        msg_Warn( p_vout, "could not create OpenGL video output" );
         return nil;
     }
 

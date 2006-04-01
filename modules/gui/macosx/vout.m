@@ -97,7 +97,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     }
     else
     {
-        msg_Warn( VLCIntf, "Cannot find Video Output");
+        msg_Warn( VLCIntf, "cannot find Video Output");
     }
 }
 

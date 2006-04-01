@@ -113,7 +113,7 @@
     int i = 0;
     id o_window = NULL;
     if( !p_dialog )
-        msg_Err( p_intf, "No available interaction framework" );
+        msg_Err( p_intf, "no available interaction framework" );
 
     if( !nib_interact_loaded )
     {

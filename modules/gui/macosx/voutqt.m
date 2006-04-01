@@ -141,7 +141,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
         p_vout->p_sys->b_embedded = VLC_FALSE;
 
     p_vout->p_sys->b_altivec = p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC;
-    msg_Dbg( p_vout, "We do%s have Altivec", p_vout->p_sys->b_altivec ? "" : "n't" );
+    msg_Dbg( p_vout, "we do%s have Altivec", p_vout->p_sys->b_altivec ? "" : "n't" );
     
     /* Initialize QuickTime */
     p_vout->p_sys->h_img_descr = 

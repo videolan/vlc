@@ -48,8 +48,8 @@ void E_(CloseVideoGL) ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 #define EMBEDDED_TEXT N_("Embedded video output")
-#define EMBEDDED_LONGTEXT N_("If enabled the video output will " \
-    "be displayed in the controller window instead of a in separate window.")
+#define EMBEDDED_LONGTEXT N_( \
+   "Display the video in the controller window instead of a in separate window.")
 
 #define VDEV_TEXT N_("Video device")
 #define VDEV_LONGTEXT N_("Number of the screen to use by default to display " \
