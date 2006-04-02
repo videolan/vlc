@@ -5,6 +5,7 @@
  * $Id$
  *
  * Author: Gildas Bazin <gbazin@videolan.org>
+ *         Damien Fouilleul <damienf@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1198,11 +1199,10 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                             int i_current_fourcc = GetFourCCFromMediaType( *p_mt );
                             int i_current_priority = GetFourCCPriority(i_current_fourcc);
 
-                            if( !i_current_fourcc
-                             || (i_fourcc && (i_current_fourcc != i_fourcc))
+                            if( (i_fourcc && (i_current_fourcc != i_fourcc))
                              || (i_priority > i_current_priority) )
                             {
-                                // incompatible or unwanted chroma, try next media type
+                                // unwanted chroma, try next media type
                                 FreeMediaType( *p_mt );
                                 CoTaskMemFree( (PVOID)p_mt );
                                 continue;
@@ -1286,7 +1286,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                      || (unsigned int)i_channels < pASCC->MinimumChannels
                                      || (unsigned int)i_channels > pASCC->MaximumChannels )
                                     {
-                                        // required channels not compatible, try next media type
+                                        // required number channels not compatible, try next media type
                                         FreeMediaType( *p_mt );
                                         CoTaskMemFree( (PVOID)p_mt );
                                         continue;
@@ -1450,11 +1450,70 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                 if( p_mt->majortype == MEDIATYPE_Video ) psz_type = "video";
                 if( p_mt->majortype == MEDIATYPE_Audio ) psz_type = "audio";
                 if( p_mt->majortype == MEDIATYPE_Stream ) psz_type = "stream";
-                msg_Dbg( p_this, "EnumDeviceCaps: input pin media: unknown format "
+                msg_Dbg( p_this, "EnumDeviceCaps: input pin media: unsupported format "
                          "(%s %4.4s)", psz_type, (char *)&p_mt->subtype );
+
                 FreeMediaType( *p_mt );
             }
             CoTaskMemFree( (PVOID)p_mt );
+        }
+
+        if( !mt_count && p_enummt->Reset() == S_OK )
+        {
+            // VLC did not find any supported MEDIATYPE for this output pin.
+            // However the graph builder might insert converter filters in
+            // the graph if we use a different codec in VLC filter input pin.
+            // however, in order to avoid nasty surprises, make use of this
+            // facility only for known unsupported codecs.
+
+            while( !mt_count && p_enummt->Next( 1, &p_mt, NULL ) == S_OK )
+            {
+                // the first four bytes of subtype GUID contains the codec FOURCC
+                const char *pfcc = (char *)&p_mt->subtype;
+                int i_current_fourcc = VLC_FOURCC(pfcc[0], pfcc[1], pfcc[2], pfcc[3]);
+                if( VLC_FOURCC('H','C','W','2') == i_current_fourcc
+                 && p_mt->majortype == MEDIATYPE_Video )
+                {
+                    // ouput format for 'Hauppauge WinTV PVR PCI II Capture'
+                    // try I420 as an input format
+                    i_current_fourcc = VLC_FOURCC('I','4','2','0');
+                    if( !i_fourcc || i_fourcc == i_current_fourcc )
+                    {
+                        // return alternative media type  
+                        AM_MEDIA_TYPE mtr;  
+                        VIDEOINFOHEADER vh;  
+             
+                        mtr.majortype            = MEDIATYPE_Video;  
+                        mtr.subtype              = MEDIASUBTYPE_I420;  
+                        mtr.bFixedSizeSamples    = TRUE;  
+                        mtr.bTemporalCompression = FALSE;  
+                        mtr.pUnk                 = NULL;  
+                        mtr.formattype           = FORMAT_VideoInfo;  
+                        mtr.cbFormat             = sizeof(vh);  
+                        mtr.pbFormat             = (BYTE *)&vh;  
+             
+                        memset(&vh, 0, sizeof(vh));  
+             
+                        vh.bmiHeader.biSize   = sizeof(vh.bmiHeader);  
+                        vh.bmiHeader.biWidth  = i_width > 0 ? i_width :
+                            ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biWidth;  
+                        vh.bmiHeader.biHeight = i_height > 0 ? i_height :
+                            ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biHeight;  
+                        vh.bmiHeader.biPlanes      = 3; 
+                        vh.bmiHeader.biBitCount    = 12;  
+                        vh.bmiHeader.biCompression = VLC_FOURCC('I','4','2','0');  
+                        vh.bmiHeader.biSizeImage   = vh.bmiHeader.biWidth * 12 *  
+                            vh.bmiHeader.biHeight / 8;  
+                        mtr.lSampleSize            = vh.bmiHeader.biSizeImage;  
+             
+                        msg_Dbg( p_this, "EnumDeviceCaps: input pin media: using 'I420' in place of unsupported format 'HCW2'");
+
+                        if( SUCCEEDED(CopyMediaType(mt+mt_count, &mtr)) )
+                            ++mt_count;
+                    }
+                }
+                FreeMediaType( *p_mt );
+            }
         }
 
         p_enummt->Release();
