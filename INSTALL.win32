@@ -140,31 +140,6 @@ along those lines:
       --enable-twolame --enable-dvdread \
       --enable-debug
 
-If you are cross-compiling with our gcc-3.3.1 package, you can use something
-along those lines:
-
-  ./bootstrap && \
-  PATH=/usr/local/mingw/bin:$PATH \
-  PKG_CONFIG_LIBDIR=/usr/win32/lib/pkgconfig \
-  CPPFLAGS=-I/usr/win32/include \
-  LDFLAGS=-L/usr/win32/lib \
-  CC=i586-mingw32msvc-gcc CXX=i586-mingw32msvc-g++ \
-  ./configure --host=i586-mingw32msvc --build=i386-linux \
-      --disable-gtk \
-      --enable-nls --enable-sdl --with-sdl-config-path=/usr/win32/bin \
-      --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
-      --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
-      --with-wx-config-path=/usr/win32/bin \
-      --with-freetype-config-path=/usr/win32/bin \
-      --with-fribidi-config-path=/usr/win32/bin \
-      --enable-livedotcom --with-livedotcom-tree=/usr/win32/live.com \
-      --enable-caca --with-caca-config-path=/usr/win32/bin \
-      --with-xml2-config-path=/usr/win32/bin \
-      --with-dvdnav-config-path=/usr/win32/bin \
-      --disable-cddax --disable-vcdx --enable-goom \
-      --enable-twolame --enable-dvdread \
-      --enable-debug
-
 If you are using cygwin, you can build VLC with or without the POSIX
 emulation layer. Without is usually better and with POSIX emulation
 hasn't been tested in about a year or so. So to build without the
@@ -235,9 +210,6 @@ Actually Compiling the VLC source
 =================================
 
 Once configured, to build VLC, just run `make'.
-
-( If you are using our gcc-3.3.1 cross-compiler you'll need to use:
-  PATH=/usr/local/mingw/bin:$PATH make )
 
 Once the compilation is done, you can either run VLC directly from the source
 tree or you can build self-contained VLC packages with the following
