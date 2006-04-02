@@ -112,10 +112,10 @@ static void Close( vlc_object_t * );
 #define QPMIN_LONGTEXT N_( "Minimum quantizer, 15/35 seems to be a useful " \
     "range." )
 
-#define QPMAX_TEXT N_("ax QP")
+#define QPMAX_TEXT N_("Max QP")
 #define QPMAX_LONGTEXT N_( "Maximum quantizer parameter." )
 
-#define QPSTEP_TEXT N_("ax QP step")
+#define QPSTEP_TEXT N_("Max QP step")
 #define QPSTEP_LONGTEXT N_( "Max QP step between frames.")
 
 #define RATETOL_TEXT N_("Average bitrate tolerance")
