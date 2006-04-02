@@ -376,7 +376,8 @@ int config_AutoSaveConfigFile( vlc_object_t * );
         i_config++; \
     if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
         (i_config+11) * sizeof(module_config_t)); \
-    {   p_config[ i_config ].i_type = type; \
+    {   memset ( p_config + i_config, 0, sizeof( *p_config ) ); \
+        p_config[ i_config ].i_type = type; \
         p_config[ i_config ].psz_name = name; \
         p_config[ i_config ].psz_current = "SUPPRESSED"; }
 
