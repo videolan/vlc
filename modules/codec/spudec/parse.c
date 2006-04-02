@@ -243,24 +243,10 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
                 return VLC_EGENERIC;
             }
 
-            pi_alpha[3] = (p_sys->buffer[i_index+1]>>4)&0x0f;
-            pi_alpha[2] = (p_sys->buffer[i_index+1])&0x0f;
-            pi_alpha[1] = (p_sys->buffer[i_index+2]>>4)&0x0f;
-            pi_alpha[0] = (p_sys->buffer[i_index+2])&0x0f;
-
-            /* Ignore blank alpha palette. Sometimes spurious blank
-             * alpha palettes are present - dunno why. */
-            if( pi_alpha[0] | pi_alpha[1] | pi_alpha[2] | pi_alpha[3] )
-            {
-                p_spu_data->pi_alpha[0] = pi_alpha[0];
-                p_spu_data->pi_alpha[1] = pi_alpha[1];
-                p_spu_data->pi_alpha[2] = pi_alpha[2];
-                p_spu_data->pi_alpha[3] = pi_alpha[3];
-            }
-            else
-            {
-                msg_Warn( p_dec, "ignoring blank alpha palette" );
-            }
+            p_spu_data->pi_alpha[3] = (p_sys->buffer[i_index+1]>>4)&0x0f;
+            p_spu_data->pi_alpha[2] = (p_sys->buffer[i_index+1])&0x0f;
+            p_spu_data->pi_alpha[1] = (p_sys->buffer[i_index+2]>>4)&0x0f;
+            p_spu_data->pi_alpha[0] = (p_sys->buffer[i_index+2])&0x0f;
 
             i_index += 3;
             break;
