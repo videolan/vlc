@@ -821,7 +821,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL;
                  p_0xa9xxx = p_0xa9xxx->p_next )
             {
-                char *psz_utf = strdup( p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                char *psz_utf;
+                if( !p_0xa9xxx || !p_0xa9xxx->data.p_0xa9xxx )
+                    continue;
+                psz_utf = strdup( p_0xa9xxx->data.p_0xa9xxx->psz_text );
                 if( psz_utf == NULL )
                     continue;
                 /* FIXME FIXME: should convert from whatever the character
