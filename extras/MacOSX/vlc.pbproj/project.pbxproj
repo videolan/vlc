@@ -173,6 +173,31 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>xspf</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>Generic.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>XSPF Playlist</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>ram</string>
+				<string>rm</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>RealPlayer Media Files</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>img</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
