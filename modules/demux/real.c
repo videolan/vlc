@@ -79,6 +79,9 @@ struct demux_sys_t
     uint32_t i_data_packets;
     int64_t  i_data_offset_next;
 
+    int  i_our_duration;
+    int  i_mux_rate;
+
     int          i_track;
     real_track_t **track;
 
@@ -595,8 +598,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
 #if 0
     double f, *pf;
-    int64_t i64, *pi64;
+    int64_t i64;
 #endif
+    int64_t *pi64;
 
     switch( i_query )
     {
@@ -613,6 +617,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 *pf = 0.0;
             }
             return VLC_SUCCESS;
+
         case DEMUX_SET_POSITION:
             f = (double) va_arg( args, double );
             i64 = stream_Size( p_demux->s );
@@ -630,17 +635,27 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             *pi64 = 0;
             return VLC_EGENERIC;
+#endif
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_mux_rate > 0 )
+            
+            /* the commented following lines are fen's implementation, which doesn't seem to
+             * work for one reason or another -- FK */
+            /*if( p_sys->i_mux_rate > 0 )
             {
                 *pi64 = (int64_t)1000000 * ( stream_Size( p_demux->s ) / 50 ) / p_sys->i_mux_rate;
+                return VLC_SUCCESS;
+            }*/
+            if( p_sys->i_our_duration > 0 )
+            {
+                /* our stored duration is in ms, so... */
+                *pi64 = (int64_t)1000 * p_sys->i_our_duration;
+                
                 return VLC_SUCCESS;
             }
             *pi64 = 0;
             return VLC_EGENERIC;
-#endif
 
         case DEMUX_GET_META:
         {
@@ -717,6 +732,10 @@ static int HeaderRead( demux_t *p_demux )
             msg_Dbg( p_demux, "    - index offset=%d", GetDWBE(&header[28]) );
             msg_Dbg( p_demux, "    - data offset=%d", GetDWBE(&header[32]) );
             msg_Dbg( p_demux, "    - num streams=%d", GetWBE(&header[36]) );
+            
+            /* set the duration for export in control */
+            p_sys->i_our_duration = (int)GetDWBE(&header[20]);
+            
             i_flags = GetWBE(&header[38]);
             msg_Dbg( p_demux, "    - flags=0x%x %s%s%s",
                      i_flags,
@@ -757,7 +776,7 @@ static int HeaderRead( demux_t *p_demux )
 
                 msg_Dbg( p_demux, "    - author=`%s'", psz );
                 EnsureUTF8( psz );
-                vlc_meta_Add( p_sys->p_meta, VLC_META_AUTHOR, psz );
+                vlc_meta_Add( p_sys->p_meta, VLC_META_ARTIST, psz );
                 free( psz );
                 i_skip -= i_len;
             }
@@ -810,6 +829,7 @@ static int HeaderRead( demux_t *p_demux )
             msg_Dbg( p_demux, "    - start time=%d", GetDWBE(&header[18]) );
             msg_Dbg( p_demux, "    - preroll=%d", GetDWBE(&header[22]) );
             msg_Dbg( p_demux, "    - duration=%d", GetDWBE(&header[26]) );
+            
             i_skip -= 30;
 
             stream_Read( p_demux->s, header, 1 );
