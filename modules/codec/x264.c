@@ -95,8 +95,8 @@ static void Close( vlc_object_t * );
     "live-action source material. Some decoders are unable to deal with " \
     "large frameref values. From 1 to 16" )
 
-#define NF_TEXT N_("Loop filter")
-#define NF_LONGTEXT N_( "Deblocking loop filter (increases quality).")
+#define NF_TEXT N_("Skip loop filter")
+#define NF_LONGTEXT N_( "Deactivate the deblocking loop filter (decreases quality).")
 
 /* Ratecontrol */
 
