@@ -73,7 +73,7 @@ library AXVLC
     {
         [id(DISPID_Visible), propget, bindable, helpstring("Returns plugin visibility.")]
         HRESULT Visible([out, retval] VARIANT_BOOL* visible);
-	[id(DISPID_Visible), propput, bindable, helpstring("Specifies plugin visibility.")]
+	[id(DISPID_Visible), propput, bindable, helpstring("Sets plugin visibility.")]
         HRESULT Visible([in] VARIANT_BOOL visible);
         [helpstring("Play current target in playlist.")]
         HRESULT play();
@@ -85,11 +85,11 @@ library AXVLC
         HRESULT Playing([out, retval] VARIANT_BOOL* isPlaying);
 	[id(DISPID_Position), propget, helpstring("Returns playback position within the current item.  Position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([out, retval] float* position);
-	[id(DISPID_Position), propput, helpstring("Specifies playback position within the current item.  Position is a relative value ranging from 0.0 to 1.0.")]
+	[id(DISPID_Position), propput, helpstring("Sets playback position within the current item.  Position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([in] float position);
 	[id(DISPID_Time), propget, helpstring("Returns playback time relative to the start of the current item.")]
         HRESULT Time([out, retval] int* seconds);
-	[id(DISPID_Time), propput, helpstring("Specifies playback time relative to the start of the current item.")]
+	[id(DISPID_Time), propput, helpstring("Sets playback time relative to the start of the current item.")]
         HRESULT Time([in] int seconds);
 	[helpstring("Advance or backtrack playback time, relative to current time.")]  //possibly find a better word to replace 'backtrack' [t]
         HRESULT shuttle([in] int seconds);
@@ -103,7 +103,7 @@ library AXVLC
         HRESULT playSlower();
 	id(DISPID_Volume), propget, helpstring("Returns playback volume, ranges from 0 to 200%.")]  //possibly remove % from 'ranges', change to 'values', and specify that 200 is equivilant to 200% (remember, 200% == 2.0, but this gets an int not a float) [t]
         HRESULT Volume([out, retval] int* volume);
-	[id(DISPID_Volume), propput, helpstring("Specifies playback volume, ranges from 0 to 200%.")]
+	[id(DISPID_Volume), propput, helpstring("Sets playback volume, ranges from 0 to 200%.")]
         HRESULT Volume([in] int volume);
 	[helpstring("Mute/unmute playback audio.")]
         HRESULT toggleMute();
@@ -133,15 +133,15 @@ library AXVLC
         HRESULT VersionInfo([out, retval] BSTR* version);
 	[id(DISPID_MRL), propget, helpstring("Returns the first MRL in the playlist")]
         HRESULT MRL([out, retval] BSTR* mrl);
-        [id(DISPID_MRL), propput, helpstring("Specifies the first MRL in the playlist")]
+        [id(DISPID_MRL), propput, helpstring("Sets the first MRL in the playlist")]
         HRESULT MRL([in] BSTR mrl);
-        [id(DISPID_AutoPlay), propget, helpstring("Specifies whether default playlist is played on startup")]
+        [id(DISPID_AutoPlay), propget, helpstring("Sets whether playlist is played on startup")]
         HRESULT AutoPlay([out, retval] VARIANT_BOOL* autoplay);
-        [id(DISPID_AutoPlay), propput, helpstring("Returns whether default playlist is played on startup")]
+        [id(DISPID_AutoPlay), propput, helpstring("Returns whether playlist is played on startup")]
         HRESULT AutoPlay([in] VARIANT_BOOL autoplay);
-        [id(DISPID_AutoLoop), propget, helpstring("Specifies whether default playlist is looped")]
+        [id(DISPID_AutoLoop), propget, helpstring("Sets whether playlist is looped")]
         HRESULT AutoLoop([out, retval] VARIANT_BOOL* autoloop);
-        [id(DISPID_AutoLoop), propput, helpstring("Returns whether default playlist is looped")]
+        [id(DISPID_AutoLoop), propput, helpstring("Returns whether playlist is looped")]
         HRESULT AutoLoop([in] VARIANT_BOOL autoloop);
     };
 
