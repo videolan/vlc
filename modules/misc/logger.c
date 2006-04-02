@@ -434,7 +434,6 @@ static void HtmlPrint( const msg_item_t *p_msg, FILE *p_file )
 static void DoRRD( intf_thread_t *p_intf )
 {
     playlist_t *p_playlist;
-    float f_input_bitrate;
     if( mdate() - p_intf->p_sys->last_update < 1000000 )
         return;
     p_intf->p_sys->last_update = mdate();
