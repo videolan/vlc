@@ -3,7 +3,7 @@
  * This file describes the programming interface for the configuration module.
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
- * Copyright (C) 1999, 2000 the VideoLAN team
+ * Copyright (C) 1999-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -216,7 +216,7 @@ int config_AutoSaveConfigFile( vlc_object_t * );
 /*****************************************************************************
  * Macros used to build the configuration structure.
  *
- * Note that internally we support only 3 types of config data: int , float
+ * Note that internally we support only 3 types of config data: int, float
  *   and string.
  *   The other types declared here just map to one of these 3 basic types but
  *   have the advantage of also providing very good hints to a configuration
@@ -230,13 +230,19 @@ int config_AutoSaveConfigFile( vlc_object_t * );
     i_config++; \
     if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
         (i_config+11) * sizeof(module_config_t)); \
-    { static module_config_t tmp = { CONFIG_CATEGORY, NULL, NULL , '\0', NULL, NULL, NULL, i_id }; p_config[ i_config ] = tmp;  }
+    { static module_config_t tmp = { CONFIG_CATEGORY, NULL, NULL , '\0', \
+        NULL, NULL, NULL, i_id, 0., 0, 0, 0., 0., NULL, NULL, NULL, NULL, \
+        NULL, 0, NULL, NULL, 0, NULL, VLC_FALSE, NULL, VLC_FALSE, VLC_FALSE, \
+        NULL, 0, 0., NULL, 0, 0., VLC_FALSE }; p_config[ i_config ] = tmp; }
 
 #define set_subcategory( i_id ) \
     i_config++; \
     if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
         (i_config+11) * sizeof(module_config_t)); \
-    { static module_config_t tmp = { CONFIG_SUBCATEGORY, NULL, NULL , '\0', NULL, NULL, NULL, i_id }; p_config[ i_config ] = tmp;  }
+    { static module_config_t tmp = { CONFIG_SUBCATEGORY, NULL, NULL , '\0', \
+        NULL, NULL, NULL, i_id, 0., 0, 0, 0., 0., NULL, NULL, NULL, NULL, \
+        NULL, 0, NULL, NULL, 0, NULL, VLC_FALSE, NULL, VLC_FALSE, VLC_FALSE, \
+        NULL, 0, 0., NULL, 0, 0., VLC_FALSE }; p_config[ i_config ] = tmp; }
 
 #define set_section( text, longtext) \
     i_config++; \
@@ -248,13 +254,21 @@ int config_AutoSaveConfigFile( vlc_object_t * );
             i_config++; \
     if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
                             (i_config+11) * sizeof(module_config_t)); \
-    { static module_config_t tmp = { CONFIG_HINT_CATEGORY, NULL, NULL, '\0', text, longtext }; p_config[ i_config ] = tmp; p_config[i_config].b_advanced = advc; }
+    { static module_config_t tmp = { CONFIG_HINT_CATEGORY, NULL, NULL, \
+        '\0', text, longtext, NULL, 0, 0., 0, 0, 0., 0., NULL, NULL, \
+        NULL, NULL, NULL, 0, NULL, NULL, 0, NULL, VLC_FALSE, NULL, \
+        VLC_FALSE, VLC_FALSE, NULL, 0, 0., NULL, 0, 0., VLC_FALSE }; \
+    p_config[ i_config ] = tmp; p_config[i_config].b_advanced = advc; }
 
 #define add_subcategory_hint( text, longtext ) \
             i_config++; \
     if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
                             (i_config+11) * sizeof(module_config_t)); \
-    { static module_config_t tmp = { CONFIG_HINT_SUBCATEGORY, NULL, NULL, '\0', text, longtext }; p_config[ i_config ] = tmp; }
+    { static module_config_t tmp = { CONFIG_HINT_SUBCATEGORY, NULL, NULL, \
+        '\0', text, longtext, NULL, 0, 0., 0, 0, 0., 0., NULL, NULL, \
+        NULL, NULL, NULL, 0, NULL, NULL, 0, NULL, VLC_FALSE, NULL, \
+        VLC_FALSE, VLC_FALSE, NULL, 0, 0., NULL, 0, 0., VLC_FALSE }; \
+    p_config[ i_config ] = tmp; }
 
 
 #define end_subcategory_hint \
