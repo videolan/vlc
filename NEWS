@@ -6,6 +6,7 @@ Changes between 0.8.4a and 0.8.5-svn (not yet released):
 Core support:
  * Statistics collection (bitrates, packets, connections, ...)
  * Support for downloading updates
+ * Updated strings
 
 Input:
  * Initial support for RTSP-over-HTTP (to allow NAT traversal)
