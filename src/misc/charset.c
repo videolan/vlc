@@ -372,6 +372,7 @@ char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
     }
 #endif
 
+    (void)p_this;
     return strdup( psz_string );
 }
 
