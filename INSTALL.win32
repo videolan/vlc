@@ -57,11 +57,6 @@ You first need to download a GNU/Linux cross-compiler version of mingw32.
 For Debian GNU/Linux users, you can use the mingw32, mingw32-binutils and
 mingw32-runtime packages.
 
-Or you can use our mingw32 gcc-3.3.1 cross-compiler package:
-http://download.videolan.org/pub/testing/win32/contrib-20060330-win32-bin-gcc-3.4.5-only.tar.bz2
-You will need to extract this package in your root directory (everything will
-be extracted in /usr/local/cross-tools).
-
 - compiling natively on Windoze with cygwin:
 You will need to download and run the setup.exe app from cygwin's web site
 (www.cygwin.com). You will also need to make sure you install at least the
