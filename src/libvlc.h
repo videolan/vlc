@@ -1280,7 +1280,7 @@ vlc_module_begin();
     add_string( "bookmarks", NULL, NULL,
                  BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_TRUE );
 
-    set_section( N_( "Default devices") , NULL )
+    set_section( N_( "Default devices") , NULL );
 
     add_file( "dvd", NULL, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT,
               VLC_FALSE );
@@ -1301,7 +1301,7 @@ vlc_module_begin();
     add_integer( "ipv4-timeout", 5 * 1000, NULL, TIMEOUT_TEXT,
                  TIMEOUT_LONGTEXT, VLC_TRUE );
 
-    set_section( N_( "Socks proxy") , NULL )
+    set_section( N_( "Socks proxy") , NULL );
     add_string( "socks", NULL, NULL,
                  SOCKS_SERVER_TEXT, SOCKS_SERVER_LONGTEXT, VLC_TRUE );
     add_string( "socks-user", NULL, NULL,
@@ -1310,7 +1310,7 @@ vlc_module_begin();
                  SOCKS_PASS_TEXT, SOCKS_PASS_LONGTEXT, VLC_TRUE );
 
 
-    set_section( N_("Metadata" ) , NULL )
+    set_section( N_("Metadata" ) , NULL );
     add_string( "meta-title", NULL, NULL, META_TITLE_TEXT,
                 META_TITLE_LONGTEXT, VLC_TRUE );
     add_string( "meta-author", NULL, NULL, META_AUTHOR_TEXT,
