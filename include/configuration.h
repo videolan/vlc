@@ -370,44 +370,28 @@ int config_AutoSaveConfigFile( vlc_object_t * );
         p_config[ i_config ].psz_name = name; \
         p_config[i_config].b_strict = strict; \
         p_config[ i_config ].psz_current = p_config[ i_config-1].psz_current?p_config[ i_config-1 ].psz_current:p_config[ i_config-1 ].psz_name; }
+
 /* For option suppressed*/
-#define add_suppressed_bool( name ) \
+#define add_suppressed_inner( name, type ) \
         i_config++; \
     if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
         (i_config+11) * sizeof(module_config_t)); \
-    {   static module_config_t tmp; \
-        p_config[ i_config ] = tmp; \
-        p_config[ i_config ].i_type = CONFIG_ITEM_BOOL; \
+    {   p_config[ i_config ].i_type = type; \
         p_config[ i_config ].psz_name = name; \
         p_config[ i_config ].psz_current = "SUPPRESSED"; }
 
+#define add_suppressed_bool( name ) \
+        add_suppressed_inner( name, CONFIG_ITEM_BOOL )
+
 #define add_suppressed_integer( name ) \
-        i_config++; \
-    if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
-        (i_config+11) * sizeof(module_config_t)); \
-    {   static module_config_t tmp; \
-        p_config[ i_config ] = tmp; \
-        p_config[ i_config ].i_type = CONFIG_ITEM_INTEGER; \
-        p_config[ i_config ].psz_name = name; \
-        p_config[ i_config ].psz_current = "SUPPRESSED"; }
+        add_suppressed_inner( name, CONFIG_ITEM_INTEGER )
+
 #define add_suppressed_float( name ) \
-        i_config++; \
-    if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
-        (i_config+11) * sizeof(module_config_t)); \
-    {   static module_config_t tmp; \
-        p_config[ i_config ] = tmp; \
-        p_config[ i_config ].i_type = CONFIG_ITEM_FLOAT; \
-        p_config[ i_config ].psz_name = name; \
-        p_config[ i_config ].psz_current = "SUPPRESSED"; }
+        add_suppressed_inner( name, CONFIG_ITEM_FLOAT )
+
 #define add_suppressed_string( name ) \
-        i_config++; \
-    if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
-        (i_config+11) * sizeof(module_config_t)); \
-    {   static module_config_t tmp; \
-        p_config[ i_config ] = tmp; \
-        p_config[ i_config ].i_type = CONFIG_ITEM_STRING; \
-        p_config[ i_config ].psz_name = name; \
-        p_config[ i_config ].psz_current = "SUPPRESSED"; }
+        add_suppressed_inner( name, CONFIG_ITEM_STRING )
+
 /* Modifier macros for the config options (used for fine tuning) */
 #define change_short( ch ) \
     p_config[i_config].i_short = ch;
