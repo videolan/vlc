@@ -7,8 +7,9 @@ Lines starting with > describe what you can send to the page
 
 All parameters need to be URL encoded.
 Examples:
- + -> %2B
  # -> %23
+ % -> %25
+ + -> %2B
  space -> +
  ...
 
@@ -43,8 +44,16 @@ status.xml:
 > empty playlist:
   ?command=pl_empty
 
-> sort playlist node <id> using sort mode <val>:
+> sort playlist using sort mode <val> and order <id>:
   ?command=pl_sort&id=<id>&val=<val>
+  If id=0 then items will be sorted in normal order, if id=1 they will be
+  sorted in reverse order
+  A non exhaustive list of sort modes:
+    0 Id
+    1 Name
+    3 Author
+    5 Random
+    7 Track number
 
 > toggle random playback:
   ?command=pl_random
@@ -57,15 +66,30 @@ status.xml:
 
 > toggle enable service discovery module <val>:
   ?command=pl_sd&val=<val>
+  Typical values are:
+    sap
+    shoutcast
+    podcast
+    hal
 
 > toggle fullscreen:
   ?command=fullscreen
 
 > set volume level to <val> (can be absolute integer, percent or +/- relative value):
   ?command=volume&val=<val>
+  Allowed values are of the form:
+    +<int>, -<int>, <int> or <int>%
 
 > seek to <val>:
   ?command=seek&val=<val>
+  Allowed values are of the form:
+    [+ or -][<int><H or h>:][<int><M or m or '>:][<int><nothing or S or s or ">]
+    or [+ or -]<int>%
+    (value between [ ] are optional, value between < > are mandatory)
+  examples:
+    1000 -> seek to the 1000th second
+    +1H:2M -> seek 1 hour and 2 minutes forward
+    -10% -> seek 10% back
 
 playlist.xml:
 =============
