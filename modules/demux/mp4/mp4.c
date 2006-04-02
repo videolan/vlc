@@ -1314,7 +1314,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
             /* FIXME: Not true, could be UTF-16 with a Byte Order Mark (0xfeff) */
             /* FIXME UTF-8 doesn't work here ? */
-            /* p_track->fmt.subs.psz_encoding = strdup( "UTF-8" ); */
+            p_track->fmt.subs.psz_encoding = strdup( "UTF-8" );
             break;
 
         default:
