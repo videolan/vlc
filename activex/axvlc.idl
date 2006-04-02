@@ -71,9 +71,9 @@ library AXVLC
     ]
     interface IVLCControl : IDispatch
     {
-        [id(DISPID_Visible), propget, bindable, helpstring("Returns plugin visibility.")]
+        [id(DISPID_Visible), propget, bindable, helpstring("Returns/sets a value that determines whether viewing area is visible or hidden.")]
         HRESULT Visible([out, retval] VARIANT_BOOL* visible);
-	[id(DISPID_Visible), propput, bindable, helpstring("Sets plugin visibility.")]
+        [id(DISPID_Visible), propput, bindable, helpstring("Returns/sets a value that determines whether viewing area is visible or hidden.")]
         HRESULT Visible([in] VARIANT_BOOL visible);
         [helpstring("Play current target in playlist.")]
         HRESULT play();
@@ -81,37 +81,37 @@ library AXVLC
         HRESULT pause();
         [helpstring("Stop playback.")]
         HRESULT stop();
-        [id(DISPID_Playing), hidden, propget, helpstring("Returns whether VLC is playing.")]
+        [id(DISPID_Playing), hidden, propget, helpstring("Returns a value that determines whether VLC is currently playing.")]
         HRESULT Playing([out, retval] VARIANT_BOOL* isPlaying);
-	[id(DISPID_Position), propget, helpstring("Returns playback position within the current item.  Position is a relative value ranging from 0.0 to 1.0.")]
+        [id(DISPID_Position), propget, helpstring("Returns/sets playback position within the current item.  Position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([out, retval] float* position);
-	[id(DISPID_Position), propput, helpstring("Sets playback position within the current item.  Position is a relative value ranging from 0.0 to 1.0.")]
+        [id(DISPID_Position), propput, helpstring("Returns/sets playback position within the current item.  Position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([in] float position);
-	[id(DISPID_Time), propget, helpstring("Returns playback time relative to the start of the current item.")]
+        [id(DISPID_Time), propget, helpstring("Returns/sets playback time relative to the start of the current item.")]
         HRESULT Time([out, retval] int* seconds);
-	[id(DISPID_Time), propput, helpstring("Sets playback time relative to the start of the current item.")]
+        [id(DISPID_Time), propput, helpstring("Returns/sets playback time relative to the start of the current item.")]
         HRESULT Time([in] int seconds);
-	[helpstring("Advance or backtrack playback time, relative to current time.")]  //possibly find a better word to replace 'backtrack' [t]
+        [helpstring("Advance or backtrack playback time, relative to current time.")]  //possibly find a better word to replace 'backtrack' [t]
         HRESULT shuttle([in] int seconds);
-	[helpstring("Switch video between normal and fullscreen view modes.")]
+        [helpstring("Switch video between normal and fullscreen view modes.")]
         HRESULT fullscreen();
-	[id(DISPID_Length), propget, hidden, helpstring("Returns the total length, in seconds, of the current item, may be unknown.")]
+        [id(DISPID_Length), propget, hidden, helpstring("Returns the total length, in seconds, of the current item, may be unknown.")]
         HRESULT Length([out, retval] int* seconds);
-	[helpstring("Increases playback speed.  Possible speeds are: 1x, 2x, 4x, 8x.")]
+        [helpstring("Increases playback speed. Possible speeds are: 1x, 2x, 4x, 8x.")]
         HRESULT playFaster();
-	[helpstring("Decreases playback speed.  Possible speeds are: 1x, 2x, 4x, 8x.")]
+        [helpstring("Decreases playback speed. Possible speeds are: 1x, 2x, 4x, 8x.")]
         HRESULT playSlower();
-	id(DISPID_Volume), propget, helpstring("Returns playback volume, ranges from 0 to 200%.")]  //possibly remove % from 'ranges', change to 'values', and specify that 200 is equivilant to 200% (remember, 200% == 2.0, but this gets an int not a float) [t]
+        [id(DISPID_Volume), propget, helpstring("Returns/sets playback volume, ranges from 0 to 200%.")]  //possibly remove % from 'ranges', change to 'values', and specify that 200 is equivilant to 200% (remember, 200% == 2.0, but this gets an int not a float) [t]
         HRESULT Volume([out, retval] int* volume);
-	[id(DISPID_Volume), propput, helpstring("Sets playback volume, ranges from 0 to 200%.")]
+        [id(DISPID_Volume), propput, helpstring("Returns/sets playback volume, ranges from 0 to 200%.")]
         HRESULT Volume([in] int volume);
-	[helpstring("Mute/unmute playback audio.")]
+        [helpstring("Mute/unmute playback audio.")]
         HRESULT toggleMute();
-	[helpstring("Set a value for a VLC variable.")]
+        [helpstring("Sets the value of a VLC variable.")]
         HRESULT setVariable([in] BSTR name, [in] VARIANT value);
-        [helpstring("Retrieve the value of a VLC variable.")]
+        [helpstring("Returns the value of a VLC variable.")]
         HRESULT getVariable([in] BSTR name, [out, retval] VARIANT *value);
-	[helpstring("Add an item to the playlist.")]
+        [helpstring("Add an item to the playlist.")]
 
 /*
 ** use VARIANT rather than a SAFEARRAY as argument type
@@ -131,17 +131,17 @@ library AXVLC
         HRESULT playlistClear();
         [propget, hidden, helpstring("Returns VLC Version.")]
         HRESULT VersionInfo([out, retval] BSTR* version);
-	[id(DISPID_MRL), propget, helpstring("Returns the first MRL in the playlist")]
+        [id(DISPID_MRL), propget, helpstring("Returns/sets the first MRL in playlist, used for AutoPlay")]
         HRESULT MRL([out, retval] BSTR* mrl);
-        [id(DISPID_MRL), propput, helpstring("Sets the first MRL in the playlist")]
+        [id(DISPID_MRL), propput, helpstring("Returns/sets the first MRL in playlist, used for AutoPlay")]
         HRESULT MRL([in] BSTR mrl);
-        [id(DISPID_AutoPlay), propget, helpstring("Sets whether playlist is played on startup")]
+        [id(DISPID_AutoPlay), propget, helpstring("Returns/sets a value that determines whether the playlist is played on startup")]
         HRESULT AutoPlay([out, retval] VARIANT_BOOL* autoplay);
-        [id(DISPID_AutoPlay), propput, helpstring("Returns whether playlist is played on startup")]
+        [id(DISPID_AutoPlay), propput, helpstring("Returns/Sets a value that determines whether the playlist is played on startup")]
         HRESULT AutoPlay([in] VARIANT_BOOL autoplay);
-        [id(DISPID_AutoLoop), propget, helpstring("Sets whether playlist is looped")]
+        [id(DISPID_AutoLoop), propget, helpstring("Returns/sets a value that determines whether the playlist is looped")]
         HRESULT AutoLoop([out, retval] VARIANT_BOOL* autoloop);
-        [id(DISPID_AutoLoop), propput, helpstring("Returns whether playlist is looped")]
+        [id(DISPID_AutoLoop), propput, helpstring("Returns/sets a value that determines whether the playlist is looped")]
         HRESULT AutoLoop([in] VARIANT_BOOL autoloop);
     };
 
