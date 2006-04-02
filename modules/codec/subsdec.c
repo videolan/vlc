@@ -99,6 +99,31 @@ static char *ppsz_encodings[] = { DEFAULT_NAME, "ASCII", "UTF-8", "",
     "HZ", "GBK", "GB18030", "JOHAB", "ARMSCII-8",
     "Georgian-Academy", "Georgian-PS", "TIS-620", "MuleLao-1", "VISCII", "TCVN",
     "HPROMAN8", "NEXTSTEP" };
+/*
+SSA supports charset selection.
+The following known charsets are used:
+
+0 = Ansi - Western European
+1 = default
+2 = symbol
+3 = invalid
+77 = Mac
+128 = Japanese (Shift JIS)
+129 = Hangul
+130 = Johab
+134 = GB2312 Simplified Chinese
+136 = Big5 Traditional Chinese
+161 = Greek
+162 = Turkish
+163 = Vietnamese
+177 = Hebrew
+178 = Arabic
+186 = Baltic
+204 = Russian (Cyrillic)
+222 = Thai
+238 = Eastern European
+254 = PC 437
+*/
 
 static int  pi_justification[] = { 0, 1, 2 };
 static char *ppsz_justification_text[] = {N_("Center"),N_("Left"),N_("Right")};
