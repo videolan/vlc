@@ -590,7 +590,7 @@ void Interface::CreateOurMenuBar()
     }
     view_menu->Append( Logs_Event, wxU(_("&Messages...\tCtrl-M")) );
     view_menu->Append( FileInfo_Event,
-                       wxU(_("Stream and Media &info...\tCtrl-I")) );
+                       wxU(_("Stream and Media &Info...\tCtrl-I")) );
     view_menu->Append( VLM_Event,
                        wxU(_("VLM Control...\tCtrl-V")) );
 
@@ -604,7 +604,7 @@ void Interface::CreateOurMenuBar()
     wxMenu *help_menu = new wxMenu;
     help_menu->Append( About_Event, wxU(_("About...")) );
     help_menu->AppendSeparator();
-    help_menu->Append( UpdateVLC_Event, wxU(_("Check for updates...")) );
+    help_menu->Append( UpdateVLC_Event, wxU(_("Check for Updates...")) );
 
     /* Append the freshly created menus to the menu bar... */
     wxMenuBar *menubar = new wxMenuBar();
@@ -1493,7 +1493,7 @@ wxMenu* Systray::CreatePopupMenu()
     systray_menu->Append( StopStream_Event, wxU(_("Stop")) );
     }
     systray_menu->AppendSeparator();
-    systray_menu->Append( Iconize_Event, wxU(_("Show/Hide interface")) );
+    systray_menu->Append( Iconize_Event, wxU(_("Show/Hide Interface")) );
     return systray_menu;
 }
 

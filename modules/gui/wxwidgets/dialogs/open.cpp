@@ -428,7 +428,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         /* Create Stream Output checkox */
         sout_checkbox = new wxCheckBox( panel, SoutEnable_Event,
                                          wxU(_("Stream/Save")) );
-        sout_checkbox->SetToolTip( wxU(_("Use VLC as a server of streams")) );
+        sout_checkbox->SetToolTip( wxU(_("Use VLC as a stream server")) );
         common_opt_sizer->Add( sout_checkbox, 0,
                                wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
 
@@ -1667,7 +1667,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         disc_title->SetToolTip( wxU(_("Title number.")) );
         disc_sub->SetToolTip( wxU(_(
           "DVD's can have up to 32 subtitles numbered 0..31. "
-          "Note this is not the same thing as a subtitle name e.g. 'en'. "
+          "Note this is not the same thing as a subtitle name (e.g. 'en'). "
           "If a value -1 is used, no subtitle will be shown." )) );
         disc_audio->SetToolTip( wxU(_("Audio track number. "
           "DVD's can have up to 8 audio tracks numbered 0..7."

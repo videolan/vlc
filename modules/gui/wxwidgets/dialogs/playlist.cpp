@@ -237,7 +237,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     manage_menu->Append( AddDir_Event, wxU(_("Add &Directory...")) );
     manage_menu->Append( AddMRL_Event, wxU(_("&Add URL...")) );
     manage_menu->AppendSeparator();
-    manage_menu->Append( MenuDummy_Event, wxU(_("Services discovery")),
+    manage_menu->Append( MenuDummy_Event, wxU(_("Services Discovery")),
                          p_sd_menu );
     manage_menu->AppendSeparator();
     manage_menu->Append( Open_Event, wxU(_("&Open Playlist...")) );
@@ -247,8 +247,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create our "Sort" menu */
     wxMenu *sort_menu = new wxMenu;
-    sort_menu->Append( SortTitle_Event, wxU(_("Sort by &title")) );
-    sort_menu->Append( RSortTitle_Event, wxU(_("&Reverse sort by title")) );
+    sort_menu->Append( SortTitle_Event, wxU(_("Sort by &Title")) );
+    sort_menu->Append( RSortTitle_Event, wxU(_("&Reverse Sort by Title")) );
     sort_menu->AppendSeparator();
     sort_menu->Append( Randomize_Event, wxU(_("&Shuffle")) );
 
@@ -272,12 +272,12 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     /* Create the popup menu */
     node_popup = new wxMenu;
     node_popup->Append( PopupPlay_Event, wxU(_("Play")) );
-    node_popup->Append( PopupPlayThis_Event, wxU(_("Play this branch")) );
+    node_popup->Append( PopupPlayThis_Event, wxU(_("Play this Branch")) );
     node_popup->Append( PopupPreparse_Event, wxU(_("Preparse")) );
-    node_popup->Append( PopupSort_Event, wxU(_("Sort this branch")) );
+    node_popup->Append( PopupSort_Event, wxU(_("Sort this Branch")) );
     node_popup->Append( PopupDel_Event, wxU(_("Delete")) );
     node_popup->Append( PopupInfo_Event, wxU(_("Info")) );
-    node_popup->Append( PopupAddNode_Event, wxU(_("Add node")) );
+    node_popup->Append( PopupAddNode_Event, wxU(_("Add Node")) );
 
     item_popup = new wxMenu;
     item_popup->Append( PopupPlay_Event, wxU(_("Play")) );
@@ -1414,7 +1414,7 @@ wxMenu * Playlist::ViewMenu()
     p_view_menu->Append( FirstView_Event + VIEW_CATEGORY,
                            wxU(_("Normal") ) );
     p_view_menu->Append( FirstView_Event + VIEW_S_AUTHOR,
-                           wxU(_("Sorted by artist") ) );
+                           wxU(_("Sorted by Artist") ) );
     p_view_menu->Append( FirstView_Event + VIEW_S_ALBUM,
                            wxU(_("Sorted by Album") ) );
 

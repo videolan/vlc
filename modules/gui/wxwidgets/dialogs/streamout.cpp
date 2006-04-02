@@ -171,9 +171,9 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
                                                 wxU(_("Target:")));
     mrl_combo = new wxComboBox( panel, MRL_Event, wxT(""),
                                 wxPoint(20,25), wxSize(120, -1) );
-    mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
-        "the full MRL you want to stream to.\n""Alternatively, the field will be "
-        "filled automatically when you use the controls below")) );
+    mrl_combo->SetToolTip( wxU(_("Specifies the MRL. This can be specified "
+        "directly or filled in automatically by adjusting the "
+        "stream settings.")) );
 
     mrl_sizer->Add( mrl_label, 0, wxALL | wxALIGN_CENTER, 5 );
     mrl_sizer->Add( mrl_combo, 1, wxALL | wxALIGN_CENTER, 5 );

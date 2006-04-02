@@ -51,7 +51,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
-    wxFrame( p_parent, -1, wxU(_("Stream and media info")), wxDefaultPosition,
+    wxFrame( p_parent, -1, wxU(_("Stream and Media Info")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     p_intf = _p_intf;

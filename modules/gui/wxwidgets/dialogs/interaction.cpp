@@ -113,7 +113,7 @@ void InteractionDialog::Render()
     {
         wxTextCtrl *errors ; // Special case
         label = new wxStaticText( widgets_panel, -1,
-          wxU( _("The following errors happened. More details might be "
+          wxU( _("The following errors occurred. More details might be "
                  "available in the Messages window.") ) );
         errors = new wxTextCtrl( widgets_panel, -1, wxT(""),
                          wxDefaultPosition, wxDefaultSize,

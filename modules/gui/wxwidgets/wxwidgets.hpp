@@ -82,7 +82,7 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 /*
  * wxL2U() use to convert localized “data” strings (while wxU() would convert
  * strings from gettext messages). Nowadays, the core use UTF-8 internally
- * and wxL2U() is only an obsoloted name for wxU().
+ * and wxL2U() is only an obsoleted name for wxU().
  */
 #define wxL2U(utf8) wxU(utf8)
 

@@ -125,10 +125,10 @@ const struct method methods_array[] =
     {"rtp",N_("RTP Multicast"),
      N_("Stream to a dynamic group of computers on a "
      "multicast-enabled network. This is the most efficient method "
-     "to stream to several computers, but it does not work over Internet."),
-     N_("Enter the multicast address to stream to in this field. "
+     "to stream to several computers, but it does not work over the Internet."),
+     N_("Enter the multicast address to stream to. "
      "This must be an IP address between 224.0.0.0 an 239.255.255.255. "
-     "For a private use, enter an address beginning with 239.255."),
+     "For private use, enter an address beginning with 239.255."),
      { MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1 } },
     {"http","HTTP",
      N_("Stream to several computers. This method is "

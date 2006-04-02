@@ -216,7 +216,7 @@ void VLMPanel::OnLoad( wxCommandEvent &event )
                                       wxT("*"), wxOPEN | wxMULTIPLE );
     if( p_file_dialog == NULL ) return;
 
-    p_file_dialog->SetTitle( wxU(_("Load configuration") ) );
+    p_file_dialog->SetTitle( wxU(_("Load Configuration") ) );
     if( p_file_dialog->ShowModal() == wxID_OK )
     {
         vlm_Load( p_vlm->GetVLM(), p_file_dialog->GetPath().mb_str() );
@@ -230,7 +230,7 @@ void VLMPanel::OnSave( wxCommandEvent &event )
                                       wxT("*"), wxSAVE | wxOVERWRITE_PROMPT );
     if( p_file_dialog == NULL ) return;
 
-    p_file_dialog->SetTitle( wxU(_("Save configuration") ) );
+    p_file_dialog->SetTitle( wxU(_("Save Configuration") ) );
     if( p_file_dialog->ShowModal() == wxID_OK )
     {
         vlm_Save( p_vlm->GetVLM(), p_file_dialog->GetPath().mb_str() );

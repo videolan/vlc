@@ -107,7 +107,7 @@ private:
 #define PLAYLIST_LONGTEXT N_("There are two possible playlist views in the " \
                 "interface : the normal playlist (separate window), or an " \
                 "embedded playlist (within the main interface, but with " \
-                "less features. You can select which one will be available " \
+                "less features). You can select which one will be available " \
                 "on the toolbar (or both)." )
 
 static int pi_playlist_views[] = { 0,1,2 };

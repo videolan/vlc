@@ -90,17 +90,17 @@ END_EVENT_TABLE()
 #define HELLO_TRANSCODE _("Transcode/Save to file")
 #define HELLO_TRANSCODE_DESC _("Use this to re-encode a stream and save it "\
         "to a file.")
-#define HELLO_NOTICE _("This wizard only gives access to a small subset " \
+#define HELLO_NOTICE _("This wizard only contains a small subset " \
         "of VLC's streaming and transcoding capabilities. Use the Open "\
-        "and Stream Output dialogs to get all of them.")
+        "and Stream Output dialogs to access all of them.")
 
 #define MOREINFO_STREAM _("Use this to stream on a network")
 
-#define MOREINFO_TRANSCODE _("Use this to save a stream to a file. You have "\
-        "the ability to reencode the stream. You can save whatever " \
-        "VLC can read.\nPlease notice that VLC is not very suited " \
-        "for file to file transcoding. You should use its transcoding " \
-        "features to save network streams, for example." )
+#define MOREINFO_TRANSCODE _("Saves the stream to a file. The stream must " \
+        "be a format that VLC recognizes. If desired, the stream can also " \
+        "be transcoded to another format.\n\nPlease note that VLC is not very" \
+        " suited for file-to-file transcoding. Its transcoding " \
+        "features are more appropriate for saving network streams." )
 
 /* Input page */
 #define INPUT_TITLE _("Input")
@@ -110,58 +110,58 @@ END_EVENT_TABLE()
 #define INPUT_PL _( "Existing playlist item" )
 
 #define CHOOSE_STREAM _("You must choose a stream")
-#define NO_PLAYLIST _("Uh Oh! Unable to find playlist !")
+#define NO_PLAYLIST _("Unable to find playlist")
 
 #define PARTIAL _("Use this to read only a part of the stream. " \
-                  "You must be able to control the incoming stream " \
+                  "To use, enter the starting and ending times (in seconds)." \
+                  "\n\nNote: You must be able to control the incoming stream " \
                   "(for example, a file or a disc, but not a RTP/UDP " \
-                  "network stream.)\n" \
-                  "Enter the starting and ending times (in seconds).")
+                  "network stream).\n" \
+)
 
 #define INPUT_BUTTON _("Choose")
 
 /* Transcode 1 */
 #define TRANSCODE1_TITLE _("Transcode")
-#define TRANSCODE1_TEXT _("If you want to change the compression format " \
-        "of the audio or video tracks, fill in this page. " \
-        "(If you only want to change the container format, proceed to next " \
-        " page.)")
+#define TRANSCODE1_TEXT _("Changes the compression format " \
+        "of the audio or video tracks. To change only the " \
+        "container format, proceed to the next page.")
 
-#define TR_VIDEO_TEXT0 _("Transcode video (if your stream has some)" )
-#define TR_VIDEO_TEXT _("Select the target video codec. Click one to get more " \
-                        "information.")
+#define TR_VIDEO_TEXT0 _("Transcode video (if available)" )
+#define TR_VIDEO_TEXT _("Select the target video codec. Choose a codec to " \
+                        "display more information about it.")
 
-#define TR_AUDIO_TEXT0 _("Transcode audio (if your stream has some)"
-#define TR_AUDIO_TEXT _("Select the target audio codec. Click one to get more " \
-                        "information.")
+#define TR_AUDIO_TEXT0 _("Transcode audio (if available)"
+#define TR_AUDIO_TEXT _("Select the target audio codec. Choose a codec to " \
+                        "display more information about it.")
 
 /* Streaming 1 */
 #define STREAMING1_TITLE _("Streaming")
-#define STREAMING1_TEXT _("In this page, you will select how your input stream will be sent.")
+#define STREAMING1_TEXT _("Determines how the input stream will be sent.")
 
 
 #define INVALID_MCAST_ADDRESS _("This does not appear to be a valid " \
                                 "multicast address" )
-#define NO_ADDRESS_TEXT _("You need to enter an address" )
+#define NO_ADDRESS_TEXT _("Please enter an address" )
 
 /* Encap  */
 #define ENCAP_TITLE _("Encapsulation format")
-#define ENCAP_TEXT _("In this page, you will select how the stream will be "\
-                     "encapsulated. Depending on the choices you made, all "\
-                     "formats won't be available." )
+#define ENCAP_TEXT _("Determines how the stream will be encapsulated. " \
+                     "Depending on the previous choices, some formats " \
+                     "might not be available." )
 
 
 /* Transcode 2 */
 #define EXTRATRANSCODE_TITLE _("Additional transcode options")
-#define EXTRATRANSCODE_TEXT _("In this page, you will define a few " \
-                              "additionnal parameters for your transcoding" )
+#define EXTRATRANSCODE_TEXT _("Defines a few additional parameters " \
+                              "for the transcoding." )
 
 #define CHOOSE_OUTFILE _("You must choose a file to save to")
 
 /* Streaming 2 */
 #define EXTRASTREAMING_TITLE _("Additional streaming options")
-#define EXTRASTREAMING_TEXT _("In this page, you will define a few " \
-                              "additionnal parameters for your stream" )
+#define EXTRASTREAMING_TEXT _("Defines a few additional parameters " \
+                              "for the stream." )
 
 #define TTL _("Define the TTL (Time-To-Live) of the stream. This parameter " \
               "is the maximum number of routers your stream can go through. " \
@@ -172,8 +172,8 @@ END_EVENT_TABLE()
               "using the SAP/SDP announcing protocol. This way, the clients " \
               "won't have to type in the multicast address, it will appear " \
               "in their playlist if they enable the SAP extra interface.\n" \
-              "If you want to give a name to your stream, enter it here, " \
-              "else, a default name will be used" )
+              "If you want to give a name to your stream, enter it here. " \
+              "Otherwise, a default name will be used." )
 
 /*****************************************************************************
  * All the pages of the wizard, declaration
