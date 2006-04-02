@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-01 22:54+0100\n"
+"POT-Creation-Date: 2006-04-02 13:53+0200\n"
 "PO-Revision-Date: 2005-12-12 14:01+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -17,6 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.0.2\n"
+
+#: include/vlc/vlc.h:578
+#, fuzzy
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute it under the terms of the GNU General Public License;\n"
+"see the file named COPYING for details.\n"
+"Written by the VideoLAN team; see the AUTHORS file.\n"
+msgstr ""
+"法律によって許可される範囲でこのプログラムには何の保証もありません。\n"
+"あなたは、GNU GPLの条項に基づいて再配布するかも知れません。\n"
+"COPYINGファイルに詳細が書かれていますので、参照してください。\n"
+"Written by the VideoLAN team at Ecole Centrale, Paris.\n"
 
 #: include/vlc_config_cat.h:32
 msgid "VLC preferences"
@@ -353,7 +366,6 @@ msgid "General playlist behaviour"
 msgstr "再生一覧を開く"
 
 #: include/vlc_config_cat.h:188 modules/gui/macosx/playlist.m:488
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:240
 #, fuzzy
 msgid "Services discovery"
 msgstr "ソースディレクトリ"
@@ -470,9 +482,9 @@ msgstr ""
 "がインストールされているディレクトリに移動し、\"vlc -I win32\"を実行してくだ"
 "さい。\n"
 
-#: include/vlc_meta.h:28 modules/gui/macosx/playlistinfo.m:205
-#: modules/gui/macosx/playlistinfo.m:310 modules/gui/macosx/playlist.m:317
-#: modules/gui/macosx/playlist.m:1229 modules/misc/growl.c:161
+#: include/vlc_meta.h:28 modules/gui/macosx/playlist.m:317
+#: modules/gui/macosx/playlist.m:1229 modules/gui/macosx/playlistinfo.m:205
+#: modules/gui/macosx/playlistinfo.m:310 modules/misc/growl.c:161
 #: modules/misc/growl.c:164
 msgid "Meta-information"
 msgstr "メタ情報"
@@ -486,15 +498,15 @@ msgstr "メタ情報"
 msgid "Title"
 msgstr "タイトル"
 
-#: include/vlc_meta.h:30 modules/gui/macosx/playlistinfo.m:58
-#: modules/gui/macosx/playlist.m:134 modules/gui/macosx/wizard.m:393
+#: include/vlc_meta.h:30 modules/gui/macosx/playlist.m:134
+#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/wizard.m:393
 #: modules/gui/wince/playlist.cpp:674 modules/mux/asf.c:50
 msgid "Author"
 msgstr "作成者"
 
-#: include/vlc_meta.h:31 modules/gui/macosx/playlistinfo.m:205
-#: modules/gui/macosx/playlistinfo.m:310 modules/gui/macosx/playlist.m:317
-#: modules/gui/macosx/playlist.m:1229
+#: include/vlc_meta.h:31 modules/gui/macosx/playlist.m:317
+#: modules/gui/macosx/playlist.m:1229 modules/gui/macosx/playlistinfo.m:205
+#: modules/gui/macosx/playlistinfo.m:310
 msgid "Artist"
 msgstr "アーティスト"
 
@@ -639,19 +651,6 @@ msgstr "コーデック名デバイス名"
 #: include/vlc_meta.h:69
 msgid "Codec Description"
 msgstr "コーデック説明"
-
-#: include/vlc/vlc.h:578
-#, fuzzy
-msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute it under the terms of the GNU General Public License;\n"
-"see the file named COPYING for details.\n"
-"Written by the VideoLAN team; see the AUTHORS file.\n"
-msgstr ""
-"法律によって許可される範囲でこのプログラムには何の保証もありません。\n"
-"あなたは、GNU GPLの条項に基づいて再配布するかも知れません。\n"
-"COPYINGファイルに詳細が書かれていますので、参照してください。\n"
-"Written by the VideoLAN team at Ecole Centrale, Paris.\n"
 
 #: src/audio_output/input.c:80 src/audio_output/input.c:126
 #: src/input/es_out.c:361 src/libvlc.h:380 src/video_output/video_output.c:379
@@ -4325,7 +4324,7 @@ msgid "Aspect-ratio"
 msgstr "アスペクト比"
 
 #: modules/access/cdda.c:52 modules/access/dshow/dshow.cpp:79
-#: modules/access/dvb/access.c:71 modules/access/dv.c:68
+#: modules/access/dv.c:68 modules/access/dvb/access.c:71
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:61
 #: modules/access/fake.c:40 modules/access/file.c:80 modules/access/ftp.c:42
 #: modules/access/gnomevfs.c:44 modules/access/http.c:53
@@ -4867,6 +4866,22 @@ msgstr "一覧の再描画"
 msgid "Configure"
 msgstr "設定"
 
+#: modules/access/dv.c:70
+#, fuzzy
+msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
+msgstr ""
+"udpストリームで使用される既定のキャッシング値が変更可能です。単位はミリ秒で指"
+"定します。"
+
+#: modules/access/dv.c:74
+msgid "Digital Video (Firewire/ieee1394)  input"
+msgstr ""
+
+#: modules/access/dv.c:75
+#, fuzzy
+msgid "dv"
+msgstr "追加"
+
 #: modules/access/dvb/access.c:73
 #, fuzzy
 msgid ""
@@ -5114,22 +5129,6 @@ msgstr "DVB 入力と v4l2 サポート"
 msgid "HTTP server"
 msgstr "HTTP ユーザー名"
 
-#: modules/access/dv.c:70
-#, fuzzy
-msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
-msgstr ""
-"udpストリームで使用される既定のキャッシング値が変更可能です。単位はミリ秒で指"
-"定します。"
-
-#: modules/access/dv.c:74
-msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr ""
-
-#: modules/access/dv.c:75
-#, fuzzy
-msgid "dv"
-msgstr "追加"
-
 #: modules/access/dvdnav.c:59 modules/access/dvdread.c:57
 msgid "DVD angle"
 msgstr "DVD アングル"
@@ -5293,40 +5292,6 @@ msgstr "FTP 入力"
 msgid "File"
 msgstr "ファイル"
 
-#: modules/access_filter/record.c:43
-#, fuzzy
-msgid "Record directory"
-msgstr "ソースディレクトリ"
-
-#: modules/access_filter/record.c:45
-#, fuzzy
-msgid "Directory where the record will be stored."
-msgstr "VLCが選択するパケッタライザーの順序を選択します。"
-
-#: modules/access_filter/timeshift.c:44
-#, fuzzy
-msgid "Timeshift granularity"
-msgstr "垂直方向位置"
-
-#: modules/access_filter/timeshift.c:45
-msgid ""
-"This is the size of the temporary files tha will be used to store the "
-"timeshifted streams."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:47
-#, fuzzy
-msgid "Timeshift directory"
-msgstr "ディレクトリを選択する"
-
-#: modules/access_filter/timeshift.c:48
-msgid "Directory used to store the timeshift temporary files."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:52 modules/access_filter/timeshift.c:53
-msgid "Timeshift"
-msgstr "タイムシフト"
-
 #: modules/access/ftp.c:44
 #, fuzzy
 msgid ""
@@ -5470,176 +5435,6 @@ msgstr ""
 #: modules/access/mms/mms.c:62
 msgid "Microsoft Media Server (MMS) input"
 msgstr "マイクロソフトメディアサーバー (MMS) 入力"
-
-#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
-msgid "Dummy stream output"
-msgstr "ダミーストリーム出力"
-
-#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
-msgid "Dummy"
-msgstr "ダミー"
-
-#: modules/access_output/file.c:60
-msgid "Append to file"
-msgstr "ファイルに追加する"
-
-#: modules/access_output/file.c:61
-msgid "Append to file if it exists instead of replacing it."
-msgstr ""
-
-#: modules/access_output/file.c:65
-msgid "File stream output"
-msgstr "ファイルストリーム出力"
-
-#: modules/access_output/http.c:60
-msgid "Username"
-msgstr "ユーザー名"
-
-#: modules/access_output/http.c:61
-msgid "User name that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:64
-msgid "Password that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:66
-msgid "Mime"
-msgstr "Mime"
-
-#: modules/access_output/http.c:67
-msgid "MIME returned by the server (autodetected if not specified."
-msgstr ""
-
-#: modules/access_output/http.c:71
-#, fuzzy
-msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
-msgstr "HTTP インターフェースの x509 PEM 証明書ファイル (SSL 有効)"
-
-#: modules/access_output/http.c:74
-msgid ""
-"Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
-"empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:78
-msgid ""
-"Path to the x509 PEM trusted root CA certificates (certificate authority) "
-"file that will be used forHTTPS. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:83
-msgid ""
-"Path to the x509 PEM Certificates Revocation List file that will be used for "
-"SSL. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:86
-msgid "Advertise with Bonjour"
-msgstr ""
-
-#: modules/access_output/http.c:87
-msgid "Advertise the stream with the Bonjour protocol."
-msgstr ""
-
-#: modules/access_output/http.c:91
-msgid "HTTP stream output"
-msgstr "HTTP ストリーム出力"
-
-#: modules/access_output/http.c:93 modules/control/http/http.c:61
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
-msgid "HTTP"
-msgstr "HTTP"
-
-#: modules/access_output/shout.c:58
-#, fuzzy
-msgid "Stream name"
-msgstr "ストリーム名"
-
-#: modules/access_output/shout.c:59
-msgid "Name to give to this stream/channel on the icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:62
-#, fuzzy
-msgid "Stream description"
-msgstr "コーデック説明"
-
-#: modules/access_output/shout.c:63
-msgid "Description of the stream content or information about your channel."
-msgstr ""
-
-#: modules/access_output/shout.c:66
-msgid "Stream MP3"
-msgstr "ストリーム MP3"
-
-#: modules/access_output/shout.c:67
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:73
-#, fuzzy
-msgid "IceCAST output"
-msgstr "オーディオ出力モジュールアクセス"
-
-#: modules/access_output/udp.c:75 modules/access/rtsp/access.c:40
-#: modules/demux/livedotcom.cpp:61
-msgid "Caching value (ms)"
-msgstr "キャッシング値 (ミリ秒)"
-
-#: modules/access_output/udp.c:77
-#, fuzzy
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"udpストリームで使用される既定のキャッシング値が変更可能です。単位はミリ秒で指"
-"定します。"
-
-#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
-#: modules/gui/macosx/wizard.m:1847
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:1338 modules/stream_out/rtp.c:87
-msgid "Time-To-Live (TTL)"
-msgstr "生存時間 (TTL):"
-
-#: modules/access_output/udp.c:81
-#, fuzzy
-msgid "Time-To-Live of the outgoing stream."
-msgstr "VLCが選択するパケッタライザーの順序を選択します。"
-
-#: modules/access_output/udp.c:84
-msgid "Group packets"
-msgstr "グループパケット"
-
-#: modules/access_output/udp.c:85
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-
-#: modules/access_output/udp.c:90
-msgid "Raw write"
-msgstr ""
-
-#: modules/access_output/udp.c:91
-msgid ""
-"Packets will be sent directly, without trying to fill the MTU (ie, without "
-"trying to make the biggest possible packets in order to improve streaming)."
-msgstr ""
-
-#: modules/access_output/udp.c:97
-msgid "UDP stream output"
-msgstr "UDP ストリーム出力"
-
-#: modules/access_output/udp.c:98
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
-msgid "UDP"
-msgstr "UDP"
 
 #: modules/access/pvr/pvr.c:48
 #, fuzzy
@@ -5807,6 +5602,11 @@ msgstr "PVR"
 #: modules/access/pvr/pvr.c:115
 msgid "IVTV MPEG Encoding cards input"
 msgstr ""
+
+#: modules/access/rtsp/access.c:40 modules/access_output/udp.c:75
+#: modules/demux/livedotcom.cpp:61
+msgid "Caching value (ms)"
+msgstr "キャッシング値 (ミリ秒)"
 
 #: modules/access/rtsp/access.c:42
 #, fuzzy
@@ -6285,6 +6085,205 @@ msgstr "再生一覧の \"author\" フィールドで使用するフォーマッ
 #, fuzzy
 msgid "Format to use in the playlist's \"title\" field."
 msgstr "再生一覧の \"author\" フィールドで使用するフォーマット"
+
+#: modules/access_filter/record.c:43
+#, fuzzy
+msgid "Record directory"
+msgstr "ソースディレクトリ"
+
+#: modules/access_filter/record.c:45
+#, fuzzy
+msgid "Directory where the record will be stored."
+msgstr "VLCが選択するパケッタライザーの順序を選択します。"
+
+#: modules/access_filter/timeshift.c:44
+#, fuzzy
+msgid "Timeshift granularity"
+msgstr "垂直方向位置"
+
+#: modules/access_filter/timeshift.c:45
+msgid ""
+"This is the size of the temporary files tha will be used to store the "
+"timeshifted streams."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:47
+#, fuzzy
+msgid "Timeshift directory"
+msgstr "ディレクトリを選択する"
+
+#: modules/access_filter/timeshift.c:48
+msgid "Directory used to store the timeshift temporary files."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:52 modules/access_filter/timeshift.c:53
+msgid "Timeshift"
+msgstr "タイムシフト"
+
+#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
+msgid "Dummy stream output"
+msgstr "ダミーストリーム出力"
+
+#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
+msgid "Dummy"
+msgstr "ダミー"
+
+#: modules/access_output/file.c:60
+msgid "Append to file"
+msgstr "ファイルに追加する"
+
+#: modules/access_output/file.c:61
+msgid "Append to file if it exists instead of replacing it."
+msgstr ""
+
+#: modules/access_output/file.c:65
+msgid "File stream output"
+msgstr "ファイルストリーム出力"
+
+#: modules/access_output/http.c:60
+msgid "Username"
+msgstr "ユーザー名"
+
+#: modules/access_output/http.c:61
+msgid "User name that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:64
+msgid "Password that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:66
+msgid "Mime"
+msgstr "Mime"
+
+#: modules/access_output/http.c:67
+msgid "MIME returned by the server (autodetected if not specified."
+msgstr ""
+
+#: modules/access_output/http.c:71
+#, fuzzy
+msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
+msgstr "HTTP インターフェースの x509 PEM 証明書ファイル (SSL 有効)"
+
+#: modules/access_output/http.c:74
+msgid ""
+"Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
+"empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:78
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used forHTTPS. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:83
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be used for "
+"SSL. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:86
+msgid "Advertise with Bonjour"
+msgstr ""
+
+#: modules/access_output/http.c:87
+msgid "Advertise the stream with the Bonjour protocol."
+msgstr ""
+
+#: modules/access_output/http.c:91
+msgid "HTTP stream output"
+msgstr "HTTP ストリーム出力"
+
+#: modules/access_output/http.c:93 modules/control/http/http.c:61
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
+msgid "HTTP"
+msgstr "HTTP"
+
+#: modules/access_output/shout.c:58
+#, fuzzy
+msgid "Stream name"
+msgstr "ストリーム名"
+
+#: modules/access_output/shout.c:59
+msgid "Name to give to this stream/channel on the icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:62
+#, fuzzy
+msgid "Stream description"
+msgstr "コーデック説明"
+
+#: modules/access_output/shout.c:63
+msgid "Description of the stream content or information about your channel."
+msgstr ""
+
+#: modules/access_output/shout.c:66
+msgid "Stream MP3"
+msgstr "ストリーム MP3"
+
+#: modules/access_output/shout.c:67
+msgid ""
+"You normally have to feed the shoutcast module with Ogg streams. It is also "
+"possible to stream MP3 instead, so you can forward MP3 streams to the "
+"icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:73
+#, fuzzy
+msgid "IceCAST output"
+msgstr "オーディオ出力モジュールアクセス"
+
+#: modules/access_output/udp.c:77
+#, fuzzy
+msgid ""
+"Default caching value for outbound UDP streams. This value should be set in "
+"milliseconds."
+msgstr ""
+"udpストリームで使用される既定のキャッシング値が変更可能です。単位はミリ秒で指"
+"定します。"
+
+#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
+#: modules/gui/macosx/wizard.m:1847
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:1338 modules/stream_out/rtp.c:87
+msgid "Time-To-Live (TTL)"
+msgstr "生存時間 (TTL):"
+
+#: modules/access_output/udp.c:81
+#, fuzzy
+msgid "Time-To-Live of the outgoing stream."
+msgstr "VLCが選択するパケッタライザーの順序を選択します。"
+
+#: modules/access_output/udp.c:84
+msgid "Group packets"
+msgstr "グループパケット"
+
+#: modules/access_output/udp.c:85
+msgid ""
+"Packets can be sent one by one at the right time or by groups. You can "
+"choose the number of packets that will be sent at a time. It helps reducing "
+"the scheduling load on heavily-loaded systems."
+msgstr ""
+
+#: modules/access_output/udp.c:90
+msgid "Raw write"
+msgstr ""
+
+#: modules/access_output/udp.c:91
+msgid ""
+"Packets will be sent directly, without trying to fill the MTU (ie, without "
+"trying to make the biggest possible packets in order to improve streaming)."
+msgstr ""
+
+#: modules/access_output/udp.c:97
+msgid "UDP stream output"
+msgstr "UDP ストリーム出力"
+
+#: modules/access_output/udp.c:98
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
+msgid "UDP"
+msgstr "UDP"
 
 #: modules/audio_filter/channel_mixer/dolby.c:47
 msgid "Simple decoder for Dolby Surround encoded streams"
@@ -10481,8 +10480,9 @@ msgstr "リモート・コントロール"
 msgid "Video filters"
 msgstr "ビデオタイトル"
 
-#: modules/gui/macosx/extended.m:84
-msgid "Adjust Image"
+#: modules/gui/macosx/extended.m:84 modules/gui/wxwidgets/extrapanel.cpp:204
+#, fuzzy
+msgid "Image adjustment"
 msgstr "画像調整"
 
 #: modules/gui/macosx/extended.m:85 modules/gui/macosx/wizard.m:371
@@ -10500,8 +10500,8 @@ msgstr "デバイス名"
 msgid "Blurring"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:87
-msgid "Creates a motion blurring on the image"
+#: modules/gui/macosx/extended.m:87 modules/gui/wxwidgets/extrapanel.cpp:151
+msgid "Adds motion blurring to the image"
 msgstr ""
 
 #: modules/gui/macosx/extended.m:88 modules/gui/wxwidgets/extrapanel.cpp:149
@@ -10510,9 +10510,10 @@ msgstr ""
 msgid "Distortion"
 msgstr "湾曲モード"
 
-#: modules/gui/macosx/extended.m:89
-msgid "Adds distorsion effects"
-msgstr ""
+#: modules/gui/macosx/extended.m:89 modules/gui/wxwidgets/extrapanel.cpp:149
+#, fuzzy
+msgid "Adds distortion effects"
+msgstr "次のチャプターを選択"
 
 #: modules/gui/macosx/extended.m:90 modules/gui/wxwidgets/extrapanel.cpp:148
 #, fuzzy
@@ -10537,8 +10538,8 @@ msgstr "画像の縁取り"
 msgid "Image inversion"
 msgstr "サイズ"
 
-#: modules/gui/macosx/extended.m:96
-msgid "Inverts the image colors"
+#: modules/gui/macosx/extended.m:96 modules/gui/wxwidgets/extrapanel.cpp:150
+msgid "Inverts the colors of the image"
 msgstr ""
 
 #: modules/gui/macosx/extended.m:97 modules/gui/wxwidgets/extrapanel.cpp:152
@@ -10557,8 +10558,7 @@ msgid "Volume normalization"
 msgstr "ビジュアル化"
 
 #: modules/gui/macosx/extended.m:100
-msgid ""
-"This filters prevents the audio output level from exceeding a defined value."
+msgid "Prevents the audio output from going over a predefined value."
 msgstr ""
 
 #: modules/gui/macosx/extended.m:102 modules/gui/wxwidgets/extrapanel.cpp:396
@@ -10566,9 +10566,8 @@ msgstr ""
 msgid "Headphone virtualization"
 msgstr "ヘッドホーンの仮想的な音の広がり効果"
 
-#: modules/gui/macosx/extended.m:103
-msgid ""
-"This filter gives the feeling of a 5.1 speaker set when using a headphone."
+#: modules/gui/macosx/extended.m:103 modules/gui/wxwidgets/extrapanel.cpp:397
+msgid "Imitates the effect of surround sound when using headphones."
 msgstr ""
 
 #: modules/gui/macosx/extended.m:105 modules/gui/wxwidgets/extrapanel.cpp:406
@@ -10596,10 +10595,9 @@ msgstr "持続期間"
 msgid "Opaqueness"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:601
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:506
+#: modules/gui/macosx/extended.m:601 modules/gui/wxwidgets/extrapanel.cpp:1007
 #, fuzzy
-msgid "More information"
+msgid "More Information"
 msgstr "バージョン情報の印刷"
 
 #: modules/gui/macosx/extended.m:602
@@ -10736,8 +10734,8 @@ msgid "Extended Controls"
 msgstr "リモート・コントロール"
 
 #: modules/gui/macosx/intf.m:579 modules/gui/macosx/intf.m:610
-#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:371
-#: modules/gui/macosx/playlist.m:484
+#: modules/gui/macosx/playlist.m:484 modules/gui/macosx/playlistinfo.m:55
+#: modules/gui/macosx/playlistinfo.m:371
 #, fuzzy
 msgid "Information"
 msgstr "バージョン情報の印刷"
@@ -11108,6 +11106,75 @@ msgstr "SDP URL"
 msgid "Save File"
 msgstr "ファイルの保存"
 
+#: modules/gui/macosx/playlist.m:479
+msgid "Save Playlist..."
+msgstr "再生一覧の保存..."
+
+#: modules/gui/macosx/playlist.m:481 modules/gui/pda/pda_interface.c:1254
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:278
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:285
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:104
+msgid "Delete"
+msgstr "削除"
+
+#: modules/gui/macosx/playlist.m:482
+msgid "Expand Node"
+msgstr "ノードを展開する"
+
+#: modules/gui/macosx/playlist.m:485
+#, fuzzy
+msgid "Get Stream Information"
+msgstr "メタ情報"
+
+#: modules/gui/macosx/playlist.m:486
+msgid "Sort Node by Name"
+msgstr "名前でノードをソートする"
+
+#: modules/gui/macosx/playlist.m:487
+msgid "Sort Node by Author"
+msgstr "著者でノードをソートする"
+
+#: modules/gui/macosx/playlist.m:490 modules/gui/macosx/playlist.m:1523
+msgid "No items in the playlist"
+msgstr "再生一覧に項目がありません"
+
+#: modules/gui/macosx/playlist.m:494
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:323
+msgid "Search"
+msgstr "検索"
+
+#: modules/gui/macosx/playlist.m:496
+#, fuzzy
+msgid "Search in Playlist"
+msgstr "再生一覧を開く"
+
+#: modules/gui/macosx/playlist.m:497
+msgid "Standard Play"
+msgstr "標準再生"
+
+#: modules/gui/macosx/playlist.m:500
+#, fuzzy
+msgid "Add Folder to Playlist"
+msgstr "再生一覧に追加"
+
+#: modules/gui/macosx/playlist.m:749
+msgid "Save Playlist"
+msgstr "再生一覧を保存"
+
+#: modules/gui/macosx/playlist.m:1492
+msgid "Empty Folder"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:1517
+#, fuzzy, c-format
+msgid "%i items in the playlist"
+msgstr "デフォルトで再生一覧に追加"
+
+#: modules/gui/macosx/playlist.m:1527
+#, fuzzy
+msgid "1 item in the playlist"
+msgstr "デフォルトで再生一覧に追加"
+
 #: modules/gui/macosx/playlistinfo.m:56
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:591
@@ -11182,75 +11249,6 @@ msgstr "早送り再生"
 #: modules/gui/macosx/playlistinfo.m:99
 msgid "Lost buffers"
 msgstr ""
-
-#: modules/gui/macosx/playlist.m:479
-msgid "Save Playlist..."
-msgstr "再生一覧の保存..."
-
-#: modules/gui/macosx/playlist.m:481 modules/gui/pda/pda_interface.c:1254
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:278
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:285
-#: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:104
-msgid "Delete"
-msgstr "削除"
-
-#: modules/gui/macosx/playlist.m:482
-msgid "Expand Node"
-msgstr "ノードを展開する"
-
-#: modules/gui/macosx/playlist.m:485
-#, fuzzy
-msgid "Get Stream Information"
-msgstr "メタ情報"
-
-#: modules/gui/macosx/playlist.m:486
-msgid "Sort Node by Name"
-msgstr "名前でノードをソートする"
-
-#: modules/gui/macosx/playlist.m:487
-msgid "Sort Node by Author"
-msgstr "著者でノードをソートする"
-
-#: modules/gui/macosx/playlist.m:490 modules/gui/macosx/playlist.m:1523
-msgid "No items in the playlist"
-msgstr "再生一覧に項目がありません"
-
-#: modules/gui/macosx/playlist.m:494
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:323
-msgid "Search"
-msgstr "検索"
-
-#: modules/gui/macosx/playlist.m:496
-#, fuzzy
-msgid "Search in Playlist"
-msgstr "再生一覧を開く"
-
-#: modules/gui/macosx/playlist.m:497
-msgid "Standard Play"
-msgstr "標準再生"
-
-#: modules/gui/macosx/playlist.m:500
-#, fuzzy
-msgid "Add Folder to Playlist"
-msgstr "再生一覧に追加"
-
-#: modules/gui/macosx/playlist.m:749
-msgid "Save Playlist"
-msgstr "再生一覧を保存"
-
-#: modules/gui/macosx/playlist.m:1492
-msgid "Empty Folder"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:1517
-#, fuzzy, c-format
-msgid "%i items in the playlist"
-msgstr "デフォルトで再生一覧に追加"
-
-#: modules/gui/macosx/playlist.m:1527
-#, fuzzy
-msgid "1 item in the playlist"
-msgstr "デフォルトで再生一覧に追加"
 
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:212
@@ -11809,7 +11807,7 @@ msgid "UDP Multicast"
 msgstr "UDP マルチキャスト"
 
 #: modules/gui/macosx/wizard.m:417 modules/gui/pda/pda_interface.c:1221
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:124
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:125
 #: modules/stream_out/transcode.c:186
 #, fuzzy
 msgid "Transcode"
@@ -12730,7 +12728,8 @@ msgid "Input has changed "
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
-msgid "Stream and media info"
+#, fuzzy
+msgid "Stream and Media Info"
 msgstr "ストリームとメディアの情報"
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:83
@@ -12740,7 +12739,7 @@ msgstr "高度なオプション"
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:116
 msgid ""
-"The following errors happened. More details might be available in the "
+"The following errors occurred. More details might be available in the "
 "Messages window."
 msgstr ""
 
@@ -12783,7 +12782,7 @@ msgid "Stream/Save"
 msgstr "ストリーム名"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:431
-msgid "Use VLC as a server of streams"
+msgid "Use VLC as a stream server"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:457
@@ -12892,8 +12891,8 @@ msgstr "チューナー番号"
 #: modules/gui/wxwidgets/dialogs/open.cpp:1669
 msgid ""
 "DVD's can have up to 32 subtitles numbered 0..31. Note this is not the same "
-"thing as a subtitle name e.g. 'en'. If a value -1 is used, no subtitle will "
-"be shown."
+"thing as a subtitle name (e.g. 'en'). If a value -1 is used, no subtitle "
+"will be shown."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1672
@@ -12952,6 +12951,11 @@ msgstr ""
 msgid "&Add URL..."
 msgstr "MRL 追加(&A)..."
 
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:240
+#, fuzzy
+msgid "Services Discovery"
+msgstr "ソースディレクトリ"
+
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:243
 msgid "&Open Playlist..."
 msgstr "再生一覧を開く(&O)"
@@ -12966,11 +12970,13 @@ msgid "&Close"
 msgstr "閉じる(&C)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:250
-msgid "Sort by &title"
+#, fuzzy
+msgid "Sort by &Title"
 msgstr "タイトルでソート(&T)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:251
-msgid "&Reverse sort by title"
+#, fuzzy
+msgid "&Reverse Sort by Title"
 msgstr "タイトルで逆ソート(&R)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:253
@@ -13000,7 +13006,7 @@ msgid "&View items"
 msgstr "ビデオタイトル"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:275
-msgid "Play this branch"
+msgid "Play this Branch"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:276
@@ -13010,7 +13016,7 @@ msgid "Preparse"
 msgstr "準備"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:277
-msgid "Sort this branch"
+msgid "Sort this Branch"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:279
@@ -13019,9 +13025,8 @@ msgid "Info"
 msgstr "情報"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:280
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
 #, fuzzy
-msgid "Add node"
+msgid "Add Node"
 msgstr "オーディオエンコーダー"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:358
@@ -13068,7 +13073,7 @@ msgstr "通常"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
 #, fuzzy
-msgid "Sorted by artist"
+msgid "Sorted by Artist"
 msgstr "タイトルでソート(&T)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1419
@@ -13079,6 +13084,11 @@ msgstr "名前でソート"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1624
 msgid "Please enter node name"
 msgstr ""
+
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
+#, fuzzy
+msgid "Add node"
+msgstr "オーディオエンコーダー"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
 #, fuzzy
@@ -13111,8 +13121,8 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:433
 msgid ""
-"Select which modules you want to use. To get more advanced control, you can "
-"also modify the resulting \"chain\" by yourself"
+"Select the desired modules. For more advanced control, the resulting \"chain"
+"\" can be modified."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:167
@@ -13126,10 +13136,8 @@ msgstr "ターゲットを開く:"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:174
 msgid ""
-"You can use this field directly by typing the full MRL you want to stream "
-"to.\n"
-"Alternatively, the field will be filled automatically when you use the "
-"controls below"
+"Specifies the MRL. This can be specified directly or filled in automatically "
+"by adjusting the stream settings."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:462
@@ -13226,7 +13234,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:154
 msgid ""
 "\n"
-"Available updates and related downloads\n"
+"Available updates and related downloads.\n"
 "(Double click on a file to download it)\n"
 msgstr ""
 
@@ -13245,12 +13253,12 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:219
 #, fuzzy
-msgid "Load configuration"
+msgid "Load Configuration"
 msgstr "YLM 設定"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:233
 #, fuzzy
-msgid "Save configuration"
+msgid "Save Configuration"
 msgstr "YLM 設定"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:249
@@ -13259,7 +13267,7 @@ msgstr "新規ブロードキャスト"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:385
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:396
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:121
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:122
 msgid "Choose"
 msgstr "選択..."
 
@@ -13295,9 +13303,8 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:93
 msgid ""
-"This wizard only gives access to a small subset of VLC's streaming and "
-"transcoding capabilities. Use the Open and Stream Output dialogs to get all "
-"of them."
+"This wizard only contains a small subset of VLC's streaming and transcoding "
+"capabilities. Use the Open and Stream Output dialogs to access all of them."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:97
@@ -13306,10 +13313,11 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:99
 msgid ""
-"Use this to save a stream to a file. You have the ability to reencode the "
-"stream. You can save whatever VLC can read.\n"
-"Please notice that VLC is not very suited for file to file transcoding. You "
-"should use its transcoding features to save network streams, for example."
+"Saves the stream to a file. The stream must be a format that VLC recognizes. "
+"If desired, the stream can also be transcoded to another format.\n"
+"\n"
+"Please note that VLC is not very suited for file-to-file transcoding. Its "
+"transcoding features are more appropriate for saving network streams."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:112
@@ -13317,43 +13325,51 @@ msgid "You must choose a stream"
 msgstr "ストリームを選択しなければなりません"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:113
-msgid "Uh Oh! Unable to find playlist !"
-msgstr ""
+#, fuzzy
+msgid "Unable to find playlist"
+msgstr "デフォルトで再生一覧に追加"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:115
 msgid ""
-"Use this to read only a part of the stream. You must be able to control the "
-"incoming stream (for example, a file or a disc, but not a RTP/UDP network "
-"stream.)\n"
-"Enter the starting and ending times (in seconds)."
+"Use this to read only a part of the stream. To use, enter the starting and "
+"ending times (in seconds).\n"
+"\n"
+"Note: You must be able to control the incoming stream (for example, a file "
+"or a disc, but not a RTP/UDP network stream).\n"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:125
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:126
 msgid ""
-"If you want to change the compression format of the audio or video tracks, "
-"fill in this page. (If you only want to change the container format, proceed "
-"to next  page.)"
+"Changes the compression format of the audio or video tracks. To change only "
+"the container format, proceed to the next page."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:130
-msgid "Transcode video (if your stream has some)"
-msgstr ""
+#, fuzzy
+msgid "Transcode video (if available)"
+msgstr "ストリームの一時停止"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:131
-msgid "Select the target video codec. Click one to get more information."
+msgid ""
+"Select the target video codec. Choose a codec to display more information "
+"about it."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:134
-msgid "Transcode audio (if your stream has some)"
-msgstr ""
+#, fuzzy
+msgid "Transcode audio (if available)"
+msgstr "ストリームの一時停止"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
-msgid "Select the target audio codec. Click one to get more information."
+msgid ""
+"Select the target audio codec. Choose a codec to display more information "
+"about it."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:140
-msgid "In this page, you will select how your input stream will be sent."
-msgstr ""
+#, fuzzy
+msgid "Determines how the input stream will be sent."
+msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:143
 msgid "This does not appear to be a valid multicast address"
@@ -13361,19 +13377,17 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:145
 #, fuzzy
-msgid "You need to enter an address"
+msgid "Please enter an address"
 msgstr "ネットワークインタフェースアドレス"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:149
 msgid ""
-"In this page, you will select how the stream will be encapsulated. Depending "
-"on the choices you made, all formats won't be available."
+"Determines how the stream will be encapsulated. Depending on the previous "
+"choices, some formats might not be available."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:156
-msgid ""
-"In this page, you will define a few additionnal parameters for your "
-"transcoding"
+msgid "Defines a few additional parameters for the transcoding."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:159
@@ -13382,9 +13396,9 @@ msgid "You must choose a file to save to"
 msgstr "ストリームの出力先の選択"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:163
-msgid ""
-"In this page, you will define a few additionnal parameters for your stream"
-msgstr ""
+#, fuzzy
+msgid "Defines a few additional parameters for the stream."
+msgstr "ストリームをナビゲートする"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:166
 msgid ""
@@ -13400,9 +13414,14 @@ msgid ""
 "announcing protocol. This way, the clients won't have to type in the "
 "multicast address, it will appear in their playlist if they enable the SAP "
 "extra interface.\n"
-"If you want to give a name to your stream, enter it here, else, a default "
-"name will be used"
+"If you want to give a name to your stream, enter it here. Otherwise, a "
+"default name will be used."
 msgstr ""
+
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:506
+#, fuzzy
+msgid "More information"
+msgstr "バージョン情報の印刷"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1289
 msgid "Save to file"
@@ -13418,19 +13437,6 @@ msgstr ""
 msgid "Creates several clones of the image"
 msgstr ""
 
-#: modules/gui/wxwidgets/extrapanel.cpp:149
-#, fuzzy
-msgid "Adds distortion effects"
-msgstr "次のチャプターを選択"
-
-#: modules/gui/wxwidgets/extrapanel.cpp:150
-msgid "Inverts the colors of the image"
-msgstr ""
-
-#: modules/gui/wxwidgets/extrapanel.cpp:151
-msgid "Adds motion blurring to the image"
-msgstr ""
-
 #: modules/gui/wxwidgets/extrapanel.cpp:153 modules/video_filter/magnify.c:60
 msgid "Magnify"
 msgstr ""
@@ -13439,11 +13445,6 @@ msgstr ""
 msgid "Magnifies part of the image"
 msgstr ""
 
-#: modules/gui/wxwidgets/extrapanel.cpp:204
-#, fuzzy
-msgid "Image adjustment"
-msgstr "画像調整"
-
 #: modules/gui/wxwidgets/extrapanel.cpp:270
 msgid "Video Options"
 msgstr "ビデオオプション"
@@ -13451,10 +13452,6 @@ msgstr "ビデオオプション"
 #: modules/gui/wxwidgets/extrapanel.cpp:284
 msgid "Aspect Ratio"
 msgstr "アスペクト比"
-
-#: modules/gui/wxwidgets/extrapanel.cpp:397
-msgid "Imitates the effect of surround sound when using headphones."
-msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:402
 msgid "Prevents the audio output level from going over a predefined value."
@@ -13479,11 +13476,6 @@ msgid ""
 "control the order in which they are applied, enter a filters string in the "
 "Video Filter Module inside the preferences."
 msgstr ""
-
-#: modules/gui/wxwidgets/extrapanel.cpp:1007
-#, fuzzy
-msgid "More Information"
-msgstr "バージョン情報の印刷"
 
 #: modules/gui/wxwidgets/input_manager.cpp:180
 msgid "Stopped"
@@ -13550,7 +13542,8 @@ msgid "&Messages...\tCtrl-M"
 msgstr "メッセージ(&M)...\tCtrl-M"
 
 #: modules/gui/wxwidgets/interface.cpp:593
-msgid "Stream and Media &info...\tCtrl-I"
+#, fuzzy
+msgid "Stream and Media &Info...\tCtrl-I"
 msgstr "ストリームとメディア情報(&I)...\tCtrl-I"
 
 #: modules/gui/wxwidgets/interface.cpp:595
@@ -13564,7 +13557,7 @@ msgid "About..."
 msgstr "VideoLANについて(_A)..."
 
 #: modules/gui/wxwidgets/interface.cpp:607
-msgid "Check for updates..."
+msgid "Check for Updates..."
 msgstr ""
 
 #: modules/gui/wxwidgets/interface.cpp:611
@@ -13653,7 +13646,8 @@ msgid "About %s"
 msgstr "%s について"
 
 #: modules/gui/wxwidgets/interface.cpp:1496
-msgid "Show/Hide interface"
+#, fuzzy
+msgid "Show/Hide Interface"
 msgstr "インターフェース表示/非表示"
 
 #: modules/gui/wxwidgets/menus.cpp:132
@@ -13750,14 +13744,14 @@ msgstr "RTP マルチキャスト"
 msgid ""
 "Stream to a dynamic group of computers on a multicast-enabled network. This "
 "is the most efficient method to stream to several computers, but it does not "
-"work over Internet."
+"work over the Internet."
 msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:129
 msgid ""
-"Enter the multicast address to stream to in this field. This must be an IP "
-"address between 224.0.0.0 an 239.255.255.255. For a private use, enter an "
-"address beginning with 239.255."
+"Enter the multicast address to stream to. This must be an IP address between "
+"224.0.0.0 an 239.255.255.255. For private use, enter an address beginning "
+"with 239.255."
 msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:134
@@ -13848,7 +13842,7 @@ msgstr "再生一覧"
 msgid ""
 "There are two possible playlist views in the interface : the normal playlist "
 "(separate window), or an embedded playlist (within the main interface, but "
-"with less features. You can select which one will be available on the "
+"with less features). You can select which one will be available on the "
 "toolbar (or both)."
 msgstr ""
 
@@ -14230,10 +14224,6 @@ msgstr "出力フォーマット"
 msgid "Output data for RRDTool in this file."
 msgstr ""
 
-#: modules/misc/memcpy/memcpyaltivec.c:56
-msgid "AltiVec memcpy"
-msgstr "AltiVec memcpy"
-
 #: modules/misc/memcpy/memcpy.c:83
 msgid "libc memcpy"
 msgstr "libc memcpy"
@@ -14249,6 +14239,10 @@ msgstr "MMX memcpy"
 #: modules/misc/memcpy/memcpy.c:99
 msgid "MMX EXT memcpy"
 msgstr "MMX 拡張memcpy"
+
+#: modules/misc/memcpy/memcpyaltivec.c:56
+msgid "AltiVec memcpy"
+msgstr "AltiVec memcpy"
 
 #: modules/misc/msn.c:63
 msgid "MSN Title format string"
@@ -17221,6 +17215,9 @@ msgstr "xods出力でテキスト出力のために使用されるフォント"
 #, fuzzy
 msgid "XOSD interface"
 msgstr "XOSD インターフェース"
+
+#~ msgid "Adjust Image"
+#~ msgstr "画像調整"
 
 #~ msgid "delay"
 #~ msgstr "ディレイ"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-01 22:54+0100\n"
+"POT-Creation-Date: 2006-04-02 13:53+0200\n"
 "PO-Revision-Date: 2006-03-31 21:20+0100\n"
 "Last-Translator: Antonio Javier Varela <tonxabar@gmail.com>\n"
 "Language-Team: Spanish-English\n"
@@ -15,6 +15,18 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-SourceCharset: utf-8\n"
+
+#: include/vlc/vlc.h:578
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute it under the terms of the GNU General Public License;\n"
+"see the file named COPYING for details.\n"
+"Written by the VideoLAN team; see the AUTHORS file.\n"
+msgstr ""
+"Este programa viene SIN GARANTIA, sólo a la extendida por ley.\n"
+"Puedes redistribuirlo bajo los términos de la Licencia Pública Gral. GNU;\n"
+"mira el archivo llamado COPYING para ver los detalles.\n"
+"Escrito por el equipo VideoLAN; mira el archivo AUTHORS.\n"
 
 #: include/vlc_config_cat.h:32
 msgid "VLC preferences"
@@ -385,7 +397,6 @@ msgid "General playlist behaviour"
 msgstr "Comportamiento general de lista de reproducción"
 
 #: include/vlc_config_cat.h:188 modules/gui/macosx/playlist.m:488
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:240
 msgid "Services discovery"
 msgstr "Servicios discovery"
 
@@ -506,9 +517,9 @@ msgstr ""
 "ventana de comandos dos, ve al directorio donde instalaste VLC y ejecuta "
 "\"vlc -I wxwin\"\n"
 
-#: include/vlc_meta.h:28 modules/gui/macosx/playlistinfo.m:205
-#: modules/gui/macosx/playlistinfo.m:310 modules/gui/macosx/playlist.m:317
-#: modules/gui/macosx/playlist.m:1229 modules/misc/growl.c:161
+#: include/vlc_meta.h:28 modules/gui/macosx/playlist.m:317
+#: modules/gui/macosx/playlist.m:1229 modules/gui/macosx/playlistinfo.m:205
+#: modules/gui/macosx/playlistinfo.m:310 modules/misc/growl.c:161
 #: modules/misc/growl.c:164
 msgid "Meta-information"
 msgstr "Meta-información"
@@ -522,15 +533,15 @@ msgstr "Meta-información"
 msgid "Title"
 msgstr "Título"
 
-#: include/vlc_meta.h:30 modules/gui/macosx/playlistinfo.m:58
-#: modules/gui/macosx/playlist.m:134 modules/gui/macosx/wizard.m:393
+#: include/vlc_meta.h:30 modules/gui/macosx/playlist.m:134
+#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/wizard.m:393
 #: modules/gui/wince/playlist.cpp:674 modules/mux/asf.c:50
 msgid "Author"
 msgstr "Autor"
 
-#: include/vlc_meta.h:31 modules/gui/macosx/playlistinfo.m:205
-#: modules/gui/macosx/playlistinfo.m:310 modules/gui/macosx/playlist.m:317
-#: modules/gui/macosx/playlist.m:1229
+#: include/vlc_meta.h:31 modules/gui/macosx/playlist.m:317
+#: modules/gui/macosx/playlist.m:1229 modules/gui/macosx/playlistinfo.m:205
+#: modules/gui/macosx/playlistinfo.m:310
 msgid "Artist"
 msgstr "Artista"
 
@@ -672,18 +683,6 @@ msgstr "Nombre de Códec"
 #: include/vlc_meta.h:69
 msgid "Codec Description"
 msgstr "Descripción de Códec"
-
-#: include/vlc/vlc.h:578
-msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute it under the terms of the GNU General Public License;\n"
-"see the file named COPYING for details.\n"
-"Written by the VideoLAN team; see the AUTHORS file.\n"
-msgstr ""
-"Este programa viene SIN GARANTIA, sólo a la extendida por ley.\n"
-"Puedes redistribuirlo bajo los términos de la Licencia Pública Gral. GNU;\n"
-"mira el archivo llamado COPYING para ver los detalles.\n"
-"Escrito por el equipo VideoLAN; mira el archivo AUTHORS.\n"
 
 #: src/audio_output/input.c:80 src/audio_output/input.c:126
 #: src/input/es_out.c:361 src/libvlc.h:380 src/video_output/video_output.c:379
@@ -4488,7 +4487,7 @@ msgid "Aspect-ratio"
 msgstr "Aspecto-tasa"
 
 #: modules/access/cdda.c:52 modules/access/dshow/dshow.cpp:79
-#: modules/access/dvb/access.c:71 modules/access/dv.c:68
+#: modules/access/dv.c:68 modules/access/dvb/access.c:71
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:61
 #: modules/access/fake.c:40 modules/access/file.c:80 modules/access/ftp.c:42
 #: modules/access/gnomevfs.c:44 modules/access/http.c:53
@@ -5107,6 +5106,21 @@ msgstr "Actualizar lista"
 msgid "Configure"
 msgstr "Configurar"
 
+#: modules/access/dv.c:70
+#, fuzzy
+msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
+msgstr ""
+"Te permite modificar el valor por defecto de caché para volcados UDP. Este "
+"valor debería ponerse en unidades de milisegundo."
+
+#: modules/access/dv.c:74
+msgid "Digital Video (Firewire/ieee1394)  input"
+msgstr "Entrada de Vídeo Digital (Firewire/ieee1394)"
+
+#: modules/access/dv.c:75
+msgid "dv"
+msgstr "dv"
+
 #: modules/access/dvb/access.c:73
 #, fuzzy
 msgid ""
@@ -5365,21 +5379,6 @@ msgstr "Entrada DVB con soporte v412"
 msgid "HTTP server"
 msgstr "Servirdor HTTP"
 
-#: modules/access/dv.c:70
-#, fuzzy
-msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
-msgstr ""
-"Te permite modificar el valor por defecto de caché para volcados UDP. Este "
-"valor debería ponerse en unidades de milisegundo."
-
-#: modules/access/dv.c:74
-msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr "Entrada de Vídeo Digital (Firewire/ieee1394)"
-
-#: modules/access/dv.c:75
-msgid "dv"
-msgstr "dv"
-
 #: modules/access/dvdnav.c:59 modules/access/dvdread.c:57
 msgid "DVD angle"
 msgstr "Ángulo DVD"
@@ -5545,42 +5544,6 @@ msgstr "Entrada falsa"
 msgid "File"
 msgstr "Archivo"
 
-#: modules/access_filter/record.c:43
-msgid "Record directory"
-msgstr "Directorio de grabación"
-
-#: modules/access_filter/record.c:45
-#, fuzzy
-msgid "Directory where the record will be stored."
-msgstr "Te permite indicar el directorio donde se almacenará la grabación."
-
-#: modules/access_filter/timeshift.c:44
-#, fuzzy
-msgid "Timeshift granularity"
-msgstr "Granularidad de timeshift"
-
-#: modules/access_filter/timeshift.c:45
-#, fuzzy
-msgid ""
-"This is the size of the temporary files tha will be used to store the "
-"timeshifted streams."
-msgstr "Los filtros de vídeo se usan para postprocesar el volcado de vídeo"
-
-#: modules/access_filter/timeshift.c:47
-#, fuzzy
-msgid "Timeshift directory"
-msgstr "Directorio de timeshift"
-
-#: modules/access_filter/timeshift.c:48
-#, fuzzy
-msgid "Directory used to store the timeshift temporary files."
-msgstr "Directorio usado para almacenar los archivos temporales timeshift."
-
-#: modules/access_filter/timeshift.c:52 modules/access_filter/timeshift.c:53
-#, fuzzy
-msgid "Timeshift"
-msgstr "Timeshift"
-
 #: modules/access/ftp.c:44
 #, fuzzy
 msgid ""
@@ -5728,203 +5691,6 @@ msgstr "Siempre elegir el volcado con la tasa de bits máxima."
 #: modules/access/mms/mms.c:62
 msgid "Microsoft Media Server (MMS) input"
 msgstr "Entrada Microsoft Media Server (MMS)"
-
-#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
-msgid "Dummy stream output"
-msgstr "Salida de volcado dummy"
-
-#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
-msgid "Dummy"
-msgstr "Dummy"
-
-#: modules/access_output/file.c:60
-msgid "Append to file"
-msgstr "Añadir a archivo"
-
-#: modules/access_output/file.c:61
-msgid "Append to file if it exists instead of replacing it."
-msgstr "Añade a archivo si existe, en vez de reemplazarlo."
-
-#: modules/access_output/file.c:65
-msgid "File stream output"
-msgstr "Salida de volcado de archivo"
-
-#: modules/access_output/http.c:60
-msgid "Username"
-msgstr "Nombre de usuario"
-
-#: modules/access_output/http.c:61
-#, fuzzy
-msgid "User name that will be requested to access the stream."
-msgstr ""
-"Te permite dar un nombre de usuario que se pregunta al acceder al volcado."
-
-#: modules/access_output/http.c:64
-#, fuzzy
-msgid "Password that will be requested to access the stream."
-msgstr "Te permite dar una clave que se preguntará al acceder al volcado."
-
-#: modules/access_output/http.c:66
-msgid "Mime"
-msgstr "Mime"
-
-#: modules/access_output/http.c:67
-msgid "MIME returned by the server (autodetected if not specified."
-msgstr ""
-
-#: modules/access_output/http.c:71
-#, fuzzy
-msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
-msgstr ""
-"Ruta del archivo de certificado x509 PEM a usar por la salida de volcado "
-"HTTP/SSL"
-
-#: modules/access_output/http.c:74
-#, fuzzy
-msgid ""
-"Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
-"empty if you don't have one."
-msgstr ""
-"Ruta del archivo de clave privada x509 PEM a usar por la salida de volcado "
-"HTTP/SSL. Dejar vacía si no tienes."
-
-#: modules/access_output/http.c:78
-#, fuzzy
-msgid ""
-"Path to the x509 PEM trusted root CA certificates (certificate authority) "
-"file that will be used forHTTPS. Leave empty if you don't have one."
-msgstr ""
-"Ruta del archivo de certificados raíz confiables CA (autoridad de "
-"certificado) x509 PEM a usar por la salida de volcado HTTP/SSL. Dejar vacía "
-"si no tienes."
-
-#: modules/access_output/http.c:83
-#, fuzzy
-msgid ""
-"Path to the x509 PEM Certificates Revocation List file that will be used for "
-"SSL. Leave empty if you don't have one."
-msgstr ""
-"Ruta del archivo de Lista de Revocación de Certificados x509 PEM a usar por "
-"la salida de volcado HTTP/SSL. Dejar vacía si no tienes."
-
-#: modules/access_output/http.c:86
-msgid "Advertise with Bonjour"
-msgstr "Anunciar con Bonjour"
-
-#: modules/access_output/http.c:87
-#, fuzzy
-msgid "Advertise the stream with the Bonjour protocol."
-msgstr "Anunciar el volcado con el protocolo Bonjour"
-
-#: modules/access_output/http.c:91
-msgid "HTTP stream output"
-msgstr "Salida de volcado HTTP"
-
-#: modules/access_output/http.c:93 modules/control/http/http.c:61
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
-msgid "HTTP"
-msgstr "HTTP"
-
-#: modules/access_output/shout.c:58
-#, fuzzy
-msgid "Stream name"
-msgstr "Volcado-nombre"
-
-#: modules/access_output/shout.c:59
-#, fuzzy
-msgid "Name to give to this stream/channel on the icecast server."
-msgstr "El nombre de este volcado/canal se subirá al servidor icecast."
-
-#: modules/access_output/shout.c:62
-#, fuzzy
-msgid "Stream description"
-msgstr "Volcado-descripción"
-
-#: modules/access_output/shout.c:63
-#, fuzzy
-msgid "Description of the stream content or information about your channel."
-msgstr ""
-"Una descripcción del contenido del volcado. (Información sobre tu canal)."
-
-#: modules/access_output/shout.c:66
-msgid "Stream MP3"
-msgstr "Volcar mp3"
-
-#: modules/access_output/shout.c:67
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:73
-#, fuzzy
-msgid "IceCAST output"
-msgstr "Salida de acceso"
-
-#: modules/access_output/udp.c:75 modules/access/rtsp/access.c:40
-#: modules/demux/livedotcom.cpp:61
-msgid "Caching value (ms)"
-msgstr "Valor de caché (ms)"
-
-#: modules/access_output/udp.c:77
-#, fuzzy
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"Te permite modificar el valor por defecto de caché para volcados UDP. Este "
-"valor debería ponerse en unidades de milisegundo."
-
-#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
-#: modules/gui/macosx/wizard.m:1847
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:1338 modules/stream_out/rtp.c:87
-msgid "Time-To-Live (TTL)"
-msgstr "Tiempo de vida (TTL): "
-
-#: modules/access_output/udp.c:81
-#, fuzzy
-msgid "Time-To-Live of the outgoing stream."
-msgstr "Te permite definir la hora de emisión en directo del volcado saliente."
-
-#: modules/access_output/udp.c:84
-msgid "Group packets"
-msgstr "Agrupar paquetes"
-
-#: modules/access_output/udp.c:85
-#, fuzzy
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"Los paquetes pueden enviarse uno por uno en el momento exacto o por grupos. "
-"Esto permite dar el nÂº de paquetes a enviar en un momento. Ayuda el reducir "
-"la carga de organización sobre sistemas muy cargados."
-
-#: modules/access_output/udp.c:90
-msgid "Raw write"
-msgstr "Escribir raw"
-
-#: modules/access_output/udp.c:91
-#, fuzzy
-msgid ""
-"Packets will be sent directly, without trying to fill the MTU (ie, without "
-"trying to make the biggest possible packets in order to improve streaming)."
-msgstr ""
-"Si habilitas esta opción, los paquetes se enviarán directamente, sin "
-"intentar llenar el MTU (ej., sin intentar hacer los paquetes más grandes "
-"posibles para mejorar el volcado)."
-
-#: modules/access_output/udp.c:97
-msgid "UDP stream output"
-msgstr "Salida de volcado UDP"
-
-#: modules/access_output/udp.c:98
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
-msgid "UDP"
-msgstr "UDP"
 
 #: modules/access/pvr/pvr.c:48
 #, fuzzy
@@ -6102,6 +5868,11 @@ msgstr "PVR"
 #, fuzzy
 msgid "IVTV MPEG Encoding cards input"
 msgstr "Entrada de tarjetas Codificadoras MPEG (con controladores ivtv)"
+
+#: modules/access/rtsp/access.c:40 modules/access_output/udp.c:75
+#: modules/demux/livedotcom.cpp:61
+msgid "Caching value (ms)"
+msgstr "Valor de caché (ms)"
 
 #: modules/access/rtsp/access.c:42
 #, fuzzy
@@ -6588,6 +6359,234 @@ msgstr "Formato a usar en campo \"autor\" de lista de reproducción."
 #: modules/access/vcdx/vcd.c:143
 msgid "Format to use in the playlist's \"title\" field."
 msgstr "Formato a usar en campo \"título\" de lista de reproducción."
+
+#: modules/access_filter/record.c:43
+msgid "Record directory"
+msgstr "Directorio de grabación"
+
+#: modules/access_filter/record.c:45
+#, fuzzy
+msgid "Directory where the record will be stored."
+msgstr "Te permite indicar el directorio donde se almacenará la grabación."
+
+#: modules/access_filter/timeshift.c:44
+#, fuzzy
+msgid "Timeshift granularity"
+msgstr "Granularidad de timeshift"
+
+#: modules/access_filter/timeshift.c:45
+#, fuzzy
+msgid ""
+"This is the size of the temporary files tha will be used to store the "
+"timeshifted streams."
+msgstr "Los filtros de vídeo se usan para postprocesar el volcado de vídeo"
+
+#: modules/access_filter/timeshift.c:47
+#, fuzzy
+msgid "Timeshift directory"
+msgstr "Directorio de timeshift"
+
+#: modules/access_filter/timeshift.c:48
+#, fuzzy
+msgid "Directory used to store the timeshift temporary files."
+msgstr "Directorio usado para almacenar los archivos temporales timeshift."
+
+#: modules/access_filter/timeshift.c:52 modules/access_filter/timeshift.c:53
+#, fuzzy
+msgid "Timeshift"
+msgstr "Timeshift"
+
+#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
+msgid "Dummy stream output"
+msgstr "Salida de volcado dummy"
+
+#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
+msgid "Dummy"
+msgstr "Dummy"
+
+#: modules/access_output/file.c:60
+msgid "Append to file"
+msgstr "Añadir a archivo"
+
+#: modules/access_output/file.c:61
+msgid "Append to file if it exists instead of replacing it."
+msgstr "Añade a archivo si existe, en vez de reemplazarlo."
+
+#: modules/access_output/file.c:65
+msgid "File stream output"
+msgstr "Salida de volcado de archivo"
+
+#: modules/access_output/http.c:60
+msgid "Username"
+msgstr "Nombre de usuario"
+
+#: modules/access_output/http.c:61
+#, fuzzy
+msgid "User name that will be requested to access the stream."
+msgstr ""
+"Te permite dar un nombre de usuario que se pregunta al acceder al volcado."
+
+#: modules/access_output/http.c:64
+#, fuzzy
+msgid "Password that will be requested to access the stream."
+msgstr "Te permite dar una clave que se preguntará al acceder al volcado."
+
+#: modules/access_output/http.c:66
+msgid "Mime"
+msgstr "Mime"
+
+#: modules/access_output/http.c:67
+msgid "MIME returned by the server (autodetected if not specified."
+msgstr ""
+
+#: modules/access_output/http.c:71
+#, fuzzy
+msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
+msgstr ""
+"Ruta del archivo de certificado x509 PEM a usar por la salida de volcado "
+"HTTP/SSL"
+
+#: modules/access_output/http.c:74
+#, fuzzy
+msgid ""
+"Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
+"empty if you don't have one."
+msgstr ""
+"Ruta del archivo de clave privada x509 PEM a usar por la salida de volcado "
+"HTTP/SSL. Dejar vacía si no tienes."
+
+#: modules/access_output/http.c:78
+#, fuzzy
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used forHTTPS. Leave empty if you don't have one."
+msgstr ""
+"Ruta del archivo de certificados raíz confiables CA (autoridad de "
+"certificado) x509 PEM a usar por la salida de volcado HTTP/SSL. Dejar vacía "
+"si no tienes."
+
+#: modules/access_output/http.c:83
+#, fuzzy
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be used for "
+"SSL. Leave empty if you don't have one."
+msgstr ""
+"Ruta del archivo de Lista de Revocación de Certificados x509 PEM a usar por "
+"la salida de volcado HTTP/SSL. Dejar vacía si no tienes."
+
+#: modules/access_output/http.c:86
+msgid "Advertise with Bonjour"
+msgstr "Anunciar con Bonjour"
+
+#: modules/access_output/http.c:87
+#, fuzzy
+msgid "Advertise the stream with the Bonjour protocol."
+msgstr "Anunciar el volcado con el protocolo Bonjour"
+
+#: modules/access_output/http.c:91
+msgid "HTTP stream output"
+msgstr "Salida de volcado HTTP"
+
+#: modules/access_output/http.c:93 modules/control/http/http.c:61
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
+msgid "HTTP"
+msgstr "HTTP"
+
+#: modules/access_output/shout.c:58
+#, fuzzy
+msgid "Stream name"
+msgstr "Volcado-nombre"
+
+#: modules/access_output/shout.c:59
+#, fuzzy
+msgid "Name to give to this stream/channel on the icecast server."
+msgstr "El nombre de este volcado/canal se subirá al servidor icecast."
+
+#: modules/access_output/shout.c:62
+#, fuzzy
+msgid "Stream description"
+msgstr "Volcado-descripción"
+
+#: modules/access_output/shout.c:63
+#, fuzzy
+msgid "Description of the stream content or information about your channel."
+msgstr ""
+"Una descripcción del contenido del volcado. (Información sobre tu canal)."
+
+#: modules/access_output/shout.c:66
+msgid "Stream MP3"
+msgstr "Volcar mp3"
+
+#: modules/access_output/shout.c:67
+msgid ""
+"You normally have to feed the shoutcast module with Ogg streams. It is also "
+"possible to stream MP3 instead, so you can forward MP3 streams to the "
+"icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:73
+#, fuzzy
+msgid "IceCAST output"
+msgstr "Salida de acceso"
+
+#: modules/access_output/udp.c:77
+#, fuzzy
+msgid ""
+"Default caching value for outbound UDP streams. This value should be set in "
+"milliseconds."
+msgstr ""
+"Te permite modificar el valor por defecto de caché para volcados UDP. Este "
+"valor debería ponerse en unidades de milisegundo."
+
+#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
+#: modules/gui/macosx/wizard.m:1847
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:1338 modules/stream_out/rtp.c:87
+msgid "Time-To-Live (TTL)"
+msgstr "Tiempo de vida (TTL): "
+
+#: modules/access_output/udp.c:81
+#, fuzzy
+msgid "Time-To-Live of the outgoing stream."
+msgstr "Te permite definir la hora de emisión en directo del volcado saliente."
+
+#: modules/access_output/udp.c:84
+msgid "Group packets"
+msgstr "Agrupar paquetes"
+
+#: modules/access_output/udp.c:85
+#, fuzzy
+msgid ""
+"Packets can be sent one by one at the right time or by groups. You can "
+"choose the number of packets that will be sent at a time. It helps reducing "
+"the scheduling load on heavily-loaded systems."
+msgstr ""
+"Los paquetes pueden enviarse uno por uno en el momento exacto o por grupos. "
+"Esto permite dar el nÂº de paquetes a enviar en un momento. Ayuda el reducir "
+"la carga de organización sobre sistemas muy cargados."
+
+#: modules/access_output/udp.c:90
+msgid "Raw write"
+msgstr "Escribir raw"
+
+#: modules/access_output/udp.c:91
+#, fuzzy
+msgid ""
+"Packets will be sent directly, without trying to fill the MTU (ie, without "
+"trying to make the biggest possible packets in order to improve streaming)."
+msgstr ""
+"Si habilitas esta opción, los paquetes se enviarán directamente, sin "
+"intentar llenar el MTU (ej., sin intentar hacer los paquetes más grandes "
+"posibles para mejorar el volcado)."
+
+#: modules/access_output/udp.c:97
+msgid "UDP stream output"
+msgstr "Salida de volcado UDP"
+
+#: modules/access_output/udp.c:98
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
+msgid "UDP"
+msgstr "UDP"
 
 #: modules/audio_filter/channel_mixer/dolby.c:47
 #, fuzzy
@@ -10847,9 +10846,10 @@ msgstr "Controles extendidos"
 msgid "Video filters"
 msgstr "Filtros de vídeo"
 
-#: modules/gui/macosx/extended.m:84
-msgid "Adjust Image"
-msgstr "Ajustar Imagen"
+#: modules/gui/macosx/extended.m:84 modules/gui/wxwidgets/extrapanel.cpp:204
+#, fuzzy
+msgid "Image adjustment"
+msgstr "Ajuste de imagen"
 
 #: modules/gui/macosx/extended.m:85 modules/gui/macosx/wizard.m:371
 #: modules/gui/macosx/wizard.m:372 modules/gui/macosx/wizard.m:443
@@ -10865,8 +10865,9 @@ msgstr "Más Info"
 msgid "Blurring"
 msgstr "Borroso"
 
-#: modules/gui/macosx/extended.m:87
-msgid "Creates a motion blurring on the image"
+#: modules/gui/macosx/extended.m:87 modules/gui/wxwidgets/extrapanel.cpp:151
+#, fuzzy
+msgid "Adds motion blurring to the image"
 msgstr "Crea un movimiento borroso en la imagen"
 
 #: modules/gui/macosx/extended.m:88 modules/gui/wxwidgets/extrapanel.cpp:149
@@ -10874,8 +10875,9 @@ msgstr "Crea un movimiento borroso en la imagen"
 msgid "Distortion"
 msgstr "Distorsión"
 
-#: modules/gui/macosx/extended.m:89
-msgid "Adds distorsion effects"
+#: modules/gui/macosx/extended.m:89 modules/gui/wxwidgets/extrapanel.cpp:149
+#, fuzzy
+msgid "Adds distortion effects"
 msgstr "Añade efectos de distorsión"
 
 #: modules/gui/macosx/extended.m:90 modules/gui/wxwidgets/extrapanel.cpp:148
@@ -10900,9 +10902,10 @@ msgstr "Aumenta parte de la imagen"
 msgid "Image inversion"
 msgstr "Inversión de imagen"
 
-#: modules/gui/macosx/extended.m:96
-msgid "Inverts the image colors"
-msgstr "Invierte los colores de la imagen"
+#: modules/gui/macosx/extended.m:96 modules/gui/wxwidgets/extrapanel.cpp:150
+#, fuzzy
+msgid "Inverts the colors of the image"
+msgstr "Crea varios clones de la imagen"
 
 #: modules/gui/macosx/extended.m:97 modules/gui/wxwidgets/extrapanel.cpp:152
 #: modules/video_filter/transform.c:67
@@ -10919,19 +10922,18 @@ msgstr "Normalización de volumen"
 
 #: modules/gui/macosx/extended.m:100
 #, fuzzy
-msgid ""
-"This filters prevents the audio output level from exceeding a defined value."
+msgid "Prevents the audio output from going over a predefined value."
 msgstr ""
-"Estos filtros evitan que la potencia de salida de audio exceda un valor "
+"Este filtro evita que la potencia de salida de audio exceda un valor "
 "definido."
 
 #: modules/gui/macosx/extended.m:102 modules/gui/wxwidgets/extrapanel.cpp:396
 msgid "Headphone virtualization"
 msgstr "Virtualización de auriculares"
 
-#: modules/gui/macosx/extended.m:103
-msgid ""
-"This filter gives the feeling of a 5.1 speaker set when using a headphone."
+#: modules/gui/macosx/extended.m:103 modules/gui/wxwidgets/extrapanel.cpp:397
+#, fuzzy
+msgid "Imitates the effect of surround sound when using headphones."
 msgstr ""
 "Este filtro da la impresión de un conjunto de altavoces 5.1 al usar unos "
 "auriculares."
@@ -10959,9 +10961,9 @@ msgstr "Saturación"
 msgid "Opaqueness"
 msgstr "Opacidad"
 
-#: modules/gui/macosx/extended.m:601
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:506
-msgid "More information"
+#: modules/gui/macosx/extended.m:601 modules/gui/wxwidgets/extrapanel.cpp:1007
+#, fuzzy
+msgid "More Information"
 msgstr "Más información"
 
 #: modules/gui/macosx/extended.m:602
@@ -11093,8 +11095,8 @@ msgid "Extended Controls"
 msgstr "Controles Extendidos"
 
 #: modules/gui/macosx/intf.m:579 modules/gui/macosx/intf.m:610
-#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:371
-#: modules/gui/macosx/playlist.m:484
+#: modules/gui/macosx/playlist.m:484 modules/gui/macosx/playlistinfo.m:55
+#: modules/gui/macosx/playlistinfo.m:371
 #, fuzzy
 msgid "Information"
 msgstr "Transformación"
@@ -11468,6 +11470,72 @@ msgstr "URL de SDP"
 msgid "Save File"
 msgstr "Salvar Archivo"
 
+#: modules/gui/macosx/playlist.m:479
+msgid "Save Playlist..."
+msgstr "Salvar Lista de Reproducción..."
+
+#: modules/gui/macosx/playlist.m:481 modules/gui/pda/pda_interface.c:1254
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:278
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:285
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:104
+msgid "Delete"
+msgstr "Borrar"
+
+#: modules/gui/macosx/playlist.m:482
+msgid "Expand Node"
+msgstr "Expandir Nodo"
+
+#: modules/gui/macosx/playlist.m:485
+#, fuzzy
+msgid "Get Stream Information"
+msgstr "Meta-información"
+
+#: modules/gui/macosx/playlist.m:486
+msgid "Sort Node by Name"
+msgstr "Ordenar Nodo por Nombre"
+
+#: modules/gui/macosx/playlist.m:487
+msgid "Sort Node by Author"
+msgstr "Ordenar Nodo por Autor"
+
+#: modules/gui/macosx/playlist.m:490 modules/gui/macosx/playlist.m:1523
+msgid "No items in the playlist"
+msgstr "Sin objetos en lista de reproducción"
+
+#: modules/gui/macosx/playlist.m:494
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:323
+msgid "Search"
+msgstr "Buscar"
+
+#: modules/gui/macosx/playlist.m:496
+msgid "Search in Playlist"
+msgstr "Buscar en Lista de Reproducción"
+
+#: modules/gui/macosx/playlist.m:497
+msgid "Standard Play"
+msgstr "Reproducción Estándar"
+
+#: modules/gui/macosx/playlist.m:500
+msgid "Add Folder to Playlist"
+msgstr "Añadir Directorio a Lista de Reproducción"
+
+#: modules/gui/macosx/playlist.m:749
+msgid "Save Playlist"
+msgstr "Salvar Lista de Reproducción"
+
+#: modules/gui/macosx/playlist.m:1492
+msgid "Empty Folder"
+msgstr "Directorio Vacío"
+
+#: modules/gui/macosx/playlist.m:1517
+#, c-format
+msgid "%i items in the playlist"
+msgstr "%i objetos en lista de reproducción"
+
+#: modules/gui/macosx/playlist.m:1527
+msgid "1 item in the playlist"
+msgstr "1 objeto en lista de reproducción"
+
 #: modules/gui/macosx/playlistinfo.m:56
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:591
@@ -11542,72 +11610,6 @@ msgstr "Reproducir más rápido"
 #: modules/gui/macosx/playlistinfo.m:99
 msgid "Lost buffers"
 msgstr ""
-
-#: modules/gui/macosx/playlist.m:479
-msgid "Save Playlist..."
-msgstr "Salvar Lista de Reproducción..."
-
-#: modules/gui/macosx/playlist.m:481 modules/gui/pda/pda_interface.c:1254
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:278
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:285
-#: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:104
-msgid "Delete"
-msgstr "Borrar"
-
-#: modules/gui/macosx/playlist.m:482
-msgid "Expand Node"
-msgstr "Expandir Nodo"
-
-#: modules/gui/macosx/playlist.m:485
-#, fuzzy
-msgid "Get Stream Information"
-msgstr "Meta-información"
-
-#: modules/gui/macosx/playlist.m:486
-msgid "Sort Node by Name"
-msgstr "Ordenar Nodo por Nombre"
-
-#: modules/gui/macosx/playlist.m:487
-msgid "Sort Node by Author"
-msgstr "Ordenar Nodo por Autor"
-
-#: modules/gui/macosx/playlist.m:490 modules/gui/macosx/playlist.m:1523
-msgid "No items in the playlist"
-msgstr "Sin objetos en lista de reproducción"
-
-#: modules/gui/macosx/playlist.m:494
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:323
-msgid "Search"
-msgstr "Buscar"
-
-#: modules/gui/macosx/playlist.m:496
-msgid "Search in Playlist"
-msgstr "Buscar en Lista de Reproducción"
-
-#: modules/gui/macosx/playlist.m:497
-msgid "Standard Play"
-msgstr "Reproducción Estándar"
-
-#: modules/gui/macosx/playlist.m:500
-msgid "Add Folder to Playlist"
-msgstr "Añadir Directorio a Lista de Reproducción"
-
-#: modules/gui/macosx/playlist.m:749
-msgid "Save Playlist"
-msgstr "Salvar Lista de Reproducción"
-
-#: modules/gui/macosx/playlist.m:1492
-msgid "Empty Folder"
-msgstr "Directorio Vacío"
-
-#: modules/gui/macosx/playlist.m:1517
-#, c-format
-msgid "%i items in the playlist"
-msgstr "%i objetos en lista de reproducción"
-
-#: modules/gui/macosx/playlist.m:1527
-msgid "1 item in the playlist"
-msgstr "1 objeto en lista de reproducción"
 
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:212
@@ -12195,7 +12197,7 @@ msgid "UDP Multicast"
 msgstr "Multiemisión UDP"
 
 #: modules/gui/macosx/wizard.m:417 modules/gui/pda/pda_interface.c:1221
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:124
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:125
 #: modules/stream_out/transcode.c:186
 msgid "Transcode"
 msgstr "Transcodificar"
@@ -13147,7 +13149,8 @@ msgid "Input has changed "
 msgstr "La entrada ha cambiado"
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
-msgid "Stream and media info"
+#, fuzzy
+msgid "Stream and Media Info"
 msgstr "Info de volcado y medios"
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:83
@@ -13155,8 +13158,9 @@ msgid "Advanced information"
 msgstr "Información avanzada"
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:116
+#, fuzzy
 msgid ""
-"The following errors happened. More details might be available in the "
+"The following errors occurred. More details might be available in the "
 "Messages window."
 msgstr ""
 "Ocurrieron los siguientes errores. Puede haber más detalles en la ventana de "
@@ -13199,7 +13203,8 @@ msgid "Stream/Save"
 msgstr "Volcado/Salvar"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:431
-msgid "Use VLC as a server of streams"
+#, fuzzy
+msgid "Use VLC as a stream server"
 msgstr "Usar VLC como servidor de volcados"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:457
@@ -13313,10 +13318,11 @@ msgid "Title number."
 msgstr "Título Nº."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1669
+#, fuzzy
 msgid ""
 "DVD's can have up to 32 subtitles numbered 0..31. Note this is not the same "
-"thing as a subtitle name e.g. 'en'. If a value -1 is used, no subtitle will "
-"be shown."
+"thing as a subtitle name (e.g. 'en'). If a value -1 is used, no subtitle "
+"will be shown."
 msgstr ""
 "Los DVDs pueden tener hasta 32 subtítulos numerados 0..31. Nótese que no es "
 "lo mismo que nombre de subtítulo p.ej. 'en'. Si se usa valor -1, no se "
@@ -13385,6 +13391,11 @@ msgstr "Añadir &Directorio..."
 msgid "&Add URL..."
 msgstr "&Añadir MRL..."
 
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:240
+#, fuzzy
+msgid "Services Discovery"
+msgstr "Servicios discovery"
+
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:243
 msgid "&Open Playlist..."
 msgstr "Abrir Lista de Repr&oducción..."
@@ -13398,11 +13409,13 @@ msgid "&Close"
 msgstr "&Cerrar"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:250
-msgid "Sort by &title"
+#, fuzzy
+msgid "Sort by &Title"
 msgstr "Ordenar por &título"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:251
-msgid "&Reverse sort by title"
+#, fuzzy
+msgid "&Reverse Sort by Title"
 msgstr "Inverti&r orden por título"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:253
@@ -13431,7 +13444,8 @@ msgid "&View items"
 msgstr "&Ver objetos"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:275
-msgid "Play this branch"
+#, fuzzy
+msgid "Play this Branch"
 msgstr "Reproducir esta rama"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:276
@@ -13440,7 +13454,8 @@ msgid "Preparse"
 msgstr "Preanalizar"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:277
-msgid "Sort this branch"
+#, fuzzy
+msgid "Sort this Branch"
 msgstr "Ordenar esta rama"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:279
@@ -13449,9 +13464,8 @@ msgid "Info"
 msgstr "Info"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:280
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
 #, fuzzy
-msgid "Add node"
+msgid "Add Node"
 msgstr "Codificador de audio"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:358
@@ -13496,7 +13510,8 @@ msgid "Normal"
 msgstr "Normal"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
-msgid "Sorted by artist"
+#, fuzzy
+msgid "Sorted by Artist"
 msgstr "Ordenado por artista"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1419
@@ -13506,6 +13521,11 @@ msgstr "Ordenado por Álbum"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1624
 msgid "Please enter node name"
 msgstr ""
+
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
+#, fuzzy
+msgid "Add node"
+msgstr "Codificador de audio"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
 #, fuzzy
@@ -13544,8 +13564,8 @@ msgstr "Mays"
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:433
 #, fuzzy
 msgid ""
-"Select which modules you want to use. To get more advanced control, you can "
-"also modify the resulting \"chain\" by yourself"
+"Select the desired modules. For more advanced control, the resulting \"chain"
+"\" can be modified."
 msgstr ""
 "Elige módulos que desees. Para tener control más avanzado, también puedes "
 "modificar la cadena resultante"
@@ -13560,17 +13580,10 @@ msgid "Target:"
 msgstr "Abrir Objetivo:"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:174
-#, fuzzy
 msgid ""
-"You can use this field directly by typing the full MRL you want to stream "
-"to.\n"
-"Alternatively, the field will be filled automatically when you use the "
-"controls below"
+"Specifies the MRL. This can be specified directly or filled in automatically "
+"by adjusting the stream settings."
 msgstr ""
-"Puedes usar este campo directamente escribiendo toda la MRL que deseas "
-"abrir.\n"
-"Alternativamente, el campo se llenará automáticamente al usar los controles "
-"de abajo."
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:462
 #, fuzzy
@@ -13664,7 +13677,7 @@ msgstr "Buscar Actualización"
 #, fuzzy
 msgid ""
 "\n"
-"Available updates and related downloads\n"
+"Available updates and related downloads.\n"
 "(Double click on a file to download it)\n"
 msgstr ""
 "\n"
@@ -13684,11 +13697,13 @@ msgid "Load"
 msgstr "Cargar"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:219
-msgid "Load configuration"
+#, fuzzy
+msgid "Load Configuration"
 msgstr "Cargar configuración"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:233
-msgid "Save configuration"
+#, fuzzy
+msgid "Save Configuration"
 msgstr "Salvar configuración"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:249
@@ -13697,7 +13712,7 @@ msgstr "Nueva retransmisión"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:385
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:396
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:121
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:122
 msgid "Choose"
 msgstr "Elige"
 
@@ -13732,9 +13747,8 @@ msgstr "Use esto para re-codificar un volcado y salvarlo a un archivo."
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:93
 #, fuzzy
 msgid ""
-"This wizard only gives access to a small subset of VLC's streaming and "
-"transcoding capabilities. Use the Open and Stream Output dialogs to get all "
-"of them."
+"This wizard only contains a small subset of VLC's streaming and transcoding "
+"capabilities. Use the Open and Stream Output dialogs to access all of them."
 msgstr ""
 "Este asistente sólo da acceso a un pequeño subconjunto de capacidades de "
 "volcado y transcodificado de VLC. Usa los diálogos Abrir y Salida de Volcado "
@@ -13747,10 +13761,11 @@ msgstr "Use esto para volcar a una red"
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:99
 #, fuzzy
 msgid ""
-"Use this to save a stream to a file. You have the ability to reencode the "
-"stream. You can save whatever VLC can read.\n"
-"Please notice that VLC is not very suited for file to file transcoding. You "
-"should use its transcoding features to save network streams, for example."
+"Saves the stream to a file. The stream must be a format that VLC recognizes. "
+"If desired, the stream can also be transcoded to another format.\n"
+"\n"
+"Please note that VLC is not very suited for file-to-file transcoding. Its "
+"transcoding features are more appropriate for saving network streams."
 msgstr ""
 "Use esto para salvar un volcado a un archivo. Tiene la posibilidad de "
 "recodificar el volcado. Puede salvar cualquier cosa que pueda leer VLC.\n"
@@ -13763,52 +13778,61 @@ msgid "You must choose a stream"
 msgstr "Debes elegir un volcado"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:113
-msgid "Uh Oh! Unable to find playlist !"
+#, fuzzy
+msgid "Unable to find playlist"
 msgstr "¡Oh-oh! ¡ Incapaz de hallar lista de reproducción !"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:115
+#, fuzzy
 msgid ""
-"Use this to read only a part of the stream. You must be able to control the "
-"incoming stream (for example, a file or a disc, but not a RTP/UDP network "
-"stream.)\n"
-"Enter the starting and ending times (in seconds)."
+"Use this to read only a part of the stream. To use, enter the starting and "
+"ending times (in seconds).\n"
+"\n"
+"Note: You must be able to control the incoming stream (for example, a file "
+"or a disc, but not a RTP/UDP network stream).\n"
 msgstr ""
 "Use esto para leer sólo una parte del volcado. Debe ser capaz de controlar "
 "el volcado entrante (p.ej, un archivo o un disco, pero no un volcado de red "
 "RTP/UDP.)\n"
 "Ponga los tiempos inicial y final (en segundos)."
 
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:125
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:126
 #, fuzzy
 msgid ""
-"If you want to change the compression format of the audio or video tracks, "
-"fill in this page. (If you only want to change the container format, proceed "
-"to next  page.)"
+"Changes the compression format of the audio or video tracks. To change only "
+"the container format, proceed to the next page."
 msgstr ""
 "Si deseas cambiar el formato de compresión de las pistas de audio o vídeo, "
 "rellena esta página. (Si sólo deseas cambiar el formato contenedor, ve a la "
 "página siguiente)."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:130
-msgid "Transcode video (if your stream has some)"
-msgstr ""
+#, fuzzy
+msgid "Transcode video (if available)"
+msgstr "Transcodificar vídeo"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:131
 #, fuzzy
-msgid "Select the target video codec. Click one to get more information."
+msgid ""
+"Select the target video codec. Choose a codec to display more information "
+"about it."
 msgstr "Elija códec de vídeo. Pulse uno para obtener más información."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:134
-msgid "Transcode audio (if your stream has some)"
-msgstr ""
+#, fuzzy
+msgid "Transcode audio (if available)"
+msgstr "Audio de transcodificación"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
 #, fuzzy
-msgid "Select the target audio codec. Click one to get more information."
+msgid ""
+"Select the target audio codec. Choose a codec to display more information "
+"about it."
 msgstr "Elija códec de audio. Pulse uno para obtener más información."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:140
-msgid "In this page, you will select how your input stream will be sent."
+#, fuzzy
+msgid "Determines how the input stream will be sent."
 msgstr "En esta página, elegirás cómo se enviará tu volcado de entrada."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:143
@@ -13816,32 +13840,33 @@ msgid "This does not appear to be a valid multicast address"
 msgstr "Ésta no parece ser una dirección multiemisión válida"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:145
-msgid "You need to enter an address"
+#, fuzzy
+msgid "Please enter an address"
 msgstr "Necesita poner una dirección"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:149
+#, fuzzy
 msgid ""
-"In this page, you will select how the stream will be encapsulated. Depending "
-"on the choices you made, all formats won't be available."
+"Determines how the stream will be encapsulated. Depending on the previous "
+"choices, some formats might not be available."
 msgstr ""
 "En esta página, elegirás cómo se enapsulará el volcado. Dependiendo de las "
 "elecciones que hagas, no serán disponibles todos los formatos."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:156
-msgid ""
-"In this page, you will define a few additionnal parameters for your "
-"transcoding"
+#, fuzzy
+msgid "Defines a few additional parameters for the transcoding."
 msgstr ""
-"En esta página, definirá algunos parámetros adicionales para su "
-"transcodificación"
+"En esta página, se definirán algunos parámetros adicionales para tu "
+"transcodificación."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:159
 msgid "You must choose a file to save to"
 msgstr "Debes elegir un archivo al que salvar"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:163
-msgid ""
-"In this page, you will define a few additionnal parameters for your stream"
+#, fuzzy
+msgid "Defines a few additional parameters for the stream."
 msgstr ""
 "En esta página, definirá algunos parámetros adicionales para su volcado"
 
@@ -13864,8 +13889,8 @@ msgid ""
 "announcing protocol. This way, the clients won't have to type in the "
 "multicast address, it will appear in their playlist if they enable the SAP "
 "extra interface.\n"
-"If you want to give a name to your stream, enter it here, else, a default "
-"name will be used"
+"If you want to give a name to your stream, enter it here. Otherwise, a "
+"default name will be used."
 msgstr ""
 "Al volcar usando UDP, puedes anunciar tus volcados usando el protocolo SAP/"
 "SDP. De este modo, los clientes no tendrán que escribir en la dirección "
@@ -13873,6 +13898,10 @@ msgstr ""
 "interfaz extra SAP.\n"
 "Si deseas dar un nombre a tu volcado, ponlo aquí, si no, se usará un nombre "
 "por defecto"
+
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:506
+msgid "More information"
+msgstr "Más información"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1289
 msgid "Save to file"
@@ -13891,21 +13920,6 @@ msgstr ""
 msgid "Creates several clones of the image"
 msgstr "Crea varios clones de la imagen"
 
-#: modules/gui/wxwidgets/extrapanel.cpp:149
-#, fuzzy
-msgid "Adds distortion effects"
-msgstr "Añade efectos de distorsión"
-
-#: modules/gui/wxwidgets/extrapanel.cpp:150
-#, fuzzy
-msgid "Inverts the colors of the image"
-msgstr "Crea varios clones de la imagen"
-
-#: modules/gui/wxwidgets/extrapanel.cpp:151
-#, fuzzy
-msgid "Adds motion blurring to the image"
-msgstr "Crea un movimiento borroso en la imagen"
-
 #: modules/gui/wxwidgets/extrapanel.cpp:153 modules/video_filter/magnify.c:60
 msgid "Magnify"
 msgstr "Magnificar"
@@ -13914,11 +13928,6 @@ msgstr "Magnificar"
 msgid "Magnifies part of the image"
 msgstr "Aumenta parte de la imagen"
 
-#: modules/gui/wxwidgets/extrapanel.cpp:204
-#, fuzzy
-msgid "Image adjustment"
-msgstr "Ajuste de imagen"
-
 #: modules/gui/wxwidgets/extrapanel.cpp:270
 msgid "Video Options"
 msgstr "Opciones de Vídeo"
@@ -13926,13 +13935,6 @@ msgstr "Opciones de Vídeo"
 #: modules/gui/wxwidgets/extrapanel.cpp:284
 msgid "Aspect Ratio"
 msgstr "Proporción de Aspecto"
-
-#: modules/gui/wxwidgets/extrapanel.cpp:397
-#, fuzzy
-msgid "Imitates the effect of surround sound when using headphones."
-msgstr ""
-"Este filtro da la impresión de un conjunto de altavoces 5.1 al usar unos "
-"auriculares."
 
 #: modules/gui/wxwidgets/extrapanel.cpp:402
 #, fuzzy
@@ -13974,11 +13976,6 @@ msgstr ""
 "Si deseas un buen control sobre los filtros ( para elegir el orden en el que "
 "se aplican ), necesitas introducir manualmente una cadena de filtros "
 "(Preferencias / General / Vídeo)."
-
-#: modules/gui/wxwidgets/extrapanel.cpp:1007
-#, fuzzy
-msgid "More Information"
-msgstr "Más información"
 
 #: modules/gui/wxwidgets/input_manager.cpp:180
 msgid "Stopped"
@@ -14045,7 +14042,8 @@ msgid "&Messages...\tCtrl-M"
 msgstr "&Mensajes...\tCtrl-M"
 
 #: modules/gui/wxwidgets/interface.cpp:593
-msgid "Stream and Media &info...\tCtrl-I"
+#, fuzzy
+msgid "Stream and Media &Info...\tCtrl-I"
 msgstr "&Info de Volcado y Medios...\tCtrl-I"
 
 #: modules/gui/wxwidgets/interface.cpp:595
@@ -14059,8 +14057,8 @@ msgstr "_Acerca de..."
 
 #: modules/gui/wxwidgets/interface.cpp:607
 #, fuzzy
-msgid "Check for updates..."
-msgstr "Buscando actualizaciones ..."
+msgid "Check for Updates..."
+msgstr "Buscar Actualización..."
 
 #: modules/gui/wxwidgets/interface.cpp:611
 msgid "&File"
@@ -14149,7 +14147,8 @@ msgid "About %s"
 msgstr "Acerca de %s"
 
 #: modules/gui/wxwidgets/interface.cpp:1496
-msgid "Show/Hide interface"
+#, fuzzy
+msgid "Show/Hide Interface"
 msgstr "Mostrar/Ocultar interfaz"
 
 #: modules/gui/wxwidgets/menus.cpp:132
@@ -14249,17 +14248,18 @@ msgstr "Multiemisión RTP"
 msgid ""
 "Stream to a dynamic group of computers on a multicast-enabled network. This "
 "is the most efficient method to stream to several computers, but it does not "
-"work over Internet."
+"work over the Internet."
 msgstr ""
 "Usa esto para volcar a un grupo dinámico de PCs en una red habilitada para "
 "multiemisión. Este es el método más eficiente para volcar a varios PCs, per "
 "no funciona en Internet."
 
 #: modules/gui/wxwidgets/streamdata.cpp:129
+#, fuzzy
 msgid ""
-"Enter the multicast address to stream to in this field. This must be an IP "
-"address between 224.0.0.0 an 239.255.255.255. For a private use, enter an "
-"address beginning with 239.255."
+"Enter the multicast address to stream to. This must be an IP address between "
+"224.0.0.0 an 239.255.255.255. For private use, enter an address beginning "
+"with 239.255."
 msgstr ""
 "Ponga en este campo la dirección multiemisión a la que volcar. Debe ser una "
 "dirección IP entre 224.0.0.0 y 239.255.255.255 Para un uso privado, ponga "
@@ -14363,7 +14363,7 @@ msgstr "Lista de reproducción"
 msgid ""
 "There are two possible playlist views in the interface : the normal playlist "
 "(separate window), or an embedded playlist (within the main interface, but "
-"with less features. You can select which one will be available on the "
+"with less features). You can select which one will be available on the "
 "toolbar (or both)."
 msgstr ""
 
@@ -14753,10 +14753,6 @@ msgstr "Archivo de salida RRD"
 msgid "Output data for RRDTool in this file."
 msgstr "Datos de salida para RRDTool en este archivo"
 
-#: modules/misc/memcpy/memcpyaltivec.c:56
-msgid "AltiVec memcpy"
-msgstr "AltiVec memcpy"
-
 #: modules/misc/memcpy/memcpy.c:83
 msgid "libc memcpy"
 msgstr "libc memcpy"
@@ -14772,6 +14768,10 @@ msgstr "MMX memcpy"
 #: modules/misc/memcpy/memcpy.c:99
 msgid "MMX EXT memcpy"
 msgstr "MMX EXT memcpy"
+
+#: modules/misc/memcpy/memcpyaltivec.c:56
+msgid "AltiVec memcpy"
+msgstr "AltiVec memcpy"
 
 #: modules/misc/msn.c:63
 msgid "MSN Title format string"
@@ -17871,6 +17871,89 @@ msgstr "Fuente usada para mostrar texto en la salida xosd"
 msgid "XOSD interface"
 msgstr "Interfaz XOSD"
 
+#~ msgid "Adjust Image"
+#~ msgstr "Ajustar Imagen"
+
+#~ msgid "Creates a motion blurring on the image"
+#~ msgstr "Crea un movimiento borroso en la imagen"
+
+#~ msgid "Adds distorsion effects"
+#~ msgstr "Añade efectos de distorsión"
+
+#~ msgid "Inverts the image colors"
+#~ msgstr "Invierte los colores de la imagen"
+
+#, fuzzy
+#~ msgid ""
+#~ "This filters prevents the audio output level from exceeding a defined "
+#~ "value."
+#~ msgstr ""
+#~ "Estos filtros evitan que la potencia de salida de audio exceda un valor "
+#~ "definido."
+
+#~ msgid ""
+#~ "This filter gives the feeling of a 5.1 speaker set when using a headphone."
+#~ msgstr ""
+#~ "Este filtro da la impresión de un conjunto de altavoces 5.1 al usar unos "
+#~ "auriculares."
+
+#, fuzzy
+#~ msgid ""
+#~ "You can use this field directly by typing the full MRL you want to stream "
+#~ "to.\n"
+#~ "Alternatively, the field will be filled automatically when you use the "
+#~ "controls below"
+#~ msgstr ""
+#~ "Puedes usar este campo directamente escribiendo toda la MRL que deseas "
+#~ "abrir.\n"
+#~ "Alternativamente, el campo se llenará automáticamente al usar los "
+#~ "controles de abajo."
+
+#, fuzzy
+#~ msgid ""
+#~ "Use this to save a stream to a file. You have the ability to reencode the "
+#~ "stream. You can save whatever VLC can read.\n"
+#~ "Please notice that VLC is not very suited for file to file transcoding. "
+#~ "You should use its transcoding features to save network streams, for "
+#~ "example."
+#~ msgstr ""
+#~ "Use esto para salvar un volcado a un archivo. Tiene la posibilidad de "
+#~ "recodificar el volcado. Puede salvar cualquier cosa que pueda leer VLC.\n"
+#~ "Por favor nótese que VLC no es muy conveniente para transcodificar de "
+#~ "archivo a archivo. Debería usar sus capacidades transcodificadoras para "
+#~ "guardar volcados de red, por ejemplo."
+
+#, fuzzy
+#~ msgid ""
+#~ "If you want to change the compression format of the audio or video "
+#~ "tracks, fill in this page. (If you only want to change the container "
+#~ "format, proceed to next  page.)"
+#~ msgstr ""
+#~ "Si deseas cambiar el formato de compresión de las pistas de audio o "
+#~ "vídeo, rellena esta página. (Si sólo deseas cambiar el formato "
+#~ "contenedor, ve a la página siguiente)."
+
+#~ msgid "In this page, you will select how your input stream will be sent."
+#~ msgstr "En esta página, elegirás cómo se enviará tu volcado de entrada."
+
+#~ msgid ""
+#~ "In this page, you will select how the stream will be encapsulated. "
+#~ "Depending on the choices you made, all formats won't be available."
+#~ msgstr ""
+#~ "En esta página, elegirás cómo se enapsulará el volcado. Dependiendo de "
+#~ "las elecciones que hagas, no serán disponibles todos los formatos."
+
+#~ msgid ""
+#~ "In this page, you will define a few additionnal parameters for your "
+#~ "transcoding"
+#~ msgstr ""
+#~ "En esta página, definirá algunos parámetros adicionales para su "
+#~ "transcodificación"
+
+#, fuzzy
+#~ msgid "Check for updates..."
+#~ msgstr "Buscando actualizaciones ..."
+
 #~ msgid "delay"
 #~ msgstr "retraso"
 
@@ -18328,13 +18411,6 @@ msgstr "Interfaz XOSD"
 
 #~ msgid "If your stream has video and you want to transcode it, enable this."
 #~ msgstr "Si el volcado tiene vídeo y desea transcodificarlo, habilite ésto."
-
-#~ msgid ""
-#~ "In this page, you will define a few additional parameters for your "
-#~ "transcoding."
-#~ msgstr ""
-#~ "En esta página, se definirán algunos parámetros adicionales para tu "
-#~ "transcodificación."
 
 #~ msgid ""
 #~ "Note that your input files will keep their original names when being "

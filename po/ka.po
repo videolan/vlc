@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-01 22:54+0100\n"
+"POT-Creation-Date: 2006-04-02 13:53+0200\n"
 "PO-Revision-Date: 2006-03-11 18:01+0100\n"
 "Last-Translator: Alexander Didebulidze <didebuli@in.tum.de>\n"
 "Language-Team: Georgian <gnome@inet.ge>\n"
@@ -17,6 +17,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "X-Generator: KBabel 1.11.2\n"
+
+#: include/vlc/vlc.h:578
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute it under the terms of the GNU General Public License;\n"
+"see the file named COPYING for details.\n"
+"Written by the VideoLAN team; see the AUTHORS file.\n"
+msgstr ""
 
 #: include/vlc_config_cat.h:32
 msgid "VLC preferences"
@@ -340,7 +348,6 @@ msgid "General playlist behaviour"
 msgstr "დასაკრავი სიის ზოდადი ქცევა"
 
 #: include/vlc_config_cat.h:188 modules/gui/macosx/playlist.m:488
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:240
 #, fuzzy
 msgid "Services discovery"
 msgstr "სერვისების აღმოჩენა"
@@ -446,9 +453,9 @@ msgid ""
 "to the directory where you installed VLC and run \"vlc -I wx\"\n"
 msgstr ""
 
-#: include/vlc_meta.h:28 modules/gui/macosx/playlistinfo.m:205
-#: modules/gui/macosx/playlistinfo.m:310 modules/gui/macosx/playlist.m:317
-#: modules/gui/macosx/playlist.m:1229 modules/misc/growl.c:161
+#: include/vlc_meta.h:28 modules/gui/macosx/playlist.m:317
+#: modules/gui/macosx/playlist.m:1229 modules/gui/macosx/playlistinfo.m:205
+#: modules/gui/macosx/playlistinfo.m:310 modules/misc/growl.c:161
 #: modules/misc/growl.c:164
 msgid "Meta-information"
 msgstr "Meta-ინფორმაცია"
@@ -462,15 +469,15 @@ msgstr "Meta-ინფორმაცია"
 msgid "Title"
 msgstr "სათაური"
 
-#: include/vlc_meta.h:30 modules/gui/macosx/playlistinfo.m:58
-#: modules/gui/macosx/playlist.m:134 modules/gui/macosx/wizard.m:393
+#: include/vlc_meta.h:30 modules/gui/macosx/playlist.m:134
+#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/wizard.m:393
 #: modules/gui/wince/playlist.cpp:674 modules/mux/asf.c:50
 msgid "Author"
 msgstr "ავტორი"
 
-#: include/vlc_meta.h:31 modules/gui/macosx/playlistinfo.m:205
-#: modules/gui/macosx/playlistinfo.m:310 modules/gui/macosx/playlist.m:317
-#: modules/gui/macosx/playlist.m:1229
+#: include/vlc_meta.h:31 modules/gui/macosx/playlist.m:317
+#: modules/gui/macosx/playlist.m:1229 modules/gui/macosx/playlistinfo.m:205
+#: modules/gui/macosx/playlistinfo.m:310
 msgid "Artist"
 msgstr "შემსრულებელი"
 
@@ -613,14 +620,6 @@ msgstr "კოდეკის სახელი"
 #: include/vlc_meta.h:69
 msgid "Codec Description"
 msgstr "კოდეკის აღწერილობა"
-
-#: include/vlc/vlc.h:578
-msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute it under the terms of the GNU General Public License;\n"
-"see the file named COPYING for details.\n"
-"Written by the VideoLAN team; see the AUTHORS file.\n"
-msgstr ""
 
 #: src/audio_output/input.c:80 src/audio_output/input.c:126
 #: src/input/es_out.c:361 src/libvlc.h:380 src/video_output/video_output.c:379
@@ -4081,7 +4080,7 @@ msgid "Aspect-ratio"
 msgstr "გვერდების შეფარდება"
 
 #: modules/access/cdda.c:52 modules/access/dshow/dshow.cpp:79
-#: modules/access/dvb/access.c:71 modules/access/dv.c:68
+#: modules/access/dv.c:68 modules/access/dvb/access.c:71
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:61
 #: modules/access/fake.c:40 modules/access/file.c:80 modules/access/ftp.c:42
 #: modules/access/gnomevfs.c:44 modules/access/http.c:53
@@ -4599,6 +4598,18 @@ msgstr "სიის განახლება"
 msgid "Configure"
 msgstr "კონფიგურირება"
 
+#: modules/access/dv.c:70
+msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
+msgstr ""
+
+#: modules/access/dv.c:74
+msgid "Digital Video (Firewire/ieee1394)  input"
+msgstr ""
+
+#: modules/access/dv.c:75
+msgid "dv"
+msgstr ""
+
 #: modules/access/dvb/access.c:73
 msgid ""
 "Caching value for DVB streams. This value should be set in milliseconds."
@@ -4831,18 +4842,6 @@ msgstr ""
 msgid "HTTP server"
 msgstr "HTTP სერვერი"
 
-#: modules/access/dv.c:70
-msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
-msgstr ""
-
-#: modules/access/dv.c:74
-msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr ""
-
-#: modules/access/dv.c:75
-msgid "dv"
-msgstr ""
-
 #: modules/access/dvdnav.c:59 modules/access/dvdread.c:57
 msgid "DVD angle"
 msgstr "DVD კუთხე"
@@ -4984,36 +4983,6 @@ msgstr "FTP შესავალი"
 msgid "File"
 msgstr "ფაილი"
 
-#: modules/access_filter/record.c:43
-msgid "Record directory"
-msgstr ""
-
-#: modules/access_filter/record.c:45
-msgid "Directory where the record will be stored."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:44
-msgid "Timeshift granularity"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:45
-msgid ""
-"This is the size of the temporary files tha will be used to store the "
-"timeshifted streams."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:47
-msgid "Timeshift directory"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:48
-msgid "Directory used to store the timeshift temporary files."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:52 modules/access_filter/timeshift.c:53
-msgid "Timeshift"
-msgstr ""
-
 #: modules/access/ftp.c:44
 msgid ""
 "Caching value for FTP streams. This value should be set in milliseconds."
@@ -5140,172 +5109,6 @@ msgstr ""
 #: modules/access/mms/mms.c:62
 msgid "Microsoft Media Server (MMS) input"
 msgstr ""
-
-#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
-msgid "Dummy stream output"
-msgstr ""
-
-#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
-msgid "Dummy"
-msgstr "ფიქტიური"
-
-#: modules/access_output/file.c:60
-msgid "Append to file"
-msgstr ""
-
-#: modules/access_output/file.c:61
-msgid "Append to file if it exists instead of replacing it."
-msgstr ""
-
-#: modules/access_output/file.c:65
-msgid "File stream output"
-msgstr ""
-
-#: modules/access_output/http.c:60
-msgid "Username"
-msgstr "მომხმარებლის სახელი"
-
-#: modules/access_output/http.c:61
-msgid "User name that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:64
-msgid "Password that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:66
-msgid "Mime"
-msgstr ""
-
-#: modules/access_output/http.c:67
-msgid "MIME returned by the server (autodetected if not specified."
-msgstr ""
-
-#: modules/access_output/http.c:71
-msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
-msgstr ""
-
-#: modules/access_output/http.c:74
-msgid ""
-"Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
-"empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:78
-msgid ""
-"Path to the x509 PEM trusted root CA certificates (certificate authority) "
-"file that will be used forHTTPS. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:83
-msgid ""
-"Path to the x509 PEM Certificates Revocation List file that will be used for "
-"SSL. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:86
-msgid "Advertise with Bonjour"
-msgstr ""
-
-#: modules/access_output/http.c:87
-msgid "Advertise the stream with the Bonjour protocol."
-msgstr ""
-
-#: modules/access_output/http.c:91
-msgid "HTTP stream output"
-msgstr ""
-
-#: modules/access_output/http.c:93 modules/control/http/http.c:61
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
-msgid "HTTP"
-msgstr "HTTP"
-
-#: modules/access_output/shout.c:58
-#, fuzzy
-msgid "Stream name"
-msgstr "ნაკადი/შენახვა"
-
-#: modules/access_output/shout.c:59
-msgid "Name to give to this stream/channel on the icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:62
-#, fuzzy
-msgid "Stream description"
-msgstr "სესიის აღწერა"
-
-#: modules/access_output/shout.c:63
-msgid "Description of the stream content or information about your channel."
-msgstr ""
-
-#: modules/access_output/shout.c:66
-msgid "Stream MP3"
-msgstr ""
-
-#: modules/access_output/shout.c:67
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:73
-#, fuzzy
-msgid "IceCAST output"
-msgstr "დამატებითი ოფციები"
-
-#: modules/access_output/udp.c:75 modules/access/rtsp/access.c:40
-#: modules/demux/livedotcom.cpp:61
-msgid "Caching value (ms)"
-msgstr ""
-
-#: modules/access_output/udp.c:77
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-
-#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
-#: modules/gui/macosx/wizard.m:1847
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:1338 modules/stream_out/rtp.c:87
-#, fuzzy
-msgid "Time-To-Live (TTL)"
-msgstr "დრო ვის TTL"
-
-#: modules/access_output/udp.c:81
-msgid "Time-To-Live of the outgoing stream."
-msgstr ""
-
-#: modules/access_output/udp.c:84
-msgid "Group packets"
-msgstr ""
-
-#: modules/access_output/udp.c:85
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-
-#: modules/access_output/udp.c:90
-msgid "Raw write"
-msgstr ""
-
-#: modules/access_output/udp.c:91
-msgid ""
-"Packets will be sent directly, without trying to fill the MTU (ie, without "
-"trying to make the biggest possible packets in order to improve streaming)."
-msgstr ""
-
-#: modules/access_output/udp.c:97
-msgid "UDP stream output"
-msgstr ""
-
-#: modules/access_output/udp.c:98
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
-msgid "UDP"
-msgstr "UDP"
 
 #: modules/access/pvr/pvr.c:48
 msgid ""
@@ -5463,6 +5266,11 @@ msgstr ""
 
 #: modules/access/pvr/pvr.c:115
 msgid "IVTV MPEG Encoding cards input"
+msgstr ""
+
+#: modules/access/rtsp/access.c:40 modules/access_output/udp.c:75
+#: modules/demux/livedotcom.cpp:61
+msgid "Caching value (ms)"
 msgstr ""
 
 #: modules/access/rtsp/access.c:42
@@ -5897,6 +5705,197 @@ msgstr ""
 #: modules/access/vcdx/vcd.c:143
 msgid "Format to use in the playlist's \"title\" field."
 msgstr ""
+
+#: modules/access_filter/record.c:43
+msgid "Record directory"
+msgstr ""
+
+#: modules/access_filter/record.c:45
+msgid "Directory where the record will be stored."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:44
+msgid "Timeshift granularity"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:45
+msgid ""
+"This is the size of the temporary files tha will be used to store the "
+"timeshifted streams."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:47
+msgid "Timeshift directory"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:48
+msgid "Directory used to store the timeshift temporary files."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:52 modules/access_filter/timeshift.c:53
+msgid "Timeshift"
+msgstr ""
+
+#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
+msgid "Dummy stream output"
+msgstr ""
+
+#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
+msgid "Dummy"
+msgstr "ფიქტიური"
+
+#: modules/access_output/file.c:60
+msgid "Append to file"
+msgstr ""
+
+#: modules/access_output/file.c:61
+msgid "Append to file if it exists instead of replacing it."
+msgstr ""
+
+#: modules/access_output/file.c:65
+msgid "File stream output"
+msgstr ""
+
+#: modules/access_output/http.c:60
+msgid "Username"
+msgstr "მომხმარებლის სახელი"
+
+#: modules/access_output/http.c:61
+msgid "User name that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:64
+msgid "Password that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:66
+msgid "Mime"
+msgstr ""
+
+#: modules/access_output/http.c:67
+msgid "MIME returned by the server (autodetected if not specified."
+msgstr ""
+
+#: modules/access_output/http.c:71
+msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
+msgstr ""
+
+#: modules/access_output/http.c:74
+msgid ""
+"Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
+"empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:78
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used forHTTPS. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:83
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be used for "
+"SSL. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:86
+msgid "Advertise with Bonjour"
+msgstr ""
+
+#: modules/access_output/http.c:87
+msgid "Advertise the stream with the Bonjour protocol."
+msgstr ""
+
+#: modules/access_output/http.c:91
+msgid "HTTP stream output"
+msgstr ""
+
+#: modules/access_output/http.c:93 modules/control/http/http.c:61
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
+msgid "HTTP"
+msgstr "HTTP"
+
+#: modules/access_output/shout.c:58
+#, fuzzy
+msgid "Stream name"
+msgstr "ნაკადი/შენახვა"
+
+#: modules/access_output/shout.c:59
+msgid "Name to give to this stream/channel on the icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:62
+#, fuzzy
+msgid "Stream description"
+msgstr "სესიის აღწერა"
+
+#: modules/access_output/shout.c:63
+msgid "Description of the stream content or information about your channel."
+msgstr ""
+
+#: modules/access_output/shout.c:66
+msgid "Stream MP3"
+msgstr ""
+
+#: modules/access_output/shout.c:67
+msgid ""
+"You normally have to feed the shoutcast module with Ogg streams. It is also "
+"possible to stream MP3 instead, so you can forward MP3 streams to the "
+"icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:73
+#, fuzzy
+msgid "IceCAST output"
+msgstr "დამატებითი ოფციები"
+
+#: modules/access_output/udp.c:77
+msgid ""
+"Default caching value for outbound UDP streams. This value should be set in "
+"milliseconds."
+msgstr ""
+
+#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
+#: modules/gui/macosx/wizard.m:1847
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:1338 modules/stream_out/rtp.c:87
+#, fuzzy
+msgid "Time-To-Live (TTL)"
+msgstr "დრო ვის TTL"
+
+#: modules/access_output/udp.c:81
+msgid "Time-To-Live of the outgoing stream."
+msgstr ""
+
+#: modules/access_output/udp.c:84
+msgid "Group packets"
+msgstr ""
+
+#: modules/access_output/udp.c:85
+msgid ""
+"Packets can be sent one by one at the right time or by groups. You can "
+"choose the number of packets that will be sent at a time. It helps reducing "
+"the scheduling load on heavily-loaded systems."
+msgstr ""
+
+#: modules/access_output/udp.c:90
+msgid "Raw write"
+msgstr ""
+
+#: modules/access_output/udp.c:91
+msgid ""
+"Packets will be sent directly, without trying to fill the MTU (ie, without "
+"trying to make the biggest possible packets in order to improve streaming)."
+msgstr ""
+
+#: modules/access_output/udp.c:97
+msgid "UDP stream output"
+msgstr ""
+
+#: modules/access_output/udp.c:98
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
+msgid "UDP"
+msgstr "UDP"
 
 #: modules/audio_filter/channel_mixer/dolby.c:47
 msgid "Simple decoder for Dolby Surround encoded streams"
@@ -9879,9 +9878,10 @@ msgstr ""
 msgid "Video filters"
 msgstr "ვიდეო ფილტრები"
 
-#: modules/gui/macosx/extended.m:84
-msgid "Adjust Image"
-msgstr ""
+#: modules/gui/macosx/extended.m:84 modules/gui/wxwidgets/extrapanel.cpp:204
+#, fuzzy
+msgid "Image adjustment"
+msgstr "სურათი"
 
 #: modules/gui/macosx/extended.m:85 modules/gui/macosx/wizard.m:371
 #: modules/gui/macosx/wizard.m:372 modules/gui/macosx/wizard.m:443
@@ -9897,8 +9897,8 @@ msgstr "მეტი ინფორმაცია"
 msgid "Blurring"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:87
-msgid "Creates a motion blurring on the image"
+#: modules/gui/macosx/extended.m:87 modules/gui/wxwidgets/extrapanel.cpp:151
+msgid "Adds motion blurring to the image"
 msgstr ""
 
 #: modules/gui/macosx/extended.m:88 modules/gui/wxwidgets/extrapanel.cpp:149
@@ -9906,8 +9906,8 @@ msgstr ""
 msgid "Distortion"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:89
-msgid "Adds distorsion effects"
+#: modules/gui/macosx/extended.m:89 modules/gui/wxwidgets/extrapanel.cpp:149
+msgid "Adds distortion effects"
 msgstr ""
 
 #: modules/gui/macosx/extended.m:90 modules/gui/wxwidgets/extrapanel.cpp:148
@@ -9931,8 +9931,8 @@ msgstr ""
 msgid "Image inversion"
 msgstr "გამოსახულების ინვერტირება"
 
-#: modules/gui/macosx/extended.m:96
-msgid "Inverts the image colors"
+#: modules/gui/macosx/extended.m:96 modules/gui/wxwidgets/extrapanel.cpp:150
+msgid "Inverts the colors of the image"
 msgstr ""
 
 #: modules/gui/macosx/extended.m:97 modules/gui/wxwidgets/extrapanel.cpp:152
@@ -9950,17 +9950,15 @@ msgid "Volume normalization"
 msgstr "ხმის რეგულაცია"
 
 #: modules/gui/macosx/extended.m:100
-msgid ""
-"This filters prevents the audio output level from exceeding a defined value."
+msgid "Prevents the audio output from going over a predefined value."
 msgstr ""
 
 #: modules/gui/macosx/extended.m:102 modules/gui/wxwidgets/extrapanel.cpp:396
 msgid "Headphone virtualization"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:103
-msgid ""
-"This filter gives the feeling of a 5.1 speaker set when using a headphone."
+#: modules/gui/macosx/extended.m:103 modules/gui/wxwidgets/extrapanel.cpp:397
+msgid "Imitates the effect of surround sound when using headphones."
 msgstr ""
 
 #: modules/gui/macosx/extended.m:105 modules/gui/wxwidgets/extrapanel.cpp:406
@@ -9986,9 +9984,9 @@ msgstr ""
 msgid "Opaqueness"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:601
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:506
-msgid "More information"
+#: modules/gui/macosx/extended.m:601 modules/gui/wxwidgets/extrapanel.cpp:1007
+#, fuzzy
+msgid "More Information"
 msgstr "მეტი ინფორმაცია"
 
 #: modules/gui/macosx/extended.m:602
@@ -10141,8 +10139,8 @@ msgid "Extended Controls"
 msgstr "გაფართოებული &გრაფიკული ინტერფეისი\tCtrl-G"
 
 #: modules/gui/macosx/intf.m:579 modules/gui/macosx/intf.m:610
-#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:371
-#: modules/gui/macosx/playlist.m:484
+#: modules/gui/macosx/playlist.m:484 modules/gui/macosx/playlistinfo.m:55
+#: modules/gui/macosx/playlistinfo.m:371
 #, fuzzy
 msgid "Information"
 msgstr "მეტი ინფორმაცია"
@@ -10518,78 +10516,6 @@ msgstr "URL"
 msgid "Save File"
 msgstr "ფაილის შენახვა"
 
-#: modules/gui/macosx/playlistinfo.m:56
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
-msgid "URI"
-msgstr "URI"
-
-#: modules/gui/macosx/playlistinfo.m:63
-#, fuzzy
-msgid "Advanced Information"
-msgstr "დამატებითი"
-
-#: modules/gui/macosx/playlistinfo.m:81
-msgid "Read at media"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:82
-#, fuzzy
-msgid "Input bitrate"
-msgstr "აუდიო"
-
-#: modules/gui/macosx/playlistinfo.m:83
-msgid "Demuxed"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:84
-#, fuzzy
-msgid "Stream bitrate"
-msgstr "ვიდეო"
-
-#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
-msgid "Decoded blocks"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:88
-#, fuzzy
-msgid "Displayed frames"
-msgstr "გამოტოვე კადრები"
-
-#: modules/gui/macosx/playlistinfo.m:89
-#, fuzzy
-msgid "Lost frames"
-msgstr "ლოგო"
-
-#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:404
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:315
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
-#: modules/video_filter/deinterlace.c:137
-msgid "Streaming"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:92
-msgid "Sent packets"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:93
-msgid "Sent bytes"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:94
-#, fuzzy
-msgid "Send rate"
-msgstr "კადრი წამში"
-
-#: modules/gui/macosx/playlistinfo.m:98
-#, fuzzy
-msgid "Played buffers"
-msgstr "დაკვრა"
-
-#: modules/gui/macosx/playlistinfo.m:99
-msgid "Lost buffers"
-msgstr ""
-
 #: modules/gui/macosx/playlist.m:479
 #, fuzzy
 msgid "Save Playlist..."
@@ -10662,6 +10588,78 @@ msgstr ""
 #, fuzzy
 msgid "1 item in the playlist"
 msgstr "დასაკრავი სიის გახსნა"
+
+#: modules/gui/macosx/playlistinfo.m:56
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
+msgid "URI"
+msgstr "URI"
+
+#: modules/gui/macosx/playlistinfo.m:63
+#, fuzzy
+msgid "Advanced Information"
+msgstr "დამატებითი"
+
+#: modules/gui/macosx/playlistinfo.m:81
+msgid "Read at media"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:82
+#, fuzzy
+msgid "Input bitrate"
+msgstr "აუდიო"
+
+#: modules/gui/macosx/playlistinfo.m:83
+msgid "Demuxed"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:84
+#, fuzzy
+msgid "Stream bitrate"
+msgstr "ვიდეო"
+
+#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
+msgid "Decoded blocks"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:88
+#, fuzzy
+msgid "Displayed frames"
+msgstr "გამოტოვე კადრები"
+
+#: modules/gui/macosx/playlistinfo.m:89
+#, fuzzy
+msgid "Lost frames"
+msgstr "ლოგო"
+
+#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:404
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:315
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
+#: modules/video_filter/deinterlace.c:137
+msgid "Streaming"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:92
+msgid "Sent packets"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:93
+msgid "Sent bytes"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:94
+#, fuzzy
+msgid "Send rate"
+msgstr "კადრი წამში"
+
+#: modules/gui/macosx/playlistinfo.m:98
+#, fuzzy
+msgid "Played buffers"
+msgstr "დაკვრა"
+
+#: modules/gui/macosx/playlistinfo.m:99
+msgid "Lost buffers"
+msgstr ""
 
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:212
@@ -11217,7 +11215,7 @@ msgid "UDP Multicast"
 msgstr "UDP RTP მრავალმისამართიანი"
 
 #: modules/gui/macosx/wizard.m:417 modules/gui/pda/pda_interface.c:1221
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:124
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:125
 #: modules/stream_out/transcode.c:186
 msgid "Transcode"
 msgstr ""
@@ -12106,7 +12104,7 @@ msgid "Input has changed "
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
-msgid "Stream and media info"
+msgid "Stream and Media Info"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:83
@@ -12116,7 +12114,7 @@ msgstr "დამატებითი"
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:116
 msgid ""
-"The following errors happened. More details might be available in the "
+"The following errors occurred. More details might be available in the "
 "Messages window."
 msgstr ""
 
@@ -12159,7 +12157,7 @@ msgid "Stream/Save"
 msgstr "ნაკადი/შენახვა"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:431
-msgid "Use VLC as a server of streams"
+msgid "Use VLC as a stream server"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:457
@@ -12261,8 +12259,8 @@ msgstr "სათაურის ნომერი."
 #: modules/gui/wxwidgets/dialogs/open.cpp:1669
 msgid ""
 "DVD's can have up to 32 subtitles numbered 0..31. Note this is not the same "
-"thing as a subtitle name e.g. 'en'. If a value -1 is used, no subtitle will "
-"be shown."
+"thing as a subtitle name (e.g. 'en'). If a value -1 is used, no subtitle "
+"will be shown."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1672
@@ -12318,6 +12316,11 @@ msgstr ""
 msgid "&Add URL..."
 msgstr ""
 
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:240
+#, fuzzy
+msgid "Services Discovery"
+msgstr "სერვისების აღმოჩენა"
+
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:243
 msgid "&Open Playlist..."
 msgstr "&გახსენი დასაკვრელი სია..."
@@ -12331,11 +12334,12 @@ msgid "&Close"
 msgstr "და&ხურვა"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:250
-msgid "Sort by &title"
-msgstr ""
+#, fuzzy
+msgid "Sort by &Title"
+msgstr "სორტირება სახელის მიხედვით"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:251
-msgid "&Reverse sort by title"
+msgid "&Reverse Sort by Title"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:253
@@ -12363,7 +12367,7 @@ msgid "&View items"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:275
-msgid "Play this branch"
+msgid "Play this Branch"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:276
@@ -12372,7 +12376,7 @@ msgid "Preparse"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:277
-msgid "Sort this branch"
+msgid "Sort this Branch"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:279
@@ -12381,9 +12385,8 @@ msgid "Info"
 msgstr "ინფორმაცია"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:280
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
 #, fuzzy
-msgid "Add node"
+msgid "Add Node"
 msgstr "აუდიო"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:358
@@ -12428,8 +12431,9 @@ msgid "Normal"
 msgstr "ნორმალური"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
-msgid "Sorted by artist"
-msgstr ""
+#, fuzzy
+msgid "Sorted by Artist"
+msgstr "სორტირება გეზი"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1419
 msgid "Sorted by Album"
@@ -12438,6 +12442,11 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1624
 msgid "Please enter node name"
 msgstr ""
+
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
+#, fuzzy
+msgid "Add node"
+msgstr "აუდიო"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
 #, fuzzy
@@ -12470,8 +12479,8 @@ msgstr "Shift"
 
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:433
 msgid ""
-"Select which modules you want to use. To get more advanced control, you can "
-"also modify the resulting \"chain\" by yourself"
+"Select the desired modules. For more advanced control, the resulting \"chain"
+"\" can be modified."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:167
@@ -12485,10 +12494,8 @@ msgstr "დიდი"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:174
 msgid ""
-"You can use this field directly by typing the full MRL you want to stream "
-"to.\n"
-"Alternatively, the field will be filled automatically when you use the "
-"controls below"
+"Specifies the MRL. This can be specified directly or filled in automatically "
+"by adjusting the stream settings."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:462
@@ -12582,7 +12589,7 @@ msgstr "შემოწმება."
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:154
 msgid ""
 "\n"
-"Available updates and related downloads\n"
+"Available updates and related downloads.\n"
 "(Double click on a file to download it)\n"
 msgstr ""
 
@@ -12599,11 +12606,13 @@ msgid "Load"
 msgstr "ჩატვირთვა"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:219
-msgid "Load configuration"
+#, fuzzy
+msgid "Load Configuration"
 msgstr "კონფიგურაციის ჩატვირთვა"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:233
-msgid "Save configuration"
+#, fuzzy
+msgid "Save Configuration"
 msgstr "კონფიგურაციის შენახვა"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:249
@@ -12612,7 +12621,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:385
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:396
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:121
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:122
 msgid "Choose"
 msgstr "არჩევა"
 
@@ -12646,9 +12655,8 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:93
 msgid ""
-"This wizard only gives access to a small subset of VLC's streaming and "
-"transcoding capabilities. Use the Open and Stream Output dialogs to get all "
-"of them."
+"This wizard only contains a small subset of VLC's streaming and transcoding "
+"capabilities. Use the Open and Stream Output dialogs to access all of them."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:97
@@ -12657,10 +12665,11 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:99
 msgid ""
-"Use this to save a stream to a file. You have the ability to reencode the "
-"stream. You can save whatever VLC can read.\n"
-"Please notice that VLC is not very suited for file to file transcoding. You "
-"should use its transcoding features to save network streams, for example."
+"Saves the stream to a file. The stream must be a format that VLC recognizes. "
+"If desired, the stream can also be transcoded to another format.\n"
+"\n"
+"Please note that VLC is not very suited for file-to-file transcoding. Its "
+"transcoding features are more appropriate for saving network streams."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:112
@@ -12668,62 +12677,66 @@ msgid "You must choose a stream"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:113
-msgid "Uh Oh! Unable to find playlist !"
-msgstr ""
+#, fuzzy
+msgid "Unable to find playlist"
+msgstr "დასაკრავი სიის გახსნა"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:115
 msgid ""
-"Use this to read only a part of the stream. You must be able to control the "
-"incoming stream (for example, a file or a disc, but not a RTP/UDP network "
-"stream.)\n"
-"Enter the starting and ending times (in seconds)."
+"Use this to read only a part of the stream. To use, enter the starting and "
+"ending times (in seconds).\n"
+"\n"
+"Note: You must be able to control the incoming stream (for example, a file "
+"or a disc, but not a RTP/UDP network stream).\n"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:125
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:126
 msgid ""
-"If you want to change the compression format of the audio or video tracks, "
-"fill in this page. (If you only want to change the container format, proceed "
-"to next  page.)"
+"Changes the compression format of the audio or video tracks. To change only "
+"the container format, proceed to the next page."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:130
-msgid "Transcode video (if your stream has some)"
+msgid "Transcode video (if available)"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:131
-msgid "Select the target video codec. Click one to get more information."
+msgid ""
+"Select the target video codec. Choose a codec to display more information "
+"about it."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:134
-msgid "Transcode audio (if your stream has some)"
+msgid "Transcode audio (if available)"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
-msgid "Select the target audio codec. Click one to get more information."
+msgid ""
+"Select the target audio codec. Choose a codec to display more information "
+"about it."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:140
-msgid "In this page, you will select how your input stream will be sent."
-msgstr ""
+#, fuzzy
+msgid "Determines how the input stream will be sent."
+msgstr "a -სკენ."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:143
 msgid "This does not appear to be a valid multicast address"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:145
-msgid "You need to enter an address"
+msgid "Please enter an address"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:149
 msgid ""
-"In this page, you will select how the stream will be encapsulated. Depending "
-"on the choices you made, all formats won't be available."
+"Determines how the stream will be encapsulated. Depending on the previous "
+"choices, some formats might not be available."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:156
-msgid ""
-"In this page, you will define a few additionnal parameters for your "
-"transcoding"
+msgid "Defines a few additional parameters for the transcoding."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:159
@@ -12731,8 +12744,7 @@ msgid "You must choose a file to save to"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:163
-msgid ""
-"In this page, you will define a few additionnal parameters for your stream"
+msgid "Defines a few additional parameters for the stream."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:166
@@ -12749,9 +12761,13 @@ msgid ""
 "announcing protocol. This way, the clients won't have to type in the "
 "multicast address, it will appear in their playlist if they enable the SAP "
 "extra interface.\n"
-"If you want to give a name to your stream, enter it here, else, a default "
-"name will be used"
+"If you want to give a name to your stream, enter it here. Otherwise, a "
+"default name will be used."
 msgstr ""
+
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:506
+msgid "More information"
+msgstr "მეტი ინფორმაცია"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1289
 msgid "Save to file"
@@ -12767,18 +12783,6 @@ msgstr ""
 msgid "Creates several clones of the image"
 msgstr ""
 
-#: modules/gui/wxwidgets/extrapanel.cpp:149
-msgid "Adds distortion effects"
-msgstr ""
-
-#: modules/gui/wxwidgets/extrapanel.cpp:150
-msgid "Inverts the colors of the image"
-msgstr ""
-
-#: modules/gui/wxwidgets/extrapanel.cpp:151
-msgid "Adds motion blurring to the image"
-msgstr ""
-
 #: modules/gui/wxwidgets/extrapanel.cpp:153 modules/video_filter/magnify.c:60
 msgid "Magnify"
 msgstr ""
@@ -12787,21 +12791,12 @@ msgstr ""
 msgid "Magnifies part of the image"
 msgstr ""
 
-#: modules/gui/wxwidgets/extrapanel.cpp:204
-#, fuzzy
-msgid "Image adjustment"
-msgstr "სურათი"
-
 #: modules/gui/wxwidgets/extrapanel.cpp:270
 msgid "Video Options"
 msgstr "ვიდეოს ოფციები"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:284
 msgid "Aspect Ratio"
-msgstr ""
-
-#: modules/gui/wxwidgets/extrapanel.cpp:397
-msgid "Imitates the effect of surround sound when using headphones."
 msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:402
@@ -12827,11 +12822,6 @@ msgid ""
 "control the order in which they are applied, enter a filters string in the "
 "Video Filter Module inside the preferences."
 msgstr ""
-
-#: modules/gui/wxwidgets/extrapanel.cpp:1007
-#, fuzzy
-msgid "More Information"
-msgstr "მეტი ინფორმაცია"
 
 #: modules/gui/wxwidgets/input_manager.cpp:180
 msgid "Stopped"
@@ -12898,8 +12888,9 @@ msgid "&Messages...\tCtrl-M"
 msgstr ""
 
 #: modules/gui/wxwidgets/interface.cpp:593
-msgid "Stream and Media &info...\tCtrl-I"
-msgstr ""
+#, fuzzy
+msgid "Stream and Media &Info...\tCtrl-I"
+msgstr "ინფორმაცია."
 
 #: modules/gui/wxwidgets/interface.cpp:595
 msgid "VLM Control...\tCtrl-V"
@@ -12912,7 +12903,7 @@ msgstr "შესახებ"
 
 #: modules/gui/wxwidgets/interface.cpp:607
 #, fuzzy
-msgid "Check for updates..."
+msgid "Check for Updates..."
 msgstr "შემოწმება."
 
 #: modules/gui/wxwidgets/interface.cpp:611
@@ -13000,8 +12991,9 @@ msgid "About %s"
 msgstr "%s შესახებ"
 
 #: modules/gui/wxwidgets/interface.cpp:1496
-msgid "Show/Hide interface"
-msgstr ""
+#, fuzzy
+msgid "Show/Hide Interface"
+msgstr "აჩვენე ინტერფეისი"
 
 #: modules/gui/wxwidgets/menus.cpp:132
 msgid "Quick &Open File..."
@@ -13100,14 +13092,14 @@ msgstr "RTP მრავალმისამართიანი"
 msgid ""
 "Stream to a dynamic group of computers on a multicast-enabled network. This "
 "is the most efficient method to stream to several computers, but it does not "
-"work over Internet."
+"work over the Internet."
 msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:129
 msgid ""
-"Enter the multicast address to stream to in this field. This must be an IP "
-"address between 224.0.0.0 an 239.255.255.255. For a private use, enter an "
-"address beginning with 239.255."
+"Enter the multicast address to stream to. This must be an IP address between "
+"224.0.0.0 an 239.255.255.255. For private use, enter an address beginning "
+"with 239.255."
 msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:134
@@ -13196,7 +13188,7 @@ msgstr "დაკვრის სია"
 msgid ""
 "There are two possible playlist views in the interface : the normal playlist "
 "(separate window), or an embedded playlist (within the main interface, but "
-"with less features. You can select which one will be available on the "
+"with less features). You can select which one will be available on the "
 "toolbar (or both)."
 msgstr ""
 
@@ -13580,10 +13572,6 @@ msgstr "გამოსავალი ფაილი"
 msgid "Output data for RRDTool in this file."
 msgstr ""
 
-#: modules/misc/memcpy/memcpyaltivec.c:56
-msgid "AltiVec memcpy"
-msgstr ""
-
 #: modules/misc/memcpy/memcpy.c:83
 msgid "libc memcpy"
 msgstr ""
@@ -13598,6 +13586,10 @@ msgstr ""
 
 #: modules/misc/memcpy/memcpy.c:99
 msgid "MMX EXT memcpy"
+msgstr ""
+
+#: modules/misc/memcpy/memcpyaltivec.c:56
+msgid "AltiVec memcpy"
 msgstr ""
 
 #: modules/misc/msn.c:63
@@ -16539,6 +16531,10 @@ msgstr ""
 #: modules/visualization/xosd.c:84
 msgid "XOSD interface"
 msgstr "XOSD ინტერფეისი"
+
+#, fuzzy
+#~ msgid "Check for updates..."
+#~ msgstr "შემოწმება."
 
 #, fuzzy
 #~ msgid "delay"
