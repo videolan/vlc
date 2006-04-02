@@ -81,27 +81,27 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_lbl_audio setStringValue: _NS("Audio")];
     [o_lbl_audioFlts setStringValue: _NS("Audio filters")];
     [o_lbl_videoFlts setStringValue: _NS("Video filters")];
-    [o_lbl_adjustImage setStringValue: _NS("Adjust Image")];
+    [o_lbl_adjustImage setStringValue: _NS("Image adjustment")];
     [o_btn_vidFlts_mrInfo setTitle: _NS("More Info")];
     [o_ckb_blur setTitle: _NS("Blurring")];
-    [o_ckb_blur setToolTip: _NS("Creates a motion blurring on the image")];
+    [o_ckb_blur setToolTip: _NS("Adds motion blurring to the image")];
     [o_ckb_distortion setTitle: _NS("Distortion")];
-    [o_ckb_distortion setToolTip: _NS("Adds distorsion effects")];
+    [o_ckb_distortion setToolTip: _NS("Adds distortion effects")];
     [o_ckb_imgClone setTitle: _NS("Image clone")];
     [o_ckb_imgClone setToolTip: _NS("Creates several copies of the Video " \
                                     "output window" )];
     [o_ckb_imgCrop setTitle: _NS("Image cropping")];
     [o_ckb_imgCrop setToolTip: _NS("Crops a defined part of the image")];
     [o_ckb_imgInvers setTitle: _NS("Image inversion")];
-    [o_ckb_imgInvers setToolTip: _NS("Inverts the image colors")];
+    [o_ckb_imgInvers setToolTip: _NS("Inverts the colors of the image")];
     [o_ckb_trnsform setTitle: _NS("Transformation")];
     [o_ckb_trnsform setToolTip: _NS("Rotates or flips the image")];
     [o_ckb_vlme_norm setTitle: _NS("Volume normalization")];
-    [o_ckb_vlme_norm setToolTip: _NS("This filters prevents the audio output " \
-        "level from exceeding a defined value.")];
+    [o_ckb_vlme_norm setToolTip: _NS("Prevents the audio output from going " \
+        "over a predefined value.")];
     [o_ckb_hdphnVirt setTitle: _NS("Headphone virtualization")];
-    [o_ckb_hdphnVirt setToolTip: _NS("This filter gives the feeling of a " \
-        "5.1 speaker set when using a headphone.")];
+    [o_ckb_hdphnVirt setToolTip: _NS("Imitates the effect of surround sound " \
+        "when using headphones.")];
     [o_lbl_maxLevel setStringValue: _NS("Maximum level")];
     [o_btn_rstrDefaults setTitle: _NS("Restore Defaults")];
     [o_ckb_enblAdjustImg setTitle: _NS("Enable")];
@@ -598,7 +598,7 @@ static VLCExtended *_o_sharedInstance = nil;
 - (IBAction)vidFlts_mrInfo:(id)sender
 {
     /* show info sheet */
-    NSBeginInformationalAlertSheet(_NS("More information"), _NS("OK"), @"", @"", \
+    NSBeginInformationalAlertSheet(_NS("More Information"), _NS("OK"), @"", @"", \
         o_extended_window, nil, nil, nil, nil, _NS("This panel allows to " \
         "select video effects filters to apply.\n" \
         "The filters can be configured indivudually in the Preferences, in " \
