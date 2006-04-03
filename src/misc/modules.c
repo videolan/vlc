@@ -98,6 +98,7 @@
 #include "vlc_tls.h"
 #include "vlc_md5.h"
 #include "vlc_xml.h"
+#include "vlc_url.h"
 
 #include "iso_lang.h"
 #include "charset.h"
