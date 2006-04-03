@@ -1422,10 +1422,16 @@ int E_(CAMOpen)( access_t *p_access )
         return VLC_EGENERIC;
     }
 
-    p_sys->i_ca_type = caps.slot_type;
-    if ( !(caps.slot_type & CA_CI_LINK) &&
-         !(caps.slot_type & CA_CI) )
+    if( caps.slot_type & CA_CI_LINK )
     {
+        p_sys->i_ca_type = CA_CI_LINK;
+    }
+    else if( caps.slot_type & CA_CI )
+    {
+        p_sys->i_ca_type = CA_CI;
+    }
+    else {
+        p_sys->i_ca_type = -1;
         msg_Err( p_access, "CAMInit: incompatible CAM interface" );
         close( p_sys->i_ca_handle );
         p_sys->i_ca_handle = 0;
