@@ -169,6 +169,9 @@ static inline void vlc_UrlClean( vlc_url_t *url )
     url->psz_buffer   = NULL;
 }
 
+VLC_EXPORT( char *, unescape_URI_duplicate, ( const char *psz ) );
+VLC_EXPORT( void, unescape_URI, ( char *psz ) );
+
 static inline int isurlsafe( int c )
 {
     return ( (unsigned char)( c - 'a' ) < 26 )

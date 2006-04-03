@@ -773,11 +773,6 @@ char *E_(ExtractURIValue)( char *psz_uri, const char *psz_name,
     return p;
 }
 
-void E_(DecodeEncodedURI)( char *psz )
-{
-    decode_encoded_URI( psz );
-}
-
 /* Since the resulting string is smaller we can work in place, so it is
  * permitted to have psz == new. new points to the first word of the
  * string, the function returns the remaining string. */

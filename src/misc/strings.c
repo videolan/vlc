@@ -33,23 +33,24 @@
 #include <assert.h>
 
 #include "vlc_strings.h"
+#include "vlc_url.h" 
 
 /**
- * Decode URI encoded string
+ * Unescape URI encoded string
  * \return decoded duplicated string
  */
-char *decode_encoded_URI_duplicate( const char *psz )
+char *unescape_URI_duplicate( const char *psz )
 {
     char *psz_dup = strdup( psz );
-    decode_encoded_URI( psz_dup );
+    unescape_URI( psz_dup );
     return psz_dup;
 }
 
 /**
- * Decode URI encoded string
+ * Unescape URI encoded string in place
  * \return nothing
  */
-void decode_encoded_URI( char *psz )
+void unescape_URI( char *psz )
 {
     unsigned char *in = (unsigned char *)psz, *out = in, c;
 
@@ -101,9 +102,7 @@ void decode_encoded_URI( char *psz )
                 break;
             }
 
-            case '+':
-                *out++ = ' ';
-                break;
+            /* + is not a special case - it means plus, not space. */
 
             default:
                 /* Inserting non-ASCII or non-printable characters is unsafe,

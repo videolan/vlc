@@ -480,9 +480,9 @@ struct module_symbols_t
     double (*us_atof_inner) (const char *);
     double (*us_strtod_inner) (const char *, char **);
     lldiv_t (*vlc_lldiv_inner) (long long numer, long long denom);
-    void (*decode_encoded_URI_inner) (char *psz);
+    void (*unescape_URI_inner) (char *psz);
     char * (*convert_xml_special_chars_inner) (const char *psz_content);
-    char * (*decode_encoded_URI_duplicate_inner) (const char *psz);
+    char * (*unescape_URI_duplicate_inner) (const char *psz);
     void (*resolve_xml_special_chars_inner) (char *psz_value);
     char * (*FromUTF16_inner) (const uint16_t *);
     const char * (*IsUTF8_inner) (const char *);
@@ -948,9 +948,9 @@ struct module_symbols_t
 #  define us_atof (p_symbols)->us_atof_inner
 #  define us_strtod (p_symbols)->us_strtod_inner
 #  define vlc_lldiv (p_symbols)->vlc_lldiv_inner
-#  define decode_encoded_URI (p_symbols)->decode_encoded_URI_inner
+#  define unescape_URI (p_symbols)->unescape_URI_inner
 #  define convert_xml_special_chars (p_symbols)->convert_xml_special_chars_inner
-#  define decode_encoded_URI_duplicate (p_symbols)->decode_encoded_URI_duplicate_inner
+#  define unescape_URI_duplicate (p_symbols)->unescape_URI_duplicate_inner
 #  define resolve_xml_special_chars (p_symbols)->resolve_xml_special_chars_inner
 #  define FromUTF16 (p_symbols)->FromUTF16_inner
 #  define IsUTF8 (p_symbols)->IsUTF8_inner
@@ -1419,9 +1419,9 @@ struct module_symbols_t
     ((p_symbols)->us_atof_inner) = us_atof; \
     ((p_symbols)->us_strtod_inner) = us_strtod; \
     ((p_symbols)->vlc_lldiv_inner) = vlc_lldiv; \
-    ((p_symbols)->decode_encoded_URI_inner) = decode_encoded_URI; \
+    ((p_symbols)->unescape_URI_inner) = unescape_URI; \
     ((p_symbols)->convert_xml_special_chars_inner) = convert_xml_special_chars; \
-    ((p_symbols)->decode_encoded_URI_duplicate_inner) = decode_encoded_URI_duplicate; \
+    ((p_symbols)->unescape_URI_duplicate_inner) = unescape_URI_duplicate; \
     ((p_symbols)->resolve_xml_special_chars_inner) = resolve_xml_special_chars; \
     ((p_symbols)->FromUTF16_inner) = FromUTF16; \
     ((p_symbols)->IsUTF8_inner) = IsUTF8; \

@@ -128,8 +128,6 @@ char *E_(ExtractURIValue)( char *psz_uri, const char *psz_name,
                              char *psz_value, int i_value_max );
 /** \todo Describe this function */
 int E_(TestURIParam)( char *psz_uri, const char *psz_name );
-/** This function extracts the original value from an URL-encoded string */
-void E_(DecodeEncodedURI)( char *psz );
 
 /** This function parses a MRL */
 playlist_item_t *E_(MRLParse)( intf_thread_t *, char *psz, char *psz_name );

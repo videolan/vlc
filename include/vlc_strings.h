@@ -31,9 +31,6 @@
  * @{
  */
 
-VLC_EXPORT( char *, decode_encoded_URI_duplicate, ( const char *psz ) );
-VLC_EXPORT( void, decode_encoded_URI, ( char *psz ) );
-
 VLC_EXPORT( void, resolve_xml_special_chars, ( char *psz_value ) );
 VLC_EXPORT( char *, convert_xml_special_chars, ( const char *psz_content ) );
 
