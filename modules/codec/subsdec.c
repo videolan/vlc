@@ -200,7 +200,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if( p_dec->fmt_in.subs.psz_encoding && *p_dec->fmt_in.subs.psz_encoding )
     {
-        msg_Dbg( p_dec, "using character encoding: %s",
+        msg_Dbg( p_dec, "using demux suggested character encoding: %s",
                  p_dec->fmt_in.subs.psz_encoding );
         if( strcmp( p_dec->fmt_in.subs.psz_encoding, "UTF-8" ) )
             p_sys->iconv_handle = vlc_iconv_open( "UTF-8", p_dec->fmt_in.subs.psz_encoding );
@@ -218,15 +218,15 @@ static int OpenDecoder( vlc_object_t *p_this )
                     "subsdec-autodetect-utf8" );
 
             p_sys->iconv_handle = vlc_iconv_open( "UTF-8", psz_charset );
-            msg_Dbg( p_dec, "using default character encoding: %s", psz_charset );
+            msg_Dbg( p_dec, "using fallback character encoding: %s", psz_charset );
         }
         else if( !strcmp( val.psz_string, "UTF-8" ) )
         {
-            msg_Dbg( p_dec, "using character encoding: UTF-8" );
+            msg_Dbg( p_dec, "using enforced character encoding: UTF-8" );
         }
         else if( val.psz_string )
         {
-            msg_Dbg( p_dec, "using character encoding: %s", val.psz_string );
+            msg_Dbg( p_dec, "using enforced character encoding: %s", val.psz_string );
             p_sys->iconv_handle = vlc_iconv_open( "UTF-8", val.psz_string );
             if( p_sys->iconv_handle == (vlc_iconv_t)-1 )
             {

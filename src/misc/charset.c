@@ -565,11 +565,25 @@ const char *FindFallbackEncoding( const char *locale )
  */
 const char *GetFallbackEncoding( void )
 {
-#if HAVE_SETLOCALE
-    return FindFallbackEncoding( setlocale( LC_CTYPE, NULL ) );
-#else
-    return FindFallbackEncoding( NULL );
-#endif
+    const char *psz_lang = NULL;
+
+    /* Some systems (like Darwin, SunOS 4 or DJGPP) have only the C locale.
+     * Therefore we don't use setlocale here; it would return "C". */
+#  if HAVE_SETLOCALE && !__APPLE__
+    psz_lang = setlocale( LC_ALL, NULL );
+#  endif
+    if( psz_lang == NULL || psz_lang[0] == '\0' )
+    {
+        psz_lang = getenv( "LC_ALL" );
+        if( psz_lang == NULL || psz_lang == '\0' )
+        {
+            psz_lang = getenv( "LC_CTYPE" );
+            if( psz_lang == NULL || psz_lang[0] == '\0')
+                psz_lang = getenv( "LANG" );
+        }
+    }
+
+    return FindFallbackEncoding( psz_lang );
 }
 
 /**
