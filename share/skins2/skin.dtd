@@ -249,6 +249,7 @@
         bgcolor2    CDATA   "#FFFFFF"
         selcolor    CDATA   "#0000FF"
         help        CDATA   ""
+        flat        CDATA   "false"
     >
 <!ELEMENT Video EMPTY>
     <!ATTLIST Video
