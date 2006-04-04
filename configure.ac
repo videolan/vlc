@@ -5140,6 +5140,16 @@ then
 fi
 
 dnl
+dnl Microsoft Layer for Unicode for WIN9x/ME
+dnl
+if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
+then
+    AC_CHECK_LIB(unicows, LoadUnicowsSymbol, [
+        VLC_ADD_LDFLAGS([vlc],[-lunicows])
+    ])
+fi
+
+dnl
 dnl  gtk_main plugin
 dnl
 if test "${NEED_GTK_MAIN}" != "no"
