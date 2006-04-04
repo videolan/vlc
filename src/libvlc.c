@@ -1906,7 +1906,7 @@ static int  AddIntfInternal( int i_object, char const *psz_module,
                              vlc_bool_t b_block, vlc_bool_t b_play,
                              int i_options, char **ppsz_options )
 {
-    int i_err,i;
+    int i_err;
     intf_thread_t *p_intf;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
@@ -1950,11 +1950,6 @@ static int  AddIntfInternal( int i_object, char const *psz_module,
         intf_Destroy( p_intf );
         if( i_object ) vlc_object_release( p_vlc );
         return i_err;
-    }
-
-    for( i = 0  ; i< i_options ; i++ )
-    {
-        
     }
 
     if( i_object ) vlc_object_release( p_vlc );
