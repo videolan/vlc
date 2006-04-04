@@ -1011,7 +1011,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                              NULL, NULL, fullScreenAllowEvents );
         }
         if( b_black == VLC_TRUE )
-        //if( var_GetBool( p_real_vout, "macosx-black" ) )
         {
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
             CGDisplayFade( token, 2 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
@@ -1101,7 +1100,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( p_fullscreen_state )
         EndFullScreen( p_fullscreen_state, 0 );
     if( b_black == VLC_TRUE )
-    //if( var_GetBool( p_vout, "macosx-black" ) )
     {
         CGDisplayFadeReservationToken token;
         CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
