@@ -1154,10 +1154,10 @@ static VLCMain *_o_sharedMainInstance = nil;
         {
             vlc_object_t * p_dec_obj;
 
-            [o_controls setupVarMenuItem: o_mi_aspect_ratio target: (vlc_object_t *)[VLCVoutView getRealVout: p_vout]
+            [o_controls setupVarMenuItem: o_mi_aspect_ratio target: (vlc_object_t *)p_vout
                 var: "aspect-ratio" selector: @selector(toggleVar:)];
 
-            [o_controls setupVarMenuItem: o_mi_crop target: (vlc_object_t *)[VLCVoutView getRealVout: p_vout]
+            [o_controls setupVarMenuItem: o_mi_crop target: (vlc_object_t *) p_vout
                 var: "crop" selector: @selector(toggleVar:)];
 
             [o_controls setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout

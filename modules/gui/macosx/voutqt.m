@@ -9,6 +9,7 @@
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
  *          Eric Petit <titer@m0k.org>
+ *          Benjamin Pracht <bigben AT videolan DOT org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,7 +82,7 @@ struct picture_sys_t
 {
     void *p_data;
     unsigned int i_size;
-    
+
     /* When using I420 output */
     PlanarPixmapInfoYUV420 pixmap_i420;
 };
@@ -378,14 +379,21 @@ static int ManageVideo( vout_thread_t *p_vout )
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
     }
 
-    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE ||
+        p_vout->i_changes & VOUT_ASPECT_CHANGE )
     {
         QTScaleMatrix( p_vout );
         SetDSequenceMatrix( p_vout->p_sys->i_seq,
                             p_vout->p_sys->p_matrix );
+    }
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
+    {
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
     }
-
+    if( p_vout->i_changes & VOUT_ASPECT_CHANGE )
+    {
+        p_vout->i_changes &= ~VOUT_ASPECT_CHANGE;
+    }
     [p_vout->p_sys->o_vout_view manage];
 
     return( 0 );
@@ -525,8 +533,8 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
     if( QTCreateSequence( p_vout ) )
     {
         msg_Err( p_vout, "unable to initialize QT: QTCreateSequence failed" );
-        return( 1 ); 
-    } 
+        return( 1 );
+    }
 
     [o_pool release];
     return 0;
@@ -591,27 +599,34 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
                            Long2Fix( p_vout->output.i_height ) );
 
     }
-    else if( i_height * p_vout->output.i_aspect < i_width * VOUT_ASPECT_FACTOR )
+    else if( i_height * p_vout->fmt_in.i_visible_width *
+             p_vout->fmt_in.i_sar_num <
+             i_width * p_vout->fmt_in.i_visible_height *
+             p_vout->fmt_in.i_sar_den )
     {
-        int i_adj_width = i_height * p_vout->output.i_aspect /
-                          VOUT_ASPECT_FACTOR;
+        int i_adj_width = i_height * p_vout->fmt_in.i_visible_width *
+                          p_vout->fmt_in.i_sar_num /
+                          ( p_vout->fmt_in.i_sar_den *
+                            p_vout->fmt_in.i_visible_height );
 
         factor_x = FixDiv( Long2Fix( i_adj_width ),
-                           Long2Fix( p_vout->output.i_width ) );
+                           Long2Fix( p_vout->fmt_in.i_visible_width ) );
         factor_y = FixDiv( Long2Fix( i_height ),
-                           Long2Fix( p_vout->output.i_height ) );
+                           Long2Fix( p_vout->fmt_in.i_visible_height ) );
 
         i_offset_x = (i_width - i_adj_width) / 2;
     }
     else
     {
-        int i_adj_height = i_width * VOUT_ASPECT_FACTOR /
-                           p_vout->output.i_aspect;
+        int i_adj_height = i_width * p_vout->fmt_in.i_visible_height *
+                           p_vout->fmt_in.i_sar_den /
+                           ( p_vout->fmt_in.i_sar_num *
+                             p_vout->fmt_in.i_visible_width );
 
         factor_x = FixDiv( Long2Fix( i_width ),
-                           Long2Fix( p_vout->output.i_width ) );
+                           Long2Fix( p_vout->fmt_in.i_visible_width ) );
         factor_y = FixDiv( Long2Fix( i_adj_height ),
-                           Long2Fix( p_vout->output.i_height ) );
+                           Long2Fix( p_vout->fmt_in.i_visible_height ) );
 
         i_offset_y = (i_height - i_adj_height) / 2;
     }
