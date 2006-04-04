@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -121,6 +121,7 @@
     vout_thread_t * p_real_vout;
     Ptr             p_fullscreen_state;
     vlc_bool_t      b_init_ok;
+    vlc_bool_t      b_black;
 }
 
 - (id) initWithVout: (vout_thread_t *) p_vout view: (VLCVoutView *) view
