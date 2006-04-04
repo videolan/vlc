@@ -169,3 +169,5 @@ NASM_VERSION=0.98.40-20060130
 NASM_URL=$(VIDEOLAN)/testing/contrib/nasm-0.98.40-20060130.tar.bz2
 PTHREADS_VERSION=2-7-0
 PTHREADS_URL=ftp://sources.redhat.com/pub/pthreads-win32/pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
+UNICOWS_VERSION=1.1.1
+UNICOWS_URL=$(SF)/libunicows/libunicows-$(UNICOWS_VERSION)-src.tar.gz

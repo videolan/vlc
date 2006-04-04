@@ -96,7 +96,7 @@ endif
 # Special target-dependant options
 #
 ifdef HAVE_WIN32
-HOSTCONF+= --without-pic --disable-shared --enable-msw --with-included-opencdk --with-included-libtasn1 --disable-depedency-tracking
+HOSTCONF+= --without-pic --disable-shared --enable-msw --with-included-opencdk --with-included-libtasn1 --disable-dependency-tracking
 FFMPEGCONF+= --enable-mingw32 --enable-memalign-hack --cpu=x86 --disable-debug
 endif
 
@@ -160,7 +160,7 @@ else
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
 	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
-	.dx_headers .dshow_headers .aclocal .gecko-win32
+	.dx_headers .dshow_headers .aclocal .gecko-win32 .unicows
 #	.SDL_image  .daap .cddb .cdio .vcdimager .dts .portaudio 
   else
 
@@ -1877,6 +1877,25 @@ DISTCLEAN_PKG += nasm-$(NASM_VERSION).tar.bz2
 	touch $@
 
 CLEAN_FILE += .aclocal
+
+# ***************************************************************************
+# UNICOWS (Unicode support for WINME/98/95)
+# ***************************************************************************
+
+libunicows-$(UNICOWS_VERSION).tar.gz:
+	$(WGET) $(UNICOWS_URL)
+	mv libunicows-$(UNICOWS_VERSION)-src.tar.gz $@ || true
+
+libunicows: libunicows-$(UNICOWS_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.unicows: libunicows
+	(cd $</src; make -f makefile.mingw32 $(HOSTCC) && cp -f ../lib/mingw32/libunicows.a $(PREFIX)/lib)
+	touch $@
+
+CLEAN_FILE += .unicows
+CLEAN_PKG += libunicows
+DISTCLEAN_PKG += libunicows-$(UNICOWS_VERSION)-src.tar.gz
 
 # ***************************************************************************
 # Some cleansing
