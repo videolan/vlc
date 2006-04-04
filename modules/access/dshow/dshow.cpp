@@ -874,7 +874,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     // Retreive acceptable media types supported by device
     AM_MEDIA_TYPE media_types[MAX_MEDIA_TYPES];
     size_t media_count =
-        EnumDeviceCaps( p_this, p_device_filter, p_sys->i_chroma,
+        EnumDeviceCaps( p_this, p_device_filter, b_audio ? 0 : p_sys->i_chroma,
                         p_sys->i_width, p_sys->i_height,
                         0, 0, 0, media_types, MAX_MEDIA_TYPES );
 
@@ -1280,55 +1280,63 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                 AUDIO_STREAM_CONFIG_CAPS *pASCC = reinterpret_cast<AUDIO_STREAM_CONFIG_CAPS*>(pSCC);
                                 WAVEFORMATEX *pWfx = reinterpret_cast<WAVEFORMATEX*>(p_mt->pbFormat);
 
-                                if( i_channels )
+                                if( i_current_fourcc && (WAVE_FORMAT_PCM == pWfx->wFormatTag) )
                                 {
+                                    if( ! i_channels )
+                                        i_channels = 2;
+
                                     if( i_channels % pASCC->ChannelsGranularity
                                      || (unsigned int)i_channels < pASCC->MinimumChannels
                                      || (unsigned int)i_channels > pASCC->MaximumChannels )
                                     {
-                                        // required number channels not compatible, try next media type
+                                        // required number channels not available, try next media type
                                         FreeMediaType( *p_mt );
                                         CoTaskMemFree( (PVOID)p_mt );
                                         continue;
                                     }
                                     pWfx->nChannels = i_channels;
-                                }
 
-                                if( i_samplespersec )
-                                {
-                                    if( i_samplespersec % pASCC->BitsPerSampleGranularity
+                                    if( ! i_samplespersec )
+                                        i_samplespersec = 44100;
+
+                                    if( i_samplespersec % pASCC->SampleFrequencyGranularity
                                      || (unsigned int)i_samplespersec < pASCC->MinimumSampleFrequency
                                      || (unsigned int)i_samplespersec > pASCC->MaximumSampleFrequency )
                                     {
-                                        // required sampling rate not compatible, try next media type
+                                        // required sampling rate not available, try next media type
                                         FreeMediaType( *p_mt );
                                         CoTaskMemFree( (PVOID)p_mt );
                                         continue;
                                     }
                                     pWfx->nSamplesPerSec = i_samplespersec;
-                                }
+ 
+                                    if( !i_bitspersample )
+                                    {
+                                        if( VLC_FOURCC('f', 'l', '3', '2') == i_current_fourcc )
+                                            i_bitspersample = 32;
+                                        else
+                                            i_bitspersample = 16;
+                                    }
 
-                                if( i_bitspersample )
-                                {
                                     if( i_bitspersample % pASCC->BitsPerSampleGranularity
                                      || (unsigned int)i_bitspersample < pASCC->MinimumBitsPerSample
                                      || (unsigned int)i_bitspersample > pASCC->MaximumBitsPerSample )
                                     {
-                                        // required sample size not compatible, try next media type
+                                        // required sample size not available, try next media type
                                         FreeMediaType( *p_mt );
                                         CoTaskMemFree( (PVOID)p_mt );
                                         continue;
                                     }
-                                    pWfx->wBitsPerSample = i_bitspersample;
-                                }
 
-                                // select this format as default
-                                if( SUCCEEDED( pSC->SetFormat(p_mt) ) )
-                                {
-                                    i_priority = i_current_priority;
-                                    if( i_fourcc )
-                                        // no need to check any more media types 
-                                        i = piCount;
+                                    pWfx->wBitsPerSample = i_bitspersample;
+                                    pWfx->nBlockAlign = (pWfx->wBitsPerSample * pWfx->nChannels)/8;
+                                    pWfx->nAvgBytesPerSec = pWfx->nSamplesPerSec * pWfx->nBlockAlign;
+
+                                    // select this format as default
+                                    if( SUCCEEDED( pSC->SetFormat(p_mt) ) )
+                                    {
+                                        i_priority = i_current_priority;
+                                    }
                                 }
                             }
                             FreeMediaType( *p_mt );
@@ -1474,7 +1482,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                 if( VLC_FOURCC('H','C','W','2') == i_current_fourcc
                  && p_mt->majortype == MEDIATYPE_Video )
                 {
-                    // ouput format for 'Hauppauge WinTV PVR PCI II Capture'
+                    // output format for 'Hauppauge WinTV PVR PCI II Capture'
                     // try I420 as an input format
                     i_current_fourcc = VLC_FOURCC('I','4','2','0');
                     if( !i_fourcc || i_fourcc == i_current_fourcc )
