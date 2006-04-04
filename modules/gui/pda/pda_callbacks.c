@@ -349,7 +349,6 @@ gboolean onPDADeleteEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data
     return TRUE;
 }
 
-
 void onRewind(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
@@ -359,7 +358,6 @@ void onRewind(GtkButton *button, gpointer user_data)
         var_SetVoid( p_intf->p_sys->p_input, "rate-slower" );
     }
 }
-
 
 void onPause(GtkButton *button, gpointer user_data)
 {
@@ -394,7 +392,6 @@ void onPlay(GtkButton *button, gpointer user_data)
     }
 }
 
-
 void onStop(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET( button ) );
@@ -407,7 +404,6 @@ void onStop(GtkButton *button, gpointer user_data)
         gdk_window_raise( p_intf->p_sys->p_window->window );
     }
 }
-
 
 void onForward(GtkButton *button, gpointer user_data)
 {
@@ -432,7 +428,6 @@ void onAbout(GtkButton *button, gpointer user_data)
     }
 }
 
-
 gboolean SliderRelease(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
@@ -445,7 +440,6 @@ gboolean SliderRelease(GtkWidget *widget, GdkEventButton *event, gpointer user_d
     return TRUE;
 }
 
-
 gboolean SliderPress(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
@@ -455,7 +449,7 @@ gboolean SliderPress(GtkWidget *widget, GdkEventButton *event, gpointer user_dat
     p_intf->p_sys->b_slider_free = 0;
     vlc_mutex_unlock( &p_intf->change_lock );
 
-    return TRUE;
+    return FALSE;
 }
 
 void SliderMove(GtkRange *range, GtkScrollType scroll, gpointer user_data)
