@@ -1890,7 +1890,7 @@ libunicows: libunicows-$(UNICOWS_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .unicows: libunicows
-	(cd $</src; make -f makefile.mingw32 $(HOSTCC) && cp -f ../lib/mingw32/libunicows.a $(PREFIX)/lib)
+	(cd $</src; make -f makefile.mingw32 PATHSEP='/' $(HOSTCC) && cp -f ../lib/mingw32/libunicows.a $(PREFIX)/lib)
 	touch $@
 
 CLEAN_FILE += .unicows
