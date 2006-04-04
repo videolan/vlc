@@ -937,6 +937,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     p_fullscreen_state = NULL;
     p_real_vout = [VLCVoutView getRealVout: p_vout];
     i_device = var_GetInteger( p_real_vout->p_vlc, "video-device" );
+    b_black = var_GetBool( p_real_vout->p_vlc, "macosx-black" );
 
     /* Find out on which screen to open the window */
     if( i_device <= 0 || i_device > (int)[o_screens count] )
@@ -967,6 +968,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
               defer: YES screen: o_screen];
 
         if( var_GetBool( p_real_vout, "macosx-black" ) )
+        if( b_black == VLC_TRUE )
         {
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
             CGDisplayFade( token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, true );
@@ -1008,7 +1010,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
             BeginFullScreen( &p_fullscreen_state, NULL, 0, 0,
                              NULL, NULL, fullScreenAllowEvents );
         }
-        if( var_GetBool( p_real_vout, "macosx-black" ) )
+        if( b_black == VLC_TRUE )
+        //if( var_GetBool( p_real_vout, "macosx-black" ) )
         {
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
             CGDisplayFade( token, 2 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
@@ -1097,7 +1100,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 {
     if( p_fullscreen_state )
         EndFullScreen( p_fullscreen_state, 0 );
-    if( var_GetBool( p_vout, "macosx-black" ) )
+    if( b_black == VLC_TRUE )
+    //if( var_GetBool( p_vout, "macosx-black" ) )
     {
         CGDisplayFadeReservationToken token;
         CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
