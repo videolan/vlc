@@ -61,8 +61,6 @@ struct vout_sys_t
     NSRect              s_frame;
     vlc_bool_t          b_got_frame;
     vlc_mutex_t         lock;
-    int                 i_vout_size_update_counter;
-    int                 i_x, i_y;
 };
 
 /*****************************************************************************
@@ -76,9 +74,6 @@ static int  Control( vout_thread_t *, int, va_list );
 static void Swap   ( vout_thread_t * p_vout );
 static int  Lock   ( vout_thread_t * p_vout );
 static void Unlock ( vout_thread_t * p_vout );
-
-static int AspectCropCallback( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
 
 int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 {
@@ -145,32 +140,28 @@ void E_(CloseVideoGL) ( vlc_object_t * p_this )
 
 static int Init( vout_thread_t * p_vout )
 {
-    /* The variable is in fact changed on the parent vout */
-    if( !var_Type( p_vout->p_parent, "aspect-ratio" ) )
-    {
-        var_Create( p_vout->p_parent, "aspect-ratio",
-                                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    }
-    var_AddCallback( p_vout->p_parent, "aspect-ratio", AspectCropCallback, p_vout );
-    if( !var_Type( p_vout->p_parent, "crop" ) )
-    {
-        var_Create( p_vout->p_parent, "crop",
-                                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    }
-    var_AddCallback( p_vout->p_parent, "crop", AspectCropCallback, p_vout );
     [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
     return VLC_SUCCESS;
 }
 
 static void End( vout_thread_t * p_vout )
 {
-    var_DelCallback( p_vout->p_parent, "aspect-ratio", AspectCropCallback, p_vout );
-    var_DelCallback( p_vout->p_parent, "crop", AspectCropCallback, p_vout );
     [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
 }
 
 static int Manage( vout_thread_t * p_vout )
 {
+    if( p_vout->i_changes & VOUT_ASPECT_CHANGE )
+    {
+        [p_vout->p_sys->o_glview reshape];
+        p_vout->i_changes &= ~VOUT_ASPECT_CHANGE;
+    }
+    if( p_vout->i_changes & VOUT_CROP_CHANGE )
+    {
+        [p_vout->p_sys->o_glview reshape];
+        p_vout->i_changes &= ~VOUT_CROP_CHANGE;
+    }
+
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
@@ -211,20 +202,6 @@ static int Manage( vout_thread_t * p_vout )
         [o_pool release];
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
-    }
-
-    if( p_vout->p_sys->i_vout_size_update_counter )
-    {
-        int i_old_x = p_vout->p_sys->i_x, i_old_y = p_vout->p_sys->i_y;
-        [p_vout->p_sys->o_glview reshape];
-        if( p_vout->p_sys->i_x != i_old_x || p_vout->p_sys->i_y != i_old_y )
-        {
-            p_vout->p_sys->i_vout_size_update_counter = 0;
-        }
-        else if( p_vout->p_sys->i_vout_size_update_counter > 0 )
-        {
-            p_vout->p_sys->i_vout_size_update_counter--;
-        }
     }
 
     [p_vout->p_sys->o_vout_view manage];
@@ -268,24 +245,6 @@ static int Lock( vout_thread_t * p_vout )
 static void Unlock( vout_thread_t * p_vout )
 {
     vlc_mutex_unlock( &p_vout->p_sys->lock );
-}
-
-static int AspectCropCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    /* Only update the vout size if the aspect ratio has actually been changed*/
-    /* We cannot change the size directly in this callback, since fmt_in
-       hasn't been updated yet, so do it in Manage */
-    if( strcmp( oldval.psz_string, newval.psz_string ) )
-    {
-        /* khludge ! Here, we are not sure that the vout size will actually
-           change (for instance if we go from Predefined to 4:3 on a 4:3
-           stream). So, to to trigger reshape endlessly, we decrease that
-           counter each time we call reshape. We put it to 0 directly if
-           we actually change the vout size. */
-        ((vout_thread_t *)p_data)->p_sys->i_vout_size_update_counter = 2;
-    }
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -366,9 +325,6 @@ static int AspectCropCallback( vlc_object_t *p_this, char const *psz_cmd,
               p_vout->fmt_in.i_sar_den) /
             ( p_vout->fmt_in.i_visible_width * p_vout->fmt_in.i_sar_num  );
     }
-
-    p_vout->p_sys->i_x = x;
-    p_vout->p_sys->i_y = y;
 
     glViewport( ( bounds.size.width - x ) / 2,
                 ( bounds.size.height - y ) / 2, x, y );
