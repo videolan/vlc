@@ -1,7 +1,7 @@
 /*****************************************************************************
  * prefs.m: MacOS X module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -303,7 +303,7 @@ static VLCTreeItem *o_root_item = nil;
                  * generate their config panel them when it is asked by the user. */
                 VLCTreeItem *p_last_category = NULL;
                 p_item = p_module->p_config;
-                o_children = [[NSMutableArray alloc] initWithCapacity:20];
+                o_children = [[NSMutableArray alloc] initWithCapacity:10];
                 if( p_item ) do
                 {
                     NSString *o_child_name;
