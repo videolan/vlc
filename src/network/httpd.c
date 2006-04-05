@@ -2166,7 +2166,8 @@ static void httpd_HostThread( httpd_host_t *host )
                                     if( b64 ) auth = malloc( strlen(b64) + 1 );
                                     else auth = malloc( strlen("") + 1 );
 
-                                    if( !strncasecmp( b64, "BASIC", 5 ) )
+                                    if( b64 != NULL
+                                         && !strncasecmp( b64, "BASIC", 5 ) )
                                     {
                                         b64 += 5;
                                         while( *b64 == ' ' )
