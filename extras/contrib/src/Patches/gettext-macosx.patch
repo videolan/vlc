@@ -1,0 +1,30 @@
+diff -ruN gettext/gettext-runtime/m4/gettext.m4 gettext-0.14.5/gettext-runtime/m4/gettext.m4
+--- gettext/gettext-runtime/m4/gettext.m4	2005-04-07 13:37:04.000000000 +0200
++++ gettext-0.14.5/gettext-runtime/m4/gettext.m4	2006-04-05 23:21:45.000000000 +0200
+@@ -445,7 +445,7 @@
+   fi
+ 
+   if test -n "$INTL_MACOSX_LIBS"; then
+-    CPPFLAGS="$CPPFLAGS -I/System/Library/Frameworks/CoreFoundation.framework/Headers"
++    CPPFLAGS="$CPPFLAGS -framework CoreFoundation"
+   fi
+ 
+   dnl intl/plural.c is generated from intl/plural.y. It requires bison,
+@@ -489,7 +489,7 @@
+   AC_CACHE_CHECK([for CFPreferencesCopyAppValue],
+     gt_cv_func_CFPreferencesCopyAppValue,
+     [gt_save_CPPFLAGS="$CPPFLAGS"
+-     CPPFLAGS="$CPPFLAGS -I/System/Library/Frameworks/CoreFoundation.framework/Headers"
++     CPPFLAGS="$CPPFLAGS -framework CoreFoundation"
+      gt_save_LIBS="$LIBS"
+      LIBS="$LIBS -framework CoreFoundation"
+      AC_TRY_LINK([#include <CFPreferences.h>],
+@@ -505,7 +505,7 @@
+   dnl Check for API introduced in MacOS X 10.3.
+   AC_CACHE_CHECK([for CFLocaleCopyCurrent], gt_cv_func_CFLocaleCopyCurrent,
+     [gt_save_CPPFLAGS="$CPPFLAGS"
+-     CPPFLAGS="$CPPFLAGS -I/System/Library/Frameworks/CoreFoundation.framework/Headers"
++     CPPFLAGS="$CPPFLAGS -framework CoreFoundation"
+      gt_save_LIBS="$LIBS"
+      LIBS="$LIBS -framework CoreFoundation"
+      AC_TRY_LINK([#include <CFLocale.h>], [CFLocaleCopyCurrent();],

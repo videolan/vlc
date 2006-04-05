@@ -376,6 +376,10 @@ gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_DARWIN_OS
+	patch -p 0 < Patches/gettext-macosx.patch
+	(cd $@; ./autogen.sh)
+endif
 
 .intl: gettext .iconv
 ifdef HAVE_WIN32
