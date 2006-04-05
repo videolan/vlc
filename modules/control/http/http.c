@@ -35,7 +35,7 @@ static void Close( vlc_object_t * );
 #define HOST_LONGTEXT N_( \
     "Address and port the HTTP interface will listen on. It defaults to " \
     "all network interfaces (0.0.0.0)." \
-    " If you want the telnet interface to be available only on the local " \
+    " If you want the HTTP interface to be available only on the local " \
     "machine, enter 127.0.0.1" )
 #define SRC_TEXT N_( "Source directory" )
 #define SRC_LONGTEXT N_( "Source directory" )
