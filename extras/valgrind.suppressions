@@ -394,20 +394,20 @@
 
 ## Configuration parsing
 
-{
-  config_Duplicate2
-  Memcheck:Leak
-  fun:malloc
-  fun:config_Duplicate
-  fun:vlc_entry__main
-  fun:AllocateBuiltinModule
-}
-{
-   config_Duplicate1
-   Memcheck:Leak
-   fun:malloc
-   fun:config_Duplicate
-}
+#{
+#  config_Duplicate2
+#  Memcheck:Leak
+#  fun:malloc
+#  fun:config_Duplicate
+#  fun:vlc_entry__main
+#  fun:AllocateBuiltinModule
+#}
+#{
+#   config_Duplicate1
+#   Memcheck:Leak
+#   fun:malloc
+#   fun:config_Duplicate
+#}
 
 ## Plugins allocation / dynamic loading
 {
