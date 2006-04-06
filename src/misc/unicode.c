@@ -375,7 +375,8 @@ int utf8_mkdir( const char *dirname )
     {
         if( GetLastError( ) == ERROR_ALREADY_EXISTS )
             errno = EEXIST;
-        errno = ENOENT;
+        else
+            errno = ENOENT;
         return -1;
     }
     return 0;
