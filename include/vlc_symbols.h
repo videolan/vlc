@@ -420,9 +420,9 @@ struct module_symbols_t
     void (*httpd_HandlerDelete_inner) (httpd_handler_t *);
     int (*__vlc_execve_inner) (vlc_object_t *p_object, int i_argc, char **pp_argv, char **pp_env, char *psz_cwd, char *p_in, int i_in, char **pp_data, int *pi_data);
     httpd_handler_t * (*httpd_HandlerNew_inner) (httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_handler_callback_t pf_fill, httpd_handler_sys_t *);
-    int (*osd_Slider_inner) (vlc_object_t *, spu_t *, int, int, int, int, short);
+    int (*osd_Slider_inner) (vlc_object_t *, spu_t *, int, int, int, int, int, int, short);
     int (*osd_ShowTextRelative_inner) (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t);
-    int (*osd_Icon_inner) (vlc_object_t *, spu_t *, int, int, int, short);
+    int (*osd_Icon_inner) (vlc_object_t *, spu_t *, int, int, int, int, int, short);
     void (*osd_Message_inner) (spu_t *, int, char *, ...);
     int (*osd_ShowTextAbsolute_inner) (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t);
     char * (*config_GetUserDir_inner) (void);

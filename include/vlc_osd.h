@@ -468,8 +468,8 @@ VLC_EXPORT( void,osd_Message, ( spu_t *, int, char *, ... ) );
  * object. The types are declared in the include file include/vlc_osd.h
  * @see vlc_osd.h
  */
-VLC_EXPORT( int, osd_Slider, ( vlc_object_t *, spu_t *, int, int, int, int, short ) );
-VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, short ) );
+VLC_EXPORT( int, osd_Slider, ( vlc_object_t *, spu_t *, int, int, int, int, int, int, short ) );
+VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, int, int, short ) );
 
 /**
  * Loading and parse the OSD Configuration file

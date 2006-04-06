@@ -44,7 +44,10 @@ void vout_OSDSlider( vlc_object_t *p_caller, int i_channel, int i_position,
     if( p_vout && ( config_GetInt( p_caller, "osd" ) || ( i_position >= 0 ) ) )
     {
         osd_Slider( p_caller, p_vout->p_spu, p_vout->render.i_width,
-            p_vout->render.i_height, i_channel, i_position, i_type );
+            p_vout->render.i_height, p_vout->fmt_in.i_x_offset,
+            p_vout->fmt_in.i_height - p_vout->fmt_in.i_visible_height
+                                    - p_vout->fmt_in.i_y_offset,
+            i_channel, i_position, i_type );
     }
     vlc_object_release( p_vout );
 }
@@ -62,8 +65,14 @@ void vout_OSDIcon( vlc_object_t *p_caller, int i_channel, short i_type )
 
     if( config_GetInt( p_caller, "osd" ) )
     {
-        osd_Icon( p_caller, p_vout->p_spu, p_vout->render.i_width,
-            p_vout->render.i_height, i_channel, i_type );
+        osd_Icon( p_caller,
+                  p_vout->p_spu,
+                  p_vout->render.i_width,
+                  p_vout->render.i_height,
+                  p_vout->fmt_in.i_width - p_vout->fmt_in.i_visible_width
+                                         - p_vout->fmt_in.i_x_offset,
+                  p_vout->fmt_in.i_y_offset,
+                  i_channel, i_type );
     }
     vlc_object_release( p_vout );
 }
