@@ -1765,6 +1765,9 @@ dirac-$(DIRAC_VERSION).tar.gz:
 
 dirac: dirac-$(DIRAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_DARWIN_OS
+	patch -p 0 <Patches/dirac-osx.patch
+endif
 ifneq ($(HOST),$(BUILD))
 	patch -p 0 <Patches/dirac-cross.patch
 	(cd $@; aclocal && autoconf && automake)

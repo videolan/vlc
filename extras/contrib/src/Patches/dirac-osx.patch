@@ -1,0 +1,13 @@
+diff -ruN dirac-0.5.3.orig/Makefile.in dirac/Makefile.in
+--- dirac-0.5.3.orig/Makefile.in	2005-08-23 13:04:01.000000000 +0200
++++ dirac/Makefile.in	2006-04-07 00:12:44.000000000 +0200
+@@ -230,8 +230,7 @@
+ sharedstatedir = @sharedstatedir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+-SUBDIRS = libdirac_common libdirac_motionest libdirac_encoder libdirac_decoder \
+-encoder decoder util $(CPPUNITTESTS_DIR) tests $(DOC_DIR) win32
++SUBDIRS = libdirac_common libdirac_motionest libdirac_encoder libdirac_decoder
+ 
+ @HAVE_DOXYGEN_FALSE@DOC_DIR = 
+ @HAVE_DOXYGEN_TRUE@DOC_DIR = doc
