@@ -39,7 +39,7 @@
 #define INTF_TITLE N_("Interface")
 #define INTF_HELP  N_( "Settings for VLC's interfaces" )
 
-#define INTF_GENERAL_HELP N_( "General interface setttings" )
+#define INTF_GENERAL_HELP N_( "General interface settings" )
 
 #define INTF_MAIN_TITLE  N_( "Main interfaces" )
 #define INTF_MAIN_HELP N_( "Settings for the main interface" )
