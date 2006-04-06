@@ -1650,7 +1650,7 @@ void E_(CAMStatus)( access_t * p_access )
 
 #define CHECK_TYPE( x, s )                                                  \
         if ( sinfo.type & (CA_##x) )                                        \
-            p += sprintf( p, s );
+            p += sprintf( p, "%s", s );
 
         CHECK_TYPE( CI, "high level, " );
         CHECK_TYPE( CI_LINK, "link layer level, " );

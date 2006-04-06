@@ -673,7 +673,7 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
   if( rtsp_read_data(rtsp_session, description, size) <= 0)
     goto error;
   description[size]=0;
-  fprintf(stderr,description);
+  fprintf(stderr, "%s", description);
 
   /* parse sdp (sdpplin) and create a header and a subscribe string */
   subscribe = (char *) malloc(sizeof(char)*256);
