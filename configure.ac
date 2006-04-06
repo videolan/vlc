@@ -130,6 +130,9 @@ dnl kludge because only the debian package provides a ffmpeg-config
     if test -z $with_mozilla_sdk_path; then
        with_mozilla_sdk_path=${topdir}/extras/contrib/gecko-sdk
     fi
+    if test -z $with_cyberlink_tree; then
+       with_cyberlink_tree=${topdir}/extras/contrib/src/clinkcc
+    fi
 
     if test ".`uname -s`" = ".Darwin"; then
       export LD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$LD_LIBRARY_PATH
