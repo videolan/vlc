@@ -812,208 +812,95 @@ char *E_(FirstWord)( char *psz, char *new )
     else
         return NULL;
 }
+
 /**********************************************************************
- * Find_end_MRL: Find the end of the sentence :
- * this function parses the string psz and find the end of the item
- * and/or option with detecting the " and ' problems.
- * returns NULL if an error is detected, otherwise, returns a pointer
- * of the end of the sentence (after the last character)
-**********************************************************************/
-static char *Find_end_MRL( char *psz )
-{
-    char *s_sent = psz;
-
-    switch( *s_sent )
-    {
-        case '\"':
-        {
-            s_sent++;
-
-            while( ( *s_sent != '\"' ) && ( *s_sent != '\0' ) )
-            {
-                if( *s_sent == '\'' )
-                {
-                    s_sent = Find_end_MRL( s_sent );
-
-                    if( s_sent == NULL )
-                    {
-                        return NULL;
-                    }
-                } else
-                {
-                    s_sent++;
-                }
-            }
-
-            if( *s_sent == '\"' )
-            {
-                s_sent++;
-                return s_sent;
-            } else  /* *s_sent == '\0' , which means the number of " is incorrect */
-            {
-                return NULL;
-            }
-            break;
-        }
-        case '\'':
-        {
-            s_sent++;
-
-            while( ( *s_sent != '\'' ) && ( *s_sent != '\0' ) )
-            {
-                if( *s_sent == '\"' )
-                {
-                    s_sent = Find_end_MRL( s_sent );
-
-                    if( s_sent == NULL )
-                    {
-                        return NULL;
-                    }
-                } else
-                {
-                    s_sent++;
-                }
-            }
-
-            if( *s_sent == '\'' )
-            {
-                s_sent++;
-                return s_sent;
-            } else  /* *s_sent == '\0' , which means the number of ' is incorrect */
-            {
-                return NULL;
-            }
-            break;
-        }
-        default: /* now we can look for spaces */
-        {
-            while( ( *s_sent != ' ' ) && ( *s_sent != '\0' ) )
-            {
-                if( ( *s_sent == '\'' ) || ( *s_sent == '\"' ) )
-                {
-                    s_sent = Find_end_MRL( s_sent );
-                } else
-                {
-                    s_sent++;
-                }
-            }
-            return s_sent;
-        }
-    }
-}
-/**********************************************************************
- * parse_MRL: parse the MRL, find the mrl string and the options,
+ * MRLParse: parse the MRL, find the MRL string and the options,
  * create an item with all information in it, and return the item.
  * return NULL if there is an error.
  **********************************************************************/
-playlist_item_t *E_(MRLParse)( intf_thread_t *p_intf, char *psz,
-                                   char *psz_name )
+
+/* Function analog to FirstWord except that it relies on colon instead
+ * of space to delimit option boundaries. */
+static char *FirstOption( char *psz, char *new )
 {
-    char **ppsz_options = NULL;
-    char *mrl;
+    vlc_bool_t b_end, b_start = VLC_TRUE;
+
+    while( *psz == ' ' )
+        psz++;
+
+    while( *psz != '\0' && (*psz != ' ' || psz[1] != ':') )
+    {
+        if( *psz == '\'' )
+        {
+            char c = *psz++;
+            while( *psz != '\0' && *psz != c )
+            {
+                if( *psz == '\\' && psz[1] != '\0' )
+                    psz++;
+                *new++ = *psz++;
+                b_start = VLC_FALSE;
+            }
+            if( *psz == c )
+                psz++;
+        }
+        else
+        {
+            if( *psz == '\\' && psz[1] != '\0' )
+                psz++;
+            *new++ = *psz++;
+            b_start = VLC_FALSE;
+        }
+    }
+    b_end = !*psz;
+
+    if ( !b_start )
+        while (new[-1] == ' ')
+            new--;
+
+    *new++ = '\0';
+    if( !b_end )
+        return psz + 1;
+    else
+        return NULL;
+}
+
+playlist_item_t *E_(MRLParse)( intf_thread_t *p_intf, char *_psz,
+                               char *psz_name )
+{
+    char *psz = strdup( _psz );
     char *s_mrl = psz;
-    int i_error = 0;
     char *s_temp;
-    int i = 0;
-    int i_options = 0;
     playlist_item_t * p_item = NULL;
 
-    /* In case there is spaces before the mrl */
-    while( *s_mrl == ' ' )
-        s_mrl++;
-
     /* extract the mrl */
-    s_temp = strstr( s_mrl , " :" );
+    s_temp = FirstOption( s_mrl, s_mrl );
     if( s_temp == NULL )
     {
         s_temp = s_mrl + strlen( s_mrl );
-    } else
-    {
-        while( (*s_temp == ' ') && (s_temp != s_mrl ) )
-        {
-            s_temp--;
-        }
-        s_temp++;
     }
 
-    /* if the mrl is between " or ', we must remove them */
-    if( (*s_mrl == '\'') || (*s_mrl == '\"') )
-    {
-        mrl = (char *)malloc( (s_temp - s_mrl - 1) * sizeof( char ) );
-        strncpy( mrl , (s_mrl + 1) , s_temp - s_mrl - 2 );
-        mrl[ s_temp - s_mrl - 2 ] = '\0';
-    } else
-    {
-        mrl = (char *)malloc( (s_temp - s_mrl + 1) * sizeof( char ) );
-        strncpy( mrl , s_mrl , s_temp - s_mrl );
-        mrl[ s_temp - s_mrl ] = '\0';
-    }
-
+    p_item = playlist_ItemNew( p_intf, s_mrl, psz_name );
     s_mrl = s_temp;
 
     /* now we can take care of the options */
-    while( (*s_mrl != '\0') && (i_error == 0) )
+    while ( *s_mrl != '\0' )
     {
-        switch( *s_mrl )
+        s_temp = FirstOption( s_mrl, s_mrl );
+        if( s_mrl == '\0' )
+            break;
+        if( s_temp == NULL )
         {
-            case ' ':
-            {
-                s_mrl++;
-                break;
-            }
-            case ':': /* an option */
-            {
-                s_temp = Find_end_MRL( s_mrl );
-
-                if( s_temp == NULL )
-                {
-                    i_error = 1;
-                }
-                else
-                {
-                    i_options++;
-                    ppsz_options = realloc( ppsz_options , i_options *
-                                            sizeof(char *) );
-                    ppsz_options[ i_options - 1 ] =
-                        malloc( (s_temp - s_mrl + 1) * sizeof(char) );
-
-                    strncpy( ppsz_options[ i_options - 1 ] , s_mrl ,
-                             s_temp - s_mrl );
-
-                    /* don't forget to finish the string with a '\0' */
-                    (ppsz_options[ i_options - 1 ])[ s_temp - s_mrl ] = '\0';
-
-                    s_mrl = s_temp;
-                }
-                break;
-            }
-            default:
-            {
-                i_error = 1;
-                break;
-            }
+            s_temp = s_mrl + strlen( s_mrl );
         }
+        playlist_ItemAddOption( p_item, s_mrl );
+        s_mrl = s_temp;
     }
 
-    if( i_error != 0 )
-    {
-        free( mrl );
-    }
-    else
-    {
-        /* now create an item */
-        p_item = playlist_ItemNew( p_intf, mrl, psz_name );
-        for( i = 0 ; i< i_options ; i++ )
-        {
-            playlist_ItemAddOption( p_item, ppsz_options[i] );
-        }
-    }
-
-    for( i = 0; i < i_options; i++ ) free( ppsz_options[i] );
-    if( i_options ) free( ppsz_options );
+    free( psz );
 
     return p_item;
 }
+
 /**********************************************************************
  * RealPath: parse ../, ~ and path stuff
  **********************************************************************/
