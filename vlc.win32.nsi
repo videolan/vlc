@@ -173,7 +173,7 @@ NoBackup:
   ReadRegStr $0 HKCR "VLC$R0" ""
   WriteRegStr HKCR "VLC$R0" "" "VLC media file"
   WriteRegStr HKCR "VLC$R0\shell" "" "Play"
-  WriteRegStr HKCR "VLC$R0\shell\Play\command" "" '"$INSTDIR\vlc.exe" --one-instance "%1"'
+  WriteRegStr HKCR "VLC$R0\shell\Play\command" "" '"$INSTDIR\vlc.exe" "%1"'
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 FunctionEnd
 
@@ -283,10 +283,10 @@ Section "Media player (required)" SEC01
 
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" "Play with VLC media player"
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC\command" "" \
-    "$INSTDIR\vlc.exe --one-instance cdda:%1"
+    "$INSTDIR\vlc.exe cdda:%1"
   WriteRegStr HKCR "DVD\shell\PlayWithVLC" "" "Play with VLC media player"
   WriteRegStr HKCR "DVD\shell\PlayWithVLC\command" "" \
-    "$INSTDIR\vlc.exe --one-instance dvd:%1"
+    "$INSTDIR\vlc.exe dvd:%1"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayDVDMovieOnArrival" "VLCPlayDVDMovieOnArrival" ""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Action" "Play DVD movie"
@@ -304,12 +304,12 @@ Section "Media player (required)" SEC01
   WriteRegStr HKCR "VLC.DVDMovie" "" "VLC DVD Movie"
   WriteRegStr HKCR "VLC.DVDMovie\shell" "" "Play"
   WriteRegStr HKCR "VLC.DVDMovie\shell\Play\command" "" \
-    '$INSTDIR\vlc.exe --one-instance dvd:%1'
+    '$INSTDIR\vlc.exe dvd:%1'
   WriteRegStr HKCR "VLC.DVDMovie\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKCR "VLC.CDAudio" "" "VLC CD Audio"
   WriteRegStr HKCR "VLC.CDAudio\shell" "" "Play"
   WriteRegStr HKCR "VLC.CDAudio\shell\Play\command" "" \
-    '$INSTDIR\vlc.exe --one-instance cdda:%1'
+    '$INSTDIR\vlc.exe cdda:%1'
   WriteRegStr HKCR "VLC.CDAudio\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
 SectionEnd
