@@ -126,8 +126,8 @@ ifdef HAVE_DARWIN_OS
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
 	.dvdcss .dvdnav .dvdread .dvbpsi .live .x264 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
-	.glib .libidl .gecko .mpcdec .expat .clinkcc .aclocal .dirac_encoder .dirac_decoder 
-# .FLAC .expat .clinkcc don't work with SDK yet
+	.glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder .aclocal
+# .expat .clinkcc don't work with SDK yet
 # .glib .libidl .gecko are required to build the mozilla plugin
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 ifneq ($(HOST),i686-apple-darwin8)
@@ -1820,6 +1820,9 @@ expat: expat-$(EXPAT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .expat: expat
+ifdef HAVE_DARWIN_OS
+	(cd $< aclocal --force && libtoolize --force && autoconf --force && autoheader --force )
+endif
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
