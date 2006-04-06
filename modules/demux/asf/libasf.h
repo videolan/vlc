@@ -364,7 +364,7 @@ typedef struct
     int64_t i_average_time_per_frame;
 
     int     i_stream_name_count;
-    int     i_payload_extention_system_count;
+    int     i_payload_extension_system_count;
 
     int     *pi_stream_name_language;
     char    **ppsz_stream_name;

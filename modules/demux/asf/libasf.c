@@ -866,7 +866,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
     p_esp->i_language_index = GetWLE( &p_data[50] );
     p_esp->i_average_time_per_frame= GetQWLE( &p_data[52] );
     p_esp->i_stream_name_count = GetWLE( &p_data[60] );
-    p_esp->i_payload_extention_system_count = GetWLE( &p_data[62] );
+    p_esp->i_payload_extension_system_count = GetWLE( &p_data[62] );
 
     p_data += 64;
 
@@ -895,7 +895,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         p_esp->ppsz_stream_name[i] = psz;
     }
 
-    for( i = 0; i < p_esp->i_payload_extention_system_count; i++ )
+    for( i = 0; i < p_esp->i_payload_extension_system_count; i++ )
     {
         /* Skip them */
         int i_size = GetDWLE( &p_data[16 + 2] );
@@ -946,8 +946,8 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         msg_Dbg( s, "     - lang id=%d name=%s",
                  p_esp->pi_stream_name_language[i],
                  p_esp->ppsz_stream_name[i] );
-    msg_Dbg( s, "  - payload extention system count=%d",
-             p_esp->i_payload_extention_system_count );
+    msg_Dbg( s, "  - payload extension system count=%d",
+             p_esp->i_payload_extension_system_count );
 #endif
     return VLC_SUCCESS;
 }
@@ -1371,7 +1371,7 @@ static const struct
     { &asf_object_file_properties_guid, "File Properties" },
     { &asf_object_stream_properties_guid, "Stream Properties" },
     { &asf_object_content_description_guid, "Content Description" },
-    { &asf_object_header_extension_guid, "Header Extention" },
+    { &asf_object_header_extension_guid, "Header Extension" },
     { &asf_object_metadata_guid, "Metadata" },
     { &asf_object_codec_list_guid, "Codec List" },
     { &asf_object_marker_guid, "Marker" },

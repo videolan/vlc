@@ -564,7 +564,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     {
         int i_type = p_frag->p_buffer[4] >> 4;
 
-        /* Extention start code */
+        /* Extension start code */
         if( i_type == 0x01 )
         {
 #if 0
@@ -576,7 +576,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             };
 #endif
 
-            /* sequence extention */
+            /* sequence extension */
             if( p_sys->p_ext) block_Release( p_sys->p_ext );
             p_sys->p_ext = block_Duplicate( p_frag );
 
@@ -604,7 +604,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         }
         else if( i_type == 0x08 )
         {
-            /* picture extention */
+            /* picture extension */
             p_sys->i_picture_structure = p_frag->p_buffer[6]&0x03;
             p_sys->i_top_field_first   = p_frag->p_buffer[7] >> 7;
             p_sys->i_repeat_first_field= (p_frag->p_buffer[7]>>1)&0x01;

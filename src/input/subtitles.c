@@ -62,7 +62,7 @@
 
 
 /**
- * The possible extentions for subtitle files we support
+ * The possible extensions for subtitle files we support
  */
 static const char * sub_exts[] = {  "utf", "utf8", "utf-8", "sub", "srt", "smi", "txt", "ssa", "idx", NULL };
 /* extensions from unsupported types */

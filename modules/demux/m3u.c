@@ -119,7 +119,7 @@ static int Activate( vlc_object_t * p_this )
         i_type = TYPE_B4S;
     }
 
-    /* we had no luck looking at the file extention, so we have a look
+    /* we had no luck looking at the file extension, so we have a look
      * at the content. This is useful for .asp, .php and similar files
      * that are actually html. Also useful for some asx files that have
      * another extension */

@@ -606,7 +606,7 @@ static void MuxWritePackHeader( sout_mux_t *p_mux, block_t **p_buf,
 
     if( p_sys->b_mpeg2 )
     {
-        bits_write( &bits, 9,  0 ); // src extention
+        bits_write( &bits, 9,  0 ); // src extension
     }
     bits_write( &bits, 1,  1 );     // marker
 

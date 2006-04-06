@@ -761,7 +761,7 @@ static const guid_t asf_object_file_properties_guid =
 {0x8cabdca1, 0xa947, 0x11cf, {0x8e, 0xe4, 0x00, 0xC0, 0x0C, 0x20, 0x53, 0x65}};
 static const guid_t asf_object_stream_properties_guid =
 {0xB7DC0791, 0xA9B7, 0x11CF, {0x8E, 0xE6, 0x00, 0xC0, 0x0C, 0x20, 0x53, 0x65}};
-static const guid_t asf_object_header_extention_guid =
+static const guid_t asf_object_header_extension_guid =
 {0x5FBF03B5, 0xA92E, 0x11CF, {0x8E, 0xE3, 0x00, 0xC0, 0x0C, 0x20, 0x53, 0x65}};
 static const guid_t asf_object_stream_type_audio =
 {0xF8699E40, 0x5B4D, 0x11CF, {0xA8, 0xFD, 0x00, 0x80, 0x5F, 0x5C, 0x44, 0x2B}};
@@ -893,10 +893,10 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size max */
     bo_addle_u32( &bo, p_sys->i_bitrate );      /* maxbitrate */
 
-    /* header extention */
+    /* header extension */
     if( i_header_ext_size )
     {
-        bo_add_guid ( &bo, &asf_object_header_extention_guid );
+        bo_add_guid ( &bo, &asf_object_header_extension_guid );
         bo_addle_u64( &bo, i_header_ext_size );
         bo_add_guid ( &bo, &asf_guid_reserved_1 );
         bo_addle_u16( &bo, 6 );

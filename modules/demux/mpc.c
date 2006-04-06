@@ -113,7 +113,7 @@ static int Open( vlc_object_t * p_this )
 
     if( memcmp( p_peek, "MP+", 3 ) )
     {
-        /* for v4..6 we check extention file */
+        /* for v4..6 we check extension file */
         const int i_version = (GetDWLE( p_peek ) >> 11)&0x3ff;
 
         if( i_version  < 4 || i_version > 6 )

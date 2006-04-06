@@ -124,7 +124,7 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                 bits_write( &bits, 1, 0x00 ); // dsm trick mode flag
                 bits_write( &bits, 1, 0x00 ); // additional copy info flag
                 bits_write( &bits, 1, 0x00 ); // pes crc flag
-                bits_write( &bits, 1, 0x00 ); // pes extention flags
+                bits_write( &bits, 1, 0x00 ); // pes extension flags
                 bits_write( &bits, 8, i_header_size ); // header size -> pts and dts
 
                 /* write pts */

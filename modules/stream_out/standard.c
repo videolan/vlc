@@ -154,7 +154,7 @@ static int Open( vlc_object_t *p_this )
     /* ext -> muxer name */
     if( psz_url && strrchr( psz_url, '.' ) )
     {
-        /* by extention */
+        /* by extension */
         static struct { char *ext; char *mux; } exttomux[] =
         {
             { "avi", "avi" },
@@ -178,7 +178,7 @@ static int Open( vlc_object_t *p_this )
         char *psz_ext = strrchr( psz_url, '.' ) + 1;
         int  i;
 
-        msg_Dbg( p_this, "extention is %s", psz_ext );
+        msg_Dbg( p_this, "extension is %s", psz_ext );
         for( i = 0; exttomux[i].ext != NULL; i++ )
         {
             if( !strcasecmp( psz_ext, exttomux[i].ext ) )
@@ -187,7 +187,7 @@ static int Open( vlc_object_t *p_this )
                 break;
             }
         }
-        msg_Dbg( p_this, "extention -> mux=%s", psz_mux_byext );
+        msg_Dbg( p_this, "extension -> mux=%s", psz_mux_byext );
     }
 
     /* We fix access/mux to valid couple */
@@ -197,7 +197,7 @@ static int Open( vlc_object_t *p_this )
         if( psz_mux_byext )
         {
             msg_Warn( p_stream,
-                      "no access _and_ no muxer, extention gives file/%s",
+                      "no access _and_ no muxer, extension gives file/%s",
                       psz_mux_byext );
             psz_access = strdup("file");
             psz_mux    = strdup(psz_mux_byext);
@@ -227,7 +227,7 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
-            msg_Err( p_stream, "no mux specified or found by extention" );
+            msg_Err( p_stream, "no mux specified or found by extension" );
             return VLC_EGENERIC;
         }
     }

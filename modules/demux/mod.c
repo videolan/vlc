@@ -135,7 +135,7 @@ static int Open( vlc_object_t *p_this )
     ModPlug_Settings settings;
     vlc_value_t val;
 
-    /* We accept file based on extention match */
+    /* We accept file based on extension match */
     if( strcasecmp( p_demux->psz_demux, "mod" ) )
     {
         if( ( ext = strchr( p_demux->psz_path, '.' ) ) == NULL ||
