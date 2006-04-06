@@ -4159,7 +4159,7 @@ dnl  CyberLink for C++ UPnP stack
 dnl
 AC_ARG_ENABLE(cyberlink,
   [  --enable-cyberlink      CyberLink for C++ UPnP stack (default disabled)])
-AS_IF([test "${CXX}" != "" -a "${enable_cyberlink}" = "yes" || (test "${enable_cyberlink}" != "no")], [
+  AS_IF([test "${enable_cyberlink}" = "yes" ], [
   AC_ARG_WITH(cyberlink-tree,
     [    --with-cyberlink-tree=PATH CyberLink for C++ tree for static linking])
 
