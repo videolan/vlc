@@ -171,90 +171,14 @@ static inline void vlc_UrlClean( vlc_url_t *url )
 
 VLC_EXPORT( char *, unescape_URI_duplicate, ( const char *psz ) );
 VLC_EXPORT( void, unescape_URI, ( char *psz ) );
+VLC_EXPORT( char *, decode_URI_duplicate, ( const char *psz ) );
+VLC_EXPORT( void, decode_URI, ( char *psz ) );
+VLC_EXPORT( char *, encode_URI, ( const char *psz ) );
 
-static inline int isurlsafe( int c )
-{
-    return ( (unsigned char)( c - 'a' ) < 26 )
-        || ( (unsigned char)( c - 'A' ) < 26 )
-        || ( (unsigned char)( c - '0' ) < 10 )
-        /* Hmm, we should not encode character that are allowed in URLs
-         * (even if they are not URL-safe), nor URL-safe characters.
-         * We still encode some of them because of Microsoft's crap browser.
-         */
-        || ( strchr( "-_.", c ) != NULL );
-}
-
-static inline char url_hexchar( int c )
-{
-    return ( c < 10 ) ? c + '0' : c + 'A' - 10;
-}
-
-/*****************************************************************************
- * vlc_UrlEncode:
- *****************************************************************************
- * perform URL encoding
- * (you do NOT want to do URL decoding - it is not reversible - do NOT do it)
- *****************************************************************************/
 static inline char *vlc_UrlEncode( const char *psz_url )
 {
-    char psz_enc[3 * strlen( psz_url ) + 1], *out = psz_enc;
-    const uint8_t *in;
-
-    for( in = (const uint8_t *)psz_url; *in; in++ )
-    {
-        uint8_t c = *in;
-
-        if( isurlsafe( c ) )
-        {
-            *out++ = (char)c;
-        }
-        else
-        {
-            uint16_t cp;
-
-            *out++ = '%';
-            /* UTF-8 to UCS-2 conversion */
-            if( ( c & 0x80 ) == 0 )
-            {
-                cp = c;
-            }
-            else if( ( c & 0xe0 ) == 0xc0 )
-            {
-                cp = (((uint16_t)c & 0x1f) << 6) | (in[1] & 0x3f);
-                in++;
-            }
-            else if( ( c & 0xf0 ) == 0xe0 )
-            {
-                cp = (((uint16_t)c & 0xf) << 12) | (((uint16_t)(in[1]) & 0x3f) << 6) | (in[2] & 0x3f);
-                in += 2;
-            }
-            else
-            {
-                /* cannot URL-encode code points outside the BMP */
-                /* better a wrong conversion than a crash */
-                cp = '?';
-            }
-
-            if( cp < 0xff )
-            {
-                /* Encode ISO-8859-1 characters */
-                *out++ = url_hexchar( cp >> 4 );
-                *out++ = url_hexchar( cp & 0xf );
-            }
-            else
-            {
-                /* Encode non-Latin-1 characters */
-                *out++ = 'u';
-                *out++ = url_hexchar( cp >> 12       );
-                *out++ = url_hexchar((cp >>  8) & 0xf );
-                *out++ = url_hexchar((cp >>  4) & 0xf );
-                *out++ = url_hexchar( cp        & 0xf );
-            }
-        }
-    }
-    *out++ = '\0';
-
-    return strdup( psz_enc );
+    /* FIXME: do not encode / : ? and & _when_ not needed */
+    return encode_URI( psz_url );
 }
 
 /*****************************************************************************
@@ -279,7 +203,10 @@ static inline int vlc_UrlIsNotEncoded( const char *psz_url )
             ptr += 2;
         }
         else
-        if( !isurlsafe( c ) )
+        if(  ( (unsigned char)( c - 'a' ) < 26 )
+          || ( (unsigned char)( c - 'A' ) < 26 )
+          || ( (unsigned char)( c - '0' ) < 10 )
+          || ( strchr( "-_.", c ) != NULL ) )
             return 1;
     }
     return 0; /* looks fine - but maybe it is not encoded */

@@ -33,7 +33,8 @@
 #include <assert.h>
 
 #include "vlc_strings.h"
-#include "vlc_url.h" 
+#include "vlc_url.h"
+#include "charset.h"
 
 /**
  * Unescape URI encoded string
@@ -114,6 +115,111 @@ void unescape_URI( char *psz )
         }
     }
     *out = '\0';
+}
+
+/**
+ * Decode encoded URI string
+ * \return decoded duplicated string
+ */
+char *decode_URI_duplicate( const char *psz )
+{
+    char *psz_dup = strdup( psz );
+    unescape_URI( psz_dup );
+    return psz_dup;
+}
+
+/**
+ * Decode encoded URI string in place
+ * \return nothing
+ */
+void decode_URI( char *psz )
+{
+    unsigned char *in = (unsigned char *)psz, *out = in, c;
+
+    while( ( c = *in++ ) != '\0' )
+    {
+        switch( c )
+        {
+            case '%':
+            {
+                char hex[2];
+
+                if( ( ( hex[0] = *in++ ) == 0 )
+                 || ( ( hex[1] = *in++ ) == 0 ) )
+                    return;
+
+                hex[2] = '\0';
+                *out++ = (unsigned char)strtoul( hex, NULL, 0x10 );
+                break;
+            }
+
+            case '+':
+                *out++ = ' ';
+
+            default:
+                /* Inserting non-ASCII or non-printable characters is unsafe,
+                 * and no sane browser will send these unencoded */
+                if( ( c < 32 ) || ( c > 127 ) )
+                    *out++ = '?';
+                else
+                    *out++ = c;
+        }
+    }
+    *out = '\0';
+    EnsureUTF8( psz );
+}
+
+static inline int isurlsafe( int c )
+{
+    return ( (unsigned char)( c - 'a' ) < 26 )
+            || ( (unsigned char)( c - 'A' ) < 26 )
+            || ( (unsigned char)( c - '0' ) < 10 )
+        /* Hmm, we should not encode character that are allowed in URLs
+         * (even if they are not URL-safe), nor URL-safe characters.
+         * We still encode some of them because of Microsoft's crap browser.
+         */
+            || ( strchr( "-_.", c ) != NULL );
+}
+
+static inline char url_hexchar( int c )
+{
+    return ( c < 10 ) ? c + '0' : c + 'A' - 10;
+}
+
+/**
+ * encode_URI_component
+ * Encodes an URI component.
+ *
+ * @param psz_url nul-terminated UTF-8 representation of the component.
+ * Obviously, you can't pass an URI containing a nul character, but you don't
+ * want to do that, do you?
+ *
+ * @return encoded string (must be free()'d)
+ */
+char *encode_URI_component( const char *psz_url )
+{
+    char psz_enc[3 * strlen( psz_url ) + 1], *out = psz_enc;
+    const uint8_t *in;
+
+    for( in = (const uint8_t *)psz_url; *in; in++ )
+    {
+        uint8_t c = *in;
+
+        if( isurlsafe( c ) )
+            *out++ = (char)c;
+        else
+        if ( c == ' ')
+            *out++ = '+';
+        else
+        {
+            *out++ = '%';
+            *out++ = url_hexchar( c >> 4 );
+            *out++ = url_hexchar( c & 0xf );
+        }
+    }
+    *out++ = '\0';
+
+    return strdup( psz_enc );
 }
 
 /**
