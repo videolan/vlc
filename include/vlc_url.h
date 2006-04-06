@@ -198,37 +198,42 @@ static inline char url_hexchar( int c )
 static inline char *vlc_UrlEncode( const char *psz_url )
 {
     char psz_enc[3 * strlen( psz_url ) + 1], *out = psz_enc;
-    const unsigned char *in;
+    const uint8_t *in;
 
-    for( in = (const unsigned char *)psz_url; *in; in++ )
+    for( in = (const uint8_t *)psz_url; *in; in++ )
     {
-        unsigned char c = *in;
+        uint8_t c = *in;
 
         if( isurlsafe( c ) )
+        {
             *out++ = (char)c;
+        }
         else
         {
             uint16_t cp;
 
             *out++ = '%';
             /* UTF-8 to UCS-2 conversion */
-            if( ( c & 0x7f ) == 0 )
-                cp = c;
-            else
-            if( ( c & 0xe0 ) == 0xc0 )
+            if( ( c & 0x80 ) == 0 )
             {
-                cp = ((c & 0x1f) << 6) | (in[1] & 0x3f);
+                cp = c;
+            }
+            else if( ( c & 0xe0 ) == 0xc0 )
+            {
+                cp = (((uint16_t)c & 0x1f) << 6) | (in[1] & 0x3f);
                 in++;
             }
-            else
-            if( ( c & 0xf0 ) == 0xe0 )
+            else if( ( c & 0xf0 ) == 0xe0 )
             {
-                cp = ((c & 0xf) << 12) | ((in[1] & 0x3f) << 6) | (in[2] & 0x3f);
+                cp = (((uint16_t)c & 0xf) << 12) | (((uint16_t)(in[1]) & 0x3f) << 6) | (in[2] & 0x3f);
                 in += 2;
             }
             else
+            {
                 /* cannot URL-encode code points outside the BMP */
-                return NULL;
+                /* better a wrong conversion than a crash */
+                cp = '?';
+            }
 
             if( cp < 0xff )
             {
