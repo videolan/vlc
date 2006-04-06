@@ -40,7 +40,7 @@ HRESULT VLCControl::getTypeInfo(void)
     {
         ITypeLib *p_typelib;
 
-        HRESULT hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
+        hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
         if( SUCCEEDED(hr) )
         {
             hr = p_typelib->GetTypeInfoOfGuid(IID_IVLCControl, &_p_typeinfo);
@@ -186,7 +186,7 @@ STDMETHODIMP VLCControl::get_Position(float *position)
     if( _p_instance->isRunning() )
     {
         int i_vlc;
-        HRESULT result = _p_instance->getVLCObject(&i_vlc);
+        result = _p_instance->getVLCObject(&i_vlc);
         if( SUCCEEDED(result) )
         {
             *position = VLC_PositionGet(i_vlc);
@@ -203,7 +203,7 @@ STDMETHODIMP VLCControl::put_Position(float position)
     if( _p_instance->isRunning() )
     {
         int i_vlc;
-        HRESULT result = _p_instance->getVLCObject(&i_vlc);
+        result = _p_instance->getVLCObject(&i_vlc);
         if( SUCCEEDED(result) )
         {
             VLC_PositionSet(i_vlc, position);
@@ -221,7 +221,7 @@ STDMETHODIMP VLCControl::get_Time(int *seconds)
     if( _p_instance->isRunning() )
     {
         int i_vlc;
-        HRESULT result = _p_instance->getVLCObject(&i_vlc);
+        result = _p_instance->getVLCObject(&i_vlc);
         if( SUCCEEDED(result) )
         {
             *seconds = VLC_TimeGet(i_vlc);
