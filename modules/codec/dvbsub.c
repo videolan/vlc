@@ -59,12 +59,6 @@
 #define ENC_POSY_TEXT N_("Encoding Y coordinate")
 #define ENC_POSY_LONGTEXT N_("Y coordinate of the encoded subtitle" )
 
-#define TIMEOUT_TEXT N_("Timeout")
-#define TIMEOUT_LONGTEXT N_( \
-    "Subpictures get a default timeout of 15 seconds added to their " \
-    "remaining time." \
-    "This will ensure that they are at least the specified time visible.")
-
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -102,7 +96,6 @@ vlc_module_begin();
 
     add_integer( ENC_CFG_PREFIX "x", -1, NULL, ENC_POSX_TEXT, ENC_POSX_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "y", -1, NULL, ENC_POSY_TEXT, ENC_POSY_LONGTEXT, VLC_FALSE );
-    add_integer( ENC_CFG_PREFIX "timeout", 15, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
 static const char *ppsz_enc_options[] = { NULL };
@@ -1498,7 +1491,6 @@ struct encoder_sys_t
     /* subpicture positioning */
     int i_offset_x;
     int i_offset_y;
-    int i_timeout_delay;
 };
 
 static void encode_page_composition( encoder_t *, bs_t *, subpicture_t * );
@@ -1547,9 +1539,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     var_Create( p_this, ENC_CFG_PREFIX "y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, ENC_CFG_PREFIX "y", &val );
     p_sys->i_offset_y = val.i_int;
-    var_Create( p_this, ENC_CFG_PREFIX "timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, ENC_CFG_PREFIX "timeout", &val );
-    p_sys->i_timeout_delay = val.i_int;
 
     return VLC_SUCCESS;
 }
@@ -1934,7 +1923,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
         i_timeout = (p_subpic->i_stop - p_subpic->i_start) / 1000000;
     }
 
-    bs_write( s, 8, i_timeout + p_sys->i_timeout_delay ); /* Timeout */
+    bs_write( s, 8, i_timeout ); /* Timeout */
     bs_write( s, 4, p_sys->i_page_ver++ );
     bs_write( s, 2, b_mode_change ?
               DVBSUB_PCS_STATE_CHANGE : DVBSUB_PCS_STATE_ACQUISITION );
