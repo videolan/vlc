@@ -149,7 +149,9 @@ void system_Configure( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
         }
     }
 
-    if( config_GetInt( p_this, "one-instance" ) )
+    if( config_GetInt( p_this, "one-instance" )
+        || ( config_GetInt( p_this, "one-instance-when-started-from-file" )
+             && config_GetInt( p_this, "started-from-file" ) ) )
     {
         HANDLE hmutex;
 

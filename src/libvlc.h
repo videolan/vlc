@@ -831,6 +831,15 @@ static char *ppsz_clock_descriptions[] =
     "double-click on a file in the explorer. This option will allow you " \
     "to play the file with the already running instance or enqueue it.")
 
+#define STARTEDFROMFILE_TEXT N_("VLC is started from file association")
+#define STARTEDFROMFILE_LONGTEXT N_( \
+    "Tell VLC that it is being launched due to a file association in the OS" )
+
+#define ONEINSTANCEWHENSTARTEDFROMFILE_TEXT N_( \
+    "Allow only on running instance when started from file")
+#define ONEINSTANCEWHENSTARTEDFROMFILE_LONGTEXT N_( \
+    "Allow only on running instance when started from file")
+
 #define HPRIORITY_TEXT N_("Increase the priority of the process")
 #define HPRIORITY_LONGTEXT N_( \
     "Increasing the priority of the process will very likely improve your " \
@@ -1464,6 +1473,11 @@ vlc_module_begin();
 #if defined(WIN32)
     add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT,
               ONEINSTANCE_LONGTEXT, VLC_TRUE );
+    add_bool( "started-from-file", 0, NULL, STARTEDFROMFILE_TEXT,
+              STARTEDFROMFILE_LONGTEXT, VLC_TRUE );
+    add_bool( "one-instance-when-started-from-file", 1, NULL,
+              ONEINSTANCEWHENSTARTEDFROMFILE_TEXT,
+              ONEINSTANCEWHENSTARTEDFROMFILE_LONGTEXT, VLC_TRUE );
     add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, VLC_TRUE );
     add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT,

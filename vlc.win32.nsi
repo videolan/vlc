@@ -173,7 +173,7 @@ NoBackup:
   ReadRegStr $0 HKCR "VLC$R0" ""
   WriteRegStr HKCR "VLC$R0" "" "VLC media file"
   WriteRegStr HKCR "VLC$R0\shell" "" "Play"
-  WriteRegStr HKCR "VLC$R0\shell\Play\command" "" '"$INSTDIR\vlc.exe" "%1"'
+  WriteRegStr HKCR "VLC$R0\shell\Play\command" "" '"$INSTDIR\vlc.exe" --one-instance-when-started-from-file "%1"'
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 FunctionEnd
 
@@ -219,10 +219,10 @@ FunctionEnd
 
 !macro AddContextMenu EXT
   WriteRegStr HKCR ${EXT}\shell\PlayWithVLC "" "Play with VLC media player"
-  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC\command "" '$INSTDIR\vlc.exe --no-playlist-enqueue "%1"'
+  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC\command "" '$INSTDIR\vlc.exe --one-instance-when-started-from-file --no-playlist-enqueue "%1"'
 
   WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC "" "Add to VLC media player's Playlist"
-  WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC\command "" '$INSTDIR\vlc.exe --one-instance --playlist-enqueue "%1"'
+  WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC\command "" '$INSTDIR\vlc.exe --one-instance-when-started-from-file --playlist-enqueue "%1"'
 !macroend
 
 !macro DeleteContextMenu EXT
@@ -278,15 +278,15 @@ Section "Media player (required)" SEC01
   WriteRegStr HKCR Applications\vlc.exe "FriendlyAppName" "VLC media player"
   WriteRegStr HKCR Applications\vlc.exe\shell\Play "" "Play with VLC"
   WriteRegStr HKCR Applications\vlc.exe\shell\Play\command "" \
-    '$INSTDIR\vlc.exe "%1"'
+    '$INSTDIR\vlc.exe --one-instance-when-started-from-file "%1"'
   !insertmacro MacroAllExtensions WriteRegStrSupportedTypes
 
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" "Play with VLC media player"
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC\command" "" \
-    "$INSTDIR\vlc.exe cdda:%1"
+    "$INSTDIR\vlc.exe --one-instance-when-started-from-file cdda:%1"
   WriteRegStr HKCR "DVD\shell\PlayWithVLC" "" "Play with VLC media player"
   WriteRegStr HKCR "DVD\shell\PlayWithVLC\command" "" \
-    "$INSTDIR\vlc.exe dvd:%1"
+    "$INSTDIR\vlc.exe --one-instance-when-started-from-file dvd:%1"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayDVDMovieOnArrival" "VLCPlayDVDMovieOnArrival" ""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Action" "Play DVD movie"
@@ -297,19 +297,19 @@ Section "Media player (required)" SEC01
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayCDAudioOnArrival" "VLCPlayCDAudioOnArrival" ""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Action" "Play CD audio"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe --one-instance-when-started-from-file",0'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "InvokeProgID" "VLC.CDAudio"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "InvokeVerb" "play"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Provider" "VideoLAN VLC media player"
   WriteRegStr HKCR "VLC.DVDMovie" "" "VLC DVD Movie"
   WriteRegStr HKCR "VLC.DVDMovie\shell" "" "Play"
   WriteRegStr HKCR "VLC.DVDMovie\shell\Play\command" "" \
-    '$INSTDIR\vlc.exe dvd:%1'
+    '$INSTDIR\vlc.exe --one-instance-when-started-from-file dvd:%1'
   WriteRegStr HKCR "VLC.DVDMovie\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKCR "VLC.CDAudio" "" "VLC CD Audio"
   WriteRegStr HKCR "VLC.CDAudio\shell" "" "Play"
   WriteRegStr HKCR "VLC.CDAudio\shell\Play\command" "" \
-    '$INSTDIR\vlc.exe cdda:%1'
+    '$INSTDIR\vlc.exe --one-instance-when-started-from-file cdda:%1'
   WriteRegStr HKCR "VLC.CDAudio\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
 SectionEnd
