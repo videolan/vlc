@@ -497,6 +497,10 @@ static char *ppsz_clock_descriptions[] =
     "VLC can display messages on the video. This is called OSD (On Screen " \
     "Display).")
 
+#define TEXTRENDERER_TEXT N_("Text rendering module")
+#define TEXTRENDERER_LONGTEXT N_( \
+    "VLC normally uses Freetype for rendering, but this allows you to use svg for instance.")
+
 #define SUB_FILTER_TEXT N_("Subpictures filter module")
 #define SUB_FILTER_LONGTEXT N_( \
     "This adds so-called \"subpicture filters\". These filters overlay " \
@@ -1217,6 +1221,8 @@ vlc_module_begin();
 
     add_bool( "spu", 1, NULL, SPU_TEXT, SPU_LONGTEXT, VLC_TRUE );
     add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, VLC_FALSE );
+    add_module( "text-renderer", "text renderer", NULL, NULL, TEXTRENDERER_TEXT,
+                TEXTRENDERER_LONGTEXT, VLC_TRUE );
 
     set_section( N_("Subtitles") , NULL );
     add_file( "sub-file", NULL, NULL, SUB_FILE_TEXT,

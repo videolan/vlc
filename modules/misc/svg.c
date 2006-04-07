@@ -69,7 +69,7 @@ static int  RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 vlc_module_begin();
  set_category( CAT_INPUT);
  set_category( SUBCAT_INPUT_SCODEC );
- set_capability( "text renderer", 101 );
+ set_capability( "text renderer", 99 );
  add_shortcut( "svg" );
  add_string( "svg-template-file", "", NULL, TEMPLATE_TEXT, TEMPLATE_LONGTEXT, VLC_TRUE );
  set_callbacks( Create, Destroy );

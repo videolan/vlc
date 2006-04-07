@@ -499,6 +499,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         /* Load the text rendering module */
         if( !p_spu->p_text && p_region )
         {
+            char *psz_modulename = NULL;
+
             p_spu->p_text = vlc_object_create( p_spu, VLC_OBJECT_FILTER );
             vlc_object_attach( p_spu->p_text, p_spu );
 
@@ -511,8 +513,19 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
             p_spu->p_text->pf_sub_buffer_new = spu_new_buffer;
             p_spu->p_text->pf_sub_buffer_del = spu_del_buffer;
-            p_spu->p_text->p_module =
-                module_Need( p_spu->p_text, "text renderer", 0, 0 );
+
+            psz_modulename = var_CreateGetString( p_spu, "text-renderer" );
+            if( psz_modulename && *psz_modulename )
+            {
+                p_spu->p_text->p_module =
+                    module_Need( p_spu->p_text, "text renderer", psz_modulename, VLC_TRUE );
+            }
+            if( !p_spu->p_text->p_module )
+            {
+                p_spu->p_text->p_module =
+                    module_Need( p_spu->p_text, "text renderer", 0, 0 );
+            }
+            if( psz_modulename ) free( psz_modulename );
         }
         else if( p_region )
         {
