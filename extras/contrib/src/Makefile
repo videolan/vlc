@@ -1139,8 +1139,8 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 # ***************************************************************************
 
 libdca:
-	(cd $@; ./bootstrap)
 	$(SVN) co $(LIBDCA_SVN) libdca
+	(cd $@; ./bootstrap)
 
 .libdca: libdca
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
