@@ -162,7 +162,7 @@ else
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
 	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32 .unicows .libdca
-#	.SDL_image  .daap .cddb .cdio .vcdimager .dts .portaudio 
+#	.SDL_image  .daap .cddb .cdio .vcdimager .portaudio 
   else
 
    ifdef HAVE_WINCE
@@ -173,7 +173,7 @@ else
 # Standard Linux or other UNIX-like systems
    all: .iconv .intl .freetype .fribidi .zlib \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-	.FLAC .speex .faad .faac .lame .ebml .dts .matroska .ffmpeg .dvdcss \
+	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
 	.png .gpg-error .gcrypt .gnutls .mpcdec\
 	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
@@ -1140,7 +1140,7 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 
 libdca:
 	(cd $@; ./bootstrap)
-	$(SVN) co $(LIBDCA_SVN) libdts
+	$(SVN) co $(LIBDCA_SVN) libdca
 
 .libdca: libdca
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
