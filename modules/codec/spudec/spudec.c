@@ -235,8 +235,9 @@ static block_t *Reassemble( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->i_spu >= p_sys->i_spu_size )
     {
         /* We have a complete sub */
-        msg_Dbg( p_dec, "SPU packets size=%d should be %d",
-                 p_sys->i_spu, p_sys->i_spu_size );
+        if( p_sys->i_spu > p_sys->i_spu_size )
+            msg_Dbg( p_dec, "SPU packets size=%d should be %d",
+                     p_sys->i_spu, p_sys->i_spu_size );
 
         return p_sys->p_block;
     }

@@ -111,9 +111,11 @@ subpicture_t * E_(ParsePacket)( decoder_t *p_dec )
         return NULL;
     }
 
+#ifdef DEBUG_SPUDEC
     msg_Dbg( p_dec, "total size: 0x%x, RLE offsets: 0x%x 0x%x",
              p_sys->i_spu_size,
              p_spu_data->pi_offset[0], p_spu_data->pi_offset[1] );
+#endif
 
     Render( p_dec, p_spu, p_spu_data );
     free( p_spu_data );
@@ -546,8 +548,10 @@ static int ParseRLE( decoder_t *p_dec, subpicture_t * p_spu,
         return VLC_EGENERIC;
     }
 
+#ifdef DEBUG_SPUDEC
     msg_Dbg( p_dec, "valid subtitle, size: %ix%i, position: %i,%i",
              p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
+#endif
 
     /* Crop if necessary */
     if( i_skipped_top || i_skipped_bottom )
@@ -557,8 +561,10 @@ static int ParseRLE( decoder_t *p_dec, subpicture_t * p_spu,
 
         p_spu_data->i_y_top_offset = i_skipped_top;
         p_spu_data->i_y_bottom_offset = i_skipped_bottom;
+#ifdef DEBUG_SPUDEC
         msg_Dbg( p_dec, "cropped to: %ix%i, position: %i,%i",
                  p_spu->i_width, i_height, p_spu->i_x, i_y );
+#endif
     }
  
     /* Handle color if no palette was found */
@@ -613,8 +619,10 @@ static int ParseRLE( decoder_t *p_dec, subpicture_t * p_spu,
             p_spu_data->pi_yuv[i_shade][2] = 0x80;
         }
 
+#ifdef DEBUG_SPUDEC
         msg_Dbg( p_dec, "using custom palette (border %i, inner %i, shade %i)",
                  i_border, i_inner, i_shade );
+#endif
     }
 
     return VLC_SUCCESS;
