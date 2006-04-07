@@ -100,6 +100,7 @@ LIBCACA_VERSION=0.9
 LIBCACA_URL=http://sam.zoy.org/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
 LIBDTS_VERSION=0.0.2
 LIBDTS_URL=http://debian.unnet.nl/pub/videolan/libdts/$(LIBDTS_VERSION)/libdts-$(LIBDTS_VERSION).tar.gz
+LIBDCA_SVN=svn://svn.videolan.org/libdca/trunk
 MODPLUG_VERSION=0.7
 MODPLUG_URL=$(VIDEOLAN)/testing/contrib/libmodplug-$(MODPLUG_VERSION).tar.gz
 MASH_VERSION=5.2

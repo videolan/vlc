@@ -126,7 +126,8 @@ ifdef HAVE_DARWIN_OS
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
 	.dvdcss .dvdnav .dvdread .dvbpsi .live .x264 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
-	.glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder .aclocal
+	.glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder .aclocal \
+        .libdca
 # .expat .clinkcc don't work with SDK yet
 # .glib .libidl .gecko are required to build the mozilla plugin
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
@@ -141,14 +142,14 @@ else
    all: .perl .autoconf .automake .libtool .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
-	.dvdnav .dvbpsi .aclocal
+	.dvdnav .dvbpsi .aclocal .libdca
   else
 # Cross compiling: we already have the Linux tools, only build the
 # libraries now
    all: .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .twolame .ebml .matroska .ffmpeg .dvdcss \
-	.dvdnav .dvbpsi .aclocal
+	.dvdnav .dvbpsi .aclocal .libdca
   endif
  else
 
@@ -160,7 +161,7 @@ else
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
 	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
-	.dx_headers .dshow_headers .aclocal .gecko-win32 .unicows
+	.dx_headers .dshow_headers .aclocal .gecko-win32 .unicows .libdca
 #	.SDL_image  .daap .cddb .cdio .vcdimager .dts .portaudio 
   else
 
@@ -176,7 +177,7 @@ else
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
 	.png .gpg-error .gcrypt .gnutls .mpcdec\
 	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
-	.aclocal 
+	.aclocal .libdca
 #	.SDL_image  .daap .cddb .cdio .vcdimager 
    endif
   endif
@@ -1134,29 +1135,19 @@ CLEAN_PKG += libcaca
 DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 
 # ***************************************************************************
-# libdts
+# libdca
 # ***************************************************************************
 
-libdts-$(LIBDTS_VERSION).tar.gz:
-	$(WGET) $(LIBDTS_URL)
-
-ifeq ($(HOST),i586-pc-beos)
-# libdts 0.0.2 doesn't compile on BeOS
-libdts:
-	$(SVN) co svn://svn.videolan.org/libdts/trunk libdts
+libdca:
+	$(SVN) co $(LIBDCA_SVN) libdts
 	(cd $@; ./bootstrap)
-else
-libdts: libdts-$(LIBDTS_VERSION).tar.gz
-	$(EXTRACT_GZ)
-endif
 
-.dts: libdts
+.dca: libdca
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	touch $@
 
-CLEAN_FILE += .dts
-CLEAN_PKG += libdts
-DISTCLEAN_PKG += libdts-$(LIBDTS_VERSION).tar.gz
+CLEAN_FILE += .dca
+CLEAN_PKG += libdca
 
 # ***************************************************************************
 # libx264
