@@ -241,7 +241,7 @@ struct decoder_sys_t
 /* List of different Page Composition Segment state */
 /* According to EN 300-743, 7.2.1 table 3 */
 #define DVBSUB_PCS_STATE_ACQUISITION    0x01
-#define DVBSUB_PCS_STATE_CHANGE         0x10
+#define DVBSUB_PCS_STATE_CHANGE         0x02
 
 /*****************************************************************************
  * Local prototypes
@@ -837,7 +837,8 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
     {
         if( p_region->p_pixbuf )
         {
-            msg_Dbg( p_dec, "region size changed (not allowed)" );
+            msg_Dbg( p_dec, "region size changed (%dx%d->%dx%d)",
+                     p_region->i_width, p_region->i_height, i_width, i_height );
             free( p_region->p_pixbuf );
         }
 
@@ -1912,10 +1913,8 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
             p_sys->p_regions[i_regions].i_width =
                 p_region->fmt.i_visible_width;
         }
-        if( ( p_sys->p_regions[i_regions].i_height <
-             (int)p_region->fmt.i_visible_height ) ||
-            ( p_sys->p_regions[i_regions].i_height >
-              (int)p_region->fmt.i_visible_height ) )
+        if( p_sys->p_regions[i_regions].i_height <
+             (int)p_region->fmt.i_visible_height )
         {
             b_mode_change = VLC_TRUE;
             msg_Dbg( p_enc, "region %i height change: %i -> %i",
