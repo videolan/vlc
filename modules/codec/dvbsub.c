@@ -96,7 +96,7 @@ vlc_module_begin();
 
     add_integer( ENC_CFG_PREFIX "x", -1, NULL, ENC_POSX_TEXT, ENC_POSX_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "y", -1, NULL, ENC_POSY_TEXT, ENC_POSY_LONGTEXT, VLC_FALSE );
-        add_deprecated( ENC_CFG_PREFIX "timeout", VLC_FALSE ); /* Deprecated since 0.8.5 */
+    add_suppressed( ENC_CFG_PREFIX "timeout" ); /* Suppressed since 0.8.5 */
 vlc_module_end();
 
 static const char *ppsz_enc_options[] = { "x", "y", NULL };
