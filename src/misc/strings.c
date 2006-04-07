@@ -155,6 +155,7 @@ void decode_URI( char *psz )
 
             case '+':
                 *out++ = ' ';
+                break;
 
             default:
                 /* Inserting non-ASCII or non-printable characters is unsafe,
