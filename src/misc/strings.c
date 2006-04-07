@@ -124,7 +124,7 @@ void unescape_URI( char *psz )
 char *decode_URI_duplicate( const char *psz )
 {
     char *psz_dup = strdup( psz );
-    unescape_URI( psz_dup );
+    decode_URI( psz_dup );
     return psz_dup;
 }
 
