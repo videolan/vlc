@@ -178,7 +178,7 @@ then
   do
     printf "."
     #  Top of the project file
-    perl -pe 'if(/§SOURCES§/){last;}' < ${target}.in > ${target}
+    perl -pe 'if(/ZSOURCESZ/){last;}' < ${target}.in > ${target}
     #  The source files
     for file in `for i in ${LIBVLC_SOURCES} ; do echo $i ; done | grep -v "/.*/"`
     do
@@ -275,7 +275,7 @@ EOF
 EOF
     done
     #  The headers
-    perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){if(/§HEADERS§/){last;}print $_}' < ${target}.in >> ${target}
+    perl -e 'while(<>){if(/ZSOURCESZ/){last;}}while(<>){if(/ZHEADERSZ/){last;}print $_}' < ${target}.in >> ${target}
     for file in ${LIBVLC_HEADERS}
     do
       cat >> ${target} << EOF
@@ -298,7 +298,7 @@ EOF
     cat >> ${target} << EOF
 # End Group${M}
 EOF
-    perl -e 'while(<>){if(/§HEADERS§/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
+    perl -e 'while(<>){if(/ZHEADERSZ/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
   done
 
   # plugins files
@@ -319,7 +319,7 @@ EOF
         source="${msdir}/plugins.${suf}.in"
         target="${msdir}/plugin_${mod}.${suf}"
         printf "."
-        perl -pe 'if(/§SOURCES§/){last;} s/§PLUGIN§/'${mod}'/g' < ${source} > ${target}
+        perl -pe 'if(/ZSOURCESZ/){last;} s/ZPLUGINZ/'${mod}'/g' < ${source} > ${target}
         for cfile in ${cfiles}
         do
           cat >> ${target} << EOF
@@ -336,8 +336,8 @@ SOURCE="..\\modules\\`echo ${dir}/${cfile} | sed 's,/,\\\\,g'`"${M}
 EOF
         done
         # sed is really nicer for this... unfortunately it's broken under cygwin
-        # sed -ne '1,/§SOURCES§/d; /§HEADERS§/,$d; p' < ${source} >> ${target}
-        perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){if(/§HEADERS§/){last;}print $_}' < ${source} >> ${target}
+        # sed -ne '1,/ZSOURCESZ/d; /ZHEADERSZ/,$d; p' < ${source} >> ${target}
+        perl -e 'while(<>){if(/ZSOURCESZ/){last;}}while(<>){if(/ZHEADERSZ/){last;}print $_}' < ${source} >> ${target}
         for hfile in ${hfiles}
         do
           cat >> ${target} << EOF
@@ -346,8 +346,8 @@ SOURCE="..\\modules\\`echo ${dir}/${hfile} | sed 's,/,\\\\,g'`"${M}
 # End Source File${M}
 EOF
         done
-        # sed -ne '1,/§HEADERS§/d; p' < ${source} >> ${target}
-        perl -e 'while(<>){if(/§HEADERS§/){last;}}while(<>){print $_}' < ${source} >> ${target}
+        # sed -ne '1,/ZHEADERSZ/d; p' < ${source} >> ${target}
+        perl -e 'while(<>){if(/ZHEADERSZ/){last;}}while(<>){print $_}' < ${source} >> ${target}
       done
     done
   done
@@ -357,7 +357,7 @@ EOF
   do
     printf "."
     #  Top of the project file
-    perl -pe 'if(/§SOURCES§/){last;}' < ${target}.in > ${target}
+    perl -pe 'if(/ZSOURCESZ/){last;}' < ${target}.in > ${target}
     #  The source files
       cat >> ${target} << EOF
 # Begin Source File${M}
@@ -365,7 +365,7 @@ SOURCE="..\\src\\vlc.c"${M}
 # End Source File${M}
 EOF
     #  Bottom of the project file - handles resource files too
-    perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
+    perl -e 'while(<>){if(/ZSOURCESZ/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
   done
 
   echo " done."
@@ -415,20 +415,20 @@ then
   printf "."
   #  Top of the project file
   guid=`perl -e 'sub r {return sprintf("%X", int rand(65536))} print r.r."-".r."-".r."-".r."-".r.r.r'`
-  perl -pe 'if(/§SOURCES§/){last;} s/§GUID§/'${guid}'/g' < ${target}.in > ${target}
+  perl -pe 'if(/ZSOURCESZ/){last;} s/ZGUIDZ/'${guid}'/g' < ${target}.in > ${target}
   #  The source files
   cat >> ${target} << EOF
 <File RelativePath="..\\src\\vlc.c"></File>${M}
 EOF
   #  Bottom of the project file - handles resource files too
-  perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
+  perl -e 'while(<>){if(/ZSOURCESZ/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
   
   # libvlc files
   target=msvc/libvlc.vcproj
   printf "."
   #  Top of the project file
   guid=`perl -e 'sub r {return sprintf("%X", int rand(65536))} print r.r."-".r."-".r."-".r."-".r.r.r'`
-  perl -pe 'if(/§SOURCES§/){last;} s/§GUID§/'${guid}'/g' < ${target}.in > ${target}
+  perl -pe 'if(/ZSOURCESZ/){last;} s/ZGUIDZ/'${guid}'/g' < ${target}.in > ${target}
   #  The source files
   for file in `for i in ${LIBVLC_SOURCES} ; do echo $i ; done | grep -v "/.*/"`
   do
@@ -463,7 +463,7 @@ EOF
 EOF
   done
   #  The headers
-  perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){if(/§HEADERS§/){last;}print $_}' < ${target}.in >> ${target}
+  perl -e 'while(<>){if(/ZSOURCESZ/){last;}}while(<>){if(/ZHEADERSZ/){last;}print $_}' < ${target}.in >> ${target}
   for file in ${LIBVLC_HEADERS}
   do
     cat >> ${target} << EOF
@@ -482,7 +482,7 @@ EOF
   cat >> ${target} << EOF
 </Filter>${M}
 EOF
-  perl -e 'while(<>){if(/§HEADERS§/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
+  perl -e 'while(<>){if(/ZHEADERSZ/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
 
   # plugins files
   for dir in `sed -ne 's,modules/\(.*\)/Makefile,\1,p' ${srcdir}/configure.ac`
@@ -502,7 +502,7 @@ EOF
         target="${msdir}/plugin_${mod}.vcproj"
         printf "."
 	guid=`perl -e 'sub r {return sprintf("%X", int rand(65536))} print r.r."-".r."-".r."-".r."-".r.r.r'`
-        perl -pe 'if(/§SOURCES§/){last;} s/§PLUGIN§/'${mod}'/g' < ${source} | sed 's,§GUID§,'${guid}',' > ${target}
+        perl -pe 'if(/ZSOURCESZ/){last;} s/ZPLUGINZ/'${mod}'/g' < ${source} | sed 's,ZGUIDZ,'${guid}',' > ${target}
         for cfile in ${cfiles}
         do
           cat >> ${target} << EOF
@@ -510,16 +510,16 @@ EOF
 EOF
         done
         # sed is really nicer for this... unfortunately it's broken under cygwin
-        # sed -ne '1,/§SOURCES§/d; /§HEADERS§/,$d; p' < ${source} >> ${target}
-        perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){if(/§HEADERS§/){last;}print $_}' < ${source} >> ${target}
+        # sed -ne '1,/ZSOURCESZ/d; /ZHEADERSZ/,$d; p' < ${source} >> ${target}
+        perl -e 'while(<>){if(/ZSOURCESZ/){last;}}while(<>){if(/ZHEADERSZ/){last;}print $_}' < ${source} >> ${target}
         for hfile in ${hfiles}
         do
           cat >> ${target} << EOF
 <File RelativePath="..\\modules\\`echo ${dir}/${hfile} | sed 's,/,\\\\,g'`"></File>${M}
 EOF
         done
-        # sed -ne '1,/§HEADERS§/d; p' < ${source} >> ${target}
-        perl -e 'while(<>){if(/§HEADERS§/){last;}}while(<>){print $_}' < ${source} >> ${target}
+        # sed -ne '1,/ZHEADERSZ/d; p' < ${source} >> ${target}
+        perl -e 'while(<>){if(/ZHEADERSZ/){last;}}while(<>){print $_}' < ${source} >> ${target}
       done
     done
   done

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="vlc"
-	ProjectGUID="{§GUID§}"
+	ProjectGUID="{ZGUIDZ}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -118,7 +118,7 @@
 	</References>
 	<Files>
 		<Filter Name="Source Files" Filter="cpp;c">
-			§SOURCES§
+			ZSOURCESZ
 		</Filter>
 		<Filter Name="Resource Files" Filter="rc">
 			<File RelativePath="..\share\vlc_win32_rc.rc"></File>

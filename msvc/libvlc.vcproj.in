@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="liblvc"
-	ProjectGUID="{§GUID§}"
+	ProjectGUID="{ZGUIDZ}"
 	RootNamespace="libvlc"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -102,10 +102,10 @@
 	</References>
 	<Files>
 		<Filter	Name="Source Files" Filter="c;cpp">
-                        §SOURCES§
+                        ZSOURCESZ
 		</Filter>
 		<Filter	Name="Header Files" Filter="h;hpp">
-                        §HEADERS§
+                        ZHEADERSZ
 		</Filter>
 	</Files>
 	<Globals>
