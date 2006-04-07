@@ -1139,14 +1139,14 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 # ***************************************************************************
 
 libdca:
-	$(SVN) co $(LIBDCA_SVN) libdts
 	(cd $@; ./bootstrap)
+	$(SVN) co $(LIBDCA_SVN) libdts
 
-.dca: libdca
+.libdca: libdca
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	touch $@
 
-CLEAN_FILE += .dca
+CLEAN_FILE += .libdca
 CLEAN_PKG += libdca
 
 # ***************************************************************************
