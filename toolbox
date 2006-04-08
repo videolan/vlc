@@ -738,6 +738,7 @@ then
   find msvc -type f -name '*.dsp' -exec rm -f '{}' ';'
   find evc -type f -name '*.vcp' -exec rm -f '{}' ';'
   find . -type d -name '.deps' -exec rm -Rf '{}' ';'
+  find . -type d -name '.libs' -exec rm -Rf '{}' ';'
   # there's some more cruft all around
   rm -f config.h config.log config.status
   rm -f vlc vlc-config Makefile Modules.am
