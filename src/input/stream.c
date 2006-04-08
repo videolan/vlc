@@ -1530,7 +1530,7 @@ char * stream_ReadLine( stream_t *s )
         if( s->i_char_width > 1 )
         {
             size_t i_in = 0, i_out = 0;
-            char * p_in = NULL;
+            const char * p_in = NULL;
             char * p_out = NULL;
             char * psz_new_line = NULL;
             
