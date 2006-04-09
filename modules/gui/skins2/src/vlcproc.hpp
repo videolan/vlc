@@ -72,6 +72,10 @@ class VlcProc: public SkinObject
         VarText &getStreamURIVar()
             { return *((VarText*)(m_cVarStreamURI.get())); }
 
+        /// Getter for the stream bitrate variable
+        VarText &getStreamBitRateVar()
+            { return *((VarText*)(m_cVarStreamBitRate.get())); }
+
         /// Getter for the vout size variable
         VarBox &getVoutSizeVar() { return m_varVoutSize; }
 
@@ -110,6 +114,7 @@ class VlcProc: public SkinObject
         /// Variable for current stream properties
         VariablePtr m_cVarStreamName;
         VariablePtr m_cVarStreamURI;
+        VariablePtr m_cVarStreamBitRate;
         /// Variable for the "mute" state
         VariablePtr m_cVarMute;
         /// Variables related to the input

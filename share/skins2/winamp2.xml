@@ -194,6 +194,7 @@
                 <Image x="0" y="0" image="title_focus" action="move" action2="main_window.setLayout(small_layout)" />
                 <Text font="digits_font;digits_font_2" x="30" y="26" width="72" text="$t" visible="not vlc.isStopped" scrolling="none" alignment="right" />
                 <Text font="text_font" x="111" y="27" width="155" text="$N" />
+                <Text font="text_font" x="111" y="43" width="15" text="$B" scrolling="none" alignment="right" />
                 <Slider value="volume" x="107" y="57" up="volume_up" down="volume_down" points="(7,6),(58,6)" tooltiptext="Volume: $V%">
                     <SliderBackground image="volume_bg;volume_bg_2" nbvert="28" padvert="2" />
                 </Slider>

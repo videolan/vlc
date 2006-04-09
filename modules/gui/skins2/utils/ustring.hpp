@@ -82,6 +82,9 @@ class UString: public SkinObject
         /// characters in this string starting at index position
         UString substr( uint32_t position = 0, uint32_t n = npos) const;
 
+        /// Build a string from an integer
+        static UString fromInt(intf_thread_t *pIntf, int number);
+
         /// XXX: temporary
         void debug() const;
 

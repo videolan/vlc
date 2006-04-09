@@ -898,6 +898,9 @@ difficulty to understand how VLC skins work.</para>
 
 <itemizedlist>
   <listitem><para>
+    <emphasis>$B</emphasis>: Get the stream bitrate (in kb/s).
+  </para></listitem>
+  <listitem><para>
     <emphasis>$V</emphasis>: Value of the volume (from 0 to 100 --> useful for a percentage).
   </para></listitem>
   <listitem><para>

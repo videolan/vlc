@@ -26,6 +26,7 @@
 #include <vlc/vout.h>
 #include <aout_internal.h>
 
+#include <math.h>
 #include "vlcproc.hpp"
 #include "os_factory.hpp"
 #include "os_timer.hpp"
@@ -108,6 +109,8 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     pVarManager->registerVar( m_cVarStreamName, "streamName" );
     m_cVarStreamURI = VariablePtr( new VarText( getIntf(), false ) );
     pVarManager->registerVar( m_cVarStreamURI, "streamURI" );
+    m_cVarStreamBitRate = VariablePtr( new VarText( getIntf(), false ) );
+    pVarManager->registerVar( m_cVarStreamBitRate, "bitrate" );
 
     // Register the equalizer bands
     for( int i = 0; i < EqualizerBands::kNbBands; i++)
@@ -239,6 +242,7 @@ void VlcProc::manage()
     VarBoolImpl *pVarDvdActive = (VarBoolImpl*)m_cVarDvdActive.get();
     VarBoolImpl *pVarFullscreen = (VarBoolImpl*)m_cVarFullscreen.get();
     VarBoolImpl *pVarHasVout = (VarBoolImpl*)m_cVarHasVout.get();
+    VarText *pBitrate = (VarText*)m_cVarStreamBitRate.get();
 
     // Refresh audio variables
     refreshAudio();
@@ -290,6 +294,12 @@ void VlcProc::manage()
             pVarFullscreen->set( pVout->b_fullscreen );
             vlc_object_release( pVout );
         }
+
+        // Get information on the current playlist item
+        input_item_t *pItem = pInput->input.p_item;
+        // Get the input bitrate
+        int bitrate = (int)(roundf(pItem->p_stats->f_demux_bitrate*8000));
+        pBitrate->set( UString::fromInt( getIntf(), bitrate ) );
     }
     else
     {
@@ -558,13 +568,16 @@ int VlcProc::onInteraction( vlc_object_t *pObj, const char *pVariable,
 
 void VlcProc::updateStreamName( playlist_t *p_playlist )
 {
-    if( p_playlist->p_input )
+    if( p_playlist && p_playlist->p_input )
     {
+        // Get playlist item information
+        input_item_t *pItem = p_playlist->p_input->input.p_item;
+
         VarText &rStreamName = getStreamNameVar();
         VarText &rStreamURI = getStreamURIVar();
         // XXX: we should not need to access p_input->psz_source directly, a
         // getter should be provided by VLC core
-        string name = p_playlist->p_input->input.p_item->psz_name;
+        string name = pItem->psz_name;
         // XXX: This should be done in VLC core, not here...
         // Remove path information if any
         OSFactory *pFactory = OSFactory::instance( getIntf() );
@@ -574,10 +587,9 @@ void VlcProc::updateStreamName( playlist_t *p_playlist )
             name = name.substr( pos + 1, name.size() - pos + 1 );
         }
         UString srcName( getIntf(), name.c_str() );
-        UString srcURI( getIntf(),
-                         p_playlist->p_input->input.p_item->psz_uri );
+        UString srcURI( getIntf(), pItem->psz_uri );
 
-        // Create commands to update the stream variables
+       // Create commands to update the stream variables
         CmdSetText *pCmd1 = new CmdSetText( getIntf(), rStreamName, srcName );
         CmdSetText *pCmd2 = new CmdSetText( getIntf(), rStreamURI, srcURI );
         // Push the commands in the asynchronous command queue

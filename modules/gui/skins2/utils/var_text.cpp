@@ -48,6 +48,7 @@ VarText::~VarText()
         pVlcProc->getVolumeVar().delObserver( this );
         pVlcProc->getStreamURIVar().delObserver( this );
         pVlcProc->getStreamNameVar().delObserver( this );
+        pVlcProc->getStreamBitRateVar().delObserver( this );
         VarManager *pVarManager = VarManager::instance( getIntf() );
         pVarManager->getHelpText().delObserver( this );
     }
@@ -121,6 +122,10 @@ const UString VarText::get() const
     {
         temp.replace( pos, 2, pVlcProc->getStreamURIVar().get() );
     }
+    while( (pos = temp.find( "$B" )) != UString::npos )
+    {
+        temp.replace( pos, 2, pVlcProc->getStreamBitRateVar().get() );
+    }
 
     return temp;
 }
@@ -144,6 +149,7 @@ void VarText::set( const UString &rText )
         pVlcProc->getVolumeVar().delObserver( this );
         pVlcProc->getStreamNameVar().delObserver( this );
         pVlcProc->getStreamURIVar().delObserver( this );
+        pVlcProc->getStreamBitRateVar().delObserver( this );
         VarManager *pVarManager = VarManager::instance( getIntf() );
         pVarManager->getHelpText().delObserver( this );
 
@@ -178,6 +184,10 @@ void VarText::set( const UString &rText )
         if( m_text.find( "$F" ) != UString::npos )
         {
             pVlcProc->getStreamURIVar().addObserver( this );
+        }
+        if( m_text.find( "$B" ) != UString::npos )
+        {
+            pVlcProc->getStreamBitRateVar().addObserver( this );
         }
     }
 
