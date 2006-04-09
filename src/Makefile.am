@@ -385,7 +385,7 @@ stamp-api: Makefile.in $(HEADERS_include) ../vlc-api.pl
 # Unit/regression test
 ###############################################################################
 if USE_LIBTOOL
-check_PROGRAMS = test_i18n_atof
+check_PROGRAMS = test_i18n_atof test_url
 TESTS = $(check_PROGRAMS)
 
 CFLAGS_tests = `$(VLC_CONFIG) --cflags vlc`
@@ -393,5 +393,9 @@ CFLAGS_tests = `$(VLC_CONFIG) --cflags vlc`
 test_i18n_atof_SOURCES = test/i18n_atof.c
 test_i18n_atof_LDADD = libvlc.la
 test_i18n_atof_CFLAGS = $(CFLAGS_tests)
+
+test_url_SOURCES = test/url.c
+test_url_LDADD = libvlc.la
+test_url_CFLAGS = $(CFLAGS_tests)
 endif
 
