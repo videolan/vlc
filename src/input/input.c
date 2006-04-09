@@ -334,7 +334,7 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 
     /* Kill access and demux */
     if( p_input->input.p_access ) p_input->input.p_access->b_die = VLC_TRUE;
-    if( p_input->input.p_demux ) p_input->input.p_access->b_die = VLC_TRUE;
+    if( p_input->input.p_demux ) p_input->input.p_demux->b_die = VLC_TRUE;
 
     /* Unload all modules */
     if( p_input->p_es_out ) input_EsOutDelete( p_input->p_es_out );
