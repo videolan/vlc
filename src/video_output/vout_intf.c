@@ -239,7 +239,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "004:3"; text.psz_string = "4:3";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "16:09"; text.psz_string = "16:9";
+    val.psz_string = "016:9"; text.psz_string = "16:9";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "16:10"; text.psz_string = "16:10";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
@@ -302,7 +302,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "004:3"; text.psz_string = "4:3";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "16:09"; text.psz_string = "16:9";
+    val.psz_string = "016:9"; text.psz_string = "16:9";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "16:10"; text.psz_string = "16:10";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
