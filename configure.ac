@@ -2554,7 +2554,7 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec])
 
    if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
-     AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
+     AC_DEFINE(HAVE_LIBAVFORMAT_TREE, 1, [Define if you have ffmpeg's libavformat.])
      VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat ${real_ffmpeg_tree}/libavformat/libavformat.a])
      VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavformat])
    fi
@@ -2573,6 +2573,8 @@ dnl Look for a ffmpeg-config (we are on debian )
   if test "${FFMPEG_CONFIG}" != "no"
   then
     AC_CHECK_HEADERS(ffmpeg/avcodec.h)
+    AC_CHECK_HEADERS(ffmpeg/avformat.h)
+    AC_CHECK_HEADERS(ffmpeg/avutil.h)
     AC_CHECK_HEADERS(postproc/postprocess.h)
     VLC_ADD_PLUGINS([ffmpeg])
     if test "${enable_sout}" != "no"; then
@@ -2587,6 +2589,8 @@ dnl Trying with pkg-config
    PKG_CHECK_MODULES(FFMPEG,[libavcodec, libavformat],
     [
      AC_CHECK_HEADERS(ffmpeg/avcodec.h)
+     AC_CHECK_HEADERS(ffmpeg/avformat.h)
+     AC_CHECK_HEADERS(ffmpeg/avutil.h)
      AC_CHECK_HEADERS(postproc/postprocess.h)
      VLC_ADD_BUILTINS([ffmpeg])
      if test "${enable_sout}" != "no"; then
@@ -2606,6 +2610,8 @@ dnl Trying with pkg-config
       CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
+      AC_CHECK_HEADERS(ffmpeg/avformat.h)
+      AC_CHECK_HEADERS(ffmpeg/avutil.h)
       AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
 
       AC_CHECK_LIB(avutil, av_add_i, [
@@ -2622,9 +2628,9 @@ dnl Trying with pkg-config
             VLC_ADD_BUILTINS([stream_out_switcher])
         fi],
          [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (cvs version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ], [$LDAVUTIL])
+
+      
       AC_CHECK_LIB(avformat, av_open_input_stream, [
-        AC_DEFINE(HAVE_LIBAVFORMAT, 1,
-        [Define if you have ffmpeg's libavformat.])
         VLC_ADD_LDFLAGS([ffmpeg],[-lavformat -lz]) ], [], [-lavcodec -lz $LDAVUTIL])
       LDFLAGS="${LDFLAGS_save}"
       CPPFLAGS="${CPPFLAGS_save}"
@@ -2666,7 +2672,7 @@ then
     VLC_ADD_CPPFLAGS([ffmpegaltivec],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
 
     if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
-      AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
+      AC_DEFINE(HAVE_LIBAVFORMAT_TREE, 1, [Define if you have ffmpeg's libavformat.])
       VLC_ADD_LDFLAGS([ffmpegaltivec],[-L${real_ffmpeg_tree}/libavformat -lavformataltivec -lz])
       VLC_ADD_CPPFLAGS([ffmpegaltivec],[-I${real_ffmpeg_tree}/libavformat])
     fi

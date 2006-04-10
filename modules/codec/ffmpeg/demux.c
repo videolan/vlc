@@ -32,7 +32,7 @@
 #include "vlc_meta.h"
 
 /* ffmpeg header */
-#ifdef HAVE_FFMPEG_AVCODEC_H
+#ifdef HAVE_FFMPEG_AVFORMAT_H
 #   include <ffmpeg/avformat.h>
 #else
 #   include <avformat.h>
@@ -43,7 +43,7 @@
 //#define AVFORMAT_DEBUG 1
 
 /* Version checking */
-#if (LIBAVFORMAT_BUILD >= 4629) && defined(HAVE_LIBAVFORMAT)
+#if (LIBAVFORMAT_BUILD >= 4629) && (defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE))
 
 /*****************************************************************************
  * demux_sys_t: demux descriptor
