@@ -1,6 +1,5 @@
-diff -ur scripts/makefile.cygwin scripts/makefile.cygwin
---- scripts/makefile.cygwin	2002-10-03 12:32:34.000000000 +0100
-+++ scripts/makefile.cygwin	2003-07-25 11:03:42.000000000 +0100
+--- scripts/makefile.cygwin	2004-12-03 00:14:31.000000000 +0000
++++ scripts/makefile.cygwin	2006-04-09 17:56:32.203125000 +0100
 @@ -35,7 +35,6 @@
  # $CFLAGS, and include pnggccrd.o in $OBJS, below, and in the dependency
  # list at the bottom of this makefile.
@@ -9,7 +8,7 @@ diff -ur scripts/makefile.cygwin scripts/makefile.cygwin
  ifdef MINGW
  MINGW_CCFLAGS=-mno-cygwin -I/usr/include/mingw
  MINGW_LDFLAGS=-mno-cygwin -L/usr/lib/mingw
-@@ -43,13 +43,12 @@
+@@ -43,13 +42,12 @@
  
  # Where "make install" puts libpng*.a, *png*.dll, png.h, and pngconf.h
  ifndef prefix
@@ -26,7 +25,7 @@ diff -ur scripts/makefile.cygwin scripts/makefile.cygwin
  #ZLIBLIB=../zlib
  #ZLIBINC=../zlib
  
-@@ -94,7 +94,9 @@
+@@ -94,7 +92,9 @@
  LDEXTRA=-Wl,--out-implib=$(IMPLIB) $(addprefix -L,$(ZLIBLIB)) -lz
  
  MKDIR=/bin/mkdir -pv
@@ -36,7 +35,7 @@ diff -ur scripts/makefile.cygwin scripts/makefile.cygwin
  #RANLIB=echo
  
  INCPATH=$(prefix)/include
-@@ -173,7 +173,7 @@
+@@ -173,10 +173,10 @@
  	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
  
  $(STATLIB): $(OBJS)
@@ -44,4 +43,8 @@ diff -ur scripts/makefile.cygwin scripts/makefile.cygwin
 +	$(AR) rc $@ $(OBJS)
  	$(RANLIB) $@
  
- $(SHAREDDEF): projects/msvc/png32ms.def
+-$(SHAREDDEF): scripts/png32ms.def
++$(SHAREDDEF): scripts/pngw32.def
+ 	cat $< | sed -e '1{G;s/^\(.*\)\(\n\)/EXPORTS/;};2,/^EXPORTS/d' | \
+ 	sed -e 's/\([^;]*\);/;/' > $@
+ 

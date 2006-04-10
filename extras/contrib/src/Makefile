@@ -1400,7 +1400,7 @@ libpng-$(PNG_VERSION).tar.bz2:
 libpng: libpng-$(PNG_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 ifdef HAVE_WIN32
-	(cd $@; cat ../Patches/libpng-1.2.5-win32.patch | sed s,??PREFIX??,$(PREFIX), | patch -p0)
+	(cd $@; cat ../Patches/libpng-win32.patch | sed s,??PREFIX??,$(PREFIX), | patch -p0)
 else
 	(cat Patches/libpng-osx.patch | sed -e 's%??PREFIX??%$(PREFIX)%' -e 's%??EXTRA_CFLAGS??%$(EXTRA_CFLAGS)%' -e 's%??EXTRA_LDFLAGS??%$(EXTRA_LDFLAGS)%' | patch -p0)
 endif
