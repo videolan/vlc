@@ -1407,7 +1407,7 @@ endif
 
 .png: libpng 
 ifdef HAVE_DARWIN_OS
-	(cd $<; cp scripts/makefile.macosx Makefile && make && make install)
+	(cd $<; cp scripts/makefile.darwin Makefile && make && make install)
 else
 ifdef HAVE_WIN32
 	(cd $<; rm -f INSTALL; cp scripts/makefile.cygwin Makefile && make $(HOSTCC) && make install-static)

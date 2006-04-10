@@ -1,36 +1,35 @@
-diff -ruN libpng-1.2.5/scripts/makefile.macosx libpng/scripts/makefile.macosx
---- libpng-1.2.5/scripts/makefile.macosx	2002-10-03 13:32:34.000000000 +0200
-+++ libpng/scripts/makefile.macosx	2006-02-22 22:05:47.000000000 +0100
-@@ -6,7 +6,7 @@
+--- libpng/scripts/makefile.darwin.orig	2004-12-03 00:14:31.000000000 +0000
++++ libpng/scripts/makefile.darwin	2006-04-10 21:55:35.000000000 +0100
+@@ -7,7 +7,7 @@
  # For conditions of distribution and use, see copyright notice in png.h
  
- # where make install puts libpng.a and png.h
+ # where "make install" puts libpng.a, libpng12.dylib, png.h and pngconf.h
 -prefix=/usr/local
 +prefix=??PREFIX??
  
  # Where the zlib library and include files are located
  #ZLIBLIB=/usr/local/lib
-@@ -20,8 +20,8 @@
- PNGMIN = 1.2.5
- PNGVER = $(PNGMAJ).$(PNGMIN)
+@@ -16,8 +16,8 @@
+ ZLIBINC=../zlib
  
--CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
--LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -current_version $(PNGVER)
-+CFLAGS=??EXTRA_CFLAGS?? -fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
-+LDFLAGS=??EXTRA_LDFLAGS?? -L. -L$(ZLIBLIB) -lpng -lz
+ CC=cc
+-CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops
+-LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
++CFLAGS=??EXTRA_CFLAGS?? -I$(ZLIBINC) -Wall -O3 -funroll-loops
++LDFLAGS=??EXTRA_LDFLAGS?? -L. -L$(ZLIBLIB) -lpng12 -lz
  
- LIBNAME=libpng12
- SHAREDLIB_POSTFIX=dylib
-@@ -52,7 +52,7 @@
- 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
- 	pngwtran.o pngmem.o pngerror.o pngpread.o
+ #RANLIB=echo
+ RANLIB=ranlib
+@@ -58,7 +58,7 @@
+ .c.pic.o:
+ 	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
  
--all: libpng.a pngtest shared libpng.pc libpng-config
+-all: libpng.a $(LIBNAME).dylib pngtest libpng.pc libpng-config
 +all: libpng.a pngtest libpng.pc libpng-config
  
- shared: $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX)
- 
-@@ -153,7 +153,7 @@
+ libpng.a: $(OBJS)
+ 	ar rc $@ $(OBJS)
+@@ -164,7 +164,7 @@
  	chmod 755 $(DB)/$(LIBNAME)-config
  	(cd $(DB); ln -sf $(LIBNAME)-config libpng-config)
  
@@ -38,4 +37,4 @@ diff -ruN libpng-1.2.5/scripts/makefile.macosx libpng/scripts/makefile.macosx
 +install: install-static install-man install-config
  
  # If you installed in $(DESTDIR), test-installed won't work until you
- # move the library to its final location.
+ # move the library to its final location.  Use test-dd to test it
