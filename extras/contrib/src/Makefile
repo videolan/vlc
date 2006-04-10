@@ -768,15 +768,13 @@ DISTCLEAN_PKG += speex-$(SPEEX_VERSION).tar.gz
 faad2-$(FAAD2_VERSION).tar.bz2:
 	$(WGET) $(FAAD2_URL)
 
-faad2: faad2-$(FAAD2_VERSION).tar.bz2
+faad: faad2-$(FAAD2_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	(cd $@; patch -p 0  < ../Patches/faad2.patch && ./bootstrap)
 
-.faad: faad2
-	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make -C libfaad && make -C libfaad install)
-ifndef HAVE_DARWIN_OS
+.faad: faad
+	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && sed -i.orig "s/shrext_cmds/shrext/g" libtool && make -C libfaad && make -C libfaad install)
 	$(INSTALL_NAME)
-endif
 	touch $@
 
 CLEAN_FILE += .faad
