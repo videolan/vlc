@@ -1380,7 +1380,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
         p_parser = (module_t *)p_list->p_values[i_modules_index].p_object ;
 
         /* count the number of exported configuration options (to allocate
-         * longopts). We also need to allocate space for too options when
+         * longopts). We also need to allocate space for two options when
          * dealing with boolean to allow for --foo and --no-foo */
         i_opts += p_parser->i_config_items
                      + 2 * p_parser->i_bool_items;
