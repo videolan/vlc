@@ -86,6 +86,7 @@ static char *ppsz_tuner_input_text[] =
     "Name of the video device that will be used by the " \
     "DirectShow plugin. If you don't specify anything, the default device " \
     "will be used.")
+/// \bug [String] size stuff should be on video !
 #define ADEV_TEXT N_("Audio device name")
 #define ADEV_LONGTEXT N_( \
     "Name of the audio device that will be used by the " \

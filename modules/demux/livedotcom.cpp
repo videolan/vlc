@@ -96,6 +96,7 @@ vlc_module_begin();
                   N_("Tunnel RTSP and RTP over HTTP"), VLC_TRUE );
         add_integer( "rtsp-http-port", 80, NULL,
                   N_("HTTP tunnel port"),
+                /// \bug [String] Missing .
                   N_("Port to use for tunneling the RTSP/RTP over HTTP"), VLC_TRUE );
 #endif
         add_integer( "rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,

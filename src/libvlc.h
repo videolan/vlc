@@ -334,6 +334,7 @@ static char *ppsz_align_descriptions[] =
     "pixels (1:1). If you have a 16:9 screen, you might need to change this " \
     "to 4:3 in order to keep proportions.")
 
+/// \bug [String] Remove "this option"
 #define SKIP_FRAMES_TEXT N_("Skip frames")
 #define SKIP_FRAMES_LONGTEXT N_( \
     "This option enables framedropping on MPEG2 stream. Framedropping " \

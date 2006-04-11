@@ -44,6 +44,7 @@
 static int  Open    ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
+/// \bug [String] missing .
 #define NOISE_LONGTEXT N_("Enable noise reduction algorithm")
 #define REVERB_LONGTEXT N_("Enable reverberation" )
 #define REVERB_LEVEL_LONGTEXT N_( "Reverberation level (from 0 " \
