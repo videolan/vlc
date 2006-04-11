@@ -654,10 +654,17 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( psz != NULL )
     {
         o_str = [[[NSString alloc] initWithUTF8String: psz] autorelease];
+
+        if ( o_str == NULL )
+        {
+            msg_Err( VLCIntf, "could not translate: %s", psz );
+            return( @"" );
+        }
     }
-    if ( o_str == NULL )
+    else
     {
-        msg_Err( VLCIntf, "could not translate: %s", psz );
+        msg_Warn( VLCIntf, "can't translate empty strings" );
+        return( @"" );
     }
 
     return( o_str );

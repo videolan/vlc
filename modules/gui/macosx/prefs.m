@@ -315,10 +315,10 @@ static VLCTreeItem *o_root_item = nil;
 			            if( p_item->i_value == -1 ) break;
 
                         o_child_name = [[VLCMain sharedInstance]
-                            localizedString: config_CategoryNameGet( p_item->i_value ) ];
+                            localizedString: config_CategoryNameGet( p_item->i_value )];
                         o_child_title = o_child_name;
                         o_child_help = [[VLCMain sharedInstance]
-                            localizedString: config_CategoryHelpGet( p_item->i_value ) ];
+                            localizedString: config_CategoryHelpGet( p_item->i_value )];
                         p_last_category = [VLCTreeItem alloc];
                         [o_children addObject:[p_last_category
                             initWithName: o_child_name
@@ -546,7 +546,6 @@ static VLCTreeItem *o_root_item = nil;
                 return nil;
             }
             p_item = p_parser->p_config;
-            int i = 0;
 
             p_item = p_parser->p_config + 1;
 
@@ -589,7 +588,6 @@ static VLCTreeItem *o_root_item = nil;
         }
         else
         {
-            int i = 0;
             int i_index;
             p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
             if( !p_list ) return o_view;
