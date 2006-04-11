@@ -1569,83 +1569,83 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                     p_conf = config_FindConfig( p_this, psz_name );
                 }
 
-            switch( p_conf->i_type )
+                switch( p_conf->i_type )
+                {
+                    case CONFIG_ITEM_STRING:
+                    case CONFIG_ITEM_FILE:
+                    case CONFIG_ITEM_DIRECTORY:
+                    case CONFIG_ITEM_MODULE:
+                    case CONFIG_ITEM_MODULE_LIST:
+                    case CONFIG_ITEM_MODULE_LIST_CAT:
+                    case CONFIG_ITEM_MODULE_CAT:
+                        config_PutPsz( p_this, psz_name, optarg );
+                        break;
+                    case CONFIG_ITEM_INTEGER:
+                        config_PutInt( p_this, psz_name, strtol(optarg, 0, 0));
+                        break;
+                    case CONFIG_ITEM_FLOAT:
+                        config_PutFloat( p_this, psz_name, (float)atof(optarg) );
+                        break;
+                    case CONFIG_ITEM_KEY:
+                        config_PutInt( p_this, psz_name, ConfigStringToKey( optarg ) );
+                        break;
+                    case CONFIG_ITEM_BOOL:
+                        config_PutInt( p_this, psz_name, !flag );
+                        break;
+                }
+                continue;
+            }
+        }
+
+        /* A short option has been recognized */
+        if( pp_shortopts[i_cmd] != NULL )
+        {
+            switch( pp_shortopts[i_cmd]->i_type )
             {
                 case CONFIG_ITEM_STRING:
                 case CONFIG_ITEM_FILE:
                 case CONFIG_ITEM_DIRECTORY:
                 case CONFIG_ITEM_MODULE:
+                case CONFIG_ITEM_MODULE_CAT:
                 case CONFIG_ITEM_MODULE_LIST:
                 case CONFIG_ITEM_MODULE_LIST_CAT:
-                case CONFIG_ITEM_MODULE_CAT:
-                    config_PutPsz( p_this, psz_name, optarg );
+                    config_PutPsz( p_this, pp_shortopts[i_cmd]->psz_name, optarg );
                     break;
                 case CONFIG_ITEM_INTEGER:
-                    config_PutInt( p_this, psz_name, strtol(optarg, 0, 0));
-                    break;
-                case CONFIG_ITEM_FLOAT:
-                    config_PutFloat( p_this, psz_name, (float)atof(optarg) );
-                    break;
-                case CONFIG_ITEM_KEY:
-                    config_PutInt( p_this, psz_name, ConfigStringToKey( optarg ) );
-                    break;
-                case CONFIG_ITEM_BOOL:
-                    config_PutInt( p_this, psz_name, !flag );
-                    break;
-            }
-
-            continue;
-        }
-    }
-    /* A short option has been recognized */
-    if( pp_shortopts[i_cmd] != NULL )
-    {
-        switch( pp_shortopts[i_cmd]->i_type )
-        {
-            case CONFIG_ITEM_STRING:
-            case CONFIG_ITEM_FILE:
-            case CONFIG_ITEM_DIRECTORY:
-            case CONFIG_ITEM_MODULE:
-            case CONFIG_ITEM_MODULE_CAT:
-            case CONFIG_ITEM_MODULE_LIST:
-            case CONFIG_ITEM_MODULE_LIST_CAT:
-                config_PutPsz( p_this, pp_shortopts[i_cmd]->psz_name, optarg );
-                break;
-            case CONFIG_ITEM_INTEGER:
-                if( i_cmd == 'v' )
-                {
-                    if( optarg )
+                    if( i_cmd == 'v' )
                     {
-                        if( *optarg == 'v' ) /* eg. -vvv */
+                        if( optarg )
                         {
-                            i_verbose++;
-                            while( *optarg == 'v' )
+                            if( *optarg == 'v' ) /* eg. -vvv */
                             {
                                 i_verbose++;
-                                optarg++;
+                                while( *optarg == 'v' )
+                                {
+                                    i_verbose++;
+                                    optarg++;
+                                }
+                            }
+                            else
+                            {
+                                i_verbose += atoi( optarg ); /* eg. -v2 */
                             }
                         }
                         else
                         {
-                            i_verbose += atoi( optarg ); /* eg. -v2 */
+                            i_verbose++; /* -v */
                         }
+                        config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
+                                               i_verbose );
                     }
                     else
                     {
-                        i_verbose++; /* -v */
+                        config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
+                                               strtol(optarg, 0, 0) );
                     }
-                    config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
-                                           i_verbose );
-                }
-                else
-                {
-                    config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
-                                           strtol(optarg, 0, 0) );
-                }
-                break;
-            case CONFIG_ITEM_BOOL:
-                config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name, 1 );
-                break;
+                    break;
+                case CONFIG_ITEM_BOOL:
+                    config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name, 1 );
+                    break;
             }
 
             continue;
