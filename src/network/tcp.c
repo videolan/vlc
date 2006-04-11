@@ -550,9 +550,10 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 
     if( i_socks_version == 4 )
     {
-        struct addrinfo hints = { 0 }, *p_res;
+        struct addrinfo hints, *p_res;
 
         /* v4 only support ipv4 */
+	memset (&hints, 0, sizeof (hints));
         hints.ai_family = AF_INET;
         if( vlc_getaddrinfo( p_obj, psz_host, 0, &hints, &p_res ) )
             return VLC_EGENERIC;
