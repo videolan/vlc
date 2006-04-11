@@ -236,7 +236,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                 {
                     char value[30];
                     E_(ExtractURIValue)( p_request, "seek_value", value, 30 );
-                    decode_URI( value );
+                    unescape_URI( value );
                     E_(HandleSeek)( p_intf, value );
                     break;
                 }
@@ -248,7 +248,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
 
                     E_(ExtractURIValue)( p_request, "value", vol, 8 );
                     aout_VolumeGet( p_intf, &i_volume );
-                    decode_URI( vol );
+                    unescape_URI( vol );
 
                     if( vol[0] == '+' )
                     {
@@ -305,9 +305,9 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     playlist_item_t *p_item;
 
                     E_(ExtractURIValue)( p_request, "mrl", mrl, 1024 );
-                    decode_URI( mrl );
+                    unescape_URI( mrl );
                     E_(ExtractURIValue)( p_request, "name", psz_name, 1024 );
-                    decode_URI( psz_name );
+                    unescape_URI( psz_name );
                     if( !*psz_name )
                     {
                         memcpy( psz_name, mrl, 1024 );
@@ -530,7 +530,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                         char val[512];
                         E_(ExtractURIValue)( p_request,
                                                vlm_properties[i], val, 512 );
-                        decode_URI( val );
+                        unescape_URI( val );
                         if( strlen( val ) > 0 && i >= 4 )
                         {
                             p += sprintf( p, " %s %s", vlm_properties[i], val );
@@ -626,7 +626,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     if( p_intf->p_sys->p_vlm == NULL ) break;
 
                     E_(ExtractURIValue)( p_request, "file", file, 512 );
-                    decode_URI( file );
+                    unescape_URI( file );
 
                     if( E_(StrToMacroType)( control ) == MVLC_VLM_LOAD )
                         sprintf( psz, "load %s", file );
@@ -661,7 +661,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                 break;
             }
             E_(ExtractURIValue)( p_request, m->param1,  value, 512 );
-            decode_URI( value );
+            unescape_URI( value );
 
             switch( E_(StrToMacroType)( m->param2 ) )
             {

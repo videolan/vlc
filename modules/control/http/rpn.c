@@ -353,7 +353,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             char *tmp;
 
             E_(ExtractURIValue)( url, name, value, 512 );
-            decode_URI( value );
+            unescape_URI( value );
             tmp = E_(FromUTF8)( p_intf, value );
             E_(SSPush)( st, tmp );
             free( tmp );
