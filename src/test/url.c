@@ -58,8 +58,9 @@ int main (void)
     test_decode ("%0000", "");
 
     /* UTF-8 tests */
-    test_decode ("T%C3%a9l%c3%A9vision", "Télévision");
+    test_decode ("T%C3%a9l%c3%A9vision+%e2%82%Ac", "Télévision €");
     test_decode ("T%E9l%E9vision", "T?l?vision");
+    test_decode ("%C1%94%C3%a9l%c3%A9vision", "??élévision"); /* overlong */
 
     return 0;
 }
