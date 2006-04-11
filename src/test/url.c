@@ -22,29 +22,44 @@
 #include <vlc/vlc.h>
 #include "vlc_url.h"
 
-#undef NDEBUG
-#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void test_decode (const char *in, const char *out)
+{
+    char *res;
+
+    printf ("\"%s\" -> \"%s\" ?\n", in, out);
+    res = decode_URI_duplicate (in);
+    if (res == NULL)
+        exit (1);
+
+    if (strcmp (res, out))
+        exit (2);
+
+    free (res);
+}
 
 int main (void)
 {
-    const char url1[] = "this_should_not_be_modified_1234";
-    const char url2[] = "This+should+be+modified+1234!";
-    const char url3[] = "This%20should%20be%20modified%201234!";
+    (void)setvbuf (stdout, NULL, _IONBF, 0);
+    test_decode ("this_should_not_be_modified_1234",
+                 "this_should_not_be_modified_1234");
 
-    char *durl = decode_URI_duplicate (url1);
-    assert (durl != NULL);
-    assert (!strcmp (durl, url1));
-    free (durl);
+    test_decode ("This+should+be+modified+1234!",
+                 "This should be modified 1234!");
 
-    durl = decode_URI_duplicate (url2);
-    assert (durl != NULL);
-    assert (!strcmp (durl, "This should be modified 1234!"));
-    free (durl);
+    test_decode ("This%20should%20be%20modified%201234!",
+                 "This should be modified 1234!");
 
-    durl = decode_URI_duplicate (url3);
-    assert (durl != NULL);
-    assert (!strcmp (durl, "This should be modified 1234!"));
-    free (durl);
+    /* tests with invalid input */
+    test_decode ("%", "%");
+    test_decode ("%2", "%2");
+    test_decode ("%0000", "");
+
+    /* UTF-8 tests */
+    test_decode ("T%C3%a9l%c3%A9vision", "Télévision");
+    test_decode ("T%E9l%E9vision", "T?l?vision");
 
     return 0;
 }
