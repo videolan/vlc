@@ -71,10 +71,12 @@ static void Close( vlc_object_t * );
 #define BFRAMES_LONGTEXT N_( "Number of consecutive B-frames between I and " \
     "P-frames. (1 to 16)" )
 
+/// \bug [String] extra space
 #define B_ADAPT_TEXT N_("Adaptive B-frame decision")
 #define B_ADAPT_LONGTEXT N_( "Force the specified number of " \
     "consecutive B-frames to be used, except possibly before an I-frame. " )
 
+/// \bug [String] extra space
 #define B_BIAS_TEXT N_("B-frames usage")
 #define B_BIAS_LONGTEXT N_( "Bias the choice to use B-frames. Positive values " \
     "cause more B-frames, negative values cause less B-frames. " )
@@ -105,6 +107,7 @@ static void Close( vlc_object_t * );
     "Lower values result in better fidelity, but higher bitrates. 26 is a " \
     "good default value. From 0 to 51. 0 means lossless" )
 
+/// \bug [String] missing point
 #define CRF_TEXT N_("Quality-based VBR")
 #define CRF_LONGTEXT N_( "1-pass Quality-based VBR. From 0 to 51" )
 
@@ -112,6 +115,7 @@ static void Close( vlc_object_t * );
 #define QPMIN_LONGTEXT N_( "Minimum quantizer, 15/35 seems to be a useful " \
     "range." )
 
+/// \bug [String] typo ? Why doesn't it work in po ?
 #define QPMAX_TEXT N_("Max QP")
 #define QPMAX_LONGTEXT N_( "Maximum quantizer parameter." )
 

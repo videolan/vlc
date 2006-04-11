@@ -69,6 +69,7 @@ static void Close( vlc_object_t * );
     "for communication. In this mode you cannot connect to normal RTSP servers." )
 
 vlc_module_begin();
+    /// \bug [String] s,live555.com,live555
     set_description( _("RTP/RTSP/SDP demuxer (using Live555.com)" ) );
     set_capability( "demux2", 50 );
     set_shortname( "RTP/RTSP");

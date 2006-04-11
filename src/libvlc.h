@@ -501,6 +501,7 @@ static char *ppsz_clock_descriptions[] =
 #define TEXTRENDERER_LONGTEXT N_( \
     "VLC normally uses Freetype for rendering, but this allows you to use svg for instance.")
 
+/// \bug typo arbitraty
 #define SUB_FILTER_TEXT N_("Subpictures filter module")
 #define SUB_FILTER_LONGTEXT N_( \
     "This adds so-called \"subpicture filters\". These filters overlay " \

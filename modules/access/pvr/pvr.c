@@ -86,6 +86,7 @@ static void Close( vlc_object_t * );
 #define BITRATE_PEAK_TEXT N_( "Bitrate peak" )
 #define BITRATE_PEAK_LONGTEXT N_( "Peak bitrate in VBR mode." )
 
+/// \bug extra parenthesis
 #define BITRATE_MODE_TEXT N_( "Bitrate mode)" )
 #define BITRATE_MODE_LONGTEXT N_( "Bitrate mode to use (VBR or CBR)." )
 

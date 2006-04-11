@@ -56,10 +56,12 @@ static void Close   ( vlc_object_t * );
 
 static mtime_t GetClockRef( intf_thread_t *, mtime_t );
 
+/// \bug [String] This string is BAD.
 #define NETSYNC_TEXT N_( "Act as master" )
 #define NETSYNC_LONGTEXT N_( "Should " \
   "act as the master client for the network synchronisation?" )
 
+/// \bug [String] This string is BAD.
 #define MIP_TEXT N_( "Master client ip address" )
 #define MIP_LONGTEXT N_( "IP address of " \
   "the master client used for the network synchronisation." )

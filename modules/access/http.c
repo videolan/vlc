@@ -64,6 +64,7 @@ static void Close( vlc_object_t * );
     "Automatically try to reconnect to the stream in case of a sudden " \
     "disconnect." )
 
+/// \bug missing space before you should
 #define CONTINUOUS_TEXT N_("Continuous stream")
 #define CONTINUOUS_LONGTEXT N_("Read a file that is " \
     "being constantly updated (for example, a JPG file on a server)." \
