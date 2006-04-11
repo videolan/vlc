@@ -142,7 +142,7 @@ void decode_URI( char *psz )
         {
             case '%':
             {
-                char hex[2];
+                char hex[3];
 
                 if( ( ( hex[0] = *in++ ) == 0 )
                  || ( ( hex[1] = *in++ ) == 0 ) )

@@ -52,6 +52,8 @@ int main (void)
     test_decode ("This%20should%20be%20modified%201234!",
                  "This should be modified 1234!");
 
+    test_decode ("%7E", "~");
+
     /* tests with invalid input */
     test_decode ("%", "%");
     test_decode ("%2", "%2");
