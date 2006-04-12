@@ -650,7 +650,7 @@ static VLCWizard *_o_sharedInstance = nil;
             /* disable all codecs which don't support MPEG PS, MPEG TS, MPEG 1,
              * OGG, RAW or ASF */
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, integer"];
-            [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, floating"];
+            [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, floating point"];
             
         } else if ( mode == 1 )
         {
@@ -663,7 +663,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_t4_pop_audioCodec removeItemWithTitle:@"FLAC"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Speex"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, integer"];
-            [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, floating"];
+            [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, floating point"];
             
             [o_t4_pop_videoCodec removeItemWithTitle:@"MPEG-1 Video"];
             [o_t4_pop_videoCodec removeItemWithTitle:@"MPEG-2 Video"];
@@ -673,7 +673,6 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_t4_pop_videoCodec removeItemWithTitle:@"Theora"];
         } else {
             /* RTP/UDP Unicast/Multicast Streaming */
-            
             [o_userSelections setObject: [[NSNumber numberWithInt: mode] \
                 stringValue] forKey:@"stmgMhd"];
             
@@ -682,7 +681,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_t4_pop_audioCodec removeItemWithTitle:@"FLAC"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Speex"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, integer"];
-            [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, floating"];
+            [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, floating point"];
         }
 
         /* store the destination and check whether is it empty */
