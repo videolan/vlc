@@ -28,10 +28,10 @@ EXTRA_DIST = \
 	vlc-config.in.in \
 	vlc.spec \
 	vlc.spec.mdk \
-	vlc.win32.nsi \
+	vlc.win32.nsi.in \
 	$(NULL)
 
-BUILT_SOURCES_distclean = vlc-config compile
+BUILT_SOURCES_distclean = vlc-config compile vlc.win32.nsi
 BUILT_SOURCES_clean = macosx-sdk
 
 BUILT_SOURCES = $(BUILT_SOURCES_distclean) $(BUILT_SOURCES_clean)
@@ -701,7 +701,7 @@ endif
 
 package-win32-base-debug: package-win-common
 # Copy relevant files
-	cp "$(srcdir)/vlc.win32.nsi" "$(top_builddir)/vlc-${VERSION}/"
+	cp "$(top_builddir)/vlc.win32.nsi" "$(top_builddir)/vlc-${VERSION}/"
 
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/plugins"
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
