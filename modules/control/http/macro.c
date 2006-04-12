@@ -301,17 +301,32 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                 /* playlist management */
                 case MVLC_ADD:
                 {
-                    char mrl[1024], psz_name[1024];
+                    char mrl[1024], psz_name[1024], tmp[1024];
+                    char *p, *str;
                     playlist_item_t *p_item;
 
-                    E_(ExtractURIValue)( p_request, "mrl", mrl, 1024 );
-                    decode_URI( mrl );
+                    E_(ExtractURIValue)( p_request, "mrl", tmp, 1024 );
+                    decode_URI( tmp );
                     E_(ExtractURIValue)( p_request, "name", psz_name, 1024 );
                     decode_URI( psz_name );
                     if( !*psz_name )
                     {
                         memcpy( psz_name, mrl, 1024 );
                     }
+                    /* addslashes for backward compatibility with the old
+                     * http intf */
+                    p = mrl; str = tmp;
+                    while( *str != '\0' )
+                    {
+                        if( *str == '"' || *str == '\'' || *str == '\\' )
+                        {
+                            *p++ = '\\';
+                        }
+                        *p++ = *str;
+                        str++;
+                    }
+                    *p = '\0';
+
                     p_item = E_(MRLParse)( p_intf, mrl, psz_name );
 
                     if( !p_item || !p_item->input.psz_uri ||
