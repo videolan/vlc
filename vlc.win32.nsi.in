@@ -265,6 +265,7 @@ Section "Media player (required)" SEC01
 
   File  vlc.exe
   File  vlc.exe.manifest
+  @FILE_LIBVLC_DLL@
   File  *.txt
 
   File  /r plugins
