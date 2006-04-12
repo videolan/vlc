@@ -77,6 +77,8 @@ int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
             msg_Err( p_this, "cannot set socket to non-blocking mode" );
     }
 #else
+    fcntl( fd, F_SETFD, FD_CLOEXEC );
+
     if( ( ( i_val = fcntl( fd, F_GETFL, 0 ) ) < 0 ) ||
         ( fcntl( fd, F_SETFL, i_val | O_NONBLOCK ) < 0 ) )
         msg_Err( p_this, "cannot set socket to non-blocking mode (%s)",
