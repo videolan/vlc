@@ -102,6 +102,7 @@ Ondrej Kuda aka Albert <kuda at natur dot cuni dot cz> - HTTP interface tips and
 Øyvind Kolbu <oyvindk at world-online.no> - FreeBSD patches
 Patrick Horn <patrickd0thorn at mindspring d0t com> - DirectShow patch
 Paul Mackerras <paulus at linuxcare.com.au> - AltiVec IDCT and motion
+Pavlov Konstantin “thresh” - several Linux configure.ac fixes
 Philippe Van Hecke <philippe at belnet dot be> - SAP header hash patch
 Pierre Marc Dumuid <pierre.dumuid at adelaide dot edu dot au> - Playlist patches
 Régis Duchesne <regis at via.ecp.fr> - original VLC code

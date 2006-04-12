@@ -3391,7 +3391,7 @@ if test "${enable_xvideo}" != "no" &&
     AC_CHECK_LIB(Xv,XvPutImage,[
       # If libXv.so is available, xvideo can be a plugin. Otherwise, we
       # test for libXv_pic.
-      if test -f /usr/X11R6/lib/libXv.so -o -f "${x_libraries}"/libXv.so; then
+      if test -f /usr/X11R6/lib/libXv.so -o -f /usr/lib/libXv.so -o -f "${x_libraries}"/libXv.so; then
         VLC_ADD_PLUGINS([xvideo])
         VLC_ADD_CPPFLAGS([xvideo],[${X_CFLAGS}])
         VLC_ADD_LDFLAGS([xvideo],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXv])
