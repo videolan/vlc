@@ -846,9 +846,9 @@ package-macosx:
 	echo "Creating disk image" ;
 	rm -f "$(top_builddir)/vlc-${VERSION}.dmg" ;
 	hdiutil create -srcfolder "$(top_builddir)/vlc-${VERSION}" \
-	  "$(top_builddir)/vlc-${VERSION}.dmg" -format UDZO -quiet \
+	  "$(top_builddir)/vlc-${VERSION}.dmg" -format UDZO \
 	  -scrub -imagekey zlib-level=9 ;
-	echo; echo "Disk image creation completed:" ;
+	echo "Disk image creation completed:" ;
 	ls -la "$(top_builddir)/vlc-${VERSION}.dmg" ; echo ;
 
 # Clean up
