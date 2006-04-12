@@ -659,7 +659,6 @@ endif
 
 	cp $(srcdir)/share/http/old/*.html $(top_builddir)/vlc-${VERSION}/http/old/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/*.html ;
-	cp $(srcdir)/share/http/old/*.ico $(top_builddir)/vlc-${VERSION}/http/old/ ;
 	cp $(srcdir)/share/http/old/*.css $(top_builddir)/vlc-${VERSION}/http/old/ ;
 	cp $(srcdir)/share/http/old/*.png $(top_builddir)/vlc-${VERSION}/http/old/ ;
 	cp $(srcdir)/share/http/old/vlm/*.html $(top_builddir)/vlc-${VERSION}/http/old/vlm/ ;
