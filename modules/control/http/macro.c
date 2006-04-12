@@ -311,7 +311,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     decode_URI( psz_name );
                     if( !*psz_name )
                     {
-                        memcpy( psz_name, mrl, 1024 );
+                        memcpy( psz_name, tmp, 1024 );
                     }
                     /* addslashes for backward compatibility with the old
                      * http intf */
