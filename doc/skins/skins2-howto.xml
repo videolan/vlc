@@ -238,7 +238,7 @@ difficulty to understand how VLC skins work.</para>
 
 <sect3 id="Font">
   <title>Font</title>
-  <para>Declares a font to be used in a <link linkend="Text">Text</link> or <link linkend="Playlist">Playlist</link>.</para>
+  <para>Declares a font to be used in a <link linkend="Text">Text</link> or <link linkend="Playtree">Playtree</link>.</para>
   <sect4 id="fontid">
     <title>id</title>
     <para>Identifiant of the font that will be used with controls.</para>
@@ -395,7 +395,7 @@ difficulty to understand how VLC skins work.</para>
 
 <sect3 id="commattr">
   <title>Attributes common to all the controls</title>
-  <para>The following attributes are common to all the controls (Image, Button, Checkbox, Text, Slider, RadialSlider, Playlist, Video)</para>
+  <para>The following attributes are common to all the controls (Image, Button, Checkbox, Text, Slider, RadialSlider, Playtree, Video)</para>
   <sect4 id="attrid">
     <title>id</title>
     <para>Identifiant of the control. Currently unused.</para>
@@ -613,7 +613,7 @@ difficulty to understand how VLC skins work.</para>
   </sect4>
   <sect4 id="slidervalue">
     <title>value</title>
-    <para>Variable controlled by the slider. This must be a <link linkend="percent">percentage variable</link>, e.g "volume" or "time" (only exception: the <link linkend="Slider">Slider</link> defined inside the <link linkend="Playlist">Playlist</link> tag does not need to set this attribute).</para>
+    <para>Variable controlled by the slider. This must be a <link linkend="percent">percentage variable</link>, e.g "volume" or "time" (only exception: the <link linkend="Slider">Slider</link> defined inside the <link linkend="Playtree">Playtree</link> tag does not need to set this attribute).</para>
     <para>Default value: none</para>
   </sect4>
   <sect4 id="slidertooltiptext">
@@ -681,7 +681,12 @@ difficulty to understand how VLC skins work.</para>
 </sect3>
 
 <sect3 id="Playlist">
-  <title>Playlist</title>
+ <title>Playlist</title>
+ <para>This tag used to create a playlist. This tag is deprecated, you should now use <link linkend="Playtree">Playtree</link></para>
+</sect3>
+
+<sect3 id="Playtree">
+  <title>Playtree</title>
   <para>Create a playlist. This tag must contain a <link linkend="Slider">Slider</link> tag (to allow scrolling in the playlist).</para>
   <para>See the <link linkend="commattr">common attributes</link>.</para>
   <sect4 id="playlistwidth">
@@ -734,6 +739,20 @@ difficulty to understand how VLC skins work.</para>
     <para>Background color for even playlist items. This attribute is ignored if the <link linkend="bgimage">bgimage</link> one is used.</para>
     <para>Default value: #FFFFFF</para>
   </sect4>
+  <sect4 id="flat">
+    <title>flat</title>
+    <para>Boolean to indicate whether the playlist should use the tree structure or be completely "flat" (only show the leafs of the tree).</para>
+    <para>A flat playtree will work like old-style playlists.</para>
+    <para>Default value: false</para>
+  </sect4>
+  <sect4 id="openimage">
+    <title>openimage</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link> shown to the left of a node, when it is expanded.</para>
+ </sect4>
+ <sect4 id="closedimage">
+    <title>closedimage</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link> shown to the left of a node, when it is retracted.</para>
+ </sect4>
 </sect3>
 
 </sect1>
