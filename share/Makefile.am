@@ -292,7 +292,6 @@ DIST_http = \
 	http/old/admin/index.html \
 	http/old/cone_minus.png \
 	http/old/cone_plus.png \
-	http/old/favicon.ico \
 	http/old/index.html \
 	http/old/info.html \
 	http/old/style.css \
