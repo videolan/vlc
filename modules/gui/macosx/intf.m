@@ -184,9 +184,22 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
-    p_intf->p_sys->b_playlist_update = TRUE;
-    p_intf->p_sys->b_intf_update = TRUE;
-    p_intf->p_sys->b_playmode_update = TRUE;
+    p_intf->p_sys->b_playlist_update = VLC_TRUE;
+    p_intf->p_sys->b_intf_update = VLC_TRUE;
+    p_intf->p_sys->b_playmode_update = VLC_TRUE;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * ShowController: Callback triggered by the show-intf playlist variable
+ * through the ShowIntf-control-intf, to let us show the controller-win;
+ * usually when in fullscreen-mode
+ *****************************************************************************/
+static int ShowController( vlc_object_t *p_this, const char *psz_variable,
+                     vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    intf_thread_t * p_intf = VLCIntf;
+    p_intf->p_sys->b_intf_show = VLC_TRUE;
     return VLC_SUCCESS;
 }
 
@@ -198,7 +211,7 @@ static int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
-    p_intf->p_sys->b_fullscreen_update = TRUE;
+    p_intf->p_sys->b_fullscreen_update = VLC_TRUE;
     return VLC_SUCCESS;
 }
 
@@ -449,6 +462,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         val.b_bool = VLC_FALSE;
 
         var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
+        var_AddCallback( p_playlist, "intf-show", ShowController, self);
 
         [o_embedded_window setFullscreen: var_GetBool( p_playlist,
                                                             "fullscreen" )];
@@ -999,6 +1013,13 @@ static VLCMain *_o_sharedMainInstance = nil;
         vlc_object_release( p_playlist );
 
         p_intf->p_sys->b_fullscreen_update = VLC_FALSE;
+    }
+
+    if( p_intf->p_sys->b_intf_show )
+    {
+        [o_window makeKeyAndOrderFront: self];
+
+        p_intf->p_sys->b_intf_show = VLC_FALSE;
     }
 
     if( p_input && !p_input->b_die )
