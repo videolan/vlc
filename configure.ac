@@ -1460,7 +1460,7 @@ dnl
 dnl Growl notification plugin
 dnl
 AC_ARG_ENABLE(growl,
-  [  --enable-growl         growl notification plugin (default enabled)])
+  [  --enable-growl          growl notification plugin (default enabled)])
 AS_IF([test "${enable_growl}" != "no"], [
     VLC_ADD_PLUGINS([growl])
   ]
@@ -2909,7 +2909,7 @@ dnl
 dnl DTS Coherent Acoustics decoder plugin
 dnl
 AC_ARG_ENABLE(dts,
-  [  --enable-dts            DTS Coherent Acoustics support with libdts (default enabled)])
+  [  --enable-dts            DTS Coherent Acoustics support with libdca (default enabled)])
 if test "${enable_dts}" != "no"; then
   AC_ARG_WITH(dts-tree,
     [    --with-dts-tree=PATH  libdts tree for static linking ],[],[])
