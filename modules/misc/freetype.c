@@ -406,13 +406,15 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
             i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
         }
 
-        if( p_region->p_style && p_line->i_width < i_width )
+        if( p_line->i_width < i_width )
         {
-            if( p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT )
+            if( ( p_region->p_style && p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT ) ||
+                ( !p_region->p_style && (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT ) )
             {
                 i_align_offset = i_width - p_line->i_width;
             }
-            else if( p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT )
+            else if( ( p_region->p_style && p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT ) ||
+                ( !p_region->p_style && (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT ) )
             {
                 i_align_offset = ( i_width - p_line->i_width ) / 2;
             }
@@ -483,13 +485,15 @@ static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_
             i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
         }
 
-        if( p_region->p_style && p_line->i_width < i_width )
+        if( p_line->i_width < i_width )
         {
-            if( p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT )
+            if( ( p_region->p_style && p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT ) ||
+                ( !p_region->p_style && (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT ) )
             {
                 i_align_offset = i_width - p_line->i_width;
             }
-            else if( p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT )
+            else if( ( p_region->p_style && p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT ) ||
+                ( !p_region->p_style && (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT ) )
             {
                 i_align_offset = ( i_width - p_line->i_width ) / 2;
             }
@@ -633,13 +637,15 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
             i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
         }
 
-        if( p_region->p_style && p_line->i_width < i_width )
+        if( p_line->i_width < i_width )
         {
-            if( p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT )
+            if( ( p_region->p_style && p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT ) ||
+                ( !p_region->p_style && (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT ) )
             {
                 i_align_offset = i_width - p_line->i_width;
             }
-            else if( p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT )
+            else if( ( p_region->p_style && p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT ) ||
+                ( !p_region->p_style && (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT ) )
             {
                 i_align_offset = ( i_width - p_line->i_width ) / 2;
             }

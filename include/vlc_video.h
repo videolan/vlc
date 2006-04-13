@@ -207,6 +207,7 @@ struct subpicture_region_t
 
     int             i_x;                             /**< position of region */
     int             i_y;                             /**< position of region */
+    int             i_align;                  /**< alignment within a region */
 
     char            *psz_text;       /**< text string comprising this region */
     text_style_t    *p_style;  /* a description of the text style formatting */

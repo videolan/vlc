@@ -497,7 +497,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Load the text rendering module */
-        if( !p_spu->p_text && p_region )
+        if( !p_spu->p_text && p_region && p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
         {
             char *psz_modulename = NULL;
 
@@ -527,7 +527,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
             if( psz_modulename ) free( psz_modulename );
         }
-        else if( p_region )
+        if( p_spu->p_text )
         {
             if( p_subpic->i_original_picture_height > 0 &&
                 p_subpic->i_original_picture_width  > 0 )
@@ -622,9 +622,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             {
                 if( p_spu->p_text && p_spu->p_text->p_module &&
                     p_spu->p_text->pf_render_text )
-                {/*
-                    if( p_region->p_style )
-                        p_region->p_style->i_text_align = p_subpic->i_flags & 0x3; */
+                {
+                    p_region->i_align = p_subpic->i_flags;
                     p_spu->p_text->pf_render_text( p_spu->p_text,
                                                    p_region, p_region ); 
                 }
