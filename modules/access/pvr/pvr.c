@@ -505,7 +505,7 @@ static int Open( vlc_object_t * p_this )
         }
         else
         {
-            msg_Dbg( p_access, "input set to :%d", p_sys->i_input);
+            msg_Dbg( p_access, "input set to: %d", p_sys->i_input);
         }
     }
 
@@ -518,7 +518,7 @@ static int Open( vlc_object_t * p_this )
         }
         else
         {
-            msg_Dbg( p_access, "video standard set to :%x", p_sys->i_standard);
+            msg_Dbg( p_access, "video standard set to: %x", p_sys->i_standard);
         }
     }
 
@@ -550,7 +550,7 @@ static int Open( vlc_object_t * p_this )
             }
             else
             {
-                msg_Dbg( p_access, "picture size set to :%dx%d",
+                msg_Dbg( p_access, "picture size set to: %dx%d",
                          vfmt.fmt.pix.width, vfmt.fmt.pix.height );
             }
         }
@@ -593,7 +593,11 @@ static int Open( vlc_object_t * p_this )
         }
         else
         {
-            vf.frequency = (p_sys->i_frequency * 16 + 500) / 1000;
+            if( p_sys->i_radio_fd == -1 )
+                vf.frequency = (p_sys->i_frequency * 16 + 500) / 1000;
+            else
+                vf.frequency = p_sys->i_frequency * 16;
+
             if( ioctl( i_fd, VIDIOC_S_FREQUENCY, &vf ) < 0 )
             {
                 msg_Warn( p_access, "VIDIOC_S_FREQUENCY failed (%s)",
@@ -601,7 +605,7 @@ static int Open( vlc_object_t * p_this )
             }
             else
             {
-                msg_Dbg( p_access, "tuner frequency set to :%d",
+                msg_Dbg( p_access, "tuner frequency set to: %d",
                          p_sys->i_frequency );
             }
         }
