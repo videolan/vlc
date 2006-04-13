@@ -1142,6 +1142,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 
         msg_Dbg( p_stream, "read box: \"soun\" mp4 or qt1/2 (rest="I64Fd")",
                  i_read );
+msg_Dbg( p_stream, "1 read box soun: p_qt_description for alac "I64Fd, i_read);
         stream_Seek( p_stream, p_box->i_pos +
                         MP4_BOX_HEADERSIZE( p_box ) + 28 );
     }
@@ -1157,20 +1158,22 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         }
     }
 
+msg_Dbg( p_stream, "2 read box soun: p_qt_description for alac "I64Fd, i_read);
     if( p_box->i_type == FOURCC_samr || p_box->i_type == FOURCC_sawb )
     {
         /* Ignore channelcount for AMR (3gpp AMRSpecificBox) */
         p_box->data.p_sample_soun->i_channelcount = 1;
     }
 
+msg_Dbg( p_stream, "3 read box soun: p_qt_description for alac "I64Fd, i_read);
     if( p_box->i_type == FOURCC_alac )
     {
         if( p_box->data.p_sample_soun->p_qt_description )
             free( p_box->data.p_sample_soun->p_qt_description );
-
-        p_box->data.p_sample_soun->p_qt_description = malloc( i_read );
-        p_box->data.p_sample_soun->i_qt_description = i_read;
-        memcpy( p_box->data.p_sample_soun->p_qt_description, p_peek, i_read );
+msg_Dbg( p_stream, "4 read box soun: p_qt_description for alac "I64Fd, i_read);
+        p_box->data.p_sample_soun->p_qt_description = malloc( 36 );
+        p_box->data.p_sample_soun->i_qt_description = 36;
+        memcpy( p_box->data.p_sample_soun->p_qt_description, p_peek, 36 );
     }
     else
     {
