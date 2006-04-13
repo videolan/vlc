@@ -55,6 +55,7 @@ static int  SendEvents   ( vlc_object_t *, char const *,
 #define DESC_TEXT N_("Description file")
 #define DESC_LONGTEXT N_("A file containing a simple playlist")
 #define HISTORY_TEXT N_("History parameter")
+/// \bug [String] typo
 #define HISTORY_LONGTEXT N_("The umber of frames used for detection.")
 
 vlc_module_begin();

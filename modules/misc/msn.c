@@ -60,6 +60,7 @@ static int SendToMSN( char * psz_msg );
  * You need to enable the "What I'm Listening To" option in MSN.
  *****************************************************************************/
 #define FORMAT_DEFAULT "{0} - {1}"
+/// \bug [String] MSN is useless
 #define FORMAT_TEXT N_("MSN Title format string")
 #define FORMAT_LONGTEXT N_("Format of the string to send to MSN " \
 "{0} Artist, {1} Title, {2} Album. Defaults to \"Artist - Title\" ({0} - {1}).")

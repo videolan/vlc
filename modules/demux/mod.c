@@ -54,6 +54,7 @@ static void Close  ( vlc_object_t * );
 #define MEGABASS_LONGTEXT N_( "Enable megabass mode" )
 #define MEGABASS_LEVEL_LONGTEXT N_("Megabass mode level (from 0 to 100, " \
                 "default value is 0)." )
+/// \bug [String] Missing space after dot
 #define MEGABASS_RANGE_LONGTEXT N_("Megabass mode cutoff frequency, in Hz." \
                 "This is the maximum frequency for which the megabass " \
                 "effect applies. Valid values are from 10 to 100 Hz" )

@@ -37,12 +37,15 @@
  * Module descriptor
  *****************************************************************************/
 #define ACCESS_TEXT N_("Output access method")
+/// \bug [String] "Output method to use for the stream." 
 #define ACCESS_LONGTEXT N_( \
     "This is the output access method that will be used." )
 #define MUX_TEXT N_("Output muxer")
+/// \bug [String] "Muxer to use for the stream." 
 #define MUX_LONGTEXT N_( \
     "This is the muxer that will be used." )
 #define DST_TEXT N_("Output destination")
+/// \bug [String] "Destination (URL) to use for the stream." 
 #define DST_LONGTEXT N_( \
     "This is the destination (URL) that will be used for the stream." )
 #define NAME_TEXT N_("Session name")

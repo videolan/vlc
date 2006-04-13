@@ -140,6 +140,7 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
     [o_btn_equalizer setToolTip: _NS("Equalizer")];
     [o_ckb_2pass setTitle: _NS("2 Pass")];
     [o_ckb_2pass setToolTip: _NS("Apply the"
+/// \bug [String] missing space
         "equalizer filter twice. The effect will be sharper.")];
     [o_ckb_enable setTitle: _NS("Enable")];
     [o_ckb_enable setToolTip: _NS("Enable the equalizer. Bands can be set "

@@ -118,6 +118,7 @@ struct filter_sys_t
         "automatically choose the best number of rows and columns. " \
         "fixed: use the user-defined number of rows and columns.")
 
+/// \bug [String] missing closing parenthesis
 #define ROWS_TEXT N_("Number of rows")
 #define ROWS_LONGTEXT N_("Number of image rows in the mosaic (only used if "\
         "positionning method is set to \"fixed\"." )

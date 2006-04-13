@@ -108,6 +108,7 @@ static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
 #define YUVP_LONGTEXT N_("This renders the font using \"paletized YUV\". " \
   "This option is only needed if you want to encode into DVB subtitles" )
 #define EFFECT_TEXT N_("Font Effect")
+/// \bug [String] Missing space
 #define EFFECT_LONGTEXT N_("It is possible to apply effects to the rendered" \
 "text to improve its readability." )
 

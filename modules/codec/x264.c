@@ -90,7 +90,7 @@ static void Close( vlc_object_t * );
 #define CABAC_LONGTEXT N_( "CABAC (Context-Adaptive Binary Arithmetic "\
     "Coding). Slightly slows down encoding and decoding, but should save " \
     "10-15% bitrate." )
-
+/// \bug [String] Missing final dot
 #define REF_TEXT N_("Number of reference frames")
 #define REF_LONGTEXT N_( "Number of previous frames used as predictors. " \
     "This is effective in Anime, but seems to make little difference in " \
@@ -168,6 +168,7 @@ static void Close( vlc_object_t * );
     " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n" \
     "(p4x4 requires p8x8. i8x8 requires 8x8dct).")
 
+/// \bug [String] Extra space
 #define DIRECT_PRED_TEXT N_("Direct MV prediction mode")
 #define DIRECT_PRED_LONGTEXT N_( "Direct MV prediction mode. ")
 
