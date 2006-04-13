@@ -431,9 +431,9 @@ static int Open( vlc_object_t *p_this )
 
         if( b_rtsp )
         {
-        //    msg_Err( p_stream, "muxing is not supported in RTSP mode" );
-        //    free( p_sys );
-        //    return VLC_EGENERIC;
+            msg_Err( p_stream, "muxing is not supported in RTSP mode" );
+            free( p_sys );
+            return VLC_EGENERIC;
         }
         else if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
         {

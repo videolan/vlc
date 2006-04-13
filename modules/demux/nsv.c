@@ -68,9 +68,6 @@ struct demux_sys_t
     int64_t     i_pcr;
     int64_t     i_time;
     int64_t     i_pcr_inc;
-    int64_t     i_audio_desync; /* The amount the audio is ahead */
-
-    vlc_bool_t  b_reinit;
 };
 
 static int Demux  ( demux_t *p_demux );
@@ -94,10 +91,21 @@ static int Open( vlc_object_t *p_this )
     if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
         return VLC_EGENERIC;
 
+    if( strncmp( (char *)p_peek, "NSVf", 4 )
+            && strncmp( (char *)p_peek, "NSVs", 4 ))
+    {
+       /* In case we had force this demuxer we try to resynch */
+        if( strcmp( p_demux->psz_demux, "nsv" ) || ReSynch( p_demux ) )
+        {
+            return VLC_EGENERIC;
+        }
+    }
+
     /* Fill p_demux field */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+
     es_format_Init( &p_sys->fmt_audio, AUDIO_ES, 0 );
     p_sys->p_audio = NULL;
 
@@ -111,18 +119,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_time  = 0;
     p_sys->i_pcr_inc = 0;
 
-    p_sys->b_reinit = VLC_TRUE;
-
-    if( strncmp( (char *)p_peek, "NSVf", 4 )
-            && strncmp( (char *)p_peek, "NSVs", 4 ))
-    {
-        /* In case we have forced this demuxer we try to resynch */
-        if( strcmp( p_demux->psz_demux, "nsv" ) || ReSynch( p_demux ) )
-        {
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
-    }
     return VLC_SUCCESS;
 }
 
@@ -232,11 +228,8 @@ static int Demux( demux_t *p_demux )
                     p_sys->p_sub = es_out_Add( p_demux->out, &p_sys->fmt_sub );
                     es_out_Control( p_demux->out, ES_OUT_SET_ES, p_sys->p_sub );
                 }
-                if( stream_Read( p_demux->s, NULL, 2 ) < 2 )
-                {
-                    msg_Warn( p_demux, "cannot read" );
-                    return 0;
-                }
+                stream_Read( p_demux->s, NULL, 2 );
+
                 if( ( p_frame = stream_Block( p_demux->s, i_aux - 2 ) ) )
                 {
                     uint8_t *p = p_frame->p_buffer;
@@ -273,11 +266,6 @@ static int Demux( demux_t *p_demux )
         /* msg_Dbg( p_demux, "frame video size=%d", i_size ); */
         if( i_size > 0 && ( p_frame = stream_Block( p_demux->s, i_size ) ) )
         {
-            if( p_frame->i_buffer < i_size )
-            {
-                msg_Warn( p_demux, "cannot read" );
-                return 0;
-            }
             p_frame->i_dts = p_sys->i_pcr;
             es_out_Send( p_demux->out, p_sys->p_video, p_frame );
         }
@@ -291,11 +279,7 @@ static int Demux( demux_t *p_demux )
         if( p_sys->fmt_audio.i_codec == VLC_FOURCC( 'a', 'r', 'a', 'w' ) )
         {
             uint8_t h[4];
-            if( stream_Read( p_demux->s, h, 4 ) < 4 )
-            {
-                msg_Warn( p_demux, "cannot read" );
-                return 0;
-            }
+            stream_Read( p_demux->s, h, 4 );
 
             p_sys->fmt_audio.audio.i_channels = h[1];
             p_sys->fmt_audio.audio.i_rate = GetWLE( &h[2] );
@@ -309,13 +293,8 @@ static int Demux( demux_t *p_demux )
 
         if( ( p_frame = stream_Block( p_demux->s, i_size ) ) )
         {
-            if( p_frame->i_buffer < i_size )
-            {
-                msg_Warn( p_demux, "cannot read" );
-                return 0;
-            }
             p_frame->i_dts =
-            p_frame->i_pts = p_sys->i_pcr - ((p_sys->i_pcr > p_sys->i_audio_desync) ? p_sys->i_audio_desync : 0);
+            p_frame->i_pts = p_sys->i_pcr;
             es_out_Send( p_demux->out, p_sys->p_audio, p_frame );
         }
     }
@@ -407,11 +386,8 @@ static int ReSynch( demux_t *p_demux )
     int      i_skip;
     int      i_peek;
 
-    msg_Dbg( p_demux, "a ReSynch was requested");
     while( !p_demux->b_die )
     {
-        p_demux->p_sys->b_reinit = VLC_TRUE;
-
         if( ( i_peek = stream_Peek( p_demux->s, &p_peek, 1024 ) ) < 8 )
         {
             return VLC_EGENERIC;
@@ -420,8 +396,8 @@ static int ReSynch( demux_t *p_demux )
 
         while( i_skip < i_peek - 4 )
         {
-            if( !strncmp( (char *)p_peek, "NSVf", 4 ) || 
-                !strncmp( (char *)p_peek, "NSVs", 4 ) )
+            if( !strncmp( (char *)p_peek, "NSVf", 4 )
+                    || !strncmp( (char *)p_peek, "NSVs", 4 ) )
             {
                 if( i_skip > 0 )
                 {
@@ -433,7 +409,7 @@ static int ReSynch( demux_t *p_demux )
             i_skip++;
         }
 
-        stream_Read( p_demux->s, NULL, i_peek );
+        stream_Read( p_demux->s, NULL, i_skip );
     }
     return VLC_EGENERIC;
 }
@@ -458,9 +434,8 @@ static int ReadNSVf( demux_t *p_demux )
 
     return stream_Read( p_demux->s, NULL, i_size ) == i_size ? VLC_SUCCESS : VLC_EGENERIC;
 }
-
 /*****************************************************************************
- * ReadNSVs:
+ * ReadNSVf:
  *****************************************************************************/
 static int ReadNSVs( demux_t *p_demux )
 {
@@ -488,7 +463,7 @@ static int ReadNSVs( demux_t *p_demux )
             msg_Warn( p_demux, "unknown codec" );
             break;
     }
-    if( fcc != VLC_FOURCC( 'N', 'O', 'N', 'E' ) && ( fcc != p_sys->fmt_video.i_codec || p_sys->b_reinit ) )
+    if( fcc != VLC_FOURCC( 'N', 'O', 'N', 'E' ) && fcc != p_sys->fmt_video.i_codec  )
     {
         es_format_Init( &p_sys->fmt_video, VIDEO_ES, fcc );
         p_sys->fmt_video.video.i_width = GetWLE( &header[12] );
@@ -514,13 +489,9 @@ static int ReadNSVs( demux_t *p_demux )
         case VLC_FOURCC( 'P', 'C', 'M', ' ' ):
             fcc = VLC_FOURCC( 'a', 'r', 'a', 'w' );
             break;
-        case VLC_FOURCC( 'V', 'L', 'B', ' ' ):
         case VLC_FOURCC( 'A', 'A', 'C', ' ' ):
         case VLC_FOURCC( 'A', 'A', 'C', 'P' ):
             fcc = VLC_FOURCC( 'm', 'p', '4', 'a' );
-            break;
-        case VLC_FOURCC( 'S', 'P', 'X', ' ' ):
-            fcc = VLC_FOURCC( 's', 'p', 'x', ' ' );
             break;
         case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
             break;
@@ -529,7 +500,7 @@ static int ReadNSVs( demux_t *p_demux )
             break;
     }
 
-    if( fcc != VLC_FOURCC( 'N', 'O', 'N', 'E' ) && ( fcc != p_sys->fmt_audio.i_codec || p_sys->b_reinit ) )
+    if( fcc != VLC_FOURCC( 'N', 'O', 'N', 'E' ) && fcc != p_sys->fmt_audio.i_codec )
     {
         msg_Dbg( p_demux, "    - audio `%4.4s'", (char*)&fcc );
 
@@ -544,15 +515,26 @@ static int ReadNSVs( demux_t *p_demux )
     if( header[16]&0x80 )
     {
         /* Fractional frame rate */
-        float s = 0;
-        int t = ( header[16]&0x7f ) >> 2;
-        if( t < 16 ) s = 1.0 / t+1;
-        else s = t-15;
+        switch( header[16]&0x03 )
+        {
+            case 0: /* 30 fps */
+                p_sys->i_pcr_inc = 33333; /* 300000/9 */
+                break;
+            case 1: /* 29.97 fps */
+                p_sys->i_pcr_inc = 33367; /* 300300/9 */
+                break;
+            case 2: /* 25 fps */
+                p_sys->i_pcr_inc = 40000; /* 360000/9 */
+                break;
+            case 3: /* 23.98 fps */
+                p_sys->i_pcr_inc = 41700; /* 375300/9 */
+                break;
+        }
 
-        if( header[16]&0x01 ) s = s * 1000.0 / 1001.0;
-        if( (header[16]&0x03) == 3) p_sys->i_pcr_inc = (int)1000000 / s * 24;
-        else if( (header[16]&0x03) == 2 ) p_sys->i_pcr_inc = (int)1000000 / s * 25;
-        else p_sys->i_pcr_inc = (int)1000000 / s * 30;
+        if( header[16] < 0xc0 )
+            p_sys->i_pcr_inc = p_sys->i_pcr_inc * (((header[16] ^ 0x80) >> 2 ) +1 );
+        else
+            p_sys->i_pcr_inc = p_sys->i_pcr_inc / (((header[16] ^ 0xc0) >> 2 ) +1 );
     }
     else if( header[16] != 0 )
     {
@@ -565,12 +547,6 @@ static int ReadNSVs( demux_t *p_demux )
         p_sys->i_pcr_inc = 40000;
     }
     msg_Dbg( p_demux, "    - fps=%.3f", 1000000.0 / (double)p_sys->i_pcr_inc );
-
-    /* amount of miliseconds the audio is ahead of the video frame */
-    p_sys->i_audio_desync = (int64_t)1000 * GetWLE( &header[18] );
-    msg_Dbg( p_demux, "    - desync=%lld", p_sys->i_audio_desync);
-
-    p_sys->b_reinit = VLC_FALSE;
 
     return VLC_SUCCESS;
 }

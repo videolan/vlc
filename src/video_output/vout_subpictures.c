@@ -615,8 +615,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         while( p_region && p_spu->p_blend && p_spu->p_blend->pf_video_blend )
         {
             int i_fade_alpha = 255;
-            int i_x_offset = p_region->i_x + i_subpic_x + p_fmt->i_x_offset;
-            int i_y_offset = p_region->i_y + p_subpic->i_y + p_fmt->i_y_offset;
+            int i_x_offset = p_region->i_x + i_subpic_x;
+            int i_y_offset = p_region->i_y + p_subpic->i_y;
 
             if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
             {
