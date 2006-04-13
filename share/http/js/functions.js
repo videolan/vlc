@@ -287,7 +287,7 @@ function in_play()
     var input = value('input_mrl');
     if( value('sout_mrl') != '' )
         input += ' '+value('sout_mrl');
-    var url = 'requests/status.xml?command=in_play&input='+escape( input );
+    var url = 'requests/status.xml?command=in_play&input='+encodeURIComponent( input );
     loadXMLDoc( url, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
@@ -296,7 +296,7 @@ function in_enqueue()
     var input = value('input_mrl');
     if( value('sout_mrl') != '' )
         input += ' '+value('sout_mrl');
-    var url = 'requests/status.xml?command=in_enqueue&input='+escape( input );
+    var url = 'requests/status.xml?command=in_enqueue&input='+encodeURIComponent( input );
     loadXMLDoc( url, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
@@ -1022,7 +1022,7 @@ function browse( dest )
 function browse_dir( dir )
 {
     document.getElementById( 'browse_lastdir' ).value = dir;
-    loadXMLDoc( 'requests/browse.xml?dir='+escape(dir), parse_browse_dir );
+    loadXMLDoc( 'requests/browse.xml?dir='+encodeURIComponent(dir), parse_browse_dir );
 }
 function browse_path( p )
 {

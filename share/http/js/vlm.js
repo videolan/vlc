@@ -635,7 +635,7 @@ function parse_vlm_elements()
 
 function vlm_cmd( cmd )
 {
-    loadXMLDoc( 'requests/vlm_cmd.xml?command='+cmd.replace(/\#/g, '%23'), parse_vlm_cmd );
+    loadXMLDoc( 'requests/vlm_cmd.xml?command='+encodeURIComponent(cmd), parse_vlm_cmd );
 }
 
 function vlm_get_elements( )
