@@ -598,6 +598,7 @@ static VLCExtended *_o_sharedInstance = nil;
 - (IBAction)vidFlts_mrInfo:(id)sender
 {
     /* show info sheet */
+/// \bug [String] Misplaced \n
     NSBeginInformationalAlertSheet(_NS("More Information"), _NS("OK"), @"", @"", \
         o_extended_window, nil, nil, nil, nil, _NS("This panel allows to " \
         "select video effects filters to apply.\n" \

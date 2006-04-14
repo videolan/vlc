@@ -59,6 +59,7 @@
     static void Close( vlc_object_t * );
 
 #define LIMIT_TEXT N_("Number of streams")
+/// \bug [String] -which would be listed + to list
 #define LIMIT_LONGTEXT N_("Maximum number of Shoutcast radio streams which " \
                           "would be listed.")
 

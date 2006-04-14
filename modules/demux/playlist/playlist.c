@@ -34,6 +34,7 @@
  * Module descriptor
  *****************************************************************************/
 #define AUTOSTART_TEXT N_( "Auto start" )
+/// \bug [String] Why \n ?
 #define AUTOSTART_LONGTEXT N_( "Automatically start playing the playlist " \
                 "content once it's loaded.\n" )
 

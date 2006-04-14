@@ -83,6 +83,7 @@ static int SetFontSize( filter_t *, int );
 #define FONT_TEXT N_("Font")
 #define FONT_LONGTEXT N_("Filename for the font you want to use")
 #define FONTSIZE_TEXT N_("Font size in pixels")
+/// \bug [String] Extra space
 #define FONTSIZE_LONGTEXT N_("This is the default size of the fonts " \
     "that will be rendered on the video. " \
     "If set to something different than 0 this option will override the " \

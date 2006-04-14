@@ -46,6 +46,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 #define HOST_TEXT N_( "RTSP host address" )
+/// \bug [String] extra space
 #define HOST_LONGTEXT N_( \
     "This defines the address, port and path the RTSP VOD server will listen " \
     "on.\nSyntax is address:port/path. The default is to listen on all "\

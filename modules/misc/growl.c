@@ -52,14 +52,19 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset );
 /*****************************************************************************
  * Module descriptor
  ****************************************************************************/
+
+/// \bug [String] REmove all "Growl" in short desc
+
 #define SERVER_DEFAULT "127.0.0.1"
 #define SERVER_TEXT N_("Growl server")
 #define SERVER_LONGTEXT N_("This is the host to which Growl notifications " \
    "will be sent. By default, notifications are sent locally." )
 #define PASS_DEFAULT ""
 #define PASS_TEXT N_("Growl password")
+/// \bug [String] Password on the Growl server.
 #define PASS_LONGTEXT N_("Growl password on the server.")
 #define PORT_TEXT N_("Growl UDP port")
+/// \bug [String] UDP port on the Growl server
 #define PORT_LONGTEXT N_("Growl UDP port on the server.")
 
 vlc_module_begin();
