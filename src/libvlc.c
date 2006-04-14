@@ -2000,10 +2000,6 @@ static void SetLanguage ( char const *psz_lang )
 #endif
 
         setlocale( LC_ALL, psz_lang );
-        /* many code paths assume that float numbers are formatted according
-         * to the US standard (ie. with dot as decimal point), so we keep
-         * C for LC_NUMERIC. */
-        setlocale( LC_NUMERIC, "C" );
     }
 
     /* Specify where to find the locales for current domain */
