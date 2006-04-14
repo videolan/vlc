@@ -322,7 +322,6 @@ static void Init( intf_thread_t *p_intf )
 #else
     wxEntry( i_args, p_args );
 #endif
-    setlocale( LC_NUMERIC, "C" );
 }
 
 /* following functions are local */
@@ -354,7 +353,6 @@ bool Instance::OnInit()
      * Usefull for things we don't have any control over, like wxWidgets
      * provided facilities (eg. open file dialog) */
     locale.Init( wxLANGUAGE_DEFAULT, wxLOCALE_LOAD_DEFAULT );
-    setlocale( LC_NUMERIC, "C" );
 
     /* Load saved window settings */
     p_intf->p_sys->p_window_settings = new WindowSettings( p_intf );
