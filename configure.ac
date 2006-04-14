@@ -1,10 +1,10 @@
 dnl Autoconf settings for vlc
 
-AC_INIT(vlc,0.8.5-test2)
+AC_INIT(vlc,0.8.6-svn)
 VERSION_MAJOR="0"
 VERSION_MINOR="8"
-VERSION_REVISION="5"
-VERSION_EXTRA="test2"
+VERSION_REVISION="6"
+VERSION_EXTRA="svn"
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Janus"
@@ -16,7 +16,7 @@ AC_CANONICAL_SYSTEM
 
 dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
 dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.8.5-test2)
+AM_INIT_AUTOMAKE(vlc,0.8.6-svn)
 AM_CONFIG_HEADER(config.h)
 
 dnl Too many people are not aware of maintainer mode:
