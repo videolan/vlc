@@ -146,13 +146,3 @@ static PyObject *vlm_test( PyObject *self, PyObject *args )
     Py_INCREF( Py_None );
     return Py_None;
 }
-
-static PyMethodDef native_libvlc_test_methods[] = {
-   DEF_METHOD( create_destroy, "Create and destroy" )
-   DEF_METHOD( exception_test, "Test Exception handling" )
-   DEF_METHOD( playlist_test, "Test Playlist interaction" )
-   DEF_METHOD( vlm_test, "Test VLM" )
-   { NULL, NULL, 0, NULL }
-};
-
-DECLARE_MODULE( native_libvlc_test )

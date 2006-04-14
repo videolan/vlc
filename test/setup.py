@@ -21,6 +21,7 @@ def get_cflags():
         return []
     else:
         cflags=os.popen('%s --cflags' % vlcconfig, 'r').readline().rstrip().split()
+	cflags.append( "-D__VLC__")
         return cflags
 
 def get_ldflags():
@@ -39,21 +40,11 @@ def get_ldflags():
 
 # To compile in a local vlc tree
 native_libvlc_test = Extension( 'native_libvlc_test',
-                sources = ['native/libvlc.c'],
+                sources = ['native/init.c'],
                 include_dirs = ['../include', '../', '/usr/win32/include' ],
-                extra_objects = [ '../src/libvlc.a' ],
+                extra_objects = [ '../src/.libs/libvlc.so' ],
                 extra_compile_args = get_cflags(),
        		    extra_link_args = [ '-L../..' ]  + get_ldflags(),
                 )
-
-native_stats_test = Extension( 'native_stats_test',
-                sources = ['native/stats.c'],
-                include_dirs = ['../include', '../', '/usr/win32/include' ],
-                extra_objects = [ '../src/libvlc.a' ],
-                extra_compile_args = get_cflags(),
-       		    extra_link_args = [ '-L../..' ]  + get_ldflags(),
-                )
-
 
 setup( name = 'native_libvlc_test' ,version = '1242', ext_modules = [ native_libvlc_test ] )
-setup( name = 'native_stats_test' ,version = '1242', ext_modules = [ native_stats_test ] )

@@ -1,8 +1,8 @@
 import unittest
 
-import native_stats_test
+import native_libvlc_test
 
 class NativeStatsTestCase( unittest.TestCase ):
     def testTimers( self ):
         """[Stats] Test timers"""
-    	native_stats_test.timers_test()
+    	native_libvlc_test.timers_test()
