@@ -560,8 +560,9 @@ static int Open( vlc_object_t * p_this )
     if ( p_sys->i_frequency != -1 )
     {
         int i_fd;
-        struct v4l2_frequency vf;
-        vf.tuner = 0; /* TODO: let the user choose the tuner */
+        struct v4l2_tuner vt;
+        vt.index = 0; /* TODO: let the user choose the tuner */
+        memset( &vt.reserved, 0, sizeof(vt.reserved) );
 
         if ( p_sys->i_frequency >= pi_radio_range[0]
               && p_sys->i_frequency <= pi_radio_range[1] )
@@ -586,27 +587,38 @@ static int Open( vlc_object_t * p_this )
             p_sys->i_radio_fd = -1;
         }
 
-        if ( ioctl( i_fd, VIDIOC_G_FREQUENCY, &vf ) < 0 )
+        if ( ioctl( i_fd, VIDIOC_G_TUNER, &vt ) < 0 )
         {
-            msg_Warn( p_access, "VIDIOC_G_FREQUENCY failed (%s)",
+            msg_Warn( p_access, "VIDIOC_G_TUNER failed (%s)",
                       strerror( errno ) );
         }
         else
         {
-            if( p_sys->i_radio_fd == -1 )
-                vf.frequency = (p_sys->i_frequency * 16 + 500) / 1000;
-            else
-                vf.frequency = p_sys->i_frequency * 16;
+            struct v4l2_frequency vf;
+            vf.tuner = vt.index;
 
-            if( ioctl( i_fd, VIDIOC_S_FREQUENCY, &vf ) < 0 )
+            if ( ioctl( i_fd, VIDIOC_G_FREQUENCY, &vf ) < 0 )
             {
-                msg_Warn( p_access, "VIDIOC_S_FREQUENCY failed (%s)",
+                msg_Warn( p_access, "VIDIOC_G_FREQUENCY failed (%s)",
                           strerror( errno ) );
             }
             else
             {
-                msg_Dbg( p_access, "tuner frequency set to: %d",
-                         p_sys->i_frequency );
+                if( vt.capability & V4L2_TUNER_CAP_LOW )
+                    vf.frequency = p_sys->i_frequency * 16;
+                else
+                    vf.frequency = (p_sys->i_frequency * 16 + 500) / 1000;
+
+                if( ioctl( i_fd, VIDIOC_S_FREQUENCY, &vf ) < 0 )
+                {
+                    msg_Warn( p_access, "VIDIOC_S_FREQUENCY failed (%s)",
+                              strerror( errno ) );
+                }
+                else
+                {
+                    msg_Dbg( p_access, "tuner frequency set to: %d",
+                             p_sys->i_frequency );
+                }
             }
         }
     }
