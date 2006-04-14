@@ -3226,33 +3226,6 @@ if test "${enable_dirac}" = "yes"; then
   ])
 fi
 
-dnl  libvc1 decoder plugin
-dnl
-AC_ARG_ENABLE(libvc1,
-[  --enable-libvc1         VC-1 codec (default disabled)])
-if test "${enable_libvc1}" = "yes"
-then
-  AC_ARG_WITH(libvc1-tree,
-  [    --with-libvc1-tree=PATH libvc1 tree for static linking])
-  if test -n "${with_libvc1_tree}"
-  then
-    AC_MSG_CHECKING(for vc1dec.o in ${with_libvc1_tree})
-    real_libvc1_tree="`cd ${with_libvc1_tree} 2>/dev/null && pwd`"
-    if test -f "${real_libvc1_tree}/src/.libs/vc1dec.o"
-    then
-      VLC_ADD_BUILTINS([libvc1])
-      VLC_ADD_CPPFLAGS([libvc1],[-I${real_libvc1_tree}/src])
-      VLC_ADD_LDFLAGS([libvc1],[${real_libvc1_tree}/src/.libs/libvc1.a])
-      AC_MSG_RESULT(yes)
-    else
-      dnl  The given libvc1 tree wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_libvc1_tree}/src/.libs/vc1dec.o,
-                    make sure you compiled libvc1 in ${with_libvc1_tree}])
-    fi
-  fi
-fi
-
 dnl
 dnl  PNG decoder module
 dnl
