@@ -1,9 +1,4 @@
-
-// TODO: Ugly, split correctly 
-#include "libvlc.c"
-#include "stats.c"
-#include "i18n.c"
-#include "url.c"
+#include "tests.h"
 
 static PyMethodDef native_libvlc_test_methods[] = {
    DEF_METHOD( create_destroy, "Create and destroy" )

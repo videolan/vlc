@@ -19,13 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "../pyunit.h"
 #include <vlc/vlc.h>
 #include "vlc_url.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
-static PyObject * test_decode (const char *in, const char *out)
+ PyObject * test_decode (const char *in, const char *out)
 {
     char *res;
 
@@ -41,7 +39,7 @@ static PyObject * test_decode (const char *in, const char *out)
     return Py_None;
 }
 
-static PyObject *url_decode_test( PyObject *self, PyObject *args )
+ PyObject *url_decode_test( PyObject *self, PyObject *args )
 {
     (void)setvbuf (stdout, NULL, _IONBF, 0);
     if( !test_decode ("this_should_not_be_modified_1234",

@@ -20,10 +20,10 @@
  *****************************************************************************/
 
 #include "../pyunit.h"
+#include <vlc/vlc.h>
 #include "charset.h"
 
-
-static PyObject *i18n_atof_test( PyObject *self, PyObject *args )
+PyObject *i18n_atof_test( PyObject *self, PyObject *args )
 {
     const char dot9[] = "999999.999999";
     const char comma9[] = "999999,999999";

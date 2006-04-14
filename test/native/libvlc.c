@@ -1,7 +1,7 @@
 #include "../pyunit.h"
 #include <vlc/libvlc.h>
 
-static PyObject *exception_test( PyObject *self, PyObject *args )
+ PyObject *exception_test( PyObject *self, PyObject *args )
 {
      libvlc_exception_t exception;
 
@@ -24,7 +24,7 @@ static PyObject *exception_test( PyObject *self, PyObject *args )
      return Py_None;
 }
 
-static PyObject *create_destroy( PyObject *self, PyObject *args )
+ PyObject *create_destroy( PyObject *self, PyObject *args )
 {
     libvlc_instance_t *p_instance;
     char *argv[] = { "vlc", "--quiet" };
@@ -45,7 +45,7 @@ static PyObject *create_destroy( PyObject *self, PyObject *args )
     return Py_None;
 }
 
-static PyObject *playlist_test( PyObject *self, PyObject *args )
+ PyObject *playlist_test( PyObject *self, PyObject *args )
 {
     libvlc_instance_t *p_instance;
     char *argv[] = { "vlc", "--quiet" };
@@ -89,7 +89,7 @@ static PyObject *playlist_test( PyObject *self, PyObject *args )
     return Py_None;
 }
 
-static PyObject *vlm_test( PyObject *self, PyObject *args )
+ PyObject *vlm_test( PyObject *self, PyObject *args )
 {
     libvlc_instance_t *p_instance;
     char *argv[] = { "vlc", "--quiet" };
