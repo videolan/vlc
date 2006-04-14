@@ -511,7 +511,7 @@ static void Run( intf_thread_t *p_intf )
                                  _("Subtitle track: %s"),
                                  list2.p_list->p_values[i].psz_string );
             }
-            else if( i_action == ACTIONID_ASPECT_RATIO )
+            else if( i_action == ACTIONID_ASPECT_RATIO && p_vout )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "aspect-ratio", &val );
@@ -537,7 +537,7 @@ static void Run( intf_thread_t *p_intf )
                 }
                 free( val.psz_string );
             }
-            else if( i_action == ACTIONID_CROP )
+            else if( i_action == ACTIONID_CROP && p_vout )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "crop", &val );
@@ -563,7 +563,7 @@ static void Run( intf_thread_t *p_intf )
                 }
                 free( val.psz_string );
             }
-            else if( i_action == ACTIONID_DEINTERLACE )
+            else if( i_action == ACTIONID_DEINTERLACE && p_vout )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "deinterlace", &val );
