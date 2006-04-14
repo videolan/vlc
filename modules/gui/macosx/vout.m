@@ -358,6 +358,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 {
     vlc_value_t val;
 
+    if( !p_real_vout ) return;
     if( var_Get( p_real_vout, "video-on-top", &val )>=0 && val.b_bool)
     {
         val.b_bool = VLC_FALSE;
@@ -372,6 +373,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)toggleFullscreen
 {
     vlc_value_t val;
+    if( !p_real_vout ) return;
     var_Get( p_real_vout, "fullscreen", &val );
     val.b_bool = !val.b_bool;
     var_Set( p_real_vout, "fullscreen", val );
@@ -425,7 +427,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         /* Escape should always get you out of fullscreen */
         if( key == (unichar) 0x1b )
         {
-             if( [self isFullscreen] )
+             if( p_real_vout && [self isFullscreen] )
              {
                  [self toggleFullscreen];
              }
