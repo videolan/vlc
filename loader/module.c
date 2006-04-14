@@ -359,7 +359,7 @@ static WIN_BOOL MODULE_FreeLibrary( WINE_MODREF *wm )
 HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 {
 	WINE_MODREF *wm = 0;
-	char* listpath[] = { "", "", "/usr/lib/win32", "/usr/local/lib/win32", 0 };
+	char* listpath[] = { "", "", "/usr/lib/win32", "/usr/local/lib/win32", "/usr/lib/codecs", "/usr/local/lib/codecs", 0 };
 	extern char* def_path;
 	char path[512];
 	char checked[2000];
