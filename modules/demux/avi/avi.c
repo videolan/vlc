@@ -32,6 +32,7 @@
 
 #include "vlc_meta.h"
 #include "codecs.h"
+#include "charset.h"
 
 #include "libavi.h"
 
