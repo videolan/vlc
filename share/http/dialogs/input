@@ -67,13 +67,13 @@ This dialog needs the following dialogs to be fully functional: browse
       <label for="input_file_filename">File name</label>
       <input type="text" id="input_file_filename" size="60" onchange="update_input_file();" onfocus="update_input_file();"/>
       <input type="button" id="input_file_browse" value="Browse" onclick="browse( 'input_file_filename' );" />
-      <hr/>
+      <!-- <hr/>
       <input type="checkbox" id="input_sub_options" />
       <label for="input_sub_options">Subtitle options *TODO/FIXME/FIXHTTPD*</label>
       <br/>
       <label for="input_sub_file">Subtitles file</label>
       <input type="text" id="input_sub_file" size="60" />
-      <br/><!-- TODO -->
+      <br/>
       <label for="input_sub_enc">Subtitles encoding</label>
       <select id="input_sub_enc">
         <option></option>
@@ -91,7 +91,7 @@ This dialog needs the following dialogs to be fully functional: browse
       <label for="input_sub_fps">Frames per second</label>
       <input type="text" id="input_sub_fps" />
       <label for="input_sub_delay">Delay</label>
-      <input type="text" id="input_sub_delay" />
+      <input type="text" id="input_sub_delay" />-->
     </div>
     <div id="input_disc" style="display: none">
       Open Disc
