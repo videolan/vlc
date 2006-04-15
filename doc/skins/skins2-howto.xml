@@ -745,6 +745,10 @@ difficulty to understand how VLC skins work.</para>
     <para>A flat playtree will work like old-style playlists.</para>
     <para>Default value: false</para>
   </sect4>
+  <sect4 id="itemimage">
+    <title>itemimage</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link> shown to the left of a leaf (playlist item).</para>
+ </sect4>
   <sect4 id="openimage">
     <title>openimage</title>
     <para>Identifiant of a <link linkend="Bitmap">Bitmap</link> shown to the left of a node, when it is expanded.</para>
