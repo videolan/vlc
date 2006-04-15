@@ -31,10 +31,10 @@
 
   <!-- input commands -->
   <vlc id="if" param1="command value 'in_play' strcmp 0 =" />
-    <vlc id="rpn" param1="input value dup playlist_add vlc_play" />
+    <vlc id="rpn" param1="input value dup stripslashes playlist_add vlc_play" />
   <vlc id="end" />
   <vlc id="if" param1="command value 'in_enqueue' strcmp 0 =" />
-    <vlc id="rpn" param1="input value dup playlist_add" />
+    <vlc id="rpn" param1="input value dup stripslashes playlist_add" />
   <vlc id="end" />
 
   <!-- playlist commands -->
