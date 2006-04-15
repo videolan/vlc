@@ -115,8 +115,9 @@ NP_GetEntryPoints(NPPluginFuncs* pFuncs)
     pFuncs->writeready    = NPP_WriteReady;
     pFuncs->write         = NPP_Write;
     pFuncs->print         = NPP_Print;
-    pFuncs->getvalue	  = NPP_GetValue;
     pFuncs->event         = 0;       /// reserved 
+    pFuncs->getvalue	  = NPP_GetValue;
+    //pFuncs->setvalue	  = NPP_SetValue;
 
 	g_pluginFuncs		  = pFuncs;
 
@@ -205,12 +206,6 @@ void NPN_Version(int* plugin_major, int* plugin_minor, int* netscape_major, int*
     *netscape_major = HIBYTE(g_pNavigatorFuncs->version);
     *netscape_minor = LOBYTE(g_pNavigatorFuncs->version);
 }
-
-NPError NPN_GetValue(NPP instance, NPNVariable variable, void *result)
-{
-    return g_pNavigatorFuncs->getvalue(instance, variable, result);
-}
-
 
 /* causes the specified URL to be fetched and streamed in
 */
@@ -360,5 +355,216 @@ JRIEnv* NPN_GetJavaEnv(void)
 jref NPN_GetJavaPeer(NPP instance)
 {
 	return g_pNavigatorFuncs->getJavaPeer(instance);
+}
+
+NPError NPN_GetValue(NPP instance, NPNVariable variable, void *result)
+{
+    return g_pNavigatorFuncs->getvalue(instance, variable, result);
+}
+
+NPError NPN_SetValue(NPP instance, NPPVariable variable, void *value)
+{
+    return g_pNavigatorFuncs->setvalue(instance, variable, value);
+}
+
+void NPN_InvalidateRect(NPP instance, NPRect *rect)
+{
+    g_pNavigatorFuncs->invalidaterect(instance, rect);
+}
+
+void NPN_InvalidateRegion(NPP instance, NPRegion region)
+{
+    g_pNavigatorFuncs->invalidateregion(instance, region);
+}
+
+void NPN_ForceRedraw(NPP instance)
+{
+    g_pNavigatorFuncs->forceredraw(instance);
+}
+
+NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->getstringidentifier(name);
+    }
+    return NULL;
+}
+
+void NPN_GetStringIdentifiers(const NPUTF8 **names, int32_t nameCount, NPIdentifier *identifiers)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	g_pNavigatorFuncs->getstringidentifiers(names, nameCount, identifiers);
+    }
+}
+
+NPIdentifier NPN_GetIntIdentifier(int32_t intid)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->getintidentifier(intid);
+    }
+    return NULL;
+}
+
+bool NPN_IdentifierIsString(NPIdentifier identifier)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->identifierisstring(identifier);
+    }
+    return false;
+}
+
+NPUTF8 *NPN_UTF8FromIdentifier(NPIdentifier identifier)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->utf8fromidentifier(identifier);
+    }
+    return NULL;
+}
+
+int32_t NPN_IntFromIdentifier(NPIdentifier identifier)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->intfromidentifier(identifier);
+    }
+    return 0;
+}
+
+NPObject *NPN_CreateObject(NPP instance, NPClass *aClass)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->createobject(instance, aClass);
+    }
+    return NULL;
+}
+
+NPObject *NPN_RetainObject(NPObject *npobj)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->retainobject(npobj);
+    }
+    return NULL;
+}
+
+void NPN_ReleaseObject(NPObject *npobj)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	g_pNavigatorFuncs->releaseobject(npobj);
+    }
+}
+
+bool NPN_Invoke(NPP instance, NPObject *npobj, NPIdentifier methodName, const NPVariant *args, uint32_t argCount, NPVariant *result)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->invoke(instance, npobj, methodName, args, argCount, result);
+    }
+    return false;
+}
+
+bool NPN_InvokeDefault(NPP instance, NPObject *npobj, const NPVariant *args, uint32_t argCount, NPVariant *result)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->invokeDefault(instance, npobj, args, argCount, result);
+    }
+    return false;
+}
+
+bool NPN_Evaluate(NPP instance, NPObject *npobj, NPString *script, NPVariant *result)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->evaluate(instance, npobj, script, result);
+    }
+    return false;
+}
+
+bool NPN_GetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, NPVariant *result)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->getproperty(instance, npobj, propertyName, result);
+    }
+    return false;
+}
+
+bool NPN_SetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, const NPVariant *value)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->setproperty(instance, npobj, propertyName, value);
+    }
+    return false;
+}
+
+bool NPN_RemoveProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->removeproperty(instance, npobj, propertyName);
+    }
+    return false;
+}
+
+bool NPN_HasProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->hasproperty(instance, npobj, propertyName);
+    }
+    return false;
+}
+
+bool NPN_HasMethod(NPP instance, NPObject *npobj, NPIdentifier methodName)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return g_pNavigatorFuncs->hasmethod(instance, npobj, methodName);
+    }
+    return false;
+}
+
+void NPN_ReleaseVariantValue(NPVariant *variant)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	g_pNavigatorFuncs->releasevariantvalue(variant);
+    }
+}
+
+void NPN_SetException(NPObject *npobj, const NPUTF8 *message)
+{
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	g_pNavigatorFuncs->setexception(npobj, message);
+    }
 }
 

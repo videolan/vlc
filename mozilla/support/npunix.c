@@ -226,6 +226,191 @@ NPN_ForceRedraw(NPP instance)
     CallNPN_ForceRedrawProc(gNetscapeFuncs.forceredraw, instance);
 }
 
+NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_GetStringIdentifierProc( gNetscapeFuncs.getstringidentifier, name);
+    }
+    return NULL;
+}
+
+void NPN_GetStringIdentifiers(const NPUTF8 **names, int32_t nameCount, NPIdentifier *identifiers)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	CallNPN_GetStringIdentifiersProc( gNetscapeFuncs.getstringidentifiers, names, nameCount, identifiers);
+    }
+}
+
+NPIdentifier NPN_GetIntIdentifier(int32_t intid)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_GetIntIdentifierProc( gNetscapeFuncs.getintidentifier, intid);
+    }
+    return NULL;
+}
+
+bool NPN_IdentifierIsString(NPIdentifier identifier)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_IdentifierIsStringProc( gNetscapeFuncs.identifierisstring, identifier);
+    }
+    return false;
+}
+
+NPUTF8 *NPN_UTF8FromIdentifier(NPIdentifier identifier)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_UTF8FromIdentifierProc( gNetscapeFuncs.utf8fromidentifier, identifier);
+    }
+    return NULL;
+}
+
+int32_t NPN_IntFromIdentifier(NPIdentifier identifier)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_IntFromIdentifierProc( gNetscapeFuncs.intfromidentifier, identifier);
+    }
+    return 0;
+}
+
+NPObject *NPN_CreateObject(NPP instance, NPClass *aClass)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_CreateObjectProc( gNetscapeFuncs.createobject, instance, aClass);
+    }
+    return NULL;
+}
+
+NPObject *NPN_RetainObject(NPObject *npobj)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_RetainObjectProc( gNetscapeFuncs.retainobject, npobj);
+    }
+    return NULL;
+}
+
+void NPN_ReleaseObject(NPObject *npobj)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	CallNPN_ReleaseObjectProc( gNetscapeFuncs.releaseobject, npobj);
+    }
+}
+
+bool NPN_Invoke(NPP instance, NPObject *npobj, NPIdentifier methodName, const NPVariant *args, uint32_t argCount, NPVariant *result)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_InvokeProc( gNetscapeFuncs.invoke, instance, npobj, methodName, args, argCount, result);
+    }
+    return false;
+}
+
+bool NPN_InvokeDefault(NPP instance, NPObject *npobj, const NPVariant *args, uint32_t argCount, NPVariant *result)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_InvokeDefaultProc( gNetscapeFuncs.invokeDefault, instance, npobj, args, argCount, result);
+    }
+    return false;
+}
+
+bool NPN_Evaluate(NPP instance, NPObject *npobj, NPString *script, NPVariant *result)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_EvaluateProc( gNetscapeFuncs.evaluate, instance, npobj, script, result);
+    }
+    return false;
+}
+
+bool NPN_GetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, NPVariant *result)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_GetPropertyProc( gNetscapeFuncs.getproperty, instance, npobj, propertyName, result);
+    }
+    return false;
+}
+
+bool NPN_SetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, const NPVariant *value)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_SetPropertyProc( gNetscapeFuncs.setproperty, instance, npobj, propertyName, value);
+    }
+    return false;
+}
+
+bool NPN_RemoveProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_RemovePropertyProc( gNetscapeFuncs.removeproperty, instance, npobj, propertyName);
+    }
+    return false;
+}
+
+bool NPN_HasProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_HasPropertyProc( gNetscapeFuncs.hasproperty, instance, npobj, propertyName);
+    }
+    return false;
+}
+
+bool NPN_HasMethod(NPP instance, NPObject *npobj, NPIdentifier methodName)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	return CallNPN_HasMethodProc( gNetscapeFuncs.hasmethod, instance, npobj, methodName);
+    }
+    return false;
+}
+
+void NPN_ReleaseVariantValue(NPVariant *variant)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	CallNPN_ReleaseVariantValueProc( gNetscapeFuncs.releasevariantvalue, variant);
+    }
+}
+
+void NPN_SetException(NPObject *npobj, const NPUTF8 *message)
+{
+    int navMinorVers = gNetscapeFuncs.version & 0xFF;
+    if( navMinorVers >= 14 )
+    {   
+	CallNPN_SetExceptionProc( gNetscapeFuncs.setexception, npobj, message);
+    }
+}
 
 
 /***********************************************************************
@@ -336,6 +521,13 @@ Private_GetValue(NPP instance, NPPVariable variable, void *r_value)
 return NPP_GetValue(instance, variable, r_value);
 }
 
+NPError
+Private_SetValue(NPP instance, NPPVariable variable, void *r_value)
+{
+    PLUGINDEBUGSTR("SetValue");
+    return NPERR_NO_ERROR; //NPP_SetValue(instance, variable, r_value);
+}
+
 JRIGlobalRef
 Private_GetJavaClass(void)
 {
@@ -423,7 +615,6 @@ NP_Initialize(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs)
         if (pluginFuncs->size < sizeof(NPPluginFuncs))      
             err = NPERR_INVALID_FUNCTABLE_ERROR;
     }
-        
     
     if (err == NPERR_NO_ERROR) {
         /*
@@ -433,11 +624,12 @@ NP_Initialize(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs)
          * the whole structure, because the Netscape function table
          * could actually be bigger than what we expect.
          */
+        int navMinorVers = nsTable->version & 0xFF;
+
         gNetscapeFuncs.version       = nsTable->version;
         gNetscapeFuncs.size          = nsTable->size;
         gNetscapeFuncs.posturl       = nsTable->posturl;
         gNetscapeFuncs.geturl        = nsTable->geturl;
-        gNetscapeFuncs.geturlnotify  = nsTable->geturlnotify;
         gNetscapeFuncs.requestread   = nsTable->requestread;
         gNetscapeFuncs.newstream     = nsTable->newstream;
         gNetscapeFuncs.write         = nsTable->write;
@@ -448,9 +640,44 @@ NP_Initialize(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs)
         gNetscapeFuncs.memfree       = nsTable->memfree;
         gNetscapeFuncs.memflush      = nsTable->memflush;
         gNetscapeFuncs.reloadplugins = nsTable->reloadplugins;
-        gNetscapeFuncs.getJavaEnv    = nsTable->getJavaEnv;
-        gNetscapeFuncs.getJavaPeer   = nsTable->getJavaPeer;
-        gNetscapeFuncs.getvalue      = nsTable->getvalue;
+        if( navMinorVers >= NPVERS_HAS_LIVECONNECT )
+        {
+            gNetscapeFuncs.getJavaEnv   = nsTable->getJavaEnv;
+            gNetscapeFuncs.getJavaPeer  = nsTable->getJavaPeer;
+        }
+        if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
+        {   
+            gNetscapeFuncs.geturlnotify  = nsTable->geturlnotify;
+            gNetscapeFuncs.posturlnotify = nsTable->posturlnotify;
+        }
+        gNetscapeFuncs.getvalue         = nsTable->getvalue;
+        gNetscapeFuncs.setvalue         = nsTable->setvalue;
+        gNetscapeFuncs.invalidaterect   = nsTable->invalidaterect;
+        gNetscapeFuncs.invalidateregion = nsTable->invalidateregion;
+        gNetscapeFuncs.forceredraw      = nsTable->forceredraw;
+        if( navMinorVers >= 14 )
+        {   
+	    // NPRuntime support 
+	    gNetscapeFuncs.getstringidentifier  = nsTable->getstringidentifier;
+	    gNetscapeFuncs.getstringidentifiers = nsTable->getstringidentifiers;
+	    gNetscapeFuncs.getintidentifier     = nsTable->getintidentifier;
+	    gNetscapeFuncs.identifierisstring   = nsTable->identifierisstring;
+	    gNetscapeFuncs.utf8fromidentifier   = nsTable->utf8fromidentifier;
+	    gNetscapeFuncs.intfromidentifier    = nsTable->intfromidentifier;
+	    gNetscapeFuncs.createobject         = nsTable->createobject;
+	    gNetscapeFuncs.retainobject         = nsTable->retainobject;
+	    gNetscapeFuncs.releaseobject        = nsTable->releaseobject;
+	    gNetscapeFuncs.invoke               = nsTable->invoke;
+	    gNetscapeFuncs.invokeDefault        = nsTable->invokeDefault;
+	    gNetscapeFuncs.evaluate             = nsTable->evaluate;
+	    gNetscapeFuncs.getproperty          = nsTable->getproperty;
+	    gNetscapeFuncs.setproperty          = nsTable->setproperty;
+	    gNetscapeFuncs.removeproperty       = nsTable->removeproperty;
+	    gNetscapeFuncs.hasproperty          = nsTable->hasproperty;
+	    gNetscapeFuncs.hasmethod            = nsTable->hasmethod;
+	    gNetscapeFuncs.releasevariantvalue  = nsTable->releasevariantvalue;
+	    gNetscapeFuncs.setexception         = nsTable->setexception;
+	}
 
         /*
          * Set up the plugin function table that Netscape will use to
@@ -469,10 +696,20 @@ NP_Initialize(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs)
         pluginFuncs->writeready = NewNPP_WriteReadyProc(Private_WriteReady);
         pluginFuncs->write      = NewNPP_WriteProc(Private_Write);
         pluginFuncs->print      = NewNPP_PrintProc(Private_Print);
-        pluginFuncs->urlnotify  = NewNPP_URLNotifyProc(Private_URLNotify);
         pluginFuncs->event      = NULL;
-        pluginFuncs->javaClass  = Private_GetJavaClass();
         pluginFuncs->getvalue   = NewNPP_GetValueProc(Private_GetValue);
+        if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
+        {   
+            pluginFuncs->urlnotify = NewNPP_URLNotifyProc(PLUGIN_TO_HOST_GLUE(urlnotify, Private_URLNotify));           
+        }
+#ifdef OJI
+        if( navMinorVers >= NPVERS_HAS_LIVECONNECT )
+        {
+            pluginFuncs->javaClass  = (JRIGlobalRef) Private_GetJavaClass();
+        }
+#else
+        pluginFuncs->javaClass = NULL;
+#endif
         
         err = NPP_Initialize();
     }
