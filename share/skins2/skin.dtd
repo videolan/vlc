@@ -72,7 +72,7 @@
         dragdrop    CDATA   "true"
         playondrop  CDATA   "true"
     >
-<!ELEMENT Layout (Group)>
+<!ELEMENT Layout (Group)+>
     <!ATTLIST Layout
         id          CDATA   "none"
         width       CDATA   #REQUIRED
