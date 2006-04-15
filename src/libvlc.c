@@ -458,7 +458,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /* Check for translation config option */
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
-
+# if defined (WIN32) || defined (__APPLE__)
     /* This ain't really nice to have to reload the config here but it seems
      * the only way to do it. */
     config_LoadConfigFile( p_vlc, "main" );
@@ -473,13 +473,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         /* Reset the default domain */
         SetLanguage( psz_language );
 
-        /* Should not be needed (otherwise, fixes should rather be
-         * attempted on vlc_current_charset().
-         * Also, if the locale charset is overriden, anything that has been
-         * translated until now would have to be retranslated. */
-        /*LocaleDeinit();
-        LocaleInit( (vlc_object_t *)p_vlc );*/
-
         /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
         msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
 
@@ -490,6 +483,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         libvlc.p_module_bank->b_cache_delete = b_cache_delete;
     }
     if( psz_language ) free( psz_language );
+# endif
 #endif
 
     /*
