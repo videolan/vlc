@@ -365,6 +365,7 @@ static void              IODFree( iod_descriptor_t * );
 #define TS_PACKET_SIZE_192 192
 #define TS_PACKET_SIZE_204 204
 #define TS_PACKET_SIZE_MAX 204
+#define TS_TOPFIELD_HEADER 1320
 
 /*****************************************************************************
  * Open
@@ -381,25 +382,42 @@ static int Open( vlc_object_t *p_this )
     ts_pid_t    *pat;
     char        *psz_mode;
     vlc_bool_t   b_append;
+    vlc_bool_t   b_topfield = VLC_FALSE;
 
     vlc_value_t  val;
 
     if( stream_Peek( p_demux->s, &p_peek, TS_PACKET_SIZE_MAX ) <
         TS_PACKET_SIZE_MAX ) return VLC_EGENERIC;
 
+    if( p_peek[0] == 'T' && p_peek[1] == 'F' &&
+        p_peek[2] == 'r' && p_peek[3] == 'c' )
+    {
+        b_topfield = VLC_TRUE;
+        msg_Dbg( p_demux, "this is a topfield file" );
+    }
+
     /* Search first sync byte */
     for( i_sync = 0; i_sync < TS_PACKET_SIZE_MAX; i_sync++ )
     {
         if( p_peek[i_sync] == 0x47 ) break;
     }
-    if( i_sync >= TS_PACKET_SIZE_MAX )
+    if( i_sync >= TS_PACKET_SIZE_MAX && !b_topfield )
     {
         if( strcmp( p_demux->psz_demux, "ts" ) ) return VLC_EGENERIC;
         msg_Warn( p_demux, "this does not look like a TS stream, continuing" );
     }
 
-    /* Check next 3 sync bytes */
-    i_peek = TS_PACKET_SIZE_MAX * 3 + i_sync + 1;
+    if( b_topfield )
+    {
+        /* Read the entire Topfield header */
+        i_peek = TS_TOPFIELD_HEADER;
+    }
+    else
+    {
+        /* Check next 3 sync bytes */
+        i_peek = TS_PACKET_SIZE_MAX * 3 + i_sync + 1;
+    }
+    
     if( ( stream_Peek( p_demux->s, &p_peek, i_peek ) ) < i_peek )
     {
         msg_Err( p_demux, "cannot peek" );
@@ -426,6 +444,73 @@ static int Open( vlc_object_t *p_this )
     else if( !strcmp( p_demux->psz_demux, "ts" ) )
     {
         i_packet_size = TS_PACKET_SIZE_188;
+    }
+    else if( b_topfield )
+    {
+        i_packet_size = TS_PACKET_SIZE_188;
+#if 0
+        /* I used the TF5000PVR 2004 Firmware .doc header documentation, 
+         * http://www.i-topfield.com/data/product/firmware/Structure%20of%20Recorded%20File%20in%20TF5000PVR%20(Feb%2021%202004).doc
+         * but after the filename the offsets seem to be incorrect.  - DJ */
+        int i_duration, i_name;
+        char *psz_name = malloc(25);
+        char *psz_event_name;
+        char *psz_event_text = malloc(130);
+        char *psz_ext_text = malloc(1025);
+
+        // 2 bytes version Uimsbf (4,5)
+        // 2 bytes reserved (6,7)
+        // 2 bytes duration in minutes Uimsbf (8,9(
+        i_duration = (int) (p_peek[8] << 8) | p_peek[9];
+        msg_Dbg( p_demux, "Topfield recording length: +/- %d minutes", i_duration);
+        // 2 bytes service number in channel list (10, 11)
+        // 2 bytes service type Bslbf 0=TV 1=Radio Bslb (12, 13)
+        // 4 bytes of reserved + tuner info (14,15,16,17)
+        // 2 bytes of Service ID  Bslbf (18,19)
+        // 2 bytes of PMT PID  Uimsbf (20,21)
+        // 2 bytes of PCR PID  Uimsbf (22,23)
+        // 2 bytes of Video PID  Uimsbf (24,25)
+        // 2 bytes of Audio PID  Uimsbf (26,27)
+        // 24 bytes filename Bslbf
+        memcpy( psz_name, &p_peek[28], 24 );
+        psz_name[24] = '\0';
+        msg_Dbg( p_demux, "recordingname=%s", psz_name );
+        // 1 byte of sat index Uimsbf  (52)
+        // 3 bytes (1 bit of polarity Bslbf +23 bits reserved)
+        // 4 bytes of freq. Uimsbf (56,57,58,59)
+        // 2 bytes of symbol rate Uimsbf (60,61)
+        // 2 bytes of TS stream ID Uimsbf (62,63)
+        // 4 bytes reserved 
+        // 2 bytes reserved
+        // 2 bytes duration Uimsbf (70,71)
+        //i_duration = (int) (p_peek[70] << 8) | p_peek[71];
+        //msg_Dbg( p_demux, "Topfield 2nd duration field: +/- %d minutes", i_duration);
+        // 4 bytes EventID Uimsbf (72-75)
+        // 8 bytes of Start and End time info (76-83)
+        // 1 byte reserved (84)
+        // 1 byte event name length Uimsbf (89)
+        i_name = (int)(p_peek[89]&~0x81);
+        msg_Dbg( p_demux, "event name length = %d", i_name);
+        psz_event_name = malloc( i_name+1 );
+        // 1 byte parental rating (90)
+        // 129 bytes of event text
+        memcpy( psz_event_name, &p_peek[91], i_name );
+        psz_event_name[i_name] = '\0';
+        memcpy( psz_event_text, &p_peek[91+i_name], 129-i_name );
+        psz_event_text[129-i_name] = '\0';
+        msg_Dbg( p_demux, "event name=%s", psz_event_name );
+        msg_Dbg( p_demux, "event text=%s", psz_event_text );
+        // 12 bytes reserved (220)
+        // 6 bytes reserved
+        // 2 bytes Event Text Length Uimsbf
+        // 4 bytes EventID Uimsbf
+        // FIXME We just have 613 bytes. not enough for this entire text
+        // 1024 bytes Extended Event Text Bslbf
+        memcpy( psz_ext_text, p_peek+372, 1024 );
+        psz_ext_text[1024] = '\0';
+        msg_Dbg( p_demux, "extended event text=%s", psz_ext_text );
+        // 52 bytes reserved Bslbf
+#endif
     }
     else
     {
