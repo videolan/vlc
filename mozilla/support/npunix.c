@@ -42,9 +42,9 @@
 #define OJI 1
 
 #include <stdio.h>
-#include "nscore.h"
-#include "npapi.h"
-#include "npupp.h"
+#include <nscore.h>
+#include <npapi.h>
+#include <npupp.h>
 
 /*
  * Define PLUGIN_TRACE to have the wrapper functions print
@@ -58,6 +58,8 @@
 #define PLUGINDEBUGSTR(msg)
 #endif
 
+#define PLUGIN_TO_HOST_GLUE(name, fp) (fp)
+#define HOST_TO_PLUGIN_GLUE(name, fp) (fp)
 
 /***********************************************************************
  *
