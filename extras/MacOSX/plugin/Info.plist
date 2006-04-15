@@ -6,15 +6,21 @@
 	<string>English</string>
 	<key>CFBundleExecutable</key>
 	<string>VLC Plugin</string>
+	<key>CFBundleGetInfoString</key>
+	<string>Copyright 2002-2006 The VideoLAN Team. All Rights Reserved</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.netscape.vlc</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>VideoLAN VLC Plug-in</string>
 	<key>CFBundlePackageType</key>
 	<string>BRPL</string>
 	<key>CFBundleSignature</key>
 	<string>MOSS</string>
 	<key>CFBundleVersion</key>
+	<string>0.12</string>
+	<key>CFBundleShortVersionString</key>
 	<string>0.12</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>

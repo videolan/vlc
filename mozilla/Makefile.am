@@ -14,6 +14,8 @@ SOURCES_mozilla_common = \
 	vlcplugin.h \
 	vlcpeer.cpp \
 	vlcpeer.h \
+	vlcruntime.cpp \
+	vlcruntime.h \
 	support/classinfo.h
 
 DIST_sources = $(SOURCES_mozilla_common) \
@@ -70,21 +72,59 @@ CPPFLAGS_mozilla_EXTRA = -I. -I$(top_builddir) -I$(srcdir)/../include -c \
 	-DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 -g \
 	-include mozilla-config.h
 LDFLAGS_npvlc = -arch ppc -bundle -read_only_relocs suppress \
-	$(LIBRARIES_libvlc) -dylib
+	$(LIBRARIES_libvlc) -dylib -headerpad_max_install_names 
 
 npvlc.rsrc: $(srcdir)/vlc.r
 	/Developer/Tools/Rez -useDF /Developer/Headers/FlatCarbon/Types.r $< -o $@
 
+#
+# Plugin uses shared libraries that are located relatively through @executable_path,
+# which unfortunately references the path of the App using the Plugin, rather than the
+# Plugin itself. Since this Plugin should always be installed in '/Library/Internet Plug-Ins',
+# it is safer to force dylibs to locate dependants through a fixed path
+#
+define FIXEXECPATH
+	otool -L "$$dylib" | \
+	awk -v libdylib="$$dylib" ' \
+	/@executable_path/ { \
+	    newpath=$$1 ; \
+	    sub("@executable_path","/Library/Internet Plug-Ins/VLC Plugin.plugin/Contents/MacOS",newpath) ; \
+	    print "install_name_tool -change \""$$1"\" \""newpath"\" \""libdylib"\"" ; \
+	}' | sh -x
+endef
+
 VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
-	rm -rf "$@"
-	mkdir -p "./$@/Contents/MacOS"
-	cp npvlc.dylib "./$@/Contents/MacOS/VLC Plugin"
-	mkdir -p ./"$@"/Contents/Resources
-	cp npvlc.rsrc "./$@/Contents/Resources/VLC Plugin.rsrc"
-	cp -r $(top_srcdir)/extras/MacOSX/plugin/English.lproj "./$@/Contents/Resources/"
-	cp $(top_srcdir)/extras/MacOSX/plugin/Info.plist "./$@/Contents/Info.plist"
-	(cd $(top_builddir)/VLC.app/Contents/MacOS/; tar cf - modules)| \
-	(cd "./$@/Contents/MacOS"; tar xf -)
+	rm -Rf "$@"
+	$(INSTALL) -d "./$@/Contents/MacOS"
+	$(INSTALL) npvlc.dylib "./$@/Contents/MacOS/VLC Plugin"
+	dylib="./$@/Contents/MacOS/VLC Plugin"; $(FIXEXECPATH) ;
+	$(INSTALL) -d "./$@/Contents/Resources"
+	$(INSTALL) npvlc.rsrc "./$@/Contents/Resources/VLC Plugin.rsrc"
+	cp -r "$(top_srcdir)/extras/MacOSX/plugin/English.lproj" "./$@/Contents/Resources/"
+	$(INSTALL) "$(top_srcdir)/extras/MacOSX/plugin/Info.plist" "./$@/Contents/Info.plist"
+	$(INSTALL) -d "./$@/Contents/MacOS/modules"
+	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
+	  if test -n "$$i" ; then \
+	    dylib="./$@/Contents/MacOS/modules/`basename $$i$(LIBEXT)`"; \
+	    $(INSTALL) "$$i$(LIBEXT)" "$$dylib"; \
+	    $(FIXEXECPATH) ; \
+	  fi ; \
+	done
+	if test -d $(top_srcdir)/extras/contrib/vlc-lib; then \
+	  $(INSTALL) -d "./$@/Contents/MacOS/lib"; \
+	  for i in $(top_srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
+	    dylib="./$@/Contents/MacOS/lib/`basename $${i}`" ; \
+	    $(INSTALL) -m 644 "$${i}" "$$dylib" ; \
+	    $(FIXEXECPATH); \
+	  done ; \
+	fi
+	if test -d "$(MOZILLA_SDK_PATH)/lib"; then \
+	  for i in "$(MOZILLA_SDK_PATH)"/lib/*.dylib ; do \
+	    dylib="./$@/Contents/MacOS/`basename $${i}`" ; \
+	    $(INSTALL) -m 644 "$${i}" "$$dylib" ; \
+	    $(FIXEXECPATH); \
+	  done ; \
+	fi
 
 else
 

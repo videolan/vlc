@@ -20,6 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef __VLCPEER_H__
+#define __VLCPEER_H__
 
 #include "vlcintf.h"
 #include "support/classinfo.h"
@@ -56,3 +58,4 @@ private:
     VlcPlugin * p_plugin;
 };
 
+#endif

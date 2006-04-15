@@ -24,6 +24,32 @@
 /*******************************************************************************
  * Instance state information about the plugin.
  ******************************************************************************/
+#ifndef __VLCPLUGIN_H__
+#define __VLCPLUGIN_H__
+
+#include "vlcpeer.h"
+
+#if !defined(XP_MACOSX) && !defined(XP_UNIX) && !defined(XP_WIN)
+#define XP_UNIX 1
+#elif defined(XP_MACOSX)
+#undef XP_UNIX
+#endif
+
+#ifdef XP_WIN
+    /* Windows stuff */
+#endif
+
+#ifdef XP_MACOSX
+    /* Mac OS X stuff */
+#   include <Quickdraw.h>
+#endif
+
+#ifdef XP_UNIX
+    /* X11 stuff */
+#   include <X11/Xlib.h>
+#   include <X11/Intrinsic.h>
+#   include <X11/StringDefs.h>
+#endif
 
 class VlcPlugin
 {
@@ -34,8 +60,6 @@ public:
     void     SetInstance( NPP );
     NPP      GetInstance();
     VlcIntf* GetPeer();
-
-    void     SetFileName( const char* );
 
     /* Window settings */
     NPWindow* p_npwin;
@@ -114,3 +138,4 @@ private:
     "audio/wav::WAV audio" \
     "audio/x-wav::WAV audio" \
 
+#endif

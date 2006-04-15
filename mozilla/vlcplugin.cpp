@@ -41,7 +41,6 @@
 #undef XP_UNIX
 #endif
 
-#include "vlcpeer.h"
 #include "vlcplugin.h"
 
 /*****************************************************************************
@@ -94,38 +93,5 @@ VlcIntf* VlcPlugin::GetPeer()
 
     NS_ADDREF( p_peer );
     return p_peer;
-}
-
-void VlcPlugin::SetFileName(const char * filename)
-{
-#if 0
-    FILE * fh;
-    fh = fopen(filename, "rb");
-    if(!fh)
-    {
-        fprintf(stderr, "Error while opening %s.\n", filename);
-        return;
-    }
-    fseek(fh, 0, SEEK_END);
-    m_lSize = ftell(fh);
-    m_szSound = (char*) malloc(m_lSize);
-    if(!m_szSound)
-    {
-        fprintf(stderr, "Error while allocating memory.\n");
-        fclose(fh);
-        return;
-    }
-    rewind(fh);
-    long pos = 0;
-    do
-    {
-        pos += fread(m_szSound + pos, 1, m_lSize - pos, fh);
-        fprintf(stderr, "pos = %d\n", pos);
-    }
-    while (pos < m_lSize -1);
-    fclose (fh);
-    fprintf(stderr, "File loaded\n");
-#endif
-    return;
 }
 
