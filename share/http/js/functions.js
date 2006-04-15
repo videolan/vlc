@@ -287,7 +287,7 @@ function in_play()
     var input = value('input_mrl');
     if( value('sout_mrl') != '' )
         input += ' '+value('sout_mrl');
-    var url = 'requests/status.xml?command=in_play&input='+encodeURIComponent( input );
+    var url = 'requests/status.xml?command=in_play&input='+encodeURIComponent( addslashes(escapebackslashes(input)) );
     loadXMLDoc( url, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
@@ -296,7 +296,7 @@ function in_enqueue()
     var input = value('input_mrl');
     if( value('sout_mrl') != '' )
         input += ' '+value('sout_mrl');
-    var url = 'requests/status.xml?command=in_enqueue&input='+encodeURIComponent( input );
+    var url = 'requests/status.xml?command=in_enqueue&input='+encodeURIComponent( addslashes(escapebackslashes(input)) );
     loadXMLDoc( url, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
