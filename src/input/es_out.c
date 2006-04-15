@@ -1596,8 +1596,11 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
                            "%d", fmt->audio.i_channels );
 
         if( fmt->audio.i_rate > 0 )
+        {
             input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Sample rate"),
                            _("%d Hz"), fmt->audio.i_rate );
+            var_SetInteger( p_input, "sample-rate", fmt->audio.i_rate );
+        }
 
         if( fmt->audio.i_bitspersample > 0 )
             input_Control( p_input, INPUT_ADD_INFO, psz_cat,
@@ -1605,8 +1608,11 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
                            fmt->audio.i_bitspersample );
 
         if( fmt->i_bitrate > 0 )
+        {
             input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Bitrate"),
                            _("%d kb/s"), fmt->i_bitrate / 1000 );
+            var_SetInteger( p_input, "bit-rate", fmt->i_bitrate );
+        }
         break;
 
     case VIDEO_ES:

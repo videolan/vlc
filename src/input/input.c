@@ -726,6 +726,9 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
     es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_FALSE );
     es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
 
+    var_Create( p_input, "bit-rate", VLC_VAR_INTEGER );
+    var_Create( p_input, "sample-rate", VLC_VAR_INTEGER );
+
     if( InputSourceInit( p_input, &p_input->input,
                          p_input->input.p_item->psz_uri, NULL, b_quick ) )
     {

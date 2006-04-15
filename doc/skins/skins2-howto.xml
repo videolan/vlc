@@ -921,7 +921,7 @@ difficulty to understand how VLC skins work.</para>
 
 <itemizedlist>
   <listitem><para>
-    <emphasis>$B</emphasis>: Get the stream bitrate (in kb/s).
+    <emphasis>$B</emphasis>: Get the audio stream bitrate (in kb/s).
   </para></listitem>
   <listitem><para>
     <emphasis>$V</emphasis>: Value of the volume (from 0 to 100 --> useful for a percentage).
@@ -947,6 +947,9 @@ difficulty to understand how VLC skins work.</para>
   </para></listitem>
   <listitem><para>
     <emphasis>$F</emphasis>: Full name (with path) of the stream that is being played.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>$S</emphasis>: Get the audio sample rate (in kHz).
   </para></listitem>
 </itemizedlist>
 

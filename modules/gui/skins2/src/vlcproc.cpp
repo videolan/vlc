@@ -26,7 +26,6 @@
 #include <vlc/vout.h>
 #include <aout_internal.h>
 
-#include <math.h>
 #include "vlcproc.hpp"
 #include "os_factory.hpp"
 #include "os_timer.hpp"
@@ -111,6 +110,8 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     pVarManager->registerVar( m_cVarStreamURI, "streamURI" );
     m_cVarStreamBitRate = VariablePtr( new VarText( getIntf(), false ) );
     pVarManager->registerVar( m_cVarStreamBitRate, "bitrate" );
+    m_cVarStreamSampleRate = VariablePtr( new VarText( getIntf(), false ) );
+    pVarManager->registerVar( m_cVarStreamSampleRate, "samplerate" );
 
     // Register the equalizer bands
     for( int i = 0; i < EqualizerBands::kNbBands; i++)
@@ -243,6 +244,7 @@ void VlcProc::manage()
     VarBoolImpl *pVarFullscreen = (VarBoolImpl*)m_cVarFullscreen.get();
     VarBoolImpl *pVarHasVout = (VarBoolImpl*)m_cVarHasVout.get();
     VarText *pBitrate = (VarText*)m_cVarStreamBitRate.get();
+    VarText *pSampleRate = (VarText*)m_cVarStreamSampleRate.get();
 
     // Refresh audio variables
     refreshAudio();
@@ -295,11 +297,13 @@ void VlcProc::manage()
             vlc_object_release( pVout );
         }
 
-        // Get information on the current playlist item
-        input_item_t *pItem = pInput->input.p_item;
         // Get the input bitrate
-        int bitrate = (int)(roundf(pItem->p_stats->f_demux_bitrate*8000));
+        int bitrate = var_GetInteger( pInput, "bit-rate" ) / 1000;
         pBitrate->set( UString::fromInt( getIntf(), bitrate ) );
+
+        // Get the audio sample rate
+        int sampleRate = var_GetInteger( pInput, "sample-rate" ) / 1000;
+        pSampleRate->set( UString::fromInt( getIntf(), sampleRate ) );
     }
     else
     {
