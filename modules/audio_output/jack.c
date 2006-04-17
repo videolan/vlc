@@ -187,6 +187,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     jack_default_audio_sample_t *p_jack_buffer;
     unsigned int i, j, i_nb_samples = 0;
     aout_instance_t *p_aout = (aout_instance_t*) p_arg;
+    unsigned int i_nb_channels = p_aout->output.p_sys->i_channels;
 
     /* Get the next audio data buffer */
     p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
@@ -196,7 +197,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
         i_nb_samples = p_buffer->i_nb_samples;
     }
 
-    for( i = 0; i < p_aout->output.p_sys->i_channels; i++ )
+    for( i = 0; i < i_nb_channels; i++ )
     {
         /* Get an output buffer from JACK */
         p_jack_buffer = jack_port_get_buffer(
@@ -205,7 +206,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
         /* Fill the buffer with audio data */
         for( j = 0; j < i_nb_samples; j++ )
         {
-            p_jack_buffer[j] = ((float*)p_buffer->p_buffer)[2*j+i];
+            p_jack_buffer[j] = ((float*)p_buffer->p_buffer)[i_nb_channels*j+i];
         }
         if (i_nb_samples < i_frames)
         {
