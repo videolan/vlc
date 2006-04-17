@@ -218,6 +218,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         if( windowId == "playlist_window" &&
             !config_GetInt( getIntf(), "skinned-playlist") )
         {
+            /// \todo Mux commands: hide_window and dialog playlist to make sure the window is hidden
             pCommand = new CmdDlgPlaylist( getIntf() );
         }
         else
@@ -252,6 +253,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         if( windowId == "playlist_window" &&
            ! config_GetInt( getIntf(), "skinned-playlist") )
         {
+            /// \todo Mux commands: hide_window and dialog playlist to make sure the window is hidden
             pCommand = new CmdDlgPlaylist( getIntf() );
         }
         else

@@ -79,6 +79,8 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
 #define REGISTER_VAR( var, type, name ) \
     var = VariablePtr( new type( getIntf() ) ); \
     pVarManager->registerVar( var, name );
+
+    /* Playlist variables */
     REGISTER_VAR( m_cPlaylist, Playlist, "playlist" )
     pVarManager->registerVar( getPlaylistVar().getPositionVarPtr(),
                               "playlist.slider" );
@@ -90,19 +92,27 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
                               "playtree.slider" );
     pVarManager->registerVar( m_cVarRandom, "playtree.isRandom" );
     pVarManager->registerVar( m_cVarLoop, "playtree.isLoop" );
-    pVarManager->registerVar( m_cVarRepeat, "playtree.isRepeat" );
-    REGISTER_VAR( m_cVarTime, StreamTime, "time" )
-    REGISTER_VAR( m_cVarVolume, Volume, "volume" )
-    REGISTER_VAR( m_cVarMute, VarBoolImpl, "vlc.isMute" )
+
     REGISTER_VAR( m_cVarPlaying, VarBoolImpl, "vlc.isPlaying" )
     REGISTER_VAR( m_cVarStopped, VarBoolImpl, "vlc.isStopped" )
     REGISTER_VAR( m_cVarPaused, VarBoolImpl, "vlc.isPaused" )
+
+    /* Input variables */
+    pVarManager->registerVar( m_cVarRepeat, "playtree.isRepeat" );
+    REGISTER_VAR( m_cVarTime, StreamTime, "time" )
     REGISTER_VAR( m_cVarSeekable, VarBoolImpl, "vlc.isSeekable" )
-    REGISTER_VAR( m_cVarEqualizer, VarBoolImpl, "equalizer.isEnabled" )
-    REGISTER_VAR( m_cVarEqPreamp, EqualizerPreamp, "equalizer.preamp" )
     REGISTER_VAR( m_cVarDvdActive, VarBoolImpl, "dvd.isActive" )
+
+    /* Vout variables */
     REGISTER_VAR( m_cVarFullscreen, VarBoolImpl, "vlc.isFullscreen" )
     REGISTER_VAR( m_cVarHasVout, VarBoolImpl, "vlc.hasVout" )
+
+    /* Aout variables */
+    REGISTER_VAR( m_cVarVolume, Volume, "volume" )
+    REGISTER_VAR( m_cVarMute, VarBoolImpl, "vlc.isMute" )
+    REGISTER_VAR( m_cVarEqualizer, VarBoolImpl, "equalizer.isEnabled" )
+    REGISTER_VAR( m_cVarEqPreamp, EqualizerPreamp, "equalizer.preamp" )
+
 #undef REGISTER_VAR
     m_cVarStreamName = VariablePtr( new VarText( getIntf(), false ) );
     pVarManager->registerVar( m_cVarStreamName, "streamName" );
@@ -223,7 +233,7 @@ void VlcProc::dropVout()
 
 void VlcProc::manage()
 {
-    // Did the user requested to quit vlc ?
+    // Did the user request to quit vlc ?
     if( getIntf()->b_die || getIntf()->p_vlc->b_die )
     {
         CmdQuit *pCmd = new CmdQuit( getIntf() );
