@@ -25,6 +25,7 @@
 
 #include "http.h"
 #include "vlc_url.h"
+#include "vlc_meta.h"
 
 static vlc_object_t *GetVLCObject( intf_thread_t *p_intf,
                                    const char *psz_object,
@@ -960,6 +961,40 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             }
             aout_VolumeGet( p_intf, &i_volume );
             free( psz_vol );
+        }
+        else if( !strcmp( s, "vlc_get_meta" ) )
+        {
+            char *psz_meta = E_(SSPop)( st );
+            char *psz_val = NULL;
+            if( p_sys->p_input && p_sys->p_input->input.p_item )
+            {
+#define p_item  p_sys->p_input->input.p_item
+                if( !strcmp( psz_meta, "ARTIST" ) )
+                {
+                    psz_val = vlc_input_item_GetInfo( p_item,
+                                _(VLC_META_INFO_CAT), _(VLC_META_ARTIST) );
+                }
+                else if( !strcmp( psz_meta, "TITLE" ) )
+                {
+                    psz_val = vlc_input_item_GetInfo( p_item,
+                                _(VLC_META_INFO_CAT), _(VLC_META_TITLE) );
+                }
+                else if( !strcmp( psz_meta, "ALBUM" ) )
+                {
+                    psz_val = vlc_input_item_GetInfo( p_item,
+                                _(VLC_META_INFO_CAT), _(VLC_META_COLLECTION) );
+                }
+                else
+                {
+                    psz_val = vlc_input_item_GetInfo( p_item,
+                                            _(VLC_META_INFO_CAT), psz_meta );
+                }
+#undef p_item
+            }
+            if( psz_val == NULL ) psz_val = strdup( "" );
+            E_(SSPush)( st, psz_val );
+            free( psz_meta );
+            free( psz_val );
         }
         else if( !strcmp( s, "vlm_command" ) || !strcmp( s, "vlm_cmd" ) )
         {
