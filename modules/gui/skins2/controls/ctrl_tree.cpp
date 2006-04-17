@@ -792,7 +792,7 @@ void CtrlTree::makeImage()
                 {
                     it = m_flat ? m_rTree.getNextLeaf( it )
                                 : m_rTree.getNextVisibleItem( it );
-                } while( it->m_deleted );
+                } while( it != m_rTree.end() && it->m_deleted );
             }
             else
             {
@@ -856,9 +856,10 @@ void CtrlTree::makeImage()
             yPos += (pText->getHeight() - ySrc );
             delete pText;
         }
-        do {
-        it = m_flat ? m_rTree.getNextLeaf( it )
-                    : m_rTree.getNextVisibleItem( it );
+        do
+        {
+            it = m_flat ? m_rTree.getNextLeaf( it )
+                : m_rTree.getNextVisibleItem( it );
         } while( it != m_rTree.end() && it->m_deleted );
     }
     stats_TimerStop( getIntf(), STATS_TIMER_SKINS_PLAYTREE_IMAGE );
