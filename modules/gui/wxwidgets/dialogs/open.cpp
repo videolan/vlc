@@ -1825,11 +1825,15 @@ void OpenDialog::OnSubsFileSettings( wxCommandEvent& WXUNUSED(event) )
         }
         if( subsfile_dialog->align_combo )
         {
-            subsfile_mrl.Add( wxString::Format(wxT("subsdec-align=%i"), 0 ) );
+            subsfile_mrl.Add( wxString::Format(wxT("subsdec-align=%i"),
+                        (int)subsfile_dialog->align_combo->GetClientData(
+                        subsfile_dialog->align_combo->GetSelection()) ) );
         }
         if( subsfile_dialog->size_combo )
         {
-            subsfile_mrl.Add( wxString::Format( wxT("freetype-rel-fontsize=%i"),0) );
+            subsfile_mrl.Add( wxString::Format( wxT("freetype-rel-fontsize=%i"),
+                        (int)subsfile_dialog->size_combo->GetClientData(
+                        subsfile_dialog->size_combo->GetSelection()) ) );
         }
         subsfile_mrl.Add( wxString::Format( wxT("sub-fps=%i"),
                           subsfile_dialog->fps_spinctrl->GetValue() ) );
