@@ -214,24 +214,34 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
     {
         int leftPos = rAction.find( ".show()" );
         string windowId = rAction.substr( 0, leftPos );
-        TopWindow *pWin = pTheme->getWindowById( windowId );
-        if( pWin )
+
+        if( windowId == "playlist_window" &&
+            !config_GetInt( getIntf(), "skinned-playlist") )
         {
-            pCommand = new CmdShowWindow( getIntf(), pTheme->getWindowManager(),
-                                          *pWin );
+            pCommand = new CmdDlgPlaylist( getIntf() );
         }
         else
         {
-            // It was maybe the id of a popup
-            Popup *pPopup = pTheme->getPopupById( windowId );
-            if( pPopup )
+            TopWindow *pWin = pTheme->getWindowById( windowId );
+            if( pWin )
             {
-                pCommand = new CmdShowPopup( getIntf(), *pPopup );
+                pCommand = new CmdShowWindow( getIntf(),
+                                              pTheme->getWindowManager(),
+                                              *pWin );
             }
             else
             {
-                msg_Err( getIntf(), "unknown window or popup (%s)",
-                         windowId.c_str() );
+                // It was maybe the id of a popup
+                Popup *pPopup = pTheme->getPopupById( windowId );
+                if( pPopup )
+                {
+                    pCommand = new CmdShowPopup( getIntf(), *pPopup );
+                }
+                else
+                {
+                    msg_Err( getIntf(), "unknown window or popup (%s)",
+                             windowId.c_str() );
+                }
             }
         }
     }
@@ -239,15 +249,24 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
     {
         int leftPos = rAction.find( ".hide()" );
         string windowId = rAction.substr( 0, leftPos );
-        TopWindow *pWin = pTheme->getWindowById( windowId );
-        if( pWin )
+        if( windowId == "playlist_window" &&
+           ! config_GetInt( getIntf(), "skinned-playlist") )
         {
-            pCommand = new CmdHideWindow( getIntf(), pTheme->getWindowManager(),
-                                          *pWin );
+            pCommand = new CmdDlgPlaylist( getIntf() );
         }
         else
         {
-            msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
+            TopWindow *pWin = pTheme->getWindowById( windowId );
+            if( pWin )
+            {
+                pCommand = new CmdHideWindow( getIntf(),
+                                              pTheme->getWindowManager(),
+                                              *pWin );
+            }
+            else
+            {
+                msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
+            }
         }
     }
 

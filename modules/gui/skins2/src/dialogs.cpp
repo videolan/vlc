@@ -242,6 +242,14 @@ void Dialogs::showPlaylistSave()
                      showPlaylistSaveCB, kSAVE );
 }
 
+void Dialogs::showPlaylist()
+{
+    if( m_pProvider && m_pProvider->pf_show_dialog )
+    {
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_PLAYLIST,
+                                     0, 0 );
+    }
+}
 
 void Dialogs::showFileSimple( bool play )
 {

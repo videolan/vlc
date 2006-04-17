@@ -86,6 +86,9 @@ class Dialogs: public SkinObject
         /// Show the Streaming Wizard dialog
         void showStreamingWizard();
 
+        /// Show the Playlist
+        void showPlaylist();
+
         /// Show the popup menu
         void showPopupMenu( bool bShow );
 
