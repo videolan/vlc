@@ -102,7 +102,7 @@ CtrlCheckbox::CtrlCheckbox( intf_thread_t *pIntf,
         m_pImgUp = &m_imgUp2;
         m_pImgOver = &m_imgOver2;
         m_pImgDown = &m_imgDown2;
-        m_pImgCurrent = m_pImgDown;
+        m_pImgCurrent = m_pImgUp;
         m_pCommand = &m_rCommand2;
         m_pTooltip = &m_tooltip2;
     }
