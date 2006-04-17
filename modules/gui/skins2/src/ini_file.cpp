@@ -66,9 +66,15 @@ void IniFile::parseFile()
                 string var = line.substr( 0, eqPos );
                 string val = line.substr( eqPos + 1, line.size() - eqPos - 1);
 
-                // register the value in the var manager
-                pVarManager->registerConst( m_name + "." + section + "." + var,
-                                            val );
+                // Convert to lower case because of some buggy winamp2 skins
+                string name = m_name + "." + section + "." + var;
+                for( size_t i=0; i< name.size(); i++)
+                {
+                    name[i] = tolower( name[i] );
+                }
+
+                // Register the value in the var manager
+                pVarManager->registerConst( name, val );
             }
         }
         fs.close();
