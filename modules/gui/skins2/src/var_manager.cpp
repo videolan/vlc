@@ -131,3 +131,15 @@ Variable *VarManager::getVar( const string &rName, const string &rType )
     }
 }
 
+
+void VarManager::registerConst( const string &rName, const string &rValue)
+{
+    m_constMap[rName] = rValue;
+}
+
+
+string VarManager::getConst( const string &rName )
+{
+    return m_constMap[rName];
+}
+

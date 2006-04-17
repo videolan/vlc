@@ -63,6 +63,9 @@ class Interpreter: public SkinObject
         /// Returns the tree variable corresponding to the given name
         VarTree *getVarTree( const string &rName, Theme *pTheme );
 
+        /// Get a constant value
+        string getConstant( const string &rValue );
+
     private:
         /// Map of global commands
         map<string, CmdGenericPtr> m_commandMap;

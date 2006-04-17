@@ -26,6 +26,7 @@
 #include "builder.hpp"
 #include "builder_data.hpp"
 #include "interpreter.hpp"
+#include "skin_parser.hpp"
 #include "../src/file_bitmap.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/generic_bitmap.hpp"
@@ -33,6 +34,7 @@
 #include "../src/anchor.hpp"
 #include "../src/bitmap_font.hpp"
 #include "../src/ft2_font.hpp"
+#include "../src/ini_file.hpp"
 #include "../src/generic_layout.hpp"
 #include "../src/popup.hpp"
 #include "../src/theme.hpp"
@@ -94,6 +96,7 @@ Theme *Builder::build()
 
     // Create everything from the data in the XML
     ADD_OBJECTS( Theme );
+    ADD_OBJECTS( IniFile );
     ADD_OBJECTS( Bitmap );
     ADD_OBJECTS( SubBitmap );
     ADD_OBJECTS( BitmapFont );
@@ -150,6 +153,14 @@ void Builder::addTheme( const BuilderData::Theme &rData )
         msg_Warn( getIntf(), "invalid tooltip font: %s",
                   rData.m_tooltipfont.c_str() );
     }
+}
+
+
+void Builder::addIniFile( const BuilderData::IniFile &rData )
+{
+    // Parse the INI file
+    IniFile iniFile( getIntf(), rData.m_id, getFilePath( rData.m_file ) );
+    iniFile.parseFile();
 }
 
 
@@ -816,10 +827,16 @@ void Builder::addList( const BuilderData::List &rData )
     // XXX check when it is null
     VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
 
+    // Get the color values
+    uint32_t fgColor = getColor( rData.m_fgColor );
+    uint32_t playColor = getColor( rData.m_playColor );
+    uint32_t bgColor1 = getColor( rData.m_bgColor1 );
+    uint32_t bgColor2 = getColor( rData.m_bgColor2 );
+    uint32_t selColor = getColor( rData.m_selColor );
+
     // Create the list control
     CtrlList *pList = new CtrlList( getIntf(), *pVar, *pFont, pBgBmp,
-       rData.m_fgColor, rData.m_playColor, rData.m_bgColor1,
-       rData.m_bgColor2, rData.m_selColor,
+       fgColor, playColor, bgColor1, bgColor2, selColor,
        UString( getIntf(), rData.m_help.c_str() ), pVisible );
 
     // Compute the position of the control
@@ -873,11 +890,17 @@ void Builder::addTree( const BuilderData::Tree &rData )
     VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
     VarBool *pFlat = pInterpreter->getVarBool( rData.m_flat, m_pTheme );
 
+    // Get the color values
+    uint32_t fgColor = getColor( rData.m_fgColor );
+    uint32_t playColor = getColor( rData.m_playColor );
+    uint32_t bgColor1 = getColor( rData.m_bgColor1 );
+    uint32_t bgColor2 = getColor( rData.m_bgColor2 );
+    uint32_t selColor = getColor( rData.m_selColor );
+
     // Create the list control
     CtrlTree *pTree = new CtrlTree( getIntf(), *pVar, *pFont, pBgBmp,
        pItemBmp, pOpenBmp, pClosedBmp,
-       rData.m_fgColor, rData.m_playColor, rData.m_bgColor1,
-       rData.m_bgColor2, rData.m_selColor,
+       fgColor, playColor, bgColor1, bgColor2, selColor,
        UString( getIntf(), rData.m_help.c_str() ), pVisible, pFlat );
 
     // Compute the position of the control
@@ -1067,5 +1090,16 @@ Bezier *Builder::getPoints( const char *pTag ) const
 
     // Create the Bezier curve
     return new Bezier( getIntf(), xBez, yBez );
+}
+
+
+uint32_t Builder::getColor( const string &rVal ) const
+{
+    // Check it the value is a registered constant
+    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
+    string val = pInterpreter->getConstant( rVal );
+
+    // Convert to an int value
+    return SkinParser::convertColor( val.c_str() );
 }
 

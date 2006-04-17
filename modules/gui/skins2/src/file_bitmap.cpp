@@ -37,8 +37,6 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
 
     fmt_out.i_chroma = VLC_FOURCC('R','V','3','2');
 
-fprintf(stderr,"FILE %s\n", fileName.c_str());
-    
     pPic = image_ReadUrl( pImageHandler, fileName.c_str(), &fmt_in, &fmt_out );
     if( !pPic ) return;
 

@@ -113,6 +113,8 @@ SOURCES_skins2 = \
 	src/generic_layout.hpp \
 	src/generic_window.cpp \
 	src/generic_window.hpp \
+	src/ini_file.cpp \
+	src/ini_file.hpp \
 	src/logger.cpp \
 	src/logger.hpp \
 	src/os_factory.cpp \

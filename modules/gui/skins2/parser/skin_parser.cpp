@@ -23,6 +23,7 @@
 
 #include "skin_parser.hpp"
 #include "../src/os_factory.hpp"
+#include "interpreter.hpp"
 #include <math.h>
 
 SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
@@ -70,6 +71,16 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         // as the parser seems to dislike it otherwise...
         SkinParser subParser( getIntf(), fullPath.c_str(), false, m_pData );
         subParser.parse();
+    }
+
+    else if( rName == "IniFile" )
+    {
+        RequireDefault( "id" );
+        RequireDefault( "file" );
+
+        const BuilderData::IniFile iniFile( attr["id"],
+                attr["file"] );
+        m_pData->m_listIniFile.push_back( iniFile );
     }
 
     else if( rName == "Anchor" )
@@ -304,13 +315,10 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         const BuilderData::List listData( m_curListId, atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["visible"],
                 atoi( attr["width"]), atoi( attr["height"] ),
-                attr["lefttop"], attr["rightbottom"],
-                attr["font"], "playlist", attr["bgimage"],
-                convertColor( attr["fgcolor"] ),
-                convertColor( attr["playcolor"] ),
-                convertColor( attr["bgcolor1"] ),
-                convertColor( attr["bgcolor2"] ),
-                convertColor( attr["selcolor"] ), attr["help"],
+                attr["lefttop"], attr["rightbottom"], attr["font"],
+                "playlist", attr["bgimage"], attr["fgcolor"],
+                attr["playcolor"], attr["bgcolor1"], attr["bgcolor2"],
+                attr["selcolor"], attr["help"],
                 m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_pData->m_listList.push_back( listData );
@@ -348,11 +356,9 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["font"], "playtree",
                 attr["bgimage"], attr["itemimage"],
                 attr["openimage"], attr["closedimage"],
-                convertColor( attr["fgcolor"] ),
-                convertColor( attr["playcolor"] ),
-                convertColor( attr["bgcolor1"] ),
-                convertColor( attr["bgcolor2"] ),
-                convertColor( attr["selcolor"] ), attr["help"],
+                attr["fgcolor"], attr["playcolor"],
+                attr["bgcolor1"], attr["bgcolor2"],
+                attr["selcolor"], attr["help"],
                 m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_pData->m_listTree.push_back( treeData );
@@ -576,8 +582,9 @@ bool SkinParser::convertBoolean( const char *value ) const
 }
 
 
-int SkinParser::convertColor( const char *transcolor ) const
+int SkinParser::convertColor( const char *transcolor )
 {
+    // TODO: move to the builder
     unsigned long iRed, iGreen, iBlue;
     iRed = iGreen = iBlue = 0;
     sscanf( transcolor, "#%2lX%2lX%2lX", &iRed, &iGreen, &iBlue );

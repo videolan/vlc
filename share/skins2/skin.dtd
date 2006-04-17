@@ -2,7 +2,7 @@
 -->
 
 
-<!ELEMENT Theme (ThemeInfo,(Include|Bitmap|BitmapFont|Font|PopupMenu|Window)*)>
+<!ELEMENT Theme (ThemeInfo,(Include|IniFile|Bitmap|BitmapFont|Font|PopupMenu|Window)*)>
     <!ATTLIST Theme
         version     CDATA   #REQUIRED
         tooltipfont CDATA   "defaultfont"
@@ -12,6 +12,11 @@
     >
 
 <!-- main elements -->
+<!ELEMENT IniFile EMPTY>
+    <!ATTLIST IniFile
+        id          CDATA   #REQUIRED
+        file        CDATA   #REQUIRED
+    >
 <!ELEMENT Include EMPTY>
     <!ATTLIST Include
         file        CDATA   #REQUIRED

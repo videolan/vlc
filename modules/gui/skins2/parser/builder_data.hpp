@@ -280,6 +280,18 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     list<Image> m_listImage;
 
     /// Type definition
+    struct IniFile
+    {
+        IniFile( const string & id, const string & file ):
+m_id( id ), m_file( file ) {}
+
+        string m_id;
+        string m_file;
+    };
+    /// List
+    list<IniFile> m_listIniFile;
+
+    /// Type definition
     struct Text
     {
         Text( const string & id, int xPos, int yPos, const string & visible, const string & fontId, const string & text, int width, const string & leftTop, const string & rightBottom, uint32_t color, const string & scrolling, const string & alignment, const string & help, int layer, const string & windowId, const string & layoutId ):
@@ -366,7 +378,7 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
     /// Type definition
     struct List
     {
-        List( const string & id, int xPos, int yPos, const string & visible, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, const string & bgImageId, uint32_t fgColor, uint32_t playColor, uint32_t bgColor1, uint32_t bgColor2, uint32_t selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
+        List( const string & id, int xPos, int yPos, const string & visible, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, const string & bgImageId, const string & fgColor, const string & playColor, const string & bgColor1, const string & bgColor2, const string & selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_fontId( fontId ), m_var( var ), m_bgImageId( bgImageId ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
@@ -380,11 +392,11 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width
         string m_fontId;
         string m_var;
         string m_bgImageId;
-        uint32_t m_fgColor;
-        uint32_t m_playColor;
-        uint32_t m_bgColor1;
-        uint32_t m_bgColor2;
-        uint32_t m_selColor;
+        string m_fgColor;
+        string m_playColor;
+        string m_bgColor1;
+        string m_bgColor2;
+        string m_selColor;
         string m_help;
         int m_layer;
         string m_windowId;
@@ -396,7 +408,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width
     /// Type definition
     struct Tree
     {
-        Tree( const string & id, int xPos, int yPos, const string & visible, const string & flat, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, const string & bgImageId, const string & itemImageId, const string & openImageId, const string & closedImageId, uint32_t fgColor, uint32_t playColor, uint32_t bgColor1, uint32_t bgColor2, uint32_t selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
+        Tree( const string & id, int xPos, int yPos, const string & visible, const string & flat, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, const string & bgImageId, const string & itemImageId, const string & openImageId, const string & closedImageId, const string & fgColor, const string & playColor, const string & bgColor1, const string & bgColor2, const string & selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_flat( flat ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_fontId( fontId ), m_var( var ), m_bgImageId( bgImageId ), m_itemImageId( itemImageId ), m_openImageId( openImageId ), m_closedImageId( closedImageId ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
@@ -414,11 +426,11 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_flat( flat )
         string m_itemImageId;
         string m_openImageId;
         string m_closedImageId;
-        uint32_t m_fgColor;
-        uint32_t m_playColor;
-        uint32_t m_bgColor1;
-        uint32_t m_bgColor2;
-        uint32_t m_selColor;
+        string m_fgColor;
+        string m_playColor;
+        string m_bgColor1;
+        string m_bgColor2;
+        string m_selColor;
         string m_help;
         int m_layer;
         string m_windowId;

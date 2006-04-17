@@ -40,6 +40,8 @@ class SkinParser: public XMLParser
 
         const BuilderData &getData() const { return *m_pData; }
 
+        static int convertColor( const char *transcolor );
+
     private:
         /// Path of the theme
         const string m_path;
@@ -72,7 +74,6 @@ class SkinParser: public XMLParser
         /// Helper functions
         //@{
         bool convertBoolean( const char *value ) const;
-        int convertColor( const char *transcolor ) const;
         /// Transform to int, and check that it is in the given range (if not,
         /// the closest range boundary will be used)
         int convertInRange( const char *value, int minValue, int maxValue,

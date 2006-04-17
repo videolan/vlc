@@ -57,6 +57,12 @@ class VarManager: public SkinObject
         /// Get the help text variable
         VarText &getHelpText() { return *m_pHelpText; }
 
+        /// Register a constant value
+        void registerConst( const string &rName, const string &rValue);
+
+        /// Get a constant value by its name
+        string getConst( const string &rName );
+
     private:
         /// Tooltip text
         VarText *m_pTooltipText;
@@ -68,6 +74,8 @@ class VarManager: public SkinObject
         list<string> m_varList;
         /// List of anonymous registed variables
         list<VariablePtr> m_anonVarList;
+        /// Map of constant values
+        map<string, string> m_constMap;
 
         /// Private because it is a singleton
         VarManager( intf_thread_t *pIntf );

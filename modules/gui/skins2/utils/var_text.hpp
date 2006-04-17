@@ -53,6 +53,9 @@ class VarText: public Variable, public Subject<VarText, void*>,
         virtual void onUpdate( Subject<VarText, void*> &rVariable, void* );
 
     private:
+        /// Stop observing other variables
+        void delObservers();
+
         /// Variable type
         static const string m_type;
         /// The text of the variable

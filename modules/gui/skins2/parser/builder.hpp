@@ -65,6 +65,7 @@ class Builder: public SkinObject
         Theme *m_pTheme;
 
         void addTheme( const BuilderData::Theme &rData );
+        void addIniFile( const BuilderData::IniFile &rData );
         void addBitmap( const BuilderData::Bitmap &rData );
         void addSubBitmap( const BuilderData::SubBitmap &rData );
         void addBitmapFont( const BuilderData::BitmapFont &rData );
@@ -99,6 +100,9 @@ class Builder: public SkinObject
 
         /// Function to parse "points" tags
         Bezier *getPoints( const char *pTag ) const;
+
+        /// Compute a color value
+        uint32_t getColor( const string &rVal ) const;
 
         /// Image handler (used to load image files)
         image_handler_t *m_pImageHandler;

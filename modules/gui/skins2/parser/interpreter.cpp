@@ -416,3 +416,17 @@ VarTree *Interpreter::getVarTree( const string &rName, Theme *pTheme )
     VarTree *pVar = (VarTree*)pVarManager->getVar( rName, "tree" );
     return pVar;
 }
+
+
+string Interpreter::getConstant( const string &rValue )
+{
+    // Check if the value is a registered constant
+    string val = VarManager::instance( getIntf() )->getConst( rValue );
+    if( val.empty() )
+    {
+        // if not, keep the value as is
+        val = rValue;
+    }
+    return val;
+}
+

@@ -43,15 +43,7 @@ VarText::~VarText()
     if( m_substVars )
     {
         // Remove the observers
-        VlcProc *pVlcProc = VlcProc::instance( getIntf() );
-        pVlcProc->getTimeVar().delObserver( this );
-        pVlcProc->getVolumeVar().delObserver( this );
-        pVlcProc->getStreamURIVar().delObserver( this );
-        pVlcProc->getStreamNameVar().delObserver( this );
-        pVlcProc->getStreamBitRateVar().delObserver( this );
-        pVlcProc->getStreamSampleRateVar().delObserver( this );
-        VarManager *pVarManager = VarManager::instance( getIntf() );
-        pVarManager->getHelpText().delObserver( this );
+        delObservers();
     }
 }
 
@@ -149,15 +141,10 @@ void VarText::set( const UString &rText )
     if( m_substVars )
     {
         // Stop observing other variables
+        delObservers();
+
         VlcProc *pVlcProc = VlcProc::instance( getIntf() );
-        pVlcProc->getTimeVar().delObserver( this );
-        pVlcProc->getVolumeVar().delObserver( this );
-        pVlcProc->getStreamNameVar().delObserver( this );
-        pVlcProc->getStreamURIVar().delObserver( this );
-        pVlcProc->getStreamBitRateVar().delObserver( this );
-        pVlcProc->getStreamSampleRateVar().delObserver( this );
         VarManager *pVarManager = VarManager::instance( getIntf() );
-        pVarManager->getHelpText().delObserver( this );
 
         // Observe needed variables
         if( m_text.find( "$H" ) != UString::npos )
@@ -226,5 +213,20 @@ void VarText::onUpdate( Subject<VarText,void*> &rVariable, void *arg )
         m_lastText = newText;
         notify();
     }
+}
+
+
+void VarText::delObservers()
+{
+    // Stop observing other variables
+    VlcProc *pVlcProc = VlcProc::instance( getIntf() );
+    pVlcProc->getTimeVar().delObserver( this );
+    pVlcProc->getVolumeVar().delObserver( this );
+    pVlcProc->getStreamNameVar().delObserver( this );
+    pVlcProc->getStreamURIVar().delObserver( this );
+    pVlcProc->getStreamBitRateVar().delObserver( this );
+    pVlcProc->getStreamSampleRateVar().delObserver( this );
+    VarManager *pVarManager = VarManager::instance( getIntf() );
+    pVarManager->getHelpText().delObserver( this );
 }
 

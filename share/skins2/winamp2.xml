@@ -149,6 +149,7 @@
     <BitmapFont id="digits_font" file="nums_ex.bmp" type="digits" />
     <BitmapFont id="digits_font_2" file="numbers.bmp" type="digits" />
     <BitmapFont id="text_font" file="text.bmp" type="text" />
+    <IniFile id="pledit" file="pledit.txt" />
 
     <Window id="main_window" x="100" y="100">
         <Layout id="small_layout" width="275" height="14">
@@ -342,7 +343,7 @@
                 <Image x="255" y="96" image="pl_resize" action="resizeSE" lefttop="rightbottom" rightbottom="rightbottom" />
                 <Button x="254" y="3" up="pl_switch_up" down="pl_switch_down" over="pl_switch_up" action="playlist_window.setLayout(pl_small_layout)" tooltiptext="Switch" lefttop="righttop" rightbottom="righttop" />
                 <Button x="264" y="3" up="pl_close_up" down="pl_close_down" over="pl_close_up" action="playlist_window.hide()" tooltiptext="Close the window" lefttop="righttop" rightbottom="righttop" />
-                <Playlist id="playlist" x="10" y="20" width="240" height="58" lefttop="lefttop" rightbottom="rightbottom" font="playlist_font" fgcolor="#dfdfff" playcolor="#ffffff" bgcolor1="#000000" bgcolor2="#000000" selcolor="#404040" >
+                <Playlist id="playlist" x="10" y="20" width="240" height="58" lefttop="lefttop" rightbottom="rightbottom" font="playlist_font" fgcolor="pledit.Text.Normal" playcolor="pledit.Text.Current" bgcolor1="pledit.Text.NormalBG" bgcolor2="pledit.Text.NormalBG" selcolor="pledit.Text.SelectedBG" >
                     <Slider id="playlist_slider" x="264" y="28" lefttop="righttop" rightbottom="rightbottom" up="pl_slider_up" down="pl_slider_down" points="(0,40),(0,0)" />
                 </Playlist>
                 <Button x="14" y="86" up="pl_add_up" down="pl_add_down" over="pl_add_up" action="playlist.add()" lefttop="leftbottom" rightbottom="leftbottom" />
