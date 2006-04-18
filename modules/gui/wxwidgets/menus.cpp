@@ -272,8 +272,8 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf,
 void VideoPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
                      const wxPoint& pos )
 {
-   POPUP_BOILERPLATE;
-   if( p_input )
+    POPUP_BOILERPLATE;
+    if( p_input )
     {
         vlc_object_yield( p_input );
         as_varnames.push_back( "video-es" );
@@ -289,6 +289,7 @@ void VideoPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         }
         vlc_object_release( p_input );
     }
+    vlc_object_release( p_playlist );
     CREATE_POPUP;
 }
 
@@ -310,6 +311,7 @@ void AudioPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         }
         vlc_object_release( p_input );
     }
+    vlc_object_release( p_playlist );
     CREATE_POPUP;
 }
 
@@ -338,6 +340,7 @@ void MiscPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     p_intf->p_sys->p_popup_menu = &popupmenu;
     p_parent->PopupMenu( &popupmenu, pos.x, pos.y );
     p_intf->p_sys->p_popup_menu = NULL;
+    vlc_object_release( p_playlist );
 }
 
 void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
@@ -393,6 +396,7 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     p_intf->p_sys->p_popup_menu = &popupmenu;
     p_parent->PopupMenu( &popupmenu, pos.x, pos.y );
     p_intf->p_sys->p_popup_menu = NULL;
+    vlc_object_release( p_playlist );
 }
 
 /*****************************************************************************
