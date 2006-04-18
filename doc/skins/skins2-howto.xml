@@ -798,10 +798,22 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>dialogs.fileInfo()</emphasis>: Show the "File Info" dialog box.
   </para></listitem>
   <listitem><para>
+    <emphasis>dialogs.playlist()</emphasis>: Show the "standard" (not skinned) playlist dialog.
+  </para></listitem>
+  <listitem><para>
     <emphasis>dialogs.streamingWizard()</emphasis>: Show the "Streaming Wizard" dialog box (new after VLC 0.8.2).
   </para></listitem>
   <listitem><para>
-    <emphasis>dialogs.popup()</emphasis>: Show the popup menu, (already available with a right-click on a <link linkend="Image">Image</link> control).
+    <emphasis>dialogs.popup()</emphasis>: Show the full popup menu, (already available with a right-click on a <link linkend="Image">Image</link> control).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>dialogs.audioPopup()</emphasis>: Show the audio settings popup menu (since VLC 0.8.5).
+  </para></listitem>
+   <listitem><para>
+    <emphasis>dialogs.videoPopup()</emphasis>: Show the video settings popup menu (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>dialogs.miscPopup()</emphasis>: Show a popup menu containing playback control and general options (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
     <emphasis>equalizer.enable()</emphasis>: Enable the equalizer audio filter (since VLC 0.8.5).
@@ -972,6 +984,9 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>vlc.hasVout</emphasis>: True if a video is being played (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
+    <emphasis>vlc.hasAudio</emphasis>: True if audio is being played (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
     <emphasis>vlc.isFullscreen</emphasis>: True when the video is in fullscreen mode (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
@@ -1002,7 +1017,7 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>playlist.isRepeat</emphasis>: True when the current playlist item is being repeated, false otherwise (since VLC 0.8.0).
   </para></listitem>
   <listitem><para>
-          <emphasis>dvd.isActive</emphasis>: True when a DVD is currently playing. This variable can be used to display buttons associated to the <link linkend="dvdactions">dvd.* actions</link> only when needed (since VLC 0.8.5).
+   <emphasis>dvd.isActive</emphasis>: True when a DVD is currently playing. This variable can be used to display buttons associated to the <link linkend="dvdactions">dvd.* actions</link> only when needed (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
     <emphasis>window_name.isVisible</emphasis>: True when the window whose <link linkend="windowid">id</link> is "window_name" is visible, false otherwise.
