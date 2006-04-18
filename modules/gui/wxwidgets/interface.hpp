@@ -239,6 +239,9 @@ namespace wxvlc
 };
 
 void PopupMenu( intf_thread_t *, wxWindow *, const wxPoint& );
+void AudioPopupMenu( intf_thread_t *, wxWindow *, const wxPoint& );
+void VideoPopupMenu( intf_thread_t *, wxWindow *, const wxPoint& );
+void MiscPopupMenu( intf_thread_t *, wxWindow *, const wxPoint& );
 wxMenu *SettingsMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );
 wxMenu *AudioMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );
 wxMenu *VideoMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );

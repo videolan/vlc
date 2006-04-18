@@ -21,19 +21,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
-
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
 #include "wxwidgets.hpp"
 #include "interface.hpp"
+
+#include <vector>
+#include <string>
+using namespace std;
 
 class wxMenuItemExt: public wxMenuItem
 {
@@ -43,16 +39,12 @@ public:
                    const wxString& helpString, wxItemKind kind,
                    char *_psz_var, int _i_object_id, vlc_value_t _val,
                    int _i_val_type );
-
     virtual ~wxMenuItemExt();
 
     char *psz_var;
     int  i_val_type;
     int  i_object_id;
     vlc_value_t val;
-
-private:
-
 };
 
 class Menu: public wxMenu
@@ -62,7 +54,7 @@ public:
     Menu( intf_thread_t *p_intf, int i_start_id );
     virtual ~Menu();
 
-    void Populate( int i_count, char **ppsz_names, int *pi_objects );
+    void Populate( vector<string> &, vector<int> &);
     void Clear();
 
 private:
@@ -81,8 +73,6 @@ private:
 /*****************************************************************************
  * Event Table.
  *****************************************************************************/
-
-/* IDs for the controls and the menu commands */
 enum
 {
     /* menu items */
@@ -126,6 +116,9 @@ BEGIN_EVENT_TABLE(MenuEvtHandler, wxEvtHandler)
     EVT_MENU(-1, MenuEvtHandler::OnMenuEvent)
 END_EVENT_TABLE()
 
+/*****************************************************************************
+ * Static menu helpers
+ *****************************************************************************/
 wxMenu *OpenStreamMenu( intf_thread_t *p_intf )
 {
     wxMenu *menu = new wxMenu;
@@ -147,215 +140,283 @@ wxMenu *MiscMenu( intf_thread_t *p_intf )
     return menu;
 }
 
-void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
-                const wxPoint& pos )
+/*****************************************************************************
+ * Builders for the dynamic menus
+ *****************************************************************************/
+#define PUSH_VAR( var ) rs_varnames.push_back( var ); \
+                        ri_objects.push_back( p_object->i_object_id );
+
+int InputAutoMenuBuilder( vlc_object_t *p_object,
+                          vector<int> &ri_objects, vector<string> &rs_varnames )
 {
-#define MAX_POPUP_ITEMS 45
+    PUSH_VAR( "bookmark");
+    PUSH_VAR( "title" );
+    PUSH_VAR ("chapter" );
+    PUSH_VAR( "program" );
+    PUSH_VAR( "navigation" );
+    PUSH_VAR( "dvd_menus" );
+    return VLC_SUCCESS;
+}
 
-    int minimal = config_GetInt( p_intf, "wx-minimal" );
+int VideoAutoMenuBuilder( vlc_object_t *p_object,
+                          vector<int> &ri_objects, vector<string> &rs_varnames )
+{
+    PUSH_VAR( "fullscreen" );
+    PUSH_VAR( "zoom" );
+    PUSH_VAR( "deinterlace" );
+    PUSH_VAR( "aspect-ratio" );
+    PUSH_VAR( "crop" );
+    PUSH_VAR( "video-on-top" );
+    PUSH_VAR( "directx-wallpaper" );
+    PUSH_VAR( "video-snapshot" );
 
-    vlc_object_t *p_object, *p_input;
-    char *ppsz_varnames[MAX_POPUP_ITEMS];
-    int pi_objects[MAX_POPUP_ITEMS];
-    int i = 0, i_last_separator = 0;
-
-    /* Initializations */
-    memset( pi_objects, 0, MAX_POPUP_ITEMS * sizeof(int) );
-
-    /* Input menu */
-    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                FIND_ANYWHERE );
-    if( p_object != NULL )
+    vlc_object_t *p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,
+                                                 VLC_OBJECT_DECODER,
+                                                 FIND_PARENT );
+    if( p_dec_obj != NULL )
     {
-        ppsz_varnames[i] = "bookmark";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "title";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "chapter";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "program";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "navigation";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "dvd_menus";
-        pi_objects[i++] = p_object->i_object_id;
-
-        ppsz_varnames[i] = "video-es";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "audio-es";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "spu-es";
-        pi_objects[i++] = p_object->i_object_id;
+        PUSH_VAR( "ffmpeg-pp-q" );
+        vlc_object_release( p_dec_obj );
     }
-    p_input = p_object;
-    if( !p_input ) goto interfacemenu;
+    return VLC_SUCCESS;
+}
 
-    /* Video menu */
-    if( i != i_last_separator ) ppsz_varnames[i++] = NULL; /* Separator */
-    i_last_separator = i;
+int AudioAutoMenuBuilder( vlc_object_t *p_object,
+                          vector<int> &ri_objects, vector<string> &rs_varnames )
+{
+    PUSH_VAR( "audio-device" );
+    PUSH_VAR( "audio-channels" );
+    PUSH_VAR( "visual" );
+    PUSH_VAR( "equalizer" );
+    return VLC_SUCCESS;
+}
 
-    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                                FIND_ANYWHERE );
-    if( p_object != NULL )
-    {
-        vlc_object_t *p_dec_obj;
-
-        ppsz_varnames[i] = "fullscreen";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "zoom";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "deinterlace";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "aspect-ratio";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "crop";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "video-on-top";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "directx-wallpaper";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "video-snapshot";
-        pi_objects[i++] = p_object->i_object_id;
-
-        p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,
-                                                     VLC_OBJECT_DECODER,
-                                                     FIND_PARENT );
-        if( p_dec_obj != NULL )
-        {
-            ppsz_varnames[i] = "ffmpeg-pp-q";
-            pi_objects[i++] = p_dec_obj->i_object_id;
-            vlc_object_release( p_dec_obj );
-        }
-
-        vlc_object_release( p_object );
-    }
-
-    /* Audio menu */
-    if( i != i_last_separator ) ppsz_varnames[i++] = NULL; /* Separator */
-    i_last_separator  = i;
-
-    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                FIND_ANYWHERE );
-    if( p_object != NULL )
-    {
-        ppsz_varnames[i] = "audio-device";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "audio-channels";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "visual";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "equalizer";
-        pi_objects[i++] = p_object->i_object_id;
-        vlc_object_release( p_object );
-    }
-
- interfacemenu:
-    /* Interface menu */
-    if( i != i_last_separator ) ppsz_varnames[i++] = NULL; /* Separator */
-    i_last_separator = i;
-
+int IntfAutoMenuBuilder( intf_thread_t *p_intf,
+                         vector<int> &ri_objects, vector<string> &rs_varnames )
+{
     /* vlc_object_find is needed because of the dialogs provider case */
+    vlc_object_t *p_object;
     p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_INTF,
                                                 FIND_PARENT );
     if( p_object != NULL )
     {
-#if 0
-#if (wxCHECK_VERSION(2,5,0))
-        ppsz_varnames[i] = "intf-switch";
-        pi_objects[i++] = p_object->i_object_id;
-#endif
-#endif
-        ppsz_varnames[i] = "intf-add";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "intf-skins";
-        pi_objects[i++] = p_object->i_object_id;
-
+        PUSH_VAR( "intf-add" );
+        PUSH_VAR( "intf-skins" );
         vlc_object_release( p_object );
     }
+    return VLC_SUCCESS;
+}
 
-    /* Build menu */
-    Menu popupmenu( p_intf, PopupMenu_Events );
-    popupmenu.Populate( i, ppsz_varnames, pi_objects );
+#undef PUSH_VAR
+/*****************************************************************************
+ * Popup menus
+ *****************************************************************************/
+#define PUSH_VAR( var ) as_varnames.push_back( var ); \
+                        ai_objects.push_back( p_object->i_object_id );
+#define PUSH_SEPARATOR if( ai_objects.size() != i_last_separator ) { \
+                            ai_objects.push_back( 0 ); \
+                            as_varnames.push_back( "" ); \
+                            i_last_separator = ai_objects.size(); }
 
-    /* Add static entries */
-    if( p_input != NULL )
+#define POPUP_BOILERPLATE \
+    unsigned int i_last_separator = 0; \
+    vector<int> ai_objects; \
+    vector<string> as_varnames; \
+    playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf, \
+                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );\
+    if( !p_playlist ) \
+        return; \
+    input_thread_t *p_input = p_playlist->p_input;
+
+#define CREATE_POPUP    \
+    Menu popupmenu( p_intf, PopupMenu_Events ); \
+    popupmenu.Populate( as_varnames, ai_objects ); \
+    p_intf->p_sys->p_popup_menu = &popupmenu; \
+    p_parent->PopupMenu( &popupmenu, pos.x, pos.y ); \
+    p_intf->p_sys->p_popup_menu = NULL; \
+
+#define POPUP_STATIC_ENTRIES \
+    if( p_input != NULL ) \
+    { \
+        vlc_value_t val; \
+        popupmenu.InsertSeparator( 0 ); \
+        if (!minimal) \
+        { \
+        popupmenu.Insert( 0, Stop_Event, wxU(_("Stop")) ); \
+        popupmenu.Insert( 0, Previous_Event, wxU(_("Previous")) ); \
+        popupmenu.Insert( 0, Next_Event, wxU(_("Next")) ); \
+        } \
+         \
+        var_Get( p_input, "state", &val ); \
+        if( val.i_int == PAUSE_S ) \
+            popupmenu.Insert( 0, Play_Event, wxU(_("Play")) ); \
+        else \
+            popupmenu.Insert( 0, Pause_Event, wxU(_("Pause")) ); \
+         \
+        vlc_object_release( p_input ); \
+    } \
+    else \
+    { \
+        if( p_playlist && p_playlist->i_size ) \
+        { \
+            popupmenu.InsertSeparator( 0 ); \
+            popupmenu.Insert( 0, Play_Event, wxU(_("Play")) ); \
+        } \
+        if( p_playlist ) vlc_object_release( p_playlist ); \
+    } \
+    \
+    popupmenu.Append( MenuDummy_Event, wxU(_("Miscellaneous")), \
+                      MiscMenu( p_intf ), wxT("") ); \
+
+
+void VideoPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
+                     const wxPoint& pos )
+{
+   POPUP_BOILERPLATE;
+   if( p_input )
     {
-        vlc_value_t val;
-        popupmenu.InsertSeparator( 0 );
-        if (!minimal)
+        vlc_object_yield( p_input );
+        as_varnames.push_back( "video-es" );
+        ai_objects.push_back( p_input->i_object_id );
+        as_varnames.push_back( "spu-es" );
+        ai_objects.push_back( p_input->i_object_id );
+        vlc_object_t *p_vout = (vlc_object_t *)vlc_object_find( p_input,
+                                                VLC_OBJECT_VOUT, FIND_CHILD );
+        if( p_vout )
         {
-        popupmenu.Insert( 0, Stop_Event, wxU(_("Stop")) );
-        popupmenu.Insert( 0, Previous_Event, wxU(_("Previous")) );
-        popupmenu.Insert( 0, Next_Event, wxU(_("Next")) );
+            VideoAutoMenuBuilder( p_vout, ai_objects, as_varnames );
+            vlc_object_release( p_vout );
         }
-
-        var_Get( p_input, "state", &val );
-        if( val.i_int == PAUSE_S )
-            popupmenu.Insert( 0, Play_Event, wxU(_("Play")) );
-        else
-            popupmenu.Insert( 0, Pause_Event, wxU(_("Pause")) );
-
         vlc_object_release( p_input );
     }
-    else
-    {
-        playlist_t * p_playlist =
-            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
-        if( p_playlist && p_playlist->i_size )
-        {
-            popupmenu.InsertSeparator( 0 );
-            popupmenu.Insert( 0, Play_Event, wxU(_("Play")) );
-        }
-        if( p_playlist ) vlc_object_release( p_playlist );
-    }
+    CREATE_POPUP;
+}
 
-    popupmenu.Append( MenuDummy_Event, wxU(_("Miscellaneous")),
-                      MiscMenu( p_intf ), wxT("") );
-    if (!minimal)
+void AudioPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
+                     const wxPoint& pos )
+{
+    POPUP_BOILERPLATE;
+    if( p_input )
     {
+        vlc_object_yield( p_input );
+        as_varnames.push_back( "audio-es" );
+        ai_objects.push_back( p_input->i_object_id );
+        vlc_object_t *p_aout = (vlc_object_t *)vlc_object_find( p_input,
+                                             VLC_OBJECT_AOUT, FIND_ANYWHERE );
+        if( p_aout )
+        {
+            AudioAutoMenuBuilder( p_aout, ai_objects, as_varnames );
+            vlc_object_release( p_aout );
+        }
+        vlc_object_release( p_input );
+    }
+    CREATE_POPUP;
+}
+
+/* Navigation stuff, and general */
+void MiscPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
+                    const wxPoint& pos )
+{
+    int minimal = 0;
+    POPUP_BOILERPLATE;
+    if( p_input )
+    {
+        vlc_object_yield( p_input );
+        as_varnames.push_back( "audio-es" );
+        InputAutoMenuBuilder( VLC_OBJECT(p_input), ai_objects, as_varnames );
+        PUSH_SEPARATOR;
+    }
+    IntfAutoMenuBuilder( p_intf, ai_objects, as_varnames );
+
+    Menu popupmenu( p_intf, PopupMenu_Events );
+    popupmenu.Populate( as_varnames, ai_objects );
+
+    POPUP_STATIC_ENTRIES;
     popupmenu.Append( MenuDummy_Event, wxU(_("Open")),
                       OpenStreamMenu( p_intf ), wxT("") );
-    }
 
     p_intf->p_sys->p_popup_menu = &popupmenu;
     p_parent->PopupMenu( &popupmenu, pos.x, pos.y );
     p_intf->p_sys->p_popup_menu = NULL;
 }
 
+void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
+                const wxPoint& pos )
+{
+    int minimal = config_GetInt( p_intf, "wx-minimal" );
+    POPUP_BOILERPLATE;
+    if( p_input )
+    {
+        vlc_object_yield( p_input );
+        InputAutoMenuBuilder( VLC_OBJECT(p_input), ai_objects, as_varnames );
+
+        /* Video menu */
+        PUSH_SEPARATOR;
+        as_varnames.push_back( "video-es" );
+        ai_objects.push_back( p_input->i_object_id );
+        as_varnames.push_back( "spu-es" );
+        ai_objects.push_back( p_input->i_object_id );
+        vlc_object_t *p_vout = (vlc_object_t *)vlc_object_find( p_input,
+                                                VLC_OBJECT_VOUT, FIND_CHILD );
+        if( p_vout )
+        {
+            VideoAutoMenuBuilder( p_vout, ai_objects, as_varnames );
+            vlc_object_release( p_vout );
+        }
+        /* Audio menu */
+        PUSH_SEPARATOR
+        as_varnames.push_back( "audio-es" );
+        ai_objects.push_back( p_input->i_object_id );
+        vlc_object_t *p_aout = (vlc_object_t *)vlc_object_find( p_input,
+                                             VLC_OBJECT_AOUT, FIND_ANYWHERE );
+        if( p_aout )
+        {
+            AudioAutoMenuBuilder( p_aout, ai_objects, as_varnames );
+            vlc_object_release( p_aout );
+        }
+    }
+
+    /* Interface menu */
+    PUSH_SEPARATOR
+    IntfAutoMenuBuilder( p_intf, ai_objects, as_varnames );
+
+    /* Build menu */
+    Menu popupmenu( p_intf, PopupMenu_Events );
+    popupmenu.Populate( as_varnames, ai_objects );
+    POPUP_STATIC_ENTRIES;
+
+    if (!minimal)
+    {
+        popupmenu.Append( MenuDummy_Event, wxU(_("Open")),
+                          OpenStreamMenu( p_intf ), wxT("") );
+    }
+    p_intf->p_sys->p_popup_menu = &popupmenu;
+    p_parent->PopupMenu( &popupmenu, pos.x, pos.y );
+    p_intf->p_sys->p_popup_menu = NULL;
+}
+
+/*****************************************************************************
+ * Auto menus
+ *****************************************************************************/
 wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 {
-#define MAX_AUDIO_ITEMS 10
-
     vlc_object_t *p_object;
-    char *ppsz_varnames[MAX_AUDIO_ITEMS];
-    int pi_objects[MAX_AUDIO_ITEMS];
-    int i = 0;
-
-    /* Initializations */
-    memset( pi_objects, 0, MAX_AUDIO_ITEMS * sizeof(int) );
+    vector<int> ai_objects;
+    vector<string> as_varnames;
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
-        ppsz_varnames[i] = "audio-es";
-        pi_objects[i++] = p_object->i_object_id;
+        PUSH_VAR( "audio-es" );
         vlc_object_release( p_object );
     }
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
-    if( p_object != NULL )
+    if( p_object )
     {
-        ppsz_varnames[i] = "audio-device";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "audio-channels";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "visual";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "equalizer";
-        pi_objects[i++] = p_object->i_object_id;
+        AudioAutoMenuBuilder( p_object, ai_objects, as_varnames );
         vlc_object_release( p_object );
     }
 
@@ -366,31 +427,23 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
     else
         p_vlc_menu->Clear();
 
-    p_vlc_menu->Populate( i, ppsz_varnames, pi_objects );
+    p_vlc_menu->Populate(  as_varnames, ai_objects );
 
     return p_vlc_menu;
 }
 
 wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 {
-#define MAX_VIDEO_ITEMS 15
-
     vlc_object_t *p_object;
-    char *ppsz_varnames[MAX_VIDEO_ITEMS];
-    int pi_objects[MAX_VIDEO_ITEMS];
-    int i = 0;
-
-    /* Initializations */
-    memset( pi_objects, 0, MAX_VIDEO_ITEMS * sizeof(int) );
+    vector<int> ai_objects;
+    vector<string> as_varnames;
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
-        ppsz_varnames[i] = "video-es";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "spu-es";
-        pi_objects[i++] = p_object->i_object_id;
+        PUSH_VAR( "video-es" );
+        PUSH_VAR( "spu-es" );
         vlc_object_release( p_object );
     }
 
@@ -398,35 +451,7 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
-        vlc_object_t *p_dec_obj;
-
-        ppsz_varnames[i] = "fullscreen";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "zoom";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "deinterlace";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "aspect-ratio";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "crop";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "video-on-top";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "directx-wallpaper";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "video-snapshot";
-        pi_objects[i++] = p_object->i_object_id;
-
-        p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,
-                                                     VLC_OBJECT_DECODER,
-                                                     FIND_PARENT );
-        if( p_dec_obj != NULL )
-        {
-            ppsz_varnames[i] = "ffmpeg-pp-q";
-            pi_objects[i++] = p_dec_obj->i_object_id;
-            vlc_object_release( p_dec_obj );
-        }
-
+        VideoAutoMenuBuilder( p_object, ai_objects, as_varnames );
         vlc_object_release( p_object );
     }
 
@@ -437,49 +462,23 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
     else
         p_vlc_menu->Clear();
 
-    p_vlc_menu->Populate( i, ppsz_varnames, pi_objects );
-
+    p_vlc_menu->Populate(  as_varnames, ai_objects );
     return p_vlc_menu;
 }
 
 wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 {
-#define MAX_NAVIG_ITEMS 15
-
     vlc_object_t *p_object;
-    char *ppsz_varnames[MAX_NAVIG_ITEMS];
-    int pi_objects[MAX_NAVIG_ITEMS];
-    int i = 0;
-
-    /* Initializations */
-    memset( pi_objects, 0, MAX_NAVIG_ITEMS * sizeof(int) );
+    vector<int> ai_objects;
+    vector<string> as_varnames;
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
-        ppsz_varnames[i] = "bookmark";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "title";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "chapter";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "program";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "navigation";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "dvd_menus";
-        pi_objects[i++] = p_object->i_object_id;
-
-        ppsz_varnames[i] = "prev-title";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "next-title";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "prev-chapter";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "next-chapter";
-        pi_objects[i++] = p_object->i_object_id;
-
+        InputAutoMenuBuilder( p_object, ai_objects, as_varnames );
+        PUSH_VAR( "prev-title"); PUSH_VAR ( "next-title" );
+        PUSH_VAR( "prev-chapter"); PUSH_VAR( "next-chapter" );
         vlc_object_release( p_object );
     }
 
@@ -490,7 +489,7 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
     else
         p_vlc_menu->Clear();
 
-    p_vlc_menu->Populate( i, ppsz_varnames, pi_objects );
+    p_vlc_menu->Populate( as_varnames, ai_objects );
 
     return p_vlc_menu;
 }
@@ -498,28 +497,15 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
                       wxMenu *p_menu )
 {
-#define MAX_SETTINGS_ITEMS 10
-
     vlc_object_t *p_object;
-    char *ppsz_varnames[MAX_SETTINGS_ITEMS];
-    int pi_objects[MAX_SETTINGS_ITEMS];
-    int i = 0;
-
-    /* Initializations */
-    memset( pi_objects, 0, MAX_SETTINGS_ITEMS * sizeof(int) );
+    vector<int> ai_objects;
+    vector<string> as_varnames;
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INTF,
                                                 FIND_PARENT );
     if( p_object != NULL )
     {
-#if 0
-#if (wxCHECK_VERSION(2,5,0))
-        ppsz_varnames[i] = "intf-switch";
-        pi_objects[i++] = p_object->i_object_id;
-#endif
-#endif
-        ppsz_varnames[i] = "intf-add";
-        pi_objects[i++] = p_object->i_object_id;
+        PUSH_VAR( "intf-add" );
         vlc_object_release( p_object );
     }
 
@@ -530,7 +516,7 @@ wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
     else
         p_vlc_menu->Clear();
 
-    p_vlc_menu->Populate( i, ppsz_varnames, pi_objects );
+    p_vlc_menu->Populate( as_varnames, ai_objects );
 
     return p_vlc_menu;
 }
@@ -552,7 +538,7 @@ Menu::~Menu()
 /*****************************************************************************
  * Public methods.
  *****************************************************************************/
-void Menu::Populate( int i_count, char **ppsz_varnames, int *pi_objects )
+void Menu::Populate( vector<string> & ras_varnames, vector<int> & rai_objects )
 {
     vlc_object_t *p_object;
     vlc_bool_t b_section_empty = VLC_FALSE;
@@ -560,33 +546,33 @@ void Menu::Populate( int i_count, char **ppsz_varnames, int *pi_objects )
 
     i_item_id = i_start_id;
 
-    for( i = 0; i < i_count; i++ )
+    for( i = 0; i < rai_objects.size() ; i++ )
     {
-        if( !ppsz_varnames[i] )
+        if( ras_varnames[i] == ""  )
         {
             if( b_section_empty )
             {
                 Append( MenuDummy_Event + i, wxU(_("Empty")) );
                 Enable( MenuDummy_Event + i, FALSE );
             }
-
             AppendSeparator();
             b_section_empty = VLC_TRUE;
             continue;
         }
 
-        if( !pi_objects[i] )
+        if( rai_objects[i] == 0  )
         {
-            Append( MenuDummy_Event, wxU(ppsz_varnames[i]) );
+            Append( MenuDummy_Event, wxU(ras_varnames[i].c_str()) );
             b_section_empty = VLC_FALSE;
             continue;
         }
 
-        p_object = (vlc_object_t *)vlc_object_get( p_intf, pi_objects[i] );
+        p_object = (vlc_object_t *)vlc_object_get( p_intf,
+                                                   rai_objects[i] );
         if( p_object == NULL ) continue;
 
         b_section_empty = VLC_FALSE;
-        CreateMenuItem( this, ppsz_varnames[i], p_object );
+        CreateMenuItem( this, ras_varnames[i].c_str(), p_object );
         vlc_object_release( p_object );
     }
 
@@ -693,7 +679,7 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
     }
 
     /* Make sure we want to display the variable */
-    if( IsMenuEmpty( psz_var, p_object ) ) return;
+    if( IsMenuEmpty( psz_var, p_object ) )  return;
 
     /* Get the descriptive name of the variable */
     var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text, NULL );

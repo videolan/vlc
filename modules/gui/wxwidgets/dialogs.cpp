@@ -84,6 +84,9 @@ private:
     void OnOpenSat( wxCommandEvent& event );
 
     void OnPopupMenu( wxCommandEvent& event );
+    void OnAudioPopupMenu( wxCommandEvent& event );
+    void OnVideoPopupMenu( wxCommandEvent& event );
+    void OnMiscPopupMenu( wxCommandEvent& event );
 
     void OnIdle( wxIdleEvent& event );
 
@@ -140,8 +143,16 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnFileInfo)
     EVT_COMMAND(INTF_DIALOG_BOOKMARKS, wxEVT_DIALOG,
                 DialogsProvider::OnBookmarks)
+
     EVT_COMMAND(INTF_DIALOG_POPUPMENU, wxEVT_DIALOG,
                 DialogsProvider::OnPopupMenu)
+    EVT_COMMAND(INTF_DIALOG_AUDIOPOPUPMENU, wxEVT_DIALOG,
+                DialogsProvider::OnAudioPopupMenu)
+    EVT_COMMAND(INTF_DIALOG_VIDEOPOPUPMENU, wxEVT_DIALOG,
+                DialogsProvider::OnVideoPopupMenu)
+    EVT_COMMAND(INTF_DIALOG_MISCPOPUPMENU, wxEVT_DIALOG,
+                DialogsProvider::OnMiscPopupMenu)
+
     EVT_COMMAND(INTF_DIALOG_EXIT, wxEVT_DIALOG,
                 DialogsProvider::OnExitThread)
     EVT_COMMAND(INTF_DIALOG_UPDATEVLC, wxEVT_DIALOG,
@@ -506,6 +517,22 @@ void DialogsProvider::OnPopupMenu( wxCommandEvent& event )
 {
     wxPoint mousepos = ScreenToClient( wxGetMousePosition() );
     ::PopupMenu( p_intf, this, mousepos );
+}
+
+void DialogsProvider::OnAudioPopupMenu( wxCommandEvent& event )
+{
+    wxPoint mousepos = ScreenToClient( wxGetMousePosition() );
+    ::AudioPopupMenu( p_intf, this, mousepos );
+}
+void DialogsProvider::OnVideoPopupMenu( wxCommandEvent& event )
+{
+    wxPoint mousepos = ScreenToClient( wxGetMousePosition() );
+    ::VideoPopupMenu( p_intf, this, mousepos );
+}
+void DialogsProvider::OnMiscPopupMenu( wxCommandEvent& event )
+{
+    wxPoint mousepos = ScreenToClient( wxGetMousePosition() );
+    ::MiscPopupMenu( p_intf, this, mousepos );
 }
 
 void DialogsProvider::OnExitThread( wxCommandEvent& WXUNUSED(event) )

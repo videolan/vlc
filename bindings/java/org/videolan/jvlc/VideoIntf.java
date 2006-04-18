@@ -1,7 +1,7 @@
 /*
  * Created on 28-feb-2006
  *
- * $Id: VideoIntf.java 8 2006-02-28 12:03:47Z little $
+ * $Id$
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public License
