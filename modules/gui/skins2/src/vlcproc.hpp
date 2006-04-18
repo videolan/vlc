@@ -131,6 +131,8 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarFullscreen;
         VarBox m_varVoutSize;
         VariablePtr m_cVarHasVout;
+        /// Variables related to audio
+        VariablePtr m_cVarHasAudio;
         /// Equalizer variables
         EqualizerBands m_varEqBands;
         VariablePtr m_cVarEqPreamp;
@@ -163,6 +165,10 @@ class VlcProc: public SkinObject
 
         /// Refresh audio variables
         void refreshAudio();
+        /// Refresh playlist variables
+        void refreshPlaylist();
+        /// Refresh input variables
+        void refreshInput();
 
         /// Update the stream name variable
         void updateStreamName( playlist_t *p_playlist );

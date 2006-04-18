@@ -108,6 +108,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     REGISTER_VAR( m_cVarHasVout, VarBoolImpl, "vlc.hasVout" )
 
     /* Aout variables */
+    REGISTER_VAR( m_cVarHasAudio, VarBoolImpl, "vlc.hasAudio" )
     REGISTER_VAR( m_cVarVolume, Volume, "volume" )
     REGISTER_VAR( m_cVarMute, VarBoolImpl, "vlc.isMute" )
     REGISTER_VAR( m_cVarEqualizer, VarBoolImpl, "equalizer.isEnabled" )
@@ -241,115 +242,15 @@ void VlcProc::manage()
         pQueue->push( CmdGenericPtr( pCmd ) );
     }
 
-    // Get the VLC variables
-    StreamTime *pTime = (StreamTime*)m_cVarTime.get();
-    VarBoolImpl *pVarPlaying = (VarBoolImpl*)m_cVarPlaying.get();
-    VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
-    VarBoolImpl *pVarPaused = (VarBoolImpl*)m_cVarPaused.get();
-    VarBoolImpl *pVarSeekable = (VarBoolImpl*)m_cVarSeekable.get();
-    VarBoolImpl *pVarRandom = (VarBoolImpl*)m_cVarRandom.get();
-    VarBoolImpl *pVarLoop = (VarBoolImpl*)m_cVarLoop.get();
-    VarBoolImpl *pVarRepeat = (VarBoolImpl*)m_cVarRepeat.get();
-    VarBoolImpl *pVarDvdActive = (VarBoolImpl*)m_cVarDvdActive.get();
-    VarBoolImpl *pVarFullscreen = (VarBoolImpl*)m_cVarFullscreen.get();
-    VarBoolImpl *pVarHasVout = (VarBoolImpl*)m_cVarHasVout.get();
-    VarText *pBitrate = (VarText*)m_cVarStreamBitRate.get();
-    VarText *pSampleRate = (VarText*)m_cVarStreamSampleRate.get();
-
-    // Refresh audio variables
+    refreshPlaylist();
     refreshAudio();
-
-    // Update the input
-    if( getIntf()->p_sys->p_input == NULL )
-    {
-        getIntf()->p_sys->p_input = getIntf()->p_sys->p_playlist->p_input;
-        if( getIntf()->p_sys->p_input )
-            vlc_object_yield( getIntf()->p_sys->p_input );
-    }
-    else if( getIntf()->p_sys->p_input->b_dead )
-    {
-        vlc_object_release( getIntf()->p_sys->p_input );
-        getIntf()->p_sys->p_input = NULL;
-    }
-
-    input_thread_t *pInput = getIntf()->p_sys->p_input;
-
-    if( pInput && !pInput->b_die )
-    {
-        // Refresh time variables
-        vlc_value_t pos;
-        var_Get( pInput, "position", &pos );
-        pTime->set( pos.f_float, false );
-
-        // Get the status of the playlist
-        playlist_status_t status =
-            getIntf()->p_sys->p_playlist->status.i_status;
-
-        pVarPlaying->set( status == PLAYLIST_RUNNING );
-        pVarStopped->set( status == PLAYLIST_STOPPED );
-        pVarPaused->set( status == PLAYLIST_PAUSED );
-
-        pVarSeekable->set( pos.f_float != 0.0 );
-
-        // Refresh DVD detection
-        vlc_value_t chapters_count;
-        var_Change( pInput, "chapter", VLC_VAR_CHOICESCOUNT,
-                    &chapters_count, NULL );
-        pVarDvdActive->set( chapters_count.i_int > 0 );
-
-        // Refresh fullscreen status
-        vout_thread_t *pVout = (vout_thread_t *)vlc_object_find( pInput,
-                VLC_OBJECT_VOUT, FIND_CHILD );
-        pVarHasVout->set( pVout != NULL );
-        if( pVout )
-        {
-            pVarFullscreen->set( pVout->b_fullscreen );
-            vlc_object_release( pVout );
-        }
-
-        // Get the input bitrate
-        int bitrate = var_GetInteger( pInput, "bit-rate" ) / 1000;
-        pBitrate->set( UString::fromInt( getIntf(), bitrate ) );
-
-        // Get the audio sample rate
-        int sampleRate = var_GetInteger( pInput, "sample-rate" ) / 1000;
-        pSampleRate->set( UString::fromInt( getIntf(), sampleRate ) );
-    }
-    else
-    {
-        pVarPlaying->set( false );
-        pVarPaused->set( false );
-        pVarStopped->set( true );
-        pVarSeekable->set( false );
-        pVarDvdActive->set( false );
-        pTime->set( 0, false );
-        pVarFullscreen->set( false );
-        pVarHasVout->set( false );
-    }
-
-    // Refresh the random variable
-    vlc_value_t val;
-    var_Get( getIntf()->p_sys->p_playlist, "random", &val );
-    pVarRandom->set( val.b_bool != 0 );
-
-    // Refresh the loop variable
-    var_Get( getIntf()->p_sys->p_playlist, "loop", &val );
-    pVarLoop->set( val.b_bool != 0 );
-
-    // Refresh the repeat variable
-    var_Get( getIntf()->p_sys->p_playlist, "repeat", &val );
-    pVarRepeat->set( val.b_bool != 0 );
-
-
+    refreshInput();
 }
-
-
 void VlcProc::CmdManage::execute()
 {
     // Just forward to VlcProc
     m_pParent->manage();
 }
-
 
 void VlcProc::refreshAudio()
 {
@@ -397,6 +298,110 @@ void VlcProc::refreshAudio()
     pVarEqualizer->set( pFilters && strstr( pFilters, "equalizer" ) );
 }
 
+void VlcProc::refreshPlaylist()
+{
+    // Get the status of the playlist
+    VarBoolImpl *pVarPlaying = (VarBoolImpl*)m_cVarPlaying.get();
+    VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
+    VarBoolImpl *pVarPaused = (VarBoolImpl*)m_cVarPaused.get();
+    playlist_status_t status =
+             getIntf()->p_sys->p_playlist->status.i_status;
+
+    pVarPlaying->set( status == PLAYLIST_RUNNING );
+    pVarStopped->set( status == PLAYLIST_STOPPED );
+    pVarPaused->set( status == PLAYLIST_PAUSED );
+
+    // Refresh the random variable
+    VarBoolImpl *pVarRandom = (VarBoolImpl*)m_cVarRandom.get();
+    vlc_value_t val;
+    var_Get( getIntf()->p_sys->p_playlist, "random", &val );
+    pVarRandom->set( val.b_bool != 0 );
+
+    // Refresh the loop variable
+    VarBoolImpl *pVarLoop = (VarBoolImpl*)m_cVarLoop.get();
+    var_Get( getIntf()->p_sys->p_playlist, "loop", &val );
+    pVarLoop->set( val.b_bool != 0 );
+
+    // Refresh the repeat variable
+    VarBoolImpl *pVarRepeat = (VarBoolImpl*)m_cVarRepeat.get();
+    var_Get( getIntf()->p_sys->p_playlist, "repeat", &val );
+    pVarRepeat->set( val.b_bool != 0 );
+}
+
+void VlcProc::refreshInput()
+{
+    StreamTime *pTime = (StreamTime*)m_cVarTime.get();
+    VarBoolImpl *pVarSeekable = (VarBoolImpl*)m_cVarSeekable.get();
+    VarBoolImpl *pVarDvdActive = (VarBoolImpl*)m_cVarDvdActive.get();
+    VarBoolImpl *pVarHasVout = (VarBoolImpl*)m_cVarHasVout.get();
+    VarBoolImpl *pVarHasAudio = (VarBoolImpl*)m_cVarHasAudio.get();
+    VarText *pBitrate = (VarText*)m_cVarStreamBitRate.get();
+    VarText *pSampleRate = (VarText*)m_cVarStreamSampleRate.get();
+    VarBoolImpl *pVarFullscreen = (VarBoolImpl*)m_cVarFullscreen.get();
+
+    // Update the input
+    if( getIntf()->p_sys->p_input == NULL )
+    {
+        getIntf()->p_sys->p_input = getIntf()->p_sys->p_playlist->p_input;
+        if( getIntf()->p_sys->p_input )
+            vlc_object_yield( getIntf()->p_sys->p_input );
+    }
+    else if( getIntf()->p_sys->p_input->b_dead )
+    {
+        vlc_object_release( getIntf()->p_sys->p_input );
+        getIntf()->p_sys->p_input = NULL;
+    }
+
+    input_thread_t *pInput = getIntf()->p_sys->p_input;
+
+    if( pInput && !pInput->b_die )
+    {
+        // Refresh time variables
+        vlc_value_t pos;
+        var_Get( pInput, "position", &pos );
+        pTime->set( pos.f_float, false );
+        pVarSeekable->set( pos.f_float != 0.0 );
+
+        // Refresh DVD detection
+        vlc_value_t chapters_count;
+        var_Change( pInput, "chapter", VLC_VAR_CHOICESCOUNT,
+                        &chapters_count, NULL );
+        pVarDvdActive->set( chapters_count.i_int > 0 );
+
+        // Get the input bitrate
+        int bitrate = var_GetInteger( pInput, "bit-rate" ) / 1000;
+        pBitrate->set( UString::fromInt( getIntf(), bitrate ) );
+
+        // Get the audio sample rate
+        int sampleRate = var_GetInteger( pInput, "sample-rate" ) / 1000;
+        pSampleRate->set( UString::fromInt( getIntf(), sampleRate ) );
+
+        // Do we have audio
+        vlc_value_t audio_es;
+        var_Change( pInput, "audio-es", VLC_VAR_CHOICESCOUNT,
+                        &audio_es, NULL );
+        pVarHasAudio->set( audio_es.i_int > 0 );
+
+        // Refresh fullscreen status
+        vout_thread_t *pVout = (vout_thread_t *)vlc_object_find( pInput,
+                                     VLC_OBJECT_VOUT, FIND_CHILD );
+        pVarHasVout->set( pVout != NULL );
+        if( pVout )
+        {
+            pVarFullscreen->set( pVout->b_fullscreen );
+            vlc_object_release( pVout );
+        }
+    }
+    else
+    {
+        pVarSeekable->set( false );
+        pVarDvdActive->set( false );
+        pTime->set( 0, false );
+        pVarFullscreen->set( false );
+        pVarHasAudio->set( false );
+        pVarHasVout->set( false );
+    }
+}
 
 int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldVal, vlc_value_t newVal,
