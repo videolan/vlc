@@ -218,8 +218,14 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         if( windowId == "playlist_window" &&
             !config_GetInt( getIntf(), "skinned-playlist") )
         {
-            /// \todo Mux commands: hide_window and dialog playlist to make sure the window is hidden
-            pCommand = new CmdDlgPlaylist( getIntf() );
+            list<CmdGeneric *> list;
+            list.push_back( new CmdDlgPlaylist( getIntf() ) );
+            TopWindow *pWin = pTheme->getWindowById( windowId );
+            if( pWin )
+                list.push_back( new CmdHideWindow( getIntf(),
+                                                   pTheme->getWindowManager(),
+                                                   *pWin ) );
+            pCommand = new CmdMuxer( getIntf(), list );
         }
         else
         {
@@ -253,8 +259,14 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         if( windowId == "playlist_window" &&
            ! config_GetInt( getIntf(), "skinned-playlist") )
         {
-            /// \todo Mux commands: hide_window and dialog playlist to make sure the window is hidden
-            pCommand = new CmdDlgPlaylist( getIntf() );
+            list<CmdGeneric *> list;
+            list.push_back( new CmdDlgPlaylist( getIntf() ) );
+            TopWindow *pWin = pTheme->getWindowById( windowId );
+            if( pWin )
+                list.push_back( new CmdHideWindow( getIntf(),
+                                                   pTheme->getWindowManager(),
+                                                   *pWin ) );
+            pCommand = new CmdMuxer( getIntf(), list );
         }
         else
         {
