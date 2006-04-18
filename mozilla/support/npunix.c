@@ -58,9 +58,6 @@
 #define PLUGINDEBUGSTR(msg)
 #endif
 
-#define PLUGIN_TO_HOST_GLUE(name, fp) (fp)
-#define HOST_TO_PLUGIN_GLUE(name, fp) (fp)
-
 /***********************************************************************
  *
  * Globals
@@ -702,7 +699,7 @@ NP_Initialize(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs)
         pluginFuncs->getvalue   = NewNPP_GetValueProc(Private_GetValue);
         if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
         {   
-            pluginFuncs->urlnotify = NewNPP_URLNotifyProc(PLUGIN_TO_HOST_GLUE(urlnotify, Private_URLNotify));           
+            pluginFuncs->urlnotify = NewNPP_URLNotifyProc(Private_URLNotify);           
         }
 #ifdef OJI
         if( navMinorVers >= NPVERS_HAS_LIVECONNECT )
