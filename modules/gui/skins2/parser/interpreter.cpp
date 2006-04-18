@@ -60,7 +60,12 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "dialogs.prefs()", CmdDlgPrefs )
     REGISTER_CMD( "dialogs.fileInfo()", CmdDlgFileInfo )
     REGISTER_CMD( "dialogs.streamingWizard()", CmdDlgStreamingWizard )
+
     REGISTER_CMD( "dialogs.popup()", CmdDlgShowPopupMenu )
+    REGISTER_CMD( "dialogs.audioPopup()", CmdDlgShowAudioPopupMenu )
+    REGISTER_CMD( "dialogs.videoPopup()", CmdDlgShowVideoPopupMenu )
+    REGISTER_CMD( "dialogs.miscPopup()", CmdDlgShowMiscPopupMenu )
+
     REGISTER_CMD( "dvd.nextTitle()", CmdDvdNextTitle )
     REGISTER_CMD( "dvd.previousTitle()", CmdDvdPreviousTitle )
     REGISTER_CMD( "dvd.nextChapter()", CmdDvdNextChapter )

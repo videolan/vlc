@@ -57,7 +57,6 @@ void Dialogs::showChangeSkinCB( intf_dialog_args_t *pArg )
     }
 }
 
-
 void Dialogs::showPlaylistLoadCB( intf_dialog_args_t *pArg )
 {
     intf_thread_t *pIntf = (intf_thread_t *)pArg->p_arg;
@@ -97,7 +96,7 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     Dialogs *p_dialogs = (Dialogs *)param;
-    p_dialogs->showPopupMenu( new_val.b_bool != 0 );
+    p_dialogs->showPopupMenu( new_val.b_bool != 0, INTF_DIALOG_POPUPMENU );
 
     return VLC_SUCCESS;
 }
@@ -337,11 +336,11 @@ void Dialogs::showStreamingWizard()
 }
 
 
-void Dialogs::showPopupMenu( bool bShow )
+void Dialogs::showPopupMenu( bool bShow, int popupType = INTF_DIALOG_POPUPMENU )
 {
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
-        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_POPUPMENU,
+        m_pProvider->pf_show_dialog( m_pProvider, popupType,
                                      (int)bShow, 0 );
     }
 }

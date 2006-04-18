@@ -89,8 +89,8 @@ class Dialogs: public SkinObject
         /// Show the Playlist
         void showPlaylist();
 
-        /// Show the popup menu
-        void showPopupMenu( bool bShow );
+        /// Show a popup menu
+        void showPopupMenu( bool bShow, int popupType );
 
         /// Show an interaction dialog
         void showInteraction( interaction_dialog_t * );

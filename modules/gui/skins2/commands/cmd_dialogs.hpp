@@ -42,8 +42,7 @@ typedef CmdDialogs<5> CmdDlgNet;
 typedef CmdDialogs<6> CmdDlgMessages;
 typedef CmdDialogs<7> CmdDlgPrefs;
 typedef CmdDialogs<8> CmdDlgFileInfo;
-typedef CmdDialogs<9> CmdDlgShowPopupMenu;
-typedef CmdDialogs<10> CmdDlgHidePopupMenu;
+
 typedef CmdDialogs<11> CmdDlgAdd;
 typedef CmdDialogs<12> CmdDlgPlaylistLoad;
 typedef CmdDialogs<13> CmdDlgPlaylistSave;
@@ -52,6 +51,15 @@ typedef CmdDialogs<15> CmdDlgStreamingWizard;
 typedef CmdDialogs<16> CmdDlgPlaytreeLoad;
 typedef CmdDialogs<17> CmdDlgPlaytreeSave;
 typedef CmdDialogs<18> CmdDlgPlaylist;
+
+typedef CmdDialogs<30> CmdDlgShowPopupMenu;
+typedef CmdDialogs<31> CmdDlgHidePopupMenu;
+typedef CmdDialogs<32> CmdDlgShowAudioPopupMenu;
+typedef CmdDialogs<33> CmdDlgHideAudioPopupMenu;
+typedef CmdDialogs<34> CmdDlgShowVideoPopupMenu;
+typedef CmdDialogs<35> CmdDlgHideVideoPopupMenu;
+typedef CmdDialogs<36> CmdDlgShowMiscPopupMenu;
+typedef CmdDialogs<37> CmdDlgHideMiscPopupMenu;
 
 
 /// Generic "Open dialog" command
@@ -98,13 +106,7 @@ class CmdDialogs: public CmdGeneric
                 case 8:
                     pDialogs->showFileInfo();
                     break;
-                case 9:
-                    pDialogs->showPopupMenu( true );
-                    break;
-                case 10:
-                    pDialogs->showPopupMenu( false );
-                    break;
-                case 11:
+               case 11:
                     pDialogs->showFile( false );
                     break;
                 case 12:
@@ -121,6 +123,30 @@ class CmdDialogs: public CmdGeneric
                     break;
                 case 18:
                     pDialogs->showPlaylist();
+                    break;
+                case 30:
+                    pDialogs->showPopupMenu( true, INTF_DIALOG_POPUPMENU );
+                    break;
+                case 31:
+                    pDialogs->showPopupMenu( false, INTF_DIALOG_POPUPMENU );
+                    break;
+                case 32:
+                    pDialogs->showPopupMenu( true, INTF_DIALOG_AUDIOPOPUPMENU );
+                    break;
+                case 33:
+                    pDialogs->showPopupMenu( false,INTF_DIALOG_AUDIOPOPUPMENU );
+                    break;
+                case 34:
+                    pDialogs->showPopupMenu( true, INTF_DIALOG_VIDEOPOPUPMENU );
+                    break;
+                case 35:
+                    pDialogs->showPopupMenu( false,INTF_DIALOG_VIDEOPOPUPMENU );
+                    break;
+                 case 36:
+                    pDialogs->showPopupMenu( true, INTF_DIALOG_MISCPOPUPMENU );
+                    break;
+                case 37:
+                    pDialogs->showPopupMenu( false,INTF_DIALOG_MISCPOPUPMENU );
                     break;
                 default:
                     msg_Warn( getIntf(), "unknown dialog type" );
