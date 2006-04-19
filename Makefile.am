@@ -840,6 +840,9 @@ package-macosx:
 
 # Copy relevant files 
 	cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/vlc-${VERSION}/VLC.app"
+if BUILD_MOZILLA
+	cp -R "$(top_builddir)/mozilla/VLC Plugin.plugin" "$(top_builddir)/vlc-${VERSION}/VLC Plugin.plugin"
+endif
 	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/vlc-${VERSION}/ && cp -R extras/MacOSX/Delete_Preferences.app $(top_builddir)/vlc-${VERSION}/
 
 # Create disk image 
