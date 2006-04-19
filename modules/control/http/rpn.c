@@ -978,6 +978,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 {
                     psz_val = vlc_input_item_GetInfo( p_item,
                                 _(VLC_META_INFO_CAT), _(VLC_META_TITLE) );
+                    if( psz_val == NULL )
+                        psz_val == strdup( p_item->psz_name );
                 }
                 else if( !strcmp( psz_meta, "ALBUM" ) )
                 {
