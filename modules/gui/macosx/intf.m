@@ -967,15 +967,16 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         if( ( b_input = ( p_input != NULL ) ) )
         {
+            vlc_object_yield( p_input );
             /* seekable streams */
-            var_Get( p_input, "seekable", &val);
-            b_seekable = val.b_bool;
+            b_seekable = var_GetBool( p_input, "seekable" );
 
             /* check wether slow/fast motion is possible*/
             b_control = p_input->input.b_can_pace_control;
 
             /* chapters & titles */
             //b_chapters = p_input->stream.i_area_nb > 1;
+            vlc_object_release( p_input );
         }
 
         [o_btn_stop setEnabled: b_input];
