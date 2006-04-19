@@ -135,6 +135,13 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
                             i_options );
 }
 
+int libvlc_playlist_delete_item( libvlc_instance_t *p_instance, int i_id,
+                                 libvlc_exception_t *p_exception )
+{
+    return playlist_Delete( p_instance->p_playlist, i_id );
+}
+
+
 int libvlc_playlist_isplaying( libvlc_instance_t *p_instance,
                                libvlc_exception_t *p_exception )
 {
