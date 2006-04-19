@@ -772,6 +772,13 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                                                     frame: s_arg_frame];
     [self updateTitle];
     [view setFrame: [self frame]];
+
+    if( var_GetBool( p_real_vout, "video-on-top" ) )
+    {
+        [o_window setLevel: NSStatusWindowLevel];
+    }
+
+
     [o_window setAcceptsMouseMovedEvents: TRUE];
     return b_return;
 }
@@ -853,6 +860,12 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         o_window = [self window];
         [o_window makeKeyAndOrderFront: self];
         [o_window setAcceptsMouseMovedEvents: TRUE];
+
+        if( var_GetBool( p_real_vout, "video-on-top" ) )
+        {
+            [o_window setLevel: NSStatusWindowLevel];
+        }
+
         [view setFrameSize: [self frame].size];
     }
     return b_return;
@@ -1056,11 +1069,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
               defer: YES screen: o_screen];
 
         [self setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
-
-        if( var_GetBool( p_real_vout, "video-on-top" ) )
-        {
-            [self setLevel: NSStatusWindowLevel];
-        }
 
         if( !s_frame )
         {
