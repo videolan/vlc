@@ -5130,7 +5130,7 @@ dnl
 if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
 then
     AC_CHECK_LIB(unicows, LoadUnicowsSymbol, [
-        VLC_ADD_LDFLAGS([vlc],[-lunicows])
+        VLC_ADD_LDFLAGS([vlc],[-Wl,--exclude-libs,libunicows.a -lunicows])
     ])
 fi
 
