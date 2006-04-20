@@ -76,9 +76,13 @@ static VLAboutBox *_o_sharedInstance = nil;
         o_version = [o_info_dict objectForKey:@"CFBundleVersion"];
         
         /* setup the creator / revision field */
+        if( VLC_Changeset() != "exported" )
         [o_revision_field setStringValue: [NSString stringWithFormat: \
             _NS("Compiled by %s, based on SVN revision %s"), VLC_CompileBy(), \
             VLC_Changeset()]];
+        else
+        [o_revision_field setStringValue: [NSString stringWithFormat: \
+            _NS("Compiled by %s"), VLC_CompileBy()]];
     
         /* Setup the nameversion field */
         o_name_version = [NSString stringWithFormat:@"Version %@", o_version];
