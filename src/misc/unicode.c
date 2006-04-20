@@ -914,7 +914,7 @@ char *FromUTF16( const uint16_t *src )
 
     /* determine the size of the string */
     for( len = 1, in = src; *in; len++ )
-        in += 2;
+        in++;
 
     return UTF16toUTF8( src, len, NULL );
 }
