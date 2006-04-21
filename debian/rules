@@ -86,16 +86,6 @@ vlc_confflags += --enable-glide
 vlc_confflags += --enable-svgalib
 endif
 
-# We need this hack for i386 and amd64
-ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU),i386)
-CC = $(shell pwd)/debian/gcc-snapshot
-export CC
-endif
-ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU),amd64)
-CC = $(shell pwd)/debian/gcc-snapshot
-export CC
-endif
-
 # Remove --without-dvdcss in non-totalitarian countries
 vlc_confflags += --enable-dvd --without-dvdcss
 
