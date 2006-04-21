@@ -33,7 +33,6 @@ vlc_confflags += \
 	--enable-a52 \
 	--enable-aa \
 	--enable-dvbpsi \
-	--enable-xosd \
 	--enable-mozilla \
 	--disable-kde \
 	--enable-mp4 \
@@ -74,6 +73,8 @@ vlc_confflags += \
 	--enable-vcd \
 	--enable-vcdx \
 	$(NULL)
+
+#	--enable-xosd \
 
 # These ones are currently shipped with VLC
 vlc_confflags += --enable-faad --with-faad-tree=extras/faad2
