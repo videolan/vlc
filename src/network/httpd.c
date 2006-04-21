@@ -2232,7 +2232,7 @@ static void httpd_HostThread( httpd_host_t *host )
 
                             /* FIXME: lots of code duplication */
                             p += sprintf( (char *)p,
-                                "<?xml version=\"1.0\" encoding=\"ascii\" ?>"
+                                "<?xml version=\"1.0\" encoding=\"us-ascii\" ?>"
                                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
                                 "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
                                 "<html>\n"
@@ -2242,7 +2242,7 @@ static void httpd_HostThread( httpd_host_t *host )
                                 "<body>\n"
                                 "<h1>403 Forbidden (%s)</h1>\n"
                                 "<hr />\n"
-                                "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
+                                "<p><a href=\"http://www.videolan.org\">VideoLAN</a></p>\n"
                                 "</body>\n"
                                 "</html>\n", query->psz_url );
                         }
@@ -2252,7 +2252,7 @@ static void httpd_HostThread( httpd_host_t *host )
                             answer->psz_status = strdup( "Authorization Required" );
 
                             p += sprintf( (char *)p,
-                                "<?xml version=\"1.0\" encoding=\"ascii\" ?>"
+                                "<?xml version=\"1.0\" encoding=\"us-ascii\" ?>"
                                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
                                 "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
                                 "<html>\n"
@@ -2262,7 +2262,7 @@ static void httpd_HostThread( httpd_host_t *host )
                                 "<body>\n"
                                 "<h1>401 Authorization Required (%s)</h1>\n"
                                 "<hr />\n"
-                                "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
+                                "<p><a href=\"http://www.videolan.org\">VideoLAN</a></p>\n"
                                 "</body>\n"
                                 "</html>\n", query->psz_url );
                         }
@@ -2273,7 +2273,7 @@ static void httpd_HostThread( httpd_host_t *host )
                             answer->psz_status = strdup( "Not found" );
 
                             p += sprintf( (char *)p,
-                                "<?xml version=\"1.0\" encoding=\"ascii\" ?>"
+                                "<?xml version=\"1.0\" encoding=\"us-ascii\" ?>"
                                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
                                 "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
                                 "<html>\n"
@@ -2283,7 +2283,7 @@ static void httpd_HostThread( httpd_host_t *host )
                                 "<body>\n"
                                 "<h1>404 Resource not found(%s)</h1>\n"
                                 "<hr />\n"
-                                "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
+                                "<p><a href=\"http://www.videolan.org\"> VideoLAN</a></p>\n"
                                 "</body>\n"
                                 "</html>\n", query->psz_url );
                         }
@@ -2291,6 +2291,7 @@ static void httpd_HostThread( httpd_host_t *host )
                         answer->i_body = p - answer->p_body;
                         cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
                         httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
+                        httpd_MsgAdd( answer, "Content-Type", "%s", "text/html" );
                     }
 
                     cl->i_state = HTTPD_CLIENT_SENDING;
