@@ -333,7 +333,6 @@ static int DemuxStation( demux_t *p_demux )
     while( xml_ReaderRead( p_sys->p_xml_reader ) == 1 )
     {
         int i_type;
-        printf("AAA\n");
 
         // Get the node type
         i_type = xml_ReaderNodeType( p_sys->p_xml_reader );

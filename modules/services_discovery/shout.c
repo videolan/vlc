@@ -79,10 +79,7 @@ vlc_module_end();
 
 struct services_discovery_sys_t
 {
-    /* playlist node */
-    playlist_item_t *p_node;
     playlist_item_t *p_item;
-    int i_limit;
     vlc_bool_t b_dialog;
 };
 
@@ -107,9 +104,6 @@ static int Open( vlc_object_t *p_this )
     playlist_view_t     *p_view;
     playlist_item_t     *p_item;
 
-    char *psz_shoutcast_url;
-    char *psz_shoutcast_title;
-
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
@@ -122,30 +116,16 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    psz_shoutcast_url = (char *)malloc( strlen( SHOUTCAST_BASE_URL ) + 20 );
-    psz_shoutcast_title = (char *)malloc( 6 + 20 );
-
-    sprintf( psz_shoutcast_url, SHOUTCAST_BASE_URL );
-    sprintf( psz_shoutcast_title, "Shoutcast", p_sys->i_limit );
-
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
-    p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
-                                         _("Shoutcast"), p_view->p_root );
-    p_item = playlist_ItemNew( p_playlist, psz_shoutcast_url,
-                                     psz_shoutcast_title );
-    free( psz_shoutcast_url );
-    free( psz_shoutcast_title );
-    playlist_NodeAddItem( p_playlist, p_item,
-                          p_sys->p_node->pp_parents[0]->i_view,
-                          p_sys->p_node, PLAYLIST_APPEND,
+
+    p_sys->p_item =
+    p_item = playlist_ItemNew( p_playlist, SHOUTCAST_BASE_URL, _("Shoutcast") );
+    playlist_NodeAddItem( p_playlist, p_item, p_view->i_id,
+                          p_view->p_root, PLAYLIST_APPEND,
                           PLAYLIST_END );
 
-    /* We need to declare the parents of the node as the same of the
-     * parent's ones */
-    playlist_CopyParents( p_sys->p_node, p_item );
+    p_sys->p_item->i_flags |= PLAYLIST_RO_FLAG;
 
-    p_sys->p_item = p_item;
-    p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
 
@@ -165,7 +145,7 @@ static void Close( vlc_object_t *p_this )
                                  VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist )
     {
-        playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE, VLC_TRUE );
+        playlist_NodeDelete( p_playlist, p_sys->p_item, VLC_TRUE, VLC_TRUE );
         vlc_object_release( p_playlist );
     }
     free( p_sys );
@@ -197,7 +177,7 @@ static void Run( services_discovery_t *p_sd )
             if( i_state == PLAYING_S )
             {
                 float f_pos = (float)(p_sys->p_item->i_children)* 2 *100.0 /
-                              (float)(p_sys->i_limit);
+                              260 /* gruiiik FIXME */;
                 intf_UserProgressUpdate( p_sd, i_dialog_id, "Downloading",
                                          f_pos );
             }
