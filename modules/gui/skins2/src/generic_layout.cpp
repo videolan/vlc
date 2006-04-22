@@ -27,6 +27,7 @@
 #include "os_factory.hpp"
 #include "os_graphics.hpp"
 #include "../controls/ctrl_generic.hpp"
+#include "../controls/ctrl_video.hpp"
 
 
 GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
@@ -34,7 +35,7 @@ GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
                               int maxHeight ):
     SkinObject( pIntf ), m_pWindow( NULL ), m_width( width ),
     m_height( height ), m_minWidth( minWidth ), m_maxWidth( maxWidth ),
-    m_minHeight( minHeight ), m_maxHeight( maxHeight )
+    m_minHeight( minHeight ), m_maxHeight( maxHeight ), m_pVideoControl( NULL )
 {
     // Get the OSFactory
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
@@ -106,6 +107,12 @@ void GenericLayout::addControl( CtrlGeneric *pControl,
         if( it == m_controlList.end() )
         {
             m_controlList.push_back( LayeredControl( pControl, layer ) );
+        }
+
+        // Check if it is a video control
+        if( pControl->getType() == "video" )
+        {
+            m_pVideoControl = (CtrlVideo*)pControl;
         }
     }
     else
@@ -200,7 +207,6 @@ void GenericLayout::resize( int width, int height )
         pWindow->refresh( 0, 0, width, height );
         pWindow->resize( width, height );
         pWindow->refresh( 0, 0, width, height );
-
         // Change the shape of the window and redraw it
         pWindow->updateShape();
         pWindow->refresh( 0, 0, width, height );
@@ -226,10 +232,6 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
         if( pPos && pCtrl->isVisible() )
         {
             pCtrl->draw( *m_pImage, pPos->getLeft(), pPos->getTop() );
-            // Remember the video control (we assume there is at most one video
-            // control per layout)
-            if( pCtrl->getType() == "video" && pCtrl->getPosition() )
-                iterVideo = iter;
         }
     }
 
@@ -248,7 +250,7 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
             height = m_height - y;
 
         // Refresh the window... but do not paint on a video control!
-        if( iterVideo == m_controlList.end() )
+        if( !m_pVideoControl )
         {
             // No video control, we can safely repaint the rectangle
             pWindow->refresh( x, y, width, height );
@@ -263,10 +265,10 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
             // becomes a real mess :)
 
             // Use short variable names for convenience
-            int xx = iterVideo->m_pControl->getPosition()->getLeft();
-            int yy = iterVideo->m_pControl->getPosition()->getTop();
-            int ww = iterVideo->m_pControl->getPosition()->getWidth();
-            int hh = iterVideo->m_pControl->getPosition()->getHeight();
+            int xx = m_pVideoControl->getPosition()->getLeft();
+            int yy = m_pVideoControl->getPosition()->getTop();
+            int ww = m_pVideoControl->getPosition()->getWidth();
+            int hh = m_pVideoControl->getPosition()->getHeight();
 
             // Top part:
             if( y < yy )
@@ -294,5 +296,26 @@ const list<Anchor*>& GenericLayout::getAnchorList() const
 void GenericLayout::addAnchor( Anchor *pAnchor )
 {
     m_anchorList.push_back( pAnchor );
+}
+
+
+void GenericLayout::onShow()
+{
+    refreshAll();
+    // TODO find a better way to handle the vout ?
+    if( m_pVideoControl )
+    {
+        m_pVideoControl->setVisible( true );
+    }
+}
+
+
+void GenericLayout::onHide()
+{
+    // TODO find a better way to handle the vout ?
+    if( m_pVideoControl )
+    {
+        m_pVideoControl->setVisible( false );
+    }
 }
 

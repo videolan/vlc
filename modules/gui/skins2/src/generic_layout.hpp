@@ -35,6 +35,7 @@
 class Anchor;
 class OSGraphics;
 class CtrlGeneric;
+class CtrlVideo;
 
 
 /// Control and its associated layer
@@ -121,6 +122,12 @@ class GenericLayout: public SkinObject, public Box
         /// Add an anchor to this layout
         virtual void addAnchor( Anchor *pAnchor );
 
+        /// Called when the layout is shown
+        virtual void onShow();
+
+        /// Called when the layout is hidden
+        virtual void onHide();
+
     private:
         /// Parent window of the layout
         TopWindow *m_pWindow;
@@ -132,6 +139,8 @@ class GenericLayout: public SkinObject, public Box
         OSGraphics *m_pImage;
         /// List of the controls in the layout
         list<LayeredControl> m_controlList;
+        //// Video control
+        CtrlVideo *m_pVideoControl;
         /// List of the anchors in the layout
         list<Anchor*> m_anchorList;
 };

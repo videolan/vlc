@@ -58,6 +58,9 @@ class CtrlVideo: public CtrlGeneric, public Observer<VarBox, void*>
         /// Method called when the vout size is updated
         virtual void onUpdate( Subject<VarBox,void*> &rVoutSize, void* );
 
+        /// Called by the layout when the control is show/hidden
+        void setVisible( bool visible );
+
     private:
         /// Vout window
         VoutWindow *m_pVout;

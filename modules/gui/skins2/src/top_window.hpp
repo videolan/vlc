@@ -85,6 +85,9 @@ class TopWindow: public GenericWindow
         /// Actually show the window
         virtual void innerShow();
 
+        /// Actually hide the window
+        virtual void innerHide();
+
     private:
         /// Change the active layout
         virtual void setActiveLayout( GenericLayout *pLayout );

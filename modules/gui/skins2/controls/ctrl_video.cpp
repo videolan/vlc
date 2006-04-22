@@ -96,15 +96,6 @@ void CtrlVideo::draw( OSGraphics &rImage, int xDest, int yDest )
         // Draw a black rectangle under the video to avoid transparency
         rImage.fillRect( pPos->getLeft(), pPos->getTop(), pPos->getWidth(),
                          pPos->getHeight(), 0 );
-
-        // Create a child window for the vout if it doesn't exist yet
-        if (!m_pVout)
-        {
-            m_pVout = new VoutWindow( getIntf(), pPos->getLeft(),
-                                      pPos->getTop(), false, false, *pParent );
-            m_pVout->resize( pPos->getWidth(), pPos->getHeight() );
-            m_pVout->show();
-        }
     }
 }
 
@@ -120,5 +111,28 @@ void CtrlVideo::onUpdate( Subject<VarBox, void *> &rVoutSize, void *arg )
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
     pQueue->push( CmdGenericPtr( pCmd ) );
+}
+
+
+void CtrlVideo::setVisible( bool visible )
+{
+    if( visible )
+    {
+        GenericWindow *pParent = getWindow();
+        const Position *pPos = getPosition();
+        // Create a child window for the vout if it doesn't exist yet
+        if( !m_pVout && pParent && pPos )
+        {
+            m_pVout = new VoutWindow( getIntf(), pPos->getLeft(),
+                                      pPos->getTop(), false, false, *pParent );
+            m_pVout->resize( pPos->getWidth(), pPos->getHeight() );
+            m_pVout->show();
+        }
+    }
+    else
+    {
+        delete m_pVout;
+        m_pVout = NULL;
+    }
 }
 
