@@ -9,6 +9,7 @@ SOURCES_playlist = \
 	podcast.c \
 	xspf.c \
 	xspf.h \
+	shoutcast.c \
 	$(NULL)
 
 

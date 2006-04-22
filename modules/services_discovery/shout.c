@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
+ *          Antoine Cellerier <dionoea -@T- videolan -d.t- org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +49,7 @@
  ************************************************************************/
 
 #define MAX_LINE_LENGTH 256
-
+#define SHOUTCAST_BASE_URL "http/shout-winamp://www.shoutcast.com/sbin/newxml.phtml"
 
 /*****************************************************************************
  * Module descriptor
@@ -58,19 +59,13 @@
     static int  Open ( vlc_object_t * );
     static void Close( vlc_object_t * );
 
-#define LIMIT_TEXT N_("Number of streams")
-/// \bug [String] -which would be listed + to list
-#define LIMIT_LONGTEXT N_("Maximum number of Shoutcast radio streams which " \
-                          "would be listed.")
-
 vlc_module_begin();
     set_shortname( "Shoutcast");
     set_description( _("Shoutcast radio listings") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
-    add_integer( "shoutcast-limit", 1000, NULL, LIMIT_TEXT,
-                    LIMIT_LONGTEXT, VLC_TRUE );
+    add_suppressed_integer( "shoutcast-limit" );
 
     set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );
@@ -127,13 +122,11 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->i_limit = config_GetInt( p_this->p_libvlc, "shoutcast-limit" );
-    #define SHOUTCAST_BASE_URL "http/shout-b4s://www.shoutcast.com/sbin/xmllister.phtml?service=vlc&no_compress=1&limit="
     psz_shoutcast_url = (char *)malloc( strlen( SHOUTCAST_BASE_URL ) + 20 );
     psz_shoutcast_title = (char *)malloc( 6 + 20 );
 
-    sprintf( psz_shoutcast_url, SHOUTCAST_BASE_URL "%d", p_sys->i_limit );
-    sprintf( psz_shoutcast_title, "Top %d", p_sys->i_limit );
+    sprintf( psz_shoutcast_url, SHOUTCAST_BASE_URL );
+    sprintf( psz_shoutcast_title, "Shoutcast", p_sys->i_limit );
 
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
     p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,

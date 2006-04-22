@@ -90,6 +90,11 @@ vlc_module_begin();
         add_shortcut( "xspf-open" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(xspf_import_Activate), NULL );
+    add_submodule();
+        set_description( _("New winamp 5.2 shoutcast import") );
+        add_shortcut( "shout-winamp" );
+        set_capability( "demux2", 10 );
+        set_callbacks( E_(Import_Shoutcast), E_(Close_Shoutcast) );
 vlc_module_end();
 
 
