@@ -254,6 +254,55 @@ FunctionEnd
   !undef Index
 !macroend
 
+Var UninstallLog
+
+!macro InstallFile FILEREGEX
+  File "${FILEREGEX}"
+  !define Index 'Line${__LINE__}'
+  FindFirst $0 $1 "$INSTDIR\${FILEREGEX}"
+  StrCmp $0 "" "${Index}-End"
+  "${Index}-Loop:"
+    StrCmp $1 "" "${Index}-End"
+    FileWrite $UninstallLog "$1$\r$\n"
+    FindNext $0 $1
+    Goto "${Index}-Loop"
+  "${Index}-End:"
+  !undef Index
+!macroend
+
+!macro InstallFolder FOLDER
+  File /r "${FOLDER}"
+  Push "${FOLDER}"
+  Call InstallFolderInternal
+!macroend
+
+Function InstallFolderInternal
+  Pop $9
+  !define Index 'Line${__LINE__}'
+  FindFirst $0 $1 "$INSTDIR\$9\*"
+  StrCmp $0 "" "${Index}-End"
+  "${Index}-Loop:"
+    StrCmp $1 "" "${Index}-End"
+    StrCmp $1 "." "${Index}-Next"
+    StrCmp $1 ".." "${Index}-Next"
+    IfFileExists "$9\$1\*" 0 "${Index}-Write"
+      Push $0
+      Push $9
+      Push "$9\$1"
+      Call InstallFolderInternal
+      Pop $9
+      Pop $0
+      Goto "${Index}-Next"
+    "${Index}-Write:"
+    FileWrite $UninstallLog "$9\$1$\r$\n"
+    "${Index}-Next:"
+    FindNext $0 $1
+    Goto "${Index}-Loop"
+  "${Index}-End:"
+  !undef Index
+FunctionEnd
+
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ; Installer sections ;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -263,16 +312,29 @@ Section "Media player (required)" SEC01
   SetShellVarContext all
   SetOutPath "$INSTDIR"
 
-  File  vlc.exe
-  File  vlc.exe.manifest
-  @FILE_LIBVLC_DLL@
-  File  *.txt
+  FileOpen $UninstallLog "$INSTDIR\uninstall.log" w
+  FileSeek $UninstallLog 0 END
 
-  File  /r plugins
-  File  /r locale
-  File  /r osdmenu
-  File  /r skins
-  File  /r http
+  !insertmacro InstallFile vlc.exe
+  !insertmacro InstallFile vlc.exe.manifest
+  @FILE_LIBVLC_DLL@
+  !insertmacro InstallFile *.txt
+
+  !insertmacro InstallFolder plugins
+  !insertmacro InstallFolder locale
+  !insertmacro InstallFolder osdmenu
+  !insertmacro InstallFolder skins
+  !insertmacro InstallFolder http
+
+  WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" \
+    "${PRODUCT_WEB_SITE}"
+  FileWrite $UninstallLog "${PRODUCT_NAME}.url$\r$\n"
+  WriteIniStr "$INSTDIR\Documentation.url" "InternetShortcut" "URL" \
+    "${PRODUCT_WEB_SITE}/doc/"
+  FileWrite $UninstallLog "Documentation.url$\r$\n"
+
+  FileClose $UninstallLog
+  SetFileAttributes "$INSTDIR\uninstall.log" HIDDEN
 
   ; Add VLC to "recomended programs" for the following extensions
   WriteRegStr HKCR Applications\vlc.exe "" ""
@@ -326,12 +388,8 @@ Section "Start Menu Shortcut" SEC02a
     "$INSTDIR\vlc.exe" "--intf skins"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Reset VLC defaults and quit.lnk" \
     "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache --save-config vlc:quit "
-  WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" \
-    "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\VideoLAN\${PRODUCT_NAME} Website.lnk" \
     "$INSTDIR\${PRODUCT_NAME}.url"
-  WriteIniStr "$INSTDIR\Documentation.url" "InternetShortcut" "URL" \
-    "${PRODUCT_WEB_SITE}/doc/"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Documentation.lnk" \
     "$INSTDIR\Documentation.url"
 SectionEnd
@@ -471,6 +529,59 @@ SectionEnd
 ; Uninstaller sections ;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
+; TrimNewlines (copied from NSIS documentation)
+; input, top of stack  (e.g. whatever$\r$\n)
+; output, top of stack (replaces, with e.g. whatever)
+; modifies no other variables.
+
+Function un.TrimNewlines
+ Exch $R0
+ Push $R1
+ Push $R2
+ StrCpy $R1 0
+ 
+ loop:
+   IntOp $R1 $R1 - 1
+   StrCpy $R2 $R0 1 $R1
+   StrCmp $R2 "$\r" loop
+   StrCmp $R2 "$\n" loop
+   IntOp $R1 $R1 + 1
+   IntCmp $R1 0 no_trim_needed
+   StrCpy $R0 $R0 $R1
+ 
+ no_trim_needed:
+   Pop $R2
+   Pop $R1
+   Exch $R0
+FunctionEnd
+
+Function un.RemoveEmptyDirs
+  Pop $9
+  !define Index 'Line${__LINE__}'
+  FindFirst $0 $1 "$INSTDIR$9*"
+  StrCmp $0 "" "${Index}-End"
+  "${Index}-Loop:"
+    StrCmp $1 "" "${Index}-End"
+    StrCmp $1 "." "${Index}-Next"
+    StrCmp $1 ".." "${Index}-Next"
+      Push $0
+      Push $1
+      Push $9
+      Push "$9$1\"
+      Call un.RemoveEmptyDirs
+      Pop $9
+      Pop $1
+      Pop $0
+    "${Index}-Remove:"
+    RMDir "$INSTDIR$9$1"
+    "${Index}-Next:"
+    FindNext $0 $1
+    Goto "${Index}-Loop"
+  "${Index}-End:"
+  FindClose $0
+  !undef Index
+FunctionEnd
+
 Section "Uninstall" SEC91
   SectionIn 1 2 3 RO
   SetShellVarContext all
@@ -508,7 +619,25 @@ Section "Uninstall" SEC91
 
   RMDir "$SMPROGRAMS\VideoLAN"
   RMDir /r $SMPROGRAMS\VideoLAN
-  RMDir /r $INSTDIR
+
+  FileOpen $UninstallLog "$INSTDIR\uninstall.log" r
+  UninstallLoop:
+    ClearErrors
+    FileRead $UninstallLog $R0
+    IfErrors UninstallEnd
+    Push $R0
+    Call un.TrimNewLines
+    Pop $R0
+    Delete "$INSTDIR\$R0"
+    Goto UninstallLoop
+  UninstallEnd:
+  FileClose $UninstallLog
+  Delete "$INSTDIR\uninstall.log"
+  Delete "$INSTDIR\uninstall.exe"
+  Push "\"
+  Call un.RemoveEmptyDirs
+  RMDir "$INSTDIR"
+
   DeleteRegKey HKLM Software\VideoLAN
 
   DeleteRegKey HKCR Applications\vlc.exe

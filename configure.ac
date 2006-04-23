@@ -5234,7 +5234,7 @@ AS_IF([test "x${enable_shared_libvlc}" = "x"], [enable_shared_libvlc=no])
 AM_CONDITIONAL(BUILD_SHARED, [test "${enable_shared_libvlc}" != "no"])
 AS_IF([test "${enable_shared_libvlc}" != "no" || test "${enable_libtool}" != "no"], [
   AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
-  FILE_LIBVLC_DLL="File libvlc.dll"],
+  FILE_LIBVLC_DLL="!insertmacro InstallFile libvlc.dll"],
   FILE_LIBVLC_DLL="" )
 
 pic=no
