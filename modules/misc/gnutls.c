@@ -186,11 +186,9 @@ _get_Bool( vlc_object_t *p_this, const char *var )
 #define get_Bool( a, b ) _get_Bool( (vlc_object_t *)(a), (b) )
 
 
-/*****************************************************************************
- * tls_Send:
- *****************************************************************************
+/**
  * Sends data through a TLS session.
- *****************************************************************************/
+ */
 static int
 gnutls_Send( void *p_session, const void *buf, int i_length )
 {
@@ -205,11 +203,9 @@ gnutls_Send( void *p_session, const void *buf, int i_length )
 }
 
 
-/*****************************************************************************
- * tls_Recv:
- *****************************************************************************
+/**
  * Receives data through a TLS session.
- *****************************************************************************/
+ */
 static int
 gnutls_Recv( void *p_session, void *buf, int i_length )
 {
@@ -361,9 +357,19 @@ gnutls_HandshakeAndValidate( tls_session_t *p_session )
     return val;
 }
 
+/**
+ * Starts negociation of a TLS session.
+ *
+ * @param fd stream socket already connected with the peer.
+ * @param psz_hostname if not NULL, hostname to mention as a Server Name.
+ *
+ * @return -1 on error (you need not and must not call tls_SessionClose),
+ * 0 on succesful handshake completion, 1 if more would-be blocking recv is
+ * needed, 2 if more would-be blocking send is required.
+ */
 static int
 gnutls_BeginHandshake( tls_session_t *p_session, int fd,
-                         const char *psz_hostname )
+                       const char *psz_hostname )
 {
     tls_session_sys_t *p_sys;
 
@@ -389,11 +395,10 @@ gnutls_BeginHandshake( tls_session_t *p_session, int fd,
     return p_session->pf_handshake2( p_session );
 }
 
-/*****************************************************************************
- * tls_SessionClose:
- *****************************************************************************
+/**
  * Terminates TLS session and releases session data.
- *****************************************************************************/
+ * You still have to close the socket yourself.
+ */
 static void
 gnutls_SessionClose( tls_session_t *p_session )
 {
@@ -544,11 +549,9 @@ gnutls_Addx509File( vlc_object_t *p_this,
 }
 
 
-/*****************************************************************************
- * tls_ClientCreate:
- *****************************************************************************
- * Initializes client-side TLS session data.
- *****************************************************************************/
+/**
+ * Initializes a client-side TLS session.
+ */
 static tls_session_t *
 gnutls_ClientCreate( tls_t *p_tls )
 {
@@ -685,9 +688,9 @@ error:
 }
 
 
-/*****************************************************************************
- * TLS session resumption callbacks
- *****************************************************************************/
+/**
+ * TLS session resumption callbacks (server-side)
+ */
 static int cb_store( void *p_server, gnutls_datum key, gnutls_datum data )
 {
     tls_server_sys_t *p_sys = ((tls_server_t *)p_server)->p_sys;
@@ -783,11 +786,9 @@ static int cb_delete( void *p_server, gnutls_datum key )
 }
 
 
-/*****************************************************************************
- * tls_ServerSessionPrepare:
- *****************************************************************************
- * Initializes server-side TLS session data.
- *****************************************************************************/
+/**
+ * Initializes a server-side TLS session.
+ */
 static tls_session_t *
 gnutls_ServerSessionPrepare( tls_server_t *p_server )
 {
@@ -872,11 +873,9 @@ error:
 }
 
 
-/*****************************************************************************
- * tls_ServerDelete:
- *****************************************************************************
- * Releases data allocated with tls_ServerCreate.
- *****************************************************************************/
+/**
+ * Releases data allocated with tls_ServerCreate().
+ */
 static void
 gnutls_ServerDelete( tls_server_t *p_server )
 {
@@ -896,11 +895,12 @@ gnutls_ServerDelete( tls_server_t *p_server )
 }
 
 
-/*****************************************************************************
- * tls_ServerAddCA:
- *****************************************************************************
+/**
  * Adds one or more certificate authorities.
- * Returns -1 on error, 0 on success.
+ *
+ * @param psz_ca_path (Unicode) path to an x509 certificates list.
+ *
+ * @return -1 on error, 0 on success.
  *****************************************************************************/
 static int
 gnutls_ServerAddCA( tls_server_t *p_server, const char *psz_ca_path )
@@ -931,12 +931,13 @@ gnutls_ServerAddCA( tls_server_t *p_server, const char *psz_ca_path )
 }
 
 
-/*****************************************************************************
- * tls_ServerAddCRL:
- *****************************************************************************
+/**
  * Adds a certificates revocation list to be sent to TLS clients.
- * Returns -1 on error, 0 on success.
- *****************************************************************************/
+ *
+ * @param psz_crl_path (Unicode) path of the CRL file.
+ *
+ * @return -1 on error, 0 on success.
+ */
 static int
 gnutls_ServerAddCRL( tls_server_t *p_server, const char *psz_crl_path )
 {
@@ -959,12 +960,11 @@ gnutls_ServerAddCRL( tls_server_t *p_server, const char *psz_crl_path )
 }
 
 
-/*****************************************************************************
- * tls_ServerCreate:
- *****************************************************************************
+/**
  * Allocates a whole server's TLS credentials.
- * Returns NULL on error.
- *****************************************************************************/
+ *
+ * @return NULL on error.
+ */
 static tls_server_t *
 gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
                      const char *psz_key_path )
@@ -1069,9 +1069,9 @@ error:
 }
 
 
-/*****************************************************************************
- * gcrypt thread option VLC implementation:
- *****************************************************************************/
+/**
+ * gcrypt thread option VLC implementation
+ */
 vlc_object_t *__p_gcry_data;
 
 static int gcry_vlc_mutex_init( void **p_sys )
