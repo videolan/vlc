@@ -1918,7 +1918,7 @@ static module_config_t p_help_config[] =
     { CONFIG_ITEM_BOOL, NULL, "help", 'h',
       N_("print help for VLC (can be combined with --advanced)") },
     { CONFIG_ITEM_BOOL, NULL, "longhelp", 'H',
-      N_("print help for VLC and all it's modules (can be combined with --advanced)") },
+      N_("print help for VLC and all its modules (can be combined with --advanced)") },
     { CONFIG_ITEM_BOOL, NULL, "advanced", '\0',
       N_("print help for the advanced options") },
     { CONFIG_ITEM_BOOL, NULL, "help-verbose", '\0',
