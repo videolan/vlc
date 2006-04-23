@@ -1450,13 +1450,19 @@ wxMenu *Playlist::SDMenu()
                      (p_parser->psz_shortname ?
                       p_parser->psz_shortname : p_parser->psz_object_name) ) );
 
+            /* hack to handle submodules properly */
+            int i = -1;
+            while( p_parser->pp_shortcuts[++i] != NULL );
+            i--;
             if( playlist_IsServicesDiscoveryLoaded( p_playlist,
-                                    p_parser->psz_object_name ) )
+                                    i>=0?p_parser->pp_shortcuts[i]
+                                    :p_parser->psz_object_name ) )
             {
                 p_sd_menu->Check( FirstSD_Event + i_number, TRUE );
             }
 
-            pp_sds[i_number++] = p_parser->psz_object_name;
+            pp_sds[i_number++] = i>=0?p_parser->pp_shortcuts[i]
+                                 :p_parser->psz_object_name;
         }
     }
     vlc_list_release( p_list );
