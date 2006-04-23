@@ -63,7 +63,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:40
 msgid "Settings for VLC's interfaces"
-msgstr ""
+msgstr "Settings for VLC’s interfaces"
 
 #: include/vlc_config_cat.h:42
 #, fuzzy
@@ -85,9 +85,8 @@ msgid "Control interfaces"
 msgstr "Remote control interface"
 
 #: include/vlc_config_cat.h:48
-#, fuzzy
 msgid "Settings for VLC's control interfaces"
-msgstr "Remote control interface"
+msgstr "Settings for VLC’s control interfaces"
 
 #: include/vlc_config_cat.h:50 include/vlc_config_cat.h:51
 #, fuzzy
@@ -349,7 +348,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:178
 msgid "VLC's implementation of Video On Demand"
-msgstr ""
+msgstr "VLC’s implementation of Video On Demand"
 
 #: include/vlc_config_cat.h:182 src/libvlc.h:1474
 #: modules/demux/playlist/playlist.c:48 modules/demux/playlist/playlist.c:49
@@ -480,15 +479,14 @@ msgid "There is no help available for these modules."
 msgstr "No help is available for these modules"
 
 #: include/vlc_interface.h:137
-#, fuzzy
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a command-line window, go "
 "to the directory where you installed VLC and run \"vlc -I wx\"\n"
 msgstr ""
 "\n"
-"Warning: if you can't access the GUI anymore, open a dos command box, go to "
-"the directory where you installed VLC and run \"vlc -I wxwin\"\n"
+"Warning: if you can’t access the GUI anymore, open a command-line window, go to "
+"the directory where you installed VLC and run “vlc -I wx”\n"
 
 #: include/vlc_meta.h:28 modules/gui/macosx/playlist.m:317
 #: modules/gui/macosx/playlist.m:1229 modules/gui/macosx/playlistinfo.m:205
@@ -736,32 +734,32 @@ msgstr "Reverse stereo"
 #: src/extras/getopt.c:636
 #, c-format
 msgid "%s: option `%s' is ambiguous\n"
-msgstr "%s: option `%s' is ambiguous\n"
+msgstr "%s: option “%s” is ambiguous\n"
 
 #: src/extras/getopt.c:661
 #, c-format
 msgid "%s: option `--%s' doesn't allow an argument\n"
-msgstr "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: option “--%s” doesn’t allow an argument\n"
 
 #: src/extras/getopt.c:666
 #, c-format
 msgid "%s: option `%c%s' doesn't allow an argument\n"
-msgstr "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: option “%c%s” doesn’t allow an argument\n"
 
 #: src/extras/getopt.c:684 src/extras/getopt.c:857
 #, c-format
 msgid "%s: option `%s' requires an argument\n"
-msgstr "%s: option `%s' requires an argument\n"
+msgstr "%s: option “%s” requires an argument\n"
 
 #: src/extras/getopt.c:713
 #, c-format
 msgid "%s: unrecognized option `--%s'\n"
-msgstr "%s: unrecognised option `--%s'\n"
+msgstr "%s: unrecognised option “--%s”\n"
 
 #: src/extras/getopt.c:717
 #, c-format
 msgid "%s: unrecognized option `%c%s'\n"
-msgstr "%s: unrecognised option `%c%s'\n"
+msgstr "%s: unrecognised option “%c%s”\n"
 
 #: src/extras/getopt.c:743
 #, c-format
@@ -781,12 +779,12 @@ msgstr "%s: option requires an argument -- %c\n"
 #: src/extras/getopt.c:823
 #, c-format
 msgid "%s: option `-W %s' is ambiguous\n"
-msgstr "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: option “-W %s” is ambiguous\n"
 
 #: src/extras/getopt.c:841
 #, c-format
 msgid "%s: option `-W %s' doesn't allow an argument\n"
-msgstr "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: option “-W %s” doesn’t allow an argument\n"
 
 #: src/input/control.c:283
 #, c-format
@@ -1601,13 +1599,12 @@ msgid "Grayscale video output"
 msgstr "Greyscale video output"
 
 #: src/libvlc.h:267
-#, fuzzy
 msgid ""
 "Output video in grayscale. As the color information aren't decoded, this can "
 "save some processing power."
 msgstr ""
-"When enabled, the colour information from the video won't be decoded (this "
-"can also allow you to save some processing power)."
+"Output video in greyscale. As the colour information aren’t decoded, this can "
+"save some processing power."
 
 #: src/libvlc.h:270
 msgid "Fullscreen video output"
@@ -1692,7 +1689,7 @@ msgstr ""
 
 #: src/libvlc.h:307
 msgid "Display the snapshot preview in the screen's top-left corner."
-msgstr ""
+msgstr "Display the snapshot preview in the screen’s top-left corner."
 
 #: src/libvlc.h:309
 #, fuzzy
@@ -2029,6 +2026,9 @@ msgid ""
 "is experimental, not all formats are supported. Use a '#' separated list of "
 "inputs."
 msgstr ""
+"This allows you to play from several inputs at the same time. This feature "
+"is experimental, not all formats are supported. Use a “#” separated list of "
+"input."
 
 #: src/libvlc.h:472
 msgid "Bookmarks list for a stream"
@@ -2169,7 +2169,7 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (eg. D:)"
 msgstr ""
-"This is the default DVD drive (or file) to use. Don't forget the colon after "
+"This is the default DVD drive (or file) to use. Don’t forget the colon after "
 "the drive letter (eg. D:)"
 
 #: src/libvlc.h:537
@@ -2185,7 +2185,7 @@ msgid ""
 "This is the default VCD device to use. If you don't specify anything, we'll "
 "scan for a suitable CD-ROM device."
 msgstr ""
-"This is the default VCD device to use. If you don't specify anything, we'll "
+"This is the default VCD device to use. If you don’t specify anything, we'll "
 "scan for a suitable CD-ROM device."
 
 #: src/libvlc.h:547
@@ -2201,7 +2201,7 @@ msgid ""
 "This is the default Audio CD device to use. If you don't specify anything, "
 "we'll scan for a suitable CD-ROM device."
 msgstr ""
-"This is the default Audio CD device to use. If you don't specify anything, "
+"This is the default Audio CD device to use. If you don’t specify anything, "
 "we'll scan for a suitable CD-ROM device."
 
 #: src/libvlc.h:557
@@ -2347,15 +2347,14 @@ msgid "Preferred decoders list"
 msgstr "Preferred encoders list"
 
 #: src/libvlc.h:625
-#, fuzzy
 msgid ""
 "List of codecs that VLC will use in priority. For instance, 'dummy,a52' will "
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
 "users should alter this option as it can break playback of all your streams."
 msgstr ""
-"This option can be used to alter the way VLC selects its codecs "
-"(decompression methods). Only advanced users should alter this option as it "
-"can break playback of all your streams."
+"List of codecs that VLC will use in priority. For instance, “dummy,a52” will "
+"try the dummy and a52 codecs before trying the other ones. Only advanced "
+"users should alter this option as it can break playback of all your streams."
 
 #: src/libvlc.h:630
 msgid "Preferred encoders list"
@@ -2667,7 +2666,7 @@ msgstr ""
 "Running VLC in real-time priority will allow for much more precise "
 "scheduling and yield better, especially when streaming content. It can "
 "however lock up your whole machine, or make it very very slow. You should "
-"only activate this if you know what you're doing."
+"only activate this if you know what you’re doing."
 
 #: src/libvlc.h:784
 msgid "Adjust VLC priority"
@@ -2761,7 +2760,6 @@ msgid "Allow only one running instance"
 msgstr ""
 
 #: src/libvlc.h:824
-#, fuzzy
 msgid ""
 "Allowing only one running instance of VLC can sometimes be useful, for "
 "example if you associated VLC with some media types and you don't want a new "
@@ -2770,7 +2768,7 @@ msgid ""
 "running instance or enqueue it."
 msgstr ""
 "Allowing only one running instance of VLC can sometimes be useful, for "
-"instance if you associated VLC with some media types and you don't want a "
+"example if you associated VLC with some media types and you don’t want a "
 "new instance of VLC to be opened each time you double-click on a file in the "
 "explorer. This option will allow you to play the file with the already "
 "running instance or enqueue it."
@@ -3708,7 +3706,7 @@ msgstr ""
 
 #: src/libvlc.h:1896
 msgid ""
-"print help for VLC and all it's modules (can be combined with --advanced)"
+"print help for VLC and all its modules (can be combined with --advanced)"
 msgstr ""
 
 #: src/libvlc.h:1898
@@ -4560,6 +4558,10 @@ msgid ""
 "and initial delay. SCSI-MMC limitations generally don't allow for more than "
 "25 blocks per access."
 msgstr ""
+"How many CD blocks to get on a single CD read. Generally on newer/faster "
+"CDs, this increases throughput at the expense of a little more memory usage "
+"and initial delay. SCSI-MMC limitations generally don’t allow for more than "
+"25 blocks per access."
 
 #: modules/access/cdda/cdda.c:69
 #, fuzzy
@@ -4876,14 +4878,12 @@ msgid "Video device name"
 msgstr "Video Device"
 
 #: modules/access/dshow/dshow.cpp:85
-#, fuzzy
 msgid ""
 "Name of the video device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
-"You can specify the name of the video device that will be used by the "
-"DirectShow plugin. If you don't specify anything, the default device will be "
-"used."
+"Name of the video device that will be used by the DirectShow plugin. If you "
+"don’t specify anything, the default device will be used."
 
 #: modules/access/dshow/dshow.cpp:88 modules/access/v4l/v4l.c:81
 #, fuzzy
@@ -4891,15 +4891,14 @@ msgid "Audio device name"
 msgstr "Audio Device"
 
 #: modules/access/dshow/dshow.cpp:90
-#, fuzzy
 msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used. You can specify a "
 "standard size (cif, d1, ...) or <width>x<height>"
 msgstr ""
-"You can specify the name of the audio device that will be used by the "
-"DirectShow plugin. If you don't specify anything, the default device will be "
-"used."
+"Name of the audio device that will be used by the DirectShow plugin. If you "
+"don’t specify anything, the default device will be used. You can specify a "
+"standard size (cif, d1, ...) or <width>x<height>"
 
 #: modules/access/dshow/dshow.cpp:93
 #, fuzzy
@@ -4907,14 +4906,12 @@ msgid "Video size"
 msgstr "Video title"
 
 #: modules/access/dshow/dshow.cpp:95
-#, fuzzy
 msgid ""
 "Size of the video that will be displayed by the DirectShow plugin. If you "
 "don't specify anything the default size for your device will be used."
 msgstr ""
-"You can specify the size of the video that will be displayed by the "
-"DirectShow plugin. If you don't specify anything the default size for your "
-"device will be used."
+"Size of the video that will be displayed by the DirectShow plugin. If you "
+"don’t specify anything the default size for your device will be used."
 
 #: modules/access/dshow/dshow.cpp:98 modules/access/v4l/v4l.c:85
 #, fuzzy
@@ -5364,10 +5361,10 @@ msgstr ""
 "stream. Thus it should work with a file as well as the DVD device. But it "
 "sometimes takes much time to decrypt a title key and may even fail. With "
 "this method, the key is only checked at the beginning of each title, so it "
-"won't work if the key changes in the middle of a title.\n"
+"won’t work if the key changes in the middle of a title.\n"
 "disc: the disc key is first cracked, then all title keys can be decrypted "
 "instantly, which allows us to check them often.\n"
-"key: the same as \"disc\" if you don't have a file with player keys at "
+"key: the same as \"disc\" if you don’t have a file with player keys at "
 "compilation time. If you do, the decryption of the disc key will be faster "
 "with this method. It is the one that was used by libcss.\n"
 "The default method is: key."
@@ -5908,6 +5905,8 @@ msgid ""
 "Automatically detect the line's MTU. This will increase the size if "
 "truncated packets are found"
 msgstr ""
+"Automatically detect the line’s MTU. This will increase the size if "
+"truncated packets are found"
 
 #: modules/access/udp.c:52
 msgid "RTP reordering timeout in ms"
@@ -5942,22 +5941,20 @@ msgstr ""
 "should be set in millisecond units."
 
 #: modules/access/v4l/v4l.c:79
-#, fuzzy
 msgid ""
 "Name of the video device to use. If you don't specify anything, no video "
 "device will be used."
 msgstr ""
-"Specify the name of the video device that will be used. If you don't specify "
-"anything, no video device will be used."
+"Name of the video device to use. If you don’t specify anything, no video "
+"device will be used."
 
 #: modules/access/v4l/v4l.c:83
-#, fuzzy
 msgid ""
 "Name of the audio device to use. If you don't specify anything, no audio "
 "device will be used."
 msgstr ""
-"Specify the name of the audio device that will be used. If you don't specify "
-"anything, no audio device will be used."
+"Name of the audio device to use. If you don’t specify anything, no audio "
+"device will be used."
 
 #: modules/access/v4l/v4l.c:87
 msgid ""
@@ -6275,11 +6272,11 @@ msgstr ""
 
 #: modules/access/vcdx/vcd.c:137
 msgid "Format to use in the playlist's \"author\" field."
-msgstr ""
+msgstr "Format to use in the playlist’s “author” field."
 
 #: modules/access/vcdx/vcd.c:143
 msgid "Format to use in the playlist's \"title\" field."
-msgstr ""
+msgstr "Format to use in the playlist’s “title” field."
 
 #: modules/access_filter/record.c:43
 #, fuzzy
@@ -6371,18 +6368,24 @@ msgid ""
 "Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
 "empty if you don't have one."
 msgstr ""
+"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
+"empty if you don’t have one."
 
 #: modules/access_output/http.c:78
 msgid ""
 "Path to the x509 PEM trusted root CA certificates (certificate authority) "
 "file that will be used forHTTPS. Leave empty if you don't have one."
 msgstr ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used for HTTPS. Leave empty if you don’t have one."
 
 #: modules/access_output/http.c:83
 msgid ""
 "Path to the x509 PEM Certificates Revocation List file that will be used for "
 "SSL. Leave empty if you don't have one."
 msgstr ""
+"Path to the x509 PEM Certificates Revocation List file that will be used for "
+"SSL. Leave empty if you don’t have one."
 
 #: modules/access_output/http.c:86
 msgid "Advertise with Bonjour"
@@ -6538,6 +6541,8 @@ msgid ""
 "Dolby Surround encoded streams won't be decoded before being processed by "
 "this filter. Enabling this setting is not recommended."
 msgstr ""
+"Dolby Surround encoded streams won’t be decoded before being processed by "
+"this filter. Enabling this setting is not recommended."
 
 #: modules/audio_filter/channel_mixer/headphone.c:72
 #, fuzzy
@@ -6678,6 +6683,9 @@ msgid ""
 "values between -20dB and 20dB, separated by spaces, e.g. \"0 2 4 2 0 -2 -4 -"
 "2 0\""
 msgstr ""
+"Don’t use presets, but manually specified bands. You need to provide 10 "
+"values between -20dB and 20dB, separated by spaces, e.g. “0 2 4 2 0 -2 -4 -"
+"2 0”"
 
 #: modules/audio_filter/equalizer.c:61
 msgid "Two pass"
@@ -6956,6 +6964,9 @@ msgid ""
 "your 'Audio Device' menu. This device will then be used by default for audio "
 "playback."
 msgstr ""
+"Choose a number corresponding to the number of an audio device, as listed in "
+"your “Audio Device” menu. This device will then be used by default for audio "
+"playback."
 
 #: modules/audio_output/auhal.c:136
 #, fuzzy
@@ -7069,6 +7080,9 @@ msgid ""
 "completely filled (the sound gets heavily hashed). If you have one of these "
 "drivers, then you need to enable this option."
 msgstr ""
+"Some buggy OSS drivers just don’t like when their internal buffers are "
+"completely filled (the sound gets heavily hashed). If you have one of these "
+"drivers, then you need to enable this option."
 
 #: modules/audio_output/oss.c:109
 #, fuzzy
@@ -7436,6 +7450,8 @@ msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
 msgstr ""
+"The decoder can partially decode or skip frame(s) when there is not enough "
+"time. It’s useful with low CPU power but it can produce distorted pictures."
 
 #: modules/codec/ffmpeg/ffmpeg.h:117
 msgid "Post processing quality"
@@ -7643,17 +7659,16 @@ msgid ""
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:245
-#, fuzzy
 msgid ""
 "The encoder can make on-the-fly quality tradeoffs if your CPU can't keep up "
 "with the encoding rate. It will disable trellis quantization, then the rate "
 "distortion of motion vectors (hq), and raise the noise reduction threshold "
 "to ease the encoder's task."
 msgstr ""
-"Allows you to specify if the encoder should make on-the-fly quality "
-"tradeoffs if your CPU can't keep up with the encoding rate. It will disable "
-"trellis quantisation, then the rate distortion of motion vectors (hq), and "
-"raise the noise reduction threshold to ease the encoder's task."
+"The encoder can make on-the-fly quality tradeoffs if your CPU can’t keep up "
+"with the encoding rate. It will disable trellis quantisation, then the rate "
+"distortion of motion vectors (hq), and raise the noise reduction threshold "
+"to ease the encoder’s task."
 
 #: modules/codec/ffmpeg/ffmpeg.h:251
 msgid "Minimum video quantizer scale"
@@ -7750,6 +7765,8 @@ msgid ""
 "Eliminates luminance blocks when the PSNR isn't much changed (default: 0.0). "
 "The H264 specification recommends -4."
 msgstr ""
+"Eliminates luminance blocks when the PSNR isn’t much changed (default: 0.0). "
+"The H264 specification recommends -4."
 
 #: modules/codec/ffmpeg/ffmpeg.h:292
 msgid "Chrominance elimination"
@@ -7760,6 +7777,8 @@ msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
 msgstr ""
+"Eliminates chrominance blocks when the PSNR isn’t much changed (default: "
+"0.0). The H264 specification recommends 7."
 
 #: modules/codec/ffmpeg/postprocess.c:88 modules/gui/macosx/intf.m:568
 #: modules/gui/macosx/intf.m:569
@@ -11481,7 +11500,7 @@ msgstr "Backwards"
 #: modules/misc/win32text.c:84 modules/video_filter/marq.c:53
 #: modules/video_filter/rss.c:64 modules/video_filter/time.c:53
 msgid "Gray"
-msgstr ""
+msgstr "Grey"
 
 #: modules/gui/macosx/sfilters.m:137 modules/misc/freetype.c:127
 #: modules/misc/win32text.c:84 modules/video_filter/marq.c:53
