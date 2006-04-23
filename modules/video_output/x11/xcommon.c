@@ -374,15 +374,27 @@ static int InitVideo( vout_thread_t *p_vout )
 
     switch( p_vout->output.i_chroma )
     {
-        case VLC_FOURCC('R','V','1','5'):
+        case VLC_FOURCC('R','V','1','6'):
+#if defined( WORDS_BIGENDIAN )
+            p_vout->output.i_rmask = 0xf800;
+            p_vout->output.i_gmask = 0x07e0;
+            p_vout->output.i_bmask = 0x001f;
+#else
             p_vout->output.i_rmask = 0x001f;
             p_vout->output.i_gmask = 0x07e0;
             p_vout->output.i_bmask = 0xf800;
+#endif
             break;
-        case VLC_FOURCC('R','V','1','6'):
+        case VLC_FOURCC('R','V','1','5'):
+#if defined( WORDS_BIGENDIAN )
+            p_vout->output.i_rmask = 0x7c00;
+            p_vout->output.i_gmask = 0x03e0;
+            p_vout->output.i_bmask = 0x001f;
+#else
             p_vout->output.i_rmask = 0x001f;
             p_vout->output.i_gmask = 0x03e0;
             p_vout->output.i_bmask = 0x7c00;
+#endif
             break;
     }
 
