@@ -139,9 +139,9 @@ struct picture_heap_t
     vlc_bool_t      b_allow_modify_pics;
 
     /* Stuff used for truecolor RGB planes */
-    int i_rmask, i_rrshift, i_lrshift;
-    int i_gmask, i_rgshift, i_lgshift;
-    int i_bmask, i_rbshift, i_lbshift;
+    int i_rmask; uint32_t i_rrshift, i_lrshift;
+    int i_gmask; uint32_t i_rgshift, i_lgshift;
+    int i_bmask; uint32_t i_rbshift, i_lbshift;
 
     /** Stuff used for palettized RGB planes */
     void (* pf_setpalette) ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
