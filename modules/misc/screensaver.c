@@ -84,6 +84,7 @@ static void Run( intf_thread_t *p_intf )
 
                 /* http://www.jwz.org/xscreensaver/faq.html#dvd */
                 system( "xscreensaver-command -deactivate >&- 2>&- &" );
+                system( "gnome-screensaver-command --poke >&- 2>&- &" );
 
                 /* FIXME: add support for other screensavers */
             }
