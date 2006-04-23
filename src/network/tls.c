@@ -21,6 +21,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * @file
+ * libvlc interface to the Transport Layer Security (TLS) plugins.
+ */
+
 #include <stdlib.h>
 #include <vlc/vlc.h>
 
@@ -90,12 +95,15 @@ tls_Deinit( tls_t *p_tls )
     }
 }
 
-/*****************************************************************************
- * tls_ServerCreate:
- *****************************************************************************
+/**
  * Allocates a whole server's TLS credentials.
- * Returns NULL on error.
- *****************************************************************************/
+ *
+ * @param psz_cert required (Unicode) path to an x509 certificate.
+ * @param psz_key required (Unicode) path to the PKCS private key for
+ * the certificate.
+ *
+ * @return NULL on error.
+ */
 tls_server_t *
 tls_ServerCreate( vlc_object_t *p_this, const char *psz_cert,
                   const char *psz_key )
@@ -124,11 +132,9 @@ tls_ServerCreate( vlc_object_t *p_this, const char *psz_cert,
 }
 
 
-/*****************************************************************************
- * tls_ServerDelete:
- *****************************************************************************
+/**
  * Releases data allocated with tls_ServerCreate.
- *****************************************************************************/
+ */
 void
 tls_ServerDelete( tls_server_t *p_server )
 {
@@ -140,12 +146,16 @@ tls_ServerDelete( tls_server_t *p_server )
 }
 
 
-/*****************************************************************************
- * tls_ClientCreate:
- *****************************************************************************
+/**
  * Allocates a client's TLS credentials and shakes hands through the network.
- * Returns NULL on error. This is a blocking network operation.
- *****************************************************************************/
+ * This is a blocking network operation.
+ *
+ * @param fd stream socket through which to establish the secure communication
+ * layer.
+ * @param psz_hostname Server Name Indication to pass to the server, or NULL.
+ *
+ * @return NULL on error.
+ **/
 tls_session_t *
 tls_ClientCreate( vlc_object_t *p_this, int fd, const char *psz_hostname )
 {
@@ -181,11 +191,10 @@ tls_ClientCreate( vlc_object_t *p_this, int fd, const char *psz_hostname )
 }
 
 
-/*****************************************************************************
- * tls_ClientDelete:
- *****************************************************************************
+/**
  * Releases data allocated with tls_ClientCreate.
- *****************************************************************************/
+ * It is your job to close the underlying socket.
+ */
 void
 tls_ClientDelete( tls_session_t *p_session )
 {
