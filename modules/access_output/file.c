@@ -29,6 +29,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <time.h>
 #include <fcntl.h>
 #include <errno.h>
 
@@ -129,9 +130,41 @@ static int Open( vlc_object_t *p_this )
     else
     {
         const char *psz_localname = ToLocale( p_access->psz_name );
-        int fd = open( psz_localname, i_flags, 0666 );
-        LocaleFree( psz_localname );
-
+        char *psz_tmp, *psz_tmp2, *psz_rewriten;
+        int fd, i, i_length = strlen( psz_localname );
+        for( i = 0, psz_tmp = psz_localname ;
+             ( psz_tmp = strstr( psz_tmp, "%T" ) ) ; psz_tmp++, i++ )
+            ;
+        if( i )
+        {
+            i_length += 32 * i;
+            psz_rewriten = (char *) malloc( i_length );
+            if( ! psz_rewriten )
+                return ( VLC_EGENERIC );
+            psz_tmp  = psz_localname;
+            psz_tmp2 = psz_rewriten;
+            while( *psz_tmp )
+            {
+                if( ( *psz_tmp == '%' ) && ( *(psz_tmp+1) == 'T' ) )
+                {
+                    time_t t;
+                    time( &t );
+                    psz_tmp2 += sprintf( psz_tmp2, "%d", (int) t );
+                    psz_tmp+=2;
+                }
+                else
+                    *psz_tmp2++ = *psz_tmp++;
+            }
+            *psz_tmp2 = *psz_tmp;
+            fd = open( psz_rewriten, i_flags, 0666 );
+            LocaleFree( psz_localname );
+            free( psz_rewriten );
+        }
+        else
+        {
+            fd = open( psz_localname, i_flags, 0666 );
+            LocaleFree( psz_localname );
+        }
         if( fd == -1 )
         {
             msg_Err( p_access, "cannot open `%s' (%s)", p_access->psz_name,
