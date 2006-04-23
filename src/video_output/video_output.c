@@ -1207,7 +1207,7 @@ static int BinaryLog( uint32_t i )
  *****************************************************************************/
 static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
 {
-    uint64_t i_low, i_high;            /* lower hand higher bits of the mask */
+    uint32_t i_low, i_high;            /* lower hand higher bits of the mask */
 
     if( !i_mask )
     {
@@ -1218,7 +1218,7 @@ static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
     /* Get bits */
     i_low = i_high = i_mask;
 
-    i_low &= - (int64_t)i_low;          /* lower bit of the mask */
+    i_low &= - (int32_t)i_low;          /* lower bit of the mask */
     i_high += i_low;                    /* higher bit of the mask */
 
     /* Transform bits into an index. Also deal with i_high overflow, which
