@@ -50,13 +50,16 @@
 
 #define MAX_LINE_LENGTH 256
 #define SHOUTCAST_BASE_URL "http/shout-winamp://www.shoutcast.com/sbin/newxml.phtml"
+#define SHOUTCAST_TV_BASE_URL "http/shout-winamp://www.shoutcast.com/sbin/newtvlister.phtml?alltv=1"
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 
 /* Callbacks */
-    static int  Open ( vlc_object_t * );
+    static int  Open ( vlc_object_t *, int );
+    static int  OpenRadio ( vlc_object_t * );
+    static int  OpenTV ( vlc_object_t * );
     static void Close( vlc_object_t * );
 
 vlc_module_begin();
@@ -68,7 +71,14 @@ vlc_module_begin();
     add_suppressed_integer( "shoutcast-limit" );
 
     set_capability( "services_discovery", 0 );
-    set_callbacks( Open, Close );
+    set_callbacks( OpenRadio, Close );
+
+    add_submodule();
+        set_shortname( "ShoutcastTV" );
+        set_description( _("Shoutcast TV listings") );
+        set_capability( "services_discovery", 0 );
+        set_callbacks( OpenTV, Close );
+        add_shortcut( "shoutcasttv" );
 
 vlc_module_end();
 
@@ -83,6 +93,9 @@ struct services_discovery_sys_t
     vlc_bool_t b_dialog;
 };
 
+#define RADIO 0
+#define TV 1
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -90,10 +103,20 @@ struct services_discovery_sys_t
 /* Main functions */
     static void Run    ( services_discovery_t *p_intf );
 
+static int OpenRadio( vlc_object_t *p_this )
+{
+    return Open( p_this, RADIO );
+}
+
+static int OpenTV( vlc_object_t *p_this )
+{
+    return Open( p_this, TV );
+}
+
 /*****************************************************************************
  * Open: initialize and create stuff
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this, int i_type )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = malloc(
@@ -118,8 +141,18 @@ static int Open( vlc_object_t *p_this )
 
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
 
-    p_sys->p_item =
-    p_item = playlist_ItemNew( p_playlist, SHOUTCAST_BASE_URL, _("Shoutcast") );
+    switch( i_type )
+    {
+        case TV:
+            p_sys->p_item = p_item = playlist_ItemNew( p_playlist,
+                                SHOUTCAST_TV_BASE_URL, _("Shoutcast TV") );
+            break;
+        case RADIO:
+        default:
+            p_sys->p_item = p_item = playlist_ItemNew( p_playlist,
+                                SHOUTCAST_BASE_URL, _("Shoutcast") );
+            break;
+    }
     playlist_NodeAddItem( p_playlist, p_item, p_view->i_id,
                           p_view->p_root, PLAYLIST_APPEND,
                           PLAYLIST_END );

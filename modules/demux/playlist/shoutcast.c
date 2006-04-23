@@ -48,6 +48,7 @@ struct demux_sys_t
 /* duplicate from modules/services_discovery/shout.c */
 #define SHOUTCAST_BASE_URL "http/shout-winamp://www.shoutcast.com/sbin/newxml.phtml"
 #define SHOUTCAST_TUNEIN_BASE_URL "http://www.shoutcast.com"
+#define SHOUTCAST_TV_TUNEIN_URL "http://www.shoutcast.com/sbin/tunein-tvstation.pls?id="
 
 /*****************************************************************************
  * Local prototypes
@@ -303,7 +304,8 @@ static int DemuxGenre( demux_t *p_demux )
     return 0;
 }
 
-/* <stationlist>
+/* radio stations:
+ * <stationlist>
  *   <tunein base="/sbin/tunein-station.pls"></tunein>
  *   <station name="the name"
  *            mt="mime type"
@@ -311,6 +313,19 @@ static int DemuxGenre( demux_t *p_demux )
  *            br="bit rate"
  *            genre="A big genre string"
  *            ct="current track name/author/..."
+ *            lc="listener count"></station>
+ * </stationlist>
+ *
+ * TV stations:
+ * <stationlist>
+ *   <tunein base="/sbin/tunein-station.pls"></tunein>
+ *   <station name="the name"
+ *            id="the id"
+ *            br="bit rate"
+ *            rt="rating"
+ *            load="server load ?"
+ *            ct="current track name/author/..."
+ *            genre="A big genre string"
  *            lc="listener count"></station>
  * </stationlist>
  **/
@@ -327,6 +342,10 @@ static int DemuxStation( demux_t *p_demux )
     char *psz_genre = NULL; /* genre */
     char *psz_ct = NULL; /* current track */
     char *psz_lc = NULL; /* listener count */
+
+    /* If these are set then it's *not* a radio but a TV */
+    char *psz_rt = NULL; /* rating for shoutcast TV */
+    char *psz_load = NULL; /* load for shoutcast TV */
 
     char *psz_eltname = NULL; /* tag name */
 
@@ -387,6 +406,8 @@ static int DemuxStation( demux_t *p_demux )
                         else GET_VALUE( genre )
                         else GET_VALUE( ct )
                         else GET_VALUE( lc )
+                        else GET_VALUE( rt )
+                        else GET_VALUE( load )
                         else
                         {
                             msg_Warn( p_demux,
@@ -409,14 +430,29 @@ static int DemuxStation( demux_t *p_demux )
                 free( psz_eltname );
                 psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
                 if( !psz_eltname ) return -1;
-                if( !strcmp( psz_eltname, "station" ) && psz_base )
+                if( !strcmp( psz_eltname, "station" ) &&
+                    ( psz_base || ( psz_rt && psz_load ) ) )
                 {
                     playlist_item_t *p_item;
-                    char *psz_mrl = malloc( strlen( SHOUTCAST_TUNEIN_BASE_URL )
+                    char *psz_mrl = NULL;
+                    if( psz_rt || psz_load )
+                    {
+                        /* tv */
+                        psz_mrl = malloc( strlen( SHOUTCAST_TV_TUNEIN_URL )
+                                          + strlen( psz_id ) + 1 );
+                        sprintf( psz_mrl, SHOUTCAST_TV_TUNEIN_URL "%s",
+                                 psz_id );
+                    }
+                    else
+                    {
+                        /* radio */
+                        psz_mrl = malloc( strlen( SHOUTCAST_TUNEIN_BASE_URL )
                             + strlen( psz_base ) + strlen( "?id=" )
                             + strlen( psz_id ) + 1 );
-                    sprintf( psz_mrl, SHOUTCAST_TUNEIN_BASE_URL "%s?id=%s",
+                        sprintf( psz_mrl, SHOUTCAST_TUNEIN_BASE_URL "%s?id=%s",
                              psz_base, psz_id );
+                    }
+                    msg_Warn( p_demux, "%s", psz_mrl );
                     p_item = playlist_ItemNew( p_sys->p_playlist, psz_mrl,
                                                psz_name );
                     free( psz_mrl );
@@ -461,6 +497,22 @@ static int DemuxStation( demux_t *p_demux )
                                                 "%s",
                                                 psz_lc );
                     }
+                    else if( psz_rt )
+                    {
+                        vlc_input_item_AddInfo( &p_item->input,
+                                                _( "Shoutcast" ),
+                                                _( "Rating" ),
+                                                "%s",
+                                                psz_rt );
+                    }
+                    else if( psz_load )
+                    {
+                        vlc_input_item_AddInfo( &p_item->input,
+                                                _( "Shoutcast" ),
+                                                _( "Load" ),
+                                                "%s",
+                                                psz_load );
+                    }
 
                     playlist_NodeAddItem( p_sys->p_playlist, p_item,
                                           p_sys->p_current->pp_parents[0]->i_view,
@@ -482,6 +534,7 @@ static int DemuxStation( demux_t *p_demux )
                     FREE( psz_genre )
                     FREE( psz_ct )
                     FREE( psz_lc )
+                    FREE( psz_rt )
 #undef FREE
                 }
                 free( psz_eltname );
