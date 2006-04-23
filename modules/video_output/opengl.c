@@ -280,22 +280,40 @@ static int Init( vout_thread_t *p_vout )
 #elif VLCGL_FORMAT == GL_RGB
 #   if VLCGL_TYPE == GL_UNSIGNED_BYTE
     p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
+#       if defined( WORDS_BIGENDIAN )
+    p_vout->output.i_rmask = 0x00ff0000;
+    p_vout->output.i_gmask = 0x0000ff00;
+    p_vout->output.i_bmask = 0x000000ff;
+#       else
     p_vout->output.i_rmask = 0x000000ff;
     p_vout->output.i_gmask = 0x0000ff00;
     p_vout->output.i_bmask = 0x00ff0000;
+#       endif
     i_pixel_pitch = 3;
 #   else
     p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
+#       if defined( WORDS_BIGENDIAN )
+    p_vout->output.i_rmask = 0x001f;
+    p_vout->output.i_gmask = 0x07e0;
+    p_vout->output.i_bmask = 0xf800;
+#       else
     p_vout->output.i_rmask = 0xf800;
     p_vout->output.i_gmask = 0x07e0;
     p_vout->output.i_bmask = 0x001f;
+#       endif
     i_pixel_pitch = 2;
 #   endif
 #else
     p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
+#       if defined( WORDS_BIGENDIAN )
+    p_vout->output.i_rmask = 0xff000000;
+    p_vout->output.i_gmask = 0x00ff0000;
+    p_vout->output.i_bmask = 0x0000ff00;
+#       else
     p_vout->output.i_rmask = 0x000000ff;
     p_vout->output.i_gmask = 0x0000ff00;
     p_vout->output.i_bmask = 0x00ff0000;
+#       endif
     i_pixel_pitch = 4;
 #endif
 
