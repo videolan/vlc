@@ -55,11 +55,6 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
-#if 0
-static void ShoutcastAdd( playlist_t *p_playlist, playlist_item_t* p_genre,
-                          playlist_item_t *p_bitrate, playlist_item_t *p_item,
-                          char *psz_genre, char *psz_bitrate );
-#endif
 
 static int DemuxGenre( demux_t *p_demux );
 static int DemuxStation( demux_t *p_demux );
@@ -146,10 +141,6 @@ static int Demux( demux_t *p_demux )
     p_xml = p_sys->p_xml = xml_Create( p_demux );
     if( !p_xml ) return -1;
 
-/*    psz_eltname = stream_ReadLine( p_demux->s );
-    if( psz_eltname ) free( psz_eltname );
-    psz_eltname = 0;*/
-
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
     if( !p_xml_reader ) return -1;
     p_sys->p_xml_reader = p_xml_reader;
@@ -176,22 +167,15 @@ static int Demux( demux_t *p_demux )
     if( !strcmp( psz_eltname, "genrelist" ) )
     {
         /* we're reading a genre list */
-        if( DemuxGenre( p_demux ) ) 
-        {
-            free( psz_eltname );
-            return -1;
-        }
+        free( psz_eltname );
+        if( DemuxGenre( p_demux ) ) return -1;
     }
     else
     {
         /* we're reading a station list */
-        if( DemuxStation( p_demux ) ) 
-        {
-            free( psz_eltname );
-            return -1;
-        }
+        free( psz_eltname );
+        if( DemuxStation( p_demux ) ) return -1;
     }
-    free( psz_eltname );
 
     /* Go back and play the playlist */
     if( b_play && p_playlist->status.p_item &&
@@ -308,7 +292,7 @@ static int DemuxGenre( demux_t *p_demux )
 
                     FREE( psz_name );
                 }
-                free( psz_eltname ); psz_eltname = NULL;
+                FREE( psz_eltname );
                 break;
         }
     }
