@@ -113,6 +113,9 @@ endif
 
 ifeq ($(HOST),i686-apple-darwin8)
 FFMPEGCONF += --enable-memalign-hack
+endif
+
+ifdef HAVE_DARWIN_OS
 X264CONF += --enable-pic
 endif
 
@@ -1153,7 +1156,7 @@ CLEAN_PKG += libdca
 
 ifdef SVN
 x264: 
-	$(SVN) co svn://svn.videolan.org/x264/trunk/ -r 501 x264
+	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
 ifdef HAVE_WIN32
 	(cd x264; patch -p 0 < ../Patches/x264-svn-win32.patch )
 endif
