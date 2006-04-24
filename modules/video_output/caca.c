@@ -68,9 +68,9 @@ vlc_module_end();
 struct vout_sys_t
 {
 #ifdef CACA_API_VERSION_1
-    struct cucul_context *p_qq;
-    struct caca_context *p_kk;
-    struct cucul_bitmap *p_bitmap;
+    cucul_canvas_t *p_cv;
+    caca_display_t *p_dp;
+    cucul_dither_t *p_dither;
 #else
     struct caca_bitmap *p_bitmap;
 #endif
@@ -149,25 +149,25 @@ static int Create( vlc_object_t *p_this )
     }
 
 #ifdef CACA_API_VERSION_1
-    p_vout->p_sys->p_qq = cucul_init(0, 0);
-    if( !p_vout->p_sys->p_qq )
+    p_vout->p_sys->p_cv = cucul_create_canvas(0, 0);
+    if( !p_vout->p_sys->p_cv )
     {
         msg_Err( p_vout, "cannot initialize libcucul" );
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
 
-    p_vout->p_sys->p_kk = caca_attach( p_vout->p_sys->p_qq );
-    if( !p_vout->p_sys->p_kk )
+    p_vout->p_sys->p_dp = caca_create_display( p_vout->p_sys->p_cv );
+    if( !p_vout->p_sys->p_dp )
     {
         msg_Err( p_vout, "cannot initialize libcaca" );
-        cucul_end( p_vout->p_sys->p_qq );
+        cucul_free_canvas( p_vout->p_sys->p_cv );
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
 
-    caca_set_window_title( p_vout->p_sys->p_kk,
-                           VOUT_TITLE " - Colour AsCii Art (caca)" );
+    caca_set_display_title( p_vout->p_sys->p_dp,
+                            VOUT_TITLE " - Colour AsCii Art (caca)" );
 #else
     if( caca_init() )
     {
@@ -208,10 +208,11 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_bmask = 0x000000ff;
 
     /* Create the libcaca bitmap */
-    p_vout->p_sys->p_bitmap =
 #ifdef CACA_API_VERSION_1
-        cucul_create_bitmap
+    p_vout->p_sys->p_dither =
+        cucul_create_dither
 #else
+    p_vout->p_sys->p_bitmap =
         caca_create_bitmap
 #endif
                        ( 32, p_vout->output.i_width, p_vout->output.i_height,
@@ -219,7 +220,11 @@ static int Init( vout_thread_t *p_vout )
                          p_vout->output.i_rmask, p_vout->output.i_gmask,
                          p_vout->output.i_bmask, 0x00000000 );
 
+#ifdef CACA_API_VERSION_1
+    if( !p_vout->p_sys->p_dither )
+#else
     if( !p_vout->p_sys->p_bitmap )
+#endif
     {
         msg_Err( p_vout, "could not create libcaca bitmap" );
         return VLC_EGENERIC;
@@ -264,7 +269,7 @@ static int Init( vout_thread_t *p_vout )
 static void End( vout_thread_t *p_vout )
 {
 #ifdef CACA_API_VERSION_1
-    cucul_free_bitmap( p_vout->p_sys->p_bitmap );
+    cucul_free_dither( p_vout->p_sys->p_dither );
 #else
     caca_free_bitmap( p_vout->p_sys->p_bitmap );
 #endif
@@ -280,8 +285,8 @@ static void Destroy( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
 #ifdef CACA_API_VERSION_1
-    caca_detach( p_vout->p_sys->p_kk );
-    cucul_end( p_vout->p_sys->p_qq );
+    caca_free_display( p_vout->p_sys->p_dp );
+    cucul_free_canvas( p_vout->p_sys->p_cv );
 #else
     caca_end();
 #endif
@@ -301,28 +306,40 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
+#ifdef CACA_API_VERSION_1
+    struct caca_event ev;
+#else
     int event;
+#endif
     vlc_value_t val;
 
 #ifdef CACA_API_VERSION_1
-    while(( event = caca_get_event(p_vout->p_sys->p_kk,
-                                   CACA_EVENT_KEY_PRESS | CACA_EVENT_RESIZE) ))
+    while(( caca_get_event(p_vout->p_sys->p_dp,
+                           CACA_EVENT_KEY_PRESS | CACA_EVENT_RESIZE, &ev, 0) ))
 #else
     while(( event = caca_get_event(CACA_EVENT_KEY_PRESS | CACA_EVENT_RESIZE) ))
 #endif
     {
-        if( event == CACA_EVENT_RESIZE )
-        {
-            /* Acknowledge the resize */
+        /* Acknowledge the resize */
 #ifdef CACA_API_VERSION_1
-            caca_display( p_vout->p_sys->p_kk );
-#else
-            caca_refresh();
-#endif
+        if( ev.type == CACA_EVENT_RESIZE )
+        {
+            caca_refresh_display( p_vout->p_sys->p_dp );
             continue;
         }
+#else
+        if( event == CACA_EVENT_RESIZE )
+        {
+            caca_refresh();
+            continue;
+        }
+#endif
 
+#ifdef CACA_API_VERSION_1
+        switch( ev.data.key.ch )
+#else
         switch( event & 0x00ffffff )
+#endif
         {
         case 'q':
             val.i_int = KEY_MODIFIER_CTRL | 'q';
@@ -346,12 +363,13 @@ static int Manage( vout_thread_t *p_vout )
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
 #ifdef CACA_API_VERSION_1
-    cucul_clear( p_vout->p_sys->p_qq );
-    cucul_draw_bitmap( p_vout->p_sys->p_qq,
-                       0, 0,
-                       cucul_get_width( p_vout->p_sys->p_qq ) - 1,
-                       cucul_get_height( p_vout->p_sys->p_qq ) - 1,
-                       p_vout->p_sys->p_bitmap, p_pic->p->p_pixels );
+    cucul_set_color( p_vout->p_sys->p_cv,
+                     CUCUL_COLOR_DEFAULT, CUCUL_COLOR_BLACK );
+    cucul_clear_canvas( p_vout->p_sys->p_cv );
+    cucul_dither_bitmap( p_vout->p_sys->p_cv, 0, 0,
+                         cucul_get_canvas_width( p_vout->p_sys->p_cv ) - 1,
+                         cucul_get_canvas_height( p_vout->p_sys->p_cv ) - 1,
+                         p_vout->p_sys->p_dither, p_pic->p->p_pixels );
 #else
     caca_clear();
     caca_draw_bitmap( 0, 0, caca_get_width() - 1, caca_get_height() - 1,
@@ -365,7 +383,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
 #ifdef CACA_API_VERSION_1
-    caca_display( p_vout->p_sys->p_kk );
+    caca_refresh_display( p_vout->p_sys->p_dp );
 #else
     caca_refresh();
 #endif
