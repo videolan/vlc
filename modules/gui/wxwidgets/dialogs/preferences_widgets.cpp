@@ -403,7 +403,12 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
         if( !strcmp( p_parser->psz_object_name, "main" ) )
               continue;
 
-        module_config_t *p_config = p_parser->p_config;
+        module_config_t *p_config;
+        if( p_parser->b_submodule )
+            p_config = ((module_t*)p_parser->p_parent)->p_config;
+        else
+            p_config = p_parser->p_config;
+
         if( p_config ) do
         {
             /* Hack: required subcategory is stored in i_min */
@@ -413,11 +418,16 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
                 moduleCheckBox *mc = new moduleCheckBox;
                 mc->checkbox = new wxCheckBox( this, wxID_HIGHEST,
                                                wxU(p_parser->psz_longname));
-                mc->psz_module = strdup( p_parser->psz_object_name );
+                /* hack to handle submodules properly */
+                int i = -1;
+                while( p_parser->pp_shortcuts[++i] != NULL );
+                i--;
+                mc->psz_module = strdup( i>=0?p_parser->pp_shortcuts[i]
+                                         :p_parser->psz_object_name );
                 pp_checkboxes.push_back( mc );
 
                 if( p_item->psz_value &&
-                    strstr( p_item->psz_value, p_parser->psz_object_name ) )
+                    strstr( p_item->psz_value, mc->psz_module ) )
                 {
                     mc->checkbox->SetValue( true );
                 }
@@ -431,7 +441,7 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
     sizer->Add(text, 0, wxEXPAND|wxALL, 5 );
 
     sizer->Add (new wxStaticText( this, -1, wxU( vlc_wraptext( _("Select "
-        "the desired modules. For more advanced control, the " 
+        "the desired modules. For more advanced control, the "
         "resulting \"chain\" can be modified.") , 72 ) ) ) );
 
     sizer->Layout();
@@ -455,7 +465,7 @@ void  ModuleListCatConfigControl::OnUpdate( wxCommandEvent &event )
 
     for( unsigned int i = 0 ; i< pp_checkboxes.size() ; i++ )
     {
-        b_waschecked = newtext.Find( wxU(pp_checkboxes[i]->psz_module)) != -1 ;
+        b_waschecked = newtext.Find( wxT(":")+wxU(pp_checkboxes[i]->psz_module)+wxT(":")) != -1 || newtext.BeforeFirst( ':' ) == wxString(wxU(pp_checkboxes[i]->psz_module)) || newtext.AfterLast( ':' ) == wxString(wxU(pp_checkboxes[i]->psz_module));
         /* For some reasons, ^^ doesn't compile :( */
         if( (pp_checkboxes[i]->checkbox->IsChecked() && ! b_waschecked )||
             (! pp_checkboxes[i]->checkbox->IsChecked() && b_waschecked) )
@@ -464,12 +474,23 @@ void  ModuleListCatConfigControl::OnUpdate( wxCommandEvent &event )
             {
                 /* Maybe not the clest solution */
                 if( ! newtext.Replace(wxString(wxT(":"))
-                                      +wxU(pp_checkboxes[i]->psz_module),
-                                      wxT("")))
+                                      +wxU(pp_checkboxes[i]->psz_module)+wxT(":"),
+                                      wxT(":")))
                 {
-                    if( ! newtext.Replace(wxString(wxU(pp_checkboxes[i]->psz_module))
-                                           + wxT(":"),wxT("")))
-            {
+                    if( newtext.BeforeFirst( ':' ) == wxString(wxU(pp_checkboxes[i]->psz_module)) )
+                    {
+                        newtext = newtext.AfterFirst( ':' );
+                    }
+                    else if( newtext.AfterLast( ':' ) == wxString(wxU(pp_checkboxes[i]->psz_module)) )
+                    {
+                        newtext = newtext.BeforeLast( ':' );
+                    }
+                    else if( newtext == wxString(wxU(pp_checkboxes[i]->psz_module)) )
+                    {
+                        newtext = wxT("");
+                    }
+                    else
+                    {
                         newtext.Replace(wxU(pp_checkboxes[i]->psz_module),wxU(""));
                     }
                 }
