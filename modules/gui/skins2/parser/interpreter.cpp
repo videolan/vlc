@@ -174,6 +174,14 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
             // Now remove any whitespace at the beginning of the right part,
             // and go on checking for further actions in it...
             rightPart = rightPart.substr( pos, rightPart.size() );
+            if ( rightPart.find_first_not_of( " \t;" ) == string::npos )
+            {
+                // The right part is completely buggy, it's time to leave the
+                // loop...
+                rightPart = "";
+                break;
+            }
+
             rightPart =
                 rightPart.substr( rightPart.find_first_not_of( " \t;" ),
                                   rightPart.size() );
