@@ -83,6 +83,7 @@ EXTRA_DIST += \
 	bitmaps/speaker.xpm \
 	bitmaps/stop.xpm \
 	bitmaps/trash.xpm \
+	bitmaps/edit.xpm \
 	bitmaps/type_afile.xpm \
 	bitmaps/type_card.xpm \
 	bitmaps/type_cdda.xpm \

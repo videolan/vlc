@@ -31,6 +31,7 @@
 #include "bitmaps/pause.xpm"
 #include "bitmaps/stop.xpm"
 #include "bitmaps/trash.xpm"
+#include "bitmaps/edit.xpm"
 
 enum
 {
@@ -100,7 +101,7 @@ VLMBroadcastStreamPanel::VLMBroadcastStreamPanel( intf_thread_t* _p_intf,
     box_sizer->Add( edit_button, 0, wxEXPAND | wxALL , 5 );
 
     wxBitmapButton *trash_button = new wxBitmapButton( this, BTrash_Event,
-                                    wxBitmap( trash_xpm ) );
+                                    wxBitmap( edit_xpm ) );
     trash_button->SetToolTip( wxU( _("Delete" ) ) );
     box_sizer->Add( trash_button, 0, wxEXPAND | wxALL , 5 );
 
