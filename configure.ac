@@ -817,6 +817,27 @@ then
   )
 fi
 
+dnl Check for dbus
+AC_ARG_ENABLE(dbus,
+  [  --enable-dbus            Linux D-BUS message bus system (default enabled)])
+ 
+if test "${enable_dbus}" != "no" -a "${SYS}" = "linux"
+then
+  PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.30,
+    [ AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the new D-BUS library API])
+      AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
+      VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
+      VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],   
+    dnl older dbus
+    [ PKG_CHECK_MODULES( DBUS, dbus-1, 
+       [AC_DEFINE(HAVE_DBUS, 1, [Define if you have the D-BUS library])
+        VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
+        VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
+       [AC_MSG_WARN(DBUS library not found)])
+    ]
+  )
+fi
+
 dnl Build the gtk_main plugins?
 NEED_GTK_MAIN=no
 NEED_GNOME_MAIN=no

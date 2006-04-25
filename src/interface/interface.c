@@ -115,7 +115,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
     }
 
     /* Choose the best module */
-    p_intf->p_module = module_Need( p_intf, "interface", psz_module, 0 );
+    p_intf->p_module = module_Need( p_intf, "interface", psz_module, VLC_TRUE );
 
     if( p_intf->p_module == NULL )
     {
