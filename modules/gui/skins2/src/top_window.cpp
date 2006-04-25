@@ -349,7 +349,6 @@ const GenericLayout& TopWindow::getActiveLayout() const
 
 void TopWindow::innerShow()
 {
-    printf("show %x\n", m_pActiveLayout);
     // First, refresh the layout and update the shape of the window
     if( m_pActiveLayout )
     {
@@ -369,7 +368,7 @@ void TopWindow::innerHide()
         m_pActiveLayout->onHide();
     }
     // Hide the window
-    GenericWindow::innerShow();
+    GenericWindow::innerHide();
 }
 
 
