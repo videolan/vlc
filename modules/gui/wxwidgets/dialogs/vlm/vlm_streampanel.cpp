@@ -96,12 +96,12 @@ VLMBroadcastStreamPanel::VLMBroadcastStreamPanel( intf_thread_t* _p_intf,
     box_sizer->Add( p_time, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5 );
 
     wxBitmapButton *edit_button = new wxBitmapButton( this, BEdit_Event,
-                                    wxBitmap( trash_xpm ) );
+                                    wxBitmap( edit_xpm ) );
     edit_button->SetToolTip( wxU( _("Edit") ) );
     box_sizer->Add( edit_button, 0, wxEXPAND | wxALL , 5 );
 
     wxBitmapButton *trash_button = new wxBitmapButton( this, BTrash_Event,
-                                    wxBitmap( edit_xpm ) );
+                                    wxBitmap( trash_xpm ) );
     trash_button->SetToolTip( wxU( _("Delete" ) ) );
     box_sizer->Add( trash_button, 0, wxEXPAND | wxALL , 5 );
 
