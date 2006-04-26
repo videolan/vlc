@@ -48,6 +48,9 @@ static void Close( vlc_object_t * );
 #define DIR_TEXT N_("Timeshift directory")
 #define DIR_LONGTEXT N_( "Directory used to store the timeshift temporary " \
   "files." )
+#define FORCE_TEXT N_("Force use of the timeshift module")
+#define FORCE_LONGTEXT N_("Force use of the timeshift module even if the " \
+  "access declares that it can control pace or pause." )
 
 vlc_module_begin();
     set_shortname( _("Timeshift") );
@@ -61,6 +64,8 @@ vlc_module_begin();
     add_integer( "timeshift-granularity", 50, NULL, GRANULARITY_TEXT,
                  GRANULARITY_LONGTEXT, VLC_TRUE );
     add_directory( "timeshift-dir", 0, 0, DIR_TEXT, DIR_LONGTEXT, VLC_FALSE );
+    add_bool( "timeshift-force", VLC_FALSE, NULL, FORCE_TEXT, FORCE_LONGTEXT,
+              VLC_FALSE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -113,17 +118,27 @@ static int Open( vlc_object_t *p_this )
     access_sys_t *p_sys;
     vlc_bool_t b_bool;
 
-    /* Only work with not pace controled access */
-    if( access2_Control( p_src, ACCESS_CAN_CONTROL_PACE, &b_bool ) || b_bool )
+    var_Create( p_access, "timeshift-force",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    if( var_GetBool( p_access, "timeshift-force" ) == VLC_TRUE )
     {
-        msg_Dbg( p_src, "ACCESS_CAN_CONTROL_PACE" );
-        return VLC_EGENERIC;
+        msg_Dbg( p_access, "Forcing use of timeshift even if access can control pace or pause" );
     }
-    /* Refuse access that can be paused */
-    if( access2_Control( p_src, ACCESS_CAN_PAUSE, &b_bool ) || b_bool )
+    else
     {
-        msg_Dbg( p_src, "ACCESS_CAN_PAUSE: timeshift useless" );
-        return VLC_EGENERIC;
+        /* Only work with not pace controled access */
+        if( access2_Control( p_src, ACCESS_CAN_CONTROL_PACE, &b_bool )
+            || b_bool )
+        {
+            msg_Dbg( p_src, "ACCESS_CAN_CONTROL_PACE: timeshift useless" );
+            return VLC_EGENERIC;
+        }
+        /* Refuse access that can be paused */
+        if( access2_Control( p_src, ACCESS_CAN_PAUSE, &b_bool ) || b_bool )
+        {
+            msg_Dbg( p_src, "ACCESS_CAN_PAUSE: timeshift useless" );
+            return VLC_EGENERIC;
+        }
     }
 
     /* */
