@@ -38,6 +38,7 @@
 #include "../commands/cmd_fullscreen.hpp"
 #include "../commands/cmd_on_top.hpp"
 #include "../commands/cmd_show_window.hpp"
+#include "../commands/cmd_snapshot.hpp"
 #include "../src/theme.hpp"
 #include "../src/var_manager.hpp"
 #include "../src/vlcproc.hpp"
@@ -108,6 +109,7 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "vlc.volumeDown()", CmdVolumeDown )
     REGISTER_CMD( "vlc.minimize()", CmdMinimize )
     REGISTER_CMD( "vlc.onTop()", CmdOnTop )
+    REGISTER_CMD( "vlc.snapshot()", CmdSnapshot )
     REGISTER_CMD( "vlc.quit()", CmdQuit )
     m_commandMap["equalizer.enable()"] =
         CmdGenericPtr( new CmdSetEqualizer( getIntf(), true ) );

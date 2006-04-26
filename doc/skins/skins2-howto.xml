@@ -849,6 +849,9 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>vlc.fullscreen()</emphasis>: Toggle the fullscreen mode.
   </para></listitem>
   <listitem><para>
+    <emphasis>vlc.snapshot()</emphasis>: Take a snapshot (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
     <emphasis>vlc.onTop()</emphasis>: Toggle the "Always on top" status (since VLC 0.8.0).
   </para></listitem>
   <listitem><para>

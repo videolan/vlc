@@ -32,6 +32,8 @@ SOURCES_skins2 = \
 	commands/cmd_quit.hpp \
 	commands/cmd_resize.cpp \
 	commands/cmd_resize.hpp \
+	commands/cmd_snapshot.cpp \
+	commands/cmd_snapshot.hpp \
 	commands/cmd_show_window.hpp \
 	commands/cmd_vars.cpp \
 	commands/cmd_vars.hpp \
