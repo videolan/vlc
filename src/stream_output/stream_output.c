@@ -169,6 +169,7 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
 
     return p_sout;
 }
+
 /*****************************************************************************
  * sout_DeleteInstance: delete a previously allocated instance
  *****************************************************************************/
@@ -1008,9 +1009,7 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
         /* create name */
         asprintf( &psz_name, "%s%s", psz_prefix, b_once ? &ppsz_options[i][1] : ppsz_options[i] );
 
-
         /* Check if the option is deprecated */
-
         p_conf = config_FindConfig( p_this, psz_name );
 
         /* This is basically cut and paste from src/misc/configuration.c
