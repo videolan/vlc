@@ -57,6 +57,8 @@ static void Close( vlc_object_t * );
 #define THROTLE_LONGTEXT N_( "This limits the maximum number of clients " \
     "that can connect to the RTSP VOD. 0 means no limit."  )
 
+#define RAWMUX_TEXT N_( "MUX for RAW RTSP transport" )
+
 vlc_module_begin();
     set_shortname( _("RTSP VoD" ) );
     set_description( _("RTSP VoD server") );
@@ -66,6 +68,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "rtsp" );
     add_string ( "rtsp-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
+    add_string( "rtsp-raw-mux", NULL, NULL, RAWMUX_TEXT, RAWMUX_TEXT, VLC_TRUE );
     add_integer( "rtsp-throttle-users", 0, NULL, THROTLE_TEXT,
                                            THROTLE_LONGTEXT, VLC_TRUE );
 vlc_module_end();
@@ -166,6 +169,8 @@ struct vod_sys_t
     int i_throttle_users;
     int i_connections;
 
+    char *psz_raw_mux;
+
     /* List of media */
     int i_media;
     vod_media_t **media;
@@ -225,6 +230,8 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_this, "allowing up to %d connections", p_sys->i_throttle_users );
     p_sys->i_connections = 0;
 
+    p_sys->psz_raw_mux = config_GetPsz( p_vod, "rtsp-raw-mux" );
+
     p_sys->p_rtsp_host =
         httpd_HostNew( VLC_OBJECT(p_vod), url.psz_host, url.i_port );
     if( !p_sys->p_rtsp_host )
@@ -250,6 +257,7 @@ static int Open( vlc_object_t *p_this )
 
 error:
     if( p_sys && p_sys->p_rtsp_host ) httpd_HostDelete( p_sys->p_rtsp_host );
+    if( p_sys && p_sys->psz_raw_mux ) free( p_sys->psz_raw_mux );
     if( p_sys ) free( p_sys );
     vlc_UrlClean( &url );
 
@@ -269,6 +277,7 @@ static void Close( vlc_object_t * p_this )
 
     /* TODO delete medias */
     free( p_sys->psz_path );
+    free( p_sys->psz_raw_mux );
     free( p_sys );
 }
 
@@ -323,6 +332,8 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_PLAY,
                     RtspCallback, (void*)p_media );
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_PAUSE,
+                    RtspCallback, (void*)p_media );
+    httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_GETPARAMETER,
                     RtspCallback, (void*)p_media );
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_TEARDOWN,
                     RtspCallback, (void*)p_media );
@@ -686,6 +697,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 if( strstr( psz_transport, "MP2T/H2221/UDP" ) ||
                     strstr( psz_transport, "RAW/RAW/UDP" ) )
                 {
+                    p_media->psz_mux = p_vod->p_sys->psz_raw_mux;
                     p_media->b_raw = VLC_TRUE;
                 }
 
@@ -889,6 +901,13 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             RtspClientDel( p_media, p_rtsp );
             break;
 
+        case HTTPD_MSG_GETPARAMETER:
+            answer->i_status = 200;
+            answer->psz_status = strdup( "OK" );
+            answer->i_body = 0;
+            answer->p_body = NULL;
+            break;
+
         default:
             return VLC_EGENERIC;
     }
@@ -897,7 +916,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     psz_cseq = httpd_MsgGet( query, "Cseq" );
     psz_cseq ? i_cseq = atoi( psz_cseq ) : 0;
-    httpd_MsgAdd( answer, "Cseq", "%d", i_cseq );
+    httpd_MsgAdd( answer, "CSeq", "%d", i_cseq );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )

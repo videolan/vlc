@@ -55,6 +55,7 @@ enum
     HTTPD_MSG_SETUP,
     HTTPD_MSG_PLAY,
     HTTPD_MSG_PAUSE,
+    HTTPD_MSG_GETPARAMETER,
     HTTPD_MSG_TEARDOWN,
 
     /* just to track the count of MSG */

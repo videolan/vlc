@@ -1506,7 +1506,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                 cl->query.i_proto = HTTPD_PROTO_RTSP;
                 cl->query.i_type  = HTTPD_MSG_ANSWER;
             }
-            else if( !memcmp( cl->p_buffer, "GET", 3 ) ||
+            else if( !memcmp( cl->p_buffer, "GET ", 4 ) ||
                      !memcmp( cl->p_buffer, "HEAD", 4 ) ||
                      !memcmp( cl->p_buffer, "POST", 4 ) )
             {
@@ -1583,18 +1583,19 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                     }
                     msg_type[] =
                     {
-                        { "GET",        HTTPD_MSG_GET,  HTTPD_PROTO_HTTP },
-                        { "HEAD",       HTTPD_MSG_HEAD, HTTPD_PROTO_HTTP },
-                        { "POST",       HTTPD_MSG_POST, HTTPD_PROTO_HTTP },
+                        { "OPTIONS",        HTTPD_MSG_OPTIONS,      HTTPD_PROTO_RTSP },
+                        { "DESCRIBE",       HTTPD_MSG_DESCRIBE,     HTTPD_PROTO_RTSP },
+                        { "SETUP",          HTTPD_MSG_SETUP,        HTTPD_PROTO_RTSP },
+                        { "PLAY",           HTTPD_MSG_PLAY,         HTTPD_PROTO_RTSP },
+                        { "PAUSE",          HTTPD_MSG_PAUSE,        HTTPD_PROTO_RTSP },
+                        { "GET_PARAMETER",  HTTPD_MSG_GETPARAMETER, HTTPD_PROTO_RTSP },
+                        { "TEARDOWN",       HTTPD_MSG_TEARDOWN,     HTTPD_PROTO_RTSP },
 
-                        { "OPTIONS",    HTTPD_MSG_OPTIONS,  HTTPD_PROTO_RTSP },
-                        { "DESCRIBE",   HTTPD_MSG_DESCRIBE, HTTPD_PROTO_RTSP },
-                        { "SETUP",      HTTPD_MSG_SETUP,    HTTPD_PROTO_RTSP },
-                        { "PLAY",       HTTPD_MSG_PLAY,     HTTPD_PROTO_RTSP },
-                        { "PAUSE",      HTTPD_MSG_PAUSE,    HTTPD_PROTO_RTSP },
-                        { "TEARDOWN",   HTTPD_MSG_TEARDOWN, HTTPD_PROTO_RTSP },
+                        { "GET",            HTTPD_MSG_GET,          HTTPD_PROTO_HTTP },
+                        { "HEAD",           HTTPD_MSG_HEAD,         HTTPD_PROTO_HTTP },
+                        { "POST",           HTTPD_MSG_POST,         HTTPD_PROTO_HTTP },
 
-                        { NULL,         HTTPD_MSG_NONE,     HTTPD_PROTO_NONE }
+                        { NULL,             HTTPD_MSG_NONE,         HTTPD_PROTO_NONE }
                     };
                     int  i;
 
