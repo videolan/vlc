@@ -1283,45 +1283,48 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
 
                                 if( i_current_fourcc && (WAVE_FORMAT_PCM == pWfx->wFormatTag) )
                                 {
-                                    if( ! i_channels )
-                                        i_channels = 2;
+                                    int val = i_channels;
+                                    if( ! val )
+                                        val = 2;
 
-                                    if( i_channels % pASCC->ChannelsGranularity
-                                     || (unsigned int)i_channels < pASCC->MinimumChannels
-                                     || (unsigned int)i_channels > pASCC->MaximumChannels )
+                                    if( val % pASCC->ChannelsGranularity
+                                     || (unsigned int)val < pASCC->MinimumChannels
+                                     || (unsigned int)val > pASCC->MaximumChannels )
                                     {
                                         // required number channels not available, try next media type
                                         FreeMediaType( *p_mt );
                                         CoTaskMemFree( (PVOID)p_mt );
                                         continue;
                                     }
-                                    pWfx->nChannels = i_channels;
+                                    pWfx->nChannels = val;
 
-                                    if( ! i_samplespersec )
-                                        i_samplespersec = 44100;
+                                    val = i_samplespersec;
+                                    if( ! val )
+                                        val = 44100;
 
-                                    if( i_samplespersec % pASCC->SampleFrequencyGranularity
-                                     || (unsigned int)i_samplespersec < pASCC->MinimumSampleFrequency
-                                     || (unsigned int)i_samplespersec > pASCC->MaximumSampleFrequency )
+                                    if( val % pASCC->SampleFrequencyGranularity
+                                     || (unsigned int)val < pASCC->MinimumSampleFrequency
+                                     || (unsigned int)val > pASCC->MaximumSampleFrequency )
                                     {
                                         // required sampling rate not available, try next media type
                                         FreeMediaType( *p_mt );
                                         CoTaskMemFree( (PVOID)p_mt );
                                         continue;
                                     }
-                                    pWfx->nSamplesPerSec = i_samplespersec;
+                                    pWfx->nSamplesPerSec = val;
  
-                                    if( !i_bitspersample )
+                                    val = i_bitspersample; 
+                                    if( ! val )
                                     {
                                         if( VLC_FOURCC('f', 'l', '3', '2') == i_current_fourcc )
-                                            i_bitspersample = 32;
+                                            val = 32;
                                         else
-                                            i_bitspersample = 16;
+                                            val = 16;
                                     }
 
-                                    if( i_bitspersample % pASCC->BitsPerSampleGranularity
-                                     || (unsigned int)i_bitspersample < pASCC->MinimumBitsPerSample
-                                     || (unsigned int)i_bitspersample > pASCC->MaximumBitsPerSample )
+                                    if( val % pASCC->BitsPerSampleGranularity
+                                     || (unsigned int)val < pASCC->MinimumBitsPerSample
+                                     || (unsigned int)val > pASCC->MaximumBitsPerSample )
                                     {
                                         // required sample size not available, try next media type
                                         FreeMediaType( *p_mt );
@@ -1329,7 +1332,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                         continue;
                                     }
 
-                                    pWfx->wBitsPerSample = i_bitspersample;
+                                    pWfx->wBitsPerSample = val;
                                     pWfx->nBlockAlign = (pWfx->wBitsPerSample * pWfx->nChannels)/8;
                                     pWfx->nAvgBytesPerSec = pWfx->nSamplesPerSec * pWfx->nBlockAlign;
 
