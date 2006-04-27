@@ -623,8 +623,20 @@ static int _OpenFile( access_t * p_access, const char * psz_name )
         return VLC_EGENERIC;
     }
 
+    // FIXME: support non-ANSI filenames on Win32
     p_sys->fd = open( psz_localname, O_NONBLOCK /*| O_LARGEFILE*/ );
     LocaleFree( psz_localname );
+
+#ifndef WIN32
+    if( p_sys->fd >= FD_SETSIZE )
+    {
+        // Avoid overflowing fd_set
+        close( p_sys->fd );
+        p_sys->fd = -1;
+        errno = EMFILE;
+    }
+#endif
+
     if ( p_sys->fd == -1 )
     {
         msg_Err( p_access, "cannot open file %s (%s)", psz_name,

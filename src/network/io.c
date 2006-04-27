@@ -69,7 +69,14 @@ int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
         return -1;
     }
 
-        /* Set to non-blocking */
+    if( fd >= FD_SETSIZE )
+    {
+        msg_Err( p_this, "cannot create socket (too many already in use)" );
+        net_Close( fd );
+        return -1;
+    }
+
+    /* Set to non-blocking */
 #if defined( WIN32 ) || defined( UNDER_CE )
     {
         unsigned long i_dummy = 1;

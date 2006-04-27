@@ -416,6 +416,11 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
             if( i_val < 0 )
                 msg_Err( p_this, "accept failed (%s)",
                          net_strerror( net_errno ) );
+            else if( i_val >= FD_SETSIZE )
+            {
+                net_Close( i_val ); /* avoid future overflows in FD_SET */
+                msg_Err( p_this, "accept failed (too many sockets opened)" );
+            }
             else
             {
                 /*
