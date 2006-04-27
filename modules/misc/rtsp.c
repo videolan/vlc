@@ -68,7 +68,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "rtsp" );
     add_string ( "rtsp-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
-    add_string( "rtsp-raw-mux", NULL, NULL, RAWMUX_TEXT, RAWMUX_TEXT, VLC_TRUE );
+    add_string( "rtsp-raw-mux", "ts", NULL, RAWMUX_TEXT, RAWMUX_TEXT, VLC_TRUE );
     add_integer( "rtsp-throttle-users", 0, NULL, THROTLE_TEXT,
                                            THROTLE_LONGTEXT, VLC_TRUE );
 vlc_module_end();
@@ -230,7 +230,8 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_this, "allowing up to %d connections", p_sys->i_throttle_users );
     p_sys->i_connections = 0;
 
-    p_sys->psz_raw_mux = config_GetPsz( p_vod, "rtsp-raw-mux" );
+    var_Create( p_this, "rtsp-raw-mux", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    p_sys->psz_raw_mux = var_GetString( p_this, "rtsp-raw-mux" );
 
     p_sys->p_rtsp_host =
         httpd_HostNew( VLC_OBJECT(p_vod), url.psz_host, url.i_port );
@@ -274,6 +275,7 @@ static void Close( vlc_object_t * p_this )
 
     httpd_HostDelete( p_sys->p_rtsp_host );
     var_Destroy( p_this, "rtsp-throttle-users" );
+    var_Destroy( p_this, "rtsp-raw-mux" );
 
     /* TODO delete medias */
     free( p_sys->psz_path );
