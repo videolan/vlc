@@ -478,7 +478,7 @@ static int DemuxStation( demux_t *p_demux )
                                                 "%s",
                                                 psz_mt );
                     }
-                    else if( psz_br )
+                    if( psz_br )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
                                                 _( "Shoutcast" ),
@@ -486,7 +486,7 @@ static int DemuxStation( demux_t *p_demux )
                                                 "%s",
                                                 psz_br );
                     }
-                    else if( psz_genre )
+                    if( psz_genre )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
                                                 _(VLC_META_INFO_CAT),
@@ -494,7 +494,7 @@ static int DemuxStation( demux_t *p_demux )
                                                 "%s",
                                                 psz_genre );
                     }
-                    else if( psz_ct )
+                    if( psz_ct )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
                                                 _(VLC_META_INFO_CAT),
@@ -502,7 +502,7 @@ static int DemuxStation( demux_t *p_demux )
                                                 "%s",
                                                 psz_ct );
                     }
-                    else if( psz_lc )
+                    if( psz_lc )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
                                                 _( "Shoutcast" ),
@@ -510,15 +510,15 @@ static int DemuxStation( demux_t *p_demux )
                                                 "%s",
                                                 psz_lc );
                     }
-                    else if( psz_rt )
+                    if( psz_rt )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _( "Shoutcast" ),
-                                                _( "Rating" ),
+                                                _(VLC_META_INFO_CAT),
+                                                _(VLC_META_RATING),
                                                 "%s",
                                                 psz_rt );
                     }
-                    else if( psz_load )
+                    if( psz_load )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
                                                 _( "Shoutcast" ),
