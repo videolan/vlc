@@ -108,6 +108,7 @@ Pierre Marc Dumuid <pierre.dumuid at adelaide dot edu dot au> - Playlist patches
 Régis Duchesne <regis at via.ecp.fr> - original VLC code
 Remco Poortinga <poortinga at telin.nl> - IPv6 multicast patch
 Rene Gollent <rgollent at u.arizona.edu> - BeOS interface fix
+Rob Casey (rob dot casey AT swishgroup dot com dot au) - Amino RTSP fix
 Roine Gustafsson <roine at popstar.com> - spudec bug fixes
 Rudolf Cornelissen <rag.cornelissen at inter.nl.net> - BeOS fixes
 Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX 
