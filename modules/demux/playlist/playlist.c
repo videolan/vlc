@@ -38,6 +38,10 @@
 #define AUTOSTART_LONGTEXT N_( "Automatically start playing the playlist " \
                 "content once it's loaded.\n" )
 
+#define SHOW_ADULT_TEXT N_( "Show shoutcast adult content" )
+#define SHOW_ADULT_LONGTEXT N_( "Show NC17 rated video streams when " \
+                "using shoutcast video playlists." )
+
 vlc_module_begin();
     add_shortcut( "playlist" );
     set_category( CAT_INPUT );
@@ -95,6 +99,8 @@ vlc_module_begin();
         add_shortcut( "shout-winamp" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_Shoutcast), E_(Close_Shoutcast) );
+        add_bool( "shoutcast-show-adult", VLC_FALSE, NULL,
+                   SHOW_ADULT_TEXT, SHOW_ADULT_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
 

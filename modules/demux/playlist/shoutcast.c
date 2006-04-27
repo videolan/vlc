@@ -43,6 +43,8 @@ struct demux_sys_t
 
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
+
+    vlc_bool_t b_adult;
 };
 
 /* duplicate from modules/services_discovery/shout.c */
@@ -89,6 +91,11 @@ int E_(Import_Shoutcast)( vlc_object_t *p_this )
     p_sys->p_playlist = NULL;
     p_sys->p_xml = NULL;
     p_sys->p_xml_reader = NULL;
+
+    /* Do we want to list adult content ? */
+    var_Create( p_demux, "shoutcast-show-adult",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    p_sys->b_adult = var_GetBool( p_demux, "shoutcast-show-adult" );
 
     return VLC_SUCCESS;
 }
@@ -437,7 +444,8 @@ static int DemuxStation( demux_t *p_demux )
                 psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
                 if( !psz_eltname ) return -1;
                 if( !strcmp( psz_eltname, "station" ) &&
-                    ( psz_base || ( psz_rt && psz_load ) ) )
+                    ( psz_base || ( psz_rt && psz_load &&
+                    ( p_sys->b_adult || strcmp( psz_rt, "NC17" ) ) ) ) )
                 {
                     playlist_item_t *p_item;
                     char *psz_mrl = NULL;
