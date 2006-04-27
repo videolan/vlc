@@ -264,7 +264,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
-    
+
 /* Frame-type options */
 
     add_integer( SOUT_CFG_PREFIX "keyint", 250, NULL, KEYINT_TEXT,
