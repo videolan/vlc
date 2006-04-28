@@ -1171,7 +1171,7 @@ vlc_module_begin();
     add_bool( "drop-late-frames", 1, NULL, DROP_LATE_FRAMES_TEXT,
               DROP_LATE_FRAMES_LONGTEXT, VLC_TRUE );
     /* Used in vout_synchro */
-    add_bool( "skip-frames", 0, NULL, SKIP_FRAMES_TEXT,
+    add_bool( "skip-frames", 1, NULL, SKIP_FRAMES_TEXT,
               SKIP_FRAMES_LONGTEXT, VLC_TRUE );
     add_bool( "quiet-synchro", 0, NULL, QUIET_SYNCHRO_TEXT,
               QUIET_SYNCHRO_LONGTEXT, VLC_TRUE );
