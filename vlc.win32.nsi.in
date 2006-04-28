@@ -411,7 +411,7 @@ SectionEnd
 Section /o "Mozilla plugin" SEC03
   SectionIn 2 3
 
-  !insertmacro InitUninstallLog
+  !insertmacro OpenUninstallLog
   !insertmacro InstallFolder mozilla
   !insertmacro CloseUninstallLog
 
@@ -452,7 +452,7 @@ SectionEnd
 Section "ActiveX plugin" SEC04
   SectionIn 2 3
   SetOutPath "$INSTDIR"
-  !insertmacro InitUninstallLog
+  !insertmacro OpenUninstallLog
   !insertmacro InstallFile activex\axvlc.dll
   !insertmacro CloseUninstallLog
   RegDLL "$INSTDIR\axvlc.dll"
