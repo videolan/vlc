@@ -423,6 +423,9 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
             }
             else
             {
+#ifdef FD_CLOEXEC
+                fcntl( i_fd, F_SETFD, FD_CLOEXEC );
+#endif
                 /*
                  * This round-robin trick ensures that the first sockets in
                  * pi_fd won't prevent the last ones from getting accept'ed.
