@@ -2435,13 +2435,7 @@ static void httpd_HostThread( httpd_host_t *host )
                 socklen_t i_sock_size = sizeof( struct sockaddr_storage );
                 struct  sockaddr_storage sock;
 
-                // FIXME: use net_Accept()
                 fd = accept( fd, (struct sockaddr *)&sock, &i_sock_size );
-                if( fd >= FD_SETSIZE )
-                {
-                    net_Close( fd );
-                    fd = -1;
-                }
 
                 if( fd >= 0 )
                 {
@@ -2455,8 +2449,13 @@ static void httpd_HostThread( httpd_host_t *host )
                     }
 #else
                     fcntl( fd, F_SETFL, O_NONBLOCK );
+                    if( fd >= FD_SETSIZE )
+                    {
+                        net_Close( fd );
+                        fd = -1;
+                    }
+                    else
 #endif
-
                     if( p_tls != NULL)
                     {
                         switch ( tls_ServerSessionHandshake( p_tls, fd ) )
