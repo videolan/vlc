@@ -756,7 +756,7 @@ static int Read( access_t * p_access, uint8_t * p_buffer, int i_len )
     int i_ret;
     struct pollfd ufd;
 
-    ufd.fd = fds;
+    ufd.fd = p_sys->i_fd;
     ufd.events = POLLIN;
 
     if( p_access->info.b_eof )
