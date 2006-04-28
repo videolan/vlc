@@ -144,11 +144,27 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
                 default:
                     i_image = 0;
             }
+            char *psz_tmp = NULL;
+            if( p_uit->file.l_size )
+            {
+                if( p_uit->file.l_size > 1024 * 1024 * 1024 )
+                     asprintf( &psz_tmp, "(%ld GB)",
+                                p_uit->file.l_size / (1024*1024*1024) );
+                if( p_uit->file.l_size > 1024 * 1024 )
+                    asprintf( &psz_tmp, "(%ld MB)",
+                                p_uit->file.l_size / (1024*1024) );
+                else if( p_uit->file.l_size > 1024 )
+                    asprintf( &psz_tmp, "(%ld kB)",
+                                p_uit->file.l_size / 1024 );
+                else
+                    asprintf( &psz_tmp, "(%ld B)", p_uit->file.l_size );
+            }
             list->InsertItem( list->GetItemCount(),
                               wxU(p_uit->file.psz_description)+wxU("\n")
-                              + wxU(p_uit->release.psz_version)+wxU(" (")
-                              + wxU(p_uit->release.psz_svn_revision)+wxU(")"),
+                              + wxU(p_uit->release.psz_version)+wxU(" ")
+                              + wxU(psz_tmp),
                               i_image );
+            if( psz_tmp ) free( psz_tmp );
         }
 
         main_sizer->Add( new wxStaticText( this, -1, wxU( _("\nAvailable " 
