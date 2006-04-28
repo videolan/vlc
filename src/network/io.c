@@ -69,14 +69,6 @@ int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
         return -1;
     }
 
-    if( fd >= FD_SETSIZE )
-    {
-        msg_Err( p_this, "cannot create socket (too many already in use)" );
-        net_Close( fd );
-        return -1;
-    }
-
-    /* Set to non-blocking */
 #if defined( WIN32 ) || defined( UNDER_CE )
     {
         unsigned long i_dummy = 1;
@@ -84,12 +76,17 @@ int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
             msg_Err( p_this, "cannot set socket to non-blocking mode" );
     }
 #else
-    fcntl( fd, F_SETFD, FD_CLOEXEC );
+    if( fd >= FD_SETSIZE )
+    {
+        /* We don't want to overflow select() fd_set */
+        msg_Err( p_this, "cannot create socket (too many already in use)" );
+        net_Close( fd );
+        return -1;
+    }
 
-    if( ( ( i_val = fcntl( fd, F_GETFL, 0 ) ) < 0 ) ||
-        ( fcntl( fd, F_SETFL, i_val | O_NONBLOCK ) < 0 ) )
-        msg_Err( p_this, "cannot set socket to non-blocking mode (%s)",
-                 strerror( errno ) );
+    fcntl( fd, F_SETFD, FD_CLOEXEC );
+    i_val = fcntl( fd, F_GETFL, 0 );
+    fcntl( fd, F_SETFL, ((i_val != -1) ? i_val : 0) | O_NONBLOCK );
 #endif
 
     i_val = 1;
