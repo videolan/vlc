@@ -24,6 +24,7 @@ Decoders:
 Playlist / Services discovery:
  * XSPF playlist support
  * Podcast support
+ * Updated Shoutcast to use new listing
 
 Audio output:
  * New JACK audio output
