@@ -35,6 +35,7 @@
 #include <errno.h>
 #include <linux/types.h>
 #include <sys/ioctl.h>
+#include <sys/poll.h>
 #include "videodev2.h"
 
 /*****************************************************************************
@@ -753,28 +754,22 @@ static int Read( access_t * p_access, uint8_t * p_buffer, int i_len )
     access_sys_t * p_sys = p_access->p_sys;
 
     int i_ret;
+    struct pollfd ufd;
 
-    struct timeval timeout;
-    fd_set fds;
-
-    FD_ZERO( &fds );
-    FD_SET( p_sys->i_fd, &fds );
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 500000;
+    ufd.fd = fds;
+    ufd.events = POLLIN;
 
     if( p_access->info.b_eof )
         return 0;
 
-    while( !( i_ret = select( p_sys->i_fd + 1, &fds, NULL, NULL, &timeout) ) )
+    do
     {
-        FD_ZERO( &fds );
-        FD_SET( p_sys->i_fd, &fds );
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 500000;
-
         if( p_access->b_die )
             return 0;
+
+        ufd.revents = 0;
     }
+    while( ( i_ret = poll( &ufd, 1, 500 ) ) == 0 );
 
     if( i_ret < 0 )
     {
