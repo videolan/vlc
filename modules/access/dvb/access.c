@@ -36,6 +36,7 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/poll.h>
 
 #include <errno.h>
 
@@ -399,35 +400,29 @@ static block_t *Block( access_t *p_access )
 
     for ( ; ; )
     {
-        struct timeval timeout;
-        fd_set fds, fde;
+        struct pollfd ufds[2];
         int i_ret;
-        int i_max_handle = p_sys->i_handle;
 
         /* Initialize file descriptor sets */
-        FD_ZERO( &fds );
-        FD_ZERO( &fde );
-        FD_SET( p_sys->i_handle, &fds );
-        FD_SET( p_sys->i_frontend_handle, &fde );
-        if ( p_sys->i_frontend_handle > i_max_handle )
-            i_max_handle = p_sys->i_frontend_handle;
+        memset (ufds, 0, sizeof (ufds));
+        ufds[0].fd = p_sys->i_handle;
+        ufds[0].events = POLLIN;
+        ufds[1].fd = p_sys->i_frontend_handle;
+        ufds[1].events = POLLOUT;
 
         /* We'll wait 0.5 second if nothing happens */
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 500000;
-
         /* Find if some data is available */
-        i_ret = select( i_max_handle + 1, &fds, NULL, &fde, &timeout );
+        i_ret = poll( ufds, 2, 500 );
 
         if ( p_access->b_die )
             return NULL;
 
-        if ( i_ret < 0 && errno == EINTR )
-            continue;
-
         if ( i_ret < 0 )
         {
-            msg_Err( p_access, "select error (%s)", strerror(errno) );
+            if( errno == EINTR )
+                continue;
+
+            msg_Err( p_access, "poll error: %s", strerror(errno) );
             return NULL;
         }
 
@@ -437,7 +432,7 @@ static block_t *Block( access_t *p_access )
             p_sys->i_ca_next_event = mdate() + p_sys->i_ca_timeout;
         }
 
-        if ( FD_ISSET( p_sys->i_frontend_handle, &fde ) )
+        if ( ufds[1].revents )
         {
             E_(FrontendPoll)( p_access );
         }
@@ -479,7 +474,7 @@ static block_t *Block( access_t *p_access )
             E_(FrontendSet)( p_access );
         }
 
-        if ( FD_ISSET( p_sys->i_handle, &fds ) )
+        if ( ufds[0].revents )
         {
             p_block = block_New( p_access,
                                  p_sys->i_read_once * TS_PACKET_SIZE );
