@@ -772,30 +772,30 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 #ifdef HAVE_X11_XLIB_H
     if( config_GetInt( p_vlc, "disable-screensaver" ) == 1 )
     {
-        VLC_AddIntf( 0, "screensaver", VLC_FALSE, VLC_FALSE );
+        VLC_AddIntf( 0, "screensaver,none", VLC_FALSE, VLC_FALSE );
     }
 #endif
 
     if( config_GetInt( p_vlc, "file-logging" ) == 1 )
     {
-        VLC_AddIntf( 0, "logger", VLC_FALSE, VLC_FALSE );
+        VLC_AddIntf( 0, "logger,none", VLC_FALSE, VLC_FALSE );
     }
 #ifdef HAVE_SYSLOG_H
     if( config_GetInt( p_vlc, "syslog" ) == 1 )
     {
         char *psz_logmode = "logmode=syslog";
-        AddIntfInternal( 0, "logger", VLC_FALSE, VLC_FALSE, 1, &psz_logmode );
+        AddIntfInternal( 0, "logger,none", VLC_FALSE, VLC_FALSE, 1, &psz_logmode );
     }
 #endif
 
     if( config_GetInt( p_vlc, "show-intf" ) == 1 )
     {
-        VLC_AddIntf( 0, "showintf", VLC_FALSE, VLC_FALSE );
+        VLC_AddIntf( 0, "showintf,none", VLC_FALSE, VLC_FALSE );
     }
 
     if( config_GetInt( p_vlc, "network-synchronisation") == 1 )
     {
-        VLC_AddIntf( 0, "netsync", VLC_FALSE, VLC_FALSE );
+        VLC_AddIntf( 0, "netsync,none", VLC_FALSE, VLC_FALSE );
     }
 
     /*
