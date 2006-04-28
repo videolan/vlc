@@ -50,6 +50,7 @@ Interfaces:
     - Improved media information panel (shows statistics, metadata, ...)
     - Drag & Drop support in the playlist
  * Skins2 
+    - New default skin
     - Support for Winamp 2 skins
     - Improved playlist handling
     - Support for popup menus, animated bitmaps, equalizer, ...
