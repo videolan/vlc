@@ -104,10 +104,7 @@ static void strcpy_strip_ext( char *d, char *s )
         return;
     }
     else
-    {
-        strncpy(d, s, tmp - s);
-        d[tmp - s] = 0;
-    }
+        strlcpy(d, s, tmp - s);
     while( *d )
     {
         *d = tolower(*d);
@@ -298,11 +295,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             strcpy( f_fname, tmp+1 ); // we skip the seperator, so it will still fit in the allocated space
         dirlen = strlen(psz_fname) - strlen(tmp) + 1; // add the seperator
         f_dir = malloc( dirlen + 1 );
-        if( f_dir )
-        {
-            strncpy( f_dir, psz_fname, dirlen );
-            f_dir[dirlen] = 0;
-        }
+        if( f_dir != NULL )
+            strlcpy( f_dir, psz_fname, dirlen );
     }
     else
     {
