@@ -457,18 +457,14 @@ static void Win32AddConnection( access_t *p_access, char *psz_path,
     net_resource.dwType = RESOURCETYPE_DISK;
 
     /* Find out server and share names */
-    strncpy( psz_server, psz_path, sizeof( psz_server ) );
-    psz_server[sizeof (psz_server) - 1] = '\0';
+    strlcpy( psz_server, psz_path, sizeof( psz_server ) );
     psz_share[0] = 0;
     psz_parser = strchr( psz_path, '/' );
     if( psz_parser )
     {
         char *psz_parser2 = strchr( ++psz_parser, '/' );
         if( psz_parser2 )
-        {
-            strncpy( psz_share, psz_parser, sizeof( psz_share ) );
-            psz_parse[sizeof (psz_parse) - 1] = '\0';
-        }
+            strlcpy( psz_share, psz_parser, sizeof( psz_share ) );
    }
 
     sprintf( psz_remote, "\\\\%s\\%s", psz_server, psz_share );
