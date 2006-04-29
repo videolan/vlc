@@ -1791,8 +1791,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     snprintf( psz_access, sizeof( psz_access ),
                               "udp{raw,ttl=%d}", p_sys->i_ttl );
                 else
-                    strncpy( psz_access, "udp{raw}", sizeof( psz_access ) );
-                psz_access[sizeof( psz_access ) - 1] = '\0';
+                    strlcpy( psz_access, "udp{raw}", sizeof( psz_access ) );
 
                 snprintf( psz_url, sizeof( psz_url ),
                          ( strchr( ip, ':' ) != NULL ) ? "[%s]:%d" : "%s:%d",
