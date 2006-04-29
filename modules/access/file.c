@@ -1,10 +1,11 @@
 /*****************************************************************************
  * file.c: file input (file: access plug-in)
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Rémi Denis-Courmont <rem # videolan # org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,9 +34,6 @@
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
-#ifdef HAVE_SYS_TIME_H
-#   include <sys/time.h>
-#endif
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif
@@ -45,6 +43,7 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
+#   include <poll.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
@@ -374,35 +373,30 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         if( !p_sys->b_kfir )
         {
             /* Find if some data is available. This won't work under Windows. */
-            struct timeval  timeout;
-            fd_set          fds;
-
-            /* Initialize file descriptor set */
-            FD_ZERO( &fds );
-            FD_SET( p_sys->fd, &fds );
-
-            /* We'll wait 0.5 second if nothing happens */
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 500000;
-
-            /* Find if some data is available */
-            while( (i_ret = select( p_sys->fd + 1, &fds, NULL, NULL, &timeout )) == 0
-                    || (i_ret < 0 && errno == EINTR) )
+            do
             {
-                FD_ZERO( &fds );
-                FD_SET( p_sys->fd, &fds );
-                timeout.tv_sec = 0;
-                timeout.tv_usec = 500000;
+                struct pollfd ufd;
 
                 if( p_access->b_die )
                     return 0;
-            }
 
-            if( i_ret < 0 )
-            {
-                msg_Err( p_access, "select error (%s)", strerror(errno) );
-                return -1;
+                memset (&ufd, 0, sizeof (ufd));
+                ufd.fd = p_sys->fd;
+                ufd.events = POLLIN;
+
+                i_ret = poll( &ufd, 1, 500 );
+                if( i_ret == -1 )
+                {
+                    if( errno != EINTR )
+                    {
+                        msg_Err( p_access, "poll error: %s",
+                                 strerror( errno ) );
+                        return -1;
+                    }
+                    i_ret = 0;
+                }
             }
+            while( i_ret == 0 );
 
             i_ret = read( p_sys->fd, p_buffer, i_len );
         }
@@ -626,16 +620,6 @@ static int _OpenFile( access_t * p_access, const char * psz_name )
     // FIXME: support non-ANSI filenames on Win32
     p_sys->fd = open( psz_localname, O_NONBLOCK /*| O_LARGEFILE*/ );
     LocaleFree( psz_localname );
-
-#ifndef WIN32
-    if( p_sys->fd >= FD_SETSIZE )
-    {
-        // Avoid overflowing fd_set
-        close( p_sys->fd );
-        p_sys->fd = -1;
-        errno = EMFILE;
-    }
-#endif
 
     if ( p_sys->fd == -1 )
     {
