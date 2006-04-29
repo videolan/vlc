@@ -119,9 +119,9 @@ int E_(SSPopN)( rpn_stack_t *st, mvar_t  *vars )
 
 void E_(SSPushN)( rpn_stack_t *st, int i )
 {
-    char v[512];
+    char v[12];
 
-    sprintf( v, "%d", i );
+    snprintf( v, sizeof (v), "%d", i );
     E_(SSPush)( st, v );
 }
 
