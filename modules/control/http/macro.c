@@ -725,9 +725,8 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     psz = config_GetPsz( p_intf, m->param1 );
                     if( psz != NULL )
                     {
-                        strncpy( value, psz,sizeof( value ) );
+                        strlcpy( value, psz,sizeof( value ) );
                         free( psz );
-                        value[sizeof( value ) - 1] = '\0';
                     }
                     else
                         *value = '\0';
@@ -736,7 +735,6 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                 default:
                     snprintf( value, sizeof( value ),
                               "invalid type(%s) in set", m->param2 );
-                    value[sizeof( value ) - 1] = '\0';
                     break;
             }
             PRINTS( "%s", value );
