@@ -126,26 +126,18 @@ void E_(mvar_RemoveVar)( mvar_t *v, mvar_t *f )
 
 mvar_t *E_(mvar_GetVar)( mvar_t *s, const char *name )
 {
-    int i;
-    char base[512], *field, *p;
-    int  i_index;
-
     /* format: name[index].field */
+    char *field = strchr( name, '.' );
+    int i = 1 + (field != NULL) ? (field - name) : strlen( name );
+    char base[i];
+    char *p;
+    int i_index;
 
-    field = strchr( name, '.' );
-    if( field )
-    {
-        int i = field - name;
-        strncpy( base, name, i );
-        base[i] = '\0';
+    strlcpy( base, name, i );
+    if( field != NULL )
         field++;
-    }
-    else
-    {
-        strcpy( base, name );
-    }
 
-    if( ( p = strchr( base, '[' ) ) )
+    if( ( p = strchr( base, '[' ) ) != NULL )
     {
         *p++ = '\0';
         sscanf( p, "%d]", &i_index );
