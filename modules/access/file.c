@@ -41,11 +41,11 @@
 #   include <fcntl.h>
 #endif
 
-#ifdef HAVE_UNISTD_H
+#if defined( WIN32 ) && !defined( UNDER_CE )
+#   include <io.h>
+#else
 #   include <unistd.h>
 #   include <poll.h>
-#elif defined( WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
 #endif
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
