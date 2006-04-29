@@ -411,19 +411,16 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
 
         for( a = 0; a < i_extensions; a++ )
         {
-            int b;
-            char *tmp;
+            char *tmp, *ptr;
 
             while( psz_parser[0] != '\0' && psz_parser[0] == ' ' ) psz_parser++;
-            for( b = 0; psz_parser[b] != '\0'; b++ )
-            {
-                if( psz_parser[b] == ',' ) break;
-            }
-            tmp = malloc( b + 1 );
-            strncpy( tmp, psz_parser, b );
-            tmp[b] = 0;
+            ptr = strchr( psz_parser, ',');
+            tmp = ( ptr == NULL )
+                 ? strdup( psz_parser )
+                 : strndup( psz_parser, ptr - psz_parser );
+
             ppsz_extensions[a] = tmp;
-            psz_parser += b+1;
+            psz_parser = ptr + 1;
         }
     }
 
