@@ -371,6 +371,9 @@
                 "o_outline_view" = id; 
                 "o_playlist_view" = id; 
                 "o_random_ckb" = id; 
+                "o_save_accessory_popup" = id; 
+                "o_save_accessory_text" = id; 
+                "o_save_accessory_view" = id; 
                 "o_search_field" = id; 
                 "o_status_field" = id; 
                 "o_tc_author" = id; 

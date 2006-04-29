@@ -112,7 +112,7 @@
         o_outline_dict = [[NSMutableDictionary alloc] init];
     }
     return self;
-}        
+}
 - (void)awakeFromNib
 {
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
@@ -498,6 +498,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [[o_loop_popup itemAtIndex:1] setTitle: _NS("Repeat One")];
     [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];
     [o_mi_addNode setTitle: _NS("Add Folder to Playlist")];
+
+    [o_save_accessory_text setStringValue: _NS("File Format:")];
+    [[o_save_accessory_popup itemAtIndex:0] setTitle: _NS("Extended M3U")];
+    [[o_save_accessory_popup itemAtIndex:1] setTitle: _NS("XML Shareable Playlist Format (XSPF)")];
 }
 
 - (void)playlistUpdated
@@ -745,18 +749,57 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                                                        FIND_ANYWHERE );
 
     NSSavePanel *o_save_panel = [NSSavePanel savePanel];
-    NSString * o_name = [NSString stringWithFormat: @"%@.m3u", _NS("Untitled")];
+    NSString * o_name = [NSString stringWithFormat: @"%@", _NS("Untitled")];
+
+    //[o_save_panel setAllowedFileTypes: [NSArray arrayWithObjects: @"m3u", @"xpf", nil] ];
     [o_save_panel setTitle: _NS("Save Playlist")];
     [o_save_panel setPrompt: _NS("Save")];
+    [o_save_panel setAccessoryView: o_save_accessory_view];
 
     if( [o_save_panel runModalForDirectory: nil
             file: o_name] == NSOKButton )
     {
-        playlist_Export( p_playlist, [[o_save_panel filename] fileSystemRepresentation], "export-m3u" );
+        NSString *o_filename = [o_save_panel filename];
+
+        if( [o_save_accessory_popup indexOfSelectedItem] == 1 )
+        {
+            NSString * o_real_filename;
+            NSRange range;
+            range.location = [o_filename length] - [@".xspf" length];
+            range.length = [@".xspf" length];
+
+            if( [o_filename compare:@".xspf" options: NSCaseInsensitiveSearch
+                                             range: range] != NSOrderedSame )
+            {
+                o_real_filename = [NSString stringWithFormat: @"%@.xspf", o_filename];
+            }
+            else
+            {
+                o_real_filename = o_filename;
+            }
+            playlist_Export( p_playlist, [o_real_filename fileSystemRepresentation], "export-xspf" );
+        }
+        else
+        {
+            NSString * o_real_filename;
+            NSRange range;
+            range.location = [o_filename length] - [@".m3u" length];
+            range.length = [@".m3u" length];
+
+            if( [o_filename compare:@".m3u" options: NSCaseInsensitiveSearch
+                                             range: range] != NSOrderedSame )
+            {
+                o_real_filename = [NSString stringWithFormat: @"%@.m3u", o_filename];
+            }
+            else
+            {
+                o_real_filename = o_filename;
+            }
+            playlist_Export( p_playlist, [o_real_filename fileSystemRepresentation], "export-m3u" );
+        }
     }
     vlc_object_release( p_playlist );
 }
-
 
 /* When called retrieves the selected outlineview row and plays that node or item */
 - (IBAction)playItem:(id)sender

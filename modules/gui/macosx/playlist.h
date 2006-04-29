@@ -96,6 +96,11 @@
     IBOutlet id o_mm_mi_services;
     IBOutlet id o_mm_mu_services;
 
+    IBOutlet id o_save_accessory_view;
+    IBOutlet id o_save_accessory_popup;
+    IBOutlet id o_save_accessory_text;
+
+
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
 
