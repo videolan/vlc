@@ -2067,13 +2067,26 @@ static int InitDisplay( vout_thread_t *p_vout )
          */
         xvisual_template.screen =   p_vout->p_sys->i_screen;
         xvisual_template.class =    TrueColor;
+/* In some cases, we get a truecolor class adaptor that has a different
+   color depth. So try to get a real true color one first */
+        xvisual_template.depth =    p_vout->p_sys->i_screen_depth;
+
         p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display,
                                     VisualScreenMask | VisualClassMask,
                                     &xvisual_template, &i_count );
         if( p_xvisual == NULL )
         {
-            msg_Err( p_vout, "no TrueColor visual available" );
-            return VLC_EGENERIC;
+            msg_Warn( p_vout, "No screen matching the required color depth" );
+            xvisual_template.depth = 0;
+            p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display,
+                                    VisualScreenMask | VisualClassMask,
+                                    &xvisual_template, &i_count );
+            if( p_xvisual == NULL )
+            {
+            
+                msg_Err( p_vout, "no TrueColor visual available" );
+                return VLC_EGENERIC;
+            }
         }
 
         p_vout->output.i_rmask = p_xvisual->red_mask;
