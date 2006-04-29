@@ -63,14 +63,14 @@ const string StreamTime::getAsStringCurrTime( bool bShortFormat ) const
         return "-:--:--";
     }
 
-    vlc_value_t pos;
+    vlc_value_t pos; pos.f_float = 0.0;
     var_Get( getIntf()->p_sys->p_input, "position", &pos );
     if( pos.f_float == 0.0 )
     {
         return "-:--:--";
     }
 
-    vlc_value_t time;
+    vlc_value_t time; time.i_time = 0L;
     var_Get( getIntf()->p_sys->p_input, "time", &time );
 
     return formatTime( time.i_time / 1000000, bShortFormat );
@@ -107,7 +107,7 @@ const string StreamTime::getAsStringDuration( bool bShortFormat ) const
         return "-:--:--";
     }
 
-    vlc_value_t pos;
+    vlc_value_t pos; pos.f_float = 0.0;
     var_Get( getIntf()->p_sys->p_input, "position", &pos );
     if( pos.f_float == 0.0 )
     {
