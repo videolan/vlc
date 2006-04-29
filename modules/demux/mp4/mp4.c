@@ -408,24 +408,17 @@ static int Open( vlc_object_t * p_this )
                         /* msg dbg relative ? */
                         int i_path_size = strlen( p_demux->psz_access ) + 3 +
                                          strlen( p_demux->psz_path ) + strlen( psz_ref ) + 1;
-#ifdef HAVE_ALLOCA
-                        char *psz_absolute = alloca( i_path_size );
-#else
-                        char *psz_absolute = (char *)malloc( i_path_size );
-#endif
+                        char psz_absolute[i_path_size];
                         char *end = strrchr( p_demux->psz_path, '/' );
 
                         if( end )
                         {
-                            int i_len = end + 1 - p_demux->psz_path;
-
-                            strcpy( psz_absolute, p_demux->psz_access );
-                            strcat( psz_absolute, "://" );
-                            strncat( psz_absolute, p_demux->psz_path, i_len);
+                            snprintf( psz_absolute, i_path_size, "%s://%s",
+                                      p_demux->psz_access, p_demux->psz_path );
                         }
                         else
                         {
-                            strcpy( psz_absolute, "" );
+                            *psz_absolute = '\0';
                         }
                         strcat( psz_absolute, psz_ref );
                         msg_Dbg( p_demux, "adding ref = `%s'", psz_absolute );
@@ -445,9 +438,6 @@ static int Open( vlc_object_t * p_this )
                                 b_play = VLC_TRUE;
                             }
                         }
-#ifndef HAVE_ALLOCA
-                        free( psz_absolute );
-#endif
                     }
                 }
                 else
