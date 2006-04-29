@@ -25,7 +25,7 @@
 #include <vlc/vlc.h>
 
 #include <stddef.h> /* size_t */
-#include <string.h> /* strncpy(), strlen(), memcpy(), memset(), strchr() */
+#include <string.h> /* strlen(), memcpy(), memset(), strchr() */
 #include <stdlib.h> /* malloc(), free(), strtoul() */
 #include <errno.h>
 
@@ -175,8 +175,7 @@ __getnameinfo( const struct sockaddr *sa, socklen_t salen,
 
                 if (hent != NULL)
                 {
-                    strncpy (host, hent->h_name, hostlen);
-                    host[hostlen - 1] = '\0';
+                    strlcpy (host, hent->h_name, hostlen);
 
                     /*
                      * only keep first part of hostname
@@ -199,11 +198,8 @@ __getnameinfo( const struct sockaddr *sa, socklen_t salen,
             }
 
             if (!solved)
-            {
                 /* inet_ntoa() can't fail */
-                strncpy (host, inet_ntoa (addr->sin_addr), hostlen);
-                host[hostlen - 1] = '\0';
-            }
+                strlcpy (host, inet_ntoa (addr->sin_addr), hostlen);
         }
 
         if (serv != NULL)
@@ -222,8 +218,7 @@ __getnameinfo( const struct sockaddr *sa, socklen_t salen,
                                      ? "udp" : "tcp");
                 if (sent != NULL)
                 {
-                    strncpy (serv, sent->s_name, servlen);
-                    serv[servlen - 1] = 0;
+                    strlcpy (serv, sent->s_name, servlen);
                     solved = 1;
                 }
             }
@@ -636,8 +631,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     }
     else
     {
-        strncpy( psz_buf, node, NI_MAXHOST );
-        psz_buf[NI_MAXHOST - 1] = '\0';
+        strlcpy( psz_buf, node, NI_MAXHOST );
 
         psz_node = psz_buf;
 

@@ -602,8 +602,7 @@ static char *SDPGenerate( sap_handler_t *p_sap,
     {
         char *ptr;
 
-        strncpy( psz_uribuf, p_session->psz_uri + 1, sizeof( psz_uribuf ) );
-        psz_uribuf[sizeof( psz_uribuf ) - 1] = '\0';
+        strlcpy( psz_uribuf, p_session->psz_uri + 1, sizeof( psz_uribuf ) );
         ptr = strchr( psz_uribuf, '%' );
         if( ptr != NULL)
             *ptr = '\0';
