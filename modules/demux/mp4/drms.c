@@ -1797,8 +1797,7 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
                                          NULL, 0, p_tmp ) ) )
         {
             strncat( p_tmp, p_filename, min( strlen( p_filename ),
-                     (sizeof(p_tmp)/sizeof(p_tmp[0]) - 1) -
-                     strlen( p_tmp ) ) );
+                     (sizeof(p_tmp) - 1) - strlen( p_tmp ) ) );
 
             psz_path = FromLocale( p_tmp );
             strncpy( p_tmp, psz_path, sizeof( p_tmp ) - 1 );
@@ -1818,7 +1817,7 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
 #define ISCINFO "iSCInfo"
         if( strstr( psz_ipod, ISCINFO ) == NULL )
         {
-            snprintf( p_tmp, sizeof(p_tmp)/sizeof(p_tmp[0]) - 1,
+            snprintf( p_tmp, sizeof(p_tmp) - 1,
                       "%s/iPod_Control/iTunes/" ISCINFO "2", psz_ipod );
             psz_path = p_tmp;
         }
