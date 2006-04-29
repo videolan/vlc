@@ -72,9 +72,9 @@ vlc_confflags += \
 	--enable-mpc \
 	--enable-vcd \
 	--enable-vcdx \
+	--enable-xosd \
 	$(NULL)
 
-#	--enable-xosd \
 
 # These ones are currently shipped with VLC
 vlc_confflags += --enable-faad --with-faad-tree=extras/faad2
