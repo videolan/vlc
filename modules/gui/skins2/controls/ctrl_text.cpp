@@ -216,7 +216,10 @@ void CtrlText::setText( const UString &rText, uint32_t color )
 
 void CtrlText::onUpdate( Subject<VarText, void*> &rVariable, void* arg )
 {
-    displayText( m_rVariable.get() );
+    if( isVisible() )
+    {
+        displayText( m_rVariable.get() );
+    }
 }
 
 
