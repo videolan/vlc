@@ -632,13 +632,8 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
     }
     else
     {
-#ifdef HAVE_STRERROR
         msg_Err( p_this, "%s thread could not be created at %s:%d (%s)",
                          psz_name, psz_file, i_line, strerror(i_ret) );
-#else
-        msg_Err( p_this, "%s thread could not be created at %s:%d",
-                         psz_name, psz_file, i_line );
-#endif
         vlc_mutex_unlock( &p_this->object_lock );
     }
 
@@ -782,14 +777,9 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
 
     if( i_ret )
     {
-#ifdef HAVE_STRERROR
         msg_Err( p_this, "thread_join(%u) failed at %s:%d (%s)",
                          (unsigned int)p_this->thread_id, psz_file, i_line,
                          strerror(i_ret) );
-#else
-        msg_Err( p_this, "thread_join(%u) failed at %s:%d",
-                         (unsigned int)p_this->thread_id, psz_file, i_line );
-#endif
     }
     else
     {
