@@ -722,7 +722,7 @@ mvar_t *E_(mvar_VlmSetNew)( char *name, vlm_t *vlm )
             /* Over name */
             vlm_message_t *el = ch->child[j];
             vlm_message_t *inf, *desc;
-            char          psz[500];
+            char          psz[6 + strlen(el->psz_name)];
 
             sprintf( psz, "show %s", el->psz_name );
             if( vlm_ExecuteCommand( vlm, psz, &inf ) )
