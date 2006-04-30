@@ -290,8 +290,9 @@ VLC_EXPORT( counter_t*, __stats_CounterGet, (vlc_object_t*, int, unsigned int ) 
 static inline int __stats_GetInteger( vlc_object_t *p_obj, int i_id,
                                       unsigned int i_counter, int *value )
 {
+    int i_ret;
     vlc_value_t val; val.i_int = 0;
-    int i_ret = __stats_Get( p_obj, i_id, i_counter, &val );
+    i_ret = __stats_Get( p_obj, i_id, i_counter, &val );
     *value = val.i_int;
     return i_ret;
 }
@@ -300,8 +301,9 @@ static inline int __stats_GetInteger( vlc_object_t *p_obj, int i_id,
 static inline int __stats_GetFloat( vlc_object_t *p_obj, int i_id,
                                     unsigned int i_counter, float *value )
 {
+    int i_ret;
     vlc_value_t val;val.f_float = 0.0;
-    int i_ret = __stats_Get( p_obj, i_id, i_counter, &val );
+    i_ret = __stats_Get( p_obj, i_id, i_counter, &val );
     *value = val.f_float;
     return i_ret;
 }
