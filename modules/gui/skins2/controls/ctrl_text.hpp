@@ -54,8 +54,6 @@ class CtrlText: public CtrlGeneric, public Observer<VarText, void*>
             // width of the control. The user can still stop it or make it
             // scroll manually with the mouse.
             kAutomatic,
-            // Same as above butt default state is off
-            kAutomaticOff,
             // Only manual scrolling is allowed (with the mouse)
             kManual,
             // No scrolling of the text is allowed

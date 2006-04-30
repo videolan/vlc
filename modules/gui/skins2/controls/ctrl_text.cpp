@@ -74,7 +74,7 @@ CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
                              &m_cmdManualStill );
         m_fsm.addTransition( "manual1", "motion", "manual1", &m_cmdMove );
     }
-    else if( m_scrollMode == kAutomatic || m_scrollMode == kAutomaticOff )
+    else if( m_scrollMode == kAutomatic )
     {
         m_fsm.addTransition( "still", "mouse:left:down", "manual1",
                              &m_cmdToManual );
@@ -91,10 +91,7 @@ CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
     }
 
     // Initial state
-    if( m_scrollMode == kAutomatic )
-        m_fsm.setState( "outMoving" );
-    else
-        m_fsm.setState( "outStill" );
+    m_fsm.setState( "outStill" );
 
     // Observe the variable
     m_rVariable.addObserver( this );

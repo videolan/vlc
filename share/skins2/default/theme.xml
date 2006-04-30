@@ -214,9 +214,9 @@
 		<Button x="408" y="2" up="close_up" over="close_over" down="close_down" lefttop="righttop" rightbottom="righttop" action="vlc.quit()" tooltiptext="Quit VLC"/>
 		
 		
-		<Text x="21" y="207" alignment="left" color="#FFFFFF" font="mainfont" lefttop="leftbottom" rightbottom="rightbottom" width="320" text="$N" visible="not dvd.isActive" scrolling="autooff"/>
+		<Text x="21" y="207" alignment="left" color="#FFFFFF" font="mainfont" lefttop="leftbottom" rightbottom="rightbottom" width="320" text="$N" visible="not dvd.isActive"/>
 		
-		<Text x="125" y="207" alignment="left" color="#FFFFFF" font="mainfont" lefttop="leftbottom" rightbottom="rightbottom" width="215" text="$N" visible="dvd.isActive" scrolling="autooff"/>
+		<Text x="125" y="207" alignment="left" color="#FFFFFF" font="mainfont" lefttop="leftbottom" rightbottom="rightbottom" width="215" text="$N" visible="dvd.isActive"/>
 		<Text x="342" y="208" alignment="right" color="#FFFFFF" font="defaultfont" lefttop="rightbottom" rightbottom="rightbottom" width="88" text="$T/$D"/>
 		<Button x="21" y="207" up="dvd_prevtitle" action="dvd.previousTitle()" tooltiptext="Play Previous Title on DVD" lefttop="leftbottom" rightbottom="rightbottom" visible="dvd.isActive"/>
 		<Button x="41" y="207" up="dvd_prevchapter" action="dvd.previousChapter()" tooltiptext="Go to Previous Chapter of Title" lefttop="leftbottom" rightbottom="rightbottom" visible="dvd.isActive"/>
@@ -342,7 +342,7 @@
 		<Anchor x="300" y="0" priority="3"/>
 		<Image x="0" y="0" action="move" image="minimal_bg"/>
 
-		<Text x="10" y="20" alignment="left" color="#FFFFFF" font="mainfont" text="$N" width="190" scrolling="autooff"/>
+		<Text x="10" y="20" alignment="left" color="#FFFFFF" font="mainfont" text="$N" width="190"/>
 		<Text x="202" y="21" alignment="right" color="#FFFFFF" font="defaultfont" text="$T/$D" width="88"/>
 		<Slider x="10" y="42" points="(5,0),(275,0)" up="timeslider" value="time" tooltiptext="$T / $D"/>
 

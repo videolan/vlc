@@ -607,8 +607,6 @@ void Builder::addText( const BuilderData::Text &rData )
     CtrlText::Scrolling_t scrolling;
     if( rData.m_scrolling == "auto" )
         scrolling = CtrlText::kAutomatic;
-    else if( rData.m_scrolling == "autooff" )
-        scrolling = CtrlText::kAutomaticOff;
     else if( rData.m_scrolling == "manual" )
         scrolling = CtrlText::kManual;
     else if( rData.m_scrolling == "none" )

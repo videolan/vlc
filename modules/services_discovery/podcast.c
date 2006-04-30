@@ -202,6 +202,7 @@ static void Close( vlc_object_t *p_this )
             p_sd->p_sys->pp_input[i] = NULL;
         }
     }
+    free( p_sd->p_sys->pp_input );
     if( p_playlist )
     {
         playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE, VLC_TRUE );
