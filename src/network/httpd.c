@@ -2439,7 +2439,10 @@ static void httpd_HostThread( httpd_host_t *host )
 
                 if( fd >= 0 )
                 {
-                    int i_state = 0;
+                    int i_state = 1;
+
+                    setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, &i_state, sizeof (i_state));
+                    i_state = 0;
 
                     /* set this new socket non-block */
 #if defined( WIN32 ) || defined( UNDER_CE )
