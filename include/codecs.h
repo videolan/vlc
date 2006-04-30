@@ -215,6 +215,7 @@ typedef struct
 #define WAVE_FORMAT_ALAW                0x0006 /* Microsoft Corporation */
 #define WAVE_FORMAT_MULAW               0x0007 /* Microsoft Corporation */
 #define WAVE_FORMAT_DTS_MS              0x0008 /* Microsoft Corporation */
+#define WAVE_FORMAT_WMAS                0x000a /* WMA 9 Speech */
 #define WAVE_FORMAT_IMA_ADPCM           0x0011 /* Intel Corporation */
 #define WAVE_FORMAT_GSM610              0x0031 /* Microsoft Corporation */
 #define WAVE_FORMAT_MSNAUDIO            0x0032 /* Microsoft Corporation */
@@ -308,6 +309,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_WMA2,       VLC_FOURCC( 'w', 'm', 'a', ' ' ), "Window Media Audio v2" },
     { WAVE_FORMAT_WMAP,       VLC_FOURCC( 'w', 'm', 'a', 'p' ), "Window Media Audio 9 Professional" },
     { WAVE_FORMAT_WMAL,       VLC_FOURCC( 'w', 'm', 'a', 'l' ), "Window Media Audio 9 Lossless" },
+    { WAVE_FORMAT_WMAS,       VLC_FOURCC( 'w', 'm', 'a', 's' ), "Window Media Audio 9 Speech" },
     { WAVE_FORMAT_DK3,        VLC_FOURCC( 'm', 's', 0x00,0x61), "Duck DK3" },
     { WAVE_FORMAT_DK4,        VLC_FOURCC( 'm', 's', 0x00,0x62), "Duck DK4" },
     { WAVE_FORMAT_DTS,        VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },

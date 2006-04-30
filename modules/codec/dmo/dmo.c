@@ -170,6 +170,9 @@ static const codec_dll decoders_table[] =
     { VLC_FOURCC('W','M','A','2'), "wma9dmod.dll", &guid_wma9 },
     { VLC_FOURCC('w','m','a','2'), "wma9dmod.dll", &guid_wma9 },
 
+    /* WMA Speech */
+    { VLC_FOURCC('w','m','a','s'), "wmspdmod.dll", &guid_wma },
+
     /* */
     { 0, NULL, NULL }
 };
