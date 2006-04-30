@@ -455,11 +455,17 @@ int utf8_scandir( const char *dirname, char ***namelist,
                 goto error;
 
             if( !select( utf_entry ) )
+            {
+                free( utf_entry );
                 continue;
+            }
 
             newtab = realloc( tab, sizeof( char * ) * (num + 1) );
             if( newtab == NULL )
+            {
+                free( utf_entry );
                 goto error;
+            }
             tab = newtab;
             tab[num++] = utf_entry;
         }
