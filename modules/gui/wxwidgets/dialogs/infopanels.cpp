@@ -264,21 +264,21 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
                                               wxU( _("Input") ) );
     input_box->SetAutoLayout( TRUE );
     input_bsizer = new wxStaticBoxSizer( input_box, wxVERTICAL );
-    input_sizer = new wxFlexGridSizer( 2,2, 20 );
+    input_sizer = new wxFlexGridSizer( 4, 3, 2, 20 );
 
 #define INPUT_ADD(txt,widget,dflt) \
-    { input_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),  \
-                         0, wxEXPAND| wxRIGHT, 5 );                     \
-      widget = new wxStaticText( this, -1, wxU( dflt ) );               \
-      input_sizer->Add( widget, 0, wxEXPAND| wxLEFT, 5  );              \
+    { input_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),   \
+                         0, wxALIGN_LEFT|wxLEFT, 5 );           \
+      input_sizer->Add( 0, 0, wxEXPAND );                                \
+      widget = new wxStaticText( this, -1, wxU( dflt ), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );                \
+      input_sizer->Add( widget, 0, wxALIGN_RIGHT|wxRIGHT, 5  ); \
     }
 
     INPUT_ADD( "Read at media", read_bytes_text, "0" );
-    INPUT_ADD( "Input bitrate", input_bitrate_text, "0" );
+    INPUT_ADD( "Input bitrate", input_bitrate_text, "           0" );
 
     INPUT_ADD( "Demuxed", demux_bytes_text ,"0");
-    /* Hack to get enough size */
-    INPUT_ADD( "Stream bitrate", demux_bitrate_text, "0              " );
+    INPUT_ADD( "Stream bitrate", demux_bitrate_text, "0" );
 
     input_sizer->Layout();
     input_bsizer->Add( input_sizer, 0, wxALL | wxGROW, 5 );
@@ -286,22 +286,20 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
     sizer->Add( input_bsizer, 0, wxALL|wxGROW, 5 );
 
    /* Vout */
-    wxStaticBox *video_box = new wxStaticBox( this, -1,
-                                              wxU( _("Video" ) ) );
+    wxStaticBox *video_box = new wxStaticBox( this, -1, wxU( _("Video" ) ) );
     video_box->SetAutoLayout( TRUE );
-    video_bsizer = new wxStaticBoxSizer( video_box,
-                                                          wxVERTICAL );
-    video_sizer = new wxFlexGridSizer( 2,3, 20 );
+    video_bsizer = new wxStaticBoxSizer( video_box, wxVERTICAL );
+    video_sizer = new wxFlexGridSizer( 3, 3, 2, 20 );
 
 #define VIDEO_ADD(txt,widget,dflt) \
-    { video_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),   \
-                         0, wxEXPAND|wxLEFT , 5  );                      \
-      widget = new wxStaticText( this, -1, wxU( dflt ) );                \
-      video_sizer->Add( widget, 0, wxEXPAND|wxRIGHT, 5 );                \
+    { video_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),  \
+                         0, wxALIGN_LEFT|wxLEFT , 5  );        \
+      video_sizer->Add( 0, 0, wxEXPAND );                                \
+      widget = new wxStaticText( this, -1, wxU( dflt ), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );               \
+      video_sizer->Add( widget, 0, wxALIGN_RIGHT|wxRIGHT, 5 ); \
     }
     VIDEO_ADD( "Decoded blocks", video_decoded_text, "0" );
-    /* Hack to get enough size */
-    VIDEO_ADD( "Displayed frames", displayed_text, "0                  " );
+    VIDEO_ADD( "Displayed frames", displayed_text, "           0" );
     VIDEO_ADD( "Lost frames", lost_frames_text, "0" );
 
 
@@ -315,17 +313,18 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
                                               wxU( _("Streaming" ) ) );
     sout_box->SetAutoLayout( TRUE );
     sout_bsizer = new wxStaticBoxSizer( sout_box, wxVERTICAL );
-    sout_sizer = new wxFlexGridSizer( 2,3, 20 );
+    sout_sizer = new wxFlexGridSizer( 3, 3, 2, 20 );
 
 #define SOUT_ADD(txt,widget,dflt) \
-    { sout_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),    \
-                         0, wxEXPAND|wxLEFT|wxALIGN_LEFT , 5  );         \
-      widget = new wxStaticText( this, -1, wxU( dflt ) );                \
-      sout_sizer->Add( widget, 0, wxEXPAND|wxRIGHT|wxALIGN_LEFT, 5 );   \
+    { sout_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),  \
+                         0, wxALIGN_LEFT|wxLEFT, 5  );        \
+      sout_sizer->Add( 0, 0, wxEXPAND );                                \
+      widget = new wxStaticText( this, -1, wxU( dflt ), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );              \
+      sout_sizer->Add( widget, 0,wxALIGN_RIGHT|wxRIGHT, 5 ); \
     }
-    SOUT_ADD( "Sent packets", sout_sent_packets_text, "0" );
-    SOUT_ADD( "Sent bytes", sout_sent_bytes_text, "0          " );
-    SOUT_ADD( "Send rate", sout_send_bitrate_text, "0        " );
+    SOUT_ADD( "Sent packets", sout_sent_packets_text, "          0" );
+    SOUT_ADD( "Sent bytes", sout_sent_bytes_text, "0" );
+    SOUT_ADD( "Send rate", sout_send_bitrate_text, "0" );
     sout_sizer->Layout();
     sout_bsizer->Add( sout_sizer, 0, wxALL | wxGROW, 5 );
     sout_bsizer->Layout();
@@ -336,18 +335,17 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
                                               wxU( _("Audio" ) ) );
     audio_box->SetAutoLayout( TRUE );
     audio_bsizer = new wxStaticBoxSizer( audio_box, wxVERTICAL );
-    audio_sizer = new wxFlexGridSizer( 2,3, 20 );
+    audio_sizer = new wxFlexGridSizer( 3, 3, 2, 20 );
 
 #define AUDIO_ADD(txt,widget,dflt) \
     { audio_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),   \
-                         0, wxEXPAND|wxLEFT , 5  );                      \
-      widget = new wxStaticText( this, -1, wxU( dflt ) );                \
-      audio_sizer->Add( widget, 0, wxEXPAND|wxRIGHT, 5 );                \
+                         0, wxALIGN_LEFT|wxLEFT, 5  );          \
+      audio_sizer->Add( 0, 0, wxEXPAND );                                \
+      widget = new wxStaticText( this, -1, wxU( dflt ), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );                \
+      audio_sizer->Add( widget, 0, wxALIGN_RIGHT|wxRIGHT, 5 );  \
     }
-    AUDIO_ADD( "Decoded blocks", audio_decoded_text, "0" );
-    /* Hack to get enough size */
-    AUDIO_ADD( "Played buffers", played_abuffers_text,
-                                 "0                  " );
+    AUDIO_ADD( "Decoded blocks", audio_decoded_text, "         0" );
+    AUDIO_ADD( "Played buffers", played_abuffers_text, "0" );
     AUDIO_ADD( "Lost buffers", lost_abuffers_text, "0" );
     audio_sizer->Layout();
     audio_bsizer->Add( audio_sizer, 0, wxALL | wxGROW, 5 );
@@ -401,6 +399,8 @@ void InputStatsInfoPanel::Update( input_item_t *p_item )
 
     input_sizer->Layout();
     video_sizer->Layout();
+    sout_sizer->Layout();
+    audio_sizer->Layout();
 
     sizer->Layout();
     panel_sizer->Layout();
