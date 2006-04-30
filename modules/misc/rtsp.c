@@ -780,7 +780,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
         case HTTPD_MSG_PLAY:
         {
-            char *psz_output, ip[NI_MAXNUMERICHOST];
+            char *psz_output, *psz_position, ip[NI_MAXNUMERICHOST];
             int i, i_port_audio = 0, i_port_video = 0;
 
             /* for now only multicast so easy */
@@ -798,6 +798,30 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
             p_rtsp = RtspClientGet( p_media, psz_session );
             if( !p_rtsp ) break;
+
+            if( p_rtsp->b_playing )
+            {
+                char *psz_position = httpd_MsgGet( query, "Range" );
+                if( psz_position ) psz_position = strstr( psz_position, "npt=" );
+                if( psz_position )
+                {
+                    double f_pos;
+                    char *end;
+
+                    msg_Dbg( p_vod, "seeking request: %s", psz_position );
+
+                    psz_position += 4;
+                    /* FIXME: npt= is not necessarily formatted as a float */
+                    f_pos = us_strtod( psz_position, &end );
+                    if( end > psz_position )
+                    {
+                        f_pos /= ((double)(p_media->i_length))/1000 /1000 / 100;
+                        vod_MediaControl( p_vod, p_media, psz_session,
+                                      VOD_MEDIA_SEEK, f_pos );
+                    }
+                    break;
+                }
+            }
 
             if( p_rtsp->b_playing && p_rtsp->b_paused )
             {
