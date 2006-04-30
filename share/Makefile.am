@@ -83,7 +83,6 @@ skins2_default_vlt_FILES = \
         skins2/default/main/main.png \
         skins2/default/main/dvd_prevtitle.png \
         skins2/default/main/dvd_nexttitle.png \
-        skins2/default/main/Thumbs.db \
         skins2/default/main/dvd_nextchapter.png \
         skins2/default/main/pause_up.png \
         skins2/default/main/main_over.png \
@@ -101,7 +100,6 @@ skins2_default_vlt_FILES = \
         skins2/default/playlist/playlist_down.png \
         skins2/default/playlist/playtreeglyphs.png \
         skins2/default/playlist/playlist_up.png \
-        skins2/default/playlist/Thumbs.db \
         skins2/default/playlist/playlist_over.png \
         skins2/default/playlist/playlist.png \
         skins2/default/minimal.png \
