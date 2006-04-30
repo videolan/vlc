@@ -37,6 +37,7 @@
 #include "controls.h"
 #include <vlc_osd.h>
 
+
 /*****************************************************************************
  * VLCControls implementation 
  *****************************************************************************/
@@ -76,6 +77,32 @@
     val.i_int = config_GetInt( p_intf, "key-play-pause" );
     var_Set( p_intf->p_vlc, "key-pressed", val );
 }
+
+/* Small helper method */
+
+-(id) getVoutView
+{
+    id o_window;
+    id o_vout_view = nil;
+    id o_embedded_vout_list = [[VLCMain sharedInstance] getEmbeddedList];
+    NSEnumerator *o_enumerator = [[NSApp orderedWindows] objectEnumerator];
+    while( !o_vout_view && ( o_window = [o_enumerator nextObject] ) )
+    {
+        /* We have an embedded vout */
+        if( [o_embedded_vout_list windowContainsEmbedded: o_window] )
+        {
+            o_vout_view = [o_embedded_vout_list getViewForWindow: o_window];
+        }
+        /* We have a detached vout */
+        else if( [[o_window className] isEqualToString: @"VLCWindow"] )
+        {
+            msg_Dbg( VLCIntf, "detached vout controls.m call getVoutView" );
+            o_vout_view = [o_window getVoutView];
+        }
+    }
+    return o_vout_view;
+}
+
 
 - (IBAction)stop:(id)sender
 {
@@ -269,55 +296,36 @@
 
 - (IBAction)windowAction:(id)sender
 {
-    id o_window = [NSApp keyWindow];
     NSString *o_title = [sender title];
-    NSArray *o_windows = [NSApp orderedWindows];
-    NSEnumerator *o_enumerator = [o_windows objectEnumerator];
+
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
-
     if( p_vout != NULL )
     {
-        id o_embedded_vout_list = [[VLCMain sharedInstance] getEmbeddedList];
-        while ((o_window = [o_enumerator nextObject]))
+        id o_vout_view = [self getVoutView];
+        if( o_vout_view )
         {
-            id o_vout_view = nil;
-            /* We have an embedded vout */
-            if( [o_embedded_vout_list windowContainsEmbedded: o_window] )
+            if( [o_title isEqualToString: _NS("Half Size") ] )
+                [o_vout_view scaleWindowWithFactor: 0.5];
+            else if( [o_title isEqualToString: _NS("Normal Size") ] )
+                [o_vout_view scaleWindowWithFactor: 1.0];
+            else if( [o_title isEqualToString: _NS("Double Size") ] )
+                [o_vout_view scaleWindowWithFactor: 2.0];
+            else if( [o_title isEqualToString: _NS("Float on Top") ] )
+                [o_vout_view toggleFloatOnTop];
+            else if( [o_title isEqualToString: _NS("Fit to Screen") ] )
             {
-                o_vout_view = [o_embedded_vout_list getViewForWindow: o_window];
+                id o_window = [o_vout_view getWindow];
+                if( ![o_window isZoomed] )
+                    [o_window performZoom:self];
             }
-            /* We have a detached Vout */
-            else if( [[o_window className] isEqualToString: @"VLCWindow"] )
+            else if( [o_title isEqualToString: _NS("Snapshot") ] )
             {
-                msg_Dbg( VLCIntf, "detached vout controls.m call getVoutView" );
-                o_vout_view = [o_window getVoutView];
+                [o_vout_view snapshot];
             }
-
-            if( o_vout_view )
+            else
             {
-                if( [o_title isEqualToString: _NS("Half Size") ] )
-                    [o_vout_view scaleWindowWithFactor: 0.5];
-                else if( [o_title isEqualToString: _NS("Normal Size") ] )
-                    [o_vout_view scaleWindowWithFactor: 1.0];
-                else if( [o_title isEqualToString: _NS("Double Size") ] )
-                    [o_vout_view scaleWindowWithFactor: 2.0];
-                else if( [o_title isEqualToString: _NS("Float on Top") ] )
-                    [o_vout_view toggleFloatOnTop];
-                else if( [o_title isEqualToString: _NS("Fit to Screen") ] )
-                {
-                    if( ![o_window isZoomed] )
-                        [o_window performZoom:self];
-                }
-                else if( [o_title isEqualToString: _NS("Snapshot") ] )
-                {
-                    [o_vout_view snapshot];
-                }
-                else
-                {
-                    [o_vout_view toggleFullscreen];
-                }
-                break;
+                [o_vout_view toggleFullscreen];
             }
         }
         vlc_object_release( (vlc_object_t *)p_vout );
@@ -337,6 +345,38 @@
         if( p_playlist ) vlc_object_release( (vlc_object_t *)p_playlist );
     }
 
+}
+
+- (BOOL)keyEvent:(NSEvent *)o_event
+{
+    BOOL eventHandled = NO;
+    unichar key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
+
+    if( key )
+    {
+        vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
+        if( p_vout != NULL )
+        {
+            /* Escape */
+            if( key == (unichar) 0x1b )
+            {
+                id o_vout_view = [self getVoutView];
+                if( o_vout_view && [o_vout_view isFullscreen] )
+                {
+                    [o_vout_view toggleFullscreen];
+                    eventHandled = YES;
+                }
+            }
+            else if( key == ' ' )
+            {
+                [self play:self];
+                eventHandled = YES;
+            }
+            vlc_object_release( (vlc_object_t *)p_vout );
+        }
+    }
+    return eventHandled;
 }
 
 - (void)setupVarMenuItem:(NSMenuItem *)o_mi
@@ -747,7 +787,7 @@
             [o_mi setState: val.b_bool];
             bEnabled = TRUE;
         }
-		[o_main setupMenus]; /* Make sure video menu is up to date */
+        [o_main setupMenus]; /* Make sure video menu is up to date */
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );

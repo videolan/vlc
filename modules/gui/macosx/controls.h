@@ -63,6 +63,7 @@
 - (IBAction)volumeSliderUpdated:(id)sender;
 
 - (IBAction)windowAction:(id)sender;
+- (BOOL)keyEvent:(NSEvent *)o_event;
 
 - (void)setupVarMenuItem:(NSMenuItem *)o_mi
                     target:(vlc_object_t *)p_object

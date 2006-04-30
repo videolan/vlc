@@ -26,6 +26,7 @@
 #include "intf.h"                                          /* VLCApplication */
 #include "misc.h"
 #include "playlist.h"
+#include "controls.h"
 
 /*****************************************************************************
  * VLCControllerWindow
@@ -46,7 +47,8 @@
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
-    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event];
+    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event] ||
+           [(VLCControls *)[[VLCMain sharedInstance] getControls] keyEvent:o_event];
 }
 
 @end
