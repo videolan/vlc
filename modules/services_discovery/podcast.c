@@ -81,7 +81,7 @@ struct services_discovery_sys_t
 {
     /* playlist node */
     playlist_item_t *p_node;
-    input_thread_t *p_input;
+    input_thread_t **pp_input;
 
     char **ppsz_urls;
     int i_urls;
@@ -153,6 +153,7 @@ static int Open( vlc_object_t *p_this )
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
     p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                          _("Podcast"), p_view->p_root );
+    p_sys->pp_input = malloc( p_sys->i_urls * sizeof( input_thread_t * ) );
     for( i = 0; i < p_sys->i_urls; i++ )
     {
         asprintf( &psz_buf, "%s", p_sys->ppsz_urls[i] );
@@ -168,9 +169,8 @@ static int Open( vlc_object_t *p_this )
         /* We need to declare the parents of the node as the same of the
          * parent's ones */
         playlist_CopyParents( p_sys->p_node, p_item );
-        p_sys->p_input = input_CreateThread( p_playlist, &p_item->input );
+        p_sys->pp_input[i] = input_CreateThread( p_playlist, &p_item->input );
     }
-
 
     p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
     val.b_bool = VLC_TRUE;
@@ -191,13 +191,16 @@ static void Close( vlc_object_t *p_this )
     playlist_t *p_playlist =  (playlist_t *) vlc_object_find( p_sd,
                                  VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     int i;
-    if( p_sd->p_sys->p_input )
+    for( i = 0; i < p_sys->i_urls; i++ )
     {
-        input_StopThread( p_sd->p_sys->p_input );
-        input_DestroyThread( p_sd->p_sys->p_input );
-        vlc_object_detach( p_sd->p_sys->p_input );
-        vlc_object_destroy( p_sd->p_sys->p_input );
-        p_sd->p_sys->p_input = NULL;
+        if( p_sd->p_sys->pp_input[i] )
+        {
+            input_StopThread( p_sd->p_sys->pp_input[i] );
+            input_DestroyThread( p_sd->p_sys->pp_input[i] );
+            vlc_object_detach( p_sd->p_sys->pp_input[i] );
+            vlc_object_destroy( p_sd->p_sys->pp_input[i] );
+            p_sd->p_sys->pp_input[i] = NULL;
+        }
     }
     if( p_playlist )
     {
@@ -216,14 +219,19 @@ static void Run( services_discovery_t *p_sd )
 {
     while( !p_sd->b_die )
     {
-        if( p_sd->p_sys->p_input &&
-            ( p_sd->p_sys->p_input->b_eof || p_sd->p_sys->p_input->b_error ) )
+        int i;
+        for( i = 0; i < p_sd->p_sys->i_urls; i++ )
         {
-            input_StopThread( p_sd->p_sys->p_input );
-            input_DestroyThread( p_sd->p_sys->p_input );
-            vlc_object_detach( p_sd->p_sys->p_input );
-            vlc_object_destroy( p_sd->p_sys->p_input );
-            p_sd->p_sys->p_input = NULL;
+            if( p_sd->p_sys->pp_input[i] &&
+                ( p_sd->p_sys->pp_input[i]->b_eof
+                  || p_sd->p_sys->pp_input[i]->b_error ) )
+            {
+                input_StopThread( p_sd->p_sys->pp_input[i] );
+                input_DestroyThread( p_sd->p_sys->pp_input[i] );
+                vlc_object_detach( p_sd->p_sys->pp_input[i] );
+                vlc_object_destroy( p_sd->p_sys->pp_input[i] );
+                p_sd->p_sys->pp_input[i] = NULL;
+            }
         }
         msleep( 100000 );
     }
