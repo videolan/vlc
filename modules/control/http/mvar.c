@@ -128,7 +128,7 @@ mvar_t *E_(mvar_GetVar)( mvar_t *s, const char *name )
 {
     /* format: name[index].field */
     char *field = strchr( name, '.' );
-    int i = 1 + (field != NULL) ? (field - name) : strlen( name );
+    int i = 1 + ((field != NULL) ? (field - name) : strlen( name ));
     char base[i];
     char *p;
     int i_index;
