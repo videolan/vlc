@@ -143,6 +143,8 @@ class GenericLayout: public SkinObject, public Box
         CtrlVideo *m_pVideoControl;
         /// List of the anchors in the layout
         list<Anchor*> m_anchorList;
+        /// Flag to know if the layout is visible
+        bool m_visible;
 };
 
 

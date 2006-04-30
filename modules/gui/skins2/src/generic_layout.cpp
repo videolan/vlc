@@ -35,7 +35,8 @@ GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
                               int maxHeight ):
     SkinObject( pIntf ), m_pWindow( NULL ), m_width( width ),
     m_height( height ), m_minWidth( minWidth ), m_maxWidth( maxWidth ),
-    m_minHeight( minHeight ), m_maxHeight( maxHeight ), m_pVideoControl( NULL )
+    m_minHeight( minHeight ), m_maxHeight( maxHeight ), m_pVideoControl( NULL ),
+    m_visible( false )
 {
     // Get the OSFactory
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
@@ -222,6 +223,10 @@ void GenericLayout::refreshAll()
 
 void GenericLayout::refreshRect( int x, int y, int width, int height )
 {
+    // Do nothing if the layout is hidden
+    if( !m_visible )
+        return;
+
     // Draw all the controls of the layout
     list<LayeredControl>::const_iterator iter;
     list<LayeredControl>::const_iterator iterVideo = m_controlList.end();
@@ -301,6 +306,8 @@ void GenericLayout::addAnchor( Anchor *pAnchor )
 
 void GenericLayout::onShow()
 {
+    m_visible = true;
+
     refreshAll();
     // TODO find a better way to handle the vout ?
     if( m_pVideoControl )
@@ -312,6 +319,8 @@ void GenericLayout::onShow()
 
 void GenericLayout::onHide()
 {
+    m_visible = false;
+
     // TODO find a better way to handle the vout ?
     if( m_pVideoControl )
     {
