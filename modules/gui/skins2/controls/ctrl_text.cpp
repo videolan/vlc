@@ -74,7 +74,7 @@ CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
                              &m_cmdManualStill );
         m_fsm.addTransition( "manual1", "motion", "manual1", &m_cmdMove );
     }
-    else if( m_scrollMode == kAutomatic )
+    else if( m_scrollMode == kAutomatic || m_scrollMode == kAutomaticOff )
     {
         m_fsm.addTransition( "still", "mouse:left:down", "manual1",
                              &m_cmdToManual );

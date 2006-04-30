@@ -577,7 +577,7 @@ difficulty to understand how VLC skins work.</para>
   </sect4>
   <sect4 id="textscrolling">
     <title>scrolling</title>
-    <para>Scrolling behaviour of the text (only when it doesn't fit in the <link linkend="textwidth">width</link> of the control). Possible values are 'auto', 'manual' and 'none'. If this attribute is set to 'auto', the text automatically starts scrolling. The user can drag the text, and click on it to start/stop the scrolling. If this attribute is set to 'manual', the text only scrolls when dragged by the user. If this attribute is set to 'none', no scrolling is possible at all. Available since VLC 0.8.5.</para>
+    <para>Scrolling behaviour of the text (only when it doesn't fit in the <link linkend="textwidth">width</link> of the control). Possible values are 'auto', 'autooff', 'manual' and 'none'. If this attribute is set to 'auto', the text automatically starts scrolling. The user can drag the text, and click on it to start/stop the scrolling. If this attribute is set to 'manual', the text only scrolls when dragged by the user. If this attribute is set to 'none', no scrolling is possible at all. Available since VLC 0.8.5.</para>
     <para>Default value: auto</para>
   </sect4>
 </sect3>
