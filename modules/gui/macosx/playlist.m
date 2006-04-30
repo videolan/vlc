@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface module
  *****************************************************************************
-* Copyright (C) 2002-2005 the VideoLAN team
+* Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -25,9 +25,7 @@
 
 /* TODO
  * add 'icons' for different types of nodes? (http://www.cocoadev.com/index.pl?IconAndTextInTableCell)
- * create a new search field build with pictures from the 'regular' search field, so it can be emulated on 10.2
  * create toggle buttons for the shuffle, repeat one, repeat all functions.
- * implement drag and drop and item reordering.
  * reimplement enable/disable item
  * create a new 'tool' button (see the gear button in the Finder window) for 'actions'
    (adding service discovery, other views, new node/playlist, save node/playlist) stuff like that
@@ -522,6 +520,29 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_outline_view reloadData];
     [[[[VLCMain sharedInstance] getWizard] getPlaylistWizard] reloadOutlineView];
     [[[[VLCMain sharedInstance] getBookmarks] getDataTable] reloadData];
+
+    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    if(! p_playlist )
+        return;
+
+    if( p_playlist->i_size >= 2 )
+    {
+        [o_status_field setStringValue: [NSString stringWithFormat:
+                    _NS("%i items in the playlist"), p_playlist->i_size]];
+    }
+    else
+    {
+        if( p_playlist->i_size == 0 )
+        {
+            [o_status_field setStringValue: _NS("No items in the playlist")];
+        }
+        else
+        {
+            [o_status_field setStringValue: _NS("1 item in the playlist")];
+        }
+    }
+    vlc_object_release( p_playlist );
 }
 
 - (void)playModeUpdated
