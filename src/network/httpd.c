@@ -2455,7 +2455,7 @@ static void httpd_HostThread( httpd_host_t *host )
                     {
                         int i_val = fcntl( fd, F_GETFL );
                         fcntl( fd, F_SETFL,
-                               O_NONBLOCK | (i_val != -1) ? i_val : 0 );
+                               O_NONBLOCK | ((i_val != -1) ? i_val : 0) );
                     }
 
                     if( fd >= FD_SETSIZE )
