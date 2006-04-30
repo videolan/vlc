@@ -840,9 +840,6 @@ package-macosx:
 
 # Copy relevant files 
 	cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/vlc-${VERSION}/VLC.app"
-if BUILD_MOZILLA
-	cp -R "$(top_builddir)/mozilla/VLC Plugin.plugin" "$(top_builddir)/vlc-${VERSION}/VLC Plugin.plugin"
-endif
 	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/vlc-${VERSION}/ && cp -R extras/MacOSX/Delete_Preferences.app $(top_builddir)/vlc-${VERSION}/
 
 # Create disk image 
@@ -856,6 +853,19 @@ endif
 
 # Clean up
 	rm -Rf "$(top_builddir)/vlc-${VERSION}" ;
+
+package-macosx-plugin:
+if BUILD_MOZILLA
+	rm -rf "$(top_builddir)/macosx-plugin-instdata/"
+	mkdir -p "$(top_builddir)/macosx-plugin-instdata"
+	cp -R "$(top_builddir)/mozilla/VLC Plugin.plugin" "$(top_builddir)/macosx-plugin-instdata"
+	rm -rf "$(top_builddir)/VLC Internet Plug-In.pkg"
+	/Developer/Tools/packagemaker -build -ds -p "$(top_builddir)/VLC Internet Plug-In.pkg" \
+	-f "$(top_builddir)/macosx-plugin-instdata" \
+	-i "$(srcdir)/extras/MacOSX/plugin/InstallerInfo.plist" \
+	-d "$(srcdir)/extras/MacOSX/plugin/InstallerDescription.plist"; true
+	rm -rf "$(top_builddir)/macosx-plugin-instdata/"
+endif
 
 package-translations:
 	@if test -e "$(srcdir)/vlc-translations-${VERSION}"; then \

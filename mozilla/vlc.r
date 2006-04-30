@@ -13,8 +13,9 @@ data 'carb' (0)
 resource 'STR#' (126)
 {
     {
-        "VideoLAN WWW: http://videolan.org"
-        "VLC multimedia plugin"
+        "Version 0.8.5, Copyright 2006, The VideoLAN Team"
+        "<BR><A HREF='http://www.videolan.org'>http://www.videolan.org</A>",
+        "VLC Multimedia Plugin"
     };
 };
 
@@ -41,7 +42,9 @@ resource 'STR#' (127)
         "ASF stream",
         "",
         "",
-        "Google VLC Plugin"
+        "Google VLC Plugin",
+        "WAV audio",
+        "WAV audio"
     };
 };
 
@@ -69,6 +72,8 @@ resource 'STR#' (128,"MIME Type")
         "application/x-mplayer2", "",
         "video/x-ms-wmv", "",
         "video/x-google-vlc-plugin", "",
+        "audio/wav", "wav",
+        "audio/x-wav", "wav",
     };
 };
 
