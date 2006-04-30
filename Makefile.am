@@ -856,7 +856,8 @@ package-macosx:
 
 package-macosx-plugin:
 if BUILD_MOZILLA
-	rm -rf "$(top_builddir)/macosx-plugin-instdata/"
+# Create Installer
+	rm -rf "$(top_builddir)/macosx-plugin-instdata/"; true
 	mkdir -p "$(top_builddir)/macosx-plugin-instdata"
 	cp -R "$(top_builddir)/mozilla/VLC Plugin.plugin" "$(top_builddir)/macosx-plugin-instdata"
 	rm -rf "$(top_builddir)/VLC Internet Plug-In.pkg"
@@ -865,6 +866,17 @@ if BUILD_MOZILLA
 	-i "$(srcdir)/extras/MacOSX/plugin/InstallerInfo.plist" \
 	-d "$(srcdir)/extras/MacOSX/plugin/InstallerDescription.plist"; true
 	rm -rf "$(top_builddir)/macosx-plugin-instdata/"
+
+# Create disk image 
+	rm -f "$(top_builddir)/vlc-plugin-${VERSION}.dmg"; true
+	rm -rf "$(top_builddir)/vlc-plugin-${VERSION}/"; true
+	mkdir -p "$(top_builddir)/vlc-plugin-${VERSION}/"
+	mv "$(top_builddir)/VLC Internet Plug-In.pkg" "$(top_builddir)/vlc-plugin-${VERSION}/"
+	hdiutil create -srcfolder "$(top_builddir)/vlc-plugin-${VERSION}" \
+	  "$(top_builddir)/vlc-plugin-${VERSION}.dmg" -format UDZO \
+	  -scrub -imagekey zlib-level=9 ;
+	echo "Disk image creation completed:"
+	rm -rf "$(top_builddir)/vlc-plugin-${VERSION}"
 endif
 
 package-translations:
