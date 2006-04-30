@@ -664,8 +664,6 @@ static int DemuxInit( demux_t *p_demux )
 
             es_format_Init( &fmt, AUDIO_ES, 0 );
             i_format = GetWLE( &p_data[0] );
-
-            fprintf( stderr, "Wave format %i\n", i_format );
             wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
             fmt.audio.i_channels        = GetWLE(  &p_data[2] );
             fmt.audio.i_rate      = GetDWLE( &p_data[4] );
