@@ -48,7 +48,6 @@
 		<SubBitmap x="326" y="258" width="30" height="24" id="eq_up"/>
 		
 		<SubBitmap x="360" y="258" width="14" height="24" id="mute_up"/>
-		<SubBitmap x="374" y="258" width="70" height="24" id="volume_bg"/>
 	</Bitmap>
 		<Bitmap id="main_over" file="main/main_over.png" alphacolor="#FF00FF">
 		<SubBitmap x="408" y="2" width="34" height="11" id="close_over"/>
@@ -117,6 +116,7 @@
 	<Bitmap file="main/dvd_nextchapter.png" id="dvd_nextchapter" alphacolor="#FF00FF"/>
 	<Bitmap file="main/dvd_nexttitle.png" id="dvd_nexttitle" alphacolor="#FF00FF"/>
 	<Bitmap file="main/vol_mask.png" id="vol_mask" alphacolor="#FF00FF"/>
+	<Bitmap file="main/vol_bg.png" id="vol_bg" alphacolor="#FF00FF"/>
 	<Bitmap file="main/vol_slider.png" id="vol_slider" alphacolor="#FF00FF"/>
 	<!--The Playlist Images-->
 	<Bitmap file="playlist/playlist.png" id="playlist_blank" alphacolor="#FF00FF">
@@ -226,10 +226,10 @@
 		
 		<Slider x="26" y="226" points="(0,0),(400,0)" up="timeslider" value="time" lefttop="leftbottom" rightbottom="rightbottom"/>
 		
-		<Image x="324" y="258" image="volume_bg" lefttop="leftbottom" rightbottom="leftbottom"/>
-		<Slider x="327" y="269" points="(0,0),(58,0)" up="vol_slider" value="volume" tooltiptext="Volume: $V%" lefttop="leftbottom" rightbottom="leftbottom"/>
+		<Slider x="310" y="259" points="(17,10),(75,10)" up="vol_slider" value="volume" tooltiptext="Volume: $V%" lefttop="leftbottom" rightbottom="leftbottom">
+            <SliderBackground image="vol_bg" x="310" y="259" nbvert="55"/>
+		</Slider>
 		<Image x="269" y="259" image="vol_mask" lefttop="leftbottom" rightbottom="leftbottom"/>
-		
 		<!--The Buttons-->
 		<Checkbox x="18" y="251" up1="play_up" over1="play_over" down1="play_down" up2="pause_up" over2="pause_over" down2="pause_down" action1="vlc.play()" action2="vlc.pause()" state="vlc.isPlaying" lefttop="leftbottom" rightbottom="leftbottom"/>
 		
@@ -357,10 +357,9 @@
 		<Button x="94" y="64" up="stop_up" over="stop_over" down="stop_down" action="vlc.stop()" tooltiptext="Stop Playing" lefttop="leftbottom" rightbottom="leftbottom"/>
 		<Button x="110" y="64" up="fast_up" over="fast_over" down="fast_down" action="vlc.faster()" tooltiptext="Play Faster" lefttop="leftbottom" rightbottom="leftbottom"/>
 		<Button x="128" y="64" up="next_up" over="next_over" down="next_down" action="playlist.next()" tooltiptext="Play Next Item in the Playlist" lefttop="leftbottom" rightbottom="leftbottom"/>
-		
-
-		<Image x="229" y="64" image="volume_bg" lefttop="leftbottom" rightbottom="leftbottom"/>
-		<Slider x="231" y="75" points="(0,0),(58,0)" up="vol_slider" value="volume" tooltiptext="Volume: $V%" lefttop="leftbottom" rightbottom="leftbottom"/>
+		<Slider x="214" y="65" points="(17,10),(75,10)" up="vol_slider" value="volume" tooltiptext="Volume: $V%" lefttop="leftbottom" rightbottom="leftbottom">
+            <SliderBackground image="vol_bg" x="310" y="259" nbvert="55"/>
+		</Slider>
 		<Image x="173" y="65" image="vol_mask" lefttop="leftbottom" rightbottom="leftbottom"/>
 		<Button x="215" y="64" up="mute_up" over="mute_over" down="mute_down" action="vlc.mute()" tooltiptext="Mute" lefttop="leftbottom" rightbottom="leftbottom"/>
 				

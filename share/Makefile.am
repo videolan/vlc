@@ -89,6 +89,7 @@ skins2_default_vlt_FILES = \
         skins2/default/main/main_over.png \
         skins2/default/main/pause_down.png \
         skins2/default/main/dvd_prevchapter.png \
+        skins2/default/main/vol_bg.png \
         skins2/default/main/vol_mask.png \
         skins2/default/main/vol_slider.png \
         skins2/default/main/dvd_menu.png \
