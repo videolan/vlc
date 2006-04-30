@@ -1,3 +1,4 @@
+static int i_global = 0, i_passed = 0, i_written = 0;
 /*****************************************************************************
  * asf.c: asf muxer module for vlc
  *****************************************************************************
@@ -583,6 +584,8 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 static int Mux( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
+    i_global++;
+    fprintf( stderr, "Called %i\n", i_global );
 
     if( p_sys->b_write_header )
     {
@@ -608,6 +611,8 @@ static int Mux( sout_mux_t *p_mux )
             /* not enough data */
             return VLC_SUCCESS;
         }
+        i_passed++;
+        fprintf( stderr, "Passed %i\n", i_passed );
 
         if( p_sys->i_dts_first < 0 )
         {
@@ -625,6 +630,8 @@ static int Mux( sout_mux_t *p_mux )
 
         if( ( pk = asf_packet_create( p_mux, tk, data ) ) )
         {
+            i_written ++;
+            fprintf( stderr, "Written %i\n", i_written );
             sout_AccessOutWrite( p_mux->p_access, pk );
         }
     }

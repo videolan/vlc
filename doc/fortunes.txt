@@ -642,3 +642,9 @@ VLC is the greatest thing since sliced bread!
 
  -- http://forum.videolan.org/
 %
+* E-bola is bouncing up and down while enjoying: HTTP/1.1 200 OK
+* E-bola is bouncing up and down while enjoying: Content-type: text/html; charset=UTF-8
+* E-bola is bouncing up and down while enjoying: Cache-Control: no-cache
+* E-bola is bouncing up and down while enjoying: Content-Length: 25
+* E-bola is bouncing up and down while enjoying: --
+%
