@@ -1244,6 +1244,11 @@ static int Mux( sout_mux_t *p_mux )
 
     if( p_sys->i_pcr_pid == 0x1fff )
     {
+        int i;
+        for( i = 0; i < p_mux->i_nb_inputs; i++ )
+        {
+            block_FifoEmpty( p_mux->pp_inputs[i]->p_fifo );
+        }
         msg_Dbg( p_mux, "waiting for PCR streams" );
         msleep( 1000 );
         return VLC_SUCCESS;
