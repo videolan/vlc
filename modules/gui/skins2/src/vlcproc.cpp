@@ -227,7 +227,7 @@ void VlcProc::dropVout()
     {
         if( vout_Control( m_pVout, VOUT_REPARENT ) != VLC_SUCCESS )
             vout_Control( m_pVout, VOUT_CLOSE );
-      //  m_pVout = NULL;
+        m_pVout = NULL;
     }
 }
 
@@ -625,13 +625,13 @@ void *VlcProc::getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
                           unsigned int *pHeightHint )
 {
     VlcProc *pThis = pIntf->p_sys->p_vlcProc;
-    pThis->m_pVout = pVout;
     if( pThis->m_handleSet.empty() )
     {
         return NULL;
     }
     else
     {
+        pThis->m_pVout = pVout;
         // Get the window handle
         void *pWindow = *pThis->m_handleSet.begin();
         // Post a resize vout command
