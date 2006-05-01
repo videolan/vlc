@@ -192,12 +192,6 @@ void GenericLayout::resize( int width, int height )
     for( iter = m_controlList.begin(); iter != m_controlList.end(); iter++ )
     {
         iter->m_pControl->onResize();
-        const Position *pPos = iter->m_pControl->getPosition();
-        if( pPos && iter->m_pControl->isVisible() )
-        {
-            iter->m_pControl->draw( *m_pImage, pPos->getLeft(),
-                                    pPos->getTop() );
-        }
     }
 
     // Resize and refresh the associated window
@@ -205,12 +199,11 @@ void GenericLayout::resize( int width, int height )
     if( pWindow )
     {
         // Resize the window
-        pWindow->refresh( 0, 0, width, height );
         pWindow->resize( width, height );
-        pWindow->refresh( 0, 0, width, height );
+        refreshAll();
         // Change the shape of the window and redraw it
         pWindow->updateShape();
-        pWindow->refresh( 0, 0, width, height );
+        refreshAll();
     }
 }
 
