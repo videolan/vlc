@@ -2357,6 +2357,43 @@ then
     VLC_ADD_LDFLAGS([mpc],[-lmpcdec])])
 fi
 
+dnl
+dnl  game music emu demux plugin
+dnl
+AC_ARG_ENABLE(gme,
+  [  --enable-gme            Game Music Emu demux support (default enabled)])
+if test "${enable_gme}" != "no" -a "${CXX}" != "";
+then
+  AC_LANG_PUSH(C++)
+  AC_ARG_WITH(gme-tree,
+  [    --with-gme-tree=PATH gme tree for static linking])
+  if test -n "${with_gme_tree}"
+  then
+    AC_MSG_CHECKING(for libgme.a in ${with_mod_tree})
+    real_gme_tree="`cd ${with_gme_tree} 2>/dev/null && pwd`"
+    if test -z "${real_gme_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_gme_tree}])
+    fi
+    if test -f "${real_gme_tree}/gme/libgme.a"
+    then
+      dnl  Use a custom gme
+      AC_MSG_RESULT(${real_gme_tree}/gme/libgme.a)
+      VLC_ADD_PLUGINS([gme])
+      VLC_ADD_LDFLAGS([gme],[${real_gme_tree}/gme/libgme.a])
+      VLC_ADD_CXXFLAGS([gme],[-I${real_gme_tree}/gme])
+    else
+      dnl  The given gme wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_mod_tree}/gme/libgme.a, make sure you compiled gme in ${with_gme_tree}])
+    fi
+  else
+      AC_MSG_WARN([only static linking is available, you must provide a gme-tree])
+  fi
+  AC_LANG_POP(C++)
+fi
 
 dnl
 dnl  Codec plugins
@@ -2835,7 +2872,7 @@ dnl
 dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
-  VLC_ADD_LDFLAGS([mp4 skins2 sap mkv],[-lz])
+  VLC_ADD_LDFLAGS([mp4 skins2 sap mkv gme],[-lz])
 ] )
 
 AC_CHECK_HEADERS(sysfs/libsysfs.h, [
