@@ -140,7 +140,7 @@ static int Open( vlc_object_t *p_this )
     /* We accept file based on extension match */
     if( strcasecmp( p_demux->psz_demux, "mod" ) )
     {
-        if( ( ext = strchr( p_demux->psz_path, '.' ) ) == NULL ||
+        if( ( ext = strrchr( p_demux->psz_path, '.' ) ) == NULL ||
             stream_Size( p_demux->s ) == 0 ) return VLC_EGENERIC;
 
         ext++;  /* skip . */
