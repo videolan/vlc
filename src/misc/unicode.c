@@ -140,18 +140,18 @@ static char *MB2MB( const char *string, UINT fromCP, UINT toCP )
     int len;
 
     len = MultiByteToWideChar( fromCP, 0, string, -1, NULL, 0 );
-    assert( len > 0 );
-    wide = (wchar_t *)malloc (len * sizeof (wchar_t));
-    if( wide == NULL )
+    if( len == 0 );
         return NULL;
+
+    wchar_t wide[len];
 
     MultiByteToWideChar( fromCP, 0, string, -1, wide, len );
     len = WideCharToMultiByte( toCP, 0, wide, -1, NULL, 0, NULL, NULL );
-    assert( len > 0 );
+    if( len == 0 )
+        return NULL;
     out = malloc( len );
 
     WideCharToMultiByte( toCP, 0, wide, -1, out, len, NULL, NULL );
-    free( wide );
     return out;
 }
 #endif
