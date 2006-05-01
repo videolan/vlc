@@ -319,22 +319,22 @@ FILE *utf8_fopen( const char *filename, const char *mode )
         errno = ENOENT;
     return NULL;
 #else
-    wchar_t wpath[MAX_PATH + 1];
-    size_t len = strlen( mode ) + 1;
-    wchar_t wmode[len];
-
-    if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH )
-     || !MultiByteToWideChar( CP_ACP, 0, mode, len, wmode, len ) )
-    {
-        errno = ENOENT;
-        return NULL;
-    }
-    wpath[MAX_PATH] = L'\0';
-
     /* retrieve OS version */
     if( GetVersion() < 0x80000000 )
     {
         /* for Windows NT and above */
+        wchar_t wpath[MAX_PATH + 1];
+        size_t len = strlen( mode ) + 1;
+        wchar_t wmode[len];
+
+        if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH )
+         || !MultiByteToWideChar( CP_ACP, 0, mode, len, wmode, len ) )
+        {
+            errno = ENOENT;
+            return NULL;
+        }
+        wpath[MAX_PATH] = L'\0';
+
         /*
          * fopen() cannot open files with non-“ANSI” characters on Windows.
          * We use _wfopen() instead. Same thing for mkdir() and stat().
@@ -344,17 +344,38 @@ FILE *utf8_fopen( const char *filename, const char *mode )
     else
     {
         /* for Windows Me/98/95 */
-        /* we use GetShortFileNameW to get the DOS 8.3 version of the file we need to open */
-        char spath[MAX_PATH + 1];
-        if( GetShortPathNameW( wpath, spath, MAX_PATH ) )
+        const char *local_name = ToLocale( filename );
+
+        if( local_name != NULL )
         {
-            fprintf( stderr, "A fopen path: %s -> %s\n", wpath, spath );
-            fwprintf( stderr, "W fopen path: %s -> %s\n", wpath, spath );
-            return fopen( spath, wmode );
+            FILE *p_file = fopen( local_name, mode );
+            LocaleFree( local_name );
+            return p_file;
         }
-        fprintf( stderr, "GetShortPathName for %s failed\n", wpath );
         errno = ENOENT;
         return NULL;
+        #if 0
+        /* Following code might work better in most cases but fails if file
+           doesn't already exist on call to GetShortPathNameW.
+           I'll keep it here in case we ever decide to try this first and
+           then fallback to previous solution if it fails. */
+        /* we use GetShortFileNameW to get the DOS 8.3 version of the file we need to open */
+        wchar_t spath[MAX_PATH + 1];
+        if( GetShortPathNameW( wpath, spath, MAX_PATH ) )
+        {
+            char path[ MAX_PATH + 1 ];
+            int len;
+            UINT i_codepage = AreFileApisANSI()?GetACP():GetOEMCP();
+            len = WideCharToMultiByte( i_codepage, 0, spath, -1, NULL, 0, NULL, NULL );
+            if( len == 0 )
+                return NULL;
+
+            WideCharToMultiByte( i_codepage, 0, spath, -1, path, len, NULL, NULL );
+            return fopen( path, mode );
+        }
+        errno = ENOENT;
+        return NULL;
+        #endif
     }
 #endif
 }
@@ -528,34 +549,56 @@ static int utf8_statEx( const char *filename, void *buf,
 # endif
     return -1;
 #else
-    wchar_t wpath[MAX_PATH + 1];
-
-    if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH ) )
-    {
-        errno = ENOENT;
-        return -1;
-    }
-    wpath[MAX_PATH] = L'\0';
-
     /* retrieve Windows OS version */
     if( GetVersion() < 0x80000000 )
     {
         /* for Windows NT and above */
+        wchar_t wpath[MAX_PATH + 1];
+
+        if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH ) )
+        {
+            errno = ENOENT;
+            return -1;
+        }
+        wpath[MAX_PATH] = L'\0';
+
         return _wstati64( wpath, (struct _stati64 *)buf );
     }
     else
     {
         /* for Windows Me/98/95 */
-        /* we use GetShortFileNameW to get the DOS 8.3 version */
-        char spath[MAX_PATH + 1];
-        if( GetShortPathNameW( wpath, spath, MAX_PATH ) )
+        const char *local_name = ToLocale( filename );
+
+        if( local_name != NULL )
         {
-            fprintf( stderr, "stati path: %s -> %s\n", wpath, spath );
-            return _stati64( spath, (struct _stati64 *)buf );
+            int res = _stati64( local_name, (struct stat *)buf );
+            LocaleFree( local_name );
+            return res;
         }
-        fprintf( stderr, "GetShortPathName for %s failed\n", wpath );
         errno = ENOENT;
         return -1;
+        #if 0
+        /* Following code might work better in most cases but fails if file
+           doesn't already exist on call to GetShortPathNameW.
+           I'll keep it here in case we ever decide to try this first and
+           then fallback to previous solution if it fails. */
+        /* we use GetShortFileNameW to get the DOS 8.3 version */
+        wchar_t spath[MAX_PATH + 1];
+        if( GetShortPathNameW( wpath, spath, MAX_PATH ) )
+        {
+            char path[ MAX_PATH + 1 ];
+            int len;
+            UINT i_codepage = AreFileApisANSI()?GetACP():GetOEMCP();
+            len = WideCharToMultiByte( i_codepage, 0, spath, -1, NULL, 0, NULL, NULL );
+            if( len == 0 )
+                return -1;
+
+            WideCharToMultiByte( i_codepage, 0, spath, -1, path, len, NULL, NULL );
+            return _stati64( path, (struct _stati64 *)buf );
+        }
+        errno = ENOENT;
+        return -1;
+        #endif
     }
 #endif
 }
