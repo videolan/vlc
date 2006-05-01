@@ -334,24 +334,26 @@ FILE *utf8_fopen( const char *filename, const char *mode )
     /* retrieve OS version */
     if( GetVersion() < 0x80000000 )
     {
-	/* for Windows NT and above */
-	/*
-	 * fopen() cannot open files with non-“ANSI” characters on Windows.
-	 * We use _wfopen() instead. Same thing for mkdir() and stat().
-	 */
-	return _wfopen( wpath, wmode );
+        /* for Windows NT and above */
+        /*
+         * fopen() cannot open files with non-“ANSI” characters on Windows.
+         * We use _wfopen() instead. Same thing for mkdir() and stat().
+         */
+        return _wfopen( wpath, wmode );
     }
     else
     {
-	/* for Windows Me/98/95 */
-	/* we use GetShortFileNameW to get the DOS 8.3 version of the file we need to open */
-	char spath[MAX_PATH + 1];
-	if( GetShortPathNameW( wpath, spath, MAX_PATH ) )
-	{
-	    return fopen( spath, wmode );
-	}
-	errno = ENOENT;
-	return NULL;
+        /* for Windows Me/98/95 */
+        /* we use GetShortFileNameW to get the DOS 8.3 version of the file we need to open */
+        char spath[MAX_PATH + 1];
+        if( GetShortPathNameW( wpath, spath, MAX_PATH ) )
+        {
+            fprintf( stderr, "fopen path: %s -> %s\n", wpath, spath );
+            return fopen( spath, wmode );
+        }
+        fprintf( stderr, "GetShortPathName for %s failed\n", wpath );
+        errno = ENOENT;
+        return NULL;
     }
 #endif
 }
@@ -537,20 +539,22 @@ static int utf8_statEx( const char *filename, void *buf,
     /* retrieve Windows OS version */
     if( GetVersion() < 0x80000000 )
     {
-	/* for Windows NT and above */
-	return _wstati64( wpath, (struct _stati64 *)buf );
+        /* for Windows NT and above */
+        return _wstati64( wpath, (struct _stati64 *)buf );
     }
     else
     {
-	/* for Windows Me/98/95 */
-	/* we use GetShortFileNameW to get the DOS 8.3 version */
-	char spath[MAX_PATH + 1];
-	if( GetShortPathNameW( wpath, spath, MAX_PATH ) )
-	{
-	    return _stati64( spath, (struct _stati64 *)buf );
-	}
-	errno = ENOENT;
-	return -1;
+        /* for Windows Me/98/95 */
+        /* we use GetShortFileNameW to get the DOS 8.3 version */
+        char spath[MAX_PATH + 1];
+        if( GetShortPathNameW( wpath, spath, MAX_PATH ) )
+        {
+            fprintf( stderr, "stati path: %s -> %s\n", wpath, spath );
+            return _stati64( spath, (struct _stati64 *)buf );
+        }
+        fprintf( stderr, "GetShortPathName for %s failed\n", wpath );
+        errno = ENOENT;
+        return -1;
     }
 #endif
 }
