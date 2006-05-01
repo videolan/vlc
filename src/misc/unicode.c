@@ -348,7 +348,8 @@ FILE *utf8_fopen( const char *filename, const char *mode )
         char spath[MAX_PATH + 1];
         if( GetShortPathNameW( wpath, spath, MAX_PATH ) )
         {
-            fprintf( stderr, "fopen path: %s -> %s\n", wpath, spath );
+            fprintf( stderr, "A fopen path: %s -> %s\n", wpath, spath );
+            wfprintf( stderr, "W fopen path: %s -> %s\n", wpath, spath );
             return fopen( spath, wmode );
         }
         fprintf( stderr, "GetShortPathName for %s failed\n", wpath );
