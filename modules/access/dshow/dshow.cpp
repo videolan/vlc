@@ -150,7 +150,7 @@ static char *ppsz_amtuner_mode_text[] = { N_("Default"),
   "Select the audio output type. See the \"video input\" option." )
 
 #define AMTUNER_MODE_TEXT N_("AM Tuner mode")
-#define AMTUNER_MODE_LONGTEST N_( \
+#define AMTUNER_MODE_LONGTEXT N_( \
     "AM Tuner mode. Can be one of DEFAULT, TV, AM_RADIO, FM_RADIO or DSS.")
 
 static int  CommonOpen ( vlc_object_t *, access_sys_t *, vlc_bool_t );
@@ -216,7 +216,7 @@ vlc_module_begin();
     add_integer( "dshow-audio-output", -1, NULL, AUDIO_OUT_TEXT,
                  AUDIO_OUT_LONGTEXT, VLC_TRUE );
 
-    add_string( "dshow-amtuner-mode", AMTUNER_MODE_TV, NULL,
+    add_integer( "dshow-amtuner-mode", AMTUNER_MODE_TV, NULL,
                 AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT, VLC_FALSE);
         change_integer_list( pi_amtuner_mode, ppsz_amtuner_mode_text, 0 );
 
@@ -2095,7 +2095,7 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
     hr = p_TV->GetAvailableModes( &l_modes );
     if( SUCCEEDED(hr) && (l_modes & i_amtuner_mode) )
     {
-        hr = p_TV->put_Mode( i_amtuner_mode );
+        hr = p_TV->put_Mode( (AMTunerModeType)i_amtuner_mode );
     }
 
     if( i_input == 1 ) p_TV->put_InputType( 0, TunerInputCable );
