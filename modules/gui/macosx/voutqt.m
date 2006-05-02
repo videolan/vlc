@@ -62,7 +62,7 @@ struct vout_sys_t
     VLCVoutView       * o_vout_view;
 
     vlc_bool_t  b_saved_frame;
-    vlc_bool_t  b_altivec;
+    vlc_bool_t  b_cpu_has_simd; /* does CPU supports Altivec, MMX, etc... */
     NSRect      s_frame;
 
     CodecType i_codec;
@@ -146,8 +146,9 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     else
         p_vout->p_sys->b_embedded = VLC_FALSE;
 
-    p_vout->p_sys->b_altivec = p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC;
-    msg_Dbg( p_vout, "we do%s have Altivec", p_vout->p_sys->b_altivec ? "" : "n't" );
+    p_vout->p_sys->b_cpu_has_simd = (p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC)
+                                  | (p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT);
+    msg_Dbg( p_vout, "we do%s have SIMD enabled CPU", p_vout->p_sys->b_cpu_has_simd ? "" : "n't" );
     
     /* Initialize QuickTime */
     p_vout->p_sys->h_img_descr = 
@@ -168,7 +169,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
 
     /* Can we find the right chroma ? */
-    if( p_vout->p_sys->b_altivec )
+    if( p_vout->p_sys->b_cpu_has_simd )
     {
         err = FindCodec( kYUVSPixelFormat, bestSpeedCodec,
                         nil, &p_vout->p_sys->img_dc );
@@ -182,7 +183,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     
     if( err == noErr && p_vout->p_sys->img_dc != 0 )
     {
-        if( p_vout->p_sys->b_altivec )
+        if( p_vout->p_sys->b_cpu_has_simd )
         {
             p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
             p_vout->p_sys->i_codec = kYUVSPixelFormat;
