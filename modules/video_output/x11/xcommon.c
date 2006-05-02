@@ -2072,12 +2072,12 @@ static int InitDisplay( vout_thread_t *p_vout )
         xvisual_template.depth =    p_vout->p_sys->i_screen_depth;
 
         p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display,
-                                    VisualScreenMask | VisualClassMask,
+                                    VisualScreenMask | VisualClassMask |
+                                    VisualDepthMask,
                                     &xvisual_template, &i_count );
         if( p_xvisual == NULL )
         {
             msg_Warn( p_vout, "No screen matching the required color depth" );
-            xvisual_template.depth = 0;
             p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display,
                                     VisualScreenMask | VisualClassMask,
                                     &xvisual_template, &i_count );
