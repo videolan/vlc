@@ -1337,7 +1337,6 @@ vlc_bool_t VLC_IsPlaying( int i_object )
     }
     else
     {
-        msg_Dbg(p_vlc, "polling playlist_IsPlaying");
         b_playing = playlist_IsPlaying( p_playlist );
     }
     vlc_object_release( p_playlist );
