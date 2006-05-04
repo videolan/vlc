@@ -93,13 +93,22 @@ dnl
 AC_ARG_WITH(contrib,
     [  --without-contrib       do not use the libraries in extras/contrib],[],[])
   if test "${with_contrib}" != "no"; then 
-
+    AC_MSG_CHECKING([for libs in extras/contrib])
     topdir="`dirname $0`"
     if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
        topdir="`pwd`/$topdir"
     fi
-
+   if test "`grep HOST ${topdir}/extras/contrib/config.mak |awk '{print $3}'`" != "${host_alias}"; then
+      if test "${with_contrib}" = "yes"; then
+        AC_MSG_RESULT([no])
+	AC_MSG_ERROR([ not using the libs in extras/contrib as it is not the same host])
+      else
+        AC_MSG_RESULT([no])
+	AC_MSG_WARN([ not using the libs in extras/contrib as it is not the same host])
+      fi
+     else
   if test -d ${topdir}/extras/contrib/lib; then
+    AC_MSG_RESULT([yes])
     export PATH=${topdir}/extras/contrib/bin:$PATH
     CPPFLAGS="${CPPFLAGS} -I${topdir}/extras/contrib/include"
     CPPFLAGS_save="${CPPFLAGS_save} -I${topdir}/extras/contrib/include"
@@ -109,7 +118,7 @@ AC_ARG_WITH(contrib,
     CXXFLAGS_save="${CXXFLAGS_save} -I${topdir}/extras/contrib/include"
     OBJCFLAGS="${OBJCFLAGS} -I${topdir}/extras/contrib/include"
     OBJCFLAGS_save="${OBJCFLAGS_save} -I${topdir}/extras/contrib/include"
-    if test $build = $host -o $PKG_CONFIG_LIBDIR; then
+    if test $build = $host -o "$PKG_CONFIG_LIBDIR"; then
     	export PKG_CONFIG_PATH=${topdir}/extras/contrib/lib/pkgconfig:$PKG_CONFIG_PATH
     else
     	export PKG_CONFIG_LIBDIR=${topdir}/extras/contrib/lib/pkgconfig
@@ -141,6 +150,9 @@ dnl kludge because only the debian package provides a ffmpeg-config
       export LIBRARY_PATH=${topdir}/extras/contrib/lib:$LIBRARY_PATH
       export BELIBRARIES=${topdir}/extras/contrib/lib:$BELIBRARIES
     fi
+  else
+     AC_MSG_RESULT([no])
+  fi
   fi
 fi
 dnl
