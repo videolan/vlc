@@ -904,6 +904,10 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| normal . . . . . . . .  normal playing of stream"));
     msg_rc(_("| f [on|off] . . . . . . . . . . toggle fullscreen"));
     msg_rc(_("| info . . .  information about the current stream"));
+    msg_rc(_("| get_time . . seconds elapsed since stream's beginning"));
+    msg_rc(_("| is_playing . .  1 if a stream plays, 0 otherwise"));
+    msg_rc(_("| get_title . . .  the title of the current stream"));
+    msg_rc(_("| get_length . .  the length of the current stream"));
     msg_rc(  "| ");
     msg_rc(_("| volume [X] . . . . . . . .  set/get audio volume"));
     msg_rc(_("| volup [X]  . . . . .  raise audio volume X steps"));
