@@ -98,7 +98,7 @@ AC_ARG_WITH(contrib,
     if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
        topdir="`pwd`/$topdir"
     fi
-   if test "`grep HOST ${topdir}/extras/contrib/config.mak |awk '{print $3}'`" != "${ac_cv_host_alias}"; then
+   if test "`grep HOST ${topdir}/extras/contrib/config.mak |awk '{print $3}'`" != "`$CC -dumpmachine`"; then
       if test "${with_contrib}" = "yes"; then
         AC_MSG_RESULT([no])
 	AC_MSG_ERROR([ not using the libs in extras/contrib as it is not the same host])
