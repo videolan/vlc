@@ -65,6 +65,7 @@
 vlc_module_begin();
     set_shortname( "Shoutcast");
     set_description( _("Shoutcast radio listings") );
+    add_shortcut( "shoutcast" );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
