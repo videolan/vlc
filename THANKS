@@ -87,6 +87,7 @@ Marco Munderloh <Marco.Munderloh at web.de> - HTTP fix for Win32 to URL filename
 Mark Gritter <mgritter at kealia.com> - fix for netlist packet leak in demuxPSI
 Markus Kern <markus-kern at gmx dot net> - video output window fixes (win32)
 Markus Kuespert <ltlBeBoy at beosmail.com> - BeOS CSS support
+Mateus Krepsky Ludwich <mateus @t csp dot com d.t br> - rc interface mosaic-order callback
 Mathias C. Berens | welcome-soft <berens at welcome-soft.de> - German translation
 Mathias Kretschmer <mathias at research.att.com> - IP Multicast support
 Mats Rojestal <mats.rojestal at bredband dot net> - compilation fixes for Solaris 9
