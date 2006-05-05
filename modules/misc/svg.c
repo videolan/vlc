@@ -27,6 +27,12 @@
 #include <stdlib.h>                                      /* malloc( ), free( ) */
 #include <string.h>
 
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include "vlc_osd.h"
+#include "vlc_block.h"
+#include "vlc_filter.h"
+
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
@@ -37,12 +43,6 @@
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
-
-#include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include "vlc_osd.h"
-#include "vlc_block.h"
-#include "vlc_filter.h"
 
 #include <glib-object.h>                                  /* g_object_unref( ) */
 #include <librsvg-2/librsvg/rsvg.h>
