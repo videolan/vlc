@@ -13,6 +13,8 @@
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 !define PRODUCT_ID "{ea92ef52-afe4-4212-bacb-dfe9fca94cd6}"
 
+!define LIBVLC_DLL "@FILE_LIBVLC_DLL@"
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; General configuration ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -326,7 +328,9 @@ Section "Media player (required)" SEC01
 
   !insertmacro InstallFile vlc.exe
   !insertmacro InstallFile vlc.exe.manifest
-  @FILE_LIBVLC_DLL@
+  !if LIBVLC_DLL != ""
+  !insertmacro InstallFile $LIBVLC_DLL
+  !endif
   !insertmacro InstallFile *.txt
 
   !insertmacro InstallFolder plugins
@@ -442,6 +446,9 @@ Section /o "Mozilla plugin" SEC03
     StrCmp $R2 "" "${Index}-Loop" ""
 
     CopyFiles "$INSTDIR\mozilla\*" "$R2"
+    !if LIBVLC_DLL != ""
+    CopyFiles $LIBVLC_DLL "$R2"
+    !endif
     Goto "${Index}-Loop"
 
   "${Index}-End:"
