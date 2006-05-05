@@ -296,6 +296,9 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->ppsz_order = NULL;
     psz_order = var_CreateGetString( p_filter, "mosaic-order" );
 
+    var_Create( p_libvlc, "mosaic-order", VLC_VAR_STRING);
+    var_AddCallback( p_libvlc, "mosaic-order", MosaicCallback, p_sys );
+
     if( psz_order[0] != 0 )
     {
         char *psz_end = NULL;
@@ -857,6 +860,41 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
         msg_Dbg( p_this, "changing number of columns from %d to %d",
                          p_sys->i_cols, newval.i_int );
         p_sys->i_cols = __MAX( newval.i_int, 1 );
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+    else if( !strcmp( psz_var, "mosaic-order" ) )
+    {
+        vlc_mutex_lock( &p_sys->lock );
+        msg_Dbg( p_this, "Changing mosaic order to %s", newval.psz_string );
+
+        char *psz_order;
+        int i_index;
+        p_sys->i_order_length = 0;
+        p_sys->ppsz_order = NULL;
+        psz_order = newval.psz_string;
+
+        while( p_sys->i_order_length-- )
+        {
+            printf("%d\n", p_sys->ppsz_order);
+            free( p_sys->ppsz_order );
+        }
+        if( psz_order[0] != 0 )
+        {
+            char *psz_end = NULL;
+            i_index = 0;
+            do
+            {
+                psz_end = strchr( psz_order, ',' );
+                i_index++;
+                p_sys->ppsz_order = realloc( p_sys->ppsz_order,
+                                    i_index * sizeof(char *) );
+                p_sys->ppsz_order[i_index - 1] = strndup( psz_order,
+                                           psz_end - psz_order );
+                psz_order = psz_end+1;
+            } while( NULL !=  psz_end );
+            p_sys->i_order_length = i_index;
+        }
+
         vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-keep-aspect-ratio" ) )

@@ -428,6 +428,8 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "mosaic-rows", Other, NULL );
     var_Create( p_intf, "mosaic-cols", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "mosaic-cols", Other, NULL );
+    var_Create( p_intf, "mosaic-order", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-order", Other, NULL );
     var_Create( p_intf, "mosaic-keep-aspect-ratio",
                      VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "mosaic-keep-aspect-ratio", Other, NULL );
@@ -953,6 +955,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
         msg_rc(_("| mosaic-position {0=auto,1=fixed} . . . .position"));
         msg_rc(_("| mosaic-rows #. . . . . . . . . . .number of rows"));
         msg_rc(_("| mosaic-cols #. . . . . . . . . . .number of cols"));
+        msg_rc(_("| mosaic-order id(,id)* . . . . order of pictures "));
         msg_rc(_("| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"));
         msg_rc(  "| ");
         msg_rc(_("| check-updates [newer] [equal] [older]\n"
@@ -1549,6 +1552,14 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "mosaic-cols", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-order" ) )
+    {
+        if( strlen( newval.psz_string ) > 0)
+        {
+            val.psz_string = newval.psz_string;
+            var_Set( p_input->p_libvlc, "mosaic-order", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-keep-aspect-ratio" ) )
