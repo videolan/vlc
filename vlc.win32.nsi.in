@@ -13,7 +13,7 @@
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 !define PRODUCT_ID "{ea92ef52-afe4-4212-bacb-dfe9fca94cd6}"
 
-"@FILE_LIBVLC_DLL@"
+@FILE_LIBVLC_DLL@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; General configuration ;
