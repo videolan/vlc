@@ -1,0 +1,36 @@
+= Frequently Asked Questions =
+
+== 1. Is it possible to use JVLC in a Java Applet? ==
+
+Yes and No.
+Yes because it's a Java program and even if it contains 
+native code, it is still possible to deploy the applet (take a look at 
+[http://www.raditha.com/java/jni/ this] article).
+No because native code for the Windows and MacOS platforms still needs
+to be written.
+
+== 2. Is it possible to use JVLC in Windows (or MacOS)? ==
+
+It's not possible at the moment. JVLC is composed of two parts, a Java
+multiplatform part and a C++ native code part. The native code has only
+been tested on GNU/Linux platforms, but I'm looking forward to porting
+it to Win32 and Darwin platforms.
+
+== 3. What features of Videolan are available to JVLC? ==
+
+JVLC contains all the features available in Videolan. In fact, JVLC uses
+Videolan core as its core, so JVLC is capable of everything Videolan can
+do.
+
+== 4. Why shouldn't I use JMF (Java Media Framework) for multimedia
+ applications? ==
+
+Well, JVLC and Videolan are free (as in freedom) software, so you can extend
+and adapt them to your needs, while JMF is free as in beer. Furthermore JVLC
+is really straightforward and simple to use.
+
+== 5. How can I help you with this application? ==
+
+Try the software and report any errors or bugs you find to me. This application
+needs porting to MS/Windows and MacOS, if you are able to implement the JNI for
+these platform you may contribute the code.

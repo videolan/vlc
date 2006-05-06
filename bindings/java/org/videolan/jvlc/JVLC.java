@@ -25,9 +25,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  * 
  */
-/**
- * @author Filippo Carone <filippo@carone.org>
- */
+
 
 package org.videolan.jvlc;
 
@@ -65,6 +63,13 @@ public class JVLC implements JLibVLC {
     private native void		_toggleMute();
     private native int		_getVolume();
     private native void		_setVolume( int volume );
+
+    /*
+     *  Input native methods
+     */
+    private native long     _getInputLength();
+    private native long     _getInputTime();
+
     
     /*
      * Video native methods
@@ -75,7 +80,6 @@ public class JVLC implements JLibVLC {
  
     
     public boolean getMute() {
-        // TODO Auto-generated method stub
         return _getMute();
     }
 
@@ -111,27 +115,25 @@ public class JVLC implements JLibVLC {
     	return _getFullscreen();        
     }
 
-    public void getLength() {
+    public long getInputLength() {
+        return _getInputLength();        
+    }
+
+    public long getInputTime() {
+        return _getInputTime();
+    }
+
+    public void getInputPosition() {
         // TODO Auto-generated method stub
         
     }
 
-    public void getTime() {
+    public void setInputTime() {
         // TODO Auto-generated method stub
         
     }
 
-    public void getPosition() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void setTime() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public double getFPS() {
+    public double getInputFPS() {
         // TODO Auto-generated method stub
         return 0;
     }

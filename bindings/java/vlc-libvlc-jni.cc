@@ -68,12 +68,14 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance___3Ljava_lang
 
     libvlc_exception_init( exception );
   
-    argc = (int) env->GetArrayLength((jarray) args);
+    argc = (int) env->GetArrayLength((jarray) args) + 1;
     argv = (const char **) malloc(argc * sizeof(char*));
-    for (int i = 0; i < argc; i++) {
-        argv[i] = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, i),
+    sprintf( (char *) argv[0], "%s", "jvlc" );
+    for (int i = 0; i < argc - 1; i++) {
+        argv[i+1] = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, i),
                                          0
         );
+	//printf("param: %s\n", argv[i + 1]);
     }
 
     res = (long) libvlc_new(argc, (char**) argv, exception );
@@ -317,9 +319,11 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_JVLC__1getFullscreen (JNIEnv *
  * Playlist native functions
  */
 
-JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1playlist_1add (JNIEnv *env, jobject _this, jstring uri, jstring name) {
+JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1playlist_1add (JNIEnv *env, jobject _this, jstring uri, jstring name,  jobjectArray options) {
     long instance = 0;
     int res = 0;
+    int i_options = 0;
+    const char** ppsz_options = NULL;
     const char* psz_uri  = env->GetStringUTFChars( uri, 0 );
     const char* psz_name = env->GetStringUTFChars( name, 0 );
     libvlc_exception_t *exception = (libvlc_exception_t *) malloc( sizeof( libvlc_exception_t ));
@@ -328,8 +332,20 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1playlist_1add (JNIEnv *
 
     instance = getPlaylistInstance( env, _this );
 
-    res = libvlc_playlist_add( (libvlc_instance_t*) instance, psz_uri, psz_name, exception );
-  
+    if ( options != NULL ) {
+       i_options = ( int ) env->GetArrayLength( ( jarray ) options ) + 1;
+       ppsz_options = ( const char ** ) malloc( i_options * sizeof( char* ) );
+       sprintf( ( char * ) ppsz_options[0], "%s", "jvlc" );
+
+       for (int i = 0; i < i_options - 1; i++) {
+           ppsz_options[ i+1 ] =
+               env->GetStringUTFChars( ( jstring ) env->GetObjectArrayElement( options, i ), 0 );
+       }
+        res = libvlc_playlist_add_extended( ( libvlc_instance_t * ) instance, psz_uri, psz_name, i_options, ppsz_options, exception );
+    } else {
+        res = libvlc_playlist_add( ( libvlc_instance_t * ) instance, psz_uri, psz_name, exception );
+    }
+ 
     /// \todo check exceptions
 
     /* free resources */
@@ -345,20 +361,29 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1playlist_1add (JNIEnv *
     return res;
 }
 
+
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1play (JNIEnv *env, jobject _this, jint id, jobjectArray options) {
 
     long instance = 0;
     int i_options = 0;
-    char** ppsz_options = NULL;
+    const char** ppsz_options = NULL;
     instance = getPlaylistInstance( env, _this );
     libvlc_exception_t *exception = ( libvlc_exception_t * ) malloc( sizeof( libvlc_exception_t ));
 
     libvlc_exception_init( exception );
 
-    if ( options != NULL ) ;
-    /// \TODO: parse options 
+    if ( options != NULL ) {
+       i_options = ( int ) env->GetArrayLength( ( jarray ) options ) + 1;
+       ppsz_options = ( const char ** ) malloc( i_options * sizeof( char* ) );
+       sprintf( ( char * ) ppsz_options[0], "%s", "jvlc" );
 
-    libvlc_playlist_play( ( libvlc_instance_t* ) instance, id, i_options, ppsz_options, exception );
+       for ( int i = 0; i < i_options - 1; i++ ) {
+           ppsz_options[ i+1 ] = 
+               env->GetStringUTFChars( ( jstring ) env->GetObjectArrayElement( options, i ), 0 );
+       }
+    }
+
+    libvlc_playlist_play( ( libvlc_instance_t * ) instance, id, i_options, ( char **  ) ppsz_options, exception );
 
     free( exception );
     return;
@@ -428,6 +453,20 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1clear (JNIEnv *env, job
     return;
 }
 
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1deleteItem (JNIEnv *env, jobject _this, jint itemID) {
+    long instance = 0;
+    libvlc_exception_t *exception = (libvlc_exception_t *) malloc( sizeof( libvlc_exception_t ));
+
+    libvlc_exception_init( exception );
+    instance = getPlaylistInstance( env, _this );
+
+    libvlc_playlist_delete_item( ( libvlc_instance_t * ) instance, itemID, exception );
+
+    free( exception );
+    return;
+}
+
+
 JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1itemsCount (JNIEnv *env, jobject _this) {
     long instance = 0;
     int res = 0;
@@ -455,6 +494,49 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1isPlaying (JNIEnv *env,
     return res;
 
 }
+
+/*
+ * Input handling functions
+ */
+
+JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC__1getInputLength (JNIEnv *env, jobject _this) 
+{
+    vlc_int64_t res = 0;
+    long instance = 0;
+    libvlc_exception_t *exception = ( libvlc_exception_t * ) malloc( sizeof( libvlc_exception_t ) );
+    libvlc_input_t *input;
+    
+    libvlc_exception_init( exception );
+    instance = getPlaylistInstance( env, _this );
+    
+    input = libvlc_playlist_get_input( ( libvlc_instance_t* ) instance, exception );
+    /// \todo check exceptions
+    
+    res = libvlc_input_get_length( input, exception );
+
+    free( exception );
+    return res;    
+}
+
+JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC__1getInputTime (JNIEnv *env, jobject _this) 
+{
+    vlc_int64_t res = 0;
+    long instance = 0;
+    libvlc_exception_t *exception = ( libvlc_exception_t * ) malloc( sizeof( libvlc_exception_t ) );
+    libvlc_input_t *input;
+    
+    libvlc_exception_init( exception );
+    instance = getPlaylistInstance( env, _this );
+    
+    input = libvlc_playlist_get_input( ( libvlc_instance_t* ) instance, exception );
+    /// \todo check exceptions
+    
+    res = libvlc_input_get_time( input, exception );
+
+    free( exception );
+    return res;    
+}
+
 
 
 /*
