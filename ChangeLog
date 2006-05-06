@@ -1,4 +1,2852 @@
 ------------------------------------------------------------------------
+r15550 | damienf | 2006-05-06 12:36:58 +0200 (Sat, 06 May 2006) | 2 lines
+Changed paths:
+   M /trunk/vlc.win32.nsi.in
+
+vlc.win32.nsi.in: i need holidays
+
+------------------------------------------------------------------------
+r15549 | littlejohn | 2006-05-06 12:04:34 +0200 (Sat, 06 May 2006) | 6 lines
+Changed paths:
+   A /trunk/bindings/java/FAQ
+   M /trunk/bindings/java/Makefile.am
+   D /trunk/bindings/java/SWTUglyPlayer.java
+   M /trunk/bindings/java/org/videolan/jvlc/AudioIntf.java
+   M /trunk/bindings/java/org/videolan/jvlc/InputIntf.java
+   M /trunk/bindings/java/org/videolan/jvlc/JLibVLC.java
+   M /trunk/bindings/java/org/videolan/jvlc/JVLC.java
+   M /trunk/bindings/java/org/videolan/jvlc/JVLCCanvas.java
+   M /trunk/bindings/java/org/videolan/jvlc/JVLCPanel.java
+   M /trunk/bindings/java/org/videolan/jvlc/Playlist.java
+   M /trunk/bindings/java/org/videolan/jvlc/PlaylistIntf.java
+   D /trunk/bindings/java/org/videolan/jvlc/SWTVideoWidget.java
+   M /trunk/bindings/java/org/videolan/jvlc/VLMIntf.java
+   M /trunk/bindings/java/org/videolan/jvlc/VideoIntf.java
+   M /trunk/bindings/java/vlc-libvlc-jni.cc
+
+Java bindings updated to latest jvlc version.
+SWT components removed until we are able to configure and check for swt-*.jar
+presence.
+
+
+
+------------------------------------------------------------------------
+r15548 | damienf | 2006-05-06 01:41:55 +0200 (Sat, 06 May 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/vlc.win32.nsi.in
+
+- vlc.win32.nsi.in: second attempt
+
+------------------------------------------------------------------------
+r15547 | damienf | 2006-05-06 01:09:43 +0200 (Sat, 06 May 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/vlc.win32.nsi.in
+
+vlc.win32.nsi: libvlc.dll needs be copied into mozilla plugins directory as well.
+
+------------------------------------------------------------------------
+r15546 | dionoea | 2006-05-05 22:38:58 +0200 (Fri, 05 May 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/services_discovery/shout.c
+
+Add "shoutcast" as an alias for "shout".
+
+------------------------------------------------------------------------
+r15545 | dionoea | 2006-05-05 22:35:43 +0200 (Fri, 05 May 2006) | 2 lines
+Changed paths:
+   M /trunk/THANKS
+
+see previous commit
+
+------------------------------------------------------------------------
+r15544 | dionoea | 2006-05-05 22:34:42 +0200 (Fri, 05 May 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/rc.c
+   M /trunk/modules/video_filter/mosaic.c
+
+"[PATCH] for changing the mosaic-order in execution time" by Mateus Krepsky Ludwich + a few fixes. Many thanks.
+
+------------------------------------------------------------------------
+r15541 | xtophe | 2006-05-05 19:12:15 +0200 (Fri, 05 May 2006) | 2 lines
+Changed paths:
+   M /trunk/po/zh_CN.po
+
+Update chinese l10n by  Wei Mingzhi
+
+------------------------------------------------------------------------
+r15538 | courmisch | 2006-05-05 17:49:54 +0200 (Fri, 05 May 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/misc/svg.c
+
+We need to include "config.h" somehow before we can use the HAVE_* defines
+
+------------------------------------------------------------------------
+r15537 | xtophe | 2006-05-05 14:02:55 +0200 (Fri, 05 May 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+Hope it really fix it
+
+------------------------------------------------------------------------
+r15536 | xtophe | 2006-05-05 00:36:31 +0200 (Fri, 05 May 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+Fix.
+
+------------------------------------------------------------------------
+r15535 | xtophe | 2006-05-05 00:00:42 +0200 (Fri, 05 May 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+configure.ac: test a bit more for contribs
+
+------------------------------------------------------------------------
+r15534 | damienf | 2006-05-04 23:58:37 +0200 (Thu, 04 May 2006) | 2 lines
+Changed paths:
+   M /trunk/src/libvlc.c
+
+libvlc.c: removed debug
+
+------------------------------------------------------------------------
+r15532 | dionoea | 2006-05-04 23:25:07 +0200 (Thu, 04 May 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/rc.c
+
+Add undocummented comments to help. Thanks to pieroxy ( http://forum.videolan.org/viewtopic.php?t=19603 )
+
+------------------------------------------------------------------------
+r15530 | dionoea | 2006-05-02 22:17:33 +0200 (Tue, 02 May 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+
+This should now at least compile
+
+------------------------------------------------------------------------
+r15528 | bigben | 2006-05-02 22:07:59 +0200 (Tue, 02 May 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/stream_out/es.c
+
+* Hopefully fix a long lasting refcount issue in the es module that prevented the mp4 frame header to be written properly on exit
+* (Well, es is deprecated anyway)
+
+
+------------------------------------------------------------------------
+r15527 | dionoea | 2006-05-02 21:54:29 +0200 (Tue, 02 May 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+
+Untested change to support different AMTUNER modes in dshow input (see http://forum.videolan.org/viewtopic.php?t=19814 )
+
+------------------------------------------------------------------------
+r15525 | bigben | 2006-05-02 21:20:28 +0200 (Tue, 02 May 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/video_output/x11/xcommon.c
+
+* Really fix the color depth specification
+
+
+------------------------------------------------------------------------
+r15524 | courmisch | 2006-05-02 17:23:39 +0200 (Tue, 02 May 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+Hopefully fix linking of the mosaic plugin
+
+------------------------------------------------------------------------
+r15523 | damienf | 2006-05-02 17:13:28 +0200 (Tue, 02 May 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/voutqt.m
+
+voutqt.m: use kYUVSPixelFormat for MacIntel CPUs
+
+------------------------------------------------------------------------
+r15522 | courmisch | 2006-05-02 16:54:32 +0200 (Tue, 02 May 2006) | 2 lines
+Changed paths:
+   M /trunk/THANKS
+   M /trunk/mozilla/Makefile.am
+
+Mozilla libtool fix from Pavlov Konstantin
+
+------------------------------------------------------------------------
+r15520 | damienf | 2006-05-02 11:23:06 +0200 (Tue, 02 May 2006) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+
+Makefile.am: fixed EXTRA_DIST for MacOS X plugin
+
+------------------------------------------------------------------------
+r15519 | damienf | 2006-05-02 10:50:18 +0200 (Tue, 02 May 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+- added support for 64 bit version of mozilla SDK, thanks to thresh for the patch
+
+------------------------------------------------------------------------
+r15518 | courmisch | 2006-05-02 08:57:46 +0200 (Tue, 02 May 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/unicode.c
+
+Avoid code duplication
+
+------------------------------------------------------------------------
+r15517 | ipkiss | 2006-05-02 08:50:30 +0200 (Tue, 02 May 2006) | 2 lines
+Changed paths:
+   M /trunk/share/skins2/default/theme.xml
+
+ * forwardport of [15426] and [15516]
+
+------------------------------------------------------------------------
+r15515 | fox | 2006-05-02 00:06:57 +0200 (Tue, 02 May 2006) | 5 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/demux/Modules.am
+   A /trunk/modules/demux/gme.cpp
+
+First rough demux2 implementation for game music files using Game_Music_Emu 
+(Super Nintendo (SPC), Nintendo NES (NSF), Nintendo Game Boy (GBS), 
+Sega Genesis/Mega Drive (VGM/VGZ/GYM), and Sega Master System (VGM/VGZ)).
+
+
+------------------------------------------------------------------------
+r15513 | fox | 2006-05-01 23:20:09 +0200 (Mon, 01 May 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/mod.c
+
+ Use strrchr to extract the file's extension
+
+------------------------------------------------------------------------
+r15512 | dionoea | 2006-05-01 21:13:45 +0200 (Mon, 01 May 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/unicode.c
+
+Win95/98/Me file opening and stat "fix". Thanks to Quovodis for the help (even though we finaly came back to an easy solution).
+
+------------------------------------------------------------------------
+r15511 | courmisch | 2006-05-01 17:18:01 +0200 (Mon, 01 May 2006) | 3 lines
+Changed paths:
+   M /trunk/src/misc/unicode.c
+
+- Save one malloc()
+- Return NULL in case of error
+
+------------------------------------------------------------------------
+r15510 | dionoea | 2006-05-01 16:47:24 +0200 (Mon, 01 May 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/unicode.c
+
+Hum
+
+------------------------------------------------------------------------
+r15509 | dionoea | 2006-05-01 16:25:07 +0200 (Mon, 01 May 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/unicode.c
+
+Add some more debug (this is easier than compiling at home).
+
+------------------------------------------------------------------------
+r15507 | ipkiss | 2006-05-01 15:28:07 +0200 (Mon, 01 May 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/src/generic_layout.cpp
+
+ * skins2/src/generic_layout.cpp: do not draw on top of the embedded vout when
+   resizing
+
+------------------------------------------------------------------------
+r15506 | dionoea | 2006-05-01 15:18:11 +0200 (Mon, 01 May 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/unicode.c
+
+Fix tabs and add some debug.
+
+------------------------------------------------------------------------
+r15505 | asmax | 2006-05-01 14:12:03 +0200 (Mon, 01 May 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/src/vlcproc.cpp
+
+* forward port of [15504]
+
+------------------------------------------------------------------------
+r15503 | fkuehne | 2006-05-01 13:47:19 +0200 (Mon, 01 May 2006) | 1 line
+Changed paths:
+   M /trunk/Makefile.am
+
+* forward-port [15502]
+------------------------------------------------------------------------
+r15501 | damienf | 2006-05-01 12:41:00 +0200 (Mon, 01 May 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/unicode.c
+
+- unicode.c: possible fix for UTF8 filename support under WinMe/98/95, needs testing though
+
+------------------------------------------------------------------------
+r15498 | zorglub | 2006-05-01 10:34:27 +0200 (Mon, 01 May 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/mux/mpeg/ts.c
+
+Forwardport [15492]
+
+------------------------------------------------------------------------
+r15494 | zorglub | 2006-05-01 00:34:50 +0200 (Mon, 01 May 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/audio_output/alsa.c
+
+Fix handling of buffer underruns in ALSA. Probably closes #461
+We passed the delay verbatim to ...frames_to_bytes function which doesn't like negative numbers.
+
+------------------------------------------------------------------------
+r15493 | hartman | 2006-05-01 00:08:18 +0200 (Mon, 01 May 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/misc/rtsp.c
+
+* Fix searching in aggregate mode for the RTSP VoD module. (fixes #655)
+  Pausing is still broken.
+
+------------------------------------------------------------------------
+r15490 | courmisch | 2006-04-30 23:01:54 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/httpd.c
+
+Rah forgot to commit this file
+
+------------------------------------------------------------------------
+r15488 | bigben | 2006-04-30 21:26:25 +0200 (Sun, 30 Apr 2006) | 5 lines
+Changed paths:
+   M /trunk/THANKS
+   M /trunk/modules/gui/macosx/controls.h
+   M /trunk/modules/gui/macosx/controls.m
+   M /trunk/modules/gui/macosx/misc.m
+
+* Patch from Basil Achermann to handle esc and space keyboard events in VLCControl when the controller is active
+* It seems that corrects a bug when the controller was the acrtive window in fullscreen (that shouldn't happen, but well...)
+* Best thing to do would be to handle the keypresses from the vout here too, I guess...
+
+
+------------------------------------------------------------------------
+r15487 | dionoea | 2006-04-30 21:16:39 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+   M /trunk/modules/gui/skins2/controls/ctrl_text.cpp
+   M /trunk/modules/gui/skins2/controls/ctrl_text.hpp
+   M /trunk/modules/gui/skins2/parser/builder.cpp
+   M /trunk/modules/services_discovery/podcast.c
+   M /trunk/share/skins2/default/theme.xml
+
+Forward port [15485] and [15486].
+
+------------------------------------------------------------------------
+r15480 | courmisch | 2006-04-30 19:51:34 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http/mvar.c
+
+Fix segfault
+
+------------------------------------------------------------------------
+r15478 | damienf | 2006-04-30 19:40:34 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+
+- MacOS X: bundle 'VLC Internet Plug-In' package into a disk image for online distribution
+
+------------------------------------------------------------------------
+r15477 | zorglub | 2006-04-30 19:40:03 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/asf/asf.c
+
+Ditto
+
+------------------------------------------------------------------------
+r15476 | zorglub | 2006-04-30 19:39:28 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/mux/asf.c
+   M /trunk/modules/mux/avi.c
+
+Woops
+
+------------------------------------------------------------------------
+r15475 | zorglub | 2006-04-30 19:36:48 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/doc/fortunes.txt
+   M /trunk/modules/demux/asf/asf.c
+   M /trunk/modules/mux/asf.c
+   M /trunk/modules/mux/avi.c
+
+Fortune
+
+------------------------------------------------------------------------
+r15474 | courmisch | 2006-04-30 19:19:29 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/tcp.c
+
+Also set SO_REUSEADDR here
+
+------------------------------------------------------------------------
+r15473 | courmisch | 2006-04-30 19:16:32 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/httpd.c
+
+Set SO_REUSEADDR on client sockets
+
+------------------------------------------------------------------------
+r15472 | dionoea | 2006-04-30 19:12:50 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/share/Makefile.am
+   D /trunk/share/skins2/default/main/Thumbs.db
+   D /trunk/share/skins2/default/playlist/Thumbs.db
+
+Remove the Thumbs.db files here too
+
+------------------------------------------------------------------------
+r15468 | courmisch | 2006-04-30 18:54:32 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/unicode.c
+
+Fix memleak
+
+------------------------------------------------------------------------
+r15467 | dionoea | 2006-04-30 18:37:30 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/playlist/podcast.c
+   M /trunk/modules/services_discovery/podcast.c
+
+Forward port podcast fixes [15462] and [15465].
+
+------------------------------------------------------------------------
+r15466 | fkuehne | 2006-04-30 18:31:38 +0200 (Sun, 30 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/playlist.m
+
+* forward-port [15464] and update the TODO-list at the top of the file
+------------------------------------------------------------------------
+r15463 | damienf | 2006-04-30 18:08:32 +0200 (Sun, 30 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/Makefile.am
+   A /trunk/extras/MacOSX/plugin/InstallerDescription.plist
+   A /trunk/extras/MacOSX/plugin/InstallerInfo.plist
+   M /trunk/mozilla/vlc.r
+
+- added installer for MacOSX VLC Plugin
+- updated supported mime types in resource
+
+------------------------------------------------------------------------
+r15459 | dionoea | 2006-04-30 17:39:19 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+   M /trunk/modules/gui/skins2/controls/ctrl_text.cpp
+   M /trunk/modules/gui/skins2/controls/ctrl_text.hpp
+   M /trunk/modules/gui/skins2/parser/builder.cpp
+   M /trunk/share/skins2/default/theme.xml
+
+Forward port [15458].
+
+------------------------------------------------------------------------
+r15457 | titer | 2006-04-30 17:30:35 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_messages.h
+
+Build fix
+
+------------------------------------------------------------------------
+r15455 | dionoea | 2006-04-30 17:19:24 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwidgets/dialogs/infopanels.cpp
+
+Fix statistics panel alignement
+
+------------------------------------------------------------------------
+r15454 | fkuehne | 2006-04-30 16:44:54 +0200 (Sun, 30 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/THANKS
+
+* forward-port [15453]
+------------------------------------------------------------------------
+r15451 | asmax | 2006-04-30 15:44:20 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/src/generic_layout.cpp
+   M /trunk/modules/gui/skins2/src/generic_layout.hpp
+
+* generic_layout.cpp: don't draw controls of an invisible layout
+
+------------------------------------------------------------------------
+r15449 | zorglub | 2006-04-30 15:25:32 +0200 (Sun, 30 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/include/codecs.h
+   M /trunk/modules/codec/dmo/dmo.c
+
+Add support for Windows Media Audio 9 Speech (Closes:#606)
+
+------------------------------------------------------------------------
+r15447 | asmax | 2006-04-30 15:12:34 +0200 (Sun, 30 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/share/Makefile.am
+   A /trunk/share/skins2/default/main/vol_bg.png
+   M /trunk/share/skins2/default/main/vol_slider.png
+   M /trunk/share/skins2/default/theme.xml
+
+* all: added a SliderBackground to the volume slider of the default skin
+ (fixes an incorrect behaviour when clicking on the white part of the slider)
+
+------------------------------------------------------------------------
+r15445 | bigben | 2006-04-29 22:48:44 +0200 (Sat, 29 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/extras/MacOSX/Resources/English.lproj/MainMenu.nib/classes.nib
+   M /trunk/extras/MacOSX/Resources/English.lproj/MainMenu.nib/info.nib
+   M /trunk/extras/MacOSX/Resources/English.lproj/MainMenu.nib/keyedobjects.nib
+   M /trunk/modules/gui/macosx/playlist.h
+   M /trunk/modules/gui/macosx/playlist.m
+
+* Support for saving xspf playlist files
+
+
+------------------------------------------------------------------------
+r15444 | xtophe | 2006-04-29 22:18:21 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/debian/control
+   M /trunk/debian/rules
+
+Re-enables the XOSD plugin in debian nightlies
+
+------------------------------------------------------------------------
+r15442 | dionoea | 2006-04-29 20:33:44 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/controls/ctrl_text.cpp
+
+Forward port [15418] and [15420].
+
+------------------------------------------------------------------------
+r15441 | courmisch | 2006-04-29 17:56:15 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http/rpn.c
+
+Hmm 512 bytes to format a decimal integer sounds a little abusive
+
+------------------------------------------------------------------------
+r15440 | courmisch | 2006-04-29 17:46:36 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http/mvar.c
+
+Another overflow
+
+------------------------------------------------------------------------
+r15439 | courmisch | 2006-04-29 17:34:09 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http/mvar.c
+
+Fix likely stack buffer overflow
+
+------------------------------------------------------------------------
+r15438 | courmisch | 2006-04-29 17:15:30 +0200 (Sat, 29 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/control/http/macro.c
+
+- Don't nul-terminate after snprintf(), it does it already
+- Use strlcpy()
+
+------------------------------------------------------------------------
+r15437 | courmisch | 2006-04-29 17:11:48 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/directory.c
+
+Clean up
+
+------------------------------------------------------------------------
+r15436 | courmisch | 2006-04-29 17:10:39 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/stream_out/rtp.c
+
+Use strlcpy
+
+------------------------------------------------------------------------
+r15434 | courmisch | 2006-04-29 16:38:39 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/input/subtitles.c
+
+Also use strlcpy()
+
+------------------------------------------------------------------------
+r15433 | courmisch | 2006-04-29 16:34:50 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/getaddrinfo.c
+   M /trunk/src/stream_output/sap.c
+
+Use strlcpy()
+
+------------------------------------------------------------------------
+r15432 | courmisch | 2006-04-29 16:30:49 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/include/vlc_common.h
+   M /trunk/include/vlc_symbols.h
+   M /trunk/modules/access/smb.c
+   M /trunk/src/extras/libc.c
+
+OpenBSDish strlcpy()
+
+------------------------------------------------------------------------
+r15430 | zorglub | 2006-04-29 16:23:44 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/po/ru.po
+
+Update ru.po from rosetta
+
+------------------------------------------------------------------------
+r15429 | zorglub | 2006-04-29 16:23:41 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/include/variables.h
+   M /trunk/include/vlc_messages.h
+
+Initialize variables
+
+------------------------------------------------------------------------
+r15428 | courmisch | 2006-04-29 16:23:00 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/file.c
+
+Win32 compile fix
+
+------------------------------------------------------------------------
+r15425 | courmisch | 2006-04-29 16:07:18 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/src/misc/threads.c
+
+Remove some unused configure checks
+
+------------------------------------------------------------------------
+r15424 | courmisch | 2006-04-29 15:59:07 +0200 (Sat, 29 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/access/smb.c
+
+Nul terminate
+
+Might be a better idea to implement strlcpy()
+
+------------------------------------------------------------------------
+r15422 | courmisch | 2006-04-29 15:55:07 +0200 (Sat, 29 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/access/file.c
+
+- Use poll() instead of select() so we don't depend on FD_SETSIZE
+- Clean up
+
+------------------------------------------------------------------------
+r15421 | bigben | 2006-04-29 15:53:49 +0200 (Sat, 29 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/video_output/x11/xcommon.c
+
+* Fix for some strange x drivers that return 8 bits screens as first answer when being requested a Truecolor class one
+
+
+------------------------------------------------------------------------
+r15419 | courmisch | 2006-04-29 15:38:50 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/smb.c
+
+Use strncpy() rather than strncat() when the destination is empty
+
+------------------------------------------------------------------------
+r15415 | courmisch | 2006-04-29 15:32:36 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/mp4.c
+
+Don't use #ifdef + alloca() when we have something simpler
+
+------------------------------------------------------------------------
+r15414 | zorglub | 2006-04-29 15:31:39 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/modules/gui/skins2/vars/time.cpp
+
+Be sure to write correct time values
+
+------------------------------------------------------------------------
+r15413 | courmisch | 2006-04-29 15:30:39 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/drms.c
+
+Simplification assuming that sizeof(char) = 1
+
+------------------------------------------------------------------------
+r15412 | courmisch | 2006-04-29 15:30:10 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/voc.c
+   M /trunk/modules/demux/xa.c
+
+Fix copyright
+
+------------------------------------------------------------------------
+r15411 | dionoea | 2006-04-29 15:12:29 +0200 (Sat, 29 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/share/skins2/default/theme.xml
+
+Forward port [15410]
+
+------------------------------------------------------------------------
+r15406 | zorglub | 2006-04-28 22:21:42 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/src/libvlc.h
+
+Set skip-frames to default enabled
+
+------------------------------------------------------------------------
+r15405 | courmisch | 2006-04-28 21:43:55 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/pvr/pvr.c
+
+Compile fix
+
+------------------------------------------------------------------------
+r15404 | courmisch | 2006-04-28 21:38:52 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/dvb/access.c
+
+Another select() -> poll()
+
+------------------------------------------------------------------------
+r15403 | courmisch | 2006-04-28 21:31:26 +0200 (Fri, 28 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/access/pvr/pvr.c
+
+Use poll() instead of select() so we won't fall for the FD_SETSIZE trap
+in any case (however unlikely we were to fall far it on Linux)
+
+------------------------------------------------------------------------
+r15401 | bigben | 2006-04-28 19:18:46 +0200 (Fri, 28 Apr 2006) | 5 lines
+Changed paths:
+   M /trunk/src/interface/interface.c
+   M /trunk/src/libvlc.c
+
+* Revert 15357, as it would make vlc crash if you try to load a main interface that doesn't exist
+* Instead, use "screensaver,none" when trying to load the screensaver interface
+* Same fix for onther interfaces loaded by libvlc
+
+
+------------------------------------------------------------------------
+r15399 | dionoea | 2006-04-28 18:32:00 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwidgets/dialogs/updatevlc.cpp
+
+Display file size instead of svn revision in update dialog
+
+------------------------------------------------------------------------
+r15397 | dionoea | 2006-04-28 17:19:10 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/vlc.win32.nsi.in
+
+Woops
+
+------------------------------------------------------------------------
+r15396 | dionoea | 2006-04-28 16:39:25 +0200 (Fri, 28 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/vlc.win32.nsi.in
+
+Remove local copies of Mozilla plugin and ActiveX dlls
+Fix #525 Fixes #525
+
+------------------------------------------------------------------------
+r15395 | courmisch | 2006-04-28 14:30:39 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/tcp.c
+
+Another close-on-exec
+
+------------------------------------------------------------------------
+r15394 | courmisch | 2006-04-28 14:29:00 +0200 (Fri, 28 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/src/network/httpd.c
+
+- Fix POSIX setting of non-blocking mode (we were clearing the R/W flags)
+- Close-on-exec: Don't leak httpd client sockets into CGI scripts or
+  whatever child process we spawn.
+
+------------------------------------------------------------------------
+r15393 | courmisch | 2006-04-28 14:25:51 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/httpd.c
+
+Only check FD_SETSIZE limit on POSIX OSes.
+
+------------------------------------------------------------------------
+r15392 | courmisch | 2006-04-28 14:22:25 +0200 (Fri, 28 Apr 2006) | 11 lines
+Changed paths:
+   M /trunk/src/network/io.c
+
+Hmm, damn stupid fd_set implementation by Winsock does of course not
+work like any other one: it's actually thirty two times as big than the
+POSIX ones for any given FD_SETSIZE, plus FD_SET and FD_ISSET are O(n)
+instead of O(1). But at least, the mingw implementations of FD_SET has
+built-in overflow checks.
+
+Also, Winsock insists on returning big socket numbers, so we can't drop
+those above FD_SETSIZE or we have no TCP/IP support at all, anyway.
+
+
+
+------------------------------------------------------------------------
+r15390 | dionoea | 2006-04-28 14:15:27 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/NEWS
+
+Shoutcast changed
+
+------------------------------------------------------------------------
+r15387 | dionoea | 2006-04-28 14:10:07 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/NEWS
+   M /trunk/THANKS
+   M /trunk/share/Makefile.am
+   A /trunk/share/skins2/default
+   A /trunk/share/skins2/default/credits.png
+   A /trunk/share/skins2/default/equalizer.png
+   A /trunk/share/skins2/default/font.otf
+   A /trunk/share/skins2/default/main
+   A /trunk/share/skins2/default/main/Thumbs.db
+   A /trunk/share/skins2/default/main/dvd_menu.png
+   A /trunk/share/skins2/default/main/dvd_nextchapter.png
+   A /trunk/share/skins2/default/main/dvd_nexttitle.png
+   A /trunk/share/skins2/default/main/dvd_prevchapter.png
+   A /trunk/share/skins2/default/main/dvd_prevtitle.png
+   A /trunk/share/skins2/default/main/main.png
+   A /trunk/share/skins2/default/main/main_down.png
+   A /trunk/share/skins2/default/main/main_over.png
+   A /trunk/share/skins2/default/main/main_up.png
+   A /trunk/share/skins2/default/main/pause_down.png
+   A /trunk/share/skins2/default/main/pause_over.png
+   A /trunk/share/skins2/default/main/pause_up.png
+   A /trunk/share/skins2/default/main/timeslider.png
+   A /trunk/share/skins2/default/main/vol_mask.png
+   A /trunk/share/skins2/default/main/vol_slider.png
+   A /trunk/share/skins2/default/minimal.png
+   A /trunk/share/skins2/default/playlist
+   A /trunk/share/skins2/default/playlist/Thumbs.db
+   A /trunk/share/skins2/default/playlist/playlist.png
+   A /trunk/share/skins2/default/playlist/playlist_down.png
+   A /trunk/share/skins2/default/playlist/playlist_over.png
+   A /trunk/share/skins2/default/playlist/playlist_up.png
+   A /trunk/share/skins2/default/playlist/playtreeglyphs.png
+   A /trunk/share/skins2/default/playlist/plscroller.png
+   A /trunk/share/skins2/default/switch.png
+   A /trunk/share/skins2/default/theme.xml
+
+New default skin by aLtgLasS. Many thanks for making one on such short notice.
+
+------------------------------------------------------------------------
+r15385 | dionoea | 2006-04-28 13:38:55 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   D /trunk/share/skins2/playtree
+
+Remove playtree skin
+
+------------------------------------------------------------------------
+r15384 | dionoea | 2006-04-28 13:37:38 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   D /trunk/share/skins2/default
+   M /trunk/share/skins2/playtree/theme.xml
+
+Remove old default skin
+
+------------------------------------------------------------------------
+r15383 | zorglub | 2006-04-28 09:58:18 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+HA HA ! (Refs:#658)
+
+------------------------------------------------------------------------
+r15382 | dionoea | 2006-04-28 00:31:16 +0200 (Fri, 28 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/playlist/shoutcast.c
+
+Ahem...
+
+------------------------------------------------------------------------
+r15381 | dionoea | 2006-04-27 23:23:34 +0200 (Thu, 27 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/playlist/playlist.c
+   M /trunk/modules/demux/playlist/shoutcast.c
+
+Add option (--shoutcast-show-adult) to show porn^WNC17 rated video streams. Default setting is of course disabled.
+
+------------------------------------------------------------------------
+r15380 | jpsaman | 2006-04-27 23:15:18 +0200 (Thu, 27 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/THANKS
+
+Added Rob Casey to THANKS file.
+------------------------------------------------------------------------
+r15379 | courmisch | 2006-04-27 22:18:14 +0200 (Thu, 27 Apr 2006) | 15 lines
+Changed paths:
+   M /trunk/modules/access/file.c
+   M /trunk/src/network/httpd.c
+   M /trunk/src/network/io.c
+   M /trunk/src/network/tcp.c
+
+Whenever using select() companion macro FD_SET(), one must ensure that
+the specified file descriptor does not exceeds the fd_set limit (FD_SETSIZE).
+Registering a file descriptor above this limit is not defined (read: this is
+a buffer overflow).
+
+This is not normally exploitable on Linux because FD_SETSIZE equals the
+default limit for file descriptors per processes, but should work on BSDs.
+Cygwin is also very prone to this problem (but right, we don't use it). As
+for Windows, it will overflow if you try to select() more than 64 sockets at
+a time (regardless of the total numbers of socket), but for the sake of
+simplicity and portability, this patch actually prevent opening more than
+64 sockets at all.
+
+There are still quite a bunch of plugins that needs fixing.
+
+------------------------------------------------------------------------
+r15378 | jpsaman | 2006-04-27 21:31:20 +0200 (Thu, 27 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/misc/rtsp.c
+
+Fix for VLM commands when 'new test vod mux mp2ts enabled' is used.
+------------------------------------------------------------------------
+r15377 | jpsaman | 2006-04-27 21:13:42 +0200 (Thu, 27 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/include/vlc_httpd.h
+   M /trunk/modules/misc/rtsp.c
+   M /trunk/src/network/httpd.c
+
+Play VOD RTSP from Amino STB with RTSP url: 'rtsp://192.168.0.5:5554//192.168.0.5:5554/dvd;type=VOD;servertype=MediaBase' Note the double slash // between the ip-addresses. Patch by Rob Casey (rob dot casey AT swishgroup dot com dot au)
+------------------------------------------------------------------------
+r15375 | damienf | 2006-04-27 17:47:53 +0200 (Thu, 27 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+
+- fix for problem reported in http://forum.videolan.org/viewtopic.php?t=19804&sid=d4ec4d6ac1bcdc8074d8d2855d734d29
+
+------------------------------------------------------------------------
+r15372 | jpsaman | 2006-04-27 10:14:45 +0200 (Thu, 27 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/codec/x264.c
+
+Remove whitespace
+------------------------------------------------------------------------
+r15371 | jpsaman | 2006-04-27 10:13:50 +0200 (Thu, 27 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/src/stream_output/stream_output.c
+
+Remove whitespace
+------------------------------------------------------------------------
+r15369 | fkuehne | 2006-04-26 23:32:10 +0200 (Wed, 26 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* forward-port [15368]
+------------------------------------------------------------------------
+r15367 | dionoea | 2006-04-26 23:04:47 +0200 (Wed, 26 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/access_filter/timeshift.c
+
+Add option to force timeshift filter even if access can control pace or pause.
+The goal is to be able to timeshift on live rtsp streams. The true fix would be to fix the rtsp access ...
+
+------------------------------------------------------------------------
+r15365 | ipkiss | 2006-04-26 19:59:29 +0200 (Wed, 26 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+   M /trunk/modules/gui/skins2/Modules.am
+   A /trunk/modules/gui/skins2/commands/cmd_snapshot.cpp
+   A /trunk/modules/gui/skins2/commands/cmd_snapshot.hpp
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+
+ * skins2: Added the vlc.snapshot() action
+
+------------------------------------------------------------------------
+r15363 | dionoea | 2006-04-26 11:56:04 +0200 (Wed, 26 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/vlc.win32.nsi.in
+
+Changes to the default selected options in the installer
+
+------------------------------------------------------------------------
+r15361 | zorglub | 2006-04-26 10:21:52 +0200 (Wed, 26 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp
+
+Oh look ! Bananas !
+
+------------------------------------------------------------------------
+r15359 | asmax | 2006-04-25 19:25:02 +0200 (Tue, 25 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/src/top_window.cpp
+
+* top_window.cpp: stupid bug...
+
+------------------------------------------------------------------------
+r15357 | bigben | 2006-04-25 18:47:56 +0200 (Tue, 25 Apr 2006) | 5 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/misc/screensaver.c
+   M /trunk/src/interface/interface.c
+
+* screensaver.c, configure.ac: use directly dbus to disable gnome-screensaver if dbus is available upon compilation, instead of using system(gnome-screensaver-command
+* interface.c: use the b_strict boolean when calling module_Need upon extra interface launching. This prevents vlc to try to launch a 2nd wx gui if the screensaver module isn't available.
+
+
+
+------------------------------------------------------------------------
+r15355 | zorglub | 2006-04-25 12:17:57 +0200 (Tue, 25 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwidgets/Modules.am
+   A /trunk/modules/gui/wxwidgets/bitmaps/edit.xpm
+   M /trunk/modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp
+
+Add edit button for VLM (Closes:#530)
+
+------------------------------------------------------------------------
+r15353 | ipkiss | 2006-04-24 23:57:04 +0200 (Mon, 24 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+
+ * skins2/parser/interpreter.cpp: Fixed a crash when using an action of the form "foo;"
+
+------------------------------------------------------------------------
+r15352 | fkuehne | 2006-04-24 23:04:54 +0200 (Mon, 24 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+* add --enable-pic to x264's configure on PPC as well and check out the latest revisions again
+------------------------------------------------------------------------
+r15350 | dionoea | 2006-04-24 21:41:04 +0200 (Mon, 24 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/playlist/shoutcast.c
+
+Some more cleaning
+
+------------------------------------------------------------------------
+r15349 | xtophe | 2006-04-24 20:29:14 +0200 (Mon, 24 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/playlist/shoutcast.c
+
+shoutcast.c: Memleak hunt.
+
+------------------------------------------------------------------------
+r15348 | sam | 2006-04-24 10:53:26 +0200 (Mon, 24 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/video_output/caca.c
+
+  * modules/video_output/caca.c: synced caca output with libcaca-0.99.beta1.
+
+------------------------------------------------------------------------
+r15347 | dionoea | 2006-04-24 02:25:25 +0200 (Mon, 24 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/wxwidgets/dialogs/preferences_widgets.cpp
+
+ * Handle submodules correctly in the prefs (so we can enable/disable them).
+ * Fix bug with modules chain if the begining or the end of one module's name matched another module's name. (like 'shoutcasttv' and 'shout')
+
+------------------------------------------------------------------------
+r15346 | dionoea | 2006-04-24 00:53:40 +0200 (Mon, 24 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/playlist/shoutcast.c
+   M /trunk/modules/services_discovery/shout.c
+
+Support for Shoutcast TV. vp3 streams segfault, vp5 and 6 don't play :)
+
+------------------------------------------------------------------------
+r15345 | dionoea | 2006-04-24 00:52:35 +0200 (Mon, 24 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwidgets/dialogs/playlist.cpp
+
+Hack to handle service discovery submodules correctly. This should maybe be changed in other interfaces.
+
+------------------------------------------------------------------------
+r15344 | dionoea | 2006-04-23 23:17:51 +0200 (Sun, 23 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/vlc.win32.nsi.in
+
+Don't remove files added by user when uninstalling
+Fix #525 / Fixes #525
+
+------------------------------------------------------------------------
+r15342 | bigben | 2006-04-23 22:31:06 +0200 (Sun, 23 Apr 2006) | 5 lines
+Changed paths:
+   M /trunk/modules/misc/screensaver.c
+
+* Support for gnome-screensaver
+* We should test if the command is in the path before trying to launch it
+* Anyway, system is dirty, we should use dbus, at least for gnome-screensaver
+
+
+------------------------------------------------------------------------
+r15341 | djc | 2006-04-23 22:11:23 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access_output/file.c
+
+Add %T modifier to filename refs: #561
+
+------------------------------------------------------------------------
+r15336 | courmisch | 2006-04-23 17:56:41 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/po/ru.po
+
+Partially updated russian localization by Pavlov Konstantin
+
+------------------------------------------------------------------------
+r15334 | courmisch | 2006-04-23 16:41:48 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/tls.c
+
+Doxygenization
+
+------------------------------------------------------------------------
+r15333 | bigben | 2006-04-23 16:37:54 +0200 (Sun, 23 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/video_output/x11/xcommon.c
+
+* bit masks for RV15 and RV16 were inverted (!) (or there is something I really haven't caught)
+* Endianness fix for RV15 and RV16 (mostly used for x11)
+
+
+------------------------------------------------------------------------
+r15332 | courmisch | 2006-04-23 16:34:44 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/misc/gnutls.c
+
+Use Doxygen syntax for comments
+
+------------------------------------------------------------------------
+r15331 | courmisch | 2006-04-23 16:05:03 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/po/en_GB.po
+
+British translation l10n update
+
+------------------------------------------------------------------------
+r15330 | courmisch | 2006-04-23 16:00:23 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access_output/http.c
+
+Add missing white space
+
+------------------------------------------------------------------------
+r15329 | courmisch | 2006-04-23 15:59:33 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access_output/http.c
+
+Remove extra white space
+
+------------------------------------------------------------------------
+r15327 | courmisch | 2006-04-23 15:54:30 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/libvlc.h
+
+Fix a grammar mistake
+
+------------------------------------------------------------------------
+r15326 | bigben | 2006-04-23 15:51:04 +0200 (Sun, 23 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/video_output/opengl.c
+
+* Try to fix endianness in the opengl output on unixes
+* RV32 works, I'm not sure of the masks for RV24 and RV16
+
+
+------------------------------------------------------------------------
+r15325 | sam | 2006-04-23 15:41:42 +0200 (Sun, 23 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/src/video_output/video_output.c
+
+  * src/video_output/video_output.c: 4th (and good) attempt at fixing mask
+    shifts.  Thanks to bigben for testing.
+
+------------------------------------------------------------------------
+r15323 | sam | 2006-04-23 15:21:42 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/video_output/video_output.c
+
+  * src/video_output/video_output.c: Fixed RGB mask when the 32nd bit is on.
+
+------------------------------------------------------------------------
+r15322 | sam | 2006-04-23 15:15:12 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_video.h
+
+  * Argh, I didn't mean to commit that. Fixed my previous commit (mask types).
+
+------------------------------------------------------------------------
+r15321 | sam | 2006-04-23 15:13:40 +0200 (Sun, 23 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_video.h
+
+  * include/vlc_video.h: Fixed mask variable types for YUV to RGB conversions.
+
+------------------------------------------------------------------------
+r15316 | asmax | 2006-04-23 01:16:20 +0200 (Sun, 23 Apr 2006) | 6 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/controls/ctrl_video.cpp
+   M /trunk/modules/gui/skins2/controls/ctrl_video.hpp
+   M /trunk/modules/gui/skins2/src/generic_layout.cpp
+   M /trunk/modules/gui/skins2/src/generic_layout.hpp
+   M /trunk/modules/gui/skins2/src/top_window.cpp
+   M /trunk/modules/gui/skins2/src/top_window.hpp
+   M /trunk/modules/gui/skins2/src/vlcproc.cpp
+   M /trunk/modules/gui/skins2/src/vout_window.cpp
+
+* all: new handling of vout controls to allow serveral layouts/windows
+ with a vout (if only one is visible at the same time)
+ A callback is now called when a layout becomes visible or hidden.
+ The vout window is still not reparented correctly if the layout
+ is changed while a video is being played...
+
+------------------------------------------------------------------------
+r15312 | fkuehne | 2006-04-23 00:06:39 +0200 (Sun, 23 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+* forward-port [15311]
+------------------------------------------------------------------------
+r15309 | dionoea | 2006-04-22 23:06:41 +0200 (Sat, 22 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/demux/playlist/shoutcast.c
+   M /trunk/modules/services_discovery/shout.c
+
+ * shout.c : change playlist layout (remove 1 node)
+ * shoutcast.c : remove "debug" printf
+
+------------------------------------------------------------------------
+r15301 | dionoea | 2006-04-22 18:39:04 +0200 (Sat, 22 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/demux/playlist/Modules.am
+   M /trunk/modules/demux/playlist/playlist.c
+   M /trunk/modules/demux/playlist/playlist.h
+   A /trunk/modules/demux/playlist/shoutcast.c
+   M /trunk/modules/services_discovery/shout.c
+
+Change shoutcast service discovery module and write a new demux to be compatible with the new winamp 5.2 format. See trac ticket for detailed info. I'd appreciate if people could test this and proof read the code since we'll have to include this in 0.8.5 which is due to be released soon.
+
+Ref #640.
+
+------------------------------------------------------------------------
+r15300 | zorglub | 2006-04-22 13:28:39 +0200 (Sat, 22 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/doc/Doxyfile
+
+Use search engine
+
+------------------------------------------------------------------------
+r15297 | xtophe | 2006-04-22 01:48:53 +0200 (Sat, 22 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/httpd.c
+
+Fix error pages
+
+------------------------------------------------------------------------
+r15296 | xtophe | 2006-04-21 23:33:39 +0200 (Fri, 21 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/debian/control
+   M /trunk/debian/rules
+
+debian/*: we no longer seems to requires gcc-snapshot. I commit mainly to test on the nightlies. feel free to revert.
+
+------------------------------------------------------------------------
+r15295 | xtophe | 2006-04-21 23:28:36 +0200 (Fri, 21 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/debian/control
+   M /trunk/debian/rules
+
+debian/*: temporarely disable the xosd plugin
+
+------------------------------------------------------------------------
+r15292 | fkuehne | 2006-04-20 22:32:14 +0200 (Thu, 20 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/about.m
+
+* show the svn-revision only if it isn't 'exported'
+------------------------------------------------------------------------
+r15291 | damienf | 2006-04-20 18:25:53 +0200 (Thu, 20 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+- fix for shared libvlc and unicows for win32 builds
+
+------------------------------------------------------------------------
+r15290 | courmisch | 2006-04-20 18:15:15 +0200 (Thu, 20 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/unicode.c
+
+Fix overflow on UTF-16 strings with an odd characters length
+
+------------------------------------------------------------------------
+r15289 | dionoea | 2006-04-20 01:30:20 +0200 (Thu, 20 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http/rpn.c
+
+Hackish fix for 'TITLE' vlc_meta_get
+
+------------------------------------------------------------------------
+r15287 | bigben | 2006-04-19 22:33:22 +0200 (Wed, 19 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.m
+
+* Fix always on top when exiting fullscreen
+
+
+------------------------------------------------------------------------
+r15286 | fkuehne | 2006-04-19 18:25:01 +0200 (Wed, 19 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/intf.m
+
+* quickly forward-port the previous commit so joneskoo can test it
+------------------------------------------------------------------------
+r15279 | littlejohn | 2006-04-19 15:51:59 +0200 (Wed, 19 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/src/control/playlist.c
+
+delete item added in playlist control
+
+
+------------------------------------------------------------------------
+r15275 | damienf | 2006-04-19 12:13:07 +0200 (Wed, 19 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/AUTHORS
+   M /trunk/Makefile.am
+
+- added 'VLC Plugin.plugin' in MacOS X Disk image
+
+------------------------------------------------------------------------
+r15271 | zorglub | 2006-04-18 23:48:37 +0200 (Tue, 18 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/doc/skins/skins2-howto.xml
+
+Update skins doc
+
+------------------------------------------------------------------------
+r15270 | zorglub | 2006-04-18 23:48:34 +0200 (Tue, 18 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+
+Add a dialogs.playlist() command
+
+------------------------------------------------------------------------
+r15269 | zorglub | 2006-04-18 23:24:43 +0200 (Tue, 18 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/modules/gui/skins2/commands/cmd_dialogs.hpp
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+   M /trunk/modules/gui/skins2/src/dialogs.cpp
+   M /trunk/modules/gui/skins2/src/dialogs.hpp
+
+Add dialogs.audioPopup, dialogs.videoPopup and dialogs.miscPopup commands
+
+------------------------------------------------------------------------
+r15268 | zorglub | 2006-04-18 23:24:42 +0200 (Tue, 18 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/modules/gui/skins2/src/vlcproc.cpp
+   M /trunk/modules/gui/skins2/src/vlcproc.hpp
+
+Add vlc.hasAudio variable
+
+------------------------------------------------------------------------
+r15267 | zorglub | 2006-04-18 23:24:38 +0200 (Tue, 18 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/modules/gui/wxwidgets/menus.cpp
+
+Fix refcount bug
+
+------------------------------------------------------------------------
+r15266 | zorglub | 2006-04-18 23:24:36 +0200 (Tue, 18 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/bindings/java/org/videolan/jvlc/VideoIntf.java
+   M /trunk/include/vlc_interface.h
+   M /trunk/modules/gui/wxwidgets/dialogs.cpp
+   M /trunk/modules/gui/wxwidgets/interface.hpp
+   M /trunk/modules/gui/wxwidgets/menus.cpp
+
+Add separate audio and video popup menus
+
+------------------------------------------------------------------------
+r15265 | damienf | 2006-04-18 23:14:38 +0200 (Tue, 18 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/mozilla/support/npunix.c
+   M /trunk/mozilla/vlcruntime.cpp
+
+- fix UNIX X11 build for plugin
+- give myself some credit
+- removed unnecessary PLUGIN_TO_HOST_GLUE macro
+
+------------------------------------------------------------------------
+r15264 | zorglub | 2006-04-18 19:50:42 +0200 (Tue, 18 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+
+Make sure we hide the skins playlist
+
+------------------------------------------------------------------------
+r15263 | dionoea | 2006-04-18 00:52:57 +0200 (Tue, 18 Apr 2006) | 6 lines
+Changed paths:
+   M /trunk/modules/control/http/rpn.c
+
+Add vlc_get_meta function. Argument can be:
+'ARTIST' -> gets the artist
+'TITLE' -> gets the title
+'ALBUM' -> gets the album name
+'something else' -> get 'something else' ... meta labels are translated so don't expect this to be portable.
+
+------------------------------------------------------------------------
+r15262 | zorglub | 2006-04-17 23:36:36 +0200 (Mon, 17 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+   M /trunk/modules/gui/skins2/src/vlcproc.cpp
+
+Add todo
+
+------------------------------------------------------------------------
+r15261 | zorglub | 2006-04-17 23:28:30 +0200 (Mon, 17 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk
+   M /trunk/modules/gui/skins2/commands/cmd_dialogs.hpp
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+   M /trunk/modules/gui/skins2/src/dialogs.cpp
+   M /trunk/modules/gui/skins2/src/dialogs.hpp
+   M /trunk/modules/gui/skins2/src/skin_main.cpp
+
+Add a (default enabled) skinned-playlist option
+
+It will show the dialogs provider playlist instead of the "playlist_window" window
+
+------------------------------------------------------------------------
+r15260 | fkuehne | 2006-04-17 19:15:43 +0200 (Mon, 17 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwidgets/dialogs/open.cpp
+
+* revert 2 hacky compilation fixes which were accidentelly committed in [15259]
+------------------------------------------------------------------------
+r15259 | fkuehne | 2006-04-17 19:10:12 +0200 (Mon, 17 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwidgets/dialogs/open.cpp
+
+* mark some buggy strings as pointed out by Mathias C. Berens
+------------------------------------------------------------------------
+r15257 | asmax | 2006-04-17 19:03:55 +0200 (Mon, 17 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/src/ini_file.cpp
+   M /trunk/share/skins2/winamp2.xml
+
+* all: convert keys in INI files to lower case, to fix buggy winamp2 skins
+
+------------------------------------------------------------------------
+r15255 | asmax | 2006-04-17 18:29:34 +0200 (Mon, 17 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/audio_output/jack.c
+
+* jack.c: fixed non-stereo audio streams
+
+------------------------------------------------------------------------
+r15253 | asmax | 2006-04-17 17:56:21 +0200 (Mon, 17 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/controls/ctrl_checkbox.cpp
+
+* ctrl_checkbox: fixed initial image of checkbox
+
+------------------------------------------------------------------------
+r15251 | ipkiss | 2006-04-17 17:26:53 +0200 (Mon, 17 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/controls/ctrl_tree.cpp
+
+ * skins2/controls/ctrl_tree.cpp: I forgot 1 occurrence of the bug
+
+------------------------------------------------------------------------
+r15250 | ipkiss | 2006-04-17 17:23:13 +0200 (Mon, 17 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/controls/ctrl_tree.cpp
+
+ * skins2/controls/ctrl_tree.cpp: Check that the iterator is not end() before using it...
+   This fixes random freezes when loading skins with a PlayTree control on Windows, and probably some crashes as well.
+
+------------------------------------------------------------------------
+r15248 | asmax | 2006-04-17 14:46:51 +0200 (Mon, 17 Apr 2006) | 9 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/Modules.am
+   M /trunk/modules/gui/skins2/parser/builder.cpp
+   M /trunk/modules/gui/skins2/parser/builder.hpp
+   M /trunk/modules/gui/skins2/parser/builder_data.def
+   M /trunk/modules/gui/skins2/parser/builder_data.hpp
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+   M /trunk/modules/gui/skins2/parser/interpreter.hpp
+   M /trunk/modules/gui/skins2/parser/skin_parser.cpp
+   M /trunk/modules/gui/skins2/parser/skin_parser.hpp
+   M /trunk/modules/gui/skins2/src/file_bitmap.cpp
+   A /trunk/modules/gui/skins2/src/ini_file.cpp
+   A /trunk/modules/gui/skins2/src/ini_file.hpp
+   M /trunk/modules/gui/skins2/src/var_manager.cpp
+   M /trunk/modules/gui/skins2/src/var_manager.hpp
+   M /trunk/modules/gui/skins2/utils/var_text.cpp
+   M /trunk/modules/gui/skins2/utils/var_text.hpp
+   M /trunk/share/skins2/skin.dtd
+   M /trunk/share/skins2/winamp2.xml
+
+* all: added a INI file parser in skins2. For instance if the file
+ with id "pledit" (defined in the new tag "<IniFile>" contains:
+    [Text]
+    Normal=#FFFFFF
+ it will create a constant "pledit.Text.Normal" with value "#FFFFFF"
+* winamp2.xml: use the "pledit.txt" file to have correct playlist colors
+
+is it ok to backport in 0.8.5 ?
+
+------------------------------------------------------------------------
+r15246 | fkuehne | 2006-04-16 17:59:33 +0200 (Sun, 16 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/sfilters.m
+
+* removed instability warning, which was introduced for the 0.8.5 betas
+------------------------------------------------------------------------
+r15244 | dionoea | 2006-04-16 00:33:27 +0200 (Sun, 16 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/share/skins2/skin.dtd
+
+Fix dtd (a Layout can have more than one groups)
+
+------------------------------------------------------------------------
+r15243 | jpsaman | 2006-04-16 00:21:18 +0200 (Sun, 16 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/mozilla/support/npunix.c
+
+Fix compilation on FC3 linux for mozilla plugin.
+------------------------------------------------------------------------
+r15240 | asmax | 2006-04-15 18:18:59 +0200 (Sat, 15 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+   M /trunk/modules/gui/skins2/src/vlcproc.cpp
+   M /trunk/modules/gui/skins2/src/vlcproc.hpp
+   M /trunk/modules/gui/skins2/utils/var_text.cpp
+   M /trunk/share/skins2/winamp2.xml
+   M /trunk/src/input/es_out.c
+   M /trunk/src/input/input.c
+
+* all: added a new skin text variable "$S" to get the audio sample rate
+ (in KHz) + fixed the bitrate ("$B") variable to use only the audio bit rate.
+* winamp2.xml: updated the winamp2 skin
+
+------------------------------------------------------------------------
+r15239 | dionoea | 2006-04-15 18:06:47 +0200 (Sat, 15 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/share/http/dialogs/input
+
+Comment subtitles related stuff (since it isn't coded yet)
+
+------------------------------------------------------------------------
+r15237 | dionoea | 2006-04-15 17:58:24 +0200 (Sat, 15 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/share/http/requests/status.xml
+
+rpn magic to remove slashes from the playlist item's name
+
+------------------------------------------------------------------------
+r15236 | dionoea | 2006-04-15 17:48:44 +0200 (Sat, 15 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/share/http/js/functions.js
+
+Fix interface in regards to [15116].
+
+------------------------------------------------------------------------
+r15234 | courmisch | 2006-04-15 16:18:13 +0200 (Sat, 15 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/src/libvlc.c
+   M /trunk/src/libvlc.h
+
+Do not provide a broken language option on Linux and similar OSes
+where the user normally use LANG, LANGUAGE, etc to define his/her
+language(s). It didn't work anyway (refs #638).
+
+------------------------------------------------------------------------
+r15233 | damienf | 2006-04-15 15:48:34 +0200 (Sat, 15 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/mozilla/support/npunix.c
+   M /trunk/mozilla/support/npwin.cpp
+
+- added support for NPRuntime to win32 and unix version of mozilla
+
+------------------------------------------------------------------------
+r15232 | damienf | 2006-04-15 13:51:45 +0200 (Sat, 15 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/MacOSX/plugin/English.lproj/InfoPlist.strings
+   M /trunk/extras/MacOSX/plugin/Info.plist
+   M /trunk/modules/gui/macosx/voutqt.m
+   M /trunk/mozilla/Makefile.am
+   M /trunk/mozilla/support/npmac.cpp
+   M /trunk/mozilla/vlc.r
+   M /trunk/mozilla/vlcpeer.h
+   M /trunk/mozilla/vlcplugin.cpp
+   M /trunk/mozilla/vlcplugin.h
+   A /trunk/mozilla/vlcruntime.cpp
+   A /trunk/mozilla/vlcruntime.h
+   M /trunk/mozilla/vlcshell.cpp
+
+- the resurected mozilla plugin for Safari/Firefox on MacOS X
+
+------------------------------------------------------------------------
+r15230 | dionoea | 2006-04-15 02:51:53 +0200 (Sat, 15 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+Add missing itemimage attribute to playtree doc
+
+------------------------------------------------------------------------
+r15229 | hartman | 2006-04-15 02:07:09 +0200 (Sat, 15 Apr 2006) | 6 lines
+Changed paths:
+   M /trunk/modules/demux/ts.c
+
+* Support for Topfield .rec recordings. It's MPEG-TS with an exceptionally large (1MB) header in front of it.
+  I tried adding the info in the header to meta, but the existing documention seems incorrect or at least incomplete. Instead we just accept the start of the header as identifying a MPEG-TS file, and skipping the header.
+
+  BTW this header is again an example of very bad format design. It is using fixed length strings, for which the used buffers clearly are not null'ed before written with new information. As such i was able to determine which programs were running before this program was recorded :D
+  Also a PID printed to a field was clearly not printed to null'ed memory, causing an invalid (too high) PID number to be in the field. You'd think the least someone could do when designing something like this, would be to analyze a hexdump of your own custom header.
+
+------------------------------------------------------------------------
+r15228 | courmisch | 2006-04-14 19:37:06 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/avi/avi.c
+
+Fix missing #include
+
+------------------------------------------------------------------------
+r15227 | courmisch | 2006-04-14 19:31:27 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwidgets/wxwidgets.cpp
+
+Same as previous commit (refs #581)
+
+------------------------------------------------------------------------
+r15226 | courmisch | 2006-04-14 19:28:24 +0200 (Fri, 14 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/src/libvlc.c
+
+Do not alter LC_NUMERIC (refs #581).
+*** NOT MEANT FOR BACKPORTING ***
+
+------------------------------------------------------------------------
+r15223 | dionoea | 2006-04-14 18:47:23 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/hotkeys.c
+
+Prevent some segfaults when using hotkeys with no vout
+
+------------------------------------------------------------------------
+r15222 | hartman | 2006-04-14 17:16:23 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.m
+
+* Fix a crash in the MacOS X vout if p_real_vout isn't available yet.
+
+------------------------------------------------------------------------
+r15221 | zorglub | 2006-04-14 16:25:26 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/test/native/i18n.c
+   M /trunk/test/native/init.c
+   M /trunk/test/native/libvlc.c
+   M /trunk/test/native/stats.c
+   A /trunk/test/native/tests.h
+   M /trunk/test/native/url.c
+   M /trunk/test/setup.py
+
+Clean-up test
+
+------------------------------------------------------------------------
+r15220 | zorglub | 2006-04-14 16:16:46 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   A /trunk/test/NativeI18NTest.py
+   M /trunk/test/NativeLibvlcTest.py
+   M /trunk/test/NativeStatsTest.py
+   A /trunk/test/NativeURLTest.py
+   D /trunk/test/libvlc_sample.c
+   A /trunk/test/native/i18n.c
+   A /trunk/test/native/init.c
+   M /trunk/test/native/libvlc.c
+   M /trunk/test/native/stats.c
+   A /trunk/test/native/url.c
+   M /trunk/test/pyunit.h
+   M /trunk/test/setup.py
+   M /trunk/test/test.sh
+
+Add I18N and URL tests in test/
+
+------------------------------------------------------------------------
+r15218 | bigben | 2006-04-14 15:22:44 +0200 (Fri, 14 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+
+* What is the point in having a detection for libvc1 if we don't have a libvc1 module ? Moreover, that prevents jlj's patch with the module from applying.
+
+
+------------------------------------------------------------------------
+r15216 | massiot | 2006-04-14 14:38:22 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/pvr/pvr.c
+
+ * modules/access/pvr/pvr.c: Be compatible with both old and new kernels.
+
+------------------------------------------------------------------------
+r15214 | bigben | 2006-04-14 14:30:40 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/loader/module.c
+
+* Marillat changed the path to the win32 codecs in his latest packages, so look for the codecs there too
+
+------------------------------------------------------------------------
+r15212 | zorglub | 2006-04-14 14:09:26 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+Bump version numbers
+
+------------------------------------------------------------------------
+r15210 | xtophe | 2006-04-14 13:42:49 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/po/zh_CN.po
+
+Update Chinese translation by Wei Mingzhi.
+
+------------------------------------------------------------------------
+r15209 | zorglub | 2006-04-14 11:37:39 +0200 (Fri, 14 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access_filter/timeshift.c
+   M /trunk/modules/audio_filter/equalizer.c
+   M /trunk/modules/demux/playlist/playlist.c
+   M /trunk/modules/gui/macosx/extended.m
+   M /trunk/modules/gui/skins2/src/skin_main.cpp
+   M /trunk/modules/misc/freetype.c
+   M /trunk/modules/misc/growl.c
+   M /trunk/modules/misc/rtsp.c
+   M /trunk/modules/misc/win32text.c
+   M /trunk/modules/mux/mpeg/ts.c
+   M /trunk/modules/services_discovery/shout.c
+
+Strings
+
+------------------------------------------------------------------------
+r15206 | fkuehne | 2006-04-13 20:51:38 +0200 (Thu, 13 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+
+* fixed 2 minor typos
+------------------------------------------------------------------------
+r15205 | fkuehne | 2006-04-13 20:51:16 +0200 (Thu, 13 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/intf.h
+   M /trunk/modules/gui/macosx/intf.m
+
+* implemented showintf-support. Thanks to ipkiss for pointing out that this was missing on OSX.
+------------------------------------------------------------------------
+r15204 | massiot | 2006-04-13 20:32:12 +0200 (Thu, 13 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/access/pvr/pvr.c
+
+ * modules/access/pvr/pvr.c: The radio API in ivtv-0.6.1 has changed : now
+   you are supposed to pass frequency * 16000 instead of frequency * 16.
+   This is sooo coherent.
+
+------------------------------------------------------------------------
+r15203 | hartman | 2006-04-13 16:47:20 +0200 (Thu, 13 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/libmp4.c
+   M /trunk/modules/demux/nsv.c
+   M /trunk/modules/stream_out/rtp.c
+   M /trunk/src/video_output/vout_subpictures.c
+
+* Revert the unintentially committed files of [15202]
+
+------------------------------------------------------------------------
+r15202 | hartman | 2006-04-13 16:43:40 +0200 (Thu, 13 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   M /trunk/modules/demux/mp4/libmp4.c
+   M /trunk/modules/demux/nsv.c
+   M /trunk/modules/stream_out/rtp.c
+   M /trunk/src/video_output/vout_subpictures.c
+
+* Fix libgcrypt on MacIntel by disabling it's ASM. This fixes #620
+------------------------------------------------------------------------
+r15201 | hartman | 2006-04-13 16:12:20 +0200 (Thu, 13 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/include/vlc_video.h
+   M /trunk/modules/misc/freetype.c
+   M /trunk/src/video_output/vout_subpictures.c
+
+* Fix subtitle  alignment if we don't have styles. fixes #619
+
+I chose to re-add the align paramter to the subpicture region struct, since adding a style struct for every single subpicture for just an alignment seemed to be overkill to me. 
+
+------------------------------------------------------------------------
+r15200 | dionoea | 2006-04-13 15:49:45 +0200 (Thu, 13 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/share/http/js/functions.js
+   M /trunk/share/http/js/vlm.js
+
+URL encode fix
+
+------------------------------------------------------------------------
+r15199 | zorglub | 2006-04-13 11:04:34 +0200 (Thu, 13 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/x264.c
+   M /trunk/modules/demux/mod.c
+   M /trunk/modules/gui/macosx/equalizer.m
+   M /trunk/modules/misc/freetype.c
+   M /trunk/modules/misc/msn.c
+   M /trunk/modules/stream_out/standard.c
+   M /trunk/modules/video_filter/mosaic.c
+   M /trunk/modules/video_filter/motiondetect.c
+   M /trunk/modules/video_filter/osdmenu.c
+
+String stuff
+
+------------------------------------------------------------------------
+r15198 | xtophe | 2006-04-13 10:31:33 +0200 (Thu, 13 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/packages.mak
+
+Really fix xml url
+
+------------------------------------------------------------------------
+r15197 | xtophe | 2006-04-13 00:31:19 +0200 (Thu, 13 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/packages.mak
+
+Fix libxml url.
+
+------------------------------------------------------------------------
+r15196 | xtophe | 2006-04-12 23:56:41 +0200 (Wed, 12 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+
+Makefile.am: Fix for introduction of vlc.win32.nsi.in
+
+------------------------------------------------------------------------
+r15195 | xtophe | 2006-04-12 23:22:51 +0200 (Wed, 12 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http/macro.c
+
+*macro.c: Get the name correctly
+
+------------------------------------------------------------------------
+r15194 | courmisch | 2006-04-12 21:25:59 +0200 (Wed, 12 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/io.c
+
+Set close-on-exec flag on sockets so that we don't pass them to CGI scripts
+
+------------------------------------------------------------------------
+r15193 | courmisch | 2006-04-12 19:27:31 +0200 (Wed, 12 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/THANKS
+   M /trunk/configure.ac
+
+xvideo X.Org 7 detection fix by Pavlov Konstantin
+
+------------------------------------------------------------------------
+r15192 | fkuehne | 2006-04-12 18:54:42 +0200 (Wed, 12 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/Makefile.am
+
+* be a bit more verbose when creating the disk-image
+------------------------------------------------------------------------
+r15191 | fkuehne | 2006-04-12 18:40:47 +0200 (Wed, 12 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/wizard.m
+
+* fix streaming. This section and a few others need to and will be re-written after 0.8.5
+------------------------------------------------------------------------
+r15190 | fkuehne | 2006-04-12 18:27:30 +0200 (Wed, 12 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/po/de.po
+
+* first update of the German translation by Mathias C. Berens | welcome-soft <berens@welcome-soft.de> and myself. More to come.
+------------------------------------------------------------------------
+r15189 | massiot | 2006-04-12 16:26:21 +0200 (Wed, 12 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/control/http/macro.c
+
+ * modules/control/http/macro.c: Add slashes in the MVLC_ADD macro for
+   backwards compatibility with the old http intf (anyway MVLC_ADD is
+   obsoleted by RPN function playlist_add).
+
+------------------------------------------------------------------------
+r15188 | zorglub | 2006-04-12 15:03:37 +0200 (Wed, 12 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/configure.ac
+   D /trunk/vlc.win32.nsi
+   A /trunk/vlc.win32.nsi.in (from /trunk/vlc.win32.nsi:15184)
+
+Ship libvlc.dll in installer if built in shared mode
+
+------------------------------------------------------------------------
+r15187 | zorglub | 2006-04-12 13:43:33 +0200 (Wed, 12 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+
+Package fix
+
+------------------------------------------------------------------------
+r15186 | zorglub | 2006-04-12 12:22:55 +0200 (Wed, 12 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/share/Makefile.am
+   D /trunk/share/http/old/favicon.ico
+
+Remove useless favicon (Refs:#634)
+
+------------------------------------------------------------------------
+r15185 | zorglub | 2006-04-12 12:22:19 +0200 (Wed, 12 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/share/Makefile.am
+
+Don't ship default skin (Refs:#634)
+
+If you think playtree is not ready yet, yell :)
+
+------------------------------------------------------------------------
+r15184 | zorglub | 2006-04-12 10:13:14 +0200 (Wed, 12 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+Document <Playtree> (Closes:#611)
+
+------------------------------------------------------------------------
+r15183 | dionoea | 2006-04-12 01:56:54 +0200 (Wed, 12 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/configuration.c
+
+"too"!=2=="two"
+
+------------------------------------------------------------------------
+r15182 | dionoea | 2006-04-12 01:51:21 +0200 (Wed, 12 Apr 2006) | 9 lines
+Changed paths:
+   M /trunk/src/misc/configuration.c
+
+Fix indentation.
+
+I was actually trying to understand why command line option parsing on my computer with self compiled VLC behaves as "If the first character of optstring is '+' or the environment variable POSIXLY_CORRECT is set, then option processing stops as soon as a non-option argument is encountered." while neither of these conditions is true (see the while( getopt_long( ... ) != EOF ) loop).
+Small illustration:
+./vlc -vvv -I dummy input.ts --color
+All options before the first non option argument work as expected (-vvv and -I dummy). All options after the first non option argument are also interpreted as being non option arguments.
+Help would be appreciated.
+(I've already had reports of other people having the same kind of issues)
+
+------------------------------------------------------------------------
+r15181 | hartman | 2006-04-12 00:09:20 +0200 (Wed, 12 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/flac.c
+
+* make the flac decoder errors less annoying. some are warns, some are err's.
+
+------------------------------------------------------------------------
+r15180 | courmisch | 2006-04-11 18:35:42 +0200 (Tue, 11 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+
+Link some additionnal plugins against the math library
+Report and fix from Pavlov Konstantin ?\226?\128?\156thresh?\226?\128?\157
+
+------------------------------------------------------------------------
+r15179 | courmisch | 2006-04-11 18:24:46 +0200 (Tue, 11 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http/macro.c
+   M /trunk/modules/control/http/rpn.c
+
+Restores [13132] back - break the new interface again
+
+------------------------------------------------------------------------
+r15178 | courmisch | 2006-04-11 18:18:39 +0200 (Tue, 11 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/strings.c
+   M /trunk/src/test/url.c
+
+Lalala
+
+------------------------------------------------------------------------
+r15177 | courmisch | 2006-04-11 17:59:43 +0200 (Tue, 11 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/control/http/macro.c
+   M /trunk/modules/control/http/rpn.c
+
+Revert [15132]:
+- Fix HTTPd crash
+- Break the old interface again
+
+------------------------------------------------------------------------
+r15176 | courmisch | 2006-04-11 17:52:29 +0200 (Tue, 11 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/test/url.c
+
+Even more tests
+
+------------------------------------------------------------------------
+r15175 | courmisch | 2006-04-11 17:47:52 +0200 (Tue, 11 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/test/url.c
+
+Additionnal unit test for decode_URI
+
+------------------------------------------------------------------------
+r15174 | courmisch | 2006-04-11 17:26:28 +0200 (Tue, 11 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/tcp.c
+
+Fix missing initializer warning
+
+------------------------------------------------------------------------
+r15173 | zorglub | 2006-04-11 15:57:01 +0200 (Tue, 11 Apr 2006) | 5 lines
+Changed paths:
+   M /trunk/po/sv.po
+
+Update of swedish translation by Daniel Nylander.
+Thanks.
+
+For those wondering, this *is* swedish.
+
+------------------------------------------------------------------------
+r15172 | zorglub | 2006-04-11 15:17:20 +0200 (Tue, 11 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+   M /trunk/modules/access_output/http.c
+   M /trunk/modules/audio_filter/converter/dtstofloat32.c
+   M /trunk/modules/demux/livedotcom.cpp
+   M /trunk/modules/demux/mod.c
+   M /trunk/src/libvlc.h
+
+More strings
+
+------------------------------------------------------------------------
+r15171 | fkuehne | 2006-04-11 15:05:50 +0200 (Tue, 11 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/audio_filter/param_eq.c
+
+* replaced NULL with empty strings when providing no help for an option
+------------------------------------------------------------------------
+r15170 | fkuehne | 2006-04-11 14:37:47 +0200 (Tue, 11 Apr 2006) | 5 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/intf.m
+   M /trunk/modules/gui/macosx/prefs.m
+
+intf.m: * we can't localise empty strings, so don't put an error when trying to do so, but just a warning
+    * be a bit nicer and return @"" instead of NULL strings
+    - this fixes the display of certain modules in the preferences such as the parametric equaliser
+
+prefs.m: * removed 2 unused variables
+------------------------------------------------------------------------
+r15169 | zorglub | 2006-04-11 11:27:46 +0200 (Tue, 11 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/http.c
+   M /trunk/modules/access/pvr/pvr.c
+   M /trunk/modules/audio_filter/param_eq.c
+   M /trunk/modules/codec/x264.c
+   M /trunk/modules/control/netsync.c
+   M /trunk/modules/demux/livedotcom.cpp
+   M /trunk/src/libvlc.h
+
+String fixes
+
+------------------------------------------------------------------------
+r15167 | damienf | 2006-04-11 01:55:28 +0200 (Tue, 11 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+- fixed faad2 libtool so that shared library is properly built for MacOS X 
+
+------------------------------------------------------------------------
+r15164 | hartman | 2006-04-10 23:32:26 +0200 (Mon, 10 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/codec/ffmpeg/demux.c
+   M /trunk/modules/codec/ffmpeg/ffmpeg.c
+
+* Fix ffmpeg libavformat linkage when we don't use --with-ffmpeg-tree (this fixes Flash playback)
+* Add Shorten codec. This refs #632 It doesn't seem to work, but that might be an endianness issue. will someone please check with this sample? http://www.mplayerhq.hu/MPlayer/samples/A-codecs/lossless/luckynight.shn
+
+------------------------------------------------------------------------
+r15163 | damienf | 2006-04-10 23:28:43 +0200 (Mon, 10 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   M /trunk/extras/contrib/src/Patches/libpng-osx.patch
+
+- update darwin/macosx patch for libpng-1.2.8
+
+------------------------------------------------------------------------
+r15162 | damienf | 2006-04-10 23:09:09 +0200 (Mon, 10 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   D /trunk/extras/contrib/src/Patches/libpng-1.2.5-win32.patch
+   A /trunk/extras/contrib/src/Patches/libpng-win32.patch
+
+- update win32 patch for libpng-1.2.8
+
+------------------------------------------------------------------------
+r15160 | hartman | 2006-04-10 16:41:23 +0200 (Mon, 10 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/video_output/vout_intf.c
+
+* Fix 16:9 vs. 16:10 AR and cropping switching on the fly.
+
+------------------------------------------------------------------------
+r15159 | dionoea | 2006-04-09 23:43:47 +0200 (Sun, 09 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/input/input.c
+
+Hum, in fact we should remove it altogether since it is already killed in previous function code.
+
+------------------------------------------------------------------------
+r15158 | dionoea | 2006-04-09 23:38:34 +0200 (Sun, 09 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/input/input.c
+
+Fix what looks like a type. (someone confirm please)
+
+------------------------------------------------------------------------
+r15157 | courmisch | 2006-04-09 20:33:22 +0200 (Sun, 09 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/Makefile.am
+   A /trunk/src/test/url.c (from /trunk/src/test/i18n_atof.c:15156)
+
+Basic unit test for URI decoding
+
+------------------------------------------------------------------------
+r15154 | asmax | 2006-04-09 16:29:26 +0200 (Sun, 09 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+   M /trunk/modules/gui/skins2/src/file_bitmap.cpp
+   M /trunk/modules/gui/skins2/src/vlcproc.cpp
+   M /trunk/modules/gui/skins2/src/vlcproc.hpp
+   M /trunk/modules/gui/skins2/utils/ustring.cpp
+   M /trunk/modules/gui/skins2/utils/ustring.hpp
+   M /trunk/modules/gui/skins2/utils/var_text.cpp
+   M /trunk/share/skins2/winamp2.xml
+
+* all: new skin text variable "$B" to get the stream bitrate
+* winamp2.xml: added "kbps" info in winamp skins
+
+------------------------------------------------------------------------
+r15150 | xtophe | 2006-04-09 01:00:14 +0200 (Sun, 09 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/po/zh_CN.po
+
+First Translation update by Wei Mingzhi
+
+------------------------------------------------------------------------
+r15149 | courmisch | 2006-04-08 23:41:53 +0200 (Sat, 08 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/input/stream.c
+
+Fix warning
+
+------------------------------------------------------------------------
+r15145 | dionoea | 2006-04-08 23:04:10 +0200 (Sat, 08 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/toolbox
+
+Remove .libs directories when running ./toolbox --distclean
+
+------------------------------------------------------------------------
+r15144 | dionoea | 2006-04-08 19:25:40 +0200 (Sat, 08 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/packages.mak
+
+Update libpng to 1.2.8 (includes lots of security fixes). Thanks to MYOB for noticing
+
+------------------------------------------------------------------------
+r15143 | dionoea | 2006-04-08 01:40:17 +0200 (Sat, 08 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+Rhaaa
+
+------------------------------------------------------------------------
+r15142 | dionoea | 2006-04-08 01:38:47 +0200 (Sat, 08 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+3rd try
+
+------------------------------------------------------------------------
+r15141 | dionoea | 2006-04-08 01:36:46 +0200 (Sat, 08 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+Ahem
+
+------------------------------------------------------------------------
+r15140 | dionoea | 2006-04-08 01:33:31 +0200 (Sat, 08 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   M /trunk/extras/contrib/src/packages.mak
+
+libdca. untested
+
+------------------------------------------------------------------------
+r15139 | dionoea | 2006-04-07 23:52:33 +0200 (Fri, 07 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/src/libvlc.h
+   M /trunk/src/misc/win32_specific.c
+   M /trunk/vlc.win32.nsi
+
+Win32 specific changes: Add --started-from-file option to tell VLC that it was started by clicking on a file (or disc). Add --one-instance-when-started-from-file option to tell VLC to use one instance mode when --started-from-file is used. See replies to r15125 for an explanation.
+
+
+------------------------------------------------------------------------
+r15138 | xtophe | 2006-04-07 23:45:01 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access_filter/record.c
+
+eliminate non-valid characters only on the name not on the full path (closes #628)
+
+------------------------------------------------------------------------
+r15137 | xtophe | 2006-04-07 23:14:52 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/msvc/libvlc.dsp.in
+   M /trunk/msvc/libvlc.vcproj.in
+   M /trunk/msvc/plugins.dsp.in
+   M /trunk/msvc/plugins.vcproj.in
+   M /trunk/msvc/vlc.dsp.in
+   M /trunk/msvc/vlc.vcproj.in
+   M /trunk/toolbox
+
+Don't use char outside ascii in shell script.
+
+------------------------------------------------------------------------
+r15136 | fkuehne | 2006-04-07 20:38:30 +0200 (Fri, 07 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/bookmarks.m
+
+* don't free a vlc-object. Thanks to Meuuh for pointing this out.
+------------------------------------------------------------------------
+r15135 | massiot | 2006-04-07 19:58:56 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/strings.c
+
+ * src/misc/strings.c: Missing break; in decode_URI().
+
+------------------------------------------------------------------------
+r15134 | massiot | 2006-04-07 19:45:35 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/dvbsub.c
+
+ * modules/codec/dvbsub.c: add_suppressed -> add_suppressed_integer
+
+------------------------------------------------------------------------
+r15133 | massiot | 2006-04-07 19:20:11 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/dvbsub.c
+
+ * modules/codec/dvbsub.c: add_deprecated -> add_suppressed
+
+------------------------------------------------------------------------
+r15132 | courmisch | 2006-04-07 19:17:53 +0200 (Fri, 07 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/control/http/macro.c
+   M /trunk/modules/control/http/rpn.c
+
+Restore previous URI components decoding instead of unescaping
+Should fix the old interface - will most likely break the new one
+(in particular try with non-Latin-1 characters)
+
+------------------------------------------------------------------------
+r15131 | massiot | 2006-04-07 18:42:18 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/dvbsub.c
+
+ * modules/codec/dvbsub.c: Add deprecated option and fix option parsing.
+
+------------------------------------------------------------------------
+r15130 | massiot | 2006-04-07 18:33:51 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/spudec/parse.c
+   M /trunk/modules/codec/spudec/spudec.c
+   M /trunk/modules/codec/spudec/spudec.h
+
+ * modules/codec/spudec: Decreased verbosity.
+
+------------------------------------------------------------------------
+r15129 | jpsaman | 2006-04-07 17:33:44 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/dvbsub.c
+
+Remove --sout-dvbsub-timeout flag
+it conflicts with DVD SPU.
+------------------------------------------------------------------------
+r15128 | massiot | 2006-04-07 15:52:32 +0200 (Fri, 07 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/codec/dvbsub.c
+
+ * modules/codec/dvbsub.c: Fixed a major bug with DVBSUB_PCS_STATE_CHANGE.
+   Partially reverted [12259] because it implied too many page
+   recompositions.
+
+------------------------------------------------------------------------
+r15127 | hartman | 2006-04-07 14:19:01 +0200 (Fri, 07 Apr 2006) | 6 lines
+Changed paths:
+   M /trunk/modules/misc/svg.c
+   M /trunk/src/libvlc.h
+   M /trunk/src/video_output/vout_subpictures.c
+
+* Lower the priority of the SVG renderer
+* Make the "text renderer" selectable with --text-renderer
+fixes #627
+
+Lol, totally forgot to commit this last night :D
+
+------------------------------------------------------------------------
+r15126 | courmisch | 2006-04-07 12:59:04 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/strings.c
+
+Oops again
+
+------------------------------------------------------------------------
+r15125 | dionoea | 2006-04-07 01:02:30 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/vlc.win32.nsi
+
+Remove --one-instance option from file open targets on win32. people seemed to be frustrated about this behavior change.
+
+------------------------------------------------------------------------
+r15124 | adn | 2006-04-07 01:00:24 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_config_cat.h
+
+typo in a string (line 42)
+
+------------------------------------------------------------------------
+r15123 | dionoea | 2006-04-07 00:41:06 +0200 (Fri, 07 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_osd.h
+   M /trunk/include/vlc_symbols.h
+   M /trunk/src/osd/osd_widgets.c
+   M /trunk/src/video_output/video_text.c
+   M /trunk/src/video_output/video_widgets.c
+
+Fix OSD display when vout crop is used (so that every thing stays on the displayed image).
+
+------------------------------------------------------------------------
+r15122 | hartman | 2006-04-07 00:29:15 +0200 (Fri, 07 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   A /trunk/extras/contrib/src/Patches/dirac-osx.patch
+
+* Fix dirac on PPC. (only compile what we need)
+ (this is a workaround, i'm too lazy to find where they double up the LDFLAGS when they link their applications).
+
+------------------------------------------------------------------------
+r15121 | courmisch | 2006-04-06 23:20:33 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_symbols.h
+   M /trunk/include/vlc_url.h
+
+Oups
+
+------------------------------------------------------------------------
+r15120 | courmisch | 2006-04-06 22:38:43 +0200 (Thu, 06 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/include/vlc_symbols.h
+   M /trunk/include/vlc_url.h
+   M /trunk/src/misc/strings.c
+
+- Reimplement URL component decoding separately from URL unescaping
+- Replace crap URL escaping with URL encoding, which is what we really need
+
+------------------------------------------------------------------------
+r15119 | hartman | 2006-04-06 22:04:24 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/bootstrap
+
+* enable SDK building for Mac PPC contrib. 
+
+------------------------------------------------------------------------
+r15118 | massiot | 2006-04-06 19:54:21 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/asf/libasf.c
+   M /trunk/modules/demux/asf/libasf.h
+   M /trunk/modules/demux/m3u.c
+   M /trunk/modules/demux/mod.c
+   M /trunk/modules/demux/mpc.c
+   M /trunk/modules/mux/asf.c
+   M /trunk/modules/mux/mpeg/pes.c
+   M /trunk/modules/mux/mpeg/ps.c
+   M /trunk/modules/packetizer/mpegvideo.c
+   M /trunk/modules/stream_out/standard.c
+   M /trunk/src/input/subtitles.c
+
+ * ALL: extention -> extension
+
+------------------------------------------------------------------------
+r15117 | massiot | 2006-04-06 19:12:32 +0200 (Thu, 06 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/include/vlc_url.h
+
+ * include/vlc_url.h: Fixed vlc_UrlEncode to return correct values and avoid
+   crashing with strings as simple as "/toto", but all in all the entire
+   function seems very wrong to me, see the next mail.
+
+------------------------------------------------------------------------
+r15116 | massiot | 2006-04-06 18:16:02 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http/util.c
+
+ * modules/control/http/util.c: Simplify MRLParse, and fix parsing of quotes.
+
+------------------------------------------------------------------------
+r15115 | massiot | 2006-04-06 17:53:06 +0200 (Thu, 06 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/codec/png.c
+
+ * modules/codec/png.c: More robust error checking, avoid calling abort() in
+   case of an invalid file.
+
+------------------------------------------------------------------------
+r15114 | hartman | 2006-04-06 17:16:05 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+* Only compile cyberlink if --enable-cyberlink is explicitly set by the user.
+
+------------------------------------------------------------------------
+r15113 | damienf | 2006-04-06 17:09:40 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/activex/vlccontrol.cpp
+
+- fixed a few return codes from APIs
+
+------------------------------------------------------------------------
+r15112 | hartman | 2006-04-06 16:46:30 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+* Disable cyberlink and expat, the module immediatly crashes. 
+
+------------------------------------------------------------------------
+r15111 | hartman | 2006-04-06 15:50:12 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+* Fix --with-cyberlink-tree when using contrib
+
+------------------------------------------------------------------------
+r15110 | xtophe | 2006-04-06 11:04:42 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/unicode.c
+
+Fix if statement
+
+------------------------------------------------------------------------
+r15109 | zorglub | 2006-04-06 09:36:57 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/lxdialog/lxdialog.c
+   M /trunk/modules/access/dvb/linux_dvb.c
+   M /trunk/modules/access/rtsp/real.c
+
+Fix potential bugs
+
+------------------------------------------------------------------------
+r15108 | hartman | 2006-04-06 02:57:01 +0200 (Thu, 06 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+* Evil hack to get libFLAC working with SDK building on OSX.
+
+------------------------------------------------------------------------
+r15107 | hartman | 2006-04-05 23:50:43 +0200 (Wed, 05 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   A /trunk/extras/contrib/src/Patches/gettext-macosx.patch
+
+* Fix gettext -framework usage. This is needed for SDK support.
+
+------------------------------------------------------------------------
+r15106 | zorglub | 2006-04-05 23:01:55 +0200 (Wed, 05 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/debian/copyright
+   M /trunk/extras/valgrind.suppressions
+
+This commit message is Copyright (C) 2006, Cl?\195?\169ment Stenac.
+
+------------------------------------------------------------------------
+r15105 | massiot | 2006-04-05 19:17:22 +0200 (Wed, 05 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/httpd.c
+
+ * src/misc/httpd.c: Do not dereference a possibly NULL pointer.
+
+------------------------------------------------------------------------
+r15104 | fkuehne | 2006-04-05 13:42:47 +0200 (Wed, 05 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/prefs.m
+
+* don't alloc more capacity than necessary
+------------------------------------------------------------------------
+r15103 | fkuehne | 2006-04-05 13:38:53 +0200 (Wed, 05 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/prefs.m
+
+* fixed a bug which prevented the display of Input's and Interface's general-nodes. Thanks to zorglub and DiDjCodt
+------------------------------------------------------------------------
+r15102 | xtophe | 2006-04-05 11:58:20 +0200 (Wed, 05 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http/http.c
+
+http.c: Fix string.
+
+------------------------------------------------------------------------
+r15101 | dionoea | 2006-04-05 01:01:11 +0200 (Wed, 05 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/libvlc.c
+
+Remove useless code (or its use was really cryptic)
+
+------------------------------------------------------------------------
+r15100 | damienf | 2006-04-05 00:33:50 +0200 (Wed, 05 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+- compilation fix for unicows on buildbot
+
+------------------------------------------------------------------------
+r15099 | damienf | 2006-04-05 00:22:39 +0200 (Wed, 05 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+- link vlc.exe with libunicows.a if available
+
+------------------------------------------------------------------------
+r15098 | damienf | 2006-04-05 00:19:13 +0200 (Wed, 05 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   M /trunk/extras/contrib/src/packages.mak
+
+- added libunicows in contribs for win32 builds to support Microsoft Layer for Unicode on Win95/98/ME (http://libunicows.sourceforge.net/)
+
+------------------------------------------------------------------------
+r15097 | dionoea | 2006-04-04 23:21:23 +0200 (Tue, 04 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/share/skins2/skin.dtd
+
+Ooops, i forgot to commit this in [14771]
+
+------------------------------------------------------------------------
+r15096 | fkuehne | 2006-04-04 22:41:44 +0200 (Tue, 04 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.h
+   M /trunk/modules/gui/macosx/vout.m
+
+* I should get some sleep now
+------------------------------------------------------------------------
+r15095 | fkuehne | 2006-04-04 22:39:52 +0200 (Tue, 04 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.m
+
+* remove commented ifs o_O
+------------------------------------------------------------------------
+r15094 | fkuehne | 2006-04-04 22:33:54 +0200 (Tue, 04 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.m
+
+* store the value of 'macosx-black' as one of VLCWindow's properties to prevent rare crashes when en-/disabling vout-filters or leaving/entering fullscreen-mode really fast.
+
+When going to fast to fullscreen/windowed-mode VLC can still crash (now at vout.m:375), but that scenario isn't realistic because you need to perform this function at least 5 to 10 times per second to get this done.
+------------------------------------------------------------------------
+r15093 | bigben | 2006-04-04 22:18:16 +0200 (Tue, 04 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/voutgl.m
+
+* Reading APIs before starting to code can allow to spare time and to avoid writing silly khludges
+
+
+
+------------------------------------------------------------------------
+r15092 | jpsaman | 2006-04-04 22:11:39 +0200 (Tue, 04 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/gui/pda/pda.c
+   M /trunk/modules/gui/pda/pda_callbacks.c
+
+Fix time update and slider movement on PDA interface. Patch from fredyd (http://forum.videolan.org/viewtopic.php?t=19028) modified by me.
+------------------------------------------------------------------------
+r15091 | bigben | 2006-04-04 22:06:13 +0200 (Tue, 04 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/intf.m
+   M /trunk/modules/gui/macosx/voutqt.m
+
+* Implement Aspect ratio change in the QT vout
+
+
+------------------------------------------------------------------------
+r15089 | damienf | 2006-04-04 18:42:01 +0200 (Tue, 04 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+
+- should fix audio capture for Hauppagge WinTV PVR and other cards
+
+------------------------------------------------------------------------
+r15087 | dionoea | 2006-04-03 22:35:24 +0200 (Mon, 03 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/vlc.win32.nsi
+
+Fix from 0.8.4-test2 forum thread
+
+------------------------------------------------------------------------
+r15086 | littlejohn | 2006-04-03 20:05:47 +0200 (Mon, 03 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/bindings/java/SWTUglyPlayer.java
+   M /trunk/bindings/java/VlcClient.java
+   M /trunk/bindings/java/org/videolan/jvlc/AudioIntf.java
+   M /trunk/bindings/java/org/videolan/jvlc/InputIntf.java
+   M /trunk/bindings/java/org/videolan/jvlc/JLibVLC.java
+   M /trunk/bindings/java/org/videolan/jvlc/JVLC.java
+   M /trunk/bindings/java/org/videolan/jvlc/JVLCCanvas.java
+   M /trunk/bindings/java/org/videolan/jvlc/JVLCPanel.java
+   M /trunk/bindings/java/org/videolan/jvlc/Playlist.java
+   M /trunk/bindings/java/org/videolan/jvlc/PlaylistIntf.java
+   M /trunk/bindings/java/org/videolan/jvlc/SWTVideoWidget.java
+   M /trunk/bindings/java/org/videolan/jvlc/VLMIntf.java
+   M /trunk/bindings/java/org/videolan/jvlc/VideoIntf.java
+   M /trunk/bindings/java/vlc-graphics-jni.cc
+   M /trunk/bindings/java/vlc-libvlc-jni.cc
+
+audio / video libvlc functions binded.
+
+
+------------------------------------------------------------------------
+r15085 | sigmunau | 2006-04-03 18:41:03 +0200 (Mon, 03 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/dvb/linux_dvb.c
+
+linux_dvb.c: hopefully fixed CAM support for some cards (full feature cards?)
+
+------------------------------------------------------------------------
+r15084 | xtophe | 2006-04-03 16:06:19 +0200 (Mon, 03 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/modules.c
+
+Comple fix
+
+------------------------------------------------------------------------
+r15083 | xtophe | 2006-04-03 13:43:16 +0200 (Mon, 03 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/debian/patches/20_no-wx-updates.dpatch
+
+Sync debian patch with string review
+
+------------------------------------------------------------------------
+r15082 | courmisch | 2006-04-03 13:39:35 +0200 (Mon, 03 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/include/vlc_strings.h
+   M /trunk/include/vlc_symbols.h
+   M /trunk/include/vlc_url.h
+   M /trunk/modules/control/http/http.h
+   M /trunk/modules/control/http/macro.c
+   M /trunk/modules/control/http/rpn.c
+   M /trunk/modules/control/http/util.c
+   M /trunk/modules/demux/playlist/xspf.c
+   M /trunk/src/misc/strings.c
+
+- Do not rewrite ?\226?\128?\156+?\226?\128?\157 as a white space when unescaping URL parameters (fixes #625).
+- Rename decode_encoded_URI as unescape_URI as it really is what is done.
+
+------------------------------------------------------------------------
+r15081 | hartman | 2006-04-03 03:39:59 +0200 (Mon, 03 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/modules/codec/subsdec.c
+   M /trunk/src/misc/charset.c
+
+* Fix FindFallbackEncoding on Mac OS X.
+* More distintinctive debug messages on the selection of charset.
+
+------------------------------------------------------------------------
+r15080 | damienf | 2006-04-03 01:16:01 +0200 (Mon, 03 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+
+possible fix for Trac Ticket #621, whereby Hauppage WinTV capture cards (PVR-150, others ?) no longer works
+
+------------------------------------------------------------------------
+r15079 | dionoea | 2006-04-03 00:57:39 +0200 (Mon, 03 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/share/http/requests/readme
+
+Add some examples
+
+------------------------------------------------------------------------
+r15077 | xtophe | 2006-04-02 23:15:18 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/x264.c
+
+typo
+
+------------------------------------------------------------------------
+r15076 | xtophe | 2006-04-02 23:06:13 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/x264.c
+
+x264.c: the string review was a bit too strong here
+
+------------------------------------------------------------------------
+r15075 | courmisch | 2006-04-02 21:15:30 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/network/acl.c
+
+Fix warning
+
+------------------------------------------------------------------------
+r15074 | courmisch | 2006-04-02 21:12:58 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/include/configuration.h
+
+Big cleanup and fix hundreds of extra warnings
+
+------------------------------------------------------------------------
+r15073 | courmisch | 2006-04-02 20:36:51 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/libvlc.h
+
+Missing ;
+
+------------------------------------------------------------------------
+r15072 | damienf | 2006-04-02 20:29:08 +0200 (Sun, 02 Apr 2006) | 4 lines
+Changed paths:
+   M /trunk/activex/axvlc.idl
+   M /trunk/activex/axvlc.tlb
+   M /trunk/activex/axvlc_idl.c
+   M /trunk/activex/axvlc_idl.h
+
+- make sure help string for propget and propput properties are identical + a couple of changes
+- commit output of MIDL compilation otherwise changes don't make it into the build
+
+
+------------------------------------------------------------------------
+r15071 | courmisch | 2006-04-02 19:16:42 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/include/configuration.h
+
+Forgot memset() to actually fix the problem... shame on me
+
+------------------------------------------------------------------------
+r15061 | hartman | 2006-04-02 17:00:59 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/subsdec.c
+
+* Finally found a list of SSA charset id's. Add to the comments. Not used so far.
+
+------------------------------------------------------------------------
+r15060 | hartman | 2006-04-02 16:49:26 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/mp4.c
+
+* Force the UTF-8 encoding on mp4 text subtitles. (Note they can also be UTF-16, but that needs to be converted to UTF-8 in that case. refs #612
+
+------------------------------------------------------------------------
+r15059 | hartman | 2006-04-02 16:28:55 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/spudec/parse.c
+
+* Don't ignore blank alpha pallettes. Tested with all my DVDs. Fixes #560
+
+------------------------------------------------------------------------
+r15058 | fkuehne | 2006-04-02 16:28:18 +0200 (Sun, 02 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/modules/demux/real.c
+
+* implement DEMUX_GET_LENGTH based upon the stream's meta data
+------------------------------------------------------------------------
+r15057 | courmisch | 2006-04-02 15:41:47 +0200 (Sun, 02 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/include/configuration.h
+
+- Fix use of undefined (static) memory
+- Code factorization
+
+------------------------------------------------------------------------
+r15056 | courmisch | 2006-04-02 15:34:21 +0200 (Sun, 02 Apr 2006) | 3 lines
+Changed paths:
+   M /trunk/include/configuration.h
+   M /trunk/include/modules_inner.h
+
+Fix a few warnings
+(struct should be fully initialized)
+
+------------------------------------------------------------------------
+r15055 | zorglub | 2006-04-02 15:20:55 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk
+   M /trunk/modules/demux/mp4/mp4.c
+
+Don't crash on null metas
+
+------------------------------------------------------------------------
+r15054 | courmisch | 2006-04-02 15:12:49 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/src/misc/charset.c
+
+Fix warning
+
+------------------------------------------------------------------------
+r15053 | dionoea | 2006-04-02 14:27:24 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/INSTALL.win32
+
+Same as previous commit
+
+------------------------------------------------------------------------
+r15052 | dionoea | 2006-04-02 14:23:41 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/INSTALL.win32
+
+We don't have a cross compiler package anymore (at least not that i know)
+
+------------------------------------------------------------------------
+r15051 | zorglub | 2006-04-02 14:22:55 +0200 (Sun, 02 Apr 2006) | 2 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/po/POTFILES.in
+   M /trunk/po/ca.po
+   M /trunk/po/da.po
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/ka.po
+   M /trunk/po/ko.po
+   M /trunk/po/nl.po
+   M /trunk/po/oc.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ro.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/tr.po
+   M /trunk/po/vlc.pot
+   M /trunk/po/zh_CN.po
+   M /trunk/po/zh_TW.po
+
+Update po and changelog
+
+------------------------------------------------------------------------
+r15050 | fkuehne | 2006-04-02 14:17:20 +0200 (Sun, 02 Apr 2006) | 1 line
+Changed paths:
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* add XSPF and RM/RAM to the list of openable files (closes #617)
+------------------------------------------------------------------------
 r15049 | fkuehne | 2006-04-02 13:45:32 +0200 (Sun, 02 Apr 2006) | 1 line
 Changed paths:
    M /trunk/modules/gui/macosx/extended.m
