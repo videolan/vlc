@@ -223,7 +223,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     delay_spinctrl = new wxSpinCtrl( panel, -1, format_delay,
                                      wxDefaultPosition, wxDefaultSize,
                                      wxSP_ARROW_KEYS,
-                                     -30000, 30000, i_delay );
+                                     -70000, 70000, i_delay );
     delay_spinctrl->SetToolTip( wxU(_("Set subtitle delay (in 1/10s)" ) ) );
 
     grid_sizer->Add( label_delay , 0, wxALIGN_CENTER, 5 );
