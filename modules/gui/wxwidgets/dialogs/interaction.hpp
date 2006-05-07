@@ -65,7 +65,7 @@ namespace wxvlc
 
         wxBoxSizer *widgets_sizer;
         wxPanel    *widgets_panel;
-        wxBoxSizer *buttons_sizer;
+        wxStdDialogButtonSizer *buttons_sizer;
         wxPanel    *buttons_panel;
 
         wxBoxSizer *main_sizer;

@@ -70,7 +70,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     widgets_panel->SetSizer( widgets_sizer );
 
     buttons_panel = new wxPanel( this, -1 );
-    buttons_sizer = new wxBoxSizer( wxHORIZONTAL );
+    buttons_sizer = new wxStdDialogButtonSizer;
     buttons_panel->SetSizer( buttons_sizer );
 
     main_sizer = new wxBoxSizer( wxVERTICAL );
@@ -170,20 +170,17 @@ void InteractionDialog::Render()
     {
         wxButton *ok = new wxButton( buttons_panel, wxID_OK );
         wxButton *cancel = new wxButton( buttons_panel, wxID_CANCEL );
-        buttons_sizer->Add( ok, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
-        buttons_sizer->Add( cancel, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
+        buttons_sizer->AddButton( ok );
+        buttons_sizer->AddButton( cancel );
     }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
         wxButton *yes = new wxButton( buttons_panel, wxID_YES );
         wxButton *no = new wxButton( buttons_panel, wxID_NO );
         wxButton *cancel = new wxButton( buttons_panel, wxID_CANCEL );
-        buttons_sizer->Add( yes, 0, wxEXPAND | wxRIGHT| wxLEFT |
-                                    wxALIGN_CENTER, 5 );
-        buttons_sizer->Add( no, 0, wxEXPAND | wxRIGHT| wxLEFT |
-                                   wxALIGN_CENTER, 5 );
-        buttons_sizer->Add( cancel, 0, wxEXPAND | wxRIGHT| wxLEFT |
-                                       wxALIGN_CENTER, 5 );
+        buttons_sizer->AddButton( yes );
+        buttons_sizer->AddButton( no );
+        buttons_sizer->AddButton( cancel );
     }
     else if( p_dialog->i_flags & DIALOG_CLEAR_NOSHOW )
     {
@@ -192,17 +189,18 @@ void InteractionDialog::Render()
         noshow->SetValue( b_noshow );
         wxButton *clear = new wxButton( buttons_panel, wxID_CLEAR );
         wxButton *close = new wxButton( buttons_panel, wxID_CLOSE );
+        close->SetDefault();
         buttons_sizer->Add( noshow, 0, wxEXPAND | wxRIGHT|
                                        wxLEFT | wxALIGN_LEFT, 5 );
         buttons_sizer->Add( 0, 0, 1 );
-        buttons_sizer->Add( clear , 0, wxEXPAND | wxRIGHT|
-                                       wxLEFT | wxALIGN_RIGHT, 5 );
-        buttons_sizer->Add( close , 0, wxEXPAND | wxRIGHT|
-                                       wxLEFT | wxALIGN_RIGHT, 5 );
+        buttons_sizer->AddButton( clear );
+        buttons_sizer->SetNegativeButton( clear );
+        buttons_sizer->AddButton( close );
+        buttons_sizer->SetAffirmativeButton( close );
     }
     widgets_sizer->Layout();
     widgets_panel->SetSizerAndFit( widgets_sizer );
-    buttons_sizer->Layout();
+    buttons_sizer->Realize();
     buttons_panel->SetSizerAndFit( buttons_sizer );
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
