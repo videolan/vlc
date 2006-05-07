@@ -409,7 +409,7 @@ SectionEnd
 Section "Desktop Shortcut" SEC02b
   SectionIn 1 2 3
   CreateShortCut "$DESKTOP\VLC media player.lnk" \
-    "$INSTDIR\vlc.exe" "--intf wx"
+    "$INSTDIR\vlc.exe" ""
 SectionEnd
 
 Section /o "Mozilla plugin" SEC03
