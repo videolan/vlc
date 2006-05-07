@@ -208,7 +208,9 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf,
 #endif
         }
         else
+        {
             PUSH_VAR( "intf-switch" );
+        }
         PUSH_VAR( "intf-add" );
         PUSH_VAR( "intf-skins" );
         vlc_object_release( p_object );
