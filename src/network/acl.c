@@ -108,8 +108,15 @@ static int ACL_Resolve( vlc_object_t *p_this, uint8_t *p_bytes,
 }
 
 
-/*
- * Returns 0 if allowed, 1 if not, -1 on error.
+/**
+ * Check if a given address passes an access control list.
+ *
+ * @param p_acl pre-existing ACL to match the address against
+ * @param psz_ip numeric IPv4/IPv6 address
+ *
+ * @return 0 if the first matching ACL entry is an access grant,
+ * 1 if the first matching ACL entry is a denial of access,
+ * -1 on error.
  */
 int ACL_Check( vlc_acl_t *p_acl, const char *psz_ip )
 {
@@ -140,6 +147,10 @@ int ACL_Check( vlc_acl_t *p_acl, const char *psz_ip )
     return !p_acl->b_allow_default;
 }
 
+/**
+ * Adds an item to an ACL.
+ * Items are always matched in the same order as they are added.
+ */
 int ACL_AddNet( vlc_acl_t *p_acl, const char *psz_ip, int i_len,
                 vlc_bool_t b_allow )
 {
@@ -192,6 +203,14 @@ int ACL_AddNet( vlc_acl_t *p_acl, const char *psz_ip, int i_len,
 }
 
 
+/**
+ * Creates an empty ACL.
+ *
+ * @param b_allow whether to grant (VLC_TRUE) or deny (VLC_FALSE) access
+ * by default (ie if none of the ACL entries matched).
+ *
+ * @return an ACL object. NULL in case of error.
+ */
 vlc_acl_t *__ACL_Create( vlc_object_t *p_this, vlc_bool_t b_allow )
 {
     vlc_acl_t *p_acl;
@@ -210,6 +229,14 @@ vlc_acl_t *__ACL_Create( vlc_object_t *p_this, vlc_bool_t b_allow )
 }
 
 
+/**
+ * Perform a deep copy of an existing ACL.
+ *
+ * @param p_this object to attach the copy to.
+ * @param p_acl ACL object to be copied.
+ *
+ * @return a new ACL object, or NULL on error.
+ */
 vlc_acl_t *__ACL_Duplicate( vlc_object_t *p_this, const vlc_acl_t *p_acl )
 {
     vlc_acl_t *p_dupacl;
@@ -247,6 +274,9 @@ vlc_acl_t *__ACL_Duplicate( vlc_object_t *p_this, const vlc_acl_t *p_acl )
 }
 
 
+/**
+ * Releases all resources associated with an ACL object.
+ */
 void ACL_Destroy( vlc_acl_t *p_acl )
 {
     if( p_acl != NULL )
@@ -263,6 +293,14 @@ void ACL_Destroy( vlc_acl_t *p_acl )
 #   define isblank(c) ((c) == ' ' || (c) == '\t')
 #endif
 
+/**
+ * Reads ACL entries from a file.
+ *
+ * @param p_acl ACL object in which to insert parsed entries.
+ * @param psz_patch filename from which to parse entries.
+ *
+ * @return 0 on success, -1 on error.
+ */
 int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
 {
     FILE *file;
