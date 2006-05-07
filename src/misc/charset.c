@@ -37,12 +37,11 @@
 #if !defined WIN32
 # if HAVE_LANGINFO_CODESET
 #  include <langinfo.h>
-# else
-#  if HAVE_SETLOCALE
-#   include <locale.h>
-#  endif
 # endif
-#elif defined WIN32
+# if HAVE_LOCALE_H
+#  include <locale.h>
+# endif
+#else
 # include <windows.h>
 #endif
 
