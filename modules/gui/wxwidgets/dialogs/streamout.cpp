@@ -197,10 +197,10 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     wxButton *cancel_button = new wxButton( panel, wxID_CANCEL );
 
     /* Place everything in sizers */
-    wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    button_sizer->Add( ok_button, 0, wxALL, 5 );
-    button_sizer->Add( cancel_button, 0, wxALL, 5 );
-    button_sizer->Layout();
+    wxStdDialogButtonSizer *button_sizer = new wxStdDialogButtonSizer;
+    button_sizer->AddButton( ok_button );
+    button_sizer->AddButton( cancel_button );
+    button_sizer->Realize();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( mrl_sizer_sizer, 0, wxEXPAND, 5 );
@@ -208,8 +208,7 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     panel_sizer->Add( encapsulation_panel, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( transcoding_panel, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( misc_panel, 0, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( button_sizer, 0, wxALIGN_LEFT | wxALIGN_BOTTOM |
-                      wxALL, 5 );
+    panel_sizer->Add( button_sizer, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Layout();
     panel->SetSizerAndFit( panel_sizer );
     main_sizer->Add( panel, 1, wxGROW, 0 );

@@ -244,14 +244,13 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     wxButton *cancel_button = new wxButton( panel, wxID_CANCEL );
 
     /* Place everything in sizers */
-    wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    button_sizer->Add( ok_button, 0, wxALL, 5 );
-    button_sizer->Add( cancel_button, 0, wxALL, 5 );
-    button_sizer->Layout();
+    wxStdDialogButtonSizer *button_sizer = new wxStdDialogButtonSizer;
+    button_sizer->AddButton( ok_button );
+    button_sizer->AddButton( cancel_button );
+    button_sizer->Realize();
 
     panel_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( button_sizer, 0, wxALIGN_LEFT | wxALIGN_BOTTOM |
-                      wxALL, 5 );
+    panel_sizer->Add( button_sizer, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Layout();
     panel->SetSizerAndFit( panel_sizer );
     main_sizer->Add( panel, 1, wxGROW, 0 );

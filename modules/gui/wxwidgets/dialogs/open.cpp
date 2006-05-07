@@ -321,11 +321,11 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
         ok_button->SetDefault();
         wxButton *cancel_button =
             new wxButton( p_advanced_dialog, wxID_CANCEL );
-        wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-        button_sizer->Add( ok_button, 0, wxALL, 5 );
-        button_sizer->Add( cancel_button, 0, wxALL, 5 );
-        button_sizer->Layout();
-        sizer->Add( button_sizer, 0, wxALL, 0 );
+        wxStdDialogButtonSizer *button_sizer = new wxStdDialogButtonSizer;
+        button_sizer->AddButton( ok_button );
+        button_sizer->AddButton( cancel_button );
+        button_sizer->Realize();
+        sizer->Add( button_sizer, 0, wxEXPAND|wxALL, 5 );
 
         sizer->SetMinSize( 400, -1 );
         p_advanced_dialog->SetSizerAndFit( sizer );
@@ -562,10 +562,10 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     OnPageChange( event );
 
     /* Place everything in sizers */
-    wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    button_sizer->Add( cancel_button, 0, wxALL, 5 );
-    button_sizer->Add( ok_button, 0, wxALL, 5 );
-    button_sizer->Layout();
+    wxStdDialogButtonSizer *button_sizer = new wxStdDialogButtonSizer;
+    button_sizer->AddButton( cancel_button );
+    button_sizer->AddButton( ok_button );
+    button_sizer->Realize();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
 #if (!wxCHECK_VERSION(2,5,2))
@@ -575,7 +575,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
 #endif
     panel_sizer->Add( adv_sizer, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( button_sizer, 0, wxALIGN_RIGHT | wxALL, 5 );
+    panel_sizer->Add( button_sizer, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Layout();
     panel->SetSizerAndFit( panel_sizer );
     main_sizer->Add( panel, 1, wxGROW, 0 );
