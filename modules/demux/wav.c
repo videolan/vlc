@@ -231,6 +231,7 @@ static int Open( vlc_object_t * p_this )
     case VLC_FOURCC( 'a', 'f', 'l', 't' ):
     case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
     case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
+    case VLC_FOURCC( 'm', 'l', 'a', 'w' ):
     case VLC_FOURCC( 'p', 'c', 'm', ' ' ):
         FrameInfo_PCM( p_demux, &p_sys->i_frame_size,
                        &p_sys->i_frame_samples );
