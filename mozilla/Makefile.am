@@ -67,11 +67,11 @@ CLEANFILES += VLC\ Plugin.plugin
 SOURCES_support = support/npmac.cpp
 CPPFLAGS_mozilla_EXTRA = -I. -I$(top_builddir) -I$(srcdir)/../include -c \
 	-F/System/Library/Frameworks/CoreFoundation.framework $(moz_CFLAGS) \
-	-I/Developer/Headers/FlatCarbon -arch ppc -fno-common -fpascal-strings \
-	-O0 -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 \
-	-DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 -g \
+	-I/Developer/Headers/FlatCarbon -fno-common -fpascal-strings \
+	-Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 \
+	-DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 \
 	-include mozilla-config.h
-LDFLAGS_npvlc = -arch ppc -bundle -read_only_relocs suppress \
+LDFLAGS_npvlc = -bundle -read_only_relocs suppress \
 	$(LIBRARIES_libvlc) -dylib -headerpad_max_install_names 
 
 npvlc.rsrc: $(srcdir)/vlc.r
@@ -118,13 +118,14 @@ VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
 	    $(FIXEXECPATH); \
 	  done ; \
 	fi
-	if test -d "$(MOZILLA_SDK_PATH)/lib"; then \
-	  for i in "$(MOZILLA_SDK_PATH)"/lib/*.dylib ; do \
-	    dylib="./$@/Contents/MacOS/`basename $${i}`" ; \
-	    $(INSTALL) -m 644 "$${i}" "$$dylib" ; \
-	    $(FIXEXECPATH); \
-	  done ; \
-	fi
+# uncomment if dependencies on XPCOM libs is sought
+#	if test -d "$(MOZILLA_SDK_PATH)/lib"; then \
+#	  for i in "$(MOZILLA_SDK_PATH)"/lib/*.dylib ; do \
+#	    dylib="./$@/Contents/MacOS/`basename $${i}`" ; \
+#	    $(INSTALL) -m 644 "$${i}" "$$dylib" ; \
+#	    $(FIXEXECPATH); \
+#	  done ; \
+#	fi
 
 else
 

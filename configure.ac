@@ -5075,6 +5075,8 @@ AC_ARG_WITH(mozilla-sdk-path,
 
 if test "${enable_mozilla}" = "yes" 
 then
+  dnl currently vlc plugin only needs headers, no xpcom support apis are actually used
+  need_xpcom_libs=false
   if test "${with_mozilla_sdk_path}" = ""
   then
     AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
@@ -5097,7 +5099,11 @@ then
       mozilla=:
       dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
       VLC_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`]])
-      VLC_ADD_LDFLAGS([mozilla],[`${MOZILLA_CONFIG} --libs plugin xpcom`])
+      if ${need_xpcom_libs}; then
+         VLC_ADD_LDFLAGS([mozilla],[`${MOZILLA_CONFIG} --libs plugin xpcom`])
+      else
+         VLC_ADD_LDFLAGS([mozilla],[`${MOZILLA_CONFIG} --libs plugin`])
+      fi
       CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mozilla}"
       AC_CHECK_HEADERS(mozilla-config.h)
       CPPFLAGS="${CPPFLAGS_save}"
@@ -5122,14 +5128,15 @@ then
     AC_CHECK_HEADERS(mozilla-config.h, [
       mozilla=:
       VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -DHAVE_CPP_MODERN_SPECIALIZE_TEMPLATE_SYNTAX -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
-      VLC_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -L${real_mozilla_sdk}/lib -lnspr4 -lplds4 -lplc4 -lxpcomglue])
-      if test "${SYS}" = "mingw32"; then
-        LDFLAGS="${LDFLAGS_save}"
-        dnl latest gecko sdk does not have embedstring
-        if test -d "${real_mozilla_sdk}/embedstring/bin"
-        then
-          VLC_ADD_LDFLAGS([mozilla],[-lembedstring -Wl,--kill-at])
-        fi
+      if ${need_xpcom_libs}; then
+         VLC_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -L${real_mozilla_sdk}/lib -lnspr4 -lplds4 -lplc4 -lxpcomglue])
+	 if test "${SYS}" = "mingw32"; then
+	   dnl latest gecko sdk does not have embedstring
+	   if test -d "${real_mozilla_sdk}/embedstring/bin"
+	   then
+	     VLC_ADD_LDFLAGS([mozilla],[-lembedstring -Wl,--kill-at])
+	   fi
+	 fi
       fi
   
       MOZILLA_SDK_PATH="${real_mozilla_sdk}"
