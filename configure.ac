@@ -5401,7 +5401,6 @@ AC_CONFIG_FILES([
   bindings/Makefile
   bindings/java/Makefile
   bindings/mediacontrol-python/Makefile
-  debian/Makefile
   doc/Makefile
   intl/Makefile
   ipkg/Makefile
