@@ -2,7 +2,7 @@
  * interaction.hpp : Headers for an interaction dialog
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
- * $Id: bookmarks.hpp 13444 2005-11-28 23:33:48Z dionoea $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *

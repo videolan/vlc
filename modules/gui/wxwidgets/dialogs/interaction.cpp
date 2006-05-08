@@ -2,7 +2,7 @@
  * interaction.cpp: wxWidgets handling of interaction dialogs
  *****************************************************************************
  * Copyright (C) 2000-2004 the VideoLAN team
- * $Id: bookmarks.cpp 13106 2005-11-02 19:20:34Z zorglub $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
