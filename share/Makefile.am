@@ -18,6 +18,7 @@ nobase_dist_pkgdata_DATA = \
 	$(DIST_http) \
 	$(DIST_osdmenu_default) \
 	$(DIST_osdmenu_dvd) \
+	$(DIST_applications) \
 	$(NULL)
 
 nobase_pkgdata_DATA = skins2/default.vlt
@@ -246,6 +247,10 @@ DIST_osdmenu_dvd = \
 	osdmenu/dvd/volume/volume04.png \
 	osdmenu/dvd/volume/volume05.png \
 	osdmenu/dvd/unselect/barroff.png \
+	$(NULL)
+
+DIST_applications = \
+	applications/vlc.desktop \
 	$(NULL)
 
 skins2/%.vlt:
