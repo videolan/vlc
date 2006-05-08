@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=VLC for GNOME
-Name[fr]=VLC pour GNOME
-Comment=GNOME media player
-Comment[fr]=Lecteur multimédia pour GNOME
-Exec=wxvlc
-Icon=vlc.png
-Terminal=0
-Type=Application

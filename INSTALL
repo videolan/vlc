@@ -52,8 +52,9 @@ from the current directory as well:
 Building packages
 =================
 
-To build a Debian package, you may use:
-
+To build a Debian package, you need to get the packaging info
+   svn co svn://svn.videolan.org/pkg-multimedia/unstable/vlc/debian debian 
+and then
    dpkg-buildpackage -rfakeroot -us -uc
 
 

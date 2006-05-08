@@ -1,3 +1,0 @@
-?package(vlc):command="/usr/bin/vlc" hotkey="V" needs="X11" \
-              section="Apps/Viewers" title="VLC media player" \
-              icon="/usr/share/vlc/vlc.xpm" hints="Video"

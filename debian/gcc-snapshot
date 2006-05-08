@@ -1,4 +1,0 @@
-#! /bin/sh
-LD_LIBRARY_PATH=/usr/lib/gcc-snapshot/lib:$LD_LIBRARY_PATH
-PATH=/usr/lib/gcc-snapshot/bin:$PATH
-gcc "$@"

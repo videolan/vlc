@@ -1,3 +1,0 @@
-?package(wxvlc):command="/usr/bin/wxvlc" hotkey="V" needs="X11" \
-                section="Apps/Viewers" title="VLC media player" \
-                icon="/usr/share/vlc/wxvlc.xpm" hints="Video"
