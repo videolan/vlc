@@ -235,11 +235,11 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "crop", VLC_VAR_DELCHOICE, &val, 0 );
     val.psz_string = ""; text.psz_string = _("Default");
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "001:1"; text.psz_string = "1:1";
+    val.psz_string = "1:1"; text.psz_string = "1:1";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "004:3"; text.psz_string = "4:3";
+    val.psz_string = "4:3"; text.psz_string = "4:3";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "016:9"; text.psz_string = "16:9";
+    val.psz_string = "16:9"; text.psz_string = "16:9";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "16:10"; text.psz_string = "16:10";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
@@ -264,8 +264,8 @@ void vout_IntfInit( vout_thread_t *p_vout )
         float i_aspect = 0;
         if( psz_parser )
         {
-            i_aspect_num = strtol( val.psz_string, 0, 0 );
-            i_aspect_den = strtol( ++psz_parser, 0, 0 );
+            i_aspect_num = strtol( val.psz_string, 0, 10 );
+            i_aspect_den = strtol( ++psz_parser, 0, 10 );
         }
         else
         {
@@ -298,11 +298,11 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "aspect-ratio", VLC_VAR_DELCHOICE, &val, 0 );
     val.psz_string = ""; text.psz_string = _("Default");
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "001:1"; text.psz_string = "1:1";
+    val.psz_string = "1:1"; text.psz_string = "1:1";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "004:3"; text.psz_string = "4:3";
+    val.psz_string = "4:3"; text.psz_string = "4:3";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "016:9"; text.psz_string = "16:9";
+    val.psz_string = "16:9"; text.psz_string = "16:9";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "16:10"; text.psz_string = "16:10";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
@@ -741,10 +741,10 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !psz_parser ) goto crop_end;
 
-    i_aspect_num = strtol( newval.psz_string, &psz_end, 0 );
+    i_aspect_num = strtol( newval.psz_string, &psz_end, 10 );
     if( psz_end == newval.psz_string || !i_aspect_num ) goto crop_end;
 
-    i_aspect_den = strtol( ++psz_parser, &psz_end, 0 );
+    i_aspect_den = strtol( ++psz_parser, &psz_end, 10 );
     if( psz_end == psz_parser || !i_aspect_den ) goto crop_end;
 
     i_width = p_vout->fmt_in.i_sar_den * p_vout->fmt_render.i_visible_height *
@@ -797,10 +797,10 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !psz_parser ) goto aspect_end;
 
-    i_aspect_num = strtol( newval.psz_string, &psz_end, 0 );
+    i_aspect_num = strtol( newval.psz_string, &psz_end, 10 );
     if( psz_end == newval.psz_string || !i_aspect_num ) goto aspect_end;
 
-    i_aspect_den = strtol( ++psz_parser, &psz_end, 0 );
+    i_aspect_den = strtol( ++psz_parser, &psz_end, 10 );
     if( psz_end == psz_parser || !i_aspect_den ) goto aspect_end;
 
     i_sar_num = i_aspect_num * p_vout->fmt_render.i_visible_height;
