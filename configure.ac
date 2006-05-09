@@ -5130,7 +5130,7 @@ then
     then
       AC_CHECK_TOOL(CYGPATH, cygpath, "")
       dnl latest gecko sdk does not have an xpcom directory
-      if test -d "${with_mozilla_sdk_pat.}/xpcom"; then
+      if test -d "${with_mozilla_sdk_path}/xpcom"; then
           mozilla_sdk_xpcom="/xpcom"
       fi
     fi
