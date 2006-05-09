@@ -807,13 +807,13 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>dialogs.popup()</emphasis>: Show the full popup menu, (already available with a right-click on a <link linkend="Image">Image</link> control).
   </para></listitem>
   <listitem><para>
-    <emphasis>dialogs.audioPopup()</emphasis>: Show the audio settings popup menu (since VLC 0.8.5).
+    <emphasis>dialogs.audioPopup()</emphasis>: Show the audio settings popup menu (since VLC 0.8.6).
   </para></listitem>
    <listitem><para>
-    <emphasis>dialogs.videoPopup()</emphasis>: Show the video settings popup menu (since VLC 0.8.5).
+    <emphasis>dialogs.videoPopup()</emphasis>: Show the video settings popup menu (since VLC 0.8.6).
   </para></listitem>
   <listitem><para>
-    <emphasis>dialogs.miscPopup()</emphasis>: Show a popup menu containing playback control and general options (since VLC 0.8.5).
+    <emphasis>dialogs.miscPopup()</emphasis>: Show a popup menu containing playback control and general options (since VLC 0.8.6).
   </para></listitem>
   <listitem><para>
     <emphasis>equalizer.enable()</emphasis>: Enable the equalizer audio filter (since VLC 0.8.5).
