@@ -233,7 +233,9 @@ int libvlc_playlist_add_extended( libvlc_instance_t *, const char *,
                                   libvlc_exception_t * );
 
 
-
+int libvlc_playlist_delete_item( libvlc_instance_t *, int,
+                                 libvlc_exception_t * );
+    
 typedef struct libvlc_input_t libvlc_input_t;
 
 /* Get the input that is currently being played by the playlist
