@@ -798,7 +798,7 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>dialogs.fileInfo()</emphasis>: Show the "File Info" dialog box.
   </para></listitem>
   <listitem><para>
-    <emphasis>dialogs.playlist()</emphasis>: Show the "standard" (not skinned) playlist dialog.
+    <emphasis>dialogs.playlist()</emphasis>: Show the "standard" (not skinned) playlist dialog (since VLC 0.8.6).
   </para></listitem>
   <listitem><para>
     <emphasis>dialogs.streamingWizard()</emphasis>: Show the "Streaming Wizard" dialog box (new after VLC 0.8.2).
