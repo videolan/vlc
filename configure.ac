@@ -5082,8 +5082,15 @@ then
     AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
     if test "${MOZILLA_CONFIG}" = "no"
     then
-      AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
-    else
+      AC_PATH_PROG(XULRUNNER_CONFIG, xulrunner-config, no)
+      if test "${XULRUNNER_CONFIG}" != "no"
+      then
+        have_xul=true
+	MOZILLA_CONFIG="${XULRUNNER_CONFIG}"
+      else
+        AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
+       fi
+     fi
       if ${MOZILLA_CONFIG} --defines | grep -q 'MOZ_X11=1'; then
         LDFLAGS="${LDFLAGS_save} ${X_LIBS} ${X_PRE_LIBS}"
         AC_CHECK_LIB(Xt,XtStrings,
@@ -5110,7 +5117,12 @@ then
       MOZILLA_SDK_PATH="`${MOZILLA_CONFIG} --prefix`"
       XPIDL_INCL="`${MOZILLA_CONFIG} --cflags plugin xpcom java` \
       `${MOZILLA_CONFIG} --idlflags plugin xpcom java` "
-      xpidl_path="`${MOZILLA_CONFIG} --prefix`/bin"
+      if ${have_xul}
+      then
+        xpidl_path="`${MOZILLA_CONFIG} --prefix`/lib/xulrunner"
+      else
+        xpidl_path="`${MOZILLA_CONFIG} --prefix`/bin"
+      fi	
     fi
   else
     dnl special case for mingw32
@@ -5118,7 +5130,7 @@ then
     then
       AC_CHECK_TOOL(CYGPATH, cygpath, "")
       dnl latest gecko sdk does not have an xpcom directory
-      if test -d "${with_mozilla_sdk_path}/xpcom"; then
+      if test -d "${with_mozilla_sdk_pat.}/xpcom"; then
           mozilla_sdk_xpcom="/xpcom"
       fi
     fi
@@ -5157,7 +5169,7 @@ then
     if test "${XPIDL}" = "no"; then
       AC_MSG_ERROR([Please install the Mozilla development tools, xpidl was not found.])
     fi
-  fi
+  
 fi
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
