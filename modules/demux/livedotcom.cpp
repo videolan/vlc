@@ -68,6 +68,13 @@ static void Close( vlc_object_t * );
     "dialect of RTSP. When you set this parameter, VLC will try this dialect "\
     "for communication. In this mode you cannot connect to normal RTSP servers." )
 
+#define USER_TEXT N_("RTSP user name")
+#define USER_LONGTEXT N_("Allows you to modify the user name that will " \
+    "be used for authenticating the connection.")
+#define PASS_TEXT N_("RTSP password")
+#define PASS_LONGTEXT N_("Allows you to modify the password that will be " \
+    "used for the connection.")
+
 vlc_module_begin();
     /// \bug [String] s,live555.com,live555
     set_description( _("RTP/RTSP/SDP demuxer (using Live555.com)" ) );
@@ -103,6 +110,10 @@ vlc_module_begin();
                   CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
         add_bool( "rtsp-kasenna", VLC_FALSE, NULL, KASENNA_TEXT,
                   KASENNA_LONGTEXT, VLC_TRUE );
+        add_string( "rtsp-user", NULL, NULL, USER_TEXT,
+                USER_LONGTEXT, VLC_TRUE );
+        add_string( "rtsp-pwd", NULL, NULL, PASS_TEXT,
+                PASS_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /* TODO:
@@ -224,6 +235,9 @@ static int  Open ( vlc_object_t *p_this )
     vlc_bool_t b_rtsp_tcp;
     uint8_t *p_peek;
 
+    char    *psz_user = NULL;
+    char    *psz_pwd  = NULL;
+
     int     i_sdp;
     int     i_sdp_max;
     uint8_t *p_sdp;
@@ -319,8 +333,15 @@ static int  Open ( vlc_object_t *p_this )
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url );
         if( psz_options ) delete [] psz_options;
 
-        p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url,
-                              NULL, var_CreateGetBool( p_demux, "rtsp-kasenna" ) ) ;
+        psz_user = var_CreateGetString( p_demux, "rtsp-user" );
+        psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
+
+        if ((*psz_user) && (*psz_pwd))
+            p_sdp = (uint8_t*)p_sys->rtsp->describeWithPassword( psz_url,
+                               psz_user, psz_pwd);
+        else
+            p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url,
+                               NULL, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
         if( p_sdp == NULL )
         {
             msg_Err( p_demux, "describeURL failed (%s)",
@@ -329,6 +350,8 @@ static int  Open ( vlc_object_t *p_this )
             goto error;
         }
         free( psz_url );
+        free( psz_user );
+        free( psz_pwd );
 
         /* malloc-ated copy */
         p_sys->p_sdp = strdup( (char*)p_sdp );
@@ -823,8 +846,8 @@ static int Demux( demux_t *p_demux )
     /* Check if we need to send the server a Keep-A-Live signal */
     if( p_sys->b_timeout_call && p_sys->rtsp && p_sys->ms )
     {
-        char *psz_bye = NULL;
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1138089600
+        char *psz_bye = NULL;
         p_sys->rtsp->getMediaSessionParameter( *p_sys->ms, NULL, psz_bye );
 #endif
         p_sys->b_timeout_call = VLC_FALSE;
@@ -1095,6 +1118,8 @@ static int RollOverTcp( demux_t *p_demux )
     MediaSubsession *sub;
     char *psz_url;
     char *psz_options;
+    char *psz_user;
+    char *psz_pwd;
     uint8_t *p_sdp;
     int i_tk;
 
@@ -1121,9 +1146,20 @@ static int RollOverTcp( demux_t *p_demux )
     if( ( psz_options = p_sys->rtsp->sendOptionsCmd( psz_url ) ) )
         delete [] psz_options;
 
-    p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url,
-                          NULL, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
+    psz_user = var_CreateGetString( p_demux, "rtsp-user" );
+    psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
+
+    if ((*psz_user) && (*psz_pwd))
+        p_sdp = (uint8_t*)p_sys->rtsp->describeWithPassword( psz_url,
+                            psz_user, psz_pwd);
+    else
+        p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url,
+                            NULL, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
+
     free( psz_url );
+    free( psz_user );
+    free( psz_pwd );
+
     if( p_sdp == NULL )
     {
         msg_Err( p_demux, "describeURL failed (%s)",
