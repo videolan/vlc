@@ -28,8 +28,8 @@
 #include "MediaControl.h"
 #include "orbit/poa/portableserver-poa-type.h"
 
-#include <vlc/control.h>
 #include <vlc/vlc.h>
+#include <vlc/mediacontrol.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
 #include <vlc/aout.h>

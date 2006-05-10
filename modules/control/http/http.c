@@ -478,13 +478,13 @@ static void Callback404( httpd_file_sys_t *p_args, char **pp_data,
     {
         return;
     }
-    p += sprintf( p, "<html>\n" );
+    p += sprintf( p, "Content-Type: text/html\n" );
+    p += sprintf( p, "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" );
     p += sprintf( p, "<head>\n" );
     p += sprintf( p, "<title>Error loading %s</title>\n", p_args->file );
     p += sprintf( p, "</head>\n" );
     p += sprintf( p, "<body>\n" );
     p += sprintf( p, "<h1><center>Error loading %s for %s</center></h1>\n", p_args->file, p_args->name );
-    p += sprintf( p, "<hr />\n" );
     p += sprintf( p, "<a href=\"http://www.videolan.org/\">VideoLAN</a>\n" );
     p += sprintf( p, "</body>\n" );
     p += sprintf( p, "</html>\n" );
