@@ -3,6 +3,10 @@ NULL =
 EXTRA_DIST = $(DIST_rsrc) $(DIST_fonts) \
 	$(skins2_default_vlt_FILES)
 
+nobase_dist_data_DATA = \
+	$(DIST_applications) \
+	$(NULL)
+
 pkgdatadir = $(datadir)/vlc
 
 dist_pkgdata_DATA = \
@@ -18,7 +22,6 @@ nobase_dist_pkgdata_DATA = \
 	$(DIST_http) \
 	$(DIST_osdmenu_default) \
 	$(DIST_osdmenu_dvd) \
-	$(DIST_applications) \
 	$(NULL)
 
 nobase_pkgdata_DATA = skins2/default.vlt
