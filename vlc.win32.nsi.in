@@ -33,8 +33,9 @@ SetCompressor /SOLID lzma
 SetOverwrite ifnewer
 CRCCheck on
 
-InstType "Normal"
+InstType "Minimum"
 InstType "Full"
+InstType "Recommended"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; NSIS Modern User Interface configuration ;
@@ -456,7 +457,7 @@ Section /o "Mozilla plugin" SEC03
 
 SectionEnd
 
-Section "ActiveX plugin" SEC04
+Section /o "ActiveX plugin" SEC04
   SectionIn 2 3
   SetOutPath "$INSTDIR"
   !insertmacro OpenUninstallLog
@@ -465,7 +466,7 @@ Section "ActiveX plugin" SEC04
   RegDLL "$INSTDIR\axvlc.dll"
 SectionEnd
 
-Section "Context Menus" SEC05
+Section /o "Context Menus" SEC05
   SectionIn 2
   !insertmacro MacroAllExtensions AddContextMenu
   !insertmacro AddContextMenu "Directory"
@@ -683,7 +684,7 @@ Section "Uninstall" SEC91
 SectionEnd
 
 Section /o "un.Delete preferences and cache" SEC92
-  SectionIn 2 3 RO
+  SectionIn 2 3
   !insertmacro delprefs
 SectionEnd
 
