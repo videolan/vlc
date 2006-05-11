@@ -28,12 +28,6 @@
  *****************************************************************************/
 
 /* IDs for the controls and the menu commands */
-enum
-{
-    Close_Event,
-    Clear_Event,
-    Save_Log_Event
-};
 
 BEGIN_EVENT_TABLE(Messages, wxFrame)
     /* Button events */
@@ -73,25 +67,25 @@ Messages::Messages( intf_thread_t *_p_intf, wxWindow *p_parent ):
     warn_attr = new wxTextAttr( *wxBLUE );
     dbg_attr = new wxTextAttr( *wxBLACK );
 
-
-
-    /* Create the Save Log button */
-    wxButton *save_log_button = new wxButton( messages_panel, wxID_SAVEAS );
-    save_log_button->SetDefault();
+    /* Create the Close button */
+    wxButton *close_button = new wxButton( messages_panel, wxID_CLOSE,
+                                        wxU(_("&Close")));
+    close_button->SetDefault();
 
     /* Create the Clear button */
-    wxButton *clear_button = new wxButton( messages_panel, wxID_CLEAR );
-    clear_button->SetDefault();
+    wxButton *clear_button = new wxButton( messages_panel, wxID_CLEAR,
+                                           wxU(_("Clear")));
 
-    /* Create the OK button */
-    wxButton *ok_button = new wxButton( messages_panel, wxID_CLOSE);
-    ok_button->SetDefault();
+    /* Create the Save Log button */
+    wxButton *save_log_button = new wxButton( messages_panel, wxID_SAVEAS,
+                                              wxU(_("Save &As...")));
+
 
     /* Place everything in sizers */
     wxBoxSizer *buttons_sizer = new wxBoxSizer( wxHORIZONTAL );
     buttons_sizer->Add( save_log_button, 0, wxEXPAND |wxALIGN_LEFT| wxALL, 5 );
     buttons_sizer->Add( clear_button, 0, wxEXPAND |wxALIGN_RIGHT| wxALL, 5 );
-    buttons_sizer->Add( ok_button, 0, wxEXPAND |wxALIGN_RIGHT| wxALL, 5 );
+    buttons_sizer->Add( close_button, 0, wxEXPAND |wxALIGN_RIGHT| wxALL, 5 );
     buttons_sizer->Add( new wxPanel( this, -1 ), 1, wxALL, 5 );
     buttons_sizer->Layout();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );

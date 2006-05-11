@@ -102,10 +102,10 @@ BookmarkEditDialog::BookmarkEditDialog( intf_thread_t *_p_intf,
     sizer->Add( bytes_text, 0, wxEXPAND|wxRIGHT, 5);
 
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    wxButton *ok_button = new wxButton( this, wxID_OK );
+    wxButton *ok_button = new wxButton( this, wxID_OK, wxU(_("&OK") ) );
     ok_button->SetDefault();
     button_sizer->Add( ok_button );
-    button_sizer->Add( new wxButton( this, wxID_CANCEL ) );
+    button_sizer->Add( new wxButton( this, wxID_CANCEL, wxU(_("&Cancel") ) ) );
 
     panel_sizer->Add( sizer, 0, wxEXPAND | wxTOP|wxBOTTOM, 5 );
     panel_sizer->Add( button_sizer, 0, wxEXPAND | wxBOTTOM, 5 );
@@ -156,11 +156,11 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
     wxPanel *panel = new wxPanel( main_panel, -1 );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     wxButton *button_add =
-        new wxButton( panel, wxID_ADD );
+        new wxButton( panel, wxID_ADD, wxU(_("Add")) );
     wxButton *button_del =
-        new wxButton( panel, wxID_DELETE );
+        new wxButton( panel, wxID_DELETE, wxU(_("&Delete")) );
     wxButton *button_clear =
-        new wxButton( panel, wxID_CLEAR );
+        new wxButton( panel, wxID_CLEAR, wxU(_("&Clear")) );
     wxButton *button_edit =
         new wxButton( panel, ButtonEdit_Event, wxU(_("Edit")) );
     wxButton *button_extract =

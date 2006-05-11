@@ -75,9 +75,10 @@ ItemInfoDialog::ItemInfoDialog( intf_thread_t *_p_intf,
     wxStaticLine *static_line = new wxStaticLine( panel, wxID_OK );
 
     /* Create the buttons */
-    wxButton *ok_button = new wxButton( panel, wxID_OK );
+    wxButton *ok_button = new wxButton( panel, wxID_OK, wxU(_("&OK")) );
     ok_button->SetDefault();
-    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL );
+    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL,
+                                            wxU(_("&Cancel")) );
 
     /* Place everything in sizers */
     wxStdDialogButtonSizer *button_sizer = new wxStdDialogButtonSizer;

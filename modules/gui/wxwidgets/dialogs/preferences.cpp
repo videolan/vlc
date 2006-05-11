@@ -202,12 +202,13 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, wxWindow *p_parent)
 
 #if 0
     /* Create the buttons */
-    wxButton *ok_button = new wxButton( panel, wxID_OK );
+    wxButton *ok_button = new wxButton( panel, wxID_OK, wxU(_("OK")) );
     ok_button->SetDefault();
 #endif
-    wxButton *save_button = new wxButton( panel, wxID_SAVE );
+    wxButton *save_button = new wxButton( panel, wxID_SAVE, wxU(_("&Save")) );
     save_button->SetDefault();
-    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL );
+    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL,
+                                            wxU(_("&Cancel")) );
     wxButton *reset_button = new wxButton( panel, ResetAll_Event,
                                            wxU(_("Reset All")) );
 

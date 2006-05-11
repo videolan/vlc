@@ -168,16 +168,21 @@ void InteractionDialog::Render()
     //-------------- Buttons ------------------
     if( p_dialog->i_flags & DIALOG_OK_CANCEL )
     {
-        wxButton *ok = new wxButton( buttons_panel, wxID_OK );
-        wxButton *cancel = new wxButton( buttons_panel, wxID_CANCEL );
+        wxButton *ok = new wxButton( buttons_panel,
+                                     wxID_OK, wxU( _("&OK") ) );
+        wxButton *cancel = new wxButton( buttons_panel,
+                                         wxID_CANCEL, wxU( _("&Cancel") ) );
         buttons_sizer->AddButton( ok );
         buttons_sizer->AddButton( cancel );
     }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
-        wxButton *yes = new wxButton( buttons_panel, wxID_YES );
-        wxButton *no = new wxButton( buttons_panel, wxID_NO );
-        wxButton *cancel = new wxButton( buttons_panel, wxID_CANCEL );
+        wxButton *yes = new wxButton( buttons_panel,
+                                      wxID_YES, wxU( _("&Yes") ) );
+        wxButton *no = new wxButton( buttons_panel,
+                                     wxID_NO, wxU( _("&No") ) );
+        wxButton *cancel = new wxButton( buttons_panel,
+                                         wxID_CANCEL, wxU( _("&Cancel") ) );
         buttons_sizer->AddButton( yes );
         buttons_sizer->AddButton( no );
         buttons_sizer->AddButton( cancel );
@@ -187,8 +192,10 @@ void InteractionDialog::Render()
         wxCheckBox *noshow = new wxCheckBox( buttons_panel,
                       NoShow_Event, wxU( _("Don't show further errors") ) );
         noshow->SetValue( b_noshow );
-        wxButton *clear = new wxButton( buttons_panel, wxID_CLEAR );
-        wxButton *close = new wxButton( buttons_panel, wxID_CLOSE );
+        wxButton *clear = new wxButton( buttons_panel,
+                                        wxID_CLEAR, wxU( _("&Clear") ) );
+        wxButton *close = new wxButton( buttons_panel, wxID_CLOSE,
+                                         wxU( _("&Close") ) );
         close->SetDefault();
         buttons_sizer->Add( noshow, 0, wxEXPAND | wxRIGHT|
                                        wxLEFT | wxALIGN_LEFT, 5 );

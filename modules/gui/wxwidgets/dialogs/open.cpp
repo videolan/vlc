@@ -317,10 +317,10 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
 
         /* Create buttons */
         wxButton *ok_button =
-            new wxButton( p_advanced_dialog, wxID_OK );
+            new wxButton( p_advanced_dialog, wxID_OK, wxU(_("&OK")) );
         ok_button->SetDefault();
         wxButton *cancel_button =
-            new wxButton( p_advanced_dialog, wxID_CANCEL );
+            new wxButton( p_advanced_dialog, wxID_CANCEL, wxU(_("&Cancel")) );
         wxStdDialogButtonSizer *button_sizer = new wxStdDialogButtonSizer;
         button_sizer->AddButton( ok_button );
         button_sizer->AddButton( cancel_button );
@@ -487,9 +487,10 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     wxStaticLine *static_line = new wxStaticLine( panel, wxID_OK );
 
     /* Create the buttons */
-    wxButton *ok_button = new wxButton( panel, wxID_OK );
+    wxButton *ok_button = new wxButton( panel, wxID_OK, wxU(_("&OK")) );
     ok_button->SetDefault();
-    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL );
+    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL,
+                                            wxU(_("&Cancel")) );
 
     /* Create notebook */
     notebook = new wxNotebook( panel, Notebook_Event );
