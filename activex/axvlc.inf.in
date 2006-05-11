@@ -5,19 +5,19 @@
   AdvancedINF=2.0
 
 [Add.Code]
-  vlc-@VERSION@-win32.exe
   axvlc.dll=axvlc.dll
+  vlc-@VERSION@-win32.exe=vlc-@VERSION@-win32.exe
 
 [axvlc.dll]
   FileVersion=@VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,0
   clsid={E23FE9C6-778E-49d4-B537-38FCDE4887D8}
   RegisterServer=no
-  hook=nsiinstaller
+  Hook=runinstaller
 
 [vlc-@VERSION@-win32.exe]
   FileVersion=@VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,0
-  file-win32-x86=thiscab
+  file-win32-x86=http://downloads.videolan.org/pub/videolan/vlc/@VERSION@/win32/vlc-@VERSION@-win32.exe
 
-[nsiinstaller]
+[runinstaller]
   run=%EXTRACT_DIR%\vlc-@VERSION@-win32.exe
 
