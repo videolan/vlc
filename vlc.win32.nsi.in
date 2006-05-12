@@ -260,7 +260,7 @@ FunctionEnd
 Var UninstallLog
 
 !macro OpenUninstallLog
-  FileOpen $UninstallLog "$INSTDIR\uninstall.log" w
+  FileOpen $UninstallLog "$INSTDIR\uninstall.log" a
   FileSeek $UninstallLog 0 END
 !macroend
 
