@@ -33,6 +33,7 @@
                 "o_ckb_imgClone" = id; 
                 "o_ckb_imgCrop" = id; 
                 "o_ckb_imgInvers" = id; 
+                "o_ckb_intZoom" = id; 
                 "o_ckb_trnsform" = id; 
                 "o_ckb_vlme_norm" = id; 
                 "o_expBtn_adjustImage" = id; 

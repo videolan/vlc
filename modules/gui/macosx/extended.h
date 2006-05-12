@@ -1,7 +1,7 @@
 /*****************************************************************************
  * extended.h: MacOS X Extended interface panel
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Felix Kühne <fkuehne@users.sf.net>
@@ -59,6 +59,7 @@
     IBOutlet id o_ckb_imgCrop;
     IBOutlet id o_ckb_imgInvers;
     IBOutlet id o_ckb_trnsform;
+    IBOutlet id o_ckb_intZoom;
     
     /* audio filters */
     IBOutlet id o_ckb_vlme_norm;

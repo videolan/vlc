@@ -11,10 +11,10 @@
 		<key>32</key>
 		<string>525 487 390 233 0 0 1440 878 </string>
 		<key>5</key>
-		<string>525 506 390 196 0 0 1440 878 </string>
+		<string>467 464 392 178 0 0 1440 878 </string>
 	</dict>
 	<key>IBFramework Version</key>
-	<string>437.0</string>
+	<string>443.0</string>
 	<key>IBLockedObjects</key>
 	<array>
 		<integer>32</integer>
@@ -22,10 +22,9 @@
 	<key>IBOpenObjects</key>
 	<array>
 		<integer>18</integer>
-		<integer>32</integer>
-		<integer>13</integer>
+		<integer>5</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>8C46</string>
+	<string>8I127</string>
 </dict>
 </plist>
