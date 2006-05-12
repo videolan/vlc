@@ -140,12 +140,11 @@ static VLCUpdate *_o_sharedInstance = nil;
     update_Check( p_u, VLC_FALSE );
     update_iterator_t *p_uit = update_iterator_New( p_u );
     BOOL releaseChecked = NO;
+    BOOL gettingReleaseNote = NO;
     int x = 0;
     NSString * pathToReleaseNote;
     pathToReleaseNote = [NSString stringWithFormat: \
-        @"/tmp/vlc_releasenote_%d.tmp", mdate()]; /*[[NSCalendarDate calendarDate] \
-        descriptionWithCalendarFormat: @"%m-%d-%y--%I.%M.%S.%F"]];*/
-    NSLog( pathToReleaseNote );
+        @"/tmp/vlc_releasenote_%d.tmp", mdate()];
     
     if( p_uit )
     {
@@ -155,6 +154,7 @@ static VLCUpdate *_o_sharedInstance = nil;
         
         while( update_iterator_Action( p_uit, UPDATE_FILE) != UPDATE_FAIL )
         {
+            msg_Dbg( p_intf, "parsing available updates, run %i", x );
             /* if the announced item is of the type "binary", keep it and display
              * its details to the user. Do similar stuff on "info". Do both 
              * only if the file is announced as stable */
@@ -162,12 +162,15 @@ static VLCUpdate *_o_sharedInstance = nil;
             {
                 if( p_uit->file.i_type == UPDATE_FILE_TYPE_INFO )
                 {
+                    msg_Dbg( p_intf, "release note found, desc = %s",
+                        p_uit->file.psz_description );
                     [o_fld_releaseNote setString: \
                         [NSString stringWithUTF8String: \
                         (p_uit->file.psz_description)]];
                     /* download our release note
                      * We will read the temp file after this loop */
                     update_download( p_uit, (char *)[pathToReleaseNote UTF8String] );
+                    gettingReleaseNote = YES;
                 }
                 else if( p_uit->file.i_type == UPDATE_FILE_TYPE_BINARY )
                 {
@@ -217,36 +220,48 @@ static VLCUpdate *_o_sharedInstance = nil;
 
         update_iterator_Delete( p_uit );
         
-        /* wait for our download, since it is done by another thread
-         * this does usually take 300000 to 500000 ms */
-        int i = 0;
-        while( [[NSFileManager defaultManager] fileExistsAtPath: pathToReleaseNote] == NO )
+        /* wait for our release notes if necessary, since the download is done
+         * by another thread -- this does usually take 300000 to 500000 ms */
+        if( gettingReleaseNote )
         {
-            msleep( 100000 );
-            i += 1;
-            if( i == 600 )
+            int i = 0;
+            while( [[NSFileManager defaultManager] fileExistsAtPath: pathToReleaseNote] == NO )
             {
-                /* if this takes more than 1 min, exit */
-                msg_Warn( p_intf, "download took more than a minute, exiting" );
-                return;
+                msleep( 100000 );
+                i += 1;
+                if( i == 150 )
+                {
+                    /* if this takes more than 15 sec, exit */
+                    msg_Warn( p_intf, "download took more than 15 sec, exiting" );
+                    break;
+                }
             }
+            msg_Dbg( p_intf, "waited %i ms for the release notes", (i * 100000) );
+            msleep( 500000 );
+
+            /* let's open our cached release note and display it
+             * we can't use NSString stringWithContentsOfFile:encoding:error: 
+             * since it is Tiger only */
+            NSString * releaseNote = [[NSString alloc] initWithData: \
+                [NSData dataWithContentsOfFile: pathToReleaseNote] \
+                encoding: NSISOLatin1StringEncoding];
+            if( releaseNote )
+                [o_fld_releaseNote setString: releaseNote];
+        
+            /* delete the file since it isn't needed anymore */
+            BOOL myBOOL = NO;
+            myBOOL = [[NSFileManager defaultManager] removeFileAtPath: \
+                pathToReleaseNote handler: nil];
         }
-        msg_Dbg( p_intf, "waited %i ms for the release notes", (i * 100000) );
-        msleep( 500000 );
-
-        /* let's open our cached release note and display it
-         * we can't use NSString stringWithContentsOfFile:encoding:error: 
-         * since it is Tiger only */
-        NSString * releaseNote = [[NSString alloc] initWithData: \
-            [NSData dataWithContentsOfFile: pathToReleaseNote] \
-            encoding: NSISOLatin1StringEncoding];
-        if( releaseNote )
-            [o_fld_releaseNote setString: releaseNote];
-
-        /* delete the file since it isn't needed anymore */
-        BOOL myBOOL = NO;
-        myBOOL = [[NSFileManager defaultManager] removeFileAtPath: \
-            pathToReleaseNote handler: nil];
+        else
+        {
+            /* don't confuse the user, but make her happy */
+            [o_fld_status setStringValue: _NS("This version of VLC " \
+                "is latest available.")];
+            [o_btn_DownloadNow setEnabled: NO];
+            msg_Dbg( p_intf, "current version is up-to-date" );
+            msg_Warn( p_intf, "retrieving current release notes failed!" );
+        }
     }
 }
 
