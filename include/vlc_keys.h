@@ -258,3 +258,11 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_DEINTERLACE           69
 #define ACTIONID_ZOOM                  70
 #define ACTIONID_UNZOOM                71
+#define ACTIONID_CROP_TOP              72
+#define ACTIONID_UNCROP_TOP            73
+#define ACTIONID_CROP_LEFT             74
+#define ACTIONID_UNCROP_LEFT           75
+#define ACTIONID_CROP_BOTTOM           76
+#define ACTIONID_UNCROP_BOTTOM         77
+#define ACTIONID_CROP_RIGHT            78
+#define ACTIONID_UNCROP_RIGHT          79

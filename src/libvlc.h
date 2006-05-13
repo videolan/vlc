@@ -1088,6 +1088,26 @@ static char *ppsz_clock_descriptions[] =
 #define UNZOOM_KEY_TEXT N_("Un-Zoom")
 #define UNZOOM_KEY_LONGTEXT N_("Un-Zoom")
 
+#define CROP_TOP_KEY_TEXT N_("Crop one pixel from the top of the video")
+#define CROP_TOP_KEY_LONGTEXT N_("Crop one pixel from the top of the video")
+#define UNCROP_TOP_KEY_TEXT N_("Uncrop one pixel from the top of the video")
+#define UNCROP_TOP_KEY_LONGTEXT N_("Uncrop one pixel from the top of the video")
+
+#define CROP_LEFT_KEY_TEXT N_("Crop one pixel from the left of the video")
+#define CROP_LEFT_KEY_LONGTEXT N_("Crop one pixel from the left of the video")
+#define UNCROP_LEFT_KEY_TEXT N_("Uncrop one pixel from the left of the video")
+#define UNCROP_LEFT_KEY_LONGTEXT N_("Uncrop one pixel from the left of the video")
+
+#define CROP_BOTTOM_KEY_TEXT N_("Crop one pixel from the bottom of the video")
+#define CROP_BOTTOM_KEY_LONGTEXT N_("Crop one pixel from the bottom of the video")
+#define UNCROP_BOTTOM_KEY_TEXT N_("Uncrop one pixel from the bottom of the video")
+#define UNCROP_BOTTOM_KEY_LONGTEXT N_("Uncrop one pixel from the bottom of the video")
+
+#define CROP_RIGHT_KEY_TEXT N_("Crop one pixel from the right of the video")
+#define CROP_RIGHT_KEY_LONGTEXT N_("Crop one pixel from the right of the video")
+#define UNCROP_RIGHT_KEY_TEXT N_("Uncrop one pixel from the right of the video")
+#define UNCROP_RIGHT_KEY_LONGTEXT N_("Uncrop one pixel from the right of the video")
+
 
 #define VLC_USAGE N_( \
     "Usage: %s [options] [stream] ..." \
@@ -1661,6 +1681,15 @@ vlc_module_begin();
 #   define KEY_ZOOM               'z'
 #   define KEY_UNZOOM             KEY_MODIFIER_SHIFT|'z'
 
+#   define KEY_CROP_TOP           KEY_MODIFIER_ALT|'i'
+#   define KEY_UNCROP_TOP         KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'i'
+#   define KEY_CROP_LEFT          KEY_MODIFIER_ALT|'j'
+#   define KEY_UNCROP_LEFT        KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'j'
+#   define KEY_CROP_BOTTOM        KEY_MODIFIER_ALT|'k'
+#   define KEY_UNCROP_BOTTOM      KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'k'
+#   define KEY_CROP_RIGHT         KEY_MODIFIER_ALT|'l'
+#   define KEY_UNCROP_RIGHT       KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'l'
+
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_COMMAND|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_COMMAND|KEY_F2
 #   define KEY_SET_BOOKMARK3      KEY_MODIFIER_COMMAND|KEY_F3
@@ -1733,6 +1762,15 @@ vlc_module_begin();
 #   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|'s'
 #   define KEY_ZOOM               'z'
 #   define KEY_UNZOOM             KEY_MODIFIER_SHIFT|'z'
+
+#   define KEY_CROP_TOP           KEY_MODIFIER_ALT|'i'
+#   define KEY_UNCROP_TOP         KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'i'
+#   define KEY_CROP_LEFT          KEY_MODIFIER_ALT|'j'
+#   define KEY_UNCROP_LEFT        KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'j'
+#   define KEY_CROP_BOTTOM        KEY_MODIFIER_ALT|'k'
+#   define KEY_UNCROP_BOTTOM      KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'k'
+#   define KEY_CROP_RIGHT         KEY_MODIFIER_ALT|'l'
+#   define KEY_UNCROP_RIGHT       KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'l'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_CTRL|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_CTRL|KEY_F2
@@ -1858,6 +1896,23 @@ vlc_module_begin();
              ZOOM_KEY_TEXT, ZOOM_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-unzoom", KEY_UNZOOM, NULL,
              UNZOOM_KEY_TEXT, UNZOOM_KEY_LONGTEXT, VLC_TRUE );
+
+    add_key( "key-crop-top", KEY_CROP_TOP, NULL,
+             CROP_TOP_KEY_TEXT, CROP_TOP_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-uncrop-top", KEY_UNCROP_TOP, NULL,
+             UNCROP_TOP_KEY_TEXT, UNCROP_TOP_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-crop-left", KEY_CROP_LEFT, NULL,
+             CROP_LEFT_KEY_TEXT, CROP_LEFT_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-uncrop-left", KEY_UNCROP_LEFT, NULL,
+             UNCROP_LEFT_KEY_TEXT, UNCROP_LEFT_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-crop-bottom", KEY_CROP_BOTTOM, NULL,
+             CROP_BOTTOM_KEY_TEXT, CROP_BOTTOM_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-uncrop-bottom", KEY_UNCROP_BOTTOM, NULL,
+             UNCROP_BOTTOM_KEY_TEXT, UNCROP_BOTTOM_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-crop-right", KEY_CROP_RIGHT, NULL,
+             CROP_RIGHT_KEY_TEXT, CROP_RIGHT_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-uncrop-right", KEY_UNCROP_RIGHT, NULL,
+             UNCROP_RIGHT_KEY_TEXT, UNCROP_RIGHT_KEY_LONGTEXT, VLC_TRUE );
 
     set_section ( N_("Jump sizes" ), NULL );
     add_integer( "extrashort-jump-size", 3, NULL, JIEXTRASHORT_TEXT,
@@ -2014,6 +2069,14 @@ static struct hotkey p_hotkeys[] =
     { "key-snapshot", ACTIONID_SNAPSHOT, 0, 0, 0, 0 },
     { "key-zoom", ACTIONID_ZOOM, 0, 0, 0, 0 },
     { "key-unzoom", ACTIONID_UNZOOM, 0, 0, 0, 0 },
+    { "key-crop-top", ACTIONID_CROP_TOP, 0, 0, 0, 0 },
+    { "key-uncrop-top", ACTIONID_UNCROP_TOP, 0, 0, 0, 0 },
+    { "key-crop-left", ACTIONID_CROP_LEFT, 0, 0, 0, 0 },
+    { "key-uncrop-left", ACTIONID_UNCROP_LEFT, 0, 0, 0, 0 },
+    { "key-crop-bottom", ACTIONID_CROP_BOTTOM, 0, 0, 0, 0 },
+    { "key-uncrop-bottom", ACTIONID_UNCROP_BOTTOM, 0, 0, 0, 0 },
+    { "key-crop-right", ACTIONID_CROP_RIGHT, 0, 0, 0, 0 },
+    { "key-uncrop-right", ACTIONID_UNCROP_RIGHT, 0, 0, 0, 0 },
     { "key-nav-activate", ACTIONID_NAV_ACTIVATE, 0, 0, 0, 0 },
     { "key-nav-up", ACTIONID_NAV_UP, 0, 0, 0, 0 },
     { "key-nav-down", ACTIONID_NAV_DOWN, 0, 0, 0, 0 },

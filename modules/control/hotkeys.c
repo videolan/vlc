@@ -618,6 +618,50 @@ static void Run( intf_thread_t *p_intf )
                                 text_list.p_list->p_values[i].var.psz_name );
                 }
             }
+            else if( i_action == ACTIONID_CROP_TOP && p_vout )
+            {
+                int i_val = var_GetInteger( p_vout, "crop-top" );
+                var_SetInteger( p_vout, "crop-top", i_val+1 );
+            }
+            else if( i_action == ACTIONID_UNCROP_TOP && p_vout )
+            {
+                int i_val = var_GetInteger( p_vout, "crop-top" );
+                if( i_val != 0 )
+                    var_SetInteger( p_vout, "crop-top", i_val-1 );
+            }
+            else if( i_action == ACTIONID_CROP_BOTTOM && p_vout )
+            {
+                int i_val = var_GetInteger( p_vout, "crop-bottom" );
+                var_SetInteger( p_vout, "crop-bottom", i_val+1 );
+            }
+            else if( i_action == ACTIONID_UNCROP_BOTTOM && p_vout )
+            {
+                int i_val = var_GetInteger( p_vout, "crop-bottom" );
+                if( i_val != 0 )
+                    var_SetInteger( p_vout, "crop-bottom", i_val-1 );
+            }
+            else if( i_action == ACTIONID_CROP_LEFT && p_vout )
+            {
+                int i_val = var_GetInteger( p_vout, "crop-left" );
+                var_SetInteger( p_vout, "crop-left", i_val+1 );
+            }
+            else if( i_action == ACTIONID_UNCROP_LEFT && p_vout )
+            {
+                int i_val = var_GetInteger( p_vout, "crop-left" );
+                if( i_val != 0 )
+                    var_SetInteger( p_vout, "crop-left", i_val-1 );
+            }
+            else if( i_action == ACTIONID_CROP_RIGHT && p_vout )
+            {
+                int i_val = var_GetInteger( p_vout, "crop-right" );
+                var_SetInteger( p_vout, "crop-right", i_val+1 );
+            }
+            else if( i_action == ACTIONID_UNCROP_RIGHT && p_vout )
+            {
+                int i_val = var_GetInteger( p_vout, "crop-right" );
+                if( i_val != 0 )
+                    var_SetInteger( p_vout, "crop-right", i_val-1 );
+            }
             else if( i_action == ACTIONID_NEXT )
             {
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
