@@ -1713,7 +1713,7 @@ vlc_module_begin();
 #   define KEY_INTF_HIDE          'I'
 #   define KEY_DISC_MENU          KEY_MODIFIER_CTRL|'m'
 #   define KEY_TITLE_PREV         KEY_MODIFIER_CTRL|'p'
-#   define KEY_TITLE_NEXT         KEY_MODIFIER_CTRL|'n'
+#   define KEY_TITLE_NEXT         KEY_MODIFIER_CTRL|'f'
 #   define KEY_CHAPTER_PREV       KEY_MODIFIER_CTRL|'u'
 #   define KEY_CHAPTER_NEXT       KEY_MODIFIER_CTRL|'d'
 #   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|'s'
