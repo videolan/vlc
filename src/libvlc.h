@@ -1072,6 +1072,12 @@ static char *ppsz_clock_descriptions[] =
 #define RECORD_KEY_TEXT N_("Record")
 #define RECORD_KEY_LONGTEXT N_("Record access filter start/stop.")
 
+#define ZOOM_KEY_TEXT N_("Zoom")
+#define ZOOM_KEY_LONGTEXT N_("Zoom")
+
+#define UNZOOM_KEY_TEXT N_("Un-Zoom")
+#define UNZOOM_KEY_LONGTEXT N_("Un-Zoom")
+
 
 #define VLC_USAGE N_( \
     "Usage: %s [options] [stream] ..." \
@@ -1638,6 +1644,8 @@ vlc_module_begin();
 #   define KEY_CHAPTER_PREV       KEY_MODIFIER_CTRL|'u'
 #   define KEY_CHAPTER_NEXT       KEY_MODIFIER_CTRL|'d'
 #   define KEY_SNAPSHOT           KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'s'
+#   define KEY_ZOOM               'z'
+#   define KEY_UNZOOM             KEY_MODIFIER_SHIFT|'z'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_COMMAND|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_COMMAND|KEY_F2
@@ -1709,6 +1717,8 @@ vlc_module_begin();
 #   define KEY_CHAPTER_PREV       KEY_MODIFIER_CTRL|'u'
 #   define KEY_CHAPTER_NEXT       KEY_MODIFIER_CTRL|'d'
 #   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|'s'
+#   define KEY_ZOOM               'z'
+#   define KEY_UNZOOM             KEY_MODIFIER_SHIFT|'z'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_CTRL|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_CTRL|KEY_F2
@@ -1830,6 +1840,10 @@ vlc_module_begin();
              HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
     add_key( "key-record", KEY_RECORD, NULL,
              RECORD_KEY_TEXT, RECORD_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-zoom", KEY_ZOOM, NULL,
+             ZOOM_KEY_TEXT, ZOOM_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-unzoom", KEY_UNZOOM, NULL,
+             UNZOOM_KEY_TEXT, UNZOOM_KEY_LONGTEXT, VLC_TRUE );
 
     set_section ( N_("Jump sizes" ), NULL );
     add_integer( "extrashort-jump-size", 3, NULL, JIEXTRASHORT_TEXT,
@@ -1984,6 +1998,8 @@ static struct hotkey p_hotkeys[] =
     { "key-intf-show", ACTIONID_INTF_SHOW, 0, 0, 0, 0 },
     { "key-intf-hide", ACTIONID_INTF_HIDE, 0, 0, 0, 0 },
     { "key-snapshot", ACTIONID_SNAPSHOT, 0, 0, 0, 0 },
+    { "key-zoom", ACTIONID_ZOOM, 0, 0, 0, 0 },
+    { "key-unzoom", ACTIONID_UNZOOM, 0, 0, 0, 0 },
     { "key-nav-activate", ACTIONID_NAV_ACTIVATE, 0, 0, 0, 0 },
     { "key-nav-up", ACTIONID_NAV_UP, 0, 0, 0, 0 },
     { "key-nav-down", ACTIONID_NAV_DOWN, 0, 0, 0, 0 },

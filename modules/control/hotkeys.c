@@ -589,6 +589,35 @@ static void Run( intf_thread_t *p_intf )
                 }
                 free( val.psz_string );
             }
+            else if( ( i_action == ACTIONID_ZOOM || i_action == ACTIONID_UNZOOM ) && p_vout )
+            {
+                vlc_value_t val={0}, val_list, text_list;
+                var_Get( p_vout, "zoom", &val );
+                if( var_Change( p_vout, "zoom", VLC_VAR_GETLIST,
+                                &val_list, &text_list ) >= 0 )
+                {
+                    int i;
+                    for( i = 0; i < val_list.p_list->i_count; i++ )
+                    {
+                        if( val_list.p_list->p_values[i].f_float
+                           == val.f_float )
+                        {
+                            if( i_action == ACTIONID_ZOOM )
+                                i++;
+                            else /* ACTIONID_UNZOOM */
+                                i--;
+                            break;
+                        }
+                    }
+                    if( i == val_list.p_list->i_count ) i = 0;
+                    if( i == -1 ) i = val_list.p_list->i_count-1;
+                    var_SetFloat( p_vout, "zoom",
+                                  val_list.p_list->p_values[i].f_float );
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                     _("Zoom mode: %s"),
+                                text_list.p_list->p_values[i].var.psz_name );
+                }
+            }
             else if( i_action == ACTIONID_NEXT )
             {
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,

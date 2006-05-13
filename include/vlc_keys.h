@@ -256,3 +256,5 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_ASPECT_RATIO          67
 #define ACTIONID_CROP                  68
 #define ACTIONID_DEINTERLACE           69
+#define ACTIONID_ZOOM                  70
+#define ACTIONID_UNZOOM                71
