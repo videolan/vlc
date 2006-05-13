@@ -103,6 +103,21 @@ void X11Factory::minimize()
                     DefaultScreen( m_pDisplay->getDisplay() ) );
 }
 
+void X11Factory::restore()
+{
+    // TODO
+}
+
+void X11Factory::addInTray()
+{
+    // TODO
+}
+
+void X11Factory::removeFromTray()
+{
+    // TODO
+}
+
 OSTimer *X11Factory::createOSTimer( CmdGeneric &rCmd )
 {
     return new X11Timer( getIntf(), rCmd );

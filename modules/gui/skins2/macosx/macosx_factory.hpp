@@ -49,8 +49,17 @@ class MacOSXFactory: public OSFactory
         /// Instantiate an OSTimer with the given callback
         virtual OSTimer *createOSTimer( const Callback &rCallback );
 
-        ///
+        /// Minimize all the windows
         virtual void minimize();
+
+        /// Restore the minimized windows
+        virtual void restore();
+
+        /// Add an icon in the system tray
+        virtual void addInTray();
+
+        /// Remove the icon from the system tray
+        virtual void removeFromTray();
 
         /// Instantiate an OSWindow object
         virtual OSWindow *createOSWindow( GenericWindow &rWindow,

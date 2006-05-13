@@ -78,8 +78,17 @@ class OSFactory: public SkinObject
         /// Destroy the instance of OSLoop
         virtual void destroyOSLoop() = 0;
 
-        ///
+        /// Minimize all the windows
         virtual void minimize() = 0;
+
+        /// Restore the minimized windows
+        virtual void restore() = 0;
+
+        /// Add an icon in the system tray
+        virtual void addInTray() = 0;
+
+        /// Remove the icon from the system tray
+        virtual void removeFromTray() = 0;
 
         /// Instantiate an OSTimer with the given command
         virtual OSTimer *createOSTimer( CmdGeneric &rCmd ) = 0;

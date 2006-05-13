@@ -33,7 +33,8 @@
 #include "win32_loop.hpp"
 #include "../src/theme.hpp"
 #include "../src/window_manager.hpp"
-#include "commands/cmd_dialogs.hpp"
+#include "../commands/cmd_dialogs.hpp"
+#include "../commands/cmd_minimize.hpp"
 
 // Custom message for the notifications of the system tray
 #define MY_WSTRAYACTION (WM_APP + 1)
@@ -92,7 +93,8 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
             }
             else if( (UINT)lParam == WM_LBUTTONDBLCLK )
             {
-                ShowWindow( hwnd, SW_RESTORE );
+                CmdRestore aCmdRestore( p_intf );
+                aCmdRestore.execute();
             }
         }
     }
@@ -172,7 +174,7 @@ bool Win32Factory::init()
     // Show the systray icon if needed
     if( config_GetInt( getIntf(), "skins2-systray" ) )
     {
-        Shell_NotifyIcon( NIM_ADD, &m_trayIcon );
+        addInTray();
     }
 
     // We do it this way otherwise CreateWindowEx will fail
@@ -242,7 +244,7 @@ Win32Factory::~Win32Factory()
     OleUninitialize();
 
     // Remove the systray icon
-    Shell_NotifyIcon( NIM_DELETE, &m_trayIcon );
+    removeFromTray();
 
     if( m_hParentWindow ) DestroyWindow( m_hParentWindow );
 
@@ -277,6 +279,21 @@ void Win32Factory::minimize()
     getIntf()->p_sys->p_theme->getWindowManager().hideTooltip();
 
     ShowWindow( m_hParentWindow, SW_MINIMIZE );
+}
+
+void Win32Factory::restore()
+{
+    ShowWindow( m_hParentWindow, SW_RESTORE );
+}
+
+void Win32Factory::addInTray()
+{
+    Shell_NotifyIcon( NIM_ADD, &m_trayIcon );
+}
+
+void Win32Factory::removeFromTray()
+{
+    Shell_NotifyIcon( NIM_DELETE, &m_trayIcon );
 }
 
 OSTimer *Win32Factory::createOSTimer( CmdGeneric &rCmd )

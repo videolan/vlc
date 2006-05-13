@@ -29,5 +29,8 @@
 
 /// Command to minimize VLC
 DEFINE_COMMAND(Minimize, "minimize" )
+DEFINE_COMMAND(Restore, "restore" )
+DEFINE_COMMAND(AddInTray, "add in tray" )
+DEFINE_COMMAND(RemoveFromTray, "remove from tray" )
 
 #endif
