@@ -30,6 +30,7 @@
 #endif
 
 #include <windows.h>
+#include <shellapi.h>
 #include "../src/os_factory.hpp"
 #include <map>
 
@@ -113,6 +114,8 @@ class Win32Factory: public OSFactory
         HINSTANCE m_hInst;
         /// Handle of the parent window
         HWND m_hParentWindow;
+        /// Structure for the system tray
+        NOTIFYICONDATA m_trayIcon;
         /// Handle on msimg32.dll (for TransparentBlt)
         HINSTANCE m_hMsimg32;
         /// Handle on user32.dll (for SetLayeredWindowAttributes)

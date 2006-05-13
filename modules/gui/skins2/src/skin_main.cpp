@@ -343,10 +343,10 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 #define SKINS2_LAST      N_("Skin to use")
 #define SKINS2_LAST_LONG N_("Path to the skin to use.")
 #define SKINS2_CONFIG      N_("Config of last used skin")
-/// \bug [String] missing "skin". Remove "by the skins module". Add "do not touch"
-#define SKINS2_CONFIG_LONG N_("Windows configuration of the last used. " \
-        "This option is updated automatically by the skins module." )
-
+#define SKINS2_CONFIG_LONG N_("Windows configuration of the last skin used. " \
+        "This option is updated automatically, do not touch it." )
+#define SKINS2_SYSTRAY      N_("Systray icon")
+#define SKINS2_SYSTRAY_LONG N_("Show a systray icon for VLC")
 #define SKINS2_TRANSPARENCY      N_("Enable transparency effects")
 #define SKINS2_TRANSPARENCY_LONG N_("You can disable all transparency effects"\
     " if you want. This is mainly useful when moving windows does not behave" \
@@ -362,6 +362,8 @@ vlc_module_begin();
                 VLC_TRUE );
         change_autosave();
 #ifdef WIN32
+    add_bool( "skins2-systray", VLC_FALSE, NULL, SKINS2_SYSTRAY,
+              SKINS2_SYSTRAY_LONG, VLC_FALSE );
     add_bool( "skins2-transparency", VLC_FALSE, NULL, SKINS2_TRANSPARENCY,
               SKINS2_TRANSPARENCY_LONG, VLC_FALSE );
 #endif

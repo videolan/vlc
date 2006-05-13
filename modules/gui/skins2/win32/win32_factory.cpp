@@ -32,6 +32,11 @@
 #include "win32_popup.hpp"
 #include "win32_loop.hpp"
 #include "../src/theme.hpp"
+#include "../src/window_manager.hpp"
+#include "commands/cmd_dialogs.hpp"
+
+// Custom message for the notifications of the system tray
+#define MY_WSTRAYACTION (WM_APP + 1)
 
 
 LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
@@ -72,6 +77,23 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 //            if( (Event *)wParam != NULL )
 //                ( (Event *)wParam )->SendEvent();
 //            return 0;
+        }
+        // Handle systray notifications
+        else if( uMsg == MY_WSTRAYACTION )
+        {
+            if( (UINT)lParam == WM_LBUTTONDOWN )
+            {
+                p_intf->p_sys->p_theme->getWindowManager().raiseAll();
+            }
+            else if( (UINT)lParam == WM_RBUTTONDOWN )
+            {
+                CmdDlgShowPopupMenu aCmdPopup( p_intf );
+                aCmdPopup.execute();
+            }
+            else if( (UINT)lParam == WM_LBUTTONDBLCLK )
+            {
+                ShowWindow( hwnd, SW_RESTORE );
+            }
         }
     }
 
@@ -135,14 +157,30 @@ bool Win32Factory::init()
         return false;
     }
 
+    // Store with it a pointer to the interface thread
+    SetWindowLongPtr( m_hParentWindow, GWLP_USERDATA, (LONG_PTR)getIntf() );
+
+    // Initialize the systray icon
+    m_trayIcon.cbSize = sizeof( NOTIFYICONDATA );
+    m_trayIcon.hWnd = m_hParentWindow;
+    m_trayIcon.uID = 42;
+    m_trayIcon.uFlags = NIF_ICON|NIF_TIP|NIF_MESSAGE;
+    m_trayIcon.uCallbackMessage = MY_WSTRAYACTION;
+    m_trayIcon.hIcon = LoadIcon( m_hInst, _T("VLC_ICON") );
+    strcpy( m_trayIcon.szTip, "VLC media player" );
+
+    // Show the systray icon if needed
+    if( config_GetInt( getIntf(), "skins2-systray" ) )
+    {
+        Shell_NotifyIcon( NIM_ADD, &m_trayIcon );
+    }
+
     // We do it this way otherwise CreateWindowEx will fail
     // if WS_EX_LAYERED is not supported
     SetWindowLongPtr( m_hParentWindow, GWL_EXSTYLE,
                       GetWindowLong( m_hParentWindow, GWL_EXSTYLE ) |
                       WS_EX_LAYERED );
 
-    // Store with it a pointer to the interface thread
-    SetWindowLongPtr( m_hParentWindow, GWLP_USERDATA, (LONG_PTR)getIntf() );
     ShowWindow( m_hParentWindow, SW_SHOW );
 
     // Initialize the OLE library (for drag & drop)
@@ -202,6 +240,9 @@ Win32Factory::~Win32Factory()
 {
     // Uninitialize the OLE library
     OleUninitialize();
+
+    // Remove the systray icon
+    Shell_NotifyIcon( NIM_DELETE, &m_trayIcon );
 
     if( m_hParentWindow ) DestroyWindow( m_hParentWindow );
 
@@ -264,7 +305,7 @@ OSPopup *Win32Factory::createOSPopup()
     // In fact, the clean way would be to have in Builder::addPopup() a call
     // to pPopup->associateToWindow() (to be written)... but the problem is
     // that there is no way to access the OS-dependent window handle from a
-    // GenericWindow (we cannot eevn access the OSWindow).
+    // GenericWindow (we cannot even access the OSWindow).
     if( m_windowMap.begin() == m_windowMap.end() )
     {
         msg_Err( getIntf(), "no window has been created before the popup!" );
