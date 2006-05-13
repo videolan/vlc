@@ -409,13 +409,13 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         /* Save the snapshot to a memory zone */
         fmt_in = p_vout->fmt_in;
         fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
-	/* FIXME: should not be hardcoded. We should be able to
-	   specify the snapshot size (snapshot-width and snapshot-height). */
+        /* FIXME: should not be hardcoded. We should be able to
+        specify the snapshot size (snapshot-width and snapshot-height). */
         fmt_out.i_width = 320;
         fmt_out.i_height = 200;
         fmt_out.i_chroma = VLC_FOURCC( 'p','n','g',' ' );
         p_block = ( block_t* ) image_Write( p_image, p_pic, &fmt_in, &fmt_out );
-        if( !p_block ) 
+        if( !p_block )
         {
             msg_Err( p_vout, "Could not get snapshot" );
             image_HandlerDelete( p_image );
@@ -452,22 +452,22 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             image_HandlerDelete( p_image );
             vlc_cond_signal( &p_dest->object_wait );
             vlc_mutex_unlock( &p_dest->object_lock );
-	    vlc_object_release( p_dest );
+            vlc_object_release( p_dest );
             return VLC_ENOMEM;
         }
-	memcpy( p_snapshot->p_data, p_block->p_buffer, p_block->i_buffer );
+        memcpy( p_snapshot->p_data, p_block->p_buffer, p_block->i_buffer );
 
-	p_dest->p_private = p_snapshot;
+        p_dest->p_private = p_snapshot;
 
         block_Release( p_block );
-        
+
         /* Unlock the object */
         vlc_cond_signal( &p_dest->object_wait );
         vlc_mutex_unlock( &p_dest->object_lock );
-	vlc_object_release( p_dest );
+        vlc_object_release( p_dest );
 
         image_HandlerDelete( p_image );
-	return VLC_SUCCESS;
+        return VLC_SUCCESS;
     }
 
 
@@ -574,6 +574,8 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     msg_Dbg( p_vout, "snapshot taken (%s)", psz_filename );
+    vout_OSDMessage( VLC_OBJECT( p_vout ), DEFAULT_CHAN,
+                     _("%s"), psz_filename );
     free( psz_filename );
 
     if( var_GetBool( p_vout, "snapshot-preview" ) )
