@@ -770,7 +770,7 @@ static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     InitWindowSize( p_vout, &p_vout->i_window_width,
                     &p_vout->i_window_height );
-    vout_Control( p_vout, VOUT_SET_SIZE, p_vout->i_window_width, 
+    vout_Control( p_vout, VOUT_SET_SIZE, p_vout->i_window_width,
                   p_vout->i_window_height );
     return VLC_SUCCESS;
 }
@@ -790,30 +790,61 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
     p_vout->fmt_in.i_y_offset = p_vout->fmt_render.i_y_offset;
     p_vout->fmt_in.i_visible_height = p_vout->fmt_render.i_visible_height;
 
-    if( !psz_parser ) goto crop_end;
-
-    i_aspect_num = strtol( newval.psz_string, &psz_end, 10 );
-    if( psz_end == newval.psz_string || !i_aspect_num ) goto crop_end;
-
-    i_aspect_den = strtol( ++psz_parser, &psz_end, 10 );
-    if( psz_end == psz_parser || !i_aspect_den ) goto crop_end;
-
-    i_width = p_vout->fmt_in.i_sar_den * p_vout->fmt_render.i_visible_height *
-        i_aspect_num / i_aspect_den / p_vout->fmt_in.i_sar_num;
-    i_height = p_vout->fmt_render.i_visible_width * p_vout->fmt_in.i_sar_num *
-        i_aspect_den / i_aspect_num / p_vout->fmt_in.i_sar_den;
-
-    if( i_width < p_vout->fmt_render.i_visible_width )
+    if( psz_parser )
     {
-        p_vout->fmt_in.i_x_offset = p_vout->fmt_render.i_x_offset +
-            (p_vout->fmt_render.i_visible_width - i_width) / 2;
-        p_vout->fmt_in.i_visible_width = i_width;
+        /* We're using the 3:4 syntax */
+        i_aspect_num = strtol( newval.psz_string, &psz_end, 10 );
+        if( psz_end == newval.psz_string || !i_aspect_num ) goto crop_end;
+
+        i_aspect_den = strtol( ++psz_parser, &psz_end, 10 );
+        if( psz_end == psz_parser || !i_aspect_den ) goto crop_end;
+
+        i_width = p_vout->fmt_in.i_sar_den*p_vout->fmt_render.i_visible_height *
+            i_aspect_num / i_aspect_den / p_vout->fmt_in.i_sar_num;
+        i_height = p_vout->fmt_render.i_visible_width*p_vout->fmt_in.i_sar_num *
+            i_aspect_den / i_aspect_num / p_vout->fmt_in.i_sar_den;
+
+        if( i_width < p_vout->fmt_render.i_visible_width )
+        {
+            p_vout->fmt_in.i_x_offset = p_vout->fmt_render.i_x_offset +
+                (p_vout->fmt_render.i_visible_width - i_width) / 2;
+            p_vout->fmt_in.i_visible_width = i_width;
+        }
+        else
+        {
+            p_vout->fmt_in.i_y_offset = p_vout->fmt_render.i_y_offset +
+                (p_vout->fmt_render.i_visible_height - i_height) / 2;
+            p_vout->fmt_in.i_visible_height = i_height;
+        }
     }
     else
     {
-        p_vout->fmt_in.i_y_offset = p_vout->fmt_render.i_y_offset +
-            (p_vout->fmt_render.i_visible_height - i_height) / 2;
+        /* Maybe we're using the <width> x <height> + <left> + <top> syntax */
+        unsigned int i_crop_width, i_crop_height, i_crop_top, i_crop_left;
+
+        psz_parser = strchr( newval.psz_string, 'x' );
+        i_crop_width = strtol( newval.psz_string, &psz_end, 10 );
+        if( psz_end != psz_parser ) goto crop_end;
+
+        psz_parser = strchr( ++psz_end, '+' );
+        i_crop_height = strtol( psz_end, &psz_end, 10 );
+        if( psz_end != psz_parser ) goto crop_end;
+
+        psz_parser = strchr( ++psz_end, '+' );
+        i_crop_left = strtol( psz_end, &psz_end, 10 );
+        if( psz_end != psz_parser ) goto crop_end;
+
+        i_crop_top = strtol( ++psz_end, &psz_end, 10 );
+        if( *psz_end != '\0' ) goto crop_end;
+
+        i_width = i_crop_width;
+        p_vout->fmt_in.i_visible_width = i_width;
+
+        i_height = i_crop_height;
         p_vout->fmt_in.i_visible_height = i_height;
+
+        p_vout->fmt_in.i_x_offset = i_crop_left;
+        p_vout->fmt_in.i_y_offset = i_crop_top;
     }
 
  crop_end:
