@@ -56,3 +56,19 @@ void CmdRemoveFromTray::execute()
     pOsFactory->removeFromTray();
 }
 
+
+void CmdAddInTaskBar::execute()
+{
+    // Get the instance of OSFactory
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    pOsFactory->addInTaskBar();
+}
+
+
+void CmdRemoveFromTaskBar::execute()
+{
+    // Get the instance of OSFactory
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    pOsFactory->removeFromTaskBar();
+}
+

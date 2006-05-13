@@ -150,7 +150,7 @@ bool Win32Factory::init()
     }
 
     // Create Window
-    m_hParentWindow = CreateWindowEx( WS_EX_APPWINDOW, _T("SkinWindowClass"),
+    m_hParentWindow = CreateWindowEx( WS_EX_TOOLWINDOW, _T("SkinWindowClass"),
         _T("VLC media player"), WS_SYSMENU|WS_POPUP,
         -200, -200, 0, 0, 0, 0, m_hInst, 0 );
     if( m_hParentWindow == NULL )
@@ -161,6 +161,14 @@ bool Win32Factory::init()
 
     // Store with it a pointer to the interface thread
     SetWindowLongPtr( m_hParentWindow, GWLP_USERDATA, (LONG_PTR)getIntf() );
+
+    // We do it this way otherwise CreateWindowEx will fail
+    // if WS_EX_LAYERED is not supported
+    SetWindowLongPtr( m_hParentWindow, GWL_EXSTYLE,
+                      GetWindowLong( m_hParentWindow, GWL_EXSTYLE ) |
+                      WS_EX_LAYERED );
+
+    ShowWindow( m_hParentWindow, SW_SHOW );
 
     // Initialize the systray icon
     m_trayIcon.cbSize = sizeof( NOTIFYICONDATA );
@@ -177,13 +185,11 @@ bool Win32Factory::init()
         addInTray();
     }
 
-    // We do it this way otherwise CreateWindowEx will fail
-    // if WS_EX_LAYERED is not supported
-    SetWindowLongPtr( m_hParentWindow, GWL_EXSTYLE,
-                      GetWindowLong( m_hParentWindow, GWL_EXSTYLE ) |
-                      WS_EX_LAYERED );
-
-    ShowWindow( m_hParentWindow, SW_SHOW );
+    // Show the task in the task bar if needed
+    if( config_GetInt( getIntf(), "skins2-taskbar" ) )
+    {
+        addInTaskBar();
+    }
 
     // Initialize the OLE library (for drag & drop)
     OleInitialize( NULL );
@@ -294,6 +300,22 @@ void Win32Factory::addInTray()
 void Win32Factory::removeFromTray()
 {
     Shell_NotifyIcon( NIM_DELETE, &m_trayIcon );
+}
+
+void Win32Factory::addInTaskBar()
+{
+    ShowWindow( m_hParentWindow, SW_HIDE );
+    SetWindowLongPtr( m_hParentWindow, GWL_EXSTYLE,
+                      WS_EX_LAYERED|WS_EX_APPWINDOW );
+    ShowWindow( m_hParentWindow, SW_SHOW );
+}
+
+void Win32Factory::removeFromTaskBar()
+{
+    ShowWindow( m_hParentWindow, SW_HIDE );
+    SetWindowLongPtr( m_hParentWindow, GWL_EXSTYLE,
+                      WS_EX_LAYERED|WS_EX_TOOLWINDOW );
+    ShowWindow( m_hParentWindow, SW_SHOW );
 }
 
 OSTimer *Win32Factory::createOSTimer( CmdGeneric &rCmd )

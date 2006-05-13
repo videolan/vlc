@@ -74,6 +74,12 @@ class X11Factory: public OSFactory
         /// Remove the icon from the system tray
         virtual void removeFromTray();
 
+        /// Show the task in the task bar
+        virtual void addInTaskBar();
+
+        /// Remove the task from the task bar
+        virtual void removeFromTaskBar();
+
         /// Instantiate an OSWindow object
         virtual OSWindow *createOSWindow( GenericWindow &rWindow,
                                           bool dragDrop, bool playOnDrop,

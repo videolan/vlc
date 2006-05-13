@@ -65,6 +65,9 @@ static int DemuxControl( demux_t *, int, va_list );
 static int onSystrayChange( vlc_object_t *pObj, const char *pVariable,
                             vlc_value_t oldVal, vlc_value_t newVal,
                             void *pParam );
+static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
+                            vlc_value_t oldVal, vlc_value_t newVal,
+                            void *pParam );
 
 
 //---------------------------------------------------------------------------
@@ -378,6 +381,35 @@ static int onSystrayChange( vlc_object_t *pObj, const char *pVariable,
 }
 
 
+/// Callback for the systray configuration option
+static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
+                            vlc_value_t oldVal, vlc_value_t newVal,
+                            void *pParam )
+{
+    intf_thread_t *pIntf =
+        (intf_thread_t*)vlc_object_find( pObj, VLC_OBJECT_INTF, FIND_ANYWHERE );
+
+    if( pIntf == NULL )
+    {
+        return VLC_EGENERIC;
+    }
+
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    if( newVal.b_bool )
+    {
+        CmdAddInTaskBar *pCmd = new CmdAddInTaskBar( pIntf );
+        pQueue->push( CmdGenericPtr( pCmd ) );
+    }
+    else
+    {
+        CmdRemoveFromTaskBar *pCmd = new CmdRemoveFromTaskBar( pIntf );
+        pQueue->push( CmdGenericPtr( pCmd ) );
+    }
+
+    vlc_object_release( pIntf );
+}
+
+
 //---------------------------------------------------------------------------
 // Module descriptor
 //---------------------------------------------------------------------------
@@ -388,6 +420,8 @@ static int onSystrayChange( vlc_object_t *pObj, const char *pVariable,
         "This option is updated automatically, do not touch it." )
 #define SKINS2_SYSTRAY      N_("Systray icon")
 #define SKINS2_SYSTRAY_LONG N_("Show a systray icon for VLC")
+#define SKINS2_TASKBAR      N_("Show VLC on the taskbar")
+#define SKINS2_TASKBAR_LONG N_("Show VLC on the taskbar")
 #define SKINS2_TRANSPARENCY      N_("Enable transparency effects")
 #define SKINS2_TRANSPARENCY_LONG N_("You can disable all transparency effects"\
     " if you want. This is mainly useful when moving windows does not behave" \
@@ -405,6 +439,8 @@ vlc_module_begin();
 #ifdef WIN32
     add_bool( "skins2-systray", VLC_FALSE, onSystrayChange, SKINS2_SYSTRAY,
               SKINS2_SYSTRAY_LONG, VLC_FALSE );
+    add_bool( "skins2-taskbar", VLC_TRUE, onTaskBarChange, SKINS2_TASKBAR,
+              SKINS2_TASKBAR_LONG, VLC_FALSE );
     add_bool( "skins2-transparency", VLC_FALSE, NULL, SKINS2_TRANSPARENCY,
               SKINS2_TRANSPARENCY_LONG, VLC_FALSE );
 #endif

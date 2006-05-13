@@ -89,6 +89,16 @@ void MacOSXFactory::removeFromTray()
     // TODO
 }
 
+void MacOSXFactory::addInTaskBar()
+{
+    // TODO
+}
+
+void MacOSXFactory::removeFromTaskBar()
+{
+    // TODO
+}
+
 OSTimer *MacOSXFactory::createOSTimer( const Callback &rCallback )
 {
     return new MacOSXTimer( getIntf(), rCallback );

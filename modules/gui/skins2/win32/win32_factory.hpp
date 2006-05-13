@@ -66,6 +66,12 @@ class Win32Factory: public OSFactory
         /// Remove the icon from the system tray
         virtual void removeFromTray();
 
+        /// Show the task in the task bar
+        virtual void addInTaskBar();
+
+        /// Remove the task from the task bar
+        virtual void removeFromTaskBar();
+
         /// Instantiate an OSTimer with the given command
         virtual OSTimer *createOSTimer( CmdGeneric &rCmd );
 

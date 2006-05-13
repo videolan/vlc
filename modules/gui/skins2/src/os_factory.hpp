@@ -90,6 +90,12 @@ class OSFactory: public SkinObject
         /// Remove the icon from the system tray
         virtual void removeFromTray() = 0;
 
+        /// Show the task in the task bar
+        virtual void addInTaskBar() = 0;
+
+        /// Remove the task from the task bar
+        virtual void removeFromTaskBar() = 0;
+
         /// Instantiate an OSTimer with the given command
         virtual OSTimer *createOSTimer( CmdGeneric &rCmd ) = 0;
 
