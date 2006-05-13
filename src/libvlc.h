@@ -322,6 +322,16 @@ static char *ppsz_align_descriptions[] =
     "aspect, or a float value (1.25, 1.3333, etc.) expressing pixel " \
     "squareness.")
 
+#define CUSTOM_CROP_RATIOS_TEXT N_("Custom crop ratios list")
+#define CUSTOM_CROP_RATIOS_LONGTEXT N_( \
+    "Comma seperated list of crop ratios which will be added in the " \
+    "interface's crop ratios list.")
+
+#define CUSTOM_ASPECT_RATIOS_TEXT N_("Custom aspect ratios list")
+#define CUSTOM_ASPECT_RATIOS_LONGTEXT N_( \
+    "Comma seperated list of aspect ratios which will be added in the " \
+    "interface's aspect ratio list.")
+
 #define HDTV_FIX_TEXT N_("Fix HDTV height")
 #define HDTV_FIX_LONGTEXT N_( \
     "This allows proper handling of HDTV-1080 video format " \
@@ -1205,10 +1215,12 @@ vlc_module_begin();
     add_integer( "video-x", -1, NULL, VIDEOX_TEXT, VIDEOX_LONGTEXT, VLC_TRUE );
     add_integer( "video-y", -1, NULL, VIDEOY_TEXT, VIDEOY_LONGTEXT, VLC_TRUE );
     add_string( "crop", NULL, NULL, CROP_TEXT, CROP_LONGTEXT, VLC_FALSE );
+    add_string( "custom-crop-ratios", NULL, NULL, CUSTOM_CROP_RATIOS_TEXT,
+                CUSTOM_CROP_RATIOS_LONGTEXT, VLC_FALSE );
     add_string( "aspect-ratio", NULL, NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_FALSE );
-    add_string( "monitor-par", NULL, NULL,
-                MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, VLC_TRUE );
+    add_string( "custom-aspect-ratios", NULL, NULL, CUSTOM_ASPECT_RATIOS_TEXT,
+                CUSTOM_ASPECT_RATIOS_LONGTEXT, VLC_FALSE );
     add_bool( "hdtv-fix", 1, NULL, HDTV_FIX_TEXT, HDTV_FIX_LONGTEXT, VLC_TRUE );
     add_bool( "video-deco", 1, NULL, VIDEO_DECO_TEXT,
               VIDEO_DECO_LONGTEXT, VLC_TRUE );

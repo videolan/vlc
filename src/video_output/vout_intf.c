@@ -181,6 +181,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 {
     vlc_value_t val, text, old_val;
     vlc_bool_t b_force_par = VLC_FALSE;
+    char *psz_buf;
 
     /* Create a few object variables we'll need later on */
     var_Create( p_vout, "snapshot-path", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -248,6 +249,30 @@ void vout_IntfInit( vout_thread_t *p_vout )
     val.psz_string = "5:4"; text.psz_string = "5:4";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
 
+    /* Add custom crop ratios */
+    psz_buf = config_GetPsz( p_vout, "custom-crop-ratios" );
+    if( psz_buf && *psz_buf )
+    {
+        char *psz_cur = psz_buf;
+        char *psz_next;
+        while( psz_cur && *psz_cur )
+        {
+            psz_next = strchr( psz_cur, ',' );
+            if( psz_next )
+            {
+                *psz_next = '\0';
+                psz_next++;
+            }
+            val.psz_string = strdup( psz_cur );
+            text.psz_string = strdup( psz_cur );
+            var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text);
+            free( val.psz_string );
+            free( text.psz_string );
+            psz_cur = psz_next;
+        }
+    }
+    if( psz_buf ) free( psz_buf );
+
     var_AddCallback( p_vout, "crop", CropCallback, NULL );
     var_Get( p_vout, "crop", &old_val );
     if( old_val.psz_string && *old_val.psz_string )
@@ -310,6 +335,30 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "5:4"; text.psz_string = "5:4";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
+
+    /* Add custom aspect ratios */
+    psz_buf = config_GetPsz( p_vout, "custom-aspect-ratios" );
+    if( psz_buf && *psz_buf )
+    {
+        char *psz_cur = psz_buf;
+        char *psz_next;
+        while( psz_cur && *psz_cur )
+        {
+            psz_next = strchr( psz_cur, ',' );
+            if( psz_next )
+            {
+                *psz_next = '\0';
+                psz_next++;
+            }
+            val.psz_string = strdup( psz_cur );
+            text.psz_string = strdup( psz_cur );
+            var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text);
+            free( val.psz_string );
+            free( text.psz_string );
+            psz_cur = psz_next;
+        }
+    }
+    if( psz_buf ) free( psz_buf );
 
     var_AddCallback( p_vout, "aspect-ratio", AspectCallback, NULL );
     var_Get( p_vout, "aspect-ratio", &old_val );
