@@ -1219,6 +1219,8 @@ vlc_module_begin();
                 CUSTOM_CROP_RATIOS_LONGTEXT, VLC_FALSE );
     add_string( "aspect-ratio", NULL, NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_FALSE );
+    add_string( "monitor-par", NULL, NULL,
+                MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, VLC_TRUE );
     add_string( "custom-aspect-ratios", NULL, NULL, CUSTOM_ASPECT_RATIOS_TEXT,
                 CUSTOM_ASPECT_RATIOS_LONGTEXT, VLC_FALSE );
     add_bool( "hdtv-fix", 1, NULL, HDTV_FIX_TEXT, HDTV_FIX_LONGTEXT, VLC_TRUE );
