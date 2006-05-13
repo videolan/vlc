@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout_intf.c : video output interface
  *****************************************************************************
- * Copyright (C) 2000-2004 the VideoLAN team
+ * Copyright (C) 2000-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -819,32 +819,67 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     else
     {
-        /* Maybe we're using the <width> x <height> + <left> + <top> syntax */
-        unsigned int i_crop_width, i_crop_height, i_crop_top, i_crop_left;
-
         psz_parser = strchr( newval.psz_string, 'x' );
-        i_crop_width = strtol( newval.psz_string, &psz_end, 10 );
-        if( psz_end != psz_parser ) goto crop_end;
+        if( psz_parser )
+        {
+            /* Maybe we're using the <width>x<height>+<left>+<top> syntax */
+            unsigned int i_crop_width, i_crop_height, i_crop_top, i_crop_left;
 
-        psz_parser = strchr( ++psz_end, '+' );
-        i_crop_height = strtol( psz_end, &psz_end, 10 );
-        if( psz_end != psz_parser ) goto crop_end;
+            i_crop_width = strtol( newval.psz_string, &psz_end, 10 );
+            if( psz_end != psz_parser ) goto crop_end;
 
-        psz_parser = strchr( ++psz_end, '+' );
-        i_crop_left = strtol( psz_end, &psz_end, 10 );
-        if( psz_end != psz_parser ) goto crop_end;
+            psz_parser = strchr( ++psz_end, '+' );
+            i_crop_height = strtol( psz_end, &psz_end, 10 );
+            if( psz_end != psz_parser ) goto crop_end;
 
-        i_crop_top = strtol( ++psz_end, &psz_end, 10 );
-        if( *psz_end != '\0' ) goto crop_end;
+            psz_parser = strchr( ++psz_end, '+' );
+            i_crop_left = strtol( psz_end, &psz_end, 10 );
+            if( psz_end != psz_parser ) goto crop_end;
 
-        i_width = i_crop_width;
-        p_vout->fmt_in.i_visible_width = i_width;
+            i_crop_top = strtol( ++psz_end, &psz_end, 10 );
+            if( *psz_end != '\0' ) goto crop_end;
 
-        i_height = i_crop_height;
-        p_vout->fmt_in.i_visible_height = i_height;
+            i_width = i_crop_width;
+            p_vout->fmt_in.i_visible_width = i_width;
 
-        p_vout->fmt_in.i_x_offset = i_crop_left;
-        p_vout->fmt_in.i_y_offset = i_crop_top;
+            i_height = i_crop_height;
+            p_vout->fmt_in.i_visible_height = i_height;
+
+            p_vout->fmt_in.i_x_offset = i_crop_left;
+            p_vout->fmt_in.i_y_offset = i_crop_top;
+        }
+        else
+        {
+            /* Maybe we're using the <left>+<top>+<right>+<bottom> syntax */
+            unsigned int i_crop_top, i_crop_left, i_crop_bottom, i_crop_right;
+
+            psz_parser = strchr( newval.psz_string, '+' );
+            i_crop_left = strtol( newval.psz_string, &psz_end, 10 );
+            if( psz_end != psz_parser ) goto crop_end;
+
+            psz_parser = strchr( ++psz_end, '+' );
+            i_crop_top = strtol( psz_end, &psz_end, 10 );
+            if( psz_end != psz_parser ) goto crop_end;
+
+            psz_parser = strchr( ++psz_end, '+' );
+            i_crop_right = strtol( psz_end, &psz_end, 10 );
+            if( psz_end != psz_parser ) goto crop_end;
+
+            i_crop_bottom = strtol( ++psz_end, &psz_end, 10 );
+            if( *psz_end != '\0' ) goto crop_end;
+
+
+            i_width = p_vout->fmt_render.i_visible_width
+                      - i_crop_left - i_crop_right;
+            p_vout->fmt_in.i_visible_width = i_width;
+
+            i_height = p_vout->fmt_render.i_visible_height
+                       - i_crop_top - i_crop_bottom;
+            p_vout->fmt_in.i_visible_height = i_height;
+
+            p_vout->fmt_in.i_x_offset = i_crop_left;
+            p_vout->fmt_in.i_y_offset = i_crop_top;
+        }
     }
 
  crop_end:
