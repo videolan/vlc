@@ -170,6 +170,8 @@ VLC_EXPORT( void, __intf_UserFatal,( vlc_object_t*, const char*, const char*, ..
 VLC_EXPORT( int, __intf_UserLoginPassword,( vlc_object_t*, const char*, const char*, char **, char **) );
 #define intf_UserYesNo( a, b, c ) __intf_UserYesNo( VLC_OBJECT(a),b,c )
 VLC_EXPORT( int, __intf_UserYesNo,( vlc_object_t*, const char*, const char*) );
+#define intf_UserOkayCancel( a, b, c ) __intf_UserOkayCancel( VLC_OBJECT(a),b,c )
+VLC_EXPORT( int, __intf_UserOkayCancel,( vlc_object_t*, const char*, const char*) );
 
 #define intf_UserProgress( a, b, c, d ) __intf_UserProgress( VLC_OBJECT(a),b,c, d )
 VLC_EXPORT( int, __intf_UserProgress,( vlc_object_t*, const char*, const char*, float) );
