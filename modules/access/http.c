@@ -407,7 +407,8 @@ connect:
         p_access->psz_demux = strdup( "nsv" );
     }
     else if( p_sys->psz_mime &&
-             !strcasecmp( p_sys->psz_mime, "application/xspf+xml" ) )
+             !strncasecmp( p_sys->psz_mime, "application/xspf+xml", 20 ) &&
+             ( memchr( " ;\t", p_sys->psz_mime[20], 4 ) != NULL ) )
         p_access->psz_demux = strdup( "xspf-open" );
 
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
