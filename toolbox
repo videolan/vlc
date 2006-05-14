@@ -3,7 +3,7 @@
 ##  toolbox for the VLC media player
 ##  $Id$
 ##
-##  Copyright (C) 2005  the VideoLAN team
+##  Copyright (C) 2002-2006  the VideoLAN team
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 ##           Rémi Denis-Courmont <rem # videolan.org>
@@ -35,7 +35,6 @@ recognized flags are:
   --update-flexml         generate and fix flexml and flex code
   --distclean             "make distclean" on steroids
   --dist-contrib          add the contrib dir to MAKE_DIST
-  --make-woody <dir>      change distdir <dir> to a woody distdir
 EOF
   exit 1
 }
@@ -90,9 +89,6 @@ case "$1" in
     ;;
   --distclean)
     action=distclean
-    ;;
-  --make-woody)
-    action=woody
     ;;
   --add-include)
     action=include
@@ -730,11 +726,10 @@ if test "${action}" = "distclean"
 then
   set -x
   # a naive sanity check to make sure we are in a VLC tree
-  test -f vlc.spec.mdk -a -f debian/rules || exit 1
+  test -f vlc.spec.mdk -a -f vlc.win32.nsi.in || exit 1
   # let's rock!
   find . -type f '(' -name '*.[oa]' -o -name '*.so' -o -name '*.sl' -o -name '*.dylib' -o -name '*.dll' -o -name .dirstamp -o '(' '(' ! -path '\./doc/developer/Makefile\.in' ')' -a -name Makefile.in ')' -o -name 'stamp-h*' -o -name '*~' -o -name '*.bak' -o -name '*.moc.cpp' ')' -exec rm -f '{}' ';'
   (cd autotools && find . -name '[a-z]*' -maxdepth 1 -exec rm -f '{}' ';')
-  (cd debian && find . -type d '(' -name '[a-z]*' ! -name 'patches' ')' -maxdepth 1 -exec rm -Rf '{}' ';')
   find msvc -type f -name '*.dsp' -exec rm -f '{}' ';'
   find evc -type f -name '*.vcp' -exec rm -f '{}' ';'
   find . -type d -name '.deps' -exec rm -Rf '{}' ';'
@@ -776,72 +771,5 @@ then
     mkdir "${distdir}/extras/contrib/src/Patches"
   fi
   cp ${srcdir}/extras/contrib/src/Patches/* "${distdir}/extras/contrib/src/Patches/"
-fi
-
-##
-##  Build a woody-friendly package
-##
-if test "${action}" = "woody"
-then
-  set -ex
-  test -d "$1"
-
-  # changelog: replace (1.2.3-4) with (1.2.3-0woody.4)
-  sed -e 's/^vlc (\([^)]*\)-\([^-)]*\))/vlc-woody (\1-0woody.\2)/' \
-      -e 's/ unstable; / stable; /' \
-      < "$1/debian/changelog" > "$1/debian/changelog.woody"
-  mv "$1/debian/changelog.woody" "$1/debian/changelog"
-
-  # control: replace liba52-*-dev with a52dec-dev (>=0.7.3)
-  #                  libdv*-dev with libdv-dev
-  #                  kdelibs4-dev with kdelibs-dev
-  #                  libqt3-mt-dev libqt3-compat-headers with libqt-dev
-  #                  libarts1-dev with libarts-dev
-  #                  libdvdread3-dev with libdvdread2-dev
-  #                  libdvdplay0-dev (>=1.0.1-2) with libdvdplay0-dev
-  #                  libxosd-dev (>=2.2.4-1.3) with libxosd-dev
-  #                  ttf-freefont with ttf-thryomanes
-  #                  dvb-dev (>= 1.0.1-6) with dvb-dev
-  #          remove libwxgtk2.4-dev
-  #                 libidl0 (workaround for mozilla-dev's bad deps)
-  #                 libglib2.0-0 (workaround for mozilla-dev's bad deps)
-  #                 gcc-3.2 (workaround for an ICE in gcc-3.3)
-  #          change Section: gnome with Section: graphics
-  #                 Section: kde with Section: kde
-  #                 Section: libdevel with Section: devel
-  sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
-      -e 's/libdv[0-9]*-dev/libdv-dev/' \
-      -e 's/kdelibs[0-9]*-dev/kdelibs-dev/' \
-      -e 's/libqt[0-9]*-mt-dev/libqt-dev/' \
-      -e 's/, libqt[0-9]*-compat-headers[^,]*//' \
-      -e 's/libarts[0-9]*-dev/libarts-dev/' \
-      -e 's/libdvdread[0-9]*-dev/libdvdread2-dev/' \
-      -e 's/, libdvdplay0-dev[^,]*/, libdvdplay0-dev/' \
-      -e 's/, libxosd-dev[^,]*/, libxosd-dev/' \
-      -e 's/, ttf-freefont[^,]*/, ttf-thryomanes/' \
-      -e 's/, dvb-dev[^,]*/, dvb-dev/' \
-      -e 's/, libwx[^,]*//' \
-      -e '/Package: wxvlc/,/^ *$/d' \
-      -e 's/, libidl0[^,]*//' \
-      -e 's/, libglib2.0-0[^,]*//' \
-      -e 's/, gcc-3.2[^,]*//' \
-      -e 's/Section: gnome/Section: graphics/' \
-      -e 's/Section: kde/Section: graphics/' \
-      -e 's/Section: libdevel/Section: devel/' \
-      < "$1/debian/control" > "$1/debian/control.woody"
-  mv "$1/debian/control.woody" "$1/debian/control"
-
-  # rules: remove wxwindows and skins stuff
-  sed -e '/# Package: wxvlc/,/^ *$/d' \
-      -e 's,--enable-wxwindows,--disable-wxwindows,' \
-      -e 's,--enable-skins,--disable-skins,' \
-      < "$1/debian/rules" > "$1/debian/rules.woody"
-  mv "$1/debian/rules.woody" "$1/debian/rules"
-  chmod 0755 "$1/debian/rules"
-
-  # modules/misc/freetype.c: replace the default font
-  sed -e 's,freefont/FreeSerifBold.ttf,thryomanes/thryb___.ttf,' \
-      < "$1/modules/misc/freetype.c" > "$1/modules/misc/freetype.c.woody"
-  mv "$1/modules/misc/freetype.c.woody" "$1/modules/misc/freetype.c"
 fi
 
