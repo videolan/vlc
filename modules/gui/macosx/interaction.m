@@ -120,6 +120,10 @@
         nib_interact_loaded = [NSBundle loadNibNamed:@"Interaction" owner:self];
         [o_prog_cancel_btn setTitle: _NS("Cancel")];
         [o_prog_bar setUsesThreadedAnimation: YES];
+        [o_auth_login_txt setStringValue: _NS("Login:")];
+        [o_auth_pw_txt setStringValue: _NS("Password:")];
+        [o_auth_cancel_btn setTitle: _NS("Cancel")];
+        [o_auth_ok_btn setTitle: _NS("OK")];
     }
 
     NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : "title"];
@@ -176,6 +180,17 @@
             NSBeginInformationalAlertSheet( o_title, @"Yes", @"No", @"Cancel", \
                 o_window, self,@selector(sheetDidEnd: returnCode: contextInfo:),\
                 NULL, nil, o_description );
+        }
+        else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
+        {
+            msg_Dbg( p_intf, "requested flag: DIALOG_LOGIN_PW_OK_CANCEL" );
+            [o_auth_title setStringValue: o_title];
+            [o_auth_description setStringValue: o_description];
+            [o_auth_login_fld setStringValue: @""];
+            [o_auth_pw_fld setStringValue: @""];
+            [NSApp beginSheet: o_auth_win modalForWindow: o_window \
+                modalDelegate: self didEndSelector: nil contextInfo: nil];
+            [o_auth_win makeKeyWindow];
         }
         else if( p_dialog->i_type & WIDGET_PROGRESS )
         {
@@ -244,6 +259,11 @@
         [NSApp endSheet: o_prog_win];
         [o_prog_win close];
     }
+    if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
+    {
+        [NSApp endSheet: o_auth_win];
+        [o_auth_win close];
+    }
 }
 
 -(void)destroyDialog
@@ -259,6 +279,20 @@
     p_dialog->i_status = ANSWERED_DIALOG;
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
     msg_Dbg( p_intf, "dialog cancelled" );
+}
+
+- (IBAction)okayAndClose:(id)sender
+{
+    msg_Dbg( p_intf, "dialog's okay btn pressed, returning values" );
+    vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
+    if( p_dialog->i_flags == DIALOG_LOGIN_PW_OK_CANCEL )
+    {
+        p_dialog->psz_returned[0] = strdup( [[o_auth_login_fld stringValue] UTF8String] );
+        p_dialog->psz_returned[1] = strdup( [[o_auth_pw_fld stringValue] UTF8String] );
+    }
+    p_dialog->i_return = DIALOG_OK_YES;
+    p_dialog->i_status = ANSWERED_DIALOG;
+    vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
 }
 
 @end

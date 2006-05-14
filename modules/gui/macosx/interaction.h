@@ -38,12 +38,24 @@
     IBOutlet id o_prog_title;
     IBOutlet id o_prog_win;
 
+    /* authentication dialogue */
+    IBOutlet id o_auth_cancel_btn;
+    IBOutlet id o_auth_description;
+    IBOutlet id o_auth_login_fld;
+    IBOutlet id o_auth_login_txt;
+    IBOutlet id o_auth_ok_btn;
+    IBOutlet id o_auth_pw_fld;
+    IBOutlet id o_auth_pw_txt;
+    IBOutlet id o_auth_title;
+    IBOutlet id o_auth_win;
+
     interaction_dialog_t * p_dialog;
     intf_thread_t * p_intf;
     BOOL nib_interact_loaded;
 }
 
 - (IBAction)cancelAndClose:(id)sender;
+- (IBAction)okayAndClose:(id)sender;
 
 -(id)initDialog: (interaction_dialog_t *)_p_dialog;
 -(void)runDialog;

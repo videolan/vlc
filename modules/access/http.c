@@ -290,8 +290,9 @@ connect:
         char *psz_login = NULL; char *psz_password = NULL;
         int i_ret;
         msg_Dbg( p_access, "authentication failed" );
-        i_ret = intf_UserLoginPassword( p_access, "HTTP authentication",
-                         "Please enter a valid login and password.", &psz_login, &psz_password );
+        i_ret = intf_UserLoginPassword( p_access, _("HTTP authentication"),
+                        _("Please enter a valid login name and a password."), 
+                                                &psz_login, &psz_password );
         if( i_ret == DIALOG_OK_YES )
         {
             msg_Dbg( p_access, "retrying with user=%s, pwd=%s",

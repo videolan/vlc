@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Felix Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +53,8 @@ struct interaction_dialog_t
     char           *psz_title;          ///< Title
     char           *psz_description;    ///< Descriptor string
 
+    char           *psz_returned[1];    ///< returned responses from the user
+
     int             i_widgets;          ///< Number of dialog widgets
     user_widget_t **pp_widgets;         ///< Dialog widgets
 
@@ -70,12 +73,13 @@ struct interaction_dialog_t
 /**
  * Possible flags . Reusable and button types
  */
-#define DIALOG_REUSABLE      0x01
-#define DIALOG_OK_CANCEL     0x02
-#define DIALOG_YES_NO        0x04
-#define DIALOG_YES_NO_CANCEL 0x04
-#define DIALOG_CLEAR_NOSHOW  0x08
-#define DIALOG_GOT_ANSWER    0x10
+#define DIALOG_REUSABLE             0x01
+#define DIALOG_OK_CANCEL            0x02
+#define DIALOG_YES_NO               0x04
+#define DIALOG_YES_NO_CANCEL        0x04
+#define DIALOG_CLEAR_NOSHOW         0x08
+#define DIALOG_GOT_ANSWER           0x10
+#define DIALOG_LOGIN_PW_OK_CANCEL   0x20
 
 /**
  * Possible return codes

@@ -2,10 +2,19 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {cancelAndClose = id; }; 
+            ACTIONS = {cancelAndClose = id; okayAndClose = id; }; 
             CLASS = VLCInteraction; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                "o_auth_cancel_btn" = id; 
+                "o_auth_description" = id; 
+                "o_auth_login_fld" = id; 
+                "o_auth_login_txt" = id; 
+                "o_auth_ok_btn" = id; 
+                "o_auth_pw_fld" = id; 
+                "o_auth_pw_txt" = id; 
+                "o_auth_title" = id; 
+                "o_auth_win" = id; 
                 "o_prog_bar" = id; 
                 "o_prog_cancel_btn" = id; 
                 "o_prog_description" = id; 

@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Felix Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -406,47 +407,24 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
                               char **ppsz_login,
                               char **ppsz_password )
 {
+
     int i_ret;
     interaction_dialog_t *p_new = NULL;
-    user_widget_t *p_widget = NULL;
 
     INTERACT_INIT( p_new );
 
     p_new->i_type = INTERACT_DIALOG_TWOWAY;
     p_new->psz_title = strdup( psz_title );
+    p_new->psz_description = strdup( psz_description );
 
-    /* Text */
-    p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
-    p_widget->i_type = WIDGET_TEXT;
-    p_widget->psz_text = strdup( psz_description );
-    p_widget->val.psz_string = NULL;
-    INSERT_ELEM ( p_new->pp_widgets, p_new->i_widgets,
-                  p_new->i_widgets,  p_widget );
-
-    /* Login */
-    p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
-    p_widget->i_type = WIDGET_INPUT_TEXT;
-    p_widget->psz_text = strdup( _("Login") );
-    p_widget->val.psz_string = NULL;
-    INSERT_ELEM ( p_new->pp_widgets, p_new->i_widgets,
-                  p_new->i_widgets,  p_widget );
-
-    /* Password */
-    p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
-    p_widget->i_type = WIDGET_INPUT_TEXT;
-    p_widget->psz_text = strdup( _("Password") );
-    p_widget->val.psz_string = NULL;
-    INSERT_ELEM ( p_new->pp_widgets, p_new->i_widgets,
-                  p_new->i_widgets,  p_widget );
-
-    p_new->i_flags = DIALOG_OK_CANCEL;
+    p_new->i_flags = DIALOG_LOGIN_PW_OK_CANCEL;
 
     i_ret = intf_Interact( p_this, p_new );
 
     if( i_ret != DIALOG_CANCELLED )
     {
-        *ppsz_login = strdup( p_new->pp_widgets[1]->val.psz_string );
-        *ppsz_password = strdup( p_new->pp_widgets[2]->val.psz_string );
+        *ppsz_login = strdup( p_new->psz_returned[0] );
+        *ppsz_password = strdup( p_new->psz_returned[1] );
     }
     return i_ret;
 }
@@ -671,6 +649,9 @@ static void intf_InteractionDialogDestroy( interaction_dialog_t *p_dialog )
     }
     FREE( p_dialog->psz_title );
     FREE( p_dialog->psz_description );
+    
+    FREE( p_dialog->psz_returned[0] );
+    FREE( p_dialog->psz_returned[1] );
 
     free( p_dialog );
 }
