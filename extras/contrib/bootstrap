@@ -139,7 +139,7 @@ echo "LD = ${LD}" >> config.mak
 echo "RANLIB = ${RANLIB}" >> config.mak
 echo "AR = ${AR}" >> config.mak
 echo "EXTRA_CFLAGS = ${EXTRA_CFLAGS}" >> config.mak
-echo "EXTRA_CPPFLAGS = ${EXTRA_CPPFLAGS}" >> config.mak
+echo "EXTRA_CPPFLAGS = ${EXTRA_CPPFLAGS} -I${PREFIX}/include" >> config.mak
 echo "EXTRA_LDFLAGS = ${EXTRA_LDFLAGS}" >> config.mak
 echo "EXTRA_PATH = ${EXTRA_PATH}" >> config.mak
 
