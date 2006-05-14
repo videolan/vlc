@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include <vlc/vlc.h>
+#include <assert.h>
 #include <vlc/input.h>
 #include "vlc_playlist.h"
 
@@ -204,20 +205,14 @@ int playlist_NodeInsert( playlist_t *p_playlist,
                          playlist_item_t *p_parent,
                          int i_position )
 {
-   if( !p_parent || p_parent->i_children == -1 )
-   {
-        msg_Err( p_playlist, "invalid node" );
-        return VLC_EGENERIC;
-   }
+   assert( p_parent && p_parent->i_children != -1 );
    if( i_position == -1 ) i_position = p_parent->i_children ;
 
    INSERT_ELEM( p_parent->pp_children,
                 p_parent->i_children,
                 i_position,
                 p_item );
-
    p_item->p_parent = p_parent;
-
    return VLC_SUCCESS;
 }
 
@@ -346,11 +341,7 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
                          p_root->p_input->psz_name );
 #endif
 
-    if( !p_root  || p_root->i_children == -1 )
-    {
-        msg_Err( p_playlist,"invalid arguments for GetNextLeaf" );
-        return NULL;
-    }
+    assert( p_root && p_root->i_children != -1 );
 
     /* Now, walk the tree until we find a suitable next item */
     p_next = p_item;
@@ -381,11 +372,7 @@ playlist_item_t *playlist_GetNextEnabledLeaf( playlist_t *p_playlist,
                          p_root->p_input->psz_name );
 #endif
 
-    if( !p_root  || p_root->i_children == -1 )
-    {
-        msg_Err( p_playlist,"invalid arguments for GetNextEnabledLeaf" );
-        return NULL;
-    }
+    assert( p_root && p_root->i_children != -1 );
 
     /* Now, walk the tree until we find a suitable next item */
     p_next = p_item;
@@ -425,12 +412,7 @@ playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
         msg_Dbg( p_playlist, "finding previous to play within %s",
                          p_root->p_input->psz_name );
 #endif
-
-    if( !p_root || p_root->i_children == -1 )
-    {
-        msg_Err( p_playlist,"invalid arguments for GetPrevLeaf" );
-        return NULL;
-    }
+    assert( p_root && p_root->i_children != -1 );
 
     /* Now, walk the tree until we find a suitable previous item */
     p_prev = p_item;
