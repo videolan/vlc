@@ -26,8 +26,10 @@
 #include "top_window.hpp"
 #include "os_factory.hpp"
 #include "os_graphics.hpp"
+#include "var_manager.hpp"
 #include "../controls/ctrl_generic.hpp"
 #include "../controls/ctrl_video.hpp"
+#include "../utils/var_bool.hpp"
 
 
 GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
@@ -36,12 +38,16 @@ GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
     SkinObject( pIntf ), m_pWindow( NULL ), m_width( width ),
     m_height( height ), m_minWidth( minWidth ), m_maxWidth( maxWidth ),
     m_minHeight( minHeight ), m_maxHeight( maxHeight ), m_pVideoControl( NULL ),
-    m_visible( false )
+    m_visible( false ), m_pVarActive( NULL )
 {
     // Get the OSFactory
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
     // Create the graphics buffer
     m_pImage = pOsFactory->createOSGraphics( width, height );
+
+    // Create the "active layout" variable and register it in the manager
+    m_pVarActive = new VarBoolImpl( pIntf );
+    VarManager::instance( pIntf )->registerVar( VariablePtr( m_pVarActive ) );
 }
 
 

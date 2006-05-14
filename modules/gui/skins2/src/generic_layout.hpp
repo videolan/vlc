@@ -36,6 +36,7 @@ class Anchor;
 class OSGraphics;
 class CtrlGeneric;
 class CtrlVideo;
+class VarBoolImpl;
 
 
 /// Control and its associated layer
@@ -128,6 +129,10 @@ class GenericLayout: public SkinObject, public Box
         /// Called when the layout is hidden
         virtual void onHide();
 
+        /// Give access to the "active layout" variable
+        // FIXME: we give read/write access
+        VarBoolImpl &getActiveVar() { return *m_pVarActive; }
+
     private:
         /// Parent window of the layout
         TopWindow *m_pWindow;
@@ -145,6 +150,13 @@ class GenericLayout: public SkinObject, public Box
         list<Anchor*> m_anchorList;
         /// Flag to know if the layout is visible
         bool m_visible;
+        /// Variable for the "active state" of the layout
+        /**
+         * Note: the layout is not an observer on this variable, because it
+         * cannot be changed externally (i.e. without an explicit change of
+         * layout). This way, we avoid using a setActiveLayoutInner method.
+         */
+        mutable VarBoolImpl *m_pVarActive;
 };
 
 

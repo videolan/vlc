@@ -401,12 +401,28 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             TopWindow *pWin = pTheme->getWindowById( windowId );
             if( pWin )
             {
-                // Push the visibility variable on the stack
+                // Push the visibility variable onto the stack
                 varStack.push_back( &pWin->getVisibleVar() );
             }
             else
             {
                 msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
+                return NULL;
+            }
+        }
+        else if( token.find( ".isActive" ) != string::npos )
+        {
+            int leftPos = token.find( ".isActive" );
+            string layoutId = token.substr( 0, leftPos );
+            GenericLayout *pLayout = pTheme->getLayoutById( layoutId );
+            if( pLayout )
+            {
+                // Push the isActive variable onto the stack
+                varStack.push_back( &pLayout->getActiveVar() );
+            }
+            else
+            {
+                msg_Err( getIntf(), "unknown layout (%s)", layoutId.c_str() );
                 return NULL;
             }
         }

@@ -323,9 +323,14 @@ void TopWindow::refresh( int left, int top, int width, int height )
 void TopWindow::setActiveLayout( GenericLayout *pLayout )
 {
     bool isVisible = getVisibleVar().get();
-    if( m_pActiveLayout && isVisible )
+    if( m_pActiveLayout )
     {
-        m_pActiveLayout->onHide();
+        if( isVisible )
+        {
+            m_pActiveLayout->onHide();
+        }
+        // The current layout becomes inactive
+        m_pActiveLayout->getActiveVar().set( false );
     }
 
     pLayout->setWindow( this );
@@ -338,6 +343,9 @@ void TopWindow::setActiveLayout( GenericLayout *pLayout )
     {
         pLayout->onShow();
     }
+
+    // The new layout is active
+    pLayout->getActiveVar().set( true );
 }
 
 

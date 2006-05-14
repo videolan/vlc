@@ -314,6 +314,11 @@ difficulty to understand how VLC skins work.</para>
 <sect3 id="Layout">
   <title>Layout</title>
   <para>A layout is one aspect of a window, i.e. a set of controls and anchors. A window can have many layouts, but only one will be visible at any time.</para>
+  <sect4 id="layoutid">
+    <title>id</title>
+    <para>Name of the layout (it may be used for actions). Two layouts cannot have the same id.</para>
+    <para>Default value: none</para>
+  </sect4>
   <sect4 id="layoutwidth">
     <title>width</title>
     <para><!--TODO: calculate it in VLC :)-->Width of the layout. this value is required since VLC is not (yet?) able to calculate it using the sizes and positions of the controls.</para>
@@ -921,7 +926,7 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>WindowID.hide()</emphasis>: Hide the <link linkend="Window">Window</link> whose <link linkend="windowid">id</link> attribute is 'WindowID'.
   </para></listitem>
   <listitem><para>
-    <emphasis>WindowID.setLayout(LayoutID)</emphasis>: Change the layout of the <link linkend="Window">Window</link> whose <link linkend="windowid">id</link> attribute is 'WindowID', using the <link linkend="Layout">Layout</link> whose <link linkend="attrid">id</link> attribute is 'LayoutID'.
+    <emphasis>WindowID.setLayout(LayoutID)</emphasis>: Change the layout of the <link linkend="Window">Window</link> whose <link linkend="windowid">id</link> attribute is 'WindowID', using the <link linkend="Layout">Layout</link> whose <link linkend="layoutid">id</link> attribute is 'LayoutID'.
   </para></listitem>
 </itemizedlist>
 
@@ -1023,7 +1028,10 @@ difficulty to understand how VLC skins work.</para>
    <emphasis>dvd.isActive</emphasis>: True when a DVD is currently playing. This variable can be used to display buttons associated to the <link linkend="dvdactions">dvd.* actions</link> only when needed (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
-    <emphasis>window_name.isVisible</emphasis>: True when the window whose <link linkend="windowid">id</link> is "window_name" is visible, false otherwise.
+    <emphasis>WindowID.isVisible</emphasis>: True when the window whose <link linkend="windowid">id</link> is "WindowID" is visible, false otherwise.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>LayoutID.isVisible</emphasis>: True when the layout whose <link linkend="layoutid">id</link> is "LayoutID" is the active layout in its window (even if the window is hidden), false otherwise (since VLC 0.8.6).
   </para></listitem>
 </itemizedlist>
 
