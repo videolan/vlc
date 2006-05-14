@@ -221,12 +221,9 @@ void intf_InteractionManage( playlist_t *p_playlist )
 }
 
 
-
 #define INTERACT_INIT( new )                                            \
         new = (interaction_dialog_t*)malloc(                            \
                         sizeof( interaction_dialog_t ) );               \
-        new->i_widgets = 0;                                             \
-        new->pp_widgets = NULL;                                         \
         new->psz_title = NULL;                                          \
         new->psz_description = NULL;                                    \
         new->p_private = NULL;                                          \
@@ -250,7 +247,6 @@ void __intf_UserFatal( vlc_object_t *p_this,
 {
     va_list args;
     interaction_dialog_t *p_new = NULL;
-    user_widget_t *p_widget = NULL;
     int i_id = DIALOG_ERRORS;
 
     if( i_id > 0 )
@@ -272,19 +268,9 @@ void __intf_UserFatal( vlc_object_t *p_this,
     p_new->i_type = INTERACT_DIALOG_ONEWAY;
     p_new->psz_title = strdup( psz_title );
 
-    p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
-
-    p_widget->i_type = WIDGET_TEXT;
-    p_widget->val.psz_string = NULL;
-
     va_start( args, psz_format );
-    vasprintf( &p_widget->psz_text, psz_format, args );
+    vasprintf( &p_new->psz_description, psz_format, args );
     va_end( args );
-
-    INSERT_ELEM ( p_new->pp_widgets,
-                  p_new->i_widgets,
-                  p_new->i_widgets,
-                  p_widget );
 
     p_new->i_flags |= DIALOG_CLEAR_NOSHOW;
 
@@ -303,21 +289,12 @@ int __intf_UserYesNo( vlc_object_t *p_this,
 {
     int i_ret;
     interaction_dialog_t *p_new = NULL;
-    user_widget_t *p_widget = NULL;
 
     INTERACT_INIT( p_new );
 
     p_new->i_type = INTERACT_DIALOG_TWOWAY;
     p_new->psz_title = strdup( psz_title );
-
-    /* Text */
-    p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
-    p_widget->i_type = WIDGET_TEXT;
-    p_widget->psz_text = strdup( psz_description );
-    p_widget->val.psz_string = NULL;
-    INSERT_ELEM ( p_new->pp_widgets, p_new->i_widgets,
-                  p_new->i_widgets,  p_widget );
-
+    p_new->psz_description = strdup( psz_description );
     p_new->i_flags = DIALOG_YES_NO_CANCEL;
 
     i_ret = intf_Interact( p_this, p_new );
@@ -325,7 +302,32 @@ int __intf_UserYesNo( vlc_object_t *p_this,
     return i_ret;
 }
 
-/** Helper function to make a progressbar box
+/** Helper function to trigger a okay-cancel dialogue
+ *  \param p_this           Parent vlc_object
+ *  \param psz_title        Title for the dialog
+ *  \param psz_description  A description
+ *  \return                 Clicked button code
+ */
+int __intf_UserOkayCancel( vlc_object_t *p_this,
+                      const char *psz_title,
+                      const char *psz_description )
+{
+    int i_ret;
+    interaction_dialog_t *p_new = NULL;
+
+    INTERACT_INIT( p_new );
+
+    p_new->i_type = INTERACT_DIALOG_TWOWAY;
+    p_new->psz_title = strdup( psz_title );
+    p_new->psz_description = strdup( psz_description );
+    p_new->i_flags = DIALOG_OK_CANCEL;
+
+    i_ret = intf_Interact( p_this, p_new );
+
+    return i_ret;
+}
+
+/** Helper function to create a dialogue showing a progress-bar with some info
  *  \param p_this           Parent vlc_object
  *  \param psz_title        Title for the dialog
  *  \param psz_status       Current status
@@ -354,7 +356,7 @@ int __intf_UserProgress( vlc_object_t *p_this,
     return p_new->i_id;
 }
 
-/** Update a progress bar
+/** Update a progress bar in a dialogue
  *  \param p_this           Parent vlc_object
  *  \param i_id             Identifier of the dialog
  *  \param psz_status       New status
@@ -388,7 +390,7 @@ void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
     vlc_mutex_unlock( &p_interaction->object_lock) ;
 }
 
-/** Helper function to make a login/password box
+/** Helper function to make a login/password dialogue
  *  \param p_this           Parent vlc_object
  *  \param psz_title        Title for the dialog
  *  \param psz_description  A description
@@ -420,6 +422,39 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
     {
         *ppsz_login = strdup( p_new->psz_returned[0] );
         *ppsz_password = strdup( p_new->psz_returned[1] );
+    }
+    return i_ret;
+}
+
+/** Helper function to make a dialogue asking the user for !password string
+ *  \param p_this           Parent vlc_object
+ *  \param psz_title        Title for the dialog
+ *  \param psz_description  A description
+ *  \param ppsz_usersString Returned login
+ *  \return                 Clicked button code
+ */
+int __intf_UserStringInput( vlc_object_t *p_this,
+                              const char *psz_title,
+                              const char *psz_description,
+                              char **ppsz_usersString )
+{
+
+    int i_ret;
+    interaction_dialog_t *p_new = NULL;
+
+    INTERACT_INIT( p_new );
+
+    p_new->i_type = INTERACT_DIALOG_TWOWAY;
+    p_new->psz_title = strdup( psz_title );
+    p_new->psz_description = strdup( psz_description );
+
+    p_new->i_flags = DIALOG_PSZ_INPUT_OK_CANCEL;
+
+    i_ret = intf_Interact( p_this, p_new );
+
+    if( i_ret != DIALOG_CANCELLED )
+    {
+        *ppsz_usersString = strdup( p_new->psz_returned[0] );
     }
     return i_ret;
 }
@@ -629,24 +664,13 @@ static interaction_dialog_t *intf_InteractionGetById( vlc_object_t* p_this,
 
 static void intf_InteractionDialogDestroy( interaction_dialog_t *p_dialog )
 {
-    int i;
-    for( i = p_dialog->i_widgets - 1 ; i >= 0 ; i-- )
-    {
-        user_widget_t *p_widget = p_dialog->pp_widgets[i];
-        FREE( p_widget->psz_text );
-        if( p_widget->i_type == WIDGET_INPUT_TEXT )
-        {
-            FREE( p_widget->val.psz_string );
-        }
+ /*   FREE( p_dialog->val.psz_string );
 
-        REMOVE_ELEM( p_dialog->pp_widgets, p_dialog->i_widgets, i );
-        free( p_widget );
-    }
     FREE( p_dialog->psz_title );
     FREE( p_dialog->psz_description );
     
     FREE( p_dialog->psz_returned[0] );
-    FREE( p_dialog->psz_returned[1] );
+    FREE( p_dialog->psz_returned[1] ); */
 
     free( p_dialog );
 }

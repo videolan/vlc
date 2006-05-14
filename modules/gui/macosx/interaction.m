@@ -110,7 +110,6 @@
 
 -(void)runDialog
 {
-    int i = 0;
     id o_window = NULL;
     if( !p_dialog )
         msg_Err( p_intf, "no available interaction framework" );
@@ -124,6 +123,8 @@
         [o_auth_pw_txt setStringValue: _NS("Password:")];
         [o_auth_cancel_btn setTitle: _NS("Cancel")];
         [o_auth_ok_btn setTitle: _NS("OK")];
+        [o_input_ok_btn setTitle: _NS("OK")];
+        [o_input_cancel_btn setTitle: _NS("Cancel")];
     }
 
     NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : "title"];
@@ -153,33 +154,25 @@
     msg_Dbg( p_intf, "Description: %s", [o_description UTF8String] );
     if( p_dialog->i_id == DIALOG_ERRORS )
     {
-        for( i = 0; i < p_dialog->i_widgets; i++ )
-        {
-            msg_Err( p_intf, "Error: %s", p_dialog->pp_widgets[i]->psz_text );
-        }
+        msg_Err( p_intf, "Error: %s", p_dialog->psz_description );
     }
     else
     {
-        for( i = 0; i < p_dialog->i_widgets; i++ )
-        {
-            msg_Dbg( p_intf, "widget: %s", p_dialog->pp_widgets[i]->psz_text );
-            o_description = [o_description stringByAppendingString: \
-                [NSString stringWithUTF8String: \
-                    p_dialog->pp_widgets[i]->psz_text]];
-        }
         if( p_dialog->i_flags & DIALOG_OK_CANCEL )
         {
             msg_Dbg( p_intf, "requested flag: DIALOG_OK_CANCEL" );
-            NSBeginInformationalAlertSheet( o_title, @"OK" , @"Cancel", nil, \
-                o_window, self,@selector(sheetDidEnd: returnCode: contextInfo:),\
-                NULL, nil, o_description );
+            NSBeginInformationalAlertSheet( o_title, _NS("OK") , _NS("Cancel"),
+                nil, o_window, self,
+                @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, 
+                o_description );
         }
         else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
         {
             msg_Dbg( p_intf, "requested flag: DIALOG_YES_NO_CANCEL" );
-            NSBeginInformationalAlertSheet( o_title, @"Yes", @"No", @"Cancel", \
-                o_window, self,@selector(sheetDidEnd: returnCode: contextInfo:),\
-                NULL, nil, o_description );
+            NSBeginInformationalAlertSheet( o_title, _NS("Yes"), _NS("No"),
+                _NS("Cancel"), o_window, self,
+                @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, 
+                o_description );
         }
         else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
         {
@@ -188,7 +181,7 @@
             [o_auth_description setStringValue: o_description];
             [o_auth_login_fld setStringValue: @""];
             [o_auth_pw_fld setStringValue: @""];
-            [NSApp beginSheet: o_auth_win modalForWindow: o_window \
+            [NSApp beginSheet: o_auth_win modalForWindow: o_window
                 modalDelegate: self didEndSelector: nil contextInfo: nil];
             [o_auth_win makeKeyWindow];
         }
@@ -198,12 +191,22 @@
             [o_prog_title setStringValue: o_title];
             [o_prog_description setStringValue: o_description];
             [o_prog_bar setDoubleValue: 0];
-            [NSApp beginSheet: o_prog_win modalForWindow: o_window \
+            [NSApp beginSheet: o_prog_win modalForWindow: o_window
                 modalDelegate: self didEndSelector: nil contextInfo: nil];
             [o_prog_win makeKeyWindow];
         }
+        else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
+        {
+            msg_Dbg( p_intf, "requested flag: DIALOG_STRING_INPUT_OK" );
+            [o_input_title setStringValue: o_title];
+            [o_input_description setStringValue: o_description];
+            [o_input_fld setStringValue: @""];
+            [NSApp beginSheet: o_input_win modalForWindow: o_window
+                modalDelegate: self didEndSelector: nil contextInfo: nil];
+            [o_input_win makeKeyWindow];
+        }
         else
-            msg_Warn( p_intf, "requested dialog type not implemented yet" );
+            msg_Warn( p_intf, "requested dialog type unknown" );
     }
 }
 
@@ -239,7 +242,6 @@
             [NSString stringWithUTF8String: p_dialog->psz_description]];
         [o_prog_bar setDoubleValue: \
             (double)(p_dialog->val.f_float)];
-        msg_Dbg( p_intf, "new value: %f", [o_prog_bar doubleValue] );
 
         if( [o_prog_bar doubleValue] == 100.0 )
         {
@@ -262,6 +264,11 @@
     {
         [NSApp endSheet: o_auth_win];
         [o_auth_win close];
+    }
+    if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
+    {
+        [NSApp endSheet: o_input_win];
+        [o_input_win close];
     }
 }
 
@@ -289,6 +296,8 @@
         p_dialog->psz_returned[0] = strdup( [[o_auth_login_fld stringValue] UTF8String] );
         p_dialog->psz_returned[1] = strdup( [[o_auth_pw_fld stringValue] UTF8String] );
     }
+    else if( p_dialog->i_flags == DIALOG_PSZ_INPUT_OK_CANCEL )
+        p_dialog->psz_returned[0] = strdup( [[o_input_fld stringValue] UTF8String] );
     p_dialog->i_return = DIALOG_OK_YES;
     p_dialog->i_status = ANSWERED_DIALOG;
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );

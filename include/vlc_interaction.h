@@ -83,6 +83,7 @@ struct interaction_dialog_t
 #define DIALOG_GOT_ANSWER           0x10
 #define DIALOG_LOGIN_PW_OK_CANCEL   0x20
 #define DIALOG_USER_PROGRESS        0x40
+#define DIALOG_PSZ_INPUT_OK_CANCEL      0x80
 
 /**
  * Possible return codes
@@ -175,6 +176,9 @@ VLC_EXPORT( int, __intf_UserProgress,( vlc_object_t*, const char*, const char*, 
 
 #define intf_UserProgressUpdate( a, b, c, d ) __intf_UserProgressUpdate( VLC_OBJECT(a),b,c, d )
 VLC_EXPORT( void, __intf_UserProgressUpdate,( vlc_object_t*, int, const char*, float) );
+
+#define intf_UserStringInput( a, b, c, d ) __intf_UserStringInput( VLC_OBJECT(a),b,c,d )
+VLC_EXPORT( int, __intf_UserStringInput,(vlc_object_t*, const char*, const char*, char **) );
 
 #define intf_UserHide( a, b ) __intf_UserHide( VLC_OBJECT(a), b )
 VLC_EXPORT( void, __intf_UserHide,( vlc_object_t *, int ));

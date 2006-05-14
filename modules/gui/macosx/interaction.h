@@ -49,6 +49,14 @@
     IBOutlet id o_auth_title;
     IBOutlet id o_auth_win;
 
+    /* string input dialogue */
+    IBOutlet id o_input_cancel_btn;
+    IBOutlet id o_input_description;
+    IBOutlet id o_input_fld;
+    IBOutlet id o_input_ok_btn;
+    IBOutlet id o_input_title;
+    IBOutlet id o_input_win;
+
     interaction_dialog_t * p_dialog;
     intf_thread_t * p_intf;
     BOOL nib_interact_loaded;
