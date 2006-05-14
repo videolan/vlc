@@ -378,6 +378,7 @@ static int onSystrayChange( vlc_object_t *pObj, const char *pVariable,
     }
 
     vlc_object_release( pIntf );
+    return VLC_SUCCESS;
 }
 
 
@@ -407,6 +408,7 @@ static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
     }
 
     vlc_object_release( pIntf );
+    return VLC_SUCCESS;
 }
 
 
