@@ -1,0 +1,13 @@
+--- src/common/uri.cpp.orig	2005-08-13 02:24:13.000000000 +0200
++++ src/common/uri.cpp	2006-05-14 10:49:14.000000000 +0200
+@@ -886,8 +886,8 @@
+                     op += 3;
+             }
+ 
+-            m_path = base.m_path.substr(0, bp - base.m_path.c_str()) +
+-                    m_path.substr((op - m_path.c_str()), m_path.Length());
++            m_path = (wxString)base.m_path.substr(0, bp - base.m_path.c_str()) +
++                    (wxString)m_path.substr((op - m_path.c_str()), m_path.Length());
+         }
+     }
+ 

@@ -171,8 +171,8 @@ else
    ifdef HAVE_WINCE
 
    all: .dvbpsi .zlib .ffmpeg .ogg .tremor .faad
-   else
 
+   else
 # Standard Linux or other UNIX-like systems
    all: .iconv .intl .freetype .fribidi .zlib \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
@@ -432,7 +432,7 @@ ifdef HAVE_DARWIN_OS
 	touch $@
 else
 .iconv: libiconv
-	(cd libiconv; CPPFLAGS="-Dssize_t=long" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
+	(cd libiconv; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 endif
@@ -1055,7 +1055,8 @@ ifdef HAVE_DARWIN_OS
 	(cd $<; sed -e 's%EXTRA_CFLAGS%$(EXTRA_CFLAGS)%' -e 's%EXTRA_LDFLAGS%$(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
 	(cd $<; ./genMakefiles macosx && make)
 else
-	(cd $<;./genMakefiles linux && make $(HOSTCC))
+	(cd $<; if [ ! -f groupsock/Makefile.head.orig ] then ; sed -e 's/=/= $$\(EXTRA_CPPFLAGS\)/'  -e 's%EXTRA_CPPFLAGS%$(EXTRA_CPPFLAGS)%' -e 's/$$\(//' -e 's/\)//' -i.orig groupsock/Makefile.head fi )
+	(cd $<; ./genMakefiles && make $(HOSTCC))
 endif
 endif
 endif
@@ -1291,6 +1292,7 @@ wxWidgets-$(WXWIDGETS_VERSION).tar.gz:
 
 wxwidgets: wxWidgets-$(WXWIDGETS_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	(cd wxwidgets; patch -p0 < ../Patches/wxwidgets_uri.patch)
 #	(cd wxwidgets; patch -p1 <../Patches/wxMSW-win32.patch)
 
 .wxwidgets: wxwidgets
