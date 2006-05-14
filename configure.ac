@@ -4287,7 +4287,7 @@ AC_ARG_ENABLE(upnp,
 VLC_ADD_CXXFLAGS([upnp_intel], [ ])
 AS_IF([test "x${enable_upnp}" != "xno"], [
   AC_CHECK_LIB([upnp], [UpnpInit], [has_upnp="yes"], [has_upnp="no"], [-lpthread])
-  AS_IF([test "x${enable_upnp}" != "x" && test "${has_upnp}" = "no"], [
+  AS_IF([test "x${enable_upnp}" != "x" && test "${has_upnp}" = "no"], [
     AC_MSG_ERROR([cannot find Intel UPnP SDK (libupnp)])
   ])
   AS_IF([test "${has_upnp}" = "yes"], [
