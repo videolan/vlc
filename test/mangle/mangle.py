@@ -44,8 +44,11 @@ def process_file_once( file, header_size ):
         os.remove( log_file )
     else:
         l.info( "Potential crash detected : %i, saving results" % suffix )
-        shutil.move( new_file , conf["crashdir"] )
-        shutil.move( log_file , conf["crashdir"] )
+        try:
+            shutil.move( new_file , conf["crashdir"] )
+            shutil.move( log_file , conf["crashdir"] )
+        except:
+            l.error( "Unable to move file" )
 
 def process_file( file, source, header_size ):
      l.info( "Starting work on " + file )
