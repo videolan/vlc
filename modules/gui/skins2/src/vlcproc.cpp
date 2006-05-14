@@ -300,17 +300,6 @@ void VlcProc::refreshAudio()
 
 void VlcProc::refreshPlaylist()
 {
-    // Get the status of the playlist
-    VarBoolImpl *pVarPlaying = (VarBoolImpl*)m_cVarPlaying.get();
-    VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
-    VarBoolImpl *pVarPaused = (VarBoolImpl*)m_cVarPaused.get();
-    playlist_status_t status =
-             getIntf()->p_sys->p_playlist->status.i_status;
-
-    pVarPlaying->set( status == PLAYLIST_RUNNING );
-    pVarStopped->set( status == PLAYLIST_STOPPED );
-    pVarPaused->set( status == PLAYLIST_PAUSED );
-
     // Refresh the random variable
     VarBoolImpl *pVarRandom = (VarBoolImpl*)m_cVarRandom.get();
     vlc_value_t val;
@@ -338,6 +327,11 @@ void VlcProc::refreshInput()
     VarText *pBitrate = (VarText*)m_cVarStreamBitRate.get();
     VarText *pSampleRate = (VarText*)m_cVarStreamSampleRate.get();
     VarBoolImpl *pVarFullscreen = (VarBoolImpl*)m_cVarFullscreen.get();
+    VarBoolImpl *pVarPlaying = (VarBoolImpl*)m_cVarPlaying.get();
+    VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
+    VarBoolImpl *pVarPaused = (VarBoolImpl*)m_cVarPaused.get();
+
+    input_thread_t *pInput = getIntf()->p_sys->p_input;
 
     // Update the input
     if( getIntf()->p_sys->p_input == NULL )
@@ -352,7 +346,6 @@ void VlcProc::refreshInput()
         getIntf()->p_sys->p_input = NULL;
     }
 
-    input_thread_t *pInput = getIntf()->p_sys->p_input;
 
     if( pInput && !pInput->b_die )
     {
@@ -391,6 +384,12 @@ void VlcProc::refreshInput()
             pVarFullscreen->set( pVout->b_fullscreen );
             vlc_object_release( pVout );
         }
+
+        // Refresh play/pause status
+        int state = var_GetInteger( pInput, "state" );
+        pVarStopped->set( false );
+        pVarPlaying->set( state != PAUSE_S );
+        pVarPaused->set( state == PAUSE_S );
     }
     else
     {
@@ -400,6 +399,9 @@ void VlcProc::refreshInput()
         pVarFullscreen->set( false );
         pVarHasAudio->set( false );
         pVarHasVout->set( false );
+        pVarStopped->set( true );
+        pVarPlaying->set( false );
+        pVarPaused->set( false );
     }
 }
 
