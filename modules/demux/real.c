@@ -761,7 +761,7 @@ static int HeaderRead( demux_t *p_demux )
 
                 msg_Dbg( p_demux, "    - title=`%s'", psz );
                 EnsureUTF8( psz );
-                vlc_meta_Add( p_sys->p_meta, VLC_META_TITLE, psz );
+                vlc_meta_SetTitle( p_sys->p_meta, psz );
                 free( psz );
                 i_skip -= i_len;
             }
@@ -776,7 +776,7 @@ static int HeaderRead( demux_t *p_demux )
 
                 msg_Dbg( p_demux, "    - author=`%s'", psz );
                 EnsureUTF8( psz );
-                vlc_meta_Add( p_sys->p_meta, VLC_META_ARTIST, psz );
+                vlc_meta_SetArtist( p_sys->p_meta, psz );
                 free( psz );
                 i_skip -= i_len;
             }
@@ -791,7 +791,7 @@ static int HeaderRead( demux_t *p_demux )
 
                 msg_Dbg( p_demux, "    - copyright=`%s'", psz );
                 EnsureUTF8( psz );
-                vlc_meta_Add( p_sys->p_meta, VLC_META_COPYRIGHT, psz );
+                vlc_meta_SetCopyright( p_sys->p_meta, psz );
                 free( psz );
                 i_skip -= i_len;
             }
@@ -806,7 +806,7 @@ static int HeaderRead( demux_t *p_demux )
 
                 msg_Dbg( p_demux, "    - comment=`%s'", psz );
                 EnsureUTF8( psz );
-                vlc_meta_Add( p_sys->p_meta, VLC_META_DESCRIPTION, psz );
+                vlc_meta_SetDescription( p_sys->p_meta, psz );
                 free( psz );
                 i_skip -= i_len;
             }

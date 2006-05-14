@@ -237,7 +237,9 @@ static int Open( vlc_object_t * p_this )
         p_sys->p_meta = vlc_meta_New();
 
     sprintf( psz_info, "Musepack v%d", p_sys->info.stream_version );
-    vlc_meta_Add( p_sys->p_meta, VLC_META_CODEC_NAME, psz_info );
+    //vlc_meta_SetCodecName( p_sys->p_meta, psz_info );
+    //   ^^ doesn't exist (yet?) to set VLC_META_CODEC_NAME, so...
+    fprintf( stderr, "***** WARNING: Unhandled child meta\n"); 
 
     return VLC_SUCCESS;
 }
@@ -298,16 +300,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     double   f, *pf;
     int64_t i64, *pi64;
-    vlc_meta_t **pp_meta;
+    vlc_meta_t *p_meta;
 
     switch( i_query )
     {
         case DEMUX_GET_META:
-            pp_meta = (vlc_meta_t **)va_arg( args, vlc_meta_t** );
+            p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
             if( p_sys->p_meta )
-                *pp_meta = vlc_meta_Duplicate( p_sys->p_meta );
+                vlc_meta_Merge( p_meta, p_sys->p_meta ); 
             else
-                *pp_meta = NULL;
+                p_meta = NULL;
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
