@@ -387,6 +387,8 @@ static int Open( vlc_object_t * p_this )
                         !strncmp( psz_ref, "rtsp://", 7 ) )
                     {
                         msg_Dbg( p_demux, "adding ref = `%s'", psz_ref );
+                        msg_Err( p_demux, "REF is broken (fix playlist") ;
+#if 0
                         if( p_item )
                         {
                             playlist_item_t *p_child =
@@ -402,6 +404,7 @@ static int Open( vlc_object_t * p_this )
                                 b_play = VLC_TRUE;
                             }
                         }
+#endif
                     }
                     else
                     {
@@ -422,6 +425,8 @@ static int Open( vlc_object_t * p_this )
                         }
                         strcat( psz_absolute, psz_ref );
                         msg_Dbg( p_demux, "adding ref = `%s'", psz_absolute );
+                        msg_Err( p_demux, "Ref broken (fix playlist" );
+#if 0
                         if( p_item )
                         {
                             playlist_item_t *p_child =
@@ -438,6 +443,7 @@ static int Open( vlc_object_t * p_this )
                                 b_play = VLC_TRUE;
                             }
                         }
+#endif
                     }
                 }
                 else
@@ -449,7 +455,6 @@ static int Open( vlc_object_t * p_this )
             if( b_play == VLC_TRUE )
             {
                  playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                                   p_playlist->status.i_view,
                                    p_playlist->status.p_item, NULL );
             }
             vlc_object_release( p_playlist );
@@ -799,15 +804,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_META:
         {
-            vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
-            vlc_meta_t *meta;
+            vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t*);
             MP4_Box_t  *p_udta   = MP4_BoxGet( p_sys->p_root, "/moov/udta" );
             MP4_Box_t  *p_0xa9xxx;
             if( p_udta == NULL )
             {
                 return VLC_EGENERIC;
             }
-            *pp_meta = meta = vlc_meta_New();
             for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL;
                  p_0xa9xxx = p_0xa9xxx->p_next )
             {
@@ -824,25 +827,25 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 switch( p_0xa9xxx->i_type )
                 {
                 case FOURCC_0xa9nam: /* Full name */
-                    vlc_meta_Add( meta, VLC_META_TITLE, psz_utf );
+                    vlc_meta_SetArtist( p_meta, psz_utf );
                     break;
                 case FOURCC_0xa9aut:
-                    vlc_meta_Add( meta, VLC_META_AUTHOR, psz_utf );
+                    vlc_meta_SetAuthor( p_meta, psz_utf );
                     break;
                 case FOURCC_0xa9ART:
-                    vlc_meta_Add( meta, VLC_META_ARTIST, psz_utf );
+                    vlc_meta_SetArtist( p_meta, psz_utf );
                     break;
                 case FOURCC_0xa9cpy:
-                    vlc_meta_Add( meta, VLC_META_COPYRIGHT, psz_utf );
+                    vlc_meta_SetCopyright( p_meta, psz_utf );
                     break;
                 case FOURCC_0xa9day: /* Creation Date */
-                    vlc_meta_Add( meta, VLC_META_DATE, psz_utf );
+                    vlc_meta_SetDate( p_meta, psz_utf );
                     break;
                 case FOURCC_0xa9des: /* Description */
-                    vlc_meta_Add( meta, VLC_META_DESCRIPTION, psz_utf );
+                    vlc_meta_SetDescription( p_meta, psz_utf );
                     break;
                 case FOURCC_0xa9gen: /* Genre */
-                    vlc_meta_Add( meta, VLC_META_GENRE, psz_utf );
+                    vlc_meta_SetGenre( p_meta, psz_utf );
                     break;
 
                 case FOURCC_0xa9swr:

@@ -50,6 +50,8 @@ vlc_module_begin();
     add_bool( "playlist-autostart", 1, NULL,
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, VLC_FALSE );
 
+    add_integer( "parent-item", 0, NULL, NULL, NULL, VLC_TRUE );
+
     set_shortname( _("Playlist") );
     set_description( _("Playlist") );
     add_shortcut( "old-open" );
@@ -153,13 +155,37 @@ char *E_(ProcessMRL)( char *psz_mrl, char *psz_prefix )
     return psz_mrl;
 }
 
+void E_(AddToPlaylist)( demux_t *p_demux, playlist_t *p_playlist,
+                        input_item_t *p_input,
+                        playlist_item_t *p_item, int i_parent_id )
+{
+    // Only add to parent if specific parent requested or not current
+    // playlist item
+   if( i_parent_id > 0 || ! (
+         p_playlist->status.p_item &&
+         p_playlist->status.p_item->p_input ==
+              ((input_thread_t *)p_demux->p_parent)->input.p_item ) )
+   {
+       playlist_NodeAddInput( p_playlist, p_input, p_item,
+                              PLAYLIST_APPEND, PLAYLIST_END );
+   }
+   // Else, add to both
+   else
+   {
+       playlist_BothAddInput( p_playlist, p_input, p_item,
+                              PLAYLIST_APPEND, PLAYLIST_END );
+   }
+   vlc_input_item_CopyOptions( p_item->p_input, p_input );
+}
+
+
 vlc_bool_t E_(FindItem)( demux_t *p_demux, playlist_t *p_playlist,
                      playlist_item_t **pp_item )
 {
      vlc_bool_t b_play = var_CreateGetBool( p_demux, "playlist-autostart" );
 
      if( b_play && p_playlist->status.p_item &&
-             &p_playlist->status.p_item->input ==
+             p_playlist->status.p_item->p_input ==
                 ((input_thread_t *)p_demux->p_parent)->input.p_item )
      {
          msg_Dbg( p_playlist, "starting playlist playback" );

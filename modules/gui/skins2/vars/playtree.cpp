@@ -80,8 +80,8 @@ void Playtree::delSelected()
             playlist_item_t *p_item = (playlist_item_t *)(it->m_pData);
             if( p_item->i_children == -1 )
             {
-                playlist_Delete( getIntf()->p_sys->p_playlist,
-                                     p_item->input.i_id );
+                playlist_DeleteFromItemId( getIntf()->p_sys->p_playlist,
+                                           p_item->i_id );
                 it2 = getNextVisibleItem( it ) ;
                 it->parent()->removeChild( it );
                 it = it2;
@@ -107,21 +107,21 @@ void Playtree::action( VarTree *pItem )
 {
     vlc_mutex_lock( &m_pPlaylist->object_lock );
     VarTree::Iterator it;
-    if( pItem->size() )
+
+    playlist_item_t *p_item = (playlist_item_t *)pItem->m_pData;
+    playlist_item_t *p_parent = p_item;
+    while( p_parent )
     {
-        it = pItem->begin();
-        while( it->size() ) it = it->begin();
+        if( p_parent == m_pPlaylist->p_root_category )
+            break;
+        p_parent = p_parent->p_parent;
     }
-    playlist_Control( m_pPlaylist,
-                      PLAYLIST_VIEWPLAY,
-                      m_pPlaylist->status.i_view,
-                      pItem->size()
-                          ? (playlist_item_t *)pItem->m_pData
-                          : (playlist_item_t *)pItem->parent()->m_pData,
-                      pItem->size()
-                          ? (playlist_item_t *)it->m_pData
-                          : (playlist_item_t *)pItem->m_pData
-                    );
+
+    if( p_parent )
+    {
+        playlist_Control( m_pPlaylist, PLAYLIST_VIEWPLAY, 1242,
+                          p_parent, p_item );
+    }
     vlc_mutex_unlock( &m_pPlaylist->object_lock );
 }
 
@@ -142,7 +142,7 @@ void Playtree::onUpdateItem( int id )
     {
         // Update the item
         playlist_item_t* pNode = (playlist_item_t*)(it->m_pData);
-        UString *pName = new UString( getIntf(), pNode->input.psz_name );
+        UString *pName = new UString( getIntf(), pNode->p_input->psz_name );
         it->m_cString = UStringPtr( pName );
         it->m_playing = m_pPlaylist->status.p_item == pNode;
         if( it->m_playing ) descr.b_active_item = true;
@@ -185,7 +185,8 @@ void Playtree::onAppend( playlist_add_t *p_add )
             playlist_item_t *p_item = playlist_ItemGetById(
                                         m_pPlaylist, p_add->i_item );
             if( !p_item ) return;
-            UString *pName = new UString( getIntf(), p_item->input.psz_name );
+            UString *pName = new UString( getIntf(),
+                                          p_item->p_input->psz_name );
             node->add( p_add->i_item, UStringPtr( pName ),
                       false,false, false, p_item->i_flags & PLAYLIST_RO_FLAG,
                       p_item );
@@ -204,8 +205,8 @@ void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
     for( int i = 0; i < pNode->i_children; i++ )
     {
         UString *pName = new UString( getIntf(),
-                                      pNode->pp_children[i]->input.psz_name );
-        rTree.add( pNode->pp_children[i]->input.i_id, UStringPtr( pName ),
+                                   pNode->pp_children[i]->p_input->psz_name );
+        rTree.add( pNode->pp_children[i]->p_input->i_id, UStringPtr( pName ),
                      false,
                      m_pPlaylist->status.p_item == pNode->pp_children[i],
                      false, pNode->pp_children[i]->i_flags & PLAYLIST_RO_FLAG,
@@ -224,17 +225,16 @@ void Playtree::buildTree()
 
     i_items_to_append = 0;
 
-    playlist_view_t *p_view;
-    p_view = playlist_ViewFind( m_pPlaylist, VIEW_CATEGORY );
-    /// \todo let the user chose the view
-
     clear();
 
+    /* TODO: Let user choose view - Stick with category ATM */
+
     /* Set the root's name */
-    UString *pName = new UString( getIntf(), p_view->p_root->input.psz_name );
+    UString *pName = new UString( getIntf(),
+                             m_pPlaylist->p_root_category->p_input->psz_name );
     m_cString = UStringPtr( pName );
 
-    buildNode( p_view->p_root, *this );
+    buildNode( m_pPlaylist->p_root_category, *this );
 
     vlc_mutex_unlock( &m_pPlaylist->object_lock );
 //  What is it ?

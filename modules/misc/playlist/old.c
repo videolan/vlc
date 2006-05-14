@@ -53,11 +53,12 @@ int Export_Old( vlc_object_t *p_this )
     /* Write header */
     fprintf( p_export->p_file , PLAYLIST_FILE_HEADER "\n" );
 
-    for ( i = 0 ; i < p_playlist->i_size ; i++ )
+    for ( i = 0 ; i < p_export->p_root->i_children ; i++ )
     {
         char *psz_uri;
 
-        psz_uri = ToLocale( p_playlist->pp_items[i]->input.psz_uri );
+        psz_uri =
+             ToLocale( p_export->p_root->pp_children[i]->p_input->psz_name );
         fprintf( p_export->p_file , "%s\n" , psz_uri );
         LocaleFree( psz_uri );
     }

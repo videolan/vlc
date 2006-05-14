@@ -1,5 +1,5 @@
 /*****************************************************************************
- * sap.c :  SAP interface module
+ * hal.c :  HAL interface module
  *****************************************************************************
  * Copyright (C) 2004 the VideoLAN team
  * $Id$
@@ -21,11 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Includes
- *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
@@ -44,21 +39,26 @@
 
 #include <hal/libhal.h>
 
-/************************************************************************
- * Macros and definitions
- ************************************************************************/
-
 #define MAX_LINE_LENGTH 256
 
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+struct services_discovery_sys_t
+{
+    LibHalContext *p_ctx;
+    playlist_item_t *p_node_cat;
+    playlist_item_t *p_node_one;
+};
+static void AddItem( services_discovery_t *p_sd, input_item_t * p_input );
+static void Run    ( services_discovery_t *p_intf );
+
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-
-/* Callbacks */
-    static int  Open ( vlc_object_t * );
-    static void Close( vlc_object_t * );
-
 vlc_module_begin();
     set_description( _("HAL devices detection") );
     set_category( CAT_PLAYLIST );
@@ -71,26 +71,6 @@ vlc_module_end();
 
 
 /*****************************************************************************
- * Local structures
- *****************************************************************************/
-
-struct services_discovery_sys_t
-{
-    LibHalContext *p_ctx;
-
-    /* playlist node */
-    playlist_item_t *p_node;
-
-};
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-
-/* Main functions */
-    static void Run    ( services_discovery_t *p_intf );
-
-/*****************************************************************************
  * Open: initialize and create stuff
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
@@ -101,7 +81,6 @@ static int Open( vlc_object_t *p_this )
 
     vlc_value_t         val;
     playlist_t          *p_playlist;
-    playlist_view_t     *p_view;
 
     DBusError           dbus_error;
     DBusConnection      *p_connection;
@@ -148,11 +127,13 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
-    p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
-                                         _("Devices"), p_view->p_root );
+    p_sys->p_node_cat = playlist_NodeCreate( p_playlist, _("Devices"),
+                                         p_playlist->p_root_category );
+    p_sys->p_node_cat->i_flags |= PLAYLIST_RO_FLAG;
+    p_sys->p_node_one = playlist_NodeCreate( p_playlist, _("Devices"),
+                                         p_playlist->p_root_onelevel );
+    p_sys->p_node_one->i_flags |= PLAYLIST_RO_FLAG;
 
-    p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
 
@@ -172,7 +153,8 @@ static void Close( vlc_object_t *p_this )
                                  VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist )
     {
-        playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE, VLC_TRUE );
+        playlist_NodeDelete( p_playlist, p_sys->p_node_cat, VLC_TRUE,VLC_TRUE );
+        playlist_NodeDelete( p_playlist, p_sys->p_node_one, VLC_TRUE,VLC_TRUE );
         vlc_object_release( p_playlist );
     }
     free( p_sys );
@@ -183,9 +165,7 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
     char *psz_name;
     char *psz_uri;
     char *psz_blockdevice;
-    services_discovery_sys_t    *p_sys  = p_sd->p_sys;
-    playlist_t          *p_playlist;
-    playlist_item_t     *p_item;
+    input_item_t        *p_input;
 #ifdef HAVE_HAL_1
     psz_name = libhal_device_get_property_string( p_sd->p_sys->p_ctx,
                                         psz_device, "volume.label", NULL );
@@ -199,29 +179,36 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
 #endif
     asprintf( &psz_uri, "dvd://%s", psz_blockdevice );
     /* Create the playlist item here */
-    p_item = playlist_ItemNew( p_sd, psz_uri,
-                               psz_name );
+    p_input = input_ItemNew( p_sd, psz_uri, psz_name );
     free( psz_uri );
 #ifdef HAVE_HAL_1
     libhal_free_string( psz_device );
 #else
     hal_free_string( psz_device );
 #endif
-    if( !p_item )
+    if( !p_input )
     {
         return;
     }
-    p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    p_playlist = (playlist_t *)vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
+    AddItem( p_sd, p_input );
+}
+
+static void AddItem( services_discovery_t *p_sd, input_item_t * p_input )
+{
+    playlist_item_t *p_item;
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_sd,
+                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( !p_playlist )
     {
         msg_Err( p_sd, "playlist not found" );
         return;
     }
-
-    playlist_NodeAddItem( p_playlist, p_item, VIEW_CATEGORY, p_sys->p_node,
-                          PLAYLIST_APPEND, PLAYLIST_END );
+    p_item = playlist_NodeAddInput( p_playlist, p_input,p_sd->p_sys->p_node_cat,
+                                    PLAYLIST_APPEND, PLAYLIST_END );
+    p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
+    p_item = playlist_NodeAddInput( p_playlist, p_input,p_sd->p_sys->p_node_one,
+                                    PLAYLIST_APPEND, PLAYLIST_END );
+    p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
 
     vlc_object_release( p_playlist );
 }
@@ -231,9 +218,7 @@ static void AddCdda( services_discovery_t *p_sd, char *psz_device )
     char *psz_name = "Audio CD";
     char *psz_uri;
     char *psz_blockdevice;
-    services_discovery_sys_t    *p_sys  = p_sd->p_sys;
-    playlist_t          *p_playlist;
-    playlist_item_t     *p_item;
+    input_item_t     *p_input;
 #ifdef HAVE_HAL_1
     psz_blockdevice = libhal_device_get_property_string( p_sd->p_sys->p_ctx,
                                             psz_device, "block.device", NULL );
@@ -243,32 +228,16 @@ static void AddCdda( services_discovery_t *p_sd, char *psz_device )
 #endif
     asprintf( &psz_uri, "cdda://%s", psz_blockdevice );
     /* Create the playlist item here */
-    p_item = playlist_ItemNew( p_sd, psz_uri,
-                               psz_name );
+    p_input = input_ItemNew( p_sd, psz_uri, psz_name );
     free( psz_uri );
 #ifdef HAVE_HAL_1
     libhal_free_string( psz_device );
 #else
     hal_free_string( psz_device );
 #endif
-    if( !p_item )
-    {
+    if( !p_input )
         return;
-    }
-    p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    p_playlist = (playlist_t *)vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Err( p_sd, "playlist not found" );
-        return;
-    }
-
-    playlist_NodeAddItem( p_playlist, p_item, VIEW_CATEGORY, p_sys->p_node,
-                          PLAYLIST_APPEND, PLAYLIST_END );
-
-    vlc_object_release( p_playlist );
-
+    AddItem( p_sd, p_input );
 }
 
 static void ParseDevice( services_discovery_t *p_sd, char *psz_device )

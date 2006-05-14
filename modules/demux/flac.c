@@ -91,7 +91,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
     p_sys->b_start = VLC_TRUE;
-    p_sys->p_meta = 0;
+    p_sys->p_meta = NULL;
 
     /* We need to read and store the STREAMINFO metadata */
     i_peek = stream_Peek( p_demux->s, &p_peek, 8 );
@@ -231,10 +231,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     if( i_query == DEMUX_SET_TIME ) return VLC_EGENERIC;
     else if( i_query == DEMUX_GET_META )
     {
-        vlc_meta_t **pp_meta = (vlc_meta_t **)va_arg( args, vlc_meta_t** );
+        vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
         if( p_demux->p_sys->p_meta )
-            *pp_meta = vlc_meta_Duplicate( p_demux->p_sys->p_meta );
-        else *pp_meta = NULL;
+            vlc_meta_Merge( p_meta, p_demux->p_sys->p_meta );
         return VLC_SUCCESS;
     }
     else return demux2_vaControlHelper( p_demux->s, 0, -1,

@@ -301,9 +301,8 @@ static inline int __stats_GetInteger( vlc_object_t *p_obj, int i_id,
 static inline int __stats_GetFloat( vlc_object_t *p_obj, int i_id,
                                     unsigned int i_counter, float *value )
 {
-    int i_ret;
     vlc_value_t val;val.f_float = 0.0;
-    i_ret = __stats_Get( p_obj, i_id, i_counter, &val );
+    int i_ret = __stats_Get( p_obj, i_id, i_counter, &val );
     *value = val.f_float;
     return i_ret;
 }

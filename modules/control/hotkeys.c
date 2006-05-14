@@ -900,7 +900,7 @@ static int ActionKeyCB( vlc_object_t *p_this, char const *psz_var,
 static void PlayBookmark( intf_thread_t *p_intf, int i_num )
 {
     vlc_value_t val;
-    int i_position;
+    int i;
     char psz_bookmark_name[11];
     playlist_t *p_playlist =
         vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -912,12 +912,13 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
     if( p_playlist )
     {
         char *psz_bookmark = strdup( val.psz_string );
-        for( i_position = 0; i_position < p_playlist->i_size; i_position++)
+        for( i = 0; i < p_playlist->pp_all_items; i++)
         {
             if( !strcmp( psz_bookmark,
-                         p_playlist->pp_items[i_position]->input.psz_uri ) )
+                         p_playlist->pp_items[i]->p_input->psz_uri ) )
             {
-                playlist_Goto( p_playlist, i_position );
+                playlist_LockControl( p_playlist, PLAYLIST_ITEMPLAY,
+                                      p_playlist->pp_items[i] );
                 break;
             }
         }
@@ -938,9 +939,9 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
         if( p_playlist->status.p_item )
         {
             config_PutPsz( p_intf, psz_bookmark_name,
-                           p_playlist->status.p_item->input.psz_uri);
+                           p_playlist->status.p_item->p_input->psz_uri);
             msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num,
-                           p_playlist->status.p_item->input.psz_uri);
+                           p_playlist->status.p_item->p_input->psz_uri);
             config_SaveConfigFile( p_intf, "hotkeys" );
         }
         vlc_object_release( p_playlist );

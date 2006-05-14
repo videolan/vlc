@@ -75,7 +75,6 @@ static int Demux( demux_t *p_demux)
         return VLC_EGENERIC;
     }
 
-    p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
     while( ( psz_line = stream_ReadLine( p_demux->s) ) != NULL )
     {
         char *psz_unicode;
@@ -95,8 +94,8 @@ static int Demux( demux_t *p_demux)
         }
 
         psz_unicode = FromLocale( psz_line );
-        playlist_Add( p_playlist, psz_unicode, psz_unicode, PLAYLIST_APPEND,
-                      PLAYLIST_END );
+//        playlist_Add( p_playlist, psz_unicode, psz_unicode, PLAYLIST_APPEND,
+//                      PLAYLIST_END );
 
         free( psz_line );
         LocaleFree( psz_line );

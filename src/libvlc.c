@@ -697,7 +697,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /*
      * Initialize playlist and get commandline files
      */
-    p_playlist = playlist_Create( p_vlc );
+    p_playlist = playlist_ThreadCreate( p_vlc );
     if( !p_playlist )
     {
         msg_Err( p_vlc, "playlist initialization failed" );
@@ -915,7 +915,7 @@ int VLC_CleanUp( int i_object )
     {
         vlc_object_detach( p_playlist );
         vlc_object_release( p_playlist );
-        playlist_Destroy( p_playlist );
+        playlist_ThreadDestroy( p_playlist );
     }
 
     /*
@@ -1198,7 +1198,7 @@ int VLC_AddTarget( int i_object, char const *psz_target,
     if( p_playlist == NULL )
     {
         msg_Dbg( p_vlc, "no playlist present, creating one" );
-        p_playlist = playlist_Create( p_vlc );
+        p_playlist = playlist_ThreadCreate( p_vlc );
 
         if( p_playlist == NULL )
         {
@@ -1209,7 +1209,7 @@ int VLC_AddTarget( int i_object, char const *psz_target,
         vlc_object_yield( p_playlist );
     }
 
-    i_err = playlist_AddExt( p_playlist, psz_target, psz_target,
+    i_err = playlist_PlaylistAddExt( p_playlist, psz_target, psz_target,
                              i_mode, i_pos, -1, ppsz_options, i_options);
 
     vlc_object_release( p_playlist );
@@ -1631,29 +1631,8 @@ float VLC_SpeedSlower( int i_object )
  */
 int VLC_PlaylistIndex( int i_object )
 {
-    int i_index;
-    playlist_t * p_playlist;
-    vlc_t *p_vlc = vlc_current_object( i_object );
-
-    /* Check that the handle is valid */
-    if( !p_vlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
-
-    if( !p_playlist )
-    {
-        if( i_object ) vlc_object_release( p_vlc );
-        return VLC_ENOOBJ;
-    }
-
-    i_index = p_playlist->i_index;
-    vlc_object_release( p_playlist );
-
-    if( i_object ) vlc_object_release( p_vlc );
-    return i_index;
+    printf( "This function is deprecated and should not be used anymore" );
+    return -1;
 }
 
 /**
@@ -1763,7 +1742,6 @@ int VLC_PlaylistPrev( int i_object )
  *****************************************************************************/
 int VLC_PlaylistClear( int i_object )
 {
-    int i_err;
     playlist_t * p_playlist;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
@@ -1781,12 +1759,12 @@ int VLC_PlaylistClear( int i_object )
         return VLC_ENOOBJ;
     }
 
-    i_err = playlist_Clear( p_playlist );
+    playlist_Clear( p_playlist );
 
     vlc_object_release( p_playlist );
 
     if( i_object ) vlc_object_release( p_vlc );
-    return i_err;
+    return VLC_SUCCESS;
 }
 
 /**

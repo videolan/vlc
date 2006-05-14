@@ -39,35 +39,15 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
     }
     if( i_id > 0 )
     {
-        /* Always use the current view when using libvlc */
-        playlist_view_t *p_view;
-        playlist_item_t *p_item;
-
-        if( p_instance->p_playlist->status.i_view == -1 )
-        {
-            playlist_Control( p_instance->p_playlist, PLAYLIST_GOTO,
-                              i_id );
-        }
-        p_view = playlist_ViewFind( p_instance->p_playlist,
-                                    p_instance->p_playlist->status.i_view );
-        if( !p_view )
-        {
-             libvlc_exception_raise( p_exception,
-                                     "Unable to find current playlist view ");
-             return;
-        }
-
-        p_item = playlist_ItemGetById( p_instance->p_playlist, i_id );
+        playlist_item_t *p_item = playlist_ItemGetById( p_instance->p_playlist, i_id );
 
         if( !p_item )
         {
             libvlc_exception_raise( p_exception, "Unable to find item " );
             return;
         }
-
         playlist_Control( p_instance->p_playlist, PLAYLIST_VIEWPLAY,
-                          p_instance->p_playlist->status.i_view,
-                          p_view->p_root, p_item );
+                          p_instance->p_playlist->status.p_node, p_item );
     }
     else
     {

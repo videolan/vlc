@@ -308,8 +308,8 @@ static int DemuxOpen( vlc_object_t *p_this )
             if( p_playlist != NULL )
             {
                 // Make sure the item is deleted afterwards
-                p_playlist->pp_items[p_playlist->i_index]->b_autodeletion =
-                    VLC_TRUE;
+                /// \bug does not always work
+                p_playlist->status.p_item->i_flags |= PLAYLIST_REMOVE_FLAG;
                 vlc_object_release( p_playlist );
             }
 

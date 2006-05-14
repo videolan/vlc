@@ -118,10 +118,9 @@ int E_(MMSHOpen)( access_t *p_access )
             free( psz_location );
             return VLC_EGENERIC;
         }
-        p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
-        playlist_Add( p_playlist, psz_location, psz_location,
-                      PLAYLIST_INSERT | PLAYLIST_GO,
-                      p_playlist->i_index + 1 );
+        /** \bug we do not autodelete here */
+        playlist_PlaylistAdd( p_playlist, psz_location, psz_location,
+                              PLAYLIST_INSERT | PLAYLIST_GO, PLAYLIST_END );
         vlc_object_release( p_playlist );
 
         free( psz_location );

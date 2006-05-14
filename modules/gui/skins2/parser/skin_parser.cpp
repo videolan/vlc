@@ -291,12 +291,12 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         m_pData->m_listLayout.push_back( layout );
         m_curLayer = 0;
     }
-
     else if( rName == "Playlist" )
     {
         RequireDefault( "id" );
         RequireDefault( "font" );
         CheckDefault( "visible", "true" );
+        CheckDefault( "flat", "true" ); // Only difference here
         CheckDefault( "x", "0" );
         CheckDefault( "y", "0" );
         CheckDefault( "width", "0" );
@@ -304,26 +304,33 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "lefttop", "lefttop" );
         CheckDefault( "rightbottom", "lefttop" );
         CheckDefault( "bgimage", "none" );
+        CheckDefault( "itemimage", "none" );
+        CheckDefault( "openimage", "none" );
+        CheckDefault( "closedimage", "none" );
         CheckDefault( "fgcolor", "#000000" );
         CheckDefault( "playcolor", "#FF0000" );
         CheckDefault( "bgcolor1", "#FFFFFF" );
         CheckDefault( "bgcolor2", "#FFFFFF" );
         CheckDefault( "selcolor", "#0000FF" );
         CheckDefault( "help", "" );
-
-        m_curListId = uniqueId( attr["id"] );
-        const BuilderData::List listData( m_curListId, atoi( attr["x"] ) +
+        m_curTreeId = uniqueId( attr["id"] );
+        const BuilderData::Tree treeData( m_curTreeId, atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["visible"],
+                attr["flat"],
                 atoi( attr["width"]), atoi( attr["height"] ),
-                attr["lefttop"], attr["rightbottom"], attr["font"],
-                "playlist", attr["bgimage"], attr["fgcolor"],
-                attr["playcolor"], attr["bgcolor1"], attr["bgcolor2"],
+                attr["lefttop"], attr["rightbottom"],
+                attr["font"], "playtree",
+                attr["bgimage"], attr["itemimage"],
+                attr["openimage"], attr["closedimage"],
+                attr["fgcolor"],
+                attr["playcolor"],
+                attr["bgcolor1"],
+                attr["bgcolor2"],
                 attr["selcolor"], attr["help"],
                 m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
-        m_pData->m_listList.push_back( listData );
+        m_pData->m_listTree.push_back( treeData );
     }
-
     else if( rName == "Playtree" )
     {
         RequireDefault( "id" );
@@ -412,12 +419,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "help", "" );
 
         string newValue = attr["value"];
-        if( m_curListId != "" )
-        {
-            // Slider associated to a list
-            newValue = "playlist.slider";
-        }
-        else if( m_curTreeId != "" )
+        if( m_curTreeId != "" )
         {
             // Slider associated to a tree
             newValue = "playtree.slider";
@@ -560,11 +562,7 @@ void SkinParser::handleEndElement( const string &rName )
         m_xOffsetList.pop_back();
         m_yOffsetList.pop_back();
     }
-    else if( rName == "Playlist" )
-    {
-        m_curListId = "";
-    }
-    else if( rName == "Playtree" )
+    else if( rName == "Playtree" || rName == "Playlist" )
     {
         m_curTreeId = "";
     }

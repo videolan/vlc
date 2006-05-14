@@ -42,7 +42,6 @@
     IBOutlet id o_outline_view;
 
     NSMutableDictionary *o_outline_dict;
-    int i_current_view;
 }
 
 - (void)initStrings;
@@ -140,7 +139,7 @@
 - (IBAction)addNode:(id)sender;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
-- (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position inView:(int)i_view enqueue:(BOOL)b_enqueue;
+- (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 
 
 @end

@@ -337,9 +337,9 @@ connect:
             goto error;
         }
 
-        /* Change the uri */
+        /* Change the URI */
         vlc_mutex_lock( &p_playlist->object_lock );
-        p_input_item = &p_playlist->status.p_item->input;
+        p_input_item = p_playlist->status.p_item->p_input;
         vlc_mutex_lock( &p_input_item->lock );
         free( p_input_item->psz_uri );
         free( p_access->psz_path );
@@ -696,7 +696,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
-    vlc_meta_t **pp_meta;
+    vlc_meta_t   *p_meta;
 
     switch( i_query )
     {
@@ -736,18 +736,14 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_GET_META:
-            pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
-            *pp_meta = vlc_meta_New();
+            p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
 
             if( p_sys->psz_icy_name )
-                vlc_meta_Add( *pp_meta, VLC_META_TITLE,
-                              p_sys->psz_icy_name );
+                vlc_meta_SetTitle( p_meta, p_sys->psz_icy_name );
             if( p_sys->psz_icy_genre )
-                vlc_meta_Add( *pp_meta, VLC_META_GENRE,
-                              p_sys->psz_icy_genre );
+                vlc_meta_SetGenre( p_meta, p_sys->psz_icy_genre );
             if( p_sys->psz_icy_title )
-                vlc_meta_Add( *pp_meta, VLC_META_NOW_PLAYING,
-                              p_sys->psz_icy_title );
+                vlc_meta_SetNowPlaying( p_meta, p_sys->psz_icy_title );
             break;
 
         case ACCESS_GET_TITLE_INFO:

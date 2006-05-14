@@ -404,6 +404,8 @@ static int Demux ( demux_t *p_demux )
         free( temp );
     }
 
+    msg_Err( p_playlist, "SGIMB playlist handling is broken" );
+#if 0
     p_child = playlist_ItemNew( p_playlist, p_sys->psz_uri,
                       p_sys->psz_name ? p_sys->psz_name : p_sys->psz_uri );
 
@@ -442,7 +444,7 @@ static int Demux ( demux_t *p_demux )
     playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                            p_playlist->status.i_view,
                            p_playlist->status.p_item, NULL );
-
+#endif
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;
 }

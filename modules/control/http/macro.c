@@ -303,7 +303,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                 {
                     char mrl[1024], psz_name[1024], tmp[1024];
                     char *p, *str;
-                    playlist_item_t *p_item;
+                    input_item_t *p_input;
 
                     E_(ExtractURIValue)( p_request, "mrl", tmp, 1024 );
                     decode_URI( tmp );
@@ -327,16 +327,16 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     }
                     *p = '\0';
 
-                    p_item = E_(MRLParse)( p_intf, mrl, psz_name );
+                    p_input = E_(MRLParse)( p_intf, mrl, psz_name );
 
-                    if( !p_item || !p_item->input.psz_uri ||
-                        !*p_item->input.psz_uri )
+                    if( !p_input || p_input->psz_uri ||
+                        !*p_input->psz_uri )
                     {
                         msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
                     }
                     else
                     {
-                        playlist_AddItem( p_sys->p_playlist, p_item,
+                        playlist_PlaylistAddInput( p_sys->p_playlist, p_input,
                                           PLAYLIST_APPEND, PLAYLIST_END );
                         msg_Dbg( p_intf, "requested mrl add: %s", mrl );
                     }
@@ -401,11 +401,13 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                         for( j = 0 ; j < i_nb_items ; j++ )
                         {
                             if( p_items[j] ==
-                                p_sys->p_playlist->pp_items[i]->input.i_id ) break;
+                                p_sys->p_playlist->pp_items[i]->p_input->i_id )
+                                break;
                         }
                         if( j == i_nb_items )
                         {
-                            playlist_LockDelete( p_sys->p_playlist, p_sys->p_playlist->pp_items[i]->input.i_id );
+                            playlist_LockDelete( p_sys->p_playlist,
+                            p_sys->p_playlist->pp_items[i]->p_input->i_id );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      i );
                         }
@@ -439,7 +441,8 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     if( !strcmp( type , "title" ) )
                     {
                         playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
-                                                    p_sys->p_playlist->pp_views[0]->p_root,
+                                                    /* Ugly hack,but not worse than before ... */
+                                                    p_sys->p_playlist->p_root_onelevel,
                                                     SORT_TITLE_NODES_FIRST,
                                                     ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
                         msg_Dbg( p_intf, "requested playlist sort by title (%d)" , i_order );
@@ -447,7 +450,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     else if( !strcmp( type , "author" ) )
                     {
                         playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
-                                                    p_sys->p_playlist->pp_views[0]->p_root,
+                                                    p_sys->p_playlist->p_root_onelevel,
                                                     SORT_AUTHOR,
                                                     ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
                         msg_Dbg( p_intf, "requested playlist sort by author (%d)" , i_order );
@@ -455,7 +458,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     else if( !strcmp( type , "shuffle" ) )
                     {
                         playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
-                                                    p_sys->p_playlist->pp_views[0]->p_root,
+                                                    p_sys->p_playlist->p_root_onelevel,
                                                     SORT_RANDOM,
                                                     ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
                         msg_Dbg( p_intf, "requested playlist shuffle");
@@ -473,6 +476,8 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     E_(ExtractURIValue)( p_request, "psz_newpos", psz_newpos, 6 );
                     i_pos = atoi( psz_pos );
                     i_newpos = atoi( psz_newpos );
+                    /* FIXME FIXME TODO TODO XXX XXX
+                    ( duplicate from rpn.c )
                     if ( i_pos < i_newpos )
                     {
                         playlist_Move( p_sys->p_playlist, i_pos, i_newpos + 1 );
@@ -482,6 +487,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                         playlist_Move( p_sys->p_playlist, i_pos, i_newpos );
                     }
                     msg_Dbg( p_intf, "requested move playlist item %d to %d", i_pos, i_newpos);
+                    FIXME FIXME TODO TODO XXX XXX */
                     break;
                 }
 

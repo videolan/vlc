@@ -279,19 +279,10 @@ mvar_t *E_(mvar_IntegerSetNew)( const char *name, const char *arg )
 mvar_t *E_(mvar_PlaylistSetNew)( intf_thread_t *p_intf, char *name,
                                  playlist_t *p_pl )
 {
-    playlist_view_t *p_view;
     mvar_t *s = E_(mvar_New)( name, "set" );
-
-
     vlc_mutex_lock( &p_pl->object_lock );
-
-    p_view = playlist_ViewFind( p_pl, VIEW_CATEGORY ); /* FIXME */
-
-    if( p_view != NULL )
-        E_(PlaylistListNode)( p_intf, p_pl, p_view->p_root, name, s, 0 );
-
+    E_(PlaylistListNode)( p_intf, p_pl, p_pl->p_root_category , name, s, 0 );
     vlc_mutex_unlock( &p_pl->object_lock );
-
     return s;
 }
 

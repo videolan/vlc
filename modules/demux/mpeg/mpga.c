@@ -371,15 +371,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t *pi64;
-    vlc_meta_t **pp_meta;
+    vlc_meta_t *p_meta;
     int i_ret;
 
     switch( i_query )
     {
         case DEMUX_GET_META:
-            pp_meta = (vlc_meta_t **)va_arg( args, vlc_meta_t** );
-            if( p_sys->meta ) *pp_meta = vlc_meta_Duplicate( p_sys->meta );
-            else *pp_meta = NULL;
+            p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
+            vlc_meta_Merge( p_meta, p_sys->meta );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

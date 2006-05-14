@@ -1165,11 +1165,11 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     for( int i = 0; i < (int)mrl.GetCount(); i++ )
     {
         vlc_bool_t b_start = !i && i_open_arg;
-        playlist_item_t *p_item;
+        input_item_t *p_input;
         char *psz_utf8;
 
         psz_utf8 = wxFromLocale( mrl[i] );
-        p_item = playlist_ItemNew( p_intf, psz_utf8, psz_utf8 );
+        p_input = input_ItemNew( p_intf, psz_utf8, psz_utf8 );
         wxLocaleFree( psz_utf8 );
 
         /* Insert options */
@@ -1177,7 +1177,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
                ((const char *)mrl[i + 1].mb_str())[0] == ':' )
         {
             psz_utf8 = wxFromLocale( mrl[i + 1] );
-            playlist_ItemAddOption( p_item, psz_utf8 );
+            vlc_input_item_AddOption( p_input, psz_utf8 );
             wxLocaleFree( psz_utf8 );
             i++;
         }
@@ -1188,7 +1188,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
             for( int j = 0; j < (int)subsfile_mrl.GetCount(); j++ )
             {
                 psz_utf8 = wxFromLocale( subsfile_mrl[j] );
-                playlist_ItemAddOption( p_item, psz_utf8 );
+                vlc_input_item_AddOption( p_input, psz_utf8 );
                 wxLocaleFree( psz_utf8 );
             }
         }
@@ -1199,24 +1199,24 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
             for( int j = 0; j < (int)sout_mrl.GetCount(); j++ )
             {
                 psz_utf8 = wxFromLocale( sout_mrl[j] );
-                playlist_ItemAddOption( p_item, psz_utf8 );
+                vlc_input_item_AddOption( p_input, psz_utf8 );
                 wxLocaleFree( psz_utf8 );
             }
         }
 
-
         if( b_start )
         {
-            playlist_AddItem( p_playlist, p_item,
-                              PLAYLIST_APPEND,
-                              PLAYLIST_END );
-            playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
+            playlist_PlaylistAddInput( p_playlist, p_input, PLAYLIST_APPEND,
+                                       PLAYLIST_END );
+            msg_Err( p_playlist, "Item start not implemented" );
+            // FIXME: Play only within the playlist node
+            //playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
         }
         else
         {
-            playlist_AddItem( p_playlist, p_item,
-                              PLAYLIST_APPEND|PLAYLIST_PREPARSE,
-                              PLAYLIST_END );
+            playlist_PlaylistAddInput( p_playlist, p_input,
+                                       PLAYLIST_APPEND|PLAYLIST_PREPARSE,
+                                       PLAYLIST_END );
         }
     }
 

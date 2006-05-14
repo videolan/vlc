@@ -68,10 +68,8 @@ vlc_module_begin();
     set_description( _("Playlist metademux") );
     set_capability( "demux2", 5 );
     set_callbacks( Activate, Deactivate );
-    add_shortcut( "m3u" );
     add_shortcut( "asx" );
     add_shortcut( "html" );
-    add_shortcut( "pls" );
     add_shortcut( "b4s" );
 vlc_module_end();
 
@@ -91,10 +89,7 @@ static int Activate( vlc_object_t * p_this )
     /* Check for m3u/asx file extension or if the demux has been forced */
     psz_ext = strrchr ( p_demux->psz_path, '.' );
 
-    if( ( psz_ext && !strcasecmp( psz_ext, ".m3u") ) ||
-        /* a .ram file can contain a single rtsp link */
-        ( psz_ext && !strcasecmp( psz_ext, ".ram") ) ||
-        ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "m3u") ) )
+    if(( psz_ext && !strcasecmp( psz_ext, ".ram") ) )
     {
         i_type = TYPE_M3U;
     }
@@ -107,11 +102,6 @@ static int Activate( vlc_object_t * p_this )
              ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "html") ) )
     {
         i_type = TYPE_HTML;
-    }
-    else if( ( psz_ext && !strcasecmp( psz_ext, ".pls") ) ||
-             ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "pls") ) )
-    {
-        i_type = TYPE_PLS;
     }
     else if( ( psz_ext && !strcasecmp( psz_ext, ".b4s") ) ||
              ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "b4s") ) )

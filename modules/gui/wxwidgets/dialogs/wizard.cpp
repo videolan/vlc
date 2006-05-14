@@ -591,6 +591,7 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
             listview->InsertColumn( 1, wxU(_("URI")) );
             listview->SetColumnWidth( 0, 250 );
             listview->SetColumnWidth( 1, 100 );
+#if 0
             for( int i=0 ; i < p_playlist->i_size ; i++ )
             {
                 wxString filename = wxL2U( p_playlist->pp_items[i]->input.
@@ -602,6 +603,7 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
                                   (long)p_playlist->pp_items[i]->input.i_id );
             }
             listview->Select( p_playlist->i_index , TRUE);
+#endif
             mainSizer->Add( listview, 1, wxALL|wxEXPAND, 5 );
 
             listview->Hide();
@@ -727,7 +729,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
         i = listview->GetNextItem( i , wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
         if( i != -1 )
         {
-            long data = listview->GetItemData( i );            
+            long data = listview->GetItemData( i );
             playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
                                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
             if( p_playlist )
@@ -736,7 +738,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
                                                    p_playlist, (int)data );
                 if( p_item )
                 {
-                    p_parent->SetMrl( (const char*)p_item->input.psz_uri );
+                    p_parent->SetMrl( (const char*)p_item->p_input->psz_uri );
                 }
                 else
                     event.Veto();
@@ -1631,27 +1633,28 @@ void WizardDialog::Run()
                             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
         if( p_playlist )
         {
-            playlist_item_t *p_item = playlist_ItemNew( p_playlist, mrl,
-                                                        ITEM_NAME );
-            playlist_ItemAddOption( p_item, psz_opt);
+            input_item_t *p_input = input_ItemNew( p_playlist, mrl,
+                                                   ITEM_NAME );
+            vlc_input_item_AddOption( p_input, psz_opt );
             if( i_from != 0)
             {
                 char psz_from[20];
                 snprintf( psz_from, 20, "start-time=%i", i_from);
-                playlist_ItemAddOption( p_item, psz_from);
+                vlc_input_item_AddOption( p_input, psz_from );
             }
             if( i_to != 0)
             {
                 char psz_to[20];
                 snprintf( psz_to, 20, "stop-time=%i", i_to);
-                playlist_ItemAddOption( p_item, psz_to);
+                vlc_input_item_AddOption( p_input, psz_to );
             }
 
             char psz_ttl[20];
             snprintf( psz_ttl, 20, "ttl=%i",i_ttl );
-            playlist_ItemAddOption( p_item, psz_ttl );
+            vlc_input_item_AddOption( p_input, psz_ttl );
 
-            playlist_AddItem( p_playlist, p_item, PLAYLIST_GO, PLAYLIST_END );
+            playlist_PlaylistAddInput( p_playlist, p_input,
+                                       PLAYLIST_GO, PLAYLIST_END );
             vlc_object_release(p_playlist);
         }
         else

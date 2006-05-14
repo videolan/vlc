@@ -26,6 +26,11 @@
 #ifndef _VLC__INPUT_H
 #define _VLC__INPUT_H 1
 
+#include <vlc_playlist.h>
+#include <vlc_meta.h>
+
+struct vlc_meta_t;
+
 /*****************************************************************************
  * input_item_t: Describes an input and is used to spawn input_thread_t objects
  *****************************************************************************/
@@ -44,29 +49,32 @@ struct info_category_t
 
 struct input_item_t
 {
+    VLC_GC_MEMBERS
+    int        i_id;                 /**< Identifier of the item */
+
     char       *psz_name;            /**< text describing this item */
     char       *psz_uri;             /**< mrl of this item */
+    vlc_bool_t  b_fixed_name;        /**< Can the interface change the name ?*/
 
     int        i_options;            /**< Number of input options */
     char       **ppsz_options;       /**< Array of input options */
 
-    mtime_t    i_duration;           /**< A hint about the duration of this
-                                      * item, in milliseconds*/
+    mtime_t    i_duration;           /**< Duration in milliseconds*/
 
-    int        i_id;                 /**< Identifier of the item */
     uint8_t    i_type;               /**< Type (file, disc, ...) */
 
     int        i_categories;         /**< Number of info categories */
     info_category_t **pp_categories; /**< Pointer to the first info category */
 
     int         i_es;                /**< Number of es format descriptions */
-    es_format_t **es;                /**< Pointer to an array of es formats */
-
-    vlc_bool_t  b_fixed_name;        /**< Can the interface change the name ?*/
+    es_format_t **es;                /**< Es formats */
 
     input_stats_t *p_stats;          /**< Statistics */
+    int           i_nb_played;       /**< Number of times played */
 
-    vlc_mutex_t lock;                /**< Item cannot be changed without this lock */
+    vlc_meta_t *p_meta;
+
+    vlc_mutex_t lock;                /**< Lock for the item */
 };
 
 #define ITEM_TYPE_UNKNOWN       0
@@ -83,18 +91,19 @@ struct input_item_t
 static inline void vlc_input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
 {
     memset( p_i, 0, sizeof(input_item_t) );
-    p_i->i_options  = 0;
-    p_i->i_es = 0;
-    p_i->i_categories = 0 ;
     p_i->psz_name = 0;
     p_i->psz_uri = 0;
-    p_i->ppsz_options = 0;
-    p_i->pp_categories = 0;
+    p_i->i_es = 0;
     p_i->es = 0;
+    p_i->i_options  = 0;
+    p_i->ppsz_options = 0;
+    p_i->i_categories = 0 ;
+    p_i->pp_categories = 0;
     p_i->i_type = ITEM_TYPE_UNKNOWN;
     p_i->b_fixed_name = VLC_TRUE;
 
     p_i->p_stats = (input_stats_t*) malloc( sizeof( input_stats_t ) );
+    p_i->p_meta = NULL;
     vlc_mutex_init( p_o, &p_i->p_stats->lock );
 
     vlc_mutex_init( p_o, &p_i->lock );
@@ -115,6 +124,8 @@ static inline void vlc_input_item_CopyOptions( input_item_t *p_parent,
     }
 }
 
+VLC_EXPORT( void, vlc_input_item_AddOption, ( input_item_t *p_input, const char *psz_option ) );
+
 static inline void vlc_input_item_Clean( input_item_t *p_i )
 {
     if( p_i->psz_name ) free( p_i->psz_name );
@@ -122,6 +133,8 @@ static inline void vlc_input_item_Clean( input_item_t *p_i )
     if( p_i->p_stats ) free( p_i->p_stats );
     p_i->psz_name = 0;
     p_i->psz_uri = 0;
+
+    if( p_i->p_meta ) vlc_meta_Delete( p_i->p_meta );
 
     while( p_i->i_options )
     {
@@ -167,6 +180,14 @@ static inline void vlc_input_item_Clean( input_item_t *p_i )
 
 VLC_EXPORT( char *, vlc_input_item_GetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
 VLC_EXPORT(int, vlc_input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) );
+
+#define input_ItemNew( a,b,c ) input_ItemNewExt( a, b, c, 0, NULL, -1 )
+#define input_ItemNewExt(a,b,c,d,e,f) __input_ItemNewExt( VLC_OBJECT(a),b,c,d,e,f)
+VLC_EXPORT( input_item_t *, __input_ItemNewExt, (vlc_object_t *, const char *, const char*, int, const char **, int)  );
+VLC_EXPORT( input_item_t *, input_ItemNewWithType, ( vlc_object_t *, const char *, const char *e, int, const char **, int, int ) );
+
+VLC_EXPORT( input_item_t *, input_ItemGetById, (playlist_t *, int ) );
+
 
 /*****************************************************************************
  * Seek point: (generalisation of chapters)

@@ -573,19 +573,8 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
     msg_Dbg( p_input, "EsOutProgramMeta: number=%d", i_group );
     sprintf( psz_cat, "%s %d", _("Program"), i_group );
 
-    for( i = 0; i < p_meta->i_meta; i++ )
-    {
-        msg_Dbg( p_input, "  - %s = %s", p_meta->name[i], p_meta->value[i] );
-
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                      _(p_meta->name[i]), "%s", p_meta->value[i] );
-        if( !strcasecmp( p_meta->name[i], "Name" ) )
-            psz_name = p_meta->value[i];
-        else if( !strcasecmp( p_meta->name[i], "Provider" ) )
-            psz_provider = p_meta->value[i];
-        else if( !strcasecmp( p_meta->name[i], VLC_META_NOW_PLAYING ) )
-            psz_now_playing = p_meta->value[i];
-    }
+//    if( p_meta->psz_provider) psz_provider = p_meta->psz_provider;
+    if( p_meta->psz_nowplaying ) psz_now_playing = p_meta->psz_nowplaying;
 
     if( !psz_name && !psz_now_playing )
     {

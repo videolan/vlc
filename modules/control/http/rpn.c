@@ -830,7 +830,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             char *psz_name = E_(SSPop)( st );
             char *mrl = E_(SSPop)( st );
             char *tmp;
-            playlist_item_t *p_item;
+            input_item_t *p_input;
             int i_id;
 
             tmp = E_(ToUTF8)( p_intf, psz_name );
@@ -842,22 +842,21 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
 
             if( !*psz_name )
             {
-                p_item = E_(MRLParse)( p_intf, mrl, mrl );
+                p_input = E_(MRLParse)( p_intf, mrl, mrl );
             }
             else
             {
-                p_item = E_(MRLParse)( p_intf, mrl, psz_name );
+                p_input = E_(MRLParse)( p_intf, mrl, psz_name );
             }
 
-            if( p_item == NULL || p_item->input.psz_uri == NULL ||
-                 !*p_item->input.psz_uri )
+            if( !p_input || !p_input->psz_uri || !*p_input->psz_uri )
             {
                 i_id = VLC_EGENERIC;
                 msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
             }
             else
             {
-                i_id = playlist_AddItem( p_sys->p_playlist, p_item,
+                i_id = playlist_PlaylistAddInput( p_sys->p_playlist, p_input,
                                          PLAYLIST_APPEND, PLAYLIST_END );
                 msg_Dbg( p_intf, "requested mrl add: %s", mrl );
             }
@@ -879,8 +878,10 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "playlist_move" ) )
         {
-            int i_newpos = E_(SSPopN)( st, vars );
-            int i_pos = E_(SSPopN)( st, vars );
+            /*int i_newpos =*/ E_(SSPopN)( st, vars );
+            /*int i_pos =*/ E_(SSPopN)( st, vars );
+            /* FIXME FIXME TODO TODO XXX XXX
+            do not release before fixing this
             if ( i_pos < i_newpos )
             {
                 playlist_Move( p_sys->p_playlist, i_pos, i_newpos + 1 );
@@ -891,6 +892,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             }
             msg_Dbg( p_intf, "requested to move playlist item %d to %d",
                      i_pos, i_newpos);
+               FIXME FIXME TODO TODO XXX XXX */
+            msg_Err( p_intf, "moving using indexes is obsolete. We need to update this function" );
         }
         else if( !strcmp( s, "playlist_sort" ) )
         {
@@ -898,11 +901,15 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             int i_sort = E_(SSPopN)( st, vars );
             i_order = i_order % 2;
             i_sort = i_sort % 9;
+            /* FIXME FIXME TODO TODO XXX XXX
+            do not release before fixing this
             playlist_RecursiveNodeSort(  p_sys->p_playlist,
                                          p_sys->p_playlist->p_general,
                                          i_sort, i_order );
             msg_Dbg( p_intf, "requested sort playlist by : %d in order : %d",
                      i_sort, i_order );
+               FIXME FIXME TODO TODO XXX XXX */
+            msg_Err( p_intf, "this needs to be fixed to use the new playlist framework" );
         }
         else if( !strcmp( s, "services_discovery_add" ) )
         {

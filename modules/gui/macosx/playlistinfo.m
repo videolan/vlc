@@ -182,27 +182,27 @@
     if(! [self isItemInPlaylist: p_item] ) return;
 
     char *psz_temp;
-    vlc_mutex_lock( &p_item->input.lock );
+    vlc_mutex_lock( &p_item->p_input->lock );
 
     /* fill uri / title / author info */
-    if( p_item->input.psz_uri )
+    if( p_item->p_input->psz_uri )
     {
         [o_uri_txt setStringValue:
-            ([NSString stringWithUTF8String:p_item->input.psz_uri] == nil ) ?
-            [NSString stringWithCString:p_item->input.psz_uri] :
-            [NSString stringWithUTF8String:p_item->input.psz_uri]];
+            ([NSString stringWithUTF8String:p_item->p_input->psz_uri] == nil ) ?
+            [NSString stringWithCString:p_item->p_input->psz_uri] :
+            [NSString stringWithUTF8String:p_item->p_input->psz_uri]];
     }
 
-    if( p_item->input.psz_name )
+    if( p_item->p_input->psz_name )
     {
         [o_title_txt setStringValue:
-            ([NSString stringWithUTF8String:p_item->input.psz_name] == nil ) ?
-            [NSString stringWithCString:p_item->input.psz_name] :
-            [NSString stringWithUTF8String:p_item->input.psz_name]];
+            ([NSString stringWithUTF8String:p_item->p_input->psz_name] == nil ) ?
+            [NSString stringWithCString:p_item->p_input->psz_name] :
+            [NSString stringWithUTF8String:p_item->p_input->psz_name]];
     }
-    vlc_mutex_unlock( &p_item->input.lock );
+    vlc_mutex_unlock( &p_item->p_input->lock );
 
-    psz_temp = vlc_input_item_GetInfo( &p_item->input, _("Meta-information"), _("Artist") );
+    psz_temp = vlc_input_item_GetInfo( p_item->p_input, _("Meta-information"), _("Artist") );
 
     if( psz_temp )
     {
@@ -232,7 +232,7 @@
 
 - (void)setMeta: (char *)meta forLabel: (id)theItem
 {
-    char *psz_meta = vlc_input_item_GetInfo( &p_item->input, \
+    char *psz_meta = vlc_input_item_GetInfo( p_item->p_input, \
         _(VLC_META_INFO_CAT), _(meta) );
     if( psz_meta != NULL && *psz_meta)
         [theItem setStringValue: [NSString stringWithUTF8String: psz_meta]];
@@ -246,43 +246,43 @@
     {
         /* we can only do that if there's a valid input around */
 
-        vlc_mutex_lock( &p_item->input.p_stats->lock );
+        vlc_mutex_lock( &p_item->p_input->p_stats->lock );
 
         /* input */
         [o_read_bytes_txt setStringValue: [NSString stringWithFormat: \
-            @"%8.0f kB", (float)(p_item->input.p_stats->i_read_bytes)/1000]];
+            @"%8.0f kB", (float)(p_item->p_input->p_stats->i_read_bytes)/1000]];
         [o_input_bitrate_txt setStringValue: [NSString stringWithFormat: \
-            @"%6.0f kb/s", (float)(p_item->input.p_stats->f_input_bitrate)*8000]];
+            @"%6.0f kb/s", (float)(p_item->p_input->p_stats->f_input_bitrate)*8000]];
         [o_demux_bytes_txt setStringValue: [NSString stringWithFormat: \
-            @"%8.0f kB", (float)(p_item->input.p_stats->i_demux_read_bytes)/1000]];
+            @"%8.0f kB", (float)(p_item->p_input->p_stats->i_demux_read_bytes)/1000]];
         [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat: \
-            @"%6.0f kb/s", (float)(p_item->input.p_stats->f_demux_bitrate)*8000]];
+            @"%6.0f kb/s", (float)(p_item->p_input->p_stats->f_demux_bitrate)*8000]];
 
         /* Video */
         [o_video_decoded_txt setStringValue: [NSString stringWithFormat: @"%5i", \
-            p_item->input.p_stats->i_decoded_video]];
+            p_item->p_input->p_stats->i_decoded_video]];
         [o_displayed_txt setStringValue: [NSString stringWithFormat: @"%5i", \
-            p_item->input.p_stats->i_displayed_pictures]];
+            p_item->p_input->p_stats->i_displayed_pictures]];
         [o_lost_frames_txt setStringValue: [NSString stringWithFormat: @"%5i", \
-            p_item->input.p_stats->i_lost_pictures]];
+            p_item->p_input->p_stats->i_lost_pictures]];
 
         /* Sout */
         [o_sent_packets_txt setStringValue: [NSString stringWithFormat: @"%5i", \
-            p_item->input.p_stats->i_sent_packets]];
+            p_item->p_input->p_stats->i_sent_packets]];
         [o_sent_bytes_txt setStringValue: [NSString stringWithFormat: @"%8.0f kB", \
-            (float)(p_item->input.p_stats->i_sent_bytes)/1000]];
+            (float)(p_item->p_input->p_stats->i_sent_bytes)/1000]];
         [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat: \
-            @"%6.0f kb/s", (float)(p_item->input.p_stats->f_send_bitrate*8)*1000]];
+            @"%6.0f kb/s", (float)(p_item->p_input->p_stats->f_send_bitrate*8)*1000]];
 
         /* Audio */
         [o_audio_decoded_txt setStringValue: [NSString stringWithFormat: @"%5i", \
-            p_item->input.p_stats->i_decoded_audio]];
+            p_item->p_input->p_stats->i_decoded_audio]];
         [o_played_abuffers_txt setStringValue: [NSString stringWithFormat: @"%5i", \
-            p_item->input.p_stats->i_played_abuffers]];
+            p_item->p_input->p_stats->i_played_abuffers]];
         [o_lost_abuffers_txt setStringValue: [NSString stringWithFormat: @"%5i", \
-            p_item->input.p_stats->i_lost_abuffers]];
+            p_item->p_input->p_stats->i_lost_abuffers]];
 
-        vlc_mutex_unlock( &p_item->input.p_stats->lock );
+        vlc_mutex_unlock( &p_item->p_input->p_stats->lock );
     }
 }
 
@@ -302,12 +302,12 @@
 
     if( [self isItemInPlaylist: p_item] )
     {
-        vlc_mutex_lock( &p_item->input.lock );
+        vlc_mutex_lock( &p_item->p_input->lock );
 
-        p_item->input.psz_uri = strdup( [[o_uri_txt stringValue] UTF8String] );
-        p_item->input.psz_name = strdup( [[o_title_txt stringValue] UTF8String] );
-        vlc_mutex_unlock( &p_item->input.lock );
-        vlc_input_item_AddInfo( &p_item->input, _("Meta-information"), _("Artist"), [[o_author_txt stringValue] UTF8String]);
+        p_item->p_input->psz_uri = strdup( [[o_uri_txt stringValue] UTF8String] );
+        p_item->p_input->psz_name = strdup( [[o_title_txt stringValue] UTF8String] );
+        vlc_mutex_unlock( &p_item->p_input->lock );
+        vlc_input_item_AddInfo( p_item->p_input, _("Meta-information"), _("Artist"), [[o_author_txt stringValue] UTF8String]);
         
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist, "intf-change", val );
@@ -461,37 +461,37 @@ static VLCInfoTreeItem *o_root_item = nil;
         {
             if( self == o_root_item )
             {
-                vlc_mutex_lock( &p_item->input.lock );
+                vlc_mutex_lock( &p_item->p_input->lock );
                 o_children = [[NSMutableArray alloc] initWithCapacity:
-                                                p_item->input.i_categories];
-                for (i = 0 ; i < p_item->input.i_categories ; i++)
+                                                p_item->p_input->i_categories];
+                for (i = 0 ; i < p_item->p_input->i_categories ; i++)
                 {
                     [o_children addObject:[[VLCInfoTreeItem alloc]
                         initWithName: [NSString stringWithUTF8String:
-                            p_item->input.pp_categories[i]->psz_name]
+                            p_item->p_input->pp_categories[i]->psz_name]
                         value: @""
                         ID: i
                         parent: self]];
                 }
-                vlc_mutex_unlock( &p_item->input.lock );
+                vlc_mutex_unlock( &p_item->p_input->lock );
             }
             else if( o_parent == o_root_item )
             {
-                vlc_mutex_lock( &p_item->input.lock );
+                vlc_mutex_lock( &p_item->p_input->lock );
                 o_children = [[NSMutableArray alloc] initWithCapacity:
-                    p_item->input.pp_categories[i_object_id]->i_infos];
+                    p_item->p_input->pp_categories[i_object_id]->i_infos];
 
-                for (i = 0 ; i < p_item->input.pp_categories[i_object_id]->i_infos ; i++)
+                for (i = 0 ; i < p_item->p_input->pp_categories[i_object_id]->i_infos ; i++)
                 {
                     [o_children addObject:[[VLCInfoTreeItem alloc]
                     initWithName: [NSString stringWithUTF8String:
-                            p_item->input.pp_categories[i_object_id]->pp_infos[i]->psz_name]
+                            p_item->p_input->pp_categories[i_object_id]->pp_infos[i]->psz_name]
                         value: [NSString stringWithUTF8String:
-                            p_item->input.pp_categories[i_object_id]->pp_infos[i]->psz_value]
+                            p_item->p_input->pp_categories[i_object_id]->pp_infos[i]->psz_value]
                         ID: i
                         parent: self]];
                 }
-                vlc_mutex_unlock( &p_item->input.lock );
+                vlc_mutex_unlock( &p_item->p_input->lock );
             }
             else
             {

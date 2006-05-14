@@ -52,51 +52,50 @@ int Export_M3U( vlc_object_t *p_this )
     fprintf( p_export->p_file, "#EXTM3U\n" );
 
     /* Go through the playlist and add items */
-    for( i = 0; i< p_playlist->i_size ; i++)
+    for( i = 0; i< p_export->p_root->i_children ; i++)
     {
-        if( (p_playlist->pp_items[i]->i_flags & PLAYLIST_SAVE_FLAG) == 0 )
-        {
+        playlist_item_t *p_current = p_export->p_root->pp_children[i];
+        if( p_current->i_flags & PLAYLIST_SAVE_FLAG )
             continue;
-        }
 
         /* General info */
-        if( p_playlist->pp_items[i]->input.psz_name &&
-             strcmp( p_playlist->pp_items[i]->input.psz_name,
-                    p_playlist->pp_items[i]->input.psz_uri ) )
+        if( p_current->p_input->psz_name &&
+             strcmp( p_current->p_input->psz_uri,
+                     p_current->p_input->psz_name ) )
         {
-            char *psz_artist =
-                vlc_input_item_GetInfo( &p_playlist->pp_items[i]->input,
-                                        _(VLC_META_INFO_CAT), _(VLC_META_ARTIST) );
+            char *psz_artist = p_current->p_input->p_meta->psz_artist ?
+                               strdup( p_current->p_input->p_meta->psz_artist ):
+                               strdup( "" );
             if( psz_artist && *psz_artist )
             {
                 /* write EXTINF with artist */
                 fprintf( p_export->p_file, "#EXTINF:%i,%s - %s\n",
-                         (int)(p_playlist->pp_items[i]->input.i_duration/1000000),
-                         psz_artist,
-                         p_playlist->pp_items[i]->input.psz_name );
+                          (int)( p_current->p_input->i_duration/1000000 ),
+                          psz_artist,
+                          p_current->p_input->psz_name);
             }
             else
             {
                 /* write EXTINF without artist */
                 fprintf( p_export->p_file, "#EXTINF:%i,%s\n",
-                       (int)(p_playlist->pp_items[i]->input.i_duration/1000000),
-                         p_playlist->pp_items[i]->input.psz_name );
+                         (int)( p_current->p_input->i_duration/1000000 ),
+                          p_current->p_input->psz_name);
             }
             if( psz_artist )
                 free( psz_artist );
         }
 
         /* VLC specific options */
-        for( j = 0; j < p_playlist->pp_items[i]->input.i_options; j++ )
+        for( j = 0; j < p_current->p_input->i_options; j++ )
         {
             fprintf( p_export->p_file, "#EXTVLCOPT:%s\n",
-                     p_playlist->pp_items[i]->input.ppsz_options[j][0] == ':' ?
-                     p_playlist->pp_items[i]->input.ppsz_options[j] + 1 :
-                     p_playlist->pp_items[i]->input.ppsz_options[j] );
+                     p_current->p_input->ppsz_options[j][0] == ':' ?
+                     p_current->p_input->ppsz_options[j] + 1 :
+                     p_current->p_input->ppsz_options[j] );
         }
 
         fprintf( p_export->p_file, "%s\n",
-                 p_playlist->pp_items[i]->input.psz_uri );
+                 p_current->p_input->psz_uri );
     }
     return VLC_SUCCESS;
 }

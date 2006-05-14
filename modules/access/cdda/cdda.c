@@ -40,7 +40,7 @@
 #if LIBCDIO_VERSION_NUM >= 72
 static char *psz_paranoia_list[] = { "none", "overlap", "full" };
 static char *psz_paranoia_list_text[] = { N_("none"), N_("overlap"),
-					  N_("full") };
+                                          N_("full") };
 #endif
 
 #define DEBUG_LONGTEXT N_( \

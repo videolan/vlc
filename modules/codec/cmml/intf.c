@@ -13,7 +13,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -192,7 +192,7 @@ static void RunIntf( intf_thread_t *p_intf )
     /* Main loop */
     while( !p_intf->b_die )
     {
-        
+
         /* find a video output if we currently don't have one */
         if( p_vout == NULL )
         {
@@ -412,7 +412,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     vlc_mutex_lock( &p_intf->change_lock );
 
     p_intf->p_sys->b_key_pressed = VLC_TRUE;
-    
+
     vlc_mutex_unlock( &p_intf->change_lock );
 
     return VLC_SUCCESS;
@@ -451,7 +451,7 @@ static void FollowAnchor ( intf_thread_t *p_intf )
         mtime_t i_seconds;
         vlc_value_t time;
 
-        p_playlist = (playlist_t *) vlc_object_find( p_intf, 
+        p_playlist = (playlist_t *) vlc_object_find( p_intf,
                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         if ( !p_playlist )
         {
@@ -460,13 +460,13 @@ static void FollowAnchor ( intf_thread_t *p_intf )
         }
 
         /* Get new URL */
-        p_current_item = p_playlist->pp_items[p_playlist->i_index];
+        p_current_item = p_playlist->status.p_item;
 #ifdef CMML_INTF_DEBUG
         msg_Dbg( p_intf, "Current playlist item URL is \"%s\"",
                 p_current_item->input.psz_uri );
 #endif
 
-        psz_uri_to_load = XURL_Concat( p_current_item->input.psz_uri,
+        psz_uri_to_load = XURL_Concat( p_current_item->p_input->psz_uri,
                                        psz_url );
 
 #ifdef CMML_INTF_DEBUG
@@ -550,7 +550,7 @@ char *GetTimedURLFromPlaylistItem( intf_thread_t *p_intf,
     char *psz_return_value = NULL;
     char *psz_seconds = NULL;
     int i_seconds;
-    
+
     psz_url = XURL_GetWithoutFragment( p_current_item->input->psz_uri );
 
     /* Get current time as a string */
@@ -577,7 +577,7 @@ char *GetTimedURLFromPlaylistItem( intf_thread_t *p_intf,
     p = GetTimedURIFragmentForTime; /* unused */
     p = GetCurrentTimeInSeconds;    /* unused */
 
-    return strdup( p_current_item->input.psz_uri );
+    return strdup( p_current_item->p_input->psz_uri );
 #endif
 }
 
@@ -653,7 +653,7 @@ void GoBack( intf_thread_t *p_intf )
 #endif
 
     /* Find the playlist */
-    p_playlist = (playlist_t *) vlc_object_find( p_intf, 
+    p_playlist = (playlist_t *) vlc_object_find( p_intf,
             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if ( !p_playlist )
     {
@@ -686,7 +686,7 @@ void GoBack( intf_thread_t *p_intf )
         return;
     }
 
-    p_current_item = p_playlist->pp_items[p_playlist->i_index];
+    p_current_item = p_playlist->status.p_item;
 
     /* Save the currently-playing media in a new history item */
     psz_timed_url = GetTimedURLFromPlaylistItem( p_intf, p_current_item );
@@ -731,7 +731,7 @@ void GoForward( intf_thread_t *p_intf )
 #endif
 
     /* Find the playlist */
-    p_playlist = (playlist_t *) vlc_object_find( p_intf, 
+    p_playlist = (playlist_t *) vlc_object_find( p_intf,
             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if ( !p_playlist )
     {
@@ -774,8 +774,8 @@ void GoForward( intf_thread_t *p_intf )
         vlc_object_release( p_playlist );
         return;
     }
-    p_current_item = p_playlist->pp_items[p_playlist->i_index];
-    p_new_history_item->psz_uri = GetTimedURLFromPlaylistItem( p_intf, 
+    p_current_item = p_playlist->status.p_item;
+    p_new_history_item->psz_uri = GetTimedURLFromPlaylistItem( p_intf,
             p_current_item );
     p_new_history_item->psz_name = p_new_history_item->psz_uri;
 
@@ -796,9 +796,8 @@ void GoForward( intf_thread_t *p_intf )
 static void ReplacePlaylistItem( playlist_t *p_playlist, char *psz_uri )
 {
     playlist_Stop( p_playlist );
-    (void) playlist_Add( p_playlist, psz_uri, psz_uri,
-                         PLAYLIST_REPLACE, p_playlist->i_index );
-    playlist_Goto( p_playlist, p_playlist->i_index );
+    (void) playlist_PlaylistAdd( p_playlist, psz_uri, psz_uri,
+                         PLAYLIST_INSERT /* FIXME: used to be PLAYLIST_REPLACE */, PLAYLIST_END|PLAYLIST_GO /* FIXME: p_playlist->status.i_index */ );
 }
 
 /****************************************************************************

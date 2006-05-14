@@ -76,6 +76,8 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
 
         while( i_strings > 0 )
         {
+            vlc_meta_t *p_meta = (vlc_meta_t *)(p_demux->p_private);
+
             char *psz_temp = id3_ucs4_utf8duplicate(
                 id3_field_getstrings( &p_frame->fields[1], --i_strings ) );
 
@@ -87,51 +89,41 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
                 if( psz_temp != psz_endptr &&
                     i_genre >= 0 && i_genre < NUM_GENRES )
                 {
-                    vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                                  VLC_META_GENRE, ppsz_genres[atoi(psz_temp)]);
+                    vlc_meta_SetGenre( p_meta, ppsz_genres[atoi(psz_temp)]);
                 }
                 else
                 {
                     /* Unknown genre */
-                    vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                                  VLC_META_GENRE, psz_temp );
+                    vlc_meta_SetGenre( p_meta,psz_temp );
                 }
             }
             else if( !strcmp(p_frame->id, ID3_FRAME_TITLE ) )
             {
-                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                              VLC_META_TITLE, psz_temp );
+                vlc_meta_SetTitle( p_meta, psz_temp );
             }
             else if( !strcmp(p_frame->id, ID3_FRAME_ARTIST ) )
             {
-                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                              VLC_META_ARTIST, psz_temp );
+                vlc_meta_SetArtist( p_meta, psz_temp );
             }
             else if( !strcmp(p_frame->id, ID3_FRAME_YEAR ) )
             {
-                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                              VLC_META_DATE, psz_temp );
+                vlc_meta_SetDate( p_meta, psz_temp );
             }
             else if( !strcmp(p_frame->id, ID3_FRAME_COMMENT ) )
             {
-                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                              VLC_META_DESCRIPTION, psz_temp );
+                vlc_meta_SetDescription( p_meta, psz_temp );
             }
             else if( strstr( (char*)p_frame->description, "Copyright" ) )
             {
-                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                              VLC_META_COPYRIGHT, psz_temp );
+                vlc_meta_SetCopyright( p_meta, psz_temp );
             }
             else if( strstr( (char*)p_frame->description, "Publisher" ) )
             {
-                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                              VLC_META_PUBLISHER, psz_temp );
+                vlc_meta_SetPublisher( p_meta, psz_temp );
             }
             else
             {
-                /* Unknown meta info */
-                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
-                              (char *)p_frame->description, psz_temp );
+                msg_Err(p_demux, "Fixme: unhandled meta" );
             }
             free( psz_temp );
         }

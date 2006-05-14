@@ -55,56 +55,51 @@ int E_(xspf_export_playlist)( vlc_object_t *p_this )
 #define p_item p_playlist->status.p_item
     if ( p_item )
     {
-        for (i = 0; i < p_item->i_parents; i++ )
+        if ( p_item->p_parent->p_input->i_type == ITEM_TYPE_PLAYLIST )
         {
-            if ( p_item->pp_parents[i]->p_parent->input.i_type
-                 == ITEM_TYPE_PLAYLIST )
-            {
-                /* set the current node and its children */
-                p_node   = p_item->pp_parents[i]->p_parent;
-                pp_items = p_node->pp_children;
-                i_size   = p_node->i_children;
+            /* set the current node and its children */
+            p_node   = p_item->p_parent;
+            pp_items = p_node->pp_children;
+            i_size   = p_node->i_children;
 #undef p_item
 
-                /* save name of the playlist node */
-                psz_temp = convert_xml_special_chars( p_node->input.psz_name );
-                if ( *psz_temp )
-                    fprintf(  p_export->p_file, "\t<title>%s</title>\n",
-                              psz_temp );
-                free( psz_temp );
+            /* save name of the playlist node */
+            psz_temp = convert_xml_special_chars( p_node->p_input->psz_name );
+            if ( *psz_temp )
+                fprintf(  p_export->p_file, "\t<title>%s</title>\n",
+                          psz_temp );
+            free( psz_temp );
 
-                /* save the creator of the playlist node */
-                psz = vlc_input_item_GetInfo( &p_node->input,
-                                              _(VLC_META_INFO_CAT),
-                                              _(VLC_META_ARTIST) );
-                if ( psz && !*psz )
-                {
-                    free ( psz );
-                    psz = NULL;
-                }
+            /* save the creator of the playlist node */
+            psz = p_node->p_input->p_meta->psz_artist ? 
+                        strdup( p_node->p_input->p_meta->psz_artist ):
+                        strdup( "" );
+            if ( psz && !*psz )
+            {
+                free ( psz );
+                psz = NULL;
+            }
 
-                if ( !psz )
-                    psz = vlc_input_item_GetInfo( &p_node->input,
-                                                  _(VLC_META_INFO_CAT),
-                                                  _(VLC_META_AUTHOR) );
+            if ( !psz )
+               psz = p_node->p_input->p_meta->psz_author ? 
+                            strdup( p_node->p_input->p_meta->psz_author ):
+                            strdup( "" );
 
-                psz_temp = convert_xml_special_chars( psz );
+            psz_temp = convert_xml_special_chars( psz );
 
-                if ( psz ) free( psz );
-                if ( *psz_temp )
-                    fprintf(  p_export->p_file, "\t<creator>%s</creator>\n",
-                              psz_temp );
-                free( psz_temp );
+            if ( psz ) free( psz );
+            if ( *psz_temp )
+                fprintf(  p_export->p_file, "\t<creator>%s</creator>\n",
+                          psz_temp );
+            free( psz_temp );
 
-                /* save location of the playlist node */
-                psz = assertUTF8URI( p_export->psz_filename );
-                if ( psz && *psz )
-                {
-                    fprintf( p_export->p_file, "\t<location>%s</location>\n",
-                             psz );
-                    free( psz );
-                }
-                break;
+            /* save location of the playlist node */
+            psz = assertUTF8URI( p_export->psz_filename );
+            if ( psz && *psz )
+            {
+                fprintf( p_export->p_file, "\t<location>%s</location>\n",
+                         psz );
+                free( psz );
             }
         }
     }
@@ -161,37 +156,37 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file )
     fprintf( p_file, "\t\t<track>\n" );
 
     /* -> the location */
-    if ( p_item->input.psz_uri && *p_item->input.psz_uri )
+    if ( p_item->p_input->psz_uri && *p_item->p_input->psz_uri )
     {
-        psz = assertUTF8URI( p_item->input.psz_uri );
+        psz = assertUTF8URI( p_item->p_input->psz_uri );
         fprintf( p_file, "\t\t\t<location>%s</location>\n", psz );
         free( psz );
     }
 
     /* -> the name/title (only if different from uri)*/
-    if ( p_item->input.psz_name &&
-         p_item->input.psz_uri &&
-         strcmp( p_item->input.psz_uri, p_item->input.psz_name ) )
+    if ( p_item->p_input->psz_name &&
+         p_item->p_input->psz_uri &&
+         strcmp( p_item->p_input->psz_uri, p_item->p_input->psz_name ) )
     {
-        psz_temp = convert_xml_special_chars( p_item->input.psz_name );
+        psz_temp = convert_xml_special_chars( p_item->p_input->psz_name );
         if ( *psz_temp )
             fprintf( p_file, "\t\t\t<title>%s</title>\n", psz_temp );
         free( psz_temp );
     }
 
     /* -> the artist/creator */
-    psz = vlc_input_item_GetInfo( &p_item->input,
-                                  _(VLC_META_INFO_CAT),
-                                  _(VLC_META_ARTIST) );
+    psz = p_item->p_input->p_meta->psz_artist ? 
+                        strdup( p_item->p_input->p_meta->psz_artist ):
+                        strdup( "" );
     if ( psz && !*psz )
     {
         free ( psz );
         psz = NULL;
     }
     if ( !psz )
-        psz = vlc_input_item_GetInfo( &p_item->input,
-                                      _(VLC_META_INFO_CAT),
-                                      _(VLC_META_AUTHOR) );
+        psz = p_item->p_input->p_meta->psz_author ? 
+                        strdup( p_item->p_input->p_meta->psz_author ):
+                        strdup( "" );
     psz_temp = convert_xml_special_chars( psz );
     if ( psz ) free( psz );
     if ( *psz_temp )
@@ -199,9 +194,9 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file )
     free( psz_temp );
 
     /* -> the album */
-    psz = vlc_input_item_GetInfo( &p_item->input,
-                                  _(VLC_META_INFO_CAT),
-                                  _(VLC_META_COLLECTION) );
+    psz = p_item->p_input->p_meta->psz_album ?
+                        strdup( p_item->p_input->p_meta->psz_album ):
+                        strdup( "" );
     psz_temp = convert_xml_special_chars( psz );
     if ( psz ) free( psz );
     if ( *psz_temp )
@@ -209,9 +204,9 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file )
     free( psz_temp );
 
     /* -> the track number */
-    psz = vlc_input_item_GetInfo( &p_item->input,
-                                  _(VLC_META_INFO_CAT),
-                                  _(VLC_META_SEQ_NUM) );
+    psz = p_item->p_input->p_meta->psz_tracknum ?
+                        strdup( p_item->p_input->p_meta->psz_tracknum ):
+                        strdup( "" );
     if ( psz )
     {
         if ( *psz )
@@ -220,10 +215,10 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file )
     }
 
     /* -> the duration */
-    if ( p_item->input.i_duration > 0 )
+    if ( p_item->p_input->i_duration > 0 )
     {
         fprintf( p_file, "\t\t\t<duration>%ld</duration>\n",
-                 (long)(p_item->input.i_duration / 1000) );
+                 (long)(p_item->p_input->i_duration / 1000) );
     }
 
     fprintf( p_file, "\t\t</track>\n" );

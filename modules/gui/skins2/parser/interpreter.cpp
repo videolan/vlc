@@ -76,12 +76,8 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "playlist.load()", CmdDlgPlaylistLoad )
     REGISTER_CMD( "playlist.save()", CmdDlgPlaylistSave )
     REGISTER_CMD( "playlist.add()", CmdDlgAdd )
-    VarList &rVar = VlcProc::instance( getIntf() )->getPlaylistVar();
-    m_commandMap["playlist.del()"] =
-        CmdGenericPtr( new CmdPlaylistDel( getIntf(), rVar ) );
     REGISTER_CMD( "playlist.next()", CmdPlaylistNext )
     REGISTER_CMD( "playlist.previous()", CmdPlaylistPrevious )
-    REGISTER_CMD( "playlist.sort()", CmdPlaylistSort )
     m_commandMap["playlist.setRandom(true)"] =
         CmdGenericPtr( new CmdPlaylistRandom( getIntf(), true ) );
     m_commandMap["playlist.setRandom(false)"] =

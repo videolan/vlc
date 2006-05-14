@@ -583,7 +583,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 NSMutableArray * tempArray = [[NSMutableArray alloc] init];
                 while( x != y )
                 {
-                    playlist_item_t *p_item = 
+                    playlist_item_t *p_item =
                         [[o_t2_tbl_plst itemAtRow: 
                             [[o_t2_tbl_plst selectedRowIndexes] 
                             indexGreaterThanOrEqualToIndex: x]] pointerValue];
@@ -591,7 +591,7 @@ static VLCWizard *_o_sharedInstance = nil;
                     if( p_item->i_children <= 0 )
                     {
                         [tempArray addObject: [NSString stringWithUTF8String:
-                        p_item->input.psz_uri]];
+                        p_item->p_input->psz_uri]];
                         stop = NO;
                     }
                     else
@@ -1289,17 +1289,17 @@ static VLCWizard *_o_sharedInstance = nil;
                 NSString *tempString = [NSString stringWithFormat: \
                     @"%@ (%i/%i)", _NS("Streaming/Transcoding Wizard"), \
                     ( x + 1 ), y];
-                playlist_item_t *p_item = playlist_ItemNew( p_playlist, \
+                input_item_t *p_input = input_ItemNew( p_playlist, \
                     [[[o_userSelections objectForKey:@"pathToStrm"] \
                     objectAtIndex:x] UTF8String], \
                     [tempString UTF8String] );
-                playlist_ItemAddOption( p_item, [[[o_userSelections \
+                vlc_input_item_AddOption( p_input, [[[o_userSelections \
                     objectForKey:@"opts"] objectAtIndex: x] UTF8String]);
 
                 if(! [[o_userSelections objectForKey:@"partExtractFrom"] \
                     isEqualToString:@""] )
                 {
-                    playlist_ItemAddOption( p_item, [[NSString \
+                    vlc_input_item_AddOption( p_input, [[NSString \
                         stringWithFormat: @"start-time=%@", [o_userSelections \
                         objectForKey: @"partExtractFrom"]] UTF8String] );
                 }
@@ -1307,25 +1307,26 @@ static VLCWizard *_o_sharedInstance = nil;
                 if(! [[o_userSelections objectForKey:@"partExtractTo"] \
                     isEqualToString:@""] )
                 {
-                    playlist_ItemAddOption( p_item, [[NSString \
+                    vlc_input_item_AddOption( p_input, [[NSString \
                         stringWithFormat: @"stop-time=%@", [o_userSelections \
                         objectForKey: @"partExtractTo"]] UTF8String] );
                 }
 
-                playlist_ItemAddOption( p_item, [[NSString stringWithFormat: \
+                vlc_input_item_AddOption( p_input, [[NSString stringWithFormat: \
                     @"ttl=%@", [o_userSelections objectForKey:@"ttl"]] \
                     UTF8String] );
 
-                playlist_AddItem( p_playlist, p_item, PLAYLIST_STOP, PLAYLIST_END );
-                
+                playlist_PlaylistAddInput( p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END );
+
                 if( x == 0 )
-                    /* play the first item and add the others afterwards */ 
+                {
+                    /* play the first item and add the others afterwards */
+                    playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
                     playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
+                }
 
                 x += 1;
             }
-
-            playlist_ViewUpdate( p_playlist, VIEW_CATEGORY );
 
             vlc_object_release(p_playlist);
         } else {

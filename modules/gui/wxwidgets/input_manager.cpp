@@ -144,8 +144,9 @@ void InputManager::UpdateInput()
 
 void InputManager::UpdateNowPlaying()
 {
-    char *psz_now_playing = vlc_input_item_GetInfo( p_input->input.p_item,
-                _(VLC_META_INFO_CAT), _(VLC_META_NOW_PLAYING) );
+    char *psz_now_playing = p_input->input.p_item->p_meta->psz_nowplaying ?
+                    strdup( p_input->input.p_item->p_meta->psz_nowplaying ):
+                    strdup( "" );
     if( psz_now_playing && *psz_now_playing )
     {
         p_main_intf->statusbar->SetStatusText(

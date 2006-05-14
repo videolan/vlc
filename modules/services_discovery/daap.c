@@ -181,8 +181,10 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_sd, "unable to find playlist, cancelling DAAP" );
         return VLC_EGENERIC;
     }
+    msg_Err( p_sd, "DAAP IS BROKEN !! Fix it if you want it !" );
+    return VLC_EGENERIC;
 
-    p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
+#if 0
     p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                          _("DAAP shares"), p_view->p_root );
     p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
@@ -192,10 +194,12 @@ static int Open( vlc_object_t *p_this )
     vlc_object_release( p_playlist );
 
     return VLC_SUCCESS;
+#endif
 }
 
 static int OpenAccess( vlc_object_t *p_this )
 {
+#if 0
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     vlc_value_t val;
@@ -294,7 +298,7 @@ static int OpenAccess( vlc_object_t *p_this )
 
     if( i_ret != 0 )
         return VLC_EGENERIC;
-
+#endif
     return VLC_SUCCESS;
 }
 
@@ -303,6 +307,7 @@ static int OpenAccess( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
+#if 0
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
 
@@ -326,6 +331,7 @@ static void Close( vlc_object_t *p_this )
     }
 
     free( p_sys );
+#endif
 }
 
 static void CloseAccess( vlc_object_t *p_this )
@@ -522,6 +528,7 @@ static int EnumerateCallback( DAAP_SClient *p_client,
 
 static void ProcessHost( services_discovery_t *p_sd, dhost_t *p_host )
 {
+#if 0
     int i_dbsize, i_db, i, i_songsize, i_ret;
     int i_size = DAAP_ClientHost_GetSharename( p_host->p_host, NULL, 0 );
 
@@ -617,6 +624,7 @@ static void ProcessHost( services_discovery_t *p_sd, dhost_t *p_host )
     DAAP_ClientHost_AsyncWaitUpdate( p_host->p_host );
 
     vlc_object_release( p_playlist );
+#endif
 }
 
 static void FreeHost( services_discovery_t *p_sd, dhost_t *p_host )

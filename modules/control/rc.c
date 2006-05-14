@@ -201,7 +201,6 @@ vlc_module_end();
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    playlist_t *p_playlist;
     char *psz_host, *psz_unix_path;
     int  *pi_socket = NULL;
 
@@ -320,17 +319,6 @@ static int Activate( vlc_object_t *p_this )
 #else
     CONSOLE_INTRO_MSG;
 #endif
-
-    /* Force "no-view" mode */
-    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
-    if( p_playlist )
-    {
-        vlc_mutex_lock( &p_playlist->object_lock );
-        p_playlist->status.i_view = -1;
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
-    }
 
     msg_rc( _("Remote control interface initialized. Type `help' for help.") );
     return VLC_SUCCESS;
@@ -1234,6 +1222,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                                            FIND_ANYWHERE );
     if( !p_playlist )
     {
+        msg_Err( p_this, "no playlist" );
         return VLC_ENOOBJ;
     }
 
@@ -1241,7 +1230,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     {
         vlc_value_t val;
         var_Get( p_playlist->p_input, "state", &val );
-        if( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) )        {
+        if( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) )
+        {
             msg_rc( _("Type 'menu select' or 'pause' to continue.") );
             vlc_object_release( p_playlist );
             return VLC_EGENERIC;
@@ -1259,29 +1249,12 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "play" ) )
     {
-        if( p_playlist->p_input )
-        {
-            vlc_value_t val;
-
-            var_Get( p_playlist->p_input, "rate", &val );
-            if( val.i_int != INPUT_RATE_DEFAULT )
-            {
-                val.i_int = INPUT_RATE_DEFAULT;
-                var_Set( p_playlist->p_input, "rate", val );
-            }
-            else
-            {
-                playlist_Play( p_playlist );
-            }
-        }
+        msg_Warn( p_playlist, "play" );
+        playlist_Play( p_playlist );
     }
     else if (!strcmp( psz_cmd, "goto" ) )
     {
-        if( strlen( newval.psz_string ) > 0)
-        {
-            val.i_int = atoi( newval.psz_string );
-            playlist_Goto( p_playlist, val.i_int);
-        }
+        msg_Err( p_playlist, "goto is deprecated" );
     }
     else if( !strcmp( psz_cmd, "stop" ) )
     {
@@ -1302,26 +1275,16 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( p_item )
         {
             msg_rc( "Trying to add %s to playlist.", newval.psz_string );
-            playlist_AddItem( p_playlist, p_item,
-                              PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
+//            playlist_AddItem( p_playlist, p_item,
+//                              PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
         }
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
     {
         int i;
-
-        for ( i = 0; i < p_playlist->i_size; i++ )
-        {
-            msg_rc( "|%s%s   %s|%s|", i == p_playlist->i_index ? "*" : " ",
-                    p_playlist->pp_items[i]->input.psz_name,
-                    p_playlist->pp_items[i]->input.psz_uri,
-                    p_playlist->pp_items[i]->i_parents > 0 ?
-                    p_playlist->pp_items[i]->pp_parents[0]->p_parent->input.psz_name : "" );
-        }
-        if ( i == 0 )
-        {
-            msg_rc( "| no entries" );
-        }
+        playlist_view_t *p_view;
+        playlist_NodeDump( p_playlist, p_playlist->p_root_category, 0 );
+        playlist_NodeDump( p_playlist, p_playlist->p_root_onelevel, 0 );
     }
     else if( !strcmp( psz_cmd, "status" ) )
     {

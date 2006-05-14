@@ -192,25 +192,17 @@ mediacontrol_start( mediacontrol_Instance *self,
     vlc_mutex_lock( &p_playlist->object_lock );
     if( p_playlist->i_size )
     {
-        int i_index;
         int i_from;
         char *psz_from = NULL;
 
         psz_from = ( char * )malloc( 20 * sizeof( char ) );
-        if( psz_from )
+        if( psz_from && p_playlist->status.p_item )
         {
             i_from = mediacontrol_position2microsecond( p_playlist->p_input, a_position ) / 1000000;
 
-            i_index = p_playlist->i_index;
-            if( i_index < 0 )
-            {
-                /* We know that there is at least 1 element, since i_size != 0 */
-                i_index = 0;
-            }
-
             /* Set start time */
             snprintf( psz_from, 20, "start-time=%i", i_from );
-            playlist_ItemAddOption( p_playlist->pp_items[i_index], psz_from );
+            playlist_ItemAddOption( p_playlist->status.p_item, psz_from );
             free( psz_from );
         }
 
@@ -345,7 +337,7 @@ mediacontrol_playlist_get_list( mediacontrol_Instance *self,
 
     for( i_index = 0 ; i_index < i_playlist_size ; i_index++ )
     {
-        retval->data[i_index] = strdup( p_playlist->pp_items[i_index]->input.psz_uri );
+        retval->data[i_index] = strdup( p_playlist->pp_items[i_index]->p_input->psz_uri );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 

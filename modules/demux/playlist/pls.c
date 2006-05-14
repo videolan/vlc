@@ -99,6 +99,7 @@ void E_(Close_PLS)( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
+#if 0
     mtime_t        i_duration = -1;
     char          *psz_name = NULL;
     char          *psz_line;
@@ -282,6 +283,7 @@ static int Demux( demux_t *p_demux )
     }
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;
+#endif
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )

@@ -216,7 +216,7 @@ static int Open( vlc_object_t *p_this )
         if( !p_playlist ) return VLC_EGENERIC;
 
         /* Let's check if we need to play */
-        if( &p_playlist->status.p_item->input ==
+        if( p_playlist->status.p_item->p_input ==
              ((input_thread_t *)p_access->p_parent)->input.p_item )
         {
             p_item = p_playlist->status.p_item;
@@ -290,8 +290,7 @@ static int Open( vlc_object_t *p_this )
     if( b_play )
     {
         playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          p_playlist->status.i_view, p_playlist->status.p_item,
-                          NULL );
+                          p_playlist->status.p_item, NULL );
     }
 
     if( p_playlist ) vlc_object_release( p_playlist );
@@ -445,7 +444,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     input_title_t ***ppp_title;
     int i;
     char         *psz_title;
-    vlc_meta_t  **pp_meta;
+    vlc_meta_t  *p_meta;
 
     switch( i_query )
     {
@@ -511,9 +510,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
              psz_title = malloc( strlen( _("Audio CD - Track ") ) + 5 );
              snprintf( psz_title, 100, _("Audio CD - Track %i" ),
                                         p_access->info.i_title+1 );
-             pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
-             *pp_meta = vlc_meta_New();
-             vlc_meta_Add( *pp_meta, _(VLC_META_TITLE), psz_title );
+             p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
+             vlc_meta_SetTitle( p_meta, psz_title );
              free( psz_title );
              break;
 
@@ -534,7 +532,7 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i;
-    playlist_item_t *p_item;
+    input_item_t *p_input_item;
     char *psz_name;
     p_sys->i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
                                           p_sys->vcddev, &p_sys->p_sectors );
@@ -560,7 +558,7 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
         playlist_ItemSetName( p_parent, psz_name );
         vlc_mutex_unlock( &p_playlist->object_lock );
         var_SetInteger( p_playlist, "item-change",
-                        p_parent->input.i_id );
+                        p_parent->p_input->i_id );
         free( psz_name );
 
 #ifdef HAVE_LIBCDDB
@@ -575,7 +573,7 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
                 playlist_ItemSetName( p_parent, psz_name );
                 vlc_mutex_unlock( &p_playlist->object_lock );
                 var_SetInteger( p_playlist, "item-change",
-                                p_parent->input.i_id );
+                                p_parent->p_input->i_id );
                 free( psz_name );
             }
         }
@@ -615,9 +613,10 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
             sprintf( psz_name, _("Audio CD - Track %i"), (i+1) );
 
             /* Create playlist items */
-            p_item = playlist_ItemNewWithType( VLC_OBJECT( p_playlist ),
-                                 psz_uri, psz_name, ITEM_TYPE_DISC );
-            playlist_ItemAddOption( p_item, psz_opt );
+            p_input_item = input_ItemNewWithType( VLC_OBJECT( p_playlist ),
+                                psz_uri, psz_name, 0, NULL, -1,
+                                ITEM_TYPE_DISC );
+            vlc_input_item_AddOption( p_input_item, psz_opt );
 #ifdef HAVE_LIBCDDB
             /* If we have CDDB info, change the name */
             if( p_sys->p_disc )
@@ -628,28 +627,27 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
                 {
                     if( cddb_track_get_title( t )  != NULL )
                     {
-                        vlc_input_item_AddInfo( &p_item->input,
+                        vlc_input_item_AddInfo( p_input_item,
                                             _(VLC_META_INFO_CAT),
                                             _(VLC_META_TITLE),
                                             cddb_track_get_title( t ) );
-                        if( p_item->input.psz_name )
-                            free( p_item->input.psz_name );
-                        asprintf( &p_item->input.psz_name, "%s",
+                        if( p_input_item->psz_name )
+                            free( p_input_item->psz_name );
+                        asprintf( &p_input_item->psz_name, "%s",
                                   cddb_track_get_title( t ) );
                     }
                     psz_result = cddb_track_get_artist( t );
                     if( psz_result )
                     {
-                        vlc_input_item_AddInfo( &p_item->input,
+                        vlc_input_item_AddInfo( p_input_item,
                                             _(VLC_META_INFO_CAT),
                                             _(VLC_META_ARTIST), psz_result );
                     }
                 }
             }
 #endif
-            playlist_NodeAddItem( p_playlist, p_item,
-                                  p_parent->pp_parents[0]->i_view,
-                                  p_parent, PLAYLIST_APPEND, PLAYLIST_END );
+            playlist_BothAddInput( p_playlist, p_input_item, p_parent,
+                                   PLAYLIST_APPEND, PLAYLIST_END );
             free( psz_uri ); free( psz_opt ); free( psz_name );
         }
     }

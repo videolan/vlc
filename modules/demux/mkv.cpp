@@ -1592,13 +1592,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int         i_skp;
     size_t      i_idx;
 
-    vlc_meta_t **pp_meta;
+    vlc_meta_t *p_meta;
 
     switch( i_query )
     {
         case DEMUX_GET_META:
-            pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
-            *pp_meta = vlc_meta_Duplicate( p_sys->meta );
+            p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
+            vlc_meta_Merge( p_meta, p_sys->meta );
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
@@ -4917,54 +4917,30 @@ void matroska_segment_c::InformationCreate( )
 
     if( psz_title )
     {
-        vlc_meta_Add( sys.meta, VLC_META_TITLE, psz_title );
+        vlc_meta_SetTitle( sys.meta, psz_title );
     }
     if( psz_date_utc )
     {
-        vlc_meta_Add( sys.meta, VLC_META_DATE, psz_date_utc );
+        vlc_meta_SetDate( sys.meta, psz_date_utc );
     }
     if( psz_segment_filename )
     {
-        vlc_meta_Add( sys.meta, _("Segment filename"), psz_segment_filename );
+        fprintf( stderr, "***** WARNING: Unhandled meta - Use custom\n" );
     }
     if( psz_muxing_application )
     {
-        vlc_meta_Add( sys.meta, _("Muxing application"), psz_muxing_application );
+        fprintf( stderr, "***** WARNING: Unhandled meta - Use custom\n" );
     }
     if( psz_writing_application )
     {
-        vlc_meta_Add( sys.meta, _("Writing application"), psz_writing_application );
+        fprintf( stderr, "***** WARNING: Unhandled meta - Use custom\n" );
     }
 
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
-        mkv_track_t *tk = tracks[i_track];
-        vlc_meta_t *mtk = vlc_meta_New();
-
-        sys.meta->track = (vlc_meta_t**)realloc( sys.meta->track,
-                                                    sizeof( vlc_meta_t * ) * ( sys.meta->i_track + 1 ) );
-        sys.meta->track[sys.meta->i_track++] = mtk;
-
-        if( tk->fmt.psz_description )
-        {
-            vlc_meta_Add( sys.meta, VLC_META_DESCRIPTION, tk->fmt.psz_description );
-        }
-        if( tk->psz_codec_name )
-        {
-            vlc_meta_Add( sys.meta, VLC_META_CODEC_NAME, tk->psz_codec_name );
-        }
-        if( tk->psz_codec_settings )
-        {
-            vlc_meta_Add( sys.meta, VLC_META_SETTING, tk->psz_codec_settings );
-        }
-        if( tk->psz_codec_info_url )
-        {
-            vlc_meta_Add( sys.meta, VLC_META_CODEC_DESCRIPTION, tk->psz_codec_info_url );
-        }
-        if( tk->psz_codec_download_url )
-        {
-            vlc_meta_Add( sys.meta, VLC_META_URL, tk->psz_codec_download_url );
-        }
+//        mkv_track_t *tk = tracks[i_track];
+//        vlc_meta_t *mtk = vlc_meta_New();
+        fprintf( stderr, "***** WARNING: Unhandled child meta\n");
     }
 
     if( i_tags_position >= 0 )

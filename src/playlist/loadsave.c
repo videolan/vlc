@@ -57,12 +57,11 @@ int playlist_Import( playlist_t * p_playlist, const char *psz_filename )
     psz_uri = (char *)malloc(sizeof(char)*strlen(psz_filename) + 17 );
     sprintf( psz_uri, "file/playlist://%s", psz_filename);
 
-    i_id = playlist_Add( p_playlist, psz_uri, psz_uri,
+    i_id = playlist_PlaylistAdd( p_playlist, psz_uri, psz_uri,
                   PLAYLIST_INSERT  , PLAYLIST_END);
 
     vlc_mutex_lock( &p_playlist->object_lock );
     p_item = playlist_ItemGetById( p_playlist, i_id );
-    p_item->b_autodeletion = VLC_TRUE;
     vlc_mutex_unlock( &p_playlist->object_lock );
 
     playlist_Play(p_playlist);
@@ -91,12 +90,11 @@ int playlist_Load( playlist_t * p_playlist, const char *psz_filename )
     psz_uri = (char *)malloc(sizeof(char)*strlen(psz_filename) + 17 );
     sprintf( psz_uri, "file/playlist://%s", psz_filename);
 
-    i_id = playlist_Add( p_playlist, psz_uri, psz_uri,
+    i_id = playlist_PlaylistAdd( p_playlist, psz_uri, psz_uri,
                   PLAYLIST_INSERT  , PLAYLIST_END);
 
     vlc_mutex_lock( &p_playlist->object_lock );
     p_item = playlist_ItemGetById( p_playlist, i_id );
-    p_item->b_autodeletion = VLC_TRUE;
     vlc_mutex_unlock( &p_playlist->object_lock );
 
     playlist_Play(p_playlist);
@@ -105,26 +103,30 @@ int playlist_Load( playlist_t * p_playlist, const char *psz_filename )
 }
 
 /**
- * Export a playlist to a certain type of playlistfile
+ * Export a node of the playlist to a certain type of playlistfile
  *
  * \param p_playlist the playlist to export
  * \param psz_filename the location where the exported file will be saved
+ * \param p_export_root the root node to export
  * \param psz_type the type of playlist file to create.
  * \return VLC_SUCCESS on success
  */
 int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
-                     const char *psz_type)
+                     playlist_item_t *p_export_root,const char *psz_type )
 {
     module_t *p_module;
     playlist_export_t *p_export;
 
-    msg_Info( p_playlist, "saving playlist to file %s", psz_filename );
+    if( p_export_root == NULL ) return VLC_EGENERIC;
+
+    msg_Info( p_playlist, "saving %s to file %s",
+                    p_export_root->p_input->psz_name, psz_filename );
 
     /* Prepare the playlist_export_t structure */
     p_export = (playlist_export_t *)malloc( sizeof(playlist_export_t) );
     if( !p_export)
     {
-        msg_Err( p_playlist, "out of memory");
+        msg_Err( p_playlist, "out of memory" );
         return VLC_ENOMEM;
     }
     p_export->psz_filename = NULL;
@@ -138,9 +140,11 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
         return VLC_EGENERIC;
     }
 
-    p_playlist->p_private = (void *)p_export;
+    p_export->p_root = p_export_root;
+
     /* Lock the playlist */
     vlc_mutex_lock( &p_playlist->object_lock );
+    p_playlist->p_private = (void *)p_export;
 
     /* And call the module ! All work is done now */
     p_module = module_Need( p_playlist, "playlist export", psz_type, VLC_TRUE);

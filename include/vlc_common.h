@@ -24,6 +24,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+
 /**
  * \file
  * This file is a collection of common definitions and types
@@ -203,6 +204,7 @@ typedef struct vlc_t vlc_t;
 typedef struct variable_t variable_t;
 typedef struct date_t date_t;
 typedef struct hashtable_entry_t hashtable_entry_t;
+typedef struct gc_object_t gc_object_t ;
 
 /* Messages */
 typedef struct msg_bank_t msg_bank_t;
@@ -524,6 +526,44 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 /* VLC_OBJECT: attempt at doing a clever cast */
 #define VLC_OBJECT( x ) \
     ((vlc_object_t *)(x))+0*(x)->be_sure_to_add_VLC_COMMON_MEMBERS_to_struct
+
+#define VLC_GC_MEMBERS                                                       \
+/** \name VLC_GC_MEMBERS                                                     \
+ * these members are common to all objects that wish to be garbage-collected \
+ */                                                                          \
+/**@{*/                                                                      \
+    int i_gc_refcount;                                                       \
+    void (*pf_destructor) ( gc_object_t * );                                 \
+    void *p_destructor_arg;                                                  \
+/**@}*/
+
+struct gc_object_t
+{
+            VLC_GC_MEMBERS
+};
+
+static inline void __vlc_gc_incref( gc_object_t * p_gc )
+{
+    p_gc->i_gc_refcount ++;
+};
+
+static inline void __vlc_gc_decref( gc_object_t *p_gc )
+{
+    p_gc->i_gc_refcount -- ;
+
+    if( p_gc->i_gc_refcount == 0 )
+    {
+        p_gc->pf_destructor( p_gc );
+        /* Do not use the p_gc pointer from now on ! */
+     }
+}
+
+#define vlc_gc_incref( a ) __vlc_gc_incref( (gc_object_t *)a )
+#define vlc_gc_decref( a ) __vlc_gc_decref( (gc_object_t *)a )
+#define vlc_gc_init( a,b,c ) {  ((gc_object_t *)a)->i_gc_refcount = 0; \
+                              ((gc_object_t *)a)->pf_destructor = b; \
+                              ((gc_object_t *)a)->p_destructor_arg = c; }
+
 
 /*****************************************************************************
  * Macros and inline functions

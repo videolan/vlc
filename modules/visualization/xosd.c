@@ -204,7 +204,6 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    int i_size,i_index;
     playlist_t *p_playlist;
     playlist_item_t *p_item = NULL;
     input_item_t item;
@@ -223,7 +222,7 @@ static void Run( intf_thread_t *p_intf )
                 continue;
             }
 
-            if( p_playlist->i_size < 0 || p_playlist->i_index < 0 )
+            if( p_playlist->i_size < 0  )
             {
                 vlc_object_release( p_playlist );
                 continue;
@@ -245,18 +244,13 @@ static void Run( intf_thread_t *p_intf )
             }
             else
             {
-    //           vlc_mutex_lock(&p_playlist->object_lock );
                  p_item = p_playlist->status.p_item;
                 item = p_item->input;
                 if( !p_item )
                 {
                     vlc_object_release( p_playlist );
-     //            vlc_mutex_unlock(&p_playlist->object_lock );
                     continue;
                 }
-                i_size = p_playlist->i_size;
-                i_index = p_playlist->i_index+1;
-    //            vlc_mutex_unlock(&p_playlist->object_lock );
 
                 vlc_object_release( p_playlist );
 
@@ -274,8 +268,8 @@ static void Run( intf_thread_t *p_intf )
                 psz_display = (char *)malloc( sizeof(char )*
                                           (strlen( item.psz_name ) +
                                           MSTRTIME_MAX_SIZE + 2+6 + 10 +10 ));
-                sprintf( psz_display," %i/%i - %s %s",
-                         i_index,i_size, item.psz_name, psz_duration);
+                sprintf( psz_display,"%s %s",
+                         item.psz_name, psz_duration);
             }
 
             /* Display */

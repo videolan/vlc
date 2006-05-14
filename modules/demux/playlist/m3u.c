@@ -107,34 +107,16 @@ void E_(Close_M3U)( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
-    playlist_t *p_playlist;
     char       *psz_line;
-
     char       *psz_name = NULL;
     char       *psz_artist = NULL;
     int        i_parsed_duration = 0;
     mtime_t    i_duration = -1;
-    char       **ppsz_options = NULL;
-    int        i_options = 0, i;
-
-    playlist_item_t *p_item, *p_current;
-
-    vlc_bool_t b_play;
-
+    const char**ppsz_options = NULL;
+    int        i_options = 0, i, i_parent_id;
     vlc_bool_t b_cleanup = VLC_FALSE;
 
-    p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Err( p_demux, "can't find playlist" );
-        return -1;
-    }
-
-    b_play = E_(FindItem)( p_demux, p_playlist, &p_current );
-
-    playlist_ItemToNode( p_playlist, p_current );
-    p_current->input.i_type = ITEM_TYPE_PLAYLIST;
+    INIT_PLAYLIST_STUFF;
 
     psz_line = stream_ReadLine( p_demux->s );
     while( psz_line )
@@ -172,7 +154,7 @@ static int Demux( demux_t *p_demux )
                                    sizeof("EXTVLCOPT:") -1 ) )
             {
                 /* VLC Option */
-                char *psz_option;
+                const char *psz_option;
                 psz_parse += sizeof("EXTVLCOPT:") -1;
                 if( !*psz_parse ) goto error;
 
@@ -199,28 +181,18 @@ static int Demux( demux_t *p_demux )
             EnsureUTF8( psz_name );
             EnsureUTF8( psz_mrl );
 
-            p_item = playlist_ItemNew( p_playlist, psz_mrl, psz_name );
             for( i = 0; i< i_options; i++ )
-            {
-                EnsureUTF8( ppsz_options[i] );
-                playlist_ItemAddOption( p_item, ppsz_options[i] );
-            }
-            p_item->input.i_duration = i_duration;
+                EnsureUTF8( (char*)ppsz_options[i] );
+
+            p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
+                                        i_options, ppsz_options, i_duration );
             if ( psz_artist && *psz_artist )
-                vlc_input_item_AddInfo( &p_item->input, _(VLC_META_INFO_CAT),
+                vlc_input_item_AddInfo( p_input, _(VLC_META_INFO_CAT),
                                         _(VLC_META_ARTIST), "%s", psz_artist );
-            playlist_NodeAddItem( p_playlist, p_item,
-                                  p_current->pp_parents[0]->i_view,
-                                  p_current, PLAYLIST_APPEND,
-                                  PLAYLIST_END );
-
-            /* We need to declare the parents of the node as the
-             *                  * same of the parent's ones */
-            playlist_CopyParents( p_current, p_item );
-
-            vlc_input_item_CopyOptions( &p_current->input,
-                                        &p_item->input );
-
+            fprintf( stderr, "Adding %s\n", p_input->psz_uri );
+            playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
+                 p_item_in_category, (i_parent_id > 0 )? VLC_TRUE : VLC_FALSE,
+                 PLAYLIST_APPEND );
             free( psz_mrl );
         }
 
@@ -234,7 +206,7 @@ static int Demux( demux_t *p_demux )
         if( b_cleanup )
         {
             /* Cleanup state */
-            while( i_options-- ) free( ppsz_options[i_options] );
+            while( i_options-- ) free( (char*)ppsz_options[i_options] );
             if( ppsz_options ) free( ppsz_options );
             ppsz_options = NULL; i_options = 0;
             if( psz_name ) free( psz_name );
@@ -247,18 +219,7 @@ static int Demux( demux_t *p_demux )
             b_cleanup = VLC_FALSE;
         }
     }
-
-    /* Go back and play the playlist */
-    if( b_play && p_playlist->status.p_item &&
-        p_playlist->status.p_item->i_children > 0 )
-    {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          p_playlist->status.i_view,
-                          p_playlist->status.p_item,
-                          p_playlist->status.p_item->pp_children[0] );
-    }
-
-    vlc_object_release( p_playlist );
+    HANDLE_PLAY_AND_RELEASE;
     return VLC_SUCCESS;
 }
 
@@ -267,7 +228,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
-static void parseEXTINF(char *psz_string, char **ppsz_artist, 
+static void parseEXTINF(char *psz_string, char **ppsz_artist,
                         char **ppsz_name, int *pi_duration)
 {
     char *end = NULL;
@@ -306,7 +267,7 @@ static void parseEXTINF(char *psz_string, char **ppsz_artist,
         *ppsz_artist = psz_string;
         *ppsz_name = psz_item + 3;          /* points directly after ' - ' */
         return;
-    } 
+    }
 
     /* reaching this point means: 0.8.1- with artist or something without artist */
     if ( *psz_string == ',' )
@@ -315,7 +276,7 @@ static void parseEXTINF(char *psz_string, char **ppsz_artist,
         psz_string++;
         *ppsz_name = psz_string;
         return;
-    } 
+    }
 
     psz_item = psz_string;
     psz_string = strchr( psz_string, ',' );

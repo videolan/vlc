@@ -100,6 +100,7 @@ void E_(Close_DVB)( vlc_object_t *p_this )
  *****************************************************************************/
 static int Demux( demux_t *p_demux )
 {
+#if 0
     playlist_t *p_playlist;
     char       *psz_line;
     playlist_item_t *p_current;
@@ -116,7 +117,7 @@ static int Demux( demux_t *p_demux )
     b_play = E_(FindItem)( p_demux, p_playlist, &p_current );
 
     playlist_ItemToNode( p_playlist, p_current );
-    p_current->input.i_type = ITEM_TYPE_PLAYLIST;
+    p_current->p_input->i_type = ITEM_TYPE_PLAYLIST;
 
     while( (psz_line = stream_ReadLine( p_demux->s )) )
     {
@@ -166,6 +167,7 @@ static int Demux( demux_t *p_demux )
 
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;
+#endif
 }
 
 static struct

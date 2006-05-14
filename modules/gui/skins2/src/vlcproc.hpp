@@ -28,7 +28,6 @@
 #include <set>
 
 #include "../vars/equalizer.hpp"
-#include "../vars/playlist.hpp"
 #include "../vars/playtree.hpp"
 #include "../vars/time.hpp"
 #include "../vars/volume.hpp"
@@ -51,9 +50,6 @@ class VlcProc: public SkinObject
 
         /// Delete the instance of VlcProc
         static void destroy( intf_thread_t *pIntf );
-
-        /// Getter for the playlist variable
-        Playlist &getPlaylistVar() { return *((Playlist*)m_cPlaylist.get()); }
 
         /// Getter for the playtree variable
         Playtree &getPlaytreeVar() { return *((Playtree*)m_cPlaytree.get()); }
@@ -104,9 +100,7 @@ class VlcProc: public SkinObject
     private:
         /// Timer to call manage() regularly (via doManage())
         OSTimer *m_pTimer;
-        /// Playlist variable
-        VariablePtr m_cPlaylist;
-        /// Playtree variable FIXME
+        /// Playtree variable
         VariablePtr m_cPlaytree;
         VariablePtr m_cVarRandom;
         VariablePtr m_cVarLoop;

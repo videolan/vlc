@@ -33,18 +33,6 @@ void CmdPlaylistDel::execute()
 }
 
 
-void CmdPlaylistSort::execute()
-{
-    // XXX add the mode and type
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    if( pPlaylist != NULL )
-    {
-        playlist_Sort( pPlaylist, SORT_TITLE, ORDER_NORMAL );
-    }
-
-}
-
-
 void CmdPlaylistNext::execute()
 {
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
@@ -118,7 +106,8 @@ void CmdPlaylistSave::execute()
     {
         // FIXME: when the PLS export will be working, we'll need to remove
         // this hardcoding...
-        playlist_Export( pPlaylist, m_file.c_str(), "export-m3u" );
+        msg_Err( getIntf(), "need to fix playlist save" );
+//        playlist_Export( pPlaylist, m_file.c_str(), "export-m3u" );
     }
 }
 

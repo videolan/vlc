@@ -130,7 +130,7 @@ char *E_(ExtractURIValue)( char *psz_uri, const char *psz_name,
 int E_(TestURIParam)( char *psz_uri, const char *psz_name );
 
 /** This function parses a MRL */
-playlist_item_t *E_(MRLParse)( intf_thread_t *, char *psz, char *psz_name );
+input_item_t *E_(MRLParse)( intf_thread_t *, char *psz, char *psz_name );
 
 /** Return the first word from a string (works in-place) */
 char *E_(FirstWord)( char *psz, char *new );

@@ -87,7 +87,7 @@ END_EVENT_TABLE()
 class PlaylistItem : public wxTreeItemData
 {
 public:
-    PlaylistItem( playlist_item_t *p_item ) : i_id(p_item->input.i_id) {}
+    PlaylistItem( playlist_item_t *p_item ) : i_id(p_item->p_input->i_id) {}
     int i_id;
 };
 
@@ -220,9 +220,9 @@ static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
 void PlaylistManager::CreateNode( playlist_item_t *p_node, wxTreeItemId parent)
 {
     wxTreeItemId node =
-        treectrl->AppendItem( parent, wxL2U( p_node->input.psz_name ), -1, -1,
+        treectrl->AppendItem( parent, wxL2U( p_node->p_input->psz_name ), -1, -1,
                               new PlaylistItem( p_node ) );
-    treectrl->SetItemImage( node, p_node->input.i_type );
+    treectrl->SetItemImage( node, p_node->p_input->i_type );
 
     UpdateNodeChildren( p_node, node );
 }
@@ -246,7 +246,7 @@ void PlaylistManager::UpdateNode( playlist_item_t *p_node, wxTreeItemId node )
         }
     }
 
-    treectrl->SetItemImage( node, p_node->input.i_type );
+    treectrl->SetItemImage( node, p_node->p_input->i_type );
 
 }
 
@@ -260,7 +260,7 @@ void PlaylistManager::UpdateNodeChildren( playlist_item_t *p_node,
         {
             wxTreeItemId item =
                 treectrl->AppendItem( node,
-                    wxL2U( p_node->pp_children[i]->input.psz_name ), -1,-1,
+                    wxL2U( p_node->pp_children[i]->p_input->psz_name ), -1,-1,
                            new PlaylistItem( p_node->pp_children[i]) );
 
             UpdateTreeItem( item );
@@ -290,9 +290,9 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
 
     wxString msg;
     wxString duration = wxU( "" );
-    char *psz_author =
-        vlc_input_item_GetInfo( &p_item->input,
-                                _(VLC_META_INFO_CAT), _(VLC_META_ARTIST) );
+    char *psz_author = p_item->p_input->p_meta->psz_artist ? 
+                        strdup( p_item->p_input->p_meta->psz_artist ) :
+                        strdup( "" );
     if( !psz_author )
     {
         UnlockPlaylist( p_intf->p_sys, p_playlist );
@@ -300,7 +300,7 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
     }
 
     char psz_duration[MSTRTIME_MAX_SIZE];
-    mtime_t dur = p_item->input.i_duration;
+    mtime_t dur = p_item->p_input->i_duration;
 
     if( dur != -1 )
     {
@@ -309,18 +309,18 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
                          wxU( " )" ) );
     }
 
-    if( !strcmp( psz_author, "" ) || p_item->input.b_fixed_name == VLC_TRUE )
+    if( !strcmp( psz_author, "" ) || p_item->p_input->b_fixed_name == VLC_TRUE )
     {
-        msg = wxString( wxU( p_item->input.psz_name ) ) + duration;
+        msg = wxString( wxU( p_item->p_input->psz_name ) ) + duration;
     }
     else
     {
         msg = wxString(wxU( psz_author )) + wxT(" - ") +
-                    wxString(wxU(p_item->input.psz_name)) + duration;
+                    wxString(wxU(p_item->p_input->psz_name)) + duration;
     }
     free( psz_author );
     treectrl->SetItemText( item , msg );
-    treectrl->SetItemImage( item, p_item->input.i_type );
+    treectrl->SetItemImage( item, p_item->p_input->i_type );
 
     if( p_playlist->status.p_item == p_item )
     {
@@ -360,9 +360,9 @@ void PlaylistManager::AppendItem( wxCommandEvent& event )
     item = FindItem( treectrl->GetRootItem(), p_add->i_item );
     if( item.IsOk() ) goto update;
 
-    item = treectrl->AppendItem( node, wxL2U( p_item->input.psz_name ), -1,-1,
+    item = treectrl->AppendItem( node, wxL2U( p_item->p_input->psz_name ), -1,-1,
                                  new PlaylistItem( p_item ) );
-    treectrl->SetItemImage( item, p_item->input.i_type );
+    treectrl->SetItemImage( item, p_item->p_input->i_type );
 
     if( item.IsOk() && p_item->i_children == -1 ) UpdateTreeItem( item );
 
@@ -415,19 +415,15 @@ void PlaylistManager::Update()
  **********************************************************************/
 void PlaylistManager::Rebuild( vlc_bool_t b_root )
 {
-    playlist_view_t *p_view;
-
     i_items_to_append = 0;
     i_cached_item_id = -1;
 
-    p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
-
     treectrl->DeleteAllItems();
     treectrl->AddRoot( wxU(_("root" )), -1, -1,
-                       new PlaylistItem( p_view->p_root ) );
+                       new PlaylistItem( p_playlist->p_root_category ) );
 
     wxTreeItemId root = treectrl->GetRootItem();
-    UpdateNode( p_view->p_root, root );
+    UpdateNode( p_playlist->p_root_category, root );
 }
 
 /**********************************************************************
@@ -506,9 +502,7 @@ void PlaylistManager::OnActivateItem( wxTreeEvent& event )
         p_node = p_item;
         p_item = NULL;
     }
-
-    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VIEW_CATEGORY,
-                      p_node, p_item );
+    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_node, p_item );
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 }
 

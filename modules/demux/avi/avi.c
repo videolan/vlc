@@ -327,7 +327,7 @@ static int Open( vlc_object_t * p_this )
                  p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
                  p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
                  p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
-        vlc_meta_Add( p_sys->meta, VLC_META_SETTING, buffer );
+        vlc_meta_SetSetting( p_sys->meta, buffer );
     }
 
     /* now read info on each stream and create ES */
@@ -1308,7 +1308,7 @@ static int    Control( demux_t *p_demux, int i_query, va_list args )
     int i;
     double   f, *pf;
     int64_t i64, *pi64;
-    vlc_meta_t **pp_meta;
+    vlc_meta_t *p_meta;
 
     switch( i_query )
     {
@@ -1369,8 +1369,8 @@ static int    Control( demux_t *p_demux, int i_query, va_list args )
             }
             return VLC_SUCCESS;
         case DEMUX_GET_META:
-            pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
-            *pp_meta = vlc_meta_Duplicate( p_sys->meta );
+            p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
+            vlc_meta_Merge( p_meta,  p_sys->meta );
             return VLC_SUCCESS;
 
         default:

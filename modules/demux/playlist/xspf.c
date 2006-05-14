@@ -61,6 +61,7 @@ int E_(xspf_import_Activate)( vlc_object_t *p_this )
  */
 int xspf_import_Demux( demux_t *p_demux )
 {
+#if 0
     playlist_t *p_playlist = NULL;
     playlist_item_t *p_current = NULL;
 
@@ -144,6 +145,7 @@ int xspf_import_Demux( demux_t *p_demux )
         xml_Delete( p_xml );
 
     return i_ret;
+#endif
 }
 
 /** \brief dummy function for demux callback interface */
@@ -151,7 +153,7 @@ int xspf_import_Control( demux_t *p_demux, int i_query, va_list args )
 {
     return VLC_EGENERIC;
 }
-
+#if 0
 /**
  * \brief parse the root node of a XSPF playlist
  * \param p_demux demuxer instance
@@ -680,3 +682,4 @@ static vlc_bool_t insert_new_item( playlist_t *p_pl, playlist_item_t *p_cur,
 
     return VLC_TRUE;
 }
+#endif

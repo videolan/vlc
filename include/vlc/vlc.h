@@ -138,11 +138,9 @@ struct vlc_list_t
 
 /* Used by VLC_AddTarget() */
 #define PLAYLIST_INSERT          0x0001
-#define PLAYLIST_REPLACE         0x0002
-#define PLAYLIST_APPEND          0x0004
-#define PLAYLIST_GO              0x0008
-#define PLAYLIST_CHECK_INSERT    0x0010
-#define PLAYLIST_PREPARSE        0x0020
+#define PLAYLIST_APPEND          0x0002
+#define PLAYLIST_GO              0x0004
+#define PLAYLIST_PREPARSE        0x0008
 
 #define PLAYLIST_END           -666
 

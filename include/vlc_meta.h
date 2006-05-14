@@ -42,140 +42,120 @@
 #define VLC_META_NOW_PLAYING        N_("Now Playing")
 #define VLC_META_PUBLISHER          N_("Publisher")
 
-#define VLC_META_CDDB_ARTIST        N_("CDDB Artist")
-#define VLC_META_CDDB_CATEGORY      N_("CDDB Category")
-#define VLC_META_CDDB_DISCID        N_("CDDB Disc ID")
-#define VLC_META_CDDB_EXT_DATA      N_("CDDB Extended Data")
-#define VLC_META_CDDB_GENRE         N_("CDDB Genre")
-#define VLC_META_CDDB_YEAR          N_("CDDB Year")
-#define VLC_META_CDDB_TITLE         N_("CDDB Title")
-
-#define VLC_META_CDTEXT_ARRANGER    N_("CD-Text Arranger")
-#define VLC_META_CDTEXT_COMPOSER    N_("CD-Text Composer")
-#define VLC_META_CDTEXT_DISCID      N_("CD-Text Disc ID")
-#define VLC_META_CDTEXT_GENRE       N_("CD-Text Genre")
-#define VLC_META_CDTEXT_MESSAGE     N_("CD-Text Message")
-#define VLC_META_CDTEXT_SONGWRITER  N_("CD-Text Songwriter")
-#define VLC_META_CDTEXT_PERFORMER   N_("CD-Text Performer")
-#define VLC_META_CDTEXT_TITLE       N_("CD-Text Title")
-
-#define VLC_META_ISO_APPLICATION_ID N_("ISO-9660 Application ID")
-#define VLC_META_ISO_PREPARER       N_("ISO-9660 Preparer")
-#define VLC_META_ISO_PUBLISHER      N_("ISO-9660 Publisher")
-#define VLC_META_ISO_VOLUME         N_("ISO-9660 Volume")
-#define VLC_META_ISO_VOLUMESET      N_("ISO-9660 Volume Set")
-
 #define VLC_META_CODEC_NAME         N_("Codec Name")
 #define VLC_META_CODEC_DESCRIPTION  N_("Codec Description")
 
 struct vlc_meta_t
 {
-    /* meta name/value pairs */
-    int     i_meta;
-    char    **name;
-    char    **value;
-
+    char *psz_title;
+    char *psz_author;
+    char *psz_artist;
+    char *psz_genre;
+    char *psz_copyright;
+    char *psz_album;
+    char *psz_tracknum;
+    char *psz_description;
+    char *psz_rating;
+    char *psz_date;
+    char *psz_setting;
+    char *psz_url;
+    char *psz_language;
+    char *psz_nowplaying;
+    char *psz_publisher;
+#if 0
     /* track meta information */
     int         i_track;
     vlc_meta_t  **track;
+#endif
 };
+
+#define vlc_meta_Set( meta,var,val ) { \
+    if( meta->psz_##var ) free( meta->psz_##var ); \
+    meta->psz_##var = strdup( val ); }
+
+#define vlc_meta_SetTitle( meta, b ) vlc_meta_Set( meta, title, b );
+#define vlc_meta_SetArtist( meta, b ) vlc_meta_Set( meta, artist, b );
+#define vlc_meta_SetAuthor( meta, b ) vlc_meta_Set( meta, author, b );
+#define vlc_meta_SetGenre( meta, b ) vlc_meta_Set( meta, genre, b );
+#define vlc_meta_SetCopyright( meta, b ) vlc_meta_Set( meta, copyright, b );
+#define vlc_meta_SetAlbum( meta, b ) vlc_meta_Set( meta, album, b );
+#define vlc_meta_SetTracknum( meta, b ) vlc_meta_Set( meta, tracknum, b );
+#define vlc_meta_SetDescription( meta, b ) vlc_meta_Set( meta, description, b );
+#define vlc_meta_SetRating( meta, b ) vlc_meta_Set( meta, rating, b );
+#define vlc_meta_SetDate( meta, b ) vlc_meta_Set( meta, date, b );
+#define vlc_meta_SetSetting( meta, b ) vlc_meta_Set( meta, setting, b );
+#define vlc_meta_SetURL( meta, b ) vlc_meta_Set( meta, url, b );
+#define vlc_meta_SetLanguage( meta, b ) vlc_meta_Set( meta, language, b );
+#define vlc_meta_SetNowPlaying( meta, b ) vlc_meta_Set( meta, nowplaying, b );
+#define vlc_meta_SetPublisher( meta, b ) vlc_meta_Set( meta, publisher, b );
 
 static inline vlc_meta_t *vlc_meta_New( void )
 {
     vlc_meta_t *m = (vlc_meta_t*)malloc( sizeof( vlc_meta_t ) );
-
-    m->i_meta = 0;
-    m->name   = NULL;
-    m->value  = NULL;
-
-    m->i_track= 0;
-    m->track  = NULL;
-
+    if( !m ) return NULL;
+    m->psz_title = NULL;
+    m->psz_author = NULL;
+    m->psz_artist = NULL;
+    m->psz_genre = NULL;
+    m->psz_copyright = NULL;
+    m->psz_album = NULL;
+    m->psz_tracknum = NULL;
+    m->psz_description = NULL;
+    m->psz_rating = NULL;
+    m->psz_date = NULL;
+    m->psz_setting = NULL;
+    m->psz_url = NULL;
+    m->psz_language = NULL;
+    m->psz_nowplaying = NULL;
+    m->psz_publisher = NULL;
     return m;
 }
 
 static inline void vlc_meta_Delete( vlc_meta_t *m )
 {
-    int i;
-    for( i = 0; i < m->i_meta; i++ )
-    {
-        free( m->name[i] );
-        free( m->value[i] );
-    }
-    if( m->name ) free( m->name );
-    if( m->value ) free( m->value );
+    free( m->psz_title );
+    free( m->psz_author );
+    free( m->psz_artist );
+    free( m->psz_genre );
+    free( m->psz_copyright );
+    free( m->psz_album );
+    free( m->psz_tracknum );
+    free( m->psz_description );
+    free( m->psz_rating );
+    free( m->psz_date );
+    free( m->psz_setting );
+    free( m->psz_url );
+    free( m->psz_language );
+    free( m->psz_nowplaying );
+    free( m->psz_publisher );
 
-    for( i = 0; i < m->i_track; i++ )
-    {
-        vlc_meta_Delete( m->track[i] );
-    }
-    if( m->track ) free( m->track );
     free( m );
-}
-
-static inline void vlc_meta_Add( vlc_meta_t *m,
-                                 const char *name, const char *value )
-{
-    m->name  = (char**)realloc( m->name, sizeof(char*) * ( m->i_meta + 1 ) );
-    m->name[m->i_meta] = strdup( name );
-
-    m->value = (char**)realloc( m->value, sizeof(char*) * ( m->i_meta + 1 ) );
-    m->value[m->i_meta] = strdup( value );
-
-    m->i_meta++;
-}
-
-static inline vlc_meta_t *vlc_meta_Duplicate( vlc_meta_t *src )
-{
-    vlc_meta_t *dst = vlc_meta_New();
-    int i;
-    for( i = 0; i < src->i_meta; i++ )
-    {
-        vlc_meta_Add( dst, src->name[i], src->value[i] );
-    }
-    for( i = 0; i < src->i_track; i++ )
-    {
-        vlc_meta_t *tk = vlc_meta_Duplicate( src->track[i] );
-
-        dst->track = (vlc_meta_t**)realloc( dst->track, sizeof( vlc_meta_t* ) * (dst->i_track+1) );
-        dst->track[dst->i_track++] = tk;
-    }
-    return dst;
 }
 
 static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
 {
-    int i, j;
-    for( i = 0; i < src->i_meta; i++ )
-    {
-        /* Check if dst contains the entry */
-        for( j = 0; j < dst->i_meta; j++ )
-        {
-            if( !strcmp( src->name[i], dst->name[j] ) ) break;
-        }
-        if( j < dst->i_meta )
-        {
-            if( dst->value[j] ) free( dst->value[j] );
-            dst->value[j] = strdup( src->value[i] );
-        }
-        else vlc_meta_Add( dst, src->name[i], src->value[i] );
+    if( !dst || !src ) return;
+#define COPY_FIELD( a ) \
+    if( src->psz_ ## a ) { \
+        if( dst->psz_ ## a ) free( dst->psz_## a ); \
+        dst->psz_##a = strdup( src->psz_##a ); \
     }
+    COPY_FIELD( title );
+    COPY_FIELD( author );
+    COPY_FIELD( artist );
+    COPY_FIELD( genre );
+    COPY_FIELD( copyright );
+    COPY_FIELD( album );
+    COPY_FIELD( tracknum );
+    COPY_FIELD( description );
+    COPY_FIELD( rating );
+    COPY_FIELD( date );
+    COPY_FIELD( setting );
+    COPY_FIELD( url );
+    COPY_FIELD( language );
+    COPY_FIELD( nowplaying );
+    COPY_FIELD( publisher );
 }
-
-static inline char *vlc_meta_GetValue( vlc_meta_t *m, const char *name )
-{
-    int i;
-
-    for( i = 0; i < m->i_meta; i++ )
-    {
-        if( !strcmp( m->name[i], name ) )
-        {
-            char *value = NULL;
-            if( m->value[i] ) value = strdup( m->value[i] );
-            return value;
-        }
-    }
-    return NULL;
-}
+    /** \todo Track meta */
 
 #endif

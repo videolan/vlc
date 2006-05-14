@@ -119,6 +119,7 @@ void E_(Close_Shoutcast)( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
+#if 0
     demux_sys_t *p_sys = p_demux->p_sys;
     playlist_t *p_playlist;
 
@@ -196,6 +197,7 @@ static int Demux( demux_t *p_demux )
 
     vlc_object_release( p_playlist );
     p_sys->p_playlist = NULL;
+#endif
     return VLC_SUCCESS;
 }
 
@@ -211,6 +213,7 @@ static int Demux( demux_t *p_demux )
  **/
 static int DemuxGenre( demux_t *p_demux )
 {
+#if 0
     demux_sys_t *p_sys = p_demux->p_sys;
     char *psz_name = NULL; /* genre name */
     char *psz_eltname = NULL; /* tag name */
@@ -303,6 +306,7 @@ static int DemuxGenre( demux_t *p_demux )
                 break;
         }
     }
+#endif
     return 0;
 }
 
@@ -333,6 +337,7 @@ static int DemuxGenre( demux_t *p_demux )
  **/
 static int DemuxStation( demux_t *p_demux )
 {
+#if 0
     demux_sys_t *p_sys = p_demux->p_sys;
 
     char *psz_base = NULL; /* */
@@ -552,6 +557,7 @@ static int DemuxStation( demux_t *p_demux )
                 break;
         }
     }
+#endif
     return 0;
 }
 #undef FREE

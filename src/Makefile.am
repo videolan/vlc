@@ -256,13 +256,16 @@ SOURCES_libvlc_common = \
 	interface/interface.c \
 	interface/intf_eject.c \
 	interface/interaction.c \
-	playlist/playlist.c \
+	playlist/thread.c \
+	playlist/control.c \
+	playlist/engine.c \
 	playlist/sort.c \
 	playlist/loadsave.c \
-	playlist/view.c \
+	playlist/tree.c \
 	playlist/item.c \
-	playlist/item-ext.c \
+	playlist/search.c \
 	playlist/services_discovery.c \
+	input/item.c \
 	input/access.c \
 	input/clock.c \
 	input/control.c \

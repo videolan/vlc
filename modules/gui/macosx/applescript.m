@@ -52,16 +52,21 @@
         if ( o_urlString )
         {
             NSURL * o_url;
-    
-            playlist_Add( p_playlist, [o_urlString fileSystemRepresentation],
-                          [[[NSFileManager defaultManager] displayNameAtPath: o_urlString] UTF8String],
-                          PLAYLIST_INSERT, PLAYLIST_END );
+            input_item_t *p_input;
+
+            p_input = input_ItemNew( p_playlist,
+                                    [o_urlString fileSystemRepresentation],
+                                    [[[NSFileManager defaultManager]
+                                    displayNameAtPath: o_urlString] UTF8String] );
+            playlist_PlaylistAddInput( p_playlist, p_input, PLAYLIST_INSERT,
+                                                                PLAYLIST_END );
+
 
             o_url = [NSURL fileURLWithPath: o_urlString];
             if( o_url != nil )
-            { 
+            {
                 [[NSDocumentController sharedDocumentController]
-                    noteNewRecentDocumentURL: o_url]; 
+                    noteNewRecentDocumentURL: o_url];
             }
         }
         vlc_object_release( p_playlist );

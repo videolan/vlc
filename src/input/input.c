@@ -57,7 +57,6 @@ static inline int ControlPopNoLock( input_thread_t *, int *, vlc_value_t * );
 static void       ControlReduce( input_thread_t * );
 static vlc_bool_t Control( input_thread_t *, int, vlc_value_t );
 
-
 static int  UpdateFromAccess( input_thread_t * );
 static int  UpdateFromDemux( input_thread_t * );
 static int  UpdateMeta( input_thread_t *, vlc_bool_t );
@@ -76,7 +75,7 @@ static void InputSourceClean( input_thread_t *, input_source_t * );
 static void SlaveDemux( input_thread_t *p_input );
 static void SlaveSeek( input_thread_t *p_input );
 
-static vlc_meta_t *InputMetaUser( input_thread_t *p_input );
+static void InputMetaUser( input_thread_t *p_input );
 
 /*****************************************************************************
  * This function creates a new input, and returns a pointer
@@ -150,6 +149,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->input.b_eof = VLC_FALSE;
     p_input->input.i_cr_average = 0;
 
+    p_input->input.p_item->p_meta = vlc_meta_New();
     stats_ReinitInputStats( p_item->p_stats );
 
     /* No slave */
@@ -334,9 +334,6 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 
     /* Unload all modules */
     if( p_input->p_es_out ) input_EsOutDelete( p_input->p_es_out );
-
-    /* Delete meta */
-    if( p_input->p_meta ) vlc_meta_Delete( p_input->p_meta );
 
     vlc_object_detach( p_input );
     vlc_object_destroy( p_input );
@@ -667,7 +664,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
     char *psz_subtitle;
     vlc_value_t val;
     double f_fps;
-    vlc_meta_t *p_meta, *p_meta_tmp;
+    vlc_meta_t *p_meta;
     int i_es_out_mode;
     int i, i_delay;
 
@@ -1017,79 +1014,32 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         }
     }
 
+    p_meta = p_input->input.p_item->p_meta;
     /* Get meta data from users */
-    p_meta_tmp = InputMetaUser( p_input );
-
+    InputMetaUser( p_input );
     /* Get meta data from master input */
-    if( demux2_Control( p_input->input.p_demux, DEMUX_GET_META, &p_meta ) )
-        p_meta = NULL;
-
-    /* Merge them */
-    if( p_meta == NULL )
-    {
-        p_meta = p_meta_tmp;
-    }
-    else if( p_meta_tmp )
-    {
-        vlc_meta_Merge( p_meta, p_meta_tmp );
-        vlc_meta_Delete( p_meta_tmp );
-    }
+    demux2_Control( p_input->input.p_demux, DEMUX_GET_META, p_meta );
 
     /* Access_file does not give any meta, and there are no slave */
     if( !b_quick )
     {
-        if( !p_input->input.p_access ||
+        if( p_input->input.p_access )
             access2_Control( p_input->input.p_access, ACCESS_GET_META,
-                             &p_meta_tmp))
-            p_meta_tmp = NULL;
-
-        if( p_meta == NULL )
-        {
-            p_meta = p_meta_tmp;
-        }
-        else if( p_meta_tmp )
-        {
-            vlc_meta_Merge( p_meta, p_meta_tmp );
-            vlc_meta_Delete( p_meta_tmp );
-        }
+                             p_meta );
 
         /* Get meta data from slave input */
         for( i = 0; i < p_input->i_slave; i++ )
         {
-            vlc_meta_t *p_meta_slave;
-
-            if( !demux2_Control( p_input->slave[i]->p_demux,
-                                 DEMUX_GET_META, &p_meta_slave ) )
+            demux2_Control( p_input->slave[i]->p_demux,
+                            DEMUX_GET_META, p_meta );
+            if( p_input->slave[i]->p_access )
             {
-                if( p_meta == NULL )
-                {
-                    p_meta = p_meta_slave;
-                }
-                else if( p_meta_slave )
-                {
-                    vlc_meta_Merge( p_meta, p_meta_slave );
-                    vlc_meta_Delete( p_meta_slave );
-                }
-            }
-
-            if( p_input->slave[i]->p_access &&
-                !access2_Control( p_input->slave[i]->p_access,
-                                  ACCESS_GET_META, &p_meta_slave ) )
-            {
-                if( p_meta == NULL )
-                {
-                    p_meta = p_meta_slave;
-                }
-                else if( p_meta_slave )
-                {
-                    vlc_meta_Merge( p_meta, p_meta_slave );
-                    vlc_meta_Delete( p_meta_slave );
-                }
+                access2_Control( p_input->slave[i]->p_access,
+                                 ACCESS_GET_META, p_meta );
             }
         }
     }
 
-    p_input->p_meta = p_meta;
     UpdateMeta( p_input, b_quick );
 
     if( !b_quick )
@@ -1194,10 +1144,6 @@ static void End( input_thread_t * p_input )
         if( p_pl )
             vlc_object_release( p_pl );
     }
-
-    /* Delete meta */
-    if( p_input->p_meta )
-        vlc_meta_Delete( p_input->p_meta );
 
     /* Tell we're dead */
     p_input->b_dead = VLC_TRUE;
@@ -1669,8 +1615,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( !InputSourceInit( p_input, slave, val.psz_string, NULL,
                                       VLC_FALSE ) )
                 {
-                    vlc_meta_t *p_meta_new = NULL;
-                    vlc_meta_t *p_meta;
+                    vlc_meta_t *p_meta = p_input->input.p_item->p_meta;
                     int64_t i_time;
 
                     /* Add the slave */
@@ -1695,38 +1640,11 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                         break;
                     }
 
-
                     /* Get meta (access and demux) */
-                    if( access2_Control( slave->p_access,
-                                          ACCESS_GET_META, &p_meta_new ) )
-                        p_meta_new = NULL;
-                    if( !demux2_Control( slave->p_demux,
-                                         DEMUX_GET_META, &p_meta ) )
-                    {
-                        if( p_meta_new )
-                        {
-                            vlc_meta_Merge( p_meta_new, p_meta );
-                            vlc_meta_Delete( p_meta );
-                        }
-                        else
-                        {
-                            p_meta_new = p_meta;
-                        }
-                    }
-                    /* Update meta */
-                    if( p_meta_new )
-                    {
-                        if( p_input->p_meta )
-                        {
-                            vlc_meta_Merge( p_input->p_meta, p_meta_new );
-                            vlc_meta_Delete( p_meta_new );
-                        }
-                        else
-                        {
-                            p_input->p_meta = p_meta_new;
-                        }
-                        UpdateMeta( p_input, VLC_FALSE );
-                    }
+                    access2_Control( slave->p_access, ACCESS_GET_META,
+                                     p_meta );
+                    demux2_Control( slave->p_demux, DEMUX_GET_META, p_meta );
+                    UpdateMeta( p_input, VLC_FALSE );
 
                     TAB_APPEND( p_input->i_slave, p_input->slave, slave );
                 }
@@ -1825,28 +1743,15 @@ static int UpdateFromAccess( input_thread_t *p_input )
     {
         v.i_int = p_access->info.i_seekpoint;
         var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &v, NULL);
-
         p_access->info.i_update &= ~INPUT_UPDATE_SEEKPOINT;
     }
     if( p_access->info.i_update & INPUT_UPDATE_META )
     {
         /* TODO maybe multi - access ? */
-        vlc_meta_t *p_meta;
-        if( !access2_Control( p_input->input.p_access,ACCESS_GET_META,&p_meta))
-        {
-            if( p_input->p_meta )
-            {
-                vlc_meta_Merge( p_input->p_meta, p_meta );
-                vlc_meta_Delete( p_meta );
-            }
-            else
-            {
-                p_input->p_meta = p_meta;
-            }
-
-            UpdateMeta( p_input, VLC_FALSE );
-            var_SetBool( p_input, "item-change", p_input->input.p_item->i_id );
-        }
+        vlc_meta_t *p_meta = p_input->input.p_item->p_meta;
+        access2_Control( p_input->input.p_access,ACCESS_GET_META, p_meta );
+        UpdateMeta( p_input, VLC_FALSE );
+        var_SetBool( p_input, "item-change", p_input->input.p_item->i_id );
         p_access->info.i_update &= ~INPUT_UPDATE_META;
     }
 
@@ -1884,58 +1789,14 @@ static int UpdateFromAccess( input_thread_t *p_input )
  *****************************************************************************/
 static int  UpdateMeta( input_thread_t *p_input, vlc_bool_t b_quick )
 {
-    vlc_meta_t *p_meta = p_input->p_meta;
-    int i;
-
-    if( !p_meta || p_meta->i_meta == 0 )
+    vlc_meta_t *p_meta = p_input->input.p_item->p_meta;
+    if( !p_meta )
         return VLC_SUCCESS;
 
-    if( !b_quick ) msg_Dbg( p_input, "meta information:" );
-    for( i = 0; i < p_meta->i_meta; i++ )
-    {
-        if( !b_quick )
-            msg_Dbg( p_input, "  - '%s' = '%s'",
-                     _(p_meta->name[i]), p_meta->value[i] );
+    if( p_meta->psz_title && !p_input->input.p_item->b_fixed_name )
+        input_Control( p_input, INPUT_SET_NAME, p_meta->psz_title );
 
-        if( !strcmp(p_meta->name[i], _(VLC_META_TITLE)) && p_meta->value[i] &&
-            !p_input->input.p_item->b_fixed_name )
-            input_Control( p_input, INPUT_SET_NAME, p_meta->value[i] );
-
-        if( !strcmp( p_meta->name[i], _(VLC_META_AUTHOR) ) )
-            input_Control( p_input, INPUT_ADD_INFO, _("General"),
-                           _(VLC_META_AUTHOR), p_meta->value[i] );
-
-        input_Control( p_input, INPUT_ADD_INFO, _(VLC_META_INFO_CAT),
-                      _(p_meta->name[i]), "%s", p_meta->value[i] );
-    }
-
-    for( i = 0; i < p_meta->i_track; i++ )
-    {
-        vlc_meta_t *tk = p_meta->track[i];
-        int j;
-
-        if( tk->i_meta > 0 )
-        {
-            char *psz_cat = malloc( strlen(_("Stream")) + 10 );
-
-            msg_Dbg( p_input, "  - track[%d]:", i );
-
-            sprintf( psz_cat, "%s %d", _("Stream"), i );
-            for( j = 0; j < tk->i_meta; j++ )
-            {
-                msg_Dbg( p_input, "     - '%s' = '%s'", _(tk->name[j]),
-                         tk->value[j] );
-
-                input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                               _(tk->name[j]), "%s", tk->value[j] );
-            }
-        }
-    }
-
-    if( p_input->p_sout && p_input->p_sout->p_meta == NULL )
-    {
-        p_input->p_sout->p_meta = vlc_meta_Duplicate( p_meta );
-    }
+    /** \todo handle sout meta */
 
     return VLC_SUCCESS;
 }
@@ -2355,32 +2216,31 @@ static void SlaveSeek( input_thread_t *p_input )
 /*****************************************************************************
  * InputMetaUser:
  *****************************************************************************/
-static vlc_meta_t *InputMetaUser( input_thread_t *p_input )
+static void InputMetaUser( input_thread_t *p_input )
 {
-    vlc_meta_t *p_meta;
+    vlc_meta_t *p_meta = p_input->input.p_item->p_meta;
     vlc_value_t val;
 
-    if( ( p_meta = vlc_meta_New() ) == NULL )
-        return NULL;
+    if( !p_meta ) return;
 
     /* Get meta information from user */
-#define GET_META( c, s ) \
+#define GET_META( field, s ) \
     var_Get( p_input, (s), &val );  \
-    if( *val.psz_string )       \
-        vlc_meta_Add( p_meta, _(c), val.psz_string ); \
+    if( *val.psz_string ) { \
+        if( p_meta->psz_ ## field ) free ( p_meta->psz_ ## field ); \
+        p_meta->psz_ ## field = strdup( val.psz_string ); \
+    } \
     free( val.psz_string )
 
-    GET_META( VLC_META_TITLE, "meta-title" );
-    GET_META( VLC_META_AUTHOR, "meta-author" );
-    GET_META( VLC_META_ARTIST, "meta-artist" );
-    GET_META( VLC_META_GENRE, "meta-genre" );
-    GET_META( VLC_META_COPYRIGHT, "meta-copyright" );
-    GET_META( VLC_META_DESCRIPTION, "meta-description" );
-    GET_META( VLC_META_DATE, "meta-date" );
-    GET_META( VLC_META_URL, "meta-url" );
+    GET_META( title, "meta-title" );
+    GET_META( author, "meta-author" );
+    GET_META( artist, "meta-artist" );
+    GET_META( genre, "meta-genre" );
+    GET_META( copyright, "meta-copyright" );
+    GET_META( description, "meta-description" );
+    GET_META( date, "meta-date" );
+    GET_META( url, "meta-url" );
 #undef GET_META
-
-    return p_meta;
 }
 
 /*****************************************************************************
@@ -2546,114 +2406,3 @@ static void MRLSections( input_thread_t *p_input, char *psz_source,
              psz_source, *pi_title_start, *pi_chapter_start,
              *pi_title_end, *pi_chapter_end );
 }
-
-
-/***********************************************************************
- * Info management functions
- ***********************************************************************/
-/**
- * Get a info item from a given category in a given input item.
- *
- * \param p_i The input item to get info from
- * \param psz_cat String representing the category for the info
- * \param psz_name String representing the name of the desired info
- * \return A pointer to the string with the given info if found, or an
- *         empty string otherwise. The caller should free the returned
- *         pointer.
- */
-char *vlc_input_item_GetInfo( input_item_t *p_i,
-                              const char *psz_cat,
-                              const char *psz_name )
-{
-    int i,j;
-
-    vlc_mutex_lock( &p_i->lock );
-
-    for( i = 0 ; i< p_i->i_categories  ; i++ )
-    {
-        info_category_t *p_cat = p_i->pp_categories[i];
-
-        if( !psz_cat || strcmp( p_cat->psz_name, psz_cat ) )
-            continue;
-
-        for( j = 0; j < p_cat->i_infos ; j++ )
-        {
-            if( !strcmp( p_cat->pp_infos[j]->psz_name, psz_name ) )
-            {
-                char *psz_ret = strdup( p_cat->pp_infos[j]->psz_value );
-                vlc_mutex_unlock( &p_i->lock );
-                return psz_ret;
-            }
-        }
-    }
-    vlc_mutex_unlock( &p_i->lock );
-    return strdup( "" );
-}
-
-int vlc_input_item_AddInfo( input_item_t *p_i,
-                            const char *psz_cat,
-                            const char *psz_name,
-                            const char *psz_format, ... )
-{
-    va_list args;
-    int i;
-    info_t *p_info = NULL;
-    info_category_t *p_cat = NULL ;
-
-    vlc_mutex_lock( &p_i->lock );
-
-    for( i = 0 ; i < p_i->i_categories ; i ++ )
-    {
-        if( !strcmp( p_i->pp_categories[i]->psz_name, psz_cat ) )
-        {
-            p_cat = p_i->pp_categories[i];
-            break;
-        }
-    }
-    if( !p_cat )
-    {
-        if( !(p_cat = (info_category_t *)malloc( sizeof(info_category_t) )) )
-        {
-            vlc_mutex_unlock( &p_i->lock );
-            return VLC_EGENERIC;
-        }
-        p_cat->psz_name = strdup( psz_cat );
-        p_cat->i_infos = 0;
-        p_cat->pp_infos = 0;
-        INSERT_ELEM( p_i->pp_categories, p_i->i_categories, p_i->i_categories,
-                     p_cat );
-    }
-
-    for( i = 0; i< p_cat->i_infos; i++ )
-    {
-        if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
-        {
-            p_info = p_cat->pp_infos[i];
-            break;
-        }
-    }
-
-    if( !p_info )
-    {
-        if( ( p_info = (info_t *)malloc( sizeof( info_t ) ) ) == NULL )
-        {
-            vlc_mutex_unlock( &p_i->lock );
-            return VLC_EGENERIC;
-        }
-        INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos, p_cat->i_infos, p_info );
-        p_info->psz_name = strdup( psz_name );
-    }
-    else
-    {
-        if( p_info->psz_value ) free( p_info->psz_value );
-    }
-
-    va_start( args, psz_format );
-    vasprintf( &p_info->psz_value, psz_format, args);
-    va_end( args );
-
-    vlc_mutex_unlock( &p_i->lock );
-
-    return VLC_SUCCESS;
-}
-

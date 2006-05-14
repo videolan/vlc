@@ -70,7 +70,7 @@ ItemInfoDialog::ItemInfoDialog( intf_thread_t *_p_intf,
 
     /* Create the standard info panel */
     info_panel = new MetaDataPanel(p_intf, panel, true );
-    info_panel->Update( &(p_item->input) );
+    info_panel->Update( p_item->p_input );
     /* Separation */
     wxStaticLine *static_line = new wxStaticLine( panel, wxID_OK );
 
@@ -107,10 +107,10 @@ ItemInfoDialog::~ItemInfoDialog()
  *****************************************************************************/
 void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
-    vlc_mutex_lock( &p_item->input.lock );
-    p_item->input.psz_name = info_panel->GetName();
-    p_item->input.psz_uri = info_panel->GetURI();
-    vlc_mutex_unlock( &p_item->input.lock );
+    vlc_mutex_lock( &p_item->p_input->lock );
+    p_item->p_input->psz_name = info_panel->GetName();
+    p_item->p_input->psz_uri = info_panel->GetURI();
+    vlc_mutex_unlock( &p_item->p_input->lock );
     EndModal( wxID_OK );
 }
 
