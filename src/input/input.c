@@ -2303,7 +2303,7 @@ void MRLSplit( vlc_object_t *p_input, char *psz_dup,
 #if defined( WIN32 ) || defined( UNDER_CE )
     if( psz - psz_dup == 1 )
     {
-        msg_Warn( p_input, "drive letter %c: found in source", *psz_dup );
+        msg_Dbg( p_input, "drive letter %c: found in source", *psz_dup );
         psz_path = psz_dup;
     }
     else
