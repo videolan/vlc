@@ -37,7 +37,7 @@
 #include "../commands/cmd_minimize.hpp"
 
 // Custom message for the notifications of the system tray
-#define MY_WSTRAYACTION (WM_APP + 1)
+#define MY_WM_TRAYACTION (WM_APP + 1)
 
 
 LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
@@ -73,14 +73,11 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
             }
             else
             {
-                msg_Err( p_intf, "WM_SYSCOMMAND %i", wParam );
+                msg_Dbg( p_intf, "WM_SYSCOMMAND %i", wParam );
             }
-//            if( (Event *)wParam != NULL )
-//                ( (Event *)wParam )->SendEvent();
-//            return 0;
         }
         // Handle systray notifications
-        else if( uMsg == MY_WSTRAYACTION )
+        else if( uMsg == MY_WM_TRAYACTION )
         {
             if( (UINT)lParam == WM_LBUTTONDOWN )
             {
@@ -175,7 +172,7 @@ bool Win32Factory::init()
     m_trayIcon.hWnd = m_hParentWindow;
     m_trayIcon.uID = 42;
     m_trayIcon.uFlags = NIF_ICON|NIF_TIP|NIF_MESSAGE;
-    m_trayIcon.uCallbackMessage = MY_WSTRAYACTION;
+    m_trayIcon.uCallbackMessage = MY_WM_TRAYACTION;
     m_trayIcon.hIcon = LoadIcon( m_hInst, _T("VLC_ICON") );
     strcpy( m_trayIcon.szTip, "VLC media player" );
 
