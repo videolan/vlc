@@ -55,6 +55,8 @@ struct interaction_dialog_t
 
     char           *psz_returned[1];    ///< returned responses from the user
 
+    vlc_value_t     val;                ///< a value coming from core for dialogue
+
     int             i_widgets;          ///< Number of dialog widgets
     user_widget_t **pp_widgets;         ///< Dialog widgets
 
@@ -80,6 +82,7 @@ struct interaction_dialog_t
 #define DIALOG_CLEAR_NOSHOW         0x08
 #define DIALOG_GOT_ANSWER           0x10
 #define DIALOG_LOGIN_PW_OK_CANCEL   0x20
+#define DIALOG_USER_PROGRESS        0x40
 
 /**
  * Possible return codes

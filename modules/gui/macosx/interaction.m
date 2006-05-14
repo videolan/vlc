@@ -192,9 +192,9 @@
                 modalDelegate: self didEndSelector: nil contextInfo: nil];
             [o_auth_win makeKeyWindow];
         }
-        else if( p_dialog->i_type & WIDGET_PROGRESS )
+        else if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
         {
-            msg_Dbg( p_intf, "requested type: WIDGET_PROGRESS" );
+            msg_Dbg( p_intf, "requested flag: DIALOG_USER_PROGRESS" );
             [o_prog_title setStringValue: o_title];
             [o_prog_description setStringValue: o_description];
             [o_prog_bar setDoubleValue: 0];
@@ -236,10 +236,12 @@
     int i = 0;
     for( i = 0 ; i< p_dialog->i_widgets; i++ )
     {
-        if( p_dialog->i_type & WIDGET_PROGRESS )
+        if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
         {
+            [o_prog_description setStringValue: \
+                [NSString stringWithUTF8String: p_dialog->psz_description]];
             [o_prog_bar setDoubleValue: \
-                (double)(p_dialog->pp_widgets[i]->val.f_float)];
+                (double)(p_dialog->val.f_float)];
 
             if( [o_prog_bar doubleValue] == 100.0 )
             {
@@ -254,7 +256,7 @@
 -(void)hideDialog
 {
     msg_Dbg( p_intf, "hide event" );
-    if( p_dialog->i_type & WIDGET_PROGRESS )
+    if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
     {
         [NSApp endSheet: o_prog_win];
         [o_prog_win close];

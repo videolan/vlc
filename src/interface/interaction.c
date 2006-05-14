@@ -339,20 +339,15 @@ int __intf_UserProgress( vlc_object_t *p_this,
 {
     int i_ret;
     interaction_dialog_t *p_new = NULL;
-    user_widget_t *p_widget = NULL;
 
     INTERACT_INIT( p_new );
 
     p_new->i_type = INTERACT_DIALOG_ONEWAY;
     p_new->psz_title = strdup( psz_title );
+    p_new->psz_description = strdup( psz_status );
+    p_new->val.f_float = f_pos;
 
-    /* Progress bar */
-    p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
-    p_widget->i_type = WIDGET_PROGRESS;
-    p_widget->psz_text = strdup( psz_status );
-    p_widget->val.f_float = f_pos;
-    INSERT_ELEM ( p_new->pp_widgets, p_new->i_widgets,
-                  p_new->i_widgets,  p_widget );
+    p_new->i_flags = DIALOG_USER_PROGRESS;
 
     i_ret = intf_Interact( p_this, p_new );
 
@@ -383,11 +378,11 @@ void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
         return;
     }
 
-    if( p_dialog->pp_widgets[0]->psz_text )
-        free( p_dialog->pp_widgets[0]->psz_text );
-    p_dialog->pp_widgets[0]->psz_text = strdup( psz_status );
+    if( p_dialog->psz_description )
+        free( p_dialog->psz_description );
+    p_dialog->psz_description = strdup( psz_status );
 
-    p_dialog->pp_widgets[0]->val.f_float = f_pos;
+    p_dialog->val.f_float = f_pos;
 
     p_dialog->i_status = UPDATED_DIALOG;
     vlc_mutex_unlock( &p_interaction->object_lock) ;
