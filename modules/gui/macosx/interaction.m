@@ -233,22 +233,19 @@
 
 -(void)updateDialog
 {
-    int i = 0;
-    for( i = 0 ; i< p_dialog->i_widgets; i++ )
+    if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
     {
-        if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
-        {
-            [o_prog_description setStringValue: \
-                [NSString stringWithUTF8String: p_dialog->psz_description]];
-            [o_prog_bar setDoubleValue: \
-                (double)(p_dialog->val.f_float)];
+        [o_prog_description setStringValue: \
+            [NSString stringWithUTF8String: p_dialog->psz_description]];
+        [o_prog_bar setDoubleValue: \
+            (double)(p_dialog->val.f_float)];
+        msg_Dbg( p_intf, "new value: %f", [o_prog_bar doubleValue] );
 
-            if( [o_prog_bar doubleValue] == 100.0 )
-            {
-                /* we are done, let's hide */
-                [self hideDialog];
-                return;
-            }
+        if( [o_prog_bar doubleValue] == 100.0 )
+        {
+            /* we are done, let's hide */
+            [self hideDialog];
+            return;
         }
     }
 }
