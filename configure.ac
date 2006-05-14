@@ -1422,7 +1422,7 @@ AC_ARG_ENABLE(debug,
 test "${enable_debug}" != "yes" && enable_debug="no"
 AH_TEMPLATE(NDEBUG,
             [Define to 1 if debug code should NOT be compiled])
-AS_IF([test "x${enable_debug}" == "xno"], [AC_DEFINE(NDEBUG)])
+AS_IF([test "x${enable_debug}" = "xno"], [AC_DEFINE(NDEBUG)])
 
 dnl
 dnl  Enable release-specific flags
@@ -4265,7 +4265,7 @@ class testclass : public SearchResponseListener, public MediaPlayer
       done
       LIBS="${LIBS_save}"
       dnl should not happen - otherwise this needs fixing - hence FAILURE
-      AS_IF([test "${LIBS_cclink}" == "no"],
+      AS_IF([test "${LIBS_cclink}" = "no"],
         [AC_MSG_FAILURE([cannot find XML parser for CyberLink])])
       AC_MSG_RESULT([${LIBS_cclink}])
       VLC_ADD_LDFLAGS([upnp_cc], [${real_cyberlink_tree}/lib/unix/libclink.a -lpthread ${LIBS_cclink}])
@@ -4287,17 +4287,17 @@ AC_ARG_ENABLE(upnp,
 VLC_ADD_CXXFLAGS([upnp_intel], [ ])
 AS_IF([test "x${enable_upnp}" != "xno"], [
   AC_CHECK_LIB([upnp], [UpnpInit], [has_upnp="yes"], [has_upnp="no"], [-lpthread])
-  AS_IF([test "x${enable_upnp}" != "x" && test "${has_upnp}" == "no"], [
+  AS_IF([test "x${enable_upnp}" != "x" && test "${has_upnp}" = "no"], [
     AC_MSG_ERROR([cannot find Intel UPnP SDK (libupnp)])
   ])
-  AS_IF([test "${has_upnp}" == "yes"], [
+  AS_IF([test "${has_upnp}" = "yes"], [
     VLC_ADD_LDFLAGS([upnp_intel], [-lupnp])
   ])
 ], [
   has_upnp="no"
 ])
 
-AS_IF([test "${has_upnp}" == "yes"], [
+AS_IF([test "${has_upnp}" = "yes"], [
   VLC_ADD_PLUGINS([upnp_intel])
 ])
 
