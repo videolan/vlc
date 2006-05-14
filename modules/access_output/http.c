@@ -313,10 +313,10 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-        psz_name = strrchr( p_playlist->status.p_item->input.psz_uri,
+        psz_name = strrchr( p_playlist->status.p_item->p_input->psz_uri,
                             DIRECTORY_SEPARATOR );
         if( psz_name != NULL ) psz_name++;
-        else psz_name = p_playlist->status.p_item->input.psz_uri;
+        else psz_name = p_playlist->status.p_item->p_input->psz_uri;
 
         asprintf( &psz_txt, "path=%s", psz_file_name );
 
