@@ -78,7 +78,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         RequireDefault( "id" );
         RequireDefault( "file" );
 
-        const BuilderData::IniFile iniFile( attr["id"],
+        const BuilderData::IniFile iniFile( uniqueId( attr["id"] ),
                 attr["file"] );
         m_pData->m_listIniFile.push_back( iniFile );
     }
@@ -122,7 +122,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "nbframes", "1" );
         CheckDefault( "fps", "4" );
 
-        const BuilderData::SubBitmap bitmap( attr["id"],
+        const BuilderData::SubBitmap bitmap( uniqueId( attr["id"] ),
                 m_curBitmapId, atoi( attr["x"] ), atoi( attr["y"] ),
                 atoi( attr["width"] ), atoi( attr["height"] ),
                 atoi( attr["nbframes"] ), atoi( attr["fps"] ) );
@@ -135,7 +135,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         RequireDefault( "file" );
         CheckDefault( "type", "digits" );
 
-        const BuilderData::BitmapFont font( attr["id"],
+        const BuilderData::BitmapFont font( uniqueId( attr["id"] ),
                 attr["file"], attr["type"] );
         m_pData->m_listBitmapFont.push_back( font );
     }
