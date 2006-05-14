@@ -975,7 +975,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
             /* chapters & titles */
             //b_chapters = p_intf->p_sys->p_input->stream.i_area_nb > 1;
-            vlc_object_release( p_input );
+            vlc_object_release( p_intf->p_sys->p_input );
         }
 
         [o_btn_stop setEnabled: b_input];
@@ -1022,7 +1022,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         p_intf->p_sys->b_intf_show = VLC_FALSE;
     }
 
-    if( p_input && !p_input->b_die )
+    if( p_intf->p_sys->p_input && !p_intf->p_sys->p_input->b_die )
     {
         vlc_value_t val;
 

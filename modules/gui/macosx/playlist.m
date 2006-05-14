@@ -741,7 +741,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             {
                 o_real_filename = o_filename;
             }
-            playlist_Export( p_playlist, [o_real_filename fileSystemRepresentation], "export-xspf" );
+            playlist_Export( p_playlist, 
+                [o_real_filename fileSystemRepresentation], 
+                p_playlist->p_local_category, "export-xspf" );
         }
         else
         {
@@ -759,7 +761,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             {
                 o_real_filename = o_filename;
             }
-            playlist_Export( p_playlist, [o_real_filename fileSystemRepresentation], p_playlist->p_local_category, "export-m3u" );
+            playlist_Export( p_playlist, 
+                [o_real_filename fileSystemRepresentation],
+                p_playlist->p_local_category, "export-m3u" );
         }
     }
     vlc_object_release( p_playlist );
