@@ -640,7 +640,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
     msg_Dbg( p_vout, "snapshot taken (%s)", psz_filename );
     vout_OSDMessage( VLC_OBJECT( p_vout ), DEFAULT_CHAN,
-                     _("%s"), psz_filename );
+                     "%s", psz_filename );
     free( psz_filename );
 
     if( var_GetBool( p_vout, "snapshot-preview" ) )
