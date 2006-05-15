@@ -137,7 +137,7 @@ static void resolve_callback(
         char *psz_uri = NULL;
         char *psz_addr = NULL;
         AvahiStringList *asl = NULL;
-        playlist_item_t *p_item = NULL;
+        input_item_t *p_input = NULL;
 
         msg_Dbg( p_sd, "service '%s' of type '%s' in domain '%s'",
                  name, type, domain );
@@ -175,17 +175,23 @@ static void resolve_callback(
 
         if( psz_uri != NULL )
         {
-            p_item = playlist_ItemNew( p_sd, psz_uri, name );
+            p_input = input_ItemNewExt( p_sd, psz_uri, name, 0, NULL, -1 );
             free( (void *)psz_uri );
         }
-        if( p_item != NULL )
+        if( p_input != NULL )
         {
+            playlist_item_t *p_item;
+            p_item = playlist_NodeAddInput( p_sys->p_playlist, p_input,
+                                            p_sys->p_node_cat,
+                                            PLAYLIST_APPEND, PLAYLIST_END );
             p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-
-            playlist_NodeAddItem( p_sys->p_playlist, p_item,
-                                  VIEW_CATEGORY, p_sys->p_node,
-                                  PLAYLIST_APPEND, PLAYLIST_END );
-        }
+            p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
+            p_item = playlist_NodeAddInput( p_sys->p_playlist, p_input,
+                                            p_sys->p_node_one,
+                                            PLAYLIST_APPEND, PLAYLIST_END );
+            p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
+            p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
+       }
     }
 
     avahi_service_resolver_free( r );
@@ -225,16 +231,15 @@ static void browse_callback(
     }
     else
     {
+        /** \todo Store the input id and search it, rather than searching the items */
         playlist_item_t *p_item;
-
-        p_item = playlist_ChildSearchName( p_sys->p_node, name );
+        p_item = playlist_ChildSearchName( p_sys->p_node_cat, name );
         if( p_item == NULL )
-        {
             msg_Err( p_sd, "failed to find service '%s' in playlist", name );
-        }
         else
         {
-            playlist_Delete( p_sys->p_playlist, p_item->input.i_id );
+            playlist_LockDeleteAllFromInput( p_sys->p_playlist,
+                                              p_item->p_input->i_id );
         }
     }
 }
@@ -302,8 +307,8 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    playlist_NodesCreateForSD( p_playlist, _("Bonjour"), &p_sys->p_node_cat,
-                               &p_sys->p_node_one );
+    playlist_NodesCreateForSD( p_sys->p_playlist, _("Bonjour"),
+                              &p_sys->p_node_cat,&p_sys->p_node_one );
     p_sd->pf_run = Run;
 
     return VLC_SUCCESS;
@@ -335,7 +340,8 @@ static void Close( vlc_object_t *p_this )
     avahi_client_free( p_sys->client );
     avahi_simple_poll_free( p_sys->simple_poll );
 
-    playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node, VLC_TRUE, VLC_TRUE );
+    playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node_one, VLC_TRUE, VLC_TRUE );
+    playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node_cat, VLC_TRUE, VLC_TRUE );
     vlc_object_release( p_sys->p_playlist );
 
     free( p_sys );
