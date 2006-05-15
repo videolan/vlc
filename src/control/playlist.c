@@ -110,7 +110,7 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
                                   int i_options, const char **ppsz_options,
                                   libvlc_exception_t *p_exception )
 {
-    return playlist_AddExt( p_instance->p_playlist, psz_uri, psz_name,
+    return playlist_PlaylistAddExt( p_instance->p_playlist, psz_uri, psz_name,
                             PLAYLIST_INSERT, PLAYLIST_END, -1, ppsz_options,
                             i_options );
 }
@@ -118,7 +118,7 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
 int libvlc_playlist_delete_item( libvlc_instance_t *p_instance, int i_id,
                                  libvlc_exception_t *p_exception )
 {
-    return playlist_Delete( p_instance->p_playlist, i_id );
+    return playlist_DeleteFromItemId( p_instance->p_playlist, i_id );
 }
 
 

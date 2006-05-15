@@ -284,7 +284,7 @@ mediacontrol_playlist_add_item( mediacontrol_Instance *self,
         RAISE( mediacontrol_InternalException, "No playlist" );
     }
     else
-        playlist_Add( self->p_playlist, psz_file, psz_file , PLAYLIST_INSERT,
+        playlist_PlaylistAdd( self->p_playlist, psz_file, psz_file , PLAYLIST_INSERT,
                       PLAYLIST_END );
 }
 
