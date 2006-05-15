@@ -26,6 +26,7 @@
 
 #include "wxwidgets.hpp"
 
+#include <wx/listctrl.h>
 #include <wx/treectrl.h>
 #include <wx/dnd.h>
 
