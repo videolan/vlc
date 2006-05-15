@@ -279,6 +279,7 @@ VLC_EXPORT( int, playlist_NodeRemoveItem, (playlist_t *,playlist_item_t*,playlis
 VLC_EXPORT( playlist_item_t *, playlist_ChildSearchName, (playlist_item_t*, const char* ) );
 VLC_EXPORT( int, playlist_NodeDelete, ( playlist_t *, playlist_item_t *, vlc_bool_t , vlc_bool_t ) );
 VLC_EXPORT( int, playlist_NodeEmpty, ( playlist_t *, playlist_item_t *, vlc_bool_t ) );
+VLC_EXPORT( void, playlist_NodesCreateForSD, (playlist_t *, char *, playlist_item_t **, playlist_item_t ** ) );
 
 /* Tree walking - These functions are only for playlist, not plugins */
 playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,

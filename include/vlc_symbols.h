@@ -512,6 +512,7 @@ struct module_symbols_t
     void (*playlist_NodeDump_inner) (playlist_t *p_playlist, playlist_item_t *p_item, int i_level);
     int (*__intf_UserOkayCancel_inner) (vlc_object_t*, const char*, const char*);
     int (*__intf_UserStringInput_inner) (vlc_object_t*, const char*, const char*, char **);
+    void (*playlist_NodesCreateForSD_inner) (playlist_t *, char *, playlist_item_t **, playlist_item_t **);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -979,6 +980,7 @@ struct module_symbols_t
 #  define playlist_NodeDump (p_symbols)->playlist_NodeDump_inner
 #  define __intf_UserOkayCancel (p_symbols)->__intf_UserOkayCancel_inner
 #  define __intf_UserStringInput (p_symbols)->__intf_UserStringInput_inner
+#  define playlist_NodesCreateForSD (p_symbols)->playlist_NodesCreateForSD_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1449,6 +1451,7 @@ struct module_symbols_t
     ((p_symbols)->playlist_NodeDump_inner) = playlist_NodeDump; \
     ((p_symbols)->__intf_UserOkayCancel_inner) = __intf_UserOkayCancel; \
     ((p_symbols)->__intf_UserStringInput_inner) = __intf_UserStringInput; \
+    ((p_symbols)->playlist_NodesCreateForSD_inner) = playlist_NodesCreateForSD; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->playlist_ItemAddParent_deprecated = NULL; \
     (p_symbols)->playlist_CopyParents_deprecated = NULL; \

@@ -292,6 +292,23 @@ playlist_item_t *playlist_ChildSearchName( playlist_item_t *p_node,
     return NULL;
 }
 
+
+void playlist_NodesCreateForSD( playlist_t *p_playlist, char *psz_name,
+                                playlist_item_t **pp_node_cat,
+                                playlist_item_t **pp_node_one )
+{
+    *pp_node_cat = playlist_NodeCreate( p_playlist, psz_name,
+                                        p_playlist->p_root_category );
+    (*pp_node_cat)->i_flags |= PLAYLIST_RO_FLAG;
+    (*pp_node_cat)->i_flags |= PLAYLIST_SKIP_FLAG;
+
+    *pp_node_one = playlist_NodeCreate( p_playlist, psz_name,
+                                        p_playlist->p_root_onelevel );
+    (*pp_node_one)->i_flags |= PLAYLIST_RO_FLAG;
+    (*pp_node_one)->i_flags |= PLAYLIST_SKIP_FLAG;
+}
+
+
 /**********************************************************************
  * Tree walking functions
  **********************************************************************/

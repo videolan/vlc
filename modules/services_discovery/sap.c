@@ -318,20 +318,9 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_sd, "unable to find playlist, cancelling SAP listening");
         return VLC_EGENERIC;
     }
-    p_sys->p_node_cat = playlist_NodeCreate( p_sys->p_playlist,
-                               _("SAP sessions"),
-                               p_sys->p_playlist->p_root_category );
-    p_sys->p_node_cat->i_flags |= PLAYLIST_RO_FLAG;
-    p_sys->p_node_cat->i_flags |= PLAYLIST_SKIP_FLAG;
 
-    p_sys->p_node_one = playlist_NodeCreate( p_sys->p_playlist,
-                               _("SAP sessions"),
-                               p_sys->p_playlist->p_root_onelevel );
-    p_sys->p_node_one->i_flags |= PLAYLIST_RO_FLAG;
-    p_sys->p_node_one->i_flags |= PLAYLIST_SKIP_FLAG;
-
-    val.b_bool = VLC_TRUE;
-    var_Set( p_sys->p_playlist, "intf-change", val );
+    playlist_NodesCreateForSD( p_sys->p_playlist, _("SAP sessions"),
+                               &p_sys->p_node_cat, &p_sys->p_node_one );
 
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;

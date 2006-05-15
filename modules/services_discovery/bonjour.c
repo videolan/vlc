@@ -62,7 +62,7 @@ vlc_module_end();
 struct services_discovery_sys_t
 {
     /* playlist node */
-    playlist_item_t     *p_node;
+    playlist_item_t     *p_node_cat, *p_node_one;
     playlist_t          *p_playlist;
 
     AvahiSimplePoll     *simple_poll;
@@ -302,14 +302,8 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    p_view = playlist_ViewFind( p_sys->p_playlist, VIEW_CATEGORY );
-    p_sys->p_node = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY,
-                                         _("Bonjour"), p_view->p_root );
-
-    p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
-    val.b_bool = VLC_TRUE;
-    var_Set( p_sys->p_playlist, "intf-change", val );
-
+    playlist_NodesCreateForSD( p_playlist, _("Bonjour"), &p_sys->p_node_cat,
+                               &p_sys->p_node_one );
     p_sd->pf_run = Run;
 
     return VLC_SUCCESS;
