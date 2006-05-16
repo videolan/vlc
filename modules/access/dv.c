@@ -169,6 +169,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_raw1394 = NULL;
     p_sys->p_avc1394 = NULL;
     p_sys->p_frame = NULL;
+    p_sys->p_ev = NULL;
 
     vlc_mutex_init( p_access, &p_sys->lock );
 
@@ -229,6 +230,14 @@ static int Open( vlc_object_t *p_this )
 
     /* Now create our event thread catcher */
     p_sys->p_ev = vlc_object_create( p_access, sizeof( event_thread_t ) );
+    if( !p_sys->p_ev )
+    {
+        msg_Err( p_access, "failed to create event thread for %s", psz_name );
+        Close( p_this );
+        free( psz_name );
+        return VLC_EGENERIC;
+    }
+    
     p_sys->p_ev->p_frame = NULL;
     p_sys->p_ev->pp_last = &p_sys->p_ev->p_frame;
     p_sys->p_ev->p_access = p_access;
