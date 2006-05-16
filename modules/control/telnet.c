@@ -137,7 +137,7 @@ struct intf_sys_t
  * option is missing from --telnet-host.
  */
 static int getPort(intf_thread_t *p_intf, vlc_url_t url, int i_port)
-    {
+{
     // Print error if two different ports have been specified
     if (url.i_port != 0  &&
         i_port != TELNETPORT_DEFAULT && 
@@ -154,7 +154,6 @@ static int getPort(intf_thread_t *p_intf, vlc_url_t url, int i_port)
     {
  	    return url.i_port;
     }
-    // return default
     return i_port;
 }
 
