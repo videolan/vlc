@@ -50,6 +50,7 @@
 #include "controls.h"
 #include "vlc_osd.h"
 #include "misc.h"
+#import <vlc_interaction.h>
 
 /*****************************************************************************
  * VLCPlaylistView implementation 
@@ -1471,22 +1472,45 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (IBAction)addNode:(id)sender
 {
+    /* we have to create a new thread here because otherwise we would block the
+     * interface since the interaction-stuff and this code would run in the same
+     * thread */
+    [NSThread detachNewThreadSelector: @selector(addNodeThreadedly) 
+        toTarget: self withObject:nil];
+    [self playlistUpdated];
+}
+
+- (void)addNodeThreadedly
+{
+    NSAutoreleasePool * ourPool = [[NSAutoreleasePool alloc] init];
+
     /* simply adds a new node to the end of the playlist */
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
+    vlc_thread_set_priority( p_playlist, VLC_THREAD_PRIORITY_LOW );
+
     if( !p_playlist )
     {
         return;
     }
 
-    playlist_item_t * p_item = playlist_NodeCreate( p_playlist,
-                                _("Empty Folder"), p_playlist->p_local_category );
+    int ret_v;
+    char *psz_name = NULL;
+    playlist_item_t * p_item;
+    ret_v = intf_UserStringInput( p_playlist, _("New Node"), 
+        _("Please enter a name for the new node."), &psz_name );
+    if( psz_name != NULL && psz_name != "" )
+        p_item = playlist_NodeCreate( p_playlist, psz_name, 
+                                            p_playlist->p_local_category );
+    else
+        p_item = playlist_NodeCreate( p_playlist, _("Empty Folder"), 
+                                            p_playlist->p_local_category );
 
     if(! p_item )
         msg_Warn( VLCIntf, "node creation failed" );
 
     vlc_object_release( p_playlist );
-    [self playlistUpdated];
+    [ourPool release];
 }
 
 @end

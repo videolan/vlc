@@ -154,7 +154,16 @@
     msg_Dbg( p_intf, "Description: %s", [o_description UTF8String] );
     if( p_dialog->i_id == DIALOG_ERRORS )
     {
-        msg_Err( p_intf, "Error: %s", p_dialog->psz_description );
+        //msg_Err( p_intf, "Error: %s", p_dialog->psz_description );
+        int myInt;
+        myInt = NSRunCriticalAlertPanel( _NS("Error"), o_description, _NS("OK"),
+            _NS("Report..."), nil );
+        if( myInt == NSCancelButton )
+        {
+            NSURL * o_url = [NSURL URLWithString:
+                @"http://www.videolan.org/support/bug-reporting.html"];
+            [[NSWorkspace sharedWorkspace] openURL: o_url];
+        }
     }
     else
     {
@@ -197,7 +206,7 @@
         }
         else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
         {
-            msg_Dbg( p_intf, "requested flag: DIALOG_STRING_INPUT_OK" );
+            msg_Dbg( p_intf, "requested flag: DIALOG_PSZ_INPUT_OK_CANCEL" );
             [o_input_title setStringValue: o_title];
             [o_input_description setStringValue: o_description];
             [o_input_fld setStringValue: @""];
