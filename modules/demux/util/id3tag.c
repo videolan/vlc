@@ -123,7 +123,7 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
             }
             else
             {
-                msg_Err(p_demux, "Fixme: unhandled meta" );
+                msg_Err(p_demux, "Fixme: unhandled meta, %s", p_frame->description );
             }
             free( psz_temp );
         }
