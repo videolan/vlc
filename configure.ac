@@ -5083,14 +5083,14 @@ then
     if test "${MOZILLA_CONFIG}" = "no"
     then
       AC_PATH_PROG(XULRUNNER_CONFIG, xulrunner-config, no)
-      if test "${XULRUNNER_CONFIG}" != "no"
+      if test "${XULRUNNER_CONFIG}" = "no"
       then
+        AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
+      else
         have_xul=true
 	MOZILLA_CONFIG="${XULRUNNER_CONFIG}"
-      else
-        AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
-       fi
-     fi
+      fi
+    
       if ${MOZILLA_CONFIG} --defines | grep -q 'MOZ_X11=1'; then
         LDFLAGS="${LDFLAGS_save} ${X_LIBS} ${X_PRE_LIBS}"
         AC_CHECK_LIB(Xt,XtStrings,
@@ -5124,6 +5124,7 @@ then
         xpidl_path="`${MOZILLA_CONFIG} --prefix`/bin"
       fi	
     fi
+    dnl End of moz_sdk = ""
   else
     dnl special case for mingw32
     if test "${SYS}" = "mingw32"
@@ -5165,11 +5166,11 @@ then
   if test "${mozilla}" != "false"
   then
     build_pic=yes
-    AC_PATH_PROG(XPIDL, xpidl, no, ${xpidl_path}:/usr/lib/mozilla:/usr/lib64/mozilla)
+    AC_PATH_PROG(XPIDL, xpidl, no, ${xpidl_path}:/usr/lib/mozilla:/usr/lib64/mozilla:/usr/lib/xulrunner:/usr/lib64/xulrunner)
     if test "${XPIDL}" = "no"; then
       AC_MSG_ERROR([Please install the Mozilla development tools, xpidl was not found.])
     fi
-  
+  fi 
 fi
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
