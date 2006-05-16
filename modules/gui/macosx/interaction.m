@@ -154,16 +154,7 @@
     msg_Dbg( p_intf, "Description: %s", [o_description UTF8String] );
     if( p_dialog->i_id == DIALOG_ERRORS )
     {
-        //msg_Err( p_intf, "Error: %s", p_dialog->psz_description );
-        int myInt;
-        myInt = NSRunCriticalAlertPanel( _NS("Error"), o_description, _NS("OK"),
-            _NS("Report..."), nil );
-        if( myInt == NSCancelButton )
-        {
-            NSURL * o_url = [NSURL URLWithString:
-                @"http://www.videolan.org/support/bug-reporting.html"];
-            [[NSWorkspace sharedWorkspace] openURL: o_url];
-        }
+        msg_Err( p_intf, "Error: %s", p_dialog->psz_description );
     }
     else
     {
