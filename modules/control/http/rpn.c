@@ -400,16 +400,17 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         {
             char *psz_src = E_(SSPop)( st );
             char *psz_dest;
+            char *str = psz_src;
 
             p = psz_dest = strdup( psz_src );
 
-            while( *psz_src )
+            while( *str )
             {
-                if( *psz_src == '\\' && *(psz_src + 1) )
+                if( *str == '\\' && *(str + 1) )
                 {
-                    psz_src++;
+                    str++;
                 }
-                *p++ = *psz_src++;
+                *p++ = *str++;
             }
             *p = '\0';
 
