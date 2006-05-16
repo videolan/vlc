@@ -113,7 +113,7 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "crl", NULL, NULL,
                 CRL_TEXT, CRL_LONGTEXT, VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "bonjour", VLC_FALSE, NULL,
-              BONJOUR_TEXT, BONJOUR_LONGTEXT,VLC_TRUE);
+              BONJOUR_TEXT, BONJOUR_LONGTEXT, VLC_TRUE);
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -328,11 +328,7 @@ static int Open( vlc_object_t *p_this )
 
         if( p_sys->p_bonjour == NULL )
         {
-            vlc_object_release( p_playlist );
-            httpd_StreamDelete( p_sys->p_httpd_stream );
-            httpd_HostDelete( p_sys->p_httpd_host );
-            free( (void *)p_sys );
-            return VLC_EGENERIC;
+            msg_Err( p_access, "Avahi stream announcing was requested, but no avahi service could be started" );
         }
         vlc_object_release( p_playlist );
     }
