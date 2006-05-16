@@ -181,7 +181,6 @@
     /* check whether our item is valid, because we would crash if not */
     if(! [self isItemInPlaylist: p_item] ) return;
 
-    char *psz_temp;
     vlc_mutex_lock( &p_item->p_input->lock );
 
     /* fill uri / title / author info */
@@ -200,27 +199,21 @@
             [NSString stringWithCString:p_item->p_input->psz_name] :
             [NSString stringWithUTF8String:p_item->p_input->psz_name]];
     }
-    vlc_mutex_unlock( &p_item->p_input->lock );
-
-    psz_temp = vlc_input_item_GetInfo( p_item->p_input, _("Meta-information"), _("Artist") );
-
-    if( psz_temp )
-    {
-        [o_author_txt setStringValue: [NSString stringWithUTF8String: psz_temp]];
-        free( psz_temp );
-    }
 
     /* fill the other fields */
-    [self setMeta: VLC_META_GENRE forLabel: o_genre_txt];
-    [self setMeta: VLC_META_COPYRIGHT forLabel: o_copyright_txt];
-    [self setMeta: VLC_META_COLLECTION forLabel: o_collection_txt];
-    [self setMeta: VLC_META_SEQ_NUM forLabel: o_seqNum_txt];
-    [self setMeta: VLC_META_DESCRIPTION forLabel: o_description_txt];
-    [self setMeta: VLC_META_RATING forLabel: o_rating_txt];
-    [self setMeta: VLC_META_DATE forLabel: o_date_txt];
-    [self setMeta: VLC_META_LANGUAGE forLabel: o_language_txt];
-    [self setMeta: VLC_META_NOW_PLAYING forLabel: o_nowPlaying_txt];
-    [self setMeta: VLC_META_PUBLISHER forLabel: o_publisher_txt];
+#define p_m p_item->p_input->p_meta
+    [self setMeta: p_m->psz_artist forLabel: o_author_txt];
+    [self setMeta: p_m->psz_album forLabel: o_collection_txt];
+    [self setMeta: p_m->psz_tracknum forLabel: o_seqNum_txt];
+    [self setMeta: p_m->psz_genre forLabel: o_genre_txt];
+    [self setMeta: p_m->psz_copyright forLabel: o_copyright_txt];
+    [self setMeta: p_m->psz_rating forLabel: o_rating_txt];
+    [self setMeta: p_m->psz_publisher forLabel: o_publisher_txt];
+    [self setMeta: p_m->psz_nowplaying forLabel: o_nowPlaying_txt];
+    [self setMeta: p_m->psz_language forLabel: o_language_txt];
+    [self setMeta: p_m->psz_date forLabel: o_date_txt];
+#undef p_m
+    vlc_mutex_unlock( &p_item->p_input->lock );
 
     /* reload the advanced table */
     [[VLCInfoTreeItem rootItem] refresh];
@@ -230,12 +223,13 @@
     [self updateStatistics: nil];
 }
 
-- (void)setMeta: (char *)meta forLabel: (id)theItem
+- (void)setMeta: (char *)psz_meta forLabel: (id)theItem
 {
-    char *psz_meta = vlc_input_item_GetInfo( p_item->p_input, \
-        _(VLC_META_INFO_CAT), _(meta) );
     if( psz_meta != NULL && *psz_meta)
-        [theItem setStringValue: [NSString stringWithUTF8String: psz_meta]];
+        [theItem setStringValue: 
+            ([NSString stringWithUTF8String:psz_meta] == nil ) ? 
+            [NSString stringWithCString:psz_meta] :
+            [NSString stringWithUTF8String:psz_meta]];
     else
         [theItem setStringValue: @"-"];
 }
@@ -306,9 +300,9 @@
 
         p_item->p_input->psz_uri = strdup( [[o_uri_txt stringValue] UTF8String] );
         p_item->p_input->psz_name = strdup( [[o_title_txt stringValue] UTF8String] );
+        vlc_meta_SetArtist( p_item->p_input->p_meta, [[o_author_txt stringValue] UTF8String] )
         vlc_mutex_unlock( &p_item->p_input->lock );
-        vlc_input_item_AddInfo( p_item->p_input, _("Meta-information"), _("Artist"), [[o_author_txt stringValue] UTF8String]);
-        
+
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist, "intf-change", val );
     }
