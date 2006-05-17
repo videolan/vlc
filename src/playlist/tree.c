@@ -179,6 +179,13 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
         {
             REMOVE_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size, i );
         }
+
+        /* Remove the item from its parent */
+        if( p_root->p_parent )
+        {
+            playlist_NodeRemoveItem( p_playlist, p_root, p_root->p_parent );
+        }
+
         playlist_ItemDelete( p_root );
     }
     return VLC_SUCCESS;
