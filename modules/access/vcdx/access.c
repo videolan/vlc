@@ -902,7 +902,7 @@ VCDOpen ( vlc_object_t *p_this )
     p_vcdplayer->p_input           = vlc_object_find( p_access,
                                                       VLC_OBJECT_INPUT,
                                                       FIND_PARENT );
-    p_vcdplayer->p_meta            = vlc_meta_New();
+//    p_vcdplayer->p_meta            = vlc_meta_New();
     p_vcdplayer->p_segments        = NULL;
     p_vcdplayer->p_entries         = NULL;
 
@@ -1037,11 +1037,14 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
             vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
 
             dbg_print( INPUT_DBG_EVENT, "get meta info" );
-
-            if ( p_vcdplayer->p_meta ) {
-              *pp_meta = vlc_meta_Duplicate( p_vcdplayer->p_meta );
-              dbg_print( INPUT_DBG_META, "%s", "Meta copied" );
-            } else
+#if 0
+            if( p_vcdplayer->p_meta )
+            {
+                *pp_meta = vlc_meta_Duplicate( p_vcdplayer->p_meta );
+                dbg_print( INPUT_DBG_META, "%s", "Meta copied" );
+            }
+            else
+#endif
               msg_Warn( p_access, "tried to copy NULL meta info" );
 
             return VLC_SUCCESS;
