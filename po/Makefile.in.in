@@ -26,7 +26,7 @@ gettextsrcdir = $(datadir)/gettext/po
 
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-MKINSTALLDIRS = @MKINSTALLDIRS@
+MKINSTALLDIRS = ${top_builddir}/@MKINSTALLDIRS@
 mkinstalldirs = $(SHELL) `case "$(MKINSTALLDIRS)" in /*) echo "$(MKINSTALLDIRS)" ;; *) echo "$(MKINSTALLDIRS)" ;; esac`
 
 GMSGFMT = @GMSGFMT@
