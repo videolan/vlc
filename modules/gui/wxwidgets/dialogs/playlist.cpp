@@ -898,7 +898,7 @@ void Playlist::DeleteTreeItem( wxTreeItemId item )
        return;
    }
 
-   if( p_item->i_children == -1 ) DeleteItem( p_item->i_id );
+   if( p_item->i_children == -1 ) DeleteItem( p_item->p_input->i_id );
    else DeleteNode( p_item );
 
    RemoveItem( p_item->i_id );
@@ -907,7 +907,7 @@ void Playlist::DeleteTreeItem( wxTreeItemId item )
 
 void Playlist::DeleteItem( int item_id )
 {
-    playlist_DeleteFromItemId( p_playlist, item_id );
+    playlist_DeleteAllFromInput( p_playlist, item_id );
 }
 
 void Playlist::DeleteNode( playlist_item_t *p_item )
