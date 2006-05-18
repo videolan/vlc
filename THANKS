@@ -97,6 +97,7 @@ Michael Mondragon <mammon at lokmail.net> - ncurses compilation fix
 Mickael Hoerdt <hoerdt at clarinet.u-strasbg.fr> - IPv6 SSM multicast patch
 Mike Schrag <mschrag at pobox dot com> - directx device selection
 Michel Lanners <mlan at cpu.lu> - fixed typos and AltiVec detection
+Miroslav Oujeský <oujesky at mail dot muni dot cz> - Czech translation
 Moritz Bunkus <moritz at bunkus dot org> - Matroska patches
 Morten Brix Pedersen <morten at wtf.dk> - Danish translation
 Nilmoni Deb <ndeb at ece.cmu.edu> - autoconf and Makefile fixes
