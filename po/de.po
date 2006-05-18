@@ -1,3 +1,4 @@
+# translation of de.po to German
 # German translation of VLC
 # (c) 2002-2006 the VideoLAN team
 # $Id$
@@ -14,8 +15,8 @@ msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-15 11:03+0200\n"
-"PO-Revision-Date: 2006-05-15 22:48+0100\n"
-"Last-Translator: Hogi <berens@welcome-soft.de>\n"
+"PO-Revision-Date: 2006-05-18 19:49+0200\n"
+"Last-Translator: Felix Kühne\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -298,7 +299,7 @@ msgid ""
 "Access output modules control the ways the muxed streams are sent. This setting allows you to always force a specific access output method. You should probably not do that.\n"
 "You can also set default parameters for each access output."
 msgstr ""
-"Access-Output-Module bestimmten die Wege wie der Stream verschickt wird. Diese Einstellung erlaubt Ihnen, immer einen bestimmten Access-Output zu erzwingen. Sie sollten dies höchstwahrscheinlich nicht tun.\n"
+"Access-Output-Module bestimmen die Wege wie der Stream verschickt wird. Diese Einstellung erlaubt Ihnen, immer einen bestimmten Access-Output zu erzwingen. Sie sollten dies höchstwahrscheinlich nicht tun.\n"
 "Sie können auch Standardparameter für jeden Access-Output festlegen."
 
 #: include/vlc_config_cat.h:158
@@ -1593,7 +1594,7 @@ msgstr "Seitenverhältnis der Monitorpixel"
 
 #: src/libvlc.h:344
 msgid "This forces the monitor aspect ratio. Most monitors have square pixels (1:1). If you have a 16:9 screen, you might need to change this to 4:3 in order to keep proportions."
-msgstr "Erzwingt ein bestimmtes Seitenverhältnis. Die meisten Monitore haben quadratische Pixel (1:1). Wenn du einen 16:9 Bildschirm hast"
+msgstr "Erzwingt ein bestimmtes Seitenverhältnis. Die meisten Monitore haben quadratische Pixel (1:1). Wenn Sie einen 16:9 Bildschirm haben, müssen Sie dies eventuell auf 4:3 setzen, um die Proportionen zu erhalten."
 
 #: src/libvlc.h:349
 msgid "Skip frames"
@@ -4555,7 +4556,7 @@ msgstr "Video-Input-Pin"
 
 #: modules/access/dshow/dshow.cpp:138
 msgid "Select the video input source, such as composite, s-video, or tuner. Since these settings are hardware-specfic, you should find good settings in the \"Device config\" area, and use those numbers here. -1 means that settings will not be changed."
-msgstr "Wähle den Videoeingang, wie z.B. Composite, S-Video oder Tuner. Da diese Einstellungen abhängig von der Hardware sind, solltest Du diese Nummern in \"Geräte Einstellungen\" nachschlagen, und die Zahlen dann hier eintragen. -1 bedeutet, dass der Videoeingang nicht initialisiert oder geändert wird."
+msgstr "Wähle den Videoeingang, wie z.B. Composite, S-Video oder Tuner. Da diese Einstellungen abhängig von der Hardware sind, sollten Sie diese Nummern im Bereich \"Geräte Einstellungen\" nachschlagen, und die Zahlen dann hier eintragen. -1 bedeutet, dass der Videoeingang nicht initialisiert oder geändert wird."
 
 #: modules/access/dshow/dshow.cpp:142
 msgid "Audio input pin"
@@ -5089,7 +5090,7 @@ msgstr "Auswahl von allen Streams erzwingen"
 
 #: modules/access/mms/mms.c:53
 msgid "MMS streams can contain several elementary streams, with different bitrates. You can choose to select all of them."
-msgstr "MMS Streams können mehrere Elementarstreams mit verschiedenen Bitraten enthalten. Du kannst sie alle auswählen."
+msgstr "MMS Streams können mehrere Elementarstreams mit verschiedenen Bitraten enthalten. Es ist möglich alle auszuwählen."
 
 #: modules/access/mms/mms.c:56
 msgid "Maximum bitrate"
@@ -5836,7 +5837,7 @@ msgstr "MP3-Stream"
 
 #: modules/access_output/shout.c:67
 msgid "You normally have to feed the shoutcast module with Ogg streams. It is also possible to stream MP3 instead, so you can forward MP3 streams to the icecast server."
-msgstr "Du solltest normalerweise Shoutcast Modul mit ogg streams bedienen, es ist aber ebenfalls möglich, MP3 Dateien zu verwenden, so dass man die MP3 streams an einen icecast server weiterleiten kann."
+msgstr "Sie sollten das Shoutcast Modul normalerweise mit ogg streams benutzen. Es ist aber ebenfalls möglich, MP3 zu verwenden, so dass man die MP3 streams an einen icecast server weiterleiten kann."
 
 #: modules/access_output/shout.c:73
 msgid "IceCAST output"
@@ -7157,7 +7158,7 @@ msgid ""
 "Try manually setting a character-encoding before you open the file."
 msgstr ""
 "Konnte den Zeichensatz des Untertitels nicht ändern.\n"
-"Versuche den Zeichensatz manuell festzulegent, bevor du die Datei aufmachst."
+"Versuchen Sie den Zeichensatz manuell festzulegen, bevor Sie die Datei öffnen."
 
 #: modules/codec/svcdsub.c:51
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -8292,7 +8293,7 @@ msgstr "Host"
 
 #: modules/control/telnet.c:73
 msgid "This is the host on which the interface will listen. It defaults to all network interfaces (0.0.0.0). If you want this interface to be available only on the local machine, enter \"127.0.0.1\"."
-msgstr "Gibt den Host an, auf dem das Interface Anfragen entgegennimmt. Der Standard für alle Netzwerkkarten ist 0.0.0.0. Wenn du auf das Interface nur von deinem eigenen Computer aus zugreifen möchtest, gebe \"127.0.0.1\" an."
+msgstr "Gibt den Host an, auf dem das Interface Anfragen entgegennimmt. Der Standard für alle Netzwerkkarten ist 0.0.0.0. Wenn dieses Interface nur vom lokalen Computer aus zugreifbar sein soll, geben Sie \"127.0.0.1\" an."
 
 #: modules/control/telnet.c:77
 #: modules/gui/macosx/open.m:178
@@ -8363,7 +8364,7 @@ msgid ""
 "Do you want to try to repair it (this might take a long time) ?"
 msgstr ""
 "Diese AVI Datei ist beschädigt. Vorspulen wird nicht korrekt funktionieren.\n"
-"Willst du versuchen diese Datei reparieren zu lassen (Die kann einige Zeit dauern!)?"
+"Möchten Sie versuchen, diese Datei reparieren zu lassen (Die kann einige Zeit dauern!)?"
 
 #: modules/demux/avi/avi.c:2270
 msgid "Fixing AVI Index"
@@ -8424,7 +8425,8 @@ msgstr "RTSP Benutzername"
 
 #: modules/demux/livedotcom.cpp:72
 msgid "Allows you to modify the user name that will be used for authenticating the connection."
-msgstr "Erlaubt Ihnen den für die Authentifizierung der Verbindung benutzten "
+msgstr ""
+"Erlaubt Ihnen den für die Authentifizierung der Verbindung benutzten "
 "Benutzernamen zu ändern."
 
 #: modules/demux/livedotcom.cpp:74
@@ -15946,73 +15948,4 @@ msgstr "Die Farbe, die zur Anzeige des Textes in der XOSD-Ausgabe benutzt wird."
 #: modules/visualization/xosd.c:84
 msgid "XOSD interface"
 msgstr "XOSD Interface"
-
-#~ msgid "CDDB Artist"
-#~ msgstr "CDDB-Künstler"
-#~ msgid "CDDB Category"
-#~ msgstr "CDDB-Kategorie"
-#~ msgid "CDDB Disc ID"
-#~ msgstr "CDDB-Disk-ID"
-#~ msgid "CDDB Extended Data"
-#~ msgstr "CDDB-Erweiterte Daten"
-#~ msgid "CDDB Genre"
-#~ msgstr "CDDB-Genre"
-#~ msgid "CDDB Year"
-#~ msgstr "CDDB-Jahr"
-#~ msgid "CDDB Title"
-#~ msgstr "CDDB-Titel"
-#~ msgid "CD-Text Arranger"
-#~ msgstr "CD-Text Bearbeiter"
-#~ msgid "CD-Text Composer"
-#~ msgstr "CD-Text Komponist"
-#~ msgid "CD-Text Disc ID"
-#~ msgstr "CD-Text Disk-ID"
-#~ msgid "CD-Text Genre"
-#~ msgstr "CD-Text Genre"
-#~ msgid "CD-Text Message"
-#~ msgstr "CD-Text Meldung"
-#~ msgid "CD-Text Songwriter"
-#~ msgstr "CD-Text Liedermacher"
-#~ msgid "CD-Text Performer"
-#~ msgstr "CD-Text ausübender Künstler"
-#~ msgid "CD-Text Title"
-#~ msgstr "CD-Text Titel"
-#~ msgid "ISO-9660 Application ID"
-#~ msgstr "ISO-9660 Anwendungs-ID"
-#~ msgid "ISO-9660 Preparer"
-#~ msgstr "ISO-9660 Vorbereiter"
-#~ msgid "ISO-9660 Publisher"
-#~ msgstr "ISO-9660 Verleger"
-#~ msgid "ISO-9660 Volume"
-#~ msgstr "ISO-9660 Volume"
-#~ msgid "ISO-9660 Volume Set"
-#~ msgstr "ISO-9660 Volume-Set"
-#~ msgid "By category"
-#~ msgstr "Nach Kategorie"
-#~ msgid "Manually added"
-#~ msgstr "Manuell hinzugefügt"
-#~ msgid "All items, unsorted"
-#~ msgstr "Alle Objekte, unsortiert"
-#~ msgid "Segment filename"
-#~ msgstr "Segmentsdateiname"
-#~ msgid "Muxing application"
-#~ msgstr "Muxing-Programm"
-#~ msgid "Writing application"
-#~ msgstr "Schreibprogramm"
-#~ msgid "%i items in playlist (%i not shown)"
-#~ msgstr "%i Objekte in der Wiedergabeliste (%i nicht gezeigt)"
-#~ msgid "Sorted by Artist"
-#~ msgstr "Nach Künstler sortiert"
-#~ msgid "Sorted by Album"
-#~ msgstr "Nach Album sortiert"
-#~ msgid "Check for Updates..."
-#~ msgstr "Suche nach Updates..."
-#~ msgid "Session Announcements (SAP)"
-#~ msgstr "Sitzungs Ankündigungen (SAP)"
-#~ msgid "Number of streams"
-#~ msgstr "Anzahl der Streams"
-#~ msgid "Maximum number of Shoutcast radio streams which would be listed."
-#~ msgstr ""
-#~ "Maximale Anzahl von Shoutcast-Radiostreams, die aufgelistet werden soll."
-
 
