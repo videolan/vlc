@@ -987,7 +987,7 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
              p_vout->fmt_in.i_sar_num, p_vout->fmt_in.i_sar_den );
 
     var_Get( p_vout, "crop", &val );
-    return CropCallback( p_this, 0, val, val, 0 );
+    return CropCallback( p_this, "crop", val, val, 0 );
 
     return VLC_SUCCESS;
 }
