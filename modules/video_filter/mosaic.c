@@ -864,11 +864,11 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     }
     else if( !strcmp( psz_var, "mosaic-order" ) )
     {
+        char *psz_order;
+        int i_index;
         vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "Changing mosaic order to %s", newval.psz_string );
 
-        char *psz_order;
-        int i_index;
         p_sys->i_order_length = 0;
         p_sys->ppsz_order = NULL;
         psz_order = newval.psz_string;
