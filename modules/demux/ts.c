@@ -2487,7 +2487,7 @@ static void EITEventFixString( unsigned char *psz )
      * caracters encoding, for now lets skip it */
     if( psz[0] >= 0x20 )
             return;
-    if( ( i_len = strlen( psz ) ) > 0 )
+    if( ( i_len = strlen( (char *) psz ) ) > 0 )
         memmove( &psz[0], &psz[1], i_len ); /* Copy the \0 too */
 }
 static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
@@ -2556,8 +2556,8 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                     memcpy( psz_text, pE->i_text, pE->i_text_length );
                     psz_text[pE->i_text_length] = '\0';
 
-                    EITEventFixString(psz_name);
-                    EITEventFixString(psz_text);
+                    EITEventFixString((unsigned char *)&psz_name);
+                    EITEventFixString((unsigned char *)&psz_text);
                     msg_Dbg( p_demux, "    - short event lang=%3.3s '%s' : '%s'",
                              pE->i_iso_639_code, psz_name, psz_text );
                 }
@@ -2578,12 +2578,12 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                         memcpy( str1, pE->i_item_description[i],
                                 pE->i_item_description_length[i] );
                         str1[pE->i_item_description_length[i]] = '\0';
-                        EITEventFixString(str1);
+                        EITEventFixString((unsigned char *)&str1);
 
                         memcpy( str2, pE->i_item[i],
                                 pE->i_item_length[i] );
                         str2[pE->i_item_length[i]] = '\0';
-                        EITEventFixString(str2);
+                        EITEventFixString((unsigned char *)&str2);
 
                         msg_Dbg( p_demux, "       - desc='%s' item='%s'", str1, str2 );
                         psz_extra = realloc( psz_extra,
@@ -2597,7 +2597,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 
                     memcpy( str1, pE->i_text, pE->i_text_length );
                     str1[pE->i_text_length] = '\0';
-                    EITEventFixString(str1);
+                    EITEventFixString((unsigned char *)&str1);
 
                     msg_Dbg( p_demux, "       - text='%s'", str1 );
                     psz_extra = realloc( psz_extra,
