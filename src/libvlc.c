@@ -286,7 +286,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     vlc_value_t  val;
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
+# if defined (WIN32) || defined (__APPLE__)
     char *       psz_language;
+#endif
 #endif
 
     if( !p_vlc )
