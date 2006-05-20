@@ -1634,10 +1634,10 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
     struct aes_s aes;
     struct shuffle_s shuffle;
     uint32_t i, y;
-    uint32_t *p_sci_data;
+    uint32_t *p_sci_data = NULL;
     uint32_t i_user, i_key;
     uint32_t p_sys_key[ 4 ];
-    uint32_t i_sci_size, i_blocks, i_remaining;
+    uint32_t i_sci_size = 0, i_blocks, i_remaining;
     uint32_t *p_sci0, *p_sci1, *p_buffer;
     uint32_t p_sci_key[ 4 ];
     char *psz_ipod;
