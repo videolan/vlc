@@ -229,6 +229,7 @@ int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
                                         p_root->pp_children[i], b_do_stop );
         }
     }
+    return -1;
 }
 
 /** Remove a playlist item from the playlist, given its id */
