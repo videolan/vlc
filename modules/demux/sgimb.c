@@ -159,14 +159,13 @@ static int Activate( vlc_object_t * p_this )
     i_size -= sizeof("sgiNameServerHost=") - 1;
     if ( i_size > 0 )
     {
-        while ( i_size && strncasecmp( p_peek, "sgiNameServerHost=",
-                                       sizeof("sgiNameServerHost=") - 1 ) )
+        unsigned int i_len = sizeof("sgiNameServerHost=") - 1;
+        while ( i_size && strncasecmp( (char *)p_peek, "sgiNameServerHost=", i_len ) )
         {
             p_peek++;
             i_size--;
         }
-        if ( !strncasecmp( p_peek, "sgiNameServerHost=",
-                           sizeof("sgiNameServerHost=") -1 ) )
+        if ( !strncasecmp( (char *)p_peek, "sgiNameServerHost=", i_len ) )
         {
             p_demux->pf_demux = Demux;
             p_demux->pf_control = Control;
