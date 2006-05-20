@@ -129,7 +129,7 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        const char *psz_localname = ToLocale( p_access->psz_name );
+        char *psz_localname = ToLocale( p_access->psz_name );
         char *psz_tmp, *psz_tmp2, *psz_rewriten;
         int fd, i, i_length = strlen( psz_localname );
         for( i = 0, psz_tmp = psz_localname ;
