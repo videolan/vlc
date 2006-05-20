@@ -675,7 +675,7 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     uint8_t *p_peek, *p_data;
     int i_peek, i_title, i_author, i_copyright, i_description, i_rating;
     vlc_iconv_t cd = (vlc_iconv_t)-1;
-    char *ib = NULL;
+    const char *ib = NULL;
     char *ob = NULL;
     size_t i_ibl, i_obl, i_len;
 
@@ -688,7 +688,7 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
 /* FIXME i_size*3 is the worst case. */
 #define GETSTRINGW( psz_str, i_size ) \
     psz_str = (char *)calloc( i_size*3+1, sizeof( char ) ); \
-    ib = (char *)p_data; \
+    ib = (const char *)p_data; \
     ob = psz_str; \
     i_ibl = i_size; \
     i_obl = i_size*3; \
