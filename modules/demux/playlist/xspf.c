@@ -146,6 +146,7 @@ int xspf_import_Demux( demux_t *p_demux )
 
     return i_ret;
 #endif
+    return 0;
 }
 
 /** \brief dummy function for demux callback interface */
