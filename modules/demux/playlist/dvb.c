@@ -168,6 +168,7 @@ static int Demux( demux_t *p_demux )
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;
 #endif
+    return 0;
 }
 
 static struct
