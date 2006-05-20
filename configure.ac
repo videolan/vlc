@@ -813,7 +813,7 @@ dnl Check for hal
 AC_ARG_ENABLE(hal,
   [  --enable-hal            Linux HAL services discovery (default enabled)])
  
-if test "${enable_hal}" != "no" -a "${SYS}" = "linux"
+if test "${enable_hal}"
 then
   PKG_CHECK_MODULES(HAL, hal >= 0.5.0,
     [ AC_DEFINE( HAVE_HAL_1, [] , [Define if you have the new HAL library API])
@@ -836,7 +836,7 @@ dnl Check for dbus
 AC_ARG_ENABLE(dbus,
   [  --enable-dbus            Linux D-BUS message bus system (default enabled)])
  
-if test "${enable_dbus}" != "no" -a "${SYS}" = "linux"
+if test "${enable_dbus}" != "no"
 then
   PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.30,
     [ AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the new D-BUS library API])
@@ -1971,7 +1971,7 @@ dnl  gnomeVFS access module
 dnl
 AC_ARG_ENABLE(gnomevfs,
   [  --enable-gnomevfs       GnomeVFS access module (default enabled)])
-if test "${enable_gnomevfs}" != "no" -a  "${SYS}" = "linux" 
+if test "${enable_gnomevfs}" != "no" 
 then
   PKG_CHECK_MODULES(GNOMEVFS, gnome-vfs-2.0,
     VLC_ADD_LDFLAGS([access_gnomevfs],[$GNOMEVFS_LIBS])
