@@ -334,7 +334,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
             break;
 
         case FOURCC_name:
-            p_drms->p_name = strdup( p_info );
+            p_drms->p_name = (uint8_t*) strdup( (char *)p_info );
 
             if( p_drms->p_name == NULL )
             {
@@ -354,7 +354,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
             }
 
             InitMD5( &md5 );
-            AddMD5( &md5, p_drms->p_name, strlen( p_drms->p_name ) );
+            AddMD5( &md5, p_drms->p_name, strlen( (char *)p_drms->p_name ) );
             AddMD5( &md5, p_drms->p_iviv, 16 );
             EndMD5( &md5 );
 
