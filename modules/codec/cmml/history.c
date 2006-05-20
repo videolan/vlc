@@ -107,7 +107,7 @@ static void history_Dump( history_t *p_history )
         void *pv_item;
 
         xarray_ObjectAtIndex( p_history->p_xarray, i, &pv_item );
-        
+
         p_item = (history_item_t *) pv_item;
 
         if( p_item == NULL )
@@ -203,7 +203,7 @@ void history_PruneAndInsert( history_t *p_history, history_item_t *p_item )
 
 unsigned int history_Count( history_t *p_history )
 {
-    int i_count;
+    unsigned int i_count;
     xarray_Count( p_history->p_xarray, &i_count );
     return i_count;
 }

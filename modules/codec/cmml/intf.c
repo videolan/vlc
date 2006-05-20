@@ -818,8 +818,6 @@ static int DisplayAnchor( intf_thread_t *p_intf,
 
     if( p_vout )
     {
-        text_style_t *p_style = NULL;
-
         if( psz_anchor_url )
         {
             /* Should display subtitle underlined and in blue, but it looks
@@ -841,7 +839,6 @@ static int DisplayAnchor( intf_thread_t *p_intf,
         {
             return VLC_EGENERIC;
         }
-
     }
     else
     {
