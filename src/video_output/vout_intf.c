@@ -806,7 +806,7 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strcmp( psz_cmd, "crop" ) )
     {
-        char *psz_end, *psz_parser = strchr( newval.psz_string, ':' );
+        char *psz_end = NULL, *psz_parser = strchr( newval.psz_string, ':' );
         if( psz_parser )
         {
             /* We're using the 3:4 syntax */
@@ -853,7 +853,8 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
                 i_crop_left = strtol( psz_end, &psz_end, 10 );
                 if( psz_end != psz_parser ) goto crop_end;
 
-                i_crop_top = strtol( ++psz_end, &psz_end, 10 );
+                psz_end++;
+                i_crop_top = strtol( psz_end, &psz_end, 10 );
                 if( *psz_end != '\0' ) goto crop_end;
 
                 i_width = i_crop_width;
@@ -882,7 +883,8 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
                 i_crop_right = strtol( psz_end, &psz_end, 10 );
                 if( psz_end != psz_parser ) goto crop_end;
 
-                i_crop_bottom = strtol( ++psz_end, &psz_end, 10 );
+                psz_end++;
+                i_crop_bottom = strtol( psz_end, &psz_end, 10 );
                 if( *psz_end != '\0' ) goto crop_end;
 
                 i_width = p_vout->fmt_render.i_visible_width
