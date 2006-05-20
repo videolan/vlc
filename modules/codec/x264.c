@@ -100,6 +100,11 @@ static void Close( vlc_object_t * );
 #define NF_TEXT N_("Skip loop filter")
 #define NF_LONGTEXT N_( "Deactivate the deblocking loop filter (decreases quality).")
 
+#define FILTER_TEXT N_("Loop filter AlphaC0 and Beta parameters alpha:beta")
+#define FILTER_LONGTEXT N_( "Loop filter AlphaC0 and Beta parameters. " \
+    "Range -6 to 6 for both alpha and beta parameters. -6 means light " \
+    "filter, 6 means strong.")
+
 /* Ratecontrol */
 
 #define QP_TEXT N_("Set QP")
@@ -191,9 +196,22 @@ static void Close( vlc_object_t * );
 
 #define SUBME_TEXT N_("Subpixel motion estimation and partition decision " \
     "quality")
+#if X264_BUILD >= 46 /* r477 */
+#define SUBME_MAX 7
 #define SUBME_LONGTEXT N_( "This parameter controls quality versus speed " \
     "tradeoffs involved in the motion estimation decision process " \
-    "(lower = quicker and higher = better quality). From 1 to 6." )
+    "(lower = quicker and higher = better quality). Range 1 to 7." )
+#elif X264_BUILD >= 30 /* r262 */
+#define SUBME_MAX 6
+#define SUBME_LONGTEXT N_( "This parameter controls quality versus speed " \
+    "tradeoffs involved in the motion estimation decision process " \
+    "(lower = quicker and higher = better quality). Range 1 to 6." )
+#else
+#define SUBME_MAX 5
+#define SUBME_LONGTEXT N_( "This parameter controls quality versus speed " \
+    "tradeoffs involved in the motion estimation decision process " \
+    "(lower = quicker and higher = better quality). Range 1 to 5." )
+#endif
 
 #define B_RDO_TEXT N_("RD based mode decision for B-frames.")
 #define B_RDO_LONGTEXT N_( "RD based mode decision for B-frames. This " \
@@ -225,6 +243,10 @@ static void Close( vlc_object_t * );
 #define FAST_PSKIP_TEXT N_("Early SKIP detection on P-frames")
 #define FAST_PSKIP_LONGTEXT N_( "Early SKIP detection on P-frames.")
 
+#define DCT_DECIMATE_TEXT N_("Coefficient thresholding on P-frames")
+#define DCT_DECIMATE_LONGTEXT N_( "Coefficient thresholding on P-frames." \
+    "Eliminate dct blocks containing only a small single coefficient.")
+
 #define NR_TEXT N_("Noise reduction")
 #define NR_LONGTEXT N_( "Dct-domain noise reduction. Adaptive pseudo-deadzone.")
 
@@ -236,6 +258,9 @@ static void Close( vlc_object_t * );
 #define PSNR_TEXT N_("PSNR calculation")
 #define PSNR_LONGTEXT N_( "This has no effect on actual encoding quality, "\
     "it just prevents the stats from being calculated (for speed)." )
+
+#define QUIET_TEXT N_("Quiet mode")
+#define QUIET_LONGTEXT N_( "Quiet mode.")
 
 #define VERBOSE_TEXT N_("Statistics")
 #define VERBOSE_LONGTEXT N_( "Print stats for each frame.")
@@ -253,10 +278,17 @@ static char *enc_analyse_list_text[] =
   { N_("default"), N_("none"), N_("fast"), N_("normal"),
     N_("slow"), N_("all") };
 
+#if X264_BUILD >= 45 /* r457 */
+static char *direct_pred_list[] =
+  { "", "none", "spatial", "temporal", "auto" };
+static char *direct_pred_list_text[] =
+  { N_("default"), N_("none"), N_("spatial"), N_("temporal"), N_("auto") };
+#else
 static char *direct_pred_list[] =
   { "", "none", "spatial", "temporal" };
 static char *direct_pred_list_text[] =
   { N_("default"), N_("none"), N_("spatial"), N_("temporal") };
+#endif
 
 vlc_module_begin();
     set_description( _("H.264/MPEG4 AVC encoder (using x264 library)"));
@@ -305,6 +337,9 @@ vlc_module_begin();
     add_bool( SOUT_CFG_PREFIX "nf", 0, NULL, NF_TEXT,
               NF_LONGTEXT, VLC_FALSE );
         add_deprecated( SOUT_CFG_PREFIX "loopfilter", VLC_FALSE ); /* Deprecated since 0.8.5 */
+
+    add_string( SOUT_CFG_PREFIX "filter", "", NULL, FILTER_TEXT,
+                 FILTER_LONGTEXT, VLC_FALSE );
 
 /* Ratecontrol */
 
@@ -372,11 +407,12 @@ vlc_module_begin();
 
 /* Analysis */
 
-    add_string( SOUT_CFG_PREFIX "analyse", "all", NULL, ANALYSE_TEXT,
+    /* x264 analyse = none (default). set at least "normal" mode. */
+    add_string( SOUT_CFG_PREFIX "analyse", "normal", NULL, ANALYSE_TEXT,
                 ANALYSE_LONGTEXT, VLC_FALSE );
         change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
 
-    add_string( SOUT_CFG_PREFIX "direct", "temporal", NULL, DIRECT_PRED_TEXT,
+    add_string( SOUT_CFG_PREFIX "direct", "spatial", NULL, DIRECT_PRED_TEXT,
                 DIRECT_PRED_LONGTEXT, VLC_FALSE );
         change_string_list( direct_pred_list, direct_pred_list_text, 0 );
 
@@ -440,6 +476,11 @@ vlc_module_begin();
               FAST_PSKIP_LONGTEXT, VLC_FALSE );
 #endif
 
+#if X264_BUILD >= 46 /* r503 */
+    add_bool( SOUT_CFG_PREFIX "dct-decimate", 1, NULL, DCT_DECIMATE_TEXT,
+              DCT_DECIMATE_LONGTEXT, VLC_FALSE );
+#endif
+
 #if X264_BUILD >= 44 /* r398 */
     add_integer( SOUT_CFG_PREFIX "nr", 0, NULL, NR_TEXT,
                  NR_LONGTEXT, VLC_FALSE );
@@ -454,6 +495,9 @@ vlc_module_begin();
     add_bool( SOUT_CFG_PREFIX "psnr", 0, NULL, PSNR_TEXT,
               PSNR_LONGTEXT, VLC_FALSE );
 
+    add_bool( SOUT_CFG_PREFIX "quiet", 0, NULL, QUIET_TEXT,
+              QUIET_LONGTEXT, VLC_FALSE );
+
 #if X264_BUILD >= 0x000e /* r81 */
     add_bool( SOUT_CFG_PREFIX "verbose", 0, NULL, VERBOSE_TEXT,
               VERBOSE_LONGTEXT, VLC_FALSE );
@@ -467,12 +511,13 @@ vlc_module_end();
 static const char *ppsz_sout_options[] = {
     "8x8dct", "analyse", "asm", "bframes", "bime", "bpyramid", "b-adapt",
     "b-bias", "b-rdo", "cabac", "chroma-me", "chroma-qp-offset", "cplxblur",
-    "crf", "direct", "fast-pskip", "frameref", "ipratio", "keyint",
-    "keyint-min", "loopfilter", "me", "merange", "min-keyint", "mixed-refs",
-    "nf", "nr", "pbratio", "psnr", "qblur", "qp", "qcomp", "qpstep",
-    "qpmax", "qpmin", "qp-max", "qp-min", "ratetol", "ref", "scenecut",
-    "subme", "subpel", "tolerance", "trellis", "verbose", "vbv-bufsize",
-    "vbv-init", "vbv-maxrate", "weightb" , NULL
+    "crf", "dct-decimate", "direct", "filter", "fast-pskip", "frameref",
+    "ipratio", "keyint", "keyint-min", "loopfilter", "me", "merange",
+    "min-keyint", "mixed-refs", "nf", "nr", "pbratio", "psnr", "qblur",
+    "qp", "qcomp", "qpstep", "qpmax", "qpmin", "qp-max", "qp-min", "quiet",
+    "ratetol", "ref", "scenecut", "subme", "subpel", "tolerance",
+    "trellis", "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate",
+    "weightb", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -602,6 +647,15 @@ static int  Open ( vlc_object_t *p_this )
     /* disable deblocking when nf (no loop filter) is enabled */
     var_Get( p_enc, SOUT_CFG_PREFIX "nf", &val );
     p_sys->param.b_deblocking_filter = !val.b_bool;
+    
+    var_Get( p_enc, SOUT_CFG_PREFIX "filter", &val );
+    if( val.psz_string )
+    {
+        char *p = strchr( val.psz_string, ':' );
+        p_sys->param.i_deblocking_filter_alphac0 = atoi( val.psz_string );
+        p_sys->param.i_deblocking_filter_beta = p ? atoi( p+1 ) : p_sys->param.i_deblocking_filter_alphac0;
+        free( val.psz_string );
+    }
 
     var_Get( p_enc, SOUT_CFG_PREFIX "ipratio", &val );
     p_sys->param.rc.f_ip_factor = val.f_float;
@@ -622,6 +676,9 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "verbose", &val );
     if( val.b_bool ) p_sys->param.i_log_level = X264_LOG_DEBUG;
 #endif
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "quiet", &val );
+    if( val.b_bool ) p_sys->param.i_log_level = X264_LOG_NONE;
 
     var_Get( p_enc, SOUT_CFG_PREFIX "keyint", &val );
 #if X264_BUILD >= 0x000e
@@ -656,14 +713,9 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_scenecut_threshold = val.i_int;
 #endif
 
-#if X264_BUILD >= 30
     var_Get( p_enc, SOUT_CFG_PREFIX "subme", &val );
-    if( val.i_int >= 1 && val.i_int <= 6 )
+    if( val.i_int >= 1 && val.i_int <= SUBME_MAX )
         p_sys->param.analyse.i_subpel_refine = val.i_int;
-#else
-    if( val.i_int >= 1 && val.i_int <= 5 )
-        p_sys->param.analyse.i_subpel_refine = val.i_int;
-#endif
 
 #if X264_BUILD >= 24
     var_Get( p_enc, SOUT_CFG_PREFIX "me", &val );
@@ -703,6 +755,12 @@ static int  Open ( vlc_object_t *p_this )
     {
         p_sys->param.analyse.i_direct_mv_pred = X264_DIRECT_PRED_TEMPORAL;
     }
+#if X264_BUILD >= 45 /* r457 */
+    else if( !strcmp( val.psz_string, "auto" ) )
+    {
+        p_sys->param.analyse.i_direct_mv_pred = X264_DIRECT_PRED_AUTO;
+    }
+#endif
     if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_enc, SOUT_CFG_PREFIX "psnr", &val );
@@ -764,6 +822,11 @@ static int  Open ( vlc_object_t *p_this )
 #if X264_BUILD >= 44
     var_Get( p_enc, SOUT_CFG_PREFIX "nr", &val );
     p_sys->param.analyse.i_noise_reduction = val.i_int;
+#endif
+
+#if X264_BUILD >= 46
+    var_Get( p_enc, SOUT_CFG_PREFIX "dct-decimate", &val );
+    p_sys->param.analyse.b_dct_decimate = val.b_bool;
 #endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "asm", &val );
