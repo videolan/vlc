@@ -89,7 +89,7 @@ static char *rtsp_get( rtsp_client_t *rtsp )
   char *psz_buffer = malloc( BUF_SIZE );
   char *psz_string = NULL;
 
-  if( rtsp->pf_read_line( rtsp->p_userdata, psz_buffer, BUF_SIZE ) >= 0 )
+  if( rtsp->pf_read_line( rtsp->p_userdata, psz_buffer, (unsigned int)BUF_SIZE ) >= 0 )
   {
     //printf( "<< '%s'\n", psz_buffer );
       psz_string = strdup( psz_buffer );
@@ -106,7 +106,7 @@ static char *rtsp_get( rtsp_client_t *rtsp )
 
 static int rtsp_put( rtsp_client_t *rtsp, const char *psz_string )
 {
-    int i_buffer = strlen( psz_string );
+    unsigned int i_buffer = strlen( psz_string );
     char *psz_buffer = malloc( i_buffer + 3 );
     int i_ret;
 
@@ -399,7 +399,7 @@ int rtsp_read_data( rtsp_client_t *rtsp, char *buffer, unsigned int size )
 
     if( size >= 4 )
     {
-        i = rtsp->pf_read( rtsp->p_userdata, buffer, 4 );
+        i = rtsp->pf_read( rtsp->p_userdata, buffer, (unsigned int) 4 );
         if( i < 4 ) return i;
 
         if( buffer[0]=='S' && buffer[1]=='E' && buffer[2]=='T' &&
@@ -433,15 +433,15 @@ int rtsp_read_data( rtsp_client_t *rtsp, char *buffer, unsigned int size )
             rtsp_put( rtsp, rest );
             rtsp_put( rtsp, "" );
             free( rest );
-            i = rtsp->pf_read( rtsp->p_userdata, buffer, size );
+            i = rtsp->pf_read( rtsp->p_userdata, (unsigned char*)buffer, size );
         }
         else
         {
-            i = rtsp->pf_read( rtsp->p_userdata, buffer + 4, size - 4 );
+            i = rtsp->pf_read( rtsp->p_userdata, (unsigned char*)buffer + 4, size - 4 );
             i += 4;
         }
     }
-    else i = rtsp->pf_read( rtsp->p_userdata, buffer, size );
+    else i = rtsp->pf_read( rtsp->p_userdata, (unsigned char*)buffer, size );
 
     //fprintf( stderr, "<< %d of %d bytes\n", i, size );
 
