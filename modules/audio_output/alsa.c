@@ -761,10 +761,8 @@ static int ALSAThread( aout_instance_t * p_aout )
 static void ALSAFill( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
-
     aout_buffer_t * p_buffer;
     snd_pcm_status_t * p_status = p_sys->p_status;
-    snd_timestamp_t ts_next;
     int i_snd_rc;
     mtime_t next_date;
 
@@ -833,7 +831,6 @@ static void ALSAFill( aout_instance_t * p_aout )
                 /* With screwed ALSA drivers the timestamp is always zero;
                  * use another method then */
                 snd_pcm_sframes_t delay = 0;
-                ssize_t i_bytes = 0;
 
                 snd_pcm_delay( p_sys->p_snd_pcm, &delay );
                 next_date = mdate() + (mtime_t)(delay) * 1000000 /
