@@ -1214,7 +1214,6 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
 static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    vlc_value_t val;
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     playlist_t *p_playlist;
 
@@ -1281,8 +1280,6 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
     {
-        int i;
-        playlist_view_t *p_view;
         playlist_NodeDump( p_playlist, p_playlist->p_root_category, 0 );
         playlist_NodeDump( p_playlist, p_playlist->p_root_onelevel, 0 );
     }
