@@ -336,8 +336,6 @@ static int Demux ( demux_t *p_demux )
     demux_sys_t     *p_sys = p_demux->p_sys;
     playlist_t      *p_playlist;
     playlist_item_t *p_item;
-    playlist_item_t *p_child;
-
     char            *psz_line;
 
     p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
