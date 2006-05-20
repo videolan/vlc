@@ -608,7 +608,7 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
 
   char *description=NULL;
   char *session_id=NULL;
-  rmff_header_t *h;
+  rmff_header_t *h=NULL;
   char *challenge1 = NULL;
   char challenge2[64];
   char checksum[34];
