@@ -130,8 +130,8 @@ dnl kludge because only the debian package provides a ffmpeg-config
     if test -z $with_ffmpeg_config_path; then 
        with_ffmpeg_config_path=${topdir}/extras/contrib/bin;
     fi
-    if test -z $with_livedotcom_tree; then
-       with_livedotcom_tree=${topdir}/extras/contrib/src/live
+    if test -z $with_live555_tree; then
+       with_live555_tree=${topdir}/extras/contrib/src/live
     fi
     if test -z $with_goom_tree; then
       with_goom_tree=${topdir}/extras/contrib/src/goom
@@ -1509,79 +1509,94 @@ dnl
 
 AC_ARG_WITH(,[Input plugins:])
 
-dnl  live.com input
+dnl  live555 input
 dnl
-AC_ARG_ENABLE(livedotcom,
-[  --enable-livedotcom     live.com RTSP input plugin (default disabled)])
+if test "${enable_livedotcom}" 
+then
+  AC_MSG_WARN(--{en|dis}able-livedotcom is deprecated. Use --{en|dis}able-live555 instead.)
+fi
+
+if test "${enable_livedotcom}" = "yes"
+then
+  enable_live555="yes"
+fi
+AC_ARG_ENABLE(live555,
+[  --enable-live555     live555 RTSP input plugin (default disabled)])
 if test "${enable_livedotcom}" = "yes"; then
-  AC_ARG_WITH(livedotcom-tree,
-    [    --with-livedotcom-tree=PATH live.com tree for static linking])
+  AC_ARG_WITH(live555-tree,
+    [    --with-live555-tree=PATH live.com tree for static linking])
 
   dnl
-  dnl test for --with-livedotcom-tree
+  dnl test for --with-live555-tree
   dnl
-  if test -z "${with_livedotcom_tree}" -a "${CXX}" != ""; then
+  if test "${with_livedotcom_tree}" 
+  then
+    AC_MSG_WARN(--with-livedotcom-tree is deprecated. Use --with-live555-tree instead.)
+  with_live555_tree="${with_livedotcom_tree}"
+  fi
+  
+  if test -z "${with_live555_tree}" -a "${CXX}" != ""; then
     AC_LANG_PUSH(C++)
     CPPFLAGS_save="${CPPFLAGS}"
-    CPPFLAGS_livedotcom="-I/usr/include/liveMedia -I/usr/include/groupsock -I/usr/include/BasicUsageEnvironment -I/usr/include/UsageEnvironment"
+    CPPFLAGS_live555="-I/usr/include/liveMedia -I/usr/include/groupsock -I/usr/include/BasicUsageEnvironment -I/usr/include/UsageEnvironment"
     if test "${SYS}" = "solaris"; then
-      CPPFLAGS_livedotcom="${CPPFLAGS_livedotcom} -DSOLARIS"
+      CPPFLAGS_live555="${CPPFLAGS_live555} -DSOLARIS"
     fi
-    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_livedotcom}"
+    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
     AC_CHECK_HEADERS(liveMedia.hh, [
-      VLC_ADD_CXXFLAGS([livedotcom], [${CPPFLAGS_livedotcom}])
+      VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
       AC_CHECK_LIB(liveMedia_pic, main, [
         # We have -lliveMedia_pic, build plugins
-        VLC_ADD_PLUGINS([livedotcom])
-        VLC_ADD_LDFLAGS([livedotcom], [-lliveMedia_pic -lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic])
+        VLC_ADD_PLUGINS([live555])
+        VLC_ADD_LDFLAGS([live555], [-lliveMedia_pic -lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic])
       ], [
         AC_CHECK_LIB(liveMedia, main, [
           # We only have -lliveMedia, do builtins
-          VLC_ADD_BUILTINS([livedotcom])
-          VLC_ADD_LDFLAGS([livedotcom], [-lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment])
+          VLC_ADD_BUILTINS([live555])
+          VLC_ADD_LDFLAGS([live555], [-lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment])
         ])
       ])
       if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
-        VLC_ADD_LDFLAGS([livedotcom],[-lws2_32])
+        VLC_ADD_LDFLAGS([live555],[-lws2_32])
       fi
     ])
     CPPFLAGS="${CPPFLAGS_save}"
     AC_LANG_POP(C++)
   else
-    AC_MSG_CHECKING(for liveMedia/libliveMedia.a in ${with_livedotcom_tree})
-    real_livedotcom_tree="`cd ${with_livedotcom_tree} 2>/dev/null && pwd`"
-    if test -z "${real_livedotcom_tree}"; then
+    AC_MSG_CHECKING(for liveMedia/libliveMedia.a in ${with_live555_tree})
+    real_live555_tree="`cd ${with_live555_tree} 2>/dev/null && pwd`"
+    if test -z "${real_live555_tree}"; then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_livedotcom_tree}])
+      AC_MSG_ERROR([cannot cd to ${with_live555_tree}])
     fi
-    if test -f "${real_livedotcom_tree}/liveMedia/libliveMedia.a"; then
-      AC_MSG_RESULT(${real_livedotcom_tree}/liveMedia/libliveMedia.a)
+    if test -f "${real_live555_tree}/liveMedia/libliveMedia.a"; then
+      AC_MSG_RESULT(${real_live555_tree}/liveMedia/libliveMedia.a)
 
-      VLC_ADD_BUILTINS([livedotcom])
+      VLC_ADD_BUILTINS([live555])
 
       if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
-        VLC_ADD_LDFLAGS([livedotcom],[-lws2_32])
+        VLC_ADD_LDFLAGS([live555],[-lws2_32])
       fi
 
-      VLC_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/liveMedia -lliveMedia])
-      VLC_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/BasicUsageEnvironment -lBasicUsageEnvironment])
-      VLC_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/groupsock -lgroupsock])
-      VLC_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/UsageEnvironment -lUsageEnvironment])
+      VLC_ADD_LDFLAGS([live555],[-L${real_live55_tree}/liveMedia -lliveMedia])
+      VLC_ADD_LDFLAGS([live555],[-L${real_live555_tree}/BasicUsageEnvironment -lBasicUsageEnvironment])
+      VLC_ADD_LDFLAGS([live555],[-L${real_live555_tree}/groupsock -lgroupsock])
+      VLC_ADD_LDFLAGS([live555],[-L${real_live555_tree}/UsageEnvironment -lUsageEnvironment])
 
-      VLC_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/BasicUsageEnvironment/include])
-      VLC_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/groupsock/include])
-      VLC_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/liveMedia/include])
-      VLC_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/UsageEnvironment/include ])
+      VLC_ADD_CXXFLAGS([live555],[-I${real_live555_tree}/BasicUsageEnvironment/include])
+      VLC_ADD_CXXFLAGS([live555],[-I${real_live555_tree}/groupsock/include])
+      VLC_ADD_CXXFLAGS([live555],[-I${real_live555_tree}/liveMedia/include])
+      VLC_ADD_CXXFLAGS([live555],[-I${real_live555_tree}/UsageEnvironment/include ])
       if test "${SYS}" = "solaris"; then
-        VLC_ADD_CXXFLAGS([livedotcom],[-DSOLARIS])
+        VLC_ADD_CXXFLAGS([live555],[-DSOLARIS])
       fi
     else
-      dnl  The given live.com wasn't built
+      dnl  The given live555 wasn't built
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_livedotcom_tree}/liveMedia/libliveMedia.a, make sure you compiled live.com in ${with_livedotcom_tree}])
+      AC_MSG_ERROR([cannot find ${real_live555_tree}/liveMedia/libliveMedia.a, make sure you compiled live555 in ${with_live555_tree}])
     fi
   fi
 fi

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * livedotcom.cpp : LIVE555 Streaming Media support.
+ * live555.cpp : LIVE555 Streaming Media support.
  *****************************************************************************
  * Copyright (C) 2003-2006 the VideoLAN team
  * $Id$
@@ -76,12 +76,12 @@ static void Close( vlc_object_t * );
     "used for the connection.")
 
 vlc_module_begin();
-    /// \bug [String] s,live555.com,live555
-    set_description( _("RTP/RTSP/SDP demuxer (using Live555.com)" ) );
+    set_description( _("RTP/RTSP/SDP demuxer (using Live555)" ) );
     set_capability( "demux2", 50 );
     set_shortname( "RTP/RTSP");
     set_callbacks( Open, Close );
     add_shortcut( "live" );
+    add_shortcut( "livedotcom" );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
 
@@ -103,8 +103,8 @@ vlc_module_begin();
                   N_("Tunnel RTSP and RTP over HTTP"), VLC_TRUE );
         add_integer( "rtsp-http-port", 80, NULL,
                   N_("HTTP tunnel port"),
-                /// \bug [String] Missing .
-                  N_("Port to use for tunneling the RTSP/RTP over HTTP"), VLC_TRUE );
+                  N_("Port to use for tunneling the RTSP/RTP over HTTP."),
+                  VLC_TRUE );
 #endif
         add_integer( "rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                   CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
