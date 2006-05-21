@@ -813,7 +813,7 @@ dnl Check for hal
 AC_ARG_ENABLE(hal,
   [  --enable-hal            Linux HAL services discovery (default enabled)])
  
-if test "${enable_hal}"
+if test "${enable_hal}" != "no"
 then
   PKG_CHECK_MODULES(HAL, hal >= 0.5.0,
     [ AC_DEFINE( HAVE_HAL_1, [] , [Define if you have the new HAL library API])
