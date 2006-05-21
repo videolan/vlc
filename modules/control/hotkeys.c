@@ -340,14 +340,21 @@ static void Run( intf_thread_t *p_intf )
             val.i_int = PLAYING_S;
             if( p_input )
             {
-                var_Get( p_input, "state", &val );
-            }
-            if( p_input && val.i_int != PAUSE_S )
-            {
                 ClearChannels( p_intf, p_vout );
-                vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
-                              OSD_PAUSE_ICON );
-                val.i_int = PAUSE_S;
+
+                var_Get( p_input, "state", &val );
+                if( val.i_int != PAUSE_S )
+                {
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                                  OSD_PAUSE_ICON );
+                    val.i_int = PAUSE_S;
+                }
+                else
+                {
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                                  OSD_PLAY_ICON );
+                    val.i_int = PLAYING_S;
+                }
                 var_Set( p_input, "state", val );
             }
             else
@@ -356,9 +363,6 @@ static void Run( intf_thread_t *p_intf )
                                               FIND_ANYWHERE );
                 if( p_playlist )
                 {
-                    ClearChannels( p_intf, p_vout );
-                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
-                                  OSD_PLAY_ICON );
                     playlist_Play( p_playlist );
                     vlc_object_release( p_playlist );
                 }
