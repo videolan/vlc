@@ -766,12 +766,11 @@ int IntegerConfigControl::GetIntValue()
 {
     /* We avoid using GetValue because of a recursion bug with wxSpinCtrl with
      * wxGTK. */
-    return i_value; //spin->GetValue();
+    return spin->GetValue();
 }
 
 void IntegerConfigControl::OnUpdate( wxCommandEvent &event )
 {
-    i_value = event.GetInt();
     ConfigControl::OnUpdate( event );
 }
 void IntegerConfigControl::OnUpdateScroll( wxScrollEvent &event )
