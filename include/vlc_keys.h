@@ -60,6 +60,24 @@
 #define KEY_MOUSEWHEELUP     0x001D0000
 #define KEY_MOUSEWHEELDOWN   0x001E0000
 
+/* TODO:
+ * The media keys are only used in win32. Support for other OSes needs to
+ * be added */
+#define KEY_BROWSER_BACK     0x001F0000
+#define KEY_BROWSER_FORWARD  0x00200000
+#define KEY_BROWSER_REFRESH  0x00210000
+#define KEY_BROWSER_STOP     0x00220000
+#define KEY_BROWSER_SEARCH   0x00230000
+#define KEY_BROWSER_FAVORITES 0x00240000
+#define KEY_BROWSER_HOME     0x00250000
+#define KEY_VOLUME_MUTE      0x00260000
+#define KEY_VOLUME_DOWN      0x00270000
+#define KEY_VOLUME_UP        0x00280000
+#define KEY_MEDIA_NEXT_TRACK 0x00290000
+#define KEY_MEDIA_PREV_TRACK 0x002a0000
+#define KEY_MEDIA_STOP       0x002b0000
+#define KEY_MEDIA_PLAY_PAUSE 0x002c0000
+
 #define KEY_ASCII            0x0000007F
 #define KEY_UNSET            0
 
@@ -153,7 +171,21 @@ static const struct key_descriptor_s vlc_keys[] =
     { "\\", '\\' },
     { "[", '[' },
     { "]", ']' },
-    { "*", '*' }
+    { "*", '*' },
+    { "Browser Back", KEY_BROWSER_BACK },
+    { "Browser Forward", KEY_BROWSER_FORWARD },
+    { "Browser Refresh", KEY_BROWSER_REFRESH },
+    { "Browser Stop", KEY_BROWSER_STOP },
+    { "Browser Search", KEY_BROWSER_SEARCH },
+    { "Browser Favorites", KEY_BROWSER_FAVORITES },
+    { "Browser Home", KEY_BROWSER_HOME },
+    { "Volume Mute", KEY_VOLUME_MUTE },
+    { "Volume Down", KEY_VOLUME_DOWN },
+    { "Volume Up", KEY_VOLUME_UP },
+    { "Media Next Track", KEY_MEDIA_NEXT_TRACK },
+    { "Media Prev Track", KEY_MEDIA_PREV_TRACK },
+    { "Media Stop", KEY_MEDIA_STOP },
+    { "Media Play Pause", KEY_MEDIA_PLAY_PAUSE }
 };
 
 static inline char *KeyToString( int i_key )

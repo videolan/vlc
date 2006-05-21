@@ -32,7 +32,7 @@
 #include <string.h>                                            /* strerror() */
 
 #ifndef _WIN32_WINNT
-#   define _WIN32_WINNT 0x0400
+#   define _WIN32_WINNT 0x0500
 #endif
 
 #include <vlc/vlc.h>
@@ -874,6 +874,21 @@ static struct
     { VK_CONTROL, 0 },
     { VK_SHIFT, 0 },
     { VK_MENU, 0 },
+
+    { VK_BROWSER_BACK, KEY_BROWSER_BACK },
+    { VK_BROWSER_FORWARD, KEY_BROWSER_FORWARD },
+    { VK_BROWSER_REFRESH, KEY_BROWSER_REFRESH },
+    { VK_BROWSER_STOP, KEY_BROWSER_STOP },
+    { VK_BROWSER_SEARCH, KEY_BROWSER_SEARCH },
+    { VK_BROWSER_FAVORITES, KEY_BROWSER_FAVORITES },
+    { VK_BROWSER_HOME, KEY_BROWSER_HOME },
+    { VK_VOLUME_MUTE, KEY_VOLUME_MUTE },
+    { VK_VOLUME_DOWN, KEY_VOLUME_DOWN },
+    { VK_VOLUME_UP, KEY_VOLUME_UP },
+    { VK_MEDIA_NEXT_TRACK, KEY_MEDIA_NEXT_TRACK },
+    { VK_MEDIA_PREV_TRACK, KEY_MEDIA_PREV_TRACK },
+    { VK_MEDIA_STOP, KEY_MEDIA_STOP },
+    { VK_MEDIA_PLAY_PAUSE, KEY_MEDIA_PLAY_PAUSE },
 
     { 0, 0 }
 };
