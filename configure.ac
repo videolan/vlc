@@ -1581,7 +1581,7 @@ if test "${enable_livedotcom}" = "yes"; then
         VLC_ADD_LDFLAGS([live555],[-lws2_32])
       fi
 
-      VLC_ADD_LDFLAGS([live555],[-L${real_live55_tree}/liveMedia -lliveMedia])
+      VLC_ADD_LDFLAGS([live555],[-L${real_live555_tree}/liveMedia -lliveMedia])
       VLC_ADD_LDFLAGS([live555],[-L${real_live555_tree}/BasicUsageEnvironment -lBasicUsageEnvironment])
       VLC_ADD_LDFLAGS([live555],[-L${real_live555_tree}/groupsock -lgroupsock])
       VLC_ADD_LDFLAGS([live555],[-L${real_live555_tree}/UsageEnvironment -lUsageEnvironment])
