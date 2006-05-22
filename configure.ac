@@ -3483,12 +3483,11 @@ if test "${enable_glx}" != "no" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
    test "${enable_glx}" = "yes"); then
   CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
-  AC_CHECK_HEADERS(X11/Xlib.h, [
-    AC_CHECK_HEADERS(GL/glx.h, [
+  AC_CHECK_HEADERS(X11/Xlib.h GL/glu.h GL/glx.h, [
       VLC_ADD_PLUGINS([glx])
       VLC_ADD_LDFLAGS([glx],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lGL -lGLU])
       VLC_ADD_CPPFLAGS([glx],[${X_CFLAGS}])
-  ]) ])
+   ])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
@@ -4798,7 +4797,7 @@ AC_ARG_ENABLE(galaktos,
   [  --enable-galaktos       OpenGL visualisation plugin (default disabled)])
 if test "${enable_galaktos}" = "yes"
 then
-  AC_CHECK_HEADERS(GL/gl.h, [
+  AC_CHECK_HEADERS(GL/gl.h GL/glu.h, [
     VLC_ADD_PLUGINS([galaktos])
     if test "${SYS}" != "mingw32"; then
       VLC_ADD_LDFLAGS([galaktos],[${X_LIBS} -lGL -lGLU])
