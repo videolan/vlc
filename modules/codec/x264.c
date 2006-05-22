@@ -434,11 +434,7 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "subme", 5, NULL, SUBME_TEXT,
                  SUBME_LONGTEXT, VLC_FALSE );
         add_deprecated( SOUT_CFG_PREFIX "subpel", VLC_FALSE ); /* Deprecated since 0.8.5 */
-#if X264_BUILD >= 30 /* r262 */
-        change_integer_range( 1, 6 );
-#else
-        change_integer_range( 1, 5 );
-#endif
+        change_integer_range( 1, SUBME_MAX );
 
 #if X264_BUILD >= 41 /* r368 */
     add_bool( SOUT_CFG_PREFIX "b-rdo", 0, NULL, B_RDO_TEXT,
