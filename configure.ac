@@ -1522,7 +1522,7 @@ then
 fi
 AC_ARG_ENABLE(live555,
 [  --enable-live555     live555 RTSP input plugin (default disabled)])
-if test "${enable_livedotcom}" = "yes"; then
+if test "${enable_live555}" = "yes"; then
   AC_ARG_WITH(live555-tree,
     [    --with-live555-tree=PATH live.com tree for static linking])
 
