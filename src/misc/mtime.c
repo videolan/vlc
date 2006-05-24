@@ -6,6 +6,7 @@
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ *          Rémi Denis-Courmont <rem$videolan,org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +23,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*
- * TODO:
- *  see if using Linux real-time extensions is possible and profitable
- */
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include <stdio.h>                                              /* sprintf() */
+#include <time.h>                      /* clock_gettime(), clock_nanosleep() */
+#include <stdlib.h>                                                /* ldiv() */
 
 #include <vlc/vlc.h>
 
@@ -105,6 +103,7 @@ char *secstotimestr( char *psz_buffer, int i_seconds )
               (int) (i_seconds % 60) );
     return( psz_buffer );
 }
+
 
 /**
  * Return high precision date
@@ -188,15 +187,23 @@ mtime_t mdate( void )
         return usec_time;
     }
 
+#elif defined (HAVE_CLOCK_GETTIME)
+    struct timespec ts;
+
+# ifdef _POSIX_MONOTONIC_CLOCK
+    /* Try to use POSIX monotonic clock if available */
+    if( clock_gettime( CLOCK_MONOTONIC, &ts ) )
+# endif
+        /* Run-time fallback to real-time clock (always available) */
+        (void)clock_gettime( CLOCK_REALTIME, &ts );
+
+    return (ts.tv_sec * 1000000) + (ts.tv_nsec / 1000);
 #else
     struct timeval tv_date;
 
-    /* gettimeofday() could return an error, and should be tested. However, the
-     * only possible error, according to 'man', is EFAULT, which can not happen
-     * here, since tv is a local variable. */
-    gettimeofday( &tv_date, NULL );
+    /* gettimeofday() cannot fail given &tv_date is a valid address */
+    (void)gettimeofday( &tv_date, NULL );
     return( (mtime_t) tv_date.tv_sec * 1000000 + (mtime_t) tv_date.tv_usec );
-
 #endif
 }
 
@@ -231,6 +238,29 @@ void mwait( mtime_t date )
     }
     msleep( delay );
 
+#elif defined (HAVE_CLOCK_GETTIME)
+    struct timespec ts;
+    ldiv_t d;
+
+# if 1
+    /*
+     * Ideally, we'd use absolute time (TIMER_ABSTIME), instead of
+     * computing the time difference... but VLC mtime_t type seems to
+     * overflow way too quickly for this to work properly, or maybe it's a
+     * signedness problem (??).
+     */
+    date -= mdate();
+    if( date <= 0 )
+        return;
+# endif
+    d = ldiv( date, 1000000 );
+    ts.tv_sec = d.quot;
+    ts.tv_nsec = d.rem * 1000;
+
+# ifdef _POSIX_MONOTONIC_CLOCK
+    if( clock_nanosleep( CLOCK_MONOTONIC, 0 /*TIMER_ABSTIME*/, &ts, NULL ) )
+# endif
+        (void)clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
 #else
 
     struct timeval tv_date;
