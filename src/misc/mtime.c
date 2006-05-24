@@ -190,7 +190,7 @@ mtime_t mdate( void )
 #elif defined (HAVE_CLOCK_GETTIME)
     struct timespec ts;
 
-# ifdef _POSIX_MONOTONIC_CLOCK
+# if (_POSIX_MONOTONIC_CLOCK >= 0)
     /* Try to use POSIX monotonic clock if available */
     if( clock_gettime( CLOCK_MONOTONIC, &ts ) )
 # endif
@@ -257,7 +257,7 @@ void mwait( mtime_t date )
     ts.tv_sec = d.quot;
     ts.tv_nsec = d.rem * 1000;
 
-# ifdef _POSIX_MONOTONIC_CLOCK
+# if (_POSIX_MONOTONIC_CLOCK >= 0)
     if( clock_nanosleep( CLOCK_MONOTONIC, 0 /*TIMER_ABSTIME*/, &ts, NULL ) )
 # endif
         (void)clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
