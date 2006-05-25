@@ -1,4 +1,6 @@
 SOURCES_macosx = \
+	AppleRemote.h \
+	AppleRemote.m \
 	about.h \
 	about.m \
 	applescript.h \

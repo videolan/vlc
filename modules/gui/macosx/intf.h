@@ -86,6 +86,7 @@ struct intf_sys_t
 /*****************************************************************************
  * VLCMain interface
  *****************************************************************************/
+@class AppleRemote;
 @interface VLCMain : NSObject
 {
     intf_thread_t *p_intf;      /* The main intf object */
@@ -275,6 +276,8 @@ struct intf_sys_t
     NSSize o_size_with_playlist;
 
     int     i_lastShownVolume;
+
+    AppleRemote * o_remote;
 }
 
 + (VLCMain *)sharedInstance;

@@ -45,6 +45,7 @@
 #include "interaction.h"
 #include "embeddedwindow.h"
 #include "update.h"
+#include "AppleRemote.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -343,6 +344,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_update = [[VLCUpdate alloc] init];
 
     i_lastShownVolume = -1;
+
+    o_remote = [[AppleRemote alloc] init];
+    [o_remote setDelegate: _o_sharedMainInstance];
+    
     return _o_sharedMainInstance;
 }
 
@@ -682,6 +687,33 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 
     return( o_str );
+}
+
+/* Listen to the remote in exclusive mode, only when VLC is the active
+   application */
+- (void)applicationDidBecomeActive:(NSNotification *)aNotification
+{
+    [o_remote startListening: self];
+}
+- (void)applicationDidResignActive:(NSNotification *)aNotification
+{
+    [o_remote stopListening: self];
+}
+
+/* Apple Remote callback */
+- (void)appleRemoteButton:(AppleRemoteEventIdentifier)buttonIdentifier
+    pressedDown:(BOOL)pressedDown
+{
+    switch( buttonIdentifier )
+    {
+        case kRemoteButtonPlay:
+            [o_controls play: self];
+            break;
+
+        default:
+            /* Add here whatever you want other buttons to do */
+            break;
+    }
 }
 
 - (char *)delocalizeString:(NSString *)id
