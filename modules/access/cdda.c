@@ -235,7 +235,7 @@ static int Open( vlc_object_t *p_this )
             if( !p_item )
             {
                 msg_Dbg( p_playlist, "unable to find item in playlist");
-               return -1;
+                return -1;
             }
             b_play = VLC_FALSE;
         }
@@ -291,8 +291,9 @@ static int Open( vlc_object_t *p_this )
 
     if( b_play )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          p_playlist->status.p_item, NULL );
+          playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, 1242,
+                            p_playlist->request.p_node, NULL );
+//        playlist_Play( p_playlist );
     }
 
     if( p_playlist ) vlc_object_release( p_playlist );
@@ -535,6 +536,7 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
     access_sys_t *p_sys = p_access->p_sys;
     int i;
     input_item_t *p_input_item;
+    playlist_item_t *p_item_in_category;
     char *psz_name;
     p_sys->i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
                                           p_sys->vcddev, &p_sys->p_sectors );
@@ -551,10 +553,7 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
 
     if( b_separate )
     {
-        if( p_parent->i_children == -1 )
-        {
-            playlist_LockItemToNode( p_playlist, p_parent );
-        }
+        p_item_in_category = playlist_LockItemToNode( p_playlist, p_parent );
         psz_name = strdup( "Audio CD" );
         vlc_mutex_lock( &p_playlist->object_lock );
         playlist_ItemSetName( p_parent, psz_name );
@@ -648,8 +647,8 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
                 }
             }
 #endif
-            playlist_BothAddInput( p_playlist, p_input_item, p_parent,
-                                   PLAYLIST_APPEND, PLAYLIST_END );
+            playlist_AddWhereverNeeded( p_playlist, p_input_item, p_parent,
+                               p_item_in_category, VLC_FALSE, PLAYLIST_APPEND );
             free( psz_uri ); free( psz_opt ); free( psz_name );
         }
     }

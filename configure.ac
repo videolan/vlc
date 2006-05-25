@@ -5494,6 +5494,7 @@ AC_CONFIG_FILES([
   modules/gui/pda/Makefile
   modules/gui/macosx/Makefile
   modules/gui/qnx/Makefile
+  modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
   modules/gui/wxwidgets/Makefile
   modules/gui/wince/Makefile

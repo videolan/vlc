@@ -113,10 +113,14 @@ int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
         p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
         if ( p_node == NULL )
         {
-            p_playlist->status.i_status = PLAYLIST_STOPPED;
-            p_playlist->request.b_request = VLC_TRUE;
-            msg_Err( p_playlist, "null node" );
-            return VLC_SUCCESS;
+            p_node = p_playlist->status.p_node;
+            if( !p_node )
+            {
+                p_playlist->status.i_status = PLAYLIST_STOPPED;
+                p_playlist->request.b_request = VLC_TRUE;
+                msg_Err( p_playlist, "null node" );
+                return VLC_SUCCESS;
+            }
         }
         p_playlist->request.i_status = PLAYLIST_RUNNING;
         p_playlist->request.i_skip = 0;

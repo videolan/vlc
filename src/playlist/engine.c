@@ -231,6 +231,8 @@ void playlist_MainLoop( playlist_t *p_playlist )
                 & PLAYLIST_REMOVE_FLAG )
             {
                  playlist_ItemDelete( p_playlist->status.p_item );
+                 if( p_playlist->request.p_item == p_playlist->status.p_item )
+                     p_playlist->request.p_item = NULL;
                  p_playlist->status.p_item = NULL;
             }
 
