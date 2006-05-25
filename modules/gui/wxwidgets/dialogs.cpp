@@ -570,6 +570,8 @@ void DialogsProvider::OnInteraction( wxCommandEvent& event )
     interaction_dialog_t *p_dialog;
     InteractionDialog *p_wxdialog;
 
+    return;
+
     if( p_arg == NULL )
     {
         msg_Dbg( p_intf, "OnInteraction() called with NULL arg" );

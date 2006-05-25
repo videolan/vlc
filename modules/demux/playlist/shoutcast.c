@@ -40,6 +40,8 @@ struct demux_sys_t
 {
     playlist_t *p_playlist;
     playlist_item_t *p_current;
+    playlist_item_t *p_item_in_category;
+    int i_parent_id;
 
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
@@ -119,32 +121,15 @@ void E_(Close_Shoutcast)( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
-#if 0
     demux_sys_t *p_sys = p_demux->p_sys;
-    playlist_t *p_playlist;
-
-    vlc_bool_t b_play;
-
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
-
     char *psz_eltname = NULL;
-
-
-    p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Err( p_demux, "can't find playlist" );
-        return -1;
-    }
+    INIT_PLAYLIST_STUFF;
     p_sys->p_playlist = p_playlist;
-
-    b_play = E_(FindItem)( p_demux, p_playlist, &p_sys->p_current );
-
-    msg_Warn( p_demux, "item: %s", p_sys->p_current->input.psz_name );
-    playlist_ItemToNode( p_playlist, p_sys->p_current );
-    p_sys->p_current->input.i_type = ITEM_TYPE_PLAYLIST;
+    p_sys->p_current = p_current;
+    p_sys->i_parent_id = i_parent_id;
+    p_sys->p_item_in_category = p_item_in_category;
 
     p_xml = p_sys->p_xml = xml_Create( p_demux );
     if( !p_xml ) return -1;
@@ -153,7 +138,6 @@ static int Demux( demux_t *p_demux )
     if( !p_xml_reader ) return -1;
     p_sys->p_xml_reader = p_xml_reader;
 
-    /* xml */
     /* check root node */
     if( xml_ReaderRead( p_xml_reader ) != 1 )
     {
@@ -185,19 +169,8 @@ static int Demux( demux_t *p_demux )
         if( DemuxStation( p_demux ) ) return -1;
     }
 
-    /* Go back and play the playlist */
-    if( b_play && p_playlist->status.p_item &&
-        p_playlist->status.p_item->i_children > 0 )
-    {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          p_playlist->status.i_view,
-                          p_playlist->status.p_item,
-                          p_playlist->status.p_item->pp_children[0] );
-    }
-
-    vlc_object_release( p_playlist );
+    HANDLE_PLAY_AND_RELEASE;
     p_sys->p_playlist = NULL;
-#endif
     return VLC_SUCCESS;
 }
 
@@ -213,10 +186,10 @@ static int Demux( demux_t *p_demux )
  **/
 static int DemuxGenre( demux_t *p_demux )
 {
-#if 0
     demux_sys_t *p_sys = p_demux->p_sys;
     char *psz_name = NULL; /* genre name */
     char *psz_eltname = NULL; /* tag name */
+    input_item_t *p_input;
 
 #define FREE(a) if( a ) free( a ); a = NULL;
     while( xml_ReaderRead( p_sys->p_xml_reader ) == 1 )
@@ -236,7 +209,6 @@ static int DemuxGenre( demux_t *p_demux )
                 // Read the element name
                 psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
                 if( !psz_eltname ) return -1;
-
 
                 if( !strcmp( psz_eltname, "genre" ) )
                 {
@@ -260,8 +232,7 @@ static int DemuxGenre( demux_t *p_demux )
                         {
                             msg_Warn( p_demux,
                                       "unexpected attribure %s in element %s",
-                                      psz_attrname,
-                                      psz_eltname );
+                                      psz_attrname,psz_eltname );
                         }
                         free( psz_attrname );
                         free( psz_attrvalue );
@@ -280,33 +251,25 @@ static int DemuxGenre( demux_t *p_demux )
                 if( !psz_eltname ) return -1;
                 if( !strcmp( psz_eltname, "genre" ) )
                 {
-                    playlist_item_t *p_item;
                     char *psz_mrl = malloc( strlen( SHOUTCAST_BASE_URL )
                             + strlen( "?genre=" ) + strlen( psz_name ) + 1 );
                     sprintf( psz_mrl, SHOUTCAST_BASE_URL "?genre=%s",
                              psz_name );
-                    p_item = playlist_ItemNew( p_sys->p_playlist, psz_mrl,
-                                               psz_name );
+                    p_input = input_ItemNewExt( p_sys->p_playlist, psz_mrl,
+                                                psz_name, 0, NULL, -1 );
+                    vlc_input_item_CopyOptions( p_sys->p_current->p_input,
+                                                p_input );
                     free( psz_mrl );
-                    playlist_NodeAddItem( p_sys->p_playlist, p_item,
-                                          p_sys->p_current->pp_parents[0]->i_view,
-                                          p_sys->p_current, PLAYLIST_APPEND,
-                                          PLAYLIST_END );
-
-                    /* We need to declare the parents of the node as the
-                     *                  * same of the parent's ones */
-                    playlist_CopyParents( p_sys->p_current, p_item );
-
-                    vlc_input_item_CopyOptions( &p_sys->p_current->input,
-                                                &p_item->input );
-
+                    playlist_AddWhereverNeeded( p_sys->p_playlist, p_input,
+                             p_sys->p_current, p_sys->p_item_in_category,
+                             (p_sys->i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
+                             PLAYLIST_APPEND );
                     FREE( psz_name );
                 }
                 FREE( psz_eltname );
                 break;
         }
     }
-#endif
     return 0;
 }
 
@@ -337,8 +300,8 @@ static int DemuxGenre( demux_t *p_demux )
  **/
 static int DemuxStation( demux_t *p_demux )
 {
-#if 0
     demux_sys_t *p_sys = p_demux->p_sys;
+    input_item_t *p_input;
 
     char *psz_base = NULL; /* */
 
@@ -395,8 +358,7 @@ static int DemuxStation( demux_t *p_demux )
                         {
                             msg_Warn( p_demux,
                                       "unexpected attribure %s in element %s",
-                                      psz_attrname,
-                                      psz_eltname );
+                                      psz_attrname, psz_eltname );
                         }
                         free( psz_attrname );
                         free( psz_attrvalue );
@@ -429,9 +391,8 @@ static int DemuxStation( demux_t *p_demux )
                         else
                         {
                             msg_Warn( p_demux,
-                                      "unexpected attribure %s in element %s",
-                                      psz_attrname,
-                                      psz_eltname );
+                                      "unexpected attribute %s in element %s",
+                                      psz_attrname, psz_eltname );
                         }
                         free( psz_attrname );
                         free( psz_attrvalue );
@@ -471,78 +432,31 @@ static int DemuxStation( demux_t *p_demux )
                         sprintf( psz_mrl, SHOUTCAST_TUNEIN_BASE_URL "%s?id=%s",
                              psz_base, psz_id );
                     }
-                    p_item = playlist_ItemNew( p_sys->p_playlist, psz_mrl,
-                                               psz_name );
+                    p_input = input_ItemNewExt( p_sys->p_playlist, psz_mrl,
+                                                psz_name , 0, NULL, -1 );
                     free( psz_mrl );
 
-                    if( psz_mt )
-                    {
-                        vlc_input_item_AddInfo( &p_item->input,
-                                                _( "Shoutcast" ),
-                                                _( "Mime type" ),
-                                                "%s",
-                                                psz_mt );
-                    }
-                    if( psz_br )
-                    {
-                        vlc_input_item_AddInfo( &p_item->input,
-                                                _( "Shoutcast" ),
-                                                _( "Bitrate" ),
-                                                "%s",
-                                                psz_br );
-                    }
+                    vlc_input_item_CopyOptions( p_sys->p_current->p_input,
+                                                p_input );
+
+#define SADD_INFO( type, field ) if( field ) { vlc_input_item_AddInfo( \
+                    p_input, _("Shoutcast"), _(type), "%s", field ) ; }
+                    SADD_INFO( "Mime type", psz_mt );
+                    SADD_INFO( "Bitrate", psz_br );
+                    SADD_INFO( "Listeners", psz_lc );
+                    SADD_INFO( "Load", psz_load );
+                    p_input->p_meta = vlc_meta_New();
                     if( psz_genre )
-                    {
-                        vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
-                                                _(VLC_META_GENRE),
-                                                "%s",
-                                                psz_genre );
-                    }
+                        vlc_meta_SetGenre( p_input->p_meta, psz_genre );
                     if( psz_ct )
-                    {
-                        vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
-                                                _(VLC_META_NOW_PLAYING),
-                                                "%s",
-                                                psz_ct );
-                    }
-                    if( psz_lc )
-                    {
-                        vlc_input_item_AddInfo( &p_item->input,
-                                                _( "Shoutcast" ),
-                                                _( "Listeners" ),
-                                                "%s",
-                                                psz_lc );
-                    }
+                        vlc_meta_SetNowPlaying( p_input->p_meta, psz_ct );
                     if( psz_rt )
-                    {
-                        vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
-                                                _(VLC_META_RATING),
-                                                "%s",
-                                                psz_rt );
-                    }
-                    if( psz_load )
-                    {
-                        vlc_input_item_AddInfo( &p_item->input,
-                                                _( "Shoutcast" ),
-                                                _( "Load" ),
-                                                "%s",
-                                                psz_load );
-                    }
+                        vlc_meta_SetRating( p_input->p_meta, psz_rt );
 
-                    playlist_NodeAddItem( p_sys->p_playlist, p_item,
-                                          p_sys->p_current->pp_parents[0]->i_view,
-                                          p_sys->p_current, PLAYLIST_APPEND,
-                                          PLAYLIST_END );
-
-                    /* We need to declare the parents of the node as the
-                     *                  * same of the parent's ones */
-                    playlist_CopyParents( p_sys->p_current, p_item );
-
-                    vlc_input_item_CopyOptions( &p_sys->p_current->input,
-                                                &p_item->input );
+                    playlist_AddWhereverNeeded( p_sys->p_playlist, p_input,
+                             p_sys->p_current, p_sys->p_item_in_category,
+                             (p_sys->i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
+                             PLAYLIST_APPEND );
 
                     FREE( psz_name );
                     FREE( psz_mt )
@@ -557,7 +471,6 @@ static int DemuxStation( demux_t *p_demux )
                 break;
         }
     }
-#endif
     return 0;
 }
 #undef FREE

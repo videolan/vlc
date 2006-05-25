@@ -99,37 +99,18 @@ void E_(Close_PLS)( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
-#if 0
     mtime_t        i_duration = -1;
     char          *psz_name = NULL;
     char          *psz_line;
     char          *psz_mrl = NULL;
     char          *psz_key;
     char          *psz_value;
-    playlist_t    *p_playlist;
     int            i_position;
     int            i_item = -1;
     int            i_new_item = 0;
     int            i_key_length;
-    playlist_item_t *p_parent;
-    vlc_bool_t b_play;
 
-    p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Err( p_demux, "can't find playlist" );
-        return -1;
-    }
-
-    b_play = E_(FindItem)( p_demux, p_playlist, &p_parent );
-    p_parent->input.i_type = ITEM_TYPE_PLAYLIST;
-
-    /* Change the item to a node */
-    if( p_parent->i_children == -1)
-    {
-        playlist_ItemToNode( p_playlist,p_parent );
-    }
+    INIT_PLAYLIST_STUFF;
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
@@ -186,25 +167,12 @@ static int Demux( demux_t *p_demux )
         {
             if( psz_mrl )
             {
-                playlist_item_t *p_item = playlist_ItemNew( p_playlist, psz_mrl,
-                                                            psz_name );
-
-                playlist_NodeAddItem( p_playlist,p_item,
-                                      p_parent->pp_parents[0]->i_view,
-                                      p_parent,
-                                      PLAYLIST_APPEND, PLAYLIST_END );
-
-                playlist_CopyParents( p_parent, p_item );
-                if( i_duration != -1 )
-                {
-                    //playlist_SetDuration( p_playlist, i_position, i_duration );
-                }
-                i_position++;
-                free( psz_mrl );
-                psz_mrl = NULL;
-
-                vlc_input_item_CopyOptions( &p_parent->input,
-                                            &p_item->input );
+                p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
+                                            0, NULL, -1 );
+                vlc_input_item_CopyOptions( p_current->p_input, p_input );
+                playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
+                                p_item_in_category, (i_parent_id > 0 ) ?
+                                VLC_TRUE: VLC_FALSE, PLAYLIST_APPEND );
             }
             else
             {
@@ -244,24 +212,13 @@ static int Demux( demux_t *p_demux )
     /* Add last object */
     if( psz_mrl )
     {
-        playlist_item_t *p_item = playlist_ItemNew( p_playlist, psz_mrl,
-                                                    psz_name );
-
-        playlist_NodeAddItem( p_playlist,p_item,
-                              p_parent->pp_parents[0]->i_view,
-                              p_parent,
-                              PLAYLIST_APPEND, PLAYLIST_END );
-
-        playlist_CopyParents( p_parent, p_item );
-        if( i_duration != -1 )
-        {
-            //playlist_SetDuration( p_playlist, i_position, i_duration );
-        }
+        p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,0, NULL, -1 );
+        vlc_input_item_CopyOptions( p_current->p_input, p_input );
+        playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
+                                p_item_in_category, (i_parent_id > 0 ) ?
+                                VLC_TRUE: VLC_FALSE, PLAYLIST_APPEND );
         free( psz_mrl );
         psz_mrl = NULL;
-
-        vlc_input_item_CopyOptions( &p_parent->input,
-                                    &p_item->input );
     }
     else
     {
@@ -273,18 +230,8 @@ static int Demux( demux_t *p_demux )
         psz_name = NULL;
     }
 
-    if( b_play && p_playlist->status.p_item &&
-        p_playlist->status.p_item->i_children > 0 )
-    {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          p_playlist->status.i_view,
-                          p_playlist->status.p_item,
-                          p_playlist->status.p_item->pp_children[0] );
-    }
-    vlc_object_release( p_playlist );
+    HANDLE_PLAY_AND_RELEASE;
     return VLC_SUCCESS;
-#endif
-    return 0;
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )

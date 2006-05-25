@@ -382,7 +382,8 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
      *  - If we find it
      *    - change it to node
      *    - we'll return it at the end
-     *    - Delete the input from ONELEVEL
+     *    - If we are a direct child of onelevel root, change to node, else
+     *      delete the input from ONELEVEL
      *  - If we don't find it, just change to node (we are probably in VLM)
      *    and return NULL
      *
@@ -397,9 +398,19 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
 
     if( p_item_in_category )
     {
+        playlist_item_t *p_item_in_one = playlist_ItemFindFromInputAndRoot(
+                                            p_playlist, p_item->p_input->i_id,
+                                            p_playlist->p_root_onelevel );
         ChangeToNode( p_playlist, p_item_in_category );
-        playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id,
-                                  p_playlist->p_root_onelevel, VLC_FALSE );
+        if( p_item_in_one->p_parent == p_playlist->p_root_onelevel )
+        {
+            ChangeToNode( p_playlist, p_item_in_one );
+        }
+        else
+        {
+            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id,
+                                      p_playlist->p_root_onelevel, VLC_FALSE );
+        }
         var_SetInteger( p_playlist, "item-change", p_item->p_input->i_id );
         return p_item_in_category;
     }
