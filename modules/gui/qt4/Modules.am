@@ -1,0 +1,27 @@
+SOURCES_qt4 = qt4.cpp
+
+EXTRA_DIST += \
+	qt4.hpp
+
+TOUI = file_open
+UIH := $(TOUI:%=%.h)
+
+TOMOC = main_interface
+MOCCPP := $(TOMOC:%=%.moc.cpp)
+
+if ENABLE_QT4
+
+BUILT_SOURCES += $(UIH) 
+BUILT_SOURCES += $(MOCCPP) 
+
+nodist_SOURCES_qt4 = $(UIH) $(MOCCPP)
+
+$(MOCCPP): %.moc.cpp: %.hpp
+	@echo "MOC $< -> $@"
+	moc -o $@ $<
+
+$(UIH): %.h: %.ui 
+	@echo "UIC $< -> $@"
+	uic -tr _ -o $@ $<  
+
+endif

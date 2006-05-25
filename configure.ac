@@ -4604,6 +4604,18 @@ then
 fi
 
 dnl
+dnl QT 4
+dnl
+enableqt4=false
+AC_ARG_ENABLE(qt4,
+  [  --enable-qt4      QT 4 support (default disabled) ],
+  [if test "${enable_qt4}" = "yes"; then
+      VLC_ADD_PLUGINS([qt4])
+      enableqt4=true
+   fi])
+AM_CONDITIONAL(ENABLE_QT4, test "$enableqt4" = "true")
+
+dnl
 dnl  WinCE GUI module
 dnl
 if test "${SYS}" = "mingwce"; then
