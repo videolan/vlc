@@ -100,24 +100,8 @@ void E_(Close_DVB)( vlc_object_t *p_this )
  *****************************************************************************/
 static int Demux( demux_t *p_demux )
 {
-#if 0
-    playlist_t *p_playlist;
     char       *psz_line;
-    playlist_item_t *p_current;
-    vlc_bool_t b_play;
-
-    p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Err( p_demux, "can't find playlist" );
-        return -1;
-    }
-
-    b_play = E_(FindItem)( p_demux, p_playlist, &p_current );
-
-    playlist_ItemToNode( p_playlist, p_current );
-    p_current->p_input->i_type = ITEM_TYPE_PLAYLIST;
+    INIT_PLAYLIST_STUFF;
 
     while( (psz_line = stream_ReadLine( p_demux->s )) )
     {
@@ -134,20 +118,16 @@ static int Demux( demux_t *p_demux )
 
         EnsureUTF8( psz_name );
 
-        p_item = playlist_ItemNew( p_playlist, "dvb:", psz_name );
+        p_input = input_ItemNewExt( p_playlist, "dvb:", psz_name, 0, NULL, -1 );
         for( i = 0; i< i_options; i++ )
         {
             EnsureUTF8( ppsz_options[i] );
-            playlist_ItemAddOption( p_item, ppsz_options[i] );
+            vlc_input_item_AddOption( p_input, ppsz_options[i] );
         }
-        playlist_NodeAddItem( p_playlist, p_item,
-                              p_current->pp_parents[0]->i_view,
-                              p_current, PLAYLIST_APPEND, PLAYLIST_END );
-
-        /* We need to declare the parents of the node as the
-         *                  * same of the parent's ones */
-        playlist_CopyParents( p_current, p_item );
-        vlc_input_item_CopyOptions( &p_current->input, &p_item->input );
+        playlist_AddWhereverNeeded( p_playlist, p_input, p_current, 
+                                    p_item_in_category,
+                                    (i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
+                                    PLAYLIST_APPEND );
 
         while( i_options-- ) free( ppsz_options[i_options] );
         if( ppsz_options ) free( ppsz_options );
@@ -155,20 +135,8 @@ static int Demux( demux_t *p_demux )
         free( psz_line );
     }
 
-    /* Go back and play the playlist */
-    if( b_play && p_playlist->status.p_item &&
-        p_playlist->status.p_item->i_children > 0 )
-    {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          p_playlist->status.i_view,
-                          p_playlist->status.p_item,
-                          p_playlist->status.p_item->pp_children[0] );
-    }
-
-    vlc_object_release( p_playlist );
+    HANDLE_PLAY_AND_RELEASE;
     return VLC_SUCCESS;
-#endif
-    return 0;
 }
 
 static struct

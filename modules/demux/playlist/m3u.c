@@ -113,7 +113,7 @@ static int Demux( demux_t *p_demux )
     int        i_parsed_duration = 0;
     mtime_t    i_duration = -1;
     const char**ppsz_options = NULL;
-    int        i_options = 0, i, i_parent_id;
+    int        i_options = 0, i;
     vlc_bool_t b_cleanup = VLC_FALSE;
 
     INIT_PLAYLIST_STUFF;

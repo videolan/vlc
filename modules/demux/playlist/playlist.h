@@ -54,6 +54,7 @@ int E_(Import_Shoutcast) ( vlc_object_t * );
 void E_(Close_Shoutcast) ( vlc_object_t * );
 
 #define INIT_PLAYLIST_STUFF \
+    int i_parent_id; \
     vlc_bool_t b_play; \
     playlist_item_t *p_current, *p_item_in_category = NULL; \
     input_item_t *p_input; \

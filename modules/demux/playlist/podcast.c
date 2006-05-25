@@ -109,7 +109,7 @@ static int Demux( demux_t *p_demux )
 
     vlc_bool_t b_item = VLC_FALSE;
     vlc_bool_t b_image = VLC_FALSE;
-    int i_ret, i_parent_id;
+    int i_ret;
 
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;

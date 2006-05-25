@@ -105,7 +105,7 @@ void E_(Close_B4S)( vlc_object_t *p_this )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i_ret, i_parent_id;
+    int i_ret;
 
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
