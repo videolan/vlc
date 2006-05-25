@@ -32,7 +32,9 @@
 
 class BMenuBar;
 class MediaControlView;
+#if 0
 class PlayListWindow;
+#endif
 class BFilePanel;
 class PreferencesWindow;
 class MessagesWindow;
@@ -126,7 +128,9 @@ class InterfaceWindow : public BWindow
     bool                    b_playlist_update;
 
     BFilePanel*             fFilePanel;
-    PlayListWindow*         fPlaylistWindow;
+#if 0
+	PlayListWindow*         fPlaylistWindow;
+#endif
     PreferencesWindow*      fPreferencesWindow;
     BMenuBar*               fMenuBar;
     BMenuItem*              fGotoMenuMI;

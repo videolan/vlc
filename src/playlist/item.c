@@ -62,8 +62,10 @@ playlist_item_t * playlist_ItemNewWithType( vlc_object_t *p_obj,
                                             int i_duration,
                                             int i_type )
 {
+    input_item_t *p_input;
+
     if( psz_uri == NULL ) return NULL;
-    input_item_t *p_input = input_ItemNewWithType( p_obj, psz_uri,
+    p_input = input_ItemNewWithType( p_obj, psz_uri,
                                         psz_name, i_options, ppsz_options,
                                         i_duration, i_type );
     return playlist_ItemNewFromInput( p_obj, p_input );

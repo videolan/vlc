@@ -24,7 +24,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
+#if 0
 /* System headers */
 #include <InterfaceKit.h>
 #include <StorageKit.h>
@@ -366,3 +366,4 @@ PlayListWindow::_SetMenuItemEnabled( BMenuItem* item, bool enabled ) const
     if ( item->IsEnabled() != enabled )
         item->SetEnabled( enabled );
 }
+#endif

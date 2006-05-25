@@ -23,7 +23,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
+#if 0
 #ifndef BEOS_PLAY_LIST_WINDOW_H
 #define BEOS_PLAY_LIST_WINDOW_H
 
@@ -78,4 +78,5 @@ class PlayListWindow : public BWindow
 };
 
 #endif	// BEOS_PLAY_LIST_WINDOW_H
+#endif
 

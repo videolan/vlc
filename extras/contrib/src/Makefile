@@ -108,7 +108,7 @@ FFMPEGCONF+= --enable-mp3lame --enable-faac
 endif
 
 ifdef HAVE_BEOS
-FFMPEGCONF+= --cpu=x86
+FFMPEGCONF+= --cpu=x86 --disable-debug --disable-audio-beos
 endif
 
 ifeq ($(HOST),i686-apple-darwin8)

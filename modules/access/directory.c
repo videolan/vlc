@@ -198,6 +198,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
 {
     char *psz_name = NULL;
     char *psz;
+    char *ptr;
     int  i_mode, i_activity;
 
     playlist_item_t *p_item, *p_root_category;
@@ -213,7 +214,6 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
         goto end;
     }
 
-    char *ptr;
     psz_name = ToLocale( p_access->psz_path );
     ptr = strdup( psz_name );
     LocaleFree( psz_name );
