@@ -28,8 +28,6 @@
 #include "vlc_playlist.h"
 #include "vlc_interaction.h"
 
-#undef PLAYLIST_DEBUG
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -192,9 +190,7 @@ void playlist_MainLoop( playlist_t *p_playlist )
     /* FIXME : this can be called several times */
     if( p_playlist->request.b_request )
     {
-#ifdef PLAYLIST_DEBUG
-        msg_Dbg(p_playlist, "incoming request - stopping current input" );
-#endif
+        PL_DEBUG( "incoming request - stopping current input" );
         /* Stop the existing input */
         if( p_playlist->p_input )
         {

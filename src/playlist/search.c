@@ -75,7 +75,6 @@ playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
 
     for( i =  0 ; i < p_playlist->i_all_size; i++ )
     {
-msg_Err( p_playlist, "%p, %p", p_item, p_playlist->pp_all_items[i]->p_input );
         if( p_playlist->pp_all_items[i]->p_input == p_item )
         {
             return p_playlist->pp_all_items[i];
@@ -102,7 +101,6 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
 #define META_MATCHES( field ) ( p_item->p_input->p_meta && \
                                 p_item->p_input->p_meta->psz_##field && \
                                 strcasestr( p_item->p_input->p_meta->psz_##field, psz_string ) )
-        /* Todo: Filter on all fields */
         if( strcasestr( p_item->p_input->psz_name, psz_string ) ||
             META_MATCHES( artist ) || META_MATCHES( album ) )
             p_item->i_flags &= ~PLAYLIST_DBL_FLAG;

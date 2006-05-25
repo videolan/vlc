@@ -25,8 +25,6 @@
 #include <vlc/input.h>
 #include "vlc_playlist.h"
 
-#define PLAYLIST_DEBUG 1
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -335,9 +333,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
     /* Start the real work */
     if( p_playlist->request.b_request )
     {
-#ifdef PLAYLIST_DEBUG
-        msg_Dbg( p_playlist,"processing request" );
-#endif
+        PL_DEBUG( "processing request" );
         p_new = p_playlist->request.p_item;
         i_skip = p_playlist->request.i_skip;
 
@@ -359,10 +355,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
                                                      p_new );
                 if( p_new == NULL )
                 {
-#ifdef PLAYLIST_DEBUG
-                    msg_Dbg( p_playlist, "looping - restarting at beginning "
-                                         "of node" );
-#endif
+                    PL_DEBUG( "looping - restarting at beginning of node" );
                     p_new = playlist_GetNextLeaf( p_playlist,
                                                   p_playlist->request.p_node,
                                                   NULL );
@@ -379,10 +372,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
                                               p_new );
                 if( p_new == NULL )
                 {
-#ifdef PLAYLIST_DEBUG
-                    msg_Dbg( p_playlist, "looping - restarting at end "
-                                         "of node" );
-#endif
+                    PL_DEBUG( "looping - restarting at end of node" );
                     /** \bug This is needed because GetPrevLeaf does not loop
                       * by itself */
                     p_new = playlist_GetLastLeaf( p_playlist,
@@ -397,9 +387,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
     /* "Automatic" item change ( next ) */
     else
     {
-#ifdef PLAYLIST_DEBUG
-        msg_Dbg( p_playlist,"changing item without a request" );
-#endif
+        PL_DEBUG( "changing item without a request" );
         /* Cant go to next from current item */
         if( p_playlist->status.p_item &&
             p_playlist->status.p_item->i_flags & PLAYLIST_SKIP_FLAG )
@@ -410,9 +398,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
                                       p_playlist->status.p_item );
         if( p_new == NULL && b_loop )
         {
-#ifdef PLAYLIST_DEBUG
-            msg_Dbg( p_playlist, "looping" );
-#endif
+            PL_DEBUG( "looping" );
             p_new = playlist_GetNextLeaf( p_playlist,
                                           p_playlist->status.p_node,
                                           NULL );

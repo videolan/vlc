@@ -25,8 +25,6 @@
 #include <vlc/input.h>
 #include "vlc_playlist.h"
 
-#define PLAYLIST_DEBUG 1
-
 /************************************************************************
  * Local prototypes
  ************************************************************************/
@@ -486,17 +484,14 @@ playlist_item_t *GetNextItem( playlist_t *p_playlist,
             if( i+1 >= p_parent->i_children )
             {
                 /* Was already the last sibling. Look for uncles */
-#ifdef PLAYLIST_DEBUG
-                msg_Dbg( p_playlist, "Current item is the last of the node,"
-                                     "looking for uncle from %s",
-                                     p_parent->p_input->psz_name );
-#endif
+                PL_DEBUG( "Current item is the last of the node,"
+                          "looking for uncle from %s",
+                           p_parent->p_input->psz_name );
+
                 if( p_parent == p_root )
                 {
-#ifdef PLAYLIST_DEBUG
-                    msg_Dbg( p_playlist, "Already at root" );
+                    PL_DEBUG( "already at root" );
                     return NULL;
-#endif
                 }
                 return GetNextUncle( p_playlist, p_item, p_root );
             }
@@ -527,12 +522,9 @@ playlist_item_t *GetNextUncle( playlist_t *p_playlist, playlist_item_t *p_item,
             {
                 if( p_parent == p_grandparent->pp_children[i] )
                 {
-#ifdef PLAYLIST_DEBUG
-                    msg_Dbg( p_playlist, "parent %s found as child %i of "
-                                    "grandparent %s",
-                                    p_parent->p_input->psz_name, i,
-                                    p_grandparent->p_input->psz_name );
-#endif
+                    PL_DEBUG( "parent %s found as child %i of grandparent %s",
+                              p_parent->p_input->psz_name, i,
+                              p_grandparent->p_input->psz_name );
                     b_found = VLC_TRUE;
                     break;
                 }
@@ -627,11 +619,9 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
             if( i-1 < 0 )
             {
                 /* Was already the first sibling. Look for uncles */
-#ifdef PLAYLIST_DEBUG
-                msg_Dbg( p_playlist, "Current item is the first of the node,"
-                                     "looking for uncle from %s",
-                                     p_parent->p_input->psz_name );
-#endif
+                PL_DEBUG( "Current item is the first of the node,"
+                          "looking for uncle from %s",
+                          p_parent->p_input->psz_name );
                 return GetPrevUncle( p_playlist, p_item, p_root );
             }
             else

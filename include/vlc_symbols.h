@@ -266,7 +266,7 @@ struct module_symbols_t
     int (*playlist_AddSDModules_inner) (playlist_t *, char *);
     vlc_bool_t (*playlist_IsServicesDiscoveryLoaded_inner) (playlist_t *,const char *);
     playlist_item_t* (*__playlist_ItemNew_inner) (vlc_object_t *,const char *,const char *);
-    playlist_item_t* (*__playlist_ItemCopy_inner) (vlc_object_t *,playlist_item_t*);
+    void *__playlist_ItemCopy_deprecated;
     playlist_item_t* (*playlist_ItemNewWithType_inner) (vlc_object_t *,const char *,const char *, int , const char **, int, int);
     int (*playlist_ItemDelete_inner) (playlist_item_t *);
     void *playlist_ItemAddParent_deprecated;
@@ -761,7 +761,6 @@ struct module_symbols_t
 #  define playlist_AddSDModules (p_symbols)->playlist_AddSDModules_inner
 #  define playlist_IsServicesDiscoveryLoaded (p_symbols)->playlist_IsServicesDiscoveryLoaded_inner
 #  define __playlist_ItemNew (p_symbols)->__playlist_ItemNew_inner
-#  define __playlist_ItemCopy (p_symbols)->__playlist_ItemCopy_inner
 #  define playlist_ItemNewWithType (p_symbols)->playlist_ItemNewWithType_inner
 #  define playlist_ItemDelete (p_symbols)->playlist_ItemDelete_inner
 #  define playlist_ItemSetName (p_symbols)->playlist_ItemSetName_inner
@@ -1232,7 +1231,6 @@ struct module_symbols_t
     ((p_symbols)->playlist_AddSDModules_inner) = playlist_AddSDModules; \
     ((p_symbols)->playlist_IsServicesDiscoveryLoaded_inner) = playlist_IsServicesDiscoveryLoaded; \
     ((p_symbols)->__playlist_ItemNew_inner) = __playlist_ItemNew; \
-    ((p_symbols)->__playlist_ItemCopy_inner) = __playlist_ItemCopy; \
     ((p_symbols)->playlist_ItemNewWithType_inner) = playlist_ItemNewWithType; \
     ((p_symbols)->playlist_ItemDelete_inner) = playlist_ItemDelete; \
     ((p_symbols)->playlist_ItemSetName_inner) = playlist_ItemSetName; \
@@ -1453,6 +1451,7 @@ struct module_symbols_t
     ((p_symbols)->__intf_UserStringInput_inner) = __intf_UserStringInput; \
     ((p_symbols)->playlist_NodesCreateForSD_inner) = playlist_NodesCreateForSD; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
+    (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \
     (p_symbols)->playlist_ItemAddParent_deprecated = NULL; \
     (p_symbols)->playlist_CopyParents_deprecated = NULL; \
     (p_symbols)->playlist_ViewInsert_deprecated = NULL; \

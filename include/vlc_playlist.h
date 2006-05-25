@@ -250,9 +250,7 @@ VLC_EXPORT( vlc_bool_t, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const
 
 /* Item management functions (act on items) */
 #define playlist_ItemNew( a , b, c ) __playlist_ItemNew(VLC_OBJECT(a) , b , c )
-#define playlist_ItemCopy( a, b ) __playlist_ItemCopy(VLC_OBJECT(a), b )
 VLC_EXPORT( playlist_item_t* , __playlist_ItemNew, ( vlc_object_t *,const char *,const char * ) );
-VLC_EXPORT( playlist_item_t* , __playlist_ItemCopy, ( vlc_object_t *,playlist_item_t* ) );
 VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( vlc_object_t *,const char *,const char *, int , const char **, int, int) );
 #define playlist_ItemNewFromInput(a,b) __playlist_ItemNewFromInput(VLC_OBJECT(a),b)
 VLC_EXPORT( playlist_item_t *, __playlist_ItemNewFromInput, ( vlc_object_t *p_obj,input_item_t *p_input ) );
@@ -386,5 +384,13 @@ static inline vlc_bool_t playlist_IsEmpty( playlist_t * p_playlist )
 /**
  * @}
  */
+
+#define PLAYLIST_DEBUG 1
+
+#ifdef PLAYLIST_DEBUG
+#define PL_DEBUG( msg, args... ) msg_Dbg( p_playlist, msg, ## args )
+#else
+#define PL_DEBUG( msg, args ... ) {}
+#endif
 
 #endif
