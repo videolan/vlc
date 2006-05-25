@@ -154,7 +154,7 @@ struct module_config_t
     vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
     vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
     vlc_bool_t   b_advanced;          /* Flag to indicate an advanced option */
-    vlc_bool_t   b_internal;   /* Flag to indicate option is not to be shows */
+    vlc_bool_t   b_internal;   /* Flag to indicate option is not to be shown */
 
     /* Original option values */
     char        *psz_value_orig;
