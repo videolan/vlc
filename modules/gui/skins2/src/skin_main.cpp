@@ -438,6 +438,7 @@ vlc_module_begin();
     add_string( "skins2-config", "", NULL, SKINS2_CONFIG, SKINS2_CONFIG_LONG,
                 VLC_TRUE );
         change_autosave();
+        change_internal();
 #ifdef WIN32
     add_bool( "skins2-systray", VLC_FALSE, onSystrayChange, SKINS2_SYSTRAY,
               SKINS2_SYSTRAY_LONG, VLC_FALSE );

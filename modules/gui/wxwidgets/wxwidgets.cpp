@@ -164,6 +164,7 @@ vlc_module_begin();
     add_string( "wx-config-last", NULL, NULL,
                 "last config", "last config", VLC_TRUE );
         change_autosave();
+        change_internal();
     add_deprecated( "wxwin-config-last", VLC_FALSE); /*Deprecated since 0.8.4*/
 
     add_submodule();

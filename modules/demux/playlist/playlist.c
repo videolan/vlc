@@ -51,6 +51,7 @@ vlc_module_begin();
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, VLC_FALSE );
 
     add_integer( "parent-item", 0, NULL, NULL, NULL, VLC_TRUE );
+        change_internal();
 
     set_shortname( _("Playlist") );
     set_description( _("Playlist") );
