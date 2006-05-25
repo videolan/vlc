@@ -70,6 +70,9 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
 
     if( !p_demux->p_private ) p_demux->p_private = (void *)vlc_meta_New();
 
+#define ID_IS( a ) (!strcmp(  p_frame->id, a ))
+#define DESCR_IS( a) strstr( (char*)p_frame->description, a )
+
     while( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
     {
         int i_strings = id3_field_getnstrings( &p_frame->fields[1] );
@@ -81,7 +84,7 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
             char *psz_temp = id3_ucs4_utf8duplicate(
                 id3_field_getstrings( &p_frame->fields[1], --i_strings ) );
 
-            if( !strcmp( p_frame->id, ID3_FRAME_GENRE ) )
+            if( ID_IS( ID3_FRAME_GENRE ) )
             {
                 char *psz_endptr;
                 int i_genre = strtol( psz_temp, &psz_endptr, 10 );
@@ -97,34 +100,39 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
                     vlc_meta_SetGenre( p_meta,psz_temp );
                 }
             }
-            else if( !strcmp(p_frame->id, ID3_FRAME_TITLE ) )
+            else if( ID_IS( ID3_FRAME_TITLE ) )
             {
                 vlc_meta_SetTitle( p_meta, psz_temp );
             }
-            else if( !strcmp(p_frame->id, ID3_FRAME_ARTIST ) )
+            else if( ID_IS( ID3_FRAME_ARTIST ) )
             {
                 vlc_meta_SetArtist( p_meta, psz_temp );
             }
-            else if( !strcmp(p_frame->id, ID3_FRAME_YEAR ) )
+            else if( ID_IS( ID3_FRAME_YEAR ) )
             {
                 vlc_meta_SetDate( p_meta, psz_temp );
             }
-            else if( !strcmp(p_frame->id, ID3_FRAME_COMMENT ) )
+            else if( ID_IS( ID3_FRAME_COMMENT ) )
             {
                 vlc_meta_SetDescription( p_meta, psz_temp );
             }
-            else if( strstr( (char*)p_frame->description, "Copyright" ) )
+            else if( DESCR_IS( "Copyright" ) )
             {
                 vlc_meta_SetCopyright( p_meta, psz_temp );
             }
-            else if( strstr( (char*)p_frame->description, "Publisher" ) )
+            else if( DESCR_IS( "Publisher" ) )
             {
                 vlc_meta_SetPublisher( p_meta, psz_temp );
             }
-            else
+            else if( DESCR_IS( "Track number/position in set" ) )
             {
-                msg_Err(p_demux, "Fixme: unhandled meta, %s", p_frame->description );
+                vlc_meta_SetTracknum( p_meta, psz_temp );
             }
+            else if( DESCR_IS( "Album/movie/show title" ) )
+            {
+                vlc_meta_SetAlbum( p_meta, psz_temp );
+            }
+            else { /* Unhandled meta*/ }
             free( psz_temp );
         }
         i++;
