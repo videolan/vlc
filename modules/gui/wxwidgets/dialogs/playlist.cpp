@@ -1038,7 +1038,7 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
     p_wxroot = (PlaylistItem *)treectrl->GetItemData( treectrl->GetRootItem() );
     playlist_item_t *p_root = playlist_ItemGetById( p_playlist, p_wxroot->i_id );
 
-    if( !p_root ) abort();
+    assert( p_root );
     char *psz_name = wxFromLocale( search_string );
     playlist_LiveSearchUpdate( p_playlist, p_root, psz_name );
     Rebuild( VLC_TRUE );
@@ -1509,40 +1509,21 @@ void Playlist::OnPopup( wxContextMenuEvent& event )
 void Playlist::OnPopupPlay( wxCommandEvent& event )
 {
     playlist_item_t *p_popup_item, *p_popup_parent;
-
-    
-    
-    abort();
-
-
     LockPlaylist( p_intf->p_sys, p_playlist );
     p_popup_item = playlist_ItemGetById( p_playlist, i_popup_item );
-    p_popup_parent = playlist_ItemGetById( p_playlist, i_popup_parent );
-    if( p_popup_item != NULL )
+
+    p_popup_parent = p_popup_item;
+    while( p_popup_parent )
     {
-        if( p_popup_item->i_children > -1 )
-        {
-            if( event.GetId() == PopupPlay_Event &&
-                p_popup_item->i_children > 0 )
-            {
-                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                                  1242, p_popup_item,
-                                  p_popup_item->pp_children[0] );
-            }
-            else
-            {
-                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, 1242,
-                                  p_popup_item, NULL );
-            }
-        }
-        else
-        {
-            if( event.GetId() == PopupPlay_Event )
-            {
-                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                                  1242, p_popup_parent, p_popup_item );
-            }
-        }
+        if( p_popup_parent == p_current_treeroot )
+            break;
+        p_popup_parent = p_popup_parent->p_parent;
+    }
+
+    if( p_popup_parent )
+    {
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, 1242,
+                          p_popup_parent, p_popup_item );
     }
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 }
