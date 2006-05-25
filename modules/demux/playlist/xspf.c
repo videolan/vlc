@@ -1,4 +1,4 @@
-/******************************************************************************
+/*******************************************************************************
  * Copyright (C) 2006 Daniel Stränger <vlc at schmaller dot de>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,12 @@
 #include "vlc_strings.h"
 #include "xspf.h"
 
+struct demux_sys_t 
+{
+    playlist_item_t *p_item_in_category;
+    int i_parent_id;
+};
+
 /**
  * \brief XSPF submodule initialization function
  */
@@ -50,6 +56,8 @@ int E_(xspf_import_Activate)( vlc_object_t *p_this )
     }
     msg_Dbg( p_demux, "using xspf playlist import");
 
+    p_demux->p_sys = (demux_sys_t*)malloc(sizeof(demux_sys_t ) );
+
     p_demux->pf_control = xspf_import_Control;
     p_demux->pf_demux = xspf_import_Demux;
 
@@ -61,16 +69,13 @@ int E_(xspf_import_Activate)( vlc_object_t *p_this )
  */
 int xspf_import_Demux( demux_t *p_demux )
 {
-#if 0
-    playlist_t *p_playlist = NULL;
-    playlist_item_t *p_current = NULL;
-
-    vlc_bool_t b_play;
     int i_ret = VLC_SUCCESS;
-
     xml_t *p_xml = NULL;
     xml_reader_t *p_xml_reader = NULL;
     char *psz_name = NULL;
+    INIT_PLAYLIST_STUFF;
+    p_demux->p_sys->p_item_in_category = p_item_in_category;
+    p_demux->p_sys->i_parent_id = i_parent_id;
 
     /* create new xml parser from stream */
     p_xml = xml_Create( p_demux );
@@ -90,11 +95,12 @@ int xspf_import_Demux( demux_t *p_demux )
             msg_Err( p_demux, "can't read xml stream" );
             i_ret = VLC_EGENERIC;
         }
-    /* checking root nody type */
+    /* checking root node type */
     if ( i_ret == VLC_SUCCESS )
         if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM )
         {
-            msg_Err( p_demux, "invalid root node type: %i", xml_ReaderNodeType( p_xml_reader ) );
+            msg_Err( p_demux, "invalid root node type: %i",
+                              xml_ReaderNodeType( p_xml_reader ) );
             i_ret = VLC_EGENERIC;
         }
     /* checking root node name */
@@ -107,45 +113,15 @@ int xspf_import_Demux( demux_t *p_demux )
     }
     FREE_NAME();
 
-    /* get the playlist ... */
-    if ( i_ret == VLC_SUCCESS )
-    {
-        p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST, FIND_PARENT );
-        if( !p_playlist )
-        {
-            msg_Err( p_demux, "can't find playlist" );
-            i_ret = VLC_ENOOBJ;
-        }
-    }
-    /* ... and its current item (to convert it to a node) */
-    if ( i_ret == VLC_SUCCESS )
-    {
-        b_play = E_(FindItem)( p_demux, p_playlist, &p_current );
-        playlist_ItemToNode( p_playlist, p_current );
-        p_current->input.i_type = ITEM_TYPE_PLAYLIST;
-        /* parse the playlist node */
-        i_ret = parse_playlist_node( p_demux, p_playlist, p_current,
-                                     p_xml_reader, "playlist" );
-        /* true/false - success/egeneric mapping */
-        i_ret = ( i_ret==VLC_TRUE ? VLC_SUCCESS : VLC_EGENERIC );
-
-        if( b_play )
-        {
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                              p_playlist->status.i_view,
-                              p_playlist->status.p_item, NULL );
-        }
-    }
-
-    if ( p_playlist )
-        vlc_object_release( p_playlist );
+    i_ret = parse_playlist_node( p_demux, p_playlist, p_current, NULL, 
+                                 p_xml_reader, "playlist" );
+    HANDLE_PLAY_AND_RELEASE;
     if ( p_xml_reader )
         xml_ReaderDelete( p_xml, p_xml_reader );
     if ( p_xml )
         xml_Delete( p_xml );
 
     return i_ret;
-#endif
     return 0;
 }
 
@@ -154,7 +130,7 @@ int xspf_import_Control( demux_t *p_demux, int i_query, va_list args )
 {
     return VLC_EGENERIC;
 }
-#if 0
+
 /**
  * \brief parse the root node of a XSPF playlist
  * \param p_demux demuxer instance
@@ -253,7 +229,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
                 {
                     if ( p_handler->pf_handler.cmplx( p_demux,
                                                       p_playlist,
-                                                      p_item,
+                                                      p_item,NULL,
                                                       p_xml_reader,
                                                       p_handler->name ) )
                     {
@@ -307,7 +283,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
 
                 if ( p_handler->pf_handler.smpl )
                 {
-                    p_handler->pf_handler.smpl( p_item, p_handler->name,
+                    p_handler->pf_handler.smpl( p_item, NULL, p_handler->name,
                                                 psz_value );
                 }
                 FREE_ATT();
@@ -357,8 +333,8 @@ static vlc_bool_t parse_tracklist_node COMPLEX_INTERFACE
             FREE_NAME();
 
             /* parse the track data in a separate function */
-            if ( parse_track_node( p_demux, p_playlist, p_item, p_xml_reader,
-                                   "track" ) == VLC_TRUE )
+            if ( parse_track_node( p_demux, p_playlist, p_item, NULL,
+                                   p_xml_reader,"track" ) == VLC_TRUE )
                 i_ntracks++;
         }
         else if ( i_node == XML_READER_ENDELEM )
@@ -392,7 +368,7 @@ static vlc_bool_t parse_tracklist_node COMPLEX_INTERFACE
  */
 static vlc_bool_t parse_track_node COMPLEX_INTERFACE
 {
-    playlist_item_t *p_new=NULL;
+    input_item_t *p_new_input = NULL;
     int i_node;
     char *psz_name=NULL;
     char *psz_value=NULL;
@@ -446,7 +422,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 /* complex content is parsed in a separate function */
                 if ( p_handler->type == COMPLEX_CONTENT )
                 {
-                    if ( !p_new )
+                    if ( !p_new_input )
                     {
                         msg_Err( p_demux,
                                  "at <%s> level no new item has been allocated",
@@ -456,7 +432,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                     }
                     if ( p_handler->pf_handler.cmplx( p_demux,
                                                       p_playlist,
-                                                      p_new,
+                                                      NULL, p_new_input,
                                                       p_xml_reader,
                                                       p_handler->name ) )
                     {
@@ -496,6 +472,11 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 if ( !strcmp( psz_name, psz_element ) )
                 {
                     FREE_ATT();
+                    /* Add it */
+                    playlist_AddWhereverNeeded( p_playlist, p_new_input,
+                              p_item, p_demux->p_sys->p_item_in_category,
+                              (p_demux->p_sys->i_parent_id >0 ) ? VLC_TRUE:
+                              VLC_FALSE, PLAYLIST_APPEND );
                     return VLC_TRUE;
                 }
                 /* there MUST have been a start tag for that element name */
@@ -511,19 +492,25 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 /* special case: location */
                 if ( !strcmp( p_handler->name, "location" ) )
                 {
+                    char *psz_uri=NULL;
                     /* there MUST NOT be an item */
-                    if ( p_new )
+                    if ( p_new_input )
                     {
-                        msg_Err( p_demux,
-                                 "a new item has just been created <%s>",
+                        msg_Err( p_demux, "item <%s> already created",
                                  psz_name );
                         FREE_ATT();
                         return VLC_FALSE;
                     }
-                    /* create it now */
-                    if ( insert_new_item( p_playlist, p_item,
-                                          &p_new, psz_value ) )
+                    psz_uri = unescape_URI_duplicate( psz_value );
+
+                    if ( psz_uri )
                     {
+                        p_new_input = input_ItemNewExt( p_playlist, psz_uri,
+                                                        NULL, 0, NULL, -1 );
+                        p_new_input->p_meta = vlc_meta_New();
+                        free( psz_uri );
+                        vlc_input_item_CopyOptions( p_item->p_input, p_new_input );
+                        psz_uri = NULL;
                         FREE_ATT();
                         p_handler = NULL;
                     }
@@ -536,17 +523,17 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 else
                 {
                     /* there MUST be an item */
-                    if ( !p_new )
+                    if ( !p_new_input )
                     {
-                        msg_Err( p_demux,
-                                 "an item hasn't been created yet <%s>",
+                        msg_Err( p_demux, "item not yet created at <%s>",
                                  psz_name );
                         FREE_ATT();
                         return VLC_FALSE;
                     }
                     if ( p_handler->pf_handler.smpl )
                     {
-                        p_handler->pf_handler.smpl( p_new, p_handler->name,
+                        p_handler->pf_handler.smpl( NULL, p_input,
+                                                    p_handler->name,
                                                     psz_value );
                         FREE_ATT();
                     }
@@ -574,7 +561,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
 static vlc_bool_t set_item_info SIMPLE_INTERFACE
 {
     /* exit if setting is impossible */
-    if ( !psz_name || !psz_value || !p_item )
+    if ( !psz_name || !psz_value || !p_input )
         return VLC_FALSE;
 
     /* re-convert xml special characters inside psz_value */
@@ -583,49 +570,26 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
     /* handle each info element in a separate "if" clause */
     if ( !strcmp( psz_name, "title" ) )
     {
-        if ( playlist_ItemSetName ( p_item, (char *)psz_value ) == VLC_SUCCESS )
-            return VLC_TRUE;
-        return VLC_FALSE;
+        p_input->psz_name = strdup( (char*)psz_value );
     }
     else if ( !strcmp( psz_name, "creator" ) )
     {
-        if ( vlc_input_item_AddInfo( &(p_item->input),
-                                     _(VLC_META_INFO_CAT), _(VLC_META_ARTIST),
-                                     "%s", psz_value ) == VLC_SUCCESS )
-            return VLC_TRUE;
-        return VLC_FALSE;
-
+        vlc_meta_SetArtist( p_input->p_meta, psz_value );
     }
     else if ( !strcmp( psz_name, "album" ) )
     {
-        if ( vlc_input_item_AddInfo( &(p_item->input),
-                                     _(VLC_META_INFO_CAT),
-                                     _(VLC_META_COLLECTION),
-                                     "%s", psz_value ) == VLC_SUCCESS )
-            return VLC_TRUE;
-        return VLC_FALSE;
-
-    } else if ( !strcmp( psz_name, "trackNum" ) )
-    {
-        long i_num = atol( psz_value );
-        if ( i_num > 0
-             && vlc_input_item_AddInfo( &(p_item->input),
-                                         _(VLC_META_INFO_CAT),
-                                         _(VLC_META_SEQ_NUM),
-                                         "%s", psz_value ) == VLC_SUCCESS )
-                return VLC_TRUE;
-        return VLC_FALSE;
-
-    } else if ( !strcmp( psz_name, "duration" ) )
-    {
-        long i_num = atol( psz_value );
-        if ( i_num > 0
-             && playlist_ItemSetDuration( p_item, i_num*1000 ) == VLC_SUCCESS )
-                return VLC_TRUE;
-        return VLC_FALSE;
+        vlc_meta_SetAlbum( p_input->p_meta, psz_value );
 
     }
-
+    else if ( !strcmp( psz_name, "trackNum" ) )
+    {
+        vlc_meta_SetTracknum( p_input->p_meta, psz_value );    
+    }
+    else if ( !strcmp( psz_name, "duration" ) )
+    {
+        long i_num = atol( psz_value );
+        p_input->i_duration = i_num*1000;
+    }
     return VLC_TRUE;
 }
 
@@ -654,33 +618,3 @@ static vlc_bool_t skip_element COMPLEX_INTERFACE
     }
     return VLC_FALSE;
 }
-
-/**
- * \brief creates a new playlist item from the given mrl
- */
-static vlc_bool_t insert_new_item( playlist_t *p_pl, playlist_item_t *p_cur,
-                                   playlist_item_t **pp_new, char *psz_location )
-{
-    char *psz_uri=NULL;
-    psz_uri = unescape_URI_duplicate( psz_location );
-
-    if ( psz_uri )
-    {
-        *pp_new = playlist_ItemNew( p_pl, psz_uri, NULL );
-        free( psz_uri );
-        psz_uri = NULL;
-    }
-
-    if ( !*pp_new )
-        return VLC_FALSE;
-
-    playlist_NodeAddItem( p_pl,  *pp_new,         p_cur->pp_parents[0]->i_view,
-                          p_cur, PLAYLIST_APPEND, PLAYLIST_END );
-
-    playlist_CopyParents( p_cur, *pp_new );
-
-    vlc_input_item_CopyOptions( &p_cur->input, &((*pp_new)->input) );
-
-    return VLC_TRUE;
-}
-#endif

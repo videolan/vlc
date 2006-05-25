@@ -30,11 +30,13 @@
 #define COMPLEX_CONTENT 2
 
 #define SIMPLE_INTERFACE  (playlist_item_t *p_item,\
+                           input_item_t    *p_input,\
                            const char      *psz_name,\
                            char            *psz_value)
 #define COMPLEX_INTERFACE (demux_t         *p_demux,\
                            playlist_t      *p_playlist,\
                            playlist_item_t *p_item,\
+                           input_item_t    *p_input, \
                            xml_reader_t    *p_xml_reader,\
                            const char      *psz_element)
 
