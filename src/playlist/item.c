@@ -357,13 +357,11 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     /* Add to category */
     p_item = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item == NULL ) return VLC_EGENERIC;
-    fprintf( stderr, "Adding to CATEGORY\n");
     AddItem( p_playlist, p_item, p_direct_parent, i_pos );
 
     /* Add to onelevel */
     p_item = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item == NULL ) return VLC_EGENERIC;
-    fprintf( stderr, "Adding to ONE\n");
 
     p_up = p_direct_parent;
     while( p_up->p_parent != p_playlist->p_root_category )
