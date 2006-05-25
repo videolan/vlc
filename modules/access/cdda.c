@@ -66,7 +66,9 @@ vlc_module_begin();
     add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, VLC_TRUE );
     add_bool( "cdda-separate-tracks", VLC_TRUE, NULL, NULL, NULL, VLC_TRUE );
+        change_internal();
     add_integer( "cdda-track", -1 , NULL, NULL, NULL, VLC_TRUE );
+        change_internal();
     add_string( "cddb-server", "freedb.freedb.org", NULL,
                 N_( "CDDB Server" ), N_( "Address of the CDDB server to use." ),
                 VLC_TRUE );

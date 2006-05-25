@@ -639,6 +639,10 @@ static VLCTreeItem *o_root_item = nil;
                 default:
                 {
                     VLCConfigControl *o_control = nil;
+		    if( p_item->b_internal == VLC_TRUE )
+		    {
+			break;
+		    }
                     o_control = [VLCConfigControl newControl:p_item
                                                   withView:o_view];
                     if( o_control != nil )

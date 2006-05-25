@@ -102,8 +102,8 @@
         static module_config_t config_end = {                                 \
             CONFIG_HINT_END, NULL, NULL, 0, NULL, NULL, NULL, 0, 0., 0, 0,    \
             0., 0., NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, NULL,     \
-            VLC_FALSE, NULL, VLC_FALSE, VLC_FALSE, NULL, 0, 0., NULL, 0, 0.,  \
-            VLC_FALSE                                                         \
+            VLC_FALSE, NULL, VLC_FALSE, VLC_FALSE, VLC_FALSE, NULL, 0, 0.,    \
+            NULL, 0, 0., VLC_FALSE                                            \
         };                                                                    \
         STORE_SYMBOLS;                                                        \
         p_module->b_submodule = VLC_FALSE;                                    \

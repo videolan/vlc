@@ -999,6 +999,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                   p_item->i_type == CONFIG_SUBCATEGORY ) )
                 break;
 
+            if( p_item->b_internal == VLC_TRUE ) continue;
+
             ConfigControl *control =
                 CreateConfigControl( VLC_OBJECT(p_intf),
                                      p_item, config_window );
