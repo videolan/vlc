@@ -23,7 +23,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-
+#include <assert.h>
 #include "vlc_playlist.h"
 
 void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
@@ -267,6 +267,7 @@ int playlist_BothAddInput( playlist_t *p_playlist,
 {
     playlist_item_t *p_item, *p_up;
     int i_top;
+    assert( p_input );
     vlc_mutex_lock( & p_playlist->object_lock );
 
     /* Add to category */
@@ -338,12 +339,8 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
                                          int i_mode, int i_pos )
 {
     playlist_item_t *p_item;
-
-    /* Sanity checks */
-    if( !p_parent || p_parent->i_children == -1 )
-    {
-        msg_Err( p_playlist, "invalid node" );
-    }
+    assert( p_input );
+    assert( p_parent && p_parent->i_children != -1 );
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
