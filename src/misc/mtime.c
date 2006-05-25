@@ -28,7 +28,7 @@
  *****************************************************************************/
 #include <stdio.h>                                              /* sprintf() */
 #include <time.h>                      /* clock_gettime(), clock_nanosleep() */
-#include <stdlib.h>                                                /* ldiv() */
+#include <stdlib.h>                                               /* lldiv() */
 
 #include <vlc/vlc.h>
 
@@ -197,8 +197,8 @@ mtime_t mdate( void )
         /* Run-time fallback to real-time clock (always available) */
         (void)clock_gettime( CLOCK_REALTIME, &ts );
 
-    fprintf (stderr, "%ld\n", (mtime_t)((ts.tv_sec * 1000000) + (ts.tv_nsec / 1000)));
-    return (ts.tv_sec * 1000000) + (ts.tv_nsec / 1000);
+    return ((mtime_t)ts.tv_sec * (mtime_t)1000000)
+           + (mtime_t)(ts.tv_nsec / 1000);
 #else
     struct timeval tv_date;
 
@@ -240,28 +240,13 @@ void mwait( mtime_t date )
     msleep( delay );
 
 #elif defined (HAVE_CLOCK_GETTIME)
-    struct timespec ts;
-    ldiv_t d;
-
-# if 1
-    /*
-     * Ideally, we'd use absolute time (TIMER_ABSTIME), instead of
-     * computing the time difference... but VLC mtime_t type seems to
-     * overflow way too quickly for this to work properly, or maybe it's a
-     * signedness problem (??).
-     */
-    date -= mdate();
-    if( date <= 0 )
-        return;
-# endif
-    d = ldiv( date, 1000000 );
-    ts.tv_sec = d.quot;
-    ts.tv_nsec = d.rem * 1000;
+    lldiv_t d = lldiv( date, 1000000 );
+    struct timespec ts = { d.quot, d.rem };
 
 # if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
-    if( clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, NULL ) )
+    if( clock_nanosleep( CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL ) )
 # endif
-        clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
+        clock_nanosleep( CLOCK_REALTIME, TIMER_ABSTIME, &ts, NULL );
 #else
 
     struct timeval tv_date;
@@ -332,7 +317,7 @@ void msleep( mtime_t delay )
     Sleep( (int) (delay / 1000) );
 
 #elif defined( HAVE_CLOCK_GETTIME )
-    ldiv_t d = ldiv( delay, 1000000 );
+    lldiv_t d = lldiv( delay, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
 # if (_POSIX_CLOCK_MONOTONIC - 0 >= 0)
     if (clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, NULL ) )
