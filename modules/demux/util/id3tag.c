@@ -132,7 +132,14 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
             {
                 vlc_meta_SetAlbum( p_meta, psz_temp );
             }
-            else { /* Unhandled meta*/ }
+            else if( DESCR_IS, "Encoded by" ) )
+            {
+                vlc_meta_SetEncodedBy( p_meta, psz_temp );
+            }
+            else if( p_frame->description )
+            { /* Unhandled meta*/
+                msg_Warn( p_demux, "Fixme: unhandled ID3 metatag, %s", p_frame->description );
+            }
             free( psz_temp );
         }
         i++;
