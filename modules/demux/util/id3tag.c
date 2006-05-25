@@ -132,7 +132,7 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
             {
                 vlc_meta_SetAlbum( p_meta, psz_temp );
             }
-            else if( DESCR_IS, "Encoded by" ) )
+            else if( DESCR_IS( "Encoded by" ) )
             {
                 vlc_meta_SetEncodedBy( p_meta, psz_temp );
             }
