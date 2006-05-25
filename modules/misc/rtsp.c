@@ -448,6 +448,11 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_rtpmap = strdup( "H263-1998/90000" );
             break;
+        case VLC_FOURCC( 'h', '2', '6', '4' ):
+            p_es->i_payload_type = p_media->i_payload_type++;
+            p_es->psz_rtpmap = strdup( "H264/90000" );
+            p_es->psz_fmtp = strdup( "packetization-mode=1" );
+            break;
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
             p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_rtpmap = strdup( "MP4V-ES/90000" );

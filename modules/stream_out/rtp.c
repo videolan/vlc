@@ -902,6 +902,7 @@ static int rtp_packetize_split( sout_stream_t *, sout_stream_id_t *, block_t * )
 static int rtp_packetize_mp4a ( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_mp4a_latm ( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_h263 ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_h264 ( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_amr  ( sout_stream_t *, sout_stream_id_t *, block_t * );
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
@@ -1066,6 +1067,13 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->i_clock_rate = 90000;
             id->psz_rtpmap = strdup( "H263-1998/90000" );
             id->pf_packetize = rtp_packetize_h263;
+            break;
+        case VLC_FOURCC( 'h', '2', '6', '4' ):
+            id->i_payload_type = p_sys->i_payload_type++;
+            id->i_clock_rate = 90000;
+            id->psz_rtpmap = strdup( "H264/90000" );
+            id->pf_packetize = rtp_packetize_h264;
+            id->psz_fmtp = strdup( "packetization-mode=1" );
             break;
 
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
@@ -2331,6 +2339,126 @@ static int rtp_packetize_h263( sout_stream_t *p_stream, sout_stream_id_t *id,
         i_data -= i_payload;
     }
 
+    return VLC_SUCCESS;
+}
+
+/* rfc3984 */
+static int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
+                               block_t *in )
+{
+    int     i_max   = id->i_mtu - 12; /* payload max in one packet */
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
+    uint8_t *p_data = in->p_buffer;
+    int     i_data  = in->i_buffer;
+    int     i;
+
+    if( i_data <= i_max )
+    {
+        /* NAL */
+        int           i_payload;
+        block_t *out;
+        uint8_t *p = p_data;
+        int      i_rest = in->i_buffer;
+
+        while( i_rest > 4 &&
+               ( p[0] != 0x00 || p[1] != 0x00 || p[2] != 0x01 ) )
+        {
+            p++;
+            i_rest--;
+        }
+
+        if (i_rest < 4)
+            return VLC_SUCCESS;
+ 
+        p+=3;
+        i_rest-=3;
+
+        i_payload = __MIN( i_max, i_rest );
+        out = block_New( p_stream, 12 + i_payload );
+
+        /* rtp common header */
+        rtp_packetize_common( id, out, 1,
+                              in->i_pts > 0 ? in->i_pts : in->i_dts );
+
+        memcpy( &out->p_buffer[12], p, i_payload );
+
+        out->i_buffer   = 12 + i_payload;
+        out->i_dts    = in->i_dts;
+        out->i_length = in->i_length;
+
+        rtp_packetize_send( id, out );
+
+        /*msg_Dbg( p_stream, "nal-out plain %d %02x", i_payload, out->p_buffer[16] );*/
+    }
+    else
+    {
+        /* FU-A */
+        int           i_payload;
+        block_t *out;
+        uint8_t *p = p_data;
+        int      i_rest = in->i_buffer;
+        int start=1, end=0, first=0, nalh=-1;
+ 
+        while( i_rest > 4 &&
+               ( p[0] != 0x00 || p[1] != 0x00 || p[2] != 0x01 ) )
+        {
+            p++;
+            i_rest--;
+        }
+
+        if (i_rest < 4)
+            return VLC_SUCCESS;
+
+        p+=3;
+        i_rest-=3;
+
+        nalh = *p;
+        p++;
+        i_rest--;
+
+        i_max   = id->i_mtu - 14;
+        i_count = ( i_rest + i_max - 1 ) / i_max;
+
+        /*msg_Dbg( p_stream, "nal-out fragmented %02x %d", nalh, i_rest);*/
+
+        i=0;
+        while (end==0){
+                i_payload = __MIN( i_max, i_rest );
+                out = block_New( p_stream, 14 + i_payload );
+
+            if (i_rest==i_payload)
+                end = 1;
+
+            /* rtp common header */
+            rtp_packetize_common( id, out, (end)?1:0,
+                              in->i_pts > 0 ? in->i_pts : in->i_dts );
+
+            /* FU indicator */
+            out->p_buffer[12] = (nalh&0x60)|28;
+            /* FU header */
+            out->p_buffer[13] = (start<<7)|(end<<6)|(nalh&0x1f);
+
+            memcpy( &out->p_buffer[14], p+first, i_payload );
+ 
+            out->i_buffer   = 14 + i_payload;
+
+            // not sure what of these should be used and what it does :)
+            out->i_dts    = in->i_dts + i * in->i_length / i_count;
+            out->i_length = in->i_length / i_count;
+            //out->i_dts    = in->i_dts;
+            //out->i_length = in->i_length;
+
+            rtp_packetize_send( id, out );
+
+            /*msg_Dbg( p_stream, "nal-out fragmented: frag %d %d %02x %02x %d", start,end,
+            out->p_buffer[12], out->p_buffer[13], i_payload );*/
+
+            i_rest -= i_payload;
+            first += i_payload;
+            i++;
+            start=0;
+        }
+    }
     return VLC_SUCCESS;
 }
 
