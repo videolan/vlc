@@ -190,13 +190,14 @@ mtime_t mdate( void )
 #elif defined (HAVE_CLOCK_GETTIME)
     struct timespec ts;
 
-# if (_POSIX_MONOTONIC_CLOCK >= 0)
+# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
     /* Try to use POSIX monotonic clock if available */
     if( clock_gettime( CLOCK_MONOTONIC, &ts ) )
 # endif
         /* Run-time fallback to real-time clock (always available) */
         (void)clock_gettime( CLOCK_REALTIME, &ts );
 
+    fprintf (stderr, "%ld\n", (mtime_t)((ts.tv_sec * 1000000) + (ts.tv_nsec / 1000)));
     return (ts.tv_sec * 1000000) + (ts.tv_nsec / 1000);
 #else
     struct timeval tv_date;
@@ -257,10 +258,10 @@ void mwait( mtime_t date )
     ts.tv_sec = d.quot;
     ts.tv_nsec = d.rem * 1000;
 
-# if (_POSIX_MONOTONIC_CLOCK >= 0)
-    if( clock_nanosleep( CLOCK_MONOTONIC, 0 /*TIMER_ABSTIME*/, &ts, NULL ) )
+# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
+    if( clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, NULL ) )
 # endif
-        (void)clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
+        clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
 #else
 
     struct timeval tv_date;
@@ -329,6 +330,14 @@ void msleep( mtime_t delay )
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
     Sleep( (int) (delay / 1000) );
+
+#elif defined( HAVE_CLOCK_GETTIME )
+    ldiv_t d = ldiv( delay, 1000000 );
+    struct timespec ts = { d.quot, d.rem * 1000 };
+# if (_POSIX_CLOCK_MONOTONIC - 0 >= 0)
+    if (clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, NULL ) )
+# endif
+        clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
 
 #elif defined( HAVE_NANOSLEEP )
     struct timespec ts_delay;
