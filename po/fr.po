@@ -13918,7 +13918,7 @@ msgstr "&Information sur le flux…\tCtrl-I"
 
 #: modules/gui/wxwidgets/interface.cpp:595
 msgid "VLM Control...\tCtrl-V"
-msgstr "Conttrôle VLM...\tCtrl-V"
+msgstr "Contrôle VLM...\tCtrl-V"
 
 #: modules/gui/wxwidgets/interface.cpp:605
 msgid "About..."
