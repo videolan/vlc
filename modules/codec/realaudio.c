@@ -107,20 +107,20 @@ struct decoder_sys_t
 #endif
 
     void *win32_dll;
-    unsigned long WINAPI (*wraCloseCodec)(void*);
-    unsigned long WINAPI (*wraDecode)(void*, char*, unsigned long, char*,
-                                      unsigned int*, long);
-    unsigned long WINAPI (*wraFlush)(unsigned long, unsigned long,
-                                     unsigned long);
-    unsigned long WINAPI (*wraFreeDecoder)(void*);
-    void*         WINAPI (*wraGetFlavorProperty)(void*, unsigned long,
-                                                 unsigned long, int*);
-    unsigned long WINAPI (*wraInitDecoder)(void*, void*);
-    unsigned long WINAPI (*wraOpenCodec)(void*);
-    unsigned long WINAPI (*wraOpenCodec2)(void*, void*);
-    unsigned long WINAPI (*wraSetFlavor)(void*, unsigned long);
-    void          WINAPI (*wraSetDLLAccessPath)(char*);
-    void          WINAPI (*wraSetPwd)(char*, char*);
+    unsigned long (*wraCloseCodec)(void*);
+    unsigned long (*wraDecode)(void*, char*, unsigned long, char*,
+                               unsigned int*, long);
+    unsigned long (*wraFlush)(unsigned long, unsigned long,
+                              unsigned long);
+    unsigned long (*wraFreeDecoder)(void*);
+    void*         (*wraGetFlavorProperty)(void*, unsigned long,
+                                          unsigned long, int*);
+    unsigned long (*wraInitDecoder)(void*, void*);
+    unsigned long (*wraOpenCodec)(void*);
+    unsigned long (*wraOpenCodec2)(void*, void*);
+    unsigned long (*wraSetFlavor)(void*, unsigned long);
+    void          (*wraSetDLLAccessPath)(char*);
+    void          (*wraSetPwd)(char*, char*);
 };
 
 /* linux dlls doesn't need packing */
