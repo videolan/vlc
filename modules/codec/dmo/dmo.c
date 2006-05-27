@@ -133,6 +133,8 @@ struct decoder_sys_t
 #endif
 };
 
+static const GUID guid_wvc1 = { 0xc9bfbccf, 0xe60e, 0x4588, { 0xa3, 0xdf, 0x5a, 0x03, 0xb1, 0xfd, 0x95, 0x85 } };
+
 static const GUID guid_wmv9 = { 0x724bb6a4, 0xe526, 0x450f, { 0xaf, 0xfa, 0xab, 0x9b, 0x45, 0x12, 0x91, 0x11 } };
 static const GUID guid_wma9 = { 0x27ca0808, 0x01f5, 0x4e7a, { 0x8b, 0x05, 0x87, 0xf8, 0x07, 0xa2, 0x33, 0xd1 } };
 
@@ -152,7 +154,10 @@ typedef struct
 
 static const codec_dll decoders_table[] =
 {
-    /* WM3 */
+    /* WVC1 */
+    { VLC_FOURCC('W','V','C','1'), "wvc1dmod.dll", &guid_wvc1 },
+    { VLC_FOURCC('w','v','c','1'), "wvc1dmod.dll", &guid_wvc1 },
+    /* WMV3 */
     { VLC_FOURCC('W','M','V','3'), "wmv9dmod.dll", &guid_wmv9 },
     { VLC_FOURCC('w','m','v','3'), "wmv9dmod.dll", &guid_wmv9 },
     /* WMV2 */
