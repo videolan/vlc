@@ -1,20 +1,13 @@
-SOURCES_qt4 = qt4.cpp
-
-EXTRA_DIST += \
-	qt4.hpp
-
-TOUI = file_open
+TOUI = ui/file_open
 UIH := $(TOUI:%=%.h)
 
-TOMOC = main_interface
+TOMOC = main_interface dialogs_provider dialogs/playlist
 MOCCPP := $(TOMOC:%=%.moc.cpp)
 
 if ENABLE_QT4
 
 BUILT_SOURCES += $(UIH) 
 BUILT_SOURCES += $(MOCCPP) 
-
-nodist_SOURCES_qt4 = $(UIH) $(MOCCPP)
 
 $(MOCCPP): %.moc.cpp: %.hpp
 	@echo "MOC $< -> $@"
@@ -25,3 +18,19 @@ $(UIH): %.h: %.ui
 	uic -tr _ -o $@ $<  
 
 endif
+
+SOURCES_qt4 = 	qt4.cpp \
+		main_interface.cpp \
+		dialogs_provider.cpp \
+		dialogs/playlist.cpp \
+		main_interface.moc.cpp \
+		dialogs_provider.moc.cpp \
+		dialogs/playlist.moc.cpp
+		$(NULL)
+
+# Why do I have to put it manually ??
+
+EXTRA_DIST += \
+	qt4.hpp \
+	main_interface.hpp \
+	dialogs_provider.hpp
