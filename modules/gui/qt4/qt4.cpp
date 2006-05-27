@@ -46,6 +46,8 @@ vlc_module_begin();
     set_capability( "interface", 100 );
     set_callbacks( Open, Close );
 
+    set_program( "qvlc" );
+
     add_submodule();
         set_description( "Dialogs provider" );
         set_capability( "dialogs provider", 51 );
