@@ -651,7 +651,7 @@ static void DecoderErrorCallback( const FLAC__StreamDecoder *decoder,
     {
     case FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC:
         msg_Warn( p_dec, "an error in the stream caused the decoder to "
-                 "loose synchronization." );
+                 "lose synchronization." );
         break;
     case FLAC__STREAM_DECODER_ERROR_STATUS_BAD_HEADER:
         msg_Err( p_dec, "the decoder encountered a corrupted frame header." );

@@ -72,7 +72,7 @@
  * sgiPacketSize=16384
  *     The packetsize of the UDP frames that Kasenna sends. They should have used a default
  *     that is a multiple of 188 (TS frame size). Most networks don't support more than 1500 anyways.
- *     Also, when you loose a frame of this size, imagecorruption is more likely then with smaller
+ *     Also, when you lose a frame of this size, imagecorruption is more likely then with smaller
  *     frames.
  * sgiServerVersion=6.1.2
  *     Version of the server

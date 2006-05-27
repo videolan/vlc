@@ -320,7 +320,7 @@ static int Open ( vlc_object_t *p_this )
         if( s ) free( s );
 
         /* It will nearly always work even for non seekable stream thanks the
-         * caching system, and if it fails we loose just a few sub */
+         * caching system, and if it fails we lose just a few sub */
         if( stream_Seek( p_demux->s, 0 ) )
         {
             msg_Warn( p_demux, "failed to rewind" );

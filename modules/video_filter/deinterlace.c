@@ -1718,7 +1718,7 @@ static inline void XDeint8x8FieldMotion( uint8_t *dst, int i_dst,
 
 #if 0
 /* Kernel interpolation (1,-5,20,20,-5,1)
- * Loose a bit more details+add aliasing than edge interpol but avoid
+ * Lose a bit more details+add aliasing than edge interpol but avoid
  * more artifacts
  */
 static inline uint8_t clip1( int a )
