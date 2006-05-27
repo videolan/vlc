@@ -29,7 +29,7 @@
 void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
               playlist_item_t *p_node, int i_pos );
 void GoAndPreparse( playlist_t *p_playlist, int i_mode,
-                    playlist_item_t *p_item );
+                    playlist_item_t *, playlist_item_t * );
 void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
 int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
                           vlc_bool_t b_stop );
@@ -236,7 +236,7 @@ int playlist_PlaylistAddExt( playlist_t *p_playlist, const char * psz_uri,
 int playlist_PlaylistAddInput( playlist_t* p_playlist, input_item_t *p_input,
                                int i_mode, int i_pos )
 {
-    playlist_item_t *p_item;
+    playlist_item_t *p_item_cat, *p_item_one;
     p_input->i_id = ++p_playlist->i_last_input_id;
 
     msg_Dbg( p_playlist, "adding playlist item `%s' ( %s )",
@@ -245,16 +245,16 @@ int playlist_PlaylistAddInput( playlist_t* p_playlist, input_item_t *p_input,
     vlc_mutex_lock( &p_playlist->object_lock );
 
     /* Add to ONELEVEL */
-    p_item = playlist_ItemNewFromInput( p_playlist, p_input );
-    if( p_item == NULL ) return VLC_EGENERIC;
-    AddItem( p_playlist, p_item,p_playlist->p_local_onelevel, i_pos );
+    p_item_one = playlist_ItemNewFromInput( p_playlist, p_input );
+    if( p_item_one == NULL ) return VLC_EGENERIC;
+    AddItem( p_playlist, p_item_one ,p_playlist->p_local_onelevel, i_pos );
 
     /* Add to CATEGORY */
-    p_item = playlist_ItemNewFromInput( p_playlist, p_input );
-    if( p_item == NULL ) return VLC_EGENERIC;
-    AddItem( p_playlist, p_item, p_playlist->p_local_category, i_pos );
+    p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );
+    if( p_item_cat == NULL ) return VLC_EGENERIC;
+    AddItem( p_playlist, p_item_cat, p_playlist->p_local_category, i_pos );
 
-    GoAndPreparse( p_playlist, i_mode, p_item );
+    GoAndPreparse( p_playlist, i_mode, p_item_cat, p_item_one );
 
     vlc_mutex_unlock( &p_playlist->object_lock );
     return VLC_SUCCESS;
@@ -267,19 +267,19 @@ int playlist_BothAddInput( playlist_t *p_playlist,
                            playlist_item_t *p_direct_parent,
                            int i_mode, int i_pos )
 {
-    playlist_item_t *p_item, *p_up;
+    playlist_item_t *p_item_cat, *p_item_one, *p_up;
     int i_top;
     assert( p_input );
     vlc_mutex_lock( & p_playlist->object_lock );
 
     /* Add to category */
-    p_item = playlist_ItemNewFromInput( p_playlist, p_input );
-    if( p_item == NULL ) return VLC_EGENERIC;
-    AddItem( p_playlist, p_item, p_direct_parent, i_pos );
+    p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );
+    if( p_item_cat == NULL ) return VLC_EGENERIC;
+    AddItem( p_playlist, p_item_cat, p_direct_parent, i_pos );
 
     /* Add to onelevel */
-    p_item = playlist_ItemNewFromInput( p_playlist, p_input );
-    if( p_item == NULL ) return VLC_EGENERIC;
+    p_item_one = playlist_ItemNewFromInput( p_playlist, p_input );
+    if( p_item_one == NULL ) return VLC_EGENERIC;
 
     p_up = p_direct_parent;
     while( p_up->p_parent != p_playlist->p_root_category )
@@ -290,12 +290,12 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     {
         if( p_playlist->p_root_onelevel->pp_children[i_top]->p_input->i_id == p_up->p_input->i_id )
         {
-            AddItem( p_playlist, p_item,
+            AddItem( p_playlist, p_item_one,
                      p_playlist->p_root_onelevel->pp_children[i_top], i_pos );
             break;
         }
     }
-    GoAndPreparse( p_playlist, i_mode, p_item );
+    GoAndPreparse( p_playlist, i_mode, p_item_cat, p_item_one );
 
     vlc_mutex_unlock( &p_playlist->object_lock );
     return VLC_SUCCESS;
@@ -560,28 +560,37 @@ void playlist_ItemAddOption( playlist_item_t *p_item,
 
 /* Enqueue an item for preparsing, and play it, if needed */
 void GoAndPreparse( playlist_t *p_playlist, int i_mode,
-                    playlist_item_t *p_item )
+                    playlist_item_t *p_item_cat, playlist_item_t *p_item_one )
 {
-#if 0
-    if( (i_mode & PLAYLIST_GO ) && p_view )
+    if( (i_mode & PLAYLIST_GO ) )
     {
+        playlist_item_t *p_parent = p_item_one;
+        playlist_item_t *p_toplay = NULL;
+        while( p_parent )
+        {
+            if( p_parent == p_playlist->p_root_category )
+            {
+                p_toplay = p_item_cat; break;
+            }
+            else if( p_parent == p_playlist->p_root_onelevel )
+            {
+                p_toplay = p_item_one; break;
+            }
+            p_parent = p_parent->p_parent;
+        }
+        assert( p_toplay );
         p_playlist->request.b_request = VLC_TRUE;
-        /* FIXME ... */
-        p_playlist->request.i_view = VIEW_CATEGORY;
-        p_playlist->request.p_node = p_view->p_root;
-        p_playlist->request.p_item = p_item;
-
+        p_playlist->request.p_item = p_toplay;
         if( p_playlist->p_input )
         {
             input_StopThread( p_playlist->p_input );
         }
-        p_playlist->status.i_status = PLAYLIST_RUNNING;
+        p_playlist->request.i_status = PLAYLIST_RUNNING;
     }
-#endif
     if( i_mode & PLAYLIST_PREPARSE &&
         var_CreateGetBool( p_playlist, "auto-preparse" ) )
     {
-        playlist_PreparseEnqueue( p_playlist, p_item->p_input );
+        playlist_PreparseEnqueue( p_playlist, p_item_cat->p_input );
     }
 }
 
