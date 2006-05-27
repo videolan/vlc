@@ -187,7 +187,7 @@ mtime_t mdate( void )
         return usec_time;
     }
 
-#elif defined (HAVE_CLOCK_GETTIME)
+#elif defined (HAVE_CLOCK_NANOSLEEP)
     struct timespec ts;
 
 # if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
@@ -239,14 +239,21 @@ void mwait( mtime_t date )
     }
     msleep( delay );
 
-#elif defined (HAVE_CLOCK_GETTIME)
+#elif defined (HAVE_CLOCK_NANOSLEEP)
+# if defined (HAVE_TIMER_ABSTIME_THAT_ACTUALLY_WORKS_WELL)
     lldiv_t d = lldiv( date, 1000000 );
     struct timespec ts = { d.quot, d.rem };
 
-# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
+#  if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
     if( clock_nanosleep( CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL ) )
-# endif
+#  endif
         clock_nanosleep( CLOCK_REALTIME, TIMER_ABSTIME, &ts, NULL );
+# else
+    date -= mdate ();
+    if( date <= 0)
+        return;
+    msleep( date );
+# endif
 #else
 
     struct timeval tv_date;
@@ -316,11 +323,12 @@ void msleep( mtime_t delay )
 #elif defined( WIN32 ) || defined( UNDER_CE )
     Sleep( (int) (delay / 1000) );
 
-#elif defined( HAVE_CLOCK_GETTIME )
+#elif defined( HAVE_CLOCK_NANOSLEEP ) 
     lldiv_t d = lldiv( delay, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
+
 # if (_POSIX_CLOCK_MONOTONIC - 0 >= 0)
-    if (clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, NULL ) )
+    if( clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, NULL ) )
 # endif
         clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
 

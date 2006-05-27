@@ -720,9 +720,9 @@ VLC_ADD_LDFLAGS([vlc plugin],[${THREAD_LIB}])
 
 dnl Don't link with rt when using GNU-pth
 if test "${THREAD_LIB}" != "-lpth" && test "${THREAD_LIB}" != "-lst"; then
-  AC_CHECK_LIB(rt, clock_gettime, [
+  AC_CHECK_LIB(rt, clock_nanosleep, [
     VLC_ADD_LDFLAGS([vlc],[-lrt])
-    AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have clock_gettime.])
+    AC_DEFINE(HAVE_CLOCK_NANOSLEEP, 1, [Define to 1 if you have clock_nanosleep.])
   ], [
     dnl HP/UX port
     AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LDFLAGS([vlc],[-lrt])])
