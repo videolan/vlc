@@ -101,9 +101,13 @@
 
 - (void)dealloc
 {
-    /* make sure that it is released in any case */
+    /* make sure that the timer is released in any case */
+    if( [o_statUpdateTimer isValid] )
+        [o_statUpdateTimer invalidate];
+
     if ( o_statUpdateTimer )
         [o_statUpdateTimer release];
+
     [super dealloc];
 }
 
@@ -140,27 +144,27 @@
             vlc_object_release( p_playlist );
         }
 
-        BOOL b_stats = config_GetInt(VLCIntf, "stats");
-        if( b_stats )
-        {
-            o_statUpdateTimer = [NSTimer scheduledTimerWithTimeInterval: 1 \
-                target: self selector: @selector(updateStatistics:) \
-                userInfo: nil repeats: YES]; 
-            [o_statUpdateTimer fire];
-            [o_statUpdateTimer retain];
-        }
-        else
-        {
-            if( [o_tab_view numberOfTabViewItems] > 2 )
-            [o_tab_view removeTabViewItem: [o_tab_view tabViewItemAtIndex: 2]];
-        }
-
         [self initPanel:sender];
     }
 }
 
 - (void)initPanel:(id)sender
 {
+    BOOL b_stats = config_GetInt(VLCIntf, "stats");
+    if( b_stats )
+    {
+        o_statUpdateTimer = [NSTimer scheduledTimerWithTimeInterval: 1
+            target: self selector: @selector(updateStatistics:)
+            userInfo: nil repeats: YES]; 
+        [o_statUpdateTimer fire];
+        [o_statUpdateTimer retain];
+    }
+    else
+    {
+        if( [o_tab_view numberOfTabViewItems] > 2 )
+            [o_tab_view removeTabViewItem: [o_tab_view tabViewItemAtIndex: 2]];
+    }
+
     [self updatePanel];
     [o_info_window makeKeyAndOrderFront: sender];
 }
@@ -183,7 +187,7 @@
 
     vlc_mutex_lock( &p_item->p_input->lock );
 
-    /* fill uri / title / author info */
+    /* fill uri info */
     if( p_item->p_input->psz_uri )
     {
         [o_uri_txt setStringValue:
@@ -192,16 +196,9 @@
             [NSString stringWithUTF8String:p_item->p_input->psz_uri]];
     }
 
-    if( p_item->p_input->psz_name )
-    {
-        [o_title_txt setStringValue:
-            ([NSString stringWithUTF8String:p_item->p_input->psz_name] == nil ) ?
-            [NSString stringWithCString:p_item->p_input->psz_name] :
-            [NSString stringWithUTF8String:p_item->p_input->psz_name]];
-    }
-
     /* fill the other fields */
 #define p_m p_item->p_input->p_meta
+    [self setMeta: p_m->psz_title forLabel: o_title_txt];
     [self setMeta: p_m->psz_artist forLabel: o_author_txt];
     [self setMeta: p_m->psz_album forLabel: o_collection_txt];
     [self setMeta: p_m->psz_tracknum forLabel: o_seqNum_txt];
@@ -243,37 +240,37 @@
         vlc_mutex_lock( &p_item->p_input->p_stats->lock );
 
         /* input */
-        [o_read_bytes_txt setStringValue: [NSString stringWithFormat: \
+        [o_read_bytes_txt setStringValue: [NSString stringWithFormat:
             @"%8.0f kB", (float)(p_item->p_input->p_stats->i_read_bytes)/1000]];
-        [o_input_bitrate_txt setStringValue: [NSString stringWithFormat: \
+        [o_input_bitrate_txt setStringValue: [NSString stringWithFormat:
             @"%6.0f kb/s", (float)(p_item->p_input->p_stats->f_input_bitrate)*8000]];
-        [o_demux_bytes_txt setStringValue: [NSString stringWithFormat: \
+        [o_demux_bytes_txt setStringValue: [NSString stringWithFormat:
             @"%8.0f kB", (float)(p_item->p_input->p_stats->i_demux_read_bytes)/1000]];
-        [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat: \
+        [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat:
             @"%6.0f kb/s", (float)(p_item->p_input->p_stats->f_demux_bitrate)*8000]];
 
         /* Video */
-        [o_video_decoded_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        [o_video_decoded_txt setStringValue: [NSString stringWithFormat: @"%5i",
             p_item->p_input->p_stats->i_decoded_video]];
-        [o_displayed_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        [o_displayed_txt setStringValue: [NSString stringWithFormat: @"%5i",
             p_item->p_input->p_stats->i_displayed_pictures]];
-        [o_lost_frames_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        [o_lost_frames_txt setStringValue: [NSString stringWithFormat: @"%5i",
             p_item->p_input->p_stats->i_lost_pictures]];
 
         /* Sout */
-        [o_sent_packets_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        [o_sent_packets_txt setStringValue: [NSString stringWithFormat: @"%5i",
             p_item->p_input->p_stats->i_sent_packets]];
-        [o_sent_bytes_txt setStringValue: [NSString stringWithFormat: @"%8.0f kB", \
+        [o_sent_bytes_txt setStringValue: [NSString stringWithFormat: @"%8.0f kB",
             (float)(p_item->p_input->p_stats->i_sent_bytes)/1000]];
-        [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat: \
+        [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat:
             @"%6.0f kb/s", (float)(p_item->p_input->p_stats->f_send_bitrate*8)*1000]];
 
         /* Audio */
-        [o_audio_decoded_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        [o_audio_decoded_txt setStringValue: [NSString stringWithFormat: @"%5i",
             p_item->p_input->p_stats->i_decoded_audio]];
-        [o_played_abuffers_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        [o_played_abuffers_txt setStringValue: [NSString stringWithFormat: @"%5i",
             p_item->p_input->p_stats->i_played_abuffers]];
-        [o_lost_abuffers_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        [o_lost_abuffers_txt setStringValue: [NSString stringWithFormat: @"%5i",
             p_item->p_input->p_stats->i_lost_abuffers]];
 
         vlc_mutex_unlock( &p_item->p_input->p_stats->lock );
@@ -342,11 +339,12 @@
 
 - (BOOL)windowShouldClose:(id)sender
 {
-    if( o_statUpdateTimer )
-    {
+    if( [o_statUpdateTimer isValid] )
         [o_statUpdateTimer invalidate];
+
+    if( o_statUpdateTimer )
         [o_statUpdateTimer release];
-    }
+
     return YES;
 }
 

@@ -578,7 +578,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                             [NSString stringWithFormat: @"%p",
                             [[o_array objectAtIndex:j] pointerValue]]] ) != nil )
         {
-            msg_Err( p_playlist, "o_item: %p", o_item );
             [o_outline_view expandItem: o_item];
         }
 
