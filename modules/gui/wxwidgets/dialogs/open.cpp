@@ -1206,11 +1206,9 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 
         if( b_start )
         {
-            playlist_PlaylistAddInput( p_playlist, p_input, PLAYLIST_APPEND,
+            playlist_PlaylistAddInput( p_playlist, p_input,
+                                       PLAYLIST_APPEND | PLAYLIST_GO,
                                        PLAYLIST_END );
-            msg_Err( p_playlist, "Item start not implemented" );
-            // FIXME: Play only within the playlist node
-            //playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
         }
         else
         {
