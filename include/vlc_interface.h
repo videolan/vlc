@@ -176,3 +176,14 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 
 /* Useful text messages shared by interfaces */
 #define INTF_ABOUT_MSG LICENSE_MSG
+
+#define EXTENSIONS_AUDIO "*.a52;*.aac;*.ac3;*.dts;*.flac;*.m4a;*.m4p;*.mka;" \
+                         "*.mod;*.mp1;*.mp2;*.mp3;*.ogg;*.spx;*.wav;*.wma;*.xm"
+
+#define EXTENSIONS_VIDEO "*.asf;*.avi;*.divx;*.dv;*.m1v;*.m2v;*.m4v;*.mkv;" \
+                         "*.mov;*.mp2;*.mp4;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4;" \
+                         "*.mpg;*.ogg;*.ogm;*.ps;*.ts;*.vob;*.wmv"
+
+#define EXTENSIONS_PLAYLIST "*.asx;*.b4s;*.m3u;*.pls;*.vlc;*.xspf"
+
+#define EXTENSIONS_SUBTITLE "*.idx;*.srt;*.sub;*.utf"

@@ -430,6 +430,12 @@ void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
         p_file_dialog = new wxFileDialog( NULL, wxU(_("Open File")),
             wxT(""), wxT(""), wxT("*"), wxOPEN | wxMULTIPLE );
 
+	p_file_dialog->SetWildcard(wxU(_("All Files (*.*)|*"
+        "|Sound Files (*.mp3, *.ogg, etc.)|" EXTENSIONS_AUDIO 
+        "|Video Files (*.avi, *.mpg, etc.)|" EXTENSIONS_VIDEO 
+        "|Playlist Files (*.m3u, *.pls, etc.)|" EXTENSIONS_PLAYLIST 
+        "|Subtitle Files (*.srt, *.sub, etc.)|" EXTENSIONS_SUBTITLE)));
+
     if( p_file_dialog && p_file_dialog->ShowModal() == wxID_OK )
     {
         wxArrayString paths;

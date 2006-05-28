@@ -971,7 +971,7 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
 void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
 {
     wxFileDialog dialog( this, wxU(_("Open playlist")), wxT(""), wxT(""),
-        wxT("All playlists|*.pls;*.m3u;*.asx;*.b4s;*.xspf|XSPF playlist|*.xspf|M3U files|*.m3u"), wxOPEN );
+        wxT("All playlists|" EXTENSIONS_PLAYLIST "|XSPF playlist|*.xspf|M3U files|*.m3u"), wxOPEN );
 
     if( dialog.ShowModal() == wxID_OK )
     {
