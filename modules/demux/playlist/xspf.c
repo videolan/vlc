@@ -88,30 +88,25 @@ int xspf_import_Demux( demux_t *p_demux )
             i_ret = VLC_EGENERIC;
     }
 
-    /* start with parsing the root node */
-    if ( i_ret == VLC_SUCCESS )
+    /* locating the root node */
+    while ( i_ret == VLC_SUCCESS &&
+            xml_ReaderNodeType(p_xml_reader)!=XML_READER_STARTELEM )
         if ( xml_ReaderRead( p_xml_reader ) != 1 )
         {
             msg_Err( p_demux, "can't read xml stream" );
             i_ret = VLC_EGENERIC;
         }
-    /* checking root node type */
-    if ( i_ret == VLC_SUCCESS )
-        if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM )
-        {
-            msg_Err( p_demux, "invalid root node type: %i",
-                              xml_ReaderNodeType( p_xml_reader ) );
-            i_ret = VLC_EGENERIC;
-        }
     /* checking root node name */
     if ( i_ret == VLC_SUCCESS )
-        psz_name = xml_ReaderName( p_xml_reader );
-    if ( !psz_name || strcmp( psz_name, "playlist" ) )
     {
-        msg_Err( p_demux, "invalid root node name: %s", psz_name );
-        i_ret = VLC_EGENERIC;
+        psz_name = xml_ReaderName( p_xml_reader );
+        if ( !psz_name || strcmp( psz_name, "playlist" ) )
+        {
+            msg_Err( p_demux, "invalid root node name: %s", psz_name );
+            i_ret = VLC_EGENERIC;
+        }
+        FREE_NAME();
     }
-    FREE_NAME();
 
     i_ret = parse_playlist_node( p_demux, p_playlist, p_current, NULL, 
                                  p_xml_reader, "playlist" );
@@ -135,7 +130,8 @@ int xspf_import_Control( demux_t *p_demux, int i_query, va_list args )
  * \brief parse the root node of a XSPF playlist
  * \param p_demux demuxer instance
  * \param p_playlist playlist instance
- * \param p_item current playlist node
+ * \param p_item current playlist item
+ * \param p_input current input item
  * \param p_xml_reader xml reader instance
  * \param psz_element name of element to parse
  */
