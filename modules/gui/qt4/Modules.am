@@ -8,6 +8,8 @@
 #   - Add it without extension to TOUI
 #   - Add it to EXTRA_DIST
 
+AUTOMAKE_OPTIONS = subdir-objects
+
 TOUI = ui/input_stats
 UIH := $(TOUI:%=%.h)
 
@@ -20,27 +22,7 @@ TOMOC = main_interface \
 	util/input_slider
 MOCCPP := $(TOMOC:%=%.moc.cpp)
 
-if ENABLE_QT4
-
-BUILT_SOURCES += $(UIH) 
-BUILT_SOURCES +=  \
-		main_interface.moc.cpp \
-		dialogs_provider.moc.cpp \
-		input_manager.moc.cpp \
-		dialogs/playlist.moc.cpp \
-		dialogs/streaminfo.moc.cpp \
-		components/infopanels.moc.cpp \
-		util/input_slider.moc.cpp
-
-$(MOCCPP): %.moc.cpp: %.hpp
-	@echo "MOC $< -> $@"
-	moc -o $@ $<
-
-$(UIH): %.h: %.ui 
-	@echo "UIC $< -> $@"
-	rm -f $@
-	echo "#define Q_(a,b) _(a)" > $@
-	uic -tr "Q_" $< >> $@
+UIC = uic
 
 nodist_SOURCES_qt4 = \
 		main_interface.moc.cpp \
@@ -51,7 +33,22 @@ nodist_SOURCES_qt4 = \
 		components/infopanels.moc.cpp \
 		util/input_slider.moc.cpp
 
+if ENABLE_QT4
+BUILT_SOURCES += $(UIH) $(nodist_SOURCES_qt4)
 endif
+
+
+$(MOCCPP): %.moc.cpp: %.hpp
+	@echo "MOC $< -> $@"
+	$(MOC) -o $@ $<
+
+$(UIH): %.h: %.ui
+	$(install_sh) -d ui
+	@echo "UIC $< -> $@"
+	rm -f $@
+	echo "#define Q_(a,b) _(a)" > $@
+	$(UIC) -tr "Q_" $< >> $@
+
 
 SOURCES_qt4 = 	qt4.cpp \
 		main_interface.cpp \
@@ -73,3 +70,4 @@ EXTRA_DIST += \
 	components/infopanels.hpp \
 	util/input_slider.hpp \
 	ui/input_stats.ui
+
