@@ -36,11 +36,14 @@ StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf ) : QVLCFrame( p_intf
 
      fprintf( stderr, "CONNECTING\n");
 
-    QObject::connect( DialogsProvider::getInstance(NULL)->fixed_timer, SIGNAL( timeout() ), DialogsProvider::getInstance(NULL), SLOT( messagesDialog() )) ;
-
-    QObject::connect( DialogsProvider::getInstance(NULL)->fixed_timer, SIGNAL( timeout() ), this, SLOT(update() ) );
 
      fprintf( stderr, "Done\n");
+}
+
+void StreamInfoDialog::init()
+{
+    QObject::connect( DialogsProvider::getInstance(NULL)->fixed_timer,
+    	              SIGNAL( timeout() ), this, SLOT(update() ) );
 }
 
 void StreamInfoDialog::update()

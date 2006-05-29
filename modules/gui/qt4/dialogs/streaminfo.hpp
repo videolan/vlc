@@ -31,16 +31,22 @@ class StreamInfoDialog : public QVLCFrame
 public:
     static StreamInfoDialog * getInstance( intf_thread_t *p_intf )
     {
-        if( !instance) instance = new StreamInfoDialog( p_intf );
+        if( !instance)
+	{
+	    instance = new StreamInfoDialog( p_intf );
+	    instance->init();
+	}
         return instance;
     }
     virtual ~StreamInfoDialog();
 private:
     StreamInfoDialog( intf_thread_t * );
+    void init();
+
     intf_thread_t *p_intf;
     static StreamInfoDialog *instance;
 public slots:
-        void update();
+    void update();
 };
 
 

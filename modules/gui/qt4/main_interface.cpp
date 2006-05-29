@@ -21,12 +21,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
 #include "main_interface.hpp"
+#include "input_manager.hpp"
+#include "dialogs_provider.hpp"
 
 MainInterface::MainInterface( intf_thread_t *p_intf ) : QWidget( NULL )
 {
-    fprintf( stderr, "QT Main interface" );
+    fprintf( stderr, "QT Main interface\n" );
+
+    /* Init UI */
+
+    /* Init input manager */
+}
+
+void MainInterface::init()
+{
+    /* Get timer updates */
+    QObject::connect( DialogsProvider::getInstance(NULL)->fixed_timer,
+    	              SIGNAL( timeout() ), this, SLOT(updateOnTimer() ) );
+    /* Tell input manager about the input changes */
+    QObject::connect( this, SIGNAL( inputChanged( input_thread_t * ) ),
+ 	           main_input_manager, SLOT( setInput( input_thread_t * ) ) );
 }
 
 MainInterface::~MainInterface()
 {
+}
+
+void MainInterface::updateOnTimer()
+{
+
 }

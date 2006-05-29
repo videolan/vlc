@@ -1,5 +1,5 @@
 /*****************************************************************************
- * main_interface.hpp : Main Interface
+ * input_slider.hpp : A slider that controls an input
  ****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id: wxwidgets.cpp 15731 2006-05-25 14:43:53Z zorglub $
@@ -20,25 +20,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
-#ifndef _MAIN_INTERFACE_H_
-#define _MAIN_INTERFACE_H_
+#ifndef _INPUTSLIDER_H_
+#define _INPUTSLIDER_H_
 
-#include <vlc/intf.h>
-#include <QWidget>
+#include "util/directslider.hpp"
 
-class InputManager;
-
-class MainInterface : public QWidget
+class InputSlider : public DirectSlider
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
-    MainInterface( intf_thread_t *);
-    virtual ~MainInterface();
+    InputSlider( QWidget *_parent ) : DirectSlider( _parent ) {};
+    InputSlider( Qt::Orientation q,QWidget *_parent ) : DirectSlider( q,_parent )
+    {};
+    virtual ~InputSlider()   {};
     void init();
-private:
-    InputManager *main_input_manager;
+public slots:
+    void setPosition( float, int, int );
 private slots:
-    void updateOnTimer();
+    void userDrag( int );
+signals:
+    void positionUpdated( float );
 };
-
 #endif

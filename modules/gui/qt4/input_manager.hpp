@@ -33,7 +33,6 @@ class InputManager : public QObject
 public:
     InputManager( QObject *, intf_thread_t *);
     virtual ~InputManager();
-    void setInput( input_thread_t * );
 
 private:
     intf_thread_t *p_intf;
@@ -41,6 +40,7 @@ private:
 
 public slots:
     void update(); ///< Periodic updates
+    void setInput( input_thread_t * ); ///< Our controlled input changed
     void sliderUpdate( float ); ///< User dragged the slider. We get new pos
 signals:
     /// Send new position, new time and new length

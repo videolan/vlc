@@ -16,7 +16,8 @@ TOMOC = main_interface \
 	input_manager \
 	dialogs/playlist \
 	dialogs/streaminfo \
-	components/infopanels
+	components/infopanels \
+	util/input_slider
 MOCCPP := $(TOMOC:%=%.moc.cpp)
 
 if ENABLE_QT4
@@ -28,7 +29,8 @@ BUILT_SOURCES +=  \
 		input_manager.moc.cpp \
 		dialogs/playlist.moc.cpp \
 		dialogs/streaminfo.moc.cpp \
-		components/infopanels.moc.cpp
+		components/infopanels.moc.cpp \
+		util/input_slider.moc.cpp
 
 $(MOCCPP): %.moc.cpp: %.hpp
 	@echo "MOC $< -> $@"
@@ -46,7 +48,8 @@ nodist_SOURCES_qt4 = \
 		input_manager.moc.cpp \
 		dialogs/playlist.moc.cpp \
 		dialogs/streaminfo.moc.cpp \
-		components/infopanels.moc.cpp
+		components/infopanels.moc.cpp \
+		util/input_slider.moc.cpp
 
 endif
 
@@ -56,7 +59,8 @@ SOURCES_qt4 = 	qt4.cpp \
 		input_manager.cpp \
 		dialogs/playlist.cpp \
 		dialogs/streaminfo.cpp \
-		components/infopanels.cpp
+		components/infopanels.cpp \
+		util/input_slider.cpp
 		$(NULL)
 
 EXTRA_DIST += \
@@ -67,4 +71,5 @@ EXTRA_DIST += \
 	dialogs/playlist.hpp \
 	dialogs/streaminfo.hpp \
 	components/infopanels.hpp \
+	util/input_slider.hpp \
 	ui/input_stats.ui

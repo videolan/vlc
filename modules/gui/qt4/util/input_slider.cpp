@@ -21,42 +21,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "input_manager.hpp"
-#include "dialogs_provider.hpp"
-#include "qt4.hpp"
+#include "util/input_slider.hpp"
 
-InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
-                           QObject( parent ), p_intf( _p_intf )
+void InputSlider::init()
 {
-    p_input = NULL;
-    /* Subscribe to updates */
-    QObject::connect( DialogsProvider::getInstance( p_intf )->fixed_timer,
-                      SIGNAL( timeout() ), this, SLOT( update() ) );
+    setMinimum( 0 );
+    setMaximum( 1000 );
+    setSingleStep( 2 );
+    setPageStep( 100 );
+    setTracking( true );
+    QObject::connect( this, SIGNAL( valueChanged(int) ), this,
+    		      SLOT( userDrag( int ) ) );
 }
 
-InputManager::~InputManager()
+void InputSlider::setPosition( float pos, int a, int b )
 {
+    setValue( (int)(pos * 1000.0 ) );
 }
 
-void InputManager::setInput( input_thread_t *_p_input )
+void InputSlider::userDrag( int new_value )
 {
-    p_input = _p_input;
-    emit reset();
-}
-
-void InputManager::update()
-{
-    if( !p_input || p_input->b_die ) return;
-
-    if( p_input->b_dead )
-    {
-        //emit statusChanged( 0 );
-    }
-    mtime_t i_length, i_time;
-    float f_pos;
-    i_length = var_GetTime( p_input, "length" ) / 1000000;
-    i_time = var_GetTime( p_input, "time") / 1000000;
-    f_pos = var_GetFloat( p_input, "position" );
-
-    emit positionUpdated( f_pos, i_time, i_length );
+    float f_pos = (float)(new_value)/1000.0;
+    emit positionUpdated( f_pos );
 }
