@@ -1,5 +1,5 @@
 /*****************************************************************************
- * qt4.hpp : QT4 interface
+ * input_manager.hpp : Manage an input and interact with its GUI elements
  ****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id: wxwidgets.cpp 15731 2006-05-25 14:43:53Z zorglub $
@@ -18,44 +18,35 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
-#ifndef _QVLC_H_
-#define _QVLC_H_
+#ifndef _INPUT_MANAGER_H_
+#define _INPUT_MANAGER_H_
 
+#include <QObject>
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <QEvent>
 
-class QApplication;
-class MainInterface;
-class DialogsProvider;
-
-
-struct intf_sys_t
+class InputManager : public QObject
 {
-    QApplication *p_app;
-    MainInterface *p_mi;
-
-    msg_subscription_t *p_sub; ///< Subscription to the message bank
-};
-
-static int DialogEvent_Type = QEvent::User + 1;
-
-class DialogEvent : public QEvent
-{
+    Q_OBJECT;
 public:
-    DialogEvent( int _i_dialog, int _i_arg, intf_dialog_args_t *_p_arg ) :
-                 QEvent( (QEvent::Type)(DialogEvent_Type) )
-    {
-        i_dialog = _i_dialog;
-        i_arg = _i_arg;
-        p_arg = _p_arg;
-    };
-    virtual ~DialogEvent() {};
+    InputManager( QObject *, intf_thread_t *);
+    virtual ~InputManager();
+    void setInput( input_thread_t * );
 
-    int i_arg, i_dialog;
-    intf_dialog_args_t *p_arg;
+private:
+    intf_thread_t *p_intf;
+    input_thread_t *p_input;
+
+public slots:
+    void update(); ///< Periodic updates
+    void sliderUpdate( float ); ///< User dragged the slider. We get new pos
+signals:
+    /// Send new position, new time and new length
+    void positionUpdated( float , int, int );
+    void reset(); ///< Input changed, tell others to reset
 };
+
 
 #endif

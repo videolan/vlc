@@ -4610,8 +4610,12 @@ enableqt4=false
 AC_ARG_ENABLE(qt4,
   [  --enable-qt4      QT 4 support (default disabled) ],
   [if test "${enable_qt4}" = "yes"; then
-      VLC_ADD_PLUGINS([qt4])
-      enableqt4=true
+      PKG_CHECK_MODULES(QT4, QtCore QtGui,
+  	[ VLC_ADD_PLUGINS([qt4]) 
+          enableqt4=true
+	  VLC_ADD_LDFLAGS([qt4],[$QT4_LIBS])
+	  VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS])],   
+       [AC_MSG_WARN(QT4 library not found)])
    fi])
 AM_CONDITIONAL(ENABLE_QT4, test "$enableqt4" = "true")
 

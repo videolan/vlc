@@ -1,5 +1,5 @@
 /*****************************************************************************
- * qt4.hpp : QT4 interface
+ * streaminfo.hpp : Information about a stream
  ****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id: wxwidgets.cpp 15731 2006-05-25 14:43:53Z zorglub $
@@ -20,42 +20,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
-#ifndef _QVLC_H_
-#define _QVLC_H_
+#ifndef _STREAMINFO_DIALOG_H_
+#define _STREAMINFO_DIALOG_H_
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <QEvent>
+#include "util/qvlcframe.hpp"
 
-class QApplication;
-class MainInterface;
-class DialogsProvider;
-
-
-struct intf_sys_t
+class StreamInfoDialog : public QVLCFrame
 {
-    QApplication *p_app;
-    MainInterface *p_mi;
-
-    msg_subscription_t *p_sub; ///< Subscription to the message bank
-};
-
-static int DialogEvent_Type = QEvent::User + 1;
-
-class DialogEvent : public QEvent
-{
+    Q_OBJECT;
 public:
-    DialogEvent( int _i_dialog, int _i_arg, intf_dialog_args_t *_p_arg ) :
-                 QEvent( (QEvent::Type)(DialogEvent_Type) )
+    static StreamInfoDialog * getInstance( intf_thread_t *p_intf )
     {
-        i_dialog = _i_dialog;
-        i_arg = _i_arg;
-        p_arg = _p_arg;
-    };
-    virtual ~DialogEvent() {};
-
-    int i_arg, i_dialog;
-    intf_dialog_args_t *p_arg;
+        if( !instance) instance = new StreamInfoDialog( p_intf );
+        return instance;
+    }
+    virtual ~StreamInfoDialog();
+private:
+    StreamInfoDialog( intf_thread_t * );
+    intf_thread_t *p_intf;
+    static StreamInfoDialog *instance;
+public slots:
+        void update();
 };
+
 
 #endif

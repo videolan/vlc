@@ -1,5 +1,5 @@
 /*****************************************************************************
- * qt4.hpp : QT4 interface
+ * infopanels.cpp : Panels for the information dialogs
  ****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id: wxwidgets.cpp 15731 2006-05-25 14:43:53Z zorglub $
@@ -18,44 +18,33 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
-#ifndef _QVLC_H_
-#define _QVLC_H_
+#include "components/infopanels.hpp"
+#include "qt4.hpp"
+#include "ui/input_stats.h"
+#include <QWidget>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <QEvent>
-
-class QApplication;
-class MainInterface;
-class DialogsProvider;
-
-
-struct intf_sys_t
+InputStatsPanel::InputStatsPanel( QWidget *parent, intf_thread_t *_p_intf ) :
+                                  QWidget( parent ), p_intf( _p_intf )
 {
-    QApplication *p_app;
-    MainInterface *p_mi;
+    ui.setupUi( this );
+}
 
-    msg_subscription_t *p_sub; ///< Subscription to the message bank
-};
-
-static int DialogEvent_Type = QEvent::User + 1;
-
-class DialogEvent : public QEvent
+InputStatsPanel::~InputStatsPanel()
 {
-public:
-    DialogEvent( int _i_dialog, int _i_arg, intf_dialog_args_t *_p_arg ) :
-                 QEvent( (QEvent::Type)(DialogEvent_Type) )
-    {
-        i_dialog = _i_dialog;
-        i_arg = _i_arg;
-        p_arg = _p_arg;
-    };
-    virtual ~DialogEvent() {};
+}
 
-    int i_arg, i_dialog;
-    intf_dialog_args_t *p_arg;
-};
+void InputStatsPanel::Update( input_item_t *p_item )
+{
 
-#endif
+    vlc_mutex_lock( &p_item->p_stats->lock );
+
+#define UPDATE( widget,format, calc... ) \
+    { QString str; ui.widget->setText( str.sprintf( format, ## calc ) );  }
+
+    UPDATE( read_text, "%8.0f kB", (float)(p_item->p_stats->i_read_bytes)/1000);
+
+    vlc_mutex_unlock(& p_item->p_stats->lock );
+}

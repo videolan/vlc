@@ -24,14 +24,21 @@
 #include "qt4.hpp"
 #include <QEvent>
 #include "dialogs/playlist.hpp"
+#include "dialogs/streaminfo.hpp"
+#include <QApplication>
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
-DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) : QObject(),
-                                  p_intf( _p_intf )
+DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
+                                      QObject( NULL ), p_intf( _p_intf )
 {
-    fprintf( stderr, "QT DP" );
+    idle_timer = new QTimer( this );
+    idle_timer->start( 0 );
+
+    fixed_timer = new QTimer( this );
+    fixed_timer->start( 100 /* milliseconds */ );
 }
+
 DialogsProvider::~DialogsProvider()
 {
 }
@@ -59,15 +66,15 @@ void DialogsProvider::customEvent( QEvent *event )
             case INTF_DIALOG_VIDEOPOPUPMENU:
             case INTF_DIALOG_MISCPOPUPMENU:
                popupMenu( de->i_dialog ); break;
+            case INTF_DIALOG_FILEINFO:
+               streaminfoDialog(); break;
             case INTF_DIALOG_VLM:
             case INTF_DIALOG_INTERACTION:
             case INTF_DIALOG_BOOKMARKS:
-            case INTF_DIALOG_FILEINFO:
             case INTF_DIALOG_WIZARD:
             default:
                fprintf( stderr, "Unimplemented dialog\n");
         }
-        fprintf( stderr, "Showing dialog\n");
     }
 }
 
@@ -80,12 +87,20 @@ void DialogsProvider::openDialog( int i_dialog )
 {
 }
 
+void DialogsProvider::streaminfoDialog()
+{
+    StreamInfoDialog::getInstance( p_intf )->toggleVisible();
+    QObject::connect( DialogsProvider::getInstance(NULL)->fixed_timer, SIGNAL( timeout() ), this, SLOT( prefsDialog() )) ;
+}
+
 void DialogsProvider::prefsDialog()
 {
+fprintf( stderr, "P\n");
 }
 
 void DialogsProvider::messagesDialog()
 {
+fprintf( stderr, "M\n");
 }
 
 void DialogsProvider::popupMenu( int i_dialog )

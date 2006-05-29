@@ -24,6 +24,8 @@
 #define _DIALOGS_PROVIDER_H_
 
 #include <QObject>
+#include <QTimer>
+#include <QApplication>
 #include <vlc/vlc.h>
 
 class QEvent;
@@ -34,19 +36,25 @@ class DialogsProvider : public QObject
 public:
     static DialogsProvider *getInstance( intf_thread_t *p_intf )
     {
-        if( !instance) instance = new DialogsProvider( p_intf );
+        if( !instance )
+            instance = new DialogsProvider( p_intf );
         return instance;
     }
     virtual ~DialogsProvider();
+
+    void init();
+    QTimer *idle_timer;
+    QTimer *fixed_timer;
 protected:
     void customEvent( QEvent *);
 private:
-    DialogsProvider( intf_thread_t * );
+    DialogsProvider( intf_thread_t *);
     intf_thread_t *p_intf;
     static DialogsProvider *instance;
 
 public slots:
     void playlistDialog();
+    void streaminfoDialog();
     void prefsDialog();
     void messagesDialog();
     void openDialog( int );

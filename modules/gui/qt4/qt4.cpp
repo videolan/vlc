@@ -123,9 +123,12 @@ static void Init( intf_thread_t *p_intf )
         p_mi->show();
     }
 
+    DialogsProvider::getInstance( p_intf );
+
     if( p_intf->pf_show_dialog )
         vlc_thread_ready( p_intf );
 
+    app->setQuitOnLastWindowClosed( false );
     app->exec();
 }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * qt4.hpp : QT4 interface
+ * streaminfo.cpp : Information about an item
  ****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id: wxwidgets.cpp 15731 2006-05-25 14:43:53Z zorglub $
@@ -20,42 +20,34 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
-#ifndef _QVLC_H_
-#define _QVLC_H_
-
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <QEvent>
-
-class QApplication;
-class MainInterface;
-class DialogsProvider;
+#include "dialogs/streaminfo.hpp"
+#include "dialogs_provider.hpp"
+#include "util/qvlcframe.hpp"
+#include "components/infopanels.hpp"
+#include "qt4.hpp"
 
 
-struct intf_sys_t
+StreamInfoDialog *StreamInfoDialog::instance = NULL;
+
+StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf ) : QVLCFrame( p_intf )
 {
-    QApplication *p_app;
-    MainInterface *p_mi;
+     setWindowTitle( _("Stream information" ) );
+//     InputStatsPanel *ISP = new InputStatsPanel( this, p_intf );
 
-    msg_subscription_t *p_sub; ///< Subscription to the message bank
-};
+     fprintf( stderr, "CONNECTING\n");
 
-static int DialogEvent_Type = QEvent::User + 1;
+    QObject::connect( DialogsProvider::getInstance(NULL)->fixed_timer, SIGNAL( timeout() ), DialogsProvider::getInstance(NULL), SLOT( messagesDialog() )) ;
 
-class DialogEvent : public QEvent
+    QObject::connect( DialogsProvider::getInstance(NULL)->fixed_timer, SIGNAL( timeout() ), this, SLOT(update() ) );
+
+     fprintf( stderr, "Done\n");
+}
+
+void StreamInfoDialog::update()
 {
-public:
-    DialogEvent( int _i_dialog, int _i_arg, intf_dialog_args_t *_p_arg ) :
-                 QEvent( (QEvent::Type)(DialogEvent_Type) )
-    {
-        i_dialog = _i_dialog;
-        i_arg = _i_arg;
-        p_arg = _p_arg;
-    };
-    virtual ~DialogEvent() {};
+    fprintf( stderr, "timer\n");
+}
 
-    int i_arg, i_dialog;
-    intf_dialog_args_t *p_arg;
-};
-
-#endif
+StreamInfoDialog::~StreamInfoDialog()
+{
+}

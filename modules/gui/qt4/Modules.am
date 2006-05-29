@@ -1,13 +1,34 @@
-TOUI = ui/file_open
+## Howto
+# For each Q_OBJECT:
+#   - Add it without extension to TOMOC
+#   - Add the moc.cpp to BUILT_SOURCES and nodist_SOURCES_qt4
+#   - Add the cpp to SOURCES_qt4
+#   - Add the hpp to EXTRA_DIST
+# For each UI
+#   - Add it without extension to TOUI
+#   - Add it to EXTRA_DIST
+
+TOUI = ui/input_stats
 UIH := $(TOUI:%=%.h)
 
-TOMOC = main_interface dialogs_provider dialogs/playlist
+TOMOC = main_interface \
+	dialogs_provider \
+	input_manager
+	dialogs/playlist \
+	dialogs/streaminfo \
+	components/infopanels
 MOCCPP := $(TOMOC:%=%.moc.cpp)
 
 if ENABLE_QT4
 
 BUILT_SOURCES += $(UIH) 
-BUILT_SOURCES += $(MOCCPP) 
+BUILT_SOURCES +=  \
+		main_interface.moc.cpp \
+		dialogs_provider.moc.cpp \
+		input_manager.moc.cpp \
+		dialogs/playlist.moc.cpp \
+		dialogs/streaminfo.moc.cpp \
+		components/infopanels.moc.cpp
 
 $(MOCCPP): %.moc.cpp: %.hpp
 	@echo "MOC $< -> $@"
@@ -15,22 +36,35 @@ $(MOCCPP): %.moc.cpp: %.hpp
 
 $(UIH): %.h: %.ui 
 	@echo "UIC $< -> $@"
-	uic -tr _ -o $@ $<  
+	rm -f $@
+	echo "#define Q_(a,b) _(a)" > $@
+	uic -tr "Q_" $< >> $@
+
+nodist_SOURCES_qt4 = \
+		main_interface.moc.cpp \
+		dialogs_provider.moc.cpp \
+		input_manager.moc.cpp \
+		dialogs/playlist.moc.cpp \
+		dialogs/streaminfo.moc.cpp \
+		components/infopanels.moc.cpp
 
 endif
 
 SOURCES_qt4 = 	qt4.cpp \
 		main_interface.cpp \
 		dialogs_provider.cpp \
+		input_manager.cpp \
 		dialogs/playlist.cpp \
-		main_interface.moc.cpp \
-		dialogs_provider.moc.cpp \
-		dialogs/playlist.moc.cpp
+		dialogs/streaminfo.cpp \
+		components/infopanels.cpp
 		$(NULL)
-
-# Why do I have to put it manually ??
 
 EXTRA_DIST += \
 	qt4.hpp \
 	main_interface.hpp \
-	dialogs_provider.hpp
+	dialogs_provider.hpp \
+	input_manager.hpp \
+	dialogs/playlist.hpp \
+	dialogs/streaminfo.hpp \
+	components/infopanels.hpp \
+	ui/input_stats.ui
