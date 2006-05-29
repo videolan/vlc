@@ -13,7 +13,7 @@ UIH := $(TOUI:%=%.h)
 
 TOMOC = main_interface \
 	dialogs_provider \
-	input_manager
+	input_manager \
 	dialogs/playlist \
 	dialogs/streaminfo \
 	components/infopanels
