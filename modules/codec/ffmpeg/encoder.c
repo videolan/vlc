@@ -7,6 +7,8 @@
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
+ * Part of the file Copyright (C) FFMPEG Project Developers
+ * (mpeg4_default matrixes)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -166,11 +168,32 @@ static const uint16_t mpa_bitrate_tab[2][15] =
 static const uint16_t mpa_freq_tab[6] =
 { 44100, 48000, 32000, 22050, 24000, 16000 };
 
+static const int16_t mpeg4_default_intra_matrix[64] = {
+  8, 17, 18, 19, 21, 23, 25, 27,
+ 17, 18, 19, 21, 23, 25, 27, 28,
+ 20, 21, 22, 23, 24, 26, 28, 30,
+ 21, 22, 23, 24, 26, 28, 30, 32,
+ 22, 23, 24, 26, 28, 30, 32, 35,
+ 23, 24, 26, 28, 30, 32, 35, 38,
+ 25, 26, 28, 30, 32, 35, 38, 41,
+ 27, 28, 30, 32, 35, 38, 41, 45,
+};
+
+static const int16_t mpeg4_default_non_intra_matrix[64] = {
+ 16, 17, 18, 19, 20, 21, 22, 23,
+ 17, 18, 19, 20, 21, 22, 23, 24,
+ 18, 19, 20, 21, 22, 23, 24, 25,
+ 19, 20, 21, 22, 23, 24, 26, 27,
+ 20, 21, 22, 23, 25, 26, 27, 28,
+ 21, 22, 23, 24, 26, 27, 28, 30,
+ 22, 23, 24, 26, 27, 28, 30, 31,
+ 23, 24, 25, 27, 28, 30, 31, 33,
+};
+
+
 /*****************************************************************************
  * OpenEncoder: probe the encoder
  *****************************************************************************/
-extern int16_t IMPORT_SYMBOL ff_mpeg4_default_intra_matrix[];
-extern int16_t IMPORT_SYMBOL ff_mpeg4_default_non_intra_matrix[];
 
 int E_(OpenEncoder)( vlc_object_t *p_this )
 {
@@ -444,8 +467,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
         if ( p_sys->b_mpeg4_matrix )
         {
-            p_context->intra_matrix = ff_mpeg4_default_intra_matrix;
-            p_context->inter_matrix = ff_mpeg4_default_non_intra_matrix;
+            p_context->intra_matrix = mpeg4_default_intra_matrix;
+            p_context->inter_matrix = mpeg4_default_non_intra_matrix;
         }
 
         if ( p_sys->b_pre_me )
