@@ -27,6 +27,7 @@
 #include <QWidget>
 
 class InputManager;
+class QCloseEvent;
 
 class MainInterface : public QWidget
 {
@@ -35,10 +36,17 @@ public:
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
     void init();
+protected:
+    void closeEvent( QCloseEvent *);
 private:
     InputManager *main_input_manager;
+    intf_thread_t *p_intf;
+    /// Main input associated to the playlist
+    input_thread_t *p_input;
 private slots:
     void updateOnTimer();
+signals:
+    void inputChanged( input_thread_t *);
 };
 
 #endif

@@ -33,7 +33,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
                                       QObject( NULL ), p_intf( _p_intf )
 {
     idle_timer = new QTimer( this );
-    idle_timer->start( 0 );
+ //   idle_timer->start( 0 );
 
     fixed_timer = new QTimer( this );
     fixed_timer->start( 100 /* milliseconds */ );
@@ -90,17 +90,14 @@ void DialogsProvider::openDialog( int i_dialog )
 void DialogsProvider::streaminfoDialog()
 {
     StreamInfoDialog::getInstance( p_intf )->toggleVisible();
-    QObject::connect( DialogsProvider::getInstance(NULL)->fixed_timer, SIGNAL( timeout() ), this, SLOT( prefsDialog() )) ;
 }
 
 void DialogsProvider::prefsDialog()
 {
-fprintf( stderr, "P\n");
 }
 
 void DialogsProvider::messagesDialog()
 {
-fprintf( stderr, "M\n");
 }
 
 void DialogsProvider::popupMenu( int i_dialog )

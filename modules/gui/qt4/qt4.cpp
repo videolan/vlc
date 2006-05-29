@@ -115,15 +115,18 @@ static void Init( intf_thread_t *p_intf )
     QApplication *app = new QApplication( argc, argv , true );
     p_intf->p_sys->p_app = app;
 
+    // Initialize timers
+    DialogsProvider::getInstance( p_intf );
+
     /* Normal interface */
     if( !p_intf->pf_show_dialog )
     {
         MainInterface *p_mi = new MainInterface( p_intf );
         p_intf->p_sys->p_mi = p_mi;
+        p_mi->init();
         p_mi->show();
     }
 
-    DialogsProvider::getInstance( p_intf );
 
     if( p_intf->pf_show_dialog )
         vlc_thread_ready( p_intf );

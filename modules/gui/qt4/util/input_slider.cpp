@@ -31,7 +31,7 @@ void InputSlider::init()
     setPageStep( 100 );
     setTracking( true );
     QObject::connect( this, SIGNAL( valueChanged(int) ), this,
-    		      SLOT( userDrag( int ) ) );
+                      SLOT( userDrag( int ) ) );
 }
 
 void InputSlider::setPosition( float pos, int a, int b )

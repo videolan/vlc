@@ -40,6 +40,7 @@ InputManager::~InputManager()
 
 void InputManager::setInput( input_thread_t *_p_input )
 {
+    fprintf( stderr, "[IM] Got input\n");
     p_input = _p_input;
     emit reset();
 }
@@ -58,5 +59,10 @@ void InputManager::update()
     i_time = var_GetTime( p_input, "time") / 1000000;
     f_pos = var_GetFloat( p_input, "position" );
 
+    fprintf( stderr, "Changing pos\n");
     emit positionUpdated( f_pos, i_time, i_length );
+}
+
+void InputManager::sliderUpdate( float new_pos )
+{
 }
