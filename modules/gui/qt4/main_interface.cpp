@@ -24,6 +24,7 @@
 #include "input_manager.hpp"
 #include "dialogs_provider.hpp"
 #include <QCloseEvent>
+#include <assert.h>
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) :
                             QWidget( NULL ), p_intf( _p_intf)
