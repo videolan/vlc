@@ -23,7 +23,13 @@
 
 #include "util/input_slider.hpp"
 
-void InputSlider::init()
+InputSlider::InputSlider( QWidget *_parent ) : DirectSlider( _parent )
+{
+    InputSlider::InputSlider( Qt::Horizontal, _parent );
+}
+
+InputSlider::InputSlider( Qt::Orientation q,QWidget *_parent ) :
+                                 DirectSlider( q, _parent )
 {
     mymove = false;
     setMinimum( 0 );
@@ -37,7 +43,6 @@ void InputSlider::init()
 
 void InputSlider::setPosition( float pos, int a, int b )
 {
-    fprintf( stderr, "Set pos %f\n", pos );
     mymove = true;
     setValue( (int)(pos * 1000.0 ) );
     mymove = false;
@@ -48,7 +53,6 @@ void InputSlider::userDrag( int new_value )
     float f_pos = (float)(new_value)/1000.0;
     if( !mymove )
     {
-        fprintf( stderr, "Emitting %f\n", f_pos );
         emit sliderDragged( f_pos );
     }
 }

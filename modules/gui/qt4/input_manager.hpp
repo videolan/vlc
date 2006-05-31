@@ -45,7 +45,6 @@ public slots:
 signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int, int );
-    void reset(); ///< Input changed, tell others to reset
 };
 
 

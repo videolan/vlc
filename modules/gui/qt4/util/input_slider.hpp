@@ -29,11 +29,9 @@ class InputSlider : public DirectSlider
 {
     Q_OBJECT
 public:
-    InputSlider( QWidget *_parent ) : DirectSlider( _parent ) {};
-    InputSlider( Qt::Orientation q,QWidget *_parent ) : DirectSlider( q,_parent )
-    {};
+    InputSlider( QWidget *_parent );
+    InputSlider( Qt::Orientation q,QWidget *_parent );
     virtual ~InputSlider()   {};
-    void init();
 private:
     bool mymove;
 public slots:

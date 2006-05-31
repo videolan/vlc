@@ -30,10 +30,8 @@
 MainInterface::MainInterface( intf_thread_t *_p_intf ) :
                             QWidget( NULL ), p_intf( _p_intf)
 {
-    fprintf( stderr, "QT Main interface\n" );
-
     /* Init UI */
-    slider = new InputSlider( Qt::Horizontal, this ); slider->init();
+    slider = new InputSlider( Qt::Horizontal, this );
 
     /* Init input manager */
     p_input = NULL;
@@ -49,7 +47,7 @@ void MainInterface::init()
     QObject::connect( this, SIGNAL( inputChanged( input_thread_t * ) ),
                    main_input_manager, SLOT( setInput( input_thread_t * ) ) );
 
-    /* Connect the slider and the input manager */
+    /* Connect the slider and the input manager (both ways) */
     QObject::connect( main_input_manager, SIGNAL(positionUpdated(
                       float, int, int ) ), slider, SLOT( setPosition( float,int,
                       int ) ) );
@@ -88,7 +86,6 @@ void MainInterface::updateOnTimer()
         if( p_input )
         {
             vlc_object_yield( p_input );
-            fprintf( stderr, "Sending input\n");
             emit inputChanged( p_input );
         }
 
