@@ -34,11 +34,13 @@ public:
     {};
     virtual ~InputSlider()   {};
     void init();
+private:
+    bool mymove;
 public slots:
     void setPosition( float, int, int );
 private slots:
     void userDrag( int );
 signals:
-    void positionUpdated( float );
+    void sliderDragged( float );
 };
 #endif

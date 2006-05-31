@@ -25,10 +25,11 @@
 
 void InputSlider::init()
 {
+    mymove = false;
     setMinimum( 0 );
     setMaximum( 1000 );
     setSingleStep( 2 );
-    setPageStep( 100 );
+    setPageStep( 1000 );
     setTracking( true );
     QObject::connect( this, SIGNAL( valueChanged(int) ), this,
                       SLOT( userDrag( int ) ) );
@@ -36,11 +37,18 @@ void InputSlider::init()
 
 void InputSlider::setPosition( float pos, int a, int b )
 {
+    fprintf( stderr, "Set pos %f\n", pos );
+    mymove = true;
     setValue( (int)(pos * 1000.0 ) );
+    mymove = false;
 }
 
 void InputSlider::userDrag( int new_value )
 {
     float f_pos = (float)(new_value)/1000.0;
-    emit positionUpdated( f_pos );
+    if( !mymove )
+    {
+        fprintf( stderr, "Emitting %f\n", f_pos );
+        emit sliderDragged( f_pos );
+    }
 }

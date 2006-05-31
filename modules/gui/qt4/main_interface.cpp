@@ -22,6 +22,7 @@
 
 #include "main_interface.hpp"
 #include "input_manager.hpp"
+#include "util/input_slider.hpp"
 #include "dialogs_provider.hpp"
 #include <QCloseEvent>
 #include <assert.h>
@@ -32,6 +33,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) :
     fprintf( stderr, "QT Main interface\n" );
 
     /* Init UI */
+    slider = new InputSlider( Qt::Horizontal, this ); slider->init();
 
     /* Init input manager */
     p_input = NULL;
@@ -48,7 +50,11 @@ void MainInterface::init()
                    main_input_manager, SLOT( setInput( input_thread_t * ) ) );
 
     /* Connect the slider and the input manager */
-    // both ways 
+    QObject::connect( main_input_manager, SIGNAL(positionUpdated(
+                      float, int, int ) ), slider, SLOT( setPosition( float,int,
+                      int ) ) );
+    QObject::connect( slider, SIGNAL( sliderDragged( float ) ),
+                      main_input_manager, SLOT( sliderUpdate( float ) ) );
 
     /* Connect the display and the input manager */
 }

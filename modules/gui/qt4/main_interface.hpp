@@ -28,6 +28,7 @@
 
 class InputManager;
 class QCloseEvent;
+class InputSlider;
 
 class MainInterface : public QWidget
 {
@@ -40,6 +41,7 @@ protected:
     void closeEvent( QCloseEvent *);
 private:
     InputManager *main_input_manager;
+    InputSlider *slider;
     intf_thread_t *p_intf;
     /// Main input associated to the playlist
     input_thread_t *p_input;
