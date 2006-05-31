@@ -63,5 +63,6 @@ void InputManager::update()
 
 void InputManager::sliderUpdate( float new_pos )
 {
-   var_SetFloat( p_input, "position", new_pos );
+   if( p_input && !p_input->b_die && !p_input->b_dead )
+        var_SetFloat( p_input, "position", new_pos );
 }
