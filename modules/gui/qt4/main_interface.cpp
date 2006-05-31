@@ -47,6 +47,10 @@ void MainInterface::init()
     QObject::connect( this, SIGNAL( inputChanged( input_thread_t * ) ),
                    main_input_manager, SLOT( setInput( input_thread_t * ) ) );
 
+    /* Connect the slider and the input manager */
+    // both ways 
+
+    /* Connect the display and the input manager */
 }
 
 MainInterface::~MainInterface()

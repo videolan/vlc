@@ -24,6 +24,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include "vlc_playlist.h"
+#include <assert.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -96,31 +97,15 @@ int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
         p_playlist->request.p_item = NULL;
         break;
 
-    case PLAYLIST_ITEMPLAY:
-        p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
-        if ( p_item == NULL || p_item->p_input->psz_uri == NULL )
-            return VLC_EGENERIC;
-        p_playlist->request.i_status = PLAYLIST_RUNNING;
-        p_playlist->request.i_skip = 0;
-        p_playlist->request.b_request = VLC_TRUE;
-        p_playlist->request.p_item = p_item;
-        p_playlist->request.p_node = p_playlist->status.p_node;
-        break;
-
+    // Node can be null, it will keep the same. Use with care ...
+    // Item null = take the first child of node
     case PLAYLIST_VIEWPLAY:
-        i_view = (int) va_arg( args, playlist_item_t *);
         p_node = (playlist_item_t *)va_arg( args, playlist_item_t * );
         p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
         if ( p_node == NULL )
         {
             p_node = p_playlist->status.p_node;
-            if( !p_node )
-            {
-                p_playlist->status.i_status = PLAYLIST_STOPPED;
-                p_playlist->request.b_request = VLC_TRUE;
-                msg_Err( p_playlist, "null node" );
-                return VLC_SUCCESS;
-            }
+            assert( p_node );
         }
         p_playlist->request.i_status = PLAYLIST_RUNNING;
         p_playlist->request.i_skip = 0;
@@ -130,23 +115,27 @@ int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
         break;
 
     case PLAYLIST_PLAY:
-        p_playlist->request.i_status = PLAYLIST_RUNNING;
-        p_playlist->request.b_request = VLC_TRUE;
-
         if( p_playlist->p_input )
         {
             val.i_int = PLAYING_S;
             var_Set( p_playlist->p_input, "state", val );
             break;
         }
-        p_playlist->request.p_node = p_playlist->status.p_node;
-        p_playlist->request.p_item = p_playlist->status.p_item;
-        p_playlist->request.i_skip = 0;
+        else
+        {
+            p_playlist->request.i_status = PLAYLIST_RUNNING;
+            p_playlist->request.b_request = VLC_TRUE;
+            p_playlist->request.p_node = p_playlist->status.p_node;
+            p_playlist->request.p_item = p_playlist->status.p_item;
+            p_playlist->request.i_skip = 0;
+        }
         break;
 
     case PLAYLIST_AUTOPLAY:
+        // AUTOPLAY is an ugly hack for initial status.
+        // Hopefully it will disappear
         p_playlist->status.i_status = PLAYLIST_RUNNING;
-        p_playlist->status.p_node = p_playlist->p_local_category;
+        p_playlist->request.p_node = p_playlist->status.p_node;
         p_playlist->request.b_request = VLC_FALSE;
         break;
 
@@ -260,7 +249,6 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
     vlc_bool_t b_playstop = var_GetBool( p_playlist, "play-and-stop" );
 
     /* Handle quickly a few special cases */
-
     /* No items to play */
     if( p_playlist->i_size == 0 )
     {
@@ -341,14 +329,12 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
         p_new = p_playlist->request.p_item;
         i_skip = p_playlist->request.i_skip;
 
-        p_playlist->status.p_node = p_playlist->request.p_node;
+        if( p_playlist->request.p_node )
+            p_playlist->status.p_node = p_playlist->request.p_node;
 
-        /* If we are asked for a node, take its first item */
-        if( i_skip == 0 &&
-              ( p_new == NULL || p_new->i_children != -1 ) )
-        {
+        /* If we are asked for a node, dont take it */
+        if( i_skip == 0 && ( p_new == NULL || p_new->i_children != -1 ) )
             i_skip++;
-        }
 
         if( i_skip > 0 )
         {

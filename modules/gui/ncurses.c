@@ -565,13 +565,13 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
                         == -1 )
                 {
-                    playlist_Control( p_sys->p_playlist, PLAYLIST_ITEMPLAY,
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
+                        NULL,
                         p_sys->pp_plist[p_sys->i_box_plidx]->p_item );
                 }
                 else
                 {
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
-                        p_sys->i_current_view,
                         p_sys->pp_plist[p_sys->i_box_plidx]->p_item,
                         NULL );
                 }

@@ -1124,8 +1124,7 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
 
     if( p_parent )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, 1242,
-                          p_parent, p_item );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_parent, p_item );
     }
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 }
@@ -1522,8 +1521,8 @@ void Playlist::OnPopupPlay( wxCommandEvent& event )
 
     if( p_popup_parent )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, 1242,
-                          p_popup_parent, p_popup_item );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_popup_parent,
+                          p_popup_item );
     }
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 }

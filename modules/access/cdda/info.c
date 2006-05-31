@@ -1037,7 +1037,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
     if( b_play )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, 0,
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                           p_playlist->status.p_item, NULL );
     }
 

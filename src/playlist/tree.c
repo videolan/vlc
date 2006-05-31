@@ -354,6 +354,8 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
 {
     playlist_item_t *p_next;
 
+    assert( p_root && p_root->i_children != -1 );
+
 #ifdef PLAYLIST_DEBUG
     if( p_item != NULL )
         msg_Dbg( p_playlist, "finding next of %s within %s",
@@ -363,7 +365,6 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
                          p_root->p_input->psz_name );
 #endif
 
-    assert( p_root && p_root->i_children != -1 );
 
     /* Now, walk the tree until we find a suitable next item */
     p_next = p_item;

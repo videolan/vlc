@@ -636,12 +636,16 @@ void OpenDialog::OnOk()
             }
         }
 
-        playlist_AddItem( p_playlist, p_item,
-                          PLAYLIST_APPEND, PLAYLIST_END );
 
         if( b_start )
         {
-            playlist_Control( p_playlist, PLAYLIST_ITEMPLAY , p_item );
+            playlist_AddItem( p_playlist, p_item,
+                              PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END );
+        }
+        else
+        {
+            playlist_AddItem( p_playlist, p_item,
+                              PLAYLIST_APPEND, PLAYLIST_END );
         }
     }
 

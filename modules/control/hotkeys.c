@@ -921,7 +921,7 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
             if( !strcmp( psz_bookmark,
                          p_playlist->pp_items[i]->p_input->psz_uri ) )
             {
-                playlist_LockControl( p_playlist, PLAYLIST_ITEMPLAY,
+                playlist_LockControl( p_playlist, PLAYLIST_VIEWPLAY, NULL,
                                       p_playlist->pp_items[i] );
                 break;
             }

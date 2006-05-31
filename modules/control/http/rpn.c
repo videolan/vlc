@@ -490,7 +490,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             int i_id = E_(SSPopN)( st, vars );
             int i_ret;
 
-            i_ret = playlist_Control( p_sys->p_playlist, PLAYLIST_ITEMPLAY,
+            i_ret = playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
+                                      NULL,
                                       playlist_ItemGetById( p_sys->p_playlist,
                                       i_id ) );
             msg_Dbg( p_intf, "requested playlist item: %i", i_id );

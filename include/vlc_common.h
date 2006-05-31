@@ -220,14 +220,11 @@ typedef struct msg_subscription_t msg_subscription_t;
 typedef enum {
     PLAYLIST_PLAY,      /**< No arg.                            res=can fail*/
     PLAYLIST_AUTOPLAY,  /**< No arg.                            res=cant fail*/
-    PLAYLIST_VIEWPLAY,  /**< arg1= int, arg2= playlist_item_t*,*/
-                        /**  arg3 = playlist_item_t*          , res=can fail */
-    PLAYLIST_ITEMPLAY,  /** <arg1 = playlist_item_t *         , res=can fail */
+    PLAYLIST_VIEWPLAY,  /**< arg1= playlist_item_t*,*/
+                        /**  arg2 = playlist_item_t*          , res=can fail */
     PLAYLIST_PAUSE,     /**< No arg                             res=can fail*/
     PLAYLIST_STOP,      /**< No arg                             res=can fail*/
     PLAYLIST_SKIP,      /**< arg1=int,                          res=can fail*/
-    PLAYLIST_GOTO,      /**< arg1=int                           res=can fail */
-    PLAYLIST_VIEWGOTO   /**< arg1=int                           res=can fail */
 } playlist_command_t;
 
 

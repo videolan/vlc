@@ -1322,7 +1322,8 @@ static VLCWizard *_o_sharedInstance = nil;
                 {
                     /* play the first item and add the others afterwards */
                     playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
-                    playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
+                    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, NULL,
+		                      p_item );
                 }
 
                 x += 1;

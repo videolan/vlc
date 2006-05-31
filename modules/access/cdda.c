@@ -291,9 +291,8 @@ static int Open( vlc_object_t *p_this )
 
     if( b_play )
     {
-          playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, 1242,
+          playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                             p_playlist->request.p_node, NULL );
-//        playlist_Play( p_playlist );
     }
 
     if( p_playlist ) vlc_object_release( p_playlist );

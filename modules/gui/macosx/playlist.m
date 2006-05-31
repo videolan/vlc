@@ -788,7 +788,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                     p_item = NULL;
                 }
             }
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, 0, p_node, p_item );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_node, p_item );
         }
         vlc_object_release( p_playlist );
     }
@@ -1086,7 +1086,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         {
             playlist_item_t *p_item;
             p_item = playlist_ItemGetByInput( p_playlist, p_input );
-            playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, NULL, p_item );
         }
         else
         {
@@ -1133,7 +1133,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         {
             playlist_item_t *p_item;
             p_item = playlist_ItemGetByInput( p_playlist, p_input );
-            playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, NULL, p_item );
         }
         else
         {

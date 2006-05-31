@@ -83,7 +83,7 @@ void E_(Close_Shoutcast) ( vlc_object_t * );
     if( b_play && p_playlist->status.p_item && \
                   p_playlist->status.p_item->i_children > 0 ) \
     { \
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, 1242, \
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,  \
                           p_playlist->status.p_item, NULL ); \
     } \
     vlc_object_release( p_playlist );
