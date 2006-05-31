@@ -47,6 +47,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     set_program( "qvlc" );
+    add_shortcut("qt");
 
     add_submodule();
         set_description( "Dialogs provider" );
