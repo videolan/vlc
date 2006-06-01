@@ -32,9 +32,9 @@
 
 #ifndef CACA_API_VERSION_1
     /* Upward compatibility macros */
-    typedef cucul_canvas_t char
-    typedef cucul_dither_t struct caca_bitmap
-    typedef caca_display_t char
+    typedef char cucul_canvas_t;
+    typedef struct caca_bitmap cucul_dither_t;
+    typedef char caca_display_t;
 #   define CUCUL_COLOR_DEFAULT CACA_COLOR_LIGHTGRAY
 #   define CUCUL_COLOR_BLACK CACA_COLOR_BLACK
 #   define cucul_clear_canvas(x) caca_clear()
