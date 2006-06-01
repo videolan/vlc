@@ -13,7 +13,7 @@ data 'carb' (0)
 resource 'STR#' (126)
 {
     {
-        "Version 0.8.5, Copyright 2006, The VideoLAN Team"
+        "Version 0.8.6, Copyright 2006, The VideoLAN Team"
         "<BR><A HREF='http://www.videolan.org'>http://www.videolan.org</A>",
         "VLC Multimedia Plugin"
     };
@@ -34,7 +34,7 @@ resource 'STR#' (127)
         "MPEG-4 video",
         "MPEG-4 video",
         "AVI video",
-        "QuickTime video",
+/*        "QuickTime video", */
         "Ogg stream",
         "Ogg stream",
         "VLC plugin",
@@ -63,7 +63,7 @@ resource 'STR#' (128,"MIME Type")
         "application/mpeg4-iod", "mp4,mpg4",
         "application/mpeg4-muxcodetable", "mp4,mpg4",
         "video/x-msvideo", "avi",
-        "video/quicktime", "mov, qt",
+/*        "video/quicktime", "mov, qt", */
         "application/ogg", "ogg",
         "application/x-ogg", "ogg",
         "application/x-vlc-plugin", "vlc",

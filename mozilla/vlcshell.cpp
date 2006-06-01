@@ -82,7 +82,7 @@ static void Resize( Widget w, XtPointer closure, XEvent *event );
  * MacOS-only declarations
 ******************************************************************************/
 #ifdef XP_MACOSX
-#   define VOUT_PLUGINS "macosx,dummy"
+#   define VOUT_PLUGINS "opengl,macosx,dummy"
 #   define AOUT_PLUGINS "auhal,macosx,dummy"
 
 #endif
@@ -204,17 +204,13 @@ int16 NPP_HandleEvent( NPP instance, void * event )
         case updateEvt:
         {
             NPWindow *npwindow = p_plugin->window;
-            NP_Port *npport = (NP_Port *)(npwindow->window);
-
-            SetPort( npport->port );
-            //SetOrigin( npport->portx , npport->porty);
 
             /* draw the beautiful "No Picture" */
 
             ForeColor(blackColor);
             PenMode( patCopy );
 
-	    Rect rect;
+            Rect rect;
             rect.left = 0;
             rect.top = 0;
             rect.right = npwindow->width;
@@ -236,8 +232,12 @@ int16 NPP_HandleEvent( NPP instance, void * event )
             return true;
         case NPEventType_AdjustCursorEvent:
             return false;
-	case NPEventType_ScrollingBeginsEvent:
-	case NPEventType_ScrollingEndsEvent:
+        case NPEventType_MenuCommandEvent:
+            return false;
+        case NPEventType_ClippingChangedEvent:
+            return false;
+        case NPEventType_ScrollingBeginsEvent:
+        case NPEventType_ScrollingEndsEvent:
             return true;
         default:
             ;
