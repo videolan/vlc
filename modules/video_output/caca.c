@@ -116,7 +116,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    HANDLE hstdout =
+    hstdout =
         CreateConsoleScreenBuffer( GENERIC_READ | GENERIC_WRITE,
                                    FILE_SHARE_READ | FILE_SHARE_WRITE,
                                    NULL, CONSOLE_TEXTMODE_BUFFER, NULL );
