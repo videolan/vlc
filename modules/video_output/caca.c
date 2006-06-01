@@ -30,6 +30,29 @@
 
 #include <caca.h>
 
+#ifndef CACA_API_VERSION_1
+    /* Upward compatibility macros */
+    typedef cucul_canvas_t char
+    typedef cucul_dither_t struct caca_bitmap
+    typedef caca_display_t char
+#   define CUCUL_COLOR_DEFAULT CACA_COLOR_LIGHTGRAY
+#   define CUCUL_COLOR_BLACK CACA_COLOR_BLACK
+#   define cucul_clear_canvas(x) caca_clear()
+#   define cucul_create_canvas(x,y) "" /* kinda hacky */
+#   define cucul_create_dither caca_create_bitmap
+#   define cucul_dither_bitmap(x,y,z,t,u,v,w) caca_draw_bitmap(y,z,t,u,v,w)
+#   define cucul_free_dither caca_free_bitmap
+#   define cucul_free_canvas(x)
+#   define cucul_get_canvas_width(x) caca_get_width()
+#   define cucul_get_canvas_height(x) caca_get_height()
+#   define cucul_set_color(x,y,z) caca_set_color(y,z)
+#   define caca_create_display(x) (caca_init() ? NULL : "") /* hacky, too */
+#   define caca_free_display(x) caca_end()
+#   define caca_get_event(x,y,z,t) *(z) = caca_get_event(y)
+#   define caca_refresh_display(x) caca_refresh()
+#   define caca_set_display_title(x,y) caca_set_window_title(y)
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/intf.h>
@@ -67,13 +90,9 @@ vlc_module_end();
  *****************************************************************************/
 struct vout_sys_t
 {
-#ifdef CACA_API_VERSION_1
     cucul_canvas_t *p_cv;
     caca_display_t *p_dp;
     cucul_dither_t *p_dither;
-#else
-    struct caca_bitmap *p_bitmap;
-#endif
 };
 
 /*****************************************************************************
@@ -86,58 +105,56 @@ static int Create( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
-    if( AllocConsole() )
-    {
-        CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-        SMALL_RECT rect;
-        COORD coord;
+    CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
+    SMALL_RECT rect;
+    COORD coord;
+    HANDLE hstdout;
 
-        HANDLE hstdout =
-            CreateConsoleScreenBuffer( GENERIC_READ | GENERIC_WRITE,
-                                       FILE_SHARE_READ | FILE_SHARE_WRITE,
-                                       NULL, CONSOLE_TEXTMODE_BUFFER, NULL );
-        if( !hstdout || hstdout == INVALID_HANDLE_VALUE )
-        {
-            msg_Err( p_vout, "cannot create screen buffer" );
-            FreeConsole();
-            return VLC_EGENERIC;
-        }
-
-        if( !SetConsoleActiveScreenBuffer( hstdout) )
-        {
-            msg_Err( p_vout, "cannot set active screen buffer" );
-            FreeConsole();
-            return VLC_EGENERIC;
-        }
-
-        coord = GetLargestConsoleWindowSize( hstdout );
-        msg_Dbg( p_vout, "SetConsoleWindowInfo: %ix%i", coord.X, coord.Y );
-
-        /* Force size for now */
-        coord.X = 100;
-        coord.Y = 40;
-
-        if( !SetConsoleScreenBufferSize( hstdout, coord ) )
-            msg_Warn( p_vout, "SetConsoleScreenBufferSize %i %i",
-                      coord.X, coord.Y );
-
-        /* Get the current screen buffer size and window position. */
-        if( GetConsoleScreenBufferInfo( hstdout, &csbiInfo ) )
-        {
-            rect.Top = 0; rect.Left = 0;
-            rect.Right = csbiInfo.dwMaximumWindowSize.X - 1;
-            rect.Bottom = csbiInfo.dwMaximumWindowSize.Y - 1;
-            if( !SetConsoleWindowInfo( hstdout, TRUE, &rect ) )
-                msg_Dbg( p_vout, "SetConsoleWindowInfo failed: %ix%i",
-                         rect.Right, rect.Bottom );
-        }
-    }
-    else
+    if( !AllocConsole() )
     {
         msg_Err( p_vout, "cannot create console" );
         return VLC_EGENERIC;
     }
 
+    HANDLE hstdout =
+        CreateConsoleScreenBuffer( GENERIC_READ | GENERIC_WRITE,
+                                   FILE_SHARE_READ | FILE_SHARE_WRITE,
+                                   NULL, CONSOLE_TEXTMODE_BUFFER, NULL );
+    if( !hstdout || hstdout == INVALID_HANDLE_VALUE )
+    {
+        msg_Err( p_vout, "cannot create screen buffer" );
+        FreeConsole();
+        return VLC_EGENERIC;
+    }
+
+    if( !SetConsoleActiveScreenBuffer( hstdout) )
+    {
+        msg_Err( p_vout, "cannot set active screen buffer" );
+        FreeConsole();
+        return VLC_EGENERIC;
+    }
+
+    coord = GetLargestConsoleWindowSize( hstdout );
+    msg_Dbg( p_vout, "SetConsoleWindowInfo: %ix%i", coord.X, coord.Y );
+
+    /* Force size for now */
+    coord.X = 100;
+    coord.Y = 40;
+
+    if( !SetConsoleScreenBufferSize( hstdout, coord ) )
+        msg_Warn( p_vout, "SetConsoleScreenBufferSize %i %i",
+                  coord.X, coord.Y );
+
+    /* Get the current screen buffer size and window position. */
+    if( GetConsoleScreenBufferInfo( hstdout, &csbiInfo ) )
+    {
+        rect.Top = 0; rect.Left = 0;
+        rect.Right = csbiInfo.dwMaximumWindowSize.X - 1;
+        rect.Bottom = csbiInfo.dwMaximumWindowSize.Y - 1;
+        if( !SetConsoleWindowInfo( hstdout, TRUE, &rect ) )
+            msg_Dbg( p_vout, "SetConsoleWindowInfo failed: %ix%i",
+                     rect.Right, rect.Bottom );
+    }
 #endif
 
     /* Allocate structure */
@@ -148,7 +165,6 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-#ifdef CACA_API_VERSION_1
     p_vout->p_sys->p_cv = cucul_create_canvas(0, 0);
     if( !p_vout->p_sys->p_cv )
     {
@@ -168,16 +184,6 @@ static int Create( vlc_object_t *p_this )
 
     caca_set_display_title( p_vout->p_sys->p_dp,
                             VOUT_TITLE " - Colour AsCii Art (caca)" );
-#else
-    if( caca_init() )
-    {
-        msg_Err( p_vout, "cannot initialize libcaca" );
-        free( p_vout->p_sys );
-        return VLC_EGENERIC;
-    }
-
-    caca_set_window_title( VOUT_TITLE " - Colour AsCii Art (caca)" );
-#endif
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -207,26 +213,16 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_gmask = 0x0000ff00;
     p_vout->output.i_bmask = 0x000000ff;
 
-    /* Create the libcaca bitmap */
-#ifdef CACA_API_VERSION_1
-    p_vout->p_sys->p_dither =
-        cucul_create_dither
-#else
-    p_vout->p_sys->p_bitmap =
-        caca_create_bitmap
-#endif
+    /* Create the libcaca dither object */
+    p_vout->p_sys->p_dither = cucul_create_dither
                        ( 32, p_vout->output.i_width, p_vout->output.i_height,
                          4 * ((p_vout->output.i_width + 15) & ~15),
                          p_vout->output.i_rmask, p_vout->output.i_gmask,
                          p_vout->output.i_bmask, 0x00000000 );
 
-#ifdef CACA_API_VERSION_1
     if( !p_vout->p_sys->p_dither )
-#else
-    if( !p_vout->p_sys->p_bitmap )
-#endif
     {
-        msg_Err( p_vout, "could not create libcaca bitmap" );
+        msg_Err( p_vout, "could not create libcaca dither object" );
         return VLC_EGENERIC;
     }
 
@@ -268,11 +264,7 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
-#ifdef CACA_API_VERSION_1
     cucul_free_dither( p_vout->p_sys->p_dither );
-#else
-    caca_free_bitmap( p_vout->p_sys->p_bitmap );
-#endif
 }
 
 /*****************************************************************************
@@ -284,12 +276,8 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-#ifdef CACA_API_VERSION_1
     caca_free_display( p_vout->p_sys->p_dp );
     cucul_free_canvas( p_vout->p_sys->p_cv );
-#else
-    caca_end();
-#endif
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
     FreeConsole();
@@ -309,36 +297,28 @@ static int Manage( vout_thread_t *p_vout )
 #ifdef CACA_API_VERSION_1
     struct caca_event ev;
 #else
-    int event;
+    int ev;
 #endif
     vlc_value_t val;
 
-#ifdef CACA_API_VERSION_1
-    while(( caca_get_event(p_vout->p_sys->p_dp,
-                           CACA_EVENT_KEY_PRESS | CACA_EVENT_RESIZE, &ev, 0) ))
-#else
-    while(( event = caca_get_event(CACA_EVENT_KEY_PRESS | CACA_EVENT_RESIZE) ))
-#endif
+    while( caca_get_event(p_vout->p_sys->p_dp,
+                          CACA_EVENT_KEY_PRESS | CACA_EVENT_RESIZE, &ev, 0) )
     {
         /* Acknowledge the resize */
 #ifdef CACA_API_VERSION_1
         if( ev.type == CACA_EVENT_RESIZE )
+#else
+        if( ev == CACA_EVENT_RESIZE )
+#endif
         {
             caca_refresh_display( p_vout->p_sys->p_dp );
             continue;
         }
-#else
-        if( event == CACA_EVENT_RESIZE )
-        {
-            caca_refresh();
-            continue;
-        }
-#endif
 
 #ifdef CACA_API_VERSION_1
         switch( ev.data.key.ch )
 #else
-        switch( event & 0x00ffffff )
+        switch( ev & 0x00ffffff )
 #endif
         {
         case 'q':
@@ -362,7 +342,6 @@ static int Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#ifdef CACA_API_VERSION_1
     cucul_set_color( p_vout->p_sys->p_cv,
                      CUCUL_COLOR_DEFAULT, CUCUL_COLOR_BLACK );
     cucul_clear_canvas( p_vout->p_sys->p_cv );
@@ -370,11 +349,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                          cucul_get_canvas_width( p_vout->p_sys->p_cv ) - 1,
                          cucul_get_canvas_height( p_vout->p_sys->p_cv ) - 1,
                          p_vout->p_sys->p_dither, p_pic->p->p_pixels );
-#else
-    caca_clear();
-    caca_draw_bitmap( 0, 0, caca_get_width() - 1, caca_get_height() - 1,
-                      p_vout->p_sys->p_bitmap, p_pic->p->p_pixels );
-#endif
 }
 
 /*****************************************************************************
@@ -382,10 +356,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#ifdef CACA_API_VERSION_1
     caca_refresh_display( p_vout->p_sys->p_dp );
-#else
-    caca_refresh();
-#endif
 }
 
