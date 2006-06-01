@@ -352,10 +352,8 @@ int VideoWindow::ControlWindow( void *p_window, int i_query, va_list args )
             unsigned int i_width  = va_arg( args, unsigned int );
             unsigned int i_height = va_arg( args, unsigned int );
 
-            vlc_mutex_lock( &lock );
             if( !i_width && p_vout ) i_width = p_vout->i_window_width;
             if( !i_height && p_vout ) i_height = p_vout->i_window_height;
-            vlc_mutex_unlock( &lock );
 
             /* Update dimensions */
             wxSizeEvent event( wxSize( i_width, i_height ), UpdateSize_Event );
