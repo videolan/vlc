@@ -45,6 +45,9 @@ public slots:
 signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int, int );
+    void nameChanged( QString );
+    void navigationChanged( int );
+    void statusChanged( int );
 };
 
 

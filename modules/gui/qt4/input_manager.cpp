@@ -46,19 +46,57 @@ void InputManager::setInput( input_thread_t *_p_input )
 
 void InputManager::update()
 {
+    /// \todo Emit the signals only if it changed
     if( !p_input || p_input->b_die ) return;
 
     if( p_input->b_dead )
     {
         emit positionUpdated( 0.0, 0, 0 );
+	emit navigationChanged( 0 );
+	emit statusChanged( 0 ); // 0 = STOPPED, 1 = PAUSE, 2 = PLAY
     }
+
+    /* Update position */
     mtime_t i_length, i_time;
     float f_pos;
     i_length = var_GetTime( p_input, "length" ) / 1000000;
     i_time = var_GetTime( p_input, "time") / 1000000;
     f_pos = var_GetFloat( p_input, "position" );
-
     emit positionUpdated( f_pos, i_time, i_length );
+
+    /* Update disc status */
+    vlc_value_t val;
+    var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    if( val.i_int > 0 )
+    {
+        vlc_value_t val;
+        var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
+	if( val.i_int > 0 )
+   	    emit navigationChanged( 1 ); // 1 = chapter, 2 = title, 3 = NO
+	else
+	    emit navigationChanged( 2 );
+    }
+    else
+    {
+	emit navigationChanged( 0 );
+    }
+
+    /* Update text */
+    QString text;
+    if( p_input->input.p_item->p_meta &&
+        p_input->input.p_item->p_meta->psz_nowplaying &&
+        *p_input->input.p_item->p_meta->psz_nowplaying )
+    {
+	text.sprintf( "%s - %s", 
+        	      p_input->input.p_item->p_meta->psz_nowplaying,
+        	      p_input->input.p_item->psz_name );
+    }
+    else
+    {
+	text.sprintf( "%s", p_input->input.p_item->psz_name );
+    }
+    emit nameChanged( text );
+
 }
 
 void InputManager::sliderUpdate( float new_pos )
