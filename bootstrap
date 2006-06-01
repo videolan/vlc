@@ -51,40 +51,33 @@ if test -d extras/contrib/bin; then
 fi
 
 # Check for automake
-amvers="none"
-if automake-1.9 --version >/dev/null 2>&1; then
-  amvers="-1.9"
-elif automake-1.8 --version >/dev/null 2>&1; then
-  amvers="-1.8"
-elif automake-1.7 --version >/dev/null 2>&1; then
-  amvers="-1.7"
-elif automake-1.6 --version >/dev/null 2>&1; then
-  amvers="-1.6"
-  if expr "`automake-1.6 --version | sed -e '1s/[^0-9]*//' -e q`" "<=" "1.6.1" > /dev/null 2>&1; then
-    AUTOMAKESUCKS=yes
+amvers="no"
+for v in "-1.9" "19" "-1.8" "18" "-1.7" "17" "-1.6" "16" "-1.5" "15"; do
+  if automake${v} --version >/dev/null 2>&1; then
+    amsuff="${v}"
+    amvers="${v}"
+    break
   fi
-elif automake-1.5 --version >/dev/null 2>&1; then
-  INSTALLSUCKS=yes
-  amvers="-1.5"
-elif automake --version > /dev/null 2>&1; then
-  amvers=""
-  case "`automake --version | sed -e '1s/[^0-9]*//' -e q`" in
-    0|0.*|1|1.[01234]|1.[01234][-.]*)
-      amvers="none" ;;
-    1.5|1.5.*)
-      INSTALLSUCKS=yes ;;
-    1.6|1.6.0|1.6.1)
-      AUTOMAKESUCKS=yes ;;
-    1.9|1.9.2)
-      ;;
-  esac
+done
+
+if test "${amvers}" = "no" && automake --version > /dev/null 2>&1; then
+  amvers="`automake --version | sed -e '1s/[^0-9]*//' -e q`"
+  amsuff=""
 fi
 
-if test "${amvers}" = "none"; then
-  set +x
-  echo "$0: you need automake version 1.5 or later"
-  exit 1
-fi
+case "${amvers}" in
+  -1.6|16|1.6|1.6.0*|1.6.1*)
+    AUTOMAKESUCKS=yes
+    ;;
+  -1.5|15|1.5|1.5.*)
+    INSTALLSUCKS=yes
+    ;;
+  no|1.[01234]|1.[01234].*|1[01234])
+    set +x
+    echo "$0: you need automake version 1.5 or later"
+    exit 1
+    ;;
+esac
 
 # Check for libtool
 libtoolize="no"
