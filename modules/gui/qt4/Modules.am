@@ -1,3 +1,4 @@
+# vim:syntax=make
 ## Howto
 # For each Q_OBJECT:
 #   - Add it without extension to TOMOC
@@ -19,6 +20,7 @@ TOMOC = main_interface \
 	dialogs/playlist \
 	dialogs/streaminfo \
 	components/infopanels \
+	components/preferences_widgets \
 	util/input_slider
 MOCCPP := $(TOMOC:%=%.moc.cpp)
 
@@ -29,6 +31,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/playlist.moc.cpp \
 		dialogs/streaminfo.moc.cpp \
 		components/infopanels.moc.cpp \
+	 	components/preferences_widgets.moc.cpp \
 		util/input_slider.moc.cpp
 
 if ENABLE_QT4
@@ -55,6 +58,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/playlist.cpp \
 		dialogs/streaminfo.cpp \
 		components/infopanels.cpp \
+		components/preferences_widgets.cpp \
 		util/input_slider.cpp
 		$(NULL)
 
@@ -66,6 +70,7 @@ EXTRA_DIST += \
 	dialogs/playlist.hpp \
 	dialogs/streaminfo.hpp \
 	components/infopanels.hpp \
+	components/preferences_widgets.hpp \
 	util/input_slider.hpp \
 	ui/input_stats.ui
 
