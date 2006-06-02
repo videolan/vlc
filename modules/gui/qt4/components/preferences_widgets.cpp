@@ -21,6 +21,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * Todo:
+ *  - Finish implementation (see WX)
+ *  - Improvements over WX
+ *      - Password field implementation (through "pwd" bool param
+ *      - Validator for modulelist
+ *  - Implement update stuff using a general Updated signal
+ */
+
 #include "components/preferences_widgets.hpp"
 
 #include <QLineEdit>
