@@ -7,6 +7,7 @@
  * Authors: Cyril Deguet <asmax@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
  *          Eric Petit <titer@m0k.org>
+ * 		    Cedric Cocquebert <cedric.cocquebert@supelec.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +21,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -89,6 +90,38 @@
 #define OPENGL_EFFECT_NONE             1
 #define OPENGL_EFFECT_CUBE             2
 #define OPENGL_EFFECT_TRANSPARENT_CUBE 4
+#if defined( HAVE_GL_GLU_H ) || defined( SYS_DARWIN )
+    #define OPENGL_MORE_EFFECT		   8
+#endif
+
+#ifdef OPENGL_MORE_EFFECT
+	#include <math.h>
+	#ifdef SYS_DARWIN
+		#include <OpenGL/glu.h>
+	#else
+		#include <GL/glu.h>
+	#endif
+/* 3D MODEL */
+	#define CYLINDER 8
+	#define TORUS	 16
+	#define SPHERE   32
+/*GRID2D TRANSFORMATION */
+	#define SQUAREXY 64
+	#define SQUARER  128
+	#define ASINXY   256
+	#define ASINR    512
+	#define SINEXY   1024
+	#define SINER    2048
+	#define INIFILE	 4096					// not used, just for mark end ...
+	#define SIGN(x)	 (x < 0 ? (-1) : 1)
+	#define PID2     1.570796326794896619231322
+
+	static char *ppsz_effects[] = {
+			"none", "cube", "transparent-cube", "cylinder", "torus", "sphere","SQUAREXY","SQUARER", "ASINXY", "ASINR", "SINEXY", "SINER" };
+	static char *ppsz_effects_text[] = {
+			N_("None"), N_("Cube"), N_("Transparent Cube"), 
+			N_("Cylinder"), N_("Torus"), N_("Sphere"), N_("SQUAREXY"),N_("SQUARER"), N_("ASINXY"), N_("ASINR"), N_("SINEXY"), N_("SINER") };
+#endif
 
 /*****************************************************************************
  * Vout interface
@@ -111,22 +144,34 @@ static int SendEvents( vlc_object_t *, char const *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define SPEED_TEXT N_( "OpenGL cube rotation speed" )
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
+#ifdef OPENGL_MORE_EFFECT
+#define ACCURACY_TEXT N_( "OpenGL sampling accuracy " )
+#define ACCURACY_LONGTEXT N_( "Select the accuracy of 3D object sampling(1 = min and 10 = max)" )
+#define RADIUS_TEXT N_( "OpenGL Cylinder radius" )
+#define RADIUS_LONGTEXT N_( "Radius of the OpenGL cylinder effect, if enabled" )
+#define POV_X_TEXT N_("Point of view x-coordinate")
+#define POV_X_LONGTEXT N_("Point of view (X coordinate) of the cube/cylinder "\
+                           "effect, if enabled.")
+#define POV_Y_TEXT N_("Point of view y-coordinate")
+#define POV_Y_LONGTEXT N_("Point of view (Y coordinate) of the cube/cylinder "\
+                           "effect, if enabled.")
+#define POV_Z_TEXT N_("Point of view z-coordinate")
+#define POV_Z_LONGTEXT N_("Point of view (Z coordinate) of the cube/cylinder "\
+                           "effect, if enabled.")
+#endif
 #define SPEED_TEXT N_( "OpenGL cube rotation speed" )
 #define SPEED_LONGTEXT N_( "Rotation speed of the OpenGL cube effect, if " \
         "enabled." )
-
 #define EFFECT_TEXT N_("Effect")
 #define EFFECT_LONGTEXT N_( \
     "Several visual OpenGL effects are available." )
 
+#ifndef OPENGL_MORE_EFFECT
 static char *ppsz_effects[] = {
         "none", "cube", "transparent-cube" };
 static char *ppsz_effects_text[] = {
         N_("None"), N_("Cube"), N_("Transparent Cube") };
+#endif
 
 vlc_module_begin();
     set_shortname( "OpenGL" );
@@ -141,10 +186,23 @@ vlc_module_begin();
     add_shortcut( "opengl" );
     add_float( "opengl-cube-speed", 2.0, NULL, SPEED_TEXT,
                     SPEED_LONGTEXT, VLC_TRUE );
+#ifdef OPENGL_MORE_EFFECT
+    add_integer_with_range( "opengl-accuracy", 4, 1, 10, NULL, ACCURACY_TEXT,
+                    ACCURACY_LONGTEXT, VLC_TRUE );
+    add_float_with_range( "opengl-pov-x", 0.0, -1.0, 1.0, NULL, POV_X_TEXT,
+                    POV_X_LONGTEXT, VLC_TRUE );
+    add_float_with_range( "opengl-pov-y", 0.0, -1.0, 1.0, NULL, POV_Y_TEXT,
+                    POV_Y_LONGTEXT, VLC_TRUE );
+    add_float_with_range( "opengl-pov-z", -1.0, -1.0, 1.0, NULL, POV_Z_TEXT,
+                    POV_Z_LONGTEXT, VLC_TRUE );
+    add_float( "opengl-cylinder-radius", -100.0, NULL, RADIUS_TEXT,
+                    RADIUS_LONGTEXT, VLC_TRUE );
+
+#endif
     set_callbacks( CreateVout, DestroyVout );
     add_string( "opengl-effect", "none", NULL, EFFECT_TEXT,
                  EFFECT_LONGTEXT, VLC_FALSE );
-        change_string_list( ppsz_effects, ppsz_effects_text, 0 );
+		change_string_list( ppsz_effects, ppsz_effects_text, 0 );
 vlc_module_end();
 
 /*****************************************************************************
@@ -166,6 +224,7 @@ struct vout_sys_t
     int         i_effect;
 
     float       f_speed;
+    float       f_radius;
 };
 
 /*****************************************************************************
@@ -231,6 +290,7 @@ static int CreateVout( vlc_object_t *p_this )
     }
 
     p_sys->f_speed = var_CreateGetFloat( p_vout, "opengl-cube-speed" );
+    p_sys->f_radius = var_CreateGetFloat( p_vout, "opengl-cylinder-radius" );
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -242,7 +302,7 @@ static int CreateVout( vlc_object_t *p_this )
     /* Forward events from the opengl provider */
     var_Create( p_sys->p_vout, "mouse-x", VLC_VAR_INTEGER );
     var_Create( p_sys->p_vout, "mouse-y", VLC_VAR_INTEGER );
-    var_Create( p_sys->p_vout, "mouse-moved", VLC_VAR_BOOL );
+    var_Create( p_sys->p_vout, "mouse-moved/", VLC_VAR_BOOL );
     var_Create( p_sys->p_vout, "mouse-clicked", VLC_VAR_INTEGER );
     var_Create( p_sys->p_vout, "mouse-button-down", VLC_VAR_INTEGER );
     var_Create( p_sys->p_vout, "video-on-top",
@@ -386,7 +446,6 @@ static int Init( vout_thread_t *p_vout )
         p_sys->i_effect = OPENGL_EFFECT_CUBE;
 
         glEnable( GL_CULL_FACE);
-        //glEnable( GL_DEPTH_TEST );
     }
     else if( !strcmp( val.psz_string, "transparent-cube" ) )
     {
@@ -398,9 +457,25 @@ static int Init( vout_thread_t *p_vout )
     }
     else
     {
+#ifdef OPENGL_MORE_EFFECT
+		p_sys->i_effect = 3;
+        while (( strcmp( val.psz_string, ppsz_effects[p_sys->i_effect]) ) && (pow(2,p_sys->i_effect) < INIFILE))
+        {
+            p_sys->i_effect ++;
+        }
+		if (pow(2,p_sys->i_effect) < INIFILE) 
+			p_sys->i_effect = pow(2,p_sys->i_effect);
+		else if ( strcmp( val.psz_string, ppsz_effects[p_sys->i_effect]))
+		{
+			msg_Warn( p_vout, "no valid opengl effect provided, using "
+					  "\"none\"" );
+			p_sys->i_effect = OPENGL_EFFECT_NONE;
+		}
+#else
         msg_Warn( p_vout, "no valid opengl effect provided, using "
                   "\"none\"" );
         p_sys->i_effect = OPENGL_EFFECT_NONE;
+#endif
     }
     if( val.psz_string ) free( val.psz_string );
 
@@ -415,7 +490,24 @@ static int Init( vout_thread_t *p_vout )
         glLoadIdentity();
         glTranslatef( 0.0, 0.0, - 5.0 );
     }
+#ifdef OPENGL_MORE_EFFECT
+	else 
+    {
+        /* Set the perpective */
+        glMatrixMode( GL_PROJECTION );
+        glLoadIdentity();
+        glFrustum( -1.0, 1.0, -1.0, 1.0, 3.0, 20.0 );
+        glMatrixMode( GL_MODELVIEW );
+        glLoadIdentity();
+        glTranslatef( 0.0, 0.0, -3.0 );
 
+		float f_pov_x, f_pov_y, f_pov_z;
+		f_pov_x = var_CreateGetFloat( p_vout, "opengl-pov-x");
+		f_pov_y = var_CreateGetFloat( p_vout, "opengl-pov-y");
+		f_pov_z = var_CreateGetFloat( p_vout, "opengl-pov-z");
+		gluLookAt(0, 0, 0, f_pov_x, f_pov_y, f_pov_z, 0, 1, 0);
+    }
+#endif
     if( p_sys->p_vout->pf_unlock )
     {
         p_sys->p_vout->pf_unlock( p_sys->p_vout );
@@ -464,6 +556,8 @@ static void DestroyVout( vlc_object_t *p_this )
     /* Free the texture buffer*/
     if( p_sys->pp_buffer[0] ) free( p_sys->pp_buffer[0] );
     if( p_sys->pp_buffer[1] ) free( p_sys->pp_buffer[1] );
+
+    glDeleteTextures( 2, p_sys->p_textures );
 
     free( p_sys );
 }
@@ -518,6 +612,17 @@ static int Manage( vout_thread_t *p_vout )
         switch( p_sys->i_effect )
         {
             case OPENGL_EFFECT_CUBE:
+#ifdef OPENGL_MORE_EFFECT
+			case CYLINDER:
+			case TORUS:
+			case SPHERE:
+			case SQUAREXY:
+			case SQUARER:
+			case ASINXY:
+			case ASINR:
+			case SINEXY:
+			case SINER:
+#endif            
                 glEnable( GL_CULL_FACE );
                 break;
 
@@ -539,6 +644,23 @@ static int Manage( vout_thread_t *p_vout )
             glLoadIdentity();
             glTranslatef( 0.0, 0.0, - 5.0 );
         }
+#ifdef OPENGL_MORE_EFFECT
+		else 
+	    {
+	        glMatrixMode( GL_PROJECTION );
+	        glLoadIdentity();
+	        glFrustum( -1.0, 1.0, -1.0, 1.0, 3.0, 20.0 );
+	        glMatrixMode( GL_MODELVIEW );
+	        glLoadIdentity();
+	        glTranslatef( 0.0, 0.0, -3.0 );
+	
+			float f_pov_x, f_pov_y, f_pov_z;
+			f_pov_x = var_CreateGetFloat( p_vout, "opengl-pov-x");
+			f_pov_y = var_CreateGetFloat( p_vout, "opengl-pov-y");
+			f_pov_z = var_CreateGetFloat( p_vout, "opengl-pov-z");
+			gluLookAt(0, 0, 0, f_pov_x, f_pov_y, f_pov_z, 0, 1, 0);
+	    }
+#endif        
     }
 
     if( p_sys->p_vout->pf_unlock )
@@ -614,6 +736,116 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     }
 }
 
+
+#ifdef OPENGL_MORE_EFFECT
+/*****************************************************************************
+ *   Transform: Calculate the distorted grid coordinates
+ *****************************************************************************/
+void Transform(float p, int distortion, float width, float height,int i, int j, int i_visible_width, int i_visible_height, double *ix,double *iy)
+{
+   double x,y,xnew,ynew;
+   double r,theta,rnew,thetanew;
+
+   x = (double)i * (width / ((double)i_visible_width));
+   y = (double)j * (height / ((double)i_visible_height));
+
+   x = (2.0 * (double)x / width) - 1;
+   y = (2.0 * (double)y / height) - 1;
+   xnew = x;
+   ynew = y;
+   r = sqrt(x*x+y*y);
+   theta = atan2(y,x);
+
+   switch (distortion) 
+   {
+/* GRID2D TRANSFORMATION */
+	   case SINEXY:
+		  xnew = sin(PID2*x);
+		  ynew = sin(PID2*y);
+		  break;
+	   case SINER:
+		  rnew = sin(PID2*r);
+		  thetanew = theta;
+		  xnew = rnew * cos(thetanew);
+		  ynew = rnew * sin(thetanew);
+		  break;
+	   case SQUAREXY:
+		  xnew = x*x*SIGN(x);
+		  ynew = y*y*SIGN(y);
+		  break;
+	   case SQUARER:
+		  rnew = r*r;
+		  thetanew = theta;
+		  xnew = rnew * cos(thetanew);
+		  ynew = rnew * sin(thetanew);
+		  break;
+	   case ASINXY:
+		  xnew = asin(x) / PID2;
+		  ynew = asin(y) / PID2;
+		  break;
+	   case ASINR:
+		  rnew = asin(r) / PID2;
+		  thetanew = theta;
+		  xnew = rnew * cos(thetanew);
+		  ynew = rnew * sin(thetanew);
+		  break;
+/* OTHER WAY: 3D MODEL */
+	   default:
+		  xnew = x;
+		  ynew = y;
+   }
+
+   *ix = width * (xnew + 1) / (2.0);
+   *iy = height * (ynew + 1) / (2.0);
+}
+
+
+/*****************************************************************************
+ *   Z_Compute: Calculate the Z-coordinate
+ *****************************************************************************/
+float Z_Compute(float p, int distortion, float x, float y)
+{
+  float f_z = 0.0;
+  double d_p = p / 100.0;
+
+  switch (distortion) 
+   {
+/* 3D MODEL */
+	   case CYLINDER:
+		  if (d_p > 0) 
+			f_z = (1 - d_p * d_p) / (2 * d_p) - sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x));
+		  else
+			f_z = (1 - d_p * d_p) / (2 * d_p) + d_p + sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x));
+		  break;
+	   case TORUS:
+		  if (d_p > 0) 
+		    f_z =  (1 - d_p * d_p) / (d_p) - sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x)) - sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - y * y));
+		  else
+			f_z =  (1 - d_p * d_p) / (d_p) + 2 * d_p + sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x)) + sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - y * y));
+		  break;
+	   case SPHERE:
+		  if (d_p > 0) 
+   		    f_z = (1 - d_p * d_p) / (2 * d_p) - sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x - y * y));
+		  else
+			f_z = (1 - d_p * d_p) / (2 * d_p) + d_p + sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x - y * y));
+		  break;
+/* OTHER WAY: GRID2D TRANSFORMATION */
+	   case SINEXY:;
+	   case SINER:
+	   case SQUAREXY:
+	   case SQUARER:;
+	   case ASINXY:
+	   case ASINR:
+		  f_z = 0.0;
+		  break;
+	   default:
+		   f_z = 0.0;
+   }
+  return f_z;
+}
+#endif
+
+
 /*****************************************************************************
  * DisplayVideo: displays previously rendered output
  *****************************************************************************/
@@ -664,7 +896,56 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
         glEnd();
     }
     else
-    {
+#ifdef OPENGL_MORE_EFFECT
+		if ((p_sys->i_effect > OPENGL_EFFECT_TRANSPARENT_CUBE) || 
+			((p_sys->i_effect == OPENGL_EFFECT_NONE)))
+		{
+		   unsigned int i_i, i_j;
+		   unsigned int i_accuracy  = config_GetInt( p_vout, "opengl-accuracy");
+		   unsigned int i_n = pow(2, i_accuracy);	
+		   unsigned int i_n_x = (p_vout->fmt_out.i_visible_width / (i_n * 2));
+		   unsigned int i_n_y = (p_vout->fmt_out.i_visible_height / i_n);
+		   double d_x, d_y;
+		   int i_distortion = p_sys->i_effect;
+		   float f_p = p_sys->f_radius; 
+                
+		   glEnable( VLCGL_TARGET );
+		   glBegin(GL_QUADS);								   
+		   for (i_i = 0; i_i < p_vout->fmt_out.i_visible_width; i_i += i_n_x) 
+		   {
+			  if ( i_i == i_n_x * i_n / 2) i_n_x += p_vout->fmt_out.i_visible_width % i_n;
+			  if ((i_i == (p_vout->fmt_out.i_visible_width / i_n) * i_n / 2 + i_n_x) &&
+				  (p_vout->fmt_out.i_visible_width / i_n != i_n_x))
+					i_n_x -= p_vout->fmt_out.i_visible_width % i_n; 
+	
+			  int i_m;
+			  int i_index_max = 0;
+					
+			  for (i_j = 0; i_j < p_vout->fmt_out.i_visible_height; i_j += i_n_y) 
+			  {
+				if ( i_j == i_n_y * i_n / 2) i_n_y += p_vout->fmt_out.i_visible_height % i_n;
+				if ((i_j == (p_vout->fmt_out.i_visible_height / i_n) * i_n / 2 + i_n_y) &&
+					(p_vout->fmt_out.i_visible_height / i_n != i_n_y))
+						i_n_y -= p_vout->fmt_out.i_visible_height % i_n;
+
+				for (i_m = i_index_max; i_m < i_index_max + 4; i_m++)
+				{
+					int i_k = ((i_m % 4) == 1) || ((i_m % 4) == 2);
+					int i_l = ((i_m % 4) == 2) || ((i_m % 4) == 3);
+
+					Transform(f_p, i_distortion, f_width, f_height, i_i + i_k * i_n_x, i_j + i_l * i_n_y, p_vout->fmt_out.i_visible_width, p_vout->fmt_out.i_visible_height, &d_x, &d_y);								
+					glTexCoord2f(f_x + d_x, f_y + d_y);
+					d_x =  - 1.0 + 2.0 * ((double)(i_k * i_n_x + i_i) / (double)p_vout->fmt_out.i_visible_width);
+					d_y =    1.0 - 2.0 * (((double)i_l * i_n_y + i_j) / (double)p_vout->fmt_out.i_visible_height);
+					glVertex3f((float)d_x, (float)d_y, Z_Compute(f_p, i_distortion, (float)d_x, (float)d_y));	
+				}
+			  }
+		   } 
+		   glEnd();
+		}
+		else
+#endif
+	{
         glRotatef( 0.5 * p_sys->f_speed , 0.3, 0.5, 0.7 );
 
         glEnable( VLCGL_TARGET );
