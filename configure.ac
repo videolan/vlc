@@ -5202,7 +5202,7 @@ then
     CPPFLAGS="${CPPFLAGS_save}"
   fi
   
-  if test "${mozilla}" != "false"
+  if test "${enable_mozilla}" != "false"
   then
     build_pic=yes
     AC_PATH_PROG(XPIDL, xpidl, no, ${xpidl_path}:/usr/lib/mozilla:/usr/lib64/mozilla:/usr/lib/xulrunner:/usr/lib64/xulrunner)
