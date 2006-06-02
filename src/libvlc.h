@@ -851,9 +851,9 @@ static char *ppsz_clock_descriptions[] =
     "Tell VLC that it is being launched due to a file association in the OS" )
 
 #define ONEINSTANCEWHENSTARTEDFROMFILE_TEXT N_( \
-    "Allow only on running instance when started from file")
+    "One instance when started from file")
 #define ONEINSTANCEWHENSTARTEDFROMFILE_LONGTEXT N_( \
-    "Allow only on running instance when started from file")
+    "Allow only one running instance when started from file.")
 
 #define HPRIORITY_TEXT N_("Increase the priority of the process")
 #define HPRIORITY_LONGTEXT N_( \
