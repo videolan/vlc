@@ -268,6 +268,8 @@ void libvlc_input_free( libvlc_input_t * );
 vlc_int64_t libvlc_input_get_length( libvlc_input_t *, libvlc_exception_t *);
 vlc_int64_t libvlc_input_get_time( libvlc_input_t *, libvlc_exception_t *);
 float libvlc_input_get_position( libvlc_input_t *, libvlc_exception_t *);
+vlc_bool_t libvlc_input_will_play( libvlc_input_t *, libvlc_exception_t *);
+    
 
 
 /** @} */
@@ -300,6 +302,10 @@ void libvlc_set_fullscreen( libvlc_input_t *, int, libvlc_exception_t * );
  * \return the fullscreen status (boolean)
  */
 int libvlc_get_fullscreen( libvlc_input_t *, libvlc_exception_t * );
+
+
+void libvlc_video_take_snapshot( libvlc_input_t *, char *, libvlc_exception_t * );
+    
 
 /** @} */
 

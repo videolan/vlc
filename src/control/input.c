@@ -112,3 +112,32 @@ float libvlc_input_get_position( libvlc_input_t *p_input,
 
     return val.f_float;
 }
+
+vlc_bool_t libvlc_input_will_play( libvlc_input_t *p_input,
+                                   libvlc_exception_t *p_exception) 
+{
+    
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+
+    if( !p_input )
+    {
+        libvlc_exception_raise( p_exception, "Input is NULL" );
+        return VLC_FALSE;
+    }
+
+    p_input_thread = (input_thread_t*)vlc_object_get(
+                            p_input->p_instance->p_vlc,
+                            p_input->i_input_id );
+
+    if( !p_input_thread )
+    {
+        libvlc_exception_raise( p_exception, "Input does not exist" );
+        return VLC_FALSE;
+    }
+
+    if ( !p_input_thread->b_die && !p_input_thread->b_dead )
+        return VLC_TRUE;
+
+    return VLC_FALSE;
+}

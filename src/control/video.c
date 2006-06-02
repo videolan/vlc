@@ -123,3 +123,38 @@ void libvlc_toggle_fullscreen( libvlc_input_t *p_input,
         libvlc_exception_raise( p_e,
                         "Unexpected error while setting fullscreen value" );
 }
+
+void
+libvlc_video_take_snapshot( libvlc_input_t *p_input, char *filepath,
+                       libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_input, p_e );
+    input_thread_t *p_input_thread;
+    
+    char path[256];
+
+    /* GetVout will raise the exception for us */
+    if( !p_vout )
+    {
+        return;
+    }
+
+    p_input_thread = (input_thread_t*)vlc_object_get(
+                                 p_input->p_instance->p_vlc,
+                                 p_input->i_input_id );
+    if( !p_input_thread )
+    {
+        libvlc_exception_raise( p_e, "Input does not exist" );
+        return NULL;
+    }
+   
+    snprintf( path, 255, "%s", filepath );
+    var_SetString( p_vout, "snapshot-path", path );
+    var_SetString( p_vout, "snapshot-format", "png" );
+
+    vout_Control( p_vout, VOUT_SNAPSHOT );
+    vlc_object_release( p_vout );
+
+    return;
+    
+}
