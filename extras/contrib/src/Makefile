@@ -889,7 +889,7 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 # ***************************************************************************
 
 ffmpeg:
-	svn co $(FFMPEG_SVN)  ffmpeg
+	$(SVN) co $(FFMPEG_SVN)  ffmpeg
 ifeq ($(HOST),i586-pc-beos)
 	(cd $@; patch -p 0 < ../Patches/ffmpeg-cvs-beos.patch)
 endif
