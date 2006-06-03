@@ -6,7 +6,7 @@
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
-#          Felix Kühne <fkuehne@users.sourceforge.net>
+#          Felix KÃ¼hne <fkuehne@users.sourceforge.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -146,7 +146,8 @@ SDL_URL=http://www.libsdl.org/release/SDL-$(SDL_VERSION).tar.gz
 SDL_IMAGE_VERSION=1.2.4
 SDL_IMAGE_URL=http://www.libsdl.org/projects/SDL_image/release/SDL_image-$(SDL_IMAGE_VERSION).tar.gz
 MUSE_VERSION=1.2.1
-MUSE_URL=http://files.musepack.net/source/libmpcdec-$(MUSE_VERSION).tar.bz2
+#MUSE_URL=http://files.musepack.net/source/libmpcdec-$(MUSE_VERSION).tar.bz2
+MUSE_URL=$(VIDEOLAN)/testing/contrib/libmpcdec-$(MUSE_VERSION).tar.bz2
 WXWIDGETS_VERSION=2.6.3
 WXWIDGETS_URL=$(SF)/wxwindows/wxWidgets-$(WXWIDGETS_VERSION).tar.gz
 ZLIB_VERSION=1.2.3
