@@ -40,7 +40,7 @@ public:
     ConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     virtual ~ConfigControl();
     QString getName() { return _name; }
-    bool getAdvanced() { return _advanced; }
+    bool isAdvanced() { return _advanced; }
 
     static ConfigControl * createControl( vlc_object_t*,
                                          module_config_t*,QWidget* );

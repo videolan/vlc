@@ -25,11 +25,72 @@
 #define _PREFSTREE_H_
 
 #include <QTreeWidget>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+
+enum
+{
+    TYPE_CATEGORY,
+    TYPE_CATSUBCAT,
+    TYPE_SUBCATEGORY,
+    TYPE_MODULE
+};
+
+class PrefsPanel;
+class QLabel;
+class QVBoxLayout;
+
+class PrefsItemData : public QObject
+{
+public:
+    PrefsItemData()
+    { panel = NULL; i_object_id = 0; i_subcat_id = -1; };
+    virtual ~PrefsItemData() {};
+    PrefsPanel *panel;
+    int i_object_id;
+    int i_subcat_id;
+    int i_type;
+    bool b_submodule;
+    QString name;
+    QString help;
+};
+
+Q_DECLARE_METATYPE( PrefsItemData* );
 
 class PrefsTree : public QTreeWidget
 {
     Q_OBJECT;
 public:
-    PrefsTree();
+    PrefsTree( intf_thread_t *, QWidget * );
     virtual ~PrefsTree();
-}
+
+    void ApplyAll();
+    void CleanAll();
+
+private:
+    void DoAll( bool );
+    intf_thread_t *p_intf;
+};
+
+class ConfigControl;
+
+class PrefsPanel : public QWidget
+{
+    Q_OBJECT
+public:
+    PrefsPanel( intf_thread_t *, QWidget *, PrefsItemData * );
+    PrefsPanel( QWidget *);
+    virtual ~PrefsPanel() {};
+    void Apply();
+    void Clean();
+private:
+    intf_thread_t *p_intf;
+    QList<ConfigControl *> controls;
+    QLabel *some_hidden_text;
+    QVBoxLayout *global_layout;
+    bool advanced;
+public slots:
+    void setAdvanced( bool );
+};
+
+#endif

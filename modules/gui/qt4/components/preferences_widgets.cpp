@@ -65,7 +65,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         if( !p_item->i_list )
             p_control = new StringConfigControl( p_this, p_item, parent,false );
         else
-            abort();
+            fprintf(stderr, "GRAA\n" );
         break;
     default:
         break;
@@ -88,7 +88,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
     label->setToolTip( p_item->psz_longtext );
 
     QHBoxLayout *layout = new QHBoxLayout();
-    layout->addWidget( label ); layout->addWidget( text );
+    layout->addWidget( label, 0 ); layout->addWidget( text, 1 );
     setLayout( layout );
 }
 

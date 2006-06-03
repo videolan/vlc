@@ -24,6 +24,7 @@
 #include "qt4.hpp"
 #include <QEvent>
 #include "dialogs/playlist.hpp"
+#include "dialogs/prefs_dialog.hpp"
 #include "dialogs/streaminfo.hpp"
 #include <QApplication>
 
@@ -94,6 +95,7 @@ void DialogsProvider::streaminfoDialog()
 
 void DialogsProvider::prefsDialog()
 {
+    PrefsDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::messagesDialog()
