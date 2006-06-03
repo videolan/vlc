@@ -59,6 +59,11 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     setColumnCount( 1 );
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
+    setAlternatingRowColors( true );
+
+    QFont f = font();
+    f.setPointSize( f.pointSize() + 1 );
+    setFont( f );
 
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b##_xpm ))
     BI( audio, audio );
@@ -346,6 +351,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             msg_Warn( p_intf, "unable to create preferences (main not found)");
             return;
         }
+        vlc_list_release( p_list );
     }
 
     if( p_module->b_submodule )

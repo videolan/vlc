@@ -42,6 +42,10 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      setWindowTitle( _("Preferences" ) );
      resize( 800, 450 );
 
+     QPalette plt( palette() );
+     plt.setColor( QPalette::Active, QPalette::Highlight, Qt::gray );
+     setPalette( plt );
+
      advanced_tree = NULL;
      simple_tree = NULL;
      simple_panel = NULL;
@@ -53,7 +57,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      types = new QGroupBox( "Show settings" );
      QHBoxLayout *tl = new QHBoxLayout();
      tl->setSpacing( 3 );
-     small = new QRadioButton( "Common", types );
+     small = new QRadioButton( "Basic", types );
      all = new QRadioButton( "All", types );
      tl->addWidget( small );
      tl->addWidget( all );
