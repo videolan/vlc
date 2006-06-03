@@ -60,13 +60,14 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      types->setLayout(tl );
 
      layout->addLayout( vertical, 1 );
-     setAll();
 
      all->setChecked( true );
 
      main_layout->addLayout( layout );
      adv_chk = new QCheckBox("Advanced options");
      main_layout->addWidget( adv_chk );
+
+     setAll();
 
      QObject::connect( adv_chk, SIGNAL( toggled(bool) ), this,
                        SLOT( setAdvanced( bool ) ) );

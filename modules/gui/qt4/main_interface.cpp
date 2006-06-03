@@ -26,6 +26,7 @@
 #include "dialogs_provider.hpp"
 #include <QCloseEvent>
 #include <assert.h>
+#include <QPushButton>
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) :
                             QWidget( NULL ), p_intf( _p_intf)
@@ -36,6 +37,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) :
     /* Init input manager */
     p_input = NULL;
     main_input_manager = new InputManager( this, p_intf );
+
+    QPushButton *button = new QPushButton( "prefs", this );
+
+    QObject::connect( button, SIGNAL( clicked() ),
+              DialogsProvider::getInstance(p_intf), SLOT( prefsDialog() ) );
+
 }
 
 void MainInterface::init()
