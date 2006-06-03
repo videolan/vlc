@@ -158,29 +158,6 @@ void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl,
 
 void GenericLayout::resize( int width, int height )
 {
-    // Check boundaries
-    if( width < m_minWidth )
-    {
-        width = m_minWidth;
-    }
-    if( width > m_maxWidth )
-    {
-        width = m_maxWidth;
-    }
-    if( height < m_minHeight )
-    {
-        height = m_minHeight;
-    }
-    if( height > m_maxHeight )
-    {
-        height = m_maxHeight;
-    }
-
-    if( width == m_width && height == m_height )
-    {
-        return;
-    }
-
     // Update the window size
     m_width = width;
     m_height = height;

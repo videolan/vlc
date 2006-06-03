@@ -27,24 +27,20 @@
 
 #include "ctrl_flat.hpp"
 #include "../commands/cmd_generic.hpp"
+#include "../src/window_manager.hpp"
 #include "../utils/fsm.hpp"
+
+class WindowManager;
 
 
 /// Control decorator for resizing windows
 class CtrlResize: public CtrlFlat
 {
     public:
-        enum Direction_t
-        {
-            kResizeE,   // East
-            kResizeSE,  // South-East
-            kResizeS,   // South
-            kNone       // Reserved for internal use
-        };
-
-        CtrlResize( intf_thread_t *pIntf, CtrlFlat &rCtrl,
-                    GenericLayout &rLayout, const UString &rHelp,
-                    VarBool *pVisible, Direction_t direction );
+        CtrlResize( intf_thread_t *pIntf, WindowManager &rWindowManager,
+                    CtrlFlat &rCtrl, GenericLayout &rLayout,
+                    const UString &rHelp, VarBool *pVisible,
+                    WindowManager::Direction_t direction );
         virtual ~CtrlResize() {}
 
         /// Handle an event
@@ -68,6 +64,8 @@ class CtrlResize: public CtrlFlat
 
     private:
         FSM m_fsm;
+        /// Window manager
+        WindowManager &m_rWindowManager;
         /// Decorated CtrlFlat
         CtrlFlat &m_rCtrl;
         /// The layout resized by this control
@@ -77,10 +75,10 @@ class CtrlResize: public CtrlFlat
         /// Position of the click that started the resizing
         int m_xPos, m_yPos;
         /// Direction of the resizing
-        Direction_t m_direction;
+        WindowManager::Direction_t m_direction;
 
         /// Change the cursor, based on the given direction
-        void changeCursor( Direction_t direction ) const;
+        void changeCursor( WindowManager::Direction_t direction ) const;
 
         /// Callback objects
         DEFINE_CALLBACK( CtrlResize, OutStill )

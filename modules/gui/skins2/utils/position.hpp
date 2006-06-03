@@ -95,6 +95,9 @@ class Position
         /// Get the size of the rectangle
         int getWidth() const;
         int getHeight() const;
+        /// Get the reference corners
+        Ref_t getRefLeftTop() const { return m_refLeftTop; }
+        Ref_t getRefRightBottom() const { return m_refRighBottom; }
 
     private:
         /// Position and reference edge/corner

@@ -26,6 +26,7 @@
 #include "../src/vout_window.hpp"
 #include "../src/os_graphics.hpp"
 #include "../src/vlcproc.hpp"
+#include "../src/window_manager.hpp"
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_resize.hpp"
 
@@ -106,11 +107,18 @@ void CtrlVideo::onUpdate( Subject<VarBox, void *> &rVoutSize, void *arg )
     int newHeight = ((VarBox&)rVoutSize).getHeight() + m_yShift;
 
     // Create a resize command
-    CmdGeneric *pCmd = new CmdResize( getIntf(), m_rLayout, newWidth,
-                                      newHeight );
+    // FIXME: this way of getting the window manager kind of sucks
+    WindowManager &rWindowManager =
+        getIntf()->p_sys->p_theme->getWindowManager();
+    rWindowManager.startResize( m_rLayout, WindowManager::kResizeSE );
+    CmdGeneric *pCmd = new CmdResize( getIntf(), rWindowManager,
+                                      m_rLayout, newWidth, newHeight );
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
     pQueue->push( CmdGenericPtr( pCmd ) );
+
+    // FIXME: this should be a command too
+    rWindowManager.stopResize();
 }
 
 

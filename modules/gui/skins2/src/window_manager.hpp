@@ -44,6 +44,15 @@ class Popup;
 class WindowManager: public SkinObject
 {
     public:
+        /// Direction of the resizing
+        enum Direction_t
+        {
+            kResizeE,   // East
+            kResizeSE,  // South-East
+            kResizeS,   // South
+            kNone       // Reserved for internal use
+        };
+
         /// Constructor
         WindowManager( intf_thread_t *pIntf);
 
@@ -57,22 +66,38 @@ class WindowManager: public SkinObject
         /// Remove a previously registered window
         void unregisterWindow( TopWindow &rWindow );
 
-        /// Tell the window manager that a move is initiated for pWindow.
+        /// Tell the window manager that a move is initiated for rWindow
         void startMove( TopWindow &rWindow );
 
-        /// Tell the window manager that the current move ended.
+        /// Tell the window manager that the current move ended
         void stopMove();
 
-        /// Move the pWindow window to (left, top), and move all its
-        /// anchored windows.
-        /// If a new anchoring is detected, the windows will move accordingly.
+        /**
+         * Move the rWindow window to (left, top), and move all its
+         * anchored windows.
+         * If a new anchoring is detected, the windows will move accordingly.
+         */
         void move( TopWindow &rWindow, int left, int top ) const;
+
+        /// Tell the window manager that a resize is initiated for rWindow
+        void startResize( GenericLayout &rLayout, Direction_t direction );
+
+        /// Tell the window manager that the current resizing ended
+        void stopResize();
+
+        /**
+         * Resize the rWindow window to (width, height), and move all its
+         * anchored windows, if some anchors are moved during the resizing.
+         * If a new anchoring is detected, the windows will move (or resize)
+         * accordingly.
+         */
+        void resize( GenericLayout &rLayout, int width, int height ) const;
 
         /// Raise all the registered windows
         void raiseAll() const;
 
         /// Show all the registered windows
-        void showAll(bool firstTime = false) const;
+        void showAll( bool firstTime = false ) const;
 
         /// Hide all the registered windows
         void hideAll() const;
@@ -142,6 +167,15 @@ class WindowManager: public SkinObject
         /// Store the moving windows; this set is updated at every start of
         /// move.
         WinSet_t m_movingWindows;
+        /**
+         * Store the moving windows in the context of resizing
+         * These sets are updated at every start of move
+         */
+        //@{
+        WinSet_t m_resizeMovingE;
+        WinSet_t m_resizeMovingS;
+        WinSet_t m_resizeMovingSE;
+        //@}
         /// Indicate whether the windows are currently on top
         VariablePtr m_cVarOnTop;
         /// Magnetism of the screen edges (= scope of action)
@@ -150,6 +184,8 @@ class WindowManager: public SkinObject
         int m_alpha;
         /// Alpha value of the moving windows
         int m_moveAlpha;
+        /// Direction of the current resizing
+        Direction_t m_direction;
         /// Tooltip
         Tooltip *m_pTooltip;
         /// Active popup, if any

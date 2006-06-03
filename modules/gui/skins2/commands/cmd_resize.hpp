@@ -27,6 +27,7 @@
 
 #include "cmd_generic.hpp"
 
+class WindowManager;
 class GenericLayout;
 
 
@@ -35,8 +36,8 @@ class CmdResize: public CmdGeneric
 {
     public:
         /// Resize the given layout
-        CmdResize( intf_thread_t *pIntf, GenericLayout &rLayout, int width,
-                   int height );
+        CmdResize( intf_thread_t *pIntf, const WindowManager &rWindowManager,
+                   GenericLayout &rLayout, int width, int height );
         virtual ~CmdResize() {}
 
         /// This method does the real job of the command
@@ -46,6 +47,7 @@ class CmdResize: public CmdGeneric
         virtual string getType() const { return "resize"; }
 
     private:
+        const WindowManager &m_rWindowManager;
         GenericLayout &m_rLayout;
         int m_width, m_height;
 };

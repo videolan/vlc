@@ -379,6 +379,12 @@ difficulty to understand how VLC skins work.</para>
     <para>...</para>
     <para>Default value: 0</para>
   </sect4>
+  <sect4 id="anchorlefttop">
+    <title>lefttop</title>
+    <para>Indicate to which corner of the Layout the top-left-hand corner of this anchor is attached, in case of resizing. Possible values are 'lefttop', 'leftbottom', 'righttop' and 'rightbottom'.</para>
+    <para>Note that there is no "rightbottom" attribute for the anchors (contrarily to normal controls), because an anchor is not resizable (even when the anchor is not ponctual and follows a Bezier curve).</para>
+    <para>Default value: lefttop</para>
+  </sect4>
   <sect4 id="anchorpriority">
     <title>priority</title>
     <para>Priority of anchor (see the previous description).</para>

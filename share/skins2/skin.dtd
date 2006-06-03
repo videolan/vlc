@@ -99,6 +99,7 @@
     <!ATTLIST Anchor
         x           CDATA   "0"
         y           CDATA   "0"
+        lefttop     CDATA   "lefttop"
         priority    CDATA   #REQUIRED
         points      CDATA   "(0,0)"
         range       CDATA   "10"

@@ -186,11 +186,12 @@ m_id( id ), m_width( width ), m_height( height ), m_minWidth( minWidth ), m_maxW
     /// Type definition
     struct Anchor
     {
-        Anchor( int xPos, int yPos, int range, int priority, const string & points, const string & layoutId ):
-m_xPos( xPos ), m_yPos( yPos ), m_range( range ), m_priority( priority ), m_points( points ), m_layoutId( layoutId ) {}
+        Anchor( int xPos, int yPos, const string & leftTop, int range, int priority, const string & points, const string & layoutId ):
+m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_range( range ), m_priority( priority ), m_points( points ), m_layoutId( layoutId ) {}
 
         int m_xPos;
         int m_yPos;
+        string m_leftTop;
         int m_range;
         int m_priority;
         string m_points;

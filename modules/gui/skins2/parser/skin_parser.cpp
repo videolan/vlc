@@ -88,12 +88,14 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         RequireDefault( "priority" );
         CheckDefault( "x", "0" );
         CheckDefault( "y", "0" );
+        CheckDefault( "lefttop", "lefttop" );
         CheckDefault( "points", "(0,0)" );
         CheckDefault( "range", "10" );
 
         const BuilderData::Anchor anchor( atoi( attr["x"] ) + m_xOffset,
-                atoi( attr["y"] ) + m_yOffset, atoi( attr["range"] ),
-                atoi( attr["priority"] ), attr["points"], m_curLayoutId );
+                atoi( attr["y"] ) + m_yOffset, attr["lefttop"],
+                atoi( attr["range"] ), atoi( attr["priority"] ),
+                attr["points"], m_curLayoutId );
         m_pData->m_listAnchor.push_back( anchor );
     }
 

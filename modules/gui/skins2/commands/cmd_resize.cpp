@@ -24,13 +24,14 @@
 
 #include "cmd_resize.hpp"
 #include "../src/generic_layout.hpp"
+#include "../src/window_manager.hpp"
 #include "../src/vlcproc.hpp"
 
 
-CmdResize::CmdResize( intf_thread_t *pIntf, GenericLayout &rLayout, int width,
-                      int height ):
-    CmdGeneric( pIntf ), m_rLayout( rLayout ), m_width( width ),
-    m_height( height )
+CmdResize::CmdResize( intf_thread_t *pIntf, const WindowManager &rWindowManager,
+                      GenericLayout &rLayout, int width, int height ):
+    CmdGeneric( pIntf ), m_rWindowManager( rWindowManager ),
+    m_rLayout( rLayout ), m_width( width ), m_height( height )
 {
 }
 
@@ -38,7 +39,7 @@ CmdResize::CmdResize( intf_thread_t *pIntf, GenericLayout &rLayout, int width,
 void CmdResize::execute()
 {
     // Resize the layout
-    m_rLayout.resize( m_width, m_height );
+    m_rWindowManager.resize( m_rLayout, m_width, m_height );
 }
 
 

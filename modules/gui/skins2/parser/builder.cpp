@@ -38,6 +38,7 @@
 #include "../src/generic_layout.hpp"
 #include "../src/popup.hpp"
 #include "../src/theme.hpp"
+#include "../src/window_manager.hpp"
 #include "../commands/cmd_generic.hpp"
 #include "../controls/ctrl_button.hpp"
 #include "../controls/ctrl_checkbox.hpp"
@@ -377,8 +378,13 @@ void Builder::addAnchor( const BuilderData::Anchor &rData )
     }
     m_pTheme->m_curves.push_back( BezierPtr( pCurve ) );
 
-    Anchor *pAnc = new Anchor( getIntf(), rData.m_xPos, rData.m_yPos,
-                               rData.m_range, rData.m_priority,
+    // Compute the position of the anchor
+    const Position pos = makePosition( rData.m_leftTop, rData.m_leftTop,
+                                       rData.m_xPos, rData.m_yPos,
+                                       pCurve->getWidth(),
+                                       pCurve->getHeight(), *pLayout );
+
+    Anchor *pAnc = new Anchor( getIntf(), pos, rData.m_range, rData.m_priority,
                                *pCurve, *pLayout );
     pLayout->addAnchor( pAnc );
 }
@@ -559,23 +565,26 @@ void Builder::addImage( const BuilderData::Image &rData )
     }
     else if( rData.m_actionId == "resizeS" )
     {
-        CtrlResize *pResize = new CtrlResize( getIntf(), *pImage, *pLayout,
+        CtrlResize *pResize = new CtrlResize( getIntf(),
+                m_pTheme->getWindowManager(), *pImage, *pLayout,
                 UString( getIntf(), rData.m_help.c_str() ), pVisible,
-                CtrlResize::kResizeS );
+                WindowManager::kResizeS );
         pLayout->addControl( pResize, pos, rData.m_layer );
     }
     else if( rData.m_actionId == "resizeE" )
     {
-        CtrlResize *pResize = new CtrlResize( getIntf(), *pImage, *pLayout,
+        CtrlResize *pResize = new CtrlResize( getIntf(),
+                m_pTheme->getWindowManager(), *pImage, *pLayout,
                 UString( getIntf(), rData.m_help.c_str() ), pVisible,
-                CtrlResize::kResizeE );
+                WindowManager::kResizeE );
         pLayout->addControl( pResize, pos, rData.m_layer );
     }
     else if( rData.m_actionId == "resizeSE" )
     {
-        CtrlResize *pResize = new CtrlResize( getIntf(), *pImage, *pLayout,
+        CtrlResize *pResize = new CtrlResize( getIntf(),
+                m_pTheme->getWindowManager(), *pImage, *pLayout,
                 UString( getIntf(), rData.m_help.c_str() ), pVisible,
-                CtrlResize::kResizeSE );
+                WindowManager::kResizeSE );
         pLayout->addControl( pResize, pos, rData.m_layer );
     }
     else
