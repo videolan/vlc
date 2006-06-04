@@ -3,6 +3,7 @@
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
 exec_prefix_set=no
+datarootdir="@datarootdir@"
 
 release="@release@"
 debug="@debug@"

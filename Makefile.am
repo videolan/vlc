@@ -211,9 +211,11 @@ bin_SCRIPTS = vlc-config
 vlc-config: $(top_builddir)/config.status $(top_builddir)/vlc-config.in
 	$(SHELL) ./config.status --file=$@
 	chmod 0755 $@
+	touch $@
 
 vlc-config.in: vlc-config.in.in
 	./config.status --recheck
+	touch $@
 
 CLEANFILES = $(BUILT_SOURCES_clean) stamp-builtin
 DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
