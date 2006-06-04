@@ -199,9 +199,6 @@ while test $# -gt 0; do
       echo_plugin=yes
       cppflags="${cppflags} -D__VLC__ -D__PLUGIN__"
       ;;
-    pic)
-      echo "Warning: vlc-config does not use \"pic\" anymore." >&2
-      ;;
     builtin)
       echo_builtin=yes
       cppflags="${cppflags} -D__VLC__ -D__BUILTIN__"
@@ -311,7 +308,7 @@ fi
 #  - We are building something from the inside (builtin)
 #       - Link with builtins in place
 #  If you want something shared from the inside (binding),
-#  you need "builtin vlc pic"
+#  you need "builtin vlc"
 if test "${echo_libs}" = yes; then
   if test "${echo_builtin}" = yes; then
     for module in `echo "${builtins}"`; do
