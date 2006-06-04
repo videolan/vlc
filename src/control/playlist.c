@@ -46,7 +46,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
             libvlc_exception_raise( p_exception, "Unable to find item " );
             return;
         }
-        playlist_Control( p_instance->p_playlist, PLAYLIST_VIEWPLAY,
+        playlist_LockControl( p_instance->p_playlist, PLAYLIST_VIEWPLAY,
                           p_instance->p_playlist->status.p_node, p_item );
     }
     else

@@ -125,7 +125,7 @@ void libvlc_toggle_fullscreen( libvlc_input_t *p_input,
 }
 
 void
-libvlc_video_take_snapshot( libvlc_input_t *p_input, char *filepath,
+libvlc_video_take_snapshot( libvlc_input_t *p_input, char *psz_filepath,
                        libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_input, p_e );
@@ -148,7 +148,7 @@ libvlc_video_take_snapshot( libvlc_input_t *p_input, char *filepath,
         return NULL;
     }
    
-    snprintf( path, 255, "%s", filepath );
+    snprintf( path, 255, "%s", psz_filepath );
     var_SetString( p_vout, "snapshot-path", path );
     var_SetString( p_vout, "snapshot-format", "png" );
 
@@ -157,4 +157,28 @@ libvlc_video_take_snapshot( libvlc_input_t *p_input, char *filepath,
 
     return;
     
+}
+
+int libvlc_video_get_height( libvlc_input_t *p_input,
+                             libvlc_exception_t *p_e ) 
+{
+    vout_thread_t *p_vout1 = GetVout( p_input, p_e );
+    if( !p_vout1 )
+        return 0;
+
+    vlc_object_release( p_vout1 );
+
+    return p_vout1->i_window_height;
+}
+
+int libvlc_video_get_width( libvlc_input_t *p_input,
+                            libvlc_exception_t *p_e ) 
+{
+    vout_thread_t *p_vout1 = GetVout( p_input, p_e );
+    if( !p_vout1 )
+        return 0;
+
+    vlc_object_release( p_vout1 );
+
+    return p_vout1->i_window_width;
 }
