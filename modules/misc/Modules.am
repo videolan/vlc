@@ -12,3 +12,4 @@ SOURCES_gnutls = gnutls.c
 SOURCES_svg = svg.c
 SOURCES_msn = msn.c
 SOURCES_growl = growl.c
+SOURCES_notify = notify.c

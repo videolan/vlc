@@ -149,7 +149,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->input.b_eof = VLC_FALSE;
     p_input->input.i_cr_average = 0;
 
-    p_input->input.p_item->p_meta = vlc_meta_New();
+    if( !p_input->input.p_item->p_meta )
+        p_input->input.p_item->p_meta = vlc_meta_New();
     stats_ReinitInputStats( p_item->p_stats );
 
     /* No slave */

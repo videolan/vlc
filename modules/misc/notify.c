@@ -139,6 +139,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     p_playlist = (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
     if( !p_playlist ) return VLC_EGENERIC;
+
     p_input = p_playlist->p_input;
     vlc_object_release( p_playlist );
     if( !p_input ) return VLC_SUCCESS;
@@ -160,7 +161,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                   strdup( _("no album") );
     psz_title = strdup( p_input->input.p_item->psz_name );
     if( psz_title == NULL ) psz_title = strdup( N_("(no title)") );
-    snprintf( psz_tmp, MAX_LENGTH, "%s - %s - %s",
+    snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\n%s - %s",
               psz_title, psz_artist, psz_album );
     free( psz_title );
     free( psz_artist );
