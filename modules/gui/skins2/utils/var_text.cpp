@@ -192,7 +192,7 @@ void VarText::set( const UString &rText )
 }
 
 
-void VarText::onUpdate( Subject<VarPercent, void*> &rVariable, void *arg )
+void VarText::onUpdate( Subject<VarPercent> &rVariable, void *arg )
 {
     UString newText = get();
     // If the text has changed, notify the observers
@@ -204,7 +204,7 @@ void VarText::onUpdate( Subject<VarPercent, void*> &rVariable, void *arg )
 }
 
 
-void VarText::onUpdate( Subject<VarText,void*> &rVariable, void *arg )
+void VarText::onUpdate( Subject<VarText> &rVariable, void *arg )
 {
     UString newText = get();
     // If the text has changed, notify the observers

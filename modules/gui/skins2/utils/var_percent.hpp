@@ -32,7 +32,7 @@ class VarPercent;
 
 
 /// Percentage variable
-class VarPercent: public Variable, public Subject<VarPercent, void*>
+class VarPercent: public Variable, public Subject<VarPercent>
 {
     public:
         VarPercent( intf_thread_t *pIntf ): Variable( pIntf ), m_value( 0 ) {}

@@ -246,7 +246,7 @@ void CtrlCheckbox::onVarBoolUpdate( VarBool &rVariable )
 }
 
 
-void CtrlCheckbox::onUpdate( Subject<AnimBitmap, void*> &rBitmap, void *arg )
+void CtrlCheckbox::onUpdate( Subject<AnimBitmap> &rBitmap, void *arg )
 {
     notifyLayout();
 }

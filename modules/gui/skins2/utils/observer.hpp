@@ -32,7 +32,7 @@ template <class S, class ARG> class Observer;
 
 
 /// Template for subjects in the Observer design pattern
-template <class S, class ARG> class Subject
+template <class S, class ARG = void*> class Subject
 {
     public:
         virtual ~Subject() {}
@@ -87,7 +87,7 @@ template <class S, class ARG> class Subject
 
 
 /// Template for observers in the Observer design pattern
-template <class S, class ARG> class Observer
+template <class S, class ARG = void*> class Observer
 {
     public:
         virtual ~Observer() {}

@@ -189,7 +189,7 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
     notifyLayout();
 }
 
-void CtrlTree::onUpdate( Subject<VarPercent, void*> &rPercent, void* arg)
+void CtrlTree::onUpdate( Subject<VarPercent> &rPercent, void* arg)
 {
     // Determine what is the first item to display
     VarTree::Iterator it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();

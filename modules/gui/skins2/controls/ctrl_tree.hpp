@@ -123,7 +123,7 @@ class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update*>,
                                tree_update *);
 
         // Method called when the position variable of the tree is modified
-        virtual void onUpdate( Subject<VarPercent, void *> &rPercent , void *);
+        virtual void onUpdate( Subject<VarPercent> &rPercent , void *);
 
         /// Called when the position is set
         virtual void onPositionChange();

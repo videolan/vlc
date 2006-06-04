@@ -34,7 +34,7 @@
 
 
 /// List variable
-class VarList: public Variable, public Subject<VarList, void* >
+class VarList: public Variable, public Subject<VarList>
 {
     public:
         VarList( intf_thread_t *pIntf );

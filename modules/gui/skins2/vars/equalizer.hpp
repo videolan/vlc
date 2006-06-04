@@ -52,7 +52,7 @@ class EqualizerBands: public SkinObject, public Observer<VarPercent, void*>
         bool m_isUpdating;
 
         /// Callback for band updates
-        virtual void onUpdate( Subject<VarPercent, void*> &rBand , void *);
+        virtual void onUpdate( Subject<VarPercent> &rBand , void *);
 };
 
 

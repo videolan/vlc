@@ -122,7 +122,7 @@ class CtrlText: public CtrlGeneric, public Observer<VarText, void*>
         DEFINE_CALLBACK( CtrlText, UpdateText );
 
         /// Method called when the observed variable is modified
-        virtual void onUpdate( Subject<VarText,void*> &rVariable, void* );
+        virtual void onUpdate( Subject<VarText> &rVariable, void* );
 
         /// Display the text on the control
         void displayText( const UString &rText );

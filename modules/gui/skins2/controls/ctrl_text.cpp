@@ -211,7 +211,7 @@ void CtrlText::setText( const UString &rText, uint32_t color )
 }
 
 
-void CtrlText::onUpdate( Subject<VarText, void*> &rVariable, void* arg )
+void CtrlText::onUpdate( Subject<VarText> &rVariable, void* arg )
 {
     if( isVisible() )
     {

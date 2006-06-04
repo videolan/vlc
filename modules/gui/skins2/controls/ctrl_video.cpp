@@ -101,7 +101,7 @@ void CtrlVideo::draw( OSGraphics &rImage, int xDest, int yDest )
 }
 
 
-void CtrlVideo::onUpdate( Subject<VarBox, void *> &rVoutSize, void *arg )
+void CtrlVideo::onUpdate( Subject<VarBox> &rVoutSize, void *arg )
 {
     int newWidth = ((VarBox&)rVoutSize).getWidth() + m_xShift;
     int newHeight = ((VarBox&)rVoutSize).getHeight() + m_yShift;
