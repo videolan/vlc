@@ -305,7 +305,7 @@ else
 	      ;; \
 	  esac; \
 	done
-if BUILD_MOZILLA
+if BUILD_PIC
 	@z=\$\$(\$(VLC_CONFIG) --list builtin); \
 	for mod in \$(mods); do \
 	  case "\$\$z " \
@@ -345,7 +345,7 @@ else
 	      ;; \
 	  esac; \
 	done
-if BUILD_MOZILLA
+if BUILD_PIC
 	@z=\$\$(\$(VLC_CONFIG) --list builtin); \
 	for mod in \$(mods); do \
 	  case "\$\$z " \

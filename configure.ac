@@ -841,7 +841,7 @@ fi
 
 dnl Check for dbus
 AC_ARG_ENABLE(dbus,
-  [  --enable-dbus            Linux D-BUS message bus system (default enabled)])
+  [  --enable-dbus           Linux D-BUS message bus system (default enabled)])
  
 if test "${enable_dbus}" != "no"
 then
@@ -1514,7 +1514,7 @@ dnl Libnotify notification plugin
 dnl
 
 AC_ARG_ENABLE(notify,
-  [  --enable-notify          libnotify notification plugin (default enabled)])
+  [  --enable-notify         libnotify notification plugin (default enabled)])
 AS_IF([test "${enable_notify}" != "no"], [
     PKG_CHECK_MODULES(NOTIFY, libnotify,
       [
@@ -1548,7 +1548,7 @@ then
   enable_live555="yes"
 fi
 AC_ARG_ENABLE(live555,
-[  --enable-live555     live555 RTSP input plugin (default disabled)])
+[  --enable-live555        live555 RTSP input plugin (default disabled)])
 if test "${enable_live555}" = "yes"; then
   AC_ARG_WITH(live555-tree,
     [    --with-live555-tree=PATH live.com tree for static linking])
@@ -4628,7 +4628,7 @@ dnl QT 4
 dnl
 enableqt4=false
 AC_ARG_ENABLE(qt4,
-  [  --enable-qt4      QT 4 support (default disabled) ],
+  [  --enable-qt4            QT 4 support (default disabled) ],
   [if test "${enable_qt4}" = "yes"; then
       PKG_CHECK_MODULES(QT4, QtCore QtGui,
   	[ VLC_ADD_PLUGINS([qt4])
@@ -5252,6 +5252,17 @@ AC_ARG_ENABLE(java-bindings,
   [  --enable-java-bindings  Enable Java bindings (default disabled)])
 AM_CONDITIONAL(BUILD_JAVA, [test "${enable_java_bindings}" = "yes"])
 if test "${enable_java_bindings}" = "yes"
+then
+  build_pic=yes
+fi
+
+dnl
+dnl  Enable pic libraries
+dnl
+AC_ARG_ENABLE(pic,
+  [  --enable-pic            Enable pic libraries (default disabled)])
+AM_CONDITIONAL(BUILD_PIC, [test "${enable_pic}" = "yes"])
+if test "${enable_pic}" = "yes"
 then
   build_pic=yes
 fi
