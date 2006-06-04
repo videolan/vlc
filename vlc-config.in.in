@@ -200,7 +200,7 @@ while test $# -gt 0; do
       cppflags="${cppflags} -D__VLC__ -D__PLUGIN__"
       ;;
     pic)
-      echo_pic=yes
+      echo "Warning: vlc-config does not use \"pic\" anymore." >&2
       ;;
     builtin)
       echo_builtin=yes
@@ -210,12 +210,7 @@ while test $# -gt 0; do
       ;;
     external)
       echo_external=yes
-      if test "x${echo_pic}" = "xno"
-      then
-        ldflags="${ldflags} -lvlc"
-      else
-        ldflags="${ldflags} -lvlc_pic"
-      fi
+      ldflags="${ldflags} -lvlc"
       ;;      
     *)
       module="$1"
@@ -270,11 +265,7 @@ if test "${echo_target}" = yes; then
     for module in `echo "${builtins}"`; do
       register_targets "${module}"
     done
-    if test "${echo_pic}" = yes; then
-      for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}_pic.a "; done
-    else
-      for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}.a "; done
-    fi
+    for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}.a "; done
     printf '\n'
   fi
   exit 0
@@ -315,7 +306,7 @@ fi
 # There are 4 possibilities
 #  - We are a plugin or a builtin
 #  - We are building from the outside (external):
-#	- Give full libvlc linkflags + -lvlc(_pic) (in libdir)
+#	- Give full libvlc linkflags + -lvlc (in libdir)
 # 	- Link with builtins in libdir
 #  - We are building something from the inside (builtin)
 #       - Link with builtins in place
@@ -327,22 +318,12 @@ if test "${echo_libs}" = yes; then
       register_targets "${module}"
       register_flags "${module}"
     done
-    if test "${echo_pic}" = yes; then
-      for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}_pic.a "; done
-    else
-      for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}.a "; done
-    fi
+    for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}.a "; done
   fi
   if test "${echo_external}" = yes; then
-    if test "${echo_pic}" = yes; then
-      for module in `echo "${builtins}"`; do
-        ldflags="${ldflags} @libdir@/vlc/lib${module}_pic.a"
-      done
-    else
-      for module in `echo "${builtins}"`; do
-        ldflags="${ldflags} @libdir@/vlc/lib${module}.a"
-      done
-    fi
+    for module in `echo "${builtins}"`; do
+      ldflags="${ldflags} @libdir@/vlc/lib${module}.a"
+    done
     for module in `echo "${builtins}"`; do
       register_flags "${module}"
     done
