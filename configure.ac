@@ -14,9 +14,7 @@ AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)
 AC_CANONICAL_SYSTEM
 
-dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
-dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.8.6-svn)
+AM_INIT_AUTOMAKE([1.7 check-news dist-bzip2])
 AM_CONFIG_HEADER(config.h)
 
 dnl Too many people are not aware of maintainer mode:
@@ -310,7 +308,7 @@ AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
   AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
-  INCLUDES="${INCLUDES} -I\$(top_builddir)/intl"
+  AM_CPPFLAGS="${AM_CPPFLAGS} -I\$(top_builddir)/intl"
   AS_IF([test "${enable_libtool}" != "no"], [
     INCLUDED_LIBINTL="${LTLIBINTL}"
   ],[
@@ -5447,7 +5445,7 @@ AC_SUBST(MOZILLA_SDK_PATH)
 AC_SUBST(XPIDL)
 AC_SUBST(XPIDL_INCL)
 AC_SUBST(LIBEXT)
-AC_SUBST(INCLUDES)
+AC_SUBST(AM_CPPFLAGS)
 AC_SUBST(ALL_LINGUAS)
 AC_SUBST(MACOSX_DEPLOYMENT_TARGET)
 AC_SUBST(FILE_LIBVLC_DLL)

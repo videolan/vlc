@@ -52,7 +52,7 @@ fi
 
 # Check for automake
 amvers="no"
-for v in "-1.9" "19" "-1.8" "18" "-1.7" "17" "-1.6" "16" "-1.5" "15"; do
+for v in "-1.9" "19" "-1.8" "18" "-1.7" "17"; do
   if automake${v} --version >/dev/null 2>&1; then
     amsuff="${v}"
     amvers="${v}"
@@ -66,15 +66,9 @@ if test "${amvers}" = "no" && automake --version > /dev/null 2>&1; then
 fi
 
 case "${amvers}" in
-  -1.6|16|1.6|1.6.0*|1.6.1*)
-    AUTOMAKESUCKS=yes
-    ;;
-  -1.5|15|1.5|1.5.*)
-    INSTALLSUCKS=yes
-    ;;
-  no|1.[01234]|1.[01234].*|1[01234])
+  no|1.[0123456]|1.[0123456].*|1[0123456])
     set +x
-    echo "$0: you need automake version 1.5 or later"
+    echo "$0: you need automake version 1.7 or later"
     exit 1
     ;;
 esac
@@ -467,7 +461,7 @@ ${autopoint} -f
 ${aclocal} ${ACLOCAL_ARGS}
 ${autoconf}
 ${autoheader}
-${automake} --add-missing --copy
+${automake} --add-missing --copy -Wall
 
 ##
 ##  files which need to be regenerated
@@ -500,28 +494,6 @@ if [ "$PKGCONFIG" = "no" ]; then
 NOTE: you do not have the "pkg-config" utility on your system;
 detection of the Gtk-2.0 and GNOME 2.0 libraries will not be
 reliable.
-EOF
-fi
-
-if [ "$AUTOMAKESUCKS" = "yes" ]; then
-  cat << EOF
-
-=============================================================
-IMPORTANT NOTE: your version of automake has a bug which will
-prevent proper plugin compilation. Either compile VLC with
-the --disable-plugins flag, or use a version of automake newer
-than 1.6.1 (1.6.2 is OK, and so are the 1.5 series).
-EOF
-fi
-
-if [ "$INSTALLSUCKS" = "yes" ]; then
-  cat << EOF
-
-=============================================================
-IMPORTANT NOTE: your version of automake has a bug which will
-prevent proper installation. Do not use "make install" with this
-version of automake, or use a version of automake newer than 1.5
-(such as 1.6 or 1.7).
 EOF
 fi
 

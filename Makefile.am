@@ -47,10 +47,6 @@ endif
 # Tell aclocal to use -I m4. Wonder if it really works.
 ACLOCAL_AMFLAGS = -I m4
 
-# XXX: these flags could be set in configure.ac, but we set them here
-# because old versions of automake don't support them in configure.ac.
-AUTOMAKE_OPTIONS = dist-bzip2
-
 ###############################################################################
 # MacOS X project
 ###############################################################################

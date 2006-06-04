@@ -12,7 +12,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 TOUI = ui/input_stats
-UIH := $(TOUI:%=%.h)
+UIH = $(TOUI:%=%.h)
 
 TOMOC = main_interface \
 	dialogs_provider \
@@ -24,7 +24,7 @@ TOMOC = main_interface \
 	components/preferences_widgets \
 	components/preferences \
 	util/input_slider
-MOCCPP := $(TOMOC:%=%.moc.cpp)
+MOCCPP = $(TOMOC:%=%.moc.cpp)
 
 nodist_SOURCES_qt4 = \
 		main_interface.moc.cpp \
