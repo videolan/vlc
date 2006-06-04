@@ -1509,6 +1509,26 @@ AS_IF([test "${enable_growl}" != "no"], [
   ]
 )
 
+dnl
+dnl Libnotify notification plugin
+dnl
+
+AC_ARG_ENABLE(notify,
+  [  --enable-notify          libnotify notification plugin (default enabled)])
+AS_IF([test "${enable_notify}" != "no"], [
+    PKG_CHECK_MODULES(NOTIFY, libnotify,
+      [
+        VLC_ADD_PLUGINS([notify])
+        VLC_ADD_CFLAGS(notify, [$NOTIFY_CFLAGS])
+	VLC_ADD_LDFLAGS(notify, [$NOTIFY_LIBS])
+      ],[
+	AS_IF([test "${enable_notify}" = "yes"],[
+	       AC_MSG_WARN( libnotify not found) ])
+      ])
+  ])
+
+
+
 
 dnl
 dnl  Input plugins
