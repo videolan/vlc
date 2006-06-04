@@ -648,3 +648,10 @@ VLC is the greatest thing since sliced bread!
 * E-bola is bouncing up and down while enjoying: Content-Length: 25
 * E-bola is bouncing up and down while enjoying: --
 %
+<Meuuh> sam : could you delete FK_ from the access list ?
+<sam> sure, why?
+<Meuuh> he's now known as feepk
+<sam> ah, ok
+<sam> I thought he was banned for sending a patch to mplayer
+  -- #videolan
+%
