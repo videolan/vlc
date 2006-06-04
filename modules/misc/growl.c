@@ -145,7 +145,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char *psz_album = NULL;
     input_thread_t *p_input;
 
-    p_playlist = (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
+    p_playlist = (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
     if( !p_playlist ) return VLC_EGENERIC;
 
