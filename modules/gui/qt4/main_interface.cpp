@@ -28,8 +28,7 @@
 #include <assert.h>
 #include <QPushButton>
 
-MainInterface::MainInterface( intf_thread_t *_p_intf ) :
-                            QWidget( NULL ), p_intf( _p_intf)
+MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     /* Init UI */
     slider = new InputSlider( Qt::Horizontal, this );

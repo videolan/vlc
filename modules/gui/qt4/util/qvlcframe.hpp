@@ -24,13 +24,30 @@
 #define _QVLCFRAME_H_
 
 #include <QWidget>
+#include <QApplication>
+#include <QPlastiqueStyle>
 #include <vlc/vlc.h>
 
 class QVLCFrame : public QWidget
 {
 public:
     QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
-    {};
+    {
+        QStyle *style = qApp->style();
+        // Plastique is too dark.
+        /// theming ? getting KDE data ? ?
+        if( qobject_cast<QPlastiqueStyle *>(style) )
+        {
+            QPalette plt( palette() );
+            plt.setColor( QPalette::Active, QPalette::Highlight, Qt::gray );
+            QColor vlg = (Qt::lightGray);
+            vlg = vlg.toHsv();
+            vlg.setHsv( vlg.hue(), vlg.saturation(), 235  );
+            plt.setColor( QPalette::Active, QPalette::Window, vlg );
+            plt.setColor( QPalette::Inactive, QPalette::Window, vlg );
+            setPalette( plt );
+        }
+    };
     virtual ~QVLCFrame()   {};
 
     void toggleVisible()

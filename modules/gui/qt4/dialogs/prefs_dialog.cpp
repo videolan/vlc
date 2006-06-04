@@ -42,11 +42,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      setWindowTitle( _("Preferences" ) );
      resize( 800, 450 );
 
-     QPalette plt( palette() );
-     plt.setColor( QPalette::Active, QPalette::Highlight, Qt::gray );
-     setPalette( plt );
-
-     advanced_tree = NULL;
+          advanced_tree = NULL;
      simple_tree = NULL;
      simple_panel = NULL;
      advanced_panel = NULL;
