@@ -192,7 +192,7 @@ do
   extra_ltlibs=""
   for mod in $mods
   do
-    extra_libs="${extra_libs} lib${mod}_plugin.a lib${mod}.a lib${mod}_pic.a"
+    extra_libs="${extra_libs} lib${mod}_plugin.a lib${mod}.a"
     extra_ltlibs="${extra_ltlibs} lib${mod}_plugin.la lib${mod}_builtin.la"
   done
   rm -f "${makf}" && cat > "${makf}" << EOF
@@ -240,7 +240,6 @@ else
 	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
 	if test "\$(plugin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin\$(LIBEXT);; esac; done; fi; \\
 	if test "\$(builtin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}.a;; esac; done; fi; \\
-	if test "\$(pic)" = "pic"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_pic.a;; esac; done; fi; \\
 	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
 	test -z "\$\$fail"
 endif
@@ -305,17 +304,6 @@ else
 	      ;; \
 	  esac; \
 	done
-if BUILD_PIC
-	@z=\$\$(\$(VLC_CONFIG) --list builtin); \
-	for mod in \$(mods); do \
-	  case "\$\$z " \
-	    in *\ \$\${mod}\ *) \
-	      echo \$(INSTALL_DATA) "lib\$\${mod}_pic.a" "\$(DESTDIR)\$(libdir)/vlc/" ; \
-	      \$(INSTALL_DATA) "lib\$\${mod}_pic.a" "\$(DESTDIR)\$(libdir)/vlc/" || exit \$\$?; \
-	      ;; \
-	  esac; \
-	done
-endif
 endif
 
 uninstall-local:
@@ -345,17 +333,6 @@ else
 	      ;; \
 	  esac; \
 	done
-if BUILD_PIC
-	@z=\$\$(\$(VLC_CONFIG) --list builtin); \
-	for mod in \$(mods); do \
-	  case "\$\$z " \
-	    in *\ \$\${mod}\ *) \
-	      echo rm -f "\$(DESTDIR)\$(libdir)/vlc/lib\$\${mod}_pic.a" ; \
-	      rm -f "\$(DESTDIR)\$(libdir)/vlc/lib\$\${mod}_pic.a" || true; \
-	      ;; \
-	  esac; \
-	done
-endif
 endif
 
 EOF
@@ -409,17 +386,6 @@ lib${mod}_plugin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs plugin ${mod}\` \\
 	-rpath '\$(libvlcdir)' -module -shrext \$(LIBEXT)
 lib${mod}_plugin_la_LIBADD = \$(LTLIBVLC)
 
-lib${mod}_pic_a_SOURCES = \$(SOURCES_${mod})
-EOF
-    if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
-nodist_lib${mod}_pic_a_SOURCES = \$(nodist_SOURCES_${mod})
-EOF
-    fi
-    cat >> "${makf}" << EOF
-lib${mod}_pic_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin pic ${mod}\`
-lib${mod}_pic_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin pic ${mod}\`
-lib${mod}_pic_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin pic ${mod}\`
-
 lib${mod}_a_SOURCES = \$(SOURCES_${mod})
 lib${mod}_builtin_la_SOURCES = \$(SOURCES_${mod})
 EOF
@@ -429,9 +395,9 @@ nodist_lib${mod}_builtin_la_SOURCES = \$(nodist_SOURCES_${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
-lib${mod}_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
-lib${mod}_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
-lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
+lib${mod}_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin \$(pic) ${mod}\`
+lib${mod}_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin \$(pic) ${mod}\`
+lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin \$(pic) ${mod}\`
 lib${mod}_builtin_la_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
 lib${mod}_builtin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
 lib${mod}_builtin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
@@ -478,9 +444,7 @@ rm -f ltmain.sh libtool ltconfig
 # remove gettext cruft
 rm -f ABOUT-NLS
 rm -Rf intl
-# remove old vlc cruft
-rm -f m4/oldgettext.m4 stamp-pic configure.ac.in Modules.am
-# remove new vlc cruft
+# remove vlc cruft
 rm -f stamp-builtin stamp-h* mozilla/stamp-pic
 
 # Automake complains if these are not present

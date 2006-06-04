@@ -9,7 +9,7 @@ NULL =
 # which have makefiles with distribution information.
 #  - intl should come before modules and . because all the code uses gettext
 #  - modules should come before . because vlc needs the builtins
-#  - . should come before mozilla/bindings because the plugin needs libvlc_pic.a
+#  - . should come before mozilla/bindings because the plugin needs libvlc.a
 #  - po should come before . because VLC.app needs the pofiles
 #  - loader should come before modules because some plugins need it
 SUBDIRS = intl loader src modules po . mozilla bindings activex share m4 doc

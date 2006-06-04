@@ -131,14 +131,13 @@ if USE_LIBTOOL
 	while read cmd; do echo $$cmd; eval "($$cmd)" || exit $$? ; done
 endif
 if BUILD_SHARED
-	@if test "$(pic)" = "pic"; then ext="_pic.a"; else ext=".a"; fi ; \
-	for c in `$(VLC_CONFIG) --libs builtin`; do \
+	@for c in `$(VLC_CONFIG) --libs builtin`; do \
 		case $$c in \
 			../modules/*.a) echo $$c ;; \
 		esac ; \
 	done | \
 	sed -e 's/^\(.*\)\/\([^\/]*\)\.a$$/cd \1 \&\& $(MAKE) \2/g' | \
-	while read cmd; do echo $$cmd$$ext; eval "($$cmd$$ext)" || exit $$? ; done
+	while read cmd; do echo $$cmd.a; eval "($$cmd.a)" || exit $$? ; done
 endif
 	touch $@
 
@@ -150,11 +149,6 @@ libvlc_a_SOURCES = $(SOURCES_libvlc)
 libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
 libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
-
-libvlc_pic_a_SOURCES = $(SOURCES_libvlc)
-libvlc_pic_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic`
-libvlc_pic_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc pic`
-libvlc_pic_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc pic`
 
 libvlc_la_SOURCES = $(SOURCES_libvlc)
 libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
@@ -190,9 +184,6 @@ if USE_LIBTOOL
 lib_LTLIBRARIES = libvlc.la
 else
 lib_LIBRARIES = libvlc.a
-if BUILD_PIC
-lib_LIBRARIES += libvlc_pic.a
-endif
 endif
 
 if HAVE_WIN32
