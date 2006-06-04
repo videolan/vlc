@@ -146,9 +146,9 @@ endif
 ###############################################################################
 
 libvlc_a_SOURCES = $(SOURCES_libvlc)
-libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
-libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
-libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
+libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc $(pic)`
+libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc $(pic)`
+libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc $(pic)`
 
 libvlc_la_SOURCES = $(SOURCES_libvlc)
 libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
