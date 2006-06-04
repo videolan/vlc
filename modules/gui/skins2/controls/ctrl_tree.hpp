@@ -34,7 +34,7 @@ class GenericBitmap;
 
 /// Class for control tree
 class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update*>,
-    public Observer<VarPercent, void*>
+    public Observer<VarPercent>
 {
     public:
         CtrlTree( intf_thread_t *pIntf,

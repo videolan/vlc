@@ -35,7 +35,7 @@ class OSGraphics;
 class UString;
 
 
-class Tooltip: public SkinObject, public Observer<VarText, void*>
+class Tooltip: public SkinObject, public Observer<VarText>
 {
     public:
         /// Create a tooltip with the given font and delay (in milliseconds)

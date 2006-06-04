@@ -38,7 +38,7 @@ class VarText;
 
 
 /// Class for control text
-class CtrlText: public CtrlGeneric, public Observer<VarText, void*>
+class CtrlText: public CtrlGeneric, public Observer<VarText>
 {
     public:
         enum Align_t

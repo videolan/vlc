@@ -36,7 +36,7 @@ class CmdGeneric;
 
 
 /// Base class for checkbox controls
-class CtrlCheckbox: public CtrlGeneric, public Observer<AnimBitmap, void*>
+class CtrlCheckbox: public CtrlGeneric, public Observer<AnimBitmap>
 {
     public:
         /// Create a checkbox with 6 images

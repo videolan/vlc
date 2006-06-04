@@ -36,7 +36,7 @@ class VarPercent;
 
 
 /// Radial slider
-class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent, void*>
+class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent>
 {
     public:
         /// Create a radial slider with the given image, which must be

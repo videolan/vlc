@@ -34,7 +34,7 @@ class CmdGeneric;
 
 
 /// Base class for button controls
-class CtrlButton: public CtrlGeneric, public Observer<AnimBitmap, void*>
+class CtrlButton: public CtrlGeneric, public Observer<AnimBitmap>
 {
     public:
         /// Create a button with 3 images

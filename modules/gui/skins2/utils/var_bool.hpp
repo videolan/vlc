@@ -89,7 +89,7 @@ class VarBoolImpl: public VarBool
 
 
 /// Conjunction of two boolean variables (AND)
-class VarBoolAndBool: public VarBool, public Observer<VarBool, void*>
+class VarBoolAndBool: public VarBool, public Observer<VarBool>
 {
     public:
         VarBoolAndBool( intf_thread_t *pIntf, VarBool &rVar1, VarBool &rVar2 );
@@ -108,7 +108,7 @@ class VarBoolAndBool: public VarBool, public Observer<VarBool, void*>
 
 
 /// Disjunction of two boolean variables (OR)
-class VarBoolOrBool: public VarBool, public Observer<VarBool, void*>
+class VarBoolOrBool: public VarBool, public Observer<VarBool>
 {
     public:
         VarBoolOrBool( intf_thread_t *pIntf, VarBool &rVar1, VarBool &rVar2 );
@@ -127,7 +127,7 @@ class VarBoolOrBool: public VarBool, public Observer<VarBool, void*>
 
 
 /// Negation of a boolean variable (NOT)
-class VarNotBool: public VarBool, public Observer<VarBool, void*>
+class VarNotBool: public VarBool, public Observer<VarBool>
 {
     public:
         VarNotBool( intf_thread_t *pIntf, VarBool &rVar );

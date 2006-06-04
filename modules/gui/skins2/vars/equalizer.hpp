@@ -29,7 +29,7 @@
 
 
 /// Variable for graphical equalizer
-class EqualizerBands: public SkinObject, public Observer<VarPercent, void*>
+class EqualizerBands: public SkinObject, public Observer<VarPercent>
 {
     public:
         /// Number of bands

@@ -41,7 +41,7 @@ class VarBool;
 
 
 /// Base class for controls
-class CtrlGeneric: public SkinObject, public Observer<VarBool, void*>
+class CtrlGeneric: public SkinObject, public Observer<VarBool>
 {
     public:
         virtual ~CtrlGeneric();

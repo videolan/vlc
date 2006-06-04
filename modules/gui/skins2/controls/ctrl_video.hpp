@@ -30,7 +30,7 @@
 class VoutWindow;
 
 /// Control video
-class CtrlVideo: public CtrlGeneric, public Observer<VarBox, void*>
+class CtrlVideo: public CtrlGeneric, public Observer<VarBox>
 {
     public:
         CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,

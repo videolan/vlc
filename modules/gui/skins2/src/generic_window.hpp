@@ -42,7 +42,7 @@ class WindowManager;
 
 
 /// Generic window class
-class GenericWindow: public SkinObject, public Observer<VarBool, void*>
+class GenericWindow: public SkinObject, public Observer<VarBool>
 {
     private:
         friend class WindowManager;

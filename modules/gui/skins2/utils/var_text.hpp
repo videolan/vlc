@@ -33,8 +33,8 @@
 
 /// String variable
 class VarText: public Variable, public Subject<VarText>,
-               public Observer<VarPercent, void*>,
-               public Observer< VarText,void*>
+               public Observer<VarPercent>,
+               public Observer<VarText>
 {
     public:
         // Set substVars to true to replace "$X" variables in the text

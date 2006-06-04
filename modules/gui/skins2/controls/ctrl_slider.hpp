@@ -37,7 +37,7 @@ class VarPercent;
 
 
 /// Cursor of a slider
-class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent, void*>
+class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
 {
     public:
         /// Create a cursor with 3 images (which are NOT copied, be careful)
@@ -109,7 +109,7 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent, void*>
 
 
 /// Slider background
-class CtrlSliderBg: public CtrlGeneric, public Observer<VarPercent, void*>
+class CtrlSliderBg: public CtrlGeneric, public Observer<VarPercent>
 {
     public:
         CtrlSliderBg( intf_thread_t *pIntf,
