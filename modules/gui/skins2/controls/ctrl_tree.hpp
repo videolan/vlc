@@ -33,7 +33,7 @@ class GenericFont;
 class GenericBitmap;
 
 /// Class for control tree
-class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update*>,
+class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update>,
     public Observer<VarPercent>
 {
     public:
@@ -119,7 +119,7 @@ class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update*>,
         bool m_flat;
 
         /// Method called when the tree variable is modified
-        virtual void onUpdate( Subject<VarTree, tree_update*> &rTree ,
+        virtual void onUpdate( Subject<VarTree, tree_update> &rTree ,
                                tree_update *);
 
         // Method called when the position variable of the tree is modified

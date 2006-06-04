@@ -140,7 +140,7 @@ int CtrlTree::maxItems()
 }
 
 
-void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
+void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
                          tree_update *arg )
 {
     if( arg->i_type == 0 ) // Item update

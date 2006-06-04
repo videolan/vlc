@@ -42,7 +42,7 @@ typedef struct tree_update
 } tree_update;
 
 /// Tree variable
-class VarTree: public Variable, public Subject<VarTree, tree_update*>
+class VarTree: public Variable, public Subject<VarTree, tree_update>
 {
     public:
         VarTree( intf_thread_t *pIntf );
