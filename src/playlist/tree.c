@@ -155,27 +155,15 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     else
     {
         var_SetInteger( p_playlist, "item-deleted", p_root->p_input->i_id );
-
-        i_bottom = 0; i_top = p_playlist->i_all_size - 1;
-        i = i_top / 2;
-        while( p_playlist->pp_all_items[i]->p_input->i_id !=
-                  p_root->p_input->i_id &&   i_top > i_bottom )
+	for( i = 0 ; i< p_playlist->i_all_size; i ++ )
         {
-            if( p_playlist->pp_all_items[i]->p_input->i_id <
+            if( p_playlist->pp_all_items[i]->p_input->i_id == 
                                p_root->p_input->i_id )
-            {
-                i_bottom = i + 1;
-            }
-            else
-            {
-                i_top = i - 1;
-            }
-            i = i_bottom + ( i_top - i_bottom ) / 2;
-        }
-        if( p_playlist->pp_all_items[i]->p_input->i_id ==
-            p_root->p_input->i_id )
-        {
-            REMOVE_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size, i );
+	    {
+                REMOVE_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size,
+                             i );
+                break;
+	    }
         }
 
         /* Remove the item from its parent */
