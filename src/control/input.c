@@ -134,22 +134,12 @@ vlc_bool_t libvlc_input_will_play( libvlc_input_t *p_input,
         return VLC_FALSE;
     }
 
-    if ( !p_input_thread->b_die && !p_input_thread->b_dead )
-        return VLC_TRUE;
-
-    return VLC_FALSE;
-}
-
-vlc_bool_t libvlc_input_has_vout( libvlc_input_t *p_input,
-                                  libvlc_exception_t *p_e )
-{
-    vout_thread_t *p_vout = GetVout( p_input, p_e );
-
-    /* GetVout will raise the exception for us */
-    if( !p_vout )
+    if ( !p_input_thread->b_die && !p_input_thread->b_dead ) 
     {
-        return VLC_FALSE;
+        vlc_object_release( p_input_thread );
+        return VLC_TRUE;
     }
-
-    return VLC_TRUE;
+    
+    vlc_object_release( p_input_thread );
+    return VLC_FALSE;
 }

@@ -27,7 +27,7 @@
 #include <vlc/vout.h>
 #include <vlc/intf.h>
 
-vout_thread_t *GetVout( libvlc_input_t *p_input,
+static vout_thread_t *GetVout( libvlc_input_t *p_input,
                                libvlc_exception_t *p_exception )
 {
     input_thread_t *p_input_thread;
@@ -80,6 +80,9 @@ void libvlc_set_fullscreen( libvlc_input_t *p_input, int b_fullscreen,
     if( i_ret )
         libvlc_exception_raise( p_e,
                         "Unexpected error while setting fullscreen value" );
+
+    vlc_object_release( p_vout1 );
+
 }
 
 int libvlc_get_fullscreen( libvlc_input_t *p_input,
@@ -122,6 +125,9 @@ void libvlc_toggle_fullscreen( libvlc_input_t *p_input,
     if( i_ret )
         libvlc_exception_raise( p_e,
                         "Unexpected error while setting fullscreen value" );
+
+    vlc_object_release( p_vout1 );
+
 }
 
 void
@@ -181,4 +187,20 @@ int libvlc_video_get_width( libvlc_input_t *p_input,
     vlc_object_release( p_vout1 );
 
     return p_vout1->i_window_width;
+}
+
+vlc_bool_t libvlc_input_has_vout( libvlc_input_t *p_input,
+                                  libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_input, p_e );
+
+    /* GetVout will raise the exception for us */
+    if( !p_vout )
+    {
+        return VLC_FALSE;
+    }
+
+    vlc_object_release( p_vout );
+    
+    return VLC_TRUE;
 }
