@@ -1,9 +1,12 @@
 $Id$
 
-Changes between 0.8.5 and 0.8.6 (not released yet)
+Changes between 0.8.5 and 0.8.6-svn (not released yet)
 --------------------------------------------------
 Core support:
  * New playlist core
+
+Nix Port
+ * Notification plugin.
 
 Localization:
  * Add Czech 
