@@ -51,9 +51,12 @@ static vout_thread_t *GetVout( libvlc_input_t *p_input,
     p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
     if( !p_vout )
     {
+        vlc_object_release( p_input_thread );
         libvlc_exception_raise( p_exception, "No active video output" );
         return NULL;
     }
+    vlc_object_release( p_input_thread );
+    
     return p_vout;
 }
 /**********************************************************************
