@@ -5244,6 +5244,12 @@ dnl  Java bindings
 dnl
 AC_ARG_ENABLE(java-bindings,
   [  --enable-java-bindings  Enable Java bindings (default disabled)])
+if test "${enable-java-bindings}" = "yes"
+then
+  AC_PROG_JAVA_CC(javac)
+  AC_PROG_JAVAC
+  AC_PROG_JAVA
+fi
 AM_CONDITIONAL(BUILD_JAVA, [test "${enable_java_bindings}" = "yes"])
 
 dnl
