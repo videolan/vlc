@@ -27,7 +27,7 @@
 #include <vlc/vout.h>
 #include <vlc/intf.h>
 
-static vout_thread_t *GetVout( libvlc_input_t *p_input,
+vout_thread_t *GetVout( libvlc_input_t *p_input,
                                libvlc_exception_t *p_exception )
 {
     input_thread_t *p_input_thread;

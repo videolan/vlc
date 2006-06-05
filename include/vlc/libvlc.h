@@ -265,10 +265,11 @@ libvlc_input_t *libvlc_playlist_get_input( libvlc_instance_t *,
 void libvlc_input_free( libvlc_input_t * );
 
 /// \bug This might go away ... to be replaced by a broader system
-vlc_int64_t libvlc_input_get_length( libvlc_input_t *, libvlc_exception_t *);
-vlc_int64_t libvlc_input_get_time( libvlc_input_t *, libvlc_exception_t *);
-float libvlc_input_get_position( libvlc_input_t *, libvlc_exception_t *);
-vlc_bool_t libvlc_input_will_play( libvlc_input_t *, libvlc_exception_t *);
+vlc_int64_t libvlc_input_get_length     ( libvlc_input_t *, libvlc_exception_t *);
+vlc_int64_t libvlc_input_get_time       ( libvlc_input_t *, libvlc_exception_t *);
+float       libvlc_input_get_position   ( libvlc_input_t *, libvlc_exception_t *);
+vlc_bool_t  libvlc_input_will_play      ( libvlc_input_t *, libvlc_exception_t *);
+vlc_bool_t  libvlc_input_has_vout       ( libvlc_input_t *, libvlc_exception_t *);
 
 /** @} */
 

@@ -116,9 +116,7 @@ float libvlc_input_get_position( libvlc_input_t *p_input,
 vlc_bool_t libvlc_input_will_play( libvlc_input_t *p_input,
                                    libvlc_exception_t *p_exception) 
 {
-    
     input_thread_t *p_input_thread;
-    vlc_value_t val;
 
     if( !p_input )
     {
@@ -140,4 +138,18 @@ vlc_bool_t libvlc_input_will_play( libvlc_input_t *p_input,
         return VLC_TRUE;
 
     return VLC_FALSE;
+}
+
+vlc_bool_t libvlc_input_has_vout( libvlc_input_t *p_input,
+                                  libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_input, p_e );
+
+    /* GetVout will raise the exception for us */
+    if( !p_vout )
+    {
+        return VLC_FALSE;
+    }
+
+    return VLC_TRUE;
 }
