@@ -154,7 +154,7 @@ libvlc_video_take_snapshot( libvlc_input_t *p_input, char *psz_filepath,
     if( !p_input_thread )
     {
         libvlc_exception_raise( p_e, "Input does not exist" );
-        return NULL;
+        return;
     }
    
     snprintf( path, 255, "%s", psz_filepath );

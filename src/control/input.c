@@ -44,7 +44,7 @@ input_thread_t *libvlc_get_input_thread( libvlc_input_t *p_input,
     if( !p_input )
     {
         libvlc_exception_raise( p_e, "Input is NULL" );
-        return -1;
+        return NULL;
     }
 
     p_input_thread = (input_thread_t*)vlc_object_get(
