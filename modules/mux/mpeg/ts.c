@@ -113,7 +113,7 @@ static void    Close  ( vlc_object_t * );
 
 #define ALIGNMENT_TEXT N_("Data alignment")
 #define ALIGNMENT_LONGTEXT N_("Enforces alignment of all access units on " \
-  "PES boundaries. This is a waste of bandwidth.")
+  "PES boundaries. Disabling this might save some bandwidth but introduce incompatibilities.")
 
 #define SHAPING_TEXT N_("Shaping delay (ms)")
 #define SHAPING_LONGTEXT N_("Cut the " \
@@ -199,7 +199,7 @@ vlc_module_begin();
 #ifdef HAVE_DVBPSI_SDT
     add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, VLC_TRUE );
 #endif
-    add_bool( SOUT_CFG_PREFIX "alignment", 0, NULL, ALIGNMENT_TEXT,
+    add_bool( SOUT_CFG_PREFIX "alignment", VLC_TRUE, NULL, ALIGNMENT_TEXT,
               ALIGNMENT_LONGTEXT, VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL,SHAPING_TEXT,
