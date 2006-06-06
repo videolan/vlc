@@ -822,7 +822,7 @@ static void Run( intf_thread_t *p_intf )
                     {
                         ClearChannels( p_intf, p_vout );
                         vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
-                                      OSD_PAUSE_ICON );
+                                      OSD_PLAY_ICON );
                         playlist_Play( p_playlist );
                     }
                     vlc_object_release( p_playlist );
