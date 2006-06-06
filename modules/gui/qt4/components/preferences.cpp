@@ -24,6 +24,7 @@
 #include "components/preferences.hpp"
 #include "components/preferences_widgets.hpp"
 #include <vlc_config_cat.h>
+#include <assert.h>
 
 #include "pixmaps/audio.xpm"
 #include "pixmaps/video.xpm"
