@@ -379,11 +379,15 @@ static void Run( intf_thread_t *p_intf )
 
             if( i_action == ACTIONID_PAUSE )
             {
-                ClearChannels( p_intf, p_vout );
-                vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
-                              OSD_PAUSE_ICON );
-                val.i_int = PAUSE_S;
-                var_Set( p_input, "state", val );
+                var_Get( p_input, "state", &val );
+                if( val.i_int != PAUSE_S )
+                {
+                    ClearChannels( p_intf, p_vout );
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                                  OSD_PAUSE_ICON );
+                    val.i_int = PAUSE_S;
+                    var_Set( p_input, "state", val );
+                }
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_EXTRASHORT
                      && b_seekable )
