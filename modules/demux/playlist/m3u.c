@@ -189,7 +189,7 @@ static int Demux( demux_t *p_demux )
             if ( psz_artist && *psz_artist )
                 vlc_input_item_AddInfo( p_input, _(VLC_META_INFO_CAT),
                                         _(VLC_META_ARTIST), "%s", psz_artist );
-            fprintf( stderr, "Adding %s\n", p_input->psz_uri );
+            msg_Dbg( p_demux, "Adding %s\n", p_input->psz_uri );
             playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
                  p_item_in_category, (i_parent_id > 0 )? VLC_TRUE : VLC_FALSE,
                  PLAYLIST_APPEND );
