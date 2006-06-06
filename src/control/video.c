@@ -163,6 +163,7 @@ libvlc_video_take_snapshot( libvlc_input_t *p_input, char *psz_filepath,
 
     vout_Control( p_vout, VOUT_SNAPSHOT );
     vlc_object_release( p_vout );
+    vlc_object_release( p_input_thread );
 
     return;
     
