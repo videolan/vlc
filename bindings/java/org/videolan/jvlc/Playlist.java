@@ -1,4 +1,4 @@
-/*****************************************************************************
+ /*****************************************************************************
  * PlaylistIntf.java: The playlist interface
  *****************************************************************************
  *
@@ -48,70 +48,83 @@ public class Playlist implements PlaylistIntf {
     native private void _deleteItem(int itemID);
     
     native private int _itemsCount();
-    native private int _isPlaying();
+    native private int _isRunning();
     
+    native private boolean _inputIsPlaying();
+	native private boolean _inputHasVout();
 
 
-    public void play(int id, String[] options) {
+    public synchronized void play(int id, String[] options) {
         _play(id, options);
+        while (! _inputIsPlaying()) ;
     }
 
-    public void play() {
+    public synchronized void play() {
         play(-1, null);
     }
 
-    public void pause() {
+    public synchronized void pause() {
         _pause();
     }
 
-    public void stop() {
+    public synchronized void stop() {
         _stop();
 
     }
 
-    public boolean isPlaying() {
-         return (_isPlaying() == 0)? false : true ;
+    public boolean isRunning() {
+         return (_isRunning() == 0)? false : true ;
     }
 
-    public int itemsCount() {
+    public synchronized int itemsCount() {
         return _itemsCount();
     }
 
-    public void next() {
-        if (! isPlaying())
+    public synchronized void next() {
+        if (! isRunning())
             play();
         _next();
     }
 
-    public void prev() {
+    public synchronized void prev() {
+        if (! isRunning())
+            play();
         _prev();
     }
 
-    public void clear() {
-        if (! isPlaying())
-            play();
-        _clear();
+    public synchronized void clear() {
+	/*
+	 * This method has been commented out until
+	 * playlist_Clear has been fixed in vlc.
+	 */
+        //_clear();
     }
 
-    public int add(String uri, String name, String[] options) {
+    public synchronized int add(String uri, String name, String[] options) {
         return _playlist_add(uri, name, options);
     }
     
-    public int add(String uri, String name) {
+    public synchronized int add(String uri, String name) {
         return add(uri, name, null);
     }
 
-    public void addExtended() {
+    public synchronized void addExtended() {
     }
 
-    public void deleteItem(int itemID) {
+    public synchronized void deleteItem(int itemID) {
         _deleteItem(itemID);
     }
     
     public long getInstance() {
         return libvlcInstance;
     }
-
     
+    public synchronized boolean inputIsPlaying() {
+        return _inputIsPlaying();
+    }
+
+    public synchronized boolean inputHasVout() {
+        return _inputHasVout();
+    }
     
 }

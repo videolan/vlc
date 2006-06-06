@@ -30,6 +30,7 @@
 package org.videolan.jvlc;
 
 public interface InputIntf {
+    
     /**
      * This function returns the total length of the current file playing
      * in millis.
@@ -41,7 +42,8 @@ public interface InputIntf {
      * currently playing playlist item.
      */
     long getInputTime();
-    void getInputPosition();
+    long getInputPosition();
     void setInputTime();
     double getInputFPS();
+    
 }

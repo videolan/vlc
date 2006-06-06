@@ -38,15 +38,18 @@ public class JVLC implements JLibVLC {
 
     private long _instance;
     public Playlist playlist;
+    public Status status;	
     
     public JVLC() {
         _instance = createInstance();
         playlist = new Playlist( _instance );
+        status = new Status(this);
     }
     
     public JVLC(String[] args) {
         _instance = createInstance( args );
         playlist = new Playlist( _instance );
+        status = new Status(this);
     }
     
     /*
@@ -68,15 +71,19 @@ public class JVLC implements JLibVLC {
      *  Input native methods
      */
     private native long     _getInputLength();
+    private native long     _getInputPosition();
     private native long     _getInputTime();
 
     
     /*
      * Video native methods
      */
-    private native void _toggleFullscreen();
-    private native void _setFullscreen( boolean value);
-    private native boolean _getFullscreen();
+    private native void     _toggleFullscreen();
+    private native void     _setFullscreen( boolean value);
+    private native boolean  _getFullscreen();
+    private native int      _getVideoHeight();
+    private native int      _getVideoWidth();
+    private native void _getSnapshot(String filename);
  
     
     public boolean getMute() {
@@ -115,6 +122,16 @@ public class JVLC implements JLibVLC {
     	return _getFullscreen();        
     }
 
+    public int getVideoHeight() {
+        return _getVideoHeight();
+    }
+    
+
+    public int getVideoWidth() {
+        return _getVideoWidth();        
+    }
+
+    
     public long getInputLength() {
         return _getInputLength();        
     }
@@ -123,8 +140,8 @@ public class JVLC implements JLibVLC {
         return _getInputTime();
     }
 
-    public void getInputPosition() {
-        // TODO Auto-generated method stub
+    public long getInputPosition() {
+        return _getInputPosition();
         
     }
 
@@ -137,7 +154,7 @@ public class JVLC implements JLibVLC {
         // TODO Auto-generated method stub
         return 0;
     }
-
+    
     public long getInstance() {
         return _instance;
     }
@@ -147,6 +164,11 @@ public class JVLC implements JLibVLC {
      */
 	public Playlist getPlaylist() {
 		return playlist;
+	}
+    
+
+	public void getSnapshot(String filename) {
+		_getSnapshot(filename);
 	}
 
 }

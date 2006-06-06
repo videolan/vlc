@@ -1,4 +1,4 @@
-$Id$
+
             First of all, this is a *developers* only version
 
 
@@ -7,17 +7,17 @@ Usage
 
  In order to use these bindings you have to compile vlc from source. I
 recommend you to take the latest version from videolan svn repository
-by doing:
+(or use at least revison 15823) by doing:
 
 svn co svn://svn.videolan.org/vlc/trunk vlc-trunk
 
- bootstrap and configure. At the configure give the command:
+ bootstrap, clean and configure:
 
-./configure --enable-mozilla && make && make install
+./bootstrap && make distclean
+./configure --enable-java-bindings && make && make install
 
- to enable compilation of _pic version of libraries. If you give a
-prefix be sure to change the PREFIX variable in the Makefile from
- /usr/local to your prefix.
+ If you give a prefix be sure to change the PREFIX variable in the Makefile
+from /usr/local to your prefix.
 
  Once you've done with vlc you can run make in jvlc directory. Be sure
 you have gcj, gcjh and if you want to use the SUN Java compiler,
@@ -28,18 +28,11 @@ LIBJINCLUDES
 
  In the next releases I will automate this process.
 
- To run JVLC issue:
+ To run a Java VLC example issue:
 
 java -Djava.library.path=. VlcClient
 
  Be sure your ldconfig can find libjawt.so and libmawt.so or you will
 get linking errors when you run the program.
-
- To try the SWT version of the player, issue:
-
-javac -cp /usr/share/java/swt-gtk.jar:. SWTUglyPlayer.java
-java -cp /usr/share/java/swt-gtk.jar:. -Djava.library.path=.:/usr/lib/jni SWTUglyPlayer
-
- using the appropriate paths.
 
  Happy playing.

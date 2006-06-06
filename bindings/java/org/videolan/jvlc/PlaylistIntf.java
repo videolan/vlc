@@ -33,12 +33,15 @@ public interface PlaylistIntf {
     void play(int id, String[] options);
     void pause();
     void stop();
-    boolean isPlaying();
+    boolean isRunning();
     int itemsCount();
+    boolean inputIsPlaying();
     void next();
     void prev();
     void clear();
     int add(String uri, String name);
     void addExtended();
+    boolean inputHasVout();
+
 
 }

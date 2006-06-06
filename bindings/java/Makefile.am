@@ -4,7 +4,7 @@
 
 if BUILD_JAVA
 
-OBJECTS = org/videolan/jvlc/AudioIntf.class org/videolan/jvlc/InputIntf.class org/videolan/jvlc/PlaylistIntf.class org/videolan/jvlc/VideoIntf.class org/videolan/jvlc/JLibVLC.class org/videolan/jvlc/JVLC.class org/videolan/jvlc/JVLCCanvas.class org/videolan/jvlc/JVLCPanel.class org/videolan/jvlc/VLMIntf.class org/videolan/jvlc/Playlist.class 
+OBJECTS = org/videolan/jvlc/AudioIntf.class org/videolan/jvlc/InputIntf.class org/videolan/jvlc/PlaylistIntf.class org/videolan/jvlc/VideoIntf.class org/videolan/jvlc/JLibVLC.class org/videolan/jvlc/JVLC.class org/videolan/jvlc/JVLCCanvas.class org/videolan/jvlc/JVLCPanel.class org/videolan/jvlc/VLMIntf.class org/videolan/jvlc/Playlist.class org/videolan/jvlc/Status.class
 
 JNIHEADERS = org_videolan_jvlc_JVLC.h org_videolan_jvlc_JVLCCanvas.h org_videolan_jvlc_JVLCPanel.h
 
@@ -21,7 +21,7 @@ JCH = gcjh -jni
 
 # Compile flags
 JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
-JAVALDFLAGS = -L../../lib -lvlc_pic `top_builddir=../.. ../../vlc-config --libs builtin vlc pic`
+JAVALDFLAGS = -L../../src -lvlc `top_builddir=../.. ../../vlc-config --libs builtin vlc pic`
 
 # Build targets
 all: libjvlc.so VlcClient

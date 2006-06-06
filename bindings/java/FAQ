@@ -33,4 +33,4 @@ is really straightforward and simple to use.
 
 Try the software and report any errors or bugs you find to me. This application
 needs porting to MS/Windows and MacOS, if you are able to implement the JNI for
-these platform you may contribute the code.
+these platforms you may contribute the code.

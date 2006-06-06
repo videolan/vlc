@@ -33,5 +33,8 @@ public interface VideoIntf {
     void toggleFullscreen();
     void setFullscreen( boolean value );
     boolean getFullscreen();
+    void getSnapshot(String filepath);
+    int getVideoHeight();
+    int getVideoWidth();
     
 }
