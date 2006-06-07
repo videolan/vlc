@@ -34,3 +34,15 @@ is really straightforward and simple to use.
 Try the software and report any errors or bugs you find to me. This application
 needs porting to MS/Windows and MacOS, if you are able to implement the JNI for
 these platforms you may contribute the code.
+
+== 6. I have a compile error, what's the problem? ==
+
+Did you set the JAVA_HOME environment variable? If not, do:
+
+export JAVA_HOME=/path/to/jvm
+
+For example I added to my .bashrc:
+
+export JAVA_HOME=/usr/lib/j2sdk1.5-sun
+
+

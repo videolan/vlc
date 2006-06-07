@@ -11,9 +11,13 @@ recommend you to take the latest version from videolan svn repository
 
 svn co svn://svn.videolan.org/vlc/trunk vlc-trunk
 
- bootstrap, clean and configure:
+ bootstrap, clean, set environment variables, configure and build:
 
 ./bootstrap && make distclean
+
+export JAVA_HOME=/path/to/jvm 
+(for example i have JAVA_HOME=/usr/lib/j2sdk1.5-sun)
+
 ./configure --enable-java-bindings && make && make install
 
  If you give a prefix be sure to change the PREFIX variable in the Makefile
