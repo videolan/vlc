@@ -2609,8 +2609,8 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
      if test -f "${real_ffmpeg_tree}/libavcodec/libpostproc/libpostproc.a"; then
        VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec/libpostproc ${real_ffmpeg_tree}/libavcodec/libpostproc/libpostproc.a])	
-     elif test -f "${{real_ffmpeg_tree}/libpostproc/libpostproc.a"; then 
-	VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec/libpostproc ${+real_ffmpeg_tree}/libavcodec/libpostproc.a])
+     elif test -f "${real_ffmpeg_tree}/libpostproc/libpostproc.a"; then 
+	VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec/libpostproc ${real_ffmpeg_tree}/libavcodec/libpostproc.a])
      else
        dnl  The given libavcodec wasn't built with --enable-pp
        AC_MSG_RESULT(no)
