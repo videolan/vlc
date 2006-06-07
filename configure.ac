@@ -77,7 +77,7 @@ AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
 AC_ARG_ENABLE(libtool,
-    [  --enable-libtool        use libtool (default disabled, EXPERIMENTAL)],
+    [  --enable-libtool        use libtool (default disabled)],
     [],[enable_libtool="no"])
 AM_CONDITIONAL(USE_LIBTOOL, [test "${enable_libtool}" != "no"])
 
