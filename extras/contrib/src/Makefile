@@ -117,6 +117,9 @@ endif
 
 ifdef HAVE_DARWIN_OS
 X264CONF += --enable-pic
+ifneq ($(HOST),i686-apple-darwin8)
+FFMPEG_CFLAGS += -DHAVE_LRINTF
+endif
 endif
 
 # ***************************************************************************
@@ -915,7 +918,7 @@ ifdef HAVE_WINCE
 else
 .ffmpeg: ffmpeg .faac .lame
 endif
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-a52 --disable-ffplay && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-a52 --disable-ffplay && make install-libs install-headers)
 	touch $@
 
 CLEAN_FILE += .ffmpeg
