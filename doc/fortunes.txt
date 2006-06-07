@@ -655,3 +655,9 @@ VLC is the greatest thing since sliced bread!
 <sam> I thought he was banned for sending a patch to mplayer
   -- #videolan
 %
+< Dnumgis> Meuuh: munhoney is writing some fec system based on vlc
+< Meuuh> Dnumgis : a fuck system ? I may be interested !
+< Dnumgis> Meuuh: still single? :)
+< Meuuh> Dnumgis : and always will be
+  -- #videolan
+%
