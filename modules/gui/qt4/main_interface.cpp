@@ -31,15 +31,16 @@
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     /* Init UI */
-    slider = new InputSlider( Qt::Horizontal, this );
+    setWindowTitle( _("VLC media player") );
+    ui.setupUi( this );
+    slider = new InputSlider( Qt::Horizontal, ui.sliderBox );
+    QVBoxLayout *box_layout = new QVBoxLayout();
+    box_layout->addWidget( slider );
+    ui.sliderBox->setLayout( box_layout );
 
     /* Init input manager */
     p_input = NULL;
     main_input_manager = new InputManager( this, p_intf );
-
-//    QPushButton *button = new QPushButton( "prefs", this );
-//    connect( button, SIGNAL( clicked() ),
-//             DialogsProvider::getInstance(p_intf), SLOT( prefsDialog() ) );
 
     /* Get timer updates */
     connect( DialogsProvider::getInstance(NULL)->fixed_timer,
@@ -48,17 +49,75 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     connect( this, SIGNAL( inputChanged( input_thread_t * ) ),
              main_input_manager, SLOT( setInput( input_thread_t * ) ) );
 
-    /* Connect the slider and the input manager (both ways) */
+    /* Connect the input manager to the GUI elements it manages */
     connect( main_input_manager, SIGNAL(positionUpdated( float, int, int ) ),
              slider, SLOT( setPosition( float,int, int ) ) );
     connect( slider, SIGNAL( sliderDragged( float ) ),
              main_input_manager, SLOT( sliderUpdate( float ) ) );
+    connect( main_input_manager, SIGNAL( positionUpdated( float, int, int ) ),
+             this, SLOT( setDisplay( float, int, int ) ) );
 
-    /* Connect the display and the input manager */
+    /* Actions */
+    connect( ui.playButton, SLOT( clicked() ), this, SLOT( play() ) );
+    connect( ui.stopButton, SLOT( clicked() ), this, SLOT( stop() ) );
+    connect( ui.nextButton, SLOT( clicked() ), this, SLOT( next() ) );
+    connect( ui.prevButton, SLOT( clicked() ), this, SLOT( prev() ) );
 }
 
 MainInterface::~MainInterface()
 {
+}
+
+void MainInterface::stop()
+{
+    /// \todo store playlist globally
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( !p_playlist ) return;
+    playlist_Stop( p_playlist );
+    vlc_object_release( p_playlist );
+}
+void MainInterface::play()
+{
+    /// \todo store playlist globally
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( !p_playlist ) return;
+    playlist_Play( p_playlist );
+    vlc_object_release( p_playlist );
+}
+void MainInterface::prev()
+{
+    /// \todo store playlist globally
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( !p_playlist ) return;
+    playlist_Prev( p_playlist );
+    vlc_object_release( p_playlist );
+}
+void MainInterface::next()
+{
+    /// \todo store playlist globally
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( !p_playlist ) return;
+    playlist_Next( p_playlist );
+    vlc_object_release( p_playlist );
+}
+
+
+
+
+
+
+void MainInterface::setDisplay( float pos, int time, int length )
+{
+    char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
+    secstotimestr( psz_length, length );
+    secstotimestr( psz_time, time );
+    QString title;
+    title.sprintf( "%s/%s", psz_time, psz_length );
+    ui.sliderBox->setTitle( title );
 }
 
 void MainInterface::updateOnTimer()

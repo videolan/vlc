@@ -52,8 +52,8 @@ void InputManager::update()
     if( p_input->b_dead )
     {
         emit positionUpdated( 0.0, 0, 0 );
-	emit navigationChanged( 0 );
-	emit statusChanged( 0 ); // 0 = STOPPED, 1 = PAUSE, 2 = PLAY
+        emit navigationChanged( 0 );
+        emit statusChanged( 0 ); // 0 = STOPPED, 1 = PAUSE, 2 = PLAY
     }
 
     /* Update position */
@@ -71,14 +71,14 @@ void InputManager::update()
     {
         vlc_value_t val;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
-	if( val.i_int > 0 )
-   	    emit navigationChanged( 1 ); // 1 = chapter, 2 = title, 3 = NO
-	else
-	    emit navigationChanged( 2 );
+    if( val.i_int > 0 )
+        emit navigationChanged( 1 ); // 1 = chapter, 2 = title, 3 = NO
+    else
+        emit navigationChanged( 2 );
     }
     else
     {
-	emit navigationChanged( 0 );
+        emit navigationChanged( 0 );
     }
 
     /* Update text */
@@ -87,13 +87,13 @@ void InputManager::update()
         p_input->input.p_item->p_meta->psz_nowplaying &&
         *p_input->input.p_item->p_meta->psz_nowplaying )
     {
-	text.sprintf( "%s - %s", 
-        	      p_input->input.p_item->p_meta->psz_nowplaying,
-        	      p_input->input.p_item->psz_name );
+        text.sprintf( "%s - %s",
+                  p_input->input.p_item->p_meta->psz_nowplaying,
+                  p_input->input.p_item->psz_name );
     }
     else
     {
-	text.sprintf( "%s", p_input->input.p_item->psz_name );
+        text.sprintf( "%s", p_input->input.p_item->psz_name );
     }
     emit nameChanged( text );
 

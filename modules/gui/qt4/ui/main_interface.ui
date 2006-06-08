@@ -8,12 +8,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
-    <height>300</height>
+    <width>450</width>
+    <height>80</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Form</string>
+   <string>VLC media player</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
@@ -28,26 +28,40 @@
       <number>0</number>
      </property>
      <property name="spacing" >
-      <number>6</number>
+      <number>0</number>
      </property>
      <item>
-      <widget class="QFrame" name="sliderFrame" />
+      <widget class="QGroupBox" name="sliderBox" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>5</hsizetype>
+         <vsizetype>5</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title" >
+        <string>0:00:00/0:00:00</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
+      <widget class="QFrame" name="frame" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>0</hsizetype>
+         <vsizetype>5</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="sizeHint" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
+       <property name="frameShape" >
+        <enum>QFrame::StyledPanel</enum>
        </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QFrame" name="volumeFrame" />
+       <property name="frameShadow" >
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -61,13 +75,29 @@
      </property>
      <item>
       <widget class="QPushButton" name="prevButton" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>4</hsizetype>
+         <vsizetype>0</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text" >
         <string>Prev</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="playButton_2" >
+      <widget class="QPushButton" name="playButton" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>4</hsizetype>
+         <vsizetype>0</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text" >
         <string>Play</string>
        </property>
@@ -75,6 +105,14 @@
      </item>
      <item>
       <widget class="QPushButton" name="stopButton" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>4</hsizetype>
+         <vsizetype>0</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text" >
         <string>Stop</string>
        </property>
@@ -82,6 +120,14 @@
      </item>
      <item>
       <widget class="QPushButton" name="nextButton" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>4</hsizetype>
+         <vsizetype>0</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text" >
         <string>Next</string>
        </property>

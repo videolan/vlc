@@ -24,6 +24,7 @@
 #define _MAIN_INTERFACE_H_
 
 #include <vlc/intf.h>
+#include "ui/main_interface.h"
 #include "util/qvlcframe.hpp"
 
 class InputManager;
@@ -43,8 +44,15 @@ private:
     InputSlider *slider;
     /// Main input associated to the playlist
     input_thread_t *p_input;
+
+    Ui::MainInterfaceUI ui;
 private slots:
+    void setDisplay( float, int, int );
     void updateOnTimer();
+    void play();
+    void stop();
+    void prev();
+    void next();
 signals:
     void inputChanged( input_thread_t *);
 };
