@@ -107,12 +107,14 @@ static void Close( vlc_object_t *p_this )
     playlist_t *p_playlist = (playlist_t *)vlc_object_find(
         p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
+msg_Err(p_this, "before playlist");
     if( p_playlist )
     {
+msg_Err(p_this, "before delete callback");
         var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
         vlc_object_release( p_playlist );
     }
-
+msg_Err(p_this, "before uninit");
     notify_uninit();
 }
 
@@ -178,7 +180,7 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp )
     NotifyNotification * notification;
     notification = notify_notification_new( _("Now Playing"),
                              psz_temp,
-                             "/usr/share/pixmaps/vlc.png",NULL);
+                             DATA_PATH "/vlc128x128.png",NULL);
     notify_notification_set_timeout( notification,
                                      config_GetInt(p_this, "notify-timeout") );
     notify_notification_set_urgency( notification, NOTIFY_URGENCY_LOW );
