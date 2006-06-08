@@ -84,6 +84,11 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->p_ml_onelevel =  playlist_NodeCreate( p_playlist,
                            _( "Media Library" ), p_playlist->p_root_onelevel );
 
+    p_playlist->p_local_category->i_flags |= PLAYLIST_RO_FLAG;
+    p_playlist->p_ml_category->i_flags |= PLAYLIST_RO_FLAG;
+    p_playlist->p_local_onelevel->i_flags |= PLAYLIST_RO_FLAG;
+    p_playlist->p_ml_onelevel->i_flags |= PLAYLIST_RO_FLAG;
+
     /* This is a hack to find it later. Quite ugly, but I haven't found a
      * better way */
     p_playlist->p_local_onelevel->p_input->i_id =
@@ -127,7 +132,12 @@ void playlist_Destroy( playlist_t *p_playlist )
     var_Destroy( p_playlist, "loop" );
     var_Destroy( p_playlist, "activity" );
 
-    playlist_LockClear( p_playlist );
+    PL_LOCK;
+    playlist_NodeDelete( p_playlist, p_playlist->p_root_category, VLC_TRUE,
+                         VLC_TRUE );
+    playlist_NodeDelete( p_playlist, p_playlist->p_root_onelevel, VLC_TRUE,
+                         VLC_TRUE );
+    PL_UNLOCK;
 
     if( p_playlist->p_stats )
         free( p_playlist->p_stats );
