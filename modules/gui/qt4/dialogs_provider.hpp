@@ -41,8 +41,6 @@ public:
         return instance;
     }
     virtual ~DialogsProvider();
-
-    void init();
     QTimer *idle_timer;
     QTimer *fixed_timer;
 protected:

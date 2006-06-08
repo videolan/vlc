@@ -11,7 +11,7 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-TOUI = ui/input_stats
+TOUI = ui/input_stats ui/main_interface
 UIH = $(TOUI:%=%.h)
 
 TOMOC = main_interface \

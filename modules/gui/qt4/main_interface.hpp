@@ -36,7 +36,6 @@ class MainInterface : public QVLCFrame
 public:
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
-    void init();
 protected:
     void closeEvent( QCloseEvent *);
 private:

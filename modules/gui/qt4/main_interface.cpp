@@ -37,28 +37,22 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     p_input = NULL;
     main_input_manager = new InputManager( this, p_intf );
 
-    QPushButton *button = new QPushButton( "prefs", this );
+//    QPushButton *button = new QPushButton( "prefs", this );
+//    connect( button, SIGNAL( clicked() ),
+//             DialogsProvider::getInstance(p_intf), SLOT( prefsDialog() ) );
 
-    QObject::connect( button, SIGNAL( clicked() ),
-              DialogsProvider::getInstance(p_intf), SLOT( prefsDialog() ) );
-
-}
-
-void MainInterface::init()
-{
     /* Get timer updates */
-    QObject::connect( DialogsProvider::getInstance(NULL)->fixed_timer,
-                      SIGNAL( timeout() ), this, SLOT(updateOnTimer() ) );
+    connect( DialogsProvider::getInstance(NULL)->fixed_timer,
+             SIGNAL( timeout() ), this, SLOT(updateOnTimer() ) );
     /* Tell input manager about the input changes */
-    QObject::connect( this, SIGNAL( inputChanged( input_thread_t * ) ),
-                   main_input_manager, SLOT( setInput( input_thread_t * ) ) );
+    connect( this, SIGNAL( inputChanged( input_thread_t * ) ),
+             main_input_manager, SLOT( setInput( input_thread_t * ) ) );
 
     /* Connect the slider and the input manager (both ways) */
-    QObject::connect( main_input_manager, SIGNAL(positionUpdated(
-                      float, int, int ) ), slider, SLOT( setPosition( float,int,
-                      int ) ) );
-    QObject::connect( slider, SIGNAL( sliderDragged( float ) ),
-                      main_input_manager, SLOT( sliderUpdate( float ) ) );
+    connect( main_input_manager, SIGNAL(positionUpdated( float, int, int ) ),
+             slider, SLOT( setPosition( float,int, int ) ) );
+    connect( slider, SIGNAL( sliderDragged( float ) ),
+             main_input_manager, SLOT( sliderUpdate( float ) ) );
 
     /* Connect the display and the input manager */
 }

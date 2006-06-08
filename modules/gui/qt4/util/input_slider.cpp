@@ -37,22 +37,21 @@ InputSlider::InputSlider( Qt::Orientation q,QWidget *_parent ) :
     setSingleStep( 2 );
     setPageStep( 1000 );
     setTracking( true );
-    QObject::connect( this, SIGNAL( valueChanged(int) ), this,
-                      SLOT( userDrag( int ) ) );
+    connect( this, SIGNAL( valueChanged(int) ), this, SLOT( userDrag( int ) ) );
 }
 
 void InputSlider::setPosition( float pos, int a, int b )
 {
     if( pos == 0.0 )
     {
-	setEnabled( false );
+        setEnabled( false );
     }
     else
     {
-	setEnabled( true );
-	mymove = true;
-	setValue( (int)(pos * 1000.0 ) );
-	mymove = false;
+        setEnabled( true );
+        mymove = true;
+        setValue( (int)(pos * 1000.0 ) );
+        mymove = false;
     }
 }
 

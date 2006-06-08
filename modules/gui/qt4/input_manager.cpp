@@ -30,8 +30,8 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
 {
     p_input = NULL;
     /* Subscribe to updates */
-    QObject::connect( DialogsProvider::getInstance( p_intf )->fixed_timer,
-                      SIGNAL( timeout() ), this, SLOT( update() ) );
+    connect( DialogsProvider::getInstance( p_intf )->fixed_timer,
+             SIGNAL( timeout() ), this, SLOT( update() ) );
 }
 
 InputManager::~InputManager()

@@ -26,24 +26,15 @@
 #include "components/infopanels.hpp"
 #include "qt4.hpp"
 
-
 StreamInfoDialog *StreamInfoDialog::instance = NULL;
 
-StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf ) : QVLCFrame( p_intf )
+StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf ) :
+                                QVLCFrame( p_intf )
 {
-     setWindowTitle( _("Stream information" ) );
-//     InputStatsPanel *ISP = new InputStatsPanel( this, p_intf );
-
-     fprintf( stderr, "CONNECTING\n");
-
-
-     fprintf( stderr, "Done\n");
-}
-
-void StreamInfoDialog::init()
-{
-    QObject::connect( DialogsProvider::getInstance(NULL)->fixed_timer,
-    	              SIGNAL( timeout() ), this, SLOT(update() ) );
+    setWindowTitle( _("Stream information" ) );
+    InputStatsPanel *ISP = new InputStatsPanel( this, p_intf );
+    connect( DialogsProvider::getInstance(NULL)->fixed_timer,
+             SIGNAL( timeout() ), this, SLOT(update() ) );
 }
 
 void StreamInfoDialog::update()

@@ -69,12 +69,12 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
      setAll();
 
-     QObject::connect( adv_chk, SIGNAL( toggled(bool) ), this,
-                       SLOT( setAdvanced( bool ) ) );
+     connect( adv_chk, SIGNAL( toggled(bool) ),
+              this, SLOT( setAdvanced( bool ) ) );
      setLayout( main_layout );
 
-     QObject::connect( small, SIGNAL( clicked() ), this, SLOT( setSmall()) );
-     QObject::connect( all, SIGNAL( clicked() ), this, SLOT( setAll()) );
+     connect( small, SIGNAL( clicked() ), this, SLOT( setSmall()) );
+     connect( all, SIGNAL( clicked() ), this, SLOT( setAll()) );
 }
 
 void PrefsDialog::setAdvanced( bool advanced )
@@ -92,10 +92,9 @@ void PrefsDialog::setAll()
     if( !advanced_tree )
     {
          advanced_tree = new PrefsTree( p_intf, this );
-         QObject::connect( advanced_tree,
-                           SIGNAL( currentItemChanged( QTreeWidgetItem *,
-                                   QTreeWidgetItem *) ), this,
-                           SLOT( changePanel( QTreeWidgetItem * ) ) );
+         connect( advanced_tree,
+          SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem *) ),
+          this, SLOT( changePanel( QTreeWidgetItem * ) ) );
     }
     advanced_tree->show();
     setAdvanced( adv_chk->isChecked() );

@@ -124,7 +124,6 @@ static void Init( intf_thread_t *p_intf )
     {
         MainInterface *p_mi = new MainInterface( p_intf );
         p_intf->p_sys->p_mi = p_mi;
-        p_mi->init();
         p_mi->show();
     }
 
