@@ -201,12 +201,10 @@ void playlist_MainLoop( playlist_t *p_playlist )
     /* FIXME : this can be called several times */
     if( p_playlist->request.b_request )
     {
-        if( p_playlist->request.i_status == PLAYLIST_STOPPED )
-            p_playlist->request.b_request = VLC_FALSE ;
-        PL_DEBUG( "incoming request - stopping current input" );
         /* Stop the existing input */
-        if( p_playlist->p_input )
+        if( p_playlist->p_input && !p_playlist->p_input->b_die )
         {
+            PL_DEBUG( "incoming request - stopping current input" );
             input_StopThread( p_playlist->p_input );
         }
     }
