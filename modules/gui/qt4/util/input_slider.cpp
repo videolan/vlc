@@ -43,16 +43,12 @@ InputSlider::InputSlider( Qt::Orientation q,QWidget *_parent ) :
 void InputSlider::setPosition( float pos, int a, int b )
 {
     if( pos == 0.0 )
-    {
         setEnabled( false );
-    }
     else
-    {
         setEnabled( true );
-        mymove = true;
-        setValue( (int)(pos * 1000.0 ) );
-        mymove = false;
-    }
+    mymove = true;
+    setValue( (int)(pos * 1000.0 ) );
+    mymove = false;
 }
 
 void InputSlider::userDrag( int new_value )
