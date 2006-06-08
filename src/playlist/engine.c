@@ -60,6 +60,9 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->i_last_input_id = 0;
     p_playlist->p_input = NULL;
 
+    p_playlist->i_vout_destroyed_date = 0;
+    p_playlist->i_sout_destroyed_date = 0;
+
     p_playlist->i_size = 0;
     p_playlist->pp_items = NULL;
     p_playlist->i_all_size = 0;
@@ -181,8 +184,6 @@ void playlist_MainLoop( playlist_t *p_playlist )
 {
     playlist_item_t *p_item = NULL;
 
-    mtime_t    i_vout_destroyed_date = 0;
-    mtime_t    i_sout_destroyed_date = 0;
 
     PL_LOCK
 
@@ -190,6 +191,8 @@ void playlist_MainLoop( playlist_t *p_playlist )
     /* FIXME : this can be called several times */
     if( p_playlist->request.b_request )
     {
+        if( p_playlist->request.i_status == PLAYLIST_STOPPED )
+            p_playlist->request.b_request = VLC_FALSE ;
         PL_DEBUG( "incoming request - stopping current input" );
         /* Stop the existing input */
         if( p_playlist->p_input )
@@ -224,8 +227,8 @@ void playlist_MainLoop( playlist_t *p_playlist )
             /* Destroy object */
             vlc_object_destroy( p_input );
 
-            i_vout_destroyed_date = 0;
-            i_sout_destroyed_date = 0;
+            p_playlist->i_vout_destroyed_date = 0;
+            p_playlist->i_sout_destroyed_date = 0;
 
             if( p_playlist->status.p_item->i_flags
                 & PLAYLIST_REMOVE_FLAG )
@@ -259,12 +262,12 @@ void playlist_MainLoop( playlist_t *p_playlist )
         else if( p_playlist->p_input->i_state != INIT_S )
         {
             PL_UNLOCK
-            i_vout_destroyed_date =
+            p_playlist->i_vout_destroyed_date =
                 ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
-                                        i_vout_destroyed_date );
-            i_sout_destroyed_date =
+                                        p_playlist->i_vout_destroyed_date );
+            p_playlist->i_sout_destroyed_date =
                 ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
-                                        i_sout_destroyed_date );
+                                        p_playlist->i_sout_destroyed_date );
             PL_LOCK
         }
     }
@@ -307,9 +310,9 @@ void playlist_MainLoop( playlist_t *p_playlist )
 
              /* Collect garbage */
              PL_UNLOCK
-             i_sout_destroyed_date =
+             p_playlist->i_sout_destroyed_date =
              ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT, mdate() );
-             i_vout_destroyed_date =
+             p_playlist->i_vout_destroyed_date =
              ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT, mdate() );
              PL_LOCK
          }

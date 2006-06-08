@@ -142,6 +142,9 @@ struct playlist_t
     services_discovery_t **pp_sds;
     int                   i_sds;
 
+    mtime_t    i_vout_destroyed_date;
+    mtime_t    i_sout_destroyed_date;
+
     struct {
         /* Current status. These fields are readonly, only the playlist
          * main loop can touch it*/
