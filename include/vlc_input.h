@@ -506,4 +506,6 @@ VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, vl
 VLC_EXPORT( void, input_DecoderDelete, ( decoder_t * ) );
 VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
 
+VLC_EXPORT( vlc_bool_t, input_AddSubtitles, ( input_thread_t *, char *, vlc_bool_t ) );
+
 #endif

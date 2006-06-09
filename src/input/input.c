@@ -2431,3 +2431,44 @@ static void MRLSections( input_thread_t *p_input, char *psz_source,
              psz_source, *pi_title_start, *pi_chapter_start,
              *pi_title_end, *pi_chapter_end );
 }
+
+/*****************************************************************************
+ * input_AddSubtitles: add a subtitles file and enable it
+ *****************************************************************************/
+vlc_bool_t input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
+                               vlc_bool_t b_check_extension )
+{
+    input_source_t *sub;
+    vlc_value_t count;
+    vlc_value_t list;
+
+    if( b_check_extension && !subtitles_Filter( psz_subtitle ) )
+    {
+        return VLC_FALSE;
+    }
+
+    var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
+
+    sub = InputSourceNew( p_input );
+    if( !InputSourceInit( p_input, sub, psz_subtitle, "subtitle", VLC_FALSE ) )
+    {
+        TAB_APPEND( p_input->i_slave, p_input->slave, sub );
+
+        /* Select the ES */
+        if( !var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
+        {
+            if( count.i_int == 0 )
+                count.i_int++;
+            /* if it was first one, there is disable too */
+
+            if( count.i_int < list.p_list->i_count )
+            {
+                input_ControlPush( p_input, INPUT_CONTROL_SET_ES,
+                                   &list.p_list->p_values[count.i_int] );
+            }
+            var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
+        }
+    }
+
+    return VLC_TRUE;
+}

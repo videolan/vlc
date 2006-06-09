@@ -1283,6 +1283,26 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
         return FALSE;
     }
 
+    /* If we drag & drop a subtitle file, add it on the fly */
+    if( filenames.GetCount() == 1 )
+    {
+        char *psz_utf8 = wxDnDFromLocale( filenames[0] );
+        input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_intf,
+                                            VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        if( p_input )
+        {
+            if( input_AddSubtitles( p_input, psz_utf8, VLC_TRUE ) )
+            {
+                vlc_object_release( p_input );
+                wxDnDLocaleFree( psz_utf8 );
+                vlc_object_release( p_playlist );
+                return TRUE;
+            }
+            vlc_object_release( p_input );
+        }
+        wxDnDLocaleFree( psz_utf8 );
+    }
+
     for( size_t i = 0; i < filenames.GetCount(); i++ )
     {
         char *psz_utf8 = wxDnDFromLocale( filenames[i] );
