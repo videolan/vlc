@@ -890,6 +890,10 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
             char **subs = subtitles_Detect( p_input, psz_autopath,
                                             p_input->input.p_item->psz_uri );
             input_source_t *sub;
+            vlc_value_t count;
+            vlc_value_t list;
+
+            var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
 
             for( i = 0; subs && subs[i]; i++ )
             {
@@ -899,7 +903,27 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                     if( !InputSourceInit( p_input, sub, subs[i], "subtitle",
                                           VLC_FALSE ) )
                     {
-                         TAB_APPEND( p_input->i_slave, p_input->slave, sub );
+                        TAB_APPEND( p_input->i_slave, p_input->slave, sub );
+
+                        /* If no subtitle was specified, select the first
+                         * autodetected subtitle. */
+                        if( i == 0 && psz_subtitle != NULL )
+                        {
+                            /* Select the ES */
+                            if( !var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
+                            {
+                                if( count.i_int == 0 )
+                                    count.i_int++;
+                                /* if it was first one, there is disable too */
+
+                                if( count.i_int < list.p_list->i_count )
+                                {
+                                    input_ControlPush( p_input, INPUT_CONTROL_SET_ES,
+                                                       &list.p_list->p_values[count.i_int] );
+                                }
+                                var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
+                            }
+                        }
                     }
                 }
                 free( subs[i] );
