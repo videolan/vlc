@@ -127,7 +127,6 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                 current_item->setData( 0, Qt::UserRole,
                                        qVariantFromValue( data ) );
                 addTopLevelItem( current_item );
-                //fprintf( stderr, "Adding %s\n", current_item->text(0).toLatin1().data() );
                 break;
             case CONFIG_SUBCATEGORY:
                 if( p_item->i_value == -1 ) break;
@@ -507,7 +506,6 @@ void PrefsPanel::setAdvanced( bool adv )
     {
         if( (*i)->isAdvanced() )
         {
-            fprintf( stderr, "Showing \n" );
             if( !advanced ) some_hidden = true;
             (*i)->setVisible( advanced );
         }

@@ -31,23 +31,28 @@
 class QVLCFrame : public QWidget
 {
 public:
-    QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
+    static void fixStyle( QWidget *w)
     {
-        QStyle *style = qApp->style();
+         QStyle *style = qApp->style();
         // Plastique is too dark.
         /// theming ? getting KDE data ? ?
         if( qobject_cast<QPlastiqueStyle *>(style) )
         {
-            QPalette plt( palette() );
+            QPalette plt( w->palette() );
             plt.setColor( QPalette::Active, QPalette::Highlight, Qt::gray );
             QColor vlg = (Qt::lightGray);
             vlg = vlg.toHsv();
             vlg.setHsv( vlg.hue(), vlg.saturation(), 235  );
             plt.setColor( QPalette::Active, QPalette::Window, vlg );
             plt.setColor( QPalette::Inactive, QPalette::Window, vlg );
-            setPalette( plt );
+            w->setPalette( plt );
         }
-    };
+    }
+
+    QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
+    {
+        fixStyle( this );
+   };
     virtual ~QVLCFrame()   {};
 
     void toggleVisible()

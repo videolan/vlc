@@ -23,38 +23,42 @@
 #include "main_interface.hpp"
 #include "input_manager.hpp"
 #include "util/input_slider.hpp"
+#include "util/qvlcframe.hpp">
 #include "dialogs_provider.hpp"
 #include <QCloseEvent>
 #include <assert.h>
 #include <QPushButton>
 
-MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+MainInterface::MainInterface( intf_thread_t *_p_intf ) : QMainWindow(), p_intf( _p_intf )
 {
-    /* Init UI */
+    /* All UI stuff */
+    QVLCFrame::fixStyle( this );
+    QWidget *main = new QWidget( this );
+    setCentralWidget( main );
     setWindowTitle( _("VLC media player") );
-    ui.setupUi( this );
+    ui.setupUi( centralWidget() );
     slider = new InputSlider( Qt::Horizontal, ui.sliderBox );
     QVBoxLayout *box_layout = new QVBoxLayout();
     box_layout->addWidget( slider );
     ui.sliderBox->setLayout( box_layout );
+    resize( QSize( 450, 80 ) );
 
     /* Init input manager */
-    p_input = NULL;
-    main_input_manager = new InputManager( this, p_intf );
+    MainInputManager::getInstance( p_intf );
 
     /* Get timer updates */
     connect( DialogsProvider::getInstance(NULL)->fixed_timer,
              SIGNAL( timeout() ), this, SLOT(updateOnTimer() ) );
-    /* Tell input manager about the input changes */
-    connect( this, SIGNAL( inputChanged( input_thread_t * ) ),
-             main_input_manager, SLOT( setInput( input_thread_t * ) ) );
 
     /* Connect the input manager to the GUI elements it manages */
-    connect( main_input_manager, SIGNAL(positionUpdated( float, int, int ) ),
+    connect( MainInputManager::getInstance( p_intf )->getIM(),
+             SIGNAL(positionUpdated( float, int, int ) ),
              slider, SLOT( setPosition( float,int, int ) ) );
     connect( slider, SIGNAL( sliderDragged( float ) ),
-             main_input_manager, SLOT( sliderUpdate( float ) ) );
-    connect( main_input_manager, SIGNAL( positionUpdated( float, int, int ) ),
+             MainInputManager::getInstance( p_intf )->getIM(),
+             SLOT( sliderUpdate( float ) ) );
+    connect( MainInputManager::getInstance( p_intf )->getIM(),
+             SIGNAL( positionUpdated( float, int, int ) ),
              this, SLOT( setDisplay( float, int, int ) ) );
 
     /* Actions */
@@ -126,32 +130,6 @@ void MainInterface::updateOnTimer()
     {
         QApplication::quit();
     }
-    vlc_mutex_lock( &p_intf->change_lock );
-    if( p_input && p_input->b_dead )
-    {
-        vlc_object_release( p_input );
-        p_input = NULL;
-        emit inputChanged( NULL );
-    }
-
-    if( !p_input )
-    {
-        playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf,
-                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        assert( p_playlist );
-        PL_LOCK;
-
-        p_input = p_playlist->p_input;
-        if( p_input )
-        {
-            vlc_object_yield( p_input );
-            emit inputChanged( p_input );
-        }
-
-        PL_UNLOCK;
-        vlc_object_release( p_playlist );
-    }
-    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 void MainInterface::closeEvent( QCloseEvent *e )

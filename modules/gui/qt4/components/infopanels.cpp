@@ -45,6 +45,26 @@ void InputStatsPanel::Update( input_item_t *p_item )
     { QString str; ui.widget->setText( str.sprintf( format, ## calc ) );  }
 
     UPDATE( read_text, "%8.0f kB", (float)(p_item->p_stats->i_read_bytes)/1000);
+    UPDATE( input_bitrate_text, "%6.0f kb/s", (float)(p_item->p_stats->f_input_bitrate * 8000 ));
+    UPDATE( demuxed_text, "%8.0f kB", (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
+    UPDATE( stream_bitrate_text, "%6.0f kb/s", (float)(p_item->p_stats->f_demux_bitrate * 8000 ));
+
+    /* Video */
+    UPDATE( vdecoded_text, "%5i", p_item->p_stats->i_decoded_video );
+    UPDATE( vdisplayed_text, "%5i", p_item->p_stats->i_displayed_pictures );
+    UPDATE( vlost_frames, "%5i", p_item->p_stats->i_lost_pictures );
+
+    /* Sout */
+    UPDATE( sent_text, "%5i", p_item->p_stats->i_sent_packets );
+    UPDATE( sent_bytes_text, "%8.0f kB",
+            (float)(p_item->p_stats->i_sent_bytes)/1000 );
+    UPDATE( send_bitrate_text, "%6.0f kb/s",
+            (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
+
+    /* Audio*/
+    UPDATE( adecoded_text, "%5i", p_item->p_stats->i_decoded_audio );
+    UPDATE( aplayed_text, "%5i", p_item->p_stats->i_played_abuffers );
+    UPDATE( alost_text, "%5i", p_item->p_stats->i_lost_abuffers );
 
     vlc_mutex_unlock(& p_item->p_stats->lock );
 }

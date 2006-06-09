@@ -25,6 +25,10 @@
 #include "dialogs_provider.hpp"
 #include "qt4.hpp"
 
+/**********************************************************************
+ * InputManager implementation
+ **********************************************************************/
+
 InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
                            QObject( parent ), p_intf( _p_intf )
 {
@@ -103,4 +107,51 @@ void InputManager::sliderUpdate( float new_pos )
 {
    if( p_input && !p_input->b_die && !p_input->b_dead )
         var_SetFloat( p_input, "position", new_pos );
+}
+
+/**********************************************************************
+ * MainInputManager implementation. Wrap an input manager and
+ * take care of updating the main playlist input
+ **********************************************************************/
+MainInputManager * MainInputManager::instance = NULL;
+
+MainInputManager::MainInputManager( intf_thread_t *_p_intf ) : QObject(NULL),
+                                                p_intf( _p_intf )
+{
+    p_input = NULL;
+    im = new InputManager( this, p_intf );
+    /* Get timer updates */
+    connect( DialogsProvider::getInstance(p_intf)->fixed_timer,
+             SIGNAL(timeout() ), this, SLOT( updateInput() ) );
+    /* Warn our embedded IM about input changes */
+    connect( this, SIGNAL( inputChanged( input_thread_t * ) ),
+             im, SLOT( setInput( input_thread_t * ) ) );
+}
+
+void MainInputManager::updateInput()
+{
+    vlc_mutex_lock( &p_intf->change_lock );
+    if( p_input && p_input->b_dead )
+    {
+        vlc_object_release( p_input );
+        p_input = NULL;
+        emit inputChanged( NULL );
+    }
+
+    if( !p_input )
+    {
+        playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf,
+                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        assert( p_playlist );
+        PL_LOCK;
+        p_input = p_playlist->p_input;
+        if( p_input )
+        {
+            vlc_object_yield( p_input );
+            emit inputChanged( p_input );
+        }
+        PL_UNLOCK;
+        vlc_object_release( p_playlist );
+    }
+    vlc_mutex_unlock( &p_intf->change_lock );
 }

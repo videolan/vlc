@@ -26,12 +26,13 @@
 #include <vlc/intf.h>
 #include "ui/main_interface.h"
 #include "util/qvlcframe.hpp"
+#include <QMainWindow>
 
 class InputManager;
 class QCloseEvent;
 class InputSlider;
 
-class MainInterface : public QVLCFrame
+class MainInterface : public QMainWindow
 {
     Q_OBJECT;
 public:
@@ -44,6 +45,7 @@ private:
     InputSlider *slider;
     /// Main input associated to the playlist
     input_thread_t *p_input;
+    intf_thread_t *p_intf;
 
     Ui::MainInterfaceUI ui;
 private slots:
@@ -53,8 +55,6 @@ private slots:
     void stop();
     void prev();
     void next();
-signals:
-    void inputChanged( input_thread_t *);
 };
 
 #endif

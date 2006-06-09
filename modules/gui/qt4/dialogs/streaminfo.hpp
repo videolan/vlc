@@ -25,20 +25,24 @@
 
 #include "util/qvlcframe.hpp"
 
+class InputStatsPanel;
+
 class StreamInfoDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
-    static StreamInfoDialog * getInstance( intf_thread_t *p_intf )
+    static StreamInfoDialog * getInstance( intf_thread_t *p_intf, bool a )
     {
         if( !instance)
-            instance = new StreamInfoDialog( p_intf );
+            instance = new StreamInfoDialog( p_intf, a );
         return instance;
     }
     virtual ~StreamInfoDialog();
 private:
-    StreamInfoDialog( intf_thread_t * );
-    intf_thread_t *p_intf;
+    StreamInfoDialog( intf_thread_t *,  bool );
+    input_thread_t *p_input;
+    InputStatsPanel *ISP;
+    bool main_input;
     static StreamInfoDialog *instance;
 public slots:
     void update();

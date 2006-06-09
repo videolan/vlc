@@ -37,7 +37,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
  //   idle_timer->start( 0 );
 
     fixed_timer = new QTimer( this );
-    fixed_timer->start( 100 /* milliseconds */ );
+    fixed_timer->start( 150 /* milliseconds */ );
 }
 
 DialogsProvider::~DialogsProvider()
@@ -90,7 +90,7 @@ void DialogsProvider::openDialog( int i_dialog )
 
 void DialogsProvider::streaminfoDialog()
 {
-    StreamInfoDialog::getInstance( p_intf )->toggleVisible();
+    StreamInfoDialog::getInstance( p_intf, true )->toggleVisible();
 }
 
 void DialogsProvider::prefsDialog()

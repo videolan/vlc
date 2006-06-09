@@ -20,6 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
+#include "input_manager.hpp"
 #include "dialogs/streaminfo.hpp"
 #include "dialogs_provider.hpp"
 #include "util/qvlcframe.hpp"
@@ -28,18 +29,22 @@
 
 StreamInfoDialog *StreamInfoDialog::instance = NULL;
 
-StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf ) :
-                                QVLCFrame( p_intf )
+StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf, bool _main_input ) :
+                              QVLCFrame( _p_intf ), main_input( _main_input )
 {
     setWindowTitle( _("Stream information" ) );
-    InputStatsPanel *ISP = new InputStatsPanel( this, p_intf );
+    ISP = new InputStatsPanel( this, p_intf );
     connect( DialogsProvider::getInstance(NULL)->fixed_timer,
              SIGNAL( timeout() ), this, SLOT(update() ) );
+    p_input = NULL;
 }
 
 void StreamInfoDialog::update()
 {
-    fprintf( stderr, "timer\n");
+    if( main_input )
+        p_input = MainInputManager::getInstance( p_intf )->getInput();
+    if( p_input && !p_input->b_dead )
+        ISP->Update( p_input->input.p_item );
 }
 
 StreamInfoDialog::~StreamInfoDialog()

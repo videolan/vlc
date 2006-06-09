@@ -43,7 +43,6 @@ class PrefsDialog : public QVLCFrame
 public:
     static PrefsDialog * getInstance( intf_thread_t *_p_intf )
     {
-        fprintf( stderr, "%p\n", _p_intf );
         if( !instance )
         {
             instance = new PrefsDialog( _p_intf );

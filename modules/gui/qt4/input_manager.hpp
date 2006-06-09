@@ -50,5 +50,31 @@ signals:
     void statusChanged( int );
 };
 
+class MainInputManager : public QObject
+{
+    Q_OBJECT;
+public:
+    static MainInputManager *getInstance( intf_thread_t *_p_intf )
+    {
+        if( !instance )
+            instance = new MainInputManager( _p_intf );
+        return instance;
+    }
+
+    input_thread_t *getInput() { return p_input; };
+    InputManager *getIM() { return im; };
+
+private:
+    InputManager *im;
+    intf_thread_t *p_intf;
+    input_thread_t *p_input;
+    static MainInputManager *instance;
+    MainInputManager( intf_thread_t *);
+private slots:
+    void updateInput();
+signals:
+    void inputChanged( input_thread_t *);
+};
+
 
 #endif
