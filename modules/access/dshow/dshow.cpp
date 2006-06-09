@@ -477,16 +477,16 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     for( i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
     {
             var_Get( p_this, "dshow-video-input", &val );
-            if( val.i_int > 0 )
+            if( val.i_int >= 0 )
                     p_sys->crossbar_routes[i].VideoInputIndex=val.i_int;
             var_Get( p_this, "dshow-video-output", &val );
-            if( val.i_int > 0 )
+            if( val.i_int >= 0 )
                     p_sys->crossbar_routes[i].VideoOutputIndex=val.i_int;
             var_Get( p_this, "dshow-audio-input", &val );
-            if( val.i_int > 0 )
+            if( val.i_int >= 0 )
                     p_sys->crossbar_routes[i].AudioInputIndex=val.i_int;
             var_Get( p_this, "dshow-audio-output", &val );
-            if( val.i_int > 0 )
+            if( val.i_int >= 0 )
                     p_sys->crossbar_routes[i].AudioOutputIndex=val.i_int;
 
         IAMCrossbar *pXbar = p_sys->crossbar_routes[i].pXbar;
