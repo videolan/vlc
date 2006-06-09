@@ -292,8 +292,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
         f_fname = malloc( strlen(tmp) );
         if( f_fname )
-            strcpy( f_fname, tmp+1 ); // we skip the seperator, so it will still fit in the allocated space
-        dirlen = strlen(psz_fname) - strlen(tmp) + 1; // add the seperator
+            strcpy( f_fname, tmp+1 ); // we skip the separator, so it will still fit in the allocated space
+        dirlen = strlen(psz_fname) - strlen(tmp) + 2; // add the separator
         f_dir = malloc( dirlen + 1 );
         if( f_dir != NULL )
             strlcpy( f_dir, psz_fname, dirlen );
