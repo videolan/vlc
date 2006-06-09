@@ -126,11 +126,8 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    /*
-     * create the output
-     */
-    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', '4', 'v' ) );
-    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
+    /* We need to wait until we gtt p_extra (VOL header) from the packetizer
+     * before we create the output */
 
     return VLC_SUCCESS;
 }
