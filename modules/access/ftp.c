@@ -122,8 +122,12 @@ static int Connect( access_t *p_access, access_sys_t *p_sys )
     }
 
     msg_Dbg( p_access, "connection accepted (%d)", i_answer );
+    
+    if( p_sys->url.psz_username && *p_sys->url.psz_username )
+        psz = strdup( p_sys->url.psz_username );
+    else
+        psz = var_CreateGetString( p_access, "ftp-user" );
 
-    psz = var_CreateGetString( p_access, "ftp-user" );
     if( ftp_SendCommand( p_access, "USER %s", psz ) < 0 ||
         ftp_ReadCommand( p_access, &i_answer, NULL ) < 0 )
     {
@@ -139,7 +143,11 @@ static int Connect( access_t *p_access, access_sys_t *p_sys )
             break;
         case 3:
             msg_Dbg( p_access, "password needed" );
-            psz = var_CreateGetString( p_access, "ftp-pwd" );
+            if( p_sys->url.psz_password && *p_sys->url.psz_password )
+                psz = strdup( p_sys->url.psz_password );
+	    else
+                psz = var_CreateGetString( p_access, "ftp-pwd" );
+
             if( ftp_SendCommand( p_access, "PASS %s", psz ) < 0 ||
                 ftp_ReadCommand( p_access, &i_answer, NULL ) < 0 )
             {
