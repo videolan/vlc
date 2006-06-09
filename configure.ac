@@ -5162,6 +5162,7 @@ then
         ])
         LDFLAGS="${LDFLAGS_save}"
       fi
+    fi
       mozilla=:
       dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
       VLC_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`]])
@@ -5182,7 +5183,6 @@ then
       else
         xpidl_path="`${MOZILLA_CONFIG} --prefix`/bin"
       fi	
-    fi
     dnl End of moz_sdk = ""
   else
     dnl special case for mingw32
