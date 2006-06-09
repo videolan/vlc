@@ -28,7 +28,6 @@
 #include "interface.hpp"
 
 #include <vector>
-#include <string>
 using namespace std;
 
 class wxMenuItemExt: public wxMenuItem
@@ -54,13 +53,13 @@ public:
     Menu( intf_thread_t *p_intf, int i_start_id );
     virtual ~Menu();
 
-    void Populate( vector<string> &, vector<int> &);
+    void Populate( vector<const char *> &, vector<int> &);
     void Clear();
 
 private:
     wxMenu *CreateDummyMenu();
     void   CreateMenuItem( wxMenu *, const char *, vlc_object_t * );
-    wxMenu *CreateChoicesMenu( char *, vlc_object_t *, bool );
+    wxMenu *CreateChoicesMenu( const char *, vlc_object_t *, bool );
 
     DECLARE_EVENT_TABLE();
 
@@ -144,10 +143,10 @@ wxMenu *MiscMenu( intf_thread_t *p_intf )
  * Builders for the dynamic menus
  *****************************************************************************/
 #define PUSH_VAR( var ) rs_varnames.push_back( var ); \
-                        ri_objects.push_back( p_object->i_object_id );
+                        ri_objects.push_back( p_object->i_object_id )
 
-int InputAutoMenuBuilder( vlc_object_t *p_object,
-                          vector<int> &ri_objects, vector<string> &rs_varnames )
+int InputAutoMenuBuilder( vlc_object_t *p_object, vector<int> &ri_objects,
+                          vector<const char *> &rs_varnames )
 {
     PUSH_VAR( "bookmark");
     PUSH_VAR( "title" );
@@ -158,8 +157,8 @@ int InputAutoMenuBuilder( vlc_object_t *p_object,
     return VLC_SUCCESS;
 }
 
-int VideoAutoMenuBuilder( vlc_object_t *p_object,
-                          vector<int> &ri_objects, vector<string> &rs_varnames )
+int VideoAutoMenuBuilder( vlc_object_t *p_object, vector<int> &ri_objects,
+                          vector<const char *> &rs_varnames )
 {
     PUSH_VAR( "fullscreen" );
     PUSH_VAR( "zoom" );
@@ -181,8 +180,8 @@ int VideoAutoMenuBuilder( vlc_object_t *p_object,
     return VLC_SUCCESS;
 }
 
-int AudioAutoMenuBuilder( vlc_object_t *p_object,
-                          vector<int> &ri_objects, vector<string> &rs_varnames )
+int AudioAutoMenuBuilder( vlc_object_t *p_object, vector<int> &ri_objects,
+                          vector<const char *> &rs_varnames )
 {
     PUSH_VAR( "audio-device" );
     PUSH_VAR( "audio-channels" );
@@ -191,9 +190,8 @@ int AudioAutoMenuBuilder( vlc_object_t *p_object,
     return VLC_SUCCESS;
 }
 
-int IntfAutoMenuBuilder( intf_thread_t *p_intf,
-                         vector<int> &ri_objects, vector<string> &rs_varnames,
-                         bool is_popup)
+int IntfAutoMenuBuilder( intf_thread_t *p_intf, vector<int> &ri_objects,
+                         vector<const char *> &rs_varnames, bool is_popup)
 {
     /* vlc_object_find is needed because of the dialogs provider case */
     vlc_object_t *p_object;
@@ -223,7 +221,8 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf,
  * Popup menus
  *****************************************************************************/
 #define PUSH_VAR( var ) as_varnames.push_back( var ); \
-                        ai_objects.push_back( p_object->i_object_id );
+                        ai_objects.push_back( p_object->i_object_id )
+
 #define PUSH_SEPARATOR if( ai_objects.size() != i_last_separator ) { \
                             ai_objects.push_back( 0 ); \
                             as_varnames.push_back( "" ); \
@@ -232,12 +231,12 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf,
 #define POPUP_BOILERPLATE \
     unsigned int i_last_separator = 0; \
     vector<int> ai_objects; \
-    vector<string> as_varnames; \
+    vector<const char *> as_varnames; \
     playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf, \
                                           VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );\
     if( !p_playlist ) \
         return; \
-    input_thread_t *p_input = p_playlist->p_input;
+    input_thread_t *p_input = p_playlist->p_input
 
 #define CREATE_POPUP    \
     Menu popupmenu( p_intf, PopupMenu_Events ); \
@@ -245,6 +244,7 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf,
     p_intf->p_sys->p_popup_menu = &popupmenu; \
     p_parent->PopupMenu( &popupmenu, pos.x, pos.y ); \
     p_intf->p_sys->p_popup_menu = NULL; \
+    i_last_separator = 0 /* stop compiler warning */
 
 #define POPUP_STATIC_ENTRIES \
     if( p_input != NULL ) \
@@ -277,7 +277,7 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf,
     } \
     \
     popupmenu.Append( MenuDummy_Event, wxU(_("Miscellaneous")), \
-                      MiscMenu( p_intf ), wxT("") ); \
+                      MiscMenu( p_intf ), wxT("") )
 
 
 void VideoPopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
@@ -417,7 +417,7 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 {
     vlc_object_t *p_object;
     vector<int> ai_objects;
-    vector<string> as_varnames;
+    vector<const char *> as_varnames;
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
                                                 FIND_ANYWHERE );
@@ -451,7 +451,7 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 {
     vlc_object_t *p_object;
     vector<int> ai_objects;
-    vector<string> as_varnames;
+    vector<const char *> as_varnames;
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
                                                 FIND_ANYWHERE );
@@ -485,7 +485,7 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 {
     vlc_object_t *p_object;
     vector<int> ai_objects;
-    vector<string> as_varnames;
+    vector<const char *> as_varnames;
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
                                                 FIND_ANYWHERE );
@@ -514,7 +514,7 @@ wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
 {
     vlc_object_t *p_object;
     vector<int> ai_objects;
-    vector<string> as_varnames;
+    vector<const char *> as_varnames;
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INTF,
                                                 FIND_PARENT );
@@ -554,7 +554,8 @@ Menu::~Menu()
 /*****************************************************************************
  * Public methods.
  *****************************************************************************/
-void Menu::Populate( vector<string> & ras_varnames, vector<int> & rai_objects )
+void Menu::Populate( vector<const char *> & ras_varnames,
+                     vector<int> & rai_objects )
 {
     vlc_object_t *p_object;
     vlc_bool_t b_section_empty = VLC_FALSE;
@@ -562,9 +563,9 @@ void Menu::Populate( vector<string> & ras_varnames, vector<int> & rai_objects )
 
     i_item_id = i_start_id;
 
-    for( i = 0; i < rai_objects.size() ; i++ )
+    for( i = 0; i < (int)rai_objects.size() ; i++ )
     {
-        if( ras_varnames[i] == ""  )
+        if( !ras_varnames[i] || !*ras_varnames[i] )
         {
             if( b_section_empty )
             {
@@ -578,7 +579,7 @@ void Menu::Populate( vector<string> & ras_varnames, vector<int> & rai_objects )
 
         if( rai_objects[i] == 0  )
         {
-            Append( MenuDummy_Event, wxU(ras_varnames[i].c_str()) );
+            Append( MenuDummy_Event, wxU(ras_varnames[i]) );
             b_section_empty = VLC_FALSE;
             continue;
         }
@@ -588,7 +589,7 @@ void Menu::Populate( vector<string> & ras_varnames, vector<int> & rai_objects )
         if( p_object == NULL ) continue;
 
         b_section_empty = VLC_FALSE;
-        CreateMenuItem( this, ras_varnames[i].c_str(), p_object );
+        CreateMenuItem( this, ras_varnames[i], p_object );
         vlc_object_release( p_object );
     }
 
@@ -627,7 +628,7 @@ void Menu::Clear( )
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
-static bool IsMenuEmpty( char *psz_var, vlc_object_t *p_object,
+static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object,
                          bool b_root = TRUE )
 {
     vlc_value_t val, val_list;
@@ -742,7 +743,7 @@ void Menu::CreateMenuItem( wxMenu *menu, const char *psz_var,
     if( text.psz_string ) free( text.psz_string );
 }
 
-wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object,
+wxMenu *Menu::CreateChoicesMenu( const char *psz_var, vlc_object_t *p_object,
                                  bool b_root )
 {
     vlc_value_t val, val_list, text_list;
