@@ -244,6 +244,7 @@ struct sout_stream_id_t
     char        *psz_destination;
     int         i_port;
     int         i_cat;
+    int         i_bitrate;
 
     /* Packetizer specific fields */
     pf_rtp_packetizer_t pf_packetize;
@@ -806,6 +807,10 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         {
             i_size += strlen( "a=fmtp:* *\r\n" ) + strlen( id->psz_fmtp ) + 10;
         }
+        if ( id->i_bitrate)
+        {
+            i_size += strlen( "b=AS: *\r\n") + 10;
+        }
         if( b_rtsp )
         {
             i_size += strlen( "a=control:*/trackID=*\r\n" ) + strlen( p_sys->psz_rtsp_control ) + 10;
@@ -875,6 +880,10 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         {
             p += sprintf( p, "a=fmtp:%d %s\r\n", id->i_payload_type,
                           id->psz_fmtp );
+        }
+        if ( id->i_bitrate)
+        {
+            p += sprintf(p,"b=AS:%d\r\n",id->i_bitrate);
         }
         if( b_rtsp )
         {
@@ -1176,6 +1185,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->ssrc[3] = rand()&0xff;
     id->i_sequence = rand()&0xffff;
     id->i_timestamp_start = rand()&0xffffffff;
+    id->i_bitrate = p_fmt->i_bitrate/1000; /* Stream bitrate in kbps */
 
     id->i_mtu    = config_GetInt( p_stream, "mtu" );  /* XXX beuk */
     if( id->i_mtu <= 16 + MTU_REDUCE )
