@@ -56,7 +56,6 @@ public class Playlist implements PlaylistIntf {
 
     public synchronized void play(int id, String[] options) {
         _play(id, options);
-        while (! _inputIsPlaying()) ;
     }
 
     public synchronized void play() {

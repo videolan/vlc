@@ -24,7 +24,7 @@ JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ..
 JAVALDFLAGS = -L../../src -lvlc `top_builddir=../.. ../../vlc-config --libs builtin vlc pic`
 
 # Build targets
-all: libjvlc.so VlcClient
+all: libjvlc.so VlcClient VLCExample
 
 libjvlc.so: vlc-libvlc-jni.o vlc-graphics-jni.o
 	$(CXX) -shared vlc-libvlc-jni.o vlc-graphics-jni.o $(LIBJINCLUDES) $(LDFLAGS) $(JAVALDFLAGS) -o libjvlc.so
@@ -37,6 +37,9 @@ vlc-libvlc-jni.o: VlcClient
 
 VlcClient: $(OBJECTS)
 	$(JCC) -C VlcClient.java
+
+VLCExample: $(OBJECTS)
+	$(JCC) -C VLCExample.java
 
 %.class: %.java
 	$(JCC) -C $?

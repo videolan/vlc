@@ -93,8 +93,9 @@ public class JVLC implements JLibVLC, Runnable {
      *  Input native methods
      */
     private native long     _getInputLength();
-    private native long     _getInputPosition();
+    private native float    _getInputPosition();
     private native long     _getInputTime();
+    private native float	_getInputFPS();
 
     
     /*
@@ -105,7 +106,7 @@ public class JVLC implements JLibVLC, Runnable {
     private native boolean  _getFullscreen();
     private native int      _getVideoHeight();
     private native int      _getVideoWidth();
-    private native void _getSnapshot(String filename);
+    private native void		_getSnapshot(String filename);
  
     
     public boolean getMute() {
@@ -162,7 +163,7 @@ public class JVLC implements JLibVLC, Runnable {
         return _getInputTime();
     }
 
-    public long getInputPosition() {
+    public float getInputPosition() {
         return _getInputPosition();
         
     }
@@ -173,8 +174,7 @@ public class JVLC implements JLibVLC, Runnable {
     }
 
     public double getInputFPS() {
-        // TODO Auto-generated method stub
-        return 0;
+        return _getInputFPS();
     }
     
     public long getInstance() {

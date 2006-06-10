@@ -42,7 +42,7 @@ public interface InputIntf {
      * currently playing playlist item.
      */
     long getInputTime();
-    long getInputPosition();
+    float getInputPosition();
     void setInputTime();
     double getInputFPS();
     

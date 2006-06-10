@@ -59,7 +59,9 @@ public interface VideoIntf {
     
     /**
      * Saves a snapshot of the current video window.
-     * @param filepath The full path (including filename) were to save the snapshot to.
+     * @param filepath The full path (including filename) were to save the snapshot to. 
+     * If you only give a path, not including the filename, the snapshot will be saved in
+     * the specified path using vlc naming conventions. 
      */
     void	getSnapshot(String filepath);
     

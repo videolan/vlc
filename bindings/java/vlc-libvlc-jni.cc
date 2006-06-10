@@ -1,5 +1,5 @@
 /*****************************************************************************
- * JVLC.java: JNI interface for vlc Java Bindings
+ * vlc-libvlc-jni.cc: JNI interface for vlc Java Bindings
  *****************************************************************************
  * Copyright (C) 1998-2006 the VideoLAN team
  *
@@ -180,34 +180,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1toggleMute (JNIEnv *env, jo
 }
 
 JNIEXPORT jint JNICALL Java_org_videolan_jvlc_JVLC__1getVolume (JNIEnv *env, jobject _this)
-{
-
-    // res is the final result
-    jboolean res;
-    long instance = 0;
-    
-    libvlc_exception_t *exception = ( libvlc_exception_t * ) malloc( sizeof( libvlc_exception_t ));
-
-    libvlc_exception_init( exception );
-
-    instance = getPlaylistInstance( env, _this );
 
     
-    res = (jboolean) libvlc_audio_get_mute( ( libvlc_instance_t * ) instance, exception );
-    
-    if ( libvlc_exception_raised( exception )) 
-    {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
-    }
-
-    free( exception );
-
-    return res;
-    
-}
-
-JNIEXPORT jint JNICALL Java_org_videolan_jvlc_JVLC__1getVolume (JNIEnv *env, jobject _this, jboolean value) 
 {
     jint res = 0;
     long instance = 0;
@@ -230,6 +204,8 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_JVLC__1getVolume (JNIEnv *env, job
 
     return res;
 }
+
+JNIEXPORT jint JNICALL Java_org_videolan_jvlc_JVLC__1getVolume (JNIEnv *env, jobject);
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1setVolume (JNIEnv *env, jobject _this, jint volume) 
 {
@@ -677,6 +653,47 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC__1getInputTime (JNIEnv *env,
 
     free( exception );
     return res;    
+}
+
+JNIEXPORT jfloat JNICALL Java_org_videolan_jvlc_JVLC__1getInputPosition (JNIEnv *env, jobject _this) 
+{
+    float res;
+    long instance = 0;
+    libvlc_exception_t *exception = ( libvlc_exception_t * ) malloc( sizeof( libvlc_exception_t ) );
+    libvlc_input_t *input;
+    
+    libvlc_exception_init( exception );
+    
+    instance = getPlaylistInstance( env, _this );
+    
+    input = libvlc_playlist_get_input( ( libvlc_instance_t* ) instance, exception );
+
+    res = libvlc_input_get_position( input, exception );
+    /// \todo handle exceptions
+    free( exception );
+    
+    return res;
+    
+}
+
+JNIEXPORT jfloat JNICALL Java_org_videolan_jvlc_JVLC__1getInputFPS (JNIEnv *env, jobject _this) 
+{
+    float res;
+    long instance = 0;
+    libvlc_exception_t *exception = ( libvlc_exception_t * ) malloc( sizeof( libvlc_exception_t ) );
+    libvlc_input_t *input;
+    
+    libvlc_exception_init( exception );
+    
+    instance = getPlaylistInstance( env, _this );
+    
+    input = libvlc_playlist_get_input( ( libvlc_instance_t* ) instance, exception );
+
+    res = libvlc_input_get_fps( input, exception );
+    /// \todo handle exceptions
+    free( exception );
+    
+    return res;
 }
 
 
