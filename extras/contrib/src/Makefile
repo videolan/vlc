@@ -894,16 +894,19 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 ffmpeg:
 	$(SVN) co $(FFMPEG_SVN)  ffmpeg
 ifeq ($(HOST),i586-pc-beos)
-	(cd $@; patch -p 0 < ../Patches/ffmpeg-cvs-beos.patch)
+	(cd $@; patch -p 0 < ../Patches/ffmpeg-svn-beos.patch)
 endif
 ifdef HAVE_WIN32
-	patch -p 0 < Patches/ffmpeg-cvs-win32.patch
+	patch -p 0 < Patches/ffmpeg-svn-win32.patch
 endif
 ifdef HAVE_WINCE
-	patch -p 1 < Patches/ffmpeg-cvs-wince.patch
+	patch -p 1 < Patches/ffmpeg-svn-wince.patch
 endif
 ifeq ($(HOST),i686-apple-darwin8)
-	(cd $@;patch -p 0 < ../Patches/ffmpeg-cvs-mactel.patch)
+	(cd $@;patch -p 0 < ../Patches/ffmpeg-svn-mactel.patch)
+endif
+ifneq ($(HOST),$(BUILD))
+	patch -p 0 < Patches/ffmpeg-svn-cross.patch
 endif
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
