@@ -1892,6 +1892,7 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     if( p_device_filter )
     {
         ShowPropertyPage( p_device_filter );
+        p_device_filter->Release();
     }
     else
     {
