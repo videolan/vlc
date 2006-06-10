@@ -91,6 +91,20 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance___3Ljava_lang
 
 }
 
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1destroy (JNIEnv *env, jobject _this) 
+{
+    long instance;
+    
+    instance = getClassInstance( env, _this );
+
+    libvlc_destroy( (libvlc_instance_t *) instance);
+
+    return;
+}
+
+
+
+
 /*
  * Audio native functions
  */

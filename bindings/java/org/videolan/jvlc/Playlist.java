@@ -93,11 +93,7 @@ public class Playlist implements PlaylistIntf {
     }
 
     public synchronized void clear() {
-	/*
-	 * This method has been commented out until
-	 * playlist_Clear has been fixed in vlc.
-	 */
-        //_clear();
+    	_clear();
     }
 
     public synchronized int add(String uri, String name, String[] options) {

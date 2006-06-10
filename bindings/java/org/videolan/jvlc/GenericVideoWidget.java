@@ -1,14 +1,14 @@
 /*****************************************************************************
- * VideoIntf.java: Video methods interface
+ * SWTVideoWidget.java: A component usable in SWT Application, embeds JVLC
  *****************************************************************************
- * 
+ *
  * Copyright (C) 1998-2006 the VideoLAN team
  * 
- * Author: Filippo Carone <filippo@carone.org>
+ * Author: Kuldipsingh Pabla <Kuldipsingh.Pabla@sun.com>
  * 
- * Created on 28-feb-2006
+ * Created on 10-jun-2006
  *
- * $Id$
+ * $Id $
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public License
@@ -28,49 +28,32 @@
 
 
 package org.videolan.jvlc;
+import java.awt.Frame;
+import java.awt.Component;
 
-/**
- * @author little
- *
- */
-/**
- * @author little
- *
- */
-public interface VideoIntf {
-    /**
-     * Toggles the fullscreen.
-     */
-    void	toggleFullscreen();
-    
-    
-    /**
-     * Sets fullscreen if fullscreen argument is true. 
-     * @param fullscreen
-     */
-    void	setFullscreen( boolean fullscreen );
-    
-    
-    /**
-     * @return True if the current video window is in fullscreen mode.
-     */
-    boolean getFullscreen();
-    
-    
-    /**
-     * Saves a snapshot of the current video window.
-     * @param filepath The full path (including filename) were to save the snapshot to.
-     */
-    void	getSnapshot(String filepath);
-    
-    
-    /**
-     * @return The current video window height
-     */
-    int		getVideoHeight();
 
-    /**
-     * @return The current video window width
+public class GenericVideoWidget {
+    /*
+     * This class implements a Composite container for VLC Video Output
      */
-    int		getVideoWidth();    
+
+    /*
+     * The root SWT Frame we embed JVLCCanvas in
+     */
+    public Frame rootFrame;
+    private JVLCCanvas jvlcCanvas;
+    
+    public GenericVideoWidget( Component parent ) {
+    	// allocate the new AWT Frame to embed in the Composite
+    	rootFrame = new Frame ();
+
+    	// add the JVLCCanvas to the Frame
+    	jvlcCanvas = new JVLCCanvas();
+    	rootFrame.add( jvlcCanvas );
+    }
+    
+    
+	public JVLC getJVLC() {
+		return jvlcCanvas.getJVLC();
+	}
 }

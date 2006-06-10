@@ -2,6 +2,7 @@ Thanks to:
 
 * Kuldipsingh Pabla
   for solaris port and various contributions to the native interface.
+  for the GenericVideoWidget class
 
 * Tvrtko Bedekovic
   for initial win32 port

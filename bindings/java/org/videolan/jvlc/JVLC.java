@@ -29,35 +29,57 @@
 
 package org.videolan.jvlc;
 
-public class JVLC implements JLibVLC {
+/**
+ * @author little
+ *
+ */
+public class JVLC implements JLibVLC, Runnable {
     
     static {
         System.load(System.getProperty( "user.dir" ) + "/libjvlc.so" );
     }
 
+    /**
+     * These are set as final since they live along the jvlc object
+     */
+    private final long _instance;
+    public  final Playlist playlist;
 
-    private long _instance;
-    public Playlist playlist;
-    public Status status;	
+    
+    private boolean beingDestroyed = false;
+    private long resolution = 50;
+	private boolean inputPlaying = false;
+	private boolean inputVout = false;
     
     public JVLC() {
         _instance = createInstance();
         playlist = new Playlist( _instance );
-        status = new Status(this);
+        new Thread(this).start();
     }
     
     public JVLC(String[] args) {
         _instance = createInstance( args );
         playlist = new Playlist( _instance );
-        status = new Status(this);
+        new Thread(this).start();
     }
     
-    /*
+    
+    /**
+     * Destroys the current instance of jvlc, cleaning up objects.
+     * This is unreversible.
+     */
+    public void destroy() {
+    	beingDestroyed = true;
+    	_destroy();
+    }
+ 
+
+	/*
      * Core methods
      */
     private native long createInstance();
     private native long createInstance( String[] args );
-    
+    private native void _destroy();   
     /*
      * 	Audio native methods
      */
@@ -170,5 +192,60 @@ public class JVLC implements JLibVLC {
 	public void getSnapshot(String filename) {
 		_getSnapshot(filename);
 	}
+	
+	/**
+	 * Checks if the input is playing.
+	 * @return True if there is a playing input.
+	 */
+	public boolean isInputPlaying() {
+		return inputPlaying;
+	}
+
+	/**
+	 * Checks if the input has spawned a video window.
+	 * @return True if there is a video window.
+	 */
+	public boolean hasVout() {
+		return inputVout;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 * 
+	 * In this thread we check the playlist and input status.
+	 */
+	public void run() {
+		while (! beingDestroyed) {
+			while (playlist.isRunning()) {
+				if (playlist.inputIsPlaying()) {
+					inputPlaying = true;
+				}
+				else {
+					inputPlaying = false;
+                }
+	                    
+				if (playlist.inputHasVout()) {
+					inputVout = true;
+                }
+				else {
+					inputVout = false;
+                }
+				try {
+					Thread.sleep(resolution);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} 
+			} // while playlist running
+	           inputPlaying = false;
+	           inputVout = false;
+			try {
+				Thread.sleep(resolution);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} // try
+		} // while ! being destroyed
+	} // run
 
 }
+
