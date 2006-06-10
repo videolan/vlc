@@ -143,7 +143,7 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
 
     msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
-    p_sys->p_output = malloc( 3 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
+    p_sys->p_output = malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE );
     p_sys->p_samples = NULL;
     p_sys->i_samples = 0;
 
@@ -219,10 +219,17 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( p_block->i_buffer <= 0 || ( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) ) )
+    if( p_block->i_buffer <= 0 ||
+        (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) )
     {
         block_Release( p_block );
         return NULL;
+    }
+
+    if( p_block->i_buffer > AVCODEC_MAX_AUDIO_FRAME_SIZE )
+    {
+        /* Grow output buffer if necessary (eg. for PCM data) */
+        p_sys->p_output = realloc(p_sys->p_output, p_block->i_buffer);
     }
 
     i_used = avcodec_decode_audio( p_sys->p_context,
