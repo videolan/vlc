@@ -25,6 +25,8 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                                /* free() */
+#include <sys/types.h>                                          /* opendir() */
+#include <dirent.h>                                             /* opendir() */
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
@@ -436,6 +438,8 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     subpicture_t *p_subpic;
     picture_t *p_pif;
     vlc_value_t val, format;
+    DIR *path;
+    
     int i_ret;
 
     var_Get( p_vout, "snapshot-path", &val );
@@ -610,7 +614,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( !val.psz_string )
     {
-        msg_Err( p_vout, "no directory specified for snapshots" );
+        msg_Err( p_vout, "no path specified for snapshots" );
         return VLC_EGENERIC;
     }
     var_Get( p_vout, "snapshot-format", &format );
@@ -620,9 +624,24 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         format.psz_string = strdup( "png" );
     }
 
-    asprintf( &psz_filename, "%s/vlcsnap-%u.%s", val.psz_string,
-              (unsigned int)(p_pic->date / 100000) & 0xFFFFFF,
-              format.psz_string );
+    /*
+     * Did the user specify a directory? If not, path = NULL.
+     */
+    path = opendir ( (const char *)val.psz_string  );
+    
+    if ( path != NULL )
+    {
+        
+        asprintf( &psz_filename, "%s/vlcsnap-%u.%s", val.psz_string,
+                  (unsigned int)(p_pic->date / 100000) & 0xFFFFFF,
+                  format.psz_string );
+        closedir( path );
+    }
+    else // The user specified a full path name (including file name)
+    {
+        asprintf ( &psz_filename, "%s", val.psz_string );
+    }
+    
     free( val.psz_string );
     free( format.psz_string );
 
