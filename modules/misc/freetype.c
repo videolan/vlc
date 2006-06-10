@@ -83,11 +83,10 @@ static int SetFontSize( filter_t *, int );
 #define FONT_TEXT N_("Font")
 #define FONT_LONGTEXT N_("Filename for the font you want to use")
 #define FONTSIZE_TEXT N_("Font size in pixels")
-/// \bug [String] Extra space
 #define FONTSIZE_LONGTEXT N_("This is the default size of the fonts " \
     "that will be rendered on the video. " \
     "If set to something different than 0 this option will override the " \
-    "relative font size. " )
+    "relative font size." )
 #define OPACITY_TEXT N_("Opacity")
 #define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of the " \
     "text that will be rendered on the video. 0 = transparent, " \
@@ -109,8 +108,7 @@ static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
 #define YUVP_LONGTEXT N_("This renders the font using \"paletized YUV\". " \
   "This option is only needed if you want to encode into DVB subtitles" )
 #define EFFECT_TEXT N_("Font Effect")
-/// \bug [String] Missing space
-#define EFFECT_LONGTEXT N_("It is possible to apply effects to the rendered" \
+#define EFFECT_LONGTEXT N_("It is possible to apply effects to the rendered " \
 "text to improve its readability." )
 
 #define EFFECT_BACKGROUND  1 
