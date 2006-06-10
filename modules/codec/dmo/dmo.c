@@ -186,7 +186,7 @@ static const codec_dll encoders_table[] =
 {
     /* WMV2 */
     { VLC_FOURCC('W','M','V','2'), "wmvdmoe.dll", &guid_wmv_enc },
-    { VLC_FOURCC('w','m','v','1'), "wmvdmoe.dll", &guid_wmv_enc },
+    { VLC_FOURCC('w','m','v','2'), "wmvdmoe.dll", &guid_wmv_enc },
     /* WMV1 */
     { VLC_FOURCC('W','M','V','1'), "wmvdmoe.dll", &guid_wmv_enc },
     { VLC_FOURCC('w','m','v','1'), "wmvdmoe.dll", &guid_wmv_enc },
