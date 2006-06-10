@@ -270,7 +270,8 @@ vlc_int64_t libvlc_input_get_time       ( libvlc_input_t *, libvlc_exception_t *
 float       libvlc_input_get_position   ( libvlc_input_t *, libvlc_exception_t *);
 vlc_bool_t  libvlc_input_will_play      ( libvlc_input_t *, libvlc_exception_t *);
 vlc_bool_t  libvlc_input_has_vout       ( libvlc_input_t *, libvlc_exception_t *);
-
+float       libvlc_input_get_fps        ( libvlc_input_t *, libvlc_exception_t *);
+        
 /** @} */
 
 /** defgroup libvlc_video Video

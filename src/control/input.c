@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <libvlc_internal.h>
+#include <vlc_demux.h>
 #include <vlc/libvlc.h>
 
 #include <vlc/intf.h>
@@ -114,6 +115,20 @@ float libvlc_input_get_position( libvlc_input_t *p_input,
     vlc_object_release( p_input_thread );
 
     return val.f_float;
+}
+
+float libvlc_input_get_fps( libvlc_input_t *p_input,
+                            libvlc_exception_t *p_exception) 
+{
+    double f_fps;
+    input_thread_t *p_input_thread;
+
+    p_input_thread = libvlc_get_input_thread ( p_input, p_exception);
+
+    if( demux2_Control( p_input_thread->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
+        return 0;
+    else
+        return( f_fps );
 }
 
 vlc_bool_t libvlc_input_will_play( libvlc_input_t *p_input,
