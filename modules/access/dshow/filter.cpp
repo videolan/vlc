@@ -144,6 +144,9 @@ const GUID MEDIASUBTYPE_MPEG2_PROGRAM = {0xe06d8022, 0xdb46, 0x11cf, {0xb4, 0xd1
 const GUID MEDIASUBTYPE_MPEG2_TRANSPORT = {0xe06d8023, 0xdb46, 0x11cf, {0xb4, 0xd1, 0x00, 0x80, 0x5f, 0x6c, 0xbb, 0xea}};
 const GUID FORMAT_MPEG2Video = {0xe06d80e3, 0xdb46, 0x11cf, {0xb4, 0xd1, 0x00, 0x80, 0x5f, 0x6c, 0xbb, 0xea}};
 
+/* MJPG format */
+const GUID MEDIASUBTYPE_MJPG = {0x47504A4D, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+
 /* Analog Video */
 const GUID FORMAT_AnalogVideo = {0x482dde0, 0x7817, 0x11cf, {0x8a, 0x3, 0x0, 0xaa, 0x0, 0x6e, 0xcb, 0x65}};
 
@@ -282,6 +285,11 @@ int GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
                i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'd' );
             else if( media_type.subtype == MEDIASUBTYPE_dvhd )
                i_fourcc = VLC_FOURCC( 'd', 'v', 'h', 'd' );
+
+            /* MJPEG format */
+            else if( media_type.subtype == MEDIASUBTYPE_MJPG )
+                i_fourcc = VLC_FOURCC( 'M', 'J', 'P', 'G' );
+
         }
     }
     else if( media_type.majortype == MEDIATYPE_Audio )
