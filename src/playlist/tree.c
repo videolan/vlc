@@ -54,7 +54,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, char *psz_name,
     input_item_t *p_input;
     playlist_item_t *p_item;
 
-    if( !psz_name ) psz_name = strdup( _("Undefined") );
+    if( !psz_name ) psz_name = _("Undefined");
     p_input = input_ItemNewWithType( VLC_OBJECT(p_playlist), NULL, psz_name,
                                      0, NULL, -1, ITEM_TYPE_NODE );
     p_input->i_id = ++p_playlist->i_last_input_id;
@@ -128,7 +128,8 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
 int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
                          vlc_bool_t b_delete_items, vlc_bool_t b_force )
 {
-    int i, i_top, i_bottom;
+    int i;
+
     if( p_root->i_children == -1 )
     {
         return VLC_EGENERIC;
