@@ -27,6 +27,7 @@
 #include "wxwidgets.hpp"
 
 #include <wx/treectrl.h>
+#include <wx/notebook.h>
 
 namespace wxvlc
 {
