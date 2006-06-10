@@ -63,8 +63,7 @@ static void                  intf_InteractionDialogDestroy(
  * \param p_interact the interaction element
  * \return VLC_SUCCESS or an error code
  */
-int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *
-                                    p_dialog )
+int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 {
     interaction_t *p_interaction = intf_InteractionGet( p_this );
 
@@ -74,10 +73,9 @@ int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *
         p_dialog->i_id = ++p_interaction->i_last_id;
     }
 
-    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
-    {
-       return VLC_EGENERIC;
-    }
+    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT ) return VLC_EGENERIC;
+
+    if( !config_GetInt(p_this, "interact") ) return VLC_EGENERIC;
 
     p_dialog->p_interaction = p_interaction;
     p_dialog->p_parent = p_this;

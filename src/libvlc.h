@@ -113,6 +113,11 @@ static char *ppsz_snap_formats[] =
     "When this is enabled, the interface is shown when you move the mouse to "\
     "the edge of the screen in fullscreen mode." )
 
+#define INTERACTION_TEXT N_("Interface interaction")
+#define INTERACTION_LONGTEXT N_( \
+    "When this is enabled, the interface will show a dialog box each time " \
+    "some user input is required." )
+
 
 /*****************************************************************************
  * Audio
@@ -1584,6 +1589,8 @@ vlc_module_begin();
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     VLC_FALSE );
+    add_bool( "interact", VLC_FALSE, NULL, INTERACTION_TEXT,
+              INTERACTION_LONGTEXT, VLC_FALSE );
 
     add_bool( "show-intf", VLC_FALSE, NULL, SHOWINTF_TEXT, SHOWINTF_LONGTEXT,
               VLC_FALSE );
