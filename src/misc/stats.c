@@ -88,10 +88,8 @@ int __stats_Create( vlc_object_t *p_this, const char *psz_name, unsigned int i_i
     counter_t *p_counter;
     stats_handler_t *p_handler;
 
-    if( p_this->p_libvlc->b_stats == VLC_FALSE )
-    {
-        return VLC_EGENERIC;
-    }
+    if( !p_this->p_libvlc->b_stats ) return VLC_EGENERIC;
+
     p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return VLC_ENOMEM;
 
@@ -128,13 +126,11 @@ int __stats_Update( vlc_object_t *p_this, unsigned int i_counter,
 {
     int i_ret;
     counter_t *p_counter;
+    stats_handler_t *p_handler;
+
+    if( !p_this->p_libvlc->b_stats ) return VLC_EGENERIC;
 
     /* Get stats handler singleton */
-    stats_handler_t *p_handler;
-    if( p_this->p_libvlc->b_stats == VLC_FALSE )
-    {
-        return VLC_EGENERIC;
-    }
     p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return VLC_ENOMEM;
 
@@ -166,13 +162,11 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id,
                  unsigned int i_counter, vlc_value_t *val )
 {
     counter_t *p_counter;
+    stats_handler_t *p_handler;
+
+    if( !p_this->p_libvlc->b_stats ) return VLC_EGENERIC;
 
     /* Get stats handler singleton */
-    stats_handler_t *p_handler;
-    if( p_this->p_libvlc->b_stats == VLC_FALSE )
-    {
-        return VLC_EGENERIC;
-    }
     p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return VLC_ENOMEM;
     vlc_mutex_lock( &p_handler->object_lock );
@@ -244,12 +238,10 @@ counter_t *__stats_CounterGet( vlc_object_t *p_this, int i_object_id,
                                unsigned int i_counter )
 {
     counter_t *p_counter;
-
     stats_handler_t *p_handler;
-    if( p_this->p_libvlc->b_stats == VLC_FALSE )
-    {
-        return NULL;
-    }
+
+    if( !p_this->p_libvlc->b_stats ) return NULL;
+
     p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return NULL;
 
@@ -264,12 +256,14 @@ counter_t *__stats_CounterGet( vlc_object_t *p_this, int i_object_id,
 }
 
 
-void stats_ComputeInputStats( input_thread_t *p_input,
-                              input_stats_t *p_stats )
+void stats_ComputeInputStats( input_thread_t *p_input, input_stats_t *p_stats )
 {
     vlc_object_t *p_obj;
     vlc_list_t *p_list;
     int i_index;
+
+    if( !p_input->p_libvlc->b_stats ) return;
+
     vlc_mutex_lock( &p_stats->lock );
 
     /* Input */
@@ -360,11 +354,13 @@ void stats_DumpInputStats( input_stats_t *p_stats  )
     vlc_mutex_unlock( &p_stats->lock );
 }
 
-void __stats_ComputeGlobalStats( vlc_object_t *p_obj,
-                                global_stats_t *p_stats )
+void __stats_ComputeGlobalStats( vlc_object_t *p_obj, global_stats_t *p_stats )
 {
     vlc_list_t *p_list;
     int i_index;
+
+    if( !p_obj->p_libvlc->b_stats ) return;
+
     vlc_mutex_lock( &p_stats->lock );
 
     p_list = vlc_list_find( p_obj, VLC_OBJECT_INPUT, FIND_ANYWHERE );
@@ -401,8 +397,11 @@ void stats_ReinitGlobalStats( global_stats_t *p_stats )
 void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name,
                          unsigned int i_id )
 {
-    counter_t *p_counter = stats_CounterGet( p_obj,
-                                             p_obj->p_vlc->i_object_id, i_id );
+    counter_t *p_counter;
+
+    if( !p_obj->p_libvlc->b_stats ) return;
+
+    p_counter = stats_CounterGet( p_obj, p_obj->p_vlc->i_object_id, i_id );
     if( !p_counter )
     {
         counter_sample_t *p_sample;
@@ -432,9 +431,11 @@ void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name,
 
 void __stats_TimerStop( vlc_object_t *p_obj, unsigned int i_id )
 {
-    counter_t *p_counter = stats_CounterGet( p_obj,
-                                             p_obj->p_vlc->i_object_id,
-                                             i_id );
+    counter_t *p_counter;
+
+    if( !p_obj->p_libvlc->b_stats ) return;
+
+    p_counter = stats_CounterGet( p_obj, p_obj->p_vlc->i_object_id, i_id );
     if( !p_counter || p_counter->i_samples != 2 )
     {
         msg_Err( p_obj, "Timer does not exist" );
@@ -448,9 +449,11 @@ void __stats_TimerStop( vlc_object_t *p_obj, unsigned int i_id )
 
 void __stats_TimerDump( vlc_object_t *p_obj, unsigned int i_id )
 {
-    counter_t *p_counter = stats_CounterGet( p_obj,
-                                             p_obj->p_vlc->i_object_id,
-                                             i_id );
+    counter_t *p_counter;
+
+    if( !p_obj->p_libvlc->b_stats ) return;
+
+    p_counter = stats_CounterGet( p_obj, p_obj->p_vlc->i_object_id, i_id );
     TimerDump( p_obj, p_counter, VLC_TRUE );
 }
 
