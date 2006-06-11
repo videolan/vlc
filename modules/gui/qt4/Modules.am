@@ -11,7 +11,7 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-TOUI = ui/input_stats ui/main_interface
+TOUI = ui/input_stats ui/main_interface ui/file_open
 UIH = $(TOUI:%=%.h)
 
 TOMOC = main_interface \
@@ -23,6 +23,7 @@ TOMOC = main_interface \
 	components/infopanels \
 	components/preferences_widgets \
 	components/preferences \
+	components/open \
 	util/input_slider
 MOCCPP = $(TOMOC:%=%.moc.cpp)
 
@@ -36,6 +37,7 @@ nodist_SOURCES_qt4 = \
 		components/infopanels.moc.cpp \
 	 	components/preferences_widgets.moc.cpp \
 	 	components/preferences.moc.cpp \
+		components/open.moc.cpp \
 		util/input_slider.moc.cpp
 
 if ENABLE_QT4
@@ -65,6 +67,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/infopanels.cpp \
 		components/preferences_widgets.cpp \
 		components/preferences.cpp \
+		components/open.cpp \
 		util/input_slider.cpp
 		$(NULL)
 
@@ -79,6 +82,7 @@ EXTRA_DIST += \
 	components/infopanels.hpp \
 	components/preferences_widgets.hpp \
 	components/preferences.hpp \
+	components/open.hpp \
 	util/input_slider.hpp \
 	ui/input_stats.ui \
 	pixmaps/advanced.xpm \
