@@ -905,9 +905,6 @@ endif
 ifeq ($(HOST),i686-apple-darwin8)
 	(cd $@;patch -p 0 < ../Patches/ffmpeg-svn-mactel.patch)
 endif
-ifneq ($(HOST),$(BUILD))
-	patch -p 0 < Patches/ffmpeg-svn-cross.patch
-endif
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	$(WGET) $(FFMPEG_URL)
