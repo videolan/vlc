@@ -164,6 +164,7 @@ namespace wxvlc
         Timer *timer;
         intf_thread_t *p_intf;
 
+        unsigned int i_update_counter;
         int i_old_playing_status;
 
         /* For auto-generated menus */

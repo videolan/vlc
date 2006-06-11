@@ -364,6 +364,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     b_extra = VLC_FALSE;
     extra_frame = 0;
     playlist_manager = 0;
+    i_update_counter = 0;
 
 
     /* Give our interface a nice little icon */
@@ -529,9 +530,11 @@ void Interface::Init()
 void Interface::Update()
 {
     /* Misc updates */
-    ((VLCVolCtrl *)volctrl)->UpdateVolume();
+    if( !(i_update_counter % 10) ) ((VLCVolCtrl *)volctrl)->UpdateVolume();
 
     if( playlist_manager ) playlist_manager->Update();
+
+    i_update_counter++;
 }
 
 void Interface::OnControlEvent( wxCommandEvent& event )
