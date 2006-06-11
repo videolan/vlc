@@ -336,22 +336,37 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
     if( p_frag->p_buffer[3] == 0xB0 || p_frag->p_buffer[3] == 0xB1 )
     {
+#if 0
         /* Remove VOS start/end code from the original stream */
         block_Release( p_frag );
+#else
+        /* Append the block for now since ts/ps muxers rely on VOL
+         * being present in the stream */
+        block_ChainLastAppend( &p_sys->pp_last, p_frag );
+#endif
         return NULL;
     }
     if( p_frag->p_buffer[3] >= 0x20 && p_frag->p_buffer[3] <= 0x2f )
     {
         /* Copy the complete VOL */
-        p_dec->fmt_out.i_extra = p_frag->i_buffer;
-        p_dec->fmt_out.p_extra =
-            realloc( p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+        if( p_dec->fmt_out.i_extra != p_frag->i_buffer )
+        {
+            p_dec->fmt_out.p_extra =
+                realloc( p_dec->fmt_out.p_extra, p_frag->i_buffer );
+            p_dec->fmt_out.i_extra = p_frag->i_buffer;
+        }
         memcpy( p_dec->fmt_out.p_extra, p_frag->p_buffer, p_frag->i_buffer );
         ParseVOL( p_dec, &p_dec->fmt_out,
                   p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
 
+#if 0
         /* Remove from the original stream */
         block_Release( p_frag );
+#else
+        /* Append the block for now since ts/ps muxers rely on VOL
+         * being present in the stream */
+        block_ChainLastAppend( &p_sys->pp_last, p_frag );
+#endif
         return NULL;
     }
     else
