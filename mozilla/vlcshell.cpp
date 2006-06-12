@@ -688,7 +688,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         {
 #if USE_LIBVLC
             VLC_AddTarget( p_plugin->i_vlc, p_plugin->psz_target,
-                           0, 0, PLAYLIST_INSERT, 0 );
+                           0, 0, i_mode, -666 );
 #endif
             p_plugin->b_stream = VLC_TRUE;
         }
