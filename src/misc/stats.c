@@ -111,6 +111,7 @@ int __stats_Create( vlc_object_t *p_this, const char *psz_name, unsigned int i_i
                  p_handler->i_counters, p_counter );
 
     vlc_mutex_unlock( &p_handler->object_lock );
+    vlc_object_release( p_handler );
 
     return VLC_SUCCESS;
 }
@@ -146,6 +147,7 @@ int __stats_Update( vlc_object_t *p_this, unsigned int i_counter,
 
     i_ret = stats_CounterUpdate( p_handler, p_counter, val, val_new );
     vlc_mutex_unlock( &p_handler->object_lock );
+    vlc_object_release( p_handler );
 
     return i_ret;
 }
@@ -184,6 +186,7 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id,
     if( p_counter->i_samples == 0 )
     {
         vlc_mutex_unlock( &p_handler->object_lock );
+        vlc_object_release( p_handler );
         val->i_int = val->f_float = 0.0;
         return VLC_EGENERIC;
     }
@@ -201,6 +204,7 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id,
         if( p_counter->i_samples < 2 )
         {
             vlc_mutex_unlock( &p_handler->object_lock );
+            vlc_object_release( p_handler );
             val->i_int = 0; val->f_float = 0.0;
             return VLC_EGENERIC;
         }
@@ -474,6 +478,7 @@ void __stats_TimersDumpAll( vlc_object_t *p_obj )
         }
     }
     vlc_mutex_unlock( &p_handler->object_lock );
+    vlc_object_release( p_handler );
 }
 
 
