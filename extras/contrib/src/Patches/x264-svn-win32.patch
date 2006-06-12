@@ -178,8 +178,8 @@ Index: configure
      AS="yasm"
      ASFLAGS="-f elf -m amd64"
      ;;
--  "Power Macintosh"|ppc)
-+  "power macintosh"|ppc)
+-  "Power Macintosh"|ppc|ppc64)
++  "power macintosh"|ppc|ppc64)
      ARCH="PPC"
      if [ $SYS = MACOSX ]
      then
