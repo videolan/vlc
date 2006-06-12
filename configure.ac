@@ -2729,7 +2729,7 @@ dnl Trying with pkg-config
       AC_CHECK_HEADERS(ffmpeg/avutil.h)
       AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
 
-      AC_CHECK_LIB(avutil, av_add_i, [
+      AC_CHECK_LIB(avutil, av_crc_init, [
         VLC_ADD_LDFLAGS([ffmpeg],[-lavutil])
         LDAVUTIL="-lavutil"])
 
