@@ -48,6 +48,16 @@ static void Display   ( vout_thread_t *, picture_t * );
 #define FORMAT_TEXT N_( "Image format" )
 #define FORMAT_LONGTEXT N_( "Format of the output images (png or jpg)." )
 
+#define WIDTH_TEXT N_( "Image width" )
+#define WIDTH_LONGTEXT N_( "You can enforce the image width. By default " \
+                            "(-1) VLC will adapt to the video " \
+                            "characteristics.")
+
+#define HEIGHT_TEXT N_( "Image height" )
+#define HEIGHT_LONGTEXT N_( "You can enforce the image height. By default " \
+                            "(-1) VLC will adapt to the video " \
+                            "characteristics.")
+
 #define RATIO_TEXT N_( "Recording ratio" )
 #define RATIO_LONGTEXT N_( "Ratio of images to record. "\
                            "3 means that one image out of three is recorded." )
@@ -74,8 +84,12 @@ vlc_module_begin( );
 
     add_string( "image-out-format", "png", NULL,  FORMAT_TEXT, FORMAT_LONGTEXT,
                                                   VLC_FALSE );
-        change_string_list( psz_format_list, psz_format_list_text, 0 );
-    add_integer( "image-out-ratio", 3 , NULL,  RATIO_TEXT, RATIO_LONGTEXT,
+    change_string_list( psz_format_list, psz_format_list_text, 0 );
+    add_integer( "image-width", -1, NULL,  WIDTH_TEXT, WIDTH_LONGTEXT,
+                                                  VLC_TRUE );
+    add_integer( "image-height", -1, NULL,  HEIGHT_TEXT, HEIGHT_LONGTEXT,
+                                                  VLC_TRUE );
+    add_integer( "image-out-ratio", 3, NULL, RATIO_TEXT, RATIO_LONGTEXT,
                                                   VLC_FALSE );
     add_string( "image-out-prefix", "img", NULL, PREFIX_TEXT, PREFIX_LONGTEXT,
                                                   VLC_FALSE );
@@ -92,6 +106,9 @@ struct vout_sys_t
     char        *psz_prefix;          /* Prefix */
     char        *psz_format;          /* Format */
     int         i_ratio;         /* Image ratio */
+
+    int         i_width;         /* Image width */
+    int         i_height;       /* Image height */
 
     int         i_current;     /* Current image */
     int         i_frames;   /* Number of frames */
@@ -121,6 +138,10 @@ static int Create( vlc_object_t *p_this )
             var_CreateGetString( p_this, "image-out-prefix" );
     p_vout->p_sys->psz_format =
             var_CreateGetString( p_this, "image-out-format" );
+    p_vout->p_sys->i_width =
+            var_CreateGetInteger( p_this, "image-width" );
+    p_vout->p_sys->i_height =
+            var_CreateGetInteger( p_this, "image-height" );
     p_vout->p_sys->i_ratio =
             var_CreateGetInteger( p_this, "image-out-ratio" );
     p_vout->p_sys->b_replace =
@@ -244,8 +265,13 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
                                       + strlen( p_vout->p_sys->psz_format ) );
 
     fmt_in.i_chroma = p_vout->render.i_chroma;
-    fmt_out.i_width = fmt_in.i_width = p_vout->render.i_width;
-    fmt_out.i_height = fmt_in.i_height = p_vout->render.i_height;
+    fmt_in.i_width = p_vout->render.i_width;
+    fmt_in.i_height = p_vout->render.i_height;
+
+    fmt_out.i_width = p_vout->p_sys->i_width > 0 ? p_vout->p_sys->i_width :
+                                                   p_vout->render.i_width;
+    fmt_out.i_height = p_vout->p_sys->i_height > 0 ? p_vout->p_sys->i_height :
+                                                     p_vout->render.i_height;
 
     if( p_vout->p_sys->b_replace )
     {
