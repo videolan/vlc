@@ -232,7 +232,7 @@ void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
             /* FIXME: ideally we would check the time amount of data
              * in the fifo instead of its size. */
             msg_Warn( p_dec, "decoder/packetizer fifo full (data not "
-                      "consummed quickly enough), resetting fifo!" );
+                      "consumed quickly enough), resetting fifo!" );
             block_FifoEmpty( p_dec->p_owner->p_fifo );
         }
 
