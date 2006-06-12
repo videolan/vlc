@@ -701,10 +701,17 @@ static void RunThread( vout_thread_t *p_vout)
 
     subpicture_t *  p_subpic = NULL;                   /* subpicture pointer */
 
+    vlc_value_t     val;
+    vlc_bool_t      b_drop_late;
+
     /*
      * Initialize thread
      */
     p_vout->b_error = InitThread( p_vout );
+
+    var_Create( p_vout, "drop-late-frames", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_vout, "drop-late-frames", &val );
+    b_drop_late = val.b_bool;
 
     /* signal the creation of the vout */
     vlc_thread_ready( p_vout );
@@ -791,12 +798,10 @@ static void RunThread( vout_thread_t *p_vout)
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ]
                 = display_date;
 
-            /* XXX: config_GetInt is slow, but this kind of frame dropping
-             * should not happen that often. */
             if( !p_picture->b_force &&
                 p_picture != p_last_picture &&
                 display_date < current_date + p_vout->render_time &&
-                config_GetInt( p_vout, "drop-late-frames" ) )
+                b_drop_late )
             {
                 /* Picture is late: it will be destroyed and the thread
                  * will directly choose the next picture */
