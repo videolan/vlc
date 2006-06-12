@@ -300,6 +300,8 @@ void playlist_NodesCreateForSD( playlist_t *p_playlist, char *psz_name,
                                         p_playlist->p_root_onelevel );
     (*pp_node_one)->i_flags |= PLAYLIST_RO_FLAG;
     (*pp_node_one)->i_flags |= PLAYLIST_SKIP_FLAG;
+
+    (*pp_node_one)->p_input->i_id = (*pp_node_cat)->p_input->i_id;
 }
 
 

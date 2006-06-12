@@ -168,6 +168,9 @@ int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
         p_playlist->request.p_node = p_playlist->status.p_node;
         p_playlist->request.p_item = p_playlist->status.p_item;
         p_playlist->request.i_skip = (int) va_arg( args, int );
+        /* if already running, keep running */
+        if( p_playlist->status.i_status != PLAYLIST_STOPPED )
+            p_playlist->request.i_status = p_playlist->status.i_status;
         p_playlist->request.b_request = VLC_TRUE;
         break;
 

@@ -237,7 +237,6 @@ int playlist_PlaylistAddInput( playlist_t* p_playlist, input_item_t *p_input,
                                int i_mode, int i_pos )
 {
     playlist_item_t *p_item_cat, *p_item_one;
-    p_input->i_id = ++p_playlist->i_last_input_id;
 
     msg_Dbg( p_playlist, "adding playlist item `%s' ( %s )",
              p_input->psz_name, p_input->psz_uri );
