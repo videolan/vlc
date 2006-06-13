@@ -849,38 +849,8 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         psz_subtitle = var_GetString( p_input, "sub-file" );
         if( *psz_subtitle )
         {
-            input_source_t *sub;
-            vlc_value_t count;
-            vlc_value_t list;
-
             msg_Dbg( p_input, "forced subtitle: %s", psz_subtitle );
-
-            var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
-
-            /* */
-            sub = InputSourceNew( p_input );
-            if( !InputSourceInit( p_input, sub, psz_subtitle, "subtitle",
-                                  VLC_FALSE ) )
-            {
-                TAB_APPEND( p_input->i_slave, p_input->slave, sub );
-
-                /* Select the ES */
-                if( !var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list,
-                                 NULL ) )
-                {
-                    if( count.i_int == 0 )
-                        count.i_int++;
-                        /* if it was first one, there is disable too */
-
-                    if( count.i_int < list.p_list->i_count )
-                    {
-                        input_ControlPush( p_input, INPUT_CONTROL_SET_ES,
-                                          &list.p_list->p_values[count.i_int] );
-                    }
-                    var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list,
-                                NULL );
-                }
-            }
+            input_AddSubtitles( p_input, psz_subtitle, VLC_FALSE );
         }
 
         var_Get( p_input, "sub-autodetect-file", &val );
@@ -890,12 +860,20 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
             char **subs = subtitles_Detect( p_input, psz_autopath,
                                             p_input->input.p_item->psz_uri );
             input_source_t *sub;
-            vlc_value_t count;
-            vlc_value_t list;
 
-            var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
+            i = 0;
 
-            for( i = 0; subs && subs[i]; i++ )
+            /* Try to autoselect the first autodetected subtitles file
+             * if no subtitles file was specified */
+            if( *psz_subtitle == 0 && subs && subs[0] )
+            {
+                input_AddSubtitles( p_input, subs[0], VLC_FALSE );
+                free( subs[0] );
+                i = 1;
+            }
+
+            /* Then, just add the following subtitles files */
+            for( ; subs && subs[i]; i++ )
             {
                 if( strcmp( psz_subtitle, subs[i] ) )
                 {
@@ -904,26 +882,6 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                                           VLC_FALSE ) )
                     {
                         TAB_APPEND( p_input->i_slave, p_input->slave, sub );
-
-                        /* If no subtitle was specified, select the first
-                         * autodetected subtitle. */
-                        if( i == 0 && psz_subtitle != NULL )
-                        {
-                            /* Select the ES */
-                            if( !var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
-                            {
-                                if( count.i_int == 0 )
-                                    count.i_int++;
-                                /* if it was first one, there is disable too */
-
-                                if( count.i_int < list.p_list->i_count )
-                                {
-                                    input_ControlPush( p_input, INPUT_CONTROL_SET_ES,
-                                                       &list.p_list->p_values[count.i_int] );
-                                }
-                                var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
-                            }
-                        }
                     }
                 }
                 free( subs[i] );
