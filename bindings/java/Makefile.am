@@ -13,7 +13,7 @@ JINCLUDES = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/win32
 LIBJINCLUDES = -L${JAVA_HOME}/lib -ljawt
 JCC = javac
 JCH = javah
-JAVA_CC_FLAGS =
+#JAVA_CC_FLAGS =
 #CXX = g++ -Wall -mno-cygwin -g
 #LDFLAGS = -mno-cygwin `vlc-config --libs external pic` -Wl,--kill-at
 JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
@@ -25,7 +25,7 @@ JCC = gcj -g
 JCH = gcjh -jni
 SWT_PATH = /usr/share/java
 # Compile flags
-JAVA_CC_FLAGS = -C
+JCC_FLAGS = -C
 JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
 JAVALDFLAGS = -L../../src -lvlc `top_builddir=../.. ../../vlc-config --libs builtin vlc pic`
 endif
@@ -48,18 +48,18 @@ vlc-libvlc-jni.o: VlcClient
 	$(CXX) -c vlc-libvlc-jni.cc $(CXXFLAGS) $(JAVACXXFLAGS)
 
 VlcClient: $(OBJECTS)
-	$(JCC) $(JAVA_CC_FLAGS) VlcClient.java
+	$(JCC) $(JCC_FLAGS) VlcClient.java
 
 VLCExample: $(OBJECTS)
-	$(JCC) $(JAVA_CC_FLAGS) VLCExample.java
+	$(JCC) $(JCC_FLAGS) VLCExample.java
 
 if HAVE_WIN32
 %.class: %.java
-	$(JCC) $(JAVA_CC_FLAGS) $?
+	$(JCC) $(JCC_FLAGS) $?
 	$(JCH) org.videolan.jvlc.$(*F)
 else
 %.class: %.java
-	$(JCC) $(JAVA_CC_FLAGS) $?
+	$(JCC) $(JCC_FLAGS) $?
 	$(JCH) org/videolan/jvlc/$(*F)
 
 clean:
