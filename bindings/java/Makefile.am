@@ -13,8 +13,8 @@ JINCLUDES = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/win32
 LIBJINCLUDES = -L${JAVA_HOME}/lib -ljawt
 JCC = javac
 JCH = javah
-CXX = g++ -Wall -mno-cygwin  -
-LDFLAGS = -mno-cygwin `vlc-config --libs external pic` -Wl,--kill-at
+#CXX = g++ -Wall -mno-cygwin -g
+#LDFLAGS = -mno-cygwin `vlc-config --libs external pic` -Wl,--kill-at
 JAVALDFLAGS = -mno-cygwin -L../../src -lvlc `top_builddir=../.. ../../vlc-config --libs builtin vlc pic` -Wl,--kill-at
 else
 JINCLUDES = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
