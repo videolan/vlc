@@ -4,7 +4,7 @@
 
 if BUILD_JAVA
 
-OBJECTS = org/videolan/jvlc/AudioIntf.class org/videolan/jvlc/InputIntf.class org/videolan/jvlc/PlaylistIntf.class org/videolan/jvlc/VideoIntf.class org/videolan/jvlc/JLibVLC.class org/videolan/jvlc/JVLC.class org/videolan/jvlc/JVLCCanvas.class org/videolan/jvlc/JVLCPanel.class org/videolan/jvlc/VLMIntf.class org/videolan/jvlc/Playlist.class org/videolan/jvlc/GenericVideoWidget.class
+OBJECTS = org/videolan/jvlc/Playlist.class org/videolan/jvlc/AudioIntf.class org/videolan/jvlc/InputIntf.class org/videolan/jvlc/PlaylistIntf.class org/videolan/jvlc/VideoIntf.class org/videolan/jvlc/JLibVLC.class org/videolan/jvlc/JVLC.class org/videolan/jvlc/JVLCCanvas.class org/videolan/jvlc/JVLCPanel.class org/videolan/jvlc/VLMIntf.class org/videolan/jvlc/GenericVideoWidget.class
 
 # Include some JAVA stuff
 PROCESSOR_FAMILY = `uname -m | sed -e 's/^i.86/i386/' | sed -e 's/^x86_64/amd64/'`
@@ -53,11 +53,17 @@ VlcClient: $(OBJECTS)
 VLCExample: $(OBJECTS)
 	$(JCC) $(JCC_FLAGS) VLCExample.java
 
+if HAVE_WIN32
+%.class: %.java
+	$(JCC) $(JCC_FLAGS) $?
+	$(JCH) org.videolan.jvlc.$(*F)
+else
 %.class: %.java
 	$(JCC) $(JCC_FLAGS) $?
 	$(JCH) org/videolan/jvlc/$(*F)
+endif
 
 clean:
-	rm -f *.class *~ org/videolan/jvlc/*.class org_videolan*.h *.so *.o
+	rm -f *.class *~ org/videolan/jvlc/*.class org_videolan*.h *.so *.o *.dll
 
 endif
