@@ -2,7 +2,7 @@
  * sfilter.h: MacOS X Subpicture filters dialogue
  *****************************************************************************
  * Copyright (C) 2005-2006 the VideoLAN team
- * $Id:$
+ * $Id$
  *
  * Authors: Felix Kühne <fkuehne@users.sf.net>
  *
@@ -39,7 +39,7 @@
     IBOutlet id o_logo_opaque_lbl;
     IBOutlet id o_logo_opaque_sld;
     IBOutlet id o_logo_pos_lbl;
-    IBOutlet id o_logo_pos_rel_pop;
+    IBOutlet id o_logo_pos_radio;
     
     /* marquee section */
     IBOutlet id o_marq_enabled_ckb;
@@ -50,7 +50,7 @@
     IBOutlet id o_marq_opaque_lbl;
     IBOutlet id o_marq_opaque_sld;
     IBOutlet id o_marq_pos_lbl;
-    IBOutlet id o_marq_pos_rel_pop;
+    IBOutlet id o_marq_pos_radio;
     IBOutlet id o_marq_size_inPx_lbl;
     IBOutlet id o_marq_size_lbl;
     IBOutlet id o_marq_size_pop;
@@ -65,7 +65,7 @@
     IBOutlet id o_time_opaque_lbl;
     IBOutlet id o_time_opaque_sld;
     IBOutlet id o_time_pos_lbl;
-    IBOutlet id o_time_pos_rel_pop;
+    IBOutlet id o_time_pos_radio;
     IBOutlet id o_time_size_inPx_lbl;
     IBOutlet id o_time_size_lbl;
     IBOutlet id o_time_size_pop;

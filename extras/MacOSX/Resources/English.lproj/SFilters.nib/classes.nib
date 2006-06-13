@@ -13,7 +13,7 @@
                 "o_logo_opaque_lbl" = id; 
                 "o_logo_opaque_sld" = id; 
                 "o_logo_pos_lbl" = id; 
-                "o_logo_pos_rel_pop" = id; 
+                "o_logo_pos_radio" = id; 
                 "o_marq_color_lbl" = id; 
                 "o_marq_color_pop" = id; 
                 "o_marq_enabled_ckb" = id; 
@@ -22,7 +22,7 @@
                 "o_marq_opaque_lbl" = id; 
                 "o_marq_opaque_sld" = id; 
                 "o_marq_pos_lbl" = id; 
-                "o_marq_pos_rel_pop" = id; 
+                "o_marq_pos_radio" = id; 
                 "o_marq_size_inPx_lbl" = id; 
                 "o_marq_size_lbl" = id; 
                 "o_marq_size_pop" = id; 
@@ -38,7 +38,7 @@
                 "o_time_opaque_lbl" = id; 
                 "o_time_opaque_sld" = id; 
                 "o_time_pos_lbl" = id; 
-                "o_time_pos_rel_pop" = id; 
+                "o_time_pos_radio" = id; 
                 "o_time_size_inPx_lbl" = id; 
                 "o_time_size_lbl" = id; 
                 "o_time_size_pop" = id; 

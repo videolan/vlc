@@ -74,38 +74,24 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_sfilter_saveSettings_ckb setTitle: _NS("Save settings")];
     [o_logo_image_btn setTitle: _NS("Browse...")];
     [o_logo_enabled_ckb setTitle: _NS("Enabled")];
-    [o_logo_image_lbl setStringValue: [_NS("Image") \
-        stringByAppendingString: @":"]];
-    [o_logo_pos_lbl setStringValue: [_NS("Position") \
-        stringByAppendingString: @":"]];
-    [o_logo_opaque_lbl setStringValue: [_NS("Opaqueness") \
-        stringByAppendingString: @":"]];
+    [o_logo_image_lbl setStringValue: _NS("Image:")];
+    [o_logo_pos_lbl setStringValue: _NS("Position:")];
+    [o_logo_opaque_lbl setStringValue: _NS("Opaqueness")];
     [o_time_enabled_ckb setTitle: _NS("Enabled")];
-    [o_time_stamp_lbl setStringValue: [_NS("Timestamp") \
-        stringByAppendingString: @":"]];
-    [o_time_size_lbl setStringValue: [_NS("Size") \
-        stringByAppendingString: @":"]];
-    [o_time_color_lbl setStringValue: [_NS("Color") \
-        stringByAppendingString: @":"]];
-    [o_time_opaque_lbl setStringValue: [_NS("Opaqueness") \
-        stringByAppendingString: @":"]];
-    [o_time_pos_lbl setStringValue: [_NS("Position") \
-        stringByAppendingString: @":"]];
+    [o_time_stamp_lbl setStringValue: _NS("Timestamp:")];
+    [o_time_size_lbl setStringValue: _NS("Size:")];
+    [o_time_color_lbl setStringValue: _NS("Color:")];
+    [o_time_opaque_lbl setStringValue: _NS("Opaqueness:")];
+    [o_time_pos_lbl setStringValue: _NS("Position:")];
     [o_time_size_inPx_lbl setStringValue: _NS("(in pixels)")];
     [o_marq_enabled_ckb setTitle: _NS("Enabled")];
-    [o_marq_color_lbl setStringValue: [_NS("Color") \
-        stringByAppendingString: @":"]];
-    [o_marq_marq_lbl setStringValue: [_NS("Marquee") \
-        stringByAppendingString: @":"]];
-    [o_marq_opaque_lbl setStringValue: [_NS("Opaqueness") \
-        stringByAppendingString: @":"]];
-    [o_marq_tmOut_lbl setStringValue: [_NS("Timeout") \
-        stringByAppendingString: @":"]];
+    [o_marq_color_lbl setStringValue: _NS("Color:")];
+    [o_marq_marq_lbl setStringValue: _NS("Marquee:")];
+    [o_marq_opaque_lbl setStringValue: _NS("Opaqueness")];
+    [o_marq_tmOut_lbl setStringValue: _NS("Timeout:")];
     [o_marq_tmOut_ms_lbl setStringValue: _NS("ms")];
-    [o_marq_pos_lbl setStringValue: [_NS("Position") \
-        stringByAppendingString: @":"]];
-    [o_marq_size_lbl setStringValue: [_NS("Size") \
-        stringByAppendingString: @":"]];
+    [o_marq_pos_lbl setStringValue: _NS("Position:")];
+    [o_marq_size_lbl setStringValue: _NS("Size:")];
     [o_time_color_lbl setStringValue: _NS("(in pixels)")];
 }
 
@@ -148,8 +134,8 @@ static VLCsFilters *_o_sharedInstance = nil;
     o_navy = [NSArray arrayWithObjects: _NS("Navy"), @"0x000080", nil];
     o_blue = [NSArray arrayWithObjects: _NS("Blue"), @"0x0000FF", nil];
     o_aqua = [NSArray arrayWithObjects: _NS("Aqua"), @"0x00FFFF", nil];
-    o_colors = [[NSArray alloc] initWithObjects: o_default, o_black, o_gray, \
-        o_silver, o_white, o_maroon, o_red, o_fuchsia, o_yellow, o_olive, \
+    o_colors = [[NSArray alloc] initWithObjects: o_default, o_black, o_gray,
+        o_silver, o_white, o_maroon, o_red, o_fuchsia, o_yellow, o_olive,
         o_green, o_teal, o_lime, o_purple, o_navy, o_blue, o_aqua, nil];
 
     unsigned int x = 0;
@@ -160,11 +146,11 @@ static VLCsFilters *_o_sharedInstance = nil;
      * the menu was sorted */
     while (x != [o_colors count])
     {
-        [o_marq_color_pop addItemWithTitle: [[o_colors objectAtIndex:x] \
+        [o_marq_color_pop addItemWithTitle: [[o_colors objectAtIndex:x]
             objectAtIndex:0]];
         [[o_marq_color_pop lastItem] setTag: x];
         
-        [o_time_color_pop addItemWithTitle: [[o_colors objectAtIndex:x] \
+        [o_time_color_pop addItemWithTitle: [[o_colors objectAtIndex:x]
             objectAtIndex:0]];
         [[o_time_color_pop lastItem] setTag: x];
         
@@ -177,7 +163,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     /* define the relative positions and copy them to the menues
      * we can destroy the array afterwards, because we are saving the ints 
      * as tags to the menu-items */
-    NSArray * o_cnt_cnt;
+    /*NSArray * o_cnt_cnt;
     NSArray * o_lft_cnt;
     NSArray * o_rht_cnt;
     NSArray * o_cnt_top;
@@ -196,8 +182,8 @@ static VLCsFilters *_o_sharedInstance = nil;
     o_cnt_btm = [NSArray arrayWithObjects: _NS("Center-Bottom"), @"8", nil];
     o_lft_btm = [NSArray arrayWithObjects: _NS("Left-Bottom"), @"9", nil];
     o_rht_btm = [NSArray arrayWithObjects: _NS("Right-Bottom"), @"10", nil];
-    o_positions = [[NSArray alloc] initWithObjects: o_cnt_cnt, o_lft_cnt, \
-        o_rht_cnt, o_cnt_top, o_lft_top, o_rht_top, o_cnt_btm, o_lft_btm, \
+    o_positions = [[NSArray alloc] initWithObjects: o_cnt_cnt, o_lft_cnt,
+        o_rht_cnt, o_cnt_top, o_lft_top, o_rht_top, o_cnt_btm, o_lft_btm,
         o_rht_btm, nil];
         
     x = 0;
@@ -205,29 +191,29 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_marq_pos_rel_pop removeAllItems];
     [o_logo_pos_rel_pop removeAllItems];
     
-    /* we are adding a tag here, so we can easily select an item later on */
+    * we are adding a tag here, so we can easily select an item later on *
     while ( x != [o_positions count] )
     {
-        [o_time_pos_rel_pop addItemWithTitle: [[o_positions objectAtIndex:x] \
+        [o_time_pos_rel_pop addItemWithTitle: [[o_positions objectAtIndex:x]
             objectAtIndex:0]];
-        [[o_time_pos_rel_pop lastItem] setTag: [[[o_positions objectAtIndex:x] \
+        [[o_time_pos_rel_pop lastItem] setTag: [[[o_positions objectAtIndex:x]
             objectAtIndex:1] intValue]];
-        [o_marq_pos_rel_pop addItemWithTitle: [[o_positions objectAtIndex:x] \
+        [o_marq_pos_rel_pop addItemWithTitle: [[o_positions objectAtIndex:x]
             objectAtIndex:0]];
-        [[o_marq_pos_rel_pop lastItem] setTag: [[[o_positions objectAtIndex:x] \
+        [[o_marq_pos_rel_pop lastItem] setTag: [[[o_positions objectAtIndex:x]
             objectAtIndex:1] intValue]];
-        [o_logo_pos_rel_pop addItemWithTitle: [[o_positions objectAtIndex:x] \
+        [o_logo_pos_rel_pop addItemWithTitle: [[o_positions objectAtIndex:x]
             objectAtIndex:0]];
-        [[o_logo_pos_rel_pop lastItem] setTag: [[[o_positions objectAtIndex:x] \
+        [[o_logo_pos_rel_pop lastItem] setTag: [[[o_positions objectAtIndex:x]
             objectAtIndex:1] intValue]];
 
         x = (x + 1);
     }
-    [o_positions release];
+    [o_positions release];*/
 
     NSArray * o_sizes;
     o_sizes = [[NSArray alloc] initWithObjects: @"6", @"8", @"10", @"11", @"12",\
-        @"14", @"13", @"16", @"18", @"24", @"36", @"48", @"64", @"72", @"96", \
+        @"14", @"13", @"16", @"18", @"24", @"36", @"48", @"64", @"72", @"96",
         @"144", @"288", nil];
     [o_marq_size_pop removeAllItems];
     [o_marq_size_pop addItemsWithTitles: o_sizes];
@@ -247,7 +233,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     /* retrieve the marquee settings */
     int x = 0;
     int tempInt = config_GetInt( p_intf, "marq-color" );
-    while( strtol([[[o_colors objectAtIndex:x] objectAtIndex:1] UTF8String], \
+    while( strtol([[[o_colors objectAtIndex:x] objectAtIndex:1] UTF8String],
         NULL, 0) != tempInt )
     {
         x = (x + 1);
@@ -259,40 +245,23 @@ static VLCsFilters *_o_sharedInstance = nil;
         }
     }
     [o_marq_color_pop selectItemAtIndex: x];
-    [o_marq_marq_fld setStringValue: [NSString stringWithUTF8String: \
+    [o_marq_marq_fld setStringValue: [NSString stringWithUTF8String:
         config_GetPsz( p_intf, "marq-marquee" )]];
     [o_marq_opaque_sld setIntValue: config_GetInt( p_intf, "marq-opacity")];
-    x = 0;
-    tempInt = config_GetInt( p_intf, "marq-position" );
-    while( tempInt != [[o_marq_pos_rel_pop itemAtIndex:x] tag] )
-    {
-        x = (x + 1);
-        
-        if( x >= [o_marq_pos_rel_pop numberOfItems] )
-        {
-            x = 0;
-            return;
-        }
-    }
-    [o_marq_pos_rel_pop selectItemAtIndex:x];
-    x = 0;
-    tempInt = config_GetInt( p_intf, "marq-size" );
-    while( [[[o_marq_size_pop itemAtIndex: x] title] intValue] != tempInt )
-        x = (x + 1);
-        
-        if( x >= [o_marq_size_pop numberOfItems] )
-        {
-            x = 0;
-            return;
-        }
+    [o_marq_pos_radio selectCellWithTag: config_GetInt( p_intf, "marq-position" )];
+    /* FIXME: the following line doesn't work with "-1", which is the default
+     * value */
+    [o_marq_size_pop selectItemWithTitle: 
+        [[NSNumber numberWithInt: config_GetInt( p_intf, "marq-size" )]
+            stringValue]];
     [o_marq_size_pop selectItemAtIndex: x];
-    [o_marq_tmOut_fld setStringValue: [[NSNumber numberWithInt: \
+    [o_marq_tmOut_fld setStringValue: [[NSNumber numberWithInt:
         config_GetInt( p_intf, "marq-timeout" )] stringValue]];
     
     /* retrieve the time settings */
     x = 0;
     tempInt = config_GetInt( p_intf, "time-color" );
-    while( strtol([[[o_colors objectAtIndex:x] objectAtIndex:1] UTF8String], \
+    while( strtol([[[o_colors objectAtIndex:x] objectAtIndex:1] UTF8String],
         NULL, 0) != tempInt )
     {
         x = (x + 1);
@@ -304,84 +273,50 @@ static VLCsFilters *_o_sharedInstance = nil;
         }
     }
     [o_time_color_pop selectItemAtIndex: x];
-    [o_time_stamp_fld setStringValue: [NSString stringWithUTF8String: \
+    [o_time_stamp_fld setStringValue: [NSString stringWithUTF8String:
         config_GetPsz( p_intf, "time-format" )]];
     [o_time_opaque_sld setIntValue: config_GetInt( p_intf, "time-opacity")];
-    x = 0;
-    tempInt = config_GetInt( p_intf, "time-size" );
-    while( [[[o_time_size_pop itemAtIndex: x] title] intValue] != tempInt )
-        x = (x + 1);
-        
-        if( x >= [o_time_size_pop numberOfItems] )
-        {
-            x = 0;
-            return;
-        }
-    [o_time_size_pop selectItemAtIndex: x];
-    x = 0;
-    tempInt = config_GetInt( p_intf, "time-position" );
-    while( tempInt != [[o_time_pos_rel_pop itemAtIndex:x] tag] )
-    {
-        x = (x + 1);
-        
-        if( x >= [o_time_pos_rel_pop numberOfItems] )
-        {
-            x = 0;
-            return;
-        }
-    }
-    
+    /* FIXME: the following line doesn't work with "-1", which is the default
+     * value */
+    [o_time_size_pop selectItemWithTitle: 
+        [[NSNumber numberWithInt: config_GetInt( p_intf, "time-size" )]
+            stringValue]];
+    [o_time_pos_radio selectCellWithTag: config_GetInt( p_intf, "time-position" )];    
+
     /* retrieve the logo settings */
     [o_logo_opaque_sld setIntValue: config_GetInt( p_intf, "logo-transparency")];
     /* in case that no path has been saved yet */
-    NSString * tempString = [[NSString alloc] initWithUTF8String: \
-        config_GetPsz( p_intf, "logo-file" )];
-    if( [tempString length] == 0 )
-    {
-        [o_logo_image_fld setStringValue: @""];
-    }
+    if( config_GetPsz( p_intf, "logo-file" ) )
+        [o_logo_image_fld setStringValue: [NSString stringWithUTF8String:
+                                        config_GetPsz( p_intf, "logo-file" )]];
     else
-    {
-        [o_logo_image_fld setStringValue: tempString ];
-    }
-    [tempString release];
-    x = 0;
-    tempInt = config_GetInt( p_intf, "logo-position" );
-    while( tempInt != [[o_logo_pos_rel_pop itemAtIndex:x] tag] )
-    {
-        x = (x + 1);
-        
-        if( x >= [o_logo_pos_rel_pop numberOfItems] )
-        {
-            x = 0;
-            return;
-        }
-    }
+        [o_logo_image_fld setStringValue: @""];
+    [o_logo_pos_radio selectCellWithTag: config_GetInt( p_intf, "logo-position" )];
     
-    /* enable the wanted filters */
+    /* enable the requested filters */
     char * psz_subfilters;
     psz_subfilters = config_GetPsz( p_intf, "sub-filter" );
     if( psz_subfilters )
     {
-        [o_marq_enabled_ckb setState: (int)strstr( psz_subfilters, "marq")];
-        [o_logo_enabled_ckb setState: (int)strstr( psz_subfilters, "logo")];
-        [o_time_enabled_ckb setState: (int)strstr( psz_subfilters, "time")];
+        [o_marq_enabled_ckb setState: (bool)strstr( psz_subfilters, "marq")];
+        [o_logo_enabled_ckb setState: (bool)strstr( psz_subfilters, "logo")];
+        [o_time_enabled_ckb setState: (bool)strstr( psz_subfilters, "time")];
+    }
         [self enableMarq];
         [self enableLogo];
         [self enableTime];
-    }
 }
 
 - (IBAction)logo_selectFile:(id)sender
 {
     NSOpenPanel * openPanel = [NSOpenPanel openPanel];
     SEL sel = @selector(logo_getFile:returnCode:contextInfo:);
-    [openPanel beginSheetForDirectory:nil file:nil types: [NSArray \
-        arrayWithObjects: @"png", @"PNG", @"'PNGf'", nil] modalForWindow: \
+    [openPanel beginSheetForDirectory:nil file:nil types: [NSArray
+        arrayWithObjects: @"png", @"PNG", @"'PNGf'", nil] modalForWindow:
         o_sfilter_win modalDelegate:self didEndSelector:sel contextInfo:nil];
 }
 
-- (void)logo_getFile: (NSOpenPanel *)sheet returnCode: \
+- (void)logo_getFile: (NSOpenPanel *)sheet returnCode:
     (int)returnCode contextInfo: (void *)contextInfo
 {
     if (returnCode == NSOKButton)
@@ -393,7 +328,7 @@ static VLCsFilters *_o_sharedInstance = nil;
 - (IBAction)propertyChanged:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
-    input_thread_t * p_input = (input_thread_t *)vlc_object_find( p_intf, \
+    input_thread_t * p_input = (input_thread_t *)vlc_object_find( p_intf,
         VLC_OBJECT_INPUT, FIND_ANYWHERE );
 
     vlc_value_t val;
@@ -422,9 +357,9 @@ static VLCsFilters *_o_sharedInstance = nil;
         config_PutPsz( p_intf, "marq-marquee", val.psz_string );
     }
     
-    else if( sender == o_marq_pos_rel_pop )
+    else if( sender == o_marq_pos_radio )
     {
-        val.i_int = [[o_marq_pos_rel_pop selectedItem] tag];
+        val.i_int = [[o_marq_pos_radio selectedCell] tag];
 
         if( p_input )
             var_Set( p_input->p_libvlc, "marq-position", val );
@@ -434,7 +369,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     
     else if( sender == o_marq_color_pop )
     {
-        val.i_int = strtol( [[[o_colors objectAtIndex: [o_marq_color_pop \
+        val.i_int = strtol( [[[o_colors objectAtIndex: [o_marq_color_pop
             indexOfSelectedItem]] objectAtIndex: 1] UTF8String], NULL, 0 );
 
         if( p_input )
@@ -492,9 +427,9 @@ static VLCsFilters *_o_sharedInstance = nil;
         config_PutPsz( p_intf, "time-format", val.psz_string );
     }
 
-    else if( sender == o_time_pos_rel_pop )
+    else if( sender == o_time_pos_radio )
     {
-        val.i_int = [[o_time_pos_rel_pop selectedItem] tag];
+        val.i_int = [[o_time_pos_radio selectedCell] tag];
 
         if( p_input )
             var_Set( p_input->p_libvlc, "time-position", val );
@@ -504,7 +439,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     
     else if( sender == o_time_color_pop )
     {
-        val.i_int = strtol( [[[o_colors objectAtIndex: [o_time_color_pop \
+        val.i_int = strtol( [[[o_colors objectAtIndex: [o_time_color_pop
             indexOfSelectedItem]] objectAtIndex: 1] UTF8String], NULL, 0 );
 
         if( p_input )
@@ -544,14 +479,19 @@ static VLCsFilters *_o_sharedInstance = nil;
         config_PutInt( p_intf, "logo-transparency", val.i_int );
     }
     
-    else if( sender == o_logo_pos_rel_pop )
+    else if( sender == o_logo_pos_radio )
     {
-        val.i_int = [[o_logo_pos_rel_pop selectedItem] tag];
+        val.i_int = [[o_logo_pos_radio selectedCell] tag];
 
         if( p_input )
             var_Set( p_input->p_libvlc, "logo-position", val );
 
         config_PutInt( p_intf, "logo-position", val.i_int );
+    }
+    else
+    {
+        /* just in case */
+        msg_Err( p_intf, "couldn't find any action for sender" );
     }
 
     /* clean up */
@@ -609,7 +549,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_marq_opaque_sld setEnabled: [o_marq_enabled_ckb state]];
     [o_marq_size_pop setEnabled: [o_marq_enabled_ckb state]];
     [o_marq_tmOut_fld setEnabled: [o_marq_enabled_ckb state]];
-    [o_marq_pos_rel_pop setEnabled: [o_marq_enabled_ckb state]];
+    [o_marq_pos_radio setEnabled: [o_marq_enabled_ckb state]];
 }
 
 - (void)enableTime
@@ -618,7 +558,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_time_stamp_fld setEnabled: [o_time_enabled_ckb state]];
     [o_time_opaque_sld setEnabled: [o_time_enabled_ckb state]];
     [o_time_size_pop setEnabled: [o_time_enabled_ckb state]];
-    [o_time_pos_rel_pop setEnabled: [o_time_enabled_ckb state]];
+    [o_time_pos_radio setEnabled: [o_time_enabled_ckb state]];
 }
 
 - (void)enableLogo
@@ -626,7 +566,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_logo_image_btn setEnabled: [o_logo_enabled_ckb state]];
     [o_logo_image_fld setEnabled: [o_logo_enabled_ckb state]];
     [o_logo_opaque_sld setEnabled: [o_logo_enabled_ckb state]];
-    [o_logo_pos_rel_pop setEnabled: [o_logo_enabled_ckb state]];
+    [o_logo_pos_radio setEnabled: [o_logo_enabled_ckb state]];
 }
 
 - (void)changeFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add
@@ -683,7 +623,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     
     /* Try to set on the fly */
     /* FIXME: enable this once we support on-the-fly addition of this kind of
-     * filters...
+     * filters... */
     vout_thread_t *p_vout;
     p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
@@ -691,7 +631,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     {
         var_SetString( p_vout, "sub-filter", psz_string );
         vlc_object_release( p_vout );
-    }*/
+    }
 
     free( psz_string );
 
