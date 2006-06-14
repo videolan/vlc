@@ -122,11 +122,17 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
         return;
     }
 
+    /* don't write empty nodes */
+    if( p_item->i_children == 0 )
+    {
+        return;
+    }
+
     /* leaves can be written directly */
     fprintf( p_file, "\t\t<track>\n" );
 
     /* print identifier and increase the counter */
-    fprintf( p_file, "\t\t\t<identifier>%d</identifier>\n", *p_i_count );
+    fprintf( p_file, "\t\t\t<identifier>%i</identifier>\n", *p_i_count );
     ( *p_i_count )++;
 
     /* -> the location */
@@ -226,13 +232,14 @@ static void xspf_extension_item( playlist_item_t *p_item, FILE *p_file,
     if( !p_item ) return;
 
     /* if we get a node here, we must traverse it */
-    if( p_item->i_children > 0 )
+    if( p_item->i_children >= 0 )
     {
         int i;
-
-        fprintf( p_file, "\t\t<node>\n" );
-        fprintf( p_file, "\t\t\t<title>%s</title>\n",
-                 p_item->p_input->psz_name );
+        char *psz_temp;
+        psz_temp = convert_xml_special_chars( p_item->p_input->psz_name );
+        fprintf( p_file, "\t\t<node title=\"%s\">\n",
+                 *psz_temp ? p_item->p_input->psz_name : "" );
+        free( psz_temp );
 
         for( i = 0; i < p_item->i_children; i++ )
         {
@@ -245,7 +252,7 @@ static void xspf_extension_item( playlist_item_t *p_item, FILE *p_file,
 
 
     /* print leaf and increase the counter */
-    fprintf( p_file, "\t\t\t<item href=\"%d\" />\n", *p_i_count );
+    fprintf( p_file, "\t\t\t<item href=\"%i\" />\n", *p_i_count );
     ( *p_i_count )++;
 
     return;
