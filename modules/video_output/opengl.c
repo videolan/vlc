@@ -433,6 +433,7 @@ static int Init( vout_thread_t *p_vout )
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glDisable(GL_CULL_FACE);
+    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT );
 
     /* Check if the user asked for useless visual effects */
@@ -533,6 +534,11 @@ static void End( vout_thread_t *p_vout )
     glFinish();
     glFlush();
 
+    /* Free the texture buffer*/
+    glDeleteTextures( 2, p_sys->p_textures );
+    if( p_sys->pp_buffer[0] ) free( p_sys->pp_buffer[0] );
+    if( p_sys->pp_buffer[1] ) free( p_sys->pp_buffer[1] );
+
     if( p_sys->p_vout->pf_unlock )
     {
         p_sys->p_vout->pf_unlock( p_sys->p_vout );
@@ -552,12 +558,6 @@ static void DestroyVout( vlc_object_t *p_this )
     module_Unneed( p_sys->p_vout, p_sys->p_vout->p_module );
     vlc_object_detach( p_sys->p_vout );
     vlc_object_destroy( p_sys->p_vout );
-
-    /* Free the texture buffer*/
-    if( p_sys->pp_buffer[0] ) free( p_sys->pp_buffer[0] );
-    if( p_sys->pp_buffer[1] ) free( p_sys->pp_buffer[1] );
-
-    glDeleteTextures( 2, p_sys->p_textures );
 
     free( p_sys );
 }

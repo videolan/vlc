@@ -470,7 +470,7 @@ static int aglInit( vout_thread_t * p_vout )
 
 static void aglEnd( vout_thread_t * p_vout )
 {
-    aglSetCurrentContext(p_vout->p_sys->agl_ctx);
+    aglSetCurrentContext(NULL);
 }
 
 static void aglReshape( vout_thread_t * p_vout )
