@@ -425,8 +425,16 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
             char *psz;
             mvar_t *itm = E_(mvar_New)( name, "set" );
 
-            sprintf( value, "%d", ( p_pl->status.p_item == p_node )? 1 : 0 );
-            E_(mvar_AppendNewVar)( itm, "current", value );
+            if( p_pl->status.p_item && p_node &&
+                p_pl->status.p_item->p_input && p_node->p_input &&
+                p_pl->status.p_item->p_input->i_id == p_node->p_input->i_id )
+            {
+                E_(mvar_AppendNewVar)( itm, "current", "1" );
+            }
+            else
+            {
+                E_(mvar_AppendNewVar)( itm, "current", "0" );
+            }
 
             sprintf( value, "%d", p_node->p_input->i_id );
             E_(mvar_AppendNewVar)( itm, "index", value );
