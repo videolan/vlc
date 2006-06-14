@@ -47,6 +47,8 @@ int xspf_import_Control( demux_t *, int, va_list );
 static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE;
 static vlc_bool_t parse_tracklist_node COMPLEX_INTERFACE;
 static vlc_bool_t parse_track_node COMPLEX_INTERFACE;
+static vlc_bool_t parse_extension_node COMPLEX_INTERFACE;
+static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE;
 static vlc_bool_t set_item_info SIMPLE_INTERFACE;
 static vlc_bool_t skip_element COMPLEX_INTERFACE;
 static vlc_bool_t insert_new_item( playlist_t *, playlist_item_t *, playlist_item_t **, char *);
