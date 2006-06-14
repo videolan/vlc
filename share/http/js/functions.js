@@ -377,6 +377,10 @@ function fullscreen()
 {
     loadXMLDoc( 'requests/status.xml?command=fullscreen', parse_status );
 }
+function snapshot()
+{
+    loadXMLDoc( 'requests/status.xml?command=snapshot', parse_status );
+}
 function update_status()
 {
     loadXMLDoc( 'requests/status.xml', parse_status );

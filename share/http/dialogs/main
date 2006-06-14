@@ -81,6 +81,11 @@ sout and playlist .
       <span class="btn_text">Fullscreen</span>
     </button>
     &nbsp;
+    <button id="btn_snapshot" onclick="snapshot();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Take video snapshot" >
+      <img src="images/snapshot.png" alt="Take video snapshot" />
+      <span class="btn_text">Take video snapshot</span>
+    </button>
+    &nbsp;
     <button id="btn_volume_down" onclick="volume_down();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Decrease Volume" >
       <img src="images/volume_down.png" alt="Decrease Volume" />
       <span class="btn_text">Decrease Volume</span>

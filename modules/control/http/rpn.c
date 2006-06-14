@@ -1062,6 +1062,24 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             free( psz_cmd );
             free( psz_error );
         }
+        else if( !strcmp( s, "snapshot" ) )
+        {
+            if( p_sys->p_input )
+            {
+                vout_thread_t *p_vout;
+                p_vout = vlc_object_find( p_sys->p_input,
+                                          VLC_OBJECT_VOUT, FIND_CHILD );
+
+                if( p_vout )
+                {
+                    vout_Control( p_vout, VOUT_SNAPSHOT );
+                    vlc_object_release( p_vout );
+                    msg_Dbg( p_intf, "requested snapshot" );
+                }
+            }
+            break;
+
+        }
         else
         {
             E_(SSPush)( st, s );
