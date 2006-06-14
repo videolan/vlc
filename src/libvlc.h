@@ -928,6 +928,21 @@ static char *ppsz_clock_descriptions[] =
 #define PAS_LONGTEXT N_( \
     "Stop the playlist after each played playlist item." )
 
+#define ML_TEXT N_("Use media library")
+#define ML_LONGTEXT N_( \
+    "The media library is automatically saved and reloaded each time you " \
+    "start VLC." )
+
+#define PLTREE_TEXT N_("Use playlist tree")
+#define PLTREE_LONGTEXT N_( \
+    "The playlist can use a tree to categorize some items, like the " \
+    "contents of a directory. \"Default\" means that the tree will only " \
+    "be used when really needed." )
+static int pi_pltree_values[] = { 0, 1, 2 };
+static char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N_("Never") };
+
+
+
 /*****************************************************************************
  * Hotkeys
  ****************************************************************************/
@@ -1549,10 +1564,15 @@ vlc_module_begin();
     add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_FALSE );
         change_short('R');
     add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, VLC_FALSE );
+    add_bool( "media-library", 1, NULL, ML_TEXT, ML_LONGTEXT, VLC_FALSE );
+    add_integer( "playlist-tree", 0, NULL, PLTREE_TEXT, PLTREE_LONGTEXT,
+                 VLC_TRUE );
+        change_integer_list( pi_pltree_values, ppsz_pltree_descriptions, 0 );
 
     add_string( "open", "", NULL, OPEN_TEXT, OPEN_LONGTEXT, VLC_FALSE );
 
-    add_bool( "auto-preparse", VLC_TRUE, NULL, PREPARSE_TEXT, PREPARSE_LONGTEXT, VLC_FALSE );
+    add_bool( "auto-preparse", VLC_TRUE, NULL, PREPARSE_TEXT,
+              PREPARSE_LONGTEXT, VLC_FALSE );
 
     set_subcategory( SUBCAT_PLAYLIST_SD );
     add_module_list_cat( "services-discovery", SUBCAT_PLAYLIST_SD, NULL,

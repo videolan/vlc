@@ -65,12 +65,13 @@ struct playlist_item_t
     uint8_t                i_flags;     /**< Flags */
 };
 
-#define PLAYLIST_SAVE_FLAG      0x01    /**< Must it be saved */
-#define PLAYLIST_SKIP_FLAG      0x02    /**< Must playlist skip after it ? */
-#define PLAYLIST_DBL_FLAG       0x04    /**< Is it disabled ? */
-#define PLAYLIST_RO_FLAG        0x10    /**< Write-enabled ? */
-#define PLAYLIST_REMOVE_FLAG    0x20    /**< Remove this item at the end */
-#define PLAYLIST_EXPANDED_FLAG  0x40    /**< Expanded node */
+#define PLAYLIST_SAVE_FLAG      0x0001    /**< Must it be saved */
+#define PLAYLIST_SKIP_FLAG      0x0002    /**< Must playlist skip after it ? */
+#define PLAYLIST_DBL_FLAG       0x0004    /**< Is it disabled ? */
+#define PLAYLIST_RO_FLAG        0x0008    /**< Write-enabled ? */
+#define PLAYLIST_REMOVE_FLAG    0x0010    /**< Remove this item at the end */
+#define PLAYLIST_EXPANDED_FLAG  0x0020    /**< Expanded node */
+#define PLAYLIST_PREFCAT_FLAG   0x0040    /**< Prefer category */
 
 /**
  * Playlist status
@@ -99,9 +100,7 @@ struct playlist_preparse_t
 };
 
 
-/**
- * Structure containing information about the playlist
- */
+/** Structure containing information about the playlist */
 struct playlist_t
 {
     VLC_COMMON_MEMBERS
@@ -112,38 +111,40 @@ struct playlist_t
 /*@{*/
     int                   i_enabled; /**< How many items are enabled ? */
 
+    /* Arrays of items */
     int                   i_size;   /**< total size of the list */
     playlist_item_t **    pp_items; /**< array of pointers to the
                                      * playlist items */
     int                   i_all_size; /**< size of list of items and nodes */
     playlist_item_t **    pp_all_items; /**< array of pointers to the
                                          * playlist items and nodes */
-    int                   i_last_playlist_id; /**< Last id to an item */
-
     int                   i_input_items;
-    input_item_t **    pp_input_items;
+    input_item_t **       pp_input_items;
 
-    int                  i_last_input_id ;
+    int                   i_last_playlist_id; /**< Last id to an item */
+    int                   i_last_input_id ; /**< Last id on an input */
 
-    input_thread_t *      p_input;  /**< the input thread associated
-                                     * with the current item */
+    services_discovery_t **pp_sds;
+    int                   i_sds;
 
-    int                   i_sort; /**< Last sorting applied to the playlist */
-    int                   i_order; /**< Last ordering applied to the playlist */
-
+    /* Predefined items */
     playlist_item_t *     p_root_category;
     playlist_item_t *     p_root_onelevel;
-
     playlist_item_t *     p_local_category; /** < "Playlist" in CATEGORY view */
     playlist_item_t *     p_ml_category; /** < "Library" in CATEGORY view */
     playlist_item_t *     p_local_onelevel; /** < "Playlist" in ONELEVEL view */
     playlist_item_t *     p_ml_onelevel; /** < "Library" in ONELEVEL iew */
 
-    services_discovery_t **pp_sds;
-    int                   i_sds;
+    /* Runtime */
+    input_thread_t *      p_input;  /**< the input thread associated
+                                     * with the current item */
+    int                   i_sort; /**< Last sorting applied to the playlist */
+    int                   i_order; /**< Last ordering applied to the playlist */
+    mtime_t               i_vout_destroyed_date;
+    mtime_t               i_sout_destroyed_date;
+    playlist_preparse_t  *p_preparse; /**< Preparser object */
 
-    mtime_t    i_vout_destroyed_date;
-    mtime_t    i_sout_destroyed_date;
+    vlc_mutex_t gc_lock;         /**< Lock to protect the garbage collection */
 
     struct {
         /* Current status. These fields are readonly, only the playlist
@@ -167,14 +168,9 @@ struct playlist_t
         vlc_mutex_t         lock;     /**< Lock to protect request */
     } request;
 
-    playlist_preparse_t     *p_preparse; /**< Preparser object */
-
-    vlc_mutex_t gc_lock;         /**< Lock to protect the garbage collection */
-
     // Playlist-unrelated fields
-    interaction_t *p_interaction;       /**< Interaction manager */
-    global_stats_t *p_stats;            /**< Global statistics */
-
+    interaction_t       *p_interaction;       /**< Interaction manager */
+    global_stats_t      *p_stats;             /**< Global statistics */
     /*@}*/
 };
 
@@ -183,7 +179,6 @@ struct playlist_add_t
 {
     int i_node;
     int i_item;
-    int i_view;
     int i_position;
 };
 

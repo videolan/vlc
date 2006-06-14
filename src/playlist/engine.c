@@ -77,24 +77,30 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     /* Create playlist and media library */
     p_playlist->p_local_category = playlist_NodeCreate( p_playlist,
                                  _( "Playlist" ),p_playlist->p_root_category );
-    p_playlist->p_ml_category =   playlist_NodeCreate( p_playlist,
-                           _( "Media Library" ), p_playlist->p_root_category );
     p_playlist->p_local_onelevel =  playlist_NodeCreate( p_playlist,
                                 _( "Playlist" ), p_playlist->p_root_onelevel );
-    p_playlist->p_ml_onelevel =  playlist_NodeCreate( p_playlist,
-                           _( "Media Library" ), p_playlist->p_root_onelevel );
-
     p_playlist->p_local_category->i_flags |= PLAYLIST_RO_FLAG;
-    p_playlist->p_ml_category->i_flags |= PLAYLIST_RO_FLAG;
     p_playlist->p_local_onelevel->i_flags |= PLAYLIST_RO_FLAG;
-    p_playlist->p_ml_onelevel->i_flags |= PLAYLIST_RO_FLAG;
 
-    /* This is a hack to find it later. Quite ugly, but I haven't found a
-     * better way */
+    /* Link the nodes together. Todo: actually create them from the same input*/
     p_playlist->p_local_onelevel->p_input->i_id =
         p_playlist->p_local_category->p_input->i_id;
-    p_playlist->p_ml_onelevel->p_input->i_id =
-        p_playlist->p_ml_category->p_input->i_id;
+
+    if( config_GetInt( p_playlist, "media-library") )
+    {
+        p_playlist->p_ml_category =   playlist_NodeCreate( p_playlist,
+                           _( "Media Library" ), p_playlist->p_root_category );
+        p_playlist->p_ml_onelevel =  playlist_NodeCreate( p_playlist,
+                           _( "Media Library" ), p_playlist->p_root_onelevel );
+        p_playlist->p_ml_category->i_flags |= PLAYLIST_RO_FLAG;
+        p_playlist->p_ml_onelevel->i_flags |= PLAYLIST_RO_FLAG;
+        p_playlist->p_ml_onelevel->p_input->i_id =
+             p_playlist->p_ml_category->p_input->i_id;
+    }
+    else
+    {
+        p_playlist->p_ml_category = p_playlist->p_ml_onelevel = NULL;
+    }
 
     /* Initial status */
     p_playlist->status.p_item = NULL;
