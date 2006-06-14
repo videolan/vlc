@@ -44,7 +44,8 @@ int E_(xspf_export_playlist)( vlc_object_t *p_this )
     const playlist_t *p_playlist = (playlist_t *)p_this;
     const playlist_export_t *p_export =
         (playlist_export_t *)p_playlist->p_private;
-    int i, i_count;
+    int               i, i_count;
+    char             *psz_temp;
     playlist_item_t  *p_node = p_export->p_root;
 
     /* write XSPF XML header */
@@ -53,6 +54,22 @@ int E_(xspf_export_playlist)( vlc_object_t *p_this )
              "<playlist version=\"1\" xmlns=\"http://xspf.org/ns/0/\">\n" );
 
     if( !p_node ) return VLC_SUCCESS;
+
+    /* save name of the playlist node */
+    psz_temp = convert_xml_special_chars( p_node->p_input->psz_name );
+    if( *psz_temp )
+    {
+        fprintf(  p_export->p_file, "\t<title>%s</title>\n", psz_temp );
+    }
+    free( psz_temp );
+
+    /* save location of the playlist node */
+    psz_temp = assertUTF8URI( p_export->psz_filename );
+    if( psz_temp && *psz_temp )
+    {
+        fprintf( p_export->p_file, "\t<location>%s</location>\n", psz_temp );
+        free( psz_temp );
+    }
 
     /* export all items in a flat format */
     fprintf( p_export->p_file, "\t<trackList>\n" );
