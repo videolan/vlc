@@ -932,7 +932,7 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
         char *psz_desc;
         char *psz_filter;
         char *psz_module;
-    } formats[] = {{ _("M3U file"), "*.m3u", "export-m3u" },
+    } formats[] = {//{ _("M3U file"), "*.m3u", "export-m3u" },
                    { _("XSPF playlist"), "*.xspf", "export-xspf"}
     };
 
@@ -959,10 +959,13 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
     {
         if( dialog.GetPath().mb_str() )
         {
-              abort();
-//            playlist_Export( p_playlist, dialog.GetPath().mb_str(),
-//                             /* ROOT */
-//                             formats[dialog.GetFilterIndex()].psz_module );
+            /* what root should we export? */
+            if( p_playlist->p_root_category->i_children > 0 )
+            {
+                playlist_Export( p_playlist, dialog.GetPath().mb_str(),
+                                 p_playlist->p_root_category->pp_children[0],
+                                 formats[dialog.GetFilterIndex()].psz_module );
+            }
         }
     }
 

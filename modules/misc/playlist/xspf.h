@@ -33,5 +33,6 @@ const char hexchars[16] = "0123456789ABCDEF";
 
 /* prototypes */
 int E_(xspf_export_playlist)( vlc_object_t * );
-static void xspf_export_item( playlist_item_t *, FILE * );
+static void xspf_export_item( playlist_item_t *, FILE *, int * );
+static void xspf_extension_item( playlist_item_t *, FILE *, int * );
 static char *assertUTF8URI( char * );
