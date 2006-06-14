@@ -394,49 +394,55 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             // Register this variable in the manager
             pVarManager->registerVar( VariablePtr( pNewVar ) );
         }
-        else if( token.find( ".isVisible" ) != string::npos )
-        {
-            int leftPos = token.find( ".isVisible" );
-            string windowId = token.substr( 0, leftPos );
-            TopWindow *pWin = pTheme->getWindowById( windowId );
-            if( pWin )
-            {
-                // Push the visibility variable onto the stack
-                varStack.push_back( &pWin->getVisibleVar() );
-            }
-            else
-            {
-                msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
-                return NULL;
-            }
-        }
-        else if( token.find( ".isActive" ) != string::npos )
-        {
-            int leftPos = token.find( ".isActive" );
-            string layoutId = token.substr( 0, leftPos );
-            GenericLayout *pLayout = pTheme->getLayoutById( layoutId );
-            if( pLayout )
-            {
-                // Push the isActive variable onto the stack
-                varStack.push_back( &pLayout->getActiveVar() );
-            }
-            else
-            {
-                msg_Err( getIntf(), "unknown layout (%s)", layoutId.c_str() );
-                return NULL;
-            }
-        }
         else
         {
-            // Try to get the variable from the variable manager
+            // Try first to get the variable from the variable manager
+            // Indeed, if the skin designer is stupid enough to call a layout
+            // "dvd", we want "dvd.isActive" to resolve as the built-in action
+            // and not as the "layoutId.isActive" one.
             VarBool *pVar = (VarBool*)pVarManager->getVar( token, "bool" );
-            if( !pVar )
+            if( pVar )
+            {
+                varStack.push_back( pVar );
+            }
+            else if( token.find( ".isVisible" ) != string::npos )
+            {
+                int leftPos = token.find( ".isVisible" );
+                string windowId = token.substr( 0, leftPos );
+                TopWindow *pWin = pTheme->getWindowById( windowId );
+                if( pWin )
+                {
+                    // Push the visibility variable onto the stack
+                    varStack.push_back( &pWin->getVisibleVar() );
+                }
+                else
+                {
+                    msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
+                    return NULL;
+                }
+            }
+            else if( token.find( ".isActive" ) != string::npos )
+            {
+                int leftPos = token.find( ".isActive" );
+                string layoutId = token.substr( 0, leftPos );
+                GenericLayout *pLayout = pTheme->getLayoutById( layoutId );
+                if( pLayout )
+                {
+                    // Push the isActive variable onto the stack
+                    varStack.push_back( &pLayout->getActiveVar() );
+                }
+                else
+                {
+                    msg_Err( getIntf(), "unknown layout (%s)", layoutId.c_str() );
+                    return NULL;
+                }
+            }
+            else
             {
                 msg_Err( getIntf(), "cannot resolve boolean variable: %s",
                          token.c_str());
                 return NULL;
             }
-            varStack.push_back( pVar );
         }
         // Get the first token from the RPN stack
         token = evaluator.getToken();
