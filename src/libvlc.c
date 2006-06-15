@@ -686,7 +686,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 
     libvlc.b_stats = config_GetInt( p_vlc, "stats" );
-    libvlc.p_stats = NULL;
+    libvlc.i_timers = 0;
+    libvlc.pp_timers = NULL;
+    vlc_mutex_init( p_vlc, &libvlc.timer_lock );
 
     /*
      * Initialize hotkey handling
@@ -887,7 +889,6 @@ int VLC_CleanUp( int i_object )
     vout_thread_t      * p_vout;
     aout_instance_t    * p_aout;
     announce_handler_t * p_announce;
-    stats_handler_t    * p_stats;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
     /* Check that the handle is valid */
@@ -942,14 +943,8 @@ int VLC_CleanUp( int i_object )
         aout_Delete( p_aout );
     }
 
-    while( ( p_stats = vlc_object_find( p_vlc, VLC_OBJECT_STATS, FIND_CHILD) ))
-    {
-        stats_TimersDumpAll( p_vlc );
-        stats_HandlerDestroy( p_stats );
-        vlc_object_detach( (vlc_object_t*) p_stats );
-        vlc_object_release( (vlc_object_t *)p_stats );
-        // TODO: Delete it
-    }
+    stats_TimersDumpAll( p_vlc );
+    stats_TimersClean( p_vlc );
 
     /*
      * Free announce handler(s?)

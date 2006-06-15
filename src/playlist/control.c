@@ -80,7 +80,6 @@ int playlist_Control( playlist_t * p_playlist, int i_query, ... )
 
 int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
 {
-    int i_view;
     playlist_item_t *p_item, *p_node;
     vlc_value_t val;
 

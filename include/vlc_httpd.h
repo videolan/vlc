@@ -77,6 +77,10 @@ struct httpd_host_t
     int         i_port;
     int         *fd;
 
+    /* Statistics */
+    counter_t *p_active_counter;
+    counter_t *p_total_counter;
+
     vlc_mutex_t lock;
 
     /* all registered url (becarefull that 2 httpd_url_t could point at the same url)

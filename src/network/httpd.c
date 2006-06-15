@@ -1942,10 +1942,10 @@ static void httpd_HostThread( httpd_host_t *host )
 {
     tls_session_t *p_tls = NULL;
 
-    stats_Create( host, "client_connections", STATS_CLIENT_CONNECTIONS,
-                  VLC_VAR_INTEGER, STATS_COUNTER );
-    stats_Create( host, "active_connections", STATS_ACTIVE_CONNECTIONS,
-                  VLC_VAR_INTEGER, STATS_COUNTER );
+    host->p_total_counter = stats_CounterCreate( host,
+                                          VLC_VAR_INTEGER, STATS_COUNTER );
+    host->p_active_counter = stats_CounterCreate( host,
+                                          VLC_VAR_INTEGER, STATS_COUNTER );
 
     while( !host->b_die )
     {
@@ -1995,7 +1995,7 @@ static void httpd_HostThread( httpd_host_t *host )
                     cl->i_activity_date+cl->i_activity_timeout < mdate()) ) ) )
             {
                 httpd_ClientClean( cl );
-                stats_UpdateInteger( host, STATS_ACTIVE_CONNECTIONS, -1, NULL );
+                stats_UpdateInteger( host, host->p_active_counter, -1, NULL );
                 TAB_REMOVE( host->i_client, host->client, cl );
                 free( cl );
                 i_client--;
@@ -2490,10 +2490,10 @@ static void httpd_HostThread( httpd_host_t *host )
                     {
                         httpd_client_t *cl;
                         char ip[NI_MAXNUMERICHOST];
-                        stats_UpdateInteger( host, STATS_CLIENT_CONNECTIONS,
+                        stats_UpdateInteger( host, host->p_total_counter,
                                              1, NULL );
-                        stats_UpdateInteger( host, STATS_ACTIVE_CONNECTIONS, 1,
-                                             NULL );
+                        stats_UpdateInteger( host, host->p_active_counter,
+                                             1, NULL );
                         cl = httpd_ClientNew( fd, &sock, i_sock_size, p_tls );
                         httpd_ClientIP( cl, ip );
                         msg_Dbg( host, "Connection from %s", ip );

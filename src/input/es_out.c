@@ -1025,9 +1025,12 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
     if( p_input->p_libvlc->b_stats )
     {
-        stats_UpdateInteger( p_input, STATS_DEMUX_READ, p_block->i_buffer,
-                             &i_total );
-        stats_UpdateFloat( p_input , STATS_DEMUX_BITRATE, (float)i_total, NULL );
+        vlc_mutex_lock( &p_input->counters.counters_lock );
+        stats_UpdateInteger( p_input, p_input->counters.p_demux_read,
+                             p_block->i_buffer, &i_total );
+        stats_UpdateFloat( p_input , p_input->counters.p_demux_bitrate,
+                           (float)i_total, NULL );
+        vlc_mutex_unlock( &p_input->counters.counters_lock );
     }
 
     /* Mark preroll blocks */

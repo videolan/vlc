@@ -56,7 +56,9 @@ struct libvlc_t
 
     /* Do stats ? - We keep this boolean to avoid unneeded lookups */
     vlc_bool_t             b_stats;
-    stats_handler_t       *p_stats;
+    vlc_mutex_t            timer_lock;
+    int                    i_timers;
+    counter_t            **pp_timers;
 
     /* Arch-specific variables */
 #if !defined( WIN32 )

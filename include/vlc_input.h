@@ -421,6 +421,26 @@ struct input_thread_t
     int            i_slave;
     input_source_t **slave;
 
+    /* Stats counters */
+    struct {
+        counter_t *p_read_packets;
+        counter_t *p_read_bytes;
+        counter_t *p_input_bitrate;
+        counter_t *p_demux_read;
+        counter_t *p_demux_bitrate;
+        counter_t *p_decoded_audio;
+        counter_t *p_decoded_video;
+        counter_t *p_decoded_sub;
+        counter_t *p_sout_sent_packets;
+        counter_t *p_sout_sent_bytes;
+        counter_t *p_sout_send_bitrate;
+        counter_t *p_played_abuffers;
+        counter_t *p_lost_abuffers;
+        counter_t *p_displayed_pictures;
+        counter_t *p_lost_pictures;
+        vlc_mutex_t counters_lock;
+    } counters;
+
     /* Buffer of pending actions */
     vlc_mutex_t lock_control;
     int i_control;

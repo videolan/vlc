@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <assert.h>
 
 #include "input_internal.h"
 
@@ -1577,15 +1578,19 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
     int i_read_orig = i_read;
     int i_total;
 
+    input_thread_t *p_input = (input_thread_t *)s->p_parent->p_parent ;
+    assert( p_input );
+
     if( !p_sys->i_list )
     {
         i_read = p_access->pf_read( p_access, p_read, i_read );
-        stats_UpdateInteger( s->p_parent->p_parent , STATS_READ_BYTES, i_read,
+        vlc_mutex_lock( &p_input->counters.counters_lock );
+        stats_UpdateInteger( s, p_input->counters.p_read_bytes, i_read,
                              &i_total );
-        stats_UpdateFloat( s->p_parent->p_parent , STATS_INPUT_BITRATE,
+        stats_UpdateFloat( s, p_input->counters.p_input_bitrate,
                            (float)i_total, NULL );
-        stats_UpdateInteger( s->p_parent->p_parent , STATS_READ_PACKETS, 1,
-                             NULL );
+        stats_UpdateInteger( s, p_input->counters.p_read_packets, 1, NULL );
+        vlc_mutex_unlock( &p_input->counters.counters_lock );
         return i_read;
     }
 
@@ -1614,11 +1619,12 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
     }
 
     /* Update read bytes in input */
-    stats_UpdateInteger( s->p_parent->p_parent ,  STATS_READ_BYTES, i_read,
-                         &i_total );
-    stats_UpdateFloat( s->p_parent->p_parent ,  STATS_INPUT_BITRATE,
-                      (float)i_total, NULL );
-    stats_UpdateInteger( s->p_parent->p_parent ,  STATS_READ_PACKETS, 1, NULL );
+    vlc_mutex_lock( &p_input->counters.counters_lock );
+    stats_UpdateInteger( s, p_input->counters.p_read_bytes, i_read, &i_total );
+    stats_UpdateFloat( s, p_input->counters.p_input_bitrate,
+                       (float)i_total, NULL );
+    stats_UpdateInteger( s, p_input->counters.p_read_packets, 1, NULL );
+    vlc_mutex_unlock( &p_input->counters.counters_lock );
     return i_read;
 }
 
@@ -1630,17 +1636,22 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
     vlc_bool_t b_eof;
     int i_total;
 
+    input_thread_t *p_input = (input_thread_t *)s->p_parent->p_parent ;
+    assert( p_input );
+
     if( !p_sys->i_list )
     {
         p_block = p_access->pf_block( p_access );
         if( pb_eof ) *pb_eof = p_access->info.b_eof;
         if( p_block && p_access->p_libvlc->b_stats )
         {
-            stats_UpdateInteger( s->p_parent->p_parent,  STATS_READ_BYTES,
+            vlc_mutex_lock( &p_input->counters.counters_lock );
+            stats_UpdateInteger( s, p_input->counters.p_read_bytes,
                                  p_block->i_buffer, &i_total );
-            stats_UpdateFloat( s->p_parent->p_parent ,  STATS_INPUT_BITRATE,
+            stats_UpdateFloat( s, p_input->counters.p_input_bitrate,
                               (float)i_total, NULL );
-            stats_UpdateInteger( s->p_parent->p_parent ,  STATS_READ_PACKETS, 1, NULL );
+            stats_UpdateInteger( s, p_input->counters.p_read_packets, 1, NULL );
+            vlc_mutex_unlock( &p_input->counters.counters_lock );
         }
         return p_block;
     }
@@ -1671,14 +1682,15 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
     }
     if( p_block )
     {
-        stats_UpdateInteger( s->p_parent->p_parent,  STATS_READ_BYTES,
+        vlc_mutex_lock( &p_input->counters.counters_lock );
+        stats_UpdateInteger( s, p_input->counters.p_read_bytes,
                              p_block->i_buffer, &i_total );
-        stats_UpdateFloat( s->p_parent->p_parent ,  STATS_INPUT_BITRATE,
+        stats_UpdateFloat( s, p_input->counters.p_input_bitrate,
                           (float)i_total, NULL );
-        stats_UpdateInteger( s->p_parent->p_parent ,  STATS_READ_PACKETS,
+        stats_UpdateInteger( s, p_input->counters.p_read_packets,
                              1 , NULL);
+        vlc_mutex_unlock( &p_input->counters.counters_lock );
     }
-
     return p_block;
 }
 

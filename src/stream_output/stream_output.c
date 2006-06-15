@@ -72,7 +72,6 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
 {
     sout_instance_t *p_sout;
     vlc_value_t keep;
-    counter_t *p_counter;
 
     if( var_Get( p_parent, "sout-keep", &keep ) < 0 )
     {
@@ -141,17 +140,6 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
 
     /* attach it for inherit */
     vlc_object_attach( p_sout, p_parent );
-
-    /* Create statistics */
-    stats_Create( p_parent, "sout_sent_packets", STATS_SOUT_SENT_PACKETS,
-                  VLC_VAR_INTEGER, STATS_COUNTER );
-    stats_Create( p_parent, "sout_sent_bytes", STATS_SOUT_SENT_BYTES,
-                  VLC_VAR_INTEGER, STATS_COUNTER );
-    stats_Create( p_parent, "sout_send_bitrate", STATS_SOUT_SEND_BITRATE,
-                  VLC_VAR_FLOAT, STATS_DERIVATIVE );
-    p_counter = stats_CounterGet( p_parent, p_parent->i_object_id,
-                                  STATS_SOUT_SEND_BITRATE );
-    if( p_counter) p_counter->update_interval = 1000000;
 
     p_sout->p_stream = sout_StreamNew( p_sout, p_sout->psz_chain );
 
@@ -383,11 +371,12 @@ int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
                                                FIND_PARENT );
         if( p_input )
         {
-            stats_UpdateInteger( p_input, STATS_SOUT_SENT_PACKETS, 30, NULL );
-            stats_UpdateInteger( p_input, STATS_SOUT_SENT_BYTES,
+            stats_UpdateInteger( p_input, p_input->counters.p_sout_sent_packets,
+			         30, NULL );
+            stats_UpdateInteger( p_input, p_input->counters.p_sout_sent_bytes,
                                  p_access->i_sent_bytes, &i_total );
-            stats_UpdateFloat( p_input, STATS_SOUT_SEND_BITRATE, (float)i_total,
-                               NULL );
+            stats_UpdateFloat( p_input, p_input->counters.p_sout_send_bitrate,
+			   	 (float)i_total, NULL );
             p_access->i_sent_bytes = 0;
             vlc_object_release( p_input );
         }

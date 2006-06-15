@@ -449,8 +449,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         start_date = 0;
         if( p_input->p_input_thread )
         {
-            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS, 1,
-                                 NULL );
+            vlc_mutex_lock( &p_input->p_input_thread->counters.counters_lock);
+            stats_UpdateInteger( p_aout, p_input->p_input_thread->counters.p_lost_abuffers, 1, NULL );
+            vlc_mutex_unlock( &p_input->p_input_thread->counters.counters_lock);
         }
     }
 
@@ -462,8 +463,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   mdate() - p_buffer->start_date );
         if( p_input->p_input_thread )
         {
-            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS,
-                                 1, NULL );
+            vlc_mutex_lock( &p_input->p_input_thread->counters.counters_lock);
+            stats_UpdateInteger( p_aout, p_input->p_input_thread->counters.p_lost_abuffers, 1, NULL );
+            vlc_mutex_unlock( &p_input->p_input_thread->counters.counters_lock);
         }
         aout_BufferFree( p_buffer );
         p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
@@ -504,8 +506,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         aout_BufferFree( p_buffer );
         if( p_input->p_input_thread )
         {
-            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS,
-                                 1, NULL );
+            vlc_mutex_lock( &p_input->p_input_thread->counters.counters_lock);
+            stats_UpdateInteger( p_aout, p_input->p_input_thread->counters.p_lost_abuffers, 1, NULL );
+            vlc_mutex_unlock( &p_input->p_input_thread->counters.counters_lock);
         }
         return 0;
     }

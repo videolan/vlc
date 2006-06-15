@@ -679,29 +679,27 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
     if( !b_quick )
     {
         /* Prepare statistics */
-        counter_t *p_counter;
-        stats_Create( p_input, "read_bytes", STATS_READ_BYTES,
-                      VLC_VAR_INTEGER, STATS_COUNTER );
-        stats_Create( p_input, "read_packets", STATS_READ_PACKETS,
-                      VLC_VAR_INTEGER, STATS_COUNTER );
-        stats_Create( p_input, "demux_read", STATS_DEMUX_READ,
-                      VLC_VAR_INTEGER, STATS_COUNTER );
-        stats_Create( p_input, "input_bitrate", STATS_INPUT_BITRATE,
-                      VLC_VAR_FLOAT, STATS_DERIVATIVE );
-        stats_Create( p_input, "demux_bitrate", STATS_DEMUX_BITRATE,
-                      VLC_VAR_FLOAT,  STATS_DERIVATIVE );
+#define INIT_COUNTER( p, type, compute ) p_input->counters.p_##p = \
+     stats_CounterCreate( p_input, VLC_VAR_##type, STATS_##compute);
 
-        p_counter = stats_CounterGet( p_input, p_input->i_object_id,
-                                      STATS_INPUT_BITRATE );
-        if( p_counter ) p_counter->update_interval = 1000000;
-        p_counter = stats_CounterGet( p_input, p_input->i_object_id,
-                                      STATS_DEMUX_BITRATE );
-        if( p_counter ) p_counter->update_interval = 1000000;
-
-        stats_Create( p_input, "played_abuffers", STATS_PLAYED_ABUFFERS,
-                      VLC_VAR_INTEGER, STATS_COUNTER );
-        stats_Create( p_input, "lost_abuffers", STATS_LOST_ABUFFERS,
-                      VLC_VAR_INTEGER, STATS_COUNTER );
+        INIT_COUNTER( read_bytes, INTEGER, COUNTER );
+        INIT_COUNTER( read_packets, INTEGER, COUNTER );
+        INIT_COUNTER( demux_read, INTEGER, COUNTER );
+        INIT_COUNTER( input_bitrate, FLOAT, DERIVATIVE );
+        INIT_COUNTER( demux_bitrate, FLOAT, DERIVATIVE );
+        INIT_COUNTER( played_abuffers, INTEGER, COUNTER );
+        INIT_COUNTER( lost_abuffers, INTEGER, COUNTER );
+        INIT_COUNTER( displayed_pictures, INTEGER, COUNTER );
+        INIT_COUNTER( lost_pictures, INTEGER, COUNTER );
+        INIT_COUNTER( decoded_audio, INTEGER, COUNTER );
+        INIT_COUNTER( decoded_video, INTEGER, COUNTER );
+        INIT_COUNTER( decoded_sub, INTEGER, COUNTER );
+        p_input->counters.p_sout_send_bitrate = NULL;
+        p_input->counters.p_sout_sent_packets = NULL;
+        p_input->counters.p_sout_sent_bytes = NULL;
+        p_input->counters.p_demux_bitrate->update_interval = 1000000;
+        p_input->counters.p_input_bitrate->update_interval = 1000000;
+        vlc_mutex_init( p_input, &p_input->counters.counters_lock );
 
         /* handle sout */
         psz = var_GetString( p_input, "sout" );
@@ -715,6 +713,10 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                 free( psz );
                 return VLC_EGENERIC;
             }
+            INIT_COUNTER( sout_sent_packets, INTEGER, COUNTER );
+            INIT_COUNTER (sout_sent_bytes, INTEGER, COUNTER );
+            INIT_COUNTER( sout_send_bitrate, FLOAT, DERIVATIVE );
+            p_input->counters.p_sout_send_bitrate->update_interval = 1000000;
         }
         free( psz );
     }
@@ -1105,12 +1107,32 @@ static void End( input_thread_t * p_input )
     if( p_input->p_es_out )
         input_EsOutDelete( p_input->p_es_out );
 
+#define CL_CO( c ) stats_CounterClean( p_input->counters.p_##c )
+
+        CL_CO( read_bytes );
+        CL_CO( read_packets );
+        CL_CO( demux_read );
+        CL_CO( input_bitrate );
+        CL_CO( demux_bitrate );
+        CL_CO( played_abuffers );
+        CL_CO( lost_abuffers );
+        CL_CO( displayed_pictures );
+        CL_CO( lost_pictures );
+        CL_CO( decoded_audio) ;
+        CL_CO( decoded_video );
+        CL_CO( decoded_sub) ;
+        CL_CO( read_bytes );
+
     /* Close optional stream output instance */
     if( p_input->p_sout )
     {
         vlc_object_t *p_pl =
             vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         vlc_value_t keep;
+
+        CL_CO( sout_sent_packets );
+        CL_CO( sout_sent_bytes );
+        CL_CO( sout_send_bitrate );
 
         if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool && p_pl )
         {
@@ -1128,6 +1150,7 @@ static void End( input_thread_t * p_input )
             vlc_object_release( p_pl );
     }
 
+#undef CL_CO
     /* Tell we're dead */
     p_input->b_dead = VLC_TRUE;
 }

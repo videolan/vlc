@@ -438,16 +438,15 @@ struct module_symbols_t
     int (*__intf_UserProgress_inner) (vlc_object_t*, const char*, const char*, float);
     void (*__intf_UserProgressUpdate_inner) (vlc_object_t*, int, const char*, float);
     void (*__intf_UserHide_inner) (vlc_object_t *, int);
-    int (*__stats_Create_inner) (vlc_object_t*, const char *, unsigned int, int, int);
-    int (*__stats_Update_inner) (vlc_object_t*, unsigned int, vlc_value_t, vlc_value_t *);
-    int (*__stats_Get_inner) (vlc_object_t*, int, unsigned int, vlc_value_t*);
+    void *__stats_Create_deprecated;
+    int (*__stats_Update_inner) (vlc_object_t*, counter_t *, vlc_value_t, vlc_value_t *);
+    int (*__stats_Get_inner) (vlc_object_t*, counter_t *, vlc_value_t*);
     void (*stats_ComputeInputStats_inner) (input_thread_t*, input_stats_t*);
     void (*stats_DumpInputStats_inner) (input_stats_t *);
     void (*stats_ReinitInputStats_inner) (input_stats_t *);
-    counter_t* (*__stats_CounterGet_inner) (vlc_object_t*, int, unsigned int);
     void *__stats_CounterGet_deprecated;
     input_thread_t * (*__input_CreateThread2_inner) (vlc_object_t *, input_item_t *, char *);
-    void (*stats_HandlerDestroy_inner) (stats_handler_t*);
+    void *stats_HandlerDestroy_deprecated;
     vlc_t * (*vlc_current_object_inner) (int);
     void (*__var_OptionParse_inner) (vlc_object_t *, const char *);
     void *__stats_TimerDumpAll_deprecated;
@@ -514,6 +513,10 @@ struct module_symbols_t
     int (*__intf_UserStringInput_inner) (vlc_object_t*, const char*, const char*, char **);
     void (*playlist_NodesCreateForSD_inner) (playlist_t *, char *, playlist_item_t **, playlist_item_t **);
     vlc_bool_t (*input_AddSubtitles_inner) (input_thread_t *, char *, vlc_bool_t);
+    counter_t * (*__stats_CounterCreate_inner) (vlc_object_t*, int, int);
+    void *stats_TimerClean_deprecated;
+    void *stats_TimersClean_deprecated;
+    void (*__stats_TimersClean_inner) (vlc_object_t *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -909,15 +912,12 @@ struct module_symbols_t
 #  define __intf_UserProgress (p_symbols)->__intf_UserProgress_inner
 #  define __intf_UserProgressUpdate (p_symbols)->__intf_UserProgressUpdate_inner
 #  define __intf_UserHide (p_symbols)->__intf_UserHide_inner
-#  define __stats_Create (p_symbols)->__stats_Create_inner
 #  define __stats_Update (p_symbols)->__stats_Update_inner
 #  define __stats_Get (p_symbols)->__stats_Get_inner
 #  define stats_ComputeInputStats (p_symbols)->stats_ComputeInputStats_inner
 #  define stats_DumpInputStats (p_symbols)->stats_DumpInputStats_inner
 #  define stats_ReinitInputStats (p_symbols)->stats_ReinitInputStats_inner
-#  define __stats_CounterGet (p_symbols)->__stats_CounterGet_inner
 #  define __input_CreateThread2 (p_symbols)->__input_CreateThread2_inner
-#  define stats_HandlerDestroy (p_symbols)->stats_HandlerDestroy_inner
 #  define vlc_current_object (p_symbols)->vlc_current_object_inner
 #  define __var_OptionParse (p_symbols)->__var_OptionParse_inner
 #  define __stats_TimerDump (p_symbols)->__stats_TimerDump_inner
@@ -982,6 +982,8 @@ struct module_symbols_t
 #  define __intf_UserStringInput (p_symbols)->__intf_UserStringInput_inner
 #  define playlist_NodesCreateForSD (p_symbols)->playlist_NodesCreateForSD_inner
 #  define input_AddSubtitles (p_symbols)->input_AddSubtitles_inner
+#  define __stats_CounterCreate (p_symbols)->__stats_CounterCreate_inner
+#  define __stats_TimersClean (p_symbols)->__stats_TimersClean_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1380,15 +1382,12 @@ struct module_symbols_t
     ((p_symbols)->__intf_UserProgress_inner) = __intf_UserProgress; \
     ((p_symbols)->__intf_UserProgressUpdate_inner) = __intf_UserProgressUpdate; \
     ((p_symbols)->__intf_UserHide_inner) = __intf_UserHide; \
-    ((p_symbols)->__stats_Create_inner) = __stats_Create; \
     ((p_symbols)->__stats_Update_inner) = __stats_Update; \
     ((p_symbols)->__stats_Get_inner) = __stats_Get; \
     ((p_symbols)->stats_ComputeInputStats_inner) = stats_ComputeInputStats; \
     ((p_symbols)->stats_DumpInputStats_inner) = stats_DumpInputStats; \
     ((p_symbols)->stats_ReinitInputStats_inner) = stats_ReinitInputStats; \
-    ((p_symbols)->__stats_CounterGet_inner) = __stats_CounterGet; \
     ((p_symbols)->__input_CreateThread2_inner) = __input_CreateThread2; \
-    ((p_symbols)->stats_HandlerDestroy_inner) = stats_HandlerDestroy; \
     ((p_symbols)->vlc_current_object_inner) = vlc_current_object; \
     ((p_symbols)->__var_OptionParse_inner) = __var_OptionParse; \
     ((p_symbols)->__stats_TimerDump_inner) = __stats_TimerDump; \
@@ -1453,6 +1452,8 @@ struct module_symbols_t
     ((p_symbols)->__intf_UserStringInput_inner) = __intf_UserStringInput; \
     ((p_symbols)->playlist_NodesCreateForSD_inner) = playlist_NodesCreateForSD; \
     ((p_symbols)->input_AddSubtitles_inner) = input_AddSubtitles; \
+    ((p_symbols)->__stats_CounterCreate_inner) = __stats_CounterCreate; \
+    ((p_symbols)->__stats_TimersClean_inner) = __stats_TimersClean; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \
     (p_symbols)->playlist_ItemAddParent_deprecated = NULL; \
@@ -1479,9 +1480,13 @@ struct module_symbols_t
     (p_symbols)->playlist_Sort_deprecated = NULL; \
     (p_symbols)->playlist_Move_deprecated = NULL; \
     (p_symbols)->playlist_NodeRemoveParent_deprecated = NULL; \
+    (p_symbols)->__stats_Create_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
+    (p_symbols)->stats_HandlerDestroy_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \
     (p_symbols)->playlist_ItemNewFromInput_deprecated = NULL; \
+    (p_symbols)->stats_TimerClean_deprecated = NULL; \
+    (p_symbols)->stats_TimersClean_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */
 #endif /* __VLC_SYMBOLS_H */
