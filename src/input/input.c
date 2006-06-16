@@ -40,6 +40,8 @@
 #include "vlc_interface.h"
 #include "vlc_interaction.h"
 
+#include "charset.h"
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -2422,10 +2424,34 @@ vlc_bool_t input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
     input_source_t *sub;
     vlc_value_t count;
     vlc_value_t list;
+    char *psz_path, *psz_extension;
 
     if( b_check_extension && !subtitles_Filter( psz_subtitle ) )
     {
         return VLC_FALSE;
+    }
+
+    /* if we are provided a subtitle.sub file,
+     * see if we don't have a subtitle.idx and use it instead */
+    psz_path = strdup( psz_subtitle );
+    if( psz_path )
+    {
+        psz_extension = strrchr( psz_path, '.');
+        if( psz_extension && strcmp( psz_extension, ".sub" ) == 0 )
+        {
+            FILE *f;
+
+            strcpy( psz_extension, ".idx" );
+            /* FIXME: a portable wrapper for stat() or access() would be more suited */
+            if( ( f = utf8_fopen( psz_path, "rt" ) ) )
+            {
+                fclose( f );
+                msg_Dbg( p_input, "using %s subtitles file instead of %s",
+                         psz_path, psz_subtitle );
+                strcpy( psz_subtitle, psz_path );
+            }
+        }
+        free( psz_path );
     }
 
     var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
