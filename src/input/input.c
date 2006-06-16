@@ -699,8 +699,10 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         p_input->counters.p_sout_send_bitrate = NULL;
         p_input->counters.p_sout_sent_packets = NULL;
         p_input->counters.p_sout_sent_bytes = NULL;
-        p_input->counters.p_demux_bitrate->update_interval = 1000000;
-        p_input->counters.p_input_bitrate->update_interval = 1000000;
+        if( p_input->counters.p_demux_bitrate )
+            p_input->counters.p_demux_bitrate->update_interval = 1000000;
+        if( p_input->counters.p_input_bitrate )
+            p_input->counters.p_input_bitrate->update_interval = 1000000;
         vlc_mutex_init( p_input, &p_input->counters.counters_lock );
 
         /* handle sout */
@@ -718,7 +720,8 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
             INIT_COUNTER( sout_sent_packets, INTEGER, COUNTER );
             INIT_COUNTER (sout_sent_bytes, INTEGER, COUNTER );
             INIT_COUNTER( sout_send_bitrate, FLOAT, DERIVATIVE );
-            p_input->counters.p_sout_send_bitrate->update_interval = 1000000;
+            if( p_input->counters.p_sout_send_bitrate )
+                p_input->counters.p_sout_send_bitrate->update_interval = 1000000;
         }
         free( psz );
     }

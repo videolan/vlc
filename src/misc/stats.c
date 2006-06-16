@@ -380,14 +380,17 @@ void __stats_TimersClean( vlc_object_t *p_obj )
 void stats_CounterClean( counter_t *p_c )
 {
     int i;
-    for( i = p_c->i_samples - 1 ; i >= 0 ; i-- )
+    if( p_c )
     {
-        counter_sample_t *p_s = p_c->pp_samples[i];
-        REMOVE_ELEM( p_c->pp_samples, p_c->i_samples, i );
-        free( p_s );
-    }
+        for( i = p_c->i_samples - 1 ; i >= 0 ; i-- )
+        {
+            counter_sample_t *p_s = p_c->pp_samples[i];
+            REMOVE_ELEM( p_c->pp_samples, p_c->i_samples, i );
+            free( p_s );
+        }
     if( p_c->psz_name ) free( p_c->psz_name );
     free( p_c );
+    }
 }
 
 
