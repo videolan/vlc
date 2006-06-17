@@ -1126,7 +1126,6 @@ static void End( input_thread_t * p_input )
         CL_CO( decoded_audio) ;
         CL_CO( decoded_video );
         CL_CO( decoded_sub) ;
-        CL_CO( read_bytes );
 
     /* Close optional stream output instance */
     if( p_input->p_sout )
