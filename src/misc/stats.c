@@ -382,11 +382,13 @@ void stats_CounterClean( counter_t *p_c )
     int i;
     if( p_c )
     {
-        for( i = p_c->i_samples - 1 ; i >= 0 ; i-- )
+        i = p_c->i_samples - 1 ;
+        while( i >= 0)
         {
             counter_sample_t *p_s = p_c->pp_samples[i];
             REMOVE_ELEM( p_c->pp_samples, p_c->i_samples, i );
             free( p_s );
+            i--;
         }
     if( p_c->psz_name ) free( p_c->psz_name );
     free( p_c );
