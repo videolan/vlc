@@ -104,7 +104,7 @@ static void strcpy_strip_ext( char *d, char *s )
         return;
     }
     else
-        strlcpy(d, s, tmp - s);
+        strlcpy(d, s, tmp - s + 1 );
     while( *d )
     {
         *d = tolower(*d);
