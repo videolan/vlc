@@ -683,7 +683,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         /* Prepare statistics */
 #define INIT_COUNTER( p, type, compute ) p_input->counters.p_##p = \
      stats_CounterCreate( p_input, VLC_VAR_##type, STATS_##compute);
-        if( p_this->p_libvlc->b_stats )
+        if( p_input->p_libvlc->b_stats )
         {
             INIT_COUNTER( read_bytes, INTEGER, COUNTER );
             INIT_COUNTER( read_packets, INTEGER, COUNTER );
