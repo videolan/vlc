@@ -51,6 +51,11 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+static int pi_index[] = {0,1,2};
+
+static char *ppsz_indexes[] = { N_("Ask"),N_("Always fix"),
+                                N_("Never fix") };
+
 vlc_module_begin();
     set_shortname( "AVI" );
     set_description( _("AVI demuxer") );
@@ -60,8 +65,9 @@ vlc_module_begin();
 
     add_bool( "avi-interleaved", 0, NULL,
               INTERLEAVE_TEXT, INTERLEAVE_LONGTEXT, VLC_TRUE );
-    add_bool( "avi-index", 0, NULL,
+    add_integer( "avi-index", 0, NULL,
               INDEX_TEXT, INDEX_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_index, ppsz_indexes, 0 );
 
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -206,6 +212,7 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t     *p_sys;
 
     vlc_bool_t       b_index = VLC_FALSE;
+    int              i_do_index;
 
     avi_chunk_t         ck_riff;
     avi_chunk_list_t    *p_riff = (avi_chunk_list_t*)&ck_riff;
@@ -518,7 +525,8 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    if( config_GetInt( p_demux, "avi-index" ) )
+    i_do_index =  config_GetInt( p_demux, "avi-index" );
+    if( i_do_index == 1 ) /* Always fix */
     {
 aviindex:
         if( p_sys->b_seekable )
@@ -544,7 +552,7 @@ aviindex:
     {
         msg_Warn( p_demux, "broken or missing index, 'seek' will be "
                            "axproximative or will have strange behaviour" );
-        if( !b_index )
+        if( i_do_index == 0 && !b_index )
         {
             int i_create;
             i_create = intf_UserYesNo( p_demux, _("AVI Index") ,
