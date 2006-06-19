@@ -683,26 +683,28 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         /* Prepare statistics */
 #define INIT_COUNTER( p, type, compute ) p_input->counters.p_##p = \
      stats_CounterCreate( p_input, VLC_VAR_##type, STATS_##compute);
-
-        INIT_COUNTER( read_bytes, INTEGER, COUNTER );
-        INIT_COUNTER( read_packets, INTEGER, COUNTER );
-        INIT_COUNTER( demux_read, INTEGER, COUNTER );
-        INIT_COUNTER( input_bitrate, FLOAT, DERIVATIVE );
-        INIT_COUNTER( demux_bitrate, FLOAT, DERIVATIVE );
-        INIT_COUNTER( played_abuffers, INTEGER, COUNTER );
-        INIT_COUNTER( lost_abuffers, INTEGER, COUNTER );
-        INIT_COUNTER( displayed_pictures, INTEGER, COUNTER );
-        INIT_COUNTER( lost_pictures, INTEGER, COUNTER );
-        INIT_COUNTER( decoded_audio, INTEGER, COUNTER );
-        INIT_COUNTER( decoded_video, INTEGER, COUNTER );
-        INIT_COUNTER( decoded_sub, INTEGER, COUNTER );
-        p_input->counters.p_sout_send_bitrate = NULL;
-        p_input->counters.p_sout_sent_packets = NULL;
-        p_input->counters.p_sout_sent_bytes = NULL;
-        if( p_input->counters.p_demux_bitrate )
-            p_input->counters.p_demux_bitrate->update_interval = 1000000;
-        if( p_input->counters.p_input_bitrate )
-            p_input->counters.p_input_bitrate->update_interval = 1000000;
+        if( p_this->p_libvlc->b_stats )
+        {
+            INIT_COUNTER( read_bytes, INTEGER, COUNTER );
+            INIT_COUNTER( read_packets, INTEGER, COUNTER );
+            INIT_COUNTER( demux_read, INTEGER, COUNTER );
+            INIT_COUNTER( input_bitrate, FLOAT, DERIVATIVE );
+            INIT_COUNTER( demux_bitrate, FLOAT, DERIVATIVE );
+            INIT_COUNTER( played_abuffers, INTEGER, COUNTER );
+            INIT_COUNTER( lost_abuffers, INTEGER, COUNTER );
+            INIT_COUNTER( displayed_pictures, INTEGER, COUNTER );
+            INIT_COUNTER( lost_pictures, INTEGER, COUNTER );
+            INIT_COUNTER( decoded_audio, INTEGER, COUNTER );
+            INIT_COUNTER( decoded_video, INTEGER, COUNTER );
+            INIT_COUNTER( decoded_sub, INTEGER, COUNTER );
+            p_input->counters.p_sout_send_bitrate = NULL;
+            p_input->counters.p_sout_sent_packets = NULL;
+            p_input->counters.p_sout_sent_bytes = NULL;
+            if( p_input->counters.p_demux_bitrate )
+                p_input->counters.p_demux_bitrate->update_interval = 1000000;
+            if( p_input->counters.p_input_bitrate )
+                p_input->counters.p_input_bitrate->update_interval = 1000000;
+        }
         vlc_mutex_init( p_input, &p_input->counters.counters_lock );
 
         /* handle sout */
@@ -717,11 +719,15 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                 free( psz );
                 return VLC_EGENERIC;
             }
-            INIT_COUNTER( sout_sent_packets, INTEGER, COUNTER );
-            INIT_COUNTER (sout_sent_bytes, INTEGER, COUNTER );
-            INIT_COUNTER( sout_send_bitrate, FLOAT, DERIVATIVE );
-            if( p_input->counters.p_sout_send_bitrate )
-                p_input->counters.p_sout_send_bitrate->update_interval = 1000000;
+            if( p_input->p_libvlc->b_stats )
+            {
+                INIT_COUNTER( sout_sent_packets, INTEGER, COUNTER );
+                INIT_COUNTER (sout_sent_bytes, INTEGER, COUNTER );
+                INIT_COUNTER( sout_send_bitrate, FLOAT, DERIVATIVE );
+                if( p_input->counters.p_sout_send_bitrate )
+                     p_input->counters.p_sout_send_bitrate->update_interval =
+                             1000000;
+            }
         }
         free( psz );
     }

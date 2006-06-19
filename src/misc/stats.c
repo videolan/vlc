@@ -94,9 +94,7 @@ int __stats_Update( vlc_object_t *p_this, counter_t *p_counter,
  */
 int __stats_Get( vlc_object_t *p_this, counter_t *p_counter, vlc_value_t *val )
 {
-    if( !p_this->p_libvlc->b_stats ) return VLC_EGENERIC;
-
-    if( p_counter->i_samples == 0 )
+    if( !p_this->p_libvlc->b_stats || p_counter->i_samples == 0 )
     {
         val->i_int = val->f_float = 0.0;
         return VLC_EGENERIC;
@@ -147,7 +145,7 @@ void stats_ComputeInputStats( input_thread_t *p_input, input_stats_t *p_stats )
     /* Input */
     stats_GetInteger( p_input, p_input->counters.p_read_packets,
                       &p_stats->i_read_packets );
-    stats_GetInteger( p_input, p_input->counters.p_read_bytes, 
+    stats_GetInteger( p_input, p_input->counters.p_read_bytes,
                       &p_stats->i_read_bytes );
     stats_GetFloat( p_input, p_input->counters.p_input_bitrate,
                     &p_stats->f_input_bitrate );
