@@ -84,19 +84,16 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     mdate();
 
     /* WinSock Library Init. */
-    if( !WSAStartup( MAKEWORD( 2, 0 ), &Data ) )
+    if( !WSAStartup( MAKEWORD( 2, 2 ), &Data ) )
     {
-        /* Confirm that the WinSock DLL supports 2.0.*/
-        if( LOBYTE( Data.wVersion ) != 2 || HIBYTE( Data.wVersion ) != 0 )
-        {
+        /* Aah, pretty useless check, we should always have Winsock 2.2
+         * since it appeared in Win98. */
+        if( LOBYTE( Data.wVersion ) != 2 || HIBYTE( Data.wVersion ) != 2 )
             /* We could not find a suitable WinSock DLL. */
             WSACleanup( );
-        }
         else
-        {
             /* Everything went ok. */
             return;
-        }
     }
 
     /* Let's try with WinSock 1.1 */
@@ -104,20 +101,14 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     {
         /* Confirm that the WinSock DLL supports 1.1.*/
         if( LOBYTE( Data.wVersion ) != 1 || HIBYTE( Data.wVersion ) != 1 )
-        {
             /* We could not find a suitable WinSock DLL. */
             WSACleanup( );
-        }
         else
-        {
             /* Everything went ok. */
             return;
-        }
     }
 
     fprintf( stderr, "error: can't initialize WinSocks\n" );
-
-    return;
 }
 
 /*****************************************************************************
