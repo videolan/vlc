@@ -33,9 +33,9 @@ SetCompressor /SOLID lzma
 SetOverwrite ifnewer
 CRCCheck on
 
+InstType "Recommended"
 InstType "Minimum"
 InstType "Full"
-InstType "Recommended"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; NSIS Modern User Interface configuration ;
@@ -197,7 +197,7 @@ FunctionEnd
 
 !macro RegisterExtensionSection EXT
   Section /o ${EXT}
-    SectionIn 2 3
+    SectionIn 1 3
     Push $R0
     StrCpy $R0 ${EXT}
     Call RegisterExtension
@@ -238,7 +238,7 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 !macro delprefs
-  SectionIn 2 3
+  SectionIn 1 3
   StrCpy $0 0
   !define Index 'Line${__LINE__}'
   "${Index}-Loop:"
@@ -414,7 +414,7 @@ Section "Desktop Shortcut" SEC02b
 SectionEnd
 
 Section /o "Mozilla plugin" SEC03
-  SectionIn 2 3
+  SectionIn 1 3
 
   !insertmacro OpenUninstallLog
   !insertmacro InstallFolder mozilla
@@ -458,7 +458,7 @@ Section /o "Mozilla plugin" SEC03
 SectionEnd
 
 Section /o "ActiveX plugin" SEC04
-  SectionIn 2 3
+  SectionIn 1 3
   SetOutPath "$INSTDIR"
   !insertmacro OpenUninstallLog
   !insertmacro InstallFile activex\axvlc.dll
@@ -467,7 +467,7 @@ Section /o "ActiveX plugin" SEC04
 SectionEnd
 
 Section /o "Context Menus" SEC05
-  SectionIn 2
+  SectionIn 3
   !insertmacro MacroAllExtensions AddContextMenu
   !insertmacro AddContextMenu "Directory"
 SectionEnd
@@ -684,7 +684,7 @@ Section "Uninstall" SEC91
 SectionEnd
 
 Section /o "un.Delete preferences and cache" SEC92
-  SectionIn 2 3
+  SectionIn 1 3
   !insertmacro delprefs
 SectionEnd
 
