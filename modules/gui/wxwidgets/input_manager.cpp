@@ -75,6 +75,10 @@ InputManager::InputManager( intf_thread_t *_p_intf, Interface *_p_main_intf,
 
     /* Create slider */
     slider = new wxSlider( this, SliderScroll_Event, 0, 0, SLIDER_MAX_POS );
+    /* Add mouse click on slider */
+    slider->Connect( wxEVT_LEFT_DOWN,
+                     wxMouseEventHandler( InputManager::OnSliderClick ),
+                     NULL, this );
 
     /* Create disc buttons */
     disc_frame = new wxPanel( this );
@@ -425,6 +429,22 @@ void InputManager::OnSliderUpdate( wxScrollEvent& event )
 
 #undef WIN32
     vlc_mutex_unlock( &p_intf->change_lock );
+}
+
+void InputManager::OnSliderClick( wxMouseEvent& event )
+{
+    wxSlider* slider = wxStaticCast( event.GetEventObject(), wxSlider );
+    int min = slider->GetMin();
+    int max = slider->GetMax();
+    int pos = event.GetPosition().x;
+    int dim = slider->GetClientSize().x;
+
+    if( pos < 0 || pos >= dim ) return;
+
+    int val = ( pos * ( max - min + 1 ) ) / dim;
+    slider->SetValue( min + val );
+
+    event.Skip();
 }
 
 void InputManager::ShowSlider( bool show )
