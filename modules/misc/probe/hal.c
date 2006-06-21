@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
+#include <vlc/intf.h>
 #include <vlc_devices.h>
 
 #include <hal/libhal.h>
@@ -40,6 +41,9 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 static void Update ( intf_thread_t *p_intf );
+static void UpdateMedia( intf_thread_t *p_intf, device_t *p_dev );
+static void AddDevice( intf_thread_t * p_intf, device_t *p_dev );
+static device_t * ParseDisc( intf_thread_t *p_intf,  char *psz_device );
 
 /*****************************************************************************
  * Module descriptor
@@ -57,19 +61,20 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    vlc_value_t         val;
     DBusError           dbus_error;
     DBusConnection      *p_connection;
+    intf_sys_t          *p_sys;
 
-    p_intf->p_sys = (intf_sys_t*)malloc( sizeof( intf_sys_t ) );
-    p_intf->p_sys->i_drives = 0;
+    p_intf->p_sys = p_sys = (intf_sys_t*)malloc( sizeof( intf_sys_t ) );
+    p_intf->p_sys->i_devices = 0;
+    p_intf->p_sys->pp_devices = NULL;
 
-    p_intf->pf_run = Run;
+    p_intf->pf_run = Update;
 
     dbus_error_init( &dbus_error );
 
-    p_intf->p_sys->p_ctx = libhal_ctx_new();
-    if( !p_intf->p_sys->p_ctx )
+    p_sys->p_ctx = libhal_ctx_new();
+    if( !p_sys->p_ctx )
     {
         msg_Err( p_intf, "unable to create HAL context") ;
         free( p_intf->p_sys );
@@ -106,7 +111,7 @@ static void Close( vlc_object_t *p_this )
 
 static int GetAllDevices( intf_thread_t *p_intf, device_t ***ppp_devices )
 {
-    /* Todo : fill the dst array */
+    /// \todo : fill the dst array 
     return p_intf->p_sys->i_devices;
 }
 
@@ -118,15 +123,17 @@ static void Update( intf_thread_t * p_intf )
     vlc_bool_t b_exists;
 
     for ( j = 0 ; j < p_sys->i_devices; j++ )
-        p_dev->b_seen = VLC_FALSE;
+        p_sys->pp_devices[j]->b_seen = VLC_FALSE;
 
-    if( ( devices = libhal_get_all_devices( p_sys->p_ctx, &i_devices, NULL ) ) )
+    /* CD/DVD */
+    if( ( devices = libhal_find_device_by_capability( p_sys->p_ctx,
+				    		      "storage.cdrom",
+						      &i_devices, NULL ) ) )
     {
-        device_t *p_device;
         for( i = 0; i < i_devices; i++ )
         {
+            device_t *p_dev = ParseDisc( p_intf, devices[ i ] );
             b_exists = VLC_FALSE;
-            p_dev = ParseDevice( p_sd, devices[ i ] );
 
             for ( j = 0 ; j < p_sys->i_devices; j++ )
             {
@@ -135,6 +142,7 @@ static void Update( intf_thread_t * p_intf )
                 {
                     b_exists = VLC_TRUE;
                     p_dev->b_seen = VLC_TRUE;
+                    UpdateMedia( p_intf, p_dev );
                     break;
                 }
                 if( !b_exists )
@@ -155,42 +163,96 @@ static void AddDevice( intf_thread_t * p_intf, device_t *p_dev )
     /// \todo : emit variable
 }
 
-
-
-
-static device_t * ParseDevice( intf_thread_t *p_intf,  char *psz_device )
+static device_t * ParseDisc( intf_thread_t *p_intf,  char *psz_device )
 {
-    char *psz_disc_type;
     intf_sys_t *p_sys = p_intf->p_sys;
-    /* FIXME: The following code provides media detection, not device */
- /*
-    if( libhal_device_property_exists( p_sys->p_ctx, psz_device,
-                                       "volume.disc.type", NULL ) )
+    device_t *p_dev;
+    char *block_dev;
+    dbus_bool_t b_dvd;
+    
+    if( !libhal_device_property_exists( p_sys->p_ctx, psz_device,
+			   	       "storage.cdrom.dvd", NULL ) )
+        return NULL;
+
+    p_dev = (device_t *)malloc( sizeof( device_t ) );
+    p_dev->i_media_type = p_dev->i_capabilities = 0;
+    p_dev->psz_name = p_dev->psz_uri = NULL;
+
+    block_dev =  libhal_device_get_property_string( p_sys->p_ctx, psz_device,
+                                                   "block.device" , NULL );
+    if( block_dev )
     {
-        psz_disc_type = libhal_device_get_property_string( p_sys->p_ctx,
-                                                        psz_device,
-                                                        "volume.disc.type",
-                                                        NULL );
-        if( !strcmp( psz_disc_type, "dvd_rom" ) )
-        {
-            /// \todo This is a DVD
-            //psz_name = libhal_device_get_property_string( p_sd->p_sys->p_ctx,
-            ///                          psz_device, "volume.label", NULL );
-            // psz_blockdevice = libhal_device_get_property_string( p_sd->p_sys->p_ctx,
-            //                            psz_device, "block.device", NULL );
-            //    libhal_free_string( psz_device );
-}
-        }
-        else if( !strcmp( psz_disc_type, "cd_rom" ) )
-        {
-            if( libhal_device_get_property_bool( p_sys->p_ctx, psz_device,
-                                         "volume.disc.has_audio" , NULL ) )
-            {
-                /// \todo This is a CDDA
-            }
-        }
-        libhal_free_string( psz_disc_type );
+        p_dev->psz_uri = strdup( block_dev );
+        libhal_free_string( block_dev );
     }
-    */
-    return NULL;
+
+    b_dvd = libhal_device_get_property_bool( p_sys->p_ctx, psz_device,
+                                            "storage.cdrom.dvd", NULL  );
+    if( b_dvd )
+        p_dev->i_capabilities = DEVICE_CAN_DVD | DEVICE_CAN_CD;
+    else
+        p_dev->i_capabilities = DEVICE_CAN_CD;
+
+    UpdateMedia( p_intf, p_dev );
+    return p_dev;
+}
+
+static void UpdateMedia( intf_thread_t *p_intf, device_t *p_dev )
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    char **matching_media;
+    int i_matching, i;
+    vlc_bool_t b_changed = VLC_FALSE;;
+    int i_old_type = p_dev->i_media_type;
+    p_dev->i_media_type = 0;
+
+    /* Find the media in the drive */
+    matching_media = libhal_manager_find_device_string_match( p_sys->p_ctx,
+	                           				"block.device",	p_dev->psz_uri,
+                        					&i_matching, NULL );
+    for( i = 0; i < i_matching; i++ )
+    {
+    	if( libhal_device_property_exists( p_sys->p_ctx, matching_media[i],
+                                           "volume.disc.type", NULL ) )
+    	{
+      	    char *psz_media_name = libhal_device_get_property_string(
+				                			p_sys->p_ctx,
+                							matching_media[i],
+                							"volume.label", NULL );
+            if( psz_media_name )
+            {
+                if( p_dev->psz_name && strcmp( p_dev->psz_name, psz_media_name))
+                {
+                    free( p_dev->psz_name );
+                    p_dev->psz_name = NULL;
+                    b_changed = VLC_TRUE;
+                }
+                if( !p_dev->psz_name )
+                    p_dev->psz_name = strdup( psz_media_name );
+                libhal_free_string( psz_media_name );
+            }
+
+            if( libhal_device_get_property_bool( p_sys->p_ctx,
+                                             matching_media[i],
+                                             "volume.disc.is_videodvd", NULL) )
+           	    p_dev->i_media_type = MEDIA_TYPE_DVD;
+            else if( libhal_device_get_property_bool( p_sys->p_ctx,
+                                             matching_media[i],
+                                             "volume.disc.is_vcd", NULL) ||
+                     libhal_device_get_property_bool( p_sys->p_ctx,
+                                             matching_media[i],
+                                             "volume.disc.is_svcd", NULL) )
+               p_dev->i_media_type = MEDIA_TYPE_VCD;
+            else if( libhal_device_get_property_bool( p_sys->p_ctx,
+                                             matching_media[i],
+                                             "volume.disc.has_audio", NULL) )
+               p_dev->i_media_type = MEDIA_TYPE_CDDA;
+
+            break;
+        }
+    }
+    if( b_changed || p_dev->i_media_type != i_old_type )
+    {
+        /// \todo emit changed signal
+    }
 }

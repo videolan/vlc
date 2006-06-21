@@ -1,0 +1,1 @@
+SOURCES_probe_hal = hal.c

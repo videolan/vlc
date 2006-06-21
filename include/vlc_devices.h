@@ -41,9 +41,12 @@ struct device_t
 {
     int             i_capabilities;
     int             i_media_type;
+    vlc_bool_t      b_seen;
     char *psz_uri;
-    char *psz_media_name;
+    char *psz_name;
 };
 
 static inline void device_GetDVD()
 {}
+
+#endif

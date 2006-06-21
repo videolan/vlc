@@ -823,9 +823,9 @@ then
   PKG_CHECK_MODULES(HAL, hal >= 0.5.0,
     [ AC_DEFINE( HAVE_HAL_1, [] , [Define if you have the new HAL library API])
       AC_DEFINE( HAVE_HAL, [], [Define if you have the HAL library] )
-      VLC_ADD_PLUGINS([hal]) 
-      VLC_ADD_LDFLAGS([vlc hal],[$HAL_LIBS])
-      VLC_ADD_CFLAGS([vlc hal],[$HAL_CFLAGS])],   
+      VLC_ADD_PLUGINS([hal probe_hal]) 
+      VLC_ADD_LDFLAGS([vlc hal probe_hal],[$HAL_LIBS])
+      VLC_ADD_CFLAGS([vlc hal probe_hal],[$HAL_CFLAGS])],   
     dnl No hal 0.5 Test for 0.2
     [ PKG_CHECK_MODULES( HAL, hal >= 0.2.97, 
        [AC_DEFINE(HAVE_HAL, [], [Define if you have the HAL library])
@@ -5533,6 +5533,7 @@ AC_CONFIG_FILES([
   modules/misc/testsuite/Makefile
   modules/misc/playlist/Makefile
   modules/misc/xml/Makefile
+  modules/misc/probe/Makefile
   modules/mux/Makefile
   modules/mux/mpeg/Makefile
   modules/mux/rtp/Makefile
