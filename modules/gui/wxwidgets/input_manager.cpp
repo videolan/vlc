@@ -434,15 +434,26 @@ void InputManager::OnSliderUpdate( wxScrollEvent& event )
 void InputManager::OnSliderClick( wxMouseEvent& event )
 {
     wxSlider* slider = wxStaticCast( event.GetEventObject(), wxSlider );
-    int min = slider->GetMin();
-    int max = slider->GetMax();
-    int pos = event.GetPosition().x;
-    int dim = slider->GetClientSize().x;
+    int i_min = slider->GetMin();
+    int i_max = slider->GetMax();
+    int i_pos = event.GetPosition().x;
+    int i_dim = slider->GetClientSize().x;
+    int i_val = i_min + ( i_pos * ( i_max - i_min + 1 ) ) / i_dim;
 
-    if( pos < 0 || pos >= dim ) return;
+    if( i_pos < 0 || i_pos >= i_dim ) return;
 
-    int val = ( pos * ( max - min + 1 ) ) / dim;
-    slider->SetValue( min + val );
+    vlc_mutex_lock( &p_intf->change_lock );
+
+    slider->SetValue( i_val );
+
+    if( i_slider_pos != i_val && p_intf->p_sys->p_input )
+    {
+        vlc_value_t pos;
+        pos.f_float = (float)i_val / (float)SLIDER_MAX_POS;
+        var_Set( p_intf->p_sys->p_input, "position", pos );
+    }
+
+    vlc_mutex_unlock( &p_intf->change_lock );
 
     event.Skip();
 }
