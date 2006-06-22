@@ -356,6 +356,8 @@ typedef struct vlc_acl_t vlc_acl_t;
 /* Misc */
 typedef struct iso639_lang_t iso639_lang_t;
 typedef struct device_t device_t;
+typedef struct device_probe_t device_probe_t;
+typedef struct probe_sys_t probe_sys_t;
 
 /* block */
 typedef struct block_t      block_t;

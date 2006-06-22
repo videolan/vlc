@@ -30,7 +30,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct intf_sys_t
+struct probe_sys_t
 {
     LibHalContext *p_ctx;
     int            i_devices;
@@ -40,10 +40,10 @@ struct intf_sys_t
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-static void Update ( intf_thread_t *p_intf );
-static void UpdateMedia( intf_thread_t *p_intf, device_t *p_dev );
-static void AddDevice( intf_thread_t * p_intf, device_t *p_dev );
-static device_t * ParseDisc( intf_thread_t *p_intf,  char *psz_device );
+static void Update ( device_probe_t *p_probe );
+static void UpdateMedia( device_probe_t *p_probe, device_t *p_dev );
+static void AddDevice( device_probe_t * p_probe, device_t *p_dev );
+static device_t * ParseDisc( device_probe_t *p_probe,  char *psz_device );
 
 /*****************************************************************************
  * Module descriptor
@@ -60,38 +60,38 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    device_probe_t *p_probe = (device_probe_t *)p_this;
     DBusError           dbus_error;
     DBusConnection      *p_connection;
-    intf_sys_t          *p_sys;
+    probe_sys_t          *p_sys;
 
-    p_intf->p_sys = p_sys = (intf_sys_t*)malloc( sizeof( intf_sys_t ) );
-    p_intf->p_sys->i_devices = 0;
-    p_intf->p_sys->pp_devices = NULL;
+    p_probe->p_sys = p_sys = (probe_sys_t*)malloc( sizeof( probe_sys_t ) );
+    p_probe->p_sys->i_devices = 0;
+    p_probe->p_sys->pp_devices = NULL;
 
-    p_intf->pf_run = Update;
+    p_probe->pf_run = Update;
 
     dbus_error_init( &dbus_error );
 
     p_sys->p_ctx = libhal_ctx_new();
     if( !p_sys->p_ctx )
     {
-        msg_Err( p_intf, "unable to create HAL context") ;
-        free( p_intf->p_sys );
+        msg_Err( p_probe, "unable to create HAL context") ;
+        free( p_probe->p_sys );
         return VLC_EGENERIC;
     }
     p_connection = dbus_bus_get( DBUS_BUS_SYSTEM, &dbus_error );
     if( dbus_error_is_set( &dbus_error ) )
     {
-        msg_Err( p_intf, "unable to connect to DBUS: %s", dbus_error.message );
+        msg_Err( p_probe, "unable to connect to DBUS: %s", dbus_error.message );
         dbus_error_free( &dbus_error );
-        free( p_intf->p_sys );
+        free( p_probe->p_sys );
         return VLC_EGENERIC;
     }
-    libhal_ctx_set_dbus_connection( p_intf->p_sys->p_ctx, p_connection );
-    if( !libhal_ctx_init( p_intf->p_sys->p_ctx, &dbus_error ) )
+    libhal_ctx_set_dbus_connection( p_probe->p_sys->p_ctx, p_connection );
+    if( !libhal_ctx_init( p_probe->p_sys->p_ctx, &dbus_error ) )
     {
-        msg_Err( p_intf, "hal not available : %s", dbus_error.message );
+        msg_Err( p_probe, "hal not available : %s", dbus_error.message );
         dbus_error_free( &dbus_error );
         free( p_sys );
         return VLC_EGENERIC;
@@ -104,20 +104,20 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = (intf_thread_t *) p_this;
-    intf_sys_t *p_sys = p_intf->p_sys;
+    device_probe_t *p_probe = (device_probe_t *) p_this;
+    probe_sys_t *p_sys = p_probe->p_sys;
     free( p_sys );
 }
 
-static int GetAllDevices( intf_thread_t *p_intf, device_t ***ppp_devices )
+static int GetAllDevices( device_probe_t *p_probe, device_t ***ppp_devices )
 {
     /// \todo : fill the dst array 
-    return p_intf->p_sys->i_devices;
+    return p_probe->p_sys->i_devices;
 }
 
-static void Update( intf_thread_t * p_intf )
+static void Update( device_probe_t * p_probe )
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
+    probe_sys_t *p_sys = p_probe->p_sys;
     int i, i_devices, j;
     char **devices;
     vlc_bool_t b_exists;
@@ -132,7 +132,7 @@ static void Update( intf_thread_t * p_intf )
     {
         for( i = 0; i < i_devices; i++ )
         {
-            device_t *p_dev = ParseDisc( p_intf, devices[ i ] );
+            device_t *p_dev = ParseDisc( p_probe, devices[ i ] );
             b_exists = VLC_FALSE;
 
             for ( j = 0 ; j < p_sys->i_devices; j++ )
@@ -142,11 +142,11 @@ static void Update( intf_thread_t * p_intf )
                 {
                     b_exists = VLC_TRUE;
                     p_dev->b_seen = VLC_TRUE;
-                    UpdateMedia( p_intf, p_dev );
+                    UpdateMedia( p_probe, p_dev );
                     break;
                 }
                 if( !b_exists )
-                    AddDevice( p_intf, p_dev );
+                    AddDevice( p_probe, p_dev );
             }
         }
     }
@@ -154,18 +154,18 @@ static void Update( intf_thread_t * p_intf )
 }
 
 
-static void AddDevice( intf_thread_t * p_intf, device_t *p_dev )
+static void AddDevice( device_probe_t * p_probe, device_t *p_dev )
 {
-    INSERT_ELEM( p_intf->p_sys->pp_devices,
-                 p_intf->p_sys->i_devices,
-                 p_intf->p_sys->i_devices,
+    INSERT_ELEM( p_probe->p_sys->pp_devices,
+                 p_probe->p_sys->i_devices,
+                 p_probe->p_sys->i_devices,
                  p_dev );
     /// \todo : emit variable
 }
 
-static device_t * ParseDisc( intf_thread_t *p_intf,  char *psz_device )
+static device_t * ParseDisc( device_probe_t *p_probe,  char *psz_device )
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
+    probe_sys_t *p_sys = p_probe->p_sys;
     device_t *p_dev;
     char *block_dev;
     dbus_bool_t b_dvd;
@@ -193,13 +193,13 @@ static device_t * ParseDisc( intf_thread_t *p_intf,  char *psz_device )
     else
         p_dev->i_capabilities = DEVICE_CAN_CD;
 
-    UpdateMedia( p_intf, p_dev );
+    UpdateMedia( p_probe, p_dev );
     return p_dev;
 }
 
-static void UpdateMedia( intf_thread_t *p_intf, device_t *p_dev )
+static void UpdateMedia( device_probe_t *p_probe, device_t *p_dev )
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
+    probe_sys_t *p_sys = p_probe->p_sys;
     char **matching_media;
     int i_matching, i;
     vlc_bool_t b_changed = VLC_FALSE;;

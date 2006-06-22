@@ -46,6 +46,16 @@ struct device_t
     char *psz_name;
 };
 
+struct device_probe_t
+{
+    VLC_COMMON_MEMBERS;
+    int         i_devices;
+    device_t  **pp_devices;
+
+    probe_sys_t *p_sys;
+    void      ( *pf_run )    ( device_probe_t * );  /** Run function */
+};
+
 static inline void device_GetDVD()
 {}
 

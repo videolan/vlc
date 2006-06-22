@@ -322,6 +322,7 @@ SOURCES_libvlc_common = \
 	misc/vlm.c \
 	misc/xml.c \
 	misc/hashtables.c \
+	misc/devices.c \
 	extras/libc.c \
 	control/core.c \
 	control/playlist.c \
