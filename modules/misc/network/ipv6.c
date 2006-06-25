@@ -51,24 +51,16 @@
 
 #if defined(WIN32)
 static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
-/* the following will have to be removed when w32api defines them */
-#   ifndef IPPROTO_IPV6
-#      define IPPROTO_IPV6 41 
-#   endif
-#   ifndef IPV6_JOIN_GROUP
-#      define IPV6_JOIN_GROUP 12
-#   endif
-#   ifndef IPV6_MULTICAST_HOPS
-#      define IPV6_MULTICAST_HOPS 10
-#   endif
-#   ifndef IPV6_UNICAST_HOPS
-#      define IPV6_UNICAST_HOPS 4
-#   endif
-#   define close closesocket
+# define close closesocket
 #endif
 
 #ifndef MCAST_JOIN_SOURCE_GROUP
-#   define MCAST_JOIN_SOURCE_GROUP         46
+# ifdef WIN32
+/* Most (all?) Mingw32 versions in use are yet to pick up Vista stuff */
+#  define MCAST_JOIN_SOURCE_GROUP 45 /* from <ws2ipdef.h> */
+# else
+#  define MCAST_JOIN_SOURCE_GROUP 46
+# endif
 struct group_source_req
 {
        uint32_t           gsr_interface;  /* interface index */
