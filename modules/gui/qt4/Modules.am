@@ -17,6 +17,7 @@ UIH = $(TOUI:%=%.h)
 TOMOC = main_interface \
 	dialogs_provider \
 	input_manager \
+    playlist_model
 	dialogs/playlist \
 	dialogs/prefs_dialog \
 	dialogs/streaminfo \
@@ -31,6 +32,7 @@ nodist_SOURCES_qt4 = \
 		main_interface.moc.cpp \
 		dialogs_provider.moc.cpp \
 		input_manager.moc.cpp \
+        playlist_model.moc.cpp \
 		dialogs/playlist.moc.cpp \
 		dialogs/streaminfo.moc.cpp \
 		dialogs/prefs_dialog.moc.cpp \
@@ -61,6 +63,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		main_interface.cpp \
 		dialogs_provider.cpp \
 		input_manager.cpp \
+        playlist_model.cpp \
 		dialogs/playlist.cpp \
 		dialogs/prefs_dialog.cpp \
 		dialogs/streaminfo.cpp \
@@ -76,6 +79,7 @@ EXTRA_DIST += \
 	main_interface.hpp \
 	dialogs_provider.hpp \
 	input_manager.hpp \
+    playlist_model.hpp \
 	dialogs/playlist.hpp \
 	dialogs/streaminfo.hpp \
 	dialogs/prefs_dialog.hpp \

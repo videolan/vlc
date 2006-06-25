@@ -43,8 +43,6 @@ private:
     intf_thread_t *p_intf;
 public slots:
     virtual void sendUpdate() = 0;
-signals:
-    virtual void dataUpdated( QString, QString ) = 0;
 };
 
 class FileOpenPanel: public OpenPanel
@@ -59,7 +57,7 @@ private:
 public slots:
     virtual void sendUpdate() ;
 signals:
-    virtual void dataUpdated( QString, QString ) ;
+    void dataUpdated( QString, QString ) ;
 
 };
 

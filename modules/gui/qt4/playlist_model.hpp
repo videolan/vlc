@@ -1,0 +1,130 @@
+/*****************************************************************************
+ * playlist_model.hpp : Model for a playlist tree
+ ****************************************************************************
+ * Copyright (C) 2000-2005 the VideoLAN team
+ * $Id: wxwidgets.cpp 15731 2006-05-25 14:43:53Z zorglub $
+ *
+ * Authors: Clément Stenac <zorglub@videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+#ifndef _PLAYLIST_MODEL_H_
+#define _PLAYLIST_MODEL_H_
+
+#include <QObject>
+#include <QEvent>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
+#include <vlc_playlist.h>
+
+class PLModel;
+
+class PLItem
+{
+public:
+    PLItem( int, int, PLItem *parent , PLModel *);
+    PLItem( playlist_item_t *, PLItem *parent, PLModel *);
+    ~PLItem();
+
+    int row() const;
+    void insertChild( PLItem *, int );
+
+    void appendChild( PLItem *item ) { insertChild( item, children.count() ); };
+    PLItem *child( int row ) { return children.value( row ); };
+    int childCount() const { return children.count(); };
+    QString columnString( int col ) { return strings.value( col ); };
+    PLItem *parent() { return parentItem; };
+protected:
+    QList<PLItem*> children;
+    int i_id;
+    int i_input_id;
+    friend class PLModel;
+private:
+    QList<QString> strings;
+    PLItem *parentItem;
+
+    PLModel *model;
+};
+
+static int ItemUpdate_Type = QEvent::User + 2;
+static int ItemDelete_Type = QEvent::User + 3;
+static int ItemAppend_Type = QEvent::User + 4;
+
+class PLEvent : public QEvent
+{
+public:
+    PLEvent( int type, int id ) : QEvent( (QEvent::Type)(type) )
+    { i_id = id; p_add = NULL; };
+    PLEvent(  playlist_add_t  *a ) : QEvent( (QEvent::Type)(ItemAppend_Type) )
+    { p_add = a; };
+    virtual ~PLEvent() {};
+                          
+    int i_id;
+    playlist_add_t *p_add;
+};   
+                    
+
+#include <QAbstractItemModel>
+#include <QModelIndex>
+#include <QVariant>
+
+class PLModel : public QAbstractItemModel
+{
+    Q_OBJECT
+
+public:
+    PLModel( playlist_item_t *, int, QObject *parent = 0);
+    ~PLModel();
+
+    void customEvent( QEvent * );
+
+    /* QModel stuff */
+    QVariant data( const QModelIndex &index, int role) const;
+    Qt::ItemFlags flags( const QModelIndex &index) const;
+    QVariant headerData( int section, Qt::Orientation orientation,
+                         int role = Qt::DisplayRole) const;
+    
+    QModelIndex index( int r, int c, const QModelIndex &parent ) const;
+    QModelIndex index( PLItem *, int c ) const;
+                    
+    QModelIndex parent( const QModelIndex &index) const;
+    int childrenCount( const QModelIndex &parent = QModelIndex() ) const;
+
+    bool b_need_update;
+    int i_items_to_append;
+private:
+    PLItem *rootItem;
+
+    playlist_t *p_playlist;
+
+    /* Update processing */
+    void ProcessInputItemUpdate( int i_input_id );
+    void ProcessItemRemoval( int i_id );
+    void ProcessItemAppend( playlist_add_t *p_add );
+            
+    /* Lookups */
+    PLItem *FindById( PLItem *, int );
+    PLItem *FindByInput( PLItem *, int );
+    PLItem *FindInner( PLItem *, int , bool );
+    PLItem *p_cached_item;
+    PLItem *p_cached_item_bi;
+    int i_cached_id;
+    int i_cached_input_id;
+
+friend class PLItem;
+};
+
+#endif
