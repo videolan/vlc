@@ -42,19 +42,31 @@ static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
  * Playlist item implementation
  *************************************************************************/
 
-PLItem::PLItem( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
+/**
+ * Column strings
+ *      Title
+ *      Artist
+ *      Duration
+ */
+
+void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
 {
     parentItem = parent;
     i_id = _i_id; i_input_id = _i_input_id;
     model = m;
+    strings.append( "" );    
+    strings.append( "" );    
+    strings.append( "" );    
+}
+
+PLItem::PLItem( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
+{
+    init( _i_id, _i_input_id, parent, m );
 }
 
 PLItem::PLItem( playlist_item_t * p_item, PLItem *parent, PLModel *m )
 {
-    i_id = p_item->i_id;
-    i_input_id = p_item->p_input->i_id;
-    parentItem = parent;
-    model = m;
+    init( p_item->i_id, p_item->p_input->i_id, parent, m );
 }
 
 PLItem::~PLItem()
@@ -65,6 +77,7 @@ PLItem::~PLItem()
 void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
 {
     assert( model );
+    fprintf( stderr, "Inserting child \n" );
     if( signal )
         model->beginInsertRows( model->index( this , 0 ), i_pos, i_pos );
     children.append( item );
@@ -79,16 +92,24 @@ int PLItem::row() const
     return 0;
 }
 
+void PLItem::update( playlist_item_t *p_item )
+{
+    assert( p_item->p_input->i_id == i_input_id );
+    strings[0] = QString::fromUtf8( p_item->p_input->psz_name );
+}
 
 /*************************************************************************
  * Playlist model implementation
  *************************************************************************/
 
-PLModel::PLModel( playlist_item_t * p_root, int i_depth, QObject *parent)
+PLModel::PLModel( playlist_t *_p_playlist,
+                  playlist_item_t * p_root, int i_depth, QObject *parent)
                                     : QAbstractItemModel(parent)
 {
-    rootItem = new PLItem( p_root, NULL, this );
-
+     rootItem = NULL;
+        rootItem = new PLItem( p_root, NULL, this );
+    fprintf( stderr, "%i -> %i, %i -> %i", p_root->i_id, rootItem->i_id, p_root->p_input->i_id, rootItem->i_input_id );
+    p_playlist= _p_playlist;
     i_items_to_append = 0;
     b_need_update     = false;
     i_cached_id       = -1;
@@ -275,6 +296,7 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
                 return childFound;
             } 
         }
+        it++;
     }
     return NULL;
 }
@@ -298,13 +320,15 @@ void PLModel::customEvent( QEvent *event )
 /**** Events processing ****/
 void PLModel::ProcessInputItemUpdate( int i_input_id )
 {
-    assert( i_input_id >= 0 );
-    UpdateTreeItem( FindByInput( rootItem, i_input_id ), true );
+    if( i_input_id <= 0 ) return;
+    PLItem *item = FindByInput( rootItem, i_input_id );
+    fprintf( stderr, "Updating %i -> %p \n", i_input_id, item );
+    UpdateTreeItem( item, true );
 }
 
 void PLModel::ProcessItemRemoval( int i_id )
 {
-    assert( i_id >= 0 );
+    if( i_id <= 0 ) return;
     if( i_id == i_cached_id ) i_cached_id = -1;
     i_cached_input_id = -1;
 
@@ -314,6 +338,7 @@ void PLModel::ProcessItemRemoval( int i_id )
 void PLModel::ProcessItemAppend( playlist_add_t *p_add )
 {
     playlist_item_t *p_item = NULL;
+    PLItem *newItem = NULL;
     i_items_to_append--;
     if( b_need_update ) return;
 
@@ -323,7 +348,9 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
     p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
 
-    nodeItem->appendChild( new PLItem( p_item, nodeItem, this ) );
+    newItem = new PLItem( p_item, nodeItem, this );
+    nodeItem->appendChild( newItem );
+    UpdateTreeItem( p_item, newItem, true );
 
 end:
     return;
@@ -362,6 +389,7 @@ void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
     for( int i = 0; i < p_node->i_children ; i++ )
     {
         PLItem *newItem =  new PLItem( p_node->pp_children[i], root, this );
+        fprintf( stderr, "New %p\n", newItem );
         root->appendChild( newItem, false );
         UpdateTreeItem( newItem, false );
         if( p_node->pp_children[i]->i_children != -1 )
@@ -371,13 +399,15 @@ void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
 
 void PLModel::UpdateTreeItem( PLItem *item, bool signal )
 {
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, rootItem->i_id );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
     UpdateTreeItem( p_item, item, signal );
 }
 
 void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item, bool signal ) 
 {
     /// \todo
+    fprintf( stderr, "Updating item %s\n", p_item->p_input->psz_name );
+    item->update( p_item );
     if( signal )
     {    // emit 
     }

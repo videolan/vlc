@@ -31,7 +31,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
                                      VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    new StandardPLPanel( this, p_intf, p_playlist->p_root_category );
+    new StandardPLPanel( this, p_intf, p_playlist, p_playlist->p_root_category );
 }
 
 PlaylistDialog::~PlaylistDialog()

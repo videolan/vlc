@@ -50,12 +50,15 @@ public:
     int childCount() const { return children.count(); };
     QString columnString( int col ) { return strings.value( col ); };
     PLItem *parent() { return parentItem; };
+
+    void update( playlist_item_t *);
 protected:
     QList<PLItem*> children;
     int i_id;
     int i_input_id;
     friend class PLModel;
 private:
+    void init( int, int, PLItem *, PLModel * );
     QList<QString> strings;
     PLItem *parentItem;
 
@@ -89,7 +92,7 @@ class PLModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    PLModel( playlist_item_t *, int, QObject *parent = 0);
+    PLModel( playlist_t *, playlist_item_t *, int, QObject *parent = 0);
     ~PLModel();
 
     void customEvent( QEvent * );
@@ -110,6 +113,7 @@ public:
 
     bool b_need_update;
     int i_items_to_append;
+    void Rebuild();
 private:
     void addCallbacks();
     void delCallbacks();
@@ -118,7 +122,6 @@ private:
     playlist_t *p_playlist;
 
     /* Update processing */
-    void Rebuild();
     void ProcessInputItemUpdate( int i_input_id );
     void ProcessItemRemoval( int i_id );
     void ProcessItemAppend( playlist_add_t *p_add );

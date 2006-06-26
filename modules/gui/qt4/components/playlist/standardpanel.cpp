@@ -26,13 +26,16 @@
 #include <QTreeView>
 
 StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
+                                  playlist_t *p_playlist,
                                   playlist_item_t *p_root ):
                                   PLPanel( _parent, _p_intf )
 {
    
-    PLModel *model = new PLModel( p_root, -1, this );
-    QTreeView *view = new QTreeView( this );
+    PLModel *model = new PLModel( p_playlist, p_root, -1, this );
+    QTreeView *view = new QTreeView( 0 );
     view->setModel(model);
+    model->Rebuild();
+    view->show();
 }
 
 StandardPLPanel::~StandardPLPanel()

@@ -46,7 +46,7 @@ class StandardPLPanel: public PLPanel
 {
     Q_OBJECT;
 public:
-    StandardPLPanel( QWidget *, intf_thread_t *, playlist_item_t * );
+    StandardPLPanel( QWidget *, intf_thread_t *, playlist_t *,playlist_item_t * );
     virtual ~StandardPLPanel();
 };
 

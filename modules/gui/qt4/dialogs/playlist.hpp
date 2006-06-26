@@ -37,7 +37,6 @@ public:
     virtual ~PlaylistDialog();
 private:
     PlaylistDialog( intf_thread_t * );
-    intf_thread_t *p_intf;
     static PlaylistDialog *instance;
 public slots:
 };
