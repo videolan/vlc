@@ -62,12 +62,14 @@ PLItem::~PLItem()
     qDeleteAll(children);
 }
 
-void PLItem::insertChild( PLItem *item, int i_pos )
+void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
 {
     assert( model );
-    model->beginInsertRows( model->index( this , 0 ), i_pos, i_pos );
+    if( signal )
+        model->beginInsertRows( model->index( this , 0 ), i_pos, i_pos );
     children.append( item );
-    model->endInsertRows();
+    if( signal )
+        model->endInsertRows();
 }
 
 int PLItem::row() const
@@ -92,6 +94,17 @@ PLModel::PLModel( playlist_item_t * p_root, int i_depth, QObject *parent)
     i_cached_id       = -1;
     i_cached_input_id = -1;
 
+    addCallbacks();
+}
+
+PLModel::~PLModel()
+{
+    delCallbacks();
+    delete rootItem;
+}
+
+void PLModel::addCallbacks()
+{
     /* Some global changes happened -> Rebuild all */
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
     /* We went to the next item */
@@ -102,17 +115,17 @@ PLModel::PLModel( playlist_item_t * p_root, int i_depth, QObject *parent)
     var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
 }
 
-PLModel::~PLModel()
+void PLModel::delCallbacks()
 {
     var_DelCallback( p_playlist, "item-change", ItemChanged, this );
     var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
     var_DelCallback( p_playlist, "item-append", ItemAppended, this );
     var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );
-    delete rootItem;
 }
 
 /****************** Base model mandatory implementations *****************/
+
 QVariant PLModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
@@ -180,7 +193,17 @@ QModelIndex PLModel::parent(const QModelIndex &index) const
     return createIndex(parentItem->row(), 0, parentItem);
 }
 
+int PLModel::columnCount( const QModelIndex &i) const 
+{
+    return 1;
+}
+
 int PLModel::childrenCount(const QModelIndex &parent) const
+{
+    return rowCount( parent );
+}
+
+int PLModel::rowCount(const QModelIndex &parent) const
 {
     PLItem *parentItem;
 
@@ -272,10 +295,11 @@ void PLModel::customEvent( QEvent *event )
         ProcessItemRemoval( ple->i_id );
 }
 
+/**** Events processing ****/
 void PLModel::ProcessInputItemUpdate( int i_input_id )
 {
     assert( i_input_id >= 0 );
-    /// \todo
+    UpdateTreeItem( FindByInput( rootItem, i_input_id ), true );
 }
 
 void PLModel::ProcessItemRemoval( int i_id )
@@ -301,9 +325,62 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
 
     nodeItem->appendChild( new PLItem( p_item, nodeItem, this ) );
 
-
 end:
     return;
+}
+
+void PLModel::Rebuild()
+{
+    /* Remove callbacks before locking to avoid deadlocks */
+    delCallbacks();
+    PL_LOCK;
+
+    /* Invalidate cache */
+    i_cached_id = i_cached_input_id = -1;
+
+    /* Clear the tree */
+    qDeleteAll( rootItem->children );
+
+    /* Recreate from root */
+    UpdateNodeChildren( rootItem );
+
+    /* And signal the view */
+    emit layoutChanged();
+
+    addCallbacks();
+    PL_UNLOCK;
+}
+
+void PLModel::UpdateNodeChildren( PLItem *root )
+{
+    playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id );
+    UpdateNodeChildren( p_node, root );
+}
+
+void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
+{
+    for( int i = 0; i < p_node->i_children ; i++ )
+    {
+        PLItem *newItem =  new PLItem( p_node->pp_children[i], root, this );
+        root->appendChild( newItem, false );
+        UpdateTreeItem( newItem, false );
+        if( p_node->pp_children[i]->i_children != -1 )
+            UpdateNodeChildren( p_node->pp_children[i], newItem );
+    }
+}
+
+void PLModel::UpdateTreeItem( PLItem *item, bool signal )
+{
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, rootItem->i_id );
+    UpdateTreeItem( p_item, item, signal );
+}
+
+void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item, bool signal ) 
+{
+    /// \todo
+    if( signal )
+    {    // emit 
+    }
 }
         
 /**********************************************************************

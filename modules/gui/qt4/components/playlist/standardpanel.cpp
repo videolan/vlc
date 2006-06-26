@@ -21,14 +21,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "playlist_model.hpp"
 #include "components/playlist/panels.hpp"
+#include <QTreeView>
 
-StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf ):
+StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
+                                  playlist_item_t *p_root ):
                                   PLPanel( _parent, _p_intf )
 {
+   
+    PLModel *model = new PLModel( p_root, -1, this );
+    QTreeView *view = new QTreeView( this );
+    view->setModel(model);
 }
 
 StandardPLPanel::~StandardPLPanel()
 {}
-
-#endif

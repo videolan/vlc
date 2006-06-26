@@ -40,9 +40,12 @@ public:
     ~PLItem();
 
     int row() const;
-    void insertChild( PLItem *, int );
+    void insertChild( PLItem *, int p, bool signal = true );
 
-    void appendChild( PLItem *item ) { insertChild( item, children.count() ); };
+    void appendChild( PLItem *item, bool signal = true ) 
+    {
+        insertChild( item, children.count(), signal );
+    };
     PLItem *child( int row ) { return children.value( row ); };
     int childCount() const { return children.count(); };
     QString columnString( int col ) { return strings.value( col ); };
@@ -102,19 +105,29 @@ public:
                     
     QModelIndex parent( const QModelIndex &index) const;
     int childrenCount( const QModelIndex &parent = QModelIndex() ) const;
+    int rowCount( const QModelIndex &parent = QModelIndex() ) const;
+    int columnCount( const QModelIndex &parent = QModelIndex() ) const;
 
     bool b_need_update;
     int i_items_to_append;
 private:
+    void addCallbacks();
+    void delCallbacks();
     PLItem *rootItem;
 
     playlist_t *p_playlist;
 
     /* Update processing */
+    void Rebuild();
     void ProcessInputItemUpdate( int i_input_id );
     void ProcessItemRemoval( int i_id );
     void ProcessItemAppend( playlist_add_t *p_add );
-            
+    
+    void UpdateTreeItem( PLItem *, bool );
+    void UpdateTreeItem( playlist_item_t *, PLItem *, bool );
+    void UpdateNodeChildren( PLItem * );
+    void UpdateNodeChildren( playlist_item_t *, PLItem * );
+        
     /* Lookups */
     PLItem *FindById( PLItem *, int );
     PLItem *FindByInput( PLItem *, int );

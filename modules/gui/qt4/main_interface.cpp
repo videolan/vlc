@@ -23,7 +23,7 @@
 #include "main_interface.hpp"
 #include "input_manager.hpp"
 #include "util/input_slider.hpp"
-#include "util/qvlcframe.hpp">
+#include "util/qvlcframe.hpp"
 #include "dialogs_provider.hpp"
 #include <QCloseEvent>
 #include <assert.h>
@@ -66,6 +66,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QMainWindow(), p_intf( 
     connect( ui.stopButton, SLOT( clicked() ), this, SLOT( stop() ) );
     connect( ui.nextButton, SLOT( clicked() ), this, SLOT( next() ) );
     connect( ui.prevButton, SLOT( clicked() ), this, SLOT( prev() ) );
+
+    connect( ui.playlistButton, SLOT(clicked() ), 
+             DialogsProvider::getInstance( p_intf ), SLOT( playlistDialog() ) );
 }
 
 MainInterface::~MainInterface()
