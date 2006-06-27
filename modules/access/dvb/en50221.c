@@ -65,6 +65,8 @@
 
 #include "dvb.h"
 
+#include "charset.h"
+
 #undef DEBUG_TPDU
 #define HLCI_WAIT_CAM_READY 0
 #define CAM_PROG_MAX MAX_PROGRAMS
@@ -74,6 +76,7 @@ static void ApplicationInformationOpen( access_t * p_access, int i_session_id );
 static void ConditionalAccessOpen( access_t * p_access, int i_session_id );
 static void DateTimeOpen( access_t * p_access, int i_session_id );
 static void MMIOpen( access_t * p_access, int i_session_id );
+static char *dvbsi_to_utf8( char *psz_instring, size_t i_length );
 
 /*****************************************************************************
  * Utility functions
@@ -1597,7 +1600,6 @@ static void MMIDisplayReply( access_t *p_access, int i_session_id )
 static char *MMIGetText( access_t *p_access, uint8_t **pp_apdu, int *pi_size )
 {
     int i_tag = APDUGetTag( *pp_apdu, *pi_size );
-    char *psz_text;
     int l;
     uint8_t *d;
 
@@ -1609,13 +1611,11 @@ static char *MMIGetText( access_t *p_access, uint8_t **pp_apdu, int *pi_size )
     }
 
     d = APDUGetLength( *pp_apdu, &l );
-    psz_text = malloc( l + 1 );
-    strncpy( psz_text, (char *)d, l );
-    psz_text[l] = '\0';
 
     *pp_apdu += l + 4;
     *pi_size -= l + 4;
-    return psz_text;
+
+    return dvbsi_to_utf8((char*)d,l);
 }
 
 /*****************************************************************************
@@ -2308,3 +2308,100 @@ void E_(en50221_End)( access_t * p_access )
      * program. */
 }
 
+static char *dvbsi_to_utf8( char *psz_instring, size_t i_length )
+{
+    char *psz_encoding, *psz_stringstart, *psz_outstring, *psz_tmp;
+    char psz_encbuf[12];
+    size_t i_in, i_out;
+    vlc_iconv_t iconv_handle;
+    if( i_length < 1 ) return NULL;
+    if( psz_instring[0] >= 0x20 )
+    {
+        psz_stringstart = psz_instring;
+        psz_encoding = "ISO_8859-1"; /* should be ISO6937 according to spec, but this seems to be the one used */
+    } else switch( psz_instring[0] )
+    {
+    case 0x01:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "ISO_8859-5";
+        break;
+    case 0x02:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "ISO_8859-6";
+        break;
+    case 0x03:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "ISO_8859-7";
+        break;
+    case 0x04:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "ISO_8859-8";
+        break;
+    case 0x05:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "ISO_8859-9";
+        break;
+    case 0x06:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "ISO_8859-10";
+        break;
+    case 0x07:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "ISO_8859-11";
+        break;
+    case 0x08:
+        psz_stringstart = &psz_instring[1]; /*possibly reserved?*/
+        psz_encoding = "ISO_8859-12";
+        break;
+    case 0x09:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "ISO_8859-13";
+        break;
+    case 0x0a:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "ISO_8859-14";
+        break;
+    case 0x0b:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "ISO_8859-15";
+        break;
+    case 0x10:
+        if( i_length < 3 || psz_instring[1] != '\0' || psz_instring[2] > 0x0f
+            || psz_instring[2] == 0 )
+            return EnsureUTF8(strndup(psz_instring,i_length));
+        sprintf( psz_encbuf, "ISO_8859-%d", psz_instring[2] );
+        psz_stringstart = &psz_instring[3];
+        psz_encoding = psz_encbuf;
+        break;
+    case 0x11:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "UTF-16";
+        break;
+    case 0x12:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "KSC5601-1987";
+        break;
+    case 0x13:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "GB2312";/*GB-2312-1980 */
+        break;
+    case 0x14:
+        psz_stringstart = &psz_instring[1];
+        psz_encoding = "BIG-5";
+        break;
+    case 0x15:
+        return EnsureUTF8(strndup(&psz_instring[1],i_length-1));
+        break;
+    default:
+        /* invalid */
+        return EnsureUTF8(strndup(psz_instring,i_length));
+    }
+    iconv_handle = vlc_iconv_open( "UTF-8", psz_encoding );
+    i_in = i_length - (psz_stringstart - psz_instring );
+    i_out = i_in * 6;
+    psz_outstring = psz_tmp = (char*)malloc( i_out * sizeof(char) + 1 );
+    vlc_iconv( iconv_handle, &psz_stringstart, &i_in, &psz_tmp, &i_out );
+    vlc_iconv_close( iconv_handle );
+    *psz_tmp = '\0';
+    return psz_outstring;
+}
