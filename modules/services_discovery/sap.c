@@ -470,7 +470,12 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void CloseDemux( vlc_object_t *p_this )
 {
-
+    demux_t *p_demux = (demux_t *)p_this;
+    if( p_demux->p_sys )
+    {
+        if( p_demux->p_sys->p_sdp ) FreeSDP( p_demux->p_sys->p_sdp );
+        free( p_demux->p_sys );
+    }
 }
 
 /*****************************************************************************
@@ -514,6 +519,7 @@ static void Run( services_discovery_t *p_sd )
     if( psz_addr && *psz_addr )
     {
         InitSocket( p_sd, psz_addr, SAP_PORT );
+        free( psz_addr );
     }
 
     if( p_sd->p_sys->i_fd == 0 )
@@ -539,18 +545,7 @@ static void Run( services_discovery_t *p_sd )
 
             if( mdate() - p_sd->p_sys->pp_announces[i]->i_last > i_timeout )
             {
-                struct sap_announce_t *p_announce;
-                p_announce = p_sd->p_sys->pp_announces[i];
-
-                /* Remove the playlist item */
-                playlist_LockDeleteAllFromInput( p_sd->p_sys->p_playlist,
-                                                 p_announce->i_input_id );
-
-                /* Remove the sap_announce from the array */
-                REMOVE_ELEM( p_sd->p_sys->pp_announces,
-                           p_sd->p_sys->i_announces, i );
-
-                free( p_announce );
+                RemoveAnnounce( p_sd, p_sd->p_sys->pp_announces[i] );
             }
         }
 
@@ -760,14 +755,13 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
             if( b_need_delete )
             {
                 RemoveAnnounce( p_sd, p_sd->p_sys->pp_announces[i]);
-                return VLC_SUCCESS;
             }
             else
             {
                 p_sd->p_sys->pp_announces[i]->i_last = mdate();
-                FreeSDP( p_sdp );
-                return VLC_SUCCESS;
             }
+            FreeSDP( p_sdp );
+            return VLC_SUCCESS;
         }
     }
     /* Add item */
