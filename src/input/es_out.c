@@ -574,7 +574,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
     sprintf( psz_cat, "%s %d", _("Program"), i_group );
 
     if( p_meta->psz_title ) psz_title = p_meta->psz_title;
-    if( p_meta->psz_provider) psz_provider = p_meta->psz_provider;
+    if( p_meta->psz_provider) psz_provider = p_meta->psz_publisher;
     if( p_meta->psz_nowplaying ) psz_now_playing = p_meta->psz_nowplaying;
 
     if( !psz_title && !psz_now_playing )

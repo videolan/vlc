@@ -2434,7 +2434,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                         pD->i_service_type, str1, str2 );
 
                 vlc_meta_SetTitle( p_meta, str2 );
-                vlc_meta_SetProvider( p_meta, str1 );
+                vlc_meta_SetPublisher( p_meta, str1 );
                 if( pD->i_service_type >= 0x01 && pD->i_service_type <= 0x10 )
                     vlc_meta_Add( p_meta, "Type", psz_type[pD->i_service_type] );
             }
