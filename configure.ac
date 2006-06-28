@@ -4636,6 +4636,7 @@ AC_ARG_ENABLE(qt4,
 	  VLC_ADD_LDFLAGS([qt4],[$QT4_LIBS])
 	  VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS])
 	  MOC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/moc
+	  RCC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/rcc
 	  UIC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/uic],
        [AC_MSG_WARN(QT4 library not found)])
    fi])
@@ -5445,6 +5446,7 @@ AC_SUBST(ARCH)
 AC_SUBST(ALIASES)
 AC_SUBST(ASM)
 AC_SUBST(MOC)
+AC_SUBST(RCC)
 AC_SUBST(UIC)
 AC_SUBST(WINDRES)
 AC_SUBST(MOZILLA_SDK_PATH)

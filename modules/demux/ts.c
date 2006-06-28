@@ -2433,8 +2433,8 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                 msg_Dbg( p_demux, "    - type=%d provider=%s name=%s",
                         pD->i_service_type, str1, str2 );
 
-                vlc_meta_Add( p_meta, "Name", str2 );
-                vlc_meta_Add( p_meta, "Provider", str1 );
+                vlc_meta_SetTitle( p_meta, str2 );
+                vlc_meta_SetProvider( p_meta, str1 );
                 if( pD->i_service_type >= 0x01 && pD->i_service_type <= 0x10 )
                     vlc_meta_Add( p_meta, "Type", psz_type[pD->i_service_type] );
             }
@@ -2450,7 +2450,6 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
             vlc_meta_Add( p_meta, "Status", "Running" );
         else
             vlc_meta_Add( p_meta, "Status", "Unknown" );
-
 
         es_out_Control( p_demux->out, ES_OUT_SET_GROUP_META,
                         p_srv->i_service_id, p_meta );
@@ -2622,7 +2621,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 
         if( p_evt->i_running_status == 0x04 )
         {
-            vlc_meta_Add( p_meta, VLC_META_NOW_PLAYING, psz_name );
+            vlc_meta_SetNowPlaying( p_meta, psz_name );
             b_event_active = VLC_TRUE;
         }
 
@@ -2631,7 +2630,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
     }
 
     if( !b_event_active )
-        vlc_meta_Add( p_meta, VLC_META_NOW_PLAYING, "" );
+        vlc_meta_SetNowPlaying( p_meta, "" );
     es_out_Control( p_demux->out, ES_OUT_SET_GROUP_META,
                     p_eit->i_service_id, p_meta );
     vlc_meta_Delete( p_meta );

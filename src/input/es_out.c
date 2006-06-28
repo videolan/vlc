@@ -565,7 +565,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
     es_out_pgrm_t     *p_pgrm = NULL;
     input_thread_t    *p_input = p_sys->p_input;
     char              *psz_cat = malloc( strlen(_("Program")) + 10 );
-    char              *psz_name = NULL;
+    char              *psz_title = NULL;
     char              *psz_now_playing = NULL;
     char              *psz_provider = NULL;
     int i;
@@ -573,10 +573,11 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
     msg_Dbg( p_input, "EsOutProgramMeta: number=%d", i_group );
     sprintf( psz_cat, "%s %d", _("Program"), i_group );
 
-//    if( p_meta->psz_provider) psz_provider = p_meta->psz_provider;
+    if( p_meta->psz_title ) psz_title = p_meta->psz_title;
+    if( p_meta->psz_provider) psz_provider = p_meta->psz_provider;
     if( p_meta->psz_nowplaying ) psz_now_playing = p_meta->psz_nowplaying;
 
-    if( !psz_name && !psz_now_playing )
+    if( !psz_title && !psz_now_playing )
     {
         free( psz_cat );
         return;
@@ -595,7 +596,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
         p_pgrm = EsOutProgramAdd( out, i_group );
 
     /* Update the description text of the program */
-    if( psz_name && *psz_name )
+    if( psz_title && *psz_title )
     {
         vlc_value_t val;
         vlc_value_t text;
@@ -606,13 +607,13 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
 
         if( psz_provider && *psz_provider )
         {
-            asprintf( &text.psz_string, "%s [%s]", psz_name, psz_provider );
+            asprintf( &text.psz_string, "%s [%s]", psz_title, psz_provider );
             var_Change( p_input, "program", VLC_VAR_ADDCHOICE, &val, &text );
             free( text.psz_string );
         }
         else
         {
-            text.psz_string = psz_name;
+            text.psz_string = psz_title;
             var_Change( p_input, "program", VLC_VAR_ADDCHOICE, &val, &text );
         }
     }
@@ -623,8 +624,8 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
 
         if( p_sys->p_pgrm == p_pgrm )
         {
-            input_Control( p_input, INPUT_ADD_INFO, _(VLC_META_INFO_CAT),
-                           _(VLC_META_NOW_PLAYING), "%s", psz_now_playing );
+            vlc_meta_SetNowPlaying( p_input->input.p_item->p_meta,
+                                    psz_now_playing );
         }
     }
     free( psz_cat );
