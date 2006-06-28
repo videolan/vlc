@@ -49,9 +49,9 @@ if ENABLE_QT4
 BUILT_SOURCES += $(UIH) $(nodist_SOURCES_qt4)
 endif
 
-resources.cpp:
-	rm -f resources.cpp
-	$(RCC) res.qrc > resources.cpp
+resources.cpp: res.qrc
+	rm -f $@
+	$(RCC) $< > $@
 
 $(MOCCPP): %.moc.cpp: %.hpp
 	@echo "$(MOC) $< -> $@"
@@ -87,6 +87,7 @@ EXTRA_DIST += \
 	dialogs_provider.hpp \
 	input_manager.hpp \
 	playlist_model.hpp \
+	res.qrc \
 	dialogs/playlist.hpp \
 	dialogs/streaminfo.hpp \
 	dialogs/prefs_dialog.hpp \
