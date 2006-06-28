@@ -221,11 +221,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_meta = vlc_meta_New();
 
     char psz_temp[512];
-#define SET_META(vlc_meta, meta_info...) \
-    snprintf( psz_temp, 511, meta_info ); \
-    vlc_meta_Add( p_sys->p_meta, vlc_meta, psz_temp );
-
-    SET_META( VLC_META_CODEC_NAME, type_str[p_sys->i_type])
+    
+    /// \todo Reinstate meta codec name
+    //SET_META( VLC_META_CODEC_NAME, type_str[p_sys->i_type])
     
     const char * p_error;
 
@@ -236,9 +234,9 @@ static int Open( vlc_object_t *p_this )
             INIT_EMU(Nsf)
             if (p_error == NULL)
             {
-                SET_META( VLC_META_TITLE, "%s", header.game )
-                SET_META( VLC_META_AUTHOR, "%s", header.author )
-                SET_META( VLC_META_COPYRIGHT, "%s", header.copyright )
+                vlc_meta_SetTitle( p_meta, header.game );
+                vlc_meta_SetArtist( p_meta, header.author );
+                vlc_meta_SetCopyright( p_meta, header.copyright );
                 p_sys->i_tracks = p_emu->track_count();
             }
         }
@@ -248,9 +246,9 @@ static int Open( vlc_object_t *p_this )
             INIT_EMU(Gbs)
             if (p_error == NULL)
             {
-                SET_META( VLC_META_TITLE, "%s", header.game )
-                SET_META( VLC_META_AUTHOR, "%s", header.author )
-                SET_META( VLC_META_COPYRIGHT, "%s", header.copyright )
+                vlc_meta_SetTitle( p_meta, header.game );
+                vlc_meta_SetArtist( p_meta, header.author );
+                vlc_meta_SetCopyright( p_meta, header.copyright );
                 p_sys->i_tracks = p_emu->track_count();
             }
         }
@@ -269,8 +267,9 @@ static int Open( vlc_object_t *p_this )
             INIT_EMU(Spc)
             if (p_error == NULL)
             {
-                SET_META( VLC_META_TITLE, "%s (%s)", header.song, header.game )
-                SET_META( VLC_META_AUTHOR, "%s", header.author )
+                snprintf( psz_temp, 511, "%s (%s)", header.song, header.game );
+                vlc_meta_SetTitle( p_meta, psz_temp );
+                vlc_meta_SetArtist( p_meta, header.author );
                 p_sys->i_tracks = p_emu->track_count();
             }
       }
@@ -280,8 +279,9 @@ static int Open( vlc_object_t *p_this )
             INIT_EMU(Gym)
             if (p_error == NULL)
             {
-                SET_META( VLC_META_TITLE, "%s (%s)", header.song, header.game )
-                SET_META( VLC_META_COPYRIGHT, "%s", header.copyright )
+                snprintf( psz_temp, 511, "%s (%s)", header.song, header.game );
+                vlc_meta_SetTitle( p_meta, psz_temp );
+                vlc_meta_SetCopyright( p_meta, header.copyright );
                 p_sys->i_tracks = p_emu->track_count();
             }
      }

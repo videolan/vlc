@@ -831,7 +831,7 @@ static int DemuxInit( demux_t *p_demux )
             vlc_meta_SetRating( p_sys->meta, p_cd->psz_rating );
         }
     }
-    fprintf( stderr, "*********** Unhandled child meta\n" );
+    /// \tood Fix Child meta for ASF tracks
 #if 0
     for( i_stream = 0, i = 0; i < 128; i++ )
     {
