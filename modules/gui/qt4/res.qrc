@@ -5,5 +5,7 @@
   <file>pixmaps/stop.png</file>
   <file>pixmaps/previous.png</file>
   <file>pixmaps/next.png</file>
+  <file>pixmaps/volume-low.png</file>
+  <file>pixmaps/volume-high.png</file>
  </qresource>
 </RCC>
