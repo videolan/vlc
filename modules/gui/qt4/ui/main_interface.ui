@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>80</height>
+    <width>428</width>
+    <height>79</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -46,7 +46,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QFrame" name="frame" >
+      <widget class="QFrame" name="discFrame" >
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>0</hsizetype>
@@ -83,8 +83,11 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="text" >
-        <string>Prev</string>
+       <property name="iconSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -99,7 +102,13 @@
         </sizepolicy>
        </property>
        <property name="text" >
-        <string>Play</string>
+        <string/>
+       </property>
+       <property name="iconSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -114,7 +123,13 @@
         </sizepolicy>
        </property>
        <property name="text" >
-        <string>Stop</string>
+        <string/>
+       </property>
+       <property name="iconSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -129,7 +144,13 @@
         </sizepolicy>
        </property>
        <property name="text" >
-        <string>Next</string>
+        <string/>
+       </property>
+       <property name="iconSize" >
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -145,6 +166,27 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="volLowLabel" >
+       <property name="text" >
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="volumeSlider" >
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="volHighLabel" >
+       <property name="text" >
+        <string/>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="playlistButton" >
