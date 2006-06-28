@@ -113,6 +113,8 @@ static void Init( intf_thread_t *p_intf )
 {
     char *argv[] = { "" };
     int argc = 1;
+    Q_INIT_RESOURCE( vlc );
+
     QApplication *app = new QApplication( argc, argv , true );
     p_intf->p_sys->p_app = app;
 

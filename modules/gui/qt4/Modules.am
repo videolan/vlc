@@ -50,8 +50,7 @@ BUILT_SOURCES += $(UIH) $(nodist_SOURCES_qt4)
 endif
 
 resources.cpp: res.qrc
-	rm -f $@
-	$(RCC) $< > $@
+	$(RCC) -name vlc -o $@ $<
 
 $(MOCCPP): %.moc.cpp: %.hpp
 	@echo "$(MOC) $< -> $@"

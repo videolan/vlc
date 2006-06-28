@@ -35,13 +35,17 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QMainWindow(), p_intf( 
     QVLCFrame::fixStyle( this );
     QWidget *main = new QWidget( this );
     setCentralWidget( main );
-    setWindowTitle( _("VLC media player") );
+    setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
     ui.setupUi( centralWidget() );
 
     slider = new InputSlider( Qt::Horizontal, ui.sliderBox );
     QVBoxLayout *box_layout = new QVBoxLayout();
     box_layout->addWidget( slider );
     ui.sliderBox->setLayout( box_layout );
+    ui.prevButton->setText( "" );
+    ui.nextButton->setText( "" );
+    ui.playButton->setText( "" ); 
+    ui.stopButton->setText( "" ); 
     ui.prevButton->setIcon( QIcon( ":/pixmaps/previous.png" ) );
     ui.nextButton->setIcon( QIcon( ":/pixmaps/next.png" ) );
     ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
