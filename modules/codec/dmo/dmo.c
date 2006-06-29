@@ -421,8 +421,17 @@ static int DecOpen( vlc_object_t *p_this )
         p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
         p_dec->fmt_out.video.i_height = p_dec->fmt_in.video.i_height;
         p_dec->fmt_out.video.i_bits_per_pixel = i_bpp;
-        p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
-            p_dec->fmt_out.video.i_width / p_dec->fmt_out.video.i_height;
+
+        /* If an aspect-ratio was specified in the input format then force it */
+        if( p_dec->fmt_in.video.i_aspect )
+        {
+            p_dec->fmt_out.video.i_aspect = p_dec->fmt_in.video.i_aspect;
+        }
+        else
+        {
+            p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
+                p_dec->fmt_out.video.i_width / p_dec->fmt_out.video.i_height;
+        }
 
         p_bih = &p_vih->bmiHeader;
         p_bih->biCompression = i_chroma;
