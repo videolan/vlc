@@ -70,6 +70,7 @@ int E_(Import_M3U)( vlc_object_t *p_this )
     else if( ( psz_ext && !strcasecmp( psz_ext, ".m3u") ) ||
              ( psz_ext && !strcasecmp( psz_ext, ".ram") ) ||
              ( psz_ext && !strcasecmp( psz_ext, ".rm") ) ||
+             ( psz_ext && !strcasecmp( psz_ext, ".vlc") ) ||
              /* A .ram file can contain a single rtsp link */
              ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "m3u") ) )
     {

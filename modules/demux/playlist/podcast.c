@@ -415,7 +415,7 @@ static int Demux( demux_t *p_demux )
                                                 psz_item_type );
                     }
 
-                    fprintf( stderr, "Adding WHEREVER\n");
+                    msg_Dbg( p_demux, "Adding WHEREVER\n" );
                     playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
                           p_item_in_category, (i_parent_id > 0 ) ? VLC_TRUE:
                                                 VLC_FALSE, PLAYLIST_APPEND );

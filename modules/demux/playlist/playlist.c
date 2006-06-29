@@ -96,6 +96,11 @@ vlc_module_begin();
         set_callbacks( E_(Import_Shoutcast), E_(Close_Shoutcast) );
         add_bool( "shoutcast-show-adult", VLC_FALSE, NULL,
                    SHOW_ADULT_TEXT, SHOW_ADULT_LONGTEXT, VLC_FALSE );
+    add_submodule();
+        set_description( _("ASX playlist import") );
+        add_shortcut( "asx-open" );
+        set_capability( "demux2", 10 );
+        set_callbacks( E_(Import_ASX), E_(Close_ASX) );
 vlc_module_end();
 
 
