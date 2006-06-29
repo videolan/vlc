@@ -408,7 +408,7 @@ static block_t *Block( access_t *p_access )
         ufds[0].fd = p_sys->i_handle;
         ufds[0].events = POLLIN;
         ufds[1].fd = p_sys->i_frontend_handle;
-        ufds[1].events = POLLOUT;
+        ufds[1].events = POLLPRI;
 
         /* We'll wait 0.5 second if nothing happens */
         /* Find if some data is available */
