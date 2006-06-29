@@ -276,7 +276,9 @@ connect:
     if( Connect( p_access, 0 ) )
     {
         /* Retry with http 1.0 */
+        msg_Dbg( p_access, "switching to HTTP version 1.0" );
         p_sys->i_version = 0;
+        p_sys->b_seekable = VLC_FALSE;
 
         if( p_access->b_die ||
             Connect( p_access, 0 ) )
@@ -969,16 +971,15 @@ static int Request( access_t *p_access, int64_t i_tell )
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Icy-MetaData: 1\r\n" );
 
 
-    if( p_sys->b_continuous && p_sys->i_version == 1 )
+    if( p_sys->b_continuous )
     {
         net_Printf( VLC_OBJECT( p_access ), p_sys->fd, pvs,
-                    "Connection: keep-alive\r\n" );
+                    "Connection: Keep-Alive\r\n" );
     }
-    else
+    else if( p_sys->i_version == 1 )
     {
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
+        net_Printf( VLC_OBJECT( p_access ), p_sys->fd, pvs,
                     "Connection: Close\r\n");
-        p_sys->b_continuous = VLC_FALSE;
     }
 
     if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "\r\n" ) < 0 )
