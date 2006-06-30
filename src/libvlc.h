@@ -835,6 +835,10 @@ static char *ppsz_clock_descriptions[] =
 #define DAEMON_LONGTEXT N_( \
      "Runs VLC as a background daemon process.")
 
+#define PIDFILE_TEXT N_("Write process id to file")
+#define PIDFILE_LONGTEXT N_( \
+       "Writes proccess id into specified file.")
+
 #define FILE_LOG_TEXT N_( "Log to file" )
 #define FILE_LOG_LONGTEXT N_( \
     "Log all VLC messages to a text file." )
@@ -1591,6 +1595,9 @@ vlc_module_begin();
 #if !defined(WIN32)
     add_bool( "daemon", 0, NULL, DAEMON_TEXT, DAEMON_LONGTEXT, VLC_TRUE );
         change_short('d');
+
+    add_string( "pidfile", NULL, NULL, PIDFILE_TEXT, PIDFILE_LONGTEXT,
+                                       VLC_FALSE );
 #endif
 
     add_bool( "file-logging", VLC_FALSE, NULL, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
