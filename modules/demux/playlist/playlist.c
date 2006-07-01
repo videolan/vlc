@@ -101,6 +101,11 @@ vlc_module_begin();
         add_shortcut( "asx-open" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_ASX), E_(Close_ASX) );
+    add_submodule();
+        set_description( _("Kasenna MediaBase parser") );
+        add_shortcut( "sgimb" );
+        set_capability( "demux2", 10 );
+        set_callbacks( E_(Import_SGIMB), E_(Close_SGIMB) );
 vlc_module_end();
 
 

@@ -101,22 +101,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-#include <vlc_playlist.h>
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  Activate  ( vlc_object_t * );
-static void Deactivate( vlc_object_t * );
-
-vlc_module_begin();
-    set_description( _("Kasenna MediaBase parser") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_capability( "demux2", 170 );
-    set_callbacks( Activate, Deactivate );
-    add_shortcut( "sgimb" );
-vlc_module_end();
+#include "playlist.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -147,7 +132,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 /*****************************************************************************
  * Activate: initializes m3u demux structures
  *****************************************************************************/
-static int Activate( vlc_object_t * p_this )
+int E_(Import_SGIMB)( vlc_object_t * p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys;
@@ -185,6 +170,8 @@ static int Activate( vlc_object_t * p_this )
             p_sys->i_sid = 0;
             p_sys->b_rtsp_kasenna = VLC_FALSE;
             p_sys->b_concert = VLC_FALSE;
+            
+            msg_Dbg( p_demux, "using sgimb playlist import");
 
             return VLC_SUCCESS;
         }
@@ -195,7 +182,7 @@ static int Activate( vlc_object_t * p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-static void Deactivate( vlc_object_t *p_this )
+void E_(Close_SGIMB)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -333,21 +320,10 @@ static int ParseLine ( demux_t *p_demux, char *psz_line )
 static int Demux ( demux_t *p_demux )
 {
     demux_sys_t     *p_sys = p_demux->p_sys;
-    playlist_t      *p_playlist;
-    playlist_item_t *p_item;
+    input_item_t    *p_child = NULL;
     char            *psz_line;
 
-    p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Err( p_demux, "can't find playlist" );
-        return -1;
-    }
-
-    p_item = playlist_LockItemGetByInput( p_playlist,
-                        ((input_thread_t *)p_demux->p_parent)->input.p_item );
-    playlist_ItemToNode( p_playlist, p_item );
+    INIT_PLAYLIST_STUFF;
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
@@ -401,48 +377,44 @@ static int Demux ( demux_t *p_demux )
         free( temp );
     }
 
-    msg_Err( p_playlist, "SGIMB playlist handling is broken" );
-#if 0
-    p_child = playlist_ItemNew( p_playlist, p_sys->psz_uri,
-                      p_sys->psz_name ? p_sys->psz_name : p_sys->psz_uri );
-
-    if( !p_child || !p_child->input.psz_uri )
+    p_child = input_ItemNewWithType( (vlc_object_t *)p_playlist, p_sys->psz_uri,
+                      p_sys->psz_name ? p_sys->psz_name : p_sys->psz_uri,
+                      0, NULL, p_sys->i_duration, ITEM_TYPE_NET );
+    
+    if( !p_child )
     {
         msg_Err( p_demux, "A valid playlistitem could not be created" );
         return VLC_EGENERIC;
     }
 
+    vlc_input_item_CopyOptions( p_current->p_input, p_child );
     if( p_sys->i_packet_size && p_sys->psz_mcast_ip )
     {
         char *psz_option;
         p_sys->i_packet_size += 1000;
         asprintf( &psz_option, "mtu=%i", p_sys->i_packet_size );
-        playlist_ItemAddOption( p_child, psz_option );
+        vlc_input_item_AddOption( p_child, psz_option );
         free( psz_option );
     }
     if( !p_sys->psz_mcast_ip )
     {
         char *psz_option;
         asprintf( &psz_option, "rtsp-caching=5000" );
-        playlist_ItemAddOption( p_child, psz_option );
+        vlc_input_item_AddOption( p_child, psz_option );
         free( psz_option );
     }
     if( !p_sys->psz_mcast_ip && p_sys->b_rtsp_kasenna )
     {
         char *psz_option;
         asprintf( &psz_option, "rtsp-kasenna" );
-        playlist_ItemAddOption( p_child, psz_option );
+        vlc_input_item_AddOption( p_child, psz_option );
         free( psz_option );
     }
 
-    playlist_ItemSetDuration( p_child, p_sys->i_duration );
-    playlist_NodeAddItem( p_playlist, p_child, p_item->pp_parents[0]->i_view, p_item, PLAYLIST_APPEND, PLAYLIST_END );
-    playlist_CopyParents( p_item, p_child );
-    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                           p_playlist->status.i_view,
-                           p_playlist->status.p_item, NULL );
-#endif
-    vlc_object_release( p_playlist );
+    playlist_AddWhereverNeeded( p_playlist, p_child, p_current,
+                                 p_item_in_category, (i_parent_id > 0 )? VLC_TRUE : VLC_FALSE,
+                                 PLAYLIST_APPEND );
+    HANDLE_PLAY_AND_RELEASE
     return VLC_SUCCESS;
 }
 
