@@ -31,6 +31,7 @@
 class InputManager;
 class QCloseEvent;
 class InputSlider;
+class VideoWidget;
 
 class MainInterface : public QMainWindow
 {
@@ -38,15 +39,20 @@ class MainInterface : public QMainWindow
 public:
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
+
+    virtual QSize sizeHint() const;
+
+    int i_saved_width, i_saved_height;
+
 protected:
     void closeEvent( QCloseEvent *);
 private:
+    VideoWidget *videoWidget;
     InputManager *main_input_manager;
     InputSlider *slider;
     /// Main input associated to the playlist
     input_thread_t *p_input;
     intf_thread_t *p_intf;
-
     Ui::MainInterfaceUI ui;
 private slots:
     void setDisplay( float, int, int );

@@ -8,9 +8,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>428</width>
-    <height>79</height>
+    <width>444</width>
+    <height>80</height>
    </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy>
+    <hsizetype>0</hsizetype>
+    <vsizetype>0</vsizetype>
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle" >
    <string>VLC media player</string>
@@ -35,7 +43,7 @@
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>5</hsizetype>
-         <vsizetype>5</vsizetype>
+         <vsizetype>0</vsizetype>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -50,7 +58,7 @@
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>0</hsizetype>
-         <vsizetype>5</vsizetype>
+         <vsizetype>0</vsizetype>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>

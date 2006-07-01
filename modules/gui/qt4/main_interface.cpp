@@ -20,16 +20,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
+#include "qt4.hpp"
 #include "main_interface.hpp"
 #include "input_manager.hpp"
 #include "util/input_slider.hpp"
 #include "util/qvlcframe.hpp"
 #include "dialogs_provider.hpp"
+#include "components/video_widget.hpp"
 #include <QCloseEvent>
 #include <assert.h>
 #include <QPushButton>
 
-MainInterface::MainInterface( intf_thread_t *_p_intf ) : QMainWindow(), p_intf( _p_intf )
+MainInterface::MainInterface( intf_thread_t *_p_intf ) : QMainWindow(),
+                                                         p_intf( _p_intf )
 {
     /* All UI stuff */
     QVLCFrame::fixStyle( this );
@@ -53,7 +56,16 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QMainWindow(), p_intf( 
     ui.volLowLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
     ui.volHighLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
 
-    resize( QSize( 450, 80 ) );
+
+//    if( config_GetInt( p_intf, "embedded" ) )
+    {
+        videoWidget = new VideoWidget( p_intf );
+        videoWidget->resize( 1,1 );
+        ui.vboxLayout->insertWidget( 0, videoWidget );
+    }
+    resize( QSize( 500, 121 ) );
+    i_saved_width = width();
+    i_saved_height = height();
 
     //QVLCMenu::createMenuBar();
 
@@ -89,47 +101,29 @@ MainInterface::~MainInterface()
 {
 }
 
+QSize MainInterface::sizeHint() const
+{
+    int i_width = __MAX( i_saved_width, p_intf->p_sys->p_video->i_video_width );
+    return QSize( i_width, i_saved_height +
+                             p_intf->p_sys->p_video->i_video_height );
+}
+
 void MainInterface::stop()
 {
-    /// \todo store playlist globally
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_playlist ) return;
-    playlist_Stop( p_playlist );
-    vlc_object_release( p_playlist );
+    playlist_Stop( THEPL );
 }
 void MainInterface::play()
 {
-    /// \todo store playlist globally
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_playlist ) return;
-    playlist_Play( p_playlist );
-    vlc_object_release( p_playlist );
+    playlist_Play( THEPL );
 }
 void MainInterface::prev()
 {
-    /// \todo store playlist globally
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_playlist ) return;
-    playlist_Prev( p_playlist );
-    vlc_object_release( p_playlist );
+    playlist_Prev( THEPL );
 }
 void MainInterface::next()
 {
-    /// \todo store playlist globally
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_playlist ) return;
-    playlist_Next( p_playlist );
-    vlc_object_release( p_playlist );
+    playlist_Next( THEPL );
 }
-
-
-
-
-
 
 void MainInterface::setDisplay( float pos, int time, int length )
 {

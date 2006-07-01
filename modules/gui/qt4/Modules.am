@@ -77,6 +77,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/preferences.cpp \
 		components/open.cpp \
 		components/playlist/standardpanel.cpp \
+        components/video_widget.cpp \
 		util/input_slider.cpp
 		$(NULL)
 
@@ -95,6 +96,7 @@ EXTRA_DIST += \
 	components/preferences.hpp \
 	components/open.hpp \
 	components/playlist/panels.hpp \
+    components/video_widget.hpp \
 	util/input_slider.hpp \
 	ui/input_stats.ui \
 	pixmaps/advanced.xpm \

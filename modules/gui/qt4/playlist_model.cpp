@@ -255,7 +255,9 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
 {
     if( ( !b_input && i_cached_id == i_id) || 
         ( b_input && i_cached_input_id ==i_id ) )
+    {
         return b_input ? p_cached_item_bi : p_cached_item;
+    }
 
     if( !b_input && root->i_id == i_id )
     {
@@ -279,6 +281,7 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
         else if( b_input && (*it)->i_input_id == i_id )
         {
             ICACHE( i_id, (*it) );
+            return p_cached_item_bi;
         }
         if( (*it)->children.size() )
         {
@@ -298,6 +301,7 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
         }
         it++;
     }
+    fprintf( stderr, "Never found" );
     return NULL;
 }
 #undef CACHE
