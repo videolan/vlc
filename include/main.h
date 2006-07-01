@@ -92,7 +92,6 @@ struct vlc_t
     char *                 psz_homedir;           /* configuration directory */
     char *                 psz_userdir;             /* user's home directory */
     char *                 psz_configfile;        /* location of config file */
-    char *                 psz_pidfile;
 
     /* Fast memcpy plugin used */
     module_t *             p_memcpy_module;

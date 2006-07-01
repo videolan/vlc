@@ -419,31 +419,32 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 
         p_vlc->p_libvlc->b_daemon = VLC_TRUE;
 
-		/* lets check if we need to write the pidfile */
-		p_vlc->psz_pidfile = config_GetPsz( p_vlc, "pidfile" );
-
-		msg_Dbg( p_vlc, "p_vlc->psz_pidfile is %s", p_vlc->psz_pidfile );
-
-		if( p_vlc->psz_pidfile != NULL )
-		{
-			pid_t i_pid;
-			FILE *pidfile;
-			
-			i_pid = getpid();
-
-			msg_Dbg( p_vlc, "our PID is %d, writing it to %s", i_pid, p_vlc->psz_pidfile );
-			
-			pidfile = utf8_fopen( p_vlc->psz_pidfile,"w" );
-			if( pidfile != NULL )
-			{
-				utf8_fprintf( pidfile, "%d", (int)i_pid );
-				fclose( pidfile );
-			}
-			else
-			{
-				msg_Err( p_vlc, "Cannot open pid file for writing: %s, error: %s", p_vlc->psz_pidfile, strerror(errno) );
-			}
+        /* lets check if we need to write the pidfile */
+        char * psz_pidfile = config_GetPsz( p_vlc, "pidfile" );
+        
+        msg_Dbg( p_vlc, "psz_pidfile is %s", psz_pidfile );
+        
+        if( psz_pidfile != NULL )
+        {
+            FILE *pidfile;
+            pid_t i_pid = getpid ();
+            
+            msg_Dbg( p_vlc, "our PID is %d, writing it to %s", i_pid, psz_pidfile );
+            
+            pidfile = utf8_fopen( psz_pidfile,"w" );
+            if( pidfile != NULL )
+            {
+                utf8_fprintf( pidfile, "%d", (int)i_pid );
+                fclose( pidfile );
+            }
+            else
+            {
+                msg_Err( p_vlc, "Cannot open pid file for writing: %s, error: %s", 
+                        psz_pidfile, strerror(errno) );
+            }
         }
+
+        free( psz_pidfile );
 
 #else
         pid_t i_pid;
