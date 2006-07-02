@@ -87,7 +87,7 @@ static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 /*****************************************************************************
- * Import_Shoutcast: main import function
+ * Import_QTL: main import function
  *****************************************************************************/
 int E_(Import_QTL)( vlc_object_t *p_this )
 {
