@@ -701,6 +701,8 @@ static void RunThread( vout_thread_t *p_vout)
     vlc_value_t     val;
     vlc_bool_t      b_drop_late;
 
+    int             i_displayed = 0, i_lost = 0, i_loops = 0;
+
     /*
      * Initialize thread
      */
@@ -720,8 +722,6 @@ static void RunThread( vout_thread_t *p_vout)
         return;
     }
 
-    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
-
     /*
      * Main loop - it is not executed if an error occurred during
      * initialization
@@ -733,6 +733,23 @@ static void RunThread( vout_thread_t *p_vout)
         display_date = 0;
         current_date = mdate();
 
+        i_loops++;
+        if( i_loops % 20 == 0 )
+        {
+            p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
+            if( p_input )
+            {
+                vlc_mutex_lock( &p_input->counters.counters_lock );
+                stats_UpdateInteger( p_vout, p_input->counters.p_lost_pictures,
+                                     i_lost , NULL);
+                stats_UpdateInteger( p_vout,
+                                     p_input->counters.p_displayed_pictures,
+                                     i_displayed , NULL);
+                i_displayed = i_lost = 0;
+                vlc_mutex_unlock( &p_input->counters.counters_lock );
+                vlc_object_release( p_input );
+            }
+        }
 #if 0
         p_vout->c_loops++;
         if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
@@ -819,10 +836,7 @@ static void RunThread( vout_thread_t *p_vout)
                 }
                 msg_Warn( p_vout, "late picture skipped ("I64Fd")",
                                   current_date - display_date );
-                vlc_mutex_lock( &p_input->counters.counters_lock );
-                stats_UpdateInteger( p_vout, p_input->counters.p_lost_pictures,
-                                     1 , NULL);
-                vlc_mutex_unlock( &p_input->counters.counters_lock );
+                i_lost++;
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
                 continue;
@@ -845,10 +859,7 @@ static void RunThread( vout_thread_t *p_vout)
                     p_picture->i_status = DESTROYED_PICTURE;
                     p_vout->i_heap_size--;
                 }
-                vlc_mutex_lock( &p_input->counters.counters_lock );
-                stats_UpdateInteger( p_vout, p_input->counters.p_lost_pictures,
-                                     1 , NULL);
-                vlc_mutex_unlock( &p_input->counters.counters_lock );
+                i_lost++;
                 msg_Warn( p_vout, "vout warning: early picture skipped "
                           "("I64Fd")", display_date - current_date
                           - p_vout->i_pts_delay );
@@ -906,10 +917,7 @@ static void RunThread( vout_thread_t *p_vout)
         /*
          * Perform rendering
          */
-        vlc_mutex_lock( &p_input->counters.counters_lock );
-        stats_UpdateInteger( p_vout, p_input->counters.p_displayed_pictures,
-                                 1 , NULL);
-        vlc_mutex_unlock( &p_input->counters.counters_lock );
+        i_displayed++;
         p_directbuffer = vout_RenderPicture( p_vout, p_picture, p_subpic );
 
         /*
