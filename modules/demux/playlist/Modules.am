@@ -12,6 +12,7 @@ SOURCES_playlist = \
 	shoutcast.c \
 	asx.c \
 	sgimb.c \
+	qtl.c \
 	$(NULL)
 
 

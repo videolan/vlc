@@ -106,6 +106,11 @@ vlc_module_begin();
         add_shortcut( "sgimb" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_SGIMB), E_(Close_SGIMB) );
+    add_submodule();
+        set_description( _("QuickTime Media Link importer") );
+        add_shortcut( "qtl" );
+        set_capability( "demux2", 10 );
+        set_callbacks( E_(Import_QTL), E_(Close_QTL) );
 vlc_module_end();
 
 

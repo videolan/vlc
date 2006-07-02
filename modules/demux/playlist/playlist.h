@@ -59,6 +59,9 @@ void E_(Close_ASX) ( vlc_object_t * );
 int E_(Import_SGIMB) ( vlc_object_t * );
 void E_(Close_SGIMB) ( vlc_object_t * );
 
+int E_(Import_QTL) ( vlc_object_t * );
+void E_(Close_QTL) ( vlc_object_t * );
+
 #define INIT_PLAYLIST_STUFF \
     int i_parent_id; \
     vlc_bool_t b_play; \
