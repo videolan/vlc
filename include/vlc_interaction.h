@@ -182,7 +182,7 @@ VLC_EXPORT( void, __intf_UserProgressUpdate,( vlc_object_t*, int, const char*, f
 #define intf_UserStringInput( a, b, c, d ) __intf_UserStringInput( VLC_OBJECT(a),b,c,d )
 VLC_EXPORT( int, __intf_UserStringInput,(vlc_object_t*, const char*, const char*, char **) );
 
-#define intf_IntfProgress( a, b, c, d ) __intf_IntfProgress( VLC_OBJECT(a),b,c, d )
+#define intf_IntfProgress( a, b, c ) __intf_IntfProgress( VLC_OBJECT(a),b,c )
 VLC_EXPORT( int, __intf_IntfProgress,( vlc_object_t*, const char*, float) );
 #define intf_IntfProgressUpdate( a, b, c, d ) __intf_IntfProgressUpdate( VLC_OBJECT(a),b,c, d )
 VLC_EXPORT( void, __intf_IntfProgressUpdate,( vlc_object_t*, int, const char*, float) );
