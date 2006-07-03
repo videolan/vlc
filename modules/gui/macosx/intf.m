@@ -913,6 +913,31 @@ static VLCMain *_o_sharedMainInstance = nil;
     return nil;
 }
 
+- (id)getMainIntfPgbar
+{
+    if( o_main_pgbar )
+        return o_main_pgbar;
+
+    msg_Err( p_intf, "main interface progress bar item wasn't found" );
+    return nil;
+}
+
+- (id)getMainScrollField
+{
+    if( o_scrollfield )
+        return o_scrollfield;
+    
+    msg_Err( p_intf, "main scroll field item wasn't found" );
+    return nil;
+}
+
+- (id)getControllerWindow
+{
+    if( o_window )
+        return o_window;
+    return nil;
+}
+
 - (void)manage
 {
     playlist_t * p_playlist;

@@ -160,7 +160,7 @@
     {
         if( p_dialog->i_flags & DIALOG_OK_CANCEL )
         {
-            msg_Dbg( p_intf, "requested flag: DIALOG_OK_CANCEL" );
+            msg_Dbg( p_intf, "OK-Cancel-dialog requested" );
             NSBeginInformationalAlertSheet( o_title, _NS("OK") , _NS("Cancel"),
                 nil, o_window, self,
                 @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, 
@@ -168,7 +168,7 @@
         }
         else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
         {
-            msg_Dbg( p_intf, "requested flag: DIALOG_YES_NO_CANCEL" );
+            msg_Dbg( p_intf, "yes-no-cancel-dialog requested" );
             NSBeginInformationalAlertSheet( o_title, _NS("Yes"), _NS("No"),
                 _NS("Cancel"), o_window, self,
                 @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, 
@@ -176,7 +176,7 @@
         }
         else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
         {
-            msg_Dbg( p_intf, "requested flag: DIALOG_LOGIN_PW_OK_CANCEL" );
+            msg_Dbg( p_intf, "dialog for login and pw requested" );
             [o_auth_title setStringValue: o_title];
             [o_auth_description setStringValue: o_description];
             [o_auth_login_fld setStringValue: @""];
@@ -187,23 +187,33 @@
         }
         else if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
         {
-            msg_Dbg( p_intf, "requested flag: DIALOG_USER_PROGRESS" );
+            msg_Dbg( p_intf, "user progress dialog requested" );
             [o_prog_title setStringValue: o_title];
             [o_prog_description setStringValue: o_description];
-            [o_prog_bar setDoubleValue: 0];
+            [o_prog_bar setFloatValue: p_dialog->val.f_float];
             [NSApp beginSheet: o_prog_win modalForWindow: o_window
                 modalDelegate: self didEndSelector: nil contextInfo: nil];
             [o_prog_win makeKeyWindow];
         }
         else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
         {
-            msg_Dbg( p_intf, "requested flag: DIALOG_PSZ_INPUT_OK_CANCEL" );
+            msg_Dbg( p_intf, "text input requested" );
             [o_input_title setStringValue: o_title];
             [o_input_description setStringValue: o_description];
             [o_input_fld setStringValue: @""];
             [NSApp beginSheet: o_input_win modalForWindow: o_window
                 modalDelegate: self didEndSelector: nil contextInfo: nil];
             [o_input_win makeKeyWindow];
+        }
+        else if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
+        {
+            msg_Dbg( p_intf, "progress-bar in main intf requested" );
+            [[[VLCMain sharedInstance] getMainScrollField] 
+                setStringValue: o_description];
+            [[[VLCMain sharedInstance] getMainIntfPgbar] 
+                setFloatValue: p_dialog->val.f_float];
+            [[[VLCMain sharedInstance] getMainIntfPgbar] setHidden: NO];
+            [[[VLCMain sharedInstance] getControllerWindow] makeKeyWindow];
         }
         else
             msg_Warn( p_intf, "requested dialog type unknown" );
@@ -240,10 +250,23 @@
     {
         [o_prog_description setStringValue: \
             [NSString stringWithUTF8String: p_dialog->psz_description]];
-        [o_prog_bar setDoubleValue: \
-            (double)(p_dialog->val.f_float)];
+        [o_prog_bar setFloatValue: p_dialog->val.f_float];
 
         if( [o_prog_bar doubleValue] == 100.0 )
+        {
+            /* we are done, let's hide */
+            [self hideDialog];
+            return;
+        }
+    }
+    if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
+    {
+        [[[VLCMain sharedInstance] getMainScrollField] setStringValue: \
+            [NSString stringWithUTF8String: p_dialog->psz_description]];
+        [[[VLCMain sharedInstance] getMainIntfPgbar] setFloatValue: \
+            p_dialog->val.f_float];
+
+        if( [[[VLCMain sharedInstance] getMainIntfPgbar] doubleValue] == 100.0 )
         {
             /* we are done, let's hide */
             [self hideDialog];
@@ -269,6 +292,12 @@
     {
         [NSApp endSheet: o_input_win];
         [o_input_win close];
+    }
+    if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
+    {
+        [[[VLCMain sharedInstance] getMainIntfPgbar] setIndeterminate: YES];
+        [[[VLCMain sharedInstance] getMainScrollField] setStringValue: @""];
+        [[[VLCMain sharedInstance] getMainIntfPgbar] setHidden: YES];
     }
 }
 

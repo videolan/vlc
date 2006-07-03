@@ -457,6 +457,67 @@ int __intf_UserStringInput( vlc_object_t *p_this,
     return i_ret;
 }
 
+/** Helper function to create a progress-bar in the main interface with a
+ *  single-line description
+ *  \param p_this           Parent vlc_object
+ *  \param psz_status       Current status
+ *  \param f_position       Current position (0.0->100.0)
+ *  \return                 Dialog id, to give to IntfProgressUpdate
+ */
+int __intf_IntfProgress( vlc_object_t *p_this,
+                         const char *psz_status,
+                         float f_pos )
+{
+    int i_ret;
+    interaction_dialog_t *p_new = NULL;
+
+    INTERACT_INIT( p_new );
+
+    p_new->i_type = INTERACT_DIALOG_ONEWAY;
+    p_new->psz_description = strdup( psz_status );
+    p_new->val.f_float = f_pos;
+
+    p_new->i_flags = DIALOG_INTF_PROGRESS;
+
+    i_ret = intf_Interact( p_this, p_new );
+
+    return p_new->i_id;
+}
+
+/** Update the progress bar in the main interface
+ *  \param p_this           Parent vlc_object
+ *  \param i_id             Identifier of the dialog
+ *  \param psz_status       New status
+ *  \param f_position       New position (0.0->100.0)
+ *  \return                 nothing
+ */
+void __intf_IntfProgressUpdate( vlc_object_t *p_this, int i_id,
+                                const char *psz_status, float f_pos )
+{
+    interaction_t *p_interaction = intf_InteractionGet( p_this );
+    interaction_dialog_t *p_dialog;
+
+    if( !p_interaction ) return;
+
+    vlc_mutex_lock( &p_interaction->object_lock );
+    p_dialog  =  intf_InteractionGetById( p_this, i_id );
+
+    if( !p_dialog )
+    {
+        vlc_mutex_unlock( &p_interaction->object_lock ) ;
+        return;
+    }
+
+    if( p_dialog->psz_description )
+        free( p_dialog->psz_description );
+    p_dialog->psz_description = strdup( psz_status );
+
+    p_dialog->val.f_float = f_pos;
+
+    p_dialog->i_status = UPDATED_DIALOG;
+    vlc_mutex_unlock( &p_interaction->object_lock) ;
+}
+
 /** Hide an interaction dialog
  * \param p_this the parent vlc object
  * \param i_id the id of the item to hide

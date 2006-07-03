@@ -226,6 +226,7 @@
                 "o_err_msg" = id; 
                 "o_error" = id; 
                 "o_info" = id; 
+                "o_main_pgbar" = id; 
                 "o_messages" = id; 
                 "o_mi_about" = id; 
                 "o_mi_add_intf" = id; 

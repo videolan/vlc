@@ -119,6 +119,7 @@ struct intf_sys_t
     float f_slider_old;         /* old slider val */
     IBOutlet id o_volumeslider; /* volume slider  */
 
+    IBOutlet id o_main_pgbar;   /* main interface progress bar */
     IBOutlet id o_btn_prev;     /* btn previous   */
     IBOutlet id o_btn_rewind;   /* btn rewind     */
     IBOutlet id o_btn_play;     /* btn play       */
@@ -292,6 +293,9 @@ struct intf_sys_t
 - (id)getBookmarks;
 - (id)getEmbeddedList;
 - (id)getInteractionList;
+- (id)getMainIntfPgbar;
+- (id)getMainScrollField;
+- (id)getControllerWindow;
 - (void)terminate;
 - (NSString *)localizedString:(char *)psz;
 - (char *)delocalizeString:(NSString *)psz;

@@ -84,6 +84,7 @@ struct interaction_dialog_t
 #define DIALOG_LOGIN_PW_OK_CANCEL   0x20
 #define DIALOG_USER_PROGRESS        0x40
 #define DIALOG_PSZ_INPUT_OK_CANCEL      0x80
+#define DIALOG_INTF_PROGRESS        0x100
 
 /**
  * Possible return codes
@@ -175,12 +176,16 @@ VLC_EXPORT( int, __intf_UserOkayCancel,( vlc_object_t*, const char*, const char*
 
 #define intf_UserProgress( a, b, c, d ) __intf_UserProgress( VLC_OBJECT(a),b,c, d )
 VLC_EXPORT( int, __intf_UserProgress,( vlc_object_t*, const char*, const char*, float) );
-
 #define intf_UserProgressUpdate( a, b, c, d ) __intf_UserProgressUpdate( VLC_OBJECT(a),b,c, d )
 VLC_EXPORT( void, __intf_UserProgressUpdate,( vlc_object_t*, int, const char*, float) );
 
 #define intf_UserStringInput( a, b, c, d ) __intf_UserStringInput( VLC_OBJECT(a),b,c,d )
 VLC_EXPORT( int, __intf_UserStringInput,(vlc_object_t*, const char*, const char*, char **) );
+
+#define intf_IntfProgress( a, b, c, d ) __intf_IntfProgress( VLC_OBJECT(a),b,c, d )
+VLC_EXPORT( int, __intf_IntfProgress,( vlc_object_t*, const char*, float) );
+#define intf_IntfProgressUpdate( a, b, c, d ) __intf_IntfProgressUpdate( VLC_OBJECT(a),b,c, d )
+VLC_EXPORT( void, __intf_IntfProgressUpdate,( vlc_object_t*, int, const char*, float) );
 
 #define intf_UserHide( a, b ) __intf_UserHide( VLC_OBJECT(a), b )
 VLC_EXPORT( void, __intf_UserHide,( vlc_object_t *, int ));
