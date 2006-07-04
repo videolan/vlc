@@ -1292,7 +1292,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         module_Need( id->p_encoder, "encoder", p_sys->psz_aenc, VLC_TRUE );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find encoder" );
+        msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_aenc );
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = 0;
         return VLC_EGENERIC;
@@ -1588,7 +1588,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         module_Need( id->p_encoder, "encoder", p_sys->psz_venc, VLC_TRUE );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find encoder" );
+        msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_venc );
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = 0;
         return VLC_EGENERIC;
@@ -1901,7 +1901,7 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
         module_Need( id->p_encoder, "encoder", p_sys->psz_venc, VLC_TRUE );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find encoder" );
+        msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_venc );
         return VLC_EGENERIC;
     }
 
@@ -2577,7 +2577,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         if( !id->p_encoder->p_module )
         {
             module_Unneed( id->p_decoder, id->p_decoder->p_module );
-            msg_Err( p_stream, "cannot find encoder" );
+            msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_senc );
             return VLC_EGENERIC;
         }
     }
@@ -2713,7 +2713,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 
         if( !id->p_encoder->p_module )
         {
-            msg_Err( p_stream, "cannot find encoder" );
+            msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_osdenc );
             goto error;
         }
 
