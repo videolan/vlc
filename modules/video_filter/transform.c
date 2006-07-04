@@ -210,13 +210,9 @@ static int Init( vout_thread_t *p_vout )
 
         fmt.i_sar_num = p_vout->fmt_out.i_sar_den;
         fmt.i_sar_den = p_vout->fmt_out.i_sar_num;
+    }
 
-        p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
-    }
-    else
-    {
-        p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
-    }
+    p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
 
     /* Everything failed */
     if( p_vout->p_sys->p_vout == NULL )
