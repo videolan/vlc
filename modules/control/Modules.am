@@ -6,3 +6,4 @@ SOURCES_ntservice = ntservice.c
 SOURCES_hotkeys = hotkeys.c
 SOURCES_lirc = lirc.c
 SOURCES_rc = rc.c
+SOURCES_motion = motion.c
