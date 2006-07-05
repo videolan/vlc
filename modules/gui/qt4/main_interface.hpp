@@ -26,14 +26,13 @@
 #include <vlc/intf.h>
 #include "ui/main_interface.h"
 #include "util/qvlcframe.hpp"
-#include <QMainWindow>
 
 class InputManager;
 class QCloseEvent;
 class InputSlider;
 class VideoWidget;
 
-class MainInterface : public QMainWindow
+class MainInterface : public QVLCMW
 {
     Q_OBJECT;
 public:

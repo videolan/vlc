@@ -31,11 +31,9 @@
 #include <assert.h>
 #include <QPushButton>
 
-MainInterface::MainInterface( intf_thread_t *_p_intf ) : QMainWindow(),
-                                                         p_intf( _p_intf )
+MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     /* All UI stuff */
-    QVLCFrame::fixStyle( this );
     QWidget *main = new QWidget( this );
     setCentralWidget( main );
     setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
@@ -56,16 +54,14 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QMainWindow(),
     ui.volLowLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
     ui.volHighLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
 
-
 //    if( config_GetInt( p_intf, "embedded" ) )
     {
         videoWidget = new VideoWidget( p_intf );
         videoWidget->resize( 1,1 );
         ui.vboxLayout->insertWidget( 0, videoWidget );
     }
-    resize( QSize( 500, 121 ) );
-    i_saved_width = width();
-    i_saved_height = height();
+
+    readSettings( "MainWindow" , QSize( 500, 131) );
 
     //QVLCMenu::createMenuBar();
 

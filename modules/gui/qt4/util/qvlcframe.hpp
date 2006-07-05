@@ -25,6 +25,8 @@
 
 #include <QWidget>
 #include <QApplication>
+#include <QSettings>
+#include <QMainWindow>
 #include <QPlastiqueStyle>
 #include <vlc/vlc.h>
 
@@ -52,7 +54,7 @@ public:
     QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
     {
         fixStyle( this );
-   };
+    };
     virtual ~QVLCFrame()   {};
 
     void toggleVisible()
@@ -62,5 +64,54 @@ public:
     }
 protected:
     intf_thread_t *p_intf;
+
+    void readSettings( QString name, QSize defSize )
+    {
+        QSettings settings( "VideoLAN", "VLC" );
+        settings.beginGroup( name );
+        resize( settings.value( "size", defSize ).toSize() );
+        move( settings.value( "pos", QPoint( 0,0 ) ).toPoint() );
+        settings.endGroup();
+    }
+    void writeSettings( QString name )
+    {
+        QSettings settings( "VideoLAN", "VLC" );
+        settings.beginGroup( name );
+        settings.setValue ("size", size() );
+        settings.setValue( "pos", pos() );
+        settings.endGroup();
+    }
 };
+
+class QVLCMW : public QMainWindow
+{
+public:
+    QVLCMW( intf_thread_t *_p_intf ) : QMainWindow( NULL ), p_intf( _p_intf )
+    {
+        QVLCFrame::fixStyle( this );
+    }
+    virtual ~QVLCMW() {};
+protected:
+    intf_thread_t *p_intf;
+    QSize mainSize;
+
+    void readSettings( QString name, QSize defSize )
+    {
+        QSettings settings( "VideoLAN", "VLC" );
+        settings.beginGroup( name );
+        mainSize = settings.value( "size", defSize ).toSize();
+        resize( mainSize );
+        move( settings.value( "pos", QPoint( 0,0 ) ).toPoint() );
+        settings.endGroup();
+    }
+    void writeSettings( QString name )
+    {
+        QSettings settings( "VideoLAN", "VLC" );
+        settings.beginGroup( name );
+        settings.setValue ("size", size() );
+        settings.setValue( "pos", pos() );
+        settings.endGroup();
+    }
+};
+
 #endif
