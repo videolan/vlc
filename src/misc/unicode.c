@@ -140,7 +140,7 @@ static char *MB2MB( const char *string, UINT fromCP, UINT toCP )
     int len;
 
     len = MultiByteToWideChar( fromCP, 0, string, -1, NULL, 0 );
-    if( len == 0 );
+    if( len == 0 )
         return NULL;
 
     wchar_t wide[len];
