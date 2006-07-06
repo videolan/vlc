@@ -460,9 +460,18 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         {
             case NSLeftMouseDown:
             {
-                var_Get( p_vout, "mouse-button-down", &val );
-                val.i_int |= 1;
-                var_Set( p_vout, "mouse-button-down", val );
+                if( [o_event clickCount] <= 1 )
+                {
+                    /* single clicking */
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int |= 1;
+                    var_Set( p_vout, "mouse-button-down", val );
+                }
+                else
+                {
+                    /* multiple clicking */
+                    [self toggleFullscreen];
+                }
             }
             break;
 
@@ -949,7 +958,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     b_init_ok = VLC_FALSE;
 
-    p_fullscreen_state = NULL;
     p_real_vout = [VLCVoutView getRealVout: p_vout];
     i_device = var_GetInteger( p_real_vout->p_vlc, "video-device" );
     b_black = var_GetBool( p_real_vout->p_vlc, "macosx-black" );
@@ -1022,8 +1030,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         }
         if( b_menubar_screen )
         {
-            BeginFullScreen( &p_fullscreen_state, NULL, 0, 0,
-                             NULL, NULL, fullScreenAllowEvents );
+            SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
         }
         if( b_black == VLC_TRUE )
         {
@@ -1107,8 +1114,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (id) closeReal: (id) sender
 {
-    if( p_fullscreen_state )
-        EndFullScreen( p_fullscreen_state, 0 );
     if( b_black == VLC_TRUE )
     {
         CGDisplayFadeReservationToken token;
@@ -1117,6 +1122,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         CGReleaseDisplayFadeReservation( token);
         CGDisplayRestoreColorSyncSettings();
     }
+    SetSystemUIMode( kUIModeNormal, 0);
     [super close];
     return NULL;
 }
