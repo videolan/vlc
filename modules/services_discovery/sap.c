@@ -411,12 +411,12 @@ static int OpenDemux( vlc_object_t *p_this )
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
 
-    free( psz_sdp );
+    FREE( psz_sdp );
     return VLC_SUCCESS;
 
 error:
-    free( psz_sdp );
-    if( p_sdp ) FreeSDP( p_sdp );
+    FREE( psz_sdp );
+    if( p_sdp ) FreeSDP( p_sdp ); p_sdp = NULL;
     stream_Seek( p_demux->s, 0 );
     return VLC_EGENERIC;
 }
@@ -470,7 +470,7 @@ static void CloseDemux( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     if( p_demux->p_sys )
     {
-        if( p_demux->p_sys->p_sdp ) FreeSDP( p_demux->p_sys->p_sdp );
+        if( p_demux->p_sys->p_sdp ) { FreeSDP( p_demux->p_sys->p_sdp ); p_demux->p_sys->p_sdp = NULL; }
         free( p_demux->p_sys );
     }
 }
@@ -571,16 +571,44 @@ static int Demux( demux_t *p_demux )
 {
     sdp_t *p_sdp = p_demux->p_sys->p_sdp;
     playlist_t *p_playlist;
+    input_thread_t *p_input;
+    input_item_t *p_parent_input;
 
     p_playlist = (playlist_t *)vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
+    if( !p_playlist )
+    {
+        msg_Err( p_demux, "playlist could not be found" );
+        return VLC_EGENERIC;
+    }
 
-    /* TODO FIXME !! Add at the correct place */
-    playlist_PlaylistAdd( p_playlist, p_sdp->psz_uri, EnsureUTF8( p_sdp->psz_sessionname ),
-                          PLAYLIST_APPEND, PLAYLIST_END );
+    p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT,
+                                               FIND_PARENT );
+    if( !p_input )
+    {
+        msg_Err( p_demux, "parent input could not be found" );
+        return VLC_EGENERIC;
+    }
 
+    p_parent_input = p_input->input.p_item;
+
+    vlc_mutex_lock( &p_parent_input->lock );
+    FREE( p_parent_input->psz_uri );
+    p_parent_input->psz_uri = strdup( p_sdp->psz_uri );
+    FREE( p_parent_input->psz_name );
+    p_parent_input->psz_name = strdup( EnsureUTF8( p_sdp->psz_sessionname ) );
+    p_parent_input->i_type = ITEM_TYPE_NET;
+
+    if( p_playlist->status.p_item &&
+             p_playlist->status.p_item->p_input == p_parent_input )
+    {
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                          p_playlist->status.p_node, p_playlist->status.p_item );
+    }
+
+    vlc_mutex_unlock( &p_parent_input->lock );
+    vlc_object_release( p_input );
     vlc_object_release( p_playlist );
-    if( p_sdp ) FreeSDP( p_sdp );
 
     return VLC_SUCCESS;
 }
@@ -762,7 +790,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
             {
                 p_sd->p_sys->pp_announces[i]->i_last = mdate();
             }
-            FreeSDP( p_sdp );
+            FreeSDP( p_sdp ); p_sdp = NULL;
             return VLC_SUCCESS;
         }
     }
@@ -1128,7 +1156,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
         if( psz_sdp[1] != '=' )
         {
             msg_Warn( p_obj, "invalid packet" ) ;
-            FreeSDP( p_sdp );
+            FreeSDP( p_sdp ); p_sdp = NULL;
             return NULL;
         }
 
@@ -1240,7 +1268,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 
         if( b_invalid )
         {
-            FreeSDP( p_sdp );
+            FreeSDP( p_sdp ); p_sdp = NULL;
             return NULL;
         }
 
@@ -1338,7 +1366,7 @@ static void FreeSDP( sdp_t *p_sdp )
         REMOVE_ELEM( p_sdp->pp_attributes, p_sdp->i_attributes, i);
         FREE( p_attr );
     }
-    free( p_sdp );
+    FREE( p_sdp );
 }
 
 static int RemoveAnnounce( services_discovery_t *p_sd,
@@ -1346,7 +1374,11 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
 {
     int i;
 
-    if( p_announce->p_sdp ) FreeSDP( p_announce->p_sdp );
+    if( p_announce->p_sdp )
+    {
+        FreeSDP( p_announce->p_sdp );
+        p_announce->p_sdp = NULL;
+    }
 
     if( p_announce->i_input_id > -1 )
     {
