@@ -341,7 +341,8 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<Meuuh> at the salsa lesson tonight, a girl told me that she was very happy to          dance with me
+<Meuuh> at the salsa lesson tonight, a girl told me that she was very happy to  
+        dance with me
 <Meuuh> do you think it means something ?
 <Dnumgis> Probably that she finally found someone that was worse at dancing 
           than she
