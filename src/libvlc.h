@@ -1500,15 +1500,22 @@ vlc_module_begin();
     set_subcategory( SUBCAT_ADVANCED_CPU );
     add_category_hint( N_("CPU"), CPU_CAT_LONGTEXT, VLC_TRUE );
     add_bool( "fpu", 1, NULL, FPU_TEXT, FPU_LONGTEXT, VLC_TRUE );
+        change_need_restart();
 #if defined( __i386__ ) || defined( __x86_64__ )
     add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT, VLC_TRUE );
+        change_need_restart();
     add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT, VLC_TRUE );
+        change_need_restart();
     add_bool( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT, VLC_TRUE );
+        change_need_restart();
     add_bool( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT, VLC_TRUE );
+        change_need_restart();
     add_bool( "sse2", 1, NULL, SSE2_TEXT, SSE2_LONGTEXT, VLC_TRUE );
+        change_need_restart();
 #endif
 #if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
     add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, VLC_TRUE );
+        change_need_restart();
 #endif
 
 /* Misc options */
@@ -1518,25 +1525,31 @@ vlc_module_begin();
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT,
                 MEMCPY_LONGTEXT, VLC_TRUE );
         change_short('A');
+        change_need_restart();
 
     set_section( N_("Plugins" ), NULL );
     add_bool( "plugins-cache", VLC_TRUE, NULL, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, VLC_TRUE );
+        change_need_restart();
     add_directory( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT,
                    PLUGIN_PATH_LONGTEXT, VLC_TRUE );
+        change_need_restart();
 
     set_section( N_("Performance options"), NULL );
     add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
               MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
+        change_need_restart();
 
 #if !defined(__APPLE__) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
     add_bool( "rt-priority", VLC_FALSE, NULL, RT_PRIORITY_TEXT,
               RT_PRIORITY_LONGTEXT, VLC_TRUE );
+        change_need_restart();
 #endif
 
 #if !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
     add_integer( "rt-offset", 0, NULL, RT_OFFSET_TEXT,
                  RT_OFFSET_LONGTEXT, VLC_TRUE );
+        change_need_restart();
 #endif
 
 #if defined(WIN32)
@@ -1551,10 +1564,13 @@ vlc_module_begin();
               PLAYLISTENQUEUE_LONGTEXT, VLC_TRUE );
     add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, VLC_FALSE );
+        change_need_restart();
     add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT,
               FAST_MUTEX_LONGTEXT, VLC_TRUE );
+        change_need_restart();
     add_integer( "win9x-cv-method", 1, NULL, WIN9X_CV_TEXT,
                   WIN9X_CV_LONGTEXT, VLC_TRUE );
+        change_need_restart();
 #endif
 
 /* Playlist options */
@@ -1574,6 +1590,7 @@ vlc_module_begin();
         change_integer_list( pi_pltree_values, ppsz_pltree_descriptions, 0 );
 
     add_string( "open", "", NULL, OPEN_TEXT, OPEN_LONGTEXT, VLC_FALSE );
+        change_need_restart();
 
     add_bool( "auto-preparse", VLC_TRUE, NULL, PREPARSE_TEXT,
               PREPARSE_LONGTEXT, VLC_FALSE );
@@ -1582,6 +1599,7 @@ vlc_module_begin();
     add_module_list_cat( "services-discovery", SUBCAT_PLAYLIST_SD, NULL,
                           NULL, SD_TEXT, SD_LONGTEXT, VLC_FALSE );
         change_short('S');
+        change_need_restart();
 
 /* Interface options */
     set_category( CAT_INTERFACE );
@@ -1595,47 +1613,58 @@ vlc_module_begin();
 #if !defined(WIN32)
     add_bool( "daemon", 0, NULL, DAEMON_TEXT, DAEMON_LONGTEXT, VLC_TRUE );
         change_short('d');
+        change_need_restart();
 
     add_string( "pidfile", NULL, NULL, PIDFILE_TEXT, PIDFILE_LONGTEXT,
                                        VLC_FALSE );
+        change_need_restart();
 #endif
 
     add_bool( "file-logging", VLC_FALSE, NULL, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
               VLC_TRUE );
+        change_need_restart();
 #if HAVE_SYSLOG_H
     add_bool ( "syslog", VLC_FALSE, NULL, SYSLOG_TEXT, SYSLOG_LONGTEXT,
                VLC_TRUE );
+        change_need_restart();
 #endif
 
 #if defined (WIN32) || defined (__APPLE__)
     add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
                 VLC_FALSE );
         change_string_list( ppsz_language, ppsz_language_text, 0 );
+        change_need_restart();
 #endif
 
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     VLC_FALSE );
+        change_need_restart();
     add_bool( "interact", VLC_FALSE, NULL, INTERACTION_TEXT,
               INTERACTION_LONGTEXT, VLC_FALSE );
 
     add_bool( "show-intf", VLC_FALSE, NULL, SHOWINTF_TEXT, SHOWINTF_LONGTEXT,
               VLC_FALSE );
+        change_need_restart();
 
     add_bool ( "stats", VLC_TRUE, NULL, STATS_TEXT, STATS_LONGTEXT, VLC_TRUE );
+        change_need_restart();
 
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_module_cat( "intf", SUBCAT_INTERFACE_MAIN, NULL, NULL, INTF_TEXT,
                 INTF_LONGTEXT, VLC_FALSE );
         change_short('I');
+        change_need_restart();
     add_module_list_cat( "extraintf", SUBCAT_INTERFACE_MAIN,
                          NULL, NULL, EXTRAINTF_TEXT,
                          EXTRAINTF_LONGTEXT, VLC_FALSE );
+        change_need_restart();
 
 
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_module_list_cat( "control", SUBCAT_INTERFACE_CONTROL, NULL, NULL,
                          CONTROL_TEXT, CONTROL_LONGTEXT, VLC_FALSE );
+        change_need_restart();
 
 /* Hotkey options*/
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS );

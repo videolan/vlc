@@ -155,6 +155,8 @@ struct module_config_t
     vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
     vlc_bool_t   b_advanced;          /* Flag to indicate an advanced option */
     vlc_bool_t   b_internal;   /* Flag to indicate option is not to be shown */
+    vlc_bool_t   b_restart;    /* Flag to indicate the option need a restart */
+                               /* to take effect */
 
     /* Original option values */
     char        *psz_value_orig;
@@ -398,6 +400,9 @@ int config_AutoSaveConfigFile( vlc_object_t * );
 
 #define change_internal() \
     p_config[i_config].b_internal = VLC_TRUE;
+
+#define change_need_restart() \
+    p_config[i_config].b_restart = VLC_TRUE;
 
 #define change_autosave() \
     p_config[i_config].b_autosave = VLC_TRUE;
