@@ -51,7 +51,6 @@ private:
     InputSlider *slider;
     /// Main input associated to the playlist
     input_thread_t *p_input;
-    intf_thread_t *p_intf;
     Ui::MainInterfaceUI ui;
 private slots:
     void setDisplay( float, int, int );
