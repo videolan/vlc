@@ -111,6 +111,11 @@ vlc_module_begin();
         add_shortcut( "qtl" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_QTL), E_(Close_QTL) );
+    add_submodule();
+        set_description( _("Google Video Playlist importer") );
+        add_shortcut( "gvp" );
+        set_capability( "demux2", 10 );
+        set_callbacks( E_(Import_GVP), E_(Close_GVP) );
 vlc_module_end();
 
 
