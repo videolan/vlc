@@ -2275,7 +2275,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
     if( stream_Size( p_demux->s ) > 10000000 )
     {
         p_demux->p_sys->i_dialog_id = intf_IntfProgress( p_demux,
-                                        _( "Fixing AVI Index" ),
+                                        _( "Fixing AVI Index..." ),
                                         0.0 );
         p_demux->p_sys->last_update = mdate();
     }
@@ -2298,7 +2298,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
             float f_pos = (float)i_pos;
             p_demux->p_sys->last_update = mdate();
             intf_IntfProgressUpdate( p_demux, p_demux->p_sys->i_dialog_id,
-                                    _( "Fixing AVI Index ..." ), f_pos );
+                                    _( "Fixing AVI Index..." ), f_pos );
         }
 
         if( AVI_PacketGetHeader( p_demux, &pk ) )
