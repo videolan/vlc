@@ -219,6 +219,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     i_items_to_append = 0;
     p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
+    msg_Err(p_intf, "p_playlist= 0x%x", p_playlist);
     if( p_playlist == NULL ) return;
 
     SetIcon( *p_intf->p_sys->p_icon );
@@ -978,7 +979,9 @@ void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
 
     if( dialog.ShowModal() == wxID_OK )
     {
-        playlist_Import( p_playlist, dialog.GetPath().mb_str() );
+        playlist_Import( p_playlist, dialog.GetPath().mb_str(),
+                         /*FIXME: where do we want to insert ? */
+                         p_playlist->p_local_category, VLC_TRUE );
     }
 }
 

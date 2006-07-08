@@ -94,7 +94,9 @@ void CmdPlaylistLoad::execute()
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
     if( pPlaylist != NULL )
     {
-        playlist_Import( pPlaylist, m_file.c_str() );
+        /*FIXME: Where do we want ot insert ?*/
+        playlist_Import( pPlaylist, m_file.c_str(),
+                         pPlaylist->p_local_category, VLC_TRUE );
     }
 }
 
