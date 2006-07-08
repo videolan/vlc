@@ -154,7 +154,7 @@ void VideoWidget::Release( void *p_win )
 
 //    p_intf->p_sys->p_mi->setMinimumSize( 500,
 //                                       p_intf->p_sys->p_mi->addSize.height() );
-    if( !config_GetIntf( p_intf, "qt-always-video" ) )
+    if( !config_GetInt( p_intf, "qt-always-video" ) )
         need_update = true;
 
     fprintf( stderr, "[After R update] MI constraints %ix%i -> %ix%i\n",
