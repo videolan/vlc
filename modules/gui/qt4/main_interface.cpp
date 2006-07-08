@@ -31,6 +31,9 @@
 #include <assert.h>
 #include <QPushButton>
 
+static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
+                             vlc_value_t, void *);
+
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     /* All UI stuff */
@@ -54,16 +57,43 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     ui.volLowLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
     ui.volHighLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
 
+    //QVLCMenu::createMenuBar();
+
+    resize (500, 131 );
+    fprintf( stderr, "Before creating the video widget, size is %ix%i\n", size().width(), size().height() );
 //    if( config_GetInt( p_intf, "embedded" ) )
+
     {
         videoWidget = new VideoWidget( p_intf );
-        videoWidget->resize( 1,1 );
+        if( config_GetInt( p_intf, "qt-always-video" ) )
+        {
+            QSettings settings( "VideoLAN", "VLC" );
+            settings.beginGroup( "MainWindow" );
+            videoSize = settings.value( "videoSize", QSize( 200, 200 ) ).
+                                                toSize();
+        } 
+        else
+            videoSize = QSize( 1,1 );
+        videoWidget->resize( videoSize );
         ui.vboxLayout->insertWidget( 0, videoWidget );
     }
+    fprintf( stderr, "Margin : %i\n",ui.vboxLayout->margin() );
+    readSettings( "MainWindow" );
 
-    readSettings( "MainWindow" , QSize( 500, 131) );
+    addSize = QSize( ui.vboxLayout->margin() * 2, 131 );
+    
+    if( config_GetInt( p_intf, "qt-always-video" ) )
+        mainSize = videoSize + addSize;
+    else
+        mainSize = QSize( 500,131 );
+        resize( 500,131 );
+    resize( mainSize );
+    mainSize = size();
 
-    //QVLCMenu::createMenuBar();
+    fprintf( stderr, "Size is %ix%i - Video %ix%i\n", mainSize.width(), mainSize.height(), videoSize.width(), videoSize.height() );
+
+    fprintf( stderr, "Additional size around video %ix%i", addSize.width(), addSize.height() );
+    setMinimumSize( 500, addSize.height() );
 
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
@@ -91,17 +121,39 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     connect( ui.playlistButton, SLOT(clicked() ), 
              DialogsProvider::getInstance( p_intf ), SLOT( playlistDialog() ) );
+
+    var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
+    var_AddCallback( p_intf, "interaction", InteractCallback, this );
+    p_intf->b_interaction = VLC_TRUE;
 }
 
 MainInterface::~MainInterface()
 {
+    writeSettings( "MainWindow" );
+    if( config_GetInt( p_intf, "qt-always-video" ) )
+    {
+        QSettings s("VideoLAN", "VLC" );
+        s.beginGroup( "MainWindow" );
+        s.setValue( "videoSize", videoSize );
+        s.endGroup();
+    }
+    p_intf->b_interaction = VLC_FALSE;
+    var_DelCallback( p_intf, "interaction", InteractCallback, this );
 }
 
-QSize MainInterface::sizeHint() const
+void MainInterface::resizeEvent( QResizeEvent *e )
 {
-    int i_width = __MAX( i_saved_width, p_intf->p_sys->p_video->i_video_width );
-    return QSize( i_width, i_saved_height +
-                             p_intf->p_sys->p_video->i_video_height );
+    fprintf( stderr, "Resized to %ix%i\n", e->size().width(), e->size().height() );
+
+     fprintf( stderr, "MI constraints %ix%i -> %ix%i\n",
+                             p_intf->p_sys->p_mi->minimumSize().width(),
+                             p_intf->p_sys->p_mi->minimumSize().height(),
+                               p_intf->p_sys->p_mi->maximumSize().width(),
+                               p_intf->p_sys->p_mi->maximumSize().height() );
+     
+        videoSize.setHeight( e->size().height() - addSize.height() );
+        videoSize.setWidth( e->size().width() - addSize.width() );
+    p_intf->p_sys->p_video->updateGeometry() ;
 }
 
 void MainInterface::stop()
@@ -143,4 +195,18 @@ void MainInterface::closeEvent( QCloseEvent *e )
 {
     hide();
     p_intf->b_die = VLC_TRUE;
+}
+
+static int InteractCallback( vlc_object_t *p_this,
+                             const char *psz_var, vlc_value_t old_val,
+                             vlc_value_t new_val, void *param )
+{
+    intf_dialog_args_t *p_arg = new intf_dialog_args_t;
+    p_arg->p_dialog = (interaction_dialog_t *)(new_val.p_address);
+    
+    MainInterface *p_interface = (MainInterface*)param;
+    DialogEvent *event = new DialogEvent( INTF_DIALOG_INTERACTION, 0, p_arg );
+    QApplication::postEvent( DialogsProvider::getInstance( NULL ),
+                                             static_cast<QEvent*>(event) );
+    return VLC_SUCCESS;
 }

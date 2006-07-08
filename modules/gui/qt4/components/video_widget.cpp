@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "dialogs_provider.hpp"
 #include <vlc/vout.h>
 #include "qt4.hpp"
 #include "components/video_widget.hpp"
@@ -30,9 +31,10 @@ static void *DoRequest( intf_thread_t *, vout_thread_t *, int*,int*,
                         unsigned int *, unsigned int * );
 static void DoRelease( intf_thread_t *, void * );
 static int DoControl( intf_thread_t *, void *, int, va_list );
-       
 
-VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QWidget( NULL ),
+bool need_update;
+       
+VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ),
                                                               p_intf( _p_i )
 {
     vlc_mutex_init( p_intf, &lock );
@@ -43,8 +45,23 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QWidget( NULL ),
     p_intf->p_sys->p_video = this;
     p_vout = NULL;
 
-    i_video_width = i_video_height = 1;
+    setFrameStyle(QFrame::Panel | QFrame::Raised);
+
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+
+    connect( DialogsProvider::getInstance(NULL)->fixed_timer,
+             SIGNAL( timeout() ), this, SLOT( update() ) );
+
+    need_update = false;
+}
+
+void VideoWidget::update()
+{
+    if( need_update )
+    {
+        p_intf->p_sys->p_mi->resize( p_intf->p_sys->p_mi->sizeHint() );
+        need_update = false;
+    }
 }
 
 VideoWidget::~VideoWidget()
@@ -72,7 +89,7 @@ VideoWidget::~VideoWidget()
 
 QSize VideoWidget::sizeHint() const
 {
-    return QSize( i_video_width, i_video_height );
+    return p_intf->p_sys->p_mi->videoSize;
 }
 
 static void *DoRequest( intf_thread_t *p_intf, vout_thread_t *p_vout,
@@ -97,19 +114,21 @@ void *VideoWidget::Request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
                     p_intf->p_sys->p_mi->maximumSize().width(),
                     p_intf->p_sys->p_mi->maximumSize().height() );
 
-    i_video_width = *pi_width;
-    i_video_height = *pi_height;
+    setMinimumSize( 1,1 );
+    p_intf->p_sys->p_mi->videoSize = QSize( *pi_width, *pi_height );
     updateGeometry();
-    p_intf->p_sys->p_mi->setMinimumSize( 
-                   p_intf->p_sys->p_mi->i_saved_width,
-                   p_intf->p_sys->p_mi->i_saved_height );
-    p_intf->p_sys->p_mi->resize( p_intf->p_sys->p_mi->sizeHint() );
-
-    fprintf( stderr, "[After update] MI constraints %ix%i -> %ix%i\n",
+    need_update = true;
+    fprintf( stderr, "[After update] MI constraints %ix%i -> %ix%i - Fr %ix%i -> %ix%i (hint %ix%i)\n",
                     p_intf->p_sys->p_mi->minimumSize().width(),
                     p_intf->p_sys->p_mi->minimumSize().height(),
                     p_intf->p_sys->p_mi->maximumSize().width(),
-                    p_intf->p_sys->p_mi->maximumSize().height() );
+                    p_intf->p_sys->p_mi->maximumSize().height(),
+                    minimumSize().width(),
+                    minimumSize().height(),
+                    maximumSize().width(),
+                    maximumSize().height(),
+                    sizeHint().width(),sizeHint().height() 
+           );
     
     return  (void*)winId();
 }
@@ -121,7 +140,10 @@ static void DoRelease( intf_thread_t *p_intf, void *p_win )
 
 void VideoWidget::Release( void *p_win )
 {
-    i_video_height = i_video_width = 1;
+    if( !config_GetInt( p_intf, "qt-always-video" ) );
+    {
+        p_intf->p_sys->p_mi->videoSize = QSize ( 1,1 );
+    }
     fprintf( stderr, "[Before R update] MI constraints %ix%i -> %ix%i\n",
                     p_intf->p_sys->p_mi->minimumSize().width(),
                     p_intf->p_sys->p_mi->minimumSize().height(),
@@ -129,8 +151,11 @@ void VideoWidget::Release( void *p_win )
                     p_intf->p_sys->p_mi->maximumSize().height() );
 
     updateGeometry();
-    p_intf->p_sys->p_mi->setMinimumSize( p_intf->p_sys->p_mi->sizeHint() );
-    p_intf->p_sys->p_mi->resize( p_intf->p_sys->p_mi->sizeHint() );
+
+//    p_intf->p_sys->p_mi->setMinimumSize( 500,
+//                                       p_intf->p_sys->p_mi->addSize.height() );
+    if( !config_GetIntf( p_intf, "qt-always-video" ) )
+        need_update = true;
 
     fprintf( stderr, "[After R update] MI constraints %ix%i -> %ix%i\n",
                     p_intf->p_sys->p_mi->minimumSize().width(),

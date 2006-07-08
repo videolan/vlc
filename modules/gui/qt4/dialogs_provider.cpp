@@ -20,9 +20,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
-#include "dialogs_provider.hpp"
 #include "qt4.hpp"
 #include <QEvent>
+#include "dialogs_provider.hpp"
 #include "dialogs/playlist.hpp"
 #include "dialogs/prefs_dialog.hpp"
 #include "dialogs/streaminfo.hpp"
@@ -33,8 +33,8 @@ DialogsProvider* DialogsProvider::instance = NULL;
 DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
                                       QObject( NULL ), p_intf( _p_intf )
 {
-    idle_timer = new QTimer( this );
- //   idle_timer->start( 0 );
+//    idle_timer = new QTimer( this );
+//    idle_timer->start( 0 );
 
     fixed_timer = new QTimer( this );
     fixed_timer->start( 150 /* milliseconds */ );
@@ -69,12 +69,13 @@ void DialogsProvider::customEvent( QEvent *event )
                popupMenu( de->i_dialog ); break;
             case INTF_DIALOG_FILEINFO:
                streaminfoDialog(); break;
-            case INTF_DIALOG_VLM:
             case INTF_DIALOG_INTERACTION:
+               doInteraction( de->p_arg ); break;
+            case INTF_DIALOG_VLM:
             case INTF_DIALOG_BOOKMARKS:
             case INTF_DIALOG_WIZARD:
             default:
-               fprintf( stderr, "Unimplemented dialog\n");
+               msg_Warn( p_intf, "unimplemented dialog\n" );
         }
     }
 }
@@ -86,6 +87,36 @@ void DialogsProvider::playlistDialog()
 
 void DialogsProvider::openDialog( int i_dialog )
 {
+}
+
+void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
+{
+    InteractionDialog *qdialog;
+    interaction_dialog_t *p_dialog = p_arg->p_dialog;
+    switch( p_dialog->i_action )
+    {
+    case INTERACT_NEW:
+        qdialog = new InteractionDialog( p_intf, p_dialog );
+        p_dialog->p_private = (void*)qdialog;
+        qdialog->show();
+        break;
+    case INTERACT_UPDATE:
+        qdialog = (InteractionDialog*)(p_dialog->p_private);
+        if( qdialog)
+            qdialog->Update();
+        break;
+    case INTERACT_HIDE:
+        qdialog = (InteractionDialog*)(p_dialog->p_private);
+        if( qdialog )
+            qdialog->hide();
+        p_dialog->i_status = HIDDEN_DIALOG;
+        break;
+    case INTERACT_DESTROY:
+        qdialog = (InteractionDialog*)(p_dialog->p_private);
+        delete qdialog; 
+        p_dialog->i_status = DESTROYED_DIALOG;
+        break;
+    }
 }
 
 void DialogsProvider::streaminfoDialog()

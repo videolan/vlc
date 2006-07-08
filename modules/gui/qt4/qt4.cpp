@@ -52,6 +52,7 @@ vlc_module_begin();
     add_submodule();
         set_description( "Dialogs provider" );
         set_capability( "dialogs provider", 51 );
+        add_bool( "qt-always-video", VLC_FALSE, NULL, "", "", VLC_TRUE );
         set_callbacks( OpenDialogs, Close );
 vlc_module_end();
 
@@ -140,6 +141,7 @@ static void Init( intf_thread_t *p_intf )
 
     app->setQuitOnLastWindowClosed( false );
     app->exec();
+    delete p_intf->p_sys->p_mi;
 }
 
 /*****************************************************************************

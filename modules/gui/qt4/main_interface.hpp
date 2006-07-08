@@ -39,9 +39,9 @@ public:
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
 
-    virtual QSize sizeHint() const;
+    void resizeEvent( QResizeEvent * );
 
-    int i_saved_width, i_saved_height;
+    QSize videoSize, addSize;
 
 protected:
     void closeEvent( QCloseEvent *);

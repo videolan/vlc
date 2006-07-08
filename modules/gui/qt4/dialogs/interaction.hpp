@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dialogs_provider.hpp : Dialogs provider
+ * interaction.hpp : Interaction dialogs
  ****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id: wxwidgets.cpp 15731 2006-05-25 14:43:53Z zorglub $
@@ -20,47 +20,31 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
-#ifndef _DIALOGS_PROVIDER_H_
-#define _DIALOGS_PROVIDER_H_
+#ifndef _INTERACTION_H_
+#define _INTERACTION_H_
 
-#include <QObject>
-#include <QTimer>
-#include <QApplication>
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include "dialogs/interaction.hpp"
+#include <vlc_interaction.h>
+#include <ui/okcanceldialog.h>
 
-class QEvent;
-
-class DialogsProvider : public QObject
+class InteractionDialog : public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
-    static DialogsProvider *getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance )
-            instance = new DialogsProvider( p_intf );
-        return instance;
-    }
-    virtual ~DialogsProvider();
-    QTimer *idle_timer;
-    QTimer *fixed_timer;
-protected:
-    void customEvent( QEvent *);
+    InteractionDialog( intf_thread_t *, interaction_dialog_t * );
+    virtual ~InteractionDialog();
+
+    void Update();
+
 private:
-    DialogsProvider( intf_thread_t *);
     intf_thread_t *p_intf;
-    static DialogsProvider *instance;
+    interaction_dialog_t *p_dialog;
+    Ui::OKCancelDialog *uiOkCancel;
 
-public slots:
-    void playlistDialog();
-    void streaminfoDialog();
-    void prefsDialog();
-    void messagesDialog();
-    void openDialog( int );
-    void popupMenu( int );
-    void doInteraction( intf_dialog_args_t * );
+    void Finish( int, QString *, QString * );
+private slots:
+    void OK();
+    void cancel();
 };
-
 
 #endif

@@ -11,7 +11,8 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-TOUI = ui/input_stats ui/main_interface ui/file_open
+TOUI = ui/input_stats ui/main_interface ui/file_open \
+        ui/okcanceldialog
 UIH = $(TOUI:%=%.h)
 
 TOMOC = main_interface \
@@ -21,11 +22,13 @@ TOMOC = main_interface \
 	dialogs/playlist \
 	dialogs/prefs_dialog \
 	dialogs/streaminfo \
+    dialogs/interaction \
 	components/infopanels \
 	components/preferences_widgets \
 	components/preferences \
 	components/open \
 	components/playlist/panels \
+    components/video_widget \
 	util/input_slider
 MOCCPP = $(TOMOC:%=%.moc.cpp)
 
@@ -37,11 +40,13 @@ nodist_SOURCES_qt4 = \
 		dialogs/playlist.moc.cpp \
 		dialogs/streaminfo.moc.cpp \
 		dialogs/prefs_dialog.moc.cpp \
+		dialogs/interaction.moc.cpp \
 		components/infopanels.moc.cpp \
 	 	components/preferences_widgets.moc.cpp \
 	 	components/preferences.moc.cpp \
 		components/open.moc.cpp \
 		components/playlist/panels.moc.cpp \
+        components/video_widget.moc.cpp \
 		util/input_slider.moc.cpp \
         resources.cpp
 
@@ -72,6 +77,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/playlist.cpp \
 		dialogs/prefs_dialog.cpp \
 		dialogs/streaminfo.cpp \
+		dialogs/interaction.cpp \
 		components/infopanels.cpp \
 		components/preferences_widgets.cpp \
 		components/preferences.cpp \
@@ -91,6 +97,7 @@ EXTRA_DIST += \
 	dialogs/playlist.hpp \
 	dialogs/streaminfo.hpp \
 	dialogs/prefs_dialog.hpp \
+	dialogs/interaction.cpp \
 	components/infopanels.hpp \
 	components/preferences_widgets.hpp \
 	components/preferences.hpp \
@@ -99,6 +106,9 @@ EXTRA_DIST += \
     components/video_widget.hpp \
 	util/input_slider.hpp \
 	ui/input_stats.ui \
+	ui/file_open.ui \
+	ui/main_interface.ui \
+	ui/okcanceldialog.ui \
 	pixmaps/advanced.xpm \
 	pixmaps/audio.xpm \
 	pixmaps/codec.xpm \

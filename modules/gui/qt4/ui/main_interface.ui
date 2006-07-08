@@ -4,14 +4,14 @@
  <exportmacro></exportmacro>
  <class>MainInterfaceUI</class>
  <widget class="QWidget" name="MainInterfaceUI" >
-  <property name="geometry" >
+<!--  <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
     <width>444</width>
     <height>80</height>
    </rect>
-  </property>
+  </property> -->
   <property name="sizePolicy" >
    <sizepolicy>
     <hsizetype>0</hsizetype>

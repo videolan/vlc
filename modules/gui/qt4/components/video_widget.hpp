@@ -27,9 +27,11 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <QWidget>
+#include <QFrame>
 
-class VideoWidget : public QWidget
+class VideoWidget : public QFrame
 {
+    Q_OBJECT
 public:
     VideoWidget( intf_thread_t *);
     virtual ~VideoWidget();
@@ -41,12 +43,13 @@ public:
     void Release( void * );
     int Control( void *, int, va_list );
     int i_video_height, i_video_width;
+    vout_thread_t *p_vout;
 private:
     QWidget *frame;
     intf_thread_t *p_intf;
-    vout_thread_t *p_vout;
     vlc_mutex_t lock;
-
+private slots:
+    void update();
 };
 
 #endif

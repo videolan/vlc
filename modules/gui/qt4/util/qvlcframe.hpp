@@ -75,6 +75,7 @@ protected:
     }
     void writeSettings( QString name )
     {
+        fprintf( stderr, "save\n" );
         QSettings settings( "VideoLAN", "VLC" );
         settings.beginGroup( name );
         settings.setValue ("size", size() );
@@ -100,8 +101,16 @@ protected:
         QSettings settings( "VideoLAN", "VLC" );
         settings.beginGroup( name );
         mainSize = settings.value( "size", defSize ).toSize();
-        resize( mainSize );
-        move( settings.value( "pos", QPoint( 0,0 ) ).toPoint() );
+        QPoint npos = settings.value( "pos", QPoint( 0,0 ) ).toPoint();
+        if( npos.x() > 0 )
+            move( npos );
+        settings.endGroup();
+    }
+    void readSettings( QString name )
+    {
+        QSettings settings( "VideoLAN", "VLC" );
+        settings.beginGroup( name );
+        mainSize = settings.value( "size", QSize( 0,0 ) ).toSize();
         settings.endGroup();
     }
     void writeSettings( QString name )
