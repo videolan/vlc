@@ -372,7 +372,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     {
         vlc_mutex_lock( &p_input->p_input_thread->counters.counters_lock);
         stats_UpdateInteger( p_aout,
-                             p_input->p_input_thread->counters.p_lost_abuffers,
+                             p_input->p_input_thread->counters.p_played_abuffers,
                              1, NULL );
         vlc_mutex_unlock( &p_input->p_input_thread->counters.counters_lock);
     }
