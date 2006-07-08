@@ -1419,12 +1419,18 @@ static int transcode_audio_process( sout_stream_t *p_stream,
     block_t *p_block, *p_audio_block;
     int i;
     *out = NULL;
+    input_thread_t *p_input = NULL;
+    
+    if( p_stream->p_parent->p_parent && p_stream->p_parent->p_parent->
+                                i_object_type == VLC_OBJECT_INPUT )
+        p_input = (input_thread_t *)p_stream->p_parent->p_parent;
 
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
                                                           &in )) )
     {
-        stats_UpdateInteger( p_stream->p_parent->p_parent, STATS_DECODED_AUDIO,
-                             1, NULL );
+        if( p_input )
+            stats_UpdateInteger( p_input, p_input->counters.p_decoded_audio,
+                                 1, NULL );
         if( p_sys->b_master_sync )
         {
             mtime_t i_dts = date_Get( &id->interpolated_pts ) + 1;
@@ -2006,12 +2012,18 @@ static int transcode_video_process( sout_stream_t *p_stream,
     int i_duplicate = 1, i;
     picture_t *p_pic, *p_pic2 = NULL;
     *out = NULL;
+    input_thread_t *p_input = NULL;
+    if( p_stream->p_parent->p_parent && p_stream->p_parent->p_parent->
+                                i_object_type == VLC_OBJECT_INPUT )
+        p_input = (input_thread_t *)p_stream->p_parent->p_parent;
+
 
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
         subpicture_t *p_subpic = 0;
-        stats_UpdateInteger( p_stream->p_parent->p_parent, STATS_DECODED_VIDEO,
-                              1, NULL );
+        if( p_input )
+            stats_UpdateInteger( p_input, p_input->counters.p_decoded_video,
+                                 1, NULL );
 
         if( p_stream->p_sout->i_out_pace_nocontrol && p_sys->b_hurry_up )
         {

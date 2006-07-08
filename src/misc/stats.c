@@ -81,7 +81,7 @@ counter_t * __stats_CounterCreate( vlc_object_t *p_this,
 int __stats_Update( vlc_object_t *p_this, counter_t *p_counter,
                     vlc_value_t val, vlc_value_t *val_new )
 {
-    if( !p_this->p_libvlc->b_stats ) return VLC_EGENERIC;
+    if( !p_this->p_libvlc->b_stats || !p_counter ) return VLC_EGENERIC;
     return CounterUpdate( p_this, p_counter, val, val_new );
 }
 
@@ -94,7 +94,7 @@ int __stats_Update( vlc_object_t *p_this, counter_t *p_counter,
  */
 int __stats_Get( vlc_object_t *p_this, counter_t *p_counter, vlc_value_t *val )
 {
-    if( !p_this->p_libvlc->b_stats || p_counter->i_samples == 0 )
+    if( !p_this->p_libvlc->b_stats || !p_counter || p_counter->i_samples == 0 )
     {
         val->i_int = val->f_float = 0.0;
         return VLC_EGENERIC;
