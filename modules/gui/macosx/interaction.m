@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "intf.h"
+#import "intf.h"
 #import "interaction.h"
 
 /*****************************************************************************
@@ -125,6 +125,7 @@
         [o_auth_ok_btn setTitle: _NS("OK")];
         [o_input_ok_btn setTitle: _NS("OK")];
         [o_input_cancel_btn setTitle: _NS("Cancel")];
+        o_mainIntfPgbar = [[VLCMain sharedInstance] getMainIntfPgbar];
     }
 
     NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : "title"];
@@ -149,9 +150,12 @@
     {
         o_window = [NSApp mainWindow];
     }
-    
+
+    #if 0
     msg_Dbg( p_intf, "Title: %s", [o_title UTF8String] );
     msg_Dbg( p_intf, "Description: %s", [o_description UTF8String] );
+    #endif
+
     if( p_dialog->i_id == DIALOG_ERRORS )
     {
         msg_Err( p_intf, "Error: %s", p_dialog->psz_description );
@@ -190,14 +194,14 @@
             msg_Dbg( p_intf, "user progress dialog requested" );
             [o_prog_title setStringValue: o_title];
             [o_prog_description setStringValue: o_description];
-            [o_prog_bar setFloatValue: p_dialog->val.f_float];
+            [o_prog_bar setDoubleValue: (double)p_dialog->val.f_float];
             [NSApp beginSheet: o_prog_win modalForWindow: o_window
                 modalDelegate: self didEndSelector: nil contextInfo: nil];
             [o_prog_win makeKeyWindow];
         }
         else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
         {
-            msg_Dbg( p_intf, "text input requested" );
+            msg_Dbg( p_intf, "text input from user requested" );
             [o_input_title setStringValue: o_title];
             [o_input_description setStringValue: o_description];
             [o_input_fld setStringValue: @""];
@@ -208,15 +212,15 @@
         else if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
         {
             msg_Dbg( p_intf, "progress-bar in main intf requested" );
-            [[[VLCMain sharedInstance] getMainScrollField] 
-                setStringValue: o_description];
-            [[[VLCMain sharedInstance] getMainIntfPgbar] 
-                setFloatValue: p_dialog->val.f_float];
-            [[[VLCMain sharedInstance] getMainIntfPgbar] setHidden: NO];
+            [[VLCMain sharedInstance] setScrollField: o_description stopAfter: -1];
+            [o_mainIntfPgbar setDoubleValue: (double)p_dialog->val.f_float];
+            [o_mainIntfPgbar setHidden: NO];
             [[[VLCMain sharedInstance] getControllerWindow] makeKeyWindow];
+            [o_mainIntfPgbar setIndeterminate: NO];
         }
         else
-            msg_Warn( p_intf, "requested dialog type unknown" );
+            msg_Err( p_intf, "requested dialog type unknown (%i)", 
+                p_dialog->i_flags );
     }
 }
 
@@ -250,28 +254,28 @@
     {
         [o_prog_description setStringValue: \
             [NSString stringWithUTF8String: p_dialog->psz_description]];
-        [o_prog_bar setFloatValue: p_dialog->val.f_float];
+        [o_prog_bar setDoubleValue: (double)p_dialog->val.f_float];
 
         if( [o_prog_bar doubleValue] == 100.0 )
         {
             /* we are done, let's hide */
             [self hideDialog];
-            return;
         }
+        return;
     }
     if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
     {
-        [[[VLCMain sharedInstance] getMainScrollField] setStringValue: \
-            [NSString stringWithUTF8String: p_dialog->psz_description]];
-        [[[VLCMain sharedInstance] getMainIntfPgbar] setFloatValue: \
-            p_dialog->val.f_float];
+        [[VLCMain sharedInstance] setScrollField:
+            [NSString stringWithUTF8String: p_dialog->psz_description]
+            stopAfter: -1];
+        [o_mainIntfPgbar setDoubleValue: (double)p_dialog->val.f_float];
 
-        if( [[[VLCMain sharedInstance] getMainIntfPgbar] doubleValue] == 100.0 )
+        if( [o_mainIntfPgbar doubleValue] == 100.0 )
         {
             /* we are done, let's hide */
             [self hideDialog];
-            return;
         }
+        return;
     }
 }
 
@@ -295,15 +299,17 @@
     }
     if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
     {
-        [[[VLCMain sharedInstance] getMainIntfPgbar] setIndeterminate: YES];
-        [[[VLCMain sharedInstance] getMainScrollField] setStringValue: @""];
-        [[[VLCMain sharedInstance] getMainIntfPgbar] setHidden: YES];
+        [o_mainIntfPgbar setIndeterminate: YES];
+        [o_mainIntfPgbar setHidden: YES];
+        [[VLCMain sharedInstance] resetScrollField];
     }
 }
 
 -(void)destroyDialog
 {
     msg_Dbg( p_intf, "destroy event" );
+    if( o_mainIntfPgbar )
+        [o_mainIntfPgbar release];
 }
 
 - (IBAction)cancelAndClose:(id)sender
@@ -318,7 +324,6 @@
 
 - (IBAction)okayAndClose:(id)sender
 {
-    msg_Dbg( p_intf, "dialog's okay btn pressed, returning values" );
     vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
     if( p_dialog->i_flags == DIALOG_LOGIN_PW_OK_CANCEL )
     {
@@ -330,6 +335,7 @@
     p_dialog->i_return = DIALOG_OK_YES;
     p_dialog->i_status = ANSWERED_DIALOG;
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
+    msg_Dbg( p_intf, "dialog acknowledged" );
 }
 
 @end

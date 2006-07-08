@@ -922,15 +922,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     return nil;
 }
 
-- (id)getMainScrollField
-{
-    if( o_scrollfield )
-        return o_scrollfield;
-    
-    msg_Err( p_intf, "main scroll field item wasn't found" );
-    return nil;
-}
-
 - (id)getControllerWindow
 {
     if( o_window )

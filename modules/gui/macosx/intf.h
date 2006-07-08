@@ -294,7 +294,6 @@ struct intf_sys_t
 - (id)getEmbeddedList;
 - (id)getInteractionList;
 - (id)getMainIntfPgbar;
-- (id)getMainScrollField;
 - (id)getControllerWindow;
 - (void)terminate;
 - (NSString *)localizedString:(char *)psz;
