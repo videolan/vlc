@@ -486,10 +486,10 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 {
                     FREE_ATT();
                     /* Add it */
-                    /*playlist_AddWhereverNeeded( p_playlist, p_new_input,
+                    playlist_AddWhereverNeeded( p_playlist, p_new_input,
                               p_item, p_demux->p_sys->p_item_in_category,
                               (p_demux->p_sys->i_parent_id >0 ) ? VLC_TRUE:
-                              VLC_FALSE, PLAYLIST_APPEND );*/
+                              VLC_FALSE, PLAYLIST_APPEND );
                     if( p_demux->p_sys->i_identifier <
                         p_demux->p_sys->i_tracklist_entries )
                     {

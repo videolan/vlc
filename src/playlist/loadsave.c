@@ -36,42 +36,36 @@
 #define PLAYLIST_FILE_HEADER  "# vlc playlist file version 0.5"
 
 /**
- * Import a certain playlist file into the library
- * This file will get inserted as a new category
- *
- * XXX: TODO
+ * Import a playlist file at a given point of a given view
  * \param p_playlist the playlist to which the new items will be added
  * \param psz_filename the name of the playlistfile to import
  * \return VLC_SUCCESS on success
  */
-int playlist_Import( playlist_t * p_playlist, const char *psz_filename )
+int playlist_Import( playlist_t * p_playlist, const char *psz_filename,
+                     playlist_item_t *p_root, vlc_bool_t b_only_there )
 {
-    playlist_item_t *p_item;
-    char *psz_uri;
-    int i_id;
-
-    msg_Info( p_playlist, "clearing playlist");
-    playlist_Clear( p_playlist );
-
-
-    psz_uri = (char *)malloc(sizeof(char)*strlen(psz_filename) + 17 );
-    sprintf( psz_uri, "file/playlist://%s", psz_filename);
-
-    i_id = playlist_PlaylistAdd( p_playlist, psz_uri, psz_uri,
-                  PLAYLIST_INSERT  , PLAYLIST_END);
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-    p_item = playlist_ItemGetById( p_playlist, i_id );
-    vlc_mutex_unlock( &p_playlist->object_lock );
-
-    playlist_Play(p_playlist);
-
+    char *psz_uri, *psz_opt;
+    input_item_t *p_input;
+    
+    asprintf( &psz_uri, "file/playlist://%s", psz_filename );
+    p_input = input_ItemNewExt( p_playlist, psz_uri, "playlist", 0, NULL, -1 );
+    if( b_only_there )
+    { 
+        asprintf( &psz_opt, "parent-item=%i", p_root->i_id );
+        vlc_input_item_AddOption( p_input, psz_opt );
+        free( psz_opt );
+    }
+    if( p_root == p_playlist->p_ml_category )
+        p_input->i_id = p_playlist->p_ml_category->p_input->i_id;
+    input_Read( p_playlist, p_input, VLC_TRUE );
+    free( psz_uri );
+    
     return VLC_SUCCESS;
 }
 
 /**
- * Load a certain playlist file into the playlist
- * This file will replace the contents of the "current" view
+ * Load a playlist file to the playlist. It will create a new node in 
+ * category
  *
  * \param p_playlist the playlist to which the new items will be added
  * \param psz_filename the name of the playlistfile to import

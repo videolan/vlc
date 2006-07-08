@@ -312,7 +312,7 @@ struct module_symbols_t
     int (*playlist_NodeGroup_inner) (playlist_t *, playlist_item_t *,playlist_item_t **,int, int, int);
     int (*playlist_NodeSort_inner) (playlist_t *, playlist_item_t *,int, int);
     int (*playlist_RecursiveNodeSort_inner) (playlist_t *, playlist_item_t *,int, int);
-    int (*playlist_Import_inner) (playlist_t *, const char *);
+    int (*playlist_Import_inner) (playlist_t *, const char *, playlist_item_t *, vlc_bool_t);
     int (*playlist_Export_inner) (playlist_t *, const char *, playlist_item_t *, const char *);
     spu_t * (*__spu_Create_inner) (vlc_object_t *);
     int (*spu_Init_inner) (spu_t *);
@@ -517,6 +517,8 @@ struct module_symbols_t
     void *stats_TimerClean_deprecated;
     void *stats_TimersClean_deprecated;
     void (*__stats_TimersClean_inner) (vlc_object_t *);
+    void (*__intf_IntfProgressUpdate_inner) (vlc_object_t*, int, const char*, float);
+    int (*__intf_IntfProgress_inner) (vlc_object_t*, const char*, float);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -984,6 +986,8 @@ struct module_symbols_t
 #  define input_AddSubtitles (p_symbols)->input_AddSubtitles_inner
 #  define __stats_CounterCreate (p_symbols)->__stats_CounterCreate_inner
 #  define __stats_TimersClean (p_symbols)->__stats_TimersClean_inner
+#  define __intf_IntfProgressUpdate (p_symbols)->__intf_IntfProgressUpdate_inner
+#  define __intf_IntfProgress (p_symbols)->__intf_IntfProgress_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1454,6 +1458,8 @@ struct module_symbols_t
     ((p_symbols)->input_AddSubtitles_inner) = input_AddSubtitles; \
     ((p_symbols)->__stats_CounterCreate_inner) = __stats_CounterCreate; \
     ((p_symbols)->__stats_TimersClean_inner) = __stats_TimersClean; \
+    ((p_symbols)->__intf_IntfProgressUpdate_inner) = __intf_IntfProgressUpdate; \
+    ((p_symbols)->__intf_IntfProgress_inner) = __intf_IntfProgress; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \
     (p_symbols)->playlist_ItemAddParent_deprecated = NULL; \

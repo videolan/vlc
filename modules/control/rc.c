@@ -1280,6 +1280,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
     {
+        playlist_Import( p_playlist, "/home/zorglub/vlc-trunk/foo.xspf",
+                         p_playlist->p_ml_category, VLC_FALSE );
         playlist_NodeDump( p_playlist, p_playlist->p_root_category, 0 );
         playlist_NodeDump( p_playlist, p_playlist->p_root_onelevel, 0 );
     }

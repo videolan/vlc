@@ -68,14 +68,15 @@ playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
                                            input_item_t *p_item )
 {
     int i;
-    if( p_playlist->status.p_item && p_playlist->status.p_item->p_input == p_item )
+    if( p_playlist->status.p_item &&
+        p_playlist->status.p_item->p_input == p_item )
     {
         return p_playlist->status.p_item;
     }
 
     for( i =  0 ; i < p_playlist->i_all_size; i++ )
     {
-        if( p_playlist->pp_all_items[i]->p_input == p_item )
+        if( p_playlist->pp_all_items[i]->p_input->i_id == p_item->i_id )
         {
             return p_playlist->pp_all_items[i];
         }

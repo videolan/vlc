@@ -277,6 +277,7 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     AddItem( p_playlist, p_item_cat, p_direct_parent, i_pos );
 
     /* Add to onelevel */
+    /** \todo make a faster case for ml import */
     p_item_one = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item_one == NULL ) return VLC_EGENERIC;
 
@@ -388,6 +389,10 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
      * If we were in ONELEVEL, we thus retrieve the node in CATEGORY (will be
      * useful for later BothAddInput )
      */
+
+    /* Fast track the media library, no time to loose */
+    if( p_item == p_playlist->p_ml_category ) 
+        return p_item;
 
     /** \todo First look if we don't already have it */
     playlist_item_t *p_item_in_category = playlist_ItemFindFromInputAndRoot(

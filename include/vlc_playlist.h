@@ -352,7 +352,7 @@ VLC_EXPORT( int,  playlist_NodeSort, ( playlist_t *, playlist_item_t *,int, int 
 VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 
 /* Load/Save */
-VLC_EXPORT( int,  playlist_Import, ( playlist_t *, const char * ) );
+VLC_EXPORT( int,  playlist_Import, ( playlist_t *, const char *, playlist_item_t *, vlc_bool_t ) );
 VLC_EXPORT( int,  playlist_Export, ( playlist_t *, const char *, playlist_item_t *, const char * ) );
 
 /***********************************************************************
