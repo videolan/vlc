@@ -837,7 +837,7 @@ static char *ppsz_clock_descriptions[] =
 
 #define PIDFILE_TEXT N_("Write process id to file")
 #define PIDFILE_LONGTEXT N_( \
-       "Writes proccess id into specified file.")
+       "Writes process id into specified file.")
 
 #define FILE_LOG_TEXT N_( "Log to file" )
 #define FILE_LOG_LONGTEXT N_( \

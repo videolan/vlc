@@ -384,7 +384,7 @@ static int Demux( demux_t *p_demux )
         p_input = input_ItemNewExt( p_sys->p_playlist,
                                 psz_src, psz_moviename, 0, NULL, -1 );
 #define SADD_INFO( type, field ) if( field ) { vlc_input_item_AddInfo( \
-                    p_input, _("QuickTime Media Link"), _(type), "%s", field ) ; }
+                    p_input, "QuickTime Media Link", _(type), "%s", field ) ; }
         SADD_INFO( "href", psz_href );
         SADD_INFO( "mime type", psz_mimetype );
         playlist_AddWhereverNeeded( p_sys->p_playlist, p_input,
