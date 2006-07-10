@@ -9262,8 +9262,8 @@ msgid ""
 "Do you want to try to repair it (this might take a long time) ?"
 msgstr ""
 "Diese AVI Datei ist beschädigt. Vorspulen wird nicht korrekt funktionieren.\n"
-"Möchten Sie versuchen, diese Datei reparieren zu lassen (Die kann einige "
-"Zeit dauern!)?"
+"Möchten Sie versuchen, diese Datei reparieren zu lassen (dieser Vorgang "
+"könnte etwas länger dauern)?"
 
 #: modules/demux/avi/avi.c:2270
 msgid "Fixing AVI Index"
