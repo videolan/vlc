@@ -36,6 +36,11 @@
  *  - ...
  */
 
+#define TIME_TEXT N_("Trust MPEG timestamps")
+#define TIME_LONGTEXT N_("Normally we use the timestamps of the MPEG files " \
+    "to calculate position and duration. However sometimes this might not " \
+    "be usable. Disable this option to calculate from the bitrate instead." )
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -50,6 +55,9 @@ vlc_module_begin();
     set_capability( "demux2", 1 );
     set_callbacks( Open, Close );
     add_shortcut( "ps" );
+
+    add_integer( "ps-trust-timestamps", VLC_TRUE, NULL, TIME_TEXT,
+                 TIME_LONGTEXT, VLC_TRUE );
 
     add_submodule();
     set_description( _("MPEG-PS demuxer") );
@@ -68,9 +76,13 @@ struct demux_sys_t
 
     int64_t     i_scr;
     int         i_mux_rate;
+    int64_t     i_length;
+    int         i_time_track;
+    int64_t     i_current_pts;
 
     vlc_bool_t  b_lost_sync;
     vlc_bool_t  b_have_pack;
+    vlc_bool_t  b_seekable;
 };
 
 static int Demux  ( demux_t *p_demux );
@@ -110,8 +122,14 @@ static int Open( vlc_object_t *p_this )
     /* Init p_sys */
     p_sys->i_mux_rate = 0;
     p_sys->i_scr      = -1;
+    p_sys->i_length   = -1;
+    p_sys->i_current_pts = (mtime_t) 0;
+    
     p_sys->b_lost_sync = VLC_FALSE;
     p_sys->b_have_pack = VLC_FALSE;
+    p_sys->b_seekable  = VLC_FALSE;
+
+    stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
 
     ps_psm_init( &p_sys->psm );
     ps_track_init( p_sys->tk );
@@ -165,6 +183,82 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
+static int Demux2( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int i_ret, i_id;
+    uint32_t i_code;
+    block_t *p_pkt;
+
+    i_ret = ps_pkt_resynch( p_demux->s, &i_code );
+    if( i_ret < 0 )
+    {
+        return 0;
+    }
+    else if( i_ret == 0 )
+    {
+        if( !p_sys->b_lost_sync )
+            msg_Warn( p_demux, "garbage at input, trying to resync..." );
+
+        p_sys->b_lost_sync = VLC_TRUE;
+        return 1;
+    }
+
+    if( p_sys->b_lost_sync ) msg_Warn( p_demux, "found sync code" );
+    p_sys->b_lost_sync = VLC_FALSE;
+
+    if( ( p_pkt = ps_pkt_read( p_demux->s, i_code ) ) == NULL )
+    {
+        return 0;
+    }
+    if( (i_id = ps_pkt_id( p_pkt )) >= 0xc0 )
+    {
+        ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
+        if( !ps_pkt_parse_pes( p_pkt, tk->i_skip ) )
+        {
+            tk->i_last_pts = p_pkt->i_pts;
+        }
+    }
+    block_Release( p_pkt );
+    return 1;
+}
+
+static void FindLength( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int64_t i_current_pos = -1, i_size = 0, i_end = 0;
+    int i;
+
+    if( !var_CreateGetInteger( p_demux, "ps-trust-timestamps" ) )
+        return;
+
+    if( p_sys->i_length == -1 ) /* First time */
+    {
+        i_current_pos = stream_Tell( p_demux->s );
+        i_size = stream_Size( p_demux->s );
+        i_end = __MAX( 0, __MIN( 100000, i_size ) );
+        stream_Seek( p_demux->s, stream_Size( p_demux->s ) - i_end );
+    
+        while( Demux2( p_demux ) > 0 && !p_demux->b_die ) ;
+    }
+
+    for( i = 0; i < PS_TK_COUNT; i++ )
+    {
+        ps_track_t *tk = &p_sys->tk[i];
+        if( tk->b_seen && tk->i_first_pts > 0 && tk->i_last_pts > 0 )
+            if( tk->i_last_pts > tk->i_first_pts )
+            {
+                int64_t i_length = (int64_t)tk->i_last_pts - tk->i_first_pts;
+                if( i_length > p_sys->i_length )
+                {
+                    p_sys->i_length = i_length;
+                    p_sys->i_time_track = i;
+                }
+            }
+    }
+    if( i_current_pos >= 0 ) stream_Seek( p_demux->s, i_current_pos );
+}
+
 /*****************************************************************************
  * Demux:
  *****************************************************************************/
@@ -191,6 +285,9 @@ static int Demux( demux_t *p_demux )
 
     if( p_sys->b_lost_sync ) msg_Warn( p_demux, "found sync code" );
     p_sys->b_lost_sync = VLC_FALSE;
+
+    if( p_sys->b_seekable && p_sys->i_length <= 0 )
+        FindLength( p_demux );
 
     if( ( p_pkt = ps_pkt_read( p_demux->s, i_code ) ) == NULL )
     {
@@ -283,6 +380,16 @@ static int Demux( demux_t *p_demux )
                     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_pkt->i_pts );
                 }
 
+                if( !tk->i_first_pts && p_pkt->i_pts > 0 )
+                {
+                    tk->i_first_pts = p_pkt->i_pts;
+                    p_sys->i_length = 0;
+                }
+                if( (int64_t)p_pkt->i_pts > p_sys->i_current_pts )
+                {
+                    p_sys->i_current_pts = (int64_t)p_pkt->i_pts;
+                }
+
                 es_out_Send( p_demux->out, tk->es, p_pkt );
             }
             else
@@ -327,13 +434,18 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_POSITION:
             f = (double) va_arg( args, double );
             i64 = stream_Size( p_demux->s );
-
+            p_sys->i_current_pts = 0;
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             return stream_Seek( p_demux->s, (int64_t)(i64 * f) );
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->i_current_pts > 0 )
+            {
+                *pi64 = p_sys->i_current_pts - p_sys->tk[p_sys->i_time_track].i_first_pts;
+                return VLC_SUCCESS;
+            }
             if( p_sys->i_mux_rate > 0 )
             {
                 *pi64 = (int64_t)1000000 * ( stream_Tell( p_demux->s ) / 50 ) /
@@ -345,7 +457,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_mux_rate > 0 )
+            if( p_sys->i_length > 0 )
+            {
+                *pi64 = p_sys->i_length;
+                return VLC_SUCCESS;
+            }
+            else if( p_sys->i_mux_rate > 0 )
             {
                 *pi64 = (int64_t)1000000 * ( stream_Size( p_demux->s ) / 50 ) /
                     p_sys->i_mux_rate;

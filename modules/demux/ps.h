@@ -36,6 +36,8 @@ typedef struct
     int         i_id;
     es_out_id_t *es;
     es_format_t fmt;
+    mtime_t     i_first_pts;
+    mtime_t     i_last_pts;
 
 } ps_track_t;
 
@@ -49,6 +51,8 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
         tk[i].i_skip = 0;
         tk[i].i_id   = 0;
         tk[i].es     = NULL;
+        tk[i].i_first_pts = 0;
+        tk[i].i_last_pts = 0;
         es_format_Init( &tk[i].fmt, UNKNOWN_ES, 0 );
     }
 }
