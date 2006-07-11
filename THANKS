@@ -49,6 +49,7 @@ Daniel Nylander <info@danielnylander at se> - Swedish translation
 David Weber <david_weber at gmx.de> - Mac OS X interface design & graphics (v0.5.0)
 Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
 Dennis van Amerongen <Dennis dot vanAmerongen at nob dot nl> - x264 options unification
+Dennis Lou <dlou99 at yahoo dot com> - ATSC support in the DVB module
 Diego Petteno <flameeyes at gentoo dot org> - remove usage of internal ffmpeg symbols
 DirektX <direktx at freemail.hu> - Hungarian translation
 Dugal Harris - DirectShow fixes and MJPEG patches

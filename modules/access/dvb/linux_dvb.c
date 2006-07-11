@@ -83,6 +83,7 @@ static int FrontendInfo( access_t * );
 static int FrontendSetQPSK( access_t * );
 static int FrontendSetQAM( access_t * );
 static int FrontendSetOFDM( access_t * );
+static int FrontendSetATSC( access_t * );
 
 /*****************************************************************************
  * FrontendOpen : Determine frontend device information and capabilities
@@ -139,6 +140,9 @@ int E_(FrontendOpen)( access_t *p_access )
         case FE_QPSK:
             psz_real = "DVB-S";
             break;
+        case FE_ATSC:
+            psz_real = "ATSC";
+            break;
         default:
             psz_real = "unknown";
         }
@@ -162,6 +166,13 @@ int E_(FrontendOpen)( access_t *p_access )
              (p_frontend->info.type != FE_OFDM) )
         {
             psz_expected = "DVB-T";
+        }
+
+        if( (!strncmp( p_access->psz_access, "usdigital", 9 ) ||
+             !strncmp( p_access->psz_access, "atsc", 4 ) ) &&
+             (p_frontend->info.type != FE_ATSC) )
+        {
+            psz_expected = "ATSC";
         }
 
         if( psz_expected != NULL )
@@ -188,6 +199,9 @@ int E_(FrontendOpen)( access_t *p_access )
         else if( !strncmp( p_access->psz_access, "terrestrial", 11 ) ||
                  !strncmp( p_access->psz_access, "dvb-t", 5 ) )
             p_frontend->info.type = FE_OFDM;
+        else if( !strncmp( p_access->psz_access, "usdigital", 9 ) ||
+                 !strncmp( p_access->psz_access, "atsc", 4 ) )
+            p_frontend->info.type = FE_ATSC;
     }
 
     return VLC_SUCCESS;
@@ -241,6 +255,15 @@ int E_(FrontendSet)( access_t *p_access )
         if( FrontendSetOFDM( p_access ) < 0 )
         {
             msg_Err( p_access, "DVB-T: tuning failed" );
+            return VLC_EGENERIC;
+        }
+        break;
+
+    /* ATSC */
+    case FE_ATSC:
+        if( FrontendSetATSC( p_access ) < 0 )
+        {
+            msg_Err( p_access, "ATSC: tuning failed" );
             return VLC_EGENERIC;
         }
         break;
@@ -520,6 +543,9 @@ static int FrontendInfo( access_t *p_access )
         case FE_OFDM:
             msg_Dbg( p_access, "  type = OFDM (DVB-T)" );
             break;
+        case FE_ATSC:
+            msg_Dbg( p_access, "  type = ATSC (USA)" );
+            break;
 #if 0 /* DVB_API_VERSION == 3 */
         case FE_MEMORY:
             msg_Dbg(p_access, "  type = MEMORY" );
@@ -599,6 +625,10 @@ static int FrontendInfo( access_t *p_access )
         msg_Dbg(p_access, "  card can mute TS");
     if( p_frontend->info.caps & FE_CAN_RECOVER)
         msg_Dbg(p_access, "  card can recover from a cable unplug");
+    if( p_frontend->info.caps & FE_CAN_8VSB)
+        msg_Dbg(p_access, "  card can do 8vsb");
+    if( p_frontend->info.caps & FE_CAN_16VSB)
+        msg_Dbg(p_access, "  card can do 16vsb");
     msg_Dbg(p_access, "End of capability list");
 
     return VLC_SUCCESS;
@@ -666,6 +696,7 @@ static fe_modulation_t DecodeModulation( access_t *p_access )
     {
         case -1: fe_modulation = QPSK; break;
         case 0: fe_modulation = QAM_AUTO; break;
+        case 8: fe_modulation = VSB_8; break;      // ugly hack
         case 16: fe_modulation = QAM_16; break;
         case 32: fe_modulation = QAM_32; break;
         case 64: fe_modulation = QAM_64; break;
@@ -1126,6 +1157,43 @@ static int FrontendSetOFDM( access_t * p_access )
         msg_Err( p_access, "DVB-T: setting frontend failed (%d) %s", ret,
                  strerror(errno) );
         return -1;
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * FrontendSetATSC : controls the FE device
+ *****************************************************************************/
+static int FrontendSetATSC( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    struct dvb_frontend_parameters fep;
+    vlc_value_t val;
+    int i_ret;
+
+    /* Prepare the fep structure */
+
+    var_Get( p_access, "dvb-frequency", &val );
+    fep.frequency = val.i_int;
+
+    fep.u.vsb.modulation = DecodeModulation( p_access );
+
+    /* Empty the event queue */
+    for( ; ; )
+    {
+        struct dvb_frontend_event event;
+        if ( ioctl( p_sys->i_frontend_handle, FE_GET_EVENT, &event ) < 0
+              && errno == EWOULDBLOCK )
+            break;
+    }
+
+    /* Now send it all to the frontend device */
+    if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
+    {
+        msg_Err( p_access, "ATSC: setting frontend failed (%d) %s", i_ret,
+                 strerror(errno) );
+        return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
