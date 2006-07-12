@@ -24,6 +24,13 @@
 #include "components/open.hpp"
 
 /**************************************************************************
+ * Open panel
+ ***************************************************************************/
+
+OpenPanel::~OpenPanel()
+{}
+
+/**************************************************************************
  * File open
  **************************************************************************/
 FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
@@ -33,6 +40,9 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 }
 
 FileOpenPanel::~FileOpenPanel()
+{}
+
+void FileOpenPanel::sendUpdate()
 {}
 
 QString FileOpenPanel::getUpdatedMRL()
