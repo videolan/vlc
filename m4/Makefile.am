@@ -1,6 +1,12 @@
 NULL =
 
 EXTRA_DIST = \
+	ac_prog_java.m4 \
+	ac_prog_java_cc.m4 \
+	ac_prog_java_works.m4 \
+	ac_prog_javac.m4 \
+	ac_prog_javac_works.m4 \
+	ac_prog_javah.m4 \
 	codeset.m4 \
 	gettext.m4 \
 	glibc21.m4 \
