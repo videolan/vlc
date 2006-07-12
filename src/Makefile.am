@@ -69,7 +69,6 @@ HEADERS_include = \
 	../include/vlc_config.h \
 	../include/vlc_cpu.h \
 	../include/vlc_demux.h \
-	../include/vlc_devices.h \
 	../include/vlc_error.h \
 	../include/vlc_es.h \
 	../include/vlc_es_out.h \
