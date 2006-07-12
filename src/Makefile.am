@@ -77,6 +77,7 @@ HEADERS_include = \
 	../include/vlc_httpd.h \
 	../include/vlc_tls.h \
 	../include/vlc_md5.h \
+	../include/vlc_devices.h \
 	../include/vlc_image.h \
 	../include/vlc_input.h \
 	../include/vlc_interaction.h \
