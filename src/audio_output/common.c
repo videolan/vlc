@@ -294,6 +294,11 @@ void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text,
 void aout_FifoInit( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
                     uint32_t i_rate )
 {
+    if( i_rate == 0 )
+    {
+        msg_Err( p_aout, "initialising fifo with zero divider" );
+    }
+
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
     aout_DateInit( &p_fifo->end_date, i_rate );
@@ -424,11 +429,6 @@ void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
  *****************************************************************************/
 void aout_DateInit( audio_date_t * p_date, uint32_t i_divider )
 {
-    if( i_divider == 0 )
-    {
-        msg_Err( p_aout, "initialising date with zero divider" );
-    }
-
     p_date->date = 0;
     p_date->i_divider = i_divider;
     p_date->i_remainder = 0;
