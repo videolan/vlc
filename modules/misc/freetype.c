@@ -532,10 +532,6 @@ static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_
 static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
                    line_desc_t *p_line, int i_width, int i_height )
 {
-    static uint8_t pi_gamma[16] =
-        {0x00, 0x52, 0x84, 0x96, 0xb8, 0xca, 0xdc, 0xee, 0xff,
-          0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-
     uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
     video_format_t fmt;
     int i, x, y, i_pitch, i_alpha;
@@ -602,7 +598,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
         DrawBlack( p_line, i_width, p_region,  1,  0);
         DrawBlack( p_line, i_width, p_region,  0,  1);
     }
-    
+
     if( p_filter->p_sys->i_effect == EFFECT_OUTLINE_FAT )
     {
         DrawBlack( p_line, i_width, p_region, -1, -1);
@@ -670,7 +666,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
 
                         p_dst_u[i_offset+x] = i_u;
                         p_dst_v[i_offset+x] = i_v;
-                        
+
                         if( p_filter->p_sys->i_effect == EFFECT_BACKGROUND )
                             p_dst_a[i_offset+x] = 0xff;
                     }
@@ -679,7 +675,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
             }
         }
     }
-    
+
     /* Apply the alpha setting */
     for( i = 0; i < (int)fmt.i_height * i_pitch; i++ )
         p_dst_a[i] = p_dst_a[i] * (255 - i_alpha) / 255;
