@@ -785,7 +785,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
         case HTTPD_MSG_PLAY:
         {
-            char *psz_output, *psz_position, ip[NI_MAXNUMERICHOST];
+            char *psz_output, ip[NI_MAXNUMERICHOST];
             int i, i_port_audio = 0, i_port_video = 0;
 
             /* for now only multicast so easy */
@@ -807,14 +807,14 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( p_rtsp->b_playing )
             {
                 char *psz_position = httpd_MsgGet( query, "Range" );
+                char *psz_scale = httpd_MsgGet( query, "Scale" );
                 if( psz_position ) psz_position = strstr( psz_position, "npt=" );
-                if( psz_position )
+                if( psz_position && !psz_scale )
                 {
                     double f_pos;
                     char *end;
 
                     msg_Dbg( p_vod, "seeking request: %s", psz_position );
-
                     psz_position += 4;
                     /* FIXME: npt= is not necessarily formatted as a float */
                     f_pos = us_strtod( psz_position, &end );
@@ -823,6 +823,37 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                         f_pos /= ((double)(p_media->i_length))/1000 /1000 / 100;
                         vod_MediaControl( p_vod, p_media, psz_session,
                                       VOD_MEDIA_SEEK, f_pos );
+                    }
+                    break;
+                }
+                if( psz_scale )
+                {
+                    double f_scale = 0.0;
+                    char *end;
+
+                    f_scale = us_strtod( psz_scale, &end );
+                    if( end > psz_scale )
+                    {
+                        f_scale = (f_scale * 30.0);
+                        if( psz_scale[0] == '-' ) /* rewind */
+                        {
+                            msg_Dbg( p_vod, "rewind request: %s", psz_scale );
+                            vod_MediaControl( p_vod, p_media, psz_session,
+                                                VOD_MEDIA_REWIND, f_scale );
+                        }
+                        else if(psz_scale[0] != '1' ) /* fast-forward */
+                        {
+                            msg_Dbg( p_vod, "fastforward request: %s", psz_scale );
+                            vod_MediaControl( p_vod, p_media, psz_session,
+                                                VOD_MEDIA_FORWARD, f_scale );
+                        }
+
+                        if( p_rtsp->b_paused == VLC_TRUE )
+                        {
+                            p_rtsp->b_paused = VLC_FALSE;
+                            vod_MediaControl( p_vod, p_media, psz_session,
+                                                VOD_MEDIA_PAUSE, psz_output );
+                        }
                     }
                     break;
                 }

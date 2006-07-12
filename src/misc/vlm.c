@@ -1276,6 +1276,40 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
             }
         }
     }
+    else if( !strcmp( psz_command, "rewind" ) )
+    {
+        float f_pos;
+        float f_scale;
+        vlc_value_t val;
+
+        if( psz_args )
+        {
+            f_scale = i18n_atof( psz_args );
+            f_pos = var_GetFloat( p_instance->p_input, "position" );
+            val.f_float = f_pos - (f_scale / 1000.0);
+            if( val.f_float < 0.0 )
+                val.f_float = 0.0;
+            var_Set( p_instance->p_input, "position", val );
+            return VLC_SUCCESS;
+        }
+    }
+    else if( !strcmp( psz_command, "forward" ) )
+    {
+        float f_pos;
+        float f_scale;
+        vlc_value_t val;
+
+        if( psz_args )
+        {
+            f_scale = i18n_atof( psz_args );
+            f_pos = var_GetFloat( p_instance->p_input, "position" );
+            val.f_float = f_pos + (f_scale / 1000.0);
+            if( val.f_float > 1.0 )
+                val.f_float = 1.0;
+            var_Set( p_instance->p_input, "position", val );
+            return VLC_SUCCESS;
+        }
+    }
     else if( !strcmp( psz_command, "stop" ) )
     {
         TAB_REMOVE( media->i_instance, media->instance, p_instance );
@@ -2353,6 +2387,26 @@ int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
         break;
     }
 
+    case VOD_MEDIA_REWIND:
+    {
+        double f_scale = (double)va_arg( args, double );
+        char psz_scale[50];
+        lldiv_t div = lldiv( f_scale * 10000000, 10000000 );
+        sprintf( psz_scale, I64Fd".%07u", div.quot, (unsigned int) div.rem );
+        i_ret = vlm_MediaControl( vlm, vlm->media[i], psz_id, "rewind", psz_scale );
+        break;
+    }
+
+    case VOD_MEDIA_FORWARD:
+    {
+        double f_scale = (double)va_arg( args, double );
+        char psz_scale[50];
+        lldiv_t div = lldiv( f_scale * 10000000, 10000000 );
+        sprintf( psz_scale, I64Fd".%07u", div.quot, (unsigned int) div.rem );
+        i_ret = vlm_MediaControl( vlm, vlm->media[i], psz_id, "forward", psz_scale );
+        break;
+    }
+
     default:
         break;
     }
@@ -2361,6 +2415,7 @@ int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
 
     return i_ret;
 }
+
 
 /*****************************************************************************
  * Manage:

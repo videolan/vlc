@@ -85,6 +85,7 @@ Jonas Larsen <jonas at vrt.dk> - Danish translation
 Julien Blache <jb at technologeek.org> - disc ejection code
 kty0ne - WinAmp 5 skin for VLC
 Kevin H. Patterson <kevpatt at khptech dot com> - Theora framesize calculation patch by Kevin H. Patterson (kevpatt at khptech dot com
+K. Staring <qdk at quickdekay dot net> - RTSP rewind and fast-forward support
 Laurent Jonqueres <laurent_jonqueres at yahoo.fr> - Occitan localization
 Laurent Mutricy <laurent.mutricy at ecl2005 dot ec-lyon dot fr> - HTTP interface fixes
 Lorena Gomes - Catalan translation
