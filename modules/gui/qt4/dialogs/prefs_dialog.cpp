@@ -1,8 +1,8 @@
 /*****************************************************************************
  * prefs_dialog.cpp : Preferences
  ****************************************************************************
- * Copyright (C) 2000-2005 the VideoLAN team
- * $Id: wxwidgets.cpp 15731 2006-05-25 14:43:53Z zorglub $
+ * Copyright (C) 2006 the VideoLAN team
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *

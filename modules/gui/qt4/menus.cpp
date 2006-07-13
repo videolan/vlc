@@ -1,8 +1,8 @@
 /*****************************************************************************
  * menus.cpp : Qt menus
  *****************************************************************************
- * Copyright (C) 2000-2004 the VideoLAN team
- * $Id: menus.cpp 15858 2006-06-09 21:35:13Z gbazin $
+ * Copyright (C) 2006 the VideoLAN team
+ * $Id$
  *
  * Authors: Cl√ment Stenac <zorglub@videolan.org>
  *
