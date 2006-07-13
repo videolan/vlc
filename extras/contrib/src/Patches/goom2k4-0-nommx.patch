@@ -1,0 +1,11 @@
+--- configure.in.orig	2006-07-13 17:23:23.000000000 +0200
++++ configure.in	2006-07-13 17:23:37.000000000 +0200
+@@ -58,7 +58,7 @@
+ dnl ARCH
+ case "$host" in
+ i*86-*-*)
+-	AC_DEFINE(HAVE_MMX)
++#	AC_DEFINE(HAVE_MMX)
+ 	AC_DEFINE(CPU_X86)
+ 	HAVE_MMX="yes"
+ 	;;
