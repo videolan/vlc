@@ -157,7 +157,7 @@ libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
 libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin|sed -e 's/\(modules\/[^ ]*\)\.a /\1_builtin.la /g'` \
-		-avoid-version -no-undefined
+		-avoid-version -no-undefined -shrext $(LIBEXT).0d
 libvlc_la_DEPENDENCIES = stamp-builtins
 
 
@@ -348,16 +348,10 @@ SOURCES_libvlc = \
 	$(OPT_SOURCES_libvlc_getopt) \
 	$(NULL)
 
-
 if !USE_LIBTOOL
 if !BUILD_SHARED
 SOURCES_libvlc += misc/version.c
 CLEANFILES += misc/version.c
-
-misc/version.c: FORCE
-	$(TOOLBOX) --update-version
-FORCE:
-
 endif
 
 # Install shared libvlc
@@ -368,6 +362,9 @@ install-exec-local:
 uninstall-local:
 	test -z "$(DATA_noinst_libvlc)" || rm -f "$(DESTDIR)$(libdir)/$(DATA_noinst_libvlc)"
 endif
+
+misc/version.c: FORCE
+	$(TOOLBOX) --update-version
 
 ###############################################################################
 # Stamp rules
@@ -395,3 +392,4 @@ test_url_LDADD = libvlc.la
 test_url_CFLAGS = $(CFLAGS_tests)
 endif
 
+FORCE:
