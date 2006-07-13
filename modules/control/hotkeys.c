@@ -920,7 +920,7 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
     if( p_playlist )
     {
         char *psz_bookmark = strdup( val.psz_string );
-        for( i = 0; i < p_playlist->pp_all_items; i++)
+        for( i = 0; i < p_playlist->i_size; i++)
         {
             if( !strcmp( psz_bookmark,
                          p_playlist->pp_items[i]->p_input->psz_uri ) )
