@@ -52,7 +52,7 @@ fi
 
 # Check for automake
 amvers="no"
-for v in "-1.9" "19" "-1.8" "18" "-1.7" "17"; do
+for v in "-1.7" "-1.9" "19" "-1.8" "18" "-1.7" "17"; do
   if automake${v} --version >/dev/null 2>&1; then
     amsuff="${v}"
     amvers="${v}"
@@ -377,7 +377,7 @@ lib${mod}_plugin_la_CFLAGS = \`\$(VLC_CONFIG) --cflags plugin ${mod}\`
 lib${mod}_plugin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags plugin ${mod}\`
 lib${mod}_plugin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags plugin ${mod}\`
 lib${mod}_plugin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs plugin ${mod}\` \\
-	-rpath '\$(libvlcdir)' -module -shrext \$(LIBEXT)
+	-rpath '\$(libvlcdir)' -avoid-version -module -shrext \$(LIBEXT)
 lib${mod}_plugin_la_LIBADD = \$(LTLIBVLC)
 
 lib${mod}_a_SOURCES = \$(SOURCES_${mod})
