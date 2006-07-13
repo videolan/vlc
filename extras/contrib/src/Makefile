@@ -1057,8 +1057,8 @@ ifdef HAVE_DARWIN_OS
 	(cd $<; sed -e 's%EXTRA_CFLAGS%$(EXTRA_CFLAGS)%' -e 's%EXTRA_LDFLAGS%$(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
 	(cd $<; ./genMakefiles macosx && make)
 else
-	(cd $<; if [ ! -f groupsock/Makefile.head.orig ] then ; sed -e 's/=/= $$\(EXTRA_CPPFLAGS\)/'  -e 's%EXTRA_CPPFLAGS%$(EXTRA_CPPFLAGS)%' -e 's/$$\(//' -e 's/\)//' -i.orig groupsock/Makefile.head fi )
-	(cd $<; ./genMakefiles && make $(HOSTCC))
+	(cd $<; sed -e 's/=/= EXTRA_CPPFLAGS/' -e 's%EXTRA_CPPFLAGS%-I/include%' -i.orig groupsock/Makefile.head)
+	(cd $<; ./genMakefiles linux && make $(HOSTCC))
 endif
 endif
 endif
