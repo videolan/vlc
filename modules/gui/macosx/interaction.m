@@ -158,7 +158,14 @@
 
     if( p_dialog->i_id == DIALOG_ERRORS )
     {
-        msg_Err( p_intf, "Error: %s", p_dialog->psz_description );
+        msg_Dbg( p_intf, "error panel requested" );
+        NSAlert * ourAlert = [NSAlert alertWithMessageText:
+            [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : _("Error")]
+            defaultButton: _NS("OK") alternateButton: nil otherButton: nil 
+            informativeTextWithFormat: 
+            [NSString stringWithUTF8String:p_dialog->psz_description]];
+        [ourAlert setAlertStyle: NSWarningAlertStyle];
+        [ourAlert runModal];
     }
     else
     {
