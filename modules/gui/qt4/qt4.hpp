@@ -44,6 +44,7 @@ struct intf_sys_t
 };
 
 #define THEPL p_intf->p_sys->p_playlist
+#define THEDP DialogsProvider::getInstance()
 
 static int DialogEvent_Type = QEvent::User + 1;
 

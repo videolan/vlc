@@ -16,6 +16,7 @@ TOUI = ui/input_stats ui/main_interface ui/file_open \
 UIH = $(TOUI:%=%.h)
 
 TOMOC = main_interface \
+    menus \
 	dialogs_provider \
 	input_manager \
 	playlist_model \
@@ -34,6 +35,7 @@ MOCCPP = $(TOMOC:%=%.moc.cpp)
 
 nodist_SOURCES_qt4 = \
 		main_interface.moc.cpp \
+        menus.moc.cpp \
 		dialogs_provider.moc.cpp \
 		input_manager.moc.cpp \
 		playlist_model.moc.cpp \
@@ -70,6 +72,7 @@ $(UIH): %.h: %.ui
 
 
 SOURCES_qt4 = 	qt4.cpp \
+        menus.cpp \
 		main_interface.cpp \
 		dialogs_provider.cpp \
 		input_manager.cpp \
@@ -89,6 +92,7 @@ SOURCES_qt4 = 	qt4.cpp \
 
 EXTRA_DIST += \
 	qt4.hpp \
+    menus.hpp
 	main_interface.hpp \
 	dialogs_provider.hpp \
 	input_manager.hpp \
@@ -104,6 +108,7 @@ EXTRA_DIST += \
 	components/open.hpp \
 	components/video_widget.hpp \
 	components/playlist/panels.hpp \
+    components/playlist/selector.hpp \
 	util/input_slider.hpp \
 	ui/input_stats.ui \
 	ui/file_open.ui \

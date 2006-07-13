@@ -27,6 +27,8 @@
 #include "dialogs/prefs_dialog.hpp"
 #include "dialogs/streaminfo.hpp"
 #include <QApplication>
+#include <QSignalMapper>
+#include "menus.hpp"
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -38,12 +40,16 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
 
     fixed_timer = new QTimer( this );
     fixed_timer->start( 150 /* milliseconds */ );
+
+    menusMapper = new QSignalMapper();
+    connect( menusMapper, SIGNAL( mapped(QObject *) ), this,
+            SLOT(menuAction( QObject *)) );
+
 }
 
 DialogsProvider::~DialogsProvider()
 {
 }
-
 void DialogsProvider::customEvent( QEvent *event )
 {
     if( event->type() == DialogEvent_Type )
@@ -85,6 +91,10 @@ void DialogsProvider::playlistDialog()
     PlaylistDialog::getInstance( p_intf )->toggleVisible();
 }
 
+void DialogsProvider::openDialog()
+{
+    openDialog( 0 );
+}
 void DialogsProvider::openDialog( int i_dialog )
 {
 }
@@ -124,12 +134,25 @@ void DialogsProvider::streaminfoDialog()
     StreamInfoDialog::getInstance( p_intf, true )->toggleVisible();
 }
 
+void DialogsProvider::streamingDialog()
+{
+}
+
 void DialogsProvider::prefsDialog()
 {
     PrefsDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::messagesDialog()
+{
+}
+
+void DialogsProvider::menuAction( QObject *data )
+{
+    QVLCMenu::DoAction( p_intf, data );
+}
+
+void DialogsProvider::simpleOpenDialog()
 {
 }
 

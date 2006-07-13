@@ -29,13 +29,21 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include "dialogs/interaction.hpp"
+#include <assert.h>
 
 class QEvent;
+class QSignalMapper;
+class QVLCMenu;
 
 class DialogsProvider : public QObject
 {
     Q_OBJECT;
 public:
+    static DialogsProvider *getInstance() 
+    {
+        assert( instance );
+        return instance;
+    }
     static DialogsProvider *getInstance( intf_thread_t *p_intf )
     {
         if( !instance )
@@ -46,6 +54,8 @@ public:
     QTimer *idle_timer;
     QTimer *fixed_timer;
 protected:
+    friend class QVLCMenu;
+    QSignalMapper *menusMapper;
     void customEvent( QEvent *);
 private:
     DialogsProvider( intf_thread_t *);
@@ -57,9 +67,13 @@ public slots:
     void streaminfoDialog();
     void prefsDialog();
     void messagesDialog();
+    void simpleOpenDialog();
+    void openDialog();
     void openDialog( int );
     void popupMenu( int );
     void doInteraction( intf_dialog_args_t * );
+    void menuAction( QObject *);
+    void streamingDialog();
 };
 
 
