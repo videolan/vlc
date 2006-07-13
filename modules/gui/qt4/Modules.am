@@ -101,7 +101,7 @@ EXTRA_DIST += \
 	dialogs/playlist.hpp \
 	dialogs/streaminfo.hpp \
 	dialogs/prefs_dialog.hpp \
-	dialogs/interaction.cpp \
+	dialogs/interaction.hpp \
 	components/infopanels.hpp \
 	components/preferences_widgets.hpp \
 	components/preferences.hpp \
@@ -110,6 +110,8 @@ EXTRA_DIST += \
 	components/playlist/panels.hpp \
         components/playlist/selector.hpp \
 	util/input_slider.hpp \
+	util/directslider.hpp \
+	util/qvlcframe.hpp \
 	ui/input_stats.ui \
 	ui/file_open.ui \
 	ui/main_interface.ui \
