@@ -1,5 +1,5 @@
 /*****************************************************************************
- * distort.c : Misc video effects plugin for vlc
+ * gradient.c : Gradient and edge detection video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2006 the VideoLAN team
  * $Id$
@@ -31,12 +31,12 @@
 #include <math.h>                                            /* sin(), cos() */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc/sout.h>
+#include <vlc/decoder.h>
 
-#include "filter_common.h"
-#include "vlc_image.h"
+#include "vlc_filter.h"
 
-enum { WAVE, RIPPLE, GRADIENT, EDGE, HOUGH, PSYCHEDELIC };
+enum { GRADIENT, EDGE, HOUGH };
 
 /*****************************************************************************
  * Local prototypes
@@ -44,25 +44,17 @@ enum { WAVE, RIPPLE, GRADIENT, EDGE, HOUGH, PSYCHEDELIC };
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static void Render    ( vout_thread_t *, picture_t * );
+static picture_t *Filter( filter_t *, picture_t * );
 
-static void DistortWave    ( vout_thread_t *, picture_t *, picture_t * );
-static void DistortRipple  ( vout_thread_t *, picture_t *, picture_t * );
-static void DistortGradient( vout_thread_t *, picture_t *, picture_t * );
-static void DistortEdge    ( vout_thread_t *, picture_t *, picture_t * );
-static void DistortHough   ( vout_thread_t *, picture_t *, picture_t * );
-static void DistortPsychedelic( vout_thread_t *, picture_t *, picture_t * );
-
-static int  SendEvents   ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
+static void FilterGradient( filter_t *, picture_t *, picture_t * );
+static void FilterEdge    ( filter_t *, picture_t *, picture_t * );
+static void FilterHough   ( filter_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 #define MODE_TEXT N_("Distort mode")
-#define MODE_LONGTEXT N_("Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough\" and \"psychedelic\".")
+#define MODE_LONGTEXT N_("Distort mode, one of \"gradient\", \"edge\" and \"hough\".")
 
 #define GRADIENT_TEXT N_("Gradient image type")
 #define GRADIENT_LONGTEXT N_("Gradient image type (0 or 1). 0 will " \
@@ -72,30 +64,34 @@ static int  SendEvents   ( vlc_object_t *, char const *,
 #define CARTOON_LONGTEXT N_("Apply cartoon effect. It is only used by " \
     "\"gradient\" and \"edge\".")
 
-static char *mode_list[] = { "wave", "ripple", "gradient", "edge", "hough",
-                             "psychedelic" };
-static char *mode_list_text[] = { N_("Wave"), N_("Ripple"), N_("Gradient"),
-                                  N_("Edge"), N_("Hough"), N_("Psychedelic") };
+static char *mode_list[] = { "gradient", "edge", "hough" };
+static char *mode_list_text[] = { N_("Gradient"), N_("Edge"), N_("Hough") };
+
+#define FILTER_PREFIX "gradient-"
 
 vlc_module_begin();
-    set_description( _("Distort video filter") );
-    set_shortname( N_( "Distortion" ));
-    set_capability( "video filter", 0 );
+    set_description( _("Gradient video filter") );
+    set_shortname( N_( "Gradient" ));
+    set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
+    set_subcategory( SUBCAT_VIDEO_VFILTER2 );
 
-    add_string( "distort-mode", "wave", NULL, MODE_TEXT, MODE_LONGTEXT,
-                VLC_FALSE );
+    add_string( FILTER_PREFIX "mode", "gradient", NULL,
+                MODE_TEXT, MODE_LONGTEXT, VLC_FALSE );
         change_string_list( mode_list, mode_list_text, 0 );
 
-    add_integer_with_range( "distort-gradient-type", 0, 0, 1, NULL,
+    add_integer_with_range( FILTER_PREFIX "type", 0, 0, 1, NULL,
                 GRADIENT_TEXT, GRADIENT_LONGTEXT, VLC_FALSE );
-    add_bool( "distort-cartoon", 1, NULL,
+    add_bool( FILTER_PREFIX "cartoon", 1, NULL,
                 CARTOON_TEXT, CARTOON_LONGTEXT, VLC_FALSE );
 
-    add_shortcut( "distort" );
+    add_shortcut( "gradient" );
     set_callbacks( Create, Destroy );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "mode", "type", "cartoon", NULL
+};
 
 /*****************************************************************************
  * vout_sys_t: Distort video output method descriptor
@@ -103,36 +99,17 @@ vlc_module_end();
  * This structure is part of the video output thread descriptor.
  * It describes the Distort specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_t
+struct filter_sys_t
 {
     int i_mode;
-    vout_thread_t *p_vout;
-
-    /* For the wave mode */
-    double  f_angle;
-    mtime_t last_date;
 
     /* For the gradient mode */
     int i_gradient_type;
     vlc_bool_t b_cartoon;
 
-    /* For pyschedelic mode */
-    image_handler_t *p_image;
-    unsigned int x, y, scale;
-    int xinc, yinc, scaleinc;
-    uint8_t u,v;
-
     /* For hough mode */
     int *p_pre_hough;
 };
-
-/*****************************************************************************
- * Control: control facility for the vout (forwards to child vout)
- *****************************************************************************/
-static int Control( vout_thread_t *p_vout, int i_query, va_list args )
-{
-    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
-}
 
 /*****************************************************************************
  * Create: allocates Distort video thread output method
@@ -141,142 +118,65 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    char *psz_method, *psz_method_tmp;
+    filter_t *p_filter = (filter_t *)p_this;
+    char *psz_method;
 
     /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
+    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
+    if( p_filter->p_sys == NULL )
     {
-        msg_Err( p_vout, "out of memory" );
+        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
 
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
-    p_vout->pf_render = Render;
-    p_vout->pf_display = NULL;
-    p_vout->pf_control = Control;
+    p_filter->pf_video_filter = Filter;
 
-    p_vout->p_sys->i_mode = 0;
-    p_vout->p_sys->p_pre_hough = NULL;
+    p_filter->p_sys->p_pre_hough = NULL;
 
-    if( !(psz_method = psz_method_tmp
-          = config_GetPsz( p_vout, "distort-mode" )) )
+    sout_CfgParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
+                   p_filter->p_cfg );
+
+    var_Create( p_filter, FILTER_PREFIX "mode",
+                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, FILTER_PREFIX "type",
+                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, FILTER_PREFIX "cartoon",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+
+    if( !(psz_method = var_GetString( p_filter, FILTER_PREFIX "mode" )) )
     {
-        msg_Err( p_vout, "configuration variable %s empty, using 'wave'",
-                         "distort-mode" );
-        p_vout->p_sys->i_mode = WAVE;
+        msg_Err( p_filter, "configuration variable "
+                 FILTER_PREFIX "mode empty" );
+        p_filter->p_sys->i_mode = GRADIENT;
     }
     else
     {
-        if( !strcmp( psz_method, "wave" ) )
+        if( !strcmp( psz_method, "gradient" ) )
         {
-            p_vout->p_sys->i_mode = WAVE;
-        }
-        else if( !strcmp( psz_method, "ripple" ) )
-        {
-            p_vout->p_sys->i_mode = RIPPLE;
-        }
-        else if( !strcmp( psz_method, "gradient" ) )
-        {
-            p_vout->p_sys->i_mode = GRADIENT;
+            p_filter->p_sys->i_mode = GRADIENT;
         }
         else if( !strcmp( psz_method, "edge" ) )
         {
-            p_vout->p_sys->i_mode = EDGE;
+            p_filter->p_sys->i_mode = EDGE;
         }
         else if( !strcmp( psz_method, "hough" ) )
         {
-            p_vout->p_sys->i_mode = HOUGH;
-        }
-        else if( !strcmp( psz_method, "psychedelic" ) )
-        {
-            p_vout->p_sys->i_mode = PSYCHEDELIC;
-            p_vout->p_sys->x = 10;
-            p_vout->p_sys->y = 10;
-            p_vout->p_sys->scale = 1;
-            p_vout->p_sys->xinc = 1;
-            p_vout->p_sys->yinc = 1;
-            p_vout->p_sys->scaleinc = 1;
-            p_vout->p_sys->u = 0;
-            p_vout->p_sys->v = 0;
+            p_filter->p_sys->i_mode = HOUGH;
         }
         else
         {
-            msg_Err( p_vout, "no valid distort mode provided, using wave" );
-            p_vout->p_sys->i_mode = WAVE;
+            msg_Err( p_filter, "no valid gradient mode provided" );
+            p_filter->p_sys->i_mode = GRADIENT;
         }
     }
-    free( psz_method_tmp );
+    free( psz_method );
 
-    p_vout->p_sys->i_gradient_type =
-        config_GetInt( p_vout, "distort-gradient-type" );
-    p_vout->p_sys->b_cartoon =
-        config_GetInt( p_vout, "distort-cartoon" );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Init: initialize Distort video thread output method
- *****************************************************************************/
-static int Init( vout_thread_t *p_vout )
-{
-    int i_index;
-    picture_t *p_pic;
-    video_format_t fmt = {0};
-
-    I_OUTPUTPICTURES = 0;
-
-    /* Initialize the output structure */
-    p_vout->output.i_chroma = p_vout->render.i_chroma;
-    p_vout->output.i_width  = p_vout->render.i_width;
-    p_vout->output.i_height = p_vout->render.i_height;
-    p_vout->output.i_aspect = p_vout->render.i_aspect;
-    p_vout->fmt_out = p_vout->fmt_in;
-    fmt = p_vout->fmt_out;
-
-    /* Try to open the real video output */
-    msg_Dbg( p_vout, "spawning the real video output" );
-
-    p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
-
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout == NULL )
-    {
-        msg_Err( p_vout, "cannot open vout, aborting" );
-        return VLC_EGENERIC;
-    }
-
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
-
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
-
-    p_vout->p_sys->f_angle = 0.0;
-    p_vout->p_sys->last_date = 0;
-
-    p_vout->p_sys->p_image = NULL;
+    p_filter->p_sys->i_gradient_type =
+        var_GetInteger( p_filter, FILTER_PREFIX "type" );
+    p_filter->p_sys->b_cartoon =
+        var_GetInteger( p_filter, FILTER_PREFIX "cartoon" );
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * End: terminate Distort video thread output method
- *****************************************************************************/
-static void End( vout_thread_t *p_vout )
-{
-    int i_index;
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
-    {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
-    }
 }
 
 /*****************************************************************************
@@ -286,24 +186,12 @@ static void End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 
-    if( p_vout->p_sys->p_vout )
-    {
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-        vlc_object_detach( p_vout->p_sys->p_vout );
-        vout_Destroy( p_vout->p_sys->p_vout );
-    }
+    if(p_filter->p_sys->p_pre_hough)
+        free(p_filter->p_sys->p_pre_hough);
 
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
-
-    if(p_vout->p_sys->p_pre_hough)
-        free(p_vout->p_sys->p_pre_hough);
-
-    if( p_vout->p_sys->p_image )
-        image_HandlerDelete( p_vout->p_sys->p_image );
-
-    free( p_vout->p_sys );
+    free( p_filter->p_sys );
 }
 
 /*****************************************************************************
@@ -313,202 +201,50 @@ static void Destroy( vlc_object_t *p_this )
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static void Render( vout_thread_t *p_vout, picture_t *p_pic )
+static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
 
-    /* This is a new frame. Get a structure from the video_output. */
-    while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
-              == NULL )
+    if( !p_pic ) return NULL;
+
+    p_outpic = p_filter->pf_vout_buffer_new( p_filter );
+    if( !p_outpic )
     {
-        if( p_vout->b_die || p_vout->b_error )
-        {
-            return;
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
+        msg_Warn( p_filter, "can't get output picture" );
+        if( p_pic->pf_release )
+            p_pic->pf_release( p_pic );
+        return NULL;
     }
 
-    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
-
-    switch( p_vout->p_sys->i_mode )
+    switch( p_filter->p_sys->i_mode )
     {
-        case WAVE:
-            DistortWave( p_vout, p_pic, p_outpic );
-            break;
-
-        case RIPPLE:
-            DistortRipple( p_vout, p_pic, p_outpic );
-            break;
-
         case EDGE:
-            DistortEdge( p_vout, p_pic, p_outpic );
+            FilterEdge( p_filter, p_pic, p_outpic );
             break;
 
         case GRADIENT:
-            DistortGradient( p_vout, p_pic, p_outpic );
+            FilterGradient( p_filter, p_pic, p_outpic );
             break;
 
         case HOUGH:
-            DistortHough( p_vout, p_pic, p_outpic );
-            break;
-
-        case PSYCHEDELIC:
-            DistortPsychedelic( p_vout, p_pic, p_outpic );
+            FilterHough( p_filter, p_pic, p_outpic );
             break;
 
         default:
             break;
     }
 
-    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+    p_outpic->date = p_pic->date;
+    p_outpic->b_force = p_pic->b_force;
+    p_outpic->i_nb_fields = p_pic->i_nb_fields;
+    p_outpic->b_progressive = p_pic->b_progressive;
+    p_outpic->b_top_field_first = p_pic->b_top_field_first;
+
+    p_pic->pf_release( p_pic );
+
+    return p_outpic;
 }
 
-/*****************************************************************************
- * DistortWave: draw a wave effect on the picture
- *****************************************************************************/
-static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
-                                                picture_t *p_outpic )
-{
-    int i_index;
-    double f_angle;
-    mtime_t new_date = mdate();
-
-    p_vout->p_sys->f_angle += (new_date - p_vout->p_sys->last_date) / 200000.0;
-    p_vout->p_sys->last_date = new_date;
-    f_angle = p_vout->p_sys->f_angle;
-
-    for( i_index = 0 ; i_index < p_inpic->i_planes ; i_index++ )
-    {
-        int i_line, i_num_lines, i_offset;
-        uint8_t black_pixel;
-        uint8_t *p_in, *p_out;
-
-        p_in = p_inpic->p[i_index].p_pixels;
-        p_out = p_outpic->p[i_index].p_pixels;
-
-        i_num_lines = p_inpic->p[i_index].i_visible_lines;
-
-        black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
-
-        /* Ok, we do 3 times the sin() calculation for each line. So what ? */
-        for( i_line = 0 ; i_line < i_num_lines ; i_line++ )
-        {
-            /* Calculate today's offset, don't go above 1/20th of the screen */
-            i_offset = (int)( (double)(p_inpic->p[i_index].i_visible_pitch)
-                         * sin( f_angle + 10.0 * (double)i_line
-                                               / (double)i_num_lines )
-                         / 20.0 );
-
-            if( i_offset )
-            {
-                if( i_offset < 0 )
-                {
-                    p_vout->p_vlc->pf_memcpy( p_out, p_in - i_offset,
-                             p_inpic->p[i_index].i_visible_pitch + i_offset );
-                    p_in += p_inpic->p[i_index].i_pitch;
-                    p_out += p_outpic->p[i_index].i_pitch;
-                    memset( p_out + i_offset, black_pixel, -i_offset );
-                }
-                else
-                {
-                    p_vout->p_vlc->pf_memcpy( p_out + i_offset, p_in,
-                             p_inpic->p[i_index].i_visible_pitch - i_offset );
-                    memset( p_out, black_pixel, i_offset );
-                    p_in += p_inpic->p[i_index].i_pitch;
-                    p_out += p_outpic->p[i_index].i_pitch;
-                }
-            }
-            else
-            {
-                p_vout->p_vlc->pf_memcpy( p_out, p_in,
-                                          p_inpic->p[i_index].i_visible_pitch );
-                p_in += p_inpic->p[i_index].i_pitch;
-                p_out += p_outpic->p[i_index].i_pitch;
-            }
-
-        }
-    }
-}
-
-/*****************************************************************************
- * DistortRipple: draw a ripple effect at the bottom of the picture
- *****************************************************************************/
-static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
-                                                  picture_t *p_outpic )
-{
-    int i_index;
-    double f_angle;
-    mtime_t new_date = mdate();
-
-    p_vout->p_sys->f_angle -= (p_vout->p_sys->last_date - new_date) / 100000.0;
-    p_vout->p_sys->last_date = new_date;
-    f_angle = p_vout->p_sys->f_angle;
-
-    for( i_index = 0 ; i_index < p_inpic->i_planes ; i_index++ )
-    {
-        int i_line, i_first_line, i_num_lines, i_offset;
-        uint8_t black_pixel;
-        uint8_t *p_in, *p_out;
-
-        black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
-
-        i_num_lines = p_inpic->p[i_index].i_visible_lines;
-
-        i_first_line = i_num_lines * 4 / 5;
-
-        p_in = p_inpic->p[i_index].p_pixels;
-        p_out = p_outpic->p[i_index].p_pixels;
-
-        for( i_line = 0 ; i_line < i_first_line ; i_line++ )
-        {
-            p_vout->p_vlc->pf_memcpy( p_out, p_in,
-                                      p_inpic->p[i_index].i_visible_pitch );
-            p_in += p_inpic->p[i_index].i_pitch;
-            p_out += p_outpic->p[i_index].i_pitch;
-        }
-
-        /* Ok, we do 3 times the sin() calculation for each line. So what ? */
-        for( i_line = i_first_line ; i_line < i_num_lines ; i_line++ )
-        {
-            /* Calculate today's offset, don't go above 1/20th of the screen */
-            i_offset = (int)( (double)(p_inpic->p[i_index].i_pitch)
-                         * sin( f_angle + 2.0 * (double)i_line
-                                              / (double)( 1 + i_line
-                                                            - i_first_line) )
-                         * (double)(i_line - i_first_line)
-                         / (double)i_num_lines
-                         / 8.0 );
-
-            if( i_offset )
-            {
-                if( i_offset < 0 )
-                {
-                    p_vout->p_vlc->pf_memcpy( p_out, p_in - i_offset,
-                             p_inpic->p[i_index].i_visible_pitch + i_offset );
-                    p_in -= p_inpic->p[i_index].i_pitch;
-                    p_out += p_outpic->p[i_index].i_pitch;
-                    memset( p_out + i_offset, black_pixel, -i_offset );
-                }
-                else
-                {
-                    p_vout->p_vlc->pf_memcpy( p_out + i_offset, p_in,
-                             p_inpic->p[i_index].i_visible_pitch - i_offset );
-                    memset( p_out, black_pixel, i_offset );
-                    p_in -= p_inpic->p[i_index].i_pitch;
-                    p_out += p_outpic->p[i_index].i_pitch;
-                }
-            }
-            else
-            {
-                p_vout->p_vlc->pf_memcpy( p_out, p_in,
-                                          p_inpic->p[i_index].i_visible_pitch );
-                p_in -= p_inpic->p[i_index].i_pitch;
-                p_out += p_outpic->p[i_index].i_pitch;
-            }
-
-        }
-    }
-}
 
 /*****************************************************************************
  * Gaussian Convolution
@@ -570,10 +306,10 @@ static void GaussianConvolution( picture_t *p_inpic, uint32_t *p_smooth )
 }
 
 /*****************************************************************************
- * DistortGradient: Sobel
+ * FilterGradient: Sobel
  *****************************************************************************/
-static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
-                                                  picture_t *p_outpic )
+static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
+                                                picture_t *p_outpic )
 {
     int x, y;
     int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
@@ -588,20 +324,20 @@ static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
 
     if( !p_smooth ) return;
 
-    if( p_vout->p_sys->b_cartoon )
+    if( p_filter->p_sys->b_cartoon )
     {
-        p_vout->p_vlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
+        p_filter->p_vlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
             p_inpic->p[U_PLANE].p_pixels,
             p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        p_vout->p_vlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
+        p_filter->p_vlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
             p_inpic->p[V_PLANE].p_pixels,
             p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
     }
     else
     {
-        p_vout->p_vlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
+        p_filter->p_vlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
             p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        p_vout->p_vlc->pf_memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
+        p_filter->p_vlc->pf_memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
             p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
     }
 
@@ -637,9 +373,9 @@ static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
                    - p_smooth[(y+1)*i_src_visible+x+1] )
               )
             );
-            if( p_vout->p_sys->i_gradient_type )
+            if( p_filter->p_sys->i_gradient_type )
             {
-                if( p_vout->p_sys->b_cartoon )
+                if( p_filter->p_sys->b_cartoon )
                 {
                     if( a > 60 )
                     {
@@ -683,7 +419,7 @@ static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
 }
 
 /*****************************************************************************
- * DistortEdge: Canny edge detection algorithm
+ * FilterEdge: Canny edge detection algorithm
  *****************************************************************************
  * http://fourier.eng.hmc.edu/e161/lectures/canny/node1.html
  * (well ... my implementation isn't really the canny algorithm ... but some
@@ -697,8 +433,8 @@ static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
 #define THETA_P 2
 /* angle : \ */
 #define THETA_M 3
-static void DistortEdge( vout_thread_t *p_vout, picture_t *p_inpic,
-                                                  picture_t *p_outpic )
+static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
+                                            picture_t *p_outpic )
 {
     int x, y;
 
@@ -716,20 +452,20 @@ static void DistortEdge( vout_thread_t *p_vout, picture_t *p_inpic,
 
     if( !p_smooth || !p_grad || !p_theta ) return;
 
-    if( p_vout->p_sys->b_cartoon )
+    if( p_filter->p_sys->b_cartoon )
     {
-        p_vout->p_vlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
+        p_filter->p_vlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
             p_inpic->p[U_PLANE].p_pixels,
             p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        p_vout->p_vlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
+        p_filter->p_vlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
             p_inpic->p[V_PLANE].p_pixels,
             p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
     }
     else
     {
-        p_vout->p_vlc->pf_memset( p_outpic->p[Y_PLANE].p_pixels, 0xff,
+        p_filter->p_vlc->pf_memset( p_outpic->p[Y_PLANE].p_pixels, 0xff,
               p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
-        p_vout->p_vlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
+        p_filter->p_vlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
             p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
         memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
             p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
@@ -822,7 +558,7 @@ static void DistortEdge( vout_thread_t *p_vout, picture_t *p_inpic,
             else
             {
                 colorize:
-                if( p_vout->p_sys->b_cartoon )
+                if( p_filter->p_sys->b_cartoon )
                 {
                     if( p_smooth[y*i_src_visible+x] > 0xa0 )
                         p_outpix[y*i_dst_pitch+x] = (uint8_t)
@@ -846,11 +582,11 @@ static void DistortEdge( vout_thread_t *p_vout, picture_t *p_inpic,
 }
 
 /*****************************************************************************
- * DistortHough
+ * FilterHough
  *****************************************************************************/
-#define p_pre_hough p_vout->p_sys->p_pre_hough
-static void DistortHough( vout_thread_t *p_vout, picture_t *p_inpic,
-                                                  picture_t *p_outpic )
+#define p_pre_hough p_filter->p_sys->p_pre_hough
+static void FilterHough( filter_t *p_filter, picture_t *p_inpic,
+                                             picture_t *p_outpic )
 {
     int x, y, i;
     int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
@@ -874,7 +610,7 @@ static void DistortHough( vout_thread_t *p_vout, picture_t *p_inpic,
 
     if( ! p_pre_hough )
     {
-        msg_Dbg(p_vout, "Starting precalculation");
+        msg_Dbg(p_filter, "Starting precalculation");
         p_pre_hough = malloc( i_num_lines*i_src_visible*i_nb_steps*sizeof(int));
         if( ! p_pre_hough ) return;
         for( i = 0 ; i < i_nb_steps ; i++)
@@ -888,18 +624,18 @@ static void DistortHough( vout_thread_t *p_vout, picture_t *p_inpic,
                         ceil(x*d_sin + y*d_cos);
                 }
         }
-        msg_Dbg(p_vout, "Precalculation done");
+        msg_Dbg(p_filter, "Precalculation done");
     }
 
     memset( p_hough, 0, i_diag * i_nb_steps * sizeof(int) );
 
-    p_vout->p_vlc->pf_memcpy(
+    p_filter->p_vlc->pf_memcpy(
         p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
         p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
-    p_vout->p_vlc->pf_memcpy(
+    p_filter->p_vlc->pf_memcpy(
         p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
         p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-    p_vout->p_vlc->pf_memcpy(
+    p_filter->p_vlc->pf_memcpy(
         p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
         p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
 
@@ -970,132 +706,3 @@ static void DistortHough( vout_thread_t *p_vout, picture_t *p_inpic,
     if( p_smooth ) free( p_smooth );
 }
 #undef p_pre_hough
-
-/*****************************************************************************
- * DistortPsychedelic
- *****************************************************************************/
-static void DistortPsychedelic( vout_thread_t *p_vout, picture_t *p_inpic,
-                                                  picture_t *p_outpic )
-{
-    unsigned int w, h;
-    int x,y;
-    uint8_t u,v;
-
-    video_format_t fmt_out = {0};
-    picture_t *p_converted;
-
-    if( !p_vout->p_sys->p_image )
-        p_vout->p_sys->p_image = image_HandlerCreate( p_vout );
-
-    /* chrominance */
-    u = p_vout->p_sys->u;
-    v = p_vout->p_sys->v;
-    for( y = 0; y<p_outpic->p[U_PLANE].i_lines; y++)
-    {
-        memset( p_outpic->p[U_PLANE].p_pixels+y*p_outpic->p[U_PLANE].i_pitch,
-                u, p_outpic->p[U_PLANE].i_pitch );
-        memset( p_outpic->p[V_PLANE].p_pixels+y*p_outpic->p[V_PLANE].i_pitch,
-                v, p_outpic->p[V_PLANE].i_pitch );
-        if( v == 0 && u != 0 )
-            u --;
-        else if( u == 0xff )
-            v --;
-        else if( v == 0xff )
-            u ++;
-        else if( u == 0 )
-            v ++;
-    }
-
-    /* luminance */
-    p_vout->p_vlc->pf_memcpy(
-                p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
-                p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
-
-
-    /* image visualization */
-    fmt_out = p_vout->fmt_out;
-    fmt_out.i_width = p_vout->render.i_width*p_vout->p_sys->scale/150;
-    fmt_out.i_height = p_vout->render.i_height*p_vout->p_sys->scale/150;
-    p_converted = image_Convert( p_vout->p_sys->p_image, p_inpic,
-                                 &(p_inpic->format), &fmt_out );
-
-#define copyimage( plane, b ) \
-    for( y=0; y<p_converted->p[plane].i_visible_lines; y++) { \
-    for( x=0; x<p_converted->p[plane].i_visible_pitch; x++) { \
-        int nx, ny; \
-        if( p_vout->p_sys->yinc == 1 ) \
-            ny= y; \
-        else \
-            ny = p_converted->p[plane].i_visible_lines-y; \
-        if( p_vout->p_sys->xinc == 1 ) \
-            nx = x; \
-        else \
-            nx = p_converted->p[plane].i_visible_pitch-x; \
-        p_outpic->p[plane].p_pixels[(p_vout->p_sys->x*b+nx)+(ny+p_vout->p_sys->y*b)*p_outpic->p[plane].i_pitch ] = p_converted->p[plane].p_pixels[y*p_converted->p[plane].i_pitch+x]; \
-    } }
-    copyimage( Y_PLANE, 2 );
-    copyimage( U_PLANE, 1 );
-    copyimage( V_PLANE, 1 );
-#undef copyimage
-
-    p_converted->pf_release( p_converted );
-
-    p_vout->p_sys->x += p_vout->p_sys->xinc;
-    p_vout->p_sys->y += p_vout->p_sys->yinc;
-
-    p_vout->p_sys->scale += p_vout->p_sys->scaleinc;
-    if( p_vout->p_sys->scale >= 50 ) p_vout->p_sys->scaleinc = -1;
-    if( p_vout->p_sys->scale <= 1 ) p_vout->p_sys->scaleinc = 1;
-
-    w = p_vout->render.i_width*p_vout->p_sys->scale/150;
-    h = p_vout->render.i_height*p_vout->p_sys->scale/150;
-    if( p_vout->p_sys->x*2 + w >= p_vout->render.i_width )
-        p_vout->p_sys->xinc = -1;
-    if( p_vout->p_sys->x <= 0 )
-        p_vout->p_sys->xinc = 1;
-
-    if( p_vout->p_sys->x*2 + w >= p_vout->render.i_width )
-        p_vout->p_sys->x = (p_vout->render.i_width-w)/2;
-    if( p_vout->p_sys->y*2 + h >= p_vout->render.i_height )
-        p_vout->p_sys->y = (p_vout->render.i_height-h)/2;
-
-    if( p_vout->p_sys->y*2 + h >= p_vout->render.i_height )
-        p_vout->p_sys->yinc = -1;
-    if( p_vout->p_sys->y <= 0 )
-        p_vout->p_sys->yinc = 1;
-
-    for( y = 0; y< 16; y++ )
-    {
-        if( p_vout->p_sys->v == 0 && p_vout->p_sys->u != 0 )
-            p_vout->p_sys->u -= 1;
-        else if( p_vout->p_sys->u == 0xff )
-            p_vout->p_sys->v -= 1;
-        else if( p_vout->p_sys->v == 0xff )
-            p_vout->p_sys->u += 1;
-        else if( p_vout->p_sys->u == 0 )
-            p_vout->p_sys->v += 1;
-    }
-}
-
-
-/*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    var_Set( (vlc_object_t *)p_data, psz_var, newval );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
-    return VLC_SUCCESS;
-}
