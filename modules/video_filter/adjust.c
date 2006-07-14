@@ -1,10 +1,11 @@
 /*****************************************************************************
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001, 2002, 2003 the VideoLAN team
+ * Copyright (C) 2000-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>
+ *          Antoine Cellerier <dionoea -at- videolan d0t org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +31,10 @@
 #include <math.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc/sout.h>
+#include <vlc/decoder.h>
 
-#include "filter_common.h"
+#include "vlc_filter.h"
 
 #ifndef M_PI
 #   define M_PI 3.14159265358979323846
@@ -46,12 +48,7 @@
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static void Render    ( vout_thread_t *, picture_t * );
-
-static int  SendEvents( vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void * );
+static picture_t *Filter( filter_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -72,13 +69,12 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define GAMMA_TEXT N_("Image gamma (0-10)")
 #define GAMMA_LONGTEXT N_("Set the image gamma, between 0.01 and 10. Defaults to 1.")
 
-
 vlc_module_begin();
     set_description( _("Image properties filter") );
     set_shortname( N_("Image adjust" ));
     set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_capability( "video filter", 0 );
+    set_subcategory( SUBCAT_VIDEO_VFILTER2 );
+    set_capability( "video filter2", 0 );
 
     add_float_with_range( "contrast", 1.0, 0.0, 2.0, NULL,
                           CONT_TEXT, CONT_LONGTEXT, VLC_FALSE );
@@ -98,28 +94,21 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
+static const char *ppsz_filter_options[] = {
+    "contrast", "brightness", "hue", "saturation", "gamma",
+    "brightness-threshold", NULL
+};
+
 /*****************************************************************************
- * vout_sys_t: adjust video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the adjust specific properties of an output thread.
+ * filter_sys_t: adjust filter method descriptor
  *****************************************************************************/
-struct vout_sys_t
+struct filter_sys_t
 {
-    vout_thread_t *p_vout;
 };
 
 inline static int32_t clip( int32_t a )
 {
     return (a > 255) ? 255 : (a < 0) ? 0 : a;
-}
-
-/*****************************************************************************
- * Control: control facility for the vout (forwards to child vout)
- *****************************************************************************/
-static int Control( vout_thread_t *p_vout, int i_query, va_list args )
-{
-    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
 }
 
 /*****************************************************************************
@@ -129,93 +118,72 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 
-    /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
+    /* XXX: we might need to add/remove some FOURCCs ... */
+    if(   p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','Y','U','V')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','0')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','1','2')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','U','Y','V')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('U','Y','V','Y')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('U','Y','N','V')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','4','2','2')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('c','y','u','v')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','Y','2')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','N','V')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','Y','U')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','1','1')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','1','0')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','U','9')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','M','G','A')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','2')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','2')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','4','4')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','4','4')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','V','P')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','V','A') )
     {
-        msg_Err( p_vout, "out of memory" );
-        return VLC_ENOMEM;
-    }
-
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
-    p_vout->pf_render = Render;
-    p_vout->pf_display = NULL;
-    p_vout->pf_control = Control;
-
-    var_Create( p_vout, "contrast", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "brightness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "hue", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "saturation", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "gamma", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "brightness-threshold",
-                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Init: initialize adjust video thread output method
- *****************************************************************************/
-static int Init( vout_thread_t *p_vout )
-{
-    int i_index;
-    picture_t *p_pic;
-    video_format_t fmt = {0};
-
-    I_OUTPUTPICTURES = 0;
-
-    /* Initialize the output structure */
-    p_vout->output.i_chroma = p_vout->render.i_chroma;
-    p_vout->output.i_width  = p_vout->render.i_width;
-    p_vout->output.i_height = p_vout->render.i_height;
-    p_vout->output.i_aspect = p_vout->render.i_aspect;
-
-    fmt.i_width = fmt.i_visible_width = p_vout->render.i_width;
-    fmt.i_height = fmt.i_visible_height = p_vout->render.i_height;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    fmt.i_chroma = p_vout->render.i_chroma;
-    fmt.i_aspect = p_vout->render.i_aspect;
-    fmt.i_sar_num = p_vout->render.i_aspect * fmt.i_height / fmt.i_width;
-    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
-
-    /* Try to open the real video output */
-    msg_Dbg( p_vout, "spawning the real video output" );
-
-    p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
-
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout == NULL )
-    {
-        msg_Err( p_vout, "can't open vout, aborting" );
+        msg_Err( p_filter, "Unsupported input chroma (%4s)",
+                 (char*)&(p_filter->fmt_in.video.i_chroma) );
         return VLC_EGENERIC;
     }
 
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
+    if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
+    {
+        msg_Err( p_filter, "Input and output chromas don't match" );
+        return VLC_EGENERIC;
+    }
 
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+    /* Allocate structure */
+    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
+    if( p_filter->p_sys == NULL )
+    {
+        msg_Err( p_filter, "out of memory" );
+        return VLC_ENOMEM;
+    }
 
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
+    p_filter->pf_video_filter = Filter;
+
+    /* needed to get options passed in transcode using the
+     * adjust{name=value} syntax */
+    sout_CfgParse( p_filter, "", ppsz_filter_options,
+                   p_filter->p_cfg );
+
+    var_Create( p_filter, "contrast",
+                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, "brightness",
+                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, "hue",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, "saturation",
+                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, "gamma",
+                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, "brightness-threshold",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * End: terminate adjust video thread output method
- *****************************************************************************/
-static void End( vout_thread_t *p_vout )
-{
-    int i_index;
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
-    {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
-    }
 }
 
 /*****************************************************************************
@@ -225,18 +193,8 @@ static void End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
-    if( p_vout->p_sys->p_vout )
-    {
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-        vlc_object_detach( p_vout->p_sys->p_vout );
-        vout_Destroy( p_vout->p_sys->p_vout );
-    }
-
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
-
-    free( p_vout->p_sys );
+    filter_t *p_filter = (filter_t *)p_this;
+    free( p_filter->p_sys );
 }
 
 /*****************************************************************************
@@ -246,7 +204,7 @@ static void Destroy( vlc_object_t *p_this )
  * waits until it is displayed and switch the two rendering buffers, preparing
  * next frame.
  *****************************************************************************/
-static void Render( vout_thread_t *p_vout, picture_t *p_pic )
+static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     int pi_luma[256];
     int pi_gamma[256];
@@ -263,32 +221,29 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     int i;
     vlc_value_t val;
 
-    /* This is a new frame. Get a structure from the video_output. */
-    while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
-              == NULL )
+    if( !p_pic ) return NULL;
+
+    p_outpic = p_filter->pf_vout_buffer_new( p_filter );
+    if( !p_outpic )
     {
-        if( p_vout->b_die || p_vout->b_error )
-        {
-            return;
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
+        msg_Warn( p_filter, "can't get output picture" );
+        if( p_pic->pf_release )
+            p_pic->pf_release( p_pic );
+        return NULL;
     }
 
-    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
-    vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
-
     /* Getvariables */
-    var_Get( p_vout, "contrast", &val );
+    var_Get( p_filter, "contrast", &val );
     i_cont = (int) ( val.f_float * 255 );
-    var_Get( p_vout, "brightness", &val );
+    var_Get( p_filter, "brightness", &val );
     i_lum = (int) (( val.f_float - 1.0 ) * 255 );
-    var_Get( p_vout, "hue", &val );
+    var_Get( p_filter, "hue", &val );
     f_hue = (float) ( val.i_int * M_PI / 180 );
-    var_Get( p_vout, "saturation", &val );
+    var_Get( p_filter, "saturation", &val );
     i_sat = (int) (val.f_float * 256 );
-    var_Get( p_vout, "gamma", &val );
+    var_Get( p_filter, "gamma", &val );
     f_gamma = 1.0 / val.f_float;
-    var_Get( p_vout, "brightness-threshold", &val );
+    var_Get( p_filter, "brightness-threshold", &val );
     b_thres = (vlc_bool_t) ( val.b_bool );
 
     /*
@@ -334,14 +289,15 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
      * Do the Y plane
      */
 
-    p_in = p_pic->p[0].p_pixels;
-    p_in_end = p_in + p_pic->p[0].i_visible_lines * p_pic->p[0].i_pitch - 8;
+    p_in = p_pic->p[Y_PLANE].p_pixels;
+    p_in_end = p_in + p_pic->p[Y_PLANE].i_visible_lines
+                      * p_pic->p[Y_PLANE].i_pitch - 8;
 
-    p_out = p_outpic->p[0].p_pixels;
+    p_out = p_outpic->p[Y_PLANE].p_pixels;
 
     for( ; p_in < p_in_end ; )
     {
-        p_line_end = p_in + p_pic->p[0].i_visible_pitch - 8;
+        p_line_end = p_in + p_pic->p[Y_PLANE].i_visible_pitch - 8;
 
         for( ; p_in < p_line_end ; )
         {
@@ -359,20 +315,23 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             *p_out++ = pi_luma[ *p_in++ ];
         }
 
-        p_in += p_pic->p[0].i_pitch - p_pic->p[0].i_visible_pitch;
-        p_out += p_outpic->p[0].i_pitch - p_outpic->p[0].i_visible_pitch;
+        p_in += p_pic->p[Y_PLANE].i_pitch
+              - p_pic->p[Y_PLANE].i_visible_pitch;
+        p_out += p_outpic->p[Y_PLANE].i_pitch
+               - p_outpic->p[Y_PLANE].i_visible_pitch;
     }
 
     /*
      * Do the U and V planes
      */
 
-    p_in = p_pic->p[1].p_pixels;
-    p_in_v = p_pic->p[2].p_pixels;
-    p_in_end = p_in + p_pic->p[1].i_visible_lines * p_pic->p[1].i_pitch - 8;
+    p_in = p_pic->p[U_PLANE].p_pixels;
+    p_in_v = p_pic->p[V_PLANE].p_pixels;
+    p_in_end = p_in + p_pic->p[U_PLANE].i_visible_lines
+                      * p_pic->p[U_PLANE].i_pitch - 8;
 
-    p_out = p_outpic->p[1].p_pixels;
-    p_out_v = p_outpic->p[2].p_pixels;
+    p_out = p_outpic->p[U_PLANE].p_pixels;
+    p_out_v = p_outpic->p[V_PLANE].p_pixels;
 
     i_sin = sin(f_hue) * 256;
     i_cos = cos(f_hue) * 256;
@@ -393,7 +352,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         for( ; p_in < p_in_end ; )
         {
-            p_line_end = p_in + p_pic->p[1].i_visible_pitch - 8;
+            p_line_end = p_in + p_pic->p[U_PLANE].i_visible_pitch - 8;
 
             for( ; p_in < p_line_end ; )
             {
@@ -411,10 +370,14 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 WRITE_UV_CLIP();
             }
 
-            p_in += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
-            p_in_v += p_pic->p[2].i_pitch - p_pic->p[2].i_visible_pitch;
-            p_out += p_outpic->p[1].i_pitch - p_outpic->p[1].i_visible_pitch;
-            p_out_v += p_outpic->p[2].i_pitch - p_outpic->p[2].i_visible_pitch;
+            p_in += p_pic->p[U_PLANE].i_pitch
+                  - p_pic->p[U_PLANE].i_visible_pitch;
+            p_in_v += p_pic->p[V_PLANE].i_pitch
+                    - p_pic->p[V_PLANE].i_visible_pitch;
+            p_out += p_outpic->p[U_PLANE].i_pitch
+                   - p_outpic->p[U_PLANE].i_visible_pitch;
+            p_out_v += p_outpic->p[V_PLANE].i_pitch
+                     - p_outpic->p[V_PLANE].i_visible_pitch;
         }
     }
     else
@@ -430,7 +393,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         for( ; p_in < p_in_end ; )
         {
-            p_line_end = p_in + p_pic->p[1].i_visible_pitch - 8;
+            p_line_end = p_in + p_pic->p[U_PLANE].i_visible_pitch - 8;
 
             for( ; p_in < p_line_end ; )
             {
@@ -446,36 +409,24 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 WRITE_UV();
             }
 
-            p_in += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
-            p_in_v += p_pic->p[2].i_pitch - p_pic->p[2].i_visible_pitch;
-            p_out += p_outpic->p[1].i_pitch - p_outpic->p[1].i_visible_pitch;
-            p_out_v += p_outpic->p[2].i_pitch - p_outpic->p[2].i_visible_pitch;
+            p_in += p_pic->p[U_PLANE].i_pitch
+                  - p_pic->p[U_PLANE].i_visible_pitch;
+            p_in_v += p_pic->p[V_PLANE].i_pitch
+                    - p_pic->p[V_PLANE].i_visible_pitch;
+            p_out += p_outpic->p[U_PLANE].i_pitch
+                   - p_outpic->p[U_PLANE].i_visible_pitch;
+            p_out_v += p_outpic->p[V_PLANE].i_pitch
+                     - p_outpic->p[V_PLANE].i_visible_pitch;
         }
     }
 
-    vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
+    p_outpic->date = p_pic->date;
+    p_outpic->b_force = p_pic->b_force;
+    p_outpic->i_nb_fields = p_pic->i_nb_fields;
+    p_outpic->b_progressive = p_pic->b_progressive;
+    p_outpic->b_top_field_first = p_pic->b_top_field_first;
 
-    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
-}
+    p_pic->pf_release( p_pic );
 
-/*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    var_Set( (vlc_object_t *)p_data, psz_var, newval );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
-    return VLC_SUCCESS;
+    return p_outpic;
 }
