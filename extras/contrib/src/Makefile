@@ -166,7 +166,7 @@ else
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
-	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
+	.dvdnav .dvbpsi .wxwidgets .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32 .unicows .libdca
 #	.SDL_image  .daap .cddb .cdio .vcdimager .portaudio 
   else
@@ -182,7 +182,7 @@ else
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
 	.png .gpg-error .gcrypt .gnutls .mpcdec\
-	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
+	.dvdnav .dvbpsi .wxwidgets .dirac \
 	.aclocal .libdca
 #	.SDL_image  .daap .cddb .cdio .vcdimager 
    endif
@@ -1410,6 +1410,7 @@ ifdef HAVE_WIN32
 else
 	(cat Patches/libpng-osx.patch | sed -e 's%??PREFIX??%$(PREFIX)%' -e 's%??EXTRA_CFLAGS??%$(EXTRA_CFLAGS)%' -e 's%??EXTRA_LDFLAGS??%$(EXTRA_LDFLAGS)%' | patch -p0)
 endif
+	(patch -p 0 < Patches/libpng-1.2.8-makefile.patch)
 
 .png: libpng 
 ifdef HAVE_DARWIN_OS
@@ -1418,7 +1419,11 @@ else
 ifdef HAVE_WIN32
 	(cd $<; rm -f INSTALL; cp scripts/makefile.cygwin Makefile && make $(HOSTCC) && make install-static)
 else
+ifeq ($(PNG_VERSION),1.2.8)
+	(cd $<; PREFIX=$(PREFIX) DESTDIR=$(PREFIX) cp scripts/makefile.linux Makefile && make && make install)
+else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+endif
 endif
 	$(INSTALL_NAME)
 endif 
