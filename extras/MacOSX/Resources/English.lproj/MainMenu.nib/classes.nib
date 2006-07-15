@@ -330,6 +330,7 @@
                 "o_timefield" = id; 
                 "o_timeslider" = id; 
                 "o_volumeslider" = id; 
+                "o_vout_menu" = id; 
                 "o_window" = id; 
             }; 
             SUPERCLASS = NSObject; 

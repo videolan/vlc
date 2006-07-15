@@ -10,6 +10,7 @@
  *          Derk-Jan Hartman <hartman at videolan dot org>
  *          Eric Petit <titer@m0k.org>
  *          Benjamin Pracht <bigben at videolan dot org>
+ *          Felix KŸhne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +41,7 @@
 
 #include "intf.h"
 #include "vout.h"
-
+#import "controls.h"
 
 /*****************************************************************************
  * DeviceCallback: Callback triggered when the video-device variable is changed
@@ -474,6 +475,12 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                 }
             }
             break;
+            case NSRightMouseDown:
+            {
+                msg_Dbg( p_vout, "received NSRightMouseDown (generic method)" );
+                [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] getVoutView]];
+            }
+            break;
 
             default:
                 [super mouseDown: o_event];
@@ -507,17 +514,14 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)rightMouseDown:(NSEvent *)o_event
 {
-    vlc_value_t val;
-
     if( p_vout )
     {
         switch( [o_event type] )
         {
             case NSRightMouseDown:
             {
-                var_Get( p_vout, "mouse-button-down", &val );
-                val.i_int |= 4;
-                var_Set( p_vout, "mouse-button-down", val );
+                msg_Dbg( p_vout, "received NSRightMouseDown (specific method)" );
+                [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] getVoutView]];
             }
             break;
 
@@ -580,17 +584,16 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)rightMouseUp:(NSEvent *)o_event
 {
-    vlc_value_t val;
-
     if( p_vout )
     {
         switch( [o_event type] )
         {
             case NSRightMouseUp:
             {
-                var_Get( p_vout, "mouse-button-down", &val );
-                val.i_int &= ~4;
-                var_Set( p_vout, "mouse-button-down", val );
+                /* FIXME: this is the appropriate place, but we can't receive
+                 * NSRightMouseDown some how */
+                msg_Dbg( p_vout, "received NSRightMouseUp" ); 
+                [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] getVoutView]];
             }
             break;
 

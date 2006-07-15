@@ -7,6 +7,7 @@
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan.org>
+ *          Felix KŸhne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -615,6 +616,17 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_dmi_next setTitle: _NS("Next")];
     [o_dmi_previous setTitle: _NS("Previous")];
     [o_dmi_mute setTitle: _NS("Mute")];
+    
+    /* vout menu */
+    [o_vmi_play setTitle: _NS("Play")];
+    [o_vmi_stop setTitle: _NS("Stop")];
+    [o_vmi_prev setTitle: _NS("Previous")];
+    [o_vmi_next setTitle: _NS("Next")];
+    [o_vmi_volup setTitle: _NS("Volume Up")];
+    [o_vmi_voldown setTitle: _NS("Volume Down")];
+    [o_vmi_mute setTitle: _NS("Mute")];
+    [o_vmi_fullscreen setTitle: _NS("Fullscreen")];
+    [o_vmi_snapshot setTitle: _NS("Snapshot")];
 
     /* error panel */
     [o_error setTitle: _NS("Error")];
@@ -927,6 +939,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( o_window )
         return o_window;
     return nil;
+}
+
+- (id)getVoutMenu
+{
+    return o_vout_menu;
 }
 
 - (void)manage
