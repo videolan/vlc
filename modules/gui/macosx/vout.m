@@ -41,7 +41,6 @@
 
 #include "intf.h"
 #include "vout.h"
-#import "controls.h"
 
 /*****************************************************************************
  * DeviceCallback: Callback triggered when the video-device variable is changed
@@ -590,7 +589,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         {
             case NSRightMouseUp:
             {
-                /* FIXME: this is the appropriate place, but we can't receive
+                /* FIXME: this isn't the appropriate place, but we can't receive
                  * NSRightMouseDown some how */
                 msg_Dbg( p_vout, "received NSRightMouseUp" ); 
                 [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] getVoutView]];
