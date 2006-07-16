@@ -52,7 +52,7 @@ fi
 
 # Check for automake
 amvers="no"
-for v in "-1.7" "-1.9" "19" "-1.8" "18" "-1.7" "17"; do
+for v in "-1.9" "19" "-1.8" "18" "-1.7" "17"; do
   if automake${v} --version >/dev/null 2>&1; then
     amsuff="${v}"
     amvers="${v}"
