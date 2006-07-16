@@ -43,6 +43,9 @@
 #include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
 #include "vlc_playlist.h"
 
+#include "vlc_filter.h"
+#include <vlc/sout.h> /* sout_CfgParse */
+
 #if defined( __APPLE__ )
 #include "darwin_specific.h"
 #endif
@@ -65,9 +68,38 @@ static int DeinterlaceCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
 static int FilterCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
+static int VideoFilter2Callback( vlc_object_t *, char const *,
+                                 vlc_value_t, vlc_value_t, void * );
 
 /* From vout_intf.c */
 int vout_Snapshot( vout_thread_t *, picture_t * );
+
+/* Video filter2 parsing */
+static int ParseVideoFilter2Chain( vout_thread_t *, char * );
+static void RemoveVideoFilters2( vout_thread_t *p_vout );
+
+/*****************************************************************************
+ * Video Filter2 functions
+ *****************************************************************************/
+struct filter_owner_sys_t
+{
+    vout_thread_t *p_vout;
+};
+
+static picture_t *video_new_buffer_filter( filter_t *p_filter )
+{
+    picture_t *p_picture;
+    vout_thread_t *p_vout = p_filter->p_owner->p_vout;
+
+    p_picture = vout_CreatePicture( p_vout, 0, 0, 0 );
+
+    return p_picture;
+}
+
+static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
+{
+    vout_DestroyPicture( p_filter->p_owner->p_vout, p_pic );
+}
 
 /*****************************************************************************
  * vout_Request: find a video output thread, create one, or destroy one.
@@ -321,6 +353,13 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         var_Create( p_vout, "vout-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
         var_Get( p_vout, "vout-filter", &val );
         p_vout->psz_filter_chain = val.psz_string;
+
+        /* Apply video filter2 objects on the first vout */
+        var_Create( p_vout, "video-filter",
+                    VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_Get( p_vout, "video-filter", &val );
+        ParseVideoFilter2Chain( p_vout, val.psz_string );
+        free( val.psz_string );
     }
     else
     {
@@ -331,7 +370,15 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         if( psz_end && *(psz_end+1) )
             p_vout->psz_filter_chain = strdup( psz_end+1 );
         else p_vout->psz_filter_chain = NULL;
+
+        /* Create a video filter2 var ... but don't inherit values */
+        var_Create( p_vout, "video-filter", VLC_VAR_STRING );
+        ParseVideoFilter2Chain( p_vout, NULL );
     }
+
+    var_AddCallback( p_vout, "video-filter", VideoFilter2Callback, NULL );
+    p_vout->b_vfilter_change = VLC_TRUE;
+    p_vout->i_vfilters = 0;
 
     /* Choose the video output module */
     if( !p_vout->psz_filter_chain || !*p_vout->psz_filter_chain )
@@ -900,6 +947,81 @@ static void RunThread( vout_thread_t *p_vout)
             i_idle_loops++;
         }
 
+        /* Video Filter2 stuff */
+        if( p_vout->b_vfilter_change == VLC_TRUE )
+        {
+            int i;
+            RemoveVideoFilters2( p_vout );
+            for( i = 0; i < p_vout->i_vfilters_cfg; i++ )
+            {
+                filter_t *p_vfilter =
+                    p_vout->pp_vfilters[p_vout->i_vfilters] =
+                        vlc_object_create( p_vout, VLC_OBJECT_FILTER );
+
+                vlc_object_attach( p_vfilter, p_vout );
+
+                p_vfilter->pf_vout_buffer_new = video_new_buffer_filter;
+                p_vfilter->pf_vout_buffer_del = video_del_buffer_filter;
+
+                p_vfilter->fmt_in.video = p_vout->fmt_render;
+                p_vfilter->fmt_out.video = p_vout->fmt_render;
+
+                p_vfilter->p_cfg = p_vout->p_vfilters_cfg[i];
+                p_vfilter->p_module = module_Need( p_vfilter, "video filter2",
+                                                 p_vout->psz_vfilters[i], 0 );
+
+                if( p_vfilter->p_module )
+                {
+                    p_vfilter->p_owner =
+                        malloc( sizeof( filter_owner_sys_t ) );
+                    p_vfilter->p_owner->p_vout = p_vout;
+                    p_vout->i_vfilters++;
+                    msg_Dbg( p_vout, "video filter found (%s)",
+                             p_vout->psz_vfilters[i] );
+                }
+                else
+                {
+                    msg_Err( p_vout, "no video filter found (%s)",
+                             p_vout->psz_vfilters[i] );
+                    vlc_object_detach( p_vfilter );
+                    vlc_object_destroy( p_vfilter );
+                }
+            }
+            p_vout->b_vfilter_change = VLC_FALSE;
+        }
+
+        if( p_picture )
+        {
+            int i;
+            for( i = 0; i < p_vout->i_vfilters; i++ )
+            {
+                picture_t *p_old = p_picture;
+                p_picture  = p_vout->pp_vfilters[i]->pf_video_filter(
+                                 p_vout->pp_vfilters[i], p_picture );
+                if( !p_picture )
+                {
+                    break;
+                }
+                /* FIXME: this is kind of wrong
+                 * if you have 2 or more vfilters and the 2nd breaks,
+                 * on the next loop the 1st one will be applied again */
+
+                /* if p_old and p_picture are the same (ie the filter
+                 * worked on the old picture), then following code is
+                 * still alright since i_status gets changed back to
+                 * the right value */
+                if( p_old->i_refcount )
+                {
+                    p_old->i_status = DISPLAYED_PICTURE;
+                }
+                else
+                {
+                    p_old->i_status = DESTROYED_PICTURE;
+                }
+                p_picture->i_status = READY_PICTURE;
+            }
+        }
+
         if( p_picture && p_vout->b_snapshot )
         {
             p_vout->b_snapshot = VLC_FALSE;
@@ -1129,6 +1251,9 @@ static void EndThread( vout_thread_t *p_vout )
     /* Destroy subpicture unit */
     spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), VLC_FALSE );
     spu_Destroy( p_vout->p_spu );
+
+    /* Destroy the video filters2 */
+    RemoveVideoFilters2( p_vout );
 
     /* Destroy translation tables */
     p_vout->pf_end( p_vout );
@@ -1400,4 +1525,88 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_object_release( p_input );
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Video Filter2 stuff
+ *****************************************************************************/
+static int ParseVideoFilter2Chain( vout_thread_t *p_vout, char *psz_vfilters )
+{
+    int i;
+    for( i = 0; i < p_vout->i_vfilters_cfg; i++ )
+    {
+        /* FIXME: this should be moved in a separate function */
+        struct sout_cfg_t *p_cfg =
+            p_vout->p_vfilters_cfg[p_vout->i_vfilters_cfg];
+        while( p_cfg )
+        {
+            struct sout_cfg_t *p_next = p_cfg->p_next;
+            free( p_cfg->psz_name );
+            free( p_cfg->psz_value );
+            free( p_cfg );
+            p_cfg = p_next;
+        }
+        /* </FIXME> */
+
+        free( p_vout->psz_vfilters[p_vout->i_vfilters_cfg] );
+    }
+    p_vout->i_vfilters_cfg = 0;
+    if( psz_vfilters && *psz_vfilters )
+    {
+        char *psz_parser = psz_vfilters;
+
+        while( psz_parser && *psz_parser )
+        {
+            psz_parser = sout_CfgCreate(
+                            &p_vout->psz_vfilters[p_vout->i_vfilters_cfg],
+                            &p_vout->p_vfilters_cfg[p_vout->i_vfilters_cfg],
+                            psz_parser );
+            msg_Dbg( p_vout, "adding vfilter: %s\n",
+                     p_vout->psz_vfilters[p_vout->i_vfilters_cfg] );
+            p_vout->i_vfilters_cfg++;
+            if( psz_parser && psz_parser )
+            {
+                if( p_vout->i_vfilters_cfg == MAX_VFILTERS )
+                {
+                    msg_Warn( p_vout,
+                  "maximum number of video filters reached. \"%s\" discarded",
+                              psz_parser );
+                    break;
+                }
+            }
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static int VideoFilter2Callback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    if( !strcmp( oldval.psz_string, newval.psz_string ) )
+    {
+        ParseVideoFilter2Chain( p_vout, newval.psz_string );
+        p_vout->b_vfilter_change = VLC_TRUE;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static void RemoveVideoFilters2( vout_thread_t *p_vout )
+{
+    int i;
+    for( i = 0; i < p_vout->i_vfilters; i++ )
+    {
+        vlc_object_detach( p_vout->pp_vfilters[i] );
+        if( p_vout->pp_vfilters[i]->p_module )
+        {
+            module_Unneed( p_vout->pp_vfilters[i],
+                           p_vout->pp_vfilters[i]->p_module );
+        }
+
+        free( p_vout->pp_vfilters[i]->p_owner );
+        vlc_object_destroy( p_vout->pp_vfilters[i] );
+    }
+    p_vout->i_vfilters = 0;
 }

@@ -296,11 +296,17 @@ static char *ppsz_align_descriptions[] =
     "VLC can avoid creating window caption, frames, etc... around the video" \
     ", giving a \"minimal\" window.")
 
-#define FILTER_TEXT N_("Video filter module")
-#define FILTER_LONGTEXT N_( \
+#define VOUT_FILTER_TEXT N_("Video output filter module")
+#define VOUT_FILTER_LONGTEXT N_( \
     "This adds post-processing filters to enhance the " \
     "picture quality, for instance deinterlacing, or to clone or distort " \
     "the video window.")
+
+#define VIDEO_FILTER_TEXT N_("Video filter module")
+#define VIDEO_FILTER_LONGTEXT N_( \
+    "This adds post-processing filters to enhance the " \
+    "picture quality, for instance deinterlacing, or distort" \
+    "the video.")
 
 #define SNAP_PATH_TEXT N_("Video snapshot directory")
 #define SNAP_PATH_LONGTEXT N_( \
@@ -1286,8 +1292,13 @@ vlc_module_begin();
 
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     add_module_list_cat( "vout-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
-                FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
+                VOUT_FILTER_TEXT, VOUT_FILTER_LONGTEXT, VLC_FALSE );
        add_deprecated( "filter", VLC_FALSE ); /*deprecated since 0.8.2 */
+
+    set_subcategory( SUBCAT_VIDEO_VFILTER2 );
+    add_module_list_cat( "video-filter", SUBCAT_VIDEO_VFILTER2, NULL, NULL,
+                VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, VLC_FALSE );
+
 #if 0
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
