@@ -969,7 +969,10 @@ modules/video_filter/blend.c
 modules/video_filter/clone.c
 modules/video_filter/crop.c
 modules/video_filter/deinterlace.c
-modules/video_filter/distort.c
+modules/video_filter/gradient.c
+modules/video_filter/psychedelic.c
+modules/video_filter/ripple.c
+modules/video_filter/wave.c
 modules/video_filter/filter_common.h
 modules/video_filter/invert.c
 modules/video_filter/logo.c
