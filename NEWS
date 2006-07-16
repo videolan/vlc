@@ -4,6 +4,10 @@ Changes between 0.8.5 and 0.8.6-svn (not released yet)
 --------------------------------------------------
 Core support:
  * New playlist core
+ * Video Filter2 filters can now be selected for local display using --video-filter
+
+Video Filters:
+ * Adjust, Invert and Distort (now splited into Wave, Ripple, Gradient and Psychedelic) video filters have been ported to the Video Filter2 API. They can now be streamed.
 
 Nix Port
  * Notification plugin.
