@@ -1584,11 +1584,8 @@ static int VideoFilter2Callback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    if( !strcmp( oldval.psz_string, newval.psz_string ) )
-    {
-        ParseVideoFilter2Chain( p_vout, newval.psz_string );
-        p_vout->b_vfilter_change = VLC_TRUE;
-    }
+    ParseVideoFilter2Chain( p_vout, newval.psz_string );
+    p_vout->b_vfilter_change = VLC_TRUE;
 
     return VLC_SUCCESS;
 }

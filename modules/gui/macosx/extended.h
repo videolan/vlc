@@ -54,12 +54,17 @@
     /* video filters */
     IBOutlet id o_btn_vidFlts_mrInfo;
     IBOutlet id o_ckb_blur;
-    IBOutlet id o_ckb_distortion;
     IBOutlet id o_ckb_imgClone;
     IBOutlet id o_ckb_imgCrop;
     IBOutlet id o_ckb_imgInvers;
     IBOutlet id o_ckb_trnsform;
     IBOutlet id o_ckb_intZoom;
+    IBOutlet id o_ckb_wave;
+    IBOutlet id o_ckb_ripple;
+    IBOutlet id o_ckb_psycho;
+    IBOutlet id o_ckb_gradient;
+    IBOutlet id o_lbl_general;
+    IBOutlet id o_lbl_distort;
     
     /* audio filters */
     IBOutlet id o_ckb_vlme_norm;
@@ -110,7 +115,8 @@
 
 - (void)showPanel;
 - (void)initStrings;
-- (void)changeVFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
+- (void)changeVoutFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
+- (void)changeVideoFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
 - (void)changeAFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
 - (void)savePrefs;
 @end
