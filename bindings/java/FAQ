@@ -11,10 +11,8 @@ to be written.
 
 == 2. Is it possible to use JVLC in Windows (or MacOS)? ==
 
-It's not possible at the moment. JVLC is composed of two parts, a Java
-multiplatform part and a C++ native code part. The native code has only
-been tested on GNU/Linux platforms, but I'm looking forward to porting
-it to Win32 and Darwin platforms.
+Yes, you can compile VideoLAN Java Bindings with --enable-java-bindings
+in ./configure . It works for GNU/Linux and Win32, but it doesn't for MacOS.
 
 == 3. What features of Videolan are available to JVLC? ==
 
