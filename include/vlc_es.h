@@ -142,6 +142,13 @@ struct subs_format_t
 /**
  * ES definition
  */
+typedef struct extra_languages_t
+{
+        char *psz_language;
+        char *psz_description;
+} extra_languages_t;
+
+
 struct es_format_t
 {
     int             i_cat;
@@ -160,11 +167,8 @@ struct es_format_t
     char            *psz_language;
     char            *psz_description;
     int             i_extra_languages;
-    struct {
-        char *psz_language;
-        char *psz_description;
-    } *p_extra_languages;
-    
+    extra_languages_t *p_extra_languages;
+
     audio_format_t audio;
     video_format_t video;
     subs_format_t  subs;
@@ -241,7 +245,7 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
     }
 
     dst->i_extra_languages = src->i_extra_languages;
-    dst->p_extra_languages = malloc( dst->i_extra_languages * sizeof(*dst->p_extra_languages ) );
+    dst->p_extra_languages = (extra_languages_t*) malloc( dst->i_extra_languages * sizeof(*dst->p_extra_languages ) );
     for( i = 0; i < dst->i_extra_languages; i++ ) {
         if( src->p_extra_languages[i].psz_language )
             dst->p_extra_languages[i].psz_language = strdup(src->p_extra_languages[i].psz_language);
