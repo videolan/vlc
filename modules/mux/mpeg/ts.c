@@ -337,7 +337,8 @@ typedef struct ts_stream_t
     uint8_t         *p_decoder_specific_info;
 
     /* language is iso639-2T */
-    uint8_t         lang[3];
+    int             i_langs;
+    uint8_t         *lang;
 
     sout_buffer_chain_t chain_pes;
     mtime_t             i_pes_dts;
@@ -885,6 +886,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
     ts_stream_t         *p_stream;
+    int                  i;
 
     p_input->p_sys = p_stream = malloc( sizeof( ts_stream_t ) );
 
@@ -1013,6 +1015,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             return VLC_EGENERIC;
     }
 
+    p_stream->i_langs = 1+p_input->p_fmt->i_extra_languages;
+    p_stream->lang = malloc(p_stream->i_langs*3);
+    i = 1;
     p_stream->lang[0] =
     p_stream->lang[1] =
     p_stream->lang[2] = '\0';
@@ -1040,8 +1045,40 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->lang[2] = pl->psz_iso639_2T[2];
 
             msg_Dbg( p_mux, "    - lang=%c%c%c",
-                     p_stream->lang[0], p_stream->lang[1], p_stream->lang[2] );
+                     p_stream->lang[0], p_stream->lang[1],
+                     p_stream->lang[2] );
         }
+    }
+    while( i < p_stream->i_langs ) {
+        if( p_input->p_fmt->p_extra_languages[i-1].psz_language )
+        {
+            char *psz = p_input->p_fmt->p_extra_languages[i-1].psz_language;
+            const iso639_lang_t *pl = NULL;
+            
+            if( strlen( psz ) == 2 )
+            {
+                pl = GetLang_1( psz );
+            }
+            else if( strlen( psz ) == 3 )
+            {
+                pl = GetLang_2B( psz );
+                if( !strcmp( pl->psz_iso639_1, "??" ) )
+                {
+                    pl = GetLang_2T( psz );
+                }
+            }
+            if( pl && strcmp( pl->psz_iso639_1, "??" ) )
+            {
+                p_stream->lang[i*3+0] = pl->psz_iso639_2T[0];
+                p_stream->lang[i*3+1] = pl->psz_iso639_2T[1];
+                p_stream->lang[i*3+2] = pl->psz_iso639_2T[2];
+                
+                msg_Dbg( p_mux, "    - lang=%c%c%c",
+                         p_stream->lang[i*3+0], p_stream->lang[i*3+1],
+                         p_stream->lang[i*3+2] );
+            }
+        }
+        i++;
     }
 
     /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
@@ -1183,6 +1220,10 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* Empty all data in chain_pes */
     BufferChainClean( p_mux->p_sout, &p_stream->chain_pes );
 
+    if( p_stream->lang )
+    {
+        free(p_stream->lang);
+    }
     if( p_stream->p_decoder_specific_info )
     {
         free( p_stream->p_decoder_specific_info );
@@ -2485,16 +2526,18 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
         if( p_stream->lang[0] != 0 )
         {
-            uint8_t data[4];
+            uint8_t data[4*p_stream->i_langs];
 
             /* I construct the content myself, way faster than looking at
              * over complicated/mind broken libdvbpsi way */
-            data[0] = p_stream->lang[0];
-            data[1] = p_stream->lang[1];
-            data[2] = p_stream->lang[2];
-            data[3] = 0x00; /* audio type: 0x00 undefined */
-
-            dvbpsi_PMTESAddDescriptor( p_es, 0x0a, 4, data );
+            for(i = 0; i < p_stream->i_langs; i++ )
+            {
+                data[i*4+0] = p_stream->lang[i*3+0];
+                data[i*4+1] = p_stream->lang[i*3+1];
+                data[i*4+2] = p_stream->lang[i*3+2];
+                data[i*4+3] = 0x00; /* audio type: 0x00 undefined */
+            }
+            dvbpsi_PMTESAddDescriptor( p_es, 0x0a, 4*p_stream->i_langs, data );
         }
     }
 
