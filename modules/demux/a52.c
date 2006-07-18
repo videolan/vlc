@@ -146,23 +146,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->b_big_endian = b_big_endian;
 
     /* Load the A52 packetizer */
-    p_sys->p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_DECODER );
-    p_sys->p_packetizer->pf_decode_audio = 0;
-    p_sys->p_packetizer->pf_decode_video = 0;
-    p_sys->p_packetizer->pf_decode_sub = 0;
-    p_sys->p_packetizer->pf_packetize = 0;
-
-    /* Initialization of decoder structure */
-    es_format_Init( &p_sys->p_packetizer->fmt_in, AUDIO_ES,
-                    VLC_FOURCC( 'a', '5', '2', ' ' ) );
-
-    p_sys->p_packetizer->p_module =
-        module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 );
-    if( !p_sys->p_packetizer->p_module )
-    {
-        msg_Err( p_demux, "cannot find A52 packetizer" );
-        return VLC_EGENERIC;
-    }
+    INIT_APACKETIZER( p_sys->p_packetizer, 'a', '5', '2', ' ' );
+    LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "A52" );
 
     /* Create one program */
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_in );

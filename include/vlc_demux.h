@@ -199,25 +199,31 @@ static inline vlc_bool_t isDemux( demux_t *p_demux, char *psz_requested )
     if( stream_Peek( p_demux->s , &p_peek, size ) < size ) return VLC_EGENERIC;}
 
 #define POKE( peek, stuff, size ) (strncasecmp( (char *)peek, stuff, size )==0)
-    
 
-#define CREATE_PACKETIZER( a,b,c,d ) \
-    p_sys->p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_DECODER ); \
-    p_sys->p_packetizer->pf_decode_audio = 0; \
-    p_sys->p_packetizer->pf_decode_video = 0; \
-    p_sys->p_packetizer->pf_decode_sub = 0; \
-    p_sys->p_packetizer->pf_packetize = 0; \
-    es_format_Init( &p_sys->p_packetizer->fmt_in, AUDIO_ES, \
+#define COMMON_INIT_PACKETIZER( location ) \
+    location = vlc_object_create( p_demux, VLC_OBJECT_DECODER ); \
+    location->pf_decode_audio = 0; \
+    location->pf_decode_video = 0; \
+    location->pf_decode_sub = 0; \
+    location->pf_packetize = 0; \
+
+#define INIT_APACKETIZER( location, a,b,c,d ) \
+    COMMON_INIT_PACKETIZER(location ); \
+    es_format_Init( &location->fmt_in, AUDIO_ES, \
+                    VLC_FOURCC( a, b, c, d ) );
+
+#define INIT_VPACKETIZER( location, a,b,c,d ) \
+    COMMON_INIT_PACKETIZER(location ); \
+    es_format_Init( &location->fmt_in, VIDEO_ES, \
                     VLC_FOURCC( a, b, c, d ) );
 
 /* BEWARE ! This can lead to memory leaks ! */
-#define LOAD_PACKETIZER_OR_FAIL( msg ) \
-    p_sys->p_packetizer->p_module = \
-        module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 ); \
-    \
-    if( p_sys->p_packetizer->p_module == NULL ) \
+#define LOAD_PACKETIZER_OR_FAIL( location, msg ) \
+    location->p_module = \
+        module_Need( location, "packetizer", NULL, 0 ); \
+    if( location->p_module == NULL ) \
     { \
-        vlc_object_destroy( p_sys->p_packetizer ); \
+        vlc_object_destroy( location ); \
         msg_Err( p_demux, "cannot find packetizer for " # msg ); \
         free( p_sys ); \
         return VLC_EGENERIC; \

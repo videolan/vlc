@@ -107,18 +107,8 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    /*
-     * Load the FLAC packetizer
-     */
-    p_sys->p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_DECODER );
-    p_sys->p_packetizer->pf_decode_audio = 0;
-    p_sys->p_packetizer->pf_decode_video = 0;
-    p_sys->p_packetizer->pf_decode_sub = 0;
-    p_sys->p_packetizer->pf_packetize = 0;
-
-    /* Initialization of decoder structure */
-    es_format_Init( &p_sys->p_packetizer->fmt_in, AUDIO_ES,
-                    VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
+    /* Load the FLAC packetizer */
+    INIT_APACKETIZER( p_sys->p_packetizer, 'f', 'l', 'a', 'c' );
 
     /* Store STREAMINFO for the decoder and packetizer */
     p_sys->p_packetizer->fmt_in.i_extra = fmt.i_extra = STREAMINFO_SIZE + 4;
