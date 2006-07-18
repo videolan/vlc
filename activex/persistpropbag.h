@@ -36,10 +36,12 @@ public:
     // IUnknown methods
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
     {
-        if( (NULL != ppv)
-         && (IID_IUnknown == riid) 
-         && (IID_IPersist == riid) 
-         && (IID_IPersistPropertyBag == riid) ) {
+        if( NULL == ppv )
+            return E_POINTER;
+        if( (IID_IUnknown == riid)
+         || (IID_IPersist == riid) 
+         || (IID_IPersistPropertyBag == riid) )
+        {
             AddRef();
             *ppv = reinterpret_cast<LPVOID>(this);
             return NOERROR;

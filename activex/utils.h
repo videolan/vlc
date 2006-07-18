@@ -108,13 +108,16 @@ VLCEnum<T>& VLCEnum<T>::operator=(const VLCEnum<T> &e)
 template<class T>
 STDMETHODIMP VLCEnum<T>::QueryInterface(REFIID riid, void **ppv)
 {
-    if( NULL == ppv ) return E_POINTER;
+    if( NULL == ppv )
+        return E_POINTER;
     if( (IID_IUnknown == riid) 
-     && ( _riid == riid) ) {
+     || (_riid == riid) )
+    {
         AddRef();
         *ppv = reinterpret_cast<LPVOID>(this);
         return NOERROR;
     }
+    // standalone object
     return E_NOINTERFACE;
 };
 

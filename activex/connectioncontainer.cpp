@@ -101,7 +101,7 @@ STDMETHODIMP VLCConnectionPoint::Advise(IUnknown *pUnk, DWORD *pdwCookie)
 
     pUnk->AddRef();
     cd.pUnk = pUnk;
-    *pdwCookie = cd.dwCookie = _connections.size();
+    *pdwCookie = cd.dwCookie = _connections.size()+1;
 
     _connections.push_back(cd);
 
@@ -110,9 +110,9 @@ STDMETHODIMP VLCConnectionPoint::Advise(IUnknown *pUnk, DWORD *pdwCookie)
 
 STDMETHODIMP VLCConnectionPoint::Unadvise(DWORD pdwCookie)
 {
-    if( pdwCookie < _connections.size() )
+    if( (0 < pdwCookie) && (pdwCookie <= _connections.size()) )
     {
-        CONNECTDATA cd = _connections[pdwCookie];
+        CONNECTDATA cd = _connections[pdwCookie-1];
         if( NULL != cd.pUnk )
         {
             cd.pUnk->Release();

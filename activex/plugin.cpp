@@ -180,7 +180,8 @@ STDMETHODIMP VLCPluginClass::QueryInterface(REFIID riid, void **ppv)
     if( NULL == ppv )
         return E_INVALIDARG;
 
-    if( (IID_IUnknown == riid) || (IID_IClassFactory == riid) )
+    if( (IID_IUnknown == riid)
+     || (IID_IClassFactory == riid) )
     {
         AddRef();
         *ppv = reinterpret_cast<LPVOID>(this);

@@ -67,9 +67,10 @@ public:
     // IUnknown methods
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
     {
-        if( (NULL != ppv)
-         && (IID_IUnknown == riid)
-         && (IID_IObjectSafety == riid) ) 
+        if( NULL == ppv)
+            return E_POINTER;
+        if( (IID_IUnknown == riid)
+         || (IID_IObjectSafety == riid) ) 
         {
             AddRef();
             *ppv = reinterpret_cast<LPVOID>(this);
