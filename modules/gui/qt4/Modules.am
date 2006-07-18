@@ -67,7 +67,7 @@ $(UIH): %.h: %.ui
 	$(install_sh) -d ui
 	@echo "$(UIC) $< -> $@"
 	rm -f $@
-	echo "#define Q_(a,b) _(a)" > $@
+	echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@
 	$(UIC) -tr "Q_" $< >> $@
 
 

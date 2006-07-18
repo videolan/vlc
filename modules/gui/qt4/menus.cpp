@@ -117,24 +117,24 @@ void QVLCMenu::createMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
             THEDP->menusUpdateMapper, SLOT(map()) ); \
     THEDP->menusUpdateMapper->setMapping( menu, f ); }
 
-    BAR_ADD( FileMenu(), _("File") );
-    BAR_ADD( ToolsMenu( p_intf ), _("Tools") );
-    BAR_DADD( VideoMenu( p_intf, NULL ), _("Video"), 1 );
-    BAR_DADD( AudioMenu( p_intf, NULL ), _("Audio"), 2 );
-    BAR_DADD( NavigMenu( p_intf, NULL ), _("Navigation"), 3 );
+    BAR_ADD( FileMenu(), qtr("File") );
+    BAR_ADD( ToolsMenu( p_intf ), qtr("Tools") );
+    BAR_DADD( VideoMenu( p_intf, NULL ), qtr("Video"), 1 );
+    BAR_DADD( AudioMenu( p_intf, NULL ), qtr("Audio"), 2 );
+    BAR_DADD( NavigMenu( p_intf, NULL ), qtr("Navigation"), 3 );
 
-    //    BAR_ADD( HelpMenu(), _("Help" ) );
+    //    BAR_ADD( HelpMenu(), qtr("Help" ) );
 }
 
 QMenu *QVLCMenu::FileMenu()
 {
     QMenu *menu = new QMenu();
-    DP_SADD( _("Quick &Open File...") , "", "", simpleOpenDialog() );
-    DP_SADD( _("&Advanced Open..." ), "", "", openDialog() );
+    DP_SADD( qtr("Quick &Open File...") , "", "", simpleOpenDialog() );
+    DP_SADD( qtr("&Advanced Open..." ), "", "", openDialog() );
     menu->addSeparator();
-    DP_SADD( _("Streaming..."), "", "", streamingDialog() );
+    DP_SADD( qtr("Streaming..."), "", "", streamingDialog() );
     menu->addSeparator();
-    DP_SADD( _("&Quit") , "", "", quit() );
+    DP_SADD( qtr("&Quit") , "", "", quit() );
     return menu;
 }
 
@@ -144,16 +144,16 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, bool with_intf )
     if( with_intf )
     {
         QMenu *intfmenu = InterfacesMenu( p_intf, NULL );
-        intfmenu->setTitle( _("Interfaces" ) );
+        intfmenu->setTitle( qtr("Interfaces" ) );
         menu->addMenu( intfmenu );
         /** \todo ADD EXT GUI HERE */
         menu->addSeparator();
     }
-    DP_SADD( _("Messages" ), "", "", messagesDialog() );
-    DP_SADD( _("Information") , "", "", streaminfoDialog() );
-    DP_SADD( _("Bookmarks"), "", "", bookmarksDialog() );
+    DP_SADD( qtr("Messages" ), "", "", messagesDialog() );
+    DP_SADD( qtr("Information") , "", "", streaminfoDialog() );
+    DP_SADD( qtr("Bookmarks"), "", "", bookmarksDialog() );
     menu->addSeparator();
-    DP_SADD( _("Preferences"), "", "", prefsDialog() );
+    DP_SADD( qtr("Preferences"), "", "", prefsDialog() );
     return menu;
 }
 
@@ -261,26 +261,26 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *current )
 
 #define POPUP_STATIC_ENTRIES \
     vlc_value_t val; \
-    MIM_SADD( _("Stop"), "", "", stop() ); \
-    MIM_SADD( _("Previous"), "", "", prev() ); \
-    MIM_SADD( _("Next"), "", "", next() ); \
+    MIM_SADD( qtr("Stop"), "", "", stop() ); \
+    MIM_SADD( qtr("Previous"), "", "", prev() ); \
+    MIM_SADD( qtr("Next"), "", "", next() ); \
     if( p_input ) \
     { \
         var_Get( p_input, "state", &val ); \
         if( val.i_int == PAUSE_S ) \
-            MIM_SADD( _("Play"), "", "", togglePlayPause() ) \
+            MIM_SADD( qtr("Play"), "", "", togglePlayPause() ) \
         else \
-            MIM_SADD( _("Pause"), "", "", togglePlayPause() ) \
+            MIM_SADD( qtr("Pause"), "", "", togglePlayPause() ) \
     } \
     else if( THEPL->i_size && THEPL->i_enabled ) \
-        MIM_SADD( _("Play"), "", "", togglePlayPause() ) \
+        MIM_SADD( qtr("Play"), "", "", togglePlayPause() ) \
     \
     QMenu *intfmenu = InterfacesMenu( p_intf, NULL ); \
-    intfmenu->setTitle( _("Interfaces" ) ); \
+    intfmenu->setTitle( qtr("Interfaces" ) ); \
     menu->addMenu( intfmenu ); \
     \
     QMenu *toolsmenu = ToolsMenu( p_intf, false ); \
-    toolsmenu->setTitle( _("Tools" ) ); \
+    toolsmenu->setTitle( qtr("Tools" ) ); \
     menu->addMenu( toolsmenu ); \
      
 void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
@@ -413,7 +413,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf, QMenu *current,
     vlc_bool_t b_section_empty = VLC_FALSE;
     int i;
 
-#define APPEND_EMPTY { QAction *action = menu->addAction( _("Empty" ) ); \
+#define APPEND_EMPTY { QAction *action = menu->addAction( qtr("Empty" ) ); \
                        action->setEnabled( false ); }
 
     for( i = 0; i < (int)objects.size() ; i++ )
@@ -541,7 +541,8 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
         if( b_submenu )
         {
             QMenu *submenu = new QMenu();
-            submenu->setTitle( text.psz_string ? text.psz_string : psz_var );
+            submenu->setTitle( QString::fromUtf8( text.psz_string ? 
+                                    text.psz_string : psz_var ) );
             if( CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0)
                 menu->addMenu( submenu );
         }
@@ -551,7 +552,8 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
         return;
     }
 
-#define TEXT_OR_VAR text.psz_string ? text.psz_string : psz_var
+#define TEXT_OR_VAR QString::fromUtf8 ( text.psz_string ? text.psz_string : \
+                                         psz_var )
 
     switch( i_type & VLC_VAR_TYPE )
     {
@@ -618,7 +620,8 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         {
         case VLC_VAR_VARIABLE:
             CreateChoicesMenu( subsubmenu, CURVAL.psz_string, p_object, false );
-            subsubmenu->setTitle( CURTEXT ? CURTEXT : CURVAL.psz_string );
+            subsubmenu->setTitle( QString::fromUtf8( CURTEXT ? CURTEXT :
+                                     CURVAL.psz_string ) );
             submenu->addMenu( subsubmenu );
             break;
 
@@ -710,6 +713,8 @@ void QVLCMenu::DoAction( intf_thread_t *p_intf, QObject *data )
                                            itemData->i_object_id );
     if( p_object == NULL ) return;
 
+    fprintf( stderr, "Setting %s on %i\n", itemData->psz_var, 
+                   p_object->i_object_id );
     var_Set( p_object, itemData->psz_var, itemData->val );
     vlc_object_release( p_object );
 }
