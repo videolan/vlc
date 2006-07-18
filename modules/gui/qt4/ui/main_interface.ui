@@ -4,14 +4,14 @@
  <exportmacro></exportmacro>
  <class>MainInterfaceUI</class>
  <widget class="QWidget" name="MainInterfaceUI" >
-<!--  <property name="geometry" >
+  <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>444</width>
-    <height>80</height>
+    <width>426</width>
+    <height>73</height>
    </rect>
-  </property> -->
+  </property>
   <property name="sizePolicy" >
    <sizepolicy>
     <hsizetype>0</hsizetype>
@@ -39,19 +39,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QGroupBox" name="sliderBox" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>5</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="title" >
-        <string>0:00:00/0:00:00</string>
-       </property>
-      </widget>
+      <widget class="QFrame" name="sliderFrame" />
      </item>
      <item>
       <widget class="QFrame" name="discFrame" >
@@ -62,12 +50,6 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="frameShape" >
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow" >
-        <enum>QFrame::Raised</enum>
        </property>
       </widget>
      </item>
@@ -91,10 +73,16 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="maximumSize" >
+        <size>
+         <width>35</width>
+         <height>26</height>
+        </size>
+       </property>
        <property name="iconSize" >
         <size>
-         <width>24</width>
-         <height>24</height>
+         <width>20</width>
+         <height>20</height>
         </size>
        </property>
       </widget>
@@ -109,13 +97,19 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="maximumSize" >
+        <size>
+         <width>35</width>
+         <height>26</height>
+        </size>
+       </property>
        <property name="text" >
         <string/>
        </property>
        <property name="iconSize" >
         <size>
-         <width>24</width>
-         <height>24</height>
+         <width>20</width>
+         <height>20</height>
         </size>
        </property>
       </widget>
@@ -130,13 +124,19 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="maximumSize" >
+        <size>
+         <width>35</width>
+         <height>26</height>
+        </size>
+       </property>
        <property name="text" >
         <string/>
        </property>
        <property name="iconSize" >
         <size>
-         <width>24</width>
-         <height>24</height>
+         <width>20</width>
+         <height>20</height>
         </size>
        </property>
       </widget>
@@ -151,13 +151,19 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="maximumSize" >
+        <size>
+         <width>35</width>
+         <height>26</height>
+        </size>
+       </property>
        <property name="text" >
         <string/>
        </property>
        <property name="iconSize" >
         <size>
-         <width>24</width>
-         <height>24</height>
+         <width>20</width>
+         <height>20</height>
         </size>
        </property>
       </widget>
@@ -184,6 +190,20 @@
      </item>
      <item>
       <widget class="QSlider" name="volumeSlider" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>0</hsizetype>
+         <vsizetype>0</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize" >
+        <size>
+         <width>80</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>

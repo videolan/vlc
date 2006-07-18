@@ -48,12 +48,15 @@ protected:
 private:
     VideoWidget *videoWidget;
     InputManager *main_input_manager;
+    QLabel *timeLabel;
+    QLabel *nameLabel;
     InputSlider *slider;
     /// Main input associated to the playlist
     input_thread_t *p_input;
     Ui::MainInterfaceUI ui;
 private slots:
     void setStatus( int );
+    void setName( QString );
     void setDisplay( float, int, int );
     void updateOnTimer();
     void play();

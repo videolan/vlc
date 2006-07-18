@@ -30,7 +30,11 @@
 #include <QCloseEvent>
 #include <assert.h>
 #include <QPushButton>
+#include <QStatusBar>
 #include "menus.hpp"
+
+#define PREF_W 480
+#define PREF_H 125
 
 static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void *);
@@ -43,10 +47,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
     ui.setupUi( centralWidget() );
 
-    slider = new InputSlider( Qt::Horizontal, ui.sliderBox );
-    QVBoxLayout *box_layout = new QVBoxLayout();
-    box_layout->addWidget( slider );
-    ui.sliderBox->setLayout( box_layout );
+    slider = new InputSlider( Qt::Horizontal, NULL );
+    ui.hboxLayout->insertWidget( 0, slider );
     ui.prevButton->setText( "" );
     ui.nextButton->setText( "" );
     ui.playButton->setText( "" ); 
@@ -60,7 +62,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     QVLCMenu::createMenuBar( menuBar(), p_intf );
 
-    resize (500, 131 );
+    timeLabel = new QLabel( this );
+    nameLabel = new QLabel( this );
+    statusBar()->addWidget( nameLabel, 4 );
+    statusBar()->addPermanentWidget( timeLabel, 1 );
+
+    resize ( PREF_W, PREF_H );
 //    if( config_GetInt( p_intf, "embedded" ) )
 
     {
@@ -80,20 +87,20 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     fprintf( stderr, "Margin : %i\n",ui.vboxLayout->margin() );
     readSettings( "MainWindow" );
 
-    addSize = QSize( ui.vboxLayout->margin() * 2, 131 );
+    addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
     
     if( config_GetInt( p_intf, "qt-always-video" ) )
         mainSize = videoSize + addSize;
     else
-        mainSize = QSize( 500,131 );
-        resize( 500,131 );
+        mainSize = QSize( PREF_W, PREF_H );
+        
     resize( mainSize );
     mainSize = size();
 
     fprintf( stderr, "Size is %ix%i - Video %ix%i\n", mainSize.width(), mainSize.height(), videoSize.width(), videoSize.height() );
 
     fprintf( stderr, "Additional size around video %ix%i", addSize.width(), addSize.height() );
-    setMinimumSize( 500, addSize.height() );
+    setMinimumSize( PREF_W, addSize.height() );
 
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
@@ -107,6 +114,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              slider, SLOT( setPosition( float,int, int ) ) );
     connect( THEMIM->getIM(), SIGNAL( positionUpdated( float, int, int ) ),
              this, SLOT( setDisplay( float, int, int ) ) );
+    connect( THEMIM->getIM(), SIGNAL( nameChanged( QString ) ),
+             this, SLOT( setName( QString ) ) );
     connect( THEMIM->getIM(), SIGNAL( statusChanged( int ) ),
              this, SLOT( setStatus( int ) ) );
     connect( slider, SIGNAL( sliderDragged( float ) ),
@@ -178,7 +187,12 @@ void MainInterface::setDisplay( float pos, int time, int length )
     secstotimestr( psz_time, time );
     QString title;
     title.sprintf( "%s/%s", psz_time, psz_length );
-    ui.sliderBox->setTitle( title );
+    timeLabel->setText( title );
+}
+
+void MainInterface::setName( QString name )
+{
+    nameLabel->setText( name );
 }
 
 void MainInterface::setStatus( int status )

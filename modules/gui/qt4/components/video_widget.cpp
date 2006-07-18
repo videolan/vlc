@@ -45,8 +45,6 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ),
     p_intf->p_sys->p_video = this;
     p_vout = NULL;
 
-    setFrameStyle(QFrame::Panel | QFrame::Raised);
-
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 
     connect( DialogsProvider::getInstance(NULL)->fixed_timer,
@@ -152,8 +150,6 @@ void VideoWidget::Release( void *p_win )
 
     updateGeometry();
 
-//    p_intf->p_sys->p_mi->setMinimumSize( 500,
-//                                       p_intf->p_sys->p_mi->addSize.height() );
     if( !config_GetInt( p_intf, "qt-always-video" ) )
         need_update = true;
 
