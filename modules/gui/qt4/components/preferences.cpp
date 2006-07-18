@@ -23,6 +23,7 @@
 
 #include "components/preferences.hpp"
 #include "components/preferences_widgets.hpp"
+#include "qt4.hpp"
 #include <vlc_config_cat.h>
 #include <assert.h>
 
@@ -351,6 +352,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             msg_Warn( p_intf, "unable to create preferences (main not found)");
             return;
         }
+        if( p_module ) vlc_object_yield( p_module );
         vlc_list_release( p_list );
     }
 
@@ -398,6 +400,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     QVBoxLayout *boxlayout = NULL;
 
     QScrollArea *scroller= new QScrollArea;
+    scroller->setFrameStyle( QFrame::NoFrame );
     QWidget *scrolled_area = new QWidget;
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -420,7 +423,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 box->setLayout( boxlayout );
                 layout->addWidget( box, 1 );
             }
-            box = new QGroupBox( p_item->psz_text );
+            box = new QGroupBox( qfu(p_item->psz_text) );
             boxlayout = new QVBoxLayout();
         }
 
@@ -449,6 +452,8 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         box->setLayout( boxlayout );
         layout->addWidget( box, 1 );
     }
+
+    vlc_object_release( p_module );
 
     scrolled_area->setSizePolicy( QSizePolicy::Preferred,QSizePolicy::Fixed );
     scrolled_area->setLayout( layout );

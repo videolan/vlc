@@ -25,6 +25,9 @@
 
 #include "util/qvlcframe.hpp"
 
+class PLSelector;
+class PLPanel;
+
 class PlaylistDialog : public QVLCFrame
 {
     Q_OBJECT;
@@ -38,6 +41,9 @@ public:
 private:
     PlaylistDialog( intf_thread_t * );
     static PlaylistDialog *instance;
+
+    PLSelector *selector;
+    PLPanel *rightPanel;
 public slots:
 };
 

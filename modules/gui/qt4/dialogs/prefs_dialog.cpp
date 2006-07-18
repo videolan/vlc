@@ -39,10 +39,10 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
      layout = new QHBoxLayout();
      QVBoxLayout * main_layout = new QVBoxLayout();
-     setWindowTitle( _("Preferences" ) );
+     setWindowTitle( qtr("Preferences" ) );
      resize( 800, 450 );
 
-          advanced_tree = NULL;
+     advanced_tree = NULL;
      simple_tree = NULL;
      simple_panel = NULL;
      advanced_panel = NULL;

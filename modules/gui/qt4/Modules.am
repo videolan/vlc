@@ -30,6 +30,7 @@ TOMOC = main_interface \
 	components/open \
 	components/video_widget \
 	components/playlist/panels \
+	components/playlist/selector \
 	util/input_slider
 MOCCPP = $(TOMOC:%=%.moc.cpp)
 
@@ -49,6 +50,7 @@ nodist_SOURCES_qt4 = \
 		components/open.moc.cpp \
 		components/video_widget.moc.cpp \
 		components/playlist/panels.moc.cpp \
+		components/playlist/selector.moc.cpp \
 		util/input_slider.moc.cpp \
 		resources.cpp
 
@@ -87,6 +89,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/open.cpp \
 		components/video_widget.cpp \
 		components/playlist/standardpanel.cpp \
+		components/playlist/selector.cpp \
 		util/input_slider.cpp \
 		$(NULL)
 
@@ -108,7 +111,7 @@ EXTRA_DIST += \
 	components/open.hpp \
 	components/video_widget.hpp \
 	components/playlist/panels.hpp \
-        components/playlist/selector.hpp \
+    components/playlist/selector.hpp \
 	util/input_slider.hpp \
 	util/directslider.hpp \
 	util/qvlcframe.hpp \

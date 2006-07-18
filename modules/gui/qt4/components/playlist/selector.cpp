@@ -1,8 +1,8 @@
 /*****************************************************************************
- * standardpanel.cpp : The "standard" playlist panel : just a treeview
+ * selector.cpp : Playlist source selector
  ****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
- * $Id$
+ * $Id: standardpanel.cpp 16024 2006-07-13 13:51:05Z xtophe $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -21,20 +21,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "playlist_model.hpp"
-#include "components/playlist/panels.hpp"
-#include <QTreeView>
+#include "components/playlist/selector.hpp"
 
-StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
-                                  playlist_t *p_playlist,
-                                  playlist_item_t *p_root ):
-                                  PLPanel( _parent, _p_intf )
+PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
 {
-    PLModel *model = new PLModel( p_playlist, p_root, -1, this );
-    QTreeView *view = new QTreeView( this );
-    view->setModel(model);
-    model->Rebuild();
+    p_intf = _p_intf;
 }
 
-StandardPLPanel::~StandardPLPanel()
-{}
+PLSelector::~PLSelector()
+{
+}
+                                        

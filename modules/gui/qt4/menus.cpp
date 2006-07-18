@@ -541,7 +541,7 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
         if( b_submenu )
         {
             QMenu *submenu = new QMenu();
-            submenu->setTitle( QString::fromUtf8( text.psz_string ? 
+            submenu->setTitle( qfu( text.psz_string ? 
                                     text.psz_string : psz_var ) );
             if( CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0)
                 menu->addMenu( submenu );
@@ -552,8 +552,7 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
         return;
     }
 
-#define TEXT_OR_VAR QString::fromUtf8 ( text.psz_string ? text.psz_string : \
-                                         psz_var )
+#define TEXT_OR_VAR qfu ( text.psz_string ? text.psz_string : psz_var )
 
     switch( i_type & VLC_VAR_TYPE )
     {
@@ -620,8 +619,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         {
         case VLC_VAR_VARIABLE:
             CreateChoicesMenu( subsubmenu, CURVAL.psz_string, p_object, false );
-            subsubmenu->setTitle( QString::fromUtf8( CURTEXT ? CURTEXT :
-                                     CURVAL.psz_string ) );
+            subsubmenu->setTitle( qfu( CURTEXT ? CURTEXT :CURVAL.psz_string ) );
             submenu->addMenu( subsubmenu );
             break;
 
@@ -629,7 +627,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
           var_Get( p_object, psz_var, &val );
           another_val.psz_string = strdup( CURVAL.psz_string );
 
-          menutext = CURTEXT ? CURTEXT : another_val.psz_string;
+          menutext = qfu( CURTEXT ? CURTEXT : another_val.psz_string );
           CreateAndConnect( submenu, psz_var, menutext, "", NORMAL_OR_RADIO,
                             p_object->i_object_id, another_val, i_type, 
                             NOTCOMMAND && val.psz_string &&
@@ -640,7 +638,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
 
         case VLC_VAR_INTEGER:
           var_Get( p_object, psz_var, &val );
-          if( CURTEXT ) menutext = CURTEXT; 
+          if( CURTEXT ) menutext = qfu( CURTEXT );
           else menutext.sprintf( "%d", CURVAL.i_int);
           CreateAndConnect( submenu, psz_var, menutext, "", NORMAL_OR_RADIO,
                             p_object->i_object_id, CURVAL, i_type,
@@ -649,7 +647,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
 
         case VLC_VAR_FLOAT:
           var_Get( p_object, psz_var, &val );
-          if( CURTEXT ) menutext = CURTEXT ;
+          if( CURTEXT ) menutext = qfu( CURTEXT );
           else menutext.sprintf( "%.2f", CURVAL.f_float );
           CreateAndConnect( submenu, psz_var, menutext, "", NORMAL_OR_RADIO,
                             p_object->i_object_id, CURVAL, i_type,

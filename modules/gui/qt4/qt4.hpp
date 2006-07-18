@@ -50,6 +50,7 @@ struct intf_sys_t
 #define THEDP DialogsProvider::getInstance()
 #define THEMIM MainInputManager::getInstance( NULL )
 
+#define qfu( i ) QString::fromUtf8( i )
 #define qtr( i ) QString::fromUtf8( _(i) )
 
 static int DialogEvent_Type = QEvent::User + 1;

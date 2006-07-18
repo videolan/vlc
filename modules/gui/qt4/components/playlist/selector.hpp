@@ -32,10 +32,7 @@ class PLSelector: public QWidget
 {
     Q_OBJECT;
 public:
-    PLSelector( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
-    {
-        p_intf = _p_intf;
-    }
+    PLSelector( QWidget *p, intf_thread_t *_p_intf );
     virtual ~PLSelector();
 private:
     intf_thread_t *p_intf;

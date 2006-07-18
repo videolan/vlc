@@ -24,15 +24,26 @@
 #include "util/qvlcframe.hpp"
 #include "qt4.hpp"
 #include "components/playlist/panels.hpp"
+#include "components/playlist/selector.hpp"
+#include <QHBoxLayout>
 
 PlaylistDialog *PlaylistDialog::instance = NULL;
 
 PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
+    setWindowTitle( qtr( "Playlist" ) );
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
                                      VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    new StandardPLPanel( this, p_intf, p_playlist, p_playlist->p_root_category );
+
+    QHBoxLayout *layout = new QHBoxLayout();
+    selector = new PLSelector( this, p_intf );
+    layout->addWidget( selector, 1 );
+    
+    rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( this, p_intf,
+                                   p_playlist, p_playlist->p_root_category ) );
+    layout->addWidget( rightPanel, 3 );
     readSettings( "playlist", QSize( 500,500 ) );
+    setLayout( layout );
 }
 
 PlaylistDialog::~PlaylistDialog()
