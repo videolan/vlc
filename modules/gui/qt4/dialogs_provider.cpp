@@ -45,6 +45,9 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
     connect( menusMapper, SIGNAL( mapped(QObject *) ), this,
             SLOT(menuAction( QObject *)) );
 
+    menusUpdateMapper = new QSignalMapper();
+    connect( menusMapper, SIGNAL( mapped(QObject *) ), this,
+            SLOT(menuUpdateAction( QObject *)) );
 }
 
 DialogsProvider::~DialogsProvider()
@@ -150,6 +153,12 @@ void DialogsProvider::messagesDialog()
 void DialogsProvider::menuAction( QObject *data )
 {
     QVLCMenu::DoAction( p_intf, data );
+}
+
+void DialogsProvider::menuUpdateAction( QObject *data )
+{
+    MenuFunc * f = qobject_cast<MenuFunc *>(data);
+    f->doFunc( p_intf );
 }
 
 void DialogsProvider::simpleOpenDialog()

@@ -30,6 +30,7 @@
 #include <QCloseEvent>
 #include <assert.h>
 #include <QPushButton>
+#include "menus.hpp"
 
 static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void *);
@@ -57,10 +58,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     ui.volLowLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
     ui.volHighLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
 
-    //QVLCMenu::createMenuBar();
+    QVLCMenu::createMenuBar( menuBar(), p_intf );
 
     resize (500, 131 );
-    fprintf( stderr, "Before creating the video widget, size is %ix%i\n", size().width(), size().height() );
 //    if( config_GetInt( p_intf, "embedded" ) )
 
     {
@@ -99,19 +99,18 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     MainInputManager::getInstance( p_intf );
 
     /* Get timer updates */
-    connect( DialogsProvider::getInstance(NULL)->fixed_timer,
-             SIGNAL( timeout() ), this, SLOT(updateOnTimer() ) );
+    connect( THEDP->fixed_timer, SIGNAL( timeout() ),
+             this, SLOT(updateOnTimer() ) );
 
     /* Connect the input manager to the GUI elements it manages */
-    connect( MainInputManager::getInstance( p_intf )->getIM(),
-             SIGNAL(positionUpdated( float, int, int ) ),
+    connect( THEMIM->getIM(),SIGNAL(positionUpdated( float, int, int ) ),
              slider, SLOT( setPosition( float,int, int ) ) );
-    connect( slider, SIGNAL( sliderDragged( float ) ),
-             MainInputManager::getInstance( p_intf )->getIM(),
-             SLOT( sliderUpdate( float ) ) );
-    connect( MainInputManager::getInstance( p_intf )->getIM(),
-             SIGNAL( positionUpdated( float, int, int ) ),
+    connect( THEMIM->getIM(), SIGNAL( positionUpdated( float, int, int ) ),
              this, SLOT( setDisplay( float, int, int ) ) );
+    connect( THEMIM->getIM(), SIGNAL( statusChanged( int ) ),
+             this, SLOT( setStatus( int ) ) );
+    connect( slider, SIGNAL( sliderDragged( float ) ),
+             THEMIM->getIM(),SLOT( sliderUpdate( float ) ) );
 
     /* Actions */
     connect( ui.playButton, SLOT( clicked() ), this, SLOT( play() ) );
@@ -119,8 +118,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     connect( ui.nextButton, SLOT( clicked() ), this, SLOT( next() ) );
     connect( ui.prevButton, SLOT( clicked() ), this, SLOT( prev() ) );
 
-    connect( ui.playlistButton, SLOT(clicked() ), 
-             DialogsProvider::getInstance( p_intf ), SLOT( playlistDialog() ) );
+    connect( ui.playlistButton, SLOT(clicked()),
+             THEDP, SLOT( playlistDialog() ) );
 
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
@@ -143,16 +142,8 @@ MainInterface::~MainInterface()
 
 void MainInterface::resizeEvent( QResizeEvent *e )
 {
-    fprintf( stderr, "Resized to %ix%i\n", e->size().width(), e->size().height() );
-
-     fprintf( stderr, "MI constraints %ix%i -> %ix%i\n",
-                             p_intf->p_sys->p_mi->minimumSize().width(),
-                             p_intf->p_sys->p_mi->minimumSize().height(),
-                               p_intf->p_sys->p_mi->maximumSize().width(),
-                               p_intf->p_sys->p_mi->maximumSize().height() );
-     
-        videoSize.setHeight( e->size().height() - addSize.height() );
-        videoSize.setWidth( e->size().width() - addSize.width() );
+    videoSize.setHeight( e->size().height() - addSize.height() );
+    videoSize.setWidth( e->size().width() - addSize.width() );
     p_intf->p_sys->p_video->updateGeometry() ;
 }
 
@@ -162,7 +153,14 @@ void MainInterface::stop()
 }
 void MainInterface::play()
 {
-    playlist_Play( THEPL );
+    if( !THEPL->i_size || !THEPL->i_enabled )
+    {
+        /* The playlist is empty, open a file requester */
+        THEDP->openDialog();
+        setStatus( 0 );
+        return;
+    }
+    THEMIM->togglePlayPause();
 }
 void MainInterface::prev()
 {
@@ -181,6 +179,15 @@ void MainInterface::setDisplay( float pos, int time, int length )
     QString title;
     title.sprintf( "%s/%s", psz_time, psz_length );
     ui.sliderBox->setTitle( title );
+}
+
+void MainInterface::setStatus( int status )
+{
+    fprintf( stderr, "Status is now %i\n", status );
+    if( status == 2 ) // Playing
+        ui.playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
+    else
+        ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
 }
 
 void MainInterface::updateOnTimer()
@@ -206,7 +213,6 @@ static int InteractCallback( vlc_object_t *p_this,
     
     MainInterface *p_interface = (MainInterface*)param;
     DialogEvent *event = new DialogEvent( INTF_DIALOG_INTERACTION, 0, p_arg );
-    QApplication::postEvent( DialogsProvider::getInstance( NULL ),
-                                             static_cast<QEvent*>(event) );
+    QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }

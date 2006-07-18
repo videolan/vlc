@@ -53,6 +53,7 @@ private:
     input_thread_t *p_input;
     Ui::MainInterfaceUI ui;
 private slots:
+    void setStatus( int );
     void setDisplay( float, int, int );
     void updateOnTimer();
     void play();

@@ -28,6 +28,7 @@
 #include <QEvent>
 
 class QApplication;
+class QMenu;
 class MainInterface;
 class DialogsProvider;
 class VideoWidget;
@@ -41,10 +42,13 @@ struct intf_sys_t
 
     VideoWidget *p_video;
     int i_saved_height, i_saved_width;
+
+    QMenu * p_popup_menu;
 };
 
 #define THEPL p_intf->p_sys->p_playlist
 #define THEDP DialogsProvider::getInstance()
+#define THEMIM MainInputManager::getInstance( NULL )
 
 static int DialogEvent_Type = QEvent::User + 1;
 

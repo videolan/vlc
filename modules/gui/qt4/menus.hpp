@@ -30,7 +30,7 @@
 using namespace std;
 
 class QMenu;
-class QPoint;
+class QMenuBar;
 
 class MenuItemData : public QObject
 {
@@ -58,27 +58,55 @@ class QVLCMenu : public QObject
 {
     Q_OBJECT;
 public:
+    static void createMenuBar( QMenuBar *, intf_thread_t * ); 
 
-    /* Individual menu builders */
+    /* Menus */
     static QMenu *FileMenu();
-
-    static void AudioPopupMenu( intf_thread_t *, const QPoint& );
-    static void VideoPopupMenu( intf_thread_t *, const QPoint& );
-
+    static QMenu *ToolsMenu( intf_thread_t *, bool with_intf = true );
     static QMenu *NavigMenu( intf_thread_t * , QMenu * );
     static QMenu *VideoMenu( intf_thread_t * , QMenu * );
     static QMenu *AudioMenu( intf_thread_t * , QMenu * );
+    static QMenu *InterfacesMenu( intf_thread_t *p_intf, QMenu * );
 
+    /* Popups */
+    static void AudioPopupMenu( intf_thread_t * );
+    static void VideoPopupMenu( intf_thread_t * );
+    static void MiscPopupMenu( intf_thread_t * );
+    static void PopupMenu( intf_thread_t * );
+
+    static void DoAction( intf_thread_t *, QObject * );
+private:
     /* Generic automenu methods */
     static QMenu * Populate( intf_thread_t *, QMenu *current,
-                             vector<const char*>&, vector<int>& );
+                             vector<const char*>&, vector<int>&,
+                             bool append = false );
 
     static void CreateAndConnect( QMenu *, const char *, QString, QString,
                                   int, int, vlc_value_t, int, bool c = false );
-    static void CreateItem( QMenu *, const char *, vlc_object_t * );
-    static QMenu *CreateChoicesMenu( const char *, vlc_object_t *, bool );
+    static void CreateItem( QMenu *, const char *, vlc_object_t *, bool );
+    static int CreateChoicesMenu( QMenu *,const char *, vlc_object_t *, bool );
 
-    static void DoAction( intf_thread_t *, QObject * );
+};
+
+class MenuFunc : public QObject
+{
+public:
+    MenuFunc( QMenu *_menu, int _id ) { menu = _menu; id = _id; };
+    void doFunc( intf_thread_t *p_intf)
+    {
+        switch( id )
+        {
+        case 1:
+            QVLCMenu::VideoMenu( p_intf, menu ); break;
+        case 2:
+            QVLCMenu::AudioMenu( p_intf, menu ); break;
+        case 3:
+            QVLCMenu::NavigMenu( p_intf, menu ); break;
+        case 4:
+            QVLCMenu::InterfacesMenu( p_intf, menu ); break;
+        }
+    };
+    int id; QMenu *menu;
 };
 
 #endif

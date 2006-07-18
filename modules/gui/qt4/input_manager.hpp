@@ -37,8 +37,10 @@ public:
 private:
     intf_thread_t *p_intf;
     input_thread_t *p_input;
+    int i_old_playing_status;
 
 public slots:
+    void togglePlayPause();
     void update(); ///< Periodic updates
     void setInput( input_thread_t * ); ///< Our controlled input changed
     void sliderUpdate( float ); ///< User dragged the slider. We get new pos
@@ -70,6 +72,8 @@ private:
     input_thread_t *p_input;
     static MainInputManager *instance;
     MainInputManager( intf_thread_t *);
+public slots:
+    void togglePlayPause();
 private slots:
     void updateInput();
 signals:

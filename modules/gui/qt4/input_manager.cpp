@@ -34,10 +34,10 @@
 InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
                            QObject( parent ), p_intf( _p_intf )
 {
+    i_old_playing_status = END_S;
     p_input = NULL;
     /* Subscribe to updates */
-    connect( DialogsProvider::getInstance( p_intf )->fixed_timer,
-             SIGNAL( timeout() ), this, SLOT( update() ) );
+    connect( THEDP->fixed_timer, SIGNAL( timeout() ), this, SLOT( update() ) );
 }
 
 InputManager::~InputManager()
@@ -103,12 +103,38 @@ void InputManager::update()
     }
     emit nameChanged( text );
 
+    /* Update playing status */
+    var_Get( p_input, "state", &val );
+    val.i_int = val.i_int == PAUSE_S ? PAUSE_S : PLAYING_S;
+    if( i_old_playing_status != val.i_int )
+    {
+        i_old_playing_status = val.i_int;
+        emit statusChanged(  val.i_int == PAUSE_S ? PAUSE_S : PLAYING_S );
+    }
 }
 
 void InputManager::sliderUpdate( float new_pos )
 {
    if( p_input && !p_input->b_die && !p_input->b_dead )
         var_SetFloat( p_input, "position", new_pos );
+}
+
+void InputManager::togglePlayPause()
+{
+    vlc_value_t state;
+    var_Get( p_input, "state", &state );
+    if( state.i_int != PAUSE_S )
+    {
+        /* A stream is being played, pause it */
+        state.i_int = PAUSE_S;
+    }
+    else
+    {
+        /* Stream is paused, resume it */
+        state.i_int = PLAYING_S;
+    }
+    var_Set( p_input, "state", state );
+    emit statusChanged( state.i_int );
 }
 
 /**********************************************************************
@@ -156,4 +182,14 @@ void MainInputManager::updateInput()
         vlc_object_release( p_playlist );
     }
     vlc_mutex_unlock( &p_intf->change_lock );
+}
+
+void MainInputManager::togglePlayPause()
+{
+    if( p_input == NULL )
+    {
+        playlist_Play( THEPL );
+        return;
+    }
+    getIM()->togglePlayPause();
 }
