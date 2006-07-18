@@ -25,13 +25,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/intf.h>
 
-#include <errno.h>                                                 /* ENOMEM */
 #include "playlist.h"
 
 struct demux_sys_t
@@ -51,34 +48,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 int E_(Import_PLS)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-
     uint8_t *p_peek;
-    char    *psz_ext;
+    CHECK_PEEK( p_peek, 7 );
 
-    if( stream_Peek( p_demux->s , &p_peek, 7 ) < 7 ) return VLC_EGENERIC;
-    psz_ext = strrchr ( p_demux->psz_path, '.' );
-
-    if( !strncasecmp( (char *)p_peek, "[playlist]", 10 ) )
-    {
-        ;
-    }
-    else if( ( psz_ext && !strcasecmp( psz_ext, ".pls") ) ||
-             ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "pls") ) )
+    if( POKE( p_peek, "[playlist]", 10 ) ||
+        isExtension( p_demux, ".pls" )   || isDemux( p_demux, "pls" ) )
     {
         ;
     }
     else return VLC_EGENERIC;
 
-    msg_Dbg( p_demux, "found valid PLS playlist file");
-
-    p_demux->pf_control = Control;
-    p_demux->pf_demux = Demux;
-    p_demux->p_sys = malloc( sizeof(demux_sys_t) );
-    if( p_demux->p_sys == NULL )
-    {
-        msg_Err( p_demux, "out of memory" );
-        return VLC_ENOMEM;
-    }
+    STANDARD_DEMUX_INIT_MSG(  "found valid PLS playlist file");
     p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
 
     return VLC_SUCCESS;

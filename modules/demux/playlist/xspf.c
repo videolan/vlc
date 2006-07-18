@@ -44,39 +44,23 @@ struct demux_sys_t
     int i_identifier;
 };
 
+static int Control( demux_t *, int, va_list );
+static int Demux( demux_t * );
+
 /**
  * \brief XSPF submodule initialization function
  */
 int E_(xspf_import_Activate)( vlc_object_t *p_this )
 {
-    demux_t *p_demux = (demux_t *)p_this;
-    char    *psz_ext;
-
-    psz_ext = strrchr( p_demux->psz_path, '.' );
-
-    if( ( psz_ext && !strcasecmp( psz_ext, ".xspf") ) ||
-        ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "xspf-open") ) )
-    {
-        ;
-    }
-    else
-    {
-        return VLC_EGENERIC;
-    }
-    msg_Dbg( p_demux, "using xspf playlist import");
-
-    p_demux->p_sys = (demux_sys_t*)malloc(sizeof(demux_sys_t ) );
-
-    p_demux->pf_control = xspf_import_Control;
-    p_demux->pf_demux = xspf_import_Demux;
-
+    DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".xspf", "xspf-open", 
+                                      "using XSPF playlist reader" );
     return VLC_SUCCESS;
 }
 
 /**
  * \brief demuxer function for XSPF parsing
  */
-int xspf_import_Demux( demux_t *p_demux )
+int Demux( demux_t *p_demux )
 {
     int i_ret = VLC_SUCCESS;
     xml_t *p_xml = NULL;
@@ -138,7 +122,7 @@ int xspf_import_Demux( demux_t *p_demux )
 }
 
 /** \brief dummy function for demux callback interface */
-int xspf_import_Control( demux_t *p_demux, int i_query, va_list args )
+static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     return VLC_EGENERIC;
 }

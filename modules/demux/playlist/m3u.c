@@ -72,7 +72,7 @@ int E_(Import_M3U)( vlc_object_t *p_this )
              ( psz_ext && !strcasecmp( psz_ext, ".rm") ) ||
              ( psz_ext && !strcasecmp( psz_ext, ".vlc") ) ||
              /* A .ram file can contain a single rtsp link */
-             ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "m3u") ) )
+             isDemux( p_demux,  "m3u" ) )
     {
         ;
     }
@@ -80,16 +80,7 @@ int E_(Import_M3U)( vlc_object_t *p_this )
     {
         return VLC_EGENERIC;
     }
-    msg_Dbg( p_demux, "found valid M3U playlist file");
-
-    p_demux->pf_control = Control;
-    p_demux->pf_demux = Demux;
-    p_demux->p_sys = malloc( sizeof(demux_sys_t) );
-    if( p_demux->p_sys == NULL )
-    {
-        msg_Err( p_demux, "Out of memory" );
-        return VLC_ENOMEM;
-    }
+    STANDARD_DEMUX_INIT_MSG( "found valid M3U playlist" );
     p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
 
     return VLC_SUCCESS;

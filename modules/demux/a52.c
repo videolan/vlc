@@ -125,13 +125,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Have a peep at the show. */
-    if( stream_Peek( p_demux->s, &p_peek, i_peek + A52_MAX_HEADER_SIZE * 2 ) <
-        i_peek + A52_MAX_HEADER_SIZE * 2 )
-    {
-        /* Stream too short */
-        msg_Warn( p_demux, "cannot peek()" );
-        return VLC_EGENERIC;
-    }
+    CHECK_PEEK( p_peek, i_peek + A52_MAX_HEADER_SIZE * 2 );
 
     if( CheckSync( p_peek + i_peek, &b_big_endian ) != VLC_SUCCESS )
     {
@@ -146,16 +140,12 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Fill p_demux fields */
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
     p_sys->b_start = VLC_TRUE;
     p_sys->i_mux_rate = 0;
     p_sys->b_big_endian = b_big_endian;
 
-    /*
-     * Load the A52 packetizer
-     */
+    /* Load the A52 packetizer */
     p_sys->p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_DECODER );
     p_sys->p_packetizer->pf_decode_audio = 0;
     p_sys->p_packetizer->pf_decode_video = 0;

@@ -41,9 +41,6 @@
                            const char      *psz_element)
 
 /* prototypes */
-int xspf_import_Demux( demux_t *);
-int xspf_import_Control( demux_t *, int, va_list );
-
 static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE;
 static vlc_bool_t parse_tracklist_node COMPLEX_INTERFACE;
 static vlc_bool_t parse_track_node COMPLEX_INTERFACE;

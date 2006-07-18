@@ -132,6 +132,97 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
     va_end( args );
     return i_result;
 }
+
+/*************************************************************************
+ * Miscellaneous helpers for demuxers
+ *************************************************************************/
+
+static inline vlc_bool_t isExtension( demux_t *p_demux, char *psz_requested )
+{
+    char    *psz_ext;
+    psz_ext = strrchr ( p_demux->psz_path, '.' );
+    if( !psz_ext || strcmp( psz_ext, psz_requested ) )
+        return VLC_FALSE;
+    return VLC_TRUE;
+}
+static inline vlc_bool_t isDemux( demux_t *p_demux, char *psz_requested )
+{
+   if( !p_demux->psz_demux || strcmp( p_demux->psz_demux, psz_requested ) )
+        return VLC_FALSE;
+    return VLC_TRUE;
+}
+
+#define STANDARD_DEMUX_INIT \
+    p_demux->pf_control = Control; \
+    p_demux->pf_demux = Demux; \
+    MALLOC_ERR( p_demux->p_sys, demux_sys_t );
+
+#define STANDARD_DEMUX_INIT_MSG( msg ) \
+    p_demux->pf_control = Control; \
+    p_demux->pf_demux = Demux; \
+    MALLOC_ERR( p_demux->p_sys, demux_sys_t ); \
+    msg_Dbg( p_demux, msg ); \
+
+#define DEMUX_BY_EXTENSION( ext ) \
+    demux_t *p_demux = (demux_t *)p_this; \
+    if( !isExtension( p_demux, ext ) ) \
+        return VLC_EGENERIC; \
+    STANDARD_DEMUX_INIT;
+
+#define DEMUX_BY_EXTENSION_MSG( ext, msg ) \
+    demux_t *p_demux = (demux_t *)p_this; \
+    if( !isExtension( p_demux, ext ) ) \
+        return VLC_EGENERIC; \
+    STANDARD_DEMUX_INIT_MSG( msg );
+
+#define DEMUX_BY_EXTENSION_OR_FORCED( ext, module ) \
+    demux_t *p_demux = (demux_t *)p_this; \
+    if( !isExtension( p_demux, ext ) && !isDemux( p_demux, module ) ) \
+        return VLC_EGENERIC; \
+    STANDARD_DEMUX_INIT;
+
+#define DEMUX_BY_EXTENSION_OR_FORCED_MSG( ext, module, msg ) \
+    demux_t *p_demux = (demux_t *)p_this; \
+    if( !isExtension( p_demux, ext ) && !isDemux( p_demux, module ) ) \
+        return VLC_EGENERIC; \
+    STANDARD_DEMUX_INIT_MSG( msg );
+
+#define CHECK_PEEK( zepeek, size ) \
+    if( stream_Peek( p_demux->s , &zepeek, size ) < size ){ \
+        msg_Dbg( p_demux, "not enough data" ); return VLC_EGENERIC; }
+
+#define CHECK_PEEK_GOTO( zepeek, size ) \
+    if( stream_Peek( p_demux->s , &zepeek, size ) < size ) { \
+        msg_Dbg( p_demux, "not enough data" ); goto error; }
+
+#define CHECK_DISCARD_PEEK( size ) { uint8_t *p_peek; \
+    if( stream_Peek( p_demux->s , &p_peek, size ) < size ) return VLC_EGENERIC;}
+
+#define POKE( peek, stuff, size ) (strncasecmp( (char *)peek, stuff, size )==0)
+    
+
+#define CREATE_PACKETIZER( a,b,c,d ) \
+    p_sys->p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_DECODER ); \
+    p_sys->p_packetizer->pf_decode_audio = 0; \
+    p_sys->p_packetizer->pf_decode_video = 0; \
+    p_sys->p_packetizer->pf_decode_sub = 0; \
+    p_sys->p_packetizer->pf_packetize = 0; \
+    es_format_Init( &p_sys->p_packetizer->fmt_in, AUDIO_ES, \
+                    VLC_FOURCC( a, b, c, d ) );
+
+/* BEWARE ! This can lead to memory leaks ! */
+#define LOAD_PACKETIZER_OR_FAIL( msg ) \
+    p_sys->p_packetizer->p_module = \
+        module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 ); \
+    \
+    if( p_sys->p_packetizer->p_module == NULL ) \
+    { \
+        vlc_object_destroy( p_sys->p_packetizer ); \
+        msg_Err( p_demux, "cannot find packetizer for " # msg ); \
+        free( p_sys ); \
+        return VLC_EGENERIC; \
+    }
+
 /**
  * @}
  */

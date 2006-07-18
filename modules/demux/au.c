@@ -89,7 +89,7 @@ struct demux_sys_t
     int             i_header_size;
 };
 
-static int DemuxPCM( demux_t * );
+static int Demux( demux_t * );
 static int Control ( demux_t *, int i_query, va_list args );
 
 /*****************************************************************************
@@ -105,7 +105,7 @@ static int Open( vlc_object_t *p_this )
     int          i_cat;
     int          i_samples, i_modulo;
 
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
+    CHECK_PEEK( p_peek, 4 );
 
     if( memcmp( p_peek, ".snd", 4 ) )
     {
@@ -128,7 +128,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys = p_demux->p_sys = malloc( sizeof( demux_sys_t ) );
+    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
     p_sys->i_time = 1;
     p_sys->i_header_size = GetDWBE( &hdr[0] );
 
@@ -276,19 +276,15 @@ static int Open( vlc_object_t *p_this )
                             (mtime_t)i_samples /
                             (mtime_t)p_sys->fmt.audio.i_rate;
 
-    /* finish to set up p_demux */
-    p_demux->pf_demux   = DemuxPCM;
-    p_demux->pf_control = Control;
-
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * DemuxPCM: read packet and send them to decoders
+ * Demux: read packet and send them to decoders
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int DemuxPCM( demux_t *p_demux )
+static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_block;

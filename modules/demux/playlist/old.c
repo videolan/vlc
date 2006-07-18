@@ -24,14 +24,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/intf.h>
 #include "charset.h"
-
-#include <errno.h>                                                 /* ENOMEM */
 
 #define PLAYLIST_FILE_HEADER "# vlc playlist file version 0.5"
 
@@ -54,7 +50,6 @@ int E_(Import_Old)( vlc_object_t *p_this )
     if( strncmp( (char *)p_peek, PLAYLIST_FILE_HEADER , 31 ) ) return VLC_EGENERIC;
 
     msg_Dbg( p_demux, "found valid old playlist file");
-
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
 

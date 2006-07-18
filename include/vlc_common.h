@@ -596,6 +596,20 @@ static int64_t GCD( int64_t a, int64_t b )
     else return a;
 }
 
+/* Malloc with automatic error */
+#define MALLOC_VOID( var, type ) { var = (type*)malloc( sizeof( type) ); \
+                                   if( !var ) return; }
+#define MALLOC_NULL( var, type ) { var = (type*)malloc( sizeof( type) ); \
+                                   if( !var ) return NULL; }
+#define MALLOC_ERR( var, type ) { var = (type*)malloc( sizeof( type) ); \
+                                   if( !var ) return VLC_ENOMEM; }
+#define MALLOC_GOTOERR( var, type ) { var = (type*)malloc( sizeof( type) ); \
+                                      if( !var ) goto error; }
+#define DECMALLOC_VOID( var, type ) type* var = (type*)malloc( sizeof(type) );\
+                                    if( !var ) return;
+#define DECMALLOC_NULL( var, type ) type* var = (type*)malloc( sizeof(type) );\
+                                    if( !var ) return NULL;
+
 /* Dynamic array handling: realloc array, move data, increment position */
 #if defined( _MSC_VER ) && _MSC_VER < 1300 && !defined( UNDER_CE )
 #   define VLCCVP (void**) /* Work-around for broken compiler */

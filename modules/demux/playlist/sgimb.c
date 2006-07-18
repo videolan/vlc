@@ -135,7 +135,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 int E_(Import_SGIMB)( vlc_object_t * p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys;
     byte_t *p_peek;
     int i_size;
 
@@ -152,27 +151,22 @@ int E_(Import_SGIMB)( vlc_object_t * p_this )
         }
         if ( !strncasecmp( (char *)p_peek, "sgiNameServerHost=", i_len ) )
         {
-            p_demux->pf_demux = Demux;
-            p_demux->pf_control = Control;
-
-            p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-            p_sys->psz_uri = NULL;
-            p_sys->psz_server = NULL;
-            p_sys->psz_location = NULL;
-            p_sys->psz_name = NULL;
-            p_sys->psz_user = NULL;
-            p_sys->psz_password = NULL;
-            p_sys->psz_mcast_ip = NULL;
-            p_sys->i_mcast_port = 0;
-            p_sys->i_packet_size = 0;
-            p_sys->i_duration = 0;
-            p_sys->i_port = 0;
-            p_sys->i_sid = 0;
-            p_sys->b_rtsp_kasenna = VLC_FALSE;
-            p_sys->b_concert = VLC_FALSE;
+            STANDARD_DEMUX_INIT_MSG( "using SGIMB playlist reader" );
+            p_demux->p_sys->psz_uri = NULL;
+            p_demux->p_sys->psz_server = NULL;
+            p_demux->p_sys->psz_location = NULL;
+            p_demux->p_sys->psz_name = NULL;
+            p_demux->p_sys->psz_user = NULL;
+            p_demux->p_sys->psz_password = NULL;
+            p_demux->p_sys->psz_mcast_ip = NULL;
+            p_demux->p_sys->i_mcast_port = 0;
+            p_demux->p_sys->i_packet_size = 0;
+            p_demux->p_sys->i_duration = 0;
+            p_demux->p_sys->i_port = 0;
+            p_demux->p_sys->i_sid = 0;
+            p_demux->p_sys->b_rtsp_kasenna = VLC_FALSE;
+            p_demux->p_sys->b_concert = VLC_FALSE;
             
-            msg_Dbg( p_demux, "using sgimb playlist import");
-
             return VLC_SUCCESS;
         }
     }

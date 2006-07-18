@@ -25,7 +25,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <ctype.h>                                              /* isspace() */
 
 #include <vlc/vlc.h>
@@ -69,35 +68,19 @@ static int DemuxStation( demux_t *p_demux );
 int E_(Import_Shoutcast)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys;
 
-    char    *psz_ext;
-
-    psz_ext = strrchr ( p_demux->psz_path, '.' );
-
-    if( !p_demux->psz_demux || strcmp(p_demux->psz_demux, "shout-winamp") )
-    {
+    if( !isDemux( p_demux, "shout-winamp" ) )
         return VLC_EGENERIC;
-    }
-    msg_Dbg( p_demux, "using shoutcast playlist import");
-
-    p_demux->pf_control = Control;
-    p_demux->pf_demux = Demux;
-    p_demux->p_sys = p_sys = malloc( sizeof(demux_sys_t) );
-    if( p_sys == NULL )
-    {
-        msg_Err( p_demux, "out of memory" );
-        return VLC_ENOMEM;
-    }
-
-    p_sys->p_playlist = NULL;
-    p_sys->p_xml = NULL;
-    p_sys->p_xml_reader = NULL;
+    
+    STANDARD_DEMUX_INIT_MSG( "using shoutcast playlist reader" );
+    p_demux->p_sys->p_playlist = NULL;
+    p_demux->p_sys->p_xml = NULL;
+    p_demux->p_sys->p_xml_reader = NULL;
 
     /* Do we want to list adult content ? */
     var_Create( p_demux, "shoutcast-show-adult",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    p_sys->b_adult = var_GetBool( p_demux, "shoutcast-show-adult" );
+    p_demux->p_sys->b_adult = var_GetBool( p_demux, "shoutcast-show-adult" );
 
     return VLC_SUCCESS;
 }

@@ -86,7 +86,6 @@ static int StoreString( demux_t *p_demux, char **ppsz_string, char *psz_source_s
 int E_(Import_ASX)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys;
 
     char    *psz_ext;
 
@@ -95,7 +94,7 @@ int E_(Import_ASX)( vlc_object_t *p_this )
     if( ( psz_ext && !strcasecmp( psz_ext, ".asx") ) ||
         ( psz_ext && !strcasecmp( psz_ext, ".wax") ) ||
         ( psz_ext && !strcasecmp( psz_ext, ".wvx") ) ||
-        ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "asx-open") ) )
+        isDemux( p_demux, "asx-open" ) )
     {
         ;
     }
@@ -103,20 +102,11 @@ int E_(Import_ASX)( vlc_object_t *p_this )
     {
         return VLC_EGENERIC;
     }
-    msg_Dbg( p_demux, "using asx playlist import");
-
-    p_demux->pf_control = Control;
-    p_demux->pf_demux = Demux;
-    p_demux->p_sys = p_sys = malloc( sizeof(demux_sys_t) );
-    if( p_sys == NULL )
-    {
-        msg_Err( p_demux, "out of memory" );
-        return VLC_ENOMEM;
-    }
-    p_sys->psz_prefix = E_(FindPrefix)( p_demux );
-    p_sys->psz_data = NULL;
-    p_sys->i_data_len = -1;
-    p_sys->b_utf8 = VLC_FALSE;
+    STANDARD_DEMUX_INIT_MSG( "using ASX playlist reader" );
+    p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
+    p_demux->p_sys->psz_data = NULL;
+    p_demux->p_sys->i_data_len = -1;
+    p_demux->p_sys->b_utf8 = VLC_FALSE;
     
     return VLC_SUCCESS;
 }

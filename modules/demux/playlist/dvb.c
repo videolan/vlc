@@ -24,8 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/intf.h>
@@ -54,13 +52,10 @@ int E_(Import_DVB)( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     uint8_t *p_peek;
     int     i_peek;
-    char    *psz_ext;
     vlc_bool_t b_valid = VLC_FALSE;
 
-    psz_ext = strrchr ( p_demux->psz_path, '.' );
-
-    if( !( psz_ext && !strncasecmp( psz_ext, ".conf", 5 ) ) &&
-        !p_demux->b_force ) return VLC_EGENERIC;
+    if( !isExtension( p_demux, ".conf" ) && !p_demux->b_force )
+        return VLC_EGENERIC;
 
     /* Check if this really is a channels file */
     if( (i_peek = stream_Peek( p_demux->s, &p_peek, 1024 )) > 0 )
@@ -81,7 +76,6 @@ int E_(Import_DVB)( vlc_object_t *p_this )
     if( !b_valid ) return VLC_EGENERIC;
 
     msg_Dbg( p_demux, "found valid DVB conf playlist file");
-
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
 

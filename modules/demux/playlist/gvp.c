@@ -37,8 +37,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/intf.h>
@@ -68,7 +66,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 int E_(Import_GVP)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys;
 
     int i_size;
     byte_t *p_peek;
@@ -79,18 +76,11 @@ int E_(Import_GVP)( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_demux, "using Google Video Playlist (gvp) import");
-
+    STANDARD_DEMUX_INIT_MSG(  "using Google Video Playlist (gvp) import" )
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
-    p_demux->p_sys = p_sys = malloc( sizeof(demux_sys_t) );
-    if( p_sys == NULL )
-    {
-        msg_Err( p_demux, "out of memory" );
-        return VLC_ENOMEM;
-    }
-
-    p_sys->p_playlist = NULL;
+    MALLOC_ERR( p_demux->p_sys, demux_sys_t );
+    p_demux->p_sys->p_playlist = NULL;
 
     return VLC_SUCCESS;
 }

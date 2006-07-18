@@ -113,10 +113,7 @@ static int Open( vlc_object_t *p_this )
     stream_Read( p_demux->s, NULL, 12 );
 
     /* Fill p_demux field */
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-
+    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
     es_format_Init( &p_sys->fmt, UNKNOWN_ES, 0 );
     p_sys->i_time = 1;
     p_sys->i_ssnd_pos = -1;
@@ -125,22 +122,14 @@ static int Open( vlc_object_t *p_this )
     {
         uint32_t i_size;
 
-        if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
-        {
-            msg_Dbg( p_demux, "cannot peek()" );
-            goto error;
-        }
+        CHECK_PEEK_GOTO( p_peek, 8 );
         i_size = GetDWBE( &p_peek[4] );
 
         msg_Dbg( p_demux, "chunk fcc=%4.4s size=%d", p_peek, i_size );
 
         if( !strncmp( (char *)&p_peek[0], "COMM", 4 ) )
         {
-            if( stream_Peek( p_demux->s, &p_peek, 18 + 8 ) < 18 + 8 )
-            {
-                msg_Dbg( p_demux, "cannot peek()" );
-                goto error;
-            }
+            CHECK_PEEK_GOTO( p_peek, 18+8 );
             es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC( 't', 'w', 'o', 's' ) );
             p_sys->fmt.audio.i_channels = GetWBE( &p_peek[8] );
             p_sys->fmt.audio.i_bitspersample = GetWBE( &p_peek[14] );
@@ -151,12 +140,7 @@ static int Open( vlc_object_t *p_this )
         }
         else if( !strncmp( (char *)&p_peek[0], "SSND", 4 ) )
         {
-            if( stream_Peek( p_demux->s, &p_peek, 8 + 8 ) < 8 + 8 )
-            {
-                msg_Dbg( p_demux, "cannot peek()" );
-                goto error;
-            }
-
+            CHECK_PEEK_GOTO( p_peek, 8+8 );
             p_sys->i_ssnd_pos = stream_Tell( p_demux->s );
             p_sys->i_ssnd_size = i_size;
             p_sys->i_ssnd_offset = GetDWBE( &p_peek[8] );

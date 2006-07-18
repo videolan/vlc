@@ -24,14 +24,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <ctype.h>                                              /* isspace() */
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/intf.h>
 
-#include <errno.h>                                                 /* ENOMEM */
 #include "playlist.h"
 #include "vlc_xml.h"
 
@@ -55,34 +53,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 int E_(Import_podcast)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys;
 
-    char    *psz_ext;
-
-    psz_ext = strrchr ( p_demux->psz_path, '.' );
-
-    if( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "podcast") )
-    {
-        ;
-    }
-    else
-    {
+    if( !isDemux( p_demux, "podcast" ) )
         return VLC_EGENERIC;
-    }
-    msg_Dbg( p_demux, "using podcast playlist import");
-
-    p_demux->pf_control = Control;
-    p_demux->pf_demux = Demux;
-    p_demux->p_sys = p_sys = malloc( sizeof(demux_sys_t) );
-    if( p_sys == NULL )
-    {
-        msg_Err( p_demux, "out of memory" );
-        return VLC_ENOMEM;
-    }
-    p_sys->psz_prefix = E_(FindPrefix)( p_demux );
-    p_sys->p_playlist = NULL;
-    p_sys->p_xml = NULL;
-    p_sys->p_xml_reader = NULL;
+    
+    STANDARD_DEMUX_INIT_MSG( "using podcast reader" );
+    p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
+    p_demux->p_sys->p_playlist = NULL;
+    p_demux->p_sys->p_xml = NULL;
+    p_demux->p_sys->p_xml_reader = NULL;
 
     return VLC_SUCCESS;
 }
