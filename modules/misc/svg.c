@@ -36,7 +36,6 @@
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
-#include <sys/stat.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -44,6 +43,8 @@
 #   include <io.h>
 #endif
 
+#include <glib.h>
+#include <glib/gstdio.h>
 #include <glib-object.h>                                  /* g_object_unref( ) */
 #include <librsvg-2/librsvg/rsvg.h>
 
@@ -146,7 +147,7 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys = p_sys;
 
     /* MUST call this before any RSVG funcs */
-    g_type_init ();
+    rsvg_init( );
 
     return VLC_SUCCESS;
 }
@@ -234,6 +235,7 @@ static void Destroy( vlc_object_t *p_this )
 
     free( p_sys->psz_template );
     free( p_sys );
+    rsvg_term( );
 }
 
 /*****************************************************************************
@@ -261,7 +263,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 
     if( p_svg->p_rendition == NULL ) {
         svg_RenderPicture( p_filter, p_svg );
-        if( ! p_svg )
+        if( ! p_svg->p_rendition )
         {
             msg_Err( p_filter, "Cannot render SVG" );
             return VLC_EGENERIC;
@@ -397,22 +399,37 @@ static void svg_RenderPicture( filter_t *p_filter,
     RsvgHandle *p_handle;
     GError *error = NULL;
 
+    p_svg->p_rendition = NULL;
+
     p_handle = rsvg_handle_new();
+
+    if( !p_handle )
+    {
+        msg_Err( p_filter, "Error creating SVG reader: %s", error->message );
+        return;
+    }
 
     rsvg_handle_set_size_callback( p_handle, svg_SizeCallback, p_filter, NULL );
 
-    rsvg_handle_write( p_handle,
-                       ( guchar* )p_svg->psz_text, strlen( p_svg->psz_text ) + 1,
-                       &error );
-    if( error != NULL )
+    if( ! rsvg_handle_write( p_handle,
+			     ( guchar* )p_svg->psz_text, strlen( p_svg->psz_text ),
+			     &error ) ) 
     {
         msg_Err( p_filter, "error while rendering SVG: %s\n", error->message );
+        g_object_unref( G_OBJECT( p_handle ) );
         return;
     }
-    rsvg_handle_close( p_handle, &error );
+
+    if( ! rsvg_handle_close( p_handle, &error ) )
+    {
+        msg_Err( p_filter, "error while rendering SVG (close): %s\n", error->message );
+        g_object_unref( G_OBJECT( p_handle ) );
+        return;
+    }
 
     p_svg->p_rendition = rsvg_handle_get_pixbuf( p_handle );
-    rsvg_handle_free( p_handle );
+
+    g_object_unref( G_OBJECT( p_handle ) );
 }
 
 
