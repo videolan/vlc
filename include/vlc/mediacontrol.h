@@ -192,6 +192,21 @@ vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
                                     WINDOWHANDLE visual_id,
                                     mediacontrol_Exception *exception );
 
+/* Rate in percent. 100 is normal rate. */
+int mediacontrol_get_rate( mediacontrol_Instance *self,
+			   mediacontrol_Exception *exception );
+
+void mediacontrol_set_rate( mediacontrol_Instance *self,
+			    const int rate,
+			    mediacontrol_Exception *exception );
+
+int mediacontrol_get_fullscreen( mediacontrol_Instance *self,
+				 mediacontrol_Exception *exception );
+
+void mediacontrol_set_fullscreen( mediacontrol_Instance *self,
+				  const int b_fullscreen,
+				  mediacontrol_Exception *exception );
+
 # ifdef __cplusplus
 }
 # endif
