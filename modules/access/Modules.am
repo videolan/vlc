@@ -10,6 +10,8 @@ SOURCES_access_gnomevfs = gnomevfs.c
 SOURCES_dvdnav = dvdnav.c
 SOURCES_dvdread = dvdread.c
 SOURCES_access_fake = fake.c
+SOURCES_pvr = pvr.c videodev2.h
+SOURCES_v4l = v4l.c videodev_mjpeg.h
 SOURCES_cdda = \
         cdda.c \
         vcd/cdrom.c \

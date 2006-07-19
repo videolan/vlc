@@ -1,1 +1,0 @@
-SOURCES_pvr = pvr.c videodev2.h
