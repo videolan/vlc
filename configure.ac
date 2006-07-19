@@ -3799,7 +3799,7 @@ AC_ARG_ENABLE(svg,
 if test "${enable_svg}" = "yes"
 then
   PKG_CHECK_MODULES(SVG, 
-	librsvg-2.0 >= 2.5.0,
+	librsvg-2.0 >= 2.9.0,
 	[
  	  VLC_ADD_LDFLAGS([svg],[$SVG_LIBS])
       	  VLC_ADD_CFLAGS([svg],[$SVG_CFLAGS])
