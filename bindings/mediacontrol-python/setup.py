@@ -21,8 +21,10 @@ except KeyError:
 if not srcdir:
     srcdir = '.'
 
-if os.sys.platform in ('win32', 'darwin'):
+#if os.sys.platform in ('win32', 'darwin'):
     # Do not use PIC version on win32 and Mac OS X
+if True:
+    # PIC version seems to be disabled on all platforms
     vlclib=os.path.join( top_builddir, 'src', 'libvlc.a' )
     picflag=''
 else:
