@@ -25,7 +25,17 @@
 
 #include <vlc/vlc.h>
 #include <vlc_interaction.h>
+#undef Q_
 #include <ui/okcanceldialog.h>
+#undef Q_
+#include <ui/yesnocanceldialog.h>
+#undef Q_
+#include <ui/inputdialog.h>
+#undef Q_
+#include <ui/logindialog.h>
+#undef Q_
+#include <ui/progressdialog.h>
+#undef Q_
 
 class InteractionDialog : public QWidget
 {
@@ -40,10 +50,16 @@ private:
     intf_thread_t *p_intf;
     interaction_dialog_t *p_dialog;
     Ui::OKCancelDialog *uiOkCancel;
+    Ui::YesNoCancelDialog *uiYesNoCancel;
+    Ui::LoginDialog *uiLogin;
+    Ui::InputDialog *uiInput;
+    Ui::ProgressDialog *uiProgress;
 
-    void Finish( int, QString *, QString * );
+    void Finish( int );
 private slots:
     void OK();
+    void yes();
+    void no();
     void cancel();
 };
 

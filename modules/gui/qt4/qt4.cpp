@@ -154,3 +154,16 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
     QApplication::postEvent( DialogsProvider::getInstance( p_intf ),
                              static_cast<QEvent*>(event) );
 }
+
+/*****************************************************************************
+ * PopupMenuCB: callback to show the popupmenu.
+ *  We don't show the menu directly here because we don't want the
+ *  caller to block for a too long time.
+ *****************************************************************************/
+static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
+                        vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)param;
+    ShowDialog( p_intf, INTF_DIALOG_POPUPMENU, new_val.b_bool, 0 );
+    return VLC_SUCCESS;
+}

@@ -12,7 +12,8 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 TOUI = ui/input_stats ui/main_interface ui/file_open \
-	ui/okcanceldialog
+	ui/okcanceldialog ui/yesnocanceldialog ui/logindialog ui/inputdialog \
+    ui/progressdialog
 UIH = $(TOUI:%=%.h)
 
 TOMOC = main_interface \
@@ -119,6 +120,10 @@ EXTRA_DIST += \
 	ui/file_open.ui \
 	ui/main_interface.ui \
 	ui/okcanceldialog.ui \
+    ui/yesnocanceldialog.ui \
+    ui/logindialog.ui \
+    ui/inputdialog.ui \
+    ui/progressdialog.ui \
 	pixmaps/advanced.xpm \
 	pixmaps/audio.xpm \
 	pixmaps/codec.xpm \

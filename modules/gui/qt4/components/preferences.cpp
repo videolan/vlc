@@ -317,7 +317,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                         QWidget( _parent ), p_intf( _p_intf )
 {
     module_config_t *p_item;
-    module_t *p_module;
+    module_t *p_module = NULL;
     vlc_list_t *p_list = NULL;
     global_layout = new QVBoxLayout();
 
