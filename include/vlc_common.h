@@ -610,6 +610,8 @@ static int64_t GCD( int64_t a, int64_t b )
 #define DECMALLOC_NULL( var, type ) type* var = (type*)malloc( sizeof(type) );\
                                     if( !var ) return NULL;
 
+#define FREENULL(a) if( a ) { free( a ); a = NULL; }
+
 /* Dynamic array handling: realloc array, move data, increment position */
 #if defined( _MSC_VER ) && _MSC_VER < 1300 && !defined( UNDER_CE )
 #   define VLCCVP (void**) /* Work-around for broken compiler */
