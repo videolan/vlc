@@ -270,10 +270,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
  *****************************************************************************/
 static void GaussianConvolution( picture_t *p_inpic, uint32_t *p_smooth )
 {
-    uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
-    int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
-    int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
-    int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
+    const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
+    const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
+    const int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
+    const int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
 
     int x,y;
     for( y = 2; y < i_num_lines - 2; y++ )
@@ -323,12 +323,12 @@ static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
                                                 picture_t *p_outpic )
 {
     int x, y;
-    int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
-    int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
-    int i_dst_pitch = p_outpic->p[Y_PLANE].i_pitch;
-    int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
+    const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
+    const int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
+    const int i_dst_pitch = p_outpic->p[Y_PLANE].i_pitch;
+    const int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
 
-    uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
+    const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
 
     uint32_t *p_smooth;
@@ -369,7 +369,7 @@ static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
     {                                                           \
         for( x = 1; x < i_src_visible - 1; x++ )                \
         {                                                       \
-            uint32_t a =                                        \
+            const uint32_t a =                                  \
             (                                                   \
               abs(                                              \
                  ( p_smooth[(y-1)*i_src_visible+x-1]            \
@@ -457,12 +457,12 @@ static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
 {
     int x, y;
 
-    int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
-    int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
-    int i_dst_pitch = p_outpic->p[Y_PLANE].i_pitch;
-    int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
+    const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
+    const int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
+    const int i_dst_pitch = p_outpic->p[Y_PLANE].i_pitch;
+    const int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
 
-    uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
+    const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
 
     uint32_t *p_smooth;
@@ -518,14 +518,14 @@ static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
         for( x = 1; x < i_src_visible - 1; x++ )
         {
 
-            int gradx =
+            const int gradx =
                  ( p_smooth[(y-1)*i_src_visible+x-1]
                    - p_smooth[(y+1)*i_src_visible+x-1] )
                + ( ( p_smooth[(y-1)*i_src_visible+x]
                     - p_smooth[(y+1)*i_src_visible+x] ) <<1 )
                + ( p_smooth[(y-1)*i_src_visible+x+1]
                    - p_smooth[(y+1)*i_src_visible+x+1] );
-            int grady =
+            const int grady =
                  ( p_smooth[(y-1)*i_src_visible+x-1]
                    - p_smooth[(y-1)*i_src_visible+x+1] )
                + ( ( p_smooth[y*i_src_visible+x-1]
