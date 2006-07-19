@@ -107,6 +107,10 @@ struct filter_sys_t
     int i_gradient_type;
     vlc_bool_t b_cartoon;
 
+    uint32_t *p_buf32;
+    uint32_t *p_buf32_bis;
+    uint8_t *p_buf8;
+
     /* For hough mode */
     int *p_pre_hough;
 };
@@ -176,6 +180,10 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys->b_cartoon =
         var_GetInteger( p_filter, FILTER_PREFIX "cartoon" );
 
+    p_filter->p_sys->p_buf32 = NULL;
+    p_filter->p_sys->p_buf32_bis = NULL;
+    p_filter->p_sys->p_buf8 = NULL;
+
     return VLC_SUCCESS;
 }
 
@@ -188,8 +196,10 @@ static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
-    if(p_filter->p_sys->p_pre_hough)
-        free(p_filter->p_sys->p_pre_hough);
+    free( p_filter->p_sys->p_buf32 );
+    free( p_filter->p_sys->p_buf32_bis );
+    free( p_filter->p_sys->p_buf8 );
+    free( p_filter->p_sys->p_pre_hough );
 
     free( p_filter->p_sys );
 }
@@ -272,36 +282,36 @@ static void GaussianConvolution( picture_t *p_inpic, uint32_t *p_smooth )
         {
             p_smooth[y*i_src_visible+x] = (uint32_t)(
               /* 2 rows up */
-                ( p_inpix[(y-2)*i_src_pitch+x-2]<<1 )
-              + ( p_inpix[(y-2)*i_src_pitch+x-1]<<2 )
-              + ( p_inpix[(y-2)*i_src_pitch+x]<<2 )
-              + ( p_inpix[(y-2)*i_src_pitch+x+1]<<2 )
-              + ( p_inpix[(y-2)*i_src_pitch+x+2]<<1 )
+                ( p_inpix[(y-2)*i_src_pitch+x-2] )
+              + ((p_inpix[(y-2)*i_src_pitch+x-1]
+              +   p_inpix[(y-2)*i_src_pitch+x]
+              +   p_inpix[(y-2)*i_src_pitch+x+1])<<1 )
+              + ( p_inpix[(y-2)*i_src_pitch+x+2] )
               /* 1 row up */
-              + ( p_inpix[(y-1)*i_src_pitch+x-2]<<2 )
-              + ( p_inpix[(y-1)*i_src_pitch+x-1]<<3 )
-              + ( p_inpix[(y-1)*i_src_pitch+x]*12 )
-              + ( p_inpix[(y-1)*i_src_pitch+x+1]<<3 )
-              + ( p_inpix[(y-1)*i_src_pitch+x+2]<<2 )
+              + ((p_inpix[(y-1)*i_src_pitch+x-2]
+              + ( p_inpix[(y-1)*i_src_pitch+x-1]<<1 )
+              + ( p_inpix[(y-1)*i_src_pitch+x]*3 )
+              + ( p_inpix[(y-1)*i_src_pitch+x+1]<<1 )
+              +   p_inpix[(y-1)*i_src_pitch+x+2]
               /* */
-              + ( p_inpix[y*i_src_pitch+x-2]<<2 )
-              + ( p_inpix[y*i_src_pitch+x-1]*12 )
-              + ( p_inpix[y*i_src_pitch+x]<<4 )
-              + ( p_inpix[y*i_src_pitch+x+1]*12 )
-              + ( p_inpix[y*i_src_pitch+x+2]<<2 )
+              +   p_inpix[y*i_src_pitch+x-2]
+              + ( p_inpix[y*i_src_pitch+x-1]*3 )
+              + ( p_inpix[y*i_src_pitch+x]<<2 )
+              + ( p_inpix[y*i_src_pitch+x+1]*3 )
+              +   p_inpix[y*i_src_pitch+x+2]
               /* 1 row down */
-              + ( p_inpix[(y+1)*i_src_pitch+x-2]<<2 )
-              + ( p_inpix[(y+1)*i_src_pitch+x-1]<<3 )
-              + ( p_inpix[(y+1)*i_src_pitch+x]*12 )
-              + ( p_inpix[(y+1)*i_src_pitch+x+1]<<3 )
-              + ( p_inpix[(y+1)*i_src_pitch+x+2]<<2 )
+              +   p_inpix[(y+1)*i_src_pitch+x-2]
+              + ( p_inpix[(y+1)*i_src_pitch+x-1]<<1 )
+              + ( p_inpix[(y+1)*i_src_pitch+x]*3 )
+              + ( p_inpix[(y+1)*i_src_pitch+x+1]<<1 )
+              +   p_inpix[(y+1)*i_src_pitch+x+2] )<<1 )
               /* 2 rows down */
-              + ( p_inpix[(y+2)*i_src_pitch+x-2]<<1 )
-              + ( p_inpix[(y+2)*i_src_pitch+x-1]<<2 )
-              + ( p_inpix[(y+2)*i_src_pitch+x]<<2 )
-              + ( p_inpix[(y+2)*i_src_pitch+x+1]<<2 )
-              + ( p_inpix[(y+2)*i_src_pitch+x+2]<<1 )
-              ) >> 7 /* 115 */;
+              + ( p_inpix[(y+2)*i_src_pitch+x-2] )
+              + ((p_inpix[(y+2)*i_src_pitch+x-1]
+              +   p_inpix[(y+2)*i_src_pitch+x]
+              +   p_inpix[(y+2)*i_src_pitch+x+1])<<1 )
+              + ( p_inpix[(y+2)*i_src_pitch+x+2] )
+              ) >> 6 /* 115 */;
         }
     }
 }
@@ -321,7 +331,11 @@ static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
     uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
 
-    uint32_t *p_smooth = (uint32_t *)malloc( i_num_lines * i_src_visible * sizeof(uint32_t));
+    uint32_t *p_smooth;
+    if( !p_filter->p_sys->p_buf32 )
+        p_filter->p_sys->p_buf32 =
+        (uint32_t *)malloc( i_num_lines * i_src_visible * sizeof(uint32_t));
+    p_smooth = p_filter->p_sys->p_buf32;
 
     if( !p_smooth ) return;
 
@@ -350,73 +364,77 @@ static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
      | -2 0 2 | and |  0  0  0 |
      | -1 0 1 |     | -1 -2 -1 | */
 
-    for( y = 1; y < i_num_lines - 1; y++ )
-    {
-        for( x = 1; x < i_src_visible - 1; x++ )
-        {
-            uint32_t a =
-            (
-              abs(
-                ( ( p_smooth[(y-1)*i_src_visible+x]
-                    - p_smooth[(y+1)*i_src_visible+x] ) <<1 )
-               + ( p_smooth[(y-1)*i_src_visible+x-1]
-                   - p_smooth[(y+1)*i_src_visible+x-1] )
-               + ( p_smooth[(y-1)*i_src_visible+x+1]
-                   - p_smooth[(y+1)*i_src_visible+x+1] )
-              )
-            +
-              abs(
-                ( ( p_smooth[y*i_src_visible+x-1]
-                    - p_smooth[y*i_src_visible+x+1] ) <<1 )
-               + ( p_smooth[(y-1)*i_src_visible+x-1]
-                   - p_smooth[(y-1)*i_src_visible+x+1] )
-               + ( p_smooth[(y+1)*i_src_visible+x-1]
-                   - p_smooth[(y+1)*i_src_visible+x+1] )
-              )
+#define FOR                                                     \
+    for( y = 1; y < i_num_lines - 1; y++ )                      \
+    {                                                           \
+        for( x = 1; x < i_src_visible - 1; x++ )                \
+        {                                                       \
+            uint32_t a =                                        \
+            (                                                   \
+              abs(                                              \
+                 ( p_smooth[(y-1)*i_src_visible+x-1]            \
+                   - p_smooth[(y+1)*i_src_visible+x-1] )        \
+               + ( ( p_smooth[(y-1)*i_src_visible+x]            \
+                    - p_smooth[(y+1)*i_src_visible+x] ) <<1 )   \
+               + ( p_smooth[(y-1)*i_src_visible+x+1]            \
+                   - p_smooth[(y+1)*i_src_visible+x+1] )        \
+              )                                                 \
+            +                                                   \
+              abs(                                              \
+                 ( p_smooth[(y-1)*i_src_visible+x-1]            \
+                   - p_smooth[(y-1)*i_src_visible+x+1] )        \
+               + ( ( p_smooth[y*i_src_visible+x-1]              \
+                    - p_smooth[y*i_src_visible+x+1] ) <<1 )     \
+               + ( p_smooth[(y+1)*i_src_visible+x-1]            \
+                   - p_smooth[(y+1)*i_src_visible+x+1] )        \
+              )                                                 \
             );
-            if( p_filter->p_sys->i_gradient_type )
+    if( p_filter->p_sys->i_gradient_type )
+    {
+        if( p_filter->p_sys->b_cartoon )
+        {
+            FOR
+            if( a > 60 )
             {
-                if( p_filter->p_sys->b_cartoon )
-                {
-                    if( a > 60 )
-                    {
-                        p_outpix[y*i_dst_pitch+x] = 0x00;
-                    }
-                    else
-                    {
-                        if( p_smooth[y*i_src_visible+x] > 0xa0 )
-                            p_outpix[y*i_dst_pitch+x] =
-                                0xff - ((0xff - p_inpix[y*i_src_pitch+x] )>>2);
-                        else if( p_smooth[y*i_src_visible+x] > 0x70 )
-                            p_outpix[y*i_dst_pitch+x] =
-                                0xa0 - ((0xa0 - p_inpix[y*i_src_pitch+x] )>>2);
-                        else if( p_smooth[y*i_src_visible+x] > 0x28 )
-                            p_outpix[y*i_dst_pitch+x] =
-                                0x70 - ((0x70 - p_inpix[y*i_src_pitch+x] )>>2);
-                        else
-                            p_outpix[y*i_dst_pitch+x] =
-                                0x28 - ((0x28 - p_inpix[y*i_src_pitch+x] )>>2);
-                    }
-                }
-                else
-                {
-                    if( a>>8 )
-                        p_outpix[y*i_dst_pitch+x] = 255;
-                    else
-                        p_outpix[y*i_dst_pitch+x] = (uint8_t)a;
-                }
+                p_outpix[y*i_dst_pitch+x] = 0x00;
             }
             else
             {
-                if( a>>8 )
-                    p_outpix[y*i_dst_pitch+x] = 0;
+                if( p_smooth[y*i_src_visible+x] > 0xa0 )
+                    p_outpix[y*i_dst_pitch+x] =
+                        0xff - ((0xff - p_inpix[y*i_src_pitch+x] )>>2);
+                else if( p_smooth[y*i_src_visible+x] > 0x70 )
+                    p_outpix[y*i_dst_pitch+x] =
+                        0xa0 - ((0xa0 - p_inpix[y*i_src_pitch+x] )>>2);
+                else if( p_smooth[y*i_src_visible+x] > 0x28 )
+                    p_outpix[y*i_dst_pitch+x] =
+                        0x70 - ((0x70 - p_inpix[y*i_src_pitch+x] )>>2);
                 else
-                    p_outpix[y*i_dst_pitch+x] = (uint8_t)(255 - a);
+                    p_outpix[y*i_dst_pitch+x] =
+                        0x28 - ((0x28 - p_inpix[y*i_src_pitch+x] )>>2);
             }
+            }}
+        }
+        else
+        {
+            FOR
+            if( a>>8 )
+                p_outpix[y*i_dst_pitch+x] = 255;
+            else
+                p_outpix[y*i_dst_pitch+x] = (uint8_t)a;
+            }}
         }
     }
-
-    if( p_smooth ) free( p_smooth );
+    else
+    {
+        FOR
+        if( a>>8 )
+            p_outpix[y*i_dst_pitch+x] = 0;
+        else
+            p_outpix[y*i_dst_pitch+x] = 0xff-(uint8_t)a;
+        }}
+    }
+#undef FOR
 }
 
 /*****************************************************************************
@@ -447,9 +465,24 @@ static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
     uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
 
-    uint32_t *p_smooth = malloc( i_num_lines*i_src_visible * sizeof(uint32_t) );
-    uint32_t *p_grad = malloc( i_num_lines*i_src_visible *sizeof(uint32_t) );
-    uint8_t *p_theta = malloc( i_num_lines*i_src_visible *sizeof(uint8_t) );
+    uint32_t *p_smooth;
+    uint32_t *p_grad;
+    uint8_t *p_theta;
+
+    if( !p_filter->p_sys->p_buf32 )
+        p_filter->p_sys->p_buf32 =
+        (uint32_t *)malloc( i_num_lines * i_src_visible * sizeof(uint32_t));
+    p_smooth = p_filter->p_sys->p_buf32;
+
+    if( !p_filter->p_sys->p_buf32_bis )
+        p_filter->p_sys->p_buf32_bis =
+        (uint32_t *)malloc( i_num_lines * i_src_visible * sizeof(uint32_t));
+    p_grad = p_filter->p_sys->p_buf32_bis;
+
+    if( !p_filter->p_sys->p_buf8 )
+        p_filter->p_sys->p_buf8 =
+        (uint8_t *)malloc( i_num_lines * i_src_visible * sizeof(uint8_t));
+    p_theta = p_filter->p_sys->p_buf8;
 
     if( !p_smooth || !p_grad || !p_theta ) return;
 
@@ -486,17 +519,17 @@ static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
         {
 
             int gradx =
-                ( ( p_smooth[(y-1)*i_src_visible+x]
-                    - p_smooth[(y+1)*i_src_visible+x] ) <<1 )
-               + ( p_smooth[(y-1)*i_src_visible+x-1]
+                 ( p_smooth[(y-1)*i_src_visible+x-1]
                    - p_smooth[(y+1)*i_src_visible+x-1] )
+               + ( ( p_smooth[(y-1)*i_src_visible+x]
+                    - p_smooth[(y+1)*i_src_visible+x] ) <<1 )
                + ( p_smooth[(y-1)*i_src_visible+x+1]
                    - p_smooth[(y+1)*i_src_visible+x+1] );
             int grady =
-                ( ( p_smooth[y*i_src_visible+x-1]
-                    - p_smooth[y*i_src_visible+x+1] ) <<1 )
-               + ( p_smooth[(y-1)*i_src_visible+x-1]
+                 ( p_smooth[(y-1)*i_src_visible+x-1]
                    - p_smooth[(y-1)*i_src_visible+x+1] )
+               + ( ( p_smooth[y*i_src_visible+x-1]
+                    - p_smooth[y*i_src_visible+x+1] ) <<1 )
                + ( p_smooth[(y+1)*i_src_visible+x-1]
                    - p_smooth[(y+1)*i_src_visible+x+1] );
 
@@ -531,29 +564,29 @@ static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
                             && p_grad[y*i_src_visible+x] > p_grad[(y+1)*i_src_visible+x] )
                         {
                             p_outpix[y*i_dst_pitch+x] = 0;
+                            break;
                         } else goto colorize;
-                        break;
                     case THETA_P:
                         if(    p_grad[y*i_src_visible+x] > p_grad[(y-1)*i_src_visible+x-1]
                             && p_grad[y*i_src_visible+x] > p_grad[(y+1)*i_src_visible+x+1] )
                         {
                             p_outpix[y*i_dst_pitch+x] = 0;
+                            break;
                         } else goto colorize;
-                        break;
                     case THETA_M:
                         if(    p_grad[y*i_src_visible+x] > p_grad[(y-1)*i_src_visible+x+1]
                             && p_grad[y*i_src_visible+x] > p_grad[(y+1)*i_src_visible+x-1] )
                         {
                             p_outpix[y*i_dst_pitch+x] = 0;
+                            break;
                         } else goto colorize;
-                        break;
                     case THETA_X:
                         if(    p_grad[y*i_src_visible+x] > p_grad[y*i_src_visible+x-1]
                             && p_grad[y*i_src_visible+x] > p_grad[y*i_src_visible+x+1] )
                         {
                             p_outpix[y*i_dst_pitch+x] = 0;
+                            break;
                         } else goto colorize;
-                        break;
                 }
             }
             else
@@ -577,9 +610,6 @@ static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
             }
         }
     }
-    if( p_smooth ) free( p_smooth );
-    if( p_grad ) free( p_grad );
-    if( p_theta) free( p_theta );
 }
 
 /*****************************************************************************
