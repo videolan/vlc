@@ -1182,6 +1182,78 @@ MediaControl_sound_get_volume( PyObject *self, PyObject *args )
 }
 
 static PyObject*
+MediaControl_set_rate( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    int rate;
+
+    if( !PyArg_ParseTuple( args, "i", &rate ) )
+        return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_set_rate( SELF->mc, rate, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject*
+MediaControl_get_rate( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    PyObject *py_retval;
+    int rate;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    rate = mediacontrol_get_rate( SELF->mc, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    py_retval = Py_BuildValue( "i", rate );
+    return py_retval;
+}
+
+static PyObject*
+MediaControl_set_fullscreen( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    int fs;
+
+    if( !PyArg_ParseTuple( args, "i", &fs ) )
+        return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_set_fullscreen( SELF->mc, fs, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject*
+MediaControl_get_fullscreen( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    PyObject *py_retval;
+    int fs;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    fs = mediacontrol_get_fullscreen( SELF->mc, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    py_retval = Py_BuildValue( "i", fs );
+    return py_retval;
+}
+
+static PyObject*
 MediaControl_set_visual( PyObject *self, PyObject *args )
 {
     mediacontrol_Exception* exception = NULL;
@@ -1235,6 +1307,14 @@ static PyMethodDef MediaControl_methods[] =
       "sound_set_volume( int )           Set the volume" },
     { "set_visual", MediaControl_set_visual, METH_VARARGS,
       "set_visual( int )           Set the embedding window visual ID" },
+    { "get_rate", MediaControl_get_rate, METH_VARARGS,
+      "get_rate( ) -> int       Get the rate" },
+    { "set_rate", MediaControl_set_rate, METH_VARARGS,
+      "set_rate( int )              Set the rate" },
+    { "get_fullscreen", MediaControl_get_fullscreen, METH_VARARGS,
+      "get_fullscreen( ) -> int       Get the fullscreen status" },
+    { "set_fullscreen", MediaControl_set_fullscreen, METH_VARARGS,
+      "set_fullscreen( int )              Set the fullscreen status" },
     { NULL, NULL, 0, NULL },
 };
 
