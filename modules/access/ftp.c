@@ -207,18 +207,7 @@ static int Open( vlc_object_t *p_this )
     char         *psz_arg;
 
     /* Init p_access */
-    p_access->pf_read = Read;
-    p_access->pf_block = NULL;
-    p_access->pf_seek = Seek;
-    p_access->pf_control = Control;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-    p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
-    memset( p_sys, 0, sizeof( access_sys_t ) );
+    STANDARD_READ_ACCESS_INIT
     p_sys->fd_cmd = -1;
     p_sys->fd_data = -1;
 

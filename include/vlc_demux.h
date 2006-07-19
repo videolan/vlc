@@ -155,12 +155,14 @@ static inline vlc_bool_t isDemux( demux_t *p_demux, char *psz_requested )
 #define STANDARD_DEMUX_INIT \
     p_demux->pf_control = Control; \
     p_demux->pf_demux = Demux; \
-    MALLOC_ERR( p_demux->p_sys, demux_sys_t );
+    MALLOC_ERR( p_demux->p_sys, demux_sys_t ); \
+    memset( p_demux->p_sys, 0, sizeof( demux_sys_t ) );
 
 #define STANDARD_DEMUX_INIT_MSG( msg ) \
     p_demux->pf_control = Control; \
     p_demux->pf_demux = Demux; \
     MALLOC_ERR( p_demux->p_sys, demux_sys_t ); \
+    memset( p_demux->p_sys, 0, sizeof( demux_sys_t ) ); \
     msg_Dbg( p_demux, msg ); \
 
 #define DEMUX_BY_EXTENSION( ext ) \
@@ -228,6 +230,10 @@ static inline vlc_bool_t isDemux( demux_t *p_demux, char *psz_requested )
         free( p_sys ); \
         return VLC_EGENERIC; \
     }
+
+#define DESTROY_PACKETIZER( location ) \
+    if( location->p_module ) module_Unneed( location, location->p_module ); \
+    vlc_object_destroy( location );
 
 /**
  * @}

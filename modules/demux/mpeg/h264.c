@@ -118,27 +118,10 @@ static int Open( vlc_object_t * p_this )
     }
     msg_Dbg( p_demux, "using %.2f fps", p_sys->f_fps );
 
-    /*
-     * Load the mpegvideo packetizer
-     */
-    p_sys->p_packetizer = vlc_object_create( p_demux, VLC_OBJECT_PACKETIZER );
-    p_sys->p_packetizer->pf_decode_audio = NULL;
-    p_sys->p_packetizer->pf_decode_video = NULL;
-    p_sys->p_packetizer->pf_decode_sub = NULL;
-    p_sys->p_packetizer->pf_packetize = NULL;
-    es_format_Init( &p_sys->p_packetizer->fmt_in, VIDEO_ES,
-                    VLC_FOURCC( 'h', '2', '6', '4' ) );
+    /* Load the mpegvideo packetizer */
+    INIT_VPACKETIZER( p_sys->p_packetizer,  'h', '2', '6', '4'  );
     es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
-    p_sys->p_packetizer->p_module =
-        module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 );
-
-    if( p_sys->p_packetizer->p_module == NULL)
-    {
-        vlc_object_destroy( p_sys->p_packetizer );
-        msg_Err( p_demux, "cannot find mp4v packetizer" );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
+    LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "H264" );
 
     return VLC_SUCCESS;
 }
@@ -151,8 +134,7 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    module_Unneed( p_sys->p_packetizer, p_sys->p_packetizer->p_module );
-    vlc_object_destroy( p_sys->p_packetizer );
+    DESTROY_PACKETIZER( p_sys->p_packetizer );
 
     free( p_sys );
 }

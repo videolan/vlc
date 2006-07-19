@@ -206,10 +206,7 @@ static int Open( vlc_object_t *p_this )
     free( psz_name );
 
     /* Fill p_demux field */
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
+    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
     p_sys->dvdnav = p_dvdnav;
 
     ps_track_init( p_sys->tk );

@@ -235,11 +235,12 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_access->info.i_size = 0;
+    /* Init p_access */
+    STANDARD_READ_ACCESS_INIT;
+
     i_ret = p_smb->fstat( p_smb, p_file, &filestat );
     if( i_ret ) msg_Err( p_access, "stat failed (%s)", strerror(errno) );
     else p_access->info.i_size = filestat.st_size;
-
 #else
 
 #ifndef WIN32
@@ -258,26 +259,15 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_access->info.i_size = 0;
+    /* Init p_access */
+    STANDARD_READ_ACCESS_INIT;
+
     i_ret = smbc_fstat( i_smb, &filestat );
     if( i_ret ) msg_Err( p_access, "stat failed (%s)", strerror(i_ret) );
     else p_access->info.i_size = filestat.st_size;
 #endif
 
     free( psz_uri );
-
-    /* Init p_access */
-    p_access->pf_read = Read;
-    p_access->pf_block = NULL;
-    p_access->pf_seek = Seek;
-    p_access->pf_control = Control;
-    p_access->info.i_update = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-    p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
-    memset( p_sys, 0, sizeof( access_sys_t ) );
 
 #ifdef USE_CTX
     p_sys->p_smb = p_smb;

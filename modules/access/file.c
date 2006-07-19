@@ -153,11 +153,8 @@ static int Open( vlc_object_t *p_this )
 #ifdef HAVE_SYS_STAT_H
     struct stat         stat_info;
 #endif
-    vlc_bool_t          b_stdin;
-
     file_entry_t *      p_file;
-
-    b_stdin = psz_name[0] == '-' && psz_name[1] == '\0';
+    vlc_bool_t          b_stdin = psz_name[0] == '-' && psz_name[1] == '\0';
 
     if( !b_stdin )
     {
@@ -192,17 +189,7 @@ static int Open( vlc_object_t *p_this )
 #endif
     }
 
-    p_access->pf_read = Read;
-    p_access->pf_block = NULL;
-    p_access->pf_seek = Seek;
-    p_access->pf_control = Control;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-    p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
+    STANDARD_READ_ACCESS_INIT;
     p_sys->i_nb_reads = 0;
     p_sys->b_kfir = VLC_FALSE;
     p_sys->file = NULL;

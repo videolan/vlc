@@ -92,7 +92,6 @@ static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    vlc_value_t val;
     es_format_t fmt;
 
     /* Only when selected */
@@ -100,27 +99,17 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Set up p_demux */
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
+    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
     p_demux->info.i_update = 0;
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
 
-    var_Create( p_demux, "fake-duration", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "fake-duration", &val );
-    p_sys->i_duration = val.i_int * 1000;
-
-    var_Create( p_demux, "fake-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "fake-fps", &val );
-    p_sys->f_fps = val.f_float;
+    p_sys->i_duration = var_CreateGetInteger( p_demux, "fake-duration" ) * 1000;
+    p_sys->f_fps = var_CreateGetFloat( p_demux, "fake-fps" );
 
     /* Declare the elementary stream */
     es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC('f','a','k','e') );
-    var_Create( p_demux, "fake-id", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "fake-id", &val );
-    fmt.i_id = val.i_int;
+    fmt.i_id = var_CreateGetInteger( p_demux, "fake-id" );
     p_sys->p_es_video = es_out_Add( p_demux->out, &fmt );
 
     /* Update default_pts to a suitable value for access */

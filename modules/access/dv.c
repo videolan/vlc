@@ -142,17 +142,9 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_access, "opening device %s", psz_name );
 
     /* Set up p_access */
-    p_access->pf_read = NULL;
-    p_access->pf_block = Block;
-    p_access->pf_control = Control;
-    p_access->pf_seek = NULL;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
+    access_InitFields( p_access );
+    ACCESS_SET_CALLBACKS( NULL, Block, Control, NULL );
     p_access->info.b_prebuffered = VLC_FALSE;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
 
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
     if( !p_sys )

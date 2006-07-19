@@ -130,4 +130,32 @@ static inline int access2_Control( access_t *p_access, int i_query, ... )
     return i_result;
 }
 
+static void inline access_InitFields( access_t *p_a )
+{
+    p_a->info.i_update = 0;
+    p_a->info.i_size = 0;
+    p_a->info.i_pos = 0;
+    p_a->info.b_eof = VLC_FALSE;
+    p_a->info.i_title = 0;
+    p_a->info.i_seekpoint = 0;
+}
+
+#define ACCESS_SET_CALLBACKS( read, block, control, seek ) \
+    p_access->pf_read = read;  \
+    p_access->pf_block = block; \
+    p_access->pf_control = control; \
+    p_access->pf_seek = seek; \
+
+#define STANDARD_READ_ACCESS_INIT \
+    access_InitFields( p_access ); \
+    ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek ); \
+    MALLOC_ERR( p_access->p_sys, access_sys_t ); \
+    p_sys = p_access->p_sys; memset( p_sys, 0, sizeof( access_sys_t ) );
+
+#define STANDARD_BLOCK_ACCESS_INIT \
+    access_InitFields( p_access ); \
+    ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek ); \
+    MALLOC_ERR( p_access->p_sys, access_sys_t ); \
+    p_sys = p_access->p_sys; memset( p_sys, 0, sizeof( access_sys_t ) );
+
 #endif

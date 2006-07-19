@@ -98,17 +98,10 @@ static int Open( vlc_object_t *p_this )
     *psz_parser++ = '\0';
 
     /* Init p_access */
-    p_access->pf_read = Read;
-    p_access->pf_block = NULL;
-    p_access->pf_control = Control;
-    p_access->pf_seek = NULL;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-    p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
+    access_InitFields( p_access ); \
+    ACCESS_SET_CALLBACKS( Read, NULL, Control, NULL ); \
+    MALLOC_ERR( p_access->p_sys, access_sys_t ); \
+    p_sys = p_access->p_sys; memset( p_sys, 0, sizeof( access_sys_t ) );
 
     p_sys->fd = net_ConnectTCP( p_access, psz_dup, atoi( psz_parser ) );
     free( psz_dup );

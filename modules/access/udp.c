@@ -190,19 +190,11 @@ static int Open( vlc_object_t *p_this )
              psz_server_addr, i_server_port, psz_bind_addr, i_bind_port );
 
     /* Set up p_access */
-    p_access->pf_read = NULL;
-    p_access->pf_block = BlockChoose;
-    p_access->pf_control = Control;
-    p_access->pf_seek = NULL;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
+    access_InitFields( p_access );
+    ACCESS_SET_CALLBACKS( NULL, BlockChoose, Control, NULL );
     p_access->info.b_prebuffered = VLC_FALSE;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
+    MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
 
-    p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
     p_sys->fd = net_OpenUDP( p_access, psz_bind_addr, i_bind_port,
                                       psz_server_addr, i_server_port );
     if( p_sys->fd < 0 )
@@ -225,7 +217,6 @@ static int Open( vlc_object_t *p_this )
 
     /* Update default_pts to a suitable value for udp access */
     var_Create( p_access, "udp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
 
     /* RTP reordering for out-of-sequence packets */
     p_sys->i_rtp_late = var_CreateGetInteger( p_access, "rtp-late" ) * 1000;
