@@ -384,7 +384,14 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         p_item++; // Why that ?
     }
     else
-        head = QString( p_module->psz_longname );
+    {
+        head = QString( qfu(p_module->psz_longname) );
+        if( p_module->psz_help ) 
+        {
+            head.append( "\n" );
+            head.append( qfu( p_module->psz_help ) );
+        }
+    }
 
     QLabel *label = new QLabel( head, this );
     QFont font = label->font();

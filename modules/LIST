@@ -57,7 +57,6 @@ $Id$
  * dirac: BBC Dirac codec
  * directfb: Direct Framebuffer video output
  * directory : input module to read files in a directory
- * distort: miscellaneous image effects filter.
  * dmo: a DirectMediaObject decoder that uses DirectMedia to decode video (WMV3)
  * dolby_surround_decoder: simple decoder for dolby surround encoded streams
  * dshow: DirectShow access plugin for encoding cards under Windows
@@ -132,11 +131,10 @@ $Id$
  * libmpeg2: Mpeg2 video decoder using libmpeg2
  * linear_resampler: linear audio resampler
  * lirc: Linux infrared control module
- * livedotcom: rtp demux based on liveMedia (live.com)
+ * live555: rtp demux based on liveMedia (live555.com)
  * logger: file logger plugin
  * logo: video filter to put a logo on the video
  * lpcm: LPCM decoder
- * m3u: PLS, M3U, ASX and B4S playlist parser
  * m4a: MPEG-4 Audio Stream demuxer
  * m4v: MPEG-4 Video Stream demuxer
  * macosx: Video output, and interface module for Mac OS X.
@@ -218,7 +216,6 @@ $Id$
  * screen: a input module that takes screenshots of the primary monitor
  * screensaver: screensaver disabling module
  * sdl_image: SDL-based image decoder
- * sgimb: SGIMB referrer files parser
  * shout: Shoutcast services discovery
  * showintf: shows the main interface
  * simple_channel_mixer: channel mixer

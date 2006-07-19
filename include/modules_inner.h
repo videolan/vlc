@@ -112,6 +112,7 @@
         p_module->psz_object_name = MODULE_STRING;                            \
         p_module->psz_shortname = NULL;                                       \
         p_module->psz_longname = MODULE_STRING;                               \
+        p_module->psz_help = NULL;                                            \
         p_module->pp_shortcuts[ 0 ] = MODULE_STRING;                          \
         p_module->i_cpu = 0;                                                  \
         p_module->psz_program = NULL;                                         \
@@ -184,6 +185,9 @@
 
 #define set_description( desc )                                               \
     p_submodule->psz_longname = desc
+
+#define set_help( help )                                                      \
+    p_submodule->psz_help = help
 
 #define set_capability( cap, score )                                          \
     p_submodule->psz_capability = cap;                                        \
