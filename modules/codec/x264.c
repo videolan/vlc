@@ -586,9 +586,13 @@ static int  Open ( vlc_object_t *p_this )
     /* average bitrate specified by transcode vb */
     p_sys->param.rc.i_bitrate = p_enc->fmt_out.i_bitrate / 1000;
 
+#if X264_BUILD < 48
     /* cbr = 1 overrides qp or crf and sets an average bitrate
        but maxrate = average bitrate is needed for "real" CBR */
     if( p_sys->param.rc.i_bitrate > 0 ) p_sys->param.rc.b_cbr = 1;
+#else
+    if( p_sys->param.rc.i_bitrate > 0 ) p_sys->param.rc.i_rc_method = X264_RC_ABR;
+#endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "qpstep", &val );
     if( val.i_int >= 0 && val.i_int <= 51 ) p_sys->param.rc.i_qp_step = val.i_int;
