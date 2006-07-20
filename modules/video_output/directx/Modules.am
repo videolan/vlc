@@ -4,6 +4,12 @@ SOURCES_vout_directx = \
 	events.c \
 	$(NULL)
 
+SOURCES_direct3d = \
+	direct3d.c \
+	vout.h \
+	events.c \
+	$(NULL)
+
 SOURCES_glwin32 = \
 	glwin32.c \
 	vout.h \

@@ -3908,11 +3908,15 @@ then
       AC_CHECK_HEADERS(ddraw.h,
       [ VLC_ADD_PLUGINS([vout_directx aout_directx])
         VLC_ADD_LDFLAGS([vout_directx],[-lgdi32])
-        dnl to be moved when dependance is removed
-        AC_CHECK_HEADERS(GL/gl.h, [
-            VLC_ADD_PLUGINS([glwin32])
-            VLC_ADD_LDFLAGS([glwin32],[-lopengl32 -lgdi32])
-        ]) ])
+      ])
+      AC_CHECK_HEADERS(GL/gl.h,
+      [ VLC_ADD_PLUGINS([glwin32])
+        VLC_ADD_LDFLAGS([glwin32],[-lopengl32 -lgdi32])
+      ])
+      AC_CHECK_HEADERS(d3d9.h,
+      [ VLC_ADD_PLUGINS([direct3d])
+        VLC_ADD_LDFLAGS([direct3d],[-ld3d9 -lgdi32])
+      ])
     else
       AC_MSG_CHECKING(for directX headers in ${with_directx})
       if test -f ${with_directx}/ddraw.h
