@@ -26,12 +26,13 @@
 
 #include <QSlider>
 #include <QMouseEvent>
+#include <QLayout>
 
 class DirectSlider : public QSlider
 {
 public:
-    DirectSlider( QWidget *_parent ) : QSlider( _parent ) {};
-    DirectSlider( Qt::Orientation q,QWidget *_parent ) : QSlider( q,_parent )
+DirectSlider( QWidget *_parent ) : QSlider( _parent ) {};
+DirectSlider( Qt::Orientation q,QWidget *_parent ) : QSlider( q,_parent )
     {};
     virtual ~DirectSlider()   {};
 
@@ -39,8 +40,14 @@ public:
     {
         if(event->button() == Qt::LeftButton)
         {
+#ifdef WIN32
+            int width = qobject_cast<QWidget*>(parent())->sizeHint().width() -
+                     2 * qobject_cast<QWidget*>(parent())->layout()->margin();
+#else
+            int width = width();
+#endif
             int pos = (int)(minimum() + 
-                          (double)(event->x())/width()*(maximum()-minimum()) );
+                          (double)(event->x())/width*(maximum()-minimum()) );
             setSliderPosition( pos );
             QSlider::mousePressEvent(event);
         }

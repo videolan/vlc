@@ -46,7 +46,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
             SLOT(menuAction( QObject *)) );
 
     menusUpdateMapper = new QSignalMapper();
-    connect( menusMapper, SIGNAL( mapped(QObject *) ), this,
+    connect( menusUpdateMapper, SIGNAL( mapped(QObject *) ), this,
             SLOT(menuUpdateAction( QObject *)) );
 }
 
@@ -132,6 +132,12 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
     }
 }
 
+void DialogsProvider::quit()
+{
+    p_intf->b_die = VLC_TRUE;
+    QApplication::quit();
+}
+
 void DialogsProvider::streaminfoDialog()
 {
     StreamInfoDialog::getInstance( p_intf, true )->toggleVisible();
@@ -164,6 +170,11 @@ void DialogsProvider::menuUpdateAction( QObject *data )
 void DialogsProvider::simpleOpenDialog()
 {
 }
+void DialogsProvider::bookmarksDialog()
+{
+}
+
+
 
 void DialogsProvider::popupMenu( int i_dialog )
 {

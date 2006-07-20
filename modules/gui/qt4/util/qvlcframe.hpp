@@ -36,6 +36,7 @@ public:
     static void fixStyle( QWidget *w)
     {
          QStyle *style = qApp->style();
+#if 0
         // Plastique is too dark.
         /// theming ? getting KDE data ? ?
         if( qobject_cast<QPlastiqueStyle *>(style) )
@@ -49,6 +50,7 @@ public:
             plt.setColor( QPalette::Inactive, QPalette::Window, vlg );
             w->setPalette( plt );
         }
+#endif
     }
 
     QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )

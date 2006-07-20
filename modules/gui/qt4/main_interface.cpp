@@ -62,8 +62,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     QVLCMenu::createMenuBar( menuBar(), p_intf );
 
-    timeLabel = new QLabel( this );
-    nameLabel = new QLabel( this );
+    timeLabel = new QLabel( 0 );
+    nameLabel = new QLabel( 0 );
     statusBar()->addWidget( nameLabel, 4 );
     statusBar()->addPermanentWidget( timeLabel, 1 );
 
@@ -122,12 +122,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              THEMIM->getIM(),SLOT( sliderUpdate( float ) ) );
 
     /* Actions */
-    connect( ui.playButton, SLOT( clicked() ), this, SLOT( play() ) );
-    connect( ui.stopButton, SLOT( clicked() ), this, SLOT( stop() ) );
-    connect( ui.nextButton, SLOT( clicked() ), this, SLOT( next() ) );
-    connect( ui.prevButton, SLOT( clicked() ), this, SLOT( prev() ) );
+    connect( ui.playButton, SIGNAL( clicked() ), this, SLOT( play() ) );
+    connect( ui.stopButton, SIGNAL( clicked() ), this, SLOT( stop() ) );
+    connect( ui.nextButton, SIGNAL( clicked() ), this, SLOT( next() ) );
+    connect( ui.prevButton, SIGNAL( clicked() ), this, SLOT( prev() ) );
 
-    connect( ui.playlistButton, SLOT(clicked()),
+    connect( ui.playlistButton, SIGNAL(clicked()),
              THEDP, SLOT( playlistDialog() ) );
 
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );

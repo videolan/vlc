@@ -63,9 +63,16 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
     setAlternatingRowColors( true );
 
+#ifndef WIN32
+    // Fixme - A bit UGLY
     QFont f = font();
-    f.setPointSize( f.pointSize() + 1 );
+    int pSize = f.pointSize();
+    if( pSize > 0 )
+        f.setPointSize( pSize + 1 );
+    else
+        f.setPixelSize( f.pixelSize() + 1 );
     setFont( f );
+#endif
 
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b##_xpm ))
     BI( audio, audio );

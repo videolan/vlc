@@ -65,6 +65,7 @@ private:
 
 public slots:
     void playlistDialog();
+    void bookmarksDialog();
     void streaminfoDialog();
     void prefsDialog();
     void messagesDialog();
@@ -76,6 +77,7 @@ public slots:
     void menuAction( QObject *);
     void menuUpdateAction( QObject *);
     void streamingDialog();
+    void quit();
 };
 
 
