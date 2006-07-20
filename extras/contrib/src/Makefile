@@ -166,7 +166,7 @@ else
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
-	.dvdnav .dvbpsi .wxwidgets .dirac \
+	.dvdnav .dvbpsi .wxwidgets .qt4 .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32 .unicows .libdca
 #	.SDL_image  .daap .cddb .cdio .vcdimager .portaudio 
   else
@@ -1309,6 +1309,20 @@ wxwidgets: wxWidgets-$(WXWIDGETS_VERSION).tar.gz
 CLEAN_FILE += .wxwidgets
 CLEAN_PKG += wxwidgets
 DISTCLEAN_PKG += wxWidgets-$(WXWIDGETS_VERSION).tar.gz
+
+qt4-$(QT4_VERSION).tar.gz:
+	$(WGET) $(QT4_URL)
+
+qt4: qt4-$(QT4_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+
+.qt4:qt4
+	(cd qt4;mkdir -p $(PREFIX)/lib/pkgconfig;rm -f $(PREFIX)/lib/pkgconfig/Qt*; sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtCore.pc.in > $(PREFIX)/lib/pkgconfig/QtCore.pc;sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtGui.pc.in > $(PREFIX)/lib/pkgconfig/QtGui.pc;cp -r include/* $(PREFIX)/include;cp lib/*a $(PREFIX)/lib)
+
+CLEAN_FILE += .qt4
+CLEAN_PKG += qt4
+DISTCLEAN_PKG += qt4-$(QT4_VERSION).tar.gz
 
 # ***************************************************************************
 # zlib
