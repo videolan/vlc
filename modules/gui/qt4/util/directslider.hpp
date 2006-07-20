@@ -41,13 +41,13 @@ DirectSlider( Qt::Orientation q,QWidget *_parent ) : QSlider( q,_parent )
         if(event->button() == Qt::LeftButton)
         {
 #ifdef WIN32
-            int width = qobject_cast<QWidget*>(parent())->sizeHint().width() -
+            int width1 = qobject_cast<QWidget*>(parent())->sizeHint().width() -
                      2 * qobject_cast<QWidget*>(parent())->layout()->margin();
 #else
-            int width = width();
+            int width1 = width();
 #endif
             int pos = (int)(minimum() + 
-                          (double)(event->x())/width*(maximum()-minimum()) );
+                          (double)(event->x())/width1*(maximum()-minimum()) );
             setSliderPosition( pos );
             QSlider::mousePressEvent(event);
         }
