@@ -1,7 +1,8 @@
 /*****************************************************************************
- * vout.c: Windows DirectX video output display method
+ * direct3d.c: Windows Direct3D video output module
  *****************************************************************************
- * Copyright (C) 2001-2006 the VideoLAN team
+ * Copyright (C) 2006 the VideoLAN team
+ *$Id$
  *
  * Authors: Damien Fouilleul <damienf@videolan.org>
  *
