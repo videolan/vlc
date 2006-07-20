@@ -218,8 +218,7 @@ modules/access/mms/mmsh.c
 modules/access/mms/mmsh.h
 modules/access/mms/mmstu.c
 modules/access/mms/mmstu.h
-modules/access/pvr/pvr.c
-modules/access/pvr/videodev2.h
+modules/access/pvr.c
 modules/access/rtsp/access.c
 modules/access/rtsp/real.c
 modules/access/rtsp/real.h
@@ -239,8 +238,7 @@ modules/access/screen/x11.c
 modules/access/smb.c
 modules/access/tcp.c
 modules/access/udp.c
-modules/access/v4l/v4l.c
-modules/access/v4l/videodev_mjpeg.h
+modules/access/v4l.c
 modules/access/vcd/cdrom.c
 modules/access/vcd/cdrom.h
 modules/access/vcd/cdrom_internals.h
@@ -255,6 +253,8 @@ modules/access/vcdx/vcd.c
 modules/access/vcdx/vcd.h
 modules/access/vcdx/vcdplayer.c
 modules/access/vcdx/vcdplayer.h
+modules/access/videodev2.h
+modules/access/videodev_mjpeg.h
 modules/access_filter/record.c
 modules/access_filter/timeshift.c
 modules/access_output/bonjour.c
@@ -532,6 +532,7 @@ modules/gui/qt4/components/infopanels.hpp
 modules/gui/qt4/components/open.cpp
 modules/gui/qt4/components/open.hpp
 modules/gui/qt4/components/playlist/panels.hpp
+modules/gui/qt4/components/playlist/selector.cpp
 modules/gui/qt4/components/playlist/selector.hpp
 modules/gui/qt4/components/playlist/standardpanel.cpp
 modules/gui/qt4/components/preferences.cpp
@@ -554,10 +555,13 @@ modules/gui/qt4/input_manager.cpp
 modules/gui/qt4/input_manager.hpp
 modules/gui/qt4/main_interface.cpp
 modules/gui/qt4/main_interface.hpp
+modules/gui/qt4/menus.cpp
+modules/gui/qt4/menus.hpp
 modules/gui/qt4/playlist_model.cpp
 modules/gui/qt4/playlist_model.hpp
 modules/gui/qt4/qt4.cpp
 modules/gui/qt4/qt4.hpp
+modules/gui/qt4/ui/input_stats.h
 modules/gui/qt4/util/directslider.hpp
 modules/gui/qt4/util/input_slider.cpp
 modules/gui/qt4/util/input_slider.hpp
@@ -969,11 +973,8 @@ modules/video_filter/blend.c
 modules/video_filter/clone.c
 modules/video_filter/crop.c
 modules/video_filter/deinterlace.c
-modules/video_filter/gradient.c
-modules/video_filter/psychedelic.c
-modules/video_filter/ripple.c
-modules/video_filter/wave.c
 modules/video_filter/filter_common.h
+modules/video_filter/gradient.c
 modules/video_filter/invert.c
 modules/video_filter/logo.c
 modules/video_filter/magnify.c
@@ -983,6 +984,8 @@ modules/video_filter/mosaic.h
 modules/video_filter/motionblur.c
 modules/video_filter/motiondetect.c
 modules/video_filter/osdmenu.c
+modules/video_filter/psychedelic.c
+modules/video_filter/ripple.c
 modules/video_filter/rss.c
 modules/video_filter/rv32.c
 modules/video_filter/scale.c
@@ -1003,6 +1006,7 @@ modules/video_filter/swscale/yuv2rgb_template.c
 modules/video_filter/time.c
 modules/video_filter/transform.c
 modules/video_filter/wall.c
+modules/video_filter/wave.c
 modules/video_output/aa.c
 modules/video_output/caca.c
 modules/video_output/directfb.c
