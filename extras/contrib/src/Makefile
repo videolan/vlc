@@ -1310,6 +1310,10 @@ CLEAN_FILE += .wxwidgets
 CLEAN_PKG += wxwidgets
 DISTCLEAN_PKG += wxWidgets-$(WXWIDGETS_VERSION).tar.gz
 
+# ***************************************************************************
+# qt4 (win32 binary)
+# ***************************************************************************
+
 qt4-$(QT4_VERSION).tar.gz:
 	$(WGET) $(QT4_URL)
 
