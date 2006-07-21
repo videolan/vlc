@@ -1317,8 +1317,9 @@ qt4: qt4-$(QT4_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 
-.qt4:qt4
+.qt4: qt4
 	(cd qt4;mkdir -p $(PREFIX)/bin; mkdir -p $(PREFIX)/include;mkdir -p $(PREFIX)/lib/pkgconfig;rm -f $(PREFIX)/lib/pkgconfig/Qt*; sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtCore.pc.in > $(PREFIX)/lib/pkgconfig/QtCore.pc;sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtGui.pc.in > $(PREFIX)/lib/pkgconfig/QtGui.pc;cp -r include/* $(PREFIX)/include;cp lib/*a $(PREFIX)/lib;cp bin/rcc bin/uic bin/moc $(PREFIX)/bin)
+	touch $@
 
 CLEAN_FILE += .qt4
 CLEAN_PKG += qt4
