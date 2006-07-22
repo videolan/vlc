@@ -308,9 +308,13 @@ static char *ppsz_align_descriptions[] =
     "picture quality, for instance deinterlacing, or distort" \
     "the video.")
 
-#define SNAP_PATH_TEXT N_("Video snapshot directory")
+#define SNAP_PATH_TEXT N_("Video snapshot directory (or filename)")
 #define SNAP_PATH_LONGTEXT N_( \
     "Directory where the video snapshots will be stored.")
+
+#define SNAP_PREFIX_TEXT N_("Video snapshot file prefix")
+#define SNAP_PREFIX_LONGTEXT N_( \
+    "Video snapshot file prefix" )
 
 #define SNAP_FORMAT_TEXT N_("Video snapshot format")
 #define SNAP_FORMAT_LONGTEXT N_( \
@@ -319,6 +323,10 @@ static char *ppsz_align_descriptions[] =
 #define SNAP_PREVIEW_TEXT N_("Display video snapshot preview")
 #define SNAP_PREVIEW_LONGTEXT N_( \
     "Display the snapshot preview in the screen's top-left corner.")
+
+#define SNAP_SEQUENTIAL_TEXT N_("Use sequential numbers instead of timestamps")
+#define SNAP_SEQUENTIAL_LONGTEXT N_( \
+    "Use sequential numbers instead of timestamps for snapshot numbering")
 
 #define CROP_TEXT N_("Video cropping")
 #define CROP_LONGTEXT N_( \
@@ -1255,11 +1263,15 @@ vlc_module_begin();
     set_section( N_("Snapshot") , NULL );
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
                    SNAP_PATH_LONGTEXT, VLC_FALSE );
+    add_directory( "snapshot-prefix", "vlcsnap-", NULL, SNAP_PATH_TEXT,
+                   SNAP_PATH_LONGTEXT, VLC_FALSE );
     add_string( "snapshot-format", "png", NULL, SNAP_FORMAT_TEXT,
                    SNAP_FORMAT_LONGTEXT, VLC_FALSE );
         change_string_list( ppsz_snap_formats, NULL, 0 );
     add_bool( "snapshot-preview", VLC_TRUE, NULL, SNAP_PREVIEW_TEXT,
               SNAP_PREVIEW_LONGTEXT, VLC_FALSE );
+    add_bool( "snapshot-sequential", VLC_FALSE, NULL, SNAP_SEQUENTIAL_TEXT,
+              SNAP_SEQUENTIAL_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Window properties" ), NULL );
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
