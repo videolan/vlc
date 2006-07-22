@@ -1263,8 +1263,8 @@ vlc_module_begin();
     set_section( N_("Snapshot") , NULL );
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
                    SNAP_PATH_LONGTEXT, VLC_FALSE );
-    add_directory( "snapshot-prefix", "vlcsnap-", NULL, SNAP_PATH_TEXT,
-                   SNAP_PATH_LONGTEXT, VLC_FALSE );
+    add_string( "snapshot-prefix", "vlcsnap-", NULL, SNAP_PREFIX_TEXT,
+                   SNAP_PREFIX_LONGTEXT, VLC_FALSE );
     add_string( "snapshot-format", "png", NULL, SNAP_FORMAT_TEXT,
                    SNAP_FORMAT_LONGTEXT, VLC_FALSE );
         change_string_list( ppsz_snap_formats, NULL, 0 );
