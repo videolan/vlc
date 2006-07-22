@@ -963,7 +963,16 @@ static void RunThread( vout_thread_t *p_vout)
                 p_vfilter->pf_vout_buffer_new = video_new_buffer_filter;
                 p_vfilter->pf_vout_buffer_del = video_del_buffer_filter;
 
-                p_vfilter->fmt_in.video = p_vout->fmt_render;
+                if( !p_vout->i_vfilters )
+                {
+                    p_vfilter->fmt_in.video = p_vout->fmt_render;
+                }
+                else
+                {
+                    p_vfilter->fmt_in.video = (p_vfilter-1)->fmt_out.video;
+                }
+                /* TODO: one day filters in the middle of the chain might
+                 * have a different fmt_out.video than fmt_render ... */
                 p_vfilter->fmt_out.video = p_vout->fmt_render;
 
                 p_vfilter->p_cfg = p_vout->p_vfilters_cfg[i];
