@@ -77,7 +77,7 @@ bool ThemeLoader::load( const string &fileName )
     // file...
     string path = getFilePath( fileName );
 #if defined( HAVE_ZLIB_H )
-    if( ! extract( fileName ) && ! parse( path, fileName ) )
+    if( ! extract( sToLocale( fileName ) ) && ! parse( path, fileName ) )
         return false;
 #else
     if( ! parse( path, fileName ) )
@@ -311,7 +311,7 @@ bool ThemeLoader::extract( const string &fileName )
             list<string>::const_iterator it;
             for( it = resPath.begin(); it != resPath.end(); it++ )
             {
-                if( findFile( *it, WINAMP2_XML_FILE, xmlFile ) )
+                if( findFile( sToLocale( *it ), WINAMP2_XML_FILE, xmlFile ) )
                     break;
             }
         }
@@ -456,7 +456,7 @@ bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
                 // Found the theme file?
                 if( rFileName == string( pDirContent->d_name ) )
                 {
-                    themeFilePath = newURI;
+                    themeFilePath = sFromLocale( newURI );
                     closedir( pCurrDir );
                     return true;
                 }

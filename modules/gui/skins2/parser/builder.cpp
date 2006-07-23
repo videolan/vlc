@@ -1061,7 +1061,7 @@ GenericFont *Builder::getFont( const string &fontId )
 string Builder::getFilePath( const string &rFileName ) const
 {
     OSFactory *pFactory = OSFactory::instance( getIntf() );
-    return m_path + pFactory->getDirSeparator() + rFileName;
+    return m_path + pFactory->getDirSeparator() + sFromLocale( rFileName );
 }
 
 

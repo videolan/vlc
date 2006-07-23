@@ -37,33 +37,59 @@ class ThemeLoader: public SkinObject
         ThemeLoader( intf_thread_t *pIntf ): SkinObject( pIntf ) {}
         virtual ~ThemeLoader() {}
 
+        /**
+         * The expected fileName must be an UTF-8 string (usually the result of
+         * a call to FromLocale())
+         */
         bool load( const string &fileName );
 
     private:
 #if defined( HAVE_ZLIB_H )
         /// Extract files from an archive (handles tar.gz and zip)
+        /**
+         * Expects a string from the current locale.
+         */
         bool extract( const string &fileName );
 
         /// Extract files from a tar.gz archive
+        /**
+         * Expects strings from the current locale.
+         */
         bool extractTarGz( const string &tarFile, const string &rootDir );
 
         /// Extract files from a .zip archive
+        /**
+         * Expects strings from the current locale.
+         */
         bool extractZip( const string &zipFile, const string &rootDir );
 
         /// Extract the current file from a .zip archive
+        /**
+         * Expects a string from the current locale.
+         */
         bool extractFileInZip( unzFile file, const string &rootDir );
 
         /// Clean up the temporary files created by the extraction
+        /**
+         * Expects a string from the current locale.
+         */
         void deleteTempFiles( const string &path );
 #endif
 
         /// Parse the XML file given as a parameter and build the skin
+        /**
+         * Expects UTF8 strings
+         */
         bool parse( const string &path, const string &xmlFile );
 
         /// Recursively look for the XML file from rootDir.
-        /// The first corresponding file found will be chosen and themeFilePath
-        /// will be updated accordingly.
-        /// The method returns true if a theme file was found, false otherwise
+        /**
+         * The first corresponding file found will be chosen and themeFilePath
+         * will be updated accordingly.
+         * The method returns true if a theme file was found, false otherwise.
+         * rootDir and rFilename must both be strings in the current locale,
+         * whereas themeFilePath will be in UTF8.
+         */
         bool findFile( const string &rootDir, const string &rFileName,
                        string &themeFilePath );
 
