@@ -427,13 +427,13 @@ static int  Open ( vlc_object_t *p_this )
             bInit = sub->initiate( 4 ); /* Constant ? */
         else
             bInit = sub->initiate();
-        
+
         if( strcasestr( sub->codecName(), "REAL" ) )
         {
             msg_Info( p_demux, "real codec detected, using real-RTSP instead" );
             delete iter;
             goto error; 
-        }   
+        }
 
         if( !bInit )
         {
@@ -596,9 +596,9 @@ static int  Open ( vlc_object_t *p_this )
                 }
 
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1141257600
-		/* Because the "faad" decoder does not handle the LATM data length field
-		   at the start of each returned LATM frame, tell the RTP source to omit it. */
-		((MPEG4LATMAudioRTPSource*)sub->rtpSource())->omitLATMDataLengthField();
+                /* Because the "faad" decoder does not handle the LATM data length field
+                   at the start of each returned LATM frame, tell the RTP source to omit it. */
+                ((MPEG4LATMAudioRTPSource*)sub->rtpSource())->omitLATMDataLengthField();
 #endif
             }
             else if( !strcmp( sub->codecName(), "MPEG4-GENERIC" ) )
@@ -713,10 +713,7 @@ static int  Open ( vlc_object_t *p_this )
             }
         }
 
-        if( tk->fmt.i_codec != VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
-        {
-            tk->p_es = es_out_Add( p_demux->out, &tk->fmt );
-        }
+        tk->p_es = es_out_Add( p_demux->out, &tk->fmt );
 
         if( sub->rtcpInstance() != NULL )
         {
