@@ -181,9 +181,10 @@ else
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
-	.png .gpg-error .gcrypt .gnutls .mpcdec\
+	.mpcdec\
 	.dvdnav .dvbpsi .wxwidgets .dirac \
 	.aclocal .libdca
+#	.png .gpg-error .gcrypt .gnutls .mpcdec\
 #	.SDL_image  .daap .cddb .cdio .vcdimager 
    endif
   endif
@@ -919,7 +920,7 @@ ifdef HAVE_WINCE
 else
 .ffmpeg: ffmpeg .faac .lame
 endif
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-a52 --disable-ffplay && make DESTDIR=$(DESTDIR) install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-a52 --disable-ffplay && make install-libs install-headers)
 	touch $@
 
 CLEAN_FILE += .ffmpeg
