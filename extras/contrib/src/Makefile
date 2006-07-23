@@ -181,7 +181,7 @@ else
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
-	.mpcdec\
+	.png .gpg-error .gcrypt .gnutls .mpcdec\
 	.dvdnav .dvbpsi .wxwidgets .dirac \
 	.aclocal .libdca
 #	.png .gpg-error .gcrypt .gnutls .mpcdec\
@@ -907,6 +907,7 @@ endif
 ifeq ($(HOST),i686-apple-darwin8)
 	(cd $@;patch -p 0 < ../Patches/ffmpeg-svn-mactel.patch)
 endif
+	(cd $@; patch -p0 < ../Patches/ffmpeg-install.patch)
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	$(WGET) $(FFMPEG_URL)
