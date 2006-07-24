@@ -931,8 +931,9 @@ update-po:
 	    | sort ; \
 	  echo "" ; \
 	  echo "# modules" ; \
-	  find modules -name '*.[chm]' -o -name '*.[ch]pp' \
+	  find modules -name '*.[chm]' -o -name '*.[ch]pp' -o -name '*.ui'\
 	    | grep -v '\(\.moc\.\|gui/gtk2/\)' \
+	    | grep -vE 'qt4/ui/.*.h' \
 	    | sort ; \
 	} > $(top_srcdir)/po/POTFILES.in
 	rm -f $(top_srcdir)/po/vlc.pot

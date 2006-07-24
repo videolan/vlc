@@ -21,7 +21,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle" >
-   <string>VLC media player</string>
+   <string>_("VLC media player")</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
@@ -219,7 +219,7 @@
      <item>
       <widget class="QPushButton" name="playlistButton" >
        <property name="text" >
-        <string>Playlist</string>
+        <string>_("Playlist")</string>
        </property>
       </widget>
      </item>

@@ -13,7 +13,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Form</string>
+   <string>_("Form")</string>
   </property>
   <widget class="QGroupBox" name="groupBox_3" >
    <property name="geometry" >
@@ -25,7 +25,7 @@
     </rect>
    </property>
    <property name="title" >
-    <string>Streaming</string>
+    <string>_("Streaming")</string>
    </property>
    <layout class="QGridLayout" >
     <property name="margin" >
@@ -67,21 +67,21 @@
     <item row="2" column="0" >
      <widget class="QLabel" name="label_13" >
       <property name="text" >
-       <string>Send bitrate</string>
+       <string>_("Send bitrate")</string>
       </property>
      </widget>
     </item>
     <item row="1" column="0" >
      <widget class="QLabel" name="label_12" >
       <property name="text" >
-       <string>Sent bytes</string>
+       <string>_("Sent bytes")</string>
       </property>
      </widget>
     </item>
     <item row="0" column="0" >
      <widget class="QLabel" name="label_11" >
       <property name="text" >
-       <string>Sent packets</string>
+       <string>_("Sent packets")</string>
       </property>
      </widget>
     </item>
@@ -97,7 +97,7 @@
     </rect>
    </property>
    <property name="title" >
-    <string>Audio</string>
+    <string>_("Audio")</string>
    </property>
    <layout class="QGridLayout" >
     <property name="margin" >
@@ -139,21 +139,21 @@
     <item row="2" column="0" >
      <widget class="QLabel" name="label_10" >
       <property name="text" >
-       <string>Lost buffers</string>
+       <string>_("Lost buffers")</string>
       </property>
      </widget>
     </item>
     <item row="1" column="0" >
      <widget class="QLabel" name="label_9" >
       <property name="text" >
-       <string>Played buffers</string>
+       <string>_("Played buffers")</string>
       </property>
      </widget>
     </item>
     <item row="0" column="0" >
      <widget class="QLabel" name="label_8" >
       <property name="text" >
-       <string>Decoded blocks</string>
+       <string>_("Decoded blocks")</string>
       </property>
      </widget>
     </item>
@@ -169,7 +169,7 @@
     </rect>
    </property>
    <property name="title" >
-    <string>Video</string>
+    <string>_("Video")</string>
    </property>
    <layout class="QGridLayout" >
     <property name="margin" >
@@ -181,7 +181,7 @@
     <item row="2" column="0" >
      <widget class="QLabel" name="label_6" >
       <property name="text" >
-       <string>Lost frames</string>
+       <string>_("Lost frames")</string>
       </property>
      </widget>
     </item>
@@ -198,14 +198,14 @@
     <item row="1" column="0" >
      <widget class="QLabel" name="label_4" >
       <property name="text" >
-       <string>Displayed frames</string>
+       <string>_("Displayed frames")</string>
       </property>
      </widget>
     </item>
     <item row="0" column="0" >
      <widget class="QLabel" name="label_2" >
       <property name="text" >
-       <string>Decoded blocks</string>
+       <string>_("Decoded blocks")</string>
       </property>
      </widget>
     </item>
@@ -241,7 +241,7 @@
     </rect>
    </property>
    <property name="title" >
-    <string>Input</string>
+    <string>_("Input")</string>
    </property>
    <layout class="QGridLayout" >
     <property name="margin" >
@@ -283,28 +283,28 @@
     <item row="1" column="0" >
      <widget class="QLabel" name="label_5" >
       <property name="text" >
-       <string>Input bitrate</string>
+       <string>_("Input bitrate")</string>
       </property>
      </widget>
     </item>
     <item row="0" column="0" >
      <widget class="QLabel" name="label" >
       <property name="text" >
-       <string>Read at media</string>
+       <string>_("Read at media")</string>
       </property>
      </widget>
     </item>
     <item row="3" column="0" >
      <widget class="QLabel" name="label_3" >
       <property name="text" >
-       <string>Stream bitrate</string>
+       <string>_("Stream bitrate")</string>
       </property>
      </widget>
     </item>
     <item row="2" column="0" >
      <widget class="QLabel" name="label_7" >
       <property name="text" >
-       <string>Demuxed</string>
+       <string>_("Demuxed")</string>
       </property>
      </widget>
     </item>

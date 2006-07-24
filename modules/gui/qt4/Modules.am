@@ -72,6 +72,7 @@ $(UIH): %.h: %.ui
 	rm -f $@
 	echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@
 	$(UIC) -tr "Q_" $< >> $@
+	sed -i -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@
 
 
 SOURCES_qt4 = 	qt4.cpp \

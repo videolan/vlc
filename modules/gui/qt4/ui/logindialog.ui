@@ -30,7 +30,7 @@
      <item row="1" column="0" >
       <widget class="QLabel" name="label" >
        <property name="text" >
-        <string>Login</string>
+        <string>_("Login")</string>
        </property>
       </widget>
      </item>
@@ -40,7 +40,7 @@
      <item row="2" column="0" >
       <widget class="QLabel" name="label_2" >
        <property name="text" >
-        <string>Password</string>
+        <string>_("Password")</string>
        </property>
       </widget>
      </item>
@@ -80,14 +80,14 @@
      <item>
       <widget class="QPushButton" name="okButton" >
        <property name="text" >
-        <string>OK</string>
+        <string>_("OK")</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="cancelButton" >
        <property name="text" >
-        <string>Cancel</string>
+        <string>_("Cancel")</string>
        </property>
       </widget>
      </item>
