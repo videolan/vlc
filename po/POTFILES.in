@@ -562,7 +562,6 @@ modules/gui/qt4/playlist_model.cpp
 modules/gui/qt4/playlist_model.hpp
 modules/gui/qt4/qt4.cpp
 modules/gui/qt4/qt4.hpp
-modules/gui/qt4/resources.cpp
 modules/gui/qt4/ui/file_open.ui
 modules/gui/qt4/ui/inputdialog.ui
 modules/gui/qt4/ui/input_stats.ui
