@@ -74,22 +74,3 @@ Index: ffmpeg/configure
  exec_prefix=
  libdir=\${pcfiledir}/libpostproc
  includedir=\${pcfiledir}/libpostproc
-
-
-Index: ffmpeg/libavutil/common.h
-===================================================================
---- ffmpeg/libavutil/common.h	(revision 5805)
-+++ ffmpeg/libavutil/common.h	(working copy)
-@@ -154,11 +154,9 @@
- #  define FF_IMPORT_ATTR
- #endif
- 
--
--#    include "bswap.h"
--
- #ifdef HAVE_AV_CONFIG_H
- /* only include the following when compiling package */
-+#    include "bswap.h"
- #    include "internal.h"
- #endif
- 
