@@ -1,0 +1,43 @@
+Index: libtheora/lib/dsp.h
+===================================================================
+--- libtheora/lib/dsp.h (revision 11456)
++++ libtheora/lib/dsp.h (revision 11701)
+@@ -20,5 +20,4 @@
+ 
+ #include <theora/theora.h>
+-typedef unsigned long int ogg_uint64_t;
+ 
+ typedef struct
+Index: libtheora/lib/x86_64/dsp_mmx.c
+===================================================================
+--- libtheora/lib/x86_64/dsp_mmx.c (revision 11441)
++++ libtheora/lib/x86_64/dsp_mmx.c (revision 11701)
+@@ -20,4 +20,6 @@
+ #include "codec_internal.h"
+ #include "dsp.h"
++
++typedef unsigned long long ogg_uint64_t;
+ 
+ static const __attribute__ ((aligned(8),used)) ogg_int64_t V128 = 0x0080008000800080LL;
+Index: libtheora/lib/x86_64/dsp_mmxext.c
+===================================================================
+--- libtheora/lib/x86_64/dsp_mmxext.c (revision 11441)
++++ libtheora/lib/x86_64/dsp_mmxext.c (revision 11701)
+@@ -21,4 +21,6 @@
+ #include "dsp.h"
+ 
++typedef unsigned long long ogg_uint64_t;
++
+ static ogg_uint32_t sad8x8__mmxext (unsigned char *ptr1, ogg_uint32_t stride1,
+                                     unsigned char *ptr2, ogg_uint32_t stride2)
+Index: libtheora/lib/x86_64/recon_mmx.c
+===================================================================
+--- libtheora/lib/x86_64/recon_mmx.c (revision 11441)
++++ libtheora/lib/x86_64/recon_mmx.c (revision 11701)
+@@ -17,4 +17,6 @@
+ 
+ #include "codec_internal.h"
++
++typedef unsigned long long ogg_uint64_t;
+ 
+ static const __attribute__ ((aligned(8),used)) ogg_int64_t V128 = 0x8080808080808080LL;

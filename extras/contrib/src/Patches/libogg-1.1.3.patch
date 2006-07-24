@@ -1,0 +1,35 @@
+--- ../libogg-1.1.3/configure.in	2005-11-28 05:26:07.000000000 +0100
++++ configure.in	2006-07-11 19:52:15.000000000 +0200
+@@ -45,27 +45,27 @@
+         case $host in 
+         *-*-linux*)
+                 DEBUG="-g -Wall -fsigned-char"
+-                CFLAGS="-O20 -ffast-math -fsigned-char"
++                EXTRA_CFLAGS="-O20 -ffast-math -fsigned-char"
+                 PROFILE="-Wall -W -pg -g -O20 -ffast-math -fsigned-char"
+ 		;;
+         sparc-sun-*)
+                 DEBUG="-g -Wall -fsigned-char -mv8"
+-                CFLAGS="-O20 -ffast-math -fsigned-char -mv8"
++                EXTRA_CFLAGS="-O20 -ffast-math -fsigned-char -mv8"
+                 PROFILE="-pg -g -O20 -fsigned-char -mv8" 
+ 		;;
+ 	*-*-darwin*)
+ 		DEBUG="-fno-common -g -Wall -fsigned-char"
+-		CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
++		EXTRA_CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
+ 		PROFILE="-fno-common -O4 -Wall -pg -g -fsigned-char -ffast-math"
+ 		;;
+         *)
+                 DEBUG="-g -Wall -fsigned-char"
+-                CFLAGS="-O20 -fsigned-char"
++                EXTRA_CFLAGS="-O20 -fsigned-char"
+                 PROFILE="-O20 -g -pg -fsigned-char" 
+ 		;;
+         esac
+ fi
+-CFLAGS="$CFLAGS $cflags_save"
++CFLAGS="$EXTRA_CFLAGS $cflags_save"
+ DEBUG="$DEBUG $cflags_save"
+ PROFILE="$PROFILE $cflags_save"
+ 
