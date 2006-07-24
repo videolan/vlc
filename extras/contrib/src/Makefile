@@ -674,6 +674,7 @@ libtheora-$(THEORA_VERSION).tar.bz2:
 libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/theora.patch
+	patch -p0 < Patches/theora-1.0a7.patch
 	(cd $@; autoconf)
 
 .theora: libtheora .ogg
@@ -699,7 +700,7 @@ ifdef HAVE_WIN32
 	(cd $@; aclocal && automake)
 endif
   
-.shout: libshout .theora .ogg
+.shout: libshout .theora .ogg .speex
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) &&  make && make install )
 	$(INSTALL_NAME)
 	touch $@

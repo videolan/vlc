@@ -65,9 +65,7 @@ diff -ruN libvorbis-1.1.1/configure.in libvorbis/configure.in
          esac
  fi
 -CFLAGS="$CFLAGS $cflags_save"
--LDFLAGS="$LDFLAGS $ldflags_save"
 +CFLAGS="$EXTRA_CFLAGS $cflags_save"
-+LDFLAGS="$EXTRA_LDFLAGS $ldflags_save"
  
  dnl --------------------------------------------------
  dnl Check for headers

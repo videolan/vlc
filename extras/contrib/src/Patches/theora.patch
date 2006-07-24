@@ -1,52 +1,50 @@
-diff -ruN libtheora-1.0alpha5/Makefile.am libtheora/Makefile.am
---- libtheora-1.0alpha5/Makefile.am	Mon Aug 15 20:02:15 2005
-+++ libtheora/Makefile.am	Thu Aug 25 21:11:34 2005
+diff -ruN libtheora-1.0alpha7/configure.ac libtheora/configure.ac
+--- libtheora-1.0alpha7/configure.ac	2006-06-20 22:04:50.000000000 +0200
++++ libtheora/configure.ac	2006-07-11 20:08:04.000000000 +0200
+@@ -88,7 +88,7 @@
+         case $host in 
+         *)
+                 DEBUG="-g -DDEBUG"
+-                CFLAGS="-O"
++                EXTRA_CFLAGS="-O"
+                 PROFILE="-g -p -DDEBUG" ;;
+         esac
+ else
+@@ -96,11 +96,11 @@
+         case $host in 
+         *)
+                 DEBUG="-g -Wall -DDEBUG -D__NO_MATH_INLINES"
+-                CFLAGS="-Wall -O3 -fforce-addr -fomit-frame-pointer -finline-functions -funroll-loops"
++                EXTRA_CFLAGS="-Wall -O3 -fforce-addr -fomit-frame-pointer -finline-functions -funroll-loops"
+                 PROFILE="-Wall -pg -g -O3 -fno-inline-functions -DDEBUG";;
+         esac
+ fi
+-CFLAGS="$CFLAGS $cflags_save"
++CFLAGS="$EXTRA_CFLAGS $cflags_save"
+ 
+ cpu_x86_64=no
+ cpu_x86_32=no
+diff -ruN libtheora-1.0alpha7/Makefile.am libtheora/Makefile.am
+--- libtheora-1.0alpha7/Makefile.am	2006-06-13 00:57:36.000000000 +0200
++++ libtheora/Makefile.am	2006-07-11 20:04:43.000000000 +0200
 @@ -2,7 +2,7 @@
  
  AUTOMAKE_OPTIONS = foreign 1.6 dist-zip dist-bzip2
  
--SUBDIRS = lib include doc examples debian tests
-+SUBDIRS = lib include doc debian tests
+-SUBDIRS = lib include doc examples tests m4
++SUBDIRS = lib include doc tests m4
  
- EXTRA_DIST = COPYING autogen.sh win32 libtheora.spec libtheora.spec.in \
- 	theora-uninstalled.pc.in
-diff -ruN libtheora-1.0alpha5/Makefile.in libtheora/Makefile.in
---- libtheora-1.0alpha5/Makefile.in	Sat Aug 20 21:30:42 2005
-+++ libtheora/Makefile.in	Thu Aug 25 21:11:46 2005
-@@ -224,7 +224,7 @@
+ # we include the whole debian/ dir in EXTRA_DIST because there's a problem
+ # with autotools and HFS+ MacOSX file systems that caused debian/Makefile.am
+diff -ruN libtheora-1.0alpha7/Makefile.in libtheora/Makefile.in
+--- libtheora-1.0alpha7/Makefile.in	2006-06-20 22:06:56.000000000 +0200
++++ libtheora/Makefile.in	2006-07-11 20:05:06.000000000 +0200
+@@ -231,7 +231,7 @@
  target_os = @target_os@
  target_vendor = @target_vendor@
  AUTOMAKE_OPTIONS = foreign 1.6 dist-zip dist-bzip2
--SUBDIRS = lib include doc examples debian tests
-+SUBDIRS = lib include doc debian tests
- EXTRA_DIST = COPYING autogen.sh win32 libtheora.spec libtheora.spec.in \
- 	theora-uninstalled.pc.in
+-SUBDIRS = lib include doc examples tests m4
++SUBDIRS = lib include doc tests m4
  
-diff -ruN libtheora-1.0alpha5/configure.ac libtheora/configure.ac
---- libtheora-1.0alpha5/configure.ac	2005-08-20 20:43:13.000000000 +0200
-+++ libtheora/configure.ac	2005-11-14 22:49:14.000000000 +0100
-@@ -89,7 +89,7 @@
-         case $host in 
-         *)
-                 DEBUG="-g"
--                CFLAGS="-O"
-+                EXTRA_CFLAGS="-O"
-                 PROFILE="-g -p" ;;
-         esac
- else
-@@ -97,12 +97,12 @@
-         case $host in 
-         *)
-                 DEBUG="-g -W -D__NO_MATH_INLINES"
--                CFLAGS="-g -O2 -Wall"
-+                EXTRA_CFLAGS="-g -O2 -Wall"
-                 PROFILE="-W -pg -g -O2 -fno-inline-functions";;
-         esac
- fi
--CFLAGS="$CFLAGS $cflags_save"
--LDFLAGS="$LDFLAGS $ldflags_save"
-+CFLAGS="$EXTRA_CFLAGS $cflags_save"
-+LDFLAGS="$EXTRA_LDFLAGS $ldflags_save"
- 
- dnl Set extra linker options
- case "$target_os" in
+ # we include the whole debian/ dir in EXTRA_DIST because there's a problem
+ # with autotools and HFS+ MacOSX file systems that caused debian/Makefile.am

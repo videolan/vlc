@@ -1,8 +1,8 @@
-Index: ffmpeg/configure
+Index: configure
 ===================================================================
---- ffmpeg/configure	(revision 5790)
+--- ffmpeg/configure	(revision 5823)
 +++ ffmpeg/configure	(working copy)
-@@ -2124,7 +2124,7 @@
+@@ -2118,7 +2118,7 @@
  # build pkg-config files libav*.pc and libpostproc.pc
  # libavutil.pc
  cat <<EOF >libavutil.pc
@@ -11,7 +11,7 @@ Index: ffmpeg/configure
  exec_prefix=\${PREFIX}
  libdir=\${exec_prefix}/lib
  includedir=\${PREFIX}/include
-@@ -2139,7 +2139,7 @@
+@@ -2133,7 +2133,7 @@
  EOF
  
  cat <<EOF >libavutil-uninstalled.pc
@@ -20,7 +20,7 @@ Index: ffmpeg/configure
  exec_prefix=
  libdir=\${pcfiledir}/libavutil
  includedir=\${pcfiledir}/libavutil
-@@ -2155,7 +2155,7 @@
+@@ -2149,7 +2149,7 @@
  
  # libavcodec.pc
  cat <<EOF >libavcodec.pc
@@ -29,7 +29,7 @@ Index: ffmpeg/configure
  exec_prefix=\${PREFIX}
  libdir=\${exec_prefix}/lib
  includedir=\${PREFIX}/include
-@@ -2170,7 +2170,7 @@
+@@ -2164,7 +2164,7 @@
  EOF
  
  cat <<EOF >libavcodec-uninstalled.pc
@@ -38,7 +38,7 @@ Index: ffmpeg/configure
  exec_prefix=
  libdir=\${pcfiledir}/libavcodec
  includedir=\${pcfiledir}/libavcodec
-@@ -2186,7 +2186,7 @@
+@@ -2180,7 +2180,7 @@
  
  # libavformat.pc
  cat <<EOF >libavformat.pc
@@ -47,7 +47,7 @@ Index: ffmpeg/configure
  exec_prefix=\${PREFIX}
  libdir=\${exec_prefix}/lib
  includedir=\${PREFIX}/include
-@@ -2201,7 +2201,7 @@
+@@ -2195,7 +2195,7 @@
  EOF
  
  cat <<EOF >libavformat-uninstalled.pc
@@ -56,7 +56,7 @@ Index: ffmpeg/configure
  exec_prefix=
  libdir=\${pcfiledir}/libavformat
  includedir=\${pcfiledir}/libavformat
-@@ -2218,7 +2218,7 @@
+@@ -2212,7 +2212,7 @@
  
  # libpostproc.pc
  cat <<EOF >libpostproc.pc
@@ -65,7 +65,7 @@ Index: ffmpeg/configure
  exec_prefix=\${PREFIX}
  libdir=\${exec_prefix}/lib
  includedir=\${PREFIX}/include
-@@ -2233,7 +2233,7 @@
+@@ -2227,7 +2227,7 @@
  EOF
  
  cat <<EOF >libpostproc-uninstalled.pc

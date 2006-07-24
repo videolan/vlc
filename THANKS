@@ -71,7 +71,8 @@ Jan Gerber <j at v2v dot org> - patch theora decoding aspect ratio
 Jan Van Boghout <vlc at macrabbit.com> - iTunes like slider for OSX intf
 Javier Varela <tonxabar at hotmail.com> - Spanish translation
 Jean-Alexis Montignies <ja at sente.ch> - coreaudio multiple streams fix
-Jean-Baptiste le Stang <jp.lestand at lestang.org> - Equalizer-GUI-fixes (OSX)
+Jean-Baptiste Kempf <jb at via dot ecp.fr> - Contrib system upgrade
+Jean-Baptiste Le Stang <jp.lestand at lestang.org> - Equalizer-GUI-fixes (OSX)
 Jean-Philippe Grimaldi <jeanphi at via.ecp.fr> - bug fixes
 Jean-Pierre Kuypers <Kuypers at sri.ucl.ac.be> - French translation
 Jeffrey Baker <jwbaker at acm.org> - port of the ALSA plugin to the ALSA 1.0 API

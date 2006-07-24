@@ -6,9 +6,9 @@
  # Prefix must be a full pathname.
 -prefix=/usr/local
 +prefix=$(PREFIX)
+ exec_prefix=$(prefix)
  
  # Where the zlib library and include files are located.
- #ZLIBLIB=/usr/local/lib
 @@ -53,7 +53,7 @@
  # If you're going to install into a temporary location
  # via DESTDIR, $(DESTDIR)$(prefix) must already exist before
