@@ -1,37 +1,28 @@
---- libpng/scripts/makefile.darwin.orig	2004-12-03 00:14:31.000000000 +0000
-+++ libpng/scripts/makefile.darwin	2006-04-10 21:55:35.000000000 +0100
+--- libpng-1.2.12/scripts/makefile.darwin	2006-06-27 22:22:40.000000000 +0200
++++ libpng/scripts/makefile.darwin	2006-07-25 13:28:44.000000000 +0200
 @@ -7,7 +7,7 @@
  # For conditions of distribution and use, see copyright notice in png.h
  
  # where "make install" puts libpng.a, libpng12.dylib, png.h and pngconf.h
 -prefix=/usr/local
 +prefix=??PREFIX??
+ exec_prefix=$(prefix)
  
  # Where the zlib library and include files are located
- #ZLIBLIB=/usr/local/lib
-@@ -16,8 +16,8 @@
- ZLIBINC=../zlib
+@@ -38,8 +38,8 @@
+ RANLIB=ranlib
+ RM_F=/bin/rm -f
  
- CC=cc
 -CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops
 -LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
 +CFLAGS=??EXTRA_CFLAGS?? -I$(ZLIBINC) -Wall -O3 -funroll-loops
 +LDFLAGS=??EXTRA_LDFLAGS?? -L. -L$(ZLIBLIB) -lpng12 -lz
  
- #RANLIB=echo
- RANLIB=ranlib
-@@ -58,7 +58,7 @@
- .c.pic.o:
- 	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
- 
--all: libpng.a $(LIBNAME).dylib pngtest libpng.pc libpng-config
-+all: libpng.a pngtest libpng.pc libpng-config
- 
- libpng.a: $(OBJS)
- 	ar rc $@ $(OBJS)
-@@ -164,7 +164,7 @@
+ INCPATH=$(prefix)/include
+ LIBPATH=$(exec_prefix)/lib
+@@ -178,7 +178,7 @@
  	chmod 755 $(DB)/$(LIBNAME)-config
- 	(cd $(DB); ln -sf $(LIBNAME)-config libpng-config)
+ 	(cd $(DB); $(LN_SF) $(LIBNAME)-config libpng-config)
  
 -install: install-static install-shared install-man install-config
 +install: install-static install-man install-config
