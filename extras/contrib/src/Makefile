@@ -1317,10 +1317,10 @@ DISTCLEAN_PKG += wxWidgets-$(WXWIDGETS_VERSION).tar.gz
 # qt4 (win32 binary)
 # ***************************************************************************
 
-qt4-$(QT4_VERSION)-bin-win32.tar.gz:
+qt4-$(QT4_VERSION)-win32-bin.tar.gz:
 	$(WGET) $(QT4_URL)
 
-qt4: qt4-$(QT4_VERSION)-bin-win32.tar.gz
+qt4: qt4-$(QT4_VERSION)-win32-bin.tar.gz
 	$(EXTRACT_GZ)
 
 
