@@ -27,6 +27,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include "charset.h"
 
 #include <string>
 using namespace std;
