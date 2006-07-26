@@ -54,71 +54,71 @@ public class Playlist implements PlaylistIntf {
 	native private boolean _inputHasVout();
 
 
-    public synchronized void play(int id, String[] options) {
+    public synchronized void play(int id, String[] options) throws VLCException {
         _play(id, options);
     }
 
-    public synchronized void play() {
+    public synchronized void play() throws VLCException {
         play(-1, null);
     }
 
-    public synchronized void pause() {
+    public synchronized void togglePause() throws VLCException {
         _pause();
     }
 
-    public synchronized void stop() {
+    public synchronized void stop() throws VLCException {
         _stop();
 
     }
 
-    public boolean isRunning() {
+    public boolean isRunning() throws VLCException {
          return (_isRunning() == 0)? false : true ;
     }
 
-    public synchronized int itemsCount() {
+    public synchronized int itemsCount() throws VLCException {
         return _itemsCount();
     }
 
-    public synchronized void next() {
+    public synchronized void next() throws VLCException {
         if (! isRunning())
             play();
         _next();
     }
 
-    public synchronized void prev() {
+    public synchronized void prev() throws VLCException {
         if (! isRunning())
             play();
         _prev();
     }
 
-    public synchronized void clear() {
+    public synchronized void clear() throws VLCException {
     	_clear();
     }
 
-    public synchronized int add(String uri, String name, String[] options) {
+    public synchronized int add(String uri, String name, String[] options) throws VLCException {
         return _playlist_add(uri, name, options);
     }
     
-    public synchronized int add(String uri, String name) {
+    public synchronized int add(String uri, String name) throws VLCException {
         return add(uri, name, null);
     }
 
     public synchronized void addExtended() {
     }
 
-    public synchronized void deleteItem(int itemID) {
+    public synchronized void deleteItem(int itemID) throws VLCException {
         _deleteItem(itemID);
     }
     
-    public long getInstance() {
+    public long getInstance() throws VLCException {
         return libvlcInstance;
     }
     
-    public synchronized boolean inputIsPlaying() {
+    public synchronized boolean inputIsPlaying() throws VLCException {
         return _inputIsPlaying();
     }
 
-    public synchronized boolean inputHasVout() {
+    public synchronized boolean inputHasVout() throws VLCException {
         return _inputHasVout();
     }
     

@@ -30,9 +30,33 @@
 package org.videolan.jvlc;
 
 public interface AudioIntf {
-    boolean getMute();
-    void setMute(boolean value);
-    void toggleMute();
-    int getVolume();
-    void setVolume(int volume);
+    /**
+     * @return True if input is currently muted.
+     * @throws VLCException
+     */
+    boolean getMute() throws VLCException;
+    
+    /**
+     * @param value If true, then the input is muted.
+     * @throws VLCException
+     */
+    void setMute(boolean value) throws VLCException;
+
+    /**
+     * Toggles mute
+     * @throws VLCException
+     */
+    void toggleMute() throws VLCException;
+
+    /**
+     * @return The volume level
+     * @throws VLCException
+     */
+    int getVolume() throws VLCException;
+
+    /**
+     * @param volume The volume level (0-200) to set.
+     * @throws VLCException
+     */
+    void setVolume(int volume) throws VLCException;
 }

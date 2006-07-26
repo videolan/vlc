@@ -4,8 +4,9 @@
  * Copyright (C) 1998-2006 the VideoLAN team
  *
  * Authors: Filippo Carone <filippo@carone.org>
+ *          Philippe Morin <phmorin@free.fr>
  *
- * $Id$
+ * $Id: vlc-libvlc-jni.cc 140 2006-07-26 13:47:20Z littlejohn $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,29 +39,18 @@
 jlong getClassInstance (JNIEnv *env, jobject _this);
 jlong getPlaylistInstance (JNIEnv *env, jobject _this);
 
-JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance__ (JNIEnv *env, jobject _this) {
+void handle_vlc_exception( JNIEnv* env, libvlc_exception_t* exception ) {
+  jclass newExcCls;
 
-    // res is the pointer to libvlc_instance_t
-    long res;
-    libvlc_exception_t *exception = ( libvlc_exception_t * ) malloc( sizeof( libvlc_exception_t ));
-    char temp_argv[1][5] = {""};
-
-    libvlc_exception_init( exception );
-
-    res = ( long ) libvlc_new( 0, (char **)temp_argv, exception );
-
-    if ( libvlc_exception_raised( exception )) 
-    {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
-    }
-
-    free( exception );
-
-    //libvlc_playlist_lock( ( libvlc_instance_t * ) res, NULL);
-
-    return res;
+  // raise a Java exception
+  newExcCls = env->FindClass("org/videolan/jvlc/VLCException");
+  if (newExcCls == 0) { /* Unable to find the new exception class, give up. */
+      return;
+  }
+  env->ThrowNew(newExcCls, libvlc_exception_get_message(exception));
+	
 }
+
 
 JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance___3Ljava_lang_String_2 (JNIEnv *env, jobject _this, jobjectArray args) {
 
@@ -74,7 +64,10 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance___3Ljava_lang
   
     argc = (int) env->GetArrayLength((jarray) args) + 1;
     argv = (const char **) malloc(argc * sizeof(char*));
-    sprintf( (char *) argv[0], "%s", "jvlc" );
+
+    argv[0] = "vlc";
+    
+    
     for (int i = 0; i < argc - 1; i++) {
         argv[i+1] = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, i),
                                          0
@@ -125,8 +118,7 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_JVLC__1getMute (JNIEnv *env, j
     
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     free( exception );
@@ -149,8 +141,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1setMute (JNIEnv *env, jobje
     
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     free( exception );
@@ -172,8 +163,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1toggleMute (JNIEnv *env, jo
     
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     free( exception );
@@ -196,8 +186,7 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_JVLC__1getVolume (JNIEnv *env, job
     
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     free( exception );
@@ -221,8 +210,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1setVolume (JNIEnv *env, job
     
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     free( exception );
@@ -250,8 +238,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1toggleFullscreen (JNIEnv *e
     
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     free( exception );
@@ -273,8 +260,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1setFullscreen (JNIEnv *env,
     
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     free( exception );
@@ -297,8 +283,7 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_JVLC__1getFullscreen (JNIEnv *
     
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     free( exception );
@@ -321,16 +306,14 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1getSnapshot (JNIEnv *env, j
 
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     libvlc_video_take_snapshot( input, (char *) psz_filepath, exception );
 
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     
@@ -357,8 +340,7 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_JVLC__1getVideoHeight (JNIEnv *env
     
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     free( exception );
@@ -383,8 +365,7 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_JVLC__1getVideoWidth (JNIEnv *env,
     
     if ( libvlc_exception_raised( exception )) 
     {
-        ///\TODO: raise java exception
-        printf("%s\n", libvlc_exception_get_message( exception ));
+        handle_vlc_exception( env, exception );
     }
 
     free( exception );
@@ -419,8 +400,17 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1playlist_1add (JNIEnv *
                env->GetStringUTFChars( ( jstring ) env->GetObjectArrayElement( options, i ), 0 );
        }
         res = libvlc_playlist_add_extended( ( libvlc_instance_t * ) instance, psz_uri, psz_name, i_options, ppsz_options, exception );
+        
+        if ( libvlc_exception_raised ( exception ) ) 
+        {
+            handle_vlc_exception( env, exception );
+        }            
     } else {
         res = libvlc_playlist_add( ( libvlc_instance_t * ) instance, psz_uri, psz_name, exception );
+        if ( libvlc_exception_raised ( exception ) ) 
+        {
+            handle_vlc_exception( env, exception );
+        }            
     }
  
     /// \todo check exceptions
@@ -451,18 +441,20 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1play (JNIEnv *env, jobj
     libvlc_exception_init( exception );
 
     if ( options != NULL ) {
-       i_options = ( int ) env->GetArrayLength( ( jarray ) options ) + 1;
+       i_options = ( int ) env->GetArrayLength( ( jarray ) options );
        ppsz_options = ( const char ** ) malloc( i_options * sizeof( char* ) );
-       sprintf( ( char * ) ppsz_options[0], "%s", "jvlc" );
-
        for ( int i = 0; i < i_options - 1; i++ ) {
-           ppsz_options[ i+1 ] = 
+           ppsz_options[ i ] = 
                env->GetStringUTFChars( ( jstring ) env->GetObjectArrayElement( options, i ), 0 );
        }
     }
 
     libvlc_playlist_play( p_instance, id, i_options, ( char **  ) ppsz_options, exception );
-
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
+    
     free( exception );
     return;
 }
@@ -476,6 +468,10 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1pause (JNIEnv *env, job
     instance = getPlaylistInstance( env, _this );
   
     libvlc_playlist_pause( ( libvlc_instance_t* ) instance, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
 
     free( exception );
     return;
@@ -488,10 +484,13 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1stop (JNIEnv *env, jobj
     libvlc_exception_init( exception );
     instance = getPlaylistInstance( env, _this );
     libvlc_playlist_stop( ( libvlc_instance_t* ) instance, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
 
     free( exception );
     return;
-  
 }
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1next (JNIEnv *env, jobject _this) {
@@ -501,7 +500,11 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1next (JNIEnv *env, jobj
     libvlc_exception_init( exception );
     instance = getPlaylistInstance( env, _this );
     libvlc_playlist_next( ( libvlc_instance_t* ) instance, exception );
-
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
+    
     free( exception );
     return;
 
@@ -514,6 +517,10 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1prev (JNIEnv *env, jobj
     libvlc_exception_init( exception );
     instance = getPlaylistInstance( env, _this );
     libvlc_playlist_prev( (libvlc_instance_t*) instance, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
 
     free( exception );
     return;
@@ -526,6 +533,10 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1clear (JNIEnv *env, job
     libvlc_exception_init( exception );
     instance = getPlaylistInstance( env, _this );
     libvlc_playlist_clear( (libvlc_instance_t*) instance, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
 
     free( exception );
     return;
@@ -539,6 +550,10 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1deleteItem (JNIEnv *env
     instance = getPlaylistInstance( env, _this );
 
     libvlc_playlist_delete_item( ( libvlc_instance_t * ) instance, itemID, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
 
     free( exception );
     return;
@@ -553,6 +568,10 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1itemsCount (JNIEnv *env
     libvlc_exception_init( exception );
     instance = getPlaylistInstance( env, _this );
     res = libvlc_playlist_items_count( (libvlc_instance_t*) instance, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
 
     free( exception );
     return res;
@@ -567,6 +586,10 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1isRunning (JNIEnv *env,
     libvlc_exception_init( exception );
     instance = getPlaylistInstance( env, _this );
     res = libvlc_playlist_isplaying( (libvlc_instance_t*) instance, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
 
     free( exception );
     return res;
@@ -584,10 +607,16 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Playlist__1inputIsPlaying (JNI
     instance = getPlaylistInstance( env, _this );
     
     input = libvlc_playlist_get_input( ( libvlc_instance_t* ) instance, exception );
-    /// \todo check exceptions
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
     
     res = libvlc_input_will_play( input, exception );
-    /// \todo check exceptions
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
 
     free( exception );
     return res;    
@@ -604,10 +633,16 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Playlist__1inputHasVout (JNIEn
     instance = getPlaylistInstance( env, _this );
     
     input = libvlc_playlist_get_input( ( libvlc_instance_t* ) instance, exception );
-    /// \todo check exceptions
-    
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }            
+
     res = libvlc_input_has_vout( input, exception );
-    /// \todo check exceptions
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }
 
     free( exception );
     return res;    
@@ -628,9 +663,16 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC__1getInputLength (JNIEnv *en
     instance = getPlaylistInstance( env, _this );
     
     input = libvlc_playlist_get_input( ( libvlc_instance_t* ) instance, exception );
-    /// \todo check exceptions
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }
     
     res = libvlc_input_get_length( input, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }
 
     free( exception );
     return res;    
@@ -647,9 +689,17 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC__1getInputTime (JNIEnv *env,
     instance = getPlaylistInstance( env, _this );
     
     input = libvlc_playlist_get_input( ( libvlc_instance_t* ) instance, exception );
-    /// \todo check exceptions
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }
+
     
     res = libvlc_input_get_time( input, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }
 
     free( exception );
     return res;    
@@ -667,9 +717,17 @@ JNIEXPORT jfloat JNICALL Java_org_videolan_jvlc_JVLC__1getInputPosition (JNIEnv 
     instance = getPlaylistInstance( env, _this );
     
     input = libvlc_playlist_get_input( ( libvlc_instance_t* ) instance, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }
 
     res = libvlc_input_get_position( input, exception );
-    /// \todo handle exceptions
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }
+
     free( exception );
     
     return res;
@@ -688,12 +746,254 @@ JNIEXPORT jfloat JNICALL Java_org_videolan_jvlc_JVLC__1getInputFPS (JNIEnv *env,
     instance = getPlaylistInstance( env, _this );
     
     input = libvlc_playlist_get_input( ( libvlc_instance_t* ) instance, exception );
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }
 
     res = libvlc_input_get_fps( input, exception );
-    /// \todo handle exceptions
+    if ( libvlc_exception_raised ( exception ) ) 
+    {
+        handle_vlc_exception( env, exception );
+    }
+
     free( exception );
     
     return res;
+}
+
+
+/*
+ *  VLM native functions
+ */
+
+/*
+ * Class:     org_videolan_jvlc_JVLC
+ * Method:    _addBroadcast
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;ZZ)V
+ */
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1addBroadcast(JNIEnv *env, jobject _this, jstring name,jstring inputmrl, jstring outputmrl, jobjectArray options, jboolean enable, jboolean loop) {
+  const char* psz_name = env->GetStringUTFChars( name, 0 );	
+  const char* psz_inputmrl = env->GetStringUTFChars( inputmrl, 0 );    
+  const char* psz_outputmrl = env->GetStringUTFChars( outputmrl, 0 );        
+  long instance = 0;
+  libvlc_exception_t *exception = (libvlc_exception_t *) malloc( sizeof( libvlc_exception_t ));
+
+  int i_options = 0;
+  const char** ppsz_options = NULL;
+
+  if ( options != NULL ) {
+       i_options = ( int ) env->GetArrayLength( ( jarray ) options );
+       ppsz_options = ( const char ** ) malloc( i_options * sizeof( char* ) );
+
+       for ( int i = 0; i < i_options - 1; i++ ) {
+           ppsz_options[ i ] = 
+               env->GetStringUTFChars( ( jstring ) env->GetObjectArrayElement( options, i ), 0 );
+       }
+    }
+
+
+  libvlc_exception_init( exception );
+  
+  instance = getPlaylistInstance( env, _this );  
+
+  libvlc_vlm_add_broadcast( (libvlc_instance_t *) instance, (char*)psz_name, (char*)psz_inputmrl, (char*)psz_outputmrl ,
+                               i_options, (char**)ppsz_options, enable, loop, exception );
+
+
+   if (psz_name != NULL) {
+       env->ReleaseStringUTFChars( name, psz_name );
+   }    
+   if (psz_inputmrl != NULL) {
+       env->ReleaseStringUTFChars( inputmrl, psz_inputmrl );
+   }    
+   if (psz_outputmrl != NULL) {
+       env->ReleaseStringUTFChars( outputmrl, psz_outputmrl );
+   }
+   
+   handle_vlc_exception(env,exception);
+
+   free(exception);
+}
+
+/*
+ * Class:     org_videolan_jvlc_JVLC
+ * Method:    _deleteMedia
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1deleteMedia(JNIEnv *env, jobject _this, jstring name) {
+    long instance = 0;
+    const char* psz_name = env->GetStringUTFChars( name, 0 );
+    libvlc_exception_t *exception = (libvlc_exception_t *) malloc( sizeof( libvlc_exception_t ));
+
+    libvlc_exception_init( exception );
+
+    instance = getPlaylistInstance( env, _this );
+
+    libvlc_vlm_del_media( (libvlc_instance_t *) instance, (char*)psz_name, exception);    
+ 
+    handle_vlc_exception(env,exception);
+    /* free resources */
+    free(exception);
+
+    if (psz_name != NULL) {
+        env->ReleaseStringUTFChars( name, psz_name );
+    }    
+}
+
+/*
+ * Class:     org_videolan_jvlc_JVLC
+ * Method:    _setEnabled
+ * Signature: (Ljava/lang/String;Z)V
+ */
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1setEnabled(JNIEnv *env, jobject _this, jstring name, jboolean newStatus) {
+    long instance = 0;
+    const char* psz_name = env->GetStringUTFChars( name, 0 );
+    libvlc_exception_t *exception = (libvlc_exception_t *) malloc( sizeof( libvlc_exception_t ));
+
+    libvlc_exception_init( exception );
+
+    instance = getPlaylistInstance( env, _this );
+
+    libvlc_vlm_set_enabled( (libvlc_instance_t *) instance, (char*)psz_name, newStatus, exception);
+
+    handle_vlc_exception(env,exception);
+    /* free resources */
+    free(exception);
+
+    if (psz_name != NULL) {
+        env->ReleaseStringUTFChars( name, psz_name );
+    }        
+}
+
+/*
+ * Class:     org_videolan_jvlc_JVLC
+ * Method:    _setOutput
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1setOutput(JNIEnv *env, jobject _this, jstring name, jstring mrl) {
+   long instance = 0;
+    const char* psz_name = env->GetStringUTFChars( name, 0 );
+    const char* psz_mrl = env->GetStringUTFChars( mrl, 0 );    
+    libvlc_exception_t *exception = (libvlc_exception_t *) malloc( sizeof( libvlc_exception_t ));
+
+    libvlc_exception_init( exception );
+
+    instance = getPlaylistInstance( env, _this );
+
+    libvlc_vlm_set_output((libvlc_instance_t *) instance, (char*)psz_name, (char*)psz_mrl, exception);
+
+    handle_vlc_exception(env,exception);
+    /* free resources */
+    free(exception);
+
+    if (psz_name != NULL) {
+        env->ReleaseStringUTFChars( name, psz_name );
+    }    
+    if (psz_mrl != NULL) {
+        env->ReleaseStringUTFChars( mrl, psz_mrl );
+    }    
+}
+
+/*
+ * Class:     org_videolan_jvlc_JVLC
+ * Method:    _setInput
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1setInput(JNIEnv *env, jobject _this, jstring name, jstring mrl) {
+   long instance = 0;
+    const char* psz_name = env->GetStringUTFChars( name, 0 );
+    const char* psz_mrl = env->GetStringUTFChars( mrl, 0 );    
+    libvlc_exception_t *exception = (libvlc_exception_t *) malloc( sizeof( libvlc_exception_t ));
+
+    libvlc_exception_init( exception );
+
+    instance = getPlaylistInstance( env, _this );
+
+    libvlc_vlm_set_input((libvlc_instance_t *) instance, (char*)psz_name, (char*)psz_mrl, exception);
+    
+    handle_vlc_exception(env,exception);
+    /* free resources */
+    free(exception);
+
+    if (psz_name != NULL) {
+        env->ReleaseStringUTFChars( name, psz_name );
+    }    
+    if (psz_mrl != NULL) {
+        env->ReleaseStringUTFChars( mrl, psz_mrl );
+    }    
+}
+
+/*
+ * Class:     org_videolan_jvlc_JVLC
+ * Method:    _setLoop
+ * Signature: (Ljava/lang/String;Z)V
+ */
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1setLoop(JNIEnv *env, jobject _this, jstring name, jboolean newStatus) {
+   long instance = 0;
+    const char* psz_name = env->GetStringUTFChars( name, 0 );
+    libvlc_exception_t *exception = (libvlc_exception_t *) malloc( sizeof( libvlc_exception_t ));
+
+    libvlc_exception_init( exception );
+
+    instance = getPlaylistInstance( env, _this );
+
+    libvlc_vlm_set_loop((libvlc_instance_t *) instance, (char*)psz_name, newStatus, exception);
+
+    handle_vlc_exception(env,exception);
+    /* free resources */
+    free(exception);
+
+    if (psz_name != NULL) {
+        env->ReleaseStringUTFChars( name, psz_name );
+    }    
+}
+
+/*
+ * Class:     org_videolan_jvlc_JVLC
+ * Method:    _changeMedia
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;ZZ)V
+ */
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1changeMedia(JNIEnv *env, jobject _this, jstring name, jstring inputmrl, jstring outputmrl, jobjectArray options, jboolean enablenewbroadcast, jboolean broadcast) {
+   int i_options = 0;
+   const char** ppsz_options = NULL;
+   long instance = 0;
+   if ( options != NULL ) {
+       i_options = ( int ) env->GetArrayLength( ( jarray ) options );
+       ppsz_options = ( const char ** ) malloc( i_options * sizeof( char* ) );
+
+       for ( int i = 0; i < i_options - 1; i++ ) {
+           ppsz_options[ i ] = 
+               env->GetStringUTFChars( ( jstring ) env->GetObjectArrayElement( options, i ), 0 );
+       }
+    }
+
+   const char* psz_name = env->GetStringUTFChars( name, 0 );
+   const char* psz_inputmrl = env->GetStringUTFChars( inputmrl, 0 );    
+   const char* psz_outputmrl = env->GetStringUTFChars( outputmrl, 0 );        
+   libvlc_exception_t *exception = (libvlc_exception_t *) malloc( sizeof( libvlc_exception_t ));
+
+   libvlc_exception_init( exception );
+
+   instance = getPlaylistInstance( env, _this );
+
+   libvlc_vlm_change_media( (libvlc_instance_t *) instance, (char*)psz_name, (char*)psz_inputmrl, (char*)psz_outputmrl ,
+                              i_options, (char**)ppsz_options, enablenewbroadcast, broadcast, exception );
+
+   handle_vlc_exception(env,exception);
+
+   if (psz_name != NULL) {
+        env->ReleaseStringUTFChars( name, psz_name );
+   }    
+
+   if (psz_inputmrl != NULL) {
+        env->ReleaseStringUTFChars( name, psz_inputmrl );
+   }    
+
+   if (psz_outputmrl != NULL) {
+        env->ReleaseStringUTFChars( name, psz_outputmrl );
+   }    
+   
 }
 
 

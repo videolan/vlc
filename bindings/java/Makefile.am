@@ -4,16 +4,15 @@
 
 if BUILD_JAVA
 
-OBJECTS = org/videolan/jvlc/Playlist.class org/videolan/jvlc/AudioIntf.class org/videolan/jvlc/InputIntf.class org/videolan/jvlc/PlaylistIntf.class org/videolan/jvlc/VideoIntf.class org/videolan/jvlc/JLibVLC.class org/videolan/jvlc/JVLC.class org/videolan/jvlc/JVLCCanvas.class org/videolan/jvlc/JVLCPanel.class org/videolan/jvlc/VLMIntf.class org/videolan/jvlc/GenericVideoWidget.class
+OBJECTS = org/videolan/jvlc/VLCException.class org/videolan/jvlc/Playlist.class org/videolan/jvlc/AudioIntf.class org/videolan/jvlc/InputIntf.class org/videolan/jvlc/PlaylistIntf.class org/videolan/jvlc/VideoIntf.class org/videolan/jvlc/JLibVLC.class org/videolan/jvlc/JVLC.class org/videolan/jvlc/JVLCCanvas.class org/videolan/jvlc/JVLCPanel.class org/videolan/jvlc/VLMIntf.class org/videolan/jvlc/GenericVideoWidget.class
 
 # Include some JAVA stuff
 PROCESSOR_FAMILY = `uname -m | sed -e 's/^i.86/i386/' | sed -e 's/^x86_64/amd64/'`
 if HAVE_WIN32
 JINCLUDES = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/win32
 LIBJINCLUDES = -L${JAVA_HOME}/lib -ljawt
-JCC = javac
+JAVAC = javac
 JCH = javah
-JCC_FLAGS = 
 #CXX = g++ -Wall -mno-cygwin -g
 #LDFLAGS = -mno-cygwin `vlc-config --libs external pic` -Wl,--kill-at
 JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
@@ -21,11 +20,10 @@ JAVALDFLAGS = -mno-cygwin -L../../src -lvlc `top_builddir=../.. ../../vlc-config
 else
 JINCLUDES = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 LIBJINCLUDES = -L$(JAVA_HOME)/jre/lib/$(PROCESSOR_FAMILY) -ljawt
-JCC = gcj -g
+JAVAC = gcj -Wall -g -C 
 JCH = gcjh -jni
 SWT_PATH = /usr/share/java
 # Compile flags
-JCC_FLAGS = -C
 JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
 JAVALDFLAGS = -L../../src -lvlc `top_builddir=../.. ../../vlc-config --libs builtin vlc pic`
 endif
@@ -48,18 +46,18 @@ vlc-libvlc-jni.o: VlcClient
 	$(CXX) -c vlc-libvlc-jni.cc $(CXXFLAGS) $(JAVACXXFLAGS)
 
 VlcClient: $(OBJECTS)
-	$(JCC) $(JCC_FLAGS) VlcClient.java
+	$(JAVAC) VlcClient.java
 
 VLCExample: $(OBJECTS)
-	$(JCC) $(JCC_FLAGS) VLCExample.java
+	$(JAVAC) VLCExample.java
 
 if HAVE_WIN32
 %.class: %.java
-	$(JCC) $(JCC_FLAGS) $?
+	$(JAVAC)  $?
 	$(JCH) org.videolan.jvlc.$(*F)
 else
 %.class: %.java
-	$(JCC) $(JCC_FLAGS) $?
+	$(JAVAC) $?
 	$(JCH) org/videolan/jvlc/$(*F)
 endif
 

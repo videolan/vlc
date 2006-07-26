@@ -30,18 +30,72 @@
 package org.videolan.jvlc;
 
 public interface PlaylistIntf {
-    void play(int id, String[] options);
-    void pause();
-    void stop();
-    boolean isRunning();
-    int itemsCount();
-    boolean inputIsPlaying();
-    void next();
-    void prev();
-    void clear();
-    int add(String uri, String name);
+    /**
+     * @param id The ID to play
+     * @param options Options to play the item withs
+     */
+    void play(int id, String[] options) throws VLCException;
+    
+    /**
+     * Plays the current item
+     */
+    void play() throws VLCException;
+    
+    /**
+     * Toggles pause for the current item.
+     */
+    void togglePause() throws VLCException;
+    
+    /**
+     * Stops the playlist.
+     */
+    void stop() throws VLCException;
+    
+    /**
+     * @return True if playlist is not stopped
+     */
+    boolean isRunning() throws VLCException;
+    
+    /**
+     * @return Current number of items in the playlist
+     */
+    int itemsCount() throws VLCException;
+    
+    /**
+     * @return True if the current input is really playing
+     */
+    boolean inputIsPlaying() throws VLCException;
+    
+    /**
+     * Move to next item
+     */
+    void next() throws VLCException;
+    
+    /**
+     * Move to previous item
+     */
+    void prev() throws VLCException;
+    
+    /**
+     * Clear the playlist
+     */
+    void clear() throws VLCException;
+    
+    /**
+     * Add a new item in the playlist
+     * @param uri Location of the item
+     * @param name Name of the item
+     * @return The item ID
+     */
+    int add(String uri, String name) throws VLCException;
+    
+    /**
+     * Currently not implemented
+     */
     void addExtended();
-    boolean inputHasVout();
-
-
+    
+    /**
+     * @return True if the current input has spawned a video output window
+     */
+    boolean inputHasVout() throws VLCException;
 }

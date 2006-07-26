@@ -29,21 +29,41 @@
 
 package org.videolan.jvlc;
 
+/**
+ * @author little
+ *
+ */
 public interface InputIntf {
     
     /**
-     * This function returns the total length of the current file playing
-     * in millis.
+     * @return The total length of the current file playing in millis.
+     * @throws VLCException
      */
-    long getInputLength();
+    long getInputLength() throws VLCException;
 
     /**
-     * This function returns the current position in millis within the
-     * currently playing playlist item.
+     * @return The current position in millis within the playing item.
+     * @throws VLCException
      */
-    long getInputTime();
-    float getInputPosition();
-    void setInputTime();
-    double getInputFPS();
+    long getInputTime() throws VLCException;
+    
+    /**
+     * @return The position in %.
+     * @throws VLCException
+     */
+    float getInputPosition() throws VLCException;
+    
+    /**
+     * Not implemented
+     * @throws VLCException
+     */
+    void setInputTime() throws VLCException;
+    
+    
+    /**
+     * @return If the playing item is a video file, returns the FPS, otherwise 0.
+     * @throws VLCException
+     */
+    double getInputFPS() throws VLCException;
     
 }

@@ -29,32 +29,25 @@
 
 package org.videolan.jvlc;
 
-/**
- * @author little
- *
- */
-/**
- * @author little
- *
- */
+
 public interface VideoIntf {
     /**
      * Toggles the fullscreen.
      */
-    void	toggleFullscreen();
+    void	toggleFullscreen() throws VLCException;
     
     
     /**
      * Sets fullscreen if fullscreen argument is true. 
      * @param fullscreen
      */
-    void	setFullscreen( boolean fullscreen );
+    void	setFullscreen( boolean fullscreen ) throws VLCException;
     
     
     /**
      * @return True if the current video window is in fullscreen mode.
      */
-    boolean getFullscreen();
+    boolean getFullscreen() throws VLCException;
     
     
     /**
@@ -63,16 +56,16 @@ public interface VideoIntf {
      * If you only give a path, not including the filename, the snapshot will be saved in
      * the specified path using vlc naming conventions. 
      */
-    void	getSnapshot(String filepath);
+    void	getSnapshot(String filepath) throws VLCException;
     
     
     /**
      * @return The current video window height
      */
-    int		getVideoHeight();
+    int		getVideoHeight() throws VLCException;
 
     /**
      * @return The current video window width
      */
-    int		getVideoWidth();    
+    int		getVideoWidth() throws VLCException;    
 }

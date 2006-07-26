@@ -1,4 +1,5 @@
 import org.videolan.jvlc.JVLC;
+import org.videolan.jvlc.VLCException;
 
 
 public class VLCExample 
@@ -7,27 +8,36 @@ public class VLCExample
     public static void main( String[] args )
     {
     	boolean videoInput = false;
-        JVLC jvlc = new JVLC();
-
+        JVLC jvlc = new JVLC(args);
+        try {
         jvlc.playlist.add("file://" + System.getProperty( "user.dir" ) + "/a.avi", "a.avi");
     	jvlc.playlist.add("file://" + System.getProperty( "user.dir" ) + "/a.mp3", "a.mp3");
         jvlc.playlist.play( -1 , null );
-        
+        } catch (VLCException e) {
+        	e.printStackTrace();
+        }
         while (! jvlc.isInputPlaying()) ;
+	while (! jvlc.hasVout() );        
         
-        // testing vout functionalities
+	
+	
+	// testing vout functionalities
 
         try {
-        	Thread.sleep(500);
+        	Thread.sleep(2500);
         	if (jvlc.hasVout()) videoInput = true;
 		} catch (InterruptedException e) {
 				e.printStackTrace();
 		}
 
         if (videoInput) {
-        	System.out.print(jvlc.getVideoWidth());
-        	System.out.print("x");
-        	System.out.println(jvlc.getVideoHeight());
+        	try {
+        		System.out.print(jvlc.getVideoWidth());
+        		System.out.print("x");
+        		System.out.println(jvlc.getVideoHeight());
+        	} catch (VLCException e) {
+        		e.printStackTrace();
+        	}
         }
         try 
         {
@@ -71,7 +81,11 @@ public class VLCExample
         
     	System.out.println("Everything fine ;)");
     	System.out.println("Playing next item");
-    	jvlc.playlist.next();
+    	try {
+    		jvlc.playlist.next();
+    	} catch (VLCException e) {
+    		e.printStackTrace();
+    	}
     	
     	try {
     		Thread.sleep(3000);

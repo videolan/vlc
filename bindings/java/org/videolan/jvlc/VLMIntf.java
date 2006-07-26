@@ -29,12 +29,64 @@
 package org.videolan.jvlc;
 
 public interface VLMIntf {
-    void addBroadcast( String name, String input, String output, String[] options, boolean enabled, boolean loop );
-    void deleteMedia( String name );
-    void setEnabled( String name, boolean enabled );
-    void setOutput( String name, String output );
-    void setInput( String name, String input );
-    void setLoop( String name, boolean loop );
-    void changeMedia( String name, String input, String output, String[] options, boolean enabled, boolean loop );
+
+	/**
+	 * Add a broadcast, with one input
+	 * @param mediaName the name of the new broadcast
+	 * @param medInputMRL the input MRL
+	 * @param mediaOutputURL the output MRL (the parameter to the "sout" variable)
+	 * @param additionalOptions additional options
+	 * @param enableBroadcast boolean for enabling the new broadcast
+	 * @param isPlayableInLoop Should this broadcast be played in loop ?
+	 */
+    void addBroadcast( String name, String input, String output, String[] options, boolean enabled, boolean loop )
+    	throws VLCException;
     
+    /**
+     * Delete a media (vod or broadcast)
+     * @param name the media to delete
+     */    
+    void deleteMedia( String name ) throws VLCException;
+    
+    /**
+     * Enable or disable a media (vod or broadcast)
+     * @param name the media to work on
+     * @param enabled the new status
+     */    
+    void setEnabled( String name, boolean enabled ) throws VLCException;
+    
+    /**
+     * Set the output for a media
+     * @param name the media to work on
+     * @param output the output MRL (the parameter to the "sout" variable)
+     */
+    void setOutput( String name, String output ) throws VLCException;
+    
+    /**
+     * Set a media's input MRL. This will delete all existing inputs and
+     * add the specified one.
+     * @param name the media to work on
+     * @param input the input MRL
+     */
+    void setInput( String name, String input ) throws VLCException;
+    
+    /**
+     * Set output for a media
+     * @param name the media to work on
+     * @param loop the new status
+     */
+    void setLoop( String name, boolean loop ) throws VLCException;
+    
+    /**
+     * Edit the parameters of a media. This will delete all existing inputs and
+     * add the specified one.
+     * @param name the name of the new broadcast
+     * @param input the input MRL
+     * @param output the output MRL (the parameter to the "sout" variable)
+     * @param options additional options
+     * @param enabled boolean for enabling the new broadcast
+     * @param loop Should this broadcast be played in loop ?
+     */    
+    void changeMedia( String name, String input, String output, String[] options, boolean enabled, boolean loop )
+    	throws VLCException;
 }

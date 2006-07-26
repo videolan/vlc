@@ -1,14 +1,14 @@
 /*****************************************************************************
- * JLibVLC.java: Main library interface
+ * JVLC.java: Main Java Class, represents a libvlc_instance_t object
  *****************************************************************************
  *
  * Copyright (C) 1998-2006 the VideoLAN team
  * 
- * Author: Filippo Carone <filippo@carone.org>
- * 
- * Created on 28-feb-2006
+ * Author: Philippe Morin <phmorin@free.fr>
  *
- * $Id$
+ * Created on 18-jul-2006
+ *
+ * $Id $
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public License
@@ -28,4 +28,19 @@
 
 package org.videolan.jvlc;
 
-public interface JLibVLC extends AudioIntf, VideoIntf, InputIntf, VLMIntf { }
+import java.lang.Exception;
+
+public class VLCException extends Exception {
+	public VLCException() {
+	   super();
+	}
+	public VLCException(String message) {
+	   super(message);
+	}
+	public VLCException(String message,Throwable cause) {
+	   super(message,cause);
+	}
+	public VLCException(Throwable cause) {
+	   super(cause);
+	}
+}

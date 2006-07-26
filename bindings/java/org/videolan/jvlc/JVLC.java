@@ -5,7 +5,8 @@
  * Copyright (C) 1998-2006 the VideoLAN team
  * 
  * Author: Filippo Carone <filippo@carone.org>
- * 
+ *         Philippe Morin <phmorin@free.fr>
+ *
  * Created on 28-feb-2006
  *
  * $Id$
@@ -29,14 +30,10 @@
 
 package org.videolan.jvlc;
 
-/**
- * @author little
- *
- */
 public class JVLC implements JLibVLC, Runnable {
     
     static {
-        System.load(System.getProperty( "user.dir" ) + "/libjvlc.so" );
+        System.loadLibrary("jvlc" );
     }
 
     /**
@@ -47,12 +44,20 @@ public class JVLC implements JLibVLC, Runnable {
 
     
     private boolean beingDestroyed = false;
+
+    /**
+     * This is the time in millis VLC checks for internal status 
+     */
     private long resolution = 50;
+    
 	private boolean inputPlaying = false;
 	private boolean inputVout = false;
     
     public JVLC() {
-        _instance = createInstance();
+        String[] args = new String[1];
+        args[0] = "";
+        
+        _instance = createInstance(args);
         playlist = new Playlist( _instance );
         new Thread(this).start();
     }
@@ -108,90 +113,139 @@ public class JVLC implements JLibVLC, Runnable {
     private native int      _getVideoWidth();
     private native void		_getSnapshot(String filename);
  
+
+    /*
+     * VLM native methods
+     */
+    private native void _addBroadcast(String mediaName, String meditInputMRL, String mediaOutputMRL ,
+                               String[] additionalOptions, boolean enableBroadcast, boolean isPlayableInLoop);
+    private native void _deleteMedia	(String mediaName);
+    private native void _setEnabled		(String mediaName,	boolean newStatus);
+    private native void _setOutput		(String mediaName,	String mediaOutputMRL);
+    private native void _setInput		(String mediaName,	String mediaInputMRL);
+    private native void _setLoop		(String mediaName,	boolean isPlayableInLoop);
+    private native void _changeMedia	(String newMediaName, String inputMRL, String outputMRL , String[] additionalOptions, boolean enableNewBroadcast, boolean isPlayableInLoop);
+
+    /*
+     * Native methods wrappers
+     */
+       
     
-    public boolean getMute() {
+    public boolean getMute() throws VLCException {
         return _getMute();
     }
 
-    public void setMute(boolean value) {
+    public void setMute(boolean value) throws VLCException {
         _setMute( value );
         
     }
     
-    public void toggleMute() {
+    public void toggleMute() throws VLCException {
     	_toggleMute();
     }
 
-    public int getVolume() {
+    public int getVolume() throws VLCException {
         return _getVolume();        
     }
 
-    public void setVolume(int volume) {
+    public void setVolume(int volume) throws VLCException {
         _setVolume( volume );
         
     }
 
-    public void toggleFullscreen() {
+    public void toggleFullscreen() throws VLCException {
         _toggleFullscreen();
         
     }
 
-    public void setFullscreen( boolean value ) {
+    public void setFullscreen( boolean value ) throws VLCException {
         _setFullscreen( value );
         
     }
 
-    public boolean getFullscreen() {
+    public boolean getFullscreen() throws VLCException {
     	return _getFullscreen();        
     }
 
-    public int getVideoHeight() {
+    public int getVideoHeight() throws VLCException {
         return _getVideoHeight();
     }
     
 
-    public int getVideoWidth() {
+    public int getVideoWidth() throws VLCException {
         return _getVideoWidth();        
     }
 
     
-    public long getInputLength() {
+    public long getInputLength() throws VLCException {
         return _getInputLength();        
     }
 
-    public long getInputTime() {
+    public long getInputTime() throws VLCException {
         return _getInputTime();
     }
 
-    public float getInputPosition() {
+    public float getInputPosition() throws VLCException {
         return _getInputPosition();
         
     }
 
-    public void setInputTime() {
+    public void setInputTime() throws VLCException {
         // TODO Auto-generated method stub
         
     }
 
-    public double getInputFPS() {
+    public double getInputFPS() throws VLCException {
         return _getInputFPS();
     }
     
-    public long getInstance() {
+    public long getInstance() throws VLCException {
         return _instance;
     }
 
     /*
      * Getters and setters
      */
-	public Playlist getPlaylist() {
+	public Playlist getPlaylist() throws VLCException {
 		return playlist;
 	}
     
 
-	public void getSnapshot(String filename) {
+	public void getSnapshot(String filename) throws VLCException {
 		_getSnapshot(filename);
 	}
+
+
+    public void addBroadcast( String name, String input, String output, String[] options, boolean enabled, boolean loop )
+    	throws VLCException {
+    	_addBroadcast(name, input, output, options, enabled, loop);
+    }
+    
+    public void deleteMedia( String name ) throws VLCException {
+    	_deleteMedia(name);
+    }
+    
+    public void setEnabled( String name, boolean enabled ) throws VLCException {
+    	_setEnabled(name, enabled);
+    }
+    
+    public void setOutput( String name, String output ) throws VLCException {
+    	_setOutput(name, output);
+    }
+    
+    public void setInput( String name, String input ) throws VLCException {
+    	_setInput(name, input);
+    }
+    
+    public void setLoop( String name, boolean loop ) throws VLCException {
+    	_setLoop(name, loop);
+    }
+    
+    public void changeMedia( String name, String input, String output, String[] options, boolean enabled, boolean loop )
+    	throws VLCException {
+    	_changeMedia(name, input, output, options, enabled, loop);
+    }
+
 	
 	/**
 	 * Checks if the input is playing.
@@ -217,26 +271,28 @@ public class JVLC implements JLibVLC, Runnable {
 	 */
 	public void run() {
 		while (! beingDestroyed) {
-			while (playlist.isRunning()) {
-				if (playlist.inputIsPlaying()) {
-					inputPlaying = true;
+			try {
+				while (playlist.isRunning()) {
+					if (playlist.inputIsPlaying()) {
+						inputPlaying = true;
+					}
+					else {
+						inputPlaying = false;
+				    }
+				            
+					if (playlist.inputHasVout()) {
+						inputVout = true;
+				    }
+					else {
+						inputVout = false;
+				    }
+					try {
+						Thread.sleep(resolution);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} 
 				}
-				else {
-					inputPlaying = false;
-                }
-	                    
-				if (playlist.inputHasVout()) {
-					inputVout = true;
-                }
-				else {
-					inputVout = false;
-                }
-				try {
-					Thread.sleep(resolution);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} 
-			} // while playlist running
+			} catch (VLCException e1) { } // while playlist running
 	           inputPlaying = false;
 	           inputVout = false;
 			try {

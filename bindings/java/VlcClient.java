@@ -1,9 +1,35 @@
+/*****************************************************************************
+ * VlcClient.java: Sample Swing player
+ *****************************************************************************
+ * Copyright (C) 1998-2006 the VideoLAN team
+ * 
+ * Created on 28-feb-2006
+ *
+ * $Id: AudioIntf.java 8 2006-02-28 12:03:47Z little $
+ *
+ * This program is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ * 
+ */
+
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import org.videolan.jvlc.JVLCPanel;
 import org.videolan.jvlc.JVLC;
+import org.videolan.jvlc.VLCException;
 
 class VLCPlayerFrame  extends Frame {
     public VLCPlayerFrame() {
@@ -109,15 +135,20 @@ class VLCPlayerFrame  extends Frame {
     private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             //System.out.println(mci.getMediaPosition(PositionOrigin.ABSOLUTE, PositionKey.BYTECOUNT));
-	    jvlc.playlist.pause();
+	    jvlc.playlist.togglePause();
         } catch (Exception e) {
             e.printStackTrace();
 	}
     }
 
     private void setButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        jvlc.playlist.add("file:///home/little/a.avi", "a.avi");
-        jvlc.playlist.play(-1, null);
+        try {
+			jvlc.playlist.add("file:///home/little/a.avi", "a.avi");
+			jvlc.playlist.play(-1, null);
+		} catch (VLCException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     private void fullScreenButtonActionPerformed(java.awt.event.ActionEvent evt) {
