@@ -236,3 +236,60 @@ void libvlc_vlm_change_media( libvlc_instance_t *p_instance, char *psz_name,
     vlc_mutex_unlock( &p_instance->p_vlm->lock );
 #endif
 }
+
+void libvlc_vlm_play_media( libvlc_instance_t *p_instance, char *psz_name,
+                            libvlc_exception_t *p_exception )
+    
+{
+    char *psz_message;
+    vlm_message_t *answer;
+    CHECK_VLM;
+#ifdef ENABLE_VLM
+    asprintf( &psz_message, "control %s play", psz_name );
+    vlm_ExecuteCommand( p_instance->p_vlm, psz_message, &answer );
+    if( answer->psz_value )
+    {
+        libvlc_exception_raise( p_exception, "Unable to play %s",
+                                psz_name );
+    }
+    free( psz_message);
+#endif
+}
+
+void libvlc_vlm_stop_media( libvlc_instance_t *p_instance, char *psz_name,
+                            libvlc_exception_t *p_exception )
+    
+{
+    char *psz_message;
+    vlm_message_t *answer;
+    CHECK_VLM;
+#ifdef ENABLE_VLM
+    asprintf( &psz_message, "control %s stop", psz_name );
+    vlm_ExecuteCommand( p_instance->p_vlm, psz_message, &answer );
+    if( answer->psz_value )
+    {
+        libvlc_exception_raise( p_exception, "Unable to stop %s",
+                                psz_name );
+    }
+    free( psz_message);
+#endif
+}
+
+void libvlc_vlm_pause_media( libvlc_instance_t *p_instance, char *psz_name,
+                            libvlc_exception_t *p_exception )
+    
+{
+    char *psz_message;
+    vlm_message_t *answer;
+    CHECK_VLM;
+#ifdef ENABLE_VLM
+    asprintf( &psz_message, "control %s pause", psz_name );
+    vlm_ExecuteCommand( p_instance->p_vlm, psz_message, &answer );
+    if( answer->psz_value )
+    {
+        libvlc_exception_raise( p_exception, "Unable to pause %s",
+                                psz_name );
+    }
+    free( psz_message);
+#endif
+}

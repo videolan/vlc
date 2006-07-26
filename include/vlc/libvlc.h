@@ -467,6 +467,32 @@ void libvlc_vlm_set_loop( libvlc_instance_t *, char *, int,
 void libvlc_vlm_change_media( libvlc_instance_t *, char *, char *, char* ,
                               int, char **, int, int, libvlc_exception_t * );
 
+/**
+ * Plays the named broadcast.
+ * \param p_instance the instance
+ * \param psz_name the name of the broadcast
+ * \param p_exception an initialized exception
+ */ 
+void libvlc_vlm_play_media ( libvlc_instance_t *, char *, libvlc_exception_t * );
+
+/**
+ * Stops the named broadcast.
+ * \param p_instance the instance
+ * \param psz_name the name of the broadcast
+ * \param p_exception an initialized exception
+ */ 
+void libvlc_vlm_stop_media ( libvlc_instance_t *, char *, libvlc_exception_t * );
+
+    
+/**
+ * Pauses the named broadcast.
+ * \param p_instance the instance
+ * \param psz_name the name of the broadcast
+ * \param p_exception an initialized exception
+ */ 
+void libvlc_vlm_pause_media( libvlc_instance_t *, char *, libvlc_exception_t * );
+    
+    
 
 /** @} */
 /** @} */
