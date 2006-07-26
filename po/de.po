@@ -3,11 +3,11 @@
 # (c) 2002-2006 the VideoLAN team
 # $Id$
 #
-# Thanks to Thomas Graf <tgr@reeler.org> for starting a translation in 2002.
-# Thanks to Philipp Weissenbacher <philippweissenbacher@aon.at> for various fixes in 2004.
-# Thanks to Jens Seidel <jensseidel@users.sf.net> for some minor fixes in 2005.
-# Felix Kühne <fkuehne@users.sf.net>, 2003-2006.
-# Mathias C. Berens | welcome-soft <berens@welcome-soft.de>, 2006.
+# Thanks to Thomas Graf <tgr @ reeler.0rg> for starting a translation in 2002.
+# Thanks to Philipp Weissenbacher <philippweissenbacher @ aon . at> for various fixes in 2004.
+# Thanks to Jens Seidel <jensseidel @ users.sf.net> for some minor fixes in 2005.
+# Felix Kühne <fkuehne @ users.sf.net>, 2003-2006.
+# Mathias C. Berens | welcome-soft <berens -at-  welcome-soft d0t de>, 2006.
 #
 #
 msgid ""
