@@ -4636,7 +4636,8 @@ AC_ARG_ENABLE(qt4,
   [if test "${enable_qt4}" = "yes"; then
       PKG_CHECK_MODULES(QT4, QtCore QtGui,
   	[ VLC_ADD_PLUGINS([qt4])
-          enableqt4=true
+          ALIASES="${ALIASES} qvlc"
+	  enableqt4=true
 	  VLC_ADD_LDFLAGS([qt4],[$QT4_LIBS])
 	  VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS])
 	  MOC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/moc
