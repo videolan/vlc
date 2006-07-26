@@ -647,7 +647,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             FILE *p_file;
             do
             {
-                asprintf( &psz_filename, "%s/%s%d.%s", val.psz_string,
+                asprintf( &psz_filename, "%s/%s%05d.%s", val.psz_string,
                           psz_prefix, i_num++, format.psz_string );
             }
             while( ( p_file = fopen( psz_filename, "r" ) ) && !fclose( p_file ) );
