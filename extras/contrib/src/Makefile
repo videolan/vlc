@@ -8,7 +8,7 @@
 #          Derk-Jan Hartman <hartman at videolan dot org>
 #          Eric Petit <titer@m0k.org>
 #          Felix Kühne <fkuehne@users.sourceforge.net>
-#          Christophe Mutricy <xtophe@nxtelevision.com>
+#          Christophe Mutricy <xtophe AT xtelevision.com>
 #          Gildas Bazin <gbazin at videolan dot org>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -895,12 +895,8 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 
 ffmpeg:
 	$(SVN) co $(FFMPEG_SVN)  ffmpeg
-	patch -p 0 < Patches/ffmpeg-svn.patch
 ifeq ($(HOST),i586-pc-beos)
 	(cd $@; patch -p 0 < ../Patches/ffmpeg-svn-beos.patch)
-endif
-ifdef HAVE_WIN32
-	patch -p 0 < Patches/ffmpeg-svn-win32.patch
 endif
 ifdef HAVE_WINCE
 	patch -p 1 < Patches/ffmpeg-svn-wince.patch
@@ -908,7 +904,7 @@ endif
 ifeq ($(HOST),i686-apple-darwin8)
 	(cd $@;patch -p 0 < ../Patches/ffmpeg-svn-mactel.patch)
 endif
-	(cd $@; patch -p0 < ../Patches/ffmpeg-install.patch)
+#	(cd $@; patch -p0 < ../Patches/ffmpeg-install.patch)
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	$(WGET) $(FFMPEG_URL)
