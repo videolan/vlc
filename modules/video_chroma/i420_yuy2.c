@@ -382,6 +382,10 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV420_UYVY );
 #endif
         }
+        for( i_x = ( p_vout->render.i_width % 8 ) / 2; i_x--; )
+        {
+            C_YUV420_UYVY( );
+        }
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
