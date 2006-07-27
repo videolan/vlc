@@ -10,6 +10,7 @@
 #          Felix Kühne <fkuehne@users.sourceforge.net>
 #          Christophe Mutricy <xtophe AT xtelevision.com>
 #          Gildas Bazin <gbazin at videolan dot org>
+#          Damien Fouilleul <damienf at videolan dot org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -81,15 +82,21 @@ else
 HOSTCC2=$(HOSTCC)
 endif
 
-ifneq ($(BUILD),$(HOST))
-# We are cross compiling
-HOSTCONF=--host=$(HOST) --build=$(BUILD)
-FFMPEGCONF=--cross-prefix=$(HOST)-
-X264CONF=--crosscompile=$(HOST)
-else
-   ifneq ($(CC),)
-      FFMPEGCONF=--cc="$(CC)"
-   endif
+#
+# compiling for MinGW under Cygwin could be detected as cross compiling
+# unfortunately there isn't a complete separate GCC toolchain for MinGW under cygwin
+#
+ifeq (,$(findstring cygwin,$(BUILD)),)
+    ifneq ($(BUILD),$(HOST))
+    # We are cross compiling
+    HOSTCONF=--host=$(HOST) --build=$(BUILD)
+    FFMPEGCONF=--cross-prefix=$(HOST)-
+    X264CONF=--crosscompile=$(HOST)
+    else
+       ifneq ($(CC),)
+          FFMPEGCONF=--cc="$(CC)"
+       endif
+    endif
 endif
 
 #
@@ -198,14 +205,23 @@ FORCE:
 # ***************************************************************************
 
 define EXTRACT_GZ
-	tar xzf $<
+	rm -rf $@ || true
+	tar xzf $< --exclude='[*?:<>\|]' 
 	mv $(patsubst %.tar.gz,%,$(patsubst %.tgz,%,$(notdir $<))) $@ || true
 	touch $@
 endef
 
 define EXTRACT_BZ2
-	bunzip2 -c $< | tar xf -
+	rm -rf $@ || true
+	bunzip2 -c $< | tar xf - --exclude='[*?:<>\|]' 
 	mv $(patsubst %.tar.bz2,%,$(notdir $<)) $@ || true
+	touch $@
+endef
+
+define EXTRACT_ZIP
+	rm -rf $@ || true
+	unzip $<
+	mv $(patsubst %.zip,%,$(notdir $<)) $@ || true
 	touch $@
 endef
 
@@ -786,7 +802,7 @@ faad: faad2-$(FAAD2_VERSION).tar.bz2
 	touch $@
 
 CLEAN_FILE += .faad
-CLEAN_PKG += faad2
+CLEAN_PKG += faad
 DISTCLEAN_PKG += faad2-$(FAAD2_VERSION).tar.bz2
 
 # ***************************************************************************
@@ -1486,7 +1502,8 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 ifeq ($(HOST),i686-apple-darwin8)
 	(cd $<; ./autogen.sh)
 endif
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared && make && make install)
+# MinGW host is not properly detected when building on cygwin
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --host=$(HOST) --prefix=$(PREFIX) --disable-nls --disable-shared && make && make install)
 #	$(INSTALL_NAME)
 	touch $@
 
@@ -1948,3 +1965,4 @@ clean-src: clean
 	rm -rf $(DISTCLEAN_PKG)
 
 distclean: clean-src
+
