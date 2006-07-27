@@ -1497,6 +1497,7 @@ libgpg-error-$(GPGERROR_VERSION).tar.gz:
 
 libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/libgpg-error.patch
 
 .gpg-error: libgpg-error
 ifeq ($(HOST),i686-apple-darwin8)
