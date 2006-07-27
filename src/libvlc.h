@@ -392,6 +392,10 @@ static char *ppsz_align_descriptions[] =
     "subsystem, such as the DVD or VCD device, the network interface " \
     "settings or the subtitle channel.")
 
+#define FRANCE_LONGTEXT N_( \
+    "If you live in France, it is not allowed to workaround any Digital " \
+    "Restrictions Management measure." )
+
 #define CR_AVERAGE_TEXT N_("Clock reference average counter")
 #define CR_AVERAGE_LONGTEXT N_( \
     "When using the PVR input (or a very irregular source), you should " \
@@ -1349,6 +1353,8 @@ vlc_module_begin();
 /* Input options */
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_GENERAL );
+
+    add_bool( "france", VLC_FALSE, NULL, "France", FRANCE_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Track settings" ), NULL );
     add_integer( "program", 0, NULL,
