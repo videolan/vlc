@@ -1,4 +1,4 @@
-# ***************************************************************************
+#***************************************************************************
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 - 2006 the VideoLAN team
@@ -1356,7 +1356,7 @@ zlib: zlib-$(ZLIB_VERSION).tar.gz
 	patch -p 0 < Patches/zlib.patch
 
 .zlib: zlib
-	(cd zlib; $(HOSTCC2) ./configure  --prefix=$(PREFIX) && make install)
+	(cd zlib; $(HOSTCC2) ./configure --prefix=$(PREFIX) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1447,7 +1447,10 @@ ifdef HAVE_WIN32
 else
 	(cat Patches/libpng-osx.patch | sed -e 's%??PREFIX??%$(PREFIX)%' -e 's%??EXTRA_CFLAGS??%$(EXTRA_CFLAGS)%' -e 's%??EXTRA_LDFLAGS??%$(EXTRA_LDFLAGS)%' | patch -p0)
 endif
-	(patch -p 0 < Patches/libpng-1.2.8-makefile.patch)
+	(patch -p 0 < Patches/libpng-makefile.patch)
+ifeq ($(HOST),i686-apple-darwin8)
+	(patch -p 0 < Patches/libpng-darwin-mactel.patch)
+endif
 
 .png: libpng 
 ifdef HAVE_DARWIN_OS

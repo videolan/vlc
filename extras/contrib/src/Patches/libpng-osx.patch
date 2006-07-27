@@ -1,6 +1,7 @@
+diff -ruN libpng-1.2.12/scripts/makefile.darwin libpng/scripts/makefile.darwin
 --- libpng-1.2.12/scripts/makefile.darwin	2006-06-27 22:22:40.000000000 +0200
-+++ libpng/scripts/makefile.darwin	2006-07-25 13:28:44.000000000 +0200
-@@ -7,7 +7,7 @@
++++ libpng/scripts/makefile.darwin	2006-07-27 12:07:18.000000000 +0200
+@@ -7,14 +7,14 @@
  # For conditions of distribution and use, see copyright notice in png.h
  
  # where "make install" puts libpng.a, libpng12.dylib, png.h and pngconf.h
@@ -9,6 +10,17 @@
  exec_prefix=$(prefix)
  
  # Where the zlib library and include files are located
+-#ZLIBLIB=/usr/local/lib
+-#ZLIBINC=/usr/local/include
+-ZLIBLIB=../zlib
+-ZLIBINC=../zlib
++ZLIBLIB=/usr/lib
++ZLIBINC=/usr/include
++#ZLIBLIB=../zlib
++#ZLIBINC=../zlib
+ 
+ # Library name:
+ LIBNAME = libpng12
 @@ -38,8 +38,8 @@
  RANLIB=ranlib
  RM_F=/bin/rm -f
