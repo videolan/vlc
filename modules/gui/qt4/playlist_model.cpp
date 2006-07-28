@@ -311,11 +311,16 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
 /************************* Updates handling *****************************/
 void PLModel::customEvent( QEvent *event )
 {
+    int type = event->type();
+    if( type != ItemUpdate_Type && type != ItemAppend_Type &&
+        type != ItemDelete_Type )
+        return;
+
     PLEvent *ple = static_cast<PLEvent *>(event);
 
-    if( event->type() == ItemUpdate_Type )
+    if( type == ItemUpdate_Type )
         ProcessInputItemUpdate( ple->i_id );
-    else if( event->type() == ItemAppend_Type )
+    else if( type == ItemAppend_Type )
         ProcessItemAppend( ple->p_add );
     else
         ProcessItemRemoval( ple->i_id );
