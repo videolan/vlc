@@ -1,10 +1,10 @@
 /*****************************************************************************
  * profiles.c: Streaming profiles
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
- * $Id: stream_output.c 15915 2006-06-15 21:22:35Z zorglub $
+ * Copyright (C) 2006 the VideoLAN team
+ * $Id$
  *
- * Authors: ClÃment Stenac <zorglub@videolan.org>
+ * Authors: Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
