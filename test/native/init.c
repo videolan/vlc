@@ -8,6 +8,9 @@ static PyMethodDef native_libvlc_test_methods[] = {
    DEF_METHOD( timers_test, "Test timers" )
    DEF_METHOD( i18n_atof_test, "Test i18n_atof" )
    DEF_METHOD( url_decode_test, "URL decoding" )
+   DEF_METHOD( chains_test, "Test building of chains" )
+   DEF_METHOD( gui_chains_test, "Test interactions between chains and GUI" )
+   DEF_METHOD( psz_chains_test, "Test building of chain strings" )
    { NULL, NULL, 0, NULL }
 };
 

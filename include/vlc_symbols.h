@@ -519,6 +519,7 @@ struct module_symbols_t
     void (*__stats_TimersClean_inner) (vlc_object_t *);
     void (*__intf_IntfProgressUpdate_inner) (vlc_object_t*, int, const char*, float);
     int (*__intf_IntfProgress_inner) (vlc_object_t*, const char*, float);
+    void *streaming_ChainToPsz_deprecated;
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1493,6 +1494,7 @@ struct module_symbols_t
     (p_symbols)->playlist_ItemNewFromInput_deprecated = NULL; \
     (p_symbols)->stats_TimerClean_deprecated = NULL; \
     (p_symbols)->stats_TimersClean_deprecated = NULL; \
+    (p_symbols)->streaming_ChainToPsz_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */
 #endif /* __VLC_SYMBOLS_H */

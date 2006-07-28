@@ -10,3 +10,7 @@ PyObject *timers_test( PyObject *self, PyObject *args );
 PyObject *url_decode_test( PyObject *self, PyObject *args );
 
 PyObject *i18n_atof_test( PyObject *self, PyObject *args );
+
+PyObject *chains_test( PyObject *self, PyObject *args );
+PyObject *gui_chains_test( PyObject *self, PyObject *args );
+PyObject *psz_chains_test( PyObject *self, PyObject *args );

@@ -23,7 +23,7 @@
 #include <vlc/vlc.h>
 #include "vlc_url.h"
 
- PyObject * test_decode (const char *in, const char *out)
+PyObject * test_decode (const char *in, const char *out)
 {
     char *res;
 
@@ -39,8 +39,9 @@
     return Py_None;
 }
 
- PyObject *url_decode_test( PyObject *self, PyObject *args )
+PyObject *url_decode_test( PyObject *self, PyObject *args )
 {
+    printf( "\n" );
     (void)setvbuf (stdout, NULL, _IONBF, 0);
     if( !test_decode ("this_should_not_be_modified_1234",
                      "this_should_not_be_modified_1234") ) return NULL;

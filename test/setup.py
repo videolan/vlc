@@ -41,7 +41,15 @@ def get_ldflags():
 # To compile in a local vlc tree
 native_libvlc_test = Extension( 'native_libvlc_test',
                 sources = ['native/init.c', 'native/url.c', 'native/i18n.c',
-			   'native/stats.c', 'native/libvlc.c'],
+			    'native/stats.c', 'native/libvlc.c', 'native/profiles.c'],
+                include_dirs = ['../include', '../', '/usr/win32/include' ],
+                extra_objects = [ '../src/.libs/libvlc.so' ],
+                extra_compile_args = get_cflags(),
+       		    extra_link_args = [ '-L../..' ]  + get_ldflags(),
+                )
+
+native_gc_test = Extension( 'native_gc_test',
+                sources = ['native/gc.c'],
                 include_dirs = ['../include', '../', '/usr/win32/include' ],
                 extra_objects = [ '../src/.libs/libvlc.so' ],
                 extra_compile_args = get_cflags(),
@@ -49,3 +57,6 @@ native_libvlc_test = Extension( 'native_libvlc_test',
                 )
 
 setup( name = 'native_libvlc_test' ,version = '1242', ext_modules = [ native_libvlc_test ] )
+
+
+setup( name = 'native_gc_test' ,version = '1242', ext_modules = [ native_gc_test ] )

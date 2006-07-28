@@ -57,6 +57,7 @@ HEADERS_include = \
 	../include/os_specific.h \
 	../include/snapshot.h \
 	../include/stream_output.h \
+	../include/vlc_streaming.h \
 	../include/variables.h \
 	../include/video_output.h \
 	../include/vlc_access.h \
@@ -287,6 +288,7 @@ SOURCES_libvlc_common = \
 	audio_output/intf.c \
 	stream_output/stream_output.c \
 	stream_output/announce.c \
+	stream_output/profiles.c \
 	stream_output/sap.c \
 	osd/osd.c \
 	osd/osd_parser.c \

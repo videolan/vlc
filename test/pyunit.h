@@ -15,5 +15,4 @@
          else PyErr_SetString( PyExc_AssertionError, "Exception not raised" ); return NULL; }
 
 
-
 #define DEF_METHOD( method, desc ) { #method, method, METH_VARARGS, desc},
