@@ -34,6 +34,10 @@
 
 #include <vlc/vlc.h>
 
+#ifndef WIN32
+#include <X11/Xlib.h>
+#endif
+
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -327,6 +331,12 @@ int libvlc_video_get_width( libvlc_input_t *, libvlc_exception_t * );
  */
 void libvlc_video_take_snapshot( libvlc_input_t *, char *, libvlc_exception_t * );
     
+int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *);
+
+#ifndef WIN32
+int libvlc_video_reparent( libvlc_input_t *, Drawable, libvlc_exception_t * );
+#endif    
+
 
 /** @} */
 

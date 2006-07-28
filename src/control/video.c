@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video.c: ibvlc new API video functions
+ * video.c: libvlc new API video functions
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  * $Id: core.c 14187 2006-02-07 16:37:40Z courmisch $
@@ -207,4 +207,28 @@ vlc_bool_t libvlc_input_has_vout( libvlc_input_t *p_input,
     vlc_object_release( p_vout );
     
     return VLC_TRUE;
+}
+
+
+#ifndef WIN32
+int libvlc_video_reparent( libvlc_input_t *p_input, Drawable d,
+                           libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_input, p_e );
+    vout_Control( p_vout , VOUT_REPARENT, d);
+    return 0;
+    
+}
+#endif
+
+int libvlc_video_destroy( libvlc_input_t *p_input,
+                          libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_input, p_e );
+    vlc_object_detach( p_vout ); 
+    vlc_object_release( p_vout );
+    vout_Destroy( p_vout );
+    
+    return 0;
+    
 }
