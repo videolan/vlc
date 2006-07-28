@@ -311,7 +311,7 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
 /************************* Updates handling *****************************/
 void PLModel::customEvent( QEvent *event )
 {
-    PLEvent *ple = dynamic_cast<PLEvent *>(event);
+    PLEvent *ple = qobject_cast<PLEvent *>(event);
 
     if( event->type() == ItemUpdate_Type )
         ProcessInputItemUpdate( ple->i_id );
