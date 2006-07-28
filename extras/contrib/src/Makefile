@@ -82,20 +82,24 @@ else
 HOSTCC2=$(HOSTCC)
 endif
 
+# For ffmpeg if not cross compiling
+ifneq ($(CC),)
+  FFMPEGCONF=--cc="$(CC)"
+endif
+
 #
-# compiling for MinGW under Cygwin could be detected as cross compiling
-# unfortunately there isn't a complete separate GCC toolchain for MinGW under cygwin
+# cross compiling
 #
-ifeq (,$(findstring cygwin,$(BUILD)),)
-    ifneq ($(BUILD),$(HOST))
-    # We are cross compiling
+ifneq ($(BUILD),$(HOST))
+    #
+    # Compiling for MinGW under Cygwin could be deemed as cross compiling
+    # unfortunately there isn't a complete separate GCC toolchain for MinGW under Cygwin
+    #
     HOSTCONF=--host=$(HOST) --build=$(BUILD)
-    FFMPEGCONF=--cross-prefix=$(HOST)-
-    X264CONF=--crosscompile=$(HOST)
-    else
-       ifneq ($(CC),)
-          FFMPEGCONF=--cc="$(CC)"
-       endif
+    ifeq ($(findstring cygwin,$(BUILD)),)
+	# We are REALLY cross compiling
+	FFMPEGCONF=--cross-prefix=$(HOST)-
+	X264CONF=--crosscompile=$(HOST)
     endif
 endif
 
@@ -1506,8 +1510,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 ifeq ($(HOST),i686-apple-darwin8)
 	(cd $<; ./autogen.sh)
 endif
-# MinGW host is not properly detected when building on cygwin
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --host=$(HOST) --prefix=$(PREFIX) --disable-nls --disable-shared && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared && make && make install)
 #	$(INSTALL_NAME)
 	touch $@
 
