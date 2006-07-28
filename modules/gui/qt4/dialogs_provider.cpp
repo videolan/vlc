@@ -57,7 +57,7 @@ void DialogsProvider::customEvent( QEvent *event )
 {
     if( event->type() == DialogEvent_Type )
     {
-        DialogEvent *de = qobject_cast<DialogEvent*>(event);
+        DialogEvent *de = static_cast<DialogEvent*>(event);
         switch( de->i_dialog )
         {
             case INTF_DIALOG_FILE:
