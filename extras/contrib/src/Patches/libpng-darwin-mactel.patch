@@ -1,14 +1,13 @@
-diff -ruN libpng-1.2.12/scripts/makefile.darwin libpng-1.2.12b/scripts/makefile.darwin
---- libpng/scripts/makefile.darwin	2006-06-27 22:22:40.000000000 +0200
-+++ libpng/scripts/makefile.darwin	2006-07-27 09:57:03.000000000 +0200
-@@ -63,7 +63,7 @@
- 
- OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
+--- libpng/scripts/makefile.darwin	2006-07-28 16:53:49.000000000 +0200
++++ libpng2/scripts/makefile.darwin	2006-07-28 16:45:50.000000000 +0200
+@@ -65,7 +65,7 @@
  	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
--	pngwtran.o pngmem.o pngerror.o pngpread.o
-+	pngwtran.o pngmem.o pngerror.o pngpread.o pnggccrd.o
+ 	pngwtran.o pngmem.o pngerror.o pngpread.o 
  
- OBJSDLL = $(OBJS:.o=.pic.o)
+-OBJSDLL = $(OBJS:.o=.pic.o)
++OBJSDLL = $(OBJS:.o=.pic.o) pnggccrd.pic.o
+ 
+ .SUFFIXES:      .c .o .pic.o
  
 @@ -226,5 +226,6 @@
  pngwtran.o pngwtran.pic.o: png.h pngconf.h
