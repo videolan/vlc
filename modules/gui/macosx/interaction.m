@@ -130,7 +130,10 @@
 
     NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : "title"];
     NSString *o_description = [NSString stringWithUTF8String:p_dialog->psz_description ? p_dialog->psz_description : ""];
-    
+    NSString *o_defaultButton = [NSString stringWithUTF8String:p_dialog->psz_defaultButton];
+    NSString *o_alternateButton = [NSString stringWithUTF8String:p_dialog->psz_alternateButton];
+    NSString *o_otherButton = p_dialog->psz_otherButton ? [NSString stringWithUTF8String:p_dialog->psz_otherButton] : nil;
+
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_vout != NULL )
     {
@@ -169,19 +172,11 @@
     }
     else
     {
-        if( p_dialog->i_flags & DIALOG_OK_CANCEL )
-        {
-            msg_Dbg( p_intf, "OK-Cancel-dialog requested" );
-            NSBeginInformationalAlertSheet( o_title, _NS("OK") , _NS("Cancel"),
-                nil, o_window, self,
-                @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, 
-                o_description );
-        }
-        else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
+        if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
         {
             msg_Dbg( p_intf, "yes-no-cancel-dialog requested" );
-            NSBeginInformationalAlertSheet( o_title, _NS("Yes"), _NS("No"),
-                _NS("Cancel"), o_window, self,
+            NSBeginInformationalAlertSheet( o_title, o_defaultButton, 
+                o_alternateButton, o_otherButton, o_window, self,
                 @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, 
                 o_description );
         }
@@ -202,6 +197,11 @@
             [o_prog_title setStringValue: o_title];
             [o_prog_description setStringValue: o_description];
             [o_prog_bar setDoubleValue: (double)p_dialog->val.f_float];
+            if( p_dialog->i_timeToGo < 1 )
+                [o_prog_timeToGo setStringValue: @""];
+            else
+                [o_prog_timeToGo setStringValue: [NSString stringWithFormat:
+                    _NS("Remaining time: %i seconds"), p_dialog->i_timeToGo]];
             [NSApp beginSheet: o_prog_win modalForWindow: o_window
                 modalDelegate: self didEndSelector: nil contextInfo: nil];
             [o_prog_win makeKeyWindow];
@@ -239,10 +239,6 @@
     {
         p_dialog->i_return = DIALOG_OK_YES;
     }
-    else if( i_return == NSAlertAlternateReturn && ( p_dialog->i_flags & DIALOG_OK_CANCEL ) )
-    {
-        p_dialog->i_return = DIALOG_CANCELLED;
-    }
     else if( i_return == NSAlertAlternateReturn )
     {
         p_dialog->i_return = DIALOG_NO;
@@ -268,6 +264,13 @@
             /* we are done, let's hide */
             [self hideDialog];
         }
+
+        if( p_dialog->i_timeToGo < 1 )
+            [o_prog_timeToGo setStringValue: @""];
+        else
+            [o_prog_timeToGo setStringValue: [NSString stringWithFormat:
+                    _NS("Remaining time: %i seconds"), p_dialog->i_timeToGo]];
+
         return;
     }
     if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
@@ -321,12 +324,22 @@
 
 - (IBAction)cancelAndClose:(id)sender
 {
-    /* tell the core that the dialog was cancelled */
+    /* tell the core that the dialog was cancelled in a yes/no-style dialogue */
     vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
     p_dialog->i_return = DIALOG_CANCELLED;
     p_dialog->i_status = ANSWERED_DIALOG;
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
     msg_Dbg( p_intf, "dialog cancelled" );
+}
+
+- (IBAction)cancelDialog:(id)sender
+{
+    /* tell core that the user wishes to cancel the dialogue
+     * Use this function if cancelling is optionally like in the progress-dialogue */
+    vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
+    p_dialog->b_cancelled = VLC_TRUE;
+    vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
+    msg_Dbg( p_intf, "cancelling dialog, will close it later on" );
 }
 
 - (IBAction)okayAndClose:(id)sender

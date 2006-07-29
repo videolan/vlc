@@ -558,7 +558,8 @@ aviindex:
             i_create = intf_UserYesNo( p_demux, _("AVI Index") ,
                         _( "This AVI file is broken. Seeking will not "
                         "work correctly.\nDo you want to "
-                        "try to repair it (this might take a long time) ?" ) );
+                        "try to repair it (this might take a long time) ?" ),
+                        _( "Repair" ), _( "Don't repair" ), NULL );
             if( i_create == DIALOG_OK_YES )
             {
                 b_index = VLC_TRUE;

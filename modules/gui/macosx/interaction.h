@@ -31,12 +31,13 @@
 
 @interface VLCInteraction : NSObject
 {
-    /* progress widget */
+    /* progress dialogue */
     IBOutlet id o_prog_bar;
     IBOutlet id o_prog_cancel_btn;
     IBOutlet id o_prog_description;
     IBOutlet id o_prog_title;
     IBOutlet id o_prog_win;
+    IBOutlet id o_prog_timeToGo;
 
     /* authentication dialogue */
     IBOutlet id o_auth_cancel_btn;
@@ -65,6 +66,7 @@
 
 - (IBAction)cancelAndClose:(id)sender;
 - (IBAction)okayAndClose:(id)sender;
+- (IBAction)cancelDialog:(id)sender;
 
 -(id)initDialog: (interaction_dialog_t *)_p_dialog;
 -(void)runDialog;

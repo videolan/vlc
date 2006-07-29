@@ -1264,7 +1264,7 @@ void update_download_for_real( download_thread_t *p_this )
     asprintf( &psz_status, "%s\nDownloading... 0.0/? %.1f%% done",
               p_this->psz_status, 0.0 );
     i_progress = intf_UserProgress( p_vlc, "Downloading...",
-                                    psz_status, 0.0 );
+                                    psz_status, 0.0, 0 );
 
     p_stream = stream_UrlNew( p_vlc, psz_src );
     if( !p_stream )
@@ -1309,7 +1309,7 @@ void update_download_for_real( download_thread_t *p_this )
                 free( psz_s1 ); free( psz_s2 );
 
                 intf_UserProgressUpdate( p_vlc, i_progress,
-                                         psz_status, f_progress );
+                                         psz_status, f_progress, 0 );
             }
 
             free( p_buffer );
@@ -1321,7 +1321,7 @@ void update_download_for_real( download_thread_t *p_this )
             asprintf( &psz_status, "%s\nDone %s (100.00%%)",
                        p_this->psz_status, psz_s2 );
             free( psz_s2 );
-            intf_UserProgressUpdate( p_vlc, i_progress, psz_status, 100.0 );
+            intf_UserProgressUpdate( p_vlc, i_progress, psz_status, 100.0, 0 );
             free( psz_status );
         }
     }

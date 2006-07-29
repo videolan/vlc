@@ -2,7 +2,7 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {cancelAndClose = id; okayAndClose = id; }; 
+            ACTIONS = {cancelAndClose = id; cancelDialog = id; okayAndClose = id; }; 
             CLASS = VLCInteraction; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -24,6 +24,7 @@
                 "o_prog_bar" = id; 
                 "o_prog_cancel_btn" = id; 
                 "o_prog_description" = id; 
+                "o_prog_timeToGo" = id; 
                 "o_prog_title" = id; 
                 "o_prog_win" = id; 
             }; 

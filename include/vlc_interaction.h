@@ -24,6 +24,7 @@
 
 /**
  * This structure describes an interaction widget
+ * WIDGETS ARE OUTDATED! THIS IS ONLY A STUB TO KEEP WX COMPILING!
  */
 struct user_widget_t
 {
@@ -35,6 +36,7 @@ struct user_widget_t
 
 /**
  * Possible widget types
+ * WIDGETS ARE OUTDATED! THIS IS ONLY A STUB TO KEEP WX COMPILING!
  */
 enum
 {
@@ -52,10 +54,15 @@ struct interaction_dialog_t
     int             i_type;             ///< Type identifier
     char           *psz_title;          ///< Title
     char           *psz_description;    ///< Descriptor string
+    char           *psz_defaultButton;  ///< default button title (~OK)
+    char           *psz_alternateButton;///< alternate button title (~NO)
+    char           *psz_otherButton;    ///< other button title (optional,~Cancel)
 
     char           *psz_returned[1];    ///< returned responses from the user
 
     vlc_value_t     val;                ///< a value coming from core for dialogue
+    int             i_timeToGo;         ///< time (in sec) until shown progress is finished
+    vlc_bool_t      b_cancelled;        ///< was the dialogue cancelled by the user?
 
     int             i_widgets;          ///< Number of dialog widgets
     user_widget_t **pp_widgets;         ///< Dialog widgets
@@ -76,8 +83,6 @@ struct interaction_dialog_t
  * Possible flags . Reusable and button types
  */
 #define DIALOG_REUSABLE             0x01
-#define DIALOG_OK_CANCEL            0x02
-#define DIALOG_YES_NO               0x04
 #define DIALOG_YES_NO_CANCEL        0x04
 #define DIALOG_CLEAR_NOSHOW         0x08
 #define DIALOG_GOT_ANSWER           0x10
@@ -169,22 +174,22 @@ VLC_EXPORT( int,__intf_Interact,( vlc_object_t *,interaction_dialog_t * ) );
 VLC_EXPORT( void, __intf_UserFatal,( vlc_object_t*, const char*, const char*, ...) );
 #define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __intf_UserLoginPassword,( vlc_object_t*, const char*, const char*, char **, char **) );
-#define intf_UserYesNo( a, b, c ) __intf_UserYesNo( VLC_OBJECT(a),b,c )
-VLC_EXPORT( int, __intf_UserYesNo,( vlc_object_t*, const char*, const char*) );
-#define intf_UserOkayCancel( a, b, c ) __intf_UserOkayCancel( VLC_OBJECT(a),b,c )
-VLC_EXPORT( int, __intf_UserOkayCancel,( vlc_object_t*, const char*, const char*) );
+#define intf_UserYesNo( a, b, c, d, e, f ) __intf_UserYesNo( VLC_OBJECT(a),b,c, d, e, f )
+VLC_EXPORT( int, __intf_UserYesNo,( vlc_object_t*, const char*, const char*, const char*, const char*, const char*) );
 
-#define intf_UserProgress( a, b, c, d ) __intf_UserProgress( VLC_OBJECT(a),b,c, d )
-VLC_EXPORT( int, __intf_UserProgress,( vlc_object_t*, const char*, const char*, float) );
-#define intf_UserProgressUpdate( a, b, c, d ) __intf_UserProgressUpdate( VLC_OBJECT(a),b,c, d )
-VLC_EXPORT( void, __intf_UserProgressUpdate,( vlc_object_t*, int, const char*, float) );
+#define intf_UserProgress( a, b, c, d, e ) __intf_UserProgress( VLC_OBJECT(a),b,c,d,e )
+VLC_EXPORT( int, __intf_UserProgress,( vlc_object_t*, const char*, const char*, float, int) );
+#define intf_UserProgressUpdate( a, b, c, d, e ) __intf_UserProgressUpdate( VLC_OBJECT(a),b,c,d,e )
+VLC_EXPORT( void, __intf_UserProgressUpdate,( vlc_object_t*, int, const char*, float, int) );
+#define intf_UserProgressIsCancelled( a, b ) __intf_UserProgressIsCancelled( VLC_OBJECT(a),b )
+VLC_EXPORT( vlc_bool_t, __intf_UserProgressIsCancelled,( vlc_object_t*, int ) );
 
 #define intf_UserStringInput( a, b, c, d ) __intf_UserStringInput( VLC_OBJECT(a),b,c,d )
 VLC_EXPORT( int, __intf_UserStringInput,(vlc_object_t*, const char*, const char*, char **) );
 
 #define intf_IntfProgress( a, b, c ) __intf_IntfProgress( VLC_OBJECT(a),b,c )
 VLC_EXPORT( int, __intf_IntfProgress,( vlc_object_t*, const char*, float) );
-#define intf_IntfProgressUpdate( a, b, c, d ) __intf_IntfProgressUpdate( VLC_OBJECT(a),b,c, d )
+#define intf_IntfProgressUpdate( a, b, c, d ) __intf_IntfProgressUpdate( VLC_OBJECT(a),b,c,d )
 VLC_EXPORT( void, __intf_IntfProgressUpdate,( vlc_object_t*, int, const char*, float) );
 
 #define intf_UserHide( a, b ) __intf_UserHide( VLC_OBJECT(a), b )

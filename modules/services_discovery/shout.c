@@ -196,7 +196,7 @@ static void Run( services_discovery_t *p_sd )
     int i_id = input_Read( p_sd, p_sys->p_input, VLC_FALSE );
     int i_dialog_id;
 
-    i_dialog_id = intf_UserProgress( p_sd, "Shoutcast" , "Connecting...", 0.0 );
+    i_dialog_id = intf_UserProgress( p_sd, "Shoutcast" , "Connecting...", 0.0, 0 );
 
     p_sys->b_dialog = VLC_TRUE;
     while( !p_sd->b_die )
@@ -215,7 +215,7 @@ static void Run( services_discovery_t *p_sd )
                 float f_pos = (float)(p_sys->p_node_cat->i_children)* 2 *100.0 /
                               260 /* gruiiik FIXME */;
                 intf_UserProgressUpdate( p_sd, i_dialog_id, "Downloading",
-                                         f_pos );
+                                         f_pos, 0 );
             }
             vlc_object_release( p_input );
         }

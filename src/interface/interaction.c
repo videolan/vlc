@@ -143,8 +143,6 @@ void intf_InteractionManage( playlist_t *p_playlist )
 
             // Give default answer
             p_dialog->i_return = DIALOG_DEFAULT;
-            if( p_dialog->i_flags & DIALOG_OK_CANCEL )
-                p_dialog->i_return = DIALOG_CANCELLED;
 
             // Pretend we have hidden and destroyed it
             if( p_dialog->i_status == HIDDEN_DIALOG )
@@ -275,15 +273,21 @@ void __intf_UserFatal( vlc_object_t *p_this,
     intf_Interact( p_this, p_new );
 }
 
-/** Helper function to ask a yes-no question
+/** Helper function to ask a yes-no-cancel question
  *  \param p_this           Parent vlc_object
  *  \param psz_title        Title for the dialog
  *  \param psz_description  A description
+ *  \param psz_default      caption for the default button
+ *  \param psz_alternate    caption for the alternate button
+ *  \param psz_other        caption for the optional 3rd button (== cancel)
  *  \return                 Clicked button code
  */
 int __intf_UserYesNo( vlc_object_t *p_this,
                       const char *psz_title,
-                      const char *psz_description )
+                      const char *psz_description,
+                      const char *psz_default,
+                      const char *psz_alternate,
+                      const char *psz_other )
 {
     int i_ret;
     interaction_dialog_t *p_new = NULL;
@@ -294,31 +298,12 @@ int __intf_UserYesNo( vlc_object_t *p_this,
     p_new->psz_title = strdup( psz_title );
     p_new->psz_description = strdup( psz_description );
     p_new->i_flags = DIALOG_YES_NO_CANCEL;
-
-    i_ret = intf_Interact( p_this, p_new );
-
-    return i_ret;
-}
-
-/** Helper function to trigger a okay-cancel dialogue
- *  \param p_this           Parent vlc_object
- *  \param psz_title        Title for the dialog
- *  \param psz_description  A description
- *  \return                 Clicked button code
- */
-int __intf_UserOkayCancel( vlc_object_t *p_this,
-                      const char *psz_title,
-                      const char *psz_description )
-{
-    int i_ret;
-    interaction_dialog_t *p_new = NULL;
-
-    INTERACT_INIT( p_new );
-
-    p_new->i_type = INTERACT_DIALOG_TWOWAY;
-    p_new->psz_title = strdup( psz_title );
-    p_new->psz_description = strdup( psz_description );
-    p_new->i_flags = DIALOG_OK_CANCEL;
+    p_new->psz_defaultButton = strdup( psz_default );
+    p_new->psz_alternateButton = strdup( psz_alternate );
+    if( psz_other )
+        p_new->psz_otherButton = strdup( psz_other );
+    else
+        p_new->psz_otherButton = NULL;
 
     i_ret = intf_Interact( p_this, p_new );
 
@@ -330,12 +315,14 @@ int __intf_UserOkayCancel( vlc_object_t *p_this,
  *  \param psz_title        Title for the dialog
  *  \param psz_status       Current status
  *  \param f_position       Current position (0.0->100.0)
+ *  \param i_timeToGo       Time (in sec) to go until process is finished
  *  \return                 Dialog id, to give to UserProgressUpdate
  */
 int __intf_UserProgress( vlc_object_t *p_this,
                          const char *psz_title,
                          const char *psz_status,
-                         float f_pos )
+                         float f_pos,
+                         int i_time )
 {
     int i_ret;
     interaction_dialog_t *p_new = NULL;
@@ -346,6 +333,7 @@ int __intf_UserProgress( vlc_object_t *p_this,
     p_new->psz_title = strdup( psz_title );
     p_new->psz_description = strdup( psz_status );
     p_new->val.f_float = f_pos;
+    p_new->i_timeToGo = i_time;
 
     p_new->i_flags = DIALOG_USER_PROGRESS;
 
@@ -359,10 +347,12 @@ int __intf_UserProgress( vlc_object_t *p_this,
  *  \param i_id             Identifier of the dialog
  *  \param psz_status       New status
  *  \param f_position       New position (0.0->100.0)
+ *  \param i_timeToGo       Time (in sec) to go until process is finished
  *  \return                 nothing
  */
 void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
-                                const char *psz_status, float f_pos )
+                                const char *psz_status, float f_pos, 
+                                int i_time )
 {
     interaction_t *p_interaction = intf_InteractionGet( p_this );
     interaction_dialog_t *p_dialog;
@@ -383,9 +373,35 @@ void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
     p_dialog->psz_description = strdup( psz_status );
 
     p_dialog->val.f_float = f_pos;
+    p_dialog->i_timeToGo = i_time;
 
     p_dialog->i_status = UPDATED_DIALOG;
     vlc_mutex_unlock( &p_interaction->object_lock) ;
+}
+
+/** Helper function to communicate dialogue cancellations between the intf-module and caller
+ *  \param p_this           Parent vlc_object
+ *  \param i_id             Identifier of the dialogue
+ *  \return                 Either true or false
+ */
+vlc_bool_t __intf_UserProgressIsCancelled( vlc_object_t *p_this, int i_id )
+{
+    interaction_t *p_interaction = intf_InteractionGet( p_this );
+    interaction_dialog_t *p_dialog;
+
+    if( !p_interaction ) return VLC_TRUE;
+
+    vlc_mutex_lock( &p_interaction->object_lock );
+    p_dialog  =  intf_InteractionGetById( p_this, i_id );
+
+    if( !p_dialog )
+    {
+        vlc_mutex_unlock( &p_interaction->object_lock ) ;
+        return VLC_TRUE;
+    }
+
+    vlc_mutex_unlock( &p_interaction->object_lock) ;
+    return p_dialog->b_cancelled;
 }
 
 /** Helper function to make a login/password dialogue
