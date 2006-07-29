@@ -281,6 +281,7 @@ static inline int __stats_GetInteger( vlc_object_t *p_obj, counter_t *p_counter,
 {
     int i_ret;
     vlc_value_t val; val.i_int = 0;
+    if( !p_counter ) return VLC_EGENERIC;
     i_ret = __stats_Get( p_obj, p_counter, &val );
     *value = val.i_int;
     return i_ret;
@@ -292,6 +293,7 @@ static inline int __stats_GetFloat( vlc_object_t *p_obj, counter_t *p_counter,
 {
     int i_ret;
     vlc_value_t val; val.f_float = 0.0;
+    if( !p_counter ) return VLC_EGENERIC;
     i_ret = __stats_Get( p_obj, p_counter, &val );
     *value = val.f_float;
     return i_ret;
@@ -303,6 +305,7 @@ static inline int __stats_UpdateInteger( vlc_object_t *p_obj,counter_t *p_co,
     int i_ret;
     vlc_value_t val;
     vlc_value_t new_val; new_val.i_int = 0;
+    if( !p_co ) return VLC_EGENERIC;
     val.i_int = i;
     i_ret = __stats_Update( p_obj, p_co, val, &new_val );
     if( pi_new )
@@ -316,6 +319,7 @@ static inline int __stats_UpdateFloat( vlc_object_t *p_obj, counter_t *p_co,
     vlc_value_t val;
     int i_ret;
     vlc_value_t new_val;new_val.f_float = 0.0;
+    if( !p_co ) return VLC_EGENERIC;
     val.f_float = f;
     i_ret =  __stats_Update( p_obj, p_co, val, &new_val );
     if( pf_new )
