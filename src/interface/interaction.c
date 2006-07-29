@@ -222,6 +222,11 @@ void intf_InteractionManage( playlist_t *p_playlist )
                         sizeof( interaction_dialog_t ) );               \
         new->psz_title = NULL;                                          \
         new->psz_description = NULL;                                    \
+        new->psz_defaultButton = NULL;                                  \
+        new->psz_alternateButton = NULL;                                \
+        new->psz_otherButton = NULL;                                    \
+        new->i_timeToGo = 0;                                            \
+        new->b_cancelled = VLC_FALSE;                                   \
         new->p_private = NULL;                                          \
         new->i_id = 0;                                                  \
         new->i_flags = 0;                                               \
@@ -739,13 +744,11 @@ static interaction_dialog_t *intf_InteractionGetById( vlc_object_t* p_this,
 
 static void intf_InteractionDialogDestroy( interaction_dialog_t *p_dialog )
 {
- /*   FREE( p_dialog->val.psz_string );
-
     FREE( p_dialog->psz_title );
     FREE( p_dialog->psz_description );
-    
-    FREE( p_dialog->psz_returned[0] );
-    FREE( p_dialog->psz_returned[1] ); */
+    FREE( p_dialog->psz_defaultButton );
+    FREE( p_dialog->psz_alternateButton );
+    FREE( p_dialog->psz_otherButton );
 
     free( p_dialog );
 }

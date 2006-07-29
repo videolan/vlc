@@ -166,16 +166,7 @@ void InteractionDialog::Render()
     }
 
     //-------------- Buttons ------------------
-    if( p_dialog->i_flags & DIALOG_OK_CANCEL )
-    {
-        wxButton *ok = new wxButton( buttons_panel,
-                                     wxID_OK, wxU( _("&OK") ) );
-        wxButton *cancel = new wxButton( buttons_panel,
-                                         wxID_CANCEL, wxU( _("&Cancel") ) );
-        buttons_sizer->AddButton( ok );
-        buttons_sizer->AddButton( cancel );
-    }
-    else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
+    if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
         wxButton *yes = new wxButton( buttons_panel,
                                       wxID_YES, wxU( _("&Yes") ) );
