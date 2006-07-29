@@ -1,8 +1,8 @@
 /*****************************************************************************
- * i18n: Test streaming profiles
+ * profiles.c: Test streaming profiles
  *****************************************************************************
  * Copyright (C) 2006 The VideoLAN project
- * $Id: i18n_atof.c 14675 2006-03-08 12:25:29Z courmisch $
+ * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@
 #include <vlc_streaming.h>
 
 #define STDCHAIN1 "#std{access=udp,url=12.42.12.42,mux=ts}"
-//#define GUICHAIN1 
+//#define GUICHAIN1
 static void BuildStdChain1( sout_chain_t *p_chain )
 {
-    streaming_ChainAddStd( p_chain, "udp", "ts", "12.42.12.42" ); 
+    streaming_ChainAddStd( p_chain, "udp", "ts", "12.42.12.42" );
 }
 
 #define TRACHAIN1 "#transcode{vcodec=mpgv,vb=1024,scale=1.0,acodec=mp3,ab=128,channels=2}:std{mux=mp4,access=file,url=/dev/null}"

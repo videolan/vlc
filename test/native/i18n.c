@@ -2,7 +2,7 @@
  * i18n: I18n tests
  *****************************************************************************
  * Copyright (C) 2006 Rémi Denis-Courmont
- * $Id: i18n_atof.c 14675 2006-03-08 12:25:29Z courmisch $
+ * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
