@@ -721,11 +721,12 @@ static struct
       VIDEO_ES, "Windows Media Video 1" },
     { VLC_FOURCC('W','M','V','2'), CODEC_ID_WMV2,
       VIDEO_ES, "Windows Media Video 2" },
+#if LIBAVCODEC_BUILD >= ((51<<16)+(10<<8)+1) 
     { VLC_FOURCC('W','M','V','3'), CODEC_ID_WMV3,
       VIDEO_ES, "Windows Media Video 3" },
     { VLC_FOURCC('W','V','C','1'), CODEC_ID_VC1,
       VIDEO_ES, "Windows Media Video VC1" },
-
+#endif
 #if 0
     /* WMVA is the VC-1 codec before the standardization proces,
        it is not bitstream compatible and deprecated  */
