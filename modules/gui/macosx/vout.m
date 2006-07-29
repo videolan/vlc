@@ -456,35 +456,31 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     if( p_vout )
     {
-        switch( [o_event type] )
+        if( ( [o_event type] == NSLeftMouseDown ) &&
+          ( ! ( [o_event modifierFlags] &  NSControlKeyMask ) ) )
         {
-            case NSLeftMouseDown:
+            if( [o_event clickCount] <= 1 )
             {
-                if( [o_event clickCount] <= 1 )
-                {
-                    /* single clicking */
-                    var_Get( p_vout, "mouse-button-down", &val );
-                    val.i_int |= 1;
-                    var_Set( p_vout, "mouse-button-down", val );
-                }
-                else
-                {
-                    /* multiple clicking */
-                    [self toggleFullscreen];
-                }
+                /* single clicking */
+                var_Get( p_vout, "mouse-button-down", &val );
+                val.i_int |= 1;
+                var_Set( p_vout, "mouse-button-down", val );
             }
-            break;
-            case NSRightMouseDown:
+            else
             {
-                msg_Dbg( p_vout, "received NSRightMouseDown (generic method)" );
-                [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] getVoutView]];
+                /* multiple clicking */
+                [self toggleFullscreen];
             }
-            break;
-
-            default:
-                [super mouseDown: o_event];
-            break;
         }
+        else if( ( [o_event type] == NSRightMouseDown ) ||
+               ( ( [o_event type] == NSLeftMouseDown ) &&
+                 ( [o_event modifierFlags] &  NSControlKeyMask ) ) )
+        {
+            msg_Dbg( p_vout, "received NSRightMouseDown (generic method) or Ctrl clic" );
+            [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] getVoutView]];
+        }
+        else
+            [super mouseDown: o_event];
     }
 }
 
