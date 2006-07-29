@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <vlc_streaming.h>
+#include <assert.h>
 
 #define MAX_CHAIN 32768
 #define CHAIN_APPEND( format, args... ) { \
@@ -73,19 +74,19 @@ sout_display_t *streaming_ChainAddDisplay( sout_chain_t *p_chain )
 sout_transcode_t *streaming_ChainAddTranscode( sout_chain_t *p_chain,
                         char *psz_vcodec, char * psz_acodec, char * psz_scodec,
                         int i_vb, float f_scale, int i_ab, int i_channels, 
-                        char *psz_additional )
+                        vlc_bool_t b_soverlay, char *psz_additional )
 {
     DECMALLOC_NULL( p_module, sout_module_t );
     MALLOC_NULL( TRAM, sout_transcode_t );
     p_module->i_type = SOUT_MOD_TRANSCODE;
-    if( psz_vcodec )
-    { TRAM->b_video = VLC_TRUE; TRAM->psz_vcodec = strdup( psz_vcodec); }
-    if( psz_acodec )
-    { TRAM->b_audio = VLC_TRUE; TRAM->psz_acodec = strdup( psz_acodec ); }
-    TRAM->psz_scodec = strdup( psz_scodec );
+
+    assert( !( b_soverlay && psz_scodec ) );
+    if( psz_vcodec ) TRAM->psz_vcodec = strdup( psz_vcodec );
+    if( psz_acodec ) TRAM->psz_acodec = strdup( psz_acodec );
+    if( psz_scodec ) TRAM->psz_scodec = strdup( psz_scodec );
     TRAM->i_vb = i_vb; TRAM->i_ab = i_ab; TRAM->f_scale = f_scale;
-    TRAM->i_channels = i_channels;
-    TRAM->psz_additional = strdup( psz_additional );
+    TRAM->i_channels = i_channels; TRAM->b_soverlay = b_soverlay;
+    if( TRAM->psz_additional ) TRAM->psz_additional = strdup( psz_additional );
     return TRAM;
 }
             
@@ -129,7 +130,6 @@ void streaming_ChainClean( sout_chain_t *p_chain )
                 FREENULL( STDM->psz_url );
                 FREENULL( STDM->psz_name );
                 FREENULL( STDM->psz_group );
-                memset( STDM, 0, sizeof( sout_std_t ) );
                 break;
             case SOUT_MOD_TRANSCODE:
                 FREENULL( TRAM->psz_vcodec );
@@ -137,10 +137,11 @@ void streaming_ChainClean( sout_chain_t *p_chain )
                 FREENULL( TRAM->psz_scodec );
                 FREENULL( TRAM->psz_venc );
                 FREENULL( TRAM->psz_aenc );
-                memset( TRAM, 0, sizeof( sout_transcode_t ) ) ;
+                FREENULL( TRAM->psz_additional );
                 break;
             }
             REMOVE_ELEM( p_chain->pp_modules, p_chain->i_modules, i );
+            free( p_module );
         }
     }
 }
@@ -179,9 +180,8 @@ void streaming_ChainClean( sout_chain_t *p_chain )
  * \param pd the destination gui descriptor object
  * \return TRUE if the conversion succeeded, false else
  */
-vlc_bool_t streaming_ChainToGuiDesc(  vlc_object_t *p_this,
-                                      sout_chain_t *p_chain,
-                                      sout_gui_descr_t *pd )
+vlc_bool_t streaming_ChainToGuiDesc( vlc_object_t *p_this,
+                                  sout_chain_t *p_chain, sout_gui_descr_t *pd )
 {
     int j, i_last = 0;
     sout_module_t *p_module;
@@ -193,13 +193,12 @@ vlc_bool_t streaming_ChainToGuiDesc(  vlc_object_t *p_this,
         p_module = p_chain->pp_modules[0];
         i_last++;
 
-        pd->b_video = TRAM->b_video; pd->b_audio = TRAM->b_audio;
-        pd->b_subtitles = TRAM->b_subtitles; pd->b_soverlay = TRAM->b_soverlay;
+        pd->b_soverlay = TRAM->b_soverlay;
         pd->i_vb = TRAM->i_vb; pd->i_ab = TRAM->i_ab;
         pd->i_channels = TRAM->i_channels; pd->f_scale = TRAM->f_scale;
-        pd->psz_vcodec = strdup( TRAM->psz_vcodec );
-        pd->psz_acodec = strdup( TRAM->psz_acodec );
-        pd->psz_scodec = strdup( TRAM->psz_scodec );
+        if( TRAM->psz_vcodec ) pd->psz_vcodec = strdup( TRAM->psz_vcodec );
+        if( TRAM->psz_acodec ) pd->psz_acodec = strdup( TRAM->psz_acodec );
+        if( TRAM->psz_scodec ) pd->psz_scodec = strdup( TRAM->psz_scodec );
     }
     if( p_chain->pp_modules[i_last]->i_type == SOUT_MOD_DUPLICATE )
     {
@@ -271,11 +270,12 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
     streaming_ChainClean( p_chain );
 
     /* Transcode */
-    if( pd->b_video || pd->b_audio || pd->b_subtitles || pd->b_soverlay )
+    if( pd->psz_vcodec || pd->psz_acodec || pd->psz_scodec || pd->b_soverlay )
     {
         streaming_ChainAddTranscode( p_chain, pd->psz_vcodec, pd->psz_acodec,
                                      pd->psz_scodec, pd->i_vb, pd->f_scale,
-                                     pd->i_ab, pd->i_channels, NULL );
+                                     pd->i_ab, pd->i_channels, 
+                                     pd->b_soverlay, NULL );
     }
     /* #std{} */
     if( pd->b_local + pd->b_file + pd->b_http + pd->b_mms + pd->b_rtp + 
@@ -340,22 +340,22 @@ char * streaming_ChainToPsz( sout_chain_t *p_chain )
         {
         case SOUT_MOD_TRANSCODE:
             CHAIN_APPEND( "transcode{" );
-            if( TRAM->b_video )
+            if( TRAM->psz_vcodec )
             {
                 CHAIN_APPEND( "vcodec=%s,vb=%i,scale=%f", TRAM->psz_vcodec,
                                      TRAM->i_vb, TRAM->f_scale );
-                if( TRAM->b_audio || TRAM->b_subtitles || TRAM->b_soverlay )
+                if( TRAM->psz_acodec || TRAM->psz_scodec || TRAM->b_soverlay )
                     CHAIN_APPEND( "," );
             }
-            if( TRAM->b_audio )
+            if( TRAM->psz_acodec )
             {
                 CHAIN_APPEND( "acodec=%s,ab=%i,channels=%i", TRAM->psz_acodec,
                               TRAM->i_ab, TRAM->i_channels );
-                if( TRAM->b_subtitles || TRAM->b_soverlay )
+                if( TRAM->psz_scodec || TRAM->b_soverlay )
                     CHAIN_APPEND( "," );
             }
-            if( TRAM->b_subtitles && TRAM->b_soverlay ) return NULL;
-            if( TRAM->b_subtitles )
+            assert( !(TRAM->psz_scodec && TRAM->b_soverlay) );
+            if( TRAM->psz_scodec )
                 CHAIN_APPEND( "scodec=%s", TRAM->psz_scodec) ;
             if( TRAM->b_soverlay )
                 CHAIN_APPEND( "soverlay" );

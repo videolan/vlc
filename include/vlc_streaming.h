@@ -98,7 +98,7 @@ struct sout_transcode_t
 {
     int i_vb, i_ab, i_channels;
     float f_scale;
-    vlc_bool_t b_audio, b_video, b_subtitles, b_soverlay;
+    vlc_bool_t b_soverlay;
     char *psz_vcodec, *psz_acodec, *psz_scodec, *psz_venc, *psz_aenc;
     char *psz_additional;
 };
@@ -115,9 +115,9 @@ struct sout_display_t
 
 struct sout_duplicate_t
 {
-    int i_children;
+    int i_children, i_conditions;
     sout_chain_t **pp_children;
-    /// Conditions
+    char **ppsz_conditions;
 };
 
 typedef union
@@ -165,7 +165,7 @@ struct sout_gui_descr_t
     char *psz_mux;
 
     /* Transcode */
-    vlc_bool_t b_video, b_audio, b_subtitles, b_soverlay;
+    vlc_bool_t b_soverlay;
     char *psz_vcodec, *psz_acodec, *psz_scodec;
     int i_vb, i_ab, i_channels;
     float f_scale;
