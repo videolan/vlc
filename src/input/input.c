@@ -678,6 +678,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
      * (this will break playing of file starting by 'vlc:' but I don't
      * want to add more logic, just force file by file:// or code it ;)
      */
+    memset( &p_input->counters, 0, sizeof( p_input->counters ) );
     if( !b_quick )
     {
         /* Prepare statistics */
