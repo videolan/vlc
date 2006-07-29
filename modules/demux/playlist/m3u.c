@@ -53,33 +53,20 @@ static void parseEXTINF( char *psz_string, char **ppsz_artist, char **ppsz_name,
 int E_(Import_M3U)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-
     uint8_t *p_peek;
-    char    *psz_ext;
-
-    if( stream_Peek( p_demux->s , &p_peek, 7 ) < 7 )
-    {
-        return VLC_EGENERIC;
-    }
-    psz_ext = strrchr ( p_demux->psz_path, '.' );
-
-    if( !strncmp( (char *)p_peek, "#EXTM3U", 7 ) )
-    {
-        ;
-    }
-    else if( ( psz_ext && !strcasecmp( psz_ext, ".m3u") ) ||
-             ( psz_ext && !strcasecmp( psz_ext, ".ram") ) ||
-             ( psz_ext && !strcasecmp( psz_ext, ".rm") ) ||
-             ( psz_ext && !strcasecmp( psz_ext, ".vlc") ) ||
-             /* A .ram file can contain a single rtsp link */
-             isDemux( p_demux,  "m3u" ) )
+    CHECK_PEEK( p_peek, 8 );
+    
+    if( POKE( p_peek, "#EXTM3U", 7 ) || POKE( p_peek, "RTSPtext", 8 ) ||
+        isExtension( p_demux, ".m3u" ) || isExtension( p_demux, ".vlc" ) ||
+        /* A .ram file can contain a single rtsp link */
+        isExtension( p_demux, ".ram" ) || isExtension( p_demux, ".rm" ) ||
+        isDemux( p_demux,  "m3u" ) )
     {
         ;
     }
     else
-    {
         return VLC_EGENERIC;
-    }
+    
     STANDARD_DEMUX_INIT_MSG( "found valid M3U playlist" );
     p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
 
@@ -155,6 +142,10 @@ static int Demux( demux_t *p_demux )
                     INSERT_ELEM( ppsz_options, i_options, i_options,
                                  psz_option );
             }
+        }
+        else if( !strncasecmp( psz_parse, "RTSPtext", sizeof("RTSPtext") -1 ) )
+        {
+            ;/* special case to handle QuickTime RTSPtext redirect files */
         }
         else if( *psz_parse )
         {

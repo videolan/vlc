@@ -49,9 +49,9 @@ int E_(Import_PLS)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     uint8_t *p_peek;
-    CHECK_PEEK( p_peek, 7 );
+    CHECK_PEEK( p_peek, 10 );
 
-    if( POKE( p_peek, "[playlist]", 10 ) ||
+    if( POKE( p_peek, "[playlist]", 10 ) || POKE( p_peek, "[Reference]", 10 ) ||
         isExtension( p_demux, ".pls" )   || isDemux( p_demux, "pls" ) )
     {
         ;
@@ -85,7 +85,6 @@ static int Demux( demux_t *p_demux )
     char          *psz_mrl = NULL;
     char          *psz_key;
     char          *psz_value;
-    int            i_position;
     int            i_item = -1;
     int            i_new_item = 0;
     int            i_key_length;
@@ -94,7 +93,8 @@ static int Demux( demux_t *p_demux )
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
-        if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) )
+        if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) || 
+            !strncasecmp( psz_line, "[Reference]", sizeof("[Reference]")-1 ) )
         {
             free( psz_line );
             continue;
@@ -120,15 +120,19 @@ static int Demux( demux_t *p_demux )
         }
         /* find the number part of of file1, title1 or length1 etc */
         i_key_length = strlen( psz_key );
-        if( i_key_length >= 5 ) /* file1 type case */
+        if( i_key_length >= 4 ) /* Ref1 type case */
         {
-            i_new_item = atoi( psz_key + 4 );
-            if( i_new_item == 0 && i_key_length >= 6 ) /* title1 type case */
+            i_new_item = atoi( psz_key + 3 );
+            if( i_new_item == 0 && i_key_length >= 5 ) /* file1 type case */
             {
-                i_new_item = atoi( psz_key + 5 );
-                if( i_new_item == 0 && i_key_length >= 7 ) /* length1 type case */
+                i_new_item = atoi( psz_key + 4 );
+                if( i_new_item == 0 && i_key_length >= 6 ) /* title1 type case */
                 {
-                    i_new_item = atoi( psz_key + 6 );
+                    i_new_item = atoi( psz_key + 5 );
+                    if( i_new_item == 0 && i_key_length >= 7 ) /* length1 type case */
+                    {
+                        i_new_item = atoi( psz_key + 6 );
+                    }
                 }
             }
         }
@@ -167,7 +171,8 @@ static int Demux( demux_t *p_demux )
             i_item = i_new_item;
             i_new_item = 0;
         }
-        if( !strncasecmp( psz_key, "file", sizeof("file") -1 ) )
+        if( !strncasecmp( psz_key, "file", sizeof("file") -1 ) ||
+            !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
         {
             psz_mrl = E_(ProcessMRL)( psz_value, p_demux->p_sys->psz_prefix );
         }

@@ -86,23 +86,19 @@ static int StoreString( demux_t *p_demux, char **ppsz_string, char *psz_source_s
 int E_(Import_ASX)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-
-    char    *psz_ext;
-
-    psz_ext = strrchr ( p_demux->psz_path, '.' );
-
-    if( ( psz_ext && !strcasecmp( psz_ext, ".asx") ) ||
-        ( psz_ext && !strcasecmp( psz_ext, ".wax") ) ||
-        ( psz_ext && !strcasecmp( psz_ext, ".wvx") ) ||
+    uint8_t *p_peek;
+    CHECK_PEEK( p_peek, 10 );
+    
+    if( POKE( p_peek, "<asx", 4 ) || isExtension( p_demux, ".asx" ) ||
+        isExtension( p_demux, ".wax" ) || isExtension( p_demux, ".wvx" ) ||
         isDemux( p_demux, "asx-open" ) )
     {
         ;
     }
     else
-    {
         return VLC_EGENERIC;
-    }
-    STANDARD_DEMUX_INIT_MSG( "using ASX playlist reader" );
+    
+    STANDARD_DEMUX_INIT_MSG( "found valid ASX playlist" );
     p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
     p_demux->p_sys->psz_data = NULL;
     p_demux->p_sys->i_data_len = -1;
