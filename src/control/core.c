@@ -61,11 +61,22 @@ inline void libvlc_exception_raise( libvlc_exception_t *p_exception,
                                     char *psz_format, ... )
 {
     va_list args;
+
+    /* does caller care about exceptions ? */
+    if( p_exception == NULL )
+       return;
+
+    /* remove previous exception if it wasn't cleared */
+    if( p_exception->b_raised && p_exception->psz_message )
+    {
+       free(p_exception->psz_message);
+       p_exception->psz_message = NULL;
+    }
+
     va_start( args, psz_format );
     vasprintf( &p_exception->psz_message, psz_format, args );
     va_end( args );
 
-    if( p_exception == NULL ) return;
     p_exception->b_raised = 1;
 }
 
@@ -120,3 +131,9 @@ void libvlc_destroy( libvlc_instance_t *p_instance )
     VLC_CleanUp( p_instance->i_vlc_id );
     VLC_Destroy( p_instance->i_vlc_id );
 }
+
+int libvlc_get_vlc_id( libvlc_instance_t *p_instance )
+{
+    return p_instance->i_vlc_id;
+}
+

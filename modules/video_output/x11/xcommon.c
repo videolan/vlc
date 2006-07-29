@@ -2393,7 +2393,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
        case VOUT_REPARENT:
             vlc_mutex_lock( &p_vout->p_sys->lock );
-	    d = va_arg( args, Drawable );
+	    d = (Drawable)va_arg( args, int );
 	    if ( !d ) 
             XReparentWindow( p_vout->p_sys->p_display,
                              p_vout->p_sys->original_window.base_window,

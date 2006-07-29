@@ -34,10 +34,6 @@
 
 #include <vlc/vlc.h>
 
-#ifndef WIN32
-#include <X11/Xlib.h>
-#endif
-
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -116,6 +112,12 @@ typedef struct libvlc_instance_t libvlc_instance_t;
  * \param exception an initialized exception pointer
  */
 libvlc_instance_t * libvlc_new( int , char **, libvlc_exception_t *);
+
+/**
+ * returns a libvlc instance identifier for legacy APIs
+ * \param p_instance the instance to destroy
+ */
+int libvlc_get_vlc_id( libvlc_instance_t *p_instance );
 
 /**
  * Destroy a libvlc instance
@@ -333,10 +335,15 @@ void libvlc_video_take_snapshot( libvlc_input_t *, char *, libvlc_exception_t * 
     
 int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *);
 
-#ifndef WIN32
-int libvlc_video_reparent( libvlc_input_t *, Drawable, libvlc_exception_t * );
-#endif    
+/**
+* Downcast to this general type as placeholder for a platform specific one, such as:
+*  Drawable on X11,
+*  CGrafPort on MacOSX,
+*  HWND on win32
+*/
+typedef int libvlc_drawable_t;
 
+int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, libvlc_exception_t * );
 
 /** @} */
 

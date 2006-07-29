@@ -210,8 +210,7 @@ vlc_bool_t libvlc_input_has_vout( libvlc_input_t *p_input,
 }
 
 
-#ifndef WIN32
-int libvlc_video_reparent( libvlc_input_t *p_input, Drawable d,
+int libvlc_video_reparent( libvlc_input_t *p_input, libvlc_drawable_t d,
                            libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_input, p_e );
@@ -219,7 +218,6 @@ int libvlc_video_reparent( libvlc_input_t *p_input, Drawable d,
     return 0;
     
 }
-#endif
 
 int libvlc_video_destroy( libvlc_input_t *p_input,
                           libvlc_exception_t *p_e )
