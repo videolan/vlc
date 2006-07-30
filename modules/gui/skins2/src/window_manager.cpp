@@ -331,6 +331,37 @@ void WindowManager::synchVisibility() const
 }
 
 
+void WindowManager::saveVisibility()
+{
+    WinSet_t::const_iterator it;
+    m_savedWindows.clear();
+    for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
+    {
+        // Remember the window if it is visible
+        if( (*it)->getVisibleVar().get() )
+        {
+            m_savedWindows.insert( *it );
+        }
+    }
+}
+
+
+void WindowManager::restoreVisibility() const
+{
+    // Warning in case we never called saveVisibility()
+    if( m_savedWindows.size() == 0 )
+    {
+        msg_Warn( getIntf(), "restoring visibility for no window" );
+    }
+
+    WinSet_t::const_iterator it;
+    for( it = m_savedWindows.begin(); it != m_savedWindows.end(); it++)
+    {
+        (*it)->show();
+    }
+}
+
+
 void WindowManager::raiseAll() const
 {
     // Raise all the windows

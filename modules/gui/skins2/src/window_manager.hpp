@@ -59,8 +59,10 @@ class WindowManager: public SkinObject
         /// Destructor
         virtual ~WindowManager();
 
-        /// Add a window to the list of known windows. Necessary if you want
-        /// your window to be movable...
+        /**
+         * Add a window to the list of known windows. Necessary if you want
+         * your window to be movable...
+         */
         void registerWindow( TopWindow &rWindow );
 
         /// Remove a previously registered window
@@ -104,6 +106,12 @@ class WindowManager: public SkinObject
 
         /// Synchronize the windows with their visibility variable
         void synchVisibility() const;
+
+        /// Save the current visibility of the windows
+        void saveVisibility();
+
+        /// Restore the saved visibility of the windows
+        void restoreVisibility() const;
 
         /// Raise the given window
         void raise( TopWindow &rWindow ) const { rWindow.raise(); }
@@ -164,8 +172,15 @@ class WindowManager: public SkinObject
         map<TopWindow*, WinSet_t> m_dependencies;
         /// Store all the windows
         WinSet_t m_allWindows;
-        /// Store the moving windows; this set is updated at every start of
-        /// move.
+        /**
+         * Store the windows that were visible when saveVisibility() was
+         * last called.
+         */
+        WinSet_t m_savedWindows;
+        /// Store the moving windows
+        /**
+         * This set is updated at every start of move.
+         */
         WinSet_t m_movingWindows;
         /**
          * Store the moving windows in the context of resizing
