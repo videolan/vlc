@@ -230,8 +230,8 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
         if( y + height > m_height )
             height = m_height - y;
 
-        // Refresh the window... but do not paint on a video control!
-        if( !m_pVideoControl )
+        // Refresh the window... but do not paint on a visible video control!
+        if( !m_pVideoControl || !m_pVideoControl->isVisible() )
         {
             // No video control, we can safely repaint the rectangle
             pWindow->refresh( x, y, width, height );
