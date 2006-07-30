@@ -87,6 +87,7 @@ struct input_item_t
 #define ITEM_TYPE_NET           7
 #define ITEM_TYPE_PLAYLIST      8
 #define ITEM_TYPE_NODE          9
+#define ITEM_TYPE_NUMBER        10
 
 static inline void vlc_input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
 {
