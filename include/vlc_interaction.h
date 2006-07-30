@@ -87,9 +87,12 @@ struct interaction_dialog_t
 #define DIALOG_CLEAR_NOSHOW         0x08
 #define DIALOG_GOT_ANSWER           0x10
 #define DIALOG_LOGIN_PW_OK_CANCEL   0x20
+#define DIALOG_BLOCKING_ERROR       0x24
+#define DIALOG_NONBLOCKING_ERROR    0x200
 #define DIALOG_USER_PROGRESS        0x40
 #define DIALOG_PSZ_INPUT_OK_CANCEL      0x80
 #define DIALOG_INTF_PROGRESS        0x100
+#define DIALOG_WARNING              0x400
 
 /**
  * Possible return codes
@@ -121,7 +124,6 @@ enum
  */
 enum
 {
-    INTERACT_PROGRESS,          ///< Progress bar (in the main interface ?)
     INTERACT_DIALOG_ONEWAY,     ///< Dialog box without feedback
     INTERACT_DIALOG_TWOWAY,     ///< Dialog box with feedback
 };
@@ -132,14 +134,13 @@ enum
 enum
 {
     DIALOG_FIRST,
-    DIALOG_ERRORS,
 
     DIALOG_LAST_PREDEFINED,
 };
 
 /**
  * This structure contains the active interaction dialogs, and is
- * used by teh manager
+ * used by the manager
  */
 struct interaction_t
 {
@@ -170,8 +171,10 @@ enum
 #define intf_Interact( a,b ) __intf_Interact( VLC_OBJECT(a), b )
 VLC_EXPORT( int,__intf_Interact,( vlc_object_t *,interaction_dialog_t * ) );
 
-#define intf_UserFatal( a, c, d, e... ) __intf_UserFatal( VLC_OBJECT(a),c,d, ## e )
-VLC_EXPORT( void, __intf_UserFatal,( vlc_object_t*, const char*, const char*, ...) );
+#define intf_UserFatal( a, b, c, d, e... ) __intf_UserFatal( VLC_OBJECT(a),b,c,d, ## e )
+VLC_EXPORT( void, __intf_UserFatal,( vlc_object_t*, vlc_bool_t, const char*, const char*, ...) );
+#define intf_UserWarn( a, c, d, e... ) __intf_UserWarn( VLC_OBJECT(a),c,d, ## e )
+VLC_EXPORT( void, __intf_UserWarn,( vlc_object_t*, const char*, const char*, ...) );
 #define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __intf_UserLoginPassword,( vlc_object_t*, const char*, const char*, char **, char **) );
 #define intf_UserYesNo( a, b, c, d, e, f ) __intf_UserYesNo( VLC_OBJECT(a),b,c, d, e, f )

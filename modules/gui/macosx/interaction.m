@@ -25,6 +25,9 @@
 #import "intf.h"
 #import "interaction.h"
 
+/* for the icons in our custom error panel */
+#import <ApplicationServices/ApplicationServices.h> 
+
 /*****************************************************************************
  * VLCInteractionList implementation
  *****************************************************************************/
@@ -38,6 +41,8 @@
         selector:@selector(newInteractionEvent:)
         name: @"VLCNewInteractionEventNotification"
         object:self];
+
+    o_error_panel = [[VLCErrorInteractionPanel alloc] init];
 
     return self;
 }
@@ -72,7 +77,6 @@
 
 -(void)addInteraction: (interaction_dialog_t *)p_dialog
 {
-
     VLCInteraction *o_interaction = [[VLCInteraction alloc] initDialog: p_dialog];
     
     p_dialog->p_private = (void *)o_interaction;
@@ -85,6 +89,11 @@
     [o_interaction_list removeObject:o_interaction];
 }
 
+-(id)getErrorPanel
+{
+    return o_error_panel;
+}
+
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -92,7 +101,6 @@
     [o_interaction_list release];
     [super dealloc];
 }
-
 @end
 
 /*****************************************************************************
@@ -128,10 +136,10 @@
         o_mainIntfPgbar = [[VLCMain sharedInstance] getMainIntfPgbar];
     }
 
-    NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : "title"];
+    NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : _("Error")];
     NSString *o_description = [NSString stringWithUTF8String:p_dialog->psz_description ? p_dialog->psz_description : ""];
-    NSString *o_defaultButton = [NSString stringWithUTF8String:p_dialog->psz_defaultButton];
-    NSString *o_alternateButton = [NSString stringWithUTF8String:p_dialog->psz_alternateButton];
+    NSString *o_defaultButton = p_dialog->psz_defaultButton ? [NSString stringWithUTF8String:p_dialog->psz_defaultButton] : nil;
+    NSString *o_alternateButton = p_dialog->psz_alternateButton ? [NSString stringWithUTF8String:p_dialog->psz_alternateButton] : nil;
     NSString *o_otherButton = p_dialog->psz_otherButton ? [NSString stringWithUTF8String:p_dialog->psz_otherButton] : nil;
 
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
@@ -154,81 +162,86 @@
         o_window = [NSApp mainWindow];
     }
 
-    #if 0
+#if 0
     msg_Dbg( p_intf, "Title: %s", [o_title UTF8String] );
     msg_Dbg( p_intf, "Description: %s", [o_description UTF8String] );
-    #endif
+    msg_Dbg( p_intf, "Delivered flag: %i", p_dialog->i_flags );
+#endif
 
-    if( p_dialog->i_id == DIALOG_ERRORS )
+    if( p_dialog->i_flags & DIALOG_BLOCKING_ERROR )
     {
         msg_Dbg( p_intf, "error panel requested" );
-        NSAlert * ourAlert = [NSAlert alertWithMessageText:
-            [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : _("Error")]
-            defaultButton: _NS("OK") alternateButton: nil otherButton: nil 
-            informativeTextWithFormat: 
-            [NSString stringWithUTF8String:p_dialog->psz_description]];
-        [ourAlert setAlertStyle: NSWarningAlertStyle];
-        [ourAlert runModal];
+        NSBeginInformationalAlertSheet( o_title, _NS("OK"), nil, nil, 
+            o_window, self, @selector(sheetDidEnd: returnCode: contextInfo:), 
+            NULL, nil, o_description );
+    }
+    else if( p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
+    {
+        msg_Dbg( p_intf, "addition to non-blocking error panel received" );
+        [[[[VLCMain sharedInstance] getInteractionList] getErrorPanel] 
+        addError: o_title withMsg: o_description];
+    }
+    else if( p_dialog->i_flags & DIALOG_WARNING )
+    {
+        msg_Dbg( p_intf, "addition to non-blocking warning panel received" );
+        [[[[VLCMain sharedInstance] getInteractionList] getErrorPanel] 
+            addWarning: o_title withMsg: o_description];
+    }
+    else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
+    {
+        msg_Dbg( p_intf, "yes-no-cancel-dialog requested" );
+        NSBeginInformationalAlertSheet( o_title, o_defaultButton, 
+            o_alternateButton, o_otherButton, o_window, self,
+            @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, 
+            o_description );
+    }
+    else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
+    {
+        msg_Dbg( p_intf, "dialog for login and pw requested" );
+        [o_auth_title setStringValue: o_title];
+        [o_auth_description setStringValue: o_description];
+        [o_auth_login_fld setStringValue: @""];
+        [o_auth_pw_fld setStringValue: @""];
+        [NSApp beginSheet: o_auth_win modalForWindow: o_window
+            modalDelegate: self didEndSelector: nil contextInfo: nil];
+        [o_auth_win makeKeyWindow];
+    }
+    else if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
+    {
+        msg_Dbg( p_intf, "user progress dialog requested" );
+        [o_prog_title setStringValue: o_title];
+        [o_prog_description setStringValue: o_description];
+        [o_prog_bar setDoubleValue: (double)p_dialog->val.f_float];
+        if( p_dialog->i_timeToGo < 1 )
+            [o_prog_timeToGo setStringValue: @""];
+        else
+            [o_prog_timeToGo setStringValue: [NSString stringWithFormat:
+                _NS("Remaining time: %i seconds"), p_dialog->i_timeToGo]];
+        [NSApp beginSheet: o_prog_win modalForWindow: o_window
+            modalDelegate: self didEndSelector: nil contextInfo: nil];
+        [o_prog_win makeKeyWindow];
+    }
+    else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
+    {
+        msg_Dbg( p_intf, "text input from user requested" );
+        [o_input_title setStringValue: o_title];
+        [o_input_description setStringValue: o_description];
+        [o_input_fld setStringValue: @""];
+        [NSApp beginSheet: o_input_win modalForWindow: o_window
+            modalDelegate: self didEndSelector: nil contextInfo: nil];
+        [o_input_win makeKeyWindow];
+    }
+    else if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
+    {
+        msg_Dbg( p_intf, "progress-bar in main intf requested" );
+        [[VLCMain sharedInstance] setScrollField: o_description stopAfter: -1];
+        [o_mainIntfPgbar setDoubleValue: (double)p_dialog->val.f_float];
+        [o_mainIntfPgbar setHidden: NO];
+        [[[VLCMain sharedInstance] getControllerWindow] makeKeyWindow];
+        [o_mainIntfPgbar setIndeterminate: NO];
     }
     else
-    {
-        if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
-        {
-            msg_Dbg( p_intf, "yes-no-cancel-dialog requested" );
-            NSBeginInformationalAlertSheet( o_title, o_defaultButton, 
-                o_alternateButton, o_otherButton, o_window, self,
-                @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, 
-                o_description );
-        }
-        else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
-        {
-            msg_Dbg( p_intf, "dialog for login and pw requested" );
-            [o_auth_title setStringValue: o_title];
-            [o_auth_description setStringValue: o_description];
-            [o_auth_login_fld setStringValue: @""];
-            [o_auth_pw_fld setStringValue: @""];
-            [NSApp beginSheet: o_auth_win modalForWindow: o_window
-                modalDelegate: self didEndSelector: nil contextInfo: nil];
-            [o_auth_win makeKeyWindow];
-        }
-        else if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
-        {
-            msg_Dbg( p_intf, "user progress dialog requested" );
-            [o_prog_title setStringValue: o_title];
-            [o_prog_description setStringValue: o_description];
-            [o_prog_bar setDoubleValue: (double)p_dialog->val.f_float];
-            if( p_dialog->i_timeToGo < 1 )
-                [o_prog_timeToGo setStringValue: @""];
-            else
-                [o_prog_timeToGo setStringValue: [NSString stringWithFormat:
-                    _NS("Remaining time: %i seconds"), p_dialog->i_timeToGo]];
-            [NSApp beginSheet: o_prog_win modalForWindow: o_window
-                modalDelegate: self didEndSelector: nil contextInfo: nil];
-            [o_prog_win makeKeyWindow];
-        }
-        else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
-        {
-            msg_Dbg( p_intf, "text input from user requested" );
-            [o_input_title setStringValue: o_title];
-            [o_input_description setStringValue: o_description];
-            [o_input_fld setStringValue: @""];
-            [NSApp beginSheet: o_input_win modalForWindow: o_window
-                modalDelegate: self didEndSelector: nil contextInfo: nil];
-            [o_input_win makeKeyWindow];
-        }
-        else if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
-        {
-            msg_Dbg( p_intf, "progress-bar in main intf requested" );
-            [[VLCMain sharedInstance] setScrollField: o_description stopAfter: -1];
-            [o_mainIntfPgbar setDoubleValue: (double)p_dialog->val.f_float];
-            [o_mainIntfPgbar setHidden: NO];
-            [[[VLCMain sharedInstance] getControllerWindow] makeKeyWindow];
-            [o_mainIntfPgbar setIndeterminate: NO];
-        }
-        else
-            msg_Err( p_intf, "requested dialog type unknown (%i)", 
-                p_dialog->i_flags );
-    }
+        msg_Err( p_intf, "requested dialog type unknown (%i)", p_dialog->i_flags );
 }
 
 - (void)sheetDidEnd:(NSWindow *)o_sheet returnCode:(int)i_return
@@ -344,6 +357,7 @@
 
 - (IBAction)okayAndClose:(id)sender
 {
+    msg_Dbg( p_intf, "running okayAndClose" );
     vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
     if( p_dialog->i_flags == DIALOG_LOGIN_PW_OK_CANCEL )
     {
@@ -356,6 +370,144 @@
     p_dialog->i_status = ANSWERED_DIALOG;
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
     msg_Dbg( p_intf, "dialog acknowledged" );
+}
+
+@end
+
+/*****************************************************************************
+ * VLCErrorInteractionPanel implementation
+ *****************************************************************************/
+@implementation VLCErrorInteractionPanel
+-(id)init
+{
+    [super init];
+    nib_interact_errpanel_loaded = [NSBundle loadNibNamed:@"InteractionErrorPanel" owner:self];
+    [o_window setTitle: _NS("Errors and Warnings")];
+    [o_cleanup_button setTitle: _NS("Clean up")];
+    o_errors = [[NSMutableArray alloc] init];
+    o_icons = [[NSMutableArray alloc] init];
+
+    /* ugly Carbon stuff following...
+     * regrettably, you can't get the icons through clean Cocoa */
+
+    /* retrieve our error icon */
+    IconRef ourIconRef;
+    int returnValue;
+    returnValue = GetIconRef(kOnSystemDisk, 'macs', 'stop', &ourIconRef);
+    errorIcon = [[NSImage alloc] initWithSize:NSMakeSize(32,32)];
+    [errorIcon lockFocus];
+    CGRect rect = CGRectMake(0,0,32,32);
+    PlotIconRefInContext((CGContextRef)[[NSGraphicsContext currentContext] 
+        graphicsPort],
+        &rect,
+        kAlignNone,
+        kTransformNone,
+        NULL /*inLabelColor*/,
+        kPlotIconRefNormalFlags,
+        (IconRef)ourIconRef);
+    [errorIcon unlockFocus];
+    returnValue = ReleaseIconRef(ourIconRef);
+
+    /* retrieve our caution icon */
+    returnValue = GetIconRef(kOnSystemDisk, 'macs', 'caut', &ourIconRef);
+    warnIcon = [[NSImage alloc] initWithSize:NSMakeSize(32,32)];
+    [warnIcon lockFocus];
+    PlotIconRefInContext((CGContextRef)[[NSGraphicsContext currentContext] 
+        graphicsPort],
+        &rect,
+        kAlignNone,
+        kTransformNone,
+        NULL /*inLabelColor*/,
+        kPlotIconRefNormalFlags,
+        (IconRef)ourIconRef);
+    [warnIcon unlockFocus];
+    returnValue = ReleaseIconRef(ourIconRef);    
+
+    return self;
+}
+
+-(void)dealloc
+{
+    [errorIcon release];
+    [warnIcon release];
+    [o_errors release];
+    [o_icons release];
+    [super dealloc];
+}
+
+-(void)showPanel
+{
+    [o_window makeKeyAndOrderFront: self];
+}
+
+-(void)addError: (NSString *)o_error withMsg:(NSString *)o_msg
+{
+    /* format our string as desired */
+    NSMutableAttributedString * ourError;
+    ourError = [[NSMutableAttributedString alloc] initWithString:
+        [NSString stringWithFormat:@"%@\n%@", o_error, o_msg]
+        attributes: 
+        [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize:11] forKey: NSFontAttributeName]];
+    [ourError 
+        addAttribute: NSFontAttributeName
+        value: [NSFont boldSystemFontOfSize:11] 
+        range: NSMakeRange( 0, [o_error length])];
+    [o_errors addObject: ourError];
+    [ourError release];
+
+    [o_icons addObject: errorIcon];
+
+    [o_error_table reloadData];
+    [self showPanel];
+}
+
+-(void)addWarning: (NSString *)o_warning withMsg:(NSString *)o_msg
+{
+    /* format our string as desired */
+    NSMutableAttributedString * ourWarning;
+    ourWarning = [[NSMutableAttributedString alloc] initWithString:
+        [NSString stringWithFormat:@"%@\n%@", o_warning, o_msg]
+        attributes: 
+        [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize:11] forKey: NSFontAttributeName]];
+    [ourWarning 
+        addAttribute: NSFontAttributeName
+        value: [NSFont boldSystemFontOfSize:11] 
+        range: NSMakeRange( 0, [o_warning length])];
+    [o_errors addObject: ourWarning];
+    [ourWarning release];
+
+    [o_icons addObject: warnIcon];
+    
+    [o_error_table reloadData];
+
+    [self showPanel];
+}
+
+-(IBAction)cleanupTable:(id)sender
+{
+    [o_errors removeAllObjects];
+    [o_icons removeAllObjects];
+    [o_error_table reloadData];
+}
+
+/*----------------------------------------------------------------------------
+ * data source methods
+ *---------------------------------------------------------------------------*/
+- (int)numberOfRowsInTableView:(NSTableView *)theDataTable
+{
+    return [o_errors count];
+}
+
+- (id)tableView:(NSTableView *)theDataTable objectValueForTableColumn:
+    (NSTableColumn *)theTableColumn row: (int)row
+{
+    if( [[theTableColumn identifier] isEqualToString: @"error_msg"] )
+        return [o_errors objectAtIndex: row];
+
+    if( [[theTableColumn identifier] isEqualToString: @"icon"] )
+        return [o_icons objectAtIndex: row];
+
+    return @"unknown identifier";
 }
 
 @end

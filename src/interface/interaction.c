@@ -236,44 +236,57 @@ void intf_InteractionManage( playlist_t *p_playlist )
         if( new->psz_title ) free( new->psz_title );                    \
         if( new->psz_description ) free( new->psz_description );
 
-/** Helper function to send an error message
+/** Helper function to send an error message, both in a blocking and non-blocking way
  *  \param p_this     Parent vlc_object
- *  \param i_id       A predefined ID, 0 if not applicable
+ *  \param b_blocking Is this dialog blocking or not?
  *  \param psz_title  Title for the dialog
  *  \param psz_format The message to display
  *  */
 void __intf_UserFatal( vlc_object_t *p_this,
+                       vlc_bool_t b_blocking,
                        const char *psz_title,
                        const char *psz_format, ... )
 {
     va_list args;
     interaction_dialog_t *p_new = NULL;
-    int i_id = DIALOG_ERRORS;
-
-    if( i_id > 0 )
-    {
-        p_new = intf_InteractionGetById( p_this, i_id );
-    }
-    if( !p_new )
-    {
-        INTERACT_INIT( p_new );
-        if( i_id > 0 ) p_new->i_id = i_id ;
-    }
-    else
-    {
-        p_new->i_status = UPDATED_DIALOG;
-    }
-
-    p_new->i_flags |= DIALOG_REUSABLE;
-
-    p_new->i_type = INTERACT_DIALOG_ONEWAY;
+    
+    INTERACT_INIT( p_new );
+    
     p_new->psz_title = strdup( psz_title );
 
     va_start( args, psz_format );
     vasprintf( &p_new->psz_description, psz_format, args );
     va_end( args );
 
-    p_new->i_flags |= DIALOG_CLEAR_NOSHOW;
+    if( b_blocking )
+        p_new->i_flags = DIALOG_BLOCKING_ERROR;
+    else
+        p_new->i_flags = DIALOG_NONBLOCKING_ERROR;
+
+    intf_Interact( p_this, p_new );
+}
+
+/** Helper function to send an warning, which is always shown non-blocking
+ *  \param p_this     Parent vlc_object
+ *  \param psz_title  Title for the dialog
+ *  \param psz_format The message to display
+ *  */
+void __intf_UserWarn( vlc_object_t *p_this,
+                       const char *psz_title,
+                       const char *psz_format, ... )
+{
+    va_list args;
+    interaction_dialog_t *p_new = NULL;
+    
+    INTERACT_INIT( p_new );
+    
+    p_new->psz_title = strdup( psz_title );
+
+    va_start( args, psz_format );
+    vasprintf( &p_new->psz_description, psz_format, args );
+    va_end( args );
+
+    p_new->i_flags = DIALOG_WARNING;
 
     intf_Interact( p_this, p_new );
 }

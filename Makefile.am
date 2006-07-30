@@ -82,6 +82,9 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/Interaction.nib/classes.nib \
 	extras/MacOSX/Resources/English.lproj/Interaction.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/Interaction.nib/keyedobjects.nib \
+	extras/MacOSX/Resources/English.lproj/InteractionErrorPanel.nib/classes.nib \
+	extras/MacOSX/Resources/English.lproj/InteractionErrorPanel.nib/info.nib \
+	extras/MacOSX/Resources/English.lproj/InteractionErrorPanel.nib/keyedobjects.nib \
 	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
 	extras/MacOSX/Resources/a52.icns \
 	extras/MacOSX/Resources/aac.icns \

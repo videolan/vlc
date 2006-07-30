@@ -76,16 +76,41 @@
 
 @end
 
+@interface VLCErrorInteractionPanel : NSObject
+{
+    IBOutlet id o_window;
+    IBOutlet id o_cleanup_button;
+    IBOutlet id o_error_table;
+
+    NSMutableArray * o_errors;
+    NSMutableArray * o_icons;
+
+    NSImage * warnIcon;
+    NSImage * errorIcon;
+
+    BOOL nib_interact_errpanel_loaded;
+}
+- (IBAction)cleanupTable:(id)sender;
+
+-(void)showPanel;
+-(void)addError: (NSString *)o_error withMsg:(NSString *)o_msg;
+-(void)addWarning: (NSString *)o_warning withMsg:(NSString *)o_msg;
+
+@end
+
 /*****************************************************************************
  * VLCInteractionList interface
  *****************************************************************************/
 @interface VLCInteractionList : NSObject
 {
     NSMutableArray *o_interaction_list;
+    VLCErrorInteractionPanel *o_error_panel;
 }
 
 -(void)newInteractionEvent: (NSNotification *)o_notification;
 -(void)addInteraction: (interaction_dialog_t *)p_dialog;
 -(void)removeInteraction: (VLCInteraction *)p_interaction;
+
+-(id)getErrorPanel;
 
 @end

@@ -1,0 +1,13 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {cleanupTable = id; }; 
+            CLASS = VLCErrorInteractionPanel; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"o_cleanup_button" = id; "o_error_table" = id; "o_window" = id; }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -109,7 +109,7 @@ void InteractionDialog::Render()
     wxGauge      *gauge;
 
 
-    if( p_dialog->i_id == DIALOG_ERRORS )
+    if( p_dialog->i_id == DIALOG_NONBLOCKING_ERRORS )
     {
         wxTextCtrl *errors ; // Special case
         label = new wxStaticText( widgets_panel, -1,
