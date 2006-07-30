@@ -2018,7 +2018,7 @@ static int InputSourceInit( input_thread_t *p_input,
         if( in->p_access == NULL )
         {
             msg_Err( p_input, "no suitable access module for `%s'", psz_mrl );
-            intf_UserFatal( VLC_OBJECT( p_input),
+            intf_UserFatal( VLC_OBJECT( p_input), VLC_FALSE,
                             _("Your input can't be opened"),
                             _("VLC is unable to open the MRL '%s'."
                             " Check the log for details."), psz_mrl );
@@ -2091,7 +2091,7 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                      psz_access, psz_demux, psz_path );
-            intf_UserFatal( VLC_OBJECT( p_input), 
+            intf_UserFatal( VLC_OBJECT( p_input), VLC_FALSE, 
                             _("Can't recognize the input's format"),
                             _("The format of '%s' can't be detected. "
                             "Have a look the log for details."), psz_mrl );
