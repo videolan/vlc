@@ -208,12 +208,21 @@ static void Thread( vlc_object_t *p_this )
     }
     vlc_object_attach( p_thread->p_opengl, p_this );
 
+    /* Initialize vout parameters */
+    vout_InitFormat( &p_thread->p_opengl->fmt_in,
+                     VLC_FOURCC('R','V','3','2'),
+                     p_thread->i_width, p_thread->i_height, 1 );
     p_thread->p_opengl->i_window_width = p_thread->i_width;
     p_thread->p_opengl->i_window_height = p_thread->i_height;
     p_thread->p_opengl->render.i_width = p_thread->i_width;
     p_thread->p_opengl->render.i_height = p_thread->i_width;
     p_thread->p_opengl->render.i_aspect = VOUT_ASPECT_FACTOR;
     p_thread->p_opengl->b_scale = VLC_TRUE;
+    p_thread->p_opengl->b_fullscreen = VLC_FALSE;
+    p_thread->p_opengl->i_alignment = 0;
+    p_thread->p_opengl->fmt_in.i_sar_num = 1;
+    p_thread->p_opengl->fmt_in.i_sar_den = 1;
+    p_thread->p_opengl->fmt_render = p_thread->p_opengl->fmt_in;
 
     p_thread->p_module =
         module_Need( p_thread->p_opengl, "opengl provider", NULL, 0 );
