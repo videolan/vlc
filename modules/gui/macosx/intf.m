@@ -47,6 +47,7 @@
 #include "embeddedwindow.h"
 #include "update.h"
 #include "AppleRemote.h"
+#import <vlc_interaction.h>
 
 /*****************************************************************************
  * Local prototypes.
@@ -1375,6 +1376,10 @@ static VLCMain *_o_sharedMainInstance = nil;
 
             var_Get( p_intf->p_vlc, "verbose", &quiet );
 
+            /* disable the display of msg_err for now 
+             * the interaction system will take care of the error messages now
+             */
+            #if 0
             if( i_type == 1 && quiet.i_int > -1 )
             {
                 NSString *o_my_msg = [NSString stringWithFormat: @"%s: %s\n",
@@ -1389,6 +1394,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                 [o_error makeKeyAndOrderFront: self];
                 [o_err_msg setEditable: NO];
             }
+            #endif
         }
 
         vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
