@@ -47,7 +47,6 @@
 #include "embeddedwindow.h"
 #include "update.h"
 #include "AppleRemote.h"
-#import <vlc_interaction.h>
 
 /*****************************************************************************
  * Local prototypes.

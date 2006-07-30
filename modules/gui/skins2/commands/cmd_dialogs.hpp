@@ -169,20 +169,13 @@ class CmdInteraction: public CmdGeneric
         /// This method does the real job of the command
         virtual void execute()
         {
-            if( m_pDialog->i_type == INTERACT_PROGRESS )
+            /// Get the dialogs provider
+            Dialogs *pDialogs = Dialogs::instance( getIntf() );
+            if( pDialogs == NULL )
             {
-                 /// \todo Handle progress in the interface
+                return;
             }
-            else
-            {
-                /// Get the dialogs provider
-                Dialogs *pDialogs = Dialogs::instance( getIntf() );
-                if( pDialogs == NULL )
-                {
-                    return;
-                }
-                pDialogs->showInteraction( m_pDialog );
-            }
+            pDialogs->showInteraction( m_pDialog );
         }
 
         virtual string getType() const { return "interaction"; }
