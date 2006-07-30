@@ -5000,6 +5000,10 @@ AS_IF([test "${enable_gnutls}" != "no"], [
   ])
 
   gnutls_LIBS="-lgcrypt -lz ${gcrypt_LIBS}"
+  AS_IF([test "${SYS}" = "darwin"], [
+    gnutls_LIBS="-lintl ${gnutls_LIBS}"
+    VLC_ADD_LDFLAGS([gnutls],[-lintl])
+  ])
 
   AC_CHECK_HEADER(gcrypt.h, [
     AC_CHECK_LIB(gcrypt, gcry_control, [
