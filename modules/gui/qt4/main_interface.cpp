@@ -78,28 +78,22 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
             settings.beginGroup( "MainWindow" );
             videoSize = settings.value( "videoSize", QSize( 200, 200 ) ).
                                                 toSize();
-        } 
+        }
         else
             videoSize = QSize( 1,1 );
         videoWidget->resize( videoSize );
         ui.vboxLayout->insertWidget( 0, videoWidget );
     }
-    fprintf( stderr, "Margin : %i\n",ui.vboxLayout->margin() );
     readSettings( "MainWindow" );
 
     addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
-    
     if( config_GetInt( p_intf, "qt-always-video" ) )
         mainSize = videoSize + addSize;
     else
         mainSize = QSize( PREF_W, PREF_H );
-        
     resize( mainSize );
     mainSize = size();
 
-    fprintf( stderr, "Size is %ix%i - Video %ix%i\n", mainSize.width(), mainSize.height(), videoSize.width(), videoSize.height() );
-
-    fprintf( stderr, "Additional size around video %ix%i", addSize.width(), addSize.height() );
     setMinimumSize( PREF_W, addSize.height() );
 
     /* Init input manager */
@@ -197,7 +191,6 @@ void MainInterface::setName( QString name )
 
 void MainInterface::setStatus( int status )
 {
-    fprintf( stderr, "Status is now %i\n", status );
     if( status == 2 ) // Playing
         ui.playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
     else

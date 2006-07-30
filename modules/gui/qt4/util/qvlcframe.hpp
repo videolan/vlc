@@ -77,7 +77,6 @@ protected:
     }
     void writeSettings( QString name )
     {
-        fprintf( stderr, "save\n" );
         QSettings settings( "VideoLAN", "VLC" );
         settings.beginGroup( name );
         settings.setValue ("size", size() );

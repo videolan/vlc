@@ -55,6 +55,7 @@ public:
 protected:
     QList<PLItem*> children;
     QList<QString> strings;
+    int type;
     int i_id;
     int i_input_id;
     friend class PLModel;
@@ -121,6 +122,8 @@ private:
 
     playlist_t *p_playlist;
     int i_depth;
+
+    static QIcon icons[ITEM_TYPE_NUMBER];
 
     /* Update processing */
     void ProcessInputItemUpdate( int i_input_id );

@@ -697,22 +697,18 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
 
     MenuItemData *itemData = new MenuItemData( i_object_id, i_val_type,
                                                val, psz_var );
-    connect( action, SIGNAL(triggered()), THEDP->menusMapper, SLOT(map()) ); 
+    connect( action, SIGNAL(triggered()), THEDP->menusMapper, SLOT(map()) );
     THEDP->menusMapper->setMapping( action, itemData );
-    
     menu->addAction( action );
 }
 
 void QVLCMenu::DoAction( intf_thread_t *p_intf, QObject *data )
 {
     MenuItemData *itemData = qobject_cast<MenuItemData *>(data);
-    
     vlc_object_t *p_object = (vlc_object_t *)vlc_object_get( p_intf,
                                            itemData->i_object_id );
     if( p_object == NULL ) return;
 
-    fprintf( stderr, "Setting %s on %i\n", itemData->psz_var, 
-                   p_object->i_object_id );
     var_Set( p_object, itemData->psz_var, itemData->val );
     vlc_object_release( p_object );
 }

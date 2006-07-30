@@ -21,10 +21,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "pixmaps/codec.xpm"
+#include <QIcon>
 #include "qt4.hpp"
 #include <QApplication>
 #include "playlist_model.hpp"
 #include <assert.h>
+
+#include "pixmaps/type_unknown.xpm"
+#include "pixmaps/type_afile.xpm"
+#include "pixmaps/type_vfile.xpm"
+#include "pixmaps/type_net.xpm"
+#include "pixmaps/type_card.xpm"
+#include "pixmaps/type_disc.xpm"
+#include "pixmaps/type_cdda.xpm"
+#include "pixmaps/type_directory.xpm"
+#include "pixmaps/type_playlist.xpm"
+#include "pixmaps/type_node.xpm"
+
+QIcon PLModel::icons[ITEM_TYPE_NUMBER];
 
 static int PlaylistChanged( vlc_object_t *, const char *,
                             vlc_value_t, vlc_value_t, void * );
@@ -98,6 +113,7 @@ void PLItem::update( playlist_item_t *p_item )
     {
         strings[1] = QString::fromUtf8( p_item->p_input->p_meta->psz_artist );
     }
+    type = p_item->p_input->i_type;
 }
 
 /*************************************************************************
@@ -116,9 +132,22 @@ PLModel::PLModel( playlist_t *_p_playlist,
     i_cached_id       = -1;
     i_cached_input_id = -1;
 
+#define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( QPixmap( type_##x##_xpm ) );
+    ADD_ICON( UNKNOWN , unknown );
+    ADD_ICON( AFILE,afile );
+    ADD_ICON( VFILE, vfile );
+    ADD_ICON( DIRECTORY, directory );
+    ADD_ICON( DISC, disc );
+    ADD_ICON( CDDA, cdda );
+    ADD_ICON( CARD, card );
+    ADD_ICON( NET, net );
+    ADD_ICON( PLAYLIST, playlist );
+    ADD_ICON( NODE, node );
+
     rootItem = NULL;
     rebuildRoot( p_root );
     addCallbacks();
+
 }
 
 void PLModel::rebuildRoot( playlist_item_t *p_root )
@@ -179,9 +208,18 @@ void PLModel::activateItem( const QModelIndex &index )
 /****************** Base model mandatory implementations *****************/
 QVariant PLModel::data(const QModelIndex &index, int role) const
 {
-    if ( !index.isValid() || role != Qt::DisplayRole ) return QVariant();
+    assert( index.isValid() );
     PLItem *item = static_cast<PLItem*>(index.internalPointer());
-    return QVariant( item->columnString( index.column() ) );
+    if( role == Qt::DisplayRole )
+    {
+        return QVariant( item->columnString( index.column() ) );
+    }
+    else if( role == Qt::DecorationRole && index.column() == 0  )
+    {
+        if( item->type >= 0 )
+            return QVariant( PLModel::icons[item->type] );
+    }
+    return QVariant();
 }
 
 int PLModel::itemId( const QModelIndex &index ) const
@@ -384,19 +422,12 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
 
     p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
-
-    fprintf( stderr, "Appending item %s - parent %i (root %i)\n",
-                    p_item->p_input->psz_name, p_item->p_parent->i_id,
-                    rootItem->i_id );
     if( i_depth == 1 && p_item->p_parent &&
                         p_item->p_parent->i_id != rootItem->i_id )
         goto end;
 
-    fprintf( stderr, "Still continuing\n" );
-
     newItem = new PLItem( p_item, nodeItem, this );
     nodeItem->appendChild( newItem );
-    fprintf( stderr, "duh\n" );
     UpdateTreeItem( p_item, newItem, true );
 end:
     return;
@@ -452,11 +483,11 @@ void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item,
                               bool signal, bool force )
 {
     if( !force && i_depth == 1 && p_item->p_parent &&
-                                 p_item->p_parent->i_id == rootItem->i_id )
+                                 p_item->p_parent->i_id != rootItem->i_id )
         return;
     item->update( p_item );
     if( signal )
-    {    // emit
+    {    /// \todo emit
     }
 }
 
@@ -514,6 +545,5 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     }
     PLEvent *event = new PLEvent(  p_add );
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
-    fprintf( stderr, "Posted event to model\n" );
     return VLC_SUCCESS;
 }

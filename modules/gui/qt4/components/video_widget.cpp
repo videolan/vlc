@@ -106,28 +106,10 @@ void *VideoWidget::Request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
     }
     p_vout = p_nvout;
 
-    fprintf( stderr, "[Before update] MI constraints %ix%i -> %ix%i\n",
-                    p_intf->p_sys->p_mi->minimumSize().width(),
-                    p_intf->p_sys->p_mi->minimumSize().height(),
-                    p_intf->p_sys->p_mi->maximumSize().width(),
-                    p_intf->p_sys->p_mi->maximumSize().height() );
-
     setMinimumSize( 1,1 );
     p_intf->p_sys->p_mi->videoSize = QSize( *pi_width, *pi_height );
     updateGeometry();
     need_update = true;
-    fprintf( stderr, "[After update] MI constraints %ix%i -> %ix%i - Fr %ix%i -> %ix%i (hint %ix%i)\n",
-                    p_intf->p_sys->p_mi->minimumSize().width(),
-                    p_intf->p_sys->p_mi->minimumSize().height(),
-                    p_intf->p_sys->p_mi->maximumSize().width(),
-                    p_intf->p_sys->p_mi->maximumSize().height(),
-                    minimumSize().width(),
-                    minimumSize().height(),
-                    maximumSize().width(),
-                    maximumSize().height(),
-                    sizeHint().width(),sizeHint().height() 
-           );
-    
     return  (void*)winId();
 }
 
@@ -142,23 +124,11 @@ void VideoWidget::Release( void *p_win )
     {
         p_intf->p_sys->p_mi->videoSize = QSize ( 1,1 );
     }
-    fprintf( stderr, "[Before R update] MI constraints %ix%i -> %ix%i\n",
-                    p_intf->p_sys->p_mi->minimumSize().width(),
-                    p_intf->p_sys->p_mi->minimumSize().height(),
-                    p_intf->p_sys->p_mi->maximumSize().width(),
-                    p_intf->p_sys->p_mi->maximumSize().height() );
 
     updateGeometry();
 
     if( !config_GetInt( p_intf, "qt-always-video" ) )
         need_update = true;
-
-    fprintf( stderr, "[After R update] MI constraints %ix%i -> %ix%i\n",
-                    p_intf->p_sys->p_mi->minimumSize().width(),
-                    p_intf->p_sys->p_mi->minimumSize().height(),
-                    p_intf->p_sys->p_mi->maximumSize().width(),
-                    p_intf->p_sys->p_mi->maximumSize().height() );
-    
     p_vout = NULL;
 }
 

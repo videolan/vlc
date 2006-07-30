@@ -65,7 +65,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         if( !p_item->i_list )
             p_control = new StringConfigControl( p_this, p_item, parent,false );
         else
-            fprintf(stderr, "GRAA\n" );
+            fprintf(stderr, "TODO\n" );
         break;
     default:
         break;
