@@ -18,7 +18,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ ******************************************************************************/
 
 #include "dialogs/playlist.hpp"
 #include "util/qvlcframe.hpp"
@@ -32,17 +33,17 @@ PlaylistDialog *PlaylistDialog::instance = NULL;
 PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Playlist" ) );
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                     VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    selector = new PLSelector( this, p_intf, THEPL );
+    selector->setMaximumWidth( 150 );
+
+    rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( this, p_intf,
+                                   THEPL, THEPL->p_local_category ) );
+    connect( selector, SIGNAL( activated( int ) ), rightPanel, SLOT( setRoot( int ) ) );
 
     QHBoxLayout *layout = new QHBoxLayout();
-    selector = new PLSelector( this, p_intf );
-    layout->addWidget( selector, 1 );
-    
-    rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( this, p_intf,
-                                   p_playlist, p_playlist->p_root_category ) );
-    layout->addWidget( rightPanel, 3 );
-    readSettings( "playlist", QSize( 500,500 ) );
+    layout->addWidget( selector, 0 );
+    layout->addWidget( rightPanel, 10 );
+    readSettings( "playlist", QSize( 600,300 ) );
     setLayout( layout );
 }
 

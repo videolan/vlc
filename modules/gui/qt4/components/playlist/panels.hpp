@@ -28,6 +28,13 @@
 #include <QWidget>
 #include <QString>
 
+class QTreeView;
+class PLModel;
+
+/**
+ * \todo Share a single model between views using a filterproxy
+ */
+
 class PLPanel: public QWidget
 {
     Q_OBJECT;
@@ -37,8 +44,10 @@ public:
         p_intf = _p_intf;
     }
     virtual ~PLPanel() {};
-private:
+protected:
     intf_thread_t *p_intf;
+public slots:
+    virtual void setRoot( int ) = 0;
 };
 
 
@@ -46,8 +55,14 @@ class StandardPLPanel: public PLPanel
 {
     Q_OBJECT;
 public:
-    StandardPLPanel( QWidget *, intf_thread_t *, playlist_t *,playlist_item_t * );
+    StandardPLPanel( QWidget *, intf_thread_t *,
+                     playlist_t *,playlist_item_t * );
     virtual ~StandardPLPanel();
+private:
+    PLModel *model;
+    QTreeView *view;
+public slots:
+    virtual void setRoot( int );
 };
 
 #endif

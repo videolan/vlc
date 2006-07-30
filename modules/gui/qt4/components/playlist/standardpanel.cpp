@@ -24,15 +24,36 @@
 #include "playlist_model.hpp"
 #include "components/playlist/panels.hpp"
 #include <QTreeView>
+#include <QVBoxLayout>
+#include <QHeaderView>
+#include "qt4.hpp"
+#include <assert.h>
 
 StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
                                   playlist_item_t *p_root ):
                                   PLPanel( _parent, _p_intf )
 {
-    PLModel *model = new PLModel( p_playlist, p_root, -1, this );
-    QTreeView *view = new QTreeView( this );
+    model = new PLModel( p_playlist, p_root, -1, this );
+    model->Rebuild();
+    view = new QTreeView( 0 );
     view->setModel(model);
+    view->header()->resizeSection( 0, 300 );
+
+    connect( view, SIGNAL( activated( const QModelIndex& ) ), model,
+             SLOT( activateItem( const QModelIndex& ) ) );
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    layout->setSpacing( 0 ); layout->setMargin( 0 );
+    layout->addWidget( view );
+    setLayout( layout );
+}
+
+void StandardPLPanel::setRoot( int i_root_id )
+{
+    playlist_item_t *p_item = playlist_ItemGetById( THEPL, i_root_id );
+    assert( p_item );
+    model->rebuildRoot( p_item );
     model->Rebuild();
 }
 

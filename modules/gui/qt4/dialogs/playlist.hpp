@@ -23,6 +23,7 @@
 #ifndef _PLAYLIST_DIALOG_H_
 #define _PLAYLIST_DIALOG_H_
 
+#include <QModelIndex>
 #include "util/qvlcframe.hpp"
 
 class PLSelector;
@@ -44,7 +45,6 @@ private:
 
     PLSelector *selector;
     PLPanel *rightPanel;
-public slots:
 };
 
 

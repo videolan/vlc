@@ -71,7 +71,7 @@ static int Open( vlc_object_t *p_this )
                             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( !p_intf->p_sys->p_playlist )
         return VLC_EGENERIC;
-                            
+
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
 
     return VLC_SUCCESS;

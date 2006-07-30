@@ -42,7 +42,7 @@ public:
     int row() const;
     void insertChild( PLItem *, int p, bool signal = true );
 
-    void appendChild( PLItem *item, bool signal = true ) 
+    void appendChild( PLItem *item, bool signal = true )
     {
         insertChild( item, children.count(), signal );
     };
@@ -54,14 +54,13 @@ public:
     void update( playlist_item_t *);
 protected:
     QList<PLItem*> children;
+    QList<QString> strings;
     int i_id;
     int i_input_id;
     friend class PLModel;
 private:
     void init( int, int, PLItem *, PLModel * );
-    QList<QString> strings;
     PLItem *parentItem;
-
     PLModel *model;
 };
 
@@ -77,11 +76,10 @@ public:
     PLEvent(  playlist_add_t  *a ) : QEvent( (QEvent::Type)(ItemAppend_Type) )
     { p_add = a; };
     virtual ~PLEvent() {};
-                          
+
     int i_id;
     playlist_add_t *p_add;
-};   
-                    
+};
 
 #include <QAbstractItemModel>
 #include <QModelIndex>
@@ -102,10 +100,11 @@ public:
     Qt::ItemFlags flags( const QModelIndex &index) const;
     QVariant headerData( int section, Qt::Orientation orientation,
                          int role = Qt::DisplayRole) const;
-    
+
     QModelIndex index( int r, int c, const QModelIndex &parent ) const;
     QModelIndex index( PLItem *, int c ) const;
-                    
+    int itemId( const QModelIndex &index ) const;
+
     QModelIndex parent( const QModelIndex &index) const;
     int childrenCount( const QModelIndex &parent = QModelIndex() ) const;
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
@@ -114,23 +113,25 @@ public:
     bool b_need_update;
     int i_items_to_append;
     void Rebuild();
+    void rebuildRoot( playlist_item_t * );
 private:
     void addCallbacks();
     void delCallbacks();
     PLItem *rootItem;
 
     playlist_t *p_playlist;
+    int i_depth;
 
     /* Update processing */
     void ProcessInputItemUpdate( int i_input_id );
     void ProcessItemRemoval( int i_id );
     void ProcessItemAppend( playlist_add_t *p_add );
-    
-    void UpdateTreeItem( PLItem *, bool );
-    void UpdateTreeItem( playlist_item_t *, PLItem *, bool );
+
+    void UpdateTreeItem( PLItem *, bool, bool force = false );
+    void UpdateTreeItem( playlist_item_t *, PLItem *, bool, bool forc = false );
     void UpdateNodeChildren( PLItem * );
     void UpdateNodeChildren( playlist_item_t *, PLItem * );
-        
+
     /* Lookups */
     PLItem *FindById( PLItem *, int );
     PLItem *FindByInput( PLItem *, int );
@@ -139,7 +140,8 @@ private:
     PLItem *p_cached_item_bi;
     int i_cached_id;
     int i_cached_input_id;
-
+public slots:
+    void activateItem( const QModelIndex &index );
 friend class PLItem;
 };
 
