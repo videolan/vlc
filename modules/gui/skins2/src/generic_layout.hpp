@@ -100,8 +100,10 @@ class GenericLayout: public SkinObject, public Box
         /// Resize the layout
         virtual void resize( int width, int height );
 
-        /// Add a control in the layout at the given position, and
-        /// the optional given layer
+        /**
+         * Add a control in the layout at the given position, and
+         * the optional given layer
+         */
         virtual void addControl( CtrlGeneric *pControl,
                                  const Position &rPosition,
                                  int layer );
@@ -110,9 +112,11 @@ class GenericLayout: public SkinObject, public Box
         virtual const list<LayeredControl> &getControlList() const;
 
         /// Called by a control when its image has changed
-        /// The arguments indicate the size of the rectangle to refresh,
-        /// and the offset (from the control position) of this rectangle.
-        /// Use a negative width or height to refresh the layout completely
+        /**
+         * The arguments indicate the size of the rectangle to refresh,
+         * and the offset (from the control position) of this rectangle.
+         * Use a negative width or height to refresh the layout completely
+         */
         virtual void onControlUpdate( const CtrlGeneric &rCtrl,
                                       int width, int height,
                                       int xOffSet, int yOffSet );
