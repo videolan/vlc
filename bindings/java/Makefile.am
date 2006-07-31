@@ -11,7 +11,7 @@ PROCESSOR_FAMILY = `uname -m | sed -e 's/^i.86/i386/' | sed -e 's/^x86_64/amd64/
 if HAVE_WIN32
 JINCLUDES = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/win32
 LIBJINCLUDES = -L${JAVA_HOME}/lib -ljawt
-JAVAC = javac
+#JAVAC = javac
 JCH = javah
 #CXX = g++ -Wall -mno-cygwin -g
 #LDFLAGS = -mno-cygwin `vlc-config --libs external pic` -Wl,--kill-at
@@ -20,7 +20,7 @@ JAVALDFLAGS = -mno-cygwin -L../../src -lvlc `top_builddir=../.. ../../vlc-config
 else
 JINCLUDES = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 LIBJINCLUDES = -L$(JAVA_HOME)/jre/lib/$(PROCESSOR_FAMILY) -ljawt
-JAVAC = gcj -Wall -g -C 
+#JAVAC = gcj -Wall -g -C 
 JCH = gcjh -jni
 SWT_PATH = /usr/share/java
 # Compile flags

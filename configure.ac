@@ -5256,9 +5256,10 @@ dnl  Java bindings
 dnl
 AC_ARG_ENABLE(java-bindings,
   [  --enable-java-bindings  Enable Java bindings (default disabled)])
-if test "${enable-java-bindings}" = "yes"
+if test "${enable_java_bindings}" = "yes"
 then
-  AC_PROG_JAVA_CC(javac)
+  AS_IF([test "x${JAVA_HOME}" == "x"],
+	[AC_MSG_ERROR([Please set the JAVA_HOME variable to your JDK environment])])
   AC_PROG_JAVAC
   AC_PROG_JAVA
 fi
