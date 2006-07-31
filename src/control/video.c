@@ -2,9 +2,11 @@
  * video.c: libvlc new API video functions
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
+ *
  * $Id: core.c 14187 2006-02-07 16:37:40Z courmisch $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Filippo Carone <littlejohn@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +29,10 @@
 #include <vlc/vout.h>
 #include <vlc/intf.h>
 
+/*
+ * Remember to release the returned vout_thread_t since it is locked at
+ * the end of this function.
+ */
 static vout_thread_t *GetVout( libvlc_input_t *p_input,
                                libvlc_exception_t *p_exception )
 {
@@ -215,9 +221,19 @@ int libvlc_video_reparent( libvlc_input_t *p_input, libvlc_drawable_t d,
 {
     vout_thread_t *p_vout = GetVout( p_input, p_e );
     vout_Control( p_vout , VOUT_REPARENT, d);
+    vlc_object_release( p_vout );
+    
     return 0;
     
 }
+
+void libvlc_video_resize( libvlc_input_t *p_input, int width, int height, libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_input, p_e );
+    vout_Control( p_vout, VOUT_SET_SIZE, width, height );
+    vlc_object_release( p_vout );
+}
+
 
 int libvlc_video_destroy( libvlc_input_t *p_input,
                           libvlc_exception_t *p_e )

@@ -40,7 +40,7 @@
 
 #define DELAY_TEXT N_("Delay")
 #define DELAY_LONGTEXT N_("Pictures coming from the picture video outputs " \
-        "will be delayed accord to thi value (in milliseconds, should be "\
+        "will be delayed according to this value (in milliseconds, should be "\
         ">= 100 ms). For high values, you will need to raise caching values." )
 
 #define ID_OFFSET_TEXT N_("ID Offset")

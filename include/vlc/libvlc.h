@@ -335,6 +335,17 @@ void libvlc_video_take_snapshot( libvlc_input_t *, char *, libvlc_exception_t * 
     
 int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *);
 
+    
+/**
+ * Resize the video output window
+ * \param p_instance libvlc instance
+ * \param width new width for video output window
+ * \param height new height for video output window
+ * \param p_exception an initialized exception
+ * \return the mute status (boolean)
+ */
+void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exception_t *);
+    
 /**
 * Downcast to this general type as placeholder for a platform specific one, such as:
 *  Drawable on X11,
@@ -343,7 +354,15 @@ int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *);
 */
 typedef int libvlc_drawable_t;
 
+/**
+ * Get current mute status
+ * \param p_instance libvlc instance
+ * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
+ * \param p_exception an initialized exception
+ * \return the mute status (boolean)
+ */
 int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, libvlc_exception_t * );
+
 
 /** @} */
 
