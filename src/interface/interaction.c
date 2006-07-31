@@ -75,20 +75,25 @@ int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 
     if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT ) return VLC_EGENERIC;
 
-    if( !config_GetInt(p_this, "interact") ) return VLC_EGENERIC;
-
-    p_dialog->p_interaction = p_interaction;
-    p_dialog->p_parent = p_this;
-
-    if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY )
+    if( config_GetInt(p_this, "interact") || 
+        p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
+        p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
-        return intf_WaitAnswer( p_interaction, p_dialog );
+        p_dialog->p_interaction = p_interaction;
+        p_dialog->p_parent = p_this;
+
+        if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY )
+        {
+            return intf_WaitAnswer( p_interaction, p_dialog );
+        }
+        else
+        {
+            p_dialog->i_flags |=  DIALOG_GOT_ANSWER;
+            return intf_Send( p_interaction, p_dialog );
+        }
     }
     else
-    {
-        p_dialog->i_flags |=  DIALOG_GOT_ANSWER;
-        return intf_Send( p_interaction, p_dialog );
-    }
+        return VLC_EGENERIC;
 }
 
 /**
@@ -253,6 +258,7 @@ void __intf_UserFatal( vlc_object_t *p_this,
     INTERACT_INIT( p_new );
     
     p_new->psz_title = strdup( psz_title );
+    p_new->i_type = INTERACT_DIALOG_ONEWAY;
 
     va_start( args, psz_format );
     vasprintf( &p_new->psz_description, psz_format, args );
@@ -281,6 +287,7 @@ void __intf_UserWarn( vlc_object_t *p_this,
     INTERACT_INIT( p_new );
     
     p_new->psz_title = strdup( psz_title );
+    p_new->i_type = INTERACT_DIALOG_ONEWAY;
 
     va_start( args, psz_format );
     vasprintf( &p_new->psz_description, psz_format, args );

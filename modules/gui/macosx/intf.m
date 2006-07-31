@@ -1309,7 +1309,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)updateMessageArray
 {
     int i_start, i_stop;
-    vlc_value_t quiet;
 
     vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
     i_stop = *p_intf->p_sys->p_sub->pi_stop;
@@ -1363,8 +1362,6 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_msg_arr addObject: [o_msg_color autorelease]];
 
             [o_msg_lock unlock];
-
-            var_Get( p_intf->p_vlc, "verbose", &quiet );
         }
 
         vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );

@@ -92,6 +92,7 @@
     BOOL nib_interact_errpanel_loaded;
 }
 - (IBAction)cleanupTable:(id)sender;
+- (IBAction)showMessages:(id)sender;
 
 -(void)showPanel;
 -(void)addError: (NSString *)o_error withMsg:(NSString *)o_msg;
