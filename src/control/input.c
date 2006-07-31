@@ -100,6 +100,45 @@ vlc_int64_t libvlc_input_get_time( libvlc_input_t *p_input,
     return val.i_time / 1000;
 }
 
+void libvlc_input_set_time( libvlc_input_t *p_input, vlc_int64_t time, libvlc_exception_t *p_exception )
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t value;
+
+    p_input_thread = libvlc_get_input_thread ( p_input, p_exception);
+
+    if ( libvlc_exception_raised( p_exception ) )
+        return;
+    
+    value.i_time = time;
+    var_Set( p_input_thread, "time", value );
+    vlc_object_release( p_input_thread );
+
+    return;
+    
+}
+
+void libvlc_input_set_position( libvlc_input_t *p_input, float position, libvlc_exception_t *p_exception ) 
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+
+    val.f_float = position;
+    
+    p_input_thread = libvlc_get_input_thread ( p_input, p_exception);
+
+    if ( libvlc_exception_raised( p_exception ) )
+        return;
+
+    var_Set( p_input_thread, "position", val );
+    vlc_object_release( p_input_thread );
+
+    return;
+
+}
+
+
+
 float libvlc_input_get_position( libvlc_input_t *p_input,
                                  libvlc_exception_t *p_exception )
 {
