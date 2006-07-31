@@ -509,6 +509,7 @@ struct module_symbols_t
     void (*playlist_AddWhereverNeeded_inner) (playlist_t* , input_item_t*, playlist_item_t*,playlist_item_t*,vlc_bool_t, int);
     int (*playlist_DeleteFromItemId_inner) (playlist_t *, int);
     void (*playlist_NodeDump_inner) (playlist_t *p_playlist, playlist_item_t *p_item, int i_level);
+    int (*__intf_UserOkayCancel_inner) (vlc_object_t*, const char*, const char*);
     int (*__intf_UserStringInput_inner) (vlc_object_t*, const char*, const char*, char **);
     void (*playlist_NodesCreateForSD_inner) (playlist_t *, char *, playlist_item_t **, playlist_item_t **);
     vlc_bool_t (*input_AddSubtitles_inner) (input_thread_t *, char *, vlc_bool_t);
@@ -980,6 +981,7 @@ struct module_symbols_t
 #  define playlist_AddWhereverNeeded (p_symbols)->playlist_AddWhereverNeeded_inner
 #  define playlist_DeleteFromItemId (p_symbols)->playlist_DeleteFromItemId_inner
 #  define playlist_NodeDump (p_symbols)->playlist_NodeDump_inner
+#  define __intf_UserOkayCancel (p_symbols)->__intf_UserOkayCancel_inner
 #  define __intf_UserStringInput (p_symbols)->__intf_UserStringInput_inner
 #  define playlist_NodesCreateForSD (p_symbols)->playlist_NodesCreateForSD_inner
 #  define input_AddSubtitles (p_symbols)->input_AddSubtitles_inner
@@ -1451,6 +1453,7 @@ struct module_symbols_t
     ((p_symbols)->playlist_AddWhereverNeeded_inner) = playlist_AddWhereverNeeded; \
     ((p_symbols)->playlist_DeleteFromItemId_inner) = playlist_DeleteFromItemId; \
     ((p_symbols)->playlist_NodeDump_inner) = playlist_NodeDump; \
+    ((p_symbols)->__intf_UserOkayCancel_inner) = __intf_UserOkayCancel; \
     ((p_symbols)->__intf_UserStringInput_inner) = __intf_UserStringInput; \
     ((p_symbols)->playlist_NodesCreateForSD_inner) = playlist_NodesCreateForSD; \
     ((p_symbols)->input_AddSubtitles_inner) = input_AddSubtitles; \
