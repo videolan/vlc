@@ -2,10 +2,15 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {cleanupTable = id; }; 
+            ACTIONS = {cleanupTable = id; showMessages = id; }; 
             CLASS = VLCErrorInteractionPanel; 
             LANGUAGE = ObjC; 
-            OUTLETS = {"o_cleanup_button" = id; "o_error_table" = id; "o_window" = id; }; 
+            OUTLETS = {
+                "o_cleanup_button" = id; 
+                "o_error_table" = id; 
+                "o_messages_btn" = id; 
+                "o_window" = id; 
+            }; 
             SUPERCLASS = NSObject; 
         }
     ); 

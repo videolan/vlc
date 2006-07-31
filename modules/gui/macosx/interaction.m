@@ -381,9 +381,16 @@
 -(id)init
 {
     [super init];
+
+    /* load the nib */
     nib_interact_errpanel_loaded = [NSBundle loadNibNamed:@"InteractionErrorPanel" owner:self];
+
+    /* init strings */
     [o_window setTitle: _NS("Errors and Warnings")];
     [o_cleanup_button setTitle: _NS("Clean up")];
+    [o_messages_btn setTitle: _NS("Show Details")];
+
+    /* init data sources */
     o_errors = [[NSMutableArray alloc] init];
     o_icons = [[NSMutableArray alloc] init];
 
@@ -488,6 +495,11 @@
     [o_errors removeAllObjects];
     [o_icons removeAllObjects];
     [o_error_table reloadData];
+}
+
+-(IBAction)showMessages:(id)sender
+{
+    [[VLCMain sharedInstance] showMessagesPanel: sender];
 }
 
 /*----------------------------------------------------------------------------

@@ -145,14 +145,6 @@ struct intf_sys_t
     NSLock * o_msg_lock;        /* messages lock  */
     IBOutlet id o_msgs_btn_crashlog;    /* messages open crashlog */
 
-    IBOutlet id o_error;        /* error panel    */
-    IBOutlet id o_err_msg;      /* NSTextView     */
-    IBOutlet id o_err_lbl;
-    IBOutlet id o_err_bug_lbl;
-    IBOutlet id o_err_btn_msgs; /* Open Messages  */
-    IBOutlet id o_err_btn_dismiss;
-    IBOutlet id o_err_ckbk_surpress;
-
     IBOutlet id o_info_window;  /* Info panel     */
 
     /* main menu */
@@ -263,6 +255,7 @@ struct intf_sys_t
     IBOutlet id o_mi_license;
     IBOutlet id o_mi_donation;
     IBOutlet id o_mi_forum;
+    IBOutlet id o_mi_errorsAndWarnings;
 
     /* dock menu */
     IBOutlet id o_dmi_play;
@@ -345,7 +338,6 @@ struct intf_sys_t
 - (IBAction)viewAbout:(id)sender;
 - (IBAction)viewPreferences:(id)sender;
 - (IBAction)checkForUpdate:(id)sender;
-- (IBAction)closeError:(id)sender;
 - (IBAction)openReadMe:(id)sender;
 - (IBAction)openDocumentation:(id)sender;
 - (IBAction)reportABug:(id)sender;
@@ -354,6 +346,8 @@ struct intf_sys_t
 - (IBAction)openForum:(id)sender;
 - (IBAction)openDonate:(id)sender;
 - (IBAction)openCrashLog:(id)sender;
+- (IBAction)viewErrorsAndWarnings:(id)sender;
+- (IBAction)showMessagesPanel:(id)sender;
 
 - (IBAction)togglePlaylist:(id)sender;
 - (void)updateTogglePlaylistState;

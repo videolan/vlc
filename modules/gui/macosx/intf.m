@@ -598,6 +598,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_playlist setTitle: _NS("Playlist")];
     [o_mi_info setTitle: _NS("Information")];
     [o_mi_messages setTitle: _NS("Messages")];
+    [o_mi_errorsAndWarnings setTitle: _NS("Errors and Warnings")];
 
     [o_mi_bring_atf setTitle: _NS("Bring All to Front")];
 
@@ -627,16 +628,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_vmi_mute setTitle: _NS("Mute")];
     [o_vmi_fullscreen setTitle: _NS("Fullscreen")];
     [o_vmi_snapshot setTitle: _NS("Snapshot")];
-
-    /* error panel */
-    [o_error setTitle: _NS("Error")];
-    [o_err_lbl setStringValue: _NS("An error has occurred which probably " \
-        "prevented the proper execution of the program:")];
-    [o_err_bug_lbl setStringValue: _NS("If you believe that it is a bug, " \
-        "please follow the instructions at:")];
-    [o_err_btn_msgs setTitle: _NS("Open Messages Window")];
-    [o_err_btn_dismiss setTitle: _NS("Dismiss")];
-    [o_err_ckbk_surpress setTitle: _NS("Do not display further errors")];
 
     [o_info_window setTitle: _NS("Information")];
 }
@@ -1374,26 +1365,6 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_msg_lock unlock];
 
             var_Get( p_intf->p_vlc, "verbose", &quiet );
-
-            /* disable the display of msg_err for now 
-             * the interaction system will take care of the error messages now
-             */
-            #if 0
-            if( i_type == 1 && quiet.i_int > -1 )
-            {
-                NSString *o_my_msg = [NSString stringWithFormat: @"%s: %s\n",
-                    p_intf->p_sys->p_sub->p_msg[i_start].psz_module,
-                    p_intf->p_sys->p_sub->p_msg[i_start].psz_msg];
-
-                NSRange s_r = NSMakeRange( [[o_err_msg string] length], 0 );
-                [o_err_msg setEditable: YES];
-                [o_err_msg setSelectedRange: s_r];
-                [o_err_msg insertText: o_my_msg];
-
-                [o_error makeKeyAndOrderFront: self];
-                [o_err_msg setEditable: NO];
-            }
-            #endif
         }
 
         vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
@@ -1758,19 +1729,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 }
 
-- (IBAction)closeError:(id)sender
-{
-    vlc_value_t val;
-
-    if( [o_err_ckbk_surpress state] == NSOnState )
-    {
-        val.i_int = -1;
-        var_Set( p_intf->p_vlc, "verbose", val );
-    }
-    [o_err_msg setString: @""];
-    [o_error performClose: self];
-}
-
 - (IBAction)openReadMe:(id)sender
 {
     NSString * o_path = [[NSBundle mainBundle]
@@ -1842,6 +1800,16 @@ static VLCMain *_o_sharedMainInstance = nil;
         NSBeginInformationalAlertSheet(_NS("No CrashLog found"), @"Continue", nil, nil, o_msgs_panel, self, NULL, NULL, nil, _NS("Couldn't find any trace of a previous crash.") );
 
     }
+}
+
+- (IBAction)viewErrorsAndWarnings:(id)sender
+{
+    [[[self getInteractionList] getErrorPanel] showPanel];
+}
+
+- (IBAction)showMessagesPanel:(id)sender
+{
+    [o_msgs_panel makeKeyAndOrderFront: sender];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)o_notification
