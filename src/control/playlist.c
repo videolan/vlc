@@ -26,6 +26,8 @@
 
 #include <vlc/intf.h>
 
+#include <assert.h>
+
 void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
                            int i_options, char **ppsz_options,
                            libvlc_exception_t *p_e )
