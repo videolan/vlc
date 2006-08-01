@@ -1,0 +1,24 @@
+diff -ruN twolame/configure twolame-2/configure
+--- twolame/configure	2006-07-03 18:50:30.000000000 +0000
++++ twolame/configure	2006-08-01 11:47:41.000000000 +0000
+@@ -21068,7 +21068,7 @@
+ 
+ 
+ 
+-CFLAGS="$CFLAGS -std=c99 -Wunused -Wall"
++CFLAGS="$CFLAGS -Wunused -Wall"
+ LDFLAGS="$LDFLAGS"
+ 
+ # If debugging is enabled then make warnings errors
+diff -ruN twolame/configure.ac twolame-2/configure.ac
+--- twolame/configure.ac	2006-07-03 18:50:04.000000000 +0000
++++ twolame/configure.ac	2006-08-01 11:47:32.000000000 +0000
+@@ -113,7 +113,7 @@
+ 
+ dnl ############## Compiler and Linker Flags
+ 
+-CFLAGS="$CFLAGS -std=c99 -Wunused -Wall"
++CFLAGS="$CFLAGS -Wunused -Wall"
+ LDFLAGS="$LDFLAGS"
+ 
+ # If debugging is enabled then make warnings errors

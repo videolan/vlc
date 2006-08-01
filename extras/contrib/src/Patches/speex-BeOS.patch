@@ -1,0 +1,19 @@
+diff -ruN speex/libspeex/testecho.c speex-2/libspeex/testecho.c
+--- speex/libspeex/testecho.c	2006-02-11 22:39:51.000000000 +0000
++++ speex-2/libspeex/testecho.c	2006-08-01 12:00:22.000000000 +0000
+@@ -22,6 +22,7 @@
+    short echo_buf[NN], ref_buf[NN], e_buf[NN];
+    SpeexEchoState *st;
+    SpeexPreprocessState *den;
++   int tmp = 8000;
+ 
+    if (argc != 4)
+    {
+@@ -34,7 +35,6 @@
+ 
+    st = speex_echo_state_init(NN, TAIL);
+    den = speex_preprocess_state_init(NN, 8000);
+-   int tmp = 8000;
+    speex_echo_ctl(st, SPEEX_ECHO_SET_SAMPLING_RATE, &tmp);
+ 
+    while (read(ref_fd, ref_buf, NN*2))

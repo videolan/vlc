@@ -698,7 +698,12 @@ libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	(cd $@; autoconf)
 
 .theora: libtheora .ogg
+ifdef HAVE_BEOS
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest --disable-asm && make && make install)
+else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest && make && make install)
+
+endif
 	$(INSTALL_NAME)
 	touch $@
 
@@ -772,6 +777,9 @@ speex-$(SPEEX_VERSION).tar.gz:
 speex: speex-$(SPEEX_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/speex.patch
+ifdef HAVE_BEOS
+	patch -p0 < Patches/speex-BeOS.patch
+endif
 
 .speex: speex
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-ogg=no && make && make install)
@@ -1428,6 +1436,9 @@ twolame-$(TWOLAME_VERSION).tar.gz:
 
 twolame: twolame-$(TWOLAME_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_BEOS
+	patch -p 0 < Patches/twolame-BeOS.patch
+endif
 
 .twolame: twolame
 	(cd twolame; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
