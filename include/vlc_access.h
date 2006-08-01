@@ -130,7 +130,7 @@ static inline int access2_Control( access_t *p_access, int i_query, ... )
     return i_result;
 }
 
-static void inline access_InitFields( access_t *p_a )
+static inline void access_InitFields( access_t *p_a )
 {
     p_a->info.i_update = 0;
     p_a->info.i_size = 0;
