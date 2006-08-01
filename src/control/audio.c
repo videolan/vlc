@@ -31,59 +31,49 @@
  * libvlc_audio_get_mute : Get the volume state, true if muted
  *****************************************************************************/
 void libvlc_audio_toggle_mute( libvlc_instance_t *p_instance,
-                               libvlc_exception_t *p_exception )
+                               libvlc_exception_t *p_e )
 {
     aout_VolumeMute( p_instance->p_vlc, NULL );
 }
 
 vlc_bool_t libvlc_audio_get_mute( libvlc_instance_t *p_instance,
-                                  libvlc_exception_t *p_exception )
+                                  libvlc_exception_t *p_e )
 {
     /*
      * If the volume level is 0, then the channel is muted
      */
     audio_volume_t i_volume;
 
-    i_volume = libvlc_audio_get_volume(p_instance, p_exception);
+    i_volume = libvlc_audio_get_volume(p_instance, p_e);
     if ( i_volume == 0 )
         return VLC_TRUE;
-
     return VLC_FALSE;
 }
 
 void libvlc_audio_set_mute( libvlc_instance_t *p_instance, vlc_bool_t status,
-                            libvlc_exception_t *p_exception )
+                            libvlc_exception_t *p_e )
 {
     if ( status )
     {
-        /*
-         * Check if the volume is already muted
-         */
-        if (! libvlc_audio_get_volume( p_instance, p_exception ) )
+        /* Check if the volume is already muted */
+        if (! libvlc_audio_get_volume( p_instance, p_e ) )
         {
             return;
         }
-        
         aout_VolumeMute( p_instance->p_vlc, NULL );
-        return;
-        
     }
     else
     {
-        /*
-         * the aout_VolumeMute is a toggle function, so this is enough.
-         */
+        /* the aout_VolumeMute is a toggle function, so this is enough. */
         aout_VolumeMute( p_instance->p_vlc, NULL );
-        return;
     }
 }
-
 
 /*****************************************************************************
  * libvlc_audio_get_volume : Get the current volume (range 0-200 %)
  *****************************************************************************/
 int libvlc_audio_get_volume( libvlc_instance_t *p_instance,
-                             libvlc_exception_t *p_exception )
+                             libvlc_exception_t *p_e )
 {
     audio_volume_t i_volume;
 
@@ -97,7 +87,7 @@ int libvlc_audio_get_volume( libvlc_instance_t *p_instance,
  * libvlc_audio_set_volume : Set the current volume
  *****************************************************************************/
 void libvlc_audio_set_volume( libvlc_instance_t *p_instance, int i_volume,
-                              libvlc_exception_t *p_exception )
+                              libvlc_exception_t *p_e )
 {
     if( i_volume >= 0 && i_volume <= 200 )
     {
@@ -106,7 +96,7 @@ void libvlc_audio_set_volume( libvlc_instance_t *p_instance, int i_volume,
     }
     else
     {
-        libvlc_exception_raise( p_exception, "Volume out of range" );
+        libvlc_exception_raise( p_e, "Volume out of range" );
     }
 }
 

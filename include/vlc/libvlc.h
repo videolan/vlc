@@ -114,8 +114,10 @@ typedef struct libvlc_instance_t libvlc_instance_t;
 libvlc_instance_t * libvlc_new( int , char **, libvlc_exception_t *);
 
 /**
- * returns a libvlc instance identifier for legacy APIs
- * \param p_instance the instance to destroy
+ * Returns a libvlc instance identifier for legacy APIs. Use of this
+ * function is discouraged, you should convert your program to use the
+ * new API.
+ * \param p_instance the instance
  */
 int libvlc_get_vlc_id( libvlc_instance_t *p_instance );
 
@@ -201,20 +203,6 @@ void libvlc_playlist_prev( libvlc_instance_t *, libvlc_exception_t * );
 void libvlc_playlist_clear( libvlc_instance_t *, libvlc_exception_t * );
 
 /**
- * Go to next playlist item
- * \param p_instance the instance
- * \param p_exception an initialized exception
- */
-void libvlc_playlist_next( libvlc_instance_t *, libvlc_exception_t * );
-
-/**
- * Go to Previous playlist item
- * \param p_instance the instance
- * \param p_exception an initialized exception
- */
-void libvlc_playlist_prev( libvlc_instance_t *, libvlc_exception_t * );
-
-/**
  * Add an item at the end of the playlist
  * If you need more advanced options, \see libvlc_playlist_add_extended
  * \param p_instance the instance
@@ -232,13 +220,20 @@ int libvlc_playlist_add( libvlc_instance_t *, const char *, const char *,
  * \param psz_name a name that you might want to give or NULL
  * \param i_options the number of options to add
  * \param ppsz_options strings representing the options to add
+ * \param p_exception an initialized exception
  * \return the identifier of the new item
  */
 int libvlc_playlist_add_extended( libvlc_instance_t *, const char *,
                                   const char *, int, const char **,
                                   libvlc_exception_t * );
 
-
+/** 
+ * Delete the playlist item with the given ID.
+ * \param p_instance the instance
+ * \param i_id the id to remove
+ * \param p_exception an initialized exception
+ * \return
+ */
 int libvlc_playlist_delete_item( libvlc_instance_t *, int,
                                  libvlc_exception_t * );
     
@@ -251,8 +246,6 @@ typedef struct libvlc_input_t libvlc_input_t;
  */
 libvlc_input_t *libvlc_playlist_get_input( libvlc_instance_t *,
                                            libvlc_exception_t * );
-
-
 
 /** @}*/
 
@@ -277,8 +270,6 @@ void        libvlc_input_set_time       ( libvlc_input_t *, vlc_int64_t, libvlc_
 float       libvlc_input_get_position   ( libvlc_input_t *, libvlc_exception_t *);
 void        libvlc_input_set_position   ( libvlc_input_t *, float, libvlc_exception_t *);
 vlc_bool_t  libvlc_input_will_play      ( libvlc_input_t *, libvlc_exception_t *);
-vlc_bool_t  libvlc_input_has_vout       ( libvlc_input_t *, libvlc_exception_t *);
-float       libvlc_input_get_fps        ( libvlc_input_t *, libvlc_exception_t *);
         
 /** @} */
 
@@ -287,6 +278,14 @@ float       libvlc_input_get_fps        ( libvlc_input_t *, libvlc_exception_t *
  * LibVLC Video handling
  * @{
  */
+
+/**
+ * Does this input have a video output ?
+ * \param p_input the input
+ * \param p_exception an initialized exception
+ */
+vlc_bool_t  libvlc_input_has_vout       ( libvlc_input_t *, libvlc_exception_t *);
+float       libvlc_input_get_fps        ( libvlc_input_t *, libvlc_exception_t *);
 
 /**
  * Toggle fullscreen status on video output
@@ -473,8 +472,6 @@ void libvlc_vlm_set_output( libvlc_instance_t *, char *, char*,
  */
 void libvlc_vlm_set_input( libvlc_instance_t *, char *, char*,
                            libvlc_exception_t *);
-
-
 
 /**
  * Set output for a media
