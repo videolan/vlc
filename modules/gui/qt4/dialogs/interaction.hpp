@@ -26,10 +26,6 @@
 #include <vlc/vlc.h>
 #include <vlc_interaction.h>
 #undef Q_
-#include <ui/okcanceldialog.h>
-#undef Q_
-#include <ui/yesnocanceldialog.h>
-#undef Q_
 #include <ui/inputdialog.h>
 #undef Q_
 #include <ui/logindialog.h>
