@@ -54,9 +54,10 @@ struct interaction_dialog_t
     int             i_type;             ///< Type identifier
     char           *psz_title;          ///< Title
     char           *psz_description;    ///< Descriptor string
-    char           *psz_defaultButton;  ///< default button title (~OK)
-    char           *psz_alternateButton;///< alternate button title (~NO)
-    char           *psz_otherButton;    ///< other button title (optional,~Cancel)
+    char           *psz_default_button;  ///< default button title (~OK)
+    char           *psz_alternate_button;///< alternate button title (~NO)
+    /// other button title (optional,~Cancel)
+    char           *psz_other_button;
 
     char           *psz_returned[1];    ///< returned responses from the user
 

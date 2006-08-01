@@ -49,18 +49,18 @@ public:
 private:
     intf_thread_t *p_intf;
     interaction_dialog_t *p_dialog;
-    Ui::OKCancelDialog *uiOkCancel;
-    Ui::YesNoCancelDialog *uiYesNoCancel;
     Ui::LoginDialog *uiLogin;
     Ui::InputDialog *uiInput;
     Ui::ProgressDialog *uiProgress;
 
+    QPushButton *defaultButton, *otherButton, *altButton;
+    QLabel *description;
+
     void Finish( int );
 private slots:
-    void OK();
-    void yes();
-    void no();
-    void cancel();
+    void defaultB();
+    void altB();
+    void otherB();
 };
 
 #endif

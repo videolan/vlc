@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
 #include "dialogs/interaction.hpp"
+#include "util/qvlcframe.hpp"
 #include <vlc/intf.h>
 #include "qt4.hpp"
 
@@ -28,43 +29,31 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
                          interaction_dialog_t *_p_dialog ) : QWidget( 0 ),
                           p_intf( _p_intf), p_dialog( _p_dialog )
 {
-    uiOkCancel = NULL;
-    uiYesNoCancel = NULL;
+    QVBoxLayout *layout = new QVBoxLayout;
     uiLogin = NULL;
     uiProgress = NULL;
     uiInput = NULL;
 
-    if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
+
+    if( p_dialog->i_flags & DIALOG_BLOCKING_ERROR )
     {
-        uiOkCancel = new Ui::OKCancelDialog;
-        uiOkCancel->setupUi( this );
-        uiOkCancel->description->setText( qfu(p_dialog->psz_description) );
-        connect( uiOkCancel->okButton, SIGNAL( clicked() ),
-                 this, SLOT( OK() ) );
-        connect( uiOkCancel->cancelButton, SIGNAL( clicked() ),
-                 this, SLOT( cancel() ) );
+
+    }
+    else if( p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
+    {
+        // Create instance of the errors dialog
     }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
-        uiYesNoCancel = new Ui::YesNoCancelDialog;      
-        uiYesNoCancel->setupUi( this );
-        uiYesNoCancel->description->setText( qfu(p_dialog->psz_description) );
-        connect( uiYesNoCancel->yesButton, SIGNAL( clicked() ),
-                 this, SLOT( yes() ) );
-        connect( uiYesNoCancel->noButton, SIGNAL( clicked() ),
-                 this, SLOT( no() ) );
-        connect( uiYesNoCancel->cancelButton, SIGNAL( clicked() ),
-                 this, SLOT( cancel() ) );
+        description = new QLabel( 0 );
+        description->setText( qfu(p_dialog->psz_description) );
+        layout->addWidget(description);
     }
     else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
     {
         uiLogin = new Ui::LoginDialog;
         uiLogin->setupUi( this );
         uiLogin->description->setText( qfu(p_dialog->psz_description) );
-        connect( uiLogin->okButton, SIGNAL( clicked() ),
-                 this, SLOT( OK() ) );
-        connect( uiLogin->cancelButton, SIGNAL( clicked() ),
-                 this, SLOT( cancel() ) );
     }
     else if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
     {
@@ -75,6 +64,19 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     }
     else
         msg_Err( p_intf, "unknown dialog type" );
+
+    QVLCFrame::doButtons( this, layout,
+                          defaultButton, p_dialog->psz_default_button,
+                          altButton, p_dialog->psz_alternate_button,
+                          otherButton, p_dialog->psz_other_button );
+    if( p_dialog->psz_default_button )
+        connect( defaultButton, SIGNAL( clicked() ), this, SLOT( defaultB() ) );
+    if( p_dialog->psz_alternate_button )
+        connect( altButton, SIGNAL( clicked() ), this, SLOT( altB() ) );
+    if( p_dialog->psz_other_button )
+        connect( otherButton, SIGNAL( clicked() ), this, SLOT( otherB() ) );
+ 
+    setLayout( layout );
     setWindowTitle( qfu( p_dialog->psz_title ) );
 }
 
@@ -84,27 +86,20 @@ void InteractionDialog::Update()
 
 InteractionDialog::~InteractionDialog()
 {
-    if( uiYesNoCancel ) delete uiYesNoCancel;
-    if( uiOkCancel ) delete uiOkCancel;
     if( uiInput ) delete uiInput;
     if( uiProgress) delete uiProgress;
     if( uiLogin ) delete uiLogin;
 }
 
-void InteractionDialog::yes()
+void InteractionDialog::defaultB()
 {
     Finish( DIALOG_OK_YES );
 }
-void InteractionDialog::no()
+void InteractionDialog::altB()
 {
     Finish( DIALOG_NO );
 }
-void InteractionDialog::OK()
-{
-    Finish( DIALOG_OK_YES );
-}
-
-void InteractionDialog::cancel()
+void InteractionDialog::otherB()
 {
     Finish( DIALOG_CANCELLED );
 }

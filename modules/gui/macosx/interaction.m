@@ -138,9 +138,9 @@
 
     NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : _("Error")];
     NSString *o_description = [NSString stringWithUTF8String:p_dialog->psz_description ? p_dialog->psz_description : ""];
-    NSString *o_defaultButton = p_dialog->psz_defaultButton ? [NSString stringWithUTF8String:p_dialog->psz_defaultButton] : nil;
-    NSString *o_alternateButton = p_dialog->psz_alternateButton ? [NSString stringWithUTF8String:p_dialog->psz_alternateButton] : nil;
-    NSString *o_otherButton = p_dialog->psz_otherButton ? [NSString stringWithUTF8String:p_dialog->psz_otherButton] : nil;
+    NSString *o_defaultButton = p_dialog->psz_default_button ? [NSString stringWithUTF8String:p_dialog->psz_default_button] : nil;
+    NSString *o_alternateButton = p_dialog->psz_alternate_button ? [NSString stringWithUTF8String:p_dialog->psz_alternate_button] : nil;
+    NSString *o_otherButton = p_dialog->psz_other_button ? [NSString stringWithUTF8String:p_dialog->psz_other_button] : nil;
 
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_vout != NULL )

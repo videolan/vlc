@@ -315,8 +315,8 @@ PLItem *PLModel::FindByInput( PLItem *root, int i_id )
     return FindInner( root, i_id, true );
 }
 
-#define CACHE( i, p ) i_cached_id = i; p_cached_item = p;
-#define ICACHE( i, p ) i_cached_input_id = i; p_cached_item_bi = p;
+#define CACHE( i, p ) { i_cached_id = i; p_cached_item = p; }
+#define ICACHE( i, p ) { i_cached_input_id = i; p_cached_item_bi = p; }
 
 PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
 {
@@ -356,13 +356,9 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
             if( childFound )
             {
                 if( b_input )
-                {
-                    ICACHE( i_id, childFound );
-                }
+                    ICACHE( i_id, childFound )
                 else
-                {
-                    CACHE( i_id, childFound );
-                }
+                    CACHE( i_id, childFound )
                 return childFound;
             }
         }

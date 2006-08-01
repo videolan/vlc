@@ -432,11 +432,11 @@ struct module_symbols_t
     int (*__intf_Interact_inner) (vlc_object_t *,interaction_dialog_t *);
     void (*intf_InteractionManage_inner) (playlist_t *);
     void (*intf_InteractionDestroy_inner) (interaction_t *);
-    void (*__intf_UserFatal_inner) (vlc_object_t*, const char*, const char*, ...);
+    void (*__intf_UserFatal_inner) (vlc_object_t*, vlc_bool_t, const char*, const char*, ...);
     int (*__intf_UserLoginPassword_inner) (vlc_object_t*, const char*, const char*, char **, char **);
-    int (*__intf_UserYesNo_inner) (vlc_object_t*, const char*, const char*);
-    int (*__intf_UserProgress_inner) (vlc_object_t*, const char*, const char*, float);
-    void (*__intf_UserProgressUpdate_inner) (vlc_object_t*, int, const char*, float);
+    int (*__intf_UserYesNo_inner) (vlc_object_t*, const char*, const char*, const char*, const char*, const char*);
+    int (*__intf_UserProgress_inner) (vlc_object_t*, const char*, const char*, float, int);
+    void (*__intf_UserProgressUpdate_inner) (vlc_object_t*, int, const char*, float, int);
     void (*__intf_UserHide_inner) (vlc_object_t *, int);
     void *__stats_Create_deprecated;
     int (*__stats_Update_inner) (vlc_object_t*, counter_t *, vlc_value_t, vlc_value_t *);
@@ -509,7 +509,7 @@ struct module_symbols_t
     void (*playlist_AddWhereverNeeded_inner) (playlist_t* , input_item_t*, playlist_item_t*,playlist_item_t*,vlc_bool_t, int);
     int (*playlist_DeleteFromItemId_inner) (playlist_t *, int);
     void (*playlist_NodeDump_inner) (playlist_t *p_playlist, playlist_item_t *p_item, int i_level);
-    int (*__intf_UserOkayCancel_inner) (vlc_object_t*, const char*, const char*);
+    void *__intf_UserOkayCancel_deprecated;
     int (*__intf_UserStringInput_inner) (vlc_object_t*, const char*, const char*, char **);
     void (*playlist_NodesCreateForSD_inner) (playlist_t *, char *, playlist_item_t **, playlist_item_t **);
     vlc_bool_t (*input_AddSubtitles_inner) (input_thread_t *, char *, vlc_bool_t);
@@ -520,6 +520,8 @@ struct module_symbols_t
     void (*__intf_IntfProgressUpdate_inner) (vlc_object_t*, int, const char*, float);
     int (*__intf_IntfProgress_inner) (vlc_object_t*, const char*, float);
     void *streaming_ChainToPsz_deprecated;
+    void (*__intf_UserWarn_inner) (vlc_object_t*, const char*, const char*, ...);
+    vlc_bool_t (*__intf_UserProgressIsCancelled_inner) (vlc_object_t*, int);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -981,7 +983,6 @@ struct module_symbols_t
 #  define playlist_AddWhereverNeeded (p_symbols)->playlist_AddWhereverNeeded_inner
 #  define playlist_DeleteFromItemId (p_symbols)->playlist_DeleteFromItemId_inner
 #  define playlist_NodeDump (p_symbols)->playlist_NodeDump_inner
-#  define __intf_UserOkayCancel (p_symbols)->__intf_UserOkayCancel_inner
 #  define __intf_UserStringInput (p_symbols)->__intf_UserStringInput_inner
 #  define playlist_NodesCreateForSD (p_symbols)->playlist_NodesCreateForSD_inner
 #  define input_AddSubtitles (p_symbols)->input_AddSubtitles_inner
@@ -989,6 +990,8 @@ struct module_symbols_t
 #  define __stats_TimersClean (p_symbols)->__stats_TimersClean_inner
 #  define __intf_IntfProgressUpdate (p_symbols)->__intf_IntfProgressUpdate_inner
 #  define __intf_IntfProgress (p_symbols)->__intf_IntfProgress_inner
+#  define __intf_UserWarn (p_symbols)->__intf_UserWarn_inner
+#  define __intf_UserProgressIsCancelled (p_symbols)->__intf_UserProgressIsCancelled_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1453,7 +1456,6 @@ struct module_symbols_t
     ((p_symbols)->playlist_AddWhereverNeeded_inner) = playlist_AddWhereverNeeded; \
     ((p_symbols)->playlist_DeleteFromItemId_inner) = playlist_DeleteFromItemId; \
     ((p_symbols)->playlist_NodeDump_inner) = playlist_NodeDump; \
-    ((p_symbols)->__intf_UserOkayCancel_inner) = __intf_UserOkayCancel; \
     ((p_symbols)->__intf_UserStringInput_inner) = __intf_UserStringInput; \
     ((p_symbols)->playlist_NodesCreateForSD_inner) = playlist_NodesCreateForSD; \
     ((p_symbols)->input_AddSubtitles_inner) = input_AddSubtitles; \
@@ -1461,6 +1463,8 @@ struct module_symbols_t
     ((p_symbols)->__stats_TimersClean_inner) = __stats_TimersClean; \
     ((p_symbols)->__intf_IntfProgressUpdate_inner) = __intf_IntfProgressUpdate; \
     ((p_symbols)->__intf_IntfProgress_inner) = __intf_IntfProgress; \
+    ((p_symbols)->__intf_UserWarn_inner) = __intf_UserWarn; \
+    ((p_symbols)->__intf_UserProgressIsCancelled_inner) = __intf_UserProgressIsCancelled; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \
     (p_symbols)->playlist_ItemAddParent_deprecated = NULL; \
@@ -1492,6 +1496,7 @@ struct module_symbols_t
     (p_symbols)->stats_HandlerDestroy_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \
     (p_symbols)->playlist_ItemNewFromInput_deprecated = NULL; \
+    (p_symbols)->__intf_UserOkayCancel_deprecated = NULL; \
     (p_symbols)->stats_TimerClean_deprecated = NULL; \
     (p_symbols)->stats_TimersClean_deprecated = NULL; \
     (p_symbols)->streaming_ChainToPsz_deprecated = NULL; \
