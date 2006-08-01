@@ -227,9 +227,9 @@ void intf_InteractionManage( playlist_t *p_playlist )
                         sizeof( interaction_dialog_t ) );               \
         new->psz_title = NULL;                                          \
         new->psz_description = NULL;                                    \
-        new->psz_defaultButton = NULL;                                  \
-        new->psz_alternateButton = NULL;                                \
-        new->psz_otherButton = NULL;                                    \
+        new->psz_default_button = NULL;                                  \
+        new->psz_alternate_button = NULL;                                \
+        new->psz_other_button = NULL;                                    \
         new->i_timeToGo = 0;                                            \
         new->b_cancelled = VLC_FALSE;                                   \
         new->p_private = NULL;                                          \
@@ -323,12 +323,12 @@ int __intf_UserYesNo( vlc_object_t *p_this,
     p_new->psz_title = strdup( psz_title );
     p_new->psz_description = strdup( psz_description );
     p_new->i_flags = DIALOG_YES_NO_CANCEL;
-    p_new->psz_defaultButton = strdup( psz_default );
-    p_new->psz_alternateButton = strdup( psz_alternate );
+    p_new->psz_default_button = strdup( psz_default );
+    p_new->psz_alternate_button = strdup( psz_alternate );
     if( psz_other )
-        p_new->psz_otherButton = strdup( psz_other );
+        p_new->psz_other_button = strdup( psz_other );
     else
-        p_new->psz_otherButton = NULL;
+        p_new->psz_other_button = NULL;
 
     i_ret = intf_Interact( p_this, p_new );
 
@@ -766,9 +766,9 @@ static void intf_InteractionDialogDestroy( interaction_dialog_t *p_dialog )
 {
     FREE( p_dialog->psz_title );
     FREE( p_dialog->psz_description );
-    FREE( p_dialog->psz_defaultButton );
-    FREE( p_dialog->psz_alternateButton );
-    FREE( p_dialog->psz_otherButton );
+    FREE( p_dialog->psz_default_button );
+    FREE( p_dialog->psz_alternate_button );
+    FREE( p_dialog->psz_other_button );
 
     free( p_dialog );
 }
