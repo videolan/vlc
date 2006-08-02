@@ -66,12 +66,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 int E_(Import_GVP)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-
     int i_size;
     byte_t *p_peek;
 
-    i_size = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
-    if( !strstr( (char*)p_peek, "gvp_version:" ) )
+    CHECK_PEEK( p_peek, 12 );
+    if( !POKE( p_peek, "gvp_version:", 12 ) )
     {
         return VLC_EGENERIC;
     }
