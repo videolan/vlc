@@ -45,12 +45,22 @@ public class JVLCCanvas extends Canvas {
         setSize(200, 200);
     }
     
+    public JVLCCanvas(String[] args) {
+    	jvlc = new JVLC(args);
+    	setSize(200, 200);
+    }
+    
     /**
      * @param width The initial canvas width
      * @param height The initial canvas height
      */
     public JVLCCanvas(int width, int height) {
         jvlc = new JVLC();
+        setSize(width, height);
+    }
+    
+    public JVLCCanvas(String[] args, int width, int height) {
+        jvlc = new JVLC(args);
         setSize(width, height);
     }
 

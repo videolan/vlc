@@ -29,6 +29,9 @@
 
 package org.videolan.jvlc;
 
+import java.awt.Component;
+import java.awt.Dimension;
+
 
 public interface VideoIntf {
     /**
@@ -62,10 +65,50 @@ public interface VideoIntf {
     /**
      * @return The current video window height
      */
-    int		getVideoHeight() throws VLCException;
+    int		getHeight() throws VLCException;
 
     /**
      * @return The current video window width
      */
-    int		getVideoWidth() throws VLCException;    
+    int		getWidth() throws VLCException;
+    
+    /**
+     * Get the size of the video output window as a Dimension object.
+     * @return The video size in a Dimension object.
+     * @throws VLCException
+     */
+    Dimension	getSize() throws VLCException;
+    
+    /**
+     * Destroys video output, but the item continues to play.
+     * @throws VLCException
+     */
+    void destroyVideo() throws VLCException;
+    
+    /**
+     * Moves video output from the current Canvas to another. This funtion
+     * doens't resize the video output to the new canvas size. See resizeVideo().
+     * @param c
+     * @throws VLCException
+     */
+    void reparent(Component c) throws VLCException;
+    
+    /**
+     * Resizes video output to width and height. This operation could be necessary
+     * after reparenting. See reparentVideo().
+     * @param width The new video output width
+     * @param height The new video output height
+     * @throws VLCException
+     */
+    void setSize(int width, int height) throws VLCException;
+    
+    /**
+     * Resizes video output to width and height. This operation could be necessary
+     * after reparenting. See reparentVideo().
+	 *
+     * @param d The new size of video
+     * @throws VLCException
+     */
+    void setSize(Dimension d) throws VLCException;
+    
 }

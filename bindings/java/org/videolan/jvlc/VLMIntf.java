@@ -32,12 +32,12 @@ public interface VLMIntf {
 
 	/**
 	 * Add a broadcast, with one input
-	 * @param mediaName the name of the new broadcast
-	 * @param medInputMRL the input MRL
-	 * @param mediaOutputURL the output MRL (the parameter to the "sout" variable)
-	 * @param additionalOptions additional options
-	 * @param enableBroadcast boolean for enabling the new broadcast
-	 * @param isPlayableInLoop Should this broadcast be played in loop ?
+	 * @param name the name of the new broadcast
+	 * @param input the input MRL
+	 * @param output the output MRL (the parameter to the "sout" variable)
+	 * @param options additional options
+	 * @param enabled boolean for enabling the new broadcast
+	 * @param loop Should this broadcast be played in loop ?
 	 */
     void addBroadcast( String name, String input, String output, String[] options, boolean enabled, boolean loop )
     	throws VLCException;
@@ -71,7 +71,7 @@ public interface VLMIntf {
     void setInput( String name, String input ) throws VLCException;
     
     /**
-     * Set output for a media
+     * Set loop mode for a media
      * @param name the media to work on
      * @param loop the new status
      */
@@ -89,4 +89,22 @@ public interface VLMIntf {
      */    
     void changeMedia( String name, String input, String output, String[] options, boolean enabled, boolean loop )
     	throws VLCException;
+    /**
+     * Plays a media
+     * @param name of the broadcast to play
+     */
+    void playMedia(String name) throws VLCException;
+
+    /**
+     * Stops a media
+     * @param name of the broadcast to stop
+     */
+    void stopMedia(String name) throws VLCException;
+
+    /**
+     * Pauses a media
+     * @param name name of the broadcast to pause
+     */    
+    void pauseMedia(String name) throws VLCException;
+
 }

@@ -50,8 +50,6 @@ public class Playlist implements PlaylistIntf {
     native private int _itemsCount();
     native private int _isRunning();
     
-    native private boolean _inputIsPlaying();
-	native private boolean _inputHasVout();
 
 
     public synchronized void play(int id, String[] options) throws VLCException {
@@ -113,13 +111,4 @@ public class Playlist implements PlaylistIntf {
     public long getInstance() throws VLCException {
         return libvlcInstance;
     }
-    
-    public synchronized boolean inputIsPlaying() throws VLCException {
-        return _inputIsPlaying();
-    }
-
-    public synchronized boolean inputHasVout() throws VLCException {
-        return _inputHasVout();
-    }
-    
 }

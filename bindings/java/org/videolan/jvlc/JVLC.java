@@ -30,7 +30,8 @@
 
 package org.videolan.jvlc;
 
-public class JVLC implements JLibVLC, Runnable {
+
+public class JVLC implements Runnable {
     
     static {
         System.loadLibrary("jvlc" );
@@ -39,9 +40,13 @@ public class JVLC implements JLibVLC, Runnable {
     /**
      * These are set as final since they live along the jvlc object
      */
-    private final long _instance;
-    public  final Playlist playlist;
-
+    private final long		_instance;
+    
+    public  final Playlist	playlist;
+    public	final Video		video;
+    public	final Audio		audio;
+    public	final Input		input;
+    public	final VLM		vlm;
     
     private boolean beingDestroyed = false;
 
@@ -57,14 +62,23 @@ public class JVLC implements JLibVLC, Runnable {
         String[] args = new String[1];
         args[0] = "";
         
-        _instance = createInstance(args);
-        playlist = new Playlist( _instance );
+        _instance	= createInstance( args );
+        playlist	= new Playlist	( _instance );
+        video		= new Video		( _instance );
+        audio		= new Audio		( _instance );
+        input		= new Input		( _instance );
+        vlm			= new VLM		( _instance );
         new Thread(this).start();
     }
     
     public JVLC(String[] args) {
-        _instance = createInstance( args );
-        playlist = new Playlist( _instance );
+        _instance	= createInstance( args );
+        playlist	= new Playlist	( _instance );
+        video		= new Video		( _instance );
+        audio		= new Audio		( _instance );
+        input		= new Input		( _instance );
+        vlm			= new VLM		( _instance );
+        
         new Thread(this).start();
     }
     
@@ -82,123 +96,9 @@ public class JVLC implements JLibVLC, Runnable {
 	/*
      * Core methods
      */
-    private native long createInstance();
     private native long createInstance( String[] args );
     private native void _destroy();   
-    /*
-     * 	Audio native methods
-     */
-    private native boolean	_getMute();
-    private native void		_setMute( boolean value );
-    private native void		_toggleMute();
-    private native int		_getVolume();
-    private native void		_setVolume( int volume );
 
-    /*
-     *  Input native methods
-     */
-    private native long     _getInputLength();
-    private native float    _getInputPosition();
-    private native long     _getInputTime();
-    private native float	_getInputFPS();
-
-    
-    /*
-     * Video native methods
-     */
-    private native void     _toggleFullscreen();
-    private native void     _setFullscreen( boolean value);
-    private native boolean  _getFullscreen();
-    private native int      _getVideoHeight();
-    private native int      _getVideoWidth();
-    private native void		_getSnapshot(String filename);
- 
-
-    /*
-     * VLM native methods
-     */
-    private native void _addBroadcast(String mediaName, String meditInputMRL, String mediaOutputMRL ,
-                               String[] additionalOptions, boolean enableBroadcast, boolean isPlayableInLoop);
-    private native void _deleteMedia	(String mediaName);
-    private native void _setEnabled		(String mediaName,	boolean newStatus);
-    private native void _setOutput		(String mediaName,	String mediaOutputMRL);
-    private native void _setInput		(String mediaName,	String mediaInputMRL);
-    private native void _setLoop		(String mediaName,	boolean isPlayableInLoop);
-    private native void _changeMedia	(String newMediaName, String inputMRL, String outputMRL , String[] additionalOptions, boolean enableNewBroadcast, boolean isPlayableInLoop);
-
-    /*
-     * Native methods wrappers
-     */
-       
-    
-    public boolean getMute() throws VLCException {
-        return _getMute();
-    }
-
-    public void setMute(boolean value) throws VLCException {
-        _setMute( value );
-        
-    }
-    
-    public void toggleMute() throws VLCException {
-    	_toggleMute();
-    }
-
-    public int getVolume() throws VLCException {
-        return _getVolume();        
-    }
-
-    public void setVolume(int volume) throws VLCException {
-        _setVolume( volume );
-        
-    }
-
-    public void toggleFullscreen() throws VLCException {
-        _toggleFullscreen();
-        
-    }
-
-    public void setFullscreen( boolean value ) throws VLCException {
-        _setFullscreen( value );
-        
-    }
-
-    public boolean getFullscreen() throws VLCException {
-    	return _getFullscreen();        
-    }
-
-    public int getVideoHeight() throws VLCException {
-        return _getVideoHeight();
-    }
-    
-
-    public int getVideoWidth() throws VLCException {
-        return _getVideoWidth();        
-    }
-
-    
-    public long getInputLength() throws VLCException {
-        return _getInputLength();        
-    }
-
-    public long getInputTime() throws VLCException {
-        return _getInputTime();
-    }
-
-    public float getInputPosition() throws VLCException {
-        return _getInputPosition();
-        
-    }
-
-    public void setInputTime() throws VLCException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public double getInputFPS() throws VLCException {
-        return _getInputFPS();
-    }
-    
     public long getInstance() throws VLCException {
         return _instance;
     }
@@ -211,42 +111,7 @@ public class JVLC implements JLibVLC, Runnable {
 	}
     
 
-	public void getSnapshot(String filename) throws VLCException {
-		_getSnapshot(filename);
-	}
 
-
-    public void addBroadcast( String name, String input, String output, String[] options, boolean enabled, boolean loop )
-    	throws VLCException {
-    	_addBroadcast(name, input, output, options, enabled, loop);
-    }
-    
-    public void deleteMedia( String name ) throws VLCException {
-    	_deleteMedia(name);
-    }
-    
-    public void setEnabled( String name, boolean enabled ) throws VLCException {
-    	_setEnabled(name, enabled);
-    }
-    
-    public void setOutput( String name, String output ) throws VLCException {
-    	_setOutput(name, output);
-    }
-    
-    public void setInput( String name, String input ) throws VLCException {
-    	_setInput(name, input);
-    }
-    
-    public void setLoop( String name, boolean loop ) throws VLCException {
-    	_setLoop(name, loop);
-    }
-    
-    public void changeMedia( String name, String input, String output, String[] options, boolean enabled, boolean loop )
-    	throws VLCException {
-    	_changeMedia(name, input, output, options, enabled, loop);
-    }
-
-	
 	/**
 	 * Checks if the input is playing.
 	 * @return True if there is a playing input.
@@ -273,14 +138,14 @@ public class JVLC implements JLibVLC, Runnable {
 		while (! beingDestroyed) {
 			try {
 				while (playlist.isRunning()) {
-					if (playlist.inputIsPlaying()) {
+					if (input.isPlaying()) {
 						inputPlaying = true;
 					}
 					else {
 						inputPlaying = false;
 				    }
 				            
-					if (playlist.inputHasVout()) {
+					if (input.hasVout()) {
 						inputVout = true;
 				    }
 					else {
@@ -302,6 +167,5 @@ public class JVLC implements JLibVLC, Runnable {
 			} // try
 		} // while ! being destroyed
 	} // run
-
 }
 

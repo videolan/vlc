@@ -39,31 +39,49 @@ public interface InputIntf {
      * @return The total length of the current file playing in millis.
      * @throws VLCException
      */
-    long getInputLength() throws VLCException;
+    long getLength() throws VLCException;
 
     /**
      * @return The current position in millis within the playing item.
      * @throws VLCException
      */
-    long getInputTime() throws VLCException;
+    long getTime() throws VLCException;
     
     /**
      * @return The position in %.
      * @throws VLCException
      */
-    float getInputPosition() throws VLCException;
+    float getPosition() throws VLCException;
     
     /**
-     * Not implemented
+     * Moves current input to position specified in a float [0-1].
+     * @param value The position, from 0 to 1, to move the input to.
      * @throws VLCException
      */
-    void setInputTime() throws VLCException;
+    void setPosition( float value ) throws VLCException;
+    
+    /**
+     * Moves current input to time specified in value
+     * @param value The time in milliseconds to move the input to.
+     * @throws VLCException
+     */
+    void setTime(long value) throws VLCException;
     
     
     /**
      * @return If the playing item is a video file, returns the FPS, otherwise 0.
      * @throws VLCException
      */
-    double getInputFPS() throws VLCException;
+    double getFPS() throws VLCException;
     
+    
+    /**
+     * @return True if the current input is really playing
+     */
+    boolean isPlaying() throws VLCException;
+    
+    /**
+     * @return True if the current input has spawned a video output window
+     */
+    boolean hasVout() throws VLCException;
 }

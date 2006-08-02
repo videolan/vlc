@@ -62,11 +62,6 @@ public interface PlaylistIntf {
     int itemsCount() throws VLCException;
     
     /**
-     * @return True if the current input is really playing
-     */
-    boolean inputIsPlaying() throws VLCException;
-    
-    /**
      * Move to next item
      */
     void next() throws VLCException;
@@ -94,8 +89,5 @@ public interface PlaylistIntf {
      */
     void addExtended();
     
-    /**
-     * @return True if the current input has spawned a video output window
-     */
-    boolean inputHasVout() throws VLCException;
+
 }

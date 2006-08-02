@@ -32,9 +32,9 @@ public class VLCExample
 
         if (videoInput) {
         	try {
-        		System.out.print(jvlc.getVideoWidth());
+        		System.out.print(jvlc.video.getWidth());
         		System.out.print("x");
-        		System.out.println(jvlc.getVideoHeight());
+        		System.out.println(jvlc.video.getHeight());
         	} catch (VLCException e) {
         		e.printStackTrace();
         	}
@@ -43,32 +43,32 @@ public class VLCExample
         {
         	if (videoInput) {
         		System.out.print("Fullscreen... ");        	
-        		jvlc.setFullscreen(true);
+        		jvlc.video.setFullscreen(true);
         		Thread.sleep(3000);
         		System.out.println("real size.");
-        		jvlc.setFullscreen(false);
+        		jvlc.video.setFullscreen(false);
             	System.out.print("Taking snapshot... ");
-            	jvlc.getSnapshot( System.getProperty( "user.dir" ) + "/snap.png");
+            	jvlc.video.getSnapshot( System.getProperty( "user.dir" ) + "/snap.png");
             	System.out.println("taken. (see " + System.getProperty( "user.dir" ) + "/snap.png )");
         	}
             System.out.print("Muting...");
-            jvlc.setMute(true);
+            jvlc.audio.setMute(true);
             Thread.sleep(3000);
             System.out.println("unmuting.");
-            jvlc.setMute(false);
+            jvlc.audio.setMute(false);
             Thread.sleep(3000);
-            System.out.println("Volume is: " + jvlc.getVolume());
+            System.out.println("Volume is: " + jvlc.audio.getVolume());
             System.out.print("Setting volume to 150... ");
-            jvlc.setVolume(150);
+            jvlc.audio.setVolume(150);
             System.out.println("done");
             Thread.sleep(3000);
             System.out.println("INPUT INFORMATION");
             System.out.println("-----------------");
-            System.out.println("Total length   (ms) :\t" + jvlc.getInputLength());
-            System.out.println("Input time     (ms) :\t" + jvlc.getInputTime());
-            System.out.println("Input position [0-1]:\t" + jvlc.getInputPosition());
+            System.out.println("Total length   (ms) :\t" + jvlc.input.getLength());
+            System.out.println("Input time     (ms) :\t" + jvlc.input.getTime());
+            System.out.println("Input position [0-1]:\t" + jvlc.input.getPosition());
             if (videoInput)
-            	System.out.println("Input FPS          :\t" + jvlc.getInputFPS());
+            	System.out.println("Input FPS          :\t" + jvlc.input.getFPS());
            
             
         }
