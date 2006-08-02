@@ -169,32 +169,24 @@ enum
  * Exported symbols
  ***************************************************************************/
 
-#define intf_Interact( a,b ) __intf_Interact( VLC_OBJECT(a), b )
-VLC_EXPORT( int,__intf_Interact,( vlc_object_t *,interaction_dialog_t * ) );
-
 #define intf_UserFatal( a, b, c, d, e... ) __intf_UserFatal( VLC_OBJECT(a),b,c,d, ## e )
-VLC_EXPORT( void, __intf_UserFatal,( vlc_object_t*, vlc_bool_t, const char*, const char*, ...) );
+VLC_EXPORT( int, __intf_UserFatal,( vlc_object_t*, vlc_bool_t, const char*, const char*, ...) );
 #define intf_UserWarn( a, c, d, e... ) __intf_UserWarn( VLC_OBJECT(a),c,d, ## e )
-VLC_EXPORT( void, __intf_UserWarn,( vlc_object_t*, const char*, const char*, ...) );
+VLC_EXPORT( int, __intf_UserWarn,( vlc_object_t*, const char*, const char*, ...) );
 #define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __intf_UserLoginPassword,( vlc_object_t*, const char*, const char*, char **, char **) );
 #define intf_UserYesNo( a, b, c, d, e, f ) __intf_UserYesNo( VLC_OBJECT(a),b,c, d, e, f )
 VLC_EXPORT( int, __intf_UserYesNo,( vlc_object_t*, const char*, const char*, const char*, const char*, const char*) );
-
-#define intf_UserProgress( a, b, c, d, e ) __intf_UserProgress( VLC_OBJECT(a),b,c,d,e )
-VLC_EXPORT( int, __intf_UserProgress,( vlc_object_t*, const char*, const char*, float, int) );
-#define intf_UserProgressUpdate( a, b, c, d, e ) __intf_UserProgressUpdate( VLC_OBJECT(a),b,c,d,e )
-VLC_EXPORT( void, __intf_UserProgressUpdate,( vlc_object_t*, int, const char*, float, int) );
-#define intf_UserProgressIsCancelled( a, b ) __intf_UserProgressIsCancelled( VLC_OBJECT(a),b )
-VLC_EXPORT( vlc_bool_t, __intf_UserProgressIsCancelled,( vlc_object_t*, int ) );
-
 #define intf_UserStringInput( a, b, c, d ) __intf_UserStringInput( VLC_OBJECT(a),b,c,d )
 VLC_EXPORT( int, __intf_UserStringInput,(vlc_object_t*, const char*, const char*, char **) );
 
-#define intf_IntfProgress( a, b, c ) __intf_IntfProgress( VLC_OBJECT(a),b,c )
-VLC_EXPORT( int, __intf_IntfProgress,( vlc_object_t*, const char*, float) );
-#define intf_IntfProgressUpdate( a, b, c, d ) __intf_IntfProgressUpdate( VLC_OBJECT(a),b,c,d )
-VLC_EXPORT( void, __intf_IntfProgressUpdate,( vlc_object_t*, int, const char*, float) );
+#define intf_IntfProgress( a, b, c ) __intf_Progress( VLC_OBJECT(a), NULL, b,c, -1 )
+#define intf_UserProgress( a, b, c, d, e ) __intf_Progress( VLC_OBJECT(a),b,c,d,e )
+VLC_EXPORT( int, __intf_Progress,( vlc_object_t*, const char*, const char*, float, int) );
+#define intf_ProgressUpdate( a, b, c, d, e ) __intf_ProgressUpdate( VLC_OBJECT(a),b,c,d,e )
+VLC_EXPORT( void, __intf_ProgressUpdate,( vlc_object_t*, int, const char*, float, int) );
+#define intf_ProgressIsCancelled( a, b ) __intf_UserProgressIsCancelled( VLC_OBJECT(a),b )
+VLC_EXPORT( vlc_bool_t, __intf_UserProgressIsCancelled,( vlc_object_t*, int ) );
 
 #define intf_UserHide( a, b ) __intf_UserHide( VLC_OBJECT(a), b )
 VLC_EXPORT( void, __intf_UserHide,( vlc_object_t *, int ));

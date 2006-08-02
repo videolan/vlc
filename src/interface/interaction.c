@@ -36,6 +36,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <assert.h>
 
 #include "vlc_interaction.h"
 #include "vlc_interface.h"
@@ -44,57 +45,13 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void                  intf_InteractionInit( playlist_t *p_playlist );
-static interaction_t *       intf_InteractionGet( vlc_object_t *p_this );
-static void                  intf_InteractionSearchInterface( interaction_t *
+static void                  InteractionInit( playlist_t *p_playlist );
+static interaction_t *       InteractionGet( vlc_object_t *p_this );
+static void                  InteractionSearchInterface( interaction_t *
                                                           p_interaction );
-static int                   intf_WaitAnswer( interaction_t *p_interact,
-                             interaction_dialog_t *p_dialog );
-static int                   intf_Send( interaction_t *p_interact,
-                             interaction_dialog_t *p_dialog );
-static interaction_dialog_t *intf_InteractionGetById( vlc_object_t* , int );
-static void                  intf_InteractionDialogDestroy(
-                                              interaction_dialog_t *p_dialog );
-
-/**
- * Send an interaction element to the user
- *
- * \param p_this the calling vlc_object_t
- * \param p_interact the interaction element
- * \return VLC_SUCCESS or an error code
- */
-int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
-{
-    interaction_t *p_interaction = intf_InteractionGet( p_this );
-
-    /* Get an id, if we don't already have one */
-    if( p_dialog->i_id == 0 )
-    {
-        p_dialog->i_id = ++p_interaction->i_last_id;
-    }
-
-    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT ) return VLC_EGENERIC;
-
-    if( config_GetInt(p_this, "interact") || 
-        p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
-        p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
-    {
-        p_dialog->p_interaction = p_interaction;
-        p_dialog->p_parent = p_this;
-
-        if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY )
-        {
-            return intf_WaitAnswer( p_interaction, p_dialog );
-        }
-        else
-        {
-            p_dialog->i_flags |=  DIALOG_GOT_ANSWER;
-            return intf_Send( p_interaction, p_dialog );
-        }
-    }
-    else
-        return VLC_EGENERIC;
-}
+static interaction_dialog_t *DialogGetById( interaction_t* , int );
+static void                  DialogDestroy( interaction_dialog_t *p_dialog );
+static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog );
 
 /**
  * Destroy the interaction system
@@ -104,16 +61,13 @@ int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 void intf_InteractionDestroy( interaction_t *p_interaction )
 {
     int i;
-
     // Remove all dialogs - Interfaces must be able to clean up their data
-
     for( i = p_interaction->i_dialogs -1 ; i >= 0; i-- )
     {
         interaction_dialog_t * p_dialog = p_interaction->pp_dialogs[i];
-        intf_InteractionDialogDestroy( p_dialog );
+        DialogDestroy( p_dialog );
         REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs, i );
     }
-
     vlc_object_destroy( p_interaction );
 }
 
@@ -128,26 +82,21 @@ void intf_InteractionManage( playlist_t *p_playlist )
 {
     vlc_value_t val;
     int i_index;
-    interaction_t *p_interaction;
-
-    p_interaction = p_playlist->p_interaction;
+    interaction_t *p_interaction = p_playlist->p_interaction;
 
     // Nothing to do
     if( p_interaction->i_dialogs == 0 ) return;
 
     vlc_mutex_lock( &p_interaction->object_lock );
 
-    intf_InteractionSearchInterface( p_interaction );
-
+    InteractionSearchInterface( p_interaction );
     if( !p_interaction->p_intf )
     {
         // We mark all dialogs as answered with their "default" answer
         for( i_index = 0 ; i_index < p_interaction->i_dialogs; i_index ++ )
         {
             interaction_dialog_t *p_dialog = p_interaction->pp_dialogs[i_index];
-
-            // Give default answer
-            p_dialog->i_return = DIALOG_DEFAULT;
+            p_dialog->i_return = DIALOG_DEFAULT; // Give default answer
 
             // Pretend we have hidden and destroyed it
             if( p_dialog->i_status == HIDDEN_DIALOG )
@@ -200,7 +149,7 @@ void intf_InteractionManage( playlist_t *p_playlist )
             REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs,
                          i_index);
             i_index--;
-            intf_InteractionDialogDestroy( p_dialog );
+            DialogDestroy( p_dialog );
             break;
         case NEW_DIALOG:
             // This is truly a new dialog, send it.
@@ -221,55 +170,42 @@ void intf_InteractionManage( playlist_t *p_playlist )
     vlc_mutex_unlock( &p_playlist->p_interaction->object_lock );
 }
 
+#define DIALOG_INIT( type ) \
+        DECMALLOC_ERR( p_new, interaction_dialog_t );                     \
+        memset( p_new, 0, sizeof( interaction_dialog_t ) );               \
+        p_new->b_cancelled = VLC_FALSE;                                   \
+        p_new->i_status = NEW_DIALOG;                                     \
+        p_new->i_type = INTERACT_DIALOG_##type;                           \
+        p_new->psz_returned[0] = NULL;                                    \
+        p_new->psz_returned[1] = NULL;
 
-#define INTERACT_INIT( new )                                            \
-        new = (interaction_dialog_t*)malloc(                            \
-                        sizeof( interaction_dialog_t ) );               \
-        new->psz_title = NULL;                                          \
-        new->psz_description = NULL;                                    \
-        new->psz_default_button = NULL;                                  \
-        new->psz_alternate_button = NULL;                                \
-        new->psz_other_button = NULL;                                    \
-        new->i_timeToGo = 0;                                            \
-        new->b_cancelled = VLC_FALSE;                                   \
-        new->p_private = NULL;                                          \
-        new->i_id = 0;                                                  \
-        new->i_flags = 0;                                               \
-        new->i_status = NEW_DIALOG;
+#define FORMAT_DESC \
+        va_start( args, psz_format ); \
+        vasprintf( &p_new->psz_description, psz_format, args ); \
+        va_end( args );
 
-#define INTERACT_FREE( new )                                            \
-        if( new->psz_title ) free( new->psz_title );                    \
-        if( new->psz_description ) free( new->psz_description );
-
-/** Helper function to send an error message, both in a blocking and non-blocking way
+/** Send an error message, both in a blocking and non-blocking way
  *  \param p_this     Parent vlc_object
  *  \param b_blocking Is this dialog blocking or not?
  *  \param psz_title  Title for the dialog
  *  \param psz_format The message to display
  *  */
-void __intf_UserFatal( vlc_object_t *p_this,
-                       vlc_bool_t b_blocking,
+int __intf_UserFatal( vlc_object_t *p_this, vlc_bool_t b_blocking,
                        const char *psz_title,
                        const char *psz_format, ... )
 {
     va_list args;
-    interaction_dialog_t *p_new = NULL;
-    
-    INTERACT_INIT( p_new );
+    DIALOG_INIT( ONEWAY );
     
     p_new->psz_title = strdup( psz_title );
-    p_new->i_type = INTERACT_DIALOG_ONEWAY;
-
-    va_start( args, psz_format );
-    vasprintf( &p_new->psz_description, psz_format, args );
-    va_end( args );
+    FORMAT_DESC;
 
     if( b_blocking )
         p_new->i_flags = DIALOG_BLOCKING_ERROR;
     else
         p_new->i_flags = DIALOG_NONBLOCKING_ERROR;
 
-    intf_Interact( p_this, p_new );
+    return DialogSend( p_this, p_new );
 }
 
 /** Helper function to send an warning, which is always shown non-blocking
@@ -277,25 +213,19 @@ void __intf_UserFatal( vlc_object_t *p_this,
  *  \param psz_title  Title for the dialog
  *  \param psz_format The message to display
  *  */
-void __intf_UserWarn( vlc_object_t *p_this,
-                       const char *psz_title,
-                       const char *psz_format, ... )
+int __intf_UserWarn( vlc_object_t *p_this,
+                     const char *psz_title,
+                     const char *psz_format, ... )
 {
     va_list args;
-    interaction_dialog_t *p_new = NULL;
-    
-    INTERACT_INIT( p_new );
+    DIALOG_INIT( ONEWAY );
     
     p_new->psz_title = strdup( psz_title );
-    p_new->i_type = INTERACT_DIALOG_ONEWAY;
-
-    va_start( args, psz_format );
-    vasprintf( &p_new->psz_description, psz_format, args );
-    va_end( args );
+    FORMAT_DESC
 
     p_new->i_flags = DIALOG_WARNING;
 
-    intf_Interact( p_this, p_new );
+    return DialogSend( p_this, p_new );
 }
 
 /** Helper function to ask a yes-no-cancel question
@@ -314,12 +244,8 @@ int __intf_UserYesNo( vlc_object_t *p_this,
                       const char *psz_alternate,
                       const char *psz_other )
 {
-    int i_ret;
-    interaction_dialog_t *p_new = NULL;
+    DIALOG_INIT( TWOWAY );
 
-    INTERACT_INIT( p_new );
-
-    p_new->i_type = INTERACT_DIALOG_TWOWAY;
     p_new->psz_title = strdup( psz_title );
     p_new->psz_description = strdup( psz_description );
     p_new->i_flags = DIALOG_YES_NO_CANCEL;
@@ -327,43 +253,35 @@ int __intf_UserYesNo( vlc_object_t *p_this,
     p_new->psz_alternate_button = strdup( psz_alternate );
     if( psz_other )
         p_new->psz_other_button = strdup( psz_other );
-    else
-        p_new->psz_other_button = NULL;
 
-    i_ret = intf_Interact( p_this, p_new );
-
-    return i_ret;
+    return DialogSend( p_this, p_new );
 }
 
 /** Helper function to create a dialogue showing a progress-bar with some info
  *  \param p_this           Parent vlc_object
- *  \param psz_title        Title for the dialog
+ *  \param psz_title        Title for the dialog (NULL implies main intf )
  *  \param psz_status       Current status
  *  \param f_position       Current position (0.0->100.0)
  *  \param i_timeToGo       Time (in sec) to go until process is finished
  *  \return                 Dialog id, to give to UserProgressUpdate
  */
-int __intf_UserProgress( vlc_object_t *p_this,
-                         const char *psz_title,
-                         const char *psz_status,
-                         float f_pos,
-                         int i_time )
+int __intf_Progress( vlc_object_t *p_this, const char *psz_title,
+                     const char *psz_status, float f_pos, int i_time )
 {
-    int i_ret;
-    interaction_dialog_t *p_new = NULL;
-
-    INTERACT_INIT( p_new );
-
-    p_new->i_type = INTERACT_DIALOG_ONEWAY;
-    p_new->psz_title = strdup( psz_title );
+    DIALOG_INIT( ONEWAY );
     p_new->psz_description = strdup( psz_status );
     p_new->val.f_float = f_pos;
     p_new->i_timeToGo = i_time;
 
-    p_new->i_flags = DIALOG_USER_PROGRESS;
+    if( psz_title )
+    {
+        p_new->psz_title = strdup( psz_title );
+        p_new->i_flags = DIALOG_USER_PROGRESS;
+    }
+    else
+        p_new->i_flags = DIALOG_INTF_PROGRESS;
 
-    i_ret = intf_Interact( p_this, p_new );
-
+    DialogSend( p_this, p_new );
     return p_new->i_id;
 }
 
@@ -375,17 +293,16 @@ int __intf_UserProgress( vlc_object_t *p_this,
  *  \param i_timeToGo       Time (in sec) to go until process is finished
  *  \return                 nothing
  */
-void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
-                                const char *psz_status, float f_pos, 
-                                int i_time )
+void __intf_ProgressUpdate( vlc_object_t *p_this, int i_id,
+                            const char *psz_status, float f_pos, int i_time )
 {
-    interaction_t *p_interaction = intf_InteractionGet( p_this );
+    interaction_t *p_interaction = InteractionGet( p_this );
     interaction_dialog_t *p_dialog;
 
     if( !p_interaction ) return;
 
     vlc_mutex_lock( &p_interaction->object_lock );
-    p_dialog  =  intf_InteractionGetById( p_this, i_id );
+    p_dialog  =  DialogGetById( p_interaction, i_id );
 
     if( !p_dialog )
     {
@@ -393,8 +310,7 @@ void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
         return;
     }
 
-    if( p_dialog->psz_description )
-        free( p_dialog->psz_description );
+    FREE( p_dialog->psz_description );
     p_dialog->psz_description = strdup( psz_status );
 
     p_dialog->val.f_float = f_pos;
@@ -404,29 +320,31 @@ void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
     vlc_mutex_unlock( &p_interaction->object_lock) ;
 }
 
-/** Helper function to communicate dialogue cancellations between the intf-module and caller
+/** Helper function to communicate dialogue cancellations between the
+ *  interface module and the caller
  *  \param p_this           Parent vlc_object
  *  \param i_id             Identifier of the dialogue
  *  \return                 Either true or false
  */
 vlc_bool_t __intf_UserProgressIsCancelled( vlc_object_t *p_this, int i_id )
 {
-    interaction_t *p_interaction = intf_InteractionGet( p_this );
+    interaction_t *p_interaction = InteractionGet( p_this );
     interaction_dialog_t *p_dialog;
+    vlc_bool_t b_cancel;
 
     if( !p_interaction ) return VLC_TRUE;
 
     vlc_mutex_lock( &p_interaction->object_lock );
-    p_dialog  =  intf_InteractionGetById( p_this, i_id );
-
+    p_dialog  =  DialogGetById( p_interaction, i_id );
     if( !p_dialog )
     {
         vlc_mutex_unlock( &p_interaction->object_lock ) ;
         return VLC_TRUE;
     }
 
-    vlc_mutex_unlock( &p_interaction->object_lock) ;
-    return p_dialog->b_cancelled;
+    b_cancel = p_dialog->b_cancelled;
+    vlc_mutex_unlock( &p_interaction->object_lock );
+    return b_cancel;
 }
 
 /** Helper function to make a login/password dialogue
@@ -443,22 +361,19 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
                               char **ppsz_login,
                               char **ppsz_password )
 {
-
     int i_ret;
-    interaction_dialog_t *p_new = NULL;
-
-    INTERACT_INIT( p_new );
-
+    DIALOG_INIT( TWOWAY );
     p_new->i_type = INTERACT_DIALOG_TWOWAY;
     p_new->psz_title = strdup( psz_title );
     p_new->psz_description = strdup( psz_description );
 
     p_new->i_flags = DIALOG_LOGIN_PW_OK_CANCEL;
 
-    i_ret = intf_Interact( p_this, p_new );
+    i_ret = DialogSend( p_this, p_new );
 
     if( i_ret != DIALOG_CANCELLED )
     {
+        assert( p_new->psz_returned[0] && p_new->psz_returned[1] );
         *ppsz_login = strdup( p_new->psz_returned[0] );
         *ppsz_password = strdup( p_new->psz_returned[1] );
     }
@@ -477,86 +392,21 @@ int __intf_UserStringInput( vlc_object_t *p_this,
                               const char *psz_description,
                               char **ppsz_usersString )
 {
-
     int i_ret;
-    interaction_dialog_t *p_new = NULL;
-
-    INTERACT_INIT( p_new );
-
-    p_new->i_type = INTERACT_DIALOG_TWOWAY;
+    DIALOG_INIT( TWOWAY );
     p_new->psz_title = strdup( psz_title );
     p_new->psz_description = strdup( psz_description );
 
     p_new->i_flags = DIALOG_PSZ_INPUT_OK_CANCEL;
 
-    i_ret = intf_Interact( p_this, p_new );
+    i_ret = DialogSend( p_this, p_new );
 
     if( i_ret != DIALOG_CANCELLED )
     {
+        assert( p_new->psz_returned[0] );
         *ppsz_usersString = strdup( p_new->psz_returned[0] );
     }
     return i_ret;
-}
-
-/** Helper function to create a progress-bar in the main interface with a
- *  single-line description
- *  \param p_this           Parent vlc_object
- *  \param psz_status       Current status
- *  \param f_position       Current position (0.0->100.0)
- *  \return                 Dialog id, to give to IntfProgressUpdate
- */
-int __intf_IntfProgress( vlc_object_t *p_this,
-                         const char *psz_status,
-                         float f_pos )
-{
-    int i_ret;
-    interaction_dialog_t *p_new = NULL;
-
-    INTERACT_INIT( p_new );
-
-    p_new->i_type = INTERACT_DIALOG_ONEWAY;
-    p_new->psz_description = strdup( psz_status );
-    p_new->val.f_float = f_pos;
-
-    p_new->i_flags = DIALOG_INTF_PROGRESS;
-
-    i_ret = intf_Interact( p_this, p_new );
-
-    return p_new->i_id;
-}
-
-/** Update the progress bar in the main interface
- *  \param p_this           Parent vlc_object
- *  \param i_id             Identifier of the dialog
- *  \param psz_status       New status
- *  \param f_position       New position (0.0->100.0)
- *  \return                 nothing
- */
-void __intf_IntfProgressUpdate( vlc_object_t *p_this, int i_id,
-                                const char *psz_status, float f_pos )
-{
-    interaction_t *p_interaction = intf_InteractionGet( p_this );
-    interaction_dialog_t *p_dialog;
-
-    if( !p_interaction ) return;
-
-    vlc_mutex_lock( &p_interaction->object_lock );
-    p_dialog  =  intf_InteractionGetById( p_this, i_id );
-
-    if( !p_dialog )
-    {
-        vlc_mutex_unlock( &p_interaction->object_lock ) ;
-        return;
-    }
-
-    if( p_dialog->psz_description )
-        free( p_dialog->psz_description );
-    p_dialog->psz_description = strdup( psz_status );
-
-    p_dialog->val.f_float = f_pos;
-
-    p_dialog->i_status = UPDATED_DIALOG;
-    vlc_mutex_unlock( &p_interaction->object_lock) ;
 }
 
 /** Hide an interaction dialog
@@ -566,13 +416,13 @@ void __intf_IntfProgressUpdate( vlc_object_t *p_this, int i_id,
  */
 void __intf_UserHide( vlc_object_t *p_this, int i_id )
 {
-    interaction_t *p_interaction = intf_InteractionGet( p_this );
+    interaction_t *p_interaction = InteractionGet( p_this );
     interaction_dialog_t *p_dialog;
 
     if( !p_interaction ) return;
 
     vlc_mutex_lock( &p_interaction->object_lock );
-    p_dialog  =  intf_InteractionGetById( p_this, i_id );
+    p_dialog = DialogGetById( p_interaction, i_id );
 
     if( !p_dialog )
     {
@@ -584,45 +434,35 @@ void __intf_UserHide( vlc_object_t *p_this, int i_id )
     vlc_mutex_unlock( &p_interaction->object_lock );
 }
 
-
-
 /**********************************************************************
  * The following functions are local
  **********************************************************************/
 
 /* Get the interaction object. Create it if needed */
-static interaction_t * intf_InteractionGet( vlc_object_t *p_this )
+static interaction_t * InteractionGet( vlc_object_t *p_this )
 {
     playlist_t *p_playlist;
     interaction_t *p_interaction;
 
     p_playlist = (playlist_t*) vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
-
     if( !p_playlist )
-    {
         return NULL;
-    }
 
     if( p_playlist->p_interaction == NULL )
-    {
-        intf_InteractionInit( p_playlist );
-    }
+       InteractionInit( p_playlist );
 
     p_interaction = p_playlist->p_interaction;
 
     vlc_object_release( p_playlist );
-
     return p_interaction;
 }
 
 /* Create the interaction object in the given playlist object */
-static void intf_InteractionInit( playlist_t *p_playlist )
+static void InteractionInit( playlist_t *p_playlist )
 {
-    interaction_t *p_interaction;
-
-    p_interaction = vlc_object_create( VLC_OBJECT( p_playlist ),
-                                       sizeof( interaction_t ) );
+    interaction_t *p_interaction = vlc_object_create( VLC_OBJECT( p_playlist ),
+                                                      sizeof( interaction_t ) );
     if( !p_interaction )
     {
         msg_Err( p_playlist,"out of memory" );
@@ -640,7 +480,7 @@ static void intf_InteractionInit( playlist_t *p_playlist )
 }
 
 /* Look for an interface suitable for interaction */
-static void intf_InteractionSearchInterface( interaction_t *p_interaction )
+static void InteractionSearchInterface( interaction_t *p_interaction )
 {
     vlc_list_t  *p_list;
     int          i_index;
@@ -667,108 +507,97 @@ static void intf_InteractionSearchInterface( interaction_t *p_interaction )
     vlc_list_release ( p_list );
 }
 
-/* Add a dialog to the queue and wait for answer */
-static int intf_WaitAnswer( interaction_t *p_interact,
-                            interaction_dialog_t *p_dialog )
-{
-    int i;
-    vlc_bool_t b_found = VLC_FALSE;
-    vlc_mutex_lock( &p_interact->object_lock );
-    for( i = 0 ; i< p_interact->i_dialogs; i++ )
-    {
-        if( p_interact->pp_dialogs[i]->i_id == p_dialog->i_id )
-        {
-            b_found = VLC_TRUE;
-        }
-    }
-    if( ! b_found )
-    {
-        INSERT_ELEM( p_interact->pp_dialogs,
-                     p_interact->i_dialogs,
-                     p_interact->i_dialogs,
-                     p_dialog );
-    }
-    else
-        p_dialog->i_status = UPDATED_DIALOG;
-    vlc_mutex_unlock( &p_interact->object_lock );
-
-    /// \todo Check that the initiating object is not dying
-    while( p_dialog->i_status != ANSWERED_DIALOG &&
-           p_dialog->i_status != HIDING_DIALOG &&
-           p_dialog->i_status != HIDDEN_DIALOG &&
-           !p_dialog->p_parent->b_die )
-    {
-        msleep( 100000 );
-    }
-    /// \todo locking
-    if( p_dialog->p_parent->b_die )
-    {
-        p_dialog->i_return = DIALOG_CANCELLED;
-        p_dialog->i_status = ANSWERED_DIALOG;
-    }
-    p_dialog->i_flags |= DIALOG_GOT_ANSWER;
-    return p_dialog->i_return;
-}
-
-/* Add a dialog to the queue and return */
-static int intf_Send( interaction_t *p_interact,
-                      interaction_dialog_t *p_dialog )
-{
-    int i;
-    vlc_bool_t b_found = VLC_FALSE;
-    if( p_interact == NULL ) return VLC_ENOOBJ;
-    vlc_mutex_lock( &p_interact->object_lock );
-
-    for( i = 0 ; i< p_interact->i_dialogs; i++ )
-    {
-        if( p_interact->pp_dialogs[i]->i_id == p_dialog->i_id )
-        {
-            b_found = VLC_TRUE;
-        }
-    }
-    if( !b_found )
-    {
-        INSERT_ELEM( p_interact->pp_dialogs,
-                     p_interact->i_dialogs,
-                     p_interact->i_dialogs,
-                     p_dialog );
-    }
-    else
-        p_dialog->i_status = UPDATED_DIALOG;
-    // Pretend we already retrieved the "answer"
-    p_dialog->i_flags |= DIALOG_GOT_ANSWER;
-    vlc_mutex_unlock( &p_interact->object_lock );
-    return VLC_SUCCESS;
-}
-
 /* Find an interaction dialog by its id */
-static interaction_dialog_t *intf_InteractionGetById( vlc_object_t* p_this,
-                                                       int i_id )
+static interaction_dialog_t *DialogGetById( interaction_t *p_interaction,
+                                            int i_id )
 {
-    interaction_t *p_interaction = intf_InteractionGet( p_this );
     int i;
-
-    if( !p_interaction ) return NULL;
-
     for( i = 0 ; i< p_interaction->i_dialogs; i++ )
     {
         if( p_interaction->pp_dialogs[i]->i_id == i_id )
-        {
             return p_interaction->pp_dialogs[i];
-        }
     }
     return NULL;
 }
 
-#define FREE( i ) { if( i ) free( i ); i = NULL; }
-
-static void intf_InteractionDialogDestroy( interaction_dialog_t *p_dialog )
+/* Destroy a dialog */
+static void DialogDestroy( interaction_dialog_t *p_dialog )
 {
-    FREE( p_dialog->psz_title );
-    FREE( p_dialog->psz_description );
-    FREE( p_dialog->psz_default_button );
-    FREE( p_dialog->psz_alternate_button );
-    FREE( p_dialog->psz_other_button );
-
+    FREENULL( p_dialog->psz_title );
+    FREENULL( p_dialog->psz_description );
+    FREENULL( p_dialog->psz_default_button );
+    FREENULL( p_dialog->psz_alternate_button );
+    FREENULL( p_dialog->psz_other_button );
     free( p_dialog );
 }
+
+/* Ask for the dialog to be sent to the user. Wait for answer
+ * if required */
+static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
+{
+    interaction_t *p_interaction = InteractionGet( p_this );
+
+    /* Get an id, if we don't already have one */
+    if( p_dialog->i_id == 0 )
+        p_dialog->i_id = ++p_interaction->i_last_id;
+
+    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT ) return VLC_EGENERIC;
+
+    if( config_GetInt(p_this, "interact") || 
+        p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
+        p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
+    {
+        vlc_bool_t b_found = VLC_FALSE;
+        int i;
+        p_dialog->p_interaction = p_interaction;
+        p_dialog->p_parent = p_this;
+
+        /* Check if we have already added this dialog */
+        vlc_mutex_lock( &p_interaction->object_lock );
+        for( i = 0 ; i< p_interaction->i_dialogs; i++ )
+        {
+            if( p_interaction->pp_dialogs[i]->i_id == p_dialog->i_id )
+                b_found = VLC_TRUE;
+        }
+        /* Add it to the queue, the main loop will send the orders to the
+         * interface */
+        if( ! b_found )
+        {
+            INSERT_ELEM( p_interaction->pp_dialogs,
+                         p_interaction->i_dialogs,
+                         p_interaction->i_dialogs,
+                         p_dialog );
+        }
+        else
+            p_dialog->i_status = UPDATED_DIALOG;
+        vlc_mutex_unlock( &p_interaction->object_lock );
+
+        if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY ) // Wait for answer
+        {
+            while( p_dialog->i_status != ANSWERED_DIALOG &&
+                   p_dialog->i_status != HIDING_DIALOG &&
+                   p_dialog->i_status != HIDDEN_DIALOG &&
+                   !p_dialog->p_parent->b_die )
+            {
+                msleep( 100000 );
+            }
+            /// \todo locking ?
+            if( p_dialog->p_parent->b_die )
+            {
+                p_dialog->i_return = DIALOG_CANCELLED;
+                p_dialog->i_status = ANSWERED_DIALOG;
+            }
+            p_dialog->i_flags |= DIALOG_GOT_ANSWER;
+            return p_dialog->i_return;
+        }
+        else
+        {
+            // Pretend we already retrieved the "answer"
+            p_dialog->i_flags |=  DIALOG_GOT_ANSWER;
+            vlc_mutex_unlock( &p_interaction->object_lock );
+            return VLC_SUCCESS;
+        }
+    }
+    else
+        return VLC_EGENERIC;
+} 

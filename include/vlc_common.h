@@ -618,10 +618,13 @@ static int64_t GCD( int64_t a, int64_t b )
                                       if( !var ) goto error; }
 #define DECMALLOC_VOID( var, type ) type* var = (type*)malloc( sizeof(type) );\
                                     if( !var ) return;
+#define DECMALLOC_ERR( var, type ) type* var = (type*)malloc( sizeof(type) );\
+                                    if( !var ) return VLC_ENOMEM;
 #define DECMALLOC_NULL( var, type ) type* var = (type*)malloc( sizeof(type) );\
                                     if( !var ) return NULL;
 
 #define FREENULL(a) if( a ) { free( a ); a = NULL; }
+#define FREE(a) if( a ) { free( a ); }
 
 /* Dynamic array handling: realloc array, move data, increment position */
 #if defined( _MSC_VER ) && _MSC_VER < 1300 && !defined( UNDER_CE )

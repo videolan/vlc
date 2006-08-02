@@ -2298,8 +2298,8 @@ static void AVI_IndexCreate( demux_t *p_demux )
                             stream_Size( p_demux->s );
             float f_pos = (float)i_pos;
             p_demux->p_sys->last_update = mdate();
-            intf_IntfProgressUpdate( p_demux, p_demux->p_sys->i_dialog_id,
-                                    _( "Fixing AVI Index..." ), f_pos );
+            intf_ProgressUpdate( p_demux, p_demux->p_sys->i_dialog_id,
+                                 _( "Fixing AVI Index..." ), f_pos, -1 );
         }
 
         if( AVI_PacketGetHeader( p_demux, &pk ) )

@@ -78,7 +78,6 @@
 #define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status.xml"
 #define UPDATE_VLC_MIRRORS_URL "http://update.videolan.org/mirrors.xml"
 
-#define FREE( a ) free(a);a=NULL;
 #define STRDUP( a ) ( a ? strdup( a ) : NULL )
 
 /*****************************************************************************
@@ -167,7 +166,7 @@ void FreeMirrorsList( update_t *p_update )
         free( p_update->p_mirrors[i].psz_type );
         free( p_update->p_mirrors[i].psz_base_url );
     }
-    FREE( p_update->p_mirrors );
+    FREENULL( p_update->p_mirrors );
     p_update->i_mirrors = 0;
     p_update->b_mirrors = VLC_FALSE;
 }
@@ -200,7 +199,7 @@ void FreeReleasesList( update_t *p_update )
         free( p_release->psz_svn_revision );
         free( p_release->p_files );
     }
-    FREE( p_update->p_releases );
+    FREENULL( p_update->p_releases );
     p_update->i_releases = 0;
     p_update->b_releases = VLC_FALSE;
 }
@@ -308,8 +307,8 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
                         else if( !strcmp( psz_name, "base" ) )
                             tmp_mirror.psz_base_url = STRDUP( psz_value );
                     }
-                    FREE( psz_name );
-                    FREE( psz_value );
+                    FREENULL( psz_name );
+                    FREENULL( psz_value );
                 }
                 if( !strcmp( psz_eltname, "url" ) )
                 {
@@ -325,7 +324,7 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
                     tmp_mirror.psz_type = NULL;
                     tmp_mirror.psz_base_url = NULL;
                 }
-                FREE( psz_eltname );
+                FREENULL( psz_eltname );
                 break;
 
             case XML_READER_ENDELEM:
@@ -339,16 +338,16 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
 
                 if( !strcmp( psz_eltname, "mirror" ) )
                 {
-                    FREE( tmp_mirror.psz_name );
-                    FREE( tmp_mirror.psz_location );
+                    FREENULL( tmp_mirror.psz_name );
+                    FREENULL( tmp_mirror.psz_location );
                 }
 
-                FREE( psz_eltname );
+                FREENULL( psz_eltname );
                 break;
 
             /*case XML_READER_TEXT:
                 psz_eltvalue = xml_ReaderValue( p_xml_reader );
-                FREE( psz_eltvalue );
+                FREENULL( psz_eltvalue );
                 break;*/
         }
     }
@@ -536,8 +535,8 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
                     {
                         b_arch = VLC_TRUE;
                     }
-                    FREE( psz_name );
-                    FREE( psz_value );
+                    FREENULL( psz_name );
+                    FREENULL( psz_value );
                 }
                 if( ( b_os && b_arch && strcmp( psz_eltname, "arch" ) ) )
                 {
@@ -579,13 +578,13 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
                         }
                         else
                         {
-                            FREE( tmp_release.psz_major );
-                            FREE( tmp_release.psz_minor );
-                            FREE( tmp_release.psz_revision );
-                            FREE( tmp_release.psz_extra );
-                            FREE( tmp_release.psz_svn_revision );
+                            FREENULL( tmp_release.psz_major );
+                            FREENULL( tmp_release.psz_minor );
+                            FREENULL( tmp_release.psz_revision );
+                            FREENULL( tmp_release.psz_extra );
+                            FREENULL( tmp_release.psz_svn_revision );
                             tmp_release.i_type = UPDATE_RELEASE_TYPE_STABLE;
-                            FREE( tmp_release.p_files );
+                            FREENULL( tmp_release.p_files );
                             tmp_release.i_files = 0;
                         }
                     }
@@ -607,7 +606,7 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
                         tmp_file.psz_description = NULL;
                     }
                 }
-                FREE( psz_eltname );
+                FREENULL( psz_eltname );
                 break;
 
             case XML_READER_ENDELEM:
@@ -623,7 +622,7 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
                     b_os = VLC_FALSE;
                 else if( !strcmp( psz_eltname, "arch" ) )
                     b_arch = VLC_FALSE;
-                FREE( psz_eltname );
+                FREENULL( psz_eltname );
                 break;
 
             case XML_READER_TEXT:
@@ -631,7 +630,7 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
                 if( p_release && p_release->i_files )
                     p_release->p_files[ p_release->i_files - 1 ]
                                .psz_description = STRDUP( psz_eltvalue );
-                FREE( psz_eltvalue );
+                FREENULL( psz_eltvalue );
                 break;
         }
     }
@@ -1115,17 +1114,17 @@ void update_iterator_GetData( update_iterator_t *p_uit )
 void update_iterator_ClearData( update_iterator_t *p_uit )
 {
     p_uit->file.i_type = UPDATE_FILE_TYPE_NONE;
-    FREE( p_uit->file.psz_md5 );
+    FREENULL( p_uit->file.psz_md5 );
     p_uit->file.l_size = 0;
-    FREE( p_uit->file.psz_description );
-    FREE( p_uit->file.psz_url );
-    FREE( p_uit->release.psz_version );
-    FREE( p_uit->release.psz_svn_revision );
+    FREENULL( p_uit->file.psz_description );
+    FREENULL( p_uit->file.psz_url );
+    FREENULL( p_uit->release.psz_version );
+    FREENULL( p_uit->release.psz_svn_revision );
     p_uit->release.i_type = UPDATE_RELEASE_TYPE_UNSTABLE;
     p_uit->release.i_status = UPDATE_RELEASE_STATUS_NONE;
-    FREE( p_uit->mirror.psz_name );
-    FREE( p_uit->mirror.psz_location );
-    FREE( p_uit->mirror.psz_type );
+    FREENULL( p_uit->mirror.psz_name );
+    FREENULL( p_uit->mirror.psz_location );
+    FREENULL( p_uit->mirror.psz_type );
 }
 
 /**
@@ -1308,8 +1307,8 @@ void update_download_for_real( download_thread_t *p_this )
                            p_this->psz_status, psz_s1, psz_s2, f_progress );
                 free( psz_s1 ); free( psz_s2 );
 
-                intf_UserProgressUpdate( p_vlc, i_progress,
-                                         psz_status, f_progress, 0 );
+                intf_ProgressUpdate( p_vlc, i_progress,
+                                     psz_status, f_progress, 0 );
             }
 
             free( p_buffer );
@@ -1321,7 +1320,7 @@ void update_download_for_real( download_thread_t *p_this )
             asprintf( &psz_status, "%s\nDone %s (100.00%%)",
                        p_this->psz_status, psz_s2 );
             free( psz_s2 );
-            intf_UserProgressUpdate( p_vlc, i_progress, psz_status, 100.0, 0 );
+            intf_ProgressUpdate( p_vlc, i_progress, psz_status, 100.0, 0 );
             free( psz_status );
         }
     }

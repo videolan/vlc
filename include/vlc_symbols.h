@@ -429,14 +429,14 @@ struct module_symbols_t
     char * (*FromUTF32_inner) (const uint32_t *);
     int (*__input_Read_inner) (vlc_object_t *, input_item_t *, vlc_bool_t);
     int (*__net_ConnectUDP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int hlim);
-    int (*__intf_Interact_inner) (vlc_object_t *,interaction_dialog_t *);
+    void *__intf_Interact_deprecated;
     void (*intf_InteractionManage_inner) (playlist_t *);
     void (*intf_InteractionDestroy_inner) (interaction_t *);
-    void (*__intf_UserFatal_inner) (vlc_object_t*, vlc_bool_t, const char*, const char*, ...);
+    int (*__intf_UserFatal_inner) (vlc_object_t*, vlc_bool_t, const char*, const char*, ...);
     int (*__intf_UserLoginPassword_inner) (vlc_object_t*, const char*, const char*, char **, char **);
     int (*__intf_UserYesNo_inner) (vlc_object_t*, const char*, const char*, const char*, const char*, const char*);
-    int (*__intf_UserProgress_inner) (vlc_object_t*, const char*, const char*, float, int);
-    void (*__intf_UserProgressUpdate_inner) (vlc_object_t*, int, const char*, float, int);
+    void *__intf_UserProgress_deprecated;
+    void *__intf_UserProgressUpdate_deprecated;
     void (*__intf_UserHide_inner) (vlc_object_t *, int);
     void *__stats_Create_deprecated;
     int (*__stats_Update_inner) (vlc_object_t*, counter_t *, vlc_value_t, vlc_value_t *);
@@ -517,11 +517,13 @@ struct module_symbols_t
     void *stats_TimerClean_deprecated;
     void *stats_TimersClean_deprecated;
     void (*__stats_TimersClean_inner) (vlc_object_t *);
-    void (*__intf_IntfProgressUpdate_inner) (vlc_object_t*, int, const char*, float);
-    int (*__intf_IntfProgress_inner) (vlc_object_t*, const char*, float);
+    void *__intf_IntfProgressUpdate_deprecated;
+    void *__intf_IntfProgress_deprecated;
     void *streaming_ChainToPsz_deprecated;
-    void (*__intf_UserWarn_inner) (vlc_object_t*, const char*, const char*, ...);
+    int (*__intf_UserWarn_inner) (vlc_object_t*, const char*, const char*, ...);
     vlc_bool_t (*__intf_UserProgressIsCancelled_inner) (vlc_object_t*, int);
+    int (*__intf_Progress_inner) (vlc_object_t*, const char*, const char*, float, int);
+    void (*__intf_ProgressUpdate_inner) (vlc_object_t*, int, const char*, float, int);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -908,14 +910,11 @@ struct module_symbols_t
 #  define FromUTF32 (p_symbols)->FromUTF32_inner
 #  define __input_Read (p_symbols)->__input_Read_inner
 #  define __net_ConnectUDP (p_symbols)->__net_ConnectUDP_inner
-#  define __intf_Interact (p_symbols)->__intf_Interact_inner
 #  define intf_InteractionManage (p_symbols)->intf_InteractionManage_inner
 #  define intf_InteractionDestroy (p_symbols)->intf_InteractionDestroy_inner
 #  define __intf_UserFatal (p_symbols)->__intf_UserFatal_inner
 #  define __intf_UserLoginPassword (p_symbols)->__intf_UserLoginPassword_inner
 #  define __intf_UserYesNo (p_symbols)->__intf_UserYesNo_inner
-#  define __intf_UserProgress (p_symbols)->__intf_UserProgress_inner
-#  define __intf_UserProgressUpdate (p_symbols)->__intf_UserProgressUpdate_inner
 #  define __intf_UserHide (p_symbols)->__intf_UserHide_inner
 #  define __stats_Update (p_symbols)->__stats_Update_inner
 #  define __stats_Get (p_symbols)->__stats_Get_inner
@@ -988,10 +987,10 @@ struct module_symbols_t
 #  define input_AddSubtitles (p_symbols)->input_AddSubtitles_inner
 #  define __stats_CounterCreate (p_symbols)->__stats_CounterCreate_inner
 #  define __stats_TimersClean (p_symbols)->__stats_TimersClean_inner
-#  define __intf_IntfProgressUpdate (p_symbols)->__intf_IntfProgressUpdate_inner
-#  define __intf_IntfProgress (p_symbols)->__intf_IntfProgress_inner
 #  define __intf_UserWarn (p_symbols)->__intf_UserWarn_inner
 #  define __intf_UserProgressIsCancelled (p_symbols)->__intf_UserProgressIsCancelled_inner
+#  define __intf_Progress (p_symbols)->__intf_Progress_inner
+#  define __intf_ProgressUpdate (p_symbols)->__intf_ProgressUpdate_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1381,14 +1380,11 @@ struct module_symbols_t
     ((p_symbols)->FromUTF32_inner) = FromUTF32; \
     ((p_symbols)->__input_Read_inner) = __input_Read; \
     ((p_symbols)->__net_ConnectUDP_inner) = __net_ConnectUDP; \
-    ((p_symbols)->__intf_Interact_inner) = __intf_Interact; \
     ((p_symbols)->intf_InteractionManage_inner) = intf_InteractionManage; \
     ((p_symbols)->intf_InteractionDestroy_inner) = intf_InteractionDestroy; \
     ((p_symbols)->__intf_UserFatal_inner) = __intf_UserFatal; \
     ((p_symbols)->__intf_UserLoginPassword_inner) = __intf_UserLoginPassword; \
     ((p_symbols)->__intf_UserYesNo_inner) = __intf_UserYesNo; \
-    ((p_symbols)->__intf_UserProgress_inner) = __intf_UserProgress; \
-    ((p_symbols)->__intf_UserProgressUpdate_inner) = __intf_UserProgressUpdate; \
     ((p_symbols)->__intf_UserHide_inner) = __intf_UserHide; \
     ((p_symbols)->__stats_Update_inner) = __stats_Update; \
     ((p_symbols)->__stats_Get_inner) = __stats_Get; \
@@ -1461,10 +1457,10 @@ struct module_symbols_t
     ((p_symbols)->input_AddSubtitles_inner) = input_AddSubtitles; \
     ((p_symbols)->__stats_CounterCreate_inner) = __stats_CounterCreate; \
     ((p_symbols)->__stats_TimersClean_inner) = __stats_TimersClean; \
-    ((p_symbols)->__intf_IntfProgressUpdate_inner) = __intf_IntfProgressUpdate; \
-    ((p_symbols)->__intf_IntfProgress_inner) = __intf_IntfProgress; \
     ((p_symbols)->__intf_UserWarn_inner) = __intf_UserWarn; \
     ((p_symbols)->__intf_UserProgressIsCancelled_inner) = __intf_UserProgressIsCancelled; \
+    ((p_symbols)->__intf_Progress_inner) = __intf_Progress; \
+    ((p_symbols)->__intf_ProgressUpdate_inner) = __intf_ProgressUpdate; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \
     (p_symbols)->playlist_ItemAddParent_deprecated = NULL; \
@@ -1491,6 +1487,9 @@ struct module_symbols_t
     (p_symbols)->playlist_Sort_deprecated = NULL; \
     (p_symbols)->playlist_Move_deprecated = NULL; \
     (p_symbols)->playlist_NodeRemoveParent_deprecated = NULL; \
+    (p_symbols)->__intf_Interact_deprecated = NULL; \
+    (p_symbols)->__intf_UserProgress_deprecated = NULL; \
+    (p_symbols)->__intf_UserProgressUpdate_deprecated = NULL; \
     (p_symbols)->__stats_Create_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->stats_HandlerDestroy_deprecated = NULL; \
@@ -1499,6 +1498,8 @@ struct module_symbols_t
     (p_symbols)->__intf_UserOkayCancel_deprecated = NULL; \
     (p_symbols)->stats_TimerClean_deprecated = NULL; \
     (p_symbols)->stats_TimersClean_deprecated = NULL; \
+    (p_symbols)->__intf_IntfProgressUpdate_deprecated = NULL; \
+    (p_symbols)->__intf_IntfProgress_deprecated = NULL; \
     (p_symbols)->streaming_ChainToPsz_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */
