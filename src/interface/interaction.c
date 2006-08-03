@@ -136,13 +136,10 @@ void intf_InteractionManage( playlist_t *p_playlist )
             break;
         case HIDDEN_DIALOG:
             if( !(p_dialog->i_flags & DIALOG_GOT_ANSWER) ) break;
-            if( !(p_dialog->i_flags & DIALOG_REUSABLE) )
-            {
-                p_dialog->i_action = INTERACT_DESTROY;
-                val.p_address = p_dialog;
-                if( p_interaction->p_intf )
-                    var_Set( p_interaction->p_intf, "interaction", val );
-            }
+            p_dialog->i_action = INTERACT_DESTROY;
+            val.p_address = p_dialog;
+            if( p_interaction->p_intf )
+                var_Set( p_interaction->p_intf, "interaction", val );
             break;
         case DESTROYED_DIALOG:
             // Interface has now destroyed it, remove it
@@ -175,6 +172,7 @@ void intf_InteractionManage( playlist_t *p_playlist )
         memset( p_new, 0, sizeof( interaction_dialog_t ) );               \
         p_new->b_cancelled = VLC_FALSE;                                   \
         p_new->i_status = NEW_DIALOG;                                     \
+        p_new->i_flags = 0; \
         p_new->i_type = INTERACT_DIALOG_##type;                           \
         p_new->psz_returned[0] = NULL;                                    \
         p_new->psz_returned[1] = NULL;
@@ -196,7 +194,7 @@ int __intf_UserFatal( vlc_object_t *p_this, vlc_bool_t b_blocking,
 {
     va_list args;
     DIALOG_INIT( ONEWAY );
-    
+
     p_new->psz_title = strdup( psz_title );
     FORMAT_DESC;
 

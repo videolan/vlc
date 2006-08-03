@@ -57,9 +57,9 @@ public:
 #endif
     }
     static void doButtons( QWidget *w, QBoxLayout *l,
-                           QPushButton *defaul, char *psz_default,
-                           QPushButton *alt, char *psz_alt,
-                           QPushButton *other, char *psz_other )
+                           QPushButton **defaul, char *psz_default,
+                           QPushButton **alt, char *psz_alt,
+                           QPushButton **other, char *psz_other )
     {
 #ifdef QT42
 #else
@@ -70,21 +70,21 @@ public:
 
         if( psz_default )
         {
-            defaul = new QPushButton;
-            buttons_layout->addWidget( defaul );
-            defaul->setText( qfu( psz_default ) );
+            *defaul = new QPushButton(0);
+            buttons_layout->addWidget( *defaul );
+            (*defaul)->setText( qfu( psz_default ) );
         }
         if( psz_alt )
         {
-            alt = new QPushButton;
-            buttons_layout->addWidget( alt );
-            alt->setText( qfu( psz_alt ) );
+            *alt = new QPushButton(0);
+            buttons_layout->addWidget( *alt );
+            (*alt)->setText( qfu( psz_alt ) );
         }
         if( psz_other )
         {
-            other = new QPushButton;
-            buttons_layout->addWidget( other );
-            other->setText( qfu( psz_other ) );
+            *other = new QPushButton( 0 );
+            buttons_layout->addWidget( *other );
+            (*other)->setText( qfu( psz_other ) );
         }
         l->addLayout( buttons_layout );
 #endif

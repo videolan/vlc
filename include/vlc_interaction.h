@@ -81,19 +81,17 @@ struct interaction_dialog_t
 };
 
 /**
- * Possible flags . Reusable and button types
+ * Possible flags . Dialog types
  */
-#define DIALOG_REUSABLE             0x01
-#define DIALOG_YES_NO_CANCEL        0x04
-#define DIALOG_CLEAR_NOSHOW         0x08
-#define DIALOG_GOT_ANSWER           0x10
-#define DIALOG_LOGIN_PW_OK_CANCEL   0x20
-#define DIALOG_BLOCKING_ERROR       0x24
-#define DIALOG_NONBLOCKING_ERROR    0x200
-#define DIALOG_USER_PROGRESS        0x40
-#define DIALOG_PSZ_INPUT_OK_CANCEL      0x80
+#define DIALOG_GOT_ANSWER           0x01
+#define DIALOG_YES_NO_CANCEL        0x02
+#define DIALOG_LOGIN_PW_OK_CANCEL   0x04
+#define DIALOG_PSZ_INPUT_OK_CANCEL  0x08
+#define DIALOG_BLOCKING_ERROR       0x10
+#define DIALOG_NONBLOCKING_ERROR    0x20
+#define DIALOG_WARNING              0x40
+#define DIALOG_USER_PROGRESS        0x80
 #define DIALOG_INTF_PROGRESS        0x100
-#define DIALOG_WARNING              0x400
 
 /**
  * Possible return codes

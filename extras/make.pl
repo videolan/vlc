@@ -23,30 +23,30 @@ while(<STDIN>)
      $line = $_;
      chomp $line;
      # Skip entering/leaving directories and incomplete lines
-     if( 
+     if(
 	$line =~ /make\[([0-9]*)\]:.*/ ||
-#        $line =~ /.*\s\\$/ || 
-        $line =~ /^test\s\-z\s/ || 
+#       $line =~ /.*\s\\$/ ||
+        $line =~ /^test\s\-z\s/ ||
         $line =~ /^Making\sclean\sin\s\./ ||
 	$line =~ /then\smv\s-f/ ||
+	$line =~ /.*make\s\s.*/ ||
         $line =~ /make\s\sall-recursive/ ||
         $line =~ /[A-z0-9-]*ar\s[A-z0-9]*\s([A-z0-9\-_\/\.]*)\s.*/ ||
         $line =~ /^[A-z0-9-]*ranlib\s[A-z0-9-_]*plugin(.*)/ ||
         $line =~ /^touch.*/ ||
         $line =~ /^srcdir=.*/ ||
-        $line =~ /^.* (lib[A-z0-9-_]*plugin.so).*/ || 
+        $line =~ /^.* (lib[A-z0-9-_]*plugin.so).*/ ||
         $line =~ s/^rm\s\-f\s(.*)//g )
      {}
-     # Info 
-     elsif( 
+     # Info
+     elsif(
           $line =~ s/^.* (lib.*\.so).*/ LINK    : $1/g ||
           $line =~ s/^.* (lib.*\.o)\s\.\/(.*)/ COMPILE : $2/g ||
           $line =~ s/^.* (lib.*\.o)\s`.*`(.*);\ \\/ COMPILE : $2/ ||
+          $line =~ s/.*\-o\s([^\s]*)\s`.*`([^\s]*);.*/ COMPILE : $2/g ||
           $line =~ s/^[A-z0-9-]*ranlib\s(.*)/ RANLIB  : $1/g ||
           $line =~ s/^Making\sall\sin\s(.*)/MAKE     : $1/g ||
-          $line =~ s/^Making\sclean\sin\s(.*)/CLEAN  : $1/g ||
-          $line =~ s/.*\-o\s([^\s]*)\s.*/ BUILD   : $1/g)
-
+          $line =~ s/^Making\sclean\sin\s(.*)/CLEAN  : $1/g  )
      {
 	print $info.$line.$reset."\n";
      }
@@ -63,10 +63,9 @@ while(<STDIN>)
      {
 	print $error.$line.$reset."\n";
      }
-     # Print unmatched lines 
+     # Print unmatched lines
      else
      {
  	print $line."\n";
      }
-
 }

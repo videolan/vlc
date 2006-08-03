@@ -178,6 +178,7 @@ void InteractionDialog::Render()
         buttons_sizer->AddButton( no );
         buttons_sizer->AddButton( cancel );
     }
+#if 0
     else if( p_dialog->i_flags & DIALOG_CLEAR_NOSHOW )
     {
         wxCheckBox *noshow = new wxCheckBox( buttons_panel,
@@ -196,6 +197,7 @@ void InteractionDialog::Render()
         buttons_sizer->AddButton( close );
         buttons_sizer->SetAffirmativeButton( close );
     }
+#endif
     widgets_sizer->Layout();
     widgets_panel->SetSizerAndFit( widgets_sizer );
     buttons_sizer->Realize();

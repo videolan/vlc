@@ -30,9 +30,6 @@
 
 #define AVI_DEBUG 1
 
-#define FREE( p ) \
-    if( p ) {free( p ); p = NULL; }
-
 #define __EVEN( x ) ( (x)&0x01 ? (x)+1 : (x) )
 
 static vlc_fourcc_t GetFOURCC( byte_t *p_buff )
@@ -417,11 +414,11 @@ static void AVI_ChunkFree_strf( avi_chunk_t *p_chk )
     avi_chunk_strf_t *p_strf = (avi_chunk_strf_t*)p_chk;
     if( p_strf->common.i_cat == AUDIO_ES )
     {
-        FREE( p_strf->auds.p_wf );
+        FREENULL( p_strf->auds.p_wf );
     }
     else if( p_strf->common.i_cat == VIDEO_ES )
     {
-        FREE( p_strf->vids.p_bih );
+        FREENULL( p_strf->vids.p_bih );
     }
 }
 
@@ -471,7 +468,7 @@ static void AVI_ChunkFree_idx1( avi_chunk_t *p_chk )
 {
     p_chk->idx1.i_entry_count = 0;
     p_chk->idx1.i_entry_max   = 0;
-    FREE( p_chk->idx1.entry )
+    FREENULL( p_chk->idx1.entry )
 }
 
 
@@ -556,9 +553,9 @@ static void AVI_ChunkFree_indx( avi_chunk_t *p_chk )
 {
     avi_chunk_indx_t *p_indx = (avi_chunk_indx_t*)p_chk;
 
-    FREE( p_indx->idx.std );
-    FREE( p_indx->idx.field );
-    FREE( p_indx->idx.super );
+    FREENULL( p_indx->idx.std );
+    FREENULL( p_indx->idx.field );
+    FREENULL( p_indx->idx.super );
 }
 
 
@@ -629,8 +626,8 @@ static int AVI_ChunkRead_strz( stream_t *s, avi_chunk_t *p_chk )
 static void AVI_ChunkFree_strz( avi_chunk_t *p_chk )
 {
     avi_chunk_STRING_t *p_strz = (avi_chunk_STRING_t*)p_chk;
-    FREE( p_strz->p_type );
-    FREE( p_strz->p_str );
+    FREENULL( p_strz->p_type );
+    FREENULL( p_strz->p_str );
 }
 
 static int AVI_ChunkRead_nothing( stream_t *s, avi_chunk_t *p_chk )
