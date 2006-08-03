@@ -99,7 +99,6 @@ static int Demux( demux_t *p_demux )
 
     while( (psz_line = stream_ReadLine( p_demux->s )) )
     {
-        playlist_item_t *p_item;
         char **ppsz_options = NULL;
         int  i, i_options = 0;
         char *psz_name = NULL;

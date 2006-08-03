@@ -395,7 +395,6 @@ static int DemuxStation( demux_t *p_demux )
                     ( psz_base || ( psz_rt && psz_load &&
                     ( p_sys->b_adult || strcmp( psz_rt, "NC17" ) ) ) ) )
                 {
-                    playlist_item_t *p_item;
                     char *psz_mrl = NULL;
                     if( psz_rt || psz_load )
                     {

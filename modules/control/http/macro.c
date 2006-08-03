@@ -725,7 +725,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                 case MVLC_FLOAT:
                     f = config_GetFloat( p_intf, m->param1 );
                     div = lldiv( f * 1000000 , 1000000 );
-                    sprintf( value, I64Fd".%06u", div.quot,
+                    sprintf( value, "%lld.%06u", div.quot,
                             (unsigned int)div.rem );
                     break;
                 case MVLC_STRING:

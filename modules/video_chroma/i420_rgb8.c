@@ -47,7 +47,7 @@ void E_(I420_RGB8)( vout_thread_t *p_vout, picture_t *p_src, picture_t *p_dest )
     uint8_t *p_v   = p_src->V_PIXELS;
 
     vlc_bool_t  b_hscale;                         /* horizontal scaling type */
-    unsigned int i_vscale;                          /* vertical scaling type */
+    int i_vscale;                                 /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
     unsigned int i_real_y;                                          /* y % 4 */
     int          i_right_margin;

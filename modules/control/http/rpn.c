@@ -698,7 +698,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 {
                     char psz_value[20];
                     lldiv_t value = lldiv( val.f_float * 1000000, 1000000 );
-                    snprintf( psz_value, sizeof(psz_value), I64Fd".%06u",
+                    snprintf( psz_value, sizeof(psz_value), "%lld.%06u",
                                     value.quot, (unsigned int)value.rem );
                     E_(SSPush)( st, psz_value );
                     break;
@@ -795,7 +795,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 char psz_string[20];
                 lldiv_t value = lldiv( config_GetFloat( p_intf, psz_variable )
                                        * 1000000, 1000000 );
-                snprintf( psz_string, sizeof(psz_string), I64Fd".%06u",
+                snprintf( psz_string, sizeof(psz_string), "%lld.%06u",
                           value.quot, (unsigned int)value.rem );
                 E_(SSPush)( st, psz_string );
                 break;
@@ -988,7 +988,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                     psz_val = vlc_input_item_GetInfo( p_item,
                                 _(VLC_META_INFO_CAT), _(VLC_META_TITLE) );
                     if( psz_val == NULL )
-                        psz_val == strdup( p_item->psz_name );
+                        psz_val = strdup( p_item->psz_name );
                 }
                 else if( !strcmp( psz_meta, "ALBUM" ) )
                 {

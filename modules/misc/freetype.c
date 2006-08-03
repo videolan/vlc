@@ -754,12 +754,12 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     }
 
     {
-        char *p_in_buffer, *p_out_buffer;
+        char *p_out_buffer;
+        const char *p_in_buffer = psz_string;
         size_t i_in_bytes, i_out_bytes, i_out_bytes_left, i_ret;
         i_in_bytes = strlen( psz_string );
         i_out_bytes = i_in_bytes * sizeof( uint32_t );
         i_out_bytes_left = i_out_bytes;
-        p_in_buffer = psz_string;
         p_out_buffer = (char *)psz_unicode;
         i_ret = vlc_iconv( iconv_handle, &p_in_buffer, &i_in_bytes,
                            &p_out_buffer, &i_out_bytes_left );

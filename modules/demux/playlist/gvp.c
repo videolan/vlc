@@ -66,7 +66,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 int E_(Import_GVP)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    int i_size;
     byte_t *p_peek;
 
     CHECK_PEEK( p_peek, 12 );

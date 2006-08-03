@@ -1291,7 +1291,7 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
     if( p_media->i_length > 0 )
     {
         lldiv_t d = lldiv( p_media->i_length / 1000, 1000 );
-        p += sprintf( p, "a=range:npt=0-"I64Fd".%03u\r\n", d.quot,
+        p += sprintf( p, "a=range:npt=0-%lld.%03u\r\n", d.quot,
                       (unsigned)d.rem );
     }
 

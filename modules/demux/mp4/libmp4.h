@@ -349,7 +349,7 @@ typedef struct MP4_Box_data_url_s
     uint8_t  i_version;
     uint32_t i_flags;
 
-    unsigned char *psz_location;
+    char *psz_location;
 
 } MP4_Box_data_url_t;
 
@@ -358,8 +358,8 @@ typedef struct MP4_Box_data_urn_s
     uint8_t  i_version;
     uint32_t i_flags;
 
-    unsigned char *psz_name;
-    unsigned char *psz_location;
+    char *psz_name;
+    char *psz_location;
 
 } MP4_Box_data_urn_t;
 
@@ -651,7 +651,7 @@ typedef struct MP4_Box_data_cprt_s
     /* 1 pad bit */
     unsigned char i_language[3];
 
-    unsigned char *psz_notice;
+    char *psz_notice;
 } MP4_Box_data_cprt_t;
 
 

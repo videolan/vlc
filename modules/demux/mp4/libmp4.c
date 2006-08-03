@@ -67,9 +67,9 @@
 #define MP4_GETSTRINGZ( p_str ) \
     if( ( i_read > 0 )&&(p_peek[0] ) ) \
     { \
-        p_str = calloc( sizeof( char ), __MIN( strlen( p_peek ), i_read )+1);\
-        memcpy( p_str, p_peek, __MIN( strlen( p_peek ), i_read ) ); \
-        p_str[__MIN( strlen( p_peek ), i_read )] = 0; \
+        p_str = calloc( sizeof( char ), __MIN( strlen( (char*)p_peek ), i_read )+1);\
+        memcpy( p_str, p_peek, __MIN( strlen( (char*)p_peek ), i_read ) ); \
+        p_str[__MIN( strlen( (char*)p_peek ), i_read )] = 0; \
         p_peek += strlen( p_str ) + 1; \
         i_read -= strlen( p_str ) + 1; \
     } \
@@ -80,14 +80,15 @@
 
 
 #define MP4_READBOX_ENTER( MP4_Box_data_TYPE_t ) \
-    int64_t  i_read = p_box->i_size; \
+    uint64_t  i_read = p_box->i_size; \
     uint8_t *p_peek, *p_buff; \
-    i_read = p_box->i_size; \
+    int i_actually_read; \
     if( !( p_peek = p_buff = malloc( i_read ) ) ) \
     { \
         return( 0 ); \
     } \
-    if( stream_Read( p_stream, p_peek, i_read ) < i_read )\
+    i_actually_read = stream_Read( p_stream, p_peek, i_read ); \
+    if( i_actually_read < 0 || (uint64_t)i_actually_read < i_read )\
     { \
         free( p_buff ); \
         return( 0 ); \
@@ -817,7 +818,7 @@ static void MP4_FreeBox_ctts( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_ctts->i_sample_offset );
 }
 
-static int MP4_ReadLengthDescriptor( uint8_t **pp_peek, int64_t  *i_read )
+static int MP4_ReadLengthDescriptor( uint8_t **pp_peek, uint64_t  *i_read )
 {
     unsigned int i_b;
     unsigned int i_len = 0;
@@ -2070,7 +2071,7 @@ static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
 
 static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int16_t i_length, i_dummy;
+    uint16_t i_length, i_dummy;
 
     MP4_READBOX_ENTER( MP4_Box_data_0xa9xxx_t );
 
