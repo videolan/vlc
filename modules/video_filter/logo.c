@@ -257,15 +257,14 @@ void __LoadLogoList( vlc_object_t *p_this, logo_list_t *p_logo_list )
 /*****************************************************************************
  * FreeLogoList
  *****************************************************************************/
-#define FREE( a ) free(a);a=NULL;
 void FreeLogoList( logo_list_t *p_logo_list )
 {
     unsigned int i;
-    if( p_logo_list->psz_filename ) FREE( p_logo_list->psz_filename );
+    FREENULL( p_logo_list->psz_filename );
     for( i = 0; i < p_logo_list->i_count; i++ )
     {
         logo_t *p_logo = &p_logo_list->p_logo[i];
-        if( p_logo[i].psz_file ) FREE( p_logo[i].psz_file );
+        FREENULL( p_logo[i].psz_file );
         if( p_logo[i].p_pic )
         {
             p_logo[i].p_pic->pf_release( p_logo[i].p_pic );
@@ -273,7 +272,6 @@ void FreeLogoList( logo_list_t *p_logo_list )
         }
     }
 }
-#undef FREE
 
 /*****************************************************************************
  * vout_sys_t: logo video output method descriptor

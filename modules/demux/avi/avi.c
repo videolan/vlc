@@ -80,7 +80,6 @@ static int Seek            ( demux_t *, mtime_t, int );
 static int Demux_Seekable  ( demux_t * );
 static int Demux_UnSeekable( demux_t * );
 
-#define FREE( p ) if( p ) { free( p ); (p) = NULL; }
 #define __ABS( x ) ( (x) < 0 ? (-(x)) : (x) )
 
 typedef struct
@@ -651,11 +650,11 @@ static void Close ( vlc_object_t * p_this )
     {
         if( p_sys->track[i] )
         {
-            FREE( p_sys->track[i]->p_index );
+            FREENULL( p_sys->track[i]->p_index );
             free( p_sys->track[i] );
         }
     }
-    FREE( p_sys->track );
+    FREENULL( p_sys->track );
     AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
     vlc_meta_Delete( p_sys->meta );
 

@@ -272,9 +272,6 @@ struct demux_sys_t
 #endif
     static void FreeSDP( sdp_t *p_sdp );
 
-
-#define FREE( p ) \
-    if( p ) { free( p ); (p) = NULL; }
 /*****************************************************************************
  * Open: initialize and create stuff
  *****************************************************************************/
@@ -411,11 +408,11 @@ static int OpenDemux( vlc_object_t *p_this )
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
 
-    FREE( psz_sdp );
+    FREENULL( psz_sdp );
     return VLC_SUCCESS;
 
 error:
-    FREE( psz_sdp );
+    FREENULL( psz_sdp );
     if( p_sdp ) FreeSDP( p_sdp ); p_sdp = NULL;
     stream_Seek( p_demux->s, 0 );
     return VLC_EGENERIC;
@@ -435,7 +432,7 @@ static void Close( vlc_object_t *p_this )
     {
         net_Close( p_sys->pi_fd[i] );
     }
-    FREE( p_sys->pi_fd );
+    FREENULL( p_sys->pi_fd );
 
 #if 0
     if( config_GetInt( p_sd, "sap-cache" ) )
@@ -448,7 +445,7 @@ static void Close( vlc_object_t *p_this )
     {
         RemoveAnnounce( p_sd, p_sys->pp_announces[i] );
     }
-    FREE( p_sys->pp_announces );
+    FREENULL( p_sys->pp_announces );
 
     if( p_sys->p_playlist )
     {
@@ -593,9 +590,9 @@ static int Demux( demux_t *p_demux )
     p_parent_input = p_input->input.p_item;
 
     vlc_mutex_lock( &p_parent_input->lock );
-    FREE( p_parent_input->psz_uri );
+    FREENULL( p_parent_input->psz_uri );
     p_parent_input->psz_uri = strdup( p_sdp->psz_uri );
-    FREE( p_parent_input->psz_name );
+    FREENULL( p_parent_input->psz_name );
     p_parent_input->psz_name = strdup( EnsureUTF8( p_sdp->psz_sessionname ) );
     p_parent_input->i_type = ITEM_TYPE_NET;
 
@@ -802,7 +799,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
 
     CreateAnnounce( p_sd, i_hash, p_sdp );
 
-    FREE( p_decompressed_buffer );
+    FREENULL( p_decompressed_buffer );
     return VLC_SUCCESS;
 }
 
@@ -993,7 +990,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
                 strncmp( psz_parse, "video", 5 ) )
             {
                 msg_Warn( p_obj, "unhandled media type -%s-", psz_parse );
-                FREE( psz_uri );
+                FREENULL( psz_uri );
                 return VLC_EGENERIC;
             }
 
@@ -1002,7 +999,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         else
         {
             msg_Warn( p_obj, "unable to parse m field (1)");
-            FREE( psz_uri );
+            FREENULL( psz_uri );
             return VLC_EGENERIC;
         }
 
@@ -1025,7 +1022,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         else
         {
             msg_Warn( p_obj, "unable to parse m field (2)");
-            FREE( psz_uri );
+            FREENULL( psz_uri );
             return VLC_EGENERIC;
         }
 
@@ -1075,8 +1072,8 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     asprintf( &p_sdp->psz_uri, "%s://%s@%s:%i", psz_proto, psz_source,
               psz_uri, i_port );
 
-    FREE( psz_uri );
-    FREE( psz_proto );
+    FREENULL( psz_uri );
+    FREENULL( psz_proto );
     return VLC_SUCCESS;
 }
 
@@ -1200,10 +1197,10 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 
                 p_sdp->i_session_id = atoll( psz_sess_id );
 
-                FREE( psz_sess_id );
+                FREENULL( psz_sess_id );
 
                 GET_FIELD( psz_sess_id );
-                FREE( psz_sess_id );
+                FREENULL( psz_sess_id );
 
                 GET_FIELD( p_sdp->psz_network_type );
                 GET_FIELD( p_sdp->psz_address_type );
@@ -1347,26 +1344,26 @@ static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len )
 static void FreeSDP( sdp_t *p_sdp )
 {
     int i;
-    FREE( p_sdp->psz_sdp );
-    FREE( p_sdp->psz_sessionname );
-    FREE( p_sdp->psz_connection );
-    FREE( p_sdp->psz_media );
-    FREE( p_sdp->psz_uri );
-    FREE( p_sdp->psz_username );
-    FREE( p_sdp->psz_network_type );
+    FREENULL( p_sdp->psz_sdp );
+    FREENULL( p_sdp->psz_sessionname );
+    FREENULL( p_sdp->psz_connection );
+    FREENULL( p_sdp->psz_media );
+    FREENULL( p_sdp->psz_uri );
+    FREENULL( p_sdp->psz_username );
+    FREENULL( p_sdp->psz_network_type );
 
-    FREE( p_sdp->psz_address );
-    FREE( p_sdp->psz_address_type );
+    FREENULL( p_sdp->psz_address );
+    FREENULL( p_sdp->psz_address_type );
 
     for( i= p_sdp->i_attributes - 1; i >= 0 ; i-- )
     {
         struct attribute_t *p_attr = p_sdp->pp_attributes[i];
-        FREE( p_sdp->pp_attributes[i]->psz_field );
-        FREE( p_sdp->pp_attributes[i]->psz_value );
+        FREENULL( p_sdp->pp_attributes[i]->psz_field );
+        FREENULL( p_sdp->pp_attributes[i]->psz_value );
         REMOVE_ELEM( p_sdp->pp_attributes, p_sdp->i_attributes, i);
-        FREE( p_attr );
+        FREENULL( p_attr );
     }
-    FREE( p_sdp );
+    FREENULL( p_sdp );
 }
 
 static int RemoveAnnounce( services_discovery_t *p_sd,

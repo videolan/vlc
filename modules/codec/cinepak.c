@@ -225,9 +225,6 @@ static void CloseDecoder( vlc_object_t *p_this )
 #define GET4BYTES( p ) \
     GetDWBE( p ); p+= 4;
 
-#define FREE( p ) \
-    if( p ) free( p )
-
 static void cinepak_LoadCodebook( cinepak_codebook_t *p_codebook,
                                   uint8_t *p_data, int b_grayscale )
 {

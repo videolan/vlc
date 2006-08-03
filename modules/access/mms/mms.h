@@ -34,5 +34,3 @@ void E_( MMSTUClose ) ( access_t * );
 /* mmsh */
 int  E_( MMSHOpen )  ( access_t * );
 void E_( MMSHClose ) ( access_t * );
-
-#define FREE( p ) if( p ) { free( p ); (p) = NULL; }

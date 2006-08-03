@@ -37,8 +37,6 @@
 #include "playlist.h"
 #include "vlc_meta.h"
 
-#define FREE( p ) if( p ) { free( p ); (p) = NULL; }
-
 struct demux_sys_t
 {
     char    *psz_prefix;
@@ -373,12 +371,12 @@ static int Demux( demux_t *p_demux )
                     continue;
                 }
                 /* cleanup entry */
-                FREE( psz_title_entry )
-                FREE( psz_base_entry )
-                FREE( psz_author_entry )
-                FREE( psz_copyright_entry )
-                FREE( psz_moreinfo_entry )
-                FREE( psz_abstract_entry )
+                FREENULL( psz_title_entry )
+                FREENULL( psz_base_entry )
+                FREENULL( psz_author_entry )
+                FREENULL( psz_copyright_entry )
+                FREENULL( psz_moreinfo_entry )
+                FREENULL( psz_abstract_entry )
                 b_entry = VLC_FALSE;
             }
             else if( !strncasecmp( psz_parse, "<Entry>", 7 ) )
@@ -419,7 +417,7 @@ static int Demux( demux_t *p_demux )
                             /* create the new entry */
                             asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current->p_input->psz_name ) );
                             p_entry = input_ItemNew( p_playlist, psz_string, psz_name );
-                            FREE( psz_name );
+                            FREENULL( psz_name );
                             
                             vlc_input_item_CopyOptions( p_current->p_input, p_entry );
                             p_entry->p_meta = vlc_meta_New();
@@ -452,12 +450,12 @@ static int Demux( demux_t *p_demux )
                 if( psz_moreinfo_asx ) vlc_meta_SetURL( p_current->p_input->p_meta, psz_moreinfo_asx );
                 if( psz_abstract_asx ) vlc_meta_SetDescription( p_current->p_input->p_meta, psz_abstract_asx );
                 vlc_mutex_unlock( &p_current->p_input->lock );
-                FREE( psz_base_asx );
-                FREE( psz_title_asx );
-                FREE( psz_author_asx );
-                FREE( psz_copyright_asx );
-                FREE( psz_moreinfo_asx );
-                FREE( psz_abstract_asx );
+                FREENULL( psz_base_asx );
+                FREENULL( psz_title_asx );
+                FREENULL( psz_author_asx );
+                FREENULL( psz_copyright_asx );
+                FREENULL( psz_moreinfo_asx );
+                FREENULL( psz_abstract_asx );
                 psz_parse++;
             }
             else psz_parse++;

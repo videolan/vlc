@@ -113,8 +113,6 @@ void E_(Close_QTL)( vlc_object_t *p_this )
     free( p_sys );
 }
 
-#define FREE( a ) if( a ) free( a );
-
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;

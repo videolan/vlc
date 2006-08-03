@@ -245,8 +245,6 @@ static inline int64_t MP4_GetMoviePTS(demux_sys_t *p_sys )
 static vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
                      playlist_item_t **pp_item );
 
-#define FREE( p ) if( p ) { free( p ); (p) = NULL;}
-
 /*****************************************************************************
  * Open: check file and initializes MP4 structures
  *****************************************************************************/
@@ -879,7 +877,7 @@ static void Close ( vlc_object_t * p_this )
     {
         MP4_TrackDestroy( p_demux, &p_sys->track[i_track] );
     }
-    FREE( p_sys->track );
+    FREENULL( p_sys->track );
 
     free( p_sys );
 }
@@ -1904,18 +1902,18 @@ static void MP4_TrackDestroy( demux_t *p_demux, mp4_track_t *p_track )
     {
         if( p_track->chunk )
         {
-           FREE(p_track->chunk[i_chunk].p_sample_count_dts);
-           FREE(p_track->chunk[i_chunk].p_sample_delta_dts );
+           FREENULL(p_track->chunk[i_chunk].p_sample_count_dts);
+           FREENULL(p_track->chunk[i_chunk].p_sample_delta_dts );
 
-           FREE(p_track->chunk[i_chunk].p_sample_count_pts);
-           FREE(p_track->chunk[i_chunk].p_sample_offset_pts );
+           FREENULL(p_track->chunk[i_chunk].p_sample_count_pts);
+           FREENULL(p_track->chunk[i_chunk].p_sample_offset_pts );
         }
     }
-    FREE( p_track->chunk );
+    FREENULL( p_track->chunk );
 
     if( !p_track->i_sample_size )
     {
-        FREE( p_track->p_sample_size );
+        FREENULL( p_track->p_sample_size );
     }
 }
 

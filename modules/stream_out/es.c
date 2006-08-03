@@ -102,8 +102,6 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
-
-#define FREE( p ) if( p ) { free( p ); (p) = NULL; }
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/

@@ -32,9 +32,6 @@
 
 #define ASF_DEBUG 1
 
-#define FREE( p ) \
-    if( p ) {free( p ); p = NULL; }
-
 #define GUID_FMT "0x%x-0x%x-0x%x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
 #define GUID_PRINT( guid )  \
     (guid).v1,              \
@@ -243,7 +240,7 @@ static void ASF_FreeObject_Index( asf_object_t *p_obj )
 {
     asf_object_index_t *p_index = (asf_object_index_t*)p_obj;
 
-    FREE( p_index->index_entry );
+    FREENULL( p_index->index_entry );
 }
 
 static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
@@ -485,7 +482,7 @@ static void ASF_FreeObject_header_extension( asf_object_t *p_obj )
     asf_object_header_extension_t *p_he =
         (asf_object_header_extension_t *)p_obj;
 
-    FREE( p_he->p_header_extension_data );
+    FREENULL( p_he->p_header_extension_data );
 }
 
 static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
@@ -554,8 +551,8 @@ static void ASF_FreeObject_stream_properties( asf_object_t *p_obj )
     asf_object_stream_properties_t *p_sp =
                 (asf_object_stream_properties_t*)p_obj;
 
-    FREE( p_sp->p_type_specific_data );
-    FREE( p_sp->p_error_correction_data );
+    FREENULL( p_sp->p_type_specific_data );
+    FREENULL( p_sp->p_error_correction_data );
 }
 
 
@@ -658,12 +655,12 @@ static void ASF_FreeObject_codec_list( asf_object_t *p_obj )
     for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
     {
 #define codec p_cl->codec[i_codec]
-        FREE( codec.psz_name );
-        FREE( codec.psz_description );
-        FREE( codec.p_information );
+        FREENULL( codec.psz_name );
+        FREENULL( codec.psz_description );
+        FREENULL( codec.p_information );
 #undef  codec
     }
-    FREE( p_cl->codec );
+    FREENULL( p_cl->codec );
 }
 
 /* Microsoft should go to hell. This time the length give number of bytes
@@ -734,11 +731,11 @@ static void ASF_FreeObject_content_description( asf_object_t *p_obj)
     asf_object_content_description_t *p_cd =
         (asf_object_content_description_t *)p_obj;
 
-    FREE( p_cd->psz_title );
-    FREE( p_cd->psz_author );
-    FREE( p_cd->psz_copyright );
-    FREE( p_cd->psz_description );
-    FREE( p_cd->psz_rating );
+    FREENULL( p_cd->psz_title );
+    FREENULL( p_cd->psz_author );
+    FREENULL( p_cd->psz_copyright );
+    FREENULL( p_cd->psz_description );
+    FREENULL( p_cd->psz_rating );
 }
 
 /* Language list: */
@@ -795,8 +792,8 @@ static void ASF_FreeObject_language_list( asf_object_t *p_obj)
     int i;
 
     for( i = 0; i < p_ll->i_language; i++ )
-        FREE( p_ll->ppsz_language[i] );
-    FREE( p_ll->ppsz_language );
+        FREENULL( p_ll->ppsz_language[i] );
+    FREENULL( p_ll->ppsz_language );
 }
 
 /* Stream bitrate properties */
@@ -958,9 +955,9 @@ static void ASF_FreeObject_extended_stream_properties( asf_object_t *p_obj)
     int i;
 
     for( i = 0; i < p_esp->i_stream_name_count; i++ )
-        FREE( p_esp->ppsz_stream_name[i] );
-    FREE( p_esp->pi_stream_name_language );
-    FREE( p_esp->ppsz_stream_name );
+        FREENULL( p_esp->ppsz_stream_name[i] );
+    FREENULL( p_esp->pi_stream_name_language );
+    FREENULL( p_esp->ppsz_stream_name );
 }
 
 
@@ -1002,7 +999,7 @@ static void ASF_FreeObject_advanced_mutual_exclusion( asf_object_t *p_obj)
     asf_object_advanced_mutual_exclusion_t *p_ae =
         (asf_object_advanced_mutual_exclusion_t *)p_obj;
 
-    FREE( p_ae->pi_stream_number );
+    FREENULL( p_ae->pi_stream_number );
 }
 
 
@@ -1046,8 +1043,8 @@ static void ASF_FreeObject_stream_prioritization( asf_object_t *p_obj)
     asf_object_stream_prioritization_t *p_sp =
         (asf_object_stream_prioritization_t *)p_obj;
 
-    FREE( p_sp->pi_priority_stream_number );
-    FREE( p_sp->pi_priority_flag );
+    FREENULL( p_sp->pi_priority_stream_number );
+    FREENULL( p_sp->pi_priority_flag );
 }
 
 
@@ -1153,8 +1150,8 @@ static void ASF_FreeObject_extended_content_description( asf_object_t *p_obj)
 
     for( i = 0; i < p_ec->i_count; i++ )
     {
-        FREE( p_ec->ppsz_name[i] );
-        FREE( p_ec->ppsz_value[i] );
+        FREENULL( p_ec->ppsz_name[i] );
+        FREENULL( p_ec->ppsz_value[i] );
     }
 }
 

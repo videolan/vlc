@@ -88,8 +88,6 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
                              session_descriptor_t *p_session );
 
-#define FREE( p ) if( p ) { free( p ); (p) = NULL; }
-
 
 /**
  * Create the SAP handler
@@ -146,17 +144,17 @@ void announce_SAPHandlerDestroy( sap_handler_t *p_sap )
     for( i = 0 ; i< p_sap->i_sessions ; i++)
     {
         sap_session_t *p_session = p_sap->pp_sessions[i];
-        FREE( p_session->psz_sdp );
-        FREE( p_session->psz_data );
+        FREENULL( p_session->psz_sdp );
+        FREENULL( p_session->psz_data );
         REMOVE_ELEM( p_sap->pp_sessions, p_sap->i_sessions , i );
-        FREE( p_session );
+        FREENULL( p_session );
     }
 
     /* Free the remaining addresses */
     for( i = 0 ; i< p_sap->i_addresses ; i++)
     {
         sap_address_t *p_address = p_sap->pp_addresses[i];
-        FREE( p_address->psz_address );
+        FREENULL( p_address->psz_address );
         if( p_address->i_rfd > -1 )
         {
             net_Close( p_address->i_rfd );
@@ -166,7 +164,7 @@ void announce_SAPHandlerDestroy( sap_handler_t *p_sap )
             net_Close( p_address->i_wfd );
         }
         REMOVE_ELEM( p_sap->pp_addresses, p_sap->i_addresses, i );
-        FREE( p_address );
+        FREENULL( p_address );
     }
 
     /* Free the structure */
@@ -526,8 +524,8 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
                          p_sap->i_sessions,
                          i );
 
-            FREE( p_session->p_sap->psz_sdp );
-            FREE( p_session->p_sap->psz_data );
+            FREENULL( p_session->p_sap->psz_sdp );
+            FREENULL( p_session->p_sap->psz_data );
             free( p_session->p_sap );
             break;
         }

@@ -44,8 +44,6 @@
 
 #include "vlc_httpd.h"
 
-#define FREE( p ) if( p ) { free( p); (p) = NULL; }
-
 #define DEFAULT_PORT        8080
 #define DEFAULT_SSL_PORT    8443
 

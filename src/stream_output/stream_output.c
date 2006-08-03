@@ -63,8 +63,6 @@ static int  mrl_Parse( mrl_t *p_mrl, char *psz_mrl );
 /* mrl_Clean: clean p_mrl  after a call to mrl_Parse */
 static void mrl_Clean( mrl_t *p_mrl );
 
-#define FREE( p ) if( p ) { free( p ); (p) = NULL; }
-
 /*****************************************************************************
  * sout_NewInstance: creates a new stream output instance
  *****************************************************************************/
@@ -147,8 +145,8 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
     {
         msg_Err( p_sout, "stream chain failed for `%s'", p_sout->psz_chain );
 
-        FREE( p_sout->psz_sout );
-        FREE( p_sout->psz_chain );
+        FREENULL( p_sout->psz_sout );
+        FREENULL( p_sout->psz_chain );
 
         vlc_object_detach( p_sout );
         vlc_object_destroy( p_sout );
@@ -170,8 +168,8 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     sout_StreamDelete( p_sout->p_stream );
 
     /* *** free all string *** */
-    FREE( p_sout->psz_sout );
-    FREE( p_sout->psz_chain );
+    FREENULL( p_sout->psz_sout );
+    FREENULL( p_sout->psz_chain );
 
     /* delete meta */
     if( p_sout->p_meta )
@@ -426,7 +424,7 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
 
     if( p_mux->p_module == NULL )
     {
-        FREE( p_mux->psz_mux );
+        FREENULL( p_mux->psz_mux );
 
         vlc_object_detach( p_mux );
         vlc_object_destroy( p_mux );
@@ -723,9 +721,9 @@ static int mrl_Parse( mrl_t *p_mrl, char *psz_mrl )
 /* mrl_Clean: clean p_mrl  after a call to mrl_Parse */
 static void mrl_Clean( mrl_t *p_mrl )
 {
-    FREE( p_mrl->psz_access );
-    FREE( p_mrl->psz_way );
-    FREE( p_mrl->psz_name );
+    FREENULL( p_mrl->psz_access );
+    FREENULL( p_mrl->psz_way );
+    FREENULL( p_mrl->psz_name );
 }
 
 
@@ -923,8 +921,8 @@ static void sout_CfgDestroy( sout_cfg_t *p_cfg )
 
         p_next = p_cfg->p_next;
 
-        FREE( p_cfg->psz_name );
-        FREE( p_cfg->psz_value );
+        FREENULL( p_cfg->psz_name );
+        FREENULL( p_cfg->psz_value );
         free( p_cfg );
 
         p_cfg = p_next;
@@ -1143,8 +1141,8 @@ void sout_StreamDelete( sout_stream_t *p_stream )
     vlc_object_detach( p_stream );
     if( p_stream->p_module ) module_Unneed( p_stream, p_stream->p_module );
 
-    FREE( p_stream->psz_name );
-    FREE( p_stream->psz_next );
+    FREENULL( p_stream->psz_name );
+    FREENULL( p_stream->psz_next );
 
     sout_CfgDestroy( p_stream->p_cfg );
 

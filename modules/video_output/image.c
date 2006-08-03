@@ -118,8 +118,6 @@ struct vout_sys_t
     image_handler_t *p_image;
 };
 
-#define FREE( p ) if( p ) { free( p ); p = NULL; }
-
 /*****************************************************************************
  * Create: allocates video thread
  *****************************************************************************
@@ -152,8 +150,8 @@ static int Create( vlc_object_t *p_this )
     if( !p_vout->p_sys->p_image )
     {
         msg_Err( p_this, "unable to create image handler") ;
-        FREE( p_vout->p_sys->psz_prefix );
-        FREE( p_vout->p_sys );
+        FREENULL( p_vout->p_sys->psz_prefix );
+        FREENULL( p_vout->p_sys );
         return VLC_EGENERIC;
     }
 
@@ -239,9 +237,9 @@ static void Destroy( vlc_object_t *p_this )
 
     /* Destroy structure */
     image_HandlerDelete( p_vout->p_sys->p_image );
-    FREE( p_vout->p_sys->psz_prefix );
-    FREE( p_vout->p_sys->psz_format );
-    FREE( p_vout->p_sys );
+    FREENULL( p_vout->p_sys->psz_prefix );
+    FREENULL( p_vout->p_sys->psz_format );
+    FREENULL( p_vout->p_sys );
 }
 
 /*****************************************************************************

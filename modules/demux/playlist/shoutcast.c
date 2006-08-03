@@ -174,7 +174,6 @@ static int DemuxGenre( demux_t *p_demux )
     char *psz_eltname = NULL; /* tag name */
     input_item_t *p_input;
 
-#define FREE(a) if( a ) free( a ); a = NULL;
     while( xml_ReaderRead( p_sys->p_xml_reader ) == 1 )
     {
         int i_type;
@@ -203,8 +202,8 @@ static int DemuxGenre( demux_t *p_demux )
                             xml_ReaderValue( p_sys->p_xml_reader );
                         if( !psz_attrname || !psz_attrvalue )
                         {
-                            FREE(psz_attrname);
-                            FREE(psz_attrvalue);
+                            FREENULL(psz_attrname);
+                            FREENULL(psz_attrvalue);
                             free(psz_eltname);
                             /*FIXME: isn't return a bit too much. what about break*/
                             return -1;
@@ -247,9 +246,9 @@ static int DemuxGenre( demux_t *p_demux )
                              p_sys->p_current, p_sys->p_item_in_category,
                              (p_sys->i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
                              PLAYLIST_APPEND );
-                    FREE( psz_name );
+                    FREENULL( psz_name );
                 }
-                FREE( psz_eltname );
+                FREENULL( psz_eltname );
                 break;
         }
     }
@@ -331,8 +330,8 @@ static int DemuxStation( demux_t *p_demux )
                         if( !psz_attrname || !psz_attrvalue )
                         {
                             free(psz_eltname);
-                            FREE(psz_attrname);
-                            FREE(psz_attrvalue);
+                            FREENULL(psz_attrname);
+                            FREENULL(psz_attrvalue);
                             return -1;
                         }
 
@@ -357,8 +356,8 @@ static int DemuxStation( demux_t *p_demux )
                         if( !psz_attrname || !psz_attrvalue )
                         {
                             free(psz_eltname);
-                            FREE(psz_attrname);
-                            FREE(psz_attrvalue);
+                            FREENULL(psz_attrname);
+                            FREENULL(psz_attrvalue);
                             return -1;
                         }
 
@@ -441,14 +440,14 @@ static int DemuxStation( demux_t *p_demux )
                              (p_sys->i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
                              PLAYLIST_APPEND );
 
-                    FREE( psz_name );
-                    FREE( psz_mt )
-                    FREE( psz_id )
-                    FREE( psz_br )
-                    FREE( psz_genre )
-                    FREE( psz_ct )
-                    FREE( psz_lc )
-                    FREE( psz_rt )
+                    FREENULL( psz_name );
+                    FREENULL( psz_mt )
+                    FREENULL( psz_id )
+                    FREENULL( psz_br )
+                    FREENULL( psz_genre )
+                    FREENULL( psz_ct )
+                    FREENULL( psz_lc )
+                    FREENULL( psz_rt )
                 }
                 free( psz_eltname );
                 break;
@@ -456,7 +455,6 @@ static int DemuxStation( demux_t *p_demux )
     }
     return 0;
 }
-#undef FREE
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {

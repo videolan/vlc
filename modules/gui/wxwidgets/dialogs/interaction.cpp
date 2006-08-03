@@ -28,8 +28,6 @@
 
 #include <wx/statline.h>
 
-#define FREE( i ) { if( i ) free( i ); i = NULL; }
-
 /*****************************************************************************
  * Event Table.
  *****************************************************************************/
@@ -236,8 +234,8 @@ void InteractionDialog::OnClear( wxCommandEvent& event )
     for( i = p_dialog->i_widgets - 1 ; i >= 0 ; i-- )
     {
         user_widget_t *p_widget = p_dialog->pp_widgets[i];
-        FREE( p_widget->psz_text );
-        FREE( p_widget->val.psz_string );
+        FREENULL( p_widget->psz_text );
+        FREENULL( p_widget->val.psz_string );
         REMOVE_ELEM( p_dialog->pp_widgets, p_dialog->i_widgets, i );
         free( p_widget );
     }
@@ -271,5 +269,3 @@ void InteractionDialog::Finish( int i_ret )
     p_dialog->i_return = i_ret;
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
 }
-
-#undef FREE

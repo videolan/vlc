@@ -912,14 +912,14 @@ static void MMSClose( access_t  *p_access )
         net_Close( p_sys->i_handle_udp );
     }
 
-    FREE( p_sys->p_cmd );
-    FREE( p_sys->p_media );
-    FREE( p_sys->p_header );
+    FREENULL( p_sys->p_cmd );
+    FREENULL( p_sys->p_media );
+    FREENULL( p_sys->p_header );
 
-    FREE( p_sys->psz_server_version );
-    FREE( p_sys->psz_tool_version );
-    FREE( p_sys->psz_update_player_url );
-    FREE( p_sys->psz_encryption_type );
+    FREENULL( p_sys->psz_server_version );
+    FREENULL( p_sys->psz_tool_version );
+    FREENULL( p_sys->psz_update_player_url );
+    FREENULL( p_sys->psz_encryption_type );
 }
 
 /****************************************************************************
@@ -1271,7 +1271,7 @@ static int  mms_ParsePacket( access_t *p_access,
     }
     else
     {
-        FREE( p_sys->p_media );
+        FREENULL( p_sys->p_media );
         p_sys->p_media = p_packet;
         p_sys->i_media = i_packet_length - 8;
         p_sys->i_media_used = 0;

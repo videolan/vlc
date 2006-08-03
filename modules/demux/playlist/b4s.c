@@ -269,14 +269,12 @@ static int Demux( demux_t *p_demux )
                          p_item_in_category, (i_parent_id > 0 ) ? VLC_TRUE:
                                                  VLC_FALSE, PLAYLIST_APPEND );
 
-#define FREE(a) if( a ) free( a ); a = NULL;
-                    FREE( psz_name );
-                    FREE( psz_mrl );
-                    FREE( psz_genre );
-                    FREE( psz_bitrate );
-                    FREE( psz_listeners );
-                    FREE( psz_now );
-#undef FREE
+                    FREENULL( psz_name );
+                    FREENULL( psz_mrl );
+                    FREENULL( psz_genre );
+                    FREENULL( psz_bitrate );
+                    FREENULL( psz_listeners );
+                    FREENULL( psz_now );
                 }
                 free( psz_elname );
                 psz_elname = strdup("");

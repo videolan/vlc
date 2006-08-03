@@ -44,8 +44,6 @@
 #include "info.h"
 #include "intf.h"
 
-#define FREE_AND_NULL(ptr) free(ptr); ptr = NULL;
-
 extern void VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
                           const vcdinfo_itemid_t *p_itemid );
 
@@ -1002,14 +1000,14 @@ VCDClose ( vlc_object_t *p_this )
 
     if( p_vcdplayer->p_input ) vlc_object_release( p_vcdplayer->p_input );
 
-    FREE_AND_NULL( p_vcdplayer->p_entries );
-    FREE_AND_NULL( p_vcdplayer->p_segments );
-    FREE_AND_NULL( p_vcdplayer->psz_source );
-    FREE_AND_NULL( p_vcdplayer->track );
-    FREE_AND_NULL( p_vcdplayer->segment );
-    FREE_AND_NULL( p_vcdplayer->entry );
-    FREE_AND_NULL( p_access->psz_demux );
-    FREE_AND_NULL( p_vcdplayer );
+    FREENULL( p_vcdplayer->p_entries );
+    FREENULL( p_vcdplayer->p_segments );
+    FREENULL( p_vcdplayer->psz_source );
+    FREENULL( p_vcdplayer->track );
+    FREENULL( p_vcdplayer->segment );
+    FREENULL( p_vcdplayer->entry );
+    FREENULL( p_access->psz_demux );
+    FREENULL( p_vcdplayer );
     p_vcd_access    = NULL;
 }
 

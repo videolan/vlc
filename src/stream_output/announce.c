@@ -31,12 +31,6 @@
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-#define FREE( p ) if( p ) { free( p ); (p) = NULL; }
-
-
 /****************************************************************************
  * Sout-side functions
  ****************************************************************************/
@@ -183,10 +177,10 @@ void sout_AnnounceSessionDestroy( session_descriptor_t *p_session )
 {
     if( p_session )
     {
-        FREE( p_session->psz_name );
-        FREE( p_session->psz_group );
-        FREE( p_session->psz_uri );
-        FREE( p_session->psz_sdp );
+        FREENULL( p_session->psz_name );
+        FREENULL( p_session->psz_group );
+        FREENULL( p_session->psz_uri );
+        FREENULL( p_session->psz_sdp );
         free( p_session );
     }
 }

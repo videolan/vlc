@@ -77,10 +77,6 @@ static int HttpCallback( httpd_file_sys_t *p_args,
  *****************************************************************************/
 int E_(HTTPOpen)( access_t *p_access )
 {
-#define FREE( x )                                                           \
-    if ( (x) != NULL )                                                      \
-        free( x );
-
     access_sys_t *p_sys = p_access->p_sys;
     char          *psz_address, *psz_cert = NULL, *psz_key = NULL,
                   *psz_ca = NULL, *psz_crl = NULL, *psz_user = NULL,
@@ -195,8 +191,6 @@ int E_(HTTPOpen)( access_t *p_access )
     p_sys->p_httpd_file = f;
     p_sys->p_httpd_redir = httpd_RedirectNew( p_sys->p_httpd_host,
                                               "/index.html", "/" );
-
-#undef FREE
 
     return VLC_SUCCESS;
 }

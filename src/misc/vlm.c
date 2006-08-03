@@ -45,9 +45,6 @@
 #include <vlc_vod.h>
 #include <charset.h>
 
-#define FREE( p ) \
-        if( p ) { free( p ); (p) = NULL; }
-
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -158,11 +155,11 @@ void vlm_Delete( vlm_t *p_vlm )
     vlc_mutex_destroy( &p_vlm->lock );
 
     while( p_vlm->i_media ) vlm_MediaDelete( p_vlm, p_vlm->media[0], NULL );
-    FREE( p_vlm->media );
+    FREENULL( p_vlm->media );
 
     while( p_vlm->i_schedule ) vlm_ScheduleDelete( p_vlm,
                                                    p_vlm->schedule[0], NULL );
-    FREE( p_vlm->schedule );
+    FREENULL( p_vlm->schedule );
 
     vlc_object_detach( p_vlm );
     vlc_object_destroy( p_vlm );
@@ -833,8 +830,8 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
     }
 
 success:
-    for( i = 0 ; i < i_command ; i++ ) FREE( ppsz_command[i] );
-    FREE( ppsz_command );
+    for( i = 0 ; i < i_command ; i++ ) FREENULL( ppsz_command[i] );
+    FREENULL( ppsz_command );
     *pp_message = p_message;
 
     return VLC_SUCCESS;
@@ -843,8 +840,8 @@ syntax_error:
     p_message = vlm_MessageNew( ppsz_command[0], "Wrong command syntax" );
 
 error:
-    for( i = 0 ; i < i_command ; i++ ) FREE( ppsz_command[i] );
-    FREE( ppsz_command );
+    for( i = 0 ; i < i_command ; i++ ) FREENULL( ppsz_command[i] );
+    FREENULL( ppsz_command );
     *pp_message = p_message;
 
     return VLC_EGENERIC;
