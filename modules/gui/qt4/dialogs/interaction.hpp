@@ -43,6 +43,7 @@ public:
     void Update();
 
 private:
+    QWidget *panel;
     intf_thread_t *p_intf;
     interaction_dialog_t *p_dialog;
     Ui::LoginDialog *uiLogin;

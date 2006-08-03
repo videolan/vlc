@@ -35,13 +35,18 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     uiLogin = NULL;
     uiProgress = NULL;
     uiInput = NULL;
+    panel = NULL;
 
     if( p_dialog->i_flags & DIALOG_BLOCKING_ERROR )
     {
+        i_ret = QMessageBox::critical( this, qfu( p_dialog->psz_title ),
+                                       qfu( p_dialog->psz_description ),
+                                       QMessageBox::Ok, 0, 0 );
     }
     else if( p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
         // Create instance of the errors dialog
+        //  QApplication::style()->standardPixmap(QStyle::SP_MessageBoxCritical)
     }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
@@ -57,13 +62,14 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     }
     else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
     {
+        panel = new QWidget( 0 );
         uiLogin = new Ui::LoginDialog;
-        uiLogin->setupUi( this );
+        uiLogin->setupUi( panel );
         uiLogin->description->setText( qfu(p_dialog->psz_description) );
+        layout->addWidget( panel );
     }
     else if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
     {
-
     }
     else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
     {
@@ -103,6 +109,7 @@ void InteractionDialog::Update()
 
 InteractionDialog::~InteractionDialog()
 {
+    if( panel ) delete panel;
     if( uiInput ) delete uiInput;
     if( uiProgress) delete uiProgress;
     if( uiLogin ) delete uiLogin;

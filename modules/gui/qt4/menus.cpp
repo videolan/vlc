@@ -459,8 +459,6 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf, QMenu *current,
  * Private methods.
  *****************************************************************************/
 
-#define FREE(x) if(x) { free(x);x=NULL;}
-
 static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object,
                          bool b_root = TRUE )
 {
@@ -548,7 +546,7 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
         }
         else
             CreateChoicesMenu( menu, psz_var, p_object, true );
-        FREE( text.psz_string );
+        FREENULL( text.psz_string );
         return;
     }
 
@@ -569,7 +567,7 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
                           p_object->i_object_id, val, i_type, val.b_bool );
         break;
     }
-    FREE( text.psz_string );
+    FREENULL( text.psz_string );
 }
 
 
