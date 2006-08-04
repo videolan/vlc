@@ -274,7 +274,7 @@ vlc_module_begin();
     set_section( N_("On Screen Display"), NULL );
     add_bool( SOUT_CFG_PREFIX "osd", 0, NULL, OSD_TEXT,
               OSD_LONGTEXT, VLC_FALSE );
-    
+
     set_section( N_("Miscellaneous"), NULL );
     add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
                  THREADS_LONGTEXT, VLC_TRUE );
@@ -400,7 +400,7 @@ struct sout_stream_sys_t
     int             i_canvas_width;
     int             i_canvas_height;
     int             i_canvas_aspect;
-    
+
     /* Video, calculated */
     int             i_src_x_offset;
     int             i_src_y_offset;
@@ -502,6 +502,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_acodec )
     {
+#if 1
         if( (strncmp( (char *)&p_sys->i_acodec, "mp3", 3) == 0) &&
                             (p_sys->i_channels > 2) )
         {
@@ -509,6 +510,7 @@ static int Open( vlc_object_t *p_this )
                       p_sys->i_channels );
             p_sys->i_channels = 2;
         }
+#endif
         msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
                  (char *)&p_sys->i_acodec, p_sys->i_sample_rate,
                  p_sys->i_channels, p_sys->i_abitrate / 1000 );
@@ -615,12 +617,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_padd_left = val.i_int;
     var_Get( p_stream, SOUT_CFG_PREFIX "paddright", &val );
     p_sys->i_padd_right = val.i_int;
-    
+
     var_Get( p_stream, SOUT_CFG_PREFIX "canvas-width", &val );
     p_sys->i_canvas_width = val.i_int;
     var_Get( p_stream, SOUT_CFG_PREFIX "canvas-height", &val );
     p_sys->i_canvas_height = val.i_int;
-    
+
     var_Get( p_stream, SOUT_CFG_PREFIX "canvas-aspect", &val );
     if ( val.psz_string )
     {
@@ -1420,7 +1422,7 @@ static int transcode_audio_process( sout_stream_t *p_stream,
     int i;
     *out = NULL;
     input_thread_t *p_input = NULL;
-    
+
     if( p_stream->p_parent->p_parent && p_stream->p_parent->p_parent->
                                 i_object_type == VLC_OBJECT_INPUT )
         p_input = (input_thread_t *)p_stream->p_parent->p_parent;
@@ -2125,11 +2127,11 @@ static int transcode_video_process( sout_stream_t *p_stream,
             /* Check if we need a filter for chroma conversion or resizing */
             if( id->p_decoder->fmt_out.video.i_chroma !=
                 id->p_encoder->fmt_in.video.i_chroma ||
-                
+
                 (int)id->p_decoder->fmt_out.video.i_width != p_sys->i_crop_width ||
                 p_sys->i_crop_width != p_sys->i_nopadd_width ||
                 p_sys->i_nopadd_width != (int)id->p_encoder->fmt_out.video.i_width ||
-                
+
                 (int)id->p_decoder->fmt_out.video.i_height != p_sys->i_crop_height ||
                 p_sys->i_crop_height != p_sys->i_nopadd_height ||
                 p_sys->i_nopadd_height != (int)id->p_encoder->fmt_out.video.i_height)
