@@ -82,8 +82,8 @@ class Position
 
         /// Create a new position relative to the given box
         Position( int left, int top, int right, int bottom, const Box &rBox,
-                  Ref_t refLeftTop = kLeftTop,
-                  Ref_t refRightBottom = kLeftTop );
+                  Ref_t refLeftTop, Ref_t refRightBottom,
+                  bool xKeepRatio, bool yKeepRatio );
 
         ~Position() {}
 
@@ -108,6 +108,13 @@ class Position
         const Box &m_rBox;
         Ref_t m_refLeftTop;
         Ref_t m_refRighBottom;
+        /// "Keep ratio" mode
+        bool m_xKeepRatio;
+        bool m_yKeepRatio;
+        /// Initial width ratio (usually between 0 and 1)
+        double m_xRatio;
+        /// Initial height ratio (usually between 0 and 1)
+        double m_yRatio;
 };
 
 

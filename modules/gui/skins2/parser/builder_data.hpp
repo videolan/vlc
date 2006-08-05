@@ -203,14 +203,16 @@ m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_range( range ), m_priori
     /// Type definition
     struct Button
     {
-        Button( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & upId, const string & downId, const string & overId, const string & actionId, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_actionId( actionId ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Button( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & visible, const string & upId, const string & downId, const string & overId, const string & actionId, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_visible( visible ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_actionId( actionId ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
         int m_xPos;
         int m_yPos;
         string m_leftTop;
         string m_rightBottom;
+        bool m_xKeepRatio;
+        bool m_yKeepRatio;
         string m_visible;
         string m_upId;
         string m_downId;
@@ -228,14 +230,16 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     /// Type definition
     struct Checkbox
     {
-        Checkbox( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & up1Id, const string & down1Id, const string & over1Id, const string & up2Id, const string & down2Id, const string & over2Id, const string & state, const string & action1, const string & action2, const string & tooltip1, const string & tooltip2, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_up1Id( up1Id ), m_down1Id( down1Id ), m_over1Id( over1Id ), m_up2Id( up2Id ), m_down2Id( down2Id ), m_over2Id( over2Id ), m_state( state ), m_action1( action1 ), m_action2( action2 ), m_tooltip1( tooltip1 ), m_tooltip2( tooltip2 ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Checkbox( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & visible, const string & up1Id, const string & down1Id, const string & over1Id, const string & up2Id, const string & down2Id, const string & over2Id, const string & state, const string & action1, const string & action2, const string & tooltip1, const string & tooltip2, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_visible( visible ), m_up1Id( up1Id ), m_down1Id( down1Id ), m_over1Id( over1Id ), m_up2Id( up2Id ), m_down2Id( down2Id ), m_over2Id( over2Id ), m_state( state ), m_action1( action1 ), m_action2( action2 ), m_tooltip1( tooltip1 ), m_tooltip2( tooltip2 ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
         int m_xPos;
         int m_yPos;
         string m_leftTop;
         string m_rightBottom;
+        bool m_xKeepRatio;
+        bool m_yKeepRatio;
         string m_visible;
         string m_up1Id;
         string m_down1Id;
@@ -259,14 +263,16 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     /// Type definition
     struct Image
     {
-        Image( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & bmpId, const string & actionId, const string & action2Id, const string & resize, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_bmpId( bmpId ), m_actionId( actionId ), m_action2Id( action2Id ), m_resize( resize ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Image( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & visible, const string & bmpId, const string & actionId, const string & action2Id, const string & resize, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_visible( visible ), m_bmpId( bmpId ), m_actionId( actionId ), m_action2Id( action2Id ), m_resize( resize ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
         int m_xPos;
         int m_yPos;
         string m_leftTop;
         string m_rightBottom;
+        bool m_xKeepRatio;
+        bool m_yKeepRatio;
         string m_visible;
         string m_bmpId;
         string m_actionId;
@@ -295,8 +301,8 @@ m_id( id ), m_file( file ) {}
     /// Type definition
     struct Text
     {
-        Text( const string & id, int xPos, int yPos, const string & visible, const string & fontId, const string & text, int width, const string & leftTop, const string & rightBottom, uint32_t color, const string & scrolling, const string & alignment, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( fontId ), m_text( text ), m_width( width ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_color( color ), m_scrolling( scrolling ), m_alignment( alignment ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Text( const string & id, int xPos, int yPos, const string & visible, const string & fontId, const string & text, int width, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, uint32_t color, const string & scrolling, const string & alignment, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( fontId ), m_text( text ), m_width( width ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_color( color ), m_scrolling( scrolling ), m_alignment( alignment ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
         int m_xPos;
@@ -307,6 +313,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( font
         int m_width;
         string m_leftTop;
         string m_rightBottom;
+        bool m_xKeepRatio;
+        bool m_yKeepRatio;
         uint32_t m_color;
         string m_scrolling;
         string m_alignment;
@@ -321,8 +329,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( font
     /// Type definition
     struct RadialSlider
     {
-        RadialSlider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & sequence, int nbImages, float minAngle, float maxAngle, const string & value, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_sequence( sequence ), m_nbImages( nbImages ), m_minAngle( minAngle ), m_maxAngle( maxAngle ), m_value( value ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        RadialSlider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & sequence, int nbImages, float minAngle, float maxAngle, const string & value, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_sequence( sequence ), m_nbImages( nbImages ), m_minAngle( minAngle ), m_maxAngle( maxAngle ), m_value( value ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
         string m_visible;
@@ -330,6 +338,8 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
         int m_yPos;
         string m_leftTop;
         string m_rightBottom;
+        bool m_xKeepRatio;
+        bool m_yKeepRatio;
         string m_sequence;
         int m_nbImages;
         float m_minAngle;
@@ -347,8 +357,8 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
     /// Type definition
     struct Slider
     {
-        Slider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & upId, const string & downId, const string & overId, const string & points, int thickness, const string & value, const string & imageId, int nbHoriz, int nbVert, int padHoriz, int padVert, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_points( points ), m_thickness( thickness ), m_value( value ), m_imageId( imageId ), m_nbHoriz( nbHoriz ), m_nbVert( nbVert ), m_padHoriz( padHoriz ), m_padVert( padVert ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Slider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & upId, const string & downId, const string & overId, const string & points, int thickness, const string & value, const string & imageId, int nbHoriz, int nbVert, int padHoriz, int padVert, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_points( points ), m_thickness( thickness ), m_value( value ), m_imageId( imageId ), m_nbHoriz( nbHoriz ), m_nbVert( nbVert ), m_padHoriz( padHoriz ), m_padVert( padVert ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
         string m_visible;
@@ -356,6 +366,8 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
         int m_yPos;
         string m_leftTop;
         string m_rightBottom;
+        bool m_xKeepRatio;
+        bool m_yKeepRatio;
         string m_upId;
         string m_downId;
         string m_overId;
@@ -379,8 +391,8 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
     /// Type definition
     struct List
     {
-        List( const string & id, int xPos, int yPos, const string & visible, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, const string & bgImageId, const string & fgColor, const string & playColor, const string & bgColor1, const string & bgColor2, const string & selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_fontId( fontId ), m_var( var ), m_bgImageId( bgImageId ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        List( const string & id, int xPos, int yPos, const string & visible, int width, int height, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & fontId, const string & var, const string & bgImageId, const string & fgColor, const string & playColor, const string & bgColor1, const string & bgColor2, const string & selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_fontId( fontId ), m_var( var ), m_bgImageId( bgImageId ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
         int m_xPos;
@@ -390,6 +402,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width
         int m_height;
         string m_leftTop;
         string m_rightBottom;
+        bool m_xKeepRatio;
+        bool m_yKeepRatio;
         string m_fontId;
         string m_var;
         string m_bgImageId;
@@ -409,8 +423,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width
     /// Type definition
     struct Tree
     {
-        Tree( const string & id, int xPos, int yPos, const string & visible, const string & flat, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, const string & bgImageId, const string & itemImageId, const string & openImageId, const string & closedImageId, const string & fgColor, const string & playColor, const string & bgColor1, const string & bgColor2, const string & selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_flat( flat ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_fontId( fontId ), m_var( var ), m_bgImageId( bgImageId ), m_itemImageId( itemImageId ), m_openImageId( openImageId ), m_closedImageId( closedImageId ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Tree( const string & id, int xPos, int yPos, const string & visible, const string & flat, int width, int height, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & fontId, const string & var, const string & bgImageId, const string & itemImageId, const string & openImageId, const string & closedImageId, const string & fgColor, const string & playColor, const string & bgColor1, const string & bgColor2, const string & selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_flat( flat ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_fontId( fontId ), m_var( var ), m_bgImageId( bgImageId ), m_itemImageId( itemImageId ), m_openImageId( openImageId ), m_closedImageId( closedImageId ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
         int m_xPos;
@@ -421,6 +435,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_flat( flat )
         int m_height;
         string m_leftTop;
         string m_rightBottom;
+        bool m_xKeepRatio;
+        bool m_yKeepRatio;
         string m_fontId;
         string m_var;
         string m_bgImageId;
@@ -443,8 +459,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_flat( flat )
     /// Type definition
     struct Video
     {
-        Video( const string & id, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, const string & visible, bool autoResize, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_autoResize( autoResize ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Video( const string & id, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & visible, bool autoResize, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_visible( visible ), m_autoResize( autoResize ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
         int m_xPos;
@@ -453,6 +469,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height )
         int m_height;
         string m_leftTop;
         string m_rightBottom;
+        bool m_xKeepRatio;
+        bool m_yKeepRatio;
         string m_visible;
         bool m_autoResize;
         string m_help;

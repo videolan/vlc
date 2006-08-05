@@ -114,6 +114,8 @@
         y           CDATA   "0"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
+        xkeepratio  CDATA   "false"
+        ykeepratio  CDATA   "false"
         image       CDATA   #REQUIRED
         action      CDATA   "none"
         action2     CDATA   "none"
@@ -128,6 +130,8 @@
         y           CDATA   "0"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
+        xkeepratio  CDATA   "false"
+        ykeepratio  CDATA   "false"
         up          CDATA   #REQUIRED
         down        CDATA   "none"
         over        CDATA   "none"
@@ -143,6 +147,8 @@
         y            CDATA   "0"
         lefttop      CDATA   "lefttop"
         rightbottom  CDATA   "lefttop"
+        xkeepratio  CDATA   "false"
+        ykeepratio  CDATA   "false"
         up1          CDATA   #REQUIRED
         down1        CDATA   "none"
         over1        CDATA   "none"
@@ -164,6 +170,8 @@
         y           CDATA   "0"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
+        xkeepratio  CDATA   "false"
+        ykeepratio  CDATA   "false"
         up          CDATA   #REQUIRED
         down        CDATA   "none"
         over        CDATA   "none"
@@ -191,6 +199,8 @@
         y           CDATA   "0"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
+        xkeepratio  CDATA   "false"
+        ykeepratio  CDATA   "false"
         sequence    CDATA   #REQUIRED
         nbimages    CDATA   #REQUIRED
         minangle    CDATA   "0"
@@ -208,6 +218,8 @@
         width       CDATA   "0"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
+        xkeepratio  CDATA   "false"
+        ykeepratio  CDATA   "false"
         text        CDATA   ""
         font        CDATA   #REQUIRED
         color       CDATA   "#000000"
@@ -225,6 +237,8 @@
         height      CDATA   "0"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
+        xkeepratio  CDATA   "false"
+        ykeepratio  CDATA   "false"
         font        CDATA   #REQUIRED
         bgimage     CDATA   "none"
         fgcolor     CDATA   "#000000"
@@ -244,6 +258,8 @@
         height      CDATA   "0"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
+        xkeepratio  CDATA   "false"
+        ykeepratio  CDATA   "false"
         font        CDATA   #REQUIRED
         bgimage     CDATA   "none"
         itemimage   CDATA   "none"
@@ -267,6 +283,8 @@
         height      CDATA   "0"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
+        xkeepratio  CDATA   "false"
+        ykeepratio  CDATA   "false"
         autoresize  CDATA   "true"
         help        CDATA   ""
     >

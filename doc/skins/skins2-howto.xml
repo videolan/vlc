@@ -398,7 +398,7 @@ difficulty to understand how VLC skins work.</para>
   </sect4>
   <sect4 id="anchorrange">
     <title>range</title>
-    <para>Range of action of the anchor, in pixels. Default is "10".</para>
+    <para>Range of action of the anchor, in pixels.</para>
     <para>Default value: 10</para>
   </sect4>
 </sect3>
@@ -406,7 +406,7 @@ difficulty to understand how VLC skins work.</para>
 
 <sect3 id="commattr">
   <title>Attributes common to all the controls</title>
-  <para>The following attributes are common to all the controls (Image, Button, Checkbox, Text, Slider, RadialSlider, Playtree, Video)</para>
+  <para>The following attributes are common to all the controls (Image, Button, Checkbox, Text, Slider, RadialSlider, Playlist, Playtree, Video)</para>
   <sect4 id="attrid">
     <title>id</title>
     <para>Identifiant of the control. Currently unused.</para>
@@ -436,6 +436,18 @@ difficulty to understand how VLC skins work.</para>
     <title>rightbottom</title>
     <para>Indicate to which corner of the Layout the bottom-right-hand corner of this control is attached, in case of resizing.</para>
     <para>Default value: lefttop</para>
+  </sect4>
+  <sect4 id="xkeepratio">
+    <title>xkeepratio</title>
+    <para>When set to true, the behaviour of the horizontal resizing is changed. Instead of taking into account the <link linkend="lefttop">lefttop</link> and <link linkend="rightbottom">rightbottom</link> attributes to determine how the control will be moved/resized, only its initial position inside the <link linkend="Layout">Layout</link> matters. For example, if initially the space to the left of the control is twice as big as the one to its right, this will stay the same during any horizontal resizing. The width of the control stays constant.</para>
+    <para>This attribute can be particularly useful to keep a control centered in the layout, without resizing it (to resize it, you would rather use the lefttop/rightbottom attributes).</para>
+    <para>Default value: false</para>
+  </sect4>
+  <sect4 id="ykeepratio">
+    <title>ykeepratio</title>
+    <para>When set to true, the behaviour of the vertical resizing is changed. Instead of taking into account the <link linkend="lefttop">lefttop</link> and <link linkend="rightbottom">rightbottom</link> attributes to determine how the control will be moved/resized, only its initial position inside the <link linkend="Layout">Layout</link> matters. For example, if initially the space to the top of the control is twice as big as the one to its bottom, this will stay the same during any vertical resizing. The height of the control stays constant.</para>
+    <para>This attribute can be particularly useful to keep a control centered in the layout, without resizing it (to resize it, you would rather use the lefttop/rightbottom attributes).</para>
+    <para>Default value: false</para>
   </sect4>
   <sect4 id="help">
     <title>help</title>

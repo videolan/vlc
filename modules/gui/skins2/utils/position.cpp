@@ -35,83 +35,186 @@ Rect::Rect( int left, int top, int right, int bottom ):
 
 
 Position::Position( int left, int top, int right, int bottom, const Box &rBox,
-                    Ref_t refLeftTop, Ref_t refRightBottom ):
+                    Ref_t refLeftTop, Ref_t refRightBottom, bool xKeepRatio,
+                    bool yKeepRatio ):
     m_left( left ), m_top( top ), m_right( right ), m_bottom( bottom ),
     m_rBox( rBox ), m_refLeftTop( refLeftTop ),
-    m_refRighBottom( refRightBottom )
+    m_refRighBottom( refRightBottom ), m_xKeepRatio( xKeepRatio ),
+    m_yKeepRatio( yKeepRatio )
 {
+    // Here is how the resizing algorithm works:
+    //
+    //  - if we "keep the ratio" (xkeepratio="true" in the XML), the relative
+    //    position of the control in the layout (i.e. the given rBox) is
+    //    saved, and will be kept constant. The size of the control will not
+    //    be changed, only its position may vary. To do that, we consider the
+    //    part of the layout to the left of the control (for an horizontal
+    //    resizing) and the part of the layout to the right of the control,
+    //    and we make sure that the ratio between their widths is constant.
+    //
+    //  - if we don't keep the ratio, the resizing algorithm is completely
+    //    different. We consider that the top left hand corner of the control
+    //    ("lefttop" attribute in the XML) is linked to one of the 4 corners
+    //    of the layouts ("lefttop", "leftbottom", "righttop" and
+    //    "rightbottom" values for the attribute). Same thing for the bottom
+    //    right hand corner ("rightbottom" attribute). When resizing occurs,
+    //    the linked corners will move together, and this will drive the
+    //    moving/resizing of the control.
+
+    // Initialize the horizontal ratio
+    if( m_xKeepRatio )
+    {
+        // First compute the width of the box minus the width of the control
+        int freeSpace = m_rBox.getWidth() - (m_right - m_left);
+        // Instead of computing left/right, we compute left/(left+right),
+        // which is more convenient in my opinion.
+        if( freeSpace != 0 )
+        {
+            m_xRatio = (double)m_left / (double)freeSpace;
+        }
+        else
+        {
+            // If the control has the same size as the box, we can't compute
+            // the ratio in the same way (otherwise we would divide by zero).
+            // So we consider that the intent was to keep the control centered
+            // (if you are unhappy with this, go and fix your skin :))
+            m_xRatio = 0.5;
+        }
+    }
+
+    // Initial the vertical ratio
+    if( m_yKeepRatio )
+    {
+        // First compute the width of the box minus the width of the control
+        int freeSpace = m_rBox.getHeight() - (m_bottom - m_top);
+        // Instead of computing left/right, we compute left/(left+right),
+        // which is more convenient in my opinion.
+        if( freeSpace != 0 )
+        {
+            m_yRatio = (double)m_top / (double)freeSpace;
+        }
+        else
+        {
+            // If the control has the same size as the box, we can't compute
+            // the ratio in the same way (otherwise we would divide by zero).
+            // So we consider that the intent was to keep the control centered
+            // (if you are unhappy with this, go and fix your skin :))
+            m_yRatio = 0.5;
+        }
+    }
+
 }
 
 
 int Position::getLeft() const
 {
-    switch( m_refLeftTop )
+    if( m_xKeepRatio )
     {
-        case kLeftTop:
-        case kLeftBottom:
-            return m_left;
-            break;
-        case kRightTop:
-        case kRightBottom:
-            return m_rBox.getWidth() + m_left - 1;
-            break;
+        // Ratio mode
+        // First compute the width of the box minus the width of the control
+        int freeSpace = m_rBox.getWidth() - (m_right - m_left);
+        return (int)(m_xRatio * freeSpace);
     }
-    // Avoid a warning
-    return 0;
+    else
+    {
+        switch( m_refLeftTop )
+        {
+            case kLeftTop:
+            case kLeftBottom:
+                return m_left;
+                break;
+            case kRightTop:
+            case kRightBottom:
+                return m_rBox.getWidth() + m_left - 1;
+                break;
+        }
+        // Avoid a warning
+        return 0;
+    }
 }
 
 
 int Position::getTop() const
 {
-    switch( m_refLeftTop )
+    if( m_yKeepRatio )
     {
-        case kLeftTop:
-        case kRightTop:
-            return m_top;
-            break;
-        case kRightBottom:
-        case kLeftBottom:
-            return m_rBox.getHeight() + m_top - 1;
-            break;
+        // Ratio mode
+        // First compute the height of the box minus the height of the control
+        int freeSpace = m_rBox.getHeight() - (m_bottom - m_top);
+        return (int)(m_yRatio * freeSpace);
     }
-    // Avoid a warning
-    return 0;
+    else
+    {
+        switch( m_refLeftTop )
+        {
+            case kLeftTop:
+            case kRightTop:
+                return m_top;
+                break;
+            case kRightBottom:
+            case kLeftBottom:
+                return m_rBox.getHeight() + m_top - 1;
+                break;
+        }
+        // Avoid a warning
+        return 0;
+    }
 }
 
 
 int Position::getRight() const
 {
-    switch( m_refRighBottom )
+    if( m_xKeepRatio )
     {
-        case kLeftTop:
-        case kLeftBottom:
-            return m_right;
-            break;
-        case kRightTop:
-        case kRightBottom:
-            return m_rBox.getWidth() + m_right - 1;
-            break;
+        // Ratio mode
+        // The width of the control being constant, we can use the result of
+        // getLeft() (this will avoid rounding issues).
+        return getLeft() + m_right - m_left;
     }
-    // Avoid a warning
-    return 0;
+    else
+    {
+        switch( m_refRighBottom )
+        {
+            case kLeftTop:
+            case kLeftBottom:
+                return m_right;
+                break;
+            case kRightTop:
+            case kRightBottom:
+                return m_rBox.getWidth() + m_right - 1;
+                break;
+        }
+        // Avoid a warning
+        return 0;
+    }
 }
 
 
 int Position::getBottom() const
 {
-    switch( m_refRighBottom )
+    if( m_yKeepRatio )
     {
-        case kLeftTop:
-        case kRightTop:
-            return m_bottom;
-            break;
-        case kLeftBottom:
-        case kRightBottom:
-            return m_rBox.getHeight() + m_bottom - 1;
-            break;
+        // Ratio mode
+        // The height of the control being constant, we can use the result of
+        // getTop() (this will avoid rounding issues).
+        return getTop() + m_bottom - m_top;
     }
-    // Avoid a warning
-    return 0;
+    else
+    {
+        switch( m_refRighBottom )
+        {
+            case kLeftTop:
+            case kRightTop:
+                return m_bottom;
+                break;
+            case kLeftBottom:
+            case kRightBottom:
+                return m_rBox.getHeight() + m_bottom - 1;
+                break;
+        }
+        // Avoid a warning
+        return 0;
+    }
 }
 
 
