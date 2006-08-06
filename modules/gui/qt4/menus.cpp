@@ -135,6 +135,8 @@ void QVLCMenu::createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
                            SLOT( simpleAppendDialog() ) );
     manageMenu->addSeparator();
     manageMenu->addMenu( SDMenu( p_intf ) );
+
+    bar->addMenu( manageMenu );
 }
 
 QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )

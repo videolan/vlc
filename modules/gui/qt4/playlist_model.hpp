@@ -118,6 +118,7 @@ public:
     int i_items_to_append;
     void Rebuild();
     void rebuildRoot( playlist_item_t * );
+    bool hasRandom(); bool hasLoop(); bool hasRepeat();
 private:
     void addCallbacks();
     void delCallbacks();
@@ -148,6 +149,9 @@ private:
     int i_cached_input_id;
 public slots:
     void activateItem( const QModelIndex &index );
+    void setRandom( bool );
+    void setLoop( bool );
+    void setRepeat( bool );
 friend class PLItem;
 };
 

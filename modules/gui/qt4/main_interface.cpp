@@ -51,8 +51,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     ui.hboxLayout->insertWidget( 0, slider );
     ui.prevButton->setText( "" );
     ui.nextButton->setText( "" );
-    ui.playButton->setText( "" ); 
-    ui.stopButton->setText( "" ); 
+    ui.playButton->setText( "" );
+    ui.stopButton->setText( "" );
     ui.prevButton->setIcon( QIcon( ":/pixmaps/previous.png" ) );
     ui.nextButton->setIcon( QIcon( ":/pixmaps/next.png" ) );
     ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );

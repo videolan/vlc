@@ -325,6 +325,36 @@ int PLModel::rowCount(const QModelIndex &parent) const
     return parentItem->childCount();
 }
 
+/************************* General playlist status ***********************/
+
+bool PLModel::hasRandom()
+{
+    if( var_GetBool( p_playlist, "random" ) ) return true;
+    return false;
+}
+bool PLModel::hasRepeat()
+{
+    if( var_GetBool( p_playlist, "repeat" ) ) return true;
+    return false;
+}
+bool PLModel::hasLoop()
+{
+    if( var_GetBool( p_playlist, "loop" ) ) return true;
+    return false;
+}
+void PLModel::setLoop( bool on )
+{
+    var_SetBool( p_playlist, "loop", on ? VLC_TRUE:VLC_FALSE );
+}
+void PLModel::setRepeat( bool on )
+{
+    var_SetBool( p_playlist, "repeat", on ? VLC_TRUE:VLC_FALSE );
+}
+void PLModel::setRandom( bool on )
+{
+    var_SetBool( p_playlist, "random", on ? VLC_TRUE:VLC_FALSE );
+}
+
 /************************* Lookups *****************************/
 
 PLItem *PLModel::FindById( PLItem *root, int i_id )
@@ -467,12 +497,22 @@ void PLModel::Rebuild()
     qDeleteAll( rootItem->children );
     /* Recreate from root */
     UpdateNodeChildren( rootItem );
+    if( p_playlist->status.p_item )
+    {
+        fprintf( stderr, "Playlist is playing" );
+        PLItem *currentItem = FindByInput( rootItem,
+                                     p_playlist->status.p_item->p_input->i_id );
+        if( currentItem )
+        {
+            fprintf( stderr, "Updating item\n" );
+            UpdateTreeItem( p_playlist->status.p_item, currentItem,
+                            true, false );
+        }
+    }
     PL_UNLOCK;
 
     /* And signal the view */
     emit layoutChanged();
-    /// \todo  Force current item to be updated
-
     addCallbacks();
 }
 

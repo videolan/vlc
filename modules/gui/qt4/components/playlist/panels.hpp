@@ -31,6 +31,7 @@
 
 class QTreeView;
 class PLModel;
+class QPushButton;
 
 /**
  * \todo Share a single model between views using a filterproxy
@@ -62,10 +63,13 @@ public:
 private:
     PLModel *model;
     QTreeView *view;
+    QPushButton *repeatButton , *randomButton;
 public slots:
     virtual void setRoot( int );
 private slots:
     void handleExpansion( const QModelIndex& );
+    void toggleRandom();
+    void toggleRepeat();
 };
 
 #endif

@@ -130,6 +130,11 @@ public:
         QVLCFrame::fixStyle( this );
     }
     virtual ~QVLCMW() {};
+    void toggleVisible()
+    {
+        if( isVisible() ) hide();
+        else show();
+    }
 protected:
     intf_thread_t *p_intf;
     QSize mainSize;
@@ -138,10 +143,8 @@ protected:
     {
         QSettings settings( "VideoLAN", "VLC" );
         settings.beginGroup( name );
-        mainSize = settings.value( "size", defSize ).toSize();
-        QPoint npos = settings.value( "pos", QPoint( 0,0 ) ).toPoint();
-        if( npos.x() > 0 )
-            move( npos );
+        resize( settings.value( "size", defSize ).toSize() );
+        move( settings.value( "pos", QPoint( 0,0 ) ).toPoint() );
         settings.endGroup();
     }
     void readSettings( QString name )

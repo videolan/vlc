@@ -24,6 +24,8 @@
 #include "playlist_model.hpp"
 #include "components/playlist/panels.hpp"
 #include <QTreeView>
+#include <QPushButton>
+#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include "qt4.hpp"
@@ -35,7 +37,6 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
                                   PLPanel( _parent, _p_intf )
 {
     model = new PLModel( p_playlist, p_root, -1, this );
-    model->Rebuild();
     view = new QTreeView( 0 );
     view->setModel(model);
     view->header()->resizeSection( 0, 300 );
@@ -47,24 +48,66 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
              SIGNAL( dataChanged( const QModelIndex&, const QModelIndex& ) ),
              this, SLOT( handleExpansion( const QModelIndex& ) ) );
 
+    model->Rebuild();
+
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing( 0 ); layout->setMargin( 0 );
+
+    QHBoxLayout *buttons = new QHBoxLayout();
+    repeatButton = new QPushButton( this );
+    buttons->addWidget( repeatButton );
+    randomButton = new QPushButton( this );
+    buttons->addWidget( randomButton );
+
+    if( model->hasRandom() ) randomButton->setText( qtr( "Random" ) );
+    else randomButton->setText( qtr( "No random" ) );
+
+    if( model->hasRepeat() ) repeatButton->setText( qtr( "Repeat One" ) );
+    else if( model->hasLoop() ) repeatButton->setText( qtr( "Repeat All" ) );
+    else repeatButton->setText( qtr( "No Repeat" ) );
+
+    connect( repeatButton, SIGNAL( clicked() ), this, SLOT( toggleRepeat() ));
+    connect( randomButton, SIGNAL( clicked() ), this, SLOT( toggleRandom() ));
+
     layout->addWidget( view );
+    layout->addLayout( buttons );
     setLayout( layout );
+}
+
+void StandardPLPanel::toggleRepeat()
+{
+    if( model->hasRepeat() )
+    {
+        model->setRepeat( false ); model->setLoop( true );
+        repeatButton->setText( qtr( "Repeat All" ) );
+    }
+    else if( model->hasLoop() )
+    {
+        model->setRepeat( false ) ; model->setLoop( false );
+        repeatButton->setText( qtr( "No Repeat" ) );
+    }
+    else
+    {
+        model->setRepeat( true );
+        repeatButton->setText( qtr( "Repeat One" ) );
+    }
+}
+
+void StandardPLPanel::toggleRandom()
+{
+    bool prev = model->hasRandom();
+    model->setRandom( !prev );
+    randomButton->setText( prev ? qtr( "No Random" ) : qtr( "Random" ) );
 }
 
 void StandardPLPanel::handleExpansion( const QModelIndex &index )
 {
-    fprintf( stderr, "Checking expansion\n" );
     QModelIndex parent;
     if( model->isCurrent( index ) )
     {
-        fprintf( stderr, "It is the current one\n" ) ;
         parent = index;
         while( parent.isValid() )
         {
-            fprintf( stderr, "Expanding %s\n",
-         (model->data( parent, Qt::DisplayRole )).toString().toUtf8().data() );
             view->setExpanded( parent, true );
             parent = model->parent( parent );
         }

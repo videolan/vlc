@@ -27,25 +27,30 @@
 #include "components/playlist/panels.hpp"
 #include "components/playlist/selector.hpp"
 #include <QHBoxLayout>
+#include "menus.hpp"
 
 PlaylistDialog *PlaylistDialog::instance = NULL;
 
-PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     setWindowTitle( qtr( "Playlist" ) );
-    selector = new PLSelector( this, p_intf, THEPL );
-    selector->setMaximumWidth( 150 );
+    QWidget *main = new QWidget( this );
+    setCentralWidget( main );
+    QVLCMenu::createPlMenuBar( menuBar(), p_intf );
 
-    rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( this, p_intf,
-                                   THEPL, THEPL->p_local_category ) );
+    selector = new PLSelector( centralWidget(), p_intf, THEPL );
+    selector->setMaximumWidth( 140 );
+
+    rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( centralWidget(),
+                              p_intf, THEPL, THEPL->p_local_category ) );
     connect( selector, SIGNAL( activated( int ) ),
              rightPanel, SLOT( setRoot( int ) ) );
 
     QHBoxLayout *layout = new QHBoxLayout();
     layout->addWidget( selector, 0 );
     layout->addWidget( rightPanel, 10 );
+    centralWidget()->setLayout( layout );
     readSettings( "playlist", QSize( 600,300 ) );
-    setLayout( layout );
 }
 
 PlaylistDialog::~PlaylistDialog()

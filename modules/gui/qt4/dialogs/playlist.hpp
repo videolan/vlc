@@ -29,7 +29,7 @@
 class PLSelector;
 class PLPanel;
 
-class PlaylistDialog : public QVLCFrame
+class PlaylistDialog : public QVLCMW
 {
     Q_OBJECT;
 public:
