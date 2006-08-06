@@ -736,7 +736,6 @@ static void ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
     }
 }
 
-
 static int GetDescrLength( int i_size )
 {
     if( i_size < 0x00000080 )
