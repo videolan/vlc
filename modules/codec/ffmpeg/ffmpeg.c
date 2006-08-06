@@ -254,7 +254,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* *** get a p_context *** */
     p_context = avcodec_alloc_context();
     if( !p_context )
-        return -ENOMEM;
+        return VLC_ENOMEM;
     p_context->debug = config_GetInt( p_dec, "ffmpeg-debug" );
     p_context->opaque = (void *)p_this;
 
