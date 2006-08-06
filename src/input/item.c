@@ -100,7 +100,7 @@ static void vlc_input_item_Destroy ( gc_object_t *p_this )
                          p_playlist->i_input_items, i );
         }
 #endif
-        for( i = 0 ; i< p_playlist->pp_input_items[i] ; i++ )
+        for( i = 0 ; i< p_playlist->i_input_items ; i++ )
         {
             if( p_playlist->pp_input_items[i]->i_id == p_input->i_id )
             {
