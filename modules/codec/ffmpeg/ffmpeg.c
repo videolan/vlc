@@ -222,8 +222,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     int i_cat, i_codec_id, i_result;
     char *psz_namecodec;
 
-    AVCodecContext *p_context;
-    AVCodec        *p_codec;
+    AVCodecContext *p_context = NULL;
+    AVCodec        *p_codec = NULL;
 
     /* *** determine codec type *** */
     if( !E_(GetFfmpegCodec)( p_dec->fmt_in.i_codec, &i_cat, &i_codec_id,
@@ -244,7 +244,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     E_(InitLibavcodec)(p_this);
 
     /* *** ask ffmpeg for a decoder *** */
-    if( !( p_codec = avcodec_find_decoder( i_codec_id ) ) )
+    p_codec = avcodec_find_decoder( i_codec_id );
+    if( !p_codec )
     {
         msg_Dbg( p_dec, "codec not found (%s)", psz_namecodec );
         return VLC_EGENERIC;
@@ -252,6 +253,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* *** get a p_context *** */
     p_context = avcodec_alloc_context();
+    if( !p_context )
+        return -ENOMEM;
     p_context->debug = config_GetInt( p_dec, "ffmpeg-debug" );
     p_context->opaque = (void *)p_this;
 
@@ -325,7 +328,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     {
         if( p_sys->p_context->extradata )
             free( p_sys->p_context->extradata );
-
+        p_sys->p_context->extradata = NULL;
         vlc_mutex_lock( lockval.p_address );
         avcodec_close( p_sys->p_context );
         vlc_mutex_unlock( lockval.p_address );
