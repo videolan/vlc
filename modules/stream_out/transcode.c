@@ -35,8 +35,8 @@
 #include <vlc/sout.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
-#include "vlc_filter.h"
-#include "vlc_osd.h"
+#include <vlc_filter.h>
+#include <vlc_osd.h>
 
 #define MASTER_SYNC_MAX_DRIFT 100000
 
@@ -135,6 +135,10 @@
 #define ACHANS_TEXT N_("Audio channels")
 #define ACHANS_LONGTEXT N_( \
     "Number of audio channels in the transcoded streams." )
+#define AFILTER_TEXT N_("Audio filter")
+#define AFILTER_LONGTEXT N_( \
+    "Audio filters will be applied to the audio streams (after conversion " \
+    "filters are applied). You must enter a comma-separated list of filters." )
 
 #define SENC_TEXT N_("Subtitles encoder")
 #define SENC_LONGTEXT N_( \
@@ -259,6 +263,9 @@ vlc_module_begin();
                  ARATE_LONGTEXT, VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "audio-sync", 0, NULL, ASYNC_TEXT,
               ASYNC_LONGTEXT, VLC_FALSE );
+    add_module_list_cat( SOUT_CFG_PREFIX "afilter", SUBCAT_AUDIO_MISC,
+                     NULL, NULL,
+                     AFILTER_TEXT, AFILTER_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Overlays/Subtitles"), NULL );
     add_string( SOUT_CFG_PREFIX "senc", NULL, NULL, SENC_TEXT,
@@ -289,8 +296,9 @@ static const char *ppsz_sout_options[] = {
     "canvas-width", "canvas-height", "canvas-aspect", 
     "scale", "fps", "width", "height", "vfilter", "deinterlace",
     "deinterlace-module", "threads", "hurry-up", "aenc", "acodec", "ab",
-    "samplerate", "channels", "senc", "scodec", "soverlay", "sfilter",
-    "osd", "audio-sync", "high-priority", "maxwidth", "maxheight", NULL
+    "afilter", "samplerate", "channels", "senc", "scodec", "soverlay",
+    "sfilter", "osd", "audio-sync", "high-priority", "maxwidth", "maxheight",
+    NULL
 };
 
 /*****************************************************************************
@@ -347,6 +355,7 @@ static int pi_channels_maps[6] =
 
 #define PICTURE_RING_SIZE 64
 #define SUBPICTURE_RING_SIZE 20
+#define TRANSCODE_FILTERS 10
 
 struct sout_stream_sys_t
 {
@@ -367,6 +376,9 @@ struct sout_stream_sys_t
     int             i_sample_rate;
     int             i_channels;
     int             i_abitrate;
+    char            *psz_afilters[TRANSCODE_FILTERS];
+    sout_cfg_t      *p_afilters_cfg[TRANSCODE_FILTERS];
+    int             i_afilters;
 
     /* Video */
     vlc_fourcc_t    i_vcodec;   /* codec video (0 if not transcode) */
@@ -383,8 +395,8 @@ struct sout_stream_sys_t
     int             i_threads;
     vlc_bool_t      b_high_priority;
     vlc_bool_t      b_hurry_up;
-    char            *psz_vfilters[10];
-    sout_cfg_t      *p_vfilters_cfg[10];
+    char            *psz_vfilters[TRANSCODE_FILTERS];
+    sout_cfg_t      *p_vfilters_cfg[TRANSCODE_FILTERS];
     int             i_vfilters;
 
     int             i_crop_top;
@@ -502,7 +514,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_acodec )
     {
-#if 1
+#if 0
         if( (strncmp( (char *)&p_sys->i_acodec, "mp3", 3) == 0) &&
                             (p_sys->i_channels > 2) )
         {
@@ -514,6 +526,30 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
                  (char *)&p_sys->i_acodec, p_sys->i_sample_rate,
                  p_sys->i_channels, p_sys->i_abitrate / 1000 );
+    }
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "afilter", &val );
+    p_sys->i_afilters = 0;
+    if( val.psz_string && *val.psz_string )
+    {
+        char *psz_parser = val.psz_string;
+
+        while( (psz_parser != NULL) && (*psz_parser != '\0')
+                && (p_sys->i_afilters < TRANSCODE_FILTERS) )
+        {
+            psz_parser = sout_CfgCreate(
+                                   &p_sys->psz_afilters[p_sys->i_afilters],
+                                   &p_sys->p_afilters_cfg[p_sys->i_afilters],
+                                   psz_parser );
+            p_sys->i_afilters++;
+            if( (psz_parser != NULL) && (*psz_parser != '\0') ) psz_parser++;
+        }
+    }
+    if( val.psz_string ) free( val.psz_string );
+    if( p_sys->i_afilters < TRANSCODE_FILTERS-1 )
+    {
+        p_sys->psz_afilters[p_sys->i_afilters] = NULL;
+        p_sys->p_afilters_cfg[p_sys->i_afilters] = NULL;
     }
 
     /* Video transcoding parameters */
@@ -570,7 +606,8 @@ static int Open( vlc_object_t *p_this )
     {
         char *psz_parser = val.psz_string;
 
-        while( psz_parser != NULL && *psz_parser != '\0' )
+        while( (psz_parser != NULL) && (*psz_parser != '\0')
+                && (p_sys->i_vfilters < TRANSCODE_FILTERS) )
         {
             psz_parser = sout_CfgCreate(
                                    &p_sys->psz_vfilters[p_sys->i_vfilters],
@@ -581,8 +618,11 @@ static int Open( vlc_object_t *p_this )
         }
     }
     if( val.psz_string ) free( val.psz_string );
-    p_sys->psz_vfilters[p_sys->i_vfilters] = NULL;
-    p_sys->p_vfilters_cfg[p_sys->i_vfilters] = NULL;
+    if( p_sys->i_vfilters < TRANSCODE_FILTERS-1 )
+    {
+        p_sys->psz_vfilters[p_sys->i_vfilters] = NULL;
+        p_sys->p_vfilters_cfg[p_sys->i_vfilters] = NULL;
+    }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "deinterlace", &val );
     p_sys->b_deinterlace = val.b_bool;
@@ -849,10 +889,11 @@ struct sout_stream_id_t
     decoder_t       *p_decoder;
 
     /* Filters */
-    filter_t        *pp_filter[10];
+    filter_t        *pp_filter[TRANSCODE_FILTERS];
     int             i_filter;
-    filter_t        *pp_vfilter[10];
-    int             i_vfilter;
+    /* User specified filters */
+    filter_t        *pp_ufilter[TRANSCODE_FILTERS];
+    int             i_ufilter;
 
     /* Encoder */
     encoder_t       *p_encoder;
@@ -1205,8 +1246,10 @@ int audio_BitsPerSample( vlc_fourcc_t i_format )
 static filter_t *transcode_audio_filter_new( sout_stream_t *p_stream,
                                              sout_stream_id_t *id,
                                              es_format_t *p_fmt_in,
-                                             es_format_t *p_fmt_out )
+                                             es_format_t *p_fmt_out,
+                                             char *psz_name )
 {
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
     filter_t *p_filter = vlc_object_create( p_stream, VLC_OBJECT_FILTER );
 
     vlc_object_attach( p_filter, p_stream );
@@ -1214,11 +1257,13 @@ static filter_t *transcode_audio_filter_new( sout_stream_t *p_stream,
 
     p_filter->fmt_in = *p_fmt_in;
     p_filter->fmt_out = *p_fmt_out;
+    if( psz_name )
+        p_filter->p_cfg = p_sys->p_afilters_cfg[id->i_ufilter];
 
-    p_filter->p_module = module_Need( p_filter, "audio filter2", 0, 0 );
+    p_filter->p_module = module_Need( p_filter, "audio filter2", psz_name, 0 );
     if( p_filter->p_module )
     {
-        p_filter->fmt_out.audio.i_bitspersample = 
+        p_filter->fmt_out.audio.i_bitspersample =
             audio_BitsPerSample( p_filter->fmt_out.i_codec );
         *p_fmt_in = p_filter->fmt_out;
     }
@@ -1237,7 +1282,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     es_format_t fmt_last;
-    int i_pass = 6;
+    int i;
 
     /*
      * Open decoder
@@ -1312,24 +1357,26 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         fmt_out.i_codec = fmt_out.audio.i_format = VLC_FOURCC('f','l','3','2');
 
         id->pp_filter[id->i_filter] =
-            transcode_audio_filter_new( p_stream, id, &fmt_last, &fmt_out );
+            transcode_audio_filter_new( p_stream, id, &fmt_last, &fmt_out, NULL );
 
         if( id->pp_filter[id->i_filter] ) id->i_filter++;
     }
 
-    while( i_pass-- )
+    for( i = 0; i < TRANSCODE_FILTERS; i++ )
     {
-        if( fmt_last.audio.i_channels !=
-            id->p_encoder->fmt_in.audio.i_channels ||
-            fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate ||
-            fmt_last.i_codec != id->p_encoder->fmt_in.i_codec )
+        if( (fmt_last.audio.i_channels !=
+            id->p_encoder->fmt_in.audio.i_channels) ||
+            (fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate) ||
+            (fmt_last.i_codec != id->p_encoder->fmt_in.i_codec) )
         {
             id->pp_filter[id->i_filter] =
                 transcode_audio_filter_new( p_stream, id, &fmt_last,
-                                            &id->p_encoder->fmt_in );
+                                            &id->p_encoder->fmt_in, NULL );
 
-            if( id->pp_filter[id->i_filter] ) id->i_filter++;
-            else break;
+            if( id->pp_filter[id->i_filter] )
+                id->i_filter++;
+            else
+                break;
         }
     }
 
@@ -1341,6 +1388,21 @@ static int transcode_audio_new( sout_stream_t *p_stream,
                  (char *)&id->p_encoder->fmt_in.i_codec );
         transcode_audio_close( p_stream, id );
         return VLC_EGENERIC;
+    }
+
+    /* Load user specified audio filters now */
+    for( i = 0; (i < p_sys->i_afilters) &&
+                (id->i_ufilter < TRANSCODE_FILTERS); i++ )
+    {
+        id->pp_ufilter[id->i_ufilter] =
+            transcode_audio_filter_new( p_stream, id, &fmt_last,
+                                        &id->p_encoder->fmt_in,
+                                        p_sys->psz_afilters[i] );
+
+        if( id->pp_ufilter[id->i_ufilter] )
+            id->i_ufilter++;
+        else
+            break;
     }
 
     if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )
@@ -1410,6 +1472,13 @@ static void transcode_audio_close( sout_stream_t *p_stream,
             module_Unneed( id->pp_filter[i], id->pp_filter[i]->p_module );
         vlc_object_destroy( id->pp_filter[i] );
     }
+    for( i = 0; i < id->i_ufilter; i++ )
+    {
+        vlc_object_detach( id->pp_ufilter[i] );
+        if( id->pp_ufilter[i]->p_module )
+            module_Unneed( id->pp_ufilter[i], id->pp_ufilter[i]->p_module );
+        vlc_object_destroy( id->pp_ufilter[i] );
+    }
 }
 
 static int transcode_audio_process( sout_stream_t *p_stream,
@@ -1463,6 +1532,14 @@ static int transcode_audio_process( sout_stream_t *p_stream,
             p_audio_block =
                 id->pp_filter[i]->pf_audio_filter( id->pp_filter[i],
                                                    p_audio_block );
+        }
+
+        /* Run user specified filter chain */
+        for( i = 0; i < id->i_ufilter; i++ )
+        {
+            p_audio_block =
+                id->pp_ufilter[i]->pf_audio_filter( id->pp_ufilter[i],
+                                                    p_audio_block );
         }
 
         p_audio_buf->p_buffer = p_audio_block->p_buffer;
@@ -1534,11 +1611,9 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int i;
 
-    /*
-     * Open decoder
+    /* Open decoder
+     * Initialization of decoder structures
      */
-
-    /* Initialization of decoder structures */
     id->p_decoder->fmt_out = id->p_decoder->fmt_in;
     id->p_decoder->fmt_out.i_extra = 0;
     id->p_decoder->fmt_out.p_extra = 0;
@@ -1640,7 +1715,6 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
      /* Calculate scaling, padding, cropping etc. */
-
      /* width/height of source */
      int i_src_width = id->p_decoder->fmt_out.video.i_width;
      int i_src_height = id->p_decoder->fmt_out.video.i_height;
@@ -1719,10 +1793,10 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
                                / p_sys->i_crop_height;
      }
 
-     /* check maxwidth and maxheight */
-     /* note: maxwidth and maxheight currently does not handle
-      * canvas and padding, just scaling and cropping. */
-
+     /* check maxwidth and maxheight
+      * note: maxwidth and maxheight currently does not handle
+      * canvas and padding, just scaling and cropping.
+      */
      if( p_sys->i_maxwidth && f_scale_width > (float)p_sys->i_maxwidth /
                                                      p_sys->i_crop_width )
      {
@@ -1738,8 +1812,9 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
      f_aspect = f_aspect * f_scale_height / f_scale_width;
      msg_Dbg( p_stream, "scaled pixel aspect is %f:1", f_aspect );
 
-     /* Correct scaling for target aspect ratio */
-     /* Shrink video if necessary */
+     /* Correct scaling for target aspect ratio
+      * Shrink video if necessary
+      */
      if ( p_sys->i_canvas_aspect > 0 )
      {
          float f_target_aspect = (float)p_sys->i_canvas_aspect /
@@ -1766,10 +1841,9 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
      }
 
      /* f_scale_width and f_scale_height are now final */
-
-     /* Calculate width, height from scaling */
-     /* Make sure its multiple of 2 */
-
+     /* Calculate width, height from scaling
+      * Make sure its multiple of 2
+      */
      i_dst_width = 2 * (int)( p_sys->i_crop_width * f_scale_width / 2 + 0.5 );
      i_dst_height = 2 *
                     (int)( p_sys->i_crop_height * f_scale_height / 2 + 0.5 );
@@ -1780,7 +1854,6 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
      p_sys->i_dst_y_offset = 0;
 
      /* Handle canvas and padding */
-
      if( p_sys->i_canvas_width <= 0 )
      {
          /* No canvas width set, add explicit padding border */
@@ -1791,7 +1864,6 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
      else
      {
          /* Canvas set, check if we have to padd or crop */
-
          if( p_sys->i_canvas_width < p_sys->i_nopadd_width )
          {
              /* need to crop more, but keep same scaling */
@@ -1823,7 +1895,6 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
      else
      {
          /* Canvas set, check if we have to padd or crop */
-
          if( p_sys->i_canvas_height < p_sys->i_nopadd_height )
          {
              /* need to crop more, but keep same scaling */
@@ -1846,9 +1917,7 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
          }
      }
 
-
      /* Change aspect ratio from scaled pixel to output frame */
-
      f_aspect = f_aspect * i_dst_width / i_dst_height;
 
      /* Store calculated values */
@@ -1984,25 +2053,26 @@ static void transcode_video_close( sout_stream_t *p_stream,
                                   id->pp_filter[i]->p_owner->pp_pics[j] );
         }
         free( id->pp_filter[i]->p_owner );
-
         vlc_object_destroy( id->pp_filter[i] );
+        id->pp_filter[i] = NULL;
     }
-    for( i = 0; i < id->i_vfilter; i++ )
+
+    for( i = 0; i < id->i_ufilter; i++ )
     {
-        vlc_object_detach( id->pp_vfilter[i] );
-        if( id->pp_vfilter[i]->p_module )
-            module_Unneed( id->pp_vfilter[i], id->pp_vfilter[i]->p_module );
+        vlc_object_detach( id->pp_ufilter[i] );
+        if( id->pp_ufilter[i]->p_module )
+            module_Unneed( id->pp_ufilter[i], id->pp_ufilter[i]->p_module );
 
         /* Clean-up pictures ring buffer */
         for( j = 0; j < PICTURE_RING_SIZE; j++ )
         {
-            if( id->pp_vfilter[i]->p_owner->pp_pics[j] )
-                video_del_buffer( VLC_OBJECT(id->pp_vfilter[i]),
-                                  id->pp_vfilter[i]->p_owner->pp_pics[j] );
+            if( id->pp_ufilter[i]->p_owner->pp_pics[j] )
+                video_del_buffer( VLC_OBJECT(id->pp_ufilter[i]),
+                                  id->pp_ufilter[i]->p_owner->pp_pics[j] );
         }
-        free( id->pp_vfilter[i]->p_owner );
-
-        vlc_object_destroy( id->pp_vfilter[i] );
+        free( id->pp_ufilter[i]->p_owner );
+        vlc_object_destroy( id->pp_ufilter[i] );
+        id->pp_ufilter[i] = NULL;
     }
 }
 
@@ -2015,10 +2085,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
     picture_t *p_pic, *p_pic2 = NULL;
     *out = NULL;
     input_thread_t *p_input = NULL;
+
     if( p_stream->p_parent->p_parent && p_stream->p_parent->p_parent->
                                 i_object_type == VLC_OBJECT_INPUT )
         p_input = (input_thread_t *)p_stream->p_parent->p_parent;
-
 
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
@@ -2149,7 +2219,6 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 id->pp_filter[id->i_filter]->fmt_out = id->p_encoder->fmt_in;
                 id->pp_filter[id->i_filter]->p_cfg = NULL;
 
-
                 id->pp_filter[id->i_filter]->fmt_in.video.i_x_offset = p_sys->i_src_x_offset;
                 id->pp_filter[id->i_filter]->fmt_in.video.i_y_offset = p_sys->i_src_y_offset;
                 id->pp_filter[id->i_filter]->fmt_in.video.i_visible_width = p_sys->i_crop_width;
@@ -2186,38 +2255,37 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 }
             }
 
-            for( i = 0; i < p_sys->i_vfilters; i++ )
+            for( i = 0; (i < p_sys->i_vfilters) && (id->i_ufilter < TRANSCODE_FILTERS); i++ )
             {
-                id->pp_vfilter[id->i_vfilter] =
+                id->pp_ufilter[id->i_ufilter] =
                     vlc_object_create( p_stream, VLC_OBJECT_FILTER );
-                vlc_object_attach( id->pp_vfilter[id->i_vfilter], p_stream );
+                vlc_object_attach( id->pp_ufilter[id->i_ufilter], p_stream );
 
-                id->pp_vfilter[id->i_vfilter]->pf_vout_buffer_new =
+                id->pp_ufilter[id->i_ufilter]->pf_vout_buffer_new =
                     video_new_buffer_filter;
-                id->pp_vfilter[id->i_vfilter]->pf_vout_buffer_del =
+                id->pp_ufilter[id->i_ufilter]->pf_vout_buffer_del =
                     video_del_buffer_filter;
 
-                id->pp_vfilter[id->i_vfilter]->fmt_in = id->p_encoder->fmt_in;
-                id->pp_vfilter[id->i_vfilter]->fmt_out = id->p_encoder->fmt_in;
-                id->pp_vfilter[id->i_vfilter]->p_cfg = p_sys->p_vfilters_cfg[i];
-                id->pp_vfilter[id->i_vfilter]->p_module =
-                    module_Need( id->pp_vfilter[id->i_vfilter],
+                id->pp_ufilter[id->i_ufilter]->fmt_in = id->p_encoder->fmt_in;
+                id->pp_ufilter[id->i_ufilter]->fmt_out = id->p_encoder->fmt_in;
+                id->pp_ufilter[id->i_ufilter]->p_cfg = p_sys->p_vfilters_cfg[i];
+                id->pp_ufilter[id->i_ufilter]->p_module =
+                    module_Need( id->pp_ufilter[id->i_ufilter],
                           "video filter2", p_sys->psz_vfilters[i], 0 );
-                if( id->pp_vfilter[id->i_vfilter]->p_module )
+                if( id->pp_ufilter[id->i_ufilter]->p_module )
                 {
-                    id->pp_vfilter[id->i_vfilter]->p_owner =
+                    id->pp_ufilter[id->i_ufilter]->p_owner =
                         malloc( sizeof(filter_owner_sys_t) );
                     for( i = 0; i < PICTURE_RING_SIZE; i++ )
-                        id->pp_vfilter[id->i_vfilter]->p_owner->pp_pics[i] = 0;
-                    id->pp_vfilter[id->i_vfilter]->p_owner->p_sys = p_sys;
-
-                    id->i_vfilter++;
+                        id->pp_ufilter[id->i_ufilter]->p_owner->pp_pics[i] = 0;
+                    id->pp_ufilter[id->i_ufilter]->p_owner->p_sys = p_sys;
+                    id->i_ufilter++;
                 }
                 else
                 {
                     msg_Dbg( p_stream, "no video filter found" );
-                    vlc_object_detach( id->pp_vfilter[id->i_vfilter] );
-                    vlc_object_destroy( id->pp_vfilter[id->i_vfilter] );
+                    vlc_object_detach( id->pp_ufilter[id->i_ufilter] );
+                    vlc_object_destroy( id->pp_ufilter[id->i_ufilter] );
                 }
             }
         }
@@ -2276,10 +2344,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
                                    i_scale_width, i_scale_height );
         }
 
-        /* Run vfilter chain */
-        for( i = 0; i < id->i_vfilter; i++ )
+        /* Run user specified filter chain */
+        for( i = 0; i < id->i_ufilter; i++ )
         {
-            p_pic = id->pp_vfilter[i]->pf_video_filter(id->pp_vfilter[i], p_pic);
+            p_pic = id->pp_ufilter[i]->pf_video_filter(id->pp_ufilter[i], p_pic);
         }
 
         if( p_sys->i_threads == 0 )
@@ -2387,7 +2455,6 @@ static int EncoderThread( sout_stream_sys_t *p_sys )
         block_ChainAppend( &p_sys->p_buffers, p_block );
 
         vlc_mutex_unlock( &p_sys->lock_out );
-
         p_pic->pf_release( p_pic );
     }
 
@@ -2395,10 +2462,8 @@ static int EncoderThread( sout_stream_sys_t *p_sys )
     {
         p_pic = p_sys->pp_pics[p_sys->i_first_pic++];
         p_sys->i_first_pic %= PICTURE_RING_SIZE;
-
         p_pic->pf_release( p_pic );
     }
-
     block_ChainRelease( p_sys->p_buffers );
 
     return 0;
@@ -2498,7 +2563,6 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
     p_pic->i_status = RESERVED_PICTURE;
 
     pp_ring[i] = p_pic;
-
     return p_pic;
 }
 
@@ -2575,10 +2639,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if( !p_sys->b_soverlay )
     {
-        /*
-         * Open encoder
-         */
-
+        /* Open encoder */
         /* Initialization of encoder format structures */
         es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
                         id->p_decoder->fmt_in.i_codec );
@@ -2712,10 +2773,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         /* Complete destination format */
         id->p_encoder->fmt_out.i_codec = p_sys->i_osdcodec;
 
-        /*
-         * Open encoder
-         */
-
+        /* Open encoder */
         /* Initialization of encoder format structures */
         es_format_Init( &id->p_encoder->fmt_in, fmt.i_cat, fmt.i_codec );
         id->p_encoder->fmt_in.psz_language = strdup( fmt.psz_language );
