@@ -137,6 +137,7 @@ void stats_ComputeInputStats( input_thread_t *p_input, input_stats_t *p_stats )
 {
     if( !p_input->p_libvlc->b_stats ) return;
 
+    vlc_mutex_lock( &p_input->counters.counters_lock );
     vlc_mutex_lock( &p_stats->lock );
 
     /* Input */
@@ -181,10 +182,12 @@ void stats_ComputeInputStats( input_thread_t *p_input, input_stats_t *p_stats )
                       &p_stats->i_lost_pictures );
 
     vlc_mutex_unlock( &p_stats->lock );
+    vlc_mutex_unlock( &p_input->counters.counters_lock );
 }
 
 void stats_ReinitInputStats( input_stats_t *p_stats )
 {
+    vlc_mutex_lock( &p_stats->lock );
     p_stats->i_read_packets = p_stats->i_read_bytes =
     p_stats->f_input_bitrate = p_stats->f_average_input_bitrate =
     p_stats->i_demux_read_packets = p_stats->i_demux_read_bytes =
@@ -194,6 +197,7 @@ void stats_ReinitInputStats( input_stats_t *p_stats )
     p_stats->i_decoded_video = p_stats->i_decoded_audio =
     p_stats->i_sent_bytes = p_stats->i_sent_packets = p_stats->f_send_bitrate
      = 0;
+    vlc_mutex_unlock( &p_stats->lock );
 }
 
 void stats_DumpInputStats( input_stats_t *p_stats  )
@@ -232,12 +236,14 @@ void __stats_ComputeGlobalStats( vlc_object_t *p_obj, global_stats_t *p_stats )
             float f_in = 0, f_out = 0, f_demux = 0;
             input_thread_t *p_input = (input_thread_t *)
                              p_list->p_values[i_index].p_object;
+            vlc_mutex_lock( &p_input->counters.counters_lock );
             stats_GetFloat( p_obj, p_input->counters.p_input_bitrate, &f_in );
             if( p_input->counters.p_sout_send_bitrate )
                 stats_GetFloat( p_obj, p_input->counters.p_sout_send_bitrate,
                                     &f_out );
             stats_GetFloat( p_obj, p_input->counters.p_demux_bitrate,
                                 &f_demux );
+            vlc_mutex_unlock( &p_input->counters.counters_lock );
             f_total_in += f_in; f_total_out += f_out;f_total_demux += f_demux;
         }
         p_stats->f_input_bitrate = f_total_in;
@@ -251,7 +257,9 @@ void __stats_ComputeGlobalStats( vlc_object_t *p_obj, global_stats_t *p_stats )
 
 void stats_ReinitGlobalStats( global_stats_t *p_stats )
 {
+    vlc_mutex_lock( &p_stats->lock );
     p_stats->f_input_bitrate = p_stats->f_output_bitrate = 0.0;
+    vlc_mutex_unlock( &p_stats->lock );
 }
 
 
@@ -276,7 +284,11 @@ void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name,
         counter_sample_t *p_sample;
         p_counter = stats_CounterCreate( p_obj->p_libvlc, VLC_VAR_TIME,
                                          STATS_TIMER );
-        if( !p_counter ) return;
+        if( !p_counter )
+        {
+            vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
+            return;
+        }
         p_counter->psz_name = strdup( psz_name );
         p_counter->i_id = i_id;
         INSERT_ELEM( p_obj->p_libvlc->pp_timers, p_obj->p_libvlc->i_timers,
@@ -296,6 +308,7 @@ void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name,
     if( p_counter->pp_samples[0]->value.b_bool == VLC_TRUE )
     {
         msg_Warn( p_obj, "timer %s was already started !", psz_name );
+        vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
         return;
     }
     p_counter->pp_samples[0]->value.b_bool = VLC_TRUE;
@@ -348,7 +361,6 @@ void __stats_TimerDump( vlc_object_t *p_obj, unsigned int i_id )
     vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
 }
 
-
 void __stats_TimersDumpAll( vlc_object_t *p_obj )
 {
     int i;
@@ -378,15 +390,15 @@ void stats_CounterClean( counter_t *p_c )
     if( p_c )
     {
         i = p_c->i_samples - 1 ;
-        while( i >= 0)
+        while( i >= 0 )
         {
             counter_sample_t *p_s = p_c->pp_samples[i];
             REMOVE_ELEM( p_c->pp_samples, p_c->i_samples, i );
             free( p_s );
             i--;
         }
-    if( p_c->psz_name ) free( p_c->psz_name );
-    free( p_c );
+        if( p_c->psz_name ) free( p_c->psz_name );
+        free( p_c );
     }
 }
 

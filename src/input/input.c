@@ -1120,7 +1120,9 @@ static void End( input_thread_t * p_input )
         input_EsOutDelete( p_input->p_es_out );
 
 #define CL_CO( c ) stats_CounterClean( p_input->counters.p_##c )
-
+    if( p_input->p_libvlc->b_stats )
+    {
+        vlc_mutex_lock( &p_input->counters.counters_lock );
         CL_CO( read_bytes );
         CL_CO( read_packets );
         CL_CO( demux_read );
@@ -1133,6 +1135,8 @@ static void End( input_thread_t * p_input )
         CL_CO( decoded_audio) ;
         CL_CO( decoded_video );
         CL_CO( decoded_sub) ;
+        vlc_mutex_unlock( &p_input->counters.counters_lock );
+    }
 
     /* Close optional stream output instance */
     if( p_input->p_sout )
@@ -1141,9 +1145,11 @@ static void End( input_thread_t * p_input )
             vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         vlc_value_t keep;
 
+        vlc_mutex_lock( &p_input->counters.counters_lock );
         CL_CO( sout_sent_packets );
         CL_CO( sout_sent_bytes );
         CL_CO( sout_send_bitrate );
+        vlc_mutex_unlock( &p_input->counters.counters_lock );
 
         if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool && p_pl )
         {
