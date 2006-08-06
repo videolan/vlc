@@ -97,6 +97,7 @@ void image_HandlerDelete( image_handler_t *p_image )
     if( p_image->p_filter ) DeleteFilter( p_image->p_filter );
 
     free( p_image );
+    p_image = NULL;
 }
 
 /**
@@ -408,7 +409,7 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
     {
         /* We need to restart a new filter */
         DeleteFilter( p_image->p_filter );
-        p_image->p_filter = 0;
+        p_image->p_filter = NULL;
     }
 
     /* Start a filter */
@@ -654,6 +655,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     es_format_Clean( &p_dec->fmt_out );
 
     vlc_object_destroy( p_dec );
+    p_dec = NULL;
 }
 
 static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
@@ -736,6 +738,7 @@ static void DeleteEncoder( encoder_t * p_enc )
     es_format_Clean( &p_enc->fmt_out );
 
     vlc_object_destroy( p_enc );
+    p_enc = NULL;
 }
 
 static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
@@ -756,8 +759,8 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
     p_filter->fmt_out = *p_fmt_in;
     p_filter->fmt_out.i_codec = p_fmt_out->i_chroma;
     p_filter->fmt_out.video = *p_fmt_out;
-    p_filter->p_module = module_Need( p_filter, "video filter2", psz_module,
-                                      0 );
+    p_filter->p_module = module_Need( p_filter, "video filter2",
+                                      psz_module, 0 );
 
     if( !p_filter->p_module )
     {
@@ -779,4 +782,5 @@ static void DeleteFilter( filter_t * p_filter )
     es_format_Clean( &p_filter->fmt_out );
 
     vlc_object_destroy( p_filter );
+    p_filter = NULL;
 }
