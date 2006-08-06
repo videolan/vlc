@@ -131,7 +131,9 @@ class CtrlText: public CtrlGeneric, public Observer<VarText>
         void adjust( int &position );
 
         /// Update the behaviour of the text whenever the control size changes
-        virtual void onChangePosition();
+        virtual void onPositionChange();
+        /// Update the behaviour of the text whenever the control size changes
+        virtual void onResize();
 };
 
 
