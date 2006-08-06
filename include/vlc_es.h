@@ -267,7 +267,8 @@ static inline void es_format_Clean( es_format_t *fmt )
     fmt->psz_description = NULL;
 
     if( fmt->i_extra > 0 ) free( fmt->p_extra );
-    fmt->i_extra = 0; fmt->p_extra = NULL;
+    fmt->i_extra = 0;
+    fmt->p_extra = NULL;
 
     if( fmt->video.p_palette ) free( fmt->video.p_palette );
     fmt->video.p_palette = NULL;
@@ -287,5 +288,4 @@ static inline void es_format_Clean( es_format_t *fmt )
         free(fmt->p_extra_languages);
     }
 }
-
 #endif
