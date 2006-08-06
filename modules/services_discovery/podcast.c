@@ -106,7 +106,6 @@ static int Open( vlc_object_t *p_this )
 
     vlc_value_t         val;
     playlist_t          *p_playlist;
-    playlist_view_t     *p_view;
     playlist_item_t     *p_item;
 
     int i, j;
