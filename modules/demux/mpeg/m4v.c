@@ -70,10 +70,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     vlc_bool_t   b_forced = VLC_FALSE;
-
     uint8_t     *p_peek;
-
-    es_format_t  fmt;
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
@@ -107,7 +104,7 @@ static int Open( vlc_object_t * p_this )
     /*  Load the mpeg4video packetizer */
     INIT_VPACKETIZER( p_sys->p_packetizer, 'm', 'p', '4', 'v' );
     es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
-    
+
     LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "mpeg4 video" );
 
     /* We need to wait until we gtt p_extra (VOL header) from the packetizer
