@@ -154,13 +154,18 @@ static int Open( vlc_object_t *p_this, int i_type )
                                 0, NULL, -1 );
             break;
     }
-    /* TODO FLAGS */
     p_sys->p_node_cat = playlist_NodeAddInput( p_playlist, p_sys->p_input,
                            p_playlist->p_root_category,
                            PLAYLIST_APPEND, PLAYLIST_END );
     p_sys->p_node_one = playlist_NodeAddInput( p_playlist, p_sys->p_input,
                            p_playlist->p_root_onelevel,
                            PLAYLIST_APPEND, PLAYLIST_END );
+    p_sys->p_node_cat->i_flags |= PLAYLIST_RO_FLAG;
+    p_sys->p_node_cat->i_flags |= PLAYLIST_SKIP_FLAG;
+    p_sys->p_node_one->i_flags |= PLAYLIST_RO_FLAG;
+    p_sys->p_node_one->i_flags |= PLAYLIST_SKIP_FLAG;
+    p_sys->p_node_one->p_input->i_id = p_sys->p_node_cat->p_input->i_id;
+
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
 

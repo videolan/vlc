@@ -137,14 +137,16 @@ int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
             p_root->pp_children[i]->p_input->i_id == i_input_id )
         {
             DeleteInner( p_playlist, p_root->pp_children[i], b_do_stop );
+            return VLC_SUCCESS;
         }
         else if( p_root->pp_children[i]->i_children >= 0 )
         {
-            return playlist_DeleteFromInput( p_playlist, i_input_id,
+            int i_ret = playlist_DeleteFromInput( p_playlist, i_input_id,
                                         p_root->pp_children[i], b_do_stop );
+            if( i_ret == VLC_SUCCESS ) return VLC_SUCCESS;
         }
     }
-    return -1;
+    return VLC_EGENERIC;
 }
 
 /** Remove a playlist item from the playlist, given its id */
@@ -389,7 +391,7 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
      */
 
     /* Fast track the media library, no time to loose */
-    if( p_item == p_playlist->p_ml_category ) 
+    if( p_item == p_playlist->p_ml_category )
         return p_item;
 
     /** \todo First look if we don't already have it */
@@ -409,7 +411,7 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
         }
         else
         {
-            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id,
+            playlist_DeleteFromInput( p_playlist, p_item_in_one->p_input->i_id,
                                       p_playlist->p_root_onelevel, VLC_FALSE );
         }
         var_SetInteger( p_playlist, "item-change", p_item->p_input->i_id );
@@ -649,9 +651,6 @@ int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
     int i, i_top, i_bottom;
     int i_id = p_item->i_id;
     vlc_bool_t b_flag = VLC_FALSE;
-
-    //fprintf( stderr, "Deleting item %i - %s\n", i_id,
-    //                                            p_item->p_input->psz_name );
 
     if( p_item->i_children > -1 )
     {
