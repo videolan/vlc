@@ -1027,6 +1027,21 @@ const Position Builder::makePosition( const string &rLeftTop,
         refRightBottom = Position::kRightBottom;
     }
 
+    // In "keep ratio" mode, overwrite the previously computed values with the
+    // actual ones
+    // XXX: this coupling between makePosition and the Position class should
+    // be reduced...
+    if( xKeepRatio )
+    {
+        left = xPos;
+        right = xPos + width;
+    }
+    if( yKeepRatio )
+    {
+        top = yPos;
+        bottom = yPos + height;
+    }
+
     return Position( left, top, right, bottom, rBox, refLeftTop,
                      refRightBottom, xKeepRatio, yKeepRatio );
 }
