@@ -358,7 +358,7 @@ int sout_AccessOutRead( sout_access_out_t *p_access, block_t *p_buffer )
  *****************************************************************************/
 int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
 {
-    int i_total;
+    int i_total = 0;
     p_access->i_writes++;
     p_access->i_sent_bytes += p_buffer->i_buffer;
     if( p_access->p_libvlc->b_stats && p_access->i_writes % 30 == 0 )
