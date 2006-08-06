@@ -875,7 +875,9 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
 
         while( p_sys->i_order_length-- )
         {
+#if 0
             printf("%d\n", p_sys->ppsz_order);
+#endif
             free( p_sys->ppsz_order );
         }
         if( psz_order[0] != 0 )
