@@ -25,6 +25,7 @@
 #define _PLPANELS_H_
 
 #include <vlc/vlc.h>
+#include <QModelIndex>
 #include <QWidget>
 #include <QString>
 
@@ -63,6 +64,8 @@ private:
     QTreeView *view;
 public slots:
     virtual void setRoot( int );
+private slots:
+    void handleExpansion( const QModelIndex& );
 };
 
 #endif

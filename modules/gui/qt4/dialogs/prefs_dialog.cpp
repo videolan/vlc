@@ -52,7 +52,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      // Choice for types
      types = new QGroupBox( "Show settings" );
      QHBoxLayout *tl = new QHBoxLayout();
-     tl->setSpacing( 3 );
+     tl->setSpacing( 3 ); tl->setMargin( 3 );
      small = new QRadioButton( "Basic", types );
      all = new QRadioButton( "All", types );
      tl->addWidget( small );

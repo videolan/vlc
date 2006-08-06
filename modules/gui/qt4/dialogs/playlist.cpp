@@ -38,7 +38,8 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
     rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( this, p_intf,
                                    THEPL, THEPL->p_local_category ) );
-    connect( selector, SIGNAL( activated( int ) ), rightPanel, SLOT( setRoot( int ) ) );
+    connect( selector, SIGNAL( activated( int ) ),
+             rightPanel, SLOT( setRoot( int ) ) );
 
     QHBoxLayout *layout = new QHBoxLayout();
     layout->addWidget( selector, 0 );

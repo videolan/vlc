@@ -43,10 +43,32 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
     connect( view, SIGNAL( activated( const QModelIndex& ) ), model,
              SLOT( activateItem( const QModelIndex& ) ) );
 
+    connect( model,
+             SIGNAL( dataChanged( const QModelIndex&, const QModelIndex& ) ),
+             this, SLOT( handleExpansion( const QModelIndex& ) ) );
+
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing( 0 ); layout->setMargin( 0 );
     layout->addWidget( view );
     setLayout( layout );
+}
+
+void StandardPLPanel::handleExpansion( const QModelIndex &index )
+{
+    fprintf( stderr, "Checking expansion\n" );
+    QModelIndex parent;
+    if( model->isCurrent( index ) )
+    {
+        fprintf( stderr, "It is the current one\n" ) ;
+        parent = index;
+        while( parent.isValid() )
+        {
+            fprintf( stderr, "Expanding %s\n",
+         (model->data( parent, Qt::DisplayRole )).toString().toUtf8().data() );
+            view->setExpanded( parent, true );
+            parent = model->parent( parent );
+        }
+    }
 }
 
 void StandardPLPanel::setRoot( int i_root_id )

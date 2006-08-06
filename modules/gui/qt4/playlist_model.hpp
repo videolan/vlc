@@ -46,15 +46,17 @@ public:
     {
         insertChild( item, children.count(), signal );
     };
+    void remove( PLItem *removed );
     PLItem *child( int row ) { return children.value( row ); };
     int childCount() const { return children.count(); };
     QString columnString( int col ) { return strings.value( col ); };
     PLItem *parent() { return parentItem; };
 
-    void update( playlist_item_t *);
+    void update( playlist_item_t *, bool);
 protected:
     QList<PLItem*> children;
     QList<QString> strings;
+    bool current;
     int type;
     int i_id;
     int i_input_id;
@@ -105,6 +107,7 @@ public:
     QModelIndex index( int r, int c, const QModelIndex &parent ) const;
     QModelIndex index( PLItem *, int c ) const;
     int itemId( const QModelIndex &index ) const;
+    bool isCurrent( const QModelIndex &index );
 
     QModelIndex parent( const QModelIndex &index) const;
     int childrenCount( const QModelIndex &parent = QModelIndex() ) const;

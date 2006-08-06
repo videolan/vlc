@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "pixmaps/codec.xpm"
 #include <QIcon>
+#include <QFont>
 #include "qt4.hpp"
 #include <QApplication>
 #include "playlist_model.hpp"
@@ -98,6 +98,15 @@ void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
         model->endInsertRows();
 }
 
+void PLItem::remove( PLItem *removed )
+{
+    assert( model && parentItem );
+    int i_index = parentItem->children.indexOf( removed );
+    model->beginRemoveRows( model->index( parentItem, 0 ), i_index, i_index );
+    parentItem->children.removeAt( i_index );
+    model->endRemoveRows();
+}
+
 int PLItem::row() const
 {
     if (parentItem)
@@ -105,7 +114,7 @@ int PLItem::row() const
     return 0;
 }
 
-void PLItem::update( playlist_item_t *p_item )
+void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 {
     assert( p_item->p_input->i_id == i_input_id );
     strings[0] = QString::fromUtf8( p_item->p_input->psz_name );
@@ -114,6 +123,7 @@ void PLItem::update( playlist_item_t *p_item )
         strings[1] = QString::fromUtf8( p_item->p_input->p_meta->psz_artist );
     }
     type = p_item->p_input->i_type;
+    current = iscurrent;
 }
 
 /*************************************************************************
@@ -219,7 +229,20 @@ QVariant PLModel::data(const QModelIndex &index, int role) const
         if( item->type >= 0 )
             return QVariant( PLModel::icons[item->type] );
     }
+    else if( role == Qt::FontRole )
+    {
+        if( item->current == true )
+        {
+            QFont f; f.setBold( true ); return QVariant( f );
+        }
+    }
     return QVariant();
+}
+
+bool PLModel::isCurrent( const QModelIndex &index )
+{
+    assert( index.isValid() );
+    return static_cast<PLItem*>(index.internalPointer())->current;
 }
 
 int PLModel::itemId( const QModelIndex &index ) const
@@ -270,13 +293,12 @@ QModelIndex PLModel::index( PLItem *item, int column ) const
 
 QModelIndex PLModel::parent(const QModelIndex &index) const
 {
-    if (!index.isValid())  return QModelIndex();
+    if( !index.isValid() ) return QModelIndex();
 
     PLItem *childItem = static_cast<PLItem*>(index.internalPointer());
     PLItem *parentItem = childItem->parent();
 
     if (parentItem == rootItem) return QModelIndex();
-
     return createIndex(parentItem->row(), 0, parentItem);
 }
 
@@ -403,7 +425,9 @@ void PLModel::ProcessItemRemoval( int i_id )
     if( i_id == i_cached_id ) i_cached_id = -1;
     i_cached_input_id = -1;
 
-    /// \todo
+    PLItem *item = FindById( rootItem, i_id );
+    if( item )
+        item->remove( item );
 }
 
 void PLModel::ProcessItemAppend( playlist_add_t *p_add )
@@ -416,6 +440,7 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
     PLItem *nodeItem = FindById( rootItem, p_add->i_node );
     if( !nodeItem ) goto end;
 
+    PL_LOCK;
     p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
     if( i_depth == 1 && p_item->p_parent &&
@@ -426,6 +451,7 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
     nodeItem->appendChild( newItem );
     UpdateTreeItem( p_item, newItem, true );
 end:
+    PL_UNLOCK;
     return;
 }
 
@@ -433,30 +459,31 @@ void PLModel::Rebuild()
 {
     /* Remove callbacks before locking to avoid deadlocks */
     delCallbacks();
-    PL_LOCK;
-
     /* Invalidate cache */
     i_cached_id = i_cached_input_id = -1;
 
+    PL_LOCK;
     /* Clear the tree */
     qDeleteAll( rootItem->children );
-
     /* Recreate from root */
     UpdateNodeChildren( rootItem );
+    PL_UNLOCK;
 
     /* And signal the view */
     emit layoutChanged();
+    /// \todo  Force current item to be updated
 
     addCallbacks();
-    PL_UNLOCK;
 }
 
+/* This function must be entered WITH the playlist lock */
 void PLModel::UpdateNodeChildren( PLItem *root )
 {
     playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id );
     UpdateNodeChildren( p_node, root );
 }
 
+/* This function must be entered WITH the playlist lock */
 void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
 {
     for( int i = 0; i < p_node->i_children ; i++ )
@@ -469,22 +496,23 @@ void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
     }
 }
 
+/* This function must be entered WITH the playlist lock */
 void PLModel::UpdateTreeItem( PLItem *item, bool signal, bool force )
 {
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
     UpdateTreeItem( p_item, item, signal, force );
 }
 
+/* This function must be entered WITH the playlist lock */
 void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item,
                               bool signal, bool force )
 {
     if( !force && i_depth == 1 && p_item->p_parent &&
                                  p_item->p_parent->i_id != rootItem->i_id )
         return;
-    item->update( p_item );
+    item->update( p_item, p_item == p_playlist->status.p_item );
     if( signal )
-    {    /// \todo emit
-    }
+        emit dataChanged( index( item, 0 ) , index( item, 1 ) );
 }
 
 /**********************************************************************
