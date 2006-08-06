@@ -115,6 +115,7 @@ static void Destroy( vlc_object_t *p_this )
 
     if( p_filter->p_sys->p_image )
         image_HandlerDelete( p_filter->p_sys->p_image );
+    p_filter->p_sys->p_image = NULL;
 
     free( p_filter->p_sys );
 }
@@ -134,8 +135,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     int x,y;
     uint8_t u,v;
 
-    video_format_t fmt_out = {0};
     picture_t *p_converted;
+    video_format_t fmt_out = {0};
+    fmt_out.p_palette = NULL;
 
     if( !p_pic ) return NULL;
 
@@ -174,7 +176,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     p_filter->p_vlc->pf_memcpy(
                 p_outpic->p[Y_PLANE].p_pixels, p_pic->p[Y_PLANE].p_pixels,
                 p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
-
 
     /* image visualization */
     fmt_out = p_filter->fmt_out.video;
