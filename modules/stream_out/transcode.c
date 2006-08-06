@@ -514,7 +514,6 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_acodec )
     {
-#if 0
         if( (strncmp( (char *)&p_sys->i_acodec, "mp3", 3) == 0) &&
                             (p_sys->i_channels > 2) )
         {
@@ -522,7 +521,6 @@ static int Open( vlc_object_t *p_this )
                       p_sys->i_channels );
             p_sys->i_channels = 2;
         }
-#endif
         msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
                  (char *)&p_sys->i_acodec, p_sys->i_sample_rate,
                  p_sys->i_channels, p_sys->i_abitrate / 1000 );
