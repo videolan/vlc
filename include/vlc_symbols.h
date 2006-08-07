@@ -309,7 +309,7 @@ struct module_symbols_t
     void (*playlist_ItemAddOption_inner) (playlist_item_t *, const char *);
     void *playlist_Sort_deprecated;
     void *playlist_Move_deprecated;
-    int (*playlist_NodeGroup_inner) (playlist_t *, playlist_item_t *,playlist_item_t **,int, int, int);
+    void *playlist_NodeGroup_deprecated;
     int (*playlist_NodeSort_inner) (playlist_t *, playlist_item_t *,int, int);
     int (*playlist_RecursiveNodeSort_inner) (playlist_t *, playlist_item_t *,int, int);
     int (*playlist_Import_inner) (playlist_t *, const char *, playlist_item_t *, vlc_bool_t);
@@ -791,7 +791,6 @@ struct module_symbols_t
 #  define playlist_ItemGetById (p_symbols)->playlist_ItemGetById_inner
 #  define playlist_ItemGetByInput (p_symbols)->playlist_ItemGetByInput_inner
 #  define playlist_ItemAddOption (p_symbols)->playlist_ItemAddOption_inner
-#  define playlist_NodeGroup (p_symbols)->playlist_NodeGroup_inner
 #  define playlist_NodeSort (p_symbols)->playlist_NodeSort_inner
 #  define playlist_RecursiveNodeSort (p_symbols)->playlist_RecursiveNodeSort_inner
 #  define playlist_Import (p_symbols)->playlist_Import_inner
@@ -1261,7 +1260,6 @@ struct module_symbols_t
     ((p_symbols)->playlist_ItemGetById_inner) = playlist_ItemGetById; \
     ((p_symbols)->playlist_ItemGetByInput_inner) = playlist_ItemGetByInput; \
     ((p_symbols)->playlist_ItemAddOption_inner) = playlist_ItemAddOption; \
-    ((p_symbols)->playlist_NodeGroup_inner) = playlist_NodeGroup; \
     ((p_symbols)->playlist_NodeSort_inner) = playlist_NodeSort; \
     ((p_symbols)->playlist_RecursiveNodeSort_inner) = playlist_RecursiveNodeSort; \
     ((p_symbols)->playlist_Import_inner) = playlist_Import; \
@@ -1486,6 +1484,7 @@ struct module_symbols_t
     (p_symbols)->playlist_GetPositionById_deprecated = NULL; \
     (p_symbols)->playlist_Sort_deprecated = NULL; \
     (p_symbols)->playlist_Move_deprecated = NULL; \
+    (p_symbols)->playlist_NodeGroup_deprecated = NULL; \
     (p_symbols)->playlist_NodeRemoveParent_deprecated = NULL; \
     (p_symbols)->__intf_Interact_deprecated = NULL; \
     (p_symbols)->__intf_UserProgress_deprecated = NULL; \

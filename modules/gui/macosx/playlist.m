@@ -919,7 +919,7 @@ NSLog( @"expandable" );
 
 - (IBAction)sortNodeByAuthor:(id)sender
 {
-    [self sortNode: SORT_AUTHOR];
+    [self sortNode: SORT_ARTIST];
 }
 
 - (void)sortNode:(int)i_mode
@@ -1390,7 +1390,7 @@ NSLog( @"expandable" );
     }
     else if( o_tc == o_tc_author )
     {
-        i_mode = SORT_AUTHOR;
+        i_mode = SORT_ARTIST;
     }
 
     if( b_isSortDescending )

@@ -360,6 +360,8 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "add", Playlist, NULL );
     var_Create( p_intf, "playlist", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "playlist", Playlist, NULL );
+    var_Create( p_intf, "sort", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "sort", Playlist, NULL );
     var_Create( p_intf, "play", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "play", Playlist, NULL );
     var_Create( p_intf, "stop", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
@@ -1280,8 +1282,15 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
     {
+        msg_Dbg( p_playlist, "Dumping category" );
         playlist_NodeDump( p_playlist, p_playlist->p_root_category, 0 );
+        msg_Dbg( p_playlist, "Dumping Onelevel" );
         playlist_NodeDump( p_playlist, p_playlist->p_root_onelevel, 0 );
+    }
+    else if( !strcmp( psz_cmd, "sort" ))
+    {
+        playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_onelevel, 
+                                    SORT_ARTIST, ORDER_NORMAL );
     }
     else if( !strcmp( psz_cmd, "status" ) )
     {

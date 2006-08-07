@@ -185,7 +185,7 @@ struct playlist_add_t
 #define SORT_ID 0
 #define SORT_TITLE 1
 #define SORT_TITLE_NODES_FIRST 2
-#define SORT_AUTHOR 3
+#define SORT_ARTIST 3
 #define SORT_GENRE 4
 #define SORT_RANDOM 5
 #define SORT_DURATION 6
@@ -341,13 +341,7 @@ static inline playlist_item_t *playlist_LockItemGetByInput(
 VLC_EXPORT( int, playlist_LiveSearchUpdate, (playlist_t *, playlist_item_t *, const char *) );
 
 /* Playlist sorting */
-#define playlist_SortID(p, i) playlist_Sort( p, SORT_ID, i)
-#define playlist_SortTitle(p, i) playlist_Sort( p, SORT_TITLE, i)
-#define playlist_SortAuthor(p, i) playlist_Sort( p, SORT_AUTHOR, i)
-#define playlist_SortAlbum(p, i) playlist_Sort( p, SORT_ALBUM, i)
-#define playlist_SortGroup(p, i) playlist_Sort( p, SORT_GROUP, i)
 VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );
-VLC_EXPORT( int,  playlist_NodeGroup, ( playlist_t *, playlist_item_t *,playlist_item_t **,int, int, int ) );
 VLC_EXPORT( int,  playlist_NodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 

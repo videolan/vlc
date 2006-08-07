@@ -452,7 +452,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     {
                         playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
                                                     p_sys->p_playlist->p_root_onelevel,
-                                                    SORT_AUTHOR,
+                                                    SORT_ARTIST,
                                                     ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
                         msg_Dbg( p_intf, "requested playlist sort by author (%d)" , i_order );
                     }
