@@ -1353,7 +1353,7 @@ dnl  Special arch tuning
 dnl
 AC_ARG_WITH(tuning,
 [  --with-tuning=ARCH      enable special tuning for an architecture
-                          (default Pentium 2 on IA-32 and 750 on PPC)])
+                          (default Pentium 2 on IA-32 and G4 on PPC)])
 if test -n "${with_tuning}"; then
     if test "${with_tuning}" != "no"; then
         CFLAGS_TUNING="-mtune=${with_tuning}"
@@ -1364,7 +1364,7 @@ else
     elif test "${target_cpu}" = "x86_64"; then
         CFLAGS_TUNING="-mtune=athlon64"
     elif test "${target_cpu}" = "powerpc"; then
-        CFLAGS_TUNING="-mtune=750";
+        CFLAGS_TUNING="-mtune=G4";
     fi
 fi
 
@@ -4779,10 +4779,12 @@ AC_ARG_ENABLE(macosx,
    then
      VLC_ADD_BUILTINS([macosx])
      VLC_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL -framework AGL])
+     VLC_ADD_OBJCFLAGS( [macosx],[-fobjc-exceptions] )
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      VLC_ADD_BUILTINS([macosx])
      VLC_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL -framework AGL])
+     VLC_ADD_OBJCFLAGS( [macosx],[-fobjc-exceptions] )
    )])
 CFLAGS=$ORIGCFLAGS
 
