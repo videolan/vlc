@@ -202,10 +202,10 @@ static int64_t get_audio_position ( access_t *p_access )
     else
     {
         i_offset = p_cdda->i_lsn;
+    }
 #else
         i_offset = p_cdda->i_lsn;
 #endif
-    }
     return i_offset;
 }
 
