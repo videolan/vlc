@@ -221,7 +221,6 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         psz_namecodec = "Raw video";
     }
 
-
     if( p_enc->fmt_out.i_cat == VIDEO_ES && i_cat != VIDEO_ES )
     {
         msg_Err( p_enc, "\"%s\" is not a video encoder", psz_namecodec );
@@ -234,7 +233,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Initialization must be done before avcodec_find_decoder() */
+    /* Initialization must be done before avcodec_find_encoder() */
     E_(InitLibavcodec)(p_this);
 
     p_codec = avcodec_find_encoder( i_codec_id );
@@ -244,7 +243,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Allocate the memory needed to store the decoder's structure */
+    /* Allocate the memory needed to store the encoder's structure */
     if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
     {
         msg_Err( p_enc, "out of memory" );
