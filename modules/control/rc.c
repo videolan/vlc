@@ -358,6 +358,8 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
 
     var_Create( p_intf, "add", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "add", Playlist, NULL );
+    var_Create( p_intf, "enqueue", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "enqueue", Playlist, NULL );
     var_Create( p_intf, "playlist", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "playlist", Playlist, NULL );
     var_Create( p_intf, "sort", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
@@ -872,6 +874,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("+----[ Remote control commands ]"));
     msg_rc(  "| ");
     msg_rc(_("| add XYZ  . . . . . . . . . . add XYZ to playlist"));
+    msg_rc(_("| enqueue XYZ  . . . . . . . queue XYZ to playlist"));
     msg_rc(_("| playlist . . .  show items currently in playlist"));
     msg_rc(_("| play . . . . . . . . . . . . . . . . play stream"));
     msg_rc(_("| stop . . . . . . . . . . . . . . . . stop stream"));
@@ -1278,6 +1281,18 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             msg_rc( "Trying to add %s to playlist.", newval.psz_string );
             playlist_PlaylistAddInput( p_playlist, p_item,
                               PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
+        }
+    }
+    else if( !strcmp( psz_cmd, "enqueue" ) &&
+             newval.psz_string && *newval.psz_string )
+    {
+        playlist_item_t *p_item = parse_MRL( p_intf, newval.psz_string );
+
+        if( p_item )
+        {
+            msg_rc( "trying to enqueue %s to playlist", newval.psz_string );
+            playlist_PlaylistAddInput( p_playlist, p_item,
+                              PLAYLIST_APPEND, PLAYLIST_END );
         }
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
