@@ -411,7 +411,9 @@ IXML_Document* parseBrowseResult( IXML_Document* doc )
     if ( !textNode ) return 0;
 
     const char* resultString = ixmlNode_getNodeValue( textNode );
-    char* resultXML = convert_xml_special_chars( resultString );
+    char* resultXML = strdup( resultString );
+    
+    resolve_xml_special_chars( resultXML );
 
     IXML_Document* browseDoc = ixmlParseBuffer( resultXML );
 
