@@ -37,42 +37,23 @@ int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
 /*****************************************************************************
  * Playlist item creation
  *****************************************************************************/
-/**
- * Create a new item, without adding it to the playlist
- *
- * \param p_obj a vlc object (anyone will do)
- * \param psz_uri the mrl of the item
- * \param psz_name a text giving a name or description of the item
- * \return the new item or NULL on failure
- */
-playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
-                                      const char *psz_uri,
-                                      const char *psz_name )
-{
-    return playlist_ItemNewWithType( p_obj, psz_uri,
-                                     psz_name, 0, NULL, -1,
-                                     ITEM_TYPE_UNKNOWN );
-}
-
 playlist_item_t * playlist_ItemNewWithType( vlc_object_t *p_obj,
                                             const char *psz_uri,
                                             const char *psz_name,
                                             int i_options,
                                             const char **ppsz_options,
-                                            int i_duration,
-                                            int i_type )
+                                            int i_duration, int i_type )
 {
     input_item_t *p_input;
-
     if( psz_uri == NULL ) return NULL;
     p_input = input_ItemNewWithType( p_obj, psz_uri,
-                                        psz_name, i_options, ppsz_options,
-                                        i_duration, i_type );
+                                     psz_name, i_options, ppsz_options,
+                                     i_duration, i_type );
     return playlist_ItemNewFromInput( p_obj, p_input );
 }
 
 playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
-                                            input_item_t *p_input )
+                                              input_item_t *p_input )
 {
     /** FIXME !!!!! don't find playlist each time */
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_obj, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -185,10 +166,7 @@ void playlist_LockClear( playlist_t *p_playlist )
 /***************************************************************************
  * Playlist item addition
  ***************************************************************************/
-
-/**
- * Add a MRL into the playlist.
- *
+/** Add an item to the playlist or the media library
  * \param p_playlist the playlist to add into
  * \param psz_uri the mrl to add to the playlist
  * \param psz_name a text giving a name or description of this item
@@ -196,17 +174,19 @@ void playlist_LockClear( playlist_t *p_playlist )
  * \param i_pos the position in the playlist where to add. If this is
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of it's size
+ * \param b_playlist TRUE for playlist, FALSE for media library
  * \return The id of the playlist item
  */
-int playlist_PlaylistAdd( playlist_t *p_playlist, const char *psz_uri,
-                          const char *psz_name, int i_mode, int i_pos )
+int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
+                  const char *psz_name, int i_mode, int i_pos,
+                  vlc_bool_t b_playlist  )
 {
-    return playlist_PlaylistAddExt( p_playlist, psz_uri, psz_name,
-                                    i_mode, i_pos, -1, NULL, 0 );
+    return playlist_AddExt( p_playlist, psz_uri, psz_name,
+                            i_mode, i_pos, -1, NULL, 0, b_playlist );
 }
 
 /**
- * Add a MRL into the playlist, duration and options given
+ * Add a MRL into the playlist or the media library, duration and options given
  *
  * \param p_playlist the playlist to add into
  * \param psz_uri the mrl to add to the playlist
@@ -218,40 +198,44 @@ int playlist_PlaylistAdd( playlist_t *p_playlist, const char *psz_uri,
  * \param i_duration length of the item in milliseconds.
  * \param ppsz_options an array of options
  * \param i_options the number of options
+ * \param b_playlist TRUE for playlist, FALSE for media library
  * \return The id of the playlist item
 */
-int playlist_PlaylistAddExt( playlist_t *p_playlist, const char * psz_uri,
-                             const char *psz_name, int i_mode, int i_pos,
-                             mtime_t i_duration, const char **ppsz_options,
-                             int i_options )
+int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
+                     const char *psz_name, int i_mode, int i_pos,
+                     mtime_t i_duration, const char **ppsz_options,
+                     int i_options, vlc_bool_t b_playlist )
 {
     input_item_t *p_input = input_ItemNewExt( p_playlist, psz_uri, psz_name,
                                               i_options, ppsz_options,
                                               i_duration );
 
-    return playlist_PlaylistAddInput( p_playlist, p_input, i_mode, i_pos );
+    return playlist_AddInput( p_playlist, p_input, i_mode, i_pos, b_playlist );
 }
 
 /** Add an input item to the playlist node */
-int playlist_PlaylistAddInput( playlist_t* p_playlist, input_item_t *p_input,
-                               int i_mode, int i_pos )
+int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
+                      int i_mode, int i_pos, vlc_bool_t b_playlist )
 {
     playlist_item_t *p_item_cat, *p_item_one;
 
-    msg_Dbg( p_playlist, "adding playlist item `%s' ( %s )",
-             p_input->psz_name, p_input->psz_uri );
+    PL_DEBUG( "adding item `%s' ( %s )", p_input->psz_name, p_input->psz_uri );
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
     /* Add to ONELEVEL */
     p_item_one = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item_one == NULL ) return VLC_EGENERIC;
-    AddItem( p_playlist, p_item_one ,p_playlist->p_local_onelevel, i_pos );
+    AddItem( p_playlist, p_item_one, 
+             b_playlist ? p_playlist->p_local_onelevel : 
+                          p_playlist->p_ml_onelevel , i_pos );
 
     /* Add to CATEGORY */
     p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item_cat == NULL ) return VLC_EGENERIC;
-    AddItem( p_playlist, p_item_cat, p_playlist->p_local_category, i_pos );
+    AddItem( p_playlist, p_item_cat,
+             b_playlist ? p_playlist->p_local_category : 
+                          p_playlist->p_ml_category , i_pos );
 
     GoAndPreparse( p_playlist, i_mode, p_item_cat, p_item_one );
 
@@ -526,38 +510,6 @@ int playlist_ItemSetName( playlist_item_t *p_item, char *psz_name )
     return VLC_EGENERIC;
 }
 
-/** Set the duration of a playlist item
- * \param i_duration the new duration in microseconds
- */
-int playlist_ItemSetDuration( playlist_item_t *p_item, mtime_t i_duration )
-{
-    char psz_buffer[MSTRTIME_MAX_SIZE];
-    if( p_item )
-    {
-        p_item->p_input->i_duration = i_duration;
-        if( i_duration != -1 )
-        {
-            secstotimestr( psz_buffer, (int)(i_duration/1000000) );
-        }
-        else
-        {
-            memcpy( psz_buffer, "--:--:--", sizeof("--:--:--") );
-        }
-        vlc_input_item_AddInfo( p_item->p_input, _("General") , _("Duration"),
-                                "%s", psz_buffer );
-
-        return VLC_SUCCESS;
-    }
-    return VLC_EGENERIC;
-}
-
-/** Add an option to a playlist item */
-void playlist_ItemAddOption( playlist_item_t *p_item,
-                             const char *psz_option)
-{
-    vlc_input_item_AddOption( p_item->p_input, psz_option );
-}
-
 /***************************************************************************
  * The following functions are local
  ***************************************************************************/
@@ -604,13 +556,6 @@ void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 {
     INSERT_ELEM( p_playlist->pp_items, p_playlist->i_size,
                  p_playlist->i_size, p_item );
-#if 0
-    fprintf( stderr, "Adding input %s (id %i) - playlist item id %i "
-                     "to node %s (id %i)\n",
-                     p_item->p_input->psz_name, p_item->p_input->i_id,
-                     p_item->i_id, p_node->p_input->psz_name,
-                     p_node->i_id );
-#endif
     INSERT_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size,
                  p_playlist->i_all_size, p_item );
     p_playlist->i_enabled ++;
@@ -693,8 +638,7 @@ int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
         b_flag = VLC_TRUE;
     }
 
-    msg_Dbg( p_playlist, "deleting playlist item `%s'",
-                          p_item->p_input->psz_name );
+    PL_DEBUG( "deleting item `%s'", p_item->p_input->psz_name );
 
     /* Remove the item from its parent */
     playlist_NodeRemoveItem( p_playlist, p_item, p_item->p_parent );

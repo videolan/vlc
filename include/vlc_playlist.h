@@ -245,76 +245,131 @@ VLC_EXPORT( int, playlist_ServicesDiscoveryRemove, (playlist_t *, const char *))
 VLC_EXPORT( int, playlist_AddSDModules, (playlist_t *, char *));
 VLC_EXPORT( vlc_bool_t, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const char *));
 
+/* Playlist sorting */
+VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );
+VLC_EXPORT( int,  playlist_NodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
+VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 
-/* Item management functions (act on items) */
-#define playlist_ItemNew( a , b, c ) __playlist_ItemNew(VLC_OBJECT(a) , b , c )
-VLC_EXPORT( playlist_item_t* , __playlist_ItemNew, ( vlc_object_t *,const char *,const char * ) );
+/* Load/Save */
+VLC_EXPORT( int,  playlist_Import, ( playlist_t *, const char *, playlist_item_t *, vlc_bool_t ) );
+VLC_EXPORT( int,  playlist_Export, ( playlist_t *, const char *, playlist_item_t *, const char * ) );
+
+/********************************************************
+ * Item management
+ ********************************************************/
+
+/*************************** Item creation **************************/
+
 VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( vlc_object_t *,const char *,const char *, int , const char **, int, int) );
+
+#define playlist_ItemNew( a , b, c ) __playlist_ItemNew(VLC_OBJECT(a) , b , c )
+/** Create a new item, without adding it to the playlist
+ * \param p_obj a vlc object (anyone will do)
+ * \param psz_uri the mrl of the item
+ * \param psz_name a text giving a name or description of the item
+ * \return the new item or NULL on failure
+ */
+static inline playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
+                                     const char *psz_uri, const char *psz_name )
+{
+    /* 0 = ITEM_TYPE_UNKNOWN */
+    return playlist_ItemNewWithType( p_obj, psz_uri,  psz_name, 0, NULL, -1,0);
+}
+
 #define playlist_ItemNewFromInput(a,b) __playlist_ItemNewFromInput(VLC_OBJECT(a),b)
 VLC_EXPORT( playlist_item_t *, __playlist_ItemNewFromInput, ( vlc_object_t *p_obj,input_item_t *p_input ) );
 
-
+/*************************** Item deletion **************************/
 VLC_EXPORT( int, playlist_ItemDelete, ( playlist_item_t * ) );
-
-/* Item informations accessors */
-VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *,  char * ) );
-VLC_EXPORT( int, playlist_ItemSetDuration, (playlist_item_t *, mtime_t ) );
-
-VLC_EXPORT( void, playlist_ItemAddOption, (playlist_item_t *, const char *) );
-
-VLC_EXPORT(void, playlist_NodeDump, ( playlist_t *p_playlist, playlist_item_t *p_item, int i_level ) );
-
-/** Counts the items of a view */
-VLC_EXPORT( int, playlist_NodeChildrenCount, (playlist_t *,playlist_item_t* ) );
-
-/* Node management */
-VLC_EXPORT( playlist_item_t *, playlist_NodeCreate, ( playlist_t *, char *, playlist_item_t * p_parent ) );
-VLC_EXPORT( int, playlist_NodeAppend, (playlist_t *,playlist_item_t*,playlist_item_t *) );
-VLC_EXPORT( int, playlist_NodeInsert, (playlist_t *,playlist_item_t*,playlist_item_t *, int) );
-VLC_EXPORT( int, playlist_NodeRemoveItem, (playlist_t *,playlist_item_t*,playlist_item_t *) );
-VLC_EXPORT( playlist_item_t *, playlist_ChildSearchName, (playlist_item_t*, const char* ) );
-VLC_EXPORT( int, playlist_NodeDelete, ( playlist_t *, playlist_item_t *, vlc_bool_t , vlc_bool_t ) );
-VLC_EXPORT( int, playlist_NodeEmpty, ( playlist_t *, playlist_item_t *, vlc_bool_t ) );
-VLC_EXPORT( void, playlist_NodesCreateForSD, (playlist_t *, char *, playlist_item_t **, playlist_item_t ** ) );
-
-/* Tree walking - These functions are only for playlist, not plugins */
-playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
-                                       playlist_item_t *p_root,
-                                       playlist_item_t *p_item );
-playlist_item_t *playlist_GetNextEnabledLeaf( playlist_t *p_playlist,
-                                              playlist_item_t *p_root,
-                                              playlist_item_t *p_item );
-playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
-                                       playlist_item_t *p_root,
-                                       playlist_item_t *p_item );
-playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
-                                       playlist_item_t *p_root );
-
-
-/* Simple add/remove functions */
-VLC_EXPORT( int,  playlist_PlaylistAdd,    ( playlist_t *, const char *, const char *, int, int ) );
-VLC_EXPORT( int,  playlist_PlaylistAddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, const char **,int ) );
-VLC_EXPORT( int, playlist_PlaylistAddInput, ( playlist_t *, input_item_t *,int , int ) );
-VLC_EXPORT( playlist_item_t *, playlist_NodeAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int ) );
-VLC_EXPORT( void, playlist_NodeAddItem, ( playlist_t *, playlist_item_t *, playlist_item_t *,int , int ) );
-VLC_EXPORT( int, playlist_BothAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int ) );
-VLC_EXPORT( void, playlist_AddWhereverNeeded, (playlist_t* , input_item_t*, playlist_item_t*,playlist_item_t*,vlc_bool_t, int ) );
-
-void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id, int i_node_id );
-
-/* Misc item operations (act on item+playlist) */
 VLC_EXPORT( int,  playlist_DeleteAllFromInput, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, int, playlist_item_t *, vlc_bool_t ) );
 VLC_EXPORT( int,  playlist_DeleteFromItemId, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_LockDelete, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_LockDeleteAllFromInput, ( playlist_t *, int ) );
+
+/*************************** Item fields accessors **************************/
+VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *,  char * ) );
+
+/******************** Item addition ********************/
+VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int, vlc_bool_t ) );
+VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, const char **,int, vlc_bool_t ) );
+VLC_EXPORT( int, playlist_AddInput, ( playlist_t *, input_item_t *,int , int, vlc_bool_t ) );
+VLC_EXPORT( playlist_item_t *, playlist_NodeAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int ) );
+VLC_EXPORT( void, playlist_NodeAddItem, ( playlist_t *, playlist_item_t *, playlist_item_t *,int , int ) );
+VLC_EXPORT( int, playlist_BothAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int ) );
+VLC_EXPORT( void, playlist_AddWhereverNeeded, (playlist_t* , input_item_t*, playlist_item_t*,playlist_item_t*,vlc_bool_t, int ) );
+
+/** Add a MRL into the playlist.
+ * \see playlist_Add
+ */
+static inline int playlist_PlaylistAdd( playlist_t *p_playlist,
+                          const char *psz_uri, const char *psz_name,
+                          int i_mode, int i_pos )
+{
+    return playlist_Add( p_playlist, psz_uri, psz_name, i_mode, i_pos,
+                         VLC_TRUE);
+}
+
+/** Add a MRL to the media library
+ * \see playlist_Add
+ */
+static inline int playlist_MLAdd( playlist_t *p_playlist, const char *psz_uri,
+                                  const char *psz_name, int i_mode, int i_pos )
+{
+    return playlist_Add( p_playlist, psz_uri, psz_name, i_mode, i_pos,
+                         VLC_FALSE );
+}
+
+/** Add a MRL to the playlist, with duration and options given
+ * \see playlist_AddExt
+ */
+static inline int playlist_PlaylistAddExt( playlist_t *p_playlist,
+            const char * psz_uri, const char *psz_name, int i_mode, int i_pos,
+            mtime_t i_duration, const char **ppsz_options, int i_options ) 
+{
+    return playlist_AddExt( p_playlist, psz_uri, psz_name, i_mode, i_pos,
+                            i_duration, ppsz_options, i_options, VLC_TRUE );
+}
+
+/** Add a MRL to the media library, with duration and options given
+ * \see playlist_AddExt
+ */
+static inline int playlist_MLAddExt( playlist_t *p_playlist,
+            const char * psz_uri, const char *psz_name, int i_mode, int i_pos,
+            mtime_t i_duration, const char **ppsz_options, int i_options ) 
+{
+    return playlist_AddExt( p_playlist, psz_uri, psz_name, i_mode, i_pos,
+                            i_duration, ppsz_options, i_options, VLC_FALSE );
+}
+
+/** Add an input item to the playlist node 
+ * \see playlist_AddInput
+ */
+static inline int playlist_PlaylistAddInput( playlist_t* p_playlist,
+                                input_item_t *p_input, int i_mode, int i_pos )
+{
+    return playlist_AddInput( p_playlist, p_input, i_mode, i_pos, VLC_TRUE );
+}
+
+/** Add an input item to the media library 
+ * \see playlist_AddInput
+ */
+static inline int playlist_MLAddInput( playlist_t* p_playlist,
+                                input_item_t *p_input, int i_mode, int i_pos )
+{
+    return playlist_AddInput( p_playlist, p_input, i_mode, i_pos, VLC_FALSE );
+}
+
+void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id, int i_node_id );
+
+/********************** Misc item operations **********************/
 VLC_EXPORT( playlist_item_t*, playlist_ItemToNode, (playlist_t *,playlist_item_t *) );
 VLC_EXPORT( playlist_item_t*, playlist_LockItemToNode, (playlist_t *,playlist_item_t *) );
 
 playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
                                    int i_input_id, playlist_item_t *p_root );
 
-/* Item search functions */
+/********************************** Item search *************************/
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int) );
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetByInput, (playlist_t *,input_item_t * ) );
 
@@ -340,14 +395,34 @@ static inline playlist_item_t *playlist_LockItemGetByInput(
 
 VLC_EXPORT( int, playlist_LiveSearchUpdate, (playlist_t *, playlist_item_t *, const char *) );
 
-/* Playlist sorting */
-VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );
-VLC_EXPORT( int,  playlist_NodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
-VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
+/********************************************************
+ * Tree management
+ ********************************************************/
+VLC_EXPORT(void, playlist_NodeDump, ( playlist_t *p_playlist, playlist_item_t *p_item, int i_level ) );
+VLC_EXPORT( int, playlist_NodeChildrenCount, (playlist_t *,playlist_item_t* ) );
 
-/* Load/Save */
-VLC_EXPORT( int,  playlist_Import, ( playlist_t *, const char *, playlist_item_t *, vlc_bool_t ) );
-VLC_EXPORT( int,  playlist_Export, ( playlist_t *, const char *, playlist_item_t *, const char * ) );
+/* Node management */
+VLC_EXPORT( playlist_item_t *, playlist_NodeCreate, ( playlist_t *, char *, playlist_item_t * p_parent ) );
+VLC_EXPORT( int, playlist_NodeAppend, (playlist_t *,playlist_item_t*,playlist_item_t *) );
+VLC_EXPORT( int, playlist_NodeInsert, (playlist_t *,playlist_item_t*,playlist_item_t *, int) );
+VLC_EXPORT( int, playlist_NodeRemoveItem, (playlist_t *,playlist_item_t*,playlist_item_t *) );
+VLC_EXPORT( playlist_item_t *, playlist_ChildSearchName, (playlist_item_t*, const char* ) );
+VLC_EXPORT( int, playlist_NodeDelete, ( playlist_t *, playlist_item_t *, vlc_bool_t , vlc_bool_t ) );
+VLC_EXPORT( int, playlist_NodeEmpty, ( playlist_t *, playlist_item_t *, vlc_bool_t ) );
+VLC_EXPORT( void, playlist_NodesCreateForSD, (playlist_t *, char *, playlist_item_t **, playlist_item_t ** ) );
+
+/* Tree walking - These functions are only for playlist, not plugins */
+playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
+                                       playlist_item_t *p_root,
+                                       playlist_item_t *p_item );
+playlist_item_t *playlist_GetNextEnabledLeaf( playlist_t *p_playlist,
+                                              playlist_item_t *p_root,
+                                              playlist_item_t *p_item );
+playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
+                                       playlist_item_t *p_root,
+                                       playlist_item_t *p_item );
+playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
+                                       playlist_item_t *p_root );
 
 /***********************************************************************
  * Inline functions
