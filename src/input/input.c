@@ -1119,7 +1119,7 @@ static void End( input_thread_t * p_input )
     if( p_input->p_es_out )
         input_EsOutDelete( p_input->p_es_out );
 
-#define CL_CO( c ) stats_CounterClean( p_input->counters.p_##c )
+#define CL_CO( c ) stats_CounterClean( p_input->counters.p_##c ); p_input->counters.p_##c = NULL;
     if( p_input->p_libvlc->b_stats )
     {
         vlc_mutex_lock( &p_input->counters.counters_lock );
