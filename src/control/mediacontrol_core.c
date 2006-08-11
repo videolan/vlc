@@ -202,7 +202,7 @@ mediacontrol_start( mediacontrol_Instance *self,
 
             /* Set start time */
             snprintf( psz_from, 20, "start-time=%i", i_from );
-            playlist_ItemAddOption( p_playlist->status.p_item, psz_from );
+            vlc_input_item_AddOption( p_playlist->status.p_item->p_input, psz_from );
             free( psz_from );
         }
 
