@@ -351,17 +351,17 @@ static int  Open ( vlc_object_t *p_this )
         goto error;
     }
     
-    /* Retrieve the duration if possible */
-    p_sys->i_length = (int64_t)( p_sys->ms->playEndTime() * 1000000.0 );
-    if( p_sys->i_length < 0 )
-        p_sys->i_length = -1;
-
     if( ( i_return = SessionsSetup( p_demux ) ) != VLC_SUCCESS )
     {
         msg_Err( p_demux, "Nothing to play for rtsp://%s", p_sys->psz_path );
         goto error;
     }
-    
+
+    /* Retrieve the duration if possible */
+    p_sys->i_length = (int64_t)( p_sys->ms->playEndTime() * 1000000.0 );
+    if( p_sys->i_length < 0 )
+        p_sys->i_length = -1;
+
     if( ( i_return = Play( p_demux ) ) != VLC_SUCCESS )
         goto error;
     
@@ -1243,18 +1243,18 @@ static int RollOverTcp( demux_t *p_demux )
             p_sys->env->getResultMsg() );
         goto error;
     }
-    
-    /* Retrieve the duration if possible */
-    p_sys->i_length = (int64_t)( p_sys->ms->playEndTime() * 1000000.0 );
-    if( p_sys->i_length < 0 )
-        p_sys->i_length = -1;
 
     if( ( i_return = SessionsSetup( p_demux ) ) != VLC_SUCCESS )
     {
         msg_Err( p_demux, "Nothing to play for rtsp://%s", p_sys->psz_path );
         goto error;
     }
-    
+
+    /* Retrieve the duration if possible */
+    p_sys->i_length = (int64_t)( p_sys->ms->playEndTime() * 1000000.0 );
+    if( p_sys->i_length < 0 )
+        p_sys->i_length = -1;
+
     if( ( i_return = Play( p_demux ) ) != VLC_SUCCESS )
         goto error;
 
