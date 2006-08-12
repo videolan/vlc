@@ -929,10 +929,6 @@ endif
 ifdef HAVE_WINCE
 	patch -p 1 < Patches/ffmpeg-svn-wince.patch
 endif
-ifeq ($(HOST),i686-apple-darwin8)
-	(cd $@;patch -p 0 < ../Patches/ffmpeg-svn-mactel.patch)
-endif
-#	(cd $@; patch -p0 < ../Patches/ffmpeg-install.patch)
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	$(WGET) $(FFMPEG_URL)
