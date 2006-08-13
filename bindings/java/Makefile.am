@@ -46,18 +46,11 @@ VlcClient: $(OBJECTS)
 VLCExample: $(OBJECTS)
 	$(JAVAC) VLCExample.java
 
-if HAVE_WIN32
-%.class: %.java
-	$(JAVAC)  $?
-	$(JCH) org.videolan.jvlc.$(*F) -o includes/$(*F).h
-else
-%.class: %.java
+.java.class:
 	$(JAVAC) $?
-	$(JCH) org/videolan/jvlc/$(*F) -o includes/$(*F).h
-endif
+	$(JCH) org/videolan/jvlc/$$(basename $*) -o includes/$$(basename $*).h
 
-clean:
+clean-local:
 	rm -f *.class *~ org/videolan/jvlc/*.class org_videolan*.h *.so *.o *.dll
-	$(MAKE) -C src clean-local
 
 endif

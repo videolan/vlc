@@ -6,8 +6,8 @@ JAVACXXFLAGS = `top_builddir=../../.. ../../../vlc-config --cflags pic` -I../../
 
 all: $(COBJECTS)
 
-%.o: %.cc
-	$(CXX) $? $(CXXFLAGS) $(JAVACXXFLAGS) -o $(*F).o
+.cc.o:
+	$(CXX) $? $(CXXFLAGS) $(JAVACXXFLAGS) -o $@
 
 .PHONY: clean-local
 
