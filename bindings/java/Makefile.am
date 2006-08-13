@@ -2,12 +2,43 @@
 # VLC Java Bindings
 #######################################################################
 
-if BUILD_JAVA
+SUBDIRS= src
+DIST_SUBDIRS = $(SUBDIRS)
+
+EXTRA_DIST= \
+	    FAQ \
+	    TODO \
+	    README \
+	    THANKS \
+	    javadoc.xml \
+	    VlcClient.java \
+	    VLCExample.java
+
+
+EXTRA_DIST+= \
+	org/videolan/jvlc/AudioIntf.java \
+	org/videolan/jvlc/Audio.java \
+	org/videolan/jvlc/GenericVideoWidget.java \
+	org/videolan/jvlc/InputIntf.java \
+	org/videolan/jvlc/Input.java \
+	org/videolan/jvlc/JLibVLC.java \
+	org/videolan/jvlc/JVLCCanvas.java \
+	org/videolan/jvlc/JVLC.java \
+	org/videolan/jvlc/JVLCPanel.java \
+	org/videolan/jvlc/PlaylistIntf.java \
+	org/videolan/jvlc/Playlist.java \
+	org/videolan/jvlc/VideoIntf.java \
+	org/videolan/jvlc/Video.java \
+	org/videolan/jvlc/VLCException.java \
+	org/videolan/jvlc/VLMIntf.java \
+	org/videolan/jvlc/VLM.java 
 
 OBJECTS = org/videolan/jvlc/VLCException.class org/videolan/jvlc/Playlist.class org/videolan/jvlc/AudioIntf.class org/videolan/jvlc/Audio.class org/videolan/jvlc/InputIntf.class org/videolan/jvlc/Input.class org/videolan/jvlc/PlaylistIntf.class org/videolan/jvlc/VideoIntf.class org/videolan/jvlc/Video.class org/videolan/jvlc/JLibVLC.class org/videolan/jvlc/JVLC.class org/videolan/jvlc/JVLCCanvas.class org/videolan/jvlc/JVLCPanel.class org/videolan/jvlc/VLMIntf.class org/videolan/jvlc/VLM.class  org/videolan/jvlc/GenericVideoWidget.class
 
+
 COBJECTS = src/utils.o src/video-jni.o src/audio-jni.o src/input-jni.o src/playlist-jni.o src/vlm-jni.o src/core-jni.o src/graphics-jni.o
 
+if BUILD_JAVA
 # Include some JAVA stuff
 PROCESSOR_FAMILY = `uname -m | sed -e 's/^i.86/i386/' | sed -e 's/^x86_64/amd64/'`
 
