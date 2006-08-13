@@ -57,7 +57,7 @@ static void Close( vlc_object_t * );
 
 #define NAME_TEXT N_("Stream name")
 #define NAME_LONGTEXT N_("Name to give to this stream/channel on the " \
-                         "icecast server." )
+                         "shoutcast/icecast server." )
 
 #define DESCRIPTION_TEXT N_("Stream description")
 #define DESCRIPTION_LONGTEXT N_("Description of the stream content or " \
@@ -66,8 +66,14 @@ static void Close( vlc_object_t * );
 #define MP3_TEXT N_("Stream MP3")
 #define MP3_LONGTEXT N_("You normally have to feed the shoutcast module " \
                         "with Ogg streams. It is also possible to stream " \
-                        "MP3 instead, so you can "\
-                        "forward MP3 streams to the icecast server." )
+                        "MP3 instead, so you can forward MP3 streams to " \
+                        "the shoutcast/icecast server." )
+
+#define PROTOCOL_TEXT N_("Shoutcast protocol")
+#define PROTOCOL_LONGTEXT N_("Shoutcast header protocol to use when communicating " \
+                             "with the server. Shoutcast servers need 'icy', " \
+                             "icecast 1.x needs 'xaudiocast', and icecast 2.x " \
+                             "needs 'http'. " )
 
 vlc_module_begin();
     set_description( _("IceCAST output") );
@@ -84,6 +90,8 @@ vlc_module_begin();
                 DESCRIPTION_TEXT, DESCRIPTION_LONGTEXT, VLC_FALSE );
     add_bool(   SOUT_CFG_PREFIX "mp3", VLC_FALSE, NULL,
                 MP3_TEXT, MP3_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "protocol", "http", NULL,
+                PROTOCOL_TEXT, PROTOCOL_LONGTEXT, VLC_FALSE );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -91,7 +99,7 @@ vlc_module_end();
  * Exported prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "name", "description", "mp3", NULL
+    "name", "description", "mp3", "protocol", NULL
 };
 
 
@@ -127,6 +135,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_mount = NULL;
     char *psz_name = NULL;
     char *psz_description = NULL;
+    char *psz_protocol = NULL;
     char *tmp_port = NULL;
   
     sout_CfgParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
@@ -180,8 +189,6 @@ static int Open( vlc_object_t *p_this )
     p_shout = p_sys->p_shout = shout_new();
     if( !p_shout
          || shout_set_host( p_shout, psz_host ) != SHOUTERR_SUCCESS
-         || shout_set_protocol( p_shout, SHOUT_PROTOCOL_HTTP )
-             != SHOUTERR_SUCCESS
          || shout_set_port( p_shout, i_port ) != SHOUTERR_SUCCESS
          || shout_set_password( p_shout, psz_pass ) != SHOUTERR_SUCCESS
          || shout_set_mount( p_shout, psz_mount ) != SHOUTERR_SUCCESS
@@ -213,6 +220,28 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "failed to set the shoutcast streaming format" );
         free( p_access->p_sys );
         free( psz_accessname );
+        return VLC_EGENERIC;
+    }
+
+    var_Get( p_access, SOUT_CFG_PREFIX "protocol", &val );
+    if( !strcmp( val.psz_string, "icy" ) )
+    {
+        i_ret = shout_set_protocol( p_shout, SHOUT_PROTOCOL_ICY );
+    }
+    else if( !strcmp( val.psz_string, "xaudiocast" ) )
+    {
+        i_ret = shout_set_protocol( p_shout, SHOUT_PROTOCOL_XAUDIOCAST );
+    }
+    else if( !strcmp( val.psz_string, "http" ) )
+    {
+        i_ret = shout_set_protocol( p_shout, SHOUT_PROTOCOL_HTTP );
+    }
+
+    if( i_ret != SHOUTERR_SUCCESS )
+    {
+        msg_Err( p_access, "failed to set the shoutcast header protocol" );
+        free( p_access->p_sys );
+        free( psz_protocol );
         return VLC_EGENERIC;
     }
 
