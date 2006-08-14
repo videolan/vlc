@@ -515,7 +515,7 @@ static int  Open ( vlc_object_t *p_this )
                 unsigned int i_extra = 0;
                 uint8_t      *p_extra = NULL;
 #endif
-                tk->fmt.i_codec = VLC_FOURCC( 'H', '2', '6', '4' );
+                tk->fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
                 tk->fmt.b_packetized = VLC_FALSE;
 
                 /* XXX not the right minimal version I fear */
@@ -1395,7 +1395,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
         if( tk->rtpSource->curPacketMarkerBit() )
             p_block->i_flags |= BLOCK_FLAG_END_OF_FRAME;
     }
-    else if( tk->fmt.i_codec == VLC_FOURCC('H','2','6','4') )
+    else if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','4') )
     {
         if( (tk->p_buffer[0] & 0x1f) >= 24 )
             msg_Warn( p_demux, "unsupported NAL type for H264" );
@@ -1565,6 +1565,7 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
                                           unsigned int& configSize )
 {
     char *dup, *psz;
+    int i, i_records = 1;
 
     if( configSize )
     configSize = 0;
@@ -1574,22 +1575,27 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
 
     psz = dup = strdup( configStr );
 
-    unsigned char *cfg = new unsigned char[5 * strlen(psz)];
-    for( ;; )
+    /* Count the number of comma's */
+    for( psz = dup; *psz != '\0'; ++psz )
     {
-        char *p = strchr( psz, ',' );
-        if( p )
-            *p++ = '\0';
+        if( *psz == ',')
+        {
+            ++i_records;
+            *psz = '\0';
+        }
+    }
 
+    unsigned char *cfg = new unsigned char[5 * strlen(dup)];
+    psz = dup;
+    for( i = 0; i < i_records; i++ )
+    {
         cfg[configSize++] = 0x00;
         cfg[configSize++] = 0x00;
         cfg[configSize++] = 0x00;
         cfg[configSize++] = 0x01;
-        configSize += b64_decode( (char*)&cfg[configSize], psz );
 
-        if( p == NULL )
-            break;
-        psz = p;
+        configSize += b64_decode( (char*)&cfg[configSize], psz );
+        psz += strlen(psz)+1;
     }
 
     if( dup ) free( dup );
