@@ -284,7 +284,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         switch( p_sys->i_state )
         {
             case STATE_NOSYNC:
-                /* Skip untill 3 byte startcode 0 0 1 */
+                /* Skip until 3 byte startcode 0 0 1 */
                 if( block_FindStartcodeFromOffset( &p_sys->bytestream,
                       &p_sys->i_offset, p_sys->startcode+1, 3 ) == VLC_SUCCESS)
                 {
@@ -354,7 +354,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 /****************************************************************************
  * PacketizeAVC1: Takes VCL blocks of data and creates annexe B type NAL stream
  * Will always use 4 byte 0 0 0 1 startcodes
- * Should prepend the SPS and PPS to the front of the stream 
+ * Will prepend a SPS and PPS before each keyframe
  ****************************************************************************/
 static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
 {
@@ -367,22 +367,6 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
     *pp_block = NULL;
-
-#if 0
-    if( //(p_block->i_flags & BLOCK_FLAG_TYPE_I) &&
-        p_sys->p_sps && p_sys->p_pps )
-    {
-        block_t *p_pic;
-        block_t *p_sps = block_Duplicate( p_sys->p_sps );
-        block_t *p_pps = block_Duplicate( p_sys->p_pps );
-        p_sps->i_dts = p_pps->i_dts = p_block->i_dts;
-        p_sps->i_pts = p_pps->i_pts = p_block->i_pts;
-        p_pic = ParseNALBlock( p_dec, p_sps );
-        if( p_pic ) block_ChainAppend( &p_ret, p_pic );
-        p_pic = ParseNALBlock( p_dec, p_pps );
-        if( p_pic ) block_ChainAppend( &p_ret, p_pic );
-    }
-#endif
 
     for( p = p_block->p_buffer; p < &p_block->p_buffer[p_block->i_buffer]; )
     {
@@ -490,12 +474,24 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     const int i_nal_type = p_frag->p_buffer[4]&0x1f;
 
 #define OUTPUT \
-    do {                                                \
-        p_pic = block_ChainGather( p_sys->p_frame );    \
-        p_pic->i_length = 0;    /* FIXME */             \
-                                                        \
-        p_sys->p_frame = NULL;                          \
-        p_sys->b_slice = VLC_FALSE;                     \
+    do {                                                      \
+        p_pic = block_ChainGather( p_sys->p_frame );          \
+        p_pic->i_length = 0;    /* FIXME */                   \
+                                                              \
+        p_sys->p_frame = NULL;                                \
+        p_sys->b_slice = VLC_FALSE;                           \
+                                                              \
+        if( ( p_pic->i_flags & BLOCK_FLAG_TYPE_I ) &&         \
+              p_sys->p_sps && p_sys->p_pps )                  \
+        {                                                     \
+            block_t *p_sps = block_Duplicate( p_sys->p_sps ); \
+            block_t *p_pps = block_Duplicate( p_sys->p_pps ); \
+            p_sps->i_dts = p_pps->i_dts = p_pic->i_dts;       \
+            p_sps->i_pts = p_pps->i_pts = p_pic->i_pts;       \
+            block_ChainAppend( &p_sps, p_pps );               \
+            block_ChainAppend( &p_sps, p_pic );               \
+            p_pic = block_ChainGather( p_sps );               \
+        }                                                     \
     } while(0)
 
 
@@ -549,6 +545,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
                 i_pic_flags = BLOCK_FLAG_TYPE_I;
                 break;
         }
+        p_frag->i_flags |= i_pic_flags;
 
         /* pic_parameter_set_id */
         bs_read_ue( &s );
@@ -709,8 +706,14 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
         free( dec );
 
-
         if( p_sys->b_slice ) OUTPUT;
+
+        /* We have a new SPS */
+        if( p_sys->p_sps ) block_Release( p_sys->p_sps );
+        p_sys->p_sps = p_frag;
+
+        /* Do not append the SPS because we will insert it on keyframes */
+        return p_pic;
     }
     else if( i_nal_type == NAL_PPS )
     {
@@ -723,6 +726,13 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         /* TODO */
 
         if( p_sys->b_slice ) OUTPUT;
+
+        /* We have a new PPS */
+        if( p_sys->p_pps ) block_Release( p_sys->p_pps );
+        p_sys->p_pps = p_frag;
+
+        /* Do not append the PPS because we will insert it on keyframes */
+        return p_pic;
     }
     else if( i_nal_type == NAL_AU_DELIMITER ||
              i_nal_type == NAL_SEI ||
