@@ -121,6 +121,8 @@ static block_t *nal_get_annexeb( decoder_t *, uint8_t *p, int );
 
 /*****************************************************************************
  * Open: probe the packetizer and return score
+ * When opening after demux, the packetizer is only loaded AFTER the decoder
+ * That means that what you set in fmt_out is ignored by the decoder in this special case
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
@@ -165,12 +167,13 @@ static int Open( vlc_object_t *p_this )
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
-    /* FIXME: FFMPEG isn't happy at all if you leave this */
-    if( p_dec->fmt_out.i_extra ) free( p_dec->fmt_out.p_extra );
-    p_dec->fmt_out.i_extra = 0; p_dec->fmt_out.p_extra = 0;
 
     if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'v', 'c', '1' ) )
     {
+        /* This type of stream is produced by mp4 and matroska
+         * when we want to store it in another streamformat, you need to convert
+         * The fmt_in.p_extra should ALWAYS contain the avcC
+         * The fmt_out.p_extra should contain all the SPS and PPS with 4 byte startcodes */
         uint8_t *p = &((uint8_t*)p_dec->fmt_in.p_extra)[4];
         int i_sps, i_pps;
         int i;
@@ -180,7 +183,6 @@ static int Open( vlc_object_t *p_this )
 
         /* Read SPS */
         i_sps = (*p++)&0x1f;
-
         for( i = 0; i < i_sps; i++ )
         {
             int i_length = GetWBE( p );
@@ -206,11 +208,25 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_dec, "avcC length size=%d, sps=%d, pps=%d",
                  p_sys->i_avcC_length_size, i_sps, i_pps );
 
+        /* FIXME: FFMPEG isn't happy at all if you leave this */
+        if( p_dec->fmt_out.i_extra ) free( p_dec->fmt_out.p_extra );
+        p_dec->fmt_out.i_extra = 0; p_dec->fmt_out.p_extra = NULL;
+        
+        /* Set the new extradata */
+        p_dec->fmt_out.i_extra = p_sys->p_pps->i_buffer + p_sys->p_sps->i_buffer;
+        p_dec->fmt_out.p_extra = (uint8_t*)malloc( p_dec->fmt_out.i_extra );
+        memcpy( p_dec->fmt_out.p_extra, p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
+        memcpy( p_dec->fmt_out.p_extra+p_sys->p_pps->i_buffer, p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
+
         /* Set callback */
         p_dec->pf_packetize = PacketizeAVC1;
     }
     else
     {
+        /* This type of stream contains data with 3 of 4 byte startcodes 
+         * The fmt_in.p_extra MAY contain SPS/PPS with 4 byte startcodes
+         * The fmt_out.p_extra should be the same */
+         
         /* Set callback */
         p_dec->pf_packetize = Packetize;
 
@@ -251,6 +267,8 @@ static void Close( vlc_object_t *p_this )
 
 /****************************************************************************
  * Packetize: the whole thing
+ * Search for the startcodes 3 or more bytes
+ * Feed ParseNALBlock ALWAYS with 4 byte startcode prepended NALs
  ****************************************************************************/
 static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 {
@@ -266,6 +284,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         switch( p_sys->i_state )
         {
             case STATE_NOSYNC:
+                /* Skip untill 3 byte startcode 0 0 1 */
                 if( block_FindStartcodeFromOffset( &p_sys->bytestream,
                       &p_sys->i_offset, p_sys->startcode+1, 3 ) == VLC_SUCCESS)
                 {
@@ -274,6 +293,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
                 if( p_sys->i_offset )
                 {
+                    /* skip the data */
                     block_SkipBytes( &p_sys->bytestream, p_sys->i_offset );
                     p_sys->i_offset = 0;
                     block_BytestreamFlush( &p_sys->bytestream );
@@ -288,7 +308,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 p_sys->i_offset = 1; /* To find next startcode */
 
             case STATE_NEXT_SYNC:
-                /* Find the next startcode */
+                /* Find the next 3 byte startcode 0 0 1*/
                 if( block_FindStartcodeFromOffset( &p_sys->bytestream,
                       &p_sys->i_offset, p_sys->startcode+1, 3 ) != VLC_SUCCESS)
                 {
@@ -297,14 +317,17 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 }
 
                 /* Get the new fragment and set the pts/dts */
-                p_pic = block_New( p_dec, p_sys->i_offset );
+                p_pic = block_New( p_dec, p_sys->i_offset +1 );
                 p_pic->i_pts = p_sys->bytestream.p_block->i_pts;
                 p_pic->i_dts = p_sys->bytestream.p_block->i_dts;
+                /* Force 4 byte startcode 0 0 0 1 */
+                p_pic->p_buffer[0] = 0;
 
-                block_GetBytes( &p_sys->bytestream, p_pic->p_buffer,
-                                p_pic->i_buffer );
+                block_GetBytes( &p_sys->bytestream, &p_pic->p_buffer[1],
+                                p_pic->i_buffer-1 );
 
-                if( !p_pic->p_buffer[p_pic->i_buffer-1] ) p_pic->i_buffer--;
+                /* Remove trailing 0 bytes */
+                while( p_pic->i_buffer && (!p_pic->p_buffer[p_pic->i_buffer-1] ) ) p_pic->i_buffer--;
                 p_sys->i_offset = 0;
 
                 /* Parse the NAL */
@@ -329,7 +352,9 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 }
 
 /****************************************************************************
- * PacketizeAVC1: the whole thing
+ * PacketizeAVC1: Takes VCL blocks of data and creates annexe B type NAL stream
+ * Will always use 4 byte 0 0 0 1 startcodes
+ * Should prepend the SPS and PPS to the front of the stream 
  ****************************************************************************/
 static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
 {
@@ -394,15 +419,16 @@ static block_t *nal_get_annexeb( decoder_t *p_dec, uint8_t *p, int i_size )
 {
     block_t *p_nal;
 
-    p_nal = block_New( p_dec, 3 + i_size );
+    p_nal = block_New( p_dec, 4 + i_size );
 
     /* Add start code */
     p_nal->p_buffer[0] = 0x00;
     p_nal->p_buffer[1] = 0x00;
-    p_nal->p_buffer[2] = 0x01;
+    p_nal->p_buffer[2] = 0x00;
+    p_nal->p_buffer[3] = 0x01;
 
     /* Copy nalu */
-    memcpy( &p_nal->p_buffer[3], p, i_size );
+    memcpy( &p_nal->p_buffer[4], p, i_size );
 
     return p_nal;
 }
@@ -451,13 +477,17 @@ static inline int bs_read_se( bs_t *s )
 }
 
 
+/*****************************************************************************
+ * ParseNALBlock: parses annexB type NALs
+ * All p_frag blocks are required to start with 0 0 0 1 4-byte startcode 
+ *****************************************************************************/
 static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
 
-    const int i_nal_ref_idc = (p_frag->p_buffer[3] >> 5)&0x03;
-    const int i_nal_type = p_frag->p_buffer[3]&0x1f;
+    const int i_nal_ref_idc = (p_frag->p_buffer[4] >> 5)&0x03;
+    const int i_nal_type = p_frag->p_buffer[4]&0x1f;
 
 #define OUTPUT \
     do {                                                \
@@ -493,8 +523,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         bs_t s;
 
         /* do not convert the whole frame */
-        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[4],
-                         __MIN( p_frag->i_buffer - 4, 60 ) );
+        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[5],
+                         __MIN( p_frag->i_buffer - 5, 60 ) );
         bs_init( &s, dec, i_dec );
 
         /* first_mb_in_slice */
@@ -573,8 +603,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
         p_sys->b_sps = VLC_TRUE;
 
-        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[4],
-                         p_frag->i_buffer - 4 );
+        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[5],
+                         p_frag->i_buffer - 5 );
 
         bs_init( &s, dec, i_dec );
         /* Skip profile(8), constraint_set012, reserver(5), level(8) */
@@ -685,7 +715,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     else if( i_nal_type == NAL_PPS )
     {
         bs_t s;
-        bs_init( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
+        bs_init( &s, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
 
         if( !p_sys->b_pps ) msg_Dbg( p_dec, "found NAL_PPS" );
         p_sys->b_pps = VLC_TRUE;
