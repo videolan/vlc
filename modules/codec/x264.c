@@ -538,6 +538,8 @@ static int  Open ( vlc_object_t *p_this )
     encoder_sys_t *p_sys;
     vlc_value_t    val;
     int i_qmin = 0, i_qmax = 0;
+    x264_nal_t    *nal;
+    int i, i_nal;
 
     if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'h', '2', '6', '4' ) &&
         !p_enc->b_force )
@@ -938,7 +940,6 @@ static int  Open ( vlc_object_t *p_this )
     p_enc->fmt_out.i_extra = 0;
     p_enc->fmt_out.p_extra = NULL;
 
-#if 0
     x264_encoder_headers( p_sys->h, &nal, &i_nal );
     for( i = 0; i < i_nal; i++ )
     {
@@ -953,7 +954,6 @@ static int  Open ( vlc_object_t *p_this )
 
         p_enc->fmt_out.i_extra += i_size;
     }
-#endif
 
     return VLC_SUCCESS;
 }
