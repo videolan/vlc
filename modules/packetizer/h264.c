@@ -215,8 +215,8 @@ static int Open( vlc_object_t *p_this )
         /* Set the new extradata */
         p_dec->fmt_out.i_extra = p_sys->p_pps->i_buffer + p_sys->p_sps->i_buffer;
         p_dec->fmt_out.p_extra = (uint8_t*)malloc( p_dec->fmt_out.i_extra );
-        memcpy( p_dec->fmt_out.p_extra, p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
-        memcpy( p_dec->fmt_out.p_extra+p_sys->p_pps->i_buffer, p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
+        memcpy( p_dec->fmt_out.p_extra, p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
+        memcpy( p_dec->fmt_out.p_extra+p_sys->p_sps->i_buffer, p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
 
         /* Set callback */
         p_dec->pf_packetize = PacketizeAVC1;
