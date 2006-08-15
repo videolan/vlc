@@ -118,6 +118,7 @@ typedef struct
     struct
     {
         int     i_profile;
+        int     i_profile_compat;
         int     i_level;
 
         int     i_sps;
@@ -440,7 +441,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_stream->i_dts_start   = 0;
     p_stream->i_duration    = 0;
     p_stream->avc.i_profile = 77;
-    p_stream->avc.i_level   = 51;
+    p_stream->avc.i_profile_compat = 64;
+    p_stream->avc.i_level   = 30;
     p_stream->avc.i_sps     = 0;
     p_stream->avc.sps       = NULL;
     p_stream->avc.i_pps     = 0;
@@ -721,6 +723,7 @@ static void ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
             memcpy( tk->avc.sps, &last[4], i_size );
 
             tk->avc.i_profile = tk->avc.sps[1];
+            tk->avc.i_profile = tk->avc.sps[2];
             tk->avc.i_level   = tk->avc.sps[3];
         }
         else if( (last[4]&0x1f) == 8 && tk->avc.i_pps <= 0 )   /* PPS */
@@ -929,7 +932,7 @@ static bo_t *GetAvcCTag( mp4_stream_t *p_stream )
     avcC = box_new( "avcC" );
     bo_add_8( avcC, 1 );      /* configuration version */
     bo_add_8( avcC, p_stream->avc.i_profile );
-    bo_add_8( avcC, p_stream->avc.i_profile );     /* profile compatible ??? */
+    bo_add_8( avcC, p_stream->avc.i_profile_compat );
     bo_add_8( avcC, p_stream->avc.i_level );       /* level, 5.1 */
     bo_add_8( avcC, 0xff );   /* 0b11111100 | lengthsize = 0x11 */
 
