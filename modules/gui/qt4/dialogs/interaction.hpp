@@ -32,6 +32,7 @@
 #undef Q_
 #include <ui/progressdialog.h>
 #undef Q_
+#include <QWidget>
 
 class InteractionDialog : public QWidget
 {

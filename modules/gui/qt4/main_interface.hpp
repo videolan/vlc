@@ -27,8 +27,9 @@
 #include "ui/main_interface.h"
 #include "util/qvlcframe.hpp"
 
-class InputManager;
 class QCloseEvent;
+class QLabel;
+class InputManager;
 class InputSlider;
 class VideoWidget;
 
