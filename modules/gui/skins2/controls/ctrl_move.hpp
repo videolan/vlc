@@ -58,7 +58,10 @@ class CtrlMove: public CtrlFlat
         /// Get the position of the decorated control in the layout, if any
         virtual const Position *getPosition() const;
 
-          /// Get the type of control (custom RTTI)
+        /// Method called when the control is resized
+        virtual void onResize();
+
+        /// Get the type of control (custom RTTI)
         virtual string getType() const { return m_rCtrl.getType(); }
 
     private:

@@ -86,6 +86,12 @@ const Position *CtrlMove::getPosition() const
 }
 
 
+void CtrlMove::onResize()
+{
+    m_rCtrl.onResize();
+}
+
+
 void CtrlMove::handleEvent( EvtGeneric &rEvent )
 {
     m_pEvt = &rEvent;
