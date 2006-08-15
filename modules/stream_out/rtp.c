@@ -927,6 +927,68 @@ static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
     s[2*i_data] = '\0';
 }
 
+static const char basis_64[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+int ap_base64encode_len(int len)
+{
+    return ((len + 2) / 3 * 4) + 1;
+}
+
+int ap_base64encode_binary(char *encoded,
+                                       const unsigned char *string, int len)
+{
+    int i;
+    char *p;
+
+    p = encoded;
+    for (i = 0; i < len - 2; i += 3) {
+        *p++ = basis_64[(string[i] >> 2) & 0x3F];
+        *p++ = basis_64[((string[i] & 0x3) << 4) |
+                        ((int) (string[i + 1] & 0xF0) >> 4)];
+        *p++ = basis_64[((string[i + 1] & 0xF) << 2) |
+                        ((int) (string[i + 2] & 0xC0) >> 6)];
+        *p++ = basis_64[string[i + 2] & 0x3F];
+    }
+    if (i < len) {
+        *p++ = basis_64[(string[i] >> 2) & 0x3F];
+        if (i == (len - 1)) {
+            *p++ = basis_64[((string[i] & 0x3) << 4)];
+            *p++ = '=';
+        }
+        else {
+            *p++ = basis_64[((string[i] & 0x3) << 4) |
+                            ((int) (string[i + 1] & 0xF0) >> 4)];
+            *p++ = basis_64[((string[i + 1] & 0xF) << 2)];
+        }
+        *p++ = '=';
+    }
+
+    *p++ = '\0';
+    return p - encoded;
+}
+
+int ap_base64encode(char *encoded, const char *string, int len)
+{
+    return ap_base64encode_binary(encoded, (const unsigned char *) string, len);
+}
+
+char *b64_encode(char *buf, int len)
+{
+    int elen;
+    char *out;
+
+    if(len == 0)
+        len = strlen(buf);
+
+    elen = ap_base64encode_len(len);
+    out = (char *) malloc(sizeof(char) * (elen + 1));
+
+    ap_base64encode(out, buf, len);
+
+    return out;
+}
+
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_instance_t   *p_sout = p_stream->p_sout;
@@ -1082,7 +1144,60 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->i_clock_rate = 90000;
             id->psz_rtpmap = strdup( "H264/90000" );
             id->pf_packetize = rtp_packetize_h264;
-            id->psz_fmtp = strdup( "packetization-mode=1" );
+            if( p_fmt->i_extra > 0 )
+            {
+                uint8_t *p_buffer = p_fmt->p_extra;
+                int     i_buffer = p_fmt->i_extra;
+                char    *p_64_sps;
+                char    *p_64_pps;
+                char    hexa[6];
+                
+                while( i_buffer > 4 && 
+                    p_buffer[0] == 0 && p_buffer[1] == 0 &&
+                    p_buffer[2] == 0 && p_buffer[3] == 1 )
+                {
+                    const int i_nal_type = p_buffer[4]&0x1f;
+                    int i_offset    = 1;
+                    int i_size      = 0;
+                    int i_startcode = 0;
+                    int i_encoded   = 0;
+                    
+                    msg_Dbg( p_stream, "we found a startcode for NAL with TYPE:%d", i_nal_type );
+                    
+                    for( i_offset = 1; i_offset+3 < i_buffer ; i_offset++)
+                    {
+                        if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 && p_buffer[i_offset+2] == 0 && p_buffer[i_offset+3] == 1 )
+                        {
+                            /* we found another startcode */
+                            i_startcode = i_offset;
+                            break;
+                        } 
+                    }
+                    i_size = i_startcode ? i_startcode : i_buffer;
+                    if( i_nal_type == 7 )
+                    {
+                        p_64_sps = (char *)malloc( ap_base64encode_len( i_size - 4) );
+                        i_encoded = ap_base64encode_binary( p_64_sps, &p_buffer[4], i_size - 4 );
+                        p_64_sps[i_encoded] = '\0';
+                        sprintf_hexa( hexa, &p_buffer[5], 3 );
+                        hexa[6] = '\0'; 
+                    }
+                    if( i_nal_type == 8 )
+                    {
+                        p_64_pps = (char *)malloc( ap_base64encode_len( i_size - 4) );
+                        i_encoded = ap_base64encode_binary( p_64_pps, &p_buffer[4], i_size - 4 );
+                        p_64_pps[i_encoded] = '\0';
+                    }
+                    i_buffer -= i_size;
+                    p_buffer += i_size;
+                }
+                /* FIXME: All this is a bit unsafe */
+                asprintf( &id->psz_fmtp, "packetization-mode=1;profile-level-id=%s;sprop-parameter-sets=%s,%s;", hexa, p_64_sps, p_64_pps );
+                free( p_64_sps );
+                free( p_64_pps );
+            }
+            else
+                id->psz_fmtp = strdup( "packetization-mode=1" );
             break;
 
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
@@ -2360,37 +2475,36 @@ static int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
     uint8_t *p_data = in->p_buffer;
     int     i_data  = in->i_buffer;
-    int     i;
+    block_t *out;
+    int     i_nal_type;
+    int     i_payload;
 
-    if( i_data <= i_max )
+    while( i_data > 5 &&
+           ( p_data[0] != 0x00 || p_data[1] != 0x00 || p_data[2] != 0x01 || /* startcode */
+            (p_data[3]&0x1f) < 1 || (p_data[3]&0x1f) > 23 ) ) /* naltype should be between 1 and 23 */
     {
-        /* NAL */
-        int           i_payload;
-        block_t *out;
-        uint8_t *p = p_data;
-        int      i_rest = in->i_buffer;
+        p_data++;
+        i_data--;
+    }
 
-        while( i_rest > 4 &&
-               ( p[0] != 0x00 || p[1] != 0x00 || p[2] != 0x01 ) )
-        {
-            p++;
-            i_rest--;
-        }
+    if( i_data < 5 )
+        return VLC_SUCCESS;
 
-        if (i_rest < 4)
-            return VLC_SUCCESS;
- 
-        p+=3;
-        i_rest-=3;
-
-        i_payload = __MIN( i_max, i_rest );
+    p_data+=3;
+    i_data-=3;
+    i_nal_type = p_data[0]&0x1f;
+    
+    if( i_data <= i_max ) /* The whole pack will fit in one rtp payload */
+    {
+        /* single NAL */
+        i_payload = __MIN( i_max, i_data );
         out = block_New( p_stream, 12 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, 1,
                               in->i_pts > 0 ? in->i_pts : in->i_dts );
 
-        memcpy( &out->p_buffer[12], p, i_payload );
+        memcpy( &out->p_buffer[12], p_data, i_payload );
 
         out->i_buffer   = 12 + i_payload;
         out->i_dts    = in->i_dts;
@@ -2403,40 +2517,24 @@ static int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
     else
     {
         /* FU-A */
-        int           i_payload;
-        block_t *out;
-        uint8_t *p = p_data;
-        int      i_rest = in->i_buffer;
-        int start=1, end=0, first=0, nalh=-1;
+        uint8_t     nalh; /* The nalheader byte */
+        int i=0, start=1, end=0, first=0;
  
-        while( i_rest > 4 &&
-               ( p[0] != 0x00 || p[1] != 0x00 || p[2] != 0x01 ) )
-        {
-            p++;
-            i_rest--;
-        }
-
-        if (i_rest < 4)
-            return VLC_SUCCESS;
-
-        p+=3;
-        i_rest-=3;
-
-        nalh = *p;
-        p++;
-        i_rest--;
+        nalh = *p_data;
+        p_data++;
+        i_data--;
 
         i_max   = id->i_mtu - 14;
-        i_count = ( i_rest + i_max - 1 ) / i_max;
+        i_count = ( i_data + i_max - 1 ) / i_max;
 
         /*msg_Dbg( p_stream, "nal-out fragmented %02x %d", nalh, i_rest);*/
 
-        i=0;
-        while (end==0){
-                i_payload = __MIN( i_max, i_rest );
-                out = block_New( p_stream, 14 + i_payload );
+        while( end == 0 )
+        {
+            i_payload = __MIN( i_max, i_data );
+            out = block_New( p_stream, 14 + i_payload );
 
-            if (i_rest==i_payload)
+            if( i_data == i_payload )
                 end = 1;
 
             /* rtp common header */
@@ -2448,22 +2546,22 @@ static int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
             /* FU header */
             out->p_buffer[13] = (start<<7)|(end<<6)|(nalh&0x1f);
 
-            memcpy( &out->p_buffer[14], p+first, i_payload );
+            memcpy( &out->p_buffer[14], p_data+first, i_payload );
  
             out->i_buffer   = 14 + i_payload;
 
             // not sure what of these should be used and what it does :)
-            out->i_dts    = in->i_dts + i * in->i_length / i_count;
-            out->i_length = in->i_length / i_count;
-            //out->i_dts    = in->i_dts;
-            //out->i_length = in->i_length;
+            out->i_pts    = in->i_pts;
+            out->i_dts    = in->i_dts;
+            //out->i_dts    = in->i_dts + i * in->i_length / i_count;
+            //out->i_length = in->i_length / i_count;
 
             rtp_packetize_send( id, out );
 
             /*msg_Dbg( p_stream, "nal-out fragmented: frag %d %d %02x %02x %d", start,end,
             out->p_buffer[12], out->p_buffer[13], i_payload );*/
 
-            i_rest -= i_payload;
+            i_data -= i_payload;
             first += i_payload;
             i++;
             start=0;
