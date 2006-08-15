@@ -154,11 +154,11 @@ VideoWindow::~VideoWindow()
         if( !p_intf->psz_switch_intf )
         {
             if( vout_Control( p_vout, VOUT_CLOSE ) != VLC_SUCCESS )
-                vout_Control( p_vout, VOUT_REPARENT );
+                vout_Control( p_vout, VOUT_REPARENT, 0 );
         }
         else
         {
-            if( vout_Control( p_vout, VOUT_REPARENT ) != VLC_SUCCESS )
+            if( vout_Control( p_vout, VOUT_REPARENT, 0 ) != VLC_SUCCESS )
                 vout_Control( p_vout, VOUT_CLOSE );
         }
     }

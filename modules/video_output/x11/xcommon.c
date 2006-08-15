@@ -2346,7 +2346,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     vlc_bool_t b_arg;
     unsigned int i_width, i_height;
     unsigned int *pi_width, *pi_height;
-    Drawable d;
+    Drawable d = 0;
     
     switch( i_query )
     {
@@ -2393,17 +2393,16 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
        case VOUT_REPARENT:
             vlc_mutex_lock( &p_vout->p_sys->lock );
-	    d = (Drawable)va_arg( args, int );
-	    if ( !d ) 
+            if( i_query == VOUT_REPARENT ) d = (Drawable)va_arg( args, int );
+            if( !d )
             XReparentWindow( p_vout->p_sys->p_display,
                              p_vout->p_sys->original_window.base_window,
                              DefaultRootWindow( p_vout->p_sys->p_display ),
                              0, 0 );
-	    else
+            else
             XReparentWindow( p_vout->p_sys->p_display,
                              p_vout->p_sys->original_window.base_window,
-			     d,
-		   	     0, 0); 
+                             d, 0, 0);
             XSync( p_vout->p_sys->p_display, False );
             p_vout->p_sys->original_window.owner_window = 0;
             vlc_mutex_unlock( &p_vout->p_sys->lock );
