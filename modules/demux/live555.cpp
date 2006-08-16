@@ -1207,7 +1207,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int RollOverTcp( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    MediaSubsessionIterator *iter;
+    MediaSubsessionIterator *iter = 0;
     MediaSubsession *sub;
     int i_tk;
     int i_return;
