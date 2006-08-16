@@ -128,6 +128,9 @@ class CtrlSliderBg: public CtrlGeneric, public Observer<VarPercent>
         /// Handle an event
         virtual void handleEvent( EvtGeneric &rEvent );
 
+        /// Method called when the control is resized
+        virtual void onResize();
+
         /// Get the type of control (custom RTTI)
         virtual string getType() const { return "slider_bg"; }
 
@@ -146,7 +149,7 @@ class CtrlSliderBg: public CtrlGeneric, public Observer<VarPercent>
         /// Initial size of the control
         int m_width, m_height;
         /// Background image sequence (optional)
-        OSGraphics *m_pImgSeq;
+        GenericBitmap *m_pImgSeq;
         /// Number of images in the background bitmap
         int m_nbHoriz, m_nbVert;
         /// Number of pixels between two images

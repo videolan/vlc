@@ -100,7 +100,7 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
         if( m_resizeMethod == kScale )
         {
             // Use scaling method
-            if( width > 1 && height > 1 )
+            if( width > 0 && height > 0 )
             {
                 if( width != m_pImage->getWidth() ||
                     height != m_pImage->getHeight() )
