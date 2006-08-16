@@ -379,6 +379,9 @@ static void LibavcodecCallback( void *p_opaque, int i_level,
         i_vlc_level = VLC_MSG_DBG;
         break;
     case AV_LOG_DEBUG:
+        /* Print debug messages if they were requested */
+        if( p_avctx->debug ) vfprintf( stderr, psz_format, va );
+        return;
     default:
         return;
     }
