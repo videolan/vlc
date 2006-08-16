@@ -219,7 +219,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     i_items_to_append = 0;
     p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
-    msg_Err(p_intf, "p_playlist= 0x%x", p_playlist);
     if( p_playlist == NULL ) return;
 
     SetIcon( *p_intf->p_sys->p_icon );
@@ -340,9 +339,9 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     toolbar->Realize();
 
     /* Create teh source selector */
-    source_sel = new wxListCtrl( playlist_panel, Source_Event,
-                                wxDefaultPosition, wxDefaultSize,
-                                wxLC_AUTOARRANGE|wxLC_SINGLE_SEL );
+    source_sel = new wxListView( playlist_panel, Source_Event,
+                                 wxDefaultPosition, wxDefaultSize,
+                                 wxLC_AUTOARRANGE|wxLC_SINGLE_SEL );
 
     /* Create the tree */
     treectrl = new wxTreeCtrl( playlist_panel, TreeCtrl_Event,
@@ -1305,7 +1304,7 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
     /* Put the items in the playlist node */
     for( size_t i = 0; i < filenames.GetCount(); i++ )
     {
-        const char *psz_utf8 = wxDnDFromLocale( filenames[i] );
+        char *psz_utf8 = wxDnDFromLocale( filenames[i] );
         input_item_t *p_input = input_ItemNew( p->p_playlist,
                                               psz_utf8, psz_utf8 );
         playlist_NodeAddInput( p->p_playlist, p_input,
@@ -1655,16 +1654,12 @@ void Playlist::OnPlaylistEvent( wxCommandEvent& event )
     switch( event.GetId() )
     {
         case UpdateItem_Event:
-            fprintf( stderr,"Update input item id %i\n", event.GetInt() );
             UpdateItem( event.GetInt() );
             break;
         case AppendItem_Event:
-            fprintf( stderr,"Append item id %i\n",
-                         ((playlist_add_t*)event.GetClientData())->i_item );
             AppendItem( event );
             break;
         case RemoveItem_Event:
-            fprintf( stderr,"Remove item id %i\n", event.GetInt() );
             RemoveItem( event.GetInt() );
             break;
     }
