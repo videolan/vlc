@@ -143,7 +143,8 @@ protected:
     {
         QSettings settings( "VideoLAN", "VLC" );
         settings.beginGroup( name );
-        resize( settings.value( "size", defSize ).toSize() );
+      QSize s =  settings.value( "size", defSize ).toSize() ;
+      fprintf( stderr, "%i %i ", s.width(), s.height() );
         move( settings.value( "pos", QPoint( 0,0 ) ).toPoint() );
         settings.endGroup();
     }

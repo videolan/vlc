@@ -29,7 +29,7 @@ static PyObject *gc_test( PyObject *self, PyObject *args )
      vlc_gc_decref( gc );
      ASSERT( gc->i_gc_refcount == 1, "Refcount should be 1" );
      vlc_gc_decref( gc );
-     
+
      Py_INCREF( Py_None );
      return Py_None;
 };

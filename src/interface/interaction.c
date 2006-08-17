@@ -217,7 +217,7 @@ int __intf_UserWarn( vlc_object_t *p_this,
 {
     va_list args;
     DIALOG_INIT( ONEWAY );
-    
+
     p_new->psz_title = strdup( psz_title );
     FORMAT_DESC
 
@@ -541,7 +541,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 
     if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT ) return VLC_EGENERIC;
 
-    if( config_GetInt(p_this, "interact") || 
+    if( config_GetInt(p_this, "interact") ||
         p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
         p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
@@ -568,7 +568,6 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
         }
         else
             p_dialog->i_status = UPDATED_DIALOG;
-        vlc_mutex_unlock( &p_interaction->object_lock );
 
         if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY ) // Wait for answer
         {
@@ -577,15 +576,17 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
                    p_dialog->i_status != HIDDEN_DIALOG &&
                    !p_dialog->p_parent->b_die )
             {
+                vlc_mutex_unlock( &p_interaction->object_lock );
                 msleep( 100000 );
+                vlc_mutex_lock( &p_interaction->object_lock );
             }
-            /// \todo locking ?
             if( p_dialog->p_parent->b_die )
             {
                 p_dialog->i_return = DIALOG_CANCELLED;
                 p_dialog->i_status = ANSWERED_DIALOG;
             }
             p_dialog->i_flags |= DIALOG_GOT_ANSWER;
+            vlc_mutex_unlock( &p_interaction->object_lock );
             return p_dialog->i_return;
         }
         else
@@ -598,4 +599,4 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
     }
     else
         return VLC_EGENERIC;
-} 
+}
