@@ -324,7 +324,7 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 
     /* Allocate descriptor */
     p_input = Create( p_parent, p_item, NULL, VLC_TRUE );
-    p_input->i_flags |= OBJECT_FLAGS_NODBG;
+    p_input->i_flags |= OBJECT_FLAGS_QUIET;
     p_input->i_flags |= OBJECT_FLAGS_NOINTERACT;
 
     /* Now we can attach our new input */
@@ -447,7 +447,7 @@ static int Run( input_thread_t *p_input )
         p_input->b_eof = VLC_TRUE;
     }
 
-    /* Wait we are asked to die */
+    /* Wait until we are asked to die */
     if( !p_input->b_die )
     {
         Error( p_input );
@@ -479,7 +479,7 @@ static int RunAndClean( input_thread_t *p_input )
 
     if( !p_input->b_eof && !p_input->b_error && p_input->input.b_eof )
     {
-        /* We have finish to demux data but not to play them */
+        /* We have finished demuxing data but not playing it */
         while( !p_input->b_die )
         {
             if( input_EsOutDecodersEmpty( p_input->p_es_out ) )
@@ -489,6 +489,7 @@ static int RunAndClean( input_thread_t *p_input )
 
             msleep( INPUT_IDLE_SLEEP );
         }
+
         /* We have finished */
         p_input->b_eof = VLC_TRUE;
     }
