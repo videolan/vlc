@@ -514,8 +514,8 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_acodec )
     {
-        if( (strncmp( (char *)&p_sys->i_acodec, "mp3", 3) == 0) &&
-                            (p_sys->i_channels > 2) )
+        if( p_sys->i_acodec == VLC_FOURCC('m','p','3',0) &&
+            p_sys->i_channels > 2 )
         {
             msg_Warn( p_stream, "%d channels invalid for mp3, forcing to 2",
                       p_sys->i_channels );
@@ -662,28 +662,20 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_canvas_height = val.i_int;
 
     var_Get( p_stream, SOUT_CFG_PREFIX "canvas-aspect", &val );
-    if ( val.psz_string )
+    p_sys->i_canvas_aspect = 0;
+    if( val.psz_string && *val.psz_string )
     {
         char *psz_parser = strchr( val.psz_string, ':' );
-
         if( psz_parser )
         {
             *psz_parser++ = '\0';
-            p_sys->i_canvas_aspect = atoi( val.psz_string ) * VOUT_ASPECT_FACTOR
-                / atoi( psz_parser );
+            p_sys->i_canvas_aspect = atoi( val.psz_string ) *
+                VOUT_ASPECT_FACTOR / atoi( psz_parser );
         }
-        else
-        {
-            msg_Warn( p_stream, "bad aspect ratio %s", val.psz_string );
-            p_sys->i_canvas_aspect = 0;
-        }
+        else msg_Warn( p_stream, "bad aspect ratio %s", val.psz_string );
 
-        free( val.psz_string );
     }
-    else
-    {
-        p_sys->i_canvas_aspect = 0;
-    }
+    if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "threads", &val );
     p_sys->i_threads = val.i_int;
