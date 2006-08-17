@@ -951,10 +951,21 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         if( !p_dec->fmt_out.video.i_visible_width ||
             !p_dec->fmt_out.video.i_visible_height )
         {
-            p_dec->fmt_out.video.i_visible_width =
-                p_dec->fmt_out.video.i_width;
-            p_dec->fmt_out.video.i_visible_height =
-                p_dec->fmt_out.video.i_height;
+            if( p_dec->fmt_in.video.i_visible_width &&
+                p_dec->fmt_in.video.i_visible_height )
+            {
+                p_dec->fmt_out.video.i_visible_width =
+                    p_dec->fmt_in.video.i_visible_width;
+                p_dec->fmt_out.video.i_visible_height =
+                    p_dec->fmt_in.video.i_visible_height;
+            }
+            else
+            {
+                p_dec->fmt_out.video.i_visible_width =
+                    p_dec->fmt_out.video.i_width;
+                p_dec->fmt_out.video.i_visible_height =
+                    p_dec->fmt_out.video.i_height;
+            }
         }
 
         if( p_dec->fmt_out.video.i_visible_height == 1088 &&
