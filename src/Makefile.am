@@ -190,10 +190,11 @@ endif
 
 if HAVE_WIN32
 if BUILD_SHARED
-DATA_noinst_libvlc = libvlc$(LIBEXT)
+DATA_noinst_libvlc = libvlc$(LIBEXT) libvlc$(LIBEXT).a
 endif
 
 libvlc.dll.a: libvlc$(LIBEXT)
+	$(DLLTOOL) --export-all-symbols -l $@ -D $< $(libvlc_a_OBJECTS)
 
 libvlc$(LIBEXT): $(OBJECTS_libvlc_so) stamp-builtins
 	@ldfl="`$(VLC_CONFIG) --libs plugin vlc builtin $(pic)` $(INCLUDED_LIBINTL)" ; \
@@ -204,12 +205,12 @@ libvlc$(LIBEXT): $(OBJECTS_libvlc_so) stamp-builtins
 	esac ; \
 	echo $$ld $(OBJECTS_libvlc_so) $(LDFLAGS_libvlc_so) $$ldfl; \
 	$$ld $(libvlc_a_OBJECTS) \
-		-Wl,--out-implib,$(top_builddir)/src/libvlc.dll.a $$ldfl
+		$$ldfl
 # It sucks big time, but we have to do that to link vlc properly
 # on non-PIC OSes, otherwise ld will favor builtins-less libvlc.a over
 # libvlc$(LIBEXT)
 	rm -f libvlc.a
-# Cygwin work-around
+# Cygwin libtool work-around
 	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
 endif
 

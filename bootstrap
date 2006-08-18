@@ -216,7 +216,7 @@ include Modules.am
 LTLIBVLC = \$(top_builddir)/src/libvlc.la
 
 if BUILD_SHARED
-LIBVLC = \$(top_builddir)/src/libvlc\$(LIBEXT)
+LIBVLC = -L\$(top_builddir)/src -lvlc
 LIBADD = \$(LIBVLC)
 endif
 
