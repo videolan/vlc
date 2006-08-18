@@ -62,7 +62,7 @@ BSTR BSTRFromCStr(UINT codePage, LPCSTR s)
             ZeroMemory(wideStr, wideLen*sizeof(WCHAR));
             MultiByteToWideChar(codePage, 0, s, -1, wideStr, wideLen);
             bstr = SysAllocStringLen(wideStr, wideLen);
-            free(wideStr);
+            CoTaskMemFree(wideStr);
 
             return bstr;
         }
@@ -105,32 +105,35 @@ HRESULT GetObjectProperty(LPUNKNOWN object, DISPID dispID, VARIANT& v)
 HDC CreateDevDC(DVTARGETDEVICE *ptd)
 {
 	HDC hdc=NULL;
-	LPDEVNAMES lpDevNames;
-	LPDEVMODE lpDevMode;
-	LPTSTR lpszDriverName;
-	LPTSTR lpszDeviceName;
-	LPTSTR lpszPortName;
-
-	if (ptd == NULL) {
+	if( NULL == ptd )
+    {
 		hdc = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
-		goto errReturn;
 	}
+    else
+    {
+        LPDEVNAMES lpDevNames;
+        LPDEVMODE lpDevMode;
+        LPTSTR lpszDriverName;
+        LPTSTR lpszDeviceName;
+        LPTSTR lpszPortName;
 
-	lpDevNames = (LPDEVNAMES) ptd; // offset for size field
+        lpDevNames = (LPDEVNAMES) ptd; // offset for size field
 
-	if (ptd->tdExtDevmodeOffset == 0) {
-		lpDevMode = NULL;
-	}else{
-		lpDevMode  = (LPDEVMODE) ((LPTSTR)ptd + ptd->tdExtDevmodeOffset);
-	}
+        if (ptd->tdExtDevmodeOffset == 0)
+        {
+            lpDevMode = NULL;
+        }
+        else
+        {
+            lpDevMode  = (LPDEVMODE) ((LPTSTR)ptd + ptd->tdExtDevmodeOffset);
+        }
 
-	lpszDriverName = (LPTSTR) lpDevNames + ptd->tdDriverNameOffset;
-	lpszDeviceName = (LPTSTR) lpDevNames + ptd->tdDeviceNameOffset;
-	lpszPortName   = (LPTSTR) lpDevNames + ptd->tdPortNameOffset;
+        lpszDriverName = (LPTSTR) lpDevNames + ptd->tdDriverNameOffset;
+        lpszDeviceName = (LPTSTR) lpDevNames + ptd->tdDeviceNameOffset;
+        lpszPortName   = (LPTSTR) lpDevNames + ptd->tdPortNameOffset;
 
-	hdc = CreateDC(lpszDriverName, lpszDeviceName, lpszPortName, lpDevMode);
-
-errReturn:
+        hdc = CreateDC(lpszDriverName, lpszDeviceName, lpszPortName, lpDevMode);
+    }
 	return hdc;
 };
 
