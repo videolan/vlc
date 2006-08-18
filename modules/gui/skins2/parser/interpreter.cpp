@@ -91,9 +91,9 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     m_commandMap["playlist.setRepeat(false)"] =
         CmdGenericPtr( new CmdPlaylistRepeat( getIntf(), false ) );
     VarTree &rVarTree = VlcProc::instance( getIntf() )->getPlaytreeVar();
-    m_commandMap["playtree.del()"] =
+    m_commandMap["playlist.del()"] =
         CmdGenericPtr( new CmdPlaytreeDel( getIntf(), rVarTree ) );
-    REGISTER_CMD( "playtree.sort()", CmdPlaytreeSort )
+    REGISTER_CMD( "playlist.sort()", CmdPlaytreeSort )
     REGISTER_CMD( "vlc.fullscreen()", CmdFullscreen )
     REGISTER_CMD( "vlc.play()", CmdPlay )
     REGISTER_CMD( "vlc.pause()", CmdPause )
