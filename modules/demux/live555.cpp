@@ -781,7 +781,7 @@ describe:
 
     /* malloc-ated copy */
     if( p_sys->p_sdp ) free( p_sys->p_sdp );
-    p_sys->p_sdp = strdup( (char*)p_sdp );
+    if( p_sdp ) p_sys->p_sdp = strdup( (char*)p_sdp );
     delete[] p_sdp;
 
     return i_ret;
