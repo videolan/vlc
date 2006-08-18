@@ -1379,6 +1379,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_btn_play setToolTip: _NS("Pause")];
         [o_mi_play setTitle: _NS("Pause")];
         [o_dmi_play setTitle: _NS("Pause")];
+        [o_vmi_play setTitle: _NS("Pause")];
     }
     else
     {
@@ -1387,6 +1388,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_btn_play setToolTip: _NS("Play")];
         [o_mi_play setTitle: _NS("Play")];
         [o_dmi_play setTitle: _NS("Play")];
+        [o_vmi_play setTitle: _NS("Play")];
     }
 }
 

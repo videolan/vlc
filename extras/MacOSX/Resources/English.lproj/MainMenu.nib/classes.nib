@@ -324,6 +324,15 @@
                 "o_scrollfield" = id; 
                 "o_timefield" = id; 
                 "o_timeslider" = id; 
+                "o_vmi_fullscreen" = id; 
+                "o_vmi_mute" = id; 
+                "o_vmi_next" = id; 
+                "o_vmi_play" = id; 
+                "o_vmi_prev" = id; 
+                "o_vmi_snapshot" = id; 
+                "o_vmi_stop" = id; 
+                "o_vmi_voldown" = id; 
+                "o_vmi_volup" = id; 
                 "o_volumeslider" = id; 
                 "o_vout_menu" = id; 
                 "o_window" = id; 
