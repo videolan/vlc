@@ -43,20 +43,20 @@ static void Close( vlc_object_t * );
 
 #define KEYINT_TEXT N_("Maximum GOP size")
 #define KEYINT_LONGTEXT N_( "Sets maximum interval between IDR-frames." \
-  "Larger values save bits, thus improving quality for a given bitrate at " \
-  "the cost of seeking precision." )
+    "Larger values save bits, thus improving quality for a given bitrate at " \
+    "the cost of seeking precision." )
 
 #define MIN_KEYINT_TEXT N_("Minimum GOP size")
 #define MIN_KEYINT_LONGTEXT N_( "Sets minimum interval between IDR-frames. " \
     "In H.264, I-frames do not necessarily bound a closed GOP because it is " \
     "allowable for a P-frame to be predicted from more frames than just the " \
-    "one frame before it (also see frameref). Therefore, I-frames are not " \
-    "necessarily seekable. IDR-Frames restrict subsequent P-frames from " \
-    "referring to any frame prior to the IDR-Frame. \n" \
+    "one frame before it (also see reference frame option). Therefore, " \
+    "I-frames are not necessarily seekable. IDR-frames restrict subsequent " \
+    "P-frames from referring to any frame prior to the IDR-frame. \n" \
     "If scenecuts appear within this interval, they are still encoded as " \
     "I-frames, but do not start a new GOP." )
 
-#define SCENE_TEXT N_("Extra I-Frames aggressivity" )
+#define SCENE_TEXT N_("Extra I-frames aggressivity" )
 #define SCENE_LONGTEXT N_( "Scene-cut detection. Controls how " \
     "aggressively to insert extra I-frames. With small values of " \
     "scenecut, the codec often has " \
@@ -64,22 +64,20 @@ static void Close( vlc_object_t * );
     "Good values of scenecut may find a better location for the " \
     "I-frame. Large values use more I-frames " \
     "than necessary, thus wasting bits. -1 disables scene-cut detection, so " \
-    "I-frames are be inserted only every other keyint frames, which probably " \
-    "leads to ugly encoding artifacts. (1-100)." )
+    "I-frames are inserted only every other keyint frames, which probably " \
+    "leads to ugly encoding artifacts. Range 1 to 100." )
 
 #define BFRAMES_TEXT N_("B-frames between I and P")
 #define BFRAMES_LONGTEXT N_( "Number of consecutive B-frames between I and " \
-    "P-frames. (1 to 16)" )
+    "P-frames. Range 1 to 16." )
 
-/// \bug [String] extra space
 #define B_ADAPT_TEXT N_("Adaptive B-frame decision")
 #define B_ADAPT_LONGTEXT N_( "Force the specified number of " \
-    "consecutive B-frames to be used, except possibly before an I-frame. " )
+    "consecutive B-frames to be used, except possibly before an I-frame." )
 
-/// \bug [String] extra space
 #define B_BIAS_TEXT N_("B-frames usage")
 #define B_BIAS_LONGTEXT N_( "Bias the choice to use B-frames. Positive values " \
-    "cause more B-frames, negative values cause less B-frames. " )
+    "cause more B-frames, negative values cause less B-frames." )
 
 #define BPYRAMID_TEXT N_("Keep some B-frames as references")
 #define BPYRAMID_LONGTEXT N_( "Allows B-frames to be used as references for " \
@@ -89,13 +87,13 @@ static void Close( vlc_object_t * );
 #define CABAC_TEXT N_("CABAC")
 #define CABAC_LONGTEXT N_( "CABAC (Context-Adaptive Binary Arithmetic "\
     "Coding). Slightly slows down encoding and decoding, but should save " \
-    "10-15% bitrate." )
-/// \bug [String] Missing final dot
+    "10 to 15% bitrate." )
+
 #define REF_TEXT N_("Number of reference frames")
 #define REF_LONGTEXT N_( "Number of previous frames used as predictors. " \
     "This is effective in Anime, but seems to make little difference in " \
     "live-action source material. Some decoders are unable to deal with " \
-    "large frameref values. From 1 to 16" )
+    "large frameref values. Range 1 to 16." )
 
 #define NF_TEXT N_("Skip loop filter")
 #define NF_LONGTEXT N_( "Deactivate the deblocking loop filter (decreases quality).")
@@ -110,17 +108,15 @@ static void Close( vlc_object_t * );
 #define QP_TEXT N_("Set QP")
 #define QP_LONGTEXT N_( "This selects the quantizer to use. " \
     "Lower values result in better fidelity, but higher bitrates. 26 is a " \
-    "good default value. From 0 to 51. 0 means lossless" )
+    "good default value. Range 0 (lossless) to 51." )
 
-/// \bug [String] missing point
 #define CRF_TEXT N_("Quality-based VBR")
-#define CRF_LONGTEXT N_( "1-pass Quality-based VBR. From 0 to 51" )
+#define CRF_LONGTEXT N_( "1-pass Quality-based VBR. Range 0 to 51." )
 
 #define QPMIN_TEXT N_("Min QP")
-#define QPMIN_LONGTEXT N_( "Minimum quantizer, 15/35 seems to be a useful " \
-    "range." )
+#define QPMIN_LONGTEXT N_( "Minimum quantizer parameter. 15 to 35 seems to " \
+    "be a useful range." )
 
-/// \bug [String] typo ? Why doesn't it work in po ?
 #define QPMAX_TEXT N_("Max QP")
 #define QPMAX_LONGTEXT N_( "Maximum quantizer parameter." )
 
@@ -128,39 +124,41 @@ static void Close( vlc_object_t * );
 #define QPSTEP_LONGTEXT N_( "Max QP step between frames.")
 
 #define RATETOL_TEXT N_("Average bitrate tolerance")
-#define RATETOL_LONGTEXT N_( "Allowed variance in average. " \
+#define RATETOL_LONGTEXT N_( "Allowed variance in average " \
     "bitrate (in kbits/s).")
 
 #define VBV_MAXRATE_TEXT N_("Max local bitrate")
-#define VBV_MAXRATE_LONGTEXT N_( "Sets a maximum local bitrate in kbits/s.")
+#define VBV_MAXRATE_LONGTEXT N_( "Sets a maximum local bitrate (in kbits/s).")
 
 #define VBV_BUFSIZE_TEXT N_("VBV buffer")
 #define VBV_BUFSIZE_LONGTEXT N_( "Averaging period for the maximum " \
-    "local bitrate in kbits.")
+    "local bitrate (in kbits).")
 
 #define VBV_INIT_TEXT N_("Initial VBV buffer occupancy")
 #define VBV_INIT_LONGTEXT N_( "Sets the initial buffer occupancy as a " \
-    "fraction of the buffer size.")
+    "fraction of the buffer size. Range 0.0 to 1.0.")
 
+/* IP Ratio < 1 is technically valid but should never improve quality */
 #define IPRATIO_TEXT N_("QP factor between I and P")
-#define IPRATIO_LONGTEXT N_( "QP factor between I and P.")
+#define IPRATIO_LONGTEXT N_( "QP factor between I and P. Range 1.0 to 2.0.")
 
+/* PB ratio < 1 is not valid and breaks ratecontrol */
 #define PBRATIO_TEXT N_("QP factor between P and B")
-#define PBRATIO_LONGTEXT N_( "QP factor between P and B.")
+#define PBRATIO_LONGTEXT N_( "QP factor between P and B. Range 1.0 to 2.0.")
 
 #define CHROMA_QP_OFFSET_TEXT N_("QP difference between chroma and luma")
 #define CHROMA_QP_OFFSET_LONGTEXT N_( "QP difference between chroma and luma.")
 
 #define QCOMP_TEXT N_("QP curve compression")
-#define QCOMP_LONGTEXT N_( "QP curve compression. (0.0=CBR to 1.0=QCP)")
+#define QCOMP_LONGTEXT N_( "QP curve compression. Range 0.0 (CBR) to 1.0 (QCP).")
 
 #define CPLXBLUR_TEXT N_("Reduce fluctuations in QP")
 #define CPLXBLUR_LONGTEXT N_( "This reduces the fluctuations in QP " \
-                "before curve compression. Temporally blurs complexity.")
+    "before curve compression. Temporally blurs complexity.")
 
 #define QBLUR_TEXT N_("Reduce fluctuations in QP")
 #define QBLUR_LONGTEXT N_( "This reduces the fluctations in QP " \
-                        "after curve compression. Temporally blurs quants.")
+    "after curve compression. Temporally blurs quants.")
 
 /* Analysis */
 
@@ -173,9 +171,8 @@ static void Close( vlc_object_t * );
     " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n" \
     "(p4x4 requires p8x8. i8x8 requires 8x8dct).")
 
-/// \bug [String] Extra space
 #define DIRECT_PRED_TEXT N_("Direct MV prediction mode")
-#define DIRECT_PRED_LONGTEXT N_( "Direct MV prediction mode. ")
+#define DIRECT_PRED_LONGTEXT N_( "Direct MV prediction mode.")
 
 #define WEIGHTB_TEXT N_("Weighted prediction for B-frames")
 #define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
@@ -190,9 +187,8 @@ static void Close( vlc_object_t * );
 #define MERANGE_TEXT N_("Maximum motion vector search range")
 #define MERANGE_LONGTEXT N_( "Maximum distance to search for " \
     "motion estimation, measured from predicted position(s). " \
-    "Default of 16 is good for most footage, "\
-    "high motion sequences may benefit from settings between 24-32. " \
-    "From 0 to 64." )
+    "Default of 16 is good for most footage, high motion sequences may " \
+    "benefit from settings between 24 and 32. Range 0 to 64." )
 
 #define SUBME_TEXT N_("Subpixel motion estimation and partition decision " \
     "quality")
@@ -213,32 +209,32 @@ static void Close( vlc_object_t * );
     "(lower = quicker and higher = better quality). Range 1 to 5." )
 #endif
 
-#define B_RDO_TEXT N_("RD based mode decision for B-frames.")
+#define B_RDO_TEXT N_("RD based mode decision for B-frames")
 #define B_RDO_LONGTEXT N_( "RD based mode decision for B-frames. This " \
-                        "requires subme 6.")
+    "requires subme 6 (or higher).")
 
 #define MIXED_REFS_TEXT N_("Decide references on a per partition basis")
 #define MIXED_REFS_LONGTEXT N_( "Allows each 8x8 or 16x8 partition to " \
-     "independently " \
-     "select a reference frame, as opposed to only one ref per macroblock." )
+    "independently select a reference frame, as opposed to only one ref " \
+    "per macroblock." )
 
 #define CHROMA_ME_TEXT N_("Ignore chroma in motion estimation")
 #define CHROMA_ME_LONGTEXT N_( "Chroma ME for subpel and mode decision in " \
-                "P-frames.")
+    "P-frames.")
 
 #define BIME_TEXT N_("Jointly optimize both MVs in B-frames")
 #define BIME_LONGTEXT N_( "Joint bidirectional motion refinement.")
 
 #define TRANSFORM_8X8DCT_TEXT N_("Adaptive spatial transform size")
 #define TRANSFORM_8X8DCT_LONGTEXT N_( \
-        "SATD-based decision for 8x8 transform in inter-MBs.")
+    "SATD-based decision for 8x8 transform in inter-MBs.")
 
 #define TRELLIS_TEXT N_("Trellis RD quantization" )
 #define TRELLIS_LONGTEXT N_( "Trellis RD quantization: \n" \
-     " - 0: disabled\n" \
-     " - 1: enabled only on the final encode of a MB\n" \
-     " - 2: enabled on all mode decisions\n" \
-     "This requires CABAC." )
+    " - 0: disabled\n" \
+    " - 1: enabled only on the final encode of a MB\n" \
+    " - 2: enabled on all mode decisions\n" \
+    "This requires CABAC." )
 
 #define FAST_PSKIP_TEXT N_("Early SKIP detection on P-frames")
 #define FAST_PSKIP_LONGTEXT N_( "Early SKIP detection on P-frames.")
@@ -247,17 +243,23 @@ static void Close( vlc_object_t * );
 #define DCT_DECIMATE_LONGTEXT N_( "Coefficient thresholding on P-frames." \
     "Eliminate dct blocks containing only a small single coefficient.")
 
+/* Noise reduction 1 is too weak to measure, suggest at least 10 */
 #define NR_TEXT N_("Noise reduction")
-#define NR_LONGTEXT N_( "Dct-domain noise reduction. Adaptive pseudo-deadzone.")
+#define NR_LONGTEXT N_( "Dct-domain noise reduction. Adaptive pseudo-deadzone. " \
+    "10 to 1000 seems to be a useful range." )
 
 /* Input/Output */
 
 #define ASM_TEXT N_("CPU optimizations")
 #define ASM_LONGTEXT N_( "Use assembler CPU optimizations.")
 
-#define PSNR_TEXT N_("PSNR calculation")
-#define PSNR_LONGTEXT N_( "This has no effect on actual encoding quality, "\
-    "it just prevents the stats from being calculated (for speed)." )
+#define PSNR_TEXT N_("PSNR computation")
+#define PSNR_LONGTEXT N_( "Compute and print PSNR stats. This has no effect on " \
+    "the actual encoding quality." )
+
+#define SSIM_TEXT N_("SSIM computation")
+#define SSIM_LONGTEXT N_( "Compute and print SSIM stats. This has no effect on " \
+    "the actual encoding quality." )
 
 #define QUIET_TEXT N_("Quiet mode")
 #define QUIET_LONGTEXT N_( "Quiet mode.")
@@ -384,11 +386,11 @@ vlc_module_begin();
 
     add_float( SOUT_CFG_PREFIX "ipratio", 1.40, NULL, IPRATIO_TEXT,
                IPRATIO_LONGTEXT, VLC_FALSE );
-        change_float_range( 0, 100 );
+        change_float_range( 1, 2 );
 
     add_float( SOUT_CFG_PREFIX "pbratio", 1.30, NULL, PBRATIO_TEXT,
                PBRATIO_LONGTEXT, VLC_FALSE );
-        change_float_range( 0, 100 );
+        change_float_range( 1, 2 );
 
 #if X264_BUILD >= 23 /* r190 */
     add_integer( SOUT_CFG_PREFIX "chroma-qp-offset", 0, NULL, CHROMA_QP_OFFSET_TEXT,
@@ -480,6 +482,7 @@ vlc_module_begin();
 #if X264_BUILD >= 44 /* r398 */
     add_integer( SOUT_CFG_PREFIX "nr", 0, NULL, NR_TEXT,
                  NR_LONGTEXT, VLC_FALSE );
+        change_integer_range( 0, 1000 );
 #endif
 
 /* Input/Output */
@@ -487,9 +490,15 @@ vlc_module_begin();
     add_bool( SOUT_CFG_PREFIX "asm", 1, NULL, ASM_TEXT,
               ASM_LONGTEXT, VLC_FALSE );
 
-    /* x264 psnr = 1 (default). disable PSNR calculation for speed. */
+    /* x264 psnr = 1 (default). disable PSNR computation for speed. */
     add_bool( SOUT_CFG_PREFIX "psnr", 0, NULL, PSNR_TEXT,
               PSNR_LONGTEXT, VLC_FALSE );
+
+#if X264_BUILD >= 50 /* r554 */
+    /* x264 ssim = 1 (default). disable SSIM computation for speed. */
+    add_bool( SOUT_CFG_PREFIX "ssim", 0, NULL, SSIM_TEXT,
+              SSIM_LONGTEXT, VLC_FALSE );
+#endif
 
     add_bool( SOUT_CFG_PREFIX "quiet", 0, NULL, QUIET_TEXT,
               QUIET_LONGTEXT, VLC_FALSE );
@@ -511,7 +520,7 @@ static const char *ppsz_sout_options[] = {
     "ipratio", "keyint", "keyint-min", "loopfilter", "me", "merange",
     "min-keyint", "mixed-refs", "nf", "nr", "pbratio", "psnr", "qblur",
     "qp", "qcomp", "qpstep", "qpmax", "qpmin", "qp-max", "qp-min", "quiet",
-    "ratetol", "ref", "scenecut", "subme", "subpel", "tolerance",
+    "ratetol", "ref", "scenecut", "ssim", "subme", "subpel", "tolerance",
     "trellis", "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate",
     "weightb", NULL
 };
@@ -649,7 +658,7 @@ static int  Open ( vlc_object_t *p_this )
     /* disable deblocking when nf (no loop filter) is enabled */
     var_Get( p_enc, SOUT_CFG_PREFIX "nf", &val );
     p_sys->param.b_deblocking_filter = !val.b_bool;
-    
+
     var_Get( p_enc, SOUT_CFG_PREFIX "filter", &val );
     if( val.psz_string )
     {
@@ -768,6 +777,11 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "psnr", &val );
     p_sys->param.analyse.b_psnr = val.b_bool;
 
+#if X264_BUILD >= 50 /* r554 */
+    var_Get( p_enc, SOUT_CFG_PREFIX "ssim", &val );
+    p_sys->param.analyse.b_ssim = val.b_bool;
+#endif
+
 #if X264_BUILD >= 0x0012
     var_Get( p_enc, SOUT_CFG_PREFIX "weightb", &val );
     p_sys->param.analyse.b_weighted_bipred = val.b_bool;
@@ -828,7 +842,8 @@ static int  Open ( vlc_object_t *p_this )
 
 #if X264_BUILD >= 44
     var_Get( p_enc, SOUT_CFG_PREFIX "nr", &val );
-    p_sys->param.analyse.i_noise_reduction = val.i_int;
+    if( val.i_int >= 0 && val.i_int <= 1000 )
+        p_sys->param.analyse.i_noise_reduction = val.i_int;
 #endif
 
 #if X264_BUILD >= 46
@@ -924,6 +939,9 @@ static int  Open ( vlc_object_t *p_this )
     }
 
 #if X264_BUILD >= 29
+    /* As of r543 x264 will autodetect the number of cpus and will set
+       the number of threads accordingly unless ofcourse the number of
+       threads is explicitly specified... */
     if( p_enc->i_threads >= 1 )
         p_sys->param.i_threads = p_enc->i_threads;
 #endif
