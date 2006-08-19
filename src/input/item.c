@@ -70,7 +70,7 @@ char *vlc_input_item_GetInfo( input_item_t *p_i,
 static void vlc_input_item_Destroy ( gc_object_t *p_this )
 {
     vlc_object_t *p_obj = (vlc_object_t *)p_this->p_destructor_arg;
-    int i, i_top, i_bottom;
+    int i;
     input_item_t *p_input = (input_item_t *) p_this;
 
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_obj,

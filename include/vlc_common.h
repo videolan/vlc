@@ -203,7 +203,8 @@ typedef struct libvlc_t libvlc_t;
 typedef struct vlc_t vlc_t;
 typedef struct variable_t variable_t;
 typedef struct date_t date_t;
-typedef struct hashtable_entry_t hashtable_entry_t;
+typedef struct dict_entry_t dict_entry_t;
+typedef struct dict_t dict_t;
 typedef struct gc_object_t gc_object_t ;
 
 /* Messages */
@@ -717,19 +718,44 @@ static int64_t GCD( int64_t a, int64_t b )
         }                                       \
     }
 
-/* Hash tables handling */
-struct hashtable_entry_t
+/* Binary search in an array */
+#define BSEARCH( entries, count, elem, zetype, key, answer ) {  \
+    int low = 0, high = count - 1;   \
+    answer = -1; \
+    while( low <= high ) {\
+        int mid = (low + high ) / 2; /* Just don't care about 2^30 tables */ \
+        zetype mid_val = entries[mid] elem;\
+        if( mid_val < key ) \
+            low = mid + 1; \
+        else if ( mid_val > key ) \
+            high = mid -1;  \
+        else    \
+        {   \
+            answer = mid;  break;   \
+        }\
+    } \
+}
+
+/* Dictionnary handling */
+struct dict_entry_t
 {
-    int       i_id;
-    char     *psz_name;
+    int       i_int;
+    char     *psz_string;
     uint64_t  i_hash;
     void     *p_data;
 };
 
-VLC_EXPORT( void, vlc_HashInsert, (hashtable_entry_t **, int *, int, const char *, void *));
-VLC_EXPORT( void*, vlc_HashRetrieve, (hashtable_entry_t*, int, int, const char *) );
-VLC_EXPORT( int, vlc_HashLookup, (hashtable_entry_t *, int, int, const char *) );
+struct dict_t
+{
+    dict_entry_t *p_entries;
+    int i_entries;
+};
 
+VLC_EXPORT( dict_t *, vlc_DictNew, (void) );
+VLC_EXPORT( void, vlc_DictClear, (dict_t * ) );
+VLC_EXPORT( void, vlc_DictInsert, (dict_t *, int, const char *, void * ) );
+VLC_EXPORT( void*, vlc_DictGet, (dict_t *, int, const char * ) );
+VLC_EXPORT( int, vlc_DictLookup, (dict_t *, int, const char * ) );
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. Note that

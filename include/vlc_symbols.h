@@ -463,9 +463,9 @@ struct module_symbols_t
     unsigned int (*update_iterator_ChooseMirrorAndFile_inner) (update_iterator_t *, int, int, int);
     update_t * (*__update_New_inner) (vlc_object_t *);
     void (*update_download_inner) (update_iterator_t *, char *);
-    void (*vlc_HashInsert_inner) (hashtable_entry_t **, int *, int, const char *, void *);
-    int (*vlc_HashLookup_inner) (hashtable_entry_t *, int, int, const char *);
-    void* (*vlc_HashRetrieve_inner) (hashtable_entry_t*, int, int, const char *);
+    void *vlc_HashInsert_deprecated;
+    void *vlc_HashLookup_deprecated;
+    void *vlc_HashRetrieve_deprecated;
     void * (*utf8_opendir_inner) (const char *dirname);
     FILE * (*utf8_fopen_inner) (const char *filename, const char *mode);
     const char * (*utf8_readdir_inner) (void *dir);
@@ -525,6 +525,11 @@ struct module_symbols_t
     int (*__intf_Progress_inner) (vlc_object_t*, const char*, const char*, float, int);
     void (*__intf_ProgressUpdate_inner) (vlc_object_t*, int, const char*, float, int);
     int (*playlist_AddInput_inner) (playlist_t *, input_item_t *,int , int, vlc_bool_t);
+    void (*vlc_DictInsert_inner) (dict_t *, int, const char *, void *);
+    void* (*vlc_DictGet_inner) (dict_t *, int, const char *);
+    int (*vlc_DictLookup_inner) (dict_t *, int, const char *);
+    void (*vlc_DictClear_inner) (dict_t *);
+    dict_t * (*vlc_DictNew_inner) (void);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -936,9 +941,6 @@ struct module_symbols_t
 #  define update_iterator_ChooseMirrorAndFile (p_symbols)->update_iterator_ChooseMirrorAndFile_inner
 #  define __update_New (p_symbols)->__update_New_inner
 #  define update_download (p_symbols)->update_download_inner
-#  define vlc_HashInsert (p_symbols)->vlc_HashInsert_inner
-#  define vlc_HashLookup (p_symbols)->vlc_HashLookup_inner
-#  define vlc_HashRetrieve (p_symbols)->vlc_HashRetrieve_inner
 #  define utf8_opendir (p_symbols)->utf8_opendir_inner
 #  define utf8_fopen (p_symbols)->utf8_fopen_inner
 #  define utf8_readdir (p_symbols)->utf8_readdir_inner
@@ -988,6 +990,11 @@ struct module_symbols_t
 #  define __intf_Progress (p_symbols)->__intf_Progress_inner
 #  define __intf_ProgressUpdate (p_symbols)->__intf_ProgressUpdate_inner
 #  define playlist_AddInput (p_symbols)->playlist_AddInput_inner
+#  define vlc_DictInsert (p_symbols)->vlc_DictInsert_inner
+#  define vlc_DictGet (p_symbols)->vlc_DictGet_inner
+#  define vlc_DictLookup (p_symbols)->vlc_DictLookup_inner
+#  define vlc_DictClear (p_symbols)->vlc_DictClear_inner
+#  define vlc_DictNew (p_symbols)->vlc_DictNew_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1402,9 +1409,6 @@ struct module_symbols_t
     ((p_symbols)->update_iterator_ChooseMirrorAndFile_inner) = update_iterator_ChooseMirrorAndFile; \
     ((p_symbols)->__update_New_inner) = __update_New; \
     ((p_symbols)->update_download_inner) = update_download; \
-    ((p_symbols)->vlc_HashInsert_inner) = vlc_HashInsert; \
-    ((p_symbols)->vlc_HashLookup_inner) = vlc_HashLookup; \
-    ((p_symbols)->vlc_HashRetrieve_inner) = vlc_HashRetrieve; \
     ((p_symbols)->utf8_opendir_inner) = utf8_opendir; \
     ((p_symbols)->utf8_fopen_inner) = utf8_fopen; \
     ((p_symbols)->utf8_readdir_inner) = utf8_readdir; \
@@ -1454,6 +1458,11 @@ struct module_symbols_t
     ((p_symbols)->__intf_Progress_inner) = __intf_Progress; \
     ((p_symbols)->__intf_ProgressUpdate_inner) = __intf_ProgressUpdate; \
     ((p_symbols)->playlist_AddInput_inner) = playlist_AddInput; \
+    ((p_symbols)->vlc_DictInsert_inner) = vlc_DictInsert; \
+    ((p_symbols)->vlc_DictGet_inner) = vlc_DictGet; \
+    ((p_symbols)->vlc_DictLookup_inner) = vlc_DictLookup; \
+    ((p_symbols)->vlc_DictClear_inner) = vlc_DictClear; \
+    ((p_symbols)->vlc_DictNew_inner) = vlc_DictNew; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__playlist_ItemNew_deprecated = NULL; \
     (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \
@@ -1489,6 +1498,9 @@ struct module_symbols_t
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->stats_HandlerDestroy_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \
+    (p_symbols)->vlc_HashInsert_deprecated = NULL; \
+    (p_symbols)->vlc_HashLookup_deprecated = NULL; \
+    (p_symbols)->vlc_HashRetrieve_deprecated = NULL; \
     (p_symbols)->playlist_ItemNewFromInput_deprecated = NULL; \
     (p_symbols)->playlist_PlaylistAdd_deprecated = NULL; \
     (p_symbols)->playlist_PlaylistAddExt_deprecated = NULL; \
