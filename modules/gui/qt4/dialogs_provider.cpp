@@ -26,6 +26,7 @@
 #include "dialogs/playlist.hpp"
 #include "dialogs/prefs_dialog.hpp"
 #include "dialogs/streaminfo.hpp"
+#include "dialogs/messages.hpp"
 #include <QApplication>
 #include <QSignalMapper>
 #include "menus.hpp"
@@ -155,6 +156,7 @@ void DialogsProvider::prefsDialog()
 
 void DialogsProvider::messagesDialog()
 {
+    MessagesDialog::getInstance( p_intf, true )->toggleVisible();
 }
 
 void DialogsProvider::menuAction( QObject *data )
