@@ -323,6 +323,11 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf,
     if( pBackground )
     {
         // Build the background image sequence
+        // Note: we suppose that the last padding is not included in the
+        // given image
+        // TODO: we should probably change this assumption, as it would make
+        // the code a bit simpler and it would be more natural for the skins
+        // designers
         m_bgWidth = (pBackground->getWidth() + m_padHoriz) / nbHoriz;
         m_bgHeight = (pBackground->getHeight() + m_padVert) / nbVert;
 
@@ -363,8 +368,9 @@ void CtrlSliderBg::draw( OSGraphics &rImage, int xDest, int yDest )
             getResizeFactors( factorX, factorY );
 
             // Rescale the image with the actual size of the control
-            ScaledBitmap bmp( getIntf(), *m_pImgSeq, m_bgWidth * m_nbHoriz,
-                              m_bgHeight * m_nbVert );
+            ScaledBitmap bmp( getIntf(), *m_pImgSeq,
+                 m_bgWidth * m_nbHoriz - (int)(m_padHoriz * factorX),
+                 m_bgHeight * m_nbVert - (int)(m_padVert * factorY) );
 
             // Locate the right image in the background bitmap
             int x = m_bgWidth * ( m_position % m_nbHoriz );
@@ -439,8 +445,8 @@ void CtrlSliderBg::onResize()
         getResizeFactors( factorX, factorY );
 
         // Size of one elementary background image (padding included)
-        m_bgWidth = (int)(m_pImgSeq->getWidth() * factorX / m_nbHoriz);
-        m_bgHeight = (int)(m_pImgSeq->getHeight() * factorY / m_nbVert);
+        m_bgWidth = (int)((m_pImgSeq->getWidth() + m_padHoriz) * factorX / m_nbHoriz);
+        m_bgHeight = (int)((m_pImgSeq->getHeight() + m_padVert) * factorY / m_nbVert);
     }
 }
 
