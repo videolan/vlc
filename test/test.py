@@ -8,9 +8,11 @@ found test suites into one big test suite and run them all at once.
 """
 
 import sys, os, re, unittest
+import native_libvlc_test
+
 
 def printAndRun( module ):
-    print "Running tests from module " + module.__name__;
+#    print "Running tests from module " + module.__name__;
     return unittest.defaultTestLoader.loadTestsFromModule( module )
 
 def regressionTest():
@@ -21,6 +23,9 @@ def regressionTest():
     filenameToModuleName = lambda f: os.path.splitext(f)[0]
     moduleNames = map(filenameToModuleName, files)         
     modules = map(__import__, moduleNames)                 
+    
+    native_libvlc_test.init()
+
 #    load = unittest.defaultTestLoader.loadTestsFromModule
     load = printAndRun
     return unittest.TestSuite(map(load, modules))        

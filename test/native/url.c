@@ -42,7 +42,6 @@ PyObject * test_decode (const char *in, const char *out)
 PyObject *url_decode_test( PyObject *self, PyObject *args )
 {
     printf( "\n" );
-    (void)setvbuf (stdout, NULL, _IONBF, 0);
     if( !test_decode ("this_should_not_be_modified_1234",
                      "this_should_not_be_modified_1234") ) return NULL;
 

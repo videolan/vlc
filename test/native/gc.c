@@ -39,4 +39,6 @@ static PyMethodDef native_gc_test_methods[] = {
    { NULL, NULL, 0, NULL }
 };
 
+asserts = 0;
+
 DECLARE_MODULE( native_gc_test )
