@@ -15,3 +15,4 @@ SOURCES_s8tofloat32 = s8tofloat32.c
 SOURCES_u8tofixed32 = u8tofixed32.c
 SOURCES_u8tofloat32 = u8tofloat32.c
 SOURCES_mpgatofixed32 = mpgatofixed32.c
+SOURCES_mono = mono.c
