@@ -62,7 +62,10 @@ static picture_t *osd_LoadImage( vlc_object_t *p_this, const char *psz_filename 
 {
     picture_t *p_pic = NULL;
     image_handler_t *p_image;
-    video_format_t fmt_in = {0}, fmt_out = {0};
+    video_format_t fmt_in, fmt_out;
+
+    memset( &fmt_in, 0, sizeof(video_format_t) );
+    memset( &fmt_out, 0, sizeof(video_format_t) );
 
     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
     p_image = image_HandlerCreate( p_this );
