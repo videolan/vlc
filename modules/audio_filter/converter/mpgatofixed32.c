@@ -7,7 +7,7 @@
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman _at_ videolan _dot_ org>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -139,7 +139,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         {
             int i;
             int i_size = p_out_buf->i_nb_bytes / sizeof(float);
-            
+
             float * a = (float *)p_out_buf->p_buffer;
             for ( i = 0 ; i < i_size ; i++ )
                 *a++ = 0.0;
