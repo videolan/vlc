@@ -32,6 +32,12 @@
 #include <QTextStream>
 #include <QMessageBox>
 
+class QPushButton;
+class QSpinBox;
+class QGridLayout;
+class QLabel;
+class QTextEdit;
+
 class MessagesDialog : public QVLCFrame
 {
     Q_OBJECT;
@@ -50,15 +56,7 @@ private:
     bool main_input;
     static MessagesDialog *instance;
 
-    QPushButton *closeButton;
-    QPushButton *clearButton;
-    QPushButton *saveLogButton;
-    QGridLayout *layout;
-    QSpinBox *verbosityBox;
-    QLabel *verbosityLabel;
     QTextEdit *messages;
-    QTextCursor *messagesCursor;
-    QFile *saveLogFile;
 
 public slots:
     void updateLog();

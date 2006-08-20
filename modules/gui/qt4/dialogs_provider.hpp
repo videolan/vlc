@@ -69,6 +69,7 @@ public slots:
     void streaminfoDialog();
     void prefsDialog();
     void messagesDialog();
+    void simpleAppendDialog();
     void simpleOpenDialog();
     void openDialog();
     void openDialog( int );

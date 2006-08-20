@@ -35,19 +35,18 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf, bool _main_input ) :
     setWindowTitle( _("Messages" ) );
     resize(420, 600);
 
-    layout = new QGridLayout(this);
-    closeButton = new QPushButton(qtr("&Close"));
-    clearButton = new QPushButton(qtr("&Clear"));
-    saveLogButton = new QPushButton(qtr("&Save as..."));
-    verbosityBox = new QSpinBox();
+    QGridLayout *layout = new QGridLayout(this);
+    QPushButton *closeButton = new QPushButton(qtr("&Close"));
+    QPushButton *clearButton = new QPushButton(qtr("&Clear"));
+    QPushButton *saveLogButton = new QPushButton(qtr("&Save as..."));
+    QSpinBox *verbosityBox = new QSpinBox();
     verbosityBox->setRange(1, 3);
     verbosityBox->setWrapping(true);
-    verbosityLabel = new QLabel(qtr("Verbosity Level"));
+    QLabel *verbosityLabel = new QLabel(qtr("Verbosity Level"));
     messages = new QTextEdit();
     messages->setReadOnly(true);
     messages->setGeometry(0, 0, 440, 600);
     messages->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    messagesCursor = new QTextCursor();
 
     layout->addWidget(messages, 0, 0, 1, 0);
     layout->addWidget(verbosityLabel, 1, 0, 1, 1);

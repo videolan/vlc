@@ -170,14 +170,56 @@ void DialogsProvider::menuUpdateAction( QObject *data )
     f->doFunc( p_intf );
 }
 
+void DialogsProvider::simpleAppendDialog()
+{
+
+}
+
 void DialogsProvider::simpleOpenDialog()
 {
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    QString FileTypes;
+    FileTypes = "Sound Files ( ";
+    FileTypes += EXTENSIONS_AUDIO;
+    FileTypes += ");; Video Files ( ";
+    FileTypes += EXTENSIONS_VIDEO;
+    FileTypes += ");; PlayList Files ( ";
+    FileTypes += EXTENSIONS_PLAYLIST;
+    FileTypes += ");; Subtitles Files ( ";
+    FileTypes += EXTENSIONS_SUBTITLE;
+    FileTypes += ");; All Files (*.*) " ;
+    FileTypes.replace(QString(";*"), QString(", *"));
+
+    QStringList fileList = QFileDialog::getOpenFileNames(
+                 NULL,
+                 qtr("Select one or more files to open"),
+                 p_intf->p_vlc->psz_homedir,
+                 FileTypes);
+
+    QStringList files = fileList;
+
+    for (size_t i = 0; i < files.size(); i++)
+    {
+        const char * psz_utf8 = files[i].toUtf8().data();
+             playlist_PlaylistAdd( p_playlist, psz_utf8, psz_utf8,
+                     PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
+                     (i ? PLAYLIST_PREPARSE : 0 ),
+                     PLAYLIST_END );
+    }
+
+    vlc_object_release(p_playlist);
 }
+
 void DialogsProvider::bookmarksDialog()
 {
 }
-
-
 
 void DialogsProvider::popupMenu( int i_dialog )
 {
