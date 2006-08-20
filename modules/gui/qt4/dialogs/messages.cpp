@@ -33,7 +33,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf, bool _main_input ) :
                               QVLCFrame( _p_intf ), main_input( _main_input )
 {
     setWindowTitle( _("Messages" ) );
-    resize(420, 600);
+    resize(600, 400);
 
     QGridLayout *layout = new QGridLayout(this);
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
@@ -101,7 +101,7 @@ void MessagesDialog::updateLog()
 
             messages->setFontItalic(true);
             messages->setTextColor("darkBlue");
-            messages->append(p_sub->p_msg[i_start].psz_module);
+            messages->insertPlainText(p_sub->p_msg[i_start].psz_module);
 
             switch( p_sub->p_msg[i_start].i_type )
             {
@@ -128,7 +128,9 @@ void MessagesDialog::updateLog()
             messages->setFontItalic(false);
             messages->setTextColor("black");
             messages->insertPlainText( p_sub->p_msg[i_start].psz_msg );
+            messages->insertPlainText( "\n" );
         }
+        messages->ensureCursorVisible();
 
         vlc_mutex_lock( p_sub->p_lock );
         p_sub->i_start = i_start;
