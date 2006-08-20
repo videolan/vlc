@@ -1086,6 +1086,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         vlc_object_detach( id->p_decoder );
         vlc_object_destroy( id->p_decoder );
+        id->p_decoder = NULL;
     }
 
     if( id->p_encoder )
@@ -1093,6 +1094,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         vlc_object_detach( id->p_encoder );
         es_format_Clean( &id->p_encoder->fmt_out );
         vlc_object_destroy( id->p_encoder );
+        id->p_encoder = NULL;
     }
 
     free( id );
@@ -1128,6 +1130,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     {
         vlc_object_detach( id->p_decoder );
         vlc_object_destroy( id->p_decoder );
+        id->p_decoder = NULL;
     }
 
     if( id->p_encoder )
@@ -1135,8 +1138,8 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         vlc_object_detach( id->p_encoder );
         es_format_Clean( &id->p_encoder->fmt_out );
         vlc_object_destroy( id->p_encoder );
+        id->p_encoder = NULL;
     }
-
     free( id );
 
     return VLC_SUCCESS;
@@ -1289,7 +1292,6 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 
     id->p_decoder->p_module =
         module_Need( id->p_decoder, "decoder", "$codec", 0 );
-
     if( !id->p_decoder->p_module )
     {
         msg_Err( p_stream, "cannot find decoder" );
@@ -1311,8 +1313,9 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_in.audio.i_format = id->p_decoder->fmt_out.i_codec;
 
     /* Initialization of encoder format structures */
-    es_format_Init( &id->p_encoder->fmt_in, AUDIO_ES, AOUT_FMT_S16_NE );
-    id->p_encoder->fmt_in.audio.i_format = AOUT_FMT_S16_NE;
+    es_format_Init( &id->p_encoder->fmt_in, AUDIO_ES, VLC_FOURCC('f','l','3','2') );
+    id->p_encoder->fmt_in.audio.i_format = VLC_FOURCC('f','l','3','2');
+
     id->p_encoder->fmt_in.audio.i_rate = id->p_encoder->fmt_out.audio.i_rate;
     id->p_encoder->fmt_in.audio.i_physical_channels =
         id->p_encoder->fmt_out.audio.i_physical_channels;
@@ -1324,7 +1327,6 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
     id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
-
     id->p_encoder->p_module =
         module_Need( id->p_encoder, "encoder", p_sys->psz_aenc, VLC_TRUE );
     if( !id->p_encoder->p_module )
@@ -2276,6 +2278,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                     msg_Dbg( p_stream, "no video filter found" );
                     vlc_object_detach( id->pp_ufilter[id->i_ufilter] );
                     vlc_object_destroy( id->pp_ufilter[id->i_ufilter] );
+                    id->pp_ufilter[id->i_ufilter] = NULL;
                 }
             }
         }
