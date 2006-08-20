@@ -1470,8 +1470,8 @@ if test "${enable_shout}" = "yes"; then
   PKG_CHECK_MODULES(SHOUT, shout >= 2.1,
     [AC_DEFINE(HAVE_SHOUT, [], [Define if you have the libshout library])
      VLC_ADD_PLUGINS([access_output_shout])
-     VLC_ADD_LDFLAGS([vlc access_output_shout],[$SHOUT_LIBS])
-     VLC_ADD_CFLAGS([vlc access_output_shout],[$SHOUT_CFLAGS])],
+     VLC_ADD_LDFLAGS([access_output_shout],[$SHOUT_LIBS])
+     VLC_ADD_CFLAGS([access_output_shout],[$SHOUT_CFLAGS])],
     [AC_MSG_WARN(libshout library not found)])
 fi
 
