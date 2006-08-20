@@ -56,7 +56,7 @@
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
-static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,  
+static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                         aout_buffer_t * );
 static int  Open      ( vlc_object_t *, filter_sys_t *,
                         audio_format_t, audio_format_t );
@@ -161,7 +161,7 @@ static int Create( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Open: 
+ * Open:
  *****************************************************************************/
 static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
                  audio_format_t input, audio_format_t output )
