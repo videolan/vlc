@@ -158,7 +158,7 @@ void Win32DragDrop::HandleDrop( HDROP HDrop )
         DragQueryFile( HDrop, i, psz_fileName, nameLength );
 
         // Add the file
-        CmdAddItem cmd( getIntf(), psz_fileName, m_playOnDrop );
+        CmdAddItem cmd( getIntf(), sFromLocale( psz_fileName ), m_playOnDrop );
         cmd.execute();
 
         delete[] psz_fileName;
