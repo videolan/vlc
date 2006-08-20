@@ -72,7 +72,7 @@ struct filter_sys_t
 #define MONO_CHANNEL_TEXT ("Select channel to keep")
 #define MONO_CHANNEL_LONGTEXT ("This option silcences all other channels " \
     "except the selected channel. Choose one from (0=left, 1=right " \
-    "2=rear left, 3=rear right, 4=center, 5=left front")
+    "2=rear left, 3=rear right, 4=center, 5=left front)")
 
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5 };
 static char *ppsz_pos_descriptions[] =
