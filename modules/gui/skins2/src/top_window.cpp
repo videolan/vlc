@@ -439,9 +439,18 @@ void TopWindow::onTooltipChange( const CtrlGeneric &rCtrl )
     // Check that the control is the active one
     if( m_pLastHitControl && m_pLastHitControl == &rCtrl )
     {
-        // Set the tooltip text variable
-        VarManager *pVarManager = VarManager::instance( getIntf() );
-        pVarManager->getTooltipText().set( rCtrl.getTooltipText() );
+        if( rCtrl.getTooltipText().size() )
+        {
+            // Set the tooltip text variable
+            VarManager *pVarManager = VarManager::instance( getIntf() );
+            pVarManager->getTooltipText().set( rCtrl.getTooltipText() );
+            m_rWindowManager.showTooltip();
+        }
+        else
+        {
+            // Nothing to display, so hide the tooltip
+            m_rWindowManager.hideTooltip();
+        }
     }
 }
 
