@@ -68,6 +68,10 @@ void E_(CloseAudioEncoder)( vlc_object_t * );
 int  E_(OpenDemux) ( vlc_object_t * );
 void E_(CloseDemux)( vlc_object_t * );
 
+/* Mux module */
+int  E_(OpenMux) ( vlc_object_t * );
+void E_(CloseMux)( vlc_object_t * );
+
 /* Video filter module */
 int  E_(OpenFilter)( vlc_object_t * );
 int  E_(OpenCropPadd)( vlc_object_t * );

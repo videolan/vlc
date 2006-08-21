@@ -8,6 +8,7 @@ SOURCES_ffmpeg = \
 	encoder.c \
 	postprocess.c \
 	demux.c \
+	mux.c \
 	$(NULL)
 
 SOURCES_ffmpegaltivec = \
@@ -20,5 +21,6 @@ SOURCES_ffmpegaltivec = \
 	encoder.c \
 	postprocess.c \
 	demux.c \
+	mux.c \
 	$(NULL)
 

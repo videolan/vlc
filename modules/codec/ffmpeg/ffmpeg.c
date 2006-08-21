@@ -191,6 +191,12 @@ vlc_module_begin();
     set_capability( "demux2", 2 );
     set_callbacks( E_(OpenDemux), E_(CloseDemux) );
 
+    /* mux submodule */
+    add_submodule();
+    set_description( _("FFmpeg muxer" ) );
+    set_capability( "sout mux", 2 );
+    set_callbacks( E_(OpenMux), E_(CloseMux) );
+
     /* video filter submodule */
     add_submodule();
     set_capability( "video filter2", 50 );
