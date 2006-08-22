@@ -51,19 +51,15 @@ static int  OpenFilter    ( vlc_object_t * );
 static void CloseFilter   ( vlc_object_t * );
 
 static block_t *Convert( filter_t *p_filter, block_t *p_block );
-static void stereo_mono_downmix( aout_instance_t *, aout_filter_t *,
-                                 aout_buffer_t *, aout_buffer_t * );
-static unsigned int stereo_to_mono( int16_t *, int16_t *, unsigned int );
 
-static void silence_channel( aout_instance_t *, aout_filter_t *,
-                             aout_buffer_t *, aout_buffer_t * );
+static unsigned int stereo_to_mono( aout_instance_t *, aout_filter_t *,
+                                    aout_buffer_t *, aout_buffer_t * );
 
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
 struct filter_sys_t
 {
-    vlc_bool_t b_block_channel;
     int i_nb_channels; /* number of float32 per sample */
     unsigned int i_channel_selected;
     int i_bitspersample;
@@ -118,7 +114,7 @@ static int OpenFilter( vlc_object_t *p_this )
     if( (p_filter->fmt_in.i_codec != AOUT_FMT_S16_NE) ||
         (p_filter->fmt_out.i_codec != AOUT_FMT_S16_NE) )
     {
-        msg_Err( p_this, "invalid format" );
+        msg_Err( p_this, "filter discarded (invalid format)" );
         return -1;
     }
 
@@ -144,22 +140,19 @@ static int OpenFilter( vlc_object_t *p_this )
     p_sys->i_channel_selected =
             (unsigned int) var_GetInteger( p_this, MONO_CFG "mono-channel" );
 
-    /* temporarily force channel silence */
-    p_sys->b_block_channel = VLC_TRUE;
-    if( p_sys->b_block_channel )
-    {
-        p_filter->fmt_out.audio.i_physical_channels =
+#if 0
+    p_filter->fmt_out.audio.i_physical_channels = AOUT_CHAN_CENTER;
+#endif
+    p_filter->fmt_out.audio.i_physical_channels =
                             (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT);
-    }
-    else
-        p_filter->fmt_out.audio.i_physical_channels = AOUT_CHAN_CENTER;
 
-    p_filter->pf_audio_filter = Convert;
     p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
     p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
 
-    p_sys->i_nb_channels = aout_FormatNbChannels( &(p_filter->fmt_out.audio) );
+    p_sys->i_nb_channels = aout_FormatNbChannels( &(p_filter->fmt_in.audio) );
     p_sys->i_bitspersample = p_filter->fmt_out.audio.i_bitspersample;
+
+    p_filter->pf_audio_filter = Convert;
 
     msg_Dbg( p_this, "%4.4s->%4.4s, channels %d->%d, bits per sample: %i->%i",
              (char *)&p_filter->fmt_in.i_codec,
@@ -193,6 +186,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     aout_buffer_t in_buf, out_buf;
     block_t *p_out = NULL;
     int i_out_size;
+    unsigned int i_samples;
 
     if( !p_block || !p_block->i_samples )
     {
@@ -202,7 +196,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     }
 
     i_out_size = p_block->i_samples * p_filter->p_sys->i_bitspersample/8 *
-                 p_filter->p_sys->i_nb_channels;
+                 aout_FormatNbChannels( &(p_filter->fmt_out.audio) );
 
     p_out = p_filter->pf_audio_buffer_new( p_filter, i_out_size );
     if( !p_out )
@@ -212,7 +206,8 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
         return NULL;
     }
 
-    p_out->i_samples = p_block->i_samples;
+    p_out->i_samples = (p_block->i_samples / p_filter->p_sys->i_nb_channels) *
+                            aout_FormatNbChannels( &(p_filter->fmt_out.audio) );
     p_out->i_dts = p_block->i_dts;
     p_out->i_pts = p_block->i_pts;
     p_out->i_length = p_block->i_length;
@@ -228,13 +223,12 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     in_buf.i_nb_samples = p_block->i_samples;
 
 #if 0
-    if( in_buf.i_nb_bytes != (p_filter->p_sys->i_bitspersample/8) * in_buf.i_nb_samples )
+    unsigned int i_in_size = in_buf.i_nb_samples  * (p_filter->p_sys->i_bitspersample/8) *
+                             aout_FormatNbChannels( &(p_filter->fmt_in.audio) );
+    if( (in_buf.i_nb_bytes != i_in_size) && ((i_in_size % 32) != 0) ) /* is it word aligned?? */
     {
-        msg_Err( p_filter, "input buffer is not alligned" );
-/*        if( in_buf.i_nb_bytes > (p_filter->p_sys->i_bitspersample/8) * in_buf.i_nb_samples)
-            in_buf.i_nb_bytes = (p_filter->p_sys->i_bitspersample/8) * in_buf.i_nb_samples;
-        else
-            //in_buf*/
+        msg_Err( p_filter, "input buffer is not word aligned" );
+        /* Fix output buffer to be word aligned */
     }
 #endif
 
@@ -242,7 +236,8 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     out_buf.i_nb_bytes = p_out->i_buffer;
     out_buf.i_nb_samples = p_out->i_samples;
 
-    stereo_mono_downmix( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
+    i_samples = stereo_to_mono( (aout_instance_t *)p_filter, &aout_filter,
+                                &out_buf, &in_buf );
 
     p_out->i_buffer = out_buf.i_nb_bytes;
     p_out->i_samples = out_buf.i_nb_samples;
@@ -251,77 +246,29 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     return p_out;
 }
 
-static void stereo_mono_downmix( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                                 aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
-{
-    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
-
-    if( p_sys->b_block_channel )
-    {
-        silence_channel( p_aout, p_filter, p_out_buf, p_in_buf );
-    }
-    else
-    {
-        unsigned int i_samples;
-
-        i_samples = stereo_to_mono( (int16_t *)p_out_buf->p_buffer, (int16_t *)p_in_buf->p_buffer,
-                                    p_out_buf->i_nb_samples );
-    }
-
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-}
-
-/* silence_channel - play silence on all channels except the selected one.
+/* stereo_to_mono - mix 2 channels (left,right) into one and play silence on
+ * all other channels.
  */
-static void silence_channel( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                             aout_buffer_t *p_out_buf, aout_buffer_t *p_in_buf )
+static unsigned int stereo_to_mono( aout_instance_t * p_aout, aout_filter_t *p_filter,
+                                    aout_buffer_t *p_output, aout_buffer_t *p_input )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
-    unsigned int n = 0;
     int16_t *p_in, *p_out;
+    unsigned int n;
 
-    p_in = (int16_t *)p_in_buf->p_buffer;
-    p_out = (int16_t *)p_out_buf->p_buffer;
+    p_in = (int16_t *) p_input->p_buffer;
+    p_out = (int16_t *) p_output->p_buffer;
 
-    for( n = 0; n < p_in_buf->i_nb_samples * p_sys->i_nb_channels; n++ )
+    for( n = 0; n < (p_input->i_nb_samples * p_sys->i_nb_channels); n++ )
     {
         if( (n%p_sys->i_nb_channels) == p_sys->i_channel_selected )
         {
-            p_out[n] = p_in[n];
+            p_out[n] = (p_in[n] + p_in[n+1]) >> 1;
         }
         else
         {
             p_out[n] = 0x0;
         }
-    }
-}
-
-/* stereo_to_mono() function is from ffmpeg file libavcodec/resample.c 
- * Copyright (c) 2000 Fabrice Bellard.
- */
-static unsigned int stereo_to_mono( int16_t *p_output, int16_t *p_input,
-                                    unsigned int i_samples )
-{
-    int16_t *p, *q;
-    unsigned int n = i_samples;
-
-    p = p_input;
-    q = p_output;
-
-    while (n >= 4) {
-        q[0] = (p[0] + p[1]) >> 1;
-        q[1] = (p[2] + p[3]) >> 1;
-        q[2] = (p[4] + p[5]) >> 1;
-        q[3] = (p[6] + p[7]) >> 1;
-        q += 4;
-        p += 8;
-        n -= 4;
-    }
-    while (n > 0) {
-        q[0] = (p[0] + p[1]) >> 1;
-        q++;
-        p += 2;
-        n--;
     }
     return n;
 }
