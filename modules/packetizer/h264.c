@@ -84,6 +84,7 @@ struct decoder_sys_t
     int i_nal_ref_idc;
     int i_idr_pic_id;
     int i_frame_num;
+    int i_frame_type;
 };
 
 enum
@@ -163,6 +164,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_nal_ref_idc = -1;
     p_sys->i_idr_pic_id = -1;
     p_sys->i_frame_num = -1;
+    p_sys->i_frame_type = 0;
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
@@ -477,7 +479,9 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     do {                                                      \
         p_pic = block_ChainGather( p_sys->p_frame );          \
         p_pic->i_length = 0;    /* FIXME */                   \
+        p_pic->i_flags |= p_sys->i_frame_type;                \
                                                               \
+        p_sys->i_frame_type = 0;                              \
         p_sys->p_frame = NULL;                                \
         p_sys->b_slice = VLC_FALSE;                           \
                                                               \
@@ -514,7 +518,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     else if( i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
     {
         uint8_t *dec;
-        int i_dec, i_first_mb, i_slice_type, i_frame_num, i_pic_flags = 0;
+        int i_dec, i_first_mb, i_slice_type, i_frame_num;
         vlc_bool_t b_pic = VLC_FALSE;
         bs_t s;
 
@@ -529,23 +533,22 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         /* slice_type */
         switch( (i_slice_type = bs_read_ue( &s )) )
         {
-            case 0: case 5:
-                i_pic_flags = BLOCK_FLAG_TYPE_P;
-                break;
-            case 1: case 6:
-                i_pic_flags = BLOCK_FLAG_TYPE_B;
-                break;
-            case 2: case 7:
-                i_pic_flags = BLOCK_FLAG_TYPE_I;
-                break;
-            case 3: case 8: /* SP */
-                i_pic_flags = BLOCK_FLAG_TYPE_P;
-                break;
-            case 4: case 9:
-                i_pic_flags = BLOCK_FLAG_TYPE_I;
-                break;
+        case 0: case 5:
+            p_sys->i_frame_type = BLOCK_FLAG_TYPE_P;
+            break;
+        case 1: case 6:
+            p_sys->i_frame_type = BLOCK_FLAG_TYPE_B;
+            break;
+        case 2: case 7:
+            p_sys->i_frame_type = BLOCK_FLAG_TYPE_I;
+            break;
+        case 3: case 8: /* SP */
+            p_sys->i_frame_type = BLOCK_FLAG_TYPE_P;
+            break;
+        case 4: case 9:
+            p_sys->i_frame_type = BLOCK_FLAG_TYPE_I;
+            break;
         }
-        p_frag->i_flags |= i_pic_flags;
 
         /* pic_parameter_set_id */
         bs_read_ue( &s );
