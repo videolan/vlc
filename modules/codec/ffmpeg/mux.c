@@ -59,6 +59,8 @@ struct sout_mux_sys_t
 
     vlc_bool_t     b_write_header;
     vlc_bool_t     b_error;
+
+    int64_t        i_initial_dts;
 };
 
 /*****************************************************************************
@@ -135,6 +137,7 @@ int E_(OpenMux)( vlc_object_t *p_this )
 
     p_sys->b_write_header = VLC_TRUE;
     p_sys->b_error = VLC_FALSE;
+    p_sys->i_initial_dts = 0;
 
     return VLC_SUCCESS;
 }
@@ -287,6 +290,7 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
     }
     if( pi_stream ) *pi_stream = i_stream;
     if( pi_dts ) *pi_dts = i_dts;
+    if( !p_mux->p_sys->i_initial_dts ) p_mux->p_sys->i_initial_dts = i_dts;
     return i_stream;
 }
 
@@ -295,25 +299,33 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     block_t *p_data = block_FifoGet( p_input->p_fifo );
     int i_stream = *((int *)p_input->p_sys);
+    AVStream *p_stream = p_sys->oc->streams[i_stream];
     AVPacket pkt = {0};
 
+    av_init_packet(&pkt);
     pkt.data = p_data->p_buffer;
     pkt.size = p_data->i_buffer;
     pkt.stream_index = i_stream;
 
     if( p_data->i_flags & BLOCK_FLAG_TYPE_I ) pkt.flags |= PKT_FLAG_KEY;
+
+    /* avformat expects pts/dts which start from 0 */
+    p_data->i_dts -= p_mux->p_sys->i_initial_dts;
+    p_data->i_pts -= p_mux->p_sys->i_initial_dts;
+
     if( p_data->i_pts > 0 )
-        pkt.pts = p_data->i_pts * p_sys->oc->streams[i_stream]->time_base.den /
-            I64C(1000000) / p_sys->oc->streams[i_stream]->time_base.num;
+        pkt.pts = p_data->i_pts * p_stream->time_base.den /
+            I64C(1000000) / p_stream->time_base.num;
     if( p_data->i_dts > 0 )
-        pkt.dts = p_data->i_dts * p_sys->oc->streams[i_stream]->time_base.den /
-            I64C(1000000) / p_sys->oc->streams[i_stream]->time_base.num;
+        pkt.dts = p_data->i_dts * p_stream->time_base.den /
+            I64C(1000000) / p_stream->time_base.num;
 
     if( av_write_frame( p_sys->oc, &pkt ) < 0 )
     {
         msg_Err( p_mux, "could not write frame (pts: "I64Fd", dts: "I64Fd") "
                  "(pkt pts: "I64Fd", dts: "I64Fd")",
                  p_data->i_pts, p_data->i_dts, pkt.pts, pkt.dts );
+        block_Release( p_data );
         return VLC_EGENERIC;
     }
 
