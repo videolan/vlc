@@ -27,6 +27,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_interaction.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -244,6 +245,9 @@ static int Open( vlc_object_t *p_this )
         else
         {
             msg_Err( p_access, "unknown file type for `%s'", psz_name );
+            intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"), 
+                            _("\"%s\"'s file type is unknown."),
+                            psz_name );
             free( psz_name );
             return VLC_EGENERIC;
         }
@@ -408,7 +412,12 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     if( i_ret < 0 )
     {
         if( errno != EINTR && errno != EAGAIN )
+        {
             msg_Err( p_access, "read failed (%s)", strerror(errno) );
+            intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"), 
+                            _("VLC could not read file \"%s\"."),
+                            strerror(errno) );
+        }
 
         /* Delay a bit to avoid consuming all the CPU. This is particularly
          * useful when reading from an unconnected FIFO. */
@@ -507,6 +516,10 @@ static int Seek( access_t *p_access, int64_t i_pos )
     if( p_access->info.i_size < p_access->info.i_pos )
     {
         msg_Err( p_access, "seeking too far" );
+        intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"), 
+                        _("VLC seeked in the file too far. This usually means "
+                          "that your file is broken and therefore cannot be "
+                          "played." ) );
         p_access->info.i_pos = p_access->info.i_size;
     }
     else if( p_access->info.i_pos < 0 )
@@ -590,6 +603,8 @@ static int _OpenFile( access_t * p_access, const char * psz_name )
     if ( !p_sys->fd )
     {
         msg_Err( p_access, "cannot open file %s", psz_name );
+        intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"), 
+                        _("VLC could not open file \"%s\"."), psz_name );
         return VLC_EGENERIC;
     }
 
@@ -613,6 +628,9 @@ static int _OpenFile( access_t * p_access, const char * psz_name )
     {
         msg_Err( p_access, "cannot open file %s (%s)", psz_name,
                  strerror(errno) );
+        intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"), 
+                        _("VLC could not open file \"%s\" (%s)."),
+                        psz_name, strerror(errno) );
         return VLC_EGENERIC;
     }
 

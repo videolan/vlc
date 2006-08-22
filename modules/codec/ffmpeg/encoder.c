@@ -33,6 +33,7 @@
 #include <vlc/aout.h>
 #include <vlc/sout.h>
 #include <vlc/decoder.h>
+#include <vlc_interaction.h>
 
 /* ffmpeg header */
 #define HAVE_MMX 1
@@ -224,12 +225,16 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_cat == VIDEO_ES && i_cat != VIDEO_ES )
     {
         msg_Err( p_enc, "\"%s\" is not a video encoder", psz_namecodec );
+        intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"), 
+                        _("\"%s\" is no video encoder."), psz_namecodec );
         return VLC_EGENERIC;
     }
 
     if( p_enc->fmt_out.i_cat == AUDIO_ES && i_cat != AUDIO_ES )
     {
         msg_Err( p_enc, "\"%s\" is not an audio encoder", psz_namecodec );
+        intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"), 
+                        _("\"%s\" is no audio encoder."), psz_namecodec );
         return VLC_EGENERIC;
     }
 
@@ -240,6 +245,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     if( !p_codec )
     {
         msg_Err( p_enc, "cannot find encoder %s", psz_namecodec );
+        intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"), 
+                        _("VLC could not find encoder \"%s\"."), psz_namecodec );
         return VLC_EGENERIC;
     }
 
@@ -609,6 +616,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             {
                 vlc_mutex_unlock( lockval.p_address );
                 msg_Err( p_enc, "cannot open encoder" );
+                intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"), 
+                                _("VLC could not open the encoder.") );
                 free( p_sys );
                 return VLC_EGENERIC;
             }
@@ -616,6 +625,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         else
         {
             msg_Err( p_enc, "cannot open encoder" );
+            intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"), 
+                            _("VLC could not open the encoder.") );
             free( p_sys );
             return VLC_EGENERIC;
         }

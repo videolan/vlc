@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_interaction.h>
 
 #include "network.h"
 #include "rtsp.h"
@@ -89,6 +90,8 @@ static int RtspConnect( void *p_userdata, char *psz_server, int i_port )
     if( p_sys->fd < 0 )
     {
         msg_Err( p_access, "cannot connect to %s:%d", psz_server, i_port );
+        intf_UserFatal( p_access, VLC_FALSE, _("Connection failed"), 
+                        _("VLC could not connect to \"%s:%d\"."), psz_server, i_port );
         return VLC_EGENERIC;
     }
 
@@ -215,6 +218,8 @@ static int Open( vlc_object_t *p_this )
 
 
             msg_Err( p_access, "rtsp session can not be established" );
+            intf_UserFatal( p_access, VLC_FALSE, _("Session failed"), 
+                    _("The requested RTSP session could not be established.") );
             goto error;
         }
 

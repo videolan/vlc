@@ -28,6 +28,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_interaction.h>
 
 #include "vlc_meta.h"
 
@@ -164,6 +165,8 @@ static int Demux( demux_t *p_demux )
                 if( DemuxInit( p_demux ) )
                 {
                     msg_Err( p_demux, "failed to load the new header" );
+                    intf_UserFatal( p_demux, VLC_FALSE, _("Could not demux ASF stream"), 
+                                    _("VLC failed to load the ASF header.") );
                     return 0;
                 }
                 continue;

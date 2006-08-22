@@ -28,6 +28,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_interaction.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -292,6 +293,9 @@ static int Open( vlc_object_t *p_this )
         if( dvdnav_title_play( p_sys->dvdnav, 1 ) != DVDNAV_STATUS_OK )
         {
             msg_Err( p_demux, "cannot set title (can't decrypt DVD?)" );
+            intf_UserFatal( p_demux, VLC_FALSE, _("Playback failure"), 
+                            _("VLC cannot set the DVD's title. It possibly "
+                              "cannot decrypt the entire disk.") );
             dvdnav_close( p_sys->dvdnav );
             free( p_sys );
             return VLC_EGENERIC;

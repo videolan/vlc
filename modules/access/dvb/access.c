@@ -29,6 +29,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_interaction.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -712,6 +713,9 @@ static int ParseMRL( access_t *p_access )
     {
         msg_Err( p_access, "the DVB input old syntax is deprecated, use vlc "
                           "-p dvb to see an explanation of the new syntax" );
+        intf_UserFatal( p_access, VLC_TRUE, _("Input syntax is deprecated"), 
+            _("The given syntax is deprecated. Run \"vlc -p dvb\" to see an " \
+                "explanation of the new syntax.") );
         free( psz_dup );
         return VLC_EGENERIC;
     }
@@ -756,6 +760,9 @@ static int ParseMRL( access_t *p_access )
             else
             {
                 msg_Err( p_access, "illegal polarization %c", *psz_parser );
+                intf_UserFatal( p_access, VLC_FALSE, _("Illegal Polarization"), 
+                                _("The provided polarization \"%c\" is not valid."),
+                                *psz_parser );
                 free( psz_dup );
                 return VLC_EGENERIC;
             }

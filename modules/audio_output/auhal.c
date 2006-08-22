@@ -30,6 +30,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
+#include <vlc_interaction.h>
 
 #include "aout_internal.h"
 
@@ -240,6 +241,9 @@ static int Open( vlc_object_t * p_this )
     if( p_sys->i_hog_pid != -1 && p_sys->i_hog_pid != getpid() )
     {
         msg_Err( p_aout, "Selected audio device is exclusively in use by another program." );
+        intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"), 
+                        _("The selected audio output device is exclusively in "
+                          "use by another program.") );
         goto error;
     }
 
@@ -422,6 +426,10 @@ static int OpenAnalog( aout_instance_t *p_aout )
             {
                 p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
                 msg_Err( p_aout, "You should configure your speaker layout with Audio Midi Setup Utility in /Applications/Utilities. Now using Stereo mode." );
+                intf_UserFatal( p_aout, VLC_FALSE, _("Audio device is not configured"), 
+                                _("You should configure your speaker layout with "
+                                  "the \"Audio Midi Setup Utility\" in /Applications/"
+                                  "Utilities. Stereo mode is being used now.") );
             }
         }
         if( layout ) free( layout );

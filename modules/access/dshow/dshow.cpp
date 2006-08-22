@@ -32,6 +32,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/vout.h>
+#include <vlc_interaction.h>
 
 #include "common.h"
 #include "filter.h"
@@ -890,6 +891,9 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     {
         msg_Err( p_this, "can't use device: %s, unsupported device type",
                  devicename.c_str() );
+        intf_UserFatal( p_vout, VLC_FALSE, _("Capturing failed"), 
+                        _("VLC cannot use the device \"%s\", because its device "
+                          "type is not supported.") );
         return VLC_EGENERIC;
     }
 
@@ -937,6 +941,9 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     else {
         /* capture device */
         msg_Err( p_this, "capture device '%s' does not support required parameters !", devicename.c_str() );
+        intf_UserFatal( p_this, VLC_FALSE, _("Capturing failed"), 
+                        _("The capture device \"%s\" does not support the "
+                          "required parameters."), devicename.c_str() );
         p_device_filter->Release();
         return VLC_EGENERIC;
     }

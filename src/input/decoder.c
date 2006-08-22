@@ -32,6 +32,7 @@
 #include <vlc/decoder.h>
 #include <vlc/vout.h>
 #include <vlc/input.h>
+#include <vlc_interaction.h>
 
 #include "stream_output.h"
 #include "input_internal.h"
@@ -109,6 +110,8 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create packetizer" );
+            intf_UserFatal( p_input, VLC_FALSE, _("Streaming / Transcoding failed"), 
+                            _("VLC could not open the packetizer module.") );
             return NULL;
         }
     }
@@ -119,6 +122,8 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create decoder" );
+            intf_UserFatal( p_input, VLC_FALSE, _("Streaming / Transcoding failed"), 
+                            _("VLC could not open the decoder module.") );
             return NULL;
         }
     }
@@ -128,6 +133,10 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
                  "VLC probably does not support this sound or video format.",
                  (char*)&p_dec->fmt_in.i_codec );
+        intf_UserFatal( p_dec, VLC_FALSE, _("No suitable decoder module "
+            "for FOURCC \"4.4s\" found"), _("VLC probably does not support this "
+            "audio or video format. Regrettably, there is no way for you to "
+            "fix this.") );
 
         DeleteDecoder( p_dec );
         vlc_object_destroy( p_dec );

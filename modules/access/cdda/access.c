@@ -31,6 +31,7 @@
 #include "info.h"          /* headers for meta info retrieval */
 #include <vlc_playlist.h>  /* Has to come *after* cdda.h */
 #include "vlc_keys.h"
+#include <vlc_interaction.h>
 
 #include <cdio/cdio.h>
 #include <cdio/logging.h>
@@ -289,6 +290,9 @@ static block_t * CDDAReadBlocks( access_t * p_access )
     {
         msg_Err( p_access, "cannot get a new block of size: %i",
                 i_blocks * CDIO_CD_FRAMESIZE_RAW );
+        intf_UserFatal( p_access, VLC_FALSE, _("CD reading failed"), 
+                        _("VLC could not get a new block of size: %i."), 
+                        i_blocks * CDIO_CD_FRAMESIZE_RAW );
         return NULL;
     }
 

@@ -34,6 +34,7 @@
 #include <vlc/vlc.h>
 
 #include <vlc/aout.h>
+#include <vlc_interaction.h>
 
 #include "aout_internal.h"
 
@@ -322,6 +323,9 @@ static int Open( vlc_object_t *p_this )
     if( (psz_device = config_GetPsz( p_aout, "alsadev" )) == NULL )
     {
         msg_Err( p_aout, "no audio device given (maybe \"default\" ?)" );
+        intf_UserFatal( p_aout, VLC_FALSE, _("No Audio Device"), 
+                        _("No audio device name was given. You might want to " \
+                          "enter \"default\".") );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -427,6 +431,9 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
                              psz_iec_device, snd_strerror( i_snd_rc ) );
+            intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"), 
+                            _("VLC could not open the ALSA device \"%s\" (%s)."),
+                            psz_iec_device, snd_strerror( i_snd_rc ) );
             free( p_sys );
             free( psz_device );
             return VLC_EGENERIC;
@@ -459,8 +466,14 @@ static int Open( vlc_object_t *p_this )
                    SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK ) ) == -EBUSY )
             {
                 if( i ) msleep( 100000 /* 100ms */ );
-                else msg_Err( p_aout, "audio device: %s is already in use",
+                else
+                {
+                    msg_Err( p_aout, "audio device: %s is already in use",
                               psz_device );
+                    intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"), 
+                                    _("The audio device \"%s\" is already in use."),
+                                    psz_device );
+                }
                 continue;
             }
             break;
@@ -469,6 +482,9 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
                              psz_device, snd_strerror( i_snd_rc ) );
+            intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"), 
+                            _("VLC could not open the ALSA device \"%s\" (%s)."),
+                            psz_device, snd_strerror( i_snd_rc ) );
             free( p_sys );
             free( psz_device );
             return VLC_EGENERIC;
