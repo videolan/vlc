@@ -31,10 +31,8 @@ extern "C" {
 
 #include <vlc/vlc.h>
 
-#ifndef WIN32
-#ifndef __BEOS__
+#ifdef HAVE_X11_XLIB_H
 #include <X11/Xlib.h>
-#endif
 #endif
     
 struct libvlc_instance_t
