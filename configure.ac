@@ -1996,6 +1996,28 @@ then
 fi
 
 dnl
+dnl  Video4Linux plugin
+dnl
+AC_ARG_ENABLE(v4l2,
+  [  --enable-v4l            Video4Linux2 input support (default disabled)])
+if test "${enable_v4l2}" = "yes"
+then
+  AC_ARG_WITH(v4l2,
+    [    --with-v4l2=PATH       path to a v4l2-enabled kernel tree],[],[])
+  if test "${with_v4l2}" != "no" -a -n "${with_v4l2}"
+  then
+    VLC_ADD_CPPFLAGS([v4l2],[-I${with_v4l2}/include])
+  fi
+
+  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_v4l2}"
+  AC_CHECK_HEADERS(linux/videodev2.h, [
+    VLC_ADD_PLUGINS([v4l2])
+  ],[])
+  CPPFLAGS="${CPPFLAGS_save}"
+fi
+
+
+dnl
 dnl  special access module for Hauppauge PVR cards
 dnl
 AC_ARG_ENABLE(pvr,
