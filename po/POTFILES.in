@@ -63,6 +63,7 @@ include/vlc_osd.h
 include/vlc_playlist.h
 include/vlc_spu.h
 include/vlc_stream.h
+include/vlc_streaming.h
 include/vlc_strings.h
 include/vlc_threads.h
 include/vlc_threads_funcs.h
@@ -123,8 +124,8 @@ src/misc/configuration.c
 src/misc/cpu.c
 src/misc/darwin_specific.m
 src/misc/devices.c
+src/misc/dict.c
 src/misc/error.c
-src/misc/hashtables.c
 src/misc/image.c
 src/misc/iso-639_def.h
 src/misc/iso_lang.c
@@ -165,6 +166,7 @@ src/playlist/sort.c
 src/playlist/thread.c
 src/playlist/tree.c
 src/stream_output/announce.c
+src/stream_output/profiles.c
 src/stream_output/sap.c
 src/stream_output/stream_output.c
 src/test/i18n_atof.c
@@ -278,6 +280,7 @@ modules/audio_filter/converter/float32tos16.c
 modules/audio_filter/converter/float32tos8.c
 modules/audio_filter/converter/float32tou16.c
 modules/audio_filter/converter/float32tou8.c
+modules/audio_filter/converter/mono.c
 modules/audio_filter/converter/mpgatofixed32.c
 modules/audio_filter/converter/s16tofixed32.c
 modules/audio_filter/converter/s16tofloat32.c
@@ -344,6 +347,7 @@ modules/codec/ffmpeg/demux.c
 modules/codec/ffmpeg/encoder.c
 modules/codec/ffmpeg/ffmpeg.c
 modules/codec/ffmpeg/ffmpeg.h
+modules/codec/ffmpeg/mux.c
 modules/codec/ffmpeg/postprocess.c
 modules/codec/ffmpeg/video.c
 modules/codec/ffmpeg/video_filter.c
@@ -408,6 +412,7 @@ modules/demux/mp4/drmstables.h
 modules/demux/mp4/libmp4.c
 modules/demux/mp4/libmp4.h
 modules/demux/mp4/mp4.c
+modules/demux/mp4/newtables.h
 modules/demux/mpc.c
 modules/demux/mpeg/h264.c
 modules/demux/mpeg/m4a.c
@@ -543,6 +548,8 @@ modules/gui/qt4/components/video_widget.cpp
 modules/gui/qt4/components/video_widget.hpp
 modules/gui/qt4/dialogs/interaction.cpp
 modules/gui/qt4/dialogs/interaction.hpp
+modules/gui/qt4/dialogs/messages.cpp
+modules/gui/qt4/dialogs/messages.hpp
 modules/gui/qt4/dialogs/playlist.cpp
 modules/gui/qt4/dialogs/playlist.hpp
 modules/gui/qt4/dialogs/prefs_dialog.cpp
