@@ -201,7 +201,7 @@ static inline void es_format_Init( es_format_t *fmt,
     fmt->psz_description        = NULL;
 
     fmt->i_extra_languages      = 0;
-    fmt->p_extra_languages      = NULL;    
+    fmt->p_extra_languages      = NULL;
 
     memset( &fmt->audio, 0, sizeof(audio_format_t) );
     memset( &fmt->video, 0, sizeof(video_format_t) );
@@ -270,7 +270,8 @@ static inline void es_format_Clean( es_format_t *fmt )
     fmt->i_extra = 0;
     fmt->p_extra = NULL;
 
-    if( fmt->video.p_palette ) free( fmt->video.p_palette );
+    if( fmt->video.p_palette )
+        free( fmt->video.p_palette );
     fmt->video.p_palette = NULL;
 
     if( fmt->subs.psz_encoding ) free( fmt->subs.psz_encoding );
