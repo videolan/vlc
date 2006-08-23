@@ -32,7 +32,9 @@ extern "C" {
 #include <vlc/vlc.h>
 
 #ifndef WIN32
+#ifndef __BEOS__
 #include <X11/Xlib.h>
+#endif
 #endif
     
 struct libvlc_instance_t

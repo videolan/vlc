@@ -100,13 +100,6 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    INIT_PLAYLIST_STUFF;
-
-    p_sys->p_playlist = p_playlist;
-    p_sys->p_current = p_current;
-    p_sys->i_parent_id = i_parent_id;
-    p_sys->p_item_in_category = p_item_in_category;
-
     char *psz_line;
     char *psz_attrvalue;
 
@@ -116,6 +109,13 @@ static int Demux( demux_t *p_demux )
     int i_duration = -1;
     char *psz_title = NULL;
     char *psz_description = NULL;
+
+    INIT_PLAYLIST_STUFF;
+
+    p_sys->p_playlist = p_playlist;
+    p_sys->p_current = p_current;
+    p_sys->i_parent_id = i_parent_id;
+    p_sys->p_item_in_category = p_item_in_category;
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {

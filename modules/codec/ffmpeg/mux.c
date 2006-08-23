@@ -79,6 +79,7 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence );
  *****************************************************************************/
 int E_(OpenMux)( vlc_object_t *p_this )
 {
+    AVOutputFormat *file_oformat; 
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys;
     AVFormatParameters params, *ap = &params;
@@ -87,7 +88,7 @@ int E_(OpenMux)( vlc_object_t *p_this )
     av_register_all();
 
     /* Find the requested muxer */
-    AVOutputFormat *file_oformat =
+    file_oformat =
         guess_format(NULL, p_mux->p_access->psz_name, NULL);
     if (!file_oformat)
     {

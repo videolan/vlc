@@ -360,6 +360,8 @@ void playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
                                       playlist_item_t *p_item )
 {
+
+    playlist_item_t *p_item_in_category;
     /* What we do
      * Find the input in CATEGORY.
      *  - If we find it
@@ -379,7 +381,7 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
         return p_item;
 
     /** \todo First look if we don't already have it */
-    playlist_item_t *p_item_in_category = playlist_ItemFindFromInputAndRoot(
+    p_item_in_category = playlist_ItemFindFromInputAndRoot(
                                             p_playlist, p_item->p_input->i_id,
                                             p_playlist->p_root_category );
 
