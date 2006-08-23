@@ -142,10 +142,10 @@ static int OpenFilter( vlc_object_t *p_this )
 
 #if 0
     p_filter->fmt_out.audio.i_physical_channels = AOUT_CHAN_CENTER;
-#endif
+#else
     p_filter->fmt_out.audio.i_physical_channels =
                             (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT);
-
+#endif
     p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
     p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
 
@@ -261,14 +261,9 @@ static unsigned int stereo_to_mono( aout_instance_t * p_aout, aout_filter_t *p_f
 
     for( n = 0; n < (p_input->i_nb_samples * p_sys->i_nb_channels); n++ )
     {
-        if( (n%p_sys->i_nb_channels) == p_sys->i_channel_selected )
-        {
-            p_out[n] = (p_in[n] + p_in[n+1]) >> 1;
-        }
-        else
-        {
-            p_out[n] = 0x0;
-        }
+        /* Fake real mono. */
+        p_out[n] = (p_in[n] + p_in[n+1]) >> 1;
+        n++;
     }
     return n;
 }
