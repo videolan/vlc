@@ -651,7 +651,7 @@ static void NetCommand( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     char psz_buffer[10];
-    int i_len = net_ReadNonBlock( p_stream, p_sys->i_fd, NULL, psz_buffer,
+    int i_len = net_ReadNonBlock( p_stream, p_sys->i_fd, NULL, (char *)&psz_buffer[0],
                                   sizeof( psz_buffer ), 0 );
 
     if ( i_len > 0 )
@@ -847,7 +847,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
         int mb_height = (id->ff_enc_c->height + 15) / 16;
         int h_chroma_shift, v_chroma_shift;
         int i;
-        
+
         avcodec_get_chroma_sub_sample( id->ff_enc_c->pix_fmt, &h_chroma_shift,
                                        &v_chroma_shift );
 
@@ -859,7 +859,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
                                     id->ff_enc_c->coded_frame->mb_type,
                                     (mb_width + 1) * mb_height
                                       * sizeof(id->p_frame->mb_type[0]));
-        
+
         for ( i = 0; i < 2; i++ )
         {
             int stride = ((16 * mb_width )
@@ -942,4 +942,3 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     return p_out;
 }
-
