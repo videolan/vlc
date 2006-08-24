@@ -28,8 +28,10 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QKeyEvent>
 #include "qt4.hpp"
 #include <assert.h>
+#include <QModelIndexList>
 
 StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
@@ -120,6 +122,24 @@ void StandardPLPanel::setRoot( int i_root_id )
     assert( p_item );
     model->rebuildRoot( p_item );
     model->Rebuild();
+}
+
+void StandardPLPanel::keyPressEvent( QKeyEvent *e )
+{
+    switch( e->key() )
+    {
+    case Qt::Key_Back:
+    case Qt::Key_Delete:
+        deleteSelection();
+        break;
+    }
+}
+
+void StandardPLPanel::deleteSelection()
+{
+    QItemSelectionModel *selection = view->selectionModel();
+    QModelIndexList list = selection->selectedIndexes();
+    model->doDelete( list );
 }
 
 StandardPLPanel::~StandardPLPanel()

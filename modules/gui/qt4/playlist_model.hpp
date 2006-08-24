@@ -119,6 +119,8 @@ public:
     void Rebuild();
     void rebuildRoot( playlist_item_t * );
     bool hasRandom(); bool hasLoop(); bool hasRepeat();
+
+    void doDelete( QModelIndexList selected );
 private:
     void addCallbacks();
     void delCallbacks();
@@ -138,6 +140,10 @@ private:
     void UpdateTreeItem( playlist_item_t *, PLItem *, bool, bool forc = false );
     void UpdateNodeChildren( PLItem * );
     void UpdateNodeChildren( playlist_item_t *, PLItem * );
+
+    /* Actions */
+    void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList);
+    void doDeleteItem( PLItem *item, QModelIndexList *fullList );
 
     /* Lookups */
     PLItem *FindById( PLItem *, int );

@@ -555,6 +555,61 @@ void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item,
         emit dataChanged( index( item, 0 ) , index( item, 1 ) );
 }
 
+/************************* Actions ******************************/
+
+/**
+ * Deletion, here we have to do a ugly slow hack as we retrieve the full
+ * list of indexes to delete at once: when we delete a node and all of
+ * its children, we need to update the list.
+ * Todo: investigate whethere we can use ranges to be sure to delete all items?
+ */
+void PLModel::doDelete( QModelIndexList selected )
+{
+    for( int i = selected.size() -1 ; i >= 0; i-- )
+    {
+        QModelIndex index = selected[i];
+        if( index.column() != 0 ) continue;
+        PLItem *item = static_cast<PLItem*>(index.internalPointer());
+        if( item )
+        {
+            if( item->children.size() )
+                recurseDelete( item->children, &selected );
+            doDeleteItem( item, &selected );
+        }
+    }
+}
+
+void PLModel::recurseDelete( QList<PLItem*> children, QModelIndexList *fullList)
+{
+    for( int i = children.size() - 1; i >= 0 ; i-- )
+    {
+        PLItem *item = children[i];
+        if( item->children.size() )
+            recurseDelete( item->children, fullList );
+        doDeleteItem( item, fullList );
+    }
+}
+
+void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
+{
+    QModelIndex deleteIndex = index( item, 0 );
+    fullList->removeAll( deleteIndex );
+
+    PL_LOCK;
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
+    if( !p_item )
+    {
+        PL_UNLOCK; return;
+    }
+    if( p_item->i_children == -1 )
+        playlist_DeleteAllFromInput( p_playlist, item->i_input_id );
+    else
+        playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_FALSE );
+    /* And finally, remove it from the tree */
+    item->remove( item );
+    PL_UNLOCK;
+}
+
 /**********************************************************************
  * Playlist callbacks
  **********************************************************************/

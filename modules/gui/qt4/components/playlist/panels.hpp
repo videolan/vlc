@@ -32,7 +32,7 @@
 class QTreeView;
 class PLModel;
 class QPushButton;
-
+class QKeyEvent;
 /**
  * \todo Share a single model between views using a filterproxy
  */
@@ -60,6 +60,8 @@ public:
     StandardPLPanel( QWidget *, intf_thread_t *,
                      playlist_t *,playlist_item_t * );
     virtual ~StandardPLPanel();
+protected:
+    virtual void keyPressEvent( QKeyEvent *e );
 private:
     PLModel *model;
     QTreeView *view;
@@ -67,6 +69,7 @@ private:
 public slots:
     virtual void setRoot( int );
 private slots:
+    void deleteSelection();
     void handleExpansion( const QModelIndex& );
     void toggleRandom();
     void toggleRepeat();
