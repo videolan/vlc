@@ -16,6 +16,7 @@ EXTRA_DIST = \
 	ChangeLog-2002 \
 	ChangeLog-2003 \
 	ChangeLog-2004 \
+	ChangeLog-2005 \
 	vlc.1 \
 	vlc-config.1 \
 	bugreport-howto.txt \
