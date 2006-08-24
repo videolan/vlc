@@ -195,7 +195,13 @@ int OpenDev( demux_t *p_demux )
              ( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE  ? 'X':' '),
              ( p_sys->dev_cap.capabilities & V4L2_CAP_AUDIO  ? 'X':' '),
              ( p_sys->dev_cap.capabilities & V4L2_CAP_TUNER  ? 'X':' ') );
-    
+
+    msg_Dbg( p_demux, "Supported I/O methods are: (%c) Read/Write, "
+                                                 "(%c) Streaming, "
+                                                 "(%c) Asynchronous",
+            ( p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE ? 'X':' ' ),
+            ( p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING ? 'X':' ' ),
+            ( p_sys->dev_cap.capabilities & V4L2_CAP_ASYNCIO ? 'X':' ' ) );
 
     /* Now, enumerate all the video inputs. This is useless at the moment
        since we have no way to present that info to the user except with
