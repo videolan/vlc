@@ -334,8 +334,8 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
 
-    if( p_frag->p_buffer[3] == 0xB0 || p_frag->p_buffer[3] == 0xB1 )
-    {
+    if( p_frag->p_buffer[3] == 0xB0 || p_frag->p_buffer[3] == 0xB1 || p_frag->p_buffer[3] == 0xB2 )
+    {   /* VOS and USERDATA */
 #if 0
         /* Remove VOS start/end code from the original stream */
         block_Release( p_frag );
