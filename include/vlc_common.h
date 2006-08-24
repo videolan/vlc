@@ -343,6 +343,7 @@ typedef struct sout_chain_t sout_chain_t;
 typedef struct streaming_profile_t streaming_profile_t;
 typedef struct sout_module_t sout_module_t;
 typedef struct sout_gui_descr_t sout_gui_descr_t;
+typedef struct profile_parser_t profile_parser_t;
 
 /* Decoders */
 typedef struct decoder_t      decoder_t;

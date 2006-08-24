@@ -191,6 +191,15 @@ static inline sout_chain_t *streaming_ChainNew()
     return p_chain;
 }
 
+
+struct profile_parser_t
+{
+    char *psz_profile;
+    streaming_profile_t *p_profile;
+};
+
+
+
 //VLC_XEXPORT( char *, streaming_ChainToPsz, (sout_chain_t * ) );
 
 #endif

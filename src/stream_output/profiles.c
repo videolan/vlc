@@ -390,55 +390,23 @@ void streaming_ProfilesList( vlc_object_t *p_this, int *pi_profiles,
 }
 
 
-//////////// DEPRECATED
-#if 0
-vlc_bool_t streaming_ChainIsGuiSupported( sout_chain_t *p_chain,
-                                          vlc_bool_t b_root )
+/** Parse a profile */
+int streaming_ProfileParse( vlc_object_t *p_this,streaming_profile_t *p_profile,
+                            const char *psz_profile )
 {
-    /* First is transcode, std/rtp or duplicate.
-     * If transcode, then std/rtp or duplicate
-     * If duplicate, each subchain is std/rtp only */
-    int j;
-    if( p_chain->i_modules == 0 || p_chain->i_modules > 2 ) return VLC_FALSE;
+    DECMALLOC_ERR( p_parser, profile_parser_t );
+    module_t *p_module;
+    assert( p_profile ); assert( psz_profile );
 
-    if( p_chain->pp_modules[0]->i_type == SOUT_MOD_TRANSCODE && b_root )
+    p_parser->psz_profile = strdup( psz_profile );
+    p_parser->p_profile = p_profile;
+
+    p_this->p_private = (void *)p_parser;
+
+    /* And call the module ! All work is done now */
+    p_module = module_Need( p_this, "profile parser", "", VLC_TRUE );
+    if( !p_module )
     {
-        if( p_chain->pp_modules[1]->i_type == SOUT_MOD_DUPLICATE )
-        {
-            sout_duplicate_t *p_dup = p_chain->pp_modules[1]->typed.p_duplicate;
-            if( p_dup->i_children == 0 ) return VLC_FALSE;
-            for( j = 0 ; j<  p_dup->i_children ; j++ )
-            {
-                if( !streaming_ChainIsGuiSupported( p_dup->pp_children[j],
-                                                    VLC_FALSE))
-                    return VLC_FALSE;
-            }
-            return VLC_TRUE;
-        }
+        msg_Warn( p_this, "parsing profile failed" );
     }
-    if( p_chain->pp_modules[0]->i_type == SOUT_MOD_DUPLICATE && b_root )
-    {
-        sout_duplicate_t *p_dup =  p_chain->pp_modules[0]->typed.p_duplicate;
-        if( p_dup->i_children == 0 ) return VLC_FALSE;
-        for( j = 0 ; j<  p_dup->i_children ; j++ )
-        {
-            if( !streaming_ChainIsSupported( p_dup->pp_children[j], VLC_FALSE))
-                return VLC_FALSE;
-        }
-        return VLC_TRUE;
-    }
-    // Now check for supported simple chain
-    if( p_chain->i_modules == 1 || b_root )
-    {
-        return p_chain->pp_modules[0]->i_type == SOUT_MOD_RTP ||
-               p_chain->pp_modules[0]->i_type == SOUT_MOD_STD;
-    }
-    else if( b_root )
-    {
-        return p_chain->pp_modules[0]->i_type == SOUT_MOD_TRANSCODE && 
-               (p_chain->pp_modules[1]->i_type == SOUT_MOD_RTP ||
-                p_chain->pp_modules[1]->i_type == SOUT_MOD_STD );
-    }
-    return VLC_FALSE;
 }
-#endif
