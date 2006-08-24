@@ -186,16 +186,16 @@ void DialogsProvider::simpleOpenDialog()
     }
 
     QString FileTypes;
-    FileTypes = "Sound Files ( ";
-    FileTypes += EXTENSIONS_AUDIO;
-    FileTypes += ");; Video Files ( ";
+    FileTypes = "Video Files ( ";
     FileTypes += EXTENSIONS_VIDEO;
+    FileTypes += ");; Sound Files ( ";
+    FileTypes += EXTENSIONS_AUDIO;
     FileTypes += ");; PlayList Files ( ";
     FileTypes += EXTENSIONS_PLAYLIST;
     FileTypes += ");; Subtitles Files ( ";
     FileTypes += EXTENSIONS_SUBTITLE;
     FileTypes += ");; All Files (*.*) " ;
-    FileTypes.replace(QString(";*"), QString(", *"));
+    FileTypes.replace(QString(";*"), QString(" *"));
 
     QStringList fileList = QFileDialog::getOpenFileNames(
                  NULL,
