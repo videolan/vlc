@@ -262,7 +262,7 @@ static unsigned int stereo_to_mono( aout_instance_t * p_aout, aout_filter_t *p_f
     for( n = 0; n < (p_input->i_nb_samples * p_sys->i_nb_channels); n++ )
     {
         /* Fake real mono. */
-        p_out[n] = (p_in[n] + p_in[n+1]) >> 1;
+        p_out[n] = p_out[n+1] = (p_in[n] + p_in[n+1]) >> 1;
         n++;
     }
     return n;
