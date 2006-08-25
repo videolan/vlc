@@ -34,6 +34,7 @@
 #include <vlc/input.h>
 
 #include <errno.h>                                                 /* ENOMEM */
+#include "charset.h"
 #include "playlist.h"
 #include "vlc_meta.h"
 

@@ -29,6 +29,7 @@
 #include <vlc/input.h>
 #include <vlc_playlist.h>
 #include <vlc_md5.h>
+#include "charset.h"
 #include "iso_lang.h"
 #include "vlc_meta.h"
 
