@@ -487,6 +487,13 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     var_Create( p_intf, "normal", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "normal", Input, NULL );
 
+    var_Create( p_intf, "atrack", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "atrack", Input, NULL );
+    var_Create( p_intf, "vtrack", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "vtrack", Input, NULL );
+    var_Create( p_intf, "strack", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "strack", Input, NULL );
+
     /* audio commands */
     var_Create( p_intf, "volume", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "volume", Volume, NULL );
@@ -909,6 +916,9 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| voldown [X]  . . . .  lower audio volume X steps"));
     msg_rc(_("| adev [X] . . . . . . . . .  set/get audio device"));
     msg_rc(_("| achan [X]. . . . . . . .  set/get audio channels"));
+    msg_rc(_("| atrack [X] . . . . . . . . . set/get audio track"));
+    msg_rc(_("| vtrack [X] . . . . . . . . . set/get video track"));
+    msg_rc(_("| strack [X] . . . . . . . set/get subtitles track"));
     msg_rc(_("| menu [on|off|up|down|left|right|select] use menu"));
     msg_rc(  "| ");
 
@@ -1210,6 +1220,81 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
+    else if(    !strcmp( psz_cmd, "atrack" )
+             || !strcmp( psz_cmd, "vtrack" )
+             || !strcmp( psz_cmd, "strack" ) )
+    {
+        char *psz_variable;
+        vlc_value_t val_name;
+        int i_error;
+
+        if( !strcmp( psz_cmd, "atrack" ) )
+        {
+            psz_variable = "audio-es";
+        }
+        else if( !strcmp( psz_cmd, "vtrack" ) )
+        {
+            psz_variable = "video-es";
+        }
+        else
+        {
+            psz_variable = "spu-es";
+        }
+
+        /* Get the descriptive name of the variable */
+        var_Change( p_input, psz_variable, VLC_VAR_GETTEXT,
+                     &val_name, NULL );
+        if( !val_name.psz_string ) val_name.psz_string = strdup(psz_variable);
+
+        if( newval.psz_string && *newval.psz_string )
+        {
+            /* set */
+            vlc_value_t val;
+            val.i_int = atoi( newval.psz_string );
+
+            i_error = var_Set( p_input, psz_variable, val );
+        }
+        else
+        {
+            /* get */
+            vlc_value_t val, text;
+            int i, i_value;
+
+            if ( var_Get( p_input, psz_variable, &val ) < 0 )
+            {
+                vlc_object_release( p_input );
+                return VLC_EGENERIC;
+            }
+            i_value = val.i_int;
+
+            if ( var_Change( p_input, psz_variable,
+                             VLC_VAR_GETLIST, &val, &text ) < 0 )
+            {
+                vlc_object_release( p_input );
+                return VLC_EGENERIC;
+            }
+
+            msg_rc( "+----[ %s ]", val_name.psz_string );
+            for ( i = 0; i < val.p_list->i_count; i++ )
+            {
+                if ( i_value == val.p_list->p_values[i].i_int )
+                    msg_rc( "| %i - %s *", val.p_list->p_values[i].i_int,
+                            text.p_list->p_values[i].psz_string );
+                else
+                    msg_rc( "| %i - %s", val.p_list->p_values[i].i_int,
+                            text.p_list->p_values[i].psz_string );
+            }
+            var_Change( p_input, psz_variable, VLC_VAR_FREELIST,
+                        &val, &text );
+            msg_rc( "+----[ end of %s ]", val_name.psz_string );
+
+            if( val_name.psz_string ) free( val_name.psz_string );
+
+            i_error = VLC_SUCCESS;
+        }
+        vlc_object_release( p_input );
+        return i_error;
+    }
 
     /* Never reached. */
     vlc_object_release( p_input );
@@ -1286,7 +1371,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if( !strcmp( psz_cmd, "enqueue" ) &&
              newval.psz_string && *newval.psz_string )
     {
-        playlist_item_t *p_item = parse_MRL( p_intf, newval.psz_string );
+        input_item_t *p_item = parse_MRL( p_intf, newval.psz_string );
 
         if( p_item )
         {
