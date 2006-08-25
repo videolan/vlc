@@ -45,6 +45,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QHeaderView>
 
 #define ITEM_HEIGHT 25
 
@@ -62,6 +63,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     setColumnCount( 1 );
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
     setAlternatingRowColors( true );
+    header()->hide();
 
 #ifndef WIN32
     // Fixme - A bit UGLY
@@ -320,7 +322,7 @@ PrefsPanel::PrefsPanel( QWidget *_parent ) : QWidget( _parent )
 {}
 
 PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
-                        PrefsItemData * data ) :
+                        PrefsItemData * data, bool currently_advanced ) :
                         QWidget( _parent ), p_intf( _p_intf )
 {
     module_config_t *p_item;
@@ -480,7 +482,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     some_hidden_text->setWordWrap( true );
 
     setLayout( global_layout );
-    setAdvanced( false );
+    setAdvanced( currently_advanced, true );
 }
 
 void PrefsPanel::Apply()
@@ -514,10 +516,10 @@ void PrefsPanel::Apply()
 void PrefsPanel::Clean()
 {}
 
-void PrefsPanel::setAdvanced( bool adv )
+void PrefsPanel::setAdvanced( bool adv, bool force )
 {
     bool some_hidden = false;
-    if( adv == advanced ) return;
+    if( !force && adv == advanced ) return;
 
     advanced = adv;
     QList<ConfigControl *>::Iterator i;

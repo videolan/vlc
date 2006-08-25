@@ -78,7 +78,7 @@ class PrefsPanel : public QWidget
 {
     Q_OBJECT
 public:
-    PrefsPanel( intf_thread_t *, QWidget *, PrefsItemData * );
+    PrefsPanel( intf_thread_t *, QWidget *, PrefsItemData *, bool );
     PrefsPanel( QWidget *);
     virtual ~PrefsPanel() {};
     void Apply();
@@ -90,7 +90,8 @@ private:
     QVBoxLayout *global_layout;
     bool advanced;
 public slots:
-    void setAdvanced( bool );
+    void setAdvanced( bool, bool );
+    void setAdvanced( bool a ) { return setAdvanced( a, false ); }
 };
 
 #endif
