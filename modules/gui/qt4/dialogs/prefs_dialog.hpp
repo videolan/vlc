@@ -44,28 +44,28 @@ public:
     static PrefsDialog * getInstance( intf_thread_t *_p_intf )
     {
         if( !instance )
-        {
             instance = new PrefsDialog( _p_intf );
-            instance->init();
-        }
         return instance;
     }
     virtual ~PrefsDialog();
 private:
     PrefsDialog( intf_thread_t * );
-    void init();
 
+    QWidget *main_panel;
+    QHBoxLayout *main_panel_l;
     PrefsPanel *advanced_panel;
-    PrefsTree *advanced_tree;
     QWidget *simple_panel;
+
+    QWidget *tree_panel;
+    QHBoxLayout *tree_panel_l;
     QTreeWidget *simple_tree;
+    PrefsTree *advanced_tree;
+
     QGroupBox *types;
-    // The layout for the main part
-    QHBoxLayout *layout;
-    // Layout for the left pane
-    QVBoxLayout *vertical;
     QRadioButton *small,*all;
     QCheckBox *adv_chk;
+    
+    QGridLayout *main_layout;
 
     static PrefsDialog *instance;
 private slots:
