@@ -33,6 +33,7 @@
 #include "playlist.h"
 #include "vlc_xml.h"
 #include "vlc_strings.h"
+#include "vlc_url.h"
 #include "xspf.h"
 
 struct demux_sys_t
