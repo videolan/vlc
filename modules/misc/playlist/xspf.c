@@ -29,8 +29,10 @@
 #include <stdio.h>
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+
 #include "vlc_meta.h"
 #include "vlc_strings.h"
+#include "charset.h"
 #include "xspf.h"
 
 /**
