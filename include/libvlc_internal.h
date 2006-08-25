@@ -31,10 +31,6 @@ extern "C" {
 
 #include <vlc/vlc.h>
 
-#ifdef HAVE_X11_XLIB_H
-#include <X11/Xlib.h>
-#endif
-    
 struct libvlc_instance_t
 {
     vlc_t *p_vlc;
