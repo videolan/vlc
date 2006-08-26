@@ -135,6 +135,9 @@ struct playlist_t
     playlist_item_t *     p_local_onelevel; /** < "Playlist" in ONELEVEL view */
     playlist_item_t *     p_ml_onelevel; /** < "Library" in ONELEVEL iew */
 
+    vlc_bool_t            b_always_tree;/**< Always display as tree */
+    vlc_bool_t            b_never_tree;/**< Never display as tree */
+
     /* Runtime */
     input_thread_t *      p_input;  /**< the input thread associated
                                      * with the current item */
@@ -410,6 +413,7 @@ VLC_EXPORT( playlist_item_t *, playlist_ChildSearchName, (playlist_item_t*, cons
 VLC_EXPORT( int, playlist_NodeDelete, ( playlist_t *, playlist_item_t *, vlc_bool_t , vlc_bool_t ) );
 VLC_EXPORT( int, playlist_NodeEmpty, ( playlist_t *, playlist_item_t *, vlc_bool_t ) );
 VLC_EXPORT( void, playlist_NodesCreateForSD, (playlist_t *, char *, playlist_item_t **, playlist_item_t ** ) );
+VLC_EXPORT( playlist_item_t *, playlist_GetPreferredNode, ( playlist_t *p_playlist, playlist_item_t *p_node ) );
 
 /* Tree walking - These functions are only for playlist, not plugins */
 playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,

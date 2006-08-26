@@ -28,6 +28,7 @@
 #include "playlist_model.hpp"
 #include <assert.h>
 #include <QMenu>
+#include <vlc_intf_strings.h>
 
 #include "pixmaps/type_unknown.xpm"
 #include "pixmaps/type_afile.xpm"
@@ -110,7 +111,7 @@ void PLItem::remove( PLItem *removed )
 
 int PLItem::row() const
 {
-    if (parentItem)
+    if( parentItem )
         return parentItem->children.indexOf(const_cast<PLItem*>(this));
     return 0;
 }
@@ -285,7 +286,8 @@ QModelIndex PLModel::index( PLItem *item, int column ) const
     if( !item ) return QModelIndex();
     const PLItem *parent = item->parent();
     if( parent )
-        return createIndex( parent->children.lastIndexOf( item ), column, item );
+        return createIndex( parent->children.lastIndexOf( item ),
+                            column, item );
     return QModelIndex();
 }
 
@@ -297,6 +299,11 @@ QModelIndex PLModel::parent(const QModelIndex &index) const
     if( !childItem ) { msg_Err( p_playlist, "NULL CHILD \n" ); return QModelIndex(); }
     PLItem *parentItem = childItem->parent();
     if( !parentItem || parentItem == rootItem ) return QModelIndex();
+    if( ! parentItem->parentItem )
+    {
+        msg_Err( p_playlist, "No parent parent, trying row 0 ----- PLEASE REPORT THIS ------" );
+        return createIndex( 0, 0, parentItem );
+    }
     QModelIndex ind = createIndex(parentItem->row(), 0, parentItem);
     return ind;
 }
@@ -642,16 +649,15 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
         PL_UNLOCK;
         current_selection = list;
         QMenu *menu = new QMenu;
-        menu->addAction( qtr("Play"), this, SLOT( popupPlay() ) );
-        menu->addAction( qtr("Fetch information"), this,
-                             SLOT( popupPreparse() ) );
-        menu->addAction( qtr("Delete"), this, SLOT( popupDel() ) );
-        menu->addAction( qtr("Information"), this, SLOT( popupInfo() ) );
+        menu->addAction( qfu(I_POP_PLAY), this, SLOT( popupPlay() ) );
+        menu->addAction( qfu(I_POP_PREPARSE), this, SLOT( popupPreparse() ) );
+        menu->addAction( qfu(I_POP_DEL), this, SLOT( popupDel() ) );
+        menu->addAction( qfu(I_POP_INFO), this, SLOT( popupInfo() ) );
         if( p_item->i_children > -1 )
         {
             menu->addSeparator();
-            menu->addAction( qtr("Sort"), this, SLOT( popupSort() ) );
-            menu->addAction( qtr("Add node"), this, SLOT( popupAdd() ) );
+            menu->addAction( qfu(I_POP_SORT), this, SLOT( popupSort() ) );
+            menu->addAction( qfu(I_POP_ADD), this, SLOT( popupAdd() ) );
         }
         menu->popup( point );
     }

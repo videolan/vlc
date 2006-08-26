@@ -304,6 +304,34 @@ void playlist_NodesCreateForSD( playlist_t *p_playlist, char *psz_name,
     (*pp_node_one)->p_input->i_id = (*pp_node_cat)->p_input->i_id;
 }
 
+playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
+                                             playlist_item_t *p_node )
+{
+    int i;
+    if( p_node->p_parent == p_playlist->p_root_category )
+    {
+        if( p_playlist->b_always_tree ||
+            p_node->p_input->b_prefers_tree ) return p_node;
+        for( i = 0 ; i< p_playlist->p_root_onelevel->i_children; i++ )
+        {
+            if( p_playlist->p_root_onelevel->pp_children[i]->p_input->i_id ==
+                    p_node->p_input->i_id )
+                return p_playlist->p_root_onelevel->pp_children[i];
+        }
+    }
+    else if( p_node->p_parent == p_playlist->p_root_onelevel )
+    {
+        if( p_playlist->b_never_tree || !p_node->p_input->b_prefers_tree )
+            return p_node;
+        for( i = 0 ; i< p_playlist->p_root_category->i_children; i++ )
+        {
+            if( p_playlist->p_root_category->pp_children[i]->p_input->i_id ==
+                    p_node->p_input->i_id )
+                return p_playlist->p_root_category->pp_children[i];
+        }
+    }
+    return NULL;
+}
 
 /**********************************************************************
  * Tree walking functions

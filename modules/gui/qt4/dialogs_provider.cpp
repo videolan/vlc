@@ -30,6 +30,7 @@
 #include <QApplication>
 #include <QSignalMapper>
 #include "menus.hpp"
+#include <vlc_intf_strings.h>
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -198,9 +199,7 @@ void DialogsProvider::simpleOpenDialog()
     FileTypes.replace(QString(";*"), QString(" *"));
 
     QStringList fileList = QFileDialog::getOpenFileNames(
-                 NULL,
-                 qtr("Select one or more files to open"),
-                 p_intf->p_vlc->psz_homedir,
+                 NULL, qfu(I_POP_SEL_FILES ), p_intf->p_vlc->psz_homedir,
                  FileTypes);
 
     QStringList files = fileList;

@@ -132,6 +132,8 @@ void StandardPLPanel::setRoot( int i_root_id )
 {
     playlist_item_t *p_item = playlist_ItemGetById( THEPL, i_root_id );
     assert( p_item );
+    p_item = playlist_GetPreferredNode( THEPL, p_item );
+    assert( p_item );
     model->rebuild( p_item );
 }
 

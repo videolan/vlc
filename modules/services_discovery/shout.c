@@ -154,6 +154,7 @@ static int Open( vlc_object_t *p_this, int i_type )
                                 0, NULL, -1 );
             break;
     }
+    p_sys->p_input->b_prefers_tree = VLC_TRUE;
     p_sys->p_node_cat = playlist_NodeAddInput( p_playlist, p_sys->p_input,
                            p_playlist->p_root_category,
                            PLAYLIST_APPEND, PLAYLIST_END );

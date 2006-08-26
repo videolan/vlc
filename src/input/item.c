@@ -256,6 +256,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
         p_input->psz_name = strdup ( p_input->psz_uri );
 
     p_input->i_type = i_type;
+    p_input->b_prefers_tree = VLC_FALSE;
 
     if( p_input->i_type == ITEM_TYPE_UNKNOWN )
         GuessType( p_input );
