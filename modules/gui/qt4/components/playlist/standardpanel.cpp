@@ -46,7 +46,11 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
     view->setIconSize( QSize(20,20) );
     view->setAlternatingRowColors( true );
     view->header()->resizeSection( 0, 300 );
+    view->header()->setSortIndicatorShown( true );
+    view->header()->setClickable( true );
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
+
+//    connect( view->header(), SIGNAL( sectionClicked( int)), view, SLOT( sortByColumn(int)));
 
     connect( view, SIGNAL( activated( const QModelIndex& ) ), model,
              SLOT( activateItem( const QModelIndex& ) ) );

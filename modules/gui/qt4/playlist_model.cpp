@@ -73,6 +73,7 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
     strings.append( "" );
     strings.append( "" );
     strings.append( "" );
+    strings.append( "" );
 }
 
 PLItem::PLItem( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
@@ -88,6 +89,7 @@ PLItem::PLItem( playlist_item_t * p_item, PLItem *parent, PLModel *m )
 PLItem::~PLItem()
 {
     qDeleteAll(children);
+    children.clear();
 }
 
 void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
@@ -118,12 +120,15 @@ int PLItem::row() const
 
 void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 {
+    char psz_duration[MSTRTIME_MAX_SIZE];
     assert( p_item->p_input->i_id == i_input_id );
     strings[0] = QString::fromUtf8( p_item->p_input->psz_name );
     if( p_item->p_input->p_meta )
     {
         strings[1] = QString::fromUtf8( p_item->p_input->p_meta->psz_artist );
     }
+    secstotimestr( psz_duration, p_item->p_input->i_duration / 1000000 );
+    strings[2] = QString( psz_duration );
     type = p_item->p_input->i_type;
     current = iscurrent;
 }
@@ -301,7 +306,8 @@ QModelIndex PLModel::parent(const QModelIndex &index) const
     if( !parentItem || parentItem == rootItem ) return QModelIndex();
     if( ! parentItem->parentItem )
     {
-        msg_Err( p_playlist, "No parent parent, trying row 0 ----- PLEASE REPORT THIS ------" );
+        msg_Err( p_playlist, "No parent parent, trying row 0 " );
+        msg_Err( p_playlist, "----- PLEASE REPORT THIS ------" );
         return createIndex( 0, 0, parentItem );
     }
     QModelIndex ind = createIndex(parentItem->row(), 0, parentItem);
@@ -311,7 +317,7 @@ QModelIndex PLModel::parent(const QModelIndex &index) const
 int PLModel::columnCount( const QModelIndex &i) const
 {
     if( i_depth == 1 ) return 1;
-    return 2;
+    return 3;
 }
 
 int PLModel::childrenCount(const QModelIndex &parent) const
@@ -508,10 +514,10 @@ void PLModel::rebuild( playlist_item_t *p_root )
     /* Clear the tree */
     if( rootItem )
     {
-        PLItem *deleted;
         beginRemoveRows( index( rootItem, 0 ), 0,
                          rootItem->children.size() -1 );
         qDeleteAll( rootItem->children );
+        rootItem->children.clear();
         endRemoveRows();
     }
     if( p_root )
@@ -633,6 +639,26 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
     /* And finally, remove it from the tree */
     item->remove( item );
     PL_UNLOCK;
+}
+
+/******* Volume III: Sorting and searching ********/
+void PLModel::sort( int column, Qt::SortOrder order )
+{
+    PL_LOCK;
+    playlist_item_t *p_root = playlist_ItemGetById( p_playlist, rootItem->i_id );
+    int i_mode;
+    switch( column )
+    {
+    case 0: i_mode = SORT_TITLE_NODES_FIRST;break;
+    case 1: i_mode = SORT_ARTIST;break;
+    case 2: i_mode = SORT_DURATION; break;
+    }
+    if( p_root )
+        playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
+                                    order == Qt::AscendingOrder ? ORDER_NORMAL :
+                                                            ORDER_REVERSE );
+    PL_UNLOCK
+    rebuild();
 }
 
 /*********** Popup *********/
