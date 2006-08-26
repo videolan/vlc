@@ -33,6 +33,7 @@ class QTreeView;
 class PLModel;
 class QPushButton;
 class QKeyEvent;
+class ClickLineEdit;
 
 class PLPanel: public QWidget
 {
@@ -63,6 +64,7 @@ private:
     PLModel *model;
     QTreeView *view;
     QPushButton *repeatButton , *randomButton;
+    ClickLineEdit *searchLine;
 public slots:
     virtual void setRoot( int );
 private slots:
@@ -71,6 +73,8 @@ private slots:
     void toggleRandom();
     void toggleRepeat();
     void doPopup( QModelIndex index, QPoint point );
+    void search( QString search );
+    void clearFilter();
 };
 
 #endif

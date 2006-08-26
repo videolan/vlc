@@ -118,6 +118,7 @@ public:
     /* Actions made by the views */
     void popup( QModelIndex & index, QPoint &point, QModelIndexList list );
     void doDelete( QModelIndexList selected );
+    void search( QString search );
     void sort( int column, Qt::SortOrder order );
 private:
     void addCallbacks();

@@ -33,7 +33,8 @@ TOMOC = main_interface \
 	components/playlist/panels \
 	components/playlist/selector \
 	util/input_slider \
-	util/views
+	util/views \
+	util/customwidgets
 MOCCPP = $(TOMOC:%=%.moc.cpp)
 
 nodist_SOURCES_qt4 = \
@@ -56,6 +57,7 @@ nodist_SOURCES_qt4 = \
 		components/playlist/selector.moc.cpp \
 		util/input_slider.moc.cpp \
 		util/views.moc.cpp \
+		util/customwidgets.moc.cpp \
 		resources.cpp
 
 if ENABLE_QT4
@@ -97,6 +99,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/playlist/standardpanel.cpp \
 		components/playlist/selector.cpp \
 		util/input_slider.cpp \
+		util/customwidgets.cpp \
 		$(NULL)
 
 EXTRA_DIST += \
@@ -122,6 +125,7 @@ EXTRA_DIST += \
 	util/input_slider.hpp \
 	util/directslider.hpp \
 	util/views.hpp \
+	util/customwidgets.hpp \
 	util/qvlcframe.hpp \
 	ui/input_stats.ui \
 	ui/file_open.ui \

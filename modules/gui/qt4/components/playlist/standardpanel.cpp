@@ -32,8 +32,11 @@
 #include "qt4.hpp"
 #include <assert.h>
 #include <QModelIndexList>
-
+#include <QToolBar>
+#include <QLabel>
+#include <QSpacerItem>
 #include "util/views.hpp"
+#include "util/customwidgets.hpp"
 
 StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
@@ -50,8 +53,6 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
     view->header()->setClickable( true );
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
 
-//    connect( view->header(), SIGNAL( sectionClicked( int)), view, SLOT( sortByColumn(int)));
-
     connect( view, SIGNAL( activated( const QModelIndex& ) ), model,
              SLOT( activateItem( const QModelIndex& ) ) );
 
@@ -66,23 +67,34 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
     layout->setSpacing( 0 ); layout->setMargin( 0 );
 
     QHBoxLayout *buttons = new QHBoxLayout();
-    repeatButton = new QPushButton( this );
-    buttons->addWidget( repeatButton );
-    randomButton = new QPushButton( this );
-    buttons->addWidget( randomButton );
 
-    if( model->hasRandom() ) randomButton->setText( qtr( "Random" ) );
-    else randomButton->setText( qtr( "No random" ) );
-
+    repeatButton = new QPushButton( 0 ); buttons->addWidget( repeatButton );
     if( model->hasRepeat() ) repeatButton->setText( qtr( "Repeat One" ) );
     else if( model->hasLoop() ) repeatButton->setText( qtr( "Repeat All" ) );
     else repeatButton->setText( qtr( "No Repeat" ) );
-
     connect( repeatButton, SIGNAL( clicked() ), this, SLOT( toggleRepeat() ));
+
+    randomButton = new QPushButton( 0 ); buttons->addWidget( randomButton );
+    if( model->hasRandom() ) randomButton->setText( qtr( "Random" ) );
+    else randomButton->setText( qtr( "No random" ) );
     connect( randomButton, SIGNAL( clicked() ), this, SLOT( toggleRandom() ));
+
+    QSpacerItem *spacer = new QSpacerItem( 10, 20 );buttons->addItem( spacer );
+
+    QLabel *filter = new QLabel( qfu( "&Search:" ) + " " );
+    buttons->addWidget( filter );
+    searchLine = new  ClickLineEdit( qfu( "Playlist filter" ), 0 );
+    connect( searchLine, SIGNAL( textChanged(QString) ),
+             this, SLOT( search(QString)) );
+    buttons->addWidget( searchLine ); filter->setBuddy( searchLine );
+
+    QPushButton *clear = new QPushButton( qfu( "CL") );
+    buttons->addWidget( clear );
+    connect( clear, SIGNAL( clicked() ), this, SLOT( clearFilter() ) );
 
     layout->addWidget( view );
     layout->addLayout( buttons );
+//    layout->addWidget( bar );
     setLayout( layout );
 }
 
@@ -124,6 +136,16 @@ void StandardPLPanel::handleExpansion( const QModelIndex &index )
             parent = model->parent( parent );
         }
     }
+}
+
+void StandardPLPanel::clearFilter()
+{
+    searchLine->setText( "" );
+}
+
+void StandardPLPanel::search( QString searchText )
+{
+    model->search( searchText );
 }
 
 void StandardPLPanel::doPopup( QModelIndex index, QPoint point )

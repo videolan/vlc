@@ -163,8 +163,8 @@ PLModel::PLModel( playlist_t *_p_playlist,
     ADD_ICON( NODE, node );
 
     rootItem = NULL;
-    rebuild( p_root );
     addCallbacks();
+    rebuild( p_root );
 }
 
 
@@ -176,6 +176,7 @@ PLModel::~PLModel()
 
 void PLModel::addCallbacks()
 {
+     fprintf( stderr, "[%i] Adding callbacks\n", i_depth );
     /* Some global changes happened -> Rebuild all */
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
     /* We went to the next item */
@@ -188,6 +189,7 @@ void PLModel::addCallbacks()
 
 void PLModel::delCallbacks()
 {
+     fprintf( stderr, "[%i] Rming callbacks\n", i_depth );
     var_DelCallback( p_playlist, "item-change", ItemChanged, this );
     var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
@@ -526,6 +528,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
         rootItem = new PLItem( p_root, NULL, this );
         rootItem->strings[0] = qtr("Name");
         rootItem->strings[1] = qtr("Artist");
+        rootItem->strings[2] = qtr("Duration");
     }
     assert( rootItem );
     /* Recreate from root */
@@ -559,6 +562,7 @@ void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
 {
     for( int i = 0; i < p_node->i_children ; i++ )
     {
+        if( p_node->pp_children[i]->i_flags & PLAYLIST_DBL_FLAG ) continue;
         PLItem *newItem =  new PLItem( p_node->pp_children[i], root, this );
         root->appendChild( newItem, false );
         UpdateTreeItem( newItem, false, true );
@@ -658,6 +662,20 @@ void PLModel::sort( int column, Qt::SortOrder order )
                                     order == Qt::AscendingOrder ? ORDER_NORMAL :
                                                             ORDER_REVERSE );
     PL_UNLOCK
+    rebuild();
+}
+
+void PLModel::search( QString search_text )
+{
+    /** \todo Fire the search with a small delay ? */
+    fprintf( stderr, "Searching\n" );
+    PL_LOCK;
+    playlist_item_t *p_root = playlist_ItemGetById( p_playlist,rootItem->i_id );
+    assert( p_root );
+    char *psz_name = search_text.toUtf8().data();
+    fprintf( stderr, "Searching %s\n", psz_name );
+    playlist_LiveSearchUpdate( p_playlist , p_root, psz_name );
+    PL_UNLOCK;
     rebuild();
 }
 
