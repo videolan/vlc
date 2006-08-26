@@ -176,7 +176,6 @@ PLModel::~PLModel()
 
 void PLModel::addCallbacks()
 {
-     fprintf( stderr, "[%i] Adding callbacks\n", i_depth );
     /* Some global changes happened -> Rebuild all */
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
     /* We went to the next item */
@@ -189,7 +188,6 @@ void PLModel::addCallbacks()
 
 void PLModel::delCallbacks()
 {
-     fprintf( stderr, "[%i] Rming callbacks\n", i_depth );
     var_DelCallback( p_playlist, "item-change", ItemChanged, this );
     var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
@@ -668,12 +666,10 @@ void PLModel::sort( int column, Qt::SortOrder order )
 void PLModel::search( QString search_text )
 {
     /** \todo Fire the search with a small delay ? */
-    fprintf( stderr, "Searching\n" );
     PL_LOCK;
     playlist_item_t *p_root = playlist_ItemGetById( p_playlist,rootItem->i_id );
     assert( p_root );
     char *psz_name = search_text.toUtf8().data();
-    fprintf( stderr, "Searching %s\n", psz_name );
     playlist_LiveSearchUpdate( p_playlist , p_root, psz_name );
     PL_UNLOCK;
     rebuild();

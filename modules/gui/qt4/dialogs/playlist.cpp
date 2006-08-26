@@ -41,8 +41,11 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     selector = new PLSelector( centralWidget(), p_intf, THEPL );
     selector->setMaximumWidth( 140 );
 
+    playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
+                                                THEPL->p_local_category );
+
     rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( centralWidget(),
-                              p_intf, THEPL, THEPL->p_local_category ) );
+                              p_intf, THEPL, p_root ) );
     connect( selector, SIGNAL( activated( int ) ),
              rightPanel, SLOT( setRoot( int ) ) );
 
@@ -50,7 +53,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     layout->addWidget( selector, 0 );
     layout->addWidget( rightPanel, 10 );
     centralWidget()->setLayout( layout );
-    readSettings( "playlist", QSize( 600,500 ) );
+    readSettings( "playlist", QSize( 600,700 ) );
 }
 
 PlaylistDialog::~PlaylistDialog()
