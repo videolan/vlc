@@ -1,0 +1,63 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>SPrefsTrivial</class>
+ <widget class="QWidget" name="SPrefsTrivial" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>681</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="4" column="1" >
+    <widget class="QSpinBox" name="crSpin" />
+   </item>
+   <item row="0" column="0" >
+    <widget class="QComboBox" name="memcpyCombo" />
+   </item>
+   <item row="5" column="0" colspan="2" >
+    <widget class="QDateTimeEdit" name="dateTimeEdit" />
+   </item>
+   <item row="4" column="0" >
+    <widget class="QLabel" name="crLabel" >
+     <property name="text" >
+      <string>That's the question</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" >
+    <widget class="QLabel" name="memcpyLabel" >
+     <property name="text" >
+      <string>Should labels be set in Designer or by program ?.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QLCDNumber" name="lcdNumber" >
+     <property name="numDigits" >
+      <number>3</number>
+     </property>
+     <property name="value" stdset="0" >
+      <double>42</double>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <resources/>
+ <connections/>
+</ui>

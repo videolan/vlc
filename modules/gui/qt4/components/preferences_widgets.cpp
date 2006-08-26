@@ -39,16 +39,9 @@
 #include <QVariant>
 #include <QComboBox>
 
-ConfigControl::ConfigControl( vlc_object_t *_p_this, module_config_t *p_item,
-                              QWidget *_parent ) : QWidget( _parent ),
-                              p_this( _p_this ), _name( p_item->psz_name )
-{
-}
-
-ConfigControl::~ConfigControl() {}
-
 ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
-                                    module_config_t *p_item, QWidget *parent )
+                                             module_config_t *p_item,
+                                             QWidget *parent )
 {
     ConfigControl *p_control = NULL;
     if( p_item->psz_current ) return NULL;
@@ -79,34 +72,60 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
 
 /*********** String **************/
 StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
-                     module_config_t *p_item, QWidget *_parent, bool pwd )
-                           : VStringConfigControl( _p_this, p_item, _parent )
+                                          module_config_t *_p_item,
+                                          QWidget *_parent, bool pwd ) :
+                           VStringConfigControl( _p_this, _p_item, _parent )
 {
     QLabel *label = new QLabel( qfu(p_item->psz_text) );
     text = new QLineEdit( qfu(p_item->psz_value) );
-    text->setToolTip( qfu(p_item->psz_longtext) );
-    label->setToolTip( qfu(p_item->psz_longtext) );
+    finish(label);
 
     QHBoxLayout *layout = new QHBoxLayout();
     layout->addWidget( label, 0 ); layout->addWidget( text, 1 );
-    setLayout( layout );
+    widget->setLayout( layout );
 }
 
-StringConfigControl::~StringConfigControl() {}
+StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
+                                   module_config_t *_p_item,
+                                   QLabel *label, QLineEdit *_text, bool pwd ):
+                           VStringConfigControl( _p_this, _p_item )
+{
+    text = _text;
+    finish( label );
+}
 
-QString StringConfigControl::getValue() { return text->text(); };
-
+void StringConfigControl::finish( QLabel *label )
+{
+    text->setToolTip( qfu(p_item->psz_longtext) );
+    label->setToolTip( qfu(p_item->psz_longtext) );
+}
 
 /********* Module **********/
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
-                module_config_t *p_item, QWidget *_parent,
-                bool bycat ) : VStringConfigControl( _p_this, p_item, _parent )
+                module_config_t *_p_item, QWidget *_parent,
+                bool bycat ) : VStringConfigControl( _p_this, _p_item, _parent )
+{
+    QLabel *label = new QLabel( qfu(p_item->psz_text) );
+    combo = new QComboBox();
+    finish( label, bycat );
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->addWidget( label ); layout->addWidget( combo );
+    widget->setLayout( layout );
+}
+ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
+                module_config_t *_p_item, QLabel *label, QComboBox *_combo,
+                bool bycat ) : VStringConfigControl( _p_this, _p_item )
+{
+    fprintf( stderr, "%p %p\n", _p_item, p_item );
+    combo = _combo;
+    finish( label, bycat );
+}
+
+void ModuleConfigControl::finish( QLabel *label, bool bycat )
 {
     vlc_list_t *p_list;
     module_t *p_parser;
 
-    QLabel *label = new QLabel( qfu(p_item->psz_text) );
-    combo = new QComboBox();
     combo->setEditable( false );
 
     /* build a list of available modules */
@@ -145,10 +164,6 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
     vlc_list_release( p_list );
     combo->setToolTip( qfu(p_item->psz_longtext) );
     label->setToolTip( qfu(p_item->psz_longtext) );
-
-    QHBoxLayout *layout = new QHBoxLayout();
-    layout->addWidget( label ); layout->addWidget( combo );
-    setLayout( layout );
 }
 
 ModuleConfigControl::~ModuleConfigControl() {};

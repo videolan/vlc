@@ -25,28 +25,42 @@
 #define _INFOPANELS_H_
 #include <vlc/vlc.h>
 #include <QWidget>
+#include <QLineEdit>
 #include "ui/input_stats.h"
+#include "qt4.hpp"
+#include <assert.h>
 
 class QSpinBox;
-class QLineEdit;
 class QString;
 class QComboBox;
 class QCheckBox;
 
-class ConfigControl : public QWidget
+class ConfigControl : public QObject
 {
     Q_OBJECT;
 public:
-    ConfigControl( vlc_object_t *, module_config_t *, QWidget * );
-    virtual ~ConfigControl();
-    QString getName() { return _name; }
-    bool isAdvanced() { return _advanced; }
+    ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf,
+                   QWidget *p ) : p_this( _p_this ), p_item( _p_conf )
+    {
+        widget = new QWidget( p );
+    }
+    ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf ) :
+                            p_this (_p_this ), p_item( _p_conf )
+    {
+        widget = NULL;
+    }
+    virtual ~ConfigControl() {};
+    QString getName() { return qfu( p_item->psz_name ); }
+    QWidget *getWidget() { assert( widget ); return widget; }
+    bool isAdvanced() { return p_item->b_advanced; }
 
     static ConfigControl * createControl( vlc_object_t*,
-                                         module_config_t*,QWidget* );
+                                          module_config_t*,QWidget* );
 protected:
     vlc_object_t *p_this;
+    module_config_t *p_item;
     QString _name;
+    QWidget *widget;
     bool _advanced;
 signals:
     void Updated();
@@ -117,8 +131,10 @@ private:
 class VStringConfigControl : public ConfigControl
 {
 public:
-    VStringConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) : 
+    VStringConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) :
                 ConfigControl(a,b,c) {};
+    VStringConfigControl( vlc_object_t *a, module_config_t *b ) :
+                ConfigControl(a,b) {};
     virtual ~VStringConfigControl() {};
     virtual QString getValue() = 0;
 };
@@ -128,9 +144,12 @@ class StringConfigControl : public VStringConfigControl
 public:
     StringConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                          bool pwd );
-    virtual ~StringConfigControl();
-    virtual QString getValue();
+    StringConfigControl( vlc_object_t *, module_config_t *, QLabel *,
+                         QLineEdit*,  bool pwd );
+    virtual ~StringConfigControl() {};
+    virtual QString getValue() { return text->text(); };
 private:
+    void finish( QLabel * );
     QLineEdit *text;
 };
 
@@ -139,9 +158,12 @@ class ModuleConfigControl : public VStringConfigControl
 public:
     ModuleConfigControl( vlc_object_t *, module_config_t *, QWidget *, bool
                          bycat );
+    ModuleConfigControl( vlc_object_t *, module_config_t *, QLabel *,
+                         QComboBox*, bool );
     virtual ~ModuleConfigControl();
     virtual QString getValue();
 private:
+    void finish( QLabel *, bool );
     QComboBox *combo;
 };
 #if 0

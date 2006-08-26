@@ -39,7 +39,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     QVLCMenu::createPlMenuBar( menuBar(), p_intf );
 
     selector = new PLSelector( centralWidget(), p_intf, THEPL );
-    selector->setMaximumWidth( 140 );
+    selector->setMaximumWidth( 130 );
 
     playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
                                                 THEPL->p_local_category );

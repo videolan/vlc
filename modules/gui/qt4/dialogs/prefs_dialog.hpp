@@ -27,7 +27,9 @@
 #include "util/qvlcframe.hpp"
 
 class PrefsTree;
+class SPrefsCatList;
 class PrefsPanel;
+class SPrefsPanel;
 class QTreeWidgetItem;
 class QTreeWidget;
 class QHBoxLayout;
@@ -36,6 +38,8 @@ class QGroupBox;
 class QRadioButton;
 class QWidget;
 class QCheckBox;
+class QListWidget;
+class QListWidgetItem;
 
 class PrefsDialog : public QVLCFrame
 {
@@ -54,22 +58,23 @@ private:
     QWidget *main_panel;
     QHBoxLayout *main_panel_l;
     PrefsPanel *advanced_panel;
-    QWidget *simple_panel;
+    SPrefsPanel *simple_panel;
 
     QWidget *tree_panel;
     QHBoxLayout *tree_panel_l;
-    QTreeWidget *simple_tree;
+    SPrefsCatList *simple_tree;
     PrefsTree *advanced_tree;
 
     QGroupBox *types;
     QRadioButton *small,*all;
     QCheckBox *adv_chk;
-    
+
     QGridLayout *main_layout;
 
     static PrefsDialog *instance;
 private slots:
      void changePanel( QTreeWidgetItem *);
+     void changeSimplePanel( QListWidgetItem *);
      void setAll();
      void setSmall();
      void setAdvanced( bool );

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * preferences_tree.cpp : Tree of modules for preferences
+ * preferences.cpp : "Normal preferences"
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
@@ -25,6 +25,7 @@
 #include "components/preferences_widgets.hpp"
 #include "qt4.hpp"
 #include <vlc_config_cat.h>
+#include <vlc_intf_strings.h>
 #include <assert.h>
 
 #include "pixmaps/audio.xpm"
@@ -395,7 +396,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     else
     {
         head = QString( qfu(p_module->psz_longname) );
-        if( p_module->psz_help ) 
+        if( p_module->psz_help )
         {
             head.append( "\n" );
             head.append( qfu( p_module->psz_help ) );
@@ -451,9 +452,9 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             continue;
         }
         if( !box )
-            layout->addWidget( control );
+            layout->addWidget( control->getWidget() );
         else
-            boxlayout->addWidget( control );
+            boxlayout->addWidget( control->getWidget() );
 
         controls.append( control );
     }
@@ -477,8 +478,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     scroller->setWidgetResizable( true );
     global_layout->addWidget( scroller );
 
-    some_hidden_text = new QLabel( "Some options are available but hidden. "\
-                                  "Check \"Advanced options\" to see them." );
+    some_hidden_text = new QLabel( qfu( I_HIDDEN_ADV ) );
     some_hidden_text->setWordWrap( true );
 
     setLayout( global_layout );
@@ -528,7 +528,7 @@ void PrefsPanel::setAdvanced( bool adv, bool force )
         if( (*i)->isAdvanced() )
         {
             if( !advanced ) some_hidden = true;
-            (*i)->setVisible( advanced );
+            (*i)->getWidget()->setVisible( advanced );
         }
     }
     if( some_hidden_text )

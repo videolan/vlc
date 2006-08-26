@@ -25,6 +25,7 @@
 #include "util/qvlcframe.hpp"
 
 #include "components/preferences.hpp"
+#include "components/simple_preferences.hpp"
 #include "qt4.hpp"
 
 #include <QHBoxLayout>
@@ -126,7 +127,13 @@ void PrefsDialog::setSmall()
         advanced_tree->hide();
     }
     if( !simple_tree )
-         simple_tree = new QTreeWidget();
+    {
+         simple_tree = new SPrefsCatList( p_intf, tree_panel );
+         connect( simple_tree,
+          SIGNAL( currentItemChanged( QListWidgetItem *, QListWidgetItem *) ),
+          this, SLOT( changeSimplePanel( QListWidgetItem * ) ) );
+ 
+    }
     tree_panel_l->addWidget( simple_tree );
     simple_tree->show();
 
@@ -136,13 +143,27 @@ void PrefsDialog::setSmall()
         advanced_panel->hide();
     }
     if( !simple_panel )
-        simple_panel = new QWidget();
+        simple_panel = new SPrefsPanel( p_intf, main_panel, 0 );
     main_panel_l->addWidget( simple_panel );
     simple_panel->show();
 }
 
 PrefsDialog::~PrefsDialog()
 {
+}
+
+void PrefsDialog::changeSimplePanel( QListWidgetItem *item )
+{
+    if( simple_panel )
+    {
+        main_panel_l->removeWidget( simple_panel );
+        simple_panel->hide();
+        /* Don't do this once it works, you would loose all changes */
+        delete simple_panel;
+    }
+    simple_panel = new SPrefsPanel( p_intf, main_panel, 0 );
+    main_panel_l->addWidget( simple_panel );
+    simple_panel->show();
 }
 
 void PrefsDialog::changePanel( QTreeWidgetItem *item )
