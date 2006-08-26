@@ -173,19 +173,33 @@ void DialogsProvider::menuUpdateAction( QObject *data )
 
 void DialogsProvider::simpleAppendDialog()
 {
-
+    QStringList files = showSimpleOpen();
+    QString file;
+    foreach( file, files )
+    {
+        const char * psz_utf8 = file.toUtf8().data();
+        playlist_PlaylistAdd( THEPL, psz_utf8, psz_utf8,
+                     PLAYLIST_APPEND | PLAYLIST_PREPARSE, PLAYLIST_END );
+    }
 }
 
 void DialogsProvider::simpleOpenDialog()
 {
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                FIND_ANYWHERE );
-    if( p_playlist == NULL )
+    QStringList files = showSimpleOpen();
+    QString file;
+    for( size_t i = 0 ; i< files.size(); i++ )
     {
-        return;
+        const char * psz_utf8 = files[i].toUtf8().data();
+        /* Play the first one, parse and enqueue the other ones */
+        playlist_PlaylistAdd( THEPL, psz_utf8, psz_utf8,
+                     PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
+                     ( i ? PLAYLIST_PREPARSE : 0 ),
+                     PLAYLIST_END );
     }
+}
 
+QStringList DialogsProvider::showSimpleOpen()
+{
     QString FileTypes;
     FileTypes = "Video Files ( ";
     FileTypes += EXTENSIONS_VIDEO;
@@ -193,27 +207,10 @@ void DialogsProvider::simpleOpenDialog()
     FileTypes += EXTENSIONS_AUDIO;
     FileTypes += ");; PlayList Files ( ";
     FileTypes += EXTENSIONS_PLAYLIST;
-    FileTypes += ");; Subtitles Files ( ";
-    FileTypes += EXTENSIONS_SUBTITLE;
     FileTypes += ");; All Files (*.*) " ;
     FileTypes.replace(QString(";*"), QString(" *"));
-
-    QStringList fileList = QFileDialog::getOpenFileNames(
-                 NULL, qfu(I_POP_SEL_FILES ), p_intf->p_vlc->psz_homedir,
-                 FileTypes);
-
-    QStringList files = fileList;
-
-    for (size_t i = 0; i < files.size(); i++)
-    {
-        const char * psz_utf8 = files[i].toUtf8().data();
-             playlist_PlaylistAdd( p_playlist, psz_utf8, psz_utf8,
-                     PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
-                     (i ? PLAYLIST_PREPARSE : 0 ),
-                     PLAYLIST_END );
-    }
-
-    vlc_object_release(p_playlist);
+    return QFileDialog::getOpenFileNames( NULL, qfu(I_POP_SEL_FILES ),
+                    p_intf->p_vlc->psz_homedir, FileTypes );
 }
 
 void DialogsProvider::bookmarksDialog()

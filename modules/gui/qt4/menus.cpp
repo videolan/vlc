@@ -131,6 +131,7 @@ void QVLCMenu::createMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
 void QVLCMenu::createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
 {
     QMenu *manageMenu = new QMenu();
+    manageMenu->setTitle( qtr("Operations") );
     manageMenu->addAction( "Quick &Add File...", THEDP,
                            SLOT( simpleAppendDialog() ) );
     manageMenu->addSeparator();

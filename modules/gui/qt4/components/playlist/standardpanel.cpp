@@ -43,6 +43,8 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
     model = new PLModel( p_playlist, p_root, -1, this );
     view = new QVLCTreeView( 0 );
     view->setModel(model);
+    view->setIconSize( QSize(20,20) );
+    view->setAlternatingRowColors( true );
     view->header()->resizeSection( 0, 300 );
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
 

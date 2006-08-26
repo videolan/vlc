@@ -32,6 +32,8 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf,
 {
     model = new PLModel( THEPL, THEPL->p_root_category, 1, this );
     view = new QTreeView( 0 );
+    view->setIconSize( QSize( 24,24 ) );
+    view->setAlternatingRowColors( true );
     view->setIndentation( 0 );
     view->header()->hide();
     view->setModel( model );

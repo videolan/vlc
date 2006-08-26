@@ -33,9 +33,9 @@ PlaylistDialog *PlaylistDialog::instance = NULL;
 
 PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
-    setWindowTitle( qtr( "Playlist" ) );
     QWidget *main = new QWidget( this );
     setCentralWidget( main );
+    setWindowTitle( qtr( "Playlist" ) );
     QVLCMenu::createPlMenuBar( menuBar(), p_intf );
 
     selector = new PLSelector( centralWidget(), p_intf, THEPL );
@@ -50,7 +50,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     layout->addWidget( selector, 0 );
     layout->addWidget( rightPanel, 10 );
     centralWidget()->setLayout( layout );
-    readSettings( "playlist", QSize( 600,300 ) );
+    readSettings( "playlist", QSize( 600,500 ) );
 }
 
 PlaylistDialog::~PlaylistDialog()

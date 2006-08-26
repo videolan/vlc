@@ -39,7 +39,7 @@ class DialogsProvider : public QObject
 {
     Q_OBJECT;
 public:
-    static DialogsProvider *getInstance() 
+    static DialogsProvider *getInstance()
     {
         assert( instance );
         return instance;
@@ -62,6 +62,7 @@ private:
     DialogsProvider( intf_thread_t *);
     intf_thread_t *p_intf;
     static DialogsProvider *instance;
+    QStringList showSimpleOpen();
 
 public slots:
     void playlistDialog();
