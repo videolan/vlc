@@ -1,11 +1,10 @@
 /*****************************************************************************
- * directslider.hpp : A slider that goes where you click
+ * views.hpp : Custom views
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
- * $Id$
+ * $Id: qvlcframe.hpp 16283 2006-08-17 18:16:09Z zorglub $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
- *          with precious help from ahigerd on #qt@freenode
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,36 +20,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
-#ifndef _DIRECTSLIDER_H_
-#define _DIRECTSLIDER_H_
+#ifndef _QVLCVIEWS_H_
+#define _QVLCVIEWS_H_
 
-#include <QSlider>
 #include <QMouseEvent>
-#include <QLayout>
+#include <QTreeView>
+#include <QCursor>
+#include <QPoint>
+#include <QModelIndex>
 
-class DirectSlider : public QSlider
+class QVLCTreeView : public QTreeView
 {
+    Q_OBJECT;
 public:
-    DirectSlider( QWidget *_parent ) : QSlider( _parent ) {};
-    DirectSlider( Qt::Orientation q,QWidget *_parent ) : QSlider( q,_parent )
-    {};
-    virtual ~DirectSlider()   {};
-
-    void mousePressEvent(QMouseEvent* event)
+    QVLCTreeView( QWidget * parent ) : QTreeView( parent )
     {
-        if(event->button() == Qt::LeftButton)
+    };
+    virtual ~QVLCTreeView()   {};
+
+    void mouseReleaseEvent(QMouseEvent* e )
+    {
+        if( e->button() & Qt::RightButton )
         {
-#ifdef WIN32
-            int width1 = qobject_cast<QWidget*>(parent())->sizeHint().width() -
-                     2 * qobject_cast<QWidget*>(parent())->layout()->margin();
-#else
-            int width1 = width();
-#endif
-            int pos = (int)(minimum() +
-                          (double)(event->x())/width1*(maximum()-minimum()) );
-            setSliderPosition( pos );
-            QSlider::mousePressEvent(event);
+            emit rightClicked( indexAt( QPoint( e->x(), e->y() ) ), QCursor::pos() );
         }
     }
+signals:
+    void rightClicked( QModelIndex, QPoint  );
 };
 #endif

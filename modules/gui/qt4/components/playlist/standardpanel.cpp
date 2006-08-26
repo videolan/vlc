@@ -33,13 +33,15 @@
 #include <assert.h>
 #include <QModelIndexList>
 
+#include "util/views.hpp"
+
 StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
                                   playlist_item_t *p_root ):
                                   PLPanel( _parent, _p_intf )
 {
     model = new PLModel( p_playlist, p_root, -1, this );
-    view = new QTreeView( 0 );
+    view = new QVLCTreeView( 0 );
     view->setModel(model);
     view->header()->resizeSection( 0, 300 );
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
@@ -47,11 +49,12 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
     connect( view, SIGNAL( activated( const QModelIndex& ) ), model,
              SLOT( activateItem( const QModelIndex& ) ) );
 
+    connect( view, SIGNAL( rightClicked( QModelIndex , QPoint ) ),
+             this, SLOT( doPopup( QModelIndex, QPoint ) ) );
+
     connect( model,
              SIGNAL( dataChanged( const QModelIndex&, const QModelIndex& ) ),
              this, SLOT( handleExpansion( const QModelIndex& ) ) );
-
-    model->Rebuild();
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing( 0 ); layout->setMargin( 0 );
@@ -117,12 +120,19 @@ void StandardPLPanel::handleExpansion( const QModelIndex &index )
     }
 }
 
+void StandardPLPanel::doPopup( QModelIndex index, QPoint point )
+{
+    assert( index.isValid() );
+    QItemSelectionModel *selection = view->selectionModel();
+    QModelIndexList list = selection->selectedIndexes();
+    model->popup( index, point, list );
+}
+
 void StandardPLPanel::setRoot( int i_root_id )
 {
     playlist_item_t *p_item = playlist_ItemGetById( THEPL, i_root_id );
     assert( p_item );
-    model->rebuildRoot( p_item );
-    model->Rebuild();
+    model->rebuild( p_item );
 }
 
 void StandardPLPanel::keyPressEvent( QKeyEvent *e )

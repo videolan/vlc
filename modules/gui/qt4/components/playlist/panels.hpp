@@ -33,9 +33,6 @@ class QTreeView;
 class PLModel;
 class QPushButton;
 class QKeyEvent;
-/**
- * \todo Share a single model between views using a filterproxy
- */
 
 class PLPanel: public QWidget
 {
@@ -73,6 +70,7 @@ private slots:
     void handleExpansion( const QModelIndex& );
     void toggleRandom();
     void toggleRepeat();
+    void doPopup( QModelIndex index, QPoint point );
 };
 
 #endif

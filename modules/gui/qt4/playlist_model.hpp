@@ -24,6 +24,7 @@
 #ifndef _PLAYLIST_MODEL_H_
 #define _PLAYLIST_MODEL_H_
 
+#include <QModelIndex>
 #include <QObject>
 #include <QEvent>
 #include <vlc/vlc.h>
@@ -85,7 +86,6 @@ public:
 };
 
 #include <QAbstractItemModel>
-#include <QModelIndex>
 #include <QVariant>
 
 class PLModel : public QAbstractItemModel
@@ -96,19 +96,15 @@ public:
     PLModel( playlist_t *, playlist_item_t *, int, QObject *parent = 0);
     ~PLModel();
 
-    void customEvent( QEvent * );
-
-    /* QModel stuff */
+    /* All types of lookups / QModel stuff */
     QVariant data( const QModelIndex &index, int role) const;
     Qt::ItemFlags flags( const QModelIndex &index) const;
     QVariant headerData( int section, Qt::Orientation orientation,
                          int role = Qt::DisplayRole) const;
-
     QModelIndex index( int r, int c, const QModelIndex &parent ) const;
     QModelIndex index( PLItem *, int c ) const;
     int itemId( const QModelIndex &index ) const;
     bool isCurrent( const QModelIndex &index );
-
     QModelIndex parent( const QModelIndex &index) const;
     int childrenCount( const QModelIndex &parent = QModelIndex() ) const;
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
@@ -116,14 +112,17 @@ public:
 
     bool b_need_update;
     int i_items_to_append;
-    void Rebuild();
-    void rebuildRoot( playlist_item_t * );
+    void rebuild(); void rebuild( playlist_item_t *);
     bool hasRandom(); bool hasLoop(); bool hasRepeat();
 
+    /* Actions made by the views */
+    void popup( QModelIndex & index, QPoint &point, QModelIndexList list );
     void doDelete( QModelIndexList selected );
 private:
     void addCallbacks();
     void delCallbacks();
+    void customEvent( QEvent * );
+
     PLItem *rootItem;
 
     playlist_t *p_playlist;
@@ -145,6 +144,10 @@ private:
     void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList);
     void doDeleteItem( PLItem *item, QModelIndexList *fullList );
 
+    /* Popup */
+    int i_popup_item, i_popup_parent;
+    QModelIndexList current_selection;
+
     /* Lookups */
     PLItem *FindById( PLItem *, int );
     PLItem *FindByInput( PLItem *, int );
@@ -155,9 +158,13 @@ private:
     int i_cached_input_id;
 public slots:
     void activateItem( const QModelIndex &index );
+    void activateItem( playlist_item_t *p_item );
     void setRandom( bool );
     void setLoop( bool );
     void setRepeat( bool );
+private slots:
+    void popupPlay();
+    void popupDel();
 friend class PLItem;
 };
 

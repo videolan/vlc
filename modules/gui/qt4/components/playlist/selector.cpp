@@ -31,7 +31,6 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf,
                         playlist_t *p_playlist ) : QWidget( p ), p_intf(_p_intf)
 {
     model = new PLModel( THEPL, THEPL->p_root_category, 1, this );
-    model->Rebuild();
     view = new QTreeView( 0 );
     view->setIndentation( 0 );
     view->header()->hide();
