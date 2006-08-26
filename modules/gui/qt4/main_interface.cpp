@@ -59,6 +59,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     ui.stopButton->setIcon( QIcon( ":/pixmaps/stop.png" ) );
     ui.volLowLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
     ui.volHighLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
+    ui.volumeSlider->setMaximum( 100 );
+
+    VolumeClickHandler *h = new VolumeClickHandler( this );
+    ui.volLowLabel->installEventFilter(h);
+    ui.volHighLabel->installEventFilter(h);
 
     QVLCMenu::createMenuBar( menuBar(), p_intf );
 
@@ -98,6 +103,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
+
+    /* Volume control */
+    connect( ui.volumeSlider, SIGNAL( valueChanged(int) ),
+             this, SLOT( updateVolume(int) ) );
 
     /* Get timer updates */
     connect( THEDP->fixed_timer, SIGNAL( timeout() ),
@@ -197,11 +206,24 @@ void MainInterface::setStatus( int status )
         ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
 }
 
+static bool b_my_volume;
+
 void MainInterface::updateOnTimer()
 {
     if( p_intf->b_die )
     {
         QApplication::quit();
+    }
+    audio_volume_t i_volume;
+    aout_VolumeGet( p_intf, &i_volume );
+    i_volume = (i_volume *  200 )/ AOUT_VOLUME_MAX ;
+    int i_gauge = ui.volumeSlider->value();
+    b_my_volume = false;
+    if( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
+    {
+        b_my_volume = true;
+        ui.volumeSlider->setValue( i_volume );
+        b_my_volume = false;
     }
 }
 
@@ -209,6 +231,16 @@ void MainInterface::closeEvent( QCloseEvent *e )
 {
     hide();
     p_intf->b_die = VLC_TRUE;
+}
+
+void MainInterface::updateVolume( int sliderVolume )
+{
+    if( !b_my_volume )
+    {
+        int i_res = sliderVolume * AOUT_VOLUME_MAX /
+                            (2*ui.volumeSlider->maximum() );
+        aout_VolumeSet( p_intf, i_res );
+    }
 }
 
 static int InteractCallback( vlc_object_t *p_this,

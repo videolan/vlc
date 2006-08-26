@@ -24,6 +24,7 @@
 #define _MAIN_INTERFACE_H_
 
 #include <vlc/intf.h>
+#include <vlc/aout.h>
 #include "ui/main_interface.h"
 #include "util/qvlcframe.hpp"
 
@@ -32,7 +33,7 @@ class QLabel;
 class InputManager;
 class InputSlider;
 class VideoWidget;
-
+class VolumeClickHandler;
 class MainInterface : public QVLCMW
 {
     Q_OBJECT;
@@ -46,6 +47,8 @@ public:
 
 protected:
     void closeEvent( QCloseEvent *);
+    Ui::MainInterfaceUI ui;
+    friend class VolumeClickHandler;
 private:
     VideoWidget *videoWidget;
     InputManager *main_input_manager;
@@ -54,7 +57,6 @@ private:
     InputSlider *slider;
     /// Main input associated to the playlist
     input_thread_t *p_input;
-    Ui::MainInterfaceUI ui;
 private slots:
     void setStatus( int );
     void setName( QString );
@@ -64,6 +66,31 @@ private slots:
     void stop();
     void prev();
     void next();
+    void updateVolume( int sliderVolume );
+};
+
+
+class VolumeClickHandler : public QObject
+{
+public:
+    VolumeClickHandler( MainInterface *_m ) :QObject(_m) {m = _m; }
+    virtual ~VolumeClickHandler() {};
+    bool eventFilter( QObject *obj, QEvent *e )
+    {
+        if (e->type() == QEvent::MouseButtonPress )
+        {
+            if( obj->objectName() == "volLowLabel" )
+            {
+                m->ui.volumeSlider->setValue( 0 );
+            }
+            else
+                m->ui.volumeSlider->setValue( 100 );
+            return true;
+        }
+        return false;
+    }
+private:
+    MainInterface *m;
 };
 
 #endif
