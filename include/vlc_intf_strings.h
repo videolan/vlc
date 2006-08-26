@@ -38,5 +38,8 @@
 #define I_POP_SORT N_("Sort")
 #define I_POP_ADD N_("Add node")
 
+/*************** Preferences *************/
 
+#define I_HIDDEN_ADV N_( "Some options are available but hidden. "\
+                         "Check \"Advanced options\" to see them." )
 #endif

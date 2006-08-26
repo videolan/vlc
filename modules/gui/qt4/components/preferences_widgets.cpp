@@ -116,7 +116,6 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
                 module_config_t *_p_item, QLabel *label, QComboBox *_combo,
                 bool bycat ) : VStringConfigControl( _p_this, _p_item )
 {
-    fprintf( stderr, "%p %p\n", _p_item, p_item );
     combo = _combo;
     finish( label, bycat );
 }

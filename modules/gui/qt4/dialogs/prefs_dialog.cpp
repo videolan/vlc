@@ -74,7 +74,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      main_layout->setColumnStretch( 0, 1 );
      main_layout->setColumnStretch( 1,3 );
 
-     setAll();
+     setSmall();
 
      connect( adv_chk, SIGNAL( toggled(bool) ),
               this, SLOT( setAdvanced( bool ) ) );
@@ -117,6 +117,7 @@ void PrefsDialog::setAll()
          advanced_panel = new PrefsPanel( main_panel );
     main_panel_l->addWidget( advanced_panel );
     advanced_panel->show();
+    adv_chk->show();
 }
 
 void PrefsDialog::setSmall()
@@ -132,7 +133,6 @@ void PrefsDialog::setSmall()
          connect( simple_tree,
           SIGNAL( currentItemChanged( QListWidgetItem *, QListWidgetItem *) ),
           this, SLOT( changeSimplePanel( QListWidgetItem * ) ) );
- 
     }
     tree_panel_l->addWidget( simple_tree );
     simple_tree->show();
@@ -146,6 +146,7 @@ void PrefsDialog::setSmall()
         simple_panel = new SPrefsPanel( p_intf, main_panel, 0 );
     main_panel_l->addWidget( simple_panel );
     simple_panel->show();
+    adv_chk->hide();
 }
 
 PrefsDialog::~PrefsDialog()
@@ -154,6 +155,7 @@ PrefsDialog::~PrefsDialog()
 
 void PrefsDialog::changeSimplePanel( QListWidgetItem *item )
 {
+    int number = item->data( Qt::UserRole ).toInt();
     if( simple_panel )
     {
         main_panel_l->removeWidget( simple_panel );
@@ -161,7 +163,7 @@ void PrefsDialog::changeSimplePanel( QListWidgetItem *item )
         /* Don't do this once it works, you would loose all changes */
         delete simple_panel;
     }
-    simple_panel = new SPrefsPanel( p_intf, main_panel, 0 );
+    simple_panel = new SPrefsPanel( p_intf, main_panel, number );
     main_panel_l->addWidget( simple_panel );
     simple_panel->show();
 }

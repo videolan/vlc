@@ -33,6 +33,7 @@
 #include <QFont>
 
 #include "pixmaps/audio.xpm"
+#include "pixmaps/video.xpm"
 #include "ui/sprefs_trivial.h"
 
 #define ITEM_HEIGHT 25
@@ -59,6 +60,10 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     addItem( "Very trivial" );
     item(0)->setIcon( QIcon( QPixmap( audio_xpm ) ) );
+    item(0)->setData( Qt::UserRole, qVariantFromValue( 0 ) );
+    addItem( "Video" );
+    item(1)->setIcon( QIcon( QPixmap( video_xpm ) ) );
+    item(1)->setData( Qt::UserRole, qVariantFromValue( 1 ) );
 }
 
 void SPrefsCatList::ApplyAll()
@@ -87,10 +92,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     {
         Ui::SPrefsTrivial ui;
         ui.setupUi( this );
-        msg_Err( p_intf, "Intf there" );
         module_config_t *p_config = config_FindConfig( VLC_OBJECT(p_intf),
                                                         "memcpy" );
-        msg_Err( p_intf, "%p", p_config );
         ConfigControl *control = new ModuleConfigControl( VLC_OBJECT(p_intf),
                         p_config, ui.memcpyLabel, ui.memcpyCombo, false );
         controls.append( control );
