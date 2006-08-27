@@ -49,6 +49,9 @@
 #include <QGridLayout>
 #include <QHeaderView>
 
+#include <QPalette>
+#include <QColor>
+
 #define ITEM_HEIGHT 25
 
 /*********************************************************************
@@ -331,7 +334,6 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     module_t *p_module = NULL;
     vlc_list_t *p_list = NULL;
     global_layout = new QVBoxLayout();
-
     if( data->i_type == TYPE_CATEGORY )
     {
         /* TODO */

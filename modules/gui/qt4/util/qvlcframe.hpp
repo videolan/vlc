@@ -52,6 +52,9 @@ public:
             vlg.setHsv( vlg.hue(), vlg.saturation(), 235  );
             plt.setColor( QPalette::Active, QPalette::Window, vlg );
             plt.setColor( QPalette::Inactive, QPalette::Window, vlg );
+            plt.setColor( QPalette::Inactive, QPalette::Button, vlg );
+            plt.setColor( QPalette::Active, QPalette::Button, vlg );
+            plt.setColor( QPalette::Active, QPalette::Text, Qt::yellow );
             w->setPalette( plt );
         }
 #endif

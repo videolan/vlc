@@ -7,5 +7,6 @@
   <file>pixmaps/next.png</file>
   <file>pixmaps/volume-low.png</file>
   <file>pixmaps/volume-high.png</file>
+  <file alias="vlc128.png">../../../share/vlc128x128.png</file>
  </qresource>
 </RCC>

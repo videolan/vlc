@@ -28,8 +28,13 @@
 #include <vlc/intf.h>
 #include <QWidget>
 #include <QFrame>
+#include <QPalette>
+#include <QResizeEvent>
+#include <QPixmap>
 
+class QLabel;
 class QHBoxLayout;
+class QColor;
 
 class VideoWidget : public QFrame
 {
@@ -47,9 +52,12 @@ public:
     int i_video_height, i_video_width;
     vout_thread_t *p_vout;
 private:
+    virtual void resizeEvent( QResizeEvent *e );
     int DrawBackground();
     int CleanBackground();
     bool always;
+    QPalette plt;
+    QLabel *label;
     QWidget *frame;
     QHBoxLayout *backgroundLayout;
     intf_thread_t *p_intf;

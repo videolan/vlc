@@ -28,6 +28,8 @@
 #include "main_interface.hpp"
 #include <QHBoxLayout>
 
+#define ICON_SIZE 128
+
 static void *DoRequest( intf_thread_t *, vout_thread_t *, int*,int*,
                         unsigned int *, unsigned int * );
 static void DoRelease( intf_thread_t *, void * );
@@ -53,8 +55,9 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i, bool _always ) : QFrame( NULL ),
              SIGNAL( timeout() ), this, SLOT( update() ) );
 
     if( always )
-        DrawBackground();
-
+    {
+       DrawBackground();
+    }
     need_update = false;
 }
 
@@ -88,6 +91,9 @@ VideoWidget::~VideoWidget()
     p_intf->pf_control_window = NULL;
     vlc_mutex_unlock( &lock );
     vlc_mutex_destroy( &lock );
+
+    if( always )
+        CleanBackground();
 }
 
 QSize VideoWidget::sizeHint() const
@@ -111,10 +117,7 @@ void *VideoWidget::Request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
     }
     p_vout = p_nvout;
 
-    if( always )
-        CleanBackground();
-
-    setMinimumSize( 1,1 );
+   setMinimumSize( 1,1 );
     p_intf->p_sys->p_mi->videoSize = QSize( *pi_width, *pi_height );
     updateGeometry();
     need_update = true;
@@ -126,6 +129,14 @@ static void DoRelease( intf_thread_t *p_intf, void *p_win )
     return p_intf->p_sys->p_video->Release( p_win );
 }
 
+void VideoWidget::resizeEvent( QResizeEvent *e )
+{
+    if( e->size().height() < ICON_SIZE -1 )
+        label->setMaximumWidth( e->size().height() );
+    else
+        label->setMaximumWidth( ICON_SIZE );
+}
+
 void VideoWidget::Release( void *p_win )
 {
     p_vout = NULL;
@@ -135,11 +146,6 @@ void VideoWidget::Release( void *p_win )
         updateGeometry();
         need_update = true;
     }
-    else
-    {
-        DrawBackground();
-    }
-
 }
 
 static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
@@ -149,7 +155,18 @@ static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
 
 int VideoWidget::DrawBackground()
 {
-    QLabel *label = new QLabel( "VLC Rulez d4 Worldz" );
+    setAutoFillBackground( true );
+    plt =  palette();
+    plt.setColor( QPalette::Active, QPalette::Window , Qt::black );
+    plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
+    setPalette( plt );
+
+    backgroundLayout = new QHBoxLayout;
+    label = new QLabel( "" );
+    label->setMaximumHeight( ICON_SIZE );
+    label->setMaximumWidth( ICON_SIZE );
+    label->setScaledContents( true );
+    label->setPixmap( QPixmap( ":/vlc128.png" ) );
     backgroundLayout = new QHBoxLayout;
     backgroundLayout->addWidget( label );
     setLayout( backgroundLayout );
