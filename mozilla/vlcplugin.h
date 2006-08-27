@@ -1,10 +1,11 @@
 /*****************************************************************************
  * vlcplugin.h: a VLC plugin for Mozilla
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+            Damien Fouilleul <damienf@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +28,9 @@
 #ifndef __VLCPLUGIN_H__
 #define __VLCPLUGIN_H__
 
-#include "vlcpeer.h"
+#include <vlc/libvlc.h>
+#include <npapi.h>
+#include "control/nporuntime.h"
 
 #if !defined(XP_MACOSX) && !defined(XP_UNIX) && !defined(XP_WIN)
 #define XP_UNIX 1
@@ -35,6 +38,7 @@
 #undef XP_UNIX
 #endif
 
+#if 0
 #ifdef XP_WIN
     /* Windows stuff */
 #endif
@@ -50,49 +54,63 @@
 #   include <X11/Intrinsic.h>
 #   include <X11/StringDefs.h>
 #endif
+#endif
 
 class VlcPlugin
 {
 public:
-             VlcPlugin( NPP ); 
+             VlcPlugin( NPP, uint16 ); 
     virtual ~VlcPlugin();
 
-    void     SetInstance( NPP );
-    NPP      GetInstance();
-    VlcIntf* GetPeer();
+    NPError             init(int argc, char* const argn[], char* const argv[]);
+    libvlc_instance_t*  getVLC() 
+                            { return libvlc_instance; };
+    NPP                 getBrowser()
+                            { return p_browser; };
+    char*               getAbsoluteURL(const char *url);
+    const NPWindow*     getWindow()
+                            { return &npwindow; };
+    void                setWindow(const NPWindow *window)
+                            { npwindow = *window; };
 
-    /* Window settings */
-    NPWindow* p_npwin;
-    uint16    i_npmode;
-    uint32    i_width, i_height;
+    NPClass*            getScriptClass()
+                            { return scriptClass; };
 
-#ifdef XP_WIN
-    /* Windows data members */
-    HWND     p_hwnd;
-    WNDPROC  pf_wndproc;
+#if XP_WIN
+    WNDPROC             getWindowProc()
+                            { return pf_wndproc; };
+    void                setWindowProc(WNDPROC wndproc)
+                            { pf_wndproc = wndproc; };
 #endif
 
-#ifdef XP_UNIX
-    /* UNIX data members */
-    Window   window;
-    Display *p_display;
+#if XP_UNIX
+    int                 setSize(unsigned width, unsigned height);
 #endif
 
-#ifdef XP_MACOSX
-    /* MACOS data members */
-    NPWindow *window;
-#endif
+    uint16    i_npmode; /* either NP_EMBED or NP_FULL */
 
-
-    /* vlc data members */
-    int      i_vlc;
+    /* plugin properties */
     int      b_stream;
     int      b_autoplay;
     char *   psz_target;
 
 private:
-    NPP      p_instance;
-    VlcPeer* p_peer;
+    /* VLC reference */
+    libvlc_instance_t *libvlc_instance;
+    NPClass           *scriptClass;
+
+    /* browser reference */
+    NPP     p_browser;
+    char*   psz_baseURL;
+
+    /* display settings */
+    NPWindow  npwindow;
+#if XP_WIN
+    WNDPROC   pf_wndproc;
+#endif
+#if XP_UNIX
+    unsigned int     i_width, i_height;
+#endif
 };
 
 /*******************************************************************************

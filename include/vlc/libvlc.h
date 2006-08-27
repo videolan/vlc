@@ -356,13 +356,52 @@ void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exception_t *);
 typedef int libvlc_drawable_t;
 
 /**
- * Get current mute status
+ * change the video output parent
  * \param p_instance libvlc instance
  * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
  * \param p_exception an initialized exception
  * \return the mute status (boolean)
  */
 int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, libvlc_exception_t * );
+
+/**
+ * Set the video output parent
+ * \param p_instance libvlc instance
+ * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
+ * \param p_exception an initialized exception
+ */
+void libvlc_video_set_parent( libvlc_instance_t *, libvlc_drawable_t, libvlc_exception_t * );
+
+/**
+ * Set the video output size
+ * \param p_instance libvlc instance
+ * \param width new width for video drawable
+ * \param height new height for video drawable
+ * \param p_exception an initialized exception
+ */
+void libvlc_video_set_size( libvlc_instance_t *, int, int, libvlc_exception_t * );
+
+/**
+* Downcast to this general type as placeholder for a platform specific one, such as:
+*  Drawable on X11,
+*  CGrafPort on MacOSX,
+*  HWND on win32
+*/
+typedef struct
+{
+    int top, left;
+    int bottom, right;
+}
+libvlc_rectangle_t;
+
+/**
+ * Set the video output viewport for a windowless video ouput (MacOS X only)
+ * \param p_instance libvlc instance
+ * \param view coordinates within video drawable
+ * \param clip coordinates within video drawable
+ * \param p_exception an initialized exception
+ */
+void libvlc_video_set_viewport( libvlc_instance_t *, const libvlc_rectangle_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
 
 
 /** @} */
@@ -379,6 +418,14 @@ int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, libvlc_exception
  * LibVLC Audio handling
  * @{
  */
+
+/**
+ * Toggle mute status
+ * \param p_instance libvlc instance
+ * \param p_exception an initialized exception
+ * \return void
+ */
+void libvlc_audio_toggle_mute( libvlc_instance_t *, libvlc_exception_t * );
 
 /**
  * Get current mute status

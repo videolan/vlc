@@ -4,18 +4,20 @@
 
 noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
 
-MOSTLYCLEANFILES = $(npvlc_DATA) $(vlcintf_xpt_DATA)
+MOSTLYCLEANFILES = $(npvlc_DATA)
 CLEANFILES = stamp-pic $(BUILT_SOURCES)
-EXTRA_DIST = $(DIST_sources) vlcintf.idl npvlc_rc.rc vlc.r
+EXTRA_DIST = $(DIST_sources) npvlc_rc.rc vlc.r
 
 SOURCES_mozilla_common = \
 	vlcshell.cpp \
 	vlcplugin.cpp \
 	vlcplugin.h \
-	vlcpeer.cpp \
-	vlcpeer.h \
-	vlcruntime.cpp \
-	vlcruntime.h \
+	control/npolibvlc.cpp \
+	control/npolibvlc.h \
+	control/npovlc.cpp \
+	control/npovlc.h \
+	control/nporuntime.cpp \
+	control/nporuntime.h \
 	support/classinfo.h
 
 DIST_sources = $(SOURCES_mozilla_common) \
@@ -141,11 +143,6 @@ endif
 
 noinst_LIBRARIES_mozilla = libnpvlc.a
 
-$(SOURCES_mozilla): vlcintf.h
-
-BUILT_SOURCES = vlcintf.h
-vlcintf_xpt_DATA = vlcintf.xpt
-
 if USE_LIBTOOL
 # FIXME: name is incorrect on Win32 & Darwin
 npvlc_LTLIBRARIES = libvlcplugin.la
@@ -174,15 +171,6 @@ $(npvlc): $(libnpvlc_a_OBJECTS) $(libnpvlc_a_DEPENDENCIES) stamp-pic
 	 $(LDFLAGS_libnpvlc)
 # Cygwin work-around
 	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
-
-vlcintf_xptdir = $(libdir)/mozilla/components
-vlcintf.xpt: vlcintf.idl
-	$(XPIDL) $(XPIDL_INCL) \
-	  -m typelib -o vlcintf $(srcdir)/vlcintf.idl
-
-vlcintf.h: vlcintf.idl
-	$(XPIDL) $(XPIDL_INCL) \
-	  -m header -o vlcintf $(srcdir)/vlcintf.idl
 
 ###############################################################################
 # Stamp rules

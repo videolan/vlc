@@ -21,9 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* XXX: disable VLC here */
-#define USE_LIBVLC 1
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -33,19 +30,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* vlc stuff */
-#ifdef USE_LIBVLC
-#   include <vlc/vlc.h>
-#endif
-
 /* Mozilla stuff */
 #ifdef HAVE_MOZILLA_CONFIG_H
 #   include <mozilla-config.h>
 #endif
-#include <nsISupports.h>
-#include <nsMemory.h>
-#include <npapi.h>
-#include <npruntime.h>
 
 /* This is from mozilla java, do we really need it? */
 #if 0
@@ -53,16 +41,11 @@
 #endif
 
 #include "vlcplugin.h"
-#include "vlcruntime.h"
-
-#if USE_LIBVLC
-#   define WINDOW_TEXT "(no picture)"
-#else
-#   define WINDOW_TEXT "(no libvlc)"
-#endif
 
 /* Enable/disable debugging printf's for X11 resizing */
 #undef X11_RESIZE_DEBUG
+
+#define WINDOW_TEXT "(no video)"
 
 /*****************************************************************************
  * Unix-only declarations
@@ -71,11 +54,9 @@
 #   define VOUT_PLUGINS "xvideo,x11,dummy"
 #   define AOUT_PLUGINS "esd,arts,alsa,oss,dummy"
 
-static unsigned int i_previous_height = 100000;
-static unsigned int i_previous_width = 100000;
-
 static void Redraw( Widget w, XtPointer closure, XEvent *event );
 static void Resize( Widget w, XtPointer closure, XEvent *event );
+
 #endif
 
 /*****************************************************************************
@@ -84,7 +65,6 @@ static void Resize( Widget w, XtPointer closure, XEvent *event );
 #ifdef XP_MACOSX
 #   define VOUT_PLUGINS "opengl,macosx,dummy"
 #   define AOUT_PLUGINS "auhal,macosx,dummy"
-
 #endif
 
 /*****************************************************************************
@@ -94,9 +74,8 @@ static void Resize( Widget w, XtPointer closure, XEvent *event );
 #   define VOUT_PLUGINS "directx,wingdi,dummy"
 #   define AOUT_PLUGINS "directx,waveout,dummy"
 
-#if defined(XP_WIN) && !USE_LIBVLC
-LRESULT CALLBACK Manage( HWND, UINT, WPARAM, LPARAM );
-#endif
+static LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpar );
+
 #endif
 
 /******************************************************************************
@@ -110,9 +89,9 @@ char * NPP_GetMIMEDescription( void )
 NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
 {
 
-    static nsIID nsid = VLCINTF_IID;
     static char psz_desc[1000];
 
+    /* plugin class variables */
     switch( variable )
     {
         case NPPVpluginNameString:
@@ -120,17 +99,13 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
             return NPERR_NO_ERROR;
 
         case NPPVpluginDescriptionString:
-#if USE_LIBVLC
-            snprintf( psz_desc, 1000-1, PLUGIN_DESCRIPTION, VLC_Version() );
-#else /* USE_LIBVLC */
-            snprintf( psz_desc, 1000-1, PLUGIN_DESCRIPTION, "(disabled)" );
-#endif /* USE_LIBVLC */
-            psz_desc[1000-1] = 0;
+            snprintf( psz_desc, sizeof(psz_desc)-1, PLUGIN_DESCRIPTION, VLC_Version() );
+            psz_desc[sizeof(psz_desc)-1] = 0;
             *((char **)value) = psz_desc;
             return NPERR_NO_ERROR;
 
         default:
-            /* go on... */
+            /* move on to instance variables ... */
             break;
     }
 
@@ -139,31 +114,21 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
         return NPERR_INVALID_INSTANCE_ERROR;
     }
 
-    VlcPlugin* p_plugin = (VlcPlugin*) instance->pdata;
+    /* plugin instance variables */
+
+    VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(instance->pdata);
+    if( NULL == p_plugin )
+    {
+        // plugin has not been initialized yet !
+        return NPERR_INVALID_INSTANCE_ERROR;
+    }
 
     switch( variable )
     {
-        case NPPVpluginScriptableInstance:
-            *(nsISupports**)value = p_plugin->GetPeer();
-            if( *(nsISupports**)value == NULL )
-            {
-                return NPERR_OUT_OF_MEMORY_ERROR;
-            }
-            break;
-
-        case NPPVpluginScriptableIID:
-            *(nsIID**)value = (nsIID*)NPN_MemAlloc( sizeof(nsIID) );
-            if( *(nsIID**)value == NULL )
-            {
-                return NPERR_OUT_OF_MEMORY_ERROR;
-            }
-            **(nsIID**)value = nsid;
-            break;
-
         case NPPVpluginScriptableNPObject:
-            static VlcRuntimeClass<VlcRuntimeRootObject> *rootClass = new VlcRuntimeClass<VlcRuntimeRootObject>;
-            *(NPObject**)value = NPN_CreateObject(instance, rootClass);
-            if( *(NPObject**)value == NULL )
+            /* create an instance and return it */
+            *(NPObject**)value = NPN_CreateObject(instance, p_plugin->getScriptClass());
+            if( NULL == *(NPObject**)value )
             {
                 return NPERR_OUT_OF_MEMORY_ERROR;
             }
@@ -172,7 +137,6 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
         default:
             return NPERR_GENERIC_ERROR;
     }
-
     return NPERR_NO_ERROR;
 }
 
@@ -203,26 +167,41 @@ int16 NPP_HandleEvent( NPP instance, void * event )
             return true;
         case updateEvt:
         {
-            NPWindow *npwindow = p_plugin->window;
+            int needsDisplay = TRUE;
+            libvlc_instance_t *p_vlc = p_plugin->getVLC();
 
-            /* draw the beautiful "No Picture" */
+            if( p_vlc )
+            {
+                if( libvlc_playlist_isplaying(p_vlc, NULL) )
+                {
+                    libvlc_input_t *p_input = libvlc_playlist_get_input(p_vlc, NULL);
+                    if( p_input )
+                    {
+                        needsDisplay = ! libvlc_input_has_vout(p_input, NULL);
+                        libvlc_input_free(p_input);
+                    }
+                }
+            }
+            if( needsDisplay )
+            {
+                const NPWindow *npwindow = p_plugin->getWindow();
+                
+                /* draw the beautiful "No Picture" */
 
-            ForeColor(blackColor);
-            PenMode( patCopy );
+                ForeColor(blackColor);
+                PenMode( patCopy );
 
-            Rect rect;
-            rect.left = 0;
-            rect.top = 0;
-            rect.right = npwindow->width;
-            rect.bottom = npwindow->height;
-            PaintRect( &rect );
+                Rect rect;
+                rect.left = 0;
+                rect.top = 0;
+                rect.right = npwindow->width;
+                rect.bottom = npwindow->height;
+                PaintRect( &rect );
 
-            ForeColor(whiteColor);
-            char *text = strdup( WINDOW_TEXT );
-            MoveTo( (npwindow->width-80)/ 2  , npwindow->height / 2 );
-            DrawText( text , 0 , strlen(text) );
-            free(text);
-
+                ForeColor(whiteColor);
+                MoveTo( (npwindow->width-80)/ 2  , npwindow->height / 2 );
+                DrawText( WINDOW_TEXT , 0 , strlen(WINDOW_TEXT) );
+            }
             return true;
         }
         case activateEvt:
@@ -267,225 +246,28 @@ void NPP_Shutdown( void )
 NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
                  char* argn[], char* argv[], NPSavedData* saved )
 {
-    int i;
-
-#if USE_LIBVLC
-    vlc_value_t value;
-    int i_ret;
-
-#endif /* USE_LIBVLC */
+    NPError status;
 
     if( instance == NULL )
     {
         return NPERR_INVALID_INSTANCE_ERROR;
     }
 
-    VlcPlugin * p_plugin = new VlcPlugin( instance );
-
-    if( p_plugin == NULL )
+    VlcPlugin * p_plugin = new VlcPlugin( instance, mode );
+    if( NULL == p_plugin )
     {
         return NPERR_OUT_OF_MEMORY_ERROR;
     }
 
-    instance->pdata = p_plugin;
-
-#ifdef XP_WIN
-    p_plugin->p_hwnd = NULL;
-    p_plugin->pf_wndproc = NULL;
-#endif /* XP_WIN */
-
-#ifdef XP_UNIX
-    p_plugin->window = 0;
-    p_plugin->p_display = NULL;
-#endif /* XP_UNIX */
-
-    p_plugin->p_npwin = NULL;
-    p_plugin->i_npmode = mode;
-    p_plugin->i_width = 0;
-    p_plugin->i_height = 0;
-
-#if USE_LIBVLC
-    p_plugin->i_vlc = VLC_Create();
-    if( p_plugin->i_vlc < 0 )
-    {
-        p_plugin->i_vlc = 0;
+    status = p_plugin->init(argc, argn, argv);
+    if( NPERR_NO_ERROR == status ) {
+        instance->pdata = reinterpret_cast<void*>(p_plugin);
+    }
+    else {
         delete p_plugin;
-        p_plugin = NULL;
-        return NPERR_GENERIC_ERROR;
     }
-
-    {
-#ifdef XP_MACOSX
-        char *ppsz_argv[] =
-        {
-            "vlc",
-            "-vvvv",
-            "--plugin-path",
-            "/Library/Internet Plug-Ins/VLC Plugin.plugin/"
-            "Contents/MacOS/modules"
-        };
-
-#elif defined(XP_WIN)
-        char *ppsz_argv[] = { NULL, "-vv" };
-        HKEY h_key;
-        DWORD i_type, i_data = MAX_PATH + 1;
-        char p_data[MAX_PATH + 1];
-        if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\\VideoLAN\\VLC",
-                          0, KEY_READ, &h_key ) == ERROR_SUCCESS )
-        {
-             if( RegQueryValueEx( h_key, "InstallDir", 0, &i_type,
-                                  (LPBYTE)p_data, &i_data ) == ERROR_SUCCESS )
-             {
-                 if( i_type == REG_SZ )
-                 {
-                     strcat( p_data, "\\vlc" );
-                     ppsz_argv[0] = p_data;
-                 }
-             }
-             RegCloseKey( h_key );
-        }
-
-        if( !ppsz_argv[0] ) ppsz_argv[0] = "vlc";
-
-#else /* XP_MACOSX */
-        char *ppsz_argv[] =
-        {
-            "vlc"
-            "-vvvv"
-            /*, "--plugin-path", ""*/
-        };
-
-#endif /* XP_MACOSX */
-
-        /* HACK: special case for loop, to have it set before playlist startup
-         */
-        for( i = 0; i < argc ; i++ )
-        {
-            if( !strcmp( argn[i], "loop" ) )
-            {
-                if( !strcmp( argv[i], "1" ) || !strcmp( argv[i], "yes" ) )
-                {
-                    value.b_bool = VLC_TRUE;
-                    VLC_VariableSet( p_plugin->i_vlc, "conf::loop", value );
-                }
-            }
-        }
-
-        i_ret = VLC_Init( p_plugin->i_vlc, sizeof(ppsz_argv)/sizeof(char*),
-                          ppsz_argv );
-
-    }
-
-    if( i_ret )
-    {
-        VLC_Destroy( p_plugin->i_vlc );
-        p_plugin->i_vlc = 0;
-        delete p_plugin;
-        p_plugin = NULL;
-        return NPERR_GENERIC_ERROR;
-    }
-
-    value.psz_string = "dummy";
-    VLC_VariableSet( p_plugin->i_vlc, "conf::intf", value );
-    value.psz_string = VOUT_PLUGINS;
-    VLC_VariableSet( p_plugin->i_vlc, "conf::vout", value );
-    value.psz_string = AOUT_PLUGINS;
-    VLC_VariableSet( p_plugin->i_vlc, "conf::aout", value );
-
-#else /* USE_LIBVLC */
-    p_plugin->i_vlc = 1;
-
-#endif /* USE_LIBVLC */
-
-    p_plugin->b_stream = VLC_FALSE;
-    p_plugin->b_autoplay = VLC_FALSE;
-    p_plugin->psz_target = NULL;
-
-    for( i = 0; i < argc ; i++ )
-    {
-        if( !strcmp( argn[i], "target" ) )
-        {
-            p_plugin->psz_target = argv[i];
-        }
-        else if( !strcmp( argn[i], "autoplay" ) )
-        {
-            if( !strcmp( argv[i], "1" ) || !strcmp( argv[i], "yes" ) )
-            {
-                p_plugin->b_autoplay = 1;
-            }
-        }
-        else if( !strcmp( argn[i], "autostart" ) )
-        {
-            if( !strcmp( argv[i], "1" ) || !strcmp( argv[i], "true" ) )
-            {
-                p_plugin->b_autoplay = 1;
-            }
-        }
-        else if( !strcmp( argn[i], "filename" ) )
-        {
-            p_plugin->psz_target = argv[i];
-        }
-        else if( !strcmp( argn[i], "src" ) )
-        {
-            p_plugin->psz_target = argv[i];
-        }
-
-#if USE_LIBVLC
-        else if( !strcmp( argn[i], "fullscreen" ) )
-        {
-            if( !strcmp( argv[i], "1" ) || !strcmp( argv[i], "yes" ) )
-            {
-                value.b_bool = VLC_TRUE;
-                VLC_VariableSet( p_plugin->i_vlc, "conf::fullscreen", value );
-            }
-        }
-        else if( !strcmp( argn[i], "mute" ) )
-        {
-            if( !strcmp( argv[i], "1" ) || !strcmp( argv[i], "yes" ) )
-            {
-                VLC_VolumeMute( p_plugin->i_vlc );
-            }
-        }
-#endif /* USE_LIBVLC */
-    }
-
-    if( p_plugin->psz_target )
-    {
-        p_plugin->psz_target = strdup( p_plugin->psz_target );
-    }
-
-    return NPERR_NO_ERROR;
+    return status;
 }
-
-#ifdef XP_WIN
-/* This is really ugly but there is a deadlock when stopping a stream
- * (in VLC_CleanUp()) because the video output is a child of the drawable but
- * is in a different thread. */
-static void HackStopVout( VlcPlugin* p_plugin )
-{
-    MSG msg;
-    HWND hwnd;
-    vlc_value_t value;
-
-    VLC_VariableGet( p_plugin->i_vlc, "drawable", &value );
-
-    hwnd = FindWindowEx( (HWND)value.i_int, 0, 0, 0 );
-    if( !hwnd ) return;
-
-    PostMessage( hwnd, WM_CLOSE, 0, 0 );
-
-    do
-    {
-        while( PeekMessage( &msg, (HWND)value.i_int, 0, 0, PM_REMOVE ) )
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-        if( FindWindowEx( (HWND)value.i_int, 0, 0, 0 ) ) Sleep( 10 );
-    }
-    while( (hwnd = FindWindowEx( (HWND)value.i_int, 0, 0, 0 )) );
-}
-#endif /* XP_WIN */
 
 NPError NPP_Destroy( NPP instance, NPSavedData** save )
 {
@@ -494,30 +276,10 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
         return NPERR_INVALID_INSTANCE_ERROR;
     }
 
-    VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
+    VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(instance->pdata);
 
-    if( p_plugin != NULL )
-    {
-        if( p_plugin->i_vlc )
-        {
-#if USE_LIBVLC
-#   ifdef XP_WIN
-            HackStopVout( p_plugin );
-#   endif /* XP_WIN */
-            VLC_CleanUp( p_plugin->i_vlc );
-            VLC_Destroy( p_plugin->i_vlc );
-#endif /* USE_LIBVLC */
-            p_plugin->i_vlc = 0;
-        }
-
-        if( p_plugin->psz_target )
-        {
-            free( p_plugin->psz_target );
-            p_plugin->psz_target = NULL;
-        }
-
+    if( p_plugin )
         delete p_plugin;
-    }
 
     instance->pdata = NULL;
 
@@ -526,71 +288,20 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
 NPError NPP_SetWindow( NPP instance, NPWindow* window )
 {
-    vlc_value_t value;
-#ifdef XP_MACOSX
-    vlc_value_t valuex;
-    vlc_value_t valuey;
-    vlc_value_t valuew;
-    vlc_value_t valueh;
-    vlc_value_t valuet;
-    vlc_value_t valuel;
-    vlc_value_t valueb;
-    vlc_value_t valuer;
-    vlc_value_t valueportx;
-    vlc_value_t valueporty;
-    vlc_value_t valueredraw;
-#endif /* XP_MACOSX */
-
-    if( instance == NULL )
+    if( ! instance )
     {
         return NPERR_INVALID_INSTANCE_ERROR;
     }
 
-    VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
+    /* NPP_SetWindow may be called before NPP_New (Opera) */
+    VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(instance->pdata);
+    if( ! p_plugin )
+    {
+        /* we should probably show a splash screen here */
+        return NPERR_NO_ERROR;
+    }
 
-    /* Write the window ID for vlc */
-#if USE_LIBVLC
-
-#ifdef XP_MACOSX
-    value.i_int = (int)(((NP_Port*) (window->window))->port);
-    VLC_VariableSet( p_plugin->i_vlc, "drawable", value );
-
-    valueportx.i_int = ((NP_Port*) (window->window))->portx;
-    valueporty.i_int = ((NP_Port*) (window->window))->porty;
-    VLC_VariableSet( p_plugin->i_vlc, "drawableportx", valueportx );
-    VLC_VariableSet( p_plugin->i_vlc, "drawableporty", valueporty );
-
-    valuex.i_int = window->x;
-    valuey.i_int = window->y;
-    valuew.i_int = window->width;
-    valueh.i_int = window->height;
-    valuet.i_int = window->clipRect.top;
-    valuel.i_int = window->clipRect.left;
-    valueb.i_int = window->clipRect.bottom;
-    valuer.i_int = window->clipRect.right;
-
-    VLC_VariableSet( p_plugin->i_vlc, "drawablet", valuet );
-    VLC_VariableSet( p_plugin->i_vlc, "drawablel", valuel );
-    VLC_VariableSet( p_plugin->i_vlc, "drawableb", valueb );
-    VLC_VariableSet( p_plugin->i_vlc, "drawabler", valuer );
-    VLC_VariableSet( p_plugin->i_vlc, "drawablex", valuex );
-    VLC_VariableSet( p_plugin->i_vlc, "drawabley", valuey );
-    VLC_VariableSet( p_plugin->i_vlc, "drawablew", valuew );
-    VLC_VariableSet( p_plugin->i_vlc, "drawableh", valueh );
-
-    p_plugin->window = window;
-
-    valueredraw.i_int = 1;
-    VLC_VariableSet( p_plugin->i_vlc, "drawableredraw", valueredraw );
-
-#else /* XP_MACOSX */
-    /* FIXME: this cast sucks */
-    value.i_int = (int) (ptrdiff_t) (void *) window->window;
-    VLC_VariableSet( p_plugin->i_vlc, "drawable", value );
-
-#endif /* XP_MACOSX */
-
-#endif /* USE_LIBVLC */
+    libvlc_instance_t *p_vlc = p_plugin->getVLC();
 
     /*
      * PLUGIN DEVELOPERS:
@@ -600,100 +311,128 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
      *  size changes, etc.
      */
 
+    libvlc_drawable_t drawable;
+    const NPWindow *curwin = p_plugin->getWindow();
+
+#ifdef XP_MACOSX
+    if( window && window->window )
+    {
+        /* check if plugin has a new parent window */
+        drawable = (libvlc_drawable_t)(((NP_Port*) (window->window))->port);
+        if( !curwin->window || drawable != (libvlc_drawable_t)(((NP_Port*) (curwin->window))->port) )
+        {
+            /* set/change parent window */
+            libvlc_video_set_parent(p_vlc, drawable, NULL);
+        }
+
+        /* as MacOS X video output is windowless, set viewport */
+        libvlc_rectangle_t view, clip;
+
+        /*
+        ** browser sets port origin to top-left location of plugin relative to GrafPort
+        ** window origin is set relative to document, which of little use for drawing
+        */
+        view.top     = ((NP_Port*) (window->window))->porty;
+        view.left    = ((NP_Port*) (window->window))->portx;
+        view.bottom  = window->height+view.top;
+        view.right   = window->width+view.left;
+
+        /* clipRect coordinates are also relative to GrafPort */
+        clip.top     = window->clipRect.top;
+        clip.left    = window->clipRect.left;
+        clip.bottom  = window->clipRect.bottom;
+        clip.right   = window->clipRect.right;
+
+        libvlc_video_set_viewport(p_vlc, &view, &clip, NULL);
+
+        /* remember window details */
+        p_plugin->setWindow(window);
+    }
+#endif /* XP_MACOSX */
+
 #ifdef XP_WIN
-    if( !window || !window->window )
+    if( window && window->window )
     {
-        /* Window was destroyed. Invalidate everything. */
-        if( p_plugin->p_npwin )
+        /* check if plugin has a new parent window */
+        /* FIXME: this cast sucks */
+        drawable = (libvlc_drawable_t) (HWND) (window->window);
+        if( !curwin->window || drawable != (libvlc_drawable_t)(HWND) (curwin->window) )
         {
-#if !USE_LIBVLC
-            SetWindowLong( p_plugin->p_hwnd, GWL_WNDPROC,
-                           (LONG)p_plugin->pf_wndproc );
-#endif /* !USE_LIBVLC */
-            p_plugin->pf_wndproc = NULL;
-            p_plugin->p_hwnd = NULL;
+            /* reset previous window settings */
+            HWND oldwin = (HWND)p_plugin->getWindow()->window;
+            WNDPROC oldproc = p_plugin->getWindowProc();
+            if( oldproc )
+            {
+                /* reset WNDPROC */
+                SetWindowLong( oldwin, GWL_WNDPROC, (LONG)oldproc );
+            }
+            /* install our WNDPROC */
+            p_plugin->setWindowProc( (WNDPROC)SetWindowLong( (HWND)drawable,
+                                                           GWL_WNDPROC, (LONG)Manage ) );
+
+            /* attach our plugin object */
+            SetWindowLongPtr((HWND)drawable, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(p_plugin));
+
+            /* change window style to our liking */
+            LONG style = GetWindowLong((HWND)drawable, GWL_STYLE);
+            style |= WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
+            SetWindowLong((HWND)drawable, GWL_STYLE, style);
+
+            /* change/set parent */
+            libvlc_video_set_parent(p_vlc, drawable, NULL);
         }
 
-        p_plugin->p_npwin = window;
-        return NPERR_NO_ERROR;
-    }
+        /* remember window details */
+        p_plugin->setWindow(window);
 
-    if( p_plugin->p_npwin )
+        /* Redraw window */
+        InvalidateRect( (HWND)drawable, NULL, TRUE );
+        UpdateWindow( (HWND)drawable );
+    }
+    else
     {
-        if( p_plugin->p_hwnd == (HWND)window->window )
-        {
-            /* Same window, but something may have changed. First we
-             * update the plugin structure, then we redraw the window */
-            p_plugin->i_width = window->width;
-            p_plugin->i_height = window->height;
-            p_plugin->p_npwin = window;
-#if !USE_LIBVLC
-            InvalidateRect( p_plugin->p_hwnd, NULL, TRUE );
-            UpdateWindow( p_plugin->p_hwnd );
-#endif /* !USE_LIBVLC */
-            return NPERR_NO_ERROR;
-        }
-
-        /* Window has changed. Destroy the one we have, and go
-         * on as if it was a real initialization. */
-#if !USE_LIBVLC
-        SetWindowLong( p_plugin->p_hwnd, GWL_WNDPROC,
-                       (LONG)p_plugin->pf_wndproc );
-#endif /* !USE_LIBVLC */
-        p_plugin->pf_wndproc = NULL;
-        p_plugin->p_hwnd = NULL;
+        /* reset WNDPROC */
+        HWND oldwin = (HWND)curwin->window;
+        SetWindowLong( oldwin, GWL_WNDPROC, (LONG)(p_plugin->getWindowProc()) );
+        p_plugin->setWindowProc(NULL);
+        /* change/set parent */
+        libvlc_video_set_parent(p_vlc, 0, NULL);
     }
-
-#if !USE_LIBVLC
-    p_plugin->pf_wndproc = (WNDPROC)SetWindowLong( (HWND)window->window,
-                                                   GWL_WNDPROC, (LONG)Manage );
-#endif /* !USE_LIBVLC */
-
-    p_plugin->p_hwnd = (HWND)window->window;
-    SetProp( p_plugin->p_hwnd, "w00t", (HANDLE)p_plugin );
-    InvalidateRect( p_plugin->p_hwnd, NULL, TRUE );
-    UpdateWindow( p_plugin->p_hwnd );
 #endif /* XP_WIN */
 
-    p_plugin->i_width = window->width;
-    p_plugin->i_height = window->height;
-    p_plugin->p_npwin = window;
-
 #ifdef XP_UNIX
-    p_plugin->window = (Window) window->window;
-    p_plugin->p_display =
-        ((NPSetWindowCallbackStruct *)window->ws_info)->display;
+    if( window && window->window )
+    {
+        Window  win   = (Window) window->window;
+        Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
 
-    XResizeWindow( p_plugin->p_display, p_plugin->window,
-                   p_plugin->i_width, p_plugin->i_height );
-    Widget w = XtWindowToWidget( p_plugin->p_display, p_plugin->window );
+        XResizeWindow( p_display, win, window->width, window->height );
+        Widget w = XtWindowToWidget( p_display, window );
 
-    XtAddEventHandler( w, ExposureMask, FALSE,
-                       (XtEventHandler)Redraw, p_plugin );
-    XtAddEventHandler( w, StructureNotifyMask, FALSE,
-                       (XtEventHandler)Resize, p_plugin );
-    Redraw( w, (XtPointer)p_plugin, NULL );
+        XtAddEventHandler( w, ExposureMask, FALSE, (XtEventHandler)Redraw, p_plugin );
+        XtAddEventHandler( w, StructureNotifyMask, FALSE, (XtEventHandler)Resize, p_plugin );
+
+        /* remember window */
+        p_plugin->setWindow(window);
+
+        Redraw( w, (XtPointer)p_plugin, NULL );
+    }
 #endif /* XP_UNIX */
 
     if( !p_plugin->b_stream )
     {
-        int i_mode = PLAYLIST_APPEND;
-
-        if( p_plugin->b_autoplay )
-        {
-            i_mode |= PLAYLIST_GO;
-        }
-
         if( p_plugin->psz_target )
         {
-#if USE_LIBVLC
-            VLC_AddTarget( p_plugin->i_vlc, p_plugin->psz_target,
-                           0, 0, i_mode, -666 );
-#endif
-            p_plugin->b_stream = VLC_TRUE;
+            if( VLC_SUCCESS == libvlc_playlist_add( p_vlc, p_plugin->psz_target, NULL, NULL ) )
+            {
+                if( p_plugin->b_autoplay )
+                {
+                    libvlc_playlist_play(p_vlc, 0, 0, NULL, NULL);
+                }
+                p_plugin->b_stream = VLC_TRUE;
+            }
         }
     }
-
     return NPERR_NO_ERROR;
 }
 
@@ -739,7 +478,7 @@ int32 NPP_WriteReady( NPP instance, NPStream *stream )
 
     if (instance != NULL)
     {
-        p_plugin = (VlcPlugin*) instance->pdata;
+        p_plugin = reinterpret_cast<VlcPlugin*>(instance->pdata);
         /* Muahahahahahahaha */
         return STREAMBUFSIZE;
         /*return SARASS_SIZE;*/
@@ -785,7 +524,7 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
 
     /* fprintf(stderr, "NPP_StreamAsFile %s\n", fname); */
 
-#if USE_LIBVLC
+#if 0
     VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
 
     VLC_AddTarget( p_plugin->i_vlc, fname, 0, 0,
@@ -875,13 +614,16 @@ void NPP_Print( NPP instance, NPPrint* printInfo )
 /******************************************************************************
  * Windows-only methods
  *****************************************************************************/
-#if defined(XP_WIN) && !USE_LIBVLC
-LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpar )
+#if XP_WIN
+static LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpar )
 {
-    VlcPlugin* p_plugin = (VlcPlugin*) GetProp( p_hwnd, "w00t" );
+    VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(GetWindowLongPtr(p_hwnd, GWLP_USERDATA));
 
     switch( i_msg )
     {
+        case WM_ERASEBKGND:
+            return 1L;
+
         case WM_PAINT:
         {
             PAINTSTRUCT paintstruct;
@@ -891,18 +633,21 @@ LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpar )
             hdc = BeginPaint( p_hwnd, &paintstruct );
 
             GetClientRect( p_hwnd, &rect );
-            FillRect( hdc, &rect, (HBRUSH)GetStockObject(WHITE_BRUSH) );
-            TextOut( hdc, p_plugin->i_width / 2 - 40, p_plugin->i_height / 2,
+
+            FillRect( hdc, &rect, (HBRUSH)GetStockObject(BLACK_BRUSH) );
+            SetTextColor(hdc, RGB(255, 255, 255));
+            SetBkColor(hdc, RGB(0, 0, 0));
+            TextOut( hdc, (rect.right-rect.left)/ 2 - 40,
+                          (rect.bottom-rect.top)/ 2,
                      WINDOW_TEXT, strlen(WINDOW_TEXT) );
 
             EndPaint( p_hwnd, &paintstruct );
-            break;
+            return 0L;
         }
         default:
-            p_plugin->pf_wndproc( p_hwnd, i_msg, wpar, lpar );
-            break;
+            /* delegate to default handler */
+            return p_plugin->getWindowProc()( p_hwnd, i_msg, wpar, lpar );
     }
-    return 0;
 }
 #endif /* XP_WIN */
 
@@ -912,29 +657,37 @@ LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpar )
 #ifdef XP_UNIX
 static void Redraw( Widget w, XtPointer closure, XEvent *event )
 {
-    VlcPlugin* p_plugin = (VlcPlugin*)closure;
+    VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(closure);
+    const NPWindow *window = p_plugin->getWindow();
     GC gc;
     XGCValues gcv;
 
-    gcv.foreground = BlackPixel( p_plugin->p_display, 0 );
-    gc = XCreateGC( p_plugin->p_display, p_plugin->window, GCForeground, &gcv );
+    Window  w   = (Window) window->window;
+    Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
 
-    XFillRectangle( p_plugin->p_display, p_plugin->window, gc,
-                    0, 0, p_plugin->i_width, p_plugin->i_height );
+    gcv.foreground = BlackPixel( p_display, 0 );
+    gc = XCreateGC( p_display, w, GCForeground, &gcv );
 
-    gcv.foreground = WhitePixel( p_plugin->p_display, 0 );
-    XChangeGC( p_plugin->p_display, gc, GCForeground, &gcv );
+    XFillRectangle( p_display, w, gc,
+                    0, 0, window->width, window->height );
 
-    XDrawString( p_plugin->p_display, p_plugin->window, gc,
-                 p_plugin->i_width / 2 - 40, p_plugin->i_height / 2,
+    gcv.foreground = WhitePixel( p_display, 0 );
+    XChangeGC( p_display, gc, GCForeground, &gcv );
+
+    XDrawString( p_display, w, gc,
+                 window->width / 2 - 40, window->height / 2,
                  WINDOW_TEXT, strlen(WINDOW_TEXT) );
 
-    XFreeGC( p_plugin->p_display, gc );
+    XFreeGC( p_display, gc );
 }
 
 static void Resize ( Widget w, XtPointer closure, XEvent *event )
 {
-    VlcPlugin* p_plugin = (VlcPlugin*)closure;
+    VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(closure);
+    const NPWindow *window = p_plugin->getWindow();
+    Window  w   = (Window) window->window;
+    Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
+
     int i_ret;
     Window root_return, parent_return, * children_return;
     Window base_window;
@@ -952,23 +705,20 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
     }
 #endif /* X11_RESIZE_DEBUG */
 
-    if( p_plugin->i_height == i_previous_height &&
-        p_plugin->i_width == i_previous_width )
+    if( ! p_plugin->setSize(window->width, window->height) )
     {
+        /* size already set */
         return;
     }
-    i_previous_height = p_plugin->i_height;
-    i_previous_width  = p_plugin->i_width;
 
 
-    i_ret = XResizeWindow( p_plugin->p_display, p_plugin->window,
-            p_plugin->i_width, p_plugin->i_height );
+    i_ret = XResizeWindow( p_display, w, window->i_width, window->i_height );
 
 #ifdef X11_RESIZE_DEBUG
     fprintf( stderr,
              "vlcshell::Resize() XResizeWindow(owner) returned %d\n", i_ret );
 
-    XGetWindowAttributes ( p_plugin->p_display, p_plugin->window, &attr );
+    XGetWindowAttributes ( p_display, w, &attr );
 
     /* X is asynchronous, so the current size reported here is not
        necessarily the requested size as the Resize request may not
@@ -977,7 +727,7 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
              attr.width, attr.height );
 #endif /* X11_RESIZE_DEBUG */
 
-    XQueryTree( p_plugin->p_display, p_plugin->window,
+    XQueryTree( p_display, w,
                 &root_return, &parent_return, &children_return,
                 &i_nchildren );
 
@@ -993,8 +743,8 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
                  base_window );
 #endif /* X11_RESIZE_DEBUG */
 
-        i_ret = XResizeWindow( p_plugin->p_display, base_window,
-                p_plugin->i_width, p_plugin->i_height );
+        i_ret = XResizeWindow( p_display, base_window,
+                window->width, window->height );
 
 #ifdef X11_RESIZE_DEBUG
         fprintf( stderr,

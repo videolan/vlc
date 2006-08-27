@@ -833,17 +833,14 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * FIXME: kludge to use a p_vlc-local variable for the Mozilla plugin
      */
     var_Create( p_vlc, "drawable", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawableredraw", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawablet", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawablel", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawableb", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawabler", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawablex", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawabley", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawablew", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawableh", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawableportx", VLC_VAR_INTEGER );
-    var_Create( p_vlc, "drawableporty", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawable-view-top", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawable-view-left", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawable-view-bottom", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawable-view-right", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawable-clip-top", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawable-clip-left", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawable-clip-bottom", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "drawable-clip-right", VLC_VAR_INTEGER );
 
     /* Create volume callback system. */
     var_Create( p_vlc, "volume-change", VLC_VAR_BOOL );

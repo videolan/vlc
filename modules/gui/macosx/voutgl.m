@@ -86,10 +86,8 @@ static void Unlock ( vout_thread_t * p_vout );
 static int  aglInit   ( vout_thread_t * p_vout );
 static void aglEnd    ( vout_thread_t * p_vout );
 static int  aglManage ( vout_thread_t * p_vout );
+static int  aglControl( vout_thread_t *, int, va_list );
 static void aglSwap   ( vout_thread_t * p_vout );
-
-static int DrawableRedraw( vlc_object_t *p_this, const char *psz_name,
-    vlc_value_t oval, vlc_value_t nval, void *param);
 
 int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 {
@@ -131,19 +129,11 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
             AGL_DEPTH_SIZE, 24,
             AGL_NONE };
 
-        AGLDevice screen;
         AGLPixelFormat pixFormat;
 
         p_vout->p_sys->b_embedded = VLC_TRUE;
 
-        screen = GetGWorldDevice((CGrafPtr)value_drawable.i_int);
-        if( NULL == screen )
-        {
-            msg_Err( p_vout, "can't find screen device for drawable" );
-            return VLC_EGENERIC;
-        }
-        
-        pixFormat = aglChoosePixelFormat(&screen, 1, ATTRIBUTES);
+        pixFormat = aglChoosePixelFormat(NULL, 0, ATTRIBUTES);
         if( NULL == pixFormat )
         {
             msg_Err( p_vout, "no screen renderer available for required attributes." );
@@ -158,8 +148,8 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
             return VLC_EGENERIC;
         }
         else {
-            // tell opengl to sync buffer swap with vertical retrace
-            GLint param = 1;
+            // tell opengl not to sync buffer swap with vertical retrace
+            GLint param = 0;
             aglSetInteger(p_vout->p_sys->agl_ctx, AGL_SWAP_INTERVAL, &param);
             aglEnable(p_vout->p_sys->agl_ctx, AGL_SWAP_INTERVAL);
         }
@@ -167,7 +157,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
         p_vout->pf_init             = aglInit;
         p_vout->pf_end              = aglEnd;
         p_vout->pf_manage           = aglManage;
-        p_vout->pf_control          = NULL;
+        p_vout->pf_control          = aglControl;
         p_vout->pf_swap             = aglSwap;
         p_vout->pf_lock             = Lock;
         p_vout->pf_unlock           = Unlock;
@@ -207,7 +197,6 @@ void E_(CloseVideoGL) ( vlc_object_t * p_this )
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
     if( p_vout->p_sys->b_embedded )
     {
-        var_DelCallback(p_vout->p_vlc, "drawableredraw", DrawableRedraw, p_vout);
         aglDestroyContext(p_vout->p_sys->agl_ctx);
     }
     else
@@ -456,13 +445,38 @@ static void Unlock( vout_thread_t * p_vout )
  * embedded AGL context implementation
  *****************************************************************************/
 
-static void UpdateEmbeddedGeometry( vout_thread_t *p_vout );
+static void aglSetViewport( vout_thread_t *p_vout, Rect viewBounds, Rect clipBounds );
 static void aglReshape( vout_thread_t * p_vout );
 
 static int aglInit( vout_thread_t * p_vout )
 {
-    UpdateEmbeddedGeometry(p_vout);
-    var_AddCallback(p_vout->p_vlc, "drawableredraw", DrawableRedraw, p_vout);
+    vlc_value_t val;
+
+    Rect viewBounds;    
+    Rect clipBounds;
+    
+    var_Get( p_vout->p_vlc, "drawable", &val );
+    p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
+    aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
+
+    var_Get( p_vout->p_vlc, "drawable-view-top", &val );
+    viewBounds.top = val.i_int;
+    var_Get( p_vout->p_vlc, "drawable-view-left", &val );
+    viewBounds.left = val.i_int;
+    var_Get( p_vout->p_vlc, "drawable-view-bottom", &val );
+    viewBounds.bottom = val.i_int;
+    var_Get( p_vout->p_vlc, "drawable-view-right", &val );
+    viewBounds.right = val.i_int;
+    var_Get( p_vout->p_vlc, "drawable-clip-top", &val );
+    clipBounds.top = val.i_int;
+    var_Get( p_vout->p_vlc, "drawable-clip-left", &val );
+    clipBounds.left = val.i_int;
+    var_Get( p_vout->p_vlc, "drawable-clip-bottom", &val );
+    clipBounds.bottom = val.i_int;
+    var_Get( p_vout->p_vlc, "drawable-clip-right", &val );
+    clipBounds.right = val.i_int;
+
+    aglSetViewport(p_vout, viewBounds, clipBounds);
 
     aglSetCurrentContext(p_vout->p_sys->agl_ctx);
     return VLC_SUCCESS;
@@ -547,84 +561,80 @@ static int aglManage( vout_thread_t * p_vout )
     return VLC_SUCCESS;
 }
 
+static int aglControl( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    switch( i_query )
+    {
+        case VOUT_SET_VIEWPORT:
+	{
+	    Rect viewBounds, clipBounds;
+            viewBounds.top = va_arg( args, int);
+            viewBounds.left = va_arg( args, int);
+            viewBounds.bottom = va_arg( args, int);
+            viewBounds.right = va_arg( args, int);
+            clipBounds.top = va_arg( args, int);
+            clipBounds.left = va_arg( args, int);
+            clipBounds.bottom = va_arg( args, int);
+            clipBounds.right = va_arg( args, int);
+	    aglSetViewport(p_vout, viewBounds, clipBounds);
+            return VLC_SUCCESS;
+	}
+
+        case VOUT_REPARENT:
+	{
+	    AGLDrawable drawable = (AGLDrawable)va_arg( args, int);
+	    if( drawable != p_vout->p_sys->agl_drawable )
+	    {
+		p_vout->p_sys->agl_drawable = drawable;
+		aglSetDrawable(p_vout->p_sys->agl_ctx, drawable);
+	    }
+            return VLC_SUCCESS;
+	}
+
+        default:
+            return vout_vaControlDefault( p_vout, i_query, args );
+    }
+}
+
 static void aglSwap( vout_thread_t * p_vout )
 {
     p_vout->p_sys->b_got_frame = VLC_TRUE;
     aglSwapBuffers(p_vout->p_sys->agl_ctx);
 }
 
-static void UpdateEmbeddedGeometry( vout_thread_t *p_vout )
+static void aglSetViewport( vout_thread_t *p_vout, Rect viewBounds, Rect clipBounds )
 {
-    vlc_value_t val;
-    vlc_value_t valt, vall, valb, valr, valx, valy, valw, valh,
-                valportx, valporty;
-
-    Rect winBounds;    
-    Rect clientBounds;
-    
-    GLint rect[4];
-
-    var_Get( p_vout->p_vlc, "drawable", &val );
-    var_Get( p_vout->p_vlc, "drawablet", &valt );
-    var_Get( p_vout->p_vlc, "drawablel", &vall );
-    var_Get( p_vout->p_vlc, "drawableb", &valb );
-    var_Get( p_vout->p_vlc, "drawabler", &valr );
-    var_Get( p_vout->p_vlc, "drawablex", &valx );
-    var_Get( p_vout->p_vlc, "drawabley", &valy );
-    var_Get( p_vout->p_vlc, "drawablew", &valw );
-    var_Get( p_vout->p_vlc, "drawableh", &valh );
-    var_Get( p_vout->p_vlc, "drawableportx", &valportx );
-    var_Get( p_vout->p_vlc, "drawableporty", &valporty );
-
     // mozilla plugin provides coordinates based on port bounds
     // however AGL coordinates are based on window structure region
     // and are vertically flipped
+    GLint rect[4];
+    CGrafPtr port = (CGrafPtr)p_vout->p_sys->agl_drawable;
+    Rect winBounds, clientBounds;
 
-    GetWindowBounds(GetWindowFromPort((CGrafPtr)val.i_int),
+    GetWindowBounds(GetWindowFromPort(port),
         kWindowStructureRgn, &winBounds);
-    GetWindowBounds(GetWindowFromPort((CGrafPtr)val.i_int),
+    GetWindowBounds(GetWindowFromPort(port),
         kWindowContentRgn, &clientBounds);
 
     /* update video clipping bounds in drawable */
     rect[0] = (clientBounds.left-winBounds.left)
-            + vall.i_int;                       // from window left edge
+            + clipBounds.left;                  // from window left edge
     rect[1] = (winBounds.bottom-winBounds.top)
             - (clientBounds.top-winBounds.top)
-            - valb.i_int;                       // from window bottom edge
-    rect[2] = valr.i_int-vall.i_int;            // width
-    rect[3] = valb.i_int-valt.i_int;            // height
+            - clipBounds.bottom;                // from window bottom edge
+    rect[2] = clipBounds.right-clipBounds.left; // width
+    rect[3] = clipBounds.bottom-clipBounds.top; // height
     aglSetInteger(p_vout->p_sys->agl_ctx, AGL_BUFFER_RECT, rect);
     aglEnable(p_vout->p_sys->agl_ctx, AGL_BUFFER_RECT);
 
     /* update video internal bounds in drawable */
-    p_vout->p_sys->i_offx   = -vall.i_int - valportx.i_int;
-    p_vout->p_sys->i_offy   = valb.i_int + valporty.i_int - valh.i_int; 
-    p_vout->p_sys->i_width  = valw.i_int;
-    p_vout->p_sys->i_height = valh.i_int;
+    p_vout->p_sys->i_width  = viewBounds.right-viewBounds.left;
+    p_vout->p_sys->i_height = viewBounds.bottom-viewBounds.top;
+    p_vout->p_sys->i_offx   = -clipBounds.left - viewBounds.left;
+    p_vout->p_sys->i_offy   = clipBounds.bottom + viewBounds.top
+                            - p_vout->p_sys->i_height; 
 
-    if( p_vout->p_sys->agl_drawable == (AGLDrawable)val.i_int )
-    {
-        aglUpdateContext(p_vout->p_sys->agl_ctx);
-    }
-    else
-    {
-        p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
-        aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
-    }
+    aglUpdateContext(p_vout->p_sys->agl_ctx);
     aglReshape( p_vout );
-}
-
-/* If we're embedded, the application is expected to indicate a
- * window change (move/resize/etc) via the "drawableredraw" value.
- */
-
-static int DrawableRedraw( vlc_object_t *p_this, const char *psz_name,
-    vlc_value_t oval, vlc_value_t nval, void *param)
-{
-    vout_thread_t *p_vout = (vout_thread_t *)param;
-
-    UpdateEmbeddedGeometry( p_vout );
-
-    return VLC_SUCCESS;
 }
 
