@@ -32,11 +32,27 @@
 #include <QString>
 #include <QFont>
 
-#include "pixmaps/audio.xpm"
-#include "pixmaps/video.xpm"
+#include "pixmaps/advanced_50x50.xpm"
+#include "pixmaps/audio_50x50.xpm"
+#include "pixmaps/input_and_codecs_50x50.xpm"
+#include "pixmaps/interface_50x50.xpm"
+#include "pixmaps/playlist_50x50.xpm"
+#include "pixmaps/subtitles_50x50.xpm"
+#include "pixmaps/video_50x50.xpm"
+
 #include "ui/sprefs_trivial.h"
 
-#define ITEM_HEIGHT 25
+#define ITEM_HEIGHT 50
+
+enum {
+    SPrefsVideo,
+    SPrefsAudio,
+    SPrefsInputAndCodecs,
+    SPrefsPlaylist,
+    SPrefsInterface,
+    SPrefsSubtitles,
+    SPrefsAdvanced
+};
 
 /*********************************************************************
  * The List of categories
@@ -58,12 +74,19 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     setFont( f );
 #endif
 
-    addItem( "Very trivial" );
-    item(0)->setIcon( QIcon( QPixmap( audio_xpm ) ) );
-    item(0)->setData( Qt::UserRole, qVariantFromValue( 0 ) );
-    addItem( "Video" );
-    item(1)->setIcon( QIcon( QPixmap( video_xpm ) ) );
-    item(1)->setData( Qt::UserRole, qVariantFromValue( 1 ) );
+#define ADD_CATEGORY( id, label, icon )                             \
+    addItem( label );                                               \
+    item( id )->setIcon( QIcon( QPixmap( icon ) ) );                \
+    item( id )->setData( Qt::UserRole, qVariantFromValue( (int)id ) );
+
+    ADD_CATEGORY( SPrefsVideo, "Video", video_50x50_xpm );
+    ADD_CATEGORY( SPrefsAudio, "Audio", audio_50x50_xpm );
+    ADD_CATEGORY( SPrefsInputAndCodecs, "Input and Codecs",
+                  input_and_codecs_50x50_xpm );
+    ADD_CATEGORY( SPrefsPlaylist, "Playlist", playlist_50x50_xpm );
+    ADD_CATEGORY( SPrefsInterface, "Interface", interface_50x50_xpm );
+    ADD_CATEGORY( SPrefsSubtitles, "Subtitles", subtitles_50x50_xpm );
+    ADD_CATEGORY( SPrefsAdvanced, "Advanced", advanced_50x50_xpm );
 }
 
 void SPrefsCatList::ApplyAll()
@@ -88,21 +111,50 @@ void SPrefsCatList::DoAll( bool doclean )
 SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                           int number ) : QWidget( _parent ), p_intf( _p_intf )
 {
-    if( number == 0 )
+    switch( number )
     {
-        Ui::SPrefsTrivial ui;
-        ui.setupUi( this );
-        module_config_t *p_config = config_FindConfig( VLC_OBJECT(p_intf),
-                                                        "memcpy" );
-        ConfigControl *control = new ModuleConfigControl( VLC_OBJECT(p_intf),
-                        p_config, ui.memcpyLabel, ui.memcpyCombo, false );
-        controls.append( control );
-    }
-    else
-    {
-        int *p = NULL;
-        fprintf( stderr, "Ha ha ca te fait bien la bite\n" );
-        *p=42;
+        case SPrefsVideo:
+        {
+            Ui::SPrefsTrivial ui;
+            ui.setupUi( this );
+            module_config_t *p_config =
+                            config_FindConfig( VLC_OBJECT(p_intf), "memcpy" );
+            ConfigControl *control =
+                            new ModuleConfigControl( VLC_OBJECT(p_intf),
+                            p_config, ui.memcpyLabel, ui.memcpyCombo, false );
+            controls.append( control );
+            break;
+        }
+
+        case SPrefsAudio:
+        {
+            break;
+        }
+
+        case SPrefsInputAndCodecs:
+        {
+            break;
+        }
+
+        case SPrefsPlaylist:
+        {
+            break;
+        }
+
+        case SPrefsInterface:
+        {
+            break;
+        }
+
+        case SPrefsSubtitles:
+        {
+            break;
+        }
+
+        case SPrefsAdvanced:
+        {
+            break;
+        }
     }
 }
 
