@@ -396,21 +396,24 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     if( window && window->window )
     {
         Window  drawable   = (Window) window->window;
-	if( !curwin->window || drawable != (Window)curwin->window )
-	{
-	    Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
+        if( !curwin->window || drawable != (Window)curwin->window )
+        {
+            Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
 
-	    XResizeWindow( p_display, drawable, window->width, window->height );
-	    Widget w = XtWindowToWidget( p_display, drawable );
+            XResizeWindow( p_display, drawable, window->width, window->height );
+            Widget w = XtWindowToWidget( p_display, drawable );
 
-	    XtAddEventHandler( w, ExposureMask, FALSE, (XtEventHandler)Redraw, p_plugin );
-	    XtAddEventHandler( w, StructureNotifyMask, FALSE, (XtEventHandler)Resize, p_plugin );
+            XtAddEventHandler( w, ExposureMask, FALSE, (XtEventHandler)Redraw, p_plugin );
+            XtAddEventHandler( w, StructureNotifyMask, FALSE, (XtEventHandler)Resize, p_plugin );
 
-	    /* remember window */
-	    p_plugin->setWindow(window);
+            /* set/change parent window */
+            libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, NULL);
 
-	    Redraw( w, (XtPointer)p_plugin, NULL );
-	}
+            /* remember window */
+            p_plugin->setWindow(window);
+
+            Redraw( w, (XtPointer)p_plugin, NULL );
+        }
     }
 #endif /* XP_UNIX */
 
