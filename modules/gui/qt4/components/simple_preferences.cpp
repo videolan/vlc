@@ -48,16 +48,6 @@
 
 #define ITEM_HEIGHT 50
 
-enum {
-    SPrefsVideo,
-    SPrefsAudio,
-    SPrefsInputAndCodecs,
-    SPrefsPlaylist,
-    SPrefsInterface,
-    SPrefsSubtitles,
-    SPrefsAdvanced
-};
-
 /*********************************************************************
  * The List of categories
  *********************************************************************/
@@ -91,6 +81,8 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     ADD_CATEGORY( SPrefsInterface, "Interface", interface_50x50_xpm );
     ADD_CATEGORY( SPrefsSubtitles, "Subtitles", subtitles_50x50_xpm );
     ADD_CATEGORY( SPrefsAdvanced, "Advanced", advanced_50x50_xpm );
+
+    setCurrentRow( SPrefsInterface );
 }
 
 void SPrefsCatList::ApplyAll()

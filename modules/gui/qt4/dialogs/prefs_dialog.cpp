@@ -143,7 +143,7 @@ void PrefsDialog::setSmall()
         advanced_panel->hide();
     }
     if( !simple_panel )
-        simple_panel = new SPrefsPanel( p_intf, main_panel, 0 );
+        simple_panel = new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat );
     main_panel_l->addWidget( simple_panel );
     simple_panel->show();
     adv_chk->hide();

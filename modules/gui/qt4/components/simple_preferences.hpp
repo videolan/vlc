@@ -28,6 +28,17 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
+enum {
+    SPrefsVideo,
+    SPrefsAudio,
+    SPrefsInputAndCodecs,
+    SPrefsPlaylist,
+    SPrefsInterface,
+    SPrefsSubtitles,
+    SPrefsAdvanced
+};
+#define SPrefsDefaultCat SPrefsInterface
+
 class ConfigControl;
 
 class SPrefsCatList : public QListWidget
