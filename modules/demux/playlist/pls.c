@@ -83,6 +83,7 @@ static int Demux( demux_t *p_demux )
     char          *psz_name = NULL;
     char          *psz_line;
     char          *psz_mrl = NULL;
+    char          *psz_mrl_orig = NULL;
     char          *psz_key;
     char          *psz_value;
     int            i_item = -1;
@@ -93,7 +94,7 @@ static int Demux( demux_t *p_demux )
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
-        if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) || 
+        if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) ||
             !strncasecmp( psz_line, "[Reference]", sizeof("[Reference]")-1 ) )
         {
             free( psz_line );
@@ -174,7 +175,19 @@ static int Demux( demux_t *p_demux )
         if( !strncasecmp( psz_key, "file", sizeof("file") -1 ) ||
             !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
         {
+            psz_mrl_orig =
             psz_mrl = E_(ProcessMRL)( psz_value, p_demux->p_sys->psz_prefix );
+
+            if( !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
+            {
+                if( !strncasecmp( psz_mrl, "http://", sizeof("http://") -1 ) )
+                {
+                    psz_mrl++;
+                    psz_mrl[0] = 'm';
+                    psz_mrl[1] = 'm';
+                    psz_mrl[2] = 's';
+                }
+            }
         }
         else if( !strncasecmp( psz_key, "title", sizeof("title") -1 ) )
         {
@@ -202,7 +215,7 @@ static int Demux( demux_t *p_demux )
         playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
                                 p_item_in_category, (i_parent_id > 0 ) ?
                                 VLC_TRUE: VLC_FALSE, PLAYLIST_APPEND );
-        free( psz_mrl );
+        free( psz_mrl_orig );
         psz_mrl = NULL;
     }
     else
