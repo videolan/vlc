@@ -223,6 +223,7 @@ void playlist_MainLoop( playlist_t *p_playlist )
         {
             int i_activity;
             input_thread_t *p_input;
+            PL_DEBUG( "dead input" );
 
             p_input = p_playlist->p_input;
             p_playlist->p_input = NULL;
@@ -247,6 +248,8 @@ void playlist_MainLoop( playlist_t *p_playlist )
             if( p_playlist->status.p_item->i_flags
                 & PLAYLIST_REMOVE_FLAG )
             {
+                 PL_DEBUG( "%s was marked for deletion, deleting",
+                                 PLI_NAME( p_playlist->status.p_item  ) );
                  playlist_ItemDelete( p_playlist->status.p_item );
                  if( p_playlist->request.p_item == p_playlist->status.p_item )
                      p_playlist->request.p_item = NULL;
@@ -262,12 +265,13 @@ void playlist_MainLoop( playlist_t *p_playlist )
         /* This input is dying, let it do */
         else if( p_playlist->p_input->b_die )
         {
-            ;
+            PL_DEBUG( "dying input" );
         }
         /* This input has finished, ask it to die ! */
         else if( p_playlist->p_input->b_error
                   || p_playlist->p_input->b_eof )
         {
+            PL_DEBUG( "finished input" );
             input_StopThread( p_playlist->p_input );
             /* Select the next playlist item */
             PL_UNLOCK
@@ -275,7 +279,7 @@ void playlist_MainLoop( playlist_t *p_playlist )
         }
         else if( p_playlist->p_input->i_state != INIT_S )
         {
-            PL_UNLOCK
+            PL_UNLOCK;
             p_playlist->i_vout_destroyed_date =
                 ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
                                         p_playlist->i_vout_destroyed_date );
@@ -298,7 +302,7 @@ void playlist_MainLoop( playlist_t *p_playlist )
               ( p_playlist->request.b_request &&
                 p_playlist->request.i_status != PLAYLIST_STOPPED ) )
          {
-             msg_Dbg( p_playlist, "Starting new item" );
+             msg_Dbg( p_playlist, "starting new item" );
              stats_TimerStart( p_playlist, "Playlist walk",
                                   STATS_TIMER_PLAYLIST_WALK );
              p_item = playlist_NextItem( p_playlist );
@@ -315,10 +319,11 @@ void playlist_MainLoop( playlist_t *p_playlist )
          }
          else
          {
-             if( p_item && p_playlist->status.p_item &&
+             if( p_playlist->status.p_item &&
                  p_playlist->status.p_item->i_flags & PLAYLIST_REMOVE_FLAG )
              {
-                 playlist_ItemDelete( p_item );
+                 PL_DEBUG( "deleting item marked for deletion" );
+                 playlist_ItemDelete( p_playlist->status.p_item );
                  p_playlist->status.p_item = NULL;
              }
 

@@ -464,4 +464,6 @@ static inline vlc_bool_t playlist_IsEmpty( playlist_t * p_playlist )
 #define PL_DEBUG( msg, args ... ) {}
 #endif
 
+#define PLI_NAME( p ) p ? p->p_input->psz_name : "null"
+
 #endif

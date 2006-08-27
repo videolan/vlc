@@ -632,7 +632,7 @@ int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
         /* Hack we don't call playlist_Control for lock reasons */
         if( b_stop )
         {
-            p_playlist->status.i_status = PLAYLIST_STOPPED;
+            p_playlist->request.i_status = PLAYLIST_STOPPED;
             p_playlist->request.b_request = VLC_TRUE;
             p_playlist->request.p_item = NULL;
             msg_Info( p_playlist, "stopping playback" );
@@ -648,7 +648,10 @@ int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
     if( b_flag == VLC_FALSE )
         playlist_ItemDelete( p_item );
     else
+    {
+        PL_DEBUG( "marking %s for further deletion", PLI_NAME( p_item ) );
         p_item->i_flags |= PLAYLIST_REMOVE_FLAG;
+    }
 
     return VLC_SUCCESS;
 }

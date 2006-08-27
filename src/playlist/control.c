@@ -327,7 +327,9 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
     /* Start the real work */
     if( p_playlist->request.b_request )
     {
-        PL_DEBUG( "processing request" );
+        PL_DEBUG( "processing request node %s item %s skip %i",
+                        PLI_NAME( p_playlist->request.p_item ),
+                        PLI_NAME( p_playlist->request.p_node ), i_skip );
         p_new = p_playlist->request.p_item;
         i_skip = p_playlist->request.i_skip;
 

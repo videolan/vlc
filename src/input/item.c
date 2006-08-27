@@ -76,6 +76,7 @@ static void vlc_input_item_Destroy ( gc_object_t *p_this )
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_obj,
                                           VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
+    fprintf( stderr, "Destroying %s\n", p_input->psz_name );
     vlc_input_item_Clean( p_input );
 
     if( p_playlist )
