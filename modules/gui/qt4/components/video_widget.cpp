@@ -131,6 +131,7 @@ static void DoRelease( intf_thread_t *p_intf, void *p_win )
 
 void VideoWidget::resizeEvent( QResizeEvent *e )
 {
+    if( !always )return;
     if( e->size().height() < ICON_SIZE -1 )
         label->setMaximumWidth( e->size().height() );
     else
