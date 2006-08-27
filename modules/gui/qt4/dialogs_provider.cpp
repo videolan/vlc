@@ -101,6 +101,12 @@ void DialogsProvider::openDialog()
 {
     openDialog( 0 );
 }
+void DialogsProvider::PLAppendDialog()
+{
+}
+void DialogsProvider::MLAppendDialog()
+{
+}
 void DialogsProvider::openDialog( int i_dialog )
 {
 }
@@ -129,7 +135,7 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
         break;
     case INTERACT_DESTROY:
         qdialog = (InteractionDialog*)(p_dialog->p_private);
-        delete qdialog; 
+        delete qdialog;
         p_dialog->i_status = DESTROYED_DIALOG;
         break;
     }
@@ -171,7 +177,7 @@ void DialogsProvider::menuUpdateAction( QObject *data )
     f->doFunc( p_intf );
 }
 
-void DialogsProvider::simpleAppendDialog()
+void DialogsProvider::simplePLAppendDialog()
 {
     QStringList files = showSimpleOpen();
     QString file;
@@ -180,6 +186,18 @@ void DialogsProvider::simpleAppendDialog()
         const char * psz_utf8 = file.toUtf8().data();
         playlist_PlaylistAdd( THEPL, psz_utf8, psz_utf8,
                      PLAYLIST_APPEND | PLAYLIST_PREPARSE, PLAYLIST_END );
+    }
+}
+
+void DialogsProvider::simpleMLAppendDialog()
+{
+    QStringList files = showSimpleOpen();
+    QString file;
+    foreach( file, files )
+    {
+        const char * psz_utf8 = file.toUtf8().data();
+        playlist_MLAdd( THEPL, psz_utf8, psz_utf8,
+                        PLAYLIST_APPEND | PLAYLIST_PREPARSE, PLAYLIST_END );
     }
 }
 

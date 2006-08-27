@@ -62,7 +62,11 @@ public:
             instance = new MainInputManager( _p_intf );
         return instance;
     }
-
+    static void killInstance()
+    {
+        if( instance ) delete instance;
+    }
+    virtual ~MainInputManager();
     input_thread_t *getInput() { return p_input; };
     InputManager *getIM() { return im; };
 

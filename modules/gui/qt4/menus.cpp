@@ -132,9 +132,25 @@ void QVLCMenu::createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
 {
     QMenu *manageMenu = new QMenu();
     manageMenu->setTitle( qtr("Operations") );
-    manageMenu->addAction( "Quick &Add File...", THEDP,
-                           SLOT( simpleAppendDialog() ) );
+
+    QMenu *subPlaylist = new QMenu();
+    subPlaylist->setTitle( qtr("Add to current playlist") );
+    subPlaylist->addAction( "&File...", THEDP,
+                           SLOT( simplePLAppendDialog() ) );
+    subPlaylist->addAction( "&Advanced add...", THEDP,
+                           SLOT( PLAppendDialog() ) );
+    manageMenu->addMenu( subPlaylist );
     manageMenu->addSeparator();
+
+    QMenu *subML = new QMenu();
+    subML->setTitle( qtr("Add to Media library") );
+    subML->addAction( "&File...", THEDP,
+                           SLOT( simpleMLAppendDialog() ) );
+    subML->addAction( "&Advanced add...", THEDP,
+                           SLOT( MLAppendDialog() ) );
+    manageMenu->addMenu( subML );
+    manageMenu->addSeparator();
+
 //    manageMenu->addMenu( SDMenu( p_intf ) );
 
     bar->addMenu( manageMenu );

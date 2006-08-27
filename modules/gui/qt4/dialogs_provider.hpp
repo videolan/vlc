@@ -70,9 +70,12 @@ public slots:
     void streaminfoDialog();
     void prefsDialog();
     void messagesDialog();
-    void simpleAppendDialog();
+    void simplePLAppendDialog();
+    void simpleMLAppendDialog();
     void simpleOpenDialog();
     void openDialog();
+    void PLAppendDialog();
+    void MLAppendDialog();
     void openDialog( int );
     void popupMenu( int );
     void doInteraction( intf_dialog_args_t * );

@@ -156,6 +156,11 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf ) : QObject(NULL),
              im, SLOT( setInput( input_thread_t * ) ) );
 }
 
+MainInputManager::~MainInputManager()
+{
+    if( p_input ) vlc_object_release( p_input );
+}
+
 void MainInputManager::updateInput()
 {
     vlc_mutex_lock( &p_intf->change_lock );

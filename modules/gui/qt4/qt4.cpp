@@ -23,6 +23,7 @@
 #include <QApplication>
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
+#include "input_manager.hpp"
 #include "main_interface.hpp"
 
 /*****************************************************************************
@@ -141,6 +142,7 @@ static void Init( intf_thread_t *p_intf )
 
     app->setQuitOnLastWindowClosed( false );
     app->exec();
+    MainInputManager::killInstance();
     delete p_intf->p_sys->p_mi;
 }
 

@@ -480,9 +480,9 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
     if( b_need_update ) return;
 
     PLItem *nodeItem = FindById( rootItem, p_add->i_node );
+    PL_LOCK;
     if( !nodeItem ) goto end;
 
-    PL_LOCK;
     p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
     if( i_depth == 1 && p_item->p_parent &&
