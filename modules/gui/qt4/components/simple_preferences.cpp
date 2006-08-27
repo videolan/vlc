@@ -174,6 +174,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,
                             fontSize );
+            CONFIG_GENERIC( "freetype-effect", IntegerList, NULL, effect );
 
         END_SPREFS_CAT;
 

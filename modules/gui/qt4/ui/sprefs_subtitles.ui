@@ -22,23 +22,6 @@
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="0" column="1" >
-    <widget class="QLineEdit" name="preferedLanguage" />
-   </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Subtitles prefered language</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>Default Encoding</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
@@ -51,16 +34,13 @@
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item row="0" column="1" >
-       <widget class="QLineEdit" name="font" />
+      <item row="3" column="1" colspan="2" >
+       <widget class="QComboBox" name="effect" />
       </item>
-      <item row="1" column="1" colspan="2" >
-       <widget class="QComboBox" name="fontSize" />
-      </item>
-      <item row="0" column="2" >
-       <widget class="QPushButton" name="fontBrowse" >
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_6" >
         <property name="text" >
-         <string>Browse</string>
+         <string>Effect</string>
         </property>
        </widget>
       </item>
@@ -74,12 +54,25 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="1" colspan="2" >
+       <widget class="QComboBox" name="fontSize" />
+      </item>
       <item row="1" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>Font size</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QPushButton" name="fontBrowse" >
+        <property name="text" >
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QLineEdit" name="font" />
       </item>
       <item row="0" column="0" >
        <widget class="QLabel" name="label_5" >
@@ -93,6 +86,23 @@
    </item>
    <item row="1" column="1" >
     <widget class="QComboBox" name="encoding" />
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Default Encoding</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Subtitles prefered language</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" >
+    <widget class="QLineEdit" name="preferedLanguage" />
    </item>
   </layout>
  </widget>
