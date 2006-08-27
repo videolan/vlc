@@ -190,12 +190,12 @@ void MainInterface::setDisplay( float pos, int time, int length )
     secstotimestr( psz_time, time );
     QString title;
     title.sprintf( "%s/%s", psz_time, psz_length );
-    timeLabel->setText( title );
+    timeLabel->setText( " "+title+" " );
 }
 
 void MainInterface::setName( QString name )
 {
-    nameLabel->setText( name );
+    nameLabel->setText( " " + name+" " );
 }
 
 void MainInterface::setStatus( int status )
