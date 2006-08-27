@@ -48,7 +48,7 @@ public:
 #endif
             int pos = (int)(minimum() +
                           (double)(event->x())/width1*(maximum()-minimum()) );
-            setSliderPosition( pos );
+            setValue( pos );
             QSlider::mousePressEvent(event);
         }
     }
