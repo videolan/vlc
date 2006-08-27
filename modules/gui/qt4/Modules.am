@@ -12,7 +12,9 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 TOUI = ui/input_stats ui/main_interface ui/file_open \
-       ui/logindialog ui/inputdialog ui/progressdialog ui/sprefs_trivial
+       ui/logindialog ui/inputdialog ui/progressdialog ui/sprefs_trivial \
+       ui/sprefs_audio ui/sprefs_playlist ui/sprefs_subtitles \
+       ui/sprefs_video
 UIH = $(TOUI:%=%.h)
 
 TOMOC = main_interface \
@@ -138,10 +140,21 @@ EXTRA_DIST += \
 	ui/inputdialog.ui \
 	ui/progressdialog.ui \
 	ui/sprefs_trivial.ui \
+	ui/sprefs_audio.ui \
+	ui/sprefs_video.ui \
+	ui/sprefs_playlist.ui \
+	ui/sprefs_subtitles.ui \
 	pixmaps/advanced.xpm \
 	pixmaps/audio.xpm \
 	pixmaps/codec.xpm \
 	pixmaps/intf.xpm \
 	pixmaps/type_net.xpm \
 	pixmaps/type_playlist.xpm \
-	pixmaps/video.xpm
+	pixmaps/video.xpm \
+	pixmaps/advanced_50x50.xpm \
+	pixmaps/audio_50x50.xpm \
+	pixmaps/input_and_codecs_50x50.xpm \
+	pixmaps/interface_50x50.xpm \
+	pixmaps/playlist_50x50.xpm \
+	pixmaps/subtitles_50x50.xpm \
+	pixmaps/video_50x50.xpm

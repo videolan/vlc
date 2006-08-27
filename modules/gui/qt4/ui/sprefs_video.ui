@@ -2,8 +2,8 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>Form</class>
- <widget class="QWidget" name="Form" >
+ <class>SPrefsVideo</class>
+ <widget class="QWidget" name="SPrefsVideo" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -35,10 +35,10 @@
        <number>6</number>
       </property>
       <item row="0" column="1" colspan="2" >
-       <widget class="QLineEdit" name="lineEdit" />
+       <widget class="QLineEdit" name="snapshotsDirectory" />
       </item>
       <item row="0" column="3" >
-       <widget class="QPushButton" name="pushButton" >
+       <widget class="QPushButton" name="snapshotsDirectoryBrowse" >
         <property name="text" >
          <string>Browse</string>
         </property>
@@ -59,7 +59,7 @@
        </widget>
       </item>
       <item row="1" column="1" >
-       <widget class="QLineEdit" name="lineEdit_2" />
+       <widget class="QLineEdit" name="snapshotsPrefix" />
       </item>
       <item row="2" column="0" >
        <widget class="QLabel" name="label_3" >
@@ -70,10 +70,10 @@
        </widget>
       </item>
       <item row="2" column="1" colspan="3" >
-       <widget class="QComboBox" name="comboBox" />
+       <widget class="QComboBox" name="snapshotsFormat" />
       </item>
       <item row="1" column="2" colspan="2" >
-       <widget class="QCheckBox" name="checkBox_5" >
+       <widget class="QCheckBox" name="snapshotsSequentialNumbering" >
         <property name="text" >
          <string>Sequential numbering</string>
         </property>
@@ -95,7 +95,7 @@
        <number>6</number>
       </property>
       <item row="2" column="1" colspan="2" >
-       <widget class="QComboBox" name="comboBox_2" />
+       <widget class="QComboBox" name="outputModule" />
       </item>
       <item row="2" column="0" >
        <widget class="QLabel" name="label_4" >
@@ -105,28 +105,28 @@
        </widget>
       </item>
       <item row="0" column="0" colspan="2" >
-       <widget class="QCheckBox" name="checkBox_2" >
+       <widget class="QCheckBox" name="fullscreen" >
         <property name="text" >
          <string>Fullscreen</string>
         </property>
        </widget>
       </item>
       <item row="1" column="2" >
-       <widget class="QCheckBox" name="checkBox_6" >
+       <widget class="QCheckBox" name="windowDecorations" >
         <property name="text" >
          <string>Window decorations</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0" colspan="2" >
-       <widget class="QCheckBox" name="checkBox_4" >
+       <widget class="QCheckBox" name="alwaysOnTop" >
         <property name="text" >
          <string>Always on top</string>
         </property>
        </widget>
       </item>
       <item row="0" column="2" >
-       <widget class="QCheckBox" name="checkBox_3" >
+       <widget class="QCheckBox" name="overlay" >
         <property name="text" >
          <string>Overlay video output</string>
         </property>
@@ -136,7 +136,7 @@
     </widget>
    </item>
    <item row="0" column="0" >
-    <widget class="QCheckBox" name="checkBox" >
+    <widget class="QCheckBox" name="enableVideo" >
      <property name="text" >
       <string>Enable video</string>
      </property>

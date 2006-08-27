@@ -41,6 +41,10 @@
 #include "pixmaps/video_50x50.xpm"
 
 #include "ui/sprefs_trivial.h"
+#include "ui/sprefs_audio.h"
+#include "ui/sprefs_video.h"
+#include "ui/sprefs_subtitles.h"
+#include "ui/sprefs_playlist.h"
 
 #define ITEM_HEIGHT 50
 
@@ -115,19 +119,15 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     {
         case SPrefsVideo:
         {
-            Ui::SPrefsTrivial ui;
+            Ui::SPrefsVideo ui;
             ui.setupUi( this );
-            module_config_t *p_config =
-                            config_FindConfig( VLC_OBJECT(p_intf), "memcpy" );
-            ConfigControl *control =
-                            new ModuleConfigControl( VLC_OBJECT(p_intf),
-                            p_config, ui.memcpyLabel, ui.memcpyCombo, false );
-            controls.append( control );
             break;
         }
 
         case SPrefsAudio:
         {
+            Ui::SPrefsAudio ui;
+            ui.setupUi( this );
             break;
         }
 
@@ -138,6 +138,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         case SPrefsPlaylist:
         {
+            Ui::SPrefsPlaylist ui;
+            ui.setupUi( this );
             break;
         }
 
@@ -148,11 +150,21 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         case SPrefsSubtitles:
         {
+            Ui::SPrefsSubtitles ui;
+            ui.setupUi( this );
             break;
         }
 
         case SPrefsAdvanced:
         {
+            Ui::SPrefsTrivial ui;
+            ui.setupUi( this );
+            module_config_t *p_config =
+                            config_FindConfig( VLC_OBJECT(p_intf), "memcpy" );
+            ConfigControl *control =
+                            new ModuleConfigControl( VLC_OBJECT(p_intf),
+                            p_config, ui.memcpyLabel, ui.memcpyCombo, false );
+            controls.append( control );
             break;
         }
     }

@@ -56,7 +56,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      small = new QRadioButton( "Basic", types ); tl->addWidget( small );
      all = new QRadioButton( "All", types ); tl->addWidget( all );
      types->setLayout(tl);
-     all->setChecked( true );
+     small->setChecked( true );
 
      adv_chk = new QCheckBox("Advanced options");
 
