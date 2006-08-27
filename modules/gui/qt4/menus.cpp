@@ -554,7 +554,7 @@ static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object,
 
     if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE )
     {
-        /* Very evil hack ! intf-switch can have only one value */ 
+        /* Very evil hack ! intf-switch can have only one value */
         if( !strcmp( psz_var, "intf-switch" ) ) return FALSE;
         if( val.i_int == 1 && b_root ) return TRUE;
         else return FALSE;
@@ -640,7 +640,6 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
 
     case VLC_VAR_BOOL:
         var_Get( p_object, psz_var, &val );
-        val.b_bool = !val.b_bool;
         CreateAndConnect( menu, psz_var, TEXT_OR_VAR, "", ITEM_CHECK,
                           p_object->i_object_id, val, i_type, val.b_bool );
         break;
@@ -649,7 +648,7 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
 }
 
 
-int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var, 
+int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                                  vlc_object_t *p_object, bool b_root )
 {
     vlc_value_t val, val_list, text_list;
@@ -702,7 +701,6 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         case VLC_VAR_STRING:
           var_Get( p_object, psz_var, &val );
           another_val.psz_string = strdup( CURVAL.psz_string );
-
           menutext = qfu( CURTEXT ? CURTEXT : another_val.psz_string );
           CreateAndConnect( submenu, psz_var, menutext, "", NORMAL_OR_RADIO,
                             p_object->i_object_id, another_val, i_type,
@@ -734,6 +732,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
           break;
         }
     }
+    currentGroup = NULL;
 
     /* clean up everything */
     var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val_list, &text_list );
@@ -758,7 +757,6 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
     if( i_item_type == ITEM_CHECK )
     {
         action->setCheckable( true );
-        currentGroup = NULL;
     }
     else if( i_item_type == ITEM_RADIO )
     {
@@ -767,10 +765,11 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
             currentGroup = new QActionGroup(menu);
         currentGroup->addAction( action );
     }
-    else
-        currentGroup = NULL;
-    if( checked ) action->setChecked( true );
 
+    if( checked )
+    {
+        action->setChecked( true );
+    }
     MenuItemData *itemData = new MenuItemData( i_object_id, i_val_type,
                                                val, psz_var );
     connect( action, SIGNAL(triggered()), THEDP->menusMapper, SLOT(map()) );
