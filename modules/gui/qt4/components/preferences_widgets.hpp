@@ -74,21 +74,26 @@ class VIntConfigControl : public ConfigControl
 public:
     VIntConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) :
             ConfigControl(a,b,c) {};
+    VIntConfigControl( vlc_object_t *a, module_config_t *b ) :
+                ConfigControl(a,b) {};
     virtual ~VIntConfigControl() {};
     virtual int getValue() = 0;
 };
 
-#if 0
 class IntegerConfigControl : public VIntConfigControl
 {
 public:
     IntegerConfigControl( vlc_object_t *, module_config_t *, QWidget * );
-    virtual ~IntegerConfigControl();
+    IntegerConfigControl( vlc_object_t *, module_config_t *,
+                          QLabel*, QSpinBox* );
+    virtual ~IntegerConfigControl() {};
     virtual int getValue();
 private:
     QSpinBox *spin;
+    void finish( QLabel * );
 };
 
+#if 0
 class BoolConfigControl : public VIntConfigControl
 {
 public:
@@ -108,6 +113,8 @@ class VFloatConfigControl : public ConfigControl
 public:
     VFloatConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) :
                 ConfigControl(a,b,c) {};
+    VFloatConfigControl( vlc_object_t *a, module_config_t *b ) :
+                ConfigControl(a,b) {};
     virtual ~VFloatConfigControl() {};
     virtual float getValue() = 0;
 };
@@ -160,7 +167,7 @@ public:
                          bycat );
     ModuleConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                          QComboBox*, bool );
-    virtual ~ModuleConfigControl();
+    virtual ~ModuleConfigControl() {};
     virtual QString getValue();
 private:
     void finish( QLabel *, bool );

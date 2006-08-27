@@ -53,13 +53,13 @@ void InputManager::setInput( input_thread_t *_p_input )
 void InputManager::update()
 {
     /// \todo Emit the signals only if it changed
-    if( !p_input || p_input->b_die ) return;
+    if( !p_input  ) return;
 
-    if( p_input->b_dead )
+    if( p_input->b_dead || p_input->b_die )
     {
         emit positionUpdated( 0.0, 0, 0 );
         emit navigationChanged( 0 );
-        emit statusChanged( 0 ); // 0 = STOPPED, 1 = PAUSE, 2 = PLAY
+        emit statusChanged( 0 ); // 0 = STOPPED, 1 = PLAY, 2 = PAUSE
     }
 
     /* Update position */

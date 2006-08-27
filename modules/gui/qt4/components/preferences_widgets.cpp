@@ -60,6 +60,14 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         else
             fprintf(stderr, "TODO\n" );
         break;
+    case CONFIG_ITEM_INTEGER:
+        if( p_item->i_list )
+            fprintf( stderr, "Todo\n" );
+        else if( p_item->i_min || p_item->i_max )
+            fprintf( stderr, "Todo\n" );
+        else
+            p_control = new IntegerConfigControl( p_this, p_item, parent );
+        break;
     default:
         break;
     }
@@ -96,6 +104,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
 
 void StringConfigControl::finish( QLabel *label )
 {
+    text->setText( qfu(p_item->psz_value) );
     text->setToolTip( qfu(p_item->psz_longtext) );
     label->setToolTip( qfu(p_item->psz_longtext) );
 }
@@ -165,9 +174,46 @@ void ModuleConfigControl::finish( QLabel *label, bool bycat )
     label->setToolTip( qfu(p_item->psz_longtext) );
 }
 
-ModuleConfigControl::~ModuleConfigControl() {};
-
 QString ModuleConfigControl::getValue()
 {
     return combo->itemData( combo->currentIndex() ).toString();
+}
+
+/**************************************************************************
+ * Integer-based controls
+ *************************************************************************/
+
+/*********** Integer **************/
+IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
+                                            module_config_t *_p_item,
+                                            QWidget *_parent ) :
+                           VIntConfigControl( _p_this, _p_item, _parent )
+{
+    QLabel *label = new QLabel( qfu(p_item->psz_text) );
+    spin = new QSpinBox;
+    finish( label );
+
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->addWidget( label, 0 ); layout->addWidget( spin, 1 );
+    widget->setLayout( layout );
+}
+IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
+                                            module_config_t *_p_item,
+                                            QLabel *label, QSpinBox *_spin ) :
+                                      VIntConfigControl( _p_this, _p_item )
+{
+    spin = _spin;
+    finish(label);
+}
+
+void IntegerConfigControl::finish( QLabel *label )
+{
+    spin->setValue( p_item->i_value );
+    spin->setToolTip( qfu(p_item->psz_longtext) );
+    label->setToolTip( qfu(p_item->psz_longtext) );
+}
+
+int IntegerConfigControl::getValue()
+{
+    return spin->value();
 }
