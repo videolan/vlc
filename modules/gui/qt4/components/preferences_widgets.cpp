@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Antoine Cellerier <dionoea@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,11 +71,13 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
             p_control = new StringConfigControl( p_this, p_item, parent,
                                                  l, line, false );
         else
-            fprintf(stderr, "TODO\n" );
+            p_control = new StringListConfigControl( p_this, p_item,
+                                            parent, false, l, line );
         break;
     case CONFIG_ITEM_INTEGER:
         if( p_item->i_list )
-            fprintf( stderr, "Todo\n" );
+            p_control = new IntegerListConfigControl( p_this, p_item,
+                                            parent, false, l, line );
         else if( p_item->i_min || p_item->i_max )
             fprintf( stderr, "Todo\n" );
         else
@@ -128,7 +131,62 @@ void StringConfigControl::finish()
 {
     text->setText( qfu(p_item->psz_value) );
     text->setToolTip( qfu(p_item->psz_longtext) );
-    label->setToolTip( qfu(p_item->psz_longtext) );
+    if( label )
+        label->setToolTip( qfu(p_item->psz_longtext) );
+}
+
+/********* String / choice list **********/
+StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
+               module_config_t *_p_item, QWidget *_parent, bool bycat,
+               QGridLayout *l, int line) :
+               VStringConfigControl( _p_this, _p_item, _parent )
+{
+    label = new QLabel( qfu(p_item->psz_text) );
+    combo = new QComboBox();
+    finish( bycat );
+    if( !l )
+    {
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget( label ); layout->addWidget( combo );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( label, line, 0 );
+        l->addWidget( combo, line, 1, Qt::AlignRight );
+    }
+}
+StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
+                module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
+                bool bycat ) : VStringConfigControl( _p_this, _p_item )
+{
+    combo = _combo;
+    label = _label;
+    finish( bycat );
+}
+
+void StringListConfigControl::finish( bool bycat )
+{
+    combo->setEditable( false );
+
+    for( int i_index = 0; i_index < p_item->i_list; i_index++ )
+    {
+        combo->addItem( qfu(p_item->ppsz_list_text ?
+                            p_item->ppsz_list_text[i_index] :
+                            p_item->ppsz_list[i_index] ),
+                        QVariant( p_item->ppsz_list[i_index] ) );
+        if( p_item->psz_value && !strcmp( p_item->psz_value,
+                                          p_item->ppsz_list[i_index] ) )
+            combo->setCurrentIndex( combo->count() - 1 );
+    }
+    combo->setToolTip( qfu(p_item->psz_longtext) );
+    if( label )
+        label->setToolTip( qfu(p_item->psz_longtext) );
+}
+
+QString StringListConfigControl::getValue()
+{
+    return combo->itemData( combo->currentIndex() ).toString();
 }
 
 /********* Module **********/
@@ -203,7 +261,8 @@ void ModuleConfigControl::finish( bool bycat )
     }
     vlc_list_release( p_list );
     combo->setToolTip( qfu(p_item->psz_longtext) );
-    label->setToolTip( qfu(p_item->psz_longtext) );
+    if( label )
+        label->setToolTip( qfu(p_item->psz_longtext) );
 }
 
 QString ModuleConfigControl::getValue()
@@ -254,10 +313,62 @@ void IntegerConfigControl::finish()
     spin->setMaximum( 2000000000 );
     spin->setValue( p_item->i_value );
     spin->setToolTip( qfu(p_item->psz_longtext) );
-    label->setToolTip( qfu(p_item->psz_longtext) );
+    if( label )
+        label->setToolTip( qfu(p_item->psz_longtext) );
 }
 
 int IntegerConfigControl::getValue()
 {
     return spin->value();
+}
+
+/********* Integer / choice list **********/
+IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
+               module_config_t *_p_item, QWidget *_parent, bool bycat,
+               QGridLayout *l, int line) :
+               VIntConfigControl( _p_this, _p_item, _parent )
+{
+    label = new QLabel( qfu(p_item->psz_text) );
+    combo = new QComboBox();
+    finish( bycat );
+    if( !l )
+    {
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget( label ); layout->addWidget( combo );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( label, line, 0 );
+        l->addWidget( combo, line, 1, Qt::AlignRight );
+    }
+}
+IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
+                module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
+                bool bycat ) : VIntConfigControl( _p_this, _p_item )
+{
+    combo = _combo;
+    label = _label;
+    finish( bycat );
+}
+
+void IntegerListConfigControl::finish( bool bycat )
+{
+    combo->setEditable( false );
+
+    for( int i_index = 0; i_index < p_item->i_list; i_index++ )
+    {
+        combo->addItem( qfu(p_item->ppsz_list_text[i_index] ),
+                        QVariant( p_item->pi_list[i_index] ) );
+        if( p_item->i_value == p_item->pi_list[i_index] )
+            combo->setCurrentIndex( combo->count() - 1 );
+    }
+    combo->setToolTip( qfu(p_item->psz_longtext) );
+    if( label )
+        label->setToolTip( qfu(p_item->psz_longtext) );
+}
+
+int IntegerListConfigControl::getValue()
+{
+    return combo->itemData( combo->currentIndex() ).toInt();
 }

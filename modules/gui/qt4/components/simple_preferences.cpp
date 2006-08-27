@@ -107,58 +107,56 @@ void SPrefsCatList::DoAll( bool doclean )
 SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                           int number ) : QWidget( _parent ), p_intf( _p_intf )
 {
+    module_config_t *p_config;
+    ConfigControl *control;
+
+#define CONFIG_GENERIC( option, type, label, qcontrol )                   \
+            p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
+            if( p_config )                                                \
+            {                                                             \
+                control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
+                           p_config, label, ui.qcontrol, false );         \
+                controls.append( control );                               \
+            }
+
+#define START_SPREFS_CAT( name )    \
+        case SPrefs ## name:        \
+        {                           \
+            Ui::SPrefs ## name ui;  \
+            ui.setupUi( this );
+
+#define END_SPREFS_CAT      \
+            break;          \
+        }
+
+
     switch( number )
     {
-        case SPrefsVideo:
-        {
-            Ui::SPrefsVideo ui;
-            ui.setupUi( this );
-            break;
-        }
+        START_SPREFS_CAT( Video );
+        END_SPREFS_CAT;
 
-        case SPrefsAudio:
-        {
-            Ui::SPrefsAudio ui;
-            ui.setupUi( this );
-            break;
-        }
+        START_SPREFS_CAT( Audio );
+        END_SPREFS_CAT;
 
-        case SPrefsInputAndCodecs:
-        {
-            break;
-        }
+        case SPrefsInputAndCodecs: break;
 
-        case SPrefsPlaylist:
-        {
-            Ui::SPrefsPlaylist ui;
-            ui.setupUi( this );
-            break;
-        }
+        START_SPREFS_CAT( Playlist );
+        END_SPREFS_CAT;
 
-        case SPrefsInterface:
-        {
-            break;
-        }
+        case SPrefsInterface: break;
 
-        case SPrefsSubtitles:
-        {
-            Ui::SPrefsSubtitles ui;
-            ui.setupUi( this );
-            break;
-        }
+        START_SPREFS_CAT( Subtitles );
 
-        case SPrefsAdvanced:
-        {
-            Ui::SPrefsTrivial ui;
-            ui.setupUi( this );
-            module_config_t *p_config =
-                            config_FindConfig( VLC_OBJECT(p_intf), "memcpy" );
-            ConfigControl *control =
-                            new ModuleConfigControl( VLC_OBJECT(p_intf),
-                            p_config, ui.memcpyLabel, ui.memcpyCombo, false );
-            controls.append( control );
-            break;
-        }
+            CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
+            CONFIG_GENERIC( "sub-language", String, NULL, preferedLanguage );
+            CONFIG_GENERIC( "freetype-font", String, NULL, font );
+            CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
+            CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,
+                            fontSize );
+
+        END_SPREFS_CAT;
+
+        case SPrefsAdvanced: break;
     }
 }
 

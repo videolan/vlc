@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Antoine Cellerier <dionoea@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,6 +105,23 @@ private:
     void finish();
 };
 
+class IntegerListConfigControl : public VIntConfigControl
+{
+public:
+    IntegerListConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                              bool, QGridLayout*, int );
+    IntegerListConfigControl( vlc_object_t *, module_config_t *, QLabel *,
+                              QComboBox*, bool );
+    virtual ~IntegerListConfigControl() {};
+    virtual int getValue();
+    virtual void hide() { combo->hide(); label->hide(); }
+    virtual void show() { combo->show(); label->show(); }
+private:
+    void finish( bool );
+    QLabel *label;
+    QComboBox *combo;
+};
+
 #if 0
 class BoolConfigControl : public VIntConfigControl
 {
@@ -182,6 +200,23 @@ public:
     ModuleConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                          QComboBox*, bool );
     virtual ~ModuleConfigControl() {};
+    virtual QString getValue();
+    virtual void hide() { combo->hide(); label->hide(); }
+    virtual void show() { combo->show(); label->show(); }
+private:
+    void finish( bool );
+    QLabel *label;
+    QComboBox *combo;
+};
+
+class StringListConfigControl : public VStringConfigControl
+{
+public:
+    StringListConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                             bool, QGridLayout*, int );
+    StringListConfigControl( vlc_object_t *, module_config_t *, QLabel *,
+                             QComboBox*, bool );
+    virtual ~StringListConfigControl() {};
     virtual QString getValue();
     virtual void hide() { combo->hide(); label->hide(); }
     virtual void show() { combo->show(); label->show(); }
