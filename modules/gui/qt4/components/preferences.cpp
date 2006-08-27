@@ -46,6 +46,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QGridLayout>
 #include <QHeaderView>
 
 #define ITEM_HEIGHT 25
@@ -414,13 +415,14 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     global_layout->addWidget( help );
 
     QGroupBox *box = NULL;
-    QVBoxLayout *boxlayout = NULL;
+    QGridLayout *boxlayout = NULL;
 
     QScrollArea *scroller= new QScrollArea;
     scroller->setFrameStyle( QFrame::NoFrame );
     QWidget *scrolled_area = new QWidget;
 
-    QVBoxLayout *layout = new QVBoxLayout();
+    QGridLayout *layout = new QGridLayout();
+    int i_line = 0, i_boxline = 0;
 
     if( p_item ) do
     {
@@ -438,24 +440,29 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             if( box )
             {
                 box->setLayout( boxlayout );
-                layout->addWidget( box, 1 );
+                layout->addWidget( box, i_line, 0, 1, 2 );
+                i_line++;
             }
             box = new QGroupBox( qfu(p_item->psz_text) );
-            boxlayout = new QVBoxLayout();
+            boxlayout = new QGridLayout();
         }
-
-        ConfigControl *control = ConfigControl::createControl(
-                                    VLC_OBJECT( p_intf ), p_item,
-                                    NULL );
+        ConfigControl *control;
+        if( ! box )
+        {
+            control = ConfigControl::createControl( VLC_OBJECT( p_intf ),
+                                        p_item, NULL, layout, i_line );
+        }
+        else
+        {
+            control = ConfigControl::createControl( VLC_OBJECT( p_intf ),
+                                    p_item, NULL, boxlayout, i_boxline );
+        }
         if( !control )
         {
             continue;
         }
-        if( !box )
-            layout->addWidget( control->getWidget() );
-        else
-            boxlayout->addWidget( control->getWidget() );
-
+        if( box ) i_boxline++;
+        else i_line++;
         controls.append( control );
     }
     while( !(p_item->i_type == CONFIG_HINT_END ||
@@ -467,7 +474,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     if( box )
     {
         box->setLayout( boxlayout );
-        layout->addWidget( box, 1 );
+        layout->addWidget( box, i_line, 0, 1, 2 );
     }
 
     vlc_object_release( p_module );
@@ -527,8 +534,13 @@ void PrefsPanel::setAdvanced( bool adv, bool force )
     {
         if( (*i)->isAdvanced() )
         {
-            if( !advanced ) some_hidden = true;
-            (*i)->getWidget()->setVisible( advanced );
+            if( !advanced )
+            {
+                some_hidden = true;
+                (*i)->hide();
+            }
+            else
+                (*i)->show();
         }
     }
     if( some_hidden_text )

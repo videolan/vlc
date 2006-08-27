@@ -26,6 +26,8 @@
 #include <vlc/vlc.h>
 #include <QWidget>
 #include <QLineEdit>
+#include <QSpinBox>
+#include <QComboBox>
 #include "ui/input_stats.h"
 #include "qt4.hpp"
 #include <assert.h>
@@ -53,9 +55,14 @@ public:
     QString getName() { return qfu( p_item->psz_name ); }
     QWidget *getWidget() { assert( widget ); return widget; }
     bool isAdvanced() { return p_item->b_advanced; }
+    virtual void hide() { getWidget()->hide(); };
+    virtual void show() { getWidget()->show(); };
 
     static ConfigControl * createControl( vlc_object_t*,
                                           module_config_t*,QWidget* );
+    static ConfigControl * createControl( vlc_object_t*,
+                                          module_config_t*,QWidget*,
+                                          QGridLayout *, int);
 protected:
     vlc_object_t *p_this;
     module_config_t *p_item;
@@ -83,14 +90,18 @@ public:
 class IntegerConfigControl : public VIntConfigControl
 {
 public:
-    IntegerConfigControl( vlc_object_t *, module_config_t *, QWidget * );
+    IntegerConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                          QGridLayout *, int );
     IntegerConfigControl( vlc_object_t *, module_config_t *,
                           QLabel*, QSpinBox* );
     virtual ~IntegerConfigControl() {};
     virtual int getValue();
+    virtual void show() { spin->show(); label->show(); }
+    virtual void hide() { spin->hide(); label->hide(); }
 private:
     QSpinBox *spin;
-    void finish( QLabel * );
+    QLabel *label;
+    void finish();
 };
 
 #if 0
@@ -150,27 +161,33 @@ class StringConfigControl : public VStringConfigControl
 {
 public:
     StringConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                         bool pwd );
+                         QGridLayout *, int,  bool pwd );
     StringConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                          QLineEdit*,  bool pwd );
     virtual ~StringConfigControl() {};
     virtual QString getValue() { return text->text(); };
+    virtual void show() { text->show(); label->show(); }
+    virtual void hide() { text->hide(); label->hide(); }
 private:
-    void finish( QLabel * );
+    void finish();
     QLineEdit *text;
+    QLabel *label;
 };
 
 class ModuleConfigControl : public VStringConfigControl
 {
 public:
-    ModuleConfigControl( vlc_object_t *, module_config_t *, QWidget *, bool
-                         bycat );
+    ModuleConfigControl( vlc_object_t *, module_config_t *, QWidget *, bool,
+                         QGridLayout*, int );
     ModuleConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                          QComboBox*, bool );
     virtual ~ModuleConfigControl() {};
     virtual QString getValue();
+    virtual void hide() { combo->hide(); label->hide(); }
+    virtual void show() { combo->show(); label->show(); }
 private:
-    void finish( QLabel *, bool );
+    void finish( bool );
+    QLabel *label;
     QComboBox *combo;
 };
 #if 0

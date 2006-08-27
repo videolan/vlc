@@ -38,10 +38,19 @@
 #include <QDoubleSpinBox>
 #include <QVariant>
 #include <QComboBox>
+#include <QGridLayout>
 
 ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
                                              module_config_t *p_item,
                                              QWidget *parent )
+{
+    return createControl( p_this, p_item, parent, NULL, 0 );
+}
+
+ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
+                                             module_config_t *p_item,
+                                             QWidget *parent,
+                                             QGridLayout *l, int line )
 {
     ConfigControl *p_control = NULL;
     if( p_item->psz_current ) return NULL;
@@ -49,14 +58,17 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     switch( p_item->i_type )
     {
     case CONFIG_ITEM_MODULE:
-        p_control = new ModuleConfigControl( p_this, p_item, parent, false );
+        p_control = new ModuleConfigControl( p_this, p_item, parent, false,
+                                             l, line );
         break;
     case CONFIG_ITEM_MODULE_CAT:
-        p_control = new ModuleConfigControl( p_this, p_item, parent, true );
+        p_control = new ModuleConfigControl( p_this, p_item, parent, true,
+                                             l, line );
         break;
     case CONFIG_ITEM_STRING:
         if( !p_item->i_list )
-            p_control = new StringConfigControl( p_this, p_item, parent,false );
+            p_control = new StringConfigControl( p_this, p_item, parent,
+                                                 l, line, false );
         else
             fprintf(stderr, "TODO\n" );
         break;
@@ -66,7 +78,8 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         else if( p_item->i_min || p_item->i_max )
             fprintf( stderr, "Todo\n" );
         else
-            p_control = new IntegerConfigControl( p_this, p_item, parent );
+            p_control = new IntegerConfigControl( p_this, p_item, parent,
+                                                  l, line );
         break;
     default:
         break;
@@ -81,28 +94,37 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
 /*********** String **************/
 StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
                                           module_config_t *_p_item,
-                                          QWidget *_parent, bool pwd ) :
+                                          QWidget *_parent, QGridLayout *l,
+                                          int line, bool pwd ) :
                            VStringConfigControl( _p_this, _p_item, _parent )
 {
-    QLabel *label = new QLabel( qfu(p_item->psz_text) );
+    label = new QLabel( qfu(p_item->psz_text) );
     text = new QLineEdit( qfu(p_item->psz_value) );
-    finish(label);
+    finish();
 
-    QHBoxLayout *layout = new QHBoxLayout();
-    layout->addWidget( label, 0 ); layout->addWidget( text, 1 );
-    widget->setLayout( layout );
+    if( !l )
+    {
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget( label, 0 ); layout->addWidget( text, 1 );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( label, line, 0 ); l->addWidget( text, line, 1 );
+    }
 }
 
 StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
                                    module_config_t *_p_item,
-                                   QLabel *label, QLineEdit *_text, bool pwd ):
+                                   QLabel *_label, QLineEdit *_text, bool pwd ):
                            VStringConfigControl( _p_this, _p_item )
 {
     text = _text;
-    finish( label );
+    label = _label;
+    finish( );
 }
 
-void StringConfigControl::finish( QLabel *label )
+void StringConfigControl::finish()
 {
     text->setText( qfu(p_item->psz_value) );
     text->setToolTip( qfu(p_item->psz_longtext) );
@@ -111,25 +133,35 @@ void StringConfigControl::finish( QLabel *label )
 
 /********* Module **********/
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
-                module_config_t *_p_item, QWidget *_parent,
-                bool bycat ) : VStringConfigControl( _p_this, _p_item, _parent )
+               module_config_t *_p_item, QWidget *_parent, bool bycat,
+               QGridLayout *l, int line) :
+               VStringConfigControl( _p_this, _p_item, _parent )
 {
-    QLabel *label = new QLabel( qfu(p_item->psz_text) );
+    label = new QLabel( qfu(p_item->psz_text) );
     combo = new QComboBox();
-    finish( label, bycat );
-    QHBoxLayout *layout = new QHBoxLayout();
-    layout->addWidget( label ); layout->addWidget( combo );
-    widget->setLayout( layout );
+    finish( bycat );
+    if( !l )
+    {
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget( label ); layout->addWidget( combo );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( label, line, 0 );
+        l->addWidget( combo, line, 1, Qt::AlignRight );
+    }
 }
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
-                module_config_t *_p_item, QLabel *label, QComboBox *_combo,
+                module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
                 bool bycat ) : VStringConfigControl( _p_this, _p_item )
 {
     combo = _combo;
-    finish( label, bycat );
+    label = _label;
+    finish( bycat );
 }
 
-void ModuleConfigControl::finish( QLabel *label, bool bycat )
+void ModuleConfigControl::finish( bool bycat )
 {
     vlc_list_t *p_list;
     module_t *p_parser;
@@ -186,28 +218,40 @@ QString ModuleConfigControl::getValue()
 /*********** Integer **************/
 IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
                                             module_config_t *_p_item,
-                                            QWidget *_parent ) :
+                                            QWidget *_parent, QGridLayout *l,
+                                            int line ) :
                            VIntConfigControl( _p_this, _p_item, _parent )
 {
-    QLabel *label = new QLabel( qfu(p_item->psz_text) );
-    spin = new QSpinBox;
-    finish( label );
+    label = new QLabel( qfu(p_item->psz_text) );
+    spin = new QSpinBox; spin->setMinimumWidth( 80 );
+    spin->setMaximumWidth( 90 );
+    finish();
 
-    QHBoxLayout *layout = new QHBoxLayout();
-    layout->addWidget( label, 0 ); layout->addWidget( spin, 1 );
-    widget->setLayout( layout );
+    if( !l )
+    {
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget( label, 0 ); layout->addWidget( spin, 1 );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( label, line, 0 );
+        l->addWidget( spin, line, 1, Qt::AlignRight );
+    }
 }
 IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
                                             module_config_t *_p_item,
-                                            QLabel *label, QSpinBox *_spin ) :
+                                            QLabel *_label, QSpinBox *_spin ) :
                                       VIntConfigControl( _p_this, _p_item )
 {
     spin = _spin;
-    finish(label);
+    label = _label;
+    finish();
 }
 
-void IntegerConfigControl::finish( QLabel *label )
+void IntegerConfigControl::finish()
 {
+    spin->setMaximum( 2000000000 );
     spin->setValue( p_item->i_value );
     spin->setToolTip( qfu(p_item->psz_longtext) );
     label->setToolTip( qfu(p_item->psz_longtext) );
