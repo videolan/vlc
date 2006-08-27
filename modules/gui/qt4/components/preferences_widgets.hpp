@@ -29,14 +29,10 @@
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QComboBox>
+#include <QCheckBox>
 #include "ui/input_stats.h"
 #include "qt4.hpp"
 #include <assert.h>
-
-class QSpinBox;
-class QString;
-class QComboBox;
-class QCheckBox;
 
 class ConfigControl : public QObject
 {
@@ -122,17 +118,21 @@ private:
     QComboBox *combo;
 };
 
-#if 0
 class BoolConfigControl : public VIntConfigControl
 {
 public:
-    IntConfigControl( vlc_object_t *, module_config_t *, QWidget * );
-    virtual ~IntConfigControl();
+    BoolConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                       QGridLayout *, int );
+    BoolConfigControl( vlc_object_t *, module_config_t *,
+                       QLabel *, QCheckBox*, bool );
+    virtual ~BoolConfigControl() {};
     virtual int getValue();
+    virtual void show() { checkbox->show(); }
+    virtual void hide() { checkbox->hide(); }
 private:
-    wxCheckBox *checkbox;
+    QCheckBox *checkbox;
+    void finish();
 };
-#endif
 
 /*******************************************************
  * Float-based controls

@@ -133,9 +133,30 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     switch( number )
     {
         START_SPREFS_CAT( Video );
+
+            CONFIG_GENERIC( "video", Bool, NULL, enableVideo );
+
+            CONFIG_GENERIC( "fullscreen", Bool, NULL, fullscreen );
+            CONFIG_GENERIC( "overlay", Bool, NULL, overlay );
+            CONFIG_GENERIC( "video-on-top", Bool, NULL, alwaysOnTop );
+            CONFIG_GENERIC( "video-deco", Bool, NULL, windowDecorations );
+
+            CONFIG_GENERIC( "vout", Module, NULL, outputModule );
+
+            CONFIG_GENERIC( "snapshot-path", String, NULL,
+            snapshotsDirectory ); /* FIXME -> use file instead of string */
+            CONFIG_GENERIC( "snapshot-prefix", String, NULL, snapshotsPrefix );
+            CONFIG_GENERIC( "snapshot-sequential", Bool, NULL,
+                            snapshotsSequentialNumbering );
+            CONFIG_GENERIC( "snapshot-format", StringList, NULL,
+                            snapshotsFormat );
+
         END_SPREFS_CAT;
 
         START_SPREFS_CAT( Audio );
+
+            CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
+
         END_SPREFS_CAT;
 
         case SPrefsInputAndCodecs: break;
@@ -149,7 +170,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
             CONFIG_GENERIC( "sub-language", String, NULL, preferedLanguage );
-            CONFIG_GENERIC( "freetype-font", String, NULL, font );
+            CONFIG_GENERIC( "freetype-font", String, NULL, font ); /* FIXME -> use file instead of string */
             CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,
                             fontSize );

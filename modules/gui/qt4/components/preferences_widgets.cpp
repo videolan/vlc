@@ -84,6 +84,18 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
             p_control = new IntegerConfigControl( p_this, p_item, parent,
                                                   l, line );
         break;
+    case CONFIG_ITEM_FILE:
+        fprintf( stderr, "Todo\n" );
+        break;
+    case CONFIG_ITEM_BOOL:
+        p_control = new BoolConfigControl( p_this, p_item, parent, l, line );
+        break;
+    case CONFIG_ITEM_FLOAT:
+        if( p_item->f_min || p_item->f_max )
+            fprintf( stderr, "Todo\n" );
+        else
+            fprintf( stderr, "Todo\n" );
+        break;
     default:
         break;
     }
@@ -371,4 +383,48 @@ void IntegerListConfigControl::finish( bool bycat )
 int IntegerListConfigControl::getValue()
 {
     return combo->itemData( combo->currentIndex() ).toInt();
+}
+
+/*********** Boolean **************/
+BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
+                                      module_config_t *_p_item,
+                                      QWidget *_parent, QGridLayout *l,
+                                      int line ) :
+                    VIntConfigControl( _p_this, _p_item, _parent )
+{
+    checkbox = new QCheckBox( qfu(p_item->psz_text) );
+    finish();
+
+    if( !l )
+    {
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget( checkbox, 0 );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( checkbox, line, 0 );
+    }
+}
+BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
+                                      module_config_t *_p_item,
+                                      QLabel *_label,
+                                      QCheckBox *_checkbox,
+                                      bool bycat ) :
+                   VIntConfigControl( _p_this, _p_item )
+{
+    checkbox = _checkbox;
+    finish();
+}
+
+void BoolConfigControl::finish()
+{
+    checkbox->setCheckState( p_item->i_value == VLC_TRUE ? Qt::Checked
+                                                        : Qt::Unchecked );
+    checkbox->setToolTip( qfu(p_item->psz_longtext) );
+}
+
+int BoolConfigControl::getValue()
+{
+    return checkbox->checkState() == Qt::Checked ? VLC_TRUE : VLC_FALSE;
 }
