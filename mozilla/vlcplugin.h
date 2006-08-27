@@ -38,7 +38,6 @@
 #undef XP_UNIX
 #endif
 
-#if 0
 #ifdef XP_WIN
     /* Windows stuff */
 #endif
@@ -53,7 +52,6 @@
 #   include <X11/Xlib.h>
 #   include <X11/Intrinsic.h>
 #   include <X11/StringDefs.h>
-#endif
 #endif
 
 class VlcPlugin

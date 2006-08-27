@@ -51,8 +51,6 @@
  * Unix-only declarations
 ******************************************************************************/
 #ifdef XP_UNIX
-#   define VOUT_PLUGINS "xvideo,x11,dummy"
-#   define AOUT_PLUGINS "esd,arts,alsa,oss,dummy"
 
 static void Redraw( Widget w, XtPointer closure, XEvent *event );
 static void Resize( Widget w, XtPointer closure, XEvent *event );
@@ -63,16 +61,12 @@ static void Resize( Widget w, XtPointer closure, XEvent *event );
  * MacOS-only declarations
 ******************************************************************************/
 #ifdef XP_MACOSX
-#   define VOUT_PLUGINS "opengl,macosx,dummy"
-#   define AOUT_PLUGINS "auhal,macosx,dummy"
 #endif
 
 /*****************************************************************************
  * Windows-only declarations
  *****************************************************************************/
 #ifdef XP_WIN
-#   define VOUT_PLUGINS "directx,wingdi,dummy"
-#   define AOUT_PLUGINS "directx,waveout,dummy"
 
 static LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpar );
 
@@ -311,18 +305,17 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
      *  size changes, etc.
      */
 
-    libvlc_drawable_t drawable;
     const NPWindow *curwin = p_plugin->getWindow();
 
 #ifdef XP_MACOSX
     if( window && window->window )
     {
         /* check if plugin has a new parent window */
-        drawable = (libvlc_drawable_t)(((NP_Port*) (window->window))->port);
-        if( !curwin->window || drawable != (libvlc_drawable_t)(((NP_Port*) (curwin->window))->port) )
+        CGrafPtr drawable = (((NP_Port*) (window->window))->port);
+        if( !curwin->window || drawable != (((NP_Port*) (curwin->window))->port) )
         {
             /* set/change parent window */
-            libvlc_video_set_parent(p_vlc, drawable, NULL);
+            libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, NULL);
         }
 
         /* as MacOS X video output is windowless, set viewport */
@@ -354,9 +347,8 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     if( window && window->window )
     {
         /* check if plugin has a new parent window */
-        /* FIXME: this cast sucks */
-        drawable = (libvlc_drawable_t) (HWND) (window->window);
-        if( !curwin->window || drawable != (libvlc_drawable_t)(HWND) (curwin->window) )
+        HWND drawable = (HWND) (window->window);
+        if( !curwin->window || drawable != curwin->window )
         {
             /* reset previous window settings */
             HWND oldwin = (HWND)p_plugin->getWindow()->window;
@@ -367,7 +359,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
                 SetWindowLong( oldwin, GWL_WNDPROC, (LONG)oldproc );
             }
             /* install our WNDPROC */
-            p_plugin->setWindowProc( (WNDPROC)SetWindowLong( (HWND)drawable,
+            p_plugin->setWindowProc( (WNDPROC)SetWindowLong( drawable,
                                                            GWL_WNDPROC, (LONG)Manage ) );
 
             /* attach our plugin object */
@@ -379,7 +371,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             SetWindowLong((HWND)drawable, GWL_STYLE, style);
 
             /* change/set parent */
-            libvlc_video_set_parent(p_vlc, drawable, NULL);
+            libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, NULL);
         }
 
         /* remember window details */
@@ -403,19 +395,22 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 #ifdef XP_UNIX
     if( window && window->window )
     {
-        Window  win   = (Window) window->window;
-        Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
+        Window  drawable   = (Window) window->window;
+	if( !curwin->window || drawable != (Window)curwin->window )
+	{
+	    Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
 
-        XResizeWindow( p_display, win, window->width, window->height );
-        Widget w = XtWindowToWidget( p_display, window );
+	    XResizeWindow( p_display, drawable, window->width, window->height );
+	    Widget w = XtWindowToWidget( p_display, drawable );
 
-        XtAddEventHandler( w, ExposureMask, FALSE, (XtEventHandler)Redraw, p_plugin );
-        XtAddEventHandler( w, StructureNotifyMask, FALSE, (XtEventHandler)Resize, p_plugin );
+	    XtAddEventHandler( w, ExposureMask, FALSE, (XtEventHandler)Redraw, p_plugin );
+	    XtAddEventHandler( w, StructureNotifyMask, FALSE, (XtEventHandler)Resize, p_plugin );
 
-        /* remember window */
-        p_plugin->setWindow(window);
+	    /* remember window */
+	    p_plugin->setWindow(window);
 
-        Redraw( w, (XtPointer)p_plugin, NULL );
+	    Redraw( w, (XtPointer)p_plugin, NULL );
+	}
     }
 #endif /* XP_UNIX */
 
@@ -662,19 +657,19 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     GC gc;
     XGCValues gcv;
 
-    Window  w   = (Window) window->window;
+    Window  drawable   = (Window) window->window;
     Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
 
     gcv.foreground = BlackPixel( p_display, 0 );
-    gc = XCreateGC( p_display, w, GCForeground, &gcv );
+    gc = XCreateGC( p_display, drawable, GCForeground, &gcv );
 
-    XFillRectangle( p_display, w, gc,
+    XFillRectangle( p_display, drawable, gc,
                     0, 0, window->width, window->height );
 
     gcv.foreground = WhitePixel( p_display, 0 );
     XChangeGC( p_display, gc, GCForeground, &gcv );
 
-    XDrawString( p_display, w, gc,
+    XDrawString( p_display, drawable, gc,
                  window->width / 2 - 40, window->height / 2,
                  WINDOW_TEXT, strlen(WINDOW_TEXT) );
 
@@ -685,7 +680,7 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
 {
     VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(closure);
     const NPWindow *window = p_plugin->getWindow();
-    Window  w   = (Window) window->window;
+    Window  drawable   = (Window) window->window;
     Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
 
     int i_ret;
@@ -712,13 +707,13 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
     }
 
 
-    i_ret = XResizeWindow( p_display, w, window->i_width, window->i_height );
+    i_ret = XResizeWindow( p_display, drawable, window->width, window->height );
 
 #ifdef X11_RESIZE_DEBUG
     fprintf( stderr,
              "vlcshell::Resize() XResizeWindow(owner) returned %d\n", i_ret );
 
-    XGetWindowAttributes ( p_display, w, &attr );
+    XGetWindowAttributes ( p_display, drawable, &attr );
 
     /* X is asynchronous, so the current size reported here is not
        necessarily the requested size as the Resize request may not
@@ -727,7 +722,7 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
              attr.width, attr.height );
 #endif /* X11_RESIZE_DEBUG */
 
-    XQueryTree( p_display, w,
+    XQueryTree( p_display, drawable,
                 &root_return, &parent_return, &children_return,
                 &i_nchildren );
 
@@ -751,7 +746,7 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
                  "vlcshell::Resize() XResizeWindow(base) returned %d\n",
                  i_ret );
 
-        XGetWindowAttributes( p_plugin->p_display, base_window, &attr );
+        XGetWindowAttributes( p_display, base_window, &attr );
 
         fprintf( stderr, "vlcshell::Resize() new size %d x %d\n",
                  attr.width, attr.height );

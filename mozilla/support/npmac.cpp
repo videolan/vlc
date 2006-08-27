@@ -94,7 +94,7 @@
 #endif
 
 
-#ifdef XP_MACOSX && !TARGET_RT_MAC_CFM
+#if defined(XP_MACOSX) && defined(__POWERPC__) && (!defined(TARGET_RT_MAC_CFM))
 
 // glue for mapping outgoing Macho function pointers to TVectors
 struct TFPtoTVGlue{

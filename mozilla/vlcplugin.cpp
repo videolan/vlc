@@ -99,9 +99,6 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
          RegCloseKey( h_key );
     }
     ppsz_argv[ppsz_argc++] = "--no-one-instance";
-#if 1
-    ppsz_argv[0] = "F:\\Cygwin\\home\\Damien\\dev\\videolan\\vlc-trunk\\vlc";
-#endif
 
 #endif /* XP_MACOSX */
 
