@@ -79,7 +79,8 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
             p_control = new IntegerListConfigControl( p_this, p_item,
                                             parent, false, l, line );
         else if( p_item->i_min || p_item->i_max )
-            fprintf( stderr, "Todo\n" );
+            p_control = new IntegerRangeConfigControl( p_this, p_item, parent,
+                                                       l, line );
         else
             p_control = new IntegerConfigControl( p_this, p_item, parent,
                                                   l, line );
@@ -92,9 +93,11 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         break;
     case CONFIG_ITEM_FLOAT:
         if( p_item->f_min || p_item->f_max )
-            fprintf( stderr, "Todo\n" );
+            p_control = new FloatRangeConfigControl( p_this, p_item, parent,
+                                                     l, line );
         else
-            fprintf( stderr, "Todo\n" );
+            p_control = new FloatConfigControl( p_this, p_item, parent,
+                                                  l, line );
         break;
     default:
         break;
@@ -323,6 +326,7 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
 void IntegerConfigControl::finish()
 {
     spin->setMaximum( 2000000000 );
+    spin->setMinimum( -2000000000 );
     spin->setValue( p_item->i_value );
     spin->setToolTip( qfu(p_item->psz_longtext) );
     if( label )
@@ -332,6 +336,30 @@ void IntegerConfigControl::finish()
 int IntegerConfigControl::getValue()
 {
     return spin->value();
+}
+
+/********* Integer range **********/
+IntegerRangeConfigControl::IntegerRangeConfigControl( vlc_object_t *_p_this,
+                                            module_config_t *_p_item,
+                                            QWidget *_parent, QGridLayout *l,
+                                            int line ) :
+            IntegerConfigControl( _p_this, _p_item, _parent, l, line )
+{
+    finish();
+}
+
+IntegerRangeConfigControl::IntegerRangeConfigControl( vlc_object_t *_p_this,
+                                            module_config_t *_p_item,
+                                            QLabel *_label, QSpinBox *_spin ) :
+            IntegerConfigControl( _p_this, _p_item, _label, _spin )
+{
+    finish();
+}
+
+void IntegerRangeConfigControl::finish()
+{
+    spin->setMaximum( p_item->i_max );
+    spin->setMinimum( p_item->i_min );
 }
 
 /********* Integer / choice list **********/
@@ -427,4 +455,85 @@ void BoolConfigControl::finish()
 int BoolConfigControl::getValue()
 {
     return checkbox->checkState() == Qt::Checked ? VLC_TRUE : VLC_FALSE;
+}
+
+/**************************************************************************
+ * Float-based controls
+ *************************************************************************/
+
+/*********** Float **************/
+FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
+                                        module_config_t *_p_item,
+                                        QWidget *_parent, QGridLayout *l,
+                                        int line ) :
+                    VFloatConfigControl( _p_this, _p_item, _parent )
+{
+    label = new QLabel( qfu(p_item->psz_text) );
+    spin = new QDoubleSpinBox; spin->setMinimumWidth( 80 );
+    spin->setMaximumWidth( 90 );
+    finish();
+
+    if( !l )
+    {
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget( label, 0 ); layout->addWidget( spin, 1 );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( label, line, 0 );
+        l->addWidget( spin, line, 1, Qt::AlignRight );
+    }
+}
+
+FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
+                                        module_config_t *_p_item,
+                                        QLabel *_label,
+                                        QDoubleSpinBox *_spin ) :
+                    VFloatConfigControl( _p_this, _p_item )
+{
+    spin = _spin;
+    label = _label;
+    finish();
+}
+
+void FloatConfigControl::finish()
+{
+    spin->setMaximum( 2000000000. );
+    spin->setMinimum( -2000000000. );
+    spin->setSingleStep( 0.1 );
+    spin->setValue( (double)p_item->f_value );
+    spin->setToolTip( qfu(p_item->psz_longtext) );
+    if( label )
+        label->setToolTip( qfu(p_item->psz_longtext) );
+}
+
+float FloatConfigControl::getValue()
+{
+    return (float)spin->value();
+}
+
+/*********** Float with range **************/
+FloatRangeConfigControl::FloatRangeConfigControl( vlc_object_t *_p_this,
+                                        module_config_t *_p_item,
+                                        QWidget *_parent, QGridLayout *l,
+                                        int line ) :
+                FloatConfigControl( _p_this, _p_item, _parent, l, line )
+{
+    finish();
+}
+
+FloatRangeConfigControl::FloatRangeConfigControl( vlc_object_t *_p_this,
+                                        module_config_t *_p_item,
+                                        QLabel *_label,
+                                        QDoubleSpinBox *_spin ) :
+                FloatConfigControl( _p_this, _p_item, _label, _spin )
+{
+    finish();
+}
+
+void FloatRangeConfigControl::finish()
+{
+    spin->setMaximum( (double)p_item->f_max );
+    spin->setMinimum( (double)p_item->f_min );
 }

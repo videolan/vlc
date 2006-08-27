@@ -28,6 +28,7 @@
 #include <QWidget>
 #include <QLineEdit>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QComboBox>
 #include <QCheckBox>
 #include "ui/input_stats.h"
@@ -95,9 +96,23 @@ public:
     virtual int getValue();
     virtual void show() { spin->show(); label->show(); }
     virtual void hide() { spin->hide(); label->hide(); }
-private:
+
+protected:
     QSpinBox *spin;
+
+private:
     QLabel *label;
+    void finish();
+};
+
+class IntegerRangeConfigControl : public IntegerConfigControl
+{
+public:
+    IntegerRangeConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                               QGridLayout *, int );
+    IntegerRangeConfigControl( vlc_object_t *, module_config_t *,
+                               QLabel*, QSpinBox* );
+private:
     void finish();
 };
 
@@ -148,6 +163,36 @@ public:
     virtual float getValue() = 0;
 };
 
+class FloatConfigControl : public VFloatConfigControl
+{
+public:
+    FloatConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                        QGridLayout *, int );
+    FloatConfigControl( vlc_object_t *, module_config_t *,
+                        QLabel*, QDoubleSpinBox* );
+    virtual ~FloatConfigControl() {};
+    virtual float getValue();
+    virtual void show() { spin->show(); label->show(); }
+    virtual void hide() { spin->hide(); label->hide(); }
+
+protected:
+    QDoubleSpinBox *spin;
+
+private:
+    QLabel *label;
+    void finish();
+};
+
+class FloatRangeConfigControl : public FloatConfigControl
+{
+public:
+    FloatRangeConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                             QGridLayout *, int );
+    FloatRangeConfigControl( vlc_object_t *, module_config_t *,
+                             QLabel*, QDoubleSpinBox* );
+private:
+    void finish();
+};
 #if 0
 class FloatConfigControl : public VFloatConfigControl
 {
