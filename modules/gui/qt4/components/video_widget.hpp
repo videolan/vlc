@@ -29,11 +29,13 @@
 #include <QWidget>
 #include <QFrame>
 
+class QHBoxLayout;
+
 class VideoWidget : public QFrame
 {
     Q_OBJECT
 public:
-    VideoWidget( intf_thread_t *);
+    VideoWidget( intf_thread_t *, bool );
     virtual ~VideoWidget();
 
     virtual QSize sizeHint() const;
@@ -45,7 +47,11 @@ public:
     int i_video_height, i_video_width;
     vout_thread_t *p_vout;
 private:
+    int DrawBackground();
+    int CleanBackground();
+    bool always;
     QWidget *frame;
+    QHBoxLayout *backgroundLayout;
     intf_thread_t *p_intf;
     vlc_mutex_t lock;
 private slots:

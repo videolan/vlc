@@ -26,6 +26,7 @@
 #include "qt4.hpp"
 #include "components/video_widget.hpp"
 #include "main_interface.hpp"
+#include <QHBoxLayout>
 
 static void *DoRequest( intf_thread_t *, vout_thread_t *, int*,int*,
                         unsigned int *, unsigned int * );
@@ -33,11 +34,12 @@ static void DoRelease( intf_thread_t *, void * );
 static int DoControl( intf_thread_t *, void *, int, va_list );
 
 bool need_update;
-       
-VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ),
-                                                              p_intf( _p_i )
+
+VideoWidget::VideoWidget( intf_thread_t *_p_i, bool _always ) : QFrame( NULL ),
+                                                               p_intf( _p_i )
 {
     vlc_mutex_init( p_intf, &lock );
+    always = _always;
 
     p_intf->pf_request_window  = ::DoRequest;
     p_intf->pf_release_window  = ::DoRelease;
@@ -49,6 +51,9 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ),
 
     connect( DialogsProvider::getInstance(NULL)->fixed_timer,
              SIGNAL( timeout() ), this, SLOT( update() ) );
+
+    if( always )
+        DrawBackground();
 
     need_update = false;
 }
@@ -106,6 +111,9 @@ void *VideoWidget::Request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
     }
     p_vout = p_nvout;
 
+    if( always )
+        CleanBackground();
+
     setMinimumSize( 1,1 );
     p_intf->p_sys->p_mi->videoSize = QSize( *pi_width, *pi_height );
     updateGeometry();
@@ -120,23 +128,40 @@ static void DoRelease( intf_thread_t *p_intf, void *p_win )
 
 void VideoWidget::Release( void *p_win )
 {
-    if( !config_GetInt( p_intf, "qt-always-video" ) );
+    p_vout = NULL;
+    if( config_GetInt( p_intf, "qt-always-video" ) == 0 )
     {
         p_intf->p_sys->p_mi->videoSize = QSize ( 1,1 );
+        updateGeometry();
+        need_update = true;
+    }
+    else
+    {
+        DrawBackground();
     }
 
-    updateGeometry();
-
-    if( !config_GetInt( p_intf, "qt-always-video" ) )
-        need_update = true;
-    p_vout = NULL;
 }
-
 
 static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
 {
     return p_intf->p_sys->p_video->Control( p_win, i_q, a );
-} 
+}
+
+int VideoWidget::DrawBackground()
+{
+    QLabel *label = new QLabel( "VLC Rulez d4 Worldz" );
+    backgroundLayout = new QHBoxLayout;
+    backgroundLayout->addWidget( label );
+    setLayout( backgroundLayout );
+    return 0;
+}
+
+int VideoWidget::CleanBackground()
+{
+    backgroundLayout->takeAt(0);
+    delete backgroundLayout;
+    return 0;
+}
 
 int VideoWidget::Control( void *p_window, int i_query, va_list args )
 {
@@ -160,16 +185,17 @@ int VideoWidget::Control( void *p_window, int i_query, va_list args )
 
             if( !i_width && p_vout ) i_width = p_vout->i_window_width;
             if( !i_height && p_vout ) i_height = p_vout->i_window_height;
-           
-            frame->resize( i_width, i_height );
+            p_intf->p_sys->p_mi->videoSize = QSize( i_width, i_height );
+            updateGeometry();
+            need_update = true;
             i_ret = VLC_SUCCESS;
-            break; 
+            break;
         }
         case VOUT_SET_STAY_ON_TOP:
         {
             /// \todo
             break;
-        }   
+        }
         default:
             msg_Warn( p_intf, "unsupported control query" );
             break;

@@ -60,6 +60,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     ui.volLowLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
     ui.volHighLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
     ui.volumeSlider->setMaximum( 100 );
+    ui.playlistButton->setIcon( QIcon( ":/pixmaps/volume-low.png" ) );
+
 
     VolumeClickHandler *h = new VolumeClickHandler( this );
     ui.volLowLabel->installEventFilter(h);
@@ -76,7 +78,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 //    if( config_GetInt( p_intf, "embedded" ) )
 
     {
-        videoWidget = new VideoWidget( p_intf );
+        videoWidget = new VideoWidget( p_intf, config_GetInt( p_intf, "qt-always-video" ) ? true:false );
         if( config_GetInt( p_intf, "qt-always-video" ) )
         {
             QSettings settings( "VideoLAN", "VLC" );
@@ -92,12 +94,15 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     readSettings( "MainWindow" );
 
     addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
-    if( config_GetInt( p_intf, "qt-always-video" ) )
-        mainSize = videoSize + addSize;
-    else
-        mainSize = QSize( PREF_W, PREF_H );
+//    if( config_GetInt( p_intf, "qt-always-video" ) )
+        mainSize.setWidth( videoSize.width() + addSize.width() );
+        mainSize.setHeight( videoSize.height() + addSize.height() );
+//    else
+//        mainSize = QSize( PREF_W, PREF_H );
+    fprintf( stderr, "Resulting size %ix%i", mainSize.width(), mainSize.height() );
     resize( mainSize );
     mainSize = size();
+    fprintf( stderr, "After size %ix%i", mainSize.width(), mainSize.height() );
 
     setMinimumSize( PREF_W, addSize.height() );
 
