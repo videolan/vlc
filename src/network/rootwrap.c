@@ -52,6 +52,11 @@
 #include <netinet/in.h>
 #include <pthread.h>
 
+#if defined (AF_INET6) && !defined (IPV6_V6ONLY)
+# warning Uho, your IPv6 support is broken and has been disabled. Fix your C library.
+# undef AF_INET6
+#endif
+
 /*#ifndef HAVE_CLEARENV
 extern char **environ;
 
