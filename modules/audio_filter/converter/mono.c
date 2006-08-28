@@ -61,7 +61,7 @@ static unsigned int stereo_to_mono( aout_instance_t *, aout_filter_t *,
 struct filter_sys_t
 {
     int i_nb_channels; /* number of float32 per sample */
-    unsigned int i_channel_selected;
+    int i_channel_selected;
     int i_bitspersample;
 };
 
@@ -88,7 +88,7 @@ vlc_module_begin();
     set_description( _("Audio filter for stereo to mono conversion") );
     set_capability( "audio filter2", 5 );
 
-    add_integer( MONO_CFG "mono-channel", 0, NULL, MONO_CHANNEL_TEXT, MONO_CHANNEL_LONGTEXT, VLC_FALSE );
+    add_integer( MONO_CFG "mono-channel", -1, NULL, MONO_CHANNEL_TEXT, MONO_CHANNEL_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     set_category( CAT_AUDIO );
@@ -262,8 +262,15 @@ static unsigned int stereo_to_mono( aout_instance_t * p_aout, aout_filter_t *p_f
     for( n = 0; n < (p_input->i_nb_samples * p_sys->i_nb_channels); n++ )
     {
         /* Fake real mono. */
-        p_out[n] = p_out[n+1] = (p_in[n] + p_in[n+1]) >> 1;
-        n++;
+        if( p_sys->i_channel_selected == -1)
+        {
+            p_out[n] = p_out[n+1] = (p_in[n] + p_in[n+1]) >> 1;
+            n++;
+        }
+        else if( (n % p_sys->i_nb_channels) == p_sys->i_channel_selected )
+        {
+            p_out[n] = p_out[n+1] = p_in[n];
+        }
     }
     return n;
 }
