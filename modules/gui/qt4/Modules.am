@@ -14,7 +14,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 TOUI = ui/input_stats ui/main_interface ui/file_open \
        ui/logindialog ui/inputdialog ui/progressdialog ui/sprefs_trivial \
        ui/sprefs_audio ui/sprefs_playlist ui/sprefs_subtitles \
-       ui/sprefs_video
+       ui/sprefs_video ui/sprefs_interface
 UIH = $(TOUI:%=%.h)
 
 TOMOC = main_interface \

@@ -45,6 +45,7 @@
 #include "ui/sprefs_video.h"
 #include "ui/sprefs_subtitles.h"
 #include "ui/sprefs_playlist.h"
+#include "ui/sprefs_interface.h"
 
 #define ITEM_HEIGHT 50
 
@@ -164,7 +165,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         START_SPREFS_CAT( Playlist );
         END_SPREFS_CAT;
 
-        case SPrefsInterface: break;
+        START_SPREFS_CAT( Interface );
+
+            CONFIG_GENERIC( "language", StringList, NULL, language );
+
+        END_SPREFS_CAT;
 
         START_SPREFS_CAT( Subtitles );
 
