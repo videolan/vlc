@@ -15,8 +15,8 @@ diff -ruN live.orig/config.macosx live/config.macosx
 --- live.orig/config.macosx	2006-02-15 23:14:39.000000000 +0100
 +++ live/config.macosx	2006-02-22 21:53:01.000000000 +0100
 @@ -1,4 +1,4 @@
--COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t
-+COMPILE_OPTS =		$(INCLUDES) -I. EXTRA_CFLAGS -DBSD=1 -O -DSOCKLEN_T=socklen_t -DUSE_LOCALE
+-COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1
++COMPILE_OPTS =		$(INCLUDES) -I. EXTRA_CFLAGS -DBSD=1 -O -DSOCKLEN_T=socklen_t -DUSE_LOCALE -DHAVE_SOCKADDR_LEN=1
  C =			c
  C_COMPILER =		cc
  C_FLAGS =		$(COMPILE_OPTS)
