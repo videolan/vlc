@@ -407,9 +407,11 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
 
     QLabel *label = new QLabel( head, this );
+#ifndef WIN32
     QFont font = label->font();
     font.setPointSize( font.pointSize() + 2 ); font.setBold( true );
     label->setFont( font );
+#endif
     QLabel *help = new QLabel( data->help, this );
     help->setWordWrap( true );
 

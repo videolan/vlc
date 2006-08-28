@@ -60,8 +60,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     ui.volLowLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
     ui.volHighLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
     ui.volumeSlider->setMaximum( 100 );
+    ui.playlistButton->setText( "" );
     ui.playlistButton->setIcon( QIcon( ":/pixmaps/volume-low.png" ) );
-
 
     VolumeClickHandler *h = new VolumeClickHandler( this );
     ui.volLowLabel->installEventFilter(h);
