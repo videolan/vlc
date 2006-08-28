@@ -176,6 +176,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                     }
                 }
             }
+            fprintf(stderr, "update !\n");
             if( needsDisplay )
             {
                 const NPWindow *npwindow = p_plugin->getWindow();
@@ -184,6 +185,9 @@ int16 NPP_HandleEvent( NPP instance, void * event )
 
                 ForeColor(blackColor);
                 PenMode( patCopy );
+
+                /* seems that firefox forgets to set the following on occasion (reload) */
+                SetOrigin(((NP_Port *)npwindow->window)->portx, ((NP_Port *)npwindow->window)->porty);
 
                 Rect rect;
                 rect.left = 0;
@@ -329,7 +333,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         view.left    = ((NP_Port*) (window->window))->portx;
         view.bottom  = window->height+view.top;
         view.right   = window->width+view.left;
-
+fprintf(stderr, "window.x=%d, window.y=%d, port.x=%d, port.y=%d\n", window->x, window->y, view.top, view.left);
         /* clipRect coordinates are also relative to GrafPort */
         clip.top     = window->clipRect.top;
         clip.left    = window->clipRect.left;

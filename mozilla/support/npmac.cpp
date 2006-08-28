@@ -1156,7 +1156,7 @@ NPError NP_GetEntryPoints(NPPluginFuncs* pluginFuncs)
 
     pluginFuncs->version    = (NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR;
     pluginFuncs->size       = sizeof(NPPluginFuncs);
-    pluginFuncs->newp       = Private_New;
+    pluginFuncs->newp       = NewNPP_NewProc(Private_New);
     pluginFuncs->destroy    = NewNPP_DestroyProc(Private_Destroy);
     pluginFuncs->setwindow  = NewNPP_SetWindowProc(Private_SetWindow);
     pluginFuncs->newstream  = NewNPP_NewStreamProc(Private_NewStream);
