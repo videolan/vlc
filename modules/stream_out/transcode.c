@@ -1333,7 +1333,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     {
         msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_aenc );
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
-        id->p_decoder->p_module = 0;
+        id->p_decoder->p_module = NULL;
         return VLC_EGENERIC;
     }
     id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
@@ -1399,11 +1399,11 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 
     if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )
     {
-        msg_Err( p_stream, "no audio filter found for mixing from"
-                 " %i to %i channels", fmt_last.audio.i_channels,
-                 id->p_encoder->fmt_in.audio.i_channels );
-#if 0
-        /* FIXME : this might work, but only if the encoder is restarted */
+#if 1
+        module_Unneed( id->p_encoder, id->p_encoder->p_module );
+        id->p_encoder->p_module = NULL;
+
+        /* This might work, but only if the encoder is restarted */
         id->p_encoder->fmt_in.audio.i_channels = fmt_last.audio.i_channels;
         id->p_encoder->fmt_out.audio.i_channels = fmt_last.audio.i_channels;
 
@@ -1413,7 +1413,30 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         id->p_encoder->fmt_out.audio.i_physical_channels =
             id->p_encoder->fmt_out.audio.i_original_channels =
                 fmt_last.audio.i_physical_channels;
+
+        msg_Dbg( p_stream, "number of audio channels for mixing changed, "
+                 "trying to reopen the encoder for mixing %i to %i channels",
+                 fmt_last.audio.i_channels,
+                 id->p_encoder->fmt_in.audio.i_channels );
+
+        /* reload encoder */
+        id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
+        id->p_encoder->p_module =
+            module_Need( id->p_encoder, "encoder", p_sys->psz_aenc, VLC_TRUE );
+        if( !id->p_encoder->p_module )
+        {
+            msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_aenc );
+            transcode_audio_close( p_stream, id );
+            return VLC_EGENERIC;
+        }
+        id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
+        id->p_encoder->fmt_in.audio.i_bitspersample =
+            audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 #else
+        msg_Err( p_stream, "no audio filter found for mixing from"
+                 " %i to %i channels", fmt_last.audio.i_channels,
+                 id->p_encoder->fmt_in.audio.i_channels );
+
         transcode_audio_close( p_stream, id );
         return VLC_EGENERIC;
 #endif
@@ -1449,12 +1472,12 @@ static void transcode_audio_close( sout_stream_t *p_stream,
     /* Close decoder */
     if( id->p_decoder->p_module )
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
-    id->p_decoder->p_module = 0;
+    id->p_decoder->p_module = NULL;
 
     /* Close encoder */
     if( id->p_encoder->p_module )
         module_Unneed( id->p_encoder, id->p_encoder->p_module );
-    id->p_encoder->p_module = 0;
+    id->p_encoder->p_module = NULL;
 
     /* Close filters */
     for( i = 0; i < id->i_filter; i++ )
