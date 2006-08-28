@@ -394,8 +394,8 @@ void streaming_ProfilesList( vlc_object_t *p_this, int *pi_profiles,
 int streaming_ProfileParse( vlc_object_t *p_this,streaming_profile_t *p_profile,
                             const char *psz_profile )
 {
-    DECMALLOC_ERR( p_parser, profile_parser_t );
     module_t *p_module;
+    DECMALLOC_ERR( p_parser, profile_parser_t );
     assert( p_profile ); assert( psz_profile );
 
     p_parser->psz_profile = strdup( psz_profile );
