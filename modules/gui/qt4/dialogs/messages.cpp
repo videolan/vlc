@@ -107,7 +107,7 @@ void MessagesDialog::updateLog()
             {
                 case VLC_MSG_INFO:
                     messages->setTextColor("blue");
-                    messages->insertPlainText(": ");
+                    messages->insertPlainText(" info: ");
                     break;
                 case VLC_MSG_ERR:
                     messages->setTextColor("red");
@@ -127,7 +127,7 @@ void MessagesDialog::updateLog()
             /* Add message Regular black Font */
             messages->setFontItalic(false);
             messages->setTextColor("black");
-            messages->insertPlainText( p_sub->p_msg[i_start].psz_msg );
+            messages->insertPlainText( qfu(p_sub->p_msg[i_start].psz_msg) );
             messages->insertPlainText( "\n" );
         }
         messages->ensureCursorVisible();

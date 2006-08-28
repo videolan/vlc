@@ -25,6 +25,7 @@
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"
 #include "main_interface.hpp"
+#include "../../../share/vlc32x32.xpm"
 
 /*****************************************************************************
  * Local prototypes.
@@ -124,6 +125,7 @@ static void Init( intf_thread_t *p_intf )
     Q_INIT_RESOURCE( vlc );
 
     QApplication *app = new QApplication( argc, argv , true );
+    app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
     p_intf->p_sys->p_app = app;
 
     // Initialize timers

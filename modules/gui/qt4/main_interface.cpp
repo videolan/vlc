@@ -33,8 +33,13 @@
 #include <QStatusBar>
 #include "menus.hpp"
 
-#define PREF_W 480
-#define PREF_H 125
+#ifdef WIN32
+    #define PREF_W 430
+    #define PREF_H 121
+#else
+    #define PREF_W 480
+    #define PREF_H 125
+#endif
 
 static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void *);
