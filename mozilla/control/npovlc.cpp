@@ -102,7 +102,7 @@ enum VlcNPObjectMethodIds
 
 const int VlcNPObject::methodCount = sizeof(VlcNPObject::methodNames)/sizeof(NPUTF8 *);
 
-RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant *result)
+RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result)
 {
     VlcPlugin *p_plugin = reinterpret_cast<VlcPlugin *>(_instance->pdata);
     if( p_plugin )
@@ -124,7 +124,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                     else
                     {
-                        VOID_TO_NPVARIANT(*result);
+                        VOID_TO_NPVARIANT(result);
                         return INVOKERESULT_NO_ERROR;
                     }
                 }
@@ -141,7 +141,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                     else
                     {
-                        VOID_TO_NPVARIANT(*result);
+                        VOID_TO_NPVARIANT(result);
                         return INVOKERESULT_NO_ERROR;
                     }
                 }
@@ -158,7 +158,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                     else
                     {
-                        VOID_TO_NPVARIANT(*result);
+                        VOID_TO_NPVARIANT(result);
                         return INVOKERESULT_NO_ERROR;
                     }
                 }
@@ -179,7 +179,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         }
                         else
                         {
-                            VOID_TO_NPVARIANT(*result);
+                            VOID_TO_NPVARIANT(result);
                             return INVOKERESULT_NO_ERROR;
                         }
                     }
@@ -207,7 +207,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                     else
                     {
-                        VOID_TO_NPVARIANT(*result);
+                        VOID_TO_NPVARIANT(result);
                         return INVOKERESULT_NO_ERROR;
                     }
                 }
@@ -224,7 +224,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                     else
                     {
-                        INT32_TO_NPVARIANT(val, *result);
+                        INT32_TO_NPVARIANT(val, result);
                         return INVOKERESULT_NO_ERROR;
                     }
                 }
@@ -241,7 +241,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                     else
                     {
-                        VOID_TO_NPVARIANT(*result);
+                        VOID_TO_NPVARIANT(result);
                         return INVOKERESULT_NO_ERROR;
                     }
                 }
@@ -249,18 +249,15 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_get_int_variable:
                 if( (argCount == 1) && NPVARIANT_IS_STRING(args[0]) )
                 {
-                    const NPString &name = NPVARIANT_TO_STRING(args[0]);
-                    NPUTF8 *s = new NPUTF8[name.utf8length+1];
+                    char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
                     if( s )
                     {
                         int vlc_id = libvlc_get_vlc_id(p_plugin->getVLC());
                         vlc_value_t val;
-                        strncpy(s, name.utf8characters, name.utf8length);
-                        s[name.utf8length] = '\0';
                         if( VLC_SUCCESS == VLC_VariableGet(vlc_id, s, &val) )
                         {
                             delete s;
-                            INT32_TO_NPVARIANT(val.i_int, *result);
+                            INT32_TO_NPVARIANT(val.i_int, result);
                             return INVOKERESULT_NO_ERROR;
                         }
                         else
@@ -278,19 +275,16 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     && NPVARIANT_IS_STRING(args[0])
                     && isNumberValue(args[1]) )
                 {
-                    const NPString &name = NPVARIANT_TO_STRING(args[0]);
-                    NPUTF8 *s = new NPUTF8[name.utf8length+1];
+                    char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
                     if( s )
                     {
                         int vlc_id = libvlc_get_vlc_id(p_plugin->getVLC());
                         vlc_value_t val;
-                        strncpy(s, name.utf8characters, name.utf8length);
-                        s[name.utf8length] = '\0';
                         val.i_int = numberValue(args[1]);
                         if( VLC_SUCCESS == VLC_VariableSet(vlc_id, s, val) )
                         {
                             delete s;
-                            VOID_TO_NPVARIANT(*result);
+                            VOID_TO_NPVARIANT(result);
                             return INVOKERESULT_NO_ERROR;
                         }
                         else
@@ -306,18 +300,15 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_get_bool_variable:
                 if( (argCount == 1) && NPVARIANT_IS_STRING(args[0]) )
                 {
-                    const NPString &name = NPVARIANT_TO_STRING(args[0]);
-                    NPUTF8 *s = new NPUTF8[name.utf8length+1];
+                    char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
                     if( s )
                     {
                         int vlc_id = libvlc_get_vlc_id(p_plugin->getVLC());
                         vlc_value_t val;
-                        strncpy(s, name.utf8characters, name.utf8length);
-                        s[name.utf8length] = '\0';
                         if( VLC_SUCCESS == VLC_VariableGet(vlc_id, s, &val) )
                         {
                             delete s;
-                            BOOLEAN_TO_NPVARIANT(val.b_bool, *result);
+                            BOOLEAN_TO_NPVARIANT(val.b_bool, result);
                             return INVOKERESULT_NO_ERROR;
                         }
                         else
@@ -335,19 +326,16 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     && NPVARIANT_IS_STRING(args[0])
                     && NPVARIANT_IS_BOOLEAN(args[1]) )
                 {
-                    const NPString &name = NPVARIANT_TO_STRING(args[0]);
-                    NPUTF8 *s = new NPUTF8[name.utf8length+1];
+                    char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
                     if( s )
                     {
                         int vlc_id = libvlc_get_vlc_id(p_plugin->getVLC());
                         vlc_value_t val;
-                        strncpy(s, name.utf8characters, name.utf8length);
-                        s[name.utf8length] = '\0';
                         val.b_bool = NPVARIANT_TO_BOOLEAN(args[1]);
                         if( VLC_SUCCESS == VLC_VariableSet(vlc_id, s, val) )
                         {
                             delete s;
-                            VOID_TO_NPVARIANT(*result);
+                            VOID_TO_NPVARIANT(result);
                             return INVOKERESULT_NO_ERROR;
                         }
                         else
@@ -363,14 +351,11 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_get_str_variable:
                 if( (argCount == 1) && NPVARIANT_IS_STRING(args[0]) )
                 {
-                    const NPString &name = NPVARIANT_TO_STRING(args[0]);
-                    NPUTF8 *s = new NPUTF8[name.utf8length+1];
+                    char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
                     if( s )
                     {
                         int vlc_id = libvlc_get_vlc_id(p_plugin->getVLC());
                         vlc_value_t val;
-                        strncpy(s, name.utf8characters, name.utf8length);
-                        s[name.utf8length] = '\0';
                         if( VLC_SUCCESS == VLC_VariableGet(vlc_id, s, &val) )
                         {
                             delete s;
@@ -381,7 +366,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                                 if( retval )
                                 {
                                     memcpy(retval, val.psz_string, len);
-                                    STRINGN_TO_NPVARIANT(retval, len, *result);
+                                    STRINGN_TO_NPVARIANT(retval, len, result);
                                     free(val.psz_string);
                                     return INVOKERESULT_NO_ERROR;
                                 }
@@ -393,7 +378,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                             else
                             {
                                 /* null string */
-                                STRINGN_TO_NPVARIANT(NULL, 0, *result);
+                                STRINGN_TO_NPVARIANT(NULL, 0, result);
                                 return INVOKERESULT_NO_ERROR;
                             }
                         }
@@ -412,25 +397,19 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     && NPVARIANT_IS_STRING(args[0])
                     && NPVARIANT_IS_STRING(args[1]) )
                 {
-                    const NPString &name = NPVARIANT_TO_STRING(args[0]);
-                    NPUTF8 *s = new NPUTF8[name.utf8length+1];
+                    char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
                     if( s )
                     {
                         int vlc_id = libvlc_get_vlc_id(p_plugin->getVLC());
                         vlc_value_t val;
-                        strncpy(s, name.utf8characters, name.utf8length);
-                        s[name.utf8length] = '\0';
-                        const NPString &v = NPVARIANT_TO_STRING(args[1]);
-                        val.psz_string = new NPUTF8[v.utf8length+1];
+                        val.psz_string = stringValue(NPVARIANT_TO_STRING(args[1]));
                         if( val.psz_string )
                         {
-                            strncpy(val.psz_string, v.utf8characters, v.utf8length);
-                            val.psz_string[v.utf8length] = '\0';
                             if( VLC_SUCCESS == VLC_VariableSet(vlc_id, s, val) )
                             {
                                 delete s;
                                 delete val.psz_string;
-                                VOID_TO_NPVARIANT(*result);
+                                VOID_TO_NPVARIANT(result);
                                 return INVOKERESULT_NO_ERROR;
                             }
                             else
@@ -462,7 +441,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                     else
                     {
-                        VOID_TO_NPVARIANT(*result);
+                        VOID_TO_NPVARIANT(result);
                         return INVOKERESULT_NO_ERROR;
                     }
                 }
@@ -470,13 +449,9 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_add_item:
                 if( (argCount == 1) && NPVARIANT_IS_STRING(args[0]) )
                 {
-                    const NPString &name = NPVARIANT_TO_STRING(args[0]);
-                    NPUTF8 *s = new NPUTF8[name.utf8length+1];
+                    char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
                     if( s )
                     {
-                        strncpy(s, name.utf8characters, name.utf8length);
-                        s[name.utf8length] = '\0';
-
                         char *url = p_plugin->getAbsoluteURL(s);
                         delete s;
                         if( ! url )
@@ -493,7 +468,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         }
                         else
                         {
-                            INT32_TO_NPVARIANT(item, *result);
+                            INT32_TO_NPVARIANT(item, result);
                             return INVOKERESULT_NO_ERROR;
                         }
                     }
@@ -513,7 +488,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                     else
                     {
-                        VOID_TO_NPVARIANT(*result);
+                        VOID_TO_NPVARIANT(result);
                         return INVOKERESULT_NO_ERROR;
                     }
                 }
@@ -530,7 +505,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                     else
                     {
-                        VOID_TO_NPVARIANT(*result);
+                        VOID_TO_NPVARIANT(result);
                         return INVOKERESULT_NO_ERROR;
                     }
                 }
@@ -547,7 +522,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                     else
                     {
-                        BOOLEAN_TO_NPVARIANT(isplaying, *result);
+                        BOOLEAN_TO_NPVARIANT(isplaying, result);
                         return INVOKERESULT_NO_ERROR;
                     }
                 }
@@ -568,7 +543,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         }
                         else
                         {
-                            INT32_TO_NPVARIANT((uint32_t)(val/1000LL), *result);
+                            INT32_TO_NPVARIANT((uint32_t)(val/1000LL), result);
                             return INVOKERESULT_NO_ERROR;
                         }
                     }
@@ -600,7 +575,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         }
                         else
                         {
-                            DOUBLE_TO_NPVARIANT((double)val, *result);
+                            DOUBLE_TO_NPVARIANT((double)val, result);
                             return INVOKERESULT_NO_ERROR;
                         }
                     }
@@ -632,7 +607,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         }
                         else
                         {
-                            DOUBLE_TO_NPVARIANT((uint32_t)(val/1000LL), *result);
+                            DOUBLE_TO_NPVARIANT((uint32_t)(val/1000LL), result);
                             return INVOKERESULT_NO_ERROR;
                         }
                     }
@@ -680,7 +655,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                             libvlc_exception_clear(&ex);
                             return INVOKERESULT_GENERIC_ERROR;
                         }
-                        VOID_TO_NPVARIANT(*result);
+                        VOID_TO_NPVARIANT(result);
                         return INVOKERESULT_NO_ERROR;
                     }
                     else

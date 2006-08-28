@@ -39,7 +39,7 @@ protected:
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];
 
-    InvokeResult getProperty(int index, NPVariant *result);
+    InvokeResult getProperty(int index, NPVariant &result);
 
     static const int methodCount;
     static const NPUTF8 * const methodNames[];
@@ -63,13 +63,13 @@ protected:
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];
 
-    InvokeResult getProperty(int index, NPVariant *result);
-    InvokeResult setProperty(int index, const NPVariant *value);
+    InvokeResult getProperty(int index, NPVariant &result);
+    InvokeResult setProperty(int index, const NPVariant &value);
 
     static const int methodCount;
     static const NPUTF8 * const methodNames[];
 
-    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant *result);
+    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
 };
 
 class LibvlcInputNPObject: public RuntimeNPObject
@@ -86,8 +86,8 @@ protected:
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];
 
-    InvokeResult getProperty(int index, NPVariant *result);
-    InvokeResult setProperty(int index, const NPVariant *value);
+    InvokeResult getProperty(int index, NPVariant &result);
+    InvokeResult setProperty(int index, const NPVariant &value);
 
     static const int methodCount;
     static const NPUTF8 * const methodNames[];
@@ -106,12 +106,15 @@ protected:
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];
 
-    InvokeResult getProperty(int index, NPVariant *result);
+    InvokeResult getProperty(int index, NPVariant &result);
 
     static const int methodCount;
     static const NPUTF8 * const methodNames[];
 
-    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant *result);
+    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
+
+    void parseOptions(const NPString &s, int *i_options, char*** ppsz_options);
+    void parseOptions(NPObject *obj, int *i_options, char*** ppsz_options);
 };
 
 class LibvlcVideoNPObject: public RuntimeNPObject
@@ -127,13 +130,13 @@ protected:
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];
 
-    InvokeResult getProperty(int index, NPVariant *result);
-    InvokeResult setProperty(int index, const NPVariant *value);
+    InvokeResult getProperty(int index, NPVariant &result);
+    InvokeResult setProperty(int index, const NPVariant &value);
 
     static const int methodCount;
     static const NPUTF8 * const methodNames[];
 
-    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant *result);
+    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
 
 };
 

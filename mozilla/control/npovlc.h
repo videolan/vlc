@@ -43,6 +43,6 @@ protected:
     static const int methodCount;
     static const NPUTF8 * const methodNames[];
 
-    virtual InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant *result);
+    virtual InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
 };
 

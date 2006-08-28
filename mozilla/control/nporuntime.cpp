@@ -35,13 +35,34 @@
 #include "nporuntime.h"
 #include "vlcplugin.h"
 
-RuntimeNPObject::InvokeResult RuntimeNPObject::getProperty(int index, NPVariant *result)
+char* RuntimeNPObject::stringValue(const NPString &s)
+{
+    NPUTF8 *val = new NPUTF8[s.utf8length+1];
+    if( val )
+    {
+        strncpy(val, s.utf8characters, s.utf8length);
+        val[s.utf8length] = '\0';
+    }
+    return val;
+}
+
+char* RuntimeNPObject::stringValue(const NPVariant &v)
+{
+    char *s = NULL;
+    if( NPVARIANT_IS_STRING(v) ) 
+    {
+        return stringValue(NPVARIANT_TO_STRING(v));
+    }
+    return s;
+}
+
+RuntimeNPObject::InvokeResult RuntimeNPObject::getProperty(int index, NPVariant &result)
 {
     /* default behaviour */
     return INVOKERESULT_GENERIC_ERROR;
 }
 
-RuntimeNPObject::InvokeResult RuntimeNPObject::setProperty(int index, const NPVariant *value)
+RuntimeNPObject::InvokeResult RuntimeNPObject::setProperty(int index, const NPVariant &value)
 {
     /* default behaviour */
     return INVOKERESULT_GENERIC_ERROR;
@@ -53,16 +74,16 @@ RuntimeNPObject::InvokeResult RuntimeNPObject::removeProperty(int index)
     return INVOKERESULT_GENERIC_ERROR;
 }
 
-RuntimeNPObject::InvokeResult RuntimeNPObject::invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant *result)
+RuntimeNPObject::InvokeResult RuntimeNPObject::invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result)
 {
     /* default beahviour */
     return INVOKERESULT_GENERIC_ERROR;
 }
 
-RuntimeNPObject::InvokeResult RuntimeNPObject::invokeDefault(const NPVariant *args, uint32_t argCount, NPVariant *result)
+RuntimeNPObject::InvokeResult RuntimeNPObject::invokeDefault(const NPVariant *args, uint32_t argCount, NPVariant &result)
 {
     /* return void */
-    VOID_TO_NPVARIANT(*result);
+    VOID_TO_NPVARIANT(result);
     return INVOKERESULT_NO_ERROR;
 }
 

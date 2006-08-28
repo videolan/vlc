@@ -52,6 +52,9 @@ public:
         }
     };
 
+    static char* stringValue(const NPString &v);
+    static char* stringValue(const NPVariant &v);
+
     RuntimeNPObject(NPP instance, const NPClass *aClass) :
         _instance(instance)
     {
@@ -88,11 +91,11 @@ protected:
                                                     uint32_t argCount,
                                                     NPVariant *result);
 
-    virtual InvokeResult getProperty(int index, NPVariant *result);
-    virtual InvokeResult setProperty(int index, const NPVariant *value);
+    virtual InvokeResult getProperty(int index, NPVariant &result);
+    virtual InvokeResult setProperty(int index, const NPVariant &value);
     virtual InvokeResult removeProperty(int index);
-    virtual InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant *result);
-    virtual InvokeResult invokeDefault(const NPVariant *args, uint32_t argCount, NPVariant *result);
+    virtual InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
+    virtual InvokeResult invokeDefault(const NPVariant *args, uint32_t argCount, NPVariant &result);
 
     bool returnInvokeResult(InvokeResult result);
 
@@ -162,7 +165,7 @@ static bool RuntimeNPClassGetProperty(NPObject *npobj, NPIdentifier name, NPVari
     if( index != -1 )
     {
         RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
-        return vObj->returnInvokeResult(vObj->getProperty(index, result));
+        return vObj->returnInvokeResult(vObj->getProperty(index, *result));
     }
     return false;
 }
@@ -175,7 +178,7 @@ static bool RuntimeNPClassSetProperty(NPObject *npobj, NPIdentifier name, const 
     if( index != -1 )
     {
         RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
-        return vObj->returnInvokeResult(vObj->setProperty(index, value));
+        return vObj->returnInvokeResult(vObj->setProperty(index, *value));
     }
     return false;
 }
@@ -203,7 +206,7 @@ static bool RuntimeNPClassInvoke(NPObject *npobj, NPIdentifier name,
     if( index != -1 )
     {
         RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
-        return vObj->returnInvokeResult(vObj->invoke(index, args, argCount, result));
+        return vObj->returnInvokeResult(vObj->invoke(index, args, argCount, *result));
 
     }
     return false;
@@ -216,7 +219,7 @@ static bool RuntimeNPClassInvokeDefault(NPObject *npobj,
                                            NPVariant *result)
 {
     RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
-    return vObj->returnInvokeResult(vObj->invokeDefault(args, argCount, result));
+    return vObj->returnInvokeResult(vObj->invokeDefault(args, argCount, *result));
 }
 
 template<class T>
