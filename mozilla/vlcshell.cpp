@@ -176,7 +176,6 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                     }
                 }
             }
-            fprintf(stderr, "update !\n");
             if( needsDisplay )
             {
                 const NPWindow *npwindow = p_plugin->getWindow();
@@ -333,7 +332,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         view.left    = ((NP_Port*) (window->window))->portx;
         view.bottom  = window->height+view.top;
         view.right   = window->width+view.left;
-fprintf(stderr, "window.x=%d, window.y=%d, port.x=%d, port.y=%d\n", window->x, window->y, view.top, view.left);
         /* clipRect coordinates are also relative to GrafPort */
         clip.top     = window->clipRect.top;
         clip.left    = window->clipRect.left;
