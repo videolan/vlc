@@ -20,7 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
 #include "components/preferences.hpp"
 #include "components/preferences_widgets.hpp"
 #include "qt4.hpp"
@@ -35,7 +34,7 @@
 #include "pixmaps/advanced.xpm"
 #include "pixmaps/codec.xpm"
 #include "pixmaps/intf.xpm"
-
+#include <QApplication>
 #include <QLabel>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
@@ -70,16 +69,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     setAlternatingRowColors( true );
     header()->hide();
 
-#ifndef WIN32
-    // Fixme - A bit UGLY
-    QFont f = font();
-    int pSize = f.pointSize();
-    if( pSize > 0 )
-        f.setPointSize( pSize + 1 );
-    else
-        f.setPixelSize( f.pixelSize() + 1 );
-    setFont( f );
-#endif
+    QFont myFont = QApplication::font(0);
+    myFont.setPointSize( myFont.pointSize() + 3 ); myFont.setBold( true );
 
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b##_xpm ))
     BI( audio, audio );
@@ -406,16 +397,15 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         }
     }
 
-    QLabel *label = new QLabel( head, this );
-#ifndef WIN32
-    QFont font = label->font();
-    font.setPointSize( font.pointSize() + 2 ); font.setBold( true );
-    label->setFont( font );
-#endif
+    QLabel *label = new QLabel( head );
+    global_layout->addWidget( label );
+    QFont myFont = QApplication::font(0);
+    myFont.setPointSize( myFont.pointSize() + 3 ); myFont.setBold( true );
+
+    label->setFont( myFont );
     QLabel *help = new QLabel( data->help, this );
     help->setWordWrap( true );
 
-    global_layout->addWidget( label );
     global_layout->addWidget( help );
 
     QGroupBox *box = NULL;
