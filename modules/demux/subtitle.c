@@ -709,6 +709,7 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
     p_subtitle->i_stop  = 0;
     p_subtitle->psz_text = NULL;
 
+next:
     for( ;; )
     {
         if( ( s = TextGetLine( txt ) ) == NULL )
@@ -730,7 +731,8 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
         /* We found a possible setting of the framerate "{1}{1}23.976" */
         float tmp = us_strtod( buffer_text, NULL );
         if( tmp > 0.0 && !var_GetFloat( p_demux, "sub-fps" ) > 0.0 )
-            p_sys->i_microsecperframe = tmp;
+            p_sys->i_microsecperframe = (int64_t)( (float)1000000 / tmp );
+        goto next;
     }
 
     /* replace | by \n */
