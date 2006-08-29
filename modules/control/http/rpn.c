@@ -26,7 +26,7 @@
 #include "http.h"
 #include "vlc_url.h"
 #include "vlc_meta.h"
-#include "vlc_string.h"
+#include "vlc_strings.h"
 
 static vlc_object_t *GetVLCObject( intf_thread_t *p_intf,
                                    const char *psz_object,
