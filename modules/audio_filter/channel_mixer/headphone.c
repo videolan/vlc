@@ -96,7 +96,7 @@ vlc_module_begin();
     /* Audio filter 2 */
     add_submodule();
     set_description( _("Headphone virtual spatialization effect") );
-    set_capability( "audio filter2", 100 );
+    set_capability( "audio filter2", 0 );
     set_callbacks( OpenFilter, CloseFilter );
 vlc_module_end();
 
@@ -652,7 +652,6 @@ static int OpenFilter( vlc_object_t *p_this )
 static void CloseFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
 
     if( p_filter->p_sys != NULL )
     {
@@ -667,8 +666,6 @@ static void CloseFilter( vlc_object_t *p_this )
         free( p_filter->p_sys );
         p_filter->p_sys = NULL;
     }
-
-    if( p_sys) free( p_sys );
 }
 
 static block_t *Convert( filter_t *p_filter, block_t *p_block )
@@ -685,8 +682,8 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     }
 
     i_out_size = p_block->i_samples *
-      p_filter->fmt_out.audio.i_bitspersample *
-        p_filter->fmt_out.audio.i_channels / 8;
+      p_filter->fmt_out.audio.i_bitspersample/8 *
+        aout_FormatNbChannels( &(p_filter->fmt_out.audio) );
 
     p_out = p_filter->pf_audio_buffer_new( p_filter, i_out_size );
     if( !p_out )
