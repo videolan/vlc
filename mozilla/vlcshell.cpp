@@ -176,10 +176,11 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                     }
                 }
             }
-            if( needsDisplay )
-            {
-                const NPWindow *npwindow = p_plugin->getWindow();
+
+            const NPWindow *npwindow = p_plugin->getWindow();
                 
+            if( needsDisplay && npwindow->window )
+            {
                 /* draw the beautiful "No Picture" */
 
                 ForeColor(blackColor);

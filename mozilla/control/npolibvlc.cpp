@@ -494,7 +494,7 @@ const NPUTF8 * const LibvlcPlaylistNPObject::methodNames[] =
 {
     "add",
     "play",
-    "togglepause"
+    "togglepause",
     "stop",
     "next",
     "prev",
@@ -811,63 +811,59 @@ void LibvlcPlaylistNPObject::parseOptions(const NPString &s, int *i_options, cha
 
 void LibvlcPlaylistNPObject::parseOptions(NPObject *obj, int *i_options, char*** ppsz_options)
 {
+    /* WARNING: Safari does not implement NPN_HasProperty/NPN_HasMethod */
+
+    NPVariant value;
+
     /* we are expecting to have a Javascript Array object */
-    NPIdentifier name = NPN_GetStringIdentifier("length");
-    if( NPN_HasProperty(_instance, obj, name) )
+    NPIdentifier propId = NPN_GetStringIdentifier("length");
+    if( NPN_GetProperty(_instance, obj, propId, &value) )
     {
-        NPVariant value;
-        if( NPN_GetProperty(_instance, obj, name, &value) )
+        int count = numberValue(value);
+        NPN_ReleaseVariantValue(&value);
+
+        if( count )
         {
-            int count = numberValue(value);
-            NPN_ReleaseVariantValue(&value);
-
-            if( count )
+            long capacity = 16;
+            char **options = (char **)malloc(capacity*sizeof(char *));
+            if( options )
             {
-                long capacity = 16;
-                char **options = (char **)malloc(capacity*sizeof(char *));
-                if( options )
+                int nOptions = 0;
+
+                while( nOptions < count )
                 {
-                    int nOptions = 0;
+                    propId = NPN_GetIntIdentifier(nOptions);
+                    if( ! NPN_GetProperty(_instance, obj, propId, &value) )
+                        /* return what we got so far */
+                        break;
 
-                    while( nOptions < count )
+                    if( ! NPVARIANT_IS_STRING(value) )
                     {
-                        name = NPN_GetIntIdentifier(nOptions);
-                        if( ! NPN_HasProperty(_instance, obj, name) )
-                            /* return what we got so far */
-                            break;
-
-                        if( ! NPN_GetProperty(_instance, obj, name, &value) )
-                            /* return what we got so far */
-                            break;
-
-                        if( ! NPVARIANT_IS_STRING(value) )
-                        {
-                            /* return what we got so far */
-                            NPN_ReleaseVariantValue(&value);
-                            break;
-                        }
-
-                        if( nOptions == capacity )
-                        {
-                            capacity += 16;
-                            char **moreOptions = (char **)realloc(options, capacity*sizeof(char*)); 
-                            if( ! moreOptions )
-                            {
-                                /* failed to allocate more memory */
-                                NPN_ReleaseVariantValue(&value);
-                                /* return what we got so far */
-                                *i_options = nOptions;
-                                *ppsz_options = options;
-                                break;
-                            }
-                            options = moreOptions;
-                        }
-
-                        options[nOptions++] = stringValue(value);
+                        /* return what we got so far */
+                        NPN_ReleaseVariantValue(&value);
+                        break;
                     }
-                    *i_options = nOptions;
-                    *ppsz_options = options;
+
+                    if( nOptions == capacity )
+                    {
+                        capacity += 16;
+                        char **moreOptions = (char **)realloc(options, capacity*sizeof(char*)); 
+                        if( ! moreOptions )
+                        {
+                            /* failed to allocate more memory */
+                            NPN_ReleaseVariantValue(&value);
+                            /* return what we got so far */
+                            *i_options = nOptions;
+                            *ppsz_options = options;
+                            break;
+                        }
+                        options = moreOptions;
+                    }
+
+                    options[nOptions++] = stringValue(value);
                 }
+                *i_options = nOptions;
+                *ppsz_options = options;
             }
         }
     }

@@ -399,7 +399,7 @@ NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_GetStringIdentifierProc( gNetscapeFuncs.getstringidentifier, name);
+        return CallNPN_GetStringIdentifierProc( gNetscapeFuncs.getstringidentifier, name);
     }
     return NULL;
 }
@@ -409,7 +409,7 @@ void NPN_GetStringIdentifiers(const NPUTF8 **names, int32_t nameCount, NPIdentif
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	CallNPN_GetStringIdentifiersProc( gNetscapeFuncs.getstringidentifiers, names, nameCount, identifiers);
+        CallNPN_GetStringIdentifiersProc( gNetscapeFuncs.getstringidentifiers, names, nameCount, identifiers);
     }
 }
 
@@ -418,7 +418,7 @@ NPIdentifier NPN_GetIntIdentifier(int32_t intid)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_GetIntIdentifierProc( gNetscapeFuncs.getintidentifier, intid);
+        return CallNPN_GetIntIdentifierProc( gNetscapeFuncs.getintidentifier, intid);
     }
     return NULL;
 }
@@ -428,7 +428,7 @@ bool NPN_IdentifierIsString(NPIdentifier identifier)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_IdentifierIsStringProc( gNetscapeFuncs.identifierisstring, identifier);
+        return CallNPN_IdentifierIsStringProc( gNetscapeFuncs.identifierisstring, identifier);
     }
     return false;
 }
@@ -438,7 +438,7 @@ NPUTF8 *NPN_UTF8FromIdentifier(NPIdentifier identifier)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_UTF8FromIdentifierProc( gNetscapeFuncs.utf8fromidentifier, identifier);
+        return CallNPN_UTF8FromIdentifierProc( gNetscapeFuncs.utf8fromidentifier, identifier);
     }
     return NULL;
 }
@@ -448,7 +448,7 @@ int32_t NPN_IntFromIdentifier(NPIdentifier identifier)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_IntFromIdentifierProc( gNetscapeFuncs.intfromidentifier, identifier);
+        return CallNPN_IntFromIdentifierProc( gNetscapeFuncs.intfromidentifier, identifier);
     }
     return 0;
 }
@@ -458,7 +458,7 @@ NPObject *NPN_CreateObject(NPP instance, NPClass *aClass)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_CreateObjectProc( gNetscapeFuncs.createobject, instance, aClass);
+        return CallNPN_CreateObjectProc( gNetscapeFuncs.createobject, instance, aClass);
     }
     return NULL;
 }
@@ -468,7 +468,7 @@ NPObject *NPN_RetainObject(NPObject *npobj)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_RetainObjectProc( gNetscapeFuncs.retainobject, npobj);
+        return CallNPN_RetainObjectProc( gNetscapeFuncs.retainobject, npobj);
     }
     return NULL;
 }
@@ -478,7 +478,7 @@ void NPN_ReleaseObject(NPObject *npobj)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	CallNPN_ReleaseObjectProc( gNetscapeFuncs.releaseobject, npobj);
+        CallNPN_ReleaseObjectProc( gNetscapeFuncs.releaseobject, npobj);
     }
 }
 
@@ -487,7 +487,7 @@ bool NPN_Invoke(NPP instance, NPObject *npobj, NPIdentifier methodName, const NP
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_InvokeProc( gNetscapeFuncs.invoke, instance, npobj, methodName, args, argCount, result);
+        return CallNPN_InvokeProc( gNetscapeFuncs.invoke, instance, npobj, methodName, args, argCount, result);
     }
     return false;
 }
@@ -497,7 +497,7 @@ bool NPN_InvokeDefault(NPP instance, NPObject *npobj, const NPVariant *args, uin
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_InvokeDefaultProc( gNetscapeFuncs.invokeDefault, instance, npobj, args, argCount, result);
+        return CallNPN_InvokeDefaultProc( gNetscapeFuncs.invokeDefault, instance, npobj, args, argCount, result);
     }
     return false;
 }
@@ -507,7 +507,7 @@ bool NPN_Evaluate(NPP instance, NPObject *npobj, NPString *script, NPVariant *re
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_EvaluateProc( gNetscapeFuncs.evaluate, instance, npobj, script, result);
+        return CallNPN_EvaluateProc( gNetscapeFuncs.evaluate, instance, npobj, script, result);
     }
     return false;
 }
@@ -517,7 +517,7 @@ bool NPN_GetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, N
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_GetPropertyProc( gNetscapeFuncs.getproperty, instance, npobj, propertyName, result);
+        return CallNPN_GetPropertyProc( gNetscapeFuncs.getproperty, instance, npobj, propertyName, result);
     }
     return false;
 }
@@ -527,7 +527,7 @@ bool NPN_SetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, c
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_SetPropertyProc( gNetscapeFuncs.setproperty, instance, npobj, propertyName, value);
+        return CallNPN_SetPropertyProc( gNetscapeFuncs.setproperty, instance, npobj, propertyName, value);
     }
     return false;
 }
@@ -537,7 +537,7 @@ bool NPN_RemoveProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_RemovePropertyProc( gNetscapeFuncs.removeproperty, instance, npobj, propertyName);
+        return CallNPN_RemovePropertyProc( gNetscapeFuncs.removeproperty, instance, npobj, propertyName);
     }
     return false;
 }
@@ -547,7 +547,7 @@ bool NPN_HasProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_HasPropertyProc( gNetscapeFuncs.hasproperty, instance, npobj, propertyName);
+        return CallNPN_HasPropertyProc( gNetscapeFuncs.hasproperty, instance, npobj, propertyName);
     }
     return false;
 }
@@ -557,7 +557,7 @@ bool NPN_HasMethod(NPP instance, NPObject *npobj, NPIdentifier methodName)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return CallNPN_HasMethodProc( gNetscapeFuncs.hasmethod, instance, npobj, methodName);
+        return CallNPN_HasMethodProc( gNetscapeFuncs.hasmethod, instance, npobj, methodName);
     }
     return false;
 }
@@ -567,7 +567,7 @@ void NPN_ReleaseVariantValue(NPVariant *variant)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	CallNPN_ReleaseVariantValueProc( gNetscapeFuncs.releasevariantvalue, variant);
+        CallNPN_ReleaseVariantValueProc( gNetscapeFuncs.releasevariantvalue, variant);
     }
 }
 
@@ -576,7 +576,7 @@ void NPN_SetException(NPObject *npobj, const NPUTF8 *message)
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	CallNPN_SetExceptionProc( gNetscapeFuncs.setexception, npobj, message);
+        CallNPN_SetExceptionProc( gNetscapeFuncs.setexception, npobj, message);
     }
 }
 
@@ -967,27 +967,27 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
         gNetscapeFuncs.forceredraw      = (NPN_ForceRedrawUPP)HOST_TO_PLUGIN_GLUE(forceredraw, nsTable->forceredraw);
         if( navMinorVers >= 14 )
         {   
-	    // NPRuntime support 
-	    gNetscapeFuncs.getstringidentifier  = (NPN_GetStringIdentifierUPP)HOST_TO_PLUGIN_GLUE(getstringidentifier, nsTable->getstringidentifier);
-	    gNetscapeFuncs.getstringidentifiers = (NPN_GetStringIdentifiersUPP)HOST_TO_PLUGIN_GLUE(getstringidentifiers, nsTable->getstringidentifiers);
-	    gNetscapeFuncs.getintidentifier     = (NPN_GetIntIdentifierUPP)HOST_TO_PLUGIN_GLUE(getintidentifier, nsTable->getintidentifier);
-	    gNetscapeFuncs.identifierisstring   = (NPN_IdentifierIsStringUPP)HOST_TO_PLUGIN_GLUE(identifierisstring, nsTable->identifierisstring);
-	    gNetscapeFuncs.utf8fromidentifier   = (NPN_UTF8FromIdentifierUPP)HOST_TO_PLUGIN_GLUE(utf8fromidentifier, nsTable->utf8fromidentifier);
-	    gNetscapeFuncs.intfromidentifier    = (NPN_IntFromIdentifierUPP)HOST_TO_PLUGIN_GLUE(intfromidentifier, nsTable->intfromidentifier);
-	    gNetscapeFuncs.createobject         = (NPN_CreateObjectUPP)HOST_TO_PLUGIN_GLUE(createobject, nsTable->createobject);
-	    gNetscapeFuncs.retainobject         = (NPN_RetainObjectUPP)HOST_TO_PLUGIN_GLUE(retainobject, nsTable->retainobject);
-	    gNetscapeFuncs.releaseobject        = (NPN_ReleaseObjectUPP)HOST_TO_PLUGIN_GLUE(releaseobject, nsTable->releaseobject);
-	    gNetscapeFuncs.invoke               = (NPN_InvokeUPP)HOST_TO_PLUGIN_GLUE(invoke, nsTable->invoke);
-	    gNetscapeFuncs.invokeDefault        = (NPN_InvokeDefaultUPP)HOST_TO_PLUGIN_GLUE(invokeDefault, nsTable->invokeDefault);
-	    gNetscapeFuncs.evaluate             = (NPN_EvaluateUPP)HOST_TO_PLUGIN_GLUE(evaluate, nsTable->evaluate);
-	    gNetscapeFuncs.getproperty          = (NPN_GetPropertyUPP)HOST_TO_PLUGIN_GLUE(getproperty, nsTable->getproperty);
-	    gNetscapeFuncs.setproperty          = (NPN_SetPropertyUPP)HOST_TO_PLUGIN_GLUE(setproperty, nsTable->setproperty);
-	    gNetscapeFuncs.removeproperty       = (NPN_RemovePropertyUPP)HOST_TO_PLUGIN_GLUE(removeproperty, nsTable->removeproperty);
-	    gNetscapeFuncs.hasproperty          = (NPN_HasPropertyUPP)HOST_TO_PLUGIN_GLUE(hasproperty, nsTable->hasproperty);
-	    gNetscapeFuncs.hasmethod            = (NPN_HasMethodUPP)HOST_TO_PLUGIN_GLUE(hasmethod, nsTable->hasmethod);
-	    gNetscapeFuncs.releasevariantvalue  = (NPN_ReleaseVariantValueUPP)HOST_TO_PLUGIN_GLUE(releasevariantvalue, nsTable->releasevariantvalue);
-	    gNetscapeFuncs.setexception         = (NPN_SetExceptionUPP)HOST_TO_PLUGIN_GLUE(setexception, nsTable->setexception);
-	}
+            // NPRuntime support 
+            gNetscapeFuncs.getstringidentifier  = (NPN_GetStringIdentifierUPP)HOST_TO_PLUGIN_GLUE(getstringidentifier, nsTable->getstringidentifier);
+            gNetscapeFuncs.getstringidentifiers = (NPN_GetStringIdentifiersUPP)HOST_TO_PLUGIN_GLUE(getstringidentifiers, nsTable->getstringidentifiers);
+            gNetscapeFuncs.getintidentifier     = (NPN_GetIntIdentifierUPP)HOST_TO_PLUGIN_GLUE(getintidentifier, nsTable->getintidentifier);
+            gNetscapeFuncs.identifierisstring   = (NPN_IdentifierIsStringUPP)HOST_TO_PLUGIN_GLUE(identifierisstring, nsTable->identifierisstring);
+            gNetscapeFuncs.utf8fromidentifier   = (NPN_UTF8FromIdentifierUPP)HOST_TO_PLUGIN_GLUE(utf8fromidentifier, nsTable->utf8fromidentifier);
+            gNetscapeFuncs.intfromidentifier    = (NPN_IntFromIdentifierUPP)HOST_TO_PLUGIN_GLUE(intfromidentifier, nsTable->intfromidentifier);
+            gNetscapeFuncs.createobject         = (NPN_CreateObjectUPP)HOST_TO_PLUGIN_GLUE(createobject, nsTable->createobject);
+            gNetscapeFuncs.retainobject         = (NPN_RetainObjectUPP)HOST_TO_PLUGIN_GLUE(retainobject, nsTable->retainobject);
+            gNetscapeFuncs.releaseobject        = (NPN_ReleaseObjectUPP)HOST_TO_PLUGIN_GLUE(releaseobject, nsTable->releaseobject);
+            gNetscapeFuncs.invoke               = (NPN_InvokeUPP)HOST_TO_PLUGIN_GLUE(invoke, nsTable->invoke);
+            gNetscapeFuncs.invokeDefault        = (NPN_InvokeDefaultUPP)HOST_TO_PLUGIN_GLUE(invokeDefault, nsTable->invokeDefault);
+            gNetscapeFuncs.evaluate             = (NPN_EvaluateUPP)HOST_TO_PLUGIN_GLUE(evaluate, nsTable->evaluate);
+            gNetscapeFuncs.getproperty          = (NPN_GetPropertyUPP)HOST_TO_PLUGIN_GLUE(getproperty, nsTable->getproperty);
+            gNetscapeFuncs.setproperty          = (NPN_SetPropertyUPP)HOST_TO_PLUGIN_GLUE(setproperty, nsTable->setproperty);
+            gNetscapeFuncs.removeproperty       = (NPN_RemovePropertyUPP)HOST_TO_PLUGIN_GLUE(removeproperty, nsTable->removeproperty);
+            gNetscapeFuncs.hasproperty          = (NPN_HasPropertyUPP)HOST_TO_PLUGIN_GLUE(hasproperty, nsTable->hasproperty);
+            gNetscapeFuncs.hasmethod            = (NPN_HasMethodUPP)HOST_TO_PLUGIN_GLUE(hasmethod, nsTable->hasmethod);
+            gNetscapeFuncs.releasevariantvalue  = (NPN_ReleaseVariantValueUPP)HOST_TO_PLUGIN_GLUE(releasevariantvalue, nsTable->releasevariantvalue);
+            gNetscapeFuncs.setexception         = (NPN_SetExceptionUPP)HOST_TO_PLUGIN_GLUE(setexception, nsTable->setexception);
+        }
 
         //
         // Set up the plugin function table that Netscape will use to
@@ -1111,26 +1111,26 @@ NPError NP_Initialize(NPNetscapeFuncs* nsTable)
     gNetscapeFuncs.forceredraw      = nsTable->forceredraw;
     if( navMinorVers >= 14 )
     {   
-	// NPRuntime support 
-	gNetscapeFuncs.getstringidentifier  = nsTable->getstringidentifier;
-	gNetscapeFuncs.getstringidentifiers = nsTable->getstringidentifiers;
-	gNetscapeFuncs.getintidentifier     = nsTable->getintidentifier;
-	gNetscapeFuncs.identifierisstring   = nsTable->identifierisstring;
-	gNetscapeFuncs.utf8fromidentifier   = nsTable->utf8fromidentifier;
-	gNetscapeFuncs.intfromidentifier    = nsTable->intfromidentifier;
-	gNetscapeFuncs.createobject         = nsTable->createobject;
-	gNetscapeFuncs.retainobject         = nsTable->retainobject;
-	gNetscapeFuncs.releaseobject        = nsTable->releaseobject;
-	gNetscapeFuncs.invoke               = nsTable->invoke;
-	gNetscapeFuncs.invokeDefault        = nsTable->invokeDefault;
-	gNetscapeFuncs.evaluate             = nsTable->evaluate;
-	gNetscapeFuncs.getproperty          = nsTable->getproperty;
-	gNetscapeFuncs.setproperty          = nsTable->setproperty;
-	gNetscapeFuncs.removeproperty       = nsTable->removeproperty;
-	gNetscapeFuncs.hasproperty          = nsTable->hasproperty;
-	gNetscapeFuncs.hasmethod            = nsTable->hasmethod;
-	gNetscapeFuncs.releasevariantvalue  = nsTable->releasevariantvalue;
-	gNetscapeFuncs.setexception         = nsTable->setexception;
+        // NPRuntime support 
+        gNetscapeFuncs.getstringidentifier  = nsTable->getstringidentifier;
+        gNetscapeFuncs.getstringidentifiers = nsTable->getstringidentifiers;
+        gNetscapeFuncs.getintidentifier     = nsTable->getintidentifier;
+        gNetscapeFuncs.identifierisstring   = nsTable->identifierisstring;
+        gNetscapeFuncs.utf8fromidentifier   = nsTable->utf8fromidentifier;
+        gNetscapeFuncs.intfromidentifier    = nsTable->intfromidentifier;
+        gNetscapeFuncs.createobject         = nsTable->createobject;
+        gNetscapeFuncs.retainobject         = nsTable->retainobject;
+        gNetscapeFuncs.releaseobject        = nsTable->releaseobject;
+        gNetscapeFuncs.invoke               = nsTable->invoke;
+        gNetscapeFuncs.invokeDefault        = nsTable->invokeDefault;
+        gNetscapeFuncs.evaluate             = nsTable->evaluate;
+        gNetscapeFuncs.getproperty          = nsTable->getproperty;
+        gNetscapeFuncs.setproperty          = nsTable->setproperty;
+        gNetscapeFuncs.removeproperty       = nsTable->removeproperty;
+        gNetscapeFuncs.hasproperty          = nsTable->hasproperty;
+        gNetscapeFuncs.hasmethod            = nsTable->hasmethod;
+        gNetscapeFuncs.releasevariantvalue  = nsTable->releasevariantvalue;
+        gNetscapeFuncs.setexception         = nsTable->setexception;
     }
     return NPP_Initialize();
 }
