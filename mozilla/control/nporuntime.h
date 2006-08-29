@@ -1,5 +1,6 @@
 /*****************************************************************************
- * runtime.h: a VLC plugin for Mozilla
+ * runtime.cpp: support for NPRuntime API for Netscape Script-able plugins
+ *              FYI: http://www.mozilla.org/projects/plugins/npruntime.html
  *****************************************************************************
  * Copyright (C) 2002-2005 the VideoLAN team
  * $Id: RuntimeNPObject.h 14466 2006-02-22 23:34:54Z dionoea $
@@ -31,9 +32,21 @@
 #include <npapi.h>
 #include <npruntime.h>
 
+static void RuntimeNPClassDeallocate(NPObject *npobj);
+static void RuntimeNPClassInvalidate(NPObject *npobj);
+static bool RuntimeNPClassInvokeDefault(NPObject *npobj,
+                                        const NPVariant *args,
+                                        uint32_t argCount,
+                                        NPVariant *result);
+
 class RuntimeNPObject : public NPObject
 {
 public:
+
+    /*
+    ** utility functions
+    */
+
     static bool isNumberValue(const NPVariant &v)
     {
         return NPVARIANT_IS_INT32(v)
@@ -55,6 +68,8 @@ public:
     static char* stringValue(const NPString &v);
     static char* stringValue(const NPVariant &v);
 
+protected:
+
     RuntimeNPObject(NPP instance, const NPClass *aClass) :
         _instance(instance)
     {
@@ -62,12 +77,6 @@ public:
         referenceCount = 1;
     };
     virtual ~RuntimeNPObject() {};
-
-    /*
-    ** utility functions
-    */
-
-protected:
 
     enum InvokeResult
     {
@@ -79,17 +88,18 @@ protected:
         INVOKERESULT_OUT_OF_MEMORY  = 5,    /* throws out of memory */
     };
 
-    template <class RuntimeNPObject> friend void RuntimeNPClassInvalidate(NPObject *npobj);
+    friend void RuntimeNPClassDeallocate(NPObject *npobj);
+    friend void RuntimeNPClassInvalidate(NPObject *npobj);
     template <class RuntimeNPObject> friend bool RuntimeNPClassGetProperty(NPObject *npobj, NPIdentifier name, NPVariant *result);
     template <class RuntimeNPObject> friend bool RuntimeNPClassSetProperty(NPObject *npobj, NPIdentifier name, const NPVariant *value);
     template <class RuntimeNPObject> friend bool RuntimeNPClassRemoveProperty(NPObject *npobj, NPIdentifier name);
     template <class RuntimeNPObject> friend bool RuntimeNPClassInvoke(NPObject *npobj, NPIdentifier name,
                                                     const NPVariant *args, uint32_t argCount,
                                                     NPVariant *result);
-    template <class RuntimeNPObject> friend bool RuntimeNPClassInvokeDefault(NPObject *npobj,
-                                                    const NPVariant *args,
-                                                    uint32_t argCount,
-                                                    NPVariant *result);
+    friend bool RuntimeNPClassInvokeDefault(NPObject *npobj,
+                                            const NPVariant *args,
+                                            uint32_t argCount,
+                                            NPVariant *result);
 
     virtual InvokeResult getProperty(int index, NPVariant &result);
     virtual InvokeResult setProperty(int index, const NPVariant &value);
@@ -105,12 +115,25 @@ protected:
 template<class T> class RuntimeNPClass : public NPClass
 {
 public:
+    static NPClass *getClass()
+    {
+        static NPClass *singleton = new RuntimeNPClass<T>;
+        return singleton;
+    }
+
+protected:
     RuntimeNPClass();
     virtual ~RuntimeNPClass();
 
-    /*template <class T> friend NPObject *RuntimeNPClassAllocate(NPP instance, NPClass *aClass);
+    template <class RuntimeNPObject> friend NPObject *RuntimeNPClassAllocate(NPP instance, NPClass *aClass);
     template <class RuntimeNPObject> friend bool RuntimeNPClassHasMethod(NPObject *npobj, NPIdentifier name);
-    template <class RuntimeNPObject> friend bool RuntimeNPClassHasProperty(NPObject *npobj, NPIdentifier name);*/
+    template <class RuntimeNPObject> friend bool RuntimeNPClassHasProperty(NPObject *npobj, NPIdentifier name);
+    template <class RuntimeNPObject> friend bool RuntimeNPClassGetProperty(NPObject *npobj, NPIdentifier name, NPVariant *result);
+    template <class RuntimeNPObject> friend bool RuntimeNPClassSetProperty(NPObject *npobj, NPIdentifier name, const NPVariant *value);
+    template <class RuntimeNPObject> friend bool RuntimeNPClassRemoveProperty(NPObject *npobj, NPIdentifier name);
+    template <class RuntimeNPObject> friend bool RuntimeNPClassInvoke(NPObject *npobj, NPIdentifier name,
+                                                                      const NPVariant *args, uint32_t argCount,
+                                                                      NPVariant *result);
 
     RuntimeNPObject *create(NPP instance) const;
 
@@ -129,14 +152,12 @@ static NPObject *RuntimeNPClassAllocate(NPP instance, NPClass *aClass)
     return (NPObject *)vClass->create(instance);
 }
 
-template<class T>
 static void RuntimeNPClassDeallocate(NPObject *npobj)
 {
     RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
     delete vObj;
 }
 
-template<class T>
 static void RuntimeNPClassInvalidate(NPObject *npobj)
 {
     RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
@@ -212,7 +233,6 @@ static bool RuntimeNPClassInvoke(NPObject *npobj, NPIdentifier name,
     return false;
 }
 
-template<class T>
 static bool RuntimeNPClassInvokeDefault(NPObject *npobj,
                                            const NPVariant *args,
                                            uint32_t argCount,
@@ -245,16 +265,16 @@ RuntimeNPClass<T>::RuntimeNPClass()
 
     // fill in NPClass structure
     structVersion  = NP_CLASS_STRUCT_VERSION;
-    allocate       = RuntimeNPClassAllocate<T>;
-    deallocate     = RuntimeNPClassDeallocate<T>;
-    invalidate     = RuntimeNPClassInvalidate<T>;
-    hasMethod      = RuntimeNPClassHasMethod<T>;
-    invoke         = RuntimeNPClassInvoke<T>;
-    invokeDefault  = RuntimeNPClassInvokeDefault<T>;
-    hasProperty    = RuntimeNPClassHasProperty<T>;
-    getProperty    = RuntimeNPClassGetProperty<T>;
-    setProperty    = RuntimeNPClassSetProperty<T>;
-    removeProperty = RuntimeNPClassRemoveProperty<T>;
+    allocate       = &RuntimeNPClassAllocate<T>;
+    deallocate     = &RuntimeNPClassDeallocate;
+    invalidate     = &RuntimeNPClassInvalidate;
+    hasMethod      = &RuntimeNPClassHasMethod<T>;
+    invoke         = &RuntimeNPClassInvoke<T>;
+    invokeDefault  = &RuntimeNPClassInvokeDefault;
+    hasProperty    = &RuntimeNPClassHasProperty<T>;
+    getProperty    = &RuntimeNPClassGetProperty<T>;
+    setProperty    = &RuntimeNPClassSetProperty<T>;
+    removeProperty = &RuntimeNPClassRemoveProperty<T>;
 }
 
 template<class T>

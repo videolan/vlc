@@ -99,6 +99,10 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
          RegCloseKey( h_key );
     }
     ppsz_argv[ppsz_argc++] = "--no-one-instance";
+#if 0
+    ppsz_argv[ppsz_argc++] = "--fast-mutex";
+    ppsz_argv[ppsz_argc++] = "--win9x-cv-method=1";
+#endif
 
 #endif /* XP_MACOSX */
 
@@ -152,9 +156,9 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
             }
         }
         else if( !strcmp( argn[i], "version") )
-	{
-	    version = argv[i];
-	}
+        {
+            version = argv[i];
+        }
     }
 
     libvlc_instance = libvlc_new(ppsz_argc, ppsz_argv, NULL);
@@ -209,13 +213,13 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     /* assign plugin script root class */
     if( (NULL != version) && (!strcmp(version, "VideoLAN.VLCPlugin.2")) )
     {
-	/* new APIs */
-	scriptClass = new RuntimeNPClass<LibvlcRootNPObject>();
+        /* new APIs */
+        scriptClass = RuntimeNPClass<LibvlcRootNPObject>::getClass();
     }
     else
     {
-	/* legacy APIs */
-	scriptClass = new RuntimeNPClass<VlcNPObject>();
+        /* legacy APIs */
+        scriptClass = RuntimeNPClass<VlcNPObject>::getClass();
     }
 
     return NPERR_NO_ERROR;

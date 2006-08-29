@@ -1,8 +1,7 @@
 /*****************************************************************************
- * vlc.cpp: support for NPRuntime API for Netscape Script-able plugins
- *                 FYI: http://www.mozilla.org/projects/plugins/npruntime.html
+ * npovlc.cpp: deprecated VLC apis implemented in late XPCOM interface
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *
@@ -50,28 +49,28 @@ const int VlcNPObject::propertyCount = sizeof(VlcNPObject::propertyNames)/sizeof
 
 const NPUTF8 * const VlcNPObject::methodNames[] =
 {
-    "play",
-    "pause",
-    "stop",
-    "fullscreen",
-    "set_volume",
-    "get_volume",
-    "mute",
-    "get_int_variable",
-    "set_int_variable",
-    "get_bool_variable",
-    "set_bool_variable",
-    "get_str_variable",
-    "set_str_variable",
-    "clear_playlist",
-    "add_item",
-    "next",
-    "previous",
-    "isplaying",
-    "get_length",
-    "get_position",
-    "get_time",
-    "seek",
+    "play",                 /* deprecated */
+    "pause",                /* deprecated */
+    "stop",                 /* deprecated */
+    "fullscreen",           /* deprecated */
+    "set_volume",           /* deprecated */
+    "get_volume",           /* deprecated */
+    "mute",                 /* deprecated */
+    "get_int_variable",     /* deprecated */
+    "set_int_variable",     /* deprecated */
+    "get_bool_variable",    /* deprecated */
+    "set_bool_variable",    /* deprecated */
+    "get_str_variable",     /* deprecated */
+    "set_str_variable",     /* deprecated */
+    "clear_playlist",       /* deprecated */
+    "add_item",             /* deprecated */
+    "next",                 /* deprecated */
+    "previous",             /* deprecated */
+    "isplaying",            /* deprecated */
+    "get_length",           /* deprecated */
+    "get_position",         /* deprecated */
+    "get_time",             /* deprecated */
+    "seek",                 /* deprecated */
 };
 
 enum VlcNPObjectMethodIds
@@ -112,7 +111,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
 
         switch( index )
         {
-            case ID_play:
+            case ID_play: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_playlist_play(p_plugin->getVLC(), -1, 0, NULL, &ex);
@@ -129,7 +128,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_pause:
+            case ID_pause: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_playlist_pause(p_plugin->getVLC(), &ex);
@@ -146,7 +145,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_stop:
+            case ID_stop: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_playlist_stop(p_plugin->getVLC(), &ex);
@@ -163,7 +162,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_fullscreen:
+            case ID_fullscreen: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_input_t *p_input = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
@@ -195,7 +194,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_set_volume:
+            case ID_set_volume: /* deprecated */
                 if( (argCount == 1) && isNumberValue(args[0]) )
                 {
                     libvlc_audio_set_volume(p_plugin->getVLC(), numberValue(args[0]), &ex);
@@ -212,7 +211,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_get_volume:
+            case ID_get_volume: /* deprecated */
                 if( argCount == 0 )
                 {
                     int val = libvlc_audio_get_volume(p_plugin->getVLC(), &ex);
@@ -229,7 +228,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_mute:
+            case ID_mute: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_audio_toggle_mute(p_plugin->getVLC(), &ex);
@@ -246,7 +245,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_get_int_variable:
+            case ID_get_int_variable: /* deprecated */
                 if( (argCount == 1) && NPVARIANT_IS_STRING(args[0]) )
                 {
                     char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
@@ -270,7 +269,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         return INVOKERESULT_OUT_OF_MEMORY;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_set_int_variable:
+            case ID_set_int_variable: /* deprecated */
                 if( (argCount == 2)
                     && NPVARIANT_IS_STRING(args[0])
                     && isNumberValue(args[1]) )
@@ -297,7 +296,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         return INVOKERESULT_OUT_OF_MEMORY;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_get_bool_variable:
+            case ID_get_bool_variable: /* deprecated */
                 if( (argCount == 1) && NPVARIANT_IS_STRING(args[0]) )
                 {
                     char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
@@ -321,7 +320,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         return INVOKERESULT_OUT_OF_MEMORY;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_set_bool_variable:
+            case ID_set_bool_variable: /* deprecated */
                 if( (argCount == 2)
                     && NPVARIANT_IS_STRING(args[0])
                     && NPVARIANT_IS_BOOLEAN(args[1]) )
@@ -348,7 +347,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         return INVOKERESULT_OUT_OF_MEMORY;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_get_str_variable:
+            case ID_get_str_variable: /* deprecated */
                 if( (argCount == 1) && NPVARIANT_IS_STRING(args[0]) )
                 {
                     char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
@@ -378,7 +377,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                             else
                             {
                                 /* null string */
-                                STRINGN_TO_NPVARIANT(NULL, 0, result);
+                                NULL_TO_NPVARIANT(result);
                                 return INVOKERESULT_NO_ERROR;
                             }
                         }
@@ -392,7 +391,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         return INVOKERESULT_OUT_OF_MEMORY;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_set_str_variable:
+            case ID_set_str_variable: /* deprecated */
                 if( (argCount == 2)
                     && NPVARIANT_IS_STRING(args[0])
                     && NPVARIANT_IS_STRING(args[1]) )
@@ -429,7 +428,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         return INVOKERESULT_OUT_OF_MEMORY;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_clear_playlist:
+            case ID_clear_playlist: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_playlist_clear(p_plugin->getVLC(), &ex);
@@ -446,7 +445,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_add_item:
+            case ID_add_item: /* deprecated */
                 if( (argCount == 1) && NPVARIANT_IS_STRING(args[0]) )
                 {
                     char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
@@ -476,7 +475,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         return INVOKERESULT_OUT_OF_MEMORY;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_next:
+            case ID_next: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_playlist_next(p_plugin->getVLC(), &ex);
@@ -493,7 +492,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_previous:
+            case ID_previous: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_playlist_prev(p_plugin->getVLC(), &ex);
@@ -510,7 +509,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_isplaying:
+            case ID_isplaying: /* deprecated */
                 if( argCount == 0 )
                 {
                     int isplaying = libvlc_playlist_isplaying(p_plugin->getVLC(), &ex);
@@ -527,7 +526,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_get_length:
+            case ID_get_length: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_input_t *p_input = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
@@ -559,7 +558,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_get_position:
+            case ID_get_position: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_input_t *p_input = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
@@ -591,7 +590,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_get_time:
+            case ID_get_time: /* deprecated */
                 if( argCount == 0 )
                 {
                     libvlc_input_t *p_input = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
@@ -623,7 +622,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     }
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            case ID_seek:
+            case ID_seek: /* deprecated */
                 if( (argCount == 2)
                   && isNumberValue(args[0])
                   && NPVARIANT_IS_BOOLEAN(args[1]) )

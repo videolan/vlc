@@ -1,8 +1,7 @@
 /*****************************************************************************
- * vlc.h: a VLC plugin for Mozilla
+ * npovlc.h: deprecated APIs implemented in late XPCOM interface
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
- * $Id: vlcruntime.h 14466 2006-02-22 23:34:54Z dionoea $
+ * Copyright (C) 2002-2006 the VideoLAN team
  *
  * Authors: Damien Fouilleul <damien.fouilleul@laposte.net>
  *
@@ -29,13 +28,12 @@
 
 class VlcNPObject: public RuntimeNPObject
 {
-public:
+protected:
+    friend class RuntimeNPClass<VlcNPObject>;
+
     VlcNPObject(NPP instance, const NPClass *aClass) :
         RuntimeNPObject(instance, aClass) {};
     virtual ~VlcNPObject() {};
-
-protected:
-    friend class RuntimeNPClass<VlcNPObject>;
 
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];

@@ -1,0 +1,148 @@
+<HTML>
+<TITLE>VLC Mozilla plugin test page</TITLE>
+<BODY>
+<TABLE>
+<TR><TD colspan="2">
+MRL:
+<INPUT size="90" id="targetTextField" value="">
+<INPUT type=submit value="Go" onClick="doGo(document.getElementById('targetTextField').value);">
+</TD></TR>
+<TR><TD colspan="2">
+<EMBED  type="application/x-vlc-plugin" pluginspage="http://www.videolan.org/" version="VideoLAN.VLCPlugin.2"
+        width="640"
+        height="480"
+        id="vlc">
+</EMBED>
+</TD></TR>
+</TD><TD width="15%">
+<DIV id="info" style="text-align:center">-:--:--/-:--:--</DIV>
+</TD></TR>
+<TR><TD colspan="2">
+<INPUT type=button id="PlayOrPause" value=" Play " onClick='doPlayOrPause()'>
+<INPUT type=button value="Stop" onClick='document.vlc.playlist.stop();'>
+&nbsp;
+<INPUT type=button value=" << " onClick='document.vlc.playlist.playSlower();'>
+<INPUT type=button value=" >> " onClick='document.vlc.playlist.playFaster();'>
+&nbsp;
+<INPUT type=button value="Show" onClick='document.vlc.visible = true;'>
+<INPUT type=button value="Hide" onClick='document.vlc.visible = false;'>
+&nbsp;
+<INPUT type=button value="Version" onClick='alert(document.vlc.VersionInfo);'>
+<SPAN style="text-align:center">Volume:</SPAN>
+<INPUT type=button value=" - " onClick='updateVolume(-10)'>
+<SPAN id="volumeTextField" style="text-align: center">--</SPAN>
+<INPUT type=button value=" + " onClick='updateVolume(+10)'>
+<INPUT type=button value="Mute" onClick='document.vlc.audio.togglemute();'>
+</TD>
+</TR>
+</TABLE>
+<SCRIPT LANGUAGE="Javascript">
+<!--
+var timerId = 0;
+
+function updateVolume(deltaVol)
+{
+    var plugin = document.getElementById('vlc');
+    plugin.audio.volume += deltaVol;
+    volumeTextField.innerText = plugin.audio.volume+"%";
+};
+function formatTime(timeVal)
+{
+    var timeHour = timeVal;
+    var timeSec = timeHour % 60;
+    if( timeSec < 10 )
+    	timeSec = '0'+timeSec;
+    timeHour = (timeHour - timeSec)/60;
+    var timeMin = timeHour % 60;
+    if( timeMin < 10 )
+    	timeMin = '0'+timeMin;
+    timeHour = (timeHour - timeMin)/60;
+    if( timeHour > 0 )
+    	return timeHour+":"+timeMin+":"+timeSec;
+    else
+    	return timeMin+":"+timeSec;
+};
+function onPlay()
+{
+    document.getElementById("PlayOrPause").value = "Pause";
+};
+function onPause()
+{
+    document.getElementById("PlayOrPause").value = " Play ";
+};
+function onStop()
+{
+    info.innerText = "-:--:--/-:--:--";
+    document.getElementById("PlayOrPause").value = " Play ";
+};
+var liveFeedText = new Array("Live", "((Live))", "(( Live ))", "((  Live  ))");
+var liveFeedRoll = 0;
+
+function doUpdate()
+{
+    if( vlc.playlist.isplaying )
+    {
+        if( vlc.input.length > 0 )
+        {
+            // seekable stream
+            info.innerText = formatTime(vlc.input.time/1000)+"/"+formatTime(vlc.input.length/1000);
+            document.getElementById("PlayOrPause").Enabled = true;
+        }
+        else {
+            liveFeedRoll = liveFeedRoll & 3;
+            info.innerText = liveFeedText[liveFeedRoll++];
+        }
+        timerId = setTimeout("doUpdate()", 1000);
+    }
+    else
+    {
+        onStop();
+        timerId = 0;
+    }
+};
+function doGo(targetURL)
+{
+	var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
+	document.vlc.playlist.add(targetURL, null, options);
+};
+function doPlayOrPause()
+{
+    if( document.vlc.playlist.isplaying )
+    {
+        document.vlc.playlist.pause();
+    }
+    else
+    {
+        document.vlc.playlist.play();
+    }
+};
+function vlcPlayEvent()
+{
+    if( ! timerId )
+    {
+        timerId = setTimeout("doUpdate()", 1000);
+    }
+    onPlay();
+};
+function vlcPauseEvent()
+{
+    if( timerId )
+    {
+        clearTimeout(timerId)
+        timerId = 0;
+    }
+    onPause();
+};
+function vlcStopEvent()
+{
+    if( timerId )
+    {
+        clearTimeout(timerId)
+        timerId = 0;
+    }
+    onStop();
+};
+//-->
+</SCRIPT>
+</BODY>
+</HTML>

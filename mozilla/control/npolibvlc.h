@@ -1,8 +1,7 @@
 /*****************************************************************************
- * vlc.h: a VLC plugin for Mozilla
+ * npolibvlc.h: official Javascript APIs
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
- * $Id: vlcruntime.h 14466 2006-02-22 23:34:54Z dionoea $
+ * Copyright (C) 2002-2006 the VideoLAN team
  *
  * Authors: Damien Fouilleul <damien.fouilleul@laposte.net>
  *
@@ -29,12 +28,11 @@
 
 class LibvlcRootNPObject: public RuntimeNPObject
 {
-public:
-    LibvlcRootNPObject(NPP instance, const NPClass *aClass);
-    virtual ~LibvlcRootNPObject();
-
 protected:
     friend class RuntimeNPClass<LibvlcRootNPObject>;
+
+    LibvlcRootNPObject(NPP instance, const NPClass *aClass);
+    virtual ~LibvlcRootNPObject();
 
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];
@@ -52,12 +50,11 @@ protected:
 
 class LibvlcAudioNPObject: public RuntimeNPObject
 {
-public:
+protected:
     LibvlcAudioNPObject(NPP instance, const NPClass *aClass) :
         RuntimeNPObject(instance, aClass) {};
     virtual ~LibvlcAudioNPObject() {};
 
-protected:
     friend class RuntimeNPClass<LibvlcAudioNPObject>;
 
     static const int propertyCount;
@@ -74,14 +71,13 @@ protected:
 
 class LibvlcInputNPObject: public RuntimeNPObject
 {
-public:
+protected:
+    friend class RuntimeNPClass<LibvlcInputNPObject>;
+
     LibvlcInputNPObject(NPP instance, const NPClass *aClass) :
         RuntimeNPObject(instance, aClass) {};
 	
     virtual ~LibvlcInputNPObject() {};
-
-protected:
-    friend class RuntimeNPClass<LibvlcInputNPObject>;
 
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];
@@ -95,13 +91,12 @@ protected:
 
 class LibvlcPlaylistNPObject: public RuntimeNPObject
 {
-public:
+protected:
+    friend class RuntimeNPClass<LibvlcPlaylistNPObject>;
+
     LibvlcPlaylistNPObject(NPP instance, const NPClass *aClass) :
         RuntimeNPObject(instance, aClass) {};
     virtual ~LibvlcPlaylistNPObject() {};
-
-protected:
-    friend class RuntimeNPClass<LibvlcPlaylistNPObject>;
 
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];
@@ -119,13 +114,12 @@ protected:
 
 class LibvlcVideoNPObject: public RuntimeNPObject
 {
-public:
+protected:
+    friend class RuntimeNPClass<LibvlcVideoNPObject>;
+
     LibvlcVideoNPObject(NPP instance, const NPClass *aClass) :
         RuntimeNPObject(instance, aClass) {};
     virtual ~LibvlcVideoNPObject() {};
-
-protected:
-    friend class RuntimeNPClass<LibvlcVideoNPObject>;
 
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];
@@ -137,6 +131,5 @@ protected:
     static const NPUTF8 * const methodNames[];
 
     InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
-
 };
 

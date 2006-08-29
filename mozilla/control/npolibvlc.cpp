@@ -1,8 +1,7 @@
 /*****************************************************************************
- * vlc.cpp: support for NPRuntime API for Netscape Script-able plugins
- *                 FYI: http://www.mozilla.org/projects/plugins/npruntime.html
+ * npolibvlc.cpp: official Javascript APIs
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *
@@ -42,15 +41,10 @@
 LibvlcRootNPObject::LibvlcRootNPObject(NPP instance, const NPClass *aClass) :
         RuntimeNPObject(instance, aClass)
 {
-    static NPClass *audioClass = new RuntimeNPClass<LibvlcAudioNPObject>();
-    static NPClass *inputClass = new RuntimeNPClass<LibvlcInputNPObject>();
-    static NPClass *playlistClass = new RuntimeNPClass<LibvlcPlaylistNPObject>();
-    static NPClass *videoClass = new RuntimeNPClass<LibvlcVideoNPObject>();
-
-    audioObj = NPN_CreateObject(instance, audioClass);
-    inputObj = NPN_CreateObject(instance, inputClass);
-    playlistObj = NPN_CreateObject(instance, playlistClass);
-    videoObj = NPN_CreateObject(instance, videoClass);
+    audioObj = NPN_CreateObject(instance, RuntimeNPClass<LibvlcAudioNPObject>::getClass());
+    inputObj = NPN_CreateObject(instance, RuntimeNPClass<LibvlcInputNPObject>::getClass());
+    playlistObj = NPN_CreateObject(instance, RuntimeNPClass<LibvlcPlaylistNPObject>::getClass());
+    videoObj = NPN_CreateObject(instance,RuntimeNPClass<LibvlcVideoNPObject>::getClass());
 }
 
 LibvlcRootNPObject::~LibvlcRootNPObject()
@@ -69,6 +63,8 @@ const NPUTF8 * const LibvlcRootNPObject::propertyNames[] =
     "video",
 };
 
+const int LibvlcRootNPObject::propertyCount = sizeof(LibvlcRootNPObject::propertyNames)/sizeof(NPUTF8 *);
+
 enum LibvlcRootNPObjectPropertyIds
 {
     ID_audio = 0,
@@ -76,8 +72,6 @@ enum LibvlcRootNPObjectPropertyIds
     ID_playlist,
     ID_video,
 };
-
-const int LibvlcRootNPObject::propertyCount = sizeof(LibvlcRootNPObject::propertyNames)/sizeof(NPUTF8 *);
 
 RuntimeNPObject::InvokeResult LibvlcRootNPObject::getProperty(int index, NPVariant &result)
 {
@@ -116,13 +110,13 @@ const NPUTF8 * const LibvlcAudioNPObject::propertyNames[] =
     "volume",
 };
 
+const int LibvlcAudioNPObject::propertyCount = sizeof(LibvlcAudioNPObject::propertyNames)/sizeof(NPUTF8 *);
+
 enum LibvlcAudioNPObjectPropertyIds
 {
     ID_mute,
     ID_volume,
 };
-
-const int LibvlcAudioNPObject::propertyCount = sizeof(LibvlcAudioNPObject::propertyNames)/sizeof(NPUTF8 *);
 
 RuntimeNPObject::InvokeResult LibvlcAudioNPObject::getProperty(int index, NPVariant &result)
 {
@@ -211,12 +205,12 @@ const NPUTF8 * const LibvlcAudioNPObject::methodNames[] =
     "togglemute",
 };
 
+const int LibvlcAudioNPObject::methodCount = sizeof(LibvlcAudioNPObject::methodNames)/sizeof(NPUTF8 *);
+
 enum LibvlcAudioNPObjectMethodIds
 {
     ID_togglemute,
 };
-
-const int LibvlcAudioNPObject::methodCount = sizeof(LibvlcAudioNPObject::methodNames)/sizeof(NPUTF8 *);
 
 RuntimeNPObject::InvokeResult LibvlcAudioNPObject::invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result)
 {
@@ -265,6 +259,8 @@ const NPUTF8 * const LibvlcInputNPObject::propertyNames[] =
     "hasvout",
 };
 
+const int LibvlcInputNPObject::propertyCount = sizeof(LibvlcInputNPObject::propertyNames)/sizeof(NPUTF8 *);
+
 enum LibvlcInputNPObjectPropertyIds
 {
     ID_length,
@@ -273,8 +269,6 @@ enum LibvlcInputNPObjectPropertyIds
     ID_fps,
     ID_hasvout,
 };
-
-const int LibvlcInputNPObject::propertyCount = sizeof(LibvlcInputNPObject::propertyNames)/sizeof(NPUTF8 *);
 
 RuntimeNPObject::InvokeResult LibvlcInputNPObject::getProperty(int index, NPVariant &result)
 {
@@ -449,13 +443,13 @@ const NPUTF8 * const LibvlcPlaylistNPObject::propertyNames[] =
     "isplaying",
 };
 
+const int LibvlcPlaylistNPObject::propertyCount = sizeof(LibvlcPlaylistNPObject::propertyNames)/sizeof(NPUTF8 *);
+
 enum LibvlcPlaylistNPObjectPropertyIds
 {
     ID_itemscount,
     ID_isplaying,
 };
-
-const int LibvlcPlaylistNPObject::propertyCount = sizeof(LibvlcPlaylistNPObject::propertyNames)/sizeof(NPUTF8 *);
 
 RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::getProperty(int index, NPVariant &result)
 {
@@ -508,6 +502,8 @@ const NPUTF8 * const LibvlcPlaylistNPObject::methodNames[] =
     "deleteitem"
 };
 
+const int LibvlcPlaylistNPObject::methodCount = sizeof(LibvlcPlaylistNPObject::methodNames)/sizeof(NPUTF8 *);
+
 enum LibvlcPlaylistNPObjectMethodIds
 {
     ID_add,
@@ -519,8 +515,6 @@ enum LibvlcPlaylistNPObjectMethodIds
     ID_clear,
     ID_deleteitem,
 };
-
-const int LibvlcPlaylistNPObject::methodCount = sizeof(LibvlcPlaylistNPObject::methodNames)/sizeof(NPUTF8 *);
 
 RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result)
 {
@@ -534,13 +528,10 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
         {
             case ID_add:
             {
-                char *url = NULL;
-                char *name = NULL;
-                int i_options = 0;
-                char** ppsz_options = NULL;
-
                 if( (argCount < 1) || (argCount > 3) )
                     return INVOKERESULT_NO_SUCH_METHOD;
+
+                char *url = NULL;
 
                 // grab URL
                 if( NPVARIANT_IS_STRING(args[0]) )
@@ -548,7 +539,7 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                     char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
                     if( s )
                     {
-                        char *url = p_plugin->getAbsoluteURL(s);
+                        url = p_plugin->getAbsoluteURL(s);
                         delete s;
                         if( ! url )
                             // what happened ?
@@ -559,6 +550,8 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                 }
                 else
                     return INVOKERESULT_NO_SUCH_METHOD;
+
+                char *name = NULL;
 
                 // grab name if available
                 if( argCount > 1 )
@@ -575,6 +568,9 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                         return INVOKERESULT_NO_SUCH_METHOD;
                 }
 
+                int i_options = 0;
+                char** ppsz_options = NULL;
+
                 // grab options if available
                 if( argCount > 2 )
                 {
@@ -584,12 +580,12 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                     }
                     else if( NPVARIANT_IS_STRING(args[2]) )
                     {
-                        parseOptions(NPVARIANT_TO_STRING(args[0]), &i_options, &ppsz_options);
+                        parseOptions(NPVARIANT_TO_STRING(args[2]), &i_options, &ppsz_options);
 
                     }
-                    else if( NPVARIANT_IS_OBJECT(args[3]) )
+                    else if( NPVARIANT_IS_OBJECT(args[2]) )
                     {
-                        parseOptions(NPVARIANT_TO_OBJECT(args[0]), &i_options, &ppsz_options);
+                        parseOptions(NPVARIANT_TO_OBJECT(args[2]), &i_options, &ppsz_options);
                     }
                 }
 
@@ -603,9 +599,11 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                 delete name;
                 for( int i=0; i< i_options; ++i )
                 {
-                    delete ppsz_options[i];
+                    if( ppsz_options[i] )
+                        free(ppsz_options[i]);
                 }
-                delete ppsz_options;
+                if( ppsz_options )
+                    free(ppsz_options);
                 if( libvlc_exception_raised(&ex) )
                 {
                     NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -762,7 +760,7 @@ void LibvlcPlaylistNPObject::parseOptions(const NPString &s, int *i_options, cha
                 {
                     // skip leading blanks
                     while( (val < end)
-                        && ((*val == ' ' ) || (*val != '\t')) )
+                        && ((*val == ' ' ) || (*val == '\t')) )
                         ++val;
 
                     char *start = val;
@@ -813,8 +811,8 @@ void LibvlcPlaylistNPObject::parseOptions(const NPString &s, int *i_options, cha
 
 void LibvlcPlaylistNPObject::parseOptions(NPObject *obj, int *i_options, char*** ppsz_options)
 {
-    NPIdentifier name = NPN_GetStringIdentifier("length");
     /* we are expecting to have a Javascript Array object */
+    NPIdentifier name = NPN_GetStringIdentifier("length");
     if( NPN_HasProperty(_instance, obj, name) )
     {
         NPVariant value;
@@ -822,6 +820,7 @@ void LibvlcPlaylistNPObject::parseOptions(NPObject *obj, int *i_options, char***
         {
             int count = numberValue(value);
             NPN_ReleaseVariantValue(&value);
+
             if( count )
             {
                 long capacity = 16;
