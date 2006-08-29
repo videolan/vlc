@@ -89,7 +89,7 @@ static char *rtsp_get( rtsp_client_t *rtsp )
   char *psz_buffer = malloc( BUF_SIZE );
   char *psz_string = NULL;
 
-  if( rtsp->pf_read_line( rtsp->p_userdata, psz_buffer, (unsigned int)BUF_SIZE ) >= 0 )
+  if( rtsp->pf_read_line( rtsp->p_userdata, (uint8_t*)psz_buffer, (unsigned int)BUF_SIZE ) >= 0 )
   {
     //printf( "<< '%s'\n", psz_buffer );
       psz_string = strdup( psz_buffer );
@@ -114,7 +114,7 @@ static int rtsp_put( rtsp_client_t *rtsp, const char *psz_string )
     psz_buffer[i_buffer] = '\r'; psz_buffer[i_buffer+1] = '\n';
     psz_buffer[i_buffer+2] = 0;
 
-    i_ret = rtsp->pf_write( rtsp->p_userdata, psz_buffer, i_buffer + 2 );
+    i_ret = rtsp->pf_write( rtsp->p_userdata, (uint8_t*)psz_buffer, i_buffer + 2 );
 
     free( psz_buffer );
     return i_ret;
@@ -393,13 +393,13 @@ int rtsp_request_tearoff( rtsp_client_t *rtsp, const char *what )
  * read opaque data from stream
  */
 
-int rtsp_read_data( rtsp_client_t *rtsp, char *buffer, unsigned int size )
+int rtsp_read_data( rtsp_client_t *rtsp, uint8_t *buffer, unsigned int size )
 {
     int i, seq;
 
     if( size >= 4 )
     {
-        i = rtsp->pf_read( rtsp->p_userdata, buffer, (unsigned int) 4 );
+        i = rtsp->pf_read( rtsp->p_userdata, (uint8_t*)buffer, (unsigned int) 4 );
         if( i < 4 ) return i;
 
         if( buffer[0]=='S' && buffer[1]=='E' && buffer[2]=='T' &&

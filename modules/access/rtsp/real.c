@@ -210,8 +210,8 @@ static void call_hash (char *key, char *challenge, int len) {
   uint8_t *ptr1, *ptr2;
   uint32_t a, b, c, d, tmp;
 
-  ptr1=(key+16);
-  ptr2=(key+20);
+  ptr1=(uint8_t*)(key+16);
+  ptr2=(uint8_t*)(key+20);
 
   a = LE_32(ptr1);
   b = (a >> 3) & 0x3f;
@@ -338,7 +338,7 @@ void real_calc_response_and_checksum (char *response, char *chksum, char *challe
 
   if (xor_table != NULL)
   {
-    table_len = strlen(xor_table);
+    table_len = strlen((char *)xor_table);
 
     if (table_len > 56) table_len=56;
 
@@ -597,8 +597,8 @@ int real_get_rdt_chunk(rtsp_client_t *rtsp_session, rmff_pheader_t *ph,
                        unsigned char **buffer) {
 
   int n;
-  rmff_dump_pheader(ph, *buffer);
-  n=rtsp_read_data(rtsp_session, *buffer + 12, ph->length - 12);
+  rmff_dump_pheader(ph, (char*)*buffer);
+  n=rtsp_read_data(rtsp_session, (uint8_t*)(*buffer + 12), ph->length - 12);
   return (n <= 0) ? 0 : n+12;
 }
 
@@ -670,7 +670,7 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
   description = (char*)malloc(sizeof(char)*(size+1));
   if( !description )
     goto error;
-  if( rtsp_read_data(rtsp_session, description, size) <= 0)
+  if( rtsp_read_data(rtsp_session, (uint8_t*)description, size) <= 0)
     goto error;
   description[size]=0;
   fprintf(stderr, "%s", description);

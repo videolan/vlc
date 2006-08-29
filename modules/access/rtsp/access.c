@@ -225,7 +225,7 @@ static int Open( vlc_object_t *p_this )
 
         p_sys->p_header = block_New( p_access, 4096 );
         p_sys->p_header->i_buffer =
-            rmff_dump_header( h, p_sys->p_header->p_buffer, 1024 );
+            rmff_dump_header( h, (char *)p_sys->p_header->p_buffer, 1024 );
         rmff_free_header( h );
     }
     else

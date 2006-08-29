@@ -58,7 +58,7 @@ int rtsp_request_tearoff( rtsp_client_t *, const char *what );
 
 int rtsp_send_ok( rtsp_client_t * );
 
-int rtsp_read_data( rtsp_client_t *, char *buffer, unsigned int size );
+int rtsp_read_data( rtsp_client_t *, uint8_t *buffer, unsigned int size );
 
 char* rtsp_search_answers( rtsp_client_t *, const char *tag );
 void rtsp_free_answers( rtsp_client_t * );
