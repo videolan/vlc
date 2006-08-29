@@ -651,7 +651,7 @@ static int Demux( demux_t *p_demux )
                             p_block->i_buffer = i_size + 1;
 
                             /* convert \r -> \n */
-                            while( ( p = strchr( p_block->p_buffer, '\r' ) ) )
+                            while( ( p = strchr((char *) p_block->p_buffer, '\r' ) ) )
                             {
                                 *p = '\n';
                             }

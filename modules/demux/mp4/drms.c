@@ -1522,14 +1522,14 @@ static int GetSystemKey( uint32_t *p_sys_key, vlc_bool_t b_ipod )
     /* Combine our system info hash with additional secret data. The resulting
      * MD5 hash will be our system key. */
     InitMD5( &md5 );
-    AddMD5( &md5, p_secret5, 8 );
+    AddMD5( &md5, (uint8_t*)p_secret5, 8 );
 
     if( !b_ipod )
     {
         AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
         AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
         AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
-        AddMD5( &md5, p_secret6, 8 );
+        AddMD5( &md5, (uint8_t *)p_secret6, 8 );
     }
     else
     {

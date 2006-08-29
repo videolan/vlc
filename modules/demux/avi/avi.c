@@ -1837,7 +1837,7 @@ vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t i_codec )
  *
  ****************************************************************************/
 static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
-                                   int *pi_number, int *pi_type )
+                                   unsigned int *pi_number, unsigned int *pi_type )
 {
 #define SET_PTR( p, v ) if( p ) *(p) = (v);
     int c1, c2;
