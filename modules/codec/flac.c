@@ -1115,7 +1115,7 @@ struct encoder_sys_t
     int i_channels;
 
     FLAC__int32 *p_buffer;
-    int         i_buffer;
+    unsigned int i_buffer;
 
     block_t *p_chain;
 
@@ -1207,7 +1207,7 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_chain;
-    int i;
+    unsigned int i;
 
     p_sys->i_pts = p_aout_buf->start_date -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /

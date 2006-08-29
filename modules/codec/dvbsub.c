@@ -322,7 +322,7 @@ static void Close( vlc_object_t *p_this )
 
     var_Destroy( p_this, DVBSUB_CFG_PREFIX "x" );
     var_Destroy( p_this, DVBSUB_CFG_PREFIX "y" );
-    var_Destroy( p_this, DVBSUB_CFG_PREFIX "position" );    
+    var_Destroy( p_this, DVBSUB_CFG_PREFIX "position" );
 
     free_all( p_dec );
     free( p_sys );
