@@ -103,7 +103,7 @@ static const uint32_t pi_channels_out[] =
 { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
   AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
 
-#define MONO_CFG "sout-"
+#define MONO_CFG "sout-mono-"
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -111,9 +111,9 @@ vlc_module_begin();
     set_description( _("Audio filter for stereo to mono conversion") );
     set_capability( "audio filter2", 5 );
 
-    add_bool( MONO_CFG "mono-downmix", VLC_FALSE, NULL, MONO_DOWNMIX_TEXT,
+    add_bool( MONO_CFG "downmix", VLC_FALSE, NULL, MONO_DOWNMIX_TEXT,
               MONO_DOWNMIX_LONGTEXT, VLC_FALSE );
-    add_integer( MONO_CFG "mono-channel", -1, NULL, MONO_CHANNEL_TEXT,
+    add_integer( MONO_CFG "channel", -1, NULL, MONO_CHANNEL_TEXT,
         MONO_CHANNEL_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
@@ -379,7 +379,9 @@ static int OpenFilter( vlc_object_t *p_this )
     if( (p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format) &&
         (p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate) &&
         (p_filter->fmt_in.audio.i_format != AOUT_FMT_S16_NE) &&
-        (p_filter->fmt_out.audio.i_format != AOUT_FMT_S16_NE) )
+        (p_filter->fmt_out.audio.i_format != AOUT_FMT_S16_NE) &&
+        (p_filter->fmt_in.audio.i_bitspersample !=
+                                    p_filter->fmt_out.audio.i_bitspersample))
     {
         msg_Err( p_this, "couldn't load mono filter" );
         return VLC_EGENERIC;
@@ -393,25 +395,28 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    var_Create( p_this, MONO_CFG "mono-downmix",
+    var_Create( p_this, MONO_CFG "downmix",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    p_sys->b_downmix = var_GetBool( p_this, MONO_CFG "mono-downmix" );
+    p_sys->b_downmix = var_GetBool( p_this, MONO_CFG "downmix" );
 
-    var_Create( p_this, MONO_CFG "mono-channel",
+    var_Create( p_this, MONO_CFG "channel",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     p_sys->i_channel_selected =
-            (unsigned int) var_GetInteger( p_this, MONO_CFG "mono-channel" );
+            (unsigned int) var_GetInteger( p_this, MONO_CFG "channel" );
 
     if( p_sys->b_downmix )
     {
+        msg_Dbg( p_this, "using stereo to mono downmix" );
         p_filter->fmt_out.audio.i_physical_channels = AOUT_CHAN_CENTER;
+        p_filter->fmt_out.audio.i_channels = 1;
     }
     else
     {
+        msg_Dbg( p_this, "using pseudo mono" );
         p_filter->fmt_out.audio.i_physical_channels =
                             (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT);
+        p_filter->fmt_out.audio.i_channels = 2;
     }
-    p_filter->fmt_out.audio.i_channels = aout_FormatNbChannels( &(p_filter->fmt_out.audio) );
 
     p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
     p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
@@ -453,8 +458,8 @@ static void CloseFilter( vlc_object_t *p_this)
     filter_t *p_filter = (filter_t *) p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    var_Destroy( p_this, MONO_CFG "mono-channel" );
-    var_Destroy( p_this, MONO_CFG "mono-downmix" );
+    var_Destroy( p_this, MONO_CFG "channel" );
+    var_Destroy( p_this, MONO_CFG "downmix" );
     free( p_sys );
 }
 
@@ -516,9 +521,9 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     out_buf.i_nb_bytes = p_out->i_buffer;
     out_buf.i_nb_samples = p_out->i_samples;
 
+    memset( p_out->p_buffer, 0, i_out_size );
     if( p_filter->p_sys->b_downmix )
     {
-        memset( out_buf.p_buffer, 0, i_out_size );
         stereo2mono_downmix( (aout_instance_t *)p_filter, &aout_filter,
                              &in_buf, &out_buf );
     }
@@ -575,7 +580,6 @@ static void stereo2mono_downmix( aout_instance_t * p_aout, aout_filter_t * p_fil
         p_overflow = p_sys->p_overflow_buffer;
         i_overflow_size = p_sys->i_overflow_buffer_size;
 
-        memset( p_out, 0, i_out_size );
         if ( i_out_size > i_overflow_size )
             memcpy( p_out, p_overflow, i_overflow_size );
         else
