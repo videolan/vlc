@@ -4,7 +4,7 @@
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: Clï¿½ent Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -408,5 +408,7 @@ int streaming_ProfileParse( vlc_object_t *p_this,streaming_profile_t *p_profile,
     if( !p_module )
     {
         msg_Warn( p_this, "parsing profile failed" );
+        return VLC_EGENERIC;
     }
+    return VLC_SUCCESS;
 }
