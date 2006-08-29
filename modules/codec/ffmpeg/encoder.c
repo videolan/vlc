@@ -52,7 +52,6 @@
 
 #include "ffmpeg.h"
 
-#define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
 #define HURRY_UP_GUARD1 (450000)
 #define HURRY_UP_GUARD2 (300000)
 #define HURRY_UP_GUARD3 (100000)
@@ -435,7 +434,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             VOUT_ASPECT_FACTOR;
 #endif
 
-        p_sys->p_buffer_out = malloc( AVCODEC_MAX_VIDEO_FRAME_SIZE );
+        p_sys->p_buffer_out = malloc( p_context->height * p_context->width * 3 );
 
         p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
         p_context->pix_fmt = E_(GetFfmpegChroma)( p_enc->fmt_in.i_codec );
@@ -878,7 +877,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     /* End work-around */
 
     i_out = avcodec_encode_video( p_sys->p_context, (uint8_t*)p_sys->p_buffer_out,
-                                  AVCODEC_MAX_VIDEO_FRAME_SIZE, &frame );
+                                  p_context->height * p_context->width * 3, &frame );
 
     if( i_out > 0 )
     {
