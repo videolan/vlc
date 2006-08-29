@@ -517,7 +517,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 
         i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
                                        &b_gotpicture,
-                                       p_sys->p_buffer, p_sys->i_buffer );
+                                       (uint8_t*)p_sys->p_buffer, p_sys->i_buffer );
         if( b_null_size && p_sys->p_context->width > 0 &&
             p_sys->p_context->height > 0 )
         {
@@ -526,7 +526,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             p_sys->p_context->hurry_up = 0;
             i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
                                            &b_gotpicture,
-                                           p_sys->p_buffer, p_sys->i_buffer );
+                                           (uint8_t*)p_sys->p_buffer, p_sys->i_buffer );
         }
 
         if( i_used < 0 )
@@ -725,7 +725,7 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
 
         /* Now remove all atoms before the SMI one */
         if( p_sys->p_context->extradata_size > 0x5a &&
-            strncmp( &p[0x56], "SMI ", 4 ) )
+            strncmp( (char*)&p[0x56], "SMI ", 4 ) )
         {
             uint8_t *psz = &p[0x52];
 
@@ -737,7 +737,7 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
                     /* FIXME handle 1 as long size */
                     break;
                 }
-                if( !strncmp( &psz[4], "SMI ", 4 ) )
+                if( !strncmp( (char*)&psz[4], "SMI ", 4 ) )
                 {
                     memmove( &p[0x52], psz,
                              &p[p_sys->p_context->extradata_size] - psz );

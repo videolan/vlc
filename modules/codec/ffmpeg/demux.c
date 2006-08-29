@@ -338,7 +338,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 *pf = (double)stream_Tell( p_demux->s ) / (double)i64;
             }
 
-            if( p_sys->ic->duration != AV_NOPTS_VALUE && p_sys->i_pcr > 0 )
+            if( (p_sys->ic->duration != AV_NOPTS_VALUE) && (p_sys->i_pcr > 0) )
             {
                 *pf = (double)p_sys->i_pcr / (double)p_sys->ic->duration;
             }
