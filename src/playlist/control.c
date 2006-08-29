@@ -243,7 +243,7 @@ void PreparseEnqueueItemSub( playlist_t *p_playlist,
 playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 {
     playlist_item_t *p_new = NULL;
-    int i_skip,i;
+    int i_skip = 0, i;
 
     vlc_bool_t b_loop = var_GetBool( p_playlist, "loop" );
     vlc_bool_t b_random = var_GetBool( p_playlist, "random" );
