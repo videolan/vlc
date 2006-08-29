@@ -2,7 +2,7 @@
  * vlc_intf_strings.h : Strings for main interfaces
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
- * $Id: vlc_config_cat.h 16001 2006-07-09 15:01:13Z dionoea $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *

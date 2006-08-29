@@ -83,6 +83,7 @@ HEADERS_include = \
 	../include/vlc_input.h \
 	../include/vlc_interaction.h \
 	../include/vlc_interface.h \
+	../include/vlc_intf_strings.h \
 	../include/vlc_keys.h \
 	../include/vlc_messages.h \
 	../include/vlc_meta.h \
