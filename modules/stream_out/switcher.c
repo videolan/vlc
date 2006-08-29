@@ -51,7 +51,6 @@
 #define SOUT_CFG_PREFIX "sout-switcher-"
 #define MAX_PICTURES 10
 #define MAX_AUDIO 30
-#define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
 #define MAX_THRESHOLD 99999999
 
 /*****************************************************************************
@@ -779,7 +778,7 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
             return 0;
         }
 
-        id->p_buffer_out = malloc( AVCODEC_MAX_VIDEO_FRAME_SIZE );
+        id->p_buffer_out = malloc( id->ff_enc_c->width * id->ff_enc_c->height * 3 );
         id->p_frame = avcodec_alloc_frame();
         id->p_frame->linesize[0] = p_sys->p_pictures[p_sys->i_cmd-1].p[0].i_pitch;
         id->p_frame->linesize[1] = p_sys->p_pictures[p_sys->i_cmd-1].p[1].i_pitch;
@@ -833,7 +832,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
 
     i_out = avcodec_encode_video( id->ff_enc_c, id->p_buffer_out,
-                                  AVCODEC_MAX_VIDEO_FRAME_SIZE,
+                                  id->ff_enc_c->width * id->ff_enc_c->height * 3,
                                   id->p_frame );
 
     if ( i_out <= 0 )
