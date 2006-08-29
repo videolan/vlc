@@ -877,7 +877,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     /* End work-around */
 
     i_out = avcodec_encode_video( p_sys->p_context, (uint8_t*)p_sys->p_buffer_out,
-                                  p_context->height * p_context->width * 3, &frame );
+                                  p_sys->p_context->height * p_sys->p_context->width * 3, &frame );
 
     if( i_out > 0 )
     {
