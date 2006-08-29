@@ -4309,6 +4309,8 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         {
             EbmlMaster *tkv = static_cast<EbmlMaster*>(l);
             unsigned int j;
+            unsigned int i_crop_right = 0, i_crop_left = 0, i_crop_top = 0, i_crop_bottom = 0;
+            unsigned int i_display_unit = 0, i_display_width = 0, i_display_height = 0;
 
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Video" );
             tk->f_fps = 0.0;
@@ -4350,44 +4352,42 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                 {
                     KaxVideoDisplayWidth &vwidth = *(KaxVideoDisplayWidth*)l;
 
-                    tk->fmt.video.i_visible_width = uint16( vwidth );
+                    i_display_width = uint16( vwidth );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + display width=%d", uint16( vwidth ) );
                 }
                 else if( MKV_IS_ID( l, KaxVideoDisplayHeight ) )
                 {
                     KaxVideoDisplayWidth &vheight = *(KaxVideoDisplayWidth*)l;
 
-                    tk->fmt.video.i_visible_height = uint16( vheight );
+                    i_display_height = uint16( vheight );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + display height=%d", uint16( vheight ) );
                 }
                 else if( MKV_IS_ID( l, KaxVideoPixelCropBottom ) )
                 {
                     KaxVideoPixelCropBottom &cropval = *(KaxVideoPixelCropBottom*)l;
 
-                    tk->fmt.video.i_height -= uint16( cropval );
+                    i_crop_bottom = uint16( cropval );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel bottom=%d", uint16( cropval ) );
                 }
                 else if( MKV_IS_ID( l, KaxVideoPixelCropTop ) )
                 {
                     KaxVideoPixelCropTop &cropval = *(KaxVideoPixelCropTop*)l;
 
-                    tk->fmt.video.i_height -= uint16( cropval );
-                    tk->fmt.video.i_y_offset += uint16( cropval );
+                    i_crop_top = uint16( cropval );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel top=%d", uint16( cropval ) );
                 }
                 else if( MKV_IS_ID( l, KaxVideoPixelCropRight ) )
                 {
                     KaxVideoPixelCropRight &cropval = *(KaxVideoPixelCropRight*)l;
 
-                    tk->fmt.video.i_width -= uint16( cropval );
+                    i_crop_right = uint16( cropval );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel right=%d", uint16( cropval ) );
                 }
                 else if( MKV_IS_ID( l, KaxVideoPixelCropLeft ) )
                 {
                     KaxVideoPixelCropLeft &cropval = *(KaxVideoPixelCropLeft*)l;
 
-                    tk->fmt.video.i_width -= uint16( cropval );
-                    tk->fmt.video.i_x_offset += uint16( cropval );
+                    i_crop_left = uint16( cropval );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel left=%d", uint16( cropval ) );
                 }
                 else if( MKV_IS_ID( l, KaxVideoFrameRate ) )
@@ -4397,13 +4397,14 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                     tk->f_fps = float( vfps );
                     msg_Dbg( &sys.demuxer, "   |   |   |   + fps=%f", float( vfps ) );
                 }
-//                else if( EbmlId( *l ) == KaxVideoDisplayUnit::ClassInfos.GlobalId )
-//                {
-//                     KaxVideoDisplayUnit &vdmode = *(KaxVideoDisplayUnit*)l;
+                else if( EbmlId( *l ) == KaxVideoDisplayUnit::ClassInfos.GlobalId )
+                {
+                    KaxVideoDisplayUnit &vdmode = *(KaxVideoDisplayUnit*)l;
 
-//                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Display Unit=%s",
-//                             uint8( vdmode ) == 0 ? "pixels" : ( uint8( vdmode ) == 1 ? "centimeters": "inches" ) );
-//                }
+                    i_display_unit = uint8( vdmode );
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Display Unit=%s",
+                             uint8( vdmode ) == 0 ? "pixels" : ( uint8( vdmode ) == 1 ? "centimeters": "inches" ) );
+                }
 //                else if( EbmlId( *l ) == KaxVideoAspectRatio::ClassInfos.GlobalId )
 //                {
 //                    KaxVideoAspectRatio &ratio = *(KaxVideoAspectRatio*)l;
@@ -4414,15 +4415,26 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 //                {
 //                    KaxVideoGamma &gamma = *(KaxVideoGamma*)l;
 
-//                    msg_Dbg( &sys.demuxer, "   |   |   |   + fps=%f", float( gamma ) );
+//                    msg_Dbg( &sys.demuxer, "   |   |   |   + gamma=%f", float( gamma ) );
 //                }
                 else
                 {
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + Unknown (%s)", typeid(*l).name() );
                 }
             }
-            if ( tk->fmt.video.i_visible_height && tk->fmt.video.i_visible_width )
-                tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * tk->fmt.video.i_visible_width / tk->fmt.video.i_visible_height;
+            if( i_display_height && i_display_width )
+                tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * i_display_width / i_display_height;
+            if( i_crop_left || i_crop_right || i_crop_top || i_crop_bottom )
+            {
+                tk->fmt.video.i_visible_width = tk->fmt.video.i_width;
+                tk->fmt.video.i_visible_height = tk->fmt.video.i_height;
+                tk->fmt.video.i_x_offset = i_crop_left;
+                tk->fmt.video.i_y_offset = i_crop_top;
+                tk->fmt.video.i_visible_width -= i_crop_left + i_crop_right;
+                tk->fmt.video.i_visible_height -= i_crop_top + i_crop_bottom;
+            }
+            /* FIXME: i_display_* allows you to not only set DAR, but also a zoom factor.
+               we do not support this atm */
         }
         else  if( MKV_IS_ID( l, KaxTrackAudio ) )
         {
