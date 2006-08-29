@@ -439,68 +439,41 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 NPError NPP_NewStream( NPP instance, NPMIMEType type, NPStream *stream,
                        NPBool seekable, uint16 *stype )
 {
-    if( instance == NULL )
+    if( NULL == instance  )
     {
         return NPERR_INVALID_INSTANCE_ERROR;
     }
 
-#if 0
-    VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
-#endif
+    VlcPlugin *p_plugin = reinterpret_cast<VlcPlugin *>(instance->pdata);
 
-    /* fprintf(stderr, "NPP_NewStream - FILE mode !!\n"); */
-
-    /* We want a *filename* ! */
-    *stype = NP_ASFILE;
-
-#if 0
-    if( !p_plugin->b_stream )
+   /*
+   ** Firefox/Mozilla may decide to open a stream from the URL specified
+   ** in the SRC parameter of the EMBED tag and pass it to us
+   **
+   ** since VLC will open the SRC URL as well, we're not interested in
+   ** that stream. Otherwise, we'll take it and queue it up in the playlist
+   */
+    if( !p_plugin->psz_target || strcmp(stream->url, p_plugin->psz_target) )
     {
-        p_plugin->psz_target = strdup( stream->url );
-        p_plugin->b_stream = VLC_TRUE;
+        /* TODO: use pipes !!!! */
+        *stype = NP_ASFILEONLY;
+        return NPERR_NO_ERROR;
     }
-#endif
-
-    return NPERR_NO_ERROR;
+    return NPERR_GENERIC_ERROR;
 }
-
-int32 STREAMBUFSIZE = 0X0FFFFFFF; /* If we are reading from a file in NPAsFile
-                   * mode so we can take any size stream in our
-                   * write call (since we ignore it) */
-
-#define SARASS_SIZE (1024*1024)
 
 int32 NPP_WriteReady( NPP instance, NPStream *stream )
 {
-    VlcPlugin* p_plugin;
-
-    /* fprintf(stderr, "NPP_WriteReady\n"); */
-
-    if (instance != NULL)
-    {
-        p_plugin = reinterpret_cast<VlcPlugin*>(instance->pdata);
-        /* Muahahahahahahaha */
-        return STREAMBUFSIZE;
-        /*return SARASS_SIZE;*/
-    }
-
-    /* Number of bytes ready to accept in NPP_Write() */
-    return STREAMBUFSIZE;
-    /*return 0;*/
+    /* TODO */
+    return 8*1024;
 }
 
 
 int32 NPP_Write( NPP instance, NPStream *stream, int32 offset,
                  int32 len, void *buffer )
 {
-    /* fprintf(stderr, "NPP_Write %i\n", (int)len); */
-
-    if( instance != NULL )
-    {
-        /*VlcPlugin* p_plugin = (VlcPlugin*) instance->pdata;*/
-    }
-
-    return len;         /* The number of bytes accepted */
+    /* TODO */
+    return len;
 }
 
 
@@ -510,7 +483,6 @@ NPError NPP_DestroyStream( NPP instance, NPStream *stream, NPError reason )
     {
         return NPERR_INVALID_INSTANCE_ERROR;
     }
-
     return NPERR_NO_ERROR;
 }
 
@@ -522,14 +494,15 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
         return;
     }
 
-    /* fprintf(stderr, "NPP_StreamAsFile %s\n", fname); */
+    VlcPlugin *p_plugin = reinterpret_cast<VlcPlugin *>(instance->pdata);
 
-#if 0
-    VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
-
-    VLC_AddTarget( p_plugin->i_vlc, fname, 0, 0,
-                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-#endif /* USE_LIBVLC */
+    if( VLC_SUCCESS == libvlc_playlist_add( p_plugin->getVLC(), fname, stream->url, NULL ) )
+    {
+        if( p_plugin->b_autoplay )
+        {
+            libvlc_playlist_play( p_plugin->getVLC(), 0, 0, NULL, NULL);
+        }
+    }
 }
 
 
