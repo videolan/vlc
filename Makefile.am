@@ -681,7 +681,6 @@ endif
 if BUILD_MOZILLA
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/mozilla"
 	cp $(top_builddir)/mozilla/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/mozilla/ ;
-	cp $(top_builddir)/mozilla/vlcintf.xpt  $(top_builddir)/vlc-${VERSION}/mozilla/ ;
 endif
 
 if BUILD_ACTIVEX
