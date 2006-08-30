@@ -217,7 +217,7 @@ static inline int vlc_UrlIsNotEncoded( const char *psz_url )
  *****************************************************************************
  *
  *****************************************************************************/
-static inline char *vlc_b64_encode( char *src )
+static inline char *vlc_b64_encode( const char *src )
 {
     static const char b64[] =
            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -232,38 +232,29 @@ static inline char *vlc_b64_encode( char *src )
 
     while( len > 0 )
     {
-        /* pops (up to) 3 bytes of input */
-        uint32_t v = *src++ << 24;
+        /* pops (up to) 3 bytes of input, push 4 bytes */
+        uint32_t v = *src++ << 24; // 1/3
+        *dst++ = b64[v >> 26]; // 1/4
+        v = v << 6;
 
         if( len >= 2 )
-        {
-            v |= *src++ << 16;
-            if( len >= 3 )
-                v |= *src++ << 8;
-        }
+            v |= *src++ << 16; // 2/3
+        *dst++ = b64[v >> 26]; // 2/4
+        v = v << 6;
 
-        /* pushes (up to) 4 bytes of output */
-        while( v )
-        {
-            *dst++ = b64[v >> 26];
-            v = v << 6;
-        }
+        if( len >= 3 )
+            v |= *src++ << 8; // 3/3
+        *dst++ = ( len >= 2 ) ? b64[v >> 26] : '='; // 3/4
+        v = v << 6;
 
-        switch( len )
+        *dst++ = ( len >= 3 ) ? b64[v >> 26] : '='; // 4/4
+
+        len--;
+        if( len > 0 )
         {
-            case 1:
-                *dst++ = '=';
-                *dst++ = '=';
+            len--;
+            if( len > 0 )
                 len--;
-                break;
-
-            case 2:
-                *dst++ = '=';
-                len -= 2;
-                break;
-
-            default:
-                len -= 3;
         }
     }
 

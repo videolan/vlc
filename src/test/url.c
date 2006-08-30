@@ -25,19 +25,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void test_decode (const char *in, const char *out)
+typedef char * (*conv_t) (const char *);
+
+static void test (conv_t f, const char *in, const char *out)
 {
     char *res;
 
     printf ("\"%s\" -> \"%s\" ?\n", in, out);
-    res = decode_URI_duplicate (in);
+    res = f (in);
     if (res == NULL)
         exit (1);
 
     if (strcmp (res, out))
+    {
+        printf (" ERROR: got \"%s\"\n", res);
         exit (2);
+    }
 
     free (res);
+}
+
+static inline void test_decode (const char *in, const char *out)
+{
+    test (decode_URI_duplicate, in, out);
+}
+
+static inline void test_b64 (const char *in, const char *out)
+{
+    test (vlc_b64_encode, in, out);
 }
 
 int main (void)
@@ -63,6 +78,13 @@ int main (void)
     test_decode ("T%C3%a9l%c3%A9vision+%e2%82%Ac", "Télévision €");
     test_decode ("T%E9l%E9vision", "T?l?vision");
     test_decode ("%C1%94%C3%a9l%c3%A9vision", "??élévision"); /* overlong */
+
+    /* Base 64 tests */
+    test_b64 ("", "");
+    test_b64 ("d", "ZA==");
+    test_b64 ("ab", "YQG=");
+    test_b64 ("abc", "YQGI");
+    test_b64 ("abcd", "YQGIZA==");
 
     return 0;
 }
