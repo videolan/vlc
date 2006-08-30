@@ -148,7 +148,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
             return VLC_EGENERIC;
         }
         else {
-            // tell opengl not to sync buffer swap with vertical retrace
+            // tell opengl not to sync buffer swap with vertical retrace (too inefficient)
             GLint param = 0;
             aglSetInteger(p_vout->p_sys->agl_ctx, AGL_SWAP_INTERVAL, &param);
             aglEnable(p_vout->p_sys->agl_ctx, AGL_SWAP_INTERVAL);
@@ -489,44 +489,17 @@ static void aglEnd( vout_thread_t * p_vout )
 
 static void aglReshape( vout_thread_t * p_vout )
 {
-    int x, y;
-    vlc_value_t val;
-    int i_offx   = p_vout->p_sys->i_offx;
-    int i_offy   = p_vout->p_sys->i_offy;
-    int i_height = p_vout->p_sys->i_height;
-    int i_width  = p_vout->p_sys->i_width;
+    unsigned int x, y;
+    unsigned int i_height = p_vout->p_sys->i_height;
+    unsigned int i_width  = p_vout->p_sys->i_width;
 
     Lock( p_vout );
 
+    vout_PlacePicture(p_vout, i_width, i_height, &x, &y, &i_width, &i_height); 
+
     aglSetCurrentContext(p_vout->p_sys->agl_ctx);
 
-    var_Get( p_vout, "macosx-stretch", &val );
-    if( val.b_bool )
-    {
-        x = i_width;
-        y = i_height;
-    }
-    else if( i_height * p_vout->fmt_in.i_visible_width *
-             p_vout->fmt_in.i_sar_num <
-             i_width * p_vout->fmt_in.i_visible_height *
-             p_vout->fmt_in.i_sar_den )
-    {
-        x = ( i_height * p_vout->fmt_in.i_visible_width *
-              p_vout->fmt_in.i_sar_num ) /
-            ( p_vout->fmt_in.i_visible_height * p_vout->fmt_in.i_sar_den);
-
-        y = i_height;
-    }
-    else
-    {
-        x = i_width;
-        y = ( i_width * p_vout->fmt_in.i_visible_height *
-              p_vout->fmt_in.i_sar_den) /
-            ( p_vout->fmt_in.i_visible_width * p_vout->fmt_in.i_sar_num  );
-    }
-
-    glViewport( i_offx+( i_width - x ) / 2,
-                i_offy+( i_height - y ) / 2, x, y );
+    glViewport( p_vout->p_sys->i_offx + x, p_vout->p_sys->i_offy + y, i_width, i_height );
 
     if( p_vout->p_sys->b_got_frame )
     {
