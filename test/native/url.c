@@ -32,6 +32,7 @@ PyObject * test (conv_t f, const char *in, const char *out)
     printf ("\"%s\" -> \"%s\" ?\n", in, out);
     res = f(in);
     ASSERT( res != NULL, "NULL result" );
+    printf( "\n\"%s\"\n",res );
     ASSERT( strcmp( res, out ) == NULL, "" );
 
     Py_INCREF( Py_None );
@@ -51,35 +52,32 @@ static inline PyObject* test_b64( const char *in, const char *out )
 PyObject *url_test( PyObject *self, PyObject *args )
 {
     printf( "\n" );
-    if( !test_decode ("this_should_not_be_modified_1234",
-                     "this_should_not_be_modified_1234") ) return NULL;
-
-    if( ! test_decode ("This+should+be+modified+1234!",
-                 "This should be modified 1234!") ) return NULL;;
-
-    if( !test_decode ("This%20should%20be%20modified%201234!",
-                 "This should be modified 1234!")) return NULL;;
-
-    if( ! test_decode ("%7E", "~")) return NULL;;
+#define DO_TEST_DECODE( a, b ) if( !test_decode( a, b) ) return NULL;
+     DO_TEST_DECODE ("this_should_not_be_modified_1234",
+                     "this_should_not_be_modified_1234");
+     DO_TEST_DECODE ("This+should+be+modified+1234!",
+                 "This should be modified 1234!");
+     DO_TEST_DECODE ("This%20should%20be%20modified%201234!",
+                 "This should be modified 1234!");
+     DO_TEST_DECODE ("%7E", "~");
 
     /* tests with invalid input */
-    if(!test_decode ("%", "%")) return NULL;;
-    if(!test_decode ("%2", "%2")) return NULL;;
-    if(!test_decode ("%0000", "")) return NULL;;
+    DO_TEST_DECODE ("%", "%" );
+    DO_TEST_DECODE ("%2", "%2");
+    DO_TEST_DECODE ("%0000", "")
 
     /* UTF-8 tests */
-    if(!test_decode ("T%C3%a9l%c3%A9vision+%e2%82%Ac",
-                      "Télévision €" ) ) return NULL;
-    if(!test_decode ("T%E9l%E9vision", "T?l?vision")) return NULL;
-    if(!test_decode ("%C1%94%C3%a9l%c3%A9vision",
-                         "??élévision") ) return NULL; /* overlong */
+    DO_TEST_DECODE ("T%C3%a9l%c3%A9vision+%e2%82%Ac", "Télévision €" );
+    DO_TEST_DECODE ("T%E9l%E9vision", "T?l?vision");
+    DO_TEST_DECODE ("%C1%94%C3%a9l%c3%A9vision",  "??élévision");
 
+#define DO_TEST_B64( a, b ) if( !test_b64( a, b ) ) return NULL;
     /* Base 64 tests */
-    test_b64 ("", "");
-    test_b64 ("d", "ZA==");
-    test_b64 ("ab", "YQG=");
-    test_b64 ("abc", "YQGI");
-    test_b64 ("abcd", "YQGIZA==");
+    DO_TEST_B64 ("", "") ;
+    DO_TEST_B64("d", "ZA==");
+    DO_TEST_B64("ab", "YWI=");
+    DO_TEST_B64("abc", "YWJj");
+    DO_TEST_B64 ("abcd", "YWJjZA==");
 
     Py_INCREF( Py_None);
     return Py_None;
