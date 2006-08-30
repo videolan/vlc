@@ -70,7 +70,7 @@ resource 'STR#' (128,"MIME Type")
         "video/x-ms-asf-plugin", "",
         "video/x-ms-asf", "",
         "application/x-mplayer2", "",
-        "video/x-ms-wmv", "",
+        "video/x-ms-wmv", "wmv",
         "video/x-google-vlc-plugin", "",
         "audio/wav", "wav",
         "audio/x-wav", "wav",
