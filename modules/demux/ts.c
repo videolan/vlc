@@ -973,7 +973,7 @@ static int DemuxFile( demux_t *p_demux )
         i_diff = ( i_cc - p_pid->i_cc )&0x0f;
         if( b_payload && i_diff == 1 )
         {
-            p_pid->i_cc++;
+            p_pid->i_cc = ( p_pid->i_cc + 1 ) & 0xf;
         }
         else
         {
@@ -1782,7 +1782,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     i_diff = ( i_cc - pid->i_cc )&0x0f;
     if( b_payload && i_diff == 1 )
     {
-        pid->i_cc++;
+        pid->i_cc = ( pid->i_cc + 1 ) & 0xf;
     }
     else
     {
