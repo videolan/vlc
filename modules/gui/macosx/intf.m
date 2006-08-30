@@ -718,6 +718,21 @@ static VLCMain *_o_sharedMainInstance = nil;
         case kRemoteButtonVolume_Minus:
             [o_controls volumeDown: self];
             break;
+        case kRemoteButtonRight:
+            [o_controls next: self];
+            break;
+        case kRemoteButtonLeft:
+            [o_controls prev: self];
+            break;
+        case kRemoteButtonRight_Hold:
+            [o_controls forward: self];
+            break;
+        case kRemoteButtonLeft_Hold:
+            [o_controls backward: self];
+            break;
+        case kRemoteButtonMenu:
+            [o_controls windowAction: self];
+            break;
 
         default:
             /* Add here whatever you want other buttons to do */
