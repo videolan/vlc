@@ -82,9 +82,9 @@ int main (void)
     /* Base 64 tests */
     test_b64 ("", "");
     test_b64 ("d", "ZA==");
-    test_b64 ("ab", "YQG=");
-    test_b64 ("abc", "YQGI");
-    test_b64 ("abcd", "YQGIZA==");
+    test_b64 ("ab", "YWI=");
+    test_b64 ("abc", "YWJj");
+    test_b64 ("abcd", "YWJjZA==");
 
     return 0;
 }
