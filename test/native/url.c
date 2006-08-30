@@ -23,23 +23,32 @@
 #include <vlc/vlc.h>
 #include "vlc_url.h"
 
-PyObject * test_decode (const char *in, const char *out)
+typedef char * (*conv_t ) (const char *);
+
+PyObject * test (conv_t f, const char *in, const char *out)
 {
     char *res;
 
     printf ("\"%s\" -> \"%s\" ?\n", in, out);
-    res = decode_URI_duplicate (in);
-    ASSERT( res != NULL, "" );
-    if (res == NULL)
-        exit (1);
-
+    res = f(in);
+    ASSERT( res != NULL, "NULL result" );
     ASSERT( strcmp( res, out ) == NULL, "" );
 
     Py_INCREF( Py_None );
     return Py_None;
 }
 
-PyObject *url_decode_test( PyObject *self, PyObject *args )
+static inline PyObject * test_decode( const char *in, const char *out)
+{
+    return test( decode_URI_duplicate, in, out );
+}
+
+static inline PyObject* test_b64( const char *in, const char *out )
+{
+    return test( vlc_b64_encode, in, out );
+}
+
+PyObject *url_test( PyObject *self, PyObject *args )
 {
     printf( "\n" );
     if( !test_decode ("this_should_not_be_modified_1234",
@@ -64,6 +73,13 @@ PyObject *url_decode_test( PyObject *self, PyObject *args )
     if(!test_decode ("T%E9l%E9vision", "T?l?vision")) return NULL;
     if(!test_decode ("%C1%94%C3%a9l%c3%A9vision",
                          "??élévision") ) return NULL; /* overlong */
+
+    /* Base 64 tests */
+    test_b64 ("", "");
+    test_b64 ("d", "ZA==");
+    test_b64 ("ab", "YQG=");
+    test_b64 ("abc", "YQGI");
+    test_b64 ("abcd", "YQGIZA==");
 
     Py_INCREF( Py_None);
     return Py_None;

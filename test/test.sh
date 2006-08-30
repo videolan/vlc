@@ -1,11 +1,11 @@
 #! /bin/sh
 
 set -e
-python setup.py build 
+python setup.py build
 
 cd ..
 # TODO: FIXME !!
-export PYTHONPATH=$PYTHONPATH:bindings/mediacontrol-python/build/lib.linux-i686-2.3:test/build/lib.linux-i686-2.3:test/build/lib.linux-x86_64-2.3
+export PYTHONPATH=$PYTHONPATH:bindings/mediacontrol-python/build/lib.linux-i686-2.3:test/build/lib.linux-i686-2.3:test/build/lib.linux-x86_64-2.3:test/build/lib.linux-i686-2.4:test/build/lib.linux-x86_64-2.4
 
 export LD_LIBRARY_PATH=src/.libs/
 
