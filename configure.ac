@@ -2000,7 +2000,7 @@ dnl
 dnl  Video4Linux plugin
 dnl
 AC_ARG_ENABLE(v4l2,
-  [  --enable-v4l            Video4Linux2 input support (default disabled)])
+  [  --enable-v4l2            Video4Linux2 input support (default disabled)])
 if test "${enable_v4l2}" = "yes"
 then
   AC_ARG_WITH(v4l2,
