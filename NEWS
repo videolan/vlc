@@ -5,11 +5,20 @@ Changes between 0.8.5 and 0.8.6-svn (not released yet)
 Core support:
  * New playlist core
  * Video Filter2 filters can now be selected for local display using --video-filter
+ * improved Interaction dialogues
+
+Decoders:
+ * WMV3/VC-1 support
 
 Video Filters:
  * Adjust, Invert and Distort (now splited into Wave, Ripple, Gradient and Psychedelic) video filters have been ported to the Video Filter2 API. They can now be streamed.
 
-Nix Port
+Interfaces:
+ * OS X
+     - right/ctrl-click menu in video outputs
+     - support for Apple's remote (courtesy Martin Kahr)
+
+Nix Port:
  * Notification plugin.
 
 Localization:
