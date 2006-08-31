@@ -531,6 +531,8 @@ struct module_symbols_t
     void (*vlc_DictClear_inner) (dict_t *);
     dict_t * (*vlc_DictNew_inner) (void);
     playlist_item_t * (*playlist_GetPreferredNode_inner) (playlist_t *p_playlist, playlist_item_t *p_node);
+    int (*utf8_fprintf_inner) (FILE *, const char *, ...);
+    int (*utf8_vfprintf_inner) (FILE *stream, const char *fmt, va_list ap);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -997,6 +999,8 @@ struct module_symbols_t
 #  define vlc_DictClear (p_symbols)->vlc_DictClear_inner
 #  define vlc_DictNew (p_symbols)->vlc_DictNew_inner
 #  define playlist_GetPreferredNode (p_symbols)->playlist_GetPreferredNode_inner
+#  define utf8_fprintf (p_symbols)->utf8_fprintf_inner
+#  define utf8_vfprintf (p_symbols)->utf8_vfprintf_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1466,6 +1470,8 @@ struct module_symbols_t
     ((p_symbols)->vlc_DictClear_inner) = vlc_DictClear; \
     ((p_symbols)->vlc_DictNew_inner) = vlc_DictNew; \
     ((p_symbols)->playlist_GetPreferredNode_inner) = playlist_GetPreferredNode; \
+    ((p_symbols)->utf8_fprintf_inner) = utf8_fprintf; \
+    ((p_symbols)->utf8_vfprintf_inner) = utf8_vfprintf; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__playlist_ItemNew_deprecated = NULL; \
     (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \

@@ -556,7 +556,7 @@ static int utf8_vasprintf( char **str, const char *fmt, va_list ap )
     return res;
 }
 
-static int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
+int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
 {
     char *str;
     int res = utf8_vasprintf( &str, fmt, ap );

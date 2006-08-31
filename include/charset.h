@@ -24,6 +24,8 @@
 #ifndef __VLC_CHARSET_H
 #define __VLC_CHARSET_H 1
 
+#include <stdarg.h>
+
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -42,9 +44,8 @@ VLC_EXPORT( int, utf8_stat, ( const char *filename, void *buf ) );
 VLC_EXPORT( int, utf8_lstat, ( const char *filename, void *buf ) );
 VLC_EXPORT( int, utf8_mkdir, ( const char *filename ) );
 
-#ifndef __PLUGIN__
-int utf8_fprintf( FILE *, const char *, ... );
-#endif
+VLC_EXPORT( int, utf8_vfprintf, ( FILE *stream, const char *fmt, va_list ap ) );
+VLC_EXPORT( int, utf8_fprintf, ( FILE *, const char *, ... ) );
 
 VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
 VLC_EXPORT( const char *, IsUTF8, ( const char * ) );
