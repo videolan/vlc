@@ -64,6 +64,8 @@ private:
     vlc_mutex_t lock;
 private slots:
     void update();
+    void hasAudio();
+    void hasVideo();
 };
 
 #endif

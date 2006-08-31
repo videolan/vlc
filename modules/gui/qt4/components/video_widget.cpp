@@ -26,6 +26,7 @@
 #include "qt4.hpp"
 #include "components/video_widget.hpp"
 #include "main_interface.hpp"
+#include "input_manager.hpp"
 #include <QHBoxLayout>
 
 #define ICON_SIZE 128
@@ -57,6 +58,10 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i, bool _always ) : QFrame( NULL ),
     if( always )
     {
        DrawBackground();
+       connect( THEMIM->getIM(), SIGNAL( audioStarted() ),
+                this, SLOT( hasAudio() ) );
+       connect( THEMIM->getIM(), SIGNAL( audioStarted() ),
+                this, SLOT( hasVideo() ) );
     }
     need_update = false;
 }
@@ -117,7 +122,20 @@ void *VideoWidget::Request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
     }
     p_vout = p_nvout;
 
-   setMinimumSize( 1,1 );
+    // if( THEMIM->getIM()->b_has_video )
+    // {
+    //      We are really running a video
+    //      Close the existing vout
+    //      Set visual to disabled
+    // }
+    // else
+    // {
+    //      We are getting a request for visual
+    //      Just go on.
+    // }
+    // Check THEMIM->b_has_audio. If true, hide audio.
+
+    setMinimumSize( 1,1 );
     p_intf->p_sys->p_mi->videoSize = QSize( *pi_width, *pi_height );
     updateGeometry();
     need_update = true;
@@ -147,6 +165,25 @@ void VideoWidget::Release( void *p_win )
         updateGeometry();
         need_update = true;
     }
+}
+
+void VideoWidget::hasAudio()
+{
+    /* We have video already, do nothing */
+    if( THEMIM->getIM()->b_has_video )
+    {
+
+    }
+    else
+    {
+        /* Show the panel to the user */
+        fprintf( stderr, "Showing panel\n" );
+    }
+}
+
+void VideoWidget::hasVideo()
+{
+    // if panel is shown, hide it
 }
 
 static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )

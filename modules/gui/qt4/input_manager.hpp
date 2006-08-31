@@ -34,6 +34,8 @@ public:
     InputManager( QObject *, intf_thread_t *);
     virtual ~InputManager();
 
+    void delInput();
+    bool b_has_audio, b_has_video, b_had_audio, b_had_video;
 private:
     intf_thread_t *p_intf;
     input_thread_t *p_input;
@@ -50,6 +52,8 @@ signals:
     void nameChanged( QString );
     void navigationChanged( int );
     void statusChanged( int );
+    void audioStarted();
+    void videoStarted();
 };
 
 class MainInputManager : public QObject

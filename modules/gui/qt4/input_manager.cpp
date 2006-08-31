@@ -27,6 +27,11 @@
 #include "dialogs_provider.hpp"
 #include "qt4.hpp"
 
+static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
+                        vlc_value_t n, void *param );
+static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
+                        vlc_value_t n, void *param );
+
 /**********************************************************************
  * InputManager implementation
  **********************************************************************/
@@ -48,6 +53,21 @@ void InputManager::setInput( input_thread_t *_p_input )
 {
     p_input = _p_input;
     emit positionUpdated( 0.0,0,0 );
+    b_had_audio = b_had_video = b_has_audio = b_has_video = false;
+    if( p_input )
+    {
+        var_AddCallback( p_input, "audio-es", ChangeAudio, this );
+        var_AddCallback( p_input, "video-es", ChangeVideo, this );
+    }
+
+}
+void InputManager::delInput()
+{
+    if( p_input )
+    {
+        var_DelCallback( p_input, "audio-es", ChangeAudio, this );
+        var_DelCallback( p_input, "video-es", ChangeVideo, this );
+    }
 }
 
 void InputManager::update()
@@ -61,6 +81,11 @@ void InputManager::update()
         emit navigationChanged( 0 );
         emit statusChanged( 0 ); // 0 = STOPPED, 1 = PLAY, 2 = PAUSE
     }
+
+    if( !b_had_audio && b_has_audio )
+        emit audioStarted();
+    if( !b_had_video && b_has_video )
+        emit videoStarted();
 
     /* Update position */
     mtime_t i_length, i_time;
@@ -77,10 +102,10 @@ void InputManager::update()
     {
         vlc_value_t val;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
-    if( val.i_int > 0 )
-        emit navigationChanged( 1 ); // 1 = chapter, 2 = title, 3 = NO
-    else
-        emit navigationChanged( 2 );
+        if( val.i_int > 0 )
+            emit navigationChanged( 1 ); // 1 = chapter, 2 = title, 0 = NO
+        else
+            emit navigationChanged( 2 );
     }
     else
     {
@@ -115,7 +140,7 @@ void InputManager::update()
 
 void InputManager::sliderUpdate( float new_pos )
 {
-   if( p_input && !p_input->b_die && !p_input->b_dead )
+    if( p_input && !p_input->b_die && !p_input->b_dead )
         var_SetFloat( p_input, "position", new_pos );
 }
 
@@ -167,6 +192,7 @@ void MainInputManager::updateInput()
     if( p_input && p_input->b_dead )
     {
         vlc_object_release( p_input );
+        getIM()->delInput();
         p_input = NULL;
         emit inputChanged( NULL );
     }
@@ -197,4 +223,18 @@ void MainInputManager::togglePlayPause()
         return;
     }
     getIM()->togglePlayPause();
+}
+
+
+static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
+                        vlc_value_t n, void *param )
+{
+    InputManager *im = (InputManager*)param;
+    im->b_has_audio = true;
+}
+static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
+                        vlc_value_t n, void *param )
+{
+    InputManager *im = (InputManager*)param;
+    im->b_has_video = true;
 }
