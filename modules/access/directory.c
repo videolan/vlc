@@ -28,6 +28,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc_playlist.h>
+#include <vlc_input.h>
 
 #include <stdlib.h>
 #include <string.h>
