@@ -275,6 +275,10 @@ static char *ppsz_align_descriptions[] =
     "Output video in grayscale. As the color information aren't decoded, " \
     "this can save some processing power." )
 
+#define EMBEDDED_TEXT N_("Embedded video")
+#define EMBEDDED_LONGTEXT N_( \
+    "Embed the video output in the main interface." )
+
 #define FULLSCREEN_TEXT N_("Fullscreen video output")
 #define FULLSCREEN_LONGTEXT N_( \
     "Start video in fullscreen mode" )
@@ -1249,6 +1253,8 @@ vlc_module_begin();
     add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
               FULLSCREEN_LONGTEXT, VLC_FALSE );
         change_short('f');
+    add_bool( "embedded-video", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
+              VLC_TRUE );
     add_bool( "drop-late-frames", 1, NULL, DROP_LATE_FRAMES_TEXT,
               DROP_LATE_FRAMES_LONGTEXT, VLC_TRUE );
     /* Used in vout_synchro */

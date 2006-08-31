@@ -34,10 +34,10 @@
 #include "menus.hpp"
 
 #ifdef WIN32
-    #define PREF_W 430
+    #define PREF_W 410
     #define PREF_H 121
 #else
-    #define PREF_W 480
+    #define PREF_W 450
     #define PREF_H 125
 #endif
 
@@ -80,10 +80,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     statusBar()->addPermanentWidget( timeLabel, 1 );
 
     resize ( PREF_W, PREF_H );
-//    if( config_GetInt( p_intf, "embedded" ) )
-
+    if( config_GetInt( p_intf, "embedded" ) )
     {
-        videoWidget = new VideoWidget( p_intf, config_GetInt( p_intf, "qt-always-video" ) ? true:false );
+        videoWidget = new VideoWidget( p_intf, config_GetInt( p_intf,
+                                         "qt-always-video" ) ? true:false );
         if( config_GetInt( p_intf, "qt-always-video" ) )
         {
             QSettings settings( "VideoLAN", "VLC" );
@@ -99,15 +99,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     readSettings( "MainWindow" );
 
     addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
-//    if( config_GetInt( p_intf, "qt-always-video" ) )
-        mainSize.setWidth( videoSize.width() + addSize.width() );
-        mainSize.setHeight( videoSize.height() + addSize.height() );
-//    else
-//        mainSize = QSize( PREF_W, PREF_H );
-    fprintf( stderr, "Resulting size %ix%i", mainSize.width(), mainSize.height() );
+    mainSize.setWidth( videoSize.width() + addSize.width() );
+    mainSize.setHeight( videoSize.height() + addSize.height() );
     resize( mainSize );
     mainSize = size();
-    fprintf( stderr, "After size %ix%i", mainSize.width(), mainSize.height() );
 
     setMinimumSize( PREF_W, addSize.height() );
 
