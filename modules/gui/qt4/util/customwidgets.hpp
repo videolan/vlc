@@ -55,4 +55,33 @@ private:
     bool mDrawClickMsg;
 };
 
-#endif // CLICKLINEEDIT_H
+/*****************************************************************
+ * Custom views
+ *****************************************************************/
+#include <QMouseEvent>
+#include <QTreeView>
+#include <QCursor>
+#include <QPoint>
+#include <QModelIndex>
+
+class QVLCTreeView : public QTreeView
+{
+    Q_OBJECT;
+public:
+    QVLCTreeView( QWidget * parent ) : QTreeView( parent )
+    {
+    };
+    virtual ~QVLCTreeView()   {};
+
+    void mouseReleaseEvent(QMouseEvent* e )
+    {
+        if( e->button() & Qt::RightButton )
+        {
+            emit rightClicked( indexAt( QPoint( e->x(), e->y() ) ),
+                               QCursor::pos() );
+        }
+    }
+signals:
+    void rightClicked( QModelIndex, QPoint  );
+};
+#endif

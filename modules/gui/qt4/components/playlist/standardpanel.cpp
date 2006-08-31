@@ -35,7 +35,6 @@
 #include <QToolBar>
 #include <QLabel>
 #include <QSpacerItem>
-#include "util/views.hpp"
 #include "util/customwidgets.hpp"
 
 StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
