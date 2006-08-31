@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ko\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-28 22:04+0100\n"
+"POT-Creation-Date: 2006-08-31 15:10+0400\n"
 "PO-Revision-Date: 2005-09-07 06:05+0900\n"
 "Last-Translator: Han HoJoong <0demon0@paran.com>\n"
 "Language-Team: Korean Linux User Group\n"
@@ -491,9 +491,9 @@ msgstr "재생에 사용하는 hot key를 선택"
 #: include/vlc_intf_strings.h:34 modules/gui/macosx/embeddedwindow.m:45
 #: modules/gui/macosx/embeddedwindow.m:72 modules/gui/macosx/intf.m:493
 #: modules/gui/macosx/intf.m:536 modules/gui/macosx/intf.m:615
-#: modules/gui/macosx/intf.m:622 modules/gui/macosx/intf.m:1388
-#: modules/gui/macosx/intf.m:1389 modules/gui/macosx/intf.m:1390
-#: modules/gui/macosx/intf.m:1391 modules/gui/macosx/playlist.m:435
+#: modules/gui/macosx/intf.m:622 modules/gui/macosx/intf.m:1403
+#: modules/gui/macosx/intf.m:1404 modules/gui/macosx/intf.m:1405
+#: modules/gui/macosx/intf.m:1406 modules/gui/macosx/playlist.m:435
 #: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:281
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:290
@@ -702,7 +702,7 @@ msgid "Stereo"
 msgstr "스테레오"
 
 #: src/audio_output/output.c:107 src/audio_output/output.c:143
-#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:75
+#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
 #: modules/control/gestures.c:86 modules/video_filter/logo.c:95
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:172
@@ -712,7 +712,7 @@ msgid "Left"
 msgstr "왼쪽"
 
 #: src/audio_output/output.c:109 src/audio_output/output.c:145
-#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:75
+#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
 #: modules/control/gestures.c:86 modules/video_filter/logo.c:95
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:172
@@ -790,9 +790,9 @@ msgid "Bookmark %i"
 msgstr "북마크 %i"
 
 #: src/input/decoder.c:113 src/input/decoder.c:125
-#: modules/codec/ffmpeg/encoder.c:228 modules/codec/ffmpeg/encoder.c:236
-#: modules/codec/ffmpeg/encoder.c:248 modules/codec/ffmpeg/encoder.c:619
-#: modules/codec/ffmpeg/encoder.c:628 modules/stream_out/es.c:365
+#: modules/codec/ffmpeg/encoder.c:227 modules/codec/ffmpeg/encoder.c:235
+#: modules/codec/ffmpeg/encoder.c:247 modules/codec/ffmpeg/encoder.c:618
+#: modules/codec/ffmpeg/encoder.c:627 modules/stream_out/es.c:365
 #: modules/stream_out/es.c:379
 #, fuzzy
 msgid "Streaming / Transcoding failed"
@@ -1567,7 +1567,7 @@ msgid ""
 "combinations of these values, like 6=4+2 meaning top-right)."
 msgstr ""
 
-#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:75
+#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
 #: modules/video_filter/logo.c:95 modules/video_filter/marq.c:107
 #: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:78
@@ -6778,7 +6778,7 @@ msgstr "스크린"
 
 #: modules/access/vcdx/access.c:426 modules/access/vcdx/access.c:707
 #: modules/access/vcdx/info.c:294 modules/access/vcdx/info.c:295
-#: modules/demux/mkv.cpp:5176
+#: modules/demux/mkv.cpp:5188
 msgid "Segment"
 msgstr "분할"
 
@@ -7095,21 +7095,21 @@ msgstr "float32->u16 변환을 위한 오디오·필터"
 msgid "Audio filter for float32->u8 conversion"
 msgstr "float32->u8변환을 위한 오디오·필터"
 
-#: modules/audio_filter/converter/mono.c:75
+#: modules/audio_filter/converter/mono.c:100
 #, fuzzy
 msgid "Left rear"
 msgstr "왼쪽"
 
-#: modules/audio_filter/converter/mono.c:75
+#: modules/audio_filter/converter/mono.c:100
 #, fuzzy
 msgid "Right rear"
 msgstr "오른쪽"
 
-#: modules/audio_filter/converter/mono.c:76
+#: modules/audio_filter/converter/mono.c:101
 msgid "Left front"
 msgstr ""
 
-#: modules/audio_filter/converter/mono.c:88
+#: modules/audio_filter/converter/mono.c:113
 #, fuzzy
 msgid "Audio filter for stereo to mono conversion"
 msgstr "float32->s8변환을 위한 오디오·필터"
@@ -7856,22 +7856,22 @@ msgstr "noninterplace화 모드"
 msgid "Fake video decoder"
 msgstr "시네 팩 비디오 디코더"
 
-#: modules/codec/ffmpeg/encoder.c:229
+#: modules/codec/ffmpeg/encoder.c:228
 #, fuzzy, c-format
 msgid "\"%s\" is no video encoder."
 msgstr "DV비디오·디코더"
 
-#: modules/codec/ffmpeg/encoder.c:237
+#: modules/codec/ffmpeg/encoder.c:236
 #, fuzzy, c-format
 msgid "\"%s\" is no audio encoder."
 msgstr "Vorbis 오디오 인코더"
 
-#: modules/codec/ffmpeg/encoder.c:249
+#: modules/codec/ffmpeg/encoder.c:248
 #, c-format
 msgid "VLC could not find encoder \"%s\"."
 msgstr ""
 
-#: modules/codec/ffmpeg/encoder.c:620 modules/codec/ffmpeg/encoder.c:629
+#: modules/codec/ffmpeg/encoder.c:619 modules/codec/ffmpeg/encoder.c:628
 msgid "VLC could not open the encoder."
 msgstr ""
 
@@ -11380,9 +11380,9 @@ msgstr "되감는다"
 msgid "Fast Forward"
 msgstr "전송"
 
-#: modules/gui/macosx/embeddedwindow.m:66 modules/gui/macosx/intf.m:1379
-#: modules/gui/macosx/intf.m:1380 modules/gui/macosx/intf.m:1381
-#: modules/gui/macosx/intf.m:1382 modules/gui/pda/pda_interface.c:250
+#: modules/gui/macosx/embeddedwindow.m:66 modules/gui/macosx/intf.m:1394
+#: modules/gui/macosx/intf.m:1395 modules/gui/macosx/intf.m:1396
+#: modules/gui/macosx/intf.m:1397 modules/gui/pda/pda_interface.c:250
 #: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:678
 #: modules/gui/wxwidgets/interface.cpp:689
 #: modules/gui/wxwidgets/interface.cpp:1210
@@ -11609,8 +11609,8 @@ msgstr "툴 팁을 표시"
 msgid "VLC - Controller"
 msgstr "컨트롤"
 
-#: modules/gui/macosx/intf.m:488 modules/gui/macosx/intf.m:984
-#: modules/gui/macosx/intf.m:1306 modules/gui/pda/pda_interface.c:212
+#: modules/gui/macosx/intf.m:488 modules/gui/macosx/intf.m:999
+#: modules/gui/macosx/intf.m:1321 modules/gui/pda/pda_interface.c:212
 #: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:52
 msgid "VLC media player"
 msgstr "VLC 미디어 플레이어"
@@ -11672,7 +11672,7 @@ msgstr "네트워크를 연다"
 msgid "Open Recent"
 msgstr "최근 사용한 항목을 연다"
 
-#: modules/gui/macosx/intf.m:525 modules/gui/macosx/intf.m:1942
+#: modules/gui/macosx/intf.m:525 modules/gui/macosx/intf.m:1957
 msgid "Clear Menu"
 msgstr "메뉴를 클리어 한다"
 
@@ -11766,17 +11766,17 @@ msgstr "미디어"
 msgid "Online Forum"
 msgstr "on-line document"
 
-#: modules/gui/macosx/intf.m:1161
+#: modules/gui/macosx/intf.m:1176
 #, fuzzy, c-format
 msgid "Volume: %d%%"
 msgstr "볼륨은 %d 입니다. \n"
 
-#: modules/gui/macosx/intf.m:1799
+#: modules/gui/macosx/intf.m:1814
 #, fuzzy
 msgid "No CrashLog found"
 msgstr "%@s 는 발견되지 않습니다"
 
-#: modules/gui/macosx/intf.m:1799
+#: modules/gui/macosx/intf.m:1814
 msgid "Couldn't find any trace of a previous crash."
 msgstr ""
 
@@ -13775,6 +13775,21 @@ msgstr ""
 msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
 msgstr ""
 
+#: modules/gui/wxwidgets/dialogs.cpp:435
+#: modules/gui/wxwidgets/dialogs/open.cpp:1267
+msgid "|Video Files (*.avi, *.mpg, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:436
+#: modules/gui/wxwidgets/dialogs/open.cpp:1268
+msgid "|Playlist Files (*.m3u, *.pls, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:437
+#: modules/gui/wxwidgets/dialogs/open.cpp:1269
+msgid "|Subtitle Files (*.srt, *.sub, etc.)|"
+msgstr ""
+
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
 #, fuzzy
 msgid "Stream and Media Info"
@@ -14325,6 +14340,11 @@ msgstr "출력 URL"
 msgid "Loop"
 msgstr "루프"
 
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:415
+#, fuzzy
+msgid "Create"
+msgstr "심볼·레이트"
+
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:560
 #, fuzzy
 msgid "VLM stream"
@@ -14399,6 +14419,11 @@ msgid ""
 "about it."
 msgstr ""
 
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
+#, fuzzy
+msgid "Transcode audio (if available)"
+msgstr "스트림의 일시정지"
+
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
 msgid ""
 "Select the target audio codec. Choose a codec to display more information "
@@ -14466,11 +14491,6 @@ msgstr "버젼 정보의 인쇄"
 #, fuzzy
 msgid "Save to file"
 msgstr "파일의 보존"
-
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
-#, fuzzy
-msgid "Transcode audio (if available)"
-msgstr "스트림의 일시정지"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:41
 msgid ""
@@ -16392,78 +16412,78 @@ msgstr "표준 재생"
 msgid "Standard stream output"
 msgstr "표준 스트림 출력"
 
-#: modules/stream_out/switcher.c:82
+#: modules/stream_out/switcher.c:81
 #, fuzzy
 msgid "Files"
 msgstr "파일"
 
-#: modules/stream_out/switcher.c:84
+#: modules/stream_out/switcher.c:83
 #, fuzzy
 msgid "Full paths of the files separated by colons."
 msgstr "출력 파일의 패스"
 
-#: modules/stream_out/switcher.c:85
+#: modules/stream_out/switcher.c:84
 #, fuzzy
 msgid "Sizes"
 msgstr "사이즈"
 
-#: modules/stream_out/switcher.c:87
+#: modules/stream_out/switcher.c:86
 msgid "List of sizes separated by colons (720x576:480x576)."
 msgstr ""
 
-#: modules/stream_out/switcher.c:88
+#: modules/stream_out/switcher.c:87
 #, fuzzy
 msgid "Aspect ratio"
 msgstr "어스펙트비"
 
-#: modules/stream_out/switcher.c:90
+#: modules/stream_out/switcher.c:89
 #, fuzzy
 msgid "Aspect ratio (4:3, 16:9)."
 msgstr "어스펙트비"
 
-#: modules/stream_out/switcher.c:91
+#: modules/stream_out/switcher.c:90
 #, fuzzy
 msgid "Command UDP port"
 msgstr "포토 번호"
 
-#: modules/stream_out/switcher.c:93
+#: modules/stream_out/switcher.c:92
 msgid "UDP port to listen to for commands."
 msgstr ""
 
-#: modules/stream_out/switcher.c:94
+#: modules/stream_out/switcher.c:93
 msgid "Command"
 msgstr "커멘드"
 
-#: modules/stream_out/switcher.c:96
+#: modules/stream_out/switcher.c:95
 msgid "Initial command to execute."
 msgstr ""
 
-#: modules/stream_out/switcher.c:97
+#: modules/stream_out/switcher.c:96
 msgid "GOP size"
 msgstr ""
 
-#: modules/stream_out/switcher.c:99
+#: modules/stream_out/switcher.c:98
 msgid "Number of P frames between two I frames."
 msgstr ""
 
-#: modules/stream_out/switcher.c:100
+#: modules/stream_out/switcher.c:99
 msgid "Quantizer scale"
 msgstr ""
 
-#: modules/stream_out/switcher.c:102
+#: modules/stream_out/switcher.c:101
 msgid "Fixed quantizer scale to use."
 msgstr ""
 
-#: modules/stream_out/switcher.c:103
+#: modules/stream_out/switcher.c:102
 #, fuzzy
 msgid "Mute audio"
 msgstr "암호 오디오 오디오"
 
-#: modules/stream_out/switcher.c:105
+#: modules/stream_out/switcher.c:104
 msgid "Mute audio when command is not 0."
 msgstr ""
 
-#: modules/stream_out/switcher.c:108
+#: modules/stream_out/switcher.c:107
 #, fuzzy
 msgid "MPEG2 video switcher stream output"
 msgstr "비디오·스트림의 출력을 유효하게 한다"
@@ -16821,6 +16841,13 @@ msgstr "MMX I420, IYUV, YV12 to RV15, RV16, RV24, RV32 전환"
 msgid "Conversions from "
 msgstr "변환원 "
 
+#: modules/video_chroma/i420_ymga.c:48 modules/video_chroma/i420_ymga.c:51
+#: modules/video_chroma/i420_yuy2.c:75 modules/video_chroma/i420_yuy2.c:78
+#: modules/video_chroma/i420_yuy2.c:86 modules/video_chroma/i422_yuy2.c:63
+#: modules/video_chroma/i422_yuy2.c:66
+msgid " to "
+msgstr " 처 "
+
 #: modules/video_chroma/i420_ymga.c:51 modules/video_chroma/i420_yuy2.c:78
 #: modules/video_chroma/i422_yuy2.c:66
 msgid "MMX conversions from "
@@ -17055,7 +17082,7 @@ msgid "Logo animation # of loops"
 msgstr ""
 
 #: modules/video_filter/logo.c:73
-msgid "Number of loops for the logo animation.1 = continuous, 0 = disabled"
+msgid "Number of loops for the logo animation.-1 = continuous, 0 = disabled"
 msgstr ""
 
 #: modules/video_filter/logo.c:75
@@ -18521,13 +18548,6 @@ msgstr "xods 출력으로 텍스트 출력을 위해서(때문에) 사용되는 
 #, fuzzy
 msgid "XOSD interface"
 msgstr "네트워크·인터페이스"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "심볼·레이트"
-
-#~ msgid " to "
-#~ msgstr " 처 "
 
 #, fuzzy
 #~ msgid "Errors"

@@ -146,6 +146,7 @@ Vincent van den Heuvel <heuvel@mac.com> - OSX about window artwork (v0.8.4)
 Vitalijus Slavinskas <Vitalijus.Slavinskas at stud.ktu dot lt> - nsv patches
 Vitaly V. Bursov <vitalyvb at ukr dot net>
 Vladimir Chernyshov - MMX motion optimizations
+Vladimir Yermolayev <init at siptelecom dot ru> -- Russian translation
 Wade Majors <guru at startrek.com> - BeOS icon integration, debugging and fixes
 Wallace Wadge <wwadge at gmail.com> - multiple programs TS mux
 Watanabe Go <go at dsl.gr.jp> - fix for non-ASCII filenames

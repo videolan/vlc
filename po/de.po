@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-28 22:04+0100\n"
+"POT-Creation-Date: 2006-08-31 15:10+0400\n"
 "PO-Revision-Date: 2006-07-10 23:27+0200\n"
 "Last-Translator: Felix Kühne\n"
 "Language-Team: German\n"
@@ -509,9 +509,9 @@ msgstr "Wählen Sie die Datei, in die gesichert wird"
 #: include/vlc_intf_strings.h:34 modules/gui/macosx/embeddedwindow.m:45
 #: modules/gui/macosx/embeddedwindow.m:72 modules/gui/macosx/intf.m:493
 #: modules/gui/macosx/intf.m:536 modules/gui/macosx/intf.m:615
-#: modules/gui/macosx/intf.m:622 modules/gui/macosx/intf.m:1388
-#: modules/gui/macosx/intf.m:1389 modules/gui/macosx/intf.m:1390
-#: modules/gui/macosx/intf.m:1391 modules/gui/macosx/playlist.m:435
+#: modules/gui/macosx/intf.m:622 modules/gui/macosx/intf.m:1403
+#: modules/gui/macosx/intf.m:1404 modules/gui/macosx/intf.m:1405
+#: modules/gui/macosx/intf.m:1406 modules/gui/macosx/playlist.m:435
 #: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:281
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:290
@@ -716,7 +716,7 @@ msgid "Stereo"
 msgstr "Stereo"
 
 #: src/audio_output/output.c:107 src/audio_output/output.c:143
-#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:75
+#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
 #: modules/control/gestures.c:86 modules/video_filter/logo.c:95
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:172
@@ -726,7 +726,7 @@ msgid "Left"
 msgstr "Links"
 
 #: src/audio_output/output.c:109 src/audio_output/output.c:145
-#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:75
+#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
 #: modules/control/gestures.c:86 modules/video_filter/logo.c:95
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:172
@@ -804,9 +804,9 @@ msgid "Bookmark %i"
 msgstr "Lesezeichen %i"
 
 #: src/input/decoder.c:113 src/input/decoder.c:125
-#: modules/codec/ffmpeg/encoder.c:228 modules/codec/ffmpeg/encoder.c:236
-#: modules/codec/ffmpeg/encoder.c:248 modules/codec/ffmpeg/encoder.c:619
-#: modules/codec/ffmpeg/encoder.c:628 modules/stream_out/es.c:365
+#: modules/codec/ffmpeg/encoder.c:227 modules/codec/ffmpeg/encoder.c:235
+#: modules/codec/ffmpeg/encoder.c:247 modules/codec/ffmpeg/encoder.c:618
+#: modules/codec/ffmpeg/encoder.c:627 modules/stream_out/es.c:365
 #: modules/stream_out/es.c:379
 #, fuzzy
 msgid "Streaming / Transcoding failed"
@@ -1591,7 +1591,7 @@ msgstr ""
 "4=oben, 8=unten; Sie können auch Kombinationen dieser Werte benutzen, wie 6=4"
 "+2 oben-rechts bedeutet)."
 
-#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:75
+#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
 #: modules/video_filter/logo.c:95 modules/video_filter/marq.c:107
 #: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:78
@@ -6732,7 +6732,7 @@ msgstr "Segmente"
 
 #: modules/access/vcdx/access.c:426 modules/access/vcdx/access.c:707
 #: modules/access/vcdx/info.c:294 modules/access/vcdx/info.c:295
-#: modules/demux/mkv.cpp:5176
+#: modules/demux/mkv.cpp:5188
 msgid "Segment"
 msgstr "Segment"
 
@@ -7029,21 +7029,21 @@ msgstr "Audiofilter für float32->u16 Konvertierung"
 msgid "Audio filter for float32->u8 conversion"
 msgstr "Audiofilter für float32->u8 Konvertierung"
 
-#: modules/audio_filter/converter/mono.c:75
+#: modules/audio_filter/converter/mono.c:100
 #, fuzzy
 msgid "Left rear"
 msgstr "Links"
 
-#: modules/audio_filter/converter/mono.c:75
+#: modules/audio_filter/converter/mono.c:100
 #, fuzzy
 msgid "Right rear"
 msgstr "Rechts"
 
-#: modules/audio_filter/converter/mono.c:76
+#: modules/audio_filter/converter/mono.c:101
 msgid "Left front"
 msgstr ""
 
-#: modules/audio_filter/converter/mono.c:88
+#: modules/audio_filter/converter/mono.c:113
 #, fuzzy
 msgid "Audio filter for stereo to mono conversion"
 msgstr "Audiofilter für PCM-Format-Konvertierung"
@@ -7748,22 +7748,22 @@ msgstr "Zu benutzendes Deinterlace-Modul."
 msgid "Fake video decoder"
 msgstr "Fake Videodekoder"
 
-#: modules/codec/ffmpeg/encoder.c:229
+#: modules/codec/ffmpeg/encoder.c:228
 #, fuzzy, c-format
 msgid "\"%s\" is no video encoder."
 msgstr "Dirac Videoencoder"
 
-#: modules/codec/ffmpeg/encoder.c:237
+#: modules/codec/ffmpeg/encoder.c:236
 #, fuzzy, c-format
 msgid "\"%s\" is no audio encoder."
 msgstr "Vorbis Audioencoder"
 
-#: modules/codec/ffmpeg/encoder.c:249
+#: modules/codec/ffmpeg/encoder.c:248
 #, c-format
 msgid "VLC could not find encoder \"%s\"."
 msgstr ""
 
-#: modules/codec/ffmpeg/encoder.c:620 modules/codec/ffmpeg/encoder.c:629
+#: modules/codec/ffmpeg/encoder.c:619 modules/codec/ffmpeg/encoder.c:628
 msgid "VLC could not open the encoder."
 msgstr ""
 
@@ -11218,9 +11218,9 @@ msgstr "Zurückspulen"
 msgid "Fast Forward"
 msgstr "Vorwärtsspulen"
 
-#: modules/gui/macosx/embeddedwindow.m:66 modules/gui/macosx/intf.m:1379
-#: modules/gui/macosx/intf.m:1380 modules/gui/macosx/intf.m:1381
-#: modules/gui/macosx/intf.m:1382 modules/gui/pda/pda_interface.c:250
+#: modules/gui/macosx/embeddedwindow.m:66 modules/gui/macosx/intf.m:1394
+#: modules/gui/macosx/intf.m:1395 modules/gui/macosx/intf.m:1396
+#: modules/gui/macosx/intf.m:1397 modules/gui/pda/pda_interface.c:250
 #: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:678
 #: modules/gui/wxwidgets/interface.cpp:689
 #: modules/gui/wxwidgets/interface.cpp:1210
@@ -11437,8 +11437,8 @@ msgstr "Alle einblenden"
 msgid "VLC - Controller"
 msgstr "VLC - Steuerung"
 
-#: modules/gui/macosx/intf.m:488 modules/gui/macosx/intf.m:984
-#: modules/gui/macosx/intf.m:1306 modules/gui/pda/pda_interface.c:212
+#: modules/gui/macosx/intf.m:488 modules/gui/macosx/intf.m:999
+#: modules/gui/macosx/intf.m:1321 modules/gui/pda/pda_interface.c:212
 #: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:52
 msgid "VLC media player"
 msgstr "VLC media player"
@@ -11499,7 +11499,7 @@ msgstr "Netzwerk öffnen..."
 msgid "Open Recent"
 msgstr "Benutzte Dokumente"
 
-#: modules/gui/macosx/intf.m:525 modules/gui/macosx/intf.m:1942
+#: modules/gui/macosx/intf.m:525 modules/gui/macosx/intf.m:1957
 msgid "Clear Menu"
 msgstr "Menü löschen"
 
@@ -11588,16 +11588,16 @@ msgstr "Eine Spende machen"
 msgid "Online Forum"
 msgstr "Online-Forum"
 
-#: modules/gui/macosx/intf.m:1161
+#: modules/gui/macosx/intf.m:1176
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Lautstärke: %d%%"
 
-#: modules/gui/macosx/intf.m:1799
+#: modules/gui/macosx/intf.m:1814
 msgid "No CrashLog found"
 msgstr "Kein CrashLog gefunden"
 
-#: modules/gui/macosx/intf.m:1799
+#: modules/gui/macosx/intf.m:1814
 msgid "Couldn't find any trace of a previous crash."
 msgstr "Konnte keine Spuren eines vorherigen Absturzes finden."
 
@@ -13611,6 +13611,21 @@ msgstr "Input hat gewechselt"
 msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
 msgstr ""
 
+#: modules/gui/wxwidgets/dialogs.cpp:435
+#: modules/gui/wxwidgets/dialogs/open.cpp:1267
+msgid "|Video Files (*.avi, *.mpg, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:436
+#: modules/gui/wxwidgets/dialogs/open.cpp:1268
+msgid "|Playlist Files (*.m3u, *.pls, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:437
+#: modules/gui/wxwidgets/dialogs/open.cpp:1269
+msgid "|Subtitle Files (*.srt, *.sub, etc.)|"
+msgstr ""
+
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
 msgid "Stream and Media Info"
 msgstr "Stream- und Medieninfo"
@@ -14155,6 +14170,10 @@ msgstr "Ausgabe"
 msgid "Loop"
 msgstr "In Schleife"
 
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:415
+msgid "Create"
+msgstr "Erstellen"
+
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:560
 msgid "VLM stream"
 msgstr "VLM-Stream"
@@ -14247,6 +14266,10 @@ msgstr ""
 "Wählen Sie den Zielvideocodec. Klicken Sie auf einen Codec, um mehr "
 "Informationen zu erhalten."
 
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
+msgid "Transcode audio (if available)"
+msgstr "Audio transcodieren (falls verfügbar)"
+
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
 msgid ""
 "Select the target audio codec. Choose a codec to display more information "
@@ -14322,10 +14345,6 @@ msgstr "Mehr Informationen"
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1291
 msgid "Save to file"
 msgstr "In Datei sichern"
-
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
-msgid "Transcode audio (if available)"
-msgstr "Audio transcodieren (falls verfügbar)"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:41
 msgid ""
@@ -16281,71 +16300,71 @@ msgstr "Standard"
 msgid "Standard stream output"
 msgstr "Standard-Streamausgabe"
 
-#: modules/stream_out/switcher.c:82
+#: modules/stream_out/switcher.c:81
 msgid "Files"
 msgstr "Dateien"
 
-#: modules/stream_out/switcher.c:84
+#: modules/stream_out/switcher.c:83
 msgid "Full paths of the files separated by colons."
 msgstr "Kompletter Pfad der Dateien, getrennt durch Doppelpunkte."
 
-#: modules/stream_out/switcher.c:85
+#: modules/stream_out/switcher.c:84
 msgid "Sizes"
 msgstr "Größen"
 
-#: modules/stream_out/switcher.c:87
+#: modules/stream_out/switcher.c:86
 msgid "List of sizes separated by colons (720x576:480x576)."
 msgstr "List von Größen, getrennt durch Doppelpunkte (720x576:480x576)."
 
-#: modules/stream_out/switcher.c:88
+#: modules/stream_out/switcher.c:87
 msgid "Aspect ratio"
 msgstr "Seitenverhältnis"
 
-#: modules/stream_out/switcher.c:90
+#: modules/stream_out/switcher.c:89
 msgid "Aspect ratio (4:3, 16:9)."
 msgstr "Seitenverhältnis (4:3, 16:9)."
 
-#: modules/stream_out/switcher.c:91
+#: modules/stream_out/switcher.c:90
 msgid "Command UDP port"
 msgstr "Befehls-UDP-Port"
 
-#: modules/stream_out/switcher.c:93
+#: modules/stream_out/switcher.c:92
 msgid "UDP port to listen to for commands."
 msgstr "UDP-Port auf dem nach Befehlen gehört wird."
 
-#: modules/stream_out/switcher.c:94
+#: modules/stream_out/switcher.c:93
 msgid "Command"
 msgstr "Befehl"
 
-#: modules/stream_out/switcher.c:96
+#: modules/stream_out/switcher.c:95
 msgid "Initial command to execute."
 msgstr "Zu Beginn auszuführender Befehl."
 
-#: modules/stream_out/switcher.c:97
+#: modules/stream_out/switcher.c:96
 msgid "GOP size"
 msgstr "GOP-Größe"
 
-#: modules/stream_out/switcher.c:99
+#: modules/stream_out/switcher.c:98
 msgid "Number of P frames between two I frames."
 msgstr "Anzahl von P-Frames zwischen 2 I-Frames."
 
-#: modules/stream_out/switcher.c:100
+#: modules/stream_out/switcher.c:99
 msgid "Quantizer scale"
 msgstr "Quantisierer-Skalierung"
 
-#: modules/stream_out/switcher.c:102
+#: modules/stream_out/switcher.c:101
 msgid "Fixed quantizer scale to use."
 msgstr "Feste Quantisierer-Skalierung benutzen."
 
-#: modules/stream_out/switcher.c:103
+#: modules/stream_out/switcher.c:102
 msgid "Mute audio"
 msgstr "Audio stumm schalten"
 
-#: modules/stream_out/switcher.c:105
+#: modules/stream_out/switcher.c:104
 msgid "Mute audio when command is not 0."
 msgstr "Audio stummschalten wenn des Befehl ungleich 0 ist."
 
-#: modules/stream_out/switcher.c:108
+#: modules/stream_out/switcher.c:107
 msgid "MPEG2 video switcher stream output"
 msgstr "MPEG2-Video-Switcher-Streamausgabe"
 
@@ -16696,6 +16715,13 @@ msgstr "MMX I420,IYUV,YV12 nach RV15,RV16,RV24,RV32 Umwandlungen"
 msgid "Conversions from "
 msgstr "Umwandlungen von "
 
+#: modules/video_chroma/i420_ymga.c:48 modules/video_chroma/i420_ymga.c:51
+#: modules/video_chroma/i420_yuy2.c:75 modules/video_chroma/i420_yuy2.c:78
+#: modules/video_chroma/i420_yuy2.c:86 modules/video_chroma/i422_yuy2.c:63
+#: modules/video_chroma/i422_yuy2.c:66
+msgid " to "
+msgstr " nach "
+
 #: modules/video_chroma/i420_ymga.c:51 modules/video_chroma/i420_yuy2.c:78
 #: modules/video_chroma/i422_yuy2.c:66
 msgid "MMX conversions from "
@@ -16923,7 +16949,8 @@ msgid "Logo animation # of loops"
 msgstr "Logoanimationen von # Durchläufen"
 
 #: modules/video_filter/logo.c:73
-msgid "Number of loops for the logo animation.1 = continuous, 0 = disabled"
+#, fuzzy
+msgid "Number of loops for the logo animation.-1 = continuous, 0 = disabled"
 msgstr ""
 "Anzahl der Schleifen für die Logoanimation. 1 = unendlich, 0 = deaktiviert"
 
@@ -18413,12 +18440,6 @@ msgstr "XOSD Interface"
 #~ msgstr ""
 #~ "Dies hat keine Auswirkungen auf die Qualität des Codierens; es verhindert "
 #~ "einfach nur die Aktualisierung der Statistik (erhöht die Geschwindigkeit)."
-
-#~ msgid "Create"
-#~ msgstr "Erstellen"
-
-#~ msgid " to "
-#~ msgstr " nach "
 
 #~ msgid "Errors"
 #~ msgstr "Fehler"

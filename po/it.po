@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-28 22:04+0100\n"
+"POT-Creation-Date: 2006-08-31 15:10+0400\n"
 "PO-Revision-Date: 2006-04-03 16:52+0000\n"
 "Last-Translator: Clément Stenac <zorglub@diwi.org>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -479,9 +479,9 @@ msgstr "Scelta del file in cui salvare"
 #: include/vlc_intf_strings.h:34 modules/gui/macosx/embeddedwindow.m:45
 #: modules/gui/macosx/embeddedwindow.m:72 modules/gui/macosx/intf.m:493
 #: modules/gui/macosx/intf.m:536 modules/gui/macosx/intf.m:615
-#: modules/gui/macosx/intf.m:622 modules/gui/macosx/intf.m:1388
-#: modules/gui/macosx/intf.m:1389 modules/gui/macosx/intf.m:1390
-#: modules/gui/macosx/intf.m:1391 modules/gui/macosx/playlist.m:435
+#: modules/gui/macosx/intf.m:622 modules/gui/macosx/intf.m:1403
+#: modules/gui/macosx/intf.m:1404 modules/gui/macosx/intf.m:1405
+#: modules/gui/macosx/intf.m:1406 modules/gui/macosx/playlist.m:435
 #: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:281
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:290
@@ -686,7 +686,7 @@ msgid "Stereo"
 msgstr "Stereo"
 
 #: src/audio_output/output.c:107 src/audio_output/output.c:143
-#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:75
+#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
 #: modules/control/gestures.c:86 modules/video_filter/logo.c:95
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:172
@@ -696,7 +696,7 @@ msgid "Left"
 msgstr "Sinistra"
 
 #: src/audio_output/output.c:109 src/audio_output/output.c:145
-#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:75
+#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
 #: modules/control/gestures.c:86 modules/video_filter/logo.c:95
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:172
@@ -774,9 +774,9 @@ msgid "Bookmark %i"
 msgstr "Segnalibro %i"
 
 #: src/input/decoder.c:113 src/input/decoder.c:125
-#: modules/codec/ffmpeg/encoder.c:228 modules/codec/ffmpeg/encoder.c:236
-#: modules/codec/ffmpeg/encoder.c:248 modules/codec/ffmpeg/encoder.c:619
-#: modules/codec/ffmpeg/encoder.c:628 modules/stream_out/es.c:365
+#: modules/codec/ffmpeg/encoder.c:227 modules/codec/ffmpeg/encoder.c:235
+#: modules/codec/ffmpeg/encoder.c:247 modules/codec/ffmpeg/encoder.c:618
+#: modules/codec/ffmpeg/encoder.c:627 modules/stream_out/es.c:365
 #: modules/stream_out/es.c:379
 #, fuzzy
 msgid "Streaming / Transcoding failed"
@@ -1589,7 +1589,7 @@ msgstr ""
 "impostazione predefinita (0) sarà centrato (0=centrato, 1=sinistra, "
 "2=destra, 4=alto, 8=basso; è possibile combinare più di un valore)."
 
-#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:75
+#: src/libvlc.h:266 modules/audio_filter/converter/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
 #: modules/video_filter/logo.c:95 modules/video_filter/marq.c:107
 #: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:78
@@ -6882,7 +6882,7 @@ msgstr "Segmenti"
 
 #: modules/access/vcdx/access.c:426 modules/access/vcdx/access.c:707
 #: modules/access/vcdx/info.c:294 modules/access/vcdx/info.c:295
-#: modules/demux/mkv.cpp:5176
+#: modules/demux/mkv.cpp:5188
 msgid "Segment"
 msgstr "Segmento"
 
@@ -7195,21 +7195,21 @@ msgstr "filtro audio per la conversione float32->u16"
 msgid "Audio filter for float32->u8 conversion"
 msgstr "filtro audio per la conversione float32->u8"
 
-#: modules/audio_filter/converter/mono.c:75
+#: modules/audio_filter/converter/mono.c:100
 #, fuzzy
 msgid "Left rear"
 msgstr "Sinistra"
 
-#: modules/audio_filter/converter/mono.c:75
+#: modules/audio_filter/converter/mono.c:100
 #, fuzzy
 msgid "Right rear"
 msgstr "Destra"
 
-#: modules/audio_filter/converter/mono.c:76
+#: modules/audio_filter/converter/mono.c:101
 msgid "Left front"
 msgstr ""
 
-#: modules/audio_filter/converter/mono.c:88
+#: modules/audio_filter/converter/mono.c:113
 #, fuzzy
 msgid "Audio filter for stereo to mono conversion"
 msgstr "filtro audio per la conversione di formato PCM"
@@ -7956,22 +7956,22 @@ msgstr "Modalità deinterlacciata"
 msgid "Fake video decoder"
 msgstr "Decodifica video Cinepak"
 
-#: modules/codec/ffmpeg/encoder.c:229
+#: modules/codec/ffmpeg/encoder.c:228
 #, fuzzy, c-format
 msgid "\"%s\" is no video encoder."
 msgstr "Codifica video Theora"
 
-#: modules/codec/ffmpeg/encoder.c:237
+#: modules/codec/ffmpeg/encoder.c:236
 #, fuzzy, c-format
 msgid "\"%s\" is no audio encoder."
 msgstr "Codifica audio Vorbis"
 
-#: modules/codec/ffmpeg/encoder.c:249
+#: modules/codec/ffmpeg/encoder.c:248
 #, c-format
 msgid "VLC could not find encoder \"%s\"."
 msgstr ""
 
-#: modules/codec/ffmpeg/encoder.c:620 modules/codec/ffmpeg/encoder.c:629
+#: modules/codec/ffmpeg/encoder.c:619 modules/codec/ffmpeg/encoder.c:628
 msgid "VLC could not open the encoder."
 msgstr ""
 
@@ -11529,9 +11529,9 @@ msgstr "Riavvolgi"
 msgid "Fast Forward"
 msgstr "Avanti veloce"
 
-#: modules/gui/macosx/embeddedwindow.m:66 modules/gui/macosx/intf.m:1379
-#: modules/gui/macosx/intf.m:1380 modules/gui/macosx/intf.m:1381
-#: modules/gui/macosx/intf.m:1382 modules/gui/pda/pda_interface.c:250
+#: modules/gui/macosx/embeddedwindow.m:66 modules/gui/macosx/intf.m:1394
+#: modules/gui/macosx/intf.m:1395 modules/gui/macosx/intf.m:1396
+#: modules/gui/macosx/intf.m:1397 modules/gui/pda/pda_interface.c:250
 #: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:678
 #: modules/gui/wxwidgets/interface.cpp:689
 #: modules/gui/wxwidgets/interface.cpp:1210
@@ -11757,8 +11757,8 @@ msgstr "Mostra suggerimenti"
 msgid "VLC - Controller"
 msgstr "Pannello - VLC"
 
-#: modules/gui/macosx/intf.m:488 modules/gui/macosx/intf.m:984
-#: modules/gui/macosx/intf.m:1306 modules/gui/pda/pda_interface.c:212
+#: modules/gui/macosx/intf.m:488 modules/gui/macosx/intf.m:999
+#: modules/gui/macosx/intf.m:1321 modules/gui/pda/pda_interface.c:212
 #: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:52
 msgid "VLC media player"
 msgstr "VLC media player"
@@ -11819,7 +11819,7 @@ msgstr "Apri Rete..."
 msgid "Open Recent"
 msgstr "Apri Recenti"
 
-#: modules/gui/macosx/intf.m:525 modules/gui/macosx/intf.m:1942
+#: modules/gui/macosx/intf.m:525 modules/gui/macosx/intf.m:1957
 msgid "Clear Menu"
 msgstr "Cancella Menu"
 
@@ -11913,16 +11913,16 @@ msgstr "Macedone"
 msgid "Online Forum"
 msgstr "Documentazione Online"
 
-#: modules/gui/macosx/intf.m:1161
+#: modules/gui/macosx/intf.m:1176
 #, fuzzy, c-format
 msgid "Volume: %d%%"
 msgstr "Il volume è %d"
 
-#: modules/gui/macosx/intf.m:1799
+#: modules/gui/macosx/intf.m:1814
 msgid "No CrashLog found"
 msgstr "Nessun Rapporto d'Errore trovato"
 
-#: modules/gui/macosx/intf.m:1799
+#: modules/gui/macosx/intf.m:1814
 msgid "Couldn't find any trace of a previous crash."
 msgstr ""
 
@@ -13983,6 +13983,21 @@ msgstr "L'ingresso è cambiato "
 msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
 msgstr ""
 
+#: modules/gui/wxwidgets/dialogs.cpp:435
+#: modules/gui/wxwidgets/dialogs/open.cpp:1267
+msgid "|Video Files (*.avi, *.mpg, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:436
+#: modules/gui/wxwidgets/dialogs/open.cpp:1268
+msgid "|Playlist Files (*.m3u, *.pls, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:437
+#: modules/gui/wxwidgets/dialogs/open.cpp:1269
+msgid "|Subtitle Files (*.srt, *.sub, etc.)|"
+msgstr ""
+
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
 #, fuzzy
 msgid "Stream and Media Info"
@@ -14540,6 +14555,11 @@ msgstr "URL uscita"
 msgid "Loop"
 msgstr "Ripeti"
 
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:415
+#, fuzzy
+msgid "Create"
+msgstr "Campionamento"
+
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:560
 #, fuzzy
 msgid "VLM stream"
@@ -14636,6 +14656,11 @@ msgstr ""
 "Scelta del codec video. Fare click su ciascun codec per maggiori "
 "informazioni."
 
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
+#, fuzzy
+msgid "Transcode audio (if available)"
+msgstr "Transcodifica Audio"
+
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
 #, fuzzy
 msgid ""
@@ -14724,11 +14749,6 @@ msgstr "Ulteriori informazioni"
 #, fuzzy
 msgid "Save to file"
 msgstr "Registra file"
-
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
-#, fuzzy
-msgid "Transcode audio (if available)"
-msgstr "Transcodifica Audio"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:41
 #, fuzzy
@@ -16746,79 +16766,79 @@ msgstr "Standard"
 msgid "Standard stream output"
 msgstr "Trasmissione in uscita standard"
 
-#: modules/stream_out/switcher.c:82
+#: modules/stream_out/switcher.c:81
 #, fuzzy
 msgid "Files"
 msgstr "Files"
 
-#: modules/stream_out/switcher.c:84
+#: modules/stream_out/switcher.c:83
 #, fuzzy
 msgid "Full paths of the files separated by colons."
 msgstr "Percorsi completi dei files separati da duepunti."
 
-#: modules/stream_out/switcher.c:85
+#: modules/stream_out/switcher.c:84
 msgid "Sizes"
 msgstr "Dimensioni"
 
-#: modules/stream_out/switcher.c:87
+#: modules/stream_out/switcher.c:86
 msgid "List of sizes separated by colons (720x576:480x576)."
 msgstr "Elenco di dimensioni sparate da duepunti (720x576:480x576)."
 
-#: modules/stream_out/switcher.c:88
+#: modules/stream_out/switcher.c:87
 #, fuzzy
 msgid "Aspect ratio"
 msgstr "Rapporto dimensioni"
 
-#: modules/stream_out/switcher.c:90
+#: modules/stream_out/switcher.c:89
 msgid "Aspect ratio (4:3, 16:9)."
 msgstr "Rapporto dimensioni (4:3, 16:9)."
 
-#: modules/stream_out/switcher.c:91
+#: modules/stream_out/switcher.c:90
 #, fuzzy
 msgid "Command UDP port"
 msgstr "Comando porta UDP"
 
-#: modules/stream_out/switcher.c:93
+#: modules/stream_out/switcher.c:92
 msgid "UDP port to listen to for commands."
 msgstr "porta UDP per ricevere comandi."
 
-#: modules/stream_out/switcher.c:94
+#: modules/stream_out/switcher.c:93
 msgid "Command"
 msgstr "Comando"
 
-#: modules/stream_out/switcher.c:96
+#: modules/stream_out/switcher.c:95
 msgid "Initial command to execute."
 msgstr "Comando iniziale da eseguire"
 
-#: modules/stream_out/switcher.c:97
+#: modules/stream_out/switcher.c:96
 msgid "GOP size"
 msgstr ""
 
-#: modules/stream_out/switcher.c:99
+#: modules/stream_out/switcher.c:98
 #, fuzzy
 msgid "Number of P frames between two I frames."
 msgstr "Pixel bianchi tra le bande."
 
-#: modules/stream_out/switcher.c:100
+#: modules/stream_out/switcher.c:99
 #, fuzzy
 msgid "Quantizer scale"
 msgstr "Valori predefiniti equalizzatore"
 
-#: modules/stream_out/switcher.c:102
+#: modules/stream_out/switcher.c:101
 #, fuzzy
 msgid "Fixed quantizer scale to use."
 msgstr "Usa una scala fissa per la quantizzazione video"
 
-#: modules/stream_out/switcher.c:103
+#: modules/stream_out/switcher.c:102
 #, fuzzy
 msgid "Mute audio"
 msgstr "Azzera audio"
 
-#: modules/stream_out/switcher.c:105
+#: modules/stream_out/switcher.c:104
 msgid "Mute audio when command is not 0."
 msgstr "Azzera audio quando il comando non è 0."
 
-#: modules/stream_out/switcher.c:108
+#: modules/stream_out/switcher.c:107
 #, fuzzy
 msgid "MPEG2 video switcher stream output"
 msgstr "Trasmissione in uscita con cambiamento di rate MPEG2 video"
@@ -17179,6 +17199,13 @@ msgstr "Conversioni da MMX I420,IYUV,YV12 a RV15,RV16,RV24,RV32"
 msgid "Conversions from "
 msgstr "Conversioni da "
 
+#: modules/video_chroma/i420_ymga.c:48 modules/video_chroma/i420_ymga.c:51
+#: modules/video_chroma/i420_yuy2.c:75 modules/video_chroma/i420_yuy2.c:78
+#: modules/video_chroma/i420_yuy2.c:86 modules/video_chroma/i422_yuy2.c:63
+#: modules/video_chroma/i422_yuy2.c:66
+msgid " to "
+msgstr " a "
+
 #: modules/video_chroma/i420_ymga.c:51 modules/video_chroma/i420_yuy2.c:78
 #: modules/video_chroma/i422_yuy2.c:66
 msgid "MMX conversions from "
@@ -17412,7 +17439,7 @@ msgid "Logo animation # of loops"
 msgstr "Velocità dell'animazione Goom"
 
 #: modules/video_filter/logo.c:73
-msgid "Number of loops for the logo animation.1 = continuous, 0 = disabled"
+msgid "Number of loops for the logo animation.-1 = continuous, 0 = disabled"
 msgstr ""
 
 #: modules/video_filter/logo.c:75
@@ -18920,13 +18947,6 @@ msgstr "Tipo di carattere utilizzato per visualizzare i testi nell'uscita xosd"
 #: modules/visualization/xosd.c:84
 msgid "XOSD interface"
 msgstr "Interfaccia XOSD"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Campionamento"
-
-#~ msgid " to "
-#~ msgstr " a "
 
 #, fuzzy
 #~ msgid "Errors"
