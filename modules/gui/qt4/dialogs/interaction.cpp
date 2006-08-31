@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
 #include <QMessageBox>
+#include "dialogs/errors.hpp"
 #include "dialogs/interaction.hpp"
 #include "util/qvlcframe.hpp"
 #include <vlc/intf.h>
@@ -45,8 +46,18 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     }
     else if( p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
-        // Create instance of the errors dialog
+        if( config_GetInt( p_intf, "qt-show-errors" ) != 0 )
+            ErrorsDialog::getInstance( p_intf )->addError(
+                 qfu( p_dialog->psz_title ), qfu( p_dialog->psz_description ) );
+        i_ret = 0;
         //  QApplication::style()->standardPixmap(QStyle::SP_MessageBoxCritical)
+    }
+    else if( p_dialog->i_flags & DIALOG_WARNING )
+    {
+        if( config_GetInt( p_intf, "qt-show-errors" ) != 0 )
+            ErrorsDialog::getInstance( p_intf )->addWarning(
+                qfu( p_dialog->psz_title ),qfu( p_dialog->psz_description ) );
+        i_ret = 0;
     }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {

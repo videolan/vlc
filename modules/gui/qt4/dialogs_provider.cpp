@@ -120,7 +120,8 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
     case INTERACT_NEW:
         qdialog = new InteractionDialog( p_intf, p_dialog );
         p_dialog->p_private = (void*)qdialog;
-        qdialog->show();
+        if( !(p_dialog->i_status == ANSWERED_DIALOG) )
+            qdialog->show();
         break;
     case INTERACT_UPDATE:
         qdialog = (InteractionDialog*)(p_dialog->p_private);
