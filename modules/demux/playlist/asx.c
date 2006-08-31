@@ -380,9 +380,9 @@ static int Demux( demux_t *p_demux )
                 FREENULL( psz_abstract_entry )
                 b_entry = VLC_FALSE;
             }
-            else if( !strncasecmp( psz_parse, "<Entry>", 7 ) )
+            else if( !strncasecmp( psz_parse, "<Entry", 6 ) )
             {
-                psz_parse+=7;
+                psz_parse+=6;
                 if( b_entry )
                 {
                     msg_Err( p_demux, "We already are in an entry section" );
@@ -390,6 +390,7 @@ static int Demux( demux_t *p_demux )
                 }
                 i_entry_count += 1;
                 b_entry = VLC_TRUE;
+                psz_parse = strcasestr( psz_parse, ">" );
             }
             else if( !strncasecmp( psz_parse, "<Ref ", 5 ) )
             {
