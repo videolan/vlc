@@ -40,7 +40,8 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf, bool _main_input ) :
     QPushButton *clearButton = new QPushButton(qtr("&Clear"));
     QPushButton *saveLogButton = new QPushButton(qtr("&Save as..."));
     QSpinBox *verbosityBox = new QSpinBox();
-    verbosityBox->setRange(1, 3);
+    verbosityBox->setRange(0, 2);
+    verbosityBox->setValue(config_GetInt(p_intf, "verbose"));
     verbosityBox->setWrapping(true);
     QLabel *verbosityLabel = new QLabel(qtr("Verbosity Level"));
     messages = new QTextEdit();
