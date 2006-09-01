@@ -630,7 +630,12 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     libvlc_input_t *p_input = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
                     if( p_input )
                     {
-                        vlc_int64_t pos = numberValue(args[0])*1000LL;
+                        vlc_int64_t pos = 0;
+                        if( NPVARIANT_IS_INT32(args[0]) )
+                            pos = (vlc_int64_t)NPVARIANT_TO_INT32(args[0]);
+                        else
+                            pos = (vlc_int64_t)NPVARIANT_TO_DOUBLE(args[0]);
+
                         if( NPVARIANT_TO_BOOLEAN(args[1]) )
                         {
                             /* relative seek */
@@ -649,7 +654,6 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         libvlc_input_free(p_input);
                         if( libvlc_exception_raised(&ex) )
                         {
-                            libvlc_input_free(p_input);
                             NPN_SetException(this, libvlc_exception_get_message(&ex));
                             libvlc_exception_clear(&ex);
                             return INVOKERESULT_GENERIC_ERROR;

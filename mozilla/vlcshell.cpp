@@ -276,6 +276,16 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
     VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(instance->pdata);
 
+#if XP_WIN
+    HWND win = (HWND)p_plugin->getWindow()->window;
+    WNDPROC winproc = p_plugin->getWindowProc();
+    if( winproc )
+    {
+        /* reset WNDPROC */
+        SetWindowLong( win, GWL_WNDPROC, (LONG)winproc );
+    }
+#endif
+
     if( p_plugin )
         delete p_plugin;
 
@@ -361,12 +371,12 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
                 /* reset WNDPROC */
                 SetWindowLong( oldwin, GWL_WNDPROC, (LONG)oldproc );
             }
+            /* attach our plugin object */
+            SetWindowLongPtr((HWND)drawable, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(p_plugin));
+
             /* install our WNDPROC */
             p_plugin->setWindowProc( (WNDPROC)SetWindowLong( drawable,
                                                            GWL_WNDPROC, (LONG)Manage ) );
-
-            /* attach our plugin object */
-            SetWindowLongPtr((HWND)drawable, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(p_plugin));
 
             /* change window style to our liking */
             LONG style = GetWindowLong((HWND)drawable, GWL_STYLE);
