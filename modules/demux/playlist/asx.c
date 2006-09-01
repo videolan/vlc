@@ -85,9 +85,14 @@ static int StoreString( demux_t *p_demux, char **ppsz_string, char *psz_source_s
 int E_(Import_ASX)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    uint8_t *p_peek;
+    uint8_t *p_peek, *p_peek_stop;
     CHECK_PEEK( p_peek, 10 );
-    
+
+    p_peek_stop = p_peek+6;
+
+    // skip over possible leading empty lines
+    while( (p_peek < p_peek_stop) && (*p_peek == '\n' || *p_peek == '\r')) ++p_peek;
+
     if( POKE( p_peek, "<asx", 4 ) || isExtension( p_demux, ".asx" ) ||
         isExtension( p_demux, ".wax" ) || isExtension( p_demux, ".wvx" ) ||
         isDemux( p_demux, "asx-open" ) )
