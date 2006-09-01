@@ -21,16 +21,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "input_manager.hpp"
 #include "dialogs/messages.hpp"
 #include "dialogs_provider.hpp"
 #include "util/qvlcframe.hpp"
 #include "qt4.hpp"
+#include <QSpacerItem>
+#include <QSpinBox>
+#include <QLabel>
+#include <QTextEdit>
+#include <QTextCursor>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QMessageBox>
 
 MessagesDialog *MessagesDialog::instance = NULL;
 
-MessagesDialog::MessagesDialog( intf_thread_t *_p_intf, bool _main_input ) :
-                              QVLCFrame( _p_intf ), main_input( _main_input )
+MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowTitle( _("Messages" ) );
     resize(600, 400);
@@ -39,10 +45,11 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf, bool _main_input ) :
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
     QPushButton *clearButton = new QPushButton(qtr("&Clear"));
     QPushButton *saveLogButton = new QPushButton(qtr("&Save as..."));
-    QSpinBox *verbosityBox = new QSpinBox();
+    verbosityBox = new QSpinBox();
     verbosityBox->setRange(0, 2);
     verbosityBox->setValue(config_GetInt(p_intf, "verbose"));
     verbosityBox->setWrapping(true);
+    verbosityBox->setMaximumWidth( 50 );
     QLabel *verbosityLabel = new QLabel(qtr("Verbosity Level"));
     messages = new QTextEdit();
     messages->setReadOnly(true);
@@ -50,11 +57,12 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf, bool _main_input ) :
     messages->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     layout->addWidget(messages, 0, 0, 1, 0);
-    layout->addWidget(verbosityLabel, 1, 0, 1, 1);
-    layout->addWidget(verbosityBox, 1, 2);
-    layout->addWidget(saveLogButton, 2, 0);
-    layout->addWidget(clearButton, 2, 1);
-    layout->addWidget(closeButton, 2, 2);
+    layout->addWidget(verbosityLabel, 1, 0, 1,1 );
+    layout->addWidget(verbosityBox, 1, 1 );
+    layout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ), 1,2 );
+    layout->addWidget(saveLogButton, 1, 3 );
+    layout->addWidget(clearButton, 1, 4 );
+    layout->addWidget(closeButton, 1, 5 );
 
     connect( closeButton, SIGNAL( clicked() ) ,
            this, SLOT( onCloseButton()));
@@ -62,12 +70,8 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf, bool _main_input ) :
            this, SLOT( onClearButton()));
     connect( saveLogButton, SIGNAL( clicked() ) ,
            this, SLOT( onSaveButton()));
-    connect( verbosityBox, SIGNAL( valueChanged(int) ),
-           this, SLOT( onVerbosityChanged(int)));
     connect( DialogsProvider::getInstance(NULL)->fixed_timer,
              SIGNAL( timeout() ), this, SLOT(updateLog() ) );
-
-    p_input = NULL;
 }
 
 MessagesDialog::~MessagesDialog()
@@ -100,10 +104,19 @@ void MessagesDialog::updateLog()
 
             /* Append all messages to log window */
 
-
-            messages->setFontItalic(true);
-            messages->setTextColor("darkBlue");
-            messages->insertPlainText(p_sub->p_msg[i_start].psz_module);
+            if( p_sub->p_msg[i_start].i_type == VLC_MSG_INFO ||
+                p_sub->p_msg[i_start].i_type == VLC_MSG_ERR ||
+                p_sub->p_msg[i_start].i_type == VLC_MSG_WARN &&
+                    verbosityBox->value() >= 1 ||
+                p_sub->p_msg[i_start].i_type == VLC_MSG_DBG &&
+                    verbosityBox->value() >= 2 )
+            {
+                messages->setFontItalic(true);
+                messages->setTextColor("darkBlue");
+                messages->insertPlainText(p_sub->p_msg[i_start].psz_module);
+            }
+            else
+                continue;
 
             switch( p_sub->p_msg[i_start].i_type )
             {
@@ -176,12 +189,3 @@ bool MessagesDialog::onSaveButton()
     }
     return false;
 }
-
-void MessagesDialog::onVerbosityChanged(int verbosityLevel)
-{
-    //FIXME: Does not seems to work.
-    vlc_value_t  val;
-    val.i_int = verbosityLevel - 1;
-    var_Set( p_intf->p_vlc, "verbose", val );
-}
-

@@ -24,13 +24,6 @@
 #define _MESSAGES_DIALOG_H_
 
 #include "util/qvlcframe.hpp"
-#include <QSpinBox>
-#include <QLabel>
-#include <QTextEdit>
-#include <QTextCursor>
-#include <QFileDialog>
-#include <QTextStream>
-#include <QMessageBox>
 
 class QPushButton;
 class QSpinBox;
@@ -42,28 +35,24 @@ class MessagesDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
-    static MessagesDialog * getInstance( intf_thread_t *p_intf, bool a )
+    static MessagesDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new MessagesDialog( p_intf, a );
+            instance = new MessagesDialog( p_intf);
         return instance;
     }
     virtual ~MessagesDialog();
 
 private:
-    MessagesDialog( intf_thread_t *,  bool );
-    input_thread_t *p_input;
-    bool main_input;
+    MessagesDialog( intf_thread_t *);
     static MessagesDialog *instance;
-
+    QSpinBox *verbosityBox;
     QTextEdit *messages;
-
 public slots:
     void updateLog();
     void onCloseButton();
     void onClearButton();
     bool onSaveButton();
-    void onVerbosityChanged(int verbosityLevel);
 };
 
 #endif

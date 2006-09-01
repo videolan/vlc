@@ -31,6 +31,7 @@
 #include <QSignalMapper>
 #include "menus.hpp"
 #include <vlc_intf_strings.h>
+#include <QFileDialog>
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -164,7 +165,7 @@ void DialogsProvider::prefsDialog()
 
 void DialogsProvider::messagesDialog()
 {
-    MessagesDialog::getInstance( p_intf, true )->toggleVisible();
+    MessagesDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::menuAction( QObject *data )
