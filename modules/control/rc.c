@@ -54,6 +54,8 @@
 #include "network.h"
 #include "vlc_url.h"
 
+#include "charset.h"
+
 #if defined(AF_UNIX) && !defined(AF_LOCAL)
 #    define AF_LOCAL AF_UNIX
 #endif
@@ -137,7 +139,7 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 
     if( p_intf->p_sys->i_socket == -1 )
     {
-        vprintf( psz_fmt, args );
+        utf8_vfprintf( stdout, psz_fmt, args );
         printf( "\r\n" );
     }
     else
