@@ -246,6 +246,8 @@ struct subpicture_t
     vlc_bool_t      b_ephemer;    /**< If this flag is set to true the subtitle
                                 will be displayed untill the next one appear */
     vlc_bool_t      b_fade;                               /**< enable fading */
+    vlc_bool_t      b_pausable;               /**< subpicture will be paused if
+                                                            stream is paused */
     /**@}*/
 
     subpicture_region_t *p_region;  /**< region list composing this subtitle */

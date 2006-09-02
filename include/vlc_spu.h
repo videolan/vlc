@@ -104,7 +104,7 @@ VLC_EXPORT( subpicture_region_t *,__spu_MakeRegion, ( vlc_object_t *, video_form
 #define spu_DestroyRegion(a,b) __spu_DestroyRegion(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __spu_DestroyRegion, ( vlc_object_t *, subpicture_region_t * ) );
 
-VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t ) );
+VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t, vlc_bool_t ) );
 VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  video_format_t *, picture_t *, picture_t *, subpicture_t *, int, int ) );
 
 /** @}*/

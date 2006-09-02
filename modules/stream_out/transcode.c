@@ -2319,7 +2319,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
         /* Check if we have a subpicture to overlay */
         if( p_sys->p_spu )
         {
-            p_subpic = spu_SortSubpictures( p_sys->p_spu, p_pic->date );
+            p_subpic = spu_SortSubpictures( p_sys->p_spu, p_pic->date,
+                       VLC_FALSE /* Fixme: check if stream is paused */ );
             /* TODO: get another pic */
         }
 
@@ -2884,7 +2885,7 @@ static int transcode_osd_process( sout_stream_t *p_stream,
     /* Check if we have a subpicture to send */
     if( p_sys->p_spu && in->i_dts > 0)
     {
-        p_subpic = spu_SortSubpictures( p_sys->p_spu, in->i_dts );
+        p_subpic = spu_SortSubpictures( p_sys->p_spu, in->i_dts, VLC_FALSE );
     }
     else
     {

@@ -445,7 +445,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     picture_t *p_pif;
     vlc_value_t val, format;
     DIR *path;
-    
+
     int i_ret;
 
     var_Get( p_vout, "snapshot-path", &val );

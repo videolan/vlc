@@ -780,6 +780,8 @@ static void RunThread( vout_thread_t *p_vout)
         display_date = 0;
         current_date = mdate();
 
+        p_input = NULL;
+
         i_loops++;
         if( i_loops % 20 == 0 )
         {
@@ -1042,7 +1044,11 @@ static void RunThread( vout_thread_t *p_vout)
          */
         if( display_date > 0 )
         {
-            p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date );
+            if( !p_input )
+                p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
+                                           FIND_PARENT );
+            p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date,
+            p_input ? var_GetBool( p_input, "state" ) == PAUSE_S : VLC_FALSE );
         }
 
         /*

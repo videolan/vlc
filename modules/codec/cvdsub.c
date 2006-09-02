@@ -496,6 +496,8 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     p_spu = p_dec->pf_spu_buffer_new( p_dec );
     if( !p_spu ) return NULL;
 
+    p_spu->b_pausable = VLC_TRUE;
+
     p_spu->i_x = p_sys->i_x_start;
     p_spu->i_x = p_spu->i_x * 3 / 4; /* FIXME: use aspect ratio for x? */
     p_spu->i_y = p_sys->i_y_start;

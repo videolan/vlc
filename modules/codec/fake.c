@@ -285,6 +285,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     picture_t *p_image = (picture_t *)p_dec->p_sys;
     picture_t *p_pic;
 
+    printf("pouet\n");
+
     if( pp_block == NULL || !*pp_block ) return NULL;
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
     if( p_pic == NULL )

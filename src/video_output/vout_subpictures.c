@@ -401,6 +401,7 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     memset( p_subpic, 0, sizeof(subpicture_t) );
     p_subpic->i_status   = RESERVED_SUBPICTURE;
     p_subpic->b_absolute = VLC_TRUE;
+    p_subpic->b_pausable = VLC_FALSE;
     p_subpic->b_fade     = VLC_FALSE;
     p_subpic->i_alpha    = 0xFF;
     p_subpic->p_region   = 0;
@@ -412,7 +413,7 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     p_subpic->pf_create_region = __spu_CreateRegion;
     p_subpic->pf_make_region = __spu_MakeRegion;
     p_subpic->pf_destroy_region = __spu_DestroyRegion;
-    
+
     return p_subpic;
 }
 
@@ -823,7 +824,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
  * to be removed if a newer one is available), which makes it a lot
  * more difficult to guess if a subpicture has to be rendered or not.
  *****************************************************************************/
-subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date )
+subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
+                                   vlc_bool_t b_paused )
 {
     int i_index, i_channel;
     subpicture_t *p_subpic = NULL;
@@ -869,7 +871,9 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date )
             if( display_date > p_spu->p_subpicture[i_index].i_stop &&
                 ( !p_spu->p_subpicture[i_index].b_ephemer ||
                   p_spu->p_subpicture[i_index].i_stop >
-                  p_spu->p_subpicture[i_index].i_start ) )
+                  p_spu->p_subpicture[i_index].i_start ) &&
+                !( p_spu->p_subpicture[i_index].b_pausable &&
+                   b_paused ) )
             {
                 /* Too late, destroy the subpic */
                 spu_DestroySubpicture( p_spu, &p_spu->p_subpicture[i_index] );
