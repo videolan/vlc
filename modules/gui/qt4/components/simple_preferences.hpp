@@ -48,11 +48,11 @@ public:
     SPrefsCatList( intf_thread_t *, QWidget *);
     virtual ~SPrefsCatList() {};
 
-    void ApplyAll();
-    void CleanAll();
+    void applyAll();
+    void cleanAll();
 
 private:
-    void DoAll( bool );
+    void doAll( bool );
     intf_thread_t *p_intf;
 };
 

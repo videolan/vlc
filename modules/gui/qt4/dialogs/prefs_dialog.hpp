@@ -67,7 +67,9 @@ private:
 
     QGroupBox *types;
     QRadioButton *small,*all;
+#if 0
     QCheckBox *adv_chk;
+#endif
 
     QGridLayout *main_layout;
 
@@ -77,7 +79,11 @@ private slots:
      void changeSimplePanel( QListWidgetItem *);
      void setAll();
      void setSmall();
+     void save();
+     void cancel();
+#if 0
      void setAdvanced( bool );
+#endif
 };
 
 #endif

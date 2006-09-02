@@ -50,7 +50,8 @@ public:
         widget = NULL;
     }
     virtual ~ConfigControl() {};
-    QString getName() { return qfu( p_item->psz_name ); }
+    virtual int getType() = 0;
+    char * getName() { return  p_item->psz_name; }
     QWidget *getWidget() { assert( widget ); return widget; }
     bool isAdvanced() { return p_item->b_advanced; }
     virtual void hide() { getWidget()->hide(); };
@@ -83,6 +84,7 @@ public:
                 ConfigControl(a,b) {};
     virtual ~VIntConfigControl() {};
     virtual int getValue() = 0;
+    virtual int getType() { return 1; }
 };
 
 class IntegerConfigControl : public VIntConfigControl
@@ -161,6 +163,7 @@ public:
                 ConfigControl(a,b) {};
     virtual ~VFloatConfigControl() {};
     virtual float getValue() = 0;
+    virtual int getType() { return 2; }
 };
 
 class FloatConfigControl : public VFloatConfigControl
@@ -218,6 +221,7 @@ public:
                 ConfigControl(a,b) {};
     virtual ~VStringConfigControl() {};
     virtual QString getValue() = 0;
+    virtual int getType() { return 3; }
 };
 
 class StringConfigControl : public VStringConfigControl

@@ -57,9 +57,9 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      all = new QRadioButton( "All", types ); tl->addWidget( all );
      types->setLayout(tl);
      small->setChecked( true );
-
+#if 0
      adv_chk = new QCheckBox("Advanced options");
-
+#endif
      advanced_tree = NULL;
      simple_tree = NULL;
      simple_panel = NULL;
@@ -67,29 +67,42 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
      main_layout->addWidget( types, 0,0,1,1 );
      main_layout->addWidget( tree_panel, 1,0,1,1 );
+#if 0
      main_layout->addWidget( adv_chk , 2,0,1,1 );
-     main_layout->addWidget( main_panel, 0, 1, 3, 1 );
+#endif
+     main_layout->addWidget( main_panel, 0, 1, 2, 1 );
 
      main_layout->setColumnMinimumWidth( 0, 200 );
      main_layout->setColumnStretch( 0, 1 );
      main_layout->setColumnStretch( 1,3 );
 
      setSmall();
-
+#if 0
      connect( adv_chk, SIGNAL( toggled(bool) ),
               this, SLOT( setAdvanced( bool ) ) );
+#endif
+
+     QPushButton *save, *cancel;
+     QHBoxLayout *buttonsLayout =
+         QVLCFrame::doButtons( this, NULL, &save, _("Save"),
+                                           &cancel, _("Cancel"),
+                                                NULL, NULL );
+     connect( save, SIGNAL( clicked() ), this, SLOT( save() ) );
+     connect( cancel, SIGNAL( clicked() ), this, SLOT( cancel() ) );
+     main_layout->addLayout( buttonsLayout, 2,0, 1 ,3 );
+
      setLayout( main_layout );
 
      connect( small, SIGNAL( clicked() ), this, SLOT( setSmall()) );
      connect( all, SIGNAL( clicked() ), this, SLOT( setAll()) );
 }
-
+#if 0
 void PrefsDialog::setAdvanced( bool advanced )
 {
     if( advanced_panel )
         advanced_panel->setAdvanced( advanced );
 }
-
+#endif
 void PrefsDialog::setAll()
 {
     if( simple_tree )
@@ -117,7 +130,9 @@ void PrefsDialog::setAll()
          advanced_panel = new PrefsPanel( main_panel );
     main_panel_l->addWidget( advanced_panel );
     advanced_panel->show();
+#if 0
     adv_chk->show();
+#endif
 }
 
 void PrefsDialog::setSmall()
@@ -146,7 +161,9 @@ void PrefsDialog::setSmall()
         simple_panel = new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat );
     main_panel_l->addWidget( simple_panel );
     simple_panel->show();
+#if 0
     adv_chk->hide();
+#endif
 }
 
 PrefsDialog::~PrefsDialog()
@@ -179,11 +196,40 @@ void PrefsDialog::changePanel( QTreeWidgetItem *item )
     }
     if( !data->panel )
     {
-        data->panel = new PrefsPanel( p_intf, main_panel , data,
-                                      adv_chk->isChecked() );
+        data->panel = new PrefsPanel( p_intf, main_panel , data, true );
+#if 0
+        adv_chk->isChecked() );
+#endif
     }
     advanced_panel = data->panel;
     main_panel_l->addWidget( advanced_panel );
     advanced_panel->show();
+#if 0
     setAdvanced( adv_chk->isChecked() );
+#endif
+}
+
+void PrefsDialog::save()
+{
+    if( small->isChecked() && simple_tree )
+        simple_tree->applyAll();
+    else if( all->isChecked() && advanced_tree )
+        advanced_tree->applyAll();
+    config_SaveConfigFile( p_intf, NULL );
+    hide();
+}
+
+void PrefsDialog::cancel()
+{
+    if( small->isChecked() && simple_tree )
+    {
+        simple_tree->cleanAll();
+        simple_panel = NULL;
+    }
+    else if( all->isChecked() && advanced_tree )
+    {
+        advanced_tree->cleanAll();
+        advanced_panel = NULL;
+    }
+    hide();
 }

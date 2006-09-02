@@ -59,10 +59,10 @@ public:
         }
 #endif
     }
-    static void doButtons( QWidget *w, QBoxLayout *l,
-                           QPushButton **defaul, char *psz_default,
-                           QPushButton **alt, char *psz_alt,
-                           QPushButton **other, char *psz_other )
+    static QHBoxLayout* doButtons( QWidget *w, QBoxLayout *l,
+                               QPushButton **defaul, char *psz_default,
+                               QPushButton **alt, char *psz_alt,
+                               QPushButton **other, char *psz_other )
     {
 #ifdef QT42
 #else
@@ -73,6 +73,7 @@ public:
 
         if( psz_default )
         {
+            fprintf( stderr, "Creating default button %s\n", psz_default );
             *defaul = new QPushButton(0);
             buttons_layout->addWidget( *defaul );
             (*defaul)->setText( qfu( psz_default ) );
@@ -89,8 +90,10 @@ public:
             buttons_layout->addWidget( *other );
             (*other)->setText( qfu( psz_other ) );
         }
-        l->addLayout( buttons_layout );
+        if( l )
+            l->addLayout( buttons_layout );
 #endif
+        return buttons_layout;
     };
 
     QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )

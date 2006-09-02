@@ -64,11 +64,11 @@ public:
     PrefsTree( intf_thread_t *, QWidget * );
     virtual ~PrefsTree();
 
-    void ApplyAll();
-    void CleanAll();
+    void applyAll();
+    void cleanAll();
 
 private:
-    void DoAll( bool );
+    void doAll( bool );
     intf_thread_t *p_intf;
 };
 
@@ -81,17 +81,21 @@ public:
     PrefsPanel( intf_thread_t *, QWidget *, PrefsItemData *, bool );
     PrefsPanel( QWidget *);
     virtual ~PrefsPanel() {};
-    void Apply();
-    void Clean();
+    void apply();
+    void clean();
 private:
     intf_thread_t *p_intf;
     QList<ConfigControl *> controls;
-    QLabel *some_hidden_text;
     QVBoxLayout *global_layout;
+#if 0
+    QLabel *some_hidden_text;
     bool advanced;
+#endif
 public slots:
+#if 0
     void setAdvanced( bool, bool );
     void setAdvanced( bool a ) { return setAdvanced( a, false ); }
+#endif
 };
 
 #endif

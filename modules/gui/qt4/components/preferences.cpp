@@ -274,42 +274,61 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 
 PrefsTree::~PrefsTree() {}
 
-void PrefsTree::ApplyAll()
+void PrefsTree::applyAll()
 {
-    DoAll( false );
+    doAll( false );
 }
 
-void PrefsTree::CleanAll()
+void PrefsTree::cleanAll()
 {
-    DoAll( true );
+    doAll( true );
 }
 
 /// \todo When cleaning, we should remove the panel ?
-void PrefsTree::DoAll( bool doclean )
+void PrefsTree::doAll( bool doclean )
 {
     for( int i_cat_index = 0 ; i_cat_index < topLevelItemCount();
              i_cat_index++ )
     {
         QTreeWidgetItem *cat_item = topLevelItem( i_cat_index );
-        for( int i_sc_index = 0; i_sc_index <= cat_item->childCount();
+        for( int i_sc_index = 0; i_sc_index < cat_item->childCount();
                  i_sc_index++ )
         {
             QTreeWidgetItem *sc_item = cat_item->child( i_sc_index );
-            for( int i_module = 0 ; i_module <= sc_item->childCount();
+            for( int i_module = 0 ; i_module < sc_item->childCount();
                      i_module++ )
             {
-                PrefsItemData *data = sc_item->child( i_sc_index )->
-                                                 data( 0, Qt::UserRole ).
-                                                 value<PrefsItemData *>();
+                PrefsItemData *data = sc_item->child( i_module )->
+                               data( 0, Qt::UserRole).value<PrefsItemData *>();
                 if( data->panel && doclean )
-                    data->panel->Clean();
+                {
+                    delete data->panel;
+                    data->panel = NULL;
+                }
                 else if( data->panel )
-                    data->panel->Apply();
+                    data->panel->apply();
             }
+            PrefsItemData *data = sc_item->data( 0, Qt::UserRole).
+                                            value<PrefsItemData *>();
+            if( data->panel && doclean )
+            {
+                delete data->panel;
+                data->panel = NULL;
+            }
+            else if( data->panel )
+                data->panel->apply();
         }
+        PrefsItemData *data = cat_item->data( 0, Qt::UserRole).
+                                            value<PrefsItemData *>();
+        if( data->panel && doclean )
+        {
+            delete data->panel;
+            data->panel = NULL;
+        }
+        else if( data->panel )
+            data->panel->apply();
     }
 }
-
 
 /*********************************************************************
  * The Panel
@@ -478,45 +497,53 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     scroller->setWidget( scrolled_area );
     scroller->setWidgetResizable( true );
     global_layout->addWidget( scroller );
-
+    setLayout( global_layout );
+#if 0
     some_hidden_text = new QLabel( qfu( I_HIDDEN_ADV ) );
     some_hidden_text->setWordWrap( true );
-
-    setLayout( global_layout );
     setAdvanced( currently_advanced, true );
+#endif
 }
 
-void PrefsPanel::Apply()
+void PrefsPanel::apply()
 {
     /* todo */
     QList<ConfigControl *>::Iterator i;
     for( i = controls.begin() ; i != controls.end() ; i++ )
     {
-        VIntConfigControl *vicc = qobject_cast<VIntConfigControl *>(*i);
-        if( !vicc )
+        ConfigControl *c = qobject_cast<ConfigControl *>(*i);
+        fprintf( stderr, "Get a control %s\n", c->getName() );
+        switch( c->getType() )
         {
-            VFloatConfigControl *vfcc = qobject_cast<VFloatConfigControl *>(*i);
-            if( !vfcc)
+        case 1:
             {
-                VStringConfigControl *vscc =
-                               qobject_cast<VStringConfigControl *>(*i);
-                assert( vscc );
-                config_PutPsz( p_intf, vscc->getName().toAscii().data(),
-                                       vscc->getValue().toAscii().data() );
-                continue;
+            VIntConfigControl *vicc = qobject_cast<VIntConfigControl *>(*i);
+                fprintf( stderr, "Put %s = %i\n",  vicc->getName(),vicc->getValue() );
+            config_PutInt( p_intf, vicc->getName(), vicc->getValue() );
+            break;
             }
-            config_PutFloat( p_intf, vfcc->getName().toAscii().data(),
-                                     vfcc->getValue() );
-            continue;
+        case 2:
+            {
+            VFloatConfigControl *vfcc = qobject_cast<VFloatConfigControl *>(*i);
+                fprintf( stderr, "Put %s = %f\n",  vfcc->getName(),vfcc->getValue() );
+            config_PutFloat( p_intf, vfcc->getName(), vfcc->getValue() );
+            break;
+            }
+        case 3:
+            {
+            VStringConfigControl *vscc =
+                            qobject_cast<VStringConfigControl *>(*i);
+                fprintf( stderr, "Put %s = %s\n",  vscc->getName(),vscc->getValue().toAscii().data() );
+            config_PutPsz( p_intf, vscc->getName(),
+                                       vscc->getValue().toAscii().data() );
+            }
         }
-        config_PutInt( p_intf, vicc->getName().toAscii().data(),
-                               vicc->getValue() );
     }
 }
 
-void PrefsPanel::Clean()
+void PrefsPanel::clean()
 {}
-
+#if 0
 void PrefsPanel::setAdvanced( bool adv, bool force )
 {
     bool some_hidden = false;
@@ -548,3 +575,4 @@ void PrefsPanel::setAdvanced( bool adv, bool force )
         some_hidden_text->show();
     }
 }
+#endif

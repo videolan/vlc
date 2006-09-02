@@ -86,18 +86,18 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     setCurrentRow( SPrefsInterface );
 }
 
-void SPrefsCatList::ApplyAll()
+void SPrefsCatList::applyAll()
 {
-    DoAll( false );
+    doAll( false );
 }
 
-void SPrefsCatList::CleanAll()
+void SPrefsCatList::cleanAll()
 {
-    DoAll( true );
+    doAll( true );
 }
 
 /// \todo When cleaning, we should remove the panel ?
-void SPrefsCatList::DoAll( bool doclean )
+void SPrefsCatList::doAll( bool doclean )
 {
     /* Todo */
 }
@@ -202,15 +202,15 @@ void SPrefsPanel::Apply()
                 VStringConfigControl *vscc =
                                qobject_cast<VStringConfigControl *>(*i);
                 assert( vscc );
-                config_PutPsz( p_intf, vscc->getName().toAscii().data(),
+                config_PutPsz( p_intf, vscc->getName(),
                                        vscc->getValue().toAscii().data() );
                 continue;
             }
-            config_PutFloat( p_intf, vfcc->getName().toAscii().data(),
+            config_PutFloat( p_intf, vfcc->getName(),
                                      vfcc->getValue() );
             continue;
         }
-        config_PutInt( p_intf, vicc->getName().toAscii().data(),
+        config_PutInt( p_intf, vicc->getName(),
                                vicc->getValue() );
     }
 }
