@@ -32,7 +32,6 @@ PyObject * test (conv_t f, const char *in, const char *out)
     printf ("\"%s\" -> \"%s\" ?\n", in, out);
     res = f(in);
     ASSERT( res != NULL, "NULL result" );
-    printf( "\n\"%s\"\n",res );
     ASSERT( strcmp( res, out ) == NULL, "" );
 
     Py_INCREF( Py_None );

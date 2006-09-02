@@ -357,14 +357,17 @@ bool PLModel::hasLoop()
 void PLModel::setLoop( bool on )
 {
     var_SetBool( p_playlist, "loop", on ? VLC_TRUE:VLC_FALSE );
+    config_PutInt( p_playlist, "loop", on ? 1: 0 );
 }
 void PLModel::setRepeat( bool on )
 {
     var_SetBool( p_playlist, "repeat", on ? VLC_TRUE:VLC_FALSE );
+    config_PutInt( p_playlist, "repeat", on ? 1: 0 );
 }
 void PLModel::setRandom( bool on )
 {
     var_SetBool( p_playlist, "random", on ? VLC_TRUE:VLC_FALSE );
+    config_PutInt( p_playlist, "random", on ? 1: 0 );
 }
 
 /************************* Lookups *****************************/
