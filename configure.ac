@@ -3343,11 +3343,7 @@ if test "${enable_theora}" = "yes"
 then
   AC_CHECK_HEADERS(theora/theora.h, [
     AC_CHECK_LIB(theora, theora_granule_time, [
-      if test "${SYS}" = "mingw32"; then
-        VLC_ADD_PLUGINS([theora])
-      else
-        VLC_ADD_BUILTINS([theora])
-      fi
+      VLC_ADD_PLUGINS([theora])
       theora_libs="-ltheora -logg"
       VLC_ADD_LDFLAGS([theora],[${theora_libs}]) ],[
       AC_MSG_ERROR([libtheora doesn't appear to be installed on your system.
