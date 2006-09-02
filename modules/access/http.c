@@ -487,8 +487,9 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             /* read the chunk header */
             if( psz == NULL )
             {
+                /* fatal error - end of file */
                 msg_Dbg( p_access, "failed reading chunk-header line" );
-                return -1;
+                return 0;
             }
             p_sys->i_chunk = strtoll( psz, NULL, 16 );
             free( psz );
