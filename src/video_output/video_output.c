@@ -743,7 +743,7 @@ static void RunThread( vout_thread_t *p_vout)
 
     subpicture_t *  p_subpic = NULL;                   /* subpicture pointer */
 
-    input_thread_t *p_input = NULL ; /* Parent input, if it exists */
+    input_thread_t *p_input = NULL ;           /* Parent input, if it exists */
 
     vlc_value_t     val;
     vlc_bool_t      b_drop_late;
@@ -780,12 +780,20 @@ static void RunThread( vout_thread_t *p_vout)
         display_date = 0;
         current_date = mdate();
 
-        p_input = NULL;
+        if( p_input && p_input->b_die )
+        {
+            vlc_object_release( p_input );
+            p_input = NULL;
+        }
 
         i_loops++;
         if( i_loops % 20 == 0 )
         {
-            p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
+            if( !p_input )
+            {
+                p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
+                                           FIND_PARENT );
+            }
             if( p_input )
             {
                 vlc_mutex_lock( &p_input->counters.counters_lock );
@@ -796,7 +804,6 @@ static void RunThread( vout_thread_t *p_vout)
                                      i_displayed , NULL);
                 i_displayed = i_lost = 0;
                 vlc_mutex_unlock( &p_input->counters.counters_lock );
-                vlc_object_release( p_input );
             }
         }
 #if 0
@@ -1045,8 +1052,10 @@ static void RunThread( vout_thread_t *p_vout)
         if( display_date > 0 )
         {
             if( !p_input )
+            {
                 p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
                                            FIND_PARENT );
+            }
             p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date,
             p_input ? var_GetBool( p_input, "state" ) == PAUSE_S : VLC_FALSE );
         }
@@ -1195,6 +1204,11 @@ static void RunThread( vout_thread_t *p_vout)
 
             vlc_mutex_unlock( &p_vout->picture_lock );
         }
+    }
+
+    if( p_input )
+    {
+        vlc_object_release( p_input );
     }
 
     /*
