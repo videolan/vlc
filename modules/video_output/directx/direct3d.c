@@ -861,7 +861,7 @@ D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3DFORMAT 
     return D3DFMT_UNKNOWN;
 }
 
-static int Direct3DVoutSetOuputFormat(vout_thread_t *p_vout, D3DFORMAT format)
+static int Direct3DVoutSetOutputFormat(vout_thread_t *p_vout, D3DFORMAT format)
 {
     switch( format )
     {
@@ -958,7 +958,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
     ** typically support more formats than textures
     */ 
     format = Direct3DVoutFindFormat(p_vout, p_vout->render.i_chroma, format);
-    if( VLC_SUCCESS != Direct3DVoutSetOuputFormat(p_vout, format) )
+    if( VLC_SUCCESS != Direct3DVoutSetOutputFormat(p_vout, format) )
     {
         msg_Err(p_vout, "surface pixel format is not supported.");
         return VLC_EGENERIC;

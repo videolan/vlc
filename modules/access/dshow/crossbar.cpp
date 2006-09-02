@@ -260,7 +260,7 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
             p_sys->crossbar_routes[depth].AudioOutputIndex = outputPinIndexRelated;
 
             msg_Dbg( p_this, "crossbar at depth %d, found route for "
-                     "ouput %ld (type %ld) to input %ld (type %ld)", depth,
+                     "output %ld (type %ld) to input %ld (type %ld)", depth,
                      outputPinIndex, outputPinPhysicalType, inputPinIndex,
                      inputPinPhysicalType );
 
