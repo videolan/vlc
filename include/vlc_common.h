@@ -1235,10 +1235,10 @@ VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 #   else
 #       define _(String) dgettext(PACKAGE_NAME, String)
 #   endif
-#   define N_(String) ((char*)(String))
+#   define N_(String) (String)
 #else
-#   define _(String) ((char*)(String))
-#   define N_(String) ((char*)(String))
+#   define _(String) (String)
+#   define N_(String) (String)
 #endif
 
 /*****************************************************************************
