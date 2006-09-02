@@ -1143,7 +1143,7 @@ VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 if test "${SYS}" != "mingwce"; then
 dnl  VLC_ADD_PLUGINS([externrun])
   VLC_ADD_PLUGINS([access_fake access_filter_timeshift access_filter_record])
-  VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq podcast shout sap fake motion])
+  VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq podcast shout sap fake])
   VLC_ADD_PLUGINS([rss mosaic wall motiondetect clone crop])
   VLC_ADD_PLUGINS([i420_yuy2 i422_yuy2 i420_ymga])
   VLC_ADD_PLUGINS([aout_file linear_resampler bandlimited_resampler])
@@ -1166,7 +1166,7 @@ dnl
 dnl Some plugins aren't useful on some platforms
 dnl
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-    VLC_ADD_PLUGINS([screensaver])
+    VLC_ADD_PLUGINS([screensaver motion])
 elif test "${SYS}" != "mingwce"; then
     VLC_ADD_PLUGINS([ntservice access_smb dmo msn])
     VLC_ADD_LDFLAGS([dmo],[-lole32])
