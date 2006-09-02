@@ -395,7 +395,7 @@ typedef struct
 libvlc_rectangle_t;
 
 /**
- * Set the video output viewport for a windowless video ouput (MacOS X only)
+ * Set the video output viewport for a windowless video output (MacOS X only)
  * \param p_instance libvlc instance
  * \param view coordinates within video drawable
  * \param clip coordinates within video drawable

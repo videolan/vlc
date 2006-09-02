@@ -1209,7 +1209,7 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
 
     if( i_selected < 0 )
     {
-        msg_Err( p_enc, "couldn't find a matching ouput" );
+        msg_Err( p_enc, "couldn't find a matching output" );
         return VLC_EGENERIC;
     }
 
