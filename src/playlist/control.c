@@ -1,5 +1,5 @@
 /*****************************************************************************
- * control.c : Hanle control of the playlist & running through it
+ * control.c : Handle control of the playlist & running through it
  *****************************************************************************
  * Copyright (C) 1999-2004 the VideoLAN team
  * $Id: /local/vlc/0.8.6-playlist-vlm/src/playlist/playlist.c 13741 2006-03-21T19:29:39.792444Z zorglub  $
@@ -99,6 +99,7 @@ int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
     // Node can be null, it will keep the same. Use with care ...
     // Item null = take the first child of node
     case PLAYLIST_VIEWPLAY:
+        p_playlist->b_reset_random = VLC_TRUE;
         p_node = (playlist_item_t *)va_arg( args, playlist_item_t * );
         p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
         if ( p_node == NULL )
@@ -287,41 +288,62 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
               p_playlist->request.i_skip == 1    ||
               p_playlist->request.i_skip == -1 ) ) ) )
     {
-#if 0
-        /* how many items to choose from ? */
-        int i_count = 0, i_new;
-        for ( i = 0; i < p_playlist->i_size; i++ )
+       PL_DEBUG( "doing random, have %i items, currently at %i, reset %i\n",
+                        p_playlist->i_random, p_playlist->i_random_index,
+                        p_playlist->b_reset_random );
+       if( p_playlist->b_reset_random )
         {
-            if ( p_playlist->pp_items[i]->p_input->i_nb_played == 0 )
-                i_count++;
-        }
-        /* Nothing left? */
-        if ( i_count == 0 )
-        {
-            /* Don't loop? Exit! */
-            if( !b_loop )
-                return NULL;
-            /* Otherwise reset the counter */
-            for ( i = 0; i < p_playlist->i_size; i++ )
+            int j;
+            FREE( p_playlist->pp_random );
+            if( !p_playlist->b_reset_random &&  !b_loop ) goto end;
+            p_playlist->i_random = 0;
+            p_playlist->i_random_index = 0;
+            p_playlist->i_random = playlist_GetAllEnabledChildren(
+                                                p_playlist,
+                                                p_playlist->status.p_node,
+                                                &p_playlist->pp_random );
+            /* Shuffle the array */
+            srand( (unsigned int)mdate() );
+            int swap = 0;
+            for( j = p_playlist->i_random -1; j > 0; j-- )
             {
-                p_playlist->pp_items[i]->p_input->i_nb_played = 0;
+                swap++;
+                int i = rand() % (j+1); /* between 0 and j */
+                playlist_item_t *p_tmp;
+                p_tmp = p_playlist->pp_random[i];
+                p_playlist->pp_random[i] = p_playlist->pp_random[j];
+                p_playlist->pp_random[j] = p_tmp;
             }
-            i_count = p_playlist->i_size;
+            p_playlist->b_reset_random = VLC_FALSE;
         }
-        srand( (unsigned int)mdate() );
-        i = rand() % i_count + 1 ;
-        /* loop thru the list and count down the unplayed items to the selected one */
-        for ( i_new = 0; i_new < p_playlist->i_size && i > 0; i_new++ )
+        else
         {
-            if ( p_playlist->pp_items[i_new]->p_input->i_nb_played == 0 )
-                i--;
+            /* Go backward or forward */
+            if( !p_playlist->request.b_request || !p_playlist->request.p_item ||
+                                               p_playlist->request.i_skip == 1 )
+                p_playlist->i_random_index++;
+            else
+                p_playlist->i_random_index--;
+            /* Handle bounds situations */
+            if( p_playlist->i_random_index == -1 )
+            {
+                if( !b_loop || p_playlist->i_random == 0 ) goto end;
+                p_playlist->i_random_index = p_playlist->i_random - 1;
+            }
+            else if( p_playlist->i_random_index == p_playlist->i_random )
+            {
+                if( !b_loop || p_playlist->i_random == 0 ) goto end;
+                p_playlist->i_random_index = 0;
+            }
         }
-        i_new--;
-
+        PL_DEBUG( "using random item %i", p_playlist->i_random_index );
+        if ( p_playlist->i_random == 0 ) goto end; /* Can this happen ?? */
+        p_new = p_playlist->pp_random[p_playlist->i_random_index];
+end:
+        if( !p_new ) p_playlist->b_reset_random = VLC_TRUE;
         p_playlist->request.i_skip = 0;
         p_playlist->request.b_request = VLC_FALSE;
-        return p_playlist->pp_items[i_new];
-#endif
+        return p_new;
     }
 
     /* Start the real work */

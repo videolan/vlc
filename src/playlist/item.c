@@ -400,6 +400,7 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
             playlist_DeleteFromInput( p_playlist, p_item_in_one->p_input->i_id,
                                       p_playlist->p_root_onelevel, VLC_FALSE );
         }
+        p_playlist->b_reset_random = VLC_TRUE;
         var_SetInteger( p_playlist, "item-change", p_item->p_input->i_id );
         return p_item_in_category;
     }
@@ -492,6 +493,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     p_add->i_item = i_item_id;
     p_add->i_node = i_node_id;
     val.p_address = p_add;
+    p_playlist->b_reset_random = VLC_TRUE;
     var_Set( p_playlist, "item-append", val );
     free( p_add );
 }
@@ -603,6 +605,7 @@ int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
     {
         return playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_FALSE );
     }
+    p_playlist->b_reset_random = VLC_TRUE;
     var_SetInteger( p_playlist, "item-deleted", i_id );
 
     /* Remove the item from the bank */

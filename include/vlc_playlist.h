@@ -32,7 +32,6 @@
 
 /**
  * \defgroup vlc_playlist Playlist
- * Brief description. Longer description
  * @{
  */
 
@@ -120,6 +119,11 @@ struct playlist_t
                                          * playlist items and nodes */
     int                   i_input_items;
     input_item_t **       pp_input_items;
+
+    int                   i_random;     /**< Number of candidates for random */
+    playlist_item_t **    pp_random;    /**< Random candidate items */
+    int                   i_random_index; /**< Current random item */
+    vlc_bool_t            b_reset_random; /**< Recreate random array ?*/
 
     int                   i_last_playlist_id; /**< Last id to an item */
     int                   i_last_input_id ; /**< Last id on an input */
@@ -416,6 +420,9 @@ VLC_EXPORT( void, playlist_NodesCreateForSD, (playlist_t *, char *, playlist_ite
 VLC_EXPORT( playlist_item_t *, playlist_GetPreferredNode, ( playlist_t *p_playlist, playlist_item_t *p_node ) );
 
 /* Tree walking - These functions are only for playlist, not plugins */
+int playlist_GetAllEnabledChildren( playlist_t *p_playlist,
+                                    playlist_item_t *p_node,
+                                    playlist_item_t ***ppp_items );
 playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
                                     playlist_item_t *p_root,
                                     playlist_item_t *, vlc_bool_t, vlc_bool_t );

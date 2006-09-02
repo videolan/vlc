@@ -72,6 +72,11 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->i_input_items = 0;
     p_playlist->pp_input_items = NULL;
 
+    p_playlist->i_random = 0;
+    p_playlist->pp_random = NULL;
+    p_playlist->i_random_index = 0;
+    p_playlist->b_reset_random = VLC_TRUE;
+
     i_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
     p_playlist->b_always_tree = (i_tree == 1);
     p_playlist->b_never_tree = (i_tree == 2);

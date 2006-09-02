@@ -359,6 +359,24 @@ playlist_item_t *playlist_GetLastLeaf(playlist_t *p_playlist,
     return NULL;
 }
 
+int playlist_GetAllEnabledChildren( playlist_t *p_playlist,
+                                    playlist_item_t *p_node,
+                                    playlist_item_t ***ppp_items )
+{
+    int i_count = 0;
+    playlist_item_t *p_next = NULL;
+    while( 1 )
+    {
+        p_next = playlist_GetNextLeaf( p_playlist, p_node,
+                                       p_next, VLC_TRUE, VLC_TRUE );
+        if( p_next )
+            INSERT_ELEM( *ppp_items, i_count, i_count, p_next );
+        else
+            break;
+    }
+    return i_count;
+}
+
 /**
  * Finds the next item to play
  *
