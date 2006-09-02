@@ -5020,12 +5020,12 @@ AC_ARG_ENABLE(gnutls,
   [  --enable-gnutls         gnutls TLS/SSL support (default enabled)])
 
 AS_IF([test "${enable_gnutls}" != "no"], [
-  PKG_CHECK_EXISTS([gnutls >= 1.0.17], [have_gnutls="yes"], [have_gnutls="no"])
+  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 1.0.17], [have_gnutls="yes"], [have_gnutls="no"])
 
   AS_IF([test "${have_gnutls}" = "yes"], [
     VLC_ADD_PLUGINS([gnutls])
-    VLC_ADD_CFLAGS([gnutls], [$("${PKG_CONFIG}" --cflags gnutls)])
-    VLC_ADD_LDFLAGS([gnutls], [$("${PKG_CONFIG}" --libs gnutls)])
+    VLC_ADD_CFLAGS([gnutls], [$GNUTLS_CFLAGS])
+    VLC_ADD_LDFLAGS([gnutls], [$GNUTLS_LIBS])
   ], [
     AS_IF([test "${enable_gnutls}" = "yes"], [
       AC_MSG_ERROR([gnutls not present or too old (version 1.0.17 required)])
