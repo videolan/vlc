@@ -315,6 +315,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
                 p_playlist->pp_random[j] = p_tmp;
             }
             p_playlist->b_reset_random = VLC_FALSE;
+            PL_DEBUG( "random rebuilt, have %i items", p_playlist->i_random );
         }
         else
         {

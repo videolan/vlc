@@ -368,7 +368,7 @@ int playlist_GetAllEnabledChildren( playlist_t *p_playlist,
     while( 1 )
     {
         p_next = playlist_GetNextLeaf( p_playlist, p_node,
-                                       p_next, VLC_TRUE, VLC_TRUE );
+                                       p_next, VLC_TRUE, VLC_FALSE );
         if( p_next )
             INSERT_ELEM( *ppp_items, i_count, i_count, p_next );
         else

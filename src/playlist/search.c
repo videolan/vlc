@@ -92,6 +92,7 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
                                const char *psz_string )
 {
    int i;
+   p_playlist->b_reset_random = VLC_TRUE;
    for( i = 0 ; i< p_root->i_children ; i ++ )
    {
         playlist_item_t *p_item = p_root->pp_children[i];
