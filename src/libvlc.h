@@ -954,6 +954,10 @@ static char *ppsz_clock_descriptions[] =
 #define PAS_LONGTEXT N_( \
     "Stop the playlist after each played playlist item." )
 
+#define PAE_TEXT N_("Play and exit")
+#define PAE_LONGTEXT N_( \
+                "Exit if there are no more items in the playlist." )
+
 #define ML_TEXT N_("Use media library")
 #define ML_LONGTEXT N_( \
     "The media library is automatically saved and reloaded each time you " \
@@ -1618,6 +1622,7 @@ vlc_module_begin();
         change_short('L');
     add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_FALSE );
         change_short('R');
+    add_bool( "play-and-exit", 0, NULL, PAE_TEXT, PAE_LONGTEXT, VLC_FALSE );
     add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, VLC_FALSE );
     add_bool( "media-library", 1, NULL, ML_TEXT, ML_LONGTEXT, VLC_FALSE );
     add_integer( "playlist-tree", 0, NULL, PLTREE_TEXT, PLTREE_LONGTEXT,

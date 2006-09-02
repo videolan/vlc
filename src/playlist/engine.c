@@ -143,6 +143,7 @@ void playlist_Destroy( playlist_t *p_playlist )
     var_Destroy( p_playlist, "intf-popmenu" );
     var_Destroy( p_playlist, "intf-show" );
     var_Destroy( p_playlist, "play-and-stop" );
+    var_Destroy( p_playlist, "play-and-exit" );
     var_Destroy( p_playlist, "random" );
     var_Destroy( p_playlist, "repeat" );
     var_Destroy( p_playlist, "loop" );
@@ -209,8 +210,7 @@ static mtime_t ObjectGarbageCollector( playlist_t *p_playlist, int i_type,
 void playlist_MainLoop( playlist_t *p_playlist )
 {
     playlist_item_t *p_item = NULL;
-
-
+    vlc_bool_t b_playexit = var_GetBool( p_playlist, "play-and-exit" );
     PL_LOCK
 
     /* First, check if we have something to do */
@@ -321,6 +321,11 @@ void playlist_MainLoop( playlist_t *p_playlist )
              if( p_item == NULL )
              {
                 msg_Dbg( p_playlist, "nothing to play" );
+                if( b_playexit == VLC_TRUE )
+                {
+                    msg_Info( p_playlist, "end of playlist, exiting" );
+                    p_playlist->p_vlc->b_die = VLC_TRUE;
+                }
                 p_playlist->status.i_status = PLAYLIST_STOPPED;
                 PL_UNLOCK
                 return;
@@ -510,6 +515,7 @@ static void VariablesInit( playlist_t *p_playlist )
 
     /* Variables to control playback */
     var_CreateGetBool( p_playlist, "play-and-stop" );
+    var_CreateGetBool( p_playlist, "play-and-exit" );
     var_CreateGetBool( p_playlist, "random" );
     var_CreateGetBool( p_playlist, "repeat" );
     var_CreateGetBool( p_playlist, "loop" );
