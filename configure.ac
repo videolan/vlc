@@ -71,16 +71,6 @@ AC_CHECK_TOOL(STRIP, strip, :)
 AC_CHECK_TOOL(AR, ar, :)
 AC_CHECK_TOOL(LD, ld, :)
 
-AC_DISABLE_STATIC
-AC_LIBTOOL_DLOPEN
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
-
-AC_ARG_ENABLE(libtool,
-    [  --enable-libtool        use libtool (default disabled)],
-    [],[enable_libtool="no"])
-AM_CONDITIONAL(USE_LIBTOOL, [test "${enable_libtool}" != "no"])
-
 dnl Check for compiler properties
 AC_C_CONST
 AC_C_INLINE
@@ -208,6 +198,7 @@ case "${target_os}" in
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
     AC_CHECK_TOOL(WINDRES, windres, :)
+    enable_libtool="no"
 
     case "${target_os}" in
       *mingw32*)
@@ -285,6 +276,21 @@ AM_CONDITIONAL(HAVE_BEOS, test "${SYS}" = "beos")
 AM_CONDITIONAL(HAVE_DARWIN, test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WINCE, test "${SYS}" = "mingwce")
+
+dnl
+dnl  Libtool
+dnl  It's very bad, but our former custom system was worst
+dnl  -- Courmisch
+dnl
+AC_DISABLE_STATIC
+AC_LIBTOOL_DLOPEN
+dnl AC_LIBTOOL_WIN32_DLL - couldn't get libtool to work on Win32 so far
+AC_PROG_LIBTOOL
+
+AC_ARG_ENABLE(libtool,
+    [  --enable-libtool        use libtool (default disabled)])
+AM_CONDITIONAL(USE_LIBTOOL, [test "x${enable_libtool}" != "xno"])
+
 
 dnl
 dnl  Check for Mac OS X SDK settings
