@@ -43,6 +43,7 @@ static void VariablesInit( playlist_t *p_playlist );
 playlist_t * playlist_Create( vlc_object_t *p_parent )
 {
     playlist_t *p_playlist;
+    int i_tree;
 
     /* Allocate structure */
     p_playlist = vlc_object_create( p_parent, VLC_OBJECT_PLAYLIST );
@@ -70,6 +71,10 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     p_playlist->i_input_items = 0;
     p_playlist->pp_input_items = NULL;
+
+    i_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
+    p_playlist->b_always_tree = (i_tree == 1);
+    p_playlist->b_never_tree = (i_tree == 2);
 
     p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL);
     p_playlist->p_root_onelevel = playlist_NodeCreate( p_playlist, NULL, NULL);
