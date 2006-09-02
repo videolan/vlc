@@ -156,15 +156,15 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     else
     {
         var_SetInteger( p_playlist, "item-deleted", p_root->p_input->i_id );
-	for( i = 0 ; i< p_playlist->i_all_size; i ++ )
+        for( i = 0 ; i< p_playlist->i_all_size; i ++ )
         {
-            if( p_playlist->pp_all_items[i]->p_input->i_id == 
+            if( p_playlist->pp_all_items[i]->p_input->i_id ==
                                p_root->p_input->i_id )
-	    {
+            {
                 REMOVE_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size,
                              i );
                 break;
-	    }
+            }
         }
 
         /* Remove the item from its parent */
@@ -369,7 +369,8 @@ playlist_item_t *playlist_GetLastLeaf(playlist_t *p_playlist,
  */
 playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
                                        playlist_item_t *p_root,
-                                       playlist_item_t *p_item )
+                                       playlist_item_t *p_item,
+                                       vlc_bool_t b_ena, vlc_bool_t b_unplayed )
 {
     playlist_item_t *p_next;
 
@@ -384,47 +385,23 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
                          p_root->p_input->psz_name );
 #endif
 
-
     /* Now, walk the tree until we find a suitable next item */
     p_next = p_item;
-    do
+    while( 1 )
     {
+        vlc_bool_t b_ena_ok = VLC_TRUE, b_unplayed_ok = VLC_TRUE;
         p_next = GetNextItem( p_playlist, p_root, p_next );
-    } while ( p_next && p_next != p_root && p_next->i_children != -1 );
-
-#ifdef PLAYLIST_DEBUG
-    if( p_next == NULL )
-        msg_Dbg( p_playlist, "At end of node" );
-#endif
-    return p_next;
-}
-
-playlist_item_t *playlist_GetNextEnabledLeaf( playlist_t *p_playlist,
-                                              playlist_item_t *p_root,
-                                              playlist_item_t *p_item )
-{
-    playlist_item_t *p_next;
-
-#ifdef PLAYLIST_DEBUG
-    if( p_item != NULL )
-        msg_Dbg( p_playlist, "finding next of %s within %s",
-                        p_item->p_input->psz_name,  p_root->p_input->psz_name );
-    else
-        msg_Dbg( p_playlist, "finding something to play within %s",
-                         p_root->p_input->psz_name );
-#endif
-
-    assert( p_root && p_root->i_children != -1 );
-
-    /* Now, walk the tree until we find a suitable next item */
-    p_next = p_item;
-    do
-    {
-        p_next = GetNextItem( p_playlist, p_root, p_next );
-    } while ( p_next && p_next != p_root &&
-              !( p_next->i_children == -1 &&
-              !(p_next->i_flags & PLAYLIST_DBL_FLAG) ) );
-
+        if( !p_next || p_next == p_root )
+            break;
+        if( p_next->i_children == -1 )
+        {
+            if( b_ena && p_next->i_flags & PLAYLIST_DBL_FLAG )
+                b_ena_ok = VLC_FALSE;
+            if( b_unplayed && p_next->p_input->i_nb_played != 0 )
+                b_unplayed_ok = VLC_FALSE;
+            if( b_ena_ok && b_unplayed_ok ) break;
+        }
+    }
 #ifdef PLAYLIST_DEBUG
     if( p_next == NULL )
         msg_Dbg( p_playlist, "At end of node" );
@@ -442,7 +419,8 @@ playlist_item_t *playlist_GetNextEnabledLeaf( playlist_t *p_playlist,
  */
 playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
                                        playlist_item_t *p_root,
-                                       playlist_item_t *p_item )
+                                       playlist_item_t *p_item,
+                                       vlc_bool_t b_ena, vlc_bool_t b_unplayed )
 {
     playlist_item_t *p_prev;
 
@@ -458,11 +436,21 @@ playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
 
     /* Now, walk the tree until we find a suitable previous item */
     p_prev = p_item;
-    do
+    while( 1 )
     {
+        vlc_bool_t b_ena_ok = VLC_TRUE, b_unplayed_ok = VLC_TRUE;
         p_prev = GetPrevItem( p_playlist, p_root, p_prev );
-    } while ( p_prev && p_prev != p_root && p_prev->i_children != -1 );
-
+        if( !p_prev || p_prev == p_root )
+            break;
+        if( p_prev->i_children == -1 )
+        {
+            if( b_ena && p_prev->i_flags & PLAYLIST_DBL_FLAG )
+                b_ena_ok = VLC_FALSE;
+            if( b_unplayed && p_prev->p_input->i_nb_played != 0 )
+                b_unplayed_ok = VLC_FALSE;
+            if( b_ena_ok && b_unplayed_ok ) break;
+        }
+    }
 #ifdef PLAYLIST_DEBUG
     if( p_prev == NULL )
         msg_Dbg( p_playlist, "At beginning of node" );

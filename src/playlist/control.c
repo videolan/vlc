@@ -280,16 +280,16 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 
     /* Random case. This is an exception: if request, but request is skip +- 1
      * we don't go to next item but select a new random one. */
-    if( b_random )
-        msg_Err( p_playlist, "random unsupported" );
-#if 0
-            &&
+    if( b_random &&
         ( !p_playlist->request.b_request ||
-        ( p_playlist->request.b_request && ( p_playlist->request.p_item == NULL ||
-          p_playlist->request.i_skip == 1 || p_playlist->request.i_skip == -1 ) ) ) )
+        ( p_playlist->request.b_request &&
+            ( p_playlist->request.p_item == NULL ||
+              p_playlist->request.i_skip == 1    ||
+              p_playlist->request.i_skip == -1 ) ) ) )
     {
+#if 0
         /* how many items to choose from ? */
-        i_count = 0;
+        int i_count = 0, i_new;
         for ( i = 0; i < p_playlist->i_size; i++ )
         {
             if ( p_playlist->pp_items[i]->p_input->i_nb_played == 0 )
@@ -321,8 +321,8 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
         p_playlist->request.i_skip = 0;
         p_playlist->request.b_request = VLC_FALSE;
         return p_playlist->pp_items[i_new];
-    }
 #endif
+    }
 
     /* Start the real work */
     if( p_playlist->request.b_request )
@@ -344,15 +344,15 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
         {
             for( i = i_skip; i > 0 ; i-- )
             {
-                p_new = playlist_GetNextEnabledLeaf( p_playlist,
-                                                     p_playlist->request.p_node,
-                                                     p_new );
+                p_new = playlist_GetNextLeaf( p_playlist,
+                                              p_playlist->request.p_node,
+                                              p_new, VLC_TRUE, VLC_FALSE );
                 if( p_new == NULL )
                 {
                     PL_DEBUG( "looping - restarting at beginning of node" );
                     p_new = playlist_GetNextLeaf( p_playlist,
                                                   p_playlist->request.p_node,
-                                                  NULL );
+                                                  NULL, VLC_TRUE, VLC_FALSE);
                     if( p_new == NULL ) break;
                 }
             }
@@ -363,7 +363,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
             {
                 p_new = playlist_GetPrevLeaf( p_playlist,
                                               p_playlist->request.p_node,
-                                              p_new );
+                                              p_new, VLC_FALSE, VLC_FALSE );
                 if( p_new == NULL )
                 {
                     PL_DEBUG( "looping - restarting at end of node" );
@@ -389,13 +389,14 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 
         p_new = playlist_GetNextLeaf( p_playlist,
                                       p_playlist->status.p_node,
-                                      p_playlist->status.p_item );
+                                      p_playlist->status.p_item,
+                                      VLC_TRUE, VLC_FALSE );
         if( p_new == NULL && b_loop )
         {
             PL_DEBUG( "looping" );
             p_new = playlist_GetNextLeaf( p_playlist,
                                           p_playlist->status.p_node,
-                                          NULL );
+                                          NULL, VLC_TRUE, VLC_FALSE );
         }
         /* The new item can't be autoselected  */
         if( p_new != NULL && p_new->i_flags & PLAYLIST_SKIP_FLAG )

@@ -417,16 +417,13 @@ VLC_EXPORT( playlist_item_t *, playlist_GetPreferredNode, ( playlist_t *p_playli
 
 /* Tree walking - These functions are only for playlist, not plugins */
 playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
-                                       playlist_item_t *p_root,
-                                       playlist_item_t *p_item );
-playlist_item_t *playlist_GetNextEnabledLeaf( playlist_t *p_playlist,
-                                              playlist_item_t *p_root,
-                                              playlist_item_t *p_item );
+                                    playlist_item_t *p_root,
+                                    playlist_item_t *, vlc_bool_t, vlc_bool_t );
 playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
-                                       playlist_item_t *p_root,
-                                       playlist_item_t *p_item );
+                                    playlist_item_t *p_root,
+                                    playlist_item_t *, vlc_bool_t, vlc_bool_t );
 playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
-                                       playlist_item_t *p_root );
+                                    playlist_item_t *p_root );
 
 /***********************************************************************
  * Inline functions
