@@ -87,7 +87,7 @@ void E_(Close_GVP) ( vlc_object_t * );
     { \
         b_play = E_(FindItem)( p_demux, p_playlist, &p_current ); \
         p_item_in_category = playlist_ItemToNode( p_playlist, p_current ); \
-        p_current->p_input->i_type = ITEM_TYPE_PLAYLIST;        \
+        p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;        \
     }
 
 #define HANDLE_PLAY_AND_RELEASE \

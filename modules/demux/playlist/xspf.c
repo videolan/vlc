@@ -553,7 +553,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                     }
                     if( p_handler->pf_handler.smpl )
                     {
-                        p_handler->pf_handler.smpl( NULL, p_input,
+                        p_handler->pf_handler.smpl( NULL, p_new_input,
                                                     p_handler->name,
                                                     psz_value );
                         FREE_ATT();
@@ -584,6 +584,7 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
     /* exit if setting is impossible */
     if( !psz_name || !psz_value || !p_input )
         return VLC_FALSE;
+
 
     /* re-convert xml special characters inside psz_value */
     resolve_xml_special_chars( psz_value );
@@ -661,11 +662,6 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
         msg_Warn( p_demux, "<node> requires \"title\" attribute" );
         return VLC_FALSE;
     }
-
-    if( !strcmp( psz_element, "node" ) )
-    {
-        fprintf( stderr, "  node: %s\n", psz_title );
-    }
     if( psz_title ) free( psz_title );
 
     /* parse the child elements */
@@ -740,7 +736,6 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
                 /* leave if the current parent node is terminated */
                 if( !strcmp( psz_name, psz_element ) )
                 {
-                    fprintf( stderr, "  </node>\n" );
                     FREE_ATT();
                     return VLC_TRUE;
                 }
@@ -818,9 +813,6 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
         msg_Warn( p_demux, "invalid \"href\" attribute" );
         return VLC_FALSE;
     }
-
-    fprintf( stderr, "    %s\n", p_demux->p_sys->pp_tracklist[i_href]->psz_name );
-
     return VLC_TRUE;
 }
 
