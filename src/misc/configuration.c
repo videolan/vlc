@@ -1171,7 +1171,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
         fprintf( file, "[%s]", p_parser->psz_object_name );
         if( p_parser->psz_longname )
-            fprintf( file, " # %s\n\n", p_parser->psz_longname );
+            utf8_fprintf( file, " # %s\n\n", p_parser->psz_longname );
         else
             fprintf( file, "\n\n" );
 
@@ -1207,7 +1207,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
             case CONFIG_ITEM_BOOL:
             case CONFIG_ITEM_INTEGER:
                 if( p_item->psz_text )
-                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
+                    utf8_fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              (p_item->i_type == CONFIG_ITEM_BOOL) ?
                              _("boolean") : _("integer") );
                 if( i_value == p_item->i_value_orig )
@@ -1219,7 +1219,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
             case CONFIG_ITEM_KEY:
                 if( p_item->psz_text )
-                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
+                    utf8_fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              _("key") );
                 if( i_value == p_item->i_value_orig )
                     fprintf( file, "#" );
@@ -1233,7 +1233,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
             case CONFIG_ITEM_FLOAT:
                 if( p_item->psz_text )
-                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
+                    utf8_fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              _("float") );
                 if( f_value == p_item->f_value_orig )
                     fprintf( file, "#" );
@@ -1244,7 +1244,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
             default:
                 if( p_item->psz_text )
-                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
+                    utf8_fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              _("string") );
                 if( (!psz_value && !p_item->psz_value_orig) ||
                     (psz_value && p_item->psz_value_orig &&
