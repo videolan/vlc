@@ -134,9 +134,9 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
                  "VLC probably does not support this sound or video format.",
                  (char*)&p_dec->fmt_in.i_codec );
         intf_UserFatal( p_dec, VLC_FALSE, _("No suitable decoder module "
-            "for FOURCC \"4.4s\" found"), _("VLC probably does not support this "
-            "audio or video format. Regrettably, there is no way for you to "
-            "fix this.") );
+            "for format"), _("VLC probably does not support the `%4.4s' "
+            "audio or video format. Unfortunately there is no way for you "
+            "to fix this."), (char*)&p_dec->fmt_in.i_codec );
 
         DeleteDecoder( p_dec );
         vlc_object_destroy( p_dec );
