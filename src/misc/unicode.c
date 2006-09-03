@@ -585,6 +585,8 @@ static char *CheckUTF8( char *str, char rep )
 {
     unsigned char *ptr, c;
 
+    assert (str != NULL);
+
     ptr = (unsigned char *)str;
     while( (c = *ptr) != '\0' )
     {
