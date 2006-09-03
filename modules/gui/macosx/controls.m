@@ -161,10 +161,12 @@
     if( val.b_bool )
     {
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Random On" ) );
+        config_PutInt( p_playlist, "random", 1 );
     }
     else
     {
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Random Off" ) );
+        config_PutInt( p_playlist, "random", 0 );
     }
 
     p_intf->p_sys->b_playmode_update = VLC_TRUE;
@@ -193,12 +195,14 @@
     if( val.b_bool )
     {
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat One" ) );
+        config_PutInt( p_playlist, "repeat", 1 );
     }
     else
     {
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat Off" ) );
+        config_PutInt( p_playlist, "repeat", 0 );
     }
-
+    
     p_intf->p_sys->b_playmode_update = VLC_TRUE;
     p_intf->p_sys->b_intf_update = VLC_TRUE;
     vlc_object_release( p_playlist );
@@ -225,10 +229,12 @@
     if( val.b_bool )
     {
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat All" ) );
+        config_PutInt( p_playlist, "loop", 1 );
     }
     else
     {
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat Off" ) );
+        config_PutInt( p_playlist, "loop", 0 );
     }
 
     p_intf->p_sys->b_playmode_update = VLC_TRUE;
