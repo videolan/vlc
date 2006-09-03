@@ -247,7 +247,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
 
     msg_Dbg( p_access, "opening directory `%s'", p_access->psz_path );
 
-    if( p_playlist->status.p_item->p_input ==
+    if( p_playlist->status.p_item && p_playlist->status.p_item->p_input ==
         ((input_thread_t *)p_access->p_parent)->input.p_item )
     {
         p_item = p_playlist->status.p_item;
