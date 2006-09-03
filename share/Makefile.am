@@ -256,7 +256,9 @@ DIST_applications = \
 	applications/vlc.desktop \
 	$(NULL)
 
-skins2/%.vlt:
+skins2/default.vlt:
 	mkdir -p skins2
-	tar cvvzf $@ --exclude .svn -C $(srcdir)/skins2 $*/
+	tar cvvzf skins2/default.vlt --exclude .svn -C $(srcdir)/skins2 default/
+
+.PHONY: $(nobase_pkgdata_DATA)
 
