@@ -622,6 +622,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
                                    httpd_message_t *query )
 {
     httpd_redirect_t *rdir = (httpd_redirect_t*)p_sys;
+    char *p_body;
 
     if( answer == NULL || query == NULL )
     {
@@ -633,7 +634,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
     answer->i_status = 301;
     answer->psz_status = strdup( "Moved Permanently" );
 
-    answer->i_body = asprintf( (char **)&answer->p_body,
+    answer->i_body = asprintf( &p_body,
         "<?xml version=\"1.0\" encoding=\"ascii\" ?>\n"
         "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
         "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
@@ -649,6 +650,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
         "<hr />\n"
         "</body>\n"
         "</html>\n", rdir->psz_dst );
+    answer->p_body = (unsigned char *)p_body;
 
     /* XXX check if it's ok or we need to set an absolute url */
     httpd_MsgAdd( answer, "Location",  "%s", rdir->psz_dst );
