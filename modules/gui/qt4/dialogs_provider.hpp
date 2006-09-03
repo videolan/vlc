@@ -82,6 +82,9 @@ public slots:
     void menuAction( QObject *);
     void menuUpdateAction( QObject *);
     void streamingDialog();
+    void openPlaylist();
+    void openDirectory();
+    void openMLDirectory();
     void quit();
 };
 

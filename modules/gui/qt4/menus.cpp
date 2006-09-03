@@ -146,9 +146,11 @@ void QVLCMenu::createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
     subML->setTitle( qtr("Add to Media library") );
     subML->addAction( "&File...", THEDP,
                            SLOT( simpleMLAppendDialog() ) );
+    subML->addAction( "Directory", THEDP, SLOT( openMLDirectory() ));
     subML->addAction( "&Advanced add...", THEDP,
                            SLOT( MLAppendDialog() ) );
     manageMenu->addMenu( subML );
+    manageMenu->addAction( "Open playlist file", THEDP, SLOT( openPlaylist() ));
     manageMenu->addSeparator();
 
 //    manageMenu->addMenu( SDMenu( p_intf ) );

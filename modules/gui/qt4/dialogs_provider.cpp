@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
-
 #include "qt4.hpp"
 #include <QEvent>
 #include "dialogs_provider.hpp"
@@ -216,6 +215,41 @@ void DialogsProvider::simpleOpenDialog()
                      ( i ? PLAYLIST_PREPARSE : 0 ),
                      PLAYLIST_END );
     }
+}
+
+void DialogsProvider::openPlaylist()
+{
+    QStringList files = showSimpleOpen();
+    QString file;
+    for( size_t i = 0 ; i< files.size(); i++ )
+    {
+        const char * psz_utf8 = files[i].toUtf8().data();
+        /* Play the first one, parse and enqueue the other ones */
+        playlist_Import( THEPL, psz_utf8, THEPL->p_root_category, VLC_FALSE );
+    }
+}
+
+void DialogsProvider::openDirectory()
+{
+    QString dir = QFileDialog::getExistingDirectory ( 0,
+                                                     _("Open directory") );
+    const char *psz_utf8 = dir.toUtf8().data();
+    input_item_t *p_input = input_ItemNewExt( THEPL, psz_utf8, psz_utf8,
+                                               0, NULL, -1 );
+    playlist_PlaylistAddInput( THEPL, p_input,
+                               PLAYLIST_APPEND, PLAYLIST_END );
+    input_Read( THEPL, p_input, VLC_FALSE );
+}
+void DialogsProvider::openMLDirectory()
+{
+    QString dir = QFileDialog::getExistingDirectory ( 0,
+                                                     _("Open directory") );
+    const char *psz_utf8 = dir.toUtf8().data();
+    fprintf( stderr, "%s\n", psz_utf8 );
+    input_item_t *p_input = input_ItemNewExt( THEPL, psz_utf8, psz_utf8,
+                                               0, NULL, -1 );
+    playlist_MLAddInput( THEPL, p_input, PLAYLIST_APPEND, PLAYLIST_END );
+    input_Read( THEPL, p_input, VLC_FALSE );
 }
 
 QStringList DialogsProvider::showSimpleOpen()
