@@ -31,7 +31,9 @@
 #include <assert.h>
 #include <QPushButton>
 #include <QStatusBar>
+#include <QKeyEvent>
 #include "menus.hpp"
+#include <vlc_keys.h>
 
 #ifdef WIN32
     #define PREF_W 410
@@ -51,6 +53,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setCentralWidget( main );
     setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
     ui.setupUi( centralWidget() );
+
+    setFocusPolicy( Qt::StrongFocus );
 
     slider = new InputSlider( Qt::Horizontal, NULL );
     ui.hboxLayout->insertWidget( 0, slider );
@@ -162,6 +166,48 @@ void MainInterface::resizeEvent( QResizeEvent *e )
     videoSize.setHeight( e->size().height() - addSize.height() );
     videoSize.setWidth( e->size().width() - addSize.width() );
     p_intf->p_sys->p_video->updateGeometry() ;
+}
+
+void MainInterface::keyPressEvent( QKeyEvent *e )
+{
+    int i_vlck = 0;
+    if( e->modifiers()& Qt::ShiftModifier ) i_vlck |= KEY_MODIFIER_SHIFT;
+    if( e->modifiers()& Qt::AltModifier ) i_vlck |= KEY_MODIFIER_ALT;
+    if( e->modifiers()& Qt::ControlModifier ) i_vlck |= KEY_MODIFIER_CTRL;
+    if( e->modifiers()& Qt::MetaModifier ) i_vlck |= KEY_MODIFIER_META;
+
+    fprintf( stderr, "After modifiers %x\n", i_vlck );
+    bool found = false;
+    fprintf( stderr, "Qt %x\n", e->key() );
+    switch( e->key() )
+    {
+        case Qt::Key_Left: i_vlck |= KEY_LEFT;found=true;;break;
+        case Qt::Key_Right: i_vlck |= KEY_RIGHT;found = true;break;
+    }
+    fprintf( stderr, "After keys %x\n", i_vlck );
+    if( !found )
+    {
+        fprintf( stderr, "Not found\n" );
+        if( e->key() >= Qt::Key_A && e->key() <= Qt::Key_Z )
+        {
+            fprintf( stderr, "Alphabet\n" );
+            i_vlck += e->key() + 32;
+        }
+        /* Rest of the ascii range */
+        else if( e->key() >= Qt::Key_Space && e->key() <= Qt::Key_AsciiTilde )
+        {
+            fprintf( stderr, "Yeh !\n" );
+            i_vlck += e->key();
+        }
+    }
+    if( i_vlck >= 0 )
+    {
+        fprintf( stderr, "Setting key-pressed %i\n", i_vlck );
+        var_SetInteger( p_intf->p_vlc, "key-pressed", i_vlck );
+        e->accept();
+    }
+    else
+        e->ignore();
 }
 
 void MainInterface::stop()

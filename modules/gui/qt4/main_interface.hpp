@@ -29,6 +29,7 @@
 #include "util/qvlcframe.hpp"
 
 class QCloseEvent;
+class QKeyEvent;
 class QLabel;
 class InputManager;
 class InputSlider;
@@ -50,6 +51,7 @@ protected:
     Ui::MainInterfaceUI ui;
     friend class VolumeClickHandler;
 private:
+    virtual void keyPressEvent( QKeyEvent *);
     VideoWidget *videoWidget;
     InputManager *main_input_manager;
     QLabel *timeLabel;
