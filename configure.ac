@@ -5163,13 +5163,19 @@ then
     AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
     if test "${MOZILLA_CONFIG}" = "no"
     then
-      AC_PATH_PROG(XULRUNNER_CONFIG, xulrunner-config, no)
-      if test "${XULRUNNER_CONFIG}" = "no"
+      AC_PATH_PROG(SEAMONKEY_CONFIG, seamonkey-config, no)
+      if test "${SEAMONKEY_CONFIG}" = "no"
       then
-        AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
+        AC_PATH_PROG(XULRUNNER_CONFIG, xulrunner-config, no)
+        if test "${XULRUNNER_CONFIG}" = "no"
+        then
+          AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
+        else
+          have_xul=true
+          MOZILLA_CONFIG="${XULRUNNER_CONFIG}"
+        fi
       else
-        have_xul=true
-	MOZILLA_CONFIG="${XULRUNNER_CONFIG}"
+        MOZILLA_CONFIG="${SEAMONKEY_CONFIG}"
       fi
     fi
     
