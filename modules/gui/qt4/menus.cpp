@@ -86,6 +86,7 @@ static int VideoAutoMenuBuilder( vlc_object_t *p_object,
                                                  FIND_PARENT );
     if( p_dec_obj != NULL )
     {
+        vlc_object_t *p_object = p_dec_obj;
         PUSH_VAR( "ffmpeg-pp-q" );
         vlc_object_release( p_dec_obj );
     }
