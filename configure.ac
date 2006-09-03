@@ -312,18 +312,21 @@ dnl
 ALL_LINGUAS="ca cs da de en_GB es fr gl he hi hu it ja ka ko nl oc pt_BR ro ru sv tr zh_CN zh_TW"
 AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT
-if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
-  AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
+AS_IF([test "${nls_cv_force_use_gnu_gettext}" = "yes"], [
+  AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, [Define if we use the local libintl])
   AM_CPPFLAGS="${AM_CPPFLAGS} -I\$(top_builddir)/intl"
   AS_IF([test "${enable_libtool}" != "no"], [
     INCLUDED_LIBINTL="${LTLIBINTL}"
   ],[
     INCLUDED_LIBINTL="${LIBINTL}"
   ])
-else
-  VLC_ADD_LDFLAGS([vlc],[${LIBINTL}])
-  INCLUDED_LIBINTL=
-fi
+], [
+  AS_IF([test "${enable_libtool}" != "no"], [
+    VLC_ADD_LDFLAGS([vlc], [${LTLIBINTL}])
+  ], [
+    VLC_ADD_LDFLAGS([vlc], [${LIBINTL}])
+  ])
+])
 AC_SUBST(INCLUDED_LIBINTL)
 XGETTEXT="${XGETTEXT} --keyword=_NS --keyword=_ANS"
 
