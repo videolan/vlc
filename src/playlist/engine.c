@@ -81,6 +81,8 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->b_always_tree = (i_tree == 1);
     p_playlist->b_never_tree = (i_tree == 2);
 
+    p_playlist->b_doing_ml = VLC_FALSE;
+
     p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL);
     p_playlist->p_root_onelevel = playlist_NodeCreate( p_playlist, NULL, NULL);
 
@@ -106,6 +108,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         p_playlist->p_ml_onelevel->i_flags |= PLAYLIST_RO_FLAG;
         p_playlist->p_ml_onelevel->p_input->i_id =
              p_playlist->p_ml_category->p_input->i_id;
+
     }
     else
     {
@@ -114,7 +117,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     /* Initial status */
     p_playlist->status.p_item = NULL;
-    p_playlist->status.p_node = p_playlist->p_root_onelevel;
+    p_playlist->status.p_node = p_playlist->p_local_onelevel;
     p_playlist->request.b_request = VLC_FALSE;
     p_playlist->status.i_status = PLAYLIST_STOPPED;
 
@@ -122,6 +125,8 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->i_order = ORDER_NORMAL;
 
     vlc_object_attach( p_playlist, p_parent );
+
+    playlist_MLLoad( p_playlist );
     return p_playlist;
 }
 
@@ -132,6 +137,9 @@ void playlist_Destroy( playlist_t *p_playlist )
         playlist_ServicesDiscoveryRemove( p_playlist,
                                           p_playlist->pp_sds[0]->psz_module );
     }
+
+    playlist_MLDump( p_playlist );
+
     vlc_thread_join( p_playlist->p_preparse );
     vlc_thread_join( p_playlist );
 

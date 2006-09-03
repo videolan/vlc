@@ -76,31 +76,10 @@ static void vlc_input_item_Destroy ( gc_object_t *p_this )
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_obj,
                                           VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
-    utf8_fprintf( stderr, "Destroying %s\n", p_input->psz_name );
     vlc_input_item_Clean( p_input );
 
     if( p_playlist )
     {
-#if 0
-        i_bottom = 0; i_top = p_playlist->i_input_items - 1;
-        i = i_top / 2;
-        while( p_playlist->pp_input_items[i]->i_id != p_input->i_id &&
-               i_top > i_bottom )
-        {
-            if( p_playlist->pp_input_items[i]->i_id < p_input->i_id )
-                i_bottom = i + 1;
-            else
-                i_top = i -1;
-
-            i = i_bottom + ( i_top - i_bottom ) / 2;
-
-        }
-        if( p_playlist->pp_input_items[i]->i_id == p_input->i_id )
-        {
-            REMOVE_ELEM( p_playlist->pp_input_items,
-                         p_playlist->i_input_items, i );
-        }
-#endif
         for( i = 0 ; i< p_playlist->i_input_items ; i++ )
         {
             if( p_playlist->pp_input_items[i]->i_id == p_input->i_id )

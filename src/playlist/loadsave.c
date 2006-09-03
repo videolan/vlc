@@ -33,7 +33,11 @@
 #include "vlc_playlist.h"
 #include "charset.h"
 
-#define PLAYLIST_FILE_HEADER  "# vlc playlist file version 0.5"
+#if defined( WIN32 ) || defined( UNDER_CE )
+#   define DIR_SEP "\\"
+#else
+#   define DIR_SEP "/"
+#endif
 
 /**
  * Import a playlist file at a given point of a given view
@@ -46,53 +50,19 @@ int playlist_Import( playlist_t * p_playlist, const char *psz_filename,
 {
     char *psz_uri, *psz_opt;
     input_item_t *p_input;
-    
+
     asprintf( &psz_uri, "file/playlist://%s", psz_filename );
     p_input = input_ItemNewExt( p_playlist, psz_uri, "playlist", 0, NULL, -1 );
     if( b_only_there )
-    { 
+    {
         asprintf( &psz_opt, "parent-item=%i", p_root->i_id );
         vlc_input_item_AddOption( p_input, psz_opt );
         free( psz_opt );
     }
-    if( p_root == p_playlist->p_ml_category )
-        p_input->i_id = p_playlist->p_ml_category->p_input->i_id;
+    playlist_PlaylistAddInput( p_playlist, p_input, PLAYLIST_APPEND,
+                               PLAYLIST_END );
     input_Read( p_playlist, p_input, VLC_TRUE );
     free( psz_uri );
-    
-    return VLC_SUCCESS;
-}
-
-/**
- * Load a playlist file to the playlist. It will create a new node in 
- * category
- *
- * \param p_playlist the playlist to which the new items will be added
- * \param psz_filename the name of the playlistfile to import
- * \return VLC_SUCCESS on success
- */
-int playlist_Load( playlist_t * p_playlist, const char *psz_filename )
-{
-    playlist_item_t *p_item;
-    char *psz_uri;
-    int i_id;
-
-    msg_Info( p_playlist, "clearing playlist");
-    playlist_Clear( p_playlist );
-
-
-    psz_uri = (char *)malloc(sizeof(char)*strlen(psz_filename) + 17 );
-    sprintf( psz_uri, "file/playlist://%s", psz_filename);
-
-    i_id = playlist_PlaylistAdd( p_playlist, psz_uri, psz_uri,
-                  PLAYLIST_INSERT  , PLAYLIST_END);
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-    p_item = playlist_ItemGetById( p_playlist, i_id );
-    vlc_mutex_unlock( &p_playlist->object_lock );
-
-    playlist_Play(p_playlist);
-
     return VLC_SUCCESS;
 }
 
@@ -158,5 +128,54 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     p_playlist->p_private = NULL;
     vlc_mutex_unlock( &p_playlist->object_lock );
 
+    return VLC_SUCCESS;
+}
+
+int playlist_MLLoad( playlist_t *p_playlist )
+{
+    char *psz_uri, *psz_homedir =p_playlist->p_vlc->psz_homedir;
+    input_item_t *p_input;
+
+    if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
+    if( !psz_homedir )
+    {
+        msg_Err( p_playlist, "no home directory, cannot load media library") ;
+        return VLC_EGENERIC;
+    }
+    asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP CONFIG_DIR DIR_SEP
+                        "ml.xsp", psz_homedir );
+
+    p_input = input_ItemNewExt( p_playlist, psz_uri,
+                                _("Media Library"), 0, NULL, -1 );
+    p_playlist->p_ml_category->p_input = p_input;
+    p_playlist->p_ml_onelevel->p_input = p_input;
+
+    p_playlist->b_doing_ml = VLC_TRUE;
+    stats_TimerStart( p_playlist, "ML Load", STATS_TIMER_ML_LOAD );
+    input_Read( p_playlist, p_input, VLC_TRUE );
+    stats_TimerStop( p_playlist,STATS_TIMER_ML_LOAD );
+    p_playlist->b_doing_ml = VLC_FALSE;
+
+    free( psz_uri );
+    return VLC_SUCCESS;
+}
+
+int playlist_MLDump( playlist_t *p_playlist )
+{
+    char *psz_uri, *psz_homedir =p_playlist->p_vlc->psz_homedir;
+    if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
+    if( !psz_homedir )
+    {
+        msg_Err( p_playlist, "no home directory, cannot load media library") ;
+        return VLC_EGENERIC;
+    }
+    asprintf( &psz_uri, "%s" DIR_SEP CONFIG_DIR DIR_SEP
+                        "ml.xsp",  psz_homedir );
+    stats_TimerStart( p_playlist, "ML Dump", STATS_TIMER_ML_DUMP );
+    playlist_Export( p_playlist, psz_uri, p_playlist->p_ml_category,
+                     "export-xspf" );
+    stats_TimerStop( p_playlist, STATS_TIMER_ML_DUMP );
+
+    free( psz_uri );
     return VLC_SUCCESS;
 }

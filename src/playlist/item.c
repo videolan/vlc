@@ -219,22 +219,24 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
 {
     playlist_item_t *p_item_cat, *p_item_one;
 
-    PL_DEBUG( "adding item `%s' ( %s )", p_input->psz_name, p_input->psz_uri );
+    if( !p_playlist->b_doing_ml )
+        PL_DEBUG( "adding item `%s' ( %s )", p_input->psz_name,
+                                             p_input->psz_uri );
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
     /* Add to ONELEVEL */
     p_item_one = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item_one == NULL ) return VLC_EGENERIC;
-    AddItem( p_playlist, p_item_one, 
-             b_playlist ? p_playlist->p_local_onelevel : 
+    AddItem( p_playlist, p_item_one,
+             b_playlist ? p_playlist->p_local_onelevel :
                           p_playlist->p_ml_onelevel , i_pos );
 
     /* Add to CATEGORY */
     p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item_cat == NULL ) return VLC_EGENERIC;
     AddItem( p_playlist, p_item_cat,
-             b_playlist ? p_playlist->p_local_category : 
+             b_playlist ? p_playlist->p_local_category :
                           p_playlist->p_ml_category , i_pos );
 
     GoAndPreparse( p_playlist, i_mode, p_item_cat, p_item_one );
@@ -392,16 +394,15 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
                                             p_playlist->p_root_onelevel );
         ChangeToNode( p_playlist, p_item_in_category );
         if( p_item_in_one->p_parent == p_playlist->p_root_onelevel )
-        {
             ChangeToNode( p_playlist, p_item_in_one );
-        }
         else
         {
             playlist_DeleteFromInput( p_playlist, p_item_in_one->p_input->i_id,
                                       p_playlist->p_root_onelevel, VLC_FALSE );
         }
         p_playlist->b_reset_random = VLC_TRUE;
-        var_SetInteger( p_playlist, "item-change", p_item->p_input->i_id );
+        var_SetInteger( p_playlist, "item-change", p_item_in_category->
+                                                        p_input->i_id );
         return p_item_in_category;
     }
     else
@@ -572,8 +573,8 @@ void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     {
         playlist_NodeInsert( p_playlist, p_item, p_node, i_pos );
     }
-
-    playlist_SendAddNotify( p_playlist, p_item->i_id, p_node->i_id );
+    if( !p_playlist->b_doing_ml )
+        playlist_SendAddNotify( p_playlist, p_item->i_id, p_node->i_id );
 }
 
 /* Actually convert an item to a node */

@@ -142,6 +142,9 @@ struct playlist_t
     vlc_bool_t            b_always_tree;/**< Always display as tree */
     vlc_bool_t            b_never_tree;/**< Never display as tree */
 
+    vlc_bool_t            b_doing_ml; /**< Doing media library stuff, */
+                                      /*get quicker */
+
     /* Runtime */
     input_thread_t *      p_input;  /**< the input thread associated
                                      * with the current item */
@@ -260,6 +263,8 @@ VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,
 /* Load/Save */
 VLC_EXPORT( int,  playlist_Import, ( playlist_t *, const char *, playlist_item_t *, vlc_bool_t ) );
 VLC_EXPORT( int,  playlist_Export, ( playlist_t *, const char *, playlist_item_t *, const char * ) );
+int playlist_MLLoad( playlist_t *p_playlist );
+int playlist_MLDump( playlist_t *p_playlist );
 
 /********************************************************
  * Item management
