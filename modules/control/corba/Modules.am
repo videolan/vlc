@@ -32,7 +32,7 @@ orbittypelib_DATA = MediaControl.so
 orbittypelib_CFLAGS=`$(VLC_CONFIG) --cflags plugin corba`
 orbittypelib_LIBS=`$(VLC_CONFIG) --libs plugin corba`
 
-ORBIT_IDL=$(shell pkg-config --variable=orbit_idl ORBit-2.0)
+ORBIT_IDL=`$(PKG_CONFIG) --variable=orbit_idl ORBit-2.0`
 
 ## MediaControl.so rules
 MediaControl-imodule.o: MediaControl-imodule.c
