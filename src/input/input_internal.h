@@ -156,4 +156,11 @@ int subtitles_Filter( const char *);
 
 void MRLSplit( vlc_object_t *, char *, char **, char **, char ** );
 
+static inline void input_ChangeState( input_thread_t *p_input, int state )
+{
+    vlc_value_t val;
+    val.i_int = state;
+    var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
+}
+
 #endif

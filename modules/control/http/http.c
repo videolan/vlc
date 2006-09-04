@@ -522,6 +522,14 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
         {
             sprintf( state, "playing" );
         }
+        else if( val.i_int == OPENING_S )
+        {
+            sprintf( state, "opening/connecting" );
+        }
+        else if( val.i_int == BUFFERING_S )
+        {
+            sprintf( state, "buffering" );
+        }
         else if( val.i_int == PAUSE_S )
         {
             sprintf( state, "paused" );
