@@ -328,7 +328,7 @@ AS_IF([test "${nls_cv_force_use_gnu_gettext}" = "yes"], [
   ])
 ])
 AC_SUBST(INCLUDED_LIBINTL)
-XGETTEXT="${XGETTEXT} --keyword=_NS --keyword=_ANS"
+XGETTEXT="${XGETTEXT} --keyword=_NS --keyword=_ANS --from-code=UTF-8"
 
 dnl
 dnl Iconv stuff
