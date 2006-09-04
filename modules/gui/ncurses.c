@@ -1213,7 +1213,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         {
             mvnprintw( y++, 0, COLS, " State    : Playing" );
         }
-        else if( val.i_int == OPENNING_S )
+        else if( val.i_int == OPENING_S )
         {
             mvnprintw( y++, 0, COLS, " State    : Openning/Connecting" );
         }
