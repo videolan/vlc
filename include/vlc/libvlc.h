@@ -270,6 +270,9 @@ void        libvlc_input_set_time       ( libvlc_input_t *, vlc_int64_t, libvlc_
 float       libvlc_input_get_position   ( libvlc_input_t *, libvlc_exception_t *);
 void        libvlc_input_set_position   ( libvlc_input_t *, float, libvlc_exception_t *);
 vlc_bool_t  libvlc_input_will_play      ( libvlc_input_t *, libvlc_exception_t *);
+float       libvlc_input_get_rate       ( libvlc_input_t *, libvlc_exception_t *);
+void        libvlc_input_set_rate       ( libvlc_input_t *, float, libvlc_exception_t *);
+int         libvlc_input_get_state      ( libvlc_input_t *, libvlc_exception_t *);
         
 /** @} */
 
