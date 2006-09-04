@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ko\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-04 11:13+0200\n"
+"POT-Creation-Date: 2006-09-04 12:40+0200\n"
 "PO-Revision-Date: 2005-09-07 06:05+0900\n"
 "Last-Translator: Han HoJoong <0demon0@paran.com>\n"
 "Language-Team: Korean Linux User Group\n"
@@ -814,7 +814,7 @@ msgstr "자막·디코더·모듈"
 #: src/input/decoder.c:137
 #, c-format
 msgid ""
-"VLC probably does not support the “%4.4s” audio or video format. "
+"VLC probably does not support the \"%4.4s\" audio or video format. "
 "Unfortunately there is no way for you to fix this."
 msgstr ""
 

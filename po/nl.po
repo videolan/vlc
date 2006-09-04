@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-04 11:13+0200\n"
+"POT-Creation-Date: 2006-09-04 12:40+0200\n"
 "PO-Revision-Date: 2004-05-16 00:41+0200\n"
 "Last-Translator: Derk-Jan Hartman <hartman at videolan dot org>\n"
 "Language-Team: Nederlands <www-doc@videolan.org>\n"
@@ -824,7 +824,7 @@ msgstr ""
 #: src/input/decoder.c:137
 #, c-format
 msgid ""
-"VLC probably does not support the “%4.4s” audio or video format. "
+"VLC probably does not support the \"%4.4s\" audio or video format. "
 "Unfortunately there is no way for you to fix this."
 msgstr ""
 

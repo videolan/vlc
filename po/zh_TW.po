@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-04 11:13+0200\n"
+"POT-Creation-Date: 2006-09-04 12:40+0200\n"
 "PO-Revision-Date: 2005-02-12 12:14+0100\n"
 "Last-Translator: Frank Chao <frank0624@gmail.com>\n"
 "Language-Team: zh_TW\n"
@@ -780,7 +780,7 @@ msgstr ""
 #: src/input/decoder.c:137
 #, c-format
 msgid ""
-"VLC probably does not support the “%4.4s” audio or video format. "
+"VLC probably does not support the \"%4.4s\" audio or video format. "
 "Unfortunately there is no way for you to fix this."
 msgstr ""
 
