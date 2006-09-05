@@ -2739,9 +2739,9 @@ dnl Trying with pkg-config
      AC_CHECK_HEADERS(ffmpeg/avformat.h)
      AC_CHECK_HEADERS(ffmpeg/avutil.h)
      AC_CHECK_HEADERS(postproc/postprocess.h)
-     VLC_ADD_BUILTINS([ffmpeg])
+     VLC_ADD_PLUGINS([ffmpeg])
      if test "${enable_sout}" != "no"; then
-         VLC_ADD_BUILTINS([stream_out_switcher])
+         VLC_ADD_PLUGINS([stream_out_switcher])
      fi
      VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_CFLAGS}])
      VLC_ADD_LDFLAGS([ffmpeg],[${FFMPEG_LIBS}])
