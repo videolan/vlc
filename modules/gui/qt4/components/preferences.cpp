@@ -104,11 +104,11 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             case CONFIG_CATEGORY:
                 if( p_item->i_value == -1 ) break;
                 data = new PrefsItemData();
-                data->name = QString( config_CategoryNameGet
-                                               ( p_item->i_value ) );
+                data->name = QString( qfu( config_CategoryNameGet
+                                               ( p_item->i_value ) ) );
                 psz_help = config_CategoryHelpGet( p_item->i_value );
                 if( psz_help )
-                    data->help = QString( psz_help );
+                    data->help = QString( qfu(psz_help) );
                 else
                     data->help.clear();
                 data->i_type = TYPE_CATEGORY;
@@ -148,11 +148,11 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                     // Data still contains the correct thing
                     data->i_type = TYPE_CATSUBCAT;
                     data->i_subcat_id = p_item->i_value;
-                    data->name = QString( config_CategoryNameGet(
-                                                p_item->i_value ) );
+                    data->name = QString( qfu( config_CategoryNameGet(
+                                                p_item->i_value )) );
                     psz_help = config_CategoryHelpGet( p_item->i_value );
                     if( psz_help )
-                        data->help = QString( psz_help );
+                        data->help = QString( qfu(psz_help) );
                     else
                         data->help.clear();
                     current_item->setData( 0, Qt::UserRole,
@@ -160,10 +160,11 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                     continue;
                 }
                 data = new PrefsItemData();
-                data->name = QString( config_CategoryNameGet( p_item->i_value));
+                data->name = QString( qfu( config_CategoryNameGet( 
+                                                            p_item->i_value)) );
                 psz_help = config_CategoryHelpGet( p_item->i_value );
                 if( psz_help )
-                    data->help = QString( psz_help );
+                    data->help = QString( qfu(psz_help) );
                 else
                     data->help.clear();
                 data->i_type = TYPE_SUBCATEGORY;
