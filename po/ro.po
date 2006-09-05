@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.8.3-svn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-04 12:40+0200\n"
+"POT-Creation-Date: 2006-09-05 07:49+0200\n"
 "PO-Revision-Date: 2005-07-12 09:55+0200\n"
 "Last-Translator: Circo Radu Sorin <Circo.RaduSorin@gmail.com>\n"
 "Language-Team: \n"
@@ -39,7 +39,7 @@ msgid "Select \"Advanced Options\" to see all options."
 msgstr "Apasa pe \"Optiuni avansate\" pentru a vedea toate optiunile"
 
 #: include/vlc_config_cat.h:36 include/vlc_config_cat.h:131
-#: src/input/input.c:1850 modules/gui/macosx/playlistinfo.m:62
+#: src/input/input.c:1843 modules/gui/macosx/playlistinfo.m:62
 #: modules/gui/wince/playlist.cpp:674
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:82
 #: modules/visualization/visual/visual.c:113
@@ -377,13 +377,13 @@ msgstr "VOD"
 msgid "VLC's implementation of Video On Demand"
 msgstr "Implementarea VLC pentru Video On Demand (  Video La Cerere)"
 
-#: include/vlc_config_cat.h:186 src/libvlc.h:1618 src/playlist/engine.c:91
-#: src/playlist/engine.c:93 modules/demux/playlist/playlist.c:56
+#: include/vlc_config_cat.h:186 src/libvlc.h:1618 src/playlist/engine.c:92
+#: src/playlist/engine.c:94 modules/demux/playlist/playlist.c:56
 #: modules/demux/playlist/playlist.c:57
 #: modules/gui/beos/InterfaceWindow.cpp:231
 #: modules/gui/beos/InterfaceWindow.cpp:325 modules/gui/macosx/intf.m:500
 #: modules/gui/macosx/intf.m:598 modules/gui/pda/pda_interface.c:1264
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:208
+#: modules/gui/qt4/zep.cpp:2 modules/gui/wxwidgets/dialogs/playlist.cpp:208
 #: modules/gui/wxwidgets/interface.cpp:679
 #: modules/gui/wxwidgets/interface.cpp:690
 msgid "Playlist"
@@ -574,7 +574,7 @@ msgstr "Meta-informatie"
 msgid "Sort"
 msgstr "Moale"
 
-#: include/vlc_intf_strings.h:39
+#: include/vlc_intf_strings.h:39 modules/gui/qt4/zep.cpp:505
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1615
 msgid "Add node"
 msgstr ""
@@ -591,7 +591,7 @@ msgid "Meta-information"
 msgstr "Meta-informatie"
 
 #: include/vlc_meta.h:29 src/input/var.c:136 modules/demux/mpc.c:55
-#: modules/gui/beos/MediaControlView.cpp:1233 modules/gui/macosx/intf.m:550
+#: modules/gui/beos/MediaControlView.cpp:1235 modules/gui/macosx/intf.m:550
 #: modules/gui/macosx/intf.m:551 modules/gui/macosx/open.m:168
 #: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/wizard.m:391
 #: modules/gui/wxwidgets/dialogs/open.cpp:760
@@ -917,25 +917,25 @@ msgstr "Viteza cadre"
 msgid "Subtitle"
 msgstr "Subtitrare"
 
-#: src/input/input.c:1850 modules/access/cdda/info.c:328
+#: src/input/input.c:1843 modules/access/cdda/info.c:328
 #: modules/access/cdda/info.c:396 modules/gui/macosx/playlist.m:131
 msgid "Duration"
 msgstr "Durata"
 
-#: src/input/input.c:2029
+#: src/input/input.c:2024
 msgid "Your input can't be opened"
 msgstr ""
 
-#: src/input/input.c:2030
+#: src/input/input.c:2025
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/input.c:2102
+#: src/input/input.c:2099
 msgid "Can't recognize the input's format"
 msgstr ""
 
-#: src/input/input.c:2103
+#: src/input/input.c:2100
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -948,7 +948,7 @@ msgstr "Semn de carte"
 msgid "Programs"
 msgstr "Programe"
 
-#: src/input/var.c:142 modules/gui/beos/MediaControlView.cpp:1234
+#: src/input/var.c:142 modules/gui/beos/MediaControlView.cpp:1236
 #: modules/gui/macosx/intf.m:552 modules/gui/macosx/intf.m:553
 #: modules/gui/macosx/open.m:169 modules/gui/wxwidgets/dialogs/open.cpp:765
 msgid "Chapter"
@@ -4683,12 +4683,12 @@ msgstr "Necunoscuta"
 msgid "Media: %s"
 msgstr ""
 
-#: src/playlist/engine.c:104 src/playlist/engine.c:106
-#: src/playlist/loadsave.c:149
+#: src/playlist/engine.c:105 src/playlist/engine.c:107
+#: src/playlist/loadsave.c:142
 msgid "Media Library"
 msgstr ""
 
-#: src/playlist/tree.c:57
+#: src/playlist/tree.c:58
 msgid "Undefined"
 msgstr "Nedefinit"
 
@@ -5854,7 +5854,7 @@ msgstr "Intrare FTP"
 
 #: modules/access/file.c:91 modules/access_output/file.c:67
 #: modules/audio_output/file.c:112 modules/gui/beos/InterfaceWindow.cpp:263
-#: modules/gui/beos/MediaControlView.cpp:1232
+#: modules/gui/beos/MediaControlView.cpp:1234
 #: modules/gui/beos/PlayListWindow.cpp:85 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/open.m:371 modules/gui/macosx/output.m:142
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
@@ -13282,6 +13282,101 @@ msgstr "Director"
 msgid "QT interface"
 msgstr "Arata interfata"
 
+#: modules/gui/qt4/zep.cpp:9 modules/gui/wxwidgets/dialogs/playlist.cpp:243
+msgid "&Simple Add File..."
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:10 modules/gui/wxwidgets/dialogs/playlist.cpp:244
+msgid "Add &Directory..."
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:11 modules/gui/wxwidgets/dialogs/playlist.cpp:245
+msgid "&Add URL..."
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:13 modules/gui/wxwidgets/dialogs/playlist.cpp:247
+#, fuzzy
+msgid "Services Discovery"
+msgstr "Servicii de descoperire"
+
+#: modules/gui/qt4/zep.cpp:16 modules/gui/wxwidgets/dialogs/playlist.cpp:250
+msgid "&Open Playlist..."
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:17 modules/gui/wxwidgets/dialogs/playlist.cpp:251
+msgid "&Save Playlist..."
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:19
+#: modules/gui/wxwidgets/dialogs/interaction.cpp:188
+#: modules/gui/wxwidgets/dialogs/messages.cpp:72
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:253
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:76
+msgid "&Close"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:23 modules/gui/wxwidgets/dialogs/playlist.cpp:264
+msgid "D&elete"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:27 modules/gui/wxwidgets/dialogs/playlist.cpp:271
+msgid "&Manage"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:28 modules/gui/wxwidgets/dialogs/playlist.cpp:272
+msgid "S&ort"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:29 modules/gui/wxwidgets/dialogs/playlist.cpp:273
+msgid "&Selection"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:30 modules/gui/wxwidgets/dialogs/playlist.cpp:274
+msgid "&View items"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:110 modules/gui/wxwidgets/dialogs/playlist.cpp:936
+#, fuzzy
+msgid "XSPF playlist"
+msgstr "Lista de redare"
+
+#: modules/gui/qt4/zep.cpp:117 modules/gui/wxwidgets/dialogs/playlist.cpp:943
+msgid "Playlist is empty"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:117 modules/gui/wxwidgets/dialogs/playlist.cpp:943
+msgid "Can't save"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:129 modules/gui/skins2/src/dialogs.cpp:240
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:955
+msgid "Save playlist"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:150 modules/gui/skins2/src/dialogs.cpp:230
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:976
+msgid "Open playlist"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:421 modules/gui/wxwidgets/dialogs/playlist.cpp:1417
+#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
+#: modules/misc/win32text.c:77
+msgid "Normal"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:422 modules/gui/wxwidgets/dialogs/playlist.cpp:1418
+#, fuzzy
+msgid "One level"
+msgstr "Nivel maxim"
+
+#: modules/gui/qt4/zep.cpp:504 modules/gui/wxwidgets/dialogs/playlist.cpp:1614
+msgid "Please enter node name"
+msgstr ""
+
+#: modules/gui/qt4/zep.cpp:505 modules/gui/wxwidgets/dialogs/playlist.cpp:1615
+msgid "New node"
+msgstr ""
+
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open a skin file"
 msgstr ""
@@ -13290,20 +13385,10 @@ msgstr ""
 msgid "Skin files (*.vlt;*.wsz)|*.vlt;*.wsz|Skin files (*.xml)|*.xml"
 msgstr ""
 
-#: modules/gui/skins2/src/dialogs.cpp:230
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:976
-msgid "Open playlist"
-msgstr ""
-
 #: modules/gui/skins2/src/dialogs.cpp:231
 msgid ""
 "All playlists|*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U files|*.m3u|XSPF playlist|*."
 "xspf"
-msgstr ""
-
-#: modules/gui/skins2/src/dialogs.cpp:240
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:955
-msgid "Save playlist"
 msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:240
@@ -13540,13 +13625,6 @@ msgstr "Norma"
 msgid "Don't show further errors"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/interaction.cpp:188
-#: modules/gui/wxwidgets/dialogs/messages.cpp:72
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:253
-#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:76
-msgid "&Close"
-msgstr ""
-
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:58
 msgid "Playlist item info"
 msgstr ""
@@ -13739,31 +13817,6 @@ msgstr ""
 msgid "Shuffle"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:243
-msgid "&Simple Add File..."
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:244
-msgid "Add &Directory..."
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:245
-msgid "&Add URL..."
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:247
-#, fuzzy
-msgid "Services Discovery"
-msgstr "Servicii de descoperire"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:250
-msgid "&Open Playlist..."
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:251
-msgid "&Save Playlist..."
-msgstr ""
-
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:257
 msgid "Sort by &Title"
 msgstr ""
@@ -13774,26 +13827,6 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:260
 msgid "&Shuffle"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:264
-msgid "D&elete"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:271
-msgid "&Manage"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:272
-msgid "S&ort"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:273
-msgid "&Selection"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:274
-msgid "&View items"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:282
@@ -13828,38 +13861,6 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:844
 #, c-format
 msgid "%i items in playlist"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:936
-#, fuzzy
-msgid "XSPF playlist"
-msgstr "Lista de redare"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:943
-msgid "Playlist is empty"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:943
-msgid "Can't save"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
-#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
-#: modules/misc/win32text.c:77
-msgid "Normal"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1418
-#, fuzzy
-msgid "One level"
-msgstr "Nivel maxim"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1614
-msgid "Please enter node name"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1615
-msgid "New node"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:208

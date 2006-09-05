@@ -161,6 +161,7 @@ src/playlist/control.c
 src/playlist/engine.c
 src/playlist/item.c
 src/playlist/loadsave.c
+src/playlist/playlist_internal.h
 src/playlist/search.c
 src/playlist/services_discovery.c
 src/playlist/sort.c
@@ -579,6 +580,7 @@ modules/gui/qt4/util/directslider.hpp
 modules/gui/qt4/util/input_slider.cpp
 modules/gui/qt4/util/input_slider.hpp
 modules/gui/qt4/util/qvlcframe.hpp
+modules/gui/qt4/zep.cpp
 modules/gui/skins2/commands/async_queue.cpp
 modules/gui/skins2/commands/async_queue.hpp
 modules/gui/skins2/commands/cmd_add_item.cpp

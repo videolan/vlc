@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-04 12:40+0200\n"
+"POT-Creation-Date: 2006-09-05 07:49+0200\n"
 "PO-Revision-Date: 2006-08-31 00:53+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
@@ -38,7 +38,7 @@ msgid "Select \"Advanced Options\" to see all options."
 msgstr "Välj \"Avancerade alternativ\" för att se alla alternativ."
 
 #: include/vlc_config_cat.h:36 include/vlc_config_cat.h:131
-#: src/input/input.c:1850 modules/gui/macosx/playlistinfo.m:62
+#: src/input/input.c:1843 modules/gui/macosx/playlistinfo.m:62
 #: modules/gui/wince/playlist.cpp:674
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:82
 #: modules/visualization/visual/visual.c:113
@@ -344,13 +344,13 @@ msgstr "VOD"
 msgid "VLC's implementation of Video On Demand"
 msgstr "VLC:s implementering av Video On Demand"
 
-#: include/vlc_config_cat.h:186 src/libvlc.h:1618 src/playlist/engine.c:91
-#: src/playlist/engine.c:93 modules/demux/playlist/playlist.c:56
+#: include/vlc_config_cat.h:186 src/libvlc.h:1618 src/playlist/engine.c:92
+#: src/playlist/engine.c:94 modules/demux/playlist/playlist.c:56
 #: modules/demux/playlist/playlist.c:57
 #: modules/gui/beos/InterfaceWindow.cpp:231
 #: modules/gui/beos/InterfaceWindow.cpp:325 modules/gui/macosx/intf.m:500
 #: modules/gui/macosx/intf.m:598 modules/gui/pda/pda_interface.c:1264
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:208
+#: modules/gui/qt4/zep.cpp:2 modules/gui/wxwidgets/dialogs/playlist.cpp:208
 #: modules/gui/wxwidgets/interface.cpp:679
 #: modules/gui/wxwidgets/interface.cpp:690
 msgid "Playlist"
@@ -523,7 +523,7 @@ msgstr "Information"
 msgid "Sort"
 msgstr "Sortera"
 
-#: include/vlc_intf_strings.h:39
+#: include/vlc_intf_strings.h:39 modules/gui/qt4/zep.cpp:505
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1615
 msgid "Add node"
 msgstr "Lägg till nod"
@@ -542,7 +542,7 @@ msgid "Meta-information"
 msgstr "Meta-information"
 
 #: include/vlc_meta.h:29 src/input/var.c:136 modules/demux/mpc.c:55
-#: modules/gui/beos/MediaControlView.cpp:1233 modules/gui/macosx/intf.m:550
+#: modules/gui/beos/MediaControlView.cpp:1235 modules/gui/macosx/intf.m:550
 #: modules/gui/macosx/intf.m:551 modules/gui/macosx/open.m:168
 #: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/wizard.m:391
 #: modules/gui/wxwidgets/dialogs/open.cpp:760
@@ -869,26 +869,26 @@ msgstr "Bildhastighet"
 msgid "Subtitle"
 msgstr "Undertext"
 
-#: src/input/input.c:1850 modules/access/cdda/info.c:328
+#: src/input/input.c:1843 modules/access/cdda/info.c:328
 #: modules/access/cdda/info.c:396 modules/gui/macosx/playlist.m:131
 msgid "Duration"
 msgstr "Speltid"
 
-#: src/input/input.c:2029
+#: src/input/input.c:2024
 msgid "Your input can't be opened"
 msgstr "Din inmatning kunde inte öppnas"
 
-#: src/input/input.c:2030
+#: src/input/input.c:2025
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 "VLC kunde inte öppna MRL:en \"%s\". Kontrollera loggen för mer detaljer."
 
-#: src/input/input.c:2102
+#: src/input/input.c:2099
 msgid "Can't recognize the input's format"
 msgstr "Känner inte igen formatet på inmatningen"
 
-#: src/input/input.c:2103
+#: src/input/input.c:2100
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -903,7 +903,7 @@ msgstr "Bokmärke"
 msgid "Programs"
 msgstr "Program"
 
-#: src/input/var.c:142 modules/gui/beos/MediaControlView.cpp:1234
+#: src/input/var.c:142 modules/gui/beos/MediaControlView.cpp:1236
 #: modules/gui/macosx/intf.m:552 modules/gui/macosx/intf.m:553
 #: modules/gui/macosx/open.m:169 modules/gui/wxwidgets/dialogs/open.cpp:765
 msgid "Chapter"
@@ -4344,12 +4344,12 @@ msgstr "Okänd"
 msgid "Media: %s"
 msgstr "Media: %s"
 
-#: src/playlist/engine.c:104 src/playlist/engine.c:106
-#: src/playlist/loadsave.c:149
+#: src/playlist/engine.c:105 src/playlist/engine.c:107
+#: src/playlist/loadsave.c:142
 msgid "Media Library"
 msgstr "Mediabibliotek"
 
-#: src/playlist/tree.c:57
+#: src/playlist/tree.c:58
 msgid "Undefined"
 msgstr "Odefinierad"
 
@@ -5393,7 +5393,7 @@ msgstr "Filinmatning"
 
 #: modules/access/file.c:91 modules/access_output/file.c:67
 #: modules/audio_output/file.c:112 modules/gui/beos/InterfaceWindow.cpp:263
-#: modules/gui/beos/MediaControlView.cpp:1232
+#: modules/gui/beos/MediaControlView.cpp:1234
 #: modules/gui/beos/PlayListWindow.cpp:85 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/open.m:371 modules/gui/macosx/output.m:142
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
@@ -12693,6 +12693,98 @@ msgstr "Öppna &katalog..."
 msgid "QT interface"
 msgstr "QT-gränssnitt"
 
+#: modules/gui/qt4/zep.cpp:9 modules/gui/wxwidgets/dialogs/playlist.cpp:243
+msgid "&Simple Add File..."
+msgstr "&Enkel lägg till fil..."
+
+#: modules/gui/qt4/zep.cpp:10 modules/gui/wxwidgets/dialogs/playlist.cpp:244
+msgid "Add &Directory..."
+msgstr "Lägg till &katalog..."
+
+#: modules/gui/qt4/zep.cpp:11 modules/gui/wxwidgets/dialogs/playlist.cpp:245
+msgid "&Add URL..."
+msgstr "&Lägg till URL..."
+
+#: modules/gui/qt4/zep.cpp:13 modules/gui/wxwidgets/dialogs/playlist.cpp:247
+msgid "Services Discovery"
+msgstr "Tjänsteidentifiering"
+
+#: modules/gui/qt4/zep.cpp:16 modules/gui/wxwidgets/dialogs/playlist.cpp:250
+msgid "&Open Playlist..."
+msgstr "&Öppna spellista..."
+
+#: modules/gui/qt4/zep.cpp:17 modules/gui/wxwidgets/dialogs/playlist.cpp:251
+msgid "&Save Playlist..."
+msgstr "&Spara spellista"
+
+#: modules/gui/qt4/zep.cpp:19
+#: modules/gui/wxwidgets/dialogs/interaction.cpp:188
+#: modules/gui/wxwidgets/dialogs/messages.cpp:72
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:253
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:76
+msgid "&Close"
+msgstr "&Stäng"
+
+#: modules/gui/qt4/zep.cpp:23 modules/gui/wxwidgets/dialogs/playlist.cpp:264
+msgid "D&elete"
+msgstr "Ta &bort"
+
+#: modules/gui/qt4/zep.cpp:27 modules/gui/wxwidgets/dialogs/playlist.cpp:271
+msgid "&Manage"
+msgstr "&Hantera"
+
+#: modules/gui/qt4/zep.cpp:28 modules/gui/wxwidgets/dialogs/playlist.cpp:272
+msgid "S&ort"
+msgstr "S&ortera"
+
+#: modules/gui/qt4/zep.cpp:29 modules/gui/wxwidgets/dialogs/playlist.cpp:273
+msgid "&Selection"
+msgstr "&Val"
+
+#: modules/gui/qt4/zep.cpp:30 modules/gui/wxwidgets/dialogs/playlist.cpp:274
+msgid "&View items"
+msgstr "&Visa objekt"
+
+#: modules/gui/qt4/zep.cpp:110 modules/gui/wxwidgets/dialogs/playlist.cpp:936
+msgid "XSPF playlist"
+msgstr "XSPF-spellista"
+
+#: modules/gui/qt4/zep.cpp:117 modules/gui/wxwidgets/dialogs/playlist.cpp:943
+msgid "Playlist is empty"
+msgstr "Spellistan är tom"
+
+#: modules/gui/qt4/zep.cpp:117 modules/gui/wxwidgets/dialogs/playlist.cpp:943
+msgid "Can't save"
+msgstr "Kan inte spara"
+
+#: modules/gui/qt4/zep.cpp:129 modules/gui/skins2/src/dialogs.cpp:240
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:955
+msgid "Save playlist"
+msgstr "Spara spellista"
+
+#: modules/gui/qt4/zep.cpp:150 modules/gui/skins2/src/dialogs.cpp:230
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:976
+msgid "Open playlist"
+msgstr "Öppna spellista"
+
+#: modules/gui/qt4/zep.cpp:421 modules/gui/wxwidgets/dialogs/playlist.cpp:1417
+#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
+#: modules/misc/win32text.c:77
+msgid "Normal"
+msgstr "Normal"
+
+#: modules/gui/qt4/zep.cpp:422 modules/gui/wxwidgets/dialogs/playlist.cpp:1418
+msgid "One level"
+msgstr "En nivå"
+
+#: modules/gui/qt4/zep.cpp:504 modules/gui/wxwidgets/dialogs/playlist.cpp:1614
+msgid "Please enter node name"
+msgstr "Ange nodnamn"
+
+#: modules/gui/qt4/zep.cpp:505 modules/gui/wxwidgets/dialogs/playlist.cpp:1615
+msgid "New node"
+msgstr "Ny nod"
+
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open a skin file"
 msgstr "Öppna en skalfil"
@@ -12701,11 +12793,6 @@ msgstr "Öppna en skalfil"
 msgid "Skin files (*.vlt;*.wsz)|*.vlt;*.wsz|Skin files (*.xml)|*.xml"
 msgstr "Skalfiler (*.vlt;*.wsz)|*.vlt;*.wsz|Skalfiler (*.xml)|*.xml"
 
-#: modules/gui/skins2/src/dialogs.cpp:230
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:976
-msgid "Open playlist"
-msgstr "Öppna spellista"
-
 #: modules/gui/skins2/src/dialogs.cpp:231
 msgid ""
 "All playlists|*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U files|*.m3u|XSPF playlist|*."
@@ -12713,11 +12800,6 @@ msgid ""
 msgstr ""
 "Alla spellistor|*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U-filer|*.m3u|XSPF-"
 "spellista|*.xspf"
-
-#: modules/gui/skins2/src/dialogs.cpp:240
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:955
-msgid "Save playlist"
-msgstr "Spara spellista"
 
 #: modules/gui/skins2/src/dialogs.cpp:240
 msgid "M3U file|*.m3u|XSPF playlist|*.xspf"
@@ -12960,13 +13042,6 @@ msgstr "&Nej"
 msgid "Don't show further errors"
 msgstr "Visa inte ytterligare fel"
 
-#: modules/gui/wxwidgets/dialogs/interaction.cpp:188
-#: modules/gui/wxwidgets/dialogs/messages.cpp:72
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:253
-#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:76
-msgid "&Close"
-msgstr "&Stäng"
-
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:58
 msgid "Playlist item info"
 msgstr ""
@@ -13152,30 +13227,6 @@ msgstr ""
 msgid "Shuffle"
 msgstr "Blanda"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:243
-msgid "&Simple Add File..."
-msgstr "&Enkel lägg till fil..."
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:244
-msgid "Add &Directory..."
-msgstr "Lägg till &katalog..."
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:245
-msgid "&Add URL..."
-msgstr "&Lägg till URL..."
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:247
-msgid "Services Discovery"
-msgstr "Tjänsteidentifiering"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:250
-msgid "&Open Playlist..."
-msgstr "&Öppna spellista..."
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:251
-msgid "&Save Playlist..."
-msgstr "&Spara spellista"
-
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:257
 msgid "Sort by &Title"
 msgstr "Sortera efter &titel"
@@ -13187,26 +13238,6 @@ msgstr "&Omvänd sortering efter titel"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:260
 msgid "&Shuffle"
 msgstr "&Blanda"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:264
-msgid "D&elete"
-msgstr "Ta &bort"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:271
-msgid "&Manage"
-msgstr "&Hantera"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:272
-msgid "S&ort"
-msgstr "S&ortera"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:273
-msgid "&Selection"
-msgstr "&Val"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:274
-msgid "&View items"
-msgstr "&Visa objekt"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:282
 msgid "Play this Branch"
@@ -13241,36 +13272,6 @@ msgstr "root"
 #, c-format
 msgid "%i items in playlist"
 msgstr "%i objekt i spellistan"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:936
-msgid "XSPF playlist"
-msgstr "XSPF-spellista"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:943
-msgid "Playlist is empty"
-msgstr "Spellistan är tom"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:943
-msgid "Can't save"
-msgstr "Kan inte spara"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
-#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
-#: modules/misc/win32text.c:77
-msgid "Normal"
-msgstr "Normal"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1418
-msgid "One level"
-msgstr "En nivå"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1614
-msgid "Please enter node name"
-msgstr "Ange nodnamn"
-
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1615
-msgid "New node"
-msgstr "Ny nod"
 
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:208
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:79

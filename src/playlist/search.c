@@ -22,8 +22,8 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-
 #include "vlc_playlist.h"
+#include "playlist_internal.h"
 
 /***************************************************************************
  * Item search functions

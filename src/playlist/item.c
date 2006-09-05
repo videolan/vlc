@@ -24,7 +24,8 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <assert.h>
-#include "vlc_playlist.h"
+#include <vlc_playlist.h>
+#include "playlist_internal.h"
 
 void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
               playlist_item_t *p_node, int i_pos );

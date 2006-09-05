@@ -24,6 +24,7 @@
 #include <assert.h>
 #include <vlc/input.h>
 #include "vlc_playlist.h"
+#include "playlist_internal.h"
 
 /************************************************************************
  * Local prototypes
