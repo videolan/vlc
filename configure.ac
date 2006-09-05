@@ -2739,9 +2739,17 @@ dnl Trying with pkg-config
      AC_CHECK_HEADERS(ffmpeg/avformat.h)
      AC_CHECK_HEADERS(ffmpeg/avutil.h)
      AC_CHECK_HEADERS(postproc/postprocess.h)
-     VLC_ADD_PLUGINS([ffmpeg])
+     if test "${SYS}" = "darwin"; then
+        VLC_ADD_BUILTINS([ffmpeg])
+     else
+        VLC_ADD_PLUGINS([ffmpeg])
+     fi
      if test "${enable_sout}" != "no"; then
-         VLC_ADD_PLUGINS([stream_out_switcher])
+        if test "${SYS}" = "darwin"; then
+            VLC_ADD_BUILTINS([stream_out_switcher])
+        else
+            VLC_ADD_PLUGINS([stream_out_switcher])
+        fi
      fi
      VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_CFLAGS}])
      VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_LIBS}])
