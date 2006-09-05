@@ -25,6 +25,7 @@
 #include "vlc_playlist.h"
 #include "playlist_internal.h"
 #include "charset.h"
+#include <errno.h>
 
 #if defined( WIN32 ) || defined( UNDER_CE )
 #   define DIR_SEP "\\"
