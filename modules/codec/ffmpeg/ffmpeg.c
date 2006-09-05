@@ -733,7 +733,7 @@ static struct
       VIDEO_ES, "Windows Media Video 1" },
     { VLC_FOURCC('W','M','V','2'), CODEC_ID_WMV2,
       VIDEO_ES, "Windows Media Video 2" },
-#if LIBAVCODEC_BUILD >= ((51<<16)+(10<<8)+1) 
+#if LIBAVCODEC_BUILD >= ((51<<16)+(10<<8)+1)
     { VLC_FOURCC('W','M','V','3'), CODEC_ID_WMV3,
       VIDEO_ES, "Windows Media Video 3" },
     { VLC_FOURCC('W','V','C','1'), CODEC_ID_VC1,
@@ -915,6 +915,12 @@ static struct
     { VLC_FOURCC('R','T','2','1'), CODEC_ID_INDEO2,
       VIDEO_ES, "Indeo Video v2" },
 #endif
+
+#if LIBAVCODEC_BUILD >= ((51<<16)+(13<<8)+0)
+    { VLC_FOURCC('V','M','n','c'), CODEC_ID_VMNC,
+      VIDEO_ES, "VMware Video" },
+#endif
+
 
     /*
      *  Image codecs
