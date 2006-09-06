@@ -258,8 +258,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         module_data->help.clear();
         // TODO image
         QTreeWidgetItem *module_item = new QTreeWidgetItem();
-        module_item->setText( 0, p_module->psz_shortname ?
-                      p_module->psz_shortname : p_module->psz_object_name );
+        module_item->setText( 0, qfu( p_module->psz_shortname ?
+                      p_module->psz_shortname : p_module->psz_object_name) );
         //item->setIcon( 0 , XXX );
         module_item->setData( 0, Qt::UserRole,
                               QVariant::fromValue( module_data) );
