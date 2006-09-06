@@ -86,10 +86,6 @@
 #define VFILTER_HELP N_( \
     "Video filters are used to postprocess the video stream." )
 
-#define VFILTER2_TITLE N_("Filters (v2)" )
-#define VFILTER2_HELP N_( \
-    "Video filters are used to postprocess the video stream." )
-
 #define SUBPIC_TITLE N_( "Subtitles/OSD")
 #define SUBPIC_HELP N_( "Miscellaneous settings related to On-Screen-Display,"\
         " subtitles and \"overlay subpictures\".")
@@ -231,9 +227,6 @@
     "In this section you can force the behavior of the subtitle demuxer, " \
     "for example by setting the subtitles type or file name.")
 
-#define VIDEO_FILTER2_TITLE N_("Video filters settings")
-#define VIDEO_FILTER2_HELP " "
-
 /*
  *  A little help for modules with unknown capabilities
  */
@@ -317,7 +310,6 @@ static struct config_category_t categories_array[] =
     { SUBCAT_VIDEO_GENERAL, VIDEO_GENERAL_TITLE, VIDEO_GENERAL_HELP },
     { SUBCAT_VIDEO_VOUT, _VOUT_TITLE, VOUT_HELP },
     { SUBCAT_VIDEO_VFILTER, VFILTER_TITLE, VFILTER_HELP },
-    { SUBCAT_VIDEO_VFILTER2, VFILTER2_TITLE, VFILTER2_HELP },
     { SUBCAT_VIDEO_SUBPIC, SUBPIC_TITLE, SUBPIC_HELP },
 
     { CAT_INPUT, INPUT_TITLE, INPUT_HELP },

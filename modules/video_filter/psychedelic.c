@@ -52,7 +52,7 @@ vlc_module_begin();
     set_shortname( N_( "Psychedelic" ));
     set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER2 );
+    set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_shortcut( "psychedelic" );
     set_callbacks( Create, Destroy );

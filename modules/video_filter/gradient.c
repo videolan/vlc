@@ -74,7 +74,7 @@ vlc_module_begin();
     set_shortname( N_( "Gradient" ));
     set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER2 );
+    set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_string( FILTER_PREFIX "mode", "gradient", NULL,
                 MODE_TEXT, MODE_LONGTEXT, VLC_FALSE );

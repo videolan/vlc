@@ -51,7 +51,7 @@ vlc_module_begin();
     set_shortname( N_( "Wave" ));
     set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER2 );
+    set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_shortcut( "wave" );
     set_callbacks( Create, Destroy );
