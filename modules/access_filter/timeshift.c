@@ -44,7 +44,7 @@ static void Close( vlc_object_t * );
 #define GRANULARITY_TEXT N_("Timeshift granularity")
 /// \bug [String] typo
 #define GRANULARITY_LONGTEXT N_( "This is the size of the temporary files " \
-  "tha will be used to store the timeshifted streams." )
+  "that will be used to store the timeshifted streams." )
 #define DIR_TEXT N_("Timeshift directory")
 #define DIR_LONGTEXT N_( "Directory used to store the timeshift temporary " \
   "files." )
