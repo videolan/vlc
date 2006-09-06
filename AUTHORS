@@ -200,6 +200,11 @@ D: XVideo video output
 D: Gnome and Gtk+ interface enhancements
 S: United Kingdom
 
+N: Dugal Harris
+E: dugalh (at) protoclea .dot co dot. za
+D: OpenCV video filter
+S: South Africa
+
 N: Derk-Jan Hartman
 E: hartman@videolan.org
 C: hartman
