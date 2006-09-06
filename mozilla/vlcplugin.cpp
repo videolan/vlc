@@ -71,6 +71,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         "vlc",
         "-vv",
         "--no-stats",
+        "--no-media-library",
         "--intf", "dummy",
     };
     int ppsz_argc = 5;
