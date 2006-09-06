@@ -221,7 +221,7 @@ vlc_module_begin();
                  MAXWIDTH_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "maxheight", 0, NULL, MAXHEIGHT_TEXT,
                  MAXHEIGHT_LONGTEXT, VLC_TRUE );
-    add_module_list_cat( SOUT_CFG_PREFIX "vfilter", SUBCAT_VIDEO_VFILTER2,
+    add_module_list( SOUT_CFG_PREFIX "vfilter", "video filter2",
                      NULL, NULL,
                      VFILTER_TEXT, VFILTER_LONGTEXT, VLC_FALSE );
 
