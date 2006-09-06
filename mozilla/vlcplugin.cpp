@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Damien Fouilleul <damienf.fouilleul@laposte.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,7 +75,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         "--no-media-library",
         "--intf", "dummy",
     };
-    int ppsz_argc = 5;
+    int ppsz_argc = 6;
 
     /* locate VLC module path */
 #ifdef XP_MACOSX
