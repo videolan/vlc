@@ -184,7 +184,7 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static int Demux2( demux_t *p_demux )
+static int Demux2( demux_t *p_demux, vlc_bool_t b_end )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_ret, i_id;
@@ -217,7 +217,14 @@ static int Demux2( demux_t *p_demux )
         ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
         if( !ps_pkt_parse_pes( p_pkt, tk->i_skip ) )
         {
-            tk->i_last_pts = p_pkt->i_pts;
+            if( b_end && p_pkt->i_pts > tk->i_last_pts )
+            {
+                tk->i_last_pts = p_pkt->i_pts;
+            }
+            else if ( tk->i_first_pts == -1 )
+            {
+                tk->i_first_pts = p_pkt->i_pts;
+            }
         }
     }
     block_Release( p_pkt );
@@ -235,18 +242,25 @@ static void FindLength( demux_t *p_demux )
 
     if( p_sys->i_length == -1 ) /* First time */
     {
+        p_sys->i_length = 0;
+        /* Check beginning */
+        i = 0;
         i_current_pos = stream_Tell( p_demux->s );
+        while( !p_demux->b_die && i < 40 && Demux2( p_demux, VLC_FALSE ) > 0 ) i++;
+
+        /* Check end */
         i_size = stream_Size( p_demux->s );
-        i_end = __MAX( 0, __MIN( 100000, i_size ) );
-        stream_Seek( p_demux->s, stream_Size( p_demux->s ) - i_end );
+        i_end = __MAX( 0, __MIN( 200000, i_size ) );
+        stream_Seek( p_demux->s, i_size - i_end );
     
-        while( Demux2( p_demux ) > 0 && !p_demux->b_die ) ;
+        while( !p_demux->b_die && Demux2( p_demux, VLC_TRUE ) > 0 );
+        if( i_current_pos >= 0 ) stream_Seek( p_demux->s, i_current_pos );
     }
 
     for( i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_sys->tk[i];
-        if( tk->b_seen && tk->i_first_pts > 0 && tk->i_last_pts > 0 )
+        if( tk->i_first_pts >= 0 && tk->i_last_pts > 0 )
             if( tk->i_last_pts > tk->i_first_pts )
             {
                 int64_t i_length = (int64_t)tk->i_last_pts - tk->i_first_pts;
@@ -254,10 +268,10 @@ static void FindLength( demux_t *p_demux )
                 {
                     p_sys->i_length = i_length;
                     p_sys->i_time_track = i;
+                    msg_Dbg( p_demux, "we found a length of: %lld", p_sys->i_length );
                 }
             }
     }
-    if( i_current_pos >= 0 ) stream_Seek( p_demux->s, i_current_pos );
 }
 
 /*****************************************************************************
@@ -287,7 +301,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->b_lost_sync ) msg_Warn( p_demux, "found sync code" );
     p_sys->b_lost_sync = VLC_FALSE;
 
-    if( p_sys->b_seekable && p_sys->i_length <= 0 )
+    if( p_sys->i_length < 0 && p_sys->b_seekable )
         FindLength( p_demux );
 
     if( ( p_pkt = ps_pkt_read( p_demux->s, i_code ) ) == NULL )
@@ -381,11 +395,6 @@ static int Demux( demux_t *p_demux )
                     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_pkt->i_pts );
                 }
 
-                if( !tk->i_first_pts && p_pkt->i_pts > 0 )
-                {
-                    tk->i_first_pts = p_pkt->i_pts;
-                    p_sys->i_length = 0;
-                }
                 if( (int64_t)p_pkt->i_pts > p_sys->i_current_pts )
                 {
                     p_sys->i_current_pts = (int64_t)p_pkt->i_pts;
