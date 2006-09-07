@@ -48,6 +48,8 @@
 #   include <byteorder.h>
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )  /* pthreads (like Linux & BSD) */
+#   define LIBVLC_USE_PTHREAD 1
+
 #   include <pthread.h>
 #   ifdef DEBUG
         /* Needed for pthread_cond_timedwait */

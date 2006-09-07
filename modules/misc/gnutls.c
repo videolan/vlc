@@ -1134,10 +1134,16 @@ error:
 }
 
 
+#ifdef LIBVLC_USE_PTHREAD
+GCRY_THREAD_OPTION_PTHREAD_IMPL;
+# define gcry_threads_vlc gcry_threads_pthread
+#else
 /**
  * gcrypt thread option VLC implementation
  */
-vlc_object_t *__p_gcry_data;
+
+# define NEED_THREAD_CONTEXT 1
+static vlc_object_t *__p_gcry_data;
 
 static int gcry_vlc_mutex_init( void **p_sys )
 {
@@ -1184,6 +1190,7 @@ static struct gcry_thread_cbs gcry_threads_vlc =
     gcry_vlc_mutex_lock,
     gcry_vlc_mutex_unlock
 };
+#endif
 
 
 /*****************************************************************************
@@ -1206,9 +1213,9 @@ Open( vlc_object_t *p_this )
 
     if( count.i_int == 0)
     {
-        const char *psz_version;
-
+#ifdef NEED_THREAD_CONTEXT
         __p_gcry_data = VLC_OBJECT( p_this->p_vlc );
+#endif
 
         gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
         if( gnutls_global_init( ) )
@@ -1218,7 +1225,7 @@ Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-        psz_version = gnutls_check_version( "1.2.9" );
+        const char *psz_version = gnutls_check_version( "1.2.9" );
         if( psz_version == NULL )
         {
             gnutls_global_deinit( );
