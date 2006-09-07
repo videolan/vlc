@@ -21,17 +21,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*
- * TODO:
- * - fix FIXMEs
- */
-
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
 #include <errno.h>
+#include <time.h>
 #include <vlc/vlc.h>
 
 #include <sys/types.h>
@@ -305,58 +300,127 @@ gnutls_VerifyHostname( vlc_object_t *p_this, gnutls_session session,
     return 0;
 }
 
-static int
-gnutls_HandshakeAndValidate( tls_session_t *p_session )
+
+typedef struct
 {
-    int val;
+    int flag;
+    const char *msg;
+} error_msg_t;
 
-    val = gnutls_ContinueHandshake( p_session );
-    if( val == 0 )
+static const error_msg_t cert_errors[] =
+{
+    { GNUTLS_CERT_INVALID,
+        "Certificate could not be verified" },
+    { GNUTLS_CERT_REVOKED,
+        "Certificate was revoked" },
+    { GNUTLS_CERT_SIGNER_NOT_FOUND,
+        "Certificate's signer was not found" },
+    { GNUTLS_CERT_SIGNER_NOT_CA,
+        "Certificate's signer is not a CA" },
+    { GNUTLS_CERT_INSECURE_ALGORITHM,
+        "Insecure certificate signature algorithm" },
+    { 0, NULL }
+};
+
+
+static int
+gnutls_HandshakeAndValidate( tls_session_t *session )
+{
+    int val = gnutls_ContinueHandshake( session );
+    if( val )
+        return val;
+
+    tls_session_sys_t *p_sys = (tls_session_sys_t *)(session->p_sys);
+
+    /* certificates chain verification */
+    unsigned status;
+    val = gnutls_certificate_verify_peers2( p_sys->session, &status );
+
+    if( val )
     {
-        unsigned status;
-        tls_session_sys_t *p_sys;
+        msg_Err( session, "Certificate verification failed: %s",
+                 gnutls_strerror( val ) );
+        goto error;
+    }
 
-        p_sys = (tls_session_sys_t *)(p_session->p_sys);
-        /* certificates chain verification */
-        val = gnutls_certificate_verify_peers2( p_sys->session, &status );
-
-        if( val )
+    if( status )
+    {
+        msg_Err( session, "TLS session: access denied" );
+        for( const error_msg_t *e = cert_errors; e->flag; e++ )
         {
-            msg_Err( p_session, "TLS certificate verification failed: %s",
-                     gnutls_strerror( val ) );
-            p_session->pf_close( p_session );
-            return -1;
+            if( status & e->flag )
+            {
+                msg_Err( session, e->msg );
+                status &= ~e->flag;
+            }
         }
 
         if( status )
-        {
-            msg_Err( p_session, "TLS session: access denied" );
-            if( status & GNUTLS_CERT_INVALID )
-                msg_Warn( p_session, "certificate could not be verified" );
-            if( status & GNUTLS_CERT_REVOKED )
-                msg_Warn( p_session, "certificate was revoked" );
-            if( status & GNUTLS_CERT_SIGNER_NOT_FOUND )
-                msg_Warn( p_session, "certificate's signer was not found" );
-            if( status & GNUTLS_CERT_SIGNER_NOT_CA )
-                msg_Warn( p_session, "certificate's signer is not a CA" );
-            if( status & GNUTLS_CERT_INSECURE_ALGORITHM )
-                msg_Warn( p_session, "insecure certificate signature algorithm" );
-            p_session->pf_close( p_session );
-            return -1;
-        }
+            msg_Err( session,
+                     "unknown certificate error (you found a bug in VLC)" );
 
-        msg_Dbg( p_session, "TLS certificate verified" );
-        if( ( p_sys->psz_hostname != NULL )
-         && gnutls_VerifyHostname( (vlc_object_t *)p_session, p_sys->session,
-                                   p_sys->psz_hostname ) )
-        {
-            p_session->pf_close( p_session );
-            return -1;
-        }
-        return 0;
+        goto error;
     }
 
-    return val;
+    /* certificate (host)name verification */
+    const gnutls_datum *data = gnutls_certificate_get_peers( p_sys->session,
+                                                             &(size_t){ 0 } );
+    if( data == NULL )
+    {
+        msg_Err( session, "Peer certificate not available" );
+        goto error;
+    }
+
+    gnutls_x509_crt cert;
+    val = gnutls_x509_crt_init( &cert );
+    if( val )
+    {
+        msg_Err( session, "x509 fatal error: %s", gnutls_strerror( val ) );
+        goto error;
+    }
+
+    val = gnutls_x509_crt_import( cert, data, GNUTLS_X509_FMT_DER );
+    if( val )
+    {
+        msg_Err( session, "Certificate import error: %s",
+                 gnutls_strerror( val ) );
+        gnutls_x509_crt_deinit( cert );
+        goto crt_error;
+    }
+
+    if( p_sys->psz_hostname != NULL )
+    {
+        if ( !gnutls_x509_crt_check_hostname( cert, p_sys->psz_hostname ) )
+        {
+            msg_Err( session, "Certificate does not match \"%s\"",
+                     p_sys->psz_hostname );
+            goto crt_error;
+        }
+    }
+    else
+        msg_Warn( session, "Certificate and hostname were not verified" );
+
+    if( gnutls_x509_crt_get_expiration_time( cert ) < time( NULL ) )
+    {
+        msg_Err( session, "Certificate expired" );
+        goto crt_error;
+    }
+
+    if( gnutls_x509_crt_get_activation_time( cert ) > time ( NULL ) )
+    {
+        msg_Err( session, "Certificate not yet valid" );
+        goto crt_error;
+    }
+
+    gnutls_x509_crt_deinit( cert );
+    msg_Dbg( session, "TLS/x509 certificate verified" );
+    return 0;
+
+crt_error:
+    gnutls_x509_crt_deinit( cert );
+error:
+    session->pf_close( session );
+    return -1;
 }
 
 /**
@@ -1011,7 +1075,6 @@ gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
     /* No certificate validation by default */
     p_sys->pf_handshake2 = gnutls_ContinueHandshake;
 
-    /* FIXME: check for errors */
     vlc_mutex_init( p_server, &p_sys->cache_lock );
 
     /* Sets server's credentials */
