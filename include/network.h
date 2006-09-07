@@ -102,6 +102,7 @@ VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, const char *psz_bind, in
 VLC_EXPORT( void, net_Close, ( int fd ) );
 VLC_EXPORT( void, net_ListenClose, ( int *fd ) );
 
+VLC_EXPORT( int, net_SetDSCP, ( int fd, uint8_t dscp ) );
 
 /* Functions to read from or write to the networking layer */
 struct virtual_socket_t
