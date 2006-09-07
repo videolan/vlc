@@ -330,15 +330,17 @@ gnutls_HandshakeAndValidate( tls_session_t *p_session )
 
         if( status )
         {
-            msg_Warn( p_session, "TLS session: access denied" );
+            msg_Err( p_session, "TLS session: access denied" );
             if( status & GNUTLS_CERT_INVALID )
-                msg_Dbg( p_session, "certificate could not be verified" );
+                msg_Warn( p_session, "certificate could not be verified" );
             if( status & GNUTLS_CERT_REVOKED )
-                msg_Dbg( p_session, "certificate was revoked" );
+                msg_Warn( p_session, "certificate was revoked" );
             if( status & GNUTLS_CERT_SIGNER_NOT_FOUND )
-                msg_Dbg( p_session, "certificate's signer was not found" );
+                msg_Warn( p_session, "certificate's signer was not found" );
             if( status & GNUTLS_CERT_SIGNER_NOT_CA )
-                msg_Dbg( p_session, "certificate's signer is not a CA" );
+                msg_Warn( p_session, "certificate's signer is not a CA" );
+            if( status & GNUTLS_CERT_INSECURE_ALGORITHM )
+                msg_Warn( p_session, "insecure certificate signature algorithm" );
             p_session->pf_close( p_session );
             return -1;
         }
@@ -1152,11 +1154,8 @@ Open( vlc_object_t *p_this )
             vlc_mutex_unlock( lock.p_address );
             return VLC_EGENERIC;
         }
-        /*
-         * FIXME: in fact, we currently depends on 1.0.17, but it breaks on
-         * Debian which as a patched 1.0.16 (which we can use).
-         */
-        psz_version = gnutls_check_version( "1.0.16" );
+
+        psz_version = gnutls_check_version( "1.2.9" );
         if( psz_version == NULL )
         {
             gnutls_global_deinit( );
