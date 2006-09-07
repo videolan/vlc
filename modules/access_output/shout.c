@@ -289,10 +289,10 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-    	/* Bitrate information is used for icecast/shoutcast servers directory
-    	   listings (sorting, stream info etc.) */
-    	msg_Warn( p_access, "no bitrate information specified (required for listing " \
-    	                    "the server as public on the shoutcast website)" );
+        /* Bitrate information is used for icecast/shoutcast servers directory
+           listings (sorting, stream info etc.) */
+        msg_Warn( p_access, "no bitrate information specified (required for listing " \
+                            "the server as public on the shoutcast website)" );
         free( val.psz_string );
     }
 
@@ -369,13 +369,13 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-    	/* If default 'http' protocol for icecast 2.x fails, fall back to 'icy'
-    	   for shoutcast server */
+        /* If default 'http' protocol for icecast 2.x fails, fall back to 'icy'
+           for shoutcast server */
         msg_Warn( p_access, "failed to connect using 'http' (icecast 2.x) protocol, "
                             "switching to 'icy' (shoutcast)" );
 
-    	i_ret = shout_get_format( p_shout );
-    	if( i_ret != SHOUT_FORMAT_MP3 )
+        i_ret = shout_get_format( p_shout );
+        if( i_ret != SHOUT_FORMAT_MP3 )
         {
             msg_Err( p_access, "failed to use 'icy' protocol: only MP3 " \
                                "streaming to shoutcast is supported" );
@@ -384,14 +384,14 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-    	/* Shout parameters cannot be changed on an open connection */
+        /* Shout parameters cannot be changed on an open connection */
         i_ret = shout_close( p_shout );
         if( i_ret == SHOUTERR_SUCCESS )
         {
             i_ret = SHOUTERR_UNCONNECTED;
         }
 
-    	i_ret = shout_set_protocol( p_shout, SHOUT_PROTOCOL_ICY );
+        i_ret = shout_set_protocol( p_shout, SHOUT_PROTOCOL_ICY );
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the protocol to 'icy'" );
