@@ -257,11 +257,7 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
     }
     else if( i_ret < 0 )
     {
-#if defined(WIN32) || defined(UNDER_CE)
-        msg_Err( p_this, "network select error (%d)", WSAGetLastError() );
-#else
-        msg_Err( p_this, "network select error (%s)", strerror(errno) );
-#endif
+        msg_Err( p_this, "network error: %s", net_strerror(net_errno) );
         return -1;
     }
     else if( i_ret == 0)
@@ -287,10 +283,9 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
                 msg_Err( p_this, "recv() failed. "
                          "Increase the mtu size (--mtu option)" );
             }
-            else msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
-#else
-            msg_Err( p_this, "recv failed (%s)", strerror(errno) );
+            else
 #endif
+            msg_Err( p_this, "recv failed: %s", net_strerror(net_errno) );
             return -1;
         }
 
@@ -339,7 +334,7 @@ int __net_Select( vlc_object_t *p_this, int *pi_fd, v_socket_t **pp_vs,
     }
     else if( i_ret < 0 )
     {
-        msg_Err( p_this, "network selection error (%s)", strerror(errno) );
+        msg_Err( p_this, "network selection error: %s", net_strerror(net_errno) );
         return -1;
     }
     else if( i_ret == 0 )
