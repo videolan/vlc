@@ -365,11 +365,7 @@ int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 
         if( i_ret < 0 )
         {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Err( p_this, "network selection error (%d)", WSAGetLastError() );
-#else
-            msg_Err( p_this, "network selection error (%s)", strerror(errno) );
-#endif
+            msg_Err( p_this, "network error: %s", net_strerror(net_errno) );
             return i_total > 0 ? i_total : -1;
         }
 
