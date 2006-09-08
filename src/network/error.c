@@ -35,7 +35,7 @@ typedef struct
     const char *msg;
 } wsaerrmsg_t;
 
-static const wsaerrmsg_t wsaerrmsg =
+static const wsaerrmsg_t wsaerrmsg[] =
 {
     { WSAEINTR, "Interrupted by signal" },
     { WSAEACCES, "Access denied" },
