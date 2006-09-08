@@ -95,6 +95,8 @@ static int  Volume       ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  VolumeMove   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
+static int  VideoConfig  ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
 static int  AudioConfig  ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Menu         ( vlc_object_t *, char const *,
@@ -495,6 +497,14 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "vtrack", Input, NULL );
     var_Create( p_intf, "strack", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "strack", Input, NULL );
+
+    /* video commands */
+    var_Create( p_intf, "vratio", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "vratio", VideoConfig, NULL );
+    var_Create( p_intf, "vcrop", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "vcrop", VideoConfig, NULL );
+    var_Create( p_intf, "vzoom", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "vzoom", VideoConfig, NULL );
 
     /* audio commands */
     var_Create( p_intf, "volume", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
@@ -920,6 +930,9 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| achan [X]. . . . . . . .  set/get audio channels"));
     msg_rc(_("| atrack [X] . . . . . . . . . set/get audio track"));
     msg_rc(_("| vtrack [X] . . . . . . . . . set/get video track"));
+    msg_rc(_("| vratio [X]  . . . . . set/get video aspect ratio"));
+    msg_rc(_("| vcrop [X]  . . . . . . . . .  set/get video crop"));
+    msg_rc(_("| vzoom [X]  . . . . . . . . .  set/get video zoom"));
     msg_rc(_("| strack [X] . . . . . . . set/get subtitles track"));
     msg_rc(_("| menu [on|off|up|down|left|right|select] use menu"));
     msg_rc(  "| ");
@@ -1904,6 +1917,126 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
     osd_Volume( p_this );
 
     if ( !i_error ) msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
+    return i_error;
+}
+
+
+static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    input_thread_t *p_input = NULL;
+    vout_thread_t * p_vout;
+    const char * psz_variable;
+    vlc_value_t val_name;
+    int i_error;
+
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+        return VLC_ENOOBJ;
+
+    p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+    vlc_object_release( p_input );
+    if( !p_vout )
+        return VLC_ENOOBJ;
+
+    if( !strcmp( psz_cmd, "vcrop" ) )
+    {
+        psz_variable = "crop";
+    }
+    else if( !strcmp( psz_cmd, "vratio" ) )
+    {
+        psz_variable = "aspect-ratio";
+    }
+    else /* if( !strcmp( psz_cmd, "vzoom" ) ) */
+    {
+        psz_variable = "zoom";
+    }
+
+
+    /* Get the descriptive name of the variable */
+    var_Change( p_vout, psz_variable, VLC_VAR_GETTEXT,
+                 &val_name, NULL );
+    if( !val_name.psz_string ) val_name.psz_string = strdup(psz_variable);
+
+    if( newval.psz_string && *newval.psz_string )
+    {
+        /* set */
+        if( !strcmp( psz_variable, "zoom" ) )
+        {
+            vlc_value_t val;
+            val.f_float = atof( newval.psz_string );
+            i_error = var_Set( p_vout, psz_variable, val );
+        }
+        else
+        {
+            i_error = var_Set( p_vout, psz_variable, newval );
+        }
+    }
+    else
+    {
+        /* get */
+        vlc_value_t val, text;
+        int i;
+        float f_value;
+        char *psz_value = NULL;
+
+        if ( var_Get( p_vout, psz_variable, &val ) < 0 )
+        {
+            vlc_object_release( p_vout );
+            return VLC_EGENERIC;
+        }
+        if( !strcmp( psz_variable, "zoom" ) )
+        {
+            f_value = val.f_float;
+        }
+        else
+        {
+            psz_value = strdup( val.psz_string );
+        }
+
+        if ( var_Change( p_vout, psz_variable,
+                         VLC_VAR_GETLIST, &val, &text ) < 0 )
+        {
+            vlc_object_release( p_vout );
+            return VLC_EGENERIC;
+        }
+
+        msg_rc( "+----[ %s ]", val_name.psz_string );
+        if( !strcmp( psz_variable, "zoom" ) )
+        {
+            for ( i = 0; i < val.p_list->i_count; i++ )
+            {
+                if ( f_value == val.p_list->p_values[i].f_float )
+                    msg_rc( "| %f - %s *", val.p_list->p_values[i].f_float,
+                            text.p_list->p_values[i].psz_string );
+                else
+                    msg_rc( "| %f - %s", val.p_list->p_values[i].f_float,
+                            text.p_list->p_values[i].psz_string );
+            }
+        }
+        else
+        {
+            for ( i = 0; i < val.p_list->i_count; i++ )
+            {
+                if ( !strcmp( psz_value, val.p_list->p_values[i].psz_string ) )
+                    msg_rc( "| %s - %s *", val.p_list->p_values[i].psz_string,
+                            text.p_list->p_values[i].psz_string );
+                else
+                    msg_rc( "| %s - %s", val.p_list->p_values[i].psz_string,
+                            text.p_list->p_values[i].psz_string );
+            }
+            free( psz_value );
+        }
+        var_Change( p_vout, psz_variable, VLC_VAR_FREELIST,
+                    &val, &text );
+        msg_rc( "+----[ end of %s ]", val_name.psz_string );
+
+        if( val_name.psz_string ) free( val_name.psz_string );
+
+        i_error = VLC_SUCCESS;
+    }
+    vlc_object_release( p_vout );
     return i_error;
 }
 
