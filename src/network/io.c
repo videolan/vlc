@@ -144,17 +144,12 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
 
     do
     {
-        if (waitall && (buflen == 0))
+        if (buflen == 0)
             return total; // output buffer full
 
-        int delay_ms;
-        if (wait_ms != -1)
-        {
-            delay_ms = (wait_ms > 500) ? 500 : wait_ms;
-            wait_ms -= delay_ms;
-        }
-        else
-            delay_ms = 500;
+        int delay_ms = 500;
+        if ((wait_ms != -1) && (wait_ms < 500))
+            delay_ms = wait_ms;
 
 #ifdef HAVE_POLL
         struct pollfd ufd[fdc];
@@ -258,6 +253,14 @@ receive:
         total += n;
         buf += n;
         buflen -= n;
+
+        if (wait_ms == -1)
+        {
+            if (!waitall)
+                return total;
+        }
+        else
+            wait_ms -= delay_ms;
     }
     while (wait_ms);
 
