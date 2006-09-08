@@ -2,6 +2,7 @@
  * io.c: network I/O functions
  *****************************************************************************
  * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright © 2005-2006 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
@@ -29,6 +30,7 @@
 #include <vlc/vlc.h>
 
 #include <errno.h>
+#include <assert.h>
 
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
@@ -38,6 +40,9 @@
 #endif
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
+#endif
+#ifdef HAVE_POLL
+#   include <sys/poll.h>
 #endif
 
 #include "network.h"
@@ -136,6 +141,142 @@ void net_Close( int fd )
 #endif
 }
 
+
+static int
+net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
+               v_socket_t *const *restrict vsv,
+               uint8_t *restrict buf, size_t buflen,
+               int wait_ms, vlc_bool_t waitall )
+{
+    int total = 0, n;
+
+    do
+    {
+        if (waitall && (buflen == 0))
+            return total; // output buffer full
+
+        int delay_ms;
+        if (wait_ms != -1)
+        {
+            delay_ms = (wait_ms > 500) ? 500 : wait_ms;
+            wait_ms -= delay_ms;
+        }
+        else
+            delay_ms = 500;
+
+#ifdef HAVE_POLL
+        struct pollfd ufd[fdc];
+        memset (ufd, 0, sizeof (ufd));
+
+        for (unsigned i = 0; i < fdc; i++)
+        {
+            ufd[i].fd = fdv[i];
+            ufd[i].events = POLLIN;
+        }
+
+        if (p_this->b_die)
+            return total;
+
+        n = poll (ufd, fdc, (wait_ms == -1) ? -1 : delay_ms);
+        if (n == -1)
+            goto error;
+
+        assert ((unsigned)n <= fdc);
+
+        for (int i = 0; n > 0; i++)
+            if (ufd[i].revents)
+            {
+                fdc = 1;
+                fdv += i;
+                vsv += i;
+                n--;
+                goto receive;
+            }
+#else
+        int maxfd = -1;
+        fd_set set;
+        FD_ZERO (&set);
+
+        for (unsigned i = 0; i < fdc; i++)
+        {
+#if !defined(WIN32) && !defined(UNDER_CE)
+            if (fdv[i] >= FD_SETSIZE)
+            {
+                /* We don't want to overflow select() fd_set */
+                msg_Err( p_this, "select set overflow" );
+                return -1;
+            }
+#endif
+            FD_SET (fdv[i], &set);
+            if (fdv[i] > maxfd)
+                maxfd = fdv[i];
+        }
+
+        n = select (maxfd + 1, &set, NULL, NULL,
+                    (wait_ms == -1) ? NULL
+                        : &(struct timeval){ 0, delay_ms * 1000 });
+        if (n == -1)
+            goto error;
+
+        for (unsigned i = 0; n > 0; i++)
+            if (FD_ISSET (fdv[i], &set))
+            {
+                fdc = 1;
+                fdv += i;
+                vsv += i;
+                n--;
+                goto receive;
+            }
+#endif
+
+        continue;
+
+receive:
+        if ((*vsv) != NULL)
+            n = (*vsv)->pf_recv ((*vsv)->p_sys, buf, buflen);
+        else
+            n = recv (*fdv, buf, buflen, 0);
+
+        if (n == -1)
+        {
+#if defined(WIN32) || defined(UNDER_CE)
+            switch (WSAGetLastError())
+            {
+                case WSAEWOULDBLOCK:
+                /* only happens with vs != NULL (SSL) - not really an error */
+                    continue;
+
+                case WSAEMSGSIZE:
+                /* For UDP only */
+                /* On Win32, recv() fails if the datagram doesn't fit inside
+                 * the passed buffer, even though the buffer will be filled
+                 * with the first part of the datagram. */
+                    msg_Err( p_this, "recv() failed. "
+                                     "Increase the mtu size (--mtu option)" );
+                    total += buflen;
+                    return total;
+            }
+#else
+            if( errno == EAGAIN ) /* spurious wake-up (sucks if fdc > 1) */
+                continue;
+#endif
+            goto error;
+        }
+
+        total += n;
+        buf += n;
+        buflen -= n;
+    }
+    while (wait_ms);
+
+    return total; // timeout
+
+error:
+    msg_Err (p_this, "Receive error: %s", net_strerror (net_errno));
+    return (total > 0) ? total : -1;
+}
+
+
 /*****************************************************************************
  * __net_Read:
  *****************************************************************************
@@ -143,8 +284,9 @@ void net_Close( int fd )
  * If b_retry is true, then we repeat until we have read the right amount of
  * data
  *****************************************************************************/
-int __net_Read( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
-                uint8_t *p_data, int i_data, vlc_bool_t b_retry )
+int __net_Read( vlc_object_t *restrict p_this, int fd,
+                v_socket_t *restrict p_vs,
+                uint8_t *restrict p_data, int i_data, vlc_bool_t b_retry )
 {
     struct timeval  timeout;
     fd_set          fds_r, fds_e;

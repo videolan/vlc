@@ -74,6 +74,7 @@ AC_CHECK_TOOL(LD, ld, :)
 dnl Check for compiler properties
 AC_C_CONST
 AC_C_INLINE
+AC_C_RESTRICT
 
 dnl
 dnl  Check for the contrib directory
@@ -783,6 +784,8 @@ AC_CHECK_HEADERS(syslog.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 AC_HEADER_TIME
+
+AC_SEARCH_LIBS(poll, [poll], [AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS is usabl... err, has poll().])])
 
 dnl Check for dirent
 need_dirent=false
