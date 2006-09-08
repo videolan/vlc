@@ -59,13 +59,11 @@ int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
     {
 #if defined(WIN32) || defined(UNDER_CE)
         if( WSAGetLastError ( ) != WSAEAFNOSUPPORT )
-            msg_Warn( p_this, "cannot create socket (%i)",
-                      WSAGetLastError() );
 #else
         if( errno != EAFNOSUPPORT )
-            msg_Warn( p_this, "cannot create socket (%s)",
-                      strerror( errno ) );
 #endif
+            msg_Warn( p_this, "cannot create socket: %s",
+                      net_strerror(net_errno) );
         return -1;
     }
 
@@ -179,11 +177,8 @@ int __net_Read( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
 
         if( i_ret < 0 )
         {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Err( p_this, "network select error (%d)", WSAGetLastError() );
-#else
-            msg_Err( p_this, "network select error (%s)", strerror(errno) );
-#endif
+            msg_Err( p_this, "network select error (%s)",
+                     net_strerror(net_errno) );
             return i_total > 0 ? i_total : -1;
         }
 
@@ -208,12 +203,11 @@ int __net_Read( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
                 i_total += i_data;
             }
             else if( WSAGetLastError() == WSAEINTR ) continue;
-            else msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
 #else
             /* EAGAIN only happens with p_vs (TLS) and it's not an error */
             if( errno != EAGAIN )
-                msg_Err( p_this, "recv failed (%s)", strerror(errno) );
 #endif
+                msg_Err( p_this, "recv failed: %s", net_strerror(net_errno) );
             return i_total > 0 ? i_total : -1;
         }
         else if( i_recv == 0 )
