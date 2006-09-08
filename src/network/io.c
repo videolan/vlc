@@ -136,7 +136,7 @@ void net_Close( int fd )
 
 static int
 net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
-               v_socket_t *const *restrict vsv,
+               const v_socket_t *const *restrict vsv,
                uint8_t *restrict buf, size_t buflen,
                int wait_ms, vlc_bool_t waitall )
 {
@@ -280,10 +280,11 @@ error:
  * data
  *****************************************************************************/
 int __net_Read( vlc_object_t *restrict p_this, int fd,
-                v_socket_t *restrict p_vs,
+                const v_socket_t *restrict p_vs,
                 uint8_t *restrict p_data, int i_data, vlc_bool_t b_retry )
 {
-    return net_ReadInner (p_this, 1, &(int){ fd }, &(v_socket_t *){ p_vs },
+    return net_ReadInner (p_this, 1, &(int){ fd },
+                          &(const v_socket_t *){ p_vs },
                           p_data, i_data, -1, b_retry);
 }
 
@@ -294,10 +295,11 @@ int __net_Read( vlc_object_t *restrict p_this, int fd,
  * Read from a network socket, non blocking mode (with timeout)
  *****************************************************************************/
 int __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
-                        v_socket_t *restrict p_vs,
+                        const v_socket_t *restrict p_vs,
                         uint8_t *restrict p_data, int i_data, mtime_t i_wait)
 {
-    return net_ReadInner (p_this, 1, &(int){ fd }, &(v_socket_t *){ p_vs },
+    return net_ReadInner (p_this, 1, &(int){ fd },
+                          &(const v_socket_t *){ p_vs },
                           p_data, i_data, i_wait / 1000, VLC_FALSE);
 }
 
@@ -308,8 +310,8 @@ int __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
  * Read from several sockets (with timeout). Takes data from the first socket
  * that has some.
  *****************************************************************************/
-int __net_Select( vlc_object_t *restrict p_this, int *restrict pi_fd,
-                  v_socket_t **restrict pp_vs,
+int __net_Select( vlc_object_t *restrict p_this, const int *restrict pi_fd,
+                  const v_socket_t *const *restrict pp_vs,
                   int i_fd, uint8_t *restrict p_data, int i_data,
                   mtime_t i_wait )
 {
@@ -328,7 +330,7 @@ int __net_Select( vlc_object_t *restrict p_this, int *restrict pi_fd,
 
 
 /* Write exact amount requested */
-int __net_Write( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
+int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                  const uint8_t *p_data, int i_data )
 {
     struct timeval  timeout;
@@ -388,7 +390,7 @@ int __net_Write( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
     return i_total;
 }
 
-char *__net_Gets( vlc_object_t *p_this, int fd, v_socket_t *p_vs )
+char *__net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
 {
     char *psz_line = NULL, *ptr = NULL;
     size_t  i_line = 0, i_max = 0;
@@ -428,7 +430,7 @@ char *__net_Gets( vlc_object_t *p_this, int fd, v_socket_t *p_vs )
     return psz_line;
 }
 
-int net_Printf( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
+int net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                 const char *psz_fmt, ... )
 {
     int i_ret;
@@ -440,7 +442,7 @@ int net_Printf( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
     return i_ret;
 }
 
-int __net_vaPrintf( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
+int __net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                     const char *psz_fmt, va_list args )
 {
     char    *psz;
