@@ -1283,10 +1283,10 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
     if( *p_media->psz_session_email )
         p += sprintf( p, "e=%s\r\n", p_media->psz_session_email );
 
-    p += sprintf( p, "t=0 0\r\n" ); /* FIXME */
-    p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
-
     p += sprintf( p, "c=IN IP%c %s\r\n", ipv, ipv == '6' ? "::" : "0.0.0.0" );
+    p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
+    p += sprintf( p, "t=0 0\r\n" ); /* FIXME */
+
 
     if( p_media->i_length > 0 )
     {
