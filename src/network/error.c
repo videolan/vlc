@@ -29,39 +29,78 @@
 #include "network.h"
 
 #if defined (WIN32) || defined (UNDER_CE)
+typedef struct
+{
+    int code;
+    const char *msg;
+} wsaerrmsg_t;
+
+static const wsaerrmsg_t wsaerrmsg =
+{
+    { WSAEINTR, "Interrupted by signal" },
+    { WSAEACCES, "Access denied" },
+    { WSAEFAULT, "Invalid memory address" },
+    { WSAEINVAL, "Invalid argument" },
+    { WSAEMFILE, "Too many open sockets" },
+    { WSAEWOULDBLOCK, "Would block" },
+    //{ WSAEALREADY
+    { WSAENOTSOCK, "Non-socket handle specified" },
+    { WSAEDESTADDRREQ, "Missing destination address" },
+    { WSAEMSGSIZE, "Message too big" },
+    //{ WSAEPROTOTYPE
+    { WSAENOPROTOOPT, "Option not supported by protocol" },
+    { WSAEPROTONOSUPPORT, "Protocol not support" },
+    //WSAESOCKTNOSUPPORT
+    { WSAEOPNOTSUPP, "Operation not supported" },
+    { WSAEPFNOSUPPORT, "Protocol family not supported" },
+    { WSAEAFNOSUPPORT, "Address family not supported" },
+    { WSAEADDRINUSE, "Address already in use" },
+    { WSAEADDRNOTAVAIL, "Address not available" },
+    { WSAENETDOWN, "Network down" },
+    { WSAENETUNREACH, "Network unreachable" },
+    //WSAENETRESET
+    { WSAECONNABORTED, "Connection aborted" },
+    { WSAECONNRESET, "Connection reset by peer" },
+    { WSAENOBUFS, "Not enough memory" },
+    { WSAEISCONN, "Socket already connected" },
+    { WSAENOTCONN, "Connection required first" },
+    { WSAESHUTDOWN, "Connection shutdown" },
+    { WSAETOOMANYREFS, "Too many references" },
+    { WSAETIMEDOUT, "Connection timed out" },
+    { WSAECONNREFUSED, "Connection refused by peer" },
+    //WSAELOOP
+    //WSAENAMETOOLONG
+    { WSAEHOSTDOWN, "Remote host down" },
+    { WSAEHOSTUNREACH, "Remote host unreachable" },
+    //WSAENOTEMPTY
+    //WSAEPROCLIM
+    //WSAEUSERS
+    //WSAEDQUOT
+    //WSAESTALE
+    //WSAEREMOTE
+    //WSAEDISCON
+    { WSASYSNOTREADY, "Network stack not ready" },
+    { WSAVERNOTSUPPORTED, "Network stack version not supported" },
+    { WSANOTINITIALISED, "Network not initialized" },
+    { WSAHOST_NOT_FOUND, "Hostname not found" },
+    { WSATRY_AGAIN, "Temporary hostname error" },
+    { WSANO_RECOVERY, "Non-recoverable hostname error" },
+    /* Winsock2 and QoS error are codes missing,
+       I'm too bored, and they "never" occur. */
+    { 0, NULL }
+};
+
+
 const char *net_strerror( int value )
 {
     /* There doesn't seem to be any portable error message generation for
      * Winsock errors. Some old versions had s_error, but it appears to be
      * gone, and is not documented.
      */
+    for( const wsaerrmsg_t *e = wsaerrmsg; e.msg != NULL; e++ )
+        if( e.code == value )
+            return e.msg;
 
-    switch( value )
-    {
-        /* Feel free to add any error message as you see fit */
-        case WSAENETUNREACH:
-            return "Destination unreachable";
-
-        case WSAETIMEDOUT:
-            return "Connection timed out";
-
-        case WSAECONNREFUSED:
-            return "Connection refused";
-
-        default:
-        {
-            static char errmsg[14 + 5 + 1];
-            /* Given PE don't support thread-local storage, this cannot be
-             * implemented in a thread-safe manner, I'm afraid. */
-
-            if( ((unsigned)value) > 99999 ) /* avoid overflow */
-                return "Invalid error code";
-
-            sprintf( errmsg, "Winsock error %u", (unsigned)value );
-            return errmsg;
-        }
-    }
-
-    return strerror( value );
+    return "Unknown network stack error";
 }
 #endif
