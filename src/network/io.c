@@ -283,155 +283,24 @@ int __net_Read( vlc_object_t *restrict p_this, int fd,
                 v_socket_t *restrict p_vs,
                 uint8_t *restrict p_data, int i_data, vlc_bool_t b_retry )
 {
-    struct timeval  timeout;
-    fd_set          fds_r, fds_e;
-    int             i_recv;
-    int             i_total = 0;
-    int             i_ret;
-    vlc_bool_t      b_die = p_this->b_die;
-
-    while( i_data > 0 )
-    {
-        do
-        {
-            if( p_this->b_die != b_die )
-            {
-                return 0;
-            }
-
-            /* Initialize file descriptor set */
-            FD_ZERO( &fds_r );
-            FD_SET( fd, &fds_r );
-            FD_ZERO( &fds_e );
-            FD_SET( fd, &fds_e );
-
-            /* We'll wait 0.5 second if nothing happens */
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 500000;
-
-        } while( (i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout)) == 0
-                 || ( i_ret < 0 && errno == EINTR ) );
-
-        if( i_ret < 0 )
-        {
-            msg_Err( p_this, "network select error (%s)",
-                     net_strerror(net_errno) );
-            return i_total > 0 ? i_total : -1;
-        }
-
-        if( ( i_recv = (p_vs != NULL)
-              ? p_vs->pf_recv( p_vs->p_sys, p_data, i_data )
-              : recv( fd, p_data, i_data, 0 ) ) < 0 )
-        {
-#if defined(WIN32) || defined(UNDER_CE)
-            if( WSAGetLastError() == WSAEWOULDBLOCK )
-            {
-                /* only happens with p_vs (SSL) - not really an error */
-            }
-            else
-            /* For udp only */
-            /* On win32 recv() will fail if the datagram doesn't fit inside
-             * the passed buffer, even though the buffer will be filled with
-             * the first part of the datagram. */
-            if( WSAGetLastError() == WSAEMSGSIZE )
-            {
-                msg_Err( p_this, "recv() failed. "
-                         "Increase the mtu size (--mtu option)" );
-                i_total += i_data;
-            }
-            else if( WSAGetLastError() == WSAEINTR ) continue;
-#else
-            /* EAGAIN only happens with p_vs (TLS) and it's not an error */
-            if( errno != EAGAIN )
-#endif
-                msg_Err( p_this, "recv failed: %s", net_strerror(net_errno) );
-            return i_total > 0 ? i_total : -1;
-        }
-        else if( i_recv == 0 )
-        {
-            /* Connection closed */
-            b_retry = VLC_FALSE;
-        }
-
-        p_data += i_recv;
-        i_data -= i_recv;
-        i_total+= i_recv;
-        if( !b_retry )
-        {
-            break;
-        }
-    }
-    return i_total;
+    return net_ReadInner (p_this, 1, &(int){ fd }, &(v_socket_t *){ p_vs },
+                          p_data, i_data, -1, b_retry);
 }
+
 
 /*****************************************************************************
  * __net_ReadNonBlock:
  *****************************************************************************
  * Read from a network socket, non blocking mode (with timeout)
  *****************************************************************************/
-int __net_ReadNonBlock( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
-                        uint8_t *p_data, int i_data, mtime_t i_wait)
+int __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
+                        v_socket_t *restrict p_vs,
+                        uint8_t *restrict p_data, int i_data, mtime_t i_wait)
 {
-    struct timeval  timeout;
-    fd_set          fds_r, fds_e;
-    int             i_recv;
-    int             i_ret;
-
-    /* Initialize file descriptor set */
-    FD_ZERO( &fds_r );
-    FD_SET( fd, &fds_r );
-    FD_ZERO( &fds_e );
-    FD_SET( fd, &fds_e );
-
-    timeout.tv_sec = 0;
-    timeout.tv_usec = i_wait;
-
-    i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout);
-
-    if( i_ret < 0 && errno == EINTR )
-    {
-        return 0;
-    }
-    else if( i_ret < 0 )
-    {
-        msg_Err( p_this, "network error: %s", net_strerror(net_errno) );
-        return -1;
-    }
-    else if( i_ret == 0)
-    {
-        return 0;
-    }
-    else
-    {
-#if !defined(UNDER_CE)
-        if( fd == 0/*STDIN_FILENO*/ ) i_recv = read( fd, p_data, i_data ); else
-#endif
-        if( ( i_recv = (p_vs != NULL)
-              ? p_vs->pf_recv( p_vs->p_sys, p_data, i_data )
-              : recv( fd, p_data, i_data, 0 ) ) < 0 )
-        {
-#if defined(WIN32) || defined(UNDER_CE)
-            /* For udp only */
-            /* On win32 recv() will fail if the datagram doesn't fit inside
-             * the passed buffer, even though the buffer will be filled with
-             * the first part of the datagram. */
-            if( WSAGetLastError() == WSAEMSGSIZE )
-            {
-                msg_Err( p_this, "recv() failed. "
-                         "Increase the mtu size (--mtu option)" );
-            }
-            else
-#endif
-            msg_Err( p_this, "recv failed: %s", net_strerror(net_errno) );
-            return -1;
-        }
-
-        return i_recv ? i_recv : -1;  /* !i_recv -> connection closed if tcp */
-    }
-
-    /* We will never be here */
-    return -1;
+    return net_ReadInner (p_this, 1, &(int){ fd }, &(v_socket_t *){ p_vs },
+                          p_data, i_data, i_wait / 1000, VLC_FALSE);
 }
+
 
 /*****************************************************************************
  * __net_Select:
@@ -439,81 +308,22 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
  * Read from several sockets (with timeout). Takes data from the first socket
  * that has some.
  *****************************************************************************/
-int __net_Select( vlc_object_t *p_this, int *pi_fd, v_socket_t **pp_vs,
-                  int i_fd, uint8_t *p_data, int i_data, mtime_t i_wait )
+int __net_Select( vlc_object_t *restrict p_this, int *restrict pi_fd,
+                  v_socket_t **restrict pp_vs,
+                  int i_fd, uint8_t *restrict p_data, int i_data,
+                  mtime_t i_wait )
 {
-    struct timeval  timeout;
-    fd_set          fds_r, fds_e;
-    int             i_recv;
-    int             i_ret;
-    int             i;
-    int             i_max_fd = 0;
-
-    /* Initialize file descriptor set */
-    FD_ZERO( &fds_r );
-    FD_ZERO( &fds_e );
-
-    for( i = 0 ; i < i_fd ; i++)
+    if (pp_vs == NULL)
     {
-        if( pi_fd[i] > i_max_fd ) i_max_fd = pi_fd[i];
-        FD_SET( pi_fd[i], &fds_r );
-        FD_SET( pi_fd[i], &fds_e );
+        const v_socket_t *vsv[i_fd];
+        memset (vsv, 0, sizeof (vsv));
+
+        return net_ReadInner (p_this, i_fd, pi_fd, vsv, p_data, i_data,
+                              i_wait / 1000, VLC_FALSE);
     }
 
-    timeout.tv_sec = 0;
-    timeout.tv_usec = i_wait;
-
-    i_ret = select( i_max_fd + 1, &fds_r, NULL, &fds_e, &timeout );
-
-    if( i_ret < 0 && errno == EINTR )
-    {
-        return 0;
-    }
-    else if( i_ret < 0 )
-    {
-        msg_Err( p_this, "network selection error: %s", net_strerror(net_errno) );
-        return -1;
-    }
-    else if( i_ret == 0 )
-    {
-        return 0;
-    }
-    else
-    {
-        for( i = 0 ; i < i_fd ; i++)
-        {
-            if( FD_ISSET( pi_fd[i], &fds_r ) )
-            {
-                i_recv = ((pp_vs != NULL) && (pp_vs[i] != NULL))
-                         ? pp_vs[i]->pf_recv( pp_vs[i]->p_sys, p_data, i_data )
-                         : recv( pi_fd[i], p_data, i_data, 0 );
-                if( i_recv < 0 )
-                {
-#ifdef WIN32
-                    /* For udp only */
-                    /* On win32 recv() will fail if the datagram doesn't
-                     * fit inside the passed buffer, even though the buffer
-                     *  will be filled with the first part of the datagram. */
-                    if( WSAGetLastError() == WSAEMSGSIZE )
-                    {
-                        msg_Err( p_this, "recv() failed. "
-                             "Increase the mtu size (--mtu option)" );
-                    }
-                    else msg_Err( p_this, "recv failed (%i)",
-                                  WSAGetLastError() );
-#else
-                    msg_Err( p_this, "recv failed (%s)", strerror(errno) );
-#endif
-                    return VLC_EGENERIC;
-                }
-
-                return i_recv;
-            }
-        }
-    }
-
-    /* We will never be here */
-    return -1;
+    return net_ReadInner (p_this, i_fd, pi_fd, pp_vs, p_data, i_data,
+                          i_wait / 1000, VLC_FALSE);
 }
 
 
