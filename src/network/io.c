@@ -79,14 +79,6 @@ int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
             msg_Err( p_this, "cannot set socket to non-blocking mode" );
     }
 #else
-    if( fd >= FD_SETSIZE )
-    {
-        /* We don't want to overflow select() fd_set */
-        msg_Err( p_this, "cannot create socket (too many already in use)" );
-        net_Close( fd );
-        return -1;
-    }
-
     fcntl( fd, F_SETFD, FD_CLOEXEC );
     i_val = fcntl( fd, F_GETFL, 0 );
     fcntl( fd, F_SETFL, ((i_val != -1) ? i_val : 0) | O_NONBLOCK );
