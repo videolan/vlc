@@ -79,7 +79,7 @@ static const wsaerrmsg_t wsaerrmsg[] =
     //WSAESTALE
     //WSAEREMOTE
     //WSAEDISCON
-    { WSASYSNOTREADY, "Network stack not ready" },
+    { WSASYSNOTREADY, "Network stack not ready" },
     { WSAVERNOTSUPPORTED, "Network stack version not supported" },
     { WSANOTINITIALISED, "Network not initialized" },
     { WSAHOST_NOT_FOUND, "Hostname not found" },
@@ -97,9 +97,9 @@ const char *net_strerror( int value )
      * Winsock errors. Some old versions had s_error, but it appears to be
      * gone, and is not documented.
      */
-    for( const wsaerrmsg_t *e = wsaerrmsg; e.msg != NULL; e++ )
-        if( e.code == value )
-            return e.msg;
+    for( const wsaerrmsg_t *e = wsaerrmsg; e->msg != NULL; e++ )
+        if( e->code == value )
+            return e->msg;
 
     return "Unknown network stack error";
 }
