@@ -25,6 +25,9 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
 
 #include <errno.h>
 
@@ -689,6 +692,13 @@ static void Close( vlc_object_t * p_this )
     {
         free( p_sys->psz_sdp );
         p_sys->psz_sdp = NULL;
+    }
+    if( p_sys->b_export_sdp_file )
+    {
+#ifdef HAVE_UNISTD_H
+        unlink( p_sys->psz_sdp_file );
+#endif
+        free( p_sys->psz_sdp_file );
     }
     free( p_sys );
 }
