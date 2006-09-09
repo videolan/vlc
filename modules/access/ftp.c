@@ -85,7 +85,7 @@ struct access_sys_t
 
     int        fd_cmd;
     int        fd_data;
-    
+
     char       sz_epsv_ip[NI_MAXNUMERICHOST];
 };
 
@@ -127,7 +127,7 @@ static int Connect( access_t *p_access, access_sys_t *p_sys )
     }
 
     msg_Dbg( p_access, "connection accepted (%d)", i_answer );
-    
+
     if( p_sys->url.psz_username && *p_sys->url.psz_username )
         psz = strdup( p_sys->url.psz_username );
     else
@@ -150,7 +150,7 @@ static int Connect( access_t *p_access, access_sys_t *p_sys )
             msg_Dbg( p_access, "password needed" );
             if( p_sys->url.psz_password && *p_sys->url.psz_password )
                 psz = strdup( p_sys->url.psz_password );
-	    else
+            else
                 psz = var_CreateGetString( p_access, "ftp-pwd" );
 
             if( ftp_SendCommand( p_access, "PASS %s", psz ) < 0 ||
