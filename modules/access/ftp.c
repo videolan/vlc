@@ -381,6 +381,7 @@ static int OutOpen( vlc_object_t *p_this )
 
     p_access->pf_seek = OutSeek;
     p_access->pf_write = Write;
+    p_access->p_sys = p_sys;
 
     return VLC_SUCCESS;
 
