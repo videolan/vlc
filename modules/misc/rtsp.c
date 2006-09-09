@@ -1245,9 +1245,9 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
         sizeof( "i=*\r\n" ) + strlen( p_media->psz_session_description ) +
         sizeof( "u=*\r\n" ) + strlen( p_media->psz_session_url ) +
         sizeof( "e=*\r\n" ) + strlen( p_media->psz_session_email ) +
+        sizeof( "c=IN IP4 0.0.0.0\r\n" ) + 20 + 10 +
         sizeof( "t=0 0\r\n" ) + /* FIXME */
         sizeof( "a=tool:"PACKAGE_STRING"\r\n" ) +
-        sizeof( "c=IN IP4 0.0.0.0\r\n" ) + 20 + 10 +
         sizeof( "a=range:npt=0-1000000000.000\r\n" );
 
     psz_control = (ipv == '6') ? p_media->psz_rtsp_control_v6
@@ -1284,9 +1284,8 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
         p += sprintf( p, "e=%s\r\n", p_media->psz_session_email );
 
     p += sprintf( p, "c=IN IP%c %s\r\n", ipv, ipv == '6' ? "::" : "0.0.0.0" );
-    p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
     p += sprintf( p, "t=0 0\r\n" ); /* FIXME */
-
+    p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
 
     if( p_media->i_length > 0 )
     {

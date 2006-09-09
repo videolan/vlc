@@ -525,14 +525,10 @@ static int Open( vlc_object_t *p_this )
 
         /* create the SDP for a muxed stream (only once) */
         /* FIXME  http://www.faqs.org/rfcs/rfc4566.html
-           All text fields should be UTF-8 encoded. Use global a:charset to announce this.
            o= - should be local username (no spaces allowed)
            o= time should be hashed with some other value to garantee uniqueness
            o= don't use the localhost address. use fully qualified domain name or IP4 address
-           p= international phone number (pass via vars?)
-           a= recvonly (missing)
-           a= type:broadcast (missing)
-           a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
+	   a= source-filter: we need our source address
            a= x-plgroup: (missing)
            RTP packets need to get the correct src IP address  */
         if( net_AddressIsMulticast( (vlc_object_t *)p_stream, p_sys->psz_destination ) )
@@ -554,8 +550,10 @@ static int Open( vlc_object_t *p_this )
                   "u=%s\r\n"
                   "e=%s\r\n"
                   "c=IN IP%c %s%s\r\n"
-                  "a=tool:"PACKAGE_STRING"\r\n"
                   "t=0 0\r\n" /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
+                  "a=tool:"PACKAGE_STRING"\r\n"
+                  "a=recvonly\r\n"
+                  "a=type:broadcast\r\n"
                   "m=video %d RTP/AVP %d\r\n"
                   "a=rtpmap:%d %s\r\n",
                   p_sys->i_sdp_id, p_sys->i_sdp_version,
