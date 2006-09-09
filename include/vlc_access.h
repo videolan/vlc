@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_access.h: Access descriptor, queries and methods
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -74,7 +74,7 @@ struct access_t
     access_t    *p_source;
 
     /* Access can fill this entry to force a demuxer
-     * XXX: fill it once you know for sure you will succed
+     * XXX: fill it once you know for sure you will succeed
      * (if you fail, this value won't be reseted */
     char        *psz_demux;
 
