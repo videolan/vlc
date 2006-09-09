@@ -612,7 +612,6 @@ static int ftp_ReadCommand( vlc_object_t *p_access, access_sys_t *p_sys,
     int          i_answer;
 
     psz_line = net_Gets( p_access, p_sys->fd_cmd, NULL );
-    msg_Dbg( p_access, "answer=%s", psz_line );
     if( psz_line == NULL || strlen( psz_line ) < 3 )
     {
         msg_Err( p_access, "cannot get answer" );
@@ -621,6 +620,7 @@ static int ftp_ReadCommand( vlc_object_t *p_access, access_sys_t *p_sys,
         if( ppsz_answer ) *ppsz_answer  = NULL;
         return -1;
     }
+    msg_Dbg( p_access, "answer=%s", psz_line );
 
     if( psz_line[3] == '-' )    /* Multiple response */
     {
@@ -684,7 +684,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
         return VLC_EGENERIC;
     }
 
-    if( psz_ip != NULL )
+    if( *psz_ip )
     {
         char psz_fmt[7] = "(|||%u";
         psz_fmt[1] = psz_fmt[2] = psz_fmt[3] = psz_parser[1];
@@ -698,7 +698,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     }
     else
     {
-        unsigned  a1, a2, a3, a4, p1, p2;
+        unsigned a1, a2, a3, a4, p1, p2;
 
         if( ( sscanf( psz_parser, "(%u,%u,%u,%u,%u,%u", &a1, &a2, &a3, &a4,
                       &p1, &p2 ) < 6 ) || ( a1 > 255 ) || ( a2 > 255 )
@@ -754,6 +754,12 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
         msg_Err( p_access, "cannot retreive file" );
         return VLC_EGENERIC;
     }
+
+    if( p_access->i_object_type == VLC_OBJECT_ACCESS )
+        net_StopSend( p_sys->fd_data );
+    else
+        net_StopRecv( p_sys->fd_data );
+
     return VLC_SUCCESS;
 }
 
