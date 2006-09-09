@@ -810,6 +810,8 @@ static struct
       VIDEO_ES, "On2's VP6.2 Video" },
     { VLC_FOURCC('v','p','6','2'), CODEC_ID_VP6,
       VIDEO_ES, "On2's VP6.2 Video" },
+    { VLC_FOURCC('V','P','6','F'), CODEC_ID_VP6F,
+      VIDEO_ES, "On2's VP6.2 Video (Flash)" },
 #endif
 
 #if LIBAVCODEC_BUILD >= 4685
