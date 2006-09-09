@@ -64,7 +64,7 @@ vlc_module_begin();
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,
                 VLC_FALSE );
-    add_string( "ftp-pwd", "anonymous@dummy.org", NULL, PASS_TEXT,
+    add_string( "ftp-pwd", "anonymous@example.com", NULL, PASS_TEXT,
                 PASS_LONGTEXT, VLC_FALSE );
     add_string( "ftp-account", "anonymous", NULL, ACCOUNT_TEXT,
                 ACCOUNT_LONGTEXT, VLC_FALSE );
