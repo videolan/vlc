@@ -117,9 +117,7 @@ int Demux( demux_t *p_demux )
         xml_ReaderDelete( p_xml, p_xml_reader );
     if( p_xml )
         xml_Delete( p_xml );
-
-    return i_ret;
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /** \brief dummy function for demux callback interface */
@@ -176,7 +174,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
         }
         /* attribute: version */
         if( !strcmp( psz_name, "version" ) )
-       {
+        {
             b_version_found = VLC_TRUE;
             if( strcmp( psz_value, "0" ) && strcmp( psz_value, "1" ) )
                 msg_Warn( p_demux, "unsupported XSPF version" );

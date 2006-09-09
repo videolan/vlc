@@ -1,10 +1,11 @@
 /*****************************************************************************
  * playtree.hpp
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN
+ * Copyright (C) 2005 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
+ *          Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
