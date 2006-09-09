@@ -618,16 +618,19 @@ static char *SDPGenerate( sap_handler_t *p_sap,
                             "o=- "I64Fd" %d IN IP%c %s\r\n"
                             "s=%s\r\n"
                             "c=IN IP%c %s/%d\r\n"
-                            "a=tool:"PACKAGE_STRING"\r\n"
                             "t=0 0\r\n"
+                            "a=tool:"PACKAGE_STRING"\r\n"
+                            "a=recvonly\r\n"
+                            "a=type:broadcast\n"
+                            "a=source-filter: incl IN IP%c * %s\r\n"
                             "m=video %d %s %d\r\n"
-                            "a=type:broadcast\r\n"
                             "%s%s%s",
                             i_sdp_id, i_sdp_version,
                             ipv, p_addr->psz_machine,
                             psz_name, ipv, psz_uri,
                             /* FIXME: 1 is IPv4 default TTL, not that of IPv6 */
                             p_session->i_ttl ?: (config_GetInt( p_sap, "ttl" ) ?: 1),
+                            ipv, psz_uri,
                             p_session->i_port, 
                             p_session->b_rtp ? "RTP/AVP" : "udp",
                             p_session->i_payload,
