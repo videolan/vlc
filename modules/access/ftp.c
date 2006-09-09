@@ -37,6 +37,10 @@
 #include "vlc_url.h"
 #include "stream_output.h"
 
+#ifndef IPPORT_FTP
+# define IPPORT_FTP 21u
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
