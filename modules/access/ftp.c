@@ -251,7 +251,7 @@ static int Connect( vlc_object_t *p_access, access_sys_t *p_sys )
         msg_Info( p_access, "FTP Extended passive mode disabled" );
         net_Close( p_sys->fd_cmd );
 
-        if( ( p_sys->fd_cmd = Login( p_access, p_sys ) ) < 0 )
+        if( Login( p_access, p_sys ) )
         {
             net_Close( p_sys->fd_cmd );
             return -1;
@@ -381,7 +381,7 @@ static int OutOpen( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 exit_error:
-        vlc_UrlClean( &p_sys->url );
+    vlc_UrlClean( &p_sys->url );
     free( p_sys );
     return VLC_EGENERIC;
 }
