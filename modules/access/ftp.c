@@ -2,6 +2,7 @@
  * ftp.c: FTP input module
  *****************************************************************************
  * Copyright (C) 2001-2006 the VideoLAN team
+ * Copyright © 2006 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr> - original code
@@ -100,24 +101,18 @@ static int Connect( access_t *p_access, access_sys_t *p_sys )
     char *psz;
 
     /* *** Open a TCP connection with server *** */
-    msg_Dbg( p_access, "waiting for connection..." );
     p_sys->fd_cmd = fd = net_ConnectTCP( p_access, p_sys->url.psz_host,
                                       p_sys->url.i_port );
-    if( fd < 0 )
+    if( fd == -1 )
     {
-        msg_Err( p_access, "failed to connect with server" );
+        msg_Err( p_access, "connection failed" );
         intf_UserFatal( p_access, VLC_FALSE, _("Network interaction failed"), 
                         _("VLC could not connect with the given server.") );
         return -1;
     }
 
-    for( ;; )
-    {
-        if( ftp_ReadCommand( p_access, &i_answer, NULL ) != 1 )
-        {
-            break;
-        }
-    }
+    while( ftp_ReadCommand( p_access, &i_answer, NULL ) == 1 );
+
     if( i_answer / 100 != 2 )
     {
         msg_Err( p_access, "connection rejected" );
@@ -313,7 +308,7 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 exit_error:
-    if( p_sys->fd_cmd >= 0 )
+    if( p_sys->fd_cmd != -1 )
         net_Close( p_sys->fd_cmd );
     vlc_UrlClean( &p_sys->url );
     free( p_sys );
