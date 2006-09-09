@@ -42,7 +42,7 @@
 #   include <unistd.h>
 #endif
 #ifdef HAVE_POLL
-#   include <sys/poll.h>
+#   include <poll.h>
 #endif
 
 #include "network.h"
@@ -140,7 +140,7 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                uint8_t *restrict buf, size_t buflen,
                int wait_ms, vlc_bool_t waitall )
 {
-    int total = 0, n;
+    int total = 0;
 
     do
     {
@@ -164,7 +164,7 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         if (p_this->b_die)
             return total;
 
-        n = poll (ufd, fdc, (wait_ms == -1) ? -1 : delay_ms);
+        int n = poll (ufd, fdc, (wait_ms == -1) ? -1 : delay_ms);
         if (n == -1)
             goto error;
 
@@ -199,9 +199,9 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                 maxfd = fdv[i];
         }
 
-        n = select (maxfd + 1, &set, NULL, NULL,
-                    (wait_ms == -1) ? NULL
-                        : &(struct timeval){ 0, delay_ms * 1000 });
+        int n = select (maxfd + 1, &set, NULL, NULL,
+                        (wait_ms == -1) ? NULL
+                            : &(struct timeval){ 0, delay_ms * 1000 });
         if (n == -1)
             goto error;
 
@@ -242,7 +242,7 @@ receive:
                 /* On Win32, recv() fails if the datagram doesn't fit inside
                  * the passed buffer, even though the buffer will be filled
                  * with the first part of the datagram. */
-                    msg_Err( p_this, "recv() failed. "
+                    msg_Err( p_this, "Receive error: "
                                      "Increase the mtu size (--mtu option)" );
                     total += buflen;
                     return total;
@@ -271,8 +271,8 @@ receive:
     return total; // timeout
 
 error:
-    msg_Err (p_this, "Receive error: %s", net_strerror (net_errno));
-    return (total > 0) ? total : -1;
+    msg_Err (p_this, "Read error: %s", net_strerror (net_errno));
+    return total ?: -1;
 }
 
 
@@ -337,56 +337,70 @@ int __net_Select( vlc_object_t *restrict p_this, const int *restrict pi_fd,
 int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                  const uint8_t *p_data, int i_data )
 {
-    struct timeval  timeout;
-    fd_set          fds_w, fds_e;
-    int             i_send;
-    int             i_total = 0;
-    int             i_ret;
+    int i_total = 0;
 
-    vlc_bool_t      b_die = p_this->b_die;
-
-    while( i_data > 0 )
+    while (i_data > 0)
     {
-        do
+        if (p_this->b_die)
+            return i_total;
+
+#ifdef HAVE_POLL
+        struct pollfd ufd[1];
+        memset (ufd, 0, sizeof (ufd));
+        ufd[0].fd = fd;
+        ufd[0].events = POLLOUT;
+
+        int val = poll (ufd, 1, 500);
+#else
+        fd_set set;
+        FD_ZERO (&set);
+
+#if !defined(WIN32) && !defined(UNDER_CE)
+        if (fd >= FD_SETSIZE)
         {
-            if( p_this->b_die != b_die )
-            {
-                return 0;
-            }
+            /* We don't want to overflow select() fd_set */
+            msg_Err (p_this, "select set overflow");
+            return -1;
+        }
+#endif
+        FD_SET (fd, &set);
 
-            /* Initialize file descriptor set */
-            FD_ZERO( &fds_w );
-            FD_SET( fd, &fds_w );
-            FD_ZERO( &fds_e );
-            FD_SET( fd, &fds_e );
-
-            /* We'll wait 0.5 second if nothing happens */
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 500000;
-
-        } while( (i_ret = select(fd + 1, NULL, &fds_w, &fds_e, &timeout)) == 0
-                 || ( i_ret < 0 && errno == EINTR ) );
-
-        if( i_ret < 0 )
+        int val = select (fd + 1, NULL, &set, NULL,
+                          &(struct timeval){ 0, 500000 });
+#endif
+        switch (val)
         {
-            msg_Err( p_this, "network error: %s", net_strerror(net_errno) );
-            return i_total > 0 ? i_total : -1;
+            case -1:
+                if (errno != EINTR)
+                {
+                    msg_Err (p_this, "Write error: %s",
+                             net_strerror (net_errno));
+                    return i_total ?: -1;
+                }
+
+            case 0:
+                continue;
         }
 
-        if( ( i_send = (p_vs != NULL)
-                       ? p_vs->pf_send( p_vs->p_sys, p_data, i_data )
-                       : send( fd, p_data, i_data, 0 ) ) < 0 )
-        {
-            /* XXX With udp for example, it will issue a message if the host
-             * isn't listening */
-            /* msg_Err( p_this, "send failed (%s)", strerror(errno) ); */
-            return i_total > 0 ? i_total : -1;
-        }
+        if (p_vs != NULL)
+            val = p_vs->pf_send (p_vs->p_sys, p_data, i_data);
+        else
+#if defined(WIN32) || defined(UNDER_CE)
+            val = recv (fd, p_data, i_data, 0);
+#else
+            val = write (fd, p_data, i_data);
+#endif
 
-        p_data += i_send;
-        i_data -= i_send;
-        i_total+= i_send;
+        if (val == -1)
+            return i_total ?: -1;
+        if (val == 0)
+            return i_total;
+
+        p_data += val;
+        i_data -= val;
+        i_total += val;
     }
+
     return i_total;
 }
 
