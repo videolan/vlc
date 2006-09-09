@@ -222,7 +222,11 @@ receive:
         if ((*vsv) != NULL)
             n = (*vsv)->pf_recv ((*vsv)->p_sys, buf, buflen);
         else
+#if defined(WIN32) || defined(UNDER_CE)
             n = recv (*fdv, buf, buflen, 0);
+#else
+            n = read (*fdv, buf, buflen);
+#endif
 
         if (n == -1)
         {
