@@ -33,6 +33,7 @@
             CLASS = VLCControls; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                "o_fs_panel" = id; 
                 "o_main" = id; 
                 "o_specificTime_cancel_btn" = id; 
                 "o_specificTime_enter_fld" = id; 
@@ -98,6 +99,14 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
+        {CLASS = VLCFSPanel; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
+        {
+            ACTIONS = {faster = id; next = id; play = id; prev = id; slower = id; }; 
+            CLASS = VLCFSPanelView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = VLCFSTimeSlider; LANGUAGE = ObjC; SUPERCLASS = NSSlider; }, 
         {
             ACTIONS = {
                 createOutlineGroup = id; 

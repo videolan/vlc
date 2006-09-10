@@ -40,7 +40,9 @@
 #include <vlc_keys.h>
 
 #include "intf.h"
+#include "fspanel.h"
 #include "vout.h"
+#import "controls.h"
 
 /*****************************************************************************
  * DeviceCallback: Callback triggered when the video-device variable is changed
@@ -377,6 +379,10 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     var_Get( p_real_vout, "fullscreen", &val );
     val.b_bool = !val.b_bool;
     var_Set( p_real_vout, "fullscreen", val );
+    if( [self isFullscreen] )
+        [[[[VLCMain sharedInstance] getControls] getFSPanel] orderFront: self];
+    else
+        [[[[VLCMain sharedInstance] getControls] getFSPanel] orderOut: self];
 }
 
 - (BOOL)isFullscreen
@@ -609,6 +615,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
             val.b_bool = VLC_TRUE;
             var_Set( p_vout, "mouse-moved", val );
         }
+        if( [self isFullscreen] )
+            [[[[VLCMain sharedInstance] getControls] getFSPanel] fadeIn];
     }
 
     [super mouseMoved: o_event];
@@ -943,7 +951,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
               styleMask: NSBorderlessWindowMask
               backing: NSBackingStoreBuffered
               defer: YES screen: o_screen];
-
+        
         if( var_GetBool( p_real_vout, "macosx-black" ) )
         if( b_black == VLC_TRUE )
         {

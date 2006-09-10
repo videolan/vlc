@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include "intf.h"
+#include "fspanel.h"
 #include "vout.h"
 #include "open.h"
 #include "controls.h"
@@ -42,6 +43,13 @@
  * VLCControls implementation 
  *****************************************************************************/
 @implementation VLCControls
+
+- (id)init
+{
+    [super init];
+    o_fs_panel = [[VLCFSPanel alloc] init];
+    return self;
+}
 
 - (void)awakeFromNib
 {
@@ -667,6 +675,17 @@
             [o_specificTime_win makeKeyWindow];
             vlc_object_release( p_input );
         }
+    }
+}
+
+- (id)getFSPanel
+{
+    if( o_fs_panel )
+        return o_fs_panel;
+    else
+    {
+        msg_Err( VLCIntf, "FSPanel is nil" );
+        return NULL;
     }
 }
 

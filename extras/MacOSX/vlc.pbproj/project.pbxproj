@@ -10,6 +10,34 @@
 		1058C7AFFEA557BF11CA2CBB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 		2A16E08006C5074F00C87B09 /* equalizerdrawer_active.png in Resources */ = {isa = PBXBuildFile; fileRef = 2A16E07E06C5074F00C87B09 /* equalizerdrawer_active.png */; };
 		2A16E08106C5074F00C87B09 /* equalizerdrawer_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = 2A16E07F06C5074F00C87B09 /* equalizerdrawer_blue.png */; };
+		2AEF85F709A6623A00130822 /* FSBase.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85D309A6623A00130822 /* FSBase.tif */; };
+		2AEF85F809A6623A00130822 /* FSExitOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85D409A6623A00130822 /* FSExitOff.tif */; };
+		2AEF85F909A6623A00130822 /* FSExitOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85D509A6623A00130822 /* FSExitOn.tif */; };
+		2AEF85FA09A6623A00130822 /* FSFastForwardOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85D609A6623A00130822 /* FSFastForwardOff.tif */; };
+		2AEF85FB09A6623A00130822 /* FSFastForwardOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85D709A6623A00130822 /* FSFastForwardOn.tif */; };
+		2AEF85FC09A6623A00130822 /* FSGotoBeginningOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85D809A6623A00130822 /* FSGotoBeginningOff.tif */; };
+		2AEF85FD09A6623A00130822 /* FSGotoBeginningOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85D909A6623A00130822 /* FSGotoBeginningOn.tif */; };
+		2AEF85FE09A6623A00130822 /* FSGotoEndOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85DA09A6623A00130822 /* FSGotoEndOff.tif */; };
+		2AEF85FF09A6623A00130822 /* FSGotoEndOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85DB09A6623A00130822 /* FSGotoEndOn.tif */; };
+		2AEF860009A6623A00130822 /* FSLCDChapterPopUp.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85DC09A6623A00130822 /* FSLCDChapterPopUp.tif */; };
+		2AEF860109A6623A00130822 /* FSLCDSliderCenter.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85DD09A6623A00130822 /* FSLCDSliderCenter.tif */; };
+		2AEF860209A6623A00130822 /* FSLCDSliderLeft.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85DE09A6623A00130822 /* FSLCDSliderLeft.tif */; };
+		2AEF860309A6623A00130822 /* FSLCDSliderPlayHead.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85DF09A6623A00130822 /* FSLCDSliderPlayHead.tif */; };
+		2AEF860409A6623A00130822 /* FSLCDSliderProgressiveDownloadCenter.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85E009A6623A00130822 /* FSLCDSliderProgressiveDownloadCenter.tif */; };
+		2AEF860509A6623A00130822 /* FSLCDSliderProgressiveDownloadLeft.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85E109A6623A00130822 /* FSLCDSliderProgressiveDownloadLeft.tif */; };
+		2AEF860609A6623A00130822 /* FSLCDSliderProgressiveDownloadRight.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85E209A6623A00130822 /* FSLCDSliderProgressiveDownloadRight.tif */; };
+		2AEF860709A6623A00130822 /* FSLCDSliderRight.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85E309A6623A00130822 /* FSLCDSliderRight.tif */; };
+		2AEF860809A6623A00130822 /* FSLCDTimeBackground.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85E409A6623A00130822 /* FSLCDTimeBackground.tif */; };
+		2AEF860909A6623A00130822 /* FSPauseOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85E509A6623A00130822 /* FSPauseOff.tif */; };
+		2AEF860A09A6623A00130822 /* FSPauseOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85E609A6623A00130822 /* FSPauseOn.tif */; };
+		2AEF860B09A6623A00130822 /* FSPlayOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85E709A6623A00130822 /* FSPlayOff.tif */; };
+		2AEF860C09A6623A00130822 /* FSPlayOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85E809A6623A00130822 /* FSPlayOn.tif */; };
+		2AEF860D09A6623A00130822 /* FSRewindOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85E909A6623A00130822 /* FSRewindOff.tif */; };
+		2AEF860E09A6623A00130822 /* FSRewindOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85EA09A6623A00130822 /* FSRewindOn.tif */; };
+		2AEF860F09A6623A00130822 /* FSVolumeBackground.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85EB09A6623A00130822 /* FSVolumeBackground.tif */; };
+		2AEF861009A6623A00130822 /* FSVolumeThumbOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85EC09A6623A00130822 /* FSVolumeThumbOff.tif */; };
+		2AEF861109A6623A00130822 /* FSVolumeThumbOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF85ED09A6623A00130822 /* FSVolumeThumbOn.tif */; };
+		2AEF861F09A6665700130822 /* qt.png in Resources */ = {isa = PBXBuildFile; fileRef = 2AEF861E09A6665700130822 /* qt.png */; };
 		8E445F9D04728A700059A3A7 /* a52.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8E445F8704728A700059A3A7 /* a52.icns */; };
 		8E445F9E04728A700059A3A7 /* aac.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8E445F8804728A700059A3A7 /* aac.icns */; };
 		8E445F9F04728A700059A3A7 /* asf.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8E445F8904728A700059A3A7 /* asf.icns */; };
@@ -816,6 +844,36 @@
 		2A16E04006C4F08700C87B09 /* equalizer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = equalizer.m; path = ../../modules/gui/macosx/equalizer.m; sourceTree = SOURCE_ROOT; };
 		2A16E07E06C5074F00C87B09 /* equalizerdrawer_active.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = equalizerdrawer_active.png; path = Resources/equalizerdrawer_active.png; sourceTree = "<group>"; };
 		2A16E07F06C5074F00C87B09 /* equalizerdrawer_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = equalizerdrawer_blue.png; path = Resources/equalizerdrawer_blue.png; sourceTree = "<group>"; };
+		2AEF857609A5FEC900130822 /* fspanel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fspanel.h; path = ../../modules/gui/macosx/fspanel.h; sourceTree = SOURCE_ROOT; };
+		2AEF857709A5FEC900130822 /* fspanel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = fspanel.m; path = ../../modules/gui/macosx/fspanel.m; sourceTree = SOURCE_ROOT; };
+		2AEF85D309A6623A00130822 /* FSBase.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSBase.tif; path = Resources/FSBase.tif; sourceTree = "<group>"; };
+		2AEF85D409A6623A00130822 /* FSExitOff.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSExitOff.tif; path = Resources/FSExitOff.tif; sourceTree = "<group>"; };
+		2AEF85D509A6623A00130822 /* FSExitOn.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSExitOn.tif; path = Resources/FSExitOn.tif; sourceTree = "<group>"; };
+		2AEF85D609A6623A00130822 /* FSFastForwardOff.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSFastForwardOff.tif; path = Resources/FSFastForwardOff.tif; sourceTree = "<group>"; };
+		2AEF85D709A6623A00130822 /* FSFastForwardOn.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSFastForwardOn.tif; path = Resources/FSFastForwardOn.tif; sourceTree = "<group>"; };
+		2AEF85D809A6623A00130822 /* FSGotoBeginningOff.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSGotoBeginningOff.tif; path = Resources/FSGotoBeginningOff.tif; sourceTree = "<group>"; };
+		2AEF85D909A6623A00130822 /* FSGotoBeginningOn.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSGotoBeginningOn.tif; path = Resources/FSGotoBeginningOn.tif; sourceTree = "<group>"; };
+		2AEF85DA09A6623A00130822 /* FSGotoEndOff.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSGotoEndOff.tif; path = Resources/FSGotoEndOff.tif; sourceTree = "<group>"; };
+		2AEF85DB09A6623A00130822 /* FSGotoEndOn.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSGotoEndOn.tif; path = Resources/FSGotoEndOn.tif; sourceTree = "<group>"; };
+		2AEF85DC09A6623A00130822 /* FSLCDChapterPopUp.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSLCDChapterPopUp.tif; path = Resources/FSLCDChapterPopUp.tif; sourceTree = "<group>"; };
+		2AEF85DD09A6623A00130822 /* FSLCDSliderCenter.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSLCDSliderCenter.tif; path = Resources/FSLCDSliderCenter.tif; sourceTree = "<group>"; };
+		2AEF85DE09A6623A00130822 /* FSLCDSliderLeft.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSLCDSliderLeft.tif; path = Resources/FSLCDSliderLeft.tif; sourceTree = "<group>"; };
+		2AEF85DF09A6623A00130822 /* FSLCDSliderPlayHead.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSLCDSliderPlayHead.tif; path = Resources/FSLCDSliderPlayHead.tif; sourceTree = "<group>"; };
+		2AEF85E009A6623A00130822 /* FSLCDSliderProgressiveDownloadCenter.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSLCDSliderProgressiveDownloadCenter.tif; path = Resources/FSLCDSliderProgressiveDownloadCenter.tif; sourceTree = "<group>"; };
+		2AEF85E109A6623A00130822 /* FSLCDSliderProgressiveDownloadLeft.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSLCDSliderProgressiveDownloadLeft.tif; path = Resources/FSLCDSliderProgressiveDownloadLeft.tif; sourceTree = "<group>"; };
+		2AEF85E209A6623A00130822 /* FSLCDSliderProgressiveDownloadRight.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSLCDSliderProgressiveDownloadRight.tif; path = Resources/FSLCDSliderProgressiveDownloadRight.tif; sourceTree = "<group>"; };
+		2AEF85E309A6623A00130822 /* FSLCDSliderRight.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSLCDSliderRight.tif; path = Resources/FSLCDSliderRight.tif; sourceTree = "<group>"; };
+		2AEF85E409A6623A00130822 /* FSLCDTimeBackground.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSLCDTimeBackground.tif; path = Resources/FSLCDTimeBackground.tif; sourceTree = "<group>"; };
+		2AEF85E509A6623A00130822 /* FSPauseOff.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSPauseOff.tif; path = Resources/FSPauseOff.tif; sourceTree = "<group>"; };
+		2AEF85E609A6623A00130822 /* FSPauseOn.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSPauseOn.tif; path = Resources/FSPauseOn.tif; sourceTree = "<group>"; };
+		2AEF85E709A6623A00130822 /* FSPlayOff.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSPlayOff.tif; path = Resources/FSPlayOff.tif; sourceTree = "<group>"; };
+		2AEF85E809A6623A00130822 /* FSPlayOn.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSPlayOn.tif; path = Resources/FSPlayOn.tif; sourceTree = "<group>"; };
+		2AEF85E909A6623A00130822 /* FSRewindOff.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSRewindOff.tif; path = Resources/FSRewindOff.tif; sourceTree = "<group>"; };
+		2AEF85EA09A6623A00130822 /* FSRewindOn.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSRewindOn.tif; path = Resources/FSRewindOn.tif; sourceTree = "<group>"; };
+		2AEF85EB09A6623A00130822 /* FSVolumeBackground.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSVolumeBackground.tif; path = Resources/FSVolumeBackground.tif; sourceTree = "<group>"; };
+		2AEF85EC09A6623A00130822 /* FSVolumeThumbOff.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSVolumeThumbOff.tif; path = Resources/FSVolumeThumbOff.tif; sourceTree = "<group>"; };
+		2AEF85ED09A6623A00130822 /* FSVolumeThumbOn.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = FSVolumeThumbOn.tif; path = Resources/FSVolumeThumbOn.tif; sourceTree = "<group>"; };
+		2AEF861E09A6665700130822 /* qt.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = qt.png; path = Resources/qt.png; sourceTree = "<group>"; };
 		8E445F8704728A700059A3A7 /* a52.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = a52.icns; path = Resources/a52.icns; sourceTree = SOURCE_ROOT; };
 		8E445F8804728A700059A3A7 /* aac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = aac.icns; path = Resources/aac.icns; sourceTree = SOURCE_ROOT; };
 		8E445F8904728A700059A3A7 /* asf.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = asf.icns; path = Resources/asf.icns; sourceTree = SOURCE_ROOT; };
@@ -914,6 +972,8 @@
 		CC26BF3109A7A08C00E94D62 /* update.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = update.h; path = ../../modules/gui/macosx/update.h; sourceTree = SOURCE_ROOT; };
 		CC26BF3209A7A08C00E94D62 /* update.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = update.m; path = ../../modules/gui/macosx/update.m; sourceTree = SOURCE_ROOT; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
+		CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppleRemote.h; path = ../../modules/gui/macosx/AppleRemote.h; sourceTree = SOURCE_ROOT; };
+		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
 		CCF3C64B0923B99D00401862 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/SFilters.nib; sourceTree = "<group>"; };
 		CCF3C6500923B9D100401862 /* sfilters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sfilters.h; path = ../../modules/gui/macosx/sfilters.h; sourceTree = SOURCE_ROOT; };
 		CCF3C6510923B9D100401862 /* sfilters.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = sfilters.m; path = ../../modules/gui/macosx/sfilters.m; sourceTree = SOURCE_ROOT; };
@@ -977,6 +1037,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				2AEF85D009A661A500130822 /* FSPanel */,
 				DCF358BC077F1236007DB450 /* nibs */,
 				DCDA5E6408F94518009D93A8 /* about_bg.png */,
 				8E445F86047289E50059A3A7 /* fileicons */,
@@ -1037,6 +1098,10 @@
 				CCF3C6510923B9D100401862 /* sfilters.m */,
 				CC26BF3109A7A08C00E94D62 /* update.h */,
 				CC26BF3209A7A08C00E94D62 /* update.m */,
+				CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */,
+				CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */,
+				2AEF857609A5FEC900130822 /* fspanel.h */,
+				2AEF857709A5FEC900130822 /* fspanel.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -1065,6 +1130,41 @@
 				014CEA410018CDE011CA2923 /* VLC.bundle */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2AEF85D009A661A500130822 /* FSPanel */ = {
+			isa = PBXGroup;
+			children = (
+				2AEF861E09A6665700130822 /* qt.png */,
+				2AEF85D309A6623A00130822 /* FSBase.tif */,
+				2AEF85D409A6623A00130822 /* FSExitOff.tif */,
+				2AEF85D509A6623A00130822 /* FSExitOn.tif */,
+				2AEF85D609A6623A00130822 /* FSFastForwardOff.tif */,
+				2AEF85D709A6623A00130822 /* FSFastForwardOn.tif */,
+				2AEF85D809A6623A00130822 /* FSGotoBeginningOff.tif */,
+				2AEF85D909A6623A00130822 /* FSGotoBeginningOn.tif */,
+				2AEF85DA09A6623A00130822 /* FSGotoEndOff.tif */,
+				2AEF85DB09A6623A00130822 /* FSGotoEndOn.tif */,
+				2AEF85DC09A6623A00130822 /* FSLCDChapterPopUp.tif */,
+				2AEF85DD09A6623A00130822 /* FSLCDSliderCenter.tif */,
+				2AEF85DE09A6623A00130822 /* FSLCDSliderLeft.tif */,
+				2AEF85DF09A6623A00130822 /* FSLCDSliderPlayHead.tif */,
+				2AEF85E009A6623A00130822 /* FSLCDSliderProgressiveDownloadCenter.tif */,
+				2AEF85E109A6623A00130822 /* FSLCDSliderProgressiveDownloadLeft.tif */,
+				2AEF85E209A6623A00130822 /* FSLCDSliderProgressiveDownloadRight.tif */,
+				2AEF85E309A6623A00130822 /* FSLCDSliderRight.tif */,
+				2AEF85E409A6623A00130822 /* FSLCDTimeBackground.tif */,
+				2AEF85E509A6623A00130822 /* FSPauseOff.tif */,
+				2AEF85E609A6623A00130822 /* FSPauseOn.tif */,
+				2AEF85E709A6623A00130822 /* FSPlayOff.tif */,
+				2AEF85E809A6623A00130822 /* FSPlayOn.tif */,
+				2AEF85E909A6623A00130822 /* FSRewindOff.tif */,
+				2AEF85EA09A6623A00130822 /* FSRewindOn.tif */,
+				2AEF85EB09A6623A00130822 /* FSVolumeBackground.tif */,
+				2AEF85EC09A6623A00130822 /* FSVolumeThumbOff.tif */,
+				2AEF85ED09A6623A00130822 /* FSVolumeThumbOn.tif */,
+			);
+			name = FSPanel;
 			sourceTree = "<group>";
 		};
 		8E445F86047289E50059A3A7 /* fileicons */ = {
@@ -1266,6 +1366,34 @@
 				C2F2A707095AE51700018C74 /* play_embedded_blue.png in Resources */,
 				C2F2A708095AE51700018C74 /* skip_forward_embedded_blue.png in Resources */,
 				C2F2A709095AE51700018C74 /* skip_previous_embedded_blue.png in Resources */,
+				2AEF85F709A6623A00130822 /* FSBase.tif in Resources */,
+				2AEF85F809A6623A00130822 /* FSExitOff.tif in Resources */,
+				2AEF85F909A6623A00130822 /* FSExitOn.tif in Resources */,
+				2AEF85FA09A6623A00130822 /* FSFastForwardOff.tif in Resources */,
+				2AEF85FB09A6623A00130822 /* FSFastForwardOn.tif in Resources */,
+				2AEF85FC09A6623A00130822 /* FSGotoBeginningOff.tif in Resources */,
+				2AEF85FD09A6623A00130822 /* FSGotoBeginningOn.tif in Resources */,
+				2AEF85FE09A6623A00130822 /* FSGotoEndOff.tif in Resources */,
+				2AEF85FF09A6623A00130822 /* FSGotoEndOn.tif in Resources */,
+				2AEF860009A6623A00130822 /* FSLCDChapterPopUp.tif in Resources */,
+				2AEF860109A6623A00130822 /* FSLCDSliderCenter.tif in Resources */,
+				2AEF860209A6623A00130822 /* FSLCDSliderLeft.tif in Resources */,
+				2AEF860309A6623A00130822 /* FSLCDSliderPlayHead.tif in Resources */,
+				2AEF860409A6623A00130822 /* FSLCDSliderProgressiveDownloadCenter.tif in Resources */,
+				2AEF860509A6623A00130822 /* FSLCDSliderProgressiveDownloadLeft.tif in Resources */,
+				2AEF860609A6623A00130822 /* FSLCDSliderProgressiveDownloadRight.tif in Resources */,
+				2AEF860709A6623A00130822 /* FSLCDSliderRight.tif in Resources */,
+				2AEF860809A6623A00130822 /* FSLCDTimeBackground.tif in Resources */,
+				2AEF860909A6623A00130822 /* FSPauseOff.tif in Resources */,
+				2AEF860A09A6623A00130822 /* FSPauseOn.tif in Resources */,
+				2AEF860B09A6623A00130822 /* FSPlayOff.tif in Resources */,
+				2AEF860C09A6623A00130822 /* FSPlayOn.tif in Resources */,
+				2AEF860D09A6623A00130822 /* FSRewindOff.tif in Resources */,
+				2AEF860E09A6623A00130822 /* FSRewindOn.tif in Resources */,
+				2AEF860F09A6623A00130822 /* FSVolumeBackground.tif in Resources */,
+				2AEF861009A6623A00130822 /* FSVolumeThumbOff.tif in Resources */,
+				2AEF861109A6623A00130822 /* FSVolumeThumbOn.tif in Resources */,
+				2AEF861F09A6665700130822 /* qt.png in Resources */,
 				CC26BF2C09A7A05000E94D62 /* Update.nib in Resources */,
 				CC1B4B4D09A8CF9E0078AD2E /* Interaction.nib in Resources */,
 				CC1AC1BC0A7BDA41002478C3 /* InteractionErrorPanel.nib in Resources */,

@@ -32,21 +32,22 @@
 #include <string.h>
 #include <vlc_keys.h>
 
-#include "intf.h"
-#include "vout.h"
-#include "prefs.h"
-#include "playlist.h"
-#include "controls.h"
-#include "about.h"
-#include "open.h"
-#include "wizard.h"
-#include "extended.h"
-#include "bookmarks.h"
-#include "sfilters.h"
-#include "interaction.h"
-#include "embeddedwindow.h"
-#include "update.h"
-#include "AppleRemote.h"
+#import "intf.h"
+#import "fspanel.h"
+#import "vout.h"
+#import "prefs.h"
+#import "playlist.h"
+#import "controls.h"
+#import "about.h"
+#import "open.h"
+#import "wizard.h"
+#import "extended.h"
+#import "bookmarks.h"
+#import "sfilters.h"
+#import "interaction.h"
+#import "embeddedwindow.h"
+#import "update.h"
+#import "AppleRemote.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -478,6 +479,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, self );
     p_intf->b_interaction = VLC_TRUE;
+
+    // First we setup the blue selection box - another window that will be attached as a child window
+    // to this one, and will be moved by timers as needed.
 
     nib_main_loaded = TRUE;
 }
@@ -1064,6 +1068,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_timeslider setFloatValue: 0.0];
         [o_timeslider setEnabled: b_seekable];
         [o_timefield setStringValue: @"0:00:00"];
+        [[[self getControls] getFSPanel] setStreamPos: 0 setSeconds: 0];
 
         [o_embedded_window setSeekable: b_seekable];
 
@@ -1120,6 +1125,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                 o_temp = [NSString stringWithCString:
                     p_playlist->status.p_item->p_input->psz_name];
             [self setScrollField: o_temp stopAfter:-1];
+            [[[self getControls] getFSPanel] setStreamTitle: o_temp];
 
             p_vout = vlc_object_find( p_intf->p_sys->p_input, VLC_OBJECT_VOUT,
                                                     FIND_PARENT );
@@ -1166,6 +1172,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                             (int) (i_seconds / 60 % 60),
                             (int) (i_seconds % 60)];
             [o_timefield setStringValue: o_time];
+            [[[self getControls] getFSPanel] setStreamPos: pos.f_float setSeconds: i_seconds];
             [o_embedded_window setTime: o_time position: f_updated];
         }
 
@@ -1389,6 +1396,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     if( i_status == PLAYING_S )
     {
+        [[[self getControls] getFSPanel] setPause];
         [o_btn_play setImage: o_img_pause];
         [o_btn_play setAlternateImage: o_img_pause_pressed];
         [o_btn_play setToolTip: _NS("Pause")];
@@ -1398,6 +1406,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     else
     {
+        [[[self getControls] getFSPanel] setPlay];
         [o_btn_play setImage: o_img_play];
         [o_btn_play setAlternateImage: o_img_play_pressed];
         [o_btn_play setToolTip: _NS("Play")];
@@ -1473,6 +1482,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                         (int) (i_seconds / 60 % 60),
                         (int) (i_seconds % 60)];
         [o_timefield setStringValue: o_time];
+        [[[self getControls] getFSPanel] setStreamPos: pos.f_float setSeconds: i_seconds];
         [o_embedded_window setTime: o_time position: f_updated];
     }
 #undef p_input

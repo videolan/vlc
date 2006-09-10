@@ -23,6 +23,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import "fspanel.h"
+
 /*****************************************************************************
  * VLCControls interface 
  *****************************************************************************/
@@ -41,6 +43,8 @@
     IBOutlet id o_specificTime_sec_lbl;
     IBOutlet id o_specificTime_stepper;
     IBOutlet id o_specificTime_mi;
+    
+    VLCFSPanel *o_fs_panel;
 }
 
 - (IBAction)play:(id)sender;
@@ -78,6 +82,8 @@
 - (int)toggleVarThread:(id)_o_data;
 
 - (IBAction)goToSpecificTime:(id)sender;
+
+- (id)getFSPanel;
 
 @end
 
