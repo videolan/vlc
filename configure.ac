@@ -1477,6 +1477,9 @@ then
   AC_DEFINE(ENABLE_SOUT, 1, Define if you want the stream output support)
 fi
 
+AC_ARG_ENABLE(switcher,
+  [  --enable-switcher       Stream-out switcher plugin (default disabled)])    
+
 dnl Check for libshout
 AC_ARG_ENABLE(shout,
   [  --enable-shout          libshout output plugin (default disabled)])
@@ -2731,7 +2734,7 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    fi
 
    VLC_ADD_BUILTINS([ffmpeg])
-   if test "${enable_sout}" != "no"; then
+   if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes" ; then
      VLC_ADD_BUILTINS([stream_out_switcher])
    fi
 
@@ -2767,7 +2770,7 @@ dnl Look for a ffmpeg-config (we are on debian )
     AC_CHECK_HEADERS(ffmpeg/avutil.h)
     AC_CHECK_HEADERS(postproc/postprocess.h)
     VLC_ADD_PLUGINS([ffmpeg])
-    if test "${enable_sout}" != "no"; then
+    if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes"; then
         VLC_ADD_PLUGINS([stream_out_switcher])
     fi
     VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --cflags`])
@@ -2787,7 +2790,7 @@ dnl Trying with pkg-config
      else
         VLC_ADD_PLUGINS([ffmpeg])
      fi
-     if test "${enable_sout}" != "no"; then
+     if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes"; then
         if test "${SYS}" = "darwin"; then
             VLC_ADD_BUILTINS([stream_out_switcher])
         else
@@ -2822,7 +2825,7 @@ dnl Trying with pkg-config
       AC_CHECK_LIB(avcodec, avcodec_init, [
         VLC_ADD_BUILTINS([ffmpeg])
         VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])
-        if test "${enable_sout}" != "no"; then
+        if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes"; then
             VLC_ADD_BUILTINS([stream_out_switcher])
         fi],
          [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (svn version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ], [$LDAVUTIL])
