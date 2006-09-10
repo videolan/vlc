@@ -32,7 +32,6 @@
 #include <string.h>
 
 #include "intf.h"
-#include "fspanel.h"
 #include "vout.h"
 #include "open.h"
 #include "controls.h"

@@ -146,7 +146,6 @@ struct intf_sys_t
     IBOutlet id o_msgs_btn_crashlog;    /* messages open crashlog */
 
     IBOutlet id o_info_window;  /* Info panel     */
-    IBOutlet id o_fs_panel;     /* Full screen panel*/
 
     /* main menu */
 

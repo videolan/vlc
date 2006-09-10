@@ -26,7 +26,6 @@
  *****************************************************************************/
 
 #include "intf.h"
-#include "fspanel.h"
 #include "vout.h"
 #include "embeddedwindow.h"
 

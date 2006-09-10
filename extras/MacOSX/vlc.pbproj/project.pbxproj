@@ -974,6 +974,8 @@
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
 		CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppleRemote.h; path = ../../modules/gui/macosx/AppleRemote.h; sourceTree = SOURCE_ROOT; };
 		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
+		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
+		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
 		CCF3C64B0923B99D00401862 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/SFilters.nib; sourceTree = "<group>"; };
 		CCF3C6500923B9D100401862 /* sfilters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sfilters.h; path = ../../modules/gui/macosx/sfilters.h; sourceTree = SOURCE_ROOT; };
 		CCF3C6510923B9D100401862 /* sfilters.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = sfilters.m; path = ../../modules/gui/macosx/sfilters.m; sourceTree = SOURCE_ROOT; };
@@ -1100,6 +1102,8 @@
 				CC26BF3209A7A08C00E94D62 /* update.m */,
 				CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */,
 				CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */,
+				CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */,
+				CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */,
 				2AEF857609A5FEC900130822 /* fspanel.h */,
 				2AEF857709A5FEC900130822 /* fspanel.m */,
 			);
