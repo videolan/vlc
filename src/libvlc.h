@@ -1317,14 +1317,10 @@ vlc_module_begin();
         change_short('V');
 
     set_subcategory( SUBCAT_VIDEO_VFILTER );
-    add_module_list_cat( "vout-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
-                VOUT_FILTER_TEXT, VOUT_FILTER_LONGTEXT, VLC_FALSE );
-       add_deprecated( "filter", VLC_FALSE ); /*deprecated since 0.8.2 */
-
-    set_subcategory( SUBCAT_VIDEO_VFILTER2 );
-    add_module_list_cat( "video-filter", SUBCAT_VIDEO_VFILTER2, NULL, NULL,
+    add_module_list_cat( "video-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, VLC_FALSE );
-
+       add_deprecated( "filter", VLC_FALSE ); /*deprecated since 0.8.2 */
+       add_deprecated( "vout-filter", VLC_FALSE ); /* deprecated since 0.8.6 */
 #if 0
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
