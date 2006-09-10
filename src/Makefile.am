@@ -158,8 +158,8 @@ libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
-libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin|sed -e 's/\(modules\/[^ ]*\)\.a /\1_builtin.la /g'` -no-undefined
-libvlc_la_DEPENDENCIES = stamp-builtins
+libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin|sed -e 's/\(modules\/[^ ]*\)\.a /\1_builtin.la /g'` -no-undefined -export-symbols libvlc.sym
+libvlc_la_DEPENDENCIES = stamp-builtins stamp-api
 
 
 if HAVE_BEOS
@@ -377,6 +377,10 @@ stamp-api: Makefile.in $(HEADERS_include) ../vlc-api.pl
 	( cd $(srcdir) && cat $(HEADERS_include) ) | \
 	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
 	touch stamp-api
+
+libvlc.sym:
+	rm -f stamp-api
+	$(MAKE) stamp-api
 
 ###############################################################################
 # Unit/regression test
