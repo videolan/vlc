@@ -146,7 +146,7 @@
     "associated options)." )
 #define SCODEC_TEXT N_("Destination subtitles codec")
 #define SCODEC_LONGTEXT N_( \
-    "This is the subtitles coded that will be used." )
+    "This is the subtitles codec that will be used." )
 
 #define SFILTER_TEXT N_("Overlays")
 #define SFILTER_LONGTEXT N_( \
