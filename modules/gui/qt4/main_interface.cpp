@@ -76,6 +76,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     ui.volLowLabel->installEventFilter(h);
     ui.volHighLabel->installEventFilter(h);
 
+    ui.volumeSlider->setFocusPolicy( Qt::NoFocus );
+
     QVLCMenu::createMenuBar( menuBar(), p_intf );
 
     timeLabel = new QLabel( 0 );
@@ -171,6 +173,7 @@ void MainInterface::resizeEvent( QResizeEvent *e )
 void MainInterface::keyPressEvent( QKeyEvent *e )
 {
     int i_vlck = 0;
+    /* Handle modifiers */
     if( e->modifiers()& Qt::ShiftModifier ) i_vlck |= KEY_MODIFIER_SHIFT;
     if( e->modifiers()& Qt::AltModifier ) i_vlck |= KEY_MODIFIER_ALT;
     if( e->modifiers()& Qt::ControlModifier ) i_vlck |= KEY_MODIFIER_CTRL;
@@ -179,30 +182,49 @@ void MainInterface::keyPressEvent( QKeyEvent *e )
     fprintf( stderr, "After modifiers %x\n", i_vlck );
     bool found = false;
     fprintf( stderr, "Qt %x\n", e->key() );
+    /* Look for some special keys */
+#define HANDLE( qt, vk ) case Qt::qt : i_vlck |= vk; found = true;break
     switch( e->key() )
     {
-        case Qt::Key_Left: i_vlck |= KEY_LEFT;found=true;;break;
-        case Qt::Key_Right: i_vlck |= KEY_RIGHT;found = true;break;
+        HANDLE( Key_Left, KEY_LEFT );
+        HANDLE( Key_Right, KEY_RIGHT );
+        HANDLE( Key_Up, KEY_UP );
+        HANDLE( Key_Down, KEY_DOWN );
+        HANDLE( Key_Space, KEY_SPACE );
+        HANDLE( Key_Escape, KEY_ESC );
+        HANDLE( Key_Enter, KEY_ENTER );
+        HANDLE( Key_F1, KEY_F1 );
+        HANDLE( Key_F2, KEY_F2 );
+        HANDLE( Key_F3, KEY_F3 );
+        HANDLE( Key_F4, KEY_F4 );
+        HANDLE( Key_F5, KEY_F5 );
+        HANDLE( Key_F6, KEY_F6 );
+        HANDLE( Key_F7, KEY_F7 );
+        HANDLE( Key_F8, KEY_F8 );
+        HANDLE( Key_F9, KEY_F9 );
+        HANDLE( Key_F10, KEY_F10 );
+        HANDLE( Key_F11, KEY_F11 );
+        HANDLE( Key_F12, KEY_F12 );
+        HANDLE( Key_PageUp, KEY_PAGEUP );
+        HANDLE( Key_PageDown, KEY_PAGEDOWN );
+        HANDLE( Key_Home, KEY_HOME );
+        HANDLE( Key_End, KEY_END );
+        HANDLE( Key_Insert, KEY_INSERT );
+        HANDLE( Key_Delete, KEY_DELETE );
+
     }
     fprintf( stderr, "After keys %x\n", i_vlck );
     if( !found )
     {
-        fprintf( stderr, "Not found\n" );
+        /* Force lowercase */
         if( e->key() >= Qt::Key_A && e->key() <= Qt::Key_Z )
-        {
-            fprintf( stderr, "Alphabet\n" );
             i_vlck += e->key() + 32;
-        }
         /* Rest of the ascii range */
         else if( e->key() >= Qt::Key_Space && e->key() <= Qt::Key_AsciiTilde )
-        {
-            fprintf( stderr, "Yeh !\n" );
             i_vlck += e->key();
-        }
     }
     if( i_vlck >= 0 )
     {
-        fprintf( stderr, "Setting key-pressed %i\n", i_vlck );
         var_SetInteger( p_intf->p_vlc, "key-pressed", i_vlck );
         e->accept();
     }
