@@ -37,9 +37,6 @@ DialogsProvider* DialogsProvider::instance = NULL;
 DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
                                       QObject( NULL ), p_intf( _p_intf )
 {
-//    idle_timer = new QTimer( this );
-//    idle_timer->start( 0 );
-
     fixed_timer = new QTimer( this );
     fixed_timer->start( 150 /* milliseconds */ );
 
@@ -52,9 +49,6 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
             SLOT(menuUpdateAction( QObject *)) );
 }
 
-DialogsProvider::~DialogsProvider()
-{
-}
 void DialogsProvider::customEvent( QEvent *event )
 {
     if( event->type() == DialogEvent_Type )

@@ -50,8 +50,7 @@ public:
             instance = new DialogsProvider( p_intf );
         return instance;
     }
-    virtual ~DialogsProvider();
-    QTimer *idle_timer;
+    virtual ~DialogsProvider() {};
     QTimer *fixed_timer;
 protected:
     friend class QVLCMenu;

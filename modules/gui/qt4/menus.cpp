@@ -38,7 +38,6 @@ enum
 };
 
 static QActionGroup *currentGroup;
-static char ** pp_sds;
 
 // Add static entries to menus
 #define DP_SADD( text, help, icon, slot ) { if( strlen(icon) > 0 ) { QAction *action = menu->addAction( text, THEDP, SLOT( slot ) ); action->setIcon(QIcon(icon));} else { menu->addAction( text, THEDP, SLOT( slot ) ); } }
@@ -128,85 +127,6 @@ void QVLCMenu::createMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
 
     //    BAR_ADD( HelpMenu(), qtr("Help" ) );
 }
-
-void QVLCMenu::createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
-{
-    QMenu *manageMenu = new QMenu();
-    manageMenu->setTitle( qtr("Operations") );
-
-    QMenu *subPlaylist = new QMenu();
-    subPlaylist->setTitle( qtr("Add to current playlist") );
-    subPlaylist->addAction( "&File...", THEDP,
-                           SLOT( simplePLAppendDialog() ) );
-    subPlaylist->addAction( "&Advanced add...", THEDP,
-                           SLOT( PLAppendDialog() ) );
-    manageMenu->addMenu( subPlaylist );
-    manageMenu->addSeparator();
-
-    QMenu *subML = new QMenu();
-    subML->setTitle( qtr("Add to Media library") );
-    subML->addAction( "&File...", THEDP,
-                           SLOT( simpleMLAppendDialog() ) );
-    subML->addAction( "Directory", THEDP, SLOT( openMLDirectory() ));
-    subML->addAction( "&Advanced add...", THEDP,
-                           SLOT( MLAppendDialog() ) );
-    manageMenu->addMenu( subML );
-    manageMenu->addAction( "Open playlist file", THEDP, SLOT( openPlaylist() ));
-    manageMenu->addSeparator();
-
-//    manageMenu->addMenu( SDMenu( p_intf ) );
-
-    bar->addMenu( manageMenu );
-}
-
-QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
-{
-    QMenu *menu = new QMenu();
-    menu->setTitle( qtr( "Services Discovery" ) );
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                            VLC_OBJECT_PLAYLIST,
-                                            FIND_ANYWHERE );
-    assert( p_playlist );
-    vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
-                                        FIND_ANYWHERE );
-    int i_num = 0;
-    for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
-    {
-        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
-            i_num++;
-    }
-    if( i_num )  pp_sds = (char **)calloc( i_num, sizeof(void *) );
-    for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
-    {
-        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object;
-        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
-        {
-            QAction *a = menu->addAction(
-                            qfu( p_parser->psz_longname ?
-                                   p_parser->psz_longname :
-                                   ( p_parser->psz_shortname ?
-                                       p_parser->psz_shortname :
-                                       p_parser->psz_object_name ) ) );
-            a->setCheckable( true );
-            /* hack to handle submodules properly */
-            int i = -1;
-            while( p_parser->pp_shortcuts[++i] != NULL );
-            i--;
-            if( playlist_IsServicesDiscoveryLoaded( p_playlist,
-                 i>=0?p_parser->pp_shortcuts[i] : p_parser->psz_object_name ) )
-            {
-                a->setChecked( true );
-            }
-            pp_sds[i_num++] = i>=0? p_parser->pp_shortcuts[i] :
-                                    p_parser->psz_object_name;
-        }
-    }
-    vlc_list_release( p_list );
-    vlc_object_release( p_playlist );
-    return menu;
-}
-
 QMenu *QVLCMenu::FileMenu()
 {
     QMenu *menu = new QMenu();
