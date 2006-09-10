@@ -969,8 +969,6 @@ static int spu_vaControlDefault( spu_t *p_spu, int i_query, va_list args )
     case SPU_CHANNEL_REGISTER:
         pi = (int *)va_arg( args, int * );
         if( pi ) *pi = p_spu->i_channel++;
-        msg_Dbg( p_spu, "Registering subpicture channel, ID: %i",
-                 p_spu->i_channel - 1 );
         break;
 
     case SPU_CHANNEL_CLEAR:
