@@ -41,8 +41,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_shortname( (char*)"QT" );
-    set_description( (char*)_("QT interface") );
+    set_shortname( (char *)"Qt" );
+    set_description( (char*)_("Qt interface") );
     set_category( CAT_INTERFACE) ;
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     set_capability( "interface", 100 );
@@ -72,7 +72,10 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_playlist = (playlist_t *)vlc_object_find( p_intf,
                             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( !p_intf->p_sys->p_playlist )
+    {
+        free( p_intf->p_sys );
         return VLC_EGENERIC;
+    }
 
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
 
@@ -107,15 +110,11 @@ static void Run( intf_thread_t *p_intf )
 {
     if( p_intf->pf_show_dialog )
     {
-        if( vlc_thread_create( p_intf, "QT dialogs", Init, 0, VLC_TRUE ) )
-        {
-            msg_Err( p_intf, "failed to create QT dialogs thread" );
-        }
+        if( vlc_thread_create( p_intf, "Qt dialogs", Init, 0, VLC_TRUE ) )
+            msg_Err( p_intf, "failed to create Qt dialogs thread" );
     }
     else
-    {
         Init( p_intf );
-    }
 }
 
 static void Init( intf_thread_t *p_intf )
@@ -131,7 +130,7 @@ static void Init( intf_thread_t *p_intf )
     // Initialize timers
     DialogsProvider::getInstance( p_intf );
 
-    /* Normal interface */
+    // Normal interface
     if( !p_intf->pf_show_dialog )
     {
         MainInterface *p_mi = new MainInterface( p_intf );

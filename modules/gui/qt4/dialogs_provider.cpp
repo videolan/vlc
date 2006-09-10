@@ -178,7 +178,7 @@ void DialogsProvider::simplePLAppendDialog()
     QString file;
     foreach( file, files )
     {
-        const char * psz_utf8 = file.toUtf8().data();
+        const char * psz_utf8 = qtu( file );
         playlist_PlaylistAdd( THEPL, psz_utf8, psz_utf8,
                      PLAYLIST_APPEND | PLAYLIST_PREPARSE, PLAYLIST_END );
     }
@@ -190,7 +190,7 @@ void DialogsProvider::simpleMLAppendDialog()
     QString file;
     foreach( file, files )
     {
-        const char * psz_utf8 = file.toUtf8().data();
+        const char * psz_utf8 =  qtu( file );
         playlist_MLAdd( THEPL, psz_utf8, psz_utf8,
                         PLAYLIST_APPEND | PLAYLIST_PREPARSE, PLAYLIST_END );
     }
@@ -202,7 +202,7 @@ void DialogsProvider::simpleOpenDialog()
     QString file;
     for( size_t i = 0 ; i< files.size(); i++ )
     {
-        const char * psz_utf8 = files[i].toUtf8().data();
+        const char * psz_utf8 = qtu( files[i] );
         /* Play the first one, parse and enqueue the other ones */
         playlist_PlaylistAdd( THEPL, psz_utf8, psz_utf8,
                      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
@@ -217,7 +217,7 @@ void DialogsProvider::openPlaylist()
     QString file;
     for( size_t i = 0 ; i< files.size(); i++ )
     {
-        const char * psz_utf8 = files[i].toUtf8().data();
+        const char * psz_utf8 = qtu( files[i] );
         /* Play the first one, parse and enqueue the other ones */
         playlist_Import( THEPL, psz_utf8, THEPL->p_root_category, VLC_FALSE );
     }
@@ -227,7 +227,7 @@ void DialogsProvider::openDirectory()
 {
     QString dir = QFileDialog::getExistingDirectory ( 0,
                                                      _("Open directory") );
-    const char *psz_utf8 = dir.toUtf8().data();
+    const char *psz_utf8 = qtu( dir );
     input_item_t *p_input = input_ItemNewExt( THEPL, psz_utf8, psz_utf8,
                                                0, NULL, -1 );
     playlist_PlaylistAddInput( THEPL, p_input,
@@ -238,8 +238,7 @@ void DialogsProvider::openMLDirectory()
 {
     QString dir = QFileDialog::getExistingDirectory ( 0,
                                                      _("Open directory") );
-    const char *psz_utf8 = dir.toUtf8().data();
-    fprintf( stderr, "%s\n", psz_utf8 );
+    const char *psz_utf8 = qtu( dir );
     input_item_t *p_input = input_ItemNewExt( THEPL, psz_utf8, psz_utf8,
                                                0, NULL, -1 );
     playlist_MLAddInput( THEPL, p_input, PLAYLIST_APPEND, PLAYLIST_END );

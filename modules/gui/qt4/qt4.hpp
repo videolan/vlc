@@ -52,6 +52,8 @@ struct intf_sys_t
 
 #define qfu( i ) QString::fromUtf8( i )
 #define qtr( i ) QString::fromUtf8( _(i) )
+#define qtu( i ) i.toUtf8().data()
+#define qta( i ) i.toAscii().data()
 
 static int DialogEvent_Type = QEvent::User + 1;
 

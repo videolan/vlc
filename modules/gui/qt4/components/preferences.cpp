@@ -342,24 +342,20 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                         QWidget( _parent ), p_intf( _p_intf )
 {
     module_config_t *p_item;
+
+    /* Find our module */
     module_t *p_module = NULL;
-    vlc_list_t *p_list = NULL;
-    global_layout = new QVBoxLayout();
     if( data->i_type == TYPE_CATEGORY )
-    {
-        /* TODO */
-            return;
-    }
+        return;
     else if( data->i_type == TYPE_MODULE )
-    {
         p_module = (module_t *) vlc_object_get( p_intf, data->i_object_id );
-    }
     else
     {
         /* List the plugins */
         int i_index;
         vlc_bool_t b_found = VLC_FALSE;
-        p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+        vlc_list_t *p_list = vlc_list_find( p_intf,
+                                            VLC_OBJECT_MODULE, FIND_ANYWHERE );
         if( !p_list ) return;
 
         for( i_index = 0; i_index < p_list->i_count; i_index++ )
@@ -394,13 +390,12 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                               p_item->i_value == data->i_object_id ) ||
                             ( data->i_type == TYPE_CATSUBCAT &&
                               p_item->i_value == data->i_subcat_id ) )
-            {
                 break;
-            }
             if( p_item->i_type == CONFIG_HINT_END ) break;
         } while( p_item++ );
     }
 
+    global_layout = new QVBoxLayout();
     QString head;
     if( data->i_type == TYPE_SUBCATEGORY || data->i_type ==  TYPE_CATSUBCAT )
     {
@@ -460,17 +455,14 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             box = new QGroupBox( qfu(p_item->psz_text) );
             boxlayout = new QGridLayout();
         }
+
         ConfigControl *control;
         if( ! box )
-        {
             control = ConfigControl::createControl( VLC_OBJECT( p_intf ),
                                         p_item, NULL, layout, i_line );
-        }
         else
-        {
             control = ConfigControl::createControl( VLC_OBJECT( p_intf ),
                                     p_item, NULL, boxlayout, i_boxline );
-        }
         if( !control )
         {
             continue;
@@ -499,11 +491,6 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     scroller->setWidgetResizable( true );
     global_layout->addWidget( scroller );
     setLayout( global_layout );
-#if 0
-    some_hidden_text = new QLabel( qfu( I_HIDDEN_ADV ) );
-    some_hidden_text->setWordWrap( true );
-    setAdvanced( currently_advanced, true );
-#endif
 }
 
 void PrefsPanel::apply()
@@ -513,20 +500,17 @@ void PrefsPanel::apply()
     for( i = controls.begin() ; i != controls.end() ; i++ )
     {
         ConfigControl *c = qobject_cast<ConfigControl *>(*i);
-        fprintf( stderr, "Get a control %s\n", c->getName() );
         switch( c->getType() )
         {
         case 1:
             {
             VIntConfigControl *vicc = qobject_cast<VIntConfigControl *>(*i);
-                fprintf( stderr, "Put %s = %i\n",  vicc->getName(),vicc->getValue() );
             config_PutInt( p_intf, vicc->getName(), vicc->getValue() );
             break;
             }
         case 2:
             {
             VFloatConfigControl *vfcc = qobject_cast<VFloatConfigControl *>(*i);
-                fprintf( stderr, "Put %s = %f\n",  vfcc->getName(),vfcc->getValue() );
             config_PutFloat( p_intf, vfcc->getName(), vfcc->getValue() );
             break;
             }
@@ -534,9 +518,7 @@ void PrefsPanel::apply()
             {
             VStringConfigControl *vscc =
                             qobject_cast<VStringConfigControl *>(*i);
-                fprintf( stderr, "Put %s = %s\n",  vscc->getName(),vscc->getValue().toAscii().data() );
-            config_PutPsz( p_intf, vscc->getName(),
-                                       vscc->getValue().toAscii().data() );
+            config_PutPsz( p_intf, vscc->getName(), qta( vscc->getValue() ) );
             }
         }
     }
@@ -544,36 +526,3 @@ void PrefsPanel::apply()
 
 void PrefsPanel::clean()
 {}
-#if 0
-void PrefsPanel::setAdvanced( bool adv, bool force )
-{
-    bool some_hidden = false;
-    if( !force && adv == advanced ) return;
-
-    advanced = adv;
-    QList<ConfigControl *>::Iterator i;
-    for( i = controls.begin() ; i != controls.end() ; i++ )
-    {
-        if( (*i)->isAdvanced() )
-        {
-            if( !advanced )
-            {
-                some_hidden = true;
-                (*i)->hide();
-            }
-            else
-                (*i)->show();
-        }
-    }
-    if( some_hidden_text )
-    {
-        global_layout->removeWidget( some_hidden_text );
-        some_hidden_text->hide();
-    }
-    if( some_hidden )
-    {
-        global_layout->addWidget( some_hidden_text );
-        some_hidden_text->show();
-    }
-}
-#endif
