@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+vim:syntax=xml
+vim:ts=4
+-->
+<profile-list xmlns="http://clement.stenac.org/projects/videolan/vsp.xsd">
+	<profile>
+		<name>Transcode / HTTP</name>
+		<description>
+			This profile transcodes and makes the stream available through HTTP
+		</description>
+
+		<meta network="true" internet="true" vod="false" />
+
+		<parameters>
+			<param id="bitrate" type="int" default="1000" min="50" max="2000">
+				<name>Video bitrate</name>
+				<description>Set the video bitrate, in kbit/s</description>
+			</param>
+			<param id="local" type="bool" default="true">
+				<name>Display locally</name>
+				<description>
+					Do you want to display the stream while streaming it ?
+					This will use more processing power.
+				</description>
+			</param>
+			<param id="codec" type="string" choices="true" default="mp4v">
+				<name>Video codec</name>
+				<description>Please choose the video codec to use
+				</description>
+				<choice value="mp4v">
+					<name>MPEG-4 Video</name>
+					<description>Video MPEG4</description>
+				</choice>
+				<choice value="theo">
+					<name>Theora</name>
+					<description>Theora</description>
+				</choice>
+			</param>
+		</parameters>
+		<options>
+			<option>file-caching=1000</option>
+		</options>
+
+		<chain>
+			<transcode vcodec="$codec" vb="$bitrate"/>
+			<duplicate>
+				<child> <!-- select="program:1242" -->
+					<standard mux="mp4" access="http" dst="0.0.0.0:$port" />
+				</child>
+				<child enabled="$local">
+					<display />
+				</child>
+			</duplicate>
+		</chain>
+	</profile>
+</profile-list>
