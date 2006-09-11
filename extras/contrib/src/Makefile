@@ -178,7 +178,7 @@ else
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
 	.dvdnav .dvbpsi .wxwidgets .qt4 .dirac \
-	.dx_headers .dshow_headers .aclocal .gecko-win32 .unicows .libdca
+	.dx_headers .dshow_headers .aclocal .gecko-win32 .unicows .libdca 
 #	.SDL_image  .daap .cddb .cdio .vcdimager .portaudio 
   else
 
@@ -1720,20 +1720,15 @@ DISTCLEAN_PKG += jpeg-$(JPEG_VERSION).tar.gz
 
 tiff-$(TIFF_VERSION).tar.gz:
 	$(WGET) $(TIFF_URL)
-	mv tiff-$(TIFF_VERSION)-tar.gz $@
 
 tiff: tiff-$(TIFF_VERSION).tar.gz 
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/tiff.patch
-ifneq ($(HOST),$(BUILD))
-	patch -p 0 < Patches/tiff-cross.patch
-endif
 
 .tiff: tiff
 ifdef HAVE_WIN32
-	(cd $<;  ./configure  --noninteractive --target=$(HOST) --with-CC=$(HOST)-gcc --with-DIR_BIN=$(PREFIX)/bin --with-DIR_LIB=$(PREFIX)/lib --with-DIR_INC=$(PREFIX)/include --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no  && make -C libtiff && make -C libtiff install)
+	(cd $<; ./configure  --target=i586-mingw32msvc --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no --prefix=$(PREFIX) --host=$(HOST) &&make -C port && make -C libtiff && make -C libtiff install)
 else
-	(cd $<; ./configure --noninteractive --with-DIR_BIN=$(PREFIX)/bin --with-DIR_LIB=$(PREFIX)/lib --with-DIR_INC=$(PREFIX)/include --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no && make -C libtiff && make -C libtiff install)
+	(cd $<; ./configure --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no --prefix=$(PREFIX) && make -C port &&make -C libtiff && make -C libtiff install)
 endif
 	touch $@
 
@@ -1750,10 +1745,9 @@ SDL-$(SDL_VERSION).tar.gz:
 
 SDL: SDL-$(SDL_VERSION).tar.gz 
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/SDL.patch
 
 .SDL: SDL
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-audio --disable-video-x11 --disable-video-aalib --disable-video-dga --disable-video-fbcon --disable-video-directfb --disable-video-ggi --disable-video-svga --disable-directx --disable-joystick --disable-cdrom --disable-threads --disable-sdl-dlopen CFLAGS="$(CFLAGS)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-audio --disable-video-x11 --disable-video-aalib --disable-video-dga --disable-video-fbcon --disable-video-directfb --disable-video-ggi --disable-video-svga --disable-directx --enable-joystick --disable-cdrom --disable-threads --disable-sdl-dlopen CFLAGS="$(CFLAGS)" && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1773,7 +1767,7 @@ SDL_image: SDL_image-$(SDL_IMAGE_VERSION).tar.gz
 	patch -p 0 < Patches/SDL_image.patch
 
 .SDL_image: SDL_image .SDL .png .jpeg .tiff
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-tif CFLAGS="$(CFLAGS)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --enable-tif --disable-sdltest && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
