@@ -149,9 +149,9 @@ endif
 ###############################################################################
 
 libvlc_a_SOURCES = $(SOURCES_libvlc)
-libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc $(pic)`
-libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc $(pic)`
-libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc $(pic)`
+libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic`
+libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc pic`
+libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc pic`
 
 libvlc_la_SOURCES = $(SOURCES_libvlc)
 libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
@@ -203,7 +203,7 @@ libvlc.dll.a: libvlc$(LIBEXT)
 	$(DLLTOOL) --export-all-symbols -l $@ -D $< $(libvlc_a_OBJECTS)
 
 libvlc$(LIBEXT): $(OBJECTS_libvlc_so) stamp-builtins
-	@ldfl="`$(VLC_CONFIG) --libs plugin vlc builtin $(pic)` $(INCLUDED_LIBINTL)" ; \
+	@ldfl="`$(VLC_CONFIG) --libs plugin vlc builtin pic` $(INCLUDED_LIBINTL)" ; \
 	case `$(VLC_CONFIG) --linkage vlc builtin` in \
 	  c++)  ld="$(CXXLINK)" ;; \
 	  objc) ld="$(OBJCLINK)" ;; \

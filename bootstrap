@@ -393,9 +393,9 @@ nodist_lib${mod}_builtin_la_SOURCES = \$(nodist_SOURCES_${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
-lib${mod}_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin \$(pic) ${mod}\`
-lib${mod}_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin \$(pic) ${mod}\`
-lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin \$(pic) ${mod}\`
+lib${mod}_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin pic ${mod}\`
+lib${mod}_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin pic ${mod}\`
+lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin pic ${mod}\`
 lib${mod}_builtin_la_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
 lib${mod}_builtin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
 lib${mod}_builtin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`

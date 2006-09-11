@@ -165,11 +165,11 @@ libvlcplugin_la_LDFLAGS = `$(VLC_CONFIG) --libs mozilla` -module -avoid-version 
 libvlcplugin_la_LIBADD = ../src/libvlc.la
 
 libnpvlc_a_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
-libnpvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla $(pic)` \
+libnpvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla pic` \
 	             $(CPPFLAGS_mozilla_EXTRA)
-libnpvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla $(pic)` \
+libnpvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla pic` \
 	               $(CPPFLAGS_mozilla_EXTRA)
-LDFLAGS_libnpvlc = $(LDFLAGS_npvlc) `$(VLC_CONFIG) --libs mozilla vlc builtin $(pic)`
+LDFLAGS_libnpvlc = $(LDFLAGS_npvlc) `$(VLC_CONFIG) --libs mozilla vlc builtin pic`
 libnpvlc_a_DEPENDENCIES = $(DATA_npvlc_rc)
 
 $(npvlc): $(libnpvlc_a_OBJECTS) $(libnpvlc_a_DEPENDENCIES) stamp-pic
@@ -182,7 +182,7 @@ $(npvlc): $(libnpvlc_a_OBJECTS) $(libnpvlc_a_DEPENDENCIES) stamp-pic
 # Stamp rules
 ###############################################################################
 stamp-pic:
-	@for dep in "" `$(VLC_CONFIG) --target builtin $(pic)`; do \
+	@for dep in "" `$(VLC_CONFIG) --target builtin pic`; do \
 	  if test "$${dep}" -nt "$(LIBRARIES_mozilla)"; then \
 	    rm -f $@; \
 	    break; \
