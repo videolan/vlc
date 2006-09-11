@@ -178,7 +178,8 @@ else
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
 	.dvdnav .dvbpsi .wxwidgets .qt4 .dirac \
-	.dx_headers .dshow_headers .aclocal .gecko-win32 .unicows .libdca 
+	.dx_headers .dshow_headers .aclocal .gecko-win32 .unicows .libdca \
+	.SDL_image
 #	.SDL_image  .daap .cddb .cdio .vcdimager .portaudio 
   else
 
@@ -310,11 +311,11 @@ endif
 # autoconf
 # ***************************************************************************
 
-autoconf-$(AUTOCONF_VERSION).tar.gz:
+autoconf-$(AUTOCONF_VERSION).tar.bz2:
 	$(WGET) $(AUTOCONF_URL)
 
-autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
-	$(EXTRACT_GZ)
+autoconf: autoconf-$(AUTOCONF_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 
 .autoconf: autoconf
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
@@ -322,7 +323,7 @@ autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
 
 CLEAN_FILE += .autoconf
 CLEAN_PKG += autoconf
-DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.gz
+DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.bz2
 
 # ***************************************************************************
 # libtool
