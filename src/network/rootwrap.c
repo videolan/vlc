@@ -57,6 +57,10 @@
 # undef AF_INET6
 #endif
 
+#ifndef AF_LOCAL
+# define AF_LOCAL AF_UNIX
+#endif
+
 /*#ifndef HAVE_CLEARENV
 extern char **environ;
 
