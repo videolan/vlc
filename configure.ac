@@ -1344,7 +1344,9 @@ if test "${ac_cv_c_altivec}" != "no"; then
   VLC_ADD_CFLAGS([vlc],[${ac_cv_c_altivec}])
   VLC_ADD_CFLAGS([idctaltivec motionaltivec],[${ac_cv_c_altivec}])
   VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
-  ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
+  if test "${ac_cv_altivec_inline}" = "no"; then
+    ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
+  fi
 fi
 
 AC_CACHE_CHECK([if linker needs -framework vecLib],
