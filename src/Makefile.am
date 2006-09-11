@@ -189,6 +189,12 @@ lib_LIBRARIES = libvlc.a
 endif
 
 if HAVE_WIN32
+pic =
+else
+pic = pic
+endif
+
+if HAVE_WIN32
 if BUILD_SHARED
 DATA_noinst_libvlc = libvlc$(LIBEXT) libvlc$(LIBEXT).a
 endif
