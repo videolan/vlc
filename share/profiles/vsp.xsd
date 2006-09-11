@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+		vim:ts=4
+-->
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns="http://clement.stenac.org/projects/videolan/vsp.xsd"
+	targetNamespace="http://clement.stenac.org/projects/videolan/vsp.xsd">
+
+<xs:element name="description">
+		<xs:complexType>
+			  <xs:simpleContent>
+			<xs:extension base="xs:string"></xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="name">
+	<xs:complexType>
+		<xs:simpleContent>
+			<xs:extension base="xs:string"></xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+</xs:element>
+
+
+<!-- ################# Stream output modules #################### -->
+<xs:element name="transcode">
+	<xs:complexType>
+		<xs:attribute name="vcodec" />
+		<xs:attribute name="acodec" />
+		<xs:attribute name="vb" />
+		<xs:attribute name="ab" />
+		<xs:attribute name="venc" />
+		<xs:attribute name="aenc" />
+	</xs:complexType>
+</xs:element>
+ 
+<xs:element name="standard">
+	<xs:complexType>
+		<xs:attribute name="mux" />
+		<xs:attribute name="access" />
+		<xs:attribute name="dst" />
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="display" />
+		
+<!-- ### Duplicate ### -->
+<xs:element name="child" >
+	<xs:complexType>
+		<xs:sequence>
+			<xs:any minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="select" />
+		<xs:attribute name="enabled" />
+	</xs:complexType>
+</xs:element>
+		
+<xs:element name="duplicate">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref="child" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="choice">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref="name" minOccurs="1" maxOccurs="1" />
+			<xs:element ref="description" minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="value" />
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="param">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref="name" minOccurs="1" maxOccurs="1" />
+			<xs:element ref="description" minOccurs="1" maxOccurs="1" />
+			<xs:element ref="choice" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="id" use="required" />
+		<xs:attribute name="type" use="required" />
+		<xs:attribute name="choices" use="optional" />
+		<xs:attribute name="default" />
+		<xs:attribute name="min" />
+		<xs:attribute name="max" />
+	</xs:complexType>
+</xs:element>
+		
+
+<xs:element name="parameters">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref="param" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="meta">
+	<xs:complexType>
+		<xs:attribute name="network" />
+		<xs:attribute name="internet" />
+		<xs:attribute name="vod" />
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="option">
+	 <xs:complexType>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="options">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref="option" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="chain">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:any minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="select" />
+	</xs:complexType>
+</xs:element>
+
+
+<xs:element name="profile">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref="name" maxOccurs="1" />
+			<xs:element ref="description" maxOccurs="unbounded" />
+			<xs:element ref="meta" maxOccurs="1" />
+			<xs:element ref="parameters" maxOccurs="1" />
+			<xs:element ref="options" />
+			<xs:element ref="chain" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="profile-list">
+    <xs:complexType>
+	    <xs:sequence>
+		    <xs:element ref="profile" />
+        </xs:sequence>
+    </xs:complexType>
+</xs:element>
+
+</xs:schema>
