@@ -140,7 +140,7 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                uint8_t *restrict buf, size_t buflen,
                int wait_ms, vlc_bool_t waitall )
 {
-    int total = 0;
+    size_t total = 0;
 
     do
     {
@@ -171,6 +171,10 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         assert ((unsigned)n <= fdc);
 
         for (int i = 0; n > 0; i++)
+        {
+            if ((total > 0) && (ufd[i].revents & POLLERR))
+                return total; // error will be dequeued on next run
+
             if (ufd[i].revents)
             {
                 fdc = 1;
@@ -179,6 +183,7 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                 n--;
                 goto receive;
             }
+        }
 #else
         int maxfd = -1;
         fd_set set;
@@ -272,7 +277,7 @@ receive:
 
 error:
     msg_Err (p_this, "Read error: %s", net_strerror (net_errno));
-    return total ?: -1;
+    return total ? (int)total : -1;
 }
 
 
@@ -337,12 +342,12 @@ int __net_Select( vlc_object_t *restrict p_this, const int *restrict pi_fd,
 int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                  const uint8_t *p_data, int i_data )
 {
-    int i_total = 0;
+    size_t total = 0;
 
     while (i_data > 0)
     {
         if (p_this->b_die)
-            return i_total;
+            return total;
 
 #ifdef HAVE_POLL
         struct pollfd ufd[1];
@@ -351,6 +356,8 @@ int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         ufd[0].events = POLLOUT;
 
         int val = poll (ufd, 1, 500);
+        if ((val > 0) && (ufd[0].revents & POLLERR) && (total > 0))
+            return total; // error will be dequeued separately on next call
 #else
         fd_set set;
         FD_ZERO (&set);
@@ -375,7 +382,7 @@ int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                 {
                     msg_Err (p_this, "Write error: %s",
                              net_strerror (net_errno));
-                    return i_total ?: -1;
+                    return total ? (int)total : -1;
                 }
 
             case 0:
@@ -392,16 +399,16 @@ int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 #endif
 
         if (val == -1)
-            return i_total ?: -1;
+            return total ? (int)total : -1;
         if (val == 0)
-            return i_total;
+            return total;
 
         p_data += val;
         i_data -= val;
-        i_total += val;
+        total += val;
     }
 
-    return i_total;
+    return total;
 }
 
 char *__net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
