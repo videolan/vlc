@@ -26,10 +26,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
-#include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc_interaction.h>
 
@@ -381,7 +383,7 @@ static int OutOpen( vlc_object_t *p_this )
 
     p_access->pf_seek = OutSeek;
     p_access->pf_write = Write;
-    p_access->p_sys = p_sys;
+    p_access->p_sys = (void *)p_sys;
 
     return VLC_SUCCESS;
 

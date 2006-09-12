@@ -26,9 +26,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>
 
 #include <vlc/vlc.h>
+
+#include <string.h>
+#include <stdlib.h>
+
 #include <vlc/input.h>
 
 #include "vlc_interaction.h"
