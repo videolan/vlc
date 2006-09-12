@@ -137,40 +137,48 @@ void net_Close( int fd )
 static int
 net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                const v_socket_t *const *restrict vsv,
-               uint8_t *restrict buf, size_t buflen,
+               uint8_t *restrict p_buf, size_t i_buflen,
                int wait_ms, vlc_bool_t waitall )
 {
-    size_t total = 0;
+    size_t i_total = 0;
 
     do
     {
-        if (buflen == 0)
-            return total; // output buffer full
+        unsigned int i;
+        int n, delay_ms;
+#ifdef HAVE_POLL
+        struct pollfd ufd[fdc];
+#else
+        int maxfd = -1;
+        fd_set set;
+#endif
 
-        int delay_ms = 500;
-        if ((wait_ms != -1) && (wait_ms < 500))
+        if( i_buflen == 0 )
+            return i_total; // output buffer full
+
+        delay_ms = 500;
+        if( (wait_ms != -1) && (wait_ms < 500) )
             delay_ms = wait_ms;
 
 #ifdef HAVE_POLL
-        struct pollfd ufd[fdc];
-        memset (ufd, 0, sizeof (ufd));
+        memset(ufd, 0, sizeof (ufd) );
 
-        for (unsigned i = 0; i < fdc; i++)
+        for( i = 0; i < fdc; i++ )
         {
             ufd[i].fd = fdv[i];
             ufd[i].events = POLLIN;
         }
 
-        if (p_this->b_die)
-            return total;
+        if( p_this->b_die )
+            return i_total;
 
-        int n = poll (ufd, fdc, (wait_ms == -1) ? -1 : delay_ms);
-        if (n == -1)
+        n = poll( ufd, fdc, (wait_ms == -1) ? -1 : delay_ms );
+        if( n == -1 )
             goto error;
 
-        assert ((unsigned)n <= fdc);
+        assert( (unsigned int)n <= fdc );
 
-        for (int i = 0; n > 0; i++)
+        for( i = 0; n > 0; i++ )
         {
             if ((total > 0) && (ufd[i].revents & POLLERR))
                 return total; // error will be dequeued on next run
@@ -185,33 +193,31 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             }
         }
 #else
-        int maxfd = -1;
-        fd_set set;
         FD_ZERO (&set);
 
-        for (unsigned i = 0; i < fdc; i++)
+        for( i = 0; i < fdc; i++ )
         {
 #if !defined(WIN32) && !defined(UNDER_CE)
-            if (fdv[i] >= FD_SETSIZE)
+            if( fdv[i] >= FD_SETSIZE )
             {
                 /* We don't want to overflow select() fd_set */
                 msg_Err( p_this, "select set overflow" );
                 return -1;
             }
 #endif
-            FD_SET (fdv[i], &set);
-            if (fdv[i] > maxfd)
+            FD_SET( fdv[i], &set );
+            if( fdv[i] > maxfd )
                 maxfd = fdv[i];
         }
 
-        int n = select (maxfd + 1, &set, NULL, NULL,
-                        (wait_ms == -1) ? NULL
-                            : &(struct timeval){ 0, delay_ms * 1000 });
-        if (n == -1)
+        n = select( maxfd + 1, &set, NULL, NULL,
+                    (wait_ms == -1) ? NULL
+                                  : &(struct timeval){ 0, delay_ms * 1000 } );
+        if( n == -1 )
             goto error;
 
-        for (unsigned i = 0; n > 0; i++)
-            if (FD_ISSET (fdv[i], &set))
+        for( i = 0; n > 0; i++ )
+            if( FD_ISSET (fdv[i], &set) )
             {
                 fdc = 1;
                 fdv += i;
@@ -224,19 +230,23 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         continue;
 
 receive:
-        if ((*vsv) != NULL)
-            n = (*vsv)->pf_recv ((*vsv)->p_sys, buf, buflen);
+        if( (*vsv) != NULL )
+        {
+            n = (*vsv)->pf_recv( (*vsv)->p_sys, p_buf, i_buflen );
+        }
         else
-#if defined(WIN32) || defined(UNDER_CE)
-            n = recv (*fdv, buf, buflen, 0);
-#else
-            n = read (*fdv, buf, buflen);
-#endif
-
-        if (n == -1)
         {
 #if defined(WIN32) || defined(UNDER_CE)
-            switch (WSAGetLastError())
+            n = recv( *fdv, p_buf, i_buflen, 0 );
+#else
+            n = read( *fdv, p_buf, i_buflen );
+#endif
+        }
+
+        if( n == -1 )
+        {
+#if defined(WIN32) || defined(UNDER_CE)
+            switch( WSAGetLastError() )
             {
                 case WSAEWOULDBLOCK:
                 /* only happens with vs != NULL (SSL) - not really an error */
@@ -249,8 +259,8 @@ receive:
                  * with the first part of the datagram. */
                     msg_Err( p_this, "Receive error: "
                                      "Increase the mtu size (--mtu option)" );
-                    total += buflen;
-                    return total;
+                    i_total += i_buflen;
+                    return i_total;
             }
 #else
             if( errno == EAGAIN ) /* spurious wake-up (sucks if fdc > 1) */
@@ -259,24 +269,26 @@ receive:
             goto error;
         }
 
-        total += n;
-        buf += n;
-        buflen -= n;
+        i_total += n;
+        p_buf += n;
+        i_buflen -= n;
 
-        if (wait_ms == -1)
+        if( wait_ms == -1 )
         {
-            if (!waitall)
-                return total;
+            if( !waitall )
+                return i_total;
         }
         else
+        {
             wait_ms -= delay_ms;
+        }
     }
-    while (wait_ms);
+    while( wait_ms );
 
-    return total; // timeout
+    return i_total; // timeout
 
 error:
-    msg_Err (p_this, "Read error: %s", net_strerror (net_errno));
+    msg_Err( p_this, "Read error: %s", net_strerror (net_errno) );
     return total ? (int)total : -1;
 }
 
@@ -292,9 +304,9 @@ int __net_Read( vlc_object_t *restrict p_this, int fd,
                 const v_socket_t *restrict p_vs,
                 uint8_t *restrict p_data, int i_data, vlc_bool_t b_retry )
 {
-    return net_ReadInner (p_this, 1, &(int){ fd },
+    return net_ReadInner( p_this, 1, &(int){ fd },
                           &(const v_socket_t *){ p_vs },
-                          p_data, i_data, -1, b_retry);
+                          p_data, i_data, -1, b_retry );
 }
 
 
@@ -324,17 +336,17 @@ int __net_Select( vlc_object_t *restrict p_this, const int *restrict pi_fd,
                   int i_fd, uint8_t *restrict p_data, int i_data,
                   mtime_t i_wait )
 {
-    if (pp_vs == NULL)
+    if( pp_vs == NULL )
     {
         const v_socket_t *vsv[i_fd];
-        memset (vsv, 0, sizeof (vsv));
+        memset( vsv, 0, sizeof (vsv) );
 
-        return net_ReadInner (p_this, i_fd, pi_fd, vsv, p_data, i_data,
-                              i_wait / 1000, VLC_FALSE);
+        return net_ReadInner( p_this, i_fd, pi_fd, vsv, p_data, i_data,
+                              i_wait / 1000, VLC_FALSE );
     }
 
-    return net_ReadInner (p_this, i_fd, pi_fd, pp_vs, p_data, i_data,
-                          i_wait / 1000, VLC_FALSE);
+    return net_ReadInner( p_this, i_fd, pi_fd, pp_vs, p_data, i_data,
+                          i_wait / 1000, VLC_FALSE );
 }
 
 
@@ -344,9 +356,9 @@ int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 {
     size_t total = 0;
 
-    while (i_data > 0)
+    while( i_data > 0 )
     {
-        if (p_this->b_die)
+        if( p_this->b_die )
             return total;
 
 #ifdef HAVE_POLL
