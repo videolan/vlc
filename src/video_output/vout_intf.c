@@ -24,11 +24,14 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#include <vlc/vlc.h>
+
+#include <stdio.h>
 #include <stdlib.h>                                                /* free() */
 #include <sys/types.h>                                          /* opendir() */
 #include <dirent.h>                                             /* opendir() */
 
-#include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc_block.h>
 

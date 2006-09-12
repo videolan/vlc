@@ -27,12 +27,14 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#include <vlc/vlc.h>
+
 #include <stdio.h>                                               /* required */
 #include <stdarg.h>                                       /* va_list for BSD */
 #include <stdlib.h>                                              /* malloc() */
 #include <string.h>                                            /* strerror() */
 
-#include <vlc/vlc.h>
 
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>                  /* O_CREAT, O_TRUNC, O_WRONLY, O_SYNC */

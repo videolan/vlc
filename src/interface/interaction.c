@@ -30,11 +30,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#include <vlc/vlc.h>
+
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                                   /* FILE */
 #include <string.h>                                            /* strerror() */
 
-#include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <assert.h>
 

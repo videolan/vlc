@@ -24,6 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc/vlc.h>
+
 /* Some faulty libcs have a broken struct dirent when _FILE_OFFSET_BITS
  * is set to 64. Don't try to be cleverer. */
 #ifdef _FILE_OFFSET_BITS
@@ -34,7 +36,6 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
 
-#include <vlc/vlc.h>
 #include <vlc/input.h>
 
 #ifdef HAVE_DIRENT_H

@@ -26,11 +26,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#include <vlc/vlc.h>
+
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
-#include <vlc/vlc.h>
 #include <vlc/sout.h>
 #include <vlc/input.h>
 

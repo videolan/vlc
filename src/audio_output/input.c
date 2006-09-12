@@ -24,10 +24,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#include <vlc/vlc.h>
+
+#include <stdio.h>
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include <vlc/vlc.h>
 #include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
 
 #ifdef HAVE_ALLOCA_H

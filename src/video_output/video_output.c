@@ -29,9 +29,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                                /* free() */
-
 #include <vlc/vlc.h>
+
+#include <stdlib.h>                                                /* free() */
+#include <string.h>
+
 
 #ifdef HAVE_SYS_TIMES_H
 #   include <sys/times.h>

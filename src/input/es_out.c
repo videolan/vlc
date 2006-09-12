@@ -25,9 +25,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
+
+#include <stdio.h>
 #include <stdlib.h>
 
-#include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/decoder.h>
 

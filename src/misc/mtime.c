@@ -26,11 +26,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#include <vlc/vlc.h>
+
 #include <stdio.h>                                              /* sprintf() */
 #include <time.h>                      /* clock_gettime(), clock_nanosleep() */
 #include <stdlib.h>                                               /* lldiv() */
 
-#include <vlc/vlc.h>
 
 #if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */
 #   include <pth.h>

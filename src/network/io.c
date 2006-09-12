@@ -26,8 +26,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>
+
 #include <vlc/vlc.h>
+
+#include <stdlib.h>
+#include <stdio.h>
 
 #include <errno.h>
 #include <assert.h>

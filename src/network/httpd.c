@@ -22,8 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <stdlib.h>
 #include <vlc/vlc.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef ENABLE_HTTPD
 
