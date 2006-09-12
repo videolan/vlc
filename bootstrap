@@ -48,6 +48,20 @@ if test -d extras/contrib/bin; then
   fi
 fi
 
+# Check for autoconf
+rm -f m4/autoconf260.m4
+case "$(autoconf --version|head -1)" in
+  *2.5[012345678]*)
+    echo "Hey, your autoconf is quite old. Update it." >&2
+    exit 1
+    ;;
+
+  *2.59*)
+    echo "Enabling provisional autoconf 2.59 work-around. Update autoconf ASAP."
+    cp -f extras/m4/autoconf260.m4 m4/
+    ;;
+esac
+
 # Check for automake
 amvers="no"
 for v in "-1.9" "19" "-1.8" "18" "-1.7" "17"; do
