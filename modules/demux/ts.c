@@ -25,10 +25,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#include <vlc/vlc.h>
+
+#include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <ctype.h>
 
-#include <vlc/vlc.h>
 #include <vlc/input.h>
 
 #include "iso_lang.h"
@@ -2403,6 +2406,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
         {
             if( p_dr->i_tag == 0x48 )
             {
+#if 0
                 static const char *psz_type[0x11] = {
                     "Reserved",
                     "Digital television service",
@@ -2422,6 +2426,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                     "RCS FLS (see EN 301 790 [35])",
                     "DVB MHP service"
                 };
+#endif
                 dvbpsi_service_dr_t *pD = dvbpsi_DecodeServiceDr( p_dr );
                 char str1[257];
                 char str2[257];

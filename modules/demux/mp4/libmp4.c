@@ -20,9 +20,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#include <vlc/vlc.h>
+
+#include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <vlc/vlc.h>
 #include <vlc/input.h>
 
 #ifdef HAVE_ZLIB_H
@@ -1112,10 +1114,12 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     {
         /* SoundDescriptionV2 */
         double f_sample_rate;
+	int64_t dummy;
         uint32_t i_channel;
 
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_sample_per_packet );
-        MP4_GET8BYTES( (*(int64_t *)&f_sample_rate) );
+        MP4_GET8BYTES( dummy );
+	memcpy( &f_sample_rate, &dummy, 8 );
 
         msg_Dbg( p_stream, "read box: %f Hz", f_sample_rate );
         p_box->data.p_sample_soun->i_sampleratehi = (int)f_sample_rate % 65536;

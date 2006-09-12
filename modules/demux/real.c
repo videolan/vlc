@@ -24,9 +24,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
+
+#include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <vlc/vlc.h>
 #include <vlc/input.h>
 #include "charset.h"
 

@@ -25,11 +25,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
+
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include <sys/types.h>
 
-#include <vlc/vlc.h>
 #include <vlc/input.h>
 #include "vlc_video.h"
 #include "charset.h"

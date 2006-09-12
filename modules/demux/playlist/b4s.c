@@ -45,7 +45,7 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
-static char *GetNextToken(char *psz_cur_string);
+//static char *GetNextToken(char *psz_cur_string);
 static int IsWhitespace( char *psz_string );
 
 /*****************************************************************************
@@ -298,6 +298,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
+#if 0
 /**
  * Get a in-string pointer to the start of the next token from a
  * string terminating the pointer returned by a previous call.
@@ -318,6 +319,7 @@ static char *GetNextToken(char *psz_cur_string) {
         psz_cur_string++;
     return psz_cur_string;
 }
+#endif
 
 static int IsWhitespace( char *psz_string )
 {

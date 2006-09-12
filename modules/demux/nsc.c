@@ -147,7 +147,7 @@ char *nscdec( vlc_object_t *p_demux, char* p_encoded )
     vlc_iconv_t conv;
     size_t buf16_size;
     unsigned char *buf16;
-    char *p_buf16;
+    const char *p_buf16;
     size_t buf8_size;
     char *buf8;
     char *p_buf8;
@@ -208,7 +208,7 @@ char *nscdec( vlc_object_t *p_demux, char* p_encoded )
     }
 
     buf16_size = length;
-    buf16 = (unsigned char *)malloc( buf16_size );
+    buf16 = malloc( buf16_size );
     if( buf16 == NULL )
     {
         msg_Err( p_demux, "out of memory" );
@@ -220,17 +220,17 @@ char *nscdec( vlc_object_t *p_demux, char* p_encoded )
         if( load_byte( encoding_type, &buf16[ i ], &p_input, &j, &k ) )
         {
             msg_Err( p_demux, "load_byte failed" );
-            free( (void *)buf16 );
+            free( buf16 );
             return NULL;
         }
     }
 
     buf8_size = length;
-    buf8 = (char *)malloc( buf8_size + 1 );
+    buf8 = malloc( buf8_size + 1 );
     if( buf8 == NULL )
     {
         msg_Err( p_demux, "out of memory" );
-        free( (void *)buf16 );
+        free( buf16 );
         return NULL;
     }
 
@@ -238,13 +238,13 @@ char *nscdec( vlc_object_t *p_demux, char* p_encoded )
     if( conv == (vlc_iconv_t)-1 )
     {
         msg_Err( p_demux, "iconv_open failed" );
-        free( (void *)buf16 );
-        free( (void *)buf8 );
+        free( buf16 );
+        free( buf8 );
         return NULL;
     }
 
-    p_buf8 = &buf8[ 0 ];
-    p_buf16 = (char *)&buf16[ 0 ];
+    p_buf8 = buf8;
+    p_buf16 = (const char *)buf16;
 
     if( vlc_iconv( conv, &p_buf16, &buf16_size, &p_buf8, &buf8_size ) < 0 )
     {
@@ -258,7 +258,7 @@ char *nscdec( vlc_object_t *p_demux, char* p_encoded )
 
     vlc_iconv_close( conv );
 
-    free( (void *)buf16 );
+    free( buf16 );
     return buf8;
 }
 
