@@ -38,31 +38,15 @@ dnl
 dnl Check for tools
 dnl
 AC_PROG_CC_C99
+AC_USE_SYSTEM_EXTENSIONS
 AM_PROG_CC_C_O
 AC_PROG_CXX
-eval "${CXX} --version" >/dev/null 2>&1 || CXX=""
-if test "${CXX}" != ""; then
-  AC_PROG_CXXCPP
-fi
+AC_PROG_OBJC
+_AM_DEPENDENCIES([OBJC])
+AC_PROG_EGREP
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AM_PROG_AS
-
-dnl AC_PROG_EGREP only exists in autoconf 2.54+, so we use AC_EGREP_CPP right
-dnl now otherwise it might be set in an obscure if statement.
-AC_EGREP_CPP(foo,foo)
-
-dnl AC_PROG_OBJC doesn't seem to exist, this is the KDE workaround
-AC_MSG_CHECKING(for an Objective-C compiler)
-OBJC="${CXX}"
-AC_SUBST(OBJC)
-OBJCFLAGS="${CXXFLAGS} -fgnu-runtime -fconstant-string-class=NSConstantString"
-AC_SUBST(OBJCFLAGS)
-dnl _AM_DEPENDENCIES(OBJC) doesn't work, so hard code OBJCDEPMODE here
-#OBJCDEPMODE="depmode=gcc3"
-#AC_SUBST(OBJCDEPMODE)
-_AM_DEPENDENCIES(OBJC)
-AC_MSG_RESULT(not implemented yet)
 
 dnl Find the right ranlib, even when cross-compiling
 AC_CHECK_TOOL(RANLIB, ranlib, :)
@@ -904,22 +888,27 @@ fi
 #    fi
 #done
 
-AC_CACHE_CHECK([if \$CC accepts -Wall],
+AC_CACHE_CHECK([if $CC accepts -Wall],
     [ac_cv_c_Wall],
     [CFLAGS="-Wall ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_Wall=yes, ac_cv_c_Wall=no)])
 
-AC_CACHE_CHECK([if \$CC accepts -Wconversion],
+AC_CACHE_CHECK([if $CC accepts -Wextra],
+    [ac_cv_c_Werror],
+    [CFLAGS="-Werror ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Werror=yes, ac_cv_c_Werror=no)])
+
+AC_CACHE_CHECK([if $CC accepts -Wconversion],
     [ac_cv_c_Wconversion],
     [CFLAGS="-Wconversion ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_Wconversion=yes, ac_cv_c_Wconversion=no)])
 
-AC_CACHE_CHECK([if \$CC accepts -Wunreachable-code],
+AC_CACHE_CHECK([if $CC accepts -Wunreachable-code],
     [ac_cv_c_Wunreachable_code],
     [CFLAGS="-Wunreachable-code ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_Wunreachable_code=yes, ac_cv_c_Wunreachable_code=no)])
 
-AC_CACHE_CHECK([if \$CC accepts -Wsign-compare],
+AC_CACHE_CHECK([if $CC accepts -Wsign-compare],
     [ac_cv_c_Wsign_compare],
     [CFLAGS="-Wsign-compare ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_Wsign_compare=yes, ac_cv_c_Wsign_compare=no)])
@@ -928,6 +917,12 @@ if test "${ac_cv_c_Wall}" != "no"; then
     CFLAGS_save="-Wall ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wall ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wall ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+fi
+
+if test "${ac_cv_c_Wextra}" != "no"; then
+    CFLAGS_save="-Wextra ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="-Wextra ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+    OBJCFLAGS_save="-Wextra ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
 if test "${ac_cv_c_Wsign_compare}" != "no"; then
