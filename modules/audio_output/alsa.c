@@ -27,12 +27,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
+
+#include <stdio.h>
 #include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
-
-#include <vlc/vlc.h>
-
 #include <vlc/aout.h>
 #include <vlc_interaction.h>
 
