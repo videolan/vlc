@@ -25,6 +25,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
+
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
@@ -33,7 +35,6 @@
 #include <ctype.h>
 #include <signal.h>
 
-#include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/aout.h>
 #include <vlc/vout.h>
@@ -1978,7 +1979,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         /* get */
         vlc_value_t val, text;
         int i;
-        float f_value;
+        float f_value = 0.;
         char *psz_value = NULL;
 
         if ( var_Get( p_vout, psz_variable, &val ) < 0 )
