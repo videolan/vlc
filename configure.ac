@@ -9,7 +9,7 @@ VERSION_EXTRA="svn"
 CONFIGURE_LINE="$0 $*"
 CODENAME="Janus"
 
-AC_PREREQ(2.59c)
+AC_PREREQ(2.59)
 AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)
 AC_CANONICAL_SYSTEM
@@ -37,7 +37,6 @@ VLC_SAVE_FLAGS
 dnl
 dnl Check for tools
 dnl
-AC_PROG_CC_C99
 AM_PROG_CC_C_O
 AC_PROG_CPP
 AC_PROG_CXX
@@ -5175,11 +5174,24 @@ dnl
 activex=false
 AC_ARG_ENABLE(activex,
   [  --enable-activex        build a vlc-based ActiveX control (default enabled on Win32)])
+AC_ARG_WITH(wine-sdk-path,
+  [    --with-wine-sdk-path=PATH path to wine sdk])
 if test "${enable_activex}" != "no"
 then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
   then
-    AC_CHECK_PROGS(MIDL, [midl widl], no)
+    AC_CHECK_PROGS(MIDL, [midl], no)
+    if test "${with_wine_sdk_path}" != ""
+    then
+       WINE_SDK_PATH=${with_wine_sdk_path}
+       AC_PATH_PROG(WIDL, widl, no, [$WINE_SDK_PATH/bin:$WINE_SDK_PATH/tools/widl])
+    else
+       AC_CHECK_PROGS(WIDL, [widl], no)
+       if test "${WIDL}" != "no"
+       then
+          WINE_SDK_PATH="`dirname ${WIDL}`"/..
+       fi
+    fi
     AC_LANG_PUSH(C++)
     AC_CHECK_HEADERS(ole2.h olectl.h,
       [ VLC_ADD_CXXFLAGS([activex],[-fno-exceptions])
@@ -5199,6 +5211,8 @@ then
 fi
 AC_ARG_VAR(MIDL, [Microsoft IDL compiler (Win32 platform only)])
 AM_CONDITIONAL(HAS_MIDL_COMPILER, test "${MIDL}" != "no")
+AC_ARG_VAR(WIDL, [Wine IDL compiler (requires Wine SDK)])
+AM_CONDITIONAL(HAS_WIDL_COMPILER, test "${WIDL}" != "no")
 AM_CONDITIONAL(BUILD_ACTIVEX,${activex})
 
 dnl
@@ -5534,6 +5548,7 @@ AC_SUBST(RCC)
 AC_SUBST(UIC)
 AC_SUBST(WINDRES)
 AC_SUBST(MOZILLA_SDK_PATH)
+AC_SUBST(WINE_SDK_PATH)
 AC_SUBST(XPIDL)
 AC_SUBST(XPIDL_INCL)
 AC_SUBST(LIBEXT)

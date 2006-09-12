@@ -472,7 +472,6 @@ ${automake} --add-missing --copy -Wall
 ##
 rm -f vlc-config.in vlc-config
 rm -f src/misc/modules_builtin.h
-rm -f mozilla/vlcintf.h
 
 # Shut up
 set +x
