@@ -12,7 +12,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 TOUI = ui/input_stats ui/main_interface ui/file_open \
-       ui/logindialog ui/inputdialog ui/progressdialog ui/sprefs_trivial \
+       ui/sprefs_trivial \
        ui/sprefs_audio ui/sprefs_playlist ui/sprefs_subtitles \
        ui/sprefs_video ui/sprefs_interface
 UIH = $(TOUI:%=%.h)
@@ -137,9 +137,6 @@ EXTRA_DIST += \
 	ui/input_stats.ui \
 	ui/file_open.ui \
 	ui/main_interface.ui \
-	ui/logindialog.ui \
-	ui/inputdialog.ui \
-	ui/progressdialog.ui \
 	ui/sprefs_trivial.ui \
 	ui/sprefs_audio.ui \
 	ui/sprefs_video.ui \

@@ -25,14 +25,12 @@
 
 #include <vlc/vlc.h>
 #include <vlc_interaction.h>
-#undef Q_
-#include <ui/inputdialog.h>
-#undef Q_
-#include <ui/logindialog.h>
-#undef Q_
-#include <ui/progressdialog.h>
-#undef Q_
 #include <QWidget>
+
+class QPushButton;
+class QLabel;
+class QProgressBar;
+class QLineEdit;
 
 class InteractionDialog : public QWidget
 {
@@ -47,12 +45,11 @@ private:
     QWidget *panel;
     intf_thread_t *p_intf;
     interaction_dialog_t *p_dialog;
-    Ui::LoginDialog *uiLogin;
-    Ui::InputDialog *uiInput;
-    Ui::ProgressDialog *uiProgress;
 
     QPushButton *defaultButton, *otherButton, *altButton;
     QLabel *description;
+    QProgressBar *progressBar;
+    QLineEdit *inputEdit, *loginEdit, *passwordEdit;
 
     void Finish( int );
 private slots:
