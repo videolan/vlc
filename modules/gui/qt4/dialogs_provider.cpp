@@ -19,18 +19,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
-#include "qt4.hpp"
+
 #include <QEvent>
+#include <QApplication>
+#include <QSignalMapper>
+#include <QFileDialog>
+
+#include "qt4.hpp"
 #include "dialogs_provider.hpp"
+#include "menus.hpp"
+#include <vlc_intf_strings.h>
+
+/* The dialogs */
 #include "dialogs/playlist.hpp"
 #include "dialogs/prefs_dialog.hpp"
 #include "dialogs/streaminfo.hpp"
 #include "dialogs/messages.hpp"
-#include <QApplication>
-#include <QSignalMapper>
-#include "menus.hpp"
-#include <vlc_intf_strings.h>
-#include <QFileDialog>
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -41,12 +45,11 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
     fixed_timer->start( 150 /* milliseconds */ );
 
     menusMapper = new QSignalMapper();
-    connect( menusMapper, SIGNAL( mapped(QObject *) ), this,
-            SLOT(menuAction( QObject *)) );
+    CONNECT( menusMapper, mapped(QObject *), this, menuAction( QObject *) );
 
     menusUpdateMapper = new QSignalMapper();
-    connect( menusUpdateMapper, SIGNAL( mapped(QObject *) ), this,
-            SLOT(menuUpdateAction( QObject *)) );
+    CONNECT( menusUpdateMapper, mapped(QObject *),
+             this, menuUpdateAction( QObject *) );
 }
 
 void DialogsProvider::customEvent( QEvent *event )

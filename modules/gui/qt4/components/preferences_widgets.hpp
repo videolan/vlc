@@ -62,6 +62,7 @@ public:
     static ConfigControl * createControl( vlc_object_t*,
                                           module_config_t*,QWidget*,
                                           QGridLayout *, int);
+    void doApply( intf_thread_t *);
 protected:
     vlc_object_t *p_this;
     module_config_t *p_item;
@@ -196,18 +197,6 @@ public:
 private:
     void finish();
 };
-#if 0
-class FloatConfigControl : public VFloatConfigControl
-{
-public:
-    FloatConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) :
-                ConfigControl(a,b,c) {};
-    virtual ~FloatConfigControl() {};
-    virtual float getValue();
-private:
-    QDoubleSpinBox *spin;
-};
-#endif
 
 /*******************************************************
  * String-based controls

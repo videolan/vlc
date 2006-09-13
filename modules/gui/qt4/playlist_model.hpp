@@ -27,6 +27,7 @@
 #include <QModelIndex>
 #include <QObject>
 #include <QEvent>
+
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc_playlist.h>

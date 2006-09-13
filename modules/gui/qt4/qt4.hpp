@@ -55,6 +55,8 @@ struct intf_sys_t
 #define qtu( i ) i.toUtf8().data()
 #define qta( i ) i.toAscii().data()
 
+#define CONNECT( a, b, c, d ) connect( a, SIGNAL( b ), c, SLOT(d) )
+
 static int DialogEvent_Type = QEvent::User + 1;
 
 class DialogEvent : public QEvent

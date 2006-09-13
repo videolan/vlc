@@ -45,9 +45,12 @@ void InputStatsPanel::Update( input_item_t *p_item )
     { QString str; ui.widget->setText( str.sprintf( format, ## calc ) );  }
 
     UPDATE( read_text, "%8.0f kB", (float)(p_item->p_stats->i_read_bytes)/1000);
-    UPDATE( input_bitrate_text, "%6.0f kb/s", (float)(p_item->p_stats->f_input_bitrate * 8000 ));
-    UPDATE( demuxed_text, "%8.0f kB", (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
-    UPDATE( stream_bitrate_text, "%6.0f kb/s", (float)(p_item->p_stats->f_demux_bitrate * 8000 ));
+    UPDATE( input_bitrate_text, "%6.0f kb/s",
+                    (float)(p_item->p_stats->f_input_bitrate * 8000 ));
+    UPDATE( demuxed_text, "%8.0f kB",
+                    (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
+    UPDATE( stream_bitrate_text, "%6.0f kb/s",
+                    (float)(p_item->p_stats->f_demux_bitrate * 8000 ));
 
     /* Video */
     UPDATE( vdecoded_text, "%5i", p_item->p_stats->i_decoded_video );

@@ -64,14 +64,10 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     layout->addWidget(clearButton, 1, 4 );
     layout->addWidget(closeButton, 1, 5 );
 
-    connect( closeButton, SIGNAL( clicked() ) ,
-           this, SLOT( onCloseButton()));
-    connect( clearButton, SIGNAL( clicked() ) ,
-           this, SLOT( onClearButton()));
-    connect( saveLogButton, SIGNAL( clicked() ) ,
-           this, SLOT( onSaveButton()));
-    connect( DialogsProvider::getInstance(NULL)->fixed_timer,
-             SIGNAL( timeout() ), this, SLOT(updateLog() ) );
+    CONNECT( closeButton, clicked(), this, close() );
+    CONNECT( clearButton, clicked(), this, clear() );
+    CONNECT( saveLogButton, clicked(), this, save() );
+    CONNECT( THEDP->fixed_timer, timeout(), this, updateLog() );
 }
 
 MessagesDialog::~MessagesDialog()
@@ -153,25 +149,24 @@ void MessagesDialog::updateLog()
     }
 }
 
-void MessagesDialog::onCloseButton()
+void MessagesDialog::close()
 {
     this->toggleVisible();
 }
 
-void MessagesDialog::onClearButton()
+void MessagesDialog::clear()
 {
     messages->clear();
 }
 
-bool MessagesDialog::onSaveButton()
+bool MessagesDialog::save()
 {
     QString saveLogFileName = QFileDialog::getSaveFileName(
-            this,
-            "Choose a filename to save the logs under...",
+            this, qtr("Choose a filename to save the logs under..."),
             p_intf->p_vlc->psz_homedir,
             "Texts / Logs (*.log *.txt);; All (*.*) ");
 
-    if (saveLogFileName != NULL)
+    if( saveLogFileName != NULL )
     {
         QFile file(saveLogFileName);
         if (!file.open(QFile::WriteOnly | QFile::Text)) {

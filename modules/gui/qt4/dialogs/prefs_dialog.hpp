@@ -25,6 +25,7 @@
 #define _PREFS_DIALOG_H_
 
 #include "util/qvlcframe.hpp"
+#include "components/simple_preferences.hpp"
 
 class PrefsTree;
 class SPrefsCatList;
@@ -51,7 +52,7 @@ public:
             instance = new PrefsDialog( _p_intf );
         return instance;
     }
-    virtual ~PrefsDialog();
+    virtual ~PrefsDialog() {};
 private:
     PrefsDialog( intf_thread_t * );
 
@@ -59,6 +60,7 @@ private:
     QHBoxLayout *main_panel_l;
     PrefsPanel *advanced_panel;
     SPrefsPanel *simple_panel;
+    SPrefsPanel *simple_panels[SPrefsMax];
 
     QWidget *tree_panel;
     QHBoxLayout *tree_panel_l;
@@ -67,9 +69,6 @@ private:
 
     QGroupBox *types;
     QRadioButton *small,*all;
-#if 0
-    QCheckBox *adv_chk;
-#endif
 
     QGridLayout *main_layout;
 
@@ -81,9 +80,6 @@ private slots:
      void setSmall();
      void save();
      void cancel();
-#if 0
-     void setAdvanced( bool );
-#endif
 };
 
 #endif

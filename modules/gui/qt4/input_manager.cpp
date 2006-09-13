@@ -23,9 +23,9 @@
 
 #include <assert.h>
 
+#include "qt4.hpp"
 #include "input_manager.hpp"
 #include "dialogs_provider.hpp"
-#include "qt4.hpp"
 
 static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
                         vlc_value_t n, void *param );
@@ -41,8 +41,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
 {
     i_old_playing_status = END_S;
     p_input = NULL;
-    /* Subscribe to updates */
-    connect( THEDP->fixed_timer, SIGNAL( timeout() ), this, SLOT( update() ) );
+    CONNECT( THEDP->fixed_timer, timeout(), this, update() );
 }
 
 InputManager::~InputManager()
@@ -174,11 +173,10 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf ) : QObject(NULL),
     p_input = NULL;
     im = new InputManager( this, p_intf );
     /* Get timer updates */
-    connect( DialogsProvider::getInstance(p_intf)->fixed_timer,
-             SIGNAL(timeout() ), this, SLOT( updateInput() ) );
+    CONNECT( THEDP->fixed_timer, timeout(), this, updateInput() );
     /* Warn our embedded IM about input changes */
-    connect( this, SIGNAL( inputChanged( input_thread_t * ) ),
-             im, SLOT( setInput( input_thread_t * ) ) );
+    CONNECT( this, inputChanged( input_thread_t * ),
+             im,   setInput( input_thread_t * ) );
 }
 
 MainInputManager::~MainInputManager()
@@ -232,6 +230,7 @@ static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
     InputManager *im = (InputManager*)param;
     im->b_has_audio = true;
 }
+
 static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
                         vlc_value_t n, void *param )
 {

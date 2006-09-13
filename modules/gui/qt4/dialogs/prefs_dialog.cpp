@@ -34,6 +34,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QCheckBox>
+
 PrefsDialog *PrefsDialog::instance = NULL;
 
 PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
@@ -74,18 +75,19 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      setSmall();
 
      QPushButton *save, *cancel;
-     QHBoxLayout *buttonsLayout =
-         QVLCFrame::doButtons( this, NULL, &save, _("Save"),
-                                           &cancel, _("Cancel"),
-                                                NULL, NULL );
-     connect( save, SIGNAL( clicked() ), this, SLOT( save() ) );
-     connect( cancel, SIGNAL( clicked() ), this, SLOT( cancel() ) );
+     QHBoxLayout *buttonsLayout = QVLCFrame::doButtons( this, NULL, 
+                                                        &save, _("Save"),
+                                                        &cancel, _("Cancel"),
+                                                        NULL, NULL );
      main_layout->addLayout( buttonsLayout, 2,0, 1 ,3 );
-
      setLayout( main_layout );
 
-     connect( small, SIGNAL( clicked() ), this, SLOT( setSmall()) );
-     connect( all, SIGNAL( clicked() ), this, SLOT( setAll()) );
+     CONNECT( save, clicked(), this, save() );
+     CONNECT( cancel, clicked(), this, cancel() );
+     CONNECT( small, clicked(), this, setSmall() );
+     CONNECT( all, clicked(), this, setAll() );
+
+     for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
 }
 
 void PrefsDialog::setAll()
@@ -127,9 +129,9 @@ void PrefsDialog::setSmall()
     if( !simple_tree )
     {
          simple_tree = new SPrefsCatList( p_intf, tree_panel );
-         connect( simple_tree,
-          SIGNAL( currentItemChanged( QListWidgetItem *, QListWidgetItem *) ),
-          this, SLOT( changeSimplePanel( QListWidgetItem * ) ) );
+         CONNECT( simple_tree,
+                  currentItemChanged( QListWidgetItem *, QListWidgetItem *),
+                  this,  changeSimplePanel( QListWidgetItem * ) );
     }
     tree_panel_l->addWidget( simple_tree );
     simple_tree->show();
@@ -145,10 +147,6 @@ void PrefsDialog::setSmall()
     simple_panel->show();
 }
 
-PrefsDialog::~PrefsDialog()
-{
-}
-
 void PrefsDialog::changeSimplePanel( QListWidgetItem *item )
 {
     int number = item->data( Qt::UserRole ).toInt();
@@ -156,10 +154,10 @@ void PrefsDialog::changeSimplePanel( QListWidgetItem *item )
     {
         main_panel_l->removeWidget( simple_panel );
         simple_panel->hide();
-        /* Don't do this once it works, you would loose all changes */
-        delete simple_panel;
     }
-    simple_panel = new SPrefsPanel( p_intf, main_panel, number );
+    if( !simple_panels[number] )
+        simple_panel = new SPrefsPanel( p_intf, main_panel, number );
+    simple_panels[number] = simple_panel;
     main_panel_l->addWidget( simple_panel );
     simple_panel->show();
 }
@@ -174,7 +172,7 @@ void PrefsDialog::changePanel( QTreeWidgetItem *item )
         advanced_panel->hide();
     }
     if( !data->panel )
-        data->panel = new PrefsPanel( p_intf, main_panel , data, true );
+        data->panel = new PrefsPanel( p_intf, main_panel , data );
 
     advanced_panel = data->panel;
     main_panel_l->addWidget( advanced_panel );
@@ -184,7 +182,10 @@ void PrefsDialog::changePanel( QTreeWidgetItem *item )
 void PrefsDialog::save()
 {
     if( small->isChecked() && simple_tree )
-        simple_tree->applyAll();
+    {
+        for( int i = 0 ; i< SPrefsMax; i++ )
+            if( simple_panels[i] ) simple_panels[i]->apply();
+    }
     else if( all->isChecked() && advanced_tree )
         advanced_tree->applyAll();
     config_SaveConfigFile( p_intf, NULL );
@@ -195,8 +196,8 @@ void PrefsDialog::cancel()
 {
     if( small->isChecked() && simple_tree )
     {
-        simple_tree->cleanAll();
-        simple_panel = NULL;
+        for( int i = 0 ; i< SPrefsMax; i++ )
+            if( simple_panels[i] ) simple_panels[i]->clean();
     }
     else if( all->isChecked() && advanced_tree )
     {

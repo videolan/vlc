@@ -105,6 +105,32 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     return p_control;
 }
 
+void ConfigControl::doApply( intf_thread_t *p_intf )
+{
+    switch( getType() )
+    {
+        case 1:
+        {
+            VIntConfigControl *vicc = qobject_cast<VIntConfigControl *>(this);
+            config_PutInt( p_intf, vicc->getName(), vicc->getValue() );
+            break;
+        }
+        case 2:
+        {
+            VFloatConfigControl *vfcc = 
+                                    qobject_cast<VFloatConfigControl *>(this);
+            config_PutFloat( p_intf, vfcc->getName(), vfcc->getValue() );
+            break;
+        }
+        case 3:
+        {
+            VStringConfigControl *vscc =
+                            qobject_cast<VStringConfigControl *>(this);
+            config_PutPsz( p_intf, vscc->getName(), qta( vscc->getValue() ) );
+        }
+    }
+}
+
 /**************************************************************************
  * String-based controls
  *************************************************************************/

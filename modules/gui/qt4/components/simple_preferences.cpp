@@ -22,15 +22,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "components/simple_preferences.hpp"
-#include "components/preferences_widgets.hpp"
-#include "qt4.hpp"
-#include <vlc_config_cat.h>
-#include <assert.h>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QString>
 #include <QFont>
+
+#include "components/simple_preferences.hpp"
+#include "components/preferences_widgets.hpp"
+#include "qt4.hpp"
+
+#include <vlc_config_cat.h>
+#include <assert.h>
 
 #include "pixmaps/advanced_50x50.xpm"
 #include "pixmaps/audio_50x50.xpm"
@@ -58,48 +60,21 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
     setAlternatingRowColors( true );
 
-#ifndef WIN32
-    // Fixme - A bit UGLY
-    QFont f = font();
-    int pSize = f.pointSize();
-    if( pSize > 0 )
-        f.setPointSize( pSize + 1 );
-    else
-        f.setPixelSize( f.pixelSize() + 1 );
-    setFont( f );
-#endif
-
 #define ADD_CATEGORY( id, label, icon )                             \
     addItem( label );                                               \
     item( id )->setIcon( QIcon( QPixmap( icon ) ) );                \
     item( id )->setData( Qt::UserRole, qVariantFromValue( (int)id ) );
 
-    ADD_CATEGORY( SPrefsVideo, "Video", video_50x50_xpm );
-    ADD_CATEGORY( SPrefsAudio, "Audio", audio_50x50_xpm );
-    ADD_CATEGORY( SPrefsInputAndCodecs, "Input and Codecs",
+    ADD_CATEGORY( SPrefsVideo, qtr("Video"), video_50x50_xpm );
+    ADD_CATEGORY( SPrefsAudio, qtr("Audio"), audio_50x50_xpm );
+    ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input and Codecs"),
                   input_and_codecs_50x50_xpm );
-    ADD_CATEGORY( SPrefsPlaylist, "Playlist", playlist_50x50_xpm );
-    ADD_CATEGORY( SPrefsInterface, "Interface", interface_50x50_xpm );
-    ADD_CATEGORY( SPrefsSubtitles, "Subtitles", subtitles_50x50_xpm );
-    ADD_CATEGORY( SPrefsAdvanced, "Advanced", advanced_50x50_xpm );
+    ADD_CATEGORY( SPrefsPlaylist, qtr("Playlist"), playlist_50x50_xpm );
+    ADD_CATEGORY( SPrefsInterface, qtr("Interface"), interface_50x50_xpm );
+    ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles"), subtitles_50x50_xpm );
+    ADD_CATEGORY( SPrefsAdvanced, qtr("Advanced"), advanced_50x50_xpm );
 
     setCurrentRow( SPrefsInterface );
-}
-
-void SPrefsCatList::applyAll()
-{
-    doAll( false );
-}
-
-void SPrefsCatList::cleanAll()
-{
-    doAll( true );
-}
-
-/// \todo When cleaning, we should remove the panel ?
-void SPrefsCatList::doAll( bool doclean )
-{
-    /* Todo */
 }
 
 /*********************************************************************
@@ -187,33 +162,15 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
 }
 
-void SPrefsPanel::Apply()
+void SPrefsPanel::apply()
 {
-    /* todo: factorize with PrefsPanel  */
     QList<ConfigControl *>::Iterator i;
     for( i = controls.begin() ; i != controls.end() ; i++ )
     {
-        VIntConfigControl *vicc = qobject_cast<VIntConfigControl *>(*i);
-        if( !vicc )
-        {
-            VFloatConfigControl *vfcc = qobject_cast<VFloatConfigControl *>(*i);
-            if( !vfcc)
-            {
-                VStringConfigControl *vscc =
-                               qobject_cast<VStringConfigControl *>(*i);
-                assert( vscc );
-                config_PutPsz( p_intf, vscc->getName(),
-                                       vscc->getValue().toAscii().data() );
-                continue;
-            }
-            config_PutFloat( p_intf, vfcc->getName(),
-                                     vfcc->getValue() );
-            continue;
-        }
-        config_PutInt( p_intf, vicc->getName(),
-                               vicc->getValue() );
+        ConfigControl *c = qobject_cast<ConfigControl *>(*i);
+        c->doApply( p_intf );
     }
 }
 
-void SPrefsPanel::Clean()
+void SPrefsPanel::clean()
 {}

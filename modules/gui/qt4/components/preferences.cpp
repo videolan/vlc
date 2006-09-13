@@ -20,20 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include "components/preferences.hpp"
-#include "components/preferences_widgets.hpp"
-#include "qt4.hpp"
-#include <vlc_config_cat.h>
-#include <vlc_intf_strings.h>
-#include <assert.h>
 
-#include "pixmaps/audio.xpm"
-#include "pixmaps/video.xpm"
-#include "pixmaps/type_net.xpm"
-#include "pixmaps/type_playlist.xpm"
-#include "pixmaps/advanced.xpm"
-#include "pixmaps/codec.xpm"
-#include "pixmaps/intf.xpm"
 #include <QApplication>
 #include <QLabel>
 #include <QTreeWidget>
@@ -47,9 +34,24 @@
 #include <QHBoxLayout>
 #include <QGridLayout>
 #include <QHeaderView>
-
 #include <QPalette>
 #include <QColor>
+
+#include "components/preferences.hpp"
+#include "components/preferences_widgets.hpp"
+#include "qt4.hpp"
+
+#include <vlc_config_cat.h>
+#include <vlc_intf_strings.h>
+#include <assert.h>
+
+#include "pixmaps/audio.xpm"
+#include "pixmaps/video.xpm"
+#include "pixmaps/type_net.xpm"
+#include "pixmaps/type_playlist.xpm"
+#include "pixmaps/advanced.xpm"
+#include "pixmaps/codec.xpm"
+#include "pixmaps/intf.xpm"
 
 #define ITEM_HEIGHT 25
 
@@ -68,9 +70,6 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
     setAlternatingRowColors( true );
     header()->hide();
-
-    QFont myFont = QApplication::font(0);
-    myFont.setPointSize( myFont.pointSize() + 3 ); myFont.setBold( true );
 
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b##_xpm ))
     BI( audio, audio );
@@ -338,7 +337,7 @@ PrefsPanel::PrefsPanel( QWidget *_parent ) : QWidget( _parent )
 {}
 
 PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
-                        PrefsItemData * data, bool currently_advanced ) :
+                        PrefsItemData * data ) :
                         QWidget( _parent ), p_intf( _p_intf )
 {
     module_config_t *p_item;
@@ -464,9 +463,8 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             control = ConfigControl::createControl( VLC_OBJECT( p_intf ),
                                     p_item, NULL, boxlayout, i_boxline );
         if( !control )
-        {
             continue;
-        }
+
         if( box ) i_boxline++;
         else i_line++;
         controls.append( control );
@@ -495,34 +493,12 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 void PrefsPanel::apply()
 {
-    /* todo */
     QList<ConfigControl *>::Iterator i;
     for( i = controls.begin() ; i != controls.end() ; i++ )
     {
         ConfigControl *c = qobject_cast<ConfigControl *>(*i);
-        switch( c->getType() )
-        {
-        case 1:
-            {
-            VIntConfigControl *vicc = qobject_cast<VIntConfigControl *>(*i);
-            config_PutInt( p_intf, vicc->getName(), vicc->getValue() );
-            break;
-            }
-        case 2:
-            {
-            VFloatConfigControl *vfcc = qobject_cast<VFloatConfigControl *>(*i);
-            config_PutFloat( p_intf, vfcc->getName(), vfcc->getValue() );
-            break;
-            }
-        case 3:
-            {
-            VStringConfigControl *vscc =
-                            qobject_cast<VStringConfigControl *>(*i);
-            config_PutPsz( p_intf, vscc->getName(), qta( vscc->getValue() ) );
-            }
-        }
+        c->doApply( p_intf );
     }
 }
-
 void PrefsPanel::clean()
 {}

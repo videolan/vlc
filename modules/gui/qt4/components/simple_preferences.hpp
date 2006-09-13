@@ -29,13 +29,14 @@
 #include <vlc/intf.h>
 
 enum {
-    SPrefsVideo,
+    SPrefsVideo = 0,
     SPrefsAudio,
     SPrefsInputAndCodecs,
     SPrefsPlaylist,
     SPrefsInterface,
     SPrefsSubtitles,
-    SPrefsAdvanced
+    SPrefsAdvanced,
+    SPrefsMax
 };
 #define SPrefsDefaultCat SPrefsInterface
 
@@ -47,12 +48,7 @@ class SPrefsCatList : public QListWidget
 public:
     SPrefsCatList( intf_thread_t *, QWidget *);
     virtual ~SPrefsCatList() {};
-
-    void applyAll();
-    void cleanAll();
-
 private:
-    void doAll( bool );
     intf_thread_t *p_intf;
 };
 
@@ -62,8 +58,8 @@ class SPrefsPanel : public QWidget
 public:
     SPrefsPanel( intf_thread_t *, QWidget *, int );
     virtual ~SPrefsPanel() {};
-    void Apply();
-    void Clean();
+    void apply();
+    void clean();
 private:
     intf_thread_t *p_intf;
     QList<ConfigControl *> controls;

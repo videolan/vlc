@@ -50,9 +50,9 @@ private:
     QTextEdit *messages;
 public slots:
     void updateLog();
-    void onCloseButton();
-    void onClearButton();
-    bool onSaveButton();
+    void close();
+    void clear();
+    bool save();
 };
 
 #endif

@@ -21,14 +21,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "menus.hpp"
-#include "dialogs_provider.hpp"
-#include "input_manager.hpp"
 #include <QMenu>
 #include <QMenuBar>
 #include <QAction>
 #include <QActionGroup>
 #include <QSignalMapper>
+
+#include "menus.hpp"
+#include "dialogs_provider.hpp"
+#include "input_manager.hpp"
 
 enum
 {
@@ -167,8 +168,7 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     objects.push_back( p_intf->i_object_id );
 
     QMenu *menu = Populate( p_intf, current, varnames, objects );
-    connect( menu, SIGNAL( aboutToShow() ),
-             THEDP->menusUpdateMapper, SLOT(map()) );
+    CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );
     THEDP->menusUpdateMapper->setMapping( menu, 4 );
 
     return menu;
@@ -695,7 +695,7 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
     }
     MenuItemData *itemData = new MenuItemData( i_object_id, i_val_type,
                                                val, psz_var );
-    connect( action, SIGNAL(triggered()), THEDP->menusMapper, SLOT(map()) );
+    CONNECT( action, triggered(), THEDP->menusMapper, map() );
     THEDP->menusMapper->setMapping( action, itemData );
     menu->addAction( action );
 }

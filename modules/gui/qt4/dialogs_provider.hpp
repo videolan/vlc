@@ -26,10 +26,12 @@
 #include <QObject>
 #include <QTimer>
 #include <QApplication>
+
+#include "dialogs/interaction.hpp"
+
+#include <assert.h>
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
-#include "dialogs/interaction.hpp"
-#include <assert.h>
 
 class QEvent;
 class QSignalMapper;
@@ -86,6 +88,5 @@ public slots:
     void openMLDirectory();
     void quit();
 };
-
 
 #endif

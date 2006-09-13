@@ -21,10 +21,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
 #include <QApplication>
+
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"
 #include "main_interface.hpp"
+
 #include "../../../share/vlc32x32.xpm"
 
 /*****************************************************************************

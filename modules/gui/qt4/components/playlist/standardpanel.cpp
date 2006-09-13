@@ -21,21 +21,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "qt4.hpp"
 #include "playlist_model.hpp"
 #include "components/playlist/panels.hpp"
+#include "util/customwidgets.hpp"
+
 #include <QTreeView>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QKeyEvent>
-#include "qt4.hpp"
-#include <assert.h>
 #include <QModelIndexList>
 #include <QToolBar>
 #include <QLabel>
 #include <QSpacerItem>
-#include "util/customwidgets.hpp"
+
+#include <assert.h>
 
 StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
@@ -52,15 +54,12 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
     view->header()->setClickable( true );
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
 
-    connect( view, SIGNAL( activated( const QModelIndex& ) ), model,
-             SLOT( activateItem( const QModelIndex& ) ) );
-
-    connect( view, SIGNAL( rightClicked( QModelIndex , QPoint ) ),
-             this, SLOT( doPopup( QModelIndex, QPoint ) ) );
-
-    connect( model,
-             SIGNAL( dataChanged( const QModelIndex&, const QModelIndex& ) ),
-             this, SLOT( handleExpansion( const QModelIndex& ) ) );
+    CONNECT( view, activated( const QModelIndex& ) ,
+             model,activateItem( const QModelIndex& ) );
+    CONNECT( view, rightClicked( QModelIndex , QPoint ),
+             this, doPopup( QModelIndex, QPoint ) );
+    CONNECT( model, dataChanged( const QModelIndex&, const QModelIndex& ),
+             this, handleExpansion( const QModelIndex& ) );
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing( 0 ); layout->setMargin( 0 );

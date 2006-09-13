@@ -78,7 +78,7 @@ class PrefsPanel : public QWidget
 {
     Q_OBJECT
 public:
-    PrefsPanel( intf_thread_t *, QWidget *, PrefsItemData *, bool );
+    PrefsPanel( intf_thread_t *, QWidget *, PrefsItemData * );
     PrefsPanel( QWidget *);
     virtual ~PrefsPanel() {};
     void apply();
@@ -87,15 +87,6 @@ private:
     intf_thread_t *p_intf;
     QList<ConfigControl *> controls;
     QVBoxLayout *global_layout;
-#if 0
-    QLabel *some_hidden_text;
-    bool advanced;
-#endif
-public slots:
-#if 0
-    void setAdvanced( bool, bool );
-    void setAdvanced( bool a ) { return setAdvanced( a, false ); }
-#endif
 };
 
 #endif

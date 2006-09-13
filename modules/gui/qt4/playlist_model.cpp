@@ -21,13 +21,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <assert.h>
 #include <QIcon>
 #include <QFont>
-#include "qt4.hpp"
-#include <QApplication>
-#include "playlist_model.hpp"
-#include <assert.h>
 #include <QMenu>
+#include <QApplication>
+
+#include "qt4.hpp"
+#include "playlist_model.hpp"
 #include <vlc_intf_strings.h>
 
 #include "pixmaps/type_unknown.xpm"
