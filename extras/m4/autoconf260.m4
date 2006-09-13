@@ -4,7 +4,7 @@
 # Distribution and usage of this file, verbatim or modified, is permitted
 # with no limitations.
 
-AC_DEFUN([AC_PROG_CC_C00],
+AC_DEFUN([AC_PROG_CC_C99],
 [ AC_REQUIRE([AC_PROG_CC])dnl
   CC="$CC -std=c99"
 ])
