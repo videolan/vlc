@@ -34,38 +34,6 @@
 VLC_EXPORT( void, resolve_xml_special_chars, ( char *psz_value ) );
 VLC_EXPORT( char *, convert_xml_special_chars, ( const char *psz_content ) );
 
-struct localized_string_t 
-{
-    char *psz_lang;
-    char *psz_text;
-};
-
-struct i18n_string_t
-{
-    int i_langs;
-    localized_string_t **pp_langs;
-};
-
-static inline void i18n_AddLang( i18n_string_t *p_src,
-                                 char *psz_lang, char *psz_text )
-{
-    DECMALLOC_VOID( pl10n, localized_string_t );
-    pl10n->psz_lang = strdup( psz_lang );
-    pl10n->psz_text = strdup( psz_text );
-    INSERT_ELEM( p_src->pp_langs, p_src->i_langs, p_src->i_langs, pl10n );
-};
-
-static inline char *i18n_Get( i18n_string_t *p_src, char *psz_lang )
-{
-    int i;
-    for( i = 0 ; i < p_src->i_langs; i++ )
-    {
-        if( !strcmp( p_src->pp_langs[i]->psz_lang, psz_lang ) )
-            return p_src->pp_langs[i]->psz_text;
-    }
-    return strdup( "" );
-};
-
 /**
  * @}
  */

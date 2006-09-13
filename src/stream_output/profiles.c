@@ -4,7 +4,7 @@
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
  *
- * Authors: Cl�ent Stenac <zorglub@videolan.org>
+ * Authors: Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,9 @@
 /**********************************************************************
  * General chain manipulation
  **********************************************************************/
+/** Add a new duplicate element to a streaming chain
+ * \return the new element
+ */
 sout_duplicate_t *streaming_ChainAddDup( sout_chain_t *p_chain )
 {
     DECMALLOC_NULL( p_module, sout_module_t );
@@ -44,11 +47,13 @@ sout_duplicate_t *streaming_ChainAddDup( sout_chain_t *p_chain )
     p_module->i_type = SOUT_MOD_DUPLICATE;
     DUPM->i_children = 0;
     DUPM->pp_children = NULL;
-    INSERT_ELEM( p_chain->pp_modules, p_chain->i_modules, p_chain->i_modules,
-                 p_module );
-    return p_module->typed.p_duplicate;
+    TAB_APPEND( p_chain->i_modules, p_chain->pp_modules, p_module );
+    return DUPM;
 }
 
+/** Add a new standard element to a streaming chain
+ * \return the new element
+ */
 sout_std_t *streaming_ChainAddStd( sout_chain_t *p_chain, char *psz_access,
                                    char *psz_mux, char *psz_url )
 {
@@ -58,22 +63,27 @@ sout_std_t *streaming_ChainAddStd( sout_chain_t *p_chain, char *psz_access,
     STDM->psz_mux = strdup( psz_mux );
     STDM->psz_access = strdup( psz_access );
     STDM->psz_url = strdup( psz_url );
-    INSERT_ELEM( p_chain->pp_modules, p_chain->i_modules, p_chain->i_modules,
-                 p_module );
+    TAB_APPEND( p_chain->i_modules, p_chain->pp_modules, p_module );
     return STDM;
 }
-
+/** Add a new display element to a streaming chain
+ * \return the new element
+ */
 sout_display_t *streaming_ChainAddDisplay( sout_chain_t *p_chain )
 {
     DECMALLOC_NULL( p_module, sout_module_t );
     MALLOC_NULL( DISM, sout_display_t );
     p_module->i_type = SOUT_MOD_DISPLAY;
+    TAB_APPEND( p_chain->i_modules, p_chain->pp_modules, p_module );
     return DISM;
 }
 
+/** Add a new transcode element to a streaming chain
+ * \return the new element
+ */
 sout_transcode_t *streaming_ChainAddTranscode( sout_chain_t *p_chain,
                         char *psz_vcodec, char * psz_acodec, char * psz_scodec,
-                        int i_vb, float f_scale, int i_ab, int i_channels, 
+                        int i_vb, float f_scale, int i_ab, int i_channels,
                         vlc_bool_t b_soverlay, char *psz_additional )
 {
     DECMALLOC_NULL( p_module, sout_module_t );
@@ -87,17 +97,16 @@ sout_transcode_t *streaming_ChainAddTranscode( sout_chain_t *p_chain,
     TRAM->i_vb = i_vb; TRAM->i_ab = i_ab; TRAM->f_scale = f_scale;
     TRAM->i_channels = i_channels; TRAM->b_soverlay = b_soverlay;
     if( TRAM->psz_additional ) TRAM->psz_additional = strdup( psz_additional );
+    TAB_APPEND( p_chain->i_modules, p_chain->pp_modules, p_module );
     return TRAM;
 }
-            
+
+/** Add a new clean child chain to an existing duplicate element */
 void streaming_DupAddChild( sout_duplicate_t *p_dup )
 {
-    if( p_dup )
-    {
-        sout_chain_t * p_child = streaming_ChainNew();
-        INSERT_ELEM( p_dup->pp_children, p_dup->i_children,
-                     p_dup->i_children, p_child );
-    }
+    assert( p_dup );
+    sout_chain_t * p_child = streaming_ChainNew();
+    TAB_APPEND( p_dup->i_children, p_dup->pp_children, p_child );
 }
 
 #define DUP_OR_CHAIN p_dup ? p_dup->pp_children[p_dup->i_children-1] : p_chain
@@ -108,6 +117,7 @@ void streaming_DupAddChild( sout_duplicate_t *p_dup )
                  psz_opt );\
     free( psz_opt ); }
 
+/** Clean up a chain (recursively if it has some children) */
 void streaming_ChainClean( sout_chain_t *p_chain )
 {
     int i,j;
@@ -122,9 +132,7 @@ void streaming_ChainClean( sout_chain_t *p_chain )
             case SOUT_MOD_DUPLICATE:
                 if( DUPM->i_children == 0 ) break;
                 for( j = DUPM->i_children - 1 ; j >= 0; j-- )
-                {
                     streaming_ChainClean( DUPM->pp_children[j] );
-                }
                 break;
             case SOUT_MOD_STD:
                 FREENULL( STDM->psz_url );
@@ -142,6 +150,105 @@ void streaming_ChainClean( sout_chain_t *p_chain )
             }
             REMOVE_ELEM( p_chain->pp_modules, p_chain->i_modules, i );
             free( p_module );
+        }
+    }
+}
+
+/**********************************************************************
+ * Parameters handling
+ **********************************************************************/
+
+#define APPLY_PSZ( element, field ) case element: \
+streaming_ParameterApply( p_param, &p_module->field, NULL, NULL, NULL ); break;
+#define APPLY_INT( element, field ) case element: \
+streaming_ParameterApply( p_param, NULL, &p_module->field, NULL, NULL ); break;
+#define APPLY_FLOAT( element, field ) case element: \
+streaming_ParameterApply( p_param, NULL, NULL, &p_module->field, NULL ); break;
+#define APPLY_BOOL( element, field ) case element: \
+streaming_ParameterApply( p_param, NULL, NULL, NULL, &p_module->field ); break;
+
+/** Apply the parameters for the Std module. It will copy the values from
+ * the parameters to the fields themselves
+ */
+void streaming_StdParametersApply( sout_std_t *p_module )
+{
+    int i;
+    for( i = 0 ; i< p_module->i_params; i++ )
+    {
+        sout_param_t *p_param = p_module->pp_params[i];
+        switch( p_param->i_element )
+        {
+            APPLY_PSZ( PSZ_MUX, psz_mux );
+            APPLY_PSZ( PSZ_ACCESS, psz_access );
+            APPLY_PSZ( PSZ_URL, psz_url );
+            APPLY_PSZ( PSZ_NAME, psz_name );
+            APPLY_PSZ( PSZ_GROUP, psz_group );
+        }
+    }
+}
+
+/** Apply the parameters for the Transcode module. It will copy the values from
+ * the parameters to the fields themselves
+ */
+void streaming_TranscodeParametersApply( sout_transcode_t *p_module )
+{
+    int i;
+    for( i = 0 ; i< p_module->i_params; i++ )
+    {
+        sout_param_t *p_param = p_module->pp_params[i];
+        switch( p_param->i_element )
+        {
+            APPLY_INT( I_VB, i_vb ); APPLY_INT( I_AB, i_ab );
+            APPLY_INT( I_CHANNELS, i_channels ) ;
+            APPLY_FLOAT( F_SCALE, f_scale );
+            APPLY_BOOL( B_SOVERLAY, b_soverlay );
+            APPLY_PSZ( PSZ_VC, psz_vcodec );
+            APPLY_PSZ( PSZ_AC, psz_acodec );
+            APPLY_PSZ( PSZ_SC, psz_scodec );
+            APPLY_PSZ( PSZ_VE, psz_venc ); APPLY_PSZ( PSZ_AE, psz_aenc );
+        }
+    }
+}
+
+/** Apply a single parameter
+ * \param p_param the parameter to apply
+ * \param ppsz_dest target string, if param is a string
+ * \param pi_dest target int, if param is an integer
+ * \param pf_dest target float, if param is a float
+ * \param pb_dest target bool, if param is a bool
+ */
+void streaming_ParameterApply( sout_param_t *p_param, char **ppsz_dest,
+                             int *pi_dest, float *pf_dest, vlc_bool_t *pb_dest )
+{
+    /* Todo : Handle psz_string like formatting */
+    if( p_param->psz_string )
+    {
+        assert( ppsz_dest );
+        fprintf( stderr, "Unsupported !\n" );
+    }
+    else
+    {
+        switch( p_param->i_type )
+        {
+        case VLC_VAR_INTEGER:
+            assert( pi_dest );
+            *pi_dest = p_param->value.i_int;
+            break;
+        case VLC_VAR_FLOAT:
+            assert( pf_dest );
+            *pf_dest = p_param->value.f_float;
+            break;
+        case VLC_VAR_STRING:
+            assert( ppsz_dest );
+            FREENULL( **ppsz_dest );
+            *ppsz_dest = p_param->value.psz_string ?
+                                strdup( p_param->value.psz_string ) :
+                                NULL;
+            break;
+        case VLC_VAR_BOOL:
+            assert( pb_dest );
+            *pb_dest = p_param->value.b_bool;
+            break;
         }
     }
 }
@@ -173,8 +280,8 @@ void streaming_ChainClean( sout_chain_t *p_chain )
 
 
 /**
- * Try to convert a chain to a gui descriptor. This is only possible for 
- * "simple" chains. 
+ * Try to convert a chain to a gui descriptor. This is only possible for
+ * "simple" chains.
  * \param p_this vlc object
  * \param p_chain the source streaming chain
  * \param pd the destination gui descriptor object
@@ -203,9 +310,9 @@ vlc_bool_t streaming_ChainToGuiDesc( vlc_object_t *p_this,
     if( p_chain->pp_modules[i_last]->i_type == SOUT_MOD_DUPLICATE )
     {
         p_module = p_chain->pp_modules[i_last];
-        
+
         // Nothing allowed after duplicate. Duplicate mustn't be empty
-        if( p_chain->i_modules > i_last +1 || !DUPM->i_children ) 
+        if( p_chain->i_modules > i_last +1 || !DUPM->i_children )
             return VLC_FALSE;
         for( j = 0 ; j<  DUPM->i_children ; j++ )
         {
@@ -274,11 +381,11 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
     {
         streaming_ChainAddTranscode( p_chain, pd->psz_vcodec, pd->psz_acodec,
                                      pd->psz_scodec, pd->i_vb, pd->f_scale,
-                                     pd->i_ab, pd->i_channels, 
+                                     pd->i_ab, pd->i_channels,
                                      pd->b_soverlay, NULL );
     }
     /* #std{} */
-    if( pd->b_local + pd->b_file + pd->b_http + pd->b_mms + pd->b_rtp + 
+    if( pd->b_local + pd->b_file + pd->b_http + pd->b_mms + pd->b_rtp +
         pd->b_udp > 1 )
     {
         p_dup = streaming_ChainAddDup( p_chain );
@@ -315,7 +422,7 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
         if( pd->b_sap )
         {
             pd->b_sap = VLC_TRUE;
-            p_std->psz_name = strdup( pd->psz_name );       
+            p_std->psz_name = strdup( pd->psz_name );
             p_std->psz_group = pd->psz_group ? strdup( pd->psz_group ) : NULL;
         }
     }
@@ -379,12 +486,12 @@ char * streaming_ChainToPsz( sout_chain_t *p_chain )
 
 /**
  * List the available profiles. Fills the pp_profiles list with preinitialized
- * values. Only metadata is decoded
+ * values.
  * \param p_this vlc object
  * \param pi_profiles number of listed profiles
  * \param pp_profiles array of profiles
  */
-void streaming_ProfilesList( vlc_object_t *p_this, int *pi_profiles, 
+void streaming_ProfilesList( vlc_object_t *p_this, int *pi_profiles,
                              streaming_profile_t **pp_profiles )
 {
 }

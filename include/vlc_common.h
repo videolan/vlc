@@ -335,6 +335,8 @@ typedef struct announce_method_t announce_method_t;
 typedef struct announce_handler_t announce_handler_t;
 typedef struct sap_handler_t sap_handler_t;
 
+typedef struct sout_param_t sout_param_t;
+typedef struct sout_pcat_t sout_pcat_t;
 typedef struct sout_std_t sout_std_t;
 typedef struct sout_display_t sout_display_t;
 typedef struct sout_duplicate_t sout_duplicate_t;
@@ -369,8 +371,6 @@ typedef struct iso639_lang_t iso639_lang_t;
 typedef struct device_t device_t;
 typedef struct device_probe_t device_probe_t;
 typedef struct probe_sys_t probe_sys_t;
-typedef struct localized_string_t localized_string_t;
-typedef struct i18n_string_t i18n_string_t;
 
 /* block */
 typedef struct block_t      block_t;

@@ -26,6 +26,10 @@
 
 #include <vlc/vlc.h>
 
+/***********************************************************************
+ * Predefined lists of streaming data
+ ***********************************************************************/
+
 #ifdef WIN32
 #define VCODECS_NUMBER 13
 #else
@@ -38,26 +42,11 @@
 #define MUXERS_NUMBER 10
 enum
 {
-    MUX_PS,
-    MUX_TS,
-    MUX_MPEG,
-    MUX_OGG,
-    MUX_RAW,
-    MUX_ASF,
-    MUX_AVI,
-    MUX_MP4,
-    MUX_MOV,
-    MUX_WAV,
+    MUX_PS, MUX_TS, MUX_MPEG, MUX_OGG, MUX_RAW,
+    MUX_ASF, MUX_AVI, MUX_MP4, MUX_MOV, MUX_WAV,
 };
 
-enum
-{
-    ACCESS_HTTP,
-    ACCESS_UDP,
-    ACCESS_MMS,
-    ACCESS_RTP,
-    ACCESS_FILE
-};
+enum { ACCESS_HTTP, ACCESS_UDP, ACCESS_MMS, ACCESS_RTP, ACCESS_FILE };
 
 struct codec_desc_t {
     char *psz_display;
@@ -93,7 +82,39 @@ struct mux_desc_t {
 
 //static const char *abitrates_array[] =
 //{ "512", "256", "192", "128", "96", "64", "32", "16" } ;
+//
 
+
+/***********************************************************************
+ * Streaming profiles
+ ***********************************************************************/
+
+/****************** Parameters handling *********************/
+struct sout_param_t
+{
+    int i_type;
+    int i_element;
+    char *psz_id;
+    char *psz_string;
+    vlc_value_t value;
+};
+
+struct sout_pcat_t
+{
+    char *psz_name;
+    int i_params;
+    sout_param_t **pp_params;
+};
+
+void streaming_ParameterApply( sout_param_t *p_param, char **ppsz_dest,
+                           int *pi_dest, float *pf_dest, vlc_bool_t *pb_dest );
+
+
+/******** Module types definitions and parametrable elements ***************/
+
+/* Transcode */
+enum { I_VB, I_AB, I_CHANNELS, F_SCALE, B_SOVERLAY, PSZ_VC, PSZ_AC, PSZ_SC,
+       PSZ_VE, PSZ_AE };
 struct sout_transcode_t
 {
     int i_vb, i_ab, i_channels;
@@ -101,18 +122,27 @@ struct sout_transcode_t
     vlc_bool_t b_soverlay;
     char *psz_vcodec, *psz_acodec, *psz_scodec, *psz_venc, *psz_aenc;
     char *psz_additional;
-};
 
-struct sout_std_t 
+    int i_params; sout_param_t **pp_params;
+};
+void streaming_TranscodeParametersApply( sout_transcode_t *p_module );
+
+/* Standard */
+enum { PSZ_MUX, PSZ_ACCESS, PSZ_URL, PSZ_NAME, PSZ_GROUP };
+struct sout_std_t
 {
     char *psz_mux, *psz_access;
     char *psz_url, *psz_name, *psz_group;
+    int i_params; sout_param_t **pp_params;
 };
+void streaming_StdParametersApply( sout_std_t *p_module );
 
-struct sout_display_t 
+/* Display */
+struct sout_display_t
 {
 };
 
+/* Duplicate */
 struct sout_duplicate_t
 {
     int i_children, i_conditions;
@@ -120,6 +150,7 @@ struct sout_duplicate_t
     char **ppsz_conditions;
 };
 
+/******* Generic profile structures and manipulation functions ********/
 typedef union
 {
     sout_transcode_t *p_transcode;
@@ -128,7 +159,6 @@ typedef union
     sout_display_t   *p_display;
 } sout_module_type_t;
 
-
 struct sout_module_t
 {
     int i_type;
@@ -136,14 +166,8 @@ struct sout_module_t
     sout_module_t *p_parent;
 };
 
-enum
-{
-    SOUT_MOD_TRANSCODE,
-    SOUT_MOD_STD,
-    SOUT_MOD_RTP,
-    SOUT_MOD_DUPLICATE,
-    SOUT_MOD_DISPLAY
-};
+enum { SOUT_MOD_TRANSCODE, SOUT_MOD_STD, SOUT_MOD_RTP, SOUT_MOD_DUPLICATE,
+       SOUT_MOD_DISPLAY };
 
 struct sout_chain_t
 {
@@ -152,9 +176,28 @@ struct sout_chain_t
 
     int i_options;
     char **ppsz_options;
+
+    int i_pcats;
+    sout_pcat_t **pp_pcats;
 };
 
-struct sout_gui_descr_t 
+static inline sout_chain_t *streaming_ChainNew()
+{
+    DECMALLOC_NULL( p_chain, sout_chain_t );
+    memset( p_chain, 0, sizeof( sout_chain_t ) );
+    p_chain->i_options = 0;
+    return p_chain;
+}
+
+struct streaming_profile_t
+{
+    char *psz_title;
+    char *psz_description;
+    sout_chain_t *p_chain;
+};
+
+/**************** GUI interaction *****************/
+struct sout_gui_descr_t
 {
     /* Access */
     vlc_bool_t b_local, b_file, b_http, b_mms, b_rtp, b_udp, b_dump;
@@ -176,30 +219,12 @@ struct sout_gui_descr_t
     int i_ttl;
 };
 
-struct streaming_profile_t 
-{
-    i18n_string_t *p_title;
-    i18n_string_t *p_description;
-    sout_chain_t *p_chain;
-};
-
-static inline sout_chain_t *streaming_ChainNew()
-{
-    DECMALLOC_NULL( p_chain, sout_chain_t );
-    memset( p_chain, 0, sizeof( sout_chain_t ) );
-    p_chain->i_options = 0;
-    return p_chain;
-}
-
+/***************** Profile parsing ***********************/
 
 struct profile_parser_t
 {
     char *psz_profile;
     streaming_profile_t *p_profile;
 };
-
-
-
-//VLC_XEXPORT( char *, streaming_ChainToPsz, (sout_chain_t * ) );
 
 #endif
