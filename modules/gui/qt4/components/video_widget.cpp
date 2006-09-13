@@ -52,16 +52,13 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i, bool _always ) : QFrame( NULL ),
 
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 
-    connect( DialogsProvider::getInstance(NULL)->fixed_timer,
-             SIGNAL( timeout() ), this, SLOT( update() ) );
+    ON_TIMEOUT( update() );
 
     if( always )
     {
-       DrawBackground();
-       connect( THEMIM->getIM(), SIGNAL( audioStarted() ),
-                this, SLOT( hasAudio() ) );
-       connect( THEMIM->getIM(), SIGNAL( audioStarted() ),
-                this, SLOT( hasVideo() ) );
+        DrawBackground();
+        CONNECT( THEMIM->getIM(), audioStarted(), this, hasAudio() );
+        CONNECT( THEMIM->getIM(), audioStarted(), this, hasVideo() );
     }
     need_update = false;
 }

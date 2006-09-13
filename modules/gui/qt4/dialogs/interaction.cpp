@@ -130,12 +130,11 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
                               &altButton, p_dialog->psz_alternate_button,
                               &otherButton, p_dialog->psz_other_button );
         if( p_dialog->psz_default_button )
-            connect( defaultButton, SIGNAL( clicked() ),
-                     this, SLOT( defaultB() ) );
+            BUTTONACT( defaultButton, defaultB );
         if( p_dialog->psz_alternate_button )
-            connect( altButton, SIGNAL( clicked() ), this, SLOT( altB() ) );
+            BUTTONACT( altButton, altB );
         if( p_dialog->psz_other_button )
-            connect( otherButton, SIGNAL( clicked() ), this, SLOT( otherB() ) );
+            BUTTONACT( otherButton, otherB );
         setLayout( layout );
         setWindowTitle( qfu( p_dialog->psz_title ) );
     }

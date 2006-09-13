@@ -42,8 +42,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setWindowTitle( qtr( "Playlist" ) );
 
     SDMapper = new QSignalMapper();
-    connect( SDMapper, SIGNAL( mapped (QString)), this,
-             SLOT( SDMenuAction( QString ) ) );
+    CONNECT( SDMapper, mapped (QString), this, SDMenuAction( QString ) );
     createPlMenuBar( menuBar(), p_intf );
 
     selector = new PLSelector( centralWidget(), p_intf, THEPL );
@@ -54,8 +53,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( centralWidget(),
                               p_intf, THEPL, p_root ) );
-    connect( selector, SIGNAL( activated( int ) ),
-             rightPanel, SLOT( setRoot( int ) ) );
+    CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
 
     QHBoxLayout *layout = new QHBoxLayout();
     layout->addWidget( selector, 0 );
@@ -126,7 +124,7 @@ QMenu *PlaylistDialog::SDMenu()
             {
                 a->setChecked( true );
             }
-            connect( a , SIGNAL( triggered() ), SDMapper, SLOT( map() ) );
+            CONNECT( a , trigerred(), SDMapper, map() );
             SDMapper->setMapping( a, i>=0? p_parser->pp_shortcuts[i] :
                                             p_parser->psz_object_name );
             menu->addAction( a );

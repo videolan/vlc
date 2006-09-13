@@ -82,10 +82,10 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      main_layout->addLayout( buttonsLayout, 2,0, 1 ,3 );
      setLayout( main_layout );
 
-     CONNECT( save, clicked(), this, save() );
-     CONNECT( cancel, clicked(), this, cancel() );
-     CONNECT( small, clicked(), this, setSmall() );
-     CONNECT( all, clicked(), this, setAll() );
+     BUTTONACT( save, save() );
+     BUTTONACT( cancel, cancel() );
+     BUTTONACT( small, setSmall() );
+     BUTTONACT( all, setAll() );
 
      for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
 }
@@ -101,9 +101,9 @@ void PrefsDialog::setAll()
     if( !advanced_tree )
     {
          advanced_tree = new PrefsTree( p_intf, tree_panel );
-         connect( advanced_tree,
-          SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem *) ),
-          this, SLOT( changePanel( QTreeWidgetItem * ) ) );
+         CONNECT( advanced_tree,
+                  currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem *),
+                  this, changePanel( QTreeWidgetItem * ) );
     }
     tree_panel_l->addWidget( advanced_tree );
     advanced_tree->show();

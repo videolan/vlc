@@ -41,7 +41,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
 {
     i_old_playing_status = END_S;
     p_input = NULL;
-    CONNECT( THEDP->fixed_timer, timeout(), this, update() );
+    ON_TIMEOUT( update() );
 }
 
 InputManager::~InputManager()
@@ -172,8 +172,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf ) : QObject(NULL),
 {
     p_input = NULL;
     im = new InputManager( this, p_intf );
-    /* Get timer updates */
-    CONNECT( THEDP->fixed_timer, timeout(), this, updateInput() );
+    ON_TIMEOUT( updateInput() );
     /* Warn our embedded IM about input changes */
     CONNECT( this, inputChanged( input_thread_t * ),
              im,   setInput( input_thread_t * ) );

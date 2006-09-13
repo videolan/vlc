@@ -114,35 +114,26 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
+    ON_TIMEOUT( updateOnTimer() );
 
     /* Volume control */
-    connect( ui.volumeSlider, SIGNAL( valueChanged(int) ),
-             this, SLOT( updateVolume(int) ) );
-
-    /* Get timer updates */
-    connect( THEDP->fixed_timer, SIGNAL( timeout() ),
-             this, SLOT(updateOnTimer() ) );
-
+    CONNECT( ui.volumeSlider, valueChanged(int), this, updateVolume(int) );
     /* Connect the input manager to the GUI elements it manages */
-    connect( THEMIM->getIM(),SIGNAL(positionUpdated( float, int, int ) ),
-             slider, SLOT( setPosition( float,int, int ) ) );
-    connect( THEMIM->getIM(), SIGNAL( positionUpdated( float, int, int ) ),
-             this, SLOT( setDisplay( float, int, int ) ) );
-    connect( THEMIM->getIM(), SIGNAL( nameChanged( QString ) ),
-             this, SLOT( setName( QString ) ) );
-    connect( THEMIM->getIM(), SIGNAL( statusChanged( int ) ),
-             this, SLOT( setStatus( int ) ) );
-    connect( slider, SIGNAL( sliderDragged( float ) ),
-             THEMIM->getIM(),SLOT( sliderUpdate( float ) ) );
+    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
+             slider, setPosition( float,int, int ) );
+    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
+             this, setDisplay( float, int, int ) );
+    CONNECT( THEMIM->getIM(), nameChanged( QString ), this,setName( QString ) );
+    CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
+    CONNECT( slider, sliderDragged( float ),
+             THEMIM->getIM(), sliderUpdate( float ) );
 
     /* Actions */
-    connect( ui.playButton, SIGNAL( clicked() ), this, SLOT( play() ) );
-    connect( ui.stopButton, SIGNAL( clicked() ), this, SLOT( stop() ) );
-    connect( ui.nextButton, SIGNAL( clicked() ), this, SLOT( next() ) );
-    connect( ui.prevButton, SIGNAL( clicked() ), this, SLOT( prev() ) );
-
-    connect( ui.playlistButton, SIGNAL(clicked()),
-             THEDP, SLOT( playlistDialog() ) );
+    BUTTONACT( ui.playButton, play() );
+    BUTTONACT( ui.stopButton, stop() );
+    BUTTONACT( ui.nextButton, next() );
+    BUTTONACT( ui.prevButton, prev() );
+    CONNECT( ui.playlistButton, clicked(), THEDP, playlistDialog() );
 
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );

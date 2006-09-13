@@ -34,8 +34,7 @@ StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf, bool _main_input ) :
 {
     setWindowTitle( _("Stream information" ) );
     ISP = new InputStatsPanel( this, p_intf );
-    connect( DialogsProvider::getInstance(NULL)->fixed_timer,
-             SIGNAL( timeout() ), this, SLOT(update() ) );
+    ON_TIMEOUT( update() );
     p_input = NULL;
 }
 

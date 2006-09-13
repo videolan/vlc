@@ -38,10 +38,10 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf,
     view->header()->hide();
     view->setModel( model );
 
-    connect( view, SIGNAL( activated( const QModelIndex& ) ),
-             this, SLOT( setSource( const QModelIndex& ) ) );
-    connect( view, SIGNAL( clicked( const QModelIndex& ) ),
-             this, SLOT( setSource( const QModelIndex& ) ) );
+    CONNECT( view, activated( const QModelIndex& ),
+             this, setSource( const QModelIndex& ) );
+    CONNECT( view, clicked( const QModelIndex& ),
+             this, setSource( const QModelIndex& ) );
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing( 0 ); layout->setMargin( 0 );

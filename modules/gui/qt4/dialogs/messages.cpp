@@ -64,10 +64,10 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     layout->addWidget(clearButton, 1, 4 );
     layout->addWidget(closeButton, 1, 5 );
 
-    CONNECT( closeButton, clicked(), this, close() );
-    CONNECT( clearButton, clicked(), this, clear() );
-    CONNECT( saveLogButton, clicked(), this, save() );
-    CONNECT( THEDP->fixed_timer, timeout(), this, updateLog() );
+    BUTTONACT( closeButton, close() );
+    BUTTONACT( clearButton, clear() );
+    BUTTONACT( saveLogButton, save() );
+    ON_TIMEOUT( updateLog() );
 }
 
 MessagesDialog::~MessagesDialog()
@@ -90,16 +90,6 @@ void MessagesDialog::updateLog()
                 i_start != i_stop;
                 i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
-          // [FIXME] Does not work as the old one
-          // Outputs too much data ?
-          // if (p_sub->p_msg[i_start].i_type = VLC_MSG_ERR)
-          //          continue;
-          //  if( !b_verbose &&
-          //         VLC_MSG_ERR != p_sub->p_msg[i_start].i_type )
-          //                continue;
-
-            /* Append all messages to log window */
-
             if( p_sub->p_msg[i_start].i_type == VLC_MSG_INFO ||
                 p_sub->p_msg[i_start].i_type == VLC_MSG_ERR ||
                 p_sub->p_msg[i_start].i_type == VLC_MSG_WARN &&

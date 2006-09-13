@@ -114,8 +114,7 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
 #define BAR_DADD( func, title, id ) { \
     QMenu *menu = func; menu->setTitle( title  ); bar->addMenu( menu ); \
     MenuFunc *f = new MenuFunc( menu, id ); \
-    connect( menu, SIGNAL( aboutToShow() ), \
-            THEDP->menusUpdateMapper, SLOT(map()) ); \
+    CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() ); \
     THEDP->menusUpdateMapper->setMapping( menu, f ); }
 
 void QVLCMenu::createMenuBar( QMenuBar *bar, intf_thread_t *p_intf )

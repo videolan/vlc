@@ -70,25 +70,24 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
     if( model->hasRepeat() ) repeatButton->setText( qtr( "Repeat One" ) );
     else if( model->hasLoop() ) repeatButton->setText( qtr( "Repeat All" ) );
     else repeatButton->setText( qtr( "No Repeat" ) );
-    connect( repeatButton, SIGNAL( clicked() ), this, SLOT( toggleRepeat() ));
+    BUTTONACT( repeatButton, toggleRepeat() );
 
     randomButton = new QPushButton( 0 ); buttons->addWidget( randomButton );
     if( model->hasRandom() ) randomButton->setText( qtr( "Random" ) );
     else randomButton->setText( qtr( "No random" ) );
-    connect( randomButton, SIGNAL( clicked() ), this, SLOT( toggleRandom() ));
+    BUTTONACT( randomButton, toggleRandom() );
 
     QSpacerItem *spacer = new QSpacerItem( 10, 20 );buttons->addItem( spacer );
 
     QLabel *filter = new QLabel( qfu( "&Search:" ) + " " );
     buttons->addWidget( filter );
     searchLine = new  ClickLineEdit( qfu( "Playlist filter" ), 0 );
-    connect( searchLine, SIGNAL( textChanged(QString) ),
-             this, SLOT( search(QString)) );
+    CONNECT( searchLine, textChanged(QString), this, search(QString));
     buttons->addWidget( searchLine ); filter->setBuddy( searchLine );
 
     QPushButton *clear = new QPushButton( qfu( "CL") );
     buttons->addWidget( clear );
-    connect( clear, SIGNAL( clicked() ), this, SLOT( clearFilter() ) );
+    BUTTONACT( clear, clearFilter() );
 
     layout->addWidget( view );
     layout->addLayout( buttons );

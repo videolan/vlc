@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "qt4.hpp"
 #include "util/input_slider.hpp"
 
 InputSlider::InputSlider( QWidget *_parent ) : DirectSlider( _parent )
@@ -37,7 +38,7 @@ InputSlider::InputSlider( Qt::Orientation q,QWidget *_parent ) :
     setSingleStep( 2 );
     setPageStep( 10 );
     setTracking( true );
-    connect( this, SIGNAL( valueChanged(int) ), this, SLOT( userDrag( int ) ) );
+    CONNECT( this, valueChanged(int), this, userDrag( int ) );
 }
 
 void InputSlider::setPosition( float pos, int a, int b )
