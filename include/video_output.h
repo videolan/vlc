@@ -246,6 +246,8 @@ VLC_EXPORT( void,   vout_ReleaseWindow, ( vout_thread_t *, void * ) );
 VLC_EXPORT( int, vout_ControlWindow, ( vout_thread_t *, void *, int, va_list ) );
 void vout_IntfInit( vout_thread_t * );
 
+VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, char *,vlc_bool_t , vlc_bool_t  ) );
+
 
 static inline int vout_vaControl( vout_thread_t *p_vout, int i_query,
                                   va_list args )

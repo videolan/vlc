@@ -461,3 +461,71 @@ int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
     aout_Restart( p_aout );
     return 0;
 }
+
+/** Enable or disable an audio filter
+ * \param p_this a vlc object
+ * \param psz_name name of the filter
+ * \param b_add are we adding or removing the filter ?
+ */
+void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
+                        vlc_bool_t b_add )
+{
+    char *psz_parser, *psz_string;
+    aout_instance_t * p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
+
+    if( p_aout )
+        psz_string = var_GetString( p_aout, "audio-filter" );
+    else
+        psz_string = config_GetPsz( p_this, "audio-filter" );
+
+    if( !psz_string ) psz_string = strdup("");
+
+    psz_parser = strstr( psz_string, psz_name );
+
+    if( b_add )
+    {
+        if( !psz_parser )
+        {
+            psz_parser = psz_string;
+            asprintf( &psz_string, (*psz_string) ? "%s:%s" : "%s%s",
+                            psz_string, psz_name );
+            free( psz_parser );
+        }
+        else
+        {
+            vlc_object_release( p_aout );
+            return;
+        }
+    }
+    else
+    {
+        if( psz_parser )
+        {
+            memmove( psz_parser, psz_parser + strlen(psz_name) +
+                            (*(psz_parser + strlen(psz_name)) == ':' ? 1 : 0 ),
+                            strlen(psz_parser + strlen(psz_name)) + 1 );
+
+            if( *(psz_string+strlen(psz_string ) -1 ) == ':' )
+            {
+                *(psz_string+strlen(psz_string ) -1 ) = '\0';
+            }
+         }
+         else
+         {
+             free( psz_string );
+             return;
+         }
+    }
+
+    if( p_aout == NULL )
+        config_PutPsz( p_this, "audio-filter", psz_string );
+    else
+    {
+        var_SetString( p_aout, "audio-filter", psz_string );
+        for( int i = 0; i < p_aout->i_nb_inputs; i++ )
+            p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+        vlc_object_release( p_aout );
+    }
+    free( psz_string );
+}

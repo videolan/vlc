@@ -200,5 +200,6 @@ VLC_EXPORT( int, __aout_VolumeMute, ( vlc_object_t *, audio_volume_t * ) );
 VLC_EXPORT( int, aout_Restart, ( aout_instance_t * p_aout ) );
 VLC_EXPORT( int, aout_FindAndRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 VLC_EXPORT( int, aout_ChannelsRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
+VLC_EXPORT( void, aout_EnableFilter, (vlc_object_t *, const char *, vlc_bool_t ));
 
 #endif /* _VLC_AUDIO_OUTPUT_H */

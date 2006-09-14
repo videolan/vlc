@@ -124,7 +124,7 @@ QMenu *PlaylistDialog::SDMenu()
             {
                 a->setChecked( true );
             }
-            CONNECT( a , trigerred(), SDMapper, map() );
+            CONNECT( a , triggered(), SDMapper, map() );
             SDMapper->setMapping( a, i>=0? p_parser->pp_shortcuts[i] :
                                             p_parser->psz_object_name );
             menu->addAction( a );

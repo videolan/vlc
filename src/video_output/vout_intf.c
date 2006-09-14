@@ -731,6 +731,59 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
+ * Handle filters
+ *****************************************************************************/
+
+void vout_EnableFilter( vout_thread_t *p_vout, char *psz_name,
+                        vlc_bool_t b_add, vlc_bool_t b_setconfig )
+{
+    char *psz_parser;
+    char *psz_string = config_GetPsz( p_vout, "vout-filter" );
+
+    /* Todo : Use some generic chain manipulation functions */
+    if( !psz_string ) psz_string = strdup("");
+
+    psz_parser = strstr( psz_string, psz_name );
+    if( b_add )
+    {
+        if( !psz_parser )
+        {
+            psz_parser = psz_string;
+            asprintf( &psz_string, (*psz_string) ? "%s:%s" : "%s%s",
+                            psz_string, psz_name );
+            free( psz_parser );
+        }
+        else
+            return;
+    }
+    else
+    {
+        if( psz_parser )
+        {
+            memmove( psz_parser, psz_parser + strlen(psz_name) +
+                            (*(psz_parser + strlen(psz_name)) == ':' ? 1 : 0 ),
+                            strlen(psz_parser + strlen(psz_name)) + 1 );
+
+            /* Remove trailing : : */
+            if( *(psz_string+strlen(psz_string ) -1 ) == ':' )
+            {
+                *(psz_string+strlen(psz_string ) -1 ) = '\0';
+            }
+         }
+         else
+         {
+             free( psz_string );
+             return;
+         }
+    }
+    if( b_setconfig )
+        config_PutPsz( p_vout, "vout-filter", psz_string );
+
+    var_SetString( p_vout, "vout-filter", psz_string );
+    free( psz_string );
+}
+
+/*****************************************************************************
  * vout_ControlDefault: default methods for video output control.
  *****************************************************************************/
 int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )

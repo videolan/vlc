@@ -534,6 +534,8 @@ struct module_symbols_t
     int (*utf8_fprintf_inner) (FILE *, const char *, ...);
     int (*utf8_vfprintf_inner) (FILE *stream, const char *fmt, va_list ap);
     int (*net_SetDSCP_inner) (int fd, uint8_t dscp);
+    void (*vout_EnableFilter_inner) (vout_thread_t *, char *,vlc_bool_t , vlc_bool_t);
+    void (*aout_EnableFilter_inner) (vlc_object_t *, const char *, vlc_bool_t);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1003,6 +1005,8 @@ struct module_symbols_t
 #  define utf8_fprintf (p_symbols)->utf8_fprintf_inner
 #  define utf8_vfprintf (p_symbols)->utf8_vfprintf_inner
 #  define net_SetDSCP (p_symbols)->net_SetDSCP_inner
+#  define vout_EnableFilter (p_symbols)->vout_EnableFilter_inner
+#  define aout_EnableFilter (p_symbols)->aout_EnableFilter_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1475,6 +1479,8 @@ struct module_symbols_t
     ((p_symbols)->utf8_fprintf_inner) = utf8_fprintf; \
     ((p_symbols)->utf8_vfprintf_inner) = utf8_vfprintf; \
     ((p_symbols)->net_SetDSCP_inner) = net_SetDSCP; \
+    ((p_symbols)->vout_EnableFilter_inner) = vout_EnableFilter; \
+    ((p_symbols)->aout_EnableFilter_inner) = aout_EnableFilter; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__playlist_ItemNew_deprecated = NULL; \
     (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \
