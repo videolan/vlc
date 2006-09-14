@@ -694,8 +694,11 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
         current_selection = list;
         QMenu *menu = new QMenu;
         menu->addAction( qfu(I_POP_PLAY), this, SLOT( popupPlay() ) );
-        menu->addAction( qfu(I_POP_PREPARSE), this, SLOT( popupPreparse() ) );
         menu->addAction( qfu(I_POP_DEL), this, SLOT( popupDel() ) );
+        menu->addSeparator();
+        menu->addAction( qfu(I_POP_STREAM), this, SLOT( popupStream() ) );
+        menu->addAction( qfu(I_POP_SAVE), this, SLOT( popupSave() ) );
+        menu->addSeparator();
         menu->addAction( qfu(I_POP_INFO), this, SLOT( popupInfo() ) );
         if( p_item->i_children > -1 )
         {
@@ -719,6 +722,20 @@ void PLModel::popupPlay()
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_popup_item );
     activateItem( p_item );
     PL_UNLOCK;
+}
+
+void PLModel::popupInfo()
+{
+    fprintf( stderr, "Popup Info is NOT implemented\n" );
+}
+
+void PLModel::popupStream()
+{
+    fprintf( stderr, "Stream not implemented\n" );
+}
+void PLModel::popupSave()
+{
+    fprintf( stderr, "Save not implemented\n" );
 }
 
 /**********************************************************************

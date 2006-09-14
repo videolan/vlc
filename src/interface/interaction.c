@@ -272,6 +272,7 @@ int __intf_Progress( vlc_object_t *p_this, const char *psz_title,
     p_new->psz_description = strdup( psz_status );
     p_new->val.f_float = f_pos;
     p_new->i_timeToGo = i_time;
+    p_new->psz_alternate_button = strdup( _("Cancel" ) );
 
     if( psz_title )
     {

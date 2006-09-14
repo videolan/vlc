@@ -34,9 +34,11 @@
 #define I_POP_PLAY N_("Play")
 #define I_POP_PREPARSE N_("Fetch information")
 #define I_POP_DEL N_("Delete")
-#define I_POP_INFO N_("Information")
+#define I_POP_INFO N_("Information...")
 #define I_POP_SORT N_("Sort")
 #define I_POP_ADD N_("Add node")
+#define I_POP_STREAM N_("Stream...")
+#define I_POP_SAVE N_("Save...")
 
 /*************** Preferences *************/
 
