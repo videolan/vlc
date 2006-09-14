@@ -1,7 +1,7 @@
 /*****************************************************************************
  * axvlc.idl: ActiveX control for VLC
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2006 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *
@@ -23,18 +23,22 @@
 //comments terminated by [t] are by tonsofpcs, regarding the string review.  April 02, 2006. [t]
 //Possibly change all instances of "the current playlist" to "the playlist" and "current playlist" to "the playlist" [t]
 
+import "oaidl.idl";
+
 [
   uuid(DF2BBE39-40A8-433b-A279-073F48DA94B6),
   version(1.0),
-  helpstring("VideoLAN VLC ActiveX Plugin"),
+  helpstring("VideoLAN VLC ActiveX Plugin")
 ]
 library AXVLC
 {
-    importlib("stdole2.tlb");
-
     // Forward declare all types defined in this typelib
     interface IVLCControl;
+    interface IVLCPlaylist;
+    interface ILibVLCControl;
     dispinterface DVLCEvents;
+
+    importlib("stdole2.tlb");
 
     enum VLCPlaylistMode
     {
@@ -64,7 +68,7 @@ library AXVLC
     [
       odl,
       uuid(C2FA41D0-B113-476e-AC8C-9BD14999C1C1),
-      helpstring("VLC Control"),
+      helpstring("VLC Control (deprecated)"),
       dual,
       hidden,
       oleautomation
@@ -167,13 +171,172 @@ library AXVLC
     };
 
     [
+      odl,
+      uuid(9E0BD17B-2D3C-4656-B94D-03084F3FD9D4),
+      helpstring("VLC Audio APIs"),
+      dual,
+      oleautomation
+    ]
+    interface IVLCAudio : IDispatch
+    {
+        [propget, helpstring("Returns/sets the audio mute state.")]
+        HRESULT mute([out, retval] VARIANT_BOOL* muted);
+        [propput, helpstring("Returns/sets the audio mute state.")]
+        HRESULT mute([in] VARIANT_BOOL muted);
+
+        [propget, helpstring("Returns/sets audio volume as a percent value.")]
+        HRESULT volume([out, retval] int* volume);
+        [propput, helpstring("Returns/sets audio volume as a percent value.")]
+        HRESULT volume([in] int volume);
+
+        [helpstring("Mute/unmute audio playback.")]
+        HRESULT toggleMute();
+    };
+
+    [
+      odl,
+      uuid(49E0DBD1-9440-466C-9C97-95C67190C603),
+      helpstring("VLC Input APIs"),
+      dual,
+      oleautomation
+    ]
+    interface IVLCInput : IDispatch
+    {
+        [propget, helpstring("Returns the clip length, in milliseconds.")]
+        HRESULT length([out, retval] __int64* length);
+
+        [propget, helpstring("Returns/sets playback position in current clip.  Position is ranging from 0.0 to 1.0.")]
+        HRESULT position([out, retval] float* position);
+        [propput, helpstring("Returns/sets playback position in the current clip.  Position ranging from 0.0 to 1.0.")]
+        HRESULT position([in] float position);
+
+        [propget, helpstring("Returns/sets playback time in current clip, in milliseconds.")]
+        HRESULT time([out, retval] __int64* time);
+        [propput, helpstring("Returns/sets playback time in the current clip, in milliseconds.")]
+        HRESULT time([in] __int64 time);
+
+        [propget, helpstring("Returns current playback state.")]
+        HRESULT state([out, retval] int* state);
+
+        [propget, helpstring("Returns/sets current playback rate, normal rate is 1.0 ")]
+        HRESULT rate([out, retval] float* rate);
+        [propput, helpstring("Returns/sets current playback rate, normal rate is 1.0.")]
+        HRESULT rate([in] float rate);
+
+        [propget, helpstring("Returns current playback frames per seconds if available.")]
+        HRESULT fps([out, retval] float* fps);
+
+        [propget, helpstring("Returns whether current playback displays video.")]
+        HRESULT hasVout([out, retval] VARIANT_BOOL* hasVout);
+    };
+
+    [
+      odl,
+      uuid(54613049-40BF-4035-9E70-0A9312C0188D),
+      helpstring("VLC Playlist APIs"),
+      dual,
+      oleautomation
+    ]
+    interface IVLCPlaylist : IDispatch
+    {
+        [propget, helpstring("Returns number of items in playlist.")]
+        HRESULT itemCount([out, retval] int* count);
+
+        [propget, helpstring("Returns whether playback displays video.")]
+        HRESULT isPlaying([out, retval] VARIANT_BOOL* playing);
+
+        [helpstring("Add a playlist item.")]
+        HRESULT add([in] BSTR uri, [in] BSTR name, [in, optional] VARIANT options, [out, retval] int* item);
+
+        [helpstring("Play/Resume the playlist.")]
+        HRESULT play();
+
+        [helpstring("Play item in playlist.")]
+        HRESULT playItem([in] int item);
+
+        [helpstring("Play/Pause current clip.")]
+        HRESULT togglePause();
+
+        [helpstring("Stop current clip.")]
+        HRESULT stop();
+
+        [helpstring("Advance to next item in playlist.")]
+        HRESULT next();
+
+        [helpstring("Advance to previous item in playlist.")]
+        HRESULT prev();
+
+        [helpstring("Remove all items from playlist.")]
+        HRESULT clear();
+
+        [helpstring("remove item from playlist.")]
+        HRESULT removeItem([in] int item);
+    };
+
+    [
+      odl,
+      uuid(0AAEDF0B-D333-4B27-A0C6-BBF31413A42E),
+      helpstring("VLC Video APIs"),
+      dual,
+      oleautomation
+    ]
+    interface IVLCVideo : IDispatch
+    {
+        [propget, helpstring("Returns/sets the fullscreen state.")]
+        HRESULT fullscreen([out, retval] VARIANT_BOOL* fullscreen);
+        [propput, helpstring("Returns/sets the fullscreen state.")]
+        HRESULT fullscreen([in] VARIANT_BOOL fullscreen);
+
+        [propget, helpstring("Returns video original width.")]
+        HRESULT width([out, retval] int* width);
+
+        [propget, helpstring("Returns video original height.")]
+        HRESULT height([out, retval] int* height);
+    };
+
+    [
+      odl,
+      uuid(2D719729-5333-406C-BF12-8DE787FD65E3),
+      helpstring("VLC Control"),
+      dual,
+      oleautomation
+    ]
+    interface IVLCControl2 : IDispatch
+    {
+        [propget, helpstring("Returns the audio object.")]
+        HRESULT audio([out, retval] IVLCAudio** obj);
+
+        [propget, helpstring("Returns the audio object.")]
+        HRESULT input([out, retval] IVLCInput** obj);
+
+        [propget, helpstring("Returns the playlist object.")]
+        HRESULT playlist([out, retval] IVLCPlaylist** obj);
+
+        [propget, helpstring("Returns the audio object.")]
+        HRESULT video([out, retval] IVLCVideo** obj);
+    };
+
+    [
       uuid(E23FE9C6-778E-49D4-B537-38FCDE4887D8),
-      helpstring("VLC control"),
+      helpstring("VLC control (deprecated)"),
       control
     ]
     coclass VLCPlugin
     {
         [default] interface IVLCControl;
+        interface IVLCControl2;
+        [default, source] dispinterface DVLCEvents;
+    };
+
+    [
+      uuid(9BE31822-FDAD-461B-AD51-BE1D1C159921),
+      helpstring("VLC control"),
+      control
+    ]
+    coclass VLCPlugin2
+    {
+        [default] interface IVLCControl2;
+        interface IVLCControl;
         [default, source] dispinterface DVLCEvents;
     };
 };

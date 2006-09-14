@@ -38,6 +38,8 @@ SOURCES_activex = \
     viewobject.h \
     vlccontrol.cpp \
     vlccontrol.h \
+    vlccontrol2.cpp \
+    vlccontrol2.h \
     plugin.cpp \
     plugin.h \
     axvlc_idl.c \
@@ -101,9 +103,19 @@ clean-tlb:
 	rm -f axvlc.tlb axvlc_idl.c axvlc_idl.h
 
 else
+if HAS_WIDL_COMPILER
+
+axvlc.tlb axvlc_idl.c axvlc_idl.h: axvlc.idl
+	$(WIDL) -I$(WINE_SDK_PATH)/include -tuh -T axvlc.tlb -U axvlc_idl.c -H axvlc_idl.h axvlc.idl
+
+clean-tlb:
+	rm -f axvlc.tlb axvlc_idl.c axvlc_idl.h
+
+else
 
 clean-tlb:
 
+endif
 endif
 
 DATA_axvlc_rc = $(noinst_axvlc_rc_DATA)
@@ -125,14 +137,13 @@ endif
 clean-stamp:
 	rm -f stamp-pic
 
-stamp-pic: FORCE
-	@for dep in "" `$(VLC_CONFIG) --target builtin`; do \
-	  if test "$${dep}" -nt "$(LIBRARIES_activex)"; then \
-	    rm -f $@; \
-	    break; \
-	  fi; \
-	done
-	@if test ! -f $@; then printf "" > $@; fi
+if BUILD_SHARED
+stamp-pic:
+else
+stamp-pic: $(shell $(VLC_CONFIG) --target builtin)
+endif
+	@touch $@
+
 
 ###############################################################################
 # Clean rules
@@ -142,7 +153,6 @@ clean-local: clean-stamp clean-tlb
 	rm -f axvlc$(LIBEXT)
 
 ###############################################################################
-# Force rule
+# Force rules
 ###############################################################################
-FORCE:
 

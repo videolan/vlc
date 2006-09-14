@@ -529,7 +529,7 @@ STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
     return hr;
 };
 
-static void freeTargetOptions(char **cOptions, int cOptionCount)
+void VLCControl::FreeTargetOptions(char **cOptions, int cOptionCount)
 {
     // clean up 
     if( NULL != cOptions )
@@ -546,7 +546,7 @@ static void freeTargetOptions(char **cOptions, int cOptionCount)
     }
 };
 
-static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOptions, int *cOptionCount)
+HRESULT VLCControl::CreateTargetOptions(int codePage, VARIANT *options, char ***cOptions, int *cOptionCount)
 {
     HRESULT hr = E_INVALIDARG;
     if( VT_ERROR == V_VT(options) )
@@ -621,7 +621,7 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
                     if( FAILED(hr) )
                     {
                         // free already processed elements
-                        freeTargetOptions(*cOptions, *cOptionCount);
+                        FreeTargetOptions(*cOptions, *cOptionCount);
                     }
                 }
                 else
@@ -715,7 +715,7 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
             if( FAILED(hr) )
             {
                 // free already processed elements
-                freeTargetOptions(*cOptions, *cOptionCount);
+                FreeTargetOptions(*cOptions, *cOptionCount);
             }
         }
         else
@@ -750,7 +750,7 @@ STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistM
         int cOptionsCount;
         char **cOptions;
 
-        if( FAILED(createTargetOptions(CP_UTF8, &options, &cOptions, &cOptionsCount)) )
+        if( FAILED(CreateTargetOptions(CP_UTF8, &options, &cOptions, &cOptionsCount)) )
             return E_INVALIDARG;
 
         if( VLC_SUCCESS <= VLC_AddTarget(i_vlc, cUri, (const char **)cOptions, cOptionsCount, mode, position) )
@@ -766,7 +766,7 @@ STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistM
                 _p_instance->fireOnStopEvent();
         }
 
-        freeTargetOptions(cOptions, cOptionsCount);
+        FreeTargetOptions(cOptions, cOptionsCount);
         CoTaskMemFree(cUri);
     }
     return hr;

@@ -23,7 +23,6 @@
 #ifndef _VLCCONTROL_H_
 #define _VLCCONTROL_H_
 
-#include <oaidl.h>
 #include "axvlc_idl.h"
 
 class VLCControl : public IVLCControl
@@ -94,6 +93,9 @@ public:
     STDMETHODIMP get_AutoPlay(VARIANT_BOOL *autoplay);
     STDMETHODIMP put_AutoPlay(VARIANT_BOOL autoplay);
  
+    static HRESULT CreateTargetOptions(int codePage, VARIANT *options, char ***cOptions, int *cOptionCount);
+    static void FreeTargetOptions(char **cOptions, int cOptionCount);
+
 private:
 
     HRESULT      getTypeInfo();

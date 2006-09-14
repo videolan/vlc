@@ -70,6 +70,28 @@ BSTR BSTRFromCStr(UINT codePage, LPCSTR s)
     return NULL;
 };
 
+char *CStrFromGUID(REFGUID clsid)
+{
+    LPOLESTR oleStr;
+
+    if( FAILED(StringFromIID(clsid, &oleStr)) )
+        return NULL;
+
+#ifdef OLE2ANSI
+    return (LPCSTR)oleStr;
+#else
+    char *pct_CLSID = NULL;
+    size_t len = WideCharToMultiByte(CP_ACP, 0, oleStr, -1, NULL, 0, NULL, NULL);
+    if( len > 0 )
+    {
+        pct_CLSID = (char *)CoTaskMemAlloc(len);
+        WideCharToMultiByte(CP_ACP, 0, oleStr, -1, pct_CLSID, len, NULL, NULL);
+    }
+    CoTaskMemFree(oleStr);
+    return pct_CLSID;
+#endif
+};
+
 /*
 **  properties
 */
