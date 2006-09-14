@@ -26,6 +26,8 @@
  * Preamble
  *****************************************************************************/
 #import "intf.h"
+#import "controls.h"
+#import "vout.h"
 #import "fspanel.h"
 
 #define KEEP_VISIBLE_AFTER_ACTION 4 /* time in half-sec until this panel will hide again after an user's action */
@@ -34,7 +36,7 @@
  * VLCFSPanel
  *****************************************************************************/
 @implementation VLCFSPanel
-// We override this initializer so we can set the NSBorderlessWindowMask styleMask, and set a few other important settings
+/* We override this initializer so we can set the NSBorderlessWindowMask styleMask, and set a few other important settings */
 - (id)initWithContentRect:(NSRect)contentRect 
                 styleMask:(unsigned int)aStyle 
                   backing:(NSBackingStoreType)bufferingType 
@@ -44,8 +46,9 @@
     [win setOpaque:NO];
     [win setHasShadow: NO];
     [win setBackgroundColor:[NSColor clearColor]];
-    [win setLevel:NSFloatingWindowLevel]; // Let's make it sit on top of everything else
-    [win setAlphaValue:0.2]; // It'll start out mostly transparent
+    /* let the window sit on top of everything else and start out completely transparent */
+    [win setLevel:NSFloatingWindowLevel];
+    [win setAlphaValue:0.0];
     return win;
 }
 
@@ -60,7 +63,7 @@
     [self mouseExited:NULL];
 }
 
-// Windows created with NSBorderlessWindowMask normally can't be key, but we want ours to be
+/* Windows created with NSBorderlessWindowMask normally can't be key, but we want ours to be */
 - (BOOL)canBecomeKeyWindow
 {
     return YES;
@@ -94,7 +97,7 @@
     [[self contentView] setStreamPos:f_pos setSeconds:i_seconds];
 }
 
-// This routine is called repeatedly when the mouse enters the window from outside it.
+/* This routine is called repeatedly when the mouse enters the window from outside it. */
 - (void)focus:(NSTimer *)timer
 {
     if( [self alphaValue] < 1.0 )
@@ -111,7 +114,7 @@
     }
 }
 
-// This routine is called repeatedly when the mouse exits the window from inside it.
+/* This routine is called repeatedly when the mouse exits the window from inside it */
 - (void)unfocus:(NSTimer *)timer
 {
     if( [self alphaValue] > 0.0 )
@@ -133,13 +136,13 @@
     }
 }
 
-// If the mouse enters a window, go make sure we fade in
+/* If the mouse enters a window, go make sure we fade in */
 - (void)mouseEntered:(NSEvent *)theEvent
 {
     [self fadeIn];
 }
 
-// If the mouse exits a window, go make sure we fade out
+/* If the mouse exits a window, go make sure we fade out */
 - (void)mouseExited:(NSEvent *)theEvent
 {
     /* the user left the window, fade out immediatelly and prevent any timer action */
@@ -150,6 +153,10 @@
         b_alreadyCounting = NO;
         hideAgainTimer = NULL;
     }
+
+    /* give up our focus, so the vout may show us again without letting the user clicking it */
+    if( [[[[VLCMain sharedInstance] getControls] getVoutView] isFullscreen] )
+        [[[[[VLCMain sharedInstance] getControls] getVoutView] window] makeKeyWindow];
 
     [self fadeOut];
 }
@@ -168,7 +175,7 @@
 
 - (void)fadeOut
 {
-    if(( [self alphaValue] > 0.0 ) && !NSPointInRect( [NSEvent mouseLocation], [self frame] ) )
+    if( ( [self alphaValue] > 0.0 ) && !NSPointInRect( [NSEvent mouseLocation], [self frame] ) )
     {
         if (![self fadeTimer])
             [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(unfocus:) userInfo:[NSNumber numberWithShort:0] repeats:YES]];
@@ -218,7 +225,7 @@
     }
 }
 
-// A getter and setter for our main timer that handles window fading
+/* A getter and setter for our main timer that handles window fading */
 - (NSTimer *)fadeTimer
 {
     return fadeTimer;
@@ -293,7 +300,9 @@
     addButton( o_fast, @"FSFastForwardOff.tif"   , @"FSFastForwardOn.tif"  , 238, 37, faster );
     addButton( o_next, @"FSGotoEndOff.tif"       , @"FSGotoEndOn.tif"      , 286, 37, next );
     addButton( o_fullscreen, @"FSExitOff.tif", @"FSExitOn.tif", 382, 45, windowAction );
-//    addButton( o_button, @"FSVolumeThumbOff.tif"   , @"FSVolumeThumbOn.tif"  ,  38, 51, something );
+/*
+    addButton( o_button, @"FSVolumeThumbOff.tif"   , @"FSVolumeThumbOn.tif"  ,  38, 51, something );
+ */
 
     s_rc = [self frame];
     s_rc.origin.x = 25;
@@ -440,7 +449,7 @@ void drawKnobInRect(NSRect knobRect)
 
 void drawFrameInRect(NSRect frameRect)
 {
-    // Draw frame
+    /* Draw frame */
     NSBundle *bundle = [NSBundle mainBundle];
 	NSRect frame = frameRect;
     NSRect image_rect;
@@ -452,7 +461,7 @@ void drawFrameInRect(NSRect frameRect)
 
 - (void)drawRect:(NSRect)rect
 {
-    // Draw default to make sure the slider behaves correctly
+    /* Draw default to make sure the slider behaves correctly */
     [[NSGraphicsContext currentContext] saveGraphicsState];
     NSRectClip(NSZeroRect);
     [super drawRect:rect];
