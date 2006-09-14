@@ -33,6 +33,7 @@
 #include "connectioncontainer.h"
 #include "objectsafety.h"
 #include "vlccontrol.h"
+#include "vlccontrol2.h"
 #include "viewobject.h"
 #include "dataobject.h"
 
@@ -265,6 +266,7 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
     vlcConnectionPointContainer = new VLCConnectionPointContainer(this);
     vlcObjectSafety = new VLCObjectSafety(this);
     vlcControl = new VLCControl(this);
+    vlcControl2 = new VLCControl2(this);
     vlcViewObject = new VLCViewObject(this);
     vlcDataObject = new VLCDataObject(this);
     vlcOleObject = new VLCOleObject(this);
@@ -284,6 +286,7 @@ VLCPlugin::~VLCPlugin()
     delete vlcOleObject;
     delete vlcDataObject;
     delete vlcViewObject;
+    delete vlcControl2;
     delete vlcControl;
     delete vlcConnectionPointContainer;
     delete vlcProvideClassInfo;
@@ -586,9 +589,8 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
              RegCloseKey( h_key );
         }
 
-#if 1
-        //ppsz_argv[0] = "C:\\cygwin\\home\\Damien_Fouilleul\\dev\\videolan\\vlc-trunk\\vlc";
-        ppsz_argv[0] = "C:\\cygwin\\home\\damienf\\vlc-trunk\\vlc";
+#if 0
+        ppsz_argv[0] = "C:\\cygwin\\home\\Damien_Fouilleul\\dev\\videolan\\vlc-trunk\\vlc";
 #endif
 
         // make sure plugin isn't affected with VLC single instance mode
