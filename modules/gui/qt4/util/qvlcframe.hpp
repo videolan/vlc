@@ -65,6 +65,7 @@ public:
                                QPushButton **other, char *psz_other )
     {
 #ifdef QT42
+        fprintf( stderr, "Gra\n" );
 #else
         QHBoxLayout *buttons_layout = new QHBoxLayout;
         QSpacerItem *spacerItem = new QSpacerItem( 40, 20,
@@ -75,6 +76,7 @@ public:
         {
             fprintf( stderr, "Creating default button %s\n", psz_default );
             *defaul = new QPushButton(0);
+            (*defaul)->setFocus();
             buttons_layout->addWidget( *defaul );
             (*defaul)->setText( qfu( psz_default ) );
         }

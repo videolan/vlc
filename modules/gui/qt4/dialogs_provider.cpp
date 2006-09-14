@@ -123,7 +123,7 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
     case INTERACT_UPDATE:
         qdialog = (InteractionDialog*)(p_dialog->p_private);
         if( qdialog)
-            qdialog->Update();
+            qdialog->update();
         break;
     case INTERACT_HIDE:
         qdialog = (InteractionDialog*)(p_dialog->p_private);
@@ -133,7 +133,8 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
         break;
     case INTERACT_DESTROY:
         qdialog = (InteractionDialog*)(p_dialog->p_private);
-        delete qdialog;
+        if( !p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
+            delete qdialog;
         p_dialog->i_status = DESTROYED_DIALOG;
         break;
     }

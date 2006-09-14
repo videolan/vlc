@@ -34,16 +34,17 @@
 #include <assert.h>
 
 InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
-                         interaction_dialog_t *_p_dialog ) : QWidget( 0 ),
+                         interaction_dialog_t *_p_dialog ) : QObject( 0 ),
                           p_intf( _p_intf), p_dialog( _p_dialog )
 {
-    QVBoxLayout *layout = new QVBoxLayout( this );
+    QVBoxLayout *layout = NULL;
     int i_ret = -1;
     panel = NULL;
+    dialog = NULL;
 
     if( p_dialog->i_flags & DIALOG_BLOCKING_ERROR )
     {
-        i_ret = QMessageBox::critical( this, qfu( p_dialog->psz_title ),
+        i_ret = QMessageBox::critical( NULL, qfu( p_dialog->psz_title ),
                                        qfu( p_dialog->psz_description ),
                                        QMessageBox::Ok, 0, 0 );
     }
@@ -64,7 +65,8 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
-        i_ret = QMessageBox::question( this,
+        p_dialog->i_status = SENT_DIALOG;
+        i_ret = QMessageBox::question( NULL,
               qfu( p_dialog->psz_title), qfu( p_dialog->psz_description ),
               p_dialog->psz_default_button ?
                     qfu( p_dialog->psz_default_button ) : QString::null,
@@ -76,6 +78,8 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     }
     else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
     {
+        dialog = new QWidget( 0 ); layout = new QVBoxLayout( dialog );
+        layout->setMargin( 2 );
         panel = new QWidget( 0 );
         QGridLayout *grid = new QGridLayout;
 
@@ -93,8 +97,11 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         panel->setLayout( grid );
         layout->addWidget( panel );
     }
-    else if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
+    else if( p_dialog->i_flags & DIALOG_USER_PROGRESS ||
+             /* TEMPORARY ! */ p_dialog->i_flags & DIALOG_INTF_PROGRESS )
     {
+        dialog = new QWidget( 0 );layout = new QVBoxLayout( dialog );
+        layout->setMargin( 2 );
         description = new QLabel( qfu( p_dialog->psz_description ) );
         layout->addWidget( description );
 
@@ -106,6 +113,8 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     }
     else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
     {
+        dialog = new QWidget( 0 );layout = new QVBoxLayout( dialog );
+        layout->setMargin( 2 );
         description = new QLabel( qfu( p_dialog->psz_description ) );
         layout->addWidget( description );
 
@@ -113,7 +122,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         layout->addWidget( inputEdit );
     }
     else
-        msg_Err( p_intf, "unknown dialog type" );
+        msg_Err( p_intf, "unknown dialog type %i", p_dialog->i_flags );
 
     /* We used a message box */
     if( i_ret != -1 )
@@ -125,33 +134,35 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     else
     /* Custom box, finish it */
     {
-        QVLCFrame::doButtons( this, layout,
+        QVLCFrame::doButtons( dialog, layout,
                               &defaultButton, p_dialog->psz_default_button,
                               &altButton, p_dialog->psz_alternate_button,
                               &otherButton, p_dialog->psz_other_button );
         if( p_dialog->psz_default_button )
-            BUTTONACT( defaultButton, defaultB );
+            BUTTONACT( defaultButton, defaultB() );
         if( p_dialog->psz_alternate_button )
-            BUTTONACT( altButton, altB );
+            BUTTONACT( altButton, altB() );
         if( p_dialog->psz_other_button )
-            BUTTONACT( otherButton, otherB );
-        setLayout( layout );
-        setWindowTitle( qfu( p_dialog->psz_title ) );
+            BUTTONACT( otherButton, otherB() );
+        dialog->setLayout( layout );
+        dialog->setWindowTitle( qfu( p_dialog->psz_title ) );
     }
 }
 
-void InteractionDialog::Update()
+void InteractionDialog::update()
 {
     if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
     {
         assert( progressBar );
         progressBar->setValue( (int)(p_dialog->val.f_float*1000) );
+        fprintf (stderr, "Setting progress to %i\n", progressBar->value() );
     }
 }
 
 InteractionDialog::~InteractionDialog()
 {
-    if( panel ) delete panel;
+//    if( panel ) delete panel;
+    if( dialog ) delete dialog;
 }
 
 void InteractionDialog::defaultB()

@@ -285,7 +285,7 @@ connect:
         int i_ret;
         msg_Dbg( p_access, "authentication failed" );
         i_ret = intf_UserLoginPassword( p_access, _("HTTP authentication"),
-                        _("Please enter a valid login name and a password."), 
+                        _("Please enter a valid login name and a password."),
                                                 &psz_login, &psz_password );
         if( i_ret == DIALOG_OK_YES )
         {

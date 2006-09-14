@@ -367,16 +367,19 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
     p_new->i_type = INTERACT_DIALOG_TWOWAY;
     p_new->psz_title = strdup( psz_title );
     p_new->psz_description = strdup( psz_description );
+    p_new->psz_default_button = strdup( _("Ok" ) );
+    p_new->psz_alternate_button = strdup( _("Cancel" ) );
 
     p_new->i_flags = DIALOG_LOGIN_PW_OK_CANCEL;
 
     i_ret = DialogSend( p_this, p_new );
 
-    if( i_ret != DIALOG_CANCELLED )
+    if( i_ret != DIALOG_CANCELLED && i_ret != VLC_EGENERIC )
     {
-        assert( p_new->psz_returned[0] && p_new->psz_returned[1] );
-        *ppsz_login = strdup( p_new->psz_returned[0] );
-        *ppsz_password = strdup( p_new->psz_returned[1] );
+        *ppsz_login = p_new->psz_returned[0]?
+                                strdup( p_new->psz_returned[0] ) : NULL;
+        *ppsz_password = p_new->psz_returned[1]?
+                                strdup( p_new->psz_returned[1] ) : NULL;
     }
     return i_ret;
 }

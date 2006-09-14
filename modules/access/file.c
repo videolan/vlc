@@ -516,10 +516,6 @@ static int Seek( access_t *p_access, int64_t i_pos )
     if( p_access->info.i_size < p_access->info.i_pos )
     {
         msg_Err( p_access, "seeking too far" );
-        intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"), 
-                        _("VLC seeked in the file too far. This usually means "
-                          "that your file is broken and therefore cannot be "
-                          "played." ) );
         p_access->info.i_pos = p_access->info.i_size;
     }
     else if( p_access->info.i_pos < 0 )
