@@ -127,7 +127,7 @@ FFMPEGCONF += --enable-memalign-hack
 endif
 
 ifdef HAVE_DARWIN_OS
-X264CONF += --enable-pic
+X264CONF += --enable-pic --enable-debug
 ifneq ($(HOST),i686-apple-darwin8)
 FFMPEG_CFLAGS += -DHAVE_LRINTF
 endif
