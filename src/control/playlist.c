@@ -28,34 +28,36 @@
 
 #include <assert.h>
 
+#define PL p_instance->p_libvlc_int->p_playlist
+
 void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
                            int i_options, char **ppsz_options,
                            libvlc_exception_t *p_e )
 {
-    assert( p_instance->p_playlist );
+    assert( PL );
     ///\todo Handle additionnal options
 
-    if( p_instance->p_playlist->i_size == 0 ) RAISEVOID( "Empty playlist" );
+    if( PL->i_size == 0 ) RAISEVOID( "Empty playlist" );
     if( i_id > 0 )
     {
-        playlist_item_t *p_item = playlist_ItemGetById( p_instance->p_playlist,
+        playlist_item_t *p_item = playlist_ItemGetById( PL,
                                                         i_id );
         if( !p_item ) RAISEVOID( "Unable to find item" );
 
-        playlist_LockControl( p_instance->p_playlist, PLAYLIST_VIEWPLAY,
-                          p_instance->p_playlist->status.p_node, p_item );
+        playlist_LockControl( PL, PLAYLIST_VIEWPLAY,
+                              PL->status.p_node, p_item );
     }
     else
     {
-        playlist_Play( p_instance->p_playlist );
+        playlist_Play( PL );
     }
 }
 
 void libvlc_playlist_pause( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
-    assert( p_instance->p_playlist );
-    if( playlist_Pause( p_instance->p_playlist ) != VLC_SUCCESS )
+    assert( PL );
+    if( playlist_Pause( PL ) != VLC_SUCCESS )
         RAISEVOID( "Empty playlist" );
 }
 
@@ -63,30 +65,30 @@ void libvlc_playlist_pause( libvlc_instance_t *p_instance,
 void libvlc_playlist_stop( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
-    assert( p_instance->p_playlist );
-    if( playlist_Stop( p_instance->p_playlist ) != VLC_SUCCESS )
+    assert( PL );
+    if( playlist_Stop( PL ) != VLC_SUCCESS )
         RAISEVOID( "Empty playlist" );
 }
 
 void libvlc_playlist_clear( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
-    assert( p_instance->p_playlist );
-    playlist_Clear( p_instance->p_playlist );
+    assert( PL );
+    playlist_Clear( PL );
 }
 
 void libvlc_playlist_next( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
-    assert( p_instance->p_playlist );
-    if( playlist_Next( p_instance->p_playlist ) != VLC_SUCCESS )
+    assert( PL );
+    if( playlist_Next( PL ) != VLC_SUCCESS )
         RAISEVOID( "Empty playlist" );
 }
 
 void libvlc_playlist_prev( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
-    if( playlist_Prev( p_instance->p_playlist ) != VLC_SUCCESS )
+    if( playlist_Prev( PL ) != VLC_SUCCESS )
         RAISEVOID( "Empty playlist" );
 }
 
@@ -102,8 +104,8 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
                                   int i_options, const char **ppsz_options,
                                   libvlc_exception_t *p_e )
 {
-    assert( p_instance->p_playlist );
-    return playlist_PlaylistAddExt( p_instance->p_playlist, psz_uri, psz_name,
+    assert( PL );
+    return playlist_PlaylistAddExt( PL, psz_uri, psz_name,
                             PLAYLIST_INSERT, PLAYLIST_END, -1, ppsz_options,
                             i_options );
 }
@@ -111,43 +113,43 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
 int libvlc_playlist_delete_item( libvlc_instance_t *p_instance, int i_id,
                                  libvlc_exception_t *p_e )
 {
-    assert( p_instance->p_playlist );
-    return playlist_DeleteFromItemId( p_instance->p_playlist, i_id );
+    assert( PL );
+    return playlist_DeleteFromItemId( PL, i_id );
 }
 
 
 int libvlc_playlist_isplaying( libvlc_instance_t *p_instance,
                                libvlc_exception_t *p_e )
 {
-    assert( p_instance->p_playlist );
-    return playlist_IsPlaying( p_instance->p_playlist );
+    assert( PL );
+    return playlist_IsPlaying( PL );
 }
 
 int libvlc_playlist_items_count( libvlc_instance_t *p_instance,
                                  libvlc_exception_t *p_e )
 {
-    assert( p_instance->p_playlist );
-    return p_instance->p_playlist->i_size;
+    assert( PL );
+    return PL->i_size;
 }
 
 libvlc_input_t * libvlc_playlist_get_input( libvlc_instance_t *p_instance,
                                             libvlc_exception_t *p_e )
 {
     libvlc_input_t *p_input;
-    assert( p_instance->p_playlist );
+    assert( PL );
 
-    vlc_mutex_lock( &p_instance->p_playlist->object_lock );
-    if( p_instance->p_playlist->p_input == NULL )
+    vlc_mutex_lock( &PL->object_lock );
+    if( PL->p_input == NULL )
     {
         libvlc_exception_raise( p_e, "No active input" );
-        vlc_mutex_unlock( &p_instance->p_playlist->object_lock );
+        vlc_mutex_unlock( &PL->object_lock );
         return NULL;
     }
     p_input = (libvlc_input_t *)malloc( sizeof( libvlc_input_t ) );
 
-    p_input->i_input_id = p_instance->p_playlist->p_input->i_object_id;
+    p_input->i_input_id = PL->p_input->i_object_id;
     p_input->p_instance = p_instance;
-    vlc_mutex_unlock( &p_instance->p_playlist->object_lock );
+    vlc_mutex_unlock( &PL->object_lock );
 
     return p_input;
 }

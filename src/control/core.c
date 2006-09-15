@@ -4,7 +4,7 @@
  * Copyright (C) 2005 the VideoLAN team
  * $Id$
  *
- * Authors: Cl�ent Stenac <zorglub@videolan.org>
+ * Authors: Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,13 +82,9 @@ inline void libvlc_exception_raise( libvlc_exception_t *p_exception,
 libvlc_instance_t * libvlc_new( int argc, char **argv,
                                 libvlc_exception_t *p_e )
 {
-    int i_vlc_id;
     libvlc_instance_t *p_new;
-    libvlc_int_t *p_libvlc_int;
 
-    i_vlc_id = VLC_Create();
-    p_libvlc_int = (libvlc_int_t* ) vlc_current_object( i_vlc_id );
-
+    libvlc_int_t *p_libvlc_int = libvlc_InternalCreate();
     if( !p_libvlc_int ) RAISENULL( "VLC initialization failed" );
 
     p_new = (libvlc_instance_t *)malloc( sizeof( libvlc_instance_t ) );
@@ -97,30 +93,21 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
     /** \todo Look for interface settings. If we don't have any, add -I dummy */
     /* Because we probably don't want a GUI by default */
 
-
-    VLC_Init( i_vlc_id, argc, argv );
+    if( libvlc_InternalInit( p_libvlc_int, argc, argv ) )
+        RAISENULL( "VLC initialization failed" );
 
     p_new->p_libvlc_int = p_libvlc_int;
-    p_new->p_playlist = (playlist_t *)vlc_object_find( p_new->p_libvlc_int,
-                                VLC_OBJECT_PLAYLIST, FIND_CHILD );
     p_new->p_vlm = NULL;
-
-    if( !p_new->p_playlist ) RAISENULL( "Playlist creation failed" );
-    
-    p_new->i_vlc_id = i_vlc_id;
     return p_new;
 }
 
 void libvlc_destroy( libvlc_instance_t *p_instance )
 {
-    if( p_instance->p_playlist )
-        vlc_object_release( p_instance->p_playlist );
-    vlc_object_release( p_instance->p_libvlc_int );
-    VLC_CleanUp( p_instance->i_vlc_id );
-    VLC_Destroy( p_instance->i_vlc_id );
+    libvlc_InternalCleanup( p_instance->p_libvlc_int );
+    libvlc_InternalDestroy( p_instance->p_libvlc_int, VLC_FALSE );
 }
 
 int libvlc_get_vlc_id( libvlc_instance_t *p_instance )
 {
-    return p_instance->i_vlc_id;
+    return p_instance->p_libvlc_int->i_object_id;
 }
