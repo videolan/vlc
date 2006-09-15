@@ -24,6 +24,8 @@
 #ifndef _VLC_PLAYLIST_H_
 #define _VLC_PLAYLIST_H_
 
+#include <assert.h>
+
 /**
  *  \file
  *  This file contain structures and function prototypes related
@@ -207,6 +209,16 @@ int           playlist_ThreadDestroy  ( playlist_t * );
 /* Helpers */
 #define PL_LOCK vlc_mutex_lock( &p_playlist->object_lock );
 #define PL_UNLOCK vlc_mutex_unlock( &p_playlist->object_lock );
+
+#define pl_Get( a ) a->p_libvlc->p_playlist
+#define pl_Yield( a ) __pl_Yield( VLC_OBJECT(a) )
+static inline playlist_t *__pl_Yield( vlc_object_t *p_this )
+{
+    assert( p_this->p_libvlc->p_playlist );
+    vlc_object_yield( p_this->p_libvlc->p_playlist );
+    return p_this->p_libvlc->p_playlist;
+}
+#define pl_Release(a) vlc_object_release( a->p_libvlc->p_playlist );
 
 /* Playlist control */
 #define playlist_Play(p) playlist_LockControl(p,PLAYLIST_PLAY )

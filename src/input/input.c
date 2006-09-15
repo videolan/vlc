@@ -1135,8 +1135,6 @@ static void End( input_thread_t * p_input )
     /* Close optional stream output instance */
     if( p_input->p_sout )
     {
-        vlc_object_t *p_pl =
-            vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         vlc_value_t keep;
 
         vlc_mutex_lock( &p_input->counters.counters_lock );
@@ -1145,20 +1143,18 @@ static void End( input_thread_t * p_input )
         CL_CO( sout_send_bitrate );
         vlc_mutex_unlock( &p_input->counters.counters_lock );
 
-        if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool && p_pl )
+        if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool )
         {
             /* attach sout to the playlist */
             msg_Dbg( p_input, "keeping sout" );
             vlc_object_detach( p_input->p_sout );
-            vlc_object_attach( p_input->p_sout, p_pl );
+            vlc_object_attach( p_input->p_sout, p_input->p_libvlc->p_playlist );
         }
         else
         {
             msg_Dbg( p_input, "destroying sout" );
             sout_DeleteInstance( p_input->p_sout );
         }
-        if( p_pl )
-            vlc_object_release( p_pl );
     }
 
 #undef CL_CO
@@ -1824,21 +1820,16 @@ static int  UpdateMeta( input_thread_t *p_input, vlc_bool_t b_quick )
 static void UpdateItemLength( input_thread_t *p_input, int64_t i_length,
                               vlc_bool_t b_quick )
 {
-    playlist_t *p_playlist;
     char psz_buffer[MSTRTIME_MAX_SIZE];
 
     vlc_mutex_lock( &p_input->input.p_item->lock );
     p_input->input.p_item->i_duration = i_length;
     vlc_mutex_unlock( &p_input->input.p_item->lock );
 
-        p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-                                               FIND_PARENT);
-    if( p_playlist )
-    {
-        var_SetInteger( p_playlist, "item-change",
-                        p_input->input.p_item->i_id );
-        vlc_object_release( p_playlist );
-    }
+    pl_Yield( p_input );
+    var_SetInteger( pl_Get( p_input ), "item-change",
+                    p_input->input.p_item->i_id );
+    pl_Release( p_input )
 
     input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Duration"),
                    msecstotimestr( psz_buffer, i_length / 1000 ) );

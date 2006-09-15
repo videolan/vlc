@@ -445,20 +445,17 @@ void __intf_UserHide( vlc_object_t *p_this, int i_id )
 /* Get the interaction object. Create it if needed */
 static interaction_t * InteractionGet( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist;
     interaction_t *p_interaction;
+    playlist_t *p_playlist = pl_Yield( p_this );
 
-    p_playlist = (playlist_t*) vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-    if( !p_playlist )
-        return NULL;
-
+    PL_LOCK;
     if( p_playlist->p_interaction == NULL )
        InteractionInit( p_playlist );
 
     p_interaction = p_playlist->p_interaction;
+    PL_UNLOCK;
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_this );
     return p_interaction;
 }
 

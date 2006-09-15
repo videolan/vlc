@@ -1099,19 +1099,14 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    playlist_t *p_playlist;
+    playlist_t *p_playlist = pl_Yield( p_this );
     vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, newval.b_bool );
 
-    p_playlist = (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
-                                                 FIND_PARENT );
-    if( p_playlist )
-    {
-        /* Modify playlist as well because the vout might have to be restarted */
-        var_Create( p_playlist, "video-on-top", VLC_VAR_BOOL );
-        var_Set( p_playlist, "video-on-top", newval );
+    /* Modify playlist as well because the vout might have to be restarted */
+    var_Create( p_playlist, "video-on-top", VLC_VAR_BOOL );
+    var_Set( p_playlist, "video-on-top", newval );
 
-        vlc_object_release( p_playlist );
-    }
+    pl_Release( p_this );
     return VLC_SUCCESS;
 }
 
@@ -1119,21 +1114,15 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    playlist_t *p_playlist;
     vlc_value_t val;
+    playlist_t *p_playlist = pl_Yield( p_this );
 
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
-    p_playlist = (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
-                                                 FIND_PARENT );
-    if( p_playlist )
-    {
-        /* Modify playlist as well because the vout might have to be restarted */
-        var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL );
-        var_Set( p_playlist, "fullscreen", newval );
-
-        vlc_object_release( p_playlist );
-    }
+    /* Modify playlist as well because the vout might have to be restarted */
+    var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL );
+    var_Set( p_playlist, "fullscreen", newval );
+    pl_Release( p_playlist );
 
     /* Disable "always on top" in fullscreen mode */
     var_Get( p_vout, "video-on-top", &val );

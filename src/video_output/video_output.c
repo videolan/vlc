@@ -114,28 +114,14 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 {
     if( !p_fmt )
     {
-        /* Reattach video output to input before bailing out */
+        /* Reattach video output to playlist before bailing out */
         if( p_vout )
         {
-            vlc_object_t *p_playlist;
-
-            p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
-
-            if( p_playlist )
-            {
-                spu_Attach( p_vout->p_spu, p_this, VLC_FALSE );
-                vlc_object_detach( p_vout );
-                vlc_object_attach( p_vout, p_playlist );
-
-                vlc_object_release( p_playlist );
-            }
-            else
-            {
-                msg_Dbg( p_this, "cannot find playlist, destroying vout" );
-                vlc_object_detach( p_vout );
-                vout_Destroy( p_vout );
-            }
+            vlc_object_t *p_playlist = pl_Yield( p_this );
+            spu_Attach( p_vout->p_spu, p_this, VLC_FALSE );
+            vlc_object_detach( p_vout );
+            vlc_object_attach( p_vout, p_playlist );
+            pl_Release( p_this );
         }
         return NULL;
     }
@@ -151,24 +137,17 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
         if( !p_vout )
         {
-            playlist_t *p_playlist;
-
-            p_playlist = vlc_object_find( p_this,
-                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-            if( p_playlist )
+            playlist_t *p_playlist = pl_Yield( p_this );
+            vlc_mutex_lock( &p_playlist->gc_lock );
+            p_vout = vlc_object_find( p_playlist,
+                                      VLC_OBJECT_VOUT, FIND_CHILD );
+            /* only first children of p_input for unused vout */
+            if( p_vout && p_vout->p_parent != (vlc_object_t *)p_playlist )
             {
-                vlc_mutex_lock( &p_playlist->gc_lock );
-                p_vout = vlc_object_find( p_playlist,
-                                          VLC_OBJECT_VOUT, FIND_CHILD );
-                /* only first children of p_input for unused vout */
-                if( p_vout && p_vout->p_parent != (vlc_object_t *)p_playlist )
-                {
-                    vlc_object_release( p_vout );
-                    p_vout = NULL;
-                }
-                vlc_mutex_unlock( &p_playlist->gc_lock );
-                vlc_object_release( p_playlist );
+                vlc_object_release( p_vout );
+                p_vout = NULL;
             }
+            vlc_mutex_unlock( &p_playlist->gc_lock );
         }
     }
 
@@ -498,7 +477,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
  *****************************************************************************/
 void vout_Destroy( vout_thread_t *p_vout )
 {
-    vlc_object_t *p_playlist;
+    vout_thread_t *p_another_vout;
+    vlc_object_t *p_playlist = pl_Yield( p_vout );
 
     /* Request thread destruction */
     p_vout->b_die = VLC_TRUE;
@@ -506,31 +486,24 @@ void vout_Destroy( vout_thread_t *p_vout )
 
     var_Destroy( p_vout, "intf-change" );
 
-    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                  FIND_ANYWHERE );
-
     if( p_vout->psz_filter_chain ) free( p_vout->psz_filter_chain );
 
     /* Free structure */
     vlc_object_destroy( p_vout );
 
-    /* If it was the last vout, tell the interface to show up */
-    if( p_playlist != NULL )
+    p_another_vout = vlc_object_find( p_playlist,
+                                      VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    if( p_another_vout == NULL )
     {
-        vout_thread_t *p_another_vout = vlc_object_find( p_playlist,
-                                            VLC_OBJECT_VOUT, FIND_ANYWHERE );
-        if( p_another_vout == NULL )
-        {
-            vlc_value_t val;
-            val.b_bool = VLC_TRUE;
-            var_Set( p_playlist, "intf-show", val );
-        }
-        else
-        {
-            vlc_object_release( p_another_vout );
-        }
-        vlc_object_release( p_playlist );
+        vlc_value_t val;
+        val.b_bool = VLC_TRUE;
+        var_Set( p_playlist, "intf-show", val );
     }
+    else
+    {
+        vlc_object_release( p_another_vout );
+    }
+    vlc_object_release( p_playlist );
 }
 
 /*****************************************************************************

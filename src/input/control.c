@@ -530,15 +530,10 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
 static void NotifyPlaylist( input_thread_t *p_input )
 {
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-                                       FIND_PARENT );
-    if( p_playlist )
-    {
-        var_SetInteger( p_playlist, "item-change",
-                        p_input->input.p_item->i_id );
-        vlc_object_release( p_playlist );
-    }
+    playlist_t *p_playlist = pl_Yield( p_input );
+    var_SetInteger( p_playlist, "item-change",
+                    p_input->input.p_item->i_id );
+    pl_Release( p_input );
 }
 
 static void UpdateBookmarksOption( input_thread_t *p_input )

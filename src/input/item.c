@@ -70,27 +70,22 @@ char *vlc_input_item_GetInfo( input_item_t *p_i,
 static void vlc_input_item_Destroy ( gc_object_t *p_this )
 {
     vlc_object_t *p_obj = (vlc_object_t *)p_this->p_destructor_arg;
-    int i;
     input_item_t *p_input = (input_item_t *) p_this;
+    int i;
 
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_obj,
-                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
+    playlist_t *p_playlist = pl_Yield( p_obj );
     vlc_input_item_Clean( p_input );
 
-    if( p_playlist )
+    for( i = 0 ; i< p_playlist->i_input_items ; i++ )
     {
-        for( i = 0 ; i< p_playlist->i_input_items ; i++ )
+        if( p_playlist->pp_input_items[i]->i_id == p_input->i_id )
         {
-            if( p_playlist->pp_input_items[i]->i_id == p_input->i_id )
-            {
-                REMOVE_ELEM( p_playlist->pp_input_items,
-                             p_playlist->i_input_items, i );
-                break;
-            }
+            REMOVE_ELEM( p_playlist->pp_input_items,
+                         p_playlist->i_input_items, i );
+            break;
         }
-        vlc_object_release( p_playlist );
     }
+    pl_Release( p_obj );
     free( p_input );
 }
 
@@ -208,20 +203,19 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
                                 const char **ppsz_options, int i_duration,
                                 int i_type )
 {
-    /* FIXME DON'T SEARCH PLAYLIST */
-    /* FIXME SHOULD LOCK */
-    input_item_t *p_input = (input_item_t *)malloc( sizeof( input_item_t ) );
-    playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_obj,
-                                VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_obj );
+    DECMALLOC_NULL( p_input, input_item_t );
 
     vlc_input_item_Init( p_obj, p_input );
     vlc_gc_init( p_input, vlc_input_item_Destroy, (void *)p_obj );
 
+    PL_LOCK;
     p_input->i_id = ++p_playlist->i_last_input_id;
-
-    INSERT_ELEM( p_playlist->pp_input_items, p_playlist->i_input_items,
-                 p_playlist->i_input_items, p_input );
-    vlc_object_release( p_playlist );
+    TAB_APPEND( p_playlist->i_input_items,
+                p_playlist->pp_input_items,
+                p_input );
+    PL_UNLOCK;
+    pl_Release( p_obj );
 
     p_input->b_fixed_name = VLC_FALSE;
 
