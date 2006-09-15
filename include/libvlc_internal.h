@@ -31,6 +31,21 @@ extern "C" {
 
 #include <vlc/vlc.h>
 
+/***************************************************************************
+ * Internal creation and destruction functions
+ ***************************************************************************/
+libvlc_int_t *libvlc_InternalCreate();
+int libvlc_InternalInit( libvlc_int_t *, int, char *ppsz_argv[] );
+int libvlc_InternalCleanup( libvlc_int_t * );
+int libvlc_InternalDestroy( libvlc_int_t *, vlc_bool_t );
+
+int libvlc_InternalAddIntf( libvlc_int_t *, char const *, vlc_bool_t,
+                            vlc_bool_t, int, char ** );
+
+/***************************************************************************
+ * Opaque structures for libvlc API
+ ***************************************************************************/
+
 struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;

@@ -252,6 +252,7 @@ SOURCES_libvlc_getopt = \
 
 SOURCES_libvlc_common = \
 	libvlc.c \
+	libvlc-common.c \
 	libvlc.h \
 	interface/interface.c \
 	interface/intf_eject.c \
