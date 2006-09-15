@@ -90,9 +90,9 @@ char const * VLC_Error( int i_err )
 }
 
 /*****************************************************************************
- * VLC_Create: allocate a vlc_t structure, and initialize libvlc if needed.
+ * VLC_Create: allocate a libvlc instance and intialize global libvlc stuff if needed
  *****************************************************************************
- * This function allocates a vlc_t structure and returns a negative value
+ * This function allocates a libvlc instance and returns a negative value
  * in case of failure. Also, the thread system is initialized.
  *****************************************************************************/
 int VLC_Create( void )
@@ -110,9 +110,9 @@ int VLC_Create( void )
 
 
 /*****************************************************************************
- * VLC_Init: initialize a vlc_t structure.
+ * VLC_Init: initialize a libvlc instance
  *****************************************************************************
- * This function initializes a previously allocated vlc_t structure:
+ * This function initializes a previously allocated libvlc instance:
  *  - CPU detection
  *  - gettext initialization
  *  - message queue, module bank and playlist initialization

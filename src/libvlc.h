@@ -2133,7 +2133,8 @@ static module_config_t p_help_config[] =
  *****************************************************************************/
 
 /*****************************************************************************
- * Initializer for the vlc_t structure storing the action / key associations
+ * Initializer for the libvlc instance structure
+ * storing the action / key associations
  *****************************************************************************/
 static struct hotkey p_hotkeys[] =
 {

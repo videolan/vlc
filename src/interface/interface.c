@@ -66,10 +66,10 @@ static int AddIntfCallback( vlc_object_t *, char const *,
  *****************************************************************************/
 @interface VLCApplication : NSApplication
 {
-   vlc_t *o_vlc;
+   libvlc_int_t *o_libvlc;
 }
 
-- (void)setVLC: (vlc_t *)p_vlc;
+- (void)setVLC: (libvlc_int_t *)p_libvlc;
 
 @end
 #endif
@@ -463,13 +463,13 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
 #ifdef __APPLE__
 /*****************************************************************************
- * VLCApplication implementation 
+ * VLCApplication implementation
  *****************************************************************************/
-@implementation VLCApplication 
+@implementation VLCApplication
 
-- (void)setVLC: (vlc_t *) p_vlc
+- (void)setVLC: (libvlc_int_t *) p_libvlc
 {
-    o_vlc = p_vlc;
+    o_vlc = p_libvlc;
 }
 
 - (void)stop: (id)sender
