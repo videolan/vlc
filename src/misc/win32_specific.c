@@ -42,7 +42,7 @@
 /*****************************************************************************
  * system_Init: initialize winsock and misc other things.
  *****************************************************************************/
-void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     WSADATA Data;
 
@@ -117,7 +117,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 static void IPCHelperThread( vlc_object_t * );
 LRESULT CALLBACK WMCOPYWNDPROC( HWND, UINT, WPARAM, LPARAM );
 
-void system_Configure( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
 #if !defined( UNDER_CE )
     p_this->p_libvlc_global->b_fast_mutex = config_GetInt( p_this, "fast-mutex" );
@@ -349,7 +349,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 /*****************************************************************************
  * system_End: terminate winsock.
  *****************************************************************************/
-void system_End( vlc_t *p_this )
+void system_End( libvlc_int_t *p_this )
 {
     if( p_this && p_this->p_libvlc_global && p_this->p_libvlc_global->psz_vlcpath )
     {

@@ -81,7 +81,7 @@ static int FindLanguage( const char * psz_lang )
     return 0;
 }
 
-void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     char i_dummy;
     char *p_char, *p_oldchar = &i_dummy;
@@ -132,7 +132,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
 
 }
@@ -140,7 +140,7 @@ void system_Configure( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 /*****************************************************************************
  * system_End: free the program path.
  *****************************************************************************/
-void system_End( vlc_t *p_this )
+void system_End( libvlc_int_t *p_this )
 {
     free( p_this->p_libvlc_global->psz_vlcpath );
 

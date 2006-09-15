@@ -44,9 +44,9 @@ extern "C" {
  * Prototypes
  *****************************************************************************/
 #ifdef _NEED_OS_SPECIFIC_H
-    void system_Init       ( vlc_t *, int *, char *[] );
-    void system_Configure  ( vlc_t *, int *, char *[] );
-    void system_End        ( vlc_t * );
+    void system_Init       ( libvlc_int_t *, int *, char *[] );
+    void system_Configure  ( libvlc_int_t *, int *, char *[] );
+    void system_End        ( libvlc_int_t * );
 #else
 #   define system_Init( a, b, c ) {}
 #   define system_Configure( a, b, c ) {}
