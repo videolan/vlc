@@ -148,6 +148,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
                 p_vout = NULL;
             }
             vlc_mutex_unlock( &p_playlist->gc_lock );
+            pl_Release( p_this );
         }
     }
 
