@@ -313,8 +313,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    playlist_NodesCreateForSD( p_sys->p_playlist, _("SAP sessions"),
-                               &p_sys->p_node_cat, &p_sys->p_node_one );
+    playlist_NodesPairCreate( p_sys->p_playlist, _("SAP sessions"),
+                              &p_sys->p_node_cat, &p_sys->p_node_one,
+                              VLC_TRUE );
 
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;

@@ -287,24 +287,42 @@ playlist_item_t *playlist_ChildSearchName( playlist_item_t *p_node,
     return NULL;
 }
 
-
-void playlist_NodesCreateForSD( playlist_t *p_playlist, char *psz_name,
-                                playlist_item_t **pp_node_cat,
-                                playlist_item_t **pp_node_one )
+/**
+ * Create a pair of nodes in the category and onelevel trees.
+ * They share the same input ID.
+ * \todo really share the input item
+ * \param p_playlist the playlist
+ * \param psz_name the name of the nodes
+ * \param pp_node_cat pointer to return the node in category tree
+ * \param pp_node_one pointer to return the node in onelevel tree
+ * \param b_for_sd For Services Discovery ? (make node read-only and unskipping)
+ */
+void playlist_NodesPairCreate( playlist_t *p_playlist, char *psz_name,
+                               playlist_item_t **pp_node_cat,
+                               playlist_item_t **pp_node_one,
+                               vlc_bool_t b_for_sd )
 {
     *pp_node_cat = playlist_NodeCreate( p_playlist, psz_name,
                                         p_playlist->p_root_category );
-    (*pp_node_cat)->i_flags |= PLAYLIST_RO_FLAG;
-    (*pp_node_cat)->i_flags |= PLAYLIST_SKIP_FLAG;
-
     *pp_node_one = playlist_NodeCreate( p_playlist, psz_name,
                                         p_playlist->p_root_onelevel );
-    (*pp_node_one)->i_flags |= PLAYLIST_RO_FLAG;
-    (*pp_node_one)->i_flags |= PLAYLIST_SKIP_FLAG;
-
     (*pp_node_one)->p_input->i_id = (*pp_node_cat)->p_input->i_id;
+    if( b_for_sd )
+    {
+        (*pp_node_cat)->i_flags |= PLAYLIST_RO_FLAG;
+        (*pp_node_cat)->i_flags |= PLAYLIST_SKIP_FLAG;
+        (*pp_node_one)->i_flags |= PLAYLIST_RO_FLAG;
+        (*pp_node_one)->i_flags |= PLAYLIST_SKIP_FLAG;
+    }
 }
 
+/**
+ * Get the node in the preferred tree from a node in one of category
+ * or onelevel tree. 
+ * For example, for the SAP node, it will return the node in the category
+ * tree if --playlist-tree is not set to never, because the SAP node prefers
+ * category
+ */
 playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
                                              playlist_item_t *p_node )
 {

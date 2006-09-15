@@ -127,8 +127,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    playlist_NodesCreateForSD( p_playlist, _("Devices"),
-                               &p_sys->p_node_cat, &p_sys->p_node_one );
+    playlist_NodesPairCreate( p_playlist, _("Devices"),
+                              &p_sys->p_node_cat, &p_sys->p_node_one,
+                              VLC_TRUE );
     vlc_object_release( p_playlist );
 
     return VLC_SUCCESS;
