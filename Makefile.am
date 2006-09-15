@@ -180,6 +180,7 @@ EXTRA_DIST += \
 	extras/vlc.vim \
 	extras/make.pl \
 	extras/valgrind.suppressions \
+	extras/m4/autoconf260.m4 \
 	$(NULL)
 
 ###############################################################################

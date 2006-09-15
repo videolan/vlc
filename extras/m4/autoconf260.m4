@@ -9,7 +9,14 @@ AC_DEFUN([AC_PROG_CC_C99],
   CC="$CC -std=c99"
 ])
 
-AC_DEFUN([AC_PROG_OBJC], [ ])
+AC_DEFUN([AC_PROG_OBJC], [ 
+ AC_MSG_CHECKING(for an Objective-C compiler) 	 	 
+ OBJC="${CXX}" 	 	 
+ AC_SUBST(OBJC) 	 	 
+ OBJCFLAGS="${CXXFLAGS} -fgnu-runtime -fconstant-string-class=NSConstantString" 	 	 
+ AC_SUBST(OBJCFLAGS)
+
+])
 
 AC_DEFUN([AC_USE_SYSTEM_EXTENSIONS],
 [ AC_DEFINE([_GNU_SOURCE], [ ], [Enable lots of stuff with glibc.])
