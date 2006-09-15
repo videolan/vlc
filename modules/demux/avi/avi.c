@@ -1165,7 +1165,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i_stream;
-    msg_Dbg( p_demux, "seek requested: "I64Fd" secondes %d%%",
+    msg_Dbg( p_demux, "seek requested: "I64Fd" seconds %d%%",
              i_date / 1000000, i_percent );
 
     if( p_sys->b_seekable )
