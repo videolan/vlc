@@ -261,7 +261,7 @@ QStringList DialogsProvider::showSimpleOpen()
     FileTypes += ");; All Files (*.*)" ;
     FileTypes.replace(QString(";*"), QString(" *"));
     return QFileDialog::getOpenFileNames( NULL, qfu(I_POP_SEL_FILES ),
-                    p_intf->p_vlc->psz_homedir, FileTypes );
+                    p_intf->p_libvlc->psz_homedir, FileTypes );
 }
 
 void DialogsProvider::bookmarksDialog()

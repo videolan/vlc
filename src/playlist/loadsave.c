@@ -127,7 +127,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-    char *psz_uri, *psz_homedir =p_playlist->p_vlc->psz_homedir;
+    char *psz_uri, *psz_homedir =p_playlist->p_libvlc->psz_homedir;
     input_item_t *p_input;
 
     if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
@@ -156,7 +156,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
 int playlist_MLDump( playlist_t *p_playlist )
 {
-    char *psz_uri, *psz_homedir =p_playlist->p_vlc->psz_homedir;
+    char *psz_uri, *psz_homedir =p_playlist->p_libvlc->psz_homedir;
     if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
     if( !psz_homedir )
     {

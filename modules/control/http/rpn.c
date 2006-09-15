@@ -39,8 +39,8 @@ static vlc_object_t *GetVLCObject( intf_thread_t *p_intf,
 
     if( !strcmp( psz_object, "VLC_OBJECT_ROOT" ) )
         i_object_type = VLC_OBJECT_ROOT;
-    else if( !strcmp( psz_object, "VLC_OBJECT_VLC" ) )
-        p_object = VLC_OBJECT(p_intf->p_vlc);
+    else if( !strcmp( psz_object, "VLC_OBJECT_LIBVLC" ) )
+        p_object = VLC_OBJECT(p_intf->p_libvlc);
     else if( !strcmp( psz_object, "VLC_OBJECT_INTF" ) )
         p_object = VLC_OBJECT(p_intf);
     else if( !strcmp( psz_object, "VLC_OBJECT_PLAYLIST" ) )

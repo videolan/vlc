@@ -966,7 +966,7 @@ if( MACOS_VERSION >= 10.3 )                                                 \
     case CONFIG_ITEM_KEY:
         /* So you don't need to restart to have the changes take effect */
         val.i_int = [self intValue];
-        var_Set( VLCIntf->p_vlc, psz_name, val );
+        var_Set( VLCIntf->p_libvlc, psz_name, val );
     case CONFIG_ITEM_INTEGER:
     case CONFIG_ITEM_BOOL:
         config_PutInt( VLCIntf, psz_name, [self intValue] );

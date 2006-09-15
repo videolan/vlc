@@ -965,7 +965,7 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
                                  p_sys->i_bits_per_sample );
         }
 
-        p_aout->p_vlc->pf_memcpy( p_write_position, p_buffer->p_buffer,
+        p_aout->p_libvlc->pf_memcpy( p_write_position, p_buffer->p_buffer,
                                   l_bytes1 );
         aout_BufferFree( p_buffer );
     }

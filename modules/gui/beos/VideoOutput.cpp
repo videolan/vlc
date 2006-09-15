@@ -464,7 +464,7 @@ VideoWindow::MessageReceived( BMessage *p_message )
             {
                 val.i_int |= KEY_MODIFIER_CTRL;
             }
-            var_Set( p_vout->p_vlc, "key-pressed", val );
+            var_Set( p_vout->p_libvlc, "key-pressed", val );
 
             free( keys );
             free( chars );

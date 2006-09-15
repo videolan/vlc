@@ -345,7 +345,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
 char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
 {
 #ifdef __APPLE__
-    if ( p_this->p_libvlc->iconv_macosx != (vlc_iconv_t)-1 )
+    if ( p_this->p_libvlc_global->iconv_macosx != (vlc_iconv_t)-1 )
     {
         const char *psz_in = psz_string;
         size_t i_in = strlen(psz_in);
@@ -353,10 +353,10 @@ char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
         char *psz_utf8 = malloc(i_out + 1);
         char *psz_out = psz_utf8;
 
-        vlc_mutex_lock( &p_this->p_libvlc->iconv_lock );
-        size_t i_ret = vlc_iconv( p_this->p_libvlc->iconv_macosx,
+        vlc_mutex_lock( &p_this->p_libvlc_global->iconv_lock );
+        size_t i_ret = vlc_iconv( p_this->p_libvlc_global->iconv_macosx,
                                   &psz_in, &i_in, &psz_out, &i_out );
-        vlc_mutex_unlock( &p_this->p_libvlc->iconv_lock );
+        vlc_mutex_unlock( &p_this->p_libvlc_global->iconv_lock );
         if( i_ret == (size_t)-1 || i_in )
         {
             msg_Warn( p_this,

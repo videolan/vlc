@@ -159,9 +159,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_db->pp_hosts = NULL;
     p_sys->p_db->i_hosts = 0;
 
-    var_Create( p_sd->p_vlc, "daap-db", VLC_VAR_ADDRESS );
+    var_Create( p_sd->p_libvlc, "daap-db", VLC_VAR_ADDRESS );
     val.p_address = p_sys->p_db;
-    var_Set( p_sd->p_vlc, "daap-db", val );
+    var_Set( p_sd->p_libvlc, "daap-db", val );
 
     vlc_mutex_init( p_sd, &p_sys->p_db->search_lock );
 
@@ -219,7 +219,7 @@ static int OpenAccess( vlc_object_t *p_this )
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
     memset( p_sys, 0, sizeof( access_sys_t ) );
 
-    i_ret = var_Get( p_access->p_vlc , "daap-db", &val );
+    i_ret = var_Get( p_access->p_libvlc , "daap-db", &val );
     p_sys->p_db = val.p_address;
 
     if( p_sys->p_db == NULL || i_ret )
@@ -322,7 +322,7 @@ static void Close( vlc_object_t *p_this )
         FreeHost( p_sd, p_sys->p_db->pp_hosts[i] );
     }
 
-    var_Destroy( p_sd->p_vlc, "daap-db" );
+    var_Destroy( p_sd->p_libvlc, "daap-db" );
 
     if( p_playlist )
     {

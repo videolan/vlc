@@ -145,7 +145,7 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
                                  p_sys->i_channels, p_sys->pi_chan_table,
                                  p_sys->i_bits_per_sample );
         }
-        p_aout->p_vlc->pf_memcpy( outputBuffer, p_buffer->p_buffer,
+        p_aout->p_libvlc->pf_memcpy( outputBuffer, p_buffer->p_buffer,
                                   framesPerBuffer * p_sys->i_sample_size );
         /* aout_BufferFree may be dangereous here, but then so is
          * aout_OutputNextBuffer (calls aout_BufferFree internally).
@@ -158,7 +158,7 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
     else
         /* Audio output buffer shortage -> stop the fill process and wait */
     {
-        p_aout->p_vlc->pf_memset( outputBuffer, 0,
+        p_aout->p_libvlc->pf_memset( outputBuffer, 0,
                                   framesPerBuffer * p_sys->i_sample_size );
     }
     return 0;

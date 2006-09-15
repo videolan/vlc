@@ -685,7 +685,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         /* Prepare statistics */
 #define INIT_COUNTER( p, type, compute ) p_input->counters.p_##p = \
      stats_CounterCreate( p_input, VLC_VAR_##type, STATS_##compute);
-        if( p_input->p_libvlc->b_stats )
+        if( p_input->p_libvlc_global->b_stats )
         {
             INIT_COUNTER( read_bytes, INTEGER, COUNTER );
             INIT_COUNTER( read_packets, INTEGER, COUNTER );
@@ -721,7 +721,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                 free( psz );
                 return VLC_EGENERIC;
             }
-            if( p_input->p_libvlc->b_stats )
+            if( p_input->p_libvlc_global->b_stats )
             {
                 INIT_COUNTER( sout_sent_packets, INTEGER, COUNTER );
                 INIT_COUNTER (sout_sent_bytes, INTEGER, COUNTER );
@@ -1114,7 +1114,7 @@ static void End( input_thread_t * p_input )
         input_EsOutDelete( p_input->p_es_out );
 
 #define CL_CO( c ) stats_CounterClean( p_input->counters.p_##c ); p_input->counters.p_##c = NULL;
-    if( p_input->p_libvlc->b_stats )
+    if( p_input->p_libvlc_global->b_stats )
     {
         vlc_mutex_lock( &p_input->counters.counters_lock );
         CL_CO( read_bytes );

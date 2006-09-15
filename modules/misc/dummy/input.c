@@ -209,7 +209,7 @@ static int Demux( demux_t *p_demux )
     switch( p_sys->i_command )
     {
         case COMMAND_QUIT:
-            b_eof = p_demux->p_vlc->b_die = VLC_TRUE;
+            b_eof = p_demux->p_libvlc->b_die = VLC_TRUE;
             break;
 
         case COMMAND_PAUSE:

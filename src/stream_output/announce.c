@@ -226,9 +226,7 @@ announce_handler_t *__announce_HandlerCreate( vlc_object_t *p_this )
     }
 
     p_announce->p_sap = NULL;
-
-    vlc_object_attach( p_announce, p_this->p_vlc);
-
+    vlc_object_attach( p_announce, p_this->p_libvlc);
 
     return p_announce;
 }

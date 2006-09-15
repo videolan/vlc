@@ -338,7 +338,7 @@ static int QNXManage( vout_thread_t *p_vout )
                 switch( p_ev->event_f )
                 {
                 case Ph_WM_CLOSE:
-                    p_vout->p_vlc->b_die = 1;
+                    p_vout->p_libvlc->b_die = 1;
                     break;
 
                 case Ph_WM_MOVE:
@@ -368,7 +368,7 @@ static int QNXManage( vout_thread_t *p_vout )
                     {
                     case Pk_q:
                     case Pk_Q:
-                        p_vout->p_vlc->b_die = 1;
+                        p_vout->p_libvlc->b_die = 1;
                         break;
 
                     case Pk_f:

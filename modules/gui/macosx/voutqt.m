@@ -140,14 +140,14 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
 
     /* Are we embedded?  If so, the drawable value will be a pointer to a
      * CGrafPtr that we're expected to use */
-    var_Get( p_vout->p_vlc, "drawable", &value_drawable );
+    var_Get( p_vout->p_libvlc, "drawable", &value_drawable );
     if( value_drawable.i_int != 0 )
         p_vout->p_sys->b_embedded = VLC_TRUE;
     else
         p_vout->p_sys->b_embedded = VLC_FALSE;
 
-    p_vout->p_sys->b_cpu_has_simd = (p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC)
-                                  | (p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT);
+    p_vout->p_sys->b_cpu_has_simd = (p_vout->p_libvlc_global->i_cpu & CPU_CAPABILITY_ALTIVEC)
+                                  | (p_vout->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT);
     msg_Dbg( p_vout, "we do%s have SIMD enabled CPU", p_vout->p_sys->b_cpu_has_simd ? "" : "n't" );
     
     /* Initialize QuickTime */
@@ -165,8 +165,8 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Damn QT isn't thread safe. so keep a lock in the p_vlc object */
-    vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
+    /* Damn QT isn't thread safe. so keep a lock in the p_libvlc object */
+    vlc_mutex_lock( &p_vout->p_libvlc->quicktime_lock );
 
     /* Can we find the right chroma ? */
     if( p_vout->p_sys->b_cpu_has_simd )
@@ -179,7 +179,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
         err = FindCodec( kYUV420CodecType, bestSpeedCodec,
                         nil, &p_vout->p_sys->img_dc );
     }
-    vlc_mutex_unlock( &p_vout->p_vlc->quicktime_lock );
+    vlc_mutex_unlock( &p_vout->p_libvlc->quicktime_lock );
     
     if( err == noErr && p_vout->p_sys->img_dc != 0 )
     {
@@ -284,7 +284,7 @@ static int InitVideo    ( vout_thread_t *p_vout )
         /* Create the clipping mask */
         p_vout->p_sys->clip_mask = NewRgn();
 	UpdateEmbeddedGeometry(p_vout);
-	var_AddCallback(p_vout->p_vlc, "drawableredraw", DrawableRedraw, p_vout);
+	var_AddCallback(p_vout->p_libvlc, "drawableredraw", DrawableRedraw, p_vout);
     }
 
     QTScaleMatrix( p_vout );
@@ -336,7 +336,7 @@ static void EndVideo( vout_thread_t *p_vout )
 
     if( !p_vout->b_fullscreen && p_vout->p_sys->b_embedded )
     {
-	var_DelCallback(p_vout->p_vlc, "drawableredraw", DrawableRedraw, p_vout);
+	var_DelCallback(p_vout->p_libvlc, "drawableredraw", DrawableRedraw, p_vout);
 	DisposeRgn(p_vout->p_sys->clip_mask);
     }
 
@@ -494,7 +494,7 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 	}
 	else
 	{
-	    var_DelCallback(p_vout->p_vlc, "drawableredraw", DrawableRedraw, p_vout);
+	    var_DelCallback(p_vout->p_libvlc, "drawableredraw", DrawableRedraw, p_vout);
 	    DisposeRgn(p_vout->p_sys->clip_mask);
 	}
     }
@@ -538,7 +538,7 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
         /* Create the clipping mask */
         p_vout->p_sys->clip_mask = NewRgn();
 	UpdateEmbeddedGeometry(p_vout);
-	var_AddCallback(p_vout->p_vlc, "drawableredraw", DrawableRedraw, p_vout);
+	var_AddCallback(p_vout->p_libvlc, "drawableredraw", DrawableRedraw, p_vout);
     }
     QTScaleMatrix( p_vout );
 
@@ -586,17 +586,17 @@ static void UpdateEmbeddedGeometry( vout_thread_t *p_vout )
     vlc_value_t valt, vall, valb, valr, valx, valy, valw, valh,
 		valportx, valporty;
 
-    var_Get( p_vout->p_vlc, "drawable", &val );
-    var_Get( p_vout->p_vlc, "drawablet", &valt );
-    var_Get( p_vout->p_vlc, "drawablel", &vall );
-    var_Get( p_vout->p_vlc, "drawableb", &valb );
-    var_Get( p_vout->p_vlc, "drawabler", &valr );
-    var_Get( p_vout->p_vlc, "drawablex", &valx );
-    var_Get( p_vout->p_vlc, "drawabley", &valy );
-    var_Get( p_vout->p_vlc, "drawablew", &valw );
-    var_Get( p_vout->p_vlc, "drawableh", &valh );
-    var_Get( p_vout->p_vlc, "drawableportx", &valportx );
-    var_Get( p_vout->p_vlc, "drawableporty", &valporty );
+    var_Get( p_vout->p_libvlc, "drawable", &val );
+    var_Get( p_vout->p_libvlc, "drawablet", &valt );
+    var_Get( p_vout->p_libvlc, "drawablel", &vall );
+    var_Get( p_vout->p_libvlc, "drawableb", &valb );
+    var_Get( p_vout->p_libvlc, "drawabler", &valr );
+    var_Get( p_vout->p_libvlc, "drawablex", &valx );
+    var_Get( p_vout->p_libvlc, "drawabley", &valy );
+    var_Get( p_vout->p_libvlc, "drawablew", &valw );
+    var_Get( p_vout->p_libvlc, "drawableh", &valh );
+    var_Get( p_vout->p_libvlc, "drawableportx", &valportx );
+    var_Get( p_vout->p_libvlc, "drawableporty", &valporty );
 
     /* portx, porty contains values for SetOrigin() function
        which isn't used, instead use QT Translate matrix */
@@ -616,7 +616,7 @@ static void UpdateEmbeddedGeometry( vout_thread_t *p_vout )
     /* reset drawableredraw variable indicating we are ready
        to take changes in video geometry */
     val.i_int=0;
-    var_Set( p_vout->p_vlc, "drawableredraw", val );
+    var_Set( p_vout->p_libvlc, "drawableredraw", val );
 }
 
 /*****************************************************************************

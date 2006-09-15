@@ -666,7 +666,7 @@ gnutls_ClientCreate( tls_t *p_tls )
         char *psz_path;
 
         if( asprintf( &psz_path, "%s/"CONFIG_DIR"/ssl/certs",
-                      p_tls->p_vlc->psz_homedir ) != -1 )
+                      p_tls->p_libvlc->psz_homedir ) != -1 )
         {
             gnutls_Addx509Directory( (vlc_object_t *)p_session,
                                      p_sys->x509_cred, psz_path, VLC_FALSE );
@@ -689,7 +689,7 @@ gnutls_ClientCreate( tls_t *p_tls )
         char *psz_path;
 
         if( asprintf( &psz_path, "%s/"CONFIG_DIR"/ssl/private",
-                      p_tls->p_vlc->psz_homedir ) == -1 )
+                      p_tls->p_libvlc->psz_homedir ) == -1 )
         {
             gnutls_certificate_free_credentials( p_sys->x509_cred );
             goto error;
@@ -1203,18 +1203,18 @@ Open( vlc_object_t *p_this )
 
     vlc_value_t lock, count;
 
-    var_Create( p_this->p_libvlc, "gnutls_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "gnutls_mutex", &lock );
+    var_Create( p_this->p_libvlc_global, "gnutls_mutex", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc_global, "gnutls_mutex", &lock );
     vlc_mutex_lock( lock.p_address );
 
     /* Initialize GnuTLS only once */
-    var_Create( p_this->p_libvlc, "gnutls_count", VLC_VAR_INTEGER );
-    var_Get( p_this->p_libvlc, "gnutls_count", &count);
+    var_Create( p_this->p_libvlc_global, "gnutls_count", VLC_VAR_INTEGER );
+    var_Get( p_this->p_libvlc_global, "gnutls_count", &count);
 
     if( count.i_int == 0)
     {
 #ifdef NEED_THREAD_CONTEXT
-        __p_gcry_data = VLC_OBJECT( p_this->p_vlc );
+        __p_gcry_data = VLC_OBJECT( p_this->p_libvlc );
 #endif
 
         gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
@@ -1237,7 +1237,7 @@ Open( vlc_object_t *p_this )
     }
 
     count.i_int++;
-    var_Set( p_this->p_libvlc, "gnutls_count", count);
+    var_Set( p_this->p_libvlc_global, "gnutls_count", count);
     vlc_mutex_unlock( lock.p_address );
 
     p_tls->pf_server_create = gnutls_ServerCreate;
@@ -1257,14 +1257,14 @@ Close( vlc_object_t *p_this )
 
     vlc_value_t lock, count;
 
-    var_Create( p_this->p_libvlc, "gnutls_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "gnutls_mutex", &lock );
+    var_Create( p_this->p_libvlc_global, "gnutls_mutex", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc_global, "gnutls_mutex", &lock );
     vlc_mutex_lock( lock.p_address );
 
-    var_Create( p_this->p_libvlc, "gnutls_count", VLC_VAR_INTEGER );
-    var_Get( p_this->p_libvlc, "gnutls_count", &count);
+    var_Create( p_this->p_libvlc_global, "gnutls_count", VLC_VAR_INTEGER );
+    var_Get( p_this->p_libvlc_global, "gnutls_count", &count);
     count.i_int--;
-    var_Set( p_this->p_libvlc, "gnutls_count", count);
+    var_Set( p_this->p_libvlc_global, "gnutls_count", count);
 
     if( count.i_int == 0 )
     {

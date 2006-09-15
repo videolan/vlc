@@ -395,7 +395,7 @@ static int Manage( vout_thread_t *p_vout )
 //        SDL_ShowCursor( 0 );
 //    }
 //
-//    if( p_vout->p_vlc->b_die )
+//    if( p_vout->p_libvlc->b_die )
 //        p_vout->p_sys->bRunning = FALSE;
 
     return 0;

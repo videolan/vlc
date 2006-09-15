@@ -213,7 +213,7 @@ vlc_module_begin();
     add_integer( "mosaic-bsvt", 17, NULL, BLUESCREENVTOL_TEXT,
                  BLUESCREENVTOL_LONGTEXT, VLC_FALSE );
 
-    var_Create( p_module->p_libvlc, "mosaic-lock", VLC_VAR_MUTEX );
+    var_Create( p_module->p_libvlc_global, "mosaic-lock", VLC_VAR_MUTEX );
 vlc_module_end();
 
 
@@ -224,7 +224,7 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    libvlc_t *p_libvlc = p_filter->p_libvlc;
+    libvlc_global_data_t *p_libvlc_global = p_filter->p_libvlc_global;
     char *psz_order;
     int i_index;
     vlc_value_t val;
@@ -246,16 +246,16 @@ static int CreateFilter( vlc_object_t *p_this )
     vlc_mutex_init( p_filter, &p_sys->lock );
     vlc_mutex_lock( &p_sys->lock );
 
-    var_Get( p_libvlc, "mosaic-lock", &val );
+    var_Get( p_libvlc_global, "mosaic-lock", &val );
     p_sys->p_lock = val.p_address;
 
 #define GET_VAR( name, min, max )                                           \
     p_sys->i_##name = __MIN( max, __MAX( min,                               \
                 var_CreateGetInteger( p_filter, "mosaic-" #name ) ) );      \
     var_Destroy( p_filter, "mosaic-" #name );                               \
-    var_Create( p_libvlc, "mosaic-" #name, VLC_VAR_INTEGER );               \
-    var_SetInteger( p_libvlc, "mosaic-" #name, p_sys->i_##name );           \
-    var_AddCallback( p_libvlc, "mosaic-" #name, MosaicCallback, p_sys );
+    var_Create( p_libvlc_global, "mosaic-" #name, VLC_VAR_INTEGER );               \
+    var_SetInteger( p_libvlc_global, "mosaic-" #name, p_sys->i_##name );           \
+    var_AddCallback( p_libvlc_global, "mosaic-" #name, MosaicCallback, p_sys );
 
     GET_VAR( width, 0, INT_MAX );
     GET_VAR( height, 0, INT_MAX );
@@ -266,9 +266,9 @@ static int CreateFilter( vlc_object_t *p_this )
     if( p_sys->i_align == 3 || p_sys->i_align == 7 )
         p_sys->i_align = 5;
     var_Destroy( p_filter, "mosaic-align" );
-    var_Create( p_libvlc, "mosaic-align", VLC_VAR_INTEGER );
-    var_SetInteger( p_libvlc, "mosaic-align", p_sys->i_align );
-    var_AddCallback( p_libvlc, "mosaic-align", MosaicCallback, p_sys );
+    var_Create( p_libvlc_global, "mosaic-align", VLC_VAR_INTEGER );
+    var_SetInteger( p_libvlc_global, "mosaic-align", p_sys->i_align );
+    var_AddCallback( p_libvlc_global, "mosaic-align", MosaicCallback, p_sys );
 
     GET_VAR( vborder, 0, INT_MAX );
     GET_VAR( hborder, 0, INT_MAX );
@@ -281,9 +281,9 @@ static int CreateFilter( vlc_object_t *p_this )
 
     p_sys->b_ar = var_CreateGetBool( p_filter, "mosaic-keep-aspect-ratio" );
     var_Destroy( p_filter, "mosaic-keep-aspect-ratio" );
-    var_Create( p_libvlc, "mosaic-keep-aspect-ratio", VLC_VAR_INTEGER );
-    var_SetBool( p_libvlc, "mosaic-keep-aspect-ratio", p_sys->b_ar );
-    var_AddCallback( p_libvlc, "mosaic-keep-aspect-ratio", MosaicCallback,
+    var_Create( p_libvlc_global, "mosaic-keep-aspect-ratio", VLC_VAR_INTEGER );
+    var_SetBool( p_libvlc_global, "mosaic-keep-aspect-ratio", p_sys->b_ar );
+    var_AddCallback( p_libvlc_global, "mosaic-keep-aspect-ratio", MosaicCallback,
                      p_sys );
 
     p_sys->b_keep = var_CreateGetBool( p_filter, "mosaic-keep-picture" );
@@ -296,8 +296,8 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->ppsz_order = NULL;
     psz_order = var_CreateGetString( p_filter, "mosaic-order" );
 
-    var_Create( p_libvlc, "mosaic-order", VLC_VAR_STRING);
-    var_AddCallback( p_libvlc, "mosaic-order", MosaicCallback, p_sys );
+    var_Create( p_libvlc_global, "mosaic-order", VLC_VAR_STRING);
+    var_AddCallback( p_libvlc_global, "mosaic-order", MosaicCallback, p_sys );
 
     if( psz_order[0] != 0 )
     {
@@ -323,9 +323,9 @@ static int CreateFilter( vlc_object_t *p_this )
     GET_VAR( bsvt, 0x00, 0xff );
     p_sys->b_bs = var_CreateGetBool( p_filter, "mosaic-bs" );
     var_Destroy( p_filter, "mosaic-bs" );
-    var_Create( p_libvlc, "mosaic-bs", VLC_VAR_INTEGER );
-    var_SetBool( p_libvlc, "mosaic-bs", p_sys->b_bs );
-    var_AddCallback( p_libvlc, "mosaic-bs", MosaicCallback, p_sys );
+    var_Create( p_libvlc_global, "mosaic-bs", VLC_VAR_INTEGER );
+    var_SetBool( p_libvlc_global, "mosaic-bs", p_sys->b_bs );
+    var_AddCallback( p_libvlc_global, "mosaic-bs", MosaicCallback, p_sys );
     if( p_sys->b_bs && p_sys->b_keep )
     {
         msg_Warn( p_filter, "mosaic-keep-picture needs to be disabled for"
@@ -344,7 +344,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-    libvlc_t *p_libvlc = p_filter->p_libvlc;
+    libvlc_global_data_t *p_libvlc_global = p_filter->p_libvlc_global;
     int i_index;
 
     vlc_mutex_lock( &p_sys->lock );
@@ -363,24 +363,24 @@ static void DestroyFilter( vlc_object_t *p_this )
         free( p_sys->ppsz_order );
     }
 
-    var_Destroy( p_libvlc, "mosaic-alpha" );
-    var_Destroy( p_libvlc, "mosaic-height" );
-    var_Destroy( p_libvlc, "mosaic-align" );
-    var_Destroy( p_libvlc, "mosaic-width" );
-    var_Destroy( p_libvlc, "mosaic-xoffset" );
-    var_Destroy( p_libvlc, "mosaic-yoffset" );
-    var_Destroy( p_libvlc, "mosaic-vborder" );
-    var_Destroy( p_libvlc, "mosaic-hborder" );
-    var_Destroy( p_libvlc, "mosaic-position" );
-    var_Destroy( p_libvlc, "mosaic-rows" );
-    var_Destroy( p_libvlc, "mosaic-cols" );
-    var_Destroy( p_libvlc, "mosaic-keep-aspect-ratio" );
+    var_Destroy( p_libvlc_global, "mosaic-alpha" );
+    var_Destroy( p_libvlc_global, "mosaic-height" );
+    var_Destroy( p_libvlc_global, "mosaic-align" );
+    var_Destroy( p_libvlc_global, "mosaic-width" );
+    var_Destroy( p_libvlc_global, "mosaic-xoffset" );
+    var_Destroy( p_libvlc_global, "mosaic-yoffset" );
+    var_Destroy( p_libvlc_global, "mosaic-vborder" );
+    var_Destroy( p_libvlc_global, "mosaic-hborder" );
+    var_Destroy( p_libvlc_global, "mosaic-position" );
+    var_Destroy( p_libvlc_global, "mosaic-rows" );
+    var_Destroy( p_libvlc_global, "mosaic-cols" );
+    var_Destroy( p_libvlc_global, "mosaic-keep-aspect-ratio" );
 
-    var_Destroy( p_libvlc, "mosaic-bsu" );
-    var_Destroy( p_libvlc, "mosaic-bsv" );
-    var_Destroy( p_libvlc, "mosaic-bsut" );
-    var_Destroy( p_libvlc, "mosaic-bsvt" );
-    var_Destroy( p_libvlc, "mosaic-bs" );
+    var_Destroy( p_libvlc_global, "mosaic-bsu" );
+    var_Destroy( p_libvlc_global, "mosaic-bsv" );
+    var_Destroy( p_libvlc_global, "mosaic-bsut" );
+    var_Destroy( p_libvlc_global, "mosaic-bsvt" );
+    var_Destroy( p_libvlc_global, "mosaic-bs" );
 
     if( p_sys->p_pic ) p_sys->p_pic->pf_release( p_sys->p_pic );
     vlc_mutex_unlock( &p_sys->lock );

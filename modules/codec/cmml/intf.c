@@ -119,18 +119,18 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 
     p_intf->pf_run = RunIntf;
 
-    var_AddCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
+    var_AddCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
     /* we also need to add the callback for "mouse-clicked", but do that later
      * when we've found a p_vout */
 
-    var_Create( p_intf->p_vlc, "browse-go-back", VLC_VAR_VOID );
-    var_AddCallback( p_intf->p_vlc, "browse-go-back",
+    var_Create( p_intf->p_libvlc, "browse-go-back", VLC_VAR_VOID );
+    var_AddCallback( p_intf->p_libvlc, "browse-go-back",
                      GoBackCallback, p_intf );
-    var_Create( p_intf->p_vlc, "browse-go-forward", VLC_VAR_VOID );
-    var_AddCallback( p_intf->p_vlc, "browse-go-forward",
+    var_Create( p_intf->p_libvlc, "browse-go-forward", VLC_VAR_VOID );
+    var_AddCallback( p_intf->p_libvlc, "browse-go-forward",
                      GoForwardCallback, p_intf );
-    var_Create( p_intf->p_vlc, "browse-follow-anchor", VLC_VAR_VOID );
-    var_AddCallback( p_intf->p_vlc, "browse-follow-anchor",
+    var_Create( p_intf->p_libvlc, "browse-follow-anchor", VLC_VAR_VOID );
+    var_AddCallback( p_intf->p_libvlc, "browse-follow-anchor",
                      FollowAnchorCallback, p_intf );
 
     return( 0 );
@@ -157,7 +157,7 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
         vlc_object_release( p_vout );
     }
 
-    var_DelCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
+    var_DelCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
 
     vlc_object_release( p_intf->p_sys->p_cmml_decoder );
 
@@ -216,10 +216,10 @@ static void RunIntf( intf_thread_t *p_intf )
         {
             vlc_value_t val;
             int i, i_action = -1;
-            struct hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
+            struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
             /* Find action triggered by hotkey (if any) */
-            var_Get( p_intf->p_vlc, "key-pressed", &val );
+            var_Get( p_intf->p_libvlc, "key-pressed", &val );
 
             /* Acknowledge that we've handled the b_key_pressed event */
             p_intf->p_sys->b_key_pressed = VLC_FALSE;
@@ -307,7 +307,7 @@ static int DisplayPendingAnchor( intf_thread_t *p_intf, vout_thread_t *p_vout )
     if( p_vout != NULL )
     {
         /* don't display anchor if main interface can display it */
-        p_primary_intf = vlc_object_find( p_intf->p_vlc, VLC_OBJECT_INTF,
+        p_primary_intf = vlc_object_find( p_intf->p_libvlc, VLC_OBJECT_INTF,
                 FIND_CHILD );
 
         if( p_primary_intf )

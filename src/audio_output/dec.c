@@ -166,7 +166,7 @@ aout_input_t * __aout_DecNew( vlc_object_t * p_this,
             {
                 return NULL;
             }
-            vlc_object_attach( *pp_aout, p_this->p_vlc );
+            vlc_object_attach( *pp_aout, p_this->p_libvlc );
         }
         else
         {
@@ -343,7 +343,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                             / p_input->input.i_rate;
 
         aout_BufferAlloc( &p_input->input_alloc, duration, NULL, p_new_buffer );
-        p_aout->p_vlc->pf_memcpy( p_new_buffer->p_buffer, p_buffer->p_buffer,
+        p_aout->p_libvlc->pf_memcpy( p_new_buffer->p_buffer, p_buffer->p_buffer,
                                   p_buffer->i_nb_bytes );
         p_new_buffer->i_nb_samples = p_buffer->i_nb_samples;
         p_new_buffer->i_nb_bytes = p_buffer->i_nb_bytes;

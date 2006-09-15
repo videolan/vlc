@@ -23,13 +23,13 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * libvlc_t (global variable)
+ * libvlc_global_data_t (global variable)
  *****************************************************************************
  * This structure has an unique instance, statically allocated in main and
- * never accessed from the outside. It store once-initialized data such as
+ * never accessed from the outside. It stores once-initialized data such as
  * the CPU capabilities or the global lock.
  *****************************************************************************/
-struct libvlc_t
+struct libvlc_global_data_t
 {
     VLC_COMMON_MEMBERS
 
@@ -48,13 +48,13 @@ struct libvlc_t
 
     module_bank_t *        p_module_bank; ///< The module bank
 
-    vlc_bool_t             b_stats;         ///< Should we collect stats
+    vlc_bool_t             b_stats;       ///< Should we collect stats
     /* Timers handling */
-    vlc_mutex_t            timer_lock;      ///< Lock to protect timers
-    int                    i_timers;        ///< Number of timers
-    counter_t            **pp_timers;       ///< Array of all timers
+    vlc_mutex_t            timer_lock;    ///< Lock to protect timers
+    int                    i_timers;      ///< Number of timers
+    counter_t            **pp_timers;     ///< Array of all timers
 
-    intf_thread_t         *p_probe;         ///< Devices prober
+    intf_thread_t         *p_probe;       ///< Devices prober
 
     /* Arch-specific variables */
 #if !defined( WIN32 )
@@ -78,11 +78,11 @@ struct libvlc_t
 };
 
 /*****************************************************************************
- * vlc_t, p_vlc
+ * libvlc_internal_instance_t
  *****************************************************************************
- * This structure is a LibVLC instance.
+ * This structure is a LibVLC instance, for use by libvlc core and plugins
  *****************************************************************************/
-struct vlc_t
+struct libvlc_int_t
 {
     VLC_COMMON_MEMBERS
 

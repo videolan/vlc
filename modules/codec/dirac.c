@@ -184,7 +184,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
         {
-            p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_width );
+            p_dec->p_libvlc->pf_memcpy( p_dst, p_src, i_width );
             p_src += i_width;
             p_dst += i_dst_stride;
         }
@@ -406,7 +406,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
         {
-            p_enc->p_vlc->pf_memcpy( p_dst, p_src, i_width );
+            p_enc->p_libvlc->pf_memcpy( p_dst, p_src, i_width );
             p_dst += i_width;
             p_src += i_src_stride;
         }

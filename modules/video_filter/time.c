@@ -145,22 +145,22 @@ static int CreateFilter( vlc_object_t *p_this )
     memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );
 
     /* Hook used for callback variables */
-    p_sys->i_xoff = var_CreateGetInteger( p_filter->p_libvlc , "time-x" );
-    p_sys->i_yoff = var_CreateGetInteger( p_filter->p_libvlc , "time-y" );
-    p_sys->psz_format = var_CreateGetString( p_filter->p_libvlc, "time-format" );
-    p_sys->i_pos = var_CreateGetInteger( p_filter->p_libvlc , "time-position" );
+    p_sys->i_xoff = var_CreateGetInteger( p_filter->p_libvlc_global , "time-x" );
+    p_sys->i_yoff = var_CreateGetInteger( p_filter->p_libvlc_global , "time-y" );
+    p_sys->psz_format = var_CreateGetString( p_filter->p_libvlc_global, "time-format" );
+    p_sys->i_pos = var_CreateGetInteger( p_filter->p_libvlc_global , "time-position" );
     
-    p_sys->p_style->i_font_alpha = 255 - var_CreateGetInteger( p_filter->p_libvlc , "time-opacity" );
-    p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter->p_libvlc , "time-color" );
-    p_sys->p_style->i_font_size = var_CreateGetInteger( p_filter->p_libvlc , "time-size" );
+    p_sys->p_style->i_font_alpha = 255 - var_CreateGetInteger( p_filter->p_libvlc_global , "time-opacity" );
+    p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter->p_libvlc_global , "time-color" );
+    p_sys->p_style->i_font_size = var_CreateGetInteger( p_filter->p_libvlc_global , "time-size" );
    
-    var_AddCallback( p_filter->p_libvlc, "time-x", TimeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "time-y", TimeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "time-format", TimeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "time-position", TimeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "time-color", TimeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "time-opacity", TimeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "time-size", TimeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "time-x", TimeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "time-y", TimeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "time-format", TimeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "time-position", TimeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "time-color", TimeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "time-opacity", TimeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "time-size", TimeCallback, p_sys );
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
@@ -181,13 +181,13 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys );
 
     /* Delete the time variables */
-    var_Destroy( p_filter->p_libvlc , "time-format" );
-    var_Destroy( p_filter->p_libvlc , "time-x" );
-    var_Destroy( p_filter->p_libvlc , "time-y" );
-    var_Destroy( p_filter->p_libvlc , "time-position" );
-    var_Destroy( p_filter->p_libvlc , "time-color");
-    var_Destroy( p_filter->p_libvlc , "time-opacity");
-    var_Destroy( p_filter->p_libvlc , "time-size");
+    var_Destroy( p_filter->p_libvlc_global , "time-format" );
+    var_Destroy( p_filter->p_libvlc_global , "time-x" );
+    var_Destroy( p_filter->p_libvlc_global , "time-y" );
+    var_Destroy( p_filter->p_libvlc_global , "time-position" );
+    var_Destroy( p_filter->p_libvlc_global , "time-color");
+    var_Destroy( p_filter->p_libvlc_global , "time-opacity");
+    var_Destroy( p_filter->p_libvlc_global , "time-size");
 }
 
 static char *FormatTime(char *tformat )

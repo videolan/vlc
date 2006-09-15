@@ -71,7 +71,7 @@ struct vlc_namedmutex_t
  *****************************************************************************/
 int __vlc_threads_init( vlc_object_t *p_this )
 {
-    libvlc_t *p_libvlc = (libvlc_t *)p_this;
+    libvlc_global_data_t *p_libvlc_global = (libvlc_global_data_t *)p_this;
     int i_ret = VLC_SUCCESS;
 
     /* If we have lazy mutex initialization, use it. Otherwise, we just
@@ -91,7 +91,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
         i_status = VLC_THREADS_PENDING;
 
         /* We should be safe now. Do all the initialization stuff we want. */
-        p_libvlc->b_ready = VLC_FALSE;
+        p_libvlc_global->b_ready = VLC_FALSE;
 
 #if defined( PTH_INIT_IN_PTH_H )
         i_ret = ( pth_init() == FALSE );
@@ -112,25 +112,25 @@ int __vlc_threads_init( vlc_object_t *p_this )
             hInstLib = LoadLibrary( "kernel32" );
             if( hInstLib )
             {
-                p_libvlc->SignalObjectAndWait =
+                p_libvlc_global->SignalObjectAndWait =
                     (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib,
                                                      "SignalObjectAndWait" );
             }
         }
         else
         {
-            p_libvlc->SignalObjectAndWait = NULL;
+            p_libvlc_global->SignalObjectAndWait = NULL;
         }
 
-        p_libvlc->b_fast_mutex = 0;
-        p_libvlc->i_win9x_cv = 0;
+        p_libvlc_global->b_fast_mutex = 0;
+        p_libvlc_global->i_win9x_cv = 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 #elif defined( HAVE_CTHREADS_H )
 #endif
 
-        p_root = vlc_object_create( p_libvlc, VLC_OBJECT_ROOT );
+        p_root = vlc_object_create( p_libvlc_global, VLC_OBJECT_ROOT );
         if( p_root == NULL )
             i_ret = VLC_ENOMEM;
 
@@ -243,8 +243,8 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
      * function and have a 100% correct vlc_cond_wait() implementation.
      * As this function is not available on Win9x, we can use the faster
      * CriticalSections */
-    if( p_this->p_libvlc->SignalObjectAndWait &&
-        !p_this->p_libvlc->b_fast_mutex )
+    if( p_this->p_libvlc_global->SignalObjectAndWait &&
+        !p_this->p_libvlc_global->b_fast_mutex )
     {
         /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
         p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
@@ -393,10 +393,11 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     p_condvar->i_waiting_threads = 0;
 
     /* Misc init */
-    p_condvar->i_win9x_cv = p_this->p_libvlc->i_win9x_cv;
-    p_condvar->SignalObjectAndWait = p_this->p_libvlc->SignalObjectAndWait;
+    p_condvar->i_win9x_cv = p_this->p_libvlc_global->i_win9x_cv;
+    p_condvar->SignalObjectAndWait = p_this->p_libvlc_global->SignalObjectAndWait;
 
-    if( (p_condvar->SignalObjectAndWait && !p_this->p_libvlc->b_fast_mutex)
+    if( (p_condvar->SignalObjectAndWait &&
+        !p_this->p_libvlc_global->b_fast_mutex)
         || p_condvar->i_win9x_cv == 0 )
     {
         /* Create an auto-reset event. */

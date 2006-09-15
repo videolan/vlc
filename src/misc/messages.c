@@ -75,17 +75,17 @@ static void CreateMsgQueue( vlc_object_t *p_this, int i_queue );
  */
 void __msg_Create( vlc_object_t *p_this )
 {
-    vlc_mutex_init( p_this, &(p_this->p_libvlc->msg_bank.lock) );
+    vlc_mutex_init( p_this, &(p_this->p_libvlc_global->msg_bank.lock) );
 
     CreateMsgQueue( p_this, MSG_QUEUE_NORMAL );
     CreateMsgQueue( p_this, MSG_QUEUE_HTTPD_ACCESS );
 
 #ifdef UNDER_CE
-    p_this->p_libvlc->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile =
+    p_this->p_libvlc_global->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile =
         CreateFile( L"vlc-log.txt", GENERIC_WRITE,
                     FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
                     CREATE_ALWAYS, 0, NULL );
-    SetFilePointer( p_this->p_libvlc->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->
+    SetFilePointer( p_this->p_libvlc_global->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->
                                      logfile, 0, NULL, FILE_END );
 #endif
 
@@ -105,8 +105,8 @@ static void CreateMsgQueue( vlc_object_t *p_this, int i_queue )
     p_queue->i_sub = 0;
     p_queue->pp_sub = NULL;
 
-    INSERT_ELEM( p_this->p_libvlc->msg_bank.pp_queues,
-                 p_this->p_libvlc->msg_bank.i_queues,
+    INSERT_ELEM( p_this->p_libvlc_global->msg_bank.pp_queues,
+                 p_this->p_libvlc_global->msg_bank.i_queues,
                  i_queue,
                  p_queue );
 }
@@ -118,11 +118,11 @@ void __msg_Flush( vlc_object_t *p_this )
 {
     int i;
 
-    for( i = 0 ; i < p_this->p_libvlc->msg_bank.i_queues; i++ )
+    for( i = 0 ; i < p_this->p_libvlc_global->msg_bank.i_queues; i++ )
     {
-        vlc_mutex_lock( &p_this->p_libvlc->msg_bank.pp_queues[i]->lock );
-        FlushMsg( p_this->p_libvlc->msg_bank.pp_queues[i] );
-        vlc_mutex_unlock( &p_this->p_libvlc->msg_bank.pp_queues[i]->lock );
+        vlc_mutex_lock( &p_this->p_libvlc_global->msg_bank.pp_queues[i]->lock );
+        FlushMsg( p_this->p_libvlc_global->msg_bank.pp_queues[i] );
+        vlc_mutex_unlock( &p_this->p_libvlc_global->msg_bank.pp_queues[i]->lock );
     }
 }
 
@@ -136,9 +136,9 @@ void __msg_Flush( vlc_object_t *p_this )
 void __msg_Destroy( vlc_object_t *p_this )
 {
     int i;
-    for( i = p_this->p_libvlc->msg_bank.i_queues -1 ; i >= 0;  i-- )
+    for( i = p_this->p_libvlc_global->msg_bank.i_queues -1 ; i >= 0;  i-- )
     {
-        msg_queue_t *p_queue = p_this->p_libvlc->msg_bank.pp_queues[i];
+        msg_queue_t *p_queue = p_this->p_libvlc_global->msg_bank.pp_queues[i];
         if( p_queue->i_sub )
         {
             msg_Err( p_this, "stale interface subscribers" );
@@ -147,15 +147,15 @@ void __msg_Destroy( vlc_object_t *p_this )
 
 #ifdef UNDER_CE
         if( i == MSG_QUEUE_NORMAL )
-            CloseHandle( p_this->p_libvlc->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile );
+            CloseHandle( p_this->p_libvlc_global->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile );
 #endif
         /* Destroy lock */
         vlc_mutex_destroy( &p_queue->lock );
-        REMOVE_ELEM( p_this->p_libvlc->msg_bank.pp_queues,
-                     p_this->p_libvlc->msg_bank.i_queues, i );
+        REMOVE_ELEM( p_this->p_libvlc_global->msg_bank.pp_queues,
+                     p_this->p_libvlc_global->msg_bank.i_queues, i );
         free( p_queue );
     }
-    vlc_mutex_destroy( &(p_this->p_libvlc->msg_bank.lock) );
+    vlc_mutex_destroy( &(p_this->p_libvlc_global->msg_bank.lock) );
 }
 
 /**
@@ -163,7 +163,7 @@ void __msg_Destroy( vlc_object_t *p_this )
  */
 msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this, int i_queue )
 {
-    msg_bank_t *p_bank = &p_this->p_libvlc->msg_bank;
+    msg_bank_t *p_bank = &p_this->p_libvlc_global->msg_bank;
     msg_subscription_t *p_sub = malloc( sizeof( msg_subscription_t ) );
     msg_queue_t *p_queue = NULL;
     int i;
@@ -209,7 +209,7 @@ msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this, int i_queue )
  */
 void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
 {
-    msg_bank_t *p_bank = &p_this->p_libvlc->msg_bank;
+    msg_bank_t *p_bank = &p_this->p_libvlc_global->msg_bank;
     int i,j;
 
     vlc_mutex_lock( &p_bank->lock );
@@ -319,7 +319,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
         return;
     }
 
-    p_bank = &p_this->p_libvlc->msg_bank;
+    p_bank = &p_this->p_libvlc_global->msg_bank;
 
     /*
      * Convert message to string
@@ -547,23 +547,23 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     switch( i_type )
     {
         case VLC_MSG_ERR:
-            if( p_this->p_libvlc->i_verbose < 0 ) return;
+            if( p_this->p_libvlc_global->i_verbose < 0 ) return;
             break;
         case VLC_MSG_INFO:
-            if( p_this->p_libvlc->i_verbose < 0 ) return;
+            if( p_this->p_libvlc_global->i_verbose < 0 ) return;
             break;
         case VLC_MSG_WARN:
-            if( p_this->p_libvlc->i_verbose < 1 ) return;
+            if( p_this->p_libvlc_global->i_verbose < 1 ) return;
             break;
         case VLC_MSG_DBG:
-            if( p_this->p_libvlc->i_verbose < 2 ) return;
+            if( p_this->p_libvlc_global->i_verbose < 2 ) return;
             break;
     }
 
     switch( p_item->i_object_type )
     {
         case VLC_OBJECT_ROOT: psz_object = "root"; break;
-        case VLC_OBJECT_VLC: psz_object = "vlc"; break;
+        case VLC_OBJECT_LIBVLC: psz_object = "libvlc"; break;
         case VLC_OBJECT_MODULE: psz_object = "module"; break;
         case VLC_OBJECT_INTF: psz_object = "interface"; break;
         case VLC_OBJECT_PLAYLIST: psz_object = "playlist"; break;
@@ -585,7 +585,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     }
 
 #ifdef UNDER_CE
-#   define CE_WRITE(str) WriteFile( p_this->p_libvlc->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile, \
+#   define CE_WRITE(str) WriteFile( p_this->p_libvlc_global->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile, \
                                     str, strlen(str), &i_dummy, NULL );
     CE_WRITE( p_item->psz_module );
     CE_WRITE( " " );
@@ -594,11 +594,11 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     CE_WRITE( ": " );
     CE_WRITE( p_item->psz_msg );
     CE_WRITE( "\r\n" );
-    FlushFileBuffers( p_this->p_libvlc->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile );
+    FlushFileBuffers( p_this->p_libvlc_global->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile );
 
 #else
     /* Send the message to stderr */
-    if( p_this->p_libvlc->b_color )
+    if( p_this->p_libvlc_global->b_color )
     {
         if( p_item->psz_header )
         {

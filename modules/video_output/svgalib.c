@@ -231,7 +231,7 @@ static int Manage( vout_thread_t *p_vout )
     if( keyboard_keypressed(SCANCODE_ESCAPE)
          || keyboard_keypressed(SCANCODE_Q ) )
     {
-        p_vout->p_vlc->b_die = VLC_TRUE;
+        p_vout->p_libvlc->b_die = VLC_TRUE;
     }
 
     return VLC_SUCCESS;

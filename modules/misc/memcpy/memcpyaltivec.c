@@ -45,7 +45,7 @@ static void * fast_memcpy ( void * to, const void * from, size_t len );
  *****************************************************************************/
 static int Activate ( vlc_object_t *p_this )
 {
-    p_this->p_vlc->pf_memcpy = fast_memcpy;
+    p_this->p_libvlc->pf_memcpy = fast_memcpy;
     return VLC_SUCCESS;
 }
 

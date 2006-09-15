@@ -163,7 +163,7 @@ static int Open( vlc_object_t *p_this )
         {
             /* This is incomplete : we should also support the ~cmassiot/
              * syntax. */
-            asprintf( &psz, "%s/%s", p_access->p_vlc->psz_homedir, psz_name + 2 );
+            asprintf( &psz, "%s/%s", p_access->p_libvlc->psz_homedir, psz_name + 2 );
             free( psz_name );
             psz_name = psz;
         }

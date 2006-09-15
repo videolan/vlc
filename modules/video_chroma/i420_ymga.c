@@ -107,7 +107,7 @@ static void I420_YMGA( vout_thread_t *p_vout, picture_t *p_source,
     int i_x;
 
     /* Copy the Y part */
-    p_vout->p_vlc->pf_memcpy( p_dest->Y_PIXELS, p_source->Y_PIXELS,
+    p_vout->p_libvlc->pf_memcpy( p_dest->Y_PIXELS, p_source->Y_PIXELS,
                  p_dest->p[Y_PLANE].i_pitch * p_dest->p[Y_PLANE].i_visible_lines );
 
     /* Copy the U:V part */

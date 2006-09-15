@@ -828,7 +828,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     int i;
 
     val.i_int = 0;
-    p_hotkeys = p_intf->p_vlc->p_hotkeys;
+    p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
     i_pressed_modifiers = [o_event modifierFlags];
 
@@ -864,7 +864,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         if( p_hotkeys[i].i_key == val.i_int )
         {
-            var_Set( p_intf->p_vlc, "key-pressed", val );
+            var_Set( p_intf->p_libvlc, "key-pressed", val );
             return YES;
         }
     }
@@ -1018,7 +1018,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     vlc_value_t val;
 
-    if( p_intf->p_vlc->b_die == VLC_TRUE )
+    if( p_intf->p_libvlc->b_die == VLC_TRUE )
     {
         [o_timer invalidate];
         return;
@@ -1183,7 +1183,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             o_text = [NSString stringWithFormat: _NS("Volume: %d%%"), i_lastShownVolume * 400 / AOUT_VOLUME_MAX];
             if( i_lastShownVolume != -1 )
             [self setScrollField:o_text stopAfter:1000000];
-            i_volume_step = config_GetInt( p_intf->p_vlc, "volume-step" );
+            i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
             [o_volumeslider setFloatValue: (float)i_lastShownVolume / i_volume_step];
             [o_volumeslider setEnabled: TRUE];
             p_intf->p_sys->b_mute = ( i_lastShownVolume == 0 );

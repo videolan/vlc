@@ -533,7 +533,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
                 while( p_in < p_in_end )
                 {
-                    p_vout->p_vlc->pf_memcpy( p_out, p_in, i_copy_pitch );
+                    p_vout->p_libvlc->pf_memcpy( p_out, p_in, i_copy_pitch );
                     p_in += i_in_pitch;
                     p_out += i_out_pitch;
                 }

@@ -97,7 +97,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     {
         /* For whatever reason the buffer allocator decided to allocate
          * a new buffer. Currently, this never happens. */
-        p_aout->p_vlc->pf_memcpy( p_out_buf->p_buffer, p_in_buf->p_buffer,
+        p_aout->p_libvlc->pf_memcpy( p_out_buf->p_buffer, p_in_buf->p_buffer,
                                   __MIN(i_out_nb, i_in_nb) * i_sample_bytes );
     }
 

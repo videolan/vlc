@@ -244,11 +244,11 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Copy all our samples in p_in */
     if( p_filter->p_sys->i_old_wing )
     {
-        p_aout->p_vlc->pf_memcpy( p_in, p_filter->p_sys->p_buf,
+        p_aout->p_libvlc->pf_memcpy( p_in, p_filter->p_sys->p_buf,
                                   p_filter->p_sys->i_old_wing * 2 *
                                   p_filter->input.i_bytes_per_frame );
     }
-    p_aout->p_vlc->pf_memcpy( p_in + p_filter->p_sys->i_old_wing * 2 *
+    p_aout->p_libvlc->pf_memcpy( p_in + p_filter->p_sys->i_old_wing * 2 *
                               i_nb_channels, p_in_buf->p_buffer,
                               p_in_buf->i_nb_samples *
                               p_filter->input.i_bytes_per_frame );

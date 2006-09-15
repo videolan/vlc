@@ -724,7 +724,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Hook used for callback variables */
     p_logo_list->psz_filename =
-        var_CreateGetString( p_filter->p_libvlc , "logo-file" );
+        var_CreateGetString( p_filter->p_libvlc_global , "logo-file" );
     if( !p_logo_list->psz_filename || !*p_logo_list->psz_filename )
     {
         msg_Err( p_this, "logo file not specified" );
@@ -733,22 +733,22 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->posx = var_CreateGetInteger( p_filter->p_libvlc , "logo-x" );
-    p_sys->posy = var_CreateGetInteger( p_filter->p_libvlc , "logo-y" );
-    p_sys->pos = var_CreateGetInteger( p_filter->p_libvlc , "logo-position" );
+    p_sys->posx = var_CreateGetInteger( p_filter->p_libvlc_global , "logo-x" );
+    p_sys->posy = var_CreateGetInteger( p_filter->p_libvlc_global , "logo-y" );
+    p_sys->pos = var_CreateGetInteger( p_filter->p_libvlc_global , "logo-position" );
     p_logo_list->i_alpha = __MAX( __MIN( var_CreateGetInteger(
-                           p_filter->p_libvlc, "logo-transparency"), 255 ), 0 );
+                           p_filter->p_libvlc_global, "logo-transparency"), 255 ), 0 );
     p_logo_list->i_delay =
-                    var_CreateGetInteger( p_filter->p_libvlc , "logo-delay" );
+                    var_CreateGetInteger( p_filter->p_libvlc_global , "logo-delay" );
     p_logo_list->i_repeat =
-                    var_CreateGetInteger( p_filter->p_libvlc , "logo-repeat" );
+                    var_CreateGetInteger( p_filter->p_libvlc_global , "logo-repeat" );
 
-    var_AddCallback( p_filter->p_libvlc, "logo-file", LogoCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "logo-x", LogoCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "logo-y", LogoCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "logo-position", LogoCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "logo-transparency", LogoCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "logo-repeat", LogoCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "logo-file", LogoCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "logo-x", LogoCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "logo-y", LogoCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "logo-position", LogoCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "logo-transparency", LogoCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "logo-repeat", LogoCallback, p_sys );
 
     vlc_mutex_init( p_filter, &p_logo_list->lock );
     vlc_mutex_lock( &p_logo_list->lock );
@@ -780,13 +780,13 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys );
 
     /* Delete the logo variables from INPUT */
-    var_Destroy( p_filter->p_libvlc , "logo-file" );
-    var_Destroy( p_filter->p_libvlc , "logo-x" );
-    var_Destroy( p_filter->p_libvlc , "logo-y" );
-    var_Destroy( p_filter->p_libvlc , "logo-delay" );
-    var_Destroy( p_filter->p_libvlc , "logo-repeat" );
-    var_Destroy( p_filter->p_libvlc , "logo-position" );
-    var_Destroy( p_filter->p_libvlc , "logo-transparency" );
+    var_Destroy( p_filter->p_libvlc_global , "logo-file" );
+    var_Destroy( p_filter->p_libvlc_global , "logo-x" );
+    var_Destroy( p_filter->p_libvlc_global , "logo-y" );
+    var_Destroy( p_filter->p_libvlc_global , "logo-delay" );
+    var_Destroy( p_filter->p_libvlc_global , "logo-repeat" );
+    var_Destroy( p_filter->p_libvlc_global , "logo-position" );
+    var_Destroy( p_filter->p_libvlc_global , "logo-transparency" );
 }
 
 /*****************************************************************************

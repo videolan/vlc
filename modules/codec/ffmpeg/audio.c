@@ -89,7 +89,7 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
     decoder_sys_t *p_sys;
     vlc_value_t lockval;
 
-    var_Get( p_dec->p_libvlc, "avcodec", &lockval );
+    var_Get( p_dec->p_libvlc_global, "avcodec", &lockval );
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =

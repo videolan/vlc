@@ -86,9 +86,9 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t lockval;
 
     /* FIXME: put this in the module (de)initialization ASAP */
-    var_Create( p_this->p_libvlc, "gtk", VLC_VAR_MUTEX );
+    var_Create( p_this->p_libvlc_global, "gtk", VLC_VAR_MUTEX );
 
-    var_Get( p_this->p_libvlc, "gtk", &lockval );
+    var_Get( p_this->p_libvlc_global, "gtk", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     if( i_refcount > 0 )
@@ -115,7 +115,7 @@ static int Open( vlc_object_t *p_this )
         vlc_object_destroy( p_gtk_main );
         i_refcount--;
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_this->p_libvlc, "gtk" );
+        var_Destroy( p_this->p_libvlc_global, "gtk" );
         return VLC_ETHREAD;
     }
 
@@ -132,7 +132,7 @@ static void Close( vlc_object_t *p_this )
 {
     vlc_value_t lockval;
 
-    var_Get( p_this->p_libvlc, "gtk", &lockval );
+    var_Get( p_this->p_libvlc_global, "gtk", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     i_refcount--;
@@ -140,7 +140,7 @@ static void Close( vlc_object_t *p_this )
     if( i_refcount > 0 )
     {
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_this->p_libvlc, "gtk" );
+        var_Destroy( p_this->p_libvlc_global, "gtk" );
         return;
     }
 
@@ -151,7 +151,7 @@ static void Close( vlc_object_t *p_this )
     p_gtk_main = NULL;
 
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_this->p_libvlc, "gtk" );
+    var_Destroy( p_this->p_libvlc_global, "gtk" );
 }
 
 static gint foo( gpointer bar ) { return TRUE; }
@@ -178,7 +178,7 @@ static void GtkMain( vlc_object_t *p_this )
 #endif
 
 #if defined(MODULE_NAME_IS_gnome_main)
-    gnome_init( p_this->p_vlc->psz_object_name, VERSION, i_args, p_args );
+    gnome_init( p_this->p_libvlc->psz_object_name, VERSION, i_args, p_args );
 #elif defined(MODULE_NAME_IS_gnome2_main)
     gnome_program_init( PACKAGE, VERSION, LIBGNOMEUI_MODULE,
                         i_args, p_args,

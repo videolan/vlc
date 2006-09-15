@@ -134,7 +134,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     /* Backup frame */
-    p_filter->p_vlc->pf_memcpy( p_filter->p_sys->p_buf + p_in_buf->i_nb_bytes *
+    p_filter->p_libvlc->pf_memcpy( p_filter->p_sys->p_buf + p_in_buf->i_nb_bytes *
                                 p_filter->p_sys->i_frames, p_in_buf->p_buffer,
                                 p_in_buf->i_nb_bytes );
 
@@ -169,14 +169,14 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         /* Copy the S/PDIF headers. */
         if( p_filter->output.i_format == VLC_FOURCC('s','p','d','b') )
         {
-            p_filter->p_vlc->pf_memcpy( p_out, p_sync_be, 6 );
+            p_filter->p_libvlc->pf_memcpy( p_out, p_sync_be, 6 );
             p_out[5] = i_ac5_spdif_type;
             p_out[6] = (( i_length ) >> 5 ) & 0xFF;
             p_out[7] = ( i_length << 3 ) & 0xFF;
         }
         else
         {
-            p_filter->p_vlc->pf_memcpy( p_out, p_sync_le, 6 );
+            p_filter->p_libvlc->pf_memcpy( p_out, p_sync_le, 6 );
             p_out[4] = i_ac5_spdif_type;
             p_out[6] = ( i_length << 3 ) & 0xFF;
             p_out[7] = (( i_length ) >> 5 ) & 0xFF;
@@ -205,12 +205,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
         else
         {
-            p_filter->p_vlc->pf_memcpy( p_out + 8, p_in, i_length );
+            p_filter->p_libvlc->pf_memcpy( p_out + 8, p_in, i_length );
         }
 
         if( i_fz > i_length + 8 )
         {
-            p_filter->p_vlc->pf_memset( p_out + 8 + i_length, 0,
+            p_filter->p_libvlc->pf_memset( p_out + 8 + i_length, 0,
                                         i_fz - i_length - 8 );
         }
     }

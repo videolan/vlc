@@ -173,7 +173,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
 
     /* luminance */
-    p_filter->p_vlc->pf_memcpy(
+    p_filter->p_libvlc->pf_memcpy(
                 p_outpic->p[Y_PLANE].p_pixels, p_pic->p[Y_PLANE].p_pixels,
                 p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
 

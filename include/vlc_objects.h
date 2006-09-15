@@ -33,7 +33,7 @@
 
 /* Object types */
 #define VLC_OBJECT_ROOT       (-1)
-#define VLC_OBJECT_VLC        (-2)
+#define VLC_OBJECT_LIBVLC     (-2)
 #define VLC_OBJECT_MODULE     (-3)
 #define VLC_OBJECT_INTF       (-4)
 #define VLC_OBJECT_PLAYLIST   (-5)
@@ -99,7 +99,7 @@ VLC_EXPORT( void, __vlc_object_yield, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_release, ( vlc_object_t * ) );
 VLC_EXPORT( vlc_list_t *, __vlc_list_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
-VLC_EXPORT( vlc_t *, vlc_current_object, ( int ) );
+VLC_EXPORT( libvlc_int_t *, vlc_current_object, ( int ) );
 
 /*}@*/
 

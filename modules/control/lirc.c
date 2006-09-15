@@ -148,7 +148,7 @@ static void Run( intf_thread_t *p_intf )
                 break;
             }
             keyval.i_int = config_GetInt( p_intf, c );
-            var_Set( p_intf->p_vlc, "key-pressed", keyval );
+            var_Set( p_intf->p_libvlc, "key-pressed", keyval );
         }
         free( code );
     }

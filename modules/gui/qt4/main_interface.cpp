@@ -216,7 +216,7 @@ void MainInterface::keyPressEvent( QKeyEvent *e )
     }
     if( i_vlck >= 0 )
     {
-        var_SetInteger( p_intf->p_vlc, "key-pressed", i_vlck );
+        var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlck );
         e->accept();
     }
     else

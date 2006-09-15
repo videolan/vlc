@@ -165,7 +165,7 @@ static int Open( vlc_object_t * p_this )
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
 
-    i_volume = config_GetInt( p_aout->p_vlc, "volume" );
+    i_volume = config_GetInt( p_aout->p_libvlc, "volume" );
     pPlayer->SetVolume( (u32)__MIN( i_volume * 64, 0xFFFF ) );
 
     /* Create thread and wait for its readiness. */
@@ -235,7 +235,7 @@ static int Thread( aout_instance_t * p_aout )
 #define i p_sys->nNextBufferIndex
         if( p_buffer == NULL )
         {
-            p_aout->p_vlc->pf_memset( p_sys->ppBuffers[ i ], 0,
+            p_aout->p_libvlc->pf_memset( p_sys->ppBuffers[ i ], 0,
                                       p_sys->nBufferSize ); 
         }
         else

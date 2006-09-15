@@ -435,7 +435,7 @@ static void Run( intf_thread_t *p_intf )
                 else if( !strncmp( cl->buffer_read, "shutdown", 8 ) )
                 {
                     msg_Err( p_intf, "shutdown requested" );
-                    p_intf->p_vlc->b_die = VLC_TRUE;
+                    p_intf->p_libvlc->b_die = VLC_TRUE;
                 }
                 else
                 {

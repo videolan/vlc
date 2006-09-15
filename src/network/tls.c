@@ -37,8 +37,8 @@ tls_Init( vlc_object_t *p_this )
     tls_t *p_tls;
     vlc_value_t lockval;
 
-    var_Create( p_this->p_libvlc, "tls_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "tls_mutex", &lockval );
+    var_Create( p_this->p_libvlc_global, "tls_mutex", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc_global, "tls_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     p_tls = vlc_object_find( p_this, VLC_OBJECT_TLS, FIND_ANYWHERE );
@@ -61,7 +61,7 @@ tls_Init( vlc_object_t *p_this )
             return NULL;
         }
 
-        vlc_object_attach( p_tls, p_this->p_vlc );
+        vlc_object_attach( p_tls, p_this->p_libvlc );
         vlc_object_yield( p_tls );
         msg_Dbg( p_tls, "TLS/SSL provider initialized" );
     }
@@ -76,7 +76,7 @@ tls_Deinit( tls_t *p_tls )
     int i;
     vlc_value_t lockval;
 
-    var_Get( p_tls->p_libvlc, "tls_mutex", &lockval );
+    var_Get( p_tls->p_libvlc_global, "tls_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     vlc_object_release( p_tls );

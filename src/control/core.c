@@ -84,12 +84,12 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
 {
     int i_vlc_id;
     libvlc_instance_t *p_new;
-    vlc_t *p_vlc;
+    libvlc_int_t *p_libvlc_int;
 
     i_vlc_id = VLC_Create();
-    p_vlc = (vlc_t* ) vlc_current_object( i_vlc_id );
+    p_libvlc_int = (libvlc_int_t* ) vlc_current_object( i_vlc_id );
 
-    if( !p_vlc ) RAISENULL( "VLC initialization failed" );
+    if( !p_libvlc_int ) RAISENULL( "VLC initialization failed" );
 
     p_new = (libvlc_instance_t *)malloc( sizeof( libvlc_instance_t ) );
     if( !p_new ) RAISENULL( "Out of memory" );
@@ -100,8 +100,8 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
 
     VLC_Init( i_vlc_id, argc, argv );
 
-    p_new->p_vlc = p_vlc;
-    p_new->p_playlist = (playlist_t *)vlc_object_find( p_new->p_vlc,
+    p_new->p_libvlc_int = p_libvlc_int;
+    p_new->p_playlist = (playlist_t *)vlc_object_find( p_new->p_libvlc_int,
                                 VLC_OBJECT_PLAYLIST, FIND_CHILD );
     p_new->p_vlm = NULL;
 
@@ -115,7 +115,7 @@ void libvlc_destroy( libvlc_instance_t *p_instance )
 {
     if( p_instance->p_playlist )
         vlc_object_release( p_instance->p_playlist );
-    vlc_object_release( p_instance->p_vlc );
+    vlc_object_release( p_instance->p_libvlc_int );
     VLC_CleanUp( p_instance->i_vlc_id );
     VLC_Destroy( p_instance->i_vlc_id );
 }

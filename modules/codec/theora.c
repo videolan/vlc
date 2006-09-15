@@ -561,7 +561,7 @@ static void theora_CopyPicture( decoder_t *p_dec, picture_t *p_pic,
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
         {
-            p_dec->p_vlc->pf_memcpy( p_dst, p_src + i_src_xoffset,
+            p_dec->p_libvlc->pf_memcpy( p_dst, p_src + i_src_xoffset,
                                      i_plane ? yuv->uv_width : yuv->y_width );
             p_src += i_src_stride;
             p_dst += i_dst_stride;

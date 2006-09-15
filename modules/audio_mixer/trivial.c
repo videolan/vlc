@@ -102,7 +102,7 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
             aout_buffer_t * p_old_buffer;
 
             if ( i_available_bytes > 0 )
-                p_aout->p_vlc->pf_memcpy( p_out, p_in, i_available_bytes );
+                p_aout->p_libvlc->pf_memcpy( p_out, p_in, i_available_bytes );
             i_nb_bytes -= i_available_bytes;
             p_out += i_available_bytes;
 
@@ -119,7 +119,7 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         else
         {
             if ( i_nb_bytes > 0 )
-                p_aout->p_vlc->pf_memcpy( p_out, p_in, i_nb_bytes );
+                p_aout->p_libvlc->pf_memcpy( p_out, p_in, i_nb_bytes );
             p_input->p_first_byte_to_mix = p_in + i_nb_bytes;
             break;
         }

@@ -264,7 +264,7 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
         {
-            p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_width );
+            p_dec->p_libvlc->pf_memcpy( p_dst, p_src, i_width );
             p_src += p_sys->b_invert ? -i_width : i_width;
             p_dst += p_pic->p[i_plane].i_pitch;
         }
@@ -335,11 +335,11 @@ static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
 
             for( j = 0; j < pic.p[i].i_visible_lines / 2; j++ )
             {
-                p_dec->p_vlc->pf_memcpy( p_tmp, p_bottom,
+                p_dec->p_libvlc->pf_memcpy( p_tmp, p_bottom,
                                          pic.p[i].i_visible_pitch  );
-                p_dec->p_vlc->pf_memcpy( p_bottom, p_top,
+                p_dec->p_libvlc->pf_memcpy( p_bottom, p_top,
                                          pic.p[i].i_visible_pitch  );
-                p_dec->p_vlc->pf_memcpy( p_top, p_tmp,
+                p_dec->p_libvlc->pf_memcpy( p_top, p_tmp,
                                          pic.p[i].i_visible_pitch  );
                 p_top += i_pitch;
                 p_bottom -= i_pitch;

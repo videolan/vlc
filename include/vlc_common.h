@@ -199,8 +199,8 @@ typedef uint32_t vlc_fourcc_t;
  *****************************************************************************/
 
 /* Internal types */
-typedef struct libvlc_t libvlc_t;
-typedef struct vlc_t vlc_t;
+typedef struct libvlc_global_data_t libvlc_global_data_t;
+typedef struct libvlc_int_t libvlc_int_t;
 typedef struct variable_t variable_t;
 typedef struct date_t date_t;
 typedef struct dict_entry_t dict_entry_t;
@@ -521,8 +521,8 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     variable_t *    p_vars;                                                 \
                                                                             \
     /* Stuff related to the libvlc structure */                             \
-    libvlc_t *      p_libvlc;                      /**< root of all evil */ \
-    vlc_t *         p_vlc;                   /**< (root of all evil) - 1 */ \
+    libvlc_global_data_t *p_libvlc_global;         /**< root of all evil */ \
+    libvlc_int_t *p_libvlc;                  /**< (root of all evil) - 1 */ \
                                                                             \
     volatile int    i_refcount;                         /**< usage count */ \
     vlc_object_t *  p_parent;                            /**< our parent */ \

@@ -921,19 +921,19 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_fps_num = p_enc->fmt_in.video.i_frame_rate;
         p_sys->param.i_fps_den = p_enc->fmt_in.video.i_frame_rate_base;
     }
-    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_MMX) )
+    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMX) )
     {
         p_sys->param.cpu &= ~X264_CPU_MMX;
     }
-    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT) )
+    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT) )
     {
         p_sys->param.cpu &= ~X264_CPU_MMXEXT;
     }
-    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_SSE) )
+    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_SSE) )
     {
         p_sys->param.cpu &= ~X264_CPU_SSE;
     }
-    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_SSE2) )
+    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_SSE2) )
     {
         p_sys->param.cpu &= ~X264_CPU_SSE2;
     }

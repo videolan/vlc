@@ -124,7 +124,7 @@ update_t *__update_New( vlc_object_t *p_this )
 
     vlc_mutex_init( p_this, &p_update->lock );
 
-    p_update->p_vlc = p_this->p_vlc;
+    p_update->p_libvlc = p_this->p_libvlc;
 
     p_update->p_releases = NULL;
     p_update->i_releases = 0;
@@ -237,17 +237,17 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
         return;
     }
 
-    p_xml = xml_Create( p_update->p_vlc );
+    p_xml = xml_Create( p_update->p_libvlc );
     if( !p_xml )
     {
-        msg_Err( p_update->p_vlc, "Failed to open XML parser" );
+        msg_Err( p_update->p_libvlc, "Failed to open XML parser" );
         goto error;
     }
 
-    p_stream = stream_UrlNew( p_update->p_vlc, UPDATE_VLC_MIRRORS_URL );
+    p_stream = stream_UrlNew( p_update->p_libvlc, UPDATE_VLC_MIRRORS_URL );
     if( !p_stream )
     {
-        msg_Err( p_update->p_vlc, "Failed to open %s for reading",
+        msg_Err( p_update->p_libvlc, "Failed to open %s for reading",
                  UPDATE_VLC_MIRRORS_URL );
         goto error;
     }
@@ -256,7 +256,7 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
 
     if( !p_xml_reader )
     {
-        msg_Err( p_update->p_vlc, "Failed to open %s for parsing",
+        msg_Err( p_update->p_libvlc, "Failed to open %s for parsing",
                  UPDATE_VLC_MIRRORS_URL );
         goto error;
     }
@@ -271,7 +271,7 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
         switch( xml_ReaderNodeType( p_xml_reader ) )
         {
             case -1:
-                msg_Err( p_update->p_vlc, "Error while parsing %s",
+                msg_Err( p_update->p_libvlc, "Error while parsing %s",
                          UPDATE_VLC_MIRRORS_URL );
                 goto error;
 
@@ -279,7 +279,7 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
                 psz_eltname = xml_ReaderName( p_xml_reader );
                 if( !psz_eltname )
                 {
-                    msg_Err( p_update->p_vlc, "Error while parsing %s",
+                    msg_Err( p_update->p_libvlc, "Error while parsing %s",
                              UPDATE_VLC_MIRRORS_URL );
                     goto error;
                 }
@@ -291,7 +291,7 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
 
                     if( !psz_name || !psz_value )
                     {
-                        msg_Err( p_update->p_vlc, "Error while parsing %s",
+                        msg_Err( p_update->p_libvlc, "Error while parsing %s",
                                  UPDATE_VLC_MIRRORS_URL );
                         goto error;
                     }
@@ -334,7 +334,7 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
                 psz_eltname = xml_ReaderName( p_xml_reader );
                 if( !psz_eltname )
                 {
-                    msg_Err( p_update->p_vlc, "Error while parsing %s",
+                    msg_Err( p_update->p_libvlc, "Error while parsing %s",
                              UPDATE_VLC_MIRRORS_URL );
                     goto error;
                 }
@@ -414,17 +414,17 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
         return;
     }
 
-    p_xml = xml_Create( p_update->p_vlc );
+    p_xml = xml_Create( p_update->p_libvlc );
     if( !p_xml )
     {
-        msg_Err( p_update->p_vlc, "Failed to open XML parser" );
+        msg_Err( p_update->p_libvlc, "Failed to open XML parser" );
         goto error;
     }
 
-    p_stream = stream_UrlNew( p_update->p_vlc, UPDATE_VLC_STATUS_URL );
+    p_stream = stream_UrlNew( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
     if( !p_stream )
     {
-        msg_Err( p_update->p_vlc, "Failed to open %s for reading",
+        msg_Err( p_update->p_libvlc, "Failed to open %s for reading",
                  UPDATE_VLC_STATUS_URL );
         goto error;
     }
@@ -433,7 +433,7 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
 
     if( !p_xml_reader )
     {
-        msg_Err( p_update->p_vlc, "Failed to open %s for parsing",
+        msg_Err( p_update->p_libvlc, "Failed to open %s for parsing",
                  UPDATE_VLC_STATUS_URL );
         goto error;
     }
@@ -448,7 +448,7 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
         switch( xml_ReaderNodeType( p_xml_reader ) )
         {
             case -1:
-                msg_Err( p_update->p_vlc, "Error while parsing %s",
+                msg_Err( p_update->p_libvlc, "Error while parsing %s",
                          UPDATE_VLC_STATUS_URL );
                 goto error;
 
@@ -456,7 +456,7 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
                 psz_eltname = xml_ReaderName( p_xml_reader );
                 if( !psz_eltname )
                 {
-                    msg_Err( p_update->p_vlc, "Error while parsing %s",
+                    msg_Err( p_update->p_libvlc, "Error while parsing %s",
                              UPDATE_VLC_STATUS_URL );
                     goto error;
                 }
@@ -468,7 +468,7 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
 
                     if( !psz_name || !psz_value )
                     {
-                        msg_Err( p_update->p_vlc, "Error while parsing %s",
+                        msg_Err( p_update->p_libvlc, "Error while parsing %s",
                                  UPDATE_VLC_STATUS_URL );
                         goto error;
                     }
@@ -616,7 +616,7 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
                 psz_eltname = xml_ReaderName( p_xml_reader );
                 if( !psz_eltname )
                 {
-                    msg_Err( p_update->p_vlc, "Error while parsing %s",
+                    msg_Err( p_update->p_libvlc, "Error while parsing %s",
                              UPDATE_VLC_STATUS_URL );
                     goto error;
                 }
@@ -1207,7 +1207,7 @@ void update_download_for_real( download_thread_t *p_this );
 void update_download( update_iterator_t *p_uit, char *psz_dest )
 {
     download_thread_t *p_dt =
-        vlc_object_create( p_uit->p_u->p_vlc, sizeof( download_thread_t ) );
+        vlc_object_create( p_uit->p_u->p_libvlc, sizeof( download_thread_t ) );
 
     p_dt->psz_dest = strdup( psz_dest );
     p_dt->psz_src = strdup( p_uit->file.psz_url );
@@ -1251,7 +1251,7 @@ void update_download_for_real( download_thread_t *p_this )
     char *psz_dest = p_this->psz_dest;
     char *psz_src = p_this->psz_src;
     stream_t *p_stream;
-    vlc_t *p_vlc = p_this->p_vlc;
+    libvlc_int_t *p_libvlc = p_this->p_libvlc;
 
     FILE *p_file = NULL;
     void *p_buffer;
@@ -1265,16 +1265,16 @@ void update_download_for_real( download_thread_t *p_this )
 
     asprintf( &psz_status, "%s\nDownloading... 0.0/? %.1f%% done",
               p_this->psz_status, 0.0 );
-    i_progress = intf_UserProgress( p_vlc, "Downloading...",
+    i_progress = intf_UserProgress( p_libvlc, "Downloading...",
                                     psz_status, 0.0, 0 );
 
-    p_stream = stream_UrlNew( p_vlc, psz_src );
+    p_stream = stream_UrlNew( p_libvlc, psz_src );
     if( !p_stream )
     {
-        msg_Err( p_vlc, "Failed to open %s for reading", psz_src );
-        intf_UserFatal( p_vlc, VLC_TRUE, "Error while Downloading...",
+        msg_Err( p_libvlc, "Failed to open %s for reading", psz_src );
+        intf_UserFatal( p_libvlc, VLC_TRUE, "Error while Downloading...",
                         "VLC failed to open %s for reading.", psz_src );
-        intf_UserHide( p_vlc, i_progress );
+        intf_UserHide( p_libvlc, i_progress );
     }
     else
     {
@@ -1282,10 +1282,10 @@ void update_download_for_real( download_thread_t *p_this )
         p_file = utf8_fopen( psz_dest, "w" );
         if( !p_file )
         {
-            msg_Err( p_vlc, "Failed to open %s for writing", psz_dest );
-            intf_UserFatal( p_vlc, VLC_TRUE, "Error while Downloading...",
+            msg_Err( p_libvlc, "Failed to open %s for writing", psz_dest );
+            intf_UserFatal( p_libvlc, VLC_TRUE, "Error while Downloading...",
                             "VLC failed to open %s for writing.", psz_dest );
-            intf_UserHide( p_vlc, i_progress );
+            intf_UserHide( p_libvlc, i_progress );
         }
         else
         {
@@ -1310,7 +1310,7 @@ void update_download_for_real( download_thread_t *p_this )
                            p_this->psz_status, psz_s1, psz_s2, f_progress );
                 free( psz_s1 ); free( psz_s2 );
 
-                intf_ProgressUpdate( p_vlc, i_progress,
+                intf_ProgressUpdate( p_libvlc, i_progress,
                                      psz_status, f_progress, 0 );
             }
 
@@ -1323,7 +1323,7 @@ void update_download_for_real( download_thread_t *p_this )
             asprintf( &psz_status, "%s\nDone %s (100.00%%)",
                        p_this->psz_status, psz_s2 );
             free( psz_s2 );
-            intf_ProgressUpdate( p_vlc, i_progress, psz_status, 100.0, 0 );
+            intf_ProgressUpdate( p_libvlc, i_progress, psz_status, 100.0, 0 );
             free( psz_status );
         }
     }

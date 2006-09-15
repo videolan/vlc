@@ -2576,7 +2576,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
     p_ev->b_key     = VLC_FALSE;
 
     /* catch all key event */
-    var_AddCallback( p_ev->p_vlc, "key-pressed", EventKey, p_ev );
+    var_AddCallback( p_ev->p_libvlc, "key-pressed", EventKey, p_ev );
 
     /* main loop */
     while( !p_ev->b_die )
@@ -2594,7 +2594,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
         if( p_ev->b_key )
         {
             vlc_value_t valk;
-            struct vlc_t::hotkey *p_hotkeys = p_ev->p_vlc->p_hotkeys;
+            struct libvlc_int_t::hotkey *p_hotkeys = p_ev->p_libvlc->p_hotkeys;
             int i, i_action = -1;
 
             msg_Dbg( p_ev->p_demux, "Handle Key Event");
@@ -2603,7 +2603,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
 
             pci_t *pci = (pci_t *) &p_sys->pci_packet;
 
-            var_Get( p_ev->p_vlc, "key-pressed", &valk );
+            var_Get( p_ev->p_libvlc, "key-pressed", &valk );
             for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
             {
                 if( p_hotkeys[i].i_key == valk.i_int )
@@ -2878,7 +2878,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
         var_DelCallback( p_vout, "mouse-clicked", EventMouse, p_ev );
         vlc_object_release( p_vout );
     }
-    var_DelCallback( p_ev->p_vlc, "key-pressed", EventKey, p_ev );
+    var_DelCallback( p_ev->p_libvlc, "key-pressed", EventKey, p_ev );
 
     vlc_mutex_destroy( &p_ev->lock );
 

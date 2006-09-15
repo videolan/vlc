@@ -883,7 +883,7 @@ static void EventThread ( vlc_object_t *p_event )
             switch( msg.wParam )
             {
             case VK_ESCAPE:
-                p_event->p_vlc->b_die = VLC_TRUE;
+                p_event->p_libvlc->b_die = VLC_TRUE;
                 break;
             }
             TranslateMessage( &msg );
@@ -894,7 +894,7 @@ static void EventThread ( vlc_object_t *p_event )
             {
             case 'q':
             case 'Q':
-                p_event->p_vlc->b_die = VLC_TRUE;
+                p_event->p_libvlc->b_die = VLC_TRUE;
                 break;
             }
             break;

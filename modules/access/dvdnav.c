@@ -1219,7 +1219,7 @@ static int EventThread( vlc_object_t *p_this )
     p_ev->b_still   = VLC_FALSE;
 
     /* catch all key event */
-    var_AddCallback( p_ev->p_vlc, "key-pressed", EventKey, p_ev );
+    var_AddCallback( p_ev->p_libvlc, "key-pressed", EventKey, p_ev );
 
     /* main loop */
     while( !p_ev->b_die )
@@ -1232,11 +1232,11 @@ static int EventThread( vlc_object_t *p_this )
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
             vlc_value_t valk;
-            struct hotkey *p_hotkeys = p_ev->p_vlc->p_hotkeys;
+            struct hotkey *p_hotkeys = p_ev->p_libvlc->p_hotkeys;
             int i, i_action = -1;
 
             vlc_mutex_lock( &p_ev->lock );
-            var_Get( p_ev->p_vlc, "key-pressed", &valk );
+            var_Get( p_ev->p_libvlc, "key-pressed", &valk );
             for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
             {
                 if( p_hotkeys[i].i_key == valk.i_int )
@@ -1340,7 +1340,7 @@ static int EventThread( vlc_object_t *p_this )
         var_DelCallback( p_vout, "mouse-clicked", EventMouse, p_ev );
         vlc_object_release( p_vout );
     }
-    var_DelCallback( p_ev->p_vlc, "key-pressed", EventKey, p_ev );
+    var_DelCallback( p_ev->p_libvlc, "key-pressed", EventKey, p_ev );
 
     vlc_mutex_destroy( &p_ev->lock );
 

@@ -185,9 +185,9 @@ static int Open( vlc_object_t * p_this )
     aout_FormatPrint( p_aout, "VLC is looking for:", (audio_sample_format_t *)&p_aout->output.output );
     
     /* Persistent device variable */
-    if( var_Type( p_aout->p_vlc, "macosx-audio-device" ) == 0 )
+    if( var_Type( p_aout->p_libvlc, "macosx-audio-device" ) == 0 )
     {
-        var_Create( p_aout->p_vlc, "macosx-audio-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+        var_Create( p_aout->p_libvlc, "macosx-audio-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     }
 
     /* Build a list of devices */
@@ -1031,7 +1031,7 @@ static void Probe( aout_instance_t * p_aout )
     }
     
     /* If a device is already "preselected", then use this device */
-    var_Get( p_aout->p_vlc, "macosx-audio-device", &val );
+    var_Get( p_aout->p_libvlc, "macosx-audio-device", &val );
     if( val.i_int > 0 )
     {
         var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
@@ -1312,7 +1312,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
     if( p_sys->i_total_bytes > 0 )
     {
         i_mData_bytes = __MIN( p_sys->i_total_bytes - p_sys->i_read_bytes, ioData->mBuffers[0].mDataByteSize );
-        p_aout->p_vlc->pf_memcpy( ioData->mBuffers[0].mData, &p_sys->p_remainder_buffer[p_sys->i_read_bytes], i_mData_bytes );
+        p_aout->p_libvlc->pf_memcpy( ioData->mBuffers[0].mData, &p_sys->p_remainder_buffer[p_sys->i_read_bytes], i_mData_bytes );
         p_sys->i_read_bytes += i_mData_bytes;
         current_date += (mtime_t) ( (mtime_t) 1000000 / p_aout->output.output.i_rate ) *
                         ( i_mData_bytes / 4 / aout_FormatNbChannels( &p_aout->output.output )  ); // 4 is fl32 specific
@@ -1331,13 +1331,13 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
         {
             uint32_t i_second_mData_bytes = __MIN( p_buffer->i_nb_bytes, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
             
-            p_aout->p_vlc->pf_memcpy( (uint8_t *)ioData->mBuffers[0].mData + i_mData_bytes, p_buffer->p_buffer, i_second_mData_bytes );
+            p_aout->p_libvlc->pf_memcpy( (uint8_t *)ioData->mBuffers[0].mData + i_mData_bytes, p_buffer->p_buffer, i_second_mData_bytes );
             i_mData_bytes += i_second_mData_bytes;
 
             if( i_mData_bytes >= ioData->mBuffers[0].mDataByteSize )
             {
                 p_sys->i_total_bytes = p_buffer->i_nb_bytes - i_second_mData_bytes;
-                p_aout->p_vlc->pf_memcpy( p_sys->p_remainder_buffer, &p_buffer->p_buffer[i_second_mData_bytes], p_sys->i_total_bytes );
+                p_aout->p_libvlc->pf_memcpy( p_sys->p_remainder_buffer, &p_buffer->p_buffer[i_second_mData_bytes], p_sys->i_total_bytes );
             }
             else
             {
@@ -1349,7 +1349,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
         }
         else
         {
-             p_aout->p_vlc->pf_memset( (uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes, 0, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
+             p_aout->p_libvlc->pf_memset( (uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes, 0, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
              i_mData_bytes += ioData->mBuffers[0].mDataByteSize - i_mData_bytes;
         }
     }
@@ -1391,13 +1391,13 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
             msg_Warn( p_aout, "bytesize: %d nb_bytes: %d", (int)BUFFER.mDataByteSize, (int)p_buffer->i_nb_bytes );
         
         /* move data into output data buffer */
-        p_aout->p_vlc->pf_memcpy( BUFFER.mData,
+        p_aout->p_libvlc->pf_memcpy( BUFFER.mData,
                                   p_buffer->p_buffer, p_buffer->i_nb_bytes );
         aout_BufferFree( p_buffer );
     }
     else
     {
-        p_aout->p_vlc->pf_memset( BUFFER.mData, 0, BUFFER.mDataByteSize );
+        p_aout->p_libvlc->pf_memset( BUFFER.mData, 0, BUFFER.mDataByteSize );
     }
 #undef BUFFER
 
@@ -1460,7 +1460,7 @@ static int AudioDeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    var_Set( p_aout->p_vlc, "macosx-audio-device", new_val );
+    var_Set( p_aout->p_libvlc, "macosx-audio-device", new_val );
     msg_Dbg( p_aout, "Set Device: %#x", new_val.i_int );
     return aout_ChannelsRestart( p_this, psz_variable, old_val, new_val, param );
 }

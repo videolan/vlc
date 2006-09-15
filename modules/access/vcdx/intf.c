@@ -63,7 +63,7 @@ int VCDOpenIntf ( vlc_object_t *p_this )
 
     p_intf->pf_run = RunIntf;
 
-    var_AddCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
+    var_AddCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
     p_intf->p_sys->m_still_time = 0;
     p_intf->p_sys->b_infinite_still = 0;
     p_intf->p_sys->b_still = 0;
@@ -77,7 +77,7 @@ int VCDOpenIntf ( vlc_object_t *p_this )
 void VCDCloseIntf ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    var_DelCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
+    var_DelCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -159,12 +159,12 @@ RunIntf( intf_thread_t *p_intf )
         {
           vlc_value_t val;
           int i, i_action = -1;
-          struct hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
+          struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
           p_intf->p_sys->b_key_pressed = VLC_FALSE;
 
           /* Find action triggered by hotkey (if any) */
-          var_Get( p_intf->p_vlc, "key-pressed", &val );
+          var_Get( p_intf->p_libvlc, "key-pressed", &val );
 
           dbg_print( INPUT_DBG_EVENT, "Key pressed %d", val.i_int );
 

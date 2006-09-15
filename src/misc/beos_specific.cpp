@@ -79,11 +79,11 @@ static void AppThread( vlc_object_t *p_appthread );
  *****************************************************************************/
 void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
-    p_this->p_libvlc->p_appthread =
+    p_this->p_libvlc_global->p_appthread =
             (vlc_object_t *)vlc_object_create( p_this, sizeof(vlc_object_t) );
 
     /* Create the BApplication thread and wait for initialization */
-    vlc_thread_create( p_this->p_libvlc->p_appthread, "app thread", AppThread,
+    vlc_thread_create( p_this->p_libvlc_global->p_appthread, "app thread", AppThread,
                        VLC_THREAD_PRIORITY_LOW, VLC_TRUE );
 }
 
@@ -102,10 +102,10 @@ void system_End( vlc_t *p_this )
     /* Tell the BApplication to die */
     be_app->PostMessage( REALLY_QUIT );
 
-    vlc_thread_join( p_this->p_libvlc->p_appthread );
-    vlc_object_destroy( p_this->p_libvlc->p_appthread );
+    vlc_thread_join( p_this->p_libvlc_global->p_appthread );
+    vlc_object_destroy( p_this->p_libvlc_global->p_appthread );
 
-    free( p_this->p_libvlc->psz_vlcpath );
+    free( p_this->p_libvlc_global->psz_vlcpath );
 }
 
 /* following functions are local */
@@ -117,7 +117,7 @@ static void AppThread( vlc_object_t * p_this )
 {
     VlcApplication * BeApp =
         new VlcApplication("application/x-vnd.videolan-vlc");
-    vlc_object_attach( p_this, p_this->p_vlc );
+    vlc_object_attach( p_this, p_this->p_libvlc );
     BeApp->p_this = p_this;
     BeApp->Run();
     vlc_object_detach( p_this );
@@ -172,7 +172,7 @@ void VlcApplication::ReadyToRun( )
     BEntry entry( &info.ref );
     entry.GetPath( &path );
     path.GetParent( &path );
-    p_this->p_libvlc->psz_vlcpath = strdup( path.Path() );
+    p_this->p_libvlc_global->psz_vlcpath = strdup( path.Path() );
 
     /* Tell the main thread we are finished initializing the BApplication */
     vlc_thread_ready( p_this );
@@ -233,7 +233,7 @@ bool VlcApplication::QuitRequested()
 {
     if( !fReadyToQuit )
     {
-        p_this->p_vlc->b_die = 1;
+        p_this->p_libvlc->b_die = 1;
         return false;
     }
 

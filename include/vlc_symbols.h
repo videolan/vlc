@@ -447,7 +447,7 @@ struct module_symbols_t
     void *__stats_CounterGet_deprecated;
     input_thread_t * (*__input_CreateThread2_inner) (vlc_object_t *, input_item_t *, char *);
     void *stats_HandlerDestroy_deprecated;
-    vlc_t * (*vlc_current_object_inner) (int);
+    libvlc_int_t * (*vlc_current_object_inner) (int);
     void (*__var_OptionParse_inner) (vlc_object_t *, const char *);
     void *__stats_TimerDumpAll_deprecated;
     void (*__stats_TimerDump_inner) (vlc_object_t*, unsigned int);
@@ -511,7 +511,7 @@ struct module_symbols_t
     void (*playlist_NodeDump_inner) (playlist_t *p_playlist, playlist_item_t *p_item, int i_level);
     void *__intf_UserOkayCancel_deprecated;
     int (*__intf_UserStringInput_inner) (vlc_object_t*, const char*, const char*, char **);
-    void (*playlist_NodesCreateForSD_inner) (playlist_t *, char *, playlist_item_t **, playlist_item_t **);
+    void *playlist_NodesCreateForSD_deprecated;
     vlc_bool_t (*input_AddSubtitles_inner) (input_thread_t *, char *, vlc_bool_t);
     counter_t * (*__stats_CounterCreate_inner) (vlc_object_t*, int, int);
     void *stats_TimerClean_deprecated;
@@ -536,6 +536,7 @@ struct module_symbols_t
     int (*net_SetDSCP_inner) (int fd, uint8_t dscp);
     void (*vout_EnableFilter_inner) (vout_thread_t *, char *,vlc_bool_t , vlc_bool_t);
     void (*aout_EnableFilter_inner) (vlc_object_t *, const char *, vlc_bool_t);
+    void (*playlist_NodesPairCreate_inner) (playlist_t *, char *, playlist_item_t **, playlist_item_t **, vlc_bool_t);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -987,7 +988,6 @@ struct module_symbols_t
 #  define playlist_DeleteFromItemId (p_symbols)->playlist_DeleteFromItemId_inner
 #  define playlist_NodeDump (p_symbols)->playlist_NodeDump_inner
 #  define __intf_UserStringInput (p_symbols)->__intf_UserStringInput_inner
-#  define playlist_NodesCreateForSD (p_symbols)->playlist_NodesCreateForSD_inner
 #  define input_AddSubtitles (p_symbols)->input_AddSubtitles_inner
 #  define __stats_CounterCreate (p_symbols)->__stats_CounterCreate_inner
 #  define __stats_TimersClean (p_symbols)->__stats_TimersClean_inner
@@ -1007,6 +1007,7 @@ struct module_symbols_t
 #  define net_SetDSCP (p_symbols)->net_SetDSCP_inner
 #  define vout_EnableFilter (p_symbols)->vout_EnableFilter_inner
 #  define aout_EnableFilter (p_symbols)->aout_EnableFilter_inner
+#  define playlist_NodesPairCreate (p_symbols)->playlist_NodesPairCreate_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1461,7 +1462,6 @@ struct module_symbols_t
     ((p_symbols)->playlist_DeleteFromItemId_inner) = playlist_DeleteFromItemId; \
     ((p_symbols)->playlist_NodeDump_inner) = playlist_NodeDump; \
     ((p_symbols)->__intf_UserStringInput_inner) = __intf_UserStringInput; \
-    ((p_symbols)->playlist_NodesCreateForSD_inner) = playlist_NodesCreateForSD; \
     ((p_symbols)->input_AddSubtitles_inner) = input_AddSubtitles; \
     ((p_symbols)->__stats_CounterCreate_inner) = __stats_CounterCreate; \
     ((p_symbols)->__stats_TimersClean_inner) = __stats_TimersClean; \
@@ -1481,6 +1481,7 @@ struct module_symbols_t
     ((p_symbols)->net_SetDSCP_inner) = net_SetDSCP; \
     ((p_symbols)->vout_EnableFilter_inner) = vout_EnableFilter; \
     ((p_symbols)->aout_EnableFilter_inner) = aout_EnableFilter; \
+    ((p_symbols)->playlist_NodesPairCreate_inner) = playlist_NodesPairCreate; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__playlist_ItemNew_deprecated = NULL; \
     (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \
@@ -1524,6 +1525,7 @@ struct module_symbols_t
     (p_symbols)->playlist_PlaylistAddExt_deprecated = NULL; \
     (p_symbols)->playlist_PlaylistAddInput_deprecated = NULL; \
     (p_symbols)->__intf_UserOkayCancel_deprecated = NULL; \
+    (p_symbols)->playlist_NodesCreateForSD_deprecated = NULL; \
     (p_symbols)->stats_TimerClean_deprecated = NULL; \
     (p_symbols)->stats_TimersClean_deprecated = NULL; \
     (p_symbols)->__intf_IntfProgressUpdate_deprecated = NULL; \

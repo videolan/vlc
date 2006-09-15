@@ -175,18 +175,18 @@ void __module_InitBank( vlc_object_t *p_this )
     module_bank_t *p_bank;
     vlc_value_t  lockval;
 
-    var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "libvlc", &lockval );
+    var_Create( p_this->p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc_global, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    if( p_this->p_libvlc->p_module_bank )
+    if( p_this->p_libvlc_global->p_module_bank )
     {
-        p_this->p_libvlc->p_module_bank->i_usage++;
+        p_this->p_libvlc_global->p_module_bank->i_usage++;
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_this->p_libvlc, "libvlc" );
+        var_Destroy( p_this->p_libvlc_global, "libvlc" );
         return;
     }
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_this->p_libvlc, "libvlc" );
+    var_Destroy( p_this->p_libvlc_global, "libvlc" );
 
     p_bank = vlc_object_create( p_this, sizeof(module_bank_t) );
     p_bank->psz_object_name = "module bank";
@@ -204,8 +204,8 @@ void __module_InitBank( vlc_object_t *p_this )
 #endif
 
     /* Everything worked, attach the object */
-    p_this->p_libvlc->p_module_bank = p_bank;
-    vlc_object_attach( p_bank, p_this->p_libvlc );
+    p_this->p_libvlc_global->p_module_bank = p_bank;
+    vlc_object_attach( p_bank, p_this->p_libvlc_global );
 
     module_LoadMain( p_this );
 
@@ -235,28 +235,28 @@ void __module_EndBank( vlc_object_t *p_this )
     module_t * p_next;
     vlc_value_t lockval;
 
-    var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "libvlc", &lockval );
+    var_Create( p_this->p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc_global, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    if( !p_this->p_libvlc->p_module_bank )
+    if( !p_this->p_libvlc_global->p_module_bank )
     {
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_this->p_libvlc, "libvlc" );
+        var_Destroy( p_this->p_libvlc_global, "libvlc" );
         return;
     }
-    if( --p_this->p_libvlc->p_module_bank->i_usage )
+    if( --p_this->p_libvlc_global->p_module_bank->i_usage )
     {
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_this->p_libvlc, "libvlc" );
+        var_Destroy( p_this->p_libvlc_global, "libvlc" );
         return;
     }
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_this->p_libvlc, "libvlc" );
+    var_Destroy( p_this->p_libvlc_global, "libvlc" );
 
     config_AutoSaveConfigFile( p_this );
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-#define p_bank p_this->p_libvlc->p_module_bank
+#define p_bank p_this->p_libvlc_global->p_module_bank
     if( p_bank->b_cache ) CacheSave( p_this );
     while( p_bank->i_loaded_cache-- )
     {
@@ -276,11 +276,11 @@ void __module_EndBank( vlc_object_t *p_this )
 #undef p_bank
 #endif
 
-    vlc_object_detach( p_this->p_libvlc->p_module_bank );
+    vlc_object_detach( p_this->p_libvlc_global->p_module_bank );
 
-    while( p_this->p_libvlc->p_module_bank->i_children )
+    while( p_this->p_libvlc_global->p_module_bank->i_children )
     {
-        p_next = (module_t *)p_this->p_libvlc->p_module_bank->pp_children[0];
+        p_next = (module_t *)p_this->p_libvlc_global->p_module_bank->pp_children[0];
 
         if( DeleteModule( p_next ) )
         {
@@ -294,8 +294,8 @@ void __module_EndBank( vlc_object_t *p_this )
         }
     }
 
-    vlc_object_destroy( p_this->p_libvlc->p_module_bank );
-    p_this->p_libvlc->p_module_bank = NULL;
+    vlc_object_destroy( p_this->p_libvlc_global->p_module_bank );
+    p_this->p_libvlc_global->p_module_bank = NULL;
 
     return;
 }
@@ -312,18 +312,18 @@ void __module_LoadMain( vlc_object_t *p_this )
 {
     vlc_value_t lockval;
 
-    var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "libvlc", &lockval );
+    var_Create( p_this->p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc_global, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    if( p_this->p_libvlc->p_module_bank->b_main )
+    if( p_this->p_libvlc_global->p_module_bank->b_main )
     {
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_this->p_libvlc, "libvlc" );
+        var_Destroy( p_this->p_libvlc_global, "libvlc" );
         return;
     }
-    p_this->p_libvlc->p_module_bank->b_main = VLC_TRUE;
+    p_this->p_libvlc_global->p_module_bank->b_main = VLC_TRUE;
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_this->p_libvlc, "libvlc" );
+    var_Destroy( p_this->p_libvlc_global, "libvlc" );
 
     AllocateBuiltinModule( p_this, vlc_entry__main );
 }
@@ -337,18 +337,18 @@ void __module_LoadBuiltins( vlc_object_t * p_this )
 {
     vlc_value_t lockval;
 
-    var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "libvlc", &lockval );
+    var_Create( p_this->p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc_global, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    if( p_this->p_libvlc->p_module_bank->b_builtins )
+    if( p_this->p_libvlc_global->p_module_bank->b_builtins )
     {
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_this->p_libvlc, "libvlc" );
+        var_Destroy( p_this->p_libvlc_global, "libvlc" );
         return;
     }
-    p_this->p_libvlc->p_module_bank->b_builtins = VLC_TRUE;
+    p_this->p_libvlc_global->p_module_bank->b_builtins = VLC_TRUE;
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_this->p_libvlc, "libvlc" );
+    var_Destroy( p_this->p_libvlc_global, "libvlc" );
 
     msg_Dbg( p_this, "checking builtin modules" );
     ALLOCATE_ALL_BUILTINS();
@@ -364,26 +364,26 @@ void __module_LoadPlugins( vlc_object_t * p_this )
 #ifdef HAVE_DYNAMIC_PLUGINS
     vlc_value_t lockval;
 
-    var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "libvlc", &lockval );
+    var_Create( p_this->p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc_global, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    if( p_this->p_libvlc->p_module_bank->b_plugins )
+    if( p_this->p_libvlc_global->p_module_bank->b_plugins )
     {
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_this->p_libvlc, "libvlc" );
+        var_Destroy( p_this->p_libvlc_global, "libvlc" );
         return;
     }
-    p_this->p_libvlc->p_module_bank->b_plugins = VLC_TRUE;
+    p_this->p_libvlc_global->p_module_bank->b_plugins = VLC_TRUE;
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_this->p_libvlc, "libvlc" );
+    var_Destroy( p_this->p_libvlc_global, "libvlc" );
 
     msg_Dbg( p_this, "checking plugin modules" );
 
     if( config_GetInt( p_this, "plugins-cache" ) )
-        p_this->p_libvlc->p_module_bank->b_cache = VLC_TRUE;
+        p_this->p_libvlc_global->p_module_bank->b_cache = VLC_TRUE;
 
-    if( p_this->p_libvlc->p_module_bank->b_cache ||
-        p_this->p_libvlc->p_module_bank->b_cache_delete ) CacheLoad( p_this );
+    if( p_this->p_libvlc_global->p_module_bank->b_cache ||
+        p_this->p_libvlc_global->p_module_bank->b_cache_delete ) CacheLoad( p_this );
 
     AllocateAllPlugins( p_this );
 #endif
@@ -492,7 +492,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         }
 
         /* Test if we have the required CPU */
-        if( (p_module->i_cpu & p_this->p_libvlc->i_cpu) != p_module->i_cpu )
+        if( (p_module->i_cpu & p_this->p_libvlc_global->i_cpu) != p_module->i_cpu )
         {
             continue;
         }
@@ -560,7 +560,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         if( !i_shortcuts && p_module->psz_program
              && !strcmp( psz_capability, "interface" )
              && !strcmp( p_module->psz_program,
-                         p_this->p_vlc->psz_object_name ) )
+                         p_this->p_libvlc->psz_object_name ) )
         {
             if( !b_intf )
             {
@@ -779,7 +779,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 #endif
         {
             int i_dirlen = strlen( *ppsz_path );
-            i_dirlen += strlen( p_this->p_libvlc->psz_vlcpath ) + 2;
+            i_dirlen += strlen( p_this->p_libvlc_global->psz_vlcpath ) + 2;
 
             psz_fullpath = malloc( i_dirlen );
             if( psz_fullpath == NULL )
@@ -788,10 +788,10 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
             }
 #ifdef WIN32
             sprintf( psz_fullpath, "%s\\%s",
-                     p_this->p_libvlc->psz_vlcpath, *ppsz_path );
+                     p_this->p_libvlc_global->psz_vlcpath, *ppsz_path );
 #else
             sprintf( psz_fullpath, "%s/%s",
-                     p_this->p_libvlc->psz_vlcpath, *ppsz_path );
+                     p_this->p_libvlc_global->psz_vlcpath, *ppsz_path );
 #endif
         }
         else
@@ -836,7 +836,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
 #endif
     char * psz_file;
 
-    if( p_this->p_vlc->b_die || i_maxdepth < 0 )
+    if( p_this->p_libvlc->b_die || i_maxdepth < 0 )
     {
         return;
     }
@@ -926,7 +926,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
             AllocatePluginFile( p_this, psz_file, i_time, i_size );
         }
     }
-    while( !p_this->p_vlc->b_die && FindNextFile( handle, &finddata ) );
+    while( !p_this->p_libvlc->b_die && FindNextFile( handle, &finddata ) );
 
     /* Close the directory */
     FindClose( handle );
@@ -941,7 +941,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     i_dirlen = strlen( psz_dir );
 
     /* Parse the directory and try to load all files it contains. */
-    while( !p_this->p_vlc->b_die && (file = readdir( dir )) )
+    while( !p_this->p_libvlc->b_die && (file = readdir( dir )) )
     {
         struct stat statbuf;
         unsigned int i_len;
@@ -1050,13 +1050,13 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
         /* msg_Dbg( p_this, "plugin \"%s\", %s",
                     p_module->psz_object_name, p_module->psz_longname ); */
 
-        vlc_object_attach( p_module, p_this->p_libvlc->p_module_bank );
+        vlc_object_attach( p_module, p_this->p_libvlc_global->p_module_bank );
     }
 
-    if( !p_this->p_libvlc->p_module_bank->b_cache ) return 0;
+    if( !p_this->p_libvlc_global->p_module_bank->b_cache ) return 0;
 
     /* Add entry to cache */
-#define p_bank p_this->p_libvlc->p_module_bank
+#define p_bank p_this->p_libvlc_global->p_module_bank
     p_bank->pp_cache =
         realloc( p_bank->pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
     p_bank->pp_cache[p_bank->i_cache] = malloc( sizeof(module_cache_t) );
@@ -1098,7 +1098,7 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
     p_module->psz_filename = psz_file;
     p_module->handle = handle;
 #ifndef HAVE_SHARED_LIBVLC
-    p_module->p_symbols = &p_this->p_libvlc->p_module_bank->symbols;
+    p_module->p_symbols = &p_this->p_libvlc_global->p_module_bank->symbols;
 #endif
     p_module->b_loaded = VLC_TRUE;
 
@@ -1225,7 +1225,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     /* msg_Dbg( p_this, "builtin \"%s\", %s",
                 p_module->psz_object_name, p_module->psz_longname ); */
 
-    vlc_object_attach( p_module, p_this->p_libvlc->p_module_bank );
+    vlc_object_attach( p_module, p_this->p_libvlc_global->p_module_bank );
 
     return 0;
 }
@@ -1599,7 +1599,7 @@ static void CacheLoad( vlc_object_t *p_this )
     module_cache_t **pp_cache = 0;
     int32_t i_file_size, i_marker;
 
-    psz_homedir = p_this->p_vlc->psz_homedir;
+    psz_homedir = p_this->p_libvlc->psz_homedir;
     if( !psz_homedir )
     {
         msg_Err( p_this, "psz_homedir is null" );
@@ -1614,7 +1614,7 @@ static void CacheLoad( vlc_object_t *p_this )
         return;
     }
 
-    if( p_this->p_libvlc->p_module_bank->b_cache_delete )
+    if( p_this->p_libvlc_global->p_module_bank->b_cache_delete )
     {
 #if !defined( UNDER_CE )
         unlink( psz_filename );
@@ -1703,10 +1703,10 @@ static void CacheLoad( vlc_object_t *p_this )
         return;
     }
 
-    p_this->p_libvlc->p_module_bank->i_loaded_cache = 0;
+    p_this->p_libvlc_global->p_module_bank->i_loaded_cache = 0;
     fread( &i_cache, sizeof(char), sizeof(i_cache), file );
     if( i_cache )
-        pp_cache = p_this->p_libvlc->p_module_bank->pp_loaded_cache =
+        pp_cache = p_this->p_libvlc_global->p_module_bank->pp_loaded_cache =
                    malloc( i_cache * sizeof(void *) );
 
 #define LOAD_IMMEDIATE(a) \
@@ -1731,7 +1731,7 @@ static void CacheLoad( vlc_object_t *p_this )
         int i_submodules;
 
         pp_cache[i] = malloc( sizeof(module_cache_t) );
-        p_this->p_libvlc->p_module_bank->i_loaded_cache++;
+        p_this->p_libvlc_global->p_module_bank->i_loaded_cache++;
 
         /* Load common info */
         LOAD_STRING( pp_cache[i]->psz_file );
@@ -1797,7 +1797,7 @@ static void CacheLoad( vlc_object_t *p_this )
     msg_Warn( p_this, "plugins cache not loaded (corrupted)" );
 
     /* TODO: cleanup */
-    p_this->p_libvlc->p_module_bank->i_loaded_cache = 0;
+    p_this->p_libvlc_global->p_module_bank->i_loaded_cache = 0;
 
     fclose( file );
     return;
@@ -1926,7 +1926,7 @@ static void CacheSave( vlc_object_t *p_this )
     module_cache_t **pp_cache;
     int32_t i_file_size = 0;
 
-    psz_homedir = p_this->p_vlc->psz_homedir;
+    psz_homedir = p_this->p_libvlc->psz_homedir;
     if( !psz_homedir )
     {
         msg_Err( p_this, "psz_homedir is null" );
@@ -1992,8 +1992,8 @@ static void CacheSave( vlc_object_t *p_this )
     i_file_size = ftell( file );
     fwrite( &i_file_size, sizeof(char), sizeof(i_file_size), file );
 
-    i_cache = p_this->p_libvlc->p_module_bank->i_cache;
-    pp_cache = p_this->p_libvlc->p_module_bank->pp_cache;
+    i_cache = p_this->p_libvlc_global->p_module_bank->i_cache;
+    pp_cache = p_this->p_libvlc_global->p_module_bank->pp_cache;
 
     fwrite( &i_cache, sizeof(char), sizeof(i_cache), file );
 
@@ -2178,8 +2178,8 @@ static module_cache_t *CacheFind( vlc_object_t *p_this, char *psz_file,
     module_cache_t **pp_cache;
     int i_cache, i;
 
-    pp_cache = p_this->p_libvlc->p_module_bank->pp_loaded_cache;
-    i_cache = p_this->p_libvlc->p_module_bank->i_loaded_cache;
+    pp_cache = p_this->p_libvlc_global->p_module_bank->pp_loaded_cache;
+    i_cache = p_this->p_libvlc_global->p_module_bank->i_loaded_cache;
 
     for( i = 0; i < i_cache; i++ )
     {

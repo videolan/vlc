@@ -957,9 +957,9 @@ char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src )
     if( psz_dir[0] == '~' )
     {
         char *dir = malloc( strlen(psz_dir)
-                             + strlen(p_intf->p_vlc->psz_userdir) );
+                             + strlen(p_intf->p_libvlc->psz_userdir) );
         /* This is incomplete : we should also support the ~cmassiot/ syntax. */
-        sprintf( dir, "%s%s", p_intf->p_vlc->psz_userdir, psz_dir + 1 );
+        sprintf( dir, "%s%s", p_intf->p_libvlc->psz_userdir, psz_dir + 1 );
         free( psz_dir );
         psz_dir = dir;
     }

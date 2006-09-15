@@ -276,7 +276,7 @@ void E_(I420_RGB32)        ( vout_thread_t *, picture_t *, picture_t * );
         while( (i_scale_count -= p_vout->render.i_height) > 0 )               \
         {                                                                     \
             /* Height increment: copy previous picture line */                \
-            p_vout->p_vlc->pf_memcpy( p_pic, p_pic_start,                     \
+            p_vout->p_libvlc->pf_memcpy( p_pic, p_pic_start,                     \
                                       p_vout->output.i_width * BPP );         \
             p_pic = (void*)((uint8_t*)p_pic + p_dest->p->i_pitch );           \
         }                                                                     \

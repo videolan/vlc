@@ -61,18 +61,18 @@ static int    Signal    ( vlc_object_t *, char const *,
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("Miscellaneous stress tests") );
-    var_Create( p_module->p_libvlc, "foo-test",
+    var_Create( p_module->p_libvlc_global, "foo-test",
                 VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_module->p_libvlc, "foo-test", Foo, NULL );
-    var_Create( p_module->p_libvlc, "callback-test",
+    var_AddCallback( p_module->p_libvlc_global, "foo-test", Foo, NULL );
+    var_Create( p_module->p_libvlc_global, "callback-test",
                 VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_module->p_libvlc, "callback-test", Callback, NULL );
-    var_Create( p_module->p_libvlc, "stress-test",
+    var_AddCallback( p_module->p_libvlc_global, "callback-test", Callback, NULL );
+    var_Create( p_module->p_libvlc_global, "stress-test",
                 VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_module->p_libvlc, "stress-test", Stress, NULL );
-    var_Create( p_module->p_libvlc, "signal",
+    var_AddCallback( p_module->p_libvlc_global, "stress-test", Stress, NULL );
+    var_Create( p_module->p_libvlc_global, "signal",
                 VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_module->p_libvlc, "signal", Signal, NULL );
+    var_AddCallback( p_module->p_libvlc_global, "signal", Signal, NULL );
 vlc_module_end();
 
 /*****************************************************************************

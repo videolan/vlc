@@ -77,7 +77,7 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
     p_block->pf_release     = BlockRelease;
 
     /* Is ok, as no comunication between p_vlc */
-    p_block->p_manager      = VLC_OBJECT( p_obj->p_vlc );
+    p_block->p_manager      = VLC_OBJECT( p_obj->p_libvlc );
     p_block->p_sys          = p_sys;
 
     return p_block;

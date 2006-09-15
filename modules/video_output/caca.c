@@ -331,7 +331,7 @@ static int Manage( vout_thread_t *p_vout )
             continue;
         }
 
-        var_Set( p_vout->p_vlc, "key-pressed", val );
+        var_Set( p_vout->p_libvlc, "key-pressed", val );
     }
 
     return VLC_SUCCESS;

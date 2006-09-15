@@ -209,13 +209,13 @@ void Messages::UpdateLog()
             {
             case VLC_MSG_ERR:
             case VLC_MSG_INFO:
-                if( p_intf->p_libvlc->i_verbose < 0 ) continue;
+                if( p_intf->p_libvlc_global->i_verbose < 0 ) continue;
                 break;
             case VLC_MSG_WARN:
-                if( p_intf->p_libvlc->i_verbose < 1 ) continue;
+                if( p_intf->p_libvlc_global->i_verbose < 1 ) continue;
                 break;
             case VLC_MSG_DBG:
-                if( p_intf->p_libvlc->i_verbose < 2 ) continue;
+                if( p_intf->p_libvlc_global->i_verbose < 2 ) continue;
                 break;
             }
 

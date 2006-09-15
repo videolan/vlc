@@ -164,7 +164,7 @@ static void Run( intf_thread_t *p_intf )
     }
 
     /* Make sure we exit (In case other interfaces have been spawned) */
-    p_intf->p_vlc->b_die = VLC_TRUE;
+    p_intf->p_libvlc->b_die = VLC_TRUE;
 }
 
 /*****************************************************************************

@@ -997,10 +997,10 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
         vlc_value_t val;
 
         val.i_int =
-            p_intf->p_vlc->p_hotkeys[event.GetId() - i_hotkey_event].i_key;
+            p_intf->p_libvlc->p_hotkeys[event.GetId() - i_hotkey_event].i_key;
 
         /* Get the key combination and send it to the hotkey handler */
-        var_Set( p_intf->p_vlc, "key-pressed", val );
+        var_Set( p_intf->p_libvlc, "key-pressed", val );
         return;
     }
 

@@ -548,7 +548,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* status callbacks */
     /* Listen to audio volume updates */
-    var_AddCallback( p_intf->p_vlc, "volume-change", VolumeChanged, p_intf );
+    var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, p_intf );
 
 #ifdef WIN32
     /* Get the file descriptor of the console input */
@@ -700,15 +700,15 @@ static void Run( intf_thread_t *p_intf )
                     psz_cmd, i_ret, vlc_error( i_ret ) );
         }
         /* Or maybe it's a global command */
-        else if( var_Type( p_intf->p_libvlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
+        else if( var_Type( p_intf->p_libvlc_global, psz_cmd ) & VLC_VAR_ISCOMMAND )
         {
             vlc_value_t val;
             int i_ret;
 
             val.psz_string = psz_arg;
             /* FIXME: it's a global command, but we should pass the
-             * local object as an argument, not p_intf->p_libvlc. */
-            i_ret = var_Set( p_intf->p_libvlc, psz_cmd, val );
+             * local object as an argument, not p_intf->p_libvlc_global. */
+            i_ret = var_Set( p_intf->p_libvlc_global, psz_cmd, val );
             if( i_ret != 0 )
             {
                 msg_rc( "%s: returned %i (%s)",
@@ -886,7 +886,7 @@ static void Run( intf_thread_t *p_intf )
         p_playlist = NULL;
     }
 
-    var_DelCallback( p_intf->p_vlc, "volume-change", VolumeChanged, p_intf );
+    var_DelCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, p_intf );
 }
 
 static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
@@ -1102,7 +1102,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     if( !strcmp( psz_cmd, "pause" ) )
     {
         val.i_int = config_GetInt( p_intf, "key-play-pause" );
-        var_Set( p_intf->p_vlc, "key-pressed", val );
+        var_Set( p_intf->p_libvlc, "key-pressed", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
@@ -1125,14 +1125,14 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     else if ( !strcmp( psz_cmd, "fastforward" ) )
     {
         val.i_int = config_GetInt( p_intf, "key-jump+extrashort" );
-        var_Set( p_intf->p_vlc, "key-pressed", val );
+        var_Set( p_intf->p_libvlc, "key-pressed", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
     else if ( !strcmp( psz_cmd, "rewind" ) )
     {
         val.i_int = config_GetInt( p_intf, "key-jump-extrashort" );
-        var_Set( p_intf->p_vlc, "key-pressed", val );
+        var_Set( p_intf->p_libvlc, "key-pressed", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
@@ -1487,12 +1487,12 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0 )
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_input->p_libvlc, "marq-marquee", val );
+            var_Set( p_input->p_libvlc_global, "marq-marquee", val );
         }
         else
         {
                 val.psz_string = "";
-                var_Set( p_input->p_libvlc, "marq-marquee", val);
+                var_Set( p_input->p_libvlc_global, "marq-marquee", val);
         }
     }
     else if( !strcmp( psz_cmd, "marq-x" ) )
@@ -1500,7 +1500,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "marq-x", val );
+            var_Set( p_input->p_libvlc_global, "marq-x", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-y" ) )
@@ -1508,7 +1508,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "marq-y", val );
+            var_Set( p_input->p_libvlc_global, "marq-y", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-position" ) )
@@ -1516,7 +1516,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "marq-position", val );
+            var_Set( p_input->p_libvlc_global, "marq-position", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-color" ) )
@@ -1524,7 +1524,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_input->p_libvlc, "marq-color", val );
+            var_Set( p_input->p_libvlc_global, "marq-color", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-opacity" ) )
@@ -1532,7 +1532,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_input->p_libvlc, "marq-opacity", val );
+            var_Set( p_input->p_libvlc_global, "marq-opacity", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-size" ) )
@@ -1540,7 +1540,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "marq-size", val );
+            var_Set( p_input->p_libvlc_global, "marq-size", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-timeout" ) )
@@ -1556,7 +1556,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-alpha", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-alpha", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-height" ) )
@@ -1564,7 +1564,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-height", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-height", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-width" ) )
@@ -1572,7 +1572,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-width", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-width", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-xoffset" ) )
@@ -1580,7 +1580,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-xoffset", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-xoffset", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-yoffset" ) )
@@ -1588,7 +1588,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-yoffset", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-yoffset", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-align" ) )
@@ -1596,7 +1596,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0 )
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-align", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-align", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-vborder" ) )
@@ -1604,7 +1604,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-vborder", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-vborder", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-hborder" ) )
@@ -1612,7 +1612,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-hborder", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-hborder", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-position" ) )
@@ -1620,7 +1620,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-position", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-position", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-rows" ) )
@@ -1628,7 +1628,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-rows", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-rows", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-cols" ) )
@@ -1636,7 +1636,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-cols", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-cols", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-order" ) )
@@ -1644,7 +1644,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_input->p_libvlc, "mosaic-order", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-order", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-keep-aspect-ratio" ) )
@@ -1652,7 +1652,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "mosaic-keep-aspect-ratio", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-keep-aspect-ratio", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-format" ) )
@@ -1660,12 +1660,12 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0 )
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_input->p_libvlc, "time-format", val );
+            var_Set( p_input->p_libvlc_global, "time-format", val );
         }
         else
         {
             val.psz_string = "";
-            var_Set( p_input->p_libvlc, "time-format", val);
+            var_Set( p_input->p_libvlc_global, "time-format", val);
         }
     }
     else if( !strcmp( psz_cmd, "time-x" ) )
@@ -1673,7 +1673,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "time-x", val );
+            var_Set( p_input->p_libvlc_global, "time-x", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-y" ) )
@@ -1681,7 +1681,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "time-y", val );
+            var_Set( p_input->p_libvlc_global, "time-y", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-position" ) )
@@ -1689,7 +1689,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "time-position", val );
+            var_Set( p_input->p_libvlc_global, "time-position", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-color" ) )
@@ -1697,7 +1697,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_input->p_libvlc, "time-color", val );
+            var_Set( p_input->p_libvlc_global, "time-color", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-opacity" ) )
@@ -1705,7 +1705,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_input->p_libvlc, "time-opacity", val );
+            var_Set( p_input->p_libvlc_global, "time-opacity", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-size" ) )
@@ -1713,7 +1713,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "time-size", val );
+            var_Set( p_input->p_libvlc_global, "time-size", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-file" ) )
@@ -1721,7 +1721,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0 )
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_input->p_libvlc, "logo-file", val );
+            var_Set( p_input->p_libvlc_global, "logo-file", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-x" ) )
@@ -1729,7 +1729,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "logo-x", val );
+            var_Set( p_input->p_libvlc_global, "logo-x", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-y" ) )
@@ -1737,7 +1737,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "logo-y", val );
+            var_Set( p_input->p_libvlc_global, "logo-y", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-position" ) )
@@ -1745,7 +1745,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc, "logo-position", val );
+            var_Set( p_input->p_libvlc_global, "logo-position", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-transparency" ) )
@@ -1753,7 +1753,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_input->p_libvlc, "logo-transparency", val );
+            var_Set( p_input->p_libvlc_global, "logo-transparency", val );
         }
     }
 
@@ -1781,7 +1781,7 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
         playlist_Stop( p_playlist );
         vlc_object_release( p_playlist );
     }
-    p_this->p_vlc->b_die = VLC_TRUE;
+    p_this->p_libvlc->b_die = VLC_TRUE;
     return VLC_SUCCESS;
 }
 
@@ -1790,7 +1790,7 @@ static int Intf( vlc_object_t *p_this, char const *psz_cmd,
 {
     intf_thread_t *p_newintf = NULL;
 
-    p_newintf = intf_Create( p_this->p_vlc, newval.psz_string, 0, NULL );
+    p_newintf = intf_Create( p_this->p_libvlc, newval.psz_string, 0, NULL );
     if( p_newintf )
     {
         p_newintf->b_block = VLC_FALSE;
@@ -1846,7 +1846,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
                 vlc_value_t keyval;
 
                 keyval.i_int = config_GetInt( p_intf, "key-vol-mute" );
-                var_Set( p_intf->p_vlc, "key-pressed", keyval );
+                var_Set( p_intf->p_libvlc, "key-pressed", keyval );
             }
             i_error = aout_VolumeSet( p_this, i_volume );
             osd_Volume( p_this );
@@ -1899,7 +1899,7 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
         vlc_object_release( p_input );
     }
 
-    i_volume_step = config_GetInt( p_intf->p_vlc, "volume-step" );
+    i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
     if ( i_nb_steps <= 0 || i_nb_steps > (AOUT_VOLUME_MAX/i_volume_step) )
     {
         i_nb_steps = 1;

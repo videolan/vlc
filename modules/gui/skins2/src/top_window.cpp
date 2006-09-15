@@ -253,7 +253,7 @@ void TopWindow::processEvent( EvtKey &rEvtKey )
             val.i_int |= KEY_MODIFIER_SHIFT;
         }
 
-        var_Set( getIntf()->p_vlc, "key-pressed", val );
+        var_Set( getIntf()->p_libvlc, "key-pressed", val );
     }
 
     // Always store the modifier, which can be needed for scroll events
@@ -298,7 +298,7 @@ void TopWindow::processEvent( EvtScroll &rEvtScroll )
         // Add the modifiers
         val.i_int |= m_currModifier;
 
-        var_Set( getIntf()->p_vlc, "key-pressed", val );
+        var_Set( getIntf()->p_libvlc, "key-pressed", val );
     }
 }
 

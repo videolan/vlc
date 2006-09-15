@@ -726,7 +726,7 @@ void __config_ResetAll( vlc_object_t *p_this )
     module_t *p_module;
 
     /* Acquire config file lock */
-    vlc_mutex_lock( &p_this->p_vlc->config_lock );
+    vlc_mutex_lock( &p_this->p_libvlc->config_lock );
 
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
@@ -748,7 +748,7 @@ void __config_ResetAll( vlc_object_t *p_this )
     }
 
     vlc_list_release( p_list );
-    vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+    vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
 }
 
 /*****************************************************************************
@@ -768,10 +768,10 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     char *psz_filename, *psz_homedir, *psz_configfile;
     int i_index;
 
-    psz_configfile = p_this->p_vlc->psz_configfile;
+    psz_configfile = p_this->p_libvlc->psz_configfile;
     if( !psz_configfile || !psz_configfile )
     {
-        psz_homedir = p_this->p_vlc->psz_homedir;
+        psz_homedir = p_this->p_libvlc->psz_homedir;
         if( !psz_homedir )
         {
             msg_Err( p_this, "psz_homedir is null" );
@@ -798,14 +798,14 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     msg_Dbg( p_this, "opening config file %s", psz_filename );
 
     /* Acquire config file lock */
-    vlc_mutex_lock( &p_this->p_vlc->config_lock );
+    vlc_mutex_lock( &p_this->p_libvlc->config_lock );
 
     file = utf8_fopen( psz_filename, "rt" );
     if( !file )
     {
         msg_Warn( p_this, "config file %s does not exist yet", psz_filename );
         free( psz_filename );
-        vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+        vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
         return -1;
     }
 
@@ -953,7 +953,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     fclose( file );
     free( psz_filename );
 
-    vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+    vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
 
     return 0;
 }
@@ -1009,16 +1009,16 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     int i_index;
 
     /* Acquire config file lock */
-    vlc_mutex_lock( &p_this->p_vlc->config_lock );
+    vlc_mutex_lock( &p_this->p_libvlc->config_lock );
 
-    psz_configfile = p_this->p_vlc->psz_configfile;
+    psz_configfile = p_this->p_libvlc->psz_configfile;
     if( !psz_configfile || !psz_configfile )
     {
-        psz_homedir = p_this->p_vlc->psz_homedir;
+        psz_homedir = p_this->p_libvlc->psz_homedir;
         if( !psz_homedir )
         {
             msg_Err( p_this, "psz_homedir is null" );
-            vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+            vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
             return -1;
         }
         psz_filename = (char *)malloc( sizeof("/" CONFIG_DIR "/" CONFIG_FILE) +
@@ -1030,7 +1030,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         if( !psz_filename )
         {
             msg_Err( p_this, "out of memory" );
-            vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+            vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
             return -1;
         }
 
@@ -1044,7 +1044,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         if( !psz_filename )
         {
             msg_Err( p_this, "out of memory" );
-            vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+            vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
             return -1;
         }
     }
@@ -1070,7 +1070,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         msg_Err( p_this, "out of memory" );
         if( file ) fclose( file );
         free( psz_filename );
-        vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+        vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
         return -1;
     }
     p_bigbuffer[0] = 0;
@@ -1146,7 +1146,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                           psz_filename );
         free( psz_filename );
         vlc_list_release( p_list );
-        vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+        vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
         return -1;
     }
 
@@ -1277,7 +1277,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
     fclose( file );
     free( psz_filename );
-    vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+    vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
 
     return 0;
 }
@@ -1290,7 +1290,7 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
     int i_index, i_count;
 
     /* Check if there's anything to save */
-    vlc_mutex_lock( &p_this->p_vlc->config_lock );
+    vlc_mutex_lock( &p_this->p_libvlc->config_lock );
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
     i_count = p_list->i_count;
     for( i_index = 0; i_index < i_count; i_index++ )
@@ -1308,7 +1308,7 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
         if( p_item->i_type != CONFIG_HINT_END ) break;
     }
     vlc_list_release( p_list );
-    vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+    vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
 
     if( i_index == i_count ) return VLC_SUCCESS;
     return SaveConfigFile( p_this, 0, VLC_TRUE );
@@ -1343,8 +1343,8 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
     char *psz_shortopts;
 
     /* Set default configuration and copy arguments */
-    p_this->p_vlc->i_argc    = *pi_argc;
-    p_this->p_vlc->ppsz_argv = ppsz_argv;
+    p_this->p_libvlc->i_argc    = *pi_argc;
+    p_this->p_libvlc->ppsz_argv = ppsz_argv;
 
 #ifdef __APPLE__
     /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg
@@ -1417,7 +1417,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             vlc_list_release( p_list );
             return -1;
         }
-        memcpy( ppsz_argv, p_this->p_vlc->ppsz_argv,
+        memcpy( ppsz_argv, p_this->p_libvlc->ppsz_argv,
                 *pi_argc * sizeof(char *) );
     }
 
@@ -1656,7 +1656,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
         {
             fprintf( stderr, "%s: unknown option"
                      " or missing mandatory argument ",
-                     p_this->p_vlc->psz_object_name );
+                     p_this->p_libvlc->psz_object_name );
             if( optopt )
             {
                 fprintf( stderr, "`-%c'\n", optopt );
@@ -1666,7 +1666,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                 fprintf( stderr, "`%s'\n", ppsz_argv[optind-1] );
             }
             fprintf( stderr, "Try `%s --help' for more information.\n",
-                             p_this->p_vlc->psz_object_name );
+                             p_this->p_libvlc->psz_object_name );
 
             for( i_index = 0; p_longopts[i_index].name; i_index++ )
                 free( (char *)p_longopts[i_index].name );
@@ -1694,14 +1694,14 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
 const char *config_GetDataDir( const vlc_object_t *p_this )
 {
 #if defined (WIN32) || defined (UNDER_CE)
-    return p_this->p_libvlc->psz_vlcpath;
+    return p_this->p_libvlc_global->psz_vlcpath;
 #elif defined(__APPLE__) || defined (SYS_BEOS)
     static char path[PATH_MAX] = "";
 
     if( *path == '\0' )
     {
         snprintf( path, sizeof( path ), "%s/share",
-                  p_this->p_libvlc->psz_vlcpath );
+                  p_this->p_libvlc_global->psz_vlcpath );
         path[sizeof( path ) - 1] = '\0';
     }
     return path;

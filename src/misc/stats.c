@@ -78,7 +78,7 @@ counter_t * __stats_CounterCreate( vlc_object_t *p_this,
 int __stats_Update( vlc_object_t *p_this, counter_t *p_counter,
                     vlc_value_t val, vlc_value_t *val_new )
 {
-    if( !p_this->p_libvlc->b_stats || !p_counter ) return VLC_EGENERIC;
+    if( !p_this->p_libvlc_global->b_stats || !p_counter ) return VLC_EGENERIC;
     return CounterUpdate( p_this, p_counter, val, val_new );
 }
 
@@ -91,7 +91,7 @@ int __stats_Update( vlc_object_t *p_this, counter_t *p_counter,
  */
 int __stats_Get( vlc_object_t *p_this, counter_t *p_counter, vlc_value_t *val )
 {
-    if( !p_this->p_libvlc->b_stats || !p_counter || p_counter->i_samples == 0 )
+    if( !p_this->p_libvlc_global->b_stats || !p_counter || p_counter->i_samples == 0 )
     {
         val->i_int = val->f_float = 0.0;
         return VLC_EGENERIC;
@@ -135,7 +135,7 @@ int __stats_Get( vlc_object_t *p_this, counter_t *p_counter, vlc_value_t *val )
 
 void stats_ComputeInputStats( input_thread_t *p_input, input_stats_t *p_stats )
 {
-    if( !p_input->p_libvlc->b_stats ) return;
+    if( !p_input->p_libvlc_global->b_stats ) return;
 
     vlc_mutex_lock( &p_input->counters.counters_lock );
     vlc_mutex_lock( &p_stats->lock );
@@ -223,7 +223,7 @@ void __stats_ComputeGlobalStats( vlc_object_t *p_obj, global_stats_t *p_stats )
     vlc_list_t *p_list;
     int i_index;
 
-    if( !p_obj->p_libvlc->b_stats ) return;
+    if( !p_obj->p_libvlc_global->b_stats ) return;
 
     vlc_mutex_lock( &p_stats->lock );
 
@@ -268,31 +268,31 @@ void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name,
 {
     int i;
     counter_t *p_counter = NULL;
-    if( !p_obj->p_libvlc->b_stats ) return;
-    vlc_mutex_lock( &p_obj->p_libvlc->timer_lock );
+    if( !p_obj->p_libvlc_global->b_stats ) return;
+    vlc_mutex_lock( &p_obj->p_libvlc_global->timer_lock );
 
-    for( i = 0 ; i < p_obj->p_libvlc->i_timers; i++ )
+    for( i = 0 ; i < p_obj->p_libvlc_global->i_timers; i++ )
     {
-        if( p_obj->p_libvlc->pp_timers[i]->i_id == i_id )
+        if( p_obj->p_libvlc_global->pp_timers[i]->i_id == i_id )
         {
-            p_counter = p_obj->p_libvlc->pp_timers[i];
+            p_counter = p_obj->p_libvlc_global->pp_timers[i];
             break;
         }
     }
     if( !p_counter )
     {
         counter_sample_t *p_sample;
-        p_counter = stats_CounterCreate( p_obj->p_libvlc, VLC_VAR_TIME,
+        p_counter = stats_CounterCreate( p_obj->p_libvlc_global, VLC_VAR_TIME,
                                          STATS_TIMER );
         if( !p_counter )
         {
-            vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
+            vlc_mutex_unlock( &p_obj->p_libvlc_global->timer_lock );
             return;
         }
         p_counter->psz_name = strdup( psz_name );
         p_counter->i_id = i_id;
-        INSERT_ELEM( p_obj->p_libvlc->pp_timers, p_obj->p_libvlc->i_timers,
-                     p_obj->p_libvlc->i_timers, p_counter );
+        INSERT_ELEM( p_obj->p_libvlc_global->pp_timers, p_obj->p_libvlc_global->i_timers,
+                     p_obj->p_libvlc_global->i_timers, p_counter );
 
         /* 1st sample : if started: start_date, else last_time, b_started */
         p_sample = (counter_sample_t *)malloc( sizeof( counter_sample_t ) );
@@ -308,80 +308,80 @@ void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name,
     if( p_counter->pp_samples[0]->value.b_bool == VLC_TRUE )
     {
         msg_Warn( p_obj, "timer %s was already started !", psz_name );
-        vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
+        vlc_mutex_unlock( &p_obj->p_libvlc_global->timer_lock );
         return;
     }
     p_counter->pp_samples[0]->value.b_bool = VLC_TRUE;
     p_counter->pp_samples[0]->date = mdate();
-    vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
+    vlc_mutex_unlock( &p_obj->p_libvlc_global->timer_lock );
 }
 
 void __stats_TimerStop( vlc_object_t *p_obj, unsigned int i_id )
 {
     counter_t *p_counter = NULL;
     int i;
-    if( !p_obj->p_libvlc->b_stats ) return;
-    vlc_mutex_lock( &p_obj->p_libvlc->timer_lock );
-    for( i = 0 ; i < p_obj->p_libvlc->i_timers; i++ )
+    if( !p_obj->p_libvlc_global->b_stats ) return;
+    vlc_mutex_lock( &p_obj->p_libvlc_global->timer_lock );
+    for( i = 0 ; i < p_obj->p_libvlc_global->i_timers; i++ )
     {
-        if( p_obj->p_libvlc->pp_timers[i]->i_id == i_id )
+        if( p_obj->p_libvlc_global->pp_timers[i]->i_id == i_id )
         {
-            p_counter = p_obj->p_libvlc->pp_timers[i];
+            p_counter = p_obj->p_libvlc_global->pp_timers[i];
             break;
         }
     }
     if( !p_counter || p_counter->i_samples != 2 )
     {
         msg_Err( p_obj, "timer does not exist" );
-        vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
+        vlc_mutex_unlock( &p_obj->p_libvlc_global->timer_lock );
         return;
     }
     p_counter->pp_samples[0]->value.b_bool = VLC_FALSE;
     p_counter->pp_samples[1]->value.i_int += 1;
     p_counter->pp_samples[0]->date = mdate() - p_counter->pp_samples[0]->date;
     p_counter->pp_samples[1]->date += p_counter->pp_samples[0]->date;
-    vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
+    vlc_mutex_unlock( &p_obj->p_libvlc_global->timer_lock );
 }
 
 void __stats_TimerDump( vlc_object_t *p_obj, unsigned int i_id )
 {
     counter_t *p_counter = NULL;
     int i;
-    if( !p_obj->p_libvlc->b_stats ) return;
-    vlc_mutex_lock( &p_obj->p_libvlc->timer_lock );
-    for( i = 0 ; i < p_obj->p_libvlc->i_timers; i++ )
+    if( !p_obj->p_libvlc_global->b_stats ) return;
+    vlc_mutex_lock( &p_obj->p_libvlc_global->timer_lock );
+    for( i = 0 ; i < p_obj->p_libvlc_global->i_timers; i++ )
     {
-        if( p_obj->p_libvlc->pp_timers[i]->i_id == i_id )
+        if( p_obj->p_libvlc_global->pp_timers[i]->i_id == i_id )
         {
-            p_counter = p_obj->p_libvlc->pp_timers[i];
+            p_counter = p_obj->p_libvlc_global->pp_timers[i];
             break;
         }
     }
     TimerDump( p_obj, p_counter, VLC_TRUE );
-    vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
+    vlc_mutex_unlock( &p_obj->p_libvlc_global->timer_lock );
 }
 
 void __stats_TimersDumpAll( vlc_object_t *p_obj )
 {
     int i;
-    if( !p_obj->p_libvlc->b_stats ) return;
-    vlc_mutex_lock( &p_obj->p_libvlc->timer_lock );
-    for ( i = 0 ; i< p_obj->p_libvlc->i_timers ; i++ )
-        TimerDump( p_obj, p_obj->p_libvlc->pp_timers[i], VLC_FALSE );
-    vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
+    if( !p_obj->p_libvlc_global->b_stats ) return;
+    vlc_mutex_lock( &p_obj->p_libvlc_global->timer_lock );
+    for ( i = 0 ; i< p_obj->p_libvlc_global->i_timers ; i++ )
+        TimerDump( p_obj, p_obj->p_libvlc_global->pp_timers[i], VLC_FALSE );
+    vlc_mutex_unlock( &p_obj->p_libvlc_global->timer_lock );
 }
 
 void __stats_TimersClean( vlc_object_t *p_obj )
 {
     int i;
-    vlc_mutex_lock( &p_obj->p_libvlc->timer_lock );
-    for ( i = p_obj->p_libvlc->i_timers -1 ; i >= 0; i-- )
+    vlc_mutex_lock( &p_obj->p_libvlc_global->timer_lock );
+    for ( i = p_obj->p_libvlc_global->i_timers -1 ; i >= 0; i-- )
     {
-        counter_t *p_counter = p_obj->p_libvlc->pp_timers[i];
-        REMOVE_ELEM( p_obj->p_libvlc->pp_timers, p_obj->p_libvlc->i_timers, i );
+        counter_t *p_counter = p_obj->p_libvlc_global->pp_timers[i];
+        REMOVE_ELEM( p_obj->p_libvlc_global->pp_timers, p_obj->p_libvlc_global->i_timers, i );
         stats_CounterClean( p_counter );
     }
-    vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
+    vlc_mutex_unlock( &p_obj->p_libvlc_global->timer_lock );
 }
 
 void stats_CounterClean( counter_t *p_c )

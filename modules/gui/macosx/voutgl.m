@@ -113,7 +113,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 
     vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
 
-    var_Get( p_vout->p_vlc, "drawable", &value_drawable );
+    var_Get( p_vout->p_libvlc, "drawable", &value_drawable );
     if( value_drawable.i_int != 0 )
     {
         static const GLint ATTRIBUTES[] = { 
@@ -455,25 +455,25 @@ static int aglInit( vout_thread_t * p_vout )
     Rect viewBounds;    
     Rect clipBounds;
     
-    var_Get( p_vout->p_vlc, "drawable", &val );
+    var_Get( p_vout->p_libvlc, "drawable", &val );
     p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
     aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
 
-    var_Get( p_vout->p_vlc, "drawable-view-top", &val );
+    var_Get( p_vout->p_libvlc, "drawable-view-top", &val );
     viewBounds.top = val.i_int;
-    var_Get( p_vout->p_vlc, "drawable-view-left", &val );
+    var_Get( p_vout->p_libvlc, "drawable-view-left", &val );
     viewBounds.left = val.i_int;
-    var_Get( p_vout->p_vlc, "drawable-view-bottom", &val );
+    var_Get( p_vout->p_libvlc, "drawable-view-bottom", &val );
     viewBounds.bottom = val.i_int;
-    var_Get( p_vout->p_vlc, "drawable-view-right", &val );
+    var_Get( p_vout->p_libvlc, "drawable-view-right", &val );
     viewBounds.right = val.i_int;
-    var_Get( p_vout->p_vlc, "drawable-clip-top", &val );
+    var_Get( p_vout->p_libvlc, "drawable-clip-top", &val );
     clipBounds.top = val.i_int;
-    var_Get( p_vout->p_vlc, "drawable-clip-left", &val );
+    var_Get( p_vout->p_libvlc, "drawable-clip-left", &val );
     clipBounds.left = val.i_int;
-    var_Get( p_vout->p_vlc, "drawable-clip-bottom", &val );
+    var_Get( p_vout->p_libvlc, "drawable-clip-bottom", &val );
     clipBounds.bottom = val.i_int;
-    var_Get( p_vout->p_vlc, "drawable-clip-right", &val );
+    var_Get( p_vout->p_libvlc, "drawable-clip-right", &val );
     clipBounds.right = val.i_int;
 
     aglSetViewport(p_vout, viewBounds, clipBounds);

@@ -809,7 +809,7 @@ static int ConvertHotkey( int i_hotkey )
 
 void Interface::SetupHotkeys()
 {
-    struct vlc_t::hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
+    struct libvlc_int_t::hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
     int i_hotkeys;
 
     /* Count number of hoteys */

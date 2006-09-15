@@ -235,7 +235,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set quiet mode */
     val.i_int = -1;
-    var_Set( p_intf->p_vlc, "verbose", val );
+    var_Set( p_intf->p_libvlc, "verbose", val );
 
     /* Set defaul playlist view */
     p_sys->i_current_view = VIEW_CATEGORY;
@@ -262,7 +262,7 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        p_sys->psz_current_dir = strdup( p_intf->p_vlc->psz_homedir );
+        p_sys->psz_current_dir = strdup( p_intf->p_libvlc->psz_homedir );
     }
 
     p_sys->i_dir_entries = 0;
@@ -834,7 +834,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         case 'q':
         case 'Q':
         case 0x1b:  /* Esc */
-            p_intf->p_vlc->b_die = VLC_TRUE;
+            p_intf->p_libvlc->b_die = VLC_TRUE;
             return 0;
 
         /* Box switching */

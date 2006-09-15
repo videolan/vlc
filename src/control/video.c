@@ -46,7 +46,7 @@ static vout_thread_t *GetVout( libvlc_input_t *p_input,
     }
 
     p_input_thread = (input_thread_t*)vlc_object_get(
-                                 p_input->p_instance->p_vlc,
+                                 p_input->p_instance->p_libvlc_int,
                                  p_input->i_input_id );
     if( !p_input_thread )
     {
@@ -155,7 +155,7 @@ libvlc_video_take_snapshot( libvlc_input_t *p_input, char *psz_filepath,
     }
 
     p_input_thread = (input_thread_t*)vlc_object_get(
-                                 p_input->p_instance->p_vlc,
+                                 p_input->p_instance->p_libvlc_int,
                                  p_input->i_input_id );
     if( !p_input_thread )
     {
@@ -240,7 +240,7 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
                            libvlc_exception_t *p_e )
 {
     /* set as default for future vout instances */
-    var_SetInteger(p_instance->p_vlc, "drawable", (int)d);
+    var_SetInteger(p_instance->p_libvlc_int, "drawable", (int)d);
 
     if( libvlc_playlist_isplaying(p_instance, p_e) )
     {
@@ -263,8 +263,8 @@ void libvlc_video_set_size( libvlc_instance_t *p_instance, int width, int height
                            libvlc_exception_t *p_e )
 {
     /* set as default for future vout instances */
-    config_PutInt(p_instance->p_vlc, "width", width);
-    config_PutInt(p_instance->p_vlc, "height", height);
+    config_PutInt(p_instance->p_libvlc_int, "width", width);
+    config_PutInt(p_instance->p_libvlc_int, "height", height);
 
     if( libvlc_playlist_isplaying(p_instance, p_e) )
     {
@@ -297,14 +297,14 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance,
         clip = view;
 
     /* set as default for future vout instances */
-    var_SetInteger( p_instance->p_vlc, "drawable-view-top", view->top );
-    var_SetInteger( p_instance->p_vlc, "drawable-view-left", view->left );
-    var_SetInteger( p_instance->p_vlc, "drawable-view-bottom", view->bottom );
-    var_SetInteger( p_instance->p_vlc, "drawable-view-right", view->right );
-    var_SetInteger( p_instance->p_vlc, "drawable-clip-top", clip->top );
-    var_SetInteger( p_instance->p_vlc, "drawable-clip-left", clip->left );
-    var_SetInteger( p_instance->p_vlc, "drawable-clip-bottom", clip->bottom );
-    var_SetInteger( p_instance->p_vlc, "drawable-clip-right", clip->right );
+    var_SetInteger( p_instance->p_libvlc_int, "drawable-view-top", view->top );
+    var_SetInteger( p_instance->p_libvlc_int, "drawable-view-left", view->left );
+    var_SetInteger( p_instance->p_libvlc_int, "drawable-view-bottom", view->bottom );
+    var_SetInteger( p_instance->p_libvlc_int, "drawable-view-right", view->right );
+    var_SetInteger( p_instance->p_libvlc_int, "drawable-clip-top", clip->top );
+    var_SetInteger( p_instance->p_libvlc_int, "drawable-clip-left", clip->left );
+    var_SetInteger( p_instance->p_libvlc_int, "drawable-clip-bottom", clip->bottom );
+    var_SetInteger( p_instance->p_libvlc_int, "drawable-clip-right", clip->right );
 
     if( libvlc_playlist_isplaying(p_instance, p_e) )
     {

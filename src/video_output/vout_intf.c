@@ -92,7 +92,7 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     *pi_height_hint = p_vout->i_window_height;
 
     /* Check whether someone provided us with a window ID */
-    var_Get( p_vout->p_vlc, "drawable", &val );
+    var_Get( p_vout->p_libvlc, "drawable", &val );
     if( val.i_int ) return (void *)val.i_int;
 
     /* Find if the main interface supports embedding */
@@ -550,14 +550,14 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
 
 #if defined(__APPLE__) || defined(SYS_BEOS)
-    if( !val.psz_string && p_vout->p_vlc->psz_homedir )
+    if( !val.psz_string && p_vout->p_libvlc->psz_homedir )
     {
         asprintf( &val.psz_string, "%s/Desktop",
-                  p_vout->p_vlc->psz_homedir );
+                  p_vout->p_libvlc->psz_homedir );
     }
 
 #elif defined(WIN32) && !defined(UNDER_CE)
-    if( !val.psz_string && p_vout->p_vlc->psz_homedir )
+    if( !val.psz_string && p_vout->p_libvlc->psz_homedir )
     {
         /* Get the My Pictures folder path */
 
@@ -604,7 +604,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         if( p_mypicturesdir == NULL )
         {
             asprintf( &val.psz_string, "%s/" CONFIG_DIR,
-                      p_vout->p_vlc->psz_homedir );
+                      p_vout->p_libvlc->psz_homedir );
         }
         else
         {
@@ -614,10 +614,10 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
 #else
-    if( !val.psz_string && p_vout->p_vlc->psz_homedir )
+    if( !val.psz_string && p_vout->p_libvlc->psz_homedir )
     {
         asprintf( &val.psz_string, "%s/" CONFIG_DIR,
-                  p_vout->p_vlc->psz_homedir );
+                  p_vout->p_libvlc->psz_homedir );
     }
 #endif
 

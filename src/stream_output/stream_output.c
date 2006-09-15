@@ -363,7 +363,7 @@ int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
     int i_total = 0;
     p_access->i_writes++;
     p_access->i_sent_bytes += p_buffer->i_buffer;
-    if( p_access->p_libvlc->b_stats && p_access->i_writes % 30 == 0 )
+    if( p_access->p_libvlc_global->b_stats && p_access->i_writes % 30 == 0 )
     {
         /* Access_out -> sout_instance -> input_thread_t */
         input_thread_t *p_input =

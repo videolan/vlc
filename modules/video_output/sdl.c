@@ -110,7 +110,7 @@ vlc_module_begin();
     add_shortcut( "sdl" );
     set_callbacks( Open, Close );
     /* XXX: check for conflicts with the SDL audio output */
-    var_Create( p_module->p_libvlc, "sdl", VLC_VAR_MUTEX );
+    var_Create( p_module->p_libvlc_global, "sdl", VLC_VAR_MUTEX );
 #if defined( __i386__ ) || defined( __x86_64__ )
     /* On i386, SDL is linked against svgalib */
     linked_with_a_crap_library_which_uses_atexit();
@@ -133,7 +133,7 @@ static int Open ( vlc_object_t *p_this )
     char *psz_method;
 #endif
 
-    var_Get( p_this->p_libvlc, "sdl", &lockval );
+    var_Get( p_this->p_libvlc_global, "sdl", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
@@ -417,7 +417,7 @@ static int Manage( vout_thread_t *p_vout )
             break;
 
         case SDL_QUIT:
-            p_vout->p_vlc->b_die = 1;
+            p_vout->p_libvlc->b_die = 1;
             break;
 
         case SDL_KEYDOWN:                             /* if a key is pressed */
@@ -431,12 +431,12 @@ static int Manage( vout_thread_t *p_vout )
                 }
                 else
                 {
-                    p_vout->p_vlc->b_die = 1;
+                    p_vout->p_libvlc->b_die = 1;
                 }
                 break;
 
             case SDLK_q:                                             /* quit */
-                p_vout->p_vlc->b_die = 1;
+                p_vout->p_libvlc->b_die = 1;
                 break;
 
             case SDLK_f:                             /* switch to fullscreen */

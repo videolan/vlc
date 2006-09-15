@@ -198,7 +198,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
             case GESTURE(DOWN,RIGHT,NONE,NONE):
                 /* FIXME: Should close the vout!"*/
-                p_intf->p_vlc->b_die = VLC_TRUE;
+                p_intf->p_libvlc->b_die = VLC_TRUE;
                 break;
             case GESTURE(DOWN,LEFT,UP,RIGHT):
                 msg_Dbg(p_intf, "a square was drawn!" );

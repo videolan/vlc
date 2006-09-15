@@ -766,7 +766,7 @@ void ConfigWidget::Apply( bool doIt )
                     {
                         val.i_int |= KEY_MODIFIER_SHIFT;
                     }
-                    var_Set( p_intf->p_vlc, fName, val );
+                    var_Set( p_intf->p_libvlc, fName, val );
                 }
             }
             else

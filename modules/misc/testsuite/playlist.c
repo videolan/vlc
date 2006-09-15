@@ -305,7 +305,7 @@ static void StressTest( vlc_object_t *p_this )
 
     if( p_sys->b_error == VLC_FALSE )
     {
-        p_this->p_vlc->b_die = VLC_TRUE;
+        p_this->p_libvlc->b_die = VLC_TRUE;
     }
     else
     {

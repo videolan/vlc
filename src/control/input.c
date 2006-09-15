@@ -44,8 +44,8 @@ input_thread_t *libvlc_get_input_thread( libvlc_input_t *p_input,
     if( !p_input ) RAISENULL( "Input is NULL" );
 
     p_input_thread = (input_thread_t*)vlc_object_get(
-                                                    p_input->p_instance->p_vlc,
-                                                    p_input->i_input_id );
+                                             p_input->p_instance->p_libvlc_int,
+                                             p_input->i_input_id );
     if( !p_input_thread ) RAISENULL( "Input does not exist" );
 
     return p_input_thread;

@@ -1614,7 +1614,7 @@ static block_t *ReadCompressed( access_t *p_access )
         }
 
         sample.p_sample->GetPointer( &p_data );
-        p_access->p_vlc->pf_memcpy( p_block->p_buffer, p_data, i_data_size );
+        p_access->p_libvlc->pf_memcpy( p_block->p_buffer, p_data, i_data_size );
         sample.p_sample->Release();
 
         /* The caller got what he wanted */
@@ -1703,7 +1703,7 @@ static int Demux( demux_t *p_demux )
 #endif
 
     p_block = block_New( p_demux, i_data_size );
-    p_demux->p_vlc->pf_memcpy( p_block->p_buffer, p_data, i_data_size );
+    p_demux->p_libvlc->pf_memcpy( p_block->p_buffer, p_data, i_data_size );
     p_block->i_pts = p_block->i_dts = i_pts;
     sample.p_sample->Release();
 

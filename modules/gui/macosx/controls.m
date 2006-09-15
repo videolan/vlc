@@ -82,7 +82,7 @@
 
     }
     val.i_int = config_GetInt( p_intf, "key-play-pause" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
 }
 
 /* Small helper method */
@@ -116,7 +116,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-stop" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
 }
 
 - (IBAction)faster:(id)sender
@@ -124,7 +124,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-faster" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
 }
 
 - (IBAction)slower:(id)sender
@@ -132,7 +132,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-slower" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
 }
 
 - (IBAction)prev:(id)sender
@@ -140,7 +140,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-prev" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
 }
 
 - (IBAction)next:(id)sender
@@ -148,7 +148,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-next" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
 }
 
 - (IBAction)random:(id)sender
@@ -254,7 +254,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-jump+short" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
 }
 
 - (IBAction)backward:(id)sender
@@ -262,7 +262,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-jump-short" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
 }
 
 
@@ -271,7 +271,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-vol-up" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
     /* Manage volume status */
     [o_main manageVolumeSlider];
 }
@@ -281,7 +281,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-vol-down" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
     /* Manage volume status */
     [o_main manageVolumeSlider];
 }
@@ -291,7 +291,7 @@
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-vol-mute" );
-    var_Set( p_intf->p_vlc, "key-pressed", val );
+    var_Set( p_intf->p_libvlc, "key-pressed", val );
     /* Manage volume status */
     [o_main manageVolumeSlider];
 }
@@ -301,7 +301,7 @@
     intf_thread_t * p_intf = VLCIntf;
     audio_volume_t i_volume = (audio_volume_t)[sender intValue];
     int i_volume_step = 0;
-    i_volume_step = config_GetInt( p_intf->p_vlc, "volume-step" );
+    i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
     aout_VolumeSet( p_intf, i_volume * i_volume_step );
     /* Manage volume status */
     [o_main manageVolumeSlider];

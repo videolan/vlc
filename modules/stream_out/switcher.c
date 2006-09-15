@@ -353,19 +353,19 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         /* Set CPU capabilities */
         id->ff_enc_c->dsp_mask = 0;
-        if( !(p_stream->p_libvlc->i_cpu & CPU_CAPABILITY_MMX) )
+        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMX) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_MMX;
         }
-        if( !(p_stream->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT) )
+        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_MMXEXT;
         }
-        if( !(p_stream->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW) )
+        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_3DNOW) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_3DNOW;
         }
-        if( !(p_stream->p_libvlc->i_cpu & CPU_CAPABILITY_SSE) )
+        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_SSE) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_SSE;
             id->ff_enc_c->dsp_mask |= FF_MM_SSE2;
@@ -726,19 +726,19 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
 
         /* Set CPU capabilities */
         id->ff_enc_c->dsp_mask = 0;
-        if( !(p_stream->p_libvlc->i_cpu & CPU_CAPABILITY_MMX) )
+        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMX) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_MMX;
         }
-        if( !(p_stream->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT) )
+        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_MMXEXT;
         }
-        if( !(p_stream->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW) )
+        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_3DNOW) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_3DNOW;
         }
-        if( !(p_stream->p_libvlc->i_cpu & CPU_CAPABILITY_SSE) )
+        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_SSE) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_SSE;
             id->ff_enc_c->dsp_mask |= FF_MM_SSE2;
@@ -854,7 +854,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
             = id->ff_enc_c->coded_frame->motion_subsample_log2;
         id->p_frame->mb_type = malloc( ((mb_width + 1) * (mb_height + 1) + 1)
                                     * sizeof(uint32_t) );
-        p_stream->p_vlc->pf_memcpy( id->p_frame->mb_type,
+        p_stream->p_libvlc->pf_memcpy( id->p_frame->mb_type,
                                     id->ff_enc_c->coded_frame->mb_type,
                                     (mb_width + 1) * mb_height
                                       * sizeof(id->p_frame->mb_type[0]));
@@ -871,7 +871,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
             {
                 id->p_frame->motion_val[i] = malloc( 2 * stride * height
                                                 * sizeof(int16_t) );
-                p_stream->p_vlc->pf_memcpy( id->p_frame->motion_val[i],
+                p_stream->p_libvlc->pf_memcpy( id->p_frame->motion_val[i],
                                      id->ff_enc_c->coded_frame->motion_val[i],
                                      2 * stride * height * sizeof(int16_t) );
             }
@@ -879,7 +879,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
             {
                 id->p_frame->ref_index[i] = malloc( b8_stride * 2 * mb_height
                                                * sizeof(int8_t) );
-                p_stream->p_vlc->pf_memcpy( id->p_frame->ref_index[i],
+                p_stream->p_libvlc->pf_memcpy( id->p_frame->ref_index[i],
                                  id->ff_enc_c->coded_frame->ref_index[i],
                                  b8_stride * 2 * mb_height * sizeof(int8_t));
             }
@@ -888,7 +888,7 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
 #endif
 
     p_out = block_New( p_stream, i_out );
-    p_stream->p_vlc->pf_memcpy( p_out->p_buffer, id->p_buffer_out, i_out );
+    p_stream->p_libvlc->pf_memcpy( p_out->p_buffer, id->p_buffer_out, i_out );
     p_out->i_length = p_buffer->i_length;
     p_out->i_pts = p_buffer->i_dts;
     p_out->i_dts = p_buffer->i_dts;
@@ -931,7 +931,7 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
         return NULL;
 
     p_out = block_New( p_stream, i_out );
-    p_stream->p_vlc->pf_memcpy( p_out->p_buffer, id->p_buffer_out, i_out );
+    p_stream->p_libvlc->pf_memcpy( p_out->p_buffer, id->p_buffer_out, i_out );
     p_out->i_length = p_buffer->i_length;
     p_out->i_pts = p_buffer->i_dts;
     p_out->i_dts = p_buffer->i_dts;

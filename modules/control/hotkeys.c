@@ -121,7 +121,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->p_vout = NULL;
 
-    var_AddCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
+    var_AddCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
     return 0;
 }
 
@@ -132,7 +132,7 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    var_DelCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
+    var_DelCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
     if( p_intf->p_sys->p_input )
     {
         vlc_object_release( p_intf->p_sys->p_input );
@@ -154,20 +154,20 @@ static void Run( intf_thread_t *p_intf )
     input_thread_t *p_input = NULL;
     vout_thread_t *p_vout = NULL;
     vout_thread_t *p_last_vout = NULL;
-    struct hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
+    struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
     vlc_value_t val;
     int i;
 
     /* Initialize hotkey structure */
     for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
     {
-        var_Create( p_intf->p_vlc, p_hotkeys[i].psz_action,
+        var_Create( p_intf->p_libvlc, p_hotkeys[i].psz_action,
                     VLC_VAR_HOTKEY | VLC_VAR_DOINHERIT );
 
-        var_AddCallback( p_intf->p_vlc, p_hotkeys[i].psz_action,
+        var_AddCallback( p_intf->p_libvlc, p_hotkeys[i].psz_action,
                          ActionKeyCB, NULL );
-        var_Get( p_intf->p_vlc, p_hotkeys[i].psz_action, &val );
-        var_Set( p_intf->p_vlc, p_hotkeys[i].psz_action, val );
+        var_Get( p_intf->p_libvlc, p_hotkeys[i].psz_action, &val );
+        var_Set( p_intf->p_libvlc, p_hotkeys[i].psz_action, val );
     }
 
     while( !p_intf->b_die )
@@ -253,7 +253,7 @@ static void Run( intf_thread_t *p_intf )
                 vlc_object_release( p_playlist );
             }
             /* Playlist is stopped now kill vlc. */
-            p_intf->p_vlc->b_die = VLC_TRUE;
+            p_intf->p_libvlc->b_die = VLC_TRUE;
             ClearChannels( p_intf, p_vout );
             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );
             continue;
@@ -881,8 +881,8 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
 static int ActionKeyCB( vlc_object_t *p_this, char const *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    vlc_t *p_vlc = (vlc_t *)p_this;
-    struct hotkey *p_hotkeys = p_vlc->p_hotkeys;
+    libvlc_int_t *p_libvlc = (libvlc_int_t *)p_this;
+    struct hotkey *p_hotkeys = p_libvlc->p_hotkeys;
     mtime_t i_date;
     int i;
 

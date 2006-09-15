@@ -199,7 +199,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             break;
 
         case 1:
-            p_filter->p_vlc->pf_memcpy( p_samples, p_left,
+            p_filter->p_libvlc->pf_memcpy( p_samples, p_left,
                                         i_samples * sizeof(mad_fixed_t) );
             break;
 
@@ -313,7 +313,7 @@ static int OpenFilter( vlc_object_t *p_this )
     mad_synth_init( &p_sys->mad_synth );
     mad_stream_options( &p_sys->mad_stream, MAD_OPTION_IGNORECRC );
 
-    if( p_this->p_libvlc->i_cpu & CPU_CAPABILITY_FPU )
+    if( p_this->p_libvlc_global->i_cpu & CPU_CAPABILITY_FPU )
         p_filter->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
     else
         p_filter->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');

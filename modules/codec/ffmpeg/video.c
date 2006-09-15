@@ -237,7 +237,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     vlc_value_t lockval;
     vlc_value_t val;
 
-    var_Get( p_dec->p_libvlc, "avcodec", &lockval );
+    var_Get( p_dec->p_libvlc_global, "avcodec", &lockval );
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
@@ -502,7 +502,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         }
         p_sys->p_buffer = p_sys->p_buffer_orig;
         p_sys->i_buffer = p_block->i_buffer;
-        p_dec->p_vlc->pf_memcpy( p_sys->p_buffer, p_block->p_buffer,
+        p_dec->p_libvlc->pf_memcpy( p_sys->p_buffer, p_block->p_buffer,
                                  p_block->i_buffer );
         memset( p_sys->p_buffer + p_block->i_buffer, 0,
                 FF_INPUT_BUFFER_PADDING_SIZE );
@@ -808,7 +808,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
             for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines;
                  i_line++ )
             {
-                p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_size );
+                p_dec->p_libvlc->pf_memcpy( p_dst, p_src, i_size );
                 p_src += i_src_stride;
                 p_dst += i_dst_stride;
             }

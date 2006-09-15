@@ -81,7 +81,7 @@ vlc_module_begin();
                  ID_OFFSET_LONGTEXT, VLC_FALSE );
     set_callbacks( OpenIn, CloseIn );
 
-    var_Create( p_module->p_libvlc, "bridge-lock", VLC_VAR_MUTEX );
+    var_Create( p_module->p_libvlc_global, "bridge-lock", VLC_VAR_MUTEX );
 vlc_module_end();
 
 
@@ -126,11 +126,11 @@ typedef struct bridge_t
 #define GetBridge(a) __GetBridge( VLC_OBJECT(a) )
 static bridge_t *__GetBridge( vlc_object_t *p_object )
 {
-    libvlc_t *p_libvlc = p_object->p_libvlc;
+    libvlc_global_data_t *p_libvlc_global = p_object->p_libvlc_global;
     bridge_t *p_bridge;
     vlc_value_t val;
 
-    if( var_Get( p_libvlc, "bridge-struct", &val ) != VLC_SUCCESS )
+    if( var_Get( p_libvlc_global, "bridge-struct", &val ) != VLC_SUCCESS )
     {
         p_bridge = NULL;
     }
@@ -170,7 +170,7 @@ static int OpenOut( vlc_object_t *p_this )
     p_sys          = malloc( sizeof( out_sout_stream_sys_t ) );
     p_sys->b_inited = VLC_FALSE;
 
-    var_Get( p_this->p_libvlc, "bridge-lock", &val );
+    var_Get( p_this->p_libvlc_global, "bridge-lock", &val );
     p_sys->p_lock = val.p_address;
 
     var_Get( p_stream, SOUT_CFG_PREFIX_OUT "id", &val );
@@ -218,14 +218,14 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_bridge = GetBridge( p_stream );
     if ( p_bridge == NULL )
     {
-        libvlc_t *p_libvlc = p_stream->p_libvlc;
+        libvlc_global_data_t *p_libvlc_global = p_stream->p_libvlc_global;
         vlc_value_t val;
 
         p_bridge = malloc( sizeof( bridge_t ) );
 
-        var_Create( p_libvlc, "bridge-struct", VLC_VAR_ADDRESS );
+        var_Create( p_libvlc_global, "bridge-struct", VLC_VAR_ADDRESS );
         val.p_address = p_bridge;
-        var_Set( p_libvlc, "bridge-struct", val );
+        var_Set( p_libvlc_global, "bridge-struct", val );
 
         p_bridge->i_es_num = 0;
         p_bridge->pp_es = NULL;
@@ -354,7 +354,7 @@ static int OpenIn( vlc_object_t *p_this )
     sout_CfgParse( p_stream, SOUT_CFG_PREFIX_IN, ppsz_sout_options_in,
                    p_stream->p_cfg );
 
-    var_Get( p_this->p_libvlc, "bridge-lock", &val );
+    var_Get( p_this->p_libvlc_global, "bridge-lock", &val );
     p_sys->p_lock = val.p_address;
 
     var_Get( p_stream, SOUT_CFG_PREFIX_IN "id-offset", &val );
@@ -518,12 +518,12 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if( b_no_es )
     {
-        libvlc_t *p_libvlc = p_stream->p_libvlc;
+        libvlc_global_data_t *p_libvlc_global = p_stream->p_libvlc_global;
         for ( i = 0; i < p_bridge->i_es_num; i++ )
             free( p_bridge->pp_es[i] );
         free( p_bridge->pp_es );
         free( p_bridge );
-        var_Destroy( p_libvlc, "bridge-struct" );
+        var_Destroy( p_libvlc_global, "bridge-struct" );
     }
 
     vlc_mutex_unlock( p_sys->p_lock );

@@ -168,17 +168,17 @@ int intf_RunThread( intf_thread_t *p_intf )
         }
     }
 
-    if( p_intf->b_block && strncmp( p_intf->p_vlc->psz_object_name,
+    if( p_intf->b_block && strncmp( p_intf->p_libvlc->psz_object_name,
                                     "clivlc", 6) )
     {
         o_pool = [[NSAutoreleasePool alloc] init];
         [VLCApplication sharedApplication];
-        [NSApp setVLC: p_intf->p_vlc];
+        [NSApp setVLC: p_intf->p_libvlc];
     }
 
     if( p_intf->b_block &&
         ( !strncmp( p_intf->p_module->psz_object_name, "macosx" , 6 ) ||
-          !strncmp( p_intf->p_vlc->psz_object_name, "clivlc", 6 ) ) )
+          !strncmp( p_intf->p_libvlc->psz_object_name, "clivlc", 6 ) ) )
     {
         /* VLC in normal primary interface mode */
         RunInterface( p_intf );
@@ -307,11 +307,11 @@ static void Manager( intf_thread_t *p_intf )
     {
         msleep( INTF_IDLE_SLEEP );
 
-        if( p_intf->p_vlc->b_die )
+        if( p_intf->p_libvlc->b_die )
         {
             p_intf->b_die = VLC_TRUE;
 #ifdef __APPLE__
-    if( strncmp( p_intf->p_vlc->psz_object_name, "clivlc", 6 ) )
+    if( strncmp( p_intf->p_libvlc->psz_object_name, "clivlc", 6 ) )
     {
         [NSApp stop: NULL];
     }
@@ -440,7 +440,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     /* Try to create the interface */
     sprintf( psz_intf, "%s,none", newval.psz_string );
-    p_intf = intf_Create( p_this->p_vlc, psz_intf, 0, NULL );
+    p_intf = intf_Create( p_this->p_libvlc, psz_intf, 0, NULL );
     free( psz_intf );
     if( p_intf == NULL )
     {

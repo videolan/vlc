@@ -74,8 +74,8 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     char *psz_vlmconf;
 
     /* to be sure to avoid multiple creation */
-    var_Create( p_this->p_libvlc, "vlm_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "vlm_mutex", &lockval );
+    var_Create( p_this->p_libvlc_global, "vlm_mutex", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc_global, "vlm_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     if( !(p_vlm = vlc_object_find( p_this, VLC_OBJECT_VLM, FIND_ANYWHERE )) )
@@ -87,7 +87,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
             return NULL;
         }
 
-        vlc_mutex_init( p_this->p_vlc, &p_vlm->lock );
+        vlc_mutex_init( p_this->p_libvlc, &p_vlm->lock );
         p_vlm->i_media      = 0;
         p_vlm->media        = NULL;
         p_vlm->i_vod        = 0;
@@ -95,7 +95,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
         p_vlm->schedule     = NULL;
 
         vlc_object_yield( p_vlm );
-        vlc_object_attach( p_vlm, p_this->p_vlc );
+        vlc_object_attach( p_vlm, p_this->p_libvlc );
     }
     vlc_mutex_unlock( lockval.p_address );
 
@@ -139,7 +139,7 @@ void vlm_Delete( vlm_t *p_vlm )
 {
     vlc_value_t lockval;
 
-    var_Get( p_vlm->p_libvlc, "vlm_mutex", &lockval );
+    var_Get( p_vlm->p_libvlc_global, "vlm_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     vlc_object_release( p_vlm );

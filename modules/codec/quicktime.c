@@ -223,7 +223,7 @@ static int Open( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
 
     /* create a mutex */
-    var_Create( p_this->p_libvlc, "qt_mutex", VLC_VAR_MUTEX );
+    var_Create( p_this->p_libvlc_global, "qt_mutex", VLC_VAR_MUTEX );
     
     switch( p_dec->fmt_in.i_codec )
     {
@@ -287,7 +287,7 @@ static void Close( vlc_object_t *p_this )
     vlc_value_t   lockval;
 
     /* get lock, avoid segfault */
-    var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
+    var_Get( p_dec->p_libvlc_global, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     if( p_dec->fmt_out.i_cat == AUDIO_ES )
@@ -328,7 +328,7 @@ static void Close( vlc_object_t *p_this )
 #endif
 
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_dec->p_libvlc, "qt_mutex" );
+    var_Destroy( p_dec->p_libvlc_global, "qt_mutex" );
 
     if( p_sys ) free( p_sys );
 }
@@ -355,7 +355,7 @@ static int OpenAudio( decoder_t *p_dec )
     memcpy( fcc, &p_dec->fmt_in.i_codec, 4 );
 
     /* get lock, avoid segfault */
-    var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
+    var_Get( p_dec->p_libvlc_global, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
 #ifdef __APPLE__
@@ -548,7 +548,7 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
             int i_frames = p_sys->i_buffer / p_sys->InFrameSize;
             unsigned long i_out_frames, i_out_bytes;
 
-            var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
+            var_Get( p_dec->p_libvlc_global, "qt_mutex", &lockval );
             vlc_mutex_lock( lockval.p_address );
             i_error = p_sys->SoundConverterConvertBuffer( p_sys->myConverter,
                                                           p_sys->p_buffer,
@@ -654,7 +654,7 @@ static int OpenVideo( decoder_t *p_dec )
              fcc, p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height );
 
     /* get lock, avoid segfault */
-    var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
+    var_Get( p_dec->p_libvlc_global, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
 #ifdef __APPLE__
@@ -861,7 +861,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
     
-    var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
+    var_Get( p_dec->p_libvlc_global, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     if( ( p_pic = p_dec->pf_vout_buffer_new( p_dec ) ) )

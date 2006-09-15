@@ -126,8 +126,8 @@ static int Open( vlc_object_t *p_this )
     char          *psz_src;
     char          psz_tmp[10];
 
-    var_Create(p_intf->p_libvlc, "http-host", VLC_VAR_STRING );
-    psz_address=var_GetString(p_intf->p_libvlc, "http-host");
+    var_Create(p_intf->p_libvlc_global, "http-host", VLC_VAR_STRING );
+    psz_address=var_GetString(p_intf->p_libvlc_global, "http-host");
     if( !psz_address || !*psz_address )
     {
         psz_address = config_GetPsz( p_intf, "http-host" );
@@ -265,7 +265,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Ugly hack to allow to run several HTTP servers on different ports. */
     sprintf( psz_tmp, "%s:%d", psz_address, i_port + 1 );
-    var_SetString( p_intf->p_libvlc, "http-host", psz_tmp );
+    var_SetString( p_intf->p_libvlc_global, "http-host", psz_tmp );
 
     msg_Dbg( p_intf, "base %s:%d", psz_address, i_port );
 
@@ -287,7 +287,7 @@ static int Open( vlc_object_t *p_this )
 #if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
     if ( ( psz_src = config_GetPsz( p_intf, "http-src" )) == NULL )
     {
-        char * psz_vlcpath = p_intf->p_libvlc->psz_vlcpath;
+        char * psz_vlcpath = p_intf->p_libvlc_global->psz_vlcpath;
         psz_src = malloc( strlen(psz_vlcpath) + strlen("/share/http" ) + 1 );
         if( !psz_src ) return VLC_ENOMEM;
 #if defined(WIN32)

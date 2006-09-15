@@ -341,7 +341,7 @@ static void MotionDetect( vout_thread_t *p_vout, picture_t *p_inpic,
         i_num_lines = p_inpic->p[i_index].i_visible_lines;
         i_size = p_inpic->p[i_index].i_lines * p_inpic->p[i_index].i_pitch;
 
-        p_vout->p_vlc->pf_memcpy( p_out, p_in, i_size );
+        p_vout->p_libvlc->pf_memcpy( p_out, p_in, i_size );
         switch( i_index )
         {
         case Y_PLANE:
@@ -415,7 +415,7 @@ static void MotionDetect( vout_thread_t *p_vout, picture_t *p_inpic,
             p_in = p_inpic->p[i_index].p_pixels;
             p_out = p_outpic->p[i_index].p_pixels;
 
-            p_vout->p_vlc->pf_memcpy( p_last_in, p_in, i_size );
+            p_vout->p_libvlc->pf_memcpy( p_last_in, p_in, i_size );
             break;
         default:
             break;

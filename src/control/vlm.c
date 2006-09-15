@@ -33,7 +33,7 @@ void InitVLM( libvlc_instance_t *p_instance )
 {
 #ifdef ENABLE_VLM
     if( p_instance->p_vlm ) return;
-    p_instance->p_vlm = vlm_New( p_instance->p_vlc );
+    p_instance->p_vlm = vlm_New( p_instance->p_libvlc_int );
 #else
     p_instance->p_vlm = NULL;
 #endif

@@ -662,7 +662,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                 {
                     val.i_int |= KEY_MODIFIER_ALT;
                 }
-                var_Set( p_vout->p_vlc, "key-pressed", val );
+                var_Set( p_vout->p_libvlc, "key-pressed", val );
             }
         }
         /* Mouse click */
@@ -843,9 +843,9 @@ static int ManageVideo( vout_thread_t *p_vout )
             {
                 /* (if this is the last a collection of expose events...) */
 #if 0
-                if( p_vout->p_vlc->p_input_bank->pp_input[0] != NULL )
+                if( p_vout->p_libvlc->p_input_bank->pp_input[0] != NULL )
                 {
-                    if( PAUSE_S == p_vout->p_vlc->p_input_bank->pp_input[0]
+                    if( PAUSE_S == p_vout->p_libvlc->p_input_bank->pp_input[0]
                                                    ->stream.control.i_status )
                     {
                         /* XVideoDisplay( p_vout )*/;
@@ -1055,7 +1055,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
             XSetWMNormalHints( p_vout->p_sys->p_display,
                                p_win->base_window, &xsize_hints );
             XSetCommand( p_vout->p_sys->p_display, p_win->base_window,
-                         p_vout->p_vlc->ppsz_argv, p_vout->p_vlc->i_argc );
+                         p_vout->p_libvlc->ppsz_argv, p_vout->p_libvlc->i_argc );
 
             if( !var_GetBool( p_vout, "video-deco") )
             {

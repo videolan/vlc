@@ -31,7 +31,7 @@
 void devices_ProbeCreate( vlc_object_t *p_this )
 {
     intf_thread_t * p_probe;
-    p_this->p_libvlc->p_probe = NULL;
+    p_this->p_libvlc_global->p_probe = NULL;
 
     /* Allocate structure */
     p_probe = vlc_object_create( p_this, VLC_OBJECT_INTF );
@@ -48,5 +48,5 @@ void devices_ProbeCreate( vlc_object_t *p_this )
         return;
     }
 
-    p_this->p_libvlc->p_probe = p_probe;
+    p_this->p_libvlc_global->p_probe = p_probe;
 }

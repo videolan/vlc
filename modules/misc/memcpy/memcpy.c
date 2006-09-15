@@ -63,11 +63,11 @@
 static int Activate ( vlc_object_t *p_this )
 {
 #ifdef MODULE_NAME_IS_memcpy
-    p_this->p_vlc->pf_memcpy = memcpy;
-    p_this->p_vlc->pf_memset = memset;
+    p_this->p_libvlc->pf_memcpy = memcpy;
+    p_this->p_libvlc->pf_memset = memset;
 #else
-    p_this->p_vlc->pf_memcpy = fast_memcpy;
-    p_this->p_vlc->pf_memset = NULL;
+    p_this->p_libvlc->pf_memcpy = fast_memcpy;
+    p_this->p_libvlc->pf_memset = NULL;
 #endif
 
     return VLC_SUCCESS;

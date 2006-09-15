@@ -54,8 +54,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     msg_Dbg( p_vout, "set %d", new_val.i_int );
-    var_Create( p_vout->p_vlc, "video-device", VLC_VAR_INTEGER );
-    var_Set( p_vout->p_vlc, "video-device", new_val );
+    var_Create( p_vout->p_libvlc, "video-device", VLC_VAR_INTEGER );
+    var_Set( p_vout->p_libvlc, "video-device", new_val );
 
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );
@@ -174,13 +174,13 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     p_real_vout = [VLCVoutView getRealVout: p_vout];
 
     /* Get the pref value when this is the first time, otherwise retrieve the device from the top level video-device var */
-    if( var_Type( p_real_vout->p_vlc, "video-device" ) == 0 )
+    if( var_Type( p_real_vout->p_libvlc, "video-device" ) == 0 )
     {
         i_device = var_GetInteger( p_vout, "macosx-vdev" );
     }
     else
     {
-        i_device = var_GetInteger( p_real_vout->p_vlc, "video-device" );
+        i_device = var_GetInteger( p_real_vout->p_libvlc, "video-device" );
     }
 
     /* Setup the menuitem for the multiple displays. */
@@ -442,12 +442,12 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         {
             vlc_value_t val;
             val.i_int = config_GetInt( p_vout, "key-play-pause" );
-            var_Set( p_vout->p_vlc, "key-pressed", val );
+            var_Set( p_vout->p_libvlc, "key-pressed", val );
         }
         else
         {
             val.i_int |= CocoaKeyToVLC( key );
-            var_Set( p_vout->p_vlc, "key-pressed", val );
+            var_Set( p_vout->p_libvlc, "key-pressed", val );
         }
     }
     else
@@ -665,7 +665,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     id o_return = nil;
     vout_thread_t * p_real_vout = [VLCVoutView getRealVout: p_vout];
 
-    var_Get( p_vout->p_vlc, "drawable", &value_drawable );
+    var_Get( p_vout->p_libvlc, "drawable", &value_drawable );
 
     var_Create( p_vout, "macosx-vdev", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -921,8 +921,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     b_init_ok = VLC_FALSE;
 
     p_real_vout = [VLCVoutView getRealVout: p_vout];
-    i_device = var_GetInteger( p_real_vout->p_vlc, "video-device" );
-    b_black = var_GetBool( p_real_vout->p_vlc, "macosx-black" );
+    i_device = var_GetInteger( p_real_vout->p_libvlc, "video-device" );
+    b_black = var_GetBool( p_real_vout->p_libvlc, "macosx-black" );
 
     /* Find out on which screen to open the window */
     if( i_device <= 0 || i_device > (int)[o_screens count] )

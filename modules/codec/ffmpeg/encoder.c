@@ -206,7 +206,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     vlc_value_t val;
     vlc_value_t lockval;
 
-    var_Get( p_enc->p_libvlc, "avcodec", &lockval );
+    var_Get( p_enc->p_libvlc_global, "avcodec", &lockval );
 
     if( !E_(GetFfmpegCodec)( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
@@ -271,19 +271,19 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
     /* Set CPU capabilities */
     p_context->dsp_mask = 0;
-    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_MMX) )
+    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMX) )
     {
         p_context->dsp_mask |= FF_MM_MMX;
     }
-    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT) )
+    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT) )
     {
         p_context->dsp_mask |= FF_MM_MMXEXT;
     }
-    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW) )
+    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_3DNOW) )
     {
         p_context->dsp_mask |= FF_MM_3DNOW;
     }
-    if( !(p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_SSE) )
+    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_SSE) )
     {
         p_context->dsp_mask |= FF_MM_SSE;
         p_context->dsp_mask |= FF_MM_SSE2;
@@ -1049,7 +1049,7 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
     encoder_sys_t *p_sys = p_enc->p_sys;
     vlc_value_t lockval;
 
-    var_Get( p_enc->p_libvlc, "avcodec", &lockval );
+    var_Get( p_enc->p_libvlc_global, "avcodec", &lockval );
 
 #if LIBAVCODEC_BUILD >= 4702
     if ( p_sys->b_inited && p_enc->i_threads >= 1 )

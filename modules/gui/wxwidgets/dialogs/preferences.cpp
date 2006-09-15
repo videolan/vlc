@@ -1077,7 +1077,7 @@ void PrefsPanel::ApplyChanges()
         case CONFIG_ITEM_KEY:
             /* So you don't need to restart to have the changes take effect */
             val.i_int = control->GetIntValue();
-            var_Set( p_intf->p_vlc, control->GetName().mb_str(), val );
+            var_Set( p_intf->p_libvlc, control->GetName().mb_str(), val );
         case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_BOOL:
             config_PutInt( p_intf, control->GetName().mb_str(),

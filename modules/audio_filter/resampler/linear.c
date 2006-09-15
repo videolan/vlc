@@ -174,7 +174,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         return;
     }
 
-    p_aout->p_vlc->pf_memcpy( p_in, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+    p_aout->p_libvlc->pf_memcpy( p_in, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
 
     /* Take care of the previous input sample (if any) */
     if( !p_filter->b_continuity )

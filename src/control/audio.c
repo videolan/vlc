@@ -33,7 +33,7 @@
 void libvlc_audio_toggle_mute( libvlc_instance_t *p_instance,
                                libvlc_exception_t *p_e )
 {
-    aout_VolumeMute( p_instance->p_vlc, NULL );
+    aout_VolumeMute( p_instance->p_libvlc_int, NULL );
 }
 
 vlc_bool_t libvlc_audio_get_mute( libvlc_instance_t *p_instance,
@@ -60,12 +60,12 @@ void libvlc_audio_set_mute( libvlc_instance_t *p_instance, vlc_bool_t status,
         {
             return;
         }
-        aout_VolumeMute( p_instance->p_vlc, NULL );
+        aout_VolumeMute( p_instance->p_libvlc_int, NULL );
     }
     else
     {
         /* the aout_VolumeMute is a toggle function, so this is enough. */
-        aout_VolumeMute( p_instance->p_vlc, NULL );
+        aout_VolumeMute( p_instance->p_libvlc_int, NULL );
     }
 }
 
@@ -77,7 +77,7 @@ int libvlc_audio_get_volume( libvlc_instance_t *p_instance,
 {
     audio_volume_t i_volume;
 
-    aout_VolumeGet( p_instance->p_vlc, &i_volume );
+    aout_VolumeGet( p_instance->p_libvlc_int, &i_volume );
 
     return i_volume*200/AOUT_VOLUME_MAX;
 }
@@ -92,7 +92,7 @@ void libvlc_audio_set_volume( libvlc_instance_t *p_instance, int i_volume,
     if( i_volume >= 0 && i_volume <= 200 )
     {
         i_volume = i_volume * AOUT_VOLUME_MAX / 200;
-        aout_VolumeSet( p_instance->p_vlc, i_volume );
+        aout_VolumeSet( p_instance->p_libvlc_int, i_volume );
     }
     else
     {

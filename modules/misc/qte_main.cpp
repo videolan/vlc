@@ -86,9 +86,9 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t lockval;
 
     /* FIXME: put this in the module (de)initialization ASAP */
-    var_Create( p_this->p_libvlc, "qte", VLC_VAR_MUTEX );
+    var_Create( p_this->p_libvlc_global, "qte", VLC_VAR_MUTEX );
 
-    var_Get( p_this->p_libvlc, "qte", &lockval );
+    var_Get( p_this->p_libvlc_global, "qte", &lockval );
     vlc_mutex_lock( (vlc_mutex_t *) lockval.p_address );
 
     if( i_refcount > 0 )
@@ -109,7 +109,7 @@ static int Open( vlc_object_t *p_this )
         vlc_object_destroy( p_qte_main );
         i_refcount--;
         vlc_mutex_unlock( (vlc_mutex_t *) lockval.p_address );
-        var_Destroy( p_this->p_libvlc, "qte" );
+        var_Destroy( p_this->p_libvlc_global, "qte" );
         return VLC_ETHREAD;
     }
 
@@ -129,7 +129,7 @@ static void Close( vlc_object_t *p_this )
 {
     vlc_value_t lockval;
 
-    var_Get( p_this->p_libvlc, "qte", &lockval );
+    var_Get( p_this->p_libvlc_global, "qte", &lockval );
     vlc_mutex_lock( (vlc_mutex_t *) lockval.p_address );
 
     i_refcount--;
@@ -137,7 +137,7 @@ static void Close( vlc_object_t *p_this )
     if( i_refcount > 0 )
     {
         vlc_mutex_unlock( (vlc_mutex_t *) lockval.p_address );
-        var_Destroy( p_this->p_libvlc, "qte" );
+        var_Destroy( p_this->p_libvlc_global, "qte" );
         return;
     }
     p_qte_main->p_qte_application->quit();
@@ -153,7 +153,7 @@ static void Close( vlc_object_t *p_this )
     p_qte_main = NULL;
 
     vlc_mutex_unlock( (vlc_mutex_t *) lockval.p_address );
-    var_Destroy( p_this->p_libvlc, "qte" );
+    var_Destroy( p_this->p_libvlc_global, "qte" );
 }
 
 /*****************************************************************************

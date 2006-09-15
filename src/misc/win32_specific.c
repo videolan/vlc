@@ -72,7 +72,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 
     if( (psz_vlc = strrchr( psz_path, '\\' )) ) *psz_vlc = '\0';
 
-    p_this->p_libvlc->psz_vlcpath = strdup( psz_path );
+    p_this->p_libvlc_global->psz_vlcpath = strdup( psz_path );
 
     /* Set the default file-translation mode */
 #if !defined( UNDER_CE )
@@ -120,8 +120,8 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND, UINT, WPARAM, LPARAM );
 void system_Configure( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
 #if !defined( UNDER_CE )
-    p_this->p_libvlc->b_fast_mutex = config_GetInt( p_this, "fast-mutex" );
-    p_this->p_libvlc->i_win9x_cv = config_GetInt( p_this, "win9x-cv-method" );
+    p_this->p_libvlc_global->b_fast_mutex = config_GetInt( p_this, "fast-mutex" );
+    p_this->p_libvlc_global->i_win9x_cv = config_GetInt( p_this, "win9x-cv-method" );
 
     /* Raise default priority of the current process */
 #ifndef ABOVE_NORMAL_PRIORITY_CLASS
@@ -351,10 +351,10 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
  *****************************************************************************/
 void system_End( vlc_t *p_this )
 {
-    if( p_this && p_this->p_libvlc && p_this->p_libvlc->psz_vlcpath )
+    if( p_this && p_this->p_libvlc_global && p_this->p_libvlc_global->psz_vlcpath )
     {
-        free( p_this->p_libvlc->psz_vlcpath );
-        p_this->p_libvlc->psz_vlcpath = NULL;
+        free( p_this->p_libvlc_global->psz_vlcpath );
+        p_this->p_libvlc_global->psz_vlcpath = NULL;
     }
 
     WSACleanup();

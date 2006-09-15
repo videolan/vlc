@@ -151,18 +151,18 @@ static void Play( void * _p_aout, void * _p_buffer, size_t i_size,
 
     if( p_aout_buffer != NULL )
     {
-        p_aout->p_vlc->pf_memcpy( p_buffer, p_aout_buffer->p_buffer,
+        p_aout->p_libvlc->pf_memcpy( p_buffer, p_aout_buffer->p_buffer,
                                   MIN( i_size, p_aout_buffer->i_nb_bytes ) );
         if( p_aout_buffer->i_nb_bytes < i_size )
         {
-            p_aout->p_vlc->pf_memset( p_buffer + p_aout_buffer->i_nb_bytes,
+            p_aout->p_libvlc->pf_memset( p_buffer + p_aout_buffer->i_nb_bytes,
                                       0, i_size - p_aout_buffer->i_nb_bytes );
         }
         aout_BufferFree( p_aout_buffer );
     }
     else
     {
-        p_aout->p_vlc->pf_memset( p_buffer, 0, i_size );
+        p_aout->p_libvlc->pf_memset( p_buffer, 0, i_size );
     }
 }
 

@@ -322,7 +322,6 @@ static int Init( vout_thread_t *p_vout )
 static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = ( vout_thread_t * )p_this;
-    vlc_object_t *p_vlc;
     int i_index;
 
     vlc_object_release( p_vout->p_sys->p_input );
@@ -330,14 +329,7 @@ static void Destroy( vlc_object_t *p_this )
     var_Destroy( p_this, "snapshot-height" );
     var_Destroy( p_this, "snapshot-datasize" );
 
-    p_vlc = vlc_object_find( p_this, VLC_OBJECT_ROOT, FIND_PARENT );
-    if( p_vlc )
-    {
-        /* UnRegister the snapshot vout module at the root level */
-        /* var_Destroy (p_vlc, "snapshot-id"); */
-        var_Destroy( p_this->p_libvlc, "snapshot-id" );
-        vlc_object_release( p_vlc );
-    }
+    var_Destroy( p_this->p_libvlc_global, "snapshot-id" );
 
     for( i_index = 0 ; i_index < p_vout->p_sys->i_size ; i_index++ )
     {
@@ -378,9 +370,9 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 
     i_index = p_vout->p_sys->i_index;
 
-    p_vout->p_vlc->pf_memcpy( p_vout->p_sys->p_list[i_index]->p_data,
-                              p_pic->p->p_pixels,
-                              p_vout->p_sys->i_datasize );
+    p_vout->p_libvlc->pf_memcpy( p_vout->p_sys->p_list[i_index]->p_data,
+                                 p_pic->p->p_pixels,
+                                  p_vout->p_sys->i_datasize );
 
     i_date = snapshot_GetMovietime( p_vout );
 

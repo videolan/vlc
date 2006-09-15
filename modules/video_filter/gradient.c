@@ -341,18 +341,18 @@ static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
 
     if( p_filter->p_sys->b_cartoon )
     {
-        p_filter->p_vlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
+        p_filter->p_libvlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
             p_inpic->p[U_PLANE].p_pixels,
             p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        p_filter->p_vlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
+        p_filter->p_libvlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
             p_inpic->p[V_PLANE].p_pixels,
             p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
     }
     else
     {
-        p_filter->p_vlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
+        p_filter->p_libvlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
             p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        p_filter->p_vlc->pf_memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
+        p_filter->p_libvlc->pf_memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
             p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
     }
 
@@ -488,18 +488,18 @@ static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
 
     if( p_filter->p_sys->b_cartoon )
     {
-        p_filter->p_vlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
+        p_filter->p_libvlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
             p_inpic->p[U_PLANE].p_pixels,
             p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        p_filter->p_vlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
+        p_filter->p_libvlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
             p_inpic->p[V_PLANE].p_pixels,
             p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
     }
     else
     {
-        p_filter->p_vlc->pf_memset( p_outpic->p[Y_PLANE].p_pixels, 0xff,
+        p_filter->p_libvlc->pf_memset( p_outpic->p[Y_PLANE].p_pixels, 0xff,
               p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
-        p_filter->p_vlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
+        p_filter->p_libvlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
             p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
         memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
             p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
@@ -660,13 +660,13 @@ static void FilterHough( filter_t *p_filter, picture_t *p_inpic,
 
     memset( p_hough, 0, i_diag * i_nb_steps * sizeof(int) );
 
-    p_filter->p_vlc->pf_memcpy(
+    p_filter->p_libvlc->pf_memcpy(
         p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
         p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
-    p_filter->p_vlc->pf_memcpy(
+    p_filter->p_libvlc->pf_memcpy(
         p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
         p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-    p_filter->p_vlc->pf_memcpy(
+    p_filter->p_libvlc->pf_memcpy(
         p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
         p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
 

@@ -161,23 +161,23 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->p_style = malloc( sizeof( text_style_t ) );
     memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );
 
-    p_sys->i_xoff = var_CreateGetInteger( p_filter->p_libvlc , "marq-x" );
-    p_sys->i_yoff = var_CreateGetInteger( p_filter->p_libvlc , "marq-y" );
-    p_sys->i_timeout = var_CreateGetInteger( p_filter->p_libvlc , "marq-timeout" );
-    p_sys->i_pos = var_CreateGetInteger( p_filter->p_libvlc , "marq-position" );
-    p_sys->psz_marquee =  var_CreateGetString( p_filter->p_libvlc, "marq-marquee" );
-    p_sys->p_style->i_font_alpha = 255 - var_CreateGetInteger( p_filter->p_libvlc , "marq-opacity" );
-    p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter->p_libvlc , "marq-color" );
-    p_sys->p_style->i_font_size  = var_CreateGetInteger( p_filter->p_libvlc , "marq-size" );
+    p_sys->i_xoff = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-x" );
+    p_sys->i_yoff = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-y" );
+    p_sys->i_timeout = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-timeout" );
+    p_sys->i_pos = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-position" );
+    p_sys->psz_marquee =  var_CreateGetString( p_filter->p_libvlc_global, "marq-marquee" );
+    p_sys->p_style->i_font_alpha = 255 - var_CreateGetInteger( p_filter->p_libvlc_global , "marq-opacity" );
+    p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-color" );
+    p_sys->p_style->i_font_size  = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-size" );
 
-    var_AddCallback( p_filter->p_libvlc, "marq-x", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "marq-y", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "marq-marquee", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "marq-timeout", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "marq-position", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "marq-color", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "marq-opacity", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc, "marq-size", MarqueeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "marq-x", MarqueeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "marq-y", MarqueeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "marq-marquee", MarqueeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "marq-timeout", MarqueeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "marq-position", MarqueeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "marq-color", MarqueeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "marq-opacity", MarqueeCallback, p_sys );
+    var_AddCallback( p_filter->p_libvlc_global, "marq-size", MarqueeCallback, p_sys );
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
@@ -199,23 +199,23 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys );
 
     /* Delete the marquee variables */
-    var_DelCallback( p_filter->p_libvlc, "marq-x", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc, "marq-y", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc, "marq-marquee", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc, "marq-timeout", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc, "marq-position", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc, "marq-color", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc, "marq-opacity", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc, "marq-size", MarqueeCallback, p_sys );
+    var_DelCallback( p_filter->p_libvlc_global, "marq-x", MarqueeCallback, p_sys );
+    var_DelCallback( p_filter->p_libvlc_global, "marq-y", MarqueeCallback, p_sys );
+    var_DelCallback( p_filter->p_libvlc_global, "marq-marquee", MarqueeCallback, p_sys );
+    var_DelCallback( p_filter->p_libvlc_global, "marq-timeout", MarqueeCallback, p_sys );
+    var_DelCallback( p_filter->p_libvlc_global, "marq-position", MarqueeCallback, p_sys );
+    var_DelCallback( p_filter->p_libvlc_global, "marq-color", MarqueeCallback, p_sys );
+    var_DelCallback( p_filter->p_libvlc_global, "marq-opacity", MarqueeCallback, p_sys );
+    var_DelCallback( p_filter->p_libvlc_global, "marq-size", MarqueeCallback, p_sys );
 
-    var_Destroy( p_filter->p_libvlc , "marq-marquee" );
-    var_Destroy( p_filter->p_libvlc , "marq-x" );
-    var_Destroy( p_filter->p_libvlc , "marq-y" );
-    var_Destroy( p_filter->p_libvlc , "marq-timeout" );
-    var_Destroy( p_filter->p_libvlc , "marq-position" );
-    var_Destroy( p_filter->p_libvlc , "marq-color");
-    var_Destroy( p_filter->p_libvlc , "marq-opacity");
-    var_Destroy( p_filter->p_libvlc , "marq-size");
+    var_Destroy( p_filter->p_libvlc_global , "marq-marquee" );
+    var_Destroy( p_filter->p_libvlc_global , "marq-x" );
+    var_Destroy( p_filter->p_libvlc_global , "marq-y" );
+    var_Destroy( p_filter->p_libvlc_global , "marq-timeout" );
+    var_Destroy( p_filter->p_libvlc_global , "marq-position" );
+    var_Destroy( p_filter->p_libvlc_global , "marq-color");
+    var_Destroy( p_filter->p_libvlc_global , "marq-opacity");
+    var_Destroy( p_filter->p_libvlc_global , "marq-size");
 }
 
 /****************************************************************************

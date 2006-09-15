@@ -510,7 +510,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                 case MVLC_SHUTDOWN:
                 {
                     msg_Dbg( p_intf, "requested shutdown" );
-                    p_intf->p_vlc->b_die = VLC_TRUE;
+                    p_intf->p_libvlc->b_die = VLC_TRUE;
                     break;
                 }
                 /* vlm */

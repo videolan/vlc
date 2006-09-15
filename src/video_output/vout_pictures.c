@@ -920,7 +920,7 @@ void __vout_CopyPicture( vlc_object_t *p_this,
         if( p_src->p[i].i_pitch == p_dest->p[i].i_pitch )
         {
             /* There are margins, but with the same width : perfect ! */
-            p_this->p_vlc->pf_memcpy(
+            p_this->p_libvlc->pf_memcpy(
                          p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
                          p_src->p[i].i_pitch * p_src->p[i].i_visible_lines );
         }
@@ -933,7 +933,7 @@ void __vout_CopyPicture( vlc_object_t *p_this,
 
             for( i_line = p_src->p[i].i_visible_lines; i_line--; )
             {
-                p_this->p_vlc->pf_memcpy( p_out, p_in,
+                p_this->p_libvlc->pf_memcpy( p_out, p_in,
                                           p_src->p[i].i_visible_pitch );
                 p_in += p_src->p[i].i_pitch;
                 p_out += p_dest->p[i].i_pitch;
