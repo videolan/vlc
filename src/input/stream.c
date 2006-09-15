@@ -1655,7 +1655,7 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
     {
         p_block = p_access->pf_block( p_access );
         if( pb_eof ) *pb_eof = p_access->info.b_eof;
-        if( p_input &&  p_block && p_access->p_libvlc_global->b_stats )
+        if( p_input &&  p_block && p_access->p_libvlc->b_stats )
         {
             vlc_object_yield( p_input );
             vlc_mutex_lock( &p_input->counters.counters_lock );

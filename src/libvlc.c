@@ -714,10 +714,10 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         p_libvlc->pf_memset = memset;
     }
 
-    libvlc_global.b_stats = config_GetInt( p_libvlc, "stats" );
-    libvlc_global.i_timers = 0;
-    libvlc_global.pp_timers = NULL;
-    vlc_mutex_init( p_libvlc, &libvlc_global.timer_lock );
+    p_libvlc->b_stats = config_GetInt( p_libvlc, "stats" );
+    p_libvlc->i_timers = 0;
+    p_libvlc->pp_timers = NULL;
+    vlc_mutex_init( p_libvlc, &p_libvlc->timer_lock );
 
     /*
      * Initialize hotkey handling

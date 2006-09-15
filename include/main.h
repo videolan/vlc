@@ -47,13 +47,6 @@ struct libvlc_global_data_t
     msg_bank_t             msg_bank;    ///< The message bank
 
     module_bank_t *        p_module_bank; ///< The module bank
-
-    vlc_bool_t             b_stats;       ///< Should we collect stats
-    /* Timers handling */
-    vlc_mutex_t            timer_lock;    ///< Lock to protect timers
-    int                    i_timers;      ///< Number of timers
-    counter_t            **pp_timers;     ///< Array of all timers
-
     intf_thread_t         *p_probe;       ///< Devices prober
 
     /* Arch-specific variables */
@@ -98,8 +91,12 @@ struct libvlc_int_t
     void* ( *pf_memcpy ) ( void *, const void *, size_t );
     void* ( *pf_memset ) ( void *, int, size_t );
 
-    /* Shared data - these structures are accessed directly from p_vlc by
-     * several modules */
+    /* Statistics */
+    vlc_bool_t             b_stats;       ///< Should we collect stats
+    /* Timers handling */
+    vlc_mutex_t            timer_lock;    ///< Lock to protect timers
+    int                    i_timers;      ///< Number of timers
+    counter_t            **pp_timers;     ///< Array of all timers
 
     /* Locks */
     vlc_mutex_t            config_lock;          /* lock for the config file */
