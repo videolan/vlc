@@ -53,6 +53,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         msg_Err( p_parent, "out of memory" );
         return NULL;
     }
+    p_parent->p_libvlc->p_playlist = p_playlist;
 
     VariablesInit( p_playlist );
 
@@ -170,6 +171,7 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     vlc_mutex_destroy( &p_playlist->gc_lock );
     vlc_object_destroy( p_playlist->p_preparse );
+    vlc_object_detach( p_playlist );
     vlc_object_destroy( p_playlist );
 
 }

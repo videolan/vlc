@@ -57,12 +57,12 @@ static void DestroyInteraction( playlist_t * );
  * \param p_parent
  * \return an object with a started thread
  */
-playlist_t * __playlist_ThreadCreate( vlc_object_t *p_parent )
+void __playlist_ThreadCreate( vlc_object_t *p_parent )
 {
     playlist_t *p_playlist;
     p_playlist = CreatePlaylist( p_parent );
 
-    if( !p_playlist ) return NULL;
+    if( !p_playlist ) return;
 
     // Stats
     p_playlist->p_stats = (global_stats_t *)malloc( sizeof( global_stats_t ) );
@@ -78,7 +78,7 @@ playlist_t * __playlist_ThreadCreate( vlc_object_t *p_parent )
     {
         msg_Err( p_playlist, "unable to create preparser" );
         vlc_object_destroy( p_playlist );
-        return NULL;
+        return;
     }
     p_playlist->p_preparse->i_waiting = 0;
     p_playlist->p_preparse->pp_waiting = NULL;
@@ -90,7 +90,7 @@ playlist_t * __playlist_ThreadCreate( vlc_object_t *p_parent )
         msg_Err( p_playlist, "cannot spawn preparse thread" );
         vlc_object_detach( p_playlist->p_preparse );
         vlc_object_destroy( p_playlist->p_preparse );
-        return NULL;
+        return;
     }
 
     // Start the thread
@@ -99,13 +99,13 @@ playlist_t * __playlist_ThreadCreate( vlc_object_t *p_parent )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
         vlc_object_destroy( p_playlist );
-        return NULL;
+        return;
     }
 
     /* The object has been initialized, now attach it */
     vlc_object_attach( p_playlist, p_parent );
 
-    return p_playlist;
+    return;
 }
 
 /**

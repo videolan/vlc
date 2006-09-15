@@ -201,7 +201,7 @@ struct playlist_add_t
 
 /* Global thread */
 #define playlist_ThreadCreate(a) __playlist_ThreadCreate(VLC_OBJECT(a))
-playlist_t *__playlist_ThreadCreate   ( vlc_object_t * );
+void        __playlist_ThreadCreate   ( vlc_object_t * );
 int           playlist_ThreadDestroy  ( playlist_t * );
 
 /* Helpers */

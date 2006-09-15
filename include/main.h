@@ -80,28 +80,26 @@ struct libvlc_int_t
     VLC_COMMON_MEMBERS
 
     /* Global properties */
-    int                    i_argc;           /* command line arguments count */
-    char **                ppsz_argv;              /* command line arguments */
-    char *                 psz_homedir;           /* configuration directory */
-    char *                 psz_userdir;             /* user's home directory */
-    char *                 psz_configfile;        /* location of config file */
+    int                    i_argc;           ///< command line arguments count
+    char **                ppsz_argv;        ///< command line arguments
+    char *                 psz_homedir;      ///< configuration directory
+    char *                 psz_userdir;      ///< user's home directory
+    char *                 psz_configfile;   ///< location of config file
 
-    /* Fast memcpy plugin used */
-    module_t *             p_memcpy_module;
-    void* ( *pf_memcpy ) ( void *, const void *, size_t );
-    void* ( *pf_memset ) ( void *, int, size_t );
+    playlist_t            *p_playlist;       ///< playlist object
 
-    /* Statistics */
-    vlc_bool_t             b_stats;       ///< Should we collect stats
-    /* Timers handling */
+    module_t *             p_memcpy_module;  ///< Fast memcpy plugin used
+    void* ( *pf_memcpy ) ( void *, const void *, size_t ); ///< fast memcpy 
+    void* ( *pf_memset ) ( void *, int, size_t );          ///< fast memset
+
+    vlc_bool_t             b_stats;       ///< Should we collect stats ?
     vlc_mutex_t            timer_lock;    ///< Lock to protect timers
     int                    i_timers;      ///< Number of timers
     counter_t            **pp_timers;     ///< Array of all timers
 
-    /* Locks */
-    vlc_mutex_t            config_lock;          /* lock for the config file */
+    vlc_mutex_t            config_lock;    ///< Lock for the config file
 #ifdef __APPLE__
-    vlc_mutex_t            quicktime_lock;          /* QT is not thread safe on OSX */
+    vlc_mutex_t            quicktime_lock; ///< QT is not thread safe on OSX
 #endif
 
     /* Structure storing the action name / key associations */

@@ -56,9 +56,9 @@ playlist_item_t * playlist_ItemNewWithType( vlc_object_t *p_obj,
 playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
                                               input_item_t *p_input )
 {
-    /** FIXME !!!!! don't find playlist each time */
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_obj, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     DECMALLOC_NULL( p_item, playlist_item_t );
+    playlist_t *p_playlist = p_obj->p_libvlc->p_playlist;
+    vlc_object_yield( p_playlist );
 
     p_item->p_input = p_input;
     vlc_gc_incref( p_item->p_input );

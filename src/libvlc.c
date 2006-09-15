@@ -244,8 +244,8 @@ int VLC_Create( void )
         return VLC_EGENERIC;
     }
     p_libvlc->thread_id = 0;
-
-    p_libvlc->psz_object_name = "root";
+    p_libvlc->p_playlist = NULL;
+    p_libvlc->psz_object_name = "libvlc";
 
     /* Initialize mutexes */
     vlc_mutex_init( p_libvlc, &p_libvlc->config_lock );
@@ -262,6 +262,13 @@ int VLC_Create( void )
 
     return p_libvlc->i_object_id;
 }
+
+#define LIBVLC_FUNC \
+    libvlc_int_t * p_libvlc = vlc_current_object( i_object ); \
+    if( !p_libvlc ) return VLC_ENOOBJ;
+#define LIBVLC_FUNC_END \
+    if( i_object ) vlc_object_release( p_libvlc );
+
 
 /*****************************************************************************
  * VLC_Init: initialize a vlc_t structure.
@@ -290,16 +297,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     char *       psz_language;
 #endif
 #endif
-    libvlc_int_t * p_libvlc = vlc_current_object( i_object );
+    LIBVLC_FUNC;
 
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    /*
-     * System specific initialization code
-     */
+    /* System specific initialization code */
     system_Init( p_libvlc, &i_argc, ppsz_argv );
 
     /* Get the executable name (similar to the basename command) */
@@ -727,11 +727,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /* Do a copy (we don't need to modify the strings) */
     memcpy( p_libvlc->p_hotkeys, p_hotkeys, sizeof(p_hotkeys) );
 
-    /*
-     * Initialize playlist and get commandline files
-     */
-    p_playlist = playlist_ThreadCreate( p_libvlc );
-    if( !p_playlist )
+    /* Initialize playlist and get commandline files */
+    playlist_ThreadCreate( p_libvlc );
+    if( !p_libvlc->p_playlist )
     {
         msg_Err( p_libvlc, "playlist initialization failed" );
         if( p_libvlc->p_memcpy_module != NULL )
@@ -742,6 +740,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         if( i_object ) vlc_object_release( p_libvlc );
         return VLC_EGENERIC;
     }
+    p_playlist = p_libvlc->p_playlist;
 
     psz_modules = config_GetPsz( p_playlist, "services-discovery" );
     if( psz_modules && *psz_modules )
@@ -864,7 +863,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
     if ( val.psz_string != NULL ) free( val.psz_string );
 
-    if( i_object ) vlc_object_release( p_libvlc );
+    LIBVLC_FUNC_END;
     return VLC_SUCCESS;
 }
 
@@ -892,16 +891,9 @@ int VLC_AddIntf( int i_object, char const *psz_module,
  *****************************************************************************/
 int VLC_Die( int i_object )
 {
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
-
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
+    LIBVLC_FUNC;
     p_libvlc->b_die = VLC_TRUE;
-
-    if( i_object ) vlc_object_release( p_libvlc );
+    LIBVLC_FUNC_END;
     return VLC_SUCCESS;
 }
 
@@ -915,17 +907,10 @@ int VLC_CleanUp( int i_object )
     vout_thread_t      * p_vout;
     aout_instance_t    * p_aout;
     announce_handler_t * p_announce;
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
+    
+    LIBVLC_FUNC;
 
-    /* Check that the handle is valid */
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    /*
-     * Ask the interfaces to stop and destroy them
-     */
+    /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
     while( (p_intf = vlc_object_find( p_libvlc, VLC_OBJECT_INTF, FIND_CHILD )) )
     {
@@ -935,21 +920,11 @@ int VLC_CleanUp( int i_object )
         intf_Destroy( p_intf );
     }
 
-    /*
-     * Free playlist
-     */
-    msg_Dbg( p_libvlc, "removing playlist handler" );
-    while( (p_playlist = vlc_object_find( p_libvlc, VLC_OBJECT_PLAYLIST,
-                                          FIND_CHILD )) )
-    {
-        vlc_object_detach( p_playlist );
-        vlc_object_release( p_playlist );
-        playlist_ThreadDestroy( p_playlist );
-    }
+    /* Free playlist */
+    msg_Dbg( p_libvlc, "removing playlist" );
+    playlist_ThreadDestroy( p_libvlc->p_playlist );
 
-    /*
-     * Free video outputs
-     */
+    /* Free video outputs */
     msg_Dbg( p_libvlc, "removing all video outputs" );
     while( (p_vout = vlc_object_find( p_libvlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
     {
@@ -958,9 +933,7 @@ int VLC_CleanUp( int i_object )
         vout_Destroy( p_vout );
     }
 
-    /*
-     * Free audio outputs
-     */
+    /* Free audio outputs */
     msg_Dbg( p_libvlc, "removing all audio outputs" );
     while( (p_aout = vlc_object_find( p_libvlc, VLC_OBJECT_AOUT, FIND_CHILD )) )
     {
@@ -972,9 +945,7 @@ int VLC_CleanUp( int i_object )
     stats_TimersDumpAll( p_libvlc );
     stats_TimersClean( p_libvlc );
 
-    /*
-     * Free announce handler(s?)
-     */
+    /* Free announce handler(s?) */
     while( (p_announce = vlc_object_find( p_libvlc, VLC_OBJECT_ANNOUNCE,
                                                  FIND_CHILD ) ) )
     {
@@ -984,8 +955,7 @@ int VLC_CleanUp( int i_object )
         announce_HandlerDestroy( p_announce );
     }
 
-    if( i_object ) vlc_object_release( p_libvlc );
-    return VLC_SUCCESS;
+    LIBVLC_FUNC_END;
 }
 
 /*****************************************************************************
@@ -996,54 +966,24 @@ int VLC_CleanUp( int i_object )
  *****************************************************************************/
 int VLC_Destroy( int i_object )
 {
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
-
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    /*
-     * Free allocated memory
-     */
+    LIBVLC_FUNC;
+    
+    /* Free allocated memory */
     if( p_libvlc->p_memcpy_module )
     {
         module_Unneed( p_libvlc, p_libvlc->p_memcpy_module );
         p_libvlc->p_memcpy_module = NULL;
     }
 
-    /*
-     * Free module bank !
-     */
+    /* Free module bank !  */
     module_EndBank( p_libvlc );
 
-    if( p_libvlc->psz_homedir )
-    {
-        free( p_libvlc->psz_homedir );
-        p_libvlc->psz_homedir = NULL;
-    }
+    FREENULL( p_libvlc->psz_homedir );
+    FREENULL( p_libvlc->psz_userdir );
+    FREENULL( p_libvlc->psz_configfile );
+    FREENULL( p_libvlc->p_hotkeys );
 
-    if( p_libvlc->psz_userdir )
-    {
-        free( p_libvlc->psz_userdir );
-        p_libvlc->psz_userdir = NULL;
-    }
-
-    if( p_libvlc->psz_configfile )
-    {
-        free( p_libvlc->psz_configfile );
-        p_libvlc->psz_configfile = NULL;
-    }
-
-    if( p_libvlc->p_hotkeys )
-    {
-        free( p_libvlc->p_hotkeys );
-        p_libvlc->p_hotkeys = NULL;
-    }
-
-    /*
-     * System specific cleaning code
-     */
+    /* System specific cleaning code */
     system_End( p_libvlc );
 
     /*
@@ -1077,13 +1017,8 @@ int VLC_Destroy( int i_object )
  *****************************************************************************/
 int VLC_VariableSet( int i_object, char const *psz_var, vlc_value_t value )
 {
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
     int i_ret;
-
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
+    LIBVLC_FUNC;
 
     /* FIXME: Temporary hack for Mozilla, if variable starts with conf:: then
      * we handle it as a configuration variable. Don't tell Gildas :) -- sam */
@@ -1118,7 +1053,7 @@ int VLC_VariableSet( int i_object, char const *psz_var, vlc_value_t value )
 
     i_ret = var_Set( p_libvlc, psz_var, value );
 
-    if( i_object ) vlc_object_release( p_libvlc );
+    LIBVLC_FUNC_END;
     return i_ret;
 }
 
@@ -1127,17 +1062,10 @@ int VLC_VariableSet( int i_object, char const *psz_var, vlc_value_t value )
  *****************************************************************************/
 int VLC_VariableGet( int i_object, char const *psz_var, vlc_value_t *p_value )
 {
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
     int i_ret;
-
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
+    LIBVLC_FUNC;
     i_ret = var_Get( p_libvlc , psz_var, p_value );
-
-    if( i_object ) vlc_object_release( p_libvlc );
+    LIBVLC_FUNC_END;
     return i_ret;
 }
 
@@ -1147,13 +1075,7 @@ int VLC_VariableGet( int i_object, char const *psz_var, vlc_value_t *p_value )
 int VLC_VariableType( int i_object, char const *psz_var, int *pi_type )
 {
     int i_type;
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
-
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
+    LIBVLC_FUNC;
     /* FIXME: Temporary hack for Mozilla, if variable starts with conf:: then
      * we handle it as a configuration variable. Don't tell Gildas :) -- sam */
     if( !strncmp( psz_var, "conf::", 6 ) )
@@ -1187,7 +1109,7 @@ int VLC_VariableType( int i_object, char const *psz_var, int *pi_type )
     else
         i_type = VLC_VAR_TYPE & var_Type( p_libvlc , psz_var );
 
-    if( i_object ) vlc_object_release( p_libvlc );
+    LIBVLC_FUNC_END;
 
     if( i_type > 0 )
     {
@@ -1197,47 +1119,31 @@ int VLC_VariableType( int i_object, char const *psz_var, int *pi_type )
     return VLC_ENOVAR;
 }
 
+#define LIBVLC_PLAYLIST_FUNC \
+    libvlc_int_t *p_libvlc = vlc_current_object( i_object );\
+    if( !p_libvlc || !p_libvlc->p_playlist ) return VLC_ENOOBJ; \
+    vlc_object_yield( p_libvlc->p_playlist );
+
+#define LIBVLC_PLAYLIST_FUNC_END \
+    vlc_object_release( p_libvlc->p_playlist ); \
+    if( i_object ) vlc_object_release( p_libvlc );
+
 /*****************************************************************************
  * VLC_AddTarget: adds a target for playing.
  *****************************************************************************
- * This function adds psz_target to the current playlist. If a playlist does
- * not exist, it will create one.
+ * This function adds psz_target to the playlist
  *****************************************************************************/
+
 int VLC_AddTarget( int i_object, char const *psz_target,
                    char const **ppsz_options, int i_options,
                    int i_mode, int i_pos )
 {
     int i_err;
-    playlist_t *p_playlist;
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
-
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    p_playlist = vlc_object_find( p_libvlc, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( p_playlist == NULL )
-    {
-        msg_Dbg( p_libvlc, "no playlist present, creating one" );
-        p_playlist = playlist_ThreadCreate( p_libvlc );
-
-        if( p_playlist == NULL )
-        {
-            if( i_object ) vlc_object_release( p_libvlc );
-            return VLC_EGENERIC;
-        }
-
-        vlc_object_yield( p_playlist );
-    }
-
-    i_err = playlist_PlaylistAddExt( p_playlist, psz_target, psz_target,
-                             i_mode, i_pos, -1, ppsz_options, i_options);
-
-    vlc_object_release( p_playlist );
-
-    if( i_object ) vlc_object_release( p_libvlc );
+    LIBVLC_PLAYLIST_FUNC;
+    i_err = playlist_PlaylistAddExt( p_libvlc->p_playlist, psz_target,
+                                     psz_target,  i_mode, i_pos, -1,
+                                     ppsz_options, i_options );
+    LIBVLC_PLAYLIST_FUNC_END;
     return i_err;
 }
 
@@ -1246,27 +1152,9 @@ int VLC_AddTarget( int i_object, char const *psz_target,
  *****************************************************************************/
 int VLC_Play( int i_object )
 {
-    playlist_t * p_playlist;
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
-
-    /* Check that the handle is valid */
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    p_playlist = vlc_object_find( p_libvlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
-
-    if( !p_playlist )
-    {
-        if( i_object ) vlc_object_release( p_libvlc );
-        return VLC_ENOOBJ;
-    }
-
-    playlist_Play( p_playlist );
-    vlc_object_release( p_playlist );
-
-    if( i_object ) vlc_object_release( p_libvlc );
+    LIBVLC_PLAYLIST_FUNC;
+    playlist_Play( p_libvlc->p_playlist );
+    LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }
 
@@ -1275,27 +1163,9 @@ int VLC_Play( int i_object )
  *****************************************************************************/
 int VLC_Pause( int i_object )
 {
-    playlist_t * p_playlist;
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
-
-    /* Check that the handle is valid */
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    p_playlist = vlc_object_find( p_libvlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
-
-    if( !p_playlist )
-    {
-        if( i_object ) vlc_object_release( p_libvlc );
-        return VLC_ENOOBJ;
-    }
-
-    playlist_Pause( p_playlist );
-    vlc_object_release( p_playlist );
-
-    if( i_object ) vlc_object_release( p_libvlc );
+    LIBVLC_PLAYLIST_FUNC;
+    playlist_Pause( p_libvlc->p_playlist );
+    LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }
 
@@ -1304,27 +1174,9 @@ int VLC_Pause( int i_object )
  *****************************************************************************/
 int VLC_Stop( int i_object )
 {
-    playlist_t * p_playlist;
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
-
-    /* Check that the handle is valid */
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    p_playlist = vlc_object_find( p_libvlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
-
-    if( !p_playlist )
-    {
-        if( i_object ) vlc_object_release( p_libvlc );
-        return VLC_ENOOBJ;
-    }
-
-    playlist_Stop( p_playlist );
-    vlc_object_release( p_playlist );
-
-    if( i_object ) vlc_object_release( p_libvlc );
+    LIBVLC_PLAYLIST_FUNC;
+    playlist_Stop( p_libvlc->p_playlist );
+    LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }
 
@@ -1333,38 +1185,20 @@ int VLC_Stop( int i_object )
  *****************************************************************************/
 vlc_bool_t VLC_IsPlaying( int i_object )
 {
-    playlist_t * p_playlist;
     vlc_bool_t   b_playing;
 
-    libvlc_int_t *p_libvlc = vlc_current_object( i_object );
-
-    /* Check that the handle is valid */
-    if( !p_libvlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    p_playlist = vlc_object_find( p_libvlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
-
-    if( !p_playlist )
-    {
-        if( i_object ) vlc_object_release( p_libvlc );
-        return VLC_ENOOBJ;
-    }
-
-    if( p_playlist->p_input )
+    LIBVLC_PLAYLIST_FUNC;
+    if( p_libvlc->p_playlist->p_input )
     {
         vlc_value_t  val;
-        var_Get( p_playlist->p_input, "state", &val );
+        var_Get( p_libvlc->p_playlist->p_input, "state", &val );
         b_playing = ( val.i_int == PLAYING_S );
     }
     else
     {
-        b_playing = playlist_IsPlaying( p_playlist );
+        b_playing = playlist_IsPlaying( p_libvlc->p_playlist );
     }
-    vlc_object_release( p_playlist );
-
-    if( i_object ) vlc_object_release( p_libvlc );
+    LIBVLC_PLAYLIST_FUNC_END;
     return b_playing;
 }
 
