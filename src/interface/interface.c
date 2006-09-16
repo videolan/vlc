@@ -469,7 +469,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
 - (void)setVLC: (libvlc_int_t *) p_libvlc
 {
-    o_vlc = p_libvlc;
+    o_libvlc = p_libvlc;
 }
 
 - (void)stop: (id)sender
@@ -491,7 +491,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
 - (void)terminate: (id)sender
 {
-    o_vlc->b_die = VLC_TRUE;
+    o_libvlc->b_die = VLC_TRUE;
 }
 
 @end
