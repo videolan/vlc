@@ -154,6 +154,7 @@ static int Open( vlc_object_t *p_this, int i_type )
                                 0, NULL, -1 );
             break;
     }
+    vlc_input_item_AddOption( p_sys->p_input, "no-playlist-autostart" );
     p_sys->p_input->b_prefers_tree = VLC_TRUE;
     p_sys->p_node_cat = playlist_NodeAddInput( p_playlist, p_sys->p_input,
                            p_playlist->p_root_category,
@@ -198,39 +199,10 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( services_discovery_t *p_sd )
 {
-    services_discovery_sys_t *p_sys  = p_sd->p_sys;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
     int i_id = input_Read( p_sd, p_sys->p_input, VLC_FALSE );
-    int i_dialog_id;
-
-    i_dialog_id = intf_UserProgress( p_sd, "Shoutcast" , 
-                                     _("Connecting...") , 0.0, 0 );
-
-    p_sys->b_dialog = VLC_TRUE;
     while( !p_sd->b_die )
     {
-        input_thread_t *p_input = (input_thread_t *)vlc_object_get( p_sd,
-                                                                    i_id );
-
-        /* The Shoutcast server does not return a content-length so we
-         * can't know where we are. Use the number of inserted items
-         * as a hint */
-        if( p_input != NULL )
-        {
-            int i_state = var_GetInteger( p_input, "state" );
-            if( i_state == PLAYING_S )
-            {
-                float f_pos = (float)(p_sys->p_node_cat->i_children)* 2 *100.0 /
-                              260 /* gruiiik FIXME */;
-                intf_ProgressUpdate( p_sd, i_dialog_id, "Downloading",
-                                     f_pos, 0 );
-            }
-            vlc_object_release( p_input );
-        }
-        else if( p_sys->b_dialog )
-        {
-            p_sys->b_dialog  = VLC_FALSE;
-            intf_UserHide( p_sd, i_dialog_id );
-        }
-        msleep( 10000 );
+        msleep( 10*INTF_IDLE_SLEEP );
     }
 }
