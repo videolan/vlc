@@ -144,6 +144,9 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                int wait_ms, vlc_bool_t waitall )
 {
     size_t i_total = 0;
+    int eof[fdc];
+    unsigned int i_eof = 0;
+    memset( eof, 0, sizeof( eof ) );
 
     do
     {
@@ -158,6 +161,9 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
 
         if( i_buflen == 0 )
             return i_total; // output buffer full
+
+        if( i_eof == fdc )
+            return i_total; // all sockets are at EOF
 
         delay_ms = 500;
         if( (wait_ms != -1) && (wait_ms < 500) )
@@ -276,6 +282,14 @@ receive:
         p_buf += n;
         i_buflen -= n;
 
+        if( n ==  0 ) // EOF on socket
+        {
+            unsigned int j;
+            for( j = 0 ; j < i_eof ; j++ )
+                if( eof[j] == *fdv ) goto end;
+            eof[i_eof++] = *fdv;
+        }
+end:
         if( wait_ms == -1 )
         {
             if( !waitall )
