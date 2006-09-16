@@ -663,10 +663,15 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
         {
             if( i-1 < 0 )
             {
-                /* Was already the first sibling. Look for uncles */
-                PL_DEBUG( "Current item is the first of the node,"
+               /* Was already the first sibling. Look for uncles */
+                PL_DEBUG( "current item is the first of its node,"
                           "looking for uncle from %s",
                           p_parent->p_input->psz_name );
+                if( p_parent == p_root )
+                {
+                    PL_DEBUG( "already at root" );
+                    return NULL;
+                }
                 return GetPrevUncle( p_playlist, p_item, p_root );
             }
             else

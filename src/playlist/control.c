@@ -358,7 +358,7 @@ end:
     /* Start the real work */
     if( p_playlist->request.b_request )
     {
-        PL_DEBUG( "processing request node %s item %s skip %i",
+        PL_DEBUG( "processing request item %s node %s skip %i",
                         PLI_NAME( p_playlist->request.p_item ),
                         PLI_NAME( p_playlist->request.p_node ), i_skip );
         p_new = p_playlist->request.p_item;
