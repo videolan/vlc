@@ -845,7 +845,7 @@ then
       VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
       VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
     dnl older dbus
-    PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.30,
+    [ PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.30,
       [ AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30 ] )
         AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
         VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
@@ -857,7 +857,7 @@ then
           VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
          [AC_MSG_WARN(DBUS library not found)])
       ]
-    )
+   )]
   )
 fi
 
