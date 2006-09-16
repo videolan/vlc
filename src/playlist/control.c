@@ -273,11 +273,18 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
         return NULL;
     }
 
-    if( !p_playlist->request.b_request && p_playlist->status.p_item &&
-         p_playlist->status.p_item->i_flags & PLAYLIST_SKIP_FLAG )
+    if( !p_playlist->request.b_request && p_playlist->status.p_item )
     {
-        msg_Dbg( p_playlist, "blocking item, stopping") ;
-        return NULL;
+        playlist_item_t *p_parent = p_playlist->status.p_item;
+        while( p_parent )
+        {
+            if( p_parent->i_flags & PLAYLIST_SKIP_FLAG )
+            {
+                msg_Dbg( p_playlist, "blocking item, stopping") ;
+                return NULL;
+            }
+            p_parent = p_parent->p_parent;
+        }
     }
 
     /* Random case. This is an exception: if request, but request is skip +- 1
