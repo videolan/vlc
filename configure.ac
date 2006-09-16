@@ -41,6 +41,7 @@ AC_PROG_CC_C99
 AC_USE_SYSTEM_EXTENSIONS
 AM_PROG_CC_C_O
 AC_PROG_CXX
+AC_PROG_CPP
 AC_PROG_OBJC
 _AM_DEPENDENCIES([OBJC])
 AC_PROG_EGREP
@@ -113,6 +114,9 @@ dnl kludge because only the debian package provides a ffmpeg-config
     fi
     if test -z $with_cyberlink_tree; then
        with_cyberlink_tree=${topdir}/extras/contrib/src/clinkcc
+    fi
+    if test -z $with_libmpeg2_tree; then
+	with_libmpeg2_tree=${topdir}/extras/contrib/src/mpeg2dec
     fi
 
     if test ".`uname -s`" = ".Darwin"; then
