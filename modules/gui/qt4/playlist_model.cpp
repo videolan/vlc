@@ -470,7 +470,6 @@ void PLModel::ProcessItemRemoval( int i_id )
     if( i_id <= 0 ) return;
     if( i_id == i_cached_id ) i_cached_id = -1;
     i_cached_input_id = -1;
-
     PLItem *item = FindById( rootItem, i_id );
     if( item )
         item->remove( item );
@@ -745,7 +744,7 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                             vlc_value_t oval, vlc_value_t nval, void *param )
 {
     PLModel *p_model = (PLModel *) param;
-    p_model->b_need_update = VLC_TRUE;
+//    p_model->b_need_update = VLC_TRUE;
     return VLC_SUCCESS;
 }
 
@@ -787,8 +786,8 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
 
     if( ++p_model->i_items_to_append >= 50 )
     {
-        p_model->b_need_update = VLC_TRUE;
-        return VLC_SUCCESS;
+//        p_model->b_need_update = VLC_TRUE;
+//        return VLC_SUCCESS;
     }
     PLEvent *event = new PLEvent(  p_add );
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
