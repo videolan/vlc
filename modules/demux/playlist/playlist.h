@@ -70,13 +70,7 @@ void E_(Close_GVP) ( vlc_object_t * );
     vlc_bool_t b_play; \
     playlist_item_t *p_current, *p_item_in_category = NULL; \
     input_item_t *p_input; \
-    playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_demux, \
-                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE ); \
-    if( !p_playlist ) \
-    { \
-        msg_Err( p_demux, "can't find playlist" ); \
-        return VLC_EGENERIC; \
-    } \
+    playlist_t *p_playlist = pl_Yield( p_demux ); \
     i_parent_id = var_CreateGetInteger( p_demux, "parent-item" ); \
     if( i_parent_id > 0 ) \
     { \
