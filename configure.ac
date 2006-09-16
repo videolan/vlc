@@ -838,18 +838,26 @@ AC_ARG_ENABLE(dbus,
  
 if test "${enable_dbus}" != "no"
 then
-  PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.30,
-    [ AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the new D-BUS library API])
+  PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.92,
+    [ AC_DEFINE( HAVE_DBUS_2, 1, [Define if you have the D-BUS library API >= 0.92] )
+      AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30] )
       AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
       VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
-      VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],   
+      VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
     dnl older dbus
-    [ PKG_CHECK_MODULES( DBUS, dbus-1, 
-       [AC_DEFINE(HAVE_DBUS, 1, [Define if you have the D-BUS library])
+    PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.30,
+      [ AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30 ] )
+        AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
         VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
-        VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
-       [AC_MSG_WARN(DBUS library not found)])
-    ]
+        VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],   
+      dnl much older dbus
+      [ PKG_CHECK_MODULES( DBUS, dbus-1, 
+         [AC_DEFINE(HAVE_DBUS, 1, [Define if you have the D-BUS library])
+          VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
+          VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
+         [AC_MSG_WARN(DBUS library not found)])
+      ]
+    )
   )
 fi
 

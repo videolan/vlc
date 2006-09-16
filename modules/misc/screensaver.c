@@ -110,7 +110,11 @@ static void Deactivate( vlc_object_t *p_this )
 
     if( p_intf->p_sys->p_connection )
     {
+#  ifdef HAVE_DBUS_2
+        dbus_connection_close( p_intf->p_sys->p_connection );
+#  else
         dbus_connection_disconnect( p_intf->p_sys->p_connection );
+#  endif
     }
 
     if( p_intf->p_sys )
