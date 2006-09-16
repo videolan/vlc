@@ -276,6 +276,8 @@ void MainInterface::updateOnTimer()
 {
     if( p_intf->b_die )
     {
+        QApplication::closeAllWindows();
+        DialogsProvider::killInstance();
         QApplication::quit();
     }
     audio_volume_t i_volume;

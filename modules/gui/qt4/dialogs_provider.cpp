@@ -52,6 +52,11 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
              this, menuUpdateAction( QObject *) );
 }
 
+DialogsProvider::~DialogsProvider()
+{
+    PlaylistDialog::killInstance();
+}
+
 void DialogsProvider::customEvent( QEvent *event )
 {
     if( event->type() == DialogEvent_Type )

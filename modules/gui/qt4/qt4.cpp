@@ -145,7 +145,6 @@ static void Init( intf_thread_t *p_intf )
 
     app->setQuitOnLastWindowClosed( false );
     app->exec();
- //   fprintf( stderr, "Qt execution terminated\n" );
     MainInputManager::killInstance();
     delete p_intf->p_sys->p_mi;
 }

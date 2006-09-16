@@ -39,6 +39,7 @@ public:
         if( !instance) instance = new PlaylistDialog( p_intf );
         return instance;
     }
+    static void killInstance() { if( instance ) delete instance; }
     virtual ~PlaylistDialog();
 private:
 

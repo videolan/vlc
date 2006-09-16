@@ -52,7 +52,8 @@ public:
             instance = new DialogsProvider( p_intf );
         return instance;
     }
-    virtual ~DialogsProvider() {};
+    static void killInstance() { if( instance ) delete instance; }
+    virtual ~DialogsProvider();
     QTimer *fixed_timer;
 protected:
     friend class QVLCMenu;
