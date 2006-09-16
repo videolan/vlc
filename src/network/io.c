@@ -422,7 +422,7 @@ int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
             val = p_vs->pf_send (p_vs->p_sys, p_data, i_data);
         else
 #if defined(WIN32) || defined(UNDER_CE)
-            val = recv (fd, p_data, i_data, 0);
+            val = send (fd, p_data, i_data, 0);
 #else
             val = write (fd, p_data, i_data);
 #endif
