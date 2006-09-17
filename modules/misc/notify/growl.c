@@ -38,7 +38,6 @@
  *****************************************************************************/
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
-static void Run     ( intf_thread_t * );
 
 static int ItemChange( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
@@ -96,8 +95,6 @@ static int Open( vlc_object_t *p_this )
     pl_Release( p_intf );
 
     RegisterToGrowl( p_this );
-    p_intf->pf_run = Run;
-
     return VLC_SUCCESS;
 }
 
@@ -109,14 +106,6 @@ static void Close( vlc_object_t *p_this )
     playlist_t *p_playlist = pl_Yield( p_this );
     var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
     pl_Release( p_this );
-}
-
-/*****************************************************************************
- * Run
- *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
-{
-    msleep( INTF_IDLE_SLEEP );
 }
 
 /*****************************************************************************
