@@ -106,7 +106,7 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    MALLOC_ERR( p_intf->P_sys, intf_sys_t );
+    MALLOC_ERR( p_intf->p_sys, intf_sys_t );
 
     vlc_mutex_init( p_intf, &p_intf->p_sys->change_lock );
     p_intf->p_sys->i_size = 0;
