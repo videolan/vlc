@@ -76,6 +76,13 @@
 		CC1B4B4D09A8CF9E0078AD2E /* Interaction.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC1B4B4B09A8CF9E0078AD2E /* Interaction.nib */; };
 		CC26BF2C09A7A05000E94D62 /* Update.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC26BF2A09A7A05000E94D62 /* Update.nib */; };
 		CC3DC89C0A7CDB9600B53F32 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */; };
+		CC4ED9B30ABE07C800CA4CC5 /* add_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9AC0ABE07C800CA4CC5 /* add_embedded_blue.png */; };
+		CC4ED9B40ABE07C800CA4CC5 /* add_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */; };
+		CC4ED9B50ABE07C800CA4CC5 /* repeat_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9AE0ABE07C800CA4CC5 /* repeat_embedded_blue.png */; };
+		CC4ED9B60ABE07C800CA4CC5 /* repeat_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9AF0ABE07C800CA4CC5 /* repeat_embedded.png */; };
+		CC4ED9B70ABE07C800CA4CC5 /* repeat_single_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9B00ABE07C800CA4CC5 /* repeat_single_embedded_blue.png */; };
+		CC4ED9B80ABE07C800CA4CC5 /* shuffle_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9B10ABE07C800CA4CC5 /* shuffle_embedded_blue.png */; };
+		CC4ED9B90ABE07C800CA4CC5 /* shuffle_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9B20ABE07C800CA4CC5 /* shuffle_embedded.png */; };
 		CCF3C64C0923B99D00401862 /* SFilters.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF3C64A0923B99D00401862 /* SFilters.nib */; };
 		DC7F46ED08A183FC0027DB24 /* Extended.nib in Resources */ = {isa = PBXBuildFile; fileRef = DC7F46EB08A183FC0027DB24 /* Extended.nib */; };
 		DCA00AA9075F948800E6BF46 /* About.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCA00AA7075F948800E6BF46 /* About.nib */; };
@@ -943,6 +950,13 @@
 		CC26BF3109A7A08C00E94D62 /* update.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = update.h; path = ../../modules/gui/macosx/update.h; sourceTree = SOURCE_ROOT; };
 		CC26BF3209A7A08C00E94D62 /* update.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = update.m; path = ../../modules/gui/macosx/update.m; sourceTree = SOURCE_ROOT; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
+		CC4ED9AC0ABE07C800CA4CC5 /* add_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded_blue.png; path = Resources/add_embedded_blue.png; sourceTree = "<group>"; };
+		CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded.png; path = Resources/add_embedded.png; sourceTree = "<group>"; };
+		CC4ED9AE0ABE07C800CA4CC5 /* repeat_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat_embedded_blue.png; path = Resources/repeat_embedded_blue.png; sourceTree = "<group>"; };
+		CC4ED9AF0ABE07C800CA4CC5 /* repeat_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat_embedded.png; path = Resources/repeat_embedded.png; sourceTree = "<group>"; };
+		CC4ED9B00ABE07C800CA4CC5 /* repeat_single_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat_single_embedded_blue.png; path = Resources/repeat_single_embedded_blue.png; sourceTree = "<group>"; };
+		CC4ED9B10ABE07C800CA4CC5 /* shuffle_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffle_embedded_blue.png; path = Resources/shuffle_embedded_blue.png; sourceTree = "<group>"; };
+		CC4ED9B20ABE07C800CA4CC5 /* shuffle_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffle_embedded.png; path = Resources/shuffle_embedded.png; sourceTree = "<group>"; };
 		CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppleRemote.h; path = ../../modules/gui/macosx/AppleRemote.h; sourceTree = SOURCE_ROOT; };
 		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
 		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
@@ -1181,6 +1195,13 @@
 		8ECA7E520563CD9500DFC000 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				CC4ED9AC0ABE07C800CA4CC5 /* add_embedded_blue.png */,
+				CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */,
+				CC4ED9AE0ABE07C800CA4CC5 /* repeat_embedded_blue.png */,
+				CC4ED9AF0ABE07C800CA4CC5 /* repeat_embedded.png */,
+				CC4ED9B00ABE07C800CA4CC5 /* repeat_single_embedded_blue.png */,
+				CC4ED9B10ABE07C800CA4CC5 /* shuffle_embedded_blue.png */,
+				CC4ED9B20ABE07C800CA4CC5 /* shuffle_embedded.png */,
 				2A16E07E06C5074F00C87B09 /* equalizerdrawer_active.png */,
 				2A16E07F06C5074F00C87B09 /* equalizerdrawer_blue.png */,
 				8E93909A0565D6D300C7661C /* display_slider.png */,
@@ -1343,6 +1364,13 @@
 				CC26BF2C09A7A05000E94D62 /* Update.nib in Resources */,
 				CC1B4B4D09A8CF9E0078AD2E /* Interaction.nib in Resources */,
 				CC1AC1BC0A7BDA41002478C3 /* InteractionErrorPanel.nib in Resources */,
+				CC4ED9B30ABE07C800CA4CC5 /* add_embedded_blue.png in Resources */,
+				CC4ED9B40ABE07C800CA4CC5 /* add_embedded.png in Resources */,
+				CC4ED9B50ABE07C800CA4CC5 /* repeat_embedded_blue.png in Resources */,
+				CC4ED9B60ABE07C800CA4CC5 /* repeat_embedded.png in Resources */,
+				CC4ED9B70ABE07C800CA4CC5 /* repeat_single_embedded_blue.png in Resources */,
+				CC4ED9B80ABE07C800CA4CC5 /* shuffle_embedded_blue.png in Resources */,
+				CC4ED9B90ABE07C800CA4CC5 /* shuffle_embedded.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
