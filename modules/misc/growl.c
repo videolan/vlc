@@ -91,17 +91,9 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find(
-        p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( !p_playlist )
-    {
-        msg_Err( p_intf, "could not find playlist object" );
-        return VLC_ENOOBJ;
-    }
-
+    playlist_t *p_playlist = pl_Yield( p_intf );
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 
     RegisterToGrowl( p_this );
     p_intf->pf_run = Run;
@@ -114,14 +106,9 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find(
-        p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( p_playlist )
-    {
-        var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
-        vlc_object_release( p_playlist );
-    }
+    playlist_t *p_playlist = pl_Yield( p_this );
+    var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
+    pl_Release( p_this );
 }
 
 /*****************************************************************************

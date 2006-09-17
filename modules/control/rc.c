@@ -1321,16 +1321,9 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    playlist_t *p_playlist;
+    playlist_t *p_playlist = pl_Yield( p_this );
 
-    p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Err( p_this, "no playlist" );
-        return VLC_ENOOBJ;
-    }
-
+    PL_LOCK;
     if( p_playlist->p_input )
     {
         vlc_value_t val;
@@ -1339,9 +1332,11 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         {
             msg_rc( _("Type 'menu select' or 'pause' to continue.") );
             vlc_object_release( p_playlist );
+            PL_UNLOCK;
             return VLC_EGENERIC;
         }
     }
+    PL_UNLOCK;
 
     /* Parse commands that require a playlist */
     if( !strcmp( psz_cmd, "prev" ) )
@@ -1359,6 +1354,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if (!strcmp( psz_cmd, "goto" ) )
     {
+        msg_rc( _("goto is deprecated" ) );
         msg_Err( p_playlist, "goto is deprecated" );
     }
     else if( !strcmp( psz_cmd, "stop" ) )

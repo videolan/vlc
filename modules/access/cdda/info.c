@@ -930,14 +930,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 #endif
 
     if (! p_cdda->b_nav_mode ) {
-        p_playlist = (playlist_t *) vlc_object_find( p_access, 
-						     VLC_OBJECT_PLAYLIST,
-						     FIND_ANYWHERE );
-	if( !p_playlist )
-	  {
-	      msg_Warn( p_access, "can't find playlist" );
-	      return VLC_EGENERIC;
-	  }
+        p_playlist = pl_Yield( p_access );
     }
 
     if( b_single_track || p_cdda->b_nav_mode ) {

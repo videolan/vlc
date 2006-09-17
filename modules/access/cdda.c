@@ -186,10 +186,7 @@ static int Open( vlc_object_t *p_this )
 
    if( p_sys->i_track < 0 && i_mrl_tracknum <= 0 )
    {
-        p_playlist = (playlist_t *) vlc_object_find( p_access,
-                                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        if( !p_playlist ) return VLC_EGENERIC;
-
+        p_playlist = pl_Yield( p_access );
         if( p_playlist->status.p_item->p_input ==
              ((input_thread_t *)p_access->p_parent)->input.p_item )
             p_item = p_playlist->status.p_item;

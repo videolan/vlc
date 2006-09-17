@@ -47,6 +47,9 @@ struct intf_sys_t
 };
 
 #define THEPL p_intf->p_sys->p_playlist
+#define QPL_LOCK vlc_mutex_lock( &THEPL->object_lock );
+#define QPL_UNLOCK vlc_mutex_unlock( &THEPL->object_lock );
+
 #define THEDP DialogsProvider::getInstance()
 #define THEMIM MainInputManager::getInstance( NULL )
 

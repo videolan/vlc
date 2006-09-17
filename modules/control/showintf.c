@@ -123,17 +123,9 @@ static void RunIntf( intf_thread_t *p_intf )
         /* Notify the interfaces */
         if( p_intf->p_sys->b_triggered )
         {
-            playlist_t *p_playlist =
-                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                               FIND_ANYWHERE );
-
-            if( p_playlist != NULL )
-            {
-                vlc_value_t val;
-                val.b_bool = VLC_TRUE;
-                var_Set( p_playlist, "intf-show", val );
-                vlc_object_release( p_playlist );
-            }
+            playlist_t *p_playlist = pl_Yield( p_intf );
+            var_SetBool( p_playlist, "intf-show", VLC_TRUE );
+            vlc_object_release( p_playlist );
             p_intf->p_sys->b_triggered = VLC_FALSE;
         }
 

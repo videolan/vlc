@@ -108,16 +108,9 @@ int E_(MMSHOpen)( access_t *p_access )
     /* Handle redirection */
     if( psz_location && *psz_location )
     {
-        playlist_t * p_playlist = vlc_object_find( p_access, VLC_OBJECT_PLAYLIST, FIND_PARENT );
-
+        playlist_t * p_playlist = pl_Yield( p_access );
         msg_Dbg( p_access, "redirection to %s", psz_location );
 
-        if( !p_playlist )
-        {
-            msg_Err( p_access, "redirection failed: can't find playlist" );
-            free( psz_location );
-            return VLC_EGENERIC;
-        }
         /** \bug we do not autodelete here */
         playlist_PlaylistAdd( p_playlist, psz_location, psz_location,
                               PLAYLIST_INSERT | PLAYLIST_GO, PLAYLIST_END );

@@ -296,20 +296,8 @@ static int Open( vlc_object_t *p_this )
 #ifdef HAVE_AVAHI_CLIENT
     if( config_GetInt(p_this, SOUT_CFG_PREFIX "bonjour") )
     {
-        playlist_t          *p_playlist;
         char                *psz_txt, *psz_name;
-
-        p_playlist = (playlist_t *)vlc_object_find( p_access,
-                                                    VLC_OBJECT_PLAYLIST,
-                                                    FIND_ANYWHERE );
-        if( p_playlist == NULL )
-        {
-            msg_Err( p_access, "unable to find playlist" );
-            httpd_StreamDelete( p_sys->p_httpd_stream );
-            httpd_HostDelete( p_sys->p_httpd_host );
-            free( (void *)p_sys );
-            return VLC_EGENERIC;
-        }
+        playlist_t          *p_playlist = pl_Yield( p_access );
 
         psz_name = strrchr( p_playlist->status.p_item->p_input->psz_uri,
                             DIRECTORY_SEPARATOR );
@@ -321,13 +309,11 @@ static int Open( vlc_object_t *p_this )
         p_sys->p_bonjour = bonjour_start_service( (vlc_object_t *)p_access,
                                     strcmp( p_access->psz_access, "https" )
                                        ? "_vlc-http._tcp" : "_vlc-https._tcp",
-                                                  psz_name, i_bind_port, psz_txt );
+                                             psz_name, i_bind_port, psz_txt );
         free( (void *)psz_txt );
 
         if( p_sys->p_bonjour == NULL )
-        {
-            msg_Err( p_access, "Avahi stream announcing was requested, but no avahi service could be started" );
-        }
+            msg_Err( p_access, "unable to start requested Bonjour announce" );
         vlc_object_release( p_playlist );
     }
     else

@@ -71,14 +71,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys = (intf_sys_t *)malloc(sizeof( intf_sys_t ) );
     memset( p_intf->p_sys, 0, sizeof( intf_sys_t ) );
 
-    p_intf->p_sys->p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                            VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_intf->p_sys->p_playlist )
-    {
-        free( p_intf->p_sys );
-        return VLC_EGENERIC;
-    }
-
+    p_intf->p_sys->p_playlist = pl_Yield( p_intf );
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
 
     return VLC_SUCCESS;

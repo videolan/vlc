@@ -196,18 +196,14 @@ void MainInputManager::updateInput()
 
     if( !p_input )
     {
-        playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf,
-                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        assert( p_playlist );
-        PL_LOCK;
-        p_input = p_playlist->p_input;
+        QPL_LOCK;
+        p_input = THEPL->p_input;
         if( p_input )
         {
             vlc_object_yield( p_input );
             emit inputChanged( p_input );
         }
-        PL_UNLOCK;
-        vlc_object_release( p_playlist );
+        QPL_UNLOCK;
     }
     vlc_mutex_unlock( &p_intf->change_lock );
 }

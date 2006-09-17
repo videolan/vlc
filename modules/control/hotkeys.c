@@ -181,15 +181,11 @@ static void Run( intf_thread_t *p_intf )
         /* Update the input */
         if( p_intf->p_sys->p_input == NULL )
         {
-            p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-            if( p_playlist )
-            {
-                p_intf->p_sys->p_input = p_playlist->p_input;
-                if( p_intf->p_sys->p_input )
-                    vlc_object_yield( p_intf->p_sys->p_input );
-                vlc_object_release( p_playlist );
-            }
+            p_playlist = pl_Yield( p_intf );
+            p_intf->p_sys->p_input = p_playlist->p_input;
+            if( p_intf->p_sys->p_input )
+                vlc_object_yield( p_intf->p_sys->p_input );
+            vlc_object_release( p_playlist );
         }
         else if( p_intf->p_sys->p_input->b_dead )
         {
@@ -245,14 +241,6 @@ static void Run( intf_thread_t *p_intf )
 
         if( i_action == ACTIONID_QUIT )
         {
-            p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                    FIND_ANYWHERE );
-            if( p_playlist )
-            {
-                playlist_Stop( p_playlist );
-                vlc_object_release( p_playlist );
-            }
-            /* Playlist is stopped now kill vlc. */
             p_intf->p_libvlc->b_die = VLC_TRUE;
             ClearChannels( p_intf, p_vout );
             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );
@@ -291,13 +279,9 @@ static void Run( intf_thread_t *p_intf )
         else if( i_action == ACTIONID_INTF_SHOW )
         {
             val.b_bool = VLC_TRUE;
-            p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
-            if( p_playlist )
-            {
-                var_Set( p_playlist, "intf-show", val );
-                vlc_object_release( p_playlist );
-            }
+            p_playlist = pl_Yield( p_intf );
+            var_Set( p_playlist, "intf-show", val );
+            vlc_object_release( p_playlist );
         }
         else if( i_action == ACTIONID_INTF_HIDE )
         {

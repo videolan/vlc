@@ -323,16 +323,10 @@ connect:
             goto error;
         }
 
-        p_playlist = vlc_object_find( p_access, VLC_OBJECT_PLAYLIST,
-                                      FIND_ANYWHERE );
-        if( !p_playlist )
-        {
-            msg_Err( p_access, "redirection failed: can't find playlist" );
-            goto error;
-        }
-
         /* Change the URI */
-        vlc_mutex_lock( &p_playlist->object_lock );
+        p_playlist = pl_Yield( p_access );
+        PL_LOCK;
+
         p_input_item = p_playlist->status.p_item->p_input;
         vlc_mutex_lock( &p_input_item->lock );
         free( p_input_item->psz_uri );
@@ -340,8 +334,9 @@ connect:
         p_input_item->psz_uri = strdup( p_sys->psz_location );
         p_access->psz_path = strdup( p_sys->psz_location );
         vlc_mutex_unlock( &p_input_item->lock );
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
+
+        PL_UNLOCK;
+        pl_Release( p_access );
 
         /* Clean up current Open() run */
         vlc_UrlClean( &p_sys->url );
