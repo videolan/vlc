@@ -232,7 +232,7 @@ static inline int __var_SetInteger( vlc_object_t *p_obj, const char *psz_name, i
     val.i_int = i;
     return __var_Set( p_obj, psz_name, val );
 }
-
+#define var_SetInteger(a,b,c)   __var_SetInteger( VLC_OBJECT(a),b,c)
 /**
  * Set the value of an boolean variable
  *
@@ -301,11 +301,8 @@ static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
     val.b_bool = VLC_TRUE;
     return __var_Set( p_obj, psz_name, val );
 }
+#define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
 
-/**
- * __var_SetInteger() with automatic casting
- */
-#define var_SetInteger(a,b,c)   __var_SetInteger( VLC_OBJECT(a),b,c)
 /**
  * __var_SetBool() with automatic casting
  */
@@ -323,14 +320,10 @@ static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
  * __var_SetString() with automatic casting
  */
 #define var_SetString(a,b,c)     __var_SetString( VLC_OBJECT(a),b,c)
-/**
- * __var_SetVoid() with automatic casting
- */
-#define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
 
 /**
- * Get a integer value
- *
+ * Get an integer value
+*
  * \param p_obj The object that holds the variable
  * \param psz_name The name of the variable
  */
@@ -424,6 +417,31 @@ static inline char *__var_GetString( vlc_object_t *p_obj, const char *psz_name )
  */
 #define var_GetString(a,b)   __var_GetString( VLC_OBJECT(a),b)
 
+
+
+/**
+ * Increment an integer variable
+ * \param p_obj the object that holds the variable
+ * \param psz_name the name of the variable
+ */
+static inline void __var_IncInteger( vlc_object_t *p_obj, const char *psz_name )
+{
+    int i_val = __var_GetInteger( p_obj, psz_name );
+    __var_SetInteger( p_obj, psz_name, ++i_val );
+}
+#define var_IncInteger(a,b) __var_IncInteger( VLC_OBJECT(a), b )
+
+/**
+ * Decrement an integer variable
+ * \param p_obj the object that holds the variable
+ * \param psz_name the name of the variable
+ */
+static inline void __var_DecInteger( vlc_object_t *p_obj, const char *psz_name )
+{
+    int i_val = __var_GetInteger( p_obj, psz_name );
+    __var_SetInteger( p_obj, psz_name, --i_val );
+}
+#define var_DecInteger(a,b) __var_DecInteger( VLC_OBJECT(a), b )
 
 /**
  * Create a integer variable with inherit and get its value.
