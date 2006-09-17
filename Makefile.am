@@ -155,6 +155,13 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/vlc.scriptSuite \
 	extras/MacOSX/Resources/vlc.scriptTerminology \
 	extras/MacOSX/Resources/README \
+	extras/MacOSX/Resources/add_embedded.png \
+	extras/MacOSX/Resources/add_embedded_blue.png \
+	extras/MacOSX/Resources/repeat_embedded.png \
+	extras/MacOSX/Resources/repeat_embedded_blue.png \
+	extras/MacOSX/Resources/repeat_single_embedded_blue.png \
+	extras/MacOSX/Resources/shuffle_embedded.png \
+	extras/MacOSX/Resources/shuffle_embedded_blue.png \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
 	extras/MacOSX/Delete_Preferences.app/Contents/Info.plist \
 	extras/MacOSX/Delete_Preferences.app/Contents/PkgInfo \
