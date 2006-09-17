@@ -11,7 +11,6 @@ Playlist:
     * Audioscrobbler / last.fm support
 
 Decoders:
- * WMA Speech support (through binary codecs)
  * VP5/VP6 - Flash Video support
 
 Video output:
@@ -21,11 +20,10 @@ Video output:
 Interfaces:
  * Windows/Linux
    * Brand new interface for Linux and Windows, based on the Qt toolkit
- * OS X
-   * Support for Apple Remote control
-   * Right/ctrl-click menu in video outputs
  * All
    * Improved user interaction
+ * OS X
+   * Full Screen controller panel
 
 Changes between 0.8.5 and 0.8.6
 --------------------------------
@@ -50,9 +48,12 @@ Video output:
 Interfaces:
  * New hotkeys for crop and zoom
  * Systray support in skins (Windows only)
- * Support for Apple Remote control
  * Notifications using notification-daemon on Linux
  * Support for snapshots from the HTTP interface
+ * OS X
+   - Support for Apple Remote control
+   - Right/ctrl-click menu in video outputs
+   - Main Menu keeps accessible when playing in fullscreen mode
 
 Localization:
  * Add Czech
