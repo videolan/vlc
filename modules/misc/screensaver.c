@@ -142,7 +142,7 @@ static void Run( intf_thread_t *p_intf )
 
     while( !p_intf->b_die )
     {
-        msleep( 100000 );
+        msleep( INTF_IDLE_SLEEP*5 ); // 250ms
 
         /* Check screensaver every 30 seconds */
         if( ++i_lastcall > 300 )

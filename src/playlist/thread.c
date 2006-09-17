@@ -141,20 +141,10 @@ static void RunControlThread ( playlist_t *p_playlist )
 
         HandleInteraction( p_playlist );
         HandleStats( p_playlist, i_loops );
-
         HandlePlaylist( p_playlist );
 
-        msleep( INTF_IDLE_SLEEP / 2 );
-
-        /* Stop sleeping earlier if we have work */
-        /* TODO : statistics about this */
-        if ( p_playlist->request.b_request &&
-                        p_playlist->status.i_status == PLAYLIST_RUNNING )
-        {
-            continue;
-        }
-
-        msleep( INTF_IDLE_SLEEP / 2 );
+        /* 100 ms is an acceptable delay for playlist operations */
+        msleep( INTF_IDLE_SLEEP*2 );
     }
 
     EndPlaylist( p_playlist );
@@ -233,7 +223,7 @@ static void HandleInteraction( playlist_t *p_playlist )
  *****************************************************************************/
 static void HandleStats( playlist_t *p_playlist, int i_loops )
 {
-    if( i_loops %5 == 0 && p_playlist->p_stats )
+    if( i_loops % 5 == 0 && p_playlist->p_stats )
     {
         stats_ComputeGlobalStats( p_playlist, p_playlist->p_stats );
         if( p_playlist->p_input )
