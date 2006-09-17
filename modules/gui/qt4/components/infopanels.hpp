@@ -23,9 +23,16 @@
 
 #ifndef _INFOPANELS_H_
 #define _INFOPANELS_H_
+
 #include <vlc/vlc.h>
+#include <vlc_meta.h>
+
 #include <QWidget>
+
 #include "ui/input_stats.h"
+
+
+class QTreeWidget;
 
 class InputStatsPanel: public QWidget
 {
@@ -39,7 +46,38 @@ private:
 
 public slots:
     void Update( input_item_t * );
+    void Clear();
 };
 
+class MetaPanel: public QWidget
+{
+    Q_OBJECT;
+public:
+    MetaPanel( QWidget *, intf_thread_t * );
+    virtual ~MetaPanel();
+private:
+    intf_thread_t *p_intf;
+
+public slots:
+    void Update( input_item_t * );
+    void Clear();
+
+    char* GetURI();
+    char* GetName();
+};
+
+class InfoPanel: public QWidget
+{
+    Q_OBJECT;
+public:
+    InfoPanel( QWidget *, intf_thread_t * );
+    virtual ~InfoPanel();
+private:
+    intf_thread_t *p_intf;
+
+public slots:
+    void Update( input_item_t * );
+    void Clear();
+};
 
 #endif

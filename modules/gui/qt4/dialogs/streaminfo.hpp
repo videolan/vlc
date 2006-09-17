@@ -24,8 +24,30 @@
 #define _STREAMINFO_DIALOG_H_
 
 #include "util/qvlcframe.hpp"
+#include <QTabWidget>
+#include <QBoxLayout>
+
 
 class InputStatsPanel;
+class MetaPanel;
+class InfoPanel;
+
+class InfoTab: public QTabWidget
+{
+    Q_OBJECT;
+public:
+    InfoTab( QWidget *, intf_thread_t * );
+    virtual ~InfoTab();
+private:
+    intf_thread_t *p_intf;
+    input_thread_t *p_input;
+    InputStatsPanel *ISP;
+    MetaPanel *MP;
+    InfoPanel *IP;
+
+public slots:
+    void update();
+};
 
 class StreamInfoDialog : public QVLCFrame
 {
@@ -41,11 +63,12 @@ public:
 private:
     StreamInfoDialog( intf_thread_t *,  bool );
     input_thread_t *p_input;
-    InputStatsPanel *ISP;
+    InfoTab *IT;
     bool main_input;
     static StreamInfoDialog *instance;
 public slots:
     void update();
+    void close();
 };
 
 #endif

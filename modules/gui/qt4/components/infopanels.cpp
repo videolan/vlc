@@ -23,8 +23,9 @@
 
 #include "components/infopanels.hpp"
 #include "qt4.hpp"
-#include "ui/input_stats.h"
-#include <QWidget>
+
+#include <QTreeWidget>
+#include <QPushButton>
 
 InputStatsPanel::InputStatsPanel( QWidget *parent, intf_thread_t *_p_intf ) :
                                   QWidget( parent ), p_intf( _p_intf )
@@ -71,3 +72,49 @@ void InputStatsPanel::Update( input_item_t *p_item )
 
     vlc_mutex_unlock(& p_item->p_stats->lock );
 }
+
+void InputStatsPanel::Clear()
+{
+}
+
+MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
+                                    QWidget( parent ), p_intf( _p_intf )
+{
+
+}
+MetaPanel::~MetaPanel()
+{
+}
+void MetaPanel::Update( input_item_t *p_item)
+{
+}
+void MetaPanel::Clear()
+{
+}
+
+char* MetaPanel::GetURI()
+{
+    char *URI;
+    return URI;
+}
+
+char* MetaPanel::GetName()
+{
+    char *Name;
+    return Name;
+}
+
+InfoPanel::InfoPanel( QWidget *parent, intf_thread_t *_p_intf ) :
+                                      QWidget( parent ), p_intf( _p_intf )
+{
+}
+InfoPanel::~InfoPanel()
+{
+}
+void InfoPanel::Update( input_item_t *p_item)
+{
+}
+void InfoPanel::Clear()
+{
+}
+
