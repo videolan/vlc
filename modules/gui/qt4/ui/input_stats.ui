@@ -37,7 +37,7 @@
     <item row="0" column="1" >
      <widget class="QLabel" name="sent_text" >
       <property name="text" >
-       <string/>
+       <string>0</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -47,7 +47,7 @@
     <item row="2" column="1" >
      <widget class="QLabel" name="send_bitrate_text" >
       <property name="text" >
-       <string/>
+       <string>0 kb/s</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -57,7 +57,7 @@
     <item row="1" column="1" >
      <widget class="QLabel" name="sent_bytes_text" >
       <property name="text" >
-       <string/>
+       <string>0 kB</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -109,7 +109,7 @@
     <item row="2" column="1" >
      <widget class="QLabel" name="alost_text" >
       <property name="text" >
-       <string/>
+       <string>0</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -119,7 +119,7 @@
     <item row="1" column="1" >
      <widget class="QLabel" name="aplayed_text" >
       <property name="text" >
-       <string/>
+       <string>0</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -129,7 +129,7 @@
     <item row="0" column="1" >
      <widget class="QLabel" name="adecoded_text" >
       <property name="text" >
-       <string/>
+       <string>0</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -188,7 +188,7 @@
     <item row="2" column="1" >
      <widget class="QLabel" name="vlost_frames" >
       <property name="text" >
-       <string/>
+       <string>0</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -212,7 +212,7 @@
     <item row="0" column="1" >
      <widget class="QLabel" name="vdecoded_text" >
       <property name="text" >
-       <string/>
+       <string>0</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -222,7 +222,7 @@
     <item row="1" column="1" >
      <widget class="QLabel" name="vdisplayed_text" >
       <property name="text" >
-       <string/>
+       <string>0</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -253,7 +253,7 @@
     <item row="0" column="1" >
      <widget class="QLabel" name="read_text" >
       <property name="text" >
-       <string/>
+       <string>0</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -263,7 +263,7 @@
     <item row="3" column="1" >
      <widget class="QLabel" name="stream_bitrate_text" >
       <property name="text" >
-       <string/>
+       <string>0 kb/s</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -273,7 +273,7 @@
     <item row="1" column="1" >
      <widget class="QLabel" name="input_bitrate_text" >
       <property name="text" >
-       <string/>
+       <string>0 kb/s</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -311,7 +311,7 @@
     <item row="2" column="1" >
      <widget class="QLabel" name="demuxed_text" >
       <property name="text" >
-       <string/>
+       <string>0 kB</string>
       </property>
       <property name="alignment" >
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
