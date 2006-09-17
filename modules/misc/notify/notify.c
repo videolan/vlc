@@ -38,7 +38,6 @@
  *****************************************************************************/
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
-static void Run     ( intf_thread_t * );
 
 static int ItemChange( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
@@ -48,7 +47,6 @@ static int Notify( vlc_object_t *, const char * );
 /*****************************************************************************
  * Module descriptor
  ****************************************************************************/
-
 
 #define APPLICATION_NAME "VLC media player"
 
@@ -86,7 +84,6 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     pl_Release( p_intf );
 
-    p_intf->pf_run = Run;
     return VLC_SUCCESS;
 }
 
@@ -100,14 +97,6 @@ static void Close( vlc_object_t *p_this )
     pl_Release( p_this );
 
     notify_uninit();
-}
-
-/*****************************************************************************
- * Run
- *****************************************************************************/
-static void Run( intf_thread_t *p_this )
-{
-    msleep( 10*INTF_IDLE_SLEEP );
 }
 
 /*****************************************************************************

@@ -186,6 +186,11 @@ int intf_RunThread( intf_thread_t *p_intf )
     }
     else
     {
+        /* This interface doesn't need to be run */
+        if( !p_intf->pf_run )
+        {
+            return VLC_SUCCESS;
+        }
         /* Run the interface in a separate thread */
         if( !strcmp( p_intf->p_module->psz_object_name, "macosx" ) )
         {
@@ -226,6 +231,10 @@ int intf_RunThread( intf_thread_t *p_intf )
     }
     else
     {
+        /* This interface doesn't need to be run */
+        if( !p_intf->pf_run )
+            return VLC_SUCCESS;
+
         /* Run the interface in a separate thread */
         if( vlc_thread_create( p_intf, "interface", RunInterface,
                                VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
@@ -255,7 +264,8 @@ void intf_StopThread( intf_thread_t *p_intf )
     }
 
     /* Wait for the thread to exit */
-    vlc_thread_join( p_intf );
+    if( p_intf->pf_run )
+        vlc_thread_join( p_intf );
 }
 
 /**
