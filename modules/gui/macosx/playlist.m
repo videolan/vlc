@@ -42,14 +42,14 @@
 #include <sys/mount.h>
 #include <vlc_keys.h>
 
-#include "intf.h"
+#import "intf.h"
 #import "wizard.h"
 #import "bookmarks.h"
 #import "playlistinfo.h"
-#include "playlist.h"
-#include "controls.h"
-#include "vlc_osd.h"
-#include "misc.h"
+#import "playlist.h"
+#import "controls.h"
+#import "vlc_osd.h"
+#import "misc.h"
 #import <vlc_interaction.h>
 
 /*****************************************************************************
@@ -204,7 +204,7 @@ NSLog( @"%d children for %s", i_return, p_item->p_input->psz_name );
     if( o_value == nil )
     {
         o_value = [[NSValue valueWithPointer: p_return] retain];
-        msg_Err( VLCIntf, @"missing playlist item's pointer value" );
+        msg_Err( VLCIntf, "missing playlist item's pointer value" );
     }
     return o_value;
 }
@@ -428,14 +428,10 @@ NSLog( @"expandable" );
     [o_status_field setStringValue: [NSString stringWithFormat:
                         _NS("No items in the playlist")]];
 
-    [o_random_ckb setTitle: _NS("Random")];
 #if 0
     [o_search_button setTitle: _NS("Search")];
 #endif
     [o_search_field setToolTip: _NS("Search in Playlist")];
-    [[o_loop_popup itemAtIndex:0] setTitle: _NS("Standard Play")];
-    [[o_loop_popup itemAtIndex:1] setTitle: _NS("Repeat One")];
-    [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];
     [o_mi_addNode setTitle: _NS("Add Folder to Playlist")];
 
     [o_save_accessory_text setStringValue: _NS("File Format:")];
@@ -492,19 +488,18 @@ NSLog( @"expandable" );
     var_Get( p_playlist, "repeat", &val );
     if( val.b_bool == VLC_TRUE )
     {
-        [o_loop_popup selectItemAtIndex: 1];
+        [[[VLCMain sharedInstance] getControls] repeatOne];
    }
     else if( val2.b_bool == VLC_TRUE )
     {
-        [o_loop_popup selectItemAtIndex: 2];
+        [[[VLCMain sharedInstance] getControls] repeatAll];
     }
     else
     {
-        [o_loop_popup selectItemAtIndex: 0];
+        [[[VLCMain sharedInstance] getControls] repeatOff];
     }
 
-    var_Get( p_playlist, "random", &val );
-    [o_random_ckb setState: val.b_bool];
+    [[[VLCMain sharedInstance] getControls] shuffle];
 
     vlc_object_release( p_playlist );
 }
@@ -1072,7 +1067,7 @@ NSLog( @"expandable" );
     [self playlistUpdated];
     vlc_object_release( p_playlist );
 }
-
+/* FIXME!!
 - (IBAction)handlePopUp:(id)sender
 
 {
@@ -1114,7 +1109,7 @@ NSLog( @"expandable" );
      vlc_object_release( p_playlist );
      [self playlistUpdated];
 }
-
+*/
 - (NSMutableArray *)subSearchItem:(playlist_item_t *)p_item
 {
     playlist_t *p_playlist = pl_Yield( VLCIntf );

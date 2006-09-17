@@ -73,8 +73,6 @@
     IBOutlet id o_playlist_view;
     IBOutlet id o_status_field;
     IBOutlet id o_search_field;
-    IBOutlet id o_random_ckb;
-    IBOutlet id o_loop_popup;
     IBOutlet id o_mi_save_playlist;
     IBOutlet id o_ctx_menu;
 
@@ -118,7 +116,6 @@
 - (void)searchfieldChanged:(NSNotification *)o_notification;
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
 
-- (IBAction)handlePopUp:(id)sender;
 - (IBAction)searchItem:(id)sender;
 
 - (void)playlistUpdated;

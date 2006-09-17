@@ -31,10 +31,11 @@
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
 
-#include "intf.h"
-#include "vout.h"
-#include "open.h"
-#include "controls.h"
+#import "intf.h"
+#import "vout.h"
+#import "open.h"
+#import "controls.h"
+#import "playlist.h"
 #include <vlc_osd.h>
 
 
@@ -172,6 +173,108 @@
     p_intf->p_sys->b_intf_update = VLC_TRUE;
     vlc_object_release( p_playlist );
 }
+
+/* three little ugly helpers */
+- (void)repeatOne
+{
+    [o_btn_repeat setImage: [[NSImage alloc] initWithContentsOfFile:
+    [[NSBundle mainBundle] pathForImageResource:@"repeat_single_embedded_blue.png"]]];
+    [o_btn_repeat setAlternateImage: [[NSImage alloc] initWithContentsOfFile:
+        [[NSBundle mainBundle] pathForImageResource:@"repeat_embedded_blue.png"]]];
+}
+- (void)repeatAll
+{
+    [o_btn_repeat setImage: [[NSImage alloc] initWithContentsOfFile:
+        [[NSBundle mainBundle] pathForImageResource:@"repeat_embedded_blue.png"]]];
+    [o_btn_repeat setAlternateImage: [[NSImage alloc] initWithContentsOfFile:
+        [[NSBundle mainBundle] pathForImageResource:@"repeat_embedded.png"]]];
+}
+- (void)repeatOff
+{
+    [o_btn_repeat setImage: [[NSImage alloc] initWithContentsOfFile:
+        [[NSBundle mainBundle] pathForImageResource:@"repeat_embedded.png"]]];
+    [o_btn_repeat setAlternateImage: [[NSImage alloc] initWithContentsOfFile:
+    [[NSBundle mainBundle] pathForImageResource:@"repeat_single_embedded_blue.png"]]];
+}
+- (void)shuffle
+{
+    vlc_value_t val;
+    playlist_t *p_playlist = pl_Yield( VLCIntf );
+    var_Get( p_playlist, "random", &val );
+    [o_btn_shuffle setState: val.b_bool];
+    vlc_object_release( p_playlist );
+}
+
+- (IBAction)repeatButtonAction:(id)sender
+{
+    vlc_value_t looping,repeating;
+    intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = pl_Yield( p_intf );
+
+    var_Get( p_playlist, "repeat", &repeating );
+    var_Get( p_playlist, "loop", &looping );
+
+    [[o_btn_repeat image] release];
+    [[o_btn_repeat alternateImage] release];
+
+    if( !repeating.b_bool && !looping.b_bool )
+    {
+        /* was: no repeating at all, switching to Repeat One */
+        
+        /* set our button's look */
+        [self repeatOne];
+        
+        /* prepare core communication */
+        repeating.b_bool = VLC_TRUE;
+        looping.b_bool = VLC_FALSE;
+        config_PutInt( p_playlist, "repeat", 1 );
+        config_PutInt( p_playlist, "loop", 0 ); 
+        
+        /* show the change */
+        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat One" ) );
+    }
+    else if( repeating.b_bool && !looping.b_bool )
+    {
+        /* was: Repeat One, switching to Repeat All */
+        
+        /* set our button's look */
+        [self repeatAll];
+        
+        /* prepare core communication */
+        repeating.b_bool = VLC_FALSE;
+        looping.b_bool = VLC_TRUE;
+        config_PutInt( p_playlist, "repeat", 0 ); 
+        config_PutInt( p_playlist, "loop", 1 ); 
+        
+        /* show the change */
+        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat All" ) );
+    }
+    else
+    {
+        /* was: Repeat All or bug in VLC, switching to Repeat Off */
+        
+        /* set our button's look */
+        [self repeatOff];
+        
+        /* prepare core communication */
+        repeating.b_bool = VLC_FALSE;
+        looping.b_bool = VLC_FALSE;
+        config_PutInt( p_playlist, "repeat", 0 ); 
+        config_PutInt( p_playlist, "loop", 0 ); 
+        
+        /* show the change */
+        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat Off" ) );
+    }
+
+    /* communicate with core and the main intf loop */
+    var_Set( p_playlist, "repeat", repeating );
+    var_Set( p_playlist, "loop", looping );    
+    p_intf->p_sys->b_playmode_update = VLC_TRUE;
+    p_intf->p_sys->b_intf_update = VLC_TRUE;
+
+    vlc_object_release( p_playlist );
+}
+
 
 - (IBAction)repeat:(id)sender
 {

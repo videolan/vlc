@@ -477,8 +477,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback( p_intf, "interaction", InteractCallback, self );
     p_intf->b_interaction = VLC_TRUE;
 
-    // First we setup the blue selection box - another window that will be attached as a child window
-    // to this one, and will be moved by timers as needed.
+    /* update the playmode stuff */
+    p_intf->p_sys->b_playmode_update = VLC_TRUE;
 
     nib_main_loaded = TRUE;
 }
@@ -916,7 +916,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (id)getPlaylist
 {
-    return o_playlist;
+    if( o_playlist )
+        return o_playlist;
+    return nil;
 }
 
 - (id)getInfo

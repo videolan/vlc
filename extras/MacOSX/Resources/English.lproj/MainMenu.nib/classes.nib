@@ -22,6 +22,7 @@
                 prev = id; 
                 random = id; 
                 repeat = id; 
+                repeatButtonAction = id; 
                 slower = id; 
                 stop = id; 
                 toggleVar = id; 
@@ -33,6 +34,9 @@
             CLASS = VLCControls; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                "o_btn_addNode" = id; 
+                "o_btn_repeat" = id; 
+                "o_btn_shuffle" = id; 
                 "o_fs_panel" = id; 
                 "o_main" = id; 
                 "o_specificTime_cancel_btn" = id; 
@@ -352,7 +356,6 @@
             ACTIONS = {
                 addNode = id; 
                 deleteItem = id; 
-                handlePopUp = id; 
                 playItem = id; 
                 preparseItem = id; 
                 recursiveExpandNode = id; 

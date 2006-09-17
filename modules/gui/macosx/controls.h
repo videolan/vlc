@@ -1,7 +1,7 @@
 /*****************************************************************************
  * controls.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -34,6 +34,10 @@
 
     IBOutlet id o_btn_fullscreen;
     IBOutlet id o_volumeslider;
+    
+    IBOutlet id o_btn_shuffle;
+    IBOutlet id o_btn_addNode;
+    IBOutlet id o_btn_repeat;
 
     IBOutlet id o_specificTime_cancel_btn;
     IBOutlet id o_specificTime_enter_fld;
@@ -57,6 +61,13 @@
 - (IBAction)random:(id)sender;
 - (IBAction)repeat:(id)sender;
 - (IBAction)loop:(id)sender;
+- (IBAction)repeatButtonAction:(id)sender;
+
+/* the three ugly helpers again */
+- (void)repeatOne;
+- (void)repeatAll;
+- (void)repeatOff;
+- (void)shuffle;
 
 - (IBAction)forward:(id)sender;
 - (IBAction)backward:(id)sender;
