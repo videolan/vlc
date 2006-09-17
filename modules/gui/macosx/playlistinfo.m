@@ -135,15 +135,11 @@
     else
     {
         intf_thread_t * p_intf = VLCIntf;
-        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( p_intf );
 
-        if( p_playlist )
-        {
-            p_item = p_playlist->status.p_item;
-            vlc_object_release( p_playlist );
-        }
-
+        p_item = p_playlist->status.p_item;
+        vlc_object_release( p_playlist );
+        
         [self initPanel:sender];
     }
 }
@@ -173,14 +169,10 @@
 {
     /* make sure that we got the current item and not an outdated one */
     intf_thread_t * p_intf = VLCIntf;
-        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( p_intf );
 
-    if( p_playlist )
-    {
-        p_item = p_playlist->status.p_item;
-        vlc_object_release( p_playlist );
-    }
+    p_item = p_playlist->status.p_item;
+    vlc_object_release( p_playlist );
 
     /* check whether our item is valid, because we would crash if not */
     if(! [self isItemInPlaylist: p_item] ) return;
@@ -287,8 +279,7 @@
 - (IBAction)infoOk:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     vlc_value_t val;
 
     if( [self isItemInPlaylist: p_item] )
@@ -316,14 +307,8 @@
 - (BOOL)isItemInPlaylist:(playlist_item_t *)p_local_item
 {
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
     int i;
-
-    if( p_playlist == NULL )
-    {
-        return NO;
-    }
 
     for( i = 0 ; i < p_playlist->i_all_size ; i++ )
     {
@@ -430,7 +415,8 @@ static VLCInfoTreeItem *o_root_item = nil;
 }
 
 + (VLCInfoTreeItem *)rootItem {
-    if (o_root_item == nil) o_root_item = [[VLCInfoTreeItem alloc] initWithName:@"main" value: @"" ID: 0 parent:nil];
+    if( o_root_item == nil )
+        o_root_item = [[VLCInfoTreeItem alloc] initWithName:@"main" value: @"" ID: 0 parent:nil];
     return o_root_item;
 }
 

@@ -87,12 +87,7 @@
 
 - (BOOL)windowShouldClose:(id)sender
 {
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return NO;
-    }
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
 
     playlist_Stop( p_playlist );
     vlc_object_release( p_playlist );

@@ -369,8 +369,7 @@ static VLCExtended *_o_sharedInstance = nil;
     id o_window = [NSApp keyWindow];
     NSArray *o_windows = [NSApp orderedWindows];
     NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-        FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     vout_thread_t *p_real_vout;
 
@@ -848,8 +847,7 @@ static VLCExtended *_o_sharedInstance = nil;
 {    
     /* save the preferences to make sure that our module-changes will up on
      * next launch again */
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-        FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
     int returnedValue;
     NSArray * theModules;
     theModules = [[NSArray alloc] initWithObjects: @"main", @"headphone",

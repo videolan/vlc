@@ -456,25 +456,22 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     o_size_with_playlist = [o_window frame].size;
 
-    p_playlist = (playlist_t *) vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    p_playlist = pl_Yield( p_intf );
 
-    if( p_playlist )
+    /* Check if we need to start playing */
+    if( p_intf->b_play )
     {
-        /* Check if we need to start playing */
-        if( p_intf->b_play )
-        {
-            playlist_LockControl( p_playlist, PLAYLIST_AUTOPLAY );
-        }
-        var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
-        val.b_bool = VLC_FALSE;
-
-        var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
-        var_AddCallback( p_playlist, "intf-show", ShowController, self);
-
-        [o_embedded_window setFullscreen: var_GetBool( p_playlist,
-                                                            "fullscreen" )];
-        vlc_object_release( p_playlist );
+        playlist_LockControl( p_playlist, PLAYLIST_AUTOPLAY );
     }
+    var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    val.b_bool = VLC_FALSE;
+
+    var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
+    var_AddCallback( p_playlist, "intf-show", ShowController, self);
+
+    [o_embedded_window setFullscreen: var_GetBool( p_playlist,
+                                                        "fullscreen" )];
+    vlc_object_release( p_playlist );
     
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, self );
@@ -741,7 +738,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         case kRemoteButtonVolume_Plus:
             /* there are two events when the plus or minus button is pressed
                one when the button is pressed down and one when the button is released */
-            if (pressedDown)
+            if( pressedDown )
             {
                 [o_controls volumeUp: self];
             }
@@ -749,7 +746,8 @@ static VLCMain *_o_sharedMainInstance = nil;
         case kRemoteButtonVolume_Minus:
             /* there are two events when the plus or minus button is pressed
                one when the button is pressed down and one when the button is released */
-            if (pressedDown) {
+            if( pressedDown )
+            {
                 [o_controls volumeDown: self];
             }
             break;
@@ -763,7 +761,8 @@ static VLCMain *_o_sharedMainInstance = nil;
         case kRemoteButtonLeft_Hold:
             /* simulate an event as long as the user holds the button */
             b_left_right_remote_button_hold = pressedDown;
-            if (pressedDown) {                
+            if( pressedDown )
+            {                
                 NSNumber* buttonIdentifierNumber = [NSNumber numberWithInt: buttonIdentifier];	
                 [self performSelector:@selector(triggerMovieStepForRemoteButton:) 
                            withObject:buttonIdentifierNumber];
@@ -917,11 +916,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (id)getPlaylist
 {
-    if ( o_playlist )
-    {
-        return o_playlist;
-    }
-    return nil;
+    return o_playlist;
 }
 
 - (id)getInfo
@@ -999,19 +994,15 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 
-    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                              FIND_ANYWHERE );
+    p_playlist = pl_Yield( p_intf );
 
-    if( p_playlist != NULL )
-    {
-        var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
-        var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
-        var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );
-        var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, self );
-        var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
 
-        vlc_object_release( p_playlist );
-    }
+    vlc_object_release( p_playlist );
 
     while( !p_intf->b_die )
     {
@@ -1073,8 +1064,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         vlc_bool_t b_seekable = VLC_FALSE;
         vlc_bool_t b_chapters = VLC_FALSE;
 
-        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                   FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( p_intf );
         b_plmul = p_playlist->i_size > 1;
 
         vlc_object_release( p_playlist );
@@ -1122,8 +1112,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if( p_intf->p_sys->b_fullscreen_update )
     {
-        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                   FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( p_intf );
         var_Get( p_playlist, "fullscreen", &val );
         [o_embedded_window setFullscreen: val.b_bool];
         vlc_object_release( p_playlist );
@@ -1146,11 +1135,11 @@ static VLCMain *_o_sharedMainInstance = nil;
         {
             NSString *o_temp;
             vout_thread_t *p_vout;
-            playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+            playlist_t * p_playlist = pl_Yield( p_intf );
 
-            if( p_playlist == NULL || p_playlist->status.p_item == NULL )
+            if( p_playlist->status.p_item == NULL )
             {
+                vlc_object_release( p_playlist );
                 return;
             }
             o_temp = [NSString stringWithUTF8String:
@@ -1344,12 +1333,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( p_intf->p_sys->p_input && !p_intf->p_sys->p_input->b_die )
     {
         NSString *o_temp;
-        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                   FIND_ANYWHERE );
-        if( p_playlist == NULL )
-        {
-            return;
-        }
+        playlist_t * p_playlist = pl_Yield( p_intf );
+
         o_temp = [NSString stringWithUTF8String:
                   p_playlist->status.p_item->p_input->psz_name];
         if( o_temp == NULL )
@@ -1536,12 +1521,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 #undef p_input
 
     /* Stop playback */
-    if( ( p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                        FIND_ANYWHERE ) ) )
-    {
-        playlist_Stop( p_playlist );
-        vlc_object_release( p_playlist );
-    }
+    p_playlist = pl_Yield( p_intf );
+    playlist_Stop( p_playlist );
+    vlc_object_release( p_playlist );
 
     /* FIXME - Wait here until all vouts are terminated because
        libvlc's VLC_CleanUp destroys interfaces before vouts, which isn't
@@ -1647,7 +1629,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)intfOpenFile:(id)sender
 {
-    if (!nib_open_loaded)
+    if ( !nib_open_loaded )
     {
         nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
         [o_open awakeFromNib];
@@ -1659,7 +1641,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)intfOpenFileGeneric:(id)sender
 {
-    if (!nib_open_loaded)
+    if ( !nib_open_loaded )
     {
         nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
         [o_open awakeFromNib];
@@ -1671,7 +1653,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)intfOpenDisc:(id)sender
 {
-    if (!nib_open_loaded)
+    if ( !nib_open_loaded )
     {
         nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
         [o_open awakeFromNib];
@@ -1683,7 +1665,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)intfOpenNet:(id)sender
 {
-    if (!nib_open_loaded)
+    if ( !nib_open_loaded )
     {
         nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
         [o_open awakeFromNib];
@@ -1695,7 +1677,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)showWizard:(id)sender
 {
-    if (!nib_wizard_loaded)
+    if ( !nib_wizard_loaded )
     {
         nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
         [o_wizard initStrings];
@@ -1713,7 +1695,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         o_extended = [[VLCExtended alloc] init];
     }
-    if (!nib_extended_loaded)
+    if ( !nib_extended_loaded )
     {
         nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner:self];
         [o_extended initStrings];
@@ -1729,7 +1711,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         o_sfilters = [[VLCsFilters alloc] init];
     }
-    if (!nib_sfilters_loaded)
+    if ( !nib_sfilters_loaded )
     {
         nib_sfilters_loaded = [NSBundle loadNibNamed:@"SFilters" owner:self];
         [o_sfilters initStrings];
@@ -1742,13 +1724,13 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (IBAction)showBookmarks:(id)sender
 {
     /* we need the wizard-nib for the bookmarks's extract functionality */
-    if (!nib_wizard_loaded)
+    if ( !nib_wizard_loaded )
     {
         nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
         [o_wizard initStrings];
     }
     
-    if (!nib_bookmarks_loaded)
+    if ( !nib_bookmarks_loaded )
     {
         nib_bookmarks_loaded = [NSBundle loadNibNamed:@"Bookmarks" owner:self];
         [o_bookmarks showBookmarks];
@@ -1759,7 +1741,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)viewAbout:(id)sender
 {
-    if (!nib_about_loaded)
+    if ( !nib_about_loaded )
     {
         nib_about_loaded = [NSBundle loadNibNamed:@"About" owner:self];
         [o_about showPanel];
@@ -1778,7 +1760,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)checkForUpdate:(id)sender
 {
-    if (!nib_update_loaded)
+    if ( !nib_update_loaded )
     {
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
         [o_update showUpdateWindow];

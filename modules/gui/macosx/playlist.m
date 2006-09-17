@@ -114,8 +114,7 @@
 }
 - (void)awakeFromNib
 {
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
     [o_outline_view setTarget: self];
     [o_outline_view setDelegate: self];
     [o_outline_view setDataSource: self];
@@ -151,10 +150,7 @@
 {
     int i_return = 0;
     playlist_item_t *p_item = NULL;
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-        return 0;
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
     if( outlineView != o_outline_view )
     {
         vlc_object_release( p_playlist );
@@ -185,11 +181,7 @@ NSLog( @"%d children for %s", i_return, p_item->p_input->psz_name );
 {
     playlist_item_t *p_return = NULL, *p_item = NULL;
     NSValue *o_value;
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-
-    if( p_playlist == NULL )
-        return nil;
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
 
     if( item == nil )
     {
@@ -206,11 +198,13 @@ NSLog( @"%d children for %s", i_return, p_item->p_input->psz_name );
     vlc_object_release( p_playlist );
 
     o_value = [o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_return]];
+    #if 0
     NSLog( @"%s", p_return->p_input->psz_name);
+    #endif
     if( o_value == nil )
     {
         o_value = [[NSValue valueWithPointer: p_return] retain];
-        NSLog( @"error missing value" );
+        msg_Err( VLCIntf, @"missing playlist item's pointer value" );
     }
     return o_value;
 }
@@ -219,10 +213,7 @@ NSLog( @"%d children for %s", i_return, p_item->p_input->psz_name );
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
     int i_return = 0;
-    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-        return NO;
+    playlist_t *p_playlist = pl_Yield( VLCIntf );
 
     if( item == nil )
     {
@@ -252,15 +243,9 @@ NSLog( @"expandable" );
 {
     id o_value = nil;
     intf_thread_t *p_intf = VLCIntf;
-    playlist_t *p_playlist;
     playlist_item_t *p_item;
     
     if( item == nil || ![item isKindOfClass: [NSValue class]] ) return( @"error" );
-    
-    /* Check to see if the playlist is present */
-    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist == NULL ) return( @"error");
-    vlc_object_release( p_playlist);
     
     p_item = (playlist_item_t *)[item pointerValue];
     if( p_item == NULL )
@@ -354,8 +339,7 @@ NSLog( @"expandable" );
 
 - (void)awakeFromNib
 {
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
     vlc_list_t *p_list = vlc_list_find( p_playlist, VLC_OBJECT_MODULE,
                                         FIND_ANYWHERE );
 
@@ -478,10 +462,7 @@ NSLog( @"expandable" );
     [[[[VLCMain sharedInstance] getWizard] getPlaylistWizard] reloadOutlineView];
     [[[[VLCMain sharedInstance] getBookmarks] getDataTable] reloadData];
 
-    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
-    if(! p_playlist )
-        return;
+    playlist_t *p_playlist = pl_Yield( VLCIntf );
 
     if( p_playlist->i_size >= 2 )
     {
@@ -504,14 +485,8 @@ NSLog( @"expandable" );
 
 - (void)playModeUpdated
 {
-    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( VLCIntf );
     vlc_value_t val, val2;
-
-    if( p_playlist == NULL )
-    {
-        return;
-    }
 
     var_Get( p_playlist, "loop", &val2 );
     var_Get( p_playlist, "repeat", &val );
@@ -539,13 +514,9 @@ NSLog( @"expandable" );
     int i_row;
     unsigned int j;
 
-    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( VLCIntf );
     playlist_item_t *p_item, *p_temp_item;
     NSMutableArray *o_array = [NSMutableArray array];
-
-    if( p_playlist == NULL )
-        return;
 
     p_item = p_playlist->status.p_item;
     if( p_item == NULL )
@@ -587,7 +558,7 @@ NSLog( @"expandable" );
     [o_outline_view selectRow: i_row byExtendingSelection: NO];
     [o_outline_view scrollRowToVisible: i_row];
 
-    vlc_object_release(p_playlist);
+    vlc_object_release( p_playlist );
 
     /* update our info-panel to reflect the new item */
     [[[VLCMain sharedInstance] getInfo] updatePanel];
@@ -602,14 +573,8 @@ NSLog( @"expandable" );
                     checkItemExistence:(BOOL)b_check
 
 {
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
     playlist_item_t *p_temp_item = p_item;
-
-    if( p_playlist == NULL )
-    {
-        return NO;
-    }
 
     if( p_node == p_item )
     {
@@ -693,8 +658,7 @@ NSLog( @"expandable" );
 - (IBAction)savePlaylist:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
     NSSavePanel *o_save_panel = [NSSavePanel savePanel];
     NSString * o_name = [NSString stringWithFormat: @"%@", _NS("Untitled")];
@@ -757,39 +721,35 @@ NSLog( @"expandable" );
 - (IBAction)playItem:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
-    if( p_playlist != NULL )
+    playlist_item_t *p_item;
+    playlist_item_t *p_node = NULL;
+
+    p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
+
+    if( p_item )
     {
-        playlist_item_t *p_item;
-        playlist_item_t *p_node = NULL;
-
-        p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
-
-        if( p_item )
+        if( p_item->i_children == -1 )
         {
-            if( p_item->i_children == -1 )
-            {
-                p_node = p_item->p_parent;
+            p_node = p_item->p_parent;
 
+        }
+        else
+        {
+            p_node = p_item;
+            if( p_node->i_children > 0 && p_node->pp_children[0]->i_children == -1 )
+            {
+                p_item = p_node->pp_children[0];
             }
             else
             {
-                p_node = p_item;
-                if( p_node->i_children > 0 && p_node->pp_children[0]->i_children == -1 )
-                {
-                    p_item = p_node->pp_children[0];
-                }
-                else
-                {
-                    p_item = NULL;
-                }
+                p_item = NULL;
             }
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_node, p_item );
         }
-        vlc_object_release( p_playlist );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_node, p_item );
     }
+    vlc_object_release( p_playlist );
 }
 
 /* When called retrieves the selected outlineview row and plays that node or item */
@@ -798,40 +758,36 @@ NSLog( @"expandable" );
     int i_count;
     NSMutableArray *o_to_preparse;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
                                                        
     o_to_preparse = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
     i_count = [o_to_preparse count];
 
-    if( p_playlist != NULL )
+    int i, i_row;
+    NSNumber *o_number;
+    playlist_item_t *p_item = NULL;
+
+    for( i = 0; i < i_count; i++ )
     {
-        int i, i_row;
-        NSNumber *o_number;
-        playlist_item_t *p_item = NULL;
+        o_number = [o_to_preparse lastObject];
+        i_row = [o_number intValue];
+        p_item = [[o_outline_view itemAtRow:i_row] pointerValue];
+        [o_to_preparse removeObject: o_number];
+        [o_outline_view deselectRow: i_row];
 
-        for( i = 0; i < i_count; i++ )
+        if( p_item )
         {
-            o_number = [o_to_preparse lastObject];
-            i_row = [o_number intValue];
-            p_item = [[o_outline_view itemAtRow:i_row] pointerValue];
-            [o_to_preparse removeObject: o_number];
-            [o_outline_view deselectRow: i_row];
-
-            if( p_item )
+            if( p_item->i_children == -1 )
             {
-                if( p_item->i_children == -1 )
-                {
-                    playlist_PreparseEnqueue( p_playlist, p_item->p_input );
-                }
-                else
-                {
-                    msg_Dbg( p_intf, "preparse of nodes not yet implemented" );
-                }
+                playlist_PreparseEnqueue( p_playlist, p_item->p_input );
+            }
+            else
+            {
+                msg_Dbg( p_intf, "preparse of nodes not yet implemented" );
             }
         }
-        vlc_object_release( p_playlist );
     }
+    vlc_object_release( p_playlist );
     [self playlistUpdated];
 }
 
@@ -839,8 +795,7 @@ NSLog( @"expandable" );
 {
     NSMenuItem *o_mi = (NSMenuItem *)sender;
     NSString *o_string = [o_mi representedObject];
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
     if( !playlist_IsServicesDiscoveryLoaded( p_playlist, [o_string cString] ) )
         playlist_ServicesDiscoveryAdd( p_playlist, [o_string cString] );
     else
@@ -868,13 +823,8 @@ NSLog( @"expandable" );
     playlist_t * p_playlist;
     intf_thread_t * p_intf = VLCIntf;
 
-    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    p_playlist = pl_Yield( p_intf );
 
-    if ( p_playlist == NULL )
-    {
-        return;
-    }
     o_to_delete = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
     i_count = [o_to_delete count];
 
@@ -924,14 +874,8 @@ NSLog( @"expandable" );
 
 - (void)sortNode:(int)i_mode
 {
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
     playlist_item_t * p_item;
-
-    if (p_playlist == NULL)
-    {
-        return;
-    }
 
     if( [o_outline_view selectedRow] > -1 )
     {
@@ -964,13 +908,8 @@ NSLog( @"expandable" );
 - (input_item_t *)createItem:(NSDictionary *)o_one_item
 {
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
-    if( p_playlist == NULL )
-    {
-        return NULL;
-    }
     input_item_t *p_input;
     int i;
     BOOL b_rem = FALSE, b_dir = FALSE;
@@ -1056,12 +995,7 @@ NSLog( @"expandable" );
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
 {
     int i_item;
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                            FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
 
     for( i_item = 0; i_item < (int)[o_array count]; i_item++ )
     {
@@ -1100,12 +1034,7 @@ NSLog( @"expandable" );
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue
 {
     int i_item;
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                            FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
 
     for( i_item = 0; i_item < (int)[o_array count]; i_item++ )
     {
@@ -1149,12 +1078,7 @@ NSLog( @"expandable" );
 {
     intf_thread_t * p_intf = VLCIntf;
     vlc_value_t val1,val2;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                            FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
     switch( [o_loop_popup indexOfSelectedItem] )
     {
@@ -1193,13 +1117,9 @@ NSLog( @"expandable" );
 
 - (NSMutableArray *)subSearchItem:(playlist_item_t *)p_item
 {
-    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( VLCIntf );
     playlist_item_t *p_selected_item;
     int i_current, i_selected_row;
-
-    if( !p_playlist )
-        return NULL;
 
     i_selected_row = [o_outline_view selectedRow];
     if (i_selected_row < 0)
@@ -1264,17 +1184,13 @@ NSLog( @"expandable" );
 
 - (IBAction)searchItem:(id)sender
 {
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
     id o_result;
 
     unsigned int i;
     int i_row = -1;
 
     b_selected_item_met = NO;
-
-    if( p_playlist == NULL )
-        return;
 
         /*First, only search after the selected item:*
          *(b_selected_item_met = NO)                 */
@@ -1360,12 +1276,7 @@ NSLog( @"expandable" );
     int i_mode = 0, i_type;
     intf_thread_t *p_intf = VLCIntf;
 
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    playlist_t *p_playlist = pl_Yield( p_intf );
 
     /* Check whether the selected table column header corresponds to a
        sortable table column*/
@@ -1430,12 +1341,9 @@ NSLog( @"expandable" );
                                 forTableColumn:(NSTableColumn *)tableColumn
                                 item:(id)item
 {
-    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( VLCIntf );
 
     id o_playing_item;
-
-    if( !p_playlist ) return;
 
     o_playing_item = [o_outline_dict objectForKey:
                 [NSString stringWithFormat:@"%p",  p_playlist->status.p_item]];
@@ -1468,14 +1376,8 @@ NSLog( @"expandable" );
     NSAutoreleasePool * ourPool = [[NSAutoreleasePool alloc] init];
 
     /* simply adds a new node to the end of the playlist */
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
     vlc_thread_set_priority( p_playlist, VLC_THREAD_PRIORITY_LOW );
-
-    if( !p_playlist )
-    {
-        return;
-    }
 
     int ret_v;
     char *psz_name = NULL;
@@ -1503,10 +1405,10 @@ NSLog( @"expandable" );
 - (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
 {
     id o_value = [super outlineView: outlineView child: index ofItem: item];
-    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                               FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( VLCIntf );
 
-    if( !p_playlist ) return nil;
+    /* FIXME: playlist->i_size doesn't provide the correct number of items anymore
+     * check the playlist API for the fixed function, once zorglub implemented it -- fpk, 9/17/06 */
 
     if( p_playlist->i_size >= 2 )
     {
@@ -1528,7 +1430,7 @@ NSLog( @"expandable" );
 
     [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",
                                                     [o_value pointerValue]]];
-NSLog( @"add item %p", [o_value pointerValue] );
+    msg_Dbg( VLCIntf, "adding item %p", [o_value pointerValue] );
     return o_value;
 
 }
@@ -1537,15 +1439,12 @@ NSLog( @"add item %p", [o_value pointerValue] );
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
     unsigned int i;
-    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                               FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( VLCIntf );
 
     /* First remove the items that were moved during the last drag & drop
        operation */
     [o_items_array removeAllObjects];
     [o_nodes_array removeAllObjects];
-
-    if( !p_playlist ) return NO;
 
     for( i = 0 ; i < [items count] ; i++ )
     {
@@ -1584,8 +1483,7 @@ NSLog( @"add item %p", [o_value pointerValue] );
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index
 {
-    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                               FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( VLCIntf );
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
 
     if( !p_playlist ) return NSDragOperationNone;
@@ -1626,27 +1524,24 @@ NSLog( @"add item %p", [o_value pointerValue] );
                 return NSDragOperationNone;
             }
         }
-        vlc_object_release(p_playlist);
+        vlc_object_release( p_playlist );
         return NSDragOperationMove;
     }
 
     /* Drop from the Finder */
     else if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
     {
-        vlc_object_release(p_playlist);
+        vlc_object_release( p_playlist );
         return NSDragOperationGeneric;
     }
-    vlc_object_release(p_playlist);
+    vlc_object_release( p_playlist );
     return NSDragOperationNone;
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(int)index
 {
-    playlist_t * p_playlist =  vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist =  pl_Yield( VLCIntf );
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
-
-    if( !p_playlist ) return NO;
 
     /* Drag & Drop inside the playlist */
     if( [[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"] )
@@ -1733,7 +1628,7 @@ NSLog( @"add item %p", [o_value pointerValue] );
         [o_outline_view selectRow: i_row byExtendingSelection: NO];
         [o_outline_view scrollRowToVisible: i_row];
 
-        vlc_object_release(p_playlist);
+        vlc_object_release( p_playlist );
         return YES;
     }
 

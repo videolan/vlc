@@ -63,24 +63,21 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                        FIND_ANYWHERE );
-    if( p_playlist )
-    {
-        vlc_mutex_lock( &p_playlist->object_lock );
-        if( p_playlist->i_size <= 0 )
-        {
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            vlc_object_release( p_playlist );
-            [o_main intfOpenFileGeneric: (id)sender];
-        }
-        else
-        {
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            vlc_object_release( p_playlist );
-        }
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
+    vlc_mutex_lock( &p_playlist->object_lock );
+    if( p_playlist->i_size <= 0 )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );
+        [o_main intfOpenFileGeneric: (id)sender];
     }
+    else
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );
+    }
+
     val.i_int = config_GetInt( p_intf, "key-play-pause" );
     var_Set( p_intf->p_libvlc, "key-pressed", val );
 }
@@ -155,12 +152,7 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
     var_Get( p_playlist, "random", &val );
     val.b_bool = !val.b_bool;
@@ -185,12 +177,7 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
     var_Get( p_playlist, "repeat", &val );
     if (!val.b_bool)
@@ -219,12 +206,7 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
     var_Get( p_playlist, "loop", &val );
     if (!val.b_bool)
@@ -345,17 +327,17 @@
     }
     else
     {
-        playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                              FIND_ANYWHERE );
+        playlist_t * p_playlist = pl_Yield( VLCIntf );
 
-        if( p_playlist && ( [o_title isEqualToString: _NS("Fullscreen")] ||
-            [sender isKindOfClass:[NSButton class]] ) )
+        if( [o_title isEqualToString: _NS("Fullscreen")] ||
+            [sender isKindOfClass:[NSButton class]] )
         {
             vlc_value_t val;
             var_Get( p_playlist, "fullscreen", &val );
             var_Set( p_playlist, "fullscreen", (vlc_value_t)!val.b_bool );
         }
-        if( p_playlist ) vlc_object_release( (vlc_object_t *)p_playlist );
+
+        vlc_object_release( p_playlist );
     }
 
 }
@@ -697,14 +679,9 @@
     BOOL bEnabled = TRUE;
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
-    if( p_playlist != NULL )
-    {
-        vlc_mutex_lock( &p_playlist->object_lock );
-    }
-    else return FALSE;
+    vlc_mutex_lock( &p_playlist->object_lock );
 
 #define p_input p_playlist->p_input
 
