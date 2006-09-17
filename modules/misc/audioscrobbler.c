@@ -476,6 +476,10 @@ static void Run( intf_thread_t *p_this )
             p_sys->b_metadata_read = VLC_TRUE;
             vlc_mutex_unlock( &p_sys->lock );
         }
+        else
+        {
+            PL_UNLOCK;
+        }
 
         pl_Release( p_playlist );
         vlc_mutex_lock( &p_sys->lock );
