@@ -1,31 +1,64 @@
 $Id$
 
-Changes between 0.8.5 and 0.8.6-svn (not released yet)
---------------------------------------------------
-Core support:
- * New playlist core
- * Video Filter2 filters can now be selected for local display using --video-filter
- * improved Interaction dialogues
+Changes between 0.8.6 and 0.9.0-svn (not released yet)
+-------------------------------------------------------
+
+Playlist:
+ * Vastly improved playlist support:
+    * Media library support
+    * "Live search"
+    * Shoutcast TV listings
+    * Audioscrobbler / last.fm support
 
 Decoders:
- * WMV3/VC-1 support
+ * WMA Speech support (through binary codecs)
+ * VP5/VP6 - Flash Video support
 
-Video Filters:
- * Adjust, Invert and Distort (now splited into Wave, Ripple, Gradient and Psychedelic) video filters have been ported to the Video Filter2 API. They can now be streamed.
+Video output:
+ * Adjust, Invert and Distort (now splited into Wave, Ripple, Gradient
+   and Psychedelic) video filters can now be streamed
 
 Interfaces:
+ * Windows/Linux
+   * Brand new interface for Linux and Windows, based on the Qt toolkit
  * OS X
-     - right/ctrl-click menu in video outputs
-     - support for Apple's remote (courtesy Martin Kahr)
+   * Support for Apple Remote control
+   * Right/ctrl-click menu in video outputs
+ * All
+   * Improved user interaction
 
-Other plugins:
- * Audioscrobbler / last.fm plugin
+Changes between 0.8.5 and 0.8.6
+--------------------------------
 
-Nix Port:
- * Notification plugin.
+Playlist:
+ * Shoutcast TV listings support
+
+Input:
+ * Support for RTSP authentication
+ * Support for adding subtitles on the fly
+ * Fixed MPEG-PS duration calculation
+ * ATSC support for DVB
+
+Decoders:
+ * Native WMV3 / VC-1 support
+ * WMA Speech support (through binary codecs)
+
+Video output:
+ * Additional OpenGL effects (cylinder, torus, sphere, ...)
+ * Improved libcaca support
+
+Interfaces:
+ * New hotkeys for crop and zoom
+ * Systray support in skins (Windows only)
+ * Support for Apple Remote control
+ * Notifications using notification-daemon on Linux
+ * Support for snapshots from the HTTP interface
 
 Localization:
- * Add Czech 
+ * Add Czech
+
+Developers:
+ * Updates to the libvlc API
 
 
 Changes between 0.8.4a and 0.8.5
