@@ -398,6 +398,7 @@ int __intf_UserStringInput( vlc_object_t *p_this,
 {
     int i_ret;
     DIALOG_INIT( TWOWAY );
+    p_new->i_type = INTERACT_DIALOG_TWOWAY;
     p_new->psz_title = strdup( psz_title );
     p_new->psz_description = strdup( psz_description );
 
@@ -407,8 +408,8 @@ int __intf_UserStringInput( vlc_object_t *p_this,
 
     if( i_ret != DIALOG_CANCELLED )
     {
-        assert( p_new->psz_returned[0] );
-        *ppsz_usersString = strdup( p_new->psz_returned[0] );
+        *ppsz_usersString = p_new->psz_returned[0]?
+                                    strdup( p_new->psz_returned[0] ) : NULL;
     }
     return i_ret;
 }
