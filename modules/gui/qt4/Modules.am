@@ -14,7 +14,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 TOUI = ui/input_stats ui/main_interface ui/file_open \
        ui/sprefs_trivial \
        ui/sprefs_audio ui/sprefs_playlist ui/sprefs_subtitles \
-       ui/sprefs_video ui/sprefs_interface
+       ui/sprefs_video ui/sprefs_interface \
+       ui/equalizer
 UIH = $(TOUI:%=%.h)
 
 TOMOC = main_interface \
@@ -142,6 +143,7 @@ EXTRA_DIST += \
 	ui/sprefs_video.ui \
 	ui/sprefs_playlist.ui \
 	ui/sprefs_subtitles.ui \
+	ui/equalizer.ui \
 	pixmaps/advanced.xpm \
 	pixmaps/audio.xpm \
 	pixmaps/codec.xpm \
