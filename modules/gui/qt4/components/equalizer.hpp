@@ -1,0 +1,58 @@
+/*****************************************************************************
+ * preferences_tree.hpp : Tree of modules for preferences
+ ****************************************************************************
+ * Copyright (C) 2006 the VideoLAN team
+ * $Id: preferences.hpp 16643 2006-09-13 12:45:46Z zorglub $
+ *
+ * Authors: Clément Stenac <zorglub@videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+#ifndef _EQUALIZER_H_
+#define _EQUALIZER_H_
+
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
+#include "ui/equalizer.h"
+
+#define BANDS 10
+
+class Equalizer: public QWidget
+{
+    Q_OBJECT
+public:
+    Equalizer( intf_thread_t *, QWidget * );
+    virtual ~Equalizer();
+
+private:
+    Ui::EqualizerWidget ui;
+    QSlider *bands[BANDS];
+    QLabel *band_texts[BANDS];
+
+    void delCallbacks( aout_instance_t * );
+    void addCallbacks( aout_instance_t * );
+    void setValues( char *, float );
+
+    intf_thread_t *p_intf;
+private slots:
+    void enable();
+    void set2Pass();
+    void setPreamp();
+    void setBand();
+    void setPreset(int);
+};
+
+#endif
