@@ -74,28 +74,19 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find(
-        p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( !p_playlist )
-    {
-        msg_Err( p_intf, "could not find playlist object" );
-        return VLC_ENOOBJ;
-    }
-
-    var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
-/*    var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );*/
-
-    vlc_object_release( p_playlist );
+    playlist_t *p_playlist;
 
     if( !notify_init( APPLICATION_NAME ) )
     {
         msg_Err( p_intf, "can't find notification daemon" );
         return VLC_EGENERIC;
     }
+
+    p_playlist = pl_Yield( p_intf );
+    var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+    pl_Release( p_intf );
+
     p_intf->pf_run = Run;
-    msg_Dbg( p_intf,"notify plugin started");
     return VLC_SUCCESS;
 }
 
@@ -104,14 +95,9 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find(
-        p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( p_playlist )
-    {
-        var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
-        vlc_object_release( p_playlist );
-    }
+    playlist_t *p_playlist = pl_Yield( p_intf );
+    var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
+    pl_Release( p_intf );
 
     notify_uninit();
 }
@@ -121,7 +107,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_this )
 {
-    msleep( 100*INTF_IDLE_SLEEP );
+    msleep( 10*INTF_IDLE_SLEEP );
 }
 
 /*****************************************************************************
@@ -136,12 +122,11 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char *psz_artist = NULL;
     char *psz_album = NULL;
     input_thread_t *p_input=NULL;
-    p_playlist = (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-    if( !p_playlist ) return VLC_EGENERIC;
+    playlist_t * p_playlist = pl_Yield( p_this );
 
     p_input = p_playlist->p_input;
     vlc_object_release( p_playlist );
+
     if( !p_input ) return VLC_SUCCESS;
     vlc_object_yield( p_input );
 

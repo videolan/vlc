@@ -126,18 +126,15 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     char psz_tmp[GROWL_MAX_LENGTH];
-    playlist_t *p_playlist;
     char *psz_title = NULL;
     char *psz_artist = NULL;
     char *psz_album = NULL;
     input_thread_t *p_input;
-
-    p_playlist = (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-    if( !p_playlist ) return VLC_EGENERIC;
+    playlist_t *p_playlist = pl_Yield( p_this );
 
     p_input = p_playlist->p_input;
     vlc_object_release( p_playlist );
+
     if( !p_input ) return VLC_SUCCESS;
     vlc_object_yield( p_input );
 

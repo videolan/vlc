@@ -141,18 +141,10 @@ static int Open( vlc_object_t *p_this )
 #endif
 
 
-    playlist_t *p_playlist =
-            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return VLC_EGENERIC;
-    }
-
+    playlist_t *p_playlist = pl_Yield( p_intf );
     var_AddCallback( p_playlist, "playlist-current", PlaylistNext, p_this );
     var_AddCallback( p_playlist, "item-change", PlaylistNext, p_this );
-
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 
     /* Set user preferences */
     xosd_set_font( p_intf->p_sys->p_osd,
@@ -189,6 +181,10 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    playlist_t *p_playlist = pl_Yield( p_intf );
+    var_DelCallback( p_playlist, "playlist-current", PlaylistNext, p_this );
+    var_DelCallback( p_playlist, "item-change", PlaylistNext, p_this );
+    pl_Release( p_intf );
 
     /* Uninitialize library */
     xosd_destroy( p_intf->p_sys->p_osd );
@@ -215,12 +211,7 @@ static void Run( intf_thread_t *p_intf )
         if( p_intf->p_sys->b_need_update == VLC_TRUE )
         {
             p_intf->p_sys->b_need_update = VLC_FALSE;
-            p_playlist = (playlist_t *)vlc_object_find( p_intf,
-                                      VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-            if( !p_playlist )
-            {
-                continue;
-            }
+            p_playlist = pl_Yield( p_intf );
 
             if( p_playlist->i_size < 0  )
             {

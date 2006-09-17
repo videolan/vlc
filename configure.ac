@@ -5637,6 +5637,7 @@ AC_CONFIG_FILES([
   modules/misc/dummy/Makefile
   modules/misc/memcpy/Makefile
   modules/misc/network/Makefile
+  modules/misc/notify/Makefile
   modules/misc/testsuite/Makefile
   modules/misc/playlist/Makefile
   modules/misc/xml/Makefile

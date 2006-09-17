@@ -86,13 +86,7 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     playlist_t *p_playlist;
 
-    /* Allocate instance and initialize some members */
-    p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
-    {
-        msg_Err( p_intf, "out of memory" );
-        return -1;
-    }
+    MALLOC_ERR( p_intf->p_sys, intf_sys_t );
 
     p_intf->p_sys->psz_format = config_GetPsz( p_intf, "msn-format" );
     if( !p_intf->p_sys->psz_format )
@@ -102,22 +96,10 @@ static int Open( vlc_object_t *p_this )
     }
     msg_Dbg( p_intf, "using format: %s", p_intf->p_sys->psz_format );
 
-    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-
-    if( !p_playlist )
-    {
-        msg_Err( p_intf, "could not find playlist object" );
-        free( p_intf->p_sys->psz_format );
-        free( p_intf->p_sys );
-        return VLC_ENOOBJ;
-    }
-
-    /* Item's info changes */
+    p_playlist = pl_Yield( p_intf );
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
-    /* We're playing a new item */
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 
     p_intf->pf_run = Run;
 
@@ -130,19 +112,15 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find(
-                      p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_this );
 
     /* clear the MSN stuff ... else it looks like we're still playing
      * something although VLC (or the MSN plugin) is closed */
     SendToMSN( "\\0Music\\01\\0\\0\\0\\0\\0\\0\\0" );
 
-    if( p_playlist )
-    {
-        var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
-        var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
-    }
-
+    var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
+    var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+    pl_Release( p_this );
 
     /* Destroy structure */
     free( p_intf->p_sys->psz_format );
@@ -164,22 +142,16 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
-    playlist_t *p_playlist;
     char psz_tmp[MSN_MAX_LENGTH];
     char *psz_title = NULL;
     char *psz_artist = NULL;
     char *psz_album = NULL;
     input_thread_t *p_input;
-
-    if( !p_intf->p_sys ) return VLC_SUCCESS;
-
-    p_playlist = (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
-
-    if( !p_playlist ) return VLC_EGENERIC;
+    playlist_t *p_playlist = pl_Yield( p_this );
 
     p_input = p_playlist->p_input;
-    vlc_object_release( p_playlist );
+    pl_Release( p_this );
+
     if( !p_input ) return VLC_SUCCESS;
     vlc_object_yield( p_input );
 
