@@ -5,8 +5,8 @@ Index: common/i386/i386inc.asm
 @@ -42,6 +42,7 @@
  %macro SECTION_RODATA 0
      %ifidn __OUTPUT_FORMAT__,macho
-         SECTION .text
-+        align 16
+-        SECTION .text
++        SECTION .text align=16
          fakegot:
      %else
          SECTION .rodata data align=16
