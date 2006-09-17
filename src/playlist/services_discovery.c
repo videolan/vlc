@@ -62,6 +62,8 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
 
     vlc_mutex_unlock( &p_playlist->object_lock );
 
+    if( !p_sd->pf_run ) return VLC_SUCCESS;
+
     if( vlc_thread_create( p_sd, "services_discovery", RunSD,
                            VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
@@ -79,8 +81,8 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
 {
     int i;
     services_discovery_t *p_sd = NULL;
-    vlc_mutex_lock( &p_playlist->object_lock );
 
+    PL_LOCK;
     for( i = 0 ; i< p_playlist->i_sds ; i ++ )
     {
         if( !strcmp( psz_module, p_playlist->pp_sds[i]->psz_module ) )
@@ -93,22 +95,22 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
 
     if( p_sd )
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        PL_UNLOCK;
         p_sd->b_die = VLC_TRUE;
-        vlc_thread_join( p_sd );
+        if( p_sd->pf_run ) vlc_thread_join( p_sd );
+
         free( p_sd->psz_module );
         module_Unneed( p_sd, p_sd->p_module );
-        vlc_mutex_lock( &p_playlist->object_lock );
+        PL_LOCK;
         vlc_object_destroy( p_sd );
     }
     else
     {
         msg_Warn( p_playlist, "module %s is not loaded", psz_module );
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        PL_UNLOCK;
         return VLC_EGENERIC;
     }
-
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    PL_UNLOCK;
     return VLC_SUCCESS;
 }
 
@@ -116,17 +118,17 @@ vlc_bool_t playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
                                               const char *psz_module )
 {
     int i;
-    vlc_mutex_lock( &p_playlist->object_lock );
+    PL_LOCK;
 
     for( i = 0 ; i< p_playlist->i_sds ; i ++ )
     {
         if( !strcmp( psz_module, p_playlist->pp_sds[i]->psz_module ) )
         {
-            vlc_mutex_unlock( &p_playlist->object_lock );
+            PL_UNLOCK;
             return VLC_TRUE;
         }
     }
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    PL_UNLOCK;
     return VLC_FALSE;
 }
 
@@ -148,14 +150,11 @@ int playlist_AddSDModules( playlist_t *p_playlist, char *psz_modules )
         while( psz_parser && *psz_parser )
         {
             while( *psz_parser == ' ' || *psz_parser == ':' )
-            {
                 psz_parser++;
-            }
 
             if( (psz_next = strchr( psz_parser, ':' ) ) )
-            {
                 *psz_next++ = '\0';
-            }
+
             if( *psz_parser == '\0' )
             {
                 break;

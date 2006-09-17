@@ -121,24 +121,11 @@ static int OpenTV( vlc_object_t *p_this )
 static int Open( vlc_object_t *p_this, int i_type )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    services_discovery_sys_t *p_sys  = malloc(
-                                    sizeof( services_discovery_sys_t ) );
-
     vlc_value_t         val;
-    playlist_t          *p_playlist;
     playlist_view_t     *p_view;
-
-    p_sd->pf_run = Run;
+    playlist_t          *p_playlist = pl_Yield( p_this );
+    DECMALLOC_ERR( p_sys, services_discovery_sys_t );
     p_sd->p_sys  = p_sys;
-
-    /* Create our playlist node */
-    p_playlist = (playlist_t *)vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Warn( p_sd, "unable to find playlist, cancelling");
-        return VLC_EGENERIC;
-    }
 
     switch( i_type )
     {
@@ -168,11 +155,11 @@ static int Open( vlc_object_t *p_this, int i_type )
     p_sys->p_node_one->i_flags |= PLAYLIST_SKIP_FLAG;
     p_sys->p_node_one->p_input->i_id = p_sys->p_node_cat->p_input->i_id;
 
-    val.b_bool = VLC_TRUE;
-    var_Set( p_playlist, "intf-change", val );
+    var_SetVoid( p_playlist, "intf-change" );
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_this );
 
+    input_Read( p_sd, p_sys->p_input, VLC_FALSE );
     return VLC_SUCCESS;
 }
 
@@ -183,26 +170,9 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
-    playlist_t *p_playlist =  (playlist_t *) vlc_object_find( p_sd,
-                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist )
-    {
-        playlist_NodeDelete( p_playlist, p_sys->p_node_cat, VLC_TRUE, VLC_TRUE );
-        playlist_NodeDelete( p_playlist, p_sys->p_node_one, VLC_TRUE, VLC_TRUE );
-        vlc_object_release( p_playlist );
-    }
+    playlist_t *p_playlist =  pl_Yield( p_sd );
+    playlist_NodeDelete( p_playlist, p_sys->p_node_cat, VLC_TRUE, VLC_TRUE );
+    playlist_NodeDelete( p_playlist, p_sys->p_node_one, VLC_TRUE, VLC_TRUE );
+    pl_Release( p_sd );
     free( p_sys );
-}
-
-/*****************************************************************************
- * Run: main thread
- *****************************************************************************/
-static void Run( services_discovery_t *p_sd )
-{
-    services_discovery_sys_t *p_sys = p_sd->p_sys;
-    int i_id = input_Read( p_sd, p_sys->p_input, VLC_FALSE );
-    while( !p_sd->b_die )
-    {
-        msleep( 10*INTF_IDLE_SLEEP );
-    }
 }

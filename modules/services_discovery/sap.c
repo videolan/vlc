@@ -224,7 +224,6 @@ struct services_discovery_sys_t
     /* playlist node */
     playlist_item_t *p_node_cat;
     playlist_item_t *p_node_one;
-    playlist_t *p_playlist;
 
     /* Table of announces */
     int i_announces;
@@ -304,16 +303,9 @@ static int Open( vlc_object_t *p_this )
             ? VLC_TRUE : VLC_FALSE;
 
     /* Create our playlist node */
-    p_sys->p_playlist = (playlist_t *)vlc_object_find( p_sd,
-                                                       VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( !p_sys->p_playlist )
-    {
-        msg_Warn( p_sd, "unable to find playlist, cancelling SAP listening");
-        return VLC_EGENERIC;
-    }
+    pl_Yield( p_sd );
 
-    playlist_NodesPairCreate( p_sys->p_playlist, _("SAP sessions"),
+    playlist_NodesPairCreate( pl_Get( p_sd ), _("SAP sessions"),
                               &p_sys->p_node_cat, &p_sys->p_node_one,
                               VLC_TRUE );
 
@@ -448,15 +440,11 @@ static void Close( vlc_object_t *p_this )
     }
     FREENULL( p_sys->pp_announces );
 
-    if( p_sys->p_playlist )
-    {
-        playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node_cat, VLC_TRUE,
-                             VLC_TRUE );
-        playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node_one, VLC_TRUE,
-                             VLC_TRUE );
-        vlc_object_release( p_sys->p_playlist );
-    }
-
+    playlist_NodeDelete( pl_Get(p_sd), p_sys->p_node_cat, VLC_TRUE,
+                         VLC_TRUE );
+    playlist_NodeDelete( pl_Get(p_sd), p_sys->p_node_one, VLC_TRUE,
+                         VLC_TRUE );
+    pl_Release( p_sd );
     free( p_sys );
 }
 
@@ -568,20 +556,13 @@ static void Run( services_discovery_t *p_sd )
 static int Demux( demux_t *p_demux )
 {
     sdp_t *p_sdp = p_demux->p_sys->p_sdp;
-    playlist_t *p_playlist;
     input_thread_t *p_input;
     input_item_t *p_parent_input;
 
-    p_playlist = (playlist_t *)vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
-                                               FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Err( p_demux, "playlist could not be found" );
-        return VLC_EGENERIC;
-    }
-
+    playlist_t *p_playlist = pl_Yield( p_demux );
     p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT,
-                                               FIND_PARENT );
+                                                 FIND_PARENT );
+    assert( p_input );
     if( !p_input )
     {
         msg_Err( p_demux, "parent input could not be found" );
@@ -862,7 +843,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
 
         if( p_child == NULL )
         {
-            p_child = playlist_NodeCreate( p_sys->p_playlist, psz_value,
+            p_child = playlist_NodeCreate( pl_Get( p_sd ), psz_value,
                                            p_sys->p_node_cat );
             p_child->i_flags &= ~PLAYLIST_SKIP_FLAG;
         }
@@ -872,13 +853,13 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
         p_child = p_sys->p_node_cat;
     }
 
-    p_item = playlist_NodeAddInput( p_sys->p_playlist, p_input, p_child,
+    p_item = playlist_NodeAddInput( pl_Get( p_sd ), p_input, p_child,
                                     PLAYLIST_APPEND, PLAYLIST_END );
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
     p_sap->i_item_id_cat = p_item->i_id;
 
-    p_item = playlist_NodeAddInput( p_sys->p_playlist, p_input,
+    p_item = playlist_NodeAddInput( pl_Get( p_sd ), p_input,
                         p_sys->p_node_one, PLAYLIST_APPEND, PLAYLIST_END );
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
@@ -1379,10 +1360,7 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
     }
 
     if( p_announce->i_input_id > -1 )
-    {
-        playlist_LockDeleteAllFromInput(
-                        p_sd->p_sys->p_playlist, p_announce->i_input_id );
-    }
+        playlist_LockDeleteAllFromInput( pl_Get(p_sd), p_announce->i_input_id );
 
     for( i = 0; i< p_sd->p_sys->i_announces; i++)
     {
