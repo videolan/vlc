@@ -371,6 +371,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i_ret = demux2_vaControlHelper( p_demux->s, 0, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
                                             args );
+            /* No bitrate, we can't have it precisely, but we can compute
+             * a raw approximation with time/position */
+            if( i_ret && i_query == DEMUX_GET_LENGTH &&!p_sys->i_bitrate_avg )
+            {
+                float f_pos = (double)( stream_Tell( p_demux->s ) ) /
+                              (double)( stream_Size( p_demux->s ) );
+                /* The first few seconds are guaranteed to be very whacky,
+                 * don't bother trying ... Too bad */
+                if( f_pos < 0.01 ||
+                    (p_sys->i_pts + p_sys->i_time_offset) < 8000000 )
+                    return VLC_EGENERIC;
+
+                pi64 = (int64_t *)va_arg( args, int64_t * );
+                *pi64 = (p_sys->i_pts + p_sys->i_time_offset) / f_pos;
+                return VLC_SUCCESS;
+            }
             if( !i_ret && p_sys->i_bitrate_avg > 0 &&
                 (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME) )
             {
