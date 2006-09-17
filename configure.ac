@@ -1549,8 +1549,15 @@ AS_IF([test "${enable_notify}" != "no"], [
       ])
   ])
 
+dnl
+dnl Audioscrobbler plugin
+dnl
 
-
+AC_ARG_ENABLE(audioscrobbler,
+  [  --enable-audioscrobbler Last.fm submission plugin (default enabled)])
+AS_IF([test "${enable_audioscrobbler}" != "no"], [
+        VLC_ADD_PLUGINS([audioscrobbler])
+  ])
 
 dnl
 dnl  Input plugins

@@ -18,6 +18,9 @@ Interfaces:
      - right/ctrl-click menu in video outputs
      - support for Apple's remote (courtesy Martin Kahr)
 
+Other plugins:
+ * Audioscrobbler / last.fm plugin
+
 Nix Port:
  * Notification plugin.
 
