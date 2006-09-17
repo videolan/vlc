@@ -30,6 +30,7 @@
 
 #define EQZ_BANDS_MAX 10
 
+#define NB_PRESETS 18
 static char *preset_list[] = {
     "flat", "classical", "club", "dance", "fullbass", "fullbasstreble",
     "fulltreble", "headphones","largehall", "live", "party", "pop", "reggae",
