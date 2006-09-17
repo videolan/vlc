@@ -4,7 +4,7 @@
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
  *
- * Authors: Rafaël Carré <rafael -dot- carre -at- wanadoo -dot- fr>
+ * Authors: Rafaël Carré <rafael -dot- carre -at- gmail -dot- com>
  *          Kenneth Ostby <kenneo -at- idi -dot- ntnu -dot- no>
  *
  * This program is free software; you can redistribute it and/or modify
