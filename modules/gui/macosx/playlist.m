@@ -1067,49 +1067,7 @@ NSLog( @"expandable" );
     [self playlistUpdated];
     vlc_object_release( p_playlist );
 }
-/* FIXME!!
-- (IBAction)handlePopUp:(id)sender
 
-{
-    intf_thread_t * p_intf = VLCIntf;
-    vlc_value_t val1,val2;
-    playlist_t * p_playlist = pl_Yield( p_intf );
-
-    switch( [o_loop_popup indexOfSelectedItem] )
-    {
-        case 1:
-
-             val1.b_bool = 0;
-             var_Set( p_playlist, "loop", val1 );
-             val1.b_bool = 1;
-             var_Set( p_playlist, "repeat", val1 );
-             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat One" ) );
-        break;
-
-        case 2:
-             val1.b_bool = 0;
-             var_Set( p_playlist, "repeat", val1 );
-             val1.b_bool = 1;
-             var_Set( p_playlist, "loop", val1 );
-             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat All" ) );
-        break;
-
-        default:
-             var_Get( p_playlist, "repeat", &val1 );
-             var_Get( p_playlist, "loop", &val2 );
-             if( val1.b_bool || val2.b_bool )
-             {
-                  val1.b_bool = 0;
-                  var_Set( p_playlist, "repeat", val1 );
-                  var_Set( p_playlist, "loop", val1 );
-                  vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat Off" ) );
-             }
-         break;
-     }
-     vlc_object_release( p_playlist );
-     [self playlistUpdated];
-}
-*/
 - (NSMutableArray *)subSearchItem:(playlist_item_t *)p_item
 {
     playlist_t *p_playlist = pl_Yield( VLCIntf );

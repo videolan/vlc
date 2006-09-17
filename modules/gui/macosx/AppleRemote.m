@@ -1,7 +1,7 @@
 /*****************************************************************************
  * AppleRemote.m
  * AppleRemote
- * $Id:$
+ * $Id$
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
  * Copyright (c) 2006 martinkahr.com. All rights reserved.
@@ -28,7 +28,7 @@
  *
  * Note that changes made by any members or contributors of the VideoLAN team
  * (i.e. changes that were checked in to one of VideoLAN's source code
- * repositories are licensed under the GNU General Public License version 2,
+ * repositories) are licensed under the GNU General Public License version 2,
  * or (at your option) any later version. 
  * Thus, the following statements apply to our changes:
  *
