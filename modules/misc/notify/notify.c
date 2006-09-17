@@ -95,9 +95,9 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist = pl_Yield( p_intf );
+    playlist_t *p_playlist = pl_Yield( p_this );
     var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
-    pl_Release( p_intf );
+    pl_Release( p_this );
 
     notify_uninit();
 }
@@ -117,7 +117,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     char psz_tmp[MAX_LENGTH];
-    playlist_t *p_playlist;
     char *psz_title = NULL;
     char *psz_artist = NULL;
     char *psz_album = NULL;
