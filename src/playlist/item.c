@@ -542,6 +542,7 @@ void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         }
         assert( p_toplay );
         p_playlist->request.b_request = VLC_TRUE;
+        p_playlist->request.i_skip = 0;
         p_playlist->request.p_item = p_toplay;
         if( p_playlist->p_input )
         {
