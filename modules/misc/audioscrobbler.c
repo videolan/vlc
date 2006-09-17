@@ -250,16 +250,25 @@ error:
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    intf_thread_t               *p_intf;
-    intf_sys_t                  *p_sys;
     audioscrobbler_queue_t      *p_current_queue, *p_next_queue;
-    playlist_t                  *p_playlist;
-
-    p_intf = ( intf_thread_t* ) p_this;
-    p_sys = p_intf->p_sys;
+    input_thread_t              *p_input;
+    intf_thread_t               *p_intf = (intf_thread_t* ) p_this;
+    intf_sys_t                  *p_sys = p_intf->p_sys;
+    playlist_t                  *p_playlist = pl_Yield( p_intf );
 
     p_playlist = pl_Yield( p_intf );
     var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+
+    PL_LOCK;
+    p_input = p_playlist->p_input;
+    if( p_input ) vlc_object_yield( p_input );
+    PL_UNLOCK;
+
+    if( p_input )
+    {
+        var_DelCallback( p_input, "state", PlayingChange, p_intf );
+    }
+
     pl_Release( p_playlist );
 
     vlc_mutex_lock ( &p_sys->lock );
@@ -572,16 +581,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     p_intf = ( intf_thread_t* ) p_data;
     p_sys = p_intf->p_sys;
-
-    vlc_mutex_lock ( &p_sys->lock );
-
-    if ( p_sys->p_input )
-    {
-        /* we delete the callback for the old p_input */
-        var_DelCallback( p_sys->p_input, "state", PlayingChange, p_intf );
-    }
-
-    vlc_mutex_unlock ( &p_sys->lock );
 
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
