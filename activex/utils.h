@@ -41,6 +41,7 @@ extern HDC CreateDevDC(DVTARGETDEVICE *ptd);
 extern void DPFromHimetric(HDC hdc, LPPOINT pt, int count);
 extern void HimetricFromDP(HDC hdc, LPPOINT pt, int count);
 
+/**************************************************************************************************/
 
 // enumeration
 template<class T> class VLCEnum : IUnknown
@@ -91,6 +92,7 @@ VLCEnum<T>::VLCEnum(REFIID riid, std::vector<T> &v) :
 
 template<class T>
 VLCEnum<T>::VLCEnum(const VLCEnum<T> &e) :
+    IUnknown(),
     _refcount(1),
     _v(e._v),
     _riid(e._riid)

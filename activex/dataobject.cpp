@@ -36,7 +36,7 @@ public:
     VLCEnumFORMATETC(vector<FORMATETC> &v) :
         e(VLCEnum<FORMATETC>(IID_IEnumFORMATETC, v)) {};
 
-    VLCEnumFORMATETC(const VLCEnumFORMATETC &vlcEnum) : e(vlcEnum.e) {};
+    VLCEnumFORMATETC(const VLCEnumFORMATETC &vlcEnum) : IEnumFORMATETC(), e(vlcEnum.e) {};
     virtual ~VLCEnumFORMATETC() {};
 
     // IUnknown methods

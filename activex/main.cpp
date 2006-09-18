@@ -57,8 +57,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppv)
 
     *ppv = NULL;
 
-    if( (CLSID_VLCPlugin == rclsid)
-     || (CLSID_VLCPlugin2 == rclsid) )
+    if( CLSID_VLCPlugin2 == rclsid )
     {
         VLCPluginClass *plugin = new VLCPluginClass(&i_class_ref, h_instance, rclsid);
         hr = plugin->QueryInterface(riid, ppv);
@@ -158,14 +157,20 @@ STDAPI DllUnregisterServer(VOID)
 
     SHDeleteKey(HKEY_CLASSES_ROOT, TEXT(PROGID_STR));
 
-    UnregisterProgID(CLSID_VLCPlugin, 1);
+    UnregisterProgID(CLSID_VLCPlugin, 2);
     UnregisterProgID(CLSID_VLCPlugin2, 1);
 
     return S_OK;
 };
 
-static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int version, const char *path, size_t pathLen)
+static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int version, BOOL isDefault, const char *path, size_t pathLen)
 {
+    char progId[sizeof(PROGID_STR)+16];
+    sprintf(progId, "%s.%u", PROGID_STR, version);
+
+    char description[sizeof(DESCRIPTION)+16];
+    sprintf(description, "%s v%u", DESCRIPTION, version);
+
     HKEY hClassKey;
     {
         LPCSTR psz_CLSID = CStrFromGUID(rclsid);
@@ -173,13 +178,43 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
         if( NULL == psz_CLSID )
             return E_OUTOFMEMORY;
 
+        HKEY hProgKey = keyCreate(HKEY_CLASSES_ROOT, progId);
+        if( NULL != hProgKey )
+        {
+            // default key value
+            keySetDef(hProgKey, description);
+
+            keyClose(keySetDef(keyCreate(hProgKey, "CLSID"),
+                psz_CLSID,
+                GUID_STRLEN));
+     
+            //hSubKey = keyClose(keyCreate(hBaseKey, "Insertable"));
+     
+            RegCloseKey(hProgKey);
+        }
+        if( isDefault )
+        {
+            hProgKey = keyCreate(HKEY_CLASSES_ROOT, PROGID_STR);
+            if( NULL != hProgKey )
+            {
+                // default key value
+                keySetDef(hProgKey, description);
+
+                keyClose(keySetDef(keyCreate(hProgKey, "CLSID"),
+                    psz_CLSID,
+                    GUID_STRLEN));
+         
+                keyClose(keySetDef(keyCreate(hProgKey, "CurVer"),
+                    progId));
+            }
+        }
         hClassKey = keyCreate(hParent, psz_CLSID);
         CoTaskMemFree((void *)psz_CLSID);
     }
     if( NULL != hClassKey )
     {
         // default key value
-        keySetDef(hClassKey, DESCRIPTION, sizeof(DESCRIPTION));
+        keySetDef(hClassKey, description);
 
         // Control key value
         keyClose(keyCreate(hClassKey, "Control"));
@@ -223,13 +258,9 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
         keyClose(keyCreate(hClassKey, "Programmable"));
 
         // ProgID key value
-        {
-            char progId[sizeof(PROGID_STR)+16];
-            sprintf(progId, "%s.%u", PROGID_STR, version);
-            keyClose(keySetDef(keyCreate(hClassKey,
-                TEXT("ProgID")),
-                progId));
-        }
+        keyClose(keySetDef(keyCreate(hClassKey,
+            TEXT("ProgID")),
+            progId));
 
         // VersionIndependentProgID key value
         keyClose(keySetDef(keyCreate(hClassKey,
@@ -237,13 +268,9 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
             PROGID_STR, sizeof(PROGID_STR)));
 
         // Version key value
-        {
-            char ver[32];
-            sprintf(ver, "%u.0", version);
-            keyClose(keySetDef(keyCreate(hClassKey,
-                "Version"),
-                ver));
-        }
+        keyClose(keySetDef(keyCreate(hClassKey,
+            "Version"),
+            "1.0"));
 
         // TypeLib key value
         LPCSTR psz_LIBID = CStrFromGUID(LIBID_AXVLC);
@@ -257,61 +284,6 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
         RegCloseKey(hClassKey);
     }
     return S_OK;
-}
-
-static HRESULT RegisterProgID(REFCLSID rclsid, unsigned int version)
-{
-    LPCSTR psz_CLSID = CStrFromGUID(rclsid);
-
-    if( NULL == psz_CLSID )
-        return E_OUTOFMEMORY;
-
-    char progId[sizeof(PROGID_STR)+16];
-    sprintf(progId, "%s.%u", PROGID_STR, version);
-
-    HKEY hBaseKey = keyCreate(HKEY_CLASSES_ROOT, progId);
-    if( NULL != hBaseKey )
-    {
-        // default key value
-        keySetDef(hBaseKey, DESCRIPTION, sizeof(DESCRIPTION));
-
-        keyClose(keySetDef(keyCreate(hBaseKey, "CLSID"),
-            psz_CLSID,
-            GUID_STRLEN));
- 
-        //hSubKey = keyClose(keyCreate(hBaseKey, "Insertable"));
- 
-        RegCloseKey(hBaseKey);
-    }
-    CoTaskMemFree((void *)psz_CLSID);
-
-    return S_OK;
-}
-
-static HRESULT RegisterDefaultProgID(REFCLSID rclsid, unsigned int version)
-{
-    LPCSTR psz_CLSID = CStrFromGUID(rclsid);
-
-    if( NULL == psz_CLSID )
-        return E_OUTOFMEMORY;
-
-    HKEY hBaseKey = keyCreate(HKEY_CLASSES_ROOT, PROGID_STR);
-    if( NULL != hBaseKey )
-    {
-        // default key value
-        keySetDef(hBaseKey, DESCRIPTION, sizeof(DESCRIPTION));
-
-        keyClose(keySetDef(keyCreate(hBaseKey, "CLSID"),
-            psz_CLSID,
-            GUID_STRLEN));
- 
-        char progId[sizeof(PROGID_STR)+16];
-        sprintf(progId, "%s.%u", PROGID_STR, version);
-
-        keyClose(keySetDef(keyCreate(hBaseKey, "CurVer"),
-            progId));
-    }
-    CoTaskMemFree((void *)psz_CLSID);
 }
 
 STDAPI DllRegisterServer(VOID)
@@ -328,16 +300,10 @@ STDAPI DllRegisterServer(VOID)
     if( ERROR_SUCCESS != RegOpenKeyExA(HKEY_CLASSES_ROOT, "CLSID", 0, KEY_CREATE_SUB_KEY, &hBaseKey) )
         return SELFREG_E_CLASS;
     
-    RegisterClassID(hBaseKey, CLSID_VLCPlugin, 1, DllPath, DllPathLen);
-    RegisterClassID(hBaseKey, CLSID_VLCPlugin2, 2, DllPath, DllPathLen);
+    RegisterClassID(hBaseKey, CLSID_VLCPlugin, 1, FALSE, DllPath, DllPathLen);
+    RegisterClassID(hBaseKey, CLSID_VLCPlugin2, 2, TRUE, DllPath, DllPathLen);
 
     RegCloseKey(hBaseKey);
-
-    RegisterProgID(CLSID_VLCPlugin, 1);
-    RegisterProgID(CLSID_VLCPlugin2, 2);
-
-    /* default control */
-    RegisterDefaultProgID(CLSID_VLCPlugin2, 2);
 
     // indicate which component categories we support
     ICatRegister *pcr;

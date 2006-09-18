@@ -4,15 +4,15 @@
 <TABLE>
 <TR><TD colspan="2">
 MRL:
-<INPUT size="90" name="targetTextField" value="">
-<INPUT type=submit value="Go" onClick="doGo(targetTextField.value);">
+<INPUT size="90" id="targetTextField" value="">
+<INPUT type=submit value="Go" onClick="doGo(document.getElementById('targetTextField').value);">
 </TD></TR>
 <TR><TD colspan="2">
 <!--
-Insert VideoLAN.VLCPlugin.1 activex control
+Insert VideoLAN.VLCPlugin.2 activex control
 -->
-<OBJECT classid="clsid:E23FE9C6-778E-49D4-B537-38FCDE4887D8"
-        codebase="http://downloads.videolan.org/pub/videolan/vlc/latest/win32/axvlc.cab#Version=0,8,4,0"
+<OBJECT classid="clsid:9BE31822-FDAD-461B-AD51-BE1D1C159921"
+        codebase="http://downloads.videolan.org/pub/videolan/vlc/latest/win32/axvlc.cab#Version=0,8,6,0"
         width="640"
         height="480"
         id="vlc"
@@ -45,20 +45,20 @@ Insert MSComctlLib.Slider.2 activex control
 </TD></TR>
 <TR><TD colspan="2">
 <INPUT type=button id="PlayOrPause" value=" Play " onClick='doPlayOrPause()'>
-<INPUT type=button value="Stop" onClick='document.vlc.stop();'>
+<INPUT type=button value="Stop" onClick='document.getElementById("vlc").playlist.stop();'>
 &nbsp;
-<INPUT type=button value=" << " onClick='document.vlc.playSlower();'>
-<INPUT type=button value=" >> " onClick='document.vlc.playFaster();'>
+<INPUT type=button value=" << " onClick='doPlaySlower();'>
+<INPUT type=button value=" >> " onClick='doPlayFaster();'>
 &nbsp;
-<INPUT type=button value="Show" onClick='document.vlc.Visible = true;'>
-<INPUT type=button value="Hide" onClick='document.vlc.Visible = false;'>
+<INPUT type=button value="Show" onClick='document.getElementById("vlc").Visible = true;'>
+<INPUT type=button value="Hide" onClick='document.getElementById("vlc").Visible = false;'>
 &nbsp;
-<INPUT type=button value="Version" onClick='alert(document.vlc.VersionInfo);'>
+<INPUT type=button value="Version" onClick='alert(document.getElementById("vlc").VersionInfo);'>
 <SPAN style="text-align:center">Volume:</SPAN>
 <INPUT type=button value=" - " onClick='updateVolume(-10)'>
 <SPAN id="volumeTextField" style="text-align: center">--</SPAN>
 <INPUT type=button value=" + " onClick='updateVolume(+10)'>
-<INPUT type=button value="Mute" onClick='document.vlc.toggleMute();'>
+<INPUT type=button value="Mute" onClick='document.getElementById("vlc").audio.toggleMute();'>
 </TD>
 </TR>
 </TABLE>
@@ -77,8 +77,10 @@ function onVLCStateChange()
 };
 function updateVolume(deltaVol)
 {
-    vlc.Volume += deltaVol;
-    volumeTextField.innerText = vlc.Volume+"%";
+    var vlc = document.getElementById("vlc");
+    vlc.audio.volume += deltaVol;
+    document.getElementById("volumeTextField").innerHTML = vlc.audio.volume+"%";
+
 };
 function formatTime(timeVal)
 {
@@ -114,22 +116,24 @@ function onStop()
     info.innerText = "-:--:--/-:--:--";
     document.getElementById("PlayOrPause").value = " Play ";
 };
+
 var liveFeedText = new Array("Live", "((Live))", "(( Live ))", "((  Live  ))");
 var liveFeedRoll = 0;
 
 function doUpdate()
 {
-    if( vlc.Playing )
+    var vlc = document.getElementById("vlc");
+    if( vlc.playlist.isPlaying )
     {
         if( ! sliderScrolling )
         {
-            if( vlc.Length > 0 )
+            if( vlc.input.length > 0 )
             {
                 // seekable stream
                 slider.Enabled = true;
-                slider.Max = vlc.Length;
-                slider.Value = vlc.Time;
-                info.innerText = formatTime(vlc.Time)+"/"+formatTime(vlc.Length);
+                slider.Max = vlc.input.length;
+                slider.Value = vlc.input.time;
+                info.innerText = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
                 document.getElementById("PlayOrPause").Enabled = true;
             }
             else {
@@ -154,18 +158,22 @@ function doUpdate()
 function doGo(targetURL)
 {
 	var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
-	document.vlc.addTarget(targetURL, options, 4+8, -666);
+	document.getElementById("vlc").playlist.add(targetURL, null, options);
 };
 function doPlayOrPause()
 {
-    if( document.vlc.playing )
-    {
-        document.vlc.pause();
-    }
-    else
-    {
-        document.vlc.play();
-    }
+    var vlc = document.getElementById("vlc");
+    vlc.playlist.togglePause();
+};
+function doPlaySlower()
+{
+    var vlc = document.getElementById("vlc");
+    vlc.input.rate = vlc.input.rate / 2;
+};
+function doPlayFaster()
+{
+    var vlc = document.getElementById("vlc");
+    vlc.input.rate = vlc.input.rate * 2;
 };
 function vlc::Play()
 {
@@ -195,8 +203,9 @@ function vlc::Stop()
 };
 function slider::Scroll()
 {
+    var vlc = document.getElementById("vlc");
     slider.Text = formatTime(slider.Value);
-    info.innerText = slider.Text+"/"+formatTime(vlc.Length);
+    info.innerText = slider.Text+"/"+formatTime(vlc.input.length);
     if( vlc.Time != slider.Value )
     {
         vlc.Time = slider.Value;

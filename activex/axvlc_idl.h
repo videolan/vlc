@@ -16,14 +16,29 @@ DEFINE_GUID(LIBID_AXVLC, 0xdf2bbe39, 0x40a8, 0x433b, 0xa2,0x79, 0x07,0x3f,0x48,0
 typedef interface IVLCControl IVLCControl;
 #endif
 
+#ifndef __IVLCAudio_FWD_DEFINED__
+#define __IVLCAudio_FWD_DEFINED__
+typedef interface IVLCAudio IVLCAudio;
+#endif
+
+#ifndef __IVLCInput_FWD_DEFINED__
+#define __IVLCInput_FWD_DEFINED__
+typedef interface IVLCInput IVLCInput;
+#endif
+
 #ifndef __IVLCPlaylist_FWD_DEFINED__
 #define __IVLCPlaylist_FWD_DEFINED__
 typedef interface IVLCPlaylist IVLCPlaylist;
 #endif
 
-#ifndef __ILibVLCControl_FWD_DEFINED__
-#define __ILibVLCControl_FWD_DEFINED__
-typedef interface ILibVLCControl ILibVLCControl;
+#ifndef __IVLCVideo_FWD_DEFINED__
+#define __IVLCVideo_FWD_DEFINED__
+typedef interface IVLCVideo IVLCVideo;
+#endif
+
+#ifndef __IVLCControl2_FWD_DEFINED__
+#define __IVLCControl2_FWD_DEFINED__
+typedef interface IVLCControl2 IVLCControl2;
 #endif
 
 #ifndef __DVLCEvents_FWD_DEFINED__
@@ -751,11 +766,6 @@ interface DVLCEvents {
 
 #endif  /* __DVLCEvents_DISPINTERFACE_DEFINED__ */
 
-#ifndef __IVLCAudio_FWD_DEFINED__
-#define __IVLCAudio_FWD_DEFINED__
-typedef interface IVLCAudio IVLCAudio;
-#endif
-
 /*****************************************************************************
  * IVLCAudio interface
  */
@@ -915,11 +925,6 @@ void __RPC_STUB IVLCAudio_toggleMute_Stub(
     DWORD* pdwStubPhase);
 
 #endif  /* __IVLCAudio_INTERFACE_DEFINED__ */
-
-#ifndef __IVLCInput_FWD_DEFINED__
-#define __IVLCInput_FWD_DEFINED__
-typedef interface IVLCInput IVLCInput;
-#endif
 
 /*****************************************************************************
  * IVLCInput interface
@@ -1181,7 +1186,7 @@ interface IVLCPlaylist : public IDispatch
 
     virtual HRESULT STDMETHODCALLTYPE add(
         BSTR uri,
-        BSTR name,
+        VARIANT name,
         VARIANT options,
         int* item) = 0;
 
@@ -1268,7 +1273,7 @@ typedef struct IVLCPlaylistVtbl {
     HRESULT (STDMETHODCALLTYPE *add)(
         IVLCPlaylist* This,
         BSTR uri,
-        BSTR name,
+        VARIANT name,
         VARIANT options,
         int* item);
 
@@ -1349,7 +1354,7 @@ void __RPC_STUB IVLCPlaylist_get_isPlaying_Stub(
 HRESULT CALLBACK IVLCPlaylist_add_Proxy(
     IVLCPlaylist* This,
     BSTR uri,
-    BSTR name,
+    VARIANT name,
     VARIANT options,
     int* item);
 void __RPC_STUB IVLCPlaylist_add_Stub(
@@ -1417,11 +1422,6 @@ void __RPC_STUB IVLCPlaylist_removeItem_Stub(
     DWORD* pdwStubPhase);
 
 #endif  /* __IVLCPlaylist_INTERFACE_DEFINED__ */
-
-#ifndef __IVLCVideo_FWD_DEFINED__
-#define __IVLCVideo_FWD_DEFINED__
-typedef interface IVLCVideo IVLCVideo;
-#endif
 
 /*****************************************************************************
  * IVLCVideo interface
@@ -1568,11 +1568,6 @@ void __RPC_STUB IVLCVideo_get_height_Stub(
     DWORD* pdwStubPhase);
 
 #endif  /* __IVLCVideo_INTERFACE_DEFINED__ */
-
-#ifndef __IVLCControl2_FWD_DEFINED__
-#define __IVLCControl2_FWD_DEFINED__
-typedef interface IVLCControl2 IVLCControl2;
-#endif
 
 /*****************************************************************************
  * IVLCControl2 interface

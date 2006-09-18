@@ -51,10 +51,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 //class factory
 
-// {E23FE9C6-778E-49d4-B537-38FCDE4887D8}
-//const GUID CLSID_VLCPlugin = 
-//    { 0xe23fe9c6, 0x778e, 0x49d4, { 0xb5, 0x37, 0x38, 0xfc, 0xde, 0x48, 0x87, 0xd8 } };
-
 static LRESULT CALLBACK VLCInPlaceClassWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch( uMsg )
     {
@@ -340,7 +336,9 @@ STDMETHODIMP VLCPlugin::QueryInterface(REFIID riid, void **ppv)
     else if( IID_IObjectSafety == riid )
         *ppv = reinterpret_cast<LPVOID>(vlcObjectSafety);
     else if( IID_IDispatch == riid )
-        *ppv = reinterpret_cast<LPVOID>(vlcControl);
+        *ppv = (CLSID_VLCPlugin2 == getClassID()) ?
+                reinterpret_cast<LPVOID>(vlcControl2) :
+                reinterpret_cast<LPVOID>(vlcControl);
     else if( IID_IVLCControl == riid )
         *ppv = reinterpret_cast<LPVOID>(vlcControl);
     else if( IID_IVLCControl2 == riid )
@@ -590,7 +588,7 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         }
 
 #if 0
-        ppsz_argv[0] = "C:\\cygwin\\home\\Damien_Fouilleul\\dev\\videolan\\vlc-trunk\\vlc";
+        ppsz_argv[0] = "C:\\cygwin\\home\\damienf\\vlc-trunk\\vlc";
 #endif
 
         // make sure plugin isn't affected with VLC single instance mode
@@ -624,11 +622,11 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         {
             /*
             ** VLC default threading mechanism is designed to be as compatible
-            ** with POSIX as possible, however when debugged on win32, threads
+            ** with POSIX as possible. However when debugged on win32, threads
             ** lose signals and eventually VLC get stuck during initialization.
             ** threading support can be configured to be more debugging friendly
             ** but it will be less compatible with POSIX.
-            ** This is done by initializing with the following options
+            ** This is done by initializing with the following options:
             */
             ppsz_argv[ppsz_argc++] = "--fast-mutex";
             ppsz_argv[ppsz_argc++] = "--win9x-cv-method=1";

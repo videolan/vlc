@@ -36,7 +36,7 @@ public:
         e(VLCEnum<CONNECTDATA>(IID_IEnumConnections, v))
     { e.setRetainOperation((VLCEnum<CONNECTDATA>::retainer)&retain); };
 
-    VLCEnumConnections(const VLCEnumConnections &vlcEnum) : e(vlcEnum.e) {};
+    VLCEnumConnections(const VLCEnumConnections &vlcEnum) : IEnumConnections(), e(vlcEnum.e) {};
 
     virtual ~VLCEnumConnections() {};
 
@@ -184,7 +184,7 @@ public:
         e(VLCEnum<LPCONNECTIONPOINT>(IID_IEnumConnectionPoints, v))
     { e.setRetainOperation((VLCEnum<LPCONNECTIONPOINT>::retainer)&retain); };
 
-    VLCEnumConnectionPoints(const VLCEnumConnectionPoints &vlcEnum) : e(vlcEnum.e) {};
+    VLCEnumConnectionPoints(const VLCEnumConnectionPoints &vlcEnum) : IEnumConnectionPoints(), e(vlcEnum.e) {};
 
     virtual ~VLCEnumConnectionPoints() {};
 

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlccontrol.h: ActiveX control for VLC
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2006 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *
@@ -27,10 +27,9 @@
 
 class VLCAudio : public IVLCAudio
 {
-    
 public:
-
-    VLCAudio(VLCPlugin *p_instance) :  _p_instance(p_instance), _p_typeinfo(NULL) {};
+    VLCAudio(VLCPlugin *p_instance) :
+        _p_instance(p_instance), _p_typeinfo(NULL) {};
     virtual ~VLCAudio();
 
     // IUnknown methods
@@ -65,23 +64,21 @@ public:
     STDMETHODIMP get_volume(int*);
     STDMETHODIMP put_volume(int);
     STDMETHODIMP toggleMute();
-    
  
 private:
+    HRESULT     loadTypeInfo();
 
-    HRESULT      getTypeInfo();
-
-    VLCPlugin *_p_instance;
-    ITypeInfo *_p_typeinfo;
+    VLCPlugin*  _p_instance;
+    ITypeInfo*  _p_typeinfo;
 
 };
  
 class VLCInput : public IVLCInput
 {
-    
 public:
 
-    VLCInput(VLCPlugin *p_instance) :  _p_instance(p_instance), _p_typeinfo(NULL) {};
+    VLCInput(VLCPlugin *p_instance) :
+        _p_instance(p_instance), _p_typeinfo(NULL) {};
     virtual ~VLCInput();
 
     // IUnknown methods
@@ -123,20 +120,18 @@ public:
     STDMETHODIMP get_hasVout(VARIANT_BOOL*);
      
 private:
+    HRESULT     loadTypeInfo();
 
-    HRESULT      getTypeInfo();
-
-    VLCPlugin *_p_instance;
-    ITypeInfo *_p_typeinfo;
+    VLCPlugin*  _p_instance;
+    ITypeInfo*  _p_typeinfo;
 
 };
  
 class VLCPlaylist : public IVLCPlaylist
 {
-    
 public:
-
-    VLCPlaylist(VLCPlugin *p_instance) :  _p_instance(p_instance), _p_typeinfo(NULL) {};
+    VLCPlaylist(VLCPlugin *p_instance) :
+        _p_instance(p_instance), _p_typeinfo(NULL) {};
     virtual ~VLCPlaylist();
 
     // IUnknown methods
@@ -168,7 +163,7 @@ public:
     // IVLCPlaylist methods
     STDMETHODIMP get_itemCount(int*);
     STDMETHODIMP get_isPlaying(VARIANT_BOOL*);
-    STDMETHODIMP add(BSTR, BSTR, VARIANT, int*);
+    STDMETHODIMP add(BSTR, VARIANT, VARIANT, int*);
     STDMETHODIMP play();
     STDMETHODIMP playItem(int);
     STDMETHODIMP togglePause();
@@ -180,19 +175,18 @@ public:
  
 private:
 
-    HRESULT      getTypeInfo();
+    HRESULT     loadTypeInfo();
 
-    VLCPlugin *_p_instance;
-    ITypeInfo *_p_typeinfo;
+    VLCPlugin*  _p_instance;
+    ITypeInfo*  _p_typeinfo;
 
 };
  
 class VLCVideo : public IVLCVideo
 {
-    
 public:
-
-    VLCVideo(VLCPlugin *p_instance) :  _p_instance(p_instance), _p_typeinfo(NULL) {};
+    VLCVideo(VLCPlugin *p_instance) :
+        _p_instance(p_instance), _p_typeinfo(NULL) {};
     virtual ~VLCVideo();
 
     // IUnknown methods
@@ -229,10 +223,10 @@ public:
  
 private:
 
-    HRESULT      getTypeInfo();
+    HRESULT     loadTypeInfo();
 
-    VLCPlugin *_p_instance;
-    ITypeInfo *_p_typeinfo;
+    VLCPlugin*  _p_instance;
+    ITypeInfo*  _p_typeinfo;
 
 };
  
@@ -277,7 +271,7 @@ public:
  
 private:
 
-    HRESULT      getTypeInfo();
+    HRESULT         loadTypeInfo();
 
     VLCPlugin*      _p_instance;
     ITypeInfo*      _p_typeinfo;

@@ -34,7 +34,7 @@ VLCAudio::~VLCAudio()
         _p_typeinfo->Release();
 };
 
-HRESULT VLCAudio::getTypeInfo(void)
+HRESULT VLCAudio::loadTypeInfo(void)
 {
     HRESULT hr = NOERROR;
     if( NULL == _p_typeinfo )
@@ -60,7 +60,7 @@ STDMETHODIMP VLCAudio::GetTypeInfoCount(UINT* pctInfo)
     if( NULL == pctInfo )
         return E_INVALIDARG;
 
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
         *pctInfo = 1;
     else
         *pctInfo = 0;
@@ -73,7 +73,7 @@ STDMETHODIMP VLCAudio::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
     if( NULL == ppTInfo )
         return E_INVALIDARG;
 
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         _p_typeinfo->AddRef();
         *ppTInfo = _p_typeinfo;
@@ -86,7 +86,7 @@ STDMETHODIMP VLCAudio::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
 STDMETHODIMP VLCAudio::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
     }
@@ -97,7 +97,7 @@ STDMETHODIMP VLCAudio::Invoke(DISPID dispIdMember, REFIID riid,
         LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
         VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
 {
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
                 pVarResult, pExcepInfo, puArgErr);
@@ -219,7 +219,7 @@ VLCInput::~VLCInput()
         _p_typeinfo->Release();
 };
 
-HRESULT VLCInput::getTypeInfo(void)
+HRESULT VLCInput::loadTypeInfo(void)
 {
     HRESULT hr = NOERROR;
     if( NULL == _p_typeinfo )
@@ -245,7 +245,7 @@ STDMETHODIMP VLCInput::GetTypeInfoCount(UINT* pctInfo)
     if( NULL == pctInfo )
         return E_INVALIDARG;
 
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
         *pctInfo = 1;
     else
         *pctInfo = 0;
@@ -258,7 +258,7 @@ STDMETHODIMP VLCInput::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
     if( NULL == ppTInfo )
         return E_INVALIDARG;
 
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         _p_typeinfo->AddRef();
         *ppTInfo = _p_typeinfo;
@@ -271,7 +271,7 @@ STDMETHODIMP VLCInput::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
 STDMETHODIMP VLCInput::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
     }
@@ -282,7 +282,7 @@ STDMETHODIMP VLCInput::Invoke(DISPID dispIdMember, REFIID riid,
         LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
         VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
 {
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
                 pVarResult, pExcepInfo, puArgErr);
@@ -571,7 +571,7 @@ VLCPlaylist::~VLCPlaylist()
         _p_typeinfo->Release();
 };
 
-HRESULT VLCPlaylist::getTypeInfo(void)
+HRESULT VLCPlaylist::loadTypeInfo(void)
 {
     HRESULT hr = NOERROR;
     if( NULL == _p_typeinfo )
@@ -597,7 +597,7 @@ STDMETHODIMP VLCPlaylist::GetTypeInfoCount(UINT* pctInfo)
     if( NULL == pctInfo )
         return E_INVALIDARG;
 
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
         *pctInfo = 1;
     else
         *pctInfo = 0;
@@ -610,7 +610,7 @@ STDMETHODIMP VLCPlaylist::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInf
     if( NULL == ppTInfo )
         return E_INVALIDARG;
 
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         _p_typeinfo->AddRef();
         *ppTInfo = _p_typeinfo;
@@ -623,7 +623,7 @@ STDMETHODIMP VLCPlaylist::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInf
 STDMETHODIMP VLCPlaylist::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
     }
@@ -634,7 +634,7 @@ STDMETHODIMP VLCPlaylist::Invoke(DISPID dispIdMember, REFIID riid,
         LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
         VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
 {
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
                 pVarResult, pExcepInfo, puArgErr);
@@ -688,7 +688,7 @@ STDMETHODIMP VLCPlaylist::get_isPlaying(VARIANT_BOOL* isPlaying)
     return hr;
 };
 
-STDMETHODIMP VLCPlaylist::add(BSTR uri, BSTR name, VARIANT options, int* item)
+STDMETHODIMP VLCPlaylist::add(BSTR uri, VARIANT name, VARIANT options, int* item)
 {
     if( NULL == item )
         return E_POINTER;
@@ -718,9 +718,14 @@ STDMETHODIMP VLCPlaylist::add(BSTR uri, BSTR name, VARIANT options, int* item)
         }
 
         char *psz_name = NULL;
-        if( SysStringLen(name) > 0 )
+        VARIANT v_name;
+        VariantInit(&v_name);
+        if( SUCCEEDED(VariantChangeType(&v_name, &name, 0, VT_BSTR)) )
         {
-            psz_name = CStrFromBSTR(CP_UTF8, name);
+            if( SysStringLen(V_BSTR(&v_name)) > 0 )
+                psz_name = CStrFromBSTR(CP_UTF8, V_BSTR(&v_name));
+
+            VariantClear(&v_name);
         }
 
         *item = libvlc_playlist_add_extended(p_libvlc,
@@ -912,7 +917,7 @@ VLCVideo::~VLCVideo()
         _p_typeinfo->Release();
 };
 
-HRESULT VLCVideo::getTypeInfo(void)
+HRESULT VLCVideo::loadTypeInfo(void)
 {
     HRESULT hr = NOERROR;
     if( NULL == _p_typeinfo )
@@ -938,7 +943,7 @@ STDMETHODIMP VLCVideo::GetTypeInfoCount(UINT* pctInfo)
     if( NULL == pctInfo )
         return E_INVALIDARG;
 
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
         *pctInfo = 1;
     else
         *pctInfo = 0;
@@ -951,7 +956,7 @@ STDMETHODIMP VLCVideo::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
     if( NULL == ppTInfo )
         return E_INVALIDARG;
 
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         _p_typeinfo->AddRef();
         *ppTInfo = _p_typeinfo;
@@ -964,7 +969,7 @@ STDMETHODIMP VLCVideo::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
 STDMETHODIMP VLCVideo::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
     }
@@ -975,7 +980,7 @@ STDMETHODIMP VLCVideo::Invoke(DISPID dispIdMember, REFIID riid,
         LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
         VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
 {
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
                 pVarResult, pExcepInfo, puArgErr);
@@ -1118,7 +1123,7 @@ VLCControl2::~VLCControl2()
         _p_typeinfo->Release();
 };
 
-HRESULT VLCControl2::getTypeInfo(void)
+HRESULT VLCControl2::loadTypeInfo(void)
 {
     HRESULT hr = NOERROR;
     if( NULL == _p_typeinfo )
@@ -1144,7 +1149,7 @@ STDMETHODIMP VLCControl2::GetTypeInfoCount(UINT* pctInfo)
     if( NULL == pctInfo )
         return E_INVALIDARG;
 
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
         *pctInfo = 1;
     else
         *pctInfo = 0;
@@ -1157,7 +1162,7 @@ STDMETHODIMP VLCControl2::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInf
     if( NULL == ppTInfo )
         return E_INVALIDARG;
 
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         _p_typeinfo->AddRef();
         *ppTInfo = _p_typeinfo;
@@ -1170,7 +1175,7 @@ STDMETHODIMP VLCControl2::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInf
 STDMETHODIMP VLCControl2::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
     }
@@ -1181,7 +1186,7 @@ STDMETHODIMP VLCControl2::Invoke(DISPID dispIdMember, REFIID riid,
         LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
         VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
 {
-    if( SUCCEEDED(getTypeInfo()) )
+    if( SUCCEEDED(loadTypeInfo()) )
     {
         return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
                 pVarResult, pExcepInfo, puArgErr);

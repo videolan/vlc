@@ -34,8 +34,11 @@ library AXVLC
 {
     // Forward declare all types defined in this typelib
     interface IVLCControl;
+    interface IVLCAudio;
+    interface IVLCInput;
     interface IVLCPlaylist;
-    interface ILibVLCControl;
+    interface IVLCVideo;
+    interface IVLCControl2;
     dispinterface DVLCEvents;
 
     importlib("stdole2.tlb");
@@ -246,7 +249,7 @@ library AXVLC
         HRESULT isPlaying([out, retval] VARIANT_BOOL* playing);
 
         [helpstring("Add a playlist item.")]
-        HRESULT add([in] BSTR uri, [in] BSTR name, [in, optional] VARIANT options, [out, retval] int* item);
+        HRESULT add([in] BSTR uri, [in, optional] VARIANT name, [in, optional] VARIANT options, [out, retval] int* item);
 
         [helpstring("Play/Resume the playlist.")]
         HRESULT play();
