@@ -1570,6 +1570,22 @@ AS_IF([test "${enable_audioscrobbler}" != "no"], [
   ])
 
 dnl
+dnl Musicbrainz plugin
+dnl
+
+enablemusicbrainz=false
+AC_ARG_ENABLE(musicbrainz,
+  [  --enable-musicbrainz    MusicBrainz support (default disabled) ],
+  [if test "${enable_musicbrainz}" = "yes"; then
+      PKG_CHECK_MODULES(MusicBrainz, QtCore QtGui,
+  	[ VLC_ADD_PLUGINS([musicbrainz])
+	  enablemusicbrainz=true
+	  VLC_ADD_LDFLAGS([musicbrainz],[-lmusicbrainz]) ],
+       [AC_MSG_WARN(MusicBrainz library not found)])
+   fi])
+AM_CONDITIONAL(ENABLE_MUSICBRAINZ, test "$enableqt4" = "true")
+
+dnl
 dnl  Input plugins
 dnl
 
