@@ -5209,6 +5209,8 @@ then
     then
        WINE_SDK_PATH=${with_wine_sdk_path}
        AC_PATH_PROG(WIDL, widl, no, [$WINE_SDK_PATH/bin:$WINE_SDK_PATH/tools/widl])
+    else
+       WIDL=no
     fi
     AC_LANG_PUSH(C++)
     AC_CHECK_HEADERS(ole2.h olectl.h,
