@@ -265,7 +265,7 @@ VlcPlugin::~VlcPlugin()
     delete psz_baseURL;
     delete psz_target;
     if( libvlc_instance )
-        libvlc_destroy(libvlc_instance);
+        libvlc_destroy(libvlc_instance, NULL );
 }
 
 /*****************************************************************************

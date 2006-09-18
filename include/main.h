@@ -36,15 +36,10 @@ struct libvlc_global_data_t
     vlc_bool_t             b_ready;     ///< Initialization boolean
     uint32_t               i_cpu;       ///< CPU extensions
     
-    int                    i_verbose;   ///< info messages
-    vlc_bool_t             b_color;     ///< color messages?
-
-    /* Object structure data */
+   /* Object structure data */
     int                    i_counter;   ///< object counter
     int                    i_objects;   ///< Attached objects count
     vlc_object_t **        pp_objects;  ///< Array of all objects 
-
-    msg_bank_t             msg_bank;    ///< The message bank
 
     module_bank_t *        p_module_bank; ///< The module bank
     intf_thread_t         *p_probe;       ///< Devices prober
@@ -87,6 +82,11 @@ struct libvlc_int_t
     char *                 psz_configfile;   ///< location of config file
 
     playlist_t            *p_playlist;       ///< playlist object
+
+    /* Messages */
+    msg_bank_t             msg_bank;    ///< The message bank
+    int                    i_verbose;   ///< info messages
+    vlc_bool_t             b_color;     ///< color messages?
 
     module_t *             p_memcpy_module;  ///< Fast memcpy plugin used
     void* ( *pf_memcpy ) ( void *, const void *, size_t ); ///< fast memcpy 

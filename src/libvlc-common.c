@@ -145,6 +145,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     int i_ret;
     libvlc_int_t * p_libvlc = NULL;
     vlc_value_t lockval;
+    char *psz_env;
 
     /* &libvlc_global never changes,
      * so we can safely call this multiple times. */
@@ -165,30 +166,9 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     if( !libvlc_global.b_ready )
     {
-        char *psz_env;
-
         /* Guess what CPU we have */
         libvlc_global.i_cpu = CPUCapabilities();
-
-        /* Find verbosity from VLC_VERBOSE environment variable */
-        psz_env = getenv( "VLC_VERBOSE" );
-        libvlc_global.i_verbose = psz_env ? atoi( psz_env ) : -1;
-
-#if defined( HAVE_ISATTY ) && !defined( WIN32 )
-        libvlc_global.b_color = isatty( 2 ); /* 2 is for stderr */
-#else
-        libvlc_global.b_color = VLC_FALSE;
-#endif
-
-        /* Initialize message queue */
-        msg_Create( p_libvlc_global );
-
-        /* Announce who we are */
-        msg_Dbg( p_libvlc_global, COPYRIGHT_MESSAGE );
-        msg_Dbg( p_libvlc_global, "libvlc was configured with %s",
-                                CONFIGURE_LINE );
-
-        /* The module bank will be initialized later */
+       /* The module bank will be initialized later */
         libvlc_global.p_module_bank = NULL;
 
         libvlc_global.b_ready = VLC_TRUE;
@@ -202,6 +182,22 @@ libvlc_int_t * libvlc_InternalCreate( void )
     p_libvlc->thread_id = 0;
     p_libvlc->p_playlist = NULL;
     p_libvlc->psz_object_name = "libvlc";
+
+    /* Initialize message queue */
+    msg_Create( p_libvlc );
+    /* Announce who we are - Do it only for first instance ? */
+    msg_Dbg( p_libvlc, COPYRIGHT_MESSAGE );
+    msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
+
+    /* Find verbosity from VLC_VERBOSE environment variable */
+    psz_env = getenv( "VLC_VERBOSE" );
+    p_libvlc->i_verbose = psz_env ? atoi( psz_env ) : -1;
+
+#if defined( HAVE_ISATTY ) && !defined( WIN32 )
+    p_libvlc->b_color = isatty( 2 ); /* 2 is for stderr */
+#else
+    p_libvlc->b_color = VLC_FALSE;
+#endif
 
     /* Initialize mutexes */
     vlc_mutex_init( p_libvlc, &p_libvlc->config_lock );
@@ -350,7 +346,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     /* End hack */
 
     /* Will be re-done properly later on */
-    p_libvlc->p_libvlc_global->i_verbose = config_GetInt( p_libvlc, "verbose" );
+    p_libvlc->i_verbose = config_GetInt( p_libvlc, "verbose" );
 
     /* Check for daemon mode */
 #ifndef WIN32
@@ -586,8 +582,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     var_AddCallback( p_libvlc, "verbose", VerboseCallback, NULL );
     var_Change( p_libvlc, "verbose", VLC_VAR_TRIGGER_CALLBACKS, NULL, NULL );
 
-    libvlc_global.b_color = libvlc_global.b_color && 
-                                config_GetInt( p_libvlc, "color" );
+    p_libvlc->b_color = p_libvlc->b_color && config_GetInt( p_libvlc, "color" );
 
     /*
      * Output messages that may still be in the queue
@@ -898,15 +893,14 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
         /* System specific cleaning code */
         system_End( p_libvlc );
 
-        /* Free message queue. Nobody shall use msg_* afterward.  */
-        msg_Flush( p_libvlc );
-        msg_Destroy( p_libvlc_global );
-
-        /* Destroy global iconv */
+       /* Destroy global iconv */
         LocaleDeinit();
     }
     vlc_mutex_unlock( lockval.p_address );
     var_Destroy( p_libvlc_global, "libvlc" );
+
+    msg_Flush( p_libvlc );
+    msg_Destroy( p_libvlc );
 
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_libvlc->config_lock );
@@ -1560,11 +1554,11 @@ static int ConsoleWidth( void )
 static int VerboseCallback( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param)
 {
-    libvlc_int_t *p_vlc = (libvlc_int_t *)p_this;
+    libvlc_int_t *p_libvlc = (libvlc_int_t *)p_this;
 
     if( new_val.i_int >= -1 )
     {
-        p_vlc->p_libvlc_global->i_verbose = __MIN( new_val.i_int, 2 );
+        p_libvlc->i_verbose = __MIN( new_val.i_int, 2 );
     }
     return VLC_SUCCESS;
 }

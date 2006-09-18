@@ -83,7 +83,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1destroy (JNIEnv *env, jobje
     
     instance = getClassInstance( env, _this );
 
-    libvlc_destroy( (libvlc_instance_t *) instance);
+    libvlc_destroy( (libvlc_instance_t *) instance, NULL );
 
     return;
 }
