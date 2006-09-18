@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
 #include <QTabWidget>
-#include <QBoxLayout>
+#include <QGridLayout>
 
 #include "dialogs/streaminfo.hpp"
 #include "input_manager.hpp"
@@ -37,13 +37,13 @@ StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf, bool _main_input ) :
                               QVLCFrame( _p_intf ), main_input( _main_input )
 {
     setWindowTitle( _("Stream information" ) );
-    QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom,this);
+    QGridLayout *layout = new QGridLayout(this);
     setGeometry(0,0,470,550);
 
     IT = new InfoTab( this, p_intf) ;
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
-    layout->addWidget(IT);
-    layout->addWidget(closeButton);
+    layout->addWidget(IT,0,0,1,3);
+    layout->addWidget(closeButton,1,2);
 
     BUTTONACT( closeButton, close() );
     ON_TIMEOUT( update() );
