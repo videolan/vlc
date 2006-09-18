@@ -941,7 +941,7 @@ update-po:
 	    | sort ; \
 	  echo "" ; \
 	  echo "# modules" ; \
-	  find modules -name '*.[chm]' -o -name '*.[ch]pp' -o -name 'qt4/ui/*.ui'\
+	  find modules -name '*.[chm]' -o -name '*.[ch]pp' -o -wholename 'modules/gui/qt4/ui/*.ui'\
 	    | grep -v '\(\.moc\.\|gui/gtk2/\)' \
 	    | grep -vE 'qt4/ui/.*.h' |grep -v qt4/resources.cpp \
 	    | sort ; \
