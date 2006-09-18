@@ -1577,7 +1577,7 @@ enablemusicbrainz=false
 AC_ARG_ENABLE(musicbrainz,
   [  --enable-musicbrainz    MusicBrainz support (default disabled) ],
   [if test "${enable_musicbrainz}" = "yes"; then
-      PKG_CHECK_MODULES(MusicBrainz, QtCore QtGui,
+      PKG_CHECK_MODULES(MusicBrainz, libmusicbrainz,
   	[ VLC_ADD_PLUGINS([musicbrainz])
 	  enablemusicbrainz=true
 	  VLC_ADD_LDFLAGS([musicbrainz],[-lmusicbrainz]) ],
