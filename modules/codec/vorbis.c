@@ -615,7 +615,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             psz_value++;
             input_Control( p_input, INPUT_ADD_INFO, _("Vorbis comment"),
                            psz_name, psz_value );
-            if( strcasestr( psz_name, "artist" ) )
+            if( !strcasecmp( psz_name, "artist" ) )
             {
                 vlc_meta_SetArtist( p_input->input.p_item->p_meta,
                                     psz_value );
@@ -623,13 +623,13 @@ static void ParseVorbisComments( decoder_t *p_dec )
                                         _(VLC_META_INFO_CAT), _(VLC_META_ARTIST),
                                         "%s", psz_value );
             }
-            else if( strcasestr( psz_name, "title" ) )
+            else if( !strcasecmp( psz_name, "title" ) )
             {
                 vlc_meta_SetTitle( p_input->input.p_item->p_meta,
                                    psz_value );
                 p_input->input.p_item->psz_name = strdup( psz_value );
             }
-            else if( strcasestr( psz_name, "album" ) )
+            else if( !strcasecmp( psz_name, "album" ) )
             {
                 vlc_meta_SetAlbum( p_input->input.p_item->p_meta,
                                    psz_value );
