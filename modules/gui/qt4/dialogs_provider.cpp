@@ -35,6 +35,7 @@
 #include "dialogs/prefs_dialog.hpp"
 #include "dialogs/streaminfo.hpp"
 #include "dialogs/messages.hpp"
+#include "dialogs/extended.hpp"
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -163,6 +164,10 @@ void DialogsProvider::streamingDialog()
 void DialogsProvider::prefsDialog()
 {
     PrefsDialog::getInstance( p_intf )->toggleVisible();
+}
+void DialogsProvider::extendedDialog()
+{
+    ExtendedDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::messagesDialog()

@@ -155,6 +155,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, bool with_intf )
     DP_SADD( qtr("Bookmarks"), "", "", bookmarksDialog() );
     menu->addSeparator();
     DP_SADD( qtr("Preferences"), "", "", prefsDialog() );
+    DP_SADD( qtr("Extended"), "","",extendedDialog() );
     return menu;
 }
 

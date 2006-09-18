@@ -95,7 +95,7 @@
       <widget class="QSlider" name="preampSlider" >
        <property name="orientation" >
         <enum>Qt::Vertical</enum>
-       </property>
+	</property>
       </widget>
      </item>
      <item rowspan="2" row="0" column="1" >

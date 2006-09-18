@@ -224,6 +224,7 @@ static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
 {
     InputManager *im = (InputManager*)param;
     im->b_has_audio = true;
+    return 0;
 }
 
 static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
@@ -231,4 +232,5 @@ static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
 {
     InputManager *im = (InputManager*)param;
     im->b_has_video = true;
+    return 0;
 }

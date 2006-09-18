@@ -38,15 +38,20 @@
 
 static const QString band_frequencies[] =
 {
-    " 60Hz", "170 Hz", "310 Hz", "600 Hz", "  1 kHz",
-    " 3 kHz", " 6 kHz", "12 kHz", "14 kHz", "16 kHz"
+    "   60Hz  ", " 170 Hz " , " 310 Hz ", " 600 Hz ", "  1 kHz  ",
+    "  3 kHz  " , "  6 kHz ", " 12 kHz ", " 14 kHz ", " 16 kHz "
 };
 
 Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
                             QWidget( _parent ) , p_intf( _p_intf )
 {
+    QFont smallFont = QApplication::font(0);
+    smallFont.setPointSize( smallFont.pointSize() - 3 );
+
     ui.setupUi( this );
 
+    ui.preampLabel->setFont( smallFont );
+    ui.preampSlider->setMaximum( 400 );
     for( int i = 0 ; i < NB_PRESETS ; i ++ )
     {
         ui.presetsCombo->addItem( qfu( preset_list_text[i] ),
@@ -54,17 +59,52 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
     }
     CONNECT( ui.presetsCombo, activated( int ), this, setPreset( int ) );
 
+    BUTTONACT( ui.enableCheck, enable() );
+    BUTTONACT( ui.eq2PassCheck, set2Pass() );
+
+    CONNECT( ui.preampSlider, valueChanged(int), this, setPreamp() );
+
+    QGridLayout *grid = new QGridLayout( ui.frame );
+    grid->setMargin( 0 );
     for( int i = 0 ; i < BANDS ; i++ )
     {
-        QGridLayout *grid = new QGridLayout( this );
-        bands[i] = new QSlider( Qt::Horizontal, this );
+        bands[i] = new QSlider( Qt::Vertical );
         bands[i]->setMaximum( 400 );
-
+        CONNECT( bands[i], valueChanged(int), this, setBand() );
         band_texts[i] = new QLabel( band_frequencies[i] + "\n0.0dB" );
-
+        band_texts[i]->setFont( smallFont );
         grid->addWidget( bands[i], 0, i );
         grid->addWidget( band_texts[i], 1, i );
     }
+
+    /* Write down initial values */
+    aout_instance_t *p_aout = (aout_instance_t *)vlc_object_find(p_intf,
+                                    VLC_OBJECT_AOUT, FIND_ANYWHERE);
+    char *psz_af = NULL;
+    char *psz_bands;
+    float f_preamp;
+    if( p_aout )
+    {
+        psz_af = var_GetString( p_aout, "audio-filter" );
+        if( var_GetBool( p_aout, "equalizer-2pass" ) )
+            ui.eq2PassCheck->setChecked( true );
+        psz_bands = var_GetString( p_aout, "equalizer-bands" );
+        f_preamp = var_GetFloat( p_aout, "equalizer-preamp" );
+        vlc_object_release( p_aout );
+    }
+    else
+    {
+        psz_af = config_GetPsz( p_intf, "audio-filter" );
+        if( config_GetInt( p_intf, "equalizer-2pass" ) )
+            ui.eq2PassCheck->setChecked( true );
+        psz_bands = config_GetPsz( p_intf, "equalizer-bands" );
+        f_preamp = config_GetFloat( p_intf, "equalizer-preamp" );
+    }
+    if( psz_af && strstr( psz_af, "equalizer" ) != NULL )
+        ui.enableCheck->setChecked( true );
+    enable( ui.enableCheck->isChecked() );
+
+    setValues( psz_bands, f_preamp );
 }
 
 Equalizer::~Equalizer()
@@ -76,8 +116,13 @@ void Equalizer::enable()
     bool en = ui.enableCheck->isChecked();
     aout_EnableFilter( VLC_OBJECT( p_intf ), "equalizer",
                        en ? VLC_TRUE : VLC_FALSE );
+    enable( en );
+}
 
+void Equalizer::enable( bool en )
+{
     ui.eq2PassCheck->setEnabled( en );
+    ui.preampLabel->setEnabled( en );
     ui.preampSlider->setEnabled( en  );
     for( int i = 0 ; i< BANDS; i++ )
     {
@@ -107,7 +152,7 @@ void Equalizer::set2Pass()
 
 void Equalizer::setPreamp()
 {
-    float f= (float)( 400 - ui.preampSlider->value() ) /10 - 20;
+    float f= (float)(  ui.preampSlider->value() ) /10 - 20;
     char psz_val[5];
     aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find(p_intf,
                                        VLC_OBJECT_AOUT, FIND_ANYWHERE);
@@ -133,9 +178,9 @@ void Equalizer::setBand()
     for( int i = 0 ; i< BANDS ; i++ )
     {
         char psz_val[5];
-        float f_val = (float)( 400 - bands[i]->value() ) / 10 - 20 ;
+        float f_val = (float)(  bands[i]->value() ) / 10 - 20 ;
         sprintf( psz_values, "%s %f", psz_values, f_val );
-        sprintf( psz_val, "%.1f", f_val );
+        sprintf( psz_val, "% 5.1f", f_val );
         band_texts[i]->setText( band_frequencies[i] + "\n" + psz_val + "dB" );
     }
     aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find(p_intf,
@@ -157,9 +202,9 @@ void Equalizer::setValues( char *psz_bands, float f_preamp )
 
         float f = strtof( p, &p );
         int  i_val= (int)( ( f + 20 ) * 10 );
-        bands[i]->setValue( 400 - i_val );
+        bands[i]->setValue(  i_val );
 
-        sprintf( psz_val, "%.1f", f );
+        sprintf( psz_val, "% 5.1f", f );
         band_texts[i]->setText( band_frequencies[i] + "\n" + psz_val + "dB" );
 
         if( p == NULL ) break;
@@ -169,7 +214,7 @@ void Equalizer::setValues( char *psz_bands, float f_preamp )
     char psz_val[5];
     int i_val = (int)( ( f_preamp + 20 ) * 10 );
     sprintf( psz_val, "%.1f", f_preamp );
-    ui.preampSlider->setValue( 400 - i_val );
+    ui.preampSlider->setValue( i_val );
     ui.preampLabel->setText( qtr("Preamp\n") + psz_val + qtr("dB") );
 }
 
@@ -210,5 +255,3 @@ void Equalizer::addCallbacks( aout_instance_t *p_aout )
 //    var_AddCallback( p_aout, "equalizer-bands", EqzCallback, this );
 //    var_AddCallback( p_aout, "equalizer-preamp", EqzCallback, this );
 }
-
-

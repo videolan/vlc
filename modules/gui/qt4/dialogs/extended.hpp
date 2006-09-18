@@ -1,8 +1,8 @@
 /*****************************************************************************
- * preferences_tree.hpp : Tree of modules for preferences
+ * extended.hpp : Extended controls - Undocked
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
- * $Id: preferences.hpp 16643 2006-09-13 12:45:46Z zorglub $
+ * $Id: streaminfo.hpp 16687 2006-09-17 12:15:42Z jb $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -18,42 +18,29 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
- *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
 
-#ifndef _EQUALIZER_H_
-#define _EQUALIZER_H_
+#ifndef _EXTENDED_DIALOG_H_
+#define _EXTENDED_DIALOG_H_
 
-#include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include "ui/equalizer.h"
+#include "util/qvlcframe.hpp"
+#include <QHBoxLayout>
 
-#define BANDS 10
-
-class Equalizer: public QWidget
+class ExtendedDialog : public QVLCFrame
 {
-    Q_OBJECT
+    Q_OBJECT;
 public:
-    Equalizer( intf_thread_t *, QWidget * );
-    virtual ~Equalizer();
-
+    static ExtendedDialog * getInstance( intf_thread_t *p_intf )
+    {
+        if( !instance)
+            instance = new ExtendedDialog( p_intf );
+        return instance;
+    }
+    virtual ~ExtendedDialog();
 private:
-    Ui::EqualizerWidget ui;
-    QSlider *bands[BANDS];
-    QLabel *band_texts[BANDS];
-
-    void delCallbacks( aout_instance_t * );
-    void addCallbacks( aout_instance_t * );
-    void setValues( char *, float );
-
-    intf_thread_t *p_intf;
-private slots:
-    void enable(bool);
-    void enable();
-    void set2Pass();
-    void setPreamp();
-    void setBand();
-    void setPreset(int);
+    ExtendedDialog( intf_thread_t * );
+    static ExtendedDialog *instance;
+public slots:
 };
 
 #endif

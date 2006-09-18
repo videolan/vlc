@@ -71,6 +71,7 @@ public slots:
     void bookmarksDialog();
     void streaminfoDialog();
     void prefsDialog();
+    void extendedDialog();
     void messagesDialog();
     void simplePLAppendDialog();
     void simpleMLAppendDialog();
