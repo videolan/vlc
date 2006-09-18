@@ -65,16 +65,7 @@ typedef struct
 
 #define MSG_QUEUE_NORMAL 0
 #define MSG_QUEUE_HTTPD_ACCESS 1
-
-/**
- * Store all data requiered by messages interfaces.
- */
-struct msg_bank_t
-{
-    vlc_mutex_t             lock;
-    int                     i_queues;
-    msg_queue_t           **pp_queues;
-};
+#define NB_QUEUES 2
 
 struct msg_queue_t
 {
@@ -97,6 +88,15 @@ struct msg_queue_t
 #ifdef UNDER_CE
     FILE *logfile;
 #endif
+};
+
+/**
+ * Store all data requiered by messages interfaces.
+ */
+struct msg_bank_t
+{
+    vlc_mutex_t             lock;
+    msg_queue_t             queues[NB_QUEUES];
 };
 
 /**
