@@ -452,7 +452,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
         input_item_t *p_current = p_playlist->p_preparse->pp_waiting[0];
         REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
         vlc_mutex_unlock( &p_obj->object_lock );
-        vlc_mutex_lock( &p_playlist->object_lock );
+        PL_LOCK;
         if( p_current )
         {
             vlc_bool_t b_preparsed = VLC_FALSE;
@@ -468,10 +468,12 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 b_preparsed = VLC_TRUE;
                 stats_TimerStart( p_playlist, "Preparse run",
                                   STATS_TIMER_PREPARSE );
+                PL_UNLOCK;
                 input_Preparse( p_playlist, p_current );
+                PL_LOCK;
                 stats_TimerStop( p_playlist, STATS_TIMER_PREPARSE );
             }
-            vlc_mutex_unlock( &p_playlist->object_lock );
+            PL_UNLOCK;
             if( b_preparsed )
             {
                 var_SetInteger( p_playlist, "item-change",
