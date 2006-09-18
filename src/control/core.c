@@ -101,7 +101,7 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
     return p_new;
 }
 
-void libvlc_destroy( libvlc_instance_t *p_instance )
+void libvlc_destroy( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
     libvlc_InternalCleanup( p_instance->p_libvlc_int );
     libvlc_InternalDestroy( p_instance->p_libvlc_int, VLC_FALSE );

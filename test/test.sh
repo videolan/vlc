@@ -9,6 +9,9 @@ export PYTHONPATH=$PYTHONPATH:bindings/mediacontrol-python/build/lib.linux-i686-
 
 export LD_LIBRARY_PATH=src/.libs/
 
+# Always dump core
+ulimit -c unlimited
+
 python test/test.py -v 2>&1|perl  -e \
 '$bold = "\033[1m";
 $grey  = "\033[37m";

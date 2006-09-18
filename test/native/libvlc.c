@@ -1,46 +1,76 @@
 #include "../pyunit.h"
 #include <vlc/libvlc.h>
 
- PyObject *exception_test( PyObject *self, PyObject *args )
+PyObject *exception_test( PyObject *self, PyObject *args )
 {
-     libvlc_exception_t exception;
+    libvlc_exception_t exception;
 
-     libvlc_exception_init( &exception );
-     ASSERT( !libvlc_exception_raised( &exception) , "Exception raised" );
-     ASSERT( !libvlc_exception_get_message( &exception) , "Exception raised" );
+    libvlc_exception_init( &exception );
+    ASSERT( !libvlc_exception_raised( &exception) , "Exception raised" );
+    ASSERT( !libvlc_exception_get_message( &exception) , "Exception raised" );
 
-     libvlc_exception_raise( &exception, NULL );
-     ASSERT( !libvlc_exception_get_message( &exception), "Unexpected message" );
-     ASSERT( libvlc_exception_raised( &exception), "Exception not raised" );
+    libvlc_exception_raise( &exception, NULL );
+    ASSERT( !libvlc_exception_get_message( &exception), "Unexpected message" );
+    ASSERT( libvlc_exception_raised( &exception), "Exception not raised" );
 
-     libvlc_exception_raise( &exception, "test" );
-     ASSERT( libvlc_exception_get_message( &exception), "No Message" );
-     ASSERT( libvlc_exception_raised( &exception), "Exception not raised" );
+    libvlc_exception_raise( &exception, "test" );
+    ASSERT( libvlc_exception_get_message( &exception), "No Message" );
+    ASSERT( libvlc_exception_raised( &exception), "Exception not raised" );
 
-     libvlc_exception_clear( &exception );
-     ASSERT( !libvlc_exception_raised( &exception ), "Exception not cleared" );
+    libvlc_exception_clear( &exception );
+    ASSERT( !libvlc_exception_raised( &exception ), "Exception not cleared" );
 
-     Py_INCREF( Py_None );
-     return Py_None;
+    Py_INCREF( Py_None );
+    return Py_None;
 }
 
- PyObject *create_destroy( PyObject *self, PyObject *args )
+PyObject *create_destroy( PyObject *self, PyObject *args )
 {
-    libvlc_instance_t *p_instance;
-    char *argv[] = { "vlc", "--quiet" };
+    libvlc_instance_t *p_i1, *p_i2;
+    char *argv1[] = { "vlc", "--quiet" };
+    char *argv2[]= { "vlc", "-vvv" };
+    int id1,id2;
+
+    printf( "\n" );
 
     libvlc_exception_t exception;
     libvlc_exception_init( &exception );
 
-    p_instance = libvlc_new( 2, argv, &exception );
+    /* Create and destroy a single instance */
+    fprintf( stderr, "Create 1\n" );
+    p_i1 = libvlc_new( 2, argv1, &exception );
+    ASSERT( p_i1 != NULL, "Instance creation failed" );
+    ASSERT_NOEXCEPTION;
+    id1 = libvlc_get_vlc_id( p_i1 );
+    libvlc_destroy( p_i1, &exception );
+    ASSERT_NOEXCEPTION;
 
-    ASSERT( p_instance != NULL, "Instance creation failed" );
+    /* Create and destroy two instances */
+    fprintf( stderr, "Create 2\n" );
+    p_i1 = libvlc_new( 2, argv1, &exception );
+    ASSERT( p_i1 != NULL, "Instance creation failed" );
+    ASSERT_NOEXCEPTION;
 
-    ASSERT( !libvlc_exception_raised( &exception ),
-             "Exception raised while creating instance" );
+    fprintf( stderr, "Create 3\n" );
+    p_i2 = libvlc_new( 2, argv2, &exception );
+    ASSERT( p_i2 != NULL, "Instance creation failed" );
+    ASSERT_NOEXCEPTION;
 
-    libvlc_destroy( p_instance );
-     
+    fprintf( stderr, "Destroy 1\n" );
+    libvlc_destroy( p_i1, &exception );
+    ASSERT_NOEXCEPTION;
+    fprintf( stderr, "Destroy 2\n" );
+    libvlc_destroy( p_i2, &exception );
+    ASSERT_NOEXCEPTION;
+
+    /* Deinit */
+    fprintf( stderr, "Create 4\n" );
+    p_i1 = libvlc_new( 2, argv1, &exception );
+    ASSERT_NOEXCEPTION;
+    id2 = libvlc_get_vlc_id( p_i1 );
+
+    ASSERT( id1 == id2, "libvlc object ids do not match after deinit" );
+
     Py_INCREF( Py_None );
     return Py_None;
 }

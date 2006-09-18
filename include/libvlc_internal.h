@@ -59,9 +59,12 @@ struct libvlc_input_t
     struct libvlc_instance_t *p_instance; ///< Parent instance
 };
 
-#define RAISENULL( psz ) { libvlc_exception_raise( p_e, psz ); return NULL; }
-#define RAISEVOID( psz ) { libvlc_exception_raise( p_e, psz ); return; }
-#define RAISEZERO( psz ) { libvlc_exception_raise( p_e, psz ); return 0; }
+#define RAISENULL( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
+                                return NULL; }
+#define RAISEVOID( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
+                                return; }
+#define RAISEZERO( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
+                                return 0; }
 
 # ifdef __cplusplus
 }

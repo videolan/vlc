@@ -868,14 +868,13 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
  */
 int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 {
-    /* Free allocated memory */
     if( p_libvlc->p_memcpy_module )
     {
         module_Unneed( p_libvlc, p_libvlc->p_memcpy_module );
         p_libvlc->p_memcpy_module = NULL;
     }
 
-    /* Free module bank !  */
+    /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank( p_libvlc );
 
     FREENULL( p_libvlc->psz_homedir );

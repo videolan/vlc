@@ -122,10 +122,10 @@ libvlc_instance_t * libvlc_new( int , char **, libvlc_exception_t *);
 int libvlc_get_vlc_id( libvlc_instance_t *p_instance );
 
 /**
- * Destroy a libvlc instance
+ * Destroy a libvlc instance.
  * \param p_instance the instance to destroy
  */
-void libvlc_destroy( libvlc_instance_t *);
+void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
 
 /** @}*/
 
