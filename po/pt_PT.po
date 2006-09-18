@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: pt_PT\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-08-31 15:10+0400\n"
-"PO-Revision-Date: 2006-09-04 15:43+0100\n"
+"PO-Revision-Date: 2006-09-18 14:46+0100\n"
 "Last-Translator: Ari Constâncio <ari.constancio at gmail dot com>\n"
 "Language-Team: Portuguese\n"
 "MIME-Version: 1.0\n"
@@ -617,10 +617,10 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"Este programa vem SEM GARANTIA, na extensão permitida por lei.\\n\n"
-"Pode redistribuí-lo sob os termos da Licença Pública Geral GNU;\\n\n"
-"veja o ficheiro denominado COPYING para detalhes.\\n\n"
-"Escrito pela equipa VideoLAN; veja o ficheiro AUTHORS.\\n"
+"Este programa vem SEM GARANTIA, na extensão permitida por lei.\n"
+"Pode redistribuí-lo sob os termos da Licença Pública Geral GNU;\n"
+"veja o ficheiro denominado COPYING para detalhes.\n"
+"Escrito pela equipa VideoLAN; veja o ficheiro AUTHORS.\n"
 
 #: src/audio_output/filters.c:154
 #: src/audio_output/filters.c:201
@@ -1080,15 +1080,13 @@ msgstr ""
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
-msgstr "Conteúdo enviado para vlc-help.txt"
+msgstr "\nConteúdo enviado para vlc-help.txt\n"
 
 #: src/libvlc.c:2487
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
-msgstr ""
-"\n"
-"Pressione a tecla RETURN para continuar...\n"
+msgstr "\nPressione a tecla RETURN para continuar...\n"
 
 #: src/libvlc.h:37
 #: src/libvlc.h:200
@@ -10147,17 +10145,17 @@ msgstr ""
 #: modules/gui/macosx/extended.m:79
 #: modules/gui/wxwidgets/extrapanel.cpp:1210
 msgid "Extended controls"
-msgstr ""
+msgstr "Controlos extendidos"
 
 #: modules/gui/macosx/extended.m:83
 #: modules/gui/wxwidgets/extrapanel.cpp:300
 msgid "Video filters"
-msgstr ""
+msgstr "Filtros de vídeo"
 
 #: modules/gui/macosx/extended.m:84
 #: modules/gui/wxwidgets/extrapanel.cpp:204
 msgid "Image adjustment"
-msgstr ""
+msgstr "Ajuste de imagem"
 
 #: modules/gui/macosx/extended.m:85
 #: modules/gui/macosx/wizard.m:371
@@ -10170,7 +10168,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:484
 #: modules/gui/wxwidgets/extrapanel.cpp:317
 msgid "More Info"
-msgstr ""
+msgstr "Mais informação"
 
 #: modules/gui/macosx/extended.m:86
 #: modules/video_filter/wave.c:51
@@ -10190,7 +10188,7 @@ msgstr ""
 
 #: modules/gui/macosx/extended.m:90
 msgid "General editing filters"
-msgstr ""
+msgstr "Filtros de edição geral"
 
 #: modules/gui/macosx/extended.m:91
 msgid "Distortion filters"
@@ -10212,7 +10210,7 @@ msgstr ""
 
 #: modules/gui/macosx/extended.m:95
 msgid "Creates several copies of the Video output window"
-msgstr ""
+msgstr "Cria várias cópias da janela de saída de vídeo"
 
 #: modules/gui/macosx/extended.m:97
 msgid "Image cropping"
@@ -10224,18 +10222,18 @@ msgstr ""
 
 #: modules/gui/macosx/extended.m:99
 msgid "Invert colors"
-msgstr ""
+msgstr "Inverte as cores"
 
 #: modules/gui/macosx/extended.m:100
 #: modules/gui/wxwidgets/extrapanel.cpp:150
 msgid "Inverts the colors of the image"
-msgstr ""
+msgstr "Inverte as cores da imagem"
 
 #: modules/gui/macosx/extended.m:101
 #: modules/gui/wxwidgets/extrapanel.cpp:152
 #: modules/video_filter/transform.c:67
 msgid "Transformation"
-msgstr ""
+msgstr "Transformação"
 
 #: modules/gui/macosx/extended.m:102
 #: modules/gui/wxwidgets/extrapanel.cpp:152
@@ -10244,63 +10242,63 @@ msgstr ""
 
 #: modules/gui/macosx/extended.m:103
 msgid "Interactive Zoom"
-msgstr ""
+msgstr "Zoom interactivo"
 
 #: modules/gui/macosx/extended.m:104
 msgid "Enables an interactive Zoom feature"
-msgstr ""
+msgstr "Activa uma opção de zoom interactivo"
 
 #: modules/gui/macosx/extended.m:105
 #: modules/gui/wxwidgets/extrapanel.cpp:401
 msgid "Volume normalization"
-msgstr ""
+msgstr "Normalização do volume"
 
 #: modules/gui/macosx/extended.m:106
 msgid "Prevents the audio output from going over a predefined value."
-msgstr ""
+msgstr "Impede a saída áudio de ultrapassar um valor pré-definido."
 
 #: modules/gui/macosx/extended.m:108
 #: modules/gui/wxwidgets/extrapanel.cpp:396
 msgid "Headphone virtualization"
-msgstr ""
+msgstr "Virtualização de auscultador"
 
 #: modules/gui/macosx/extended.m:109
 #: modules/gui/wxwidgets/extrapanel.cpp:397
 msgid "Imitates the effect of surround sound when using headphones."
-msgstr ""
+msgstr "Imita o efeito do som envolvente quando usando auscultadores."
 
 #: modules/gui/macosx/extended.m:111
 #: modules/gui/wxwidgets/extrapanel.cpp:406
 msgid "Maximum level"
-msgstr ""
+msgstr "Nível máximo"
 
 #: modules/gui/macosx/extended.m:112
 #: modules/gui/wxwidgets/extrapanel.cpp:221
 #: modules/gui/wxwidgets/extrapanel.cpp:481
 msgid "Restore Defaults"
-msgstr ""
+msgstr "Restaura valores por defeito"
 
 #: modules/gui/macosx/extended.m:116
 #: modules/gui/wxwidgets/extrapanel.cpp:244
 msgid "Gamma"
-msgstr ""
+msgstr "Gama"
 
 #: modules/gui/macosx/extended.m:118
 #: modules/gui/wxwidgets/extrapanel.cpp:239
 msgid "Saturation"
-msgstr ""
+msgstr "Saturação"
 
 #: modules/gui/macosx/extended.m:119
 #: modules/gui/macosx/macosx.m:59
 #: modules/gui/macosx/sfilters.m:79
 #: modules/gui/macosx/sfilters.m:90
 msgid "Opaqueness"
-msgstr ""
+msgstr "Opacidade"
 
 #: modules/gui/macosx/extended.m:620
 #: modules/gui/wxwidgets/extrapanel.cpp:1007
 msgid "More Information"
-msgstr ""
+msgstr "Mais informação"
 
 #: modules/gui/macosx/extended.m:621
 msgid ""
@@ -10311,35 +10309,35 @@ msgstr ""
 
 #: modules/gui/macosx/interaction.m:130
 msgid "Login:"
-msgstr ""
+msgstr "Login:"
 
 #: modules/gui/macosx/interaction.m:131
 msgid "Password:"
-msgstr ""
+msgstr "Palavra-passe:"
 
 #: modules/gui/macosx/interaction.m:139
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:81
 msgid "Error"
-msgstr ""
+msgstr "Erro"
 
 #: modules/gui/macosx/interaction.m:219
 #: modules/gui/macosx/interaction.m:285
 #, c-format
 msgid "Remaining time: %i seconds"
-msgstr ""
+msgstr "Tempo restante: %i segundos"
 
 #: modules/gui/macosx/interaction.m:389
 #: modules/gui/macosx/intf.m:601
 msgid "Errors and Warnings"
-msgstr ""
+msgstr "Erros e avisos"
 
 #: modules/gui/macosx/interaction.m:390
 msgid "Clean up"
-msgstr ""
+msgstr "Limpar"
 
 #: modules/gui/macosx/interaction.m:391
 msgid "Show Details"
-msgstr ""
+msgstr "Mostrar detalhes"
 
 #: modules/gui/macosx/intf.m:487
 msgid "VLC - Controller"
@@ -10385,7 +10383,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:517
 #: modules/gui/wxwidgets/interface.cpp:1502
 msgid "Quit VLC"
-msgstr ""
+msgstr "Sair de VLC"
 
 #: modules/gui/macosx/intf.m:519
 msgid "1:File"
@@ -10607,7 +10605,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:501
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:82
 msgid "Browse..."
-msgstr ""
+msgstr "Explorar..."
 
 #: modules/gui/macosx/open.m:165
 msgid "Treat as a pipe rather than as a file"
@@ -10626,21 +10624,21 @@ msgstr ""
 #: modules/gui/macosx/open.m:595
 #: modules/gui/wxwidgets/dialogs/open.cpp:697
 msgid "DVD"
-msgstr ""
+msgstr "DVD"
 
 #: modules/gui/macosx/open.m:179
 #: modules/gui/macosx/output.m:146
 #: modules/gui/wxwidgets/dialogs/open.cpp:849
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:520
 msgid "Address"
-msgstr ""
+msgstr "Endereço"
 
 #: modules/gui/macosx/open.m:184
 #: modules/gui/macosx/open.m:655
 #: modules/gui/macosx/open.m:704
 #: modules/gui/wxwidgets/dialogs/open.cpp:805
 msgid "UDP/RTP Multicast"
-msgstr ""
+msgstr "Multicast UDP/RTP"
 
 #: modules/gui/macosx/open.m:185
 #: modules/gui/macosx/open.m:656
@@ -10662,7 +10660,7 @@ msgstr ""
 #: modules/gui/macosx/output.m:137
 #: modules/gui/wxwidgets/dialogs/open.cpp:436
 msgid "Settings..."
-msgstr ""
+msgstr "Definições..."
 
 #: modules/gui/macosx/open.m:243
 msgid "Override parametters"
@@ -10738,12 +10736,12 @@ msgstr ""
 #: modules/gui/macosx/output.m:155
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:661
 msgid "Encapsulation Method"
-msgstr ""
+msgstr "Método de encapsulação"
 
 #: modules/gui/macosx/output.m:159
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:711
 msgid "Transcoding options"
-msgstr ""
+msgstr "Opções de transcodificação"
 
 #: modules/gui/macosx/output.m:163
 #: modules/gui/macosx/output.m:173
@@ -10753,31 +10751,31 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:848
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:887
 msgid "Bitrate (kb/s)"
-msgstr ""
+msgstr "Taxa de transmissão (kb/s)"
 
 #: modules/gui/macosx/output.m:166
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:782
 msgid "Scale"
-msgstr ""
+msgstr "Escala"
 
 #: modules/gui/macosx/output.m:180
 msgid "Stream Announcing"
-msgstr ""
+msgstr "Anúncio de emissão"
 
 #: modules/gui/macosx/output.m:181
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:590
 msgid "SAP announce"
-msgstr ""
+msgstr "Anúncio SAP"
 
 #: modules/gui/macosx/output.m:182
 #: modules/gui/macosx/output.m:635
 msgid "RTSP announce"
-msgstr ""
+msgstr "Anúncio RTSP"
 
 #: modules/gui/macosx/output.m:183
 #: modules/gui/macosx/output.m:641
 msgid "HTTP announce"
-msgstr ""
+msgstr "Anúncio HTTP"
 
 #: modules/gui/macosx/output.m:184
 #: modules/gui/macosx/output.m:647
@@ -10800,7 +10798,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:591
 msgid "URI"
-msgstr ""
+msgstr "URI"
 
 #: modules/gui/macosx/playlistinfo.m:63
 msgid "Advanced Information"
@@ -10892,7 +10890,7 @@ msgstr ""
 #: modules/gui/macosx/playlist.m:449
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:330
 msgid "Search"
-msgstr ""
+msgstr "Procurar"
 
 #: modules/gui/macosx/playlist.m:451
 msgid "Search in Playlist"
@@ -10948,12 +10946,12 @@ msgstr ""
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:213
 msgid "Reset All"
-msgstr ""
+msgstr "Limpar tudo"
 
 #: modules/gui/macosx/prefs.m:142
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:296
 msgid "Reset Preferences"
-msgstr ""
+msgstr "Limpar preferências"
 
 #: modules/gui/macosx/prefs.m:143
 msgid "Continue"
@@ -11003,7 +11001,7 @@ msgstr ""
 #: modules/gui/macosx/sfilters.m:87
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:399
 msgid "Enabled"
-msgstr ""
+msgstr "Activado"
 
 #: modules/gui/macosx/sfilters.m:77
 msgid "Image:"
@@ -11236,22 +11234,22 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:126
 #: modules/gui/wxwidgets/streamdata.cpp:43
 msgid "DivX first version (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "Primeira versão DivX (a usar com MPEG TS, MPEG1, ASF e OGG)"
 
 #: modules/gui/macosx/wizard.m:130
 #: modules/gui/wxwidgets/streamdata.cpp:47
 msgid "DivX second version (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "Segunda versão DivX (a usar com MPEG TS, MPEG1, ASF e OGG)<"
 
 #: modules/gui/macosx/wizard.m:134
 #: modules/gui/wxwidgets/streamdata.cpp:50
 msgid "DivX third version (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "Terceira versão DivX (a usar com MPEG TS, MPEG1, ASF e OGG)<"
 
 #: modules/gui/macosx/wizard.m:138
 #: modules/gui/wxwidgets/streamdata.cpp:53
 msgid "H263 is a video codec optimized for videoconference (low rates, useable with MPEG TS)"
-msgstr ""
+msgstr "H263 é um codec de vídeo optimizado para videoconferência (taxas baixas, a usar com MPEG TS)"
 
 #: modules/gui/macosx/wizard.m:142
 msgid "H264 is a new video codec (useable with MPEG TS and MP4)"
@@ -11268,7 +11266,7 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:154
 #: modules/gui/wxwidgets/streamdata.cpp:70
 msgid "MJPEG consists of a series of JPEG pictures (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "MJPEG consiste numa série de imagens JPEG (a usar com MPEG TS, MPEG1, ASF e OGG)"
 
 #: modules/gui/macosx/wizard.m:158
 msgid "Theora is a free general-purpose codec (useable with MPEG TS and OGG)"
@@ -11284,7 +11282,7 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:181
 #: modules/gui/wxwidgets/streamdata.cpp:84
 msgid "The standard MPEG audio (1/2) format (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)"
-msgstr ""
+msgstr "O formato padrão MPEG áudio (1/2) (a usar com MPEG PS, Mpeg TS, MPEG1, ASF, OGG e RAW)"
 
 #: modules/gui/macosx/wizard.m:185
 #: modules/gui/wxwidgets/streamdata.cpp:88
@@ -12419,11 +12417,11 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
 msgid "Stream and Media Info"
-msgstr ""
+msgstr "Informação de media e emissão"
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:83
 msgid "Advanced information"
-msgstr ""
+msgstr "Informação avançada"
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:114
 msgid "The following errors occurred. More details might be available in the Messages window."
@@ -12431,74 +12429,74 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:170
 msgid "&Yes"
-msgstr ""
+msgstr "&Sim"
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:172
 msgid "&No"
-msgstr ""
+msgstr "&Não"
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:183
 msgid "Don't show further errors"
-msgstr ""
+msgstr "Não mostrar mais erros"
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:188
 #: modules/gui/wxwidgets/dialogs/messages.cpp:72
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:253
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:76
 msgid "&Close"
-msgstr ""
+msgstr "&Fechar"
 
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:58
 msgid "Playlist item info"
-msgstr ""
+msgstr "Informção sobre item da lista de reprodução"
 
 #: modules/gui/wxwidgets/dialogs/messages.cpp:81
 msgid "Save &As..."
-msgstr ""
+msgstr "&Guardar como..."
 
 #: modules/gui/wxwidgets/dialogs/messages.cpp:199
 msgid "Save Messages As..."
-msgstr ""
+msgstr "Guardar mensagens como..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:259
 msgid "Advanced options..."
-msgstr ""
+msgstr "Opções avançadas..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:264
 #: modules/gui/wxwidgets/dialogs/open.cpp:275
 #: modules/gui/wxwidgets/dialogs/open.cpp:420
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:217
 msgid "Advanced options"
-msgstr ""
+msgstr "Opções avançadas"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:279
 msgid "Options:"
-msgstr ""
+msgstr "Opções:"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:388
 #: modules/gui/wxwidgets/dialogs/open.cpp:396
 msgid "Open..."
-msgstr ""
+msgstr "Abrir..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:430
 msgid "Stream/Save"
-msgstr ""
+msgstr "Emitir/guardar"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:431
 msgid "Use VLC as a stream server"
-msgstr ""
+msgstr "Usar VLC como servidor de emissão"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:457
 msgid "Caching"
-msgstr ""
+msgstr "Caching"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:458
 msgid "Change the default caching value (in milliseconds)"
-msgstr ""
+msgstr "Mudar o valor padrão de caching (em milissegundos)"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:471
 msgid "Customize:"
-msgstr ""
+msgstr "Customizar:"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:475
 msgid ""
@@ -12869,15 +12867,15 @@ msgstr "Broadcasts"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:78
 msgid "Load"
-msgstr ""
+msgstr "Carregar"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:217
 msgid "Load Configuration"
-msgstr ""
+msgstr "Carregar configuração"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:231
 msgid "Save Configuration"
-msgstr ""
+msgstr "Guardar configuração"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:247
 msgid "New broadcast"
@@ -12887,15 +12885,15 @@ msgstr "Novo broadcast"
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:394
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:122
 msgid "Choose"
-msgstr ""
+msgstr "Escolher"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:388
 msgid "Output"
-msgstr ""
+msgstr "Saída"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:404
 msgid "Loop"
-msgstr ""
+msgstr "Loop"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:415
 msgid "Create"
@@ -12907,15 +12905,15 @@ msgstr "Emissão VLM"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:86
 msgid "This wizard helps you to stream, transcode or save a stream."
-msgstr ""
+msgstr "Este assistente ajudá-lo-á a emitir, transcodificar ou guardar uma emissão."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:89
 msgid "Use this to stream on a network."
-msgstr ""
+msgstr "Use isto para emitir numa rede."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:91
 msgid "Use this to re-encode a stream and save it to a file."
-msgstr ""
+msgstr "Use isto para re-codificar uma emissão e guardá-la num ficheiro."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:93
 msgid "This wizard only contains a small subset of VLC's streaming and transcoding capabilities. Use the Open and Stream Output dialogs to access all of them."
@@ -12923,7 +12921,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:97
 msgid "Use this to stream on a network"
-msgstr ""
+msgstr "Use isto para emitir numa rede."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:99
 msgid ""
@@ -12938,7 +12936,7 @@ msgstr "Deve escolher uma emissão"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:113
 msgid "Unable to find playlist"
-msgstr ""
+msgstr "Não foi possível encontrar uma lista de reprodução"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:115
 msgid ""
@@ -12953,19 +12951,19 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:130
 msgid "Transcode video (if available)"
-msgstr ""
+msgstr "Transcodifica vídeo (se possível)"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:131
 msgid "Select the target video codec. Choose a codec to display more information about it."
-msgstr ""
+msgstr "Selecciona o codec de vídeo pretendido. Escolha um codec para ver mais informações."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:134
 msgid "Transcode audio (if available)"
-msgstr ""
+msgstr "Transcodifica áudio (se disponível)"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
 msgid "Select the target audio codec. Choose a codec to display more information about it."
-msgstr ""
+msgstr "Selecciona o codec de áudio pretendido. Escolha um codec para ver mais informações."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:140
 msgid "Determines how the input stream will be sent."
@@ -12981,37 +12979,39 @@ msgstr "Indique por favor um endereço"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:149
 msgid "Determines how the stream will be encapsulated. Depending on the previous choices, some formats might not be available."
-msgstr ""
+msgstr "Determina de que forma a emissão vai ser encapsulada. Dependendo das escolhas anteriores, alguns formatos poderão não estar disponíveis."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:156
 msgid "Defines a few additional parameters for the transcoding."
-msgstr ""
+msgstr "Define alguns parâmetros adicionais para a transcodificação."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:159
 msgid "You must choose a file to save to"
-msgstr ""
+msgstr "Deve escolher um ficheiro para gravar nel"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:163
 msgid "Defines a few additional parameters for the stream."
-msgstr ""
+msgstr "Define alguns parâmetros adicionais para a emissão."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:166
 msgid "Define the TTL (Time-To-Live) of the stream. This parameter is the maximum number of routers your stream can go through. If you don't know what it means, or if you want to stream on your local network only, leave this setting to 1."
-msgstr ""
+msgstr "Define o TTL (Time-To-Live) da emissão. Este parâmetro é o número máximo de routers que a emissão poderá atravessar. Se não sabe o que isto quer dizer, ou pretende emitir apenas na rede local, deixe esta opção com o valor 1."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:171
 msgid ""
 "When streaming using RTP, you can announce your streams using the SAP/SDP announcing protocol. This way, the clients won't have to type in the multicast address, it will appear in their playlist if they enable the SAP extra interface.\n"
 "If you want to give a name to your stream, enter it here. Otherwise, a default name will be used."
 msgstr ""
+"Quando emitir com RTP, pode anunciar as suas emissões com o protocolo de anúncio SAP/SDP. Desta forma, os clientes não precisam de introduzir o endereço multicast, que irá aparecer na sua lista de reprodução, caso tenham activado a interface extra SAP.\n"
+"Se quiser dar um nome à emissão, introduza-o aqui. Caso contrário, será usado um nome padrão."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:506
 msgid "More information"
-msgstr ""
+msgstr "Mais informação"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1291
 msgid "Save to file"
-msgstr ""
+msgstr "Guardar em ficheiro"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:41
 msgid "Controls the blending of equalizer bands. The higher this value is, the more correlated their movement will be."
@@ -13139,7 +13139,7 @@ msgstr "&Mensagens...\tCtrl-M"
 
 #: modules/gui/wxwidgets/interface.cpp:596
 msgid "Stream and Media &Info...\tCtrl-I"
-msgstr "&Informação de média e emissão...\tCtrl-I"
+msgstr "&Informação de media e emissão...\tCtrl-I"
 
 #: modules/gui/wxwidgets/interface.cpp:598
 msgid "VLM Control...\tCtrl-V"
@@ -13159,7 +13159,7 @@ msgstr "&Ficheiro"
 
 #: modules/gui/wxwidgets/interface.cpp:615
 msgid "&View"
-msgstr "&Ver"
+msgstr "V&er"
 
 #: modules/gui/wxwidgets/interface.cpp:616
 msgid "&Settings"
@@ -13167,7 +13167,7 @@ msgstr "&Definições"
 
 #: modules/gui/wxwidgets/interface.cpp:617
 msgid "&Audio"
-msgstr "&Áudio"
+msgstr "Á&udio"
 
 #: modules/gui/wxwidgets/interface.cpp:618
 msgid "&Video"
@@ -13196,29 +13196,29 @@ msgstr ""
 
 #: modules/gui/wxwidgets/interface.cpp:683
 msgid "Play slower"
-msgstr ""
+msgstr "Reproduzir mais lentamente"
 
 #: modules/gui/wxwidgets/interface.cpp:684
 msgid "Play faster"
-msgstr ""
+msgstr "Reproduzir mais rapidamente"
 
 #: modules/gui/wxwidgets/interface.cpp:881
 msgid "Extended &GUI\tCtrl-G"
-msgstr ""
+msgstr "GUI extendido\tCtrl-G"
 
 #: modules/gui/wxwidgets/interface.cpp:884
 msgid "&Bookmarks...\tCtrl-B"
-msgstr ""
+msgstr "&Marcas...\tCtrl-B"
 
 #: modules/gui/wxwidgets/interface.cpp:886
 msgid "Preference&s...\tCtrl-S"
-msgstr ""
+msgstr "Preferência&s...\tCtrl-S"
 
 #: modules/gui/wxwidgets/interface.cpp:939
 msgid ""
 " (wxWidgets interface)\n"
 "\n"
-msgstr ""
+msgstr "(interface wxWidgets)\n\n"
 
 #: modules/gui/wxwidgets/interface.cpp:952
 msgid ""
@@ -13230,11 +13230,11 @@ msgstr ""
 #: modules/gui/wxwidgets/interface.cpp:955
 #, c-format
 msgid "About %s"
-msgstr ""
+msgstr "Sobre %s"
 
 #: modules/gui/wxwidgets/interface.cpp:1513
 msgid "Show/Hide Interface"
-msgstr ""
+msgstr "Mostrar/esconder interface"
 
 #: modules/gui/wxwidgets/menus.cpp:124
 msgid "Quick &Open File..."
