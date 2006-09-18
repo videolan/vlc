@@ -94,6 +94,7 @@
 static libvlc_global_data_t   libvlc_global;
 static libvlc_global_data_t * p_libvlc_global;
 static libvlc_int_t *    p_static_vlc;
+static volatile unsigned int i_instances = 0;
 
 /*****************************************************************************
  * Local prototypes
@@ -159,6 +160,9 @@ libvlc_int_t * libvlc_InternalCreate( void )
     var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
     var_Get( p_libvlc_global, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
+
+    i_instances++;
+
     if( !libvlc_global.b_ready )
     {
         char *psz_env;
@@ -194,7 +198,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     /* Allocate a libvlc instance object */
     p_libvlc = vlc_object_create( p_libvlc_global, VLC_OBJECT_LIBVLC );
-    if( p_libvlc == NULL ) return NULL;
+    if( p_libvlc == NULL ) { i_instances--; return NULL; }
     p_libvlc->thread_id = 0;
     p_libvlc->p_playlist = NULL;
     p_libvlc->psz_object_name = "libvlc";
@@ -868,6 +872,8 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
  */
 int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 {
+    vlc_value_t lockval;
+
     if( p_libvlc->p_memcpy_module )
     {
         module_Unneed( p_libvlc, p_libvlc->p_memcpy_module );
@@ -882,18 +888,25 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
     FREENULL( p_libvlc->psz_configfile );
     FREENULL( p_libvlc->p_hotkeys );
 
-    /* System specific cleaning code */
-    system_End( p_libvlc );
+    var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_libvlc_global, "libvlc", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+    i_instances--;
 
-    /*
-     * Free message queue.
-     * Nobody shall use msg_* afterward.
-     */
-    msg_Flush( p_libvlc );
-    msg_Destroy( p_libvlc_global );
+    if( i_instances == 0 )
+    {
+        /* System specific cleaning code */
+        system_End( p_libvlc );
 
-    /* Destroy global iconv */
-    LocaleDeinit();
+        /* Free message queue. Nobody shall use msg_* afterward.  */
+        msg_Flush( p_libvlc );
+        msg_Destroy( p_libvlc_global );
+
+        /* Destroy global iconv */
+        LocaleDeinit();
+    }
+    vlc_mutex_unlock( lockval.p_address );
+    var_Destroy( p_libvlc_global, "libvlc" );
 
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_libvlc->config_lock );
@@ -902,7 +915,9 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
     if( b_release ) vlc_object_release( p_libvlc );
     vlc_object_destroy( p_libvlc );
 
-    /* Stop thread system: last one out please shut the door! */
+    /* Stop thread system: last one out please shut the door!
+     * The number of initializations of the thread system is counted, we 
+     * can call this each time */
     vlc_threads_end( p_libvlc_global );
 
     return VLC_SUCCESS;
