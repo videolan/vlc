@@ -36,10 +36,15 @@ while(<STDIN>)
         $line =~ /^touch.*/ ||
         $line =~ /^srcdir=.*/ ||
         $line =~ /^.* (lib[A-z0-9-_]*plugin.so).*/ ||
-        $line =~ s/^rm\s\-f\s(.*)//g )
+	$line =~ /^\sgcc\s-std=.*/ ||
+	$line =~ /^.*libtool.*\-o\s(lib.*\.la).*/ ||
+        $line =~ /^.*rm\s\-f\s(.*)/ ||
+	$line =~ /^rm\s-fr\s(.*)/ ||
+	$line =~ /^creating lib.*/ )
      {}
      # Info
      elsif(
+	  $line =~ s/^.*\-shared.*(lib.*\.so).*/ LINK    : $1/g ||
           $line =~ s/^.* (lib.*\.so).*/ LINK    : $1/g ||
           $line =~ s/^.* (lib.*\.o)\s\.\/(.*)/ COMPILE : $2/g ||
           $line =~ s/^.* (lib.*\.o)\s`.*`(.*);\ \\/ COMPILE : $2/ ||
