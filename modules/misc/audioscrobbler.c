@@ -4,7 +4,7 @@
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
  *
- * Authors: Rafaël Carré <rafael -dot- carre -at- gmail -dot- com>
+ * Authors: RafaÃ«l CarrÃ© <rafael -dot- carre -at- gmail -dot- com>
  *          Kenneth Ostby <kenneo -at- idi -dot- ntnu -dot- no>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -94,7 +94,6 @@ struct intf_sys_t
     char                    *psz_response_md5;  /* md5 response to use    */
 
 /* data about input elements */
-    input_thread_t          *p_input;           /* previous p_input       */
     audioscrobbler_song_t   *p_current_song;    /* song being played      */
     time_t                  time_pause;         /* time when vlc paused   */
     time_t                  time_total_pauses;  /* sum of time in pause   */
@@ -171,12 +170,10 @@ vlc_module_end();
 
 static int Open( vlc_object_t *p_this )
 {
-    intf_thread_t       *p_intf;
-    intf_sys_t          *p_sys;
     playlist_t          *p_playlist;
 
-    p_intf = ( intf_thread_t* ) p_this;
-    p_sys = malloc( sizeof( intf_sys_t ) );
+    intf_thread_t *p_intf = ( intf_thread_t* ) p_this;
+    intf_sys_t *p_sys = malloc( sizeof( intf_sys_t ) );
     if( !p_sys )
     {
       goto error;
@@ -191,7 +188,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_interval = 0;
     p_sys->time_last_interval = time( NULL );
     p_sys->psz_username = NULL;
-    p_sys->p_input = NULL;
     p_sys->b_paused = VLC_FALSE;
 
     /* md5 response is 32 chars, + final \0 */
@@ -251,24 +247,25 @@ error:
 static void Close( vlc_object_t *p_this )
 {
     audioscrobbler_queue_t      *p_current_queue, *p_next_queue;
+    playlist_t                  *p_playlist;
     input_thread_t              *p_input;
-    intf_thread_t               *p_intf = (intf_thread_t* ) p_this;
-    intf_sys_t                  *p_sys = p_intf->p_sys;
-    playlist_t                  *p_playlist = pl_Yield( p_intf );
+
+    intf_thread_t *p_intf = ( intf_thread_t* ) p_this;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
     p_playlist = pl_Yield( p_intf );
-    var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
-
     PL_LOCK;
     p_input = p_playlist->p_input;
-    if( p_input ) vlc_object_yield( p_input );
-    PL_UNLOCK;
+    var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
 
-    if( p_input )
+    if ( p_input )
     {
+        vlc_object_yield( p_input );
         var_DelCallback( p_input, "state", PlayingChange, p_intf );
+        vlc_object_release( p_input );
     }
 
+    PL_UNLOCK;
     pl_Release( p_playlist );
 
     vlc_mutex_lock ( &p_sys->lock );
@@ -313,10 +310,10 @@ static void Run( intf_thread_t *p_this )
     char                    *p_buffer_pos = NULL;
     time_t                  played_time;
     audioscrobbler_queue_t  *p_first_queue;
-    intf_sys_t              *p_sys;
 
     p_this->p_sys = p_sys_global;
-    p_sys = p_this->p_sys;
+    intf_sys_t *p_sys = p_this->p_sys;
+
     while( !p_this->b_die )
     {
         if( p_sys->b_handshaked == VLC_FALSE )
@@ -479,6 +476,7 @@ static void Run( intf_thread_t *p_this )
         if( p_playlist->request.i_status == PLAYLIST_STOPPED )
         {
             PL_UNLOCK;
+            pl_Release( p_playlist );
             /* if we stopped, we won't submit playing song */
             vlc_mutex_lock( &p_sys->lock );
             p_sys->b_queued = VLC_TRUE;
@@ -488,9 +486,9 @@ static void Run( intf_thread_t *p_this )
         else
         {
             PL_UNLOCK;
+            pl_Release( p_playlist );
         }
 
-        pl_Release( p_playlist );
         vlc_mutex_lock( &p_sys->lock );
 
         if( p_sys->b_metadata_read == VLC_FALSE )
@@ -534,11 +532,8 @@ static void Run( intf_thread_t *p_this )
 static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    intf_thread_t       *p_intf;
-    intf_sys_t          *p_sys;
-
-    p_intf = ( intf_thread_t* ) p_data;
-    p_sys = p_intf->p_sys;
+    intf_thread_t *p_intf = ( intf_thread_t* ) p_data;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
     (void)p_this; (void)psz_var; (void)oldval;
 
@@ -569,18 +564,14 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 {
     playlist_t          *p_playlist;
     input_thread_t      *p_input = NULL;
-    intf_thread_t       *p_intf;
-    intf_sys_t          *p_sys;
-
     time_t              epoch;
     struct tm           *epoch_tm;
-
     char                psz_date[20];
 
     (void)p_this; (void)psz_var; (void)oldval; (void)newval;
 
-    p_intf = ( intf_thread_t* ) p_data;
-    p_sys = p_intf->p_sys;
+    intf_thread_t *p_intf = ( intf_thread_t* ) p_data;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
@@ -610,9 +601,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     /* reset pause counter */
     p_sys->time_total_pauses = 0;
-
-    /* we save the p_input value to delete the callback later */
-    p_sys->p_input = p_input;
 
     /* we'll read after to be sure it's present */
     p_sys->b_metadata_read = VLC_FALSE;
@@ -645,9 +633,8 @@ static int AddToQueue ( intf_thread_t *p_this )
     int                         i_songs_nb;
     time_t                      played_time;
     audioscrobbler_queue_t      *p_queue = NULL, *p_next_queue = NULL;
-    intf_sys_t                  *p_sys;
 
-    p_sys = p_this->p_sys;
+    intf_sys_t *p_sys = p_this->p_sys;
 
     /* has it been queued already ? is it long enough ? */
     vlc_mutex_lock( &p_sys->lock );
@@ -741,11 +728,8 @@ static int Handshake( intf_thread_t *p_this )
 
     char                *b1, *b2, *b3, *b4;
 
-    intf_thread_t       *p_intf;
-    intf_sys_t          *p_sys;
-
-    p_intf = ( intf_thread_t* ) p_this;
-    p_sys = p_this->p_sys;
+    intf_thread_t *p_intf = ( intf_thread_t* ) p_this;
+    intf_sys_t *p_sys = p_this->p_sys;
 
     vlc_mutex_lock ( &p_sys->lock );
 
@@ -1024,16 +1008,18 @@ static int ReadMetaData( intf_thread_t *p_this )
     int                 i_length = -1;
     input_thread_t      *p_input = NULL;
     vlc_value_t         video_val;
-    intf_sys_t          *p_sys;
 
-    p_sys = p_this->p_sys;
+    intf_sys_t *p_sys = p_this->p_sys;
+
     p_playlist = pl_Yield( p_this );
     PL_LOCK;
     p_input = p_playlist->p_input;
 
     if( !p_input )
     {
-        return VLC_SUCCESS;
+        PL_UNLOCK;
+        pl_Release( p_playlist );
+        return( VLC_SUCCESS );
     }
 
     vlc_object_yield( p_input );
@@ -1079,8 +1065,7 @@ static int ReadMetaData( intf_thread_t *p_this )
     }
     else
     {
-        msg_Dbg( p_this, "No album.." );
-        goto no_submission;
+        psz_album = calloc( 1, sizeof( char ) );
     }
 
     if ( p_input->input.p_item->psz_name )
@@ -1121,6 +1106,8 @@ static int ReadMetaData( intf_thread_t *p_this )
     return VLC_SUCCESS;
 
 error:
+    vlc_object_release( p_input );
+
     free( psz_artist );
     free( psz_album );
     free( psz_title );
