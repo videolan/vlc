@@ -77,7 +77,6 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     pl_Release( p_intf );
-    fprintf(stdout, "POUET POUET\nPOUET POEUT\nPOUET POUET\n" );
 
     return VLC_SUCCESS;
 }
@@ -129,13 +128,13 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     psz_album = p_input->input.p_item->p_meta->psz_album;
     psz_title = p_input->input.p_item->psz_name;
 
-    if( psz_artist && psz_album && psz_title )
+    if( psz_artist && psz_album /* && psz_title */ )
     {
         musicbrainz_t p_mb;
         char psz_buf[256];
         char psz_data[256];
         char i_album_count, i;
-        char *ppsz_args[2];
+        char *ppsz_args[4];
 
         fprintf( stdout,"[33;1m--> %s %s %s[0m\n", psz_artist, psz_album, psz_title );
         p_mb = mb_New();
@@ -144,8 +143,15 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 #endif
         mb_SetDepth( p_mb, 2 );
         ppsz_args[0] = psz_album;
-        ppsz_args[1] = NULL;
-        if( !mb_QueryWithArgs( p_mb, MBQ_FindAlbumByName, ppsz_args ) )
+        ppsz_args[1] = psz_artist;
+        ppsz_args[2] = NULL;
+        if( !mb_QueryWithArgs( p_mb,
+            "<mq:FindAlbum>\n" \
+            "   <mq:depth>@DEPTH@</mq:depth>\n" \
+            "   <mq:maxItems>@MAX_ITEMS@</mq:maxItems>\n" \
+            "   <mq:albumName>@1@</mq:albumName>\n" \
+            "   <mq:artistName>@2@</mq:artistName>\n" \
+            "</mq:FindAlbum>\n", ppsz_args ) )
         {
             mb_GetQueryError( p_mb, psz_buf, 256 );
             msg_Err( p_intf, "Query failed: %s\n", psz_buf );
