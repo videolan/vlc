@@ -183,7 +183,7 @@ int VLC_CleanUp( int i_object )
 int VLC_Destroy( int i_object )
 {
     LIBVLC_FUNC;
-    return libvlc_InternalDestroy( p_libvlc, VLC_TRUE );
+    return libvlc_InternalDestroy( p_libvlc, i_object ? VLC_TRUE : VLC_FALSE );
 }
 
 /*****************************************************************************
