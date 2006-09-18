@@ -124,6 +124,7 @@ endif
 
 ifeq ($(HOST),i686-apple-darwin8)
 FFMPEGCONF += --enable-memalign-hack
+X264CONF += --extra-ldflags=-read_only_relocs suppress
 endif
 
 ifdef HAVE_DARWIN_OS
@@ -1190,9 +1191,6 @@ x264:
 	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
 ifdef HAVE_WIN32
 	(cd x264; patch -p 0 < ../Patches/x264-svn-win32.patch )
-endif
-ifeq ($(HOST),i686-apple-darwin8)
-	(cd x264; patch -p 0 < ../Patches/x264-svn-darwin_intel.patch )
 endif
 else
 x264-$(X264_VERSION).tar.gz:
