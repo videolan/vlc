@@ -906,9 +906,14 @@ AC_CACHE_CHECK([if $CC accepts -Wall],
      AC_TRY_COMPILE([],,ac_cv_c_Wall=yes, ac_cv_c_Wall=no)])
 
 AC_CACHE_CHECK([if $CC accepts -Wextra],
-    [ac_cv_c_Werror],
+    [ac_cv_c_Wextra],
     [CFLAGS="-Werror ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Werror=yes, ac_cv_c_Werror=no)])
+     AC_TRY_COMPILE([],,ac_cv_c_Wextra=yes, ac_cv_c_Wextra=no)])
+
+AC_CACHE_CHECK([if $CC accepts -Wno-unused-parameter],
+    [ac_cv_c_Wno_unused_parameter],
+    [CFLAGS="-Werror ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wno_unused_parameter=yes, ac_cv_c_Wno_unused_parameter=no)])
 
 AC_CACHE_CHECK([if $CC accepts -Wconversion],
     [ac_cv_c_Wconversion],
@@ -934,6 +939,12 @@ if test "${ac_cv_c_Wextra}" != "no"; then
     CFLAGS_save="-Wextra ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wextra ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wextra ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+fi
+
+if test "${ac_cv_c_Wno_unused_parameter}" != "no"; then
+    CFLAGS_save="${CFLAGS_save} -Wno-unused-parameter"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="${CFLAGS_save} -Wno-unused-parameter"; CXXFLAGS="${CXXFLAGS_save}"
+    OBJCFLAGS_save="${OBJCFLAGS_save} -Wno-unused-parameter "; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
 if test "${ac_cv_c_Wsign_compare}" != "no"; then
@@ -5198,12 +5209,6 @@ then
     then
        WINE_SDK_PATH=${with_wine_sdk_path}
        AC_PATH_PROG(WIDL, widl, no, [$WINE_SDK_PATH/bin:$WINE_SDK_PATH/tools/widl])
-    else
-       AC_CHECK_PROGS(WIDL, [widl], no)
-       if test "${WIDL}" != "no"
-       then
-          WINE_SDK_PATH="`dirname ${WIDL}`"/..
-       fi
     fi
     AC_LANG_PUSH(C++)
     AC_CHECK_HEADERS(ole2.h olectl.h,
