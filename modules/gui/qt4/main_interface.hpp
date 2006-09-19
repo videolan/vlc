@@ -49,9 +49,14 @@ public:
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
 
-    void resizeEvent( QResizeEvent * );
 
+    void *requestVideo( vout_thread_t *p_nvout, int *pi_x,
+                        int *pi_y, unsigned int *pi_width,
+                        unsigned int *pi_height );
+    void releaseVideo( void *);
+    int controlVideo( void *p_window, int i_query, va_list args );
 protected:
+    void resizeEvent( QResizeEvent * );
     void closeEvent( QCloseEvent *);
     Ui::MainInterfaceUI ui;
     friend class VolumeClickHandler;
@@ -59,13 +64,15 @@ private:
     QSettings *settings;
     QSize mainSize, addSize;
 
+    bool need_components_update;
     void calculateInterfaceSize();
     void handleMainUi( QSettings* );
-    
+    void doComponentsUpdate();
+
+    /* Video */
+    VideoWidget         *videoWidget;
     virtual void keyPressEvent( QKeyEvent *);
 
-    /* All the stuff that goes in the main position */
-    VideoWidget         *videoWidget;
     BackgroundWidget    *bgWidget;
     PlaylistWidget      *playlistWidget;
 

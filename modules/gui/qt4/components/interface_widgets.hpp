@@ -43,10 +43,10 @@ public:
     VideoWidget( intf_thread_t * );
     virtual ~VideoWidget();
 
-    void *Request( vout_thread_t *, int *, int *,
+    void *request( vout_thread_t *, int *, int *,
                    unsigned int *, unsigned int * );
-    void Release( void * );
-    int Control( void *, int, va_list );
+    void release( void * );
+    int control( void *, int, va_list );
 
     int i_video_height, i_video_width;
     vout_thread_t *p_vout;

@@ -22,11 +22,13 @@
  *****************************************************************************/
 
 #include "dialogs_provider.hpp"
-#include <vlc/vout.h>
 #include "qt4.hpp"
 #include "components/interface_widgets.hpp"
 #include "main_interface.hpp"
 #include "input_manager.hpp"
+
+#include <vlc/vout.h>
+
 #include <QHBoxLayout>
 
 #define ICON_SIZE 128
@@ -45,26 +47,9 @@ bool need_update;
 VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
     vlc_mutex_init( p_intf, &lock );
-
-    p_intf->pf_request_window  = ::DoRequest;
-    p_intf->pf_release_window  = ::DoRelease;
-    p_intf->pf_control_window  = ::DoControl;
-    p_intf->p_sys->p_video = this;
     p_vout = NULL;
 
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
-
-    ON_TIMEOUT( update() );
-    need_update = false;
-}
-
-void VideoWidget::update()
-{
-    if( need_update )
-    {
-        p_intf->p_sys->p_mi->resize( p_intf->p_sys->p_mi->sizeHint() );
-        need_update = false;
-    }
 }
 
 VideoWidget::~VideoWidget()
@@ -83,9 +68,6 @@ VideoWidget::~VideoWidget()
                 vout_Control( p_vout, VOUT_CLOSE );
         }
     }
-    p_intf->pf_request_window = NULL;
-    p_intf->pf_release_window = NULL;
-    p_intf->pf_control_window = NULL;
     vlc_mutex_unlock( &lock );
     vlc_mutex_destroy( &lock );
 }
@@ -95,13 +77,7 @@ QSize VideoWidget::sizeHint() const
     return widgetSize;
 }
 
-static void *DoRequest( intf_thread_t *p_intf, vout_thread_t *p_vout,
-                        int *pi1, int *pi2, unsigned int*pi3,unsigned int*pi4)
-{
-    return p_intf->p_sys->p_video->Request( p_vout, pi1, pi2, pi3, pi4 );
-}
-
-void *VideoWidget::Request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
+void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
                            unsigned int *pi_width, unsigned int *pi_height )
 {
     if( p_vout )
@@ -110,76 +86,14 @@ void *VideoWidget::Request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
         return NULL;
     }
     p_vout = p_nvout;
-
     setMinimumSize( 1,1 );
-    widgetSize = QSize( *pi_width, *pi_height );
-    updateGeometry();
-    need_update = true;
-    return  (void*)winId();
+    return (void*)winId();
 }
 
-static void DoRelease( intf_thread_t *p_intf, void *p_win )
-{
-    return p_intf->p_sys->p_video->Release( p_win );
-}
-
-void VideoWidget::Release( void *p_win )
+void VideoWidget::release( void *p_win )
 {
     p_vout = NULL;
-    if( config_GetInt( p_intf, "qt-always-video" ) == 0 )
-    {
-        widgetSize = QSize ( 1,1 );
-        updateGeometry();
-        need_update = true;
-    }
 }
-
-static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
-{
-    return p_intf->p_sys->p_video->Control( p_win, i_q, a );
-}
-
-int VideoWidget::Control( void *p_window, int i_query, va_list args )
-{
-    int i_ret = VLC_EGENERIC;
-    vlc_mutex_lock( &lock );
-    switch( i_query )
-    {
-        case VOUT_GET_SIZE:
-        {
-            unsigned int *pi_width  = va_arg( args, unsigned int * );
-            unsigned int *pi_height = va_arg( args, unsigned int * );
-            *pi_width = frame->width();
-            *pi_height = frame->height();
-            i_ret = VLC_SUCCESS;
-            break;
-        }
-        case VOUT_SET_SIZE:
-        {
-            unsigned int i_width  = va_arg( args, unsigned int );
-            unsigned int i_height = va_arg( args, unsigned int );
-
-            if( !i_width && p_vout ) i_width = p_vout->i_window_width;
-            if( !i_height && p_vout ) i_height = p_vout->i_window_height;
-            widgetSize = QSize( i_width, i_height );
-            updateGeometry();
-            need_update = true;
-            i_ret = VLC_SUCCESS;
-            break;
-        }
-        case VOUT_SET_STAY_ON_TOP:
-        {
-            /// \todo
-            break;
-        }
-        default:
-            msg_Warn( p_intf, "unsupported control query" );
-            break;
-    }
-    vlc_mutex_unlock( &lock );
-    return i_ret;
-}
-
 /**********************************************************************
  * Background Widget. Show a simple image background. Currently,
  * it's a static cone.
@@ -190,6 +104,11 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
     DrawBackground();
     CONNECT( THEMIM->getIM(), audioStarted(), this, hasAudio() );
     CONNECT( THEMIM->getIM(), audioStarted(), this, hasVideo() );
+}
+
+BackgroundWidget::~BackgroundWidget()
+{
+    CleanBackground();
 }
 
 int BackgroundWidget::DrawBackground()

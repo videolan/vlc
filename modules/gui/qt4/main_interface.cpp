@@ -37,6 +37,7 @@
 
 #include <assert.h>
 #include <vlc_keys.h>
+#include <vlc/vout.h>
 
 #ifdef WIN32
     #define PREF_W 410
@@ -48,11 +49,27 @@
 
 static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void *);
+/* Video handling */
+static void *DoRequest( intf_thread_t *p_intf, vout_thread_t *p_vout,
+                        int *pi1, int *pi2, unsigned int*pi3,unsigned int*pi4)
+{
+    return p_intf->p_sys->p_mi->requestVideo( p_vout, pi1, pi2, pi3, pi4 );
+}
+static void DoRelease( intf_thread_t *p_intf, void *p_win )
+{
+    return p_intf->p_sys->p_mi->releaseVideo( p_win );
+}
+static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
+{
+    return p_intf->p_sys->p_mi->controlVideo( p_win, i_q, a );
+}
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     settings = new QSettings( "VideoLAN", "VLC" );
     settings->beginGroup( "MainWindow" );
+
+    need_components_update = false;
 
     setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
     handleMainUi( settings );
@@ -99,6 +116,10 @@ MainInterface::~MainInterface()
     /// \todo Save everything
     p_intf->b_interaction = VLC_FALSE;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
+
+    p_intf->pf_request_window = NULL;
+    p_intf->pf_release_window = NULL;
+    p_intf->pf_control_window = NULL;
 }
 
 void MainInterface::handleMainUi( QSettings *settings )
@@ -149,6 +170,10 @@ void MainInterface::handleMainUi( QSettings *settings )
         videoWidget->resize( videoWidget->widgetSize );
         ui.vboxLayout->insertWidget( 0, videoWidget );
 
+        p_intf->pf_request_window  = ::DoRequest;
+        p_intf->pf_release_window  = ::DoRelease;
+        p_intf->pf_control_window  = ::DoControl;
+
         if( config_GetInt( p_intf, "qt-always-video" ))
         {
             bgWidget = new BackgroundWidget( p_intf );
@@ -170,6 +195,9 @@ void MainInterface::handleMainUi( QSettings *settings )
     setMinimumSize( PREF_W, addSize.height() );
 }
 
+/**********************************************************************
+ * Handling of the components
+ **********************************************************************/
 void MainInterface::calculateInterfaceSize()
 {
     int width = 0, height = 0;
@@ -178,7 +206,6 @@ void MainInterface::calculateInterfaceSize()
         width += bgWidget->widgetSize.width();
         height += bgWidget->widgetSize.height();
         assert( !playlistWidget->isVisible() );
-
     }
     if( playlistWidget->isVisible() )
     {
@@ -191,6 +218,7 @@ void MainInterface::calculateInterfaceSize()
                                                  addSize.height() );
 }
 
+/// To update !!
 void MainInterface::resizeEvent( QResizeEvent *e )
 {
     videoWidget->widgetSize.setHeight( e->size().height() - addSize.height() );
@@ -198,6 +226,96 @@ void MainInterface::resizeEvent( QResizeEvent *e )
     p_intf->p_sys->p_video->updateGeometry() ;
 }
 
+void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
+                                   int *pi_y, unsigned int *pi_width,
+                                   unsigned int *pi_height )
+{
+    void *ret = videoWidget->request( p_nvout,pi_x, pi_y, pi_width, pi_height );
+    videoWidget->widgetSize = QSize( *pi_width, *pi_height );
+    videoWidget->updateGeometry(); /// FIXME: Needed ?
+    need_components_update = true;
+    return ret;
+}
+
+void MainInterface::releaseVideo( void *p_win )
+{
+    videoWidget->release( p_win );
+    videoWidget->widgetSize = QSize( 1, 1 );
+    videoWidget->updateGeometry();
+    need_components_update = true;
+}  
+int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
+{
+    int i_ret = VLC_EGENERIC;
+    switch( i_query )
+    {
+        case VOUT_GET_SIZE:
+        {
+            unsigned int *pi_width  = va_arg( args, unsigned int * );
+            unsigned int *pi_height = va_arg( args, unsigned int * );
+            *pi_width = videoWidget->widgetSize.width();
+            *pi_height = videoWidget->widgetSize.height();
+            i_ret = VLC_SUCCESS;
+            break;
+        }
+        case VOUT_SET_SIZE:
+        {
+            unsigned int i_width  = va_arg( args, unsigned int );
+            unsigned int i_height = va_arg( args, unsigned int );
+//          if( !i_width && p_vout ) i_width = p_vout->i_window_width;
+//          if( !i_height && p_vout ) i_height = p_vout->i_window_height;
+            videoWidget->widgetSize = QSize( i_width, i_height );
+            videoWidget->updateGeometry();
+            need_components_update = true;
+            i_ret = VLC_SUCCESS;
+            break;
+        }
+        case VOUT_SET_STAY_ON_TOP:
+        default:
+            msg_Warn( p_intf, "unsupported control query" );
+            break;
+    }
+    return i_ret;
+}
+
+void MainInterface::playlist()
+{
+    // Toggle the playlist dialog
+    if( !playlistEmbeddedFlag )
+    {
+        if( playlistWidget )
+        {
+            /// \todo Destroy it 
+
+        }
+        THEDP->playlistDialog();
+        return;
+    }
+
+    if( !playlistWidget )
+    {
+        PlaylistDialog::killInstance();
+        playlistWidget = new PlaylistWidget( p_intf );
+        ui.vboxLayout->insertWidget( 0, playlistWidget );
+        playlistWidget->widgetSize = settings->value( "playlistSize",
+                                               QSize( 600, 300 ) ).toSize();
+    }
+    /// Todo, reset its size ?
+    if( playlistWidget->isVisible() ) playlistWidget->show();
+    else playlistWidget->hide();
+
+    calculateInterfaceSize();
+    resize( mainSize );
+}
+
+void MainInterface::doComponentsUpdate()
+{
+
+}
+
+/************************************************************************
+ * Other stuff
+ ************************************************************************/
 void MainInterface::keyPressEvent( QKeyEvent *e )
 {
     int i_vlck = 0;
@@ -281,36 +399,6 @@ void MainInterface::next()
     playlist_Next( THEPL );
 }
 
-void MainInterface::playlist()
-{
-    // Toggle the playlist dialog
-    if( !playlistEmbeddedFlag )
-    {
-        if( playlistWidget )
-        {
-            /// \todo Destroy it 
-
-        }
-        THEDP->playlistDialog();
-        return;
-    }
-
-    if( !playlistWidget )
-    {
-        PlaylistDialog::killInstance();
-        playlistWidget = new PlaylistWidget( p_intf );
-        ui.vboxLayout->insertWidget( 0, playlistWidget );
-        playlistWidget->widgetSize = settings->value( "playlistSize",
-                                               QSize( 600, 300 ) ).toSize();
-    }
-    /// Todo, reset its size ?
-    if( playlistWidget->isVisible() ) playlistWidget->show();
-    else playlistWidget->hide();
-
-    calculateInterfaceSize();
-    resize( mainSize );
-}
-
 void MainInterface::setDisplay( float pos, int time, int length )
 {
     char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
@@ -344,6 +432,12 @@ void MainInterface::updateOnTimer()
         DialogsProvider::killInstance();
         QApplication::quit();
     }
+    if( need_components_update )
+    {
+        doComponentsUpdate();
+        need_components_update = false;
+    }
+
     audio_volume_t i_volume;
     aout_VolumeGet( p_intf, &i_volume );
     i_volume = (i_volume *  200 )/ AOUT_VOLUME_MAX ;
