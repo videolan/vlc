@@ -92,7 +92,7 @@ VideoWidget::~VideoWidget()
 
 QSize VideoWidget::sizeHint() const
 {
-    return p_intf->p_sys->p_mi->videoSize;
+    return widgetSize;
 }
 
 static void *DoRequest( intf_thread_t *p_intf, vout_thread_t *p_vout,
@@ -112,7 +112,7 @@ void *VideoWidget::Request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
     p_vout = p_nvout;
 
     setMinimumSize( 1,1 );
-    p_intf->p_sys->p_mi->videoSize = QSize( *pi_width, *pi_height );
+    widgetSize = QSize( *pi_width, *pi_height );
     updateGeometry();
     need_update = true;
     return  (void*)winId();
@@ -128,7 +128,7 @@ void VideoWidget::Release( void *p_win )
     p_vout = NULL;
     if( config_GetInt( p_intf, "qt-always-video" ) == 0 )
     {
-        p_intf->p_sys->p_mi->videoSize = QSize ( 1,1 );
+        widgetSize = QSize ( 1,1 );
         updateGeometry();
         need_update = true;
     }
@@ -161,7 +161,7 @@ int VideoWidget::Control( void *p_window, int i_query, va_list args )
 
             if( !i_width && p_vout ) i_width = p_vout->i_window_width;
             if( !i_height && p_vout ) i_height = p_vout->i_window_height;
-            p_intf->p_sys->p_mi->videoSize = QSize( i_width, i_height );
+            widgetSize = QSize( i_width, i_height );
             updateGeometry();
             need_update = true;
             i_ret = VLC_SUCCESS;
@@ -219,6 +219,11 @@ int BackgroundWidget::CleanBackground()
     return 0;
 }
 
+QSize BackgroundWidget::sizeHint() const
+{
+    return widgetSize;
+}
+
 void BackgroundWidget::hasAudio()
 {
     /* We have video already, do nothing */
@@ -240,3 +245,39 @@ void BackgroundWidget::resizeEvent( QResizeEvent *e )
     else
         label->setMaximumWidth( ICON_SIZE );
 }
+
+/**********************************************************************
+ * Playlist Widget. The embedded playlist
+ **********************************************************************/
+#include "components/playlist/panels.hpp"
+#include "components/playlist/selector.hpp"
+
+PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
+                                                            p_intf( _p_intf )
+{
+    selector = new PLSelector( this, p_intf, THEPL );
+    selector->setMaximumWidth( 130 );
+
+    playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
+                                                THEPL->p_local_category );
+
+    rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( this,
+                              p_intf, THEPL, p_root ) );
+
+    CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
+
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->addWidget( selector, 0 );
+    layout->addWidget( rightPanel, 10 );
+    setLayout( layout );
+}
+
+PlaylistWidget::~PlaylistWidget()
+{
+}
+
+QSize PlaylistWidget::sizeHint() const
+{
+    return widgetSize;
+}
+

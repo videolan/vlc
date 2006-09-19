@@ -34,8 +34,8 @@
 
 class QLabel;
 class QHBoxLayout;
-class QColor;
 
+/******************** Video Widget ****************/
 class VideoWidget : public QFrame
 {
     Q_OBJECT
@@ -43,14 +43,16 @@ public:
     VideoWidget( intf_thread_t * );
     virtual ~VideoWidget();
 
-    virtual QSize sizeHint() const;
-
     void *Request( vout_thread_t *, int *, int *,
                    unsigned int *, unsigned int * );
     void Release( void * );
     int Control( void *, int, va_list );
+
     int i_video_height, i_video_width;
     vout_thread_t *p_vout;
+
+    QSize widgetSize;
+    virtual QSize sizeHint() const;
 private:
     QWidget *frame;
     intf_thread_t *p_intf;
@@ -59,12 +61,15 @@ private slots:
     void update();
 };
 
+/******************** Background Widget ****************/
 class BackgroundWidget : public QFrame
 {
     Q_OBJECT
 public:
     BackgroundWidget( intf_thread_t * );
     virtual ~BackgroundWidget();
+    QSize widgetSize;
+    virtual QSize sizeHint() const;
 private:
     QPalette plt;
     QLabel *label;
@@ -79,7 +84,24 @@ private slots:
 };
 
 
+/******************** Playlist Widget ****************/
+#include <QModelIndex>
+class QSignalMapper;
+class PLSelector;
+class PLPanel;
 
-
+class PlaylistWidget : public QFrame
+{
+    Q_OBJECT;
+public:
+    PlaylistWidget( intf_thread_t * );
+    virtual ~PlaylistWidget();
+    QSize widgetSize;
+    virtual QSize sizeHint() const;
+private:
+    PLSelector *selector;
+    PLPanel *rightPanel;
+    intf_thread_t *p_intf;
+};
 
 #endif

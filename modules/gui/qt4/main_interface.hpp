@@ -28,13 +28,20 @@
 #include "ui/main_interface.h"
 #include "util/qvlcframe.hpp"
 
+#include <QSize>
+
+class QSettings;
 class QCloseEvent;
 class QKeyEvent;
 class QLabel;
+
 class InputManager;
 class InputSlider;
 class VideoWidget;
+class BackgroundWidget;
+class PlaylistWidget;
 class VolumeClickHandler;
+
 class MainInterface : public QVLCMW
 {
     Q_OBJECT;
@@ -44,21 +51,33 @@ public:
 
     void resizeEvent( QResizeEvent * );
 
-    QSize videoSize, addSize;
-
 protected:
     void closeEvent( QCloseEvent *);
     Ui::MainInterfaceUI ui;
     friend class VolumeClickHandler;
 private:
+    QSettings *settings;
+    QSize mainSize, addSize;
+
+    void calculateInterfaceSize();
+    void handleMainUi( QSettings* );
+    
     virtual void keyPressEvent( QKeyEvent *);
-    VideoWidget *videoWidget;
-    InputManager *main_input_manager;
-    QLabel *timeLabel;
-    QLabel *nameLabel;
-    InputSlider *slider;
-    /// Main input associated to the playlist
-    input_thread_t *p_input;
+
+    /* All the stuff that goes in the main position */
+    VideoWidget         *videoWidget;
+    BackgroundWidget    *bgWidget;
+    PlaylistWidget      *playlistWidget;
+
+    bool                 playlistEmbeddedFlag;
+    bool                 videoEmbeddedFlag;
+
+    InputManager        *main_input_manager;
+    InputSlider         *slider;
+    input_thread_t      *p_input;    ///< Main input associated to the playlist
+
+    QLabel              *timeLabel;
+    QLabel              *nameLabel;
 private slots:
     void setStatus( int );
     void setName( QString );
@@ -68,6 +87,7 @@ private slots:
     void stop();
     void prev();
     void next();
+    void playlist();
     void updateVolume( int sliderVolume );
 };
 

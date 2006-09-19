@@ -27,12 +27,15 @@
 #include "util/qvlcframe.hpp"
 #include "dialogs_provider.hpp"
 #include "components/interface_widgets.hpp"
+#include "dialogs/playlist.hpp"
+#include "menus.hpp"
+
 #include <QCloseEvent>
-#include <assert.h>
 #include <QPushButton>
 #include <QStatusBar>
 #include <QKeyEvent>
-#include "menus.hpp"
+
+#include <assert.h>
 #include <vlc_keys.h>
 
 #ifdef WIN32
@@ -48,68 +51,20 @@ static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
-    /* All UI stuff */
-    QWidget *main = new QWidget( this );
-    setCentralWidget( main );
+    settings = new QSettings( "VideoLAN", "VLC" );
+    settings->beginGroup( "MainWindow" );
+
     setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
-    ui.setupUi( centralWidget() );
-
-    setFocusPolicy( Qt::StrongFocus );
-
-    slider = new InputSlider( Qt::Horizontal, NULL );
-    ui.hboxLayout->insertWidget( 0, slider );
-    ui.prevButton->setText( "" );
-    ui.nextButton->setText( "" );
-    ui.playButton->setText( "" );
-    ui.stopButton->setText( "" );
-    ui.prevButton->setIcon( QIcon( ":/pixmaps/previous.png" ) );
-    ui.nextButton->setIcon( QIcon( ":/pixmaps/next.png" ) );
-    ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
-    ui.stopButton->setIcon( QIcon( ":/pixmaps/stop.png" ) );
-    ui.volLowLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
-    ui.volHighLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
-    ui.volumeSlider->setMaximum( 100 );
-    ui.playlistButton->setText( "" );
-    ui.playlistButton->setIcon( QIcon( ":/pixmaps/volume-low.png" ) );
-
-    VolumeClickHandler *h = new VolumeClickHandler( this );
-    ui.volLowLabel->installEventFilter(h);
-    ui.volHighLabel->installEventFilter(h);
-
-    ui.volumeSlider->setFocusPolicy( Qt::NoFocus );
+    handleMainUi( settings );
 
     QVLCMenu::createMenuBar( menuBar(), p_intf );
-
+    /* Status bar */
     timeLabel = new QLabel( 0 );
     nameLabel = new QLabel( 0 );
     statusBar()->addWidget( nameLabel, 4 );
     statusBar()->addPermanentWidget( timeLabel, 1 );
 
-    resize ( PREF_W, PREF_H );
-    if( config_GetInt( p_intf, "embedded" ) )
-    {
-        videoWidget = new VideoWidget( p_intf );
-        if( config_GetInt( p_intf, "qt-always-video" ) )
-        {
-            QSettings settings( "VideoLAN", "VLC" );
-            settings.beginGroup( "MainWindow" );
-            videoSize = settings.value( "videoSize", QSize( 200, 200 ) ).
-                                                toSize();
-        }
-        else
-            videoSize = QSize( 1,1 );
-        videoWidget->resize( videoSize );
-        ui.vboxLayout->insertWidget( 0, videoWidget );
-    }
-    readSettings( "MainWindow" );
-
-    addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
-    mainSize.setWidth( videoSize.width() + addSize.width() );
-    mainSize.setHeight( videoSize.height() + addSize.height() );
-    resize( mainSize );
-    mainSize = size();
-
-    setMinimumSize( PREF_W, addSize.height() );
+    setFocusPolicy( Qt::StrongFocus );
 
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
@@ -132,7 +87,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     BUTTONACT( ui.stopButton, stop() );
     BUTTONACT( ui.nextButton, next() );
     BUTTONACT( ui.prevButton, prev() );
-    CONNECT( ui.playlistButton, clicked(), THEDP, playlistDialog() );
+    BUTTONACT( ui.playlistButton, playlist() );
 
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
@@ -141,22 +96,105 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
 MainInterface::~MainInterface()
 {
-    writeSettings( "MainWindow" );
-    if( config_GetInt( p_intf, "qt-always-video" ) )
-    {
-        QSettings s("VideoLAN", "VLC" );
-        s.beginGroup( "MainWindow" );
-        s.setValue( "videoSize", videoSize );
-        s.endGroup();
-    }
+    /// \todo Save everything
     p_intf->b_interaction = VLC_FALSE;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
 }
 
+void MainInterface::handleMainUi( QSettings *settings )
+{
+    QWidget *main = new QWidget( this );
+    setCentralWidget( main );
+    ui.setupUi( centralWidget() );
+
+    slider = new InputSlider( Qt::Horizontal, NULL );
+    ui.hboxLayout->insertWidget( 0, slider );
+
+    ui.prevButton->setText( "" );
+    ui.nextButton->setText( "" );
+    ui.playButton->setText( "" );
+    ui.stopButton->setText( "" );
+    ui.prevButton->setIcon( QIcon( ":/pixmaps/previous.png" ) );
+    ui.nextButton->setIcon( QIcon( ":/pixmaps/next.png" ) );
+    ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
+    ui.stopButton->setIcon( QIcon( ":/pixmaps/stop.png" ) );
+
+    /* Volume */
+    ui.volLowLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
+    ui.volHighLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
+    ui.volumeSlider->setMaximum( 100 );
+
+    VolumeClickHandler *h = new VolumeClickHandler( this );
+    ui.volLowLabel->installEventFilter(h);
+    ui.volHighLabel->installEventFilter(h);
+    ui.volumeSlider->setFocusPolicy( Qt::NoFocus );
+
+    ui.playlistButton->setText( "" );
+    ui.playlistButton->setIcon( QIcon( ":/pixmaps/volume-low.png" ) );
+
+    /* Fetch configuration from settings and vlc config */
+    videoEmbeddedFlag = false;
+    if( config_GetInt( p_intf, "embedded-video" ) )
+        videoEmbeddedFlag = true;
+
+    playlistEmbeddedFlag = true;
+    /// \todo fetch playlist settings
+
+    resize ( PREF_W, PREF_H );
+
+    if( videoEmbeddedFlag )
+    {
+        videoWidget = new VideoWidget( p_intf );
+        videoWidget->widgetSize = QSize( 1, 1 );
+        videoWidget->resize( videoWidget->widgetSize );
+        ui.vboxLayout->insertWidget( 0, videoWidget );
+
+        if( config_GetInt( p_intf, "qt-always-video" ))
+        {
+            bgWidget = new BackgroundWidget( p_intf );
+            bgWidget->widgetSize = settings->value( "backgroundSize",
+                                                QSize( 200, 200 ) ).toSize();
+            ui.vboxLayout->insertWidget( 0, bgWidget ); 
+            bgWidget->hide();
+        }
+    }
+
+    // Size for fixed elements
+    addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
+
+    calculateInterfaceSize();
+    resize( mainSize );
+    /// \bug still needed ?
+    mainSize = size();
+
+    setMinimumSize( PREF_W, addSize.height() );
+}
+
+void MainInterface::calculateInterfaceSize()
+{
+    int width = 0, height = 0;
+    if( bgWidget->isVisible() )
+    {
+        width += bgWidget->widgetSize.width();
+        height += bgWidget->widgetSize.height();
+        assert( !playlistWidget->isVisible() );
+
+    }
+    if( playlistWidget->isVisible() )
+    {
+        width += playlistWidget->widgetSize.width();
+        height += playlistWidget->widgetSize.height();
+    }
+    mainSize.setWidth( width + videoWidget->widgetSize.width() + 
+                                               addSize.width() );
+    mainSize.setHeight( height + videoWidget->widgetSize.height() +
+                                                 addSize.height() );
+}
+
 void MainInterface::resizeEvent( QResizeEvent *e )
 {
-    videoSize.setHeight( e->size().height() - addSize.height() );
-    videoSize.setWidth( e->size().width() - addSize.width() );
+    videoWidget->widgetSize.setHeight( e->size().height() - addSize.height() );
+    videoWidget->widgetSize.setWidth( e->size().width() - addSize.width() );
     p_intf->p_sys->p_video->updateGeometry() ;
 }
 
@@ -169,9 +207,7 @@ void MainInterface::keyPressEvent( QKeyEvent *e )
     if( e->modifiers()& Qt::ControlModifier ) i_vlck |= KEY_MODIFIER_CTRL;
     if( e->modifiers()& Qt::MetaModifier ) i_vlck |= KEY_MODIFIER_META;
 
-    fprintf( stderr, "After modifiers %x\n", i_vlck );
     bool found = false;
-    fprintf( stderr, "Qt %x\n", e->key() );
     /* Look for some special keys */
 #define HANDLE( qt, vk ) case Qt::qt : i_vlck |= vk; found = true;break
     switch( e->key() )
@@ -203,7 +239,6 @@ void MainInterface::keyPressEvent( QKeyEvent *e )
         HANDLE( Key_Delete, KEY_DELETE );
 
     }
-    fprintf( stderr, "After keys %x\n", i_vlck );
     if( !found )
     {
         /* Force lowercase */
@@ -244,6 +279,36 @@ void MainInterface::prev()
 void MainInterface::next()
 {
     playlist_Next( THEPL );
+}
+
+void MainInterface::playlist()
+{
+    // Toggle the playlist dialog
+    if( !playlistEmbeddedFlag )
+    {
+        if( playlistWidget )
+        {
+            /// \todo Destroy it 
+
+        }
+        THEDP->playlistDialog();
+        return;
+    }
+
+    if( !playlistWidget )
+    {
+        PlaylistDialog::killInstance();
+        playlistWidget = new PlaylistWidget( p_intf );
+        ui.vboxLayout->insertWidget( 0, playlistWidget );
+        playlistWidget->widgetSize = settings->value( "playlistSize",
+                                               QSize( 600, 300 ) ).toSize();
+    }
+    /// Todo, reset its size ?
+    if( playlistWidget->isVisible() ) playlistWidget->show();
+    else playlistWidget->hide();
+
+    calculateInterfaceSize();
+    resize( mainSize );
 }
 
 void MainInterface::setDisplay( float pos, int time, int length )
