@@ -351,9 +351,10 @@ void MainInterface::playlist()
         PlaylistDialog::killInstance();
         playlistWidget = new PlaylistWidget( p_intf );
         ui.vboxLayout->insertWidget( 0, playlistWidget );
+
         fprintf( stderr, "BUG ! Do not set size if it has already been changed\n" );
         playlistWidget->widgetSize = settings->value( "playlistSize",
-                                               QSize( 600, 300 ) ).toSize();
+                                               QSize( 650, 310 ) ).toSize();
         playlistWidget->hide();
     }
     /// Todo, reset its size ?
@@ -378,6 +379,8 @@ void MainInterface::playlist()
     resize( mainSize );
 }
 
+/* Video widget cannot do this synchronously as it runs in another thread */
+/* Well, could it, actually ? Probably dangerous ... */
 void MainInterface::doComponentsUpdate()
 {
     calculateInterfaceSize();

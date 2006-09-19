@@ -27,8 +27,10 @@
 #include "main_interface.hpp"
 #include "input_manager.hpp"
 
+#include "pixmaps/art.xpm"
 #include <vlc/vout.h>
 
+#include <QPushButton>
 #include <QHBoxLayout>
 
 #define ICON_SIZE 128
@@ -160,9 +162,29 @@ void BackgroundWidget::resizeEvent( QResizeEvent *e )
 PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
                                                             p_intf( _p_intf )
 {
+    QVBoxLayout *left = new QVBoxLayout( );
+    QHBoxLayout *middle = new QHBoxLayout;
+
     setFrameStyle(QFrame::StyledPanel | QFrame::Sunken );
     selector = new PLSelector( this, p_intf, THEPL );
     selector->setMaximumWidth( 130 );
+    left->addWidget( selector );
+
+    QPushButton *undockButton = new QPushButton( "UN", this );
+    undockButton->setMaximumWidth( 25 );
+    undockButton->setToolTip( qtr( "Undock playlist for main interface" ) );
+    QPushButton *sourcesButton = new QPushButton( "Sources", this );
+    sourcesButton->setToolTip( qtr( "Select additional stream sources" ) );
+    middle->addWidget( undockButton );
+    middle->addWidget( sourcesButton );
+    left->addLayout( middle );
+
+    QLabel *art = new QLabel( "" );
+    art->setMaximumHeight( 128 );
+    art->setMaximumWidth( 128 );
+    art->setScaledContents( true );
+    art->setPixmap( QPixmap( art_xpm ) ); //":/vlc128.png" ) );
+    left->addWidget( art );
 
     playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
                                                 THEPL->p_local_category );
@@ -172,8 +194,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
 
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
 
-    QHBoxLayout *layout = new QHBoxLayout();
-    layout->addWidget( selector, 0 );
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->addLayout( left, 0 );
     layout->addWidget( rightPanel, 10 );
     setLayout( layout );
 }
