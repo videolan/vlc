@@ -42,12 +42,11 @@ static void *DoRequest( intf_thread_t *, vout_thread_t *, int*,int*,
 static void DoRelease( intf_thread_t *, void * );
 static int DoControl( intf_thread_t *, void *, int, va_list );
 
-bool need_update;
-
 VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
     vlc_mutex_init( p_intf, &lock );
     p_vout = NULL;
+    setFrameStyle(QFrame::Panel | QFrame::Raised);
 
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
@@ -74,6 +73,7 @@ VideoWidget::~VideoWidget()
 
 QSize VideoWidget::sizeHint() const
 {
+    fprintf( stderr, "Video Size %ix%i\n", widgetSize.width(), widgetSize.height() );
     return widgetSize;
 }
 
@@ -101,9 +101,8 @@ void VideoWidget::release( void *p_win )
 BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
                                         QFrame( NULL ), p_intf( _p_i )
 {
+    setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
     DrawBackground();
-    CONNECT( THEMIM->getIM(), audioStarted(), this, hasAudio() );
-    CONNECT( THEMIM->getIM(), audioStarted(), this, hasVideo() );
 }
 
 BackgroundWidget::~BackgroundWidget()
@@ -140,21 +139,8 @@ int BackgroundWidget::CleanBackground()
 
 QSize BackgroundWidget::sizeHint() const
 {
+    fprintf( stderr, "BG %ix%i\n", widgetSize.width(), widgetSize.height() );
     return widgetSize;
-}
-
-void BackgroundWidget::hasAudio()
-{
-    /* We have video already, do nothing */
-    if( THEMIM->getIM()->b_has_video )
-    {
-
-    }
-    else
-    {
-        /* Show the panel to the user */
-        fprintf( stderr, "Showing panel\n" );
-    }
 }
 
 void BackgroundWidget::resizeEvent( QResizeEvent *e )
@@ -174,6 +160,7 @@ void BackgroundWidget::resizeEvent( QResizeEvent *e )
 PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
                                                             p_intf( _p_intf )
 {
+    setFrameStyle(QFrame::StyledPanel | QFrame::Sunken );
     selector = new PLSelector( this, p_intf, THEPL );
     selector->setMaximumWidth( 130 );
 
@@ -197,6 +184,7 @@ PlaylistWidget::~PlaylistWidget()
 
 QSize PlaylistWidget::sizeHint() const
 {
+    fprintf( stderr, "PL Size %ix%i\n", widgetSize.width(), widgetSize.height() );
     return widgetSize;
 }
 

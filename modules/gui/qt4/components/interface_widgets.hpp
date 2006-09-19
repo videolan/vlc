@@ -57,8 +57,6 @@ private:
     QWidget *frame;
     intf_thread_t *p_intf;
     vlc_mutex_t lock;
-private slots:
-    void update();
 };
 
 /******************** Background Widget ****************/
@@ -78,9 +76,6 @@ private:
     int DrawBackground();
     int CleanBackground();
     intf_thread_t *p_intf;
-private slots:
-    void hasAudio();
-    void hasVideo();
 };
 
 
