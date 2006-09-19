@@ -36,7 +36,7 @@ TOMOC = main_interface \
 	components/preferences \
 	components/simple_preferences \
 	components/open \
-	components/video_widget \
+	components/interface_widgets \
 	components/playlist/panels \
 	components/playlist/selector \
 	util/input_slider \
@@ -62,7 +62,7 @@ nodist_SOURCES_qt4 = \
 	 	components/preferences.moc.cpp \
 		components/simple_preferences.moc.cpp \
 		components/open.moc.cpp \
-		components/video_widget.moc.cpp \
+		components/interface_widgets.moc.cpp \
 		components/playlist/panels.moc.cpp \
 		components/playlist/selector.moc.cpp \
 		util/input_slider.moc.cpp \
@@ -108,7 +108,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/preferences.cpp \
 		components/simple_preferences.cpp \
 		components/open.cpp \
-		components/video_widget.cpp \
+		components/interface_widgets.cpp \
 		components/playlist/standardpanel.cpp \
 		components/playlist/selector.cpp \
 		util/input_slider.cpp \
@@ -136,7 +136,7 @@ EXTRA_DIST += \
 	components/preferences.hpp \
 	components/simple_preferences.hpp \
 	components/open.hpp \
-	components/video_widget.hpp \
+	components/interface_widgets.hpp \
 	components/playlist/panels.hpp \
 	components/playlist/selector.hpp \
 	util/input_slider.hpp \

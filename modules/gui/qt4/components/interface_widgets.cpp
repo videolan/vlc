@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_widget.cpp : Embedded video output
+ * interface_widgets.cpp : Custom widgets for the main interface
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
@@ -24,13 +24,17 @@
 #include "dialogs_provider.hpp"
 #include <vlc/vout.h>
 #include "qt4.hpp"
-#include "components/video_widget.hpp"
+#include "components/interface_widgets.hpp"
 #include "main_interface.hpp"
 #include "input_manager.hpp"
 #include <QHBoxLayout>
 
 #define ICON_SIZE 128
 
+/**********************************************************************
+ * Video Widget. A simple frame on which video is drawn
+ * This class handles resize issues
+ **********************************************************************/
 static void *DoRequest( intf_thread_t *, vout_thread_t *, int*,int*,
                         unsigned int *, unsigned int * );
 static void DoRelease( intf_thread_t *, void * );
@@ -38,11 +42,9 @@ static int DoControl( intf_thread_t *, void *, int, va_list );
 
 bool need_update;
 
-VideoWidget::VideoWidget( intf_thread_t *_p_i, bool _always ) : QFrame( NULL ),
-                                                               p_intf( _p_i )
+VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
     vlc_mutex_init( p_intf, &lock );
-    always = _always;
 
     p_intf->pf_request_window  = ::DoRequest;
     p_intf->pf_release_window  = ::DoRelease;
@@ -53,13 +55,6 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i, bool _always ) : QFrame( NULL ),
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 
     ON_TIMEOUT( update() );
-
-    if( always )
-    {
-        DrawBackground();
-        CONNECT( THEMIM->getIM(), audioStarted(), this, hasAudio() );
-        CONNECT( THEMIM->getIM(), audioStarted(), this, hasVideo() );
-    }
     need_update = false;
 }
 
@@ -93,9 +88,6 @@ VideoWidget::~VideoWidget()
     p_intf->pf_control_window = NULL;
     vlc_mutex_unlock( &lock );
     vlc_mutex_destroy( &lock );
-
-    if( always )
-        CleanBackground();
 }
 
 QSize VideoWidget::sizeHint() const
@@ -119,19 +111,6 @@ void *VideoWidget::Request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
     }
     p_vout = p_nvout;
 
-    // if( THEMIM->getIM()->b_has_video )
-    // {
-    //      We are really running a video
-    //      Close the existing vout
-    //      Set visual to disabled
-    // }
-    // else
-    // {
-    //      We are getting a request for visual
-    //      Just go on.
-    // }
-    // Check THEMIM->b_has_audio. If true, hide audio.
-
     setMinimumSize( 1,1 );
     p_intf->p_sys->p_mi->videoSize = QSize( *pi_width, *pi_height );
     updateGeometry();
@@ -142,15 +121,6 @@ void *VideoWidget::Request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
 static void DoRelease( intf_thread_t *p_intf, void *p_win )
 {
     return p_intf->p_sys->p_video->Release( p_win );
-}
-
-void VideoWidget::resizeEvent( QResizeEvent *e )
-{
-    if( !always )return;
-    if( e->size().height() < ICON_SIZE -1 )
-        label->setMaximumWidth( e->size().height() );
-    else
-        label->setMaximumWidth( ICON_SIZE );
 }
 
 void VideoWidget::Release( void *p_win )
@@ -164,55 +134,9 @@ void VideoWidget::Release( void *p_win )
     }
 }
 
-void VideoWidget::hasAudio()
-{
-    /* We have video already, do nothing */
-    if( THEMIM->getIM()->b_has_video )
-    {
-
-    }
-    else
-    {
-        /* Show the panel to the user */
-        fprintf( stderr, "Showing panel\n" );
-    }
-}
-
-void VideoWidget::hasVideo()
-{
-    // if panel is shown, hide it
-}
-
 static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
 {
     return p_intf->p_sys->p_video->Control( p_win, i_q, a );
-}
-
-int VideoWidget::DrawBackground()
-{
-    setAutoFillBackground( true );
-    plt =  palette();
-    plt.setColor( QPalette::Active, QPalette::Window , Qt::black );
-    plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
-    setPalette( plt );
-
-    backgroundLayout = new QHBoxLayout;
-    label = new QLabel( "" );
-    label->setMaximumHeight( ICON_SIZE );
-    label->setMaximumWidth( ICON_SIZE );
-    label->setScaledContents( true );
-    label->setPixmap( QPixmap( ":/vlc128.png" ) );
-    backgroundLayout = new QHBoxLayout;
-    backgroundLayout->addWidget( label );
-    setLayout( backgroundLayout );
-    return 0;
-}
-
-int VideoWidget::CleanBackground()
-{
-    backgroundLayout->takeAt(0);
-    delete backgroundLayout;
-    return 0;
 }
 
 int VideoWidget::Control( void *p_window, int i_query, va_list args )
@@ -254,4 +178,65 @@ int VideoWidget::Control( void *p_window, int i_query, va_list args )
     }
     vlc_mutex_unlock( &lock );
     return i_ret;
+}
+
+/**********************************************************************
+ * Background Widget. Show a simple image background. Currently,
+ * it's a static cone.
+ **********************************************************************/
+BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
+                                        QFrame( NULL ), p_intf( _p_i )
+{
+    DrawBackground();
+    CONNECT( THEMIM->getIM(), audioStarted(), this, hasAudio() );
+    CONNECT( THEMIM->getIM(), audioStarted(), this, hasVideo() );
+}
+
+int BackgroundWidget::DrawBackground()
+{
+   setAutoFillBackground( true );
+    plt =  palette();
+    plt.setColor( QPalette::Active, QPalette::Window , Qt::black );
+    plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
+    setPalette( plt );
+
+    backgroundLayout = new QHBoxLayout;
+    label = new QLabel( "" );
+    label->setMaximumHeight( ICON_SIZE );
+    label->setMaximumWidth( ICON_SIZE );
+    label->setScaledContents( true );
+    label->setPixmap( QPixmap( ":/vlc128.png" ) );
+    backgroundLayout = new QHBoxLayout;
+    backgroundLayout->addWidget( label );
+    setLayout( backgroundLayout );
+    return 0;
+}
+
+int BackgroundWidget::CleanBackground()
+{
+    backgroundLayout->takeAt(0);
+    delete backgroundLayout;
+    return 0;
+}
+
+void BackgroundWidget::hasAudio()
+{
+    /* We have video already, do nothing */
+    if( THEMIM->getIM()->b_has_video )
+    {
+
+    }
+    else
+    {
+        /* Show the panel to the user */
+        fprintf( stderr, "Showing panel\n" );
+    }
+}
+
+void BackgroundWidget::resizeEvent( QResizeEvent *e )
+{
+    if( e->size().height() < ICON_SIZE -1 )
+        label->setMaximumWidth( e->size().height() );
+    else
+        label->setMaximumWidth( ICON_SIZE );
 }

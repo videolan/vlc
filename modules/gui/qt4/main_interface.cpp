@@ -26,7 +26,7 @@
 #include "util/input_slider.hpp"
 #include "util/qvlcframe.hpp"
 #include "dialogs_provider.hpp"
-#include "components/video_widget.hpp"
+#include "components/interface_widgets.hpp"
 #include <QCloseEvent>
 #include <assert.h>
 #include <QPushButton>
@@ -88,8 +88,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     resize ( PREF_W, PREF_H );
     if( config_GetInt( p_intf, "embedded" ) )
     {
-        videoWidget = new VideoWidget( p_intf, config_GetInt( p_intf,
-                                         "qt-always-video" ) ? true:false );
+        videoWidget = new VideoWidget( p_intf );
         if( config_GetInt( p_intf, "qt-always-video" ) )
         {
             QSettings settings( "VideoLAN", "VLC" );

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_widget.hpp : Embedded video
+ * interface_widgets.hpp : Custom widgets for the main interface
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VIDEO_H_
-#define _VIDEO_H_
+#ifndef _INTFWIDGETS_H_
+#define _INTFWIDGETS_H_
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
@@ -40,7 +40,7 @@ class VideoWidget : public QFrame
 {
     Q_OBJECT
 public:
-    VideoWidget( intf_thread_t *, bool );
+    VideoWidget( intf_thread_t * );
     virtual ~VideoWidget();
 
     virtual QSize sizeHint() const;
@@ -52,20 +52,34 @@ public:
     int i_video_height, i_video_width;
     vout_thread_t *p_vout;
 private:
-    virtual void resizeEvent( QResizeEvent *e );
-    int DrawBackground();
-    int CleanBackground();
-    bool always;
-    QPalette plt;
-    QLabel *label;
     QWidget *frame;
-    QHBoxLayout *backgroundLayout;
     intf_thread_t *p_intf;
     vlc_mutex_t lock;
 private slots:
     void update();
+};
+
+class BackgroundWidget : public QFrame
+{
+    Q_OBJECT
+public:
+    BackgroundWidget( intf_thread_t * );
+    virtual ~BackgroundWidget();
+private:
+    QPalette plt;
+    QLabel *label;
+    QHBoxLayout *backgroundLayout;
+    virtual void resizeEvent( QResizeEvent *e );
+    int DrawBackground();
+    int CleanBackground();
+    intf_thread_t *p_intf;
+private slots:
     void hasAudio();
     void hasVideo();
 };
+
+
+
+
 
 #endif
