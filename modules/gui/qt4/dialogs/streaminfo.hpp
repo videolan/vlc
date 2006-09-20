@@ -18,7 +18,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ ******************************************************************************/
 
 #ifndef _STREAMINFO_DIALOG_H_
 #define _STREAMINFO_DIALOG_H_
@@ -39,6 +40,7 @@ public:
             instance = new StreamInfoDialog( p_intf);
         return instance;
     }
+    static void killInstance() { if( instance ) delete instance; }
     virtual ~StreamInfoDialog();
     bool need_update;
 private:

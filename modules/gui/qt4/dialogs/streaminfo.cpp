@@ -39,7 +39,6 @@ StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf ) :QVLCFrame( _p_intf
     i_runs = 0;
     setWindowTitle( _("Stream information" ) );
     QGridLayout *layout = new QGridLayout(this);
-    setGeometry(0,0,470,550);
 
     IT = new InfoTab( this, p_intf, true ) ;
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
@@ -51,11 +50,14 @@ StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf ) :QVLCFrame( _p_intf
     p_input = NULL;
 
     var_AddCallback( THEPL, "item-change", ItemChanged, this );
+
+    readSettings( "StreamInfo" , QSize( 470, 450 ) );
 }
 
 StreamInfoDialog::~StreamInfoDialog()
 {
     var_DelCallback( THEPL, "item-change", ItemChanged, this );
+    writeSettings( "StreamInfo" );
 }
 
 static int ItemChanged( vlc_object_t *p_this, const char *psz_var,

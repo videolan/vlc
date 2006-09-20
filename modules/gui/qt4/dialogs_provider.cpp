@@ -56,6 +56,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
 DialogsProvider::~DialogsProvider()
 {
     PlaylistDialog::killInstance();
+    StreamInfoDialog::killInstance();
 }
 
 void DialogsProvider::customEvent( QEvent *event )
