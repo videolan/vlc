@@ -26,6 +26,8 @@
 
 #include <QTreeWidget>
 #include <QPushButton>
+#include <QHeaderView>
+#include <QList>
 
 InputStatsPanel::InputStatsPanel( QWidget *parent, intf_thread_t *_p_intf ) :
                                   QWidget( parent ), p_intf( _p_intf )
@@ -107,13 +109,48 @@ char* MetaPanel::GetName()
 InfoPanel::InfoPanel( QWidget *parent, intf_thread_t *_p_intf ) :
                                       QWidget( parent ), p_intf( _p_intf )
 {
+     resize(400, 500);
+     QGridLayout *layout = new QGridLayout(this);
+     InfoTree = new QTreeWidget(this);
+     QList<QTreeWidgetItem *> items;
+
+     layout->addWidget(InfoTree, 0, 0 );
+     InfoTree->setColumnCount( 1 );
+     InfoTree->header()->hide();
+     InfoTree->resize(400, 400);
+
 }
+
 InfoPanel::~InfoPanel()
 {
 }
+
 void InfoPanel::Update( input_item_t *p_item)
 {
+    InfoTree->clear();
+    QTreeWidgetItem *current_item = NULL;
+    QTreeWidgetItem *child_item = NULL;
+
+    for( int i = 0; i< p_item->i_categories ; i++)
+    {
+        current_item = new QTreeWidgetItem();
+        current_item->setText( 0, qfu(p_item->pp_categories[i]->psz_name) );
+        InfoTree->addTopLevelItem( current_item );
+
+        for( int j = 0 ; j < p_item->pp_categories[i]->i_infos ; j++ )
+        {
+            child_item = new QTreeWidgetItem ();
+            child_item->setText( 0,
+                    qfu(p_item->pp_categories[i]->pp_infos[j]->psz_name)
+                    + ": "
+                    + qfu(p_item->pp_categories[i]->pp_infos[j]->psz_value));
+
+            current_item->addChild(child_item);
+        }
+         InfoTree->setItemExpanded( current_item, true);
+    }
 }
+
 void InfoPanel::Clear()
 {
 }

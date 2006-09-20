@@ -88,6 +88,10 @@ void InfoTab::update()
     if( p_intf )
         p_input = MainInputManager::getInstance( p_intf )->getInput();
     if( p_input && !p_input->b_dead )
+    {
         ISP->Update( p_input->input.p_item );
+        // FIXME should not be updated here 
+        IP->Update( p_input->input.p_item );
+    }
 }
 

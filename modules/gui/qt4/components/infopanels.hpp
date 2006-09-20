@@ -33,6 +33,7 @@
 
 
 class QTreeWidget;
+class QTreeWidgetItem;
 
 class InputStatsPanel: public QWidget
 {
@@ -74,6 +75,7 @@ public:
     virtual ~InfoPanel();
 private:
     intf_thread_t *p_intf;
+    QTreeWidget *InfoTree;
 
 public slots:
     void Update( input_item_t * );
