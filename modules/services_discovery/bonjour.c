@@ -307,8 +307,9 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    playlist_NodesCreateForSD( p_sys->p_playlist, _("Bonjour"),
-                              &p_sys->p_node_cat,&p_sys->p_node_one );
+    playlist_NodesCreate( p_sys->p_playlist, _("Bonjour"),
+                              &p_sys->p_node_cat,&p_sys->p_node_one,
+                              VLC_TRUE );
     p_sd->pf_run = Run;
 
     return VLC_SUCCESS;
