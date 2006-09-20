@@ -70,6 +70,7 @@ static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
 
 bool embeddedPlaylistWasActive;
 bool videoIsActive;
+QSize savedVideoSize;
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
@@ -179,14 +180,13 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Set initial size */
     resize ( PREF_W, PREF_H );
-    addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
 
+    addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
     if( videoEmbeddedFlag )
     {
         videoWidget = new VideoWidget( p_intf );
-        videoWidget->widgetSize = QSize( PREF_W, 1 );
+        videoWidget->widgetSize = QSize( 1, 1 );
         videoWidget->resize( videoWidget->widgetSize );
-        videoWidget->hide();
         ui.vboxLayout->insertWidget( 0, videoWidget );
 
         p_intf->pf_request_window  = ::DoRequest;
@@ -195,10 +195,10 @@ void MainInterface::handleMainUi( QSettings *settings )
 
         if( config_GetInt( p_intf, "qt-always-video" ))
         {
-//            bgWidget = new BackgroundWidget( p_intf );
-//            bgWidget->widgetSize = settings->value( "backgroundSize",
-//                                                QSize( 200, 200 ) ).toSize();
-//            ui.vboxLayout->insertWidget( 0, bgWidget );
+            bgWidget = new BackgroundWidget( p_intf );
+            bgWidget->widgetSize = settings->value( "backgroundSize",
+                                                QSize( 200, 200 ) ).toSize();
+            ui.vboxLayout->insertWidget( 0, bgWidget );
         }
     }
 //    visualSelector = new VisualSelector( p_intf );
@@ -242,6 +242,7 @@ void MainInterface::calculateInterfaceSize()
         width = PREF_W - addSize.width();
         height = PREF_H - addSize.height();
     }
+    fprintf( stderr, "Setting to %ix%i\n", width + addSize.width() , height + addSize.height() );
     mainSize.setWidth( width + addSize.width() );
     mainSize.setHeight( height + addSize.height() );
 }
@@ -255,11 +256,10 @@ void MainInterface::resizeEvent( QResizeEvent *e )
      */
     if( videoWidget )
     {
-       if( videoIsActive )
-        {
         videoWidget->widgetSize.setWidth( e->size().width() -
                                            addSize.width() );
- 
+        if( videoIsActive && videoWidget->widgetSize.height() > 1 )
+        {
             videoWidget->widgetSize.setHeight( e->size().height() -
                                               addSize.height() );
             videoWidget->updateGeometry();
@@ -303,7 +303,6 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
         {
             bgWidget->hide();
         }
-        videoWidget->show();
         videoWidget->widgetSize = QSize( *pi_width, *pi_height );
         videoWidget->updateGeometry(); /// FIXME: Needed ?
         need_components_update = true;
@@ -314,9 +313,8 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 void MainInterface::releaseVideo( void *p_win )
 {
     videoWidget->release( p_win );
-    videoWidget->hide();
-//    videoWidget->widgetSize = QSize( 1, 1 );
-//    videoWidget->updateGeometry();
+    videoWidget->widgetSize = QSize( 0, 0 );
+    videoWidget->resize( videoWidget->widgetSize );
 
     if( embeddedPlaylistWasActive )
         playlistWidget->show();
@@ -379,8 +377,6 @@ void MainInterface::playlist()
         PlaylistDialog::killInstance();
         playlistWidget = new PlaylistWidget( p_intf );
         ui.vboxLayout->insertWidget( 0, playlistWidget );
-
-        fprintf( stderr, "BUG ! Do not set size if it has already been changed\n" );
         playlistWidget->widgetSize = settings->value( "playlistSize",
                                                QSize( 650, 310 ) ).toSize();
         playlistWidget->hide();
@@ -392,7 +388,9 @@ void MainInterface::playlist()
         playlistWidget->hide();
         if( videoIsActive )
         {
-            videoWidget->show();
+            videoWidget->widgetSize = savedVideoSize;
+            videoWidget->resize( videoWidget->widgetSize );
+            videoWidget->updateGeometry();
         }
     }
     else
@@ -400,7 +398,12 @@ void MainInterface::playlist()
         fprintf( stderr, "showing playlist\n" );
         playlistWidget->show();
         if( videoIsActive )
-            videoWidget->hide();
+        {
+            savedVideoSize = videoWidget->widgetSize;
+            videoWidget->widgetSize.setHeight( 0 );
+            videoWidget->resize( videoWidget->widgetSize );
+            videoWidget->updateGeometry();
+        }
     }
 
     calculateInterfaceSize();
