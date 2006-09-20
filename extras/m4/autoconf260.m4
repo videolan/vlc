@@ -6,7 +6,7 @@
 
 AC_DEFUN([AC_PROG_CC_C99],
 [ AC_REQUIRE([AC_PROG_CC])dnl
-  CC="$CC -std=c99"
+  CC="$CC -std=gnu99"
 ])
 
 AC_DEFUN([AC_PROG_OBJC], [ 
