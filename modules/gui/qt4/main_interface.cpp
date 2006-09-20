@@ -74,13 +74,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     need_components_update = false;
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
-    embeddedPlaylistWasActive = false;
-    videoIsActive= false;
+    embeddedPlaylistWasActive = videoIsActive = false;
 
     setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
     handleMainUi( settings );
 
     QVLCMenu::createMenuBar( menuBar(), p_intf );
+
     /* Status bar */
     timeLabel = new QLabel( 0 );
     nameLabel = new QLabel( 0 );
@@ -137,14 +137,16 @@ void MainInterface::handleMainUi( QSettings *settings )
     slider = new InputSlider( Qt::Horizontal, NULL );
     ui.hboxLayout->insertWidget( 0, slider );
 
-    ui.prevButton->setText( "" );
-    ui.nextButton->setText( "" );
-    ui.playButton->setText( "" );
-    ui.stopButton->setText( "" );
-    ui.prevButton->setIcon( QIcon( ":/pixmaps/previous.png" ) );
-    ui.nextButton->setIcon( QIcon( ":/pixmaps/next.png" ) );
-    ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
-    ui.stopButton->setIcon( QIcon( ":/pixmaps/stop.png" ) );
+    ui.discFrame->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
+
+#define SET( button, image ) ui.button##Button->setText(""); \
+    ui.button##Button->setIcon( QIcon( ":/pixmaps/"#image ) );
+    SET( prev, previous.png );
+    SET( next, next.png );
+    SET( play, play.png );
+    SET( stop, stop.png );
+    SET( playlist, volume-low.png );
+#undef SET
 
     /* Volume */
     ui.volLowLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
@@ -156,9 +158,6 @@ void MainInterface::handleMainUi( QSettings *settings )
     ui.volHighLabel->installEventFilter(h);
     ui.volumeSlider->setFocusPolicy( Qt::NoFocus );
 
-    ui.playlistButton->setText( "" );
-    ui.playlistButton->setIcon( QIcon( ":/pixmaps/volume-low.png" ) );
-
     /* Fetch configuration from settings and vlc config */
     videoEmbeddedFlag = false;
     if( config_GetInt( p_intf, "embedded-video" ) )
@@ -167,13 +166,16 @@ void MainInterface::handleMainUi( QSettings *settings )
     playlistEmbeddedFlag = true;
     /// \todo fetch playlist settings
 
+    /* Set initial size */
     resize ( PREF_W, PREF_H );
+    addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
 
     if( videoEmbeddedFlag )
     {
         videoWidget = new VideoWidget( p_intf );
         videoWidget->widgetSize = QSize( 1, 1 );
         videoWidget->resize( videoWidget->widgetSize );
+        videoWidget->hide();
         ui.vboxLayout->insertWidget( 0, videoWidget );
 
         p_intf->pf_request_window  = ::DoRequest;
@@ -186,16 +188,13 @@ void MainInterface::handleMainUi( QSettings *settings )
 //            bgWidget->widgetSize = settings->value( "backgroundSize",
 //                                                QSize( 200, 200 ) ).toSize();
 //            ui.vboxLayout->insertWidget( 0, bgWidget );
-//            bgWidget->hide();
         }
     }
-
-    // Size for fixed elements
-    addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
+//    visualSelector = new VisualSelector( p_intf );
+//    visualSelector->hide();
 
     calculateInterfaceSize();
     resize( mainSize );
-    /// \bug still needed ?
     mainSize = size();
 
     setMinimumSize( PREF_W, addSize.height() );
@@ -212,7 +211,7 @@ void MainInterface::calculateInterfaceSize()
     {
         width = bgWidget->widgetSize.width();
         height = bgWidget->widgetSize.height();
-        assert( !playlistWidget->isVisible() );
+        assert( !(playlistWidget && playlistWidget->isVisible() ) );
     }
     else if( playlistWidget && playlistWidget->isVisible() )
     {
@@ -239,22 +238,26 @@ void MainInterface::resizeEvent( QResizeEvent *e )
      */
     if( videoWidget )
     {
+       if( videoIsActive )
+        {
         videoWidget->widgetSize.setWidth( e->size().width() -
                                            addSize.width() );
-        if( videoIsActive )
-        {
+ 
             videoWidget->widgetSize.setHeight( e->size().height() -
                                               addSize.height() );
             videoWidget->updateGeometry();
         }
-        fprintf( stderr, "Video set to %ix%\ni",  videoWidget->widgetSize.width(),  videoWidget->widgetSize.height() );
+        fprintf( stderr, "Video set to %ix%i\n",
+                videoWidget->widgetSize.width(),
+                videoWidget->widgetSize.height() );
     }
     if( playlistWidget )
     {
+       if( playlistWidget->isVisible() )
+        {
         playlistWidget->widgetSize.setWidth( e->size().width() -
                                               addSize.width() );
-        if( playlistWidget->isVisible() )
-        {
+ 
             playlistWidget->widgetSize.setHeight( e->size().height() -
                                                  addSize.height() );
             playlistWidget->updateGeometry();
@@ -279,6 +282,11 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
             embeddedPlaylistWasActive = true;
             playlistWidget->hide();
         }
+        if( bgWidget && bgWidget->isVisible() )
+        {
+            bgWidget->hide();
+        }
+        videoWidget->show();
         videoWidget->widgetSize = QSize( *pi_width, *pi_height );
         videoWidget->updateGeometry(); /// FIXME: Needed ?
         need_components_update = true;
@@ -289,12 +297,15 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 void MainInterface::releaseVideo( void *p_win )
 {
     videoWidget->release( p_win );
-    videoWidget->widgetSize = QSize( 1, 1 );
-    videoWidget->updateGeometry();
+    videoWidget->hide();
+//    videoWidget->widgetSize = QSize( 1, 1 );
+//    videoWidget->updateGeometry();
+
     if( embeddedPlaylistWasActive )
-    {
         playlistWidget->show();
-    }
+    else if( bgWidget )
+        bgWidget->show();
+
     videoIsActive = false;
     need_components_update = true;
 }

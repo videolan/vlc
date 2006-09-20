@@ -41,6 +41,7 @@ class VideoWidget;
 class BackgroundWidget;
 class PlaylistWidget;
 class VolumeClickHandler;
+class VisualSelector;
 
 class MainInterface : public QVLCMW
 {
@@ -74,6 +75,7 @@ private:
     virtual void keyPressEvent( QKeyEvent *);
 
     BackgroundWidget    *bgWidget;
+    VisualSelector      *visualSelector;
     PlaylistWidget      *playlistWidget;
 
     bool                 playlistEmbeddedFlag;

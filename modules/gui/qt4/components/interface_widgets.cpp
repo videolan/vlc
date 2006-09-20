@@ -104,17 +104,8 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
                                         QFrame( NULL ), p_intf( _p_i )
 {
     setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
-    DrawBackground();
-}
 
-BackgroundWidget::~BackgroundWidget()
-{
-    CleanBackground();
-}
-
-int BackgroundWidget::DrawBackground()
-{
-   setAutoFillBackground( true );
+    setAutoFillBackground( true );
     plt =  palette();
     plt.setColor( QPalette::Active, QPalette::Window , Qt::black );
     plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
@@ -129,14 +120,12 @@ int BackgroundWidget::DrawBackground()
     backgroundLayout = new QHBoxLayout;
     backgroundLayout->addWidget( label );
     setLayout( backgroundLayout );
-    return 0;
 }
 
-int BackgroundWidget::CleanBackground()
+BackgroundWidget::~BackgroundWidget()
 {
     backgroundLayout->takeAt(0);
     delete backgroundLayout;
-    return 0;
 }
 
 QSize BackgroundWidget::sizeHint() const
@@ -151,6 +140,26 @@ void BackgroundWidget::resizeEvent( QResizeEvent *e )
         label->setMaximumWidth( e->size().height() );
     else
         label->setMaximumWidth( ICON_SIZE );
+}
+
+/**********************************************************************
+ * Visualization selector panel
+ **********************************************************************/
+VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
+                                                QFrame( NULL ), p_intf( _p_i )
+{
+    setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
+    QHBoxLayout *layout = new QHBoxLayout( this );
+    QPushButton *prevButton = new QPushButton( "Prev" );
+    QPushButton *nextButton = new QPushButton( "Next");
+    layout->addWidget( prevButton );
+    layout->addWidget( nextButton );
+    setLayout( layout );
+    setMaximumHeight( 30 );
+}
+
+VisualSelector::~VisualSelector()
+{
 }
 
 /**********************************************************************

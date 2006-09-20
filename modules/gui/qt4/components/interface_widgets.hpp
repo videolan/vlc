@@ -78,6 +78,15 @@ private:
     intf_thread_t *p_intf;
 };
 
+class VisualSelector : public QFrame
+{
+    Q_OBJECT
+public:
+    VisualSelector( intf_thread_t *);
+    virtual ~VisualSelector();
+private:
+    intf_thread_t *p_intf;
+};
 
 /******************** Playlist Widget ****************/
 #include <QModelIndex>
