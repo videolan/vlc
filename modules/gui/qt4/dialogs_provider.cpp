@@ -154,7 +154,7 @@ void DialogsProvider::quit()
 
 void DialogsProvider::streaminfoDialog()
 {
-    StreamInfoDialog::getInstance( p_intf, true )->toggleVisible();
+    StreamInfoDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::streamingDialog()

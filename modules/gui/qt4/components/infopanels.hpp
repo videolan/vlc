@@ -28,7 +28,7 @@
 #include <vlc_meta.h>
 
 #include <QWidget>
-
+#include <QTabWidget>
 #include "ui/input_stats.h"
 
 
@@ -44,10 +44,9 @@ public:
 private:
     intf_thread_t *p_intf;
     Ui::InputStats ui;
-
 public slots:
-    void Update( input_item_t * );
-    void Clear();
+    void update( input_item_t * );
+    void clear();
 };
 
 class MetaPanel: public QWidget
@@ -60,11 +59,11 @@ private:
     intf_thread_t *p_intf;
 
 public slots:
-    void Update( input_item_t * );
-    void Clear();
+    void update( input_item_t * );
+    void clear();
 
-    char* GetURI();
-    char* GetName();
+    char* getURI();
+    char* getName();
 };
 
 class InfoPanel: public QWidget
@@ -78,8 +77,25 @@ private:
     QTreeWidget *InfoTree;
 
 public slots:
-    void Update( input_item_t * );
-    void Clear();
+    void update( input_item_t * );
+    void clear();
+};
+
+class InfoTab: public QTabWidget
+{
+    Q_OBJECT;
+public:
+    InfoTab( QWidget *, intf_thread_t *, bool );
+    virtual ~InfoTab();
+    void update( input_item_t *, bool, bool );
+    void clear();
+private:
+    bool stats;
+    intf_thread_t *p_intf;
+    InputStatsPanel *ISP;
+    MetaPanel *MP;
+    InfoPanel *IP;
+    int i_runs;
 };
 
 #endif

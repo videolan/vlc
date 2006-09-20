@@ -30,17 +30,18 @@
 #include "components/infopanels.hpp"
 #include "qt4.hpp"
 
-/* This is the dialog Windows */
+static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *param );
 StreamInfoDialog *StreamInfoDialog::instance = NULL;
 
-StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf, bool _main_input ) :
-                              QVLCFrame( _p_intf ), main_input( _main_input )
+StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf ) :QVLCFrame( _p_intf )
 {
+    i_runs = 0;
     setWindowTitle( _("Stream information" ) );
     QGridLayout *layout = new QGridLayout(this);
     setGeometry(0,0,470,550);
 
-    IT = new InfoTab( this, p_intf) ;
+    IT = new InfoTab( this, p_intf, true ) ;
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
     layout->addWidget(IT,0,0,1,3);
     layout->addWidget(closeButton,1,2);
@@ -48,50 +49,47 @@ StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf, bool _main_input ) :
     BUTTONACT( closeButton, close() );
     ON_TIMEOUT( update() );
     p_input = NULL;
-}
 
-void StreamInfoDialog::update()
-{
-    IT->update();
+    var_AddCallback( THEPL, "item-change", ItemChanged, this );
 }
 
 StreamInfoDialog::~StreamInfoDialog()
 {
+    var_DelCallback( THEPL, "item-change", ItemChanged, this );
+}
+
+static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    StreamInfoDialog *p_d = (StreamInfoDialog *)param;
+    p_d->need_update = VLC_TRUE;
+    return VLC_SUCCESS;
+}
+
+void StreamInfoDialog::update()
+{
+    // Timer runs at 150 ms, dont' update more than 2 times per second
+    i_runs++;
+    if( i_runs % 3 != 0 ) return;
+
+    input_thread_t *p_input = MainInputManager::getInstance( p_intf )->getInput();
+    if( !p_input || p_input->b_dead )
+    {
+        IT->clear();
+        return;
+    }
+
+    vlc_object_yield( p_input );
+    vlc_mutex_lock( &p_input->input.p_item->lock );
+
+    IT->update( p_input->input.p_item, need_update, need_update );
+    need_update = false;
+
+    vlc_mutex_unlock( &p_input->input.p_item->lock );
+    vlc_object_release( p_input );
 }
 
 void StreamInfoDialog::close()
 {
     this->toggleVisible();
 }
-
-/* This is the tab Widget Inside the windows*/
-InfoTab::InfoTab( QWidget *parent,  intf_thread_t *_p_intf ) : 
-                    QTabWidget( parent ), p_intf( _p_intf )
-{
-  setGeometry(0, 0, 400, 500);
-
-  ISP = new InputStatsPanel( NULL, p_intf );
-  MP = new MetaPanel(NULL, p_intf);
-  IP = new InfoPanel(NULL, p_intf);
-
-  addTab(MP, qtr("&Meta"));
-  addTab(ISP, qtr("&Stats"));
-  addTab(IP, qtr("&Info"));
-}
-
-InfoTab::~InfoTab()
-{
-}
-
-void InfoTab::update()
-{
-    if( p_intf )
-        p_input = MainInputManager::getInstance( p_intf )->getInput();
-    if( p_input && !p_input->b_dead )
-    {
-        ISP->Update( p_input->input.p_item );
-        // FIXME should not be updated here 
-        IP->Update( p_input->input.p_item );
-    }
-}
-

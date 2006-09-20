@@ -27,45 +27,26 @@
 #include <QTabWidget>
 #include <QBoxLayout>
 
-
-class InputStatsPanel;
-class MetaPanel;
-class InfoPanel;
-
-class InfoTab: public QTabWidget
-{
-    Q_OBJECT;
-public:
-    InfoTab( QWidget *, intf_thread_t * );
-    virtual ~InfoTab();
-private:
-    intf_thread_t *p_intf;
-    input_thread_t *p_input;
-    InputStatsPanel *ISP;
-    MetaPanel *MP;
-    InfoPanel *IP;
-
-public slots:
-    void update();
-};
+class InfoTab;
 
 class StreamInfoDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
-    static StreamInfoDialog * getInstance( intf_thread_t *p_intf, bool a )
+    static StreamInfoDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new StreamInfoDialog( p_intf, a );
+            instance = new StreamInfoDialog( p_intf);
         return instance;
     }
     virtual ~StreamInfoDialog();
+    bool need_update;
 private:
-    StreamInfoDialog( intf_thread_t *,  bool );
+    StreamInfoDialog( intf_thread_t * );
     input_thread_t *p_input;
     InfoTab *IT;
-    bool main_input;
     static StreamInfoDialog *instance;
+    int i_runs;
 public slots:
     void update();
     void close();

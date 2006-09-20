@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +30,10 @@
 #include <QHeaderView>
 #include <QList>
 
+/************************************************************************
+ * Single panels
+ ************************************************************************/
+
 InputStatsPanel::InputStatsPanel( QWidget *parent, intf_thread_t *_p_intf ) :
                                   QWidget( parent ), p_intf( _p_intf )
 {
@@ -39,9 +44,8 @@ InputStatsPanel::~InputStatsPanel()
 {
 }
 
-void InputStatsPanel::Update( input_item_t *p_item )
+void InputStatsPanel::update( input_item_t *p_item )
 {
-
     vlc_mutex_lock( &p_item->p_stats->lock );
 
 #define UPDATE( widget,format, calc... ) \
@@ -75,7 +79,7 @@ void InputStatsPanel::Update( input_item_t *p_item )
     vlc_mutex_unlock(& p_item->p_stats->lock );
 }
 
-void InputStatsPanel::Clear()
+void InputStatsPanel::clear()
 {
 }
 
@@ -87,29 +91,30 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
 MetaPanel::~MetaPanel()
 {
 }
-void MetaPanel::Update( input_item_t *p_item)
+void MetaPanel::update( input_item_t *p_item )
 {
 }
-void MetaPanel::Clear()
+void MetaPanel::clear()
 {
 }
 
-char* MetaPanel::GetURI()
+char* MetaPanel::getURI()
 {
     char *URI;
     return URI;
 }
 
-char* MetaPanel::GetName()
+char* MetaPanel::getName()
 {
     char *Name;
     return Name;
 }
 
+
 InfoPanel::InfoPanel( QWidget *parent, intf_thread_t *_p_intf ) :
                                       QWidget( parent ), p_intf( _p_intf )
 {
-     resize(400, 500);
+//     resize(400, 500);
      QGridLayout *layout = new QGridLayout(this);
      InfoTree = new QTreeWidget(this);
      QList<QTreeWidgetItem *> items;
@@ -117,15 +122,14 @@ InfoPanel::InfoPanel( QWidget *parent, intf_thread_t *_p_intf ) :
      layout->addWidget(InfoTree, 0, 0 );
      InfoTree->setColumnCount( 1 );
      InfoTree->header()->hide();
-     InfoTree->resize(400, 400);
-
+//     InfoTree->resize(400, 400);
 }
 
 InfoPanel::~InfoPanel()
 {
 }
 
-void InfoPanel::Update( input_item_t *p_item)
+void InfoPanel::update( input_item_t *p_item)
 {
     InfoTree->clear();
     QTreeWidgetItem *current_item = NULL;
@@ -151,7 +155,53 @@ void InfoPanel::Update( input_item_t *p_item)
     }
 }
 
-void InfoPanel::Clear()
+void InfoPanel::clear()
+{
+    InfoTree->clear();
+}
+
+/***************************************************************************
+ * Tab widget
+ ***************************************************************************/
+
+InfoTab::InfoTab( QWidget *parent,  intf_thread_t *_p_intf, bool _stats ) :
+                      QTabWidget( parent ), stats( _stats ), p_intf( _p_intf )
+{
+//    setGeometry(0, 0, 400, 500);
+
+    MP = new MetaPanel(NULL, p_intf);
+    addTab(MP, qtr("&Meta"));
+    if( stats )
+    {
+        ISP = new InputStatsPanel( NULL, p_intf );
+        addTab(ISP, qtr("&Stats"));
+    }
+
+    IP = new InfoPanel(NULL, p_intf);
+    addTab(IP, qtr("&Info"));
+}
+
+InfoTab::~InfoTab()
 {
 }
 
+/* This function should be called approximately twice a second.
+ * p_item should be locked
+ * Stats will always be updated */
+void InfoTab::update( input_item_t *p_item, bool update_info,
+                      bool update_meta )
+{
+    if( update_info )
+        IP->update( p_item );
+    if( update_meta )
+        MP->update( p_item );
+    if( stats )
+        ISP->update( p_item );
+}
+
+void InfoTab::clear()
+{
+    IP->clear();
+    MP->clear();
+    if( stats ) ISP->clear();
+}
