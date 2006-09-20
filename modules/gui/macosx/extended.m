@@ -127,7 +127,21 @@ static VLCExtended *_o_sharedInstance = nil;
     char * psz_vfilters;
     intf_thread_t * p_intf = VLCIntf;
     psz_vfilters = config_GetPsz( p_intf, "vout-filter" );
-    if( psz_vfilters && strstr( psz_vfilters, "adjust" ) )
+    /* set the video-filter-checkboxes to the correct values */
+    if( psz_vfilters )
+    {
+        [o_ckb_blur setState: (int)strstr( psz_vfilters, "motionblur")];
+        [o_ckb_imgClone setState: (int)strstr( psz_vfilters, "clone")];
+        [o_ckb_imgCrop setState: (int)strstr( psz_vfilters, "crop")];
+        [o_ckb_trnsform setState: (int)strstr( psz_vfilters, "transform")];
+
+        free( psz_vfilters );
+    }
+    
+    /* set the video-filter checkboxes to the correct values */
+    char * psz_vifilters;
+    psz_vifilters = config_GetPsz( p_intf, "video-filter" );
+    if( psz_vifilters && strstr( psz_vifilters, "adjust" ) )
     {
         [o_ckb_enblAdjustImg setState: NSOnState];
         [o_btn_rstrDefaults setEnabled: YES];
@@ -147,21 +161,6 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_hue setEnabled: NO];
         [o_sld_saturation setEnabled: NO];
     }
-    
-    /* set the other video-filter-checkboxes to the correct values */
-    if( psz_vfilters )
-    {
-        [o_ckb_blur setState: (int)strstr( psz_vfilters, "motionblur")];
-        [o_ckb_imgClone setState: (int)strstr( psz_vfilters, "clone")];
-        [o_ckb_imgCrop setState: (int)strstr( psz_vfilters, "crop")];
-        [o_ckb_trnsform setState: (int)strstr( psz_vfilters, "transform")];
-
-        free( psz_vfilters );
-    }
-    
-    /* set the video-filter checkboxes to the correct values */
-    char * psz_vifilters;
-    psz_vifilters = config_GetPsz( p_intf, "video-filter" );
     if( psz_vifilters )
     {
         [o_ckb_wave setState: (int)strstr( psz_vifilters, "wave")];
@@ -271,7 +270,7 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_gamma setEnabled: YES];
         [o_sld_hue setEnabled: YES];
         [o_sld_saturation setEnabled: YES];
-        [self changeVoutFiltersString: "adjust" onOrOff: VLC_TRUE];
+        [self changeVideoFiltersString: "adjust" onOrOff: VLC_TRUE];
     }else{
         [o_btn_rstrDefaults setEnabled: NO];
         [o_sld_brightness setEnabled: NO];
@@ -279,7 +278,7 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_gamma setEnabled: NO];
         [o_sld_hue setEnabled: NO];
         [o_sld_saturation setEnabled: NO];
-        [self changeVoutFiltersString: "adjust" onOrOff: VLC_FALSE];
+        [self changeVideoFiltersString: "adjust" onOrOff: VLC_FALSE];
     }
 }
 
