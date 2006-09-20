@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: pt_PT\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-08-31 15:10+0400\n"
-"PO-Revision-Date: 2006-09-18 14:46+0100\n"
+"PO-Revision-Date: 2006-09-20 10:30+0100\n"
 "Last-Translator: Ari Constâncio <ari.constancio at gmail dot com>\n"
 "Language-Team: Portuguese\n"
 "MIME-Version: 1.0\n"
@@ -12611,59 +12611,59 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:243
 msgid "&Simple Add File..."
-msgstr ""
+msgstr "Adição &simples de ficheiro..."
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:244
 msgid "Add &Directory..."
-msgstr ""
+msgstr "Adicionar &Directório..."
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:245
 msgid "&Add URL..."
-msgstr ""
+msgstr "&Adicionar URL..."
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:247
 msgid "Services Discovery"
-msgstr ""
+msgstr "Descoberta de Serviços"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:250
 msgid "&Open Playlist..."
-msgstr ""
+msgstr "A&brir Lista de Reprodução..."
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:251
 msgid "&Save Playlist..."
-msgstr ""
+msgstr "&Guardar Lista de Reprodução..."
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:257
 msgid "Sort by &Title"
-msgstr ""
+msgstr "Ordenar por &Título"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:258
 msgid "&Reverse Sort by Title"
-msgstr ""
+msgstr "Ordenar por Título (&Reverso)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:260
 msgid "&Shuffle"
-msgstr ""
+msgstr "&Escolher aleatoriamente"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:264
 msgid "D&elete"
-msgstr ""
+msgstr "A&pagar"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:271
 msgid "&Manage"
-msgstr ""
+msgstr "&Gerir"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:272
 msgid "S&ort"
-msgstr ""
+msgstr "&Ordenar"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:273
 msgid "&Selection"
-msgstr ""
+msgstr "&Seleccionar"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:274
 msgid "&View items"
-msgstr ""
+msgstr "&Ver items"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:282
 msgid "Play this Branch"
@@ -12681,77 +12681,79 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:286
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:293
 msgid "Info"
-msgstr ""
+msgstr "Informação"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:287
 msgid "Add Node"
-msgstr ""
+msgstr "Adicionar Nó"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:370
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:833
 #: modules/gui/wxwidgets/playlist_manager.cpp:422
 msgid "root"
-msgstr ""
+msgstr "raíz"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:604
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:844
 #, c-format
 msgid "%i items in playlist"
-msgstr ""
+msgstr "%i items na lista de reprodução"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:936
 msgid "XSPF playlist"
-msgstr ""
+msgstr "Lista de reprodução XSPF"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:943
 msgid "Playlist is empty"
-msgstr ""
+msgstr "A lista de reprodução está vazia"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:943
 msgid "Can't save"
-msgstr ""
+msgstr "Não é possível guardar"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
 #: modules/gui/wxwidgets/wxwidgets.cpp:114
 #: modules/misc/freetype.c:105
 #: modules/misc/win32text.c:77
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1418
 msgid "One level"
-msgstr ""
+msgstr "Um nível"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1614
 msgid "Please enter node name"
-msgstr ""
+msgstr "Introduza, por favor, o nome do nó"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1615
 msgid "New node"
-msgstr ""
+msgstr "Novo nó"
 
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:208
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:79
 msgid "&Save"
-msgstr ""
+msgstr "&Guardar"
 
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:294
 msgid ""
 "This will reset your VLC media player preferences.\n"
 "Are you sure you want to continue?"
 msgstr ""
+"Vai inicializar as suas preferências de VLC.\n"
+"Quer mesmo continuar?"
 
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:196
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:198
 msgid "Ctrl"
-msgstr ""
+msgstr "Ctrl"
 
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:200
 msgid "Shift"
-msgstr ""
+msgstr "Shift"
 
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:443
 msgid "Select the desired modules. For more advanced control, the resulting \"chain\" can be modified."
@@ -12767,7 +12769,7 @@ msgstr "Destino"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:174
 msgid "Specifies the MRL. This can be specified directly or filled in automatically by adjusting the stream settings."
-msgstr ""
+msgstr "Especifica o MRL. Pode ser especificado directamente ou preenchido automaticamente ajustando as definições da emissão."
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:462
 msgid "Outputs"
@@ -12788,11 +12790,11 @@ msgstr "RTP"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:592
 msgid "Group name"
-msgstr ""
+msgstr "Nome do grupo"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:599
 msgid "Channel name"
-msgstr ""
+msgstr "Nome do canal"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:606
 msgid "Select all elementary streams"
@@ -12859,7 +12861,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:198
 msgid "Save file..."
-msgstr ""
+msgstr "Guardar ficheiro..."
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:65
 msgid "Broadcasts"
@@ -13023,15 +13025,15 @@ msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:149
 msgid "Distortion"
-msgstr ""
+msgstr "Distorção"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:149
 msgid "Adds distortion effects"
-msgstr ""
+msgstr "Adiciona efeitos de distorção"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:150
 msgid "Image inversion"
-msgstr ""
+msgstr "Inversão de imagem"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:151
 msgid "Blurring"
@@ -13040,19 +13042,19 @@ msgstr ""
 #: modules/gui/wxwidgets/extrapanel.cpp:153
 #: modules/video_filter/magnify.c:60
 msgid "Magnify"
-msgstr ""
+msgstr "Magnificar"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:153
 msgid "Magnifies part of the image"
-msgstr ""
+msgstr "Magnifica parte da imagem"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:270
 msgid "Video Options"
-msgstr ""
+msgstr "Opções de vídeo"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:284
 msgid "Aspect Ratio"
-msgstr ""
+msgstr "Rácio de aspecto"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:402
 msgid "Prevents the audio output level from going over a predefined value."
@@ -13060,11 +13062,11 @@ msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:466
 msgid "Enable the equalizer. You can either manually adjust the bands or use a preset (Audio Menu->Equalizer)."
-msgstr ""
+msgstr "Activa o equalizador. Pode ajustar manualmente as bandas ou usar um preset (Audio Menu->Equalizer)."
 
 #: modules/gui/wxwidgets/extrapanel.cpp:473
 msgid "Apply the equalizer twice. The resulting effect will be sharper."
-msgstr ""
+msgstr "Aplica o equalizador duas vezes. O efeito resultante será mais pronunciado."
 
 #: modules/gui/wxwidgets/extrapanel.cpp:999
 msgid ""
@@ -13184,15 +13186,15 @@ msgstr "A&juda"
 #: modules/gui/wxwidgets/interface.cpp:680
 #: modules/gui/wxwidgets/interface.cpp:691
 msgid "Embedded playlist"
-msgstr ""
+msgstr "Lista de reprodução embebida"
 
 #: modules/gui/wxwidgets/interface.cpp:681
 msgid "Previous playlist item"
-msgstr ""
+msgstr "Item anterior da lista de reprodução"
 
 #: modules/gui/wxwidgets/interface.cpp:682
 msgid "Next playlist item"
-msgstr ""
+msgstr "Item seguinte da lista de reprodução"
 
 #: modules/gui/wxwidgets/interface.cpp:683
 msgid "Play slower"
@@ -13226,6 +13228,9 @@ msgid ""
 "http://www.videolan.org/\n"
 "\n"
 msgstr ""
+"A equipa VideoLAN <videolan@videolan.org>\n"
+"http://www.videolan.org/\n"
+"\n"
 
 #: modules/gui/wxwidgets/interface.cpp:955
 #, c-format
@@ -13238,7 +13243,7 @@ msgstr "Mostrar/esconder interface"
 
 #: modules/gui/wxwidgets/menus.cpp:124
 msgid "Quick &Open File..."
-msgstr ""
+msgstr "&Abrir rapidamente ficheiro..."
 
 #: modules/gui/wxwidgets/menus.cpp:125
 msgid "Open &File..."
@@ -13246,11 +13251,11 @@ msgstr "Abrir &Ficheiro..."
 
 #: modules/gui/wxwidgets/menus.cpp:126
 msgid "Open D&irectory..."
-msgstr ""
+msgstr "Abrir D&irectório..."
 
 #: modules/gui/wxwidgets/menus.cpp:127
 msgid "Open &Disc..."
-msgstr ""
+msgstr "Abrir &Disco..."
 
 #: modules/gui/wxwidgets/menus.cpp:128
 msgid "Open &Network Stream..."
@@ -13258,11 +13263,11 @@ msgstr "Abrir Emissão de &Rede...\""
 
 #: modules/gui/wxwidgets/menus.cpp:129
 msgid "Open &Capture Device..."
-msgstr ""
+msgstr "Abrir Dispositivo de &Captura..."
 
 #: modules/gui/wxwidgets/menus.cpp:136
 msgid "Media &Info..."
-msgstr ""
+msgstr "&Informação de media..."
 
 #: modules/gui/wxwidgets/menus.cpp:137
 msgid "&Messages..."
@@ -13295,15 +13300,15 @@ msgstr "H264 é um novo codec de vídeo (a usar com MPEG TS e MPEG4)"
 
 #: modules/gui/wxwidgets/streamdata.cpp:59
 msgid "WMV (Windows Media Video) 7 (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "WMV (Windows Media Video) 7 (a usar com MPEG TS, MPEG1, ASF e OGG)"
 
 #: modules/gui/wxwidgets/streamdata.cpp:62
 msgid "WMV (Windows Media Video) 8 (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "WMV (Windows Media Video) 8 (a usar com MPEG TS, MPEG1, ASF e OGG)"
 
 #: modules/gui/wxwidgets/streamdata.cpp:66
 msgid "WMV (Windows Media Video) 9 (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "WMV (Windows Media Video) 9 (a usar com MPEG TS, MPEG1, ASF e OGG)"
 
 #: modules/gui/wxwidgets/streamdata.cpp:73
 msgid "Theora is a free general-purpose codec (useable with MPEG TS)"
@@ -13339,23 +13344,23 @@ msgstr "Indique os endereços locais que quer escutar. Não indique nada se quis
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:89
 msgid "Bookmarks dialog"
-msgstr ""
+msgstr "Diálogo de marcas"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:90
 msgid "Show bookmarks dialog at startup"
-msgstr ""
+msgstr "Mostrar diálogo de marcas no arranque"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:91
 msgid "Extended GUI"
-msgstr ""
+msgstr "GUI extendido"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:92
 msgid "Show extended GUI (equalizer, image adjust, video filters...) at startup"
-msgstr ""
+msgstr "Mostrar GUI extendido (equalizador, ajuste de imagem, filtros de vídeo...) no arranque"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:94
 msgid "Taskbar"
-msgstr ""
+msgstr "Barra de tarefas"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:96
 msgid "Minimal interface"
@@ -13383,7 +13388,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:106
 msgid "Playlist view"
-msgstr ""
+msgstr "Vista da lista de reprodução"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:107
 msgid "There are two possible playlist views in the interface : the normal playlist (separate window), or an embedded playlist (within the main interface, but with less features). You can select which one will be available on the toolbar (or both)."
@@ -13391,11 +13396,11 @@ msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:114
 msgid "Embedded"
-msgstr ""
+msgstr "Embebido"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:115
 msgid "Both"
-msgstr ""
+msgstr "Ambos"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:124
 msgid "wxWidgets interface module"
