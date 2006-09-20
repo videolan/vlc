@@ -21,14 +21,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef _VLCGLUE_H
+#define _VLCGLUE_H 1
 
 #include <Python.h>
 #include "structmember.h"
 
-#define __VLC__
-
 #include <stdio.h>
 #include <vlc/vlc.h>
+#include <vlc/libvlc.h>
 #include <vlc/mediacontrol_structures.h>
 #include <vlc/mediacontrol.h>
 
@@ -70,6 +71,7 @@ PyObject *MediaControl_PositionKeyNotSupported;
 PyObject *MediaControl_PositionOriginNotSupported;
 PyObject *MediaControl_InvalidPosition;
 PyObject *MediaControl_PlaylistException;
+PyObject *vlcInstance_Exception;
 
 /**********************************************************************
  * VLC Object
@@ -86,8 +88,6 @@ typedef struct
     int b_released;
 } vlcObject;
 
-staticforward PyTypeObject vlcObject_Type;
-
 /**********************************************************************
  * MediaControl Object
  **********************************************************************/
@@ -95,9 +95,7 @@ typedef struct
 {
     PyObject_HEAD
     mediacontrol_Instance* mc;
-}MediaControl;
-
-staticforward PyTypeObject MediaControl_Type;
+} MediaControl;
 
 /**********************************************************************
  * Position Object
@@ -110,7 +108,42 @@ typedef struct
     PY_LONG_LONG value;
 } PyPosition;
 
+/**********************************************************************
+ * vlc.Instance Object
+ **********************************************************************/
+typedef struct
+{
+    PyObject_HEAD
+    libvlc_instance_t* p_instance;
+} vlcInstance;
+
+#define LIBVLC_INSTANCE ((vlcInstance*)self)
+
+/**********************************************************************
+ * vlc.Input Object
+ **********************************************************************/
+typedef struct
+{
+    PyObject_HEAD
+    libvlc_input_t* p_input;
+} vlcInput;
+
+/* Forward declarations */
+staticforward PyTypeObject vlcObject_Type;
+staticforward PyTypeObject MediaControl_Type;
 staticforward PyTypeObject PyPosition_Type;
+staticforward PyTypeObject vlcInstance_Type;
+staticforward PyTypeObject vlcInput_Type;
+
+#define LIBVLC_INPUT ((vlcInput*)self)
+
+#define LIBVLC_TRY libvlc_exception_init( &ex );
+
+#define LIBVLC_EXCEPT if( libvlc_exception_raised( &ex ) ) { \
+    PyObject *py_exc = vlcInstance_Exception; \
+    PyErr_SetString( py_exc, libvlc_exception_get_message( &ex ) ); \
+    return NULL; \
+  }
 
 mediacontrol_PositionKey positionKey_py_to_c( PyObject * py_key );
 mediacontrol_PositionOrigin positionOrigin_py_to_c( PyObject * py_origin );
@@ -124,3 +157,4 @@ PyPosition * position_c_to_py( mediacontrol_Position * position );
 #define ntohll(x) (x)
 #endif
 
+#endif

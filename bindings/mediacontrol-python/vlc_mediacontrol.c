@@ -1,0 +1,660 @@
+/*****************************************************************************
+ * vlc_mediacontrol.c: vlc.MediaControl binding
+ *****************************************************************************
+ * Copyright (C) 2006 the VideoLAN team
+ * $Id: $
+ *
+ * Authors: Olivier Aubert <oaubert at bat710.univ-lyon1.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+#include "vlcglue.h"
+
+/*****************************************************************************
+ * VLC MediaControl object implementation
+ *****************************************************************************/
+
+static PyObject *
+MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
+{
+    MediaControl *self;
+    mediacontrol_Exception *exception = NULL;
+    PyObject* py_list = NULL;
+    char** ppsz_args = NULL;
+
+    fprintf(stderr, "mc_new start\n");
+    self = PyObject_New( MediaControl, &MediaControl_Type );
+
+    if( PyArg_ParseTuple( args, "O", &py_list ) )
+    {
+        int i_size;
+        int i_index;
+
+        Py_INCREF( py_list );
+        if( ! PySequence_Check( py_list ) )
+        {
+            PyErr_SetString( PyExc_TypeError, "Parameter must be a sequence." );
+            return NULL;
+        }
+        i_size = PySequence_Size( py_list );
+        ppsz_args = malloc( ( i_size + 1 ) * sizeof( char * ) );
+        if( ! ppsz_args )
+        {
+            PyErr_SetString( PyExc_MemoryError, "Out of memory" );
+            return NULL;
+        }
+
+        for ( i_index = 0; i_index < i_size; i_index++ )
+        {
+            ppsz_args[i_index] =
+                strdup( PyString_AsString( PyObject_Str(
+                                               PySequence_GetItem( py_list,
+                                                                   i_index ) ) ) );
+        }
+        ppsz_args[i_size] = NULL;
+        Py_DECREF( py_list );
+    }
+    else
+    {
+        /* No arguments were given. Clear the exception raised
+           by PyArg_ParseTuple. */
+        PyErr_Clear( );
+    }
+
+    fprintf(stderr, "before mc_new\n");
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    self->mc = mediacontrol_new( ppsz_args, exception );
+    MC_EXCEPT;
+    Py_END_ALLOW_THREADS
+
+    fprintf(stderr, "mc_new end\n");
+
+    Py_INCREF( self );
+    return ( PyObject * )self;
+}
+
+static void
+MediaControl_dealloc( PyObject *self )
+{
+    PyMem_DEL( self );
+}
+
+/**
+ *  Return the current position in the stream. The returned value can
+   be relative or absolute ( according to PositionOrigin ) and the unit
+   is set by PositionKey
+ */
+static PyObject *
+MediaControl_get_media_position( PyObject *self, PyObject *args )
+{
+    mediacontrol_Position* pos;
+    mediacontrol_Exception* exception = NULL;
+    PyObject *py_origin;
+    PyObject *py_key;
+    PyObject *py_retval;
+    mediacontrol_PositionOrigin origin;
+    mediacontrol_PositionKey key;
+
+    if( !PyArg_ParseTuple( args, "OO", &py_origin, &py_key ) )
+        return NULL;
+
+    origin = positionOrigin_py_to_c( py_origin );
+    key    = positionKey_py_to_c( py_key );
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    pos = mediacontrol_get_media_position( SELF->mc, origin, key, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    py_retval = ( PyObject* )position_c_to_py( pos );
+    free( pos );
+    return py_retval;
+}
+
+/** Set the media position */
+static PyObject *
+MediaControl_set_media_position( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    mediacontrol_Position *a_position;
+    PyObject *py_pos;
+
+    if( !PyArg_ParseTuple( args, "O", &py_pos ) )
+        return NULL;
+
+    a_position = position_py_to_c( py_pos );
+    if( !a_position )
+    {
+        PyErr_SetString( PyExc_MemoryError, "Out of memory" );
+        return NULL;
+    }
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_set_media_position( SELF->mc, a_position, exception );
+    free( a_position );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+MediaControl_start( PyObject *self, PyObject *args )
+{
+    mediacontrol_Position *a_position;
+    mediacontrol_Exception *exception = NULL;
+    PyObject *py_pos;
+
+    if( !PyArg_ParseTuple( args, "O", &py_pos ) )
+    {
+        /* No argument. Use a default 0 value. */
+        PyErr_Clear( );
+        py_pos = NULL;
+    }
+    a_position = position_py_to_c( py_pos );
+    if( !a_position )
+        return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_start( SELF->mc, a_position, exception );
+    free( a_position );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+MediaControl_pause( PyObject *self, PyObject *args )
+{
+    mediacontrol_Position *a_position;
+    mediacontrol_Exception *exception = NULL;
+    PyObject *py_pos;
+
+    if( !PyArg_ParseTuple( args, "O", &py_pos ) )
+    {
+        /* No argument. Use a default 0 value. */
+        PyErr_Clear( );
+        py_pos = NULL;
+    }
+    a_position = position_py_to_c( py_pos );
+    if( !a_position )
+        return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_pause( SELF->mc, a_position, exception );
+    free( a_position );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+  Py_INCREF( Py_None );
+  return Py_None;
+}
+
+static PyObject *
+MediaControl_resume( PyObject *self, PyObject *args )
+{
+    mediacontrol_Position *a_position;
+    mediacontrol_Exception *exception = NULL;
+    PyObject *py_pos;
+
+    if( !PyArg_ParseTuple( args, "O", &py_pos ) )
+    {
+        /* No argument. Use a default 0 value. */
+        PyErr_Clear( );
+        py_pos = NULL;
+    }
+    a_position = position_py_to_c( py_pos );
+    if( !a_position )
+        return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_start( SELF->mc, a_position, exception );
+    free( a_position );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+MediaControl_stop( PyObject *self, PyObject *args )
+{
+    mediacontrol_Position *a_position;
+    mediacontrol_Exception *exception = NULL;
+    PyObject *py_pos;
+
+    if( !PyArg_ParseTuple( args, "O", &py_pos ) )
+    {
+        /* No argument. Use a default 0 value. */
+        PyErr_Clear( );
+        py_pos = NULL;
+    }
+    a_position = position_py_to_c( py_pos );
+    if( !a_position )
+        return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_stop( SELF->mc, a_position, exception );
+    free( a_position );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+MediaControl_exit( PyObject *self, PyObject *args )
+{
+    mediacontrol_exit( SELF->mc );
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+MediaControl_playlist_add_item( PyObject *self, PyObject *args )
+{
+    char *psz_file;
+    mediacontrol_Exception *exception = NULL;
+
+    if( !PyArg_ParseTuple( args, "s", &psz_file ) )
+      return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_playlist_add_item( SELF->mc, psz_file, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+MediaControl_playlist_clear( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception *exception = NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_playlist_clear( SELF->mc, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+MediaControl_playlist_get_list( PyObject *self, PyObject *args )
+{
+    PyObject *py_retval;
+    mediacontrol_Exception *exception = NULL;
+    mediacontrol_PlaylistSeq* pl;
+    int i_index;
+    int i_playlist_size;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    pl = mediacontrol_playlist_get_list( SELF->mc, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    i_playlist_size = pl->size;
+
+    py_retval = PyList_New( i_playlist_size );
+
+    for ( i_index = 0 ; i_index < i_playlist_size ; i_index++ )
+    {
+        PyList_SetItem( py_retval, i_index,
+                        Py_BuildValue( "s", pl->data[i_index] ) );
+    }
+    mediacontrol_PlaylistSeq__free( pl );
+
+    return py_retval;
+}
+
+
+static PyObject *
+MediaControl_snapshot( PyObject *self, PyObject *args )
+{
+    mediacontrol_RGBPicture *p_retval = NULL;
+    mediacontrol_Exception* exception = NULL;
+    mediacontrol_Position *a_position = NULL;
+    PyObject *py_pos = NULL;
+    PyObject *py_obj = NULL;
+
+    if( !PyArg_ParseTuple( args, "O", &py_pos ) )
+      return NULL;
+
+    a_position = position_py_to_c( py_pos );
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    p_retval = mediacontrol_snapshot( SELF->mc, a_position, exception );
+    free( a_position );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    if( !p_retval )
+    {
+        Py_INCREF( Py_None );
+        return Py_None;
+    }
+
+    /* FIXME: create a real RGBPicture object */
+    py_obj = PyDict_New();
+
+    PyDict_SetItemString( py_obj, "width",
+                          Py_BuildValue( "i", p_retval->width ) );
+    PyDict_SetItemString( py_obj, "height",
+                          Py_BuildValue( "i", p_retval->height ) );
+    PyDict_SetItemString( py_obj, "type",
+                          Py_BuildValue( "i", p_retval->type ) );
+    PyDict_SetItemString( py_obj, "data",
+                          Py_BuildValue( "s#", p_retval->data, p_retval->size ) );
+    PyDict_SetItemString( py_obj, "date",
+                          Py_BuildValue( "L", p_retval->date ) );
+
+    return py_obj;
+}
+
+static PyObject*
+MediaControl_display_text( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    PyObject *py_begin, *py_end;
+    char* message;
+    mediacontrol_Position * begin;
+    mediacontrol_Position * end;
+
+    if( !PyArg_ParseTuple( args, "sOO", &message, &py_begin, &py_end ) )
+        return NULL;
+
+    begin = position_py_to_c( py_begin );
+    end   = position_py_to_c( py_end );
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_display_text( SELF->mc, message, begin, end, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    free( begin );
+    free( end );
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject*
+MediaControl_get_stream_information( PyObject *self, PyObject *args )
+{
+    mediacontrol_StreamInformation *retval  = NULL;
+    mediacontrol_Exception* exception = NULL;
+    PyObject *py_obj;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    retval = mediacontrol_get_stream_information(
+        SELF->mc, mediacontrol_MediaTime, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    py_obj = PyDict_New( );
+
+     /* FIXME: create a real StreamInformation object */
+    PyDict_SetItemString( py_obj, "status",
+                  Py_BuildValue( "i", retval->streamstatus ) );
+    PyDict_SetItemString( py_obj, "url",
+                  Py_BuildValue( "s", retval->url ) );
+    PyDict_SetItemString( py_obj, "position",
+                  Py_BuildValue( "L", retval->position ) );
+    PyDict_SetItemString( py_obj, "length",
+                  Py_BuildValue( "L", retval->length ) );
+
+    free( retval->url );
+    free( retval );
+
+    return py_obj;
+}
+
+static PyObject*
+MediaControl_sound_set_volume( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    unsigned short volume;
+
+    if( !PyArg_ParseTuple( args, "H", &volume ) )
+        return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_sound_set_volume( SELF->mc, volume, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject*
+MediaControl_sound_get_volume( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    PyObject *py_retval;
+    unsigned short volume;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    volume = mediacontrol_sound_get_volume( SELF->mc, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    py_retval = Py_BuildValue( "H", volume );
+    return py_retval;
+}
+
+static PyObject*
+MediaControl_set_rate( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    int rate;
+
+    if( !PyArg_ParseTuple( args, "i", &rate ) )
+        return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_set_rate( SELF->mc, rate, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject*
+MediaControl_get_rate( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    PyObject *py_retval;
+    int rate;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    rate = mediacontrol_get_rate( SELF->mc, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    py_retval = Py_BuildValue( "i", rate );
+    return py_retval;
+}
+
+static PyObject*
+MediaControl_set_fullscreen( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    int fs;
+
+    if( !PyArg_ParseTuple( args, "i", &fs ) )
+        return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_set_fullscreen( SELF->mc, fs, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject*
+MediaControl_get_fullscreen( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    PyObject *py_retval;
+    int fs;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    fs = mediacontrol_get_fullscreen( SELF->mc, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    py_retval = Py_BuildValue( "i", fs );
+    return py_retval;
+}
+
+static PyObject*
+MediaControl_set_visual( PyObject *self, PyObject *args )
+{
+    mediacontrol_Exception* exception = NULL;
+    WINDOWHANDLE visual;
+
+    if( !PyArg_ParseTuple( args, "i", &visual ) )
+       return NULL;
+
+    Py_BEGIN_ALLOW_THREADS
+    MC_TRY;
+    mediacontrol_set_visual( SELF->mc, visual, exception );
+    Py_END_ALLOW_THREADS
+    MC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyMethodDef MediaControl_methods[] =
+{
+    {"get_media_position", MediaControl_get_media_position, METH_VARARGS,
+     "get_media_position( origin, key ) -> Position    Get current media position." },
+    { "set_media_position", MediaControl_set_media_position, METH_VARARGS,
+      "set_media_position( Position )            Set media position" },
+    { "start", MediaControl_start, METH_VARARGS,
+      "start( Position )         Start the player." },
+    { "pause", MediaControl_pause, METH_VARARGS,
+      "pause( Position )         Pause the player." },
+    { "resume", MediaControl_resume, METH_VARARGS,
+      "resume( Position )        Resume the player" },
+    { "stop", MediaControl_stop, METH_VARARGS,
+      "stop( Position )              Stop the player" },
+    { "exit", MediaControl_exit, METH_VARARGS,
+      "exit( )                     Exit the player" },
+    { "playlist_add_item", MediaControl_playlist_add_item, METH_VARARGS,
+      "playlist_add_item( str )               Add an item to the playlist" },
+    { "playlist_get_list", MediaControl_playlist_get_list, METH_VARARGS,
+      "playlist_get_list( ) -> list       Get the contents of the playlist" },
+    { "playlist_clear", MediaControl_playlist_clear, METH_VARARGS,
+      "clear( )         Clear the playlist." },
+    { "snapshot", MediaControl_snapshot, METH_VARARGS,
+      "snapshot( Position ) -> dict        Take a snapshot" },
+    { "display_text", MediaControl_display_text, METH_VARARGS,
+      "display_text( str, Position, Position )    Display a text on the video" },
+    { "get_stream_information", MediaControl_get_stream_information,
+      METH_VARARGS,
+      "get_stream_information( ) -> dict      Get information about the stream"},
+    { "sound_get_volume", MediaControl_sound_get_volume, METH_VARARGS,
+      "sound_get_volume( ) -> int       Get the volume" },
+    { "sound_set_volume", MediaControl_sound_set_volume, METH_VARARGS,
+      "sound_set_volume( int )           Set the volume" },
+    { "set_visual", MediaControl_set_visual, METH_VARARGS,
+      "set_visual( int )           Set the embedding window visual ID" },
+    { "get_rate", MediaControl_get_rate, METH_VARARGS,
+      "get_rate( ) -> int       Get the rate" },
+    { "set_rate", MediaControl_set_rate, METH_VARARGS,
+      "set_rate( int )              Set the rate" },
+    { "get_fullscreen", MediaControl_get_fullscreen, METH_VARARGS,
+      "get_fullscreen( ) -> int       Get the fullscreen status" },
+    { "set_fullscreen", MediaControl_set_fullscreen, METH_VARARGS,
+      "set_fullscreen( int )              Set the fullscreen status" },
+    { NULL, NULL, 0, NULL },
+};
+
+static PyTypeObject MediaControl_Type =
+{
+    PyObject_HEAD_INIT( NULL )
+    0,                         /*ob_size*/
+    "vlc.MediaControl",        /*tp_name*/
+    sizeof( MediaControl_Type ), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    ( destructor )MediaControl_dealloc,      /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "Control of a VLC instance.",  /* tp_doc */
+    0,                     /* tp_traverse */
+    0,                     /* tp_clear */
+    0,                     /* tp_richcompare */
+    0,                     /* tp_weaklistoffset */
+    0,                     /* tp_iter */
+    0,                     /* tp_iternext */
+    MediaControl_methods,             /* tp_methods */
+    0,             /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    0,                         /* tp_init */
+    0,                         /* tp_alloc */
+    MediaControl_new,          /* tp_new */
+};

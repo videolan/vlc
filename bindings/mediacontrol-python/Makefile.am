@@ -2,7 +2,10 @@
 # Building the Python binding
 ###############################################################################
 
-EXTRA_DIST = vlcglue.c vlcglue.h setup.py vlcwrapper.py
+EXTRA_DIST = vlcglue.h setup.py vlcwrapper.py \
+	vlc_module.c vlc_object.c \
+	vlc_mediacontrol.c vlc_position.c \
+	vlc_instance.c vlc_input.c
 
 if BUILD_PYTHON
 

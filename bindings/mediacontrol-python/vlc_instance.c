@@ -1,0 +1,644 @@
+/*****************************************************************************
+ * vlc_instance.c: vlc.Instance binding
+ *****************************************************************************
+ * Copyright (C) 2006 the VideoLAN team
+ * $Id: $
+ *
+ * Authors: Olivier Aubert <oaubert at bat710.univ-lyon1.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+#include "vlcglue.h"
+
+/*****************************************************************************
+ * Instance object implementation
+ *****************************************************************************/
+
+static PyObject *
+vlcInstance_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
+{
+    vlcInstance *self;
+    libvlc_exception_t ex;
+    PyObject* py_list = NULL;
+    char** ppsz_args = NULL;
+    int i_size = 0;
+
+    self = PyObject_New( vlcInstance, &vlcInstance_Type );
+
+    if( PyArg_ParseTuple( args, "O", &py_list ) )
+    {
+        int i_index;
+
+        Py_INCREF( py_list );
+        if( ! PySequence_Check( py_list ) )
+        {
+            PyErr_SetString( PyExc_TypeError, "Parameter must be a sequence." );
+            return NULL;
+        }
+        i_size = PySequence_Size( py_list );
+        ppsz_args = malloc( ( i_size + 2 ) * sizeof( char * ) );
+        if( ! ppsz_args )
+        {
+            PyErr_SetString( PyExc_MemoryError, "Out of memory" );
+            return NULL;
+        }
+
+	/* FIXME: we define a default args[0], since the libvlc API
+	   needs one. But it would be cleaner to fix the libvlc API.
+	 */
+        ppsz_args[0] = strdup("vlc");
+        for ( i_index = 0; i_index < i_size; i_index++ )
+        {
+            ppsz_args[i_index + 1] =
+                strdup( PyString_AsString( PyObject_Str(
+                                               PySequence_GetItem( py_list,
+                                                                   i_index ) ) ) );
+        }
+        ppsz_args[i_size + 1] = NULL;
+        /* Since we prepended the arg[0] */
+        i_size += 1;
+        Py_DECREF( py_list );
+    }
+    else
+    {
+        /* No arguments were given. Clear the exception raised
+           by PyArg_ParseTuple. */
+        PyErr_Clear( );
+    }
+
+    Py_BEGIN_ALLOW_THREADS
+    LIBVLC_TRY
+    LIBVLC_INSTANCE->p_instance = libvlc_new( i_size, ppsz_args, &ex );
+    LIBVLC_EXCEPT
+    Py_END_ALLOW_THREADS
+
+    Py_INCREF( self );
+    return ( PyObject * )self;
+}
+
+static void
+vlcInstance_dealloc( PyObject *self )
+{
+    libvlc_exception_t ex;
+    libvlc_destroy( LIBVLC_INSTANCE->p_instance, &ex );
+    PyMem_DEL( self );
+}
+
+static PyObject *
+vlcInstance_get_vlc_id( PyObject *self, PyObject *args )
+{
+    return Py_BuildValue( "i", libvlc_get_vlc_id( LIBVLC_INSTANCE->p_instance ) );
+}
+
+/* Playlist play. 2 parameters: i_id, the id to play
+   l_options: a list of options */
+static PyObject *
+vlcInstance_playlist_play( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_id = -1;
+    PyObject *py_options = NULL;
+    int i_size = 0;
+    char** ppsz_args = NULL;
+
+    if( !PyArg_ParseTuple( args, "|iO", &i_id, &py_options ) )
+        return NULL;
+
+    if( py_options )
+    {
+        /* Options were given. Convert them to a char** */
+        int i_index;
+
+        Py_INCREF( py_options );
+        if( ! PySequence_Check( py_options ) )
+        {
+            PyErr_SetString( PyExc_TypeError, "Parameter must be a sequence." );
+            return NULL;
+        }
+        i_size = PySequence_Size( py_options );
+        ppsz_args = malloc( ( i_size + 1 ) * sizeof( char * ) );
+        if( ! ppsz_args )
+        {
+            PyErr_SetString( PyExc_MemoryError, "Out of memory" );
+            return NULL;
+        }
+
+        for ( i_index = 0; i_index < i_size; i_index++ )
+        {
+            ppsz_args[i_index] =
+                strdup( PyString_AsString( PyObject_Str(
+                                               PySequence_GetItem( py_options,
+                                                                   i_index ) ) ) );
+        }
+        ppsz_args[i_size] = NULL;
+        Py_DECREF( py_options );
+    }
+
+    LIBVLC_TRY;
+    libvlc_playlist_play( LIBVLC_INSTANCE->p_instance, i_id, i_size, ppsz_args, &ex );
+    LIBVLC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_playlist_pause( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_playlist_pause( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_playlist_isplaying( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_ret;
+
+    LIBVLC_TRY;
+    i_ret = libvlc_playlist_isplaying( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcInstance_playlist_items_count( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_ret;
+
+    LIBVLC_TRY;
+    i_ret = libvlc_playlist_items_count( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcInstance_playlist_stop( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_playlist_stop( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_playlist_next( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_playlist_next( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_playlist_prev( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_playlist_prev( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_playlist_clear( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_playlist_clear( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+/* Add a playlist item. Main parameter: URI.
+   Optional parameters: name, options */
+static PyObject *
+vlcInstance_playlist_add( PyObject *self, PyObject *args)
+{
+    libvlc_exception_t ex;
+    int i_ret;
+    char* psz_uri = NULL;
+    char* psz_name = NULL;
+    PyObject *py_options = NULL;
+    int i_size = 0;
+    char** ppsz_args = NULL;
+
+    if( !PyArg_ParseTuple( args, "s|sO", &psz_uri, &psz_name, &py_options ) )
+        return NULL;
+
+    if( !psz_name )
+    {
+        /* Set a default name */
+        psz_name = strdup( psz_uri );
+    }
+
+    if( py_options )
+    {
+        /* Options were given. Convert them to a char** */
+        int i_index;
+
+        Py_INCREF( py_options );
+        if( ! PySequence_Check( py_options ) )
+        {
+            PyErr_SetString( PyExc_TypeError, "Parameter must be a sequence." );
+            return NULL;
+        }
+        i_size = PySequence_Size( py_options );
+        ppsz_args = malloc( ( i_size + 1 ) * sizeof( char * ) );
+        if( ! ppsz_args )
+        {
+            PyErr_SetString( PyExc_MemoryError, "Out of memory" );
+            return NULL;
+        }
+
+        for ( i_index = 0; i_index < i_size; i_index++ )
+        {
+            ppsz_args[i_index] =
+                strdup( PyString_AsString( PyObject_Str(
+                                               PySequence_GetItem( py_options,
+                                                                   i_index ) ) ) );
+        }
+        ppsz_args[i_size] = NULL;
+        Py_DECREF( py_options );
+    }
+
+    LIBVLC_TRY;
+    if( ppsz_args )
+    {
+        i_ret = libvlc_playlist_add_extended( LIBVLC_INSTANCE->p_instance,
+                                              psz_uri,
+                                              psz_name,
+                                              i_size,
+                                              ppsz_args,
+                                              &ex );
+    }
+    else
+    {
+        i_ret = libvlc_playlist_add( LIBVLC_INSTANCE->p_instance,
+                                     psz_uri,
+                                     psz_name,
+                                     &ex );
+    }
+    LIBVLC_EXCEPT;
+
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcInstance_playlist_delete_item( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_id;
+    int i_ret;
+
+    if( !PyArg_ParseTuple( args, "i", &i_id ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    i_ret = libvlc_playlist_delete_item( LIBVLC_INSTANCE->p_instance, i_id, &ex );
+    LIBVLC_EXCEPT;
+
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcInstance_playlist_get_input( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    libvlc_input_t *p_input;
+    vlcInput *p_ret;
+
+    LIBVLC_TRY;
+    p_input = libvlc_playlist_get_input( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+
+    p_ret = PyObject_New( vlcInput, &vlcInput_Type );
+    p_ret->p_input = p_input;
+    Py_INCREF( p_ret ); /* Ah bon ? */
+    return ( PyObject * )p_ret;
+}
+
+static PyObject *
+vlcInstance_video_set_parent( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_drawable;
+
+    if( !PyArg_ParseTuple( args, "i", &i_drawable ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_video_set_parent( LIBVLC_INSTANCE->p_instance, (libvlc_drawable_t) i_drawable, &ex );
+    LIBVLC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_video_set_size( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_width;
+    int i_height;
+
+    if( !PyArg_ParseTuple( args, "ii", &i_width, &i_height ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_video_set_size( LIBVLC_INSTANCE->p_instance, i_width, i_height, &ex );
+    LIBVLC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_audio_toggle_mute( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_audio_toggle_mute( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_audio_get_mute( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_ret;
+
+    LIBVLC_TRY;
+    i_ret = libvlc_audio_get_mute( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcInstance_audio_set_mute( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_mute;
+
+    if( !PyArg_ParseTuple( args, "i", &i_mute ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_audio_set_mute( LIBVLC_INSTANCE->p_instance, i_mute, &ex );
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_audio_get_volume( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_ret;
+
+    LIBVLC_TRY;
+    i_ret = libvlc_audio_get_volume( LIBVLC_INSTANCE->p_instance, &ex );
+    LIBVLC_EXCEPT;
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcInstance_audio_set_volume( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_volume;
+
+    if( !PyArg_ParseTuple( args, "i", &i_volume ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_audio_set_mute( LIBVLC_INSTANCE->p_instance, i_volume, &ex );
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+/* FIXME: add vlm related bindings here */
+
+/* static PyObject *
+vlcInstance_vlm_add_broadcast( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    FIXME libvlc_vlm_add_broadcast( LIBVLC_INSTANCE->p_instance, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_vlm_del_media( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_vlm_del_media( LIBVLC_INSTANCE->p_instance, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_vlm_set_enabled( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_vlm_set_enabled( LIBVLC_INSTANCE->p_instance, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_vlm_set_output( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_vlm_set_output( LIBVLC_INSTANCE->p_instance, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_vlm_set_input( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_vlm_set_input( LIBVLC_INSTANCE->p_instance, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_vlm_set_loop( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_vlm_set_loop( LIBVLC_INSTANCE->p_instance, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_vlm_change_media( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_vlm_change_media( LIBVLC_INSTANCE->p_instance, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_vlm_play_media( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_vlm_play_media( LIBVLC_INSTANCE->p_instance, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_vlm_stop_media( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_vlm_stop_media( LIBVLC_INSTANCE->p_instance, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInstance_vlm_pause_media( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    LIBVLC_TRY;
+    libvlc_vlm_pause_media( LIBVLC_INSTANCE->p_instance, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+*/
+
+/* Method table */
+static PyMethodDef vlcInstance_methods[] =
+{
+    { "get_vlc_id", vlcInstance_get_vlc_id, METH_VARARGS,
+      "get_vlc_id( ) -> int        Get the instance id."},
+    { "playlist_play", vlcInstance_playlist_play, METH_VARARGS,
+      "playlist_play( int, options )   Play the given playlist item (-1 for current item) with optional options (a list of strings)" },
+    { "playlist_pause", vlcInstance_playlist_pause, METH_VARARGS,
+      "playlist_pause()            Pause the current stream"},
+    { "playlist_isplaying", vlcInstance_playlist_isplaying, METH_VARARGS,
+      "playlist_isplaying() -> int     Return True if the playlist if playing"},
+    { "playlist_items_count", vlcInstance_playlist_items_count, METH_VARARGS,
+      "playlist_items_count() -> int   Return the number of items in the playlist"},
+    { "playlist_stop", vlcInstance_playlist_stop, METH_VARARGS,
+      "playlist_stop()             Stop the current stream"},
+    { "playlist_next", vlcInstance_playlist_next, METH_VARARGS,
+      "playlist_next()             Play the next item"},
+    { "playlist_prev", vlcInstance_playlist_prev, METH_VARARGS,
+      "playlist_prev()             Play the previous item"},
+    { "playlist_clear", vlcInstance_playlist_clear, METH_VARARGS,
+      "playlist_clear()            Clear the playlist"},
+    { "playlist_add", vlcInstance_playlist_add, METH_VARARGS,
+      "playlist_add( str, str, options ) -> int  Add a new item to the playlist. Second argument is its name. options is a list of strings."},
+    { "playlist_delete_item", vlcInstance_playlist_delete_item, METH_VARARGS,
+      "playlist_delete_item(int)   Delete the given item"},
+    { "playlist_get_input", vlcInstance_playlist_get_input, METH_VARARGS,
+      "playlist_get_input() -> object   Return the current input"},
+    { "video_set_parent", vlcInstance_video_set_parent, METH_VARARGS,
+      "video_set_parent(int)       Set the parent xid or HWND"},
+    { "video_set_size", vlcInstance_video_set_size, METH_VARARGS,
+      "video_set_size(int, int)    Set the video width and height"},
+    { "audio_toggle_mute", vlcInstance_audio_toggle_mute, METH_VARARGS,
+      "audio_toggle_mute()         Toggle the mute state"},
+    { "audio_get_mute", vlcInstance_audio_get_mute, METH_VARARGS,
+      "audio_get_mute() -> int     Get the mute state"},
+    { "audio_set_mute", vlcInstance_audio_set_mute, METH_VARARGS,
+      "audio_set_mute(int)         Set the mute state"},
+    { "audio_get_volume", vlcInstance_audio_get_volume, METH_VARARGS,
+      "audio_get_volume() -> int   Get the audio volume"},
+    { "audio_set_volume", vlcInstance_audio_set_volume, METH_VARARGS,
+      "audio_set_volume(int)       Set the audio volume"},
+    { NULL, NULL, 0, NULL },
+};
+
+static PyTypeObject vlcInstance_Type =
+{
+    PyObject_HEAD_INIT( NULL )
+    0,                          /*ob_size*/
+    "vlc.Instance",             /*tp_name*/
+    sizeof( vlcInstance_Type ), /*tp_basicsize*/
+    0,                          /*tp_itemsize*/
+    ( destructor )vlcInstance_dealloc,      /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "VLC Instance.",  /* tp_doc */
+    0,                     /* tp_traverse */
+    0,                     /* tp_clear */
+    0,                     /* tp_richcompare */
+    0,                     /* tp_weaklistoffset */
+    0,                     /* tp_iter */
+    0,                     /* tp_iternext */
+    vlcInstance_methods,             /* tp_methods */
+    0,             /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    0,                         /* tp_init */
+    0,                         /* tp_alloc */
+    vlcInstance_new,          /* tp_new */
+};

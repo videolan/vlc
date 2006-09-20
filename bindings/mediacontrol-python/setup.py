@@ -21,15 +21,8 @@ except KeyError:
 if not srcdir:
     srcdir = '.'
 
-#if os.sys.platform in ('win32', 'darwin'):
-    # Do not use PIC version on win32 and Mac OS X
-if True:
-    # PIC version seems to be disabled on all platforms
-    vlclib=os.path.join( top_builddir, 'src', 'libvlc.a' )
-    picflag=''
-else:
-    vlclib=os.path.join( top_builddir, 'src', 'libvlc_pic.a' )
-    picflag='pic'
+vlclib="-lvlc"
+picflag=''
 
 def get_vlcconfig():
     vlcconfig=None
@@ -69,39 +62,47 @@ def get_ldflags():
 	ldflags = []
 	if os.sys.platform == 'darwin':
 	    ldflags = "-read_only_relocs warning".split()
-        ldflags.extend(os.popen('%s --libs vlc %s builtin' % (vlcconfig,
+        ldflags.extend(os.popen('%s --libs vlc %s' % (vlcconfig,
 							      picflag), 
 				'r').readline().rstrip().split())
 	if os.sys.platform == 'darwin':
 	    ldflags.append('-lstdc++')
         return ldflags
 
+#source_files = [ 'vlc_module.c', 'vlc_object.c', 'vlc_mediacontrol.c',
+#                 'vlc_position.c', 'vlc_instance.c', 'vlc_input.c' ]
+source_files = [ 'vlc_module.c' ]
+
 # To compile in a local vlc tree
 vlclocal = Extension('vlc',
-                sources = [ os.path.join( srcdir, 'vlcglue.c'),
-                            os.path.join( srcdir, '../../src/control/mediacontrol_init.c')],
-                include_dirs = [ top_builddir,
-		                 os.path.join( srcdir, '../../include'),
-		                 os.path.join( srcdir, '../../', '/usr/win32/include') ],
-
+                     sources = [ os.path.join( srcdir, f ) for f in source_files ] +
+                     [ os.path.join( top_builddir, 'src/control/mediacontrol_init.c') ],
+                     include_dirs = [ top_builddir,
+                                      os.path.join( top_builddir, 'include' ),
+                                      srcdir,
+                                      '/usr/win32/include' ],
                 extra_objects = [ vlclib ],
                 extra_compile_args = get_cflags(),
 		extra_link_args = [ '-L' + top_builddir ]  + get_ldflags(),
                 )
 
-setup (name = 'MediaControl',
+setup (name = 'VLC Bindings',
        version = get_vlc_version(),
-       scripts = [ os.path.join( srcdir, 'vlcwrapper.py') ],
+       #scripts = [ os.path.join( srcdir, 'vlcwrapper.py') ],
        keywords = [ 'vlc', 'video' ],
        license = "GPL", 
        description = """VLC bindings for python.
 
-This module provides a MediaControl object, which implements an API
-inspired from the OMG Audio/Video Stream 1.0 specification. Moreover,
-the module provides a Object type, which gives a low-level access to
-the vlc objects and their variables.
+This module provides bindings for the native libvlc API of the VLC
+video player. Documentation can be found on the VLC wiki : 
+http://wiki.videolan.org/index.php/ExternalAPI
 
-Documentation can be found on the VLC wiki : 
+The module also provides a Object type, which gives a low-level access
+to the vlc objects and their variables.
+
+This module also provides a MediaControl object, which implements an
+API inspired from the OMG Audio/Video Stream 1.0 specification.
+Documentation can be found on the VLC wiki :
 http://wiki.videolan.org/index.php/PythonBinding
 
 Example session:
@@ -135,5 +136,6 @@ o.info()
 i=o.find_object('input')
 i.list()
 i.get('time')
+
        """,
        ext_modules = [ vlclocal ])
