@@ -47,6 +47,10 @@
     #define PREF_H 125
 #endif
 
+#define BUTTON_SET( button, image, tooltip ) ui.button##Button->setText(""); \
+    ui.button##Button->setIcon( QIcon( ":/pixmaps/"#image ) ); \
+    ui.button##Button->setToolTip( tooltip );
+
 static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void *);
 /* Video handling */
@@ -137,6 +141,10 @@ void MainInterface::handleMainUi( QSettings *settings )
     slider = new InputSlider( Qt::Horizontal, NULL );
     ui.hboxLayout->insertWidget( 0, slider );
 
+    BUTTON_SET( prev, previous.png, qtr( "Previous" ) );
+    BUTTON_SET( next, next.png , qtr( "Next" ) );
+    BUTTON_SET( play, play.png , qtr( "Play" ) );
+    BUTTON_SET( stop, stop.png , qtr( "Stop" )  );
     ui.discFrame->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
 
 #define SET( button, image ) ui.button##Button->setText(""); \
@@ -165,6 +173,9 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     playlistEmbeddedFlag = true;
     /// \todo fetch playlist settings
+    BUTTON_SET( playlist, volume-low.png, playlistEmbeddedFlag ?
+                                                qtr( "Show playlist" ) :
+                                                qtr( "Open playlist" ) );
 
     /* Set initial size */
     resize ( PREF_W, PREF_H );
@@ -173,7 +184,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     if( videoEmbeddedFlag )
     {
         videoWidget = new VideoWidget( p_intf );
-        videoWidget->widgetSize = QSize( 1, 1 );
+        videoWidget->widgetSize = QSize( PREF_W, 1 );
         videoWidget->resize( videoWidget->widgetSize );
         videoWidget->hide();
         ui.vboxLayout->insertWidget( 0, videoWidget );
@@ -194,6 +205,7 @@ void MainInterface::handleMainUi( QSettings *settings )
 //    visualSelector->hide();
 
     calculateInterfaceSize();
+    fprintf( stderr, "Resize to %ix%i\n", mainSize.width(), mainSize.height() );
     resize( mainSize );
     mainSize = size();
 
@@ -224,6 +236,11 @@ void MainInterface::calculateInterfaceSize()
         width =  videoWidget->widgetSize.width() ;
         height = videoWidget->widgetSize.height();
         fprintf( stderr, "Video Size %ix%i\n", videoWidget->widgetSize.width(), videoWidget->widgetSize.height() );
+    }
+    else
+    {
+        width = PREF_W - addSize.width();
+        height = PREF_H - addSize.height();
     }
     mainSize.setWidth( width + addSize.width() );
     mainSize.setHeight( height + addSize.height() );
