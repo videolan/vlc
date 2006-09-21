@@ -26,6 +26,7 @@
 #include <ocidl.h>
 #include <vector>
 #include <queue>
+#include <map>
 
 class VLCConnectionPoint : public IConnectionPoint
 {
@@ -69,7 +70,7 @@ private:
 
     REFIID _iid;
     IConnectionPointContainer *_p_cpc;
-    std::vector<CONNECTDATA> _connections;
+    std::map<DWORD, LPUNKNOWN> _connections;
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -29,46 +29,62 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-class VLCEnumConnections : public IEnumConnections
+/* this function object is used to return the value from a map pair */
+struct VLCEnumConnectionsDereference
+{
+    CONNECTDATA operator()(const map<DWORD,LPUNKNOWN>::iterator& i)
+    {
+        CONNECTDATA cd;
+        
+        cd.dwCookie = i->first;
+        cd.pUnk     = i->second;
+        return cd;
+    };
+};
+
+class VLCEnumConnections : public VLCEnumIterator<IID_IEnumConnections,
+    IEnumConnections,
+    CONNECTDATA,
+    map<DWORD,LPUNKNOWN>::iterator,
+    VLCEnumConnectionsDereference>
 {
 public:
-    VLCEnumConnections(vector<CONNECTDATA> &v) :
-        e(VLCEnum<CONNECTDATA>(IID_IEnumConnections, v))
-    { e.setRetainOperation((VLCEnum<CONNECTDATA>::retainer)&retain); };
+    VLCEnumConnections(map<DWORD,LPUNKNOWN> &m) :
+        VLCEnumIterator<IID_IEnumConnections,
+            IEnumConnections,
+            CONNECTDATA,
+            map<DWORD,LPUNKNOWN>::iterator,
+            VLCEnumConnectionsDereference> (m.begin(), m.end())
+    {};
+};
 
-    VLCEnumConnections(const VLCEnumConnections &vlcEnum) : IEnumConnections(), e(vlcEnum.e) {};
+////////////////////////////////////////////////////////////////////////////////////////////////
 
-    virtual ~VLCEnumConnections() {};
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-        { return e.QueryInterface(riid, ppv); };
-    STDMETHODIMP_(ULONG) AddRef(void)
-        { return e.AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void)
-        {return e.Release(); };
-
-    //IEnumConnectionPoints
-    STDMETHODIMP Next(ULONG celt, LPCONNECTDATA rgelt, ULONG *pceltFetched)
-        { return e.Next(celt, rgelt, pceltFetched); };
-    STDMETHODIMP Skip(ULONG celt)
-        { return e.Skip(celt);};
-    STDMETHODIMP Reset(void)
-        { return e.Reset();};
-    STDMETHODIMP Clone(LPENUMCONNECTIONS *ppenum)
-        { if( NULL == ppenum ) return E_POINTER;
-          *ppenum = dynamic_cast<LPENUMCONNECTIONS>(new VLCEnumConnections(*this));
-          return (NULL != *ppenum) ? S_OK : E_OUTOFMEMORY;
-        };
-
-private:
-
-    static void retain(CONNECTDATA cd)
+/* this function object is used to retain the dereferenced iterator value */
+struct VLCEnumConnectionPointsDereference
+{
+    LPCONNECTIONPOINT operator()(const vector<LPCONNECTIONPOINT>::iterator& i)
     {
-        cd.pUnk->AddRef();
-    };
+        LPCONNECTIONPOINT cp = *i;
+        cp->AddRef();
+        return cp;
+    }
+};
 
-    VLCEnum<CONNECTDATA> e;
+class VLCEnumConnectionPoints: public VLCEnumIterator<IID_IEnumConnectionPoints,
+    IEnumConnectionPoints,
+    LPCONNECTIONPOINT,
+    vector<LPCONNECTIONPOINT>::iterator,
+    VLCEnumConnectionPointsDereference>
+{
+public:
+    VLCEnumConnectionPoints(vector<LPCONNECTIONPOINT>& v) :
+        VLCEnumIterator<IID_IEnumConnectionPoints,
+            IEnumConnectionPoints,
+            LPCONNECTIONPOINT,
+            vector<LPCONNECTIONPOINT>::iterator,
+            VLCEnumConnectionPointsDereference> (v.begin(), v.end())
+    {};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,31 +110,28 @@ STDMETHODIMP VLCConnectionPoint::GetConnectionPointContainer(LPCONNECTIONPOINTCO
 
 STDMETHODIMP VLCConnectionPoint::Advise(IUnknown *pUnk, DWORD *pdwCookie)
 {
+    static DWORD dwCookieCounter = 0;
+
     if( (NULL == pUnk) || (NULL == pdwCookie) )
         return E_POINTER;
 
-    CONNECTDATA cd;
-
     pUnk->AddRef();
-    cd.pUnk = pUnk;
-    *pdwCookie = cd.dwCookie = _connections.size()+1;
 
-    _connections.push_back(cd);
+    *pdwCookie = ++dwCookieCounter;
+    _connections[*pdwCookie] = pUnk;
 
     return S_OK;
 };
 
 STDMETHODIMP VLCConnectionPoint::Unadvise(DWORD pdwCookie)
 {
-    if( (0 < pdwCookie) && (pdwCookie <= _connections.size()) )
+    map<DWORD,LPUNKNOWN>::iterator pcd = _connections.find((DWORD)pdwCookie);
+    if( pcd != _connections.end() )
     {
-        CONNECTDATA cd = _connections[pdwCookie-1];
-        if( NULL != cd.pUnk )
-        {
-            cd.pUnk->Release();
-            cd.pUnk = NULL;
-            return S_OK;
-        }
+        pcd->second->Release();
+
+        _connections.erase(pdwCookie);
+        return S_OK;
     }
     return CONNECT_E_NOCONNECTION;
 };
@@ -135,16 +148,16 @@ STDMETHODIMP VLCConnectionPoint::EnumConnections(IEnumConnections **ppEnum)
 
 void VLCConnectionPoint::fireEvent(DISPID dispId, DISPPARAMS *pDispParams)
 {
-    vector<CONNECTDATA>::iterator end = _connections.end();
-    vector<CONNECTDATA>::iterator iter = _connections.begin();
+    map<DWORD,LPUNKNOWN>::iterator end = _connections.end();
+    map<DWORD,LPUNKNOWN>::iterator iter = _connections.begin();
 
     while( iter != end )
     {
-        CONNECTDATA cd = *iter;
-        if( NULL != cd.pUnk )
+        LPUNKNOWN pUnk = iter->second;
+        if( NULL != pUnk )
         {
             IDispatch *pDisp;
-            if( SUCCEEDED(cd.pUnk->QueryInterface(IID_IDispatch, (LPVOID *)&pDisp)) )
+            if( SUCCEEDED(pUnk->QueryInterface(IID_IDispatch, (LPVOID *)&pDisp)) )
             {
                 pDisp->Invoke(dispId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, pDispParams, NULL, NULL, NULL);
                 pDisp->Release();
@@ -156,16 +169,16 @@ void VLCConnectionPoint::fireEvent(DISPID dispId, DISPPARAMS *pDispParams)
 
 void VLCConnectionPoint::firePropChangedEvent(DISPID dispId)
 {
-    vector<CONNECTDATA>::iterator end = _connections.end();
-    vector<CONNECTDATA>::iterator iter = _connections.begin();
+    map<DWORD,LPUNKNOWN>::iterator end = _connections.end();
+    map<DWORD,LPUNKNOWN>::iterator iter = _connections.begin();
 
     while( iter != end )
     {
-        CONNECTDATA cd = *iter;
-        if( NULL != cd.pUnk )
+        LPUNKNOWN pUnk = iter->second;
+        if( NULL != pUnk )
         {
             IPropertyNotifySink *pPropSink;
-            if( SUCCEEDED(cd.pUnk->QueryInterface(IID_IPropertyNotifySink, (LPVOID *)&pPropSink)) )
+            if( SUCCEEDED(pUnk->QueryInterface(IID_IPropertyNotifySink, (LPVOID *)&pPropSink)) )
             {
                 pPropSink->OnChanged(dispId);
                 pPropSink->Release();
@@ -173,50 +186,6 @@ void VLCConnectionPoint::firePropChangedEvent(DISPID dispId)
         }
         ++iter;
     }
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-class VLCEnumConnectionPoints : public IEnumConnectionPoints
-{
-public:
-    VLCEnumConnectionPoints(vector<LPCONNECTIONPOINT> &v) :
-        e(VLCEnum<LPCONNECTIONPOINT>(IID_IEnumConnectionPoints, v))
-    { e.setRetainOperation((VLCEnum<LPCONNECTIONPOINT>::retainer)&retain); };
-
-    VLCEnumConnectionPoints(const VLCEnumConnectionPoints &vlcEnum) : IEnumConnectionPoints(), e(vlcEnum.e) {};
-
-    virtual ~VLCEnumConnectionPoints() {};
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-        { return e.QueryInterface(riid, ppv); };
-    STDMETHODIMP_(ULONG) AddRef(void)
-        { return e.AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void)
-        {return e.Release(); };
-
-    //IEnumConnectionPoints
-    STDMETHODIMP Next(ULONG celt, LPCONNECTIONPOINT *rgelt, ULONG *pceltFetched)
-        { return e.Next(celt, rgelt, pceltFetched); };
-    STDMETHODIMP Skip(ULONG celt)
-        { return e.Skip(celt);};
-    STDMETHODIMP Reset(void)
-        { return e.Reset();};
-    STDMETHODIMP Clone(LPENUMCONNECTIONPOINTS *ppenum)
-        { if( NULL == ppenum ) return E_POINTER;
-          *ppenum = dynamic_cast<LPENUMCONNECTIONPOINTS>(new VLCEnumConnectionPoints(*this));
-          return (NULL != *ppenum) ? S_OK : E_OUTOFMEMORY;
-        };
-
-private:
-
-    static void retain(LPCONNECTIONPOINT cp)
-    {
-        cp->AddRef();
-    };
-
-    VLCEnum<LPCONNECTIONPOINT> e;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

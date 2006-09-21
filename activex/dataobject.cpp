@@ -29,44 +29,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-class VLCEnumFORMATETC : public IEnumFORMATETC
-{
-public:
-
-    VLCEnumFORMATETC(vector<FORMATETC> &v) :
-        e(VLCEnum<FORMATETC>(IID_IEnumFORMATETC, v)) {};
-
-    VLCEnumFORMATETC(const VLCEnumFORMATETC &vlcEnum) : IEnumFORMATETC(), e(vlcEnum.e) {};
-    virtual ~VLCEnumFORMATETC() {};
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-        { return e.QueryInterface(riid, ppv); };
-    STDMETHODIMP_(ULONG) AddRef(void)
-        { return e.AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void)
-        {return e.Release(); };
-
-    //IEnumConnectionPoints
-    STDMETHODIMP Next(ULONG celt, LPFORMATETC rgelt, ULONG *pceltFetched)
-        { return e.Next(celt, rgelt, pceltFetched); };
-    STDMETHODIMP Skip(ULONG celt)
-        { return e.Skip(celt);};
-    STDMETHODIMP Reset(void)
-        { return e.Reset();};
-    STDMETHODIMP Clone(LPENUMFORMATETC *ppenum)
-        { if( NULL == ppenum ) return E_POINTER;
-          *ppenum = dynamic_cast<LPENUMFORMATETC>(new VLCEnumFORMATETC(*this));
-          return (NULL != *ppenum) ? S_OK : E_OUTOFMEMORY;
-        };
-
-private:
-
-    VLCEnum<FORMATETC> e;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-
 static const FORMATETC _metaFileFormatEtc =
     {
         CF_METAFILEPICT,
@@ -83,6 +45,22 @@ static const FORMATETC _enhMetaFileFormatEtc =
         -1,
         TYMED_ENHMF,
     };
+
+class VLCEnumFORMATETC : public VLCEnumIterator<IID_IEnumFORMATETC,
+    IEnumFORMATETC,
+    FORMATETC,
+    vector<FORMATETC>::iterator>
+{
+public:
+    VLCEnumFORMATETC(vector<FORMATETC> v) :
+        VLCEnumIterator<IID_IEnumFORMATETC,
+        IEnumFORMATETC,
+        FORMATETC,
+        vector<FORMATETC>::iterator>(v.begin(), v.end())
+    {};
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////
 
 VLCDataObject::VLCDataObject(VLCPlugin *p_instance) : _p_instance(p_instance)
 {
@@ -114,13 +92,14 @@ STDMETHODIMP VLCDataObject::EnumDAdvise(IEnumSTATDATA **ppenumAdvise)
     return _p_adviseHolder->EnumAdvise(ppenumAdvise);
 };
 
-STDMETHODIMP VLCDataObject::EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppenumformatetc)
+STDMETHODIMP VLCDataObject::EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppEnum)
 {
-    if( NULL == ppenumformatetc )
+    if( NULL == ppEnum )
         return E_POINTER;
 
-    *ppenumformatetc = new VLCEnumFORMATETC(_v_formatEtc);
-    return NOERROR;
+    *ppEnum = dynamic_cast<IEnumFORMATETC *>(new VLCEnumFORMATETC(_v_formatEtc));
+
+    return (NULL != *ppEnum ) ? S_OK : E_OUTOFMEMORY;
 };
 
 STDMETHODIMP VLCDataObject::GetCanonicalFormatEtc(LPFORMATETC pFormatEtcIn, LPFORMATETC pFormatEtcOut)
