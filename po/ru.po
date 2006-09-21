@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-20 22:11+0100\n"
+"POT-Creation-Date: 2006-09-22 00:18+0200\n"
 "PO-Revision-Date: 2006-08-29 20:10+0700\n"
 "Last-Translator: Vladimir Yermolayev <init@siptelecom.ru>\n"
 "Language-Team: Russian\n"
@@ -18,6 +18,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Russian\n"
+
+#: include/vlc/vlc.h:576
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute it under the terms of the GNU General Public License;\n"
+"see the file named COPYING for details.\n"
+"Written by the VideoLAN team; see the AUTHORS file.\n"
+msgstr ""
+"Эта программа поставляется БЕЗ ГАРАНТИИ, в степени, разрешенной "
+"законодательством.\n"
+"Вы можете пользоваться и передавать ее на условиях Основной Публичной "
+"Лицензии GNU;\n"
+"подробнее смотрите в файле COPYING. \n"
+"Написано командой VideoLAN; подробнее смотрите в файле AUTHORS.\n"
 
 #: include/vlc_config_cat.h:32
 msgid "VLC preferences"
@@ -71,7 +85,7 @@ msgstr "Настройка горячих клавиш"
 #: modules/gui/beos/InterfaceWindow.cpp:282 modules/gui/macosx/extended.m:81
 #: modules/gui/macosx/intf.m:556 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:96 modules/gui/macosx/wizard.m:421
-#: modules/gui/qt4/ui/input_stats.ui:100
+#: modules/gui/qt4/ui/input_stats.ui:177
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:336
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:864
 #: modules/gui/wxwidgets/extrapanel.cpp:178 modules/stream_out/transcode.c:253
@@ -125,7 +139,7 @@ msgstr "Прочие настройки звука и модули."
 #: include/vlc_config_cat.h:75 src/input/es_out.c:1615 src/libvlc.h:1252
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:569
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:86
-#: modules/gui/macosx/wizard.m:422 modules/gui/qt4/ui/input_stats.ui:172
+#: modules/gui/macosx/wizard.m:422 modules/gui/qt4/ui/input_stats.ui:111
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:290
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:825
 #: modules/gui/wxwidgets/extrapanel.cpp:176 modules/misc/dummy/dummy.c:95
@@ -557,8 +571,8 @@ msgstr "Мета-данные"
 msgid "Title"
 msgstr "Глава"
 
-#: include/vlc_meta.h:30 modules/gui/macosx/playlistinfo.m:58
-#: modules/gui/macosx/playlist.m:129 modules/gui/macosx/wizard.m:393
+#: include/vlc_meta.h:30 modules/gui/macosx/playlist.m:129
+#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/wizard.m:393
 #: modules/gui/wince/playlist.cpp:674 modules/mux/asf.c:50
 msgid "Author"
 msgstr "Автор"
@@ -629,20 +643,6 @@ msgstr "Название кодека"
 #: include/vlc_meta.h:47
 msgid "Codec Description"
 msgstr "Описание кодека"
-
-#: include/vlc/vlc.h:576
-msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute it under the terms of the GNU General Public License;\n"
-"see the file named COPYING for details.\n"
-"Written by the VideoLAN team; see the AUTHORS file.\n"
-msgstr ""
-"Эта программа поставляется БЕЗ ГАРАНТИИ, в степени, разрешенной "
-"законодательством.\n"
-"Вы можете пользоваться и передавать ее на условиях Основной Публичной "
-"Лицензии GNU;\n"
-"подробнее смотрите в файле COPYING. \n"
-"Написано командой VideoLAN; подробнее смотрите в файле AUTHORS.\n"
 
 #: src/audio_output/filters.c:154 src/audio_output/filters.c:201
 #: src/audio_output/filters.c:224
@@ -863,8 +863,8 @@ msgstr "%d Гц"
 msgid "Bits per sample"
 msgstr "Бит"
 
-#: src/input/es_out.c:1607 modules/access_output/shout.c:86
-#: modules/access/pvr.c:84
+#: src/input/es_out.c:1607 modules/access/pvr.c:84
+#: modules/access_output/shout.c:86
 msgid "Bitrate"
 msgstr "Битрейт"
 
@@ -3854,7 +3854,7 @@ msgid "Decoders"
 msgstr "Декодеры"
 
 #: src/libvlc.h:1469 modules/access/v4l2.c:56
-#: modules/gui/macosx/playlistinfo.m:80 modules/gui/qt4/ui/input_stats.ui:244
+#: modules/gui/macosx/playlistinfo.m:80 modules/gui/qt4/ui/input_stats.ui:28
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:265
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:378
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:106
@@ -4605,17 +4605,8 @@ msgstr "Обрезать"
 msgid "Aspect-ratio"
 msgstr "Соотношение сторон"
 
-#: modules/access/cdda/access.c:293
-msgid "CD reading failed"
-msgstr ""
-
-#: modules/access/cdda/access.c:294
-#, c-format
-msgid "VLC could not get a new block of size: %i."
-msgstr ""
-
 #: modules/access/cdda.c:58 modules/access/dshow/dshow.cpp:91
-#: modules/access/dvb/access.c:73 modules/access/dv.c:68
+#: modules/access/dv.c:68 modules/access/dvb/access.c:73
 #: modules/access/dvdnav.c:64 modules/access/dvdread.c:62
 #: modules/access/fake.c:40 modules/access/file.c:80 modules/access/ftp.c:54
 #: modules/access/gnomevfs.c:44 modules/access/http.c:56
@@ -4670,6 +4661,15 @@ msgstr "Аудио CD - Дорожка "
 #, c-format
 msgid "Audio CD - Track %i"
 msgstr "Аудио CD - Дорожка %i"
+
+#: modules/access/cdda/access.c:293
+msgid "CD reading failed"
+msgstr ""
+
+#: modules/access/cdda/access.c:294
+#, c-format
+msgid "VLC could not get a new block of size: %i."
+msgstr ""
 
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:78
 #: modules/codec/x264.c:280 modules/codec/x264.c:287 modules/codec/x264.c:292
@@ -5241,6 +5241,18 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 
+#: modules/access/dv.c:70
+msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
+msgstr "Размер кэша для потока DV. Значение указывается в миллисекудах."
+
+#: modules/access/dv.c:74
+msgid "Digital Video (Firewire/ieee1394)  input"
+msgstr "Источник Digital Video (Firewire/IEEE 1394)"
+
+#: modules/access/dv.c:75
+msgid "dv"
+msgstr "dv"
+
 #: modules/access/dvb/access.c:75
 msgid ""
 "Caching value for DVB streams. This value should be set in milliseconds."
@@ -5506,18 +5518,6 @@ msgstr "Нормализация громкости"
 msgid "The provided polarization \"%c\" is not valid."
 msgstr ""
 
-#: modules/access/dv.c:70
-msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
-msgstr "Размер кэша для потока DV. Значение указывается в миллисекудах."
-
-#: modules/access/dv.c:74
-msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr "Источник Digital Video (Firewire/IEEE 1394)"
-
-#: modules/access/dv.c:75
-msgid "dv"
-msgstr "dv"
-
 #: modules/access/dvdnav.c:60 modules/access/dvdread.c:58
 msgid "DVD angle"
 msgstr "Угол DVD"
@@ -5730,51 +5730,6 @@ msgstr ""
 msgid "VLC could not open file \"%s\" (%s)."
 msgstr ""
 
-#: modules/access_filter/record.c:46
-msgid "Record directory"
-msgstr "Каталог для записи"
-
-#: modules/access_filter/record.c:48
-msgid "Directory where the record will be stored."
-msgstr "Каталог, где будут сохраняться все записи."
-
-#: modules/access_filter/timeshift.c:46
-msgid "Timeshift granularity"
-msgstr "Размер сдвига по времени"
-
-#: modules/access_filter/timeshift.c:48
-#, fuzzy
-msgid ""
-"This is the size of the temporary files that will be used to store the "
-"timeshifted streams."
-msgstr ""
-"Размер временных файлов, которые будут содержать сдвинутые по времени потоки."
-
-#: modules/access_filter/timeshift.c:50
-msgid "Timeshift directory"
-msgstr "Каталог сдвига по времени"
-
-#: modules/access_filter/timeshift.c:51
-msgid "Directory used to store the timeshift temporary files."
-msgstr ""
-"Каталог, где будут сохраняться временные файлы модуля сдвига по времени."
-
-#: modules/access_filter/timeshift.c:53
-#, fuzzy
-msgid "Force use of the timeshift module"
-msgstr ""
-"Каталог, где будут сохраняться временные файлы модуля сдвига по времени."
-
-#: modules/access_filter/timeshift.c:54
-msgid ""
-"Force use of the timeshift module even if the access declares that it can "
-"control pace or pause."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
-msgid "Timeshift"
-msgstr "Сдвиг по времени"
-
 #: modules/access/ftp.c:56
 msgid ""
 "Caching value for FTP streams. This value should be set in milliseconds."
@@ -5944,257 +5899,6 @@ msgstr "Максимальный разрешенный битрейт пото�
 msgid "Microsoft Media Server (MMS) input"
 msgstr "Ввод с Microsoft Media Server (MMS)"
 
-#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
-msgid "Dummy stream output"
-msgstr "Ложный вывод потока"
-
-#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
-msgid "Dummy"
-msgstr "Ложный"
-
-#: modules/access_output/file.c:61
-msgid "Append to file"
-msgstr "Добавлять к файлу"
-
-#: modules/access_output/file.c:62
-msgid "Append to file if it exists instead of replacing it."
-msgstr "Добавлять поток к файлу вместо того, чтобы заменять его."
-
-#: modules/access_output/file.c:66
-msgid "File stream output"
-msgstr "Вывод потока в файл"
-
-#: modules/access_output/http.c:58 modules/misc/audioscrobbler.c:130
-msgid "Username"
-msgstr "Имя пользователя"
-
-#: modules/access_output/http.c:59
-msgid "User name that will be requested to access the stream."
-msgstr "Имя пользователя, которое будет запрошено для доступа к потоку."
-
-#: modules/access_output/http.c:61 modules/control/telnet.c:81
-#: modules/misc/audioscrobbler.c:132
-msgid "Password"
-msgstr "Пароль"
-
-#: modules/access_output/http.c:62
-msgid "Password that will be requested to access the stream."
-msgstr "Пароль, который будет запрошен для доступа к потоку."
-
-#: modules/access_output/http.c:66
-msgid "Mime"
-msgstr "MIME"
-
-#: modules/access_output/http.c:67
-msgid "MIME returned by the server (autodetected if not specified."
-msgstr ""
-"Типы MIME, возвращаемые сервером (автоопределение, если ничего не указано)."
-
-#: modules/access_output/http.c:71
-msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
-msgstr ""
-"Путь к файлу сертификатов x509 PEM, который будет использован для HTTPS."
-
-#: modules/access_output/http.c:74
-#, fuzzy
-msgid ""
-"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
-"empty if you don't have one."
-msgstr ""
-"Путь к файлу приватного ключа x509 PEM, который будет использован для HTTPS. "
-"Оставьте пустым, если у вас его нет."
-
-#: modules/access_output/http.c:78
-#, fuzzy
-msgid ""
-"Path to the x509 PEM trusted root CA certificates (certificate authority) "
-"file that will be used for HTTPS. Leave empty if you don't have one."
-msgstr ""
-"Путь к файлу доверенного корневого сертификата (Root CA) x509 PEM, который "
-"будет использован для HTTPS. Оставьте пустым, если у вас его нет."
-
-#: modules/access_output/http.c:83
-msgid ""
-"Path to the x509 PEM Certificates Revocation List file that will be used for "
-"SSL. Leave empty if you don't have one."
-msgstr ""
-"Путь к файлу со списком отозванных сертификатов x509 PEM (CRL), который "
-"будет использован для HTTPS. Оставьте пустым, если у вас его нет."
-
-#: modules/access_output/http.c:86
-msgid "Advertise with Bonjour"
-msgstr "Оповещение Bonjur"
-
-#: modules/access_output/http.c:87
-msgid "Advertise the stream with the Bonjour protocol."
-msgstr "Оповещать о потоке с помощью протокола Bonjour."
-
-#: modules/access_output/http.c:91
-msgid "HTTP stream output"
-msgstr "Вывод потока HTTP"
-
-#: modules/access_output/http.c:93 modules/control/http/http.c:61
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
-msgid "HTTP"
-msgstr "HTTP"
-
-#: modules/access_output/shout.c:58
-msgid "Stream name"
-msgstr "Имя потока"
-
-#: modules/access_output/shout.c:59
-#, fuzzy
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr "Имя потока или канала на сервере icecast."
-
-#: modules/access_output/shout.c:62
-msgid "Stream description"
-msgstr "Описание потока"
-
-#: modules/access_output/shout.c:63
-msgid "Description of the stream content or information about your channel."
-msgstr "Описание потока или информация о вашем канале."
-
-#: modules/access_output/shout.c:66
-msgid "Stream MP3"
-msgstr "Вещать в MP3"
-
-#: modules/access_output/shout.c:67
-#, fuzzy
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-"Обычно вы должны передавать модулю shoutcast потоки Ogg. Но также возможно "
-"вместо этого вещать MP3, так что вы можете передавать потоки MP3 на сервер "
-"icecast."
-
-#: modules/access_output/shout.c:76
-#, fuzzy
-msgid "Genre description"
-msgstr "Описание потока"
-
-#: modules/access_output/shout.c:77
-msgid "Genre of the content. "
-msgstr ""
-
-#: modules/access_output/shout.c:79
-#, fuzzy
-msgid "URL description"
-msgstr "Описание"
-
-#: modules/access_output/shout.c:80
-msgid "URL with information about the stream or your channel. "
-msgstr ""
-
-#: modules/access_output/shout.c:87
-#, fuzzy
-msgid "Bitrate information of the transcoded stream. "
-msgstr "Целевой битрейт сжатого аудио потока."
-
-#: modules/access_output/shout.c:89 modules/access/v4l.c:122
-msgid "Samplerate"
-msgstr "Частота дискретизации"
-
-#: modules/access_output/shout.c:90
-#, fuzzy
-msgid "Samplerate information of the transcoded stream. "
-msgstr "Целевой битрейт сжатого видео потока"
-
-#: modules/access_output/shout.c:92
-#, fuzzy
-msgid "Number of channels"
-msgstr "Количество выходных каналов"
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Number of channels information of the transcoded stream. "
-msgstr "Количество каналов звука в сжатом потоке."
-
-#: modules/access_output/shout.c:95
-msgid "Ogg Vorbis Quality"
-msgstr ""
-
-#: modules/access_output/shout.c:96
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream. "
-msgstr "Целевой битрейт сжатого видео потока"
-
-#: modules/access_output/shout.c:98
-#, fuzzy
-msgid "Stream public"
-msgstr "Остановить поток"
-
-#: modules/access_output/shout.c:99
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-
-#: modules/access_output/shout.c:105
-msgid "IceCAST output"
-msgstr "Вывод в IceCAST"
-
-#: modules/access_output/udp.c:75 modules/access/rtsp/access.c:41
-#: modules/demux/live555.cpp:63
-msgid "Caching value (ms)"
-msgstr "Размер кэша (мс)"
-
-#: modules/access_output/udp.c:77
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"Размер кэша для исходящих потоков UDP. Значение указывается в миллисекундах."
-
-#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
-#: modules/gui/macosx/wizard.m:1843
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:1340 modules/stream_out/rtp.c:90
-msgid "Time-To-Live (TTL)"
-msgstr "\"Время жизни\" (TTL)"
-
-#: modules/access_output/udp.c:81
-msgid "Time-To-Live of the outgoing stream."
-msgstr "\"Время жизни\" (TTL) исходящего потока."
-
-#: modules/access_output/udp.c:84
-msgid "Group packets"
-msgstr "Пакеты в группах"
-
-#: modules/access_output/udp.c:85
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-"Пакеты могут посылаться один за одном или в группах. Вы можете выбирать "
-"количество пакетов, посылаемых за один раз. Это помогает уменьшать нагрузку "
-"на загруженных системах."
-
-#: modules/access_output/udp.c:90
-msgid "Raw write"
-msgstr "Сырая передача"
-
-#: modules/access_output/udp.c:91
-msgid ""
-"Packets will be sent directly, without trying to fill the MTU (ie, without "
-"trying to make the biggest possible packets in order to improve streaming)."
-msgstr ""
-"Пакеты будут посылать напрямую, без попытки заполнить MTU (то есть без "
-"попытки собирать наибольшие возможные пакеты для оптимизации вещания)."
-
-#: modules/access_output/udp.c:97
-msgid "UDP stream output"
-msgstr "Вывод потока UDP"
-
-#: modules/access_output/udp.c:98
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
-msgid "UDP"
-msgstr "UDP"
-
 #: modules/access/pvr.c:49
 msgid ""
 "Default caching value for PVR streams. This value should be set in "
@@ -6354,6 +6058,11 @@ msgstr "PVR"
 msgid "IVTV MPEG Encoding cards input"
 msgstr "Ввод с карты IVTV MPEG Encoding"
 
+#: modules/access/rtsp/access.c:41 modules/access_output/udp.c:75
+#: modules/demux/live555.cpp:63
+msgid "Caching value (ms)"
+msgstr "Размер кэша (мс)"
+
 #: modules/access/rtsp/access.c:43
 msgid ""
 "Caching value for RTSP streams. This value should be set in milliseconds."
@@ -6488,36 +6197,6 @@ msgstr "UDP порт"
 msgid "UDP/RTP input"
 msgstr "Ввод с UDP/RTP"
 
-#: modules/access/v4l2.c:52 modules/gui/macosx/open.m:167
-#: modules/gui/wxwidgets/dialogs/open.cpp:723
-msgid "Device name"
-msgstr "Имя устройства"
-
-#: modules/access/v4l2.c:54
-#, fuzzy
-msgid ""
-"Name of the device to use. If you don't specify anything, /dev/video0 will "
-"be used."
-msgstr ""
-"Имя видео устройства. Если параметр не казан, не будет использовано никакого "
-"устройства."
-
-#: modules/access/v4l2.c:58
-#, fuzzy
-msgid ""
-"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
-msgstr "Канал карты (обычно, 0 = тюнер, 1 = композитный вход, 2 - s-video)."
-
-#: modules/access/v4l2.c:63
-#, fuzzy
-msgid "Video4Linux2"
-msgstr "Video4Linux"
-
-#: modules/access/v4l2.c:64
-#, fuzzy
-msgid "Video4Linux2 input"
-msgstr "Ввод из Video4Linux"
-
 #: modules/access/v4l.c:75
 msgid ""
 "Caching value for V4L captures. This value should be set in milliseconds."
@@ -6613,6 +6292,10 @@ msgstr "Тюнер"
 msgid "Tuner to use, if there are several ones."
 msgstr "Выберите тюнер, если их несколько."
 
+#: modules/access/v4l.c:122 modules/access_output/shout.c:89
+msgid "Samplerate"
+msgstr "Частота дискретизации"
+
 #: modules/access/v4l.c:124
 msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100)"
@@ -6653,6 +6336,36 @@ msgstr "Video4Linux"
 
 #: modules/access/v4l.c:147
 msgid "Video4Linux input"
+msgstr "Ввод из Video4Linux"
+
+#: modules/access/v4l2.c:52 modules/gui/macosx/open.m:167
+#: modules/gui/wxwidgets/dialogs/open.cpp:723
+msgid "Device name"
+msgstr "Имя устройства"
+
+#: modules/access/v4l2.c:54
+#, fuzzy
+msgid ""
+"Name of the device to use. If you don't specify anything, /dev/video0 will "
+"be used."
+msgstr ""
+"Имя видео устройства. Если параметр не казан, не будет использовано никакого "
+"устройства."
+
+#: modules/access/v4l2.c:58
+#, fuzzy
+msgid ""
+"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
+msgstr "Канал карты (обычно, 0 = тюнер, 1 = композитный вход, 2 - s-video)."
+
+#: modules/access/v4l2.c:63
+#, fuzzy
+msgid "Video4Linux2"
+msgstr "Video4Linux"
+
+#: modules/access/v4l2.c:64
+#, fuzzy
+msgid "Video4Linux2 input"
 msgstr "Ввод из Video4Linux"
 
 #: modules/access/vcd/vcd.c:42
@@ -6842,6 +6555,293 @@ msgstr "Формат поля \"исполнитель\" элементов пл
 #: modules/access/vcdx/vcd.c:143
 msgid "Format to use in the playlist's \"title\" field."
 msgstr "Формат поля \"название\" элементов плейлиста."
+
+#: modules/access_filter/record.c:46
+msgid "Record directory"
+msgstr "Каталог для записи"
+
+#: modules/access_filter/record.c:48
+msgid "Directory where the record will be stored."
+msgstr "Каталог, где будут сохраняться все записи."
+
+#: modules/access_filter/timeshift.c:46
+msgid "Timeshift granularity"
+msgstr "Размер сдвига по времени"
+
+#: modules/access_filter/timeshift.c:48
+#, fuzzy
+msgid ""
+"This is the size of the temporary files that will be used to store the "
+"timeshifted streams."
+msgstr ""
+"Размер временных файлов, которые будут содержать сдвинутые по времени потоки."
+
+#: modules/access_filter/timeshift.c:50
+msgid "Timeshift directory"
+msgstr "Каталог сдвига по времени"
+
+#: modules/access_filter/timeshift.c:51
+msgid "Directory used to store the timeshift temporary files."
+msgstr ""
+"Каталог, где будут сохраняться временные файлы модуля сдвига по времени."
+
+#: modules/access_filter/timeshift.c:53
+#, fuzzy
+msgid "Force use of the timeshift module"
+msgstr ""
+"Каталог, где будут сохраняться временные файлы модуля сдвига по времени."
+
+#: modules/access_filter/timeshift.c:54
+msgid ""
+"Force use of the timeshift module even if the access declares that it can "
+"control pace or pause."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
+msgid "Timeshift"
+msgstr "Сдвиг по времени"
+
+#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
+msgid "Dummy stream output"
+msgstr "Ложный вывод потока"
+
+#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
+msgid "Dummy"
+msgstr "Ложный"
+
+#: modules/access_output/file.c:61
+msgid "Append to file"
+msgstr "Добавлять к файлу"
+
+#: modules/access_output/file.c:62
+msgid "Append to file if it exists instead of replacing it."
+msgstr "Добавлять поток к файлу вместо того, чтобы заменять его."
+
+#: modules/access_output/file.c:66
+msgid "File stream output"
+msgstr "Вывод потока в файл"
+
+#: modules/access_output/http.c:58 modules/misc/audioscrobbler.c:130
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: modules/access_output/http.c:59
+msgid "User name that will be requested to access the stream."
+msgstr "Имя пользователя, которое будет запрошено для доступа к потоку."
+
+#: modules/access_output/http.c:61 modules/control/telnet.c:81
+#: modules/misc/audioscrobbler.c:132
+msgid "Password"
+msgstr "Пароль"
+
+#: modules/access_output/http.c:62
+msgid "Password that will be requested to access the stream."
+msgstr "Пароль, который будет запрошен для доступа к потоку."
+
+#: modules/access_output/http.c:66
+msgid "Mime"
+msgstr "MIME"
+
+#: modules/access_output/http.c:67
+msgid "MIME returned by the server (autodetected if not specified."
+msgstr ""
+"Типы MIME, возвращаемые сервером (автоопределение, если ничего не указано)."
+
+#: modules/access_output/http.c:71
+msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
+msgstr ""
+"Путь к файлу сертификатов x509 PEM, который будет использован для HTTPS."
+
+#: modules/access_output/http.c:74
+#, fuzzy
+msgid ""
+"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
+"empty if you don't have one."
+msgstr ""
+"Путь к файлу приватного ключа x509 PEM, который будет использован для HTTPS. "
+"Оставьте пустым, если у вас его нет."
+
+#: modules/access_output/http.c:78
+#, fuzzy
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used for HTTPS. Leave empty if you don't have one."
+msgstr ""
+"Путь к файлу доверенного корневого сертификата (Root CA) x509 PEM, который "
+"будет использован для HTTPS. Оставьте пустым, если у вас его нет."
+
+#: modules/access_output/http.c:83
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be used for "
+"SSL. Leave empty if you don't have one."
+msgstr ""
+"Путь к файлу со списком отозванных сертификатов x509 PEM (CRL), который "
+"будет использован для HTTPS. Оставьте пустым, если у вас его нет."
+
+#: modules/access_output/http.c:86
+msgid "Advertise with Bonjour"
+msgstr "Оповещение Bonjur"
+
+#: modules/access_output/http.c:87
+msgid "Advertise the stream with the Bonjour protocol."
+msgstr "Оповещать о потоке с помощью протокола Bonjour."
+
+#: modules/access_output/http.c:91
+msgid "HTTP stream output"
+msgstr "Вывод потока HTTP"
+
+#: modules/access_output/http.c:93 modules/control/http/http.c:61
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
+msgid "HTTP"
+msgstr "HTTP"
+
+#: modules/access_output/shout.c:58
+msgid "Stream name"
+msgstr "Имя потока"
+
+#: modules/access_output/shout.c:59
+#, fuzzy
+msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+msgstr "Имя потока или канала на сервере icecast."
+
+#: modules/access_output/shout.c:62
+msgid "Stream description"
+msgstr "Описание потока"
+
+#: modules/access_output/shout.c:63
+msgid "Description of the stream content or information about your channel."
+msgstr "Описание потока или информация о вашем канале."
+
+#: modules/access_output/shout.c:66
+msgid "Stream MP3"
+msgstr "Вещать в MP3"
+
+#: modules/access_output/shout.c:67
+#, fuzzy
+msgid ""
+"You normally have to feed the shoutcast module with Ogg streams. It is also "
+"possible to stream MP3 instead, so you can forward MP3 streams to the "
+"shoutcast/icecast server."
+msgstr ""
+"Обычно вы должны передавать модулю shoutcast потоки Ogg. Но также возможно "
+"вместо этого вещать MP3, так что вы можете передавать потоки MP3 на сервер "
+"icecast."
+
+#: modules/access_output/shout.c:76
+#, fuzzy
+msgid "Genre description"
+msgstr "Описание потока"
+
+#: modules/access_output/shout.c:77
+msgid "Genre of the content. "
+msgstr ""
+
+#: modules/access_output/shout.c:79
+#, fuzzy
+msgid "URL description"
+msgstr "Описание"
+
+#: modules/access_output/shout.c:80
+msgid "URL with information about the stream or your channel. "
+msgstr ""
+
+#: modules/access_output/shout.c:87
+#, fuzzy
+msgid "Bitrate information of the transcoded stream. "
+msgstr "Целевой битрейт сжатого аудио потока."
+
+#: modules/access_output/shout.c:90
+#, fuzzy
+msgid "Samplerate information of the transcoded stream. "
+msgstr "Целевой битрейт сжатого видео потока"
+
+#: modules/access_output/shout.c:92
+#, fuzzy
+msgid "Number of channels"
+msgstr "Количество выходных каналов"
+
+#: modules/access_output/shout.c:93
+#, fuzzy
+msgid "Number of channels information of the transcoded stream. "
+msgstr "Количество каналов звука в сжатом потоке."
+
+#: modules/access_output/shout.c:95
+msgid "Ogg Vorbis Quality"
+msgstr ""
+
+#: modules/access_output/shout.c:96
+#, fuzzy
+msgid "Ogg Vorbis Quality information of the transcoded stream. "
+msgstr "Целевой битрейт сжатого видео потока"
+
+#: modules/access_output/shout.c:98
+#, fuzzy
+msgid "Stream public"
+msgstr "Остановить поток"
+
+#: modules/access_output/shout.c:99
+msgid ""
+"Make the server publicly available on the 'Yellow Pages' (directory listing "
+"of streams) on the icecast/shoutcast website. Requires the bitrate "
+"information specified for shoutcast. Requires Ogg streaming for icecast."
+msgstr ""
+
+#: modules/access_output/shout.c:105
+msgid "IceCAST output"
+msgstr "Вывод в IceCAST"
+
+#: modules/access_output/udp.c:77
+msgid ""
+"Default caching value for outbound UDP streams. This value should be set in "
+"milliseconds."
+msgstr ""
+"Размер кэша для исходящих потоков UDP. Значение указывается в миллисекундах."
+
+#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
+#: modules/gui/macosx/wizard.m:1843
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:1340 modules/stream_out/rtp.c:90
+msgid "Time-To-Live (TTL)"
+msgstr "\"Время жизни\" (TTL)"
+
+#: modules/access_output/udp.c:81
+msgid "Time-To-Live of the outgoing stream."
+msgstr "\"Время жизни\" (TTL) исходящего потока."
+
+#: modules/access_output/udp.c:84
+msgid "Group packets"
+msgstr "Пакеты в группах"
+
+#: modules/access_output/udp.c:85
+msgid ""
+"Packets can be sent one by one at the right time or by groups. You can "
+"choose the number of packets that will be sent at a time. It helps reducing "
+"the scheduling load on heavily-loaded systems."
+msgstr ""
+"Пакеты могут посылаться один за одном или в группах. Вы можете выбирать "
+"количество пакетов, посылаемых за один раз. Это помогает уменьшать нагрузку "
+"на загруженных системах."
+
+#: modules/access_output/udp.c:90
+msgid "Raw write"
+msgstr "Сырая передача"
+
+#: modules/access_output/udp.c:91
+msgid ""
+"Packets will be sent directly, without trying to fill the MTU (ie, without "
+"trying to make the biggest possible packets in order to improve streaming)."
+msgstr ""
+"Пакеты будут посылать напрямую, без попытки заполнить MTU (то есть без "
+"попытки собирать наибольшие возможные пакеты для оптимизации вещания)."
+
+#: modules/access_output/udp.c:97
+msgid "UDP stream output"
+msgstr "Вывод потока UDP"
+
+#: modules/access_output/udp.c:98
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
+msgid "UDP"
+msgstr "UDP"
 
 #: modules/audio_filter/channel_mixer/dolby.c:47
 msgid "Simple decoder for Dolby Surround encoded streams"
@@ -11436,7 +11436,7 @@ msgstr "Открыть окно списка для воспроизведени
 
 #: modules/gui/macosx/intf.m:489 modules/gui/macosx/intf.m:1030
 #: modules/gui/macosx/intf.m:1349 modules/gui/pda/pda_interface.c:212
-#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:80
+#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:84
 #: modules/gui/qt4/ui/main_interface.ui:24
 msgid "VLC media player"
 msgstr "VLC media player"
@@ -11562,8 +11562,8 @@ msgid "Extended Controls"
 msgstr "Расширенный интерфейс\tCtrl-G"
 
 #: modules/gui/macosx/intf.m:600 modules/gui/macosx/intf.m:633
-#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:348
-#: modules/gui/macosx/playlist.m:423
+#: modules/gui/macosx/playlist.m:423 modules/gui/macosx/playlistinfo.m:55
+#: modules/gui/macosx/playlistinfo.m:348
 #, fuzzy
 msgid "Information"
 msgstr "Следующий файл"
@@ -11664,48 +11664,37 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:69
 #, fuzzy
-msgid "Crop borders in fullscreen"
-msgstr "Запускать видео в полноэкранном режиме"
-
-#: modules/gui/macosx/macosx.m:70
-msgid ""
-"In fullscreen mode, crop the picture if necessary in order to fill the "
-"screen without black borders (OpenGL only)."
-msgstr ""
-
-#: modules/gui/macosx/macosx.m:74
-#, fuzzy
 msgid "Black screens in fullscreen"
 msgstr "Экран для полноэкранного режима."
 
-#: modules/gui/macosx/macosx.m:75
+#: modules/gui/macosx/macosx.m:70
 msgid "In fullscreen mode, keep screen where there is no video displayed black"
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:78
+#: modules/gui/macosx/macosx.m:73
 msgid "Use as Desktop Background"
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:79
+#: modules/gui/macosx/macosx.m:74
 msgid ""
 "Use the video as the Desktop Background Desktop icons cannot be interacted "
 "with in this mode."
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:82
+#: modules/gui/macosx/macosx.m:77
 msgid "Remember wizard options"
 msgstr "Запомнить настройки мастера"
 
-#: modules/gui/macosx/macosx.m:83
+#: modules/gui/macosx/macosx.m:78
 msgid "Remember the options in the wizard during one session of VLC."
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:87
+#: modules/gui/macosx/macosx.m:82
 #, fuzzy
 msgid "Mac OS X interface"
 msgstr "Открыть окно списка для воспроизведения"
 
-#: modules/gui/macosx/macosx.m:98
+#: modules/gui/macosx/macosx.m:93
 #, fuzzy
 msgid "Quartz video"
 msgstr "Шифрование видео"
@@ -11917,85 +11906,6 @@ msgstr "SDP URL"
 msgid "Save File"
 msgstr "Сохранить файл"
 
-#: modules/gui/macosx/playlistinfo.m:56
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
-msgid "URI"
-msgstr "URI"
-
-#: modules/gui/macosx/playlistinfo.m:63
-#, fuzzy
-msgid "Advanced Information"
-msgstr "Расширенные настройки"
-
-#: modules/gui/macosx/playlistinfo.m:81 modules/gui/qt4/ui/input_stats.ui:293
-msgid "Read at media"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:82 modules/gui/qt4/ui/input_stats.ui:286
-#, fuzzy
-msgid "Input bitrate"
-msgstr "Исходящий поток"
-
-#: modules/gui/macosx/playlistinfo.m:83 modules/gui/qt4/ui/input_stats.ui:307
-#, fuzzy
-msgid "Demuxed"
-msgstr "Сепараторы"
-
-#: modules/gui/macosx/playlistinfo.m:84 modules/gui/qt4/ui/input_stats.ui:300
-#, fuzzy
-msgid "Stream bitrate"
-msgstr "Открыть окно списка для воспроизведения"
-
-#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
-#: modules/gui/qt4/ui/input_stats.ui:156 modules/gui/qt4/ui/input_stats.ui:208
-#, fuzzy
-msgid "Decoded blocks"
-msgstr "Декодеры"
-
-#: modules/gui/macosx/playlistinfo.m:88 modules/gui/qt4/ui/input_stats.ui:201
-#, fuzzy
-msgid "Displayed frames"
-msgstr "Пропускать кадры"
-
-#: modules/gui/macosx/playlistinfo.m:89 modules/gui/qt4/ui/input_stats.ui:184
-#, fuzzy
-msgid "Lost frames"
-msgstr "Воспроизвести поток"
-
-#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:404
-#: modules/gui/qt4/ui/input_stats.ui:28
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
-#: modules/video_filter/deinterlace.c:137
-msgid "Streaming"
-msgstr "Вещание"
-
-#: modules/gui/macosx/playlistinfo.m:92 modules/gui/qt4/ui/input_stats.ui:84
-#, fuzzy
-msgid "Sent packets"
-msgstr "Пакеты в группах"
-
-#: modules/gui/macosx/playlistinfo.m:93 modules/gui/qt4/ui/input_stats.ui:77
-#, fuzzy
-msgid "Sent bytes"
-msgstr "Частота дискретизации"
-
-#: modules/gui/macosx/playlistinfo.m:94
-#, fuzzy
-msgid "Send rate"
-msgstr "Частота дискретизации"
-
-#: modules/gui/macosx/playlistinfo.m:98 modules/gui/qt4/ui/input_stats.ui:149
-#, fuzzy
-msgid "Played buffers"
-msgstr "Воспроизводить быстрее"
-
-#: modules/gui/macosx/playlistinfo.m:99 modules/gui/qt4/ui/input_stats.ui:142
-#, fuzzy
-msgid "Lost buffers"
-msgstr "Воспроизвести поток"
-
 #: modules/gui/macosx/playlist.m:418
 msgid "Save Playlist..."
 msgstr "Сохранить плейлист..."
@@ -12077,6 +11987,85 @@ msgstr "Введите имя узла"
 #, fuzzy
 msgid "Empty Folder"
 msgstr "Порядок элементов"
+
+#: modules/gui/macosx/playlistinfo.m:56
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
+msgid "URI"
+msgstr "URI"
+
+#: modules/gui/macosx/playlistinfo.m:63
+#, fuzzy
+msgid "Advanced Information"
+msgstr "Расширенные настройки"
+
+#: modules/gui/macosx/playlistinfo.m:81 modules/gui/qt4/ui/input_stats.ui:77
+msgid "Read at media"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:82 modules/gui/qt4/ui/input_stats.ui:70
+#, fuzzy
+msgid "Input bitrate"
+msgstr "Исходящий поток"
+
+#: modules/gui/macosx/playlistinfo.m:83 modules/gui/qt4/ui/input_stats.ui:91
+#, fuzzy
+msgid "Demuxed"
+msgstr "Сепараторы"
+
+#: modules/gui/macosx/playlistinfo.m:84 modules/gui/qt4/ui/input_stats.ui:84
+#, fuzzy
+msgid "Stream bitrate"
+msgstr "Открыть окно списка для воспроизведения"
+
+#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
+#: modules/gui/qt4/ui/input_stats.ui:147 modules/gui/qt4/ui/input_stats.ui:233
+#, fuzzy
+msgid "Decoded blocks"
+msgstr "Декодеры"
+
+#: modules/gui/macosx/playlistinfo.m:88 modules/gui/qt4/ui/input_stats.ui:140
+#, fuzzy
+msgid "Displayed frames"
+msgstr "Пропускать кадры"
+
+#: modules/gui/macosx/playlistinfo.m:89 modules/gui/qt4/ui/input_stats.ui:123
+#, fuzzy
+msgid "Lost frames"
+msgstr "Воспроизвести поток"
+
+#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:404
+#: modules/gui/qt4/ui/input_stats.ui:243
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
+#: modules/video_filter/deinterlace.c:137
+msgid "Streaming"
+msgstr "Вещание"
+
+#: modules/gui/macosx/playlistinfo.m:92 modules/gui/qt4/ui/input_stats.ui:299
+#, fuzzy
+msgid "Sent packets"
+msgstr "Пакеты в группах"
+
+#: modules/gui/macosx/playlistinfo.m:93 modules/gui/qt4/ui/input_stats.ui:292
+#, fuzzy
+msgid "Sent bytes"
+msgstr "Частота дискретизации"
+
+#: modules/gui/macosx/playlistinfo.m:94
+#, fuzzy
+msgid "Send rate"
+msgstr "Частота дискретизации"
+
+#: modules/gui/macosx/playlistinfo.m:98 modules/gui/qt4/ui/input_stats.ui:226
+#, fuzzy
+msgid "Played buffers"
+msgstr "Воспроизводить быстрее"
+
+#: modules/gui/macosx/playlistinfo.m:99 modules/gui/qt4/ui/input_stats.ui:219
+#, fuzzy
+msgid "Lost buffers"
+msgstr "Воспроизвести поток"
 
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:213
@@ -13463,16 +13452,16 @@ msgstr "Остановить поток"
 msgid "Errors"
 msgstr "Ошибки"
 
-#: modules/gui/qt4/dialogs_provider.cpp:243
-#: modules/gui/qt4/dialogs_provider.cpp:254
-#, fuzzy
-msgid "Open directory"
-msgstr "Открыть каталог..."
-
-#: modules/gui/qt4/dialogs/streaminfo.cpp:39
+#: modules/gui/qt4/dialogs/streaminfo.cpp:40
 #, fuzzy
 msgid "Stream information"
 msgstr "Информация о потоке"
+
+#: modules/gui/qt4/dialogs_provider.cpp:244
+#: modules/gui/qt4/dialogs_provider.cpp:255
+#, fuzzy
+msgid "Open directory"
+msgstr "Открыть каталог..."
 
 #: modules/gui/qt4/qt4.cpp:47
 #, fuzzy
@@ -13507,7 +13496,7 @@ msgstr "Расширенные параметры"
 msgid "Justification"
 msgstr "Усиление"
 
-#: modules/gui/qt4/ui/input_stats.ui:70
+#: modules/gui/qt4/ui/input_stats.ui:285
 #, fuzzy
 msgid "Send bitrate"
 msgstr "Частота дискретизации"
@@ -13695,6 +13684,11 @@ msgstr "Открыть окно списка для воспроизведени
 msgid "WinCE dialogs provider"
 msgstr "Окна wxWidgets"
 
+#: modules/gui/wxwidgets/dialogs.cpp:433
+#: modules/gui/wxwidgets/dialogs/open.cpp:1265
+msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
+msgstr ""
+
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:75
 msgid "Edit bookmark"
 msgstr "Редактировать закладку"
@@ -13760,11 +13754,6 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:452
 msgid "Input has changed "
 msgstr "Входной поток был изменен "
-
-#: modules/gui/wxwidgets/dialogs.cpp:433
-#: modules/gui/wxwidgets/dialogs/open.cpp:1265
-msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
-msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
 msgid "Stream and Media Info"
@@ -15245,10 +15234,6 @@ msgstr "Файл вывода RRD"
 msgid "Output data for RRDTool in this file."
 msgstr "Выводить данны для RRDTool в этот файл."
 
-#: modules/misc/memcpy/memcpyaltivec.c:56
-msgid "AltiVec memcpy"
-msgstr "AltiVec memcpy"
-
 #: modules/misc/memcpy/memcpy.c:83
 msgid "libc memcpy"
 msgstr "libc memcpy"
@@ -15264,6 +15249,10 @@ msgstr "MMX memcpy"
 #: modules/misc/memcpy/memcpy.c:99
 msgid "MMX EXT memcpy"
 msgstr "MMX EXT memcpy"
+
+#: modules/misc/memcpy/memcpyaltivec.c:56
+msgid "AltiVec memcpy"
+msgstr "AltiVec memcpy"
 
 #: modules/misc/musicbrainz.c:59
 #, fuzzy
@@ -18574,6 +18563,10 @@ msgstr "Фильтр визуализатора"
 #: modules/visualization/visual/visual.c:120
 msgid "Spectrum analyser"
 msgstr "Анализатор спектра"
+
+#, fuzzy
+#~ msgid "Crop borders in fullscreen"
+#~ msgstr "Запускать видео в полноэкранном режиме"
 
 #, fuzzy
 #~ msgid "Standard Play"

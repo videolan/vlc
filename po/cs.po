@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-20 22:11+0100\n"
+"POT-Creation-Date: 2006-09-22 00:18+0200\n"
 "PO-Revision-Date: 2006-05-18 19:31+0100\n"
 "Last-Translator: Miroslav Oujeský <oujesky@mail.muni.cz>\n"
 "Language-Team: \n"
@@ -18,6 +18,14 @@ msgstr ""
 "X-Poedit-Basepath: C:\\Program Files\\poEdit\\vlc\\vlc-0.8.5\\\n"
 "X-Poedit-Language: Czech\n"
 "X-Poedit-Country: CZECH REPUBLIC\n"
+
+#: include/vlc/vlc.h:576
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute it under the terms of the GNU General Public License;\n"
+"see the file named COPYING for details.\n"
+"Written by the VideoLAN team; see the AUTHORS file.\n"
+msgstr ""
 
 #: include/vlc_config_cat.h:32
 msgid "VLC preferences"
@@ -76,7 +84,7 @@ msgstr "Nastavení klávesových zkratek"
 #: modules/gui/beos/InterfaceWindow.cpp:282 modules/gui/macosx/extended.m:81
 #: modules/gui/macosx/intf.m:556 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:96 modules/gui/macosx/wizard.m:421
-#: modules/gui/qt4/ui/input_stats.ui:100
+#: modules/gui/qt4/ui/input_stats.ui:177
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:336
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:864
 #: modules/gui/wxwidgets/extrapanel.cpp:178 modules/stream_out/transcode.c:253
@@ -133,7 +141,7 @@ msgstr ""
 #: include/vlc_config_cat.h:75 src/input/es_out.c:1615 src/libvlc.h:1252
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:569
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:86
-#: modules/gui/macosx/wizard.m:422 modules/gui/qt4/ui/input_stats.ui:172
+#: modules/gui/macosx/wizard.m:422 modules/gui/qt4/ui/input_stats.ui:111
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:290
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:825
 #: modules/gui/wxwidgets/extrapanel.cpp:176 modules/misc/dummy/dummy.c:95
@@ -536,8 +544,8 @@ msgstr "Meta-informace"
 msgid "Title"
 msgstr "Titul"
 
-#: include/vlc_meta.h:30 modules/gui/macosx/playlistinfo.m:58
-#: modules/gui/macosx/playlist.m:129 modules/gui/macosx/wizard.m:393
+#: include/vlc_meta.h:30 modules/gui/macosx/playlist.m:129
+#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/wizard.m:393
 #: modules/gui/wince/playlist.cpp:674 modules/mux/asf.c:50
 msgid "Author"
 msgstr "Autor"
@@ -611,14 +619,6 @@ msgstr "Název kodeku"
 #: include/vlc_meta.h:47
 msgid "Codec Description"
 msgstr "Popis kodeku"
-
-#: include/vlc/vlc.h:576
-msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute it under the terms of the GNU General Public License;\n"
-"see the file named COPYING for details.\n"
-"Written by the VideoLAN team; see the AUTHORS file.\n"
-msgstr ""
 
 #: src/audio_output/filters.c:154 src/audio_output/filters.c:201
 #: src/audio_output/filters.c:224
@@ -845,8 +845,8 @@ msgstr "%d Hz"
 msgid "Bits per sample"
 msgstr "Bitů na vzorek"
 
-#: src/input/es_out.c:1607 modules/access_output/shout.c:86
-#: modules/access/pvr.c:84
+#: src/input/es_out.c:1607 modules/access/pvr.c:84
+#: modules/access_output/shout.c:86
 msgid "Bitrate"
 msgstr "Bitrate"
 
@@ -3653,7 +3653,7 @@ msgid "Decoders"
 msgstr ""
 
 #: src/libvlc.h:1469 modules/access/v4l2.c:56
-#: modules/gui/macosx/playlistinfo.m:80 modules/gui/qt4/ui/input_stats.ui:244
+#: modules/gui/macosx/playlistinfo.m:80 modules/gui/qt4/ui/input_stats.ui:28
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:265
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:378
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:106
@@ -4404,17 +4404,8 @@ msgstr "Ořez"
 msgid "Aspect-ratio"
 msgstr "Poměr stran"
 
-#: modules/access/cdda/access.c:293
-msgid "CD reading failed"
-msgstr ""
-
-#: modules/access/cdda/access.c:294
-#, c-format
-msgid "VLC could not get a new block of size: %i."
-msgstr ""
-
 #: modules/access/cdda.c:58 modules/access/dshow/dshow.cpp:91
-#: modules/access/dvb/access.c:73 modules/access/dv.c:68
+#: modules/access/dv.c:68 modules/access/dvb/access.c:73
 #: modules/access/dvdnav.c:64 modules/access/dvdread.c:62
 #: modules/access/fake.c:40 modules/access/file.c:80 modules/access/ftp.c:54
 #: modules/access/gnomevfs.c:44 modules/access/http.c:56
@@ -4471,6 +4462,15 @@ msgstr "Audio CD - Stopa"
 #, c-format
 msgid "Audio CD - Track %i"
 msgstr "Audio CD - Stopa %i"
+
+#: modules/access/cdda/access.c:293
+msgid "CD reading failed"
+msgstr ""
+
+#: modules/access/cdda/access.c:294
+#, c-format
+msgid "VLC could not get a new block of size: %i."
+msgstr ""
 
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:78
 #: modules/codec/x264.c:280 modules/codec/x264.c:287 modules/codec/x264.c:292
@@ -4986,6 +4986,19 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 
+#: modules/access/dv.c:70
+msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
+msgstr ""
+
+#: modules/access/dv.c:74
+msgid "Digital Video (Firewire/ieee1394)  input"
+msgstr ""
+
+#: modules/access/dv.c:75
+#, fuzzy
+msgid "dv"
+msgstr "Video DV"
+
 #: modules/access/dvb/access.c:75
 msgid ""
 "Caching value for DVB streams. This value should be set in milliseconds."
@@ -5252,19 +5265,6 @@ msgstr "Normalizace hlasitosti"
 msgid "The provided polarization \"%c\" is not valid."
 msgstr ""
 
-#: modules/access/dv.c:70
-msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
-msgstr ""
-
-#: modules/access/dv.c:74
-msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr ""
-
-#: modules/access/dv.c:75
-#, fuzzy
-msgid "dv"
-msgstr "Video DV"
-
 #: modules/access/dvdnav.c:60 modules/access/dvdread.c:58
 #, fuzzy
 msgid "DVD angle"
@@ -5461,50 +5461,6 @@ msgstr ""
 msgid "VLC could not open file \"%s\" (%s)."
 msgstr ""
 
-#: modules/access_filter/record.c:46
-#, fuzzy
-msgid "Record directory"
-msgstr "Odstraňuji adresář %s.\n"
-
-#: modules/access_filter/record.c:48
-msgid "Directory where the record will be stored."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:46
-#, fuzzy
-msgid "Timeshift granularity"
-msgstr "Hrubost mřížky"
-
-#: modules/access_filter/timeshift.c:48
-msgid ""
-"This is the size of the temporary files that will be used to store the "
-"timeshifted streams."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:50
-#, fuzzy
-msgid "Timeshift directory"
-msgstr "Odstraňuji adresář %s.\n"
-
-#: modules/access_filter/timeshift.c:51
-msgid "Directory used to store the timeshift temporary files."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:53
-#, fuzzy
-msgid "Force use of the timeshift module"
-msgstr "Snížení hlasitosti na konci modulu"
-
-#: modules/access_filter/timeshift.c:54
-msgid ""
-"Force use of the timeshift module even if the access declares that it can "
-"control pace or pause."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
-msgid "Timeshift"
-msgstr ""
-
 #: modules/access/ftp.c:56
 msgid ""
 "Caching value for FTP streams. This value should be set in milliseconds."
@@ -5667,248 +5623,6 @@ msgstr ""
 #: modules/access/mms/mms.c:62
 msgid "Microsoft Media Server (MMS) input"
 msgstr ""
-
-#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
-#, fuzzy
-msgid "Dummy stream output"
-msgstr "fiktivní modul zvukového výstupu xine"
-
-#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
-#, fuzzy
-msgid "Dummy"
-msgstr "prázdné"
-
-#: modules/access_output/file.c:61
-msgid "Append to file"
-msgstr "Připojit do souboru"
-
-#: modules/access_output/file.c:62
-msgid "Append to file if it exists instead of replacing it."
-msgstr ""
-
-#: modules/access_output/file.c:66
-#, fuzzy
-msgid "File stream output"
-msgstr "Volby výstupu souborů:"
-
-#: modules/access_output/http.c:58 modules/misc/audioscrobbler.c:130
-msgid "Username"
-msgstr "Uživatel"
-
-#: modules/access_output/http.c:59
-msgid "User name that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:61 modules/control/telnet.c:81
-#: modules/misc/audioscrobbler.c:132
-msgid "Password"
-msgstr "Heslo"
-
-#: modules/access_output/http.c:62
-msgid "Password that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:66
-#, fuzzy
-msgid "Mime"
-msgstr "MIME"
-
-#: modules/access_output/http.c:67
-msgid "MIME returned by the server (autodetected if not specified."
-msgstr ""
-
-#: modules/access_output/http.c:71
-msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
-msgstr ""
-
-#: modules/access_output/http.c:74
-msgid ""
-"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
-"empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:78
-msgid ""
-"Path to the x509 PEM trusted root CA certificates (certificate authority) "
-"file that will be used for HTTPS. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:83
-msgid ""
-"Path to the x509 PEM Certificates Revocation List file that will be used for "
-"SSL. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:86
-#, fuzzy
-msgid "Advertise with Bonjour"
-msgstr "Provzdušňovač s bublinkami"
-
-#: modules/access_output/http.c:87
-msgid "Advertise the stream with the Bonjour protocol."
-msgstr ""
-
-#: modules/access_output/http.c:91
-#, fuzzy
-msgid "HTTP stream output"
-msgstr "jméno výstupního souboru s psf písmem"
-
-#: modules/access_output/http.c:93 modules/control/http/http.c:61
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
-msgid "HTTP"
-msgstr "HTTP"
-
-#: modules/access_output/shout.c:58
-#, fuzzy
-msgid "Stream name"
-msgstr "Zpřístupněný název"
-
-#: modules/access_output/shout.c:59
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:62
-#, fuzzy
-msgid "Stream description"
-msgstr "Zpřístupněný popis"
-
-#: modules/access_output/shout.c:63
-msgid "Description of the stream content or information about your channel."
-msgstr ""
-
-#: modules/access_output/shout.c:66
-#, fuzzy
-msgid "Stream MP3"
-msgstr "Zvuk MP3"
-
-#: modules/access_output/shout.c:67
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:76
-#, fuzzy
-msgid "Genre description"
-msgstr "Zpřístupněný popis"
-
-#: modules/access_output/shout.c:77
-msgid "Genre of the content. "
-msgstr ""
-
-#: modules/access_output/shout.c:79
-#, fuzzy
-msgid "URL description"
-msgstr "Popis"
-
-#: modules/access_output/shout.c:80
-msgid "URL with information about the stream or your channel. "
-msgstr ""
-
-#: modules/access_output/shout.c:87
-#, fuzzy
-msgid "Bitrate information of the transcoded stream. "
-msgstr "Zobrazení informací o současné stránce"
-
-#: modules/access_output/shout.c:89 modules/access/v4l.c:122
-msgid "Samplerate"
-msgstr "Vzorkovací frekvence"
-
-#: modules/access_output/shout.c:90
-msgid "Samplerate information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:92
-#, fuzzy
-msgid "Number of channels"
-msgstr "Počet výstupních kanálů"
-
-#: modules/access_output/shout.c:93
-msgid "Number of channels information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:95
-msgid "Ogg Vorbis Quality"
-msgstr ""
-
-#: modules/access_output/shout.c:96
-msgid "Ogg Vorbis Quality information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:98
-#, fuzzy
-msgid "Stream public"
-msgstr "výstupní soubor"
-
-#: modules/access_output/shout.c:99
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-
-#: modules/access_output/shout.c:105
-#, fuzzy
-msgid "IceCAST output"
-msgstr "výstupní soubor"
-
-#: modules/access_output/udp.c:75 modules/access/rtsp/access.c:41
-#: modules/demux/live555.cpp:63
-#, fuzzy
-msgid "Caching value (ms)"
-msgstr "/SS/df/MS/F/P-hodnota/kritická hodnota F"
-
-#: modules/access_output/udp.c:77
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-
-#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
-#: modules/gui/macosx/wizard.m:1843
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:1340 modules/stream_out/rtp.c:90
-#, fuzzy
-msgid "Time-To-Live (TTL)"
-msgstr "Time To Live (TTL):"
-
-#: modules/access_output/udp.c:81
-msgid "Time-To-Live of the outgoing stream."
-msgstr ""
-
-#: modules/access_output/udp.c:84
-#, fuzzy
-msgid "Group packets"
-msgstr "Odmítnout pakety"
-
-#: modules/access_output/udp.c:85
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-
-#: modules/access_output/udp.c:90
-#, fuzzy
-msgid "Raw write"
-msgstr "Zapsat animaci"
-
-#: modules/access_output/udp.c:91
-msgid ""
-"Packets will be sent directly, without trying to fill the MTU (ie, without "
-"trying to make the biggest possible packets in order to improve streaming)."
-msgstr ""
-
-#: modules/access_output/udp.c:97
-#, fuzzy
-msgid "UDP stream output"
-msgstr "jméno výstupního souboru s psf písmem"
-
-#: modules/access_output/udp.c:98
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
-msgid "UDP"
-msgstr "UDP"
 
 #: modules/access/pvr.c:49
 msgid ""
@@ -6077,6 +5791,12 @@ msgstr ""
 msgid "IVTV MPEG Encoding cards input"
 msgstr ""
 
+#: modules/access/rtsp/access.c:41 modules/access_output/udp.c:75
+#: modules/demux/live555.cpp:63
+#, fuzzy
+msgid "Caching value (ms)"
+msgstr "/SS/df/MS/F/P-hodnota/kritická hodnota F"
+
 #: modules/access/rtsp/access.c:43
 msgid ""
 "Caching value for RTSP streams. This value should be set in milliseconds."
@@ -6208,35 +5928,6 @@ msgstr "UDP/RTP"
 msgid "UDP/RTP input"
 msgstr "UDP/RTP vstup"
 
-#: modules/access/v4l2.c:52 modules/gui/macosx/open.m:167
-#: modules/gui/wxwidgets/dialogs/open.cpp:723
-msgid "Device name"
-msgstr "Název zařízení"
-
-#: modules/access/v4l2.c:54
-#, fuzzy
-msgid ""
-"Name of the device to use. If you don't specify anything, /dev/video0 will "
-"be used."
-msgstr ""
-"Toto je výchozí VCD zařízení. Pokud zde nic neuvedete, zkusíme nalézt "
-"vhodnou CD-ROM mechaniku."
-
-#: modules/access/v4l2.c:58
-msgid ""
-"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
-msgstr ""
-
-#: modules/access/v4l2.c:63
-#, fuzzy
-msgid "Video4Linux2"
-msgstr "Video4Linux"
-
-#: modules/access/v4l2.c:64
-#, fuzzy
-msgid "Video4Linux2 input"
-msgstr "Video4Linux vstup"
-
 #: modules/access/v4l.c:75
 msgid ""
 "Caching value for V4L captures. This value should be set in milliseconds."
@@ -6326,6 +6017,10 @@ msgstr ""
 msgid "Tuner to use, if there are several ones."
 msgstr ""
 
+#: modules/access/v4l.c:122 modules/access_output/shout.c:89
+msgid "Samplerate"
+msgstr "Vzorkovací frekvence"
+
 #: modules/access/v4l.c:124
 msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100)"
@@ -6366,6 +6061,35 @@ msgstr "Video4Linux"
 
 #: modules/access/v4l.c:147
 msgid "Video4Linux input"
+msgstr "Video4Linux vstup"
+
+#: modules/access/v4l2.c:52 modules/gui/macosx/open.m:167
+#: modules/gui/wxwidgets/dialogs/open.cpp:723
+msgid "Device name"
+msgstr "Název zařízení"
+
+#: modules/access/v4l2.c:54
+#, fuzzy
+msgid ""
+"Name of the device to use. If you don't specify anything, /dev/video0 will "
+"be used."
+msgstr ""
+"Toto je výchozí VCD zařízení. Pokud zde nic neuvedete, zkusíme nalézt "
+"vhodnou CD-ROM mechaniku."
+
+#: modules/access/v4l2.c:58
+msgid ""
+"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
+msgstr ""
+
+#: modules/access/v4l2.c:63
+#, fuzzy
+msgid "Video4Linux2"
+msgstr "Video4Linux"
+
+#: modules/access/v4l2.c:64
+#, fuzzy
+msgid "Video4Linux2 input"
 msgstr "Video4Linux vstup"
 
 #: modules/access/vcd/vcd.c:42
@@ -6559,6 +6283,282 @@ msgstr ""
 #: modules/access/vcdx/vcd.c:143
 msgid "Format to use in the playlist's \"title\" field."
 msgstr ""
+
+#: modules/access_filter/record.c:46
+#, fuzzy
+msgid "Record directory"
+msgstr "Odstraňuji adresář %s.\n"
+
+#: modules/access_filter/record.c:48
+msgid "Directory where the record will be stored."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:46
+#, fuzzy
+msgid "Timeshift granularity"
+msgstr "Hrubost mřížky"
+
+#: modules/access_filter/timeshift.c:48
+msgid ""
+"This is the size of the temporary files that will be used to store the "
+"timeshifted streams."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:50
+#, fuzzy
+msgid "Timeshift directory"
+msgstr "Odstraňuji adresář %s.\n"
+
+#: modules/access_filter/timeshift.c:51
+msgid "Directory used to store the timeshift temporary files."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:53
+#, fuzzy
+msgid "Force use of the timeshift module"
+msgstr "Snížení hlasitosti na konci modulu"
+
+#: modules/access_filter/timeshift.c:54
+msgid ""
+"Force use of the timeshift module even if the access declares that it can "
+"control pace or pause."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
+msgid "Timeshift"
+msgstr ""
+
+#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
+#, fuzzy
+msgid "Dummy stream output"
+msgstr "fiktivní modul zvukového výstupu xine"
+
+#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
+#, fuzzy
+msgid "Dummy"
+msgstr "prázdné"
+
+#: modules/access_output/file.c:61
+msgid "Append to file"
+msgstr "Připojit do souboru"
+
+#: modules/access_output/file.c:62
+msgid "Append to file if it exists instead of replacing it."
+msgstr ""
+
+#: modules/access_output/file.c:66
+#, fuzzy
+msgid "File stream output"
+msgstr "Volby výstupu souborů:"
+
+#: modules/access_output/http.c:58 modules/misc/audioscrobbler.c:130
+msgid "Username"
+msgstr "Uživatel"
+
+#: modules/access_output/http.c:59
+msgid "User name that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:61 modules/control/telnet.c:81
+#: modules/misc/audioscrobbler.c:132
+msgid "Password"
+msgstr "Heslo"
+
+#: modules/access_output/http.c:62
+msgid "Password that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:66
+#, fuzzy
+msgid "Mime"
+msgstr "MIME"
+
+#: modules/access_output/http.c:67
+msgid "MIME returned by the server (autodetected if not specified."
+msgstr ""
+
+#: modules/access_output/http.c:71
+msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
+msgstr ""
+
+#: modules/access_output/http.c:74
+msgid ""
+"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
+"empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:78
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used for HTTPS. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:83
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be used for "
+"SSL. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:86
+#, fuzzy
+msgid "Advertise with Bonjour"
+msgstr "Provzdušňovač s bublinkami"
+
+#: modules/access_output/http.c:87
+msgid "Advertise the stream with the Bonjour protocol."
+msgstr ""
+
+#: modules/access_output/http.c:91
+#, fuzzy
+msgid "HTTP stream output"
+msgstr "jméno výstupního souboru s psf písmem"
+
+#: modules/access_output/http.c:93 modules/control/http/http.c:61
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
+msgid "HTTP"
+msgstr "HTTP"
+
+#: modules/access_output/shout.c:58
+#, fuzzy
+msgid "Stream name"
+msgstr "Zpřístupněný název"
+
+#: modules/access_output/shout.c:59
+msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:62
+#, fuzzy
+msgid "Stream description"
+msgstr "Zpřístupněný popis"
+
+#: modules/access_output/shout.c:63
+msgid "Description of the stream content or information about your channel."
+msgstr ""
+
+#: modules/access_output/shout.c:66
+#, fuzzy
+msgid "Stream MP3"
+msgstr "Zvuk MP3"
+
+#: modules/access_output/shout.c:67
+msgid ""
+"You normally have to feed the shoutcast module with Ogg streams. It is also "
+"possible to stream MP3 instead, so you can forward MP3 streams to the "
+"shoutcast/icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:76
+#, fuzzy
+msgid "Genre description"
+msgstr "Zpřístupněný popis"
+
+#: modules/access_output/shout.c:77
+msgid "Genre of the content. "
+msgstr ""
+
+#: modules/access_output/shout.c:79
+#, fuzzy
+msgid "URL description"
+msgstr "Popis"
+
+#: modules/access_output/shout.c:80
+msgid "URL with information about the stream or your channel. "
+msgstr ""
+
+#: modules/access_output/shout.c:87
+#, fuzzy
+msgid "Bitrate information of the transcoded stream. "
+msgstr "Zobrazení informací o současné stránce"
+
+#: modules/access_output/shout.c:90
+msgid "Samplerate information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:92
+#, fuzzy
+msgid "Number of channels"
+msgstr "Počet výstupních kanálů"
+
+#: modules/access_output/shout.c:93
+msgid "Number of channels information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:95
+msgid "Ogg Vorbis Quality"
+msgstr ""
+
+#: modules/access_output/shout.c:96
+msgid "Ogg Vorbis Quality information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:98
+#, fuzzy
+msgid "Stream public"
+msgstr "výstupní soubor"
+
+#: modules/access_output/shout.c:99
+msgid ""
+"Make the server publicly available on the 'Yellow Pages' (directory listing "
+"of streams) on the icecast/shoutcast website. Requires the bitrate "
+"information specified for shoutcast. Requires Ogg streaming for icecast."
+msgstr ""
+
+#: modules/access_output/shout.c:105
+#, fuzzy
+msgid "IceCAST output"
+msgstr "výstupní soubor"
+
+#: modules/access_output/udp.c:77
+msgid ""
+"Default caching value for outbound UDP streams. This value should be set in "
+"milliseconds."
+msgstr ""
+
+#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
+#: modules/gui/macosx/wizard.m:1843
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:1340 modules/stream_out/rtp.c:90
+#, fuzzy
+msgid "Time-To-Live (TTL)"
+msgstr "Time To Live (TTL):"
+
+#: modules/access_output/udp.c:81
+msgid "Time-To-Live of the outgoing stream."
+msgstr ""
+
+#: modules/access_output/udp.c:84
+#, fuzzy
+msgid "Group packets"
+msgstr "Odmítnout pakety"
+
+#: modules/access_output/udp.c:85
+msgid ""
+"Packets can be sent one by one at the right time or by groups. You can "
+"choose the number of packets that will be sent at a time. It helps reducing "
+"the scheduling load on heavily-loaded systems."
+msgstr ""
+
+#: modules/access_output/udp.c:90
+#, fuzzy
+msgid "Raw write"
+msgstr "Zapsat animaci"
+
+#: modules/access_output/udp.c:91
+msgid ""
+"Packets will be sent directly, without trying to fill the MTU (ie, without "
+"trying to make the biggest possible packets in order to improve streaming)."
+msgstr ""
+
+#: modules/access_output/udp.c:97
+#, fuzzy
+msgid "UDP stream output"
+msgstr "jméno výstupního souboru s psf písmem"
+
+#: modules/access_output/udp.c:98
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
+msgid "UDP"
+msgstr "UDP"
 
 #: modules/audio_filter/channel_mixer/dolby.c:47
 msgid "Simple decoder for Dolby Surround encoded streams"
@@ -11136,7 +11136,7 @@ msgstr "VLC - Ovladač"
 
 #: modules/gui/macosx/intf.m:489 modules/gui/macosx/intf.m:1030
 #: modules/gui/macosx/intf.m:1349 modules/gui/pda/pda_interface.c:212
-#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:80
+#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:84
 #: modules/gui/qt4/ui/main_interface.ui:24
 msgid "VLC media player"
 msgstr "VLC media player"
@@ -11254,8 +11254,8 @@ msgid "Extended Controls"
 msgstr "Rozšířené ovládání"
 
 #: modules/gui/macosx/intf.m:600 modules/gui/macosx/intf.m:633
-#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:348
-#: modules/gui/macosx/playlist.m:423
+#: modules/gui/macosx/playlist.m:423 modules/gui/macosx/playlistinfo.m:55
+#: modules/gui/macosx/playlistinfo.m:348
 msgid "Information"
 msgstr "Information"
 
@@ -11349,48 +11349,37 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:69
 #, fuzzy
-msgid "Crop borders in fullscreen"
-msgstr "Zamknout v režimu přes celou obrazovku"
-
-#: modules/gui/macosx/macosx.m:70
-msgid ""
-"In fullscreen mode, crop the picture if necessary in order to fill the "
-"screen without black borders (OpenGL only)."
-msgstr ""
-
-#: modules/gui/macosx/macosx.m:74
-#, fuzzy
 msgid "Black screens in fullscreen"
 msgstr "Zamknout v režimu přes celou obrazovku"
 
-#: modules/gui/macosx/macosx.m:75
+#: modules/gui/macosx/macosx.m:70
 msgid "In fullscreen mode, keep screen where there is no video displayed black"
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:78
+#: modules/gui/macosx/macosx.m:73
 #, fuzzy
 msgid "Use as Desktop Background"
 msgstr "Použít jako pozadí pracovní plochy '%s'"
 
-#: modules/gui/macosx/macosx.m:79
+#: modules/gui/macosx/macosx.m:74
 msgid ""
 "Use the video as the Desktop Background Desktop icons cannot be interacted "
 "with in this mode."
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:82
+#: modules/gui/macosx/macosx.m:77
 msgid "Remember wizard options"
 msgstr "Zapamatovat nastavení průvodce"
 
-#: modules/gui/macosx/macosx.m:83
+#: modules/gui/macosx/macosx.m:78
 msgid "Remember the options in the wizard during one session of VLC."
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:87
+#: modules/gui/macosx/macosx.m:82
 msgid "Mac OS X interface"
 msgstr "Rozhraní Mac OS X"
 
-#: modules/gui/macosx/macosx.m:98
+#: modules/gui/macosx/macosx.m:93
 #, fuzzy
 msgid "Quartz video"
 msgstr "<b>Videokonference</b>"
@@ -11604,79 +11593,6 @@ msgstr "SDP URL"
 msgid "Save File"
 msgstr "Uložit soubor"
 
-#: modules/gui/macosx/playlistinfo.m:56
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
-msgid "URI"
-msgstr "URI"
-
-#: modules/gui/macosx/playlistinfo.m:63
-msgid "Advanced Information"
-msgstr "Rozšířené informace"
-
-#: modules/gui/macosx/playlistinfo.m:81 modules/gui/qt4/ui/input_stats.ui:293
-#, fuzzy
-msgid "Read at media"
-msgstr "nelze přečíst `%s' na řádku %d"
-
-#: modules/gui/macosx/playlistinfo.m:82 modules/gui/qt4/ui/input_stats.ui:286
-#, fuzzy
-msgid "Input bitrate"
-msgstr "maximální bitrate"
-
-#: modules/gui/macosx/playlistinfo.m:83 modules/gui/qt4/ui/input_stats.ui:307
-msgid "Demuxed"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:84 modules/gui/qt4/ui/input_stats.ui:300
-#, fuzzy
-msgid "Stream bitrate"
-msgstr "maximální bitrate"
-
-#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
-#: modules/gui/qt4/ui/input_stats.ui:156 modules/gui/qt4/ui/input_stats.ui:208
-msgid "Decoded blocks"
-msgstr "Dekódované bloky "
-
-#: modules/gui/macosx/playlistinfo.m:88 modules/gui/qt4/ui/input_stats.ui:201
-msgid "Displayed frames"
-msgstr "Zobrazené rámce"
-
-#: modules/gui/macosx/playlistinfo.m:89 modules/gui/qt4/ui/input_stats.ui:184
-msgid "Lost frames"
-msgstr "Ztracené rámce"
-
-#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:404
-#: modules/gui/qt4/ui/input_stats.ui:28
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
-#: modules/video_filter/deinterlace.c:137
-#, fuzzy
-msgid "Streaming"
-msgstr "Streamování"
-
-#: modules/gui/macosx/playlistinfo.m:92 modules/gui/qt4/ui/input_stats.ui:84
-msgid "Sent packets"
-msgstr "Odeslané pakety"
-
-#: modules/gui/macosx/playlistinfo.m:93 modules/gui/qt4/ui/input_stats.ui:77
-msgid "Sent bytes"
-msgstr "Odeslané byty"
-
-#: modules/gui/macosx/playlistinfo.m:94
-msgid "Send rate"
-msgstr "Přenosová rychlost"
-
-#: modules/gui/macosx/playlistinfo.m:98 modules/gui/qt4/ui/input_stats.ui:149
-#, fuzzy
-msgid "Played buffers"
-msgstr "Menu Buffery"
-
-#: modules/gui/macosx/playlistinfo.m:99 modules/gui/qt4/ui/input_stats.ui:142
-#, fuzzy
-msgid "Lost buffers"
-msgstr "Menu Buffery"
-
 #: modules/gui/macosx/playlist.m:418
 msgid "Save Playlist..."
 msgstr "Uložit seznam skladeb..."
@@ -11756,6 +11672,79 @@ msgstr "Zadejte prosím název uzlu"
 #: modules/gui/macosx/playlist.m:1344
 msgid "Empty Folder"
 msgstr "Prázdná složka"
+
+#: modules/gui/macosx/playlistinfo.m:56
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
+msgid "URI"
+msgstr "URI"
+
+#: modules/gui/macosx/playlistinfo.m:63
+msgid "Advanced Information"
+msgstr "Rozšířené informace"
+
+#: modules/gui/macosx/playlistinfo.m:81 modules/gui/qt4/ui/input_stats.ui:77
+#, fuzzy
+msgid "Read at media"
+msgstr "nelze přečíst `%s' na řádku %d"
+
+#: modules/gui/macosx/playlistinfo.m:82 modules/gui/qt4/ui/input_stats.ui:70
+#, fuzzy
+msgid "Input bitrate"
+msgstr "maximální bitrate"
+
+#: modules/gui/macosx/playlistinfo.m:83 modules/gui/qt4/ui/input_stats.ui:91
+msgid "Demuxed"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:84 modules/gui/qt4/ui/input_stats.ui:84
+#, fuzzy
+msgid "Stream bitrate"
+msgstr "maximální bitrate"
+
+#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
+#: modules/gui/qt4/ui/input_stats.ui:147 modules/gui/qt4/ui/input_stats.ui:233
+msgid "Decoded blocks"
+msgstr "Dekódované bloky "
+
+#: modules/gui/macosx/playlistinfo.m:88 modules/gui/qt4/ui/input_stats.ui:140
+msgid "Displayed frames"
+msgstr "Zobrazené rámce"
+
+#: modules/gui/macosx/playlistinfo.m:89 modules/gui/qt4/ui/input_stats.ui:123
+msgid "Lost frames"
+msgstr "Ztracené rámce"
+
+#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:404
+#: modules/gui/qt4/ui/input_stats.ui:243
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
+#: modules/video_filter/deinterlace.c:137
+#, fuzzy
+msgid "Streaming"
+msgstr "Streamování"
+
+#: modules/gui/macosx/playlistinfo.m:92 modules/gui/qt4/ui/input_stats.ui:299
+msgid "Sent packets"
+msgstr "Odeslané pakety"
+
+#: modules/gui/macosx/playlistinfo.m:93 modules/gui/qt4/ui/input_stats.ui:292
+msgid "Sent bytes"
+msgstr "Odeslané byty"
+
+#: modules/gui/macosx/playlistinfo.m:94
+msgid "Send rate"
+msgstr "Přenosová rychlost"
+
+#: modules/gui/macosx/playlistinfo.m:98 modules/gui/qt4/ui/input_stats.ui:226
+#, fuzzy
+msgid "Played buffers"
+msgstr "Menu Buffery"
+
+#: modules/gui/macosx/playlistinfo.m:99 modules/gui/qt4/ui/input_stats.ui:219
+#, fuzzy
+msgid "Lost buffers"
+msgstr "Menu Buffery"
 
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:213
@@ -13001,16 +12990,16 @@ msgstr ""
 msgid "Errors"
 msgstr "Chyby"
 
-#: modules/gui/qt4/dialogs_provider.cpp:243
-#: modules/gui/qt4/dialogs_provider.cpp:254
-#, fuzzy
-msgid "Open directory"
-msgstr "Otevřít &složku..."
-
-#: modules/gui/qt4/dialogs/streaminfo.cpp:39
+#: modules/gui/qt4/dialogs/streaminfo.cpp:40
 #, fuzzy
 msgid "Stream information"
 msgstr "Získat informace o uživateli"
+
+#: modules/gui/qt4/dialogs_provider.cpp:244
+#: modules/gui/qt4/dialogs_provider.cpp:255
+#, fuzzy
+msgid "Open directory"
+msgstr "Otevřít &složku..."
 
 #: modules/gui/qt4/qt4.cpp:47
 #, fuzzy
@@ -13045,7 +13034,7 @@ msgstr "Pokročilá nastavení"
 msgid "Justification"
 msgstr "Cíl"
 
-#: modules/gui/qt4/ui/input_stats.ui:70
+#: modules/gui/qt4/ui/input_stats.ui:285
 #, fuzzy
 msgid "Send bitrate"
 msgstr "Přenosová rychlost"
@@ -13222,6 +13211,11 @@ msgstr "nastavit název modulu"
 msgid "WinCE dialogs provider"
 msgstr "Otvírat dialogy v:"
 
+#: modules/gui/wxwidgets/dialogs.cpp:433
+#: modules/gui/wxwidgets/dialogs/open.cpp:1265
+msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
+msgstr ""
+
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:75
 msgid "Edit bookmark"
 msgstr "Editovat záložku"
@@ -13285,11 +13279,6 @@ msgstr ""
 #, fuzzy
 msgid "Input has changed "
 msgstr "Vstup se změnil"
-
-#: modules/gui/wxwidgets/dialogs.cpp:433
-#: modules/gui/wxwidgets/dialogs/open.cpp:1265
-msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
-msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
 #, fuzzy
@@ -14708,11 +14697,6 @@ msgstr "Volby výstupu souborů:"
 msgid "Output data for RRDTool in this file."
 msgstr ""
 
-#: modules/misc/memcpy/memcpyaltivec.c:56
-#, fuzzy
-msgid "AltiVec memcpy"
-msgstr "libc memcpy"
-
 #: modules/misc/memcpy/memcpy.c:83
 msgid "libc memcpy"
 msgstr "libc memcpy"
@@ -14728,6 +14712,11 @@ msgstr "MMX memcpy"
 #: modules/misc/memcpy/memcpy.c:99
 msgid "MMX EXT memcpy"
 msgstr "MMX EXT memcpy"
+
+#: modules/misc/memcpy/memcpyaltivec.c:56
+#, fuzzy
+msgid "AltiVec memcpy"
+msgstr "libc memcpy"
 
 #: modules/misc/musicbrainz.c:59
 #, fuzzy
@@ -18054,6 +18043,10 @@ msgstr "režim filtru"
 #, fuzzy
 msgid "Spectrum analyser"
 msgstr "Analyzátor spektra"
+
+#, fuzzy
+#~ msgid "Crop borders in fullscreen"
+#~ msgstr "Zamknout v režimu přes celou obrazovku"
 
 #, fuzzy
 #~ msgid "Standard Play"
