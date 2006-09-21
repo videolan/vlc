@@ -589,13 +589,13 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             if( p_dec->p_owner->p_sout->i_out_pace_nocontrol > 0 &&
                 p_dec->p_owner->p_input->b_out_pace_control )
             {
-                msg_Dbg( p_dec, "switching to synch mode" );
+                msg_Dbg( p_dec, "switching to sync mode" );
                 p_dec->p_owner->p_input->b_out_pace_control = VLC_FALSE;
             }
             else if( p_dec->p_owner->p_sout->i_out_pace_nocontrol <= 0 &&
                      !p_dec->p_owner->p_input->b_out_pace_control )
             {
-                msg_Dbg( p_dec, "switching to asynch mode" );
+                msg_Dbg( p_dec, "switching to async mode" );
                 p_dec->p_owner->p_input->b_out_pace_control = VLC_TRUE;
             }
         }

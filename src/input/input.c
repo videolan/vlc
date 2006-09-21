@@ -1008,7 +1008,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
             }
 
             msg_Dbg( p_input, "starting in %s mode",
-                     p_input->b_out_pace_control ? "asynch" : "synch" );
+                     p_input->b_out_pace_control ? "async" : "sync" );
         }
     }
 
@@ -1270,7 +1270,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             }
             if( f_pos < 0.0 ) f_pos = 0.0;
             if( f_pos > 1.0 ) f_pos = 1.0;
-            /* Reset the decoders states and clock synch (before calling the demuxer */
+            /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
             input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
             if( demux2_Control( p_input->input.p_demux, DEMUX_SET_POSITION,
@@ -1308,7 +1308,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             }
             if( i_time < 0 ) i_time = 0;
 
-            /* Reset the decoders states and clock synch (before calling the demuxer */
+            /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
             input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
 
