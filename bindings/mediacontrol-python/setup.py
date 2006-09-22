@@ -14,15 +14,17 @@ if not top_builddir:
     os.environ['top_builddir'] = top_builddir
 
 try:
-    srcdir=os.environ['srcdir']
+    top_srcdir=os.environ['top_srcdir']
 except KeyError:
     # Note: same as above
     srcdir=None
-if not srcdir:
-    srcdir = '.'
+if not top_srcdir:
+    top_srcdir = os.path.join( '..', '..' )
+    os.environ['top_srcdir'] = top_srcdir
 
-vlclib="-lvlc"
+vlclib= "-L"  + os.path.join( top_builddir, 'src') + " -lvlc"
 picflag=''
+srcdir=os.path.join( top_srcdir, 'bindings', 'mediacontrol-python' )
 
 def get_vlcconfig():
     vlcconfig=None
@@ -77,7 +79,7 @@ source_files = [ 'vlc_module.c' ]
 vlclocal = Extension('vlc',
                      sources = [ os.path.join( srcdir, f ) for f in source_files ],
                      include_dirs = [ top_builddir,
-                                      os.path.join( top_builddir, 'include' ),
+                                      os.path.join( top_srcdir, 'include' ),
                                       srcdir,
                                       '/usr/win32/include' ],
                 extra_objects = [ vlclib ],

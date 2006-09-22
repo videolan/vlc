@@ -16,7 +16,7 @@ else
 endif
 
 all:
-	srcdir="$(srcdir)" top_builddir="$(top_builddir)" python "$(srcdir)/setup.py" build $(COMPILERARG) "--build-base=$(top_builddir)/bindings/mediacontrol-python" "--build-temp=$(top_builddir)/bindings/mediacontrol-python"
+	top_srcdir="$(top_srcdir)" top_builddir="$(top_builddir)" python "$(srcdir)/setup.py" build $(COMPILERARG) "--build-base=$(top_builddir)/bindings/mediacontrol-python" "--build-temp=$(top_builddir)/bindings/mediacontrol-python"
 
 # FIXME: python setup.py install does not have any option to install from a different build directory
 # so this will not work in a separate builddir
