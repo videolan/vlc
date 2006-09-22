@@ -42,10 +42,10 @@ static void DecoderClose  ( vlc_object_t * );
 #define DEBUG_TEXT \
      "Enable debug"
 
-#define DEBUG_LONGTEXT \
+#define DEBUG_LONGTEXT N_( \
     "This integer when viewed in binary is a debugging mask\n" \
     "calls                 1\n" \
-    "packet assembly info  2\n"
+    "packet assembly info  2\n")
 
 vlc_module_begin();
     set_description( _("Philips OGT (SVCD subtitle) decoder") );

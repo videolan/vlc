@@ -1360,7 +1360,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_GENERAL );
 
-    add_bool( "france", VLC_FALSE, NULL, "France", FRANCE_LONGTEXT, VLC_TRUE );
+    add_bool( "france", VLC_FALSE, NULL, N_("France"), FRANCE_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Track settings" ), NULL );
     add_integer( "program", 0, NULL,

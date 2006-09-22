@@ -85,13 +85,13 @@ struct filter_sys_t
     struct atomic_operation_t * p_atomic_operations;
 };
 
-#define MONO_DOWNMIX_TEXT ("Use downmix algorithme.")
-#define MONO_DOWNMIX_LONGTEXT ("This option selects a stereo to mono " \
+#define MONO_DOWNMIX_TEXT N_("Use downmix algorithme.")
+#define MONO_DOWNMIX_LONGTEXT N_("This option selects a stereo to mono " \
     "downmix algorithm that is used in the headphone channel mixer. It" \
     "gives the effect of standing in a room full of speakers." )
 
-#define MONO_CHANNEL_TEXT ("Select channel to keep")
-#define MONO_CHANNEL_LONGTEXT ("This option silences all other channels " \
+#define MONO_CHANNEL_TEXT N_("Select channel to keep")
+#define MONO_CHANNEL_LONGTEXT N_("This option silences all other channels " \
     "except the selected channel. Choose one from (0=left, 1=right " \
     "2=rear left, 3=rear right, 4=center, 5=left front)")
 

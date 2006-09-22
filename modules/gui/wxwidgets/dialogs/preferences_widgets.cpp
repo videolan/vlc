@@ -709,7 +709,7 @@ void FileConfigControl::OnBrowse( wxCommandEvent& event )
 #if defined( __WXMSW__ )
                              wxOPEN
 #else
-                             wxOPEN | wxSAVE
+                             wxOPEN
 #endif
                            );
         if( dialog.ShowModal() == wxID_OK )

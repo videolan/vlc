@@ -166,13 +166,13 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
     wxButton *button_extract =
         new wxButton( panel, ButtonExtract_Event, wxU(_("Extract")) );
 
-#define ADD_TEXT "Adds a bookmark at the current position in the stream"
-#define REMOVE_TEXT "Removes the selected bookmarks"
-#define CLEAR_TEXT "Removes all the bookmarks for that stream"
-#define EDIT_TEXT "Edit the properties of a bookmark"
-#define EXTRACT_TEXT "If you select two or more bookmarks, this will " \
+#define ADD_TEXT N_("Adds a bookmark at the current position in the stream")
+#define REMOVE_TEXT N_("Removes the selected bookmarks")
+#define CLEAR_TEXT N_("Removes all the bookmarks for that stream")
+#define EDIT_TEXT N_("Edit the properties of a bookmark")
+#define EXTRACT_TEXT N_("If you select two or more bookmarks, this will " \
                "launch the streaming/transcoding wizard to allow you to " \
-              "stream or save the part of the stream between these bookmarks"
+              "stream or save the part of the stream between these bookmarks")
     button_add->SetToolTip(  wxU(_( ADD_TEXT ) ) );
     button_del->SetToolTip(  wxU(_( REMOVE_TEXT ) ) );
     button_clear->SetToolTip(  wxU(_( CLEAR_TEXT ) ) );

@@ -149,7 +149,7 @@ void E_(ClosePostproc)( decoder_t *, void * );
 #define LIBAVCODEC_PP_TEXT N_("FFmpeg post processing filter chains")
 /* FIXME (cut/past from ffmpeg */
 #define LIBAVCODEC_PP_LONGTEXT \
-"<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n" \
+N_("<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n" \
 "long form example:\n" \
 "vdeblock:autoq/hdeblock:autoq/linblenddeint    default,-vdeblock\n" \
 "short form example:\n" \
@@ -181,7 +181,7 @@ void E_(ClosePostproc)( decoder_t *, void * );
 "fa     fast                                    h1:a,v1:a,dr:a,al\n" \
 "tn     tmpnoise        (3 Thresholds)          Temporal Noise Reducer\n" \
 "                       1. <= 2. <= 3.          larger -> stronger filtering\n" \
-"fq     forceQuant      <quantizer>             Force quantizer\n"
+"fq     forceQuant      <quantizer>             Force quantizer\n")
 
 /*
  * Encoder options
