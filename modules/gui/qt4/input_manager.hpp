@@ -35,6 +35,8 @@ public:
     virtual ~InputManager();
 
     void delInput();
+    bool hasAudio() { return b_has_audio; }
+    bool hasVideo() { return b_has_video; }
     bool b_has_audio, b_has_video, b_had_audio, b_had_video;
 private:
     intf_thread_t *p_intf;

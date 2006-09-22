@@ -182,7 +182,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="volLowLabel" >
+      <widget class="QLabel" name="volMuteLabel" >
        <property name="text" >
         <string/>
        </property>
@@ -210,7 +210,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="volHighLabel" >
+      <widget class="QPushButton" name="visualButton" >
        <property name="text" >
         <string/>
        </property>
@@ -219,7 +219,7 @@
      <item>
       <widget class="QPushButton" name="playlistButton" >
        <property name="text" >
-        <string> </string>
+        <string/>
        </property>
       </widget>
      </item>

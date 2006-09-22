@@ -49,8 +49,6 @@ class MainInterface : public QVLCMW
 public:
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
-
-
     void *requestVideo( vout_thread_t *p_nvout, int *pi_x,
                         int *pi_y, unsigned int *pi_width,
                         unsigned int *pi_height );
@@ -80,6 +78,7 @@ private:
 
     bool                 playlistEmbeddedFlag;
     bool                 videoEmbeddedFlag;
+    bool                 alwaysVideoFlag;
 
     InputManager        *main_input_manager;
     InputSlider         *slider;
@@ -97,6 +96,7 @@ private slots:
     void prev();
     void next();
     void playlist();
+    void visual();
     void updateVolume( int sliderVolume );
 };
 
@@ -104,24 +104,21 @@ private slots:
 class VolumeClickHandler : public QObject
 {
 public:
-    VolumeClickHandler( MainInterface *_m ) :QObject(_m) {m = _m; }
+    VolumeClickHandler( intf_thread_t *_p_intf, MainInterface *_m ) :QObject(_m)
+    {m = _m; p_intf = _p_intf; }
     virtual ~VolumeClickHandler() {};
     bool eventFilter( QObject *obj, QEvent *e )
     {
         if (e->type() == QEvent::MouseButtonPress )
         {
-            if( obj->objectName() == "volLowLabel" )
-            {
-                m->ui.volumeSlider->setValue( 0 );
-            }
-            else
-                m->ui.volumeSlider->setValue( 100 );
+            aout_VolumeMute( p_intf, NULL );
             return true;
         }
         return false;
     }
 private:
     MainInterface *m;
+    intf_thread_t *p_intf;
 };
 
 #endif

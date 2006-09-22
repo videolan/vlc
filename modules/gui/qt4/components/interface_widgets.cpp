@@ -150,12 +150,13 @@ VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
 {
     setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
     QHBoxLayout *layout = new QHBoxLayout( this );
+    layout->setMargin( 0 );
     QPushButton *prevButton = new QPushButton( "Prev" );
     QPushButton *nextButton = new QPushButton( "Next");
     layout->addWidget( prevButton );
     layout->addWidget( nextButton );
     setLayout( layout );
-    setMaximumHeight( 30 );
+    setMaximumHeight( 35 );
 }
 
 VisualSelector::~VisualSelector()
