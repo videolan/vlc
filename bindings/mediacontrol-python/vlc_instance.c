@@ -443,8 +443,6 @@ vlcInstance_audio_set_volume( PyObject *self, PyObject *args )
     return Py_None;
 }
 
-/* FIXME: add vlm related bindings here */
-
 /* vlm_add_broadcast : name, input MRL, output MRL
    Keywords: options, enable, loop */
 static PyObject *
@@ -693,7 +691,7 @@ static PyMethodDef vlcInstance_methods[] =
     { "audio_set_volume", vlcInstance_audio_set_volume, METH_VARARGS,
       "audio_set_volume(volume=int)       Set the audio volume"},
 
-    { "vlm_add_broadcast", vlcInstance_vlm_add_broadcast, METH_KEYWORDS,
+    { "vlm_add_broadcast", vlcInstance_vlm_add_broadcast, METH_VARARGS | METH_KEYWORDS,
       "vlm_add_broadcast(name=str, input=str, output=str, options=list, enable=int, loop=int)   Add a new broadcast" },
     { "vlm_del_media", vlcInstance_vlm_del_media, METH_VARARGS,
       "vlm_del_media(name=str)    Delete a media" },
@@ -705,7 +703,7 @@ static PyMethodDef vlcInstance_methods[] =
       "vlm_set_input(name=str, output=str)       Set the input" },
     { "vlm_set_loop", vlcInstance_vlm_set_loop, METH_VARARGS,
       "vlm_set_loop(name=str, loop=int)          Change the looping value" },
-    { "vlm_change_media", vlcInstance_vlm_change_media, METH_KEYWORDS,
+    { "vlm_change_media", vlcInstance_vlm_change_media, METH_VARARGS | METH_KEYWORDS,
       "vlm_change_media(name=str, input=str, output=str, options=list, enable=int, loop=int)   Change the broadcast parameters" },
     { "vlm_play_media", vlcInstance_vlm_play_media, METH_VARARGS,
       "vlm_play_media(name=str)" },

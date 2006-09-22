@@ -26,45 +26,56 @@
  * VLC MediaControl object implementation
  *****************************************************************************/
 
+/* The MediaControl constructor takes either an existing vlc.Instance or a
+   list of strings */
 static PyObject *
 MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 {
     MediaControl *self;
     mediacontrol_Exception *exception = NULL;
-    PyObject* py_list = NULL;
+    PyObject* py_param = NULL;
     char** ppsz_args = NULL;
-
-    fprintf(stderr, "mc_new start\n");
+    libvlc_instance_t* p_instance = NULL;
+    
     self = PyObject_New( MediaControl, &MediaControl_Type );
 
-    if( PyArg_ParseTuple( args, "O", &py_list ) )
+    if( PyArg_ParseTuple( args, "O", &py_param ) )
     {
-        int i_size;
-        int i_index;
+        Py_INCREF( py_param );
+        if( PyObject_TypeCheck( py_param, &vlcInstance_Type ) == 1 )
+        {
+            p_instance = ((vlcInstance*)py_param)->p_instance;
+        }
+        else
+        {
+            int i_size;
+            int i_index;
 
-        Py_INCREF( py_list );
-        if( ! PySequence_Check( py_list ) )
-        {
-            PyErr_SetString( PyExc_TypeError, "Parameter must be a sequence." );
-            return NULL;
-        }
-        i_size = PySequence_Size( py_list );
-        ppsz_args = malloc( ( i_size + 1 ) * sizeof( char * ) );
-        if( ! ppsz_args )
-        {
-            PyErr_SetString( PyExc_MemoryError, "Out of memory" );
-            return NULL;
-        }
+            if( ! PySequence_Check( py_param ) )
+            {
+                PyErr_SetString( PyExc_TypeError, "Parameter must be a vlc.Instance or a sequence of strings." );
+                Py_DECREF( py_param );
+                return NULL;
+            }
+            i_size = PySequence_Size( py_param );
+            ppsz_args = malloc( ( i_size + 1 ) * sizeof( char * ) );
+            if( ! ppsz_args )
+            {
+                PyErr_SetString( PyExc_MemoryError, "Out of memory" );
+                Py_DECREF( py_param );
+                return NULL;
+            }
 
-        for ( i_index = 0; i_index < i_size; i_index++ )
-        {
-            ppsz_args[i_index] =
-                strdup( PyString_AsString( PyObject_Str(
-                                               PySequence_GetItem( py_list,
-                                                                   i_index ) ) ) );
+            for ( i_index = 0; i_index < i_size; i_index++ )
+            {
+                ppsz_args[i_index] =
+                    strdup( PyString_AsString( PyObject_Str(
+                                                   PySequence_GetItem( py_param,
+                                                                       i_index ) ) ) );
+            }
+            ppsz_args[i_size] = NULL;
         }
-        ppsz_args[i_size] = NULL;
-        Py_DECREF( py_list );
+        Py_DECREF( py_param );
     }
     else
     {
@@ -73,15 +84,18 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
         PyErr_Clear( );
     }
 
-    fprintf(stderr, "before mc_new\n");
-
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    self->mc = mediacontrol_new( ppsz_args, exception );
+    if( p_instance )
+    {
+        self->mc = mediacontrol_new_from_instance( p_instance, exception );
+    }
+    else
+    {
+        self->mc = mediacontrol_new( ppsz_args, exception );
+    }
     MC_EXCEPT;
     Py_END_ALLOW_THREADS
-
-    fprintf(stderr, "mc_new end\n");
 
     Py_INCREF( self );
     return ( PyObject * )self;
@@ -91,6 +105,18 @@ static void
 MediaControl_dealloc( PyObject *self )
 {
     PyMem_DEL( self );
+}
+
+static PyObject *
+MediaControl_get_instance( PyObject *self, PyObject *args )
+{
+    vlcInstance *p_ret;
+
+    p_ret = PyObject_New( vlcInstance, &vlcInstance_Type );
+    if( !p_ret )
+        return NULL;
+    p_ret->p_instance = mediacontrol_get_libvlc_instance( SELF->mc );
+    return ( PyObject * )p_ret;
 }
 
 /**
@@ -572,8 +598,10 @@ MediaControl_set_visual( PyObject *self, PyObject *args )
 
 static PyMethodDef MediaControl_methods[] =
 {
-    {"get_media_position", MediaControl_get_media_position, METH_VARARGS,
-     "get_media_position( origin, key ) -> Position    Get current media position." },
+    { "get_instance", MediaControl_get_instance, METH_VARARGS,
+      "get_instance( ) -> Instance    Get matching vlc.Instance." },
+    { "get_media_position", MediaControl_get_media_position, METH_VARARGS,
+      "get_media_position( origin, key ) -> Position    Get current media position." },
     { "set_media_position", MediaControl_set_media_position, METH_VARARGS,
       "set_media_position( Position )            Set media position" },
     { "start", MediaControl_start, METH_VARARGS,

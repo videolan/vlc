@@ -75,8 +75,7 @@ source_files = [ 'vlc_module.c' ]
 
 # To compile in a local vlc tree
 vlclocal = Extension('vlc',
-                     sources = [ os.path.join( srcdir, f ) for f in source_files ] +
-                     [ os.path.join( top_builddir, 'src/control/mediacontrol_init.c') ],
+                     sources = [ os.path.join( srcdir, f ) for f in source_files ],
                      include_dirs = [ top_builddir,
                                       os.path.join( top_builddir, 'include' ),
                                       srcdir,
