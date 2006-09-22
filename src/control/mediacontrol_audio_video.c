@@ -24,6 +24,7 @@
 #include <mediacontrol_internal.h>
 
 #include <vlc/mediacontrol.h>
+#include <vlc/libvlc.h>
 
 #include <vlc/intf.h>
 #include <vlc/vout.h>
@@ -245,17 +246,16 @@ unsigned short
 mediacontrol_sound_get_volume( mediacontrol_Instance *self,
                                mediacontrol_Exception *exception )
 {
-    short retval;
-    audio_volume_t i_volume;
+    libvlc_exception_t ex;
+    int i_ret = 0;
 
-    if( !self->p_intf )
-    {
-        RAISE( mediacontrol_InternalException, "No interface module" );
-        return 0;
-    }
-    aout_VolumeGet( self->p_intf, &i_volume );
-    retval = i_volume;
-    return retval;
+    mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
+
+    i_ret = libvlc_audio_get_volume( self->p_instance, &ex );
+    HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
+    /* FIXME: Normalize in [0..100] */
+    return (unsigned short)i_ret;
 }
 
 void
@@ -263,46 +263,49 @@ mediacontrol_sound_set_volume( mediacontrol_Instance *self,
                                const unsigned short volume,
                                mediacontrol_Exception *exception )
 {
-    if( !self->p_intf )
-    {
-        RAISE( mediacontrol_InternalException, "No interface module" );
-    }
-    else aout_VolumeSet( self->p_intf,( audio_volume_t )volume );
+    /* FIXME: Normalize in [0..100] */
+    libvlc_exception_t ex;
+
+    mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
+
+    libvlc_audio_set_volume( self->p_instance, volume, &ex );
+    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
 vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
                                     WINDOWHANDLE visual_id,
                                     mediacontrol_Exception *exception )
 {
-    vlc_value_t value;
-    int ret;
+    libvlc_exception_t ex;
 
-    if( !self->p_vlc )
-    {
-        RAISE( mediacontrol_InternalException, "No vlc reference" );
-        return VLC_FALSE;
-    }
-    value.i_int=visual_id;
-    ret = var_Set(self->p_vlc, "drawable", value);
+    mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
 
-    return (ret == VLC_SUCCESS);
+    libvlc_video_set_parent( self->p_instance, visual_id, &ex );
+    HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
+    return VLC_TRUE;
 }
 
 int
 mediacontrol_get_rate( mediacontrol_Instance *self,
 		       mediacontrol_Exception *exception )
 {
-    int retval;
-    input_thread_t *p_input = NULL;
+    libvlc_exception_t ex;
+    libvlc_input_t* p_input;
+    int i_ret;
 
-    p_input = self->p_playlist->p_input;
-    if( ! p_input )
-      {
-	RAISE( mediacontrol_InternalException, "No input" );
-	return 0;
-      }
-    retval = var_GetInteger(p_input, "rate") / 10;
-    return retval;
+    mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
+
+    p_input = libvlc_playlist_get_input( self->p_instance, &ex );
+    HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
+
+    i_ret = libvlc_input_get_rate( p_input, &ex );
+    libvlc_input_free( p_input );
+    HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
+
+    return i_ret / 10;
 }
 
 void
@@ -310,42 +313,39 @@ mediacontrol_set_rate( mediacontrol_Instance *self,
 		       const int rate,
 		       mediacontrol_Exception *exception )
 {
-    input_thread_t *p_input = NULL;
+    libvlc_exception_t ex;
+    libvlc_input_t* p_input;
 
-    p_input = self->p_playlist->p_input;
-    if( ! p_input )
-      {
-	RAISE( mediacontrol_InternalException, "No input" );
-	return;
-      }
-    var_SetInteger(p_input, "rate", rate * 10);
-    return;
+    mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
+
+    p_input = libvlc_playlist_get_input( self->p_instance, &ex );
+    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
+
+    libvlc_input_set_rate( p_input, rate * 10, &ex );
+    libvlc_input_free( p_input );
+    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
 int
 mediacontrol_get_fullscreen( mediacontrol_Instance *self,
 			     mediacontrol_Exception *exception )
 {
-    vout_thread_t *p_vout = NULL;
-    vlc_value_t val;
+    libvlc_exception_t ex;
+    libvlc_input_t* p_input;
     int i_ret;
-    
-    p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
-    if( ! p_vout )
-    {
-        RAISE( mediacontrol_InternalException, "no video output" );
-        return 0;
-    }
-    
-    i_ret = var_Get( p_vout, "fullscreen", &val );
-    vlc_object_release( p_vout );
 
-    if( i_ret )
-      {
-          RAISE( mediacontrol_InternalException, "Unexpected error while looking up fullscreen value" );
-          return 0;
-      }
-    return val.b_bool == VLC_TRUE ? 1 : 0;
+    mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
+
+    p_input = libvlc_playlist_get_input( self->p_instance, &ex );
+    HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
+
+    i_ret = libvlc_get_fullscreen( p_input, &ex );
+    libvlc_input_free( p_input );
+    HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
+
+    return i_ret;
 }
 
 void
@@ -353,27 +353,16 @@ mediacontrol_set_fullscreen( mediacontrol_Instance *self,
 			     const int b_fullscreen,
 			     mediacontrol_Exception *exception )
 {
-    vout_thread_t *p_vout = NULL;
-    vlc_value_t val;
-    int i_ret;
-    
-    p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
-    if( ! p_vout )
-    {
-        RAISE( mediacontrol_InternalException, "no video output" );
-        return;
-    }
+    libvlc_exception_t ex;
+    libvlc_input_t* p_input;
 
-    if( b_fullscreen ) val.b_bool = VLC_TRUE;
-    else               val.b_bool = VLC_FALSE;
+    mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
 
-    i_ret = var_Set( p_vout, "fullscreen", val );
-    vlc_object_release( p_vout );
+    p_input = libvlc_playlist_get_input( self->p_instance, &ex );
+    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
-    if( i_ret )
-      {
-          RAISE( mediacontrol_InternalException, "Unexpected error while setting fullscreen value" );
-          return;
-      }
-    return;
+    libvlc_set_fullscreen( p_input, b_fullscreen, &ex );
+    libvlc_input_free( p_input );
+    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }

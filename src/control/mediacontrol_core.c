@@ -24,6 +24,7 @@
 #include <mediacontrol_internal.h>
 #include <vlc/mediacontrol.h>
 
+#include <vlc/libvlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
 #include <vlc/aout.h>
@@ -54,46 +55,84 @@
 #    include <sys/types.h>
 #endif
 
-#define RAISE( c, m )  exception->code = c; \
-                       exception->message = strdup(m);
-
-mediacontrol_Instance* mediacontrol_new_from_object( int vlc_object_id,
-                                                     mediacontrol_Exception *exception )
+mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *exception )
 {
-    mediacontrol_Instance* retval = NULL;
-    vlc_object_t *p_vlc;
-    vlc_object_t *p_object;
+    mediacontrol_Instance* retval;
+    libvlc_exception_t ex;
+    char **ppsz_argv;
+    int i_count = 0;
+    int i_index;
+    char **p_tmp;
 
-    p_object = ( vlc_object_t* )vlc_current_object( vlc_object_id );
-    if( ! p_object )
+    libvlc_exception_init( &ex );
+    exception=mediacontrol_exception_init( exception );
+
+    /* Copy args array */
+    if( args )
     {
-        RAISE( mediacontrol_InternalException, "unable to find vlc object" );
-        return NULL;
+        for ( p_tmp = args ; *p_tmp != NULL ; p_tmp++ )
+            i_count++;
     }
 
-    p_vlc = vlc_object_find( p_object, VLC_OBJECT_ROOT, FIND_PARENT );
-    if( ! p_vlc )
+    ppsz_argv = malloc( ( i_count + 2 ) * sizeof( char * ) ) ;
+    if( ! ppsz_argv )
     {
-        RAISE( mediacontrol_InternalException, "unable to initialize VLC" );
-        return NULL;
+        RAISE_NULL( mediacontrol_InternalException, "out of memory" );
     }
+    ppsz_argv[0] = "vlc";
+    for ( i_index = 0; i_index < i_count; i_index++ )
+    {
+        ppsz_argv[i_index + 1] = strdup( args[i_index] );
+        if( ! ppsz_argv[i_index + 1] )
+        {
+            RAISE_NULL( mediacontrol_InternalException, "out of memory" );
+        }
+    }
+
+    ppsz_argv[i_count + 2] = NULL;
+
     retval = ( mediacontrol_Instance* )malloc( sizeof( mediacontrol_Instance ) );
-    retval->p_vlc = p_vlc;
-    retval->vlc_object_id = p_vlc->i_object_id;
-
-    /* We can keep references on these, which should not change. Is it true ? */
-    retval->p_playlist = vlc_object_find( p_vlc,
-                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    retval->p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF, FIND_ANYWHERE );
-
-    if( ! retval->p_playlist || ! retval->p_intf )
-    {
-        RAISE( mediacontrol_InternalException, "no interface available" );
-        return NULL;
+    if( ! retval )
+    { 
+        RAISE_NULL( mediacontrol_InternalException, "out of memory" );
     }
-    return retval;
+
+    retval->p_instance = libvlc_new( i_count + 1, ppsz_argv, &ex );
+    retval->p_playlist = retval->p_instance->p_libvlc_int->p_playlist;
+    HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
+    return retval;  
 };
 
+void
+mediacontrol_exit( mediacontrol_Instance *self )
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+
+    libvlc_destroy( self->p_instance, &ex );
+}
+
+libvlc_instance_t*
+mediacontrol_get_libvlc_instance( mediacontrol_Instance *self )
+{
+  return self->p_instance;
+}
+
+mediacontrol_Instance *
+mediacontrol_new_from_instance( libvlc_instance_t* p_instance,
+				mediacontrol_Exception *exception )
+{
+  mediacontrol_Instance* retval;
+
+  retval = ( mediacontrol_Instance* )malloc( sizeof( mediacontrol_Instance ) );
+  if( ! retval )
+  { 
+      RAISE_NULL( mediacontrol_InternalException, "out of memory" );
+  }
+  retval->p_instance = p_instance;
+  retval->p_playlist = retval->p_instance->p_libvlc_int->p_playlist;
+  return retval;  
+}
 
 /**************************************************************************
  * Playback management
@@ -105,38 +144,49 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
                                  mediacontrol_Exception *exception )
 {
     mediacontrol_Position* retval = NULL;
-    vlc_value_t val;
-    input_thread_t * p_input = self->p_playlist->p_input;
+    libvlc_exception_t ex;
+    vlc_int64_t pos;
+    libvlc_input_t * p_input;
 
     exception = mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
 
     retval = ( mediacontrol_Position* )malloc( sizeof( mediacontrol_Position ) );
     retval->origin = an_origin;
     retval->key = a_key;
 
-    if( ! p_input )
-    {
-        RAISE( mediacontrol_InternalException, "No input thread." );
-        return NULL;
-    }
+    p_input = libvlc_playlist_get_input( self->p_instance, &ex);
+    HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
 
     if(  an_origin != mediacontrol_AbsolutePosition )
     {
+        libvlc_input_free( p_input );
         /* Relative or ModuloPosition make no sense */
-        RAISE( mediacontrol_PositionOriginNotSupported,
-                                        "Only absolute position is valid." );
-        return NULL;
+        RAISE_NULL( mediacontrol_PositionOriginNotSupported,
+                    "Only absolute position is valid." );
     }
 
     /* We are asked for an AbsolutePosition. */
-    val.i_time = 0;
-    var_Get( p_input, "time", &val );
-    /* FIXME: check val.i_time > 0 */
+    pos = libvlc_input_get_time( p_input, &ex );
 
-    retval->value = mediacontrol_unit_convert( p_input,
-                                               mediacontrol_MediaTime,
-                                               a_key,
-                                               val.i_time / 1000 );
+    if( a_key == mediacontrol_MediaTime )
+    {
+        retval->value = pos / 1000;
+    }
+    else
+    {
+        if( ! self->p_playlist->p_input ) 
+        {
+            libvlc_input_free( p_input );
+            RAISE_NULL( mediacontrol_InternalException,
+                        "No input" );
+        }
+        retval->value = mediacontrol_unit_convert( self->p_playlist->p_input,
+                                                   mediacontrol_MediaTime,
+                                                   a_key,
+                                                   pos / 1000 );
+    }
+    libvlc_input_free( p_input );
     return retval;
 }
 
@@ -146,23 +196,20 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
                                  const mediacontrol_Position * a_position,
                                  mediacontrol_Exception *exception )
 {
-    vlc_value_t val;
-    input_thread_t * p_input = self->p_playlist->p_input;
+    libvlc_input_t * p_input;
+    libvlc_exception_t ex;
+    vlc_int64_t i_pos;
 
-    exception=mediacontrol_exception_init( exception );
-    if( ! p_input )
-    {
-        RAISE( mediacontrol_InternalException, "No input thread." );
-    }
-    else if( !var_GetBool( p_input, "seekable" ) )
-    {
-        RAISE( mediacontrol_InvalidPosition, "Stream not seekable" );
-    }
-    else
-    {
-        val.i_time = mediacontrol_position2microsecond( p_input, a_position );
-        var_Set( p_input, "time", val );
-    }
+    libvlc_exception_init( &ex );
+    mediacontrol_exception_init( exception );
+
+    p_input = libvlc_playlist_get_input( self->p_instance, &ex);
+    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
+
+    i_pos = mediacontrol_position2microsecond( self->p_playlist->p_input, a_position );
+    libvlc_input_set_time( p_input, i_pos, &ex );
+    libvlc_input_free( p_input );
+    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
 /* Starts playing a stream */
@@ -278,40 +325,39 @@ mediacontrol_playlist_add_item( mediacontrol_Instance *self,
                                 const char * psz_file,
                                 mediacontrol_Exception *exception )
 {
-    exception=mediacontrol_exception_init( exception );
-    if( !self->p_playlist )
-    {
-        RAISE( mediacontrol_InternalException, "No playlist" );
-    }
-    else
-        playlist_PlaylistAdd( self->p_playlist, psz_file, psz_file , PLAYLIST_INSERT,
-                      PLAYLIST_END );
+    libvlc_exception_t ex;
+
+    mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
+
+    libvlc_playlist_add( self->p_instance, psz_file, psz_file, &ex );
+    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
 void
 mediacontrol_playlist_next_item( mediacontrol_Instance *self,
                                  mediacontrol_Exception *exception )
 {
-    exception=mediacontrol_exception_init( exception );
-    if ( !self->p_playlist )
-    {
-        RAISE( mediacontrol_InternalException, "No playlist" );
-    }
-    else
-        playlist_Next( self->p_playlist );
+    libvlc_exception_t ex;
+
+    mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
+
+    libvlc_playlist_next( self->p_instance, &ex );
+    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
 void
 mediacontrol_playlist_clear( mediacontrol_Instance *self,
                              mediacontrol_Exception *exception )
 {
-    exception=mediacontrol_exception_init( exception );
-    if( !self->p_playlist )
-    {
-        RAISE( mediacontrol_PlaylistException, "No playlist" );
-    }
-    else
-        playlist_Clear( self->p_playlist );
+    libvlc_exception_t ex;
+
+    mediacontrol_exception_init( exception );
+    libvlc_exception_init( &ex );
+
+    libvlc_playlist_clear( self->p_instance, &ex );
+    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
 mediacontrol_PlaylistSeq *

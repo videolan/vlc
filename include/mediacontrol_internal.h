@@ -29,13 +29,13 @@ extern "C" {
 # endif
 
 #include <vlc/vlc.h>
-#include "vlc/mediacontrol_structures.h"
+#include <vlc/mediacontrol_structures.h>
+#include <libvlc_internal.h>
+#include <vlc/libvlc.h>
 
 struct mediacontrol_Instance {
-    vlc_object_t  *p_vlc;
+    struct libvlc_instance_t * p_instance;
     playlist_t    *p_playlist;
-    intf_thread_t *p_intf;
-    int           vlc_object_id;
 };
 
 vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
@@ -45,6 +45,28 @@ vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
 vlc_int64_t mediacontrol_position2microsecond(
     input_thread_t *p_input,
     const mediacontrol_Position *pos );
+
+#define RAISE( c, m )  exception->code = c; \
+                       exception->message = strdup(m);
+
+#define RAISE_NULL( c, m ) RAISE( c, m ); return NULL;
+#define RAISE_VOID( c, m ) RAISE( c, m ); return;
+
+#define HANDLE_LIBVLC_EXCEPTION_VOID( e )  if( libvlc_exception_raised( e ) ) {	\
+	RAISE( mediacontrol_InternalException, libvlc_exception_get_message( e )); \
+        libvlc_exception_clear( e ); \
+        return; }
+
+#define HANDLE_LIBVLC_EXCEPTION_NULL( e )  if( libvlc_exception_raised( e ) ) { 	\
+        RAISE( mediacontrol_InternalException, libvlc_exception_get_message( e )); \
+        libvlc_exception_clear( e ); \
+        return NULL; }
+
+#define HANDLE_LIBVLC_EXCEPTION_ZERO( e )  if( libvlc_exception_raised( e ) ) { \
+        RAISE( mediacontrol_InternalException, libvlc_exception_get_message( e )); \
+        libvlc_exception_clear( e ); \
+        return 0; }
+
 
 # ifdef __cplusplus
 }

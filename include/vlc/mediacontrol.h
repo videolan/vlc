@@ -114,9 +114,13 @@ void mediacontrol_exception_free(mediacontrol_Exception *exception);
 mediacontrol_Instance *
   mediacontrol_new( char **args, mediacontrol_Exception *exception );
 
+/* Bridge with the libvlc API */
 mediacontrol_Instance *
-  mediacontrol_new_from_object( int vlc_object_id,
-                                mediacontrol_Exception *exception );
+mediacontrol_new_from_instance( libvlc_instance_t* p_instance,
+				mediacontrol_Exception *exception );
+
+libvlc_instance_t*
+mediacontrol_get_libvlc_instance( mediacontrol_Instance* self );
 
 mediacontrol_Position * mediacontrol_get_media_position(
                          mediacontrol_Instance *self,
