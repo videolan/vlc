@@ -349,7 +349,7 @@ inline char *config_CategoryNameGet( int i_value )
     {
         if( categories_array[i].i_id == i_value )
         {
-            return categories_array[i].psz_name;
+            return _(categories_array[i].psz_name);
         }
         i++;
     }
@@ -363,7 +363,7 @@ inline char *config_CategoryHelpGet( int i_value )
     {
         if( categories_array[i].i_id == i_value )
         {
-            return categories_array[i].psz_help;
+            return _(categories_array[i].psz_help);
         }
         i++;
     }
