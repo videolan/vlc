@@ -171,7 +171,11 @@ void libvlc_input_set_rate( libvlc_input_t *p_input, float rate,
 {
     input_thread_t *p_input_thread;
     vlc_value_t val;
-    val.i_int = rate*1000.0f;
+
+    if( rate <= 0 )
+        RAISEVOID( "Rate value is invalid" );
+
+    val.i_int = 1000.0f/rate;
     
     p_input_thread = libvlc_get_input_thread ( p_input, p_e);
     if ( libvlc_exception_raised( p_e ) ) return;
@@ -192,7 +196,7 @@ float libvlc_input_get_rate( libvlc_input_t *p_input,
     var_Get( p_input_thread, "rate", &val );
     vlc_object_release( p_input_thread );
 
-    return (float)val.i_int/1000.0f;
+    return (float)1000.0f/val.i_int;
 }
 
 int libvlc_input_get_state( libvlc_input_t *p_input,
