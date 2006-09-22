@@ -124,9 +124,7 @@ struct demux_sys_t
     es_out_id_t *es;
 
     int64_t     i_next_demux_date;
-
     int64_t     i_microsecperframe;
-    int64_t     i_original_mspf;
 
     char        *psz_header;
     int         i_subtitle;
@@ -197,23 +195,25 @@ static int Open ( vlc_object_t *p_this )
     p_sys->i_subtitles        = 0;
     p_sys->subtitle           = NULL;
     p_sys->i_microsecperframe = 0;
-    p_sys->i_original_mspf    = 0;
 
     /* Get the FPS */
-    f_fps = var_CreateGetFloat( p_demux, "sub-fps" );
-    if( f_fps >= 1.0 )
-    {
-        p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
-    }
-
+    /* Check for fps of the video when available */
+    p_sys->i_microsecperframe = 40000; /* default to 25 fps */
     p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
     if( p_input )
     {
         f_fps = var_GetFloat( p_input, "sub-original-fps" );
         if( f_fps >= 1.0 )
-            p_sys->i_original_mspf = (int64_t)( (float)1000000 / f_fps );
+            p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
 
         vlc_object_release( p_input );
+    }
+
+    /* Check for override of the fps */
+    f_fps = var_CreateGetFloat( p_demux, "sub-fps" );
+    if( f_fps >= 1.0 )
+    {
+        p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
     }
 
     /* Get or probe the type */
@@ -704,10 +704,6 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
     int    i_stop;
     unsigned int i;
 
-    int i_microsecperframe = 40000; /* default to 25 fps */
-    if( p_sys->i_microsecperframe > 0 )
-        i_microsecperframe = p_sys->i_microsecperframe;
-
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
     p_subtitle->psz_text = NULL;
@@ -732,8 +728,9 @@ next:
     if( i_start == 1 && i_stop == 1 )
     {
         /* We found a possible setting of the framerate "{1}{1}23.976" */
+        /* Check if it's usable, and if the sub-fps is not set */
         float tmp = us_strtod( buffer_text, NULL );
-        if( tmp > 0.0 && !var_GetFloat( p_demux, "sub-fps" ) > 0.0 )
+        if( tmp >= 1.0 && !var_GetFloat( p_demux, "sub-fps" ) >= 1.0 )
             p_sys->i_microsecperframe = (int64_t)( (float)1000000 / tmp );
         goto next;
     }
@@ -747,8 +744,8 @@ next:
         }
     }
 
-    p_subtitle->i_start = (int64_t)i_start * i_microsecperframe;
-    p_subtitle->i_stop  = (int64_t)i_stop  * i_microsecperframe;
+    p_subtitle->i_start = (int64_t)i_start * p_sys->i_microsecperframe;
+    p_subtitle->i_stop  = (int64_t)i_stop  * p_sys->i_microsecperframe;
     p_subtitle->psz_text = strndup( buffer_text, MAX_LINE );
     return( 0 );
 }
@@ -816,17 +813,6 @@ static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle )
                     p_subtitle->i_start = i_start;
                     p_subtitle->i_stop = i_stop;
                     p_subtitle->psz_text = strdup( buffer_text );
-                    /* If framerate is available, use sub-fps */
-                    if( p_sys->i_microsecperframe != 0 &&
-                        p_sys->i_original_mspf != 0)
-                    {
-                        p_subtitle->i_start = (int64_t)i_start *
-                                              p_sys->i_microsecperframe/
-                                              p_sys->i_original_mspf;
-                        p_subtitle->i_stop  = (int64_t)i_stop  *
-                                              p_sys->i_microsecperframe /
-                                              p_sys->i_original_mspf;
-                    }
                     return 0;
                 }
                 else
