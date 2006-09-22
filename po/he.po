@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-22 00:18+0200\n"
+"POT-Creation-Date: 2006-09-23 00:14+0100\n"
 "PO-Revision-Date: 2005-11-09 16:45+0000\n"
 "Last-Translator: Yaniv Abir <yanivabir@gmail.com>\n"
 "Language-Team: Hebrew <he@li.org>\n"
@@ -16,14 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Rosetta-Version: 0.1\n"
-
-#: include/vlc/vlc.h:576
-msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute it under the terms of the GNU General Public License;\n"
-"see the file named COPYING for details.\n"
-"Written by the VideoLAN team; see the AUTHORS file.\n"
-msgstr ""
 
 #: include/vlc_config_cat.h:32
 msgid "VLC preferences"
@@ -519,8 +511,8 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: include/vlc_meta.h:30 modules/gui/macosx/playlist.m:129
-#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/wizard.m:393
+#: include/vlc_meta.h:30 modules/gui/macosx/playlistinfo.m:58
+#: modules/gui/macosx/playlist.m:129 modules/gui/macosx/wizard.m:393
 #: modules/gui/wince/playlist.cpp:674 modules/mux/asf.c:50
 msgid "Author"
 msgstr ""
@@ -590,6 +582,14 @@ msgstr "שם מקודד"
 
 #: include/vlc_meta.h:47
 msgid "Codec Description"
+msgstr ""
+
+#: include/vlc/vlc.h:576
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute it under the terms of the GNU General Public License;\n"
+"see the file named COPYING for details.\n"
+"Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
 
 #: src/audio_output/filters.c:154 src/audio_output/filters.c:201
@@ -810,8 +810,8 @@ msgstr "%d  Hz"
 msgid "Bits per sample"
 msgstr "ביטים לדגימה"
 
-#: src/input/es_out.c:1607 modules/access/pvr.c:84
-#: modules/access_output/shout.c:86
+#: src/input/es_out.c:1607 modules/access_output/shout.c:86
+#: modules/access/pvr.c:84
 msgid "Bitrate"
 msgstr ""
 
@@ -3461,6 +3461,11 @@ msgstr "כתוביות"
 msgid "Overlays"
 msgstr ""
 
+#: src/libvlc.h:1363
+#, fuzzy
+msgid "France"
+msgstr "טראנס"
+
 #: src/libvlc.h:1365
 msgid "Track settings"
 msgstr "הגדרות רצועה"
@@ -4239,8 +4244,17 @@ msgstr ""
 msgid "Aspect-ratio"
 msgstr ""
 
+#: modules/access/cdda/access.c:293
+msgid "CD reading failed"
+msgstr ""
+
+#: modules/access/cdda/access.c:294
+#, c-format
+msgid "VLC could not get a new block of size: %i."
+msgstr ""
+
 #: modules/access/cdda.c:58 modules/access/dshow/dshow.cpp:91
-#: modules/access/dv.c:68 modules/access/dvb/access.c:73
+#: modules/access/dvb/access.c:73 modules/access/dv.c:68
 #: modules/access/dvdnav.c:64 modules/access/dvdread.c:62
 #: modules/access/fake.c:40 modules/access/file.c:80 modules/access/ftp.c:54
 #: modules/access/gnomevfs.c:44 modules/access/http.c:56
@@ -4295,15 +4309,6 @@ msgstr "תקליטור שמע - רצועה "
 #, c-format
 msgid "Audio CD - Track %i"
 msgstr "תקליטור שמע - רצועה %i"
-
-#: modules/access/cdda/access.c:293
-msgid "CD reading failed"
-msgstr ""
-
-#: modules/access/cdda/access.c:294
-#, c-format
-msgid "VLC could not get a new block of size: %i."
-msgstr ""
 
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:78
 #: modules/codec/x264.c:280 modules/codec/x264.c:287 modules/codec/x264.c:292
@@ -4801,18 +4806,6 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 
-#: modules/access/dv.c:70
-msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
-msgstr ""
-
-#: modules/access/dv.c:74
-msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr ""
-
-#: modules/access/dv.c:75
-msgid "dv"
-msgstr ""
-
 #: modules/access/dvb/access.c:75
 msgid ""
 "Caching value for DVB streams. This value should be set in milliseconds."
@@ -5063,6 +5056,18 @@ msgstr ""
 msgid "The provided polarization \"%c\" is not valid."
 msgstr ""
 
+#: modules/access/dv.c:70
+msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
+msgstr ""
+
+#: modules/access/dv.c:74
+msgid "Digital Video (Firewire/ieee1394)  input"
+msgstr ""
+
+#: modules/access/dv.c:75
+msgid "dv"
+msgstr ""
+
 #: modules/access/dvdnav.c:60 modules/access/dvdread.c:58
 msgid "DVD angle"
 msgstr "זווית DVD"
@@ -5252,6 +5257,46 @@ msgstr ""
 msgid "VLC could not open file \"%s\" (%s)."
 msgstr ""
 
+#: modules/access_filter/record.c:46
+msgid "Record directory"
+msgstr "תיקיית הקלטות"
+
+#: modules/access_filter/record.c:48
+msgid "Directory where the record will be stored."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:46
+msgid "Timeshift granularity"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:48
+msgid ""
+"This is the size of the temporary files that will be used to store the "
+"timeshifted streams."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:50
+msgid "Timeshift directory"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:51
+msgid "Directory used to store the timeshift temporary files."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:53
+msgid "Force use of the timeshift module"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:54
+msgid ""
+"Force use of the timeshift module even if the access declares that it can "
+"control pace or pause."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
+msgid "Timeshift"
+msgstr ""
+
 #: modules/access/ftp.c:56
 msgid ""
 "Caching value for FTP streams. This value should be set in milliseconds."
@@ -5412,6 +5457,231 @@ msgstr ""
 msgid "Microsoft Media Server (MMS) input"
 msgstr ""
 
+#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
+msgid "Dummy stream output"
+msgstr ""
+
+#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
+msgid "Dummy"
+msgstr ""
+
+#: modules/access_output/file.c:61
+msgid "Append to file"
+msgstr ""
+
+#: modules/access_output/file.c:62
+msgid "Append to file if it exists instead of replacing it."
+msgstr ""
+
+#: modules/access_output/file.c:66
+msgid "File stream output"
+msgstr ""
+
+#: modules/access_output/http.c:58 modules/misc/audioscrobbler.c:130
+msgid "Username"
+msgstr "שם משתמש"
+
+#: modules/access_output/http.c:59
+msgid "User name that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:61 modules/control/telnet.c:81
+#: modules/misc/audioscrobbler.c:132
+msgid "Password"
+msgstr "סיסמה"
+
+#: modules/access_output/http.c:62
+msgid "Password that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:66
+msgid "Mime"
+msgstr ""
+
+#: modules/access_output/http.c:67
+msgid "MIME returned by the server (autodetected if not specified."
+msgstr ""
+
+#: modules/access_output/http.c:71
+msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
+msgstr ""
+
+#: modules/access_output/http.c:74
+msgid ""
+"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
+"empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:78
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used for HTTPS. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:83
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be used for "
+"SSL. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:86
+msgid "Advertise with Bonjour"
+msgstr ""
+
+#: modules/access_output/http.c:87
+msgid "Advertise the stream with the Bonjour protocol."
+msgstr ""
+
+#: modules/access_output/http.c:91
+msgid "HTTP stream output"
+msgstr ""
+
+#: modules/access_output/http.c:93 modules/control/http/http.c:61
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
+msgid "HTTP"
+msgstr "HTTP"
+
+#: modules/access_output/shout.c:58
+msgid "Stream name"
+msgstr ""
+
+#: modules/access_output/shout.c:59
+msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:62
+msgid "Stream description"
+msgstr ""
+
+#: modules/access_output/shout.c:63
+msgid "Description of the stream content or information about your channel."
+msgstr ""
+
+#: modules/access_output/shout.c:66
+msgid "Stream MP3"
+msgstr ""
+
+#: modules/access_output/shout.c:67
+msgid ""
+"You normally have to feed the shoutcast module with Ogg streams. It is also "
+"possible to stream MP3 instead, so you can forward MP3 streams to the "
+"shoutcast/icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:76
+#, fuzzy
+msgid "Genre description"
+msgstr "תיאור"
+
+#: modules/access_output/shout.c:77
+msgid "Genre of the content. "
+msgstr ""
+
+#: modules/access_output/shout.c:79
+#, fuzzy
+msgid "URL description"
+msgstr "תיאור"
+
+#: modules/access_output/shout.c:80
+msgid "URL with information about the stream or your channel. "
+msgstr ""
+
+#: modules/access_output/shout.c:87
+msgid "Bitrate information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:89 modules/access/v4l.c:122
+msgid "Samplerate"
+msgstr "קצב דגימה"
+
+#: modules/access_output/shout.c:90
+msgid "Samplerate information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:92
+#, fuzzy
+msgid "Number of channels"
+msgstr "מספר טורים"
+
+#: modules/access_output/shout.c:93
+msgid "Number of channels information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:95
+msgid "Ogg Vorbis Quality"
+msgstr ""
+
+#: modules/access_output/shout.c:96
+msgid "Ogg Vorbis Quality information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:98
+msgid "Stream public"
+msgstr ""
+
+#: modules/access_output/shout.c:99
+msgid ""
+"Make the server publicly available on the 'Yellow Pages' (directory listing "
+"of streams) on the icecast/shoutcast website. Requires the bitrate "
+"information specified for shoutcast. Requires Ogg streaming for icecast."
+msgstr ""
+
+#: modules/access_output/shout.c:105
+msgid "IceCAST output"
+msgstr ""
+
+#: modules/access_output/udp.c:75 modules/access/rtsp/access.c:41
+#: modules/demux/live555.cpp:63
+msgid "Caching value (ms)"
+msgstr ""
+
+#: modules/access_output/udp.c:77
+msgid ""
+"Default caching value for outbound UDP streams. This value should be set in "
+"milliseconds."
+msgstr ""
+
+#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
+#: modules/gui/macosx/wizard.m:1843
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:1340 modules/stream_out/rtp.c:90
+msgid "Time-To-Live (TTL)"
+msgstr ""
+
+#: modules/access_output/udp.c:81
+msgid "Time-To-Live of the outgoing stream."
+msgstr ""
+
+#: modules/access_output/udp.c:84
+msgid "Group packets"
+msgstr ""
+
+#: modules/access_output/udp.c:85
+msgid ""
+"Packets can be sent one by one at the right time or by groups. You can "
+"choose the number of packets that will be sent at a time. It helps reducing "
+"the scheduling load on heavily-loaded systems."
+msgstr ""
+
+#: modules/access_output/udp.c:90
+msgid "Raw write"
+msgstr ""
+
+#: modules/access_output/udp.c:91
+msgid ""
+"Packets will be sent directly, without trying to fill the MTU (ie, without "
+"trying to make the biggest possible packets in order to improve streaming)."
+msgstr ""
+
+#: modules/access_output/udp.c:97
+msgid "UDP stream output"
+msgstr ""
+
+#: modules/access_output/udp.c:98
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
+msgid "UDP"
+msgstr "UDP"
+
 #: modules/access/pvr.c:49
 msgid ""
 "Default caching value for PVR streams. This value should be set in "
@@ -5568,11 +5838,6 @@ msgstr "PVR"
 msgid "IVTV MPEG Encoding cards input"
 msgstr ""
 
-#: modules/access/rtsp/access.c:41 modules/access_output/udp.c:75
-#: modules/demux/live555.cpp:63
-msgid "Caching value (ms)"
-msgstr ""
-
 #: modules/access/rtsp/access.c:43
 msgid ""
 "Caching value for RTSP streams. This value should be set in milliseconds."
@@ -5701,6 +5966,35 @@ msgstr "UDP/RTP"
 msgid "UDP/RTP input"
 msgstr "קלט UDP/RTP"
 
+#: modules/access/v4l2.c:52 modules/gui/macosx/open.m:167
+#: modules/gui/wxwidgets/dialogs/open.cpp:723
+msgid "Device name"
+msgstr "שם התקן"
+
+#: modules/access/v4l2.c:54
+#, fuzzy
+msgid ""
+"Name of the device to use. If you don't specify anything, /dev/video0 will "
+"be used."
+msgstr ""
+"ציין את שם התקן הוידאו לשימוש. אם לא ייבחר התקן, לא ייעשה שימוש בשום התקן "
+"וידאו."
+
+#: modules/access/v4l2.c:58
+msgid ""
+"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
+msgstr ""
+
+#: modules/access/v4l2.c:63
+#, fuzzy
+msgid "Video4Linux2"
+msgstr "Video4Linux"
+
+#: modules/access/v4l2.c:64
+#, fuzzy
+msgid "Video4Linux2 input"
+msgstr "קלט Video4Linux"
+
 #: modules/access/v4l.c:75
 msgid ""
 "Caching value for V4L captures. This value should be set in milliseconds."
@@ -5790,10 +6084,6 @@ msgstr ""
 msgid "Tuner to use, if there are several ones."
 msgstr ""
 
-#: modules/access/v4l.c:122 modules/access_output/shout.c:89
-msgid "Samplerate"
-msgstr "קצב דגימה"
-
 #: modules/access/v4l.c:124
 msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100)"
@@ -5833,35 +6123,6 @@ msgstr "Video4Linux"
 
 #: modules/access/v4l.c:147
 msgid "Video4Linux input"
-msgstr "קלט Video4Linux"
-
-#: modules/access/v4l2.c:52 modules/gui/macosx/open.m:167
-#: modules/gui/wxwidgets/dialogs/open.cpp:723
-msgid "Device name"
-msgstr "שם התקן"
-
-#: modules/access/v4l2.c:54
-#, fuzzy
-msgid ""
-"Name of the device to use. If you don't specify anything, /dev/video0 will "
-"be used."
-msgstr ""
-"ציין את שם התקן הוידאו לשימוש. אם לא ייבחר התקן, לא ייעשה שימוש בשום התקן "
-"וידאו."
-
-#: modules/access/v4l2.c:58
-msgid ""
-"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
-msgstr ""
-
-#: modules/access/v4l2.c:63
-#, fuzzy
-msgid "Video4Linux2"
-msgstr "Video4Linux"
-
-#: modules/access/v4l2.c:64
-#, fuzzy
-msgid "Video4Linux2 input"
 msgstr "קלט Video4Linux"
 
 #: modules/access/vcd/vcd.c:42
@@ -6046,262 +6307,6 @@ msgstr ""
 msgid "Format to use in the playlist's \"title\" field."
 msgstr ""
 
-#: modules/access_filter/record.c:46
-msgid "Record directory"
-msgstr "תיקיית הקלטות"
-
-#: modules/access_filter/record.c:48
-msgid "Directory where the record will be stored."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:46
-msgid "Timeshift granularity"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:48
-msgid ""
-"This is the size of the temporary files that will be used to store the "
-"timeshifted streams."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:50
-msgid "Timeshift directory"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:51
-msgid "Directory used to store the timeshift temporary files."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:53
-msgid "Force use of the timeshift module"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:54
-msgid ""
-"Force use of the timeshift module even if the access declares that it can "
-"control pace or pause."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
-msgid "Timeshift"
-msgstr ""
-
-#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
-msgid "Dummy stream output"
-msgstr ""
-
-#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
-msgid "Dummy"
-msgstr ""
-
-#: modules/access_output/file.c:61
-msgid "Append to file"
-msgstr ""
-
-#: modules/access_output/file.c:62
-msgid "Append to file if it exists instead of replacing it."
-msgstr ""
-
-#: modules/access_output/file.c:66
-msgid "File stream output"
-msgstr ""
-
-#: modules/access_output/http.c:58 modules/misc/audioscrobbler.c:130
-msgid "Username"
-msgstr "שם משתמש"
-
-#: modules/access_output/http.c:59
-msgid "User name that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:61 modules/control/telnet.c:81
-#: modules/misc/audioscrobbler.c:132
-msgid "Password"
-msgstr "סיסמה"
-
-#: modules/access_output/http.c:62
-msgid "Password that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:66
-msgid "Mime"
-msgstr ""
-
-#: modules/access_output/http.c:67
-msgid "MIME returned by the server (autodetected if not specified."
-msgstr ""
-
-#: modules/access_output/http.c:71
-msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
-msgstr ""
-
-#: modules/access_output/http.c:74
-msgid ""
-"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
-"empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:78
-msgid ""
-"Path to the x509 PEM trusted root CA certificates (certificate authority) "
-"file that will be used for HTTPS. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:83
-msgid ""
-"Path to the x509 PEM Certificates Revocation List file that will be used for "
-"SSL. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:86
-msgid "Advertise with Bonjour"
-msgstr ""
-
-#: modules/access_output/http.c:87
-msgid "Advertise the stream with the Bonjour protocol."
-msgstr ""
-
-#: modules/access_output/http.c:91
-msgid "HTTP stream output"
-msgstr ""
-
-#: modules/access_output/http.c:93 modules/control/http/http.c:61
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
-msgid "HTTP"
-msgstr "HTTP"
-
-#: modules/access_output/shout.c:58
-msgid "Stream name"
-msgstr ""
-
-#: modules/access_output/shout.c:59
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:62
-msgid "Stream description"
-msgstr ""
-
-#: modules/access_output/shout.c:63
-msgid "Description of the stream content or information about your channel."
-msgstr ""
-
-#: modules/access_output/shout.c:66
-msgid "Stream MP3"
-msgstr ""
-
-#: modules/access_output/shout.c:67
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:76
-#, fuzzy
-msgid "Genre description"
-msgstr "תיאור"
-
-#: modules/access_output/shout.c:77
-msgid "Genre of the content. "
-msgstr ""
-
-#: modules/access_output/shout.c:79
-#, fuzzy
-msgid "URL description"
-msgstr "תיאור"
-
-#: modules/access_output/shout.c:80
-msgid "URL with information about the stream or your channel. "
-msgstr ""
-
-#: modules/access_output/shout.c:87
-msgid "Bitrate information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:90
-msgid "Samplerate information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:92
-#, fuzzy
-msgid "Number of channels"
-msgstr "מספר טורים"
-
-#: modules/access_output/shout.c:93
-msgid "Number of channels information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:95
-msgid "Ogg Vorbis Quality"
-msgstr ""
-
-#: modules/access_output/shout.c:96
-msgid "Ogg Vorbis Quality information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:98
-msgid "Stream public"
-msgstr ""
-
-#: modules/access_output/shout.c:99
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-
-#: modules/access_output/shout.c:105
-msgid "IceCAST output"
-msgstr ""
-
-#: modules/access_output/udp.c:77
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-
-#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:442
-#: modules/gui/macosx/wizard.m:1843
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:1340 modules/stream_out/rtp.c:90
-msgid "Time-To-Live (TTL)"
-msgstr ""
-
-#: modules/access_output/udp.c:81
-msgid "Time-To-Live of the outgoing stream."
-msgstr ""
-
-#: modules/access_output/udp.c:84
-msgid "Group packets"
-msgstr ""
-
-#: modules/access_output/udp.c:85
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-
-#: modules/access_output/udp.c:90
-msgid "Raw write"
-msgstr ""
-
-#: modules/access_output/udp.c:91
-msgid ""
-"Packets will be sent directly, without trying to fill the MTU (ie, without "
-"trying to make the biggest possible packets in order to improve streaming)."
-msgstr ""
-
-#: modules/access_output/udp.c:97
-msgid "UDP stream output"
-msgstr ""
-
-#: modules/access_output/udp.c:98
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
-msgid "UDP"
-msgstr "UDP"
-
 #: modules/audio_filter/channel_mixer/dolby.c:47
 msgid "Simple decoder for Dolby Surround encoded streams"
 msgstr ""
@@ -6430,6 +6435,28 @@ msgstr ""
 
 #: modules/audio_filter/converter/float32tou8.c:48
 msgid "Audio filter for float32->u8 conversion"
+msgstr ""
+
+#: modules/audio_filter/converter/mono.c:88
+msgid "Use downmix algorithme."
+msgstr ""
+
+#: modules/audio_filter/converter/mono.c:89
+msgid ""
+"This option selects a stereo to mono downmix algorithm that is used in the "
+"headphone channel mixer. Itgives the effect of standing in a room full of "
+"speakers."
+msgstr ""
+
+#: modules/audio_filter/converter/mono.c:93
+#, fuzzy
+msgid "Select channel to keep"
+msgstr "בחרו את הקובץ בו המידע יישמר"
+
+#: modules/audio_filter/converter/mono.c:94
+msgid ""
+"This option silences all other channels except the selected channel. Choose "
+"one from (0=left, 1=right 2=rear left, 3=rear right, 4=center, 5=left front)"
 msgstr ""
 
 #: modules/audio_filter/converter/mono.c:100
@@ -7316,6 +7343,51 @@ msgstr ""
 msgid "FFmpeg post processing filter chains"
 msgstr ""
 
+#: modules/codec/ffmpeg/ffmpeg.h:152
+msgid ""
+"<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:"
+"<option>...]]...\n"
+"long form example:\n"
+"vdeblock:autoq/hdeblock:autoq/linblenddeint    default,-vdeblock\n"
+"short form example:\n"
+"vb:a/hb:a/lb de,-vb\n"
+"more examples:\n"
+"tn:64:128:256\n"
+"Filters                        Options\n"
+"short  long name       short   long option     Description\n"
+"*      *               a       autoq           cpu power dependant enabler\n"
+"                       c       chrom           chrominance filtring enabled\n"
+"                       y       nochrom         chrominance filtring "
+"disabled\n"
+"hb     hdeblock        (2 Threshold)           horizontal deblocking filter\n"
+"       1. difference factor: default=64, higher -> more deblocking\n"
+"       2. flatness threshold: default=40, lower -> more deblocking\n"
+"                       the h & v deblocking filters share these\n"
+"                       so u cant set different thresholds for h / v\n"
+"vb     vdeblock        (2 Threshold)           vertical deblocking filter\n"
+"h1     x1hdeblock                              Experimental h deblock filter "
+"1\n"
+"v1     x1vdeblock                              Experimental v deblock filter "
+"1\n"
+"dr     dering                                  Deringing filter\n"
+"al     autolevels                              automatic brightness / "
+"contrast\n"
+"                       f       fullyrange      stretch luminance to "
+"(0..255)\n"
+"lb     linblenddeint                           linear blend deinterlacer\n"
+"li     linipoldeint                            linear interpolating "
+"deinterlace\n"
+"ci     cubicipoldeint                          cubic interpolating "
+"deinterlacer\n"
+"md     mediandeint                             median deinterlacer\n"
+"fd     ffmpegdeint                             ffmpeg deinterlacer\n"
+"de     default                                 hb:a,vb:a,dr:a,al\n"
+"fa     fast                                    h1:a,v1:a,dr:a,al\n"
+"tn     tmpnoise        (3 Thresholds)          Temporal Noise Reducer\n"
+"                       1. <= 2. <= 3.          larger -> stronger filtering\n"
+"fq     forceQuant      <quantizer>             Force quantizer\n"
+msgstr ""
+
 #: modules/codec/ffmpeg/ffmpeg.h:191
 msgid "Ratio of key frames"
 msgstr ""
@@ -7683,6 +7755,13 @@ msgstr "מפענח כתוביות טקסט"
 msgid ""
 "failed to convert subtitle encoding.\n"
 "Try manually setting a character-encoding before you open the file."
+msgstr ""
+
+#: modules/codec/svcdsub.c:46
+msgid ""
+"This integer when viewed in binary is a debugging mask\n"
+"calls                 1\n"
+"packet assembly info  2\n"
 msgstr ""
 
 #: modules/codec/svcdsub.c:51
@@ -10554,7 +10633,7 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:489 modules/gui/macosx/intf.m:1030
 #: modules/gui/macosx/intf.m:1349 modules/gui/pda/pda_interface.c:212
-#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:84
+#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:93
 #: modules/gui/qt4/ui/main_interface.ui:24
 msgid "VLC media player"
 msgstr "נגן המדיה VLC"
@@ -10669,8 +10748,8 @@ msgid "Extended Controls"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:600 modules/gui/macosx/intf.m:633
-#: modules/gui/macosx/playlist.m:423 modules/gui/macosx/playlistinfo.m:55
-#: modules/gui/macosx/playlistinfo.m:348
+#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:348
+#: modules/gui/macosx/playlist.m:423
 msgid "Information"
 msgstr ""
 
@@ -10985,6 +11064,73 @@ msgstr ""
 msgid "Save File"
 msgstr "שמור קובץ"
 
+#: modules/gui/macosx/playlistinfo.m:56
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
+msgid "URI"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:63
+msgid "Advanced Information"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:81 modules/gui/qt4/ui/input_stats.ui:77
+msgid "Read at media"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:82 modules/gui/qt4/ui/input_stats.ui:70
+msgid "Input bitrate"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:83 modules/gui/qt4/ui/input_stats.ui:91
+msgid "Demuxed"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:84 modules/gui/qt4/ui/input_stats.ui:84
+msgid "Stream bitrate"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
+#: modules/gui/qt4/ui/input_stats.ui:147 modules/gui/qt4/ui/input_stats.ui:233
+msgid "Decoded blocks"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:88 modules/gui/qt4/ui/input_stats.ui:140
+msgid "Displayed frames"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:89 modules/gui/qt4/ui/input_stats.ui:123
+msgid "Lost frames"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:404
+#: modules/gui/qt4/ui/input_stats.ui:243
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
+#: modules/video_filter/deinterlace.c:137
+msgid "Streaming"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:92 modules/gui/qt4/ui/input_stats.ui:299
+msgid "Sent packets"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:93 modules/gui/qt4/ui/input_stats.ui:292
+msgid "Sent bytes"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:94
+msgid "Send rate"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:98 modules/gui/qt4/ui/input_stats.ui:226
+msgid "Played buffers"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:99 modules/gui/qt4/ui/input_stats.ui:219
+msgid "Lost buffers"
+msgstr ""
+
 #: modules/gui/macosx/playlist.m:418
 msgid "Save Playlist..."
 msgstr "שמור רשימת השמעה..."
@@ -11061,73 +11207,6 @@ msgstr ""
 
 #: modules/gui/macosx/playlist.m:1344
 msgid "Empty Folder"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:56
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
-msgid "URI"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:63
-msgid "Advanced Information"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:81 modules/gui/qt4/ui/input_stats.ui:77
-msgid "Read at media"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:82 modules/gui/qt4/ui/input_stats.ui:70
-msgid "Input bitrate"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:83 modules/gui/qt4/ui/input_stats.ui:91
-msgid "Demuxed"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:84 modules/gui/qt4/ui/input_stats.ui:84
-msgid "Stream bitrate"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
-#: modules/gui/qt4/ui/input_stats.ui:147 modules/gui/qt4/ui/input_stats.ui:233
-msgid "Decoded blocks"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:88 modules/gui/qt4/ui/input_stats.ui:140
-msgid "Displayed frames"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:89 modules/gui/qt4/ui/input_stats.ui:123
-msgid "Lost frames"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:404
-#: modules/gui/qt4/ui/input_stats.ui:243
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
-#: modules/video_filter/deinterlace.c:137
-msgid "Streaming"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:92 modules/gui/qt4/ui/input_stats.ui:299
-msgid "Sent packets"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:93 modules/gui/qt4/ui/input_stats.ui:292
-msgid "Sent bytes"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:94
-msgid "Send rate"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:98 modules/gui/qt4/ui/input_stats.ui:226
-msgid "Played buffers"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:99 modules/gui/qt4/ui/input_stats.ui:219
-msgid "Lost buffers"
 msgstr ""
 
 #: modules/gui/macosx/prefs.m:123
@@ -12347,16 +12426,16 @@ msgstr ""
 msgid "Errors"
 msgstr "שגיאה"
 
+#: modules/gui/qt4/dialogs_provider.cpp:257
+#: modules/gui/qt4/dialogs_provider.cpp:268
+#, fuzzy
+msgid "Open directory"
+msgstr "תיקיית הקלטות"
+
 #: modules/gui/qt4/dialogs/streaminfo.cpp:40
 #, fuzzy
 msgid "Stream information"
 msgstr "מידע נוסף"
-
-#: modules/gui/qt4/dialogs_provider.cpp:244
-#: modules/gui/qt4/dialogs_provider.cpp:255
-#, fuzzy
-msgid "Open directory"
-msgstr "תיקיית הקלטות"
 
 #: modules/gui/qt4/qt4.cpp:47
 #, fuzzy
@@ -12560,11 +12639,6 @@ msgstr "מודול ממשק WinCE"
 msgid "WinCE dialogs provider"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs.cpp:433
-#: modules/gui/wxwidgets/dialogs/open.cpp:1265
-msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
-msgstr ""
-
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:75
 msgid "Edit bookmark"
 msgstr "ערוך סימנייה"
@@ -12608,6 +12682,30 @@ msgstr "מחק"
 msgid "&Clear"
 msgstr "נקה"
 
+#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:169
+msgid "Adds a bookmark at the current position in the stream"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:170
+#, fuzzy
+msgid "Removes the selected bookmarks"
+msgstr "עלייך לבחור שתי סימניות"
+
+#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:171
+msgid "Removes all the bookmarks for that stream"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:172
+msgid "Edit the properties of a bookmark"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:173
+msgid ""
+"If you select two or more bookmarks, this will launch the streaming/"
+"transcoding wizard to allow you to stream or save the part of the stream "
+"between these bookmarks"
+msgstr ""
+
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:347
 msgid "You must select two bookmarks"
 msgstr "עלייך לבחור שתי סימניות"
@@ -12631,6 +12729,11 @@ msgstr ""
 msgid "Input has changed "
 msgstr "הקלט השתנה "
 
+#: modules/gui/wxwidgets/dialogs.cpp:433
+#: modules/gui/wxwidgets/dialogs/open.cpp:1265
+msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
+msgstr ""
+
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
 msgid "Stream and Media Info"
 msgstr ""
@@ -12638,6 +12741,14 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:83
 msgid "Advanced information"
 msgstr ""
+
+#: modules/gui/wxwidgets/dialogs/fileinfo.cpp:93
+#: modules/gui/wxwidgets/dialogs/interaction.cpp:188
+#: modules/gui/wxwidgets/dialogs/messages.cpp:72
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:253
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:76
+msgid "&Close"
+msgstr "&סגור"
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:114
 msgid ""
@@ -12656,13 +12767,6 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:183
 msgid "Don't show further errors"
 msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/interaction.cpp:188
-#: modules/gui/wxwidgets/dialogs/messages.cpp:72
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:253
-#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:76
-msgid "&Close"
-msgstr "&סגור"
 
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:58
 msgid "Playlist item info"
@@ -13992,6 +14096,10 @@ msgstr ""
 msgid "Output data for RRDTool in this file."
 msgstr ""
 
+#: modules/misc/memcpy/memcpyaltivec.c:56
+msgid "AltiVec memcpy"
+msgstr ""
+
 #: modules/misc/memcpy/memcpy.c:83
 msgid "libc memcpy"
 msgstr ""
@@ -14006,10 +14114,6 @@ msgstr ""
 
 #: modules/misc/memcpy/memcpy.c:99
 msgid "MMX EXT memcpy"
-msgstr ""
-
-#: modules/misc/memcpy/memcpyaltivec.c:56
-msgid "AltiVec memcpy"
 msgstr ""
 
 #: modules/misc/musicbrainz.c:59
