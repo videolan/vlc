@@ -38,6 +38,8 @@ SOURCES_activex = \
     viewobject.h \
     vlccontrol.cpp \
     vlccontrol.h \
+    vlcconfiguration.cpp \
+    vlcconfiguration.h \
     vlccontrol2.cpp \
     vlccontrol2.h \
     plugin.cpp \

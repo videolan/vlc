@@ -148,6 +148,8 @@ STDMETHODIMP VLCAudio::put_mute(VARIANT_BOOL mute)
     return hr;
 };
 
+#include <iostream>
+
 STDMETHODIMP VLCAudio::get_volume(int* volume)
 {
     if( NULL == volume )
@@ -161,6 +163,7 @@ STDMETHODIMP VLCAudio::get_volume(int* volume)
         libvlc_exception_init(&ex);
 
         *volume = libvlc_audio_get_volume(p_libvlc, &ex);
+        cerr << "volume is " << *volume;
         if( libvlc_exception_raised(&ex) )
         {
             libvlc_exception_clear(&ex);
@@ -1100,6 +1103,7 @@ STDMETHODIMP VLCVideo::get_height(int* height)
 /*******************************************************************************/
 
 VLCControl2::VLCControl2(VLCPlugin *p_instance) :
+    VLCConfiguration(p_instance),
     _p_instance(p_instance),
     _p_typeinfo(NULL),
     _p_vlcaudio(NULL),

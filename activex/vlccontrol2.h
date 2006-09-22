@@ -24,6 +24,7 @@
 #define _VLCCONTROL2_H_
 
 #include "axvlc_idl.h"
+#include "vlcconfiguration.h"
 
 class VLCAudio : public IVLCAudio
 {
@@ -65,11 +66,12 @@ public:
     STDMETHODIMP put_volume(int);
     STDMETHODIMP toggleMute();
  
-private:
-    HRESULT     loadTypeInfo();
+protected:
+    virtual HRESULT loadTypeInfo();
 
-    VLCPlugin*  _p_instance;
-    ITypeInfo*  _p_typeinfo;
+private:
+    VLCPlugin*      _p_instance;
+    ITypeInfo*      _p_typeinfo;
 
 };
  
@@ -118,12 +120,13 @@ public:
     STDMETHODIMP put_rate(float);
     STDMETHODIMP get_fps(float*);
     STDMETHODIMP get_hasVout(VARIANT_BOOL*);
-     
-private:
-    HRESULT     loadTypeInfo();
+    
+protected:
+    virtual HRESULT loadTypeInfo();
 
-    VLCPlugin*  _p_instance;
-    ITypeInfo*  _p_typeinfo;
+private:
+    VLCPlugin*      _p_instance;
+    ITypeInfo*      _p_typeinfo;
 
 };
  
@@ -173,10 +176,10 @@ public:
     STDMETHODIMP clear();
     STDMETHODIMP removeItem(int);
  
+protected:
+    virtual HRESULT loadTypeInfo();
+
 private:
-
-    HRESULT     loadTypeInfo();
-
     VLCPlugin*  _p_instance;
     ITypeInfo*  _p_typeinfo;
 
@@ -221,16 +224,16 @@ public:
     STDMETHODIMP get_width(int*);
     STDMETHODIMP get_height(int*);
  
+protected:
+    virtual HRESULT loadTypeInfo();
+
 private:
-
-    HRESULT     loadTypeInfo();
-
-    VLCPlugin*  _p_instance;
-    ITypeInfo*  _p_typeinfo;
+    VLCPlugin*      _p_instance;
+    ITypeInfo*      _p_typeinfo;
 
 };
  
-class VLCControl2 : public IVLCControl2
+class VLCControl2 : public VLCConfiguration
 {
     
 public:
@@ -245,6 +248,7 @@ public:
           return E_POINTER;
         if( (IID_IUnknown == riid)
          || (IID_IDispatch == riid)
+         || (IID_IVLCConfiguration == riid)
          || (IID_IVLCControl2 == riid) )
         {
             AddRef();
@@ -268,11 +272,11 @@ public:
     STDMETHODIMP get_input(IVLCInput**);
     STDMETHODIMP get_playlist(IVLCPlaylist**);
     STDMETHODIMP get_video(IVLCVideo**);
- 
+
+protected:
+    virtual HRESULT loadTypeInfo();
+
 private:
-
-    HRESULT         loadTypeInfo();
-
     VLCPlugin*      _p_instance;
     ITypeInfo*      _p_typeinfo;
 

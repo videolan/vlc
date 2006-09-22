@@ -223,6 +223,7 @@ STDMETHODIMP VLCPluginClass::CreateInstance(LPUNKNOWN pUnkOuter, REFIID riid, vo
     if( NULL != plugin )
     {
         HRESULT hr = plugin->QueryInterface(riid, ppv);
+        // the following will destroy the object if QueryInterface() failed
         plugin->Release();
         return hr;
     }
@@ -472,9 +473,10 @@ HRESULT VLCPlugin::onInit(void)
     if( NULL == _p_libvlc )
     {
         // initialize persistable properties
-        _bstr_mrl = NULL;
         _b_autoplay = TRUE;
         _b_autoloop = FALSE;
+        _bstr_baseurl = NULL;
+        _bstr_mrl = NULL;
         _b_visible = TRUE;
         _b_mute = FALSE;
         _i_volume = 50;
@@ -493,12 +495,11 @@ HRESULT VLCPlugin::onInit(void)
 
 HRESULT VLCPlugin::onLoad(void)
 {
-    if( SysStringLen(_bstr_mrl) > 0 )
+    if( SysStringLen(_bstr_baseurl) == 0 )
     {
         /*
-        ** try to combine MRL with client site moniker, which for Internet Explorer
-        ** is the URL of the page the plugin is embedded into. Hence, if the MRL
-        ** is a relative URL, we should end up with an absolute URL
+        ** try to retreive the base URL using the client site moniker, which for Internet Explorer
+        ** is the URL of the page the plugin is embedded into. 
         */
         LPOLECLIENTSITE pClientSite;
         if( SUCCEEDED(vlcOleObject->GetClientSite(&pClientSite)) && (NULL != pClientSite) )
@@ -518,26 +519,13 @@ HRESULT VLCPlugin::onLoad(void)
                         */
                         if( UrlIsW(base_url, URLIS_URL) )
                         {
-                            DWORD len = INTERNET_MAX_URL_LENGTH;
-                            LPOLESTR abs_url = (LPOLESTR)CoTaskMemAlloc(sizeof(OLECHAR)*len);
-                            if( NULL != abs_url )
-                            {
-                                if( SUCCEEDED(UrlCombineW(base_url, _bstr_mrl, abs_url, &len,
-                                                URL_ESCAPE_UNSAFE|URL_PLUGGABLE_PROTOCOL)) )
-                                {
-                                    SysFreeString(_bstr_mrl);
-                                    _bstr_mrl = SysAllocStringLen(abs_url, len);
-                                }
-                                CoTaskMemFree(abs_url);
-                            }
+                            /* copy base URL */
+                            _bstr_mrl = SysAllocString(base_url);
                         }
                         CoTaskMemFree(base_url);
                     }
-                    pContMoniker->Release();
                 }
-                pBC->Release();
             }
-            pClientSite->Release();
         }
     }
     setDirty(FALSE);
@@ -639,21 +627,42 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
             return E_FAIL;
         }
 
-        char *psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
-        if( NULL != psz_mrl )
+        if( SysStringLen(_bstr_mrl) > 0 )
         {
-            const char *options[1];
-            int i_options = 0;
-
-            char timeBuffer[32];
-            if( _i_time )
+            char *psz_mrl = NULL;
+            DWORD len = INTERNET_MAX_URL_LENGTH;
+            LPOLESTR abs_url = (LPOLESTR)CoTaskMemAlloc(sizeof(OLECHAR)*len);
+            if( NULL != abs_url )
             {
-                snprintf(timeBuffer, sizeof(timeBuffer), ":start-time=%d", _i_time);
-                options[i_options++] = timeBuffer;
+                /*
+                ** if the MRL a relative URL, we should end up with an absolute URL
+                */
+                if( SUCCEEDED(UrlCombineW(_bstr_baseurl, _bstr_mrl, abs_url, &len,
+                                URL_ESCAPE_UNSAFE|URL_PLUGGABLE_PROTOCOL)) )
+                {
+                    psz_mrl = CStrFromBSTR(CP_UTF8, abs_url);
+                }
+                else
+                {
+                    psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
+                }
+                CoTaskMemFree(abs_url);
             }
-            // add default target to playlist
-            libvlc_playlist_add_extended(_p_libvlc, psz_mrl, NULL, i_options, options, NULL);
-            CoTaskMemFree(psz_mrl);
+            if( NULL != psz_mrl )
+            {
+                const char *options[1];
+                int i_options = 0;
+
+                char timeBuffer[32];
+                if( _i_time )
+                {
+                    snprintf(timeBuffer, sizeof(timeBuffer), ":start-time=%d", _i_time);
+                    options[i_options++] = timeBuffer;
+                }
+                // add default target to playlist
+                libvlc_playlist_add_extended(_p_libvlc, psz_mrl, NULL, i_options, options, NULL);
+                CoTaskMemFree(psz_mrl);
+            }
         }
     }
     *pp_libvlc = _p_libvlc;
@@ -917,7 +926,7 @@ void VLCPlugin::setTime(int seconds)
 
     if( seconds != _i_time )
     {
-        _i_time = seconds;
+        setStartTime(_i_time);
         if( isRunning() )
         {
             libvlc_input_t *p_input = libvlc_playlist_get_input(_p_libvlc, NULL);
@@ -927,7 +936,6 @@ void VLCPlugin::setTime(int seconds)
                 libvlc_input_free(p_input);
             }
         }
-        setDirty(TRUE);
     }
 };
 

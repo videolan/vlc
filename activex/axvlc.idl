@@ -43,7 +43,7 @@ library AXVLC
 
     importlib("stdole2.tlb");
 
-    enum VLCPlaylistMode
+    typedef [public] enum VLCPlaylistMode
     {
         VLCPlayListInsert       =  1,
         VLCPlayListInsertAndGo  =  9,
@@ -52,7 +52,7 @@ library AXVLC
         VLCPlayListAppend       =  4,
         VLCPlayListAppendAndGo  = 12,
         VLCPlayListCheckInsert  = 16
-    };
+    } eVLCPlaylistMode;
 
     // playlist target position
     const int VLCPlayListEnd    = -666;
@@ -67,6 +67,8 @@ library AXVLC
     const int DISPID_MRL        = 106;
     const int DISPID_AutoPlay   = 107;
     const int DISPID_AutoLoop   = 108;
+    const int DISPID_StartTime  = 109;
+    const int DISPID_BaseURL    = 110;
 
     [
       odl,
@@ -299,12 +301,60 @@ library AXVLC
 
     [
       odl,
+      uuid(15179CD8-CC12-4242-A58E-E412217FF343),
+      helpstring("VLC Configuration options"),
+      dual,
+      oleautomation
+    ]
+    interface IVLCConfiguration : IDispatch
+    {
+        [id(DISPID_AutoLoop), propget, helpstring("Returns/sets a value that determines whether the playlist is looped")]
+        HRESULT AutoLoop([out, retval] VARIANT_BOOL* autoloop);
+        [id(DISPID_AutoLoop), propput, helpstring("Returns/sets a value that determines whether the playlist is looped")]
+        HRESULT AutoLoop([in] VARIANT_BOOL autoloop);
+
+        [id(DISPID_AutoPlay), propget, helpstring("Returns/sets a value that determines whether the playlist is played on startup")]
+        HRESULT AutoPlay([out, retval] VARIANT_BOOL* autoplay);
+        [id(DISPID_AutoPlay), propput, helpstring("Returns/Sets a value that determines whether the playlist is played on startup")]
+        HRESULT AutoPlay([in] VARIANT_BOOL autoplay);
+
+        [id(DISPID_BaseURL), propget, helpstring("Returns/sets the base URL for relative paths")]
+        HRESULT BaseURL([out, retval] BSTR* url);
+        [id(DISPID_BaseURL), propput, helpstring("Returns/sets the base URL for relative paths")]
+        HRESULT BaseURL([in] BSTR url);
+
+        [id(DISPID_StartTime), propget, helpstring("Returns/sets playback start time of URL.")]
+        HRESULT StartTime([out, retval] int* seconds);
+        [id(DISPID_StartTime), propput, helpstring("Returns/sets playback start time of URL.")]
+        HRESULT StartTime([in] int seconds);
+
+        [id(DISPID_MRL), propget, helpstring("Returns/sets the default MRL in playlist")]
+        HRESULT MRL([out, retval] BSTR* mrl);
+        [id(DISPID_MRL), propput, helpstring("Returns/sets the default MRL in playlist")]
+        HRESULT MRL([in] BSTR mrl);
+
+        [propget, helpstring("Returns VLC Version.")]
+        HRESULT VersionInfo([out, retval] BSTR* version);
+
+        [id(DISPID_Visible), propget, helpstring("Returns/sets a value that determines whether viewing area is visible or hidden.")]
+        HRESULT Visible([out, retval] VARIANT_BOOL* visible);
+        [id(DISPID_Visible), propput, helpstring("Returns/sets a value that determines whether viewing area is visible or hidden.")]
+        HRESULT Visible([in] VARIANT_BOOL visible);
+
+        [id(DISPID_Volume), propget, helpstring("Returns/sets default audio volume.")]
+        HRESULT Volume([out, retval] int* volume);
+        [id(DISPID_Volume), propput, helpstring("Returns/sets default audio volume.")]
+        HRESULT Volume([in] int volume);
+    };
+
+    [
+      odl,
       uuid(2D719729-5333-406C-BF12-8DE787FD65E3),
       helpstring("VLC Control"),
       dual,
       oleautomation
     ]
-    interface IVLCControl2 : IDispatch
+    interface IVLCControl2 : IVLCConfiguration
     {
         [propget, helpstring("Returns the audio object.")]
         HRESULT audio([out, retval] IVLCAudio** obj);

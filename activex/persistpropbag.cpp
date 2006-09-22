@@ -171,7 +171,14 @@ STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErr
     V_VT(&value) = VT_I4;
     if( S_OK == pPropBag->Read(OLESTR("starttime"), &value, pErrorLog) )
     {
-        _p_instance->setTime(V_I4(&value));
+        _p_instance->setStartTime(V_I4(&value));
+        VariantClear(&value);
+    }
+
+    V_VT(&value) = VT_BSTR;
+    if( S_OK == pPropBag->Read(OLESTR("baseurl"), &value, pErrorLog) )
+    {
+        _p_instance->setBaseURL(V_BSTR(&value));
         VariantClear(&value);
     }
 
@@ -221,8 +228,14 @@ STDMETHODIMP VLCPersistPropertyBag::Save(LPPROPERTYBAG pPropBag, BOOL fClearDirt
     VariantClear(&value);
 
     V_VT(&value) = VT_I4;
-    V_I4(&value) = _p_instance->getTime();
+    V_I4(&value) = _p_instance->getStartTime();
     pPropBag->Write(OLESTR("StartTime"), &value);
+    VariantClear(&value);
+
+    V_VT(&value) = VT_BSTR;
+    V_BSTR(&value) = SysAllocStringLen(_p_instance->getBaseURL(),
+                            SysStringLen(_p_instance->getBaseURL()));
+    pPropBag->Write(OLESTR("BaseURL"), &value);
     VariantClear(&value);
 
     if( fClearDirty )

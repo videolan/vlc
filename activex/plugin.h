@@ -120,8 +120,23 @@ public:
     BOOL getVisible(void) { return _b_visible; };
     BOOL isVisible(void) { return _b_visible || (! _b_usermode); };
 
+    inline void setStartTime(int time)
+    {
+        _i_time = time;
+        setDirty(TRUE);
+    };
+    inline int getStartTime(void) { return _i_time; };
+
     void setTime(int time);
     int  getTime(void) { return _i_time; };
+
+    void setBaseURL(BSTR url)
+    {
+        SysFreeString(_bstr_baseurl);
+        _bstr_baseurl = SysAllocStringLen(url, SysStringLen(url));
+        setDirty(TRUE);
+    };
+    const BSTR getBaseURL(void) { return _bstr_baseurl; };
 
     // control size in HIMETRIC
     inline void setExtent(const SIZEL& extent)
@@ -240,6 +255,7 @@ private:
     RECT _posRect;
 
     // persistable properties
+    BSTR _bstr_baseurl;
     BSTR _bstr_mrl;
     BOOL _b_autoplay;
     BOOL _b_autoloop;

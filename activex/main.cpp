@@ -384,6 +384,7 @@ STDAPI_(int) WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
         return 0;
  
     DWORD dwRegisterClassObject;
+    DWORD dwRegisterClassObject2;
 
     if( FAILED(CoRegisterClassObject(CLSID_VLCPlugin, classProc,
         CLSCTX_LOCAL_SERVER, REGCLS_MULTIPLEUSE, &dwRegisterClassObject)) )
@@ -393,6 +394,10 @@ STDAPI_(int) WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 
     if( FAILED(RegisterActiveObject(classProc, CLSID_VLCPlugin,
                     ACTIVEOBJECT_WEAK, &dwRegisterActiveObject)) )
+        return 0;
+
+    if( FAILED(RegisterActiveObject(classProc, CLSID_VLCPlugin2,
+                    ACTIVEOBJECT_WEAK, &dwRegisterActiveObject2)) )
         return 0;
 
     classProc->Release();
@@ -405,7 +410,7 @@ STDAPI_(int) WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
         while( PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) )
         {
             if( msg.message == WM_QUIT )
-                break;  // Leave the PeekMessage while() loop
+                break;  // break out PeekMessage loop
 
             /*if(TranslateAccelerator(ghwndApp, ghAccel, &msg))
                 continue;*/
@@ -415,7 +420,7 @@ STDAPI_(int) WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
         }
 
         if(msg.message == WM_QUIT)
-            break;  // Leave the for() loop
+            break;  // break out main loop
 
         WaitMessage();
     }
@@ -423,8 +428,11 @@ STDAPI_(int) WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     if( SUCCEEDED(RevokeActiveObject(dwRegisterActiveObject, NULL)) )
         CoRevokeClassObject(dwRegisterClassObject);
 
+    if( SUCCEEDED(RevokeActiveObject(dwRegisterActiveObject2, NULL)) )
+        CoRevokeClassObject(dwRegisterClassObject2);
+
     // Reached on WM_QUIT message
-    CoUninitialize();
+    OleUninitialize();
     return ((int) msg.wParam);
 };
 

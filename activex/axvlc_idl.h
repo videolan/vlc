@@ -46,7 +46,7 @@ typedef interface IVLCControl2 IVLCControl2;
 typedef interface DVLCEvents DVLCEvents;
 #endif
 
-enum VLCPlaylistMode {
+typedef enum VLCPlaylistMode {
     VLCPlayListInsert = 1,
     VLCPlayListInsertAndGo = 9,
     VLCPlayListReplace = 2,
@@ -54,8 +54,7 @@ enum VLCPlaylistMode {
     VLCPlayListAppend = 4,
     VLCPlayListAppendAndGo = 12,
     VLCPlayListCheckInsert = 16
-};
-
+} eVLCPlaylistMode;
 #define VLCPlayListEnd (-666)
 
 #define DISPID_Visible (100)
@@ -75,6 +74,10 @@ enum VLCPlaylistMode {
 #define DISPID_AutoPlay (107)
 
 #define DISPID_AutoLoop (108)
+
+#define DISPID_StartTime (109)
+
+#define DISPID_BaseURL (110)
 
 /*****************************************************************************
  * IVLCControl interface
@@ -1569,6 +1572,333 @@ void __RPC_STUB IVLCVideo_get_height_Stub(
 
 #endif  /* __IVLCVideo_INTERFACE_DEFINED__ */
 
+#ifndef __IVLCConfiguration_FWD_DEFINED__
+#define __IVLCConfiguration_FWD_DEFINED__
+typedef interface IVLCConfiguration IVLCConfiguration;
+#endif
+
+/*****************************************************************************
+ * IVLCConfiguration interface
+ */
+#ifndef __IVLCConfiguration_INTERFACE_DEFINED__
+#define __IVLCConfiguration_INTERFACE_DEFINED__
+
+DEFINE_GUID(IID_IVLCConfiguration, 0x15179cd8, 0xcc12, 0x4242, 0xa5,0x8e, 0xe4,0x12,0x21,0x7f,0xf3,0x43);
+#if defined(__cplusplus) && !defined(CINTERFACE)
+interface IVLCConfiguration : public IDispatch
+{
+    virtual HRESULT STDMETHODCALLTYPE get_AutoLoop(
+        VARIANT_BOOL* autoloop) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_AutoLoop(
+        VARIANT_BOOL autoloop) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_AutoPlay(
+        VARIANT_BOOL* autoplay) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_AutoPlay(
+        VARIANT_BOOL autoplay) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_BaseURL(
+        BSTR* url) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_BaseURL(
+        BSTR url) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_StartTime(
+        int* seconds) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_StartTime(
+        int seconds) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_MRL(
+        BSTR* mrl) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_MRL(
+        BSTR mrl) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_VersionInfo(
+        BSTR* version) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_Visible(
+        VARIANT_BOOL* visible) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_Visible(
+        VARIANT_BOOL visible) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_Volume(
+        int* volume) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_Volume(
+        int volume) = 0;
+
+};
+#else
+typedef struct IVLCConfigurationVtbl {
+    BEGIN_INTERFACE
+
+    /*** IUnknown methods ***/
+    HRESULT (STDMETHODCALLTYPE *QueryInterface)(
+        IVLCConfiguration* This,
+        REFIID riid,
+        void** ppvObject);
+
+    ULONG (STDMETHODCALLTYPE *AddRef)(
+        IVLCConfiguration* This);
+
+    ULONG (STDMETHODCALLTYPE *Release)(
+        IVLCConfiguration* This);
+
+    /*** IDispatch methods ***/
+    HRESULT (STDMETHODCALLTYPE *GetTypeInfoCount)(
+        IVLCConfiguration* This,
+        UINT* pctinfo);
+
+    HRESULT (STDMETHODCALLTYPE *GetTypeInfo)(
+        IVLCConfiguration* This,
+        UINT iTInfo,
+        LCID lcid,
+        ITypeInfo** ppTInfo);
+
+    HRESULT (STDMETHODCALLTYPE *GetIDsOfNames)(
+        IVLCConfiguration* This,
+        REFIID riid,
+        LPOLESTR* rgszNames,
+        UINT cNames,
+        LCID lcid,
+        DISPID* rgDispId);
+
+    HRESULT (STDMETHODCALLTYPE *Invoke)(
+        IVLCConfiguration* This,
+        DISPID dispIdMember,
+        REFIID riid,
+        LCID lcid,
+        WORD wFlags,
+        DISPPARAMS* pDispParams,
+        VARIANT* pVarResult,
+        EXCEPINFO* pExcepInfo,
+        UINT* puArgErr);
+
+    /*** IVLCConfiguration methods ***/
+    HRESULT (STDMETHODCALLTYPE *get_AutoLoop)(
+        IVLCConfiguration* This,
+        VARIANT_BOOL* autoloop);
+
+    HRESULT (STDMETHODCALLTYPE *put_AutoLoop)(
+        IVLCConfiguration* This,
+        VARIANT_BOOL autoloop);
+
+    HRESULT (STDMETHODCALLTYPE *get_AutoPlay)(
+        IVLCConfiguration* This,
+        VARIANT_BOOL* autoplay);
+
+    HRESULT (STDMETHODCALLTYPE *put_AutoPlay)(
+        IVLCConfiguration* This,
+        VARIANT_BOOL autoplay);
+
+    HRESULT (STDMETHODCALLTYPE *get_BaseURL)(
+        IVLCConfiguration* This,
+        BSTR* url);
+
+    HRESULT (STDMETHODCALLTYPE *put_BaseURL)(
+        IVLCConfiguration* This,
+        BSTR url);
+
+    HRESULT (STDMETHODCALLTYPE *get_StartTime)(
+        IVLCConfiguration* This,
+        int* seconds);
+
+    HRESULT (STDMETHODCALLTYPE *put_StartTime)(
+        IVLCConfiguration* This,
+        int seconds);
+
+    HRESULT (STDMETHODCALLTYPE *get_MRL)(
+        IVLCConfiguration* This,
+        BSTR* mrl);
+
+    HRESULT (STDMETHODCALLTYPE *put_MRL)(
+        IVLCConfiguration* This,
+        BSTR mrl);
+
+    HRESULT (STDMETHODCALLTYPE *get_VersionInfo)(
+        IVLCConfiguration* This,
+        BSTR* version);
+
+    HRESULT (STDMETHODCALLTYPE *get_Visible)(
+        IVLCConfiguration* This,
+        VARIANT_BOOL* visible);
+
+    HRESULT (STDMETHODCALLTYPE *put_Visible)(
+        IVLCConfiguration* This,
+        VARIANT_BOOL visible);
+
+    HRESULT (STDMETHODCALLTYPE *get_Volume)(
+        IVLCConfiguration* This,
+        int* volume);
+
+    HRESULT (STDMETHODCALLTYPE *put_Volume)(
+        IVLCConfiguration* This,
+        int volume);
+
+    END_INTERFACE
+} IVLCConfigurationVtbl;
+interface IVLCConfiguration {
+    const IVLCConfigurationVtbl* lpVtbl;
+};
+
+#ifdef COBJMACROS
+/*** IUnknown methods ***/
+#define IVLCConfiguration_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
+#define IVLCConfiguration_AddRef(p) (p)->lpVtbl->AddRef(p)
+#define IVLCConfiguration_Release(p) (p)->lpVtbl->Release(p)
+/*** IDispatch methods ***/
+#define IVLCConfiguration_GetTypeInfoCount(p,a) (p)->lpVtbl->GetTypeInfoCount(p,a)
+#define IVLCConfiguration_GetTypeInfo(p,a,b,c) (p)->lpVtbl->GetTypeInfo(p,a,b,c)
+#define IVLCConfiguration_GetIDsOfNames(p,a,b,c,d,e) (p)->lpVtbl->GetIDsOfNames(p,a,b,c,d,e)
+#define IVLCConfiguration_Invoke(p,a,b,c,d,e,f,g,h) (p)->lpVtbl->Invoke(p,a,b,c,d,e,f,g,h)
+/*** IVLCConfiguration methods ***/
+#define IVLCConfiguration_get_AutoLoop(p,a) (p)->lpVtbl->get_AutoLoop(p,a)
+#define IVLCConfiguration_put_AutoLoop(p,a) (p)->lpVtbl->put_AutoLoop(p,a)
+#define IVLCConfiguration_get_AutoPlay(p,a) (p)->lpVtbl->get_AutoPlay(p,a)
+#define IVLCConfiguration_put_AutoPlay(p,a) (p)->lpVtbl->put_AutoPlay(p,a)
+#define IVLCConfiguration_get_BaseURL(p,a) (p)->lpVtbl->get_BaseURL(p,a)
+#define IVLCConfiguration_put_BaseURL(p,a) (p)->lpVtbl->put_BaseURL(p,a)
+#define IVLCConfiguration_get_StartTime(p,a) (p)->lpVtbl->get_StartTime(p,a)
+#define IVLCConfiguration_put_StartTime(p,a) (p)->lpVtbl->put_StartTime(p,a)
+#define IVLCConfiguration_get_MRL(p,a) (p)->lpVtbl->get_MRL(p,a)
+#define IVLCConfiguration_put_MRL(p,a) (p)->lpVtbl->put_MRL(p,a)
+#define IVLCConfiguration_get_VersionInfo(p,a) (p)->lpVtbl->get_VersionInfo(p,a)
+#define IVLCConfiguration_get_Visible(p,a) (p)->lpVtbl->get_Visible(p,a)
+#define IVLCConfiguration_put_Visible(p,a) (p)->lpVtbl->put_Visible(p,a)
+#define IVLCConfiguration_get_Volume(p,a) (p)->lpVtbl->get_Volume(p,a)
+#define IVLCConfiguration_put_Volume(p,a) (p)->lpVtbl->put_Volume(p,a)
+#endif
+
+#endif
+
+HRESULT CALLBACK IVLCConfiguration_get_AutoLoop_Proxy(
+    IVLCConfiguration* This,
+    VARIANT_BOOL* autoloop);
+void __RPC_STUB IVLCConfiguration_get_AutoLoop_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_put_AutoLoop_Proxy(
+    IVLCConfiguration* This,
+    VARIANT_BOOL autoloop);
+void __RPC_STUB IVLCConfiguration_put_AutoLoop_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_get_AutoPlay_Proxy(
+    IVLCConfiguration* This,
+    VARIANT_BOOL* autoplay);
+void __RPC_STUB IVLCConfiguration_get_AutoPlay_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_put_AutoPlay_Proxy(
+    IVLCConfiguration* This,
+    VARIANT_BOOL autoplay);
+void __RPC_STUB IVLCConfiguration_put_AutoPlay_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_get_BaseURL_Proxy(
+    IVLCConfiguration* This,
+    BSTR* url);
+void __RPC_STUB IVLCConfiguration_get_BaseURL_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_put_BaseURL_Proxy(
+    IVLCConfiguration* This,
+    BSTR url);
+void __RPC_STUB IVLCConfiguration_put_BaseURL_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_get_StartTime_Proxy(
+    IVLCConfiguration* This,
+    int* seconds);
+void __RPC_STUB IVLCConfiguration_get_StartTime_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_put_StartTime_Proxy(
+    IVLCConfiguration* This,
+    int seconds);
+void __RPC_STUB IVLCConfiguration_put_StartTime_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_get_MRL_Proxy(
+    IVLCConfiguration* This,
+    BSTR* mrl);
+void __RPC_STUB IVLCConfiguration_get_MRL_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_put_MRL_Proxy(
+    IVLCConfiguration* This,
+    BSTR mrl);
+void __RPC_STUB IVLCConfiguration_put_MRL_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_get_VersionInfo_Proxy(
+    IVLCConfiguration* This,
+    BSTR* version);
+void __RPC_STUB IVLCConfiguration_get_VersionInfo_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_get_Visible_Proxy(
+    IVLCConfiguration* This,
+    VARIANT_BOOL* visible);
+void __RPC_STUB IVLCConfiguration_get_Visible_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_put_Visible_Proxy(
+    IVLCConfiguration* This,
+    VARIANT_BOOL visible);
+void __RPC_STUB IVLCConfiguration_put_Visible_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_get_Volume_Proxy(
+    IVLCConfiguration* This,
+    int* volume);
+void __RPC_STUB IVLCConfiguration_get_Volume_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCConfiguration_put_Volume_Proxy(
+    IVLCConfiguration* This,
+    int volume);
+void __RPC_STUB IVLCConfiguration_put_Volume_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+
+#endif  /* __IVLCConfiguration_INTERFACE_DEFINED__ */
+
 /*****************************************************************************
  * IVLCControl2 interface
  */
@@ -1577,7 +1907,7 @@ void __RPC_STUB IVLCVideo_get_height_Stub(
 
 DEFINE_GUID(IID_IVLCControl2, 0x2d719729, 0x5333, 0x406c, 0xbf,0x12, 0x8d,0xe7,0x87,0xfd,0x65,0xe3);
 #if defined(__cplusplus) && !defined(CINTERFACE)
-interface IVLCControl2 : public IDispatch
+interface IVLCControl2 : public IVLCConfiguration
 {
     virtual HRESULT STDMETHODCALLTYPE get_audio(
         IVLCAudio** obj) = 0;
@@ -1638,6 +1968,67 @@ typedef struct IVLCControl2Vtbl {
         EXCEPINFO* pExcepInfo,
         UINT* puArgErr);
 
+    /*** IVLCConfiguration methods ***/
+    HRESULT (STDMETHODCALLTYPE *get_AutoLoop)(
+        IVLCControl2* This,
+        VARIANT_BOOL* autoloop);
+
+    HRESULT (STDMETHODCALLTYPE *put_AutoLoop)(
+        IVLCControl2* This,
+        VARIANT_BOOL autoloop);
+
+    HRESULT (STDMETHODCALLTYPE *get_AutoPlay)(
+        IVLCControl2* This,
+        VARIANT_BOOL* autoplay);
+
+    HRESULT (STDMETHODCALLTYPE *put_AutoPlay)(
+        IVLCControl2* This,
+        VARIANT_BOOL autoplay);
+
+    HRESULT (STDMETHODCALLTYPE *get_BaseURL)(
+        IVLCControl2* This,
+        BSTR* url);
+
+    HRESULT (STDMETHODCALLTYPE *put_BaseURL)(
+        IVLCControl2* This,
+        BSTR url);
+
+    HRESULT (STDMETHODCALLTYPE *get_StartTime)(
+        IVLCControl2* This,
+        int* seconds);
+
+    HRESULT (STDMETHODCALLTYPE *put_StartTime)(
+        IVLCControl2* This,
+        int seconds);
+
+    HRESULT (STDMETHODCALLTYPE *get_MRL)(
+        IVLCControl2* This,
+        BSTR* mrl);
+
+    HRESULT (STDMETHODCALLTYPE *put_MRL)(
+        IVLCControl2* This,
+        BSTR mrl);
+
+    HRESULT (STDMETHODCALLTYPE *get_VersionInfo)(
+        IVLCControl2* This,
+        BSTR* version);
+
+    HRESULT (STDMETHODCALLTYPE *get_Visible)(
+        IVLCControl2* This,
+        VARIANT_BOOL* visible);
+
+    HRESULT (STDMETHODCALLTYPE *put_Visible)(
+        IVLCControl2* This,
+        VARIANT_BOOL visible);
+
+    HRESULT (STDMETHODCALLTYPE *get_Volume)(
+        IVLCControl2* This,
+        int* volume);
+
+    HRESULT (STDMETHODCALLTYPE *put_Volume)(
+        IVLCControl2* This,
+        int volume);
+
     /*** IVLCControl2 methods ***/
     HRESULT (STDMETHODCALLTYPE *get_audio)(
         IVLCControl2* This,
@@ -1671,6 +2062,22 @@ interface IVLCControl2 {
 #define IVLCControl2_GetTypeInfo(p,a,b,c) (p)->lpVtbl->GetTypeInfo(p,a,b,c)
 #define IVLCControl2_GetIDsOfNames(p,a,b,c,d,e) (p)->lpVtbl->GetIDsOfNames(p,a,b,c,d,e)
 #define IVLCControl2_Invoke(p,a,b,c,d,e,f,g,h) (p)->lpVtbl->Invoke(p,a,b,c,d,e,f,g,h)
+/*** IVLCConfiguration methods ***/
+#define IVLCControl2_get_AutoLoop(p,a) (p)->lpVtbl->get_AutoLoop(p,a)
+#define IVLCControl2_put_AutoLoop(p,a) (p)->lpVtbl->put_AutoLoop(p,a)
+#define IVLCControl2_get_AutoPlay(p,a) (p)->lpVtbl->get_AutoPlay(p,a)
+#define IVLCControl2_put_AutoPlay(p,a) (p)->lpVtbl->put_AutoPlay(p,a)
+#define IVLCControl2_get_BaseURL(p,a) (p)->lpVtbl->get_BaseURL(p,a)
+#define IVLCControl2_put_BaseURL(p,a) (p)->lpVtbl->put_BaseURL(p,a)
+#define IVLCControl2_get_StartTime(p,a) (p)->lpVtbl->get_StartTime(p,a)
+#define IVLCControl2_put_StartTime(p,a) (p)->lpVtbl->put_StartTime(p,a)
+#define IVLCControl2_get_MRL(p,a) (p)->lpVtbl->get_MRL(p,a)
+#define IVLCControl2_put_MRL(p,a) (p)->lpVtbl->put_MRL(p,a)
+#define IVLCControl2_get_VersionInfo(p,a) (p)->lpVtbl->get_VersionInfo(p,a)
+#define IVLCControl2_get_Visible(p,a) (p)->lpVtbl->get_Visible(p,a)
+#define IVLCControl2_put_Visible(p,a) (p)->lpVtbl->put_Visible(p,a)
+#define IVLCControl2_get_Volume(p,a) (p)->lpVtbl->get_Volume(p,a)
+#define IVLCControl2_put_Volume(p,a) (p)->lpVtbl->put_Volume(p,a)
 /*** IVLCControl2 methods ***/
 #define IVLCControl2_get_audio(p,a) (p)->lpVtbl->get_audio(p,a)
 #define IVLCControl2_get_input(p,a) (p)->lpVtbl->get_input(p,a)
