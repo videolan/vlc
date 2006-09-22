@@ -172,19 +172,10 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
                                 BasePlaylistWidget ( _p_intf)
 {
     QVBoxLayout *left = new QVBoxLayout( );
-    QHBoxLayout *middle = new QHBoxLayout;
 
     selector = new PLSelector( this, p_intf, THEPL );
     selector->setMaximumWidth( 130 );
     left->addWidget( selector );
-
-/*    QPushButton *undockButton = new QPushButton( "UN", this );
-    undockButton->setMaximumWidth( 25 );
-    undockButton->setToolTip( qtr( "Undock playlist for main interface" ) );
-    BUTTONACT( undockButton, undock() );
-    middle->addWidget( undockButton );
-*/
-    left->addLayout( middle );
 
     QLabel *art = new QLabel( "" );
     art->setMaximumHeight( 128 );
