@@ -39,7 +39,11 @@ public:
         if( !instance) instance = new PlaylistDialog( p_intf );
         return instance;
     }
-    static void killInstance() { if( instance ) delete instance; }
+    static void killInstance()
+    {
+        if( instance ) delete instance;
+        instance = NULL;
+    }
     virtual ~PlaylistDialog();
 private:
 
@@ -52,6 +56,7 @@ private:
     PLSelector *selector;
     PLPanel *rightPanel;
 private slots:
+    void dock();
     void SDMenuAction( QString );
 };
 

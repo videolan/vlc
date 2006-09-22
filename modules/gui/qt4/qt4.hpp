@@ -63,6 +63,8 @@ struct intf_sys_t
 #define ON_TIMEOUT( act ) CONNECT( THEDP->fixed_timer, timeout(), this, act )
 
 static int DialogEvent_Type = QEvent::User + 1;
+static int PLUndockEvent_Type = QEvent::User + 2;
+static int PLDockEvent_Type = QEvent::User + 3;
 
 class DialogEvent : public QEvent
 {

@@ -22,16 +22,19 @@
  ******************************************************************************/
 
 #include "dialogs/playlist.hpp"
-#include "util/qvlcframe.hpp"
+
 #include "qt4.hpp"
+#include "main_interface.hpp"
+#include "util/qvlcframe.hpp"
 #include "components/playlist/panels.hpp"
 #include "components/playlist/selector.hpp"
+#include "dialogs_provider.hpp"
+
 #include <QHBoxLayout>
 #include <QSignalMapper>
 #include <QMenu>
 #include <QAction>
 #include <QMenuBar>
-#include "dialogs_provider.hpp"
 
 PlaylistDialog *PlaylistDialog::instance = NULL;
 
@@ -91,6 +94,7 @@ void PlaylistDialog::createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
     manageMenu->addMenu( subML );
     manageMenu->addAction( "Open playlist file", THEDP, SLOT( openPlaylist() ));
 
+    manageMenu->addAction( "Dock playlist", this, SLOT( dock() ) );
     bar->addMenu( manageMenu );
     bar->addMenu( SDMenu() );
 }
@@ -132,6 +136,13 @@ QMenu *PlaylistDialog::SDMenu()
     }
     vlc_list_release( p_list );
     return menu;
+}
+
+void PlaylistDialog::dock()
+{
+    hide();
+    QEvent *event = new QEvent( (QEvent::Type)(PLDockEvent_Type) );
+    QApplication::postEvent( p_intf->p_sys->p_mi, event );
 }
 
 void PlaylistDialog::SDMenuAction( QString data )

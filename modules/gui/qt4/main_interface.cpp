@@ -375,8 +375,7 @@ void MainInterface::visual()
         /* Stop any currently running visualization */
         visualSelector->hide();
     }
-    calculateInterfaceSize();
-    resize( mainSize );
+    doComponentsUpdate();
 }
 
 void MainInterface::playlist()
@@ -426,9 +425,7 @@ void MainInterface::playlist()
         }
         if( VISIBLE( bgWidget ) ) bgWidget->hide();
     }
-
-    calculateInterfaceSize();
-    resize( mainSize );
+    doComponentsUpdate();
 }
 
 /* Video widget cannot do this synchronously as it runs in another thread */
@@ -437,6 +434,23 @@ void MainInterface::doComponentsUpdate()
 {
     calculateInterfaceSize();
     resize( mainSize );
+}
+
+void MainInterface::customEvent( QEvent *event )
+{
+    if( event->type() == PLUndockEvent_Type )
+    {
+        ui.vboxLayout->removeWidget( playlistWidget );
+        playlistWidget = NULL;
+        playlistEmbeddedFlag = false;
+        doComponentsUpdate();
+    }
+    else if( event->type() == PLDockEvent_Type )
+    {
+        PlaylistDialog::killInstance();
+        playlistEmbeddedFlag = true;
+        playlist();
+    }
 }
 
 /************************************************************************

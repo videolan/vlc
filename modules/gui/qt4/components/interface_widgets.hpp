@@ -106,6 +106,8 @@ private:
     PLSelector *selector;
     PLPanel *rightPanel;
     intf_thread_t *p_intf;
+private slots:
+    void undock();
 };
 
 #endif

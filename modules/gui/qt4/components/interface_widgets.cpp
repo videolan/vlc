@@ -182,6 +182,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
 
     QPushButton *undockButton = new QPushButton( "UN", this );
     undockButton->setMaximumWidth( 25 );
+    BUTTONACT( undockButton, undock() );
+
     undockButton->setToolTip( qtr( "Undock playlist for main interface" ) );
     QPushButton *sourcesButton = new QPushButton( "Sources", this );
     sourcesButton->setToolTip( qtr( "Select additional stream sources" ) );
@@ -212,6 +214,16 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
 
 PlaylistWidget::~PlaylistWidget()
 {
+}
+
+void PlaylistWidget::undock()
+{
+    hide();
+    THEDP->playlistDialog();
+    deleteLater();
+
+    QEvent *event = new QEvent( (QEvent::Type)(PLUndockEvent_Type) );
+    QApplication::postEvent( p_intf->p_sys->p_mi, event );
 }
 
 QSize PlaylistWidget::sizeHint() const

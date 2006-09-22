@@ -34,7 +34,7 @@ class QSettings;
 class QCloseEvent;
 class QKeyEvent;
 class QLabel;
-
+class QEvent;
 class InputManager;
 class InputSlider;
 class VideoWidget;
@@ -86,6 +86,8 @@ private:
 
     QLabel              *timeLabel;
     QLabel              *nameLabel;
+
+    void customEvent( QEvent *);
 private slots:
     void setStatus( int );
     void setName( QString );
