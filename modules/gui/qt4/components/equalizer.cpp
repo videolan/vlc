@@ -70,6 +70,7 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
     {
         bands[i] = new QSlider( Qt::Vertical );
         bands[i]->setMaximum( 400 );
+        bands[i]->setValue( 200 );
         CONNECT( bands[i], valueChanged(int), this, setBand() );
         band_texts[i] = new QLabel( band_frequencies[i] + "\n0.0dB" );
         band_texts[i]->setFont( smallFont );
@@ -196,20 +197,21 @@ void Equalizer::setBand()
 void Equalizer::setValues( char *psz_bands, float f_preamp )
 {
     char *p = psz_bands;
-    for( int i = 0; i < 10; i++ )
+    if ( p )
     {
-        char psz_val[5];
-
-        float f = strtof( p, &p );
-        int  i_val= (int)( ( f + 20 ) * 10 );
-        bands[i]->setValue(  i_val );
-
-        sprintf( psz_val, "% 5.1f", f );
-        band_texts[i]->setText( band_frequencies[i] + "\n" + psz_val + "dB" );
-
-        if( p == NULL ) break;
-        p++;
-        if( *p == 0 )  break;
+        for( int i = 0; i < 10; i++ )
+        {
+            char psz_val[5];
+            float f = strtof( p, &p );
+            int  i_val= (int)( ( f + 20 ) * 10 );
+            bands[i]->setValue(  i_val );
+            sprintf( psz_val, "% 5.1f", f );
+            band_texts[i]->setText( band_frequencies[i] + "\n" + psz_val +
+                                    "dB" );
+            if( p == NULL ) break;
+            p++;
+            if( *p == 0 )  break;
+        }
     }
     char psz_val[5];
     int i_val = (int)( ( f_preamp + 20 ) * 10 );
