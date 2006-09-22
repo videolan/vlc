@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include "qt4.hpp"
+#include "dialogs_provider.hpp"
 #include "playlist_model.hpp"
 #include "components/playlist/panels.hpp"
 #include "util/customwidgets.hpp"
@@ -36,10 +37,12 @@
 #include <QToolBar>
 #include <QLabel>
 #include <QSpacerItem>
+#include <QMenu>
 
 #include <assert.h>
 
-StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
+StandardPLPanel::StandardPLPanel( BasePlaylistWidget *_parent,
+                                  intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
                                   playlist_item_t *p_root ):
                                   PLPanel( _parent, _p_intf )
@@ -62,20 +65,28 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
     CONNECT( model, dataChanged( const QModelIndex&, const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
 
+    currentRootId = -1;
+    CONNECT( parent, rootChanged(int), this, setCurrentRootId( int ) );
+
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing( 0 ); layout->setMargin( 0 );
 
     QHBoxLayout *buttons = new QHBoxLayout();
 
+    addButton = new QPushButton( "+", this );
+    addButton->setMaximumWidth( 25 );
+    BUTTONACT( addButton, add() );
+    buttons->addWidget( addButton );
+
     repeatButton = new QPushButton( 0 ); buttons->addWidget( repeatButton );
-    if( model->hasRepeat() ) repeatButton->setText( qtr( "Repeat One" ) );
-    else if( model->hasLoop() ) repeatButton->setText( qtr( "Repeat All" ) );
-    else repeatButton->setText( qtr( "No Repeat" ) );
+    if( model->hasRepeat() ) repeatButton->setText( qtr( "R1" ) );
+    else if( model->hasLoop() ) repeatButton->setText( qtr( "RA" ) );
+    else repeatButton->setText( qtr( "NR" ) );
     BUTTONACT( repeatButton, toggleRepeat() );
 
     randomButton = new QPushButton( 0 ); buttons->addWidget( randomButton );
-    if( model->hasRandom() ) randomButton->setText( qtr( "Random" ) );
-    else randomButton->setText( qtr( "No random" ) );
+    if( model->hasRandom() ) randomButton->setText( qtr( " RND" ) );
+    else randomButton->setText( qtr( "NRND" ) );
     BUTTONACT( randomButton, toggleRandom() );
 
     QSpacerItem *spacer = new QSpacerItem( 10, 20 );buttons->addItem( spacer );
@@ -87,6 +98,7 @@ StandardPLPanel::StandardPLPanel( QWidget *_parent, intf_thread_t *_p_intf,
     buttons->addWidget( searchLine ); filter->setBuddy( searchLine );
 
     QPushButton *clear = new QPushButton( qfu( "CL") );
+    clear->setMaximumWidth( 30 );
     buttons->addWidget( clear );
     BUTTONACT( clear, clearFilter() );
 
@@ -134,6 +146,44 @@ void StandardPLPanel::handleExpansion( const QModelIndex &index )
             parent = model->parent( parent );
         }
     }
+}
+
+void StandardPLPanel::setCurrentRootId( int _new )
+{
+    currentRootId = _new;
+    if( currentRootId == THEPL->p_local_category->i_id ||
+        currentRootId == THEPL->p_local_onelevel->i_id  )
+    {
+        addButton->setEnabled( true );
+        addButton->setToolTip( qtr("Add to playlist" ) );
+    }
+    else if( currentRootId == THEPL->p_ml_category->i_id ||
+             currentRootId == THEPL->p_ml_onelevel->i_id )
+    {
+        addButton->setEnabled( true );
+        addButton->setToolTip( qtr("Add to media library" ) );
+    }
+    else
+        addButton->setEnabled( false );
+}
+
+void StandardPLPanel::add()
+{
+    QMenu *popup = new QMenu();
+    if( currentRootId == THEPL->p_local_category->i_id ||
+        currentRootId == THEPL->p_local_onelevel->i_id )
+    {
+        popup->addAction( "Add file", THEDP, SLOT( simplePLAppendDialog() ) );
+        popup->addAction( "Advanced add", THEDP, SLOT( PLAppendDialog() ) );
+    }
+    else if( currentRootId == THEPL->p_ml_category->i_id ||
+             currentRootId == THEPL->p_ml_onelevel->i_id )
+    {
+        popup->addAction( "Add file", THEDP, SLOT( simpleMLAppendDialog() ) );
+        popup->addAction( "Advanced add", THEDP, SLOT( MLAppendDialog() ) );
+        popup->addAction( "Directory", THEDP, SLOT( openMLDirectory() ) );
+    }
+    popup->popup( QCursor::pos() );
 }
 
 void StandardPLPanel::clearFilter()

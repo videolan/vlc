@@ -25,6 +25,9 @@
 #define _PLPANELS_H_
 
 #include <vlc/vlc.h>
+
+#include "qt4.hpp"
+
 #include <QModelIndex>
 #include <QWidget>
 #include <QString>
@@ -39,13 +42,15 @@ class PLPanel: public QWidget
 {
     Q_OBJECT;
 public:
-    PLPanel( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
+    PLPanel( BasePlaylistWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
     {
         p_intf = _p_intf;
+        parent = p;
     }
     virtual ~PLPanel() {};
 protected:
     intf_thread_t *p_intf;
+    BasePlaylistWidget *parent;
 public slots:
     virtual void setRoot( int ) = 0;
 };
@@ -55,7 +60,7 @@ class StandardPLPanel: public PLPanel
 {
     Q_OBJECT;
 public:
-    StandardPLPanel( QWidget *, intf_thread_t *,
+    StandardPLPanel( BasePlaylistWidget *, intf_thread_t *,
                      playlist_t *,playlist_item_t * );
     virtual ~StandardPLPanel();
 protected:
@@ -63,8 +68,9 @@ protected:
 private:
     PLModel *model;
     QTreeView *view;
-    QPushButton *repeatButton , *randomButton;
+    QPushButton *repeatButton , *randomButton,*addButton;
     ClickLineEdit *searchLine;
+    int currentRootId;
 public slots:
     virtual void setRoot( int );
 private slots:
@@ -75,6 +81,8 @@ private slots:
     void doPopup( QModelIndex index, QPoint point );
     void search( QString search );
     void clearFilter();
+    void add();
+    void setCurrentRootId( int );
 };
 
 #endif

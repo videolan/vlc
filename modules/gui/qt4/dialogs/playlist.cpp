@@ -26,8 +26,7 @@
 #include "qt4.hpp"
 #include "main_interface.hpp"
 #include "util/qvlcframe.hpp"
-#include "components/playlist/panels.hpp"
-#include "components/playlist/selector.hpp"
+#include "components/interface_widgets.hpp"
 #include "dialogs_provider.hpp"
 #include "menus.hpp"
 
@@ -45,22 +44,12 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setCentralWidget( main );
     setWindowTitle( qtr( "Playlist" ) );
 
-   createPlMenuBar( menuBar(), p_intf );
+    createPlMenuBar( menuBar(), p_intf );
 
-    selector = new PLSelector( centralWidget(), p_intf, THEPL );
-    selector->setMaximumWidth( 130 );
+    QHBoxLayout *l = new QHBoxLayout( centralWidget() );
+    PlaylistWidget *plw = new PlaylistWidget( p_intf );
+    l->addWidget( plw );
 
-    playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
-                                                THEPL->p_local_category );
-
-    rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( centralWidget(),
-                              p_intf, THEPL, p_root ) );
-    CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
-
-    QHBoxLayout *layout = new QHBoxLayout();
-    layout->addWidget( selector, 0 );
-    layout->addWidget( rightPanel, 10 );
-    centralWidget()->setLayout( layout );
     readSettings( "playlist", QSize( 600,700 ) );
 }
 
@@ -72,27 +61,9 @@ PlaylistDialog::~PlaylistDialog()
 void PlaylistDialog::createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
 {
     QMenu *manageMenu = new QMenu();
-    manageMenu->setTitle( qtr("Add") );
-
-    QMenu *subPlaylist = new QMenu();
-    subPlaylist->setTitle( qtr("Add to current playlist") );
-    subPlaylist->addAction( "&File...", THEDP,
-                           SLOT( simplePLAppendDialog() ) );
-    subPlaylist->addAction( "&Advanced add...", THEDP,
-                           SLOT( PLAppendDialog() ) );
-    manageMenu->addMenu( subPlaylist );
-    manageMenu->addSeparator();
-
-    QMenu *subML = new QMenu();
-    subML->setTitle( qtr("Add to Media library") );
-    subML->addAction( "&File...", THEDP,
-                           SLOT( simpleMLAppendDialog() ) );
-    subML->addAction( "Directory", THEDP, SLOT( openMLDirectory() ));
-    subML->addAction( "&Advanced add...", THEDP,
-                           SLOT( MLAppendDialog() ) );
-    manageMenu->addMenu( subML );
+    manageMenu->setTitle( qtr("Manage") );
     manageMenu->addAction( "Open playlist file", THEDP, SLOT( openPlaylist() ));
-
+    manageMenu->addSeparator();
     manageMenu->addAction( "Dock playlist", this, SLOT( dock() ) );
     bar->addMenu( manageMenu );
     bar->addMenu( QVLCMenu::SDMenu( p_intf ) );

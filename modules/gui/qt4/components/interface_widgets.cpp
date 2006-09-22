@@ -168,8 +168,8 @@ VisualSelector::~VisualSelector()
 #include "components/playlist/panels.hpp"
 #include "components/playlist/selector.hpp"
 
-PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
-                                                            p_intf( _p_intf )
+PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
+                                BasePlaylistWidget ( _p_intf)
 {
     QVBoxLayout *left = new QVBoxLayout( );
     QHBoxLayout *middle = new QHBoxLayout;
@@ -178,17 +178,12 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
     selector->setMaximumWidth( 130 );
     left->addWidget( selector );
 
-    QPushButton *undockButton = new QPushButton( "UN", this );
+/*    QPushButton *undockButton = new QPushButton( "UN", this );
     undockButton->setMaximumWidth( 25 );
     undockButton->setToolTip( qtr( "Undock playlist for main interface" ) );
     BUTTONACT( undockButton, undock() );
     middle->addWidget( undockButton );
-
-    addButton = new QPushButton( "+", this );
-    addButton->setMaximumWidth( 25 );
-    BUTTONACT( addButton, add() );
-    middle->addWidget( addButton );
-
+*/
     left->addLayout( middle );
 
     QLabel *art = new QLabel( "" );
@@ -200,13 +195,15 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
 
     playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
                                                 THEPL->p_local_category );
-    currentRootId = p_root->i_id;
 
     rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( this,
                               p_intf, THEPL, p_root ) );
 
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
-    CONNECT( selector, activated( int ), this, setCurrentRootId( int ) );
+
+    connect( selector, SIGNAL(activated( int )),
+             this, SIGNAL( rootChanged( int ) ) );
+    emit rootChanged( p_root->i_id );
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->addLayout( left, 0 );
@@ -216,54 +213,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
 
 PlaylistWidget::~PlaylistWidget()
 {
-}
-
-void PlaylistWidget::setCurrentRootId( int _new )
-{
-    currentRootId = _new;
-    if( currentRootId == THEPL->p_local_category->i_id ||
-        currentRootId == THEPL->p_local_onelevel->i_id  )
-    {
-        addButton->setEnabled( true );
-        addButton->setToolTip( qtr("Add to playlist" ) );
-    }
-    else if( currentRootId == THEPL->p_ml_category->i_id ||
-             currentRootId == THEPL->p_ml_onelevel->i_id )
-    {
-        addButton->setEnabled( true );
-        addButton->setToolTip( qtr("Add to media library" ) );
-    }
-    else
-        addButton->setEnabled( false );
-}
-
-void PlaylistWidget::undock()
-{
-    hide();
-    THEDP->playlistDialog();
-    deleteLater();
-
-    QEvent *event = new QEvent( (QEvent::Type)(PLUndockEvent_Type) );
-    QApplication::postEvent( p_intf->p_sys->p_mi, event );
-}
-
-void PlaylistWidget::add()
-{
-    QMenu *popup = new QMenu();
-    if( currentRootId == THEPL->p_local_category->i_id ||
-        currentRootId == THEPL->p_local_onelevel->i_id )
-    {
-        popup->addAction( "Add file", THEDP, SLOT( simplePLAppendDialog() ) );
-        popup->addAction( "Advanced add", THEDP, SLOT( PLAppendDialog() ) );
-    }
-    else if( currentRootId == THEPL->p_ml_category->i_id ||
-             currentRootId == THEPL->p_ml_onelevel->i_id )
-    {
-        popup->addAction( "Add file", THEDP, SLOT( simpleMLAppendDialog() ) );
-        popup->addAction( "Advanced add", THEDP, SLOT( MLAppendDialog() ) );
-        popup->addAction( "Directory", THEDP, SLOT( openMLDirectory() ) );
-    }
-    popup->popup( QCursor::pos() );
 }
 
 QSize PlaylistWidget::sizeHint() const

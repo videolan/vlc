@@ -27,6 +27,8 @@
 #include <QActionGroup>
 #include <QSignalMapper>
 
+#include "main_interface.hpp"
+
 #include "menus.hpp"
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"
@@ -117,13 +119,14 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() ); \
     THEDP->menusUpdateMapper->setMapping( menu, f ); }
 
-void QVLCMenu::createMenuBar( QMenuBar *bar, intf_thread_t *p_intf,
+void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
                               bool playlist )
 {
+    QMenuBar *bar = mi->menuBar();
     BAR_ADD( FileMenu(), qtr("File") );
     if( playlist )
     {
-        BAR_ADD( PlaylistMenu( p_intf ), qtr("Playlist" ) );
+        BAR_ADD( PlaylistMenu( mi,p_intf ), qtr("Playlist" ) );
     }
     BAR_ADD( ToolsMenu( p_intf ), qtr("Tools") );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr("Video"), 1 );
@@ -144,7 +147,7 @@ QMenu *QVLCMenu::FileMenu()
     return menu;
 }
 
-QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf )
+QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
     menu->addMenu( SDMenu( p_intf ) );
@@ -152,6 +155,9 @@ QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf )
 
     DP_SADD( qtr( "Open playlist file"), "", "", openPlaylist() );
 //    DP_SADD( qtr( "Save playlist to file" ), "", "", savePlaylist() );
+    menu->addSeparator();
+    menu->addAction( qtr("Undock from interface"), mi,
+                     SLOT( undockPlaylist() ) );
     return menu;
 }
 

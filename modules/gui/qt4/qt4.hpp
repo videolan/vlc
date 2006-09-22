@@ -82,4 +82,15 @@ public:
     intf_dialog_args_t *p_arg;
 };
 
+/* Ugly to put it here, but don't want more files ... */
+#include <QFrame>
+class BasePlaylistWidget : public QFrame
+{
+public:
+    BasePlaylistWidget( intf_thread_t *_p_i ) : p_intf( _p_i)  {};
+    virtual ~BasePlaylistWidget() {};
+protected:
+    intf_thread_t *p_intf;
+};
+
 #endif

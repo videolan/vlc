@@ -26,6 +26,9 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+
+#include "qt4.hpp"
+
 #include <QWidget>
 #include <QFrame>
 #include <QPalette>
@@ -88,14 +91,14 @@ private:
     intf_thread_t *p_intf;
 };
 
-/******************** Playlist Widget ****************/
+/******************** Playlist Widgets ****************/
 #include <QModelIndex>
 class QSignalMapper;
 class PLSelector;
 class PLPanel;
 class QPushButton;
 
-class PlaylistWidget : public QFrame
+class PlaylistWidget : public BasePlaylistWidget
 {
     Q_OBJECT;
 public:
@@ -106,13 +109,9 @@ public:
 private:
     PLSelector *selector;
     PLPanel *rightPanel;
-    intf_thread_t *p_intf;
-    int currentRootId;
     QPushButton *addButton;
-private slots:
-    void undock();
-    void add();
-    void setCurrentRootId( int );
+signals:
+    void rootChanged( int );
 };
 
 #endif

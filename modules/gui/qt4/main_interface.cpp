@@ -93,7 +93,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
     handleMainUi( settings );
 
-    QVLCMenu::createMenuBar( menuBar(), p_intf, playlistEmbeddedFlag );
+    QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag );
 
     /* Status bar */
     timeLabel = new QLabel( 0 );
@@ -437,23 +437,39 @@ void MainInterface::doComponentsUpdate()
     resize( mainSize );
 }
 
-void MainInterface::customEvent( QEvent *event )
+void MainInterface::undockPlaylist()
 {
-    if( event->type() == PLUndockEvent_Type )
+    if( playlistWidget )
     {
+        playlistWidget->hide();
+        playlistWidget->deleteLater();
         ui.vboxLayout->removeWidget( playlistWidget );
         playlistWidget = NULL;
         playlistEmbeddedFlag = false;
-        doComponentsUpdate();
+
         menuBar()->clear();
-        QVLCMenu::createMenuBar( menuBar(), p_intf, false );
+        QVLCMenu::createMenuBar( this, p_intf, false );
+
+        if( videoIsActive )
+        {
+            videoWidget->widgetSize = savedVideoSize;
+            videoWidget->resize( videoWidget->widgetSize );
+            videoWidget->updateGeometry();
+        }
+
+        doComponentsUpdate();
+        THEDP->playlistDialog();
     }
-    else if( event->type() == PLDockEvent_Type )
+}
+
+void MainInterface::customEvent( QEvent *event )
+{
+    if( event->type() == PLDockEvent_Type )
     {
         PlaylistDialog::killInstance();
         playlistEmbeddedFlag = true;
         menuBar()->clear();
-        QVLCMenu::createMenuBar( menuBar(), p_intf, true );
+        QVLCMenu::createMenuBar(this, p_intf, true );
         playlist();
     }
 }

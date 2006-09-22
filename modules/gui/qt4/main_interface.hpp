@@ -88,6 +88,8 @@ private:
     QLabel              *nameLabel;
 
     void customEvent( QEvent *);
+public slots:
+    void undockPlaylist();
 private slots:
     void setStatus( int );
     void setName( QString );
