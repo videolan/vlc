@@ -58,12 +58,12 @@ class QVLCMenu : public QObject
 {
     Q_OBJECT;
 public:
-    static void createMenuBar( QMenuBar *, intf_thread_t * );
-    static void createPlMenuBar( QMenuBar *, intf_thread_t * );
+    static void createMenuBar( QMenuBar *, intf_thread_t *, bool );
 
     /* Menus */
     static QMenu *FileMenu();
     static QMenu *SDMenu( intf_thread_t * );
+    static QMenu *PlaylistMenu( intf_thread_t *);
     static QMenu *ToolsMenu( intf_thread_t *, bool with_intf = true );
     static QMenu *NavigMenu( intf_thread_t * , QMenu * );
     static QMenu *VideoMenu( intf_thread_t * , QMenu * );
@@ -98,14 +98,10 @@ public:
     {
         switch( id )
         {
-        case 1:
-            QVLCMenu::VideoMenu( p_intf, menu ); break;
-        case 2:
-            QVLCMenu::AudioMenu( p_intf, menu ); break;
-        case 3:
-            QVLCMenu::NavigMenu( p_intf, menu ); break;
-        case 4:
-            QVLCMenu::InterfacesMenu( p_intf, menu ); break;
+        case 1: QVLCMenu::VideoMenu( p_intf, menu ); break;
+        case 2: QVLCMenu::AudioMenu( p_intf, menu ); break;
+        case 3: QVLCMenu::NavigMenu( p_intf, menu ); break;
+        case 4: QVLCMenu::InterfacesMenu( p_intf, menu ); break;
         }
     };
     int id; QMenu *menu;

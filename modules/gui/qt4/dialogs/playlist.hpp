@@ -48,16 +48,13 @@ public:
 private:
 
     void createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf );
-    QMenu * SDMenu();
     PlaylistDialog( intf_thread_t * );
     static PlaylistDialog *instance;
 
-    QSignalMapper *SDMapper;
     PLSelector *selector;
     PLPanel *rightPanel;
 private slots:
     void dock();
-    void SDMenuAction( QString );
 };
 
 

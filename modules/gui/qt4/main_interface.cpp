@@ -30,6 +30,7 @@
 #include "dialogs/playlist.hpp"
 #include "menus.hpp"
 
+#include <QMenuBar>
 #include <QCloseEvent>
 #include <QPushButton>
 #include <QStatusBar>
@@ -92,7 +93,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
     handleMainUi( settings );
 
-    QVLCMenu::createMenuBar( menuBar(), p_intf );
+    QVLCMenu::createMenuBar( menuBar(), p_intf, playlistEmbeddedFlag );
 
     /* Status bar */
     timeLabel = new QLabel( 0 );
@@ -444,11 +445,15 @@ void MainInterface::customEvent( QEvent *event )
         playlistWidget = NULL;
         playlistEmbeddedFlag = false;
         doComponentsUpdate();
+        menuBar()->clear();
+        QVLCMenu::createMenuBar( menuBar(), p_intf, false );
     }
     else if( event->type() == PLDockEvent_Type )
     {
         PlaylistDialog::killInstance();
         playlistEmbeddedFlag = true;
+        menuBar()->clear();
+        QVLCMenu::createMenuBar( menuBar(), p_intf, true );
         playlist();
     }
 }
@@ -524,7 +529,7 @@ void MainInterface::play()
     if( !THEPL->i_size || !THEPL->i_enabled )
     {
         /* The playlist is empty, open a file requester */
-        THEDP->openDialog();
+        THEDP->simpleOpenDialog();
         setStatus( 0 );
         return;
     }

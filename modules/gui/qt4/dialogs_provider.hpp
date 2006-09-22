@@ -59,6 +59,7 @@ protected:
     friend class QVLCMenu;
     QSignalMapper *menusMapper;
     QSignalMapper *menusUpdateMapper;
+    QSignalMapper *SDMapper;
     void customEvent( QEvent *);
 private:
     DialogsProvider( intf_thread_t *);
@@ -84,6 +85,7 @@ public slots:
     void doInteraction( intf_dialog_args_t * );
     void menuAction( QObject *);
     void menuUpdateAction( QObject *);
+    void SDMenuAction( QString );
     void streamingDialog();
     void openPlaylist();
     void openDirectory();

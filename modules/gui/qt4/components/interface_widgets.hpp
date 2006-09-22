@@ -93,6 +93,7 @@ private:
 class QSignalMapper;
 class PLSelector;
 class PLPanel;
+class QPushButton;
 
 class PlaylistWidget : public QFrame
 {
@@ -106,8 +107,12 @@ private:
     PLSelector *selector;
     PLPanel *rightPanel;
     intf_thread_t *p_intf;
+    int currentRootId;
+    QPushButton *addButton;
 private slots:
     void undock();
+    void add();
+    void setCurrentRootId( int );
 };
 
 #endif

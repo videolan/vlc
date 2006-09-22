@@ -29,6 +29,7 @@
 #include "components/playlist/panels.hpp"
 #include "components/playlist/selector.hpp"
 #include "dialogs_provider.hpp"
+#include "menus.hpp"
 
 #include <QHBoxLayout>
 #include <QSignalMapper>
@@ -44,9 +45,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setCentralWidget( main );
     setWindowTitle( qtr( "Playlist" ) );
 
-    SDMapper = new QSignalMapper();
-    CONNECT( SDMapper, mapped (QString), this, SDMenuAction( QString ) );
-    createPlMenuBar( menuBar(), p_intf );
+   createPlMenuBar( menuBar(), p_intf );
 
     selector = new PLSelector( centralWidget(), p_intf, THEPL );
     selector->setMaximumWidth( 130 );
@@ -96,46 +95,7 @@ void PlaylistDialog::createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
 
     manageMenu->addAction( "Dock playlist", this, SLOT( dock() ) );
     bar->addMenu( manageMenu );
-    bar->addMenu( SDMenu() );
-}
-
-QMenu *PlaylistDialog::SDMenu()
-{
-    QMenu *menu = new QMenu();
-    menu->setTitle( qtr( "Additional sources" ) );
-    vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
-                                        FIND_ANYWHERE );
-    int i_num = 0;
-    for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
-    {
-        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
-            i_num++;
-    }
-    for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
-    {
-        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object;
-        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
-        {
-            QAction *a = new QAction( qfu( p_parser->psz_longname ), menu );
-            a->setCheckable( true );
-            /* hack to handle submodules properly */
-            int i = -1;
-            while( p_parser->pp_shortcuts[++i] != NULL );
-            i--;
-            if( playlist_IsServicesDiscoveryLoaded( THEPL,
-                 i>=0?p_parser->pp_shortcuts[i] : p_parser->psz_object_name ) )
-            {
-                a->setChecked( true );
-            }
-            CONNECT( a , triggered(), SDMapper, map() );
-            SDMapper->setMapping( a, i>=0? p_parser->pp_shortcuts[i] :
-                                            p_parser->psz_object_name );
-            menu->addAction( a );
-        }
-    }
-    vlc_list_release( p_list );
-    return menu;
+    bar->addMenu( QVLCMenu::SDMenu( p_intf ) );
 }
 
 void PlaylistDialog::dock()
@@ -143,13 +103,4 @@ void PlaylistDialog::dock()
     hide();
     QEvent *event = new QEvent( (QEvent::Type)(PLDockEvent_Type) );
     QApplication::postEvent( p_intf->p_sys->p_mi, event );
-}
-
-void PlaylistDialog::SDMenuAction( QString data )
-{
-    char *psz_sd = data.toUtf8().data();
-    if( !playlist_IsServicesDiscoveryLoaded( THEPL, psz_sd ) )
-        playlist_ServicesDiscoveryAdd( THEPL, psz_sd );
-    else
-        playlist_ServicesDiscoveryRemove( THEPL, psz_sd );
 }

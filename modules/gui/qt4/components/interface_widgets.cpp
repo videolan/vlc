@@ -30,8 +30,10 @@
 #include "pixmaps/art.xpm"
 #include <vlc/vout.h>
 
+#include <QCursor>
 #include <QPushButton>
 #include <QHBoxLayout>
+#include <QMenu>
 
 #define ICON_SIZE 128
 
@@ -48,7 +50,6 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
     vlc_mutex_init( p_intf, &lock );
     p_vout = NULL;
-    setFrameStyle(QFrame::Panel | QFrame::Raised);
 
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
@@ -103,7 +104,6 @@ void VideoWidget::release( void *p_win )
 BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
                                         QFrame( NULL ), p_intf( _p_i )
 {
-    setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
 
     setAutoFillBackground( true );
     plt =  palette();
@@ -148,7 +148,6 @@ void BackgroundWidget::resizeEvent( QResizeEvent *e )
 VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
                                                 QFrame( NULL ), p_intf( _p_i )
 {
-    setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
     QHBoxLayout *layout = new QHBoxLayout( this );
     layout->setMargin( 0 );
     QPushButton *prevButton = new QPushButton( "Prev" );
@@ -175,20 +174,21 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
     QVBoxLayout *left = new QVBoxLayout( );
     QHBoxLayout *middle = new QHBoxLayout;
 
-    setFrameStyle(QFrame::StyledPanel | QFrame::Sunken );
     selector = new PLSelector( this, p_intf, THEPL );
     selector->setMaximumWidth( 130 );
     left->addWidget( selector );
 
     QPushButton *undockButton = new QPushButton( "UN", this );
     undockButton->setMaximumWidth( 25 );
-    BUTTONACT( undockButton, undock() );
-
     undockButton->setToolTip( qtr( "Undock playlist for main interface" ) );
-    QPushButton *sourcesButton = new QPushButton( "Sources", this );
-    sourcesButton->setToolTip( qtr( "Select additional stream sources" ) );
+    BUTTONACT( undockButton, undock() );
     middle->addWidget( undockButton );
-    middle->addWidget( sourcesButton );
+
+    addButton = new QPushButton( "+", this );
+    addButton->setMaximumWidth( 25 );
+    BUTTONACT( addButton, add() );
+    middle->addWidget( addButton );
+
     left->addLayout( middle );
 
     QLabel *art = new QLabel( "" );
@@ -200,11 +200,13 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
 
     playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
                                                 THEPL->p_local_category );
+    currentRootId = p_root->i_id;
 
     rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( this,
                               p_intf, THEPL, p_root ) );
 
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
+    CONNECT( selector, activated( int ), this, setCurrentRootId( int ) );
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->addLayout( left, 0 );
@@ -214,6 +216,25 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) : QFrame(NULL),
 
 PlaylistWidget::~PlaylistWidget()
 {
+}
+
+void PlaylistWidget::setCurrentRootId( int _new )
+{
+    currentRootId = _new;
+    if( currentRootId == THEPL->p_local_category->i_id ||
+        currentRootId == THEPL->p_local_onelevel->i_id  )
+    {
+        addButton->setEnabled( true );
+        addButton->setToolTip( qtr("Add to playlist" ) );
+    }
+    else if( currentRootId == THEPL->p_ml_category->i_id ||
+             currentRootId == THEPL->p_ml_onelevel->i_id )
+    {
+        addButton->setEnabled( true );
+        addButton->setToolTip( qtr("Add to media library" ) );
+    }
+    else
+        addButton->setEnabled( false );
 }
 
 void PlaylistWidget::undock()
@@ -226,9 +247,27 @@ void PlaylistWidget::undock()
     QApplication::postEvent( p_intf->p_sys->p_mi, event );
 }
 
+void PlaylistWidget::add()
+{
+    QMenu *popup = new QMenu();
+    if( currentRootId == THEPL->p_local_category->i_id ||
+        currentRootId == THEPL->p_local_onelevel->i_id )
+    {
+        popup->addAction( "Add file", THEDP, SLOT( simplePLAppendDialog() ) );
+        popup->addAction( "Advanced add", THEDP, SLOT( PLAppendDialog() ) );
+    }
+    else if( currentRootId == THEPL->p_ml_category->i_id ||
+             currentRootId == THEPL->p_ml_onelevel->i_id )
+    {
+        popup->addAction( "Add file", THEDP, SLOT( simpleMLAppendDialog() ) );
+        popup->addAction( "Advanced add", THEDP, SLOT( MLAppendDialog() ) );
+        popup->addAction( "Directory", THEDP, SLOT( openMLDirectory() ) );
+    }
+    popup->popup( QCursor::pos() );
+}
+
 QSize PlaylistWidget::sizeHint() const
 {
-    fprintf( stderr, "PL Size %ix%i\n", widgetSize.width(), widgetSize.height() );
     return widgetSize;
 }
 

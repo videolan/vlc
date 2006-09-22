@@ -51,6 +51,9 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
     menusUpdateMapper = new QSignalMapper();
     CONNECT( menusUpdateMapper, mapped(QObject *),
              this, menuUpdateAction( QObject *) );
+
+    SDMapper = new QSignalMapper();
+    CONNECT( SDMapper, mapped (QString), this, SDMenuAction( QString ) );
 }
 
 DialogsProvider::~DialogsProvider()
@@ -186,6 +189,16 @@ void DialogsProvider::menuUpdateAction( QObject *data )
     MenuFunc * f = qobject_cast<MenuFunc *>(data);
     f->doFunc( p_intf );
 }
+
+void DialogsProvider::SDMenuAction( QString data )
+{
+    char *psz_sd = data.toUtf8().data();
+    if( !playlist_IsServicesDiscoveryLoaded( THEPL, psz_sd ) )
+        playlist_ServicesDiscoveryAdd( THEPL, psz_sd );
+    else
+        playlist_ServicesDiscoveryRemove( THEPL, psz_sd );
+}
+
 
 void DialogsProvider::simplePLAppendDialog()
 {

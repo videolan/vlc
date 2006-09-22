@@ -117,9 +117,14 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() ); \
     THEDP->menusUpdateMapper->setMapping( menu, f ); }
 
-void QVLCMenu::createMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
+void QVLCMenu::createMenuBar( QMenuBar *bar, intf_thread_t *p_intf,
+                              bool playlist )
 {
     BAR_ADD( FileMenu(), qtr("File") );
+    if( playlist )
+    {
+        BAR_ADD( PlaylistMenu( p_intf ), qtr("Playlist" ) );
+    }
     BAR_ADD( ToolsMenu( p_intf ), qtr("Tools") );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr("Video"), 1 );
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr("Audio"), 2 );
@@ -136,6 +141,17 @@ QMenu *QVLCMenu::FileMenu()
     DP_SADD( qtr("Streaming..."), "", "", streamingDialog() );
     menu->addSeparator();
     DP_SADD( qtr("&Quit") , "", "", quit() );
+    return menu;
+}
+
+QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf )
+{
+    QMenu *menu = new QMenu();
+    menu->addMenu( SDMenu( p_intf ) );
+    menu->addSeparator();
+
+    DP_SADD( qtr( "Open playlist file"), "", "", openPlaylist() );
+//    DP_SADD( qtr( "Save playlist to file" ), "", "", savePlaylist() );
     return menu;
 }
 
@@ -242,6 +258,44 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *current )
     return Populate( p_intf, current, varnames, objects );
 }
 
+QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
+{
+    QMenu *menu = new QMenu();
+    menu->setTitle( qtr( "Additional sources" ) );
+    vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
+                                        FIND_ANYWHERE );
+    int i_num = 0;
+    for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
+    {
+        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
+            i_num++;
+    }
+    for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
+    {
+        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object;
+        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
+        {
+            QAction *a = new QAction( qfu( p_parser->psz_longname ), menu );
+            a->setCheckable( true );
+            /* hack to handle submodules properly */
+            int i = -1;
+            while( p_parser->pp_shortcuts[++i] != NULL );
+            i--;
+            if( playlist_IsServicesDiscoveryLoaded( THEPL,
+                 i>=0?p_parser->pp_shortcuts[i] : p_parser->psz_object_name ) )
+            {
+                a->setChecked( true );
+            }
+            CONNECT( a , triggered(), THEDP->SDMapper, map() );
+            THEDP->SDMapper->setMapping( a, i>=0? p_parser->pp_shortcuts[i] :
+                                                  p_parser->psz_object_name );
+            menu->addAction( a );
+        }
+    }
+    vlc_list_release( p_list );
+    return menu;
+}
 
 /*****************************************************************************
  * Popup menus
