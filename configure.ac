@@ -1596,13 +1596,13 @@ then
   AC_MSG_WARN(--{en|dis}able-livedotcom is deprecated. Use --{en|dis}able-live555 instead.)
 fi
 
-if test "${enable_livedotcom}" = "yes"
+if test "${enable_livedotcom}" = "no"
 then
-  enable_live555="yes"
+  enable_live555="no"
 fi
 AC_ARG_ENABLE(live555,
-[  --enable-live555        live555 RTSP input plugin (default disabled)])
-if test "${enable_live555}" = "yes"; then
+[  --enable-live555        live555 RTSP input plugin (default enabled)])
+if test "${enable_live555}" != "no"; then
   AC_ARG_WITH(live555-tree,
     [    --with-live555-tree=PATH live.com tree for static linking])
 
@@ -1675,8 +1675,10 @@ if test "${enable_live555}" = "yes"; then
       fi
     else
       dnl  The given live555 wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_live555_tree}/liveMedia/libliveMedia.a, make sure you compiled live555 in ${with_live555_tree}])
+        AC_MSG_RESULT(no)
+      if test "${enable_live555}" = "yes"; then
+        AC_MSG_ERROR([cannot find ${real_live555_tree}/liveMedia/libliveMedia.a, make sure you compiled live555 in ${with_live555_tree}])
+      fi	
     fi
   fi
 fi
