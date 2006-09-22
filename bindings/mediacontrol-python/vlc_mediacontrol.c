@@ -108,7 +108,7 @@ MediaControl_dealloc( PyObject *self )
 }
 
 static PyObject *
-MediaControl_get_instance( PyObject *self, PyObject *args )
+MediaControl_get_vlc_instance( PyObject *self, PyObject *args )
 {
     vlcInstance *p_ret;
 
@@ -598,8 +598,8 @@ MediaControl_set_visual( PyObject *self, PyObject *args )
 
 static PyMethodDef MediaControl_methods[] =
 {
-    { "get_instance", MediaControl_get_instance, METH_VARARGS,
-      "get_instance( ) -> Instance    Get matching vlc.Instance." },
+    { "get_vlc_instance", MediaControl_get_vlc_instance, METH_VARARGS,
+      "get_vlc_instance( ) -> Instance    Get matching vlc.Instance." },
     { "get_media_position", MediaControl_get_media_position, METH_VARARGS,
       "get_media_position( origin, key ) -> Position    Get current media position." },
     { "set_media_position", MediaControl_set_media_position, METH_VARARGS,
