@@ -356,7 +356,6 @@ int __input_SecondaryPreparse( vlc_object_t *p_parent, input_item_t *p_item )
     p_me = vlc_object_create( p_parent, VLC_OBJECT_META_ENGINE );
     p_me->i_flags |= OBJECT_FLAGS_NOINTERACT;
     p_me->i_mandatory =   VLC_META_ENGINE_TITLE
-                        | VLC_META_ENGINE_AUTHOR
                         | VLC_META_ENGINE_ARTIST
                         | VLC_META_ENGINE_ART_URL;
     p_me->i_optional = 0;
@@ -427,14 +426,10 @@ int __input_SecondaryPreparse( vlc_object_t *p_parent, input_item_t *p_item )
                 void *p_buffer = malloc( 1<<16 );
                 long int l_read;
                 p_file = utf8_fopen( psz_filename+7, "w" );
-                printf("a %p\n");
                 while( ( l_read = stream_Read( p_stream, p_buffer, 1<<16 ) ) )
                 {
-                    printf("%d\n", l_read);
                     fwrite( p_buffer, l_read, 1, p_file );
-                    printf("////\n");
                 }
-                printf("a\n");
                 free( p_buffer );
                 fclose( p_file );
                 stream_Delete( p_stream );
