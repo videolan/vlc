@@ -30,6 +30,7 @@
 #include <playlist_model.hpp>
 
 class QTreeView;
+class PlaylistWidget;
 
 class PLSelector: public QWidget
 {
@@ -37,9 +38,11 @@ class PLSelector: public QWidget
 public:
     PLSelector( QWidget *p, intf_thread_t *_p_intf, playlist_t * );
     virtual ~PLSelector();
+protected:
+    PLModel *model;
+    friend class PlaylistWidget;
 private:
     intf_thread_t *p_intf;
-    PLModel *model;
     QTreeView *view;
 private slots:
     void setSource( const QModelIndex& );

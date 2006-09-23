@@ -287,7 +287,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
     selector->setMaximumWidth( 130 );
     left->addWidget( selector );
 
-    QLabel *art = new QLabel( "" );
+    art = new QLabel( "" );
     art->setMaximumHeight( 128 );
     art->setMaximumWidth( 128 );
     art->setScaledContents( true );
@@ -302,6 +302,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
 
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
 
+    CONNECT( qobject_cast<StandardPLPanel *>(rightPanel)->model, artSet( QString ) , this, setArt( QString ) );
+
     connect( selector, SIGNAL(activated( int )),
              this, SIGNAL( rootChanged( int ) ) );
     emit rootChanged( p_root->i_id );
@@ -310,6 +312,12 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
     layout->addLayout( left, 0 );
     layout->addWidget( rightPanel, 10 );
     setLayout( layout );
+}
+
+void PlaylistWidget::setArt( QString url )
+{
+    fprintf( stderr, "************** YEAH ! *************\n" );
+    art->setPixmap( QPixmap( url ) );
 }
 
 PlaylistWidget::~PlaylistWidget()

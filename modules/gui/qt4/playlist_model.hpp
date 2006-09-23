@@ -121,6 +121,8 @@ public:
     void doDelete( QModelIndexList selected );
     void search( QString search );
     void sort( int column, Qt::SortOrder order );
+
+    void sendArt( QString url );
 private:
     void addCallbacks();
     void delCallbacks();
@@ -159,6 +161,8 @@ private:
     PLItem *p_cached_item_bi;
     int i_cached_id;
     int i_cached_input_id;
+signals:
+    void artSet( QString );
 public slots:
     void activateItem( const QModelIndex &index );
     void activateItem( playlist_item_t *p_item );

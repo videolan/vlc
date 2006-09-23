@@ -55,6 +55,7 @@ public slots:
     virtual void setRoot( int ) = 0;
 };
 
+class PlaylistWidget;
 
 class StandardPLPanel: public PLPanel
 {
@@ -65,8 +66,10 @@ public:
     virtual ~StandardPLPanel();
 protected:
     virtual void keyPressEvent( QKeyEvent *e );
-private:
+protected:
     PLModel *model;
+    friend class PlaylistWidget;
+private:
     QTreeView *view;
     QPushButton *repeatButton , *randomButton,*addButton;
     ClickLineEdit *searchLine;

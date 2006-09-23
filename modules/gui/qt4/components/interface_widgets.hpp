@@ -136,6 +136,9 @@ private:
     PLSelector *selector;
     PLPanel *rightPanel;
     QPushButton *addButton;
+    QLabel *art;
+private slots:
+    void setArt( QString );
 signals:
     void rootChanged( int );
 };
