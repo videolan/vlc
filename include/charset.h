@@ -55,9 +55,9 @@ VLC_EXPORT( char *, FromUTF16, ( const uint16_t * ) );
 
 static inline char *FromWide( const wchar_t *in )
 {
-	return (sizeof( wchar_t ) == 2)
-		? FromUTF16( (const uint16_t *)in )
-		: FromUTF32( (const uint32_t *)in );
+    return (sizeof( wchar_t ) == 2)
+        ? FromUTF16( (const uint16_t *)in )
+        : FromUTF32( (const uint32_t *)in );
 }
 
 
