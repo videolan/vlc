@@ -316,8 +316,12 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
 
 void PlaylistWidget::setArt( QString url )
 {
-    fprintf( stderr, "************** YEAH ! *************\n" );
-    art->setPixmap( QPixmap( url ) );
+    if( prevArt != url )
+    {
+        fprintf( stderr, "Display %s\n", qta( url ) );
+        art->setPixmap( QPixmap( url ) );
+        prevArt = url;
+    }
 }
 
 PlaylistWidget::~PlaylistWidget()

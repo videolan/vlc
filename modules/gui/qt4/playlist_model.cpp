@@ -132,13 +132,10 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     strings[2] = QString( psz_duration );
     type = p_item->p_input->i_type;
     current = iscurrent;
-    fprintf( stderr, "Updating current %i\n" );
-    fprintf( stderr, "Meta %p art %s\n", p_item->p_input->p_meta,p_item->p_input->p_meta ?p_item->p_input->p_meta->psz_arturl : "non" );
     if( current && p_item->p_input->p_meta &&
         p_item->p_input->p_meta->psz_arturl &&
         !strncmp( p_item->p_input->p_meta->psz_arturl, "file://", 7 ) )
     {
-        fprintf( stderr, "Have art %s\n", p_item->p_input->p_meta->psz_arturl );
         model->sendArt( qfu( p_item->p_input->p_meta->psz_arturl ) );
     }
 }
@@ -605,7 +602,6 @@ void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item,
 void PLModel::sendArt( QString url )
 {
     QString arturl = url.replace( "file://",QString("" ) );
-    fprintf( stderr, "send %s\n", qta( arturl ) );
     emit artSet( arturl );
 }
 

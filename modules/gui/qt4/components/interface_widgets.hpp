@@ -137,6 +137,7 @@ private:
     PLPanel *rightPanel;
     QPushButton *addButton;
     QLabel *art;
+    QString prevArt;
 private slots:
     void setArt( QString );
 signals:
