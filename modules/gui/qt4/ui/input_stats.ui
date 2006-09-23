@@ -8,302 +8,420 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>434</width>
-    <height>294</height>
+    <width>470</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>_("Form")</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
-    <number>9</number>
+  <widget class="QGroupBox" name="groupBox_4" >
+   <property name="geometry" >
+    <rect>
+     <x>240</x>
+     <y>150</y>
+     <width>215</width>
+     <height>135</height>
+    </rect>
    </property>
-   <property name="spacing" >
-    <number>6</number>
+   <property name="title" >
+    <string>_("Audio")</string>
    </property>
-   <item row="0" column="0" >
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
-      <string>_("Input")</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
+   <layout class="QGridLayout" >
+    <property name="margin" >
+     <number>9</number>
+    </property>
+    <property name="spacing" >
+     <number>6</number>
+    </property>
+    <item row="1" column="1" >
+     <widget class="QLabel" name="aplayed_text" >
+      <property name="text" >
+       <string>0</string>
       </property>
-      <property name="spacing" >
-       <number>6</number>
+      <property name="alignment" >
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="read_text" >
-        <property name="text" >
-         <string>0</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1" >
-       <widget class="QLabel" name="stream_bitrate_text" >
-        <property name="text" >
-         <string>0 kb/s</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="input_bitrate_text" >
-        <property name="text" >
-         <string>0 kb/s</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_5" >
-        <property name="text" >
-         <string>_("Input bitrate")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>_("Read at media")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
-         <string>_("Stream bitrate")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
-         <string>_("Demuxed")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" >
-       <widget class="QLabel" name="demuxed_text" >
-        <property name="text" >
-         <string>0 kB</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="1" >
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
-      <string>_("Video")</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
+     </widget>
+    </item>
+    <item row="1" column="0" >
+     <widget class="QLabel" name="label_9" >
+      <property name="text" >
+       <string>_("Played buffers")</string>
       </property>
-      <property name="spacing" >
-       <number>6</number>
+     </widget>
+    </item>
+    <item row="2" column="1" >
+     <widget class="QLabel" name="alost_text" >
+      <property name="text" >
+       <string>0</string>
       </property>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
-         <string>_("Lost frames")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" >
-       <widget class="QLabel" name="vlost_frames" >
-        <property name="text" >
-         <string>0</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
-         <string>_("Displayed frames")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
-         <string>_("Decoded blocks")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="vdecoded_text" >
-        <property name="text" >
-         <string>0</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="vdisplayed_text" >
-        <property name="text" >
-         <string>0</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="1" >
-    <widget class="QGroupBox" name="groupBox_4" >
-     <property name="title" >
-      <string>_("Audio")</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
+      <property name="alignment" >
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
-      <property name="spacing" >
-       <number>6</number>
+     </widget>
+    </item>
+    <item row="2" column="0" >
+     <widget class="QLabel" name="label_10" >
+      <property name="text" >
+       <string>_("Lost buffers")</string>
       </property>
-      <item row="2" column="1" >
-       <widget class="QLabel" name="alost_text" >
-        <property name="text" >
-         <string>0</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="aplayed_text" >
-        <property name="text" >
-         <string>0</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="adecoded_text" >
-        <property name="text" >
-         <string>0</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_10" >
-        <property name="text" >
-         <string>_("Lost buffers")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_9" >
-        <property name="text" >
-         <string>_("Played buffers")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_8" >
-        <property name="text" >
-         <string>_("Decoded blocks")</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QGroupBox" name="groupBox_3" >
-     <property name="title" >
-      <string>_("Streaming")</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
+     </widget>
+    </item>
+    <item row="0" column="1" >
+     <widget class="QLabel" name="adecoded_text" >
+      <property name="text" >
+       <string>0</string>
       </property>
-      <property name="spacing" >
-       <number>6</number>
+      <property name="alignment" >
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="sent_text" >
-        <property name="text" >
-         <string>0</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" >
-       <widget class="QLabel" name="send_bitrate_text" >
-        <property name="text" >
-         <string>0 kb/s</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="sent_bytes_text" >
-        <property name="text" >
-         <string>0 kB</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_13" >
-        <property name="text" >
-         <string>_("Send bitrate")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_12" >
-        <property name="text" >
-         <string>_("Sent bytes")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_11" >
-        <property name="text" >
-         <string>_("Sent packets")</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-  </layout>
+     </widget>
+    </item>
+    <item row="0" column="0" >
+     <widget class="QLabel" name="label_8" >
+      <property name="text" >
+       <string>_("Decoded blocks")</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="groupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>215</width>
+     <height>135</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>_("Input")</string>
+   </property>
+   <layout class="QGridLayout" >
+    <property name="margin" >
+     <number>9</number>
+    </property>
+    <property name="spacing" >
+     <number>6</number>
+    </property>
+    <item row="0" column="1" >
+     <widget class="QLabel" name="read_text" >
+      <property name="text" >
+       <string>0</string>
+      </property>
+      <property name="alignment" >
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" >
+     <widget class="QLabel" name="input_bitrate_text" >
+      <property name="text" >
+       <string>0</string>
+      </property>
+      <property name="alignment" >
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2" >
+     <widget class="QLabel" name="sent_bytes_text_6" >
+      <property name="text" >
+       <string>kb/s</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2" >
+     <widget class="QLabel" name="sent_bytes_text_5" >
+      <property name="text" >
+       <string>kb/s</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2" >
+     <widget class="QLabel" name="sent_bytes_text_4" >
+      <property name="sizePolicy" >
+       <sizepolicy>
+        <hsizetype>0</hsizetype>
+        <vsizetype>0</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text" >
+       <string>kB</string>
+      </property>
+      <property name="alignment" >
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1" >
+     <widget class="QLabel" name="stream_bitrate_text" >
+      <property name="text" >
+       <string>0</string>
+      </property>
+      <property name="alignment" >
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1" >
+     <widget class="QLabel" name="demuxed_text" >
+      <property name="text" >
+       <string>0</string>
+      </property>
+      <property name="alignment" >
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" >
+     <widget class="QLabel" name="label_7" >
+      <property name="text" >
+       <string>_("Demuxed")</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" >
+     <widget class="QLabel" name="label_3" >
+      <property name="text" >
+       <string>_("Stream bitrate")</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" >
+     <widget class="QLabel" name="label" >
+      <property name="text" >
+       <string>_("Read at media")</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" >
+     <widget class="QLabel" name="label_5" >
+      <property name="text" >
+       <string>_("Input bitrate")</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2" >
+     <widget class="QLabel" name="sent_bytes_text_7" >
+      <property name="text" >
+       <string>kB</string>
+      </property>
+      <property name="alignment" >
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3" >
+   <property name="geometry" >
+    <rect>
+     <x>240</x>
+     <y>10</y>
+     <width>215</width>
+     <height>135</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>_("Streaming")</string>
+   </property>
+   <layout class="QGridLayout" >
+    <property name="margin" >
+     <number>9</number>
+    </property>
+    <property name="spacing" >
+     <number>6</number>
+    </property>
+    <item row="2" column="2" >
+     <widget class="QLabel" name="sent_bytes_text_3" >
+      <property name="sizePolicy" >
+       <sizepolicy>
+        <hsizetype>0</hsizetype>
+        <vsizetype>0</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text" >
+       <string>kb/s</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1" >
+     <widget class="QLabel" name="send_bitrate_text" >
+      <property name="text" >
+       <string>0</string>
+      </property>
+      <property name="alignment" >
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" >
+     <widget class="QLabel" name="sent_bytes_text" >
+      <property name="text" >
+       <string>0</string>
+      </property>
+      <property name="alignment" >
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" >
+     <widget class="QLabel" name="sent_text" >
+      <property name="text" >
+       <string>0</string>
+      </property>
+      <property name="alignment" >
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2" >
+     <widget class="QLabel" name="sent_bytes_text_2" >
+      <property name="text" >
+       <string>kB</string>
+      </property>
+      <property name="alignment" >
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" >
+     <widget class="QLabel" name="label_13" >
+      <property name="text" >
+       <string>_("Send bitrate")</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" >
+     <widget class="QLabel" name="label_12" >
+      <property name="text" >
+       <string>_("Sent bytes")</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" >
+     <widget class="QLabel" name="label_11" >
+      <property name="text" >
+       <string>_("Sent packets")</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" >
+     <widget class="QLabel" name="label_14" >
+      <property name="text" >
+       <string/>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>150</y>
+     <width>215</width>
+     <height>135</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>_("Video")</string>
+   </property>
+   <widget class="QLabel" name="label_4" >
+    <property name="geometry" >
+     <rect>
+      <x>11</x>
+      <y>62</y>
+      <width>133</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>_("Displayed frames")</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6" >
+    <property name="geometry" >
+     <rect>
+      <x>11</x>
+      <y>96</y>
+      <width>133</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>_("Lost frames")</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2" >
+    <property name="geometry" >
+     <rect>
+      <x>11</x>
+      <y>28</y>
+      <width>133</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>_("Decoded blocks")</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="vlost_frames" >
+    <property name="geometry" >
+     <rect>
+      <x>150</x>
+      <y>96</y>
+      <width>50</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>0</string>
+    </property>
+    <property name="alignment" >
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="vdisplayed_text" >
+    <property name="geometry" >
+     <rect>
+      <x>150</x>
+      <y>62</y>
+      <width>50</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>0</string>
+    </property>
+    <property name="alignment" >
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="vdecoded_text" >
+    <property name="geometry" >
+     <rect>
+      <x>150</x>
+      <y>28</y>
+      <width>50</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>0</string>
+    </property>
+    <property name="alignment" >
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+  </widget>
  </widget>
  <pixmapfunction></pixmapfunction>
  <resources/>

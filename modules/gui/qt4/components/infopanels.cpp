@@ -51,12 +51,12 @@ void InputStatsPanel::update( input_item_t *p_item )
 #define UPDATE( widget,format, calc... ) \
     { QString str; ui.widget->setText( str.sprintf( format, ## calc ) );  }
 
-    UPDATE( read_text, "%8.0f kB", (float)(p_item->p_stats->i_read_bytes)/1000);
-    UPDATE( input_bitrate_text, "%6.0f kb/s",
+    UPDATE( read_text, "%8.0f", (float)(p_item->p_stats->i_read_bytes)/1000);
+    UPDATE( input_bitrate_text, "%6.0f",
                     (float)(p_item->p_stats->f_input_bitrate * 8000 ));
-    UPDATE( demuxed_text, "%8.0f kB",
+    UPDATE( demuxed_text, "%8.0f",
                     (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
-    UPDATE( stream_bitrate_text, "%6.0f kb/s",
+    UPDATE( stream_bitrate_text, "%6.0f",
                     (float)(p_item->p_stats->f_demux_bitrate * 8000 ));
 
     /* Video */
@@ -66,9 +66,9 @@ void InputStatsPanel::update( input_item_t *p_item )
 
     /* Sout */
     UPDATE( sent_text, "%5i", p_item->p_stats->i_sent_packets );
-    UPDATE( sent_bytes_text, "%8.0f kB",
+    UPDATE( sent_bytes_text, "%8.0f",
             (float)(p_item->p_stats->i_sent_bytes)/1000 );
-    UPDATE( send_bitrate_text, "%6.0f kb/s",
+    UPDATE( send_bitrate_text, "%6.0f",
             (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
 
     /* Audio*/
@@ -170,15 +170,14 @@ InfoTab::InfoTab( QWidget *parent,  intf_thread_t *_p_intf, bool _stats ) :
 //    setGeometry(0, 0, 400, 500);
 
     MP = new MetaPanel(NULL, p_intf);
-    addTab(MP, qtr("&Meta"));
+    addTab(MP, qtr("&General"));
+    IP = new InfoPanel(NULL, p_intf);
+    addTab(IP, qtr("&Details"));
     if( stats )
     {
         ISP = new InputStatsPanel( NULL, p_intf );
         addTab(ISP, qtr("&Stats"));
     }
-
-    IP = new InfoPanel(NULL, p_intf);
-    addTab(IP, qtr("&Info"));
 }
 
 InfoTab::~InfoTab()
