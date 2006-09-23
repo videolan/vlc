@@ -186,4 +186,7 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 
 #define EXTENSIONS_PLAYLIST "*.asx;*.b4s;*.m3u;*.pls;*.vlc;*.xspf"
 
+#define EXTENSIONS_MEDIA EXTENSIONS_VIDEO ";" EXTENSIONS_AUDIO ";" \
+                          EXTENSIONS_PLAYLIST
+
 #define EXTENSIONS_SUBTITLE "*.idx;*.srt;*.sub;*.utf"

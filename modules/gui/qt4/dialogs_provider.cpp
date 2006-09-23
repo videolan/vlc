@@ -276,13 +276,24 @@ void DialogsProvider::openMLDirectory()
 QStringList DialogsProvider::showSimpleOpen()
 {
     QString FileTypes;
-    FileTypes = "Video Files ( ";
+    FileTypes = _("Media Files");
+    FileTypes += " ( ";
+    FileTypes += EXTENSIONS_MEDIA;
+    FileTypes += ");;";
+    FileTypes += _("Video Files");
+    FileTypes += " ( ";
     FileTypes += EXTENSIONS_VIDEO;
-    FileTypes += ");; Sound Files ( ";
+    FileTypes += ");;";
+    FileTypes += _("Sound Files");
+    FileTypes += " ( ";
     FileTypes += EXTENSIONS_AUDIO;
-    FileTypes += ");; PlayList Files ( ";
+    FileTypes += ");;";
+    FileTypes += _("PlayList Files");
+    FileTypes += " ( ";
     FileTypes += EXTENSIONS_PLAYLIST;
-    FileTypes += ");; All Files (*.*)" ;
+    FileTypes += ");;";
+    FileTypes += _("All Files");
+    FileTypes += " (*.*)";
     FileTypes.replace(QString(";*"), QString(" *"));
     return QFileDialog::getOpenFileNames( NULL, qfu(I_POP_SEL_FILES ),
                     p_intf->p_libvlc->psz_homedir, FileTypes );
