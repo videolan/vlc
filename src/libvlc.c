@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlc.c: main libvlc source
+ * libvlc.c: Implementation of the old libvlc API
  *****************************************************************************
  * Copyright (C) 1998-2006 the VideoLAN team
  * $Id$

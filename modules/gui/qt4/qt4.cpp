@@ -139,6 +139,7 @@ static void Init( intf_thread_t *p_intf )
     app->setQuitOnLastWindowClosed( false );
     app->exec();
     MainInputManager::killInstance();
+    DialogsProvider::killInstance();
     delete p_intf->p_sys->p_mi;
 }
 
@@ -149,8 +150,7 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
                         intf_dialog_args_t *p_arg )
 {
     DialogEvent *event = new DialogEvent( i_dialog_event, i_arg, p_arg );
-    QApplication::postEvent( DialogsProvider::getInstance( p_intf ),
-                             static_cast<QEvent*>(event) );
+    QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
 }
 
 /*****************************************************************************

@@ -40,7 +40,11 @@ public:
             instance = new StreamInfoDialog( p_intf);
         return instance;
     }
-    static void killInstance() { if( instance ) delete instance; }
+    static void killInstance()
+    {
+        if( instance ) delete instance;
+        instance= NULL;
+    }
     virtual ~StreamInfoDialog();
     bool need_update;
 private:

@@ -624,7 +624,6 @@ void MainInterface::updateOnTimer()
     if( p_intf->b_die )
     {
         QApplication::closeAllWindows();
-        DialogsProvider::killInstance();
         QApplication::quit();
     }
     if( need_components_update )

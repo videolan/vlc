@@ -299,6 +299,11 @@ QStringList DialogsProvider::showSimpleOpen()
                     p_intf->p_libvlc->psz_homedir, FileTypes );
 }
 
+void DialogsProvider::switchToSkins()
+{
+    var_SetString( p_intf, "intf-switch", "skins2" );
+}
+
 void DialogsProvider::bookmarksDialog()
 {
 }

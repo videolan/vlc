@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlc-common.c: libvlc instances creation and deletion
+ * libvlc-common.c: libvlc instances creation and deletion, interfaces handling
  *****************************************************************************
  * Copyright (C) 1998-2006 the VideoLAN team
  * $Id$
@@ -161,6 +161,8 @@ libvlc_int_t * libvlc_InternalCreate( void )
     var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
     var_Get( p_libvlc_global, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
+
+	
 
     i_instances++;
 

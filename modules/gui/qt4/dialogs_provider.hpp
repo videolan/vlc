@@ -52,7 +52,11 @@ public:
             instance = new DialogsProvider( p_intf );
         return instance;
     }
-    static void killInstance() { if( instance ) delete instance; }
+    static void killInstance()
+    {
+        if( instance ) delete instance;
+        instance=NULL;
+    }
     virtual ~DialogsProvider();
     QTimer *fixed_timer;
 protected:
@@ -91,6 +95,7 @@ public slots:
     void openDirectory();
     void openMLDirectory();
     void quit();
+    void switchToSkins();
 };
 
 #endif

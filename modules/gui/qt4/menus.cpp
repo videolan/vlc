@@ -198,9 +198,15 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     objects.push_back( p_intf->i_object_id );
 
     QMenu *menu = Populate( p_intf, current, varnames, objects );
+
+    if( !p_intf->pf_show_dialog )
+    {
+        menu->addSeparator();
+        menu->addAction( qtr("Switch to skins"), THEDP, SLOT(switchToSkins()) );
+    }
+
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );
     THEDP->menusUpdateMapper->setMapping( menu, 4 );
-
     return menu;
 }
 

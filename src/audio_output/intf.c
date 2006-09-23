@@ -529,3 +529,12 @@ void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
     }
     free( psz_string );
 }
+
+/**
+ * Change audio visualization
+ * -1 goes backwards, +1 goes forward
+ */
+char *aout_VisualChange( vlc_object_t *p_this, int i_skip )
+{
+    return strdup("foobar");
+}
