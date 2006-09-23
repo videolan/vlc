@@ -26,6 +26,7 @@
 
 #include <QObject>
 #include <vlc/vlc.h>
+#include <vlc/input.h>
 
 class InputManager : public QObject
 {
@@ -35,6 +36,7 @@ public:
     virtual ~InputManager();
 
     void delInput();
+    bool hasInput() { return p_input && !p_input->b_dead && !p_input->b_die; }
     bool hasAudio() { return b_has_audio; }
     bool hasVideo() { return b_has_video; }
     bool b_has_audio, b_has_video, b_had_audio, b_had_video;
@@ -48,6 +50,9 @@ public slots:
     void update(); ///< Periodic updates
     void setInput( input_thread_t * ); ///< Our controlled input changed
     void sliderUpdate( float ); ///< User dragged the slider. We get new pos
+    void slower();
+    void faster();
+    void normalRate();
 signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int, int );

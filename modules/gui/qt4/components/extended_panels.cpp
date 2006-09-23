@@ -1,5 +1,5 @@
 /*****************************************************************************
- * equalizer.cpp : Equalizer
+ * extended_panels.cpp : Extended controls panels
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id: preferences.cpp 16643 2006-09-13 12:45:46Z zorglub $
@@ -27,7 +27,7 @@
 #include <QFont>
 #include <QGridLayout>
 
-#include "components/equalizer.hpp"
+#include "components/extended_panels.hpp"
 #include "qt4.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
@@ -35,6 +35,10 @@
 #include <aout_internal.h>
 #include <vlc_intf_strings.h>
 #include <assert.h>
+
+/**********************************************************************
+ * Equalizer
+ **********************************************************************/
 
 static const QString band_frequencies[] =
 {
@@ -257,3 +261,16 @@ void Equalizer::addCallbacks( aout_instance_t *p_aout )
 //    var_AddCallback( p_aout, "equalizer-bands", EqzCallback, this );
 //    var_AddCallback( p_aout, "equalizer-preamp", EqzCallback, this );
 }
+
+
+/**********************************************************************
+ * Video filters / Adjust
+ **********************************************************************/
+
+/**********************************************************************
+ * Audio filters
+ **********************************************************************/
+
+/**********************************************************************
+ * Extended playbak controls
+ **********************************************************************/

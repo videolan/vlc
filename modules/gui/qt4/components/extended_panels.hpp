@@ -56,4 +56,20 @@ private slots:
     void setPreset(int);
 };
 
+class ExtendedControls: public QWidget
+{
+    Q_OBJECT
+public:
+    ExtendedControls( intf_thread_t *, QWidget * ) {};
+    virtual ~ExtendedControls() {};
+
+private:
+    intf_thread_t *p_intf;
+private slots:
+    void slower() {};
+    void faster() {};
+    void normal() {};
+    void snapshot() {};
+};
+
 #endif

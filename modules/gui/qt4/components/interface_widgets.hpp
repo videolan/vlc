@@ -89,7 +89,33 @@ public:
     virtual ~VisualSelector();
 private:
     intf_thread_t *p_intf;
+    QLabel *current;
+private slots:
+    void prev();
+    void next();
 };
+
+class QPushButton;
+class ControlsWidget : public QFrame
+{
+    Q_OBJECT
+public:
+    ControlsWidget( intf_thread_t *);
+    virtual ~ControlsWidget();
+    void enableInput( bool );
+    void enableVideo( bool );
+private:
+    intf_thread_t *p_intf;
+    QPushButton *slowerButton, *normalButton, *fasterButton;
+    QPushButton *fullscreenButton, *snapshotButton;
+private slots:
+    void faster();
+    void slower();
+    void normal();
+    void snapshot();
+    void fullscreen();
+};
+
 
 /******************** Playlist Widgets ****************/
 #include <QModelIndex>

@@ -39,6 +39,7 @@
 #include <assert.h>
 #include <vlc_keys.h>
 #include <vlc/vout.h>
+#include <aout_internal.h>
 
 #ifdef WIN32
     #define PREF_W 410
@@ -47,10 +48,6 @@
     #define PREF_W 450
     #define PREF_H 125
 #endif
-
-#define BUTTON_SET( button, image, tooltip ) ui.button##Button->setText(""); \
-    ui.button##Button->setIcon( QIcon( ":/pixmaps/"#image ) ); \
-    ui.button##Button->setToolTip( tooltip );
 
 #define VISIBLE(i) (i && i->isVisible())
 
@@ -90,10 +87,24 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
     embeddedPlaylistWasActive = videoIsActive = false;
 
+    /* Fetch configuration from settings and vlc config */
+    videoEmbeddedFlag = false;
+    if( config_GetInt( p_intf, "embedded-video" ) )
+        videoEmbeddedFlag = true;
+
+    alwaysVideoFlag = false;
+    if( videoEmbeddedFlag && config_GetInt( p_intf, "qt-always-video" ))
+        alwaysVideoFlag = true;
+
+    playlistEmbeddedFlag = settings->value( "playlist-embedded", true ).
+                                                                    toBool();
+    advControlsEnabled= settings->value( "adv-controls", false ).toBool();
+
     setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
     handleMainUi( settings );
 
-    QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag );
+    QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag,
+                             advControlsEnabled );
 
     /* Status bar */
     timeLabel = new QLabel( 0 );
@@ -126,7 +137,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
 MainInterface::~MainInterface()
 {
-    /// \todo Save everything
+    settings->setValue( "playlist-embedded", playlistEmbeddedFlag );
+    settings->setValue( "adv-controls", advControlsEnabled );
+    settings->setValue( "pos", pos() );
+    settings->endGroup();
+    delete settings;
     p_intf->b_interaction = VLC_FALSE;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
 
@@ -144,17 +159,13 @@ void MainInterface::handleMainUi( QSettings *settings )
     slider = new InputSlider( Qt::Horizontal, NULL );
     ui.hboxLayout->insertWidget( 0, slider );
 
-    BUTTON_SET( prev, previous.png, qtr( "Previous" ) );
-    BUTTONACT( ui.prevButton, prev() );
-    BUTTON_SET( next, next.png , qtr( "Next" ) );
-    BUTTONACT( ui.nextButton, next() );
-    BUTTON_SET( play, play.png , qtr( "Play" ) );
-    BUTTONACT( ui.playButton, play() );
-    BUTTON_SET( stop, stop.png , qtr( "Stop" )  );
-    BUTTONACT( ui.stopButton, stop() );
-
-    BUTTON_SET( visual,  stop.png, qtr( "Audio visualizations" ) );
-    BUTTONACT( ui.visualButton, visual() );
+    BUTTON_SET_ACT_I( ui.prevButton, "" , previous.png,
+                      qtr("Previous"), prev() );
+    BUTTON_SET_ACT_I( ui.nextButton, "", next.png, qtr("Next"), next() );
+    BUTTON_SET_ACT_I( ui.playButton, "", play.png, qtr("Play"), play() );
+    BUTTON_SET_ACT_I( ui.stopButton, "", stop.png, qtr("Stop"), stop() );
+    BUTTON_SET_ACT_I( ui.visualButton, "", stop.png,
+                    qtr( "Audio visualizations" ), visual() );
 
     /* Volume */
     ui.volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
@@ -164,20 +175,8 @@ void MainInterface::handleMainUi( QSettings *settings )
     ui.volMuteLabel->installEventFilter(h);
     ui.volumeSlider->setFocusPolicy( Qt::NoFocus );
 
-    /* Fetch configuration from settings and vlc config */
-    videoEmbeddedFlag = false;
-    if( config_GetInt( p_intf, "embedded-video" ) )
-        videoEmbeddedFlag = true;
-
-    alwaysVideoFlag = false;
-    if( videoEmbeddedFlag && config_GetInt( p_intf, "qt-always-video" ))
-        alwaysVideoFlag = true;
-
-    playlistEmbeddedFlag = true;
-    /// \todo fetch playlist settings
-
-    BUTTON_SET( playlist, volume-low.png, playlistEmbeddedFlag ?
-                                                qtr( "Show playlist" ) :
+    BUTTON_SET_IMG( ui.playlistButton, "" ,volume-low.png,
+                        playlistEmbeddedFlag ?  qtr( "Show playlist" ) :
                                                 qtr( "Open playlist" ) );
     BUTTONACT( ui.playlistButton, playlist() );
 
@@ -185,6 +184,12 @@ void MainInterface::handleMainUi( QSettings *settings )
     resize ( PREF_W, PREF_H );
 
     addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
+
+    advControls = new ControlsWidget( p_intf );
+    ui.vboxLayout->insertWidget( 0, advControls );
+    advControls->updateGeometry();
+    if( !advControlsEnabled ) advControls->hide();
+    need_components_update = true;
 
     visualSelector = new VisualSelector( p_intf );
     ui.vboxLayout->insertWidget( 0, visualSelector );
@@ -211,10 +216,6 @@ void MainInterface::handleMainUi( QSettings *settings )
         p_intf->pf_release_window  = ::DoRelease;
         p_intf->pf_control_window  = ::DoControl;
     }
-
-    calculateInterfaceSize();
-    resize( mainSize );
-
     setMinimumSize( PREF_W, addSize.height() );
 }
 
@@ -249,7 +250,14 @@ void MainInterface::calculateInterfaceSize()
     }
     if( VISIBLE( visualSelector ) )
         height += visualSelector->height();
+    fprintf( stderr, "Adv %p - visible %i\n", advControls, advControls->isVisible() );
+    if( VISIBLE( advControls) )
+    {
+        fprintf( stderr, "visible\n" );
+        height += advControls->sizeHint().height();
+    }
 
+    fprintf( stderr, "Adv height %i\n", advControls->sizeHint().height() );
     fprintf( stderr, "Setting to %ix%i\n",
                      width + addSize.width() , height + addSize.height() );
 
@@ -265,14 +273,12 @@ void MainInterface::resizeEvent( QResizeEvent *e )
         SET_WH( videoWidget, e->size().width() - addSize.width(),
                              e->size().height()  - addSize.height() );
         videoWidget->updateGeometry();
-        fprintf( stderr, "Video set to %ix%i\n", DS( videoWidget->widgetSize) );
     }
     if( VISIBLE( playlistWidget ) )
     {
         SET_WH( playlistWidget , e->size().width() - addSize.width(),
                                  e->size().height() - addSize.height() );
         playlistWidget->updateGeometry();
-        fprintf( stderr, "PL set to %ix%i\n",DS(playlistWidget->widgetSize ) );
     }
 }
 
@@ -361,6 +367,21 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
     return i_ret;
 }
 
+void MainInterface::advanced()
+{
+    if( !VISIBLE( advControls ) )
+    {
+        advControls->show();
+        advControlsEnabled = true;
+    }
+    else
+    {
+        advControls->hide();
+        advControlsEnabled = false;
+    }
+    doComponentsUpdate();
+}
+
 void MainInterface::visual()
 {
     if( !VISIBLE( visualSelector) )
@@ -404,7 +425,6 @@ void MainInterface::playlist()
     /// Todo, reset its size ?
     if( VISIBLE( playlistWidget) )
     {
-        fprintf( stderr, "hiding playlist\n" );
         playlistWidget->hide();
         if( videoIsActive )
         {
@@ -415,7 +435,6 @@ void MainInterface::playlist()
     }
     else
     {
-        fprintf( stderr, "showing playlist\n" );
         playlistWidget->show();
         if( videoIsActive )
         {
@@ -448,7 +467,7 @@ void MainInterface::undockPlaylist()
         playlistEmbeddedFlag = false;
 
         menuBar()->clear();
-        QVLCMenu::createMenuBar( this, p_intf, false );
+        QVLCMenu::createMenuBar( this, p_intf, false, advControlsEnabled );
 
         if( videoIsActive )
         {
@@ -469,7 +488,7 @@ void MainInterface::customEvent( QEvent *event )
         PlaylistDialog::killInstance();
         playlistEmbeddedFlag = true;
         menuBar()->clear();
-        QVLCMenu::createMenuBar(this, p_intf, true );
+        QVLCMenu::createMenuBar(this, p_intf, true, advControlsEnabled );
         playlist();
     }
 }
@@ -587,6 +606,21 @@ static bool b_my_volume;
 
 void MainInterface::updateOnTimer()
 {
+    aout_instance_t *p_aout = (aout_instance_t *)vlc_object_find( p_intf,
+                                    VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    /* Todo: make this event-driven */
+    if( p_aout )
+    {
+        ui.visualButton->setEnabled( true );
+        vlc_object_release( p_aout );
+    }
+    else
+        ui.visualButton->setEnabled( false );
+
+    /* And this too */
+    advControls->enableInput( THEMIM->getIM()->hasInput() );
+    advControls->enableVideo( THEMIM->getIM()->hasVideo() );
+
     if( p_intf->b_die )
     {
         QApplication::closeAllWindows();
@@ -634,8 +668,6 @@ static int InteractCallback( vlc_object_t *p_this,
 {
     intf_dialog_args_t *p_arg = new intf_dialog_args_t;
     p_arg->p_dialog = (interaction_dialog_t *)(new_val.p_address);
-
-    MainInterface *p_interface = (MainInterface*)param;
     DialogEvent *event = new DialogEvent( INTF_DIALOG_INTERACTION, 0, p_arg );
     QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;

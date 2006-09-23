@@ -55,6 +55,11 @@ void InputManager::setInput( input_thread_t *_p_input )
     b_had_audio = b_had_video = b_has_audio = b_has_video = false;
     if( p_input )
     {
+        vlc_value_t val;
+        var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+        b_has_video = val.i_int > 0;
+        var_Change( p_input, "audio-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+        b_has_audio = val.i_int > 0;
         var_AddCallback( p_input, "audio-es", ChangeAudio, this );
         var_AddCallback( p_input, "video-es", ChangeVideo, this );
     }
@@ -139,7 +144,7 @@ void InputManager::update()
 
 void InputManager::sliderUpdate( float new_pos )
 {
-    if( p_input && !p_input->b_die && !p_input->b_dead )
+    if( hasInput() )
         var_SetFloat( p_input, "position", new_pos );
 }
 
@@ -159,6 +164,24 @@ void InputManager::togglePlayPause()
     }
     var_Set( p_input, "state", state );
     emit statusChanged( state.i_int );
+}
+
+void InputManager::slower()
+{
+    if( hasInput() )
+        var_SetVoid( p_input, "rate-slower" );
+}
+
+void InputManager::faster()
+{
+    if( hasInput() )
+        var_SetVoid( p_input, "rate-faster" );
+}
+
+void InputManager::normalRate()
+{
+    if( hasInput() )
+        var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
 }
 
 /**********************************************************************

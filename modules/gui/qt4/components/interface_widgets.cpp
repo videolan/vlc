@@ -30,6 +30,8 @@
 #include "pixmaps/art.xpm"
 #include <vlc/vout.h>
 
+#include <QLabel>
+#include <QSpacerItem>
 #include <QCursor>
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -154,11 +156,119 @@ VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
     QPushButton *nextButton = new QPushButton( "Next");
     layout->addWidget( prevButton );
     layout->addWidget( nextButton );
+
+    layout->addItem( new QSpacerItem( 40,20,
+                              QSizePolicy::Expanding, QSizePolicy::Minimum) );
+    layout->addWidget( new QLabel( qtr("Current visualization:") ) );
+
+    current = new QLabel( qtr( "None" ) );
+    layout->addWidget( current );
+
+    BUTTONACT( prevButton, prev() );
+    BUTTONACT( nextButton, next() );
+
     setLayout( layout );
     setMaximumHeight( 35 );
 }
 
 VisualSelector::~VisualSelector()
+{
+}
+
+void VisualSelector::prev()
+{
+    char *psz_new = aout_VisualPrev( p_intf );
+    if( psz_new )
+    {
+        current->setText( qfu( psz_new ) );
+        free( psz_new );
+    }
+}
+
+void VisualSelector::next()
+{
+    char *psz_new = aout_VisualNext( p_intf );
+    if( psz_new )
+    {
+        current->setText( qfu( psz_new ) );
+        free( psz_new );
+    }
+}
+
+/**********************************************************************
+ * More controls
+ **********************************************************************/
+ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
+                                           QFrame( NULL ), p_intf( _p_i )
+{
+    QHBoxLayout *layout = new QHBoxLayout( this );
+    layout->setMargin( 0 );
+
+    slowerButton = new QPushButton( "S" );
+    BUTTON_SET_ACT( slowerButton, "S", qtr("Slower" ), slower() );
+    layout->addWidget( slowerButton );
+    slowerButton->setMaximumWidth( 35 );
+
+    normalButton = new QPushButton( "N" );
+    BUTTON_SET_ACT( normalButton, "N", qtr("Normal rate"), normal() );
+    layout->addWidget( normalButton );
+    normalButton->setMaximumWidth( 35 );
+
+    fasterButton = new QPushButton( "F" );
+    BUTTON_SET_ACT( fasterButton, "F", qtr("Faster" ), faster() );
+    layout->addWidget( fasterButton );
+    fasterButton->setMaximumWidth( 35 );
+
+    layout->addItem( new QSpacerItem( 100,20,
+                              QSizePolicy::Expanding, QSizePolicy::Minimum) );
+
+    snapshotButton = new QPushButton( "S" );
+    BUTTON_SET_ACT( snapshotButton, "S", qtr("Take a snapshot"), snapshot() );
+    layout->addWidget( snapshotButton );
+    snapshotButton->setMaximumWidth( 35 );
+
+    fullscreenButton = new QPushButton( "F" );
+    BUTTON_SET_ACT( fullscreenButton, "F", qtr("Fullscreen"), fullscreen() );
+    layout->addWidget( fullscreenButton );
+    fullscreenButton->setMaximumWidth( 35 );
+}
+
+ControlsWidget::~ControlsWidget()
+{
+}
+
+void ControlsWidget::enableInput( bool enable )
+{
+    slowerButton->setEnabled( enable );
+    normalButton->setEnabled( enable );
+    fasterButton->setEnabled( enable );
+}
+void ControlsWidget::enableVideo( bool enable )
+{
+    snapshotButton->setEnabled( enable );
+    fullscreenButton->setEnabled( enable );
+}
+
+void ControlsWidget::slower()
+{
+    THEMIM->getIM()->slower();
+}
+
+void ControlsWidget::faster()
+{
+    THEMIM->getIM()->faster();
+}
+
+void ControlsWidget::normal()
+{
+    THEMIM->getIM()->normalRate();
+}
+
+void ControlsWidget::snapshot()
+{
+}
+
+void ControlsWidget::fullscreen()
 {
 }
 

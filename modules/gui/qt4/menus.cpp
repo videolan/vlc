@@ -120,15 +120,15 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
     THEDP->menusUpdateMapper->setMapping( menu, f ); }
 
 void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
-                              bool playlist )
+                              bool playlist, bool adv_controls_enabled )
 {
     QMenuBar *bar = mi->menuBar();
-    BAR_ADD( FileMenu(), qtr("File") );
+    BAR_ADD( FileMenu(), qtr("Media") );
     if( playlist )
     {
         BAR_ADD( PlaylistMenu( mi,p_intf ), qtr("Playlist" ) );
     }
-    BAR_ADD( ToolsMenu( p_intf ), qtr("Tools") );
+    BAR_ADD( ToolsMenu( p_intf, mi, adv_controls_enabled ), qtr("Tools") );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr("Video"), 1 );
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr("Audio"), 2 );
     BAR_DADD( NavigMenu( p_intf, NULL ), qtr("Navigation"), 3 );
@@ -161,7 +161,8 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
     return menu;
 }
 
-QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, bool with_intf )
+QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
+                            bool adv_controls_enabled, bool with_intf )
 {
     QMenu *menu = new QMenu();
     if( with_intf )
@@ -169,15 +170,22 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, bool with_intf )
         QMenu *intfmenu = InterfacesMenu( p_intf, NULL );
         intfmenu->setTitle( qtr("Interfaces" ) );
         menu->addMenu( intfmenu );
-        /** \todo ADD EXT GUI HERE */
         menu->addSeparator();
     }
     DP_SADD( qtr("Messages" ), "", "", messagesDialog() );
     DP_SADD( qtr("Information") , "", "", streaminfoDialog() );
     DP_SADD( qtr("Bookmarks"), "", "", bookmarksDialog() );
+    DP_SADD( qtr("Extended settings"), "","",extendedDialog() );
+    if( mi )
+    {
+        menu->addSeparator();
+        QAction *adv = menu->addAction( qtr("Advanced controls" ),
+                                        mi, SLOT( advanced() ) );
+        adv->setCheckable( true );
+        if( adv_controls_enabled ) adv->setChecked( true );
+    }
     menu->addSeparator();
     DP_SADD( qtr("Preferences"), "", "", prefsDialog() );
-    DP_SADD( qtr("Extended"), "","",extendedDialog() );
     return menu;
 }
 
@@ -340,7 +348,7 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
     intfmenu->setTitle( qtr("Interfaces" ) ); \
     menu->addMenu( intfmenu ); \
     \
-    QMenu *toolsmenu = ToolsMenu( p_intf, false ); \
+    QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, false ); \
     toolsmenu->setTitle( qtr("Tools" ) ); \
     menu->addMenu( toolsmenu ); \
 

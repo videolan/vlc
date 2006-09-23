@@ -30,7 +30,7 @@ TOMOC = main_interface \
 	dialogs/streaminfo \
 	dialogs/extended \
 	dialogs/interaction \
-	components/equalizer \
+	components/extended_panels \
 	components/infopanels \
 	components/preferences_widgets \
 	components/preferences \
@@ -56,7 +56,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/errors.moc.cpp \
 		dialogs/prefs_dialog.moc.cpp \
 		dialogs/interaction.moc.cpp \
-		components/equalizer.moc.cpp \
+		components/extended_panels.moc.cpp \
 		components/infopanels.moc.cpp \
 	 	components/preferences_widgets.moc.cpp \
 	 	components/preferences.moc.cpp \
@@ -102,7 +102,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/messages.cpp \
 		dialogs/errors.cpp \
 		dialogs/interaction.cpp \
-		components/equalizer.cpp \
+		components/extended_panels.cpp \
 		components/infopanels.cpp \
 		components/preferences_widgets.cpp \
 		components/preferences.cpp \
@@ -130,7 +130,7 @@ EXTRA_DIST += \
 	dialogs/errors.hpp \
 	dialogs/prefs_dialog.hpp \
 	dialogs/interaction.hpp \
-	components/equalizer.hpp \
+	components/extended_panels.hpp \
 	components/infopanels.hpp \
 	components/preferences_widgets.hpp \
 	components/preferences.hpp \

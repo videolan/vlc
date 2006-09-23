@@ -42,6 +42,7 @@ class BackgroundWidget;
 class PlaylistWidget;
 class VolumeClickHandler;
 class VisualSelector;
+class ControlsWidget;
 
 class MainInterface : public QVLCMW
 {
@@ -74,11 +75,13 @@ private:
 
     BackgroundWidget    *bgWidget;
     VisualSelector      *visualSelector;
+    ControlsWidget      *advControls;
     PlaylistWidget      *playlistWidget;
 
     bool                 playlistEmbeddedFlag;
     bool                 videoEmbeddedFlag;
     bool                 alwaysVideoFlag;
+    bool                 advControlsEnabled;
 
     InputManager        *main_input_manager;
     InputSlider         *slider;
@@ -101,6 +104,7 @@ private slots:
     void next();
     void playlist();
     void visual();
+    void advanced();
     void updateVolume( int sliderVolume );
 };
 

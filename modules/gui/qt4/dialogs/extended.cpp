@@ -26,7 +26,7 @@
 #include "dialogs/extended.hpp"
 #include "dialogs_provider.hpp"
 #include "util/qvlcframe.hpp"
-#include "components/equalizer.hpp"
+#include "components/extended_panels.hpp"
 #include "qt4.hpp"
 
 ExtendedDialog *ExtendedDialog::instance = NULL;
