@@ -80,6 +80,8 @@ static void SlaveSeek( input_thread_t *p_input );
 
 static void InputMetaUser( input_thread_t *p_input );
 
+int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item );
+
 /*****************************************************************************
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
@@ -235,8 +237,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 }
 
 /**
- * Initialize an input thread and run it. You will need to monitor the thread to clean
- * up after it is done
+ * Initialize an input thread and run it. You will need to monitor the
+ * thread to clean up after it is done
  *
  * \param p_parent a vlc_object
  * \param p_item an input item
@@ -362,84 +364,20 @@ int __input_SecondaryPreparse( vlc_object_t *p_parent, input_item_t *p_item )
     p_me->p_item = p_item;
     p_me->p_module = module_Need( p_me, "meta engine", 0, VLC_FALSE );
 
+
     if( !p_me->p_module )
     {
         msg_Err( p_parent, "no suitable meta engine module" );
+        vlc_object_detach( p_me );
+        vlc_object_destroy( p_me );
         return VLC_EGENERIC;
     }
 
     module_Unneed( p_me, p_me->p_module );
 
-    if( p_item->p_meta
-        && p_item->p_meta->psz_arturl
-        && *p_item->p_meta->psz_arturl
-        && strncmp( p_item->p_meta->psz_arturl, "file", 4 ) )
-    {
-        /* process album art */
-        #define MAX_PATH 10000
-        char *psz_artist = p_item->p_meta->psz_artist;
-        char *psz_album = p_item->p_meta->psz_album;
-        char *psz_type = strrchr( p_item->p_meta->psz_arturl, '.' );
-        char *psz_filename = (char *)malloc( MAX_PATH );
-        FILE *p_file;
+    vlc_object_destroy( p_me );
 
-        /* GRUIKKKKKKKKKK */
-        snprintf( psz_filename, MAX_PATH,
-                  "file://%s/" CONFIG_DIR,
-                  p_parent->p_libvlc->psz_homedir );
-        utf8_mkdir( psz_filename+7 );
-        snprintf( psz_filename, MAX_PATH,
-                  "file://%s/" CONFIG_DIR "/art",
-                  p_parent->p_libvlc->psz_homedir );
-        utf8_mkdir( psz_filename+7 );
-        snprintf( psz_filename, MAX_PATH,
-                  "file://%s/" CONFIG_DIR "/art/%s",
-                  p_parent->p_libvlc->psz_homedir,
-                  psz_artist );
-        utf8_mkdir( psz_filename+7 );
-        snprintf( psz_filename, MAX_PATH,
-                  "file://%s/" CONFIG_DIR "/art/%s/%s",
-                  p_parent->p_libvlc->psz_homedir,
-                  psz_artist, psz_album );
-        utf8_mkdir( psz_filename+7 );
-
-        snprintf( psz_filename, MAX_PATH,
-                  "file://%s/" CONFIG_DIR "/art/%s/%s/art%s",
-                  p_parent->p_libvlc->psz_homedir,
-                  psz_artist, psz_album, psz_type );
-        msg_Dbg( p_parent, "Saving album art to %s", psz_filename );
-
-        /* Check if file exists */
-        p_file = utf8_fopen( psz_filename+7, "r" );
-        if( p_file )
-        {
-            msg_Dbg( p_parent, "Album art %s already exists", psz_filename );
-            fclose( p_file );
-        }
-        else
-        {
-            stream_t *p_stream = stream_UrlNew( p_parent,
-                                                p_item->p_meta->psz_arturl );
-
-            if( p_stream )
-            {
-                void *p_buffer = malloc( 1<<16 );
-                long int l_read;
-                p_file = utf8_fopen( psz_filename+7, "w" );
-                while( ( l_read = stream_Read( p_stream, p_buffer, 1<<16 ) ) )
-                {
-                    fwrite( p_buffer, l_read, 1, p_file );
-                }
-                free( p_buffer );
-                fclose( p_file );
-                stream_Delete( p_stream );
-                msg_Dbg( p_parent, "Album art saved to %s\n", psz_filename );
-                free( p_item->p_meta->psz_arturl );
-                p_item->p_meta->psz_arturl = strdup( psz_filename );
-            }
-        }
-        free( psz_filename );
-    }
+    input_DownloadAndCacheArt( p_parent, p_item );
 
     return VLC_SUCCESS;
 }
@@ -2586,4 +2524,91 @@ vlc_bool_t input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
     }
 
     return VLC_TRUE;
+}
+
+#define MAX_PATH 260
+int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
+{
+    char *psz_artist;
+    char *psz_album;
+    char *psz_type;
+    char *psz_filename;
+    int i_status = VLC_EGENERIC;
+    int i_ret;
+
+    if( !p_item->p_meta
+        || !p_item->p_meta->psz_arturl
+        || !*p_item->p_meta->psz_arturl )
+    {
+        return VLC_EGENERIC;
+    }
+    if( !strncmp( p_item->p_meta->psz_arturl, "file", 4 ) )
+    {
+        return VLC_SUCCESS;
+    }
+
+    psz_artist = p_item->p_meta->psz_artist;
+    psz_album = p_item->p_meta->psz_album;
+    psz_type = strrchr( p_item->p_meta->psz_arturl, '.' );
+    psz_filename = (char *)malloc( MAX_PATH );
+
+
+    snprintf( psz_filename, MAX_PATH,
+              "file://%s/" CONFIG_DIR "/art/%s/%s/art%s",
+              p_parent->p_libvlc->psz_homedir,
+              psz_artist, psz_album, psz_type );
+    msg_Dbg( p_parent, "Saving album art to %s", psz_filename );
+
+    /* Check if file exists */
+    i_ret = utf8_stat( psz_filename+7, NULL );
+    if( i_ret == 0 )
+    {
+        msg_Dbg( p_parent, "Album art %s already exists", psz_filename );
+    }
+    else
+    {
+        //if( i_ret == -1 && errno == ENOTDIR )
+        {
+            /* GRUIKKKKKKKKKK (make sure that all the directories exist) */
+            char *psz_dir = malloc( MAX_PATH );
+            snprintf( psz_dir, MAX_PATH, "%s/" CONFIG_DIR,
+                      p_parent->p_libvlc->psz_homedir );
+            utf8_mkdir( psz_dir );
+            snprintf( psz_dir, MAX_PATH, "%s/" CONFIG_DIR "/art",
+                      p_parent->p_libvlc->psz_homedir );
+            utf8_mkdir( psz_dir );
+            snprintf( psz_dir, MAX_PATH, "%s/" CONFIG_DIR "/art/%s",
+                      p_parent->p_libvlc->psz_homedir, psz_artist );
+            utf8_mkdir( psz_dir );
+            snprintf( psz_dir, MAX_PATH, "%s/" CONFIG_DIR "/art/%s/%s",
+                      p_parent->p_libvlc->psz_homedir,
+                      psz_artist, psz_album );
+            utf8_mkdir( psz_dir );
+            free( psz_dir );
+        }
+
+        stream_t *p_stream = stream_UrlNew( p_parent,
+                                            p_item->p_meta->psz_arturl );
+
+        if( p_stream )
+        {
+            void *p_buffer = malloc( 1<<16 );
+            long int l_read;
+            FILE *p_file = utf8_fopen( psz_filename+7, "w" );
+            while( ( l_read = stream_Read( p_stream, p_buffer, 1<<16 ) ) )
+            {
+                fwrite( p_buffer, l_read, 1, p_file );
+            }
+            free( p_buffer );
+            fclose( p_file );
+            stream_Delete( p_stream );
+            msg_Dbg( p_parent, "Album art saved to %s\n", psz_filename );
+            free( p_item->p_meta->psz_arturl );
+            p_item->p_meta->psz_arturl = strdup( psz_filename );
+            i_status = VLC_SUCCESS;
+        }
+    }
+    free( psz_filename );
+
+    return i_status;
 }
