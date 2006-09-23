@@ -641,6 +641,8 @@ static struct
       VIDEO_ES, "h264" },
     { VLC_FOURCC('x','2','6','4'), CODEC_ID_H264,
       VIDEO_ES, "h264" },
+    { VLC_FOURCC('X','2','6','4'), CODEC_ID_H264,
+      VIDEO_ES, "h264" },
     /* avc1: special case h264 */
     { VLC_FOURCC('a','v','c','1'), CODEC_ID_H264,
       VIDEO_ES, "h264" },
