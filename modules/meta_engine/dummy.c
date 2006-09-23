@@ -33,6 +33,11 @@
 #include <vlc_meta_engine.h>
 #include <charset.h>
 
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -80,22 +85,21 @@ static int FindMeta( vlc_object_t *p_this )
     CHECK( language, LANGUAGE )
     CHECK( arturl, ART_URL )
 
-    if( !(i_meta & VLC_META_ENGINE_ART_URL) )
+    if( !( i_meta & VLC_META_ENGINE_ART_URL )
+        && ( p_me->i_mandatory & VLC_META_ENGINE_ART_URL ) )
     {
         if( i_meta & VLC_META_ENGINE_COLLECTION
             && i_meta & VLC_META_ENGINE_ARTIST )
         {
-            FILE *p_file;
             char *psz_filename;
+            struct stat a;
             asprintf( &psz_filename,
                       "file://%s/" CONFIG_DIR "/art/%s/%s/art.jpg", /* ahem ... we can have other filetype too... */
                       p_me->p_libvlc->psz_homedir,
                       p_item->p_meta->psz_artist,
                       p_item->p_meta->psz_album );
-            p_file = utf8_fopen( psz_filename+7, "r" );
-            if( p_file )
+            if( utf8_stat( psz_filename+7, &a ) != -1 )
             {
-                fclose( p_file );
                 vlc_meta_SetArtURL( p_item->p_meta, psz_filename );
                 i_meta |= VLC_META_ENGINE_ART_URL;
             }

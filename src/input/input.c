@@ -43,6 +43,10 @@
 
 #include "charset.h"
 
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -2526,7 +2530,9 @@ vlc_bool_t input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
     return VLC_TRUE;
 }
 
-#define MAX_PATH 260
+#ifndef MAX_PATH
+#   define MAX_PATH 250
+#endif
 int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
 {
     char *psz_artist;
@@ -2535,6 +2541,7 @@ int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
     char *psz_filename;
     int i_status = VLC_EGENERIC;
     int i_ret;
+    struct stat a;
 
     if( !p_item->p_meta
         || !p_item->p_meta->psz_arturl
@@ -2560,7 +2567,7 @@ int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
     msg_Dbg( p_parent, "Saving album art to %s", psz_filename );
 
     /* Check if file exists */
-    i_ret = utf8_stat( psz_filename+7, NULL );
+    i_ret = utf8_stat( psz_filename+7, &a );
     if( i_ret == 0 )
     {
         msg_Dbg( p_parent, "Album art %s already exists", psz_filename );
