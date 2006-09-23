@@ -362,9 +362,16 @@ int __input_SecondaryPreparse( vlc_object_t *p_parent, input_item_t *p_item )
     p_me = vlc_object_create( p_parent, VLC_OBJECT_META_ENGINE );
     p_me->i_flags |= OBJECT_FLAGS_NOINTERACT;
     p_me->i_mandatory =   VLC_META_ENGINE_TITLE
-                        | VLC_META_ENGINE_ARTIST
-                        | VLC_META_ENGINE_ART_URL;
+                        | VLC_META_ENGINE_ARTIST;
     p_me->i_optional = 0;
+    if( var_CreateGetInteger( p_parent, "album-art" ) != ALBUM_ART_NEVER )
+    {
+        p_me->i_mandatory |= VLC_META_ENGINE_ART_URL;
+    }
+    else
+    {
+        p_me->i_optional |= VLC_META_ENGINE_ART_URL;
+    }
     p_me->p_item = p_item;
     p_me->p_module = module_Need( p_me, "meta engine", 0, VLC_FALSE );
 
@@ -380,8 +387,6 @@ int __input_SecondaryPreparse( vlc_object_t *p_parent, input_item_t *p_item )
     module_Unneed( p_me, p_me->p_module );
 
     vlc_object_destroy( p_me );
-
-    input_DownloadAndCacheArt( p_parent, p_item );
 
     return VLC_SUCCESS;
 }

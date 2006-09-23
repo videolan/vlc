@@ -171,4 +171,10 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
 }
     /** \todo Track meta */
 
+enum {
+    ALBUM_ART_NEVER,
+    ALBUM_ART_WHEN_ASKED,
+    ALBUM_ART_WHEN_PLAYED,
+    ALBUM_ART_ALL };
+
 #endif

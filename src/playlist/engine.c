@@ -500,7 +500,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
             vlc_mutex_unlock( &p_playlist->object_lock );
         }
         vlc_mutex_lock( &p_obj->object_lock );
-        i_activity=  var_GetInteger( p_playlist, "activity" );
+        i_activity = var_GetInteger( p_playlist, "activity" );
         if( i_activity < 0 ) i_activity = 0;
         vlc_mutex_unlock( &p_obj->object_lock );
         msleep( (i_activity+1) * 1000 );

@@ -26,6 +26,7 @@
 
 #define Nothing here, this is just to prevent update-po from being stupid
 #include "vlc_keys.h"
+#include "vlc_meta.h"
 
 #if defined (WIN32) || defined (__APPLE__)
 static char *ppsz_language[] =
@@ -933,6 +934,19 @@ static char *ppsz_clock_descriptions[] =
     "Automatically preparse files added to the playlist " \
     "(to retrieve some metadata)." )
 
+#define ALBUM_ART_TEXT N_( "Album art policy" )
+#define ALBUM_ART_LONGTEXT N_( \
+    "Choose when to download and cache album art." )
+
+static int pi_albumart_values[] = { ALBUM_ART_NEVER,
+                                    ALBUM_ART_WHEN_ASKED,
+                                    ALBUM_ART_WHEN_PLAYED,
+                                    ALBUM_ART_ALL };
+static char *ppsz_albumart_descriptions[] =
+    { N_("Never download"), N_("Download when asked"),
+      N_("Download when track starts playing"),
+      N_("Download everything ASAP") };
+
 #define SD_TEXT N_( "Services discovery modules")
 #define SD_LONGTEXT N_( \
      "Specifies the services discovery modules to load, separated by " \
@@ -1633,6 +1647,11 @@ vlc_module_begin();
 
     add_bool( "auto-preparse", VLC_TRUE, NULL, PREPARSE_TEXT,
               PREPARSE_LONGTEXT, VLC_FALSE );
+
+    add_integer( "album-art", ALBUM_ART_WHEN_PLAYED, NULL, ALBUM_ART_TEXT,
+                 ALBUM_ART_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_albumart_values,
+                             ppsz_albumart_descriptions, 0 );
 
     set_subcategory( SUBCAT_PLAYLIST_SD );
     add_module_list_cat( "services-discovery", SUBCAT_PLAYLIST_SD, NULL,
