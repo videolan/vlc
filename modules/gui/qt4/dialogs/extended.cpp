@@ -33,13 +33,15 @@ ExtendedDialog *ExtendedDialog::instance = NULL;
 
 ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
+    QHBoxLayout *l = new QHBoxLayout( this );
+    QTabWidget *tab = new QTabWidget( this );
+
+    l->addWidget( tab );
+
     setWindowTitle( _("Extended controls" ) );
-    QHBoxLayout *layout = new QHBoxLayout( this );
-
     Equalizer *foo = new Equalizer( p_intf, this );
-    layout->addWidget( foo );
 
-    setLayout( layout );
+    tab->addTab( foo, qtr( "Equalizer" ) );
 }
 
 ExtendedDialog::~ExtendedDialog()
