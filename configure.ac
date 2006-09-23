@@ -5662,6 +5662,7 @@ AC_CONFIG_FILES([
   modules/gui/skins2/Makefile
   modules/gui/wxwidgets/Makefile
   modules/gui/wince/Makefile
+  modules/meta_engine/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
   modules/misc/memcpy/Makefile
