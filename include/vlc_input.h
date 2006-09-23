@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_input.h: Core input structures
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -307,7 +307,7 @@ static inline input_title_t *vlc_input_title_Duplicate( input_title_t *t )
 /* "state" value */
 enum input_state_e
 {
-    INIT_S,   
+    INIT_S,
     OPENING_S,
     BUFFERING_S,
     PLAYING_S,
@@ -465,6 +465,8 @@ VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item
 VLC_EXPORT( input_thread_t *, __input_CreateThread2, ( vlc_object_t *, input_item_t *, char * ) );
 #define input_Preparse(a,b) __input_Preparse(VLC_OBJECT(a),b)
 VLC_EXPORT( int, __input_Preparse, ( vlc_object_t *, input_item_t * ) );
+#define input_SecondaryPreparse(a,b) __input_SecondaryPreparse(VLC_OBJECT(a),b)
+VLC_EXPORT( int, __input_SecondaryPreparse, ( vlc_object_t *, input_item_t * ) );
 
 #define input_Read(a,b,c) __input_Read(VLC_OBJECT(a),b, c)
 VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, vlc_bool_t ) );

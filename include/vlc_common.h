@@ -443,6 +443,9 @@ typedef struct global_stats_t global_stats_t;
 typedef struct update_t update_t;
 typedef struct update_iterator_t update_iterator_t;
 
+/* Meta engine */
+typedef struct meta_engine_t meta_engine_t;
+
 /*****************************************************************************
  * Variable callbacks
  *****************************************************************************/

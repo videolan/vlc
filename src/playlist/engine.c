@@ -143,9 +143,11 @@ void playlist_Destroy( playlist_t *p_playlist )
     playlist_MLDump( p_playlist );
 
     vlc_thread_join( p_playlist->p_preparse );
+    vlc_thread_join( p_playlist->p_secondary_preparse );
     vlc_thread_join( p_playlist );
 
     vlc_object_detach( p_playlist->p_preparse );
+    vlc_object_detach( p_playlist->p_secondary_preparse );
 
     var_Destroy( p_playlist, "intf-change" );
     var_Destroy( p_playlist, "item-change" );
@@ -171,6 +173,7 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     vlc_mutex_destroy( &p_playlist->gc_lock );
     vlc_object_destroy( p_playlist->p_preparse );
+    vlc_object_destroy( p_playlist->p_secondary_preparse );
     vlc_object_detach( p_playlist );
     vlc_object_destroy( p_playlist );
 
@@ -449,7 +452,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
 
     if( p_obj->i_waiting > 0 )
     {
-        input_item_t *p_current = p_playlist->p_preparse->pp_waiting[0];
+        input_item_t *p_current = p_obj->pp_waiting[0];
         REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
         vlc_mutex_unlock( &p_obj->object_lock );
         PL_LOCK;
@@ -478,8 +481,19 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
             {
                 var_SetInteger( p_playlist, "item-change",
                                 p_current->i_id );
+
             }
             vlc_gc_decref( p_current );
+            /* Add to secondary preparse queue */
+            PL_LOCK
+            vlc_mutex_lock( &p_playlist->p_secondary_preparse->object_lock );
+            INSERT_ELEM( p_playlist->p_secondary_preparse->pp_waiting,
+                         p_playlist->p_secondary_preparse->i_waiting,
+                         p_playlist->p_secondary_preparse->i_waiting,
+                         p_current );
+            vlc_gc_incref( p_current );
+            vlc_mutex_unlock( &p_playlist->p_secondary_preparse->object_lock );
+            PL_UNLOCK
         }
         else
         {
@@ -490,6 +504,34 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
         if( i_activity < 0 ) i_activity = 0;
         vlc_mutex_unlock( &p_obj->object_lock );
         msleep( (i_activity+1) * 1000 );
+        return;
+    }
+    vlc_mutex_unlock( &p_obj->object_lock );
+}
+
+/** Main loop for secondary preparser queue */
+void playlist_SecondaryPreparseLoop( playlist_preparse_t *p_obj )
+{
+    playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
+
+    vlc_mutex_lock( &p_obj->object_lock );
+
+    if( p_obj->i_waiting > 0 )
+    {
+        input_item_t *p_current = p_obj->pp_waiting[0];
+        REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
+        vlc_mutex_unlock( &p_obj->object_lock );
+        if( p_current )
+        {
+            input_SecondaryPreparse( p_playlist, p_current );
+            var_SetInteger( p_playlist, "item-change",
+                            p_current->i_id );
+            vlc_gc_decref( p_current );
+        }
+        else
+        {
+            vlc_mutex_unlock( &p_playlist->object_lock );
+        }
         return;
     }
     vlc_mutex_unlock( &p_obj->object_lock );

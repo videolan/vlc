@@ -538,6 +538,7 @@ struct module_symbols_t
     void (*aout_EnableFilter_inner) (vlc_object_t *, const char *, vlc_bool_t);
     void (*playlist_NodesPairCreate_inner) (playlist_t *, char *, playlist_item_t **, playlist_item_t **, vlc_bool_t);
     char * (*aout_VisualChange_inner) (vlc_object_t *, int);
+    int (*__input_SecondaryPreparse_inner) (vlc_object_t *, input_item_t *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1010,6 +1011,7 @@ struct module_symbols_t
 #  define aout_EnableFilter (p_symbols)->aout_EnableFilter_inner
 #  define playlist_NodesPairCreate (p_symbols)->playlist_NodesPairCreate_inner
 #  define aout_VisualChange (p_symbols)->aout_VisualChange_inner
+#  define __input_SecondaryPreparse (p_symbols)->__input_SecondaryPreparse_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1485,6 +1487,7 @@ struct module_symbols_t
     ((p_symbols)->aout_EnableFilter_inner) = aout_EnableFilter; \
     ((p_symbols)->playlist_NodesPairCreate_inner) = playlist_NodesPairCreate; \
     ((p_symbols)->aout_VisualChange_inner) = aout_VisualChange; \
+    ((p_symbols)->__input_SecondaryPreparse_inner) = __input_SecondaryPreparse; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__playlist_ItemNew_deprecated = NULL; \
     (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \

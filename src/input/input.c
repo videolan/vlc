@@ -39,6 +39,7 @@
 #include "vlc_playlist.h"
 #include "vlc_interface.h"
 #include "vlc_interaction.h"
+#include "vlc_meta_engine.h"
 
 #include "charset.h"
 
@@ -340,6 +341,110 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 
     vlc_object_detach( p_input );
     vlc_object_destroy( p_input );
+
+    return VLC_SUCCESS;
+}
+
+int __input_SecondaryPreparse( vlc_object_t *p_parent, input_item_t *p_item )
+{
+    struct meta_engine_t *p_me;
+
+    /* FIXME: don't launch any module if we already have all the needed
+     * info. Easiest way to do this would be to add a dummy module.
+     * I'll do that later */
+
+    p_me = vlc_object_create( p_parent, VLC_OBJECT_META_ENGINE );
+    p_me->i_flags |= OBJECT_FLAGS_NOINTERACT;
+    p_me->i_mandatory =   VLC_META_ENGINE_TITLE
+                        | VLC_META_ENGINE_AUTHOR
+                        | VLC_META_ENGINE_ARTIST
+                        | VLC_META_ENGINE_ART_URL;
+    p_me->i_optional = 0;
+    p_me->p_item = p_item;
+    p_me->p_module = module_Need( p_me, "meta engine", 0, VLC_FALSE );
+
+    if( !p_me->p_module )
+    {
+        msg_Err( p_parent, "no suitable meta engine module" );
+        return VLC_EGENERIC;
+    }
+
+    module_Unneed( p_me, p_me->p_module );
+
+    if( p_item->p_meta
+        && p_item->p_meta->psz_arturl
+        && *p_item->p_meta->psz_arturl
+        && strncmp( p_item->p_meta->psz_arturl, "file", 4 ) )
+    {
+        /* process album art */
+        #define MAX_PATH 10000
+        char *psz_artist = p_item->p_meta->psz_artist;
+        char *psz_album = p_item->p_meta->psz_album;
+        char *psz_type = strrchr( p_item->p_meta->psz_arturl, '.' );
+        char *psz_filename = (char *)malloc( MAX_PATH );
+        FILE *p_file;
+
+        /* GRUIKKKKKKKKKK */
+        snprintf( psz_filename, MAX_PATH,
+                  "file://%s/" CONFIG_DIR,
+                  p_parent->p_libvlc->psz_homedir );
+        utf8_mkdir( psz_filename+7 );
+        snprintf( psz_filename, MAX_PATH,
+                  "file://%s/" CONFIG_DIR "/art",
+                  p_parent->p_libvlc->psz_homedir );
+        utf8_mkdir( psz_filename+7 );
+        snprintf( psz_filename, MAX_PATH,
+                  "file://%s/" CONFIG_DIR "/art/%s",
+                  p_parent->p_libvlc->psz_homedir,
+                  psz_artist );
+        utf8_mkdir( psz_filename+7 );
+        snprintf( psz_filename, MAX_PATH,
+                  "file://%s/" CONFIG_DIR "/art/%s/%s",
+                  p_parent->p_libvlc->psz_homedir,
+                  psz_artist, psz_album );
+        utf8_mkdir( psz_filename+7 );
+
+        snprintf( psz_filename, MAX_PATH,
+                  "file://%s/" CONFIG_DIR "/art/%s/%s/art%s",
+                  p_parent->p_libvlc->psz_homedir,
+                  psz_artist, psz_album, psz_type );
+        msg_Dbg( p_parent, "Saving album art to %s", psz_filename );
+
+        /* Check if file exists */
+        p_file = utf8_fopen( psz_filename+7, "r" );
+        if( p_file )
+        {
+            msg_Dbg( p_parent, "Album art %s already exists", psz_filename );
+            fclose( p_file );
+        }
+        else
+        {
+            stream_t *p_stream = stream_UrlNew( p_parent,
+                                                p_item->p_meta->psz_arturl );
+
+            if( p_stream )
+            {
+                void *p_buffer = malloc( 1<<16 );
+                long int l_read;
+                p_file = utf8_fopen( psz_filename+7, "w" );
+                printf("a %p\n");
+                while( ( l_read = stream_Read( p_stream, p_buffer, 1<<16 ) ) )
+                {
+                    printf("%d\n", l_read);
+                    fwrite( p_buffer, l_read, 1, p_file );
+                    printf("////\n");
+                }
+                printf("a\n");
+                free( p_buffer );
+                fclose( p_file );
+                stream_Delete( p_stream );
+                msg_Dbg( p_parent, "Album art saved to %s\n", psz_filename );
+                free( p_item->p_meta->psz_arturl );
+                p_item->p_meta->psz_arturl = strdup( psz_filename );
+            }
+        }
+        free( psz_filename );
+    }
 
     return VLC_SUCCESS;
 }

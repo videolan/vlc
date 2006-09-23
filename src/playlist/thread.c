@@ -33,6 +33,7 @@
  *****************************************************************************/
 static void RunControlThread ( playlist_t * );
 static void RunPreparse( playlist_preparse_t * );
+static void RunSecondaryPreparse( playlist_preparse_t * );
 
 static playlist_t * CreatePlaylist( vlc_object_t *p_parent );
 static void HandlePlaylist( playlist_t * );
@@ -90,6 +91,30 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
         msg_Err( p_playlist, "cannot spawn preparse thread" );
         vlc_object_detach( p_playlist->p_preparse );
         vlc_object_destroy( p_playlist->p_preparse );
+        return;
+    }
+
+    // Secondary Preparse
+    p_playlist->p_secondary_preparse = vlc_object_create( p_playlist,
+                                  sizeof( playlist_preparse_t ) );
+    if( !p_playlist->p_secondary_preparse )
+    {
+        msg_Err( p_playlist, "unable to create secondary preparser" );
+        vlc_object_destroy( p_playlist );
+        return;
+    }
+    p_playlist->p_secondary_preparse->i_waiting = 0;
+    p_playlist->p_secondary_preparse->pp_waiting = NULL;
+
+    vlc_object_attach( p_playlist->p_secondary_preparse, p_playlist );
+    if( vlc_thread_create( p_playlist->p_secondary_preparse,
+                           "secondary preparser",
+                           RunSecondaryPreparse,
+                           VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
+    {
+        msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
+        vlc_object_detach( p_playlist->p_secondary_preparse );
+        vlc_object_destroy( p_playlist->p_secondary_preparse );
         return;
     }
 
@@ -185,7 +210,23 @@ static void RunPreparse ( playlist_preparse_t *p_obj )
 
     while( !p_playlist->b_die )
     {
-        playlist_PreparseLoop(  p_obj );
+        playlist_PreparseLoop( p_obj );
+        if( p_obj->i_waiting == 0 )
+        {
+            msleep( INTF_IDLE_SLEEP );
+        }
+    }
+}
+
+static void RunSecondaryPreparse( playlist_preparse_t *p_obj )
+{
+    playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
+    /* Tell above that we're ready */
+    vlc_thread_ready( p_obj );
+
+    while( !p_playlist->b_die )
+    {
+        playlist_SecondaryPreparseLoop( p_obj );
         if( p_obj->i_waiting == 0 )
         {
             msleep( INTF_IDLE_SLEEP );

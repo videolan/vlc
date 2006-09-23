@@ -52,6 +52,7 @@ void        playlist_Destroy  ( playlist_t * );
 void playlist_MainLoop( playlist_t * );
 void playlist_LastLoop( playlist_t * );
 void playlist_PreparseLoop( playlist_preparse_t * );
+void playlist_SecondaryPreparseLoop( playlist_preparse_t * );
 
 /* Control */
 playlist_item_t * playlist_NextItem  ( playlist_t * );

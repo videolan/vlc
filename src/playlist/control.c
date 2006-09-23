@@ -230,8 +230,7 @@ void PreparseEnqueueItemSub( playlist_t *p_playlist,
     {
         for( i = 0; i < p_item->i_children; i++)
         {
-            PreparseEnqueueItemSub( p_playlist,
-                                             p_item->pp_children[i] );
+            PreparseEnqueueItemSub( p_playlist, p_item->pp_children[i] );
         }
     }
 }

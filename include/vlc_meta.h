@@ -43,6 +43,8 @@
 #define VLC_META_PUBLISHER          N_("Publisher")
 #define VLC_META_ENCODED_BY         N_("Encoded by")
 
+#define VLC_META_ART_URL            N_("Art URL")
+
 #define VLC_META_CODEC_NAME         N_("Codec Name")
 #define VLC_META_CODEC_DESCRIPTION  N_("Codec Description")
 
@@ -64,6 +66,7 @@ struct vlc_meta_t
     char *psz_nowplaying;
     char *psz_publisher;
     char *psz_encodedby;
+    char *psz_arturl;
 #if 0
     /* track meta information */
     int         i_track;
@@ -91,6 +94,7 @@ struct vlc_meta_t
 #define vlc_meta_SetNowPlaying( meta, b ) vlc_meta_Set( meta, nowplaying, b );
 #define vlc_meta_SetPublisher( meta, b ) vlc_meta_Set( meta, publisher, b );
 #define vlc_meta_SetEncodedBy( meta, b ) vlc_meta_Set( meta, encodedby, b );
+#define vlc_meta_SetArtURL( meta, b ) vlc_meta_Set( meta, arturl, b );
 
 static inline vlc_meta_t *vlc_meta_New( void )
 {
@@ -112,6 +116,7 @@ static inline vlc_meta_t *vlc_meta_New( void )
     m->psz_nowplaying = NULL;
     m->psz_publisher = NULL;
     m->psz_encodedby = NULL;
+    m->psz_arturl = NULL;
     return m;
 }
 
@@ -133,6 +138,7 @@ static inline void vlc_meta_Delete( vlc_meta_t *m )
     free( m->psz_nowplaying );
     free( m->psz_publisher );
     free( m->psz_encodedby );
+    free( m->psz_arturl );
 
     free( m );
 }
@@ -161,6 +167,7 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
     COPY_FIELD( nowplaying );
     COPY_FIELD( publisher );
     COPY_FIELD( encodedby );
+    COPY_FIELD( arturl );
 }
     /** \todo Track meta */
 

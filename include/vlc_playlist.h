@@ -145,6 +145,7 @@ struct playlist_t
     mtime_t               i_vout_destroyed_date;
     mtime_t               i_sout_destroyed_date;
     playlist_preparse_t  *p_preparse; /**< Preparser object */
+    playlist_preparse_t  *p_secondary_preparse; /**< Preparser object */
 
     vlc_mutex_t gc_lock;         /**< Lock to protect the garbage collection */
 

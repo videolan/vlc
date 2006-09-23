@@ -56,6 +56,7 @@
 #include "vlc_tls.h"
 #include "vlc_xml.h"
 #include "vlc_osd.h"
+#include "vlc_meta_engine.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -211,6 +212,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_ANNOUNCE:
             i_size = sizeof( announce_handler_t );
             psz_type = "announce";
+            break;
+        case VLC_OBJECT_META_ENGINE:
+            i_size = sizeof( meta_engine_t );
+            psz_type = "meta engine";
             break;
         case VLC_OBJECT_OSDMENU:
             i_size = sizeof( osd_menu_t );
