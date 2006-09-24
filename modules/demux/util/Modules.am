@@ -1,6 +1,0 @@
-SOURCES_id3tag = \
-	id3tag.c \
-	id3genres.h \
-	$(NULL)
-
-

@@ -48,7 +48,7 @@ static int  ParseID3Tags ( vlc_object_t * );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("ID3 tags parser" ) );
-    set_capability( "id3", 70 );
+    set_capability( "meta reader", 70 );
     set_callbacks( ParseID3Tags, NULL );
 vlc_module_end();
 

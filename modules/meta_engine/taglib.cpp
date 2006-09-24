@@ -33,12 +33,11 @@ vlc_module_begin();
     set_capability( "meta reader", 1000 );
     set_callbacks( ReadMeta, NULL );
 vlc_module_end();
-
+ 
 static int ReadMeta( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
-    fprintf( stderr, "Demuxing with %s\n", p_demux->psz_access );
     if( !strncmp( p_demux->psz_access, "file", 4 ) )
     {
         if( !p_demux->p_private )

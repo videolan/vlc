@@ -262,7 +262,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_block_out = p_block_out;
 
     /* Parse possible id3 header */
-    if( ( p_id3 = module_Need( p_demux, "id3", NULL, 0 ) ) )
+    if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
     {
         p_sys->meta = (vlc_meta_t *)p_demux->p_private;
         p_demux->p_private = NULL;

@@ -5662,7 +5662,6 @@ AC_CONFIG_FILES([
   modules/demux/mp4/Makefile
   modules/demux/mpeg/Makefile
   modules/demux/playlist/Makefile
-  modules/demux/util/Makefile
   modules/gui/Makefile
   modules/gui/beos/Makefile
   modules/gui/pda/Makefile
