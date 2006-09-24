@@ -39,6 +39,19 @@ struct playlist_preparse_t
     input_item_t  **pp_waiting;
 };
 
+typedef struct preparse_item_t
+{
+    input_item_t *p_item;
+    vlc_bool_t   b_fetch_art;
+} preparse_item_t;
+
+struct playlist_secondary_preparse_t
+{
+    VLC_COMMON_MEMBERS
+    vlc_mutex_t     lock;
+    int             i_waiting;
+    preparse_item_t *p_waiting;
+};
 
 /*****************************************************************************
  * Prototypes
@@ -52,7 +65,7 @@ void        playlist_Destroy  ( playlist_t * );
 void playlist_MainLoop( playlist_t * );
 void playlist_LastLoop( playlist_t * );
 void playlist_PreparseLoop( playlist_preparse_t * );
-void playlist_SecondaryPreparseLoop( playlist_preparse_t * );
+void playlist_SecondaryPreparseLoop( playlist_secondary_preparse_t * );
 
 /* Control */
 playlist_item_t * playlist_NextItem  ( playlist_t * );

@@ -222,7 +222,7 @@ static char **paths_to_list( char *psz_dir, char *psz_path )
                              psz_subdir[0] == '.' ? psz_dir : "",
                              psz_subdir,
                              psz_subdir[strlen(psz_subdir) - 1] ==
-                              DIR_SEP ? '\0' : DIR_SEP );
+                              DIR_SEP_CHAR ? '\0' : DIR_SEP_CHAR );
                     subdirs[i] = psz_temp;
                     i++;
                 }
@@ -277,7 +277,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     }
 
     /* extract filename & dirname from psz_fname */
-    tmp = strrchr( psz_fname, DIR_SEP );
+    tmp = strrchr( psz_fname, DIR_SEP_CHAR );
     if( tmp )
     {
         int dirlen = 0;
@@ -304,7 +304,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         }
         dirlen = strlen( f_dir );
         f_dir = (char *)realloc(f_dir, dirlen +2 );
-        f_dir[dirlen] = DIR_SEP;
+        f_dir[dirlen] = DIR_SEP_CHAR;
         f_dir[dirlen+1] = '\0';
         f_fname = FromLocaleDup( psz_fname );
     }

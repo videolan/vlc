@@ -32,7 +32,7 @@
 #   include <sys/stat.h>
 #endif
 
-int input_FindArt( vlc_object_t *p_parent, input_item_t *p_item );
+int input_FindArtInCache( vlc_object_t *p_parent, input_item_t *p_item );
 
 int __input_MetaFetch( vlc_object_t *p_parent, input_item_t *p_item )
 {
@@ -55,7 +55,7 @@ int __input_MetaFetch( vlc_object_t *p_parent, input_item_t *p_item )
         i_optional |= VLC_META_ENGINE_ART_URL;
     }
 
-    input_FindArt( p_parent, p_item );
+    input_FindArtInCache( p_parent, p_item );
 
     i_meta = input_GetMetaEngineFlags( p_item->p_meta );
     i_mandatory &= ~i_meta;
@@ -87,18 +87,34 @@ int __input_MetaFetch( vlc_object_t *p_parent, input_item_t *p_item )
     return VLC_SUCCESS;
 }
 
+int __input_ArtFetch( vlc_object_t *p_parent, input_item_t *p_item )
+{
+    if( !p_item->p_meta )
+        return VLC_EGENERIC;
+
+    /* TODO: call art fetcher modules */
+
+    if( !p_item->p_meta->psz_arturl || !*p_item->p_meta->psz_arturl )
+        return VLC_EGENERIC;
+
+    if( strncmp( "file://", p_item->p_meta->psz_arturl, 7 ) )
+    {
+        return input_DownloadAndCacheArt( p_parent, p_item );
+    }
+    return VLC_SUCCESS;
+}
+
 #ifndef MAX_PATH
 #   define MAX_PATH 250
 #endif
-int input_FindArt( vlc_object_t *p_parent, input_item_t *p_item )
+int input_FindArtInCache( vlc_object_t *p_parent, input_item_t *p_item )
 {
     char *psz_artist;
     char *psz_album;
-    char *psz_type;
     char psz_filename[MAX_PATH];
     int i;
     struct stat a;
-    const char ppsz_type[] = { ".jpg", ".png", ".gif", ".bmp", "" };
+    const char *ppsz_type[] = { ".jpg", ".png", ".gif", ".bmp", "" };
 
     if( !p_item->p_meta ) return VLC_EGENERIC;
 
@@ -111,13 +127,14 @@ int input_FindArt( vlc_object_t *p_parent, input_item_t *p_item )
                   "file://%s" DIR_SEP CONFIG_DIR DIR_SEP "art"
                   DIR_SEP "%s" DIR_SEP "%s" DIR_SEP "art%s",
                   p_parent->p_libvlc->psz_homedir,
-                  psz_artist, psz_album, psz_type );
+                  psz_artist, psz_album, ppsz_type[i] );
 
         /* Check if file exists */
         if( utf8_stat( psz_filename+7, &a ) == 0 )
         {
             msg_Dbg( p_parent, "album art %s already exists in cache"
                              , psz_filename );
+            vlc_meta_SetArtURL( p_item->p_meta, psz_filename );
             return VLC_SUCCESS;
         }
     }

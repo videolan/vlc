@@ -546,6 +546,9 @@ struct module_symbols_t
     int (*__input_MetaFetch_inner) (vlc_object_t *, input_item_t *);
     int (*input_DownloadAndCacheArt_inner) (vlc_object_t *p_parent, input_item_t *p_item);
     uint32_t (*input_GetMetaEngineFlags_inner) (vlc_meta_t *p_meta);
+    int (*__input_ArtFetch_inner) (vlc_object_t *, input_item_t *);
+    void *input_AskForArt_deprecated;
+    int (*playlist_AskForArtEnqueue_inner) (playlist_t *, input_item_t *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1022,6 +1025,8 @@ struct module_symbols_t
 #  define __input_MetaFetch (p_symbols)->__input_MetaFetch_inner
 #  define input_DownloadAndCacheArt (p_symbols)->input_DownloadAndCacheArt_inner
 #  define input_GetMetaEngineFlags (p_symbols)->input_GetMetaEngineFlags_inner
+#  define __input_ArtFetch (p_symbols)->__input_ArtFetch_inner
+#  define playlist_AskForArtEnqueue (p_symbols)->playlist_AskForArtEnqueue_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1501,6 +1506,8 @@ struct module_symbols_t
     ((p_symbols)->__input_MetaFetch_inner) = __input_MetaFetch; \
     ((p_symbols)->input_DownloadAndCacheArt_inner) = input_DownloadAndCacheArt; \
     ((p_symbols)->input_GetMetaEngineFlags_inner) = input_GetMetaEngineFlags; \
+    ((p_symbols)->__input_ArtFetch_inner) = __input_ArtFetch; \
+    ((p_symbols)->playlist_AskForArtEnqueue_inner) = playlist_AskForArtEnqueue; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_input_item_GetInfo_deprecated = NULL; \
     (p_symbols)->vlc_input_item_AddInfo_deprecated = NULL; \
@@ -1554,6 +1561,7 @@ struct module_symbols_t
     (p_symbols)->__intf_IntfProgress_deprecated = NULL; \
     (p_symbols)->streaming_ChainToPsz_deprecated = NULL; \
     (p_symbols)->__input_SecondaryPreparse_deprecated = NULL; \
+    (p_symbols)->input_AskForArt_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */
 #endif /* __VLC_SYMBOLS_H */

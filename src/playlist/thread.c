@@ -33,7 +33,7 @@
  *****************************************************************************/
 static void RunControlThread ( playlist_t * );
 static void RunPreparse( playlist_preparse_t * );
-static void RunSecondaryPreparse( playlist_preparse_t * );
+static void RunSecondaryPreparse( playlist_secondary_preparse_t * );
 
 static playlist_t * CreatePlaylist( vlc_object_t *p_parent );
 static void HandlePlaylist( playlist_t * );
@@ -96,7 +96,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 
     // Secondary Preparse
     p_playlist->p_secondary_preparse = vlc_object_create( p_playlist,
-                                  sizeof( playlist_preparse_t ) );
+                              sizeof( playlist_secondary_preparse_t ) );
     if( !p_playlist->p_secondary_preparse )
     {
         msg_Err( p_playlist, "unable to create secondary preparser" );
@@ -104,7 +104,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
         return;
     }
     p_playlist->p_secondary_preparse->i_waiting = 0;
-    p_playlist->p_secondary_preparse->pp_waiting = NULL;
+    p_playlist->p_secondary_preparse->p_waiting = NULL;
 
     vlc_object_attach( p_playlist->p_secondary_preparse, p_playlist );
     if( vlc_thread_create( p_playlist->p_secondary_preparse,
@@ -218,7 +218,7 @@ static void RunPreparse ( playlist_preparse_t *p_obj )
     }
 }
 
-static void RunSecondaryPreparse( playlist_preparse_t *p_obj )
+static void RunSecondaryPreparse( playlist_secondary_preparse_t *p_obj )
 {
     playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
     /* Tell above that we're ready */

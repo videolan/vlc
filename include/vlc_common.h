@@ -237,6 +237,7 @@ typedef struct services_discovery_t services_discovery_t;
 typedef struct services_discovery_sys_t services_discovery_sys_t;
 typedef struct playlist_add_t playlist_add_t;
 typedef struct playlist_preparse_t playlist_preparse_t;
+typedef struct playlist_secondary_preparse_t playlist_secondary_preparse_t;
 
 /* Modules */
 typedef struct module_bank_t module_bank_t;
@@ -1280,7 +1281,9 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #endif
 
 #if defined( WIN32 ) || defined( UNDER_CE )
+#   define DIR_SEP_CHAR '\\'
 #   define DIR_SEP "\\"
 #else
+#   define DIR_SEP_CHAR '/'
 #   define DIR_SEP "/"
 #endif

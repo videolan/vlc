@@ -145,7 +145,7 @@ struct playlist_t
     mtime_t               i_vout_destroyed_date;
     mtime_t               i_sout_destroyed_date;
     playlist_preparse_t  *p_preparse; /**< Preparser object */
-    playlist_preparse_t  *p_secondary_preparse; /**< Preparser object */
+    playlist_secondary_preparse_t *p_secondary_preparse;/**< Preparser object */
 
     vlc_mutex_t gc_lock;         /**< Lock to protect the garbage collection */
 
@@ -237,6 +237,7 @@ VLC_EXPORT( void,  playlist_LockClear, ( playlist_t * ) );
 
 VLC_EXPORT( int, playlist_PreparseEnqueue, (playlist_t *, input_item_t *) );
 VLC_EXPORT( int, playlist_PreparseEnqueueItem, (playlist_t *, playlist_item_t *) );
+VLC_EXPORT( int, playlist_AskForArtEnqueue, (playlist_t *, input_item_t *) );
 
 /* Services discovery */
 

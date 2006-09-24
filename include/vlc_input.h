@@ -476,6 +476,8 @@ VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
 
 #define input_MetaFetch(a,b) __input_MetaFetch(VLC_OBJECT(a),b)
 VLC_EXPORT( int, __input_MetaFetch, ( vlc_object_t *, input_item_t * ) );
+#define input_ArtFetch(a,b) __input_ArtFetch(VLC_OBJECT(a),b)
+VLC_EXPORT( int, __input_ArtFetch, ( vlc_object_t *, input_item_t * ) );
 
 enum input_query_e
 {
