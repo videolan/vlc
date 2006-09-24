@@ -538,11 +538,12 @@ struct module_symbols_t
     void (*aout_EnableFilter_inner) (vlc_object_t *, const char *, vlc_bool_t);
     void (*playlist_NodesPairCreate_inner) (playlist_t *, char *, playlist_item_t **, playlist_item_t **, vlc_bool_t);
     char * (*aout_VisualChange_inner) (vlc_object_t *, int);
-    int (*__input_SecondaryPreparse_inner) (vlc_object_t *, input_item_t *);
+    void *__input_SecondaryPreparse_deprecated;
     void (*input_ItemAddOption_inner) (input_item_t *, const char *);
     char * (*input_ItemGetInfo_inner) (input_item_t *p_i, const char *psz_cat,const char *psz_name);
     int (*input_ItemAddInfo_inner) (input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ...);
     void (*input_ItemAddOptionNoDup_inner) (input_item_t *, const char *);
+    int (*__input_MetaFetch_inner) (vlc_object_t *, input_item_t *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1012,11 +1013,11 @@ struct module_symbols_t
 #  define aout_EnableFilter (p_symbols)->aout_EnableFilter_inner
 #  define playlist_NodesPairCreate (p_symbols)->playlist_NodesPairCreate_inner
 #  define aout_VisualChange (p_symbols)->aout_VisualChange_inner
-#  define __input_SecondaryPreparse (p_symbols)->__input_SecondaryPreparse_inner
 #  define input_ItemAddOption (p_symbols)->input_ItemAddOption_inner
 #  define input_ItemGetInfo (p_symbols)->input_ItemGetInfo_inner
 #  define input_ItemAddInfo (p_symbols)->input_ItemAddInfo_inner
 #  define input_ItemAddOptionNoDup (p_symbols)->input_ItemAddOptionNoDup_inner
+#  define __input_MetaFetch (p_symbols)->__input_MetaFetch_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1489,11 +1490,11 @@ struct module_symbols_t
     ((p_symbols)->aout_EnableFilter_inner) = aout_EnableFilter; \
     ((p_symbols)->playlist_NodesPairCreate_inner) = playlist_NodesPairCreate; \
     ((p_symbols)->aout_VisualChange_inner) = aout_VisualChange; \
-    ((p_symbols)->__input_SecondaryPreparse_inner) = __input_SecondaryPreparse; \
     ((p_symbols)->input_ItemAddOption_inner) = input_ItemAddOption; \
     ((p_symbols)->input_ItemGetInfo_inner) = input_ItemGetInfo; \
     ((p_symbols)->input_ItemAddInfo_inner) = input_ItemAddInfo; \
     ((p_symbols)->input_ItemAddOptionNoDup_inner) = input_ItemAddOptionNoDup; \
+    ((p_symbols)->__input_MetaFetch_inner) = __input_MetaFetch; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_input_item_GetInfo_deprecated = NULL; \
     (p_symbols)->vlc_input_item_AddInfo_deprecated = NULL; \
@@ -1546,6 +1547,7 @@ struct module_symbols_t
     (p_symbols)->__intf_IntfProgressUpdate_deprecated = NULL; \
     (p_symbols)->__intf_IntfProgress_deprecated = NULL; \
     (p_symbols)->streaming_ChainToPsz_deprecated = NULL; \
+    (p_symbols)->__input_SecondaryPreparse_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */
 #endif /* __VLC_SYMBOLS_H */

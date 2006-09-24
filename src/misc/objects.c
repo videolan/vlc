@@ -56,7 +56,7 @@
 #include "vlc_tls.h"
 #include "vlc_xml.h"
 #include "vlc_osd.h"
-#include "vlc_meta_engine.h"
+#include "vlc_meta.h"
 
 /*****************************************************************************
  * Local prototypes

@@ -532,7 +532,7 @@ void playlist_SecondaryPreparseLoop( playlist_preparse_t *p_obj )
         vlc_mutex_unlock( &p_obj->object_lock );
         if( p_current )
         {
-            input_SecondaryPreparse( p_playlist, p_current );
+            input_MetaFetch( p_playlist, p_current );
             p_current->p_meta->i_status |= ITEM_META_FETCHED;
             var_SetInteger( p_playlist, "item-change", p_current->i_id );
             vlc_gc_decref( p_current );

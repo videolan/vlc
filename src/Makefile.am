@@ -275,6 +275,7 @@ SOURCES_libvlc_common = \
 	input/demux.c \
 	input/es_out.c \
 	input/input.c \
+	input/meta.c \
 	input/input_internal.h \
 	input/stream.c \
 	input/mem_stream.c \
