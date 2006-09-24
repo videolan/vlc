@@ -619,7 +619,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 vlc_meta_SetArtist( p_input->input.p_item->p_meta,
                                     psz_value );
-                vlc_input_item_AddInfo( p_input->input.p_item,
+                input_ItemAddInfo( p_input->input.p_item,
                                         _(VLC_META_INFO_CAT), _(VLC_META_ARTIST),
                                         "%s", psz_value );
             }

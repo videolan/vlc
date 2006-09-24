@@ -414,7 +414,7 @@ static int Open( vlc_object_t * p_this )
                         msg_Dbg( p_demux, "adding ref = `%s'", psz_ref );
                         p_input = input_ItemNewExt( p_playlist, psz_ref, NULL,
                                             0, NULL, -1 );
-                        vlc_input_item_CopyOptions( p_current->p_input, p_input );
+                        input_ItemCopyOptions( p_current->p_input, p_input );
                         playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
                                 p_item_in_category, VLC_FALSE, PLAYLIST_APPEND );
                     }

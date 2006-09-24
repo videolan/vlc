@@ -115,7 +115,7 @@ static int Demux( demux_t *p_demux )
         for( i = 0; i< i_options; i++ )
         {
             EnsureUTF8( ppsz_options[i] );
-            vlc_input_item_AddOption( p_input, ppsz_options[i] );
+            input_ItemAddOption( p_input, ppsz_options[i] );
         }
         playlist_AddWhereverNeeded( p_playlist, p_input, p_current, 
                                     p_item_in_category,

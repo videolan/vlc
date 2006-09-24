@@ -469,9 +469,9 @@ static int GetTracks( access_t *p_access,
         p_input_item = input_ItemNewWithType( VLC_OBJECT( p_playlist ),
                                               psz_uri, psz_name, 0, NULL, -1,
                                               ITEM_TYPE_DISC );
-        vlc_input_item_AddOption( p_input_item, psz_first );
-        vlc_input_item_AddOption( p_input_item, psz_last );
-        vlc_input_item_AddOption( p_input_item, psz_opt );
+        input_ItemAddOption( p_input_item, psz_first );
+        input_ItemAddOption( p_input_item, psz_last );
+        input_ItemAddOption( p_input_item, psz_opt );
 
 #ifdef HAVE_LIBCDDB
         /* If we have CDDB info, change the name */
@@ -483,7 +483,7 @@ static int GetTracks( access_t *p_access,
             {
                 if( cddb_track_get_title( t )  != NULL )
                 {
-                    vlc_input_item_AddInfo( p_input_item, _(VLC_META_INFO_CAT),
+                    input_ItemAddInfo( p_input_item, _(VLC_META_INFO_CAT),
                                             _(VLC_META_TITLE),
                                             cddb_track_get_title( t ) );
                     if( p_input_item->psz_name )
@@ -494,7 +494,7 @@ static int GetTracks( access_t *p_access,
                 psz_result = cddb_track_get_artist( t );
                 if( psz_result )
                 {
-                    vlc_input_item_AddInfo( p_input_item, _(VLC_META_INFO_CAT),
+                    input_ItemAddInfo( p_input_item, _(VLC_META_INFO_CAT),
                                             _(VLC_META_ARTIST), psz_result );
                 }
             }

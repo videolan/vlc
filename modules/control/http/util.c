@@ -902,7 +902,7 @@ input_item_t *E_(MRLParse)( intf_thread_t *p_intf, char *_psz,
         {
             s_temp = s_mrl + strlen( s_mrl );
         }
-        vlc_input_item_AddOption( p_input, s_mrl );
+        input_ItemAddOption( p_input, s_mrl );
         s_mrl = s_temp;
     }
 

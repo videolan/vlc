@@ -981,29 +981,29 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
 #define p_item  p_sys->p_input->input.p_item
                 if( !strcmp( psz_meta, "ARTIST" ) )
                 {
-                    psz_val = vlc_input_item_GetInfo( p_item,
+                    psz_val = input_ItemGetInfo( p_item,
                                 _(VLC_META_INFO_CAT), _(VLC_META_ARTIST) );
                 }
                 else if( !strcmp( psz_meta, "TITLE" ) )
                 {
-                    psz_val = vlc_input_item_GetInfo( p_item,
+                    psz_val = input_ItemGetInfo( p_item,
                                 _(VLC_META_INFO_CAT), _(VLC_META_TITLE) );
                     if( psz_val == NULL )
                         psz_val = strdup( p_item->psz_name );
                 }
                 else if( !strcmp( psz_meta, "ALBUM" ) )
                 {
-                    psz_val = vlc_input_item_GetInfo( p_item,
+                    psz_val = input_ItemGetInfo( p_item,
                                 _(VLC_META_INFO_CAT), _(VLC_META_COLLECTION) );
                 }
                 else if( !strcmp( psz_meta, "GENRE" ) )
                 {
-                    psz_val = vlc_input_item_GetInfo( p_item,
+                    psz_val = input_ItemGetInfo( p_item,
                                 _(VLC_META_INFO_CAT), _(VLC_META_GENRE) );
                 }
                 else
                 {
-                    psz_val = vlc_input_item_GetInfo( p_item,
+                    psz_val = input_ItemGetInfo( p_item,
                                             _(VLC_META_INFO_CAT), psz_meta );
                 }
 #undef p_item

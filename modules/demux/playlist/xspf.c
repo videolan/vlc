@@ -524,7 +524,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                                                         NULL, 0, NULL, -1 );
                         p_new_input->p_meta = vlc_meta_New();
                         free( psz_uri );
-                        vlc_input_item_CopyOptions( p_item->p_input, p_new_input );
+                        input_ItemCopyOptions( p_item->p_input, p_new_input );
                         psz_uri = NULL;
                         FREE_ATT();
                         p_handler = NULL;

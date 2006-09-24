@@ -353,7 +353,7 @@ static int Demux( demux_t *p_demux )
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
                             p_input = input_ItemNew( p_playlist, psz_string, psz_title_asx );
-                            vlc_input_item_CopyOptions( p_current->p_input, p_input );
+                            input_ItemCopyOptions( p_current->p_input, p_input );
                             playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
                                  p_item_in_category, (i_parent_id > 0 )? VLC_TRUE : VLC_FALSE,
                                  PLAYLIST_APPEND );
@@ -426,7 +426,7 @@ static int Demux( demux_t *p_demux )
                             p_entry = input_ItemNew( p_playlist, psz_string, psz_name );
                             FREENULL( psz_name );
                             
-                            vlc_input_item_CopyOptions( p_current->p_input, p_entry );
+                            input_ItemCopyOptions( p_current->p_input, p_entry );
                             p_entry->p_meta = vlc_meta_New();
                             if( psz_title_entry ) vlc_meta_SetTitle( p_entry->p_meta, psz_title_entry );
                             if( psz_author_entry ) vlc_meta_SetAuthor( p_entry->p_meta, psz_author_entry );

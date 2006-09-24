@@ -971,7 +971,7 @@ NSLog( @"expandable" );
     {
         for( i = 0; i < (int)[o_options count]; i++ )
         {
-            vlc_input_item_AddOption( p_input, strdup( [[o_options objectAtIndex:i] UTF8String] ) );
+            input_ItemAddOption( p_input, strdup( [[o_options objectAtIndex:i] UTF8String] ) );
         }
     }
 
@@ -1089,7 +1089,7 @@ NSLog( @"expandable" );
         vlc_mutex_lock( &p_playlist->object_lock );
         o_current_name = [NSString stringWithUTF8String:
             p_item->pp_children[i_current]->p_input->psz_name];
-        psz_temp = vlc_input_item_GetInfo( p_item->p_input ,
+        psz_temp = input_ItemGetInfo( p_item->p_input ,
                    _("Meta-information"),_("Artist") );
         o_current_author = [NSString stringWithUTF8String: psz_temp];
         free( psz_temp);

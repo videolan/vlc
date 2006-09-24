@@ -381,27 +381,27 @@ static int Demux ( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    vlc_input_item_CopyOptions( p_current->p_input, p_child );
+    input_ItemCopyOptions( p_current->p_input, p_child );
     if( p_sys->i_packet_size && p_sys->psz_mcast_ip )
     {
         char *psz_option;
         p_sys->i_packet_size += 1000;
         asprintf( &psz_option, "mtu=%i", p_sys->i_packet_size );
-        vlc_input_item_AddOption( p_child, psz_option );
+        input_ItemAddOption( p_child, psz_option );
         free( psz_option );
     }
     if( !p_sys->psz_mcast_ip )
     {
         char *psz_option;
         asprintf( &psz_option, "rtsp-caching=5000" );
-        vlc_input_item_AddOption( p_child, psz_option );
+        input_ItemAddOption( p_child, psz_option );
         free( psz_option );
     }
     if( !p_sys->psz_mcast_ip && p_sys->b_rtsp_kasenna )
     {
         char *psz_option;
         asprintf( &psz_option, "rtsp-kasenna" );
-        vlc_input_item_AddOption( p_child, psz_option );
+        input_ItemAddOption( p_child, psz_option );
         free( psz_option );
     }
 

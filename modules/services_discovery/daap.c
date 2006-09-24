@@ -611,9 +611,9 @@ static void ProcessHost( services_discovery_t *p_sd, dhost_t *p_host )
                                                    p_host->p_songs[i].id );
         p_item = playlist_ItemNew( p_sd, psz_buff,
                                          p_host->p_songs[i].itemname );
-        vlc_input_item_AddInfo( &p_item->input, _(VLC_META_INFO_CAT),
+        input_ItemAddInfo( &p_item->input, _(VLC_META_INFO_CAT),
                                 _(VLC_META_ARTIST), p_host->p_songs[i].songartist );
-        vlc_input_item_AddInfo( &p_item->input, _(VLC_META_INFO_CAT),
+        input_ItemAddInfo( &p_item->input, _(VLC_META_INFO_CAT),
                                 _(VLC_META_COLLECTION), p_host->p_songs[i].songalbum );
 
         playlist_NodeAddItem( p_playlist, p_item, VIEW_CATEGORY,

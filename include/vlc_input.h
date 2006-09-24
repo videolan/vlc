@@ -90,7 +90,7 @@ struct input_item_t
 #define ITEM_TYPE_NODE          9
 #define ITEM_TYPE_NUMBER        10
 
-static inline void vlc_input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
+static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
 {
     memset( p_i, 0, sizeof(input_item_t) );
     p_i->psz_name = 0;
@@ -111,8 +111,8 @@ static inline void vlc_input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
     vlc_mutex_init( p_o, &p_i->lock );
 }
 
-static inline void vlc_input_item_CopyOptions( input_item_t *p_parent,
-                                               input_item_t *p_child )
+static inline void input_ItemCopyOptions( input_item_t *p_parent,
+                                          input_item_t *p_child )
 {
     int i;
     for( i = 0 ; i< p_parent->i_options; i++ )
@@ -126,9 +126,10 @@ static inline void vlc_input_item_CopyOptions( input_item_t *p_parent,
     }
 }
 
-VLC_EXPORT( void, vlc_input_item_AddOption, ( input_item_t *p_input, const char *psz_option ) );
+VLC_EXPORT( void, input_ItemAddOption,( input_item_t *, const char * ) );
+VLC_EXPORT( void, input_ItemAddOptionNoDup,( input_item_t *, const char * ) );
 
-static inline void vlc_input_item_Clean( input_item_t *p_i )
+static inline void input_ItemClean( input_item_t *p_i )
 {
     if( p_i->psz_name ) free( p_i->psz_name );
     if( p_i->psz_uri ) free( p_i->psz_uri );
@@ -180,8 +181,8 @@ static inline void vlc_input_item_Clean( input_item_t *p_i )
     vlc_mutex_destroy( &p_i->lock );
 }
 
-VLC_EXPORT( char *, vlc_input_item_GetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
-VLC_EXPORT(int, vlc_input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) );
+VLC_EXPORT( char *, input_ItemGetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
+VLC_EXPORT(int, input_ItemAddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) );
 
 #define input_ItemNew( a,b,c ) input_ItemNewExt( a, b, c, 0, NULL, -1 )
 #define input_ItemNewExt(a,b,c,d,e,f) __input_ItemNewExt( VLC_OBJECT(a),b,c,d,e,f)

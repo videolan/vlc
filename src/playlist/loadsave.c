@@ -50,7 +50,7 @@ int playlist_Import( playlist_t * p_playlist, const char *psz_filename,
     if( b_only_there )
     {
         asprintf( &psz_opt, "parent-item=%i", p_root->i_id );
-        vlc_input_item_AddOption( p_input, psz_opt );
+        input_ItemAddOption( p_input, psz_opt );
         free( psz_opt );
     }
     playlist_PlaylistAddInput( p_playlist, p_input, PLAYLIST_APPEND,

@@ -2367,7 +2367,7 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
         p_item = input_ItemNew( p_intf, psz_item_mrl, psz_item_mrl );
         for( i = 0; i < i_options; i++ )
         {
-            vlc_input_item_AddOption( p_item, ppsz_options[i] );
+            input_ItemAddOption( p_item, ppsz_options[i] );
         }
     }
 

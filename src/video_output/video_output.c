@@ -117,7 +117,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         /* Reattach video output to playlist before bailing out */
         if( p_vout )
         {
-            vlc_object_t *p_playlist = pl_Yield( p_this );
+            playlist_t  *p_playlist = pl_Yield( p_this );
             spu_Attach( p_vout->p_spu, p_this, VLC_FALSE );
             vlc_object_detach( p_vout );
             vlc_object_attach( p_vout, p_playlist );
@@ -479,7 +479,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 void vout_Destroy( vout_thread_t *p_vout )
 {
     vout_thread_t *p_another_vout;
-    vlc_object_t *p_playlist = pl_Yield( p_vout );
+    playlist_t *p_playlist = pl_Yield( p_vout );
 
     /* Request thread destruction */
     p_vout->b_die = VLC_TRUE;

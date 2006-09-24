@@ -932,7 +932,7 @@ vlm_media_t *vlm_MediaNew( vlm_t *vlm, const char *psz_name, int i_type )
     media->i_instance = 0;
     media->instance = NULL;
 
-    vlc_input_item_Init( VLC_OBJECT(vlm), &media->item );
+    input_ItemInit( VLC_OBJECT(vlm), &media->item );
 
     TAB_APPEND( vlm->i_media, vlm->media, media );
 
@@ -980,7 +980,7 @@ void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, const char *psz_name )
     while( media->i_option-- ) free( media->option[media->i_option] );
     if( media->option ) free( media->option );
 
-    vlc_input_item_Clean( &media->item );
+    input_ItemClean( &media->item );
 
     free( media );
 }
@@ -1113,8 +1113,8 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
             char *psz_header;
             int i;
 
-            vlc_input_item_Clean( &media->item );
-            vlc_input_item_Init( VLC_OBJECT(vlm), &media->item );
+            input_ItemClean( &media->item );
+            input_ItemInit( VLC_OBJECT(vlm), &media->item );
 
             if( media->psz_output )
                 asprintf( &psz_output, "%s:description", media->psz_output );
@@ -1197,7 +1197,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
             p_instance = malloc( sizeof(vlm_media_instance_t) );
             if( !p_instance ) return VLC_EGENERIC;
             memset( p_instance, 0, sizeof(vlm_media_instance_t) );
-            vlc_input_item_Init( VLC_OBJECT(vlm), &p_instance->item );
+            input_ItemInit( VLC_OBJECT(vlm), &p_instance->item );
             p_instance->p_input = NULL;
 
             if( ( media->psz_output != NULL ) || ( media->psz_vod_output != NULL ) )
@@ -1248,7 +1248,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
         if( !p_instance->p_input )
         {
             TAB_REMOVE( media->i_instance, media->instance, p_instance );
-            vlc_input_item_Clean( &p_instance->item );
+            input_ItemClean( &p_instance->item );
             if( p_instance->psz_name ) free( p_instance->psz_name );
         }
         free( psz_header );
@@ -1320,7 +1320,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
             vlc_object_destroy( p_instance->p_input );
         }
 
-        vlc_input_item_Clean( &p_instance->item );
+        input_ItemClean( &p_instance->item );
         if( p_instance->psz_name ) free( p_instance->psz_name );
         free( p_instance );
 

@@ -185,7 +185,7 @@ void E_(AddToPlaylist)( demux_t *p_demux, playlist_t *p_playlist,
        playlist_BothAddInput( p_playlist, p_input, p_item,
                               PLAYLIST_APPEND, PLAYLIST_END );
    }
-   vlc_input_item_CopyOptions( p_item->p_input, p_input );
+   input_ItemCopyOptions( p_item->p_input, p_input );
 }
 
 

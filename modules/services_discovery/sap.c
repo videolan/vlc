@@ -817,16 +817,16 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     }
 
     if( p_sys->b_timeshift )
-        vlc_input_item_AddOption( p_input, ":access-filter=timeshift" );
+        input_ItemAddOption( p_input, ":access-filter=timeshift" );
 
     psz_value = GetAttribute( p_sap->p_sdp, "tool" );
     if( psz_value != NULL )
     {
-        vlc_input_item_AddInfo( p_input, _("Session"),_("Tool"), psz_value );
+        input_ItemAddInfo( p_input, _("Session"),_("Tool"), psz_value );
     }
     if( strcmp( p_sdp->psz_username, "-" ) )
     {
-        vlc_input_item_AddInfo( p_input, _("Session"),
+        input_ItemAddInfo( p_input, _("Session"),
                                 _("User"), p_sdp->psz_username );
     }
 

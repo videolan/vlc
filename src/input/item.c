@@ -38,7 +38,7 @@ static void GuessType( input_item_t *p_item );
  *         empty string otherwise. The caller should free the returned
  *         pointer.
  */
-char *vlc_input_item_GetInfo( input_item_t *p_i,
+char *input_ItemGetInfo( input_item_t *p_i,
                               const char *psz_cat,
                               const char *psz_name )
 {
@@ -67,14 +67,14 @@ char *vlc_input_item_GetInfo( input_item_t *p_i,
     return strdup( "" );
 }
 
-static void vlc_input_item_Destroy ( gc_object_t *p_this )
+static void input_ItemDestroy ( gc_object_t *p_this )
 {
     vlc_object_t *p_obj = (vlc_object_t *)p_this->p_destructor_arg;
     input_item_t *p_input = (input_item_t *) p_this;
     int i;
 
     playlist_t *p_playlist = pl_Yield( p_obj );
-    vlc_input_item_Clean( p_input );
+    input_ItemClean( p_input );
 
     for( i = 0 ; i< p_playlist->i_input_items ; i++ )
     {
@@ -89,7 +89,35 @@ static void vlc_input_item_Destroy ( gc_object_t *p_this )
     free( p_input );
 }
 
-int vlc_input_item_AddInfo( input_item_t *p_i,
+void input_ItemAddOption( input_item_t *p_input,
+                          const char *psz_option )
+{
+    if( !psz_option ) return;
+    vlc_mutex_lock( &p_input->lock );
+    INSERT_ELEM( p_input->ppsz_options, p_input->i_options,
+                 p_input->i_options, strdup( psz_option ) );
+    vlc_mutex_unlock( &p_input->lock );
+}
+
+void input_ItemAddOptionNoDup( input_item_t *p_input,
+                               const char *psz_option )
+{
+    int i;
+    if( !psz_option ) return ;
+    vlc_mutex_lock( &p_input->lock );
+    for( i = 0 ; i< p_input->i_options; i++ )
+    {
+        if( !strcmp( p_input->ppsz_options[i], psz_option ) )
+        {
+            vlc_mutex_unlock(& p_input->lock );
+            return;
+        }
+    }
+    TAB_APPEND( p_input->i_options, p_input->ppsz_options, strdup( psz_option));    vlc_mutex_unlock( &p_input->lock );
+}
+
+
+int input_ItemAddInfo( input_item_t *p_i,
                             const char *psz_cat,
                             const char *psz_name,
                             const char *psz_format, ... )
@@ -156,17 +184,6 @@ int vlc_input_item_AddInfo( input_item_t *p_i,
     return VLC_SUCCESS;
 }
 
-void vlc_input_item_AddOption( input_item_t *p_input,
-                              const char *psz_option )
-{
-    if( !psz_option ) return;
-    vlc_mutex_lock( &p_input->lock );
-    INSERT_ELEM( p_input->ppsz_options, p_input->i_options,
-                 p_input->i_options, strdup( psz_option ) );
-    vlc_mutex_unlock( &p_input->lock );
-};
-
-
 input_item_t *input_ItemGetById( playlist_t *p_playlist, int i_id )
 {
     int i, i_top, i_bottom;
@@ -206,8 +223,8 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
     playlist_t *p_playlist = pl_Yield( p_obj );
     DECMALLOC_NULL( p_input, input_item_t );
 
-    vlc_input_item_Init( p_obj, p_input );
-    vlc_gc_init( p_input, vlc_input_item_Destroy, (void *)p_obj );
+    input_ItemInit( p_obj, p_input );
+    vlc_gc_init( p_input, input_ItemDestroy, (void *)p_obj );
 
     PL_LOCK;
     p_input->i_id = ++p_playlist->i_last_input_id;

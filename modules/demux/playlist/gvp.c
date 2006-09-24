@@ -189,7 +189,7 @@ static int Demux( demux_t *p_demux )
     {
         p_input = input_ItemNewExt( p_sys->p_playlist,
                                     psz_url, psz_title, 0, NULL, -1 );
-#define SADD_INFO( type, field ) if( field ) { vlc_input_item_AddInfo( \
+#define SADD_INFO( type, field ) if( field ) { input_ItemAddInfo( \
                     p_input, _("Google Video"), _(type), "%s", field ) ; }
         SADD_INFO( "gvp_version", psz_version );
         SADD_INFO( "docid", psz_docid );

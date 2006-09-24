@@ -239,7 +239,7 @@ static int DemuxGenre( demux_t *p_demux )
                              psz_name );
                     p_input = input_ItemNewExt( p_sys->p_playlist, psz_mrl,
                                                 psz_name, 0, NULL, -1 );
-                    vlc_input_item_CopyOptions( p_sys->p_current->p_input,
+                    input_ItemCopyOptions( p_sys->p_current->p_input,
                                                 p_input );
                     free( psz_mrl );
                     playlist_AddWhereverNeeded( p_sys->p_playlist, p_input,
@@ -417,10 +417,10 @@ static int DemuxStation( demux_t *p_demux )
                                                 psz_name , 0, NULL, -1 );
                     free( psz_mrl );
 
-                    vlc_input_item_CopyOptions( p_sys->p_current->p_input,
+                    input_ItemCopyOptions( p_sys->p_current->p_input,
                                                 p_input );
 
-#define SADD_INFO( type, field ) if( field ) { vlc_input_item_AddInfo( \
+#define SADD_INFO( type, field ) if( field ) { input_ItemAddInfo( \
                     p_input, _("Shoutcast"), _(type), "%s", field ) ; }
                     SADD_INFO( "Mime type", psz_mt );
                     SADD_INFO( "Bitrate", psz_br );

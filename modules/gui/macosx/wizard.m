@@ -1291,13 +1291,13 @@ static VLCWizard *_o_sharedInstance = nil;
                 [[[o_userSelections objectForKey:@"pathToStrm"] \
                 objectAtIndex:x] UTF8String], \
                 [tempString UTF8String] );
-            vlc_input_item_AddOption( p_input, [[[o_userSelections \
+            input_ItemAddOption( p_input, [[[o_userSelections \
                 objectForKey:@"opts"] objectAtIndex: x] UTF8String]);
 
             if(! [[o_userSelections objectForKey:@"partExtractFrom"] \
                 isEqualToString:@""] )
             {
-                vlc_input_item_AddOption( p_input, [[NSString \
+                input_ItemAddOption( p_input, [[NSString \
                     stringWithFormat: @"start-time=%@", [o_userSelections \
                     objectForKey: @"partExtractFrom"]] UTF8String] );
             }
@@ -1305,12 +1305,12 @@ static VLCWizard *_o_sharedInstance = nil;
             if(! [[o_userSelections objectForKey:@"partExtractTo"] \
                 isEqualToString:@""] )
             {
-                vlc_input_item_AddOption( p_input, [[NSString \
+                input_ItemAddOption( p_input, [[NSString \
                     stringWithFormat: @"stop-time=%@", [o_userSelections \
                     objectForKey: @"partExtractTo"]] UTF8String] );
             }
 
-            vlc_input_item_AddOption( p_input, [[NSString stringWithFormat: \
+            input_ItemAddOption( p_input, [[NSString stringWithFormat: \
                 @"ttl=%@", [o_userSelections objectForKey:@"ttl"]] \
                 UTF8String] );
 
