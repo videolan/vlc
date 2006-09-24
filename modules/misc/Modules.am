@@ -12,4 +12,3 @@ SOURCES_gnutls = gnutls.c
 SOURCES_svg = svg.c
 SOURCES_profile_parser = profile_parser.c
 SOURCES_audioscrobbler = audioscrobbler.c
-SOURCES_taglib = taglib.cpp
