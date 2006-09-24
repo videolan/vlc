@@ -164,7 +164,7 @@ static void Run( intf_thread_t *p_intf )
         var_Set( p_intf->p_libvlc, p_hotkeys[i].psz_action, val );
     }
 
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         int i_key, i_action;
         int i_times = 0;

@@ -245,7 +245,7 @@ static void Run( intf_thread_t *p_intf )
 
     psz_password = config_GetPsz( p_intf, "telnet-password" );
 
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         fd_set fds_read, fds_write;
         int    i_handle_max = 0;

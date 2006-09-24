@@ -621,7 +621,7 @@ void MainInterface::updateOnTimer()
     advControls->enableInput( THEMIM->getIM()->hasInput() );
     advControls->enableVideo( THEMIM->getIM()->hasVideo() );
 
-    if( p_intf->b_die )
+    if( intf_ShouldDie( p_intf ) )
     {
         QApplication::closeAllWindows();
         QApplication::quit();

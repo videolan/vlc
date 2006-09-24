@@ -52,7 +52,6 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void Manager( intf_thread_t *p_intf );
 static void RunInterface( intf_thread_t *p_intf );
 
 static int SwitchIntfCallback( vlc_object_t *, char const *,
@@ -61,6 +60,7 @@ static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
 
 #ifdef __APPLE__
+static void Manager( intf_thread_t *p_intf );
 /*****************************************************************************
  * VLCApplication interface
  *****************************************************************************/
@@ -188,9 +188,8 @@ int intf_RunThread( intf_thread_t *p_intf )
     {
         /* This interface doesn't need to be run */
         if( !p_intf->pf_run )
-        {
             return VLC_SUCCESS;
-        }
+
         /* Run the interface in a separate thread */
         if( !strcmp( p_intf->p_module->psz_object_name, "macosx" ) )
         {
@@ -216,16 +215,16 @@ int intf_RunThread( intf_thread_t *p_intf )
 #else
     if( p_intf->b_block )
     {
-        /* Run a manager thread, launch the interface, kill the manager */
-        if( vlc_thread_create( p_intf, "manager", Manager,
-                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+        /* If the main interface does not have a run function,
+         * implement a waiting loop ourselves
+         */
+        if( p_intf->pf_run )
+            RunInterface( p_intf );
+        else
         {
-            msg_Err( p_intf, "cannot spawn manager thread" );
-            return VLC_EGENERIC;
+            while( !intf_ShouldDie( p_intf ) )
+                msleep( INTF_IDLE_SLEEP * 2);
         }
-
-        RunInterface( p_intf );
-
         p_intf->b_die = VLC_TRUE;
         /* Do not join the thread... intf_StopThread will do it for us */
     }
@@ -261,11 +260,9 @@ void intf_StopThread( intf_thread_t *p_intf )
     if( !p_intf->b_block )
     {
         p_intf->b_die = VLC_TRUE;
+        if( p_intf->pf_run )
+            vlc_thread_join( p_intf );
     }
-
-    /* Wait for the thread to exit */
-    if( p_intf->pf_run )
-        vlc_thread_join( p_intf );
 }
 
 /**
@@ -293,24 +290,9 @@ void intf_Destroy( intf_thread_t *p_intf )
 /* Following functions are local */
 
 /*****************************************************************************
- * Manager: helper thread for blocking interfaces
- *****************************************************************************
- * If the interface is launched in the main thread, it will not listen to
- * p_vlc->b_die events because it is only supposed to listen to p_intf->b_die.
- * This thread takes care of the matter.
+ * Manager: helper thread for blocking OS X
  *****************************************************************************/
-/**
- * \brief Helper thread for blocking interfaces.
- * \ingroup vlc_interface
- *
- * This is a local function
- * If the interface is launched in the main thread, it will not listen to
- * p_vlc->b_die events because it is only supposed to listen to p_intf->b_die.
- * This thread takes care of the matter.
- * \see intf_RunThread
- * \param p_intf an interface thread
- * \return nothing
- */
+#ifdef __APPLE__
 static void Manager( intf_thread_t *p_intf )
 {
     while( !p_intf->b_die )
@@ -320,16 +302,15 @@ static void Manager( intf_thread_t *p_intf )
         if( p_intf->p_libvlc->b_die )
         {
             p_intf->b_die = VLC_TRUE;
-#ifdef __APPLE__
-    if( strncmp( p_intf->p_libvlc->psz_object_name, "clivlc", 6 ) )
-    {
-        [NSApp stop: NULL];
-    }
-#endif
+            if( strncmp( p_intf->p_libvlc->psz_object_name, "clivlc", 6 ) )
+            {
+                [NSApp stop: NULL];
+            }
             return;
         }
     }
 }
+#endif
 
 /*****************************************************************************
  * RunInterface: setups necessary data and give control to the interface

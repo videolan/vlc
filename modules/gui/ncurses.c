@@ -336,7 +336,7 @@ static void Run( intf_thread_t *p_intf )
      */
     t_last_refresh = ( time( 0 ) - 1);
 
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         msleep( INTF_IDLE_SLEEP );
 

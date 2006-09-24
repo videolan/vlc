@@ -319,7 +319,7 @@ static void Run( intf_thread_t *p_intf )
 
 #ifdef NEED_GTK2_MAIN
     msg_Dbg( p_intf, "Manage GTK keyboard events using threads" );
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         Manage( p_intf );
 
@@ -518,14 +518,14 @@ static int Manage( intf_thread_t *p_intf )
         }
         vlc_mutex_unlock( &p_input->object_lock );
     }
-    else if( p_intf->p_sys->b_playing && !p_intf->b_die )
+    else if( p_intf->p_sys->b_playing && !intf_ShouldDie( p_intf ) )
     {
         E_(GtkModeManage)( p_intf );
         p_intf->p_sys->b_playing = 0;
     }
 
 #ifndef NEED_GTK2_MAIN
-    if( p_intf->b_die )
+    if( intf_ShouldDie( p_intf ) )
     {
         vlc_mutex_unlock( &p_intf->change_lock );
 

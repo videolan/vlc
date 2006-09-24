@@ -119,6 +119,10 @@ VLC_EXPORT( int,               intf_RunThread,  ( intf_thread_t * ) );
 VLC_EXPORT( void,              intf_StopThread, ( intf_thread_t * ) );
 VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 
+/* If the interface is in the main thread, it should listen both to
+ * p_intf->b_die and p_libvlc->b_die */
+#define intf_ShouldDie( p_intf ) (p_intf->b_die || (p_intf->b_block && p_intf->p_libvlc->b_die ) )
+
 /*@}*/
 
 /*****************************************************************************

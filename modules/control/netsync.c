@@ -159,7 +159,7 @@ static void Run( intf_thread_t *p_intf )
     /* High priority thread */
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_INPUT );
 
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         struct timeval timeout;
         fd_set fds_r;

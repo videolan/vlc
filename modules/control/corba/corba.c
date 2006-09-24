@@ -757,13 +757,13 @@ static gboolean Manage( gpointer p_interface )
         msg_Err( p_intf, "Exception in CORBA events check loop" );
         return FALSE;
     }
-  
+
     vlc_mutex_lock( &p_intf->change_lock );
 
     if( b_work_pending )
         CORBA_ORB_perform_work( p_intf->p_sys->orb, ev );
-  
-    if( p_intf->b_die )
+
+    if( intf_ShouldDie( p_intf ) )
     {
         vlc_mutex_unlock( &p_intf->change_lock );
         CORBA_ORB_shutdown( p_intf->p_sys->orb, TRUE, ev );

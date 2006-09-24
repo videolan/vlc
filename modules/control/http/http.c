@@ -431,7 +431,7 @@ static void Run( intf_thread_t *p_intf )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
 
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         /* get the playlist */
         if( p_sys->p_playlist == NULL )

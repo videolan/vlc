@@ -132,7 +132,7 @@ static void RunIntf( intf_thread_t *p_intf )
 {
     int i_x, i_oldx = 0;
 
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
 #define LOW_THRESHOLD 80
 #define HIGH_THRESHOLD 100

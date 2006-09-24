@@ -119,7 +119,7 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         p_intf->p_sys->p_window->UpdateInterface();
         msleep( INTF_IDLE_SLEEP );

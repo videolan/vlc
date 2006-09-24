@@ -107,7 +107,7 @@ void Timer::Notify()
         p_intf->p_sys->b_intf_show = VLC_FALSE;
     }
 
-    if( p_intf->b_die )
+    if( intf_ShouldDie( p_intf ) )
     {
         vlc_mutex_unlock( &p_intf->change_lock );
 

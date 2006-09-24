@@ -560,7 +560,7 @@ static void Run( intf_thread_t *p_intf )
     }
 #endif
 
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         char *psz_cmd, *psz_arg;
         vlc_bool_t b_complete;
@@ -2201,7 +2201,7 @@ vlc_bool_t ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     while( WaitForSingleObject( p_intf->p_sys->hConsoleIn,
                                 INTF_IDLE_SLEEP/1000 ) == WAIT_OBJECT_0 )
     {
-        while( !p_intf->b_die && *pi_size < MAX_LINE_LENGTH &&
+        while( !intf_ShouldDie( p_intf ) && *pi_size < MAX_LINE_LENGTH &&
                ReadConsoleInput( p_intf->p_sys->hConsoleIn, &input_record,
                                  1, &i_dw ) )
         {
@@ -2271,7 +2271,7 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     }
 #endif
 
-    while( !p_intf->b_die && *pi_size < MAX_LINE_LENGTH &&
+    while( !intf_ShouldDie( p_intf ) && *pi_size < MAX_LINE_LENGTH &&
            (i_read = net_ReadNonBlock( p_intf, p_intf->p_sys->i_socket == -1 ?
                        0 /*STDIN_FILENO*/ : p_intf->p_sys->i_socket, NULL,
                   (uint8_t *)p_buffer + *pi_size, 1, INTF_IDLE_SLEEP ) ) > 0 )

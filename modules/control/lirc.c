@@ -120,7 +120,7 @@ static void Run( intf_thread_t *p_intf )
 {
     char *code, *c;
 
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         /* Sleep a bit */
         msleep( INTF_IDLE_SLEEP );
@@ -136,7 +136,7 @@ static void Run( intf_thread_t *p_intf )
             continue;
         }
 
-        while( !p_intf->b_die
+        while( !intf_ShouldDie( p_intf )
                 && lirc_code2char( p_intf->p_sys->config, code, &c ) == 0
                 && c != NULL )
         {

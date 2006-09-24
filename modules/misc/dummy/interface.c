@@ -51,20 +51,7 @@ int  E_(OpenIntf) ( vlc_object_t *p_this )
 
     msg_Info( p_intf, "using the dummy interface module..." );
 
-    p_intf->pf_run = Run;
+    p_intf->pf_run = NULL;
 
     return VLC_SUCCESS;
 }
-
-/*****************************************************************************
- * Run: main loop
- *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
-{
-    while( !p_intf->b_die )
-    {
-        /* Wait a bit */
-        msleep( INTF_IDLE_SLEEP );
-    }
-}
-
