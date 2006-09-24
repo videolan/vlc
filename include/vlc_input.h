@@ -538,4 +538,7 @@ VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
 
 VLC_EXPORT( vlc_bool_t, input_AddSubtitles, ( input_thread_t *, char *, vlc_bool_t ) );
 
+VLC_EXPORT( int, input_DownloadAndCacheArt, ( vlc_object_t *p_parent, input_item_t *p_item ) );
+
+
 #endif

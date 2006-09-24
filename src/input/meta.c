@@ -32,35 +32,48 @@
 #   include <sys/stat.h>
 #endif
 
+int input_FindArt( vlc_object_t *p_parent, input_item_t *p_item );
+
 int __input_MetaFetch( vlc_object_t *p_parent, input_item_t *p_item )
 {
     struct meta_engine_t *p_me;
+    uint32_t i_mandatory = 0, i_optional = 0, i_meta;
+    int i_policy;
 
-    /* FIXME: don't launch any module if we already have all the needed
-     * info. Easiest way to do this would be to add a dummy module.
-     * I'll do that later */
+    if( !p_item->p_meta ) return VLC_EGENERIC;
 
-    p_me = vlc_object_create( p_parent, VLC_OBJECT_META_ENGINE );
-    p_me->i_flags |= OBJECT_FLAGS_NOINTERACT;
-    p_me->i_mandatory =   VLC_META_ENGINE_TITLE
-                        | VLC_META_ENGINE_ARTIST;
-    p_me->i_optional = 0;
-/*
-    if( var_CreateGetInteger( p_parent, "album-art" ) != ALBUM_ART_NEVER )
+    i_policy = var_CreateGetInteger( p_parent, "album-art" );
+
+    i_mandatory =   VLC_META_ENGINE_TITLE
+                  | VLC_META_ENGINE_ARTIST;
+    if( i_policy == ALBUM_ART_ALL )
     {
-        p_me->i_mandatory |= VLC_META_ENGINE_ART_URL;
+        i_mandatory |= VLC_META_ENGINE_ART_URL;
     }
     else
     {
-        p_me->i_optional |= VLC_META_ENGINE_ART_URL;
+        i_optional |= VLC_META_ENGINE_ART_URL;
     }
-*/
+
+    input_FindArt( p_parent, p_item );
+
+    i_meta = input_GetMetaEngineFlags( p_item->p_meta );
+    i_mandatory &= ~i_meta;
+    i_optional &= ~i_meta;
+
+    if( !i_mandatory ) return VLC_SUCCESS;
+
+    p_me = vlc_object_create( p_parent, VLC_OBJECT_META_ENGINE );
+    p_me->i_flags |= OBJECT_FLAGS_NOINTERACT;
+    p_me->i_mandatory = i_mandatory;
+    p_me->i_optional = i_optional;
+
     p_me->p_item = p_item;
     p_me->p_module = module_Need( p_me, "meta fetcher", 0, VLC_FALSE );
     vlc_object_attach( p_me, p_parent );
     if( !p_me->p_module )
     {
-        msg_Err( p_parent, "no suitable meta engine module" );
+        msg_Err( p_parent, "no suitable meta fetcher module" );
         vlc_object_detach( p_me );
         vlc_object_destroy( p_me );
         return VLC_EGENERIC;
@@ -68,6 +81,7 @@ int __input_MetaFetch( vlc_object_t *p_parent, input_item_t *p_item )
 
     module_Unneed( p_me, p_me->p_module );
 
+    vlc_object_detach( p_me );
     vlc_object_destroy( p_me );
 
     return VLC_SUCCESS;
@@ -82,36 +96,34 @@ int input_FindArt( vlc_object_t *p_parent, input_item_t *p_item )
     char *psz_album;
     char *psz_type;
     char psz_filename[MAX_PATH];
-    int i_ret;
+    int i;
     struct stat a;
+    const char ppsz_type[] = { ".jpg", ".png", ".gif", ".bmp", "" };
 
     if( !p_item->p_meta ) return VLC_EGENERIC;
 
     psz_artist = p_item->p_meta->psz_artist;
     psz_album = p_item->p_meta->psz_album;
 
-    //FIXME !!!!!
-    psz_type = strdup( "jpg" );
-
-    snprintf( psz_filename, MAX_PATH,
-              "file://%s" DIR_SEP CONFIG_DIR DIR_SEP "art"
-              DIR_SEP "%s" DIR_SEP "%s" DIR_SEP "art%s",
-              p_parent->p_libvlc->psz_homedir,
-              psz_artist, psz_album, psz_type );
-
-    /* Check if file exists */
-    i_ret = utf8_stat( psz_filename+7, &a );
-    if( i_ret == 0 )
+    for( i = 0; i < 5; i++ )
     {
-        msg_Dbg( p_parent, "album art %s already exists in cache"
-                         , psz_filename );
-        return VLC_SUCCESS;
+        snprintf( psz_filename, MAX_PATH,
+                  "file://%s" DIR_SEP CONFIG_DIR DIR_SEP "art"
+                  DIR_SEP "%s" DIR_SEP "%s" DIR_SEP "art%s",
+                  p_parent->p_libvlc->psz_homedir,
+                  psz_artist, psz_album, psz_type );
+
+        /* Check if file exists */
+        if( utf8_stat( psz_filename+7, &a ) == 0 )
+        {
+            msg_Dbg( p_parent, "album art %s already exists in cache"
+                             , psz_filename );
+            return VLC_SUCCESS;
+        }
     }
-    else
-    {
-        /* Use a art finder module to find the URL */
-        return VLC_EGENERIC;
-    }
+
+    /* Use a art finder module to find the URL */
+    return VLC_EGENERIC;
 }
 
 /**
@@ -121,8 +133,6 @@ int input_FindArt( vlc_object_t *p_parent, input_item_t *p_item )
 int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
 {
     int i_status = VLC_EGENERIC;
-    int i_ret;
-    struct stat a;
     stream_t *p_stream;
     char psz_filename[MAX_PATH], psz_dir[MAX_PATH];
     char *psz_artist;
@@ -135,6 +145,8 @@ int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
     if( !p_item->p_meta || !p_item->p_meta->psz_arturl
                         || !*p_item->p_meta->psz_arturl )
         return VLC_EGENERIC;
+
+    psz_type = strrchr( p_item->p_meta->psz_arturl, '.' );
 
     /* Todo: get a helper to do this */
     snprintf( psz_filename, MAX_PATH,
@@ -180,4 +192,29 @@ int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
         i_status = VLC_SUCCESS;
     }
     return i_status;
+}
+
+uint32_t input_GetMetaEngineFlags( vlc_meta_t *p_meta )
+{
+    uint32_t i_meta = 0;
+
+#define CHECK( a, b ) \
+    if( p_meta->psz_ ## a && *p_meta->psz_ ## a ) \
+        i_meta |= VLC_META_ENGINE_ ## b;
+
+    CHECK( title, TITLE )
+    CHECK( author, AUTHOR )
+    CHECK( artist, ARTIST )
+    CHECK( genre, GENRE )
+    CHECK( copyright, COPYRIGHT )
+    CHECK( album, COLLECTION )
+    CHECK( tracknum, SEQ_NUM )
+    CHECK( description, DESCRIPTION )
+    CHECK( rating, RATING )
+    CHECK( date, DATE )
+    CHECK( url, URL )
+    CHECK( language, LANGUAGE )
+    CHECK( arturl, ART_URL )
+
+    return i_meta;
 }

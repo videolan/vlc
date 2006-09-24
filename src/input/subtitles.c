@@ -47,15 +47,6 @@
 #include <ctype.h>
 
 /**
- * What's between a directory and a filename?
- */
-#if defined( WIN32 )
-    #define DIRECTORY_SEPARATOR '\\'
-#else
-    #define DIRECTORY_SEPARATOR '/'
-#endif
-
-/**
  * We are not going to autodetect more subtitle files than this.
  */
 #define MAX_SUBTITLE_FILES 128
@@ -231,7 +222,7 @@ static char **paths_to_list( char *psz_dir, char *psz_path )
                              psz_subdir[0] == '.' ? psz_dir : "",
                              psz_subdir,
                              psz_subdir[strlen(psz_subdir) - 1] ==
-                              DIRECTORY_SEPARATOR ? '\0' : DIRECTORY_SEPARATOR );
+                              DIR_SEP ? '\0' : DIR_SEP );
                     subdirs[i] = psz_temp;
                     i++;
                 }
@@ -286,7 +277,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     }
 
     /* extract filename & dirname from psz_fname */
-    tmp = strrchr( psz_fname, DIRECTORY_SEPARATOR );
+    tmp = strrchr( psz_fname, DIR_SEP );
     if( tmp )
     {
         int dirlen = 0;
@@ -313,7 +304,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         }
         dirlen = strlen( f_dir );
         f_dir = (char *)realloc(f_dir, dirlen +2 );
-        f_dir[dirlen] = DIRECTORY_SEPARATOR;
+        f_dir[dirlen] = DIR_SEP;
         f_dir[dirlen+1] = '\0';
         f_fname = FromLocaleDup( psz_fname );
     }

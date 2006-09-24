@@ -67,6 +67,7 @@ static int FindMeta( vlc_object_t *p_this )
     char psz_data[256];
     char i_album_count, i;
     char *ppsz_args[4];
+    uint32_t i_meta;
 
     if( !p_item->p_meta ) return VLC_EGENERIC;
     psz_artist = p_item->p_meta->psz_artist;
@@ -132,5 +133,11 @@ static int FindMeta( vlc_object_t *p_this )
 
     mb_Delete( p_mb );
 
-    return VLC_SUCCESS;
+    i_meta = input_GetMetaEngineFlags( p_item->p_meta );
+    p_me->i_mandatory &= ~i_meta;
+    p_me->i_optional &= ~i_meta;
+    if( p_me->i_mandatory )
+        return VLC_EGENERIC;
+    else
+        return VLC_SUCCESS;
 }

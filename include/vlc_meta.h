@@ -225,4 +225,6 @@ struct meta_engine_t
     input_item_t *p_item;
 };
 
+VLC_EXPORT( uint32_t, input_GetMetaEngineFlags, ( vlc_meta_t *p_meta ) );
+
 #endif

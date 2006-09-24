@@ -67,6 +67,7 @@ static int FindMeta( vlc_object_t *p_this )
     meta_engine_t *p_me = (meta_engine_t *)p_this;
     input_item_t *p_item = p_me->p_item;
     vlc_bool_t b_have_art = VLC_FALSE;
+    uint32_t i_meta;
 
     if( !p_item->p_meta ) return VLC_EGENERIC;
 
@@ -123,5 +124,11 @@ static int FindMeta( vlc_object_t *p_this )
         free( psz_dir );
     }
 
-    return VLC_SUCCESS;
+    i_meta = input_GetMetaEngineFlags( p_item->p_meta );
+    p_me->i_mandatory &= ~i_meta;
+    p_me->i_optional &= ~i_meta;
+    if( p_me->i_mandatory )
+        return VLC_EGENERIC;
+    else
+        return VLC_SUCCESS;
 }
