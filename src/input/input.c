@@ -55,7 +55,7 @@ static  int RunAndClean  ( input_thread_t *p_input );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *, char *,
                                   vlc_bool_t );
-static  int             Init    ( input_thread_t *p_input, vlc_bool_t b_quick );
+static  int             Init    ( input_thread_t *p_input );
 static void             Error   ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input );
@@ -66,17 +66,16 @@ static vlc_bool_t Control( input_thread_t *, int, vlc_value_t );
 
 static int  UpdateFromAccess( input_thread_t * );
 static int  UpdateFromDemux( input_thread_t * );
-static int  UpdateMeta( input_thread_t *, vlc_bool_t );
+static int  UpdateMeta( input_thread_t * );
 
-static void UpdateItemLength( input_thread_t *, int64_t i_length, vlc_bool_t );
+static void UpdateItemLength( input_thread_t *, int64_t i_length );
 
 static void DecodeUrl( char * );
 static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
 static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *,
-                             char *, char *psz_forced_demux,
-                             vlc_bool_t b_quick );
+                             char *, char *psz_forced_demux );
 static void InputSourceClean( input_thread_t *, input_source_t * );
 
 static void SlaveDemux( input_thread_t *p_input );
@@ -124,6 +123,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
         msg_Err( p_parent, "out of memory" );
         return NULL;
     }
+    p_input->b_preparsing = b_quick;
     p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;
 
     /* Init Common fields */
@@ -185,7 +185,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_ControlVarInit( p_input );
     p_input->input.i_cr_average = var_GetInteger( p_input, "cr-average" );
 
-    if( !b_quick )
+    if( !p_input->b_preparsing )
     {
         var_Get( p_input, "bookmarks", &val );
         if( val.psz_string )
@@ -337,7 +337,7 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
     /* Now we can attach our new input */
     vlc_object_attach( p_input, p_parent );
 
-    Init( p_input, VLC_TRUE );
+    Init( p_input );
 
     /* Clean up master */
     InputSourceClean( p_input, &p_input->input );
@@ -462,7 +462,7 @@ static int Run( input_thread_t *p_input )
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
 
-    if( Init( p_input, VLC_FALSE ) )
+    if( Init( p_input ) )
     {
         /* If we failed, wait before we are killed, and exit */
         p_input->b_error = VLC_TRUE;
@@ -516,7 +516,7 @@ static int RunAndClean( input_thread_t *p_input )
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
 
-    if( Init( p_input, VLC_FALSE ) )
+    if( Init( p_input ) )
     {
         /* If we failed, just exit */
         return 0;
@@ -698,7 +698,7 @@ static void MainLoop( input_thread_t *p_input )
 
                 if( old_val.i_time != val.i_time )
                 {
-                    UpdateItemLength( p_input, i_length, VLC_TRUE );
+                    UpdateItemLength( p_input, i_length );
                 }
             }
 
@@ -709,7 +709,7 @@ static void MainLoop( input_thread_t *p_input )
 }
 
 
-static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
+static int Init( input_thread_t * p_input )
 {
     char *psz;
     char *psz_subtitle;
@@ -727,7 +727,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
      * want to add more logic, just force file by file:// or code it ;)
      */
     memset( &p_input->counters, 0, sizeof( p_input->counters ) );
-    if( !b_quick )
+    if( !p_input->b_preparsing )
     {
         /* Prepare statistics */
 #define INIT_COUNTER( p, type, compute ) p_input->counters.p_##p = \
@@ -790,13 +790,13 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
     var_Create( p_input, "sample-rate", VLC_VAR_INTEGER );
 
     if( InputSourceInit( p_input, &p_input->input,
-                         p_input->input.p_item->psz_uri, NULL, b_quick ) )
+                         p_input->input.p_item->psz_uri, NULL ) )
     {
         goto error;
     }
 
     /* Create global title (from master) */
-    if( !b_quick )
+    if( !p_input->b_preparsing )
     {
         p_input->i_title = p_input->input.i_title;
         p_input->title   = p_input->input.title;
@@ -834,12 +834,12 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                          &val.i_time ) && val.i_time > 0 )
     {
         var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
-        UpdateItemLength( p_input, val.i_time, b_quick );
+        UpdateItemLength( p_input, val.i_time );
         p_input->input.p_item->i_duration = val.i_time;
     }
 
     /* Start title/chapter */
-    if( !b_quick )
+    if( !p_input->b_preparsing )
     {
         val.i_int = p_input->input.i_title_start -
                     p_input->input.i_title_offset;
@@ -940,8 +940,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                 if( strcmp( psz_subtitle, subs[i] ) )
                 {
                     sub = InputSourceNew( p_input );
-                    if( !InputSourceInit( p_input, sub, subs[i], "subtitle",
-                                          VLC_FALSE ) )
+                    if( !InputSourceInit( p_input, sub, subs[i], "subtitle" ) )
                     {
                         TAB_APPEND( p_input->i_slave, p_input->slave, sub );
                     }
@@ -976,7 +975,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
 
                 msg_Dbg( p_input, "adding slave input '%s'", psz );
                 slave = InputSourceNew( p_input );
-                if( !InputSourceInit( p_input, slave, psz, NULL, VLC_FALSE ) )
+                if( !InputSourceInit( p_input, slave, psz, NULL ) )
                 {
                     TAB_APPEND( p_input->i_slave, p_input->slave, slave );
                 }
@@ -992,7 +991,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
     }
 
     /* Set up es_out */
-    if( !b_quick )
+    if( !p_input->b_preparsing )
     {
         es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );
         i_es_out_mode = ES_OUT_MODE_AUTO;
@@ -1066,7 +1065,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
     demux2_Control( p_input->input.p_demux, DEMUX_GET_META, p_meta );
 
     /* Access_file does not give any meta, and there are no slave */
-    if( !b_quick )
+    if( !p_input->b_preparsing )
     {
         if( p_input->input.p_access )
             access2_Control( p_input->input.p_access, ACCESS_GET_META,
@@ -1085,9 +1084,9 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         }
     }
 
-    UpdateMeta( p_input, b_quick );
+    UpdateMeta( p_input );
 
-    if( !b_quick )
+    if( !p_input->b_preparsing )
     {
         msg_Dbg( p_input, "`%s' successfully opened",
                  p_input->input.p_item->psz_uri );
@@ -1672,8 +1671,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             {
                 input_source_t *slave = InputSourceNew( p_input );
 
-                if( !InputSourceInit( p_input, slave, val.psz_string, NULL,
-                                      VLC_FALSE ) )
+                if( !InputSourceInit( p_input, slave, val.psz_string, NULL ) )
                 {
                     vlc_meta_t *p_meta = p_input->input.p_item->p_meta;
                     int64_t i_time;
@@ -1704,7 +1702,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                     access2_Control( slave->p_access, ACCESS_GET_META,
                                      p_meta );
                     demux2_Control( slave->p_demux, DEMUX_GET_META, p_meta );
-                    UpdateMeta( p_input, VLC_FALSE );
+                    UpdateMeta( p_input );
 
                     TAB_APPEND( p_input->i_slave, p_input->slave, slave );
                 }
@@ -1810,7 +1808,7 @@ static int UpdateFromAccess( input_thread_t *p_input )
         /* TODO maybe multi - access ? */
         vlc_meta_t *p_meta = p_input->input.p_item->p_meta;
         access2_Control( p_input->input.p_access,ACCESS_GET_META, p_meta );
-        UpdateMeta( p_input, VLC_FALSE );
+        UpdateMeta( p_input );
         var_SetBool( p_input, "item-change", p_input->input.p_item->i_id );
         p_access->info.i_update &= ~INPUT_UPDATE_META;
     }
@@ -1847,7 +1845,7 @@ static int UpdateFromAccess( input_thread_t *p_input )
 /*****************************************************************************
  * UpdateMeta:
  *****************************************************************************/
-static int  UpdateMeta( input_thread_t *p_input, vlc_bool_t b_quick )
+static int  UpdateMeta( input_thread_t *p_input )
 {
     vlc_meta_t *p_meta = p_input->input.p_item->p_meta;
     if( !p_meta )
@@ -1864,22 +1862,19 @@ static int  UpdateMeta( input_thread_t *p_input, vlc_bool_t b_quick )
 /*****************************************************************************
  * UpdateItemLength:
  *****************************************************************************/
-static void UpdateItemLength( input_thread_t *p_input, int64_t i_length,
-                              vlc_bool_t b_quick )
+static void UpdateItemLength( input_thread_t *p_input, int64_t i_length )
 {
-    char psz_buffer[MSTRTIME_MAX_SIZE];
-
     vlc_mutex_lock( &p_input->input.p_item->lock );
     p_input->input.p_item->i_duration = i_length;
     vlc_mutex_unlock( &p_input->input.p_item->lock );
 
-    pl_Yield( p_input );
-    var_SetInteger( pl_Get( p_input ), "item-change",
-                    p_input->input.p_item->i_id );
-    pl_Release( p_input )
-
-    input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Duration"),
-                   msecstotimestr( psz_buffer, i_length / 1000 ) );
+    if( !p_input->b_preparsing )
+    {
+        pl_Yield( p_input );
+        var_SetInteger( pl_Get( p_input ), "item-change",
+                        p_input->input.p_item->i_id );
+        pl_Release( p_input )
+    }
 }
 
 /*****************************************************************************
@@ -1914,7 +1909,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input )
  *****************************************************************************/
 static int InputSourceInit( input_thread_t *p_input,
                             input_source_t *in, char *psz_mrl,
-                            char *psz_forced_demux, vlc_bool_t b_quick )
+                            char *psz_forced_demux )
 {
     char *psz_dup = strdup( psz_mrl );
     char *psz_access;
@@ -1927,7 +1922,7 @@ static int InputSourceInit( input_thread_t *p_input,
     if( !in ) return VLC_EGENERIC;
 
     /* Split uri */
-    if( !b_quick )
+    if( !p_input->b_preparsing )
     {
         MRLSplit( VLC_OBJECT(p_input), psz_dup,
                   &psz_access, &psz_demux, &psz_path );
@@ -2018,7 +2013,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
         /* Now try a real access */
         in->p_access = access2_New( p_input, psz_access, psz_demux, psz_path,
-                                    b_quick );
+                                    p_input->b_preparsing );
 
         /* Access failed, URL encoded ? */
         if( in->p_access == NULL && strchr( psz_path, '%' ) )
@@ -2030,7 +2025,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
             in->p_access = access2_New( p_input,
                                         psz_access, psz_demux, psz_path,
-                                        b_quick );
+                                        p_input->b_preparsing );
         }
 #ifndef WIN32      /* Remove this gross hack from the win32 build as colons
                         * are forbidden in filenames on Win32. */
@@ -2051,7 +2046,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
             in->p_access = access2_New( p_input,
                                         psz_access, psz_demux, psz_path,
-                                        b_quick );
+                                        p_input->b_preparsing );
         }
 #endif
 
@@ -2088,7 +2083,7 @@ static int InputSourceInit( input_thread_t *p_input,
         if( psz_tmp ) free( psz_tmp );
 
         /* Get infos from access */
-        if( !b_quick )
+        if( !p_input->b_preparsing )
         {
             access2_Control( in->p_access,
                              ACCESS_GET_PTS_DELAY, &i_pts_delay );
@@ -2115,7 +2110,7 @@ static int InputSourceInit( input_thread_t *p_input,
         input_ChangeState( p_input, BUFFERING_S);
 
         /* Create the stream_t */
-        in->p_stream = stream_AccessNew( in->p_access, b_quick );
+        in->p_stream = stream_AccessNew( in->p_access, p_input->b_preparsing );
         if( in->p_stream == NULL )
         {
             msg_Warn( p_input, "cannot create a stream_t from access" );
@@ -2128,7 +2123,8 @@ static int InputSourceInit( input_thread_t *p_input,
             psz_demux = in->p_access->psz_demux;
         }
         in->p_demux = demux2_New( p_input, psz_access, psz_demux, psz_path,
-                                  in->p_stream, p_input->p_es_out, b_quick );
+                                  in->p_stream, p_input->p_es_out,
+                                  p_input->b_preparsing );
         if( in->p_demux == NULL )
         {
             msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
@@ -2141,7 +2137,7 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         /* TODO get title from demux */
-        if( !b_quick && in->i_title <= 0 )
+        if( !p_input->b_preparsing && in->i_title <= 0 )
         {
             if( demux2_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
                                 &in->title, &in->i_title,
@@ -2512,7 +2508,7 @@ vlc_bool_t input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
     var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
 
     sub = InputSourceNew( p_input );
-    if( !InputSourceInit( p_input, sub, psz_subtitle, "subtitle", VLC_FALSE ) )
+    if( !InputSourceInit( p_input, sub, psz_subtitle, "subtitle" ) )
     {
         TAB_APPEND( p_input->i_slave, p_input->slave, sub );
 

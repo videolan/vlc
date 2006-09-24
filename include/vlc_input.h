@@ -387,6 +387,7 @@ struct input_thread_t
     vlc_bool_t  b_eof;
     vlc_bool_t  b_can_pace_control;
     vlc_bool_t  b_can_pause;
+    vlc_bool_t  b_preparsing;
 
     /* Global state */
     int         i_state;

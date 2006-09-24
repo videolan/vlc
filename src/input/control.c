@@ -195,7 +195,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             vlc_mutex_unlock( &p_input->input.p_item->lock );
 
-            NotifyPlaylist( p_input );
+            if( !p_input->b_preparsing )
+                NotifyPlaylist( p_input );
         }
         return VLC_SUCCESS;
 
@@ -240,7 +241,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             if( i >= p_cat->i_infos )
                 return VLC_EGENERIC;
 
-            NotifyPlaylist( p_input );
+            if( !p_input->b_preparsing )
+                NotifyPlaylist( p_input );
         }
         return VLC_SUCCESS;
 
@@ -270,7 +272,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             p_input->input.p_item->psz_name = strdup( psz_name );
             vlc_mutex_unlock( &p_input->input.p_item->lock );
 
-            NotifyPlaylist( p_input );
+            if( !p_input->b_preparsing )
+                NotifyPlaylist( p_input );
 
             return VLC_SUCCESS;
         }
