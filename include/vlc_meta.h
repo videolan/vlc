@@ -48,6 +48,11 @@
 #define VLC_META_CODEC_NAME         N_("Codec Name")
 #define VLC_META_CODEC_DESCRIPTION  N_("Codec Description")
 
+#define ITEM_PREPARSED      0x01
+#define ITEM_META_FETCHED   0x02
+#define ITEM_ARTURL_FETCHED 0x04
+#define ITEM_ART_FETCHED    0x08
+
 struct vlc_meta_t
 {
     char *psz_title;
@@ -67,6 +72,8 @@ struct vlc_meta_t
     char *psz_publisher;
     char *psz_encodedby;
     char *psz_arturl;
+
+    int i_status;
 #if 0
     /* track meta information */
     int         i_track;
@@ -117,6 +124,7 @@ static inline vlc_meta_t *vlc_meta_New( void )
     m->psz_publisher = NULL;
     m->psz_encodedby = NULL;
     m->psz_arturl = NULL;
+    m->i_status = 0;
     return m;
 }
 

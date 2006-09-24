@@ -479,9 +479,8 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
             PL_UNLOCK;
             if( b_preparsed )
             {
-                var_SetInteger( p_playlist, "item-change",
-                                p_current->i_id );
-
+                p_current->p_meta->i_status |= ITEM_PREPARSED;
+                var_SetInteger( p_playlist, "item-change", p_current->i_id );
             }
             vlc_gc_decref( p_current );
             /* Add to secondary preparse queue */
