@@ -1278,3 +1278,8 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #   define PACKAGE
 #endif
 
+#if defined( WIN32 ) || defined( UNDER_CE )
+#   define DIR_SEP "\\"
+#else
+#   define DIR_SEP "/"
+#endif

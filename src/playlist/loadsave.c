@@ -27,12 +27,6 @@
 #include "charset.h"
 #include <errno.h>
 
-#if defined( WIN32 ) || defined( UNDER_CE )
-#   define DIR_SEP "\\"
-#else
-#   define DIR_SEP "/"
-#endif
-
 /**
  * Import a playlist file at a given point of a given view
  * \param p_playlist the playlist to which the new items will be added

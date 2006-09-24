@@ -63,12 +63,6 @@
 #include <tchar.h>
 #endif
 
-#if defined( WIN32 ) || defined( UNDER_CE )
-#   define DIR_SEP "\\"
-#else
-#   define DIR_SEP "/"
-#endif
-
 static int ConfigStringToKey( char * );
 static char *ConfigKeyToString( int );
 

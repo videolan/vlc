@@ -83,8 +83,6 @@ static void SlaveSeek( input_thread_t *p_input );
 
 static void InputMetaUser( input_thread_t *p_input );
 
-int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item );
-
 /*****************************************************************************
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
