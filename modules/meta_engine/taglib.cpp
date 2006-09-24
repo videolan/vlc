@@ -26,6 +26,8 @@
 
 #include <fileref.h>
 #include <tag.h>
+#include <id3v2tag.h>
+#include <mpegfile.h>
 
 static int  ReadMeta ( vlc_object_t * );
 
@@ -33,7 +35,14 @@ vlc_module_begin();
     set_capability( "meta reader", 1000 );
     set_callbacks( ReadMeta, NULL );
 vlc_module_end();
- 
+
+bool checkID3Image( const TagLib::ID3v2::Tag *tag )
+{
+    TagLib::ID3v2::FrameList l = tag->frameListMap()[ "APIC" ];
+    return !l.isEmpty();
+}
+
+
 static int ReadMeta( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
@@ -50,6 +59,16 @@ static int ReadMeta( vlc_object_t *p_this )
 
             vlc_meta_SetTitle( p_meta, tag->title().toCString( true ) );
             vlc_meta_SetArtist( p_meta, tag->artist().toCString( true ) );
+
+            if( TagLib::MPEG::File *mpeg =
+                           dynamic_cast<TagLib::MPEG::File *>(f.file() ) )
+            {
+                if( mpeg->ID3v2Tag() && checkID3Image( mpeg->ID3v2Tag() ) )
+                {
+                    fprintf( stderr, "%s has APIC\n", p_meta->psz_title );
+                    vlc_meta_SetArtURL( p_meta, "APIC" ); /// Means that the interface will use us to actually fetch it
+                }
+            }
             return VLC_SUCCESS;
         }
     }
