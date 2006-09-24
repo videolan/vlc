@@ -2560,7 +2560,8 @@ int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
 
 
     snprintf( psz_filename, MAX_PATH,
-              "file://%s/" CONFIG_DIR "/art/%s/%s/art%s",
+              "file://%s" DIR_SEP CONFIG_DIR DIR_SEP "art"
+              DIR_SEP "%s" DIR_SEP "%s" DIR_SEP "art%s",
               p_parent->p_libvlc->psz_homedir,
               psz_artist, psz_album, psz_type );
     msg_Dbg( p_parent, "Saving album art to %s", psz_filename );
@@ -2577,16 +2578,18 @@ int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
         {
             /* GRUIKKKKKKKKKK (make sure that all the directories exist) */
             char *psz_dir = malloc( MAX_PATH );
-            snprintf( psz_dir, MAX_PATH, "%s/" CONFIG_DIR,
+            snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR,
                       p_parent->p_libvlc->psz_homedir );
             utf8_mkdir( psz_dir );
-            snprintf( psz_dir, MAX_PATH, "%s/" CONFIG_DIR "/art",
+            snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP "art",
                       p_parent->p_libvlc->psz_homedir );
             utf8_mkdir( psz_dir );
-            snprintf( psz_dir, MAX_PATH, "%s/" CONFIG_DIR "/art/%s",
+            snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
+                      "art" DIR_SEP "%s",
                       p_parent->p_libvlc->psz_homedir, psz_artist );
             utf8_mkdir( psz_dir );
-            snprintf( psz_dir, MAX_PATH, "%s/" CONFIG_DIR "/art/%s/%s",
+            snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
+                      "art" DIR_SEP "%s" DIR_SEP "%s",
                       p_parent->p_libvlc->psz_homedir,
                       psz_artist, psz_album );
             utf8_mkdir( psz_dir );

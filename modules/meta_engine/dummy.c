@@ -94,7 +94,8 @@ static int FindMeta( vlc_object_t *p_this )
             char *psz_filename;
             struct stat a;
             asprintf( &psz_filename,
-                      "file://%s/" CONFIG_DIR "/art/%s/%s/art.jpg", /* ahem ... we can have other filetype too... */
+                      "file://%s" DIR_SEP CONFIG_DIR DIR_SEP "art"
+                      DIR_SEP "%s" DIR_SEP "%s" DIR_SEP "art.jpg", /* ahem ... we can have other filetype too... */
                       p_me->p_libvlc->psz_homedir,
                       p_item->p_meta->psz_artist,
                       p_item->p_meta->psz_album );
