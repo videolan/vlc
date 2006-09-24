@@ -412,6 +412,8 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "mosaic-xoffset", Other, NULL );
     var_Create( p_intf, "mosaic-yoffset", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "mosaic-yoffset", Other, NULL );
+    var_Create( p_intf, "mosaic-offsets", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-offsets", Other, NULL );
     var_Create( p_intf, "mosaic-align", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "mosaic-align", Other, NULL );
     var_Create( p_intf, "mosaic-vborder", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
@@ -1641,6 +1643,14 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         {
             val.psz_string = newval.psz_string;
             var_Set( p_input->p_libvlc_global, "mosaic-order", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "mosaic-offsets" ) )
+    {
+        if( strlen( newval.psz_string ) > 0)
+        {
+            val.psz_string = newval.psz_string;
+            var_Set( p_input->p_libvlc, "mosaic-offsets", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-keep-aspect-ratio" ) )

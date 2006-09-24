@@ -81,6 +81,10 @@ struct filter_sys_t
     char **ppsz_order; /* list of picture-id */
     int i_order_length;
 
+    int *pi_x_offsets; /* list of substreams x offsets */
+    int *pi_y_offsets; /* list of substreams y offsets */
+    int i_offsets_length;
+
     mtime_t i_delay;
 };
 
@@ -116,7 +120,8 @@ struct filter_sys_t
 #define POS_TEXT N_("Positioning method")
 #define POS_LONGTEXT N_("Positioning method for the mosaic. auto: " \
         "automatically choose the best number of rows and columns. " \
-        "fixed: use the user-defined number of rows and columns.")
+        "fixed: use the user-defined number of rows and columns. " \
+        "offsets: use the user-defined offsets for each image." )
 
 /// \bug [String] missing closing parenthesis
 #define ROWS_TEXT N_("Number of rows")
@@ -136,6 +141,11 @@ struct filter_sys_t
 #define ORDER_LONGTEXT N_( "You can enforce the order of the elements on " \
         "the mosaic. You must give a comma-separated list of picture ID(s)." \
         "These IDs are assigned in the \"mosaic-bridge\" module." )
+
+#define OFFSETS_TEXT N_("Offsets in order" )
+#define OFFSETS_LONGTEXT N_( "You can enforce the (x,y) offsets of the elements on " \
+        "the mosaic (only used if positioning method is set to \"offsets\"). You " \
+        "must give a comma-separated list of coordinates (eg: 10,10,150,10)." )
 
 #define DELAY_TEXT N_("Delay")
 #define DELAY_LONGTEXT N_("Pictures coming from the mosaic elements " \
@@ -163,9 +173,9 @@ struct filter_sys_t
         "on color variations for the V plane. A value between 10 and 20 " \
         "seems sensible." )
 
-static int pi_pos_values[] = { 0, 1 };
+static int pi_pos_values[] = { 0, 1, 2 };
 static char * ppsz_pos_descriptions[] =
-{ N_("auto"), N_("fixed") };
+{ N_("auto"), N_("fixed"), N_("offsets") };
 
 static int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_align_descriptions[] =
@@ -198,6 +208,7 @@ vlc_module_begin();
     add_bool( "mosaic-keep-aspect-ratio", 0, NULL, AR_TEXT, AR_LONGTEXT, VLC_FALSE );
     add_bool( "mosaic-keep-picture", 0, NULL, KEEP_TEXT, KEEP_LONGTEXT, VLC_FALSE );
     add_string( "mosaic-order", "", NULL, ORDER_TEXT, ORDER_LONGTEXT, VLC_FALSE );
+    add_string( "mosaic-offsets", "", NULL, OFFSETS_TEXT, OFFSETS_LONGTEXT, VLC_FALSE );
 
     add_integer( "mosaic-delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
                  VLC_FALSE );
@@ -218,6 +229,38 @@ vlc_module_end();
 
 
 /*****************************************************************************
+ * mosaic_ParseSetOffsets:
+ * parse the "--mosaic-offsets x1,y1,x2,y2,x3,y3" parameter
+ * and set the corresponding struct filter_sys_t entries.
+ *****************************************************************************/
+void mosaic_ParseSetOffsets( vlc_object_t *p_this, filter_sys_t *p_sys, char *psz_offsets )
+{
+    if( psz_offsets[0] != 0 )
+    {
+        char *psz_end = NULL;
+        int i_index = 0;
+        do
+        {
+            i_index++;
+
+            p_sys->pi_x_offsets = realloc( p_sys->pi_x_offsets, i_index * sizeof(int) );
+            p_sys->pi_x_offsets[i_index - 1] = atoi( psz_offsets );
+            psz_end = strchr( psz_offsets, ',' );
+            psz_offsets = psz_end + 1;
+
+            p_sys->pi_y_offsets = realloc( p_sys->pi_y_offsets, i_index * sizeof(int) );
+            p_sys->pi_y_offsets[i_index - 1] = atoi( psz_offsets );
+            psz_end = strchr( psz_offsets, ',' );
+            psz_offsets = psz_end + 1;
+
+            msg_Dbg( p_this, "mosaic-offset: id %d, x=%d, y=%d", i_index, p_sys->pi_x_offsets[i_index - 1], p_sys->pi_y_offsets[i_index - 1] );
+
+        } while( NULL != psz_end );
+        p_sys->i_offsets_length = i_index;
+    }
+}
+
+/*****************************************************************************
  * CreateFiler: allocate mosaic video filter
  *****************************************************************************/
 static int CreateFilter( vlc_object_t *p_this )
@@ -226,6 +269,7 @@ static int CreateFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     libvlc_global_data_t *p_libvlc_global = p_filter->p_libvlc_global;
     char *psz_order;
+    char *psz_offsets;
     int i_index;
     vlc_value_t val;
 
@@ -275,7 +319,7 @@ static int CreateFilter( vlc_object_t *p_this )
     GET_VAR( rows, 1, INT_MAX );
     GET_VAR( cols, 1, INT_MAX );
     GET_VAR( alpha, 0, 255 );
-    GET_VAR( position, 0, 1 );
+    GET_VAR( position, 0, 2 );
     GET_VAR( delay, 100, INT_MAX );
     p_sys->i_delay *= 1000;
 
@@ -315,6 +359,17 @@ static int CreateFilter( vlc_object_t *p_this )
         } while( NULL !=  psz_end );
         p_sys->i_order_length = i_index;
     }
+
+    /* Manage specific offsets for substreams */
+    psz_offsets = var_CreateGetString( p_filter, "mosaic-offsets" );
+    var_Destroy( p_filter, "mosaic-offsets" );
+    p_sys->i_offsets_length = 0;
+    p_sys->pi_x_offsets = NULL;
+    p_sys->pi_y_offsets = NULL;
+    mosaic_ParseSetOffsets( (vlc_object_t *) p_filter, p_sys, psz_offsets );
+    var_Create( p_libvlc_global, "mosaic-offsets", VLC_VAR_STRING);
+    var_SetString( p_libvlc_global, "mosaic-offsets", psz_offsets );
+    var_AddCallback( p_libvlc_global, "mosaic-offsets", MosaicCallback, p_sys );
 
     /* Bluescreen specific stuff */
     GET_VAR( bsu, 0x00, 0xff );
@@ -362,7 +417,13 @@ static void DestroyFilter( vlc_object_t *p_this )
         }
         free( p_sys->ppsz_order );
     }
-
+    if( p_sys->i_offsets_length )
+    {
+        free( p_sys->pi_x_offsets );
+        free( p_sys->pi_y_offsets );
+        p_sys->i_offsets_length = 0;
+    }
+    var_Destroy( p_libvlc_global, "mosaic-offsets" );
     var_Destroy( p_libvlc_global, "mosaic-alpha" );
     var_Destroy( p_libvlc_global, "mosaic-height" );
     var_Destroy( p_libvlc_global, "mosaic-align" );
@@ -441,6 +502,17 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         vlc_mutex_unlock( p_sys->p_lock );
         vlc_mutex_unlock( &p_sys->lock );
         return p_spu;
+    }
+
+    if ( p_sys->i_position == 2 ) /* user-defined offsets for positioning */
+    {
+        /* If we have either too much or not enough offsets, fall-back
+         * to automatic positioning. */
+        if ( p_sys->i_offsets_length != p_sys->i_order_length )
+        {
+            msg_Err( p_filter, "Number of specified offsets (%d) does not match number of input substreams in mosaic-order (%d), falling back to mosaic-position=0", p_sys->i_offsets_length, p_sys->i_order_length );
+            p_sys->i_position = 0;
+        }
     }
 
     if ( p_sys->i_position == 0 ) /* use automatic positioning */
@@ -697,7 +769,11 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             p_region->picture.pf_release = MosaicReleasePicture;
         }
 
-        if( fmt_out.i_width > col_inner_width ||
+        if( p_sys->i_position == 2 ) /* user-defined offset */
+        {
+            p_region->i_x = p_sys->pi_x_offsets[i_real_index];
+        }
+        else if( fmt_out.i_width > col_inner_width ||
             p_sys->b_ar || p_sys->b_keep )
         {
             /* we don't have to center the video since it takes the
@@ -715,7 +791,11 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                     + ( col_inner_width - fmt_out.i_width ) / 2;
         }
 
-        if( fmt_out.i_height < row_inner_height
+        if( p_sys->i_position == 2 ) /* user-defined offset */
+        {
+            p_region->i_y = p_sys->pi_y_offsets[i_real_index];
+        }
+        else if( fmt_out.i_height < row_inner_height
             || p_sys->b_ar || p_sys->b_keep )
         {
             /* we don't have to center the video since it takes the
@@ -896,6 +976,22 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
             } while( NULL !=  psz_end );
             p_sys->i_order_length = i_index;
         }
+
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+    else if( !strcmp( psz_var, "mosaic-offsets" ) )
+    {
+        vlc_mutex_lock( &p_sys->lock );
+        msg_Info( p_this, "Changing mosaic-offsets to %s", newval.psz_string );
+
+        if( p_sys->i_offsets_length != 0 )
+        {
+            free( p_sys->pi_x_offsets );
+            free( p_sys->pi_y_offsets );
+        }
+        p_sys->i_offsets_length = 0;
+
+        mosaic_ParseSetOffsets( (vlc_object_t *) p_this, p_sys, newval.psz_string );
 
         vlc_mutex_unlock( &p_sys->lock );
     }
