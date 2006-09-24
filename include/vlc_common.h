@@ -431,6 +431,7 @@ typedef struct vlm_schedule_t vlm_schedule_t;
 
 /* divers */
 typedef struct vlc_meta_t    vlc_meta_t;
+typedef struct meta_export_t meta_export_t;
 
 /* Stats */
 typedef struct counter_t     counter_t;

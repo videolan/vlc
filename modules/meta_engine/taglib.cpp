@@ -30,11 +30,19 @@
 #include <mpegfile.h>
 #include <flacfile.h>
 
-static int  ReadMeta ( vlc_object_t * );
+static int  ReadMeta    ( vlc_object_t * );
+static int  DownloadArt ( vlc_object_t * );
+static int  WriteMeta   ( vlc_object_t * );
 
 vlc_module_begin();
     set_capability( "meta reader", 1000 );
     set_callbacks( ReadMeta, NULL );
+    add_submodule();
+        set_capability( "art downloader", 50 );
+        set_callbacks( DownloadArt, NULL );
+    add_submodule();
+        set_capability( "meta writer", 50 );
+        set_callbacks( WriteMeta, NULL );
 vlc_module_end();
 
 static bool checkID3Image( const TagLib::ID3v2::Tag *tag )
@@ -99,5 +107,31 @@ static int ReadMeta( vlc_object_t *p_this )
             return VLC_SUCCESS;
         }
     }
+    return VLC_EGENERIC;
+}
+
+static int WriteMeta( vlc_object_t *p_this )
+{
+    playlist_t *p_playlist = (playlist_t *)p_this;
+
+    meta_export_t *p_export = (meta_export_t *)p_playlist->p_private;
+    input_item_t *p_item = p_export->p_item;
+
+    TagLib::FileRef f( p_export->psz_file );
+    if( !f.isNull() && f.tag() )
+    {
+        TagLib::Tag *tag = f.tag();
+        tag->setArtist( p_item->p_meta->psz_artist );
+        f.save();
+        return VLC_SUCCESS;
+    }
+    return VLC_EGENERIC;
+}
+
+static int DownloadArt( vlc_object_t *p_this )
+{
+    /* We need to be passed the file name
+     * Fetch the thing from the file, save it to the cache folder
+     */
     return VLC_EGENERIC;
 }

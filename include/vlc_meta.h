@@ -185,4 +185,10 @@ enum {
     ALBUM_ART_WHEN_PLAYED,
     ALBUM_ART_ALL };
 
+struct meta_export_t
+{
+    input_item_t *p_item;
+    const char *psz_file;
+};
+
 #endif
