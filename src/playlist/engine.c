@@ -482,22 +482,32 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 p_current->p_meta->i_status |= ITEM_PREPARSED;
                 var_SetInteger( p_playlist, "item-change", p_current->i_id );
             }
-            vlc_gc_decref( p_current );
-            /* Add to secondary preparse queue */
-            PL_LOCK
-            vlc_mutex_lock( &p_playlist->p_secondary_preparse->object_lock );
-            INSERT_ELEM( p_playlist->p_secondary_preparse->pp_waiting,
-                         p_playlist->p_secondary_preparse->i_waiting,
-                         p_playlist->p_secondary_preparse->i_waiting,
-                         p_current );
-            vlc_gc_incref( p_current );
-            vlc_mutex_unlock( &p_playlist->p_secondary_preparse->object_lock );
-            PL_UNLOCK
+            PL_LOCK;
+            /* We haven't retrieved enough meta, add to secondary queue
+             * which will run the "meta fetchers"
+             * TODO: - use i_mandatory stuff here instead of hardcoded T/A
+             *       - don't do this for things we won't get meta for, like
+             *         videos
+             */
+            if( !(p_current->p_meta->psz_title && *p_current->p_meta->psz_title
+                && p_current->p_meta->psz_artist &&
+                   *p_current->p_meta->psz_artist) )
+            {
+                vlc_mutex_lock( &p_playlist->p_secondary_preparse->object_lock);
+                INSERT_ELEM( p_playlist->p_secondary_preparse->pp_waiting,
+                             p_playlist->p_secondary_preparse->i_waiting,
+                             p_playlist->p_secondary_preparse->i_waiting,
+                             p_current );
+                vlc_mutex_unlock(
+                            &p_playlist->p_secondary_preparse->object_lock);
+            }
+            else
+                vlc_gc_decref( p_current );
+            PL_UNLOCK;
         }
         else
-        {
-            vlc_mutex_unlock( &p_playlist->object_lock );
-        }
+            PL_UNLOCK;
+
         vlc_mutex_lock( &p_obj->object_lock );
         i_activity = var_GetInteger( p_playlist, "activity" );
         if( i_activity < 0 ) i_activity = 0;

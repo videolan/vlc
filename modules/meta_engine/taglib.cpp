@@ -113,7 +113,6 @@ static int ReadMeta( vlc_object_t *p_this )
 static int WriteMeta( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t *)p_this;
-
     meta_export_t *p_export = (meta_export_t *)p_playlist->p_private;
     input_item_t *p_item = p_export->p_item;
 

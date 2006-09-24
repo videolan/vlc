@@ -362,6 +362,7 @@ int __input_SecondaryPreparse( vlc_object_t *p_parent, input_item_t *p_item )
     p_me->i_mandatory =   VLC_META_ENGINE_TITLE
                         | VLC_META_ENGINE_ARTIST;
     p_me->i_optional = 0;
+/*
     if( var_CreateGetInteger( p_parent, "album-art" ) != ALBUM_ART_NEVER )
     {
         p_me->i_mandatory |= VLC_META_ENGINE_ART_URL;
@@ -370,10 +371,10 @@ int __input_SecondaryPreparse( vlc_object_t *p_parent, input_item_t *p_item )
     {
         p_me->i_optional |= VLC_META_ENGINE_ART_URL;
     }
+*/
     p_me->p_item = p_item;
-    p_me->p_module = module_Need( p_me, "meta engine", 0, VLC_FALSE );
-
-
+    p_me->p_module = module_Need( p_me, "meta fetcher", 0, VLC_FALSE );
+    vlc_object_attach( p_me, p_parent );
     if( !p_me->p_module )
     {
         msg_Err( p_parent, "no suitable meta engine module" );

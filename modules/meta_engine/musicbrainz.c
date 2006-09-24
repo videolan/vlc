@@ -48,7 +48,7 @@ vlc_module_begin();
     set_shortname( N_( "MusicBrainz" ) );
     set_description( _("MusicBrainz meta data") );
 
-    set_capability( "meta engine", 80 );
+    set_capability( "meta fetcher", 80 );
     set_callbacks( FindMeta, NULL );
 vlc_module_end();
 

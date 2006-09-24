@@ -53,7 +53,7 @@ vlc_module_begin();
     set_shortname( N_( "Dummy" ) );
     set_description( _("Dummy meta data") );
 
-    set_capability( "meta engine", 1000 );
+    set_capability( "meta engine", 0 );
     set_callbacks( FindMeta, NULL );
 vlc_module_end();
 
