@@ -201,6 +201,20 @@ static int Open( vlc_object_t * p_this )
     /* Begnning of stream, tell the demux to look for elementary streams. */
     p_sys->i_eos = 0;
 
+
+    if( ((input_thread_t* )(p_demux->p_parent ))->b_preparsing == VLC_TRUE )
+    {
+        module_t *p_meta = module_Need( p_demux, "meta reader", NULL, 0 );
+        if( p_meta )
+        {
+            vlc_meta_Merge( ((input_thread_t* )(p_demux->p_parent ))->
+                                                input.p_item->p_meta,
+                                (vlc_meta_t*)(p_demux->p_private ) );
+            module_Unneed( p_demux, p_meta );
+        }
+        return VLC_SUCCESS;
+    }
+
     /* Initialize the Ogg physical bitstream parser */
     ogg_sync_init( &p_sys->oy );
 

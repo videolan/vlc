@@ -136,6 +136,10 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
             {
                 vlc_meta_SetEncodedBy( p_meta, psz_temp );
             }
+            else if( ID_IS ( "APIC" ) )
+            {
+                fprintf( stderr, "** Has APIC **\n" );
+            }
             else if( p_frame->description )
             { /* Unhandled meta*/
                 msg_Warn( p_demux, "Fixme: unhandled ID3 metatag, %s", p_frame->description );

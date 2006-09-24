@@ -1572,7 +1572,6 @@ AS_IF([test "${enable_audioscrobbler}" != "no"], [
 dnl
 dnl Musicbrainz plugin
 dnl
-
 AC_ARG_ENABLE(musicbrainz,
   [  --enable-musicbrainz    MusicBrainz support (default disabled) ])
   AS_IF([test "${enable_musicbrainz}" = "yes"],[
@@ -1581,6 +1580,17 @@ AC_ARG_ENABLE(musicbrainz,
 	  VLC_ADD_LDFLAGS([musicbrainz],[$MUSICBRAINZ_LIBS]) 
 	  VLC_ADD_CFLAGS([musicbrainz],[$MUSICBRAINZ_CFLAGS])  ],
        [AC_MSG_WARN(MusicBrainz library not found)])
+   ])
+
+dnl
+dnl Taglibplugin
+dnl
+AC_ARG_ENABLE(taglib,
+  [  --enable-taglib Taglib support (default disabled) ])
+  AS_IF([test "x${enable_taglib}" = "xyes"],[
+	VLC_ADD_PLUGINS([taglib])
+	VLC_ADD_LDFLAGS([taglib], [-ltag])
+	VLC_ADD_CXXFLAGS([taglib], [-I/usr/include/taglib])
    ])
 
 dnl
