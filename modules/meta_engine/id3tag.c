@@ -138,7 +138,7 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
             }
             else if( ID_IS ( "APIC" ) )
             {
-                fprintf( stderr, "** Has APIC **\n" );
+                msg_Dbg( p_demux, "** Has APIC **" );
             }
             else if( p_frame->description )
             { /* Unhandled meta*/
