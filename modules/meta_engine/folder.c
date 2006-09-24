@@ -30,7 +30,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc_meta.h>
-#include <vlc_meta_engine.h>
+#include <vlc_meta.h>
 #include <charset.h>
 
 #ifdef HAVE_SYS_STAT_H
