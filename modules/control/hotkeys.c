@@ -170,7 +170,7 @@ static void Run( intf_thread_t *p_intf )
         int i_times = 0;
 
         /* Sleep a bit */
-        msleep( INTF_IDLE_SLEEP );
+//        msleep( INTF_IDLE_SLEEP );
 
         /* Update the input */
         if( p_intf->p_sys->p_input == NULL )
@@ -228,8 +228,11 @@ static void Run( intf_thread_t *p_intf )
 
         if( !i_action )
         {
+            vlc_mutex_lock( &p_intf->object_lock );
+            vlc_cond_wait( &p_intf->object_wait, &p_intf->object_lock );
+            vlc_mutex_unlock( &p_intf->object_lock );
             /* No key pressed, sleep a bit more */
-            msleep( INTF_IDLE_SLEEP );
+//            msleep( INTF_IDLE_SLEEP );
             continue;
         }
 
@@ -746,6 +749,9 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
         p_intf->p_sys->p_keys[ p_intf->p_sys->i_size ] = newval.i_int;
         p_intf->p_sys->i_size++;
     }
+    vlc_mutex_lock( &p_intf->object_lock );
+    vlc_cond_signal( &p_intf->object_wait );
+    vlc_mutex_unlock( &p_intf->object_lock );
     vlc_mutex_unlock( &p_intf->p_sys->change_lock );
 
     return VLC_SUCCESS;

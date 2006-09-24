@@ -261,7 +261,10 @@ void intf_StopThread( intf_thread_t *p_intf )
     {
         p_intf->b_die = VLC_TRUE;
         if( p_intf->pf_run )
+        {
+            vlc_cond_signal( &p_intf->object_wait );
             vlc_thread_join( p_intf );
+        }
     }
 }
 
