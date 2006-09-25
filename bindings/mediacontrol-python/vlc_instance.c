@@ -84,39 +84,12 @@ vlcInstance_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 
     self = PyObject_New( vlcInstance, &vlcInstance_Type );
 
+
     if( PyArg_ParseTuple( args, "O", &py_list ) )
     {
-        int i_index;
-
-        Py_INCREF( py_list );
-        if( ! PySequence_Check( py_list ) )
-        {
-            PyErr_SetString( PyExc_TypeError, "Parameter must be a sequence." );
+        i_size = pyoptions_to_args( py_list, &ppsz_args );
+        if( i_size < 0 )
             return NULL;
-        }
-        i_size = PySequence_Size( py_list );
-        ppsz_args = malloc( ( i_size + 2 ) * sizeof( char * ) );
-        if( ! ppsz_args )
-        {
-            PyErr_SetString( PyExc_MemoryError, "Out of memory" );
-            return NULL;
-        }
-
-	/* FIXME: we define a default args[0], since the libvlc API
-	   needs one. But it would be cleaner to fix the libvlc API.
-	 */
-        ppsz_args[0] = strdup("vlc");
-        for ( i_index = 0; i_index < i_size; i_index++ )
-        {
-            ppsz_args[i_index + 1] =
-                strdup( PyString_AsString( PyObject_Str(
-                                               PySequence_GetItem( py_list,
-                                                                   i_index ) ) ) );
-        }
-        ppsz_args[i_size + 1] = NULL;
-        /* Since we prepended the arg[0] */
-        i_size += 1;
-        Py_DECREF( py_list );
     }
     else
     {
