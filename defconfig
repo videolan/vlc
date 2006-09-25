@@ -23,7 +23,6 @@ CONFIG_VISUAL=y
 # CONFIG_SLP is not set
 # CONFIG_LIRC is not set
 CONFIG_JOYSTICK=y
-# CONFIG_CORBA is not set
 
 #
 # Input plugins

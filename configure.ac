@@ -5095,30 +5095,6 @@ then
 fi
 
 
-dnl
-dnl corba (ORBit) plugin
-dnl
-dnl Default: do not enable corba
-enablecorba=false
-AC_ARG_ENABLE(corba,
-  [  --enable-corba          corba interface support (default disabled)])
-if test "${enable_corba}" = "yes"; then
-      GLIB_VERSION=2.3.2
-      PKG_CHECK_MODULES(CORBA, 
-	ORBit-2.0 >= 2.8.0 \
-	glib-2.0 >= $GLIB_VERSION \
-	gobject-2.0 >= $GLIB_VERSION \
-	gthread-2.0 >= $GLIB_VERSION,
-	[
-	  enablecorba=true
- 	  VLC_ADD_LDFLAGS([corba],[$CORBA_LIBS])
-      	  VLC_ADD_CFLAGS([corba],[$CORBA_CFLAGS])
-          VLC_ADD_PLUGINS([corba snapshot]) ],
-        [ enablecorba=false
-	  AC_MSG_WARN(corba library not found) ])
-fi
-AM_CONDITIONAL(ENABLE_CORBA, test "$enablecorba" = "true")
-
 AC_ARG_WITH(,[Misc options:])
 
 dnl
@@ -5655,7 +5631,6 @@ AC_CONFIG_FILES([
   modules/codec/spudec/Makefile
   modules/control/Makefile
   modules/control/http/Makefile
-  modules/control/corba/Makefile
   modules/demux/Makefile
   modules/demux/asf/Makefile
   modules/demux/avi/Makefile

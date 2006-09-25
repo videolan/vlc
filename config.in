@@ -38,7 +38,6 @@ if [ "$CONFIG_GOOM" = "y" ]; then
 fi
 bool 'GaLaktos visualization plugin' CONFIG_GALAKTOS
 bool 'IR remote control support' CONFIG_LIRC
-bool 'Corba interface support' CONFIG_CORBA
 endmenu
 
 mainmenu_option next_comment

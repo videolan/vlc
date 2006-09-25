@@ -35,7 +35,7 @@ S: Germany
 
 N: Olivier Aubert
 E: oaubert at lisi dot univ-lyon1 dot fr
-D: CORBA interface
+D: Mediacontrol API, Python bindings, svg module
 S: France
 
 N: Sigmund Augdal Helberg

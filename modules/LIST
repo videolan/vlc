@@ -48,7 +48,6 @@ $Id$
  * cinepak: Cinepack video decoder
  * clone: Clone video filter
  * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
- * corba: CORBA control module
  * crop: Crop video filter
  * cvdsub: CVD subtitles decoder
  * daap: iTunes shares services discovery
