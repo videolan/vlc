@@ -1,1 +1,1 @@
-SUBDIRS = mediacontrol-python java
+SUBDIRS = python java

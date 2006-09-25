@@ -5356,10 +5356,10 @@ AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 dnl
 dnl  Mediacontrol Python bindings
 dnl
-AC_ARG_ENABLE(mediacontrol-python-bindings,
-  [  --enable-mediacontrol-python-bindings    Enable Python bindings for MediaControl (default disabled)])
+AC_ARG_ENABLE(python-bindings,
+  [  --enable-python-bindings    Enable Python bindings (default disabled)])
 dnl TODO: look for python dev headers
-AM_CONDITIONAL(BUILD_PYTHON, [test "${enable_mediacontrol_python_bindings}" = "yes"])
+AM_CONDITIONAL(BUILD_PYTHON, [test "${enable_python_bindings}" = "yes"])
 
 dnl
 dnl  Java bindings
@@ -5593,7 +5593,7 @@ AC_CONFIG_FILES([
   bindings/Makefile
   bindings/java/Makefile
   bindings/java/src/Makefile
-  bindings/mediacontrol-python/Makefile
+  bindings/python/Makefile
   doc/Makefile
   intl/Makefile
   ipkg/Makefile
