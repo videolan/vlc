@@ -52,9 +52,6 @@
 #    include <sys/types.h>
 #endif
 
-#define RAISE( c, m )  exception->code = c; \
-                       exception->message = strdup(m);
-
 mediacontrol_RGBPicture *
 mediacontrol_snapshot( mediacontrol_Instance *self,
                        const mediacontrol_Position * a_position,
@@ -71,16 +68,13 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
     if( ! p_vout )
     {
-        RAISE( mediacontrol_InternalException, "No video output" );
-        return NULL;
+        RAISE_NULL( mediacontrol_InternalException, "No video output" );
     }
     p_cache = vlc_object_create( self->p_playlist, VLC_OBJECT_GENERIC );
     if( p_cache == NULL )
     {
         vlc_object_release( p_vout );
-        msg_Err( self->p_playlist, "out of memory" );
-        RAISE( mediacontrol_InternalException, "Out of memory" );
-        return NULL;
+        RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
     }
     snprintf( path, 255, "object:%d", p_cache->i_object_id );
     var_SetString( p_vout, "snapshot-path", path );
@@ -103,13 +97,15 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
                                                 p_snapshot->p_data,
                                                 p_snapshot->i_datasize );
         if( !p_pic )
-            RAISE( mediacontrol_InternalException, "out of memory" );
-        free( p_snapshot->p_data );
-        free( p_snapshot );
+        {
+            free( p_snapshot->p_data );
+            free( p_snapshot );
+            RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
+        }
     }
     else
     {
-        RAISE( mediacontrol_InternalException, "Snapshot exception" );
+        RAISE_NULL( mediacontrol_InternalException, "Snapshot exception" );
     }
     return p_pic;
 }
@@ -120,8 +116,7 @@ mediacontrol_all_snapshots( mediacontrol_Instance *self,
 {
     exception=mediacontrol_exception_init( exception );
 
-    RAISE( mediacontrol_InternalException, "unsupported method" );
-    return NULL;
+    RAISE_NULL( mediacontrol_InternalException, "unsupported method" );
 }
 
 int mediacontrol_showtext( vout_thread_t *p_vout, int i_channel,
@@ -182,15 +177,13 @@ mediacontrol_display_text( mediacontrol_Instance *self,
     psz_message = strdup( message );
     if( !psz_message )
     {
-        RAISE( mediacontrol_InternalException, "no more memory" );
-        return;
+        RAISE_VOID( mediacontrol_InternalException, "no more memory" );
     }
 
     p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
     if( ! p_vout )
     {
-        RAISE( mediacontrol_InternalException, "no video output" );
-        return;
+        RAISE_VOID( mediacontrol_InternalException, "no video output" );
     }
 
     if( begin->origin == mediacontrol_RelativePosition &&
@@ -217,9 +210,8 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         p_input = self->p_playlist->p_input;
         if( ! p_input )
         {
-            RAISE( mediacontrol_InternalException, "No input" );
             vlc_object_release( p_vout );
-            return;
+            RAISE_VOID( mediacontrol_InternalException, "No input" );
         }
 
         /* FIXME */
