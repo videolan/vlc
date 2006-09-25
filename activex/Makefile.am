@@ -142,7 +142,7 @@ clean-stamp:
 if BUILD_SHARED
 stamp-pic:
 else
-stamp-pic: $(shell $(VLC_CONFIG) --target builtin)
+stamp-pic: $(shell ${VLC_CONFIG} --target builtin)
 endif
 	@touch $@
 
