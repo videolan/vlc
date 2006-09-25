@@ -29,7 +29,6 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc_meta.h>
-#include <vlc_meta.h>
 
 #include "musicbrainz/mb_c.h"
 
