@@ -348,9 +348,6 @@ SOURCES_libvlc_common = \
 	control/mediacontrol_audio_video.c \
 	$(NULL)
 
-# These should be distributed, but not compiled
-EXTRA_DIST += control/mediacontrol_init.c control/mediacontrol_plugin.c
-
 SOURCES_libvlc = \
 	$(SOURCES_libvlc_common) \
 	$(OPT_SOURCES_libvlc_beos) \

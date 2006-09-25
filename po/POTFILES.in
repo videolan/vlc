@@ -108,6 +108,7 @@ src/input/input.c
 src/input/input_internal.h
 src/input/item.c
 src/input/mem_stream.c
+src/input/meta.c
 src/input/stream.c
 src/input/subtitles.c
 src/input/var.c
@@ -270,6 +271,7 @@ modules/access/videodev2.h
 modules/access/videodev_mjpeg.h
 modules/audio_filter/channel_mixer/dolby.c
 modules/audio_filter/channel_mixer/headphone.c
+modules/audio_filter/channel_mixer/mono.c
 modules/audio_filter/channel_mixer/simple.c
 modules/audio_filter/channel_mixer/trivial.c
 modules/audio_filter/converter/a52tofloat32.c
@@ -282,7 +284,6 @@ modules/audio_filter/converter/float32tos16.c
 modules/audio_filter/converter/float32tos8.c
 modules/audio_filter/converter/float32tou16.c
 modules/audio_filter/converter/float32tou8.c
-modules/audio_filter/converter/mono.c
 modules/audio_filter/converter/mpgatofixed32.c
 modules/audio_filter/converter/s16tofixed32.c
 modules/audio_filter/converter/s16tofloat32.c
@@ -374,7 +375,6 @@ modules/codec/theora.c
 modules/codec/twolame.c
 modules/codec/vorbis.c
 modules/codec/x264.c
-modules/control/corba/corba.c
 modules/control/gestures.c
 modules/control/hotkeys.c
 modules/control/http/http.c
@@ -446,8 +446,6 @@ modules/demux/real.c
 modules/demux/subtitle.c
 modules/demux/ts.c
 modules/demux/ty.c
-modules/demux/util/id3genres.h
-modules/demux/util/id3tag.c
 modules/demux/vobsub.c
 modules/demux/voc.c
 modules/demux/wav.c
@@ -534,8 +532,8 @@ modules/gui/pda/pda_support.h
 modules/gui/qnx/aout.c
 modules/gui/qnx/qnx.c
 modules/gui/qnx/vout.c
-modules/gui/qt4/components/equalizer.cpp
-modules/gui/qt4/components/equalizer.hpp
+modules/gui/qt4/components/extended_panels.cpp
+modules/gui/qt4/components/extended_panels.hpp
 modules/gui/qt4/components/infopanels.cpp
 modules/gui/qt4/components/infopanels.hpp
 modules/gui/qt4/components/interface_widgets.cpp
@@ -899,6 +897,11 @@ modules/gui/wxwidgets/video.cpp
 modules/gui/wxwidgets/video.hpp
 modules/gui/wxwidgets/wxwidgets.cpp
 modules/gui/wxwidgets/wxwidgets.hpp
+modules/meta_engine/folder.c
+modules/meta_engine/id3genres.h
+modules/meta_engine/id3tag.c
+modules/meta_engine/musicbrainz.c
+modules/meta_engine/taglib.cpp
 modules/misc/audioscrobbler.c
 modules/misc/dummy/aout.c
 modules/misc/dummy/decoder.c
@@ -916,7 +919,6 @@ modules/misc/logger.c
 modules/misc/memcpy/fastmemcpy.h
 modules/misc/memcpy/memcpyaltivec.c
 modules/misc/memcpy/memcpy.c
-modules/misc/musicbrainz.c
 modules/misc/network/ipv4.c
 modules/misc/network/ipv6.c
 modules/misc/notify/growl.c
