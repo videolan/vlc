@@ -36,6 +36,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     PyObject* py_param = NULL;
     char** ppsz_args = NULL;
     libvlc_instance_t* p_instance = NULL;
+    int i_size = 0;
     
     self = PyObject_New( MediaControl, &MediaControl_Type );
 
@@ -48,7 +49,6 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
         }
         else
         {
-            int i_size;
             int i_index;
 
             if( ! PySequence_Check( py_param ) )
@@ -92,7 +92,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     }
     else
     {
-        self->mc = mediacontrol_new( ppsz_args, exception );
+        self->mc = mediacontrol_new( i_size, ppsz_args, exception );
     }
     MC_EXCEPT;
     Py_END_ALLOW_THREADS
