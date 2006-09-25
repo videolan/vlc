@@ -112,7 +112,7 @@ void mediacontrol_exception_free(mediacontrol_Exception *exception);
  * Core functions
  *****************************************************************************/
 mediacontrol_Instance *
-  mediacontrol_new( char **args, mediacontrol_Exception *exception );
+mediacontrol_new( int argc, char **argv, mediacontrol_Exception *exception );
 
 /* Bridge with the libvlc API */
 mediacontrol_Instance *

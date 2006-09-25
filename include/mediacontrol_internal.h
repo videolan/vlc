@@ -49,8 +49,8 @@ vlc_int64_t mediacontrol_position2microsecond(
 #define RAISE( c, m )  exception->code = c; \
                        exception->message = strdup(m);
 
-#define RAISE_NULL( c, m ) RAISE( c, m ); return NULL;
-#define RAISE_VOID( c, m ) RAISE( c, m ); return;
+#define RAISE_NULL( c, m ) { RAISE( c, m ); return NULL; }
+#define RAISE_VOID( c, m ) { RAISE( c, m ); return; }
 
 #define HANDLE_LIBVLC_EXCEPTION_VOID( e )  if( libvlc_exception_raised( e ) ) {	\
 	RAISE( mediacontrol_InternalException, libvlc_exception_get_message( e )); \

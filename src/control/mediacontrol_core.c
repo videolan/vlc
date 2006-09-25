@@ -55,49 +55,19 @@
 #    include <sys/types.h>
 #endif
 
-mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *exception )
+mediacontrol_Instance* mediacontrol_new( int argc, char** argv, mediacontrol_Exception *exception )
 {
     mediacontrol_Instance* retval;
     libvlc_exception_t ex;
-    char **ppsz_argv;
-    int i_count = 0;
-    int i_index;
-    char **p_tmp;
 
     libvlc_exception_init( &ex );
     exception=mediacontrol_exception_init( exception );
 
-    /* Copy args array */
-    if( args )
-    {
-        for ( p_tmp = args ; *p_tmp != NULL ; p_tmp++ )
-            i_count++;
-    }
-
-    ppsz_argv = malloc( ( i_count + 2 ) * sizeof( char * ) ) ;
-    if( ! ppsz_argv )
-    {
-        RAISE_NULL( mediacontrol_InternalException, "out of memory" );
-    }
-    ppsz_argv[0] = "vlc";
-    for ( i_index = 0; i_index < i_count; i_index++ )
-    {
-        ppsz_argv[i_index + 1] = strdup( args[i_index] );
-        if( ! ppsz_argv[i_index + 1] )
-        {
-            RAISE_NULL( mediacontrol_InternalException, "out of memory" );
-        }
-    }
-
-    ppsz_argv[i_count + 2] = NULL;
-
     retval = ( mediacontrol_Instance* )malloc( sizeof( mediacontrol_Instance ) );
-    if( ! retval )
-    { 
-        RAISE_NULL( mediacontrol_InternalException, "out of memory" );
-    }
+    if( !retval ) 
+        RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
 
-    retval->p_instance = libvlc_new( i_count + 1, ppsz_argv, &ex );
+    retval->p_instance = libvlc_new( argc, argv, &ex );
     retval->p_playlist = retval->p_instance->p_libvlc_int->p_playlist;
     HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
     return retval;  
@@ -127,7 +97,7 @@ mediacontrol_new_from_instance( libvlc_instance_t* p_instance,
   retval = ( mediacontrol_Instance* )malloc( sizeof( mediacontrol_Instance ) );
   if( ! retval )
   { 
-      RAISE_NULL( mediacontrol_InternalException, "out of memory" );
+      RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
   }
   retval->p_instance = p_instance;
   retval->p_playlist = retval->p_instance->p_libvlc_int->p_playlist;
