@@ -92,9 +92,9 @@ library AXVLC
         HRESULT stop();
         [id(DISPID_Playing), hidden, propget, helpstring("Returns a value that determines whether VLC is currently playing.")]
         HRESULT Playing([out, retval] VARIANT_BOOL* isPlaying);
-        [id(DISPID_Position), propget, helpstring("Returns/sets playback position within the current item.  Position is a relative value ranging from 0.0 to 1.0.")]
+        [id(DISPID_Position), propget, helpstring("Returns/sets playback position within the current item. Position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([out, retval] float* position);
-        [id(DISPID_Position), propput, helpstring("Returns/sets playback position within the current item.  Position is a relative value ranging from 0.0 to 1.0.")]
+        [id(DISPID_Position), propput, helpstring("Returns/sets playback position within the current item. Position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([in] float position);
         [id(DISPID_Time), propget, helpstring("Returns/sets playback time relative to the start of the current item.")]
         HRESULT Time([out, retval] int* seconds);

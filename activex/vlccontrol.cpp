@@ -113,7 +113,7 @@ STDMETHODIMP VLCControl::get_Visible(VARIANT_BOOL *isVisible)
 
     return NOERROR;
 };
-        
+
 STDMETHODIMP VLCControl::put_Visible(VARIANT_BOOL isVisible)
 {
     _p_instance->setVisible(isVisible != VARIANT_FALSE);
