@@ -83,6 +83,8 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
                                 libvlc_exception_t *p_e )
 {
     libvlc_instance_t *p_new;
+    int i_index;
+    char** ppsz_argv = NULL;
 
     libvlc_int_t *p_libvlc_int = libvlc_InternalCreate();
     if( !p_libvlc_int ) RAISENULL( "VLC initialization failed" );
@@ -91,13 +93,25 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
     if( !p_new ) RAISENULL( "Out of memory" );
 
     /** \todo Look for interface settings. If we don't have any, add -I dummy */
-    /* Because we probably don't want a GUI by default */
+    /* Because we probably don't want a GUI by default */    
 
-    if( libvlc_InternalInit( p_libvlc_int, argc, argv ) )
+    /* Prepend a dummy argv[0] so that users of the libvlc API do not have to 
+       do it themselves, and can simply provide the args list. */
+    ppsz_argv = malloc( ( argc + 2 ) * sizeof( char * ) ) ;
+    if( ! ppsz_argv ) 
+        RAISENULL( "Out of memory" );
+
+    ppsz_argv[0] = strdup("vlc");
+    for ( i_index = 0; i_index < argc; i_index++ )
+        ppsz_argv[i_index + 1] = argv[i_index];
+    ppsz_argv[argc + 1] = NULL;
+    
+    if( libvlc_InternalInit( p_libvlc_int, argc + 1, ppsz_argv ) )
         RAISENULL( "VLC initialization failed" );
 
     p_new->p_libvlc_int = p_libvlc_int;
     p_new->p_vlm = NULL;
+
     return p_new;
 }
 
