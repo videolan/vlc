@@ -141,7 +141,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
 
     if( a_key == mediacontrol_MediaTime )
     {
-        retval->value = pos / 1000;
+        retval->value = pos;
     }
     else
     {
@@ -154,7 +154,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
         retval->value = mediacontrol_unit_convert( self->p_playlist->p_input,
                                                    mediacontrol_MediaTime,
                                                    a_key,
-                                                   pos / 1000 );
+                                                   pos );
     }
     libvlc_input_free( p_input );
     return retval;
@@ -177,7 +177,7 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
     i_pos = mediacontrol_position2microsecond( self->p_playlist->p_input, a_position );
-    libvlc_input_set_time( p_input, i_pos, &ex );
+    libvlc_input_set_time( p_input, i_pos / 1000, &ex );
     libvlc_input_free( p_input );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
