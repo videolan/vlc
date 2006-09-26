@@ -24,6 +24,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "config.h"
+#include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -1154,8 +1156,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             {
                 uint8_t *p_buffer = p_fmt->p_extra;
                 int     i_buffer = p_fmt->i_extra;
-                char    *p_64_sps;
-                char    *p_64_pps;
+                char    *p_64_sps = NULL;
+                char    *p_64_pps = NULL;
                 char    hexa[6];
                 
                 while( i_buffer > 4 && 
@@ -1729,7 +1731,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             answer->i_status = 200;
             answer->psz_status = strdup( "OK" );
             httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
-
+	    httpd_MsgAdd( answer, "Content-Base",  "%s/", p_sys->psz_rtsp_control );
             answer->p_body = (uint8_t *)psz_sdp;
             answer->i_body = strlen( psz_sdp );
             break;
