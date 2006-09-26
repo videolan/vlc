@@ -12,6 +12,7 @@ Playlist:
 
 Decoders:
  * VP5/VP6 - Flash Video support
+ * WavPack
 
 Video output:
  * Adjust, Invert and Distort (now splited into Wave, Ripple, Gradient
