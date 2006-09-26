@@ -67,15 +67,8 @@ static int boolValue(const char *value) {
 NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
 {
     /* prepare VLC command line */
-    char *ppsz_argv[32] =
-    {
-        "vlc",
-        "-vv",
-        "--no-stats",
-        "--no-media-library",
-        "--intf", "dummy",
-    };
-    int ppsz_argc = 6;
+    char *ppsz_argv[32] = { "vlc" };
+    int ppsz_argc = 1;
 
     /* locate VLC module path */
 #ifdef XP_MACOSX
@@ -94,19 +87,41 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
          {
              if( i_type == REG_SZ )
              {
-                 strcat( p_data, "\\vlc" );
-                 ppsz_argv[0] = p_data;
+                 strcat( p_data, "\\plugins" );
+                 ppsz_argv[ppsz_argc++] = "--plugin-path";
+                 ppsz_argv[ppsz_argc++] = p_data;
              }
          }
          RegCloseKey( h_key );
     }
     ppsz_argv[ppsz_argc++] = "--no-one-instance";
+    if( IsDebuggerPresent() )
+    {
+        /*
+        ** VLC default threading mechanism is designed to be as compatible
+        ** with POSIX as possible. However when debugged on win32, threads
+        ** lose signals and eventually VLC get stuck during initialization.
+        ** threading support can be configured to be more debugging friendly
+        ** but it will be less compatible with POSIX.
+        ** This is done by initializing with the following options:
+        */
+        ppsz_argv[ppsz_argc++] = "--fast-mutex";
+        ppsz_argv[ppsz_argc++] = "--win9x-cv-method=1";
+    }
+
+
 #if 0
-    ppsz_argv[ppsz_argc++] = "--fast-mutex";
-    ppsz_argv[ppsz_argc++] = "--win9x-cv-method=1";
+    ppsz_argv[0] = "C:\\Cygwin\\home\\damienf\\vlc-trunk\\vlc";
 #endif
 
 #endif /* XP_MACOSX */
+
+    /* common settings */
+    ppsz_argv[ppsz_argc++] = "-vv";
+    ppsz_argv[ppsz_argc++] = "--no-stats";
+    ppsz_argv[ppsz_argc++] = "--no-media-library";
+    ppsz_argv[ppsz_argc++] = "--intf";
+    ppsz_argv[ppsz_argc++] = "dummy";
 
     const char *version = NULL;
 
