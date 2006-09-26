@@ -148,8 +148,6 @@ STDMETHODIMP VLCAudio::put_mute(VARIANT_BOOL mute)
     return hr;
 };
 
-#include <iostream>
-
 STDMETHODIMP VLCAudio::get_volume(int* volume)
 {
     if( NULL == volume )
@@ -163,7 +161,6 @@ STDMETHODIMP VLCAudio::get_volume(int* volume)
         libvlc_exception_init(&ex);
 
         *volume = libvlc_audio_get_volume(p_libvlc, &ex);
-        cerr << "volume is " << *volume;
         if( libvlc_exception_raised(&ex) )
         {
             libvlc_exception_clear(&ex);
@@ -293,7 +290,7 @@ STDMETHODIMP VLCInput::Invoke(DISPID dispIdMember, REFIID riid,
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCInput::get_length(__int64* length)
+STDMETHODIMP VLCInput::get_length(double* length)
 {
     if( NULL == length )
         return E_POINTER;
@@ -308,7 +305,7 @@ STDMETHODIMP VLCInput::get_length(__int64* length)
         libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *length = (__int64)libvlc_input_get_length(p_input, &ex);
+            *length = (double)libvlc_input_get_length(p_input, &ex);
             libvlc_input_free(p_input);
             if( ! libvlc_exception_raised(&ex) )
             {
@@ -374,7 +371,7 @@ STDMETHODIMP VLCInput::put_position(float position)
     return hr;
 };
 
-STDMETHODIMP VLCInput::get_time(__int64* time)
+STDMETHODIMP VLCInput::get_time(double* time)
 {
     if( NULL == time )
         return E_POINTER;
@@ -389,7 +386,7 @@ STDMETHODIMP VLCInput::get_time(__int64* time)
         libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *time = libvlc_input_get_time(p_input, &ex);
+            *time = (double)libvlc_input_get_time(p_input, &ex);
             libvlc_input_free(p_input);
             if( ! libvlc_exception_raised(&ex) )
             {
@@ -402,7 +399,7 @@ STDMETHODIMP VLCInput::get_time(__int64* time)
     return hr;
 };
 
-STDMETHODIMP VLCInput::put_time(__int64 time)
+STDMETHODIMP VLCInput::put_time(double time)
 {
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
@@ -414,7 +411,7 @@ STDMETHODIMP VLCInput::put_time(__int64 time)
         libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_input_set_time(p_input, time, &ex);
+            libvlc_input_set_time(p_input, (vlc_int64_t)time, &ex);
             libvlc_input_free(p_input);
             if( ! libvlc_exception_raised(&ex) )
             {
@@ -1103,7 +1100,6 @@ STDMETHODIMP VLCVideo::get_height(int* height)
 /*******************************************************************************/
 
 VLCControl2::VLCControl2(VLCPlugin *p_instance) :
-    VLCConfiguration(p_instance),
     _p_instance(p_instance),
     _p_typeinfo(NULL),
     _p_vlcaudio(NULL),
@@ -1196,6 +1192,135 @@ STDMETHODIMP VLCControl2::Invoke(DISPID dispIdMember, REFIID riid,
                 pVarResult, pExcepInfo, puArgErr);
     }
     return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCControl2::get_AutoLoop(VARIANT_BOOL *autoloop)
+{
+    if( NULL == autoloop )
+        return E_POINTER;
+
+    *autoloop = _p_instance->getAutoLoop() ? VARIANT_TRUE: VARIANT_FALSE;
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl2::put_AutoLoop(VARIANT_BOOL autoloop)
+{
+    _p_instance->setAutoLoop((VARIANT_FALSE != autoloop) ? TRUE: FALSE);
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl2::get_AutoPlay(VARIANT_BOOL *autoplay)
+{
+    if( NULL == autoplay )
+        return E_POINTER;
+
+    *autoplay = _p_instance->getAutoPlay() ? VARIANT_TRUE: VARIANT_FALSE;
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl2::put_AutoPlay(VARIANT_BOOL autoplay)
+{
+    _p_instance->setAutoPlay((VARIANT_FALSE != autoplay) ? TRUE: FALSE);
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl2::get_BaseURL(BSTR *url)
+{
+    if( NULL == url )
+        return E_POINTER;
+
+    *url = SysAllocStringLen(_p_instance->getBaseURL(),
+                SysStringLen(_p_instance->getBaseURL()));
+    return NOERROR;
+};
+
+STDMETHODIMP VLCControl2::put_BaseURL(BSTR mrl)
+{
+    _p_instance->setBaseURL(mrl);
+
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl2::get_MRL(BSTR *mrl)
+{
+    if( NULL == mrl )
+        return E_POINTER;
+
+    *mrl = SysAllocStringLen(_p_instance->getMRL(),
+                SysStringLen(_p_instance->getMRL()));
+    return NOERROR;
+};
+
+STDMETHODIMP VLCControl2::put_MRL(BSTR mrl)
+{
+    _p_instance->setMRL(mrl);
+
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl2::get_StartTime(int *seconds)
+{
+    if( NULL == seconds )
+        return E_POINTER;
+
+    *seconds = _p_instance->getStartTime();
+
+    return S_OK;
+};
+     
+STDMETHODIMP VLCControl2::put_StartTime(int seconds)
+{
+    _p_instance->setStartTime(seconds);
+
+    return NOERROR;
+};
+        
+STDMETHODIMP VLCControl2::get_VersionInfo(BSTR *version)
+{
+    if( NULL == version )
+        return E_POINTER;
+
+    const char *versionStr = VLC_Version();
+    if( NULL != versionStr )
+    {
+        *version = BSTRFromCStr(_p_instance->getCodePage(), versionStr);
+        
+        return NULL == *version ? E_OUTOFMEMORY : NOERROR;
+    }
+    *version = NULL;
+    return E_FAIL;
+};
+ 
+STDMETHODIMP VLCControl2::get_Visible(VARIANT_BOOL *isVisible)
+{
+    if( NULL == isVisible )
+        return E_POINTER;
+
+    *isVisible = _p_instance->getVisible() ? VARIANT_TRUE : VARIANT_FALSE;
+
+    return NOERROR;
+};
+        
+STDMETHODIMP VLCControl2::put_Visible(VARIANT_BOOL isVisible)
+{
+    _p_instance->setVisible(isVisible != VARIANT_FALSE);
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCControl2::get_Volume(int *volume)
+{
+    if( NULL == volume )
+        return E_POINTER;
+
+    *volume  = _p_instance->getVolume();
+    return NOERROR;
+};
+        
+STDMETHODIMP VLCControl2::put_Volume(int volume)
+{
+    _p_instance->setVolume(volume);
+    return NOERROR;
 };
 
 STDMETHODIMP VLCControl2::get_audio(IVLCAudio** obj)

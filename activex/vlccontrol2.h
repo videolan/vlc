@@ -24,7 +24,6 @@
 #define _VLCCONTROL2_H_
 
 #include "axvlc_idl.h"
-#include "vlcconfiguration.h"
 
 class VLCAudio : public IVLCAudio
 {
@@ -67,7 +66,7 @@ public:
     STDMETHODIMP toggleMute();
  
 protected:
-    virtual HRESULT loadTypeInfo();
+    HRESULT loadTypeInfo();
 
 private:
     VLCPlugin*      _p_instance;
@@ -110,11 +109,11 @@ public:
     STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
 
     // IVLCInput methods
-    STDMETHODIMP get_length(__int64*);
+    STDMETHODIMP get_length(double*);
     STDMETHODIMP get_position(float*);
     STDMETHODIMP put_position(float);
-    STDMETHODIMP get_time(__int64*);
-    STDMETHODIMP put_time(__int64);
+    STDMETHODIMP get_time(double*);
+    STDMETHODIMP put_time(double);
     STDMETHODIMP get_state(int*);
     STDMETHODIMP get_rate(float*);
     STDMETHODIMP put_rate(float);
@@ -122,7 +121,7 @@ public:
     STDMETHODIMP get_hasVout(VARIANT_BOOL*);
     
 protected:
-    virtual HRESULT loadTypeInfo();
+    HRESULT loadTypeInfo();
 
 private:
     VLCPlugin*      _p_instance;
@@ -177,7 +176,7 @@ public:
     STDMETHODIMP removeItem(int);
  
 protected:
-    virtual HRESULT loadTypeInfo();
+    HRESULT loadTypeInfo();
 
 private:
     VLCPlugin*  _p_instance;
@@ -225,7 +224,7 @@ public:
     STDMETHODIMP get_height(int*);
  
 protected:
-    virtual HRESULT loadTypeInfo();
+    HRESULT loadTypeInfo();
 
 private:
     VLCPlugin*      _p_instance;
@@ -233,7 +232,7 @@ private:
 
 };
  
-class VLCControl2 : public VLCConfiguration
+class VLCControl2 : public IVLCControl2
 {
     
 public:
@@ -248,7 +247,6 @@ public:
           return E_POINTER;
         if( (IID_IUnknown == riid)
          || (IID_IDispatch == riid)
-         || (IID_IVLCConfiguration == riid)
          || (IID_IVLCControl2 == riid) )
         {
             AddRef();
@@ -268,13 +266,29 @@ public:
     STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
 
     // IVLCControl2 methods
+    STDMETHODIMP get_AutoLoop(VARIANT_BOOL *autoloop);
+    STDMETHODIMP put_AutoLoop(VARIANT_BOOL autoloop);
+    STDMETHODIMP get_AutoPlay(VARIANT_BOOL *autoplay);
+    STDMETHODIMP put_AutoPlay(VARIANT_BOOL autoplay);
+    STDMETHODIMP get_BaseURL(BSTR *url);
+    STDMETHODIMP put_BaseURL(BSTR url);
+    STDMETHODIMP get_MRL(BSTR *mrl);
+    STDMETHODIMP put_MRL(BSTR mrl);
+    STDMETHODIMP get_StartTime(int *seconds);
+    STDMETHODIMP put_StartTime(int seconds);
+    STDMETHODIMP get_VersionInfo(BSTR *version);
+    STDMETHODIMP get_Visible(VARIANT_BOOL *visible);
+    STDMETHODIMP put_Visible(VARIANT_BOOL visible);
+    STDMETHODIMP get_Volume(int *volume);
+    STDMETHODIMP put_Volume(int volume);
+
     STDMETHODIMP get_audio(IVLCAudio**);
     STDMETHODIMP get_input(IVLCInput**);
     STDMETHODIMP get_playlist(IVLCPlaylist**);
     STDMETHODIMP get_video(IVLCVideo**);
 
 protected:
-    virtual HRESULT loadTypeInfo();
+    HRESULT loadTypeInfo();
 
 private:
     VLCPlugin*      _p_instance;

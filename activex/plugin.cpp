@@ -520,7 +520,7 @@ HRESULT VLCPlugin::onLoad(void)
                         if( UrlIsW(base_url, URLIS_URL) )
                         {
                             /* copy base URL */
-                            _bstr_mrl = SysAllocString(base_url);
+                            _bstr_baseurl = SysAllocString(base_url);
                         }
                         CoTaskMemFree(base_url);
                     }
@@ -630,23 +630,34 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         if( SysStringLen(_bstr_mrl) > 0 )
         {
             char *psz_mrl = NULL;
-            DWORD len = INTERNET_MAX_URL_LENGTH;
-            LPOLESTR abs_url = (LPOLESTR)CoTaskMemAlloc(sizeof(OLECHAR)*len);
-            if( NULL != abs_url )
+
+            if( SysStringLen(_bstr_baseurl) > 0 )
+            {
+                DWORD len = INTERNET_MAX_URL_LENGTH;
+                LPOLESTR abs_url = (LPOLESTR)CoTaskMemAlloc(sizeof(OLECHAR)*len);
+                if( NULL != abs_url )
+                {
+                    /*
+                    ** if the MRL a relative URL, we should end up with an absolute URL
+                    */
+                    if( SUCCEEDED(UrlCombineW(_bstr_baseurl, _bstr_mrl, abs_url, &len,
+                                    URL_ESCAPE_UNSAFE|URL_PLUGGABLE_PROTOCOL)) )
+                    {
+                        psz_mrl = CStrFromBSTR(CP_UTF8, abs_url);
+                    }
+                    else
+                    {
+                        psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
+                    }
+                    CoTaskMemFree(abs_url);
+                }
+            }
+            else
             {
                 /*
-                ** if the MRL a relative URL, we should end up with an absolute URL
+                ** baseURL is empty, assume MRL is absolute
                 */
-                if( SUCCEEDED(UrlCombineW(_bstr_baseurl, _bstr_mrl, abs_url, &len,
-                                URL_ESCAPE_UNSAFE|URL_PLUGGABLE_PROTOCOL)) )
-                {
-                    psz_mrl = CStrFromBSTR(CP_UTF8, abs_url);
-                }
-                else
-                {
-                    psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
-                }
-                CoTaskMemFree(abs_url);
+                psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
             }
             if( NULL != psz_mrl )
             {

@@ -208,7 +208,7 @@ library AXVLC
     interface IVLCInput : IDispatch
     {
         [propget, helpstring("Returns the clip length, in milliseconds.")]
-        HRESULT length([out, retval] __int64* length);
+        HRESULT length([out, retval] double* length);
 
         [propget, helpstring("Returns/sets playback position in current clip.  Position is ranging from 0.0 to 1.0.")]
         HRESULT position([out, retval] float* position);
@@ -216,9 +216,9 @@ library AXVLC
         HRESULT position([in] float position);
 
         [propget, helpstring("Returns/sets playback time in current clip, in milliseconds.")]
-        HRESULT time([out, retval] __int64* time);
+        HRESULT time([out, retval] double* time);
         [propput, helpstring("Returns/sets playback time in the current clip, in milliseconds.")]
-        HRESULT time([in] __int64 time);
+        HRESULT time([in] double time);
 
         [propget, helpstring("Returns current playback state.")]
         HRESULT state([out, retval] int* state);
@@ -301,12 +301,12 @@ library AXVLC
 
     [
       odl,
-      uuid(15179CD8-CC12-4242-A58E-E412217FF343),
-      helpstring("VLC Configuration options"),
+      uuid(2D719729-5333-406C-BF12-8DE787FD65E3),
+      helpstring("VLC Control"),
       dual,
       oleautomation
     ]
-    interface IVLCConfiguration : IDispatch
+    interface IVLCControl2 : IDispatch
     {
         [id(DISPID_AutoLoop), propget, helpstring("Returns/sets a value that determines whether the playlist is looped")]
         HRESULT AutoLoop([out, retval] VARIANT_BOOL* autoloop);
@@ -345,17 +345,7 @@ library AXVLC
         HRESULT Volume([out, retval] int* volume);
         [id(DISPID_Volume), propput, helpstring("Returns/sets default audio volume.")]
         HRESULT Volume([in] int volume);
-    };
 
-    [
-      odl,
-      uuid(2D719729-5333-406C-BF12-8DE787FD65E3),
-      helpstring("VLC Control"),
-      dual,
-      oleautomation
-    ]
-    interface IVLCControl2 : IVLCConfiguration
-    {
         [propget, helpstring("Returns the audio object.")]
         HRESULT audio([out, retval] IVLCAudio** obj);
 

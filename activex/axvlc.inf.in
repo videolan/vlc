@@ -10,7 +10,7 @@
 
 [axvlc.dll]
   FileVersion=@VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,0
-  clsid={E23FE9C6-778E-49d4-B537-38FCDE4887D8}
+  clsid={9BE31822-FDAD-461B-AD51-BE1D1C159921}
   RegisterServer=no
   Hook=runinstaller
 

@@ -44,8 +44,8 @@ Insert MSComctlLib.Slider.2 activex control
 <DIV id="info" style="text-align:center">-:--:--/-:--:--</DIV>
 </TD></TR>
 <TR><TD colspan="2">
-<INPUT type=button id="PlayOrPause" value=" Play " onClick='doPlayOrPause()'>
-<INPUT type=button value="Stop" onClick='document.getElementById("vlc").playlist.stop();'>
+<INPUT type=button id="PlayOrPause" value=" Play " onClick='doPlayOrPause();'>
+<INPUT type=button value="Stop" onClick='doStop();'>
 &nbsp;
 <INPUT type=button value=" << " onClick='doPlaySlower();'>
 <INPUT type=button value=" >> " onClick='doPlayFaster();'>
@@ -53,7 +53,7 @@ Insert MSComctlLib.Slider.2 activex control
 <INPUT type=button value="Show" onClick='document.getElementById("vlc").Visible = true;'>
 <INPUT type=button value="Hide" onClick='document.getElementById("vlc").Visible = false;'>
 &nbsp;
-<INPUT type=button value="Version" onClick='alert(document.getElementById("vlc").VersionInfo);'>
+<INPUT type=button id="VersionBut" value="Version" onClick='alert(document.getElementById("vlc").VersionInfo);'>
 <SPAN style="text-align:center">Volume:</SPAN>
 <INPUT type=button value=" - " onClick='updateVolume(-10)'>
 <SPAN id="volumeTextField" style="text-align: center">--</SPAN>
@@ -62,45 +62,171 @@ Insert MSComctlLib.Slider.2 activex control
 </TD>
 </TR>
 </TABLE>
-<SCRIPT LANGUAGE="JScript">
+<SCRIPT language="javascript">
 <!--
-var sliderTimerId = 0;
+
+var prevState = 0;
+var monitorTimerId = 0;
 var sliderScrolling = false;
 
-document.onreadystatechange=onVLCStateChange;
-function onVLCStateChange()
-{
-    if( document.readyState == 'complete' )
-    {
-        updateVolume(0);
-    }
-};
 function updateVolume(deltaVol)
 {
     var vlc = document.getElementById("vlc");
     vlc.audio.volume += deltaVol;
     document.getElementById("volumeTextField").innerHTML = vlc.audio.volume+"%";
-
 };
 function formatTime(timeVal)
 {
-    var timeHour = timeVal;
+    var timeHour = Math.round(timeVal / 1000);
     var timeSec = timeHour % 60;
     if( timeSec < 10 )
-    	timeSec = '0'+timeSec;
+	timeSec = '0'+timeSec;
     timeHour = (timeHour - timeSec)/60;
     var timeMin = timeHour % 60;
     if( timeMin < 10 )
-    	timeMin = '0'+timeMin;
+	timeMin = '0'+timeMin;
     timeHour = (timeHour - timeMin)/60;
     if( timeHour > 0 )
-    	return timeHour+":"+timeMin+":"+timeSec;
+	return timeHour+":"+timeMin+":"+timeSec;
     else
-    	return timeMin+":"+timeSec;
+	return timeMin+":"+timeSec;
+};
+function monitor()
+{
+    var vlc = document.getElementById("vlc");
+    var newState = vlc.input.state;
+    if( prevState != newState )
+    {
+	if( newState == 0 )
+	{
+	    // current media has stopped 
+	    onStop();
+	}
+	else if( newState == 1 )
+	{
+	    // current media is openning/connecting
+	    onOpen();
+	}
+	else if( newState == 2 )
+	{
+	    // current media is buffering data
+	    onBuffer();
+	}
+	else if( newState == 3 )
+	{
+	    // current media is now playing
+	    onPlay();
+	}
+	else if( vlc.input.state == 4 )
+	{
+	    // current media is now paused
+	    onPause();
+	}
+	prevState = newState;
+    }
+    else if( newState == 3 )
+    {
+	// current media is playing
+	onPlaying();
+    }
+    monitorTimerId = setTimeout("monitor()", 1000);
+};
+
+/* actions */
+
+function doGo(targetURL)
+{
+    var vlc = document.getElementById("vlc");
+    var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
+    vlc.playlist.clear();
+    vlc.playlist.add(targetURL, null, options);
+    vlc.playlist.play();
+    if( monitorTimerId == 0 )
+    {
+	monitor();
+    }
+};
+function doPlayOrPause()
+{
+    var vlc = document.getElementById("vlc");
+    if( vlc.playlist.isPlaying )
+    {
+	vlc.playlist.togglePause();
+    }
+    else
+    {
+	vlc.playlist.play();
+	if( monitorTimerId == 0 )
+	{
+	    monitor();
+	}
+    }
+};
+function doStop()
+{
+    document.getElementById("vlc").playlist.stop();
+    if( monitorTimerId != 0 )
+    {
+	clearTimeout(monitorTimerId);
+	monitorTimerId = 0;
+    }
+    onStop();
+};
+function doPlaySlower()
+{
+    var vlc = document.getElementById("vlc");
+    vlc.input.rate = vlc.input.rate / 2;
+};
+function doPlayFaster()
+{
+    var vlc = document.getElementById("vlc");
+    vlc.input.rate = vlc.input.rate * 2;
+};
+
+/* events */
+
+function onOpen()
+{
+    document.getElementById("info").innerHTML = "Opening...";
+    document.getElementById("PlayOrPause").value = "Pause";
+};
+function onBuffer()
+{
+    document.getElementById("info").innerHTML = "Buffering...";
+    document.getElementById("PlayOrPause").value = "Pause";
 };
 function onPlay()
 {
+    onPlaying();
     document.getElementById("PlayOrPause").value = "Pause";
+};
+var liveFeedText = new Array("Live", "((Live))", "(( Live ))", "((  Live  ))");
+var liveFeedRoll = 0;
+function onPlaying()
+{
+    if( ! sliderScrolling )
+    {
+	var slider = document.getElementById("slider");
+	if( vlc.input.length > 0 )
+	{
+	    // seekable media
+	    slider.Enabled = true;
+	    slider.Max = vlc.input.length/1000;
+	    slider.Value = vlc.input.time/1000;
+	    info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
+	}
+	else
+	{
+	    // non-seekable "live" media
+	    if( slider.Enabled )
+	    {
+		slider.Value = slider.Min;
+		slider.Enabled = false;
+	    }
+            liveFeedRoll = liveFeedRoll & 3;
+            info.innerHTML = liveFeedText[liveFeedRoll++];
+	}
+    }
 };
 function onPause()
 {
@@ -113,113 +239,44 @@ function onStop()
         slider.Value = slider.Min;
         slider.Enabled = false;
     }
-    info.innerText = "-:--:--/-:--:--";
+    document.getElementById("info").innerHTML = "-:--:--/-:--:--";
     document.getElementById("PlayOrPause").value = " Play ";
 };
+//-->
+</SCRIPT>
+<SCRIPT language="JScript">
+<!--
 
-var liveFeedText = new Array("Live", "((Live))", "(( Live ))", "((  Live  ))");
-var liveFeedRoll = 0;
-
-function doUpdate()
+document.onreadystatechange=onVLCStateChange;
+function onVLCStateChange()
 {
-    var vlc = document.getElementById("vlc");
-    if( vlc.playlist.isPlaying )
+    if( document.readyState == 'complete' )
     {
-        if( ! sliderScrolling )
-        {
-            if( vlc.input.length > 0 )
-            {
-                // seekable stream
-                slider.Enabled = true;
-                slider.Max = vlc.input.length;
-                slider.Value = vlc.input.time;
-                info.innerText = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
-                document.getElementById("PlayOrPause").Enabled = true;
-            }
-            else {
-                // non-seekable "live" stream
-                if( slider.Enabled )
-                {
-                    slider.Value = slider.Min;
-                    slider.Enabled = false;
-                }
-                liveFeedRoll = liveFeedRoll & 3;
-                info.innerText = liveFeedText[liveFeedRoll++];
-            }
-        }
-        sliderTimerId = setTimeout("doUpdate()", 1000);
+        updateVolume(0);
     }
-    else
-    {
-        onStop();
-        sliderTimerId = 0;
-    }
-};
-function doGo(targetURL)
-{
-	var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
-	document.getElementById("vlc").playlist.add(targetURL, null, options);
-};
-function doPlayOrPause()
-{
-    var vlc = document.getElementById("vlc");
-    vlc.playlist.togglePause();
-};
-function doPlaySlower()
-{
-    var vlc = document.getElementById("vlc");
-    vlc.input.rate = vlc.input.rate / 2;
-};
-function doPlayFaster()
-{
-    var vlc = document.getElementById("vlc");
-    vlc.input.rate = vlc.input.rate * 2;
-};
-function vlc::Play()
-{
-    if( ! sliderTimerId )
-    {
-        sliderTimerId = setTimeout("doUpdate()", 1000);
-    }
-    onPlay();
-};
-function vlc::Pause()
-{
-    if( sliderTimerId )
-    {
-        clearTimeout(sliderTimerId)
-        sliderTimerId = 0;
-    }
-    onPause();
-};
-function vlc::Stop()
-{
-    if( sliderTimerId )
-    {
-        clearTimeout(sliderTimerId)
-        sliderTimerId = 0;
-    }
-    onStop();
 };
 function slider::Scroll()
 {
+    var newPos = slider.Value * 1000;
     var vlc = document.getElementById("vlc");
-    slider.Text = formatTime(slider.Value);
-    info.innerText = slider.Text+"/"+formatTime(vlc.input.length);
-    if( vlc.Time != slider.Value )
+    slider.Text = formatTime(newPos);
+    info.innerHTML = slider.Text+"/"+formatTime(vlc.input.length);
+    if( (vlc.input.state == 3) && (vlc.input.time != newPos) )
     {
-        vlc.Time = slider.Value;
+        vlc.input.time = newPos;
     }
+    sliderScrolling = true;
 };
 function slider::Change()
 {
+    var newPos = slider.Value * 1000;
     if( sliderScrolling )
     {
         sliderScrolling = false;
     }
-    else if( vlc.Time != slider.Value )
+    else if( (vlc.input.state == 3) && (vlc.input.time != newPos) )
     {
-        vlc.Time = slider.Value;
+        vlc.input.time = newPos;
     }
 };
 //-->
