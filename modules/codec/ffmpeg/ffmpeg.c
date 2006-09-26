@@ -1111,6 +1111,11 @@ static struct
     { VLC_FOURCC('u','l','a','w'), CODEC_ID_PCM_MULAW,
       AUDIO_ES, "PCM ULAW" },
 
+#if LIBAVCODEC_BUILD >= ((51<<16)+(15<<8)+1)
+    { VLC_FOURCC('w','v','p','k'), CODEC_ID_WAVPACK,
+      AUDIO_ES, "WavPack" },
+#endif
+
     {0}
 };
 
