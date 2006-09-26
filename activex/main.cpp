@@ -51,13 +51,19 @@ extern const CATID CATID_SafeForScripting;
 static LONG i_class_ref= 0;
 static HINSTANCE h_instance= 0;
 
+HMODULE DllGetModule()
+{
+    return h_instance;
+};
+
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppv)
 {
     HRESULT hr = CLASS_E_CLASSNOTAVAILABLE;
 
     *ppv = NULL;
 
-    if( CLSID_VLCPlugin2 == rclsid )
+    if( (CLSID_VLCPlugin == rclsid )
+     || ( CLSID_VLCPlugin2 == rclsid) )
     {
         VLCPluginClass *plugin = new VLCPluginClass(&i_class_ref, h_instance, rclsid);
         hr = plugin->QueryInterface(riid, ppv);

@@ -549,6 +549,8 @@ HRESULT VLCPlugin::getVLCObject(int* i_vlc)
 
 HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
 {
+    extern HMODULE DllGetModule();
+
     if( ! isRunning() )
     {
         /*
@@ -568,16 +570,21 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
              {
                  if( i_type == REG_SZ )
                  {
-                     strcat( p_data, "\\vlc" );
-                     ppsz_argv[0] = p_data;
+                     strcat( p_data, "\\plugins" );
+		     ppsz_argv[ppsz_argc++] = "--plugin-path";
+                     ppsz_argv[ppsz_argc++] = p_data;
                  }
              }
              RegCloseKey( h_key );
         }
 
-#if 0
-        ppsz_argv[0] = "C:\\cygwin\\home\\damienf\\vlc-trunk\\vlc";
-#endif
+	char p_path[MAX_PATH+1];
+	DWORD len = GetModuleFileNameA(DllGetModule(), p_path, sizeof(p_path));
+	if( len > 0 )
+	{
+	    p_path[len] = '\0';
+	    ppsz_argv[0] = p_path;
+	}
 
         // make sure plugin isn't affected with VLC single instance mode
         ppsz_argv[ppsz_argc++] = "--no-one-instance";
