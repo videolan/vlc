@@ -68,7 +68,7 @@ vlc_int64_t libvlc_input_get_length( libvlc_input_t *p_input,
     var_Get( p_input_thread, "length", &val );
     vlc_object_release( p_input_thread );
 
-    return val.i_time;
+    return val.i_time/1000LL;
 }
 
 vlc_int64_t libvlc_input_get_time( libvlc_input_t *p_input,
@@ -82,7 +82,7 @@ vlc_int64_t libvlc_input_get_time( libvlc_input_t *p_input,
 
     var_Get( p_input_thread , "time", &val );
     vlc_object_release( p_input_thread );
-    return val.i_time;
+    return val.i_time/1000LL;
 }
 
 void libvlc_input_set_time( libvlc_input_t *p_input, vlc_int64_t time,
@@ -94,7 +94,7 @@ void libvlc_input_set_time( libvlc_input_t *p_input, vlc_int64_t time,
     p_input_thread = libvlc_get_input_thread ( p_input, p_e );
     if( libvlc_exception_raised( p_e ) )  return;
     
-    value.i_time = time;
+    value.i_time = time*1000LL;
     var_Set( p_input_thread, "time", value );
     vlc_object_release( p_input_thread );
 }
