@@ -667,7 +667,7 @@ static PyTypeObject MediaControl_Type =
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    "Control of a VLC instance.",  /* tp_doc */
+    "Control of a VLC instance.\n\nvlc.MediaControl(args): initialisation with a list of VLC parameters.\nvlc.MediaControl(instance): initialisation with an existing vlc.Instance",  /* tp_doc */
     0,                     /* tp_traverse */
     0,                     /* tp_clear */
     0,                     /* tp_richcompare */
