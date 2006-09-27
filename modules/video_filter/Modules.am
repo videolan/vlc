@@ -22,5 +22,5 @@ SOURCES_ripple = ripple.c
 SOURCES_psychedelic = psychedelic.c
 SOURCES_gradient = gradient.c
 SOURCES_opencv_wrapper = opencv_wrapper.c
-SOURCES_opencv_example = opencv_example.cpp
+SOURCES_opencv_example = opencv_example.cpp filter_event_info.h
 noinst_HEADERS = filter_common.h

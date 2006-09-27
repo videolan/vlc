@@ -11,11 +11,20 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-TOUI = ui/input_stats ui/main_interface ui/file_open \
-       ui/sprefs_trivial \
-       ui/sprefs_audio ui/sprefs_playlist ui/sprefs_subtitles \
-       ui/sprefs_video ui/sprefs_interface \
-       ui/equalizer
+TOUI = 	\
+	ui/equalizer \
+	ui/file_open \
+	ui/input_stats \
+	ui/main_interface \
+	ui/sprefs_audio \
+	ui/sprefs_interface \
+	ui/sprefs_playlist \
+	ui/sprefs_subtitles \
+	ui/sprefs_trivial \ 
+	ui/sprefs_video \
+	ui/streampanel 
+
+
 UIH = $(TOUI:%=%.h)
 
 TOMOC = main_interface \
@@ -143,15 +152,17 @@ EXTRA_DIST += \
 	util/directslider.hpp \
 	util/customwidgets.hpp \
 	util/qvlcframe.hpp \
-	ui/input_stats.ui \
+	ui/equalizer.ui \
 	ui/file_open.ui \
+	ui/input_stats.ui \
 	ui/main_interface.ui \
-	ui/sprefs_trivial.ui \
 	ui/sprefs_audio.ui \
-	ui/sprefs_video.ui \
+	ui/sprefs_interface.ui \
 	ui/sprefs_playlist.ui \
 	ui/sprefs_subtitles.ui \
-	ui/equalizer.ui \
+	ui/sprefs_trivial.ui \
+	ui/sprefs_video.ui \
+	ui/streampanel.ui \
 	pixmaps/advanced.xpm \
 	pixmaps/audio.xpm \
 	pixmaps/codec.xpm \
