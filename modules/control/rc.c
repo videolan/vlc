@@ -970,6 +970,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
         msg_rc(_("| mosaic-width # . . . . . . . . . . . . . . width"));
         msg_rc(_("| mosaic-xoffset # . . . .top left corner position"));
         msg_rc(_("| mosaic-yoffset # . . . .top left corner position"));
+        msg_rc(_("| mosaic-offsets x,y(,x,y)*. . . . list of offsets"));
         msg_rc(_("| mosaic-align 0..2,4..6,8..10. . .mosaic alignment"));
         msg_rc(_("| mosaic-vborder # . . . . . . . . vertical border"));
         msg_rc(_("| mosaic-hborder # . . . . . . . horizontal border"));
@@ -1650,7 +1651,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_input->p_libvlc, "mosaic-offsets", val );
+            var_Set( p_input->p_libvlc_global, "mosaic-offsets", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-keep-aspect-ratio" ) )
