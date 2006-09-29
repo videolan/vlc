@@ -142,7 +142,11 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
  */
 int playlist_ThreadDestroy( playlist_t * p_playlist )
 {
-    p_playlist->b_die = 1;
+    p_playlist->b_die = VLC_TRUE;
+    if( p_playlist->p_preparse )
+        vlc_cond_signal( &p_playlist->p_preparse->object_wait );
+    if( p_playlist->p_secondary_preparse )
+        vlc_cond_signal( &p_playlist->p_secondary_preparse->object_wait );
 
     DestroyInteraction( p_playlist );
     DestroyPlaylist( p_playlist );
@@ -208,14 +212,7 @@ static void RunPreparse ( playlist_preparse_t *p_obj )
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
 
-    while( !p_playlist->b_die )
-    {
-        playlist_PreparseLoop( p_obj );
-        if( p_obj->i_waiting == 0 )
-        {
-            msleep( INTF_IDLE_SLEEP );
-        }
-    }
+    playlist_PreparseLoop( p_obj );
 }
 
 static void RunSecondaryPreparse( playlist_secondary_preparse_t *p_obj )
@@ -224,14 +221,7 @@ static void RunSecondaryPreparse( playlist_secondary_preparse_t *p_obj )
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
 
-    while( !p_playlist->b_die )
-    {
-        playlist_SecondaryPreparseLoop( p_obj );
-        if( p_obj->i_waiting == 0 )
-        {
-            msleep( INTF_IDLE_SLEEP );
-        }
-    }
+    playlist_SecondaryPreparseLoop( p_obj );
 }
 
 /*****************************************************************************

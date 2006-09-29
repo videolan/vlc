@@ -132,7 +132,7 @@ static int FindMeta( vlc_object_t *p_this )
 
     mb_Delete( p_mb );
 
-    i_meta = input_GetMetaEngineFlags( p_item->p_meta );
+    i_meta = input_CurrentMetaFlags( p_item->p_meta );
     p_me->i_mandatory &= ~i_meta;
     p_me->i_optional &= ~i_meta;
     if( p_me->i_mandatory )

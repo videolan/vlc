@@ -198,6 +198,7 @@ int playlist_PreparseEnqueue( playlist_t *p_playlist,
                  p_playlist->p_preparse->i_waiting,
                  p_item );
     vlc_mutex_unlock( &p_playlist->p_preparse->object_lock );
+    vlc_cond_signal( &p_playlist->p_preparse->object_wait );
     return VLC_SUCCESS;
 }
 
@@ -229,9 +230,9 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
     vlc_gc_incref( p_item );
     INSERT_ELEM( p_playlist->p_secondary_preparse->p_waiting,
                  p_playlist->p_secondary_preparse->i_waiting,
-                 i,
-                 p );
+                 i, p );
     vlc_mutex_unlock( &p_playlist->p_secondary_preparse->object_lock );
+    vlc_cond_signal( &p_playlist->p_secondary_preparse->object_lock );
     return VLC_SUCCESS;
 }
 

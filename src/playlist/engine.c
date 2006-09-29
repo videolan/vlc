@@ -446,16 +446,27 @@ void playlist_LastLoop( playlist_t *p_playlist )
 void playlist_PreparseLoop( playlist_preparse_t *p_obj )
 {
     playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
+    input_item_t *p_current;
     int i_activity;
     uint32_t i_m, i_o;
 
-    vlc_mutex_lock( &p_obj->object_lock );
-
-    if( p_obj->i_waiting > 0 )
+    while( !p_playlist->b_die )
     {
-        input_item_t *p_current = p_obj->pp_waiting[0];
+        vlc_mutex_lock( &p_obj->object_lock );
+        while( p_obj->i_waiting == 0 )
+        {
+            vlc_cond_wait( &p_obj->object_wait, &p_obj->object_lock );
+            if( p_playlist->b_die )
+            {
+                vlc_mutex_unlock( &p_obj->object_lock );
+                return;
+            }
+        }
+
+        p_current = p_obj->pp_waiting[0];
         REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
         vlc_mutex_unlock( &p_obj->object_lock );
+
         PL_LOCK;
         if( p_current )
         {
@@ -484,6 +495,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 var_SetInteger( p_playlist, "item-change", p_current->i_id );
             }
             PL_LOCK;
+
             /* If we haven't retrieved enough meta, add to secondary queue
              * which will run the "meta fetchers"
              * TODO:
@@ -503,6 +515,8 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                              p );
                 vlc_mutex_unlock(
                             &p_playlist->p_secondary_preparse->object_lock);
+                vlc_cond_signal(
+                            &p_playlist->p_secondary_preparse->object_wait );
             }
             else
                 vlc_gc_decref( p_current );
@@ -515,23 +529,34 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
         i_activity = var_GetInteger( p_playlist, "activity" );
         if( i_activity < 0 ) i_activity = 0;
         vlc_mutex_unlock( &p_obj->object_lock );
+        /* Sleep at least 1ms */
         msleep( (i_activity+1) * 1000 );
-        return;
     }
-    vlc_mutex_unlock( &p_obj->object_lock );
 }
 
 /** Main loop for secondary preparser queue */
 void playlist_SecondaryPreparseLoop( playlist_secondary_preparse_t *p_obj )
 {
     playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
+    vlc_bool_t b_fetch_art;
+    input_item_t *p_item;
+    int i_activity;
 
-    vlc_mutex_lock( &p_obj->object_lock );
-
-    if( p_obj->i_waiting > 0 )
+    while( !p_playlist->b_die )
     {
-        vlc_bool_t b_fetch_art = p_obj->p_waiting->b_fetch_art;
-        input_item_t *p_item = p_obj->p_waiting->p_item;
+        vlc_mutex_lock( &p_obj->object_lock );
+        while( p_obj->i_waiting == 0 )
+        {
+            vlc_cond_wait( &p_obj->object_wait, &p_obj->object_lock );
+            if( p_playlist->b_die )
+            {
+                vlc_mutex_unlock( &p_obj->object_lock );
+                return;
+            }
+        }
+
+        b_fetch_art = p_obj->p_waiting->b_fetch_art;
+        p_item = p_obj->p_waiting->p_item;
         REMOVE_ELEM( p_obj->p_waiting, p_obj->i_waiting, 0 );
         vlc_mutex_unlock( &p_obj->object_lock );
         if( p_item )
@@ -549,9 +574,13 @@ void playlist_SecondaryPreparseLoop( playlist_secondary_preparse_t *p_obj )
             var_SetInteger( p_playlist, "item-change", p_item->i_id );
             vlc_gc_decref( p_item );
         }
-        return;
+        vlc_mutex_lock( &p_obj->object_lock );
+        i_activity = var_GetInteger( p_playlist, "activity" );
+        if( i_activity < 0 ) i_activity = 0;
+        vlc_mutex_unlock( &p_obj->object_lock );
+        /* Sleep at least 1ms */
+        msleep( (i_activity+1) * 1000 );
     }
-    vlc_mutex_unlock( &p_obj->object_lock );
 }
 
 static void VariablesInit( playlist_t *p_playlist )
