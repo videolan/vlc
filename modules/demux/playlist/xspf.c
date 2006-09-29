@@ -516,7 +516,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                         FREE_ATT();
                         return VLC_FALSE;
                     }
-                    psz_uri = unescape_URI_duplicate( psz_value );
+                    psz_uri = decode_URI_duplicate( psz_value );
 
                     if( psz_uri )
                     {
