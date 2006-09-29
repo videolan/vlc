@@ -543,10 +543,10 @@ struct module_symbols_t
     char * (*input_ItemGetInfo_inner) (input_item_t *p_i, const char *psz_cat,const char *psz_name);
     int (*input_ItemAddInfo_inner) (input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ...);
     void (*input_ItemAddOptionNoDup_inner) (input_item_t *, const char *);
-    int (*__input_MetaFetch_inner) (vlc_object_t *, input_item_t *);
-    int (*input_DownloadAndCacheArt_inner) (vlc_object_t *p_parent, input_item_t *p_item);
-    uint32_t (*input_GetMetaEngineFlags_inner) (vlc_meta_t *p_meta);
-    int (*__input_ArtFetch_inner) (vlc_object_t *, input_item_t *);
+    void *__input_MetaFetch_deprecated;
+    void *input_DownloadAndCacheArt_deprecated;
+    void *input_GetMetaEngineFlags_deprecated;
+    void *__input_ArtFetch_deprecated;
     void *input_AskForArt_deprecated;
     int (*playlist_AskForArtEnqueue_inner) (playlist_t *, input_item_t *);
 };
@@ -1022,10 +1022,6 @@ struct module_symbols_t
 #  define input_ItemGetInfo (p_symbols)->input_ItemGetInfo_inner
 #  define input_ItemAddInfo (p_symbols)->input_ItemAddInfo_inner
 #  define input_ItemAddOptionNoDup (p_symbols)->input_ItemAddOptionNoDup_inner
-#  define __input_MetaFetch (p_symbols)->__input_MetaFetch_inner
-#  define input_DownloadAndCacheArt (p_symbols)->input_DownloadAndCacheArt_inner
-#  define input_GetMetaEngineFlags (p_symbols)->input_GetMetaEngineFlags_inner
-#  define __input_ArtFetch (p_symbols)->__input_ArtFetch_inner
 #  define playlist_AskForArtEnqueue (p_symbols)->playlist_AskForArtEnqueue_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
@@ -1503,10 +1499,6 @@ struct module_symbols_t
     ((p_symbols)->input_ItemGetInfo_inner) = input_ItemGetInfo; \
     ((p_symbols)->input_ItemAddInfo_inner) = input_ItemAddInfo; \
     ((p_symbols)->input_ItemAddOptionNoDup_inner) = input_ItemAddOptionNoDup; \
-    ((p_symbols)->__input_MetaFetch_inner) = __input_MetaFetch; \
-    ((p_symbols)->input_DownloadAndCacheArt_inner) = input_DownloadAndCacheArt; \
-    ((p_symbols)->input_GetMetaEngineFlags_inner) = input_GetMetaEngineFlags; \
-    ((p_symbols)->__input_ArtFetch_inner) = __input_ArtFetch; \
     ((p_symbols)->playlist_AskForArtEnqueue_inner) = playlist_AskForArtEnqueue; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_input_item_GetInfo_deprecated = NULL; \
@@ -1561,6 +1553,10 @@ struct module_symbols_t
     (p_symbols)->__intf_IntfProgress_deprecated = NULL; \
     (p_symbols)->streaming_ChainToPsz_deprecated = NULL; \
     (p_symbols)->__input_SecondaryPreparse_deprecated = NULL; \
+    (p_symbols)->__input_MetaFetch_deprecated = NULL; \
+    (p_symbols)->input_DownloadAndCacheArt_deprecated = NULL; \
+    (p_symbols)->input_GetMetaEngineFlags_deprecated = NULL; \
+    (p_symbols)->__input_ArtFetch_deprecated = NULL; \
     (p_symbols)->input_AskForArt_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */

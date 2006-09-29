@@ -474,10 +474,11 @@ VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
 
 
-#define input_MetaFetch(a,b) __input_MetaFetch(VLC_OBJECT(a),b)
-VLC_EXPORT( int, __input_MetaFetch, ( vlc_object_t *, input_item_t * ) );
-#define input_ArtFetch(a,b) __input_ArtFetch(VLC_OBJECT(a),b)
-VLC_EXPORT( int, __input_ArtFetch, ( vlc_object_t *, input_item_t * ) );
+int         input_MetaFetch     ( playlist_t *, input_item_t * );
+int         input_ArtFetch      ( playlist_t *, input_item_t * );
+vlc_bool_t  input_MetaSatisfied ( playlist_t*, input_item_t*,
+                                  uint32_t*, uint32_t*, vlc_bool_t );
+int         input_DownloadAndCacheArt ( playlist_t *, input_item_t * );
 
 enum input_query_e
 {
@@ -540,7 +541,6 @@ VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
 
 VLC_EXPORT( vlc_bool_t, input_AddSubtitles, ( input_thread_t *, char *, vlc_bool_t ) );
 
-VLC_EXPORT( int, input_DownloadAndCacheArt, ( vlc_object_t *p_parent, input_item_t *p_item ) );
 
 
 #endif

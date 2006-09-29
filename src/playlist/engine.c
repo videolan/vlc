@@ -447,6 +447,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
 {
     playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
     int i_activity;
+    uint32_t i_m, i_o;
 
     vlc_mutex_lock( &p_obj->object_lock );
 
@@ -459,7 +460,6 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
         if( p_current )
         {
             vlc_bool_t b_preparsed = VLC_FALSE;
-            preparse_item_t p;
             if( strncmp( p_current->psz_uri, "http:", 5 ) &&
                 strncmp( p_current->psz_uri, "rtsp:", 5 ) &&
                 strncmp( p_current->psz_uri, "udp:", 4 ) &&
@@ -484,17 +484,16 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 var_SetInteger( p_playlist, "item-change", p_current->i_id );
             }
             PL_LOCK;
-            /* We haven't retrieved enough meta, add to secondary queue
+            /* If we haven't retrieved enough meta, add to secondary queue
              * which will run the "meta fetchers"
-             * TODO: - use i_mandatory stuff here instead of hardcoded T/A
-             *       - don't do this for things we won't get meta for, like
-             *         videos
-             * -> done in input_MetaFetch atm
+             * TODO:
+             *  don't do this for things we won't get meta for, like
+             *  videos
              */
-            /*if( !(p_current->p_meta->psz_title && *p_current->p_meta->psz_title
-                && p_current->p_meta->psz_artist &&
-                   *p_current->p_meta->psz_artist) )
-            {*/
+            if( !input_MetaSatisfied( p_playlist, p_current, &i_m, &i_o,
+                                      VLC_TRUE ) )
+            {
+                preparse_item_t p;
                 p.p_item = p_current;
                 p.b_fetch_art = VLC_FALSE;
                 vlc_mutex_lock( &p_playlist->p_secondary_preparse->object_lock);
@@ -504,9 +503,9 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                              p );
                 vlc_mutex_unlock(
                             &p_playlist->p_secondary_preparse->object_lock);
-            /*}
+            }
             else
-                vlc_gc_decref( p_current );*/
+                vlc_gc_decref( p_current );
             PL_UNLOCK;
         }
         else
@@ -537,9 +536,12 @@ void playlist_SecondaryPreparseLoop( playlist_secondary_preparse_t *p_obj )
         vlc_mutex_unlock( &p_obj->object_lock );
         if( p_item )
         {
-            input_MetaFetch( p_playlist, p_item );
-            p_item->p_meta->i_status |= ITEM_META_FETCHED;
-            if( b_fetch_art == VLC_TRUE )
+            if( !b_fetch_art )
+            {
+                input_MetaFetch( p_playlist, p_item );
+                p_item->p_meta->i_status |= ITEM_META_FETCHED;
+            }
+            else
             {
                 input_ArtFetch( p_playlist, p_item );
                 p_item->p_meta->i_status |= ITEM_ART_FETCHED;
@@ -547,8 +549,6 @@ void playlist_SecondaryPreparseLoop( playlist_secondary_preparse_t *p_obj )
             var_SetInteger( p_playlist, "item-change", p_item->i_id );
             vlc_gc_decref( p_item );
         }
-        else
-            PL_UNLOCK;
         return;
     }
     vlc_mutex_unlock( &p_obj->object_lock );

@@ -32,48 +32,50 @@
 #   include <sys/stat.h>
 #endif
 
-int input_FindArtInCache( vlc_object_t *p_parent, input_item_t *p_item );
+int input_FindArtInCache( playlist_t *p_playlist, input_item_t *p_item );
 
-int __input_MetaFetch( vlc_object_t *p_parent, input_item_t *p_item )
+vlc_bool_t input_MetaSatisfied( playlist_t *p_playlist, input_item_t *p_item,
+                                uint32_t *pi_mandatory, uint32_t *pi_optional,
+                                vlc_bool_t b_check_cache )
+{
+    // FIXME don't var_Stuff at each loop
+    int i_policy = var_CreateGetInteger( p_playlist,     "album-art" );
+    if( b_check_cache )
+        input_FindArtInCache( p_playlist, p_item );
+
+    *pi_mandatory = VLC_META_ENGINE_TITLE | VLC_META_ENGINE_ARTIST |
+                    (i_policy == ALBUM_ART_ALL ? VLC_META_ENGINE_ART_URL : 0 );
+
+    uint32_t i_meta = input_CurrentMetaFlags( p_item->p_meta );
+    *pi_mandatory &= ~i_meta;
+    *pi_optional = 0; /// Todo
+    return *pi_mandatory ? VLC_FALSE:VLC_TRUE;
+}
+
+int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
 {
     struct meta_engine_t *p_me;
-    uint32_t i_mandatory = 0, i_optional = 0, i_meta;
-    int i_policy;
+    uint32_t i_mandatory, i_optional;
 
     if( !p_item->p_meta ) return VLC_EGENERIC;
 
-    i_policy = var_CreateGetInteger( p_parent, "album-art" );
+    input_MetaSatisfied( p_playlist, p_item,
+                         &i_mandatory, &i_optional, VLC_FALSE );
 
-    i_mandatory =   VLC_META_ENGINE_TITLE
-                  | VLC_META_ENGINE_ARTIST;
-    if( i_policy == ALBUM_ART_ALL )
-    {
-        i_mandatory |= VLC_META_ENGINE_ART_URL;
-    }
-    else
-    {
-        i_optional |= VLC_META_ENGINE_ART_URL;
-    }
+    // Meta shouldn't magically appear
+    assert( i_mandatory );
 
-    input_FindArtInCache( p_parent, p_item );
-
-    i_meta = input_GetMetaEngineFlags( p_item->p_meta );
-    i_mandatory &= ~i_meta;
-    i_optional &= ~i_meta;
-
-    if( !i_mandatory ) return VLC_SUCCESS;
-
-    p_me = vlc_object_create( p_parent, VLC_OBJECT_META_ENGINE );
+    p_me = vlc_object_create( p_playlist, VLC_OBJECT_META_ENGINE );
     p_me->i_flags |= OBJECT_FLAGS_NOINTERACT;
     p_me->i_mandatory = i_mandatory;
     p_me->i_optional = i_optional;
 
     p_me->p_item = p_item;
     p_me->p_module = module_Need( p_me, "meta fetcher", 0, VLC_FALSE );
-    vlc_object_attach( p_me, p_parent );
+    vlc_object_attach( p_me, p_playlist );
     if( !p_me->p_module )
     {
-        msg_Err( p_parent, "no suitable meta fetcher module" );
+        msg_Dbg( p_playlist, "unable to fetch meta" );
         vlc_object_detach( p_me );
         vlc_object_destroy( p_me );
         return VLC_EGENERIC;
@@ -87,27 +89,34 @@ int __input_MetaFetch( vlc_object_t *p_parent, input_item_t *p_item )
     return VLC_SUCCESS;
 }
 
-int __input_ArtFetch( vlc_object_t *p_parent, input_item_t *p_item )
+int input_ArtFetch( playlist_t *p_playlist, input_item_t *p_item )
 {
-    if( !p_item->p_meta )
-        return VLC_EGENERIC;
-
-    /* TODO: call art fetcher modules */
+    if( !p_item->p_meta ) return VLC_EGENERIC;
 
     if( !p_item->p_meta->psz_arturl || !*p_item->p_meta->psz_arturl )
-        return VLC_EGENERIC;
-
-    if( strncmp( "file://", p_item->p_meta->psz_arturl, 7 ) )
     {
-        return input_DownloadAndCacheArt( p_parent, p_item );
+        module_t *p_module;
+        PL_LOCK;
+        p_playlist->p_private = p_item;
+        p_module = module_Need( p_playlist, "art finder", 0, VLC_FALSE );
+        if( !p_module )
+        {
+            msg_Dbg( p_playlist, "unable to find art" );
+            return VLC_EGENERIC;
+        }
+        module_Unneed( p_playlist, p_module );
+        p_playlist->p_private = NULL;
+
+        if( !p_item->p_meta->psz_arturl || !*p_item->p_meta->psz_arturl )
+            return VLC_EGENERIC;
     }
-    return VLC_SUCCESS;
+    return input_DownloadAndCacheArt( p_playlist, p_item );
 }
 
 #ifndef MAX_PATH
 #   define MAX_PATH 250
 #endif
-int input_FindArtInCache( vlc_object_t *p_parent, input_item_t *p_item )
+int input_FindArtInCache( playlist_t *p_playlist, input_item_t *p_item )
 {
     char *psz_artist;
     char *psz_album;
@@ -126,20 +135,19 @@ int input_FindArtInCache( vlc_object_t *p_parent, input_item_t *p_item )
         snprintf( psz_filename, MAX_PATH,
                   "file://%s" DIR_SEP CONFIG_DIR DIR_SEP "art"
                   DIR_SEP "%s" DIR_SEP "%s" DIR_SEP "art%s",
-                  p_parent->p_libvlc->psz_homedir,
+                  p_playlist->p_libvlc->psz_homedir,
                   psz_artist, psz_album, ppsz_type[i] );
 
         /* Check if file exists */
         if( utf8_stat( psz_filename+7, &a ) == 0 )
         {
-            msg_Dbg( p_parent, "album art %s already exists in cache"
+            msg_Dbg( p_playlist, "album art %s already exists in cache"
                              , psz_filename );
             vlc_meta_SetArtURL( p_item->p_meta, psz_filename );
             return VLC_SUCCESS;
         }
     }
 
-    /* Use a art finder module to find the URL */
     return VLC_EGENERIC;
 }
 
@@ -147,7 +155,7 @@ int input_FindArtInCache( vlc_object_t *p_parent, input_item_t *p_item )
  * Download the art using the URL or an art downloaded
  * This function should be called only if data is not already in cache
  */
-int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
+int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
 {
     int i_status = VLC_EGENERIC;
     stream_t *p_stream;
@@ -169,27 +177,27 @@ int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
     snprintf( psz_filename, MAX_PATH,
               "file://%s" DIR_SEP CONFIG_DIR DIR_SEP "art"
               DIR_SEP "%s" DIR_SEP "%s" DIR_SEP "art%s",
-              p_parent->p_libvlc->psz_homedir,
+              p_playlist->p_libvlc->psz_homedir,
               psz_artist, psz_album, psz_type );
 
     snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR,
-              p_parent->p_libvlc->psz_homedir );
+              p_playlist->p_libvlc->psz_homedir );
     utf8_mkdir( psz_dir );
     snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP "art",
-              p_parent->p_libvlc->psz_homedir );
+              p_playlist->p_libvlc->psz_homedir );
     utf8_mkdir( psz_dir );
     snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
               "art" DIR_SEP "%s",
-                 p_parent->p_libvlc->psz_homedir, psz_artist );
+                 p_playlist->p_libvlc->psz_homedir, psz_artist );
     utf8_mkdir( psz_dir );
     snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
               "art" DIR_SEP "%s" DIR_SEP "%s",
-                      p_parent->p_libvlc->psz_homedir,
+                      p_playlist->p_libvlc->psz_homedir,
                       psz_artist, psz_album );
     utf8_mkdir( psz_dir );
 
     /* Todo: check for stuff that needs a downloader module */
-    p_stream = stream_UrlNew( p_parent, p_item->p_meta->psz_arturl );
+    p_stream = stream_UrlNew( p_playlist, p_item->p_meta->psz_arturl );
 
     if( p_stream )
     {
@@ -203,7 +211,7 @@ int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
         free( p_buffer );
         fclose( p_file );
         stream_Delete( p_stream );
-        msg_Dbg( p_parent, "Album art saved to %s\n", psz_filename );
+        msg_Dbg( p_playlist, "Album art saved to %s\n", psz_filename );
         free( p_item->p_meta->psz_arturl );
         p_item->p_meta->psz_arturl = strdup( psz_filename );
         i_status = VLC_SUCCESS;
@@ -211,7 +219,7 @@ int input_DownloadAndCacheArt( vlc_object_t *p_parent, input_item_t *p_item )
     return i_status;
 }
 
-uint32_t input_GetMetaEngineFlags( vlc_meta_t *p_meta )
+uint32_t input_CurrentMetaFlags( vlc_meta_t *p_meta )
 {
     uint32_t i_meta = 0;
 
