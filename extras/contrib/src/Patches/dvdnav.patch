@@ -389,7 +389,7 @@ diff -ur libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
 +if test x"$link_dvdcss" != xyes; then
 +dnl dlopen libdvdcss
 +  AC_CHECK_FUNC( dlopen,
-+    [DL_LIBS="" ].
++    [DL_LIBS="" ],
 +    AC_CHECK_LIB( dl, dlopen,
 +      [DL_LIBS=-ld ],
 +      AC_MSG_ERROR(You need libdl (dlopen))

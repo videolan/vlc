@@ -1027,11 +1027,11 @@ libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 	patch -p 0 < Patches/libdvdnav-mactel.patch
 	(cd $@; ./autogen.sh noconfig)
 
-.dvdnav: libdvdnav
+.dvdnav: libdvdnav .dvdcss
 ifdef HAVE_WIN32	
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS) -Dssize_t=long" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS) -Dssize_t=long" && make && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX)  CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
