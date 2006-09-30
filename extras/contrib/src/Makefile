@@ -145,7 +145,7 @@ ifdef HAVE_DARWIN_OS
 	.dvdcss .dvdnav .dvdread .dvbpsi .live .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
 	.glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder .aclocal \
-        .libdca
+        .libdca .tag
 # .expat .clinkcc don't work with SDK yet
 # .glib .libidl .gecko are required to build the mozilla plugin
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
@@ -1960,6 +1960,21 @@ libunicows: libunicows-$(UNICOWS_VERSION).tar.gz
 CLEAN_FILE += .unicows
 CLEAN_PKG += libunicows
 DISTCLEAN_PKG += libunicows-$(UNICOWS_VERSION)-src.tar.gz
+
+# ***************************************************************************
+# TagLib read and editing of tags of popular audio formats
+# ***************************************************************************
+
+taglib-$(TAGLIB_VERSION).tar.gz:
+	$(WGET) $(TAGLIB_URL)
+
+taglib: taglib-$(TAGLIB_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.tag: taglib
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	$(INSTALL_NAME)
+	touch $@
 
 # ***************************************************************************
 # Some cleansing

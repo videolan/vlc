@@ -175,3 +175,7 @@ PTHREADS_VERSION=2-7-0
 PTHREADS_URL=ftp://sources.redhat.com/pub/pthreads-win32/pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 UNICOWS_VERSION=1.1.1
 UNICOWS_URL=$(SF)/libunicows/libunicows-$(UNICOWS_VERSION)-src.tar.gz
+ZVBI_VERSION=0.2.22
+ZVBI_URL=$(SF)/zapping/zvbi-$(ZVBI_VERSION).tar.bz2
+TAGLIB_VERSION=1.4
+TAGLIB_URL=http://developer.kde.org/~wheeler/files/src/taglib-$(TAGLIB_VERSION).tar.gz

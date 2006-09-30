@@ -1582,16 +1582,20 @@ AC_ARG_ENABLE(musicbrainz,
        [AC_MSG_WARN(MusicBrainz library not found)])
    ])
 
+
 dnl
 dnl Taglibplugin
 dnl
 AC_ARG_ENABLE(taglib,
   [  --enable-taglib Taglib support (default disabled) ])
   AS_IF([test "x${enable_taglib}" = "xyes"],[
-	VLC_ADD_PLUGINS([taglib])
-	VLC_ADD_LDFLAGS([taglib], [-ltag])
-	VLC_ADD_CXXFLAGS([taglib], [-I/usr/include/taglib])
-   ])
+    PKG_CHECK_MODULES(TAGLIB, libtag,
+      [ VLC_ADD_PLUGINS([taglib])
+        VLC_ADD_LDFLAGS([taglib],[$TAGLIB_LIBS])
+       VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS]) ],
+      [AC_MSG_WARN(TagLib library not found)])
+  ])
+
 
 dnl
 dnl  Input plugins
