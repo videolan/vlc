@@ -171,6 +171,16 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
                         || !*p_item->p_meta->psz_arturl )
         return VLC_EGENERIC;
 
+    /* FIXME: use an alternate saving filename scheme if we don't have
+     * the artist or album name */
+    if(    !p_item->p_meta->psz_artist
+        || !p_item->p_meta->psz_album )
+        return VLC_EGENERIC;
+
+    /* Check if file doesn't already exist */
+    if( input_FindArtInCache( p_playlist, p_item ) == VLC_SUCCESS )
+        return VLC_SUCCESS;
+
     psz_type = strrchr( p_item->p_meta->psz_arturl, '.' );
 
     /* Todo: get a helper to do this */
