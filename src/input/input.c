@@ -2249,7 +2249,6 @@ static void InputMetaUser( input_thread_t *p_input )
     free( val.psz_string )
 
     GET_META( title, "meta-title" );
-    GET_META( author, "meta-author" );
     GET_META( artist, "meta-artist" );
     GET_META( genre, "meta-genre" );
     GET_META( copyright, "meta-copyright" );

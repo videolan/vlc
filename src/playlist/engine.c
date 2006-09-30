@@ -565,14 +565,28 @@ void playlist_SecondaryPreparseLoop( playlist_secondary_preparse_t *p_obj )
             {
                 input_MetaFetch( p_playlist, p_item );
                 p_item->p_meta->i_status |= ITEM_META_FETCHED;
+                var_SetInteger( p_playlist, "item-change", p_item->i_id );
+                /*  Fetch right now */
+                if( var_GetInteger( p_playlist, "album-art" ) == ALBUM_ART_ALL )
+                {
+                    vlc_mutex_lock( &p_obj->object_lock );
+                    preparse_item_t p;
+                    p.p_item = p_item;
+                    p.b_fetch_art = VLC_TRUE;
+                    INSERT_ELEM( p_playlist->p_secondary_preparse->p_waiting,
+                                 p_playlist->p_secondary_preparse->i_waiting,
+                                 0, p );
+                    vlc_mutex_unlock( &p_obj->object_lock );
+                }
+                else
+                    vlc_gc_decref( p_item );
             }
             else
             {
                 input_ArtFetch( p_playlist, p_item );
                 p_item->p_meta->i_status |= ITEM_ART_FETCHED;
-            }
-            var_SetInteger( p_playlist, "item-change", p_item->i_id );
-            vlc_gc_decref( p_item );
+                vlc_gc_decref( p_item );
+           }
         }
         vlc_mutex_lock( &p_obj->object_lock );
         i_activity = var_GetInteger( p_playlist, "activity" );

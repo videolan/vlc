@@ -50,8 +50,6 @@ static int FindMeta( vlc_object_t * );
  *****************************************************************************/
 
 vlc_module_begin();
-/*    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );*/
     set_shortname( N_( "Folder" ) );
     set_description( _("Folder meta data") );
 
@@ -63,71 +61,59 @@ vlc_module_end();
  *****************************************************************************/
 static int FindMeta( vlc_object_t *p_this )
 {
-    meta_engine_t *p_me = (meta_engine_t *)p_this;
-    input_item_t *p_item = p_me->p_item;
+    playlist_t *p_playlist = (playlist_t *)p_this;
+    input_item_t *p_item = (input_item_t *)(p_playlist->p_private);
     vlc_bool_t b_have_art = VLC_FALSE;
     uint32_t i_meta;
 
+    int i = 0;
+    struct stat a;
+    char psz_filename[MAX_PATH];
+    char *psz_dir = strdup( p_item->psz_uri );
+    char *psz_buf = strrchr( psz_dir, '/' );
+
     if( !p_item->p_meta ) return VLC_EGENERIC;
-
-
-    if( p_me->i_mandatory & VLC_META_ENGINE_ART_URL
-        || p_me->i_optional & VLC_META_ENGINE_ART_URL )
+    if( psz_buf )
     {
-        int i = 0;
-        struct stat a;
-        char psz_filename[MAX_PATH];
-        char *psz_dir = strdup( p_item->psz_uri );
-        char *psz_buf = strrchr( psz_dir, '/' );
-
-        if( psz_buf )
-        {
-            psz_buf++;
-            *psz_buf = '\0';
-        }
-        else
-        {
-            *psz_dir = '\0';
-        }
-
-        for( i = 0; b_have_art == VLC_FALSE && i < 3; i++ )
-        {
-            switch( i )
-            {
-                case 0:
-                /* Windows Folder.jpg */
-                snprintf( psz_filename, MAX_PATH,
-                          "file://%sFolder.jpg", psz_dir );
-                break;
-
-                case 1:
-                /* Windows AlbumArtSmall.jpg == small version of Folder.jpg */
-                snprintf( psz_filename, MAX_PATH,
-                      "file://%sAlbumArtSmall.jpg", psz_dir );
-                break;
-
-                case 2:
-                /* KDE (?) .folder.png */
-                snprintf( psz_filename, MAX_PATH,
-                      "file://%s.folder.png", psz_dir );
-                break;
-            }
-
-            if( utf8_stat( psz_filename+7, &a ) != -1 )
-            {
-                vlc_meta_SetArtURL( p_item->p_meta, psz_filename );
-                b_have_art = VLC_TRUE;
-            }
-        }
-
-        free( psz_dir );
+        psz_buf++;
+        *psz_buf = '\0';
+    }
+    else
+    {
+        *psz_dir = '\0';
     }
 
-    i_meta = input_CurrentMetaFlags( p_item->p_meta );
-    p_me->i_mandatory &= ~i_meta;
-    p_me->i_optional &= ~i_meta;
-    if( p_me->i_mandatory )
-        return VLC_EGENERIC;
-    else
-        return VLC_SUCCESS;
+    for( i = 0; b_have_art == VLC_FALSE && i < 3; i++ )
+    {
+        switch( i )
+        {
+            case 0:
+            /* Windows Folder.jpg */
+            snprintf( psz_filename, MAX_PATH,
+                      "file://%sFolder.jpg", psz_dir );
+            break;
+
+            case 1:
+            /* Windows AlbumArtSmall.jpg == small version of Folder.jpg */
+            snprintf( psz_filename, MAX_PATH,
+                  "file://%sAlbumArtSmall.jpg", psz_dir );
+            break;
+
+            case 2:
+            /* KDE (?) .folder.png */
+            snprintf( psz_filename, MAX_PATH,
+                  "file://%s.folder.png", psz_dir );
+            break;
+        }
+
+        if( utf8_stat( psz_filename+7, &a ) != -1 )
+        {
+            vlc_meta_SetArtURL( p_item->p_meta, psz_filename );
+            b_have_art = VLC_TRUE;
+        }
+    }
+
+    free( psz_dir );
+
+    return b_have_art ? VLC_SUCCESS : VLC_EGENERIC;
 }

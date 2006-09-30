@@ -102,10 +102,12 @@ int input_ArtFetch( playlist_t *p_playlist, input_item_t *p_item )
         if( !p_module )
         {
             msg_Dbg( p_playlist, "unable to find art" );
+            PL_UNLOCK;
             return VLC_EGENERIC;
         }
         module_Unneed( p_playlist, p_module );
         p_playlist->p_private = NULL;
+        PL_UNLOCK;
 
         if( !p_item->p_meta->psz_arturl || !*p_item->p_meta->psz_arturl )
             return VLC_EGENERIC;
@@ -141,8 +143,6 @@ int input_FindArtInCache( playlist_t *p_playlist, input_item_t *p_item )
         /* Check if file exists */
         if( utf8_stat( psz_filename+7, &a ) == 0 )
         {
-            msg_Dbg( p_playlist, "album art %s already exists in cache"
-                             , psz_filename );
             vlc_meta_SetArtURL( p_item->p_meta, psz_filename );
             return VLC_SUCCESS;
         }
@@ -211,7 +211,7 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
         free( p_buffer );
         fclose( p_file );
         stream_Delete( p_stream );
-        msg_Dbg( p_playlist, "Album art saved to %s\n", psz_filename );
+        msg_Dbg( p_playlist, "album art saved to %s\n", psz_filename );
         free( p_item->p_meta->psz_arturl );
         p_item->p_meta->psz_arturl = strdup( psz_filename );
         i_status = VLC_SUCCESS;
@@ -228,7 +228,6 @@ uint32_t input_CurrentMetaFlags( vlc_meta_t *p_meta )
         i_meta |= VLC_META_ENGINE_ ## b;
 
     CHECK( title, TITLE )
-    CHECK( author, AUTHOR )
     CHECK( artist, ARTIST )
     CHECK( genre, GENRE )
     CHECK( copyright, COPYRIGHT )

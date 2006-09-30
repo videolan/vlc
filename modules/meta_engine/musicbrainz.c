@@ -162,7 +162,8 @@ static int FindMetaMBId( vlc_object_t *p_this )
 {
     meta_engine_t *p_me = (meta_engine_t *)p_this;
     input_item_t *p_item = p_me->p_item;
-    int i_ret = GetData( VLC_OBJECT(p_me), p_item, VLC_FALSE );
+    int i_ret = GetData( VLC_OBJECT(p_me), p_item,
+                         p_me->i_mandatory & VLC_META_ENGINE_ART_URL );
 
     if( !i_ret )
     {
@@ -176,9 +177,9 @@ static int FindMetaMBId( vlc_object_t *p_this )
 
 static int FindArt( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist;
-    input_item_t *p_item = (input_item_t *)p_playlist->p_private;
+    playlist_t *p_playlist = (playlist_t *)p_this;
+    input_item_t *p_item = (input_item_t *)(p_playlist->p_private);
     assert( p_item );
 
-    return GetData( p_playlist, p_item, VLC_TRUE );
+    return GetData( VLC_OBJECT(p_playlist), p_item, VLC_TRUE );
 }

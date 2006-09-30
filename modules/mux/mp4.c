@@ -1047,7 +1047,6 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
         } }
 
         ADD_META_BOX( title, "nam" );
-        ADD_META_BOX( author, "aut" );
         ADD_META_BOX( artist, "ART" );
         ADD_META_BOX( genre, "gen" );
         ADD_META_BOX( copyright, "cpy" );
