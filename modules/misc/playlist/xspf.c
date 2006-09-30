@@ -172,8 +172,8 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     }
     if( !psz )
     {
-        psz = p_item->p_input->p_meta->psz_author ?
-                        strdup( p_item->p_input->p_meta->psz_author ):
+        psz = p_item->p_input->p_meta->psz_artist ?
+                        strdup( p_item->p_input->p_meta->psz_artist ):
                         strdup( "" );
     }
     psz_temp = convert_xml_special_chars( psz );

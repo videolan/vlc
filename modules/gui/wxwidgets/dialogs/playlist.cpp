@@ -515,15 +515,15 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
     wxString msg;
     wxString duration = wxU( "" );
 
-    char *psz_author;
+    char *psz_artist;
     if( p_item->p_input->p_meta )
     {
-        psz_author= p_item->p_input->p_meta->psz_artist ?
+        psz_artist= p_item->p_input->p_meta->psz_artist ?
                         strdup( p_item->p_input->p_meta->psz_artist ) :
                         strdup("");
     }
     else
-        psz_author = strdup( "" );
+        psz_artist = strdup( "" );
 
     char psz_duration[MSTRTIME_MAX_SIZE];
     mtime_t dur = p_item->p_input->i_duration;
@@ -535,16 +535,16 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
                          wxU( " )" ) );
     }
 
-    if( !strcmp( psz_author, "" ) || p_item->p_input->b_fixed_name == VLC_TRUE )
+    if( !strcmp( psz_artist, "" ) || p_item->p_input->b_fixed_name == VLC_TRUE )
     {
         msg = wxString( wxU( p_item->p_input->psz_name ) ) + duration;
     }
     else
     {
-        msg = wxString(wxU( psz_author )) + wxT(" - ") +
+        msg = wxString(wxU( psz_artist )) + wxT(" - ") +
               wxString(wxU(p_item->p_input->psz_name)) + duration;
     }
-    free( psz_author );
+    free( psz_artist );
     treectrl->SetItemText( item , msg );
     treectrl->SetItemImage( item, p_item->p_input->i_type );
 

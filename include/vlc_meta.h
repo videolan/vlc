@@ -27,7 +27,6 @@
 /* VLC meta name */
 #define VLC_META_INFO_CAT           N_("Meta-information")
 #define VLC_META_TITLE              N_("Title")
-#define VLC_META_AUTHOR             N_("Author")
 #define VLC_META_ARTIST             N_("Artist")
 #define VLC_META_GENRE              N_("Genre")
 #define VLC_META_COPYRIGHT          N_("Copyright")
@@ -56,7 +55,6 @@
 struct vlc_meta_t
 {
     char *psz_title;
-    char *psz_author;
     char *psz_artist;
     char *psz_genre;
     char *psz_copyright;
@@ -87,7 +85,6 @@ struct vlc_meta_t
 
 #define vlc_meta_SetTitle( meta, b ) vlc_meta_Set( meta, title, b );
 #define vlc_meta_SetArtist( meta, b ) vlc_meta_Set( meta, artist, b );
-#define vlc_meta_SetAuthor( meta, b ) vlc_meta_Set( meta, author, b );
 #define vlc_meta_SetGenre( meta, b ) vlc_meta_Set( meta, genre, b );
 #define vlc_meta_SetCopyright( meta, b ) vlc_meta_Set( meta, copyright, b );
 #define vlc_meta_SetAlbum( meta, b ) vlc_meta_Set( meta, album, b );
@@ -108,7 +105,6 @@ static inline vlc_meta_t *vlc_meta_New( void )
     vlc_meta_t *m = (vlc_meta_t*)malloc( sizeof( vlc_meta_t ) );
     if( !m ) return NULL;
     m->psz_title = NULL;
-    m->psz_author = NULL;
     m->psz_artist = NULL;
     m->psz_genre = NULL;
     m->psz_copyright = NULL;
@@ -131,7 +127,6 @@ static inline vlc_meta_t *vlc_meta_New( void )
 static inline void vlc_meta_Delete( vlc_meta_t *m )
 {
     free( m->psz_title );
-    free( m->psz_author );
     free( m->psz_artist );
     free( m->psz_genre );
     free( m->psz_copyright );
@@ -160,7 +155,6 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
         dst->psz_##a = strdup( src->psz_##a ); \
     }
     COPY_FIELD( title );
-    COPY_FIELD( author );
     COPY_FIELD( artist );
     COPY_FIELD( genre );
     COPY_FIELD( copyright );
@@ -192,7 +186,6 @@ struct meta_export_t
 };
 
 #define VLC_META_ENGINE_TITLE           0x00000001
-#define VLC_META_ENGINE_AUTHOR          0x00000002
 #define VLC_META_ENGINE_ARTIST          0x00000004
 #define VLC_META_ENGINE_GENRE           0x00000008
 #define VLC_META_ENGINE_COPYRIGHT       0x00000010

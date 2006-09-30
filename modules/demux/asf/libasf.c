@@ -672,7 +672,7 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     asf_object_content_description_t *p_cd =
         (asf_object_content_description_t *)p_obj;
     uint8_t *p_peek, *p_data;
-    int i_peek, i_title, i_author, i_copyright, i_description, i_rating;
+    int i_peek, i_title, i_artist, i_copyright, i_description, i_rating;
     vlc_iconv_t cd = (vlc_iconv_t)-1;
     const char *ib = NULL;
     char *ob = NULL;
@@ -701,13 +701,13 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     p_data = p_peek + 24;
 
     i_title = GetWLE( p_data ); p_data += 2;
-    i_author= GetWLE( p_data ); p_data += 2;
+    i_artist= GetWLE( p_data ); p_data += 2;
     i_copyright     = GetWLE( p_data ); p_data += 2;
     i_description   = GetWLE( p_data ); p_data += 2;
     i_rating        = GetWLE( p_data ); p_data += 2;
 
     GETSTRINGW( p_cd->psz_title, i_title );
-    GETSTRINGW( p_cd->psz_author, i_author );
+    GETSTRINGW( p_cd->psz_artist, i_artist );
     GETSTRINGW( p_cd->psz_copyright, i_copyright );
     GETSTRINGW( p_cd->psz_description, i_description );
     GETSTRINGW( p_cd->psz_rating, i_rating );
@@ -716,9 +716,9 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
-             "read \"content description object\" title:\"%s\" author:\"%s\" copyright:\"%s\" description:\"%s\" rating:\"%s\"",
+             "read \"content description object\" title:\"%s\" artist:\"%s\" copyright:\"%s\" description:\"%s\" rating:\"%s\"",
              p_cd->psz_title,
-             p_cd->psz_author,
+             p_cd->psz_artist,
              p_cd->psz_copyright,
              p_cd->psz_description,
              p_cd->psz_rating );
@@ -734,7 +734,7 @@ static void ASF_FreeObject_content_description( asf_object_t *p_obj)
         (asf_object_content_description_t *)p_obj;
 
     FREENULL( p_cd->psz_title );
-    FREENULL( p_cd->psz_author );
+    FREENULL( p_cd->psz_artist );
     FREENULL( p_cd->psz_copyright );
     FREENULL( p_cd->psz_description );
     FREENULL( p_cd->psz_rating );

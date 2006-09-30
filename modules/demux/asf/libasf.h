@@ -264,7 +264,7 @@ typedef struct
     ASF_OBJECT_COMMON
 
     char *psz_title;
-    char *psz_author;
+    char *psz_artist;
     char *psz_copyright;
     char *psz_description;
     char *psz_rating;

@@ -290,10 +290,10 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
 
     wxString msg;
     wxString duration = wxU( "" );
-    char *psz_author = p_item->p_input->p_meta->psz_artist ? 
+    char *psz_artist = p_item->p_input->p_meta->psz_artist ?
                         strdup( p_item->p_input->p_meta->psz_artist ) :
                         strdup( "" );
-    if( !psz_author )
+    if( !psz_artist )
     {
         UnlockPlaylist( p_intf->p_sys, p_playlist );
         return;
@@ -309,16 +309,16 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
                          wxU( " )" ) );
     }
 
-    if( !strcmp( psz_author, "" ) || p_item->p_input->b_fixed_name == VLC_TRUE )
+    if( !strcmp( psz_artist, "" ) || p_item->p_input->b_fixed_name == VLC_TRUE )
     {
         msg = wxString( wxU( p_item->p_input->psz_name ) ) + duration;
     }
     else
     {
-        msg = wxString(wxU( psz_author )) + wxT(" - ") +
+        msg = wxString(wxU( psz_artist )) + wxT(" - ") +
                     wxString(wxU(p_item->p_input->psz_name)) + duration;
     }
-    free( psz_author );
+    free( psz_artist );
     treectrl->SetItemText( item , msg );
     treectrl->SetItemImage( item, p_item->p_input->i_type );
 

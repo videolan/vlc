@@ -817,9 +817,9 @@ static int DemuxInit( demux_t *p_demux )
         {
             vlc_meta_SetTitle( p_sys->meta, p_cd->psz_title );
         }
-        if( p_cd->psz_author && *p_cd->psz_author )
+        if( p_cd->psz_artist && *p_cd->psz_artist )
         {
-             vlc_meta_SetAuthor( p_sys->meta, p_cd->psz_author );
+             vlc_meta_SetArtist( p_sys->meta, p_cd->psz_artist );
         }
         if( p_cd->psz_copyright && *p_cd->psz_copyright )
         {

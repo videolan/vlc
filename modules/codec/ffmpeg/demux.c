@@ -413,7 +413,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->ic->title[0] )
                 vlc_meta_SetTitle( p_meta, p_sys->ic->title );
             if( p_sys->ic->author[0] )
-                vlc_meta_SetAuthor( p_meta, p_sys->ic->author );
+                vlc_meta_SetArtist( p_meta, p_sys->ic->author );
             if( p_sys->ic->copyright[0] )
                 vlc_meta_SetCopyright( p_meta, p_sys->ic->copyright );
             if( p_sys->ic->comment[0] )

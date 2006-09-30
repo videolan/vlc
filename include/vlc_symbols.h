@@ -549,6 +549,7 @@ struct module_symbols_t
     void *__input_ArtFetch_deprecated;
     void *input_AskForArt_deprecated;
     int (*playlist_AskForArtEnqueue_inner) (playlist_t *, input_item_t *);
+    uint32_t (*input_CurrentMetaFlags_inner) (vlc_meta_t *p_meta);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1023,6 +1024,7 @@ struct module_symbols_t
 #  define input_ItemAddInfo (p_symbols)->input_ItemAddInfo_inner
 #  define input_ItemAddOptionNoDup (p_symbols)->input_ItemAddOptionNoDup_inner
 #  define playlist_AskForArtEnqueue (p_symbols)->playlist_AskForArtEnqueue_inner
+#  define input_CurrentMetaFlags (p_symbols)->input_CurrentMetaFlags_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1500,6 +1502,7 @@ struct module_symbols_t
     ((p_symbols)->input_ItemAddInfo_inner) = input_ItemAddInfo; \
     ((p_symbols)->input_ItemAddOptionNoDup_inner) = input_ItemAddOptionNoDup; \
     ((p_symbols)->playlist_AskForArtEnqueue_inner) = playlist_AskForArtEnqueue; \
+    ((p_symbols)->input_CurrentMetaFlags_inner) = input_CurrentMetaFlags; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_input_item_GetInfo_deprecated = NULL; \
     (p_symbols)->vlc_input_item_AddInfo_deprecated = NULL; \

@@ -805,7 +805,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     vlc_meta_SetArtist( p_meta, psz_utf );
                     break;
                 case FOURCC_0xa9aut:
-                    vlc_meta_SetAuthor( p_meta, psz_utf );
+                    vlc_meta_SetArtist( p_meta, psz_utf );
                     break;
                 case FOURCC_0xa9ART:
                     vlc_meta_SetArtist( p_meta, psz_utf );

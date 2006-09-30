@@ -166,14 +166,14 @@ static int Demux( demux_t *p_demux )
 
         char *psz_base_asx = NULL;
         char *psz_title_asx = NULL;
-        char *psz_author_asx = NULL;
+        char *psz_artist_asx = NULL;
         char *psz_copyright_asx = NULL;
         char *psz_moreinfo_asx = NULL;
         char *psz_abstract_asx = NULL;
         
         char *psz_base_entry = NULL;
         char *psz_title_entry = NULL;
-        char *psz_author_entry = NULL;
+        char *psz_artist_entry = NULL;
         char *psz_copyright_entry = NULL;
         char *psz_moreinfo_entry = NULL;
         char *psz_abstract_entry = NULL;
@@ -292,7 +292,7 @@ static int Demux( demux_t *p_demux )
                 psz_backup = psz_parse+=8;
                 if( ( psz_parse = strcasestr( psz_parse, "</Author>" ) ) )
                 {
-                    StoreString( p_demux, (b_entry ? &psz_author_entry : &psz_author_asx), psz_backup, psz_parse );
+                    StoreString( p_demux, (b_entry ? &psz_artist_entry : &psz_artist_asx), psz_backup, psz_parse );
                     psz_parse += 9;
                 }
                 else continue;
@@ -379,7 +379,7 @@ static int Demux( demux_t *p_demux )
                 /* cleanup entry */
                 FREENULL( psz_title_entry )
                 FREENULL( psz_base_entry )
-                FREENULL( psz_author_entry )
+                FREENULL( psz_artist_entry )
                 FREENULL( psz_copyright_entry )
                 FREENULL( psz_moreinfo_entry )
                 FREENULL( psz_abstract_entry )
@@ -429,7 +429,7 @@ static int Demux( demux_t *p_demux )
                             input_ItemCopyOptions( p_current->p_input, p_entry );
                             p_entry->p_meta = vlc_meta_New();
                             if( psz_title_entry ) vlc_meta_SetTitle( p_entry->p_meta, psz_title_entry );
-                            if( psz_author_entry ) vlc_meta_SetAuthor( p_entry->p_meta, psz_author_entry );
+                            if( psz_artist_entry ) vlc_meta_SetArtist( p_entry->p_meta, psz_artist_entry );
                             if( psz_copyright_entry ) vlc_meta_SetCopyright( p_entry->p_meta, psz_copyright_entry );
                             if( psz_moreinfo_entry ) vlc_meta_SetURL( p_entry->p_meta, psz_moreinfo_entry );
                             if( psz_abstract_entry ) vlc_meta_SetDescription( p_entry->p_meta, psz_abstract_entry );
@@ -452,14 +452,14 @@ static int Demux( demux_t *p_demux )
                 vlc_mutex_lock( &p_current->p_input->lock );
                 if( !p_current->p_input->p_meta ) p_current->p_input->p_meta = vlc_meta_New();
                 if( psz_title_asx ) vlc_meta_SetTitle( p_current->p_input->p_meta, psz_title_asx );
-                if( psz_author_asx ) vlc_meta_SetAuthor( p_current->p_input->p_meta, psz_author_asx );
+                if( psz_artist_asx ) vlc_meta_SetArtist( p_current->p_input->p_meta, psz_artist_asx );
                 if( psz_copyright_asx ) vlc_meta_SetCopyright( p_current->p_input->p_meta, psz_copyright_asx );
                 if( psz_moreinfo_asx ) vlc_meta_SetURL( p_current->p_input->p_meta, psz_moreinfo_asx );
                 if( psz_abstract_asx ) vlc_meta_SetDescription( p_current->p_input->p_meta, psz_abstract_asx );
                 vlc_mutex_unlock( &p_current->p_input->lock );
                 FREENULL( psz_base_asx );
                 FREENULL( psz_title_asx );
-                FREENULL( psz_author_asx );
+                FREENULL( psz_artist_asx );
                 FREENULL( psz_copyright_asx );
                 FREENULL( psz_moreinfo_asx );
                 FREENULL( psz_abstract_asx );
