@@ -1588,7 +1588,7 @@ dnl Taglibplugin
 dnl
 AC_ARG_ENABLE(taglib,
   [  --enable-taglib Taglib support (default disabled) ])
-  AS_IF([test "x${enable_taglib}" = "xyes"],[
+  AS_IF([test "${enable_taglib}" = "yes"],[
     PKG_CHECK_MODULES(TAGLIB, libtag,
       [ VLC_ADD_PLUGINS([taglib])
         VLC_ADD_LDFLAGS([taglib],[$TAGLIB_LIBS])
