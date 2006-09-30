@@ -5,6 +5,8 @@
  * $Id$
  *
  * Authors: Mark Moriarty
+ *          Sigmund Augdal Helberg <dnumgis@videolan.org>
+ *          Antoine Cellerier <dionoea . videolan \ org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,12 +29,17 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
+#include <time.h>
+
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
 #include "vlc_filter.h"
 #include "vlc_block.h"
 #include "vlc_osd.h"
+#include "vlc_playlist.h"
+#include "vlc_meta.h"
+#include "vlc_input.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -74,7 +81,17 @@ struct filter_sys_t
 };
 
 #define MSG_TEXT N_("Text")
-#define MSG_LONGTEXT N_("Marquee text to display.")
+#define MSG_LONGTEXT N_( \
+    "Marquee text to display. " \
+    "(Available format strings: " \
+    "Time related: %Y = year, %m = month, %d = day, %H = hour, " \
+    "%M = minute, %S = second, ... " \
+    "Meta data related: $a = artist, $b = album, $c = copyright, " \
+    "$d = description, $e = encoded by, $g = genre, " \
+    "$l = language, $n = track num, $p = now playing, " \
+    "$r = rating, $t = title, $u = url, $A = date, " \
+    "$D = duration, $F = full name with path, $L = time left " \
+    "$N = name, $P = publisher, $T = time) ")
 #define POSX_TEXT N_("X offset")
 #define POSX_LONGTEXT N_("X offset, from the left screen edge." )
 #define POSY_TEXT N_("Y offset")
@@ -140,6 +157,7 @@ vlc_module_begin();
 
     set_description( _("Marquee display") );
     add_shortcut( "marq" );
+    add_shortcut( "time" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -217,6 +235,212 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_filter->p_libvlc_global , "marq-opacity");
     var_Destroy( p_filter->p_libvlc_global , "marq-size");
 }
+/****************************************************************************
+ * String formating functions
+ ****************************************************************************/
+
+static char *FormatTime(char *tformat )
+{
+    char buffer[255];
+    time_t curtime;
+#if defined(HAVE_LOCALTIME_R)
+    struct tm loctime;
+#else
+    struct tm *loctime;
+#endif
+
+    /* Get the current time.  */
+    curtime = time( NULL );
+
+    /* Convert it to local time representation.  */
+#if defined(HAVE_LOCALTIME_R)
+    localtime_r( &curtime, &loctime );
+    strftime( buffer, 255, tformat, &loctime );
+#else
+    loctime = localtime( &curtime );
+    strftime( buffer, 255, tformat, loctime );
+#endif
+    return strdup( buffer );
+}
+
+#define INSERT_STRING( check, string )                              \
+                    if( check && string )                           \
+                    {                                               \
+                        int len = strlen( string );                 \
+                        dst = realloc( dst,                         \
+                                       i_size = i_size + len + 1 ); \
+                        strncpy( d, string, len+1 );                \
+                        d += len;                                   \
+                    }                                               \
+                    else                                            \
+                    {                                               \
+                        *d = '-';                                   \
+                        d++;                                        \
+                    }
+char *FormatMeta( vlc_object_t *p_object, char *string )
+{
+    char *s = string;
+    char *dst = malloc( 1000 );
+    char *d = dst;
+    int b_is_format = 0;
+    char buf[10];
+    int i_size = strlen( string );
+
+    playlist_t *p_playlist = pl_Yield( p_object );
+    input_thread_t *p_input = p_playlist->p_input;
+    input_item_t *p_item = NULL;
+    pl_Release( p_object );
+    if( p_input )
+    {
+        vlc_object_yield( p_input );
+        p_item = p_input->input.p_item;
+        if( p_item )
+            vlc_mutex_lock( &p_item->lock );
+    }
+
+    sprintf( dst, string );
+
+    while( *s )
+    {
+        if( b_is_format )
+        {
+            switch( *s )
+            {
+                case 'a':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_artist );
+                    break;
+                case 'b':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_album );
+                    break;
+                case 'c':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_copyright );
+                    break;
+                case 'd':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_description );
+                    break;
+                case 'e':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_encodedby );
+                    break;
+                case 'g':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_genre );
+                    break;
+                case 'l':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_language );
+                    break;
+                case 'n':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_tracknum );
+                    break;
+                case 'p':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_nowplaying );
+                    break;
+                case 'r':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_rating );
+                    break;
+                case 't':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_title );
+                    break;
+                case 'u':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_url );
+                    break;
+                case 'A':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_date );
+                    break;
+                case 'D':
+                    if( p_item )
+                    {
+                        sprintf( buf, "%02d:%02d:%02d",
+                                 (int)(p_item->i_duration/(3600000000)),
+                                 (int)((p_item->i_duration/(60000000))%60),
+                                 (int)((p_item->i_duration/1000000)%60) );
+                    }
+                    else
+                    {
+                        sprintf( buf, "--:--:--" );
+                    }
+                    INSERT_STRING( 1, buf );
+                    break;
+                case 'F':
+                    INSERT_STRING( p_item, p_item->psz_uri );
+                    break;
+                case 'L':
+                    if( p_item && p_input )
+                    {
+                        sprintf( buf, "%02d:%02d:%02d",
+                     (int)((p_item->i_duration-p_input->i_time)/(3600000000)),
+                     (int)(((p_item->i_duration-p_input->i_time)/(60000000))%60),
+                     (int)(((p_item->i_duration-p_input->i_time)/1000000)%60) );
+                    }
+                    else
+                    {
+                        sprintf( buf, "--:--:--" );
+                    }
+                    INSERT_STRING( 1, buf );
+                    break;
+                case 'N':
+                    INSERT_STRING( p_item, p_item->psz_name );
+                    break;
+                case 'P':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_publisher );
+                    break;
+                case 'T':
+                    if( p_input )
+                    {
+                        sprintf( buf, "%02d:%02d:%02d",
+                                 (int)(p_input->i_time/(3600000000)),
+                                 (int)((p_input->i_time/(60000000))%60),
+                                 (int)((p_input->i_time/1000000)%60) );
+                    }
+                    else
+                    {
+                        sprintf( buf, "--:--:--" );
+                    }
+                    INSERT_STRING( 1, buf );
+                    break;
+
+
+                default:
+                    *d = *s;
+                    d++;
+                    break;
+            }
+            b_is_format = 0;
+        }
+        else if( *s == '$' )
+        {
+            b_is_format = 1;
+        }
+        else
+        {
+            *d = *s;
+            d++;
+        }
+        s++;
+    }
+    *d = '\0';
+
+    if( p_input )
+    {
+        vlc_object_release( p_input );
+        if( p_item )
+            vlc_mutex_unlock( &p_item->lock );
+    }
+
+    return dst;
+}
 
 /****************************************************************************
  * Filter: the whole thing
@@ -229,16 +453,17 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_t *p_spu;
     video_format_t fmt;
     time_t t;
+    char *buf;
 
     if( p_sys->last_time == time( NULL ) )
     {
         return NULL;
     }
 
-    if( p_sys->b_need_update == VLC_FALSE )
+/*    if( p_sys->b_need_update == VLC_FALSE )
     {
         return NULL;
-    }
+    }*/
 
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
@@ -258,7 +483,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     t = p_sys->last_time = time( NULL );
 
-    p_spu->p_region->psz_text = strdup(p_sys->psz_marquee);
+    buf = FormatTime( p_sys->psz_marquee );
+    p_spu->p_region->psz_text = FormatMeta( VLC_OBJECT( p_filter ), buf );
+    free( buf );
     p_spu->i_start = date;
     p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout * 1000;
     p_spu->b_ephemer = VLC_TRUE;
