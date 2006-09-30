@@ -35,38 +35,50 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int FindMeta( vlc_object_t * );
+static int FindArt( vlc_object_t * );
+static int FindMetaMBId( vlc_object_t *p_this );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 
 vlc_module_begin();
-/*    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );*/
     set_shortname( N_( "MusicBrainz" ) );
     set_description( _("MusicBrainz meta data") );
 
-    set_capability( "meta fetcher", 80 );
-    set_callbacks( FindMeta, NULL );
+    set_capability( "meta fetcher", 10 );
+        /* This meta fetcher module only retrieves the musicbrainz track id
+         * and stores it
+         * TODO:
+         *  - Actually do it
+         *  - Also store the album id
+         * */
+        set_callbacks( FindMetaMBId, NULL );
+    add_submodule();
+        /* This art finder module fetches the album ID from musicbrainz and
+         * uses it to fetch the amazon ASIN from musicbrainz.
+         * TODO:
+         *  - Add ability to reuse MB album ID if we already have it
+         */
+        set_capability( "art finder", 80 );
+        set_callbacks( FindArt, NULL );
 vlc_module_end();
 
 /*****************************************************************************
  *****************************************************************************/
-static int FindMeta( vlc_object_t *p_this )
+
+static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
+                    vlc_bool_t b_art )
 {
-    meta_engine_t *p_me = (meta_engine_t *)p_this;
-    input_item_t *p_item = p_me->p_item;
-
-    char *psz_title = NULL;
-    char *psz_artist = NULL;
-    char *psz_album = NULL;
-
     char psz_buf[256];
     char psz_data[256];
     char i_album_count, i;
     char *ppsz_args[4];
     uint32_t i_meta;
+
+    char *psz_title;
+    char *psz_artist;
+    char *psz_album;
 
     if( !p_item->p_meta ) return VLC_EGENERIC;
     psz_artist = p_item->p_meta->psz_artist;
@@ -75,12 +87,14 @@ static int FindMeta( vlc_object_t *p_this )
 
     if( !psz_artist || !psz_album )
         return VLC_EGENERIC;
+
     musicbrainz_t p_mb;
 
     p_mb = mb_New();
 #ifdef WIN32
     mb_WSAInit( p_mb );
 #endif
+
     mb_SetDepth( p_mb, 2 );
     ppsz_args[0] = psz_album;
     ppsz_args[1] = psz_artist;
@@ -94,7 +108,7 @@ static int FindMeta( vlc_object_t *p_this )
         "</mq:FindAlbum>\n", ppsz_args ) )
     {
         mb_GetQueryError( p_mb, psz_buf, 256 );
-        msg_Err( p_me, "Query failed: %s\n", psz_buf );
+        msg_Err( p_obj, "Query failed: %s\n", psz_buf );
         mb_Delete( p_mb );
         return VLC_EGENERIC;
     }
@@ -102,12 +116,12 @@ static int FindMeta( vlc_object_t *p_this )
     i_album_count = mb_GetResultInt( p_mb, MBE_GetNumAlbums );
     if( i_album_count < 1 )
     {
-        msg_Err( p_me, "No albums found.\n" );
         mb_Delete( p_mb );
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_me, "Found %d albums.\n", i_album_count );
+    /** \todo Get the MB Track ID and store it */
+    msg_Dbg( p_obj, "found %d albums.\n", i_album_count );
 
     for( i = 1; i <= i_album_count; i++ )
     {
@@ -116,12 +130,18 @@ static int FindMeta( vlc_object_t *p_this )
 
         mb_GetResultData( p_mb, MBE_AlbumGetAlbumId, psz_data, 256 );
         mb_GetIDFromURL( p_mb, psz_data, psz_buf, 256 );
-        msg_Dbg( p_me, "Album Id: %s", psz_buf );
+        msg_Dbg( p_obj, "album Id: %s", psz_buf );
+
+
+        if( !b_art )
+            break;
 
         if( mb_GetResultData( p_mb, MBE_AlbumGetAmazonAsin, psz_buf, 256 ) )
         {
-            msg_Dbg( p_me, "Amazon ASIN: %s", psz_buf );
-            sprintf( psz_data, "http://images.amazon.com/images/P/%s.01._SCLZZZZZZZ_.jpg", psz_buf );
+            msg_Dbg( p_obj, "Amazon ASIN: %s", psz_buf );
+            snprintf( psz_data, 255,
+                    "http://images.amazon.com/images/P/%s.01._SCLZZZZZZZ_.jpg",
+                    psz_buf );
             vlc_meta_SetArtURL( p_item->p_meta, psz_data );
             break;
         }
@@ -129,14 +149,36 @@ static int FindMeta( vlc_object_t *p_this )
 #ifdef WIN32
     mb_WSAInit( p_mb );
 #endif
-
     mb_Delete( p_mb );
 
-    i_meta = input_CurrentMetaFlags( p_item->p_meta );
-    p_me->i_mandatory &= ~i_meta;
-    p_me->i_optional &= ~i_meta;
-    if( p_me->i_mandatory )
-        return VLC_EGENERIC;
-    else
+    if( !b_art )
         return VLC_SUCCESS;
+    else
+        return p_item->p_meta->psz_arturl && *p_item->p_meta->psz_arturl ?
+               VLC_SUCCESS : VLC_EGENERIC;
+}
+
+static int FindMetaMBId( vlc_object_t *p_this )
+{
+    meta_engine_t *p_me = (meta_engine_t *)p_this;
+    input_item_t *p_item = p_me->p_item;
+    int i_ret = GetData( VLC_OBJECT(p_me), p_item, VLC_FALSE );
+
+    if( !i_ret )
+    {
+        uint32_t i_meta = input_CurrentMetaFlags( p_item->p_meta );
+        p_me->i_mandatory &= ~i_meta;
+        p_me->i_optional &= ~i_meta;
+        return p_me->i_mandatory ? VLC_EGENERIC : VLC_SUCCESS;
+    }
+    return VLC_EGENERIC;
+}
+
+static int FindArt( vlc_object_t *p_this )
+{
+    playlist_t *p_playlist;
+    input_item_t *p_item = (input_item_t *)p_playlist->p_private;
+    assert( p_item );
+
+    return GetData( p_playlist, p_item, VLC_TRUE );
 }
