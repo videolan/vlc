@@ -90,8 +90,8 @@ struct filter_sys_t
     "$d = description, $e = encoded by, $g = genre, " \
     "$l = language, $n = track num, $p = now playing, " \
     "$r = rating, $t = title, $u = url, $A = date, " \
-    "$D = duration, $F = full name with path, $L = time left " \
-    "$N = name, $P = publisher, $T = time) ")
+    "$D = duration, $F = full name with path, $L = time left, " \
+    "$N = name, $P = publisher, $T = time, $_ = new line) ")
 #define POSX_TEXT N_("X offset")
 #define POSX_LONGTEXT N_("X offset, from the left screen edge." )
 #define POSY_TEXT N_("Y offset")
@@ -410,7 +410,10 @@ char *FormatMeta( vlc_object_t *p_object, char *string )
                     }
                     INSERT_STRING( 1, buf );
                     break;
-
+                case '_':
+                    *d = '\n';
+                    d++;
+                    break;
 
                 default:
                     *d = *s;
