@@ -31,6 +31,7 @@
 #include <QDoubleSpinBox>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QVector>
 #include "ui/input_stats.h"
 #include "qt4.hpp"
 #include <assert.h>
@@ -61,7 +62,7 @@ public:
                                           module_config_t*,QWidget* );
     static ConfigControl * createControl( vlc_object_t*,
                                           module_config_t*,QWidget*,
-                                          QGridLayout *, int);
+                                          QGridLayout *, int& );
     void doApply( intf_thread_t *);
 protected:
     vlc_object_t *p_this;
@@ -92,7 +93,7 @@ class IntegerConfigControl : public VIntConfigControl
 {
 public:
     IntegerConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                          QGridLayout *, int );
+                          QGridLayout *, int& );
     IntegerConfigControl( vlc_object_t *, module_config_t *,
                           QLabel*, QSpinBox* );
     virtual ~IntegerConfigControl() {};
@@ -112,7 +113,7 @@ class IntegerRangeConfigControl : public IntegerConfigControl
 {
 public:
     IntegerRangeConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                               QGridLayout *, int );
+                               QGridLayout *, int& );
     IntegerRangeConfigControl( vlc_object_t *, module_config_t *,
                                QLabel*, QSpinBox* );
 private:
@@ -123,7 +124,7 @@ class IntegerListConfigControl : public VIntConfigControl
 {
 public:
     IntegerListConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                              bool, QGridLayout*, int );
+                              bool, QGridLayout*, int& );
     IntegerListConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                               QComboBox*, bool );
     virtual ~IntegerListConfigControl() {};
@@ -140,7 +141,7 @@ class BoolConfigControl : public VIntConfigControl
 {
 public:
     BoolConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                       QGridLayout *, int );
+                       QGridLayout *, int& );
     BoolConfigControl( vlc_object_t *, module_config_t *,
                        QLabel *, QCheckBox*, bool );
     virtual ~BoolConfigControl() {};
@@ -171,7 +172,7 @@ class FloatConfigControl : public VFloatConfigControl
 {
 public:
     FloatConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                        QGridLayout *, int );
+                        QGridLayout *, int& );
     FloatConfigControl( vlc_object_t *, module_config_t *,
                         QLabel*, QDoubleSpinBox* );
     virtual ~FloatConfigControl() {};
@@ -191,7 +192,7 @@ class FloatRangeConfigControl : public FloatConfigControl
 {
 public:
     FloatRangeConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                             QGridLayout *, int );
+                             QGridLayout *, int& );
     FloatRangeConfigControl( vlc_object_t *, module_config_t *,
                              QLabel*, QDoubleSpinBox* );
 private:
@@ -217,7 +218,7 @@ class StringConfigControl : public VStringConfigControl
 {
 public:
     StringConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                         QGridLayout *, int,  bool pwd );
+                         QGridLayout *, int&,  bool pwd );
     StringConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                          QLineEdit*,  bool pwd );
     virtual ~StringConfigControl() {};
@@ -234,7 +235,7 @@ class ModuleConfigControl : public VStringConfigControl
 {
 public:
     ModuleConfigControl( vlc_object_t *, module_config_t *, QWidget *, bool,
-                         QGridLayout*, int );
+                         QGridLayout*, int& );
     ModuleConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                          QComboBox*, bool );
     virtual ~ModuleConfigControl() {};
@@ -247,11 +248,32 @@ private:
     QComboBox *combo;
 };
 
+class ModuleListConfigControl : public VStringConfigControl
+{
+    Q_OBJECT;
+public:
+    ModuleListConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                             bool, QGridLayout*, int& );
+//    ModuleListConfigControl( vlc_object_t *, module_config_t *, QLabel *,
+//                         QComboBox*, bool );
+    virtual ~ModuleListConfigControl();
+    virtual QString getValue();
+    virtual void hide();
+    virtual void show();
+public slots:
+    void wakeUp_TheUserJustClickedOnSomething( int value );
+private:
+    void finish( bool );
+    QVector<QCheckBox*> modules;
+    QLabel *label;
+    QLineEdit *text;
+};
+
 class StringListConfigControl : public VStringConfigControl
 {
 public:
     StringListConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                             bool, QGridLayout*, int );
+                             bool, QGridLayout*, int& );
     StringListConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                              QComboBox*, bool );
     virtual ~StringListConfigControl() {};
