@@ -179,23 +179,20 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->p_style = malloc( sizeof( text_style_t ) );
     memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );
 
-    p_sys->i_xoff = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-x" );
-    p_sys->i_yoff = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-y" );
-    p_sys->i_timeout = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-timeout" );
-    p_sys->i_pos = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-position" );
-    p_sys->psz_marquee =  var_CreateGetString( p_filter->p_libvlc_global, "marq-marquee" );
-    p_sys->p_style->i_font_alpha = 255 - var_CreateGetInteger( p_filter->p_libvlc_global , "marq-opacity" );
-    p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-color" );
-    p_sys->p_style->i_font_size  = var_CreateGetInteger( p_filter->p_libvlc_global , "marq-size" );
+#define CREATE_VAR( stor, type, var ) \
+    p_sys->stor = var_CreateGet##type( p_filter->p_libvlc, var ); \
+    var_AddCallback( p_filter->p_libvlc, var, MarqueeCallback, p_sys );
 
-    var_AddCallback( p_filter->p_libvlc_global, "marq-x", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc_global, "marq-y", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc_global, "marq-marquee", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc_global, "marq-timeout", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc_global, "marq-position", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc_global, "marq-color", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc_global, "marq-opacity", MarqueeCallback, p_sys );
-    var_AddCallback( p_filter->p_libvlc_global, "marq-size", MarqueeCallback, p_sys );
+    CREATE_VAR( i_xoff, Integer, "marq-x" );
+    CREATE_VAR( i_yoff, Integer, "marq-y" );
+    CREATE_VAR( i_timeout,Integer, "marq-timeout" );
+    CREATE_VAR( i_pos, Integer, "marq-position" );
+    CREATE_VAR( psz_marquee, String, "marq-marquee" );
+    CREATE_VAR( p_style->i_font_alpha, Integer, "marq-opacity" );
+    CREATE_VAR( p_style->i_font_color, Integer, "marq-color" );
+    CREATE_VAR( p_style->i_font_size, Integer, "marq-size" );
+
+    p_sys->p_style->i_font_alpha = 255 - p_sys->p_style->i_font_alpha ;
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
@@ -217,23 +214,17 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys );
 
     /* Delete the marquee variables */
-    var_DelCallback( p_filter->p_libvlc_global, "marq-x", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc_global, "marq-y", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc_global, "marq-marquee", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc_global, "marq-timeout", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc_global, "marq-position", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc_global, "marq-color", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc_global, "marq-opacity", MarqueeCallback, p_sys );
-    var_DelCallback( p_filter->p_libvlc_global, "marq-size", MarqueeCallback, p_sys );
-
-    var_Destroy( p_filter->p_libvlc_global , "marq-marquee" );
-    var_Destroy( p_filter->p_libvlc_global , "marq-x" );
-    var_Destroy( p_filter->p_libvlc_global , "marq-y" );
-    var_Destroy( p_filter->p_libvlc_global , "marq-timeout" );
-    var_Destroy( p_filter->p_libvlc_global , "marq-position" );
-    var_Destroy( p_filter->p_libvlc_global , "marq-color");
-    var_Destroy( p_filter->p_libvlc_global , "marq-opacity");
-    var_Destroy( p_filter->p_libvlc_global , "marq-size");
+#define DEL_VAR(var) \
+    var_DelCallback( p_filter->p_libvlc, var, MarqueeCallback, p_sys ) \
+    var_Destroy( p_filter->p_libvlc, var );
+    DEL_VAR( "marq-x" );
+    DEL_VAR( "marq-y" );
+    DEL_VAR( "marq-marquee" );
+    DEL_VAR( "marq-timeout" );
+    DEL_VAR( "marq-position" );
+    DEL_VAR( "marq-color" );
+    DEL_VAR( "marq-opacity" );
+    DEL_VAR( "marq-size" );
 }
 /****************************************************************************
  * String formating functions
