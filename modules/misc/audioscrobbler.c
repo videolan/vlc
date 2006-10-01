@@ -4,7 +4,7 @@
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
  *
- * Authors: Rafaël Carré <rafael -dot- carre -at- gmail -dot- com>
+ * Authors: Rafaël Carré <funman at videolan org>
  *          Kenneth Ostby <kenneo -at- idi -dot- ntnu -dot- no>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -59,8 +59,7 @@ typedef struct audioscrobbler_song_t
     char        *psz_t;                /* track title      */
     char        *psz_b;                /* track album      */
     int         i_l;                   /* track length     */
-/* vlc can't retrieve musicbrainz id, so let's ignore it   */
-/*  int         i_m;  */               /* musicbrainz id   */
+    char        *psz_m;                /* musicbrainz id   */
     char        *psz_i;                /* date             */
     time_t      time_playing;          /* date (epoch)     */
 } audioscrobbler_song_t;
@@ -146,7 +145,7 @@ void DeleteQueue( audioscrobbler_queue_t *p_queue );
 
 /* data to submit */
 #define POST_DATA "u=%s&s=%s&a%%5B%d%%5D=%s&t%%5B%d%%5D=%s" \
-                  "&b%%5B%d%%5D=%s&m%%5B%d%%5D=&l%%5B%d%%5D=%d&i%%5B%d%%5D=%s"
+                  "&b%%5B%d%%5D=%s&m%%5B%d%%5D=%s&l%%5B%d%%5D=%d&i%%5B%d%%5D=%s"
 
 vlc_module_begin();
     set_category( CAT_INTERFACE );
@@ -378,7 +377,7 @@ static void Run( intf_thread_t *p_this )
                     i_song, p_sys->p_first_queue->p_queue[i_song]->psz_a,
                     i_song, p_sys->p_first_queue->p_queue[i_song]->psz_t,
                     i_song, p_sys->p_first_queue->p_queue[i_song]->psz_b,
-                    i_song,
+                    i_song, p_sys->p_first_queue->p_queue[i_song]->psz_m,
                     i_song, p_sys->p_first_queue->p_queue[i_song]->i_l,
                     i_song, p_sys->p_first_queue->p_queue[i_song]->psz_i
                 );
@@ -711,6 +710,9 @@ static int AddToQueue ( intf_thread_t *p_this )
     p_queue->p_queue[i_songs_nb]->psz_b =
         strdup( p_sys->p_current_song->psz_b );
 
+    p_queue->p_queue[i_songs_nb]->psz_m =
+        strdup( p_sys->p_current_song->psz_m );
+
     p_queue->p_queue[i_songs_nb]->psz_i =
         strdup( p_sys->p_current_song->psz_i );
 
@@ -1019,6 +1021,7 @@ static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input )
     char                *psz_title = NULL;
     char                *psz_artist = NULL;
     char                *psz_album = NULL;
+    char                *psz_trackid = NULL;
     int                 i_length = -1;
     vlc_bool_t          b_waiting;
     int                 i_status;
@@ -1077,6 +1080,19 @@ static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input )
             }
         }
 
+        if ( p_input->input.p_item->p_meta->psz_trackid )
+        {
+            psz_trackid = strdup( p_input->input.p_item->p_meta->psz_trackid );
+            if ( !psz_trackid )
+            {
+                goto error;
+            }
+        }
+        else
+        {
+            psz_trackid = calloc( 1, sizeof( char ) );
+        }
+
         if ( p_input->input.p_item->p_meta->psz_album )
         {
             psz_album = encode_URI_component(
@@ -1100,6 +1116,7 @@ static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input )
         p_sys->p_current_song->psz_a = strdup( psz_artist );
         p_sys->p_current_song->psz_t = strdup( psz_title );
         p_sys->p_current_song->psz_b = strdup( psz_album );
+        p_sys->p_current_song->psz_m = strdup( psz_trackid );
         p_sys->p_current_song->i_l = i_length;
         p_sys->b_queued = VLC_FALSE;
         p_sys->b_metadata_read = VLC_TRUE;
@@ -1111,6 +1128,7 @@ static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input )
         free( psz_title );
         free( psz_artist );
         free( psz_album );
+        free( psz_trackid );
 
         return VLC_SUCCESS;
     }
@@ -1136,5 +1154,6 @@ error:
     free( psz_artist );
     free( psz_album );
     free( psz_title );
+    free( psz_trackid );
     return VLC_ENOMEM;
 }

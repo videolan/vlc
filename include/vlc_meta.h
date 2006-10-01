@@ -70,6 +70,9 @@ struct vlc_meta_t
     char *psz_publisher;
     char *psz_encodedby;
     char *psz_arturl;
+    char *psz_trackid;
+    char *psz_artistid;
+    char *psz_albumid;
 
     int i_status;
 #if 0
@@ -99,6 +102,10 @@ struct vlc_meta_t
 #define vlc_meta_SetPublisher( meta, b ) vlc_meta_Set( meta, publisher, b );
 #define vlc_meta_SetEncodedBy( meta, b ) vlc_meta_Set( meta, encodedby, b );
 #define vlc_meta_SetArtURL( meta, b ) vlc_meta_Set( meta, arturl, b );
+#define vlc_meta_SetTrackID( meta, b ) vlc_meta_Set( meta, trackid, b );
+#define vlc_meta_SetArtistID( meta, b ) vlc_meta_Set( meta, artistid, b );
+#define vlc_meta_SetAlbumID( meta, b ) vlc_meta_Set( meta, albumid, b );
+
 
 static inline vlc_meta_t *vlc_meta_New( void )
 {
@@ -120,6 +127,9 @@ static inline vlc_meta_t *vlc_meta_New( void )
     m->psz_publisher = NULL;
     m->psz_encodedby = NULL;
     m->psz_arturl = NULL;
+    m->psz_trackid = NULL;
+    m->psz_artistid = NULL;
+    m->psz_albumid = NULL;
     m->i_status = 0;
     return m;
 }
@@ -141,6 +151,9 @@ static inline void vlc_meta_Delete( vlc_meta_t *m )
     free( m->psz_nowplaying );
     free( m->psz_publisher );
     free( m->psz_encodedby );
+    free( m->psz_trackid );
+    free( m->psz_artistid );
+    free( m->psz_albumid );
     free( m->psz_arturl );
 
     free( m );
@@ -169,6 +182,9 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
     COPY_FIELD( nowplaying );
     COPY_FIELD( publisher );
     COPY_FIELD( encodedby );
+    COPY_FIELD( trackid );
+    COPY_FIELD( artistid );
+    COPY_FIELD( albumid );
     COPY_FIELD( arturl );
 }
     /** \todo Track meta */
