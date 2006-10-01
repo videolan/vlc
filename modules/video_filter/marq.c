@@ -215,7 +215,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     /* Delete the marquee variables */
 #define DEL_VAR(var) \
-    var_DelCallback( p_filter->p_libvlc, var, MarqueeCallback, p_sys ) \
+    var_DelCallback( p_filter->p_libvlc, var, MarqueeCallback, p_sys ); \
     var_Destroy( p_filter->p_libvlc, var );
     DEL_VAR( "marq-x" );
     DEL_VAR( "marq-y" );
