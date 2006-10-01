@@ -2468,7 +2468,10 @@ static int Manage( vlc_object_t* p_object )
                 else
                 {
                     if( vlm_MediaControl( vlm, p_media, p_instance->psz_name,
-                                          "stop", 0 ) == VLC_SUCCESS ) i--;
+                                          "stop", 0 ) == VLC_SUCCESS )
+                    {
+			 j--; /* the aray is one element smaller now. */
+		    }
                 }
             }
         }
