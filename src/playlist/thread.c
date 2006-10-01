@@ -40,8 +40,6 @@ static void HandlePlaylist( playlist_t * );
 static void EndPlaylist( playlist_t * );
 static void DestroyPlaylist( playlist_t * );
 
-static void HandleStats( playlist_t *, int );
-
 static void HandleInteraction( playlist_t * );
 static void DestroyInteraction( playlist_t * );
 
@@ -68,6 +66,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     // Stats
     p_playlist->p_stats = (global_stats_t *)malloc( sizeof( global_stats_t ) );
     vlc_mutex_init( p_playlist, &p_playlist->p_stats->lock );
+    p_playlist->p_stats_computer = NULL;
 
     // Interaction
     p_playlist->p_interaction = NULL;
@@ -169,7 +168,6 @@ static void RunControlThread ( playlist_t *p_playlist )
         i_loops++;
 
         HandleInteraction( p_playlist );
-        HandleStats( p_playlist, i_loops );
         HandlePlaylist( p_playlist );
 
         /* 100 ms is an acceptable delay for playlist operations */
@@ -245,22 +243,5 @@ static void HandleInteraction( playlist_t *p_playlist )
                           STATS_TIMER_INTERACTION );
         intf_InteractionManage( p_playlist );
         stats_TimerStop( p_playlist, STATS_TIMER_INTERACTION );
-    }
-}
-
-
-/*****************************************************************************
- * Stats functions
- *****************************************************************************/
-static void HandleStats( playlist_t *p_playlist, int i_loops )
-{
-    if( i_loops % 5 == 0 && p_playlist->p_stats )
-    {
-        stats_ComputeGlobalStats( p_playlist, p_playlist->p_stats );
-        if( p_playlist->p_input )
-        {
-            stats_ComputeInputStats( p_playlist->p_input,
-                                p_playlist->p_input->input.p_item->p_stats );
-        }
     }
 }

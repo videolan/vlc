@@ -104,9 +104,8 @@ static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
     p_i->i_type = ITEM_TYPE_UNKNOWN;
     p_i->b_fixed_name = VLC_TRUE;
 
-    p_i->p_stats = (input_stats_t*) malloc( sizeof( input_stats_t ) );
+    p_i->p_stats = NULL;
     p_i->p_meta = NULL;
-    vlc_mutex_init( p_o, &p_i->p_stats->lock );
 
     vlc_mutex_init( p_o, &p_i->lock );
 }
@@ -131,11 +130,13 @@ VLC_EXPORT( void, input_ItemAddOptionNoDup,( input_item_t *, const char * ) );
 
 static inline void input_ItemClean( input_item_t *p_i )
 {
-    if( p_i->psz_name ) free( p_i->psz_name );
-    if( p_i->psz_uri ) free( p_i->psz_uri );
-    if( p_i->p_stats ) free( p_i->p_stats );
-    p_i->psz_name = 0;
-    p_i->psz_uri = 0;
+    free( p_i->psz_name );
+    free( p_i->psz_uri );
+    if( p_i->p_stats )
+    {
+        vlc_mutex_destroy( &p_i->p_stats->lock );
+        free( p_i->p_stats );
+    }
 
     if( p_i->p_meta ) vlc_meta_Delete( p_i->p_meta );
 

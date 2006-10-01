@@ -120,6 +120,19 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
         msg_Err( p_parent, "out of memory" );
         return NULL;
     }
+
+    /* One "randomly" selected input thread is responsible for computing
+     * the global stats. Check if there is already someone doing this */
+    if( p_input->p_libvlc->p_playlist->p_stats && !b_quick )
+    {
+        vlc_mutex_lock( &p_input->p_libvlc->p_playlist->p_stats->lock );
+        if( p_input->p_libvlc->p_playlist->p_stats_computer == NULL )
+        {
+            p_input->p_libvlc->p_playlist->p_stats_computer = p_input;
+        }
+        vlc_mutex_unlock( &p_input->p_libvlc->p_playlist->p_stats->lock );
+    }
+
     p_input->b_preparsing = b_quick;
     p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;
 
@@ -157,7 +170,13 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     if( !p_input->input.p_item->p_meta )
         p_input->input.p_item->p_meta = vlc_meta_New();
-    stats_ReinitInputStats( p_item->p_stats );
+
+    if( !p_item->p_stats )
+    {
+        p_item->p_stats = (input_stats_t*)malloc( sizeof( input_stats_t ) );
+        vlc_mutex_init( p_input, &p_item->p_stats->lock );
+        stats_ReinitInputStats( p_item->p_stats );
+    }
 
     /* No slave */
     p_input->i_slave = 0;
@@ -515,6 +534,7 @@ static int RunAndClean( input_thread_t *p_input )
 static void MainLoop( input_thread_t *p_input )
 {
     int64_t i_intf_update = 0;
+    int i_updates = 0;
     while( !p_input->b_die && !p_input->b_error && !p_input->input.b_eof )
     {
         vlc_bool_t b_force_update = VLC_FALSE;
@@ -661,6 +681,17 @@ static void MainLoop( input_thread_t *p_input )
 
             var_SetBool( p_input, "intf-change", VLC_TRUE );
             i_intf_update = mdate() + I64C(150000);
+        }
+        /* 150ms * 8 = ~ 1 second */
+        if( ++i_updates % 8 == 0 )
+        {
+            stats_ComputeInputStats( p_input, p_input->input.p_item->p_stats );
+            /* Are we the thread responsible for computing global stats ? */
+            if( p_input->p_libvlc->p_playlist->p_stats_computer == p_input )
+            {
+                stats_ComputeGlobalStats( p_input->p_libvlc->p_playlist,
+                                     p_input->p_libvlc->p_playlist->p_stats );
+            }
         }
     }
 }
@@ -1119,6 +1150,14 @@ static void End( input_thread_t * p_input )
 #define CL_CO( c ) stats_CounterClean( p_input->counters.p_##c ); p_input->counters.p_##c = NULL;
     if( p_input->p_libvlc->b_stats )
     {
+        /* make sure we are up to date */
+        stats_ComputeInputStats( p_input, p_input->input.p_item->p_stats );
+        if( p_input->p_libvlc->p_playlist->p_stats_computer == p_input )
+        {
+            stats_ComputeGlobalStats( p_input->p_libvlc->p_playlist,
+                                      p_input->p_libvlc->p_playlist->p_stats );
+            p_input->p_libvlc->p_playlist->p_stats_computer = NULL;
+        }
         vlc_mutex_lock( &p_input->counters.counters_lock );
         CL_CO( read_bytes );
         CL_CO( read_packets );

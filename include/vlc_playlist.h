@@ -173,6 +173,8 @@ struct playlist_t
 
     // Playlist-unrelated fields
     interaction_t       *p_interaction;       /**< Interaction manager */
+    /** The input thread computing stats */
+    input_thread_t      *p_stats_computer;
     global_stats_t      *p_stats;             /**< Global statistics */
     /*@}*/
 };

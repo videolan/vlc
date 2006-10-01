@@ -35,7 +35,7 @@ struct libvlc_global_data_t
 
     vlc_bool_t             b_ready;     ///< Initialization boolean
     uint32_t               i_cpu;       ///< CPU extensions
-    
+
    /* Object structure data */
     int                    i_counter;   ///< object counter
     int                    i_objects;   ///< Attached objects count
