@@ -182,6 +182,7 @@ static char *ppsz_align_descriptions[] =
      { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
      N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
+#define CFG_PREFIX "mosaic-"
 
 vlc_module_begin();
     set_description( N_("Mosaic video sub filter") );
@@ -191,42 +192,48 @@ vlc_module_begin();
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
 
-    add_integer( "mosaic-alpha", 255, NULL, ALPHA_TEXT, ALPHA_LONGTEXT, VLC_FALSE );
-    add_integer( "mosaic-height", 100, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
-    add_integer( "mosaic-width", 100, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
-    add_integer( "mosaic-align", 5, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE);
+    add_integer( CFG_PREFIX "alpha", 255, NULL, ALPHA_TEXT, ALPHA_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "height", 100, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "width", 100, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "align", 5, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE);
         change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
-    add_integer( "mosaic-xoffset", 0, NULL, XOFFSET_TEXT, XOFFSET_LONGTEXT, VLC_TRUE );
-    add_integer( "mosaic-yoffset", 0, NULL, YOFFSET_TEXT, YOFFSET_LONGTEXT, VLC_TRUE );
-    add_integer( "mosaic-vborder", 0, NULL, VBORDER_TEXT, VBORDER_LONGTEXT, VLC_TRUE );
-    add_integer( "mosaic-hborder", 0, NULL, HBORDER_TEXT, HBORDER_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "xoffset", 0, NULL, XOFFSET_TEXT, XOFFSET_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "yoffset", 0, NULL, YOFFSET_TEXT, YOFFSET_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "vborder", 0, NULL, VBORDER_TEXT, VBORDER_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "hborder", 0, NULL, HBORDER_TEXT, HBORDER_LONGTEXT, VLC_TRUE );
 
-    add_integer( "mosaic-position", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "position", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_integer( "mosaic-rows", 2, NULL, ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
-    add_integer( "mosaic-cols", 2, NULL, COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
-    add_bool( "mosaic-keep-aspect-ratio", 0, NULL, AR_TEXT, AR_LONGTEXT, VLC_FALSE );
-    add_bool( "mosaic-keep-picture", 0, NULL, KEEP_TEXT, KEEP_LONGTEXT, VLC_FALSE );
-    add_string( "mosaic-order", "", NULL, ORDER_TEXT, ORDER_LONGTEXT, VLC_FALSE );
-    add_string( "mosaic-offsets", "", NULL, OFFSETS_TEXT, OFFSETS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "rows", 2, NULL, ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "cols", 2, NULL, COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
+    add_bool( CFG_PREFIX "keep-aspect-ratio", 0, NULL, AR_TEXT, AR_LONGTEXT, VLC_FALSE );
+    add_bool( CFG_PREFIX "keep-picture", 0, NULL, KEEP_TEXT, KEEP_LONGTEXT, VLC_FALSE );
+    add_string( CFG_PREFIX "order", "", NULL, ORDER_TEXT, ORDER_LONGTEXT, VLC_FALSE );
+    add_string( CFG_PREFIX "offsets", "", NULL, OFFSETS_TEXT, OFFSETS_LONGTEXT, VLC_FALSE );
 
-    add_integer( "mosaic-delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
+    add_integer( CFG_PREFIX "delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
                  VLC_FALSE );
 
-    add_bool( "mosaic-bs", 0, NULL, BLUESCREEN_TEXT,
+    add_bool( CFG_PREFIX "bs", 0, NULL, BLUESCREEN_TEXT,
               BLUESCREEN_LONGTEXT, VLC_FALSE );
-    add_integer( "mosaic-bsu", 120, NULL, BLUESCREENU_TEXT,
+    add_integer( CFG_PREFIX "bsu", 120, NULL, BLUESCREENU_TEXT,
                  BLUESCREENU_LONGTEXT, VLC_FALSE );
-    add_integer( "mosaic-bsv", 90, NULL, BLUESCREENV_TEXT,
+    add_integer( CFG_PREFIX "bsv", 90, NULL, BLUESCREENV_TEXT,
                  BLUESCREENV_LONGTEXT, VLC_FALSE );
-    add_integer( "mosaic-bsut", 17, NULL, BLUESCREENUTOL_TEXT,
+    add_integer( CFG_PREFIX "bsut", 17, NULL, BLUESCREENUTOL_TEXT,
                  BLUESCREENUTOL_LONGTEXT, VLC_FALSE );
-    add_integer( "mosaic-bsvt", 17, NULL, BLUESCREENVTOL_TEXT,
+    add_integer( CFG_PREFIX "bsvt", 17, NULL, BLUESCREENVTOL_TEXT,
                  BLUESCREENVTOL_LONGTEXT, VLC_FALSE );
 
     var_Create( p_module->p_libvlc_global, "mosaic-lock", VLC_VAR_MUTEX );
 vlc_module_end();
 
+static const char *ppsz_filter_options[] = {
+    "alpha", "height", "width", "align", "xoffset", "yoffset",
+    "vborder", "hborder", "position", "rows", "cols",
+    "keep-aspect-ratio", "keep-picture", "order", "offsets",
+    "delay", "bs", "bsu", "bsv", "bsut", "bsvt", NULL
+};
 
 /*****************************************************************************
  * mosaic_ParseSetOffsets:
@@ -292,6 +299,9 @@ static int CreateFilter( vlc_object_t *p_this )
 
     var_Get( p_libvlc_global, "mosaic-lock", &val );
     p_sys->p_lock = val.p_address;
+
+    config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
+                       p_filter->p_cfg );
 
 #define GET_VAR( name, min, max )                                           \
     p_sys->i_##name = __MIN( max, __MAX( min,                               \

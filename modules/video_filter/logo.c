@@ -90,6 +90,8 @@ static int LogoCallback( vlc_object_t *, char const *,
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
   "also use combinations of these values, eg 6 = top-right).")
 
+#define CFG_PREFIX "logo-"
+
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -104,15 +106,15 @@ vlc_module_begin();
     add_shortcut( "logo" );
     set_callbacks( Create, Destroy );
 
-    add_file( "logo-file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
-    add_integer( "logo-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
-    add_integer( "logo-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
+    add_file( CFG_PREFIX "file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
     /* default to 1000 ms per image, continuously cycle through them */
-    add_integer( "logo-delay", 1000, NULL, DELAY_TEXT, DELAY_LONGTEXT, VLC_TRUE );
-    add_integer( "logo-repeat", -1, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "logo-transparency", 255, 0, 255, NULL,
+    add_integer( CFG_PREFIX "delay", 1000, NULL, DELAY_TEXT, DELAY_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "repeat", -1, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "transparency", 255, 0, 255, NULL,
         TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
-    add_integer( "logo-position", 6, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "position", 6, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     /* subpicture filter submodule */
@@ -122,6 +124,10 @@ vlc_module_begin();
     set_description( _("Logo sub filter") );
     add_shortcut( "logo" );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "file", "x", "y", "delay", "repeat", "transparency", "position", NULL
+};
 
 /*****************************************************************************
  * Structure to hold the set of individual logo image names, times,
@@ -721,6 +727,10 @@ static int CreateFilter( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
+
+    config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
+                       p_filter->p_cfg );
+
 
     /* Hook used for callback variables */
     p_logo_list->psz_filename =

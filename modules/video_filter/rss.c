@@ -160,6 +160,8 @@ static char *ppsz_pos_descriptions[] =
      { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
      N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
+#define CFG_PREFIX "rrs-"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -169,35 +171,40 @@ vlc_module_begin();
     set_callbacks( CreateFilter, DestroyFilter );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
-    add_string( "rss-urls", "rss", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
+    add_string( CFG_PREFIX "urls", "rss", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Position"), NULL );
-    add_integer( "rss-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
-    add_integer( "rss-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
-    add_integer( "rss-position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     set_section( N_("Font"), NULL );
     /* 5 sets the default to top [1] left [4] */
-    add_integer_with_range( "rss-opacity", 255, 0, 255, NULL,
+    add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
-    add_integer( "rss-color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
+    add_integer( CFG_PREFIX "color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
                   VLC_FALSE );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
-    add_integer( "rss-size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Misc"), NULL );
-    add_integer( "rss-speed", 100000, NULL, SPEED_TEXT, SPEED_LONGTEXT,
+    add_integer( CFG_PREFIX "speed", 100000, NULL, SPEED_TEXT, SPEED_LONGTEXT,
                  VLC_FALSE );
-    add_integer( "rss-length", 60, NULL, LENGTH_TEXT, LENGTH_LONGTEXT,
+    add_integer( CFG_PREFIX "length", 60, NULL, LENGTH_TEXT, LENGTH_LONGTEXT,
                  VLC_FALSE );
-    add_integer( "rss-ttl", 1800, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_FALSE );
-    add_bool( "rss-images", 1, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "ttl", 1800, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_FALSE );
+    add_bool( CFG_PREFIX "images", 1, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, VLC_FALSE );
 
     set_description( _("RSS and Atom feed display") );
     add_shortcut( "rss" );
     add_shortcut( "atom" );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "urls", "x", "y", "position", "color", "size", "speed", "length",
+    "ttl", "images", NULL
+};
 
 /*****************************************************************************
  * CreateFilter: allocates RSS video filter
@@ -218,6 +225,9 @@ static int CreateFilter( vlc_object_t *p_this )
 
     vlc_mutex_init( p_filter, &p_sys->lock );
     vlc_mutex_lock( &p_sys->lock );
+
+    config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
+                       p_filter->p_cfg );
 
     p_sys->psz_urls = var_CreateGetString( p_filter, "rss-urls" );
     p_sys->i_cur_feed = 0;
