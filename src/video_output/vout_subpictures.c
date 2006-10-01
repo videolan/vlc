@@ -98,7 +98,8 @@ spu_t *__spu_Create( vlc_object_t *p_this )
  */
 int spu_Init( spu_t *p_spu )
 {
-    char *psz_filter, *psz_filter_orig;
+    char *psz_filter;
+    char *psz_parser;
     vlc_value_t val;
 
     /* If the user requested a sub margin, we force the position. */
@@ -108,21 +109,28 @@ int spu_Init( spu_t *p_spu )
 
     var_Create( p_spu, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_spu, "sub-filter", &val );
-    psz_filter = psz_filter_orig = val.psz_string;
-    while( psz_filter && *psz_filter )
-    {
-        char *psz_parser = strchr( psz_filter, ':' );
 
-        if( psz_parser ) *psz_parser++ = 0;
+    psz_filter = val.psz_string;
+    psz_parser = psz_filter;
+
+    while( psz_parser && *psz_parser )
+    {
+        config_chain_t *p_cfg; /* Do we ever need to free this ? */
+        char *psz_name;
+
+        psz_parser = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
+
+        msg_Dbg( p_spu, "adding sub-filter: %s", psz_name );
 
         p_spu->pp_filter[p_spu->i_filter] =
             vlc_object_create( p_spu, VLC_OBJECT_FILTER );
         vlc_object_attach( p_spu->pp_filter[p_spu->i_filter], p_spu );
         p_spu->pp_filter[p_spu->i_filter]->pf_sub_buffer_new = sub_new_buffer;
         p_spu->pp_filter[p_spu->i_filter]->pf_sub_buffer_del = sub_del_buffer;
+        p_spu->pp_filter[p_spu->i_filter]->p_cfg = p_cfg;;
         p_spu->pp_filter[p_spu->i_filter]->p_module =
             module_Need( p_spu->pp_filter[p_spu->i_filter],
-                         "sub filter", psz_filter, 0 );
+                         "sub filter", psz_name, 0 );
         if( p_spu->pp_filter[p_spu->i_filter]->p_module )
         {
             filter_owner_sys_t *p_sys = malloc( sizeof(filter_owner_sys_t) );
@@ -143,9 +151,8 @@ int spu_Init( spu_t *p_spu )
             msg_Dbg( p_spu, "can't add anymore filters" );
         }
 
-        psz_filter = psz_parser;
+        free( psz_name );
     }
-    if( psz_filter_orig ) free( psz_filter_orig );
 
     return VLC_EGENERIC;
 }

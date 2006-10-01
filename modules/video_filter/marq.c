@@ -130,6 +130,8 @@ static char *ppsz_pos_descriptions[] =
      { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
      N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
+#define CFG_PREFIX "marq-"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -139,32 +141,37 @@ vlc_module_begin();
     set_callbacks( CreateFilter, DestroyFilter );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
-    add_string( "marq-marquee", "VLC", NULL, MSG_TEXT, MSG_LONGTEXT,
+    add_string( CFG_PREFIX "marquee", "VLC", NULL, MSG_TEXT, MSG_LONGTEXT,
                 VLC_FALSE );
 
     set_section( N_("Position"), NULL );
-    add_integer( "marq-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
-    add_integer( "marq-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
-    add_integer( "marq-position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Font"), NULL );
     /* 5 sets the default to top [1] left [4] */
     change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_integer_with_range( "marq-opacity", 255, 0, 255, NULL,
+    add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
-    add_integer( "marq-color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
-                  VLC_FALSE );
+    add_integer( CFG_PREFIX "color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
+                 VLC_FALSE );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
-    add_integer( "marq-size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT,
+                 VLC_FALSE );
 
     set_section( N_("Misc"), NULL );
-    add_integer( "marq-timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
+    add_integer( CFG_PREFIX "timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
                  VLC_FALSE );
 
     set_description( _("Marquee display") );
     add_shortcut( "marq" );
     add_shortcut( "time" );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "marquee", "x", "y", "position", "color", "size", "timeout", NULL
+};
 
 /*****************************************************************************
  * CreateFilter: allocates marquee video filter
@@ -185,9 +192,12 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->p_style = malloc( sizeof( text_style_t ) );
     memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );
 
+    config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
+                       p_filter->p_cfg );
+
 #define CREATE_VAR( stor, type, var ) \
-    p_sys->stor = var_CreateGet##type( p_filter->p_libvlc, var ); \
-    var_AddCallback( p_filter->p_libvlc, var, MarqueeCallback, p_sys );
+    p_sys->stor = var_CreateGet##type( p_filter, var ); \
+    var_AddCallback( p_filter, var, MarqueeCallback, p_sys );
 
     CREATE_VAR( i_xoff, Integer, "marq-x" );
     CREATE_VAR( i_yoff, Integer, "marq-y" );
@@ -221,8 +231,8 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     /* Delete the marquee variables */
 #define DEL_VAR(var) \
-    var_DelCallback( p_filter->p_libvlc, var, MarqueeCallback, p_sys ); \
-    var_Destroy( p_filter->p_libvlc, var );
+    var_DelCallback( p_filter, var, MarqueeCallback, p_sys ); \
+    var_Destroy( p_filter, var );
     DEL_VAR( "marq-x" );
     DEL_VAR( "marq-y" );
     DEL_VAR( "marq-marquee" );
