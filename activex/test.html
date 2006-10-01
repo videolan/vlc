@@ -68,6 +68,7 @@ Insert MSComctlLib.Slider.2 activex control
 var prevState = 0;
 var monitorTimerId = 0;
 var sliderScrolling = false;
+var ignoreSliderChange = false;
 
 function updateVolume(deltaVol)
 {
@@ -139,7 +140,8 @@ function doGo(targetURL)
     var vlc = document.getElementById("vlc");
     var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
     vlc.playlist.clear();
-    vlc.playlist.add(targetURL, null, options);
+    //vlc.playlist.add(targetURL, null, options);
+    vlc.playlist.add(targetURL);
     vlc.playlist.play();
     if( monitorTimerId == 0 )
     {
@@ -211,9 +213,11 @@ function onPlaying()
 	{
 	    // seekable media
 	    slider.Enabled = true;
-	    slider.Max = vlc.input.length/1000;
-	    slider.Value = vlc.input.time/1000;
-	    info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
+	    slider.Max = slider.width;
+	    ignoreSliderChange = true;
+	    slider.Value = vlc.input.position*slider.width;
+	    ignoreSliderChange = false;
+	    document.getElementById("info").innerHTML = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
 	}
 	else
 	{
@@ -224,7 +228,7 @@ function onPlaying()
 		slider.Enabled = false;
 	    }
             liveFeedRoll = liveFeedRoll & 3;
-            info.innerHTML = liveFeedText[liveFeedRoll++];
+            document.getElementById("info").innerHTML = liveFeedText[liveFeedRoll++];
 	}
     }
 };
@@ -257,26 +261,31 @@ function onVLCStateChange()
 };
 function slider::Scroll()
 {
-    var newPos = slider.Value * 1000;
     var vlc = document.getElementById("vlc");
-    slider.Text = formatTime(newPos);
-    info.innerHTML = slider.Text+"/"+formatTime(vlc.input.length);
-    if( (vlc.input.state == 3) && (vlc.input.time != newPos) )
+    var slider = document.getElementById("slider");
+    var oldPos = vlc.input.position;
+    var newPos = slider.Value/slider.width;
+    if( (vlc.input.state == 3) && (oldPos != newPos) )
     {
-        vlc.input.time = newPos;
+        vlc.input.position = newPos;
+	slider.Text = formatTime(vlc.input.time);
+	document.getElementById("info").innerHTML = slider.Text+"/"+formatTime(vlc.input.length);
     }
     sliderScrolling = true;
 };
 function slider::Change()
 {
-    var newPos = slider.Value * 1000;
+    var vlc = document.getElementById("vlc");
+    var slider = document.getElementById("slider");
+    var oldPos = vlc.input.position;
+    var newPos = slider.Value/slider.width;
     if( sliderScrolling )
     {
         sliderScrolling = false;
     }
-    else if( (vlc.input.state == 3) && (vlc.input.time != newPos) )
+    else if( !ignoreSliderChange && (vlc.input.state == 3) && (oldPos != newPos) )
     {
-        vlc.input.time = newPos;
+        vlc.input.position = newPos;
     }
 };
 //-->
