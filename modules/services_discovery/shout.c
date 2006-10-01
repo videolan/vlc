@@ -103,8 +103,6 @@ struct services_discovery_sys_t
  *****************************************************************************/
 
 /* Main functions */
-    static void Run    ( services_discovery_t *p_intf );
-
 static int OpenRadio( vlc_object_t *p_this )
 {
     return Open( p_this, RADIO );

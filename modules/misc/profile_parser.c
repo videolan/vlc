@@ -43,8 +43,8 @@ static int Open( vlc_object_t *p_this )
     xml_t *p_xml;
     xml_reader_t *p_reader;
     int i_ret;
-    char *psz_elname;
-   
+    char *psz_elname = NULL;
+
     /* Open the profile and get a XML reader from it */
     if( !p_stream )
     {
