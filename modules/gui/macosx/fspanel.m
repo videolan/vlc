@@ -449,6 +449,11 @@ void drawKnobInRect(NSRect knobRect)
     [img drawInRect:knobRect fromRect:image_rect operation:NSCompositeSourceOver fraction:1];
 }
 
+void drawFrameInRect(NSRect frameRect) 
+{
+    /* we don't do anything here atm */
+}
+
 - (void)drawRect:(NSRect)rect
 {
     /* Draw default to make sure the slider behaves correctly */
