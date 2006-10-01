@@ -77,7 +77,7 @@ VlcClient: $(OBJECTS)
 VLCExample: $(OBJECTS)
 	$(JAVAC) VLCExample.java
 
-.java.class:
+.class:
 	$(JAVAC) $?
 	$(JCH) org/videolan/jvlc/$$(basename $*) -o includes/$$(basename $*).h
 
