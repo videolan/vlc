@@ -328,7 +328,7 @@ typedef struct sout_mux_sys_t sout_mux_sys_t;
 typedef struct sout_stream_t    sout_stream_t;
 typedef struct sout_stream_sys_t sout_stream_sys_t;
 
-typedef struct sout_cfg_t       sout_cfg_t;
+typedef struct config_chain_t       config_chain_t;
 typedef struct sap_session_t    sap_session_t;
 typedef struct sap_address_t sap_address_t;
 typedef struct session_descriptor_t session_descriptor_t;

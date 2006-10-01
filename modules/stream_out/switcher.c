@@ -189,7 +189,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    sout_CfgParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "files", &val );

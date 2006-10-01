@@ -479,7 +479,7 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t         val;
     int i;
 
-    sout_CfgParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
+    config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
     p_sys = malloc( sizeof( sout_mux_sys_t ) );
     if( !p_sys )

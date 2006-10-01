@@ -324,6 +324,7 @@ SOURCES_libvlc_common = \
 	misc/unicode.c \
 	misc/cpu.c \
 	misc/configuration.c \
+	misc/configuration_chain.c \
 	misc/image.c \
 	misc/iso_lang.c \
 	misc/iso-639_def.h \

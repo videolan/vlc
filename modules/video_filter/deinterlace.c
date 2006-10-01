@@ -2205,7 +2205,7 @@ static int OpenFilter( vlc_object_t *p_this )
     p_filter->p_sys = (filter_sys_t *)p_vout;
     p_vout->render.i_chroma = p_filter->fmt_in.video.i_chroma;
 
-    sout_CfgParse( p_filter, FILTER_CFG_PREFIX, ppsz_filter_options,
+    config_ChainParse( p_filter, FILTER_CFG_PREFIX, ppsz_filter_options,
                    p_filter->p_cfg );
     var_Get( p_filter, FILTER_CFG_PREFIX "mode", &val );
     var_Create( p_filter, "deinterlace-mode", VLC_VAR_STRING );

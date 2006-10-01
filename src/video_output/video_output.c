@@ -46,7 +46,6 @@
 #include "vlc_playlist.h"
 
 #include "vlc_filter.h"
-#include <vlc/sout.h> /* sout_CfgParse */
 
 #if defined( __APPLE__ )
 #include "darwin_specific.h"
@@ -1540,19 +1539,9 @@ static int ParseVideoFilter2Chain( vout_thread_t *p_vout, char *psz_vfilters )
     int i;
     for( i = 0; i < p_vout->i_vfilters_cfg; i++ )
     {
-        /* FIXME: this should be moved in a separate function */
-        struct sout_cfg_t *p_cfg =
+        struct config_chain_t *p_cfg =
             p_vout->p_vfilters_cfg[p_vout->i_vfilters_cfg];
-        while( p_cfg )
-        {
-            struct sout_cfg_t *p_next = p_cfg->p_next;
-            free( p_cfg->psz_name );
-            free( p_cfg->psz_value );
-            free( p_cfg );
-            p_cfg = p_next;
-        }
-        /* </FIXME> */
-
+        config_ChainDestroy( p_cfg );
         free( p_vout->psz_vfilters[p_vout->i_vfilters_cfg] );
     }
     p_vout->i_vfilters_cfg = 0;
@@ -1562,7 +1551,7 @@ static int ParseVideoFilter2Chain( vout_thread_t *p_vout, char *psz_vfilters )
 
         while( psz_parser && *psz_parser )
         {
-            psz_parser = sout_CfgCreate(
+            psz_parser = config_ChainCreate(
                             &p_vout->psz_vfilters[p_vout->i_vfilters_cfg],
                             &p_vout->p_vfilters_cfg[p_vout->i_vfilters_cfg],
                             psz_parser );

@@ -84,7 +84,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_separator_block, *psz_separator;
 
     msg_Dbg( p_mux, "Multipart jpeg muxer opened" );
-    sout_CfgParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
+    config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
     p_sys = p_mux->p_sys = malloc( sizeof(sout_mux_sys_t) );
     p_sys->b_send_headers = VLC_TRUE;

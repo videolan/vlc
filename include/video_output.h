@@ -157,7 +157,7 @@ struct vout_thread_t
      * these are handled like in transcode.c
      * XXX: we might need to merge the two chains (v1 and v2 filters) */
     char       *psz_vfilters[MAX_VFILTERS];
-    sout_cfg_t *p_vfilters_cfg[MAX_VFILTERS];
+    config_chain_t *p_vfilters_cfg[MAX_VFILTERS];
     int         i_vfilters_cfg;
 
     filter_t   *pp_vfilters[MAX_VFILTERS];

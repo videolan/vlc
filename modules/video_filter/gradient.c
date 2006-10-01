@@ -137,7 +137,7 @@ static int Create( vlc_object_t *p_this )
 
     p_filter->p_sys->p_pre_hough = NULL;
 
-    sout_CfgParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
+    config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                    p_filter->p_cfg );
 
     var_Create( p_filter, FILTER_PREFIX "mode",

@@ -576,7 +576,7 @@ static int  Open ( vlc_object_t *p_this )
     }
 #endif
 
-    sout_CfgParse( p_enc, SOUT_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg );
+    config_ChainParse( p_enc, SOUT_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg );
 
     p_enc->fmt_out.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
     p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');

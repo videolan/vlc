@@ -101,7 +101,7 @@ static int Open( vlc_object_t *p_this )
     int                 i_flags;
     vlc_value_t         val;
 
-    sout_CfgParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
+    config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     if( !p_access->psz_name )
     {

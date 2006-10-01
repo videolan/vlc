@@ -53,21 +53,6 @@ struct sout_instance_t
 };
 
 /****************************************************************************
- * sout_cfg_t:
- ****************************************************************************/
-struct sout_cfg_t
-{
-    sout_cfg_t  *p_next;
-
-    char        *psz_name;
-    char        *psz_value;
-};
-
-#define sout_CfgParse( a, b, c, d ) __sout_CfgParse( VLC_OBJECT(a), b, c, d )
-VLC_EXPORT( void,   __sout_CfgParse, ( vlc_object_t *, char *psz_prefix, const char **ppsz_options, sout_cfg_t * ) );
-VLC_EXPORT( char *, sout_CfgCreate, ( char **, sout_cfg_t **, char * ) );
-
-/****************************************************************************
  * sout_stream_id_t: opaque (private for all sout_stream_t)
  ****************************************************************************/
 typedef struct sout_stream_id_t  sout_stream_id_t;
@@ -104,7 +89,7 @@ struct sout_access_out_t
     sout_instance_t         *p_sout;
 
     char                    *psz_access;
-    sout_cfg_t              *p_cfg;
+    config_chain_t              *p_cfg;
 
     int                      i_writes;
     int64_t                  i_sent_bytes;      ///< This is a "local" counter that is reset each
@@ -134,7 +119,7 @@ struct  sout_mux_t
     sout_instance_t     *p_sout;
 
     char                *psz_mux;
-    sout_cfg_t          *p_cfg;
+    config_chain_t          *p_cfg;
 
     sout_access_out_t   *p_access;
 
@@ -208,7 +193,7 @@ struct sout_stream_t
     sout_instance_t   *p_sout;
 
     char              *psz_name;
-    sout_cfg_t        *p_cfg;
+    config_chain_t        *p_cfg;
     char              *psz_next;
 
     /* Subpicture unit */
@@ -311,32 +296,6 @@ struct announce_handler_t
 };
 
 /* End */
-
-
-static inline sout_cfg_t *sout_cfg_find( sout_cfg_t *p_cfg, char *psz_name )
-{
-    while( p_cfg && strcmp( p_cfg->psz_name, psz_name ) )
-    {
-        p_cfg = p_cfg->p_next;
-    }
-
-    return p_cfg;
-}
-
-static inline char *sout_cfg_find_value( sout_cfg_t *p_cfg, char *psz_name )
-{
-    while( p_cfg && strcmp( p_cfg->psz_name, psz_name ) )
-    {
-        p_cfg = p_cfg->p_next;
-    }
-
-    if( p_cfg && p_cfg->psz_value )
-    {
-        return( p_cfg->psz_value );
-    }
-
-    return NULL;
-}
 
 /* Announce system */
 VLC_EXPORT( int,                sout_AnnounceRegister, (sout_instance_t *,session_descriptor_t*, announce_method_t* ) );

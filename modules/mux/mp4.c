@@ -196,7 +196,7 @@ static int Open( vlc_object_t *p_this )
     bo_t            *box;
 
     msg_Dbg( p_mux, "Mp4 muxer opend" );
-    sout_CfgParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
+    config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;

@@ -172,7 +172,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM ;
     }
 
-    sout_CfgParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
+    config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     /* p_access->psz_name = "hostname:port/filename" */
     psz_bind_addr = psz_parser = strdup( p_access->psz_name );

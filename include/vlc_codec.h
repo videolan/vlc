@@ -127,7 +127,7 @@ struct encoder_t
     int i_tolerance;             /* Bitrate tolerance */
 
     /* Encoder config */
-    sout_cfg_t *p_cfg;
+    config_chain_t *p_cfg;
 };
 
 /**

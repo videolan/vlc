@@ -149,7 +149,7 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t val;
 
     msg_Info( p_mux, "Open" );
-    sout_CfgParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
+    config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;

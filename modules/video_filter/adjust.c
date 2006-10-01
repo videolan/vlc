@@ -167,7 +167,7 @@ static int Create( vlc_object_t *p_this )
 
     /* needed to get options passed in transcode using the
      * adjust{name=value} syntax */
-    sout_CfgParse( p_filter, "", ppsz_filter_options,
+    config_ChainParse( p_filter, "", ppsz_filter_options,
                    p_filter->p_cfg );
 
     var_Create( p_filter, "contrast",

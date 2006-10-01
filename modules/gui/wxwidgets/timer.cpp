@@ -104,6 +104,7 @@ void Timer::Notify()
     if( p_intf->p_sys->b_intf_show )
     {
         p_main_interface->Raise();
+        p_main_interface->Show();
         p_intf->p_sys->b_intf_show = VLC_FALSE;
     }
 

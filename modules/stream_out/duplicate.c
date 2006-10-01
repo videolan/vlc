@@ -79,7 +79,7 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
-    sout_cfg_t        *p_cfg;
+    config_chain_t        *p_cfg;
 
     msg_Dbg( p_stream, "creating 'duplicate'" );
 

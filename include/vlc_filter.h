@@ -58,7 +58,7 @@ struct filter_t
     es_format_t         fmt_out;
 
     /* Filter configuration */
-    sout_cfg_t *        p_cfg;
+    config_chain_t *        p_cfg;
 
     picture_t *         ( * pf_video_filter ) ( filter_t *, picture_t * );
     block_t *           ( * pf_audio_filter ) ( filter_t *, block_t * );

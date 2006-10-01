@@ -164,7 +164,7 @@ static int OpenOut( vlc_object_t *p_this )
     out_sout_stream_sys_t *p_sys;
     vlc_value_t val;
 
-    sout_CfgParse( p_stream, SOUT_CFG_PREFIX_OUT, ppsz_sout_options_out,
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX_OUT, ppsz_sout_options_out,
                    p_stream->p_cfg );
 
     p_sys          = malloc( sizeof( out_sout_stream_sys_t ) );
@@ -351,7 +351,7 @@ static int OpenIn( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    sout_CfgParse( p_stream, SOUT_CFG_PREFIX_IN, ppsz_sout_options_in,
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX_IN, ppsz_sout_options_in,
                    p_stream->p_cfg );
 
     var_Get( p_this->p_libvlc_global, "bridge-lock", &val );

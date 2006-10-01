@@ -296,11 +296,12 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_instance_t     *p_sout = p_stream->p_sout;
     sout_stream_sys_t   *p_sys = NULL;
-    sout_cfg_t          *p_cfg = NULL;
+    config_chain_t      *p_cfg = NULL;
     vlc_value_t         val;
     vlc_bool_t          b_rtsp = VLC_FALSE;
 
-    sout_CfgParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX,
+                       ppsz_sout_options, p_stream->p_cfg );
 
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
 
@@ -590,7 +591,7 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX "sdp", &val );
     if( *val.psz_string )
     {
-        sout_cfg_t *p_cfg;
+        config_chain_t *p_cfg;
 
         SDPHandleUrl( p_stream, val.psz_string );
 

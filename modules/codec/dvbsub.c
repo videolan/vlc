@@ -1526,7 +1526,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_out.i_codec = VLC_FOURCC('d','v','b','s');
     p_enc->fmt_out.subs.dvb.i_id  = 1 << 16 | 1;
 
-    sout_CfgParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+    config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
     p_sys->i_page_ver = 0;
     p_sys->i_region_ver = 0;

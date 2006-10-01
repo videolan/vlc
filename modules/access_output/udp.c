@@ -182,7 +182,7 @@ static int Open( vlc_object_t *p_this )
 
     vlc_value_t         val;
 
-    sout_CfgParse( p_access, SOUT_CFG_PREFIX,
+    config_ChainParse( p_access, SOUT_CFG_PREFIX,
                    ppsz_sout_options, p_access->p_cfg );
 
     if( !( p_sys = malloc( sizeof( sout_access_out_sys_t ) ) ) )

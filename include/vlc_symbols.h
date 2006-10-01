@@ -109,8 +109,8 @@ struct module_symbols_t
     void (*__vout_OSDMessage_inner) (vlc_object_t *, int, char *, ...);
     void (*vout_OSDSlider_inner) (vlc_object_t *, int, int , short);
     void (*vout_OSDIcon_inner) (vlc_object_t *, int, short);
-    void (*__sout_CfgParse_inner) (vlc_object_t *, char *psz_prefix, const char **ppsz_options, sout_cfg_t *);
-    char * (*sout_CfgCreate_inner) (char **, sout_cfg_t **, char *);
+    void *__sout_CfgParse_deprecated;
+    void *sout_CfgCreate_deprecated;
     sout_instance_t * (*__sout_NewInstance_inner) (vlc_object_t *, char *);
     void (*sout_DeleteInstance_inner) (sout_instance_t *);
     sout_packetizer_input_t * (*sout_InputNew_inner) (sout_instance_t *, es_format_t *);
@@ -550,6 +550,9 @@ struct module_symbols_t
     void *input_AskForArt_deprecated;
     int (*playlist_AskForArtEnqueue_inner) (playlist_t *, input_item_t *);
     uint32_t (*input_CurrentMetaFlags_inner) (vlc_meta_t *p_meta);
+    void (*__config_ChainParse_inner) (vlc_object_t *, char *psz_prefix, const char **ppsz_options, config_chain_t *);
+    void (*config_ChainDestroy_inner) (config_chain_t *);
+    char * (*config_ChainCreate_inner) (char **, config_chain_t **, char *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -641,8 +644,6 @@ struct module_symbols_t
 #  define __vout_OSDMessage (p_symbols)->__vout_OSDMessage_inner
 #  define vout_OSDSlider (p_symbols)->vout_OSDSlider_inner
 #  define vout_OSDIcon (p_symbols)->vout_OSDIcon_inner
-#  define __sout_CfgParse (p_symbols)->__sout_CfgParse_inner
-#  define sout_CfgCreate (p_symbols)->sout_CfgCreate_inner
 #  define __sout_NewInstance (p_symbols)->__sout_NewInstance_inner
 #  define sout_DeleteInstance (p_symbols)->sout_DeleteInstance_inner
 #  define sout_InputNew (p_symbols)->sout_InputNew_inner
@@ -1025,6 +1026,9 @@ struct module_symbols_t
 #  define input_ItemAddOptionNoDup (p_symbols)->input_ItemAddOptionNoDup_inner
 #  define playlist_AskForArtEnqueue (p_symbols)->playlist_AskForArtEnqueue_inner
 #  define input_CurrentMetaFlags (p_symbols)->input_CurrentMetaFlags_inner
+#  define __config_ChainParse (p_symbols)->__config_ChainParse_inner
+#  define config_ChainDestroy (p_symbols)->config_ChainDestroy_inner
+#  define config_ChainCreate (p_symbols)->config_ChainCreate_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1119,8 +1123,6 @@ struct module_symbols_t
     ((p_symbols)->__vout_OSDMessage_inner) = __vout_OSDMessage; \
     ((p_symbols)->vout_OSDSlider_inner) = vout_OSDSlider; \
     ((p_symbols)->vout_OSDIcon_inner) = vout_OSDIcon; \
-    ((p_symbols)->__sout_CfgParse_inner) = __sout_CfgParse; \
-    ((p_symbols)->sout_CfgCreate_inner) = sout_CfgCreate; \
     ((p_symbols)->__sout_NewInstance_inner) = __sout_NewInstance; \
     ((p_symbols)->sout_DeleteInstance_inner) = sout_DeleteInstance; \
     ((p_symbols)->sout_InputNew_inner) = sout_InputNew; \
@@ -1503,7 +1505,12 @@ struct module_symbols_t
     ((p_symbols)->input_ItemAddOptionNoDup_inner) = input_ItemAddOptionNoDup; \
     ((p_symbols)->playlist_AskForArtEnqueue_inner) = playlist_AskForArtEnqueue; \
     ((p_symbols)->input_CurrentMetaFlags_inner) = input_CurrentMetaFlags; \
+    ((p_symbols)->__config_ChainParse_inner) = __config_ChainParse; \
+    ((p_symbols)->config_ChainDestroy_inner) = config_ChainDestroy; \
+    ((p_symbols)->config_ChainCreate_inner) = config_ChainCreate; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
+    (p_symbols)->__sout_CfgParse_deprecated = NULL; \
+    (p_symbols)->sout_CfgCreate_deprecated = NULL; \
     (p_symbols)->vlc_input_item_GetInfo_deprecated = NULL; \
     (p_symbols)->vlc_input_item_AddInfo_deprecated = NULL; \
     (p_symbols)->__playlist_ItemNew_deprecated = NULL; \

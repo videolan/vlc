@@ -350,7 +350,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_in.video.i_bits_per_pixel = 12;
     p_enc->fmt_out.i_codec = VLC_FOURCC('d','r','a','c');
 
-    sout_CfgParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+    config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
     /* Initialse the encoder context with the presets for SD576 - Standard
      * Definition Digital (some parameters will be overwritten later on) */
