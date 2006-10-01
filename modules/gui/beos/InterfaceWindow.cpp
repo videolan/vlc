@@ -749,7 +749,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
                 if( p_playlist )
                 {
-                    playlist_PlaylistAdd( p_playlist, path.Path(), path.Path(),
+                    playlist_PlaylistAdd( p_playlist, path.Path(), NULL,
                                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
                 }
             }

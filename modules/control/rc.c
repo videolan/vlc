@@ -2290,7 +2290,7 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
     /* Now create a playlist item */
     if( psz_item_mrl )
     {
-        p_item = input_ItemNew( p_intf, psz_item_mrl, psz_item_mrl );
+        p_item = input_ItemNew( p_intf, psz_item_mrl, NULL );
         for( i = 0; i < i_options; i++ )
         {
             input_ItemAddOption( p_item, ppsz_options[i] );

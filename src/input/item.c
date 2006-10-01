@@ -241,16 +241,25 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
     else
         p_input->psz_uri = NULL;
 
-    if( psz_name != NULL )
-        p_input->psz_name = strdup( psz_name );
-    else
-        p_input->psz_name = strdup ( p_input->psz_uri );
-
     p_input->i_type = i_type;
     p_input->b_prefers_tree = VLC_FALSE;
 
     if( p_input->i_type == ITEM_TYPE_UNKNOWN )
         GuessType( p_input );
+
+    if( psz_name != NULL )
+        p_input->psz_name = strdup( psz_name );
+    else if( p_input->i_type == ITEM_TYPE_AFILE
+             || p_input->i_type == ITEM_TYPE_VFILE )
+    {
+        char *psz_filename = strrchr( p_input->psz_uri, DIR_SEP_CHAR );
+        if( psz_filename && *psz_filename == DIR_SEP_CHAR )
+            psz_filename++;
+        p_input->psz_name = strdup( psz_filename && *psz_filename
+                                    ? psz_filename : p_input->psz_uri );
+    }
+    else
+        p_input->psz_name = strdup( p_input->psz_uri );
 
     p_input->i_duration = i_duration;
     p_input->ppsz_options = NULL;

@@ -68,6 +68,7 @@ int E_(Import_GVP)( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     byte_t *p_peek;
 
+    /* FIXME: we need to skip comment lines !!!! */
     CHECK_PEEK( p_peek, 12 );
     if( !POKE( p_peek, "gvp_version:", 12 ) )
     {

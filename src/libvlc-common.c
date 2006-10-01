@@ -162,8 +162,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     var_Get( p_libvlc_global, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
-	
-
     i_instances++;
 
     if( !libvlc_global.b_ready )

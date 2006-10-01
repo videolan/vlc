@@ -1169,7 +1169,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         char *psz_utf8;
 
         psz_utf8 = wxFromLocale( mrl[i] );
-        p_input = input_ItemNew( p_intf, psz_utf8, psz_utf8 );
+        p_input = input_ItemNew( p_intf, psz_utf8, NULL );
         wxLocaleFree( psz_utf8 );
 
         /* Insert options */

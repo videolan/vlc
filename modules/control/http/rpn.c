@@ -843,14 +843,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             free( mrl );
             mrl = tmp;
 
-            if( !*psz_name )
-            {
-                p_input = E_(MRLParse)( p_intf, mrl, mrl );
-            }
-            else
-            {
-                p_input = E_(MRLParse)( p_intf, mrl, psz_name );
-            }
+            p_input = E_(MRLParse)( p_intf, mrl, psz_name );
 
             if( !p_input || !p_input->psz_uri || !*p_input->psz_uri )
             {

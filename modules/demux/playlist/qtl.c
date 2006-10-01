@@ -369,7 +369,7 @@ static int Demux( demux_t *p_demux )
         if( psz_qtnext )
         {
             p_input = input_ItemNewExt( p_sys->p_playlist,
-                                        psz_qtnext, psz_qtnext, 0, NULL, -1 );
+                                        psz_qtnext, NULL, 0, NULL, -1 );
             playlist_AddWhereverNeeded( p_sys->p_playlist, p_input,
                             p_sys->p_current, p_sys->p_item_in_category,
                             (p_sys->i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
