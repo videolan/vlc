@@ -294,21 +294,21 @@
     fillColor = [[NSColor clearColor] retain];
     NSRect s_rc = [self frame];
     NSImage * image;
-    addButton( o_prev, @"FSGotoBeginningOff.tif" , @"FSGotoBeginningOn.tif", 106, 37, prev );
-    addButton( o_slow, @"FSRewindOff.tif"        , @"FSRewindOn.tif"       , 143, 37, slower );
-    addButton( o_play, @"FSPlayOff.tif"          , @"FSPlayOn.tif"         , 191, 37, play );
-    addButton( o_fast, @"FSFastForwardOff.tif"   , @"FSFastForwardOn.tif"  , 238, 37, faster );
-    addButton( o_next, @"FSGotoEndOff.tif"       , @"FSGotoEndOn.tif"      , 286, 37, next );
-    addButton( o_fullscreen, @"FSExitOff.tif", @"FSExitOn.tif", 382, 45, windowAction );
+    addButton( o_prev, @"fs_skip_previous.png" , @"fs_skip_previous_highlight.png", 174, 15, prev );
+    addButton( o_slow, @"fs_rewind.png"        , @"fs_rewind_highlight.png"       , 211, 14, slower );
+    addButton( o_play, @"fs_play.png"          , @"fs_play_highlight.png"         , 269, 10, play );
+    addButton( o_fast, @"fs_forward.png"       , @"fs_forward_highlight.png"      , 313, 14, faster );
+    addButton( o_next, @"fs_skip_next.png"     , @"fs_skip_next_highlight.png"    , 365, 15, next );
+    addButton( o_fullscreen, @"fs_exit_fullscreen.png", @"fs_exit_fullscreen_hightlight.png", 507, 13, windowAction );
 /*
     addButton( o_button, @"FSVolumeThumbOff.tif"   , @"FSVolumeThumbOn.tif"  ,  38, 51, something );
  */
 
     s_rc = [self frame];
-    s_rc.origin.x = 25;
-    s_rc.origin.y = 14;
-    s_rc.size.width = 329;
-    s_rc.size.height = 13;
+    s_rc.origin.x = 15;
+    s_rc.origin.y = 53;
+    s_rc.size.width = 518;
+    s_rc.size.height = 9;
     o_time_slider = [[[VLCFSTimeSlider alloc] initWithFrame: s_rc] retain];
     [o_time_slider setMinValue:0];
     [o_time_slider setMaxValue:1];
@@ -317,15 +317,15 @@
     [self addSubview: o_time_slider];
     
     s_rc = [self frame];
-    s_rc.origin.x = 25;
-    s_rc.origin.y = 83;
-    s_rc.size.width = s_rc.size.width - s_rc.origin.x * 2;
-    s_rc.size.height = 16;
+    s_rc.origin.x = 98;
+    s_rc.origin.y = 64;
+    s_rc.size.width = 352;
+    s_rc.size.height = 14;
     addTextfield( o_textfield, NSCenterTextAlignment, systemFontOfSize, whiteColor, 0 );
-    s_rc.origin.x = 349;
-    s_rc.origin.y = 10;
+    s_rc.origin.x = 486;
+    s_rc.origin.y = 64;
     s_rc.size.width = 50;
-    addTextfield( o_textPos, NSRightTextAlignment, systemFontOfSize, blackColor, 2 );
+    addTextfield( o_textPos, NSRightTextAlignment, systemFontOfSize, whiteColor, 0 );
 
     return view;
 }
@@ -336,9 +336,9 @@
     NSImage *image;
     [[o_play image] release];
     [[o_play alternateImage] release];
-    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"FSPlayOff.tif"]];
+    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"fs_play.png"]];
     [o_play setImage:image];
-    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"FSPlayOn.tif"]];
+    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"fs_play_highlight.png"]];
     [o_play setAlternateImage:image];
 }
 
@@ -348,9 +348,9 @@
     NSImage *image;
     [[o_play image] release];
     [[o_play alternateImage] release];
-    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"FSPauseOff.tif"]];
+    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"fs_pause.png"]];
     [o_play setImage:image];
-    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"FSPauseOn.tif"]];
+    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"fs_pause_highlight.png"]];
     [o_play setAlternateImage:image];
 }
 
@@ -422,9 +422,11 @@
 	NSRect frame = [self frame];
     NSRect image_rect;
     NSImage *img;
-    addImage( @"FSBase.tif", 0, 0, NSCompositeCopy, 0 );
-    addImage( @"FSVolumeBackground.tif" ,  25, 49, NSCompositeSourceOver, 0 );
-    addImage( @"FSLCDTimeBackground.tif", 354, 14, NSCompositeSourceOver, 0 );
+    addImage( @"fs_background.png", 0, 0, NSCompositeCopy, 0 );
+    addImage( @"fs_volume_slider_bar.png" , 26, 22, NSCompositeSourceOver, 0 );
+    addImage( @"fs_volume_mute.png", 16, 18, NSCompositeSourceOver, 0 );
+    addImage( @"fs_volume_max.png", 124, 17, NSCompositeSourceOver, 0 );
+    addImage(@"fs_time_slider.png" ,  15, 53, NSCompositeSourceOver, 0);
 }
 
 @end
@@ -437,7 +439,7 @@ void drawKnobInRect(NSRect knobRect)
 {
     NSBundle *bundle = [NSBundle mainBundle];
     NSRect image_rect;
-    NSImage *img = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"FSLCDSliderPlayHead"]];
+    NSImage *img = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"fs_time_slider_knob.png"]];
     image_rect.size = [img size];
     image_rect.origin.x = 0;
     image_rect.origin.y = 0;
@@ -445,18 +447,6 @@ void drawKnobInRect(NSRect knobRect)
     knobRect.size.width = image_rect.size.width;
     knobRect.size.height = image_rect.size.height;
     [img drawInRect:knobRect fromRect:image_rect operation:NSCompositeSourceOver fraction:1];
-}
-
-void drawFrameInRect(NSRect frameRect)
-{
-    /* Draw frame */
-    NSBundle *bundle = [NSBundle mainBundle];
-	NSRect frame = frameRect;
-    NSRect image_rect;
-    NSImage *img;
-    addImage(@"FSLCDSliderLeft.tif"    ,  0, 0, NSCompositeSourceOver, 0);
-    addImage(@"FSLCDSliderCenter.tif"  ,  9, 0, NSCompositeSourceOver, 311);
-    addImage(@"FSLCDSliderRight.tif"   , 320, 0, NSCompositeSourceOver, 0);
 }
 
 - (void)drawRect:(NSRect)rect
@@ -468,7 +458,7 @@ void drawFrameInRect(NSRect frameRect)
     [[NSGraphicsContext currentContext] restoreGraphicsState];
     
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
-    knobRect.origin.y+=6;
+    knobRect.origin.y+=7.5;
     [[[NSColor blackColor] colorWithAlphaComponent:0.6] set];
     drawFrameInRect(rect);
     drawKnobInRect(knobRect);
