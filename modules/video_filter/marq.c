@@ -355,6 +355,7 @@ char *FormatMeta( vlc_object_t *p_object, char *string )
                         lang = strdup( "-" );
                     }
                     INSERT_STRING( 1, lang );
+                    free( lang );
                     break;
                 }
                 case 't':
@@ -451,6 +452,7 @@ char *FormatMeta( vlc_object_t *p_object, char *string )
                         lang = strdup( "-" );
                     }
                     INSERT_STRING( 1, lang );
+                    free( lang );
                     break;
                 }
                 case 'P':
