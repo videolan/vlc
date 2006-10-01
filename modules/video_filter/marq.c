@@ -90,11 +90,13 @@ struct filter_sys_t
     "Meta data related: $a = artist, $b = album, $c = copyright, " \
     "$d = description, $e = encoded by, $g = genre, " \
     "$l = language, $n = track num, $p = now playing, " \
-    "$r = rating, $t = title, $u = url, $A = date, " \
+    "$r = rating, $s = subtitles language, $t = title, "\
+    "$u = url, $A = date, " \
     "$B = audio bitrate (in kb/s), $C = chapter," \
     "$D = duration, $F = full name with path, $I = title, "\
     "$L = time left, " \
-    "$N = name, $P = position (in %), $S = audio sample rate (in kHz), " \
+    "$N = name, $O = audio language, $P = position (in %), $R = rate, " \
+    "$S = audio sample rate (in kHz), " \
     "$T = time, $U = publisher, $V = volume, $_ = new line) ")
 #define POSX_TEXT N_("X offset")
 #define POSX_LONGTEXT N_("X offset, from the left screen edge." )
@@ -341,6 +343,20 @@ char *FormatMeta( vlc_object_t *p_object, char *string )
                     INSERT_STRING( p_item && p_item->p_meta,
                                    p_item->p_meta->psz_rating );
                     break;
+                case 's':
+                {
+                    char *lang;
+                    if( p_input )
+                    {
+                        lang = var_GetString( p_input, "sub-language" );
+                    }
+                    else
+                    {
+                        lang = strdup( "-" );
+                    }
+                    INSERT_STRING( 1, lang );
+                    break;
+                }
                 case 't':
                     INSERT_STRING( p_item && p_item->p_meta,
                                    p_item->p_meta->psz_title );
@@ -423,6 +439,20 @@ char *FormatMeta( vlc_object_t *p_object, char *string )
                 case 'N':
                     INSERT_STRING( p_item, p_item->psz_name );
                     break;
+                case 'O':
+                {
+                    char *lang;
+                    if( p_input )
+                    {
+                        lang = var_GetString( p_input, "audio-language" );
+                    }
+                    else
+                    {
+                        lang = strdup( "-" );
+                    }
+                    INSERT_STRING( 1, lang );
+                    break;
+                }
                 case 'P':
                     if( p_input )
                     {
@@ -432,6 +462,18 @@ char *FormatMeta( vlc_object_t *p_object, char *string )
                     else
                     {
                         sprintf( buf, "--.-%%" );
+                    }
+                    INSERT_STRING( 1, buf );
+                    break;
+                case 'R':
+                    if( p_input )
+                    {
+                        int r = var_GetInteger( p_input, "rate" );
+                        snprintf( buf, 10, "%d.%d", r/1000, r%1000 );
+                    }
+                    else
+                    {
+                        sprintf( buf, "-" );
                     }
                     INSERT_STRING( 1, buf );
                     break;
