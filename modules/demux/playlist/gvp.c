@@ -32,6 +32,17 @@
  * description:<desc linei>^M
  * description:<desc final line (no ^M)>
  * lines starting with # are comments
+ *
+ * Example:
+
+# download the free Google Video Player from http://video.google.com/
+gvp_version:1.1
+url:http://vp.video.google.com/videodownload?version=0&secureurl=uAAAAMVHt_Q99OwfGxlWVWH7jd6AA_3n4TboaxIELD_kCg3KcBPSxExZFvQv5DGAxrahVg57KZNZvd0EORPBM3xrxTJ3FdLEWBYiduklpviqjE1Q5zLAkiEZaUsUSFtmbBZDTUUBuN9moYY59eK8lpWXsgTbYB1tLVtaxNBpAMRMyVeHoiJ7BzYdENk-PqJeBbr50QbQ83WK87yJAbN2pSRnF-ucCuNMSLBV7wBL4IcxFpYb1WOK-YXkyxY0NtWlPBufTA&sigh=matNCEVSOR8c-3zN9Gtx0zGinwU&begin=0&len=59749&docid=-715862862672743260
+docid:-715862862672743260
+duration:59749
+title:Apple Macintosh 1984 Superbowl Commercial
+description:The now infamous Apple Macintosh commercial aired during the 1984 SuperBowl.
+
  */
 
 /*****************************************************************************
@@ -68,9 +79,8 @@ int E_(Import_GVP)( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     byte_t *p_peek;
 
-    /* FIXME: we need to skip comment lines !!!! */
-    CHECK_PEEK( p_peek, 12 );
-    if( !POKE( p_peek, "gvp_version:", 12 ) )
+    stream_Peek( p_demux->s, &p_peek, MAX_LINE );
+    if( !strstr( p_peek, "gvp_version:" ) )
     {
         return VLC_EGENERIC;
     }
