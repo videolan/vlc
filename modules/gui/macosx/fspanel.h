@@ -42,7 +42,8 @@
 - (void)setPlay;
 - (void)setPause;
 - (void)setStreamTitle:(NSString *)o_title;
-- (void)setStreamPos:(float) f_pos setSeconds:(int)i_seconds;
+- (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time;
+- (void)setSeekable:(BOOL) b_seekable;
 
 - (void)focus:(NSTimer *)timer;
 - (void)unfocus:(NSTimer *)timer;
@@ -67,20 +68,22 @@
     NSColor *fillColor;
     NSButton *o_prev, *o_next, *o_slow, *o_fast, *o_play, *o_fullscreen;
     NSTextField *o_textfield, *o_textPos;
-    NSSlider *o_time_slider;
+    NSSlider *o_fs_timeSlider;
 }
 - (id)initWithFrame:(NSRect)frameRect;
 - (void)drawRect:(NSRect)rect;
 
-- (void) setPlay;
-- (void) setPause;
-- (void) setStreamTitle: (NSString *)o_title;
-- (void) setStreamPos:(float) f_pos setSeconds:(int)i_seconds;
+- (void)setPlay;
+- (void)setPause;
+- (void)setStreamTitle: (NSString *)o_title;
+- (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time;
+- (void)setSeekable: (BOOL)b_seekable; 
 - (IBAction)play:(id)sender;
 - (IBAction)prev:(id)sender;
 - (IBAction)next:(id)sender;
 - (IBAction)faster:(id)sender;
 - (IBAction)slower:(id)sender;
+- (IBAction)fsTimeSliderUpdate:(id)sender;
 
 @end
 

@@ -1094,7 +1094,8 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_timeslider setFloatValue: 0.0];
         [o_timeslider setEnabled: b_seekable];
         [o_timefield setStringValue: @"0:00:00"];
-        [[[self getControls] getFSPanel] setStreamPos: 0 setSeconds: 0];
+        [[[self getControls] getFSPanel] setStreamPos: 0 andTime: @"0:00:00"];
+        [[[self getControls] getFSPanel] setSeekable: b_seekable];
 
         [o_embedded_window setSeekable: b_seekable];
 
@@ -1197,7 +1198,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                             (int) (i_seconds / 60 % 60),
                             (int) (i_seconds % 60)];
             [o_timefield setStringValue: o_time];
-            [[[self getControls] getFSPanel] setStreamPos: pos.f_float setSeconds: i_seconds];
+            [[[self getControls] getFSPanel] setStreamPos: f_updated andTime: o_time];
             [o_embedded_window setTime: o_time position: f_updated];
         }
 
@@ -1503,7 +1504,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                         (int) (i_seconds / 60 % 60),
                         (int) (i_seconds % 60)];
         [o_timefield setStringValue: o_time];
-        [[[self getControls] getFSPanel] setStreamPos: pos.f_float setSeconds: i_seconds];
+        [[[self getControls] getFSPanel] setStreamPos: f_updated andTime: o_time];
         [o_embedded_window setTime: o_time position: f_updated];
     }
 #undef p_input

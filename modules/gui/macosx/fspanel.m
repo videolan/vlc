@@ -69,6 +69,11 @@
     return YES;
 }
 
+- (BOOL)mouseDownCanMoveWindow
+{
+    return YES;
+}
+
 -(void)dealloc
 {
     if( hideAgainTimer )
@@ -92,9 +97,14 @@
     [[self contentView] setStreamTitle: o_title];
 }
 
-- (void)setStreamPos:(float) f_pos setSeconds:(int)i_seconds;
+- (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time
 {
-    [[self contentView] setStreamPos:f_pos setSeconds:i_seconds];
+    [[self contentView] setStreamPos:f_pos andTime: o_time];
+}
+
+- (void)setSeekable:(BOOL) b_seekable;
+{
+    [[self contentView] setSeekable: b_seekable];
 }
 
 /* This routine is called repeatedly when the mouse enters the window from outside it. */
@@ -309,12 +319,14 @@
     s_rc.origin.y = 53;
     s_rc.size.width = 518;
     s_rc.size.height = 9;
-    o_time_slider = [[[VLCFSTimeSlider alloc] initWithFrame: s_rc] retain];
-    [o_time_slider setMinValue:0];
-    [o_time_slider setMaxValue:1];
-    [o_time_slider setFloatValue: 0];
-    [o_time_slider setAction: @selector(timesliderUpdate:)];
-    [self addSubview: o_time_slider];
+    o_fs_timeSlider = [[VLCFSTimeSlider alloc] initWithFrame: s_rc];
+    [o_fs_timeSlider setMinValue:0];
+    [o_fs_timeSlider setMaxValue:10000];
+    [o_fs_timeSlider setFloatValue: 0];
+    [o_fs_timeSlider setContinuous: YES];
+    [o_fs_timeSlider setTarget: self];
+    [o_fs_timeSlider setAction: @selector(fsTimeSliderUpdate:)];
+    [self addSubview: o_fs_timeSlider];
     
     s_rc = [self frame];
     s_rc.origin.x = 98;
@@ -328,6 +340,12 @@
     addTextfield( o_textPos, NSRightTextAlignment, systemFontOfSize, whiteColor, 0 );
 
     return view;
+}
+
+- (void)dealloc
+{
+    [o_fs_timeSlider release];
+    [super dealloc];
 }
 
 - (void)setPlay
@@ -359,15 +377,17 @@
     [o_textfield setStringValue: o_title];
 }
 
-- (void)setStreamPos:(float) f_pos setSeconds:(int)i_seconds
+- (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time
 {
-    NSString *o_pos = [NSString stringWithFormat: @"%d:%02d:%02d",
-                        (int) (i_seconds / (60 * 60)),
-                        (int) (i_seconds / 60 % 60),
-                        (int) (i_seconds % 60)];
+    [o_textPos setStringValue: o_time];
+    [o_fs_timeSlider setFloatValue: f_pos];
+}
 
-    [o_textPos setStringValue: o_pos];
-    [o_time_slider setFloatValue: f_pos];
+- (void)setSeekable:(BOOL)b_seekable
+{
+    [o_slow setEnabled: b_seekable];
+    [o_fast setEnabled: b_seekable];
+    [o_fs_timeSlider setEnabled: b_seekable];
 }
 
 - (IBAction)play:(id)sender
@@ -400,7 +420,7 @@
     [[[VLCMain sharedInstance] getControls] windowAction: sender];
 }
 
-- (IBAction)timesliderUpdate:(id)sender
+- (IBAction)fsTimeSliderUpdate:(id)sender
 {
     [[VLCMain sharedInstance] timesliderUpdate: sender];
 }
