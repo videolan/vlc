@@ -433,22 +433,6 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
                      VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "mosaic-keep-aspect-ratio", Other, NULL );
 
-    /* time on the fly items */
-    var_Create( p_intf, "time-format", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "time-format", Other, NULL );
-    var_Create( p_intf, "time-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "time-x", Other, NULL );
-    var_Create( p_intf, "time-y", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "time-y", Other, NULL );
-    var_Create( p_intf, "time-position", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "time-position", Other, NULL );
-    var_Create( p_intf, "time-color", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "time-color", Other, NULL );
-    var_Create( p_intf, "time-opacity", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "time-opacity", Other, NULL );
-    var_Create( p_intf, "time-size", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "time-size", Other, NULL );
-
     /* logo on the fly items */
     var_Create( p_intf, "logo-file", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "logo-file", Other, NULL );
@@ -950,14 +934,6 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
         msg_rc(_("| marq-opacity # . . . . . . . . . . . . . opacity"));
         msg_rc(_("| marq-timeout T. . . . . . . . . . timeout, in ms"));
         msg_rc(_("| marq-size # . . . . . . . . font size, in pixels"));
-        msg_rc(  "| ");
-        msg_rc(_("| time-format STRING . . . overlay STRING in video"));
-        msg_rc(_("| time-x X . . . . . . . . . . . .offset from left"));
-        msg_rc(_("| time-y Y . . . . . . . . . . . . offset from top"));
-        msg_rc(_("| time-position #. . . . . . . . relative position"));
-        msg_rc(_("| time-color # . . . . . . . . . . font color, RGB"));
-        msg_rc(_("| time-opacity # . . . . . . . . . . . . . opacity"));
-        msg_rc(_("| time-size # . . . . . . . . font size, in pixels"));
         msg_rc(  "| ");
         msg_rc(_("| logo-file STRING . . .the overlay file path/name"));
         msg_rc(_("| logo-x X . . . . . . . . . . . .offset from left"));
@@ -1660,67 +1636,6 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc_global, "mosaic-keep-aspect-ratio", val );
-        }
-    }
-    else if( !strcmp( psz_cmd, "time-format" ) )
-    {
-        if( strlen( newval.psz_string ) > 0 )
-        {
-            val.psz_string = newval.psz_string;
-            var_Set( p_input->p_libvlc_global, "time-format", val );
-        }
-        else
-        {
-            val.psz_string = "";
-            var_Set( p_input->p_libvlc_global, "time-format", val);
-        }
-    }
-    else if( !strcmp( psz_cmd, "time-x" ) )
-    {
-        if( strlen( newval.psz_string ) > 0)
-        {
-            val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc_global, "time-x", val );
-        }
-    }
-    else if( !strcmp( psz_cmd, "time-y" ) )
-    {
-        if( strlen( newval.psz_string ) > 0)
-        {
-            val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc_global, "time-y", val );
-        }
-    }
-    else if( !strcmp( psz_cmd, "time-position" ) )
-    {
-        if( strlen( newval.psz_string ) > 0)
-        {
-            val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc_global, "time-position", val );
-        }
-    }
-    else if( !strcmp( psz_cmd, "time-color" ) )
-    {
-        if( strlen( newval.psz_string ) > 0)
-        {
-            val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_input->p_libvlc_global, "time-color", val );
-        }
-    }
-    else if( !strcmp( psz_cmd, "time-opacity" ) )
-    {
-        if( strlen( newval.psz_string ) > 0)
-        {
-            val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_input->p_libvlc_global, "time-opacity", val );
-        }
-    }
-    else if( !strcmp( psz_cmd, "time-size" ) )
-    {
-        if( strlen( newval.psz_string ) > 0)
-        {
-            val.i_int = atoi( newval.psz_string );
-            var_Set( p_input->p_libvlc_global, "time-size", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-file" ) )
