@@ -145,12 +145,12 @@ ifdef HAVE_DARWIN_OS
 	.dvdcss .dvdnav .dvdread .dvbpsi .live .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
 	.glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder .aclocal \
-        .libdca .tag
+        .libdca .tag .goom2k4
 # .expat .clinkcc don't work with SDK yet
 # .glib .libidl .gecko are required to build the mozilla plugin
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 ifneq ($(HOST),i686-apple-darwin8)
-all: .goom2k4 .x264
+all: .x264
 endif
 else
 
@@ -1124,6 +1124,7 @@ goom: goom$(GOOM2k4_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
 	patch -p 0 < Patches/goom.patch
+	patch -p 0 < Patches/goom2k4-0-mmx.patch
 endif
 ifdef HAVE_WIN32
 	(cd $@; dos2unix configure.in)
