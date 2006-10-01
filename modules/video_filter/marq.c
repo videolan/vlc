@@ -40,6 +40,7 @@
 #include "vlc_playlist.h"
 #include "vlc_meta.h"
 #include "vlc_input.h"
+#include <vlc/aout.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -90,8 +91,11 @@ struct filter_sys_t
     "$d = description, $e = encoded by, $g = genre, " \
     "$l = language, $n = track num, $p = now playing, " \
     "$r = rating, $t = title, $u = url, $A = date, " \
-    "$D = duration, $F = full name with path, $L = time left, " \
-    "$N = name, $P = publisher, $T = time, $_ = new line) ")
+    "$B = audio bitrate (in kb/s), $C = chapter," \
+    "$D = duration, $F = full name with path, $I = title, "\
+    "$L = time left, " \
+    "$N = name, $P = position (in %), $S = audio sample rate (in kHz), " \
+    "$T = time, $U = publisher, $V = volume, $_ = new line) ")
 #define POSX_TEXT N_("X offset")
 #define POSX_LONGTEXT N_("X offset, from the left screen edge." )
 #define POSY_TEXT N_("Y offset")
@@ -349,6 +353,30 @@ char *FormatMeta( vlc_object_t *p_object, char *string )
                     INSERT_STRING( p_item && p_item->p_meta,
                                    p_item->p_meta->psz_date );
                     break;
+                case 'B':
+                    if( p_input )
+                    {
+                        snprintf( buf, 10, "%d",
+                                  var_GetInteger( p_input, "bit-rate" )/1000 );
+                    }
+                    else
+                    {
+                        sprintf( buf, "-" );
+                    }
+                    INSERT_STRING( 1, buf );
+                    break;
+                case 'C':
+                    if( p_input )
+                    {
+                        snprintf( buf, 10, "%d",
+                                  var_GetInteger( p_input, "chapter" ) );
+                    }
+                    else
+                    {
+                        sprintf( buf, "-" );
+                    }
+                    INSERT_STRING( 1, buf );
+                    break;
                 case 'D':
                     if( p_item )
                     {
@@ -365,6 +393,18 @@ char *FormatMeta( vlc_object_t *p_object, char *string )
                     break;
                 case 'F':
                     INSERT_STRING( p_item, p_item->psz_uri );
+                    break;
+                case 'I':
+                    if( p_input )
+                    {
+                        snprintf( buf, 10, "%d",
+                                  var_GetInteger( p_input, "title" ) );
+                    }
+                    else
+                    {
+                        sprintf( buf, "-" );
+                    }
+                    INSERT_STRING( 1, buf );
                     break;
                 case 'L':
                     if( p_item && p_input )
@@ -384,8 +424,28 @@ char *FormatMeta( vlc_object_t *p_object, char *string )
                     INSERT_STRING( p_item, p_item->psz_name );
                     break;
                 case 'P':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_publisher );
+                    if( p_input )
+                    {
+                        snprintf( buf, 10, "%2.1lf",
+                                  var_GetFloat( p_input, "position" ) * 100. );
+                    }
+                    else
+                    {
+                        sprintf( buf, "--.-%%" );
+                    }
+                    INSERT_STRING( 1, buf );
+                    break;
+                case 'S':
+                    if( p_input )
+                    {
+                        int r = var_GetInteger( p_input, "sample-rate" );
+                        snprintf( buf, 10, "%d.%d", r/1000, (r/100)%10 );
+                    }
+                    else
+                    {
+                        sprintf( buf, "-" );
+                    }
+                    INSERT_STRING( 1, buf );
                     break;
                 case 'T':
                     if( p_input )
@@ -401,6 +461,18 @@ char *FormatMeta( vlc_object_t *p_object, char *string )
                     }
                     INSERT_STRING( 1, buf );
                     break;
+                case 'U':
+                    INSERT_STRING( p_item && p_item->p_meta,
+                                   p_item->p_meta->psz_publisher );
+                    break;
+                case 'V':
+                {
+                    audio_volume_t volume;
+                    aout_VolumeGet( p_object, &volume );
+                    snprintf( buf, 10, "%d", volume );
+                    INSERT_STRING( 1, buf );
+                    break;
+                }
                 case '_':
                     *d = '\n';
                     d++;
