@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.44"
+   sodipodi:docbase="/Users/simon/Desktop/VLC fuld skærm/4"
+   sodipodi:docname="fullscreen.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient1928">
+      <stop
+         style="stop-color:white;stop-opacity:1;"
+         offset="0"
+         id="stop1930" />
+      <stop
+         style="stop-color:black;stop-opacity:0;"
+         offset="1"
+         id="stop1932" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2817">
+      <stop
+         style="stop-color:#e6e6e6;stop-opacity:1;"
+         offset="0"
+         id="stop2819" />
+      <stop
+         style="stop-color:#e6e6e6;stop-opacity:0;"
+         offset="1"
+         id="stop2821" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1928"
+       id="linearGradient1934"
+       x1="224.15468"
+       y1="609.71338"
+       x2="223.44574"
+       y2="685.37378"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.998704,0,0,1,2.132312,0)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.0927797"
+     inkscape:cx="384.30664"
+     inkscape:cy="479.6469"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer4"
+     inkscape:window-width="1150"
+     inkscape:window-height="774"
+     inkscape:window-x="0"
+     inkscape:window-y="22"
+     showguides="true"
+     inkscape:guide-bbox="true" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>VLC Full Screen Panel</dc:title>
+        <dc:date>2006-10-06</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Simon Damkjær</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/GPL/2.0/" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/GPL/2.0/">
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/Reproduction" />
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/Distribution" />
+        <cc:requires
+           rdf:resource="http://web.resource.org/cc/Notice" />
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+        <cc:requires
+           rdf:resource="http://web.resource.org/cc/ShareAlike" />
+        <cc:requires
+           rdf:resource="http://web.resource.org/cc/SourceCode" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="Background"
+     style="display:inline">
+    <rect
+       style="opacity:0.84905659;fill:black;fill-opacity:1;fill-rule:evenodd;stroke:#ccc;stroke-width:1.82514656;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1;display:inline"
+       id="rect19047"
+       width="547.02386"
+       height="84.87587"
+       x="9.7179785"
+       y="646.21271"
+       ry="8.8270912"
+       inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/background.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Info">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot19676"
+       transform="translate(-6.405683,-2.745293)"><flowRegion
+         id="flowRegion19678"><rect
+           id="rect19680"
+           width="307.47278"
+           height="88.764465"
+           x="31.113317"
+           y="804.37073" /></flowRegion><flowPara
+         id="flowPara19682">Black key values:</flowPara><flowPara
+         id="flowPara19686">Normal: 40%</flowPara><flowPara
+         id="flowPara19684">Highlight: 20%</flowPara></flowRoot>  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Buttons"
+     style="opacity:1;display:inline">
+    <g
+       id="g4591"
+       transform="matrix(0.368254,0,0,0.368254,236.707,727.4346)"
+       inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/pause_highlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         y="70.120323"
+         x="116.57344"
+         height="73.475487"
+         width="36.353088"
+         id="rect1933"
+         style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99469399;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1" />
+      <rect
+         y="69.73365"
+         x="171.09698"
+         height="73.475487"
+         width="36.353088"
+         id="rect2824"
+         style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99469399;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1" />
+    </g>
+    <g
+       id="g24419"
+       transform="translate(5.236631,-43.33535)">
+      <rect
+         y="714.22815"
+         x="19.832584"
+         height="7.5147595"
+         width="516.32141"
+         id="rect18115"
+         style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#999;stroke-width:1.72987223;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1;display:inline"
+         inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/time_slider.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         transform="matrix(0.707107,-0.707107,0.707107,0.707107,0,0)"
+         y="738.12457"
+         x="-277.24356"
+         height="4.2426405"
+         width="4.2426405"
+         id="rect18117"
+         style="opacity:1;fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.78499889;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1;display:inline"
+         inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/time_slider_knob_highlight.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+    </g>
+    <path
+       style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 277.2774,695.28359 L 277.2774,722.52023 L 311.72059,708.9019 L 277.2774,695.28359 z "
+       id="path2872"
+       inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/play_highlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g20835"
+       transform="matrix(0.2612,0,0,0.23311,200.0183,565.2425)"
+       inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/rewind_highlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       style="fill:#999">
+      <path
+         id="path3802"
+         d="M 241.03742,575.36218 L 241.42857,657.14789 L 159.28571,616.07646 L 241.03742,575.36218 z "
+         style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         id="path6462"
+         d="M 159.46599,575.3979 L 159.85714,657.18361 L 77.714285,616.11218 L 159.46599,575.3979 z "
+         style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
+    </g>
+    <g
+       id="g20839"
+       transform="matrix(0.2612,0,0,0.23311,205.8823,623.3409)"
+       inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/forward_highlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       style="fill:#999">
+      <path
+         id="path1885"
+         d="M 442.22255,326.13066 L 441.8314,407.91637 L 523.97426,366.84494 L 442.22255,326.13066 z "
+         style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
+      <path
+         id="path1887"
+         d="M 523.79398,326.16638 L 523.40283,407.95209 L 605.54568,366.88066 L 523.79398,326.16638 z "
+         style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
+    </g>
+    <rect
+       style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+       id="rect7473"
+       width="27.200001"
+       height="27.200001"
+       x="210.76373"
+       y="755.24377"
+       inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/stop_highlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g20848"
+       transform="matrix(0.25886,0,0,0.194448,151.4971,542.7451)"
+       inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/skip_previous_highlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       style="fill:#999">
+      <path
+         id="path6537"
+         d="M 235.53571,899.86218 L 235.53571,809.1479 L 180.89286,854.50504 L 235.53571,899.86218 z "
+         style="opacity:1;fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
+      <path
+         id="path7425"
+         d="M 181.24999,899.86218 L 181.24999,809.1479 L 126.60714,854.50504 L 181.24999,899.86218 z "
+         style="opacity:1;fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
+      <rect
+         y="809.14789"
+         x="119.64286"
+         height="90.714287"
+         width="6.7857141"
+         id="rect7427"
+         style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1" />
+    </g>
+    <g
+       id="g20843"
+       transform="matrix(0.25886,0,0,0.194448,276.0424,542.2519)"
+       inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/skip_next_highlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       style="fill:#999">
+      <path
+         id="path1889"
+         d="M 376.84436,902.65272 L 376.84436,811.93844 L 431.48721,857.29558 L 376.84436,902.65272 z "
+         style="opacity:1;fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
+      <path
+         id="path1891"
+         d="M 431.13008,902.14428 L 431.13008,811.43 L 485.77293,856.78714 L 431.13008,902.14428 z "
+         style="opacity:1;fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
+      <rect
+         transform="scale(-1,1)"
+         y="811.42999"
+         x="-492.73721"
+         height="90.714287"
+         width="6.7857141"
+         id="rect1893"
+         style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1;display:inline" />
+    </g>
+    <g
+       id="g25308"
+       transform="translate(-318.5763,-45.75388)">
+      <g
+         transform="matrix(0.140582,0,0,0.140582,384.499,669.4403)"
+         id="g20853"
+         inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/volume_max_highlight.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90"
+         style="fill:#999">
+        <path
+           style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="M 476.4111,592.72042 L 491.90086,592.72042 L 522.4763,566.85926 L 522.4763,644.44275 L 491.90441,618.98567 L 476.00702,618.98567 L 476.4111,592.72042 z "
+           id="path1986"
+           sodipodi:nodetypes="ccccccc" />
+        <path
+           style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#999;stroke-width:5;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+           d="M 548.14675,650.11365 C 565.03032,642.67205 576.8072,625.77136 576.80721,606.14589 C 576.80721,586.52003 565.03091,569.65208 548.14675,562.21071"
+           id="path10070"
+           sodipodi:nodetypes="csc" />
+        <path
+           style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#999;stroke-width:5;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1;display:inline"
+           d="M 540.48356,634.41879 C 551.37283,629.61924 558.96846,618.71893 558.96847,606.06123 C 558.96847,593.40328 551.3732,582.5241 540.48356,577.7247"
+           id="path10073"
+           sodipodi:nodetypes="csc" />
+        <path
+           style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#999;stroke-width:5;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1;display:inline"
+           d="M 532.83148,619.04613 C 537.89756,616.81322 541.43135,611.74199 541.43135,605.85319 C 541.43135,599.96423 537.89774,594.90284 532.83148,592.66997"
+           id="path10075"
+           sodipodi:nodetypes="csc" />
+      </g>
+      <path
+         sodipodi:nodetypes="ccccccc"
+         id="path20861"
+         d="M 343.64616,752.83797 L 345.82375,752.83797 L 350.1221,749.20235 L 350.1221,760.10921 L 345.82424,756.53039 L 343.58935,756.53039 L 343.64616,752.83797 z "
+         style="opacity:1;fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/volume_mute.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <path
+         id="path20873"
+         d="M 353.9895,754.65488 L 447.3167,754.65668"
+         style="fill:none;fill-rule:evenodd;stroke:#999;stroke-width:1.83266532;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/volume_slider_bar.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <path
+         transform="matrix(0.621528,0,0,0.621528,243.3288,285.7584)"
+         d="M 273.9667 754.15063 A 5.6571293 5.6571293 0 1 1  262.65244,754.15063 A 5.6571293 5.6571293 0 1 1  273.9667 754.15063 z"
+         sodipodi:ry="5.6571293"
+         sodipodi:rx="5.6571293"
+         sodipodi:cy="754.15063"
+         sodipodi:cx="268.30957"
+         id="path22645"
+         style="opacity:1;fill:#262626;fill-opacity:1;fill-rule:evenodd;stroke:#999;stroke-width:2.58342528;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+         sodipodi:type="arc"
+         inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/volume_slider_knob.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <path
+         sodipodi:type="arc"
+         style="opacity:1;fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+         id="path3703"
+         sodipodi:cx="92.710823"
+         sodipodi:cy="709.08624"
+         sodipodi:rx="1.42984"
+         sodipodi:ry="1.2582592"
+         d="M 94.140663 709.08624 A 1.42984 1.2582592 0 1 1  91.280983,709.08624 A 1.42984 1.2582592 0 1 1  94.140663 709.08624 z"
+         transform="matrix(0.699379,0,0,0.794749,345.2507,190.9386)" />
+    </g>
+    <g
+       id="g35119"
+       transform="matrix(1.88674,0,0,1.88674,-476.5009,-708.0485)"
+       inkscape:export-filename="/Users/simon/Desktop/VLC fuld skærm/4/Individual graphics/exit_fullscreen_highlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       style="fill:#999">
+      <path
+         id="rect30632"
+         d="M 533.32,748.03511 C 532.18417,748.04361 531.04659,748.12896 529.92419,748.31399 C 529.36122,748.51635 529.15716,749.22221 529.14111,749.79549 C 529.1329,750.64427 529.12556,751.49428 529.14449,752.34274 C 529.18905,752.892 529.43699,753.57523 530.0073,753.6908 C 532.26201,754.02327 534.56561,754.04568 536.81645,753.67046 C 537.37892,753.46434 537.58329,752.75867 537.59962,752.18388 C 537.60782,751.33519 537.61513,750.48524 537.59619,749.63684 C 537.5524,749.08805 537.30135,748.41061 536.73341,748.29421 C 535.60358,748.11989 534.46175,748.03046 533.32,748.03511 z "
+         style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:#999;stroke-width:0.35932359;stroke-linecap:round;stroke-miterlimit:4;stroke-dashoffset:8;stroke-opacity:1" />
+      <g
+         transform="matrix(-0.477112,-0.477112,-0.477112,0.477112,1136.194,640.7622)"
+         id="g34209"
+         style="fill:#999">
+        <path
+           style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+           d="M 517.94619,754.12038 L 515.44619,757.33913 L 520.38369,757.33913 L 517.94619,754.12038 z "
+           id="rect34202" />
+        <rect
+           style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+           id="rect34207"
+           width="1.7845169"
+           height="3.7515414"
+           x="517.00293"
+           y="755.58484"
+           ry="0" />
+      </g>
+      <g
+         transform="matrix(0.477112,-0.477112,0.477112,0.477112,-69.54944,640.7622)"
+         id="g34213"
+         style="opacity:1;display:inline;fill:#999">
+        <path
+           style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+           d="M 517.94619,754.12038 L 515.44619,757.33913 L 520.38369,757.33913 L 517.94619,754.12038 z "
+           id="path34215" />
+        <rect
+           style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+           id="rect34217"
+           width="1.7845169"
+           height="3.7515414"
+           x="517.00293"
+           y="755.58484"
+           ry="0" />
+      </g>
+      <g
+         transform="matrix(0.477112,0.477112,0.477112,-0.477112,-69.54944,861.247)"
+         id="g34219"
+         style="opacity:1;display:inline;fill:#999">
+        <path
+           style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+           d="M 517.94619,754.12038 L 515.44619,757.33913 L 520.38369,757.33913 L 517.94619,754.12038 z "
+           id="path34221" />
+        <rect
+           style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+           id="rect34223"
+           width="1.7845169"
+           height="3.7515414"
+           x="517.00293"
+           y="755.58484"
+           ry="0" />
+      </g>
+      <g
+         transform="matrix(-0.477112,0.477112,-0.477112,-0.477112,1136.194,861.247)"
+         id="g34225"
+         style="opacity:1;display:inline;fill:#999">
+        <path
+           style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+           d="M 517.94619,754.12038 L 515.44619,757.33913 L 520.38369,757.33913 L 517.94619,754.12038 z "
+           id="path34227" />
+        <rect
+           style="fill:#999;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:8;stroke-opacity:1"
+           id="rect34229"
+           width="1.7845169"
+           height="3.7515414"
+           x="517.00293"
+           y="755.58484"
+           ry="0" />
+      </g>
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Text"
+     style="opacity:1;display:inline">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot19938"
+       style="font-size:10px;fill:#999;fill-opacity:1"
+       transform="translate(58.47307,-37.14568)"><flowRegion
+         id="flowRegion19940"><rect
+           id="rect19942"
+           width="272.35037"
+           height="12.930603"
+           x="168.09755"
+           y="692.73041"
+           style="font-size:10px;fill:#999;fill-opacity:1" /></flowRegion><flowPara
+         id="flowPara19944"
+         style="font-size:12px">VLC Full Screen.avi</flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#999;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Tahoma"
+       x="501.32318"
+       y="665.86108"
+       id="text20831"
+       sodipodi:linespacing="125%"
+       inkscape:transform-center-x="19.666992"
+       inkscape:transform-center-y="-4.5439453"><tspan
+         sodipodi:role="line"
+         id="tspan20833"
+         x="501.32318"
+         y="665.86108"
+         style="font-size:12px;font-weight:normal;fill:#999;fill-opacity:1">1:23:45</tspan></text>
+  </g>
+</svg>
