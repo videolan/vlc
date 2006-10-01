@@ -371,7 +371,6 @@
                 "o_btn_addNode" = id; 
                 "o_controller" = id; 
                 "o_ctx_menu" = id; 
-                "o_loop_popup" = id; 
                 "o_mi_addNode" = id; 
                 "o_mi_delete" = id; 
                 "o_mi_info" = id; 
