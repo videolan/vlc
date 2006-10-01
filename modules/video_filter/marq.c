@@ -570,10 +570,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
 
-/*    if( p_sys->b_need_update == VLC_FALSE )
+    if( p_sys->b_need_update == VLC_FALSE )
     {
         return NULL;
-    }*/
+    }
 
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
@@ -593,6 +593,14 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     t = p_sys->last_time = time( NULL );
 
+    if( strchr( p_sys->psz_marquee, '%' ) || strchr( p_sys->psz_marquee, '$' ) )
+    {
+        p_sys->b_need_update = VLC_TRUE;
+    }
+    else
+    {
+        p_sys->b_need_update = VLC_FALSE;
+    }
     buf = FormatTime( p_sys->psz_marquee );
     p_spu->p_region->psz_text = FormatMeta( VLC_OBJECT( p_filter ), buf );
     free( buf );
@@ -617,7 +625,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     }
     p_spu->p_region->p_style = p_sys->p_style;
 
-    p_sys->b_need_update = VLC_FALSE;
     return p_spu;
 }
 
