@@ -70,8 +70,56 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
 
     if( !p_demux->p_private ) p_demux->p_private = (void *)vlc_meta_New();
 
+    vlc_meta_t *p_meta = (vlc_meta_t *)(p_demux->p_private);
 #define ID_IS( a ) (!strcmp(  p_frame->id, a ))
 #define DESCR_IS( a) strstr( (char*)p_frame->description, a )
+
+    while ( ( p_frame = id3_tag_findframe( p_id3_tag, "UFID", i ) ) )
+    {
+        char *psz_owner = id3_field_getlatin1( &p_frame->fields[0] );
+
+        if( !strncmp( psz_owner, "http://musicbrainz.org", 22 ) )
+        {
+            id3_byte_t const * p_ufid;
+            id3_length_t i_ufidlen;
+
+            p_ufid = id3_field_getbinarydata( &p_frame->fields[1], &i_ufidlen );
+            char *psz_ufid = strndup( p_ufid, i_ufidlen );
+
+            vlc_meta_SetTrackID( p_meta, psz_ufid );
+            free( psz_ufid );
+        }
+        i++;
+    }
+
+    i = 0;
+
+    while( ( p_frame = id3_tag_findframe( p_id3_tag, "TXXX", i ) ) )
+    {
+        char *psz_desc = id3_ucs4_latin1duplicate(
+                id3_field_getstring( &p_frame->fields[1] ) );
+
+        if ( ! strncmp( psz_desc, "MusicBrainz Artist Id", 21 ) )
+        {
+            char *psz_artistid = id3_ucs4_latin1duplicate(
+                    id3_field_getstring( &p_frame->fields[2] ) );
+            vlc_meta_SetArtistID( p_meta, psz_artistid );
+            free( psz_artistid );
+        }
+
+        if ( ! strncmp( psz_desc, "MusicBrainz Album Id", 20 ) )
+        {
+            char *psz_albumid = id3_ucs4_latin1duplicate(
+                    id3_field_getstring( &p_frame->fields[2] ) );
+            vlc_meta_SetAlbumID( p_meta, psz_albumid );
+            free( psz_albumid );
+        }
+
+        free( psz_desc );
+        i++;
+    }
+    
+    i = 0;
 
     while( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
     {
@@ -79,8 +127,6 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
 
         while( i_strings > 0 )
         {
-            vlc_meta_t *p_meta = (vlc_meta_t *)(p_demux->p_private);
-
             char *psz_temp = id3_ucs4_utf8duplicate(
                 id3_field_getstrings( &p_frame->fields[1], --i_strings ) );
 
