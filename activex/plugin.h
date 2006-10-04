@@ -52,7 +52,6 @@ public:
     REFCLSID getClassID(void) { return (REFCLSID)_classid; };
 
     LPCSTR getInPlaceWndClassName(void) const { return TEXT("VLC Plugin In-Place"); };
-    LPCSTR getVideoWndClassName(void) const { return TEXT("VLC Plugin Video"); };
     HINSTANCE getHInstance(void) const { return _hinstance; };
     LPPICTURE getInPlacePict(void) const
         { if( NULL != _inplace_picture) _inplace_picture->AddRef(); return _inplace_picture; };
@@ -67,7 +66,6 @@ private:
     HINSTANCE   _hinstance;
     CLSID       _classid;
     ATOM        _inplace_wndclass_atom;
-    ATOM        _video_wndclass_atom;
     LPPICTURE   _inplace_picture;
 };
 
@@ -241,10 +239,8 @@ private:
     class VLCViewObject *vlcViewObject;
     class VLCDataObject *vlcDataObject;
 
-    // in place activated window (Clipping window)
+    // in place activated window (Plugin window)
     HWND _inplacewnd;
-    // video window (Drawing window)
-    HWND _videownd;
 
     VLCPluginClass* _p_class;
     ULONG _i_ref;

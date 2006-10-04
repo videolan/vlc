@@ -52,26 +52,6 @@ using namespace std;
 //class factory
 
 static LRESULT CALLBACK VLCInPlaceClassWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch( uMsg )
-    {
-        case WM_ERASEBKGND:
-            return 1L;
-
-        case WM_PAINT:
-            PAINTSTRUCT ps;
-            if( GetUpdateRect(hWnd, NULL, FALSE) )
-            {
-                BeginPaint(hWnd, &ps);
-                EndPaint(hWnd, &ps);
-            }
-            return 0L;
-
-        default:
-            return DefWindowProc(hWnd, uMsg, wParam, lParam);
-    }
-};
-
-static LRESULT CALLBACK VLCVideoClassWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     VLCPlugin *p_instance = reinterpret_cast<VLCPlugin *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
     switch( uMsg )
@@ -125,26 +105,6 @@ VLCPluginClass::VLCPluginClass(LONG *p_class_ref, HINSTANCE hInstance, REFCLSID 
         _inplace_wndclass_atom = 0;
     }
 
-    if( ! GetClassInfo(hInstance, getVideoWndClassName(), &wClass) )
-    {
-        wClass.style          = CS_NOCLOSE;
-        wClass.lpfnWndProc    = VLCVideoClassWndProc;
-        wClass.cbClsExtra     = 0;
-        wClass.cbWndExtra     = 0;
-        wClass.hInstance      = hInstance;
-        wClass.hIcon          = NULL;
-        wClass.hCursor        = LoadCursor(NULL, IDC_ARROW);
-        wClass.hbrBackground  = NULL;
-        wClass.lpszMenuName   = NULL;
-        wClass.lpszClassName  = getVideoWndClassName();
-       
-        _video_wndclass_atom = RegisterClass(&wClass);
-    }
-    else
-    {
-        _video_wndclass_atom = 0;
-    }
-
     HBITMAP hbitmap = (HBITMAP)LoadImage(getHInstance(), TEXT("INPLACE-PICT"), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
     if( NULL != hbitmap )
     {
@@ -165,9 +125,6 @@ VLCPluginClass::~VLCPluginClass()
 {
     if( 0 != _inplace_wndclass_atom )
         UnregisterClass(MAKEINTATOM(_inplace_wndclass_atom), _hinstance);
-
-    if( 0 != _video_wndclass_atom )
-        UnregisterClass(MAKEINTATOM(_video_wndclass_atom), _hinstance);
 
     if( NULL != _inplace_picture )
         _inplace_picture->Release();
@@ -244,7 +201,6 @@ STDMETHODIMP VLCPluginClass::LockServer(BOOL fLock)
 
 VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
     _inplacewnd(NULL),
-    _videownd(NULL),
     _p_class(p_class),
     _i_ref(1UL),
     _p_libvlc(NULL),
@@ -376,98 +332,6 @@ STDMETHODIMP_(ULONG) VLCPlugin::Release(void)
 
 //////////////////////////////////////
 
-/*
-** we use a window to represent plugin viewport,
-** whose geometry is limited by the clipping rectangle
-** all drawing within this window must follow must
-** follow coordinates system described in lprPosRect
-*/
-
-static void getViewportCoords(LPRECT lprPosRect, LPRECT lprClipRect)
-{
-    RECT bounds;
-    bounds.right  = lprPosRect->right-lprPosRect->left;
-
-    if( lprClipRect->left <= lprPosRect->left )
-    {
-        // left side is not clipped out
-        bounds.left = 0;
-
-        if( lprClipRect->right >= lprPosRect->right )
-        {
-            // right side is not clipped out, no change
-        }
-        else if( lprClipRect->right >= lprPosRect->left )
-        {
-            // right side is clipped out
-            lprPosRect->right = lprClipRect->right;
-        }
-        else
-        {
-            // outside of clipping rectange, not visible
-            lprPosRect->right = lprPosRect->left;
-        }
-    }
-    else
-    {
-        // left side is clipped out
-        bounds.left = lprPosRect->left-lprClipRect->left;
-        bounds.right += bounds.left;
-
-        lprPosRect->left = lprClipRect->left;
-        if( lprClipRect->right >= lprPosRect->right )
-        {
-            // right side is not clipped out
-        }
-        else
-        {
-            // right side is clipped out
-            lprPosRect->right = lprClipRect->right;
-        }
-    }
-
-    bounds.bottom = lprPosRect->bottom-lprPosRect->top;
-
-    if( lprClipRect->top <= lprPosRect->top )
-    {
-        // top side is not clipped out
-        bounds.top = 0;
-
-        if( lprClipRect->bottom >= lprPosRect->bottom )
-        {
-            // bottom side is not clipped out, no change
-        }
-        else if( lprClipRect->bottom >= lprPosRect->top )
-        {
-            // bottom side is clipped out
-            lprPosRect->bottom = lprClipRect->bottom;
-        }
-        else
-        {
-            // outside of clipping rectange, not visible
-            lprPosRect->right = lprPosRect->left;
-        }
-    }
-    else
-    {
-        bounds.top = lprPosRect->top-lprClipRect->top;
-        bounds.bottom += bounds.top;
-
-        lprPosRect->top = lprClipRect->top;
-        if( lprClipRect->bottom >= lprPosRect->bottom )
-        {
-            // bottom side is not clipped out
-        }
-        else
-        {
-            // bottom side is clipped out
-            lprPosRect->bottom = lprClipRect->bottom;
-        }
-    }
-    *lprClipRect = *lprPosRect;
-    *lprPosRect  = bounds;
-};
-
 HRESULT VLCPlugin::onInit(void)
 {
     if( NULL == _p_libvlc )
@@ -571,20 +435,20 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
                  if( i_type == REG_SZ )
                  {
                      strcat( p_data, "\\plugins" );
-		     ppsz_argv[ppsz_argc++] = "--plugin-path";
+                     ppsz_argv[ppsz_argc++] = "--plugin-path";
                      ppsz_argv[ppsz_argc++] = p_data;
                  }
              }
              RegCloseKey( h_key );
         }
 
-	char p_path[MAX_PATH+1];
-	DWORD len = GetModuleFileNameA(DllGetModule(), p_path, sizeof(p_path));
-	if( len > 0 )
-	{
-	    p_path[len] = '\0';
-	    ppsz_argv[0] = p_path;
-	}
+        char p_path[MAX_PATH+1];
+        DWORD len = GetModuleFileNameA(DllGetModule(), p_path, sizeof(p_path));
+        if( len > 0 )
+        {
+            p_path[len] = '\0';
+            ppsz_argv[0] = p_path;
+        }
 
         // make sure plugin isn't affected with VLC single instance mode
         ppsz_argv[ppsz_argc++] = "--no-one-instance";
@@ -600,19 +464,6 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         if( _b_autoloop )
             ppsz_argv[ppsz_argc++] = "--loop";
 
-        // initial volume setting
-        char volBuffer[16];
-        ppsz_argv[ppsz_argc++] = "--volume";
-        if( _b_mute )
-        {
-           ppsz_argv[ppsz_argc++] = "0";
-        }
-        else
-        {
-            snprintf(volBuffer, sizeof(volBuffer), "%d", _i_volume);
-            ppsz_argv[ppsz_argc++] = volBuffer;
-        }
-            
         if( IsDebuggerPresent() )
         {
             /*
@@ -634,6 +485,14 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
             return E_FAIL;
         }
 
+        // initial volume setting
+        libvlc_audio_set_volume(_p_libvlc, _i_volume, NULL);
+        if( _b_mute )
+        {
+	    libvlc_audio_set_mute(_p_libvlc, TRUE, NULL);
+        }
+            
+        // initial playlist item
         if( SysStringLen(_bstr_mrl) > 0 )
         {
             char *psz_mrl = NULL;
@@ -792,32 +651,26 @@ BOOL VLCPlugin::isInPlaceActive(void)
 
 HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprcPosRect, LPCRECT lprcClipRect)
 {
-    RECT posRect = *lprcPosRect;
     RECT clipRect = *lprcClipRect;
 
     /*
     ** record keeping of control geometry within container
     */ 
-    _posRect = posRect;
-
-    /*
-    ** convert posRect & clipRect to match control viewport coordinates
-    */
-    getViewportCoords(&posRect, &clipRect);
+    _posRect = *lprcPosRect;
 
     /*
     ** Create a window for in place activated control.
     ** the window geometry matches the control viewport
     ** within container so that embedded video is always
-    ** properly clipped.
+    ** properly displayed.
     */
     _inplacewnd = CreateWindow(_p_class->getInPlaceWndClassName(),
             "VLC Plugin In-Place Window",
             WS_CHILD|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
-            clipRect.left,
-            clipRect.top,
-            clipRect.right-clipRect.left,
-            clipRect.bottom-clipRect.top,
+            lprcPosRect->left,
+            lprcPosRect->top,
+            lprcPosRect->right-lprcPosRect->left,
+            lprcPosRect->bottom-lprcPosRect->top,
             hwndParent,
             0,
             _p_class->getHInstance(),
@@ -829,32 +682,11 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
 
     SetWindowLongPtr(_inplacewnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
-    /*
-    ** VLC embedded video automatically grows to cover client
-    ** area of parent window.
-    ** hence create a such a 'parent' window whose geometry
-    ** is always correct relative to the viewport bounds
-    */
-    _videownd = CreateWindow(_p_class->getVideoWndClassName(),
-            "VLC Plugin Video Window",
-            WS_CHILD|WS_CLIPCHILDREN|WS_VISIBLE,
-            posRect.left,
-            posRect.top,
-            posRect.right-posRect.left,
-            posRect.bottom-posRect.top,
-            _inplacewnd,
-            0,
-            _p_class->getHInstance(),
-            NULL
-           );
+    /* change cliprect coordinates system relative to window bounding rect */
+    OffsetRect(&clipRect, -lprcPosRect->left, -lprcPosRect->top);
 
-    if( NULL == _videownd )
-    {
-        DestroyWindow(_inplacewnd);
-        return E_FAIL;
-    }
-
-    SetWindowLongPtr(_videownd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    HRGN clipRgn = CreateRectRgnIndirect(&clipRect);
+    SetWindowRgn(_inplacewnd, clipRgn, TRUE);
 
     if( _b_usermode )
     {
@@ -866,13 +698,13 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
 
         /* set internal video width and height */
         libvlc_video_set_size(p_libvlc,
-            posRect.right-posRect.left,
-            posRect.bottom-posRect.top,
+            lprcPosRect->right-lprcPosRect->left,
+            lprcPosRect->bottom-lprcPosRect->top,
             NULL );
 
         /* set internal video parent window */
         libvlc_video_set_parent(p_libvlc,
-            reinterpret_cast<libvlc_drawable_t>(_videownd), NULL);
+            reinterpret_cast<libvlc_drawable_t>(_inplacewnd), NULL);
 
         if( _b_autoplay & (libvlc_playlist_items_count(p_libvlc, NULL) > 0) )
         {
@@ -895,8 +727,6 @@ HRESULT VLCPlugin::onInPlaceDeactivate(void)
         fireOnStopEvent();
     }
 
-    DestroyWindow(_videownd);
-    _videownd = NULL;
     DestroyWindow(_inplacewnd);
     _inplacewnd = NULL;
  
@@ -912,7 +742,7 @@ void VLCPlugin::setVisible(BOOL fVisible)
         {
             ShowWindow(_inplacewnd, fVisible ? SW_SHOW : SW_HIDE);
             if( fVisible )
-                InvalidateRect(_videownd, NULL, TRUE);
+                InvalidateRect(_inplacewnd, NULL, TRUE);
         }
         setDirty(TRUE);
         firePropChangedEvent(DISPID_Visible);
@@ -1079,52 +909,38 @@ void VLCPlugin::onPaint(HDC hdc, const RECT &bounds, const RECT &clipRect)
 void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
 {
     RECT clipRect = *lprcClipRect;
-    RECT posRect  = *lprcPosRect;
 
     //RedrawWindow(GetParent(_inplacewnd), &_posRect, NULL, RDW_INVALIDATE|RDW_ERASE|RDW_ALLCHILDREN);
 
     /*
     ** record keeping of control geometry within container
     */
-    _posRect = posRect;
-
-    /*
-    ** convert posRect & clipRect to match control viewport coordinates
-    */
-    getViewportCoords(&posRect, &clipRect);
+    _posRect = *lprcPosRect;
 
     /*
     ** change in-place window geometry to match clipping region
     */
     SetWindowPos(_inplacewnd, NULL,
-            clipRect.left,
-            clipRect.top,
-            clipRect.right-clipRect.left,
-            clipRect.bottom-clipRect.top,
+            lprcPosRect->left,
+            lprcPosRect->top,
+            lprcPosRect->right-lprcPosRect->left,
+            lprcPosRect->bottom-lprcPosRect->top,
             SWP_NOACTIVATE|
             SWP_NOCOPYBITS|
             SWP_NOZORDER|
             SWP_NOOWNERZORDER );
 
-    /*
-    ** change video window geometry to match object bounds within clipping region
-    */
-    SetWindowPos(_videownd, NULL,
-            posRect.left,
-            posRect.top,
-            posRect.right-posRect.left,
-            posRect.bottom-posRect.top,
-            SWP_NOACTIVATE|
-            SWP_NOCOPYBITS|
-            SWP_NOZORDER|
-            SWP_NOOWNERZORDER );
+    /* change cliprect coordinates system relative to window bounding rect */
+    OffsetRect(&clipRect, -lprcPosRect->left, -lprcPosRect->top);
+    HRGN clipRgn = CreateRectRgnIndirect(&clipRect);
+    SetWindowRgn(_inplacewnd, clipRgn, TRUE);
 
     //RedrawWindow(_videownd, &posRect, NULL, RDW_INVALIDATE|RDW_ERASE|RDW_ALLCHILDREN);
     if( isRunning() )
     {
         libvlc_video_set_size(_p_libvlc,
-            posRect.right-posRect.left,
-            posRect.bottom-posRect.top,
+            lprcPosRect->right-lprcPosRect->left,
+            lprcPosRect->bottom-lprcPosRect->top,
             NULL );
     }
 };
