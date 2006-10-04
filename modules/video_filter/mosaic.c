@@ -73,7 +73,7 @@ struct filter_sys_t
     int i_cols, i_rows; /* mosaic rows and cols */
     int i_align; /* mosaic alignment in background video */
     int i_xoffset, i_yoffset; /* top left corner offset */
-    int i_vborder, i_hborder; /* border width/height between miniatures */
+    int i_borderw, i_borderh; /* border width/height between miniatures */
     int i_alpha; /* subfilter alpha blending */
 
     vlc_bool_t b_bs; /* Bluescreen vars */
@@ -105,12 +105,10 @@ struct filter_sys_t
 #define XOFFSET_LONGTEXT N_("X Coordinate of the top-left corner of the mosaic.")
 #define YOFFSET_TEXT N_("Top left corner Y coordinate")
 #define YOFFSET_LONGTEXT N_("Y Coordinate of the top-left corner of the mosaic.")
-#define VBORDER_TEXT N_("Vertical border width")
-#define VBORDER_LONGTEXT N_( "Width in pixels of the border than can be "\
-    "drawn vertically around the mosaic." )
-#define HBORDER_TEXT N_("Horizontal border width")
-#define HBORDER_LONGTEXT N_( "Width in pixels of the border than can "\
-    "be drawn horizontally around the mosaic." )
+#define BORDERW_TEXT N_("Border width")
+#define BORDERW_LONGTEXT N_( "Width in pixels of the border between miniatures." )
+#define BORDERH_TEXT N_("Border height")
+#define BORDERH_LONGTEXT N_( "Height in pixels of the border between miniatures." )
 
 #define ALIGN_TEXT N_("Mosaic alignment" )
 #define ALIGN_LONGTEXT N_( \
@@ -200,8 +198,10 @@ vlc_module_begin();
         change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
     add_integer( CFG_PREFIX "xoffset", 0, NULL, XOFFSET_TEXT, XOFFSET_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "yoffset", 0, NULL, YOFFSET_TEXT, YOFFSET_LONGTEXT, VLC_TRUE );
-    add_integer( CFG_PREFIX "vborder", 0, NULL, VBORDER_TEXT, VBORDER_LONGTEXT, VLC_TRUE );
-    add_integer( CFG_PREFIX "hborder", 0, NULL, HBORDER_TEXT, HBORDER_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "borderw", 0, NULL, BORDERW_TEXT, BORDERW_LONGTEXT, VLC_TRUE );
+        add_deprecated( CFG_PREFIX "vborder", VLC_FALSE );
+    add_integer( CFG_PREFIX "borderh", 0, NULL, BORDERH_TEXT, BORDERH_LONGTEXT, VLC_TRUE );
+        add_deprecated( CFG_PREFIX "hborder", VLC_FALSE );
 
     add_integer( CFG_PREFIX "position", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
@@ -231,7 +231,7 @@ vlc_module_end();
 
 static const char *ppsz_filter_options[] = {
     "alpha", "height", "width", "align", "xoffset", "yoffset",
-    "vborder", "hborder", "position", "rows", "cols",
+    "borderw", "borderh", "position", "rows", "cols",
     "keep-aspect-ratio", "keep-picture", "order", "offsets",
     "delay", "bs", "bsu", "bsv", "bsut", "bsvt", NULL
 };
@@ -325,8 +325,8 @@ static int CreateFilter( vlc_object_t *p_this )
     var_SetInteger( p_libvlc_global, CFG_PREFIX "align", p_sys->i_align );
     var_AddCallback( p_libvlc_global, CFG_PREFIX "align", MosaicCallback, p_sys );
 
-    GET_VAR( vborder, 0, INT_MAX );
-    GET_VAR( hborder, 0, INT_MAX );
+    GET_VAR( borderw, 0, INT_MAX );
+    GET_VAR( borderh, 0, INT_MAX );
     GET_VAR( rows, 1, INT_MAX );
     GET_VAR( cols, 1, INT_MAX );
     GET_VAR( alpha, 0, 255 );
@@ -559,9 +559,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     }
 
     col_inner_width  = ( ( p_sys->i_width - ( p_sys->i_cols - 1 )
-                       * p_sys->i_vborder ) / p_sys->i_cols );
+                       * p_sys->i_borderw ) / p_sys->i_cols );
     row_inner_height = ( ( p_sys->i_height - ( p_sys->i_rows - 1 )
-                       * p_sys->i_hborder ) / p_sys->i_rows );
+                       * p_sys->i_borderh ) / p_sys->i_rows );
 
     i_real_index = 0;
 
@@ -791,14 +791,14 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             whole rectangle area or it's larger than the rectangle */
             p_region->i_x = p_sys->i_xoffset
                         + i_col * ( p_sys->i_width / p_sys->i_cols )
-                        + ( i_col * p_sys->i_vborder ) / p_sys->i_cols;
+                        + ( i_col * p_sys->i_borderw ) / p_sys->i_cols;
         }
         else
         {
             /* center the video in the dedicated rectangle */
             p_region->i_x = p_sys->i_xoffset
                     + i_col * ( p_sys->i_width / p_sys->i_cols )
-                    + ( i_col * p_sys->i_vborder ) / p_sys->i_cols
+                    + ( i_col * p_sys->i_borderw ) / p_sys->i_cols
                     + ( col_inner_width - fmt_out.i_width ) / 2;
         }
 
@@ -813,14 +813,14 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             whole rectangle area or it's taller than the rectangle */
             p_region->i_y = p_sys->i_yoffset
                     + i_row * ( p_sys->i_height / p_sys->i_rows )
-                    + ( i_row * p_sys->i_hborder ) / p_sys->i_rows;
+                    + ( i_row * p_sys->i_borderh ) / p_sys->i_rows;
         }
         else
         {
             /* center the video in the dedicated rectangle */
             p_region->i_y = p_sys->i_yoffset
                     + i_row * ( p_sys->i_height / p_sys->i_rows )
-                    + ( i_row * p_sys->i_hborder ) / p_sys->i_rows
+                    + ( i_row * p_sys->i_borderh ) / p_sys->i_rows
                     + ( row_inner_height - fmt_out.i_height ) / 2;
         }
 
@@ -905,20 +905,20 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
         p_sys->i_align = newval.i_int;
         vlc_mutex_unlock( &p_sys->lock );
     }
-    else if( !strcmp( psz_var, CFG_PREFIX "vborder" ) )
+    else if( !strcmp( psz_var, CFG_PREFIX "borderw" ) )
     {
         vlc_mutex_lock( &p_sys->lock );
-        msg_Dbg( p_this, "changing vertical border from %dpx to %dpx",
-                         p_sys->i_vborder, newval.i_int );
-        p_sys->i_vborder = __MAX( newval.i_int, 0 );
+        msg_Dbg( p_this, "changing border width from %dpx to %dpx",
+                         p_sys->i_borderw, newval.i_int );
+        p_sys->i_borderw = __MAX( newval.i_int, 0 );
         vlc_mutex_unlock( &p_sys->lock );
     }
-    else if( !strcmp( psz_var, CFG_PREFIX "hborder" ) )
+    else if( !strcmp( psz_var, CFG_PREFIX "borderh" ) )
     {
         vlc_mutex_lock( &p_sys->lock );
-        msg_Dbg( p_this, "changing horizontal border from %dpx to %dpx",
-                         p_sys->i_vborder, newval.i_int );
-        p_sys->i_hborder = __MAX( newval.i_int, 0 );
+        msg_Dbg( p_this, "changing border height from %dpx to %dpx",
+                         p_sys->i_borderh, newval.i_int );
+        p_sys->i_borderh = __MAX( newval.i_int, 0 );
         vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, CFG_PREFIX "position" ) )
