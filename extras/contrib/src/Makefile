@@ -124,7 +124,6 @@ endif
 
 ifeq ($(HOST),i686-apple-darwin8)
 FFMPEGCONF += --enable-memalign-hack
-X264CONF += --extra-ldflags=-read_only_relocs suppress
 endif
 
 ifdef HAVE_DARWIN_OS
