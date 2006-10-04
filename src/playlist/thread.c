@@ -206,19 +206,15 @@ static void EndPlaylist( playlist_t *p_playlist )
  *****************************************************************************/
 static void RunPreparse ( playlist_preparse_t *p_obj )
 {
-    playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
-
     playlist_PreparseLoop( p_obj );
 }
 
 static void RunSecondaryPreparse( playlist_secondary_preparse_t *p_obj )
 {
-    playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
-
     playlist_SecondaryPreparseLoop( p_obj );
 }
 

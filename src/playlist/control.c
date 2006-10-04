@@ -232,7 +232,7 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
                  p_playlist->p_secondary_preparse->i_waiting,
                  i, p );
     vlc_mutex_unlock( &p_playlist->p_secondary_preparse->object_lock );
-    vlc_cond_signal( &p_playlist->p_secondary_preparse->object_lock );
+    vlc_cond_signal( &p_playlist->p_secondary_preparse->object_wait );
     return VLC_SUCCESS;
 }
 

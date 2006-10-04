@@ -240,7 +240,7 @@ void streaming_ParameterApply( sout_param_t *p_param, char **ppsz_dest,
             break;
         case VLC_VAR_STRING:
             assert( ppsz_dest );
-            FREENULL( **ppsz_dest );
+            free( *ppsz_dest );
             *ppsz_dest = p_param->value.psz_string ?
                                 strdup( p_param->value.psz_string ) :
                                 NULL;
