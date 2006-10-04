@@ -145,13 +145,10 @@ ifdef HAVE_DARWIN_OS
 	.dvdcss .dvdnav .dvdread .dvbpsi .live .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
 	.glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder .aclocal \
-        .libdca .tag .goom2k4
+        .libdca .tag .x264 .goom2k4
 # .expat .clinkcc don't work with SDK yet
 # .glib .libidl .gecko are required to build the mozilla plugin
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
-ifneq ($(HOST),i686-apple-darwin8)
-all: .x264
-endif
 else
 
  ifdef HAVE_BEOS
