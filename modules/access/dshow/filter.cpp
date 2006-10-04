@@ -614,10 +614,11 @@ STDMETHODIMP CapturePin::QueryAccept( const AM_MEDIA_TYPE *pmt )
         }
 
         msg_Dbg( p_input, "CapturePin::QueryAccept [OK] "
-                 "(width=%ld, height=%ld, chroma=%4.4s)",
+                 "(width=%ld, height=%ld, chroma=%4.4s, fps=%f)",
                  ((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth,
                  ((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight,
-                 (char *)&i_fourcc );
+                 (char *)&i_fourcc,
+		 10000000.0f/((float)((VIDEOINFOHEADER *)pmt->pbFormat)->AvgTimePerFrame) );
     }
     else if( pmt->majortype == MEDIATYPE_Audio )
     {
