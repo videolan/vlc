@@ -313,7 +313,7 @@ void E_(DirectXEventThread)( event_thread_t *p_event )
 #ifdef MODULE_NAME_IS_direct3d
                 val.psz_string = strdup( VOUT_TITLE " (Direct3D output)" );
 #endif
-#ifdef MODULE_NAME_IS_directx
+#ifdef MODULE_NAME_IS_vout_directx
                 if( p_event->p_vout->p_sys->b_using_overlay ) val.psz_string = 
                 strdup( VOUT_TITLE " (hardware YUV overlay DirectX output)" );
                 else if( p_event->p_vout->p_sys->b_hw_yuv ) val.psz_string = 

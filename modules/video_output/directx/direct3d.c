@@ -1351,7 +1351,7 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Clear the backbuffer and the zbuffer */
     hr = IDirect3DDevice9_Clear( p_d3ddev, 0, NULL, D3DCLEAR_TARGET,
-                              D3DCOLOR_XRGB(0, 255, 0), 1.0f, 0 );
+                              D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0 );
     if( FAILED(hr) )
     {
         msg_Dbg( p_vout, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
