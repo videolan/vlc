@@ -556,6 +556,7 @@ const NPUTF8 * const LibvlcPlaylistNPObject::methodNames[] =
 {
     "add",
     "play",
+    "playItem",
     "togglePause",
     "stop",
     "next",
@@ -570,6 +571,7 @@ enum LibvlcPlaylistNPObjectMethodIds
 {
     ID_add,
     ID_play,
+    ID_playItem,
     ID_togglepause,
     ID_stop,
     ID_next,
@@ -682,6 +684,23 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                 if( argCount == 0 )
                 {
                     libvlc_playlist_play(p_plugin->getVLC(), -1, 0, NULL, &ex);
+                    if( libvlc_exception_raised(&ex) )
+                    {
+                        NPN_SetException(this, libvlc_exception_get_message(&ex));
+                        libvlc_exception_clear(&ex);
+                        return INVOKERESULT_GENERIC_ERROR;
+                    }
+                    else
+                    {
+                        VOID_TO_NPVARIANT(result);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            case ID_playItem:
+                if( (argCount == 1) && isNumberValue(args[0]) )
+                {
+                    libvlc_playlist_play(p_plugin->getVLC(), numberValue(args[0]), 0, NULL, &ex);
                     if( libvlc_exception_raised(&ex) )
                     {
                         NPN_SetException(this, libvlc_exception_get_message(&ex));

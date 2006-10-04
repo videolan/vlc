@@ -93,8 +93,7 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
             return NPERR_NO_ERROR;
 
         case NPPVpluginDescriptionString:
-            snprintf( psz_desc, sizeof(psz_desc)-1, PLUGIN_DESCRIPTION, VLC_Version() );
-            psz_desc[sizeof(psz_desc)-1] = 0;
+            snprintf( psz_desc, sizeof(psz_desc), PLUGIN_DESCRIPTION, VLC_Version() );
             *((char **)value) = psz_desc;
             return NPERR_NO_ERROR;
 
