@@ -44,6 +44,7 @@
 - (void)setStreamTitle:(NSString *)o_title;
 - (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time;
 - (void)setSeekable:(BOOL) b_seekable;
+- (void)setVolumeLevel: (float)f_volumeLevel;
 
 - (void)focus:(NSTimer *)timer;
 - (void)unfocus:(NSTimer *)timer;
@@ -67,8 +68,8 @@
 {
     NSColor *fillColor;
     NSButton *o_prev, *o_next, *o_slow, *o_fast, *o_play, *o_fullscreen;
-    NSTextField *o_textfield, *o_textPos;
-    NSSlider *o_fs_timeSlider;
+    NSTextField *o_streamTitle_txt, *o_streamPosition_txt;
+    NSSlider *o_fs_timeSlider, *o_fs_volumeSlider;
 }
 - (id)initWithFrame:(NSRect)frameRect;
 - (void)drawRect:(NSRect)rect;
@@ -76,21 +77,31 @@
 - (void)setPlay;
 - (void)setPause;
 - (void)setStreamTitle: (NSString *)o_title;
-- (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time;
+- (void)setStreamPos: (float)f_pos andTime: (NSString *)o_time;
 - (void)setSeekable: (BOOL)b_seekable; 
+- (void)setVolumeLevel: (float)f_volumeLevel;
 - (IBAction)play:(id)sender;
 - (IBAction)prev:(id)sender;
 - (IBAction)next:(id)sender;
 - (IBAction)faster:(id)sender;
 - (IBAction)slower:(id)sender;
 - (IBAction)fsTimeSliderUpdate:(id)sender;
+- (IBAction)fsVolumeSliderUpdate:(id)sender;
 
 @end
 
 @interface VLCFSTimeSlider : NSSlider
-{}
-void drawKnobInRect(NSRect knobRect);
-void drawFrameInRect(NSRect frameRect);
+{
+}
+- (void)drawKnobInRect:(NSRect)knobRect;
+- (void)drawRect:(NSRect)rect;
+
+@end
+
+@interface VLCFSVolumeSlider : NSSlider
+{
+}
+- (void)drawKnobInRect:(NSRect)knobRect;
 - (void)drawRect:(NSRect)rect;
 
 @end

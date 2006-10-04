@@ -1212,6 +1212,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
             [o_volumeslider setFloatValue: (float)i_lastShownVolume / i_volume_step];
             [o_volumeslider setEnabled: TRUE];
+            [[[self getControls] getFSPanel] setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
             p_intf->p_sys->b_mute = ( i_lastShownVolume == 0 );
             p_intf->p_sys->b_volume_update = FALSE;
         }

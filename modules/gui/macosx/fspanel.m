@@ -102,9 +102,14 @@
     [[self contentView] setStreamPos:f_pos andTime: o_time];
 }
 
-- (void)setSeekable:(BOOL) b_seekable;
+- (void)setSeekable:(BOOL) b_seekable
 {
     [[self contentView] setSeekable: b_seekable];
+}
+
+- (void)setVolumeLevel: (float)f_volumeLevel
+{
+    [[self contentView] setVolumeLevel: f_volumeLevel];
 }
 
 /* This routine is called repeatedly when the mouse enters the window from outside it. */
@@ -276,10 +281,8 @@
     [o_button setBezelStyle: NSRegularSquareBezelStyle];                                        \
     [o_button setBordered: NO];                                                                 \
     [o_button setFont:[NSFont systemFontOfSize:0]];                                             \
-    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:imageOff]];    \
-    [o_button setImage:image];                                                                  \
-    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:imageOn]];     \
-    [o_button setAlternateImage:image];                                                         \
+    [o_button setImage:[NSImage imageNamed:imageOff]];                                 \
+    [o_button setAlternateImage:[NSImage imageNamed:imageOn]];                         \
     [o_button sizeToFit];                                                                       \
     [o_button setTarget: self];                                                                 \
     [o_button setAction: @selector(action:)];                                                   \
@@ -299,21 +302,21 @@
 
 - (id)initWithFrame:(NSRect)frameRect
 {
-    NSBundle * bundle = [NSBundle mainBundle];
     id view = [super initWithFrame:frameRect];
     fillColor = [[NSColor clearColor] retain];
     NSRect s_rc = [self frame];
     NSImage * image;
-    addButton( o_prev, @"fs_skip_previous.png" , @"fs_skip_previous_highlight.png", 174, 15, prev );
-    addButton( o_slow, @"fs_rewind.png"        , @"fs_rewind_highlight.png"       , 211, 14, slower );
-    addButton( o_play, @"fs_play.png"          , @"fs_play_highlight.png"         , 269, 10, play );
-    addButton( o_fast, @"fs_forward.png"       , @"fs_forward_highlight.png"      , 313, 14, faster );
-    addButton( o_next, @"fs_skip_next.png"     , @"fs_skip_next_highlight.png"    , 365, 15, next );
-    addButton( o_fullscreen, @"fs_exit_fullscreen.png", @"fs_exit_fullscreen_hightlight.png", 507, 13, windowAction );
+    addButton( o_prev, @"fs_skip_previous" , @"fs_skip_previous_highlight", 174, 15, prev );
+    addButton( o_slow, @"fs_rewind"        , @"fs_rewind_highlight"       , 211, 14, slower );
+    addButton( o_play, @"fs_play"          , @"fs_play_highlight"         , 267, 10, play );
+    addButton( o_fast, @"fs_forward"       , @"fs_forward_highlight"      , 313, 14, faster );
+    addButton( o_next, @"fs_skip_next"     , @"fs_skip_next_highlight"    , 365, 15, next );
+    addButton( o_fullscreen, @"fs_exit_fullscreen", @"fs_exit_fullscreen_hightlight", 507, 13, windowAction );
 /*
-    addButton( o_button, @"FSVolumeThumbOff.tif"   , @"FSVolumeThumbOn.tif"  ,  38, 51, something );
+    addButton( o_button, @"image (off state)", @"image (on state)", 38, 51, something );
  */
 
+    /* time slider */
     s_rc = [self frame];
     s_rc.origin.x = 15;
     s_rc.origin.y = 53;
@@ -327,17 +330,33 @@
     [o_fs_timeSlider setTarget: self];
     [o_fs_timeSlider setAction: @selector(fsTimeSliderUpdate:)];
     [self addSubview: o_fs_timeSlider];
+
+    /* volume slider */
+    s_rc = [self frame];
+    s_rc.origin.x = 26;
+    s_rc.origin.y = 17.5;
+    s_rc.size.width = 95;
+    s_rc.size.height = 10;
+    o_fs_volumeSlider = [[VLCFSVolumeSlider alloc] initWithFrame: s_rc];
+    [o_fs_volumeSlider setMinValue:0];
+    [o_fs_volumeSlider setMaxValue:32];
+    [o_fs_volumeSlider setFloatValue: 0];
+    [o_fs_volumeSlider setContinuous: YES];
+    [o_fs_volumeSlider setTarget: self];
+    [o_fs_volumeSlider setAction: @selector(fsVolumeSliderUpdate:)];
+    [self addSubview: o_fs_volumeSlider];
     
+    /* time counter and stream title output fields */
     s_rc = [self frame];
     s_rc.origin.x = 98;
     s_rc.origin.y = 64;
     s_rc.size.width = 352;
     s_rc.size.height = 14;
-    addTextfield( o_textfield, NSCenterTextAlignment, systemFontOfSize, whiteColor, 0 );
+    addTextfield( o_streamTitle_txt, NSCenterTextAlignment, systemFontOfSize, whiteColor, 0 );
     s_rc.origin.x = 486;
     s_rc.origin.y = 64;
     s_rc.size.width = 50;
-    addTextfield( o_textPos, NSRightTextAlignment, systemFontOfSize, whiteColor, 0 );
+    addTextfield( o_streamPosition_txt, NSRightTextAlignment, systemFontOfSize, whiteColor, 0 );
 
     return view;
 }
@@ -345,6 +364,15 @@
 - (void)dealloc
 {
     [o_fs_timeSlider release];
+    [o_fs_volumeSlider release];
+    [o_prev release];
+    [o_next release];
+    [o_slow release];
+    [o_play release];
+    [o_fast release];
+    [o_fullscreen release];
+    [o_streamTitle_txt release];
+    [o_streamPosition_txt release];
     [super dealloc];
 }
 
@@ -352,11 +380,9 @@
 {
     NSBundle *bundle = [NSBundle mainBundle];
     NSImage *image;
-    [[o_play image] release];
-    [[o_play alternateImage] release];
-    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"fs_play.png"]];
+    image = [NSImage imageNamed:@"fs_play"];
     [o_play setImage:image];
-    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"fs_play_highlight.png"]];
+    image = [NSImage imageNamed:@"fs_play_highlight"];
     [o_play setAlternateImage:image];
 }
 
@@ -364,22 +390,20 @@
 {
     NSBundle *bundle = [NSBundle mainBundle];
     NSImage *image;
-    [[o_play image] release];
-    [[o_play alternateImage] release];
-    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"fs_pause.png"]];
+    image = [NSImage imageNamed:@"fs_pause"];
     [o_play setImage:image];
-    image = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"fs_pause_highlight.png"]];
+    image = [NSImage imageNamed:@"fs_pause_highlight"];
     [o_play setAlternateImage:image];
 }
 
 - (void)setStreamTitle:(NSString *)o_title
 {
-    [o_textfield setStringValue: o_title];
+    [o_streamTitle_txt setStringValue: o_title];
 }
 
 - (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time
 {
-    [o_textPos setStringValue: o_time];
+    [o_streamPosition_txt setStringValue: o_time];
     [o_fs_timeSlider setFloatValue: f_pos];
 }
 
@@ -388,6 +412,11 @@
     [o_slow setEnabled: b_seekable];
     [o_fast setEnabled: b_seekable];
     [o_fs_timeSlider setEnabled: b_seekable];
+}
+
+- (void)setVolumeLevel: (float)f_volumeLevel
+{
+    [o_fs_volumeSlider setFloatValue: f_volumeLevel];
 }
 
 - (IBAction)play:(id)sender
@@ -425,8 +454,13 @@
     [[VLCMain sharedInstance] timesliderUpdate: sender];
 }
 
+- (IBAction)fsVolumeSliderUpdate:(id)sender
+{
+    [[[VLCMain sharedInstance] getControls] volumeSliderUpdated: sender];
+}
+
 #define addImage(image, _x, _y, mode, _width)                                               \
-    img = [[[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:image]] autorelease];     \
+    img = [NSImage imageNamed:image];                                              \
     image_rect.size = [img size];                                                           \
     image_rect.origin.x = 0;                                                                \
     image_rect.origin.y = 0;                                                                \
@@ -438,15 +472,14 @@
 
 - (void)drawRect:(NSRect)rect
 {
-    NSBundle *bundle = [NSBundle mainBundle];
 	NSRect frame = [self frame];
     NSRect image_rect;
     NSImage *img;
-    addImage( @"fs_background.png", 0, 0, NSCompositeCopy, 0 );
-    addImage( @"fs_volume_slider_bar.png" , 26, 22, NSCompositeSourceOver, 0 );
-    addImage( @"fs_volume_mute.png", 16, 18, NSCompositeSourceOver, 0 );
-    addImage( @"fs_volume_max.png", 124, 17, NSCompositeSourceOver, 0 );
-    addImage(@"fs_time_slider.png" ,  15, 53, NSCompositeSourceOver, 0);
+    addImage( @"fs_background", 0, 0, NSCompositeCopy, 0 );
+    addImage( @"fs_volume_slider_bar", 26, 22, NSCompositeSourceOver, 0 );
+    addImage( @"fs_volume_mute", 16, 18, NSCompositeSourceOver, 0 );
+    addImage( @"fs_volume_max", 124, 17, NSCompositeSourceOver, 0 );
+    addImage( @"fs_time_slider", 15, 53, NSCompositeSourceOver, 0);
 }
 
 @end
@@ -455,11 +488,11 @@
  * VLCFSTimeSlider
  *****************************************************************************/
 @implementation VLCFSTimeSlider
-void drawKnobInRect(NSRect knobRect)
+- (void)drawKnobInRect:(NSRect)knobRect
 {
     NSBundle *bundle = [NSBundle mainBundle];
     NSRect image_rect;
-    NSImage *img = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"fs_time_slider_knob.png"]];
+    NSImage *img = [NSImage imageNamed:@"fs_time_slider_knob_highlight"];
     image_rect.size = [img size];
     image_rect.origin.x = 0;
     image_rect.origin.y = 0;
@@ -467,11 +500,6 @@ void drawKnobInRect(NSRect knobRect)
     knobRect.size.width = image_rect.size.width;
     knobRect.size.height = image_rect.size.height;
     [img drawInRect:knobRect fromRect:image_rect operation:NSCompositeSourceOver fraction:1];
-}
-
-void drawFrameInRect(NSRect frameRect) 
-{
-    /* we don't do anything here atm */
 }
 
 - (void)drawRect:(NSRect)rect
@@ -485,8 +513,41 @@ void drawFrameInRect(NSRect frameRect)
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
     knobRect.origin.y+=7.5;
     [[[NSColor blackColor] colorWithAlphaComponent:0.6] set];
-    drawFrameInRect(rect);
-    drawKnobInRect(knobRect);
+    [self drawKnobInRect: knobRect];
+}
+
+@end
+
+/*****************************************************************************
+* VLCFSVolumeSlider
+*****************************************************************************/
+@implementation VLCFSVolumeSlider
+- (void)drawKnobInRect:(NSRect) knobRect
+{
+    NSBundle *bundle = [NSBundle mainBundle];
+    NSRect image_rect;
+    NSImage *img = [NSImage imageNamed:@"fs_volume_slider_knob"];
+    image_rect.size = [img size];
+    image_rect.origin.x = 0;
+    image_rect.origin.y = 0;
+    knobRect.origin.x += (knobRect.size.width - image_rect.size.width) / 2;
+    knobRect.size.width = image_rect.size.width;
+    knobRect.size.height = image_rect.size.height;
+    [img drawInRect:knobRect fromRect:image_rect operation:NSCompositeSourceOver fraction:1];
+}
+
+- (void)drawRect:(NSRect)rect
+{
+    /* Draw default to make sure the slider behaves correctly */
+    [[NSGraphicsContext currentContext] saveGraphicsState];
+    NSRectClip(NSZeroRect);
+    [super drawRect:rect];
+    [[NSGraphicsContext currentContext] restoreGraphicsState];
+    
+    NSRect knobRect = [[self cell] knobRectFlipped:NO];
+    knobRect.origin.y+=6;
+    [[[NSColor blackColor] colorWithAlphaComponent:0.6] set];
+    [self drawKnobInRect: knobRect];
 }
 
 @end
