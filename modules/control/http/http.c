@@ -263,11 +263,10 @@ static int Open( vlc_object_t *p_this )
             i_port= 8080;
     }
 
-    /* maximum port is 65535 , strlen("65535") == 5 */
-    psz_tmp = malloc( ( strlen( psz_address ) + 5 ) * sizeof( char) );
+    /* maximum port is 65535 , strlen("65535") = 5 , + ':' = 6 */
+    psz_tmp = malloc( ( strlen( psz_address ) + 6 ) * sizeof( char) );
 
     /* Ugly hack to allow to run several HTTP servers on different ports. */
-
     sprintf( psz_tmp, "%s:%d", psz_address, i_port + 1 );
     var_SetString( p_intf->p_libvlc_global, "http-host", psz_tmp );
     free( psz_tmp );
