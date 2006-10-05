@@ -124,7 +124,6 @@ static int Open( vlc_object_t *p_this )
                   *psz_crl = NULL;
     int           i_port       = 0;
     char          *psz_src;
-    char          *psz_tmp;
 
     var_Create(p_intf->p_libvlc_global, "http-host", VLC_VAR_STRING );
     psz_address=var_GetString(p_intf->p_libvlc_global, "http-host");
@@ -263,14 +262,6 @@ static int Open( vlc_object_t *p_this )
             i_port= 8080;
     }
 
-    /* maximum port is 65535 , strlen("65535") = 5 , + ':' = 6 */
-    psz_tmp = malloc( ( strlen( psz_address ) + 6 ) * sizeof( char) );
-
-    /* Ugly hack to allow to run several HTTP servers on different ports. */
-    sprintf( psz_tmp, "%s:%d", psz_address, i_port + 1 );
-    var_SetString( p_intf->p_libvlc_global, "http-host", psz_tmp );
-    free( psz_tmp );
-
     msg_Dbg( p_intf, "base %s:%d", psz_address, i_port );
 
     p_sys->p_httpd_host = httpd_TLSHostNew( VLC_OBJECT(p_intf), psz_address,
@@ -283,6 +274,14 @@ static int Open( vlc_object_t *p_this )
         free( p_sys->psz_address );
         free( p_sys );
         return VLC_EGENERIC;
+    }
+    else
+    {
+        char psz_tmp[NI_MAXHOST + 6];
+
+        /* Ugly hack to run several HTTP servers on different ports */
+        snprintf( psz_tmp, sizeof (psz_tmp), "%s:%d", psz_address, i_port + 1 );
+        var_SetString( p_intf->p_libvlc_global, "http-host", psz_tmp );
     }
 
     p_sys->i_files  = 0;
