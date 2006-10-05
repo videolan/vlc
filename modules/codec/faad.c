@@ -25,6 +25,7 @@
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/decoder.h>
+#include <vlc/input.h>
 
 #include <faad.h>
 
@@ -66,6 +67,8 @@ struct decoder_sys_t
 
     /* Channel positions of the current stream (for re-ordering) */
     uint32_t pi_channel_positions[MAX_CHANNEL_POSITIONS];
+
+    vlc_bool_t b_sbr, b_ps;
 };
 
 static const uint32_t pi_channels_in[MAX_CHANNEL_POSITIONS] =
@@ -166,6 +169,7 @@ static int Open( vlc_object_t *p_this )
     /* Faad2 can't deal with truncated data (eg. from MPEG TS) */
     p_dec->b_need_packetized = VLC_TRUE;
 
+    p_sys->b_sbr = p_sys->b_ps = VLC_FALSE;
     return VLC_SUCCESS;
 }
 
@@ -311,6 +315,27 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_dec->fmt_out.audio.i_rate = frame.samplerate;
         p_dec->fmt_out.audio.i_channels = frame.channels;
 
+        /* Adjust stream info when dealing with SBR/PS */
+        if( (p_sys->b_sbr != frame.sbr || p_sys->b_ps != frame.ps) &&
+            p_dec->p_parent->i_object_type == VLC_OBJECT_INPUT )
+        {
+          input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
+          char *psz_cat, *psz_ext = (frame.sbr && frame.ps) ? "SBR+PS" :
+            frame.sbr ? "SBR" : "PS";
+
+          msg_Dbg( p_dec, "AAC %s (channels: %u, samplerate: %lu)",
+                   psz_ext, frame.channels, frame.samplerate );
+
+          asprintf( &psz_cat, _("Stream %d"), p_dec->fmt_in.i_id );
+          input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                          _("AAC extension"), "%s", psz_ext );
+          input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                         _("Channels"), "%d", frame.channels );
+          input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                         _("Sample rate"), _("%d Hz"), frame.samplerate );
+          free( psz_cat );
+          p_sys->b_sbr = frame.sbr; p_sys->b_ps = frame.ps;
+        }
 
         /* Convert frame.channel_position to our own channel values */
         for( i = 0; i < frame.channels; i++ )
@@ -330,8 +355,11 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( j == MAX_CHANNEL_POSITIONS )
             {
                 msg_Warn( p_dec, "unknown channel ordering" );
-                block_Release( p_block );
-                return NULL;
+
+                /* Try to invent something */
+                p_sys->pi_channel_positions[i] = pi_channels_out[i];
+                p_dec->fmt_out.audio.i_physical_channels |=
+                    pi_channels_out[i];
             }
         }
         p_dec->fmt_out.audio.i_original_channels =
