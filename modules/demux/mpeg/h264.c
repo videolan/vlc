@@ -75,33 +75,23 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    vlc_bool_t   b_forced = VLC_FALSE;
-
     uint8_t     *p_peek;
     vlc_value_t val;
 
-    if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 )
-    {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
-
-    if( !strncmp( p_demux->psz_demux, "h264", 4 ) )
-    {
-        b_forced = VLC_TRUE;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
 
     if( p_peek[0] != 0x00 || p_peek[1] != 0x00 ||
         p_peek[2] != 0x00 || p_peek[3] != 0x01 ||
         (p_peek[4]&0x1F) != 7 ) /* SPS */
     {
-        if( !b_forced )
+        if( !p_demux->b_force )
         {
             msg_Warn( p_demux, "h264 module discarded (no startcode)" );
             return VLC_EGENERIC;
         }
 
-        msg_Err( p_demux, "this doesn't look like a H264 ES stream, continuing" );
+        msg_Err( p_demux, "this doesn't look like a H264 ES stream, "
+                 "continuing anyway" );
     }
 
     p_demux->pf_demux  = Demux;
@@ -112,10 +102,7 @@ static int Open( vlc_object_t * p_this )
     var_Create( p_demux, "h264-fps", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT );
     var_Get( p_demux, "h264-fps", &val );
     p_sys->f_fps = val.f_float;
-    if( val.f_float < 0.001 )
-    {
-        p_sys->f_fps = 0.001;
-    }
+    if( val.f_float < 0.001 ) p_sys->f_fps = 0.001;
     msg_Dbg( p_demux, "using %.2f fps", p_sys->f_fps );
 
     /* Load the mpegvideo packetizer */

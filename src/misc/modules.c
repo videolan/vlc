@@ -578,7 +578,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         /* Store this new module */
         p_list[ i_index ].p_module = p_module;
         p_list[ i_index ].i_score = p_module->i_score + i_shortcut_bonus;
-        p_list[ i_index ].b_force = !!i_shortcut_bonus;
+        p_list[ i_index ].b_force = i_shortcut_bonus && b_strict;
 
         /* Add it to the modules-to-probe list */
         if( i_index == 0 )

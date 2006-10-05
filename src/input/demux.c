@@ -97,6 +97,8 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
             { "ogg",  "ogg" }, { "ogm",  "ogg" },
             { "pva",  "pva" },
             { "rm",   "rm" },
+            { "m4v",  "m4v" },
+            { "h264",  "h264" },
             { NULL,  NULL },
         };
         /* Here, we don't mind if it does not work, it must be quick */
