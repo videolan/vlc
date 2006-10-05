@@ -174,7 +174,7 @@ void playlist_LockClear( playlist_t *p_playlist )
  * \param i_mode the mode used when adding
  * \param i_pos the position in the playlist where to add. If this is
  *        PLAYLIST_END the item will be added at the end of the playlist
- *        regardless of it's size
+ *        regardless of its size
  * \param b_playlist TRUE for playlist, FALSE for media library
  * \return The id of the playlist item
  */
@@ -195,7 +195,7 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
  * \param i_mode the mode used when adding
  * \param i_pos the position in the playlist where to add. If this is
  *        PLAYLIST_END the item will be added at the end of the playlist
- *        regardless of it's size
+ *        regardless of its size
  * \param i_duration length of the item in milliseconds.
  * \param ppsz_options an array of options
  * \param i_options the number of options

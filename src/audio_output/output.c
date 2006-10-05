@@ -296,7 +296,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         p_aout->output.fifo.pp_last = &p_aout->output.fifo.p_first;
 
 #if 0 /* This is bad because the audio output might just be trying to fill
-       * in it's internal buffers. And anyway, it's up to the audio output
+       * in its internal buffers. And anyway, it's up to the audio output
        * to deal with this kind of starvation. */
 
         /* Set date to 0, to allow the mixer to send a new buffer ASAP */

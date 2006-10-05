@@ -455,7 +455,7 @@ static int cinepak_decode_frame( cinepak_context_t *p_context,
         i_strip_id   = GET2BYTES( p_data );
         i_strip_size = GET2BYTES( p_data );
         i_strip_size = __MIN( i_strip_size, i_length );
-        /* FIXME I don't really understand how it's work; */
+        /* FIXME I don't really understand how it works; */
         i_strip_y1  = i_strip_y2 + GET2BYTES( p_data );
         i_strip_x1  = GET2BYTES( p_data );
         i_strip_y2  = i_strip_y2 + GET2BYTES( p_data );

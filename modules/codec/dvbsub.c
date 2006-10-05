@@ -30,7 +30,7 @@
  *
  * FIXME:
  * DVB subtitles coded as strings of characters are not handled correctly.
- * The character codes in the string should actually be indexes refering to a
+ * The character codes in the string should actually be indexes referring to a
  * character table identified in the subtitle descriptor.
  *****************************************************************************/
 #include <vlc/vlc.h>

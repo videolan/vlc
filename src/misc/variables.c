@@ -936,7 +936,7 @@ void __var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
     if( psz_value ) i_name_len = psz_value - psz_option;
     else i_name_len = strlen( psz_option );
 
-    /* It's too much of an hassle to remove the ':' when we parse
+    /* It's too much of a hassle to remove the ':' when we parse
      * the cmd line :) */
     if( i_name_len && *psz_option == ':' )
     {

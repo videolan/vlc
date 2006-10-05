@@ -1172,7 +1172,7 @@ void Playlist::OnDragItemEnd( wxTreeEvent& event )
 
     if( !dest_tree_item.IsOk() ) return;
 
-    /* check that we're not trying to move a node into one of it's children */
+    /* check that we're not trying to move a node into one of its children */
     wxTreeItemId parent = dest_tree_item;
     while( parent != treectrl->GetRootItem() )
     {
@@ -1275,7 +1275,7 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
         {
             /* This is a leaf. Append right after it
              * We thus need to find the parrent node and the position of the
-             * leaf in it's children list */
+             * leaf in its children list */
             wxTreeItemId parent = p->treectrl->GetItemParent( item );
             PlaylistItem *p_parent =
                 (PlaylistItem *)p->treectrl->GetItemData( parent );

@@ -98,12 +98,12 @@
    <item row="2" column="0" >
     <widget class="QLabel" name="label" >
      <property name="text" >
-      <string>Prefered audio language</string>
+      <string>Preferred audio language</string>
      </property>
     </widget>
    </item>
    <item row="2" column="1" >
-    <widget class="QComboBox" name="preferedAudioLanguage" />
+    <widget class="QComboBox" name="preferredAudioLanguage" />
    </item>
    <item row="3" column="0" >
     <widget class="QLabel" name="label_2" >

@@ -737,7 +737,7 @@ describe:
     
     if( p_sdp == NULL )
     {
-        /* failure occured */
+        /* failure occurred */
         int i_code = 0;
         const char *psz_error = p_sys->env->getResultMsg();
                 

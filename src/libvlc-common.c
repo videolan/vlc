@@ -1110,14 +1110,14 @@ static void Help( libvlc_int_t *p_this, char const *psz_help_name )
 static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 {
 #define FORMAT_STRING "  %s --%s%s%s%s%s%s%s "
-    /* short option ------'    |     | | | |  | |
-     * option name ------------'     | | | |  | |
-     * <bra -------------------------' | | |  | |
-     * option type or "" --------------' | |  | |
-     * ket> -----------------------------' |  | |
-     * padding spaces ---------------------'  | |
-     * comment -------------------------------' |
-     * comment suffix --------------------------'
+    /* short option ------'    | | | | | | |
+     * option name ------------' | | | | | |
+     * <bra ---------------------' | | | | |
+     * option type or "" ----------' | | | |
+     * ket> -------------------------' | | |
+     * padding spaces -----------------' | |
+     * comment --------------------------' |
+     * comment suffix ---------------------'
      *
      * The purpose of having bra and ket is that we might i18n them as well.
      */

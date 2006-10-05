@@ -149,7 +149,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         START_SPREFS_CAT( Subtitles );
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
-            CONFIG_GENERIC( "sub-language", String, NULL, preferedLanguage );
+            CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
             CONFIG_GENERIC( "freetype-font", String, NULL, font ); /* FIXME -> use file instead of string */
             CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,

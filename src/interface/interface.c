@@ -85,7 +85,7 @@ static void Manager( intf_thread_t *p_intf );
  * You can give some additional options to be used for interface initialization
  *
  * \param p_this the calling vlc_object_t
- * \param psz_module a prefered interface module
+ * \param psz_module a preferred interface module
  * \param i_options number additional options
  * \param ppsz_options additional option strings
  * \return a pointer to the created interface thread, NULL on error

@@ -145,8 +145,8 @@ typedef struct
 /****************************************************************************
  * High level asf object
  ****************************************************************************/
-/* This is the first header find in a asf file
- * It's the only object that have subobject */
+/* This is the first header found in an asf file
+ * It's the only object that has subobjects */
 typedef struct
 {
     ASF_OBJECT_COMMON

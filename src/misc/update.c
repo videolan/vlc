@@ -546,7 +546,7 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
                     if( !strcmp( psz_eltname, "version" ) )
                     {
                         int i;
-                        /* look for a previous occurence of this release */
+                        /* look for a previous occurrence of this release */
                         for( i = 0; i < p_update->i_releases; i++ )
                         {
                             p_release = p_update->p_releases + i;

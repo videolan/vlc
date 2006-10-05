@@ -97,12 +97,12 @@
    <item row="0" column="0" >
     <widget class="QLabel" name="label" >
      <property name="text" >
-      <string>Subtitles prefered language</string>
+      <string>Subtitles preferred language</string>
      </property>
     </widget>
    </item>
    <item row="0" column="1" >
-    <widget class="QLineEdit" name="preferedLanguage" />
+    <widget class="QLineEdit" name="preferredLanguage" />
    </item>
   </layout>
  </widget>

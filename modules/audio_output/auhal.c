@@ -1217,7 +1217,7 @@ static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_str
     }
 
     /* The AudioStreamSetProperty is not only asynchronious (requiring the locks)
-     * it is also not Atomic, in it's behaviour.
+     * it is also not atomic in its behaviour.
      * Therefore we check 5 times before we really give up.
      * FIXME: failing isn't actually implemented yet. */
     for( i = 0; i < 5; i++ )

@@ -1500,7 +1500,7 @@ static int Mux( sout_mux_t *p_mux )
                         if( p_stream->i_stream_id == 0xa0 &&
                             p_data->i_pts <= 0 )
                         {
-                            /* XXX yes I know, it's awfull, but it's needed,
+                            /* XXX yes I know, it's awful, but it's needed,
                              * so don't remove it ... */
                             p_data->i_pts = p_data->i_dts;
                         }
