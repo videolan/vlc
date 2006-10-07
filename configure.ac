@@ -561,7 +561,7 @@ AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LDFLAGS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual],[-lm])
+  VLC_ADD_LDFLAGS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
   VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer param_eq vlc freetype mpc dmo quicktime realaudio galaktos],[-lm])
@@ -3594,9 +3594,9 @@ if test "${enable_x11}" != "no" &&
    test "${enable_x11}" = "yes"); then
   CPPFLAGS="${CPPFLAGS_save} ${X_FLAGS}"
   AC_CHECK_HEADERS(X11/Xlib.h, [
-    VLC_ADD_PLUGINS([x11])
-    VLC_ADD_LDFLAGS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
-    VLC_ADD_CPPFLAGS([x11],[${X_CFLAGS}])
+    VLC_ADD_PLUGINS([x11 panoramix])
+    VLC_ADD_LDFLAGS([x11 panoramix],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
+    VLC_ADD_CPPFLAGS([x11 panoramix],[${X_CFLAGS}])
   ])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
@@ -4032,6 +4032,12 @@ fi
 dnl
 dnl  Windows DirectX module
 dnl
+
+if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "cygwin"
+then
+  VLC_ADD_PLUGINS([panoramix])
+fi
+
 AC_ARG_ENABLE(directx,
   [  --enable-directx        Win32 DirectX support (default enabled on Win32)])
 if test "${enable_directx}" != "no"

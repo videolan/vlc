@@ -34,7 +34,7 @@ Brieuc Jeunhomme <bbp at via.ecp.fr> - bug fixes
 Bruno Vella <allevb at tin.it> - Italian localization
 Carlo Calabrò <murray at via.ecp.fr> - Italian localization
 Carsten Gottbehüt <gottbehuet at active-elements dot de> - v4l hotplug fix
-Cédric Cocquebert - Misc opengl effects for the OpenGL Video Output
+Cédric Cocquebert - Misc opengl effects for the OpenGL Video Output. "Panoramix" video filter for image walls with automatic attenuation
 Chris Clepper - OpenGL fix
 Christian Henz - libupnp service discovery plugin, CyberLink UPnP fixes
 Christof Baumgaertner - dbox web intf

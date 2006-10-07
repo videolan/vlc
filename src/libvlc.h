@@ -1334,7 +1334,9 @@ vlc_module_begin();
     add_module_list_cat( "video-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, VLC_FALSE );
        add_deprecated( "filter", VLC_FALSE ); /*deprecated since 0.8.2 */
-       add_deprecated( "vout-filter", VLC_FALSE ); /* deprecated since 0.8.6 */
+//       add_deprecated( "vout-filter", VLC_FALSE ); /* deprecated since 0.8.6 *// While the "video-filter" chain isn't parsed for both vfilter and vfilter2, keep both options
+    add_module_list_cat( "vout-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
+                        NULL, NULL, VLC_FALSE );
 #if 0
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
