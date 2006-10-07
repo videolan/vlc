@@ -98,7 +98,6 @@ spu_t *__spu_Create( vlc_object_t *p_this )
  */
 int spu_Init( spu_t *p_spu )
 {
-    char *psz_filter;
     char *psz_parser;
     vlc_value_t val;
 
@@ -110,8 +109,7 @@ int spu_Init( spu_t *p_spu )
     var_Create( p_spu, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_spu, "sub-filter", &val );
 
-    psz_filter = val.psz_string;
-    psz_parser = psz_filter;
+    psz_parser = val.psz_string;
 
     while( psz_parser && *psz_parser )
     {
@@ -153,6 +151,7 @@ int spu_Init( spu_t *p_spu )
 
         free( psz_name );
     }
+    if( val.psz_string ) free( val.psz_string );
 
     return VLC_EGENERIC;
 }

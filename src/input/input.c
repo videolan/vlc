@@ -1970,8 +1970,8 @@ static int InputSourceInit( input_thread_t *p_input,
     {
         psz_path = psz_mrl;
         msg_Dbg( p_input, "trying to pre-parse %s",  psz_path );
-        psz_demux = strdup( "" );
-        psz_access = strdup( "file" );
+        psz_demux = "";
+        psz_access = "file";
     }
 
     if( in->p_demux )

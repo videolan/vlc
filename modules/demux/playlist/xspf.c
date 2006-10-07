@@ -51,11 +51,17 @@ static int Demux( demux_t * );
 /**
  * \brief XSPF submodule initialization function
  */
-int E_(xspf_import_Activate)( vlc_object_t *p_this )
+int E_(Import_xspf)( vlc_object_t *p_this )
 {
     DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".xspf", "xspf-open", 
                                       "using XSPF playlist reader" );
     return VLC_SUCCESS;
+}
+
+void E_(Close_xspf)( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t *)p_this;
+    free( p_demux->p_sys );
 }
 
 /**
