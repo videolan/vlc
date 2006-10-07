@@ -212,6 +212,7 @@ vlc_bool_t E_(FindItem)( demux_t *p_demux, playlist_t *p_playlist,
              msg_Dbg( p_playlist, "unable to find item in playlist");
          }
          msg_Dbg( p_playlist, "not starting playlist playback");
+         p_playlist->status.i_status = PLAYLIST_STOPPED;
          b_play = VLC_FALSE;
      }
      return b_play;
