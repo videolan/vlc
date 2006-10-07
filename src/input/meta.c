@@ -67,23 +67,19 @@ int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
 
     p_me = vlc_object_create( p_playlist, VLC_OBJECT_META_ENGINE );
     p_me->i_flags |= OBJECT_FLAGS_NOINTERACT;
+    p_me->i_flags |= OBJECT_FLAGS_QUIET;
     p_me->i_mandatory = i_mandatory;
     p_me->i_optional = i_optional;
 
     p_me->p_item = p_item;
     p_me->p_module = module_Need( p_me, "meta fetcher", 0, VLC_FALSE );
-    vlc_object_attach( p_me, p_playlist );
     if( !p_me->p_module )
     {
-        msg_Dbg( p_playlist, "unable to fetch meta" );
-        vlc_object_detach( p_me );
         vlc_object_destroy( p_me );
         return VLC_EGENERIC;
     }
 
     module_Unneed( p_me, p_me->p_module );
-
-    vlc_object_detach( p_me );
     vlc_object_destroy( p_me );
 
     return VLC_SUCCESS;
