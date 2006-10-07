@@ -1207,6 +1207,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             }
             else
                 id->psz_fmtp = strdup( "packetization-mode=1" );
+if( p_fmt->i_extra > 0 )
+msg_Dbg( p_stream, "WE HAVE %d bytes extra data", p_fmt->i_extra );
             break;
 
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
@@ -2502,6 +2504,10 @@ static int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
     p_data+=3;
     i_data-=3;
     i_nal_type = p_data[0]&0x1f;
+
+    /* Skip global headers */
+    if( i_nal_type == 7 || i_nal_type == 8 )
+        return VLC_SUCCESS;
     
     if( i_data <= i_max ) /* The whole pack will fit in one rtp payload */
     {
