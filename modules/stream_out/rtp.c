@@ -2483,103 +2483,98 @@ static int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
                                block_t *in )
 {
     int     i_max   = id->i_mtu - 12; /* payload max in one packet */
-    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
     uint8_t *p_data = in->p_buffer;
     int     i_data  = in->i_buffer;
     block_t *out;
     int     i_nal_type;
     int     i_payload;
 
-    while( i_data > 5 &&
-           ( p_data[0] != 0x00 || p_data[1] != 0x00 || p_data[2] != 0x01 || /* startcode */
-            (p_data[3]&0x1f) < 1 || (p_data[3]&0x1f) > 23 ) ) /* naltype should be between 1 and 23 */
+    while( i_data > 4 )
     {
-        p_data++;
-        i_data--;
-    }
-
-    if( i_data < 5 )
-        return VLC_SUCCESS;
-
-    p_data+=3;
-    i_data-=3;
-    i_nal_type = p_data[0]&0x1f;
-
-    /* Skip global headers */
-    if( i_nal_type == 7 || i_nal_type == 8 )
-        return VLC_SUCCESS;
-    
-    if( i_data <= i_max ) /* The whole pack will fit in one rtp payload */
-    {
-        /* single NAL */
-        i_payload = __MIN( i_max, i_data );
-        out = block_New( p_stream, 12 + i_payload );
-
-        /* rtp common header */
-        rtp_packetize_common( id, out, 1,
-                              in->i_pts > 0 ? in->i_pts : in->i_dts );
-
-        memcpy( &out->p_buffer[12], p_data, i_payload );
-
-        out->i_buffer   = 12 + i_payload;
-        out->i_dts    = in->i_dts;
-        out->i_length = in->i_length;
-
-        rtp_packetize_send( id, out );
-
-        /*msg_Dbg( p_stream, "nal-out plain %d %02x", i_payload, out->p_buffer[16] );*/
-    }
-    else
-    {
-        /* FU-A */
-        uint8_t     nalh; /* The nalheader byte */
-        int i=0, start=1, end=0, first=0;
- 
-        nalh = *p_data;
-        p_data++;
-        i_data--;
-
-        i_max   = id->i_mtu - 14;
-        i_count = ( i_data + i_max - 1 ) / i_max;
-
-        /*msg_Dbg( p_stream, "nal-out fragmented %02x %d", nalh, i_rest);*/
-
-        while( end == 0 )
+        if( p_data[0] == 0x00 && p_data[1] == 0x00 && p_data[2] == 0x01 && /* startcode */
+            (p_data[3]&0x1f) > 0 && (p_data[3]&0x1f) < 24 ) /* naltype should be between 1 and 23 */
         {
-            i_payload = __MIN( i_max, i_data );
-            out = block_New( p_stream, 14 + i_payload );
+            p_data += 3;
+            i_data -= 3;
+            i_nal_type = p_data[0]&0x1f;
 
-            if( i_data == i_payload )
-                end = 1;
+            /* Skip global headers */
+            if( i_nal_type == 7 || i_nal_type == 8 )
+                continue;
+            
+            if( i_data <= i_max ) /* The whole pack will fit in one rtp payload */
+            {
+                /* single NAL */
+                i_payload = __MIN( i_max, i_data );
+                out = block_New( p_stream, 12 + i_payload );
 
-            /* rtp common header */
-            rtp_packetize_common( id, out, (end)?1:0,
-                              in->i_pts > 0 ? in->i_pts : in->i_dts );
+                /* rtp common header */
+                rtp_packetize_common( id, out, 1,
+                                      in->i_pts > 0 ? in->i_pts : in->i_dts );
 
-            /* FU indicator */
-            out->p_buffer[12] = (nalh&0x60)|28;
-            /* FU header */
-            out->p_buffer[13] = (start<<7)|(end<<6)|(nalh&0x1f);
+                memcpy( &out->p_buffer[12], p_data, i_payload );
 
-            memcpy( &out->p_buffer[14], p_data+first, i_payload );
- 
-            out->i_buffer   = 14 + i_payload;
+                out->i_buffer+= i_payload;
+                out->i_dts    = in->i_dts;
+                out->i_length = in->i_length;
 
-            // not sure what of these should be used and what it does :)
-            out->i_pts    = in->i_pts;
-            out->i_dts    = in->i_dts;
-            //out->i_dts    = in->i_dts + i * in->i_length / i_count;
-            //out->i_length = in->i_length / i_count;
+                rtp_packetize_send( id, out );
+                p_data += i_payload;
+                i_data -= i_payload;
+                /*msg_Dbg( p_stream, "nal-out plain %d %02x", i_payload, out->p_buffer[16] );*/
+            }
+            else
+            {
+                /* FU-A */
+                uint8_t     nalh; /* The nalheader byte */
+                int         start=1, end=0;
+                
+                /* skip but remember the nalh byte */
+                nalh = *p_data;
+                p_data++;
+                i_data--;
 
-            rtp_packetize_send( id, out );
+                i_max   = id->i_mtu - 14;
 
-            /*msg_Dbg( p_stream, "nal-out fragmented: frag %d %d %02x %02x %d", start,end,
-            out->p_buffer[12], out->p_buffer[13], i_payload );*/
+                /*msg_Dbg( p_stream, "nal-out fragmented %02x %d", nalh, i_rest);*/
 
-            i_data -= i_payload;
-            first += i_payload;
-            i++;
-            start=0;
+                while( end == 0 )
+                {
+                    i_payload = __MIN( i_max, i_data );
+                    out = block_New( p_stream, 14 + i_payload );
+
+                    if( i_data == i_payload )
+                        end = 1;
+
+                    /* rtp common header */
+                    rtp_packetize_common( id, out, (end)?1:0,
+                                      in->i_pts > 0 ? in->i_pts : in->i_dts );
+
+                    /* FU indicator */
+                    out->p_buffer[12] = (nalh&0x60)|28;
+                    /* FU header */
+                    out->p_buffer[13] = (start<<7)|(end<<6)|(nalh&0x1f);
+
+                    memcpy( &out->p_buffer[14], p_data, i_payload );
+         
+                    out->i_buffer   = 14 + i_payload;
+                    /* The dts should "slide" ? See the i_count trick and adapt */
+                    out->i_dts    = in->i_dts;
+                    
+                    rtp_packetize_send( id, out );
+                    /*msg_Dbg( p_stream, "nal-out fragmented: frag %d %d %02x %02x %d", start,end,
+                    out->p_buffer[12], out->p_buffer[13], i_payload );*/
+
+                    i_data -= i_payload;
+                    p_data +- i_payload;
+                    start = 0;
+                }
+            }
+        }
+        else
+        {
+            p_data++;
+            i_data--;
         }
     }
     return VLC_SUCCESS;
