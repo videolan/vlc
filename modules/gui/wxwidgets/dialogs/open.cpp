@@ -51,9 +51,6 @@
 #include <wx/statline.h>
 #include <wx/tokenzr.h>
 
-#include <vector>
-
-
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0
 #endif
