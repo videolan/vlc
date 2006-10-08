@@ -1094,6 +1094,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                     XStoreName( p_vout->p_sys->p_display,
                                p_win->base_window, val.psz_string );
                 }
+                if( val.psz_string ) free( val.psz_string );
             }
         }
     }
@@ -2116,6 +2117,8 @@ static int InitDisplay( vout_thread_t *p_vout )
                 }
             }
         }
+        if( p_formats ) XFree( p_formats );
+
         break;
     }
     p_vout->p_sys->p_visual = p_xvisual->visual;

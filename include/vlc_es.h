@@ -245,7 +245,9 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
     }
 
     dst->i_extra_languages = src->i_extra_languages;
-    dst->p_extra_languages = (extra_languages_t*) malloc( dst->i_extra_languages * sizeof(*dst->p_extra_languages ) );
+    if( dst->i_extra_languages )
+        dst->p_extra_languages = (extra_languages_t*)
+            malloc(dst->i_extra_languages * sizeof(*dst->p_extra_languages ));
     for( i = 0; i < dst->i_extra_languages; i++ ) {
         if( src->p_extra_languages[i].psz_language )
             dst->p_extra_languages[i].psz_language = strdup(src->p_extra_languages[i].psz_language);

@@ -426,10 +426,13 @@ static int AVI_ChunkRead_strd( stream_t *s, avi_chunk_t *p_chk )
 {
     AVI_READCHUNK_ENTER;
     p_chk->strd.p_data = malloc( p_chk->common.i_chunk_size );
-    memcpy( p_chk->strd.p_data,
-            p_buff + 8,
-            p_chk->common.i_chunk_size );
+    memcpy( p_chk->strd.p_data, p_buff + 8, p_chk->common.i_chunk_size );
     AVI_READCHUNK_EXIT( VLC_SUCCESS );
+}
+
+static void AVI_ChunkFree_strd( avi_chunk_t *p_chk )
+{
+    if( p_chk->strd.p_data ) free( p_chk->strd.p_data );
 }
 
 static int AVI_ChunkRead_idx1( stream_t *s, avi_chunk_t *p_chk )
@@ -651,7 +654,7 @@ static struct
     { AVIFOURCC_avih, AVI_ChunkRead_avih, AVI_ChunkFree_nothing },
     { AVIFOURCC_strh, AVI_ChunkRead_strh, AVI_ChunkFree_nothing },
     { AVIFOURCC_strf, AVI_ChunkRead_strf, AVI_ChunkFree_strf },
-    { AVIFOURCC_strd, AVI_ChunkRead_strd, AVI_ChunkFree_nothing },
+    { AVIFOURCC_strd, AVI_ChunkRead_strd, AVI_ChunkFree_strd },
     { AVIFOURCC_idx1, AVI_ChunkRead_idx1, AVI_ChunkFree_idx1 },
     { AVIFOURCC_indx, AVI_ChunkRead_indx, AVI_ChunkFree_indx },
     { AVIFOURCC_JUNK, AVI_ChunkRead_nothing, AVI_ChunkFree_nothing },
