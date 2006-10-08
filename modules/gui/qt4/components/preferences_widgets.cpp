@@ -100,6 +100,9 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     case CONFIG_ITEM_DIRECTORY:
         fprintf( stderr, "Todo (CONFIG_ITEM_DIRECTORY)\n" );
         break;
+    case CONFIG_ITEM_KEY:
+        p_control = new KeySelectorControl( p_this, p_item, parent, l, line );
+        break;
     case CONFIG_ITEM_BOOL:
         p_control = new BoolConfigControl( p_this, p_item, parent, l, line );
         break;
@@ -129,7 +132,7 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
         }
         case 2:
         {
-            VFloatConfigControl *vfcc = 
+            VFloatConfigControl *vfcc =
                                     qobject_cast<VFloatConfigControl *>(this);
             config_PutFloat( p_intf, vfcc->getName(), vfcc->getValue() );
             break;
@@ -139,6 +142,11 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
             VStringConfigControl *vscc =
                             qobject_cast<VStringConfigControl *>(this);
             config_PutPsz( p_intf, vscc->getName(), qta( vscc->getValue() ) );
+        }
+        case 4:
+        {
+            KeySelectorControl *ksc = qobject_cast<KeySelectorControl *>(this);
+            ksc->doApply();
         }
     }
 }
@@ -703,4 +711,64 @@ void FloatRangeConfigControl::finish()
 {
     spin->setMaximum( (double)p_item->f_max );
     spin->setMinimum( (double)p_item->f_min );
+}
+
+
+/**********************************************************************
+ * Key selector widget
+ **********************************************************************/
+KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
+                                      module_config_t *_p_item,
+                                      QWidget *_parent, QGridLayout *l,
+                                      int &line ) :
+                                ConfigControl( _p_this, _p_item, _parent )
+
+{
+    label = new QLabel( qtr("Select an action to change the associated hotkey") );
+    table = new QTreeWidget( 0 );
+    finish();
+
+    if( !l )
+    {
+        QVBoxLayout *layout = new QVBoxLayout();
+        layout->addWidget( label, 0 ); layout->addWidget( table, 1 );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( label, line, 0, 1, 2 );
+        l->addWidget( table, line+1, 0, 1,2 );
+    }
+}
+
+void KeySelectorControl::finish()
+{
+    if( label )
+        label->setToolTip( qfu(p_item->psz_longtext) );
+
+    /* Fill the table */
+    table->setColumnCount( 2 );
+    table->setAlternatingRowColors( true );
+
+    module_t *p_main = config_FindModule( p_this, "main" );
+    assert( p_main );
+    module_config_t *p_item = p_main->p_config;
+
+    if( p_item ) do
+    {
+        if( p_item->i_type & CONFIG_ITEM && p_item->psz_name &&
+            strstr( p_item->psz_name , "key-" ) )
+        {
+            QTreeWidgetItem *treeItem = new QTreeWidgetItem();
+            treeItem->setText( 0, qfu( p_item->psz_text ) );
+            treeItem->setText( 1, p_item->psz_value );
+            treeItem->setData( 0, Qt::UserRole, QVariant( p_item->psz_name ) );
+            table->addTopLevelItem( treeItem );
+        }
+    } while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+}
+
+void KeySelectorControl::doApply()
+{
+
 }

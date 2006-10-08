@@ -49,7 +49,7 @@ static const QString band_frequencies[] =
 Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
                             QWidget( _parent ) , p_intf( _p_intf )
 {
-    QFont smallFont = QApplication::font(0);
+    QFont smallFont = QApplication::font( static_cast<QWidget*>(0) );
     smallFont.setPointSize( smallFont.pointSize() - 3 );
 
     ui.setupUi( this );

@@ -159,7 +159,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                     continue;
                 }
                 data = new PrefsItemData();
-                data->name = QString( qfu( config_CategoryNameGet( 
+                data->name = QString( qfu( config_CategoryNameGet(
                                                             p_item->i_value)) );
                 psz_help = config_CategoryHelpGet( p_item->i_value );
                 if( psz_help )
@@ -413,7 +413,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
     QLabel *label = new QLabel( head );
     global_layout->addWidget( label );
-    QFont myFont = QApplication::font(0);
+    QFont myFont = QApplication::font( static_cast<QWidget*>(0) );
     myFont.setPointSize( myFont.pointSize() + 3 ); myFont.setBold( true );
 
     label->setFont( myFont );
@@ -431,6 +431,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
     QGridLayout *layout = new QGridLayout();
     int i_line = 0, i_boxline = 0;
+    bool has_hotkey = false;
 
     if( p_item ) do
     {
@@ -454,6 +455,13 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             box = new QGroupBox( qfu(p_item->psz_text) );
             boxlayout = new QGridLayout();
         }
+        /* Only one hotkey control */
+        if( has_hotkey && p_item->i_type & CONFIG_ITEM && p_item->psz_name &&
+                                         strstr( p_item->psz_name, "key-" ) )
+            continue;
+        if( p_item->i_type & CONFIG_ITEM && p_item->psz_name &&
+                                            strstr( p_item->psz_name, "key-" ) )
+            has_hotkey = true;
 
         ConfigControl *control;
         if( ! box )
@@ -464,6 +472,13 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                                     p_item, NULL, boxlayout, i_boxline );
         if( !control )
             continue;
+
+        if( has_hotkey )
+        {
+            /* A hotkey widget takes 2 lines */
+            if( box ) i_boxline ++;
+            else i_line++;
+        }
 
         if( box ) i_boxline++;
         else i_line++;

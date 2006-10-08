@@ -26,6 +26,7 @@
 #define _INFOPANELS_H_
 #include <vlc/vlc.h>
 #include <QWidget>
+#include <QTreeWidget>
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
@@ -305,5 +306,25 @@ private slot:
     void OnUpdate();
 };
 #endif
+
+/**********************************************************************
+ * Key selector widget
+ **********************************************************************/
+class KeySelectorControl : public ConfigControl
+{
+    Q_OBJECT;
+public:
+    KeySelectorControl( vlc_object_t *, module_config_t *, QWidget *,
+                        QGridLayout*, int& );
+    virtual int getType() { return 4; }
+    virtual ~KeySelectorControl() {};
+    virtual void hide() { table->hide(); label->hide(); }
+    virtual void show() { table->show(); label->show(); }
+    void doApply();
+private:
+    void finish();
+    QLabel *label;
+    QTreeWidget *table;
+};
 
 #endif
