@@ -99,7 +99,7 @@ vlc_module_begin();
     add_submodule();
     set_description( _("DTS audio packetizer") );
     set_capability( "packetizer", 10 );
-    set_callbacks( OpenPacketizer, NULL );
+    set_callbacks( OpenPacketizer, CloseDecoder );
 vlc_module_end();
 
 /*****************************************************************************

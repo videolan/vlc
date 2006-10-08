@@ -176,10 +176,15 @@ static void Close( vlc_object_t *p_this )
             if( tk->p_subpackets[ j ] )
                 block_Release( tk->p_subpackets[ j ] );
         }
-        if( !tk->i_subpackets ) free( tk->p_subpackets );
+        if( tk->i_subpackets ) free( tk->p_subpackets );
 
         free( tk );
     }
+
+    if( p_sys->psz_title ) free( p_sys->psz_title );
+    if( p_sys->psz_artist ) free( p_sys->psz_artist );
+    if( p_sys->psz_copyright ) free( p_sys->psz_copyright );
+    if( p_sys->psz_description ) free( p_sys->psz_description );
 
     if( p_sys->i_track > 0 ) free( p_sys->track );
     free( p_sys );
@@ -523,6 +528,8 @@ static int Demux( demux_t *p_demux )
                 p_block->i_dts = p_block->i_pts = i_pts;
                 tk->p_subpackets[i_index] = p_block;
                 tk->i_subpacket++;
+		msg_Err( p_demux, "PTS!DTS: %lld, %lld",
+			 p_block->i_dts, p_block->i_pts);
             }
 
             if( tk->fmt.i_codec == VLC_FOURCC('2','8','_','8') )
@@ -715,7 +722,7 @@ static int HeaderRead( demux_t *p_demux )
         msg_Dbg( p_demux, "object %4.4s size=%d version=%d",
                  (char*)&i_id, i_size, i_version );
 
-        if( i_size < 10 )
+        if( i_size < 10 && i_id != VLC_FOURCC('D','A','T','A') )
         {
             msg_Dbg( p_demux, "invalid size for object %4.4s", (char*)&i_id );
             return VLC_EGENERIC;
