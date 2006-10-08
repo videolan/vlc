@@ -847,6 +847,10 @@ static struct
       VIDEO_ES, "Real Video 10" },
     { VLC_FOURCC('R','V','1','3'), CODEC_ID_RV10,
       VIDEO_ES, "Real Video 13" },
+#if LIBAVCODEC_BUILD >= ((51<<16)+(15<<8)+1)
+    { VLC_FOURCC('R','V','2','0'), CODEC_ID_RV20,
+      VIDEO_ES, "Real Video 20" },
+#endif
 
 #if LIBAVCODEC_BUILD >= 4684
     /* Apple Video */
