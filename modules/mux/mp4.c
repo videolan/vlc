@@ -114,19 +114,6 @@ typedef struct
     uint64_t i_stco_pos;
     vlc_bool_t b_stco64;
 
-    /* for h264 */
-    struct
-    {
-        int     i_profile;
-        int     i_profile_compat;
-        int     i_level;
-
-        int     i_sps;
-        uint8_t *sps;
-        int     i_pps;
-        uint8_t *pps;
-    } avc;
-
     /* for spu */
     int64_t i_last_dts;
 
@@ -184,7 +171,7 @@ static block_t *bo_to_sout( sout_instance_t *p_sout,  bo_t *box );
 static bo_t *GetMoovBox( sout_mux_t *p_mux );
 
 static block_t *ConvertSUBT( sout_mux_t *, mp4_stream_t *, block_t *);
-static void ConvertAVC1( sout_mux_t *, mp4_stream_t *, block_t * );
+static block_t *ConvertAVC1( sout_mux_t *, mp4_stream_t *, block_t * );
 
 /*****************************************************************************
  * Open:
@@ -364,8 +351,6 @@ static void Close( vlc_object_t * p_this )
         mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
 
         es_format_Clean( &p_stream->fmt );
-        if( p_stream->avc.i_sps ) free( p_stream->avc.sps );
-        if( p_stream->avc.i_pps ) free( p_stream->avc.pps );
         free( p_stream->entry );
         free( p_stream );
     }
@@ -440,13 +425,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         calloc( p_stream->i_entry_max, sizeof( mp4_entry_t ) );
     p_stream->i_dts_start   = 0;
     p_stream->i_duration    = 0;
-    p_stream->avc.i_profile = 77;
-    p_stream->avc.i_profile_compat = 64;
-    p_stream->avc.i_level   = 30;
-    p_stream->avc.i_sps     = 0;
-    p_stream->avc.sps       = NULL;
-    p_stream->avc.i_pps     = 0;
-    p_stream->avc.pps       = NULL;
 
     p_input->p_sys          = p_stream;
 
@@ -527,15 +505,17 @@ static int Mux( sout_mux_t *p_mux )
         p_input  = p_mux->pp_inputs[i_stream];
         p_stream = (mp4_stream_t*)p_input->p_sys;
 
+again:
         p_data  = block_FifoGet( p_input->p_fifo );
         if( p_stream->fmt.i_codec == VLC_FOURCC( 'h', '2', '6', '4' ) )
         {
-            ConvertAVC1( p_mux, p_stream, p_data );
+            p_data = ConvertAVC1( p_mux, p_stream, p_data );
         }
         else if( p_stream->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) )
         {
             p_data = ConvertSUBT( p_mux, p_stream, p_data );
         }
+        if( p_data == NULL ) goto again;
 
         if( p_stream->fmt.i_cat != SPU_ES )
         {
@@ -682,7 +662,7 @@ static block_t *ConvertSUBT( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_blo
     return p_block;
 }
 
-static void ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
+static block_t *ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
 {
     uint8_t *last = p_block->p_buffer;  /* Assume it starts with 0x00000001 */
     uint8_t *dat  = &p_block->p_buffer[4];
@@ -716,27 +696,14 @@ static void ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
         last[2] = ( i_size >>  8 )&0xff;
         last[3] = ( i_size       )&0xff;
 
-        if( (last[4]&0x1f) == 7 && tk->avc.i_sps <= 0 )  /* SPS */
-        {
-            tk->avc.i_sps = i_size;
-            tk->avc.sps = malloc( i_size );
-            memcpy( tk->avc.sps, &last[4], i_size );
-
-            tk->avc.i_profile = tk->avc.sps[1];
-            tk->avc.i_profile = tk->avc.sps[2];
-            tk->avc.i_level   = tk->avc.sps[3];
-        }
-        else if( (last[4]&0x1f) == 8 && tk->avc.i_pps <= 0 )   /* PPS */
-        {
-            tk->avc.i_pps = i_size;
-            tk->avc.pps = malloc( i_size );
-            memcpy( tk->avc.pps, &last[4], i_size );
-        }
+        /* Skip blocks with SPS/PPS */ 
+        if( (last[4]&0x1f) == 7 || (last[4]&0x1f) == 8 )
+            p_block->i_buffer = 0;
 
         last = dat;
-
         dat += 4;
     }
+    return p_block;
 }
 
 static int GetDescrLength( int i_size )
@@ -926,28 +893,75 @@ static bo_t *GetD263Tag( mp4_stream_t *p_stream )
 
 static bo_t *GetAvcCTag( mp4_stream_t *p_stream )
 {
-    bo_t *avcC;
+    bo_t    *avcC = NULL;
+    uint8_t *p_sps = NULL;
+    uint8_t *p_pps = NULL;
+    int     i_sps_size = 0;
+    int     i_pps_size = 0;
 
+    if( p_stream->fmt.i_extra > 0 )
+    {
+        /* FIXME: take into account multiple sps/pps */
+        uint8_t *p_buffer = p_stream->fmt.p_extra;
+        int     i_buffer = p_stream->fmt.i_extra;
+
+        while( i_buffer > 4 && 
+            p_buffer[0] == 0 && p_buffer[1] == 0 &&
+            p_buffer[2] == 0 && p_buffer[3] == 1 )
+        {
+            const int i_nal_type = p_buffer[4]&0x1f;
+            int i_offset    = 1;
+            int i_size      = 0;
+            int i_startcode = 0;
+            
+            //msg_Dbg( p_stream, "we found a startcode for NAL with TYPE:%d", i_nal_type );
+            
+            for( i_offset = 1; i_offset+3 < i_buffer ; i_offset++)
+            {
+                if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 && 
+                    p_buffer[i_offset+2] == 0 && p_buffer[i_offset+3] == 1 )
+                {
+                    /* we found another startcode */
+                    i_startcode = i_offset;
+                    break;
+                } 
+            }
+            i_size = i_startcode ? i_startcode : i_buffer;
+            if( i_nal_type == 7 )
+            {
+                p_sps = &p_buffer[4];
+                i_sps_size = i_size - 4;
+            }
+            if( i_nal_type == 8 )
+            {
+                p_pps = &p_buffer[4];
+                i_pps_size = i_size - 4;
+            }
+            i_buffer -= i_size;
+            p_buffer += i_size;
+        }
+    }
+    
     /* FIXME use better value */
     avcC = box_new( "avcC" );
     bo_add_8( avcC, 1 );      /* configuration version */
-    bo_add_8( avcC, p_stream->avc.i_profile );
-    bo_add_8( avcC, p_stream->avc.i_profile_compat );
-    bo_add_8( avcC, p_stream->avc.i_level );       /* level, 5.1 */
+    bo_add_8( avcC, i_sps_size ? p_sps[1] : 77 );
+    bo_add_8( avcC, i_sps_size ? p_sps[2] : 64 );
+    bo_add_8( avcC, i_sps_size ? p_sps[3] : 30 );       /* level, 5.1 */
     bo_add_8( avcC, 0xff );   /* 0b11111100 | lengthsize = 0x11 */
 
-    bo_add_8( avcC, 0xe0 | (p_stream->avc.i_sps > 0 ? 1 : 0) );   /* 0b11100000 | sps_count */
-    if( p_stream->avc.i_sps > 0 )
+    bo_add_8( avcC, 0xe0 | (i_sps_size > 0 ? 1 : 0) );   /* 0b11100000 | sps_count */
+    if( i_sps_size > 0 )
     {
-        bo_add_16be( avcC, p_stream->avc.i_sps );
-        bo_add_mem( avcC, p_stream->avc.i_sps, p_stream->avc.sps );
+        bo_add_16be( avcC, i_sps_size );
+        bo_add_mem( avcC, i_sps_size, p_sps );
     }
 
-    bo_add_8( avcC, (p_stream->avc.i_pps > 0 ? 1 : 0) );   /* pps_count */
-    if( p_stream->avc.i_pps > 0 )
+    bo_add_8( avcC, (i_pps_size > 0 ? 1 : 0) );   /* pps_count */
+    if( i_pps_size > 0 )
     {
-        bo_add_16be( avcC, p_stream->avc.i_pps );
-        bo_add_mem( avcC, p_stream->avc.i_pps, p_stream->avc.pps );
+        bo_add_16be( avcC, i_pps_size );
+        bo_add_mem( avcC, i_pps_size, p_pps );
     }
     box_fix( avcC );
 
