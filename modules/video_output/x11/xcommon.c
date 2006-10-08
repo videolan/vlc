@@ -1996,7 +1996,7 @@ static int InitDisplay( vout_thread_t *p_vout )
     XPixmapFormatValues *       p_formats;                 /* pixmap formats */
     XVisualInfo *               p_xvisual;            /* visuals information */
     XVisualInfo                 xvisual_template;         /* visual template */
-    int                         i_count;                       /* array size */
+    int                         i_count, i;                    /* array size */
 #endif
 
 #ifdef HAVE_SYS_SHM_H
@@ -2102,18 +2102,18 @@ static int InitDisplay( vout_thread_t *p_vout )
         p_formats = XListPixmapFormats( p_vout->p_sys->p_display, &i_count );
         p_vout->p_sys->i_bytes_per_pixel = 0;
 
-        for( ; i_count-- ; p_formats++ )
+        for( i = 0; i < i_count; i++ )
         {
             /* Under XFree4.0, the list contains pixmap formats available
              * through all video depths ; so we have to check against current
              * depth. */
-            if( p_formats->depth == (int)p_vout->p_sys->i_screen_depth )
+            if( p_formats[i].depth == (int)p_vout->p_sys->i_screen_depth )
             {
-                if( p_formats->bits_per_pixel / 8
+                if( p_formats[i].bits_per_pixel / 8
                         > (int)p_vout->p_sys->i_bytes_per_pixel )
                 {
                     p_vout->p_sys->i_bytes_per_pixel =
-                                               p_formats->bits_per_pixel / 8;
+                        p_formats[i].bits_per_pixel / 8;
                 }
             }
         }
