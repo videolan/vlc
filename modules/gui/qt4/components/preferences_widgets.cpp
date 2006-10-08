@@ -132,6 +132,7 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
         case 1:
         {
             VIntConfigControl *vicc = qobject_cast<VIntConfigControl *>(this);
+            assert( vicc );
             config_PutInt( p_intf, vicc->getName(), vicc->getValue() );
             break;
         }
@@ -139,6 +140,7 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
         {
             VFloatConfigControl *vfcc =
                                     qobject_cast<VFloatConfigControl *>(this);
+            assert( vfcc );
             config_PutFloat( p_intf, vfcc->getName(), vfcc->getValue() );
             break;
         }
@@ -146,11 +148,14 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
         {
             VStringConfigControl *vscc =
                             qobject_cast<VStringConfigControl *>(this);
+            assert( vscc );
             config_PutPsz( p_intf, vscc->getName(), qta( vscc->getValue() ) );
+            break;
         }
         case 4:
         {
             KeySelectorControl *ksc = qobject_cast<KeySelectorControl *>(this);
+            assert( ksc );
             ksc->doApply();
         }
     }
@@ -807,6 +812,10 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
 
 void KeySelectorControl::doApply()
 {
+    foreach( module_config_t *p_current, values )
+    {
+        config_PutInt( p_this, p_current->psz_name, p_current->i_value );
+    }
 }
 
 KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
