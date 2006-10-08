@@ -84,4 +84,9 @@ public:
 signals:
     void rightClicked( QModelIndex, QPoint  );
 };
+
+class QKeyEvent;
+int qtEventToVLCKey( QKeyEvent *e );
+QString VLCKeyToString( int val );
+
 #endif

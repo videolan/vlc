@@ -33,6 +33,8 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QVector>
+#include <QDialog>
+
 #include "ui/input_stats.h"
 #include "qt4.hpp"
 #include <assert.h>
@@ -310,6 +312,20 @@ private slot:
 /**********************************************************************
  * Key selector widget
  **********************************************************************/
+class KeyInputDialog : public QDialog
+{
+public:
+    KeyInputDialog( QList<module_config_t *> &, char * );
+    int keyValue;
+    bool conflicts;
+private:
+    void keyPressEvent( QKeyEvent *);
+    QLabel *selected;
+    QLabel *warning;
+    char * keyToChange;
+    QList<module_config_t*> values;
+};
+
 class KeySelectorControl : public ConfigControl
 {
     Q_OBJECT;
@@ -325,6 +341,9 @@ private:
     void finish();
     QLabel *label;
     QTreeWidget *table;
+    QList<module_config_t *> values;
+private slots:
+    void selectKey( QTreeWidgetItem *);
 };
 
 #endif

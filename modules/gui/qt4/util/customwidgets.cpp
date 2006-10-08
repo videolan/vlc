@@ -29,6 +29,9 @@
 #include <QPainter>
 #include <QColorGroup>
 #include <QRect>
+#include <QKeyEvent>
+
+#include <vlc_keys.h>
 
 ClickLineEdit::ClickLineEdit( const QString &msg, QWidget *parent) : QLineEdit( parent )
 {
@@ -89,4 +92,82 @@ void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
         repaint();
     }
     QLineEdit::focusOutEvent( ev );
+}
+
+/***************************************************************************
+ * Hotkeys converters
+ ***************************************************************************/
+
+int qtEventToVLCKey( QKeyEvent *e )
+{
+    int i_vlck = 0;
+    /* Handle modifiers */
+    if( e->modifiers()& Qt::ShiftModifier ) i_vlck |= KEY_MODIFIER_SHIFT;
+    if( e->modifiers()& Qt::AltModifier ) i_vlck |= KEY_MODIFIER_ALT;
+    if( e->modifiers()& Qt::ControlModifier ) i_vlck |= KEY_MODIFIER_CTRL;
+    if( e->modifiers()& Qt::MetaModifier ) i_vlck |= KEY_MODIFIER_META;
+
+    bool found = false;
+    /* Look for some special keys */
+#define HANDLE( qt, vk ) case Qt::qt : i_vlck |= vk; found = true;break
+    switch( e->key() )
+    {
+        HANDLE( Key_Left, KEY_LEFT );
+        HANDLE( Key_Right, KEY_RIGHT );
+        HANDLE( Key_Up, KEY_UP );
+        HANDLE( Key_Down, KEY_DOWN );
+        HANDLE( Key_Space, KEY_SPACE );
+        HANDLE( Key_Escape, KEY_ESC );
+        HANDLE( Key_Enter, KEY_ENTER );
+        HANDLE( Key_F1, KEY_F1 );
+        HANDLE( Key_F2, KEY_F2 );
+        HANDLE( Key_F3, KEY_F3 );
+        HANDLE( Key_F4, KEY_F4 );
+        HANDLE( Key_F5, KEY_F5 );
+        HANDLE( Key_F6, KEY_F6 );
+        HANDLE( Key_F7, KEY_F7 );
+        HANDLE( Key_F8, KEY_F8 );
+        HANDLE( Key_F9, KEY_F9 );
+        HANDLE( Key_F10, KEY_F10 );
+        HANDLE( Key_F11, KEY_F11 );
+        HANDLE( Key_F12, KEY_F12 );
+        HANDLE( Key_PageUp, KEY_PAGEUP );
+        HANDLE( Key_PageDown, KEY_PAGEDOWN );
+        HANDLE( Key_Home, KEY_HOME );
+        HANDLE( Key_End, KEY_END );
+        HANDLE( Key_Insert, KEY_INSERT );
+        HANDLE( Key_Delete, KEY_DELETE );
+
+    }
+    if( !found )
+    {
+        /* Force lowercase */
+        if( e->key() >= Qt::Key_A && e->key() <= Qt::Key_Z )
+            i_vlck += e->key() + 32;
+        /* Rest of the ascii range */
+        else if( e->key() >= Qt::Key_Space && e->key() <= Qt::Key_AsciiTilde )
+            i_vlck += e->key();
+    }
+    return i_vlck;
+}
+
+QString VLCKeyToString( int val )
+{
+    QString r = "";
+    if( val & KEY_MODIFIER_CTRL )
+        r+= "Ctrl+";
+    if( val & KEY_MODIFIER_ALT )
+        r+= "Alt+";
+    if( val & KEY_MODIFIER_SHIFT )
+        r+= "Shift+";
+
+    unsigned int i_keys = sizeof(vlc_keys)/sizeof(key_descriptor_t);
+    for( unsigned int i = 0; i< i_keys; i++ )
+    {
+        if( vlc_keys[i].i_key_code == (val& ~KEY_MODIFIER) )
+        {
+            r+= vlc_keys[i].psz_key_string;
+        }
+    }
+    return r;
 }
