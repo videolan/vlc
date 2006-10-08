@@ -255,7 +255,6 @@ void E_(CloseDemux)( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
-    unsigned int i;
 
     FREENULL( p_sys->tk );
     if( p_sys->ic ) av_close_input_file( p_sys->ic );

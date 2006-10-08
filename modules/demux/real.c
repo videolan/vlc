@@ -528,8 +528,6 @@ static int Demux( demux_t *p_demux )
                 p_block->i_dts = p_block->i_pts = i_pts;
                 tk->p_subpackets[i_index] = p_block;
                 tk->i_subpacket++;
-		msg_Err( p_demux, "PTS!DTS: %lld, %lld",
-			 p_block->i_dts, p_block->i_pts);
             }
 
             if( tk->fmt.i_codec == VLC_FOURCC('2','8','_','8') )
