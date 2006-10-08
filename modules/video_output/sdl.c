@@ -327,7 +327,7 @@ static int Manage( vout_thread_t *p_vout )
 {
     SDL_Event event;                                            /* SDL event */
     vlc_value_t val;
-    int i_width, i_height, i_x, i_y;
+    unsigned int i_width, i_height, i_x, i_y;
 
     /* Process events */
     while( SDL_PollEvent(&event) )
@@ -576,7 +576,7 @@ static int Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    int x, y, w, h;
+    unsigned int x, y, w, h;
     SDL_Rect disp;
 
     vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,

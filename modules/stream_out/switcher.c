@@ -162,7 +162,7 @@ struct sout_stream_id_t
     AVCodec         *ff_enc;
     AVCodecContext  *ff_enc_c;
     AVFrame         *p_frame;
-    char            *p_buffer_out;
+    uint8_t         *p_buffer_out;
     int             i_nb_pred;
     int16_t         *p_samples;
 };
@@ -650,7 +650,7 @@ static void NetCommand( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     char psz_buffer[10];
-    int i_len = net_ReadNonBlock( p_stream, p_sys->i_fd, NULL, (char *)&psz_buffer[0],
+    int i_len = net_ReadNonBlock( p_stream, p_sys->i_fd, NULL, (uint8_t *)&psz_buffer[0],
                                   sizeof( psz_buffer ), 0 );
 
     if ( i_len > 0 )

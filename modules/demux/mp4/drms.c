@@ -716,8 +716,8 @@ static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key,
         int32_t i_hash;
 
         InitMD5( &md5 );
-        AddMD5( &md5, (uint8_t *)p_sys_key, 16 );
-        AddMD5( &md5, (uint8_t *)p_secret1, 4 );
+        AddMD5( &md5, (const uint8_t *)p_sys_key, 16 );
+        AddMD5( &md5, (const uint8_t *)p_secret1, 4 );
         EndMD5( &md5 );
 
         p_secret1[ 3 ]++;
@@ -824,11 +824,11 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
     {
         p_big_bordel[ i ] = U32_AT(p_bordel + i);
     }
-    AddMD5( &md5, (uint8_t *)p_big_bordel, 64 );
+    AddMD5( &md5, (const uint8_t *)p_big_bordel, 64 );
     if( p_shuffle->i_version == 0x01000300 )
     {
-        AddMD5( &md5, (uint8_t *)p_secret3, sizeof(p_secret3) );
-        AddMD5( &md5, (uint8_t *)p_secret4, i_secret );
+        AddMD5( &md5, (const uint8_t *)p_secret3, sizeof(p_secret3) );
+        AddMD5( &md5, (const uint8_t *)p_secret4, i_secret );
     }
     EndMD5( &md5 );
 
@@ -1522,21 +1522,21 @@ static int GetSystemKey( uint32_t *p_sys_key, vlc_bool_t b_ipod )
     /* Combine our system info hash with additional secret data. The resulting
      * MD5 hash will be our system key. */
     InitMD5( &md5 );
-    AddMD5( &md5, (uint8_t*)p_secret5, 8 );
+    AddMD5( &md5, (const uint8_t*)p_secret5, 8 );
 
     if( !b_ipod )
     {
-        AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
-        AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
-        AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
-        AddMD5( &md5, (uint8_t *)p_secret6, 8 );
+        AddMD5( &md5, (const uint8_t *)p_system_hash, 6 );
+        AddMD5( &md5, (const uint8_t *)p_system_hash, 6 );
+        AddMD5( &md5, (const uint8_t *)p_system_hash, 6 );
+        AddMD5( &md5, (const uint8_t *)p_secret6, 8 );
     }
     else
     {
         i_ipod_id = U64_AT(&i_ipod_id);
-        AddMD5( &md5, (uint8_t *)&i_ipod_id, sizeof(i_ipod_id) );
-        AddMD5( &md5, (uint8_t *)&i_ipod_id, sizeof(i_ipod_id) );
-        AddMD5( &md5, (uint8_t *)&i_ipod_id, sizeof(i_ipod_id) );
+        AddMD5( &md5, (const uint8_t *)&i_ipod_id, sizeof(i_ipod_id) );
+        AddMD5( &md5, (const uint8_t *)&i_ipod_id, sizeof(i_ipod_id) );
+        AddMD5( &md5, (const uint8_t *)&i_ipod_id, sizeof(i_ipod_id) );
     }
 
     EndMD5( &md5 );
@@ -1905,7 +1905,7 @@ static int HashSystemInfo( uint32_t *p_system_hash )
 
     GetVolumeInformation( _T("C:\\"), NULL, 0, &i_serial,
                           NULL, NULL, NULL, 0 );
-    AddMD5( &md5, (uint8_t *)&i_serial, 4 );
+    AddMD5( &md5, (const uint8_t *)&i_serial, 4 );
 
     for( i = 0; i < sizeof(p_reg_keys) / sizeof(p_reg_keys[ 0 ]); i++ )
     {
@@ -1930,7 +1930,7 @@ static int HashSystemInfo( uint32_t *p_system_hash )
                                  NULL, NULL, p_reg_buf,
                                  &i_size ) == ERROR_SUCCESS )
             {
-                AddMD5( &md5, (uint8_t *)p_reg_buf, i_size );
+                AddMD5( &md5, (const uint8_t *)p_reg_buf, i_size );
             }
 
             free( p_reg_buf );

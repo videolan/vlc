@@ -48,7 +48,7 @@ struct sout_stream_sys_t
     decoder_t       *p_decoder;
     image_handler_t *p_image; /* filter for resizing */
     int i_height, i_width;
-    int i_sar_num, i_sar_den;
+    unsigned int i_sar_num, i_sar_den;
     char *psz_id;
     vlc_bool_t b_inited;
 };

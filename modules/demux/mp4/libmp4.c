@@ -72,8 +72,8 @@
         p_str = calloc( sizeof( char ), __MIN( strlen( (char*)p_peek ), i_read )+1);\
         memcpy( p_str, p_peek, __MIN( strlen( (char*)p_peek ), i_read ) ); \
         p_str[__MIN( strlen( (char*)p_peek ), i_read )] = 0; \
-        p_peek += strlen( p_str ) + 1; \
-        i_read -= strlen( p_str ) + 1; \
+        p_peek += strlen( (char *)p_str ) + 1; \
+        i_read -= strlen( (char *)p_str ) + 1; \
     } \
     else \
     { \

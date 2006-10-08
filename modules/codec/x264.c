@@ -977,7 +977,7 @@ static int  Open ( vlc_object_t *p_this )
     if( p_enc->fmt_in.video.i_aspect > 0 )
     {
         int64_t i_num, i_den;
-        int i_dst_num, i_dst_den;
+        unsigned int i_dst_num, i_dst_den;
 
         i_num = p_enc->fmt_in.video.i_aspect *
             (int64_t)p_enc->fmt_in.video.i_height;

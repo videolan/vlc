@@ -761,7 +761,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         i_out_bytes = i_in_bytes * sizeof( uint32_t );
         i_out_bytes_left = i_out_bytes;
         p_out_buffer = (char *)psz_unicode;
-        i_ret = vlc_iconv( iconv_handle, &p_in_buffer, &i_in_bytes,
+        i_ret = vlc_iconv( iconv_handle, (const char**)&p_in_buffer, &i_in_bytes,
                            &p_out_buffer, &i_out_bytes_left );
 
         vlc_iconv_close( iconv_handle );
@@ -780,7 +780,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     {
         uint32_t *p_fribidi_string;
         int start_pos, pos = 0;
-        
+
         p_fribidi_string = malloc( (i_string_length + 1) * sizeof(uint32_t) );
 
         /* Do bidi conversion line-by-line */
