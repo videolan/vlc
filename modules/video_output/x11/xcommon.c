@@ -356,7 +356,7 @@ void E_(Deactivate) ( vlc_object_t *p_this )
  *****************************************************************************/
 static int InitVideo( vout_thread_t *p_vout )
 {
-    int i_index;
+    unsigned int i_index = 0;
     picture_t *p_pic;
 
     I_OUTPUTPICTURES = 0;
@@ -498,7 +498,7 @@ static int InitVideo( vout_thread_t *p_vout )
  *****************************************************************************/
 static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    int i_width, i_height, i_x, i_y;
+    unsigned int i_width, i_height, i_x, i_y;
 
     vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
                        p_vout->p_sys->p_win->i_height,
@@ -791,7 +791,7 @@ static int ManageVideo( vout_thread_t *p_vout )
         /* Mouse move */
         else if( xevent.type == MotionNotify )
         {
-            int i_width, i_height, i_x, i_y;
+            unsigned int i_width, i_height, i_x, i_y;
             vlc_value_t val;
 
             /* somewhat different use for vout_PlacePicture:
@@ -919,7 +919,7 @@ static int ManageVideo( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        int i_width, i_height, i_x, i_y;
+        unsigned int i_width, i_height, i_x, i_y;
 
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
@@ -1100,7 +1100,8 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     else
     {
         Window dummy1;
-        unsigned int dummy2, dummy3;
+        int dummy2, dummy3;
+        unsigned int dummy4, dummy5;
 
         /* Select events we are interested in. */
         XSelectInput( p_vout->p_sys->p_display, p_win->owner_window,
@@ -1111,7 +1112,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                       &dummy1, &dummy2, &dummy3,
                       &p_win->i_width,
                       &p_win->i_height,
-                      &dummy2, &dummy3 );
+                      &dummy4, &dummy5 );
 
         /* We are already configured */
         b_configure_notify = VLC_TRUE;
@@ -1806,7 +1807,8 @@ static int XVideoGetPort( vout_thread_t *p_vout,
 {
     XvAdaptorInfo *p_adaptor;
     unsigned int i;
-    int i_adaptor, i_num_adaptors, i_requested_adaptor;
+    unsigned int i_adaptor, i_num_adaptors;
+    int i_requested_adaptor;
     int i_selected_port;
 
     switch( XvQueryExtension( p_vout->p_sys->p_display, &i, &i, &i, &i, &i ) )
@@ -1858,7 +1860,7 @@ static int XVideoGetPort( vout_thread_t *p_vout,
 
         /* If we requested an adaptor and it's not this one, we aren't
          * interested */
-        if( i_requested_adaptor != -1 && i_adaptor != i_requested_adaptor )
+        if( i_requested_adaptor != -1 && ((int)i_adaptor != i_requested_adaptor) )
         {
             continue;
         }
@@ -2083,7 +2085,7 @@ static int InitDisplay( vout_thread_t *p_vout )
                                     &xvisual_template, &i_count );
             if( p_xvisual == NULL )
             {
-            
+
                 msg_Err( p_vout, "no TrueColor visual available" );
                 return VLC_EGENERIC;
             }
@@ -2266,10 +2268,10 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
     /* Create XImage. p_data will be automatically freed */
 #ifdef MODULE_NAME_IS_xvideo
     p_image = XvCreateImage( p_display, i_xvport, i_chroma,
-                             p_data, i_width, i_height );
+                             (char *)p_data, i_width, i_height );
 #elif defined(MODULE_NAME_IS_x11)
     p_image = XCreateImage( p_display, p_visual, i_depth, ZPixmap, 0,
-                            p_data, i_width, i_height, i_quantum, 0 );
+                            (char *)p_data, i_width, i_height, i_quantum, 0 );
 #endif
     if( p_image == NULL )
     {

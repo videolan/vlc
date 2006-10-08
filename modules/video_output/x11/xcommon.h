@@ -117,10 +117,10 @@ struct vout_sys_t
 #endif
 
     /* Screen saver properties */
-    unsigned int        i_ss_timeout;                             /* timeout */
-    unsigned int        i_ss_interval;           /* interval between changes */
-    unsigned int        i_ss_blanking;                      /* blanking mode */
-    unsigned int        i_ss_exposure;                      /* exposure mode */
+    int                 i_ss_timeout;                             /* timeout */
+    int                 i_ss_interval;           /* interval between changes */
+    int                 i_ss_blanking;                      /* blanking mode */
+    int                 i_ss_exposure;                      /* exposure mode */
 #ifdef DPMSINFO_IN_DPMS_H
     BOOL                b_ss_dpms;                              /* DPMS mode */
 #endif
