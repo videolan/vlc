@@ -210,13 +210,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="visualButton" >
-       <property name="text" >
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="playlistButton" >
        <property name="text" >
         <string/>

@@ -82,6 +82,7 @@ private:
     bool                 videoEmbeddedFlag;
     bool                 alwaysVideoFlag;
     bool                 advControlsEnabled;
+    bool                 visualSelectorEnabled;
 
     InputManager        *main_input_manager;
     InputSlider         *slider;

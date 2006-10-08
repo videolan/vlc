@@ -78,7 +78,6 @@ VideoWidget::~VideoWidget()
 
 QSize VideoWidget::sizeHint() const
 {
-    fprintf( stderr, "Video Size %ix%i\n", widgetSize.width(), widgetSize.height() );
     return widgetSize;
 }
 
@@ -132,7 +131,6 @@ BackgroundWidget::~BackgroundWidget()
 
 QSize BackgroundWidget::sizeHint() const
 {
-    fprintf( stderr, "BG %ix%i\n", widgetSize.width(), widgetSize.height() );
     return widgetSize;
 }
 
@@ -318,7 +316,6 @@ void PlaylistWidget::setArt( QString url )
 {
     if( prevArt != url )
     {
-        fprintf( stderr, "Display %s\n", qta( url ) );
         art->setPixmap( QPixmap( url ) );
         prevArt = url;
     }

@@ -120,7 +120,8 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
     THEDP->menusUpdateMapper->setMapping( menu, f ); }
 
 void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
-                              bool playlist, bool adv_controls_enabled )
+                              bool playlist, bool adv_controls_enabled,
+                              bool visual_selector_enabled )
 {
     QMenuBar *bar = mi->menuBar();
     BAR_ADD( FileMenu(), qtr("Media") );
@@ -128,7 +129,8 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
     {
         BAR_ADD( PlaylistMenu( mi,p_intf ), qtr("Playlist" ) );
     }
-    BAR_ADD( ToolsMenu( p_intf, mi, adv_controls_enabled ), qtr("Tools") );
+    BAR_ADD( ToolsMenu( p_intf, mi, adv_controls_enabled,
+                        visual_selector_enabled ), qtr("Tools") );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr("Video"), 1 );
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr("Audio"), 2 );
     BAR_DADD( NavigMenu( p_intf, NULL ), qtr("Navigation"), 3 );
@@ -162,7 +164,8 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
 }
 
 QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
-                            bool adv_controls_enabled, bool with_intf )
+                            bool adv_controls_enabled,
+                            bool visual_selector_enabled, bool with_intf )
 {
     QMenu *menu = new QMenu();
     if( with_intf )
@@ -183,6 +186,10 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
                                         mi, SLOT( advanced() ) );
         adv->setCheckable( true );
         if( adv_controls_enabled ) adv->setChecked( true );
+        adv = menu->addAction( qtr("Visualizations selector" ),
+                               mi, SLOT( visual() ) );
+        adv->setCheckable( true );
+        if( visual_selector_enabled ) adv->setChecked( true );
     }
     menu->addSeparator();
     DP_SADD( qtr("Preferences"), "", "", prefsDialog() );
