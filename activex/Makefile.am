@@ -36,6 +36,8 @@ SOURCES_activex = \
     dataobject.h \
     viewobject.cpp \
     viewobject.h \
+    supporterrorinfo.cpp \
+    supporterrorinfo.h \
     vlccontrol.cpp \
     vlccontrol.h \
     vlccontrol2.cpp \

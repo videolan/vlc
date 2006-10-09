@@ -185,6 +185,7 @@ public:
     inline BOOL isRunning(void) { return NULL != _p_libvlc; };
     HRESULT getVLCObject(int *i_vlc);
     HRESULT getVLC(libvlc_instance_t** p_vlc);
+    void setErrorInfo(REFIID riid, const char *description);
 
     // control geometry within container
     RECT getPosRect(void) { return _posRect; }; 
@@ -238,6 +239,7 @@ private:
     class VLCControl2 *vlcControl2;
     class VLCViewObject *vlcViewObject;
     class VLCDataObject *vlcDataObject;
+    class VLCSupportErrorInfo *vlcSupportErrorInfo;
 
     // in place activated window (Plugin window)
     HWND _inplacewnd;

@@ -36,6 +36,7 @@
 #include "vlccontrol2.h"
 #include "viewobject.h"
 #include "dataobject.h"
+#include "supporterrorinfo.h"
 
 #include "utils.h"
 
@@ -223,6 +224,7 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
     vlcViewObject = new VLCViewObject(this);
     vlcDataObject = new VLCDataObject(this);
     vlcOleObject = new VLCOleObject(this);
+    vlcSupportErrorInfo = new VLCSupportErrorInfo(this);
 
     // configure controlling IUnknown interface for implemented interfaces
     this->pUnkOuter = (NULL != pUnkOuter) ? pUnkOuter : dynamic_cast<LPUNKNOWN>(this);
@@ -236,6 +238,7 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
 
 VLCPlugin::~VLCPlugin()
 {
+    delete vlcSupportErrorInfo;
     delete vlcOleObject;
     delete vlcDataObject;
     delete vlcViewObject;
@@ -306,6 +309,8 @@ STDMETHODIMP VLCPlugin::QueryInterface(REFIID riid, void **ppv)
         *ppv = reinterpret_cast<LPVOID>(vlcViewObject);
     else if( IID_IDataObject == riid )
         *ppv = reinterpret_cast<LPVOID>(vlcDataObject);
+    else if( IID_ISupportErrorInfo == riid )
+        *ppv = reinterpret_cast<LPVOID>(vlcSupportErrorInfo);
     else
     {
         *ppv = NULL;
@@ -435,8 +440,8 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
                  if( i_type == REG_SZ )
                  {
                      strcat( p_data, "\\plugins" );
-                     ppsz_argv[ppsz_argc++] = "--plugin-path";
-                     ppsz_argv[ppsz_argc++] = p_data;
+                     //ppsz_argv[ppsz_argc++] = "--plugin-path";
+                     //ppsz_argv[ppsz_argc++] = p_data;
                  }
              }
              RegCloseKey( h_key );
@@ -544,6 +549,13 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
     }
     *pp_libvlc = _p_libvlc;
     return S_OK;
+};
+
+void VLCPlugin::setErrorInfo(REFIID riid, const char *description)
+{
+    vlcSupportErrorInfo->setErrorInfo( getClassID() == CLSID_VLCPlugin2 ?
+        OLESTR("VideoLAN.VLCPlugin.2") : OLESTR("VideoLAN.VLCPlugin.1"),
+        riid, description );
 };
 
 HRESULT VLCPlugin::onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID)
@@ -933,7 +945,7 @@ void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
     /* change cliprect coordinates system relative to window bounding rect */
     OffsetRect(&clipRect, -lprcPosRect->left, -lprcPosRect->top);
     HRGN clipRgn = CreateRectRgnIndirect(&clipRect);
-    SetWindowRgn(_inplacewnd, clipRgn, TRUE);
+    SetWindowRgn(_inplacewnd, clipRgn, FALSE);
 
     //RedrawWindow(_videownd, &posRect, NULL, RDW_INVALIDATE|RDW_ERASE|RDW_ALLCHILDREN);
     if( isRunning() )

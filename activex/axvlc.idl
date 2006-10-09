@@ -179,7 +179,9 @@ library AXVLC
       odl,
       uuid(9E0BD17B-2D3C-4656-B94D-03084F3FD9D4),
       helpstring("VLC Audio APIs"),
+      hidden,
       dual,
+      nonextensible,
       oleautomation
     ]
     interface IVLCAudio : IDispatch
@@ -202,7 +204,9 @@ library AXVLC
       odl,
       uuid(49E0DBD1-9440-466C-9C97-95C67190C603),
       helpstring("VLC Input APIs"),
+      hidden,
       dual,
+      nonextensible,
       oleautomation
     ]
     interface IVLCInput : IDispatch
@@ -239,7 +243,9 @@ library AXVLC
       odl,
       uuid(54613049-40BF-4035-9E70-0A9312C0188D),
       helpstring("VLC Playlist APIs"),
+      hidden,
       dual,
+      nonextensible,
       oleautomation
     ]
     interface IVLCPlaylist : IDispatch
@@ -282,7 +288,9 @@ library AXVLC
       odl,
       uuid(0AAEDF0B-D333-4B27-A0C6-BBF31413A42E),
       helpstring("VLC Video APIs"),
+      hidden,
       dual,
+      nonextensible,
       oleautomation
     ]
     interface IVLCVideo : IDispatch
@@ -297,12 +305,16 @@ library AXVLC
 
         [propget, helpstring("Returns video original height.")]
         HRESULT height([out, retval] int* height);
+
+        [helpstring("toggle fullscreen/windowed state.")]
+        HRESULT toggleFullscreen();
     };
 
     [
       odl,
       uuid(2D719729-5333-406C-BF12-8DE787FD65E3),
       helpstring("VLC Control"),
+      hidden,
       dual,
       oleautomation
     ]

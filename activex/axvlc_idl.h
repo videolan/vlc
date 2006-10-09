@@ -1448,6 +1448,9 @@ interface IVLCVideo : public IDispatch
     virtual HRESULT STDMETHODCALLTYPE get_height(
         int* height) = 0;
 
+    virtual HRESULT STDMETHODCALLTYPE toggleFullscreen(
+        ) = 0;
+
 };
 #else
 typedef struct IVLCVideoVtbl {
@@ -1512,6 +1515,9 @@ typedef struct IVLCVideoVtbl {
         IVLCVideo* This,
         int* height);
 
+    HRESULT (STDMETHODCALLTYPE *toggleFullscreen)(
+        IVLCVideo* This);
+
     END_INTERFACE
 } IVLCVideoVtbl;
 interface IVLCVideo {
@@ -1533,6 +1539,7 @@ interface IVLCVideo {
 #define IVLCVideo_put_fullscreen(p,a) (p)->lpVtbl->put_fullscreen(p,a)
 #define IVLCVideo_get_width(p,a) (p)->lpVtbl->get_width(p,a)
 #define IVLCVideo_get_height(p,a) (p)->lpVtbl->get_height(p,a)
+#define IVLCVideo_toggleFullscreen(p) (p)->lpVtbl->toggleFullscreen(p)
 #endif
 
 #endif
@@ -1565,6 +1572,13 @@ HRESULT CALLBACK IVLCVideo_get_height_Proxy(
     IVLCVideo* This,
     int* height);
 void __RPC_STUB IVLCVideo_get_height_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCVideo_toggleFullscreen_Proxy(
+    IVLCVideo* This);
+void __RPC_STUB IVLCVideo_toggleFullscreen_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,

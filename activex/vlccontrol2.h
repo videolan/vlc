@@ -222,6 +222,7 @@ public:
     STDMETHODIMP put_fullscreen(VARIANT_BOOL);
     STDMETHODIMP get_width(int*);
     STDMETHODIMP get_height(int*);
+    STDMETHODIMP toggleFullscreen();
  
 protected:
     HRESULT loadTypeInfo();
