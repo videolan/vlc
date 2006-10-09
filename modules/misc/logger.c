@@ -126,7 +126,7 @@ static char *mode_list_text[] = { N_("Text"), "HTML"
 #endif
 
 vlc_module_begin();
-    set_shortname( N_( "Logging" ) );
+    set_shortname( _( "Logging" ) );
     set_description( _("File logging") );
 
     set_category( CAT_ADVANCED );

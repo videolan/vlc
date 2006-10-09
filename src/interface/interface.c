@@ -352,7 +352,7 @@ static void RunInterface( intf_thread_t *p_intf )
             if( !strcmp( p_module->psz_object_name, ppsz_parser[0] ) )
             {
                 val.psz_string = ppsz_parser[0];
-                text.psz_string = ppsz_parser[1];
+                text.psz_string = _(ppsz_parser[1]);
                 var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE,
                             &val, &text );
                 break;
@@ -371,13 +371,13 @@ static void RunInterface( intf_thread_t *p_intf )
 
     val.psz_string = "rc"; text.psz_string = "Console";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "telnet"; text.psz_string = "Telnet Interface";
+    val.psz_string = "telnet"; text.psz_string = _("Telnet Interface");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "http"; text.psz_string = "Web Interface";
+    val.psz_string = "http"; text.psz_string = _("Web Interface");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "logger"; text.psz_string = "Debug logging";
+    val.psz_string = "logger"; text.psz_string = _("Debug logging");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "gestures"; text.psz_string = "Mouse Gestures";
+    val.psz_string = "gestures"; text.psz_string = _("Mouse Gestures");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );

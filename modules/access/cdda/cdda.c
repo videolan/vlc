@@ -112,7 +112,7 @@ vlc_module_begin();
     add_usage_hint( N_("cddax://[device-or-file][@[T]track]") );
     set_description( _("Compact Disc Digital Audio (CD-DA) input") );
     set_capability( "access2", 10 /* compare with priority of cdda */ );
-    set_shortname( N_("Audio Compact Disc"));
+    set_shortname( _("Audio Compact Disc"));
     set_callbacks( CDDAOpen, CDDAClose );
     add_shortcut( "cddax" );
     add_shortcut( "cd" );

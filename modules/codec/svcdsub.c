@@ -39,17 +39,16 @@ static int  DecoderOpen   ( vlc_object_t * );
 static int  PacketizerOpen( vlc_object_t * );
 static void DecoderClose  ( vlc_object_t * );
 
-#define DEBUG_TEXT \
-     "Enable debug"
+#define DEBUG_TEXT N_("Enable debug")
 
-#define DEBUG_LONGTEXT N_( \
-    "This integer when viewed in binary is a debugging mask\n" \
+#define DEBUG_LONGTEXT  \
+    N_("This integer when viewed in binary is a debugging mask\n" \
     "calls                 1\n" \
-    "packet assembly info  2\n")
+    "packet assembly info  2\n" )
 
 vlc_module_begin();
     set_description( _("Philips OGT (SVCD subtitle) decoder") );
-    set_shortname( N_("SVCD subtitles"));
+    set_shortname( _("SVCD subtitles") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_SCODEC );
     set_capability( "decoder", 50 );

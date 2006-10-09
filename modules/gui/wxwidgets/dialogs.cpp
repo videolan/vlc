@@ -471,7 +471,7 @@ void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
     }
 
     if( p_dir_dialog == NULL )
-        p_dir_dialog = new wxDirDialog( NULL );
+        p_dir_dialog = new wxDirDialog( NULL, wxU(_("Select a directory")) );
 
     if( p_dir_dialog && p_dir_dialog->ShowModal() == wxID_OK )
     {

@@ -92,7 +92,7 @@ int  E_(BlocksPerReadCallback) ( vlc_object_t *p_this, const char *psz_name,
  *****************************************************************************/
 
 vlc_module_begin();
-    set_shortname( N_("(Super) Video CD"));
+    set_shortname( _("(Super) Video CD"));
     set_description( _("Video CD (VCD 1.0, 1.1, 2.0, SVCD, HQVCD) input") );
     add_usage_hint( N_("vcdx://[device-or-file][@{P,S,T}num]") );
     add_shortcut( "vcdx" );

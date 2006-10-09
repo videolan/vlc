@@ -60,7 +60,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Screen Input") );
-    set_shortname( N_("Screen" ));
+    set_shortname( _("Screen" ));
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 

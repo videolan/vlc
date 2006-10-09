@@ -100,7 +100,7 @@ static char *ppsz_pos_descriptions[] =
 vlc_module_begin();
     set_description( _("Logo video filter") );
     set_capability( "video filter", 0 );
-    set_shortname( N_("Logo overlay") );
+    set_shortname( _("Logo overlay") );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
     add_shortcut( "logo" );

@@ -71,7 +71,7 @@ static picture_t *Filter( filter_t *, picture_t * );
 
 vlc_module_begin();
     set_description( _("Image properties filter") );
-    set_shortname( N_("Image adjust" ));
+    set_shortname( _("Image adjust" ));
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter2", 0 );

@@ -162,7 +162,7 @@ vlc_module_begin();
 #endif
     add_bool( "wx-labels", 0, NULL, LABEL_TEXT, LABEL_LONGTEXT, VLC_TRUE);
     add_string( "wx-config-last", NULL, NULL,
-                "last config", "last config", VLC_TRUE );
+                N_("last config"), N_("last config"), VLC_TRUE );
         change_autosave();
         change_internal();
     add_deprecated( "wxwin-config-last", VLC_FALSE); /*Deprecated since 0.8.4*/

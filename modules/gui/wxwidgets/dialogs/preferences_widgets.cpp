@@ -573,7 +573,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
     {
         wxButton *button =
             new wxButton( this, wxID_HIGHEST+i,
-                          wxU(p_item->ppsz_action_text[i]) );
+                          wxU(_(p_item->ppsz_action_text[i])) );
         sizer->Add( button, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
     }
 

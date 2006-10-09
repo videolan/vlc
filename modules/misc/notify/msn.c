@@ -67,7 +67,7 @@ static int SendToMSN( char * psz_msg );
 vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_shortname( N_( "MSN" ) );
+    set_shortname( _( "MSN" ) );
     set_description( _("MSN Now-Playing") );
 
     add_string( "msn-format", FORMAT_DEFAULT, NULL,

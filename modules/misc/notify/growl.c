@@ -69,7 +69,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset );
 vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_shortname( N_( "Growl" ) );
+    set_shortname( _( "Growl" ) );
     set_description( _("Growl Notification Plugin") );
 
     add_string( "growl-server", SERVER_DEFAULT, NULL,

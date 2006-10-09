@@ -76,7 +76,7 @@ static block_t *Convert( filter_t *, block_t * );
      "processed by this filter. Enabling this setting is not recommended.")
 
 vlc_module_begin();
-    set_description( N_("Headphone virtual spatialization effect") );
+    set_description( _("Headphone virtual spatialization effect") );
     set_shortname( _("Headphone effect") );
     set_help( MODULE_DESCRIPTION );
     set_category( CAT_AUDIO );
