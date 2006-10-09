@@ -759,8 +759,6 @@ static int  Open ( vlc_object_t *p_this )
         free( val.psz_string );
     }
 
-    p_sys->param.rc.f_ip_factor = val.f_float;
-
 #if X264_BUILD >= 51 /* r570 */
     var_Get( p_enc, SOUT_CFG_PREFIX "interlaced", &val );
     p_sys->param.b_interlaced = val.b_bool;
