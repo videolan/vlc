@@ -203,6 +203,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
         return 0;
     }
 
+    free( p_buffer );
     p_reader = malloc( sizeof(xml_reader_t) );
     p_reader->p_sys = malloc( sizeof(xml_reader_sys_t) );
     p_reader->p_sys->p_root = p_root;
