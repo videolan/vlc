@@ -95,7 +95,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("UDP stream output") );
-    set_shortname( _( "UDP" ) );
+    set_shortname( "UDP" );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );
     add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
