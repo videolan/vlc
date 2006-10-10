@@ -31,8 +31,7 @@ class VLCSupportErrorInfo : public ISupportErrorInfo
 public:
 
     VLCSupportErrorInfo(VLCPlugin *p_instance) :
-        _p_instance(p_instance),
-        _riid(IID_NULL)
+        _p_instance(p_instance)
     {};
     virtual ~VLCSupportErrorInfo()
     {};
@@ -63,7 +62,6 @@ public:
 
 private:
     VLCPlugin *_p_instance;
-    IID _riid;
 };
 
 #endif

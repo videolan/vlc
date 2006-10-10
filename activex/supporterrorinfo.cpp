@@ -24,20 +24,25 @@
 #include "supporterrorinfo.h"
 
 #include "utils.h"
+#include "axvlc_idl.h"
 
 using namespace std;
 
 STDMETHODIMP VLCSupportErrorInfo::InterfaceSupportsErrorInfo(REFIID  riid)
 {
-    if( IID_NULL == riid )
-        return S_FALSE;
-
-    return riid == _riid ? S_OK : S_FALSE;
+    if( (riid == IID_IVLCAudio)
+     || (riid == IID_IVLCInput)
+     || (riid == IID_IVLCPlaylist)
+     || (riid == IID_IVLCVideo)
+     || (riid == IID_IVLCControl2) )
+    {
+        return S_OK;
+    }
+    return S_FALSE;
 };
 
 void VLCSupportErrorInfo::setErrorInfo(LPCOLESTR progid, REFIID riid, const char *description)
 {
-    _riid = IID_NULL;
     BSTR bstrDescription = BSTRFromCStr(CP_UTF8, description);
     if( NULL != bstrDescription )
     {
@@ -54,7 +59,6 @@ void VLCSupportErrorInfo::setErrorInfo(LPCOLESTR progid, REFIID riid, const char
             hr = pcerrinfo->QueryInterface(IID_IErrorInfo, (LPVOID*) &perrinfo);
             if( SUCCEEDED(hr) )
             {
-               _riid = riid;
                ::SetErrorInfo(0, perrinfo);
                perrinfo->Release();
             }
