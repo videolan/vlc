@@ -61,7 +61,7 @@ static picture_t *Filter( filter_t *, picture_t * );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("OpenCV face detection example filter") );
-    set_shortname( N_( "OpenCV example" ));
+    set_shortname( _( "OpenCV example" ));
     set_capability( "opencv example", 1 );
     add_shortcut( "opencv_example" );
     

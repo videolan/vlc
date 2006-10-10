@@ -71,7 +71,7 @@ static char *mode_list_text[] = { N_("Gradient"), N_("Edge"), N_("Hough") };
 
 vlc_module_begin();
     set_description( _("Gradient video filter") );
-    set_shortname( N_( "Gradient" ));
+    set_shortname( _( "Gradient" ));
     set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );

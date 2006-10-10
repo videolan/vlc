@@ -181,7 +181,7 @@ static void Close( vlc_object_t *p_this );
 
 vlc_module_begin();
     set_shortname( _("DVB") );
-    set_shortname( _("DVB input with v4l2 support") );
+    set_description( _("DVB input with v4l2 support") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 

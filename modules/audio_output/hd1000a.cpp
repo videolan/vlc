@@ -73,7 +73,7 @@ static void    InterleaveS16( int16_t *, int16_t * );
  *****************************************************************************/
 vlc_module_begin();
     set_shortname( "Roku HD1000" );
-    set_description( N_("Roku HD1000 audio output") );
+    set_description( _("Roku HD1000 audio output") );
     set_capability( "audio output", 100 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );

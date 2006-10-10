@@ -115,7 +115,7 @@ vlc_module_begin();
         OSD_UPDATE_LONGTEXT, VLC_TRUE );
 
     set_capability( "sub filter", 100 );
-    set_shortname( _("On Screen Display menu") );
+    set_description( _("On Screen Display menu") );
     set_shortname( _("OSD menu") );
     add_shortcut( "osdmenu" );
 /*

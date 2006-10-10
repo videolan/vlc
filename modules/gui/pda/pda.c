@@ -63,7 +63,7 @@ gint E_(GtkModeManage)   ( intf_thread_t * p_intf );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_shortname( _("PDA Linux Gtk2+ interface") );
+    set_description( _("PDA Linux Gtk2+ interface") );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
 //    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, VLC_TRUE );
