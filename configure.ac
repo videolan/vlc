@@ -907,7 +907,7 @@ AC_CACHE_CHECK([if $CC accepts -Wall],
 
 AC_CACHE_CHECK([if $CC accepts -Wextra],
     [ac_cv_c_Wextra],
-    [CFLAGS="-Werror ${CFLAGS_save}"
+    [CFLAGS="-Wextra ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_Wextra=yes, ac_cv_c_Wextra=no)])
 
 AC_CACHE_CHECK([if $CC accepts -Wno-unused-parameter],
