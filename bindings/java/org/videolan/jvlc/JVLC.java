@@ -60,7 +60,7 @@ public class JVLC implements Runnable {
     
     public JVLC() {
         String[] args = new String[1];
-        args[0] = "";
+        args[0] = "jvlc";
         
         _instance	= createInstance( args );
         playlist	= new Playlist	( _instance );
