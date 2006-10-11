@@ -2,7 +2,7 @@
 # VLC Java Bindings
 #######################################################################
 
-SUBDIRS= src
+#SUBDIRS= src
 DIST_SUBDIRS = $(SUBDIRS)
 
 EXTRA_DIST= \
@@ -77,11 +77,12 @@ VlcClient: $(OBJECTS)
 VLCExample: $(OBJECTS)
 	$(JAVAC) VLCExample.java
 
-.class:
+class: %.java
 	$(JAVAC) $?
-	$(JCH) org/videolan/jvlc/$$(basename $*) -o includes/$$(basename $*).h
+	$(JCH) $(@D)/$(*F) -o includes/$(*F).h
+
 
 clean-local:
-	rm -f *.class *~ org/videolan/jvlc/*.class org_videolan*.h *.so *.o *.dll
+	rm -f *.class *~ org/videolan/jvlc/*.class org_videolan*.h includes/*.h src/*.o *.so *.o *.dll
 
 endif

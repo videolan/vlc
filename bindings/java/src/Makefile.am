@@ -13,7 +13,7 @@ EXTRA_DIST= \
 
 if BUILD_JAVA
 
-JAVACXXFLAGS = `top_builddir=../../.. ../../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES) -c
+JAVACXXFLAGS = `top_builddir=../../.. ../../../vlc-config --cflags pic` -I. -Isrc -I../../ -I ../../include $(JINCLUDES) -c
 
 
 all: $(COBJECTS)
