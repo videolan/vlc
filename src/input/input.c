@@ -715,6 +715,8 @@ static int Init( input_thread_t * p_input )
      * want to add more logic, just force file by file:// or code it ;)
      */
     memset( &p_input->counters, 0, sizeof( p_input->counters ) );
+    vlc_mutex_init( p_input, &p_input->counters.counters_lock );
+
     if( !p_input->b_preparsing )
     {
         /* Prepare statistics */
@@ -742,7 +744,6 @@ static int Init( input_thread_t * p_input )
             if( p_input->counters.p_input_bitrate )
                 p_input->counters.p_input_bitrate->update_interval = 1000000;
         }
-        vlc_mutex_init( p_input, &p_input->counters.counters_lock );
 
         /* handle sout */
         psz = var_GetString( p_input, "sout" );
@@ -1160,7 +1161,6 @@ static void End( input_thread_t * p_input )
                                       p_input->p_libvlc->p_playlist->p_stats );
             p_input->p_libvlc->p_playlist->p_stats_computer = NULL;
         }
-        vlc_mutex_lock( &p_input->counters.counters_lock );
         CL_CO( read_bytes );
         CL_CO( read_packets );
         CL_CO( demux_read );
@@ -1173,7 +1173,6 @@ static void End( input_thread_t * p_input )
         CL_CO( decoded_audio) ;
         CL_CO( decoded_video );
         CL_CO( decoded_sub) ;
-        vlc_mutex_unlock( &p_input->counters.counters_lock );
     }
 
     /* Close optional stream output instance */
@@ -1181,11 +1180,9 @@ static void End( input_thread_t * p_input )
     {
         vlc_value_t keep;
 
-        vlc_mutex_lock( &p_input->counters.counters_lock );
         CL_CO( sout_sent_packets );
         CL_CO( sout_sent_bytes );
         CL_CO( sout_send_bitrate );
-        vlc_mutex_unlock( &p_input->counters.counters_lock );
 
         if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool )
         {
@@ -1200,8 +1197,10 @@ static void End( input_thread_t * p_input )
             sout_DeleteInstance( p_input->p_sout );
         }
     }
-
 #undef CL_CO
+
+    vlc_mutex_destroy( &p_input->counters.counters_lock );
+
     /* Tell we're dead */
     p_input->b_dead = VLC_TRUE;
 }
