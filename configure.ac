@@ -912,7 +912,7 @@ AC_CACHE_CHECK([if $CC accepts -Wextra],
 
 AC_CACHE_CHECK([if $CC accepts -Wno-unused-parameter],
     [ac_cv_c_Wno_unused_parameter],
-    [CFLAGS="-Werror ${CFLAGS_save}"
+    [CFLAGS="-Wno-unused-parameter ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_Wno_unused_parameter=yes, ac_cv_c_Wno_unused_parameter=no)])
 
 AC_CACHE_CHECK([if $CC accepts -Wconversion],
