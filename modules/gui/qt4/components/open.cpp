@@ -47,7 +47,7 @@ void FileOpenPanel::sendUpdate()
 
 QString FileOpenPanel::getUpdatedMRL()
 {
-    return ui.fileInput->text();
+    return ui.fileInput->currentText();
 }
 
 /**************************************************************************

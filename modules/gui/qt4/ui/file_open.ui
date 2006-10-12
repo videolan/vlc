@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog" >
+ <class>FileOpen</class>
+ <widget class="QWidget" name="FileOpen" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -238,7 +238,7 @@ p, li { white-space: pre-wrap; }
         </spacer>
        </item>
        <item>
-        <widget class="QComboBox" name="lineEdit" >
+        <widget class="QComboBox" name="fileInput" >
          <property name="sizePolicy" >
           <sizepolicy>
            <hsizetype>7</hsizetype>
@@ -286,19 +286,6 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>140</x>
        <y>100</y>
-       <width>320</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="Line" name="line_2" >
-     <property name="geometry" >
-      <rect>
-       <x>150</x>
-       <y>230</y>
        <width>320</width>
        <height>16</height>
       </rect>
@@ -678,6 +665,19 @@ p, li { white-space: pre-wrap; }
       <string>Extra Audio</string>
      </property>
     </widget>
+    <widget class="Line" name="line_2" >
+     <property name="geometry" >
+      <rect>
+       <x>150</x>
+       <y>230</y>
+       <width>320</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_Disk" >
     <attribute name="title" >
@@ -885,7 +885,7 @@ p, li { white-space: pre-wrap; }
   </widget>
  </widget>
  <tabstops>
-  <tabstop>lineEdit</tabstop>
+  <tabstop>fileInput</tabstop>
   <tabstop>pushButton_3</tabstop>
   <tabstop>lineEdit_2</tabstop>
   <tabstop>pushButton_4</tabstop>
