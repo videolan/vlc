@@ -38,8 +38,6 @@
 #include <jawt.h>
 #include <jawt_md.h>
 
-#include <X11/Xlib.h> // for Xlibs graphics functions
-
 #include "utils.h"
 
 
