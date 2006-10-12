@@ -363,6 +363,10 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
 
     var_Create( p_intf, "add", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "add", Playlist, NULL );
+    var_Create( p_intf, "repeat", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "repeat", Playlist, NULL );
+    var_Create( p_intf, "loop", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "loop", Playlist, NULL );
     var_Create( p_intf, "enqueue", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "enqueue", Playlist, NULL );
     var_Create( p_intf, "playlist", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
@@ -887,6 +891,8 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| next . . . . . . . . . . . .  next playlist item"));
     msg_rc(_("| prev . . . . . . . . . .  previous playlist item"));
     msg_rc(_("| goto . . . . . . . . . . . .  goto item at index"));
+    msg_rc(_("| repeat [on|off] . .  toggle playlist item repeat"));
+    msg_rc(_("| loop [on|off] . . . .  toggle playlist item loop"));
     msg_rc(_("| clear . . . . . . . . . . .   clear the playlist"));
     msg_rc(_("| status . . . . . . . . . current playlist status"));
     msg_rc(_("| title [X]  . . . . set/get title in current item"));
@@ -1299,13 +1305,14 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
 static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    vlc_value_t val;
+
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     playlist_t *p_playlist = pl_Yield( p_this );
 
     PL_LOCK;
     if( p_playlist->p_input )
     {
-        vlc_value_t val;
         var_Get( p_playlist->p_input, "state", &val );
         if( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) )
         {
@@ -1330,6 +1337,50 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     {
         msg_Warn( p_playlist, "play" );
         playlist_Play( p_playlist );
+    }
+    else if( !strcmp( psz_cmd, "repeat" ) )
+    {
+        vlc_bool_t b_update = VLC_TRUE;
+
+        var_Get( p_playlist, "repeat", &val );
+
+        if( strlen( newval.psz_string ) > 0 )
+        {
+            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool == VLC_TRUE ) ) ||
+                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == VLC_FALSE ) ) )
+            {
+                b_update = VLC_FALSE;
+            }
+        }
+
+        if ( b_update )
+        {
+            val.b_bool = !val.b_bool;
+            var_Set( p_playlist, "repeat", val );
+        }
+        msg_rc( "Setting repeat to %d", val.b_bool );
+    }
+    else if( !strcmp( psz_cmd, "loop" ) )
+    {
+        vlc_bool_t b_update = VLC_TRUE;
+
+        var_Get( p_playlist, "loop", &val );
+
+        if( strlen( newval.psz_string ) > 0 )
+        {
+            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool == VLC_TRUE ) ) ||
+                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == VLC_FALSE ) ) )
+            {
+                b_update = VLC_FALSE;
+            }
+        }
+
+        if ( b_update )
+        {
+            val.b_bool = !val.b_bool;
+            var_Set( p_playlist, "loop", val );
+        }
+        msg_rc( "Setting loop to %d", val.b_bool );
     }
     else if (!strcmp( psz_cmd, "goto" ) )
     {
