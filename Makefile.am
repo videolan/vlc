@@ -162,6 +162,33 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/repeat_single_embedded_blue.png \
 	extras/MacOSX/Resources/shuffle_embedded.png \
 	extras/MacOSX/Resources/shuffle_embedded_blue.png \
+	extras/MacOSX/Resources/fs_volume_slider_knob_highlight.png \
+	extras/MacOSX/Resources/fs_volume_slider_knob.png \
+	extras/MacOSX/Resources/fs_volume_slider_bar.png \
+	extras/MacOSX/Resources/fs_volume_mute_highlight.png \
+	extras/MacOSX/Resources/fs_volume_mute.png \
+	extras/MacOSX/Resources/fs_volume_max_highlight.png \
+	extras/MacOSX/Resources/fs_volume_max.png \
+	extras/MacOSX/Resources/fs_time_slider_knob_highlight.png \
+	extras/MacOSX/Resources/fs_time_slider_knob.png \
+	extras/MacOSX/Resources/fs_time_slider.png \
+	extras/MacOSX/Resources/fs_stop_highlight.png \
+	extras/MacOSX/Resources/fs_stop.png \
+	extras/MacOSX/Resources/fs_skip_previous_highlight.png \
+	extras/MacOSX/Resources/fs_skip_previous.png \
+	extras/MacOSX/Resources/fs_skip_next_highlight.png \
+	extras/MacOSX/Resources/fs_skip_next.png \
+	extras/MacOSX/Resources/fs_rewind_highlight.png \
+	extras/MacOSX/Resources/fs_rewind.png \
+	extras/MacOSX/Resources/fs_play_highlight.png \
+	extras/MacOSX/Resources/fs_play.png \
+	extras/MacOSX/Resources/fs_pause_highlight.png \
+	extras/MacOSX/Resources/fs_pause.png \
+	extras/MacOSX/Resources/fs_forward_highlight.png \
+	extras/MacOSX/Resources/fs_forward.png \
+	extras/MacOSX/Resources/fs_exit_fullscreen_highlight.png \
+	extras/MacOSX/Resources/fs_exit_fullscreen.png \
+	extras/MacOSX/Resources/fs_background.png \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
 	extras/MacOSX/Delete_Preferences.app/Contents/Info.plist \
 	extras/MacOSX/Delete_Preferences.app/Contents/PkgInfo \
@@ -401,6 +428,8 @@ VLC-release.app: vlc
 	    interaction.m \
 	    embeddedwindow.h \
 	    embeddedwindow.m \
+	    fspanel.h \
+	    fspanel.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
@@ -541,6 +570,8 @@ VLC.app: vlc
 	    interaction.m \
 	    embeddedwindow.h \
 	    embeddedwindow.m \
+	    fspanel.h \
+	    fspanel.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
