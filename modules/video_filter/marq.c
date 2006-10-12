@@ -227,7 +227,6 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     if( p_sys->p_style ) free( p_sys->p_style );
     if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
-    free( p_sys );
 
     /* Delete the marquee variables */
 #define DEL_VAR(var) \
@@ -241,6 +240,8 @@ static void DestroyFilter( vlc_object_t *p_this )
     DEL_VAR( "marq-color" );
     DEL_VAR( "marq-opacity" );
     DEL_VAR( "marq-size" );
+
+    free( p_sys );
 }
 /****************************************************************************
  * String formating functions
