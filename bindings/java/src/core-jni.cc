@@ -65,7 +65,6 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance (JNIEnv *env,
         argv[i+1] = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, i),
                                          0
         );
-	//printf("param: %s\n", argv[i + 1]);
     }
 
     res = (long) libvlc_new(argc, (char**) argv, exception );
