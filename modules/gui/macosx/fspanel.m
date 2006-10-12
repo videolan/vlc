@@ -112,7 +112,7 @@
     [[self contentView] setVolumeLevel: f_volumeLevel];
 }
 
-/* This routine is called repeatedly when the mouse enters the window from outside it. */
+/* This routine is called repeatedly to fade in the window */
 - (void)focus:(NSTimer *)timer
 {
     if( [self alphaValue] < 1.0 )
@@ -129,9 +129,18 @@
     }
 }
 
-/* This routine is called repeatedly when the mouse exits the window from inside it */
+/* This routine is called repeatedly to hide the window */
 - (void)unfocus:(NSTimer *)timer
 {
+    if( b_keptVisible )
+    {
+        b_keptVisible = NO;
+        b_fadeQueued = NO;
+        [[self fadeTimer] release];
+        [self setFadeTimer: NULL];
+        [self fadeIn];
+        return;
+    }
     if( [self alphaValue] > 0.0 )
         [self setAlphaValue:[self alphaValue]-0.1];
     if( [self alphaValue] <= 0.1 )
@@ -151,29 +160,11 @@
     }
 }
 
-/* If the mouse enters a window, go make sure we fade in */
-- (void)mouseEntered:(NSEvent *)theEvent
-{
-    [self fadeIn];
-}
-
-/* If the mouse exits a window, go make sure we fade out */
 - (void)mouseExited:(NSEvent *)theEvent
 {
-    /* the user left the window, fade out immediatelly and prevent any timer action */
-    if( b_alreadyCounting )
-    {
-        [hideAgainTimer invalidate];
-        [hideAgainTimer release];
-        b_alreadyCounting = NO;
-        hideAgainTimer = NULL;
-    }
-
     /* give up our focus, so the vout may show us again without letting the user clicking it */
     if( [[[[VLCMain sharedInstance] getControls] getVoutView] isFullscreen] )
         [[[[[VLCMain sharedInstance] getControls] getVoutView] window] makeKeyWindow];
-
-    [self fadeOut];
 }
 
 - (void)fadeIn
@@ -181,7 +172,7 @@
     if( [self alphaValue] < 1.0 )
     {
         if (![self fadeTimer])
-            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(focus:) userInfo:[NSNumber numberWithShort:1] repeats:YES]];
+            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(focus:) userInfo:[NSNumber numberWithShort:1] repeats:YES]];
         else if ([[[self fadeTimer] userInfo] shortValue]==0)
             b_fadeQueued=YES;
     }
