@@ -349,7 +349,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         p_module = (module_t *) vlc_object_get( p_intf, data->i_object_id );
     else
     {
-        p_module = config_FindModule( p_intf, "main" );
+        p_module = config_FindModule( VLC_OBJECT(p_intf), "main" );
         assert( p_module );
         vlc_object_yield( p_module );
     }
