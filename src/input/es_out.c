@@ -594,8 +594,11 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
         }
     }
 
-    if( p_pgrm == NULL )
-        p_pgrm = EsOutProgramAdd( out, i_group );
+    if( p_pgrm == NULL ) {
+	free( psz_cat );
+	msg_Dbg( p_input, "Trying to add meta for non-existing program" );
+	return;
+    }
 
     /* Update the description text of the program */
     if( psz_title && *psz_title )

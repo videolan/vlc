@@ -2652,6 +2652,8 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
     msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
              i_table_id, i_table_id, i_extension, i_extension );
 #endif
+    if( p_demux->p_sys->pid[0].psi->i_pat_version == -1 )
+	return;
 
     if( i_table_id == 0x42 )
     {
