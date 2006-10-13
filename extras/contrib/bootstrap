@@ -63,21 +63,23 @@ case $HOST in
 # Makefile cross compiling is only supported with gcc-4.0
 # ENVP defines the oldest environment on which the program will be able to run
 # SDK 10.2.8 requires gcc-3.3 (so we cannot use that SDK)
-            SDK_TARGET=10.3
-            echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
+	    SDK_TARGET=10.3
+	    echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
 	    echo "HAVE_DARWIN_OS = 1" >> config.mak
-            echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
+	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.9.sdk" >> config.mak
+	    CFLAGS_TUNING=" -mtune=G4"
 	    #EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
 	    #EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
 	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         ;;
     i686-apple-darwin8)
-            SDK_TARGET=10.3
-            echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
+	    SDK_TARGET=10.3
+	    echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
 	    echo "HAVE_DARWIN_OS = 1" >> config.mak
-            echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
+	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.9.sdk" >> config.mak
+	    CFLAGS_TUNING=" -march=pentium-m -mtune=prescott"
 	    #EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
 	    #EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
 	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
@@ -139,7 +141,7 @@ echo "CXX = ${CXX}" >> config.mak
 echo "LD = ${LD}" >> config.mak
 echo "RANLIB = ${RANLIB}" >> config.mak
 echo "AR = ${AR}" >> config.mak
-echo "EXTRA_CFLAGS = ${EXTRA_CFLAGS}" >> config.mak
+echo "EXTRA_CFLAGS = ${CFLAGS_TUNING} ${EXTRA_CFLAGS}" >> config.mak
 echo "EXTRA_CPPFLAGS = ${EXTRA_CPPFLAGS} -I${PREFIX}/include" >> config.mak
 echo "EXTRA_LDFLAGS = ${EXTRA_LDFLAGS}" >> config.mak
 echo "EXTRA_PATH = ${EXTRA_PATH}" >> config.mak
