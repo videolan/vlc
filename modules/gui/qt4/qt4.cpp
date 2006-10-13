@@ -55,7 +55,7 @@ vlc_module_begin();
 
     add_submodule();
         set_description( "Dialogs provider" );
-        set_capability( "dialogs provider", 51 );
+        set_capability( "dialogs provider", 49 );
         add_bool( "qt-always-video", VLC_FALSE, NULL, "", "", VLC_TRUE );
         set_callbacks( OpenDialogs, Close );
 vlc_module_end();
