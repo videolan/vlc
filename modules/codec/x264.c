@@ -916,7 +916,11 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "crf", &val ); 
     if( val.i_int > 0 && val.i_int <= 51 )
     {
+#if X264_BUILD >= 54
+        p_sys->param.rc.f_rf_constant = val.i_int;
+#else
         p_sys->param.rc.i_rf_constant = val.i_int;
+#endif
 #if X264_BUILD >= 48
         p_sys->param.rc.i_rc_method = X264_RC_CRF;
 #endif
