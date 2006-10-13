@@ -1,8 +1,8 @@
 Index: configure
 ===================================================================
---- configure	(revision 560)
+--- configure	(revision 590)
 +++ configure	(working copy)
-@@ -66,8 +66,109 @@
+@@ -64,8 +64,101 @@
  
  EXE=""
  
@@ -56,11 +56,9 @@ Index: configure
 +            ;;
 +        --extra-cflags=*)
 +            CFLAGS="$CFLAGS ${opt#--extra-cflags=}"
-+            VFW_CFLAGS="${opt#--extra-cflags=}"
 +            ;;
 +        --extra-ldflags=*)
 +            LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
-+            VFW_LDFLAGS="${opt#--extra-ldflags=}"
 +            ;;
 +        --enable-pthread)
 +            pthread="yes"
@@ -78,12 +76,6 @@ Index: configure
 +            ;;
 +        --enable-pic)
 +            pic="yes"
-+            ;;
-+        --enable-vfw)
-+            vfw="yes"
-+            ;;
-+        --disable-vfw)
-+            vfw="no"
 +            ;;
 +        --enable-gtk)
 +            gtk="yes"
@@ -112,7 +104,7 @@ Index: configure
  case "${MACHINE#*-*-}" in
    beos*)
      SYS="BEOS"
-@@ -180,96 +281,6 @@
+@@ -178,88 +271,6 @@
  esac
  
  CFLAGS="$CFLAGS -DARCH_$ARCH -DSYS_$SYS"
@@ -154,11 +146,9 @@ Index: configure
 -            ;;
 -        --extra-cflags=*)
 -            CFLAGS="$CFLAGS ${opt#--extra-cflags=}"
--            VFW_CFLAGS="${opt#--extra-cflags=}"
 -            ;;
 -        --extra-ldflags=*)
 -            LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
--            VFW_LDFLAGS="${opt#--extra-ldflags=}"
 -            ;;
 -        --enable-pthread)
 -            pthread="yes"
@@ -176,12 +166,6 @@ Index: configure
 -            ;;
 -        --enable-pic)
 -            pic="yes"
--            ;;
--        --enable-vfw)
--            vfw="yes"
--            ;;
--        --disable-vfw)
--            vfw="no"
 -            ;;
 -        --enable-gtk)
 -            gtk="yes"
@@ -209,8 +193,8 @@ Index: configure
  # autodetect options that weren't forced nor disabled
  
  if test "$pthread" = "auto" ; then
-@@ -361,6 +372,9 @@
- VFW=$vfw
+@@ -349,6 +360,9 @@
+ ASFLAGS=$ASFLAGS
  GTK=$gtk
  EXE=$EXE
 +AR=$AR 
@@ -221,9 +205,9 @@ Index: configure
  DEVNULL=$DEVNULL
 Index: Makefile
 ===================================================================
---- Makefile	(revision 560)
+--- Makefile	(revision 590)
 +++ Makefile	(working copy)
-@@ -64,8 +64,8 @@
+@@ -66,8 +66,8 @@
  default: $(DEP) x264$(EXE)
  
  libx264.a: .depend $(OBJS) $(OBJASM)
@@ -235,7 +219,7 @@ Index: Makefile
  $(SONAME): .depend $(OBJS) $(OBJASM)
  	$(CC) -shared -o $@ $(OBJS) $(OBJASM) -Wl,-soname,$(SONAME) $(LDFLAGS)
 @@ -138,14 +138,14 @@
- 	rm -f config.mak config.h vfw/build/cygwin/config.mak x264.pc
+ 	rm -f config.mak config.h x264.pc
  	$(MAKE) -C gtk distclean
  
 -install: x264 $(SONAME)

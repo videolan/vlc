@@ -145,6 +145,7 @@ Steven M. Schultz <sms at TO.GD-ES.COM> - BSD/OS port
 Steven Sheehy - wxWidgets interface fix
 Tadashi Jokagi <elf2000 at users.sourceforge dot net> - Japanese translation
 Tim 'O Callaghan <tim.ocallaghan at limestudios dot com> - pvr input cleaning patch
+Tim Schuerewegen <ma054331 at skynet dot be> - contrib fixes
 Thomas Graf <tgraf at europe.com> - gettext support, German translation
 Thomas L. Wood <twood at lucent.com> - fixed a bug in QuantMatrixExtension
 Thomas Parmelan <tom+vlc at ankh.fr.EU.org> - mosaic user-defined offsets for substreams
