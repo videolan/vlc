@@ -51,7 +51,10 @@
 /* include the icon graphic */
 #include "../../../share/vlc32x32.xpm"
 
+
 /* Dialogs Provider */
+namespace wxvlc
+{
 class DialogsProvider: public wxFrame
 {
 public:
@@ -111,6 +114,7 @@ public:
     UpdateVLC           *p_updatevlc_dialog;
     VLMFrame            *p_vlm_dialog;
 };
+}
 
 DEFINE_LOCAL_EVENT_TYPE( wxEVT_DIALOG );
 

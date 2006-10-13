@@ -163,10 +163,6 @@ namespace wxvlc {
 
 using namespace wxvlc;
 
-class DialogsProvider;
-class PrefsTreeCtrl;
-class AutoBuiltPanel;
-
 /*****************************************************************************
  * intf_sys_t: description and status of wxwindows interface
  *****************************************************************************/
