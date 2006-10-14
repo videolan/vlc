@@ -149,7 +149,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
 
     p_filter->p_sys->last_date = new_date;
-    f_angle = (double)p_filter->p_sys->i_angle;
+    f_angle = (((double)p_filter->p_sys->i_angle)*M_PI)/180.;
     f_sin = sin( f_angle );
     f_cos = cos( f_angle );
 
