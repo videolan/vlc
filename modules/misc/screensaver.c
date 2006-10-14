@@ -111,7 +111,7 @@ static void Deactivate( vlc_object_t *p_this )
     if( p_intf->p_sys->p_connection )
     {
 #  ifdef HAVE_DBUS_2
-        dbus_connection_close( p_intf->p_sys->p_connection );
+        dbus_connection_unref( p_intf->p_sys->p_connection );
 #  else
         dbus_connection_disconnect( p_intf->p_sys->p_connection );
 #  endif
@@ -145,28 +145,36 @@ static void Run( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP*5 ); // 250ms
 
         /* Check screensaver every 30 seconds */
-        if( ++i_lastcall > 300 )
+        if( ++i_lastcall > 120 )
         {
             vlc_object_t *p_vout;
             p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
             /* If there is a video output, disable xscreensaver */
             if( p_vout )
             {
+                input_thread_t *p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
                 vlc_object_release( p_vout );
+                if( p_input )
+                {
+                    if( PLAYING_S == p_input->i_state )
+                    {
+                        /* http://www.jwz.org/xscreensaver/faq.html#dvd */
 
-                /* http://www.jwz.org/xscreensaver/faq.html#dvd */
-                system( "xscreensaver-command -deactivate >&- 2>&- &" );
+                        system( "xscreensaver-command -deactivate >&- 2>&- &" );
 
-/* If we have dbug support, let's communicate directly with gnome-screensaver
-   else, run gnome-screensaver-command */
+                        /* If we have dbus support, let's communicate directly
+                           with gnome-screensave else, run
+                           gnome-screensaver-command */
 #ifdef HAVE_DBUS
-                poke_screensaver( p_intf, p_intf->p_sys->p_connection );
+                        poke_screensaver( p_intf, p_intf->p_sys->p_connection );
 #else
-                system( "gnome-screensaver-command --poke >&- 2>&- &" );
+                        system( "gnome-screensaver-command --poke >&- 2>&- &" );
 #endif
-                /* FIXME: add support for other screensavers */
+                        /* FIXME: add support for other screensavers */
+                    }
+                    vlc_object_release( p_input );
+                }
             }
-
             i_lastcall = 0;
         }
     }
