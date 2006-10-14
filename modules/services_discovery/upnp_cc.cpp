@@ -73,6 +73,7 @@ struct services_discovery_sys_t
 {
     /* playlist node */
     playlist_item_t *p_node;
+    playlist_item_t *p_node_cat;
     playlist_t *p_playlist;
 };
 
@@ -92,9 +93,6 @@ static int Open( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys  = (services_discovery_sys_t *)
                                 malloc( sizeof( services_discovery_sys_t ) );
 
-    playlist_view_t     *p_view;
-    vlc_value_t         val;
-
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
@@ -108,14 +106,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_view = playlist_ViewFind( p_sys->p_playlist, VIEW_CATEGORY );
-    p_sys->p_node = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY,
-                                         "UPnP", p_view->p_root );
-    p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
-    p_sys->p_node->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    val.b_bool = VLC_TRUE;
-    var_Set( p_sys->p_playlist, "intf-change", val );
-
+    playlist_NodesPairCreate( p_sys->p_playlist, _("Devices"),
+                              &p_sys->p_node_cat, &p_sys->p_node,
+                              VLC_TRUE );
     return VLC_SUCCESS;
 }
 
@@ -131,6 +124,8 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->p_playlist )
     {
         playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node, VLC_TRUE,
+                             VLC_TRUE );
+        playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node_cat, VLC_TRUE,
                              VLC_TRUE );
         vlc_object_release( p_sys->p_playlist );
     }
@@ -227,8 +222,7 @@ playlist_item_t *UPnPHandler::AddDevice( Device *dev )
      */
     char *str = strdup( dev->getFriendlyName( ) );
 
-    p_item = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY,
-                                  str, p_sys->p_node );
+    p_item = playlist_NodeCreate( p_sys->p_playlist, str, p_sys->p_node );
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     msg_Dbg( p_sd, "device %s added", str );
     free( str );
@@ -264,7 +258,7 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
 	playlist_item_t *p_item;
 	p_item = playlist_ItemNew( p_sd, iNode->getResource(), title );
     
-	playlist_NodeAddItem( p_sys->p_playlist, p_item, VIEW_CATEGORY,
+	playlist_NodeAddItem( p_sys->p_playlist, p_item,
 			      p_parent, PLAYLIST_APPEND, PLAYLIST_END );
 
     } else if ( node->isContainerNode() ) 
@@ -272,7 +266,7 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
         ContainerNode *conNode = (ContainerNode *)node;
 
 	char* p_name = strdup(title); /* See other comment on strdup */
-	playlist_item_t* p_node = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY, 
+	playlist_item_t* p_node = playlist_NodeCreate( p_sys->p_playlist,
 						       p_name, p_parent );
 	free(p_name);
 

@@ -310,9 +310,11 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->p_playlist )
     {
-    playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node, VLC_TRUE,
-                 VLC_TRUE );
-    vlc_object_release( p_sys->p_playlist );
+        playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node, VLC_TRUE,
+                             VLC_TRUE );
+        playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node_cat, VLC_TRUE,
+                             VLC_TRUE );
+        vlc_object_release( p_sys->p_playlist );
     }
 
     free( p_sys );
@@ -476,6 +478,14 @@ static int Callback( Upnp_EventType eventType, void* event, void* pCookie )
     }
     break;
 
+    case UPNP_EVENT_SUBSCRIBE_COMPLETE:
+        msg_Warn( cookie->serviceDiscovery, "subscription complete" );
+        break;
+        
+    case UPNP_DISCOVERY_SEARCH_TIMEOUT:
+        msg_Warn( cookie->serviceDiscovery, "search timeout" );
+        break;
+        
     default:
     msg_Dbg( cookie->serviceDiscovery, "%s:%d: DEBUG: UNHANDLED EVENT ( TYPE=%d )", __FILE__, __LINE__, eventType );
     break;
