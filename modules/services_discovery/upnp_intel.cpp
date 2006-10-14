@@ -48,6 +48,7 @@
 
 struct services_discovery_sys_t
 {
+    playlist_item_t *p_node_cat;
     playlist_item_t *p_node;
     playlist_t *p_playlist;
 };
@@ -282,9 +283,6 @@ static int Open( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys  = ( services_discovery_sys_t * )
     malloc( sizeof( services_discovery_sys_t ) );
 
-    playlist_view_t *p_view;
-    vlc_value_t val;
-
     p_sd->pf_run = Run;
     p_sd->p_sys = p_sys;
 
@@ -294,17 +292,13 @@ static int Open( vlc_object_t *p_this )
                              FIND_ANYWHERE );
     if( !p_sys->p_playlist )
     {
-    msg_Warn( p_sd, "unable to find playlist, cancelling UPnP listening" );
-    return VLC_EGENERIC;
+        msg_Warn( p_sd, "unable to find playlist, cancelling UPnP listening" );
+        return VLC_EGENERIC;
     }
 
-    p_view = playlist_ViewFind( p_sys->p_playlist, VIEW_CATEGORY );
-    p_sys->p_node = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY,
-                                         "UPnP", p_view->p_root );
-    p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
-    p_sys->p_node->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    val.b_bool = VLC_TRUE;
-    var_Set( p_sys->p_playlist, "intf-change", val );
+    playlist_NodesPairCreate( p_sys->p_playlist, _("Devices"),
+                              &p_sys->p_node_cat, &p_sys->p_node,
+                              VLC_TRUE );
 
     return VLC_SUCCESS;
 }
@@ -871,7 +865,6 @@ void MediaServer::_buildPlaylist( Container* parent )
 
     char* title = strdup( container->getTitle() );
     playlist_item_t* node = playlist_NodeCreate( _cookie->serviceDiscovery->p_sys->p_playlist,
-                             VIEW_CATEGORY,
                              title,
                              parentNode );
     free( title );
@@ -891,7 +884,6 @@ void MediaServer::_buildPlaylist( Container* parent )
 
     playlist_NodeAddItem( _cookie->serviceDiscovery->p_sys->p_playlist,
                  node,
-                 VIEW_CATEGORY,
                  parentNode, PLAYLIST_APPEND, PLAYLIST_END );
 
     item->setPlaylistNode( node );
@@ -934,7 +926,6 @@ bool MediaServerList::addServer( MediaServer* s )
 
     char* name = strdup( s->getFriendlyName() );
     playlist_item_t* node = playlist_NodeCreate( _cookie->serviceDiscovery->p_sys->p_playlist,
-                        VIEW_CATEGORY,
                         name,
                         _cookie->serviceDiscovery->p_sys->p_node );
     free( name );
