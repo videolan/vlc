@@ -137,7 +137,10 @@ void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
  * LibVLC Playlist handling
  * @{
  */
-
+/**
+ * Set loop variable
+ */
+void libvlc_playlist_loop( libvlc_instance_t* , vlc_bool_t, libvlc_exception_t * );
 /**
  * Start playing. You can give some additionnal playlist item options
  * that will be added to the item before playing it.
