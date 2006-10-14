@@ -27,6 +27,7 @@
 #include <QModelIndex>
 #include <QObject>
 #include <QEvent>
+#include <QMimeData>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -72,6 +73,7 @@ private:
 static int ItemUpdate_Type = QEvent::User + 2;
 static int ItemDelete_Type = QEvent::User + 3;
 static int ItemAppend_Type = QEvent::User + 4;
+static int PLUpdate_Type = QEvent::User + 5;
 
 class PLEvent : public QEvent
 {
@@ -121,6 +123,13 @@ public:
     void doDelete( QModelIndexList selected );
     void search( QString search );
     void sort( int column, Qt::SortOrder order );
+
+    /* DnD handling */
+    Qt::DropActions supportedDropActions() const;
+    QMimeData* mimeData(const QModelIndexList &indexes) const;
+    bool dropMimeData(const QMimeData *data, Qt::DropAction action,
+                      int row, int column, const QModelIndex &target);
+    QStringList mimeTypes() const;
 
     void sendArt( QString url );
 private:

@@ -30,6 +30,7 @@
 #include "dialogs_provider.hpp"
 #include "menus.hpp"
 
+#include <QUrl>
 #include <QHBoxLayout>
 #include <QSignalMapper>
 #include <QMenu>
@@ -75,3 +76,31 @@ void PlaylistDialog::dock()
     QEvent *event = new QEvent( (QEvent::Type)(PLDockEvent_Type) );
     QApplication::postEvent( p_intf->p_sys->p_mi, event );
 }
+
+
+void PlaylistDialog::dropEvent(QDropEvent *event)
+{
+     const QMimeData *mimeData = event->mimeData();
+     foreach( QUrl url, mimeData->urls() ) {
+        QString s = url.toString();
+        if( s.length() > 0 ) {
+            playlist_PlaylistAdd( THEPL, qtu(s), NULL,
+                                  PLAYLIST_APPEND, PLAYLIST_END );
+        }
+     }
+     event->acceptProposedAction();
+}
+void PlaylistDialog::dragEnterEvent(QDragEnterEvent *event)
+{
+     event->acceptProposedAction();
+}
+void PlaylistDialog::dragMoveEvent(QDragMoveEvent *event)
+{
+     event->acceptProposedAction();
+}
+void PlaylistDialog::dragLeaveEvent(QDragLeaveEvent *event)
+{
+     event->accept();
+}
+
+

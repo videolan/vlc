@@ -36,6 +36,7 @@
 #include <QPushButton>
 #include <QStatusBar>
 #include <QKeyEvent>
+#include <QUrl>
 
 #include <assert.h>
 #include <vlc_keys.h>
@@ -83,6 +84,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     settings = new QSettings( "VideoLAN", "VLC" );
     settings->beginGroup( "MainWindow" );
+
+    setAcceptDrops(true);
 
     need_components_update = false;
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
@@ -136,6 +139,51 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
     p_intf->b_interaction = VLC_TRUE;
 }
+
+void MainInterface::dropEvent(QDropEvent *event)
+{
+     const QMimeData *mimeData = event->mimeData();
+
+     /* D&D of a subtitles file, add it on the fly */
+     if( mimeData->urls().size() == 1 )
+     {
+        if( THEMIM->getIM()->hasInput() )
+        {
+            if( input_AddSubtitles( THEMIM->getInput(),
+                                    qtu( mimeData->urls()[0].toString() ),
+                                    VLC_TRUE ) )
+            {
+                event->acceptProposedAction();
+                return;
+            }
+        }
+     }
+     bool first = true;
+     foreach( QUrl url, mimeData->urls() ) {
+        QString s = url.toString();
+        if( s.length() > 0 ) {
+            playlist_PlaylistAdd( THEPL, qtu(s), NULL,
+                                  PLAYLIST_APPEND | (first ? PLAYLIST_GO:0),
+                                  PLAYLIST_END );
+            first = false;
+        }
+     }
+     event->acceptProposedAction();
+}
+void MainInterface::dragEnterEvent(QDragEnterEvent *event)
+{
+     event->acceptProposedAction();
+}
+void MainInterface::dragMoveEvent(QDragMoveEvent *event)
+{
+     event->acceptProposedAction();
+}
+void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
+{
+     event->accept();
+}
+
+
 
 MainInterface::~MainInterface()
 {

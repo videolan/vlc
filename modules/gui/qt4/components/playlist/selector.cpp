@@ -38,6 +38,10 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf,
     view->header()->hide();
     view->setModel( model );
 
+    view->setDragEnabled(true);
+    view->setAcceptDrops(true);
+    view->setDropIndicatorShown(true);
+
     CONNECT( view, activated( const QModelIndex& ),
              this, setSource( const QModelIndex& ) );
     CONNECT( view, clicked( const QModelIndex& ),

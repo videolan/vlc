@@ -482,6 +482,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
 
     /* Attach to new parent */
     INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
+    p_item->p_parent = p_node;
 
     return VLC_SUCCESS;
 }

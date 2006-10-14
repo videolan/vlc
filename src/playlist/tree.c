@@ -430,6 +430,7 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
     {
         vlc_bool_t b_ena_ok = VLC_TRUE, b_unplayed_ok = VLC_TRUE;
         p_next = GetNextItem( p_playlist, p_root, p_next );
+        PL_DEBUG( "Got next item %s, testing suitability", PLI_NAME(p_next) );
         if( !p_next || p_next == p_root )
             break;
         if( p_next->i_children == -1 )
@@ -520,7 +521,8 @@ playlist_item_t *GetNextItem( playlist_t *p_playlist,
         p_parent = p_item->p_parent;
     else
         p_parent = p_root;
-
+    PL_DEBUG( "Parent %s has %i children", PLI_NAME(p_parent),
+                                           p_parent->i_children );
     for( i= 0 ; i < p_parent->i_children ; i++ )
     {
         if( p_item == NULL || p_parent->pp_children[i] == p_item )

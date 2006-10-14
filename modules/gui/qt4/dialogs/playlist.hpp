@@ -49,6 +49,12 @@ private:
 
     void createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf );
     PlaylistDialog( intf_thread_t * );
+
+    void dropEvent( QDropEvent *);
+    void dragEnterEvent( QDragEnterEvent * );
+    void dragMoveEvent( QDragMoveEvent * );
+    void dragLeaveEvent( QDragLeaveEvent * );
+
     static PlaylistDialog *instance;
 
     PLSelector *selector;

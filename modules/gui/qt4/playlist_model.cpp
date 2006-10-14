@@ -20,6 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#define PLI_NAME( p ) p ? p->p_input->psz_name : "null"
 
 #include <assert.h>
 #include <QIcon>
@@ -98,7 +99,7 @@ void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
     assert( model );
     if( signal )
         model->beginInsertRows( model->index( this , 0 ), i_pos, i_pos );
-    children.append( item );
+    children.insert( i_pos, item );
     if( signal )
         model->endInsertRows();
 }
@@ -181,6 +182,115 @@ PLModel::~PLModel()
     delete rootItem;
 }
 
+Qt::DropActions PLModel::supportedDropActions() const
+{
+    return Qt::CopyAction;
+}
+
+Qt::ItemFlags PLModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
+    if( index.isValid() )
+        return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | defaultFlags;
+    else
+        return Qt::ItemIsDropEnabled | defaultFlags;
+}
+
+QStringList PLModel::mimeTypes() const
+{
+    QStringList types;
+    types << "vlc/playlist-item-id";
+    return types;
+}
+
+QMimeData *PLModel::mimeData(const QModelIndexList &indexes) const
+{
+    QMimeData *mimeData = new QMimeData();
+    QByteArray encodedData;
+    QDataStream stream(&encodedData, QIODevice::WriteOnly);
+
+    foreach (QModelIndex index, indexes) {
+        if (index.isValid() && index.column() == 0 )
+            stream << itemId(index);
+    }
+    mimeData->setData("vlc/playlist-item-id", encodedData);
+    return mimeData;
+}
+
+bool PLModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
+                           int row, int column, const QModelIndex &target)
+{
+    if ( data->hasFormat("vlc/playlist-item-id") )
+    {
+        if (action == Qt::IgnoreAction)
+            return true;
+
+        PLItem *targetItem;
+        if( target.isValid() )
+            targetItem = static_cast<PLItem*>( target.internalPointer() );
+        else
+            targetItem = rootItem;
+
+        QByteArray encodedData = data->data("vlc/playlist-item-id");
+        QDataStream stream(&encodedData, QIODevice::ReadOnly);
+
+        PLItem *newParentItem;
+        while (!stream.atEnd())
+        {
+            int i;
+            int srcId;
+            stream >> srcId;
+
+            PL_LOCK;
+            playlist_item_t *p_target =
+                        playlist_ItemGetById( p_playlist, targetItem->i_id );
+            playlist_item_t *p_src = playlist_ItemGetById( p_playlist, srcId );
+
+            if( !p_target || !p_src )
+            {
+                PL_UNLOCK;
+                return false;
+            }
+
+            if( p_target->i_children == -1 ) /* A leaf */
+            {
+                PLItem *parentItem = targetItem->parent();
+                assert( parentItem );
+                playlist_item_t *p_parent =
+                         playlist_ItemGetById( p_playlist, parentItem->i_id );
+                if( !p_parent )
+                {
+                    PL_UNLOCK;
+                    return false;
+                }
+                for( i = 0 ; i< p_parent->i_children ; i++ )
+                    if( p_parent->pp_children[i] == p_target ) break;
+                playlist_TreeMove( p_playlist, p_src, p_parent, i );
+                newParentItem = parentItem;
+            }
+            else
+            {
+                /* \todo: if we drop on a top-level node, use copy instead ? */
+                playlist_TreeMove( p_playlist, p_src, p_target, 0 );
+                i = 0;
+                newParentItem = targetItem;
+            }
+            /* Remove from source */
+            PLItem *srcItem = FindByInput( rootItem, p_src->p_input->i_id );
+            srcItem->remove( srcItem );
+            /* Display at new destination */
+            PLItem *newItem = new PLItem( p_src, newParentItem, this );
+            newParentItem->insertChild( newItem, i, true );
+            UpdateTreeItem( p_src, newItem, true );
+            if( p_src->i_children != -1 )
+                UpdateNodeChildren( newItem );
+            PL_UNLOCK;
+        }
+    }
+    return true;
+ }
+
+
 void PLModel::addCallbacks()
 {
     /* Some global changes happened -> Rebuild all */
@@ -229,7 +339,7 @@ void PLModel::activateItem( playlist_item_t *p_item )
 /****************** Base model mandatory implementations *****************/
 QVariant PLModel::data(const QModelIndex &index, int role) const
 {
-    assert( index.isValid() );
+    if(!index.isValid() ) return QVariant();
     PLItem *item = static_cast<PLItem*>(index.internalPointer());
     if( role == Qt::DisplayRole )
     {
@@ -260,12 +370,6 @@ int PLModel::itemId( const QModelIndex &index ) const
 {
     assert( index.isValid() );
     return static_cast<PLItem*>(index.internalPointer())->i_id;
-}
-
-Qt::ItemFlags PLModel::flags(const QModelIndex &index) const
-{
-    if( !index.isValid() ) return Qt::ItemIsEnabled;
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
 QVariant PLModel::headerData( int section, Qt::Orientation orientation,
@@ -449,7 +553,7 @@ void PLModel::customEvent( QEvent *event )
 {
     int type = event->type();
     if( type != ItemUpdate_Type && type != ItemAppend_Type &&
-        type != ItemDelete_Type )
+        type != ItemDelete_Type && type != PLUpdate_Type )
         return;
 
     PLEvent *ple = static_cast<PLEvent *>(event);
@@ -458,8 +562,10 @@ void PLModel::customEvent( QEvent *event )
         ProcessInputItemUpdate( ple->i_id );
     else if( type == ItemAppend_Type )
         ProcessItemAppend( ple->p_add );
-    else
+    else if( type == ItemDelete_Type )
         ProcessItemRemoval( ple->i_id );
+    else
+        rebuild();
 }
 
 /**** Events processing ****/
@@ -669,6 +775,7 @@ void PLModel::sort( int column, Qt::SortOrder order )
     case 0: i_mode = SORT_TITLE_NODES_FIRST;break;
     case 1: i_mode = SORT_ARTIST;break;
     case 2: i_mode = SORT_DURATION; break;
+    default: i_mode = SORT_TITLE_NODES_FIRST; break;
     }
     if( p_root )
         playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
@@ -756,7 +863,8 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                             vlc_value_t oval, vlc_value_t nval, void *param )
 {
     PLModel *p_model = (PLModel *) param;
-//    p_model->b_need_update = VLC_TRUE;
+    PLEvent *event = new PLEvent( PLUpdate_Type, 0 );
+    QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }
 

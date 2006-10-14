@@ -57,6 +57,10 @@ public:
     int controlVideo( void *p_window, int i_query, va_list args );
 protected:
     void resizeEvent( QResizeEvent * );
+    void dropEvent( QDropEvent *);
+    void dragEnterEvent( QDragEnterEvent * );
+    void dragMoveEvent( QDragMoveEvent * );
+    void dragLeaveEvent( QDragLeaveEvent * );
     void closeEvent( QCloseEvent *);
     Ui::MainInterfaceUI ui;
     friend class VolumeClickHandler;
