@@ -30,6 +30,13 @@
 
 #define PL p_instance->p_libvlc_int->p_playlist
 
+void libvlc_playlist_loop( libvlc_instance_t *p_instance, vlc_bool_t loop,
+                           libvlc_exception_t *p_e)
+{
+    assert( PL );
+    var_SetBool(PL,"loop",loop);
+}
+
 void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
                            int i_options, char **ppsz_options,
                            libvlc_exception_t *p_e )
