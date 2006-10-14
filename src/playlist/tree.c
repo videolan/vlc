@@ -255,7 +255,7 @@ int playlist_NodeChildrenCount( playlist_t *p_playlist, playlist_item_t*p_node)
     for( i=0 ; i< p_node->i_children;i++ )
     {
         if( p_node->pp_children[i]->i_children == -1 )
-            break;;
+            break;
         else
             i_nb += playlist_NodeChildrenCount( p_playlist,
                                                 p_node->pp_children[i] );
