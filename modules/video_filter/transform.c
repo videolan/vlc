@@ -1,7 +1,7 @@
 /*****************************************************************************
  * transform.c : transform image module for vlc
  *****************************************************************************
- * Copyright (C) 2000-2004 the VideoLAN team
+ * Copyright (C) 2000-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
