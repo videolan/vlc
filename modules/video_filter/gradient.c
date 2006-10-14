@@ -143,7 +143,7 @@ static int Create( vlc_object_t *p_this )
     var_Create( p_filter, FILTER_PREFIX "mode",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_filter, FILTER_PREFIX "type",
-                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_filter, FILTER_PREFIX "cartoon",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
