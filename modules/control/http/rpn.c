@@ -869,7 +869,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         else if( !strcmp( s, "playlist_delete" ) )
         {
             int i_id = E_(SSPopN)( st, vars );
-            playlist_LockDelete( p_sys->p_playlist, i_id );
+            playlist_LockDeleteAllFromInput( p_sys->p_playlist, i_id );
             msg_Dbg( p_intf, "requested playlist delete: %d", i_id );
         }
         else if( !strcmp( s, "playlist_move" ) )

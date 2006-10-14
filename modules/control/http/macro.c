@@ -368,7 +368,8 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                         int i;
                         for( i = 0; i < i_nb_items; i++ )
                         {
-                            playlist_LockDelete( p_sys->p_playlist, p_items[i] );
+                            playlist_LockDeleteAllFromInput( p_sys->p_playlist,
+                                                             p_items[i] );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      p_items[i] );
                             p_items[i] = -1;
@@ -408,7 +409,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                         }
                         if( j == i_nb_items )
                         {
-                            playlist_LockDelete( p_sys->p_playlist,
+                            playlist_LockDeleteAllFromInput( p_sys->p_playlist,
                             p_sys->p_playlist->pp_items[i]->p_input->i_id );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      i );
