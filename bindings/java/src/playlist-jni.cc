@@ -53,7 +53,7 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1playlist_1add (JNIEnv *
                 env->GetStringUTFChars( ( jstring ) env->GetObjectArrayElement( options, i ), 0 );
         }
         res = libvlc_playlist_add_extended( ( libvlc_instance_t * ) instance, psz_uri, psz_name, i_options, ppsz_options, exception );
-       
+
         CHECK_EXCEPTION_FREE;
         
     } else {
@@ -176,3 +176,14 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1isRunning (JNIEnv *env,
 
     return res;
 }
+
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1setLoop
+  (JNIEnv *env, jobject _this, jboolean loop)
+{
+   INIT_FUNCTION ;
+
+   libvlc_playlist_loop( (libvlc_instance_t*) instance, loop, exception );
+
+   CHECK_EXCEPTION_FREE ;
+   
+}   
