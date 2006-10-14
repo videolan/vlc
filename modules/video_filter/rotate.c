@@ -42,6 +42,10 @@ static void Destroy   ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
 
+static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data );
+
 #define ANGLE_TEXT N_("Angle in degrees")
 #define ANGLE_LONGTEXT N_("Angle in degrees (0 to 359)")
 
@@ -108,6 +112,12 @@ static int Create( vlc_object_t *p_this )
                                                FILTER_PREFIX "angle" );
     p_filter->p_sys->last_date = 0;
 
+    var_Create( p_filter->p_libvlc, "rotate_angle", VLC_VAR_INTEGER );
+    var_SetInteger( p_filter->p_libvlc, "rotate_angle",
+                    p_filter->p_sys->i_angle );
+    var_AddCallback( p_filter->p_libvlc,
+                     "rotate_angle", RotateCallback, p_filter->p_sys );
+
     return VLC_SUCCESS;
 }
 
@@ -119,6 +129,9 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+
+    var_DelCallback( p_filter->p_libvlc,
+                     "rotate_angle", RotateCallback, p_filter->p_sys );
     free( p_filter->p_sys );
 }
 
@@ -176,10 +189,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             {
                 int i_line_orig, i_col_orig;
                 i_line_orig = (int)( f_cos * (double)(i_line-i_line_center)
-                                   + f_sin * (double)(i_col-i_col_center) )
+                                   + f_sin * (double)(i_col-i_col_center)
+                                   + 0.5 )
                               + i_line_center;
                 i_col_orig = (int)(-f_sin * (double)(i_line-i_line_center)
-                                  + f_cos * (double)(i_col-i_col_center) )
+                                  + f_cos * (double)(i_col-i_col_center)
+                                  + 0.5 )
                              + i_col_center;
 
                 if(    0 <= i_line_orig && i_line_orig < i_num_lines
@@ -207,4 +222,17 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         p_pic->pf_release( p_pic );
 
     return p_outpic;
+}
+
+static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *)p_data;
+
+    if( !strcmp( psz_var, "rotate_angle" ) )
+    {
+        p_sys->i_angle = newval.i_int;
+    }
+    return VLC_SUCCESS;
 }

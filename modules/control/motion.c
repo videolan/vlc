@@ -42,8 +42,9 @@ struct intf_sys_t
 {
     enum { NO_SENSOR, HDAPS_SENSOR, AMS_SENSOR } sensor;
 
-    int i_last_x, i_calibrate;
-    int i_threshold;
+    int i_calibrate;
+
+    vlc_bool_t b_use_rotate;
 };
 
 /*****************************************************************************
@@ -55,6 +56,8 @@ static void Close  ( vlc_object_t * );
 static void RunIntf( intf_thread_t *p_intf );
 static int GetOrientation( intf_thread_t *p_intf );
 
+#define USE_ROTATE_TEXT N_("Use the rotate video filter instead of transform")
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -62,6 +65,9 @@ vlc_module_begin();
     set_shortname( _("motion"));
     set_category( CAT_INTERFACE );
     set_description( _("motion control interface") );
+
+    add_bool( "motion-use-rotate", 0, NULL,
+              USE_ROTATE_TEXT, USE_ROTATE_TEXT, VLC_FALSE );
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
@@ -112,6 +118,13 @@ int Open ( vlc_object_t *p_this )
 
     p_intf->pf_run = RunIntf;
 
+    p_intf->p_sys->b_use_rotate = config_GetInt( p_intf, "motion-use-rotate" );
+
+    if( p_intf->p_sys->b_use_rotate )
+    {
+        var_Create( p_intf->p_libvlc, "rotate_angle", VLC_VAR_INTEGER );
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -144,6 +157,17 @@ static void RunIntf( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
 
         i_x = GetOrientation( p_intf );
+
+        if( p_intf->p_sys->b_use_rotate )
+        {
+            if( i_oldx != i_x )
+            {
+                var_SetInteger( p_intf->p_libvlc, "rotate_angle",
+                            ((360+i_x/2)%360) );
+                i_oldx = i_x;
+            }
+            continue;
+        }
 
         if( i_x < -HIGH_THRESHOLD && i_oldx > -LOW_THRESHOLD )
         {
