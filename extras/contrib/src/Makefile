@@ -36,6 +36,7 @@ include ./packages.mak
 
 export PATH := $(PREFIX)/bin:$(EXTRA_PATH):$(PATH)
 export PKG_CONFIG_PATH
+export PKG_CONFIG_LIBDIR = $(PREFIX)/lib/pkgconfig
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
 # following is required for configure scripts that check dyld libraries
 # by building and running a test app 
