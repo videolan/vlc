@@ -151,7 +151,7 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp )
     NotifyNotification * notification;
     notification = notify_notification_new( _("Now Playing"),
                              psz_temp,
-                             DATA_PATH "/vlc128x128.png",NULL);
+                             DATA_PATH "/vlc48x48.png",NULL);
     notify_notification_set_timeout( notification,
                                      config_GetInt(p_this, "notify-timeout") );
     notify_notification_set_urgency( notification, NOTIFY_URGENCY_LOW );
