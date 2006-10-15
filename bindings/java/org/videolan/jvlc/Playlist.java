@@ -1,5 +1,5 @@
  /*****************************************************************************
- * PlaylistIntf.java: The playlist interface
+ * Playlist.java: PlaylistIntf implementation class
  *****************************************************************************
  *
  * Copyright (C) 1998-2006 the VideoLAN team
@@ -49,7 +49,7 @@ public class Playlist implements PlaylistIntf {
     
     native private int _itemsCount();
     native private int _isRunning();
-    
+    native private void _setLoop(boolean loop);
 
 
     public synchronized void play(int id, String[] options) throws VLCException {
@@ -66,7 +66,13 @@ public class Playlist implements PlaylistIntf {
 
     public synchronized void stop() throws VLCException {
         _stop();
-
+//        do {
+//        	try {
+//				Thread.sleep(50);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//        } while (isRunning());
     }
 
     public boolean isRunning() throws VLCException {
@@ -108,7 +114,16 @@ public class Playlist implements PlaylistIntf {
         _deleteItem(itemID);
     }
     
+    public synchronized void setLoop(boolean loop) {
+    	_setLoop(loop);
+    }
+    
     public long getInstance() throws VLCException {
         return libvlcInstance;
     }
+
+	public void setPause(boolean pause) throws VLCException {
+		// TODO Auto-generated method stub		
+	}
+
 }

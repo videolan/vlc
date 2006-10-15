@@ -30,14 +30,17 @@
 package org.videolan.jvlc;
 
 public interface PlaylistIntf {
-    /**
+
+	/**
+	 * Plays the item specified in id, with options. At the moment options
+	 * has no effect and can be safely set to null.
      * @param id The ID to play
-     * @param options Options to play the item withs
+     * @param options Options to play the item with
      */
     void play(int id, String[] options) throws VLCException;
     
     /**
-     * Plays the current item
+     * Plays the current item in the playlist.
      */
     void play() throws VLCException;
     
@@ -46,38 +49,59 @@ public interface PlaylistIntf {
      */
     void togglePause() throws VLCException;
     
+    
     /**
-     * Stops the playlist.
+     * Pauses the currently playing item if pause value is true. Plays it
+     * otherwise. If you set pause to true and the current item is already
+     * playing, this has no effect.
+     * 
+     * @param pause
+     * @throws VLCException
+     */
+    void setPause(boolean pause) throws VLCException;
+    
+    /**
+     * Stops the currently playing item. Differently from pause, stopping
+     * an item destroys any information related to the item.
      */
     void stop() throws VLCException;
     
     /**
-     * @return True if playlist is not stopped
+     * This function returns true if the current item has not been stopped.
+     * @return True if the current item has not been stopped
      */
     boolean isRunning() throws VLCException;
     
     /**
+     * TODO: this should return the number of items added with add, with no
+     * respect to videolan internal playlist.
+     * 
+     * Returns the number of items in the playlist. Beware that this number
+     * could be bigger than the number of times add() has been called.
+     * 
      * @return Current number of items in the playlist
      */
     int itemsCount() throws VLCException;
     
     /**
-     * Move to next item
+     * Move to next item in the playlist and play it.
      */
     void next() throws VLCException;
     
     /**
-     * Move to previous item
+     * Move to previous item in the playlist and play it.
      */
     void prev() throws VLCException;
     
     /**
-     * Clear the playlist
+     * Clear the playlist which becomes empty after this call.
      */
     void clear() throws VLCException;
     
     /**
-     * Add a new item in the playlist
+     * TODO: document the kind of items that can be added.
+     * Add a new item in the playlist.
+     * 
      * @param uri Location of the item
      * @param name Name of the item
      * @return The item ID
@@ -89,5 +113,8 @@ public interface PlaylistIntf {
      */
     void addExtended();
     
-
+    /**
+     * @param loop
+     */
+    void setLoop(boolean loop);
 }
