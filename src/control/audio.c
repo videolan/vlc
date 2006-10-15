@@ -50,21 +50,11 @@ vlc_bool_t libvlc_audio_get_mute( libvlc_instance_t *p_instance,
     return VLC_FALSE;
 }
 
-void libvlc_audio_set_mute( libvlc_instance_t *p_instance, vlc_bool_t status,
+void libvlc_audio_set_mute( libvlc_instance_t *p_instance, vlc_bool_t mute,
                             libvlc_exception_t *p_e )
 {
-    if ( status )
+    if ( mute ^ libvlc_audio_get_mute( p_instance, p_e ) )
     {
-        /* Check if the volume is already muted */
-        if (! libvlc_audio_get_volume( p_instance, p_e ) )
-        {
-            return;
-        }
-        aout_VolumeMute( p_instance->p_libvlc_int, NULL );
-    }
-    else
-    {
-        /* the aout_VolumeMute is a toggle function, so this is enough. */
         aout_VolumeMute( p_instance->p_libvlc_int, NULL );
     }
 }
