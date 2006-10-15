@@ -413,19 +413,27 @@ static char *TitleGet( vlc_object_t *p_this )
 
     if( p_input )
     {
-        char *psz = strrchr( p_input->input.p_item->psz_uri, '/' );
-
-        if( psz )
+        if( p_input->input.p_item->p_meta->psz_title &&
+                *p_input->input.p_item->p_meta->psz_title )
         {
-            psz++;
+            psz_title = strdup( p_input->input.p_item->p_meta->psz_title );
         }
         else
         {
-            psz = p_input->input.p_item->psz_uri;
-        }
-        if( psz && *psz )
-        {
-            psz_title = strdup( psz );
+            char *psz = strrchr( p_input->input.p_item->psz_uri, '/' );
+
+            if( psz )
+            {
+                psz++;
+            }
+            else
+            {
+                psz = p_input->input.p_item->psz_uri;
+            }
+            if( psz && *psz )
+            {
+                psz_title = strdup( psz );
+            }
         }
         vlc_object_release( p_input );
     }
