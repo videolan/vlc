@@ -707,6 +707,14 @@ static int DemuxInit( demux_t *p_demux )
             fmt.video.i_width = GetDWLE( p_data + 4 );
             fmt.video.i_height= GetDWLE( p_data + 8 );
 
+
+            if( fmt.i_codec == VLC_FOURCC( 'D','V','R',' ') )
+            {
+                /* DVR-MS special ASF */
+                fmt.i_codec = VLC_FOURCC( 'm','p','g','2' ) ;
+                fmt.b_packetized = VLC_FALSE;
+            }
+
             if( p_sp->i_type_specific_data_length > 11 +
                 sizeof( BITMAPINFOHEADER ) )
             {
@@ -757,6 +765,53 @@ static int DemuxInit( demux_t *p_demux )
 
             msg_Dbg( p_demux, "added new video stream(ID:%d)",
                      p_sp->i_stream_number );
+        }
+        else if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_extended_stream_header ) &&
+            p_sp->i_type_specific_data_length >= 64 )
+        {
+            /* Now follows a 64 byte header of which we don't know much */
+            es_format_t fmt;
+            guid_t  *p_ref  = (guid_t *)p_sp->p_type_specific_data;
+            uint8_t *p_data = p_sp->p_type_specific_data + 64;
+            unsigned int i_data = p_sp->i_type_specific_data_length - 64;
+
+            msg_Dbg( p_demux, "Ext stream header detected. datasize = %d", p_sp->i_type_specific_data_length );
+            if( ASF_CmpGUID( p_ref, &asf_object_extended_stream_type_audio ) && 
+                i_data >= sizeof( WAVEFORMATEX ) - 2)
+            {
+                int      i_format;
+                es_format_Init( &fmt, AUDIO_ES, 0 );
+                i_format = GetWLE( &p_data[0] );
+                if( i_format == 0 ) 
+                    fmt.i_codec = VLC_FOURCC( 'a','5','2',' ');
+                else
+                    wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
+                fmt.audio.i_channels        = GetWLE(  &p_data[2] );
+                fmt.audio.i_rate      = GetDWLE( &p_data[4] );
+                fmt.i_bitrate         = GetDWLE( &p_data[8] ) * 8;
+                fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
+                fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
+                fmt.b_packetized = VLC_TRUE;
+
+                if( p_sp->i_type_specific_data_length > sizeof( WAVEFORMATEX ) &&
+                    i_format != WAVE_FORMAT_MPEGLAYER3 &&
+                    i_format != WAVE_FORMAT_MPEG )
+                {
+                    fmt.i_extra = __MIN( GetWLE( &p_data[16] ),
+                                         p_sp->i_type_specific_data_length -
+                                         sizeof( WAVEFORMATEX ) );
+                    fmt.p_extra = malloc( fmt.i_extra );
+                    memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )],
+                        fmt.i_extra );
+                }
+
+                tk->i_cat = AUDIO_ES;
+                tk->p_es = es_out_Add( p_demux->out, &fmt );
+                es_format_Clean( &fmt );
+
+                msg_Dbg( p_demux, "added new audio stream (codec:0x%x,ID:%d)",
+                    i_format, p_sp->i_stream_number );
+            }
         }
         else
         {
