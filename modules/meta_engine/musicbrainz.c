@@ -74,7 +74,6 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
     char psz_data[256];
     char i_album_count, i;
     char *ppsz_args[4];
-    uint32_t i_meta;
 
     char *psz_title;
     char *psz_artist;

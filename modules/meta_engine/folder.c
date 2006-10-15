@@ -64,7 +64,6 @@ static int FindMeta( vlc_object_t *p_this )
     playlist_t *p_playlist = (playlist_t *)p_this;
     input_item_t *p_item = (input_item_t *)(p_playlist->p_private);
     vlc_bool_t b_have_art = VLC_FALSE;
-    uint32_t i_meta;
 
     int i = 0;
     struct stat a;

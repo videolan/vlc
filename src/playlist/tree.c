@@ -550,7 +550,6 @@ playlist_item_t *GetNextItem( playlist_t *p_playlist,
             }
         }
     }
-    msg_Err( p_playlist, "I should not be here" );
     return NULL;
 }
 
@@ -684,7 +683,6 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
             }
         }
     }
-    msg_Err( p_playlist, "I should not be here" );
     return NULL;
 }
 
