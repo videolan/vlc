@@ -1121,13 +1121,12 @@ goom: goom$(GOOM2k4_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
 	patch -p 0 < Patches/goom.patch
-	patch -p 0 < Patches/goom2k4-0-mmx.patch
-else
-	patch -p 0 < Patches/goom2k4-0-nommx.patch
 endif
 ifdef HAVE_WIN32
 	(cd $@; dos2unix configure.in)
-	patch -p 0 <Patches/goom2k4-0-win32.patch
+	patch -p 0 < Patches/goom2k4-0-win32.patch
+else
+	patch -p 0 < Patches/goom2k4-0-mmx.patch
 endif
 
 .goom2k4: goom
