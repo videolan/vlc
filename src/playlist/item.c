@@ -498,6 +498,10 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     {
         /* Fixme: avoid useless lookups but we need some clean helpers */
         {
+            /* Fixme: if we try to move a node on a top-level node, it will
+             * fail because the node doesn't exist in onelevel and we will
+             * do some shit in onelevel. We should recursively move all items
+             * within the node */
             playlist_item_t *p_node_onelevel;
             playlist_item_t *p_item_onelevel;
             p_node_onelevel = playlist_ItemFindFromInputAndRoot( p_playlist,
@@ -508,7 +512,8 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
                                                 p_item->p_input->i_id,
                                                 p_playlist->p_root_onelevel,
                                                 VLC_FALSE );
-            TreeMove( p_playlist, p_item_onelevel, p_node_onelevel, 0 );
+            if( p_node_onelevel && p_item_onelevel )
+                TreeMove( p_playlist, p_item_onelevel, p_node_onelevel, 0 );
         }
         {
             playlist_item_t *p_node_category;
@@ -521,7 +526,8 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
                                                 p_item->p_input->i_id,
                                                 p_playlist->p_root_category,
                                                 VLC_FALSE );
-            TreeMove( p_playlist, p_item_category, p_node_category, 0 );
+            if( p_node_category && p_item_category )
+                TreeMove( p_playlist, p_item_category, p_node_category, 0 );
         }
         return VLC_SUCCESS;
     }
