@@ -258,6 +258,8 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 #define AVIFOURCC_vids         VLC_FOURCC('v','i','d','s')
 #define AVIFOURCC_txts         VLC_FOURCC('t','x','t','s')
 #define AVIFOURCC_mids         VLC_FOURCC('m','i','d','s')
+#define AVIFOURCC_iavs         VLC_FOURCC('i','a','v','s')
+#define AVIFOURCC_ivas         VLC_FOURCC('i','v','a','s')
 
 #define AVIFOURCC_IARL         VLC_FOURCC('I','A','R','L')
 #define AVIFOURCC_IART         VLC_FOURCC('I','A','R','T')
@@ -360,3 +362,8 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 #define FOURCC_H264         VLC_FOURCC('H','2','6','4')
 #define FOURCC_h264         VLC_FOURCC('h','2','6','4')
 #define FOURCC_VSSH         VLC_FOURCC('V','S','S','H')
+
+    /* DV */
+#define FOURCC_dvsd         VLC_FOURCC('d','v','s','d')
+#define FOURCC_dvhd         VLC_FOURCC('d','v','h','d')
+#define FOURCC_dvsl         VLC_FOURCC('d','v','s','l')

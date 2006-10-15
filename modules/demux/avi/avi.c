@@ -119,16 +119,20 @@ typedef struct
 
     es_out_id_t     *p_es;
 
+    /* Avi Index */
     avi_entry_t     *p_index;
-    unsigned int        i_idxnb;
-    unsigned int        i_idxmax;
+    unsigned int    i_idxnb;
+    unsigned int    i_idxmax;
 
-    unsigned int        i_idxposc;  /* numero of chunk */
-    unsigned int        i_idxposb;  /* byte in the current chunk */
+    unsigned int    i_idxposc;  /* numero of chunk */
+    unsigned int    i_idxposb;  /* byte in the current chunk */
 
     /* For VBR audio only */
-    unsigned int        i_blockno;
-    unsigned int        i_blocksize;
+    unsigned int    i_blockno;
+    unsigned int    i_blocksize;
+
+    /* For muxed streams */
+    stream_t        *p_out_muxed;
 } avi_track_t;
 
 struct demux_sys_t
@@ -137,6 +141,7 @@ struct demux_sys_t
     mtime_t i_length;
 
     vlc_bool_t  b_seekable;
+    vlc_bool_t  b_muxed;
     avi_chunk_t ck_root;
 
     vlc_bool_t  b_odml;
@@ -244,6 +249,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_length = 0;
     p_sys->i_movi_lastchunk_pos = 0;
     p_sys->b_odml   = VLC_FALSE;
+    p_sys->b_muxed  = VLC_FALSE;
     p_sys->i_track  = 0;
     p_sys->track    = NULL;
     p_sys->meta     = NULL;
@@ -339,12 +345,12 @@ static int Open( vlc_object_t * p_this )
     /* now read info on each stream and create ES */
     for( i = 0 ; i < i_track; i++ )
     {
-        avi_track_t      *tk = malloc( sizeof( avi_track_t ) );
-        avi_chunk_list_t *p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i );
-        avi_chunk_strh_t *p_strh = AVI_ChunkFind( p_strl, AVIFOURCC_strh, 0 );
-        avi_chunk_STRING_t *p_strn = AVI_ChunkFind( p_strl, AVIFOURCC_strn, 0 );
-        avi_chunk_strf_auds_t *p_auds;
-        avi_chunk_strf_vids_t *p_vids;
+        avi_track_t           *tk     = malloc( sizeof( avi_track_t ) );
+        avi_chunk_list_t      *p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i );
+        avi_chunk_strh_t      *p_strh = AVI_ChunkFind( p_strl, AVIFOURCC_strh, 0 );
+        avi_chunk_STRING_t    *p_strn = AVI_ChunkFind( p_strl, AVIFOURCC_strn, 0 );
+        avi_chunk_strf_auds_t *p_auds = NULL;
+        avi_chunk_strf_vids_t *p_vids = NULL;
         es_format_t fmt;
 
         tk->b_activated = VLC_FALSE;
@@ -356,6 +362,9 @@ static int Open( vlc_object_t * p_this )
 
         tk->i_blockno   = 0;
         tk->i_blocksize = 0;
+
+        tk->p_es        = NULL;
+        tk->p_out_muxed = NULL;
 
         p_vids = (avi_chunk_strf_vids_t*)AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0 );
         p_auds = (avi_chunk_strf_auds_t*)AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0 );
@@ -500,11 +509,27 @@ static int Open( vlc_object_t * p_this )
                 es_format_Init( &fmt, SPU_ES, tk->i_codec );
                 break;
 
+            case( AVIFOURCC_iavs):
+            case( AVIFOURCC_ivas):
+                p_sys->b_muxed = VLC_TRUE;
+                msg_Dbg( p_demux, "stream[%d] iavs with handler %4.4s", i, (char *)&p_strh->i_handler );
+                if( p_strh->i_handler == FOURCC_dvsd ||
+                    p_strh->i_handler == FOURCC_dvhd ||
+                    p_strh->i_handler == FOURCC_dvsl )
+                {
+                    tk->p_out_muxed = stream_DemuxNew( p_demux, "rawdv", p_demux->out );
+                    if( !tk->p_out_muxed )
+                        msg_Err( p_demux, "could not load the DV parser" );
+                    else break;
+                }
+                free( tk );
+                continue;
+
             case( AVIFOURCC_mids):
                 msg_Dbg( p_demux, "stream[%d] midi is UNSUPPORTED", i );
 
             default:
-                msg_Warn( p_demux, "stream[%d] unknown type", i );
+                msg_Warn( p_demux, "stream[%d] unknown type %4.4s", i, (char *)&p_strh->i_type );
                 free( tk );
                 continue;
         }
@@ -514,7 +539,8 @@ static int Open( vlc_object_t * p_this )
             EnsureUTF8( p_strn->p_str );
             fmt.psz_description = strdup( p_strn->p_str );
         }
-        tk->p_es = es_out_Add( p_demux->out, &fmt );
+        if( tk->p_out_muxed == NULL )
+            tk->p_es = es_out_Add( p_demux->out, &fmt );
         TAB_APPEND( p_sys->i_track, p_sys->track, tk );
     }
 
@@ -650,6 +676,8 @@ static void Close ( vlc_object_t * p_this )
     {
         if( p_sys->track[i] )
         {
+            if( p_sys->track[i]->p_out_muxed )
+                stream_DemuxDelete( p_sys->track[i]->p_out_muxed );
             FREENULL( p_sys->track[i]->p_index );
             free( p_sys->track[i] );
         }
@@ -695,6 +723,13 @@ static int Demux_Seekable( demux_t *p_demux )
     {
         avi_track_t *tk = p_sys->track[i_track];
         vlc_bool_t  b;
+
+        if( p_sys->b_muxed && tk->p_out_muxed )
+        {
+            i_track_count++;
+            tk->b_activated = VLC_TRUE;
+            continue;
+        }
 
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
         if( b && !tk->b_activated )
@@ -1017,7 +1052,10 @@ static int Demux_Seekable( demux_t *p_demux )
         }
 
         //p_pes->i_rate = p_demux->stream.control.i_rate;
-        es_out_Send( p_demux->out, tk->p_es, p_frame );
+        if( tk->p_out_muxed )
+            stream_DemuxSend( tk->p_out_muxed, p_frame );
+        else
+            es_out_Send( p_demux->out, tk->p_es, p_frame );
     }
 }
 
@@ -1034,6 +1072,12 @@ static int Demux_UnSeekable( demux_t *p_demux )
     unsigned int i_stream;
     unsigned int i_packet;
 
+    if( p_sys->b_muxed )
+    {
+        msg_Err( p_demux, "Can not yet process muxed avi substreams without seeking" );
+        return VLC_EGENERIC;
+    }
+   
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time + 1 );
 
     /* *** find master stream for data packet skipping algo *** */
@@ -2387,7 +2431,7 @@ static int AVI_TrackStopFinishedStreams( demux_t *p_demux )
         if( tk->i_idxposc >= tk->i_idxnb )
         {
             tk->b_activated = VLC_FALSE;
-            es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->p_es, VLC_FALSE );
+            if( tk->p_es ) es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->p_es, VLC_FALSE );
         }
         else
         {
