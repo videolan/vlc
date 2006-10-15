@@ -386,13 +386,15 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
     /** \todo First look if we don't already have it */
     p_item_in_category = playlist_ItemFindFromInputAndRoot(
                                             p_playlist, p_item->p_input->i_id,
-                                            p_playlist->p_root_category );
+                                            p_playlist->p_root_category,
+                                            VLC_TRUE );
 
     if( p_item_in_category )
     {
         playlist_item_t *p_item_in_one = playlist_ItemFindFromInputAndRoot(
                                             p_playlist, p_item->p_input->i_id,
-                                            p_playlist->p_root_onelevel );
+                                            p_playlist->p_root_onelevel,
+                                            VLC_TRUE );
         ChangeToNode( p_playlist, p_item_in_category );
         if( p_item_in_one->p_parent == p_playlist->p_root_onelevel )
             ChangeToNode( p_playlist, p_item_in_one );
@@ -432,12 +434,13 @@ playlist_item_t * playlist_LockItemToNode( playlist_t *p_playlist,
  */
 playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
                                                     int i_input_id,
-                                                    playlist_item_t *p_root )
+                                                    playlist_item_t *p_root,
+                                                    vlc_bool_t b_items_only )
 {
     int i;
     for( i = 0 ; i< p_root->i_children ; i++ )
     {
-        if( p_root->pp_children[i]->i_children == -1 &&
+        if( ( b_items_only ? p_root->pp_children[i]->i_children == -1 : 1 ) &&
             p_root->pp_children[i]->p_input->i_id == i_input_id )
         {
             return p_root->pp_children[i];
@@ -446,13 +449,34 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
         {
             playlist_item_t *p_search =
                  playlist_ItemFindFromInputAndRoot( p_playlist, i_input_id,
-                                                    p_root->pp_children[i] );
+                                                    p_root->pp_children[i],
+                                                    b_items_only );
             if( p_search ) return p_search;
         }
     }
     return NULL;
 }
 
+
+static int TreeMove( playlist_t *p_playlist, playlist_item_t *p_item,
+                     playlist_item_t *p_node, int i_newpos )
+{
+    int j;
+    playlist_item_t *p_detach = p_item->p_parent;
+    if( p_node->i_children == -1 ) return VLC_EGENERIC;
+
+    for( j = 0; j < p_detach->i_children; j++ )
+    {
+         if( p_detach->pp_children[j] == p_item ) break;
+    }
+    REMOVE_ELEM( p_detach->pp_children, p_detach->i_children, j );
+
+    /* Attach to new parent */
+    INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
+    p_item->p_parent = p_node;
+
+    return VLC_SUCCESS;
+}
 
 /**
  * Moves an item
@@ -468,23 +492,41 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
 int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
                        playlist_item_t *p_node, int i_newpos )
 {
-    int j;
-    playlist_item_t *p_detach = NULL;
-
-    if( p_node->i_children == -1 ) return VLC_EGENERIC;
-
-    p_detach = p_item->p_parent;
-    for( j = 0; j < p_detach->i_children; j++ )
+    /* Drop on a top level node. Move in the two trees */
+    if( p_node->p_parent == p_playlist->p_root_category ||
+        p_node->p_parent == p_playlist->p_root_onelevel )
     {
-         if( p_detach->pp_children[j] == p_item ) break;
+        /* Fixme: avoid useless lookups but we need some clean helpers */
+        {
+            playlist_item_t *p_node_onelevel;
+            playlist_item_t *p_item_onelevel;
+            p_node_onelevel = playlist_ItemFindFromInputAndRoot( p_playlist,
+                                                p_node->p_input->i_id,
+                                                p_playlist->p_root_onelevel,
+                                                VLC_FALSE );
+            p_item_onelevel = playlist_ItemFindFromInputAndRoot( p_playlist,
+                                                p_item->p_input->i_id,
+                                                p_playlist->p_root_onelevel,
+                                                VLC_FALSE );
+            TreeMove( p_playlist, p_item_onelevel, p_node_onelevel, 0 );
+        }
+        {
+            playlist_item_t *p_node_category;
+            playlist_item_t *p_item_category;
+            p_node_category = playlist_ItemFindFromInputAndRoot( p_playlist,
+                                                p_node->p_input->i_id,
+                                                p_playlist->p_root_category,
+                                                VLC_FALSE );
+            p_item_category = playlist_ItemFindFromInputAndRoot( p_playlist,
+                                                p_item->p_input->i_id,
+                                                p_playlist->p_root_category,
+                                                VLC_FALSE );
+            TreeMove( p_playlist, p_item_category, p_node_category, 0 );
+        }
+        return VLC_SUCCESS;
     }
-    REMOVE_ELEM( p_detach->pp_children, p_detach->i_children, j );
-
-    /* Attach to new parent */
-    INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
-    p_item->p_parent = p_node;
-
-    return VLC_SUCCESS;
+    else
+        return TreeMove( p_playlist, p_item, p_node, i_newpos );
 }
 
 /** Send a notification that an item has been added to a node */

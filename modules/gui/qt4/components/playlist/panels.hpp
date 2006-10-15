@@ -75,6 +75,7 @@ private:
     ClickLineEdit *searchLine;
     int currentRootId;
 public slots:
+    void removeItem( int );
     virtual void setRoot( int );
 private slots:
     void deleteSelection();

@@ -217,6 +217,11 @@ void StandardPLPanel::setRoot( int i_root_id )
     model->rebuild( p_item );
 }
 
+void StandardPLPanel::removeItem( int i_id )
+{
+    model->removeItem( i_id );
+}
+
 void StandardPLPanel::keyPressEvent( QKeyEvent *e )
 {
     switch( e->key() )

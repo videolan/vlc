@@ -123,6 +123,7 @@ public:
     void doDelete( QModelIndexList selected );
     void search( QString search );
     void sort( int column, Qt::SortOrder order );
+    void removeItem( int );
 
     /* DnD handling */
     Qt::DropActions supportedDropActions() const;
@@ -172,6 +173,7 @@ private:
     int i_cached_input_id;
 signals:
     void artSet( QString );
+    void shouldRemove( int );
 public slots:
     void activateItem( const QModelIndex &index );
     void activateItem( playlist_item_t *p_item );

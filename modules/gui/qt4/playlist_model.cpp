@@ -251,7 +251,6 @@ bool PLModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
                 PL_UNLOCK;
                 return false;
             }
-
             if( p_target->i_children == -1 ) /* A leaf */
             {
                 PLItem *parentItem = targetItem->parent();
@@ -276,8 +275,16 @@ bool PLModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
                 newParentItem = targetItem;
             }
             /* Remove from source */
-            PLItem *srcItem = FindByInput( rootItem, p_src->p_input->i_id );
-            srcItem->remove( srcItem );
+            PLItem *srcItem = FindById( rootItem, p_src->i_id );
+            // We dropped on the source selector. Ask the dialog to forward
+            // to the main view
+            if( !srcItem )
+            {
+                emit shouldRemove( p_src->i_id );
+            }
+            else
+                srcItem->remove( srcItem );
+
             /* Display at new destination */
             PLItem *newItem = new PLItem( p_src, newParentItem, this );
             newParentItem->insertChild( newItem, i, true );
@@ -288,8 +295,13 @@ bool PLModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
         }
     }
     return true;
- }
+}
 
+void PLModel::removeItem( int i_id )
+{
+    PLItem *item = FindById( rootItem,i_id );
+    if( item ) item->remove( item );
+}
 
 void PLModel::addCallbacks()
 {

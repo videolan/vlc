@@ -300,7 +300,12 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
 
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
 
-    CONNECT( qobject_cast<StandardPLPanel *>(rightPanel)->model, artSet( QString ) , this, setArt( QString ) );
+    CONNECT( qobject_cast<StandardPLPanel *>(rightPanel)->model,
+             artSet( QString ) , this, setArt( QString ) );
+    /* Forward removal requests from the selector to the main panel */
+    CONNECT( qobject_cast<PLSelector *>(selector)->model,
+             shouldRemove( int ),
+             qobject_cast<StandardPLPanel *>(rightPanel), removeItem(int) );
 
     connect( selector, SIGNAL(activated( int )),
              this, SIGNAL( rootChanged( int ) ) );

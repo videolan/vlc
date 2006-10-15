@@ -368,7 +368,8 @@ VLC_EXPORT( playlist_item_t*, playlist_ItemToNode, (playlist_t *,playlist_item_t
 VLC_EXPORT( playlist_item_t*, playlist_LockItemToNode, (playlist_t *,playlist_item_t *) );
 
 playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
-                                   int i_input_id, playlist_item_t *p_root );
+                                   int i_input_id, playlist_item_t *p_root,
+                                   vlc_bool_t );
 
 /********************************** Item search *************************/
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int) );

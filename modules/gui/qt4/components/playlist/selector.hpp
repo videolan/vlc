@@ -48,6 +48,7 @@ private slots:
     void setSource( const QModelIndex& );
 signals:
     void activated( int );
+    void shouldRemove( int );
 };
 
 #endif
