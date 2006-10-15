@@ -81,6 +81,9 @@ static const char *ppsz_filter_options[] = {
 struct filter_sys_t
 {
     int     i_angle;
+    int     i_cos;
+    int     i_sin;
+
     mtime_t last_date;
 };
 
@@ -113,10 +116,10 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys->last_date = 0;
 
     var_Create( p_filter->p_libvlc, "rotate_angle", VLC_VAR_INTEGER );
-    var_SetInteger( p_filter->p_libvlc, "rotate_angle",
-                    p_filter->p_sys->i_angle );
     var_AddCallback( p_filter->p_libvlc,
                      "rotate_angle", RotateCallback, p_filter->p_sys );
+    var_SetInteger( p_filter->p_libvlc, "rotate_angle",
+                    p_filter->p_sys->i_angle );
 
     return VLC_SUCCESS;
 }
@@ -145,9 +148,9 @@ static void Destroy( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
+    filter_sys_t *p_sys = p_filter->p_sys;
     int i_index;
-    double f_angle;
-    double f_sin, f_cos;
+    int i_sin = p_sys->i_sin, i_cos = p_sys->i_cos;
     mtime_t new_date = mdate();
 
     if( !p_pic ) return NULL;
@@ -161,10 +164,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    p_filter->p_sys->last_date = new_date;
-    f_angle = (((double)p_filter->p_sys->i_angle)*M_PI)/180.;
-    f_sin = sin( f_angle );
-    f_cos = cos( f_angle );
+    p_sys->last_date = new_date;
 
     for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
@@ -182,19 +182,18 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
 
-        /* Ok, we do 3 times the sin() calculation for each line. So what ? */
         for( i_line = 0 ; i_line < i_num_lines ; i_line++ )
         {
             for( i_col = 0; i_col < i_num_cols ; i_col++ )
             {
                 int i_line_orig, i_col_orig;
-                i_line_orig = (int)( f_cos * (double)(i_line-i_line_center)
-                                   + f_sin * (double)(i_col-i_col_center)
-                                   + 0.5 )
+                i_line_orig = ( ( i_cos * (i_line-i_line_center)
+                                + i_sin * (i_col-i_col_center)
+                                + 128 )>>8 )
                               + i_line_center;
-                i_col_orig = (int)(-f_sin * (double)(i_line-i_line_center)
-                                  + f_cos * (double)(i_col-i_col_center)
-                                  + 0.5 )
+                i_col_orig = ( (-i_sin * (i_line-i_line_center)
+                               + i_cos * (i_col-i_col_center)
+                               + 128 )>>8 )
                              + i_col_center;
 
                 if(    0 <= i_line_orig && i_line_orig < i_num_lines
@@ -232,7 +231,13 @@ static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
 
     if( !strcmp( psz_var, "rotate_angle" ) )
     {
+        double f_angle;
+
         p_sys->i_angle = newval.i_int;
+
+        f_angle = (((double)p_sys->i_angle)*M_PI)/180.;
+        p_sys->i_sin = (int)(sin( f_angle )*256.);
+        p_sys->i_cos = (int)(cos( f_angle )*256.);
     }
     return VLC_SUCCESS;
 }
