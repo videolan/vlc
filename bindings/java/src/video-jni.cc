@@ -182,7 +182,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
     /* Get the platform-specific drawing info */
     dsi_win = (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
 
-    libvlc_video_reparent( input, dsi_win->hwnd, exception );
+    libvlc_video_reparent( input, (libvlc_drawable_t)dsi_win->hwnd, exception );
 
     CHECK_EXCEPTION_FREE ;
     
