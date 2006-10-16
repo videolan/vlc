@@ -7,6 +7,7 @@
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,6 +70,7 @@ struct decoder_sys_t
 
     vlc_bool_t   b_sps;
     vlc_bool_t   b_pps;
+    vlc_bool_t   b_header;
 
     /* avcC data */
     int i_avcC_length_size;
@@ -160,6 +162,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_pps   = VLC_FALSE;
     p_sys->p_sps   = 0;
     p_sys->p_pps   = 0;
+    p_sys->b_header= VLC_FALSE;
 
     p_sys->i_nal_type = -1;
     p_sys->i_nal_ref_idc = -1;
@@ -220,6 +223,7 @@ static int Open( vlc_object_t *p_this )
         p_dec->fmt_out.p_extra = (uint8_t*)malloc( p_dec->fmt_out.i_extra );
         memcpy( p_dec->fmt_out.p_extra, p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
         memcpy( p_dec->fmt_out.p_extra+p_sys->p_sps->i_buffer, p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
+        p_sys->b_header = VLC_TRUE;
 
         /* Set callback */
         p_dec->pf_packetize = PacketizeAVC1;
@@ -478,6 +482,9 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
 #define OUTPUT \
     do {                                                      \
+        if( !p_sys->b_header && p_sys->i_frame_type != BLOCK_FLAG_TYPE_I) \
+            break;                                            \
+                                                              \
         p_pic = block_ChainGather( p_sys->p_frame );          \
         p_pic->i_length = 0;    /* FIXME */                   \
         p_pic->i_flags |= p_sys->i_frame_type;                \
@@ -496,6 +503,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
             block_ChainAppend( &p_sps, p_pps );               \
             block_ChainAppend( &p_sps, p_pic );               \
             p_pic = block_ChainGather( p_sps );               \
+            p_sys->b_header = VLC_TRUE;                       \
         }                                                     \
     } while(0)
 
