@@ -805,7 +805,7 @@ package-win32-base-exe-linux:
 
 package-win32-base-zip: package-win32-base
 # Create package 
-	zip -r vlc-${VERSION}-win32.zip vlc-${VERSION}
+	zip -r -9 vlc-${VERSION}-win32.zip vlc-${VERSION}
 
 package-win32-base-7zip: package-win32-base
 # Create package 
