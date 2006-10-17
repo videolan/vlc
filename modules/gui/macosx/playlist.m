@@ -364,40 +364,44 @@ NSLog( @"expandable" );
 
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        NSMenuItem * o_lmi;
-        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        vlc_bool_t  b_enabled;
+        char        *objectname;
+        NSMenuItem  *o_lmi;
+        module_t    *p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
         {
-            /* create the menu entries used in the playlist menu */
+            /* Check for submodules */
+            int i = -1;
+            while( p_parser->pp_shortcuts[++i] != NULL ); i--;
+
+            /* Check whether to enable these menuitems */
+            objectname = i>=0 ? p_parser->pp_shortcuts[i] : p_parser->psz_object_name;
+            b_enabled = playlist_IsServicesDiscoveryLoaded( p_playlist, objectname );
+            
+            /* Create the menu entries used in the playlist menu */
             o_lmi = [[o_mi_services submenu] addItemWithTitle:
                      [NSString stringWithUTF8String:
                      p_parser->psz_longname ? p_parser->psz_longname :
                      ( p_parser->psz_shortname ? p_parser->psz_shortname:
-                     p_parser->psz_object_name)]
+                     objectname)]
                                              action: @selector(servicesChange:)
                                              keyEquivalent: @""];
             [o_lmi setTarget: self];
-            [o_lmi setRepresentedObject:
-                   [NSString stringWithCString: p_parser->psz_object_name]];
-            if( playlist_IsServicesDiscoveryLoaded( p_playlist,
-                    p_parser->psz_object_name ) )
-                [o_lmi setState: NSOnState];
+            [o_lmi setRepresentedObject: [NSString stringWithCString: objectname]];
+            if( b_enabled ) [o_lmi setState: NSOnState];
                 
-            /* create the menu entries for the main menu */
+            /* Create the menu entries for the main menu */
             o_lmi = [[o_mm_mi_services submenu] addItemWithTitle:
                      [NSString stringWithUTF8String:
                      p_parser->psz_longname ? p_parser->psz_longname :
                      ( p_parser->psz_shortname ? p_parser->psz_shortname:
-                     p_parser->psz_object_name)]
+                     objectname)]
                                              action: @selector(servicesChange:)
                                              keyEquivalent: @""];
             [o_lmi setTarget: self];
-            [o_lmi setRepresentedObject:
-                   [NSString stringWithCString: p_parser->psz_object_name]];
-            if( playlist_IsServicesDiscoveryLoaded( p_playlist,
-                    p_parser->psz_object_name ) )
-                [o_lmi setState: NSOnState];
+            [o_lmi setRepresentedObject: [NSString stringWithCString:objectname]];
+            if( b_enabled ) [o_lmi setState: NSOnState];
         }
     }
     vlc_list_release( p_list );
