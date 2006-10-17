@@ -521,9 +521,9 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
         var_Get( p_sys->p_input, "position", &val);
         sprintf( position, "%d" , (int)((val.f_float) * 100.0));
         var_Get( p_sys->p_input, "time", &val);
-        sprintf( time, "%d" , (int)(val.i_time / 1000000) );
+        sprintf( time, I64Fi, val.i_time / 1000000LL );
         var_Get( p_sys->p_input, "length", &val);
-        sprintf( length, "%d" , (int)(val.i_time / 1000000) );
+        sprintf( length, I64Fi, val.i_time / 1000000LL );
 
         var_Get( p_sys->p_input, "state", &val );
         if( val.i_int == PLAYING_S )
