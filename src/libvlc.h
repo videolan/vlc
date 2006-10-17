@@ -2125,29 +2125,66 @@ vlc_module_end();
 
 static module_config_t p_help_config[] =
 {
-    { CONFIG_ITEM_BOOL, NULL, "help", 'h',
-      N_("print help for VLC (can be combined with --advanced)") },
-    { CONFIG_ITEM_BOOL, NULL, "longhelp", 'H',
-      N_("print help for VLC and all its modules (can be combined with --advanced)") },
-    { CONFIG_ITEM_BOOL, NULL, "advanced", '\0',
-      N_("print help for the advanced options") },
-    { CONFIG_ITEM_BOOL, NULL, "help-verbose", '\0',
-      N_("ask for extra verbosity when displaying help") },
-    { CONFIG_ITEM_BOOL, NULL, "list", 'l',
-      N_("print a list of available modules") },
-    { CONFIG_ITEM_STRING, NULL, "module", 'p',
-      N_("print help on a specific module (can be combined with --advanced)") },
-    { CONFIG_ITEM_BOOL, NULL, "save-config", '\0',
-      N_("save the current command line options in the config") },
-    { CONFIG_ITEM_BOOL, NULL, "reset-config", '\0',
-      N_("reset the current config to the default values") },
-    { CONFIG_ITEM_STRING, NULL, "config", '\0',
-      N_("use alternate config file") },
-    { CONFIG_ITEM_BOOL, NULL, "reset-plugins-cache", '\0',
-      N_("resets the current plugins cache") },
-    { CONFIG_ITEM_BOOL, NULL, "version", '\0',
-      N_("print version information") },
-    { CONFIG_HINT_END, NULL, NULL, '\0', NULL }
+    { 
+        .i_type   = CONFIG_ITEM_BOOL,
+        .psz_name = "help",
+        .i_short  = 'h',
+        .psz_text = N_("print help for VLC (can be combined with --advanced)")
+    },
+    {
+        .i_type   = CONFIG_ITEM_BOOL,
+        .psz_name = "longhelp",
+        .i_short  = 'H',
+        .psz_text = N_("print help for VLC and all its modules (can be combined with --advanced)")
+    },
+    {
+        .i_type   = CONFIG_ITEM_BOOL,
+        .psz_name = "advanced",
+        .psz_text = N_("print help for the advanced options")
+    },
+    {
+        .i_type   = CONFIG_ITEM_BOOL,
+        .psz_name = "help-verbose",
+        .psz_text = N_("ask for extra verbosity when displaying help")
+    },
+    {
+        .i_type   = CONFIG_ITEM_BOOL,
+        .psz_name = "list",
+        .i_short  = 'l',
+        .psz_text = N_("print a list of available modules")
+    },
+    {
+        .i_type   = CONFIG_ITEM_STRING,
+        .psz_name = "module",
+        .i_short  = 'p',
+        .psz_text = N_("print help on a specific module (can be combined with --advanced)")
+    },
+    {
+        .i_type   = CONFIG_ITEM_BOOL,
+        .psz_name = "save-config",
+        .psz_text = N_("save the current command line options in the config")
+    },
+    {
+        .i_type   = CONFIG_ITEM_BOOL,
+        .psz_name = "reset-config",
+        .psz_text = N_("reset the current config to the default values")
+    },
+    {
+        .i_type   = CONFIG_ITEM_STRING,
+        .psz_name = "config",
+        .psz_text = N_("use alternate config file")
+    },
+    {
+        .i_type   = CONFIG_ITEM_BOOL,
+        .psz_name = "reset-plugins-cache",
+        .psz_text = N_("resets the current plugins cache")
+    },
+    {
+        .i_type   = CONFIG_ITEM_BOOL,
+        .psz_name = "version",
+        .psz_text = N_("print version information")
+    },
+    { .i_type = CONFIG_HINT_END }
 };
 
 /*****************************************************************************
