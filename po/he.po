@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-09 23:28+0100\n"
+"POT-Creation-Date: 2006-10-17 10:33+0200\n"
 "PO-Revision-Date: 2005-11-09 16:45+0000\n"
 "Last-Translator: Yaniv Abir <yanivabir@gmail.com>\n"
 "Language-Team: Hebrew <he@li.org>\n"
@@ -65,7 +65,7 @@ msgstr ""
 msgid "Hotkeys settings"
 msgstr "הגדרות קיצורי מקלדת"
 
-#: include/vlc_config_cat.h:54 src/input/es_out.c:1587 src/libvlc.h:1232
+#: include/vlc_config_cat.h:54 src/input/es_out.c:1590 src/libvlc.h:1232
 #: modules/gui/beos/InterfaceWindow.cpp:282 modules/gui/macosx/extended.m:81
 #: modules/gui/macosx/intf.m:556 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:96 modules/gui/macosx/wizard.m:421
@@ -120,7 +120,7 @@ msgstr "שונות"
 msgid "Miscellaneous audio settings and modules."
 msgstr ""
 
-#: include/vlc_config_cat.h:75 src/input/es_out.c:1615 src/libvlc.h:1267
+#: include/vlc_config_cat.h:75 src/input/es_out.c:1618 src/libvlc.h:1267
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:569
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:86
 #: modules/gui/macosx/wizard.m:422 modules/gui/qt4/ui/input_stats.ui:335
@@ -371,6 +371,7 @@ msgstr "הגדרות מתקדמות אחרות"
 
 #: include/vlc_config_cat.h:203 modules/gui/macosx/open.m:162
 #: modules/gui/macosx/open.m:379 modules/gui/pda/pda_interface.c:548
+#: modules/gui/qt4/ui/file_open.ui:890
 #: modules/gui/wxwidgets/dialogs/open.cpp:503
 msgid "Network"
 msgstr "רשת"
@@ -548,11 +549,12 @@ msgid "Setting"
 msgstr ""
 
 #: include/vlc_meta.h:39 modules/gui/macosx/open.m:181
+#: modules/gui/qt4/ui/file_open.ui:965 modules/gui/qt4/ui/file_open.ui:1043
 #: modules/gui/wxwidgets/dialogs/open.cpp:871
 msgid "URL"
 msgstr "URL"
 
-#: include/vlc_meta.h:40 src/input/es_out.c:1579 src/libvlc.h:97
+#: include/vlc_meta.h:40 src/input/es_out.c:1582 src/libvlc.h:97
 #: modules/gui/beos/InterfaceWindow.cpp:278
 msgid "Language"
 msgstr "שפה"
@@ -649,9 +651,10 @@ msgstr "סטריאו"
 #: src/audio_output/output.c:107 src/audio_output/output.c:143
 #: src/libvlc.h:268 modules/audio_filter/channel_mixer/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
-#: modules/control/gestures.c:86 modules/video_filter/logo.c:97
-#: modules/video_filter/marq.c:130 modules/video_filter/mosaic.c:181
-#: modules/video_filter/osdmenu.c:78 modules/video_filter/rss.c:160
+#: modules/control/gestures.c:86 modules/gui/qt4/ui/file_open.ui:416
+#: modules/video_filter/logo.c:97 modules/video_filter/marq.c:130
+#: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:78
+#: modules/video_filter/rss.c:160
 msgid "Left"
 msgstr "שמאל"
 
@@ -772,81 +775,81 @@ msgstr "רצועה %i"
 msgid "Program"
 msgstr "תכנית"
 
-#: src/input/es_out.c:1574 modules/codec/faad.c:329
+#: src/input/es_out.c:1577 modules/codec/faad.c:329
 #, c-format
 msgid "Stream %d"
 msgstr ""
 
-#: src/input/es_out.c:1576 modules/gui/macosx/wizard.m:426
+#: src/input/es_out.c:1579 modules/gui/macosx/wizard.m:426
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:834
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:874
 msgid "Codec"
 msgstr ""
 
-#: src/input/es_out.c:1587 src/input/es_out.c:1615 src/input/es_out.c:1642
+#: src/input/es_out.c:1590 src/input/es_out.c:1618 src/input/es_out.c:1645
 #: modules/gui/macosx/output.m:153
 msgid "Type"
 msgstr "סוג"
 
-#: src/input/es_out.c:1590 modules/codec/faad.c:333
+#: src/input/es_out.c:1593 modules/codec/faad.c:333
 #: modules/gui/macosx/output.m:176
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:857
 msgid "Channels"
 msgstr "ערוצים"
 
-#: src/input/es_out.c:1595 modules/codec/faad.c:335
+#: src/input/es_out.c:1598 modules/codec/faad.c:335
 msgid "Sample rate"
 msgstr "קצב דגימה"
 
-#: src/input/es_out.c:1596 modules/codec/faad.c:335
+#: src/input/es_out.c:1599 modules/codec/faad.c:335
 #, c-format
 msgid "%d Hz"
 msgstr "%d  Hz"
 
-#: src/input/es_out.c:1602
+#: src/input/es_out.c:1605
 msgid "Bits per sample"
 msgstr "ביטים לדגימה"
 
-#: src/input/es_out.c:1607 modules/access_output/shout.c:86
+#: src/input/es_out.c:1610 modules/access_output/shout.c:86
 #: modules/access/pvr.c:84
 msgid "Bitrate"
 msgstr ""
 
-#: src/input/es_out.c:1608
+#: src/input/es_out.c:1611
 #, c-format
 msgid "%d kb/s"
 msgstr "%d kb/s"
 
-#: src/input/es_out.c:1619
+#: src/input/es_out.c:1622
 msgid "Resolution"
 msgstr "רזולוציה"
 
-#: src/input/es_out.c:1625
+#: src/input/es_out.c:1628
 msgid "Display resolution"
 msgstr "רצולוציית תצוגה"
 
-#: src/input/es_out.c:1635 modules/access/screen/screen.c:41
+#: src/input/es_out.c:1638 modules/access/screen/screen.c:41
 msgid "Frame rate"
 msgstr "קצב פריימים"
 
-#: src/input/es_out.c:1642
+#: src/input/es_out.c:1645
 msgid "Subtitle"
 msgstr "כתובית"
 
-#: src/input/input.c:2056
+#: src/input/input.c:2055
 msgid "Your input can't be opened"
 msgstr ""
 
-#: src/input/input.c:2057
+#: src/input/input.c:2056
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/input.c:2132
+#: src/input/input.c:2131
 msgid "Can't recognize the input's format"
 msgstr ""
 
-#: src/input/input.c:2133
+#: src/input/input.c:2132
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -861,7 +864,8 @@ msgstr "תכניות"
 
 #: src/input/var.c:143 modules/gui/beos/MediaControlView.cpp:1236
 #: modules/gui/macosx/intf.m:553 modules/gui/macosx/intf.m:554
-#: modules/gui/macosx/open.m:169 modules/gui/wxwidgets/dialogs/open.cpp:762
+#: modules/gui/macosx/open.m:169 modules/gui/qt4/ui/file_open.ui:835
+#: modules/gui/wxwidgets/dialogs/open.cpp:762
 msgid "Chapter"
 msgstr "פרק"
 
@@ -914,7 +918,7 @@ msgid "Previous chapter"
 msgstr "הפרק הקודם"
 
 #: src/interface/interaction.c:275 src/interface/interaction.c:371
-#: modules/demux/avi/avi.c:561 modules/gui/beos/InterfaceWindow.cpp:159
+#: modules/demux/avi/avi.c:587 modules/gui/beos/InterfaceWindow.cpp:159
 #: modules/gui/macosx/bookmarks.m:107 modules/gui/macosx/controls.m:58
 #: modules/gui/macosx/interaction.m:128 modules/gui/macosx/interaction.m:132
 #: modules/gui/macosx/interaction.m:135 modules/gui/macosx/open.m:158
@@ -1081,6 +1085,10 @@ msgstr "גרוזינית"
 #: src/libvlc.h:41 src/misc/iso-639_def.h:111
 msgid "Korean"
 msgstr "קוראנית"
+
+#: src/libvlc.h:41 src/misc/iso-639_def.h:125
+msgid "Malay"
+msgstr "מלאית"
 
 #: src/libvlc.h:41 src/misc/iso-639_def.h:69
 msgid "Dutch"
@@ -1473,9 +1481,9 @@ msgstr ""
 
 #: src/libvlc.h:268 modules/audio_filter/channel_mixer/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
-#: modules/video_filter/logo.c:97 modules/video_filter/marq.c:130
-#: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:78
-#: modules/video_filter/rss.c:160
+#: modules/gui/qt4/ui/file_open.ui:421 modules/video_filter/logo.c:97
+#: modules/video_filter/marq.c:130 modules/video_filter/mosaic.c:181
+#: modules/video_filter/osdmenu.c:78 modules/video_filter/rss.c:160
 msgid "Center"
 msgstr "מרכז"
 
@@ -3488,6 +3496,7 @@ msgstr ""
 
 #: src/libvlc.h:1355 modules/codec/subsdec.c:144 modules/demux/subtitle.c:66
 #: modules/gui/beos/InterfaceWindow.cpp:279
+#: modules/gui/qt4/ui/file_open.ui:201 modules/gui/qt4/ui/file_open.ui:845
 msgid "Subtitles"
 msgstr "כתוביות"
 
@@ -3920,10 +3929,6 @@ msgstr "מאורית"
 #: src/misc/iso-639_def.h:124
 msgid "Marathi"
 msgstr "מארתית"
-
-#: src/misc/iso-639_def.h:125
-msgid "Malay"
-msgstr "מלאית"
 
 #: src/misc/iso-639_def.h:126
 msgid "Malagasy"
@@ -5163,7 +5168,7 @@ msgid ""
 "The default method is: key."
 msgstr ""
 
-#: modules/access/dvdread.c:85
+#: modules/access/dvdread.c:85 modules/gui/qt4/ui/file_open.ui:486
 msgid "title"
 msgstr ""
 
@@ -5260,8 +5265,7 @@ msgstr ""
 #: modules/gui/beos/PlayListWindow.cpp:85 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/open.m:371 modules/gui/macosx/output.m:142
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
-#: modules/gui/pda/pda_interface.c:366 modules/gui/qt4/ui/file_open.ui:36
-#: modules/gui/qt4/ui/file_open.ui:78
+#: modules/gui/pda/pda_interface.c:366 modules/gui/qt4/ui/file_open.ui:176
 #: modules/gui/wxwidgets/dialogs/open.cpp:499
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:471
 msgid "File"
@@ -5571,11 +5575,6 @@ msgstr ""
 msgid "HTTP stream output"
 msgstr ""
 
-#: modules/access_output/http.c:93 modules/control/http/http.c:61
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
-msgid "HTTP"
-msgstr "HTTP"
-
 #: modules/access_output/shout.c:58
 msgid "Stream name"
 msgstr ""
@@ -5711,11 +5710,6 @@ msgstr ""
 #: modules/access_output/udp.c:97
 msgid "UDP stream output"
 msgstr ""
-
-#: modules/access_output/udp.c:98
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
-msgid "UDP"
-msgstr "UDP"
 
 #: modules/access/pvr.c:49
 msgid ""
@@ -6058,7 +6052,7 @@ msgid ""
 "Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
 msgstr ""
 
-#: modules/access/v4l.c:100
+#: modules/access/v4l.c:100 modules/gui/qt4/ui/file_open.ui:825
 msgid "Audio Channel"
 msgstr ""
 
@@ -7250,7 +7244,7 @@ msgstr "פענוח"
 msgid "FFmpeg chroma conversion"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.c:131 modules/gui/qt4/ui/file_open.ui:157
+#: modules/codec/ffmpeg/ffmpeg.c:131
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:97
 msgid "Encoding"
 msgstr "קידוד"
@@ -8616,6 +8610,11 @@ msgstr ""
 msgid "HTTP interace Certificates Revocation List file."
 msgstr ""
 
+#: modules/control/http/http.c:61
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
+msgid "HTTP"
+msgstr "HTTP"
+
 #: modules/control/http/http.c:62
 msgid "HTTP remote control interface"
 msgstr ""
@@ -8628,12 +8627,16 @@ msgstr "HTTP SSL"
 msgid "Infrared remote control interface"
 msgstr ""
 
-#: modules/control/motion.c:62
+#: modules/control/motion.c:59
+msgid "Use the rotate video filter instead of transform"
+msgstr ""
+
+#: modules/control/motion.c:65
 #, fuzzy
 msgid "motion"
 msgstr "רזולוציה"
 
-#: modules/control/motion.c:64
+#: modules/control/motion.c:67
 #, fuzzy
 msgid "motion control interface"
 msgstr "ממשקי שליטה"
@@ -8766,332 +8769,340 @@ msgstr ""
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr ""
 
-#: modules/control/rc.c:847
+#: modules/control/rc.c:851
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr ""
 
-#: modules/control/rc.c:880
+#: modules/control/rc.c:884
 msgid "+----[ Remote control commands ]"
 msgstr ""
 
-#: modules/control/rc.c:882
+#: modules/control/rc.c:886
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
 msgstr ""
 
-#: modules/control/rc.c:883
+#: modules/control/rc.c:887
 msgid "| enqueue XYZ  . . . . . . . queue XYZ to playlist"
 msgstr ""
 
-#: modules/control/rc.c:884
+#: modules/control/rc.c:888
 msgid "| playlist . . .  show items currently in playlist"
 msgstr ""
 
-#: modules/control/rc.c:885
+#: modules/control/rc.c:889
 msgid "| play . . . . . . . . . . . . . . . . play stream"
 msgstr ""
 
-#: modules/control/rc.c:886
+#: modules/control/rc.c:890
 msgid "| stop . . . . . . . . . . . . . . . . stop stream"
 msgstr ""
 
-#: modules/control/rc.c:887
+#: modules/control/rc.c:891
 msgid "| next . . . . . . . . . . . .  next playlist item"
 msgstr ""
 
-#: modules/control/rc.c:888
+#: modules/control/rc.c:892
 msgid "| prev . . . . . . . . . .  previous playlist item"
 msgstr ""
 
-#: modules/control/rc.c:889
+#: modules/control/rc.c:893
 msgid "| goto . . . . . . . . . . . .  goto item at index"
 msgstr ""
 
-#: modules/control/rc.c:890
-msgid "| clear . . . . . . . . . . .   clear the playlist"
-msgstr ""
-
-#: modules/control/rc.c:891
-msgid "| status . . . . . . . . . current playlist status"
-msgstr ""
-
-#: modules/control/rc.c:892
-msgid "| title [X]  . . . . set/get title in current item"
-msgstr ""
-
-#: modules/control/rc.c:893
-msgid "| title_n  . . . . . .  next title in current item"
-msgstr ""
-
 #: modules/control/rc.c:894
-msgid "| title_p  . . . .  previous title in current item"
+msgid "| repeat [on|off] . .  toggle playlist item repeat"
 msgstr ""
 
 #: modules/control/rc.c:895
-msgid "| chapter [X]  . . set/get chapter in current item"
+msgid "| loop [on|off] . . . .  toggle playlist item loop"
 msgstr ""
 
 #: modules/control/rc.c:896
-msgid "| chapter_n  . . . .  next chapter in current item"
+msgid "| clear . . . . . . . . . . .   clear the playlist"
 msgstr ""
 
 #: modules/control/rc.c:897
-msgid "| chapter_p  . .  previous chapter in current item"
+msgid "| status . . . . . . . . . current playlist status"
+msgstr ""
+
+#: modules/control/rc.c:898
+msgid "| title [X]  . . . . set/get title in current item"
 msgstr ""
 
 #: modules/control/rc.c:899
-msgid "| seek X . seek in seconds, for instance `seek 12'"
+msgid "| title_n  . . . . . .  next title in current item"
 msgstr ""
 
 #: modules/control/rc.c:900
-msgid "| pause  . . . . . . . . . . . . . .  toggle pause"
+msgid "| title_p  . . . .  previous title in current item"
 msgstr ""
 
 #: modules/control/rc.c:901
-msgid "| fastforward  . . . . . .  .  set to maximum rate"
+msgid "| chapter [X]  . . set/get chapter in current item"
 msgstr ""
 
 #: modules/control/rc.c:902
-msgid "| rewind  . . . . . . . . . .  set to minimum rate"
+msgid "| chapter_n  . . . .  next chapter in current item"
 msgstr ""
 
 #: modules/control/rc.c:903
-msgid "| faster . . . . . . . .  faster playing of stream"
-msgstr ""
-
-#: modules/control/rc.c:904
-msgid "| slower . . . . . . . .  slower playing of stream"
+msgid "| chapter_p  . .  previous chapter in current item"
 msgstr ""
 
 #: modules/control/rc.c:905
-msgid "| normal . . . . . . . .  normal playing of stream"
+msgid "| seek X . seek in seconds, for instance `seek 12'"
 msgstr ""
 
 #: modules/control/rc.c:906
-msgid "| f [on|off] . . . . . . . . . . toggle fullscreen"
+msgid "| pause  . . . . . . . . . . . . . .  toggle pause"
 msgstr ""
 
 #: modules/control/rc.c:907
-msgid "| info . . .  information about the current stream"
+msgid "| fastforward  . . . . . .  .  set to maximum rate"
 msgstr ""
 
 #: modules/control/rc.c:908
-msgid "| get_time . . seconds elapsed since stream's beginning"
+msgid "| rewind  . . . . . . . . . .  set to minimum rate"
 msgstr ""
 
 #: modules/control/rc.c:909
-msgid "| is_playing . .  1 if a stream plays, 0 otherwise"
+msgid "| faster . . . . . . . .  faster playing of stream"
 msgstr ""
 
 #: modules/control/rc.c:910
-msgid "| get_title . . .  the title of the current stream"
+msgid "| slower . . . . . . . .  slower playing of stream"
 msgstr ""
 
 #: modules/control/rc.c:911
-msgid "| get_length . .  the length of the current stream"
+msgid "| normal . . . . . . . .  normal playing of stream"
+msgstr ""
+
+#: modules/control/rc.c:912
+msgid "| f [on|off] . . . . . . . . . . toggle fullscreen"
 msgstr ""
 
 #: modules/control/rc.c:913
-msgid "| volume [X] . . . . . . . .  set/get audio volume"
+msgid "| info . . .  information about the current stream"
 msgstr ""
 
 #: modules/control/rc.c:914
-msgid "| volup [X]  . . . . .  raise audio volume X steps"
+msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr ""
 
 #: modules/control/rc.c:915
-msgid "| voldown [X]  . . . .  lower audio volume X steps"
+msgid "| is_playing . .  1 if a stream plays, 0 otherwise"
 msgstr ""
 
 #: modules/control/rc.c:916
-msgid "| adev [X] . . . . . . . . .  set/get audio device"
+msgid "| get_title . . .  the title of the current stream"
 msgstr ""
 
 #: modules/control/rc.c:917
-msgid "| achan [X]. . . . . . . .  set/get audio channels"
-msgstr ""
-
-#: modules/control/rc.c:918
-msgid "| atrack [X] . . . . . . . . . set/get audio track"
+msgid "| get_length . .  the length of the current stream"
 msgstr ""
 
 #: modules/control/rc.c:919
-msgid "| vtrack [X] . . . . . . . . . set/get video track"
+msgid "| volume [X] . . . . . . . .  set/get audio volume"
 msgstr ""
 
 #: modules/control/rc.c:920
-msgid "| vratio [X]  . . . . . set/get video aspect ratio"
+msgid "| volup [X]  . . . . .  raise audio volume X steps"
 msgstr ""
 
 #: modules/control/rc.c:921
-msgid "| vcrop [X]  . . . . . . . . .  set/get video crop"
+msgid "| voldown [X]  . . . .  lower audio volume X steps"
 msgstr ""
 
 #: modules/control/rc.c:922
-msgid "| vzoom [X]  . . . . . . . . .  set/get video zoom"
+msgid "| adev [X] . . . . . . . . .  set/get audio device"
 msgstr ""
 
 #: modules/control/rc.c:923
-msgid "| strack [X] . . . . . . . set/get subtitles track"
+msgid "| achan [X]. . . . . . . .  set/get audio channels"
 msgstr ""
 
 #: modules/control/rc.c:924
-msgid "| menu [on|off|up|down|left|right|select] use menu"
+msgid "| atrack [X] . . . . . . . . . set/get audio track"
+msgstr ""
+
+#: modules/control/rc.c:925
+msgid "| vtrack [X] . . . . . . . . . set/get video track"
+msgstr ""
+
+#: modules/control/rc.c:926
+msgid "| vratio [X]  . . . . . set/get video aspect ratio"
+msgstr ""
+
+#: modules/control/rc.c:927
+msgid "| vcrop [X]  . . . . . . . . .  set/get video crop"
+msgstr ""
+
+#: modules/control/rc.c:928
+msgid "| vzoom [X]  . . . . . . . . .  set/get video zoom"
 msgstr ""
 
 #: modules/control/rc.c:929
-msgid "| marq-marquee STRING  . . overlay STRING in video"
+msgid "| strack [X] . . . . . . . set/get subtitles track"
 msgstr ""
 
 #: modules/control/rc.c:930
-msgid "| marq-x X . . . . . . . . . . . .offset from left"
-msgstr ""
-
-#: modules/control/rc.c:931
-msgid "| marq-y Y . . . . . . . . . . . . offset from top"
-msgstr ""
-
-#: modules/control/rc.c:932
-msgid "| marq-position #. . .  .relative position control"
-msgstr ""
-
-#: modules/control/rc.c:933
-msgid "| marq-color # . . . . . . . . . . font color, RGB"
-msgstr ""
-
-#: modules/control/rc.c:934
-msgid "| marq-opacity # . . . . . . . . . . . . . opacity"
+msgid "| menu [on|off|up|down|left|right|select] use menu"
 msgstr ""
 
 #: modules/control/rc.c:935
-msgid "| marq-timeout T. . . . . . . . . . timeout, in ms"
+msgid "| marq-marquee STRING  . . overlay STRING in video"
 msgstr ""
 
 #: modules/control/rc.c:936
-msgid "| marq-size # . . . . . . . . font size, in pixels"
+msgid "| marq-x X . . . . . . . . . . . .offset from left"
+msgstr ""
+
+#: modules/control/rc.c:937
+msgid "| marq-y Y . . . . . . . . . . . . offset from top"
 msgstr ""
 
 #: modules/control/rc.c:938
-msgid "| logo-file STRING . . .the overlay file path/name"
+msgid "| marq-position #. . .  .relative position control"
 msgstr ""
 
 #: modules/control/rc.c:939
-msgid "| logo-x X . . . . . . . . . . . .offset from left"
+msgid "| marq-color # . . . . . . . . . . font color, RGB"
 msgstr ""
 
 #: modules/control/rc.c:940
-msgid "| logo-y Y . . . . . . . . . . . . offset from top"
+msgid "| marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr ""
 
 #: modules/control/rc.c:941
-msgid "| logo-position #. . . . . . . . relative position"
+msgid "| marq-timeout T. . . . . . . . . . timeout, in ms"
 msgstr ""
 
 #: modules/control/rc.c:942
-msgid "| logo-transparency #. . . . . . . . .transparency"
+msgid "| marq-size # . . . . . . . . font size, in pixels"
 msgstr ""
 
 #: modules/control/rc.c:944
-msgid "| mosaic-alpha # . . . . . . . . . . . . . . alpha"
+msgid "| logo-file STRING . . .the overlay file path/name"
 msgstr ""
 
 #: modules/control/rc.c:945
-msgid "| mosaic-height #. . . . . . . . . . . . . .height"
+msgid "| logo-x X . . . . . . . . . . . .offset from left"
 msgstr ""
 
 #: modules/control/rc.c:946
-msgid "| mosaic-width # . . . . . . . . . . . . . . width"
+msgid "| logo-y Y . . . . . . . . . . . . offset from top"
 msgstr ""
 
 #: modules/control/rc.c:947
-msgid "| mosaic-xoffset # . . . .top left corner position"
+msgid "| logo-position #. . . . . . . . relative position"
 msgstr ""
 
 #: modules/control/rc.c:948
-msgid "| mosaic-yoffset # . . . .top left corner position"
-msgstr ""
-
-#: modules/control/rc.c:949
-msgid "| mosaic-offsets x,y(,x,y)*. . . . list of offsets"
+msgid "| logo-transparency #. . . . . . . . .transparency"
 msgstr ""
 
 #: modules/control/rc.c:950
-msgid "| mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
+msgid "| mosaic-alpha # . . . . . . . . . . . . . . alpha"
 msgstr ""
 
 #: modules/control/rc.c:951
-msgid "| mosaic-vborder # . . . . . . . . vertical border"
+msgid "| mosaic-height #. . . . . . . . . . . . . .height"
 msgstr ""
 
 #: modules/control/rc.c:952
-msgid "| mosaic-hborder # . . . . . . . horizontal border"
+msgid "| mosaic-width # . . . . . . . . . . . . . . width"
 msgstr ""
 
 #: modules/control/rc.c:953
-msgid "| mosaic-position {0=auto,1=fixed} . . . .position"
+msgid "| mosaic-xoffset # . . . .top left corner position"
 msgstr ""
 
 #: modules/control/rc.c:954
-msgid "| mosaic-rows #. . . . . . . . . . .number of rows"
+msgid "| mosaic-yoffset # . . . .top left corner position"
 msgstr ""
 
 #: modules/control/rc.c:955
-msgid "| mosaic-cols #. . . . . . . . . . .number of cols"
+msgid "| mosaic-offsets x,y(,x,y)*. . . . list of offsets"
 msgstr ""
 
 #: modules/control/rc.c:956
-msgid "| mosaic-order id(,id)* . . . . order of pictures "
+msgid "| mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
 msgstr ""
 
 #: modules/control/rc.c:957
-msgid "| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
+msgid "| mosaic-vborder # . . . . . . . . vertical border"
+msgstr ""
+
+#: modules/control/rc.c:958
+msgid "| mosaic-hborder # . . . . . . . horizontal border"
 msgstr ""
 
 #: modules/control/rc.c:959
+msgid "| mosaic-position {0=auto,1=fixed} . . . .position"
+msgstr ""
+
+#: modules/control/rc.c:960
+msgid "| mosaic-rows #. . . . . . . . . . .number of rows"
+msgstr ""
+
+#: modules/control/rc.c:961
+msgid "| mosaic-cols #. . . . . . . . . . .number of cols"
+msgstr ""
+
+#: modules/control/rc.c:962
+msgid "| mosaic-order id(,id)* . . . . order of pictures "
+msgstr ""
+
+#: modules/control/rc.c:963
+msgid "| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
+msgstr ""
+
+#: modules/control/rc.c:965
 msgid ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
 msgstr ""
 
-#: modules/control/rc.c:963
+#: modules/control/rc.c:969
 msgid "| help . . . . . . . . . . . . . this help message"
 msgstr ""
 
-#: modules/control/rc.c:964
+#: modules/control/rc.c:970
 msgid "| longhelp . . . . . . . . . a longer help message"
 msgstr ""
 
-#: modules/control/rc.c:965
+#: modules/control/rc.c:971
 msgid "| logout . . . . .  exit (if in socket connection)"
 msgstr ""
 
-#: modules/control/rc.c:966
+#: modules/control/rc.c:972
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr ""
 
-#: modules/control/rc.c:968
+#: modules/control/rc.c:974
 msgid "+----[ end of help ]"
 msgstr ""
 
-#: modules/control/rc.c:1075
+#: modules/control/rc.c:1081
 msgid "Press menu select or pause to continue."
 msgstr ""
 
-#: modules/control/rc.c:1312 modules/control/rc.c:1747
-#: modules/control/rc.c:1817 modules/control/rc.c:1986
-#: modules/control/rc.c:2085
+#: modules/control/rc.c:1319 modules/control/rc.c:1798
+#: modules/control/rc.c:1868 modules/control/rc.c:2037
+#: modules/control/rc.c:2136
 msgid "Type 'menu select' or 'pause' to continue."
 msgstr ""
 
-#: modules/control/rc.c:1336
+#: modules/control/rc.c:1387
 msgid "goto is deprecated"
 msgstr ""
 
-#: modules/control/rc.c:1452
+#: modules/control/rc.c:1503
 msgid "Type 'pause' to continue."
 msgstr ""
 
-#: modules/control/rc.c:2070 modules/control/rc.c:2109
+#: modules/control/rc.c:2121 modules/control/rc.c:2160
 msgid "Please provide one of the following parameters:"
 msgstr ""
 
@@ -9116,6 +9127,7 @@ msgstr ""
 
 #: modules/control/telnet.c:77 modules/gui/macosx/open.m:178
 #: modules/gui/macosx/open.m:180 modules/gui/macosx/output.m:147
+#: modules/gui/qt4/ui/file_open.ui:1074
 #: modules/gui/wxwidgets/dialogs/open.cpp:827
 #: modules/gui/wxwidgets/dialogs/open.cpp:854
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:531 modules/stream_out/rtp.c:82
@@ -9196,26 +9208,26 @@ msgstr ""
 msgid "AVI demuxer"
 msgstr ""
 
-#: modules/demux/avi/avi.c:557
+#: modules/demux/avi/avi.c:583
 msgid "AVI Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:558
+#: modules/demux/avi/avi.c:584
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to repair it (this might take a long time) ?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:561
+#: modules/demux/avi/avi.c:587
 #, fuzzy
 msgid "Repair"
 msgstr "נפאלית"
 
-#: modules/demux/avi/avi.c:561
+#: modules/demux/avi/avi.c:587
 msgid "Don't repair"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2278 modules/demux/avi/avi.c:2301
+#: modules/demux/avi/avi.c:2322 modules/demux/avi/avi.c:2345
 msgid "Fixing AVI Index..."
 msgstr ""
 
@@ -9782,16 +9794,16 @@ msgstr ""
 msgid "MPEG Transport Stream demuxer"
 msgstr ""
 
-#: modules/demux/ts.c:3144 modules/demux/ts.c:3178
+#: modules/demux/ts.c:3146 modules/demux/ts.c:3180
 #, fuzzy
 msgid "clean effects"
 msgstr "אפקט אוזניות"
 
-#: modules/demux/ts.c:3148 modules/demux/ts.c:3182
+#: modules/demux/ts.c:3150 modules/demux/ts.c:3184
 msgid "hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3152 modules/demux/ts.c:3186
+#: modules/demux/ts.c:3154 modules/demux/ts.c:3188
 msgid "visual impaired commentary"
 msgstr ""
 
@@ -9829,7 +9841,9 @@ msgstr "האם לפתוח גם את הקבצים מכל תתי התיקיות?"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
-#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:675
+#: modules/gui/macosx/open.m:784 modules/gui/qt4/ui/file_open.ui:231
+#: modules/gui/qt4/ui/file_open.ui:517 modules/gui/qt4/ui/file_open.ui:620
+#: modules/gui/wxwidgets/interface.cpp:675
 #: modules/gui/wxwidgets/interface.cpp:686 modules/gui/wxwidgets/menus.cpp:351
 #: modules/gui/wxwidgets/menus.cpp:407
 msgid "Open"
@@ -9851,7 +9865,7 @@ msgstr "הודעות"
 #: modules/gui/beos/InterfaceWindow.cpp:265
 #: modules/gui/beos/PlayListWindow.cpp:87 modules/gui/macosx/open.m:439
 #: modules/gui/macosx/open.m:737 modules/gui/macosx/open.m:783
-#: modules/gui/wxwidgets/dialogs.cpp:430
+#: modules/gui/wxwidgets/dialogs.cpp:434
 #: modules/gui/wxwidgets/dialogs/open.cpp:1259
 msgid "Open File"
 msgstr "פתח קובץ"
@@ -10381,7 +10395,7 @@ msgid ""
 "can be set in the Preferences, Video / Filters section."
 msgstr ""
 
-#: modules/gui/macosx/fspanel.m:297
+#: modules/gui/macosx/fspanel.m:288
 #, fuzzy
 msgid "(no item is being played)"
 msgstr "אין פריטים ברשימת ההשמעה"
@@ -10425,7 +10439,7 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:489 modules/gui/macosx/intf.m:1030
 #: modules/gui/macosx/intf.m:1351 modules/gui/pda/pda_interface.c:212
-#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:105
+#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:108
 #: modules/gui/qt4/ui/main_interface.ui:24
 msgid "VLC media player"
 msgstr "נגן המדיה VLC"
@@ -10703,6 +10717,7 @@ msgid "DVD"
 msgstr "DVD"
 
 #: modules/gui/macosx/open.m:179 modules/gui/macosx/output.m:146
+#: modules/gui/qt4/ui/file_open.ui:1094
 #: modules/gui/wxwidgets/dialogs/open.cpp:846
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:520
 msgid "Address"
@@ -10736,14 +10751,14 @@ msgstr "הגדרות..."
 msgid "Override parametters"
 msgstr ""
 
-#: modules/gui/macosx/open.m:244 modules/gui/qt4/ui/file_open.ui:130
+#: modules/gui/macosx/open.m:244
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:218
 #: modules/stream_out/bridge.c:41 modules/stream_out/display.c:41
 #: modules/video_filter/mosaic.c:149
 msgid "Delay"
 msgstr ""
 
-#: modules/gui/macosx/open.m:246 modules/gui/qt4/ui/file_open.ui:117
+#: modules/gui/macosx/open.m:246
 msgid "FPS"
 msgstr ""
 
@@ -10751,7 +10766,7 @@ msgstr ""
 msgid "Subtitles encoding"
 msgstr "קידוד כתוביות"
 
-#: modules/gui/macosx/open.m:250 modules/gui/qt4/ui/file_open.ui:140
+#: modules/gui/macosx/open.m:250
 msgid "Font size"
 msgstr "גודל גופן"
 
@@ -11032,7 +11047,7 @@ msgid "Some options are hidden. Check \"Advanced\" to display them."
 msgstr ""
 
 #: modules/gui/macosx/prefs_widgets.m:1222
-#: modules/gui/wxwidgets/dialogs.cpp:474
+#: modules/gui/wxwidgets/dialogs.cpp:478
 msgid "Select a directory"
 msgstr "בחרו תיקייה"
 
@@ -11803,7 +11818,7 @@ msgstr "שם קובץ"
 msgid "Permissions"
 msgstr "הרשאות"
 
-#: modules/gui/pda/pda.c:232
+#: modules/gui/pda/pda.c:232 modules/gui/qt4/ui/file_open.ui:322
 msgid "Size"
 msgstr "גודל"
 
@@ -12266,33 +12281,207 @@ msgstr "מידע נוסף"
 msgid "Qt interface"
 msgstr "הצג ממשק"
 
-#: modules/gui/qt4/ui/file_open.ui:16 modules/gui/qt4/ui/input_stats.ui:16
-#, fuzzy
-msgid "Form"
-msgstr "רגיל"
+#: modules/gui/qt4/ui/file_open.ui:43
+msgid "Personnalize"
+msgstr ""
 
-#: modules/gui/qt4/ui/file_open.ui:46 modules/gui/qt4/ui/file_open.ui:88
+#: modules/gui/qt4/ui/file_open.ui:104
+#: modules/gui/wxwidgets/dialogs/open.cpp:454
+msgid "Caching"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:285 modules/gui/qt4/ui/file_open.ui:571
+#: modules/gui/qt4/ui/file_open.ui:677 modules/gui/qt4/ui/file_open.ui:815
 #, fuzzy
 msgid "Browse"
 msgstr "סייר..."
 
-#: modules/gui/qt4/ui/file_open.ui:55
-#: modules/gui/wxwidgets/dialogs/subtitles.cpp:73
-msgid "Subtitles file"
-msgstr "קובץ כתוביות"
+#: modules/gui/qt4/ui/file_open.ui:343
+msgid "Very Small)</string>"
+msgstr ""
 
-#: modules/gui/qt4/ui/file_open.ui:97
-#: modules/gui/wxwidgets/dialogs/open.cpp:261
-#: modules/gui/wxwidgets/dialogs/open.cpp:272
-#: modules/gui/wxwidgets/dialogs/open.cpp:417
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:217
-msgid "Advanced options"
-msgstr "אפשרויות מתקדמות"
-
-#: modules/gui/qt4/ui/file_open.ui:147
+#: modules/gui/qt4/ui/file_open.ui:347 modules/gui/qt4/ui/file_open.ui:352
+#: modules/gui/qt4/ui/file_open.ui:357 modules/gui/qt4/ui/file_open.ui:362
+#: modules/gui/qt4/ui/file_open.ui:388 modules/gui/qt4/ui/file_open.ui:442
+#: modules/gui/qt4/ui/file_open.ui:457 modules/gui/qt4/ui/file_open.ui:513
 #, fuzzy
-msgid "Justification"
-msgstr "יעד"
+msgid "text"
+msgstr "הבא"
+
+#: modules/gui/qt4/ui/file_open.ui:348 modules/misc/freetype.c:105
+#: modules/misc/win32text.c:77
+msgid "Small"
+msgstr "קטן"
+
+#: modules/gui/qt4/ui/file_open.ui:353
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
+#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
+#: modules/misc/win32text.c:77
+msgid "Normal"
+msgstr "רגיל"
+
+#: modules/gui/qt4/ui/file_open.ui:358
+msgid "Big"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:363
+msgid "Very Big"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:370 modules/gui/qt4/ui/file_open.ui:495
+#, fuzzy
+msgid "QWidget"
+msgstr "רוחב"
+
+#: modules/gui/qt4/ui/file_open.ui:370
+msgid "layoutWidget"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:371 modules/gui/qt4/ui/file_open.ui:434
+#: modules/gui/qt4/ui/file_open.ui:449 modules/gui/qt4/ui/file_open.ui:462
+#: modules/gui/qt4/ui/file_open.ui:478 modules/gui/qt4/ui/file_open.ui:496
+msgid "geometry"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:379 modules/gui/qt4/ui/file_open.ui:504
+msgid "QHBoxLayout"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:380 modules/gui/qt4/ui/file_open.ui:505
+#, fuzzy
+msgid "margin"
+msgstr "אמהרית"
+
+#: modules/gui/qt4/ui/file_open.ui:383 modules/gui/qt4/ui/file_open.ui:508
+#, fuzzy
+msgid "spacing"
+msgstr "דירוג"
+
+#: modules/gui/qt4/ui/file_open.ui:387 modules/gui/qt4/ui/file_open.ui:512
+msgid "QLabel"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:387
+msgid "alignSubLabel"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:389 modules/gui/qt4/ui/file_open.ui:514
+msgid "qrichtext"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:389 modules/gui/qt4/ui/file_open.ui:514
+msgid "1"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:389 modules/gui/qt4/ui/file_open.ui:514
+msgid "text/css"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:392
+#, fuzzy
+msgid "Alignment"
+msgstr "יישור וידאו"
+
+#: modules/gui/qt4/ui/file_open.ui:426
+msgid "Right)</string>"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:433
+msgid "QToolButton"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:433
+msgid "optionsSubButton"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:448
+#, fuzzy
+msgid "QPushButton"
+msgstr "פאשטו"
+
+#: modules/gui/qt4/ui/file_open.ui:448
+msgid "extraAudioButton"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:461
+#, fuzzy
+msgid "Line"
+msgstr "חי"
+
+#: modules/gui/qt4/ui/file_open.ui:461
+#, fuzzy
+msgid "line"
+msgstr "נקה"
+
+#: modules/gui/qt4/ui/file_open.ui:470
+#, fuzzy
+msgid "orientation"
+msgstr "מידע נוסף"
+
+#: modules/gui/qt4/ui/file_open.ui:474
+#, fuzzy
+msgid "QGroupBox"
+msgstr "קבוצה"
+
+#: modules/gui/qt4/ui/file_open.ui:474
+msgid "audioGroupBox"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:475
+#, fuzzy
+msgid "enabled"
+msgstr "כבלים"
+
+#: modules/gui/qt4/ui/file_open.ui:487
+#, fuzzy
+msgid "Extra Audio File"
+msgstr "קצב סיביות השמע"
+
+#: modules/gui/qt4/ui/file_open.ui:489
+msgid "checkable"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:492
+msgid "checked"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:495
+#, fuzzy
+msgid "horizontalLayout_3"
+msgstr "הפוך אופקית"
+
+#: modules/gui/qt4/ui/file_open.ui:512
+msgid "audioOpenLabel"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:588
+#, fuzzy
+msgid "Media File"
+msgstr "מדיטטיבי"
+
+#: modules/gui/qt4/ui/file_open.ui:687
+#, fuzzy
+msgid "Disk"
+msgstr "תקליטור"
+
+#: modules/gui/qt4/ui/file_open.ui:699
+#, fuzzy
+msgid "Disc Type"
+msgstr "סוג תקליטור"
+
+#: modules/gui/qt4/ui/file_open.ui:780
+#: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
+msgid "Options"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:801
+msgid "Peripheric Path"
+msgstr ""
+
+#: modules/gui/qt4/ui/input_stats.ui:16
+#, fuzzy
+msgid "Form"
+msgstr "רגיל"
 
 #: modules/gui/qt4/ui/input_stats.ui:298
 #, fuzzy
@@ -12553,9 +12742,24 @@ msgstr ""
 msgid "Input has changed "
 msgstr "הקלט השתנה "
 
-#: modules/gui/wxwidgets/dialogs.cpp:433
+#: modules/gui/wxwidgets/dialogs.cpp:437
 #: modules/gui/wxwidgets/dialogs/open.cpp:1262
 msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:439
+#: modules/gui/wxwidgets/dialogs/open.cpp:1264
+msgid "|Video Files (*.avi, *.mpg, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:440
+#: modules/gui/wxwidgets/dialogs/open.cpp:1265
+msgid "|Playlist Files (*.m3u, *.pls, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:441
+#: modules/gui/wxwidgets/dialogs/open.cpp:1266
+msgid "|Subtitle Files (*.srt, *.sub, etc.)|"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
@@ -12609,6 +12813,13 @@ msgstr "שמירת הודעות בשם..."
 msgid "Advanced options..."
 msgstr "אפשרויות מתקדמות..."
 
+#: modules/gui/wxwidgets/dialogs/open.cpp:261
+#: modules/gui/wxwidgets/dialogs/open.cpp:272
+#: modules/gui/wxwidgets/dialogs/open.cpp:417
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:217
+msgid "Advanced options"
+msgstr "אפשרויות מתקדמות"
+
 #: modules/gui/wxwidgets/dialogs/open.cpp:276
 msgid "Options:"
 msgstr "אפשרויות:"
@@ -12624,10 +12835,6 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:428
 msgid "Use VLC as a stream server"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/open.cpp:454
-msgid "Caching"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:455
@@ -12880,12 +13087,6 @@ msgstr "רשימת ההשמעה ריקה"
 msgid "Can't save"
 msgstr "לא ניתן לשמור"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
-#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
-#: modules/misc/win32text.c:77
-msgid "Normal"
-msgstr "רגיל"
-
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1418
 msgid "One level"
 msgstr ""
@@ -12959,6 +13160,10 @@ msgstr "MMSH"
 msgid "RTP"
 msgstr "RTP"
 
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
+msgid "UDP"
+msgstr "UDP"
+
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:592
 msgid "Group name"
 msgstr "שם קבוצה"
@@ -12995,9 +13200,9 @@ msgstr "שמור קובץ"
 msgid "Subtitle options"
 msgstr "אפשרויות כתוביות"
 
-#: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
-msgid "Options"
-msgstr ""
+#: modules/gui/wxwidgets/dialogs/subtitles.cpp:73
+msgid "Subtitles file"
+msgstr "קובץ כתוביות"
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:211
 msgid ""
@@ -13065,6 +13270,11 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:404
 msgid "Loop"
 msgstr ""
+
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:415
+#, fuzzy
+msgid "Create"
+msgstr "קצב פריימים"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:560
 msgid "VLM stream"
@@ -13134,6 +13344,10 @@ msgid ""
 "about it."
 msgstr ""
 
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
+msgid "Transcode audio (if available)"
+msgstr ""
+
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
 msgid ""
 "Select the target audio codec. Choose a codec to display more information "
@@ -13194,10 +13408,6 @@ msgstr "מידע נוסף"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1291
 msgid "Save to file"
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
-msgid "Transcode audio (if available)"
 msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:41
@@ -14107,10 +14317,6 @@ msgstr ""
 msgid "Smaller"
 msgstr "קטן יותר"
 
-#: modules/misc/freetype.c:105 modules/misc/win32text.c:77
-msgid "Small"
-msgstr "קטן"
-
 #: modules/misc/freetype.c:106 modules/misc/win32text.c:78
 msgid "Large"
 msgstr "גדול"
@@ -14314,10 +14520,6 @@ msgstr ""
 msgid "Growl UDP port on the server."
 msgstr ""
 
-#: modules/misc/notify/growl.c:72
-msgid "Growl"
-msgstr ""
-
 #: modules/misc/notify/growl.c:73
 msgid "Growl Notification Plugin"
 msgstr ""
@@ -14343,10 +14545,6 @@ msgstr ""
 msgid ""
 "Format of the string to send to MSN {0} Artist, {1} Title, {2} Album. "
 "Defaults to \"Artist - Title\" ({0} - {1})."
-msgstr ""
-
-#: modules/misc/notify/msn.c:70
-msgid "MSN"
 msgstr ""
 
 #: modules/misc/notify/msn.c:71
@@ -14834,7 +15032,7 @@ msgstr ""
 msgid "Copy packetizer"
 msgstr ""
 
-#: modules/packetizer/h264.c:47
+#: modules/packetizer/h264.c:48
 msgid "H.264 video packetizer"
 msgstr ""
 
@@ -14877,6 +15075,8 @@ msgid "DAAP access"
 msgstr ""
 
 #: modules/services_discovery/hal.c:130
+#: modules/services_discovery/upnp_cc.cpp:109
+#: modules/services_discovery/upnp_intel.cpp:299
 msgid "Devices"
 msgstr "התקנים"
 
@@ -15017,7 +15217,7 @@ msgstr ""
 msgid "Universal Plug'n'Play discovery"
 msgstr ""
 
-#: modules/services_discovery/upnp_intel.cpp:260
+#: modules/services_discovery/upnp_intel.cpp:261
 msgid "Universal Plug'n'Play discovery ( Intel SDK )"
 msgstr ""
 
@@ -15726,6 +15926,13 @@ msgstr "המרות MMX I420,IYUV,YV12 ל-RV15,RV16,RV24,RV32"
 #: modules/video_chroma/i422_yuy2.c:63
 msgid "Conversions from "
 msgstr "המרות מ- "
+
+#: modules/video_chroma/i420_ymga.c:48 modules/video_chroma/i420_ymga.c:51
+#: modules/video_chroma/i420_yuy2.c:75 modules/video_chroma/i420_yuy2.c:78
+#: modules/video_chroma/i420_yuy2.c:86 modules/video_chroma/i422_yuy2.c:63
+#: modules/video_chroma/i422_yuy2.c:66
+msgid " to "
+msgstr ""
 
 #: modules/video_chroma/i420_ymga.c:51 modules/video_chroma/i420_yuy2.c:78
 #: modules/video_chroma/i422_yuy2.c:66
@@ -17537,16 +17744,16 @@ msgid "Spectrum analyser"
 msgstr ""
 
 #, fuzzy
+#~ msgid "Justification"
+#~ msgstr "יעד"
+
+#, fuzzy
 #~ msgid "Audioscrobbler username"
 #~ msgstr "שם התקן שמע"
 
 #, fuzzy
 #~ msgid "Connecting..."
 #~ msgstr "הגדרות..."
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "קצב פריימים"
 
 #, fuzzy
 #~ msgid "Yes"

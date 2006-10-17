@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-09 23:28+0100\n"
+"POT-Creation-Date: 2006-10-17 10:33+0200\n"
 "PO-Revision-Date: 2006-04-16 12:14+0200\n"
 "Last-Translator: Alexander Didebulidze <didebuli@in.tum.de>\n"
 "Language-Team: Georgian <gnome@inet.ge>\n"
@@ -66,7 +66,7 @@ msgstr "VLC-ს მართვის ინტერფეისის პა�
 msgid "Hotkeys settings"
 msgstr "ცხელი ღილაკების პარამეტრები"
 
-#: include/vlc_config_cat.h:54 src/input/es_out.c:1587 src/libvlc.h:1232
+#: include/vlc_config_cat.h:54 src/input/es_out.c:1590 src/libvlc.h:1232
 #: modules/gui/beos/InterfaceWindow.cpp:282 modules/gui/macosx/extended.m:81
 #: modules/gui/macosx/intf.m:556 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:96 modules/gui/macosx/wizard.m:421
@@ -121,7 +121,7 @@ msgstr "სხვადასხვა"
 msgid "Miscellaneous audio settings and modules."
 msgstr "სხვადასხვა აუდიო პარამეტრები და მოდულები."
 
-#: include/vlc_config_cat.h:75 src/input/es_out.c:1615 src/libvlc.h:1267
+#: include/vlc_config_cat.h:75 src/input/es_out.c:1618 src/libvlc.h:1267
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:569
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:86
 #: modules/gui/macosx/wizard.m:422 modules/gui/qt4/ui/input_stats.ui:335
@@ -379,6 +379,7 @@ msgstr "სხვა დამატებითი პარამეტრე�
 
 #: include/vlc_config_cat.h:203 modules/gui/macosx/open.m:162
 #: modules/gui/macosx/open.m:379 modules/gui/pda/pda_interface.c:548
+#: modules/gui/qt4/ui/file_open.ui:890
 #: modules/gui/wxwidgets/dialogs/open.cpp:503
 msgid "Network"
 msgstr "ქსელი"
@@ -560,11 +561,12 @@ msgid "Setting"
 msgstr "პარამეტრი"
 
 #: include/vlc_meta.h:39 modules/gui/macosx/open.m:181
+#: modules/gui/qt4/ui/file_open.ui:965 modules/gui/qt4/ui/file_open.ui:1043
 #: modules/gui/wxwidgets/dialogs/open.cpp:871
 msgid "URL"
 msgstr "URL"
 
-#: include/vlc_meta.h:40 src/input/es_out.c:1579 src/libvlc.h:97
+#: include/vlc_meta.h:40 src/input/es_out.c:1582 src/libvlc.h:97
 #: modules/gui/beos/InterfaceWindow.cpp:278
 msgid "Language"
 msgstr "ენა"
@@ -662,9 +664,10 @@ msgstr "სტერეო"
 #: src/audio_output/output.c:107 src/audio_output/output.c:143
 #: src/libvlc.h:268 modules/audio_filter/channel_mixer/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
-#: modules/control/gestures.c:86 modules/video_filter/logo.c:97
-#: modules/video_filter/marq.c:130 modules/video_filter/mosaic.c:181
-#: modules/video_filter/osdmenu.c:78 modules/video_filter/rss.c:160
+#: modules/control/gestures.c:86 modules/gui/qt4/ui/file_open.ui:416
+#: modules/video_filter/logo.c:97 modules/video_filter/marq.c:130
+#: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:78
+#: modules/video_filter/rss.c:160
 msgid "Left"
 msgstr "მარცხენა"
 
@@ -787,83 +790,83 @@ msgstr "კვალი %i"
 msgid "Program"
 msgstr "პროგრამა"
 
-#: src/input/es_out.c:1574 modules/codec/faad.c:329
+#: src/input/es_out.c:1577 modules/codec/faad.c:329
 #, c-format
 msgid "Stream %d"
 msgstr "ნაკადი %d"
 
-#: src/input/es_out.c:1576 modules/gui/macosx/wizard.m:426
+#: src/input/es_out.c:1579 modules/gui/macosx/wizard.m:426
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:834
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:874
 msgid "Codec"
 msgstr "კოდეკი"
 
-#: src/input/es_out.c:1587 src/input/es_out.c:1615 src/input/es_out.c:1642
+#: src/input/es_out.c:1590 src/input/es_out.c:1618 src/input/es_out.c:1645
 #: modules/gui/macosx/output.m:153
 msgid "Type"
 msgstr "ტიპი"
 
-#: src/input/es_out.c:1590 modules/codec/faad.c:333
+#: src/input/es_out.c:1593 modules/codec/faad.c:333
 #: modules/gui/macosx/output.m:176
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:857
 msgid "Channels"
 msgstr "არხი"
 
-#: src/input/es_out.c:1595 modules/codec/faad.c:335
+#: src/input/es_out.c:1598 modules/codec/faad.c:335
 #, fuzzy
 msgid "Sample rate"
 msgstr "ნიმუში"
 
-#: src/input/es_out.c:1596 modules/codec/faad.c:335
+#: src/input/es_out.c:1599 modules/codec/faad.c:335
 #, c-format
 msgid "%d Hz"
 msgstr "%d Hz"
 
-#: src/input/es_out.c:1602
+#: src/input/es_out.c:1605
 msgid "Bits per sample"
 msgstr ""
 
-#: src/input/es_out.c:1607 modules/access_output/shout.c:86
+#: src/input/es_out.c:1610 modules/access_output/shout.c:86
 #: modules/access/pvr.c:84
 msgid "Bitrate"
 msgstr ""
 
-#: src/input/es_out.c:1608
+#: src/input/es_out.c:1611
 #, c-format
 msgid "%d kb/s"
 msgstr "%d kb/s"
 
-#: src/input/es_out.c:1619
+#: src/input/es_out.c:1622
 #, fuzzy
 msgid "Resolution"
 msgstr "გარჩევადობა"
 
-#: src/input/es_out.c:1625
+#: src/input/es_out.c:1628
 msgid "Display resolution"
 msgstr "ეკრანის გარჩევადობა"
 
-#: src/input/es_out.c:1635 modules/access/screen/screen.c:41
+#: src/input/es_out.c:1638 modules/access/screen/screen.c:41
 msgid "Frame rate"
 msgstr "კადრი წამში"
 
-#: src/input/es_out.c:1642
+#: src/input/es_out.c:1645
 msgid "Subtitle"
 msgstr "ტიტრები"
 
-#: src/input/input.c:2056
+#: src/input/input.c:2055
 msgid "Your input can't be opened"
 msgstr ""
 
-#: src/input/input.c:2057
+#: src/input/input.c:2056
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/input.c:2132
+#: src/input/input.c:2131
 msgid "Can't recognize the input's format"
 msgstr ""
 
-#: src/input/input.c:2133
+#: src/input/input.c:2132
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -878,7 +881,8 @@ msgstr "პროგრამები"
 
 #: src/input/var.c:143 modules/gui/beos/MediaControlView.cpp:1236
 #: modules/gui/macosx/intf.m:553 modules/gui/macosx/intf.m:554
-#: modules/gui/macosx/open.m:169 modules/gui/wxwidgets/dialogs/open.cpp:762
+#: modules/gui/macosx/open.m:169 modules/gui/qt4/ui/file_open.ui:835
+#: modules/gui/wxwidgets/dialogs/open.cpp:762
 msgid "Chapter"
 msgstr "თავი"
 
@@ -931,7 +935,7 @@ msgid "Previous chapter"
 msgstr "წინა თავი"
 
 #: src/interface/interaction.c:275 src/interface/interaction.c:371
-#: modules/demux/avi/avi.c:561 modules/gui/beos/InterfaceWindow.cpp:159
+#: modules/demux/avi/avi.c:587 modules/gui/beos/InterfaceWindow.cpp:159
 #: modules/gui/macosx/bookmarks.m:107 modules/gui/macosx/controls.m:58
 #: modules/gui/macosx/interaction.m:128 modules/gui/macosx/interaction.m:132
 #: modules/gui/macosx/interaction.m:135 modules/gui/macosx/open.m:158
@@ -1100,6 +1104,10 @@ msgstr "ქართული"
 #: src/libvlc.h:41 src/misc/iso-639_def.h:111
 msgid "Korean"
 msgstr "კორეული"
+
+#: src/libvlc.h:41 src/misc/iso-639_def.h:125
+msgid "Malay"
+msgstr "მალაიზიური"
 
 #: src/libvlc.h:41 src/misc/iso-639_def.h:69
 msgid "Dutch"
@@ -1509,9 +1517,9 @@ msgstr ""
 
 #: src/libvlc.h:268 modules/audio_filter/channel_mixer/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
-#: modules/video_filter/logo.c:97 modules/video_filter/marq.c:130
-#: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:78
-#: modules/video_filter/rss.c:160
+#: modules/gui/qt4/ui/file_open.ui:421 modules/video_filter/logo.c:97
+#: modules/video_filter/marq.c:130 modules/video_filter/mosaic.c:181
+#: modules/video_filter/osdmenu.c:78 modules/video_filter/rss.c:160
 msgid "Center"
 msgstr "ცენტრში"
 
@@ -3625,6 +3633,7 @@ msgstr ""
 
 #: src/libvlc.h:1355 modules/codec/subsdec.c:144 modules/demux/subtitle.c:66
 #: modules/gui/beos/InterfaceWindow.cpp:279
+#: modules/gui/qt4/ui/file_open.ui:201 modules/gui/qt4/ui/file_open.ui:845
 msgid "Subtitles"
 msgstr "ტიტრები"
 
@@ -4076,10 +4085,6 @@ msgstr "მაორი"
 #: src/misc/iso-639_def.h:124
 msgid "Marathi"
 msgstr "მარათჰი"
-
-#: src/misc/iso-639_def.h:125
-msgid "Malay"
-msgstr "მალაიზიური"
 
 #: src/misc/iso-639_def.h:126
 msgid "Malagasy"
@@ -5368,7 +5373,7 @@ msgid ""
 "The default method is: key."
 msgstr ""
 
-#: modules/access/dvdread.c:85
+#: modules/access/dvdread.c:85 modules/gui/qt4/ui/file_open.ui:486
 msgid "title"
 msgstr "სათაური"
 
@@ -5472,8 +5477,7 @@ msgstr "ფაილი"
 #: modules/gui/beos/PlayListWindow.cpp:85 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/open.m:371 modules/gui/macosx/output.m:142
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
-#: modules/gui/pda/pda_interface.c:366 modules/gui/qt4/ui/file_open.ui:36
-#: modules/gui/qt4/ui/file_open.ui:78
+#: modules/gui/pda/pda_interface.c:366 modules/gui/qt4/ui/file_open.ui:176
 #: modules/gui/wxwidgets/dialogs/open.cpp:499
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:471
 msgid "File"
@@ -5794,11 +5798,6 @@ msgstr ""
 msgid "HTTP stream output"
 msgstr "HTTP"
 
-#: modules/access_output/http.c:93 modules/control/http/http.c:61
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
-msgid "HTTP"
-msgstr "HTTP"
-
 #: modules/access_output/shout.c:58
 #, fuzzy
 msgid "Stream name"
@@ -5948,11 +5947,6 @@ msgstr "-სკენ -სკენ დუიმი -სკენ."
 #: modules/access_output/udp.c:97
 #, fuzzy
 msgid "UDP stream output"
-msgstr "UDP"
-
-#: modules/access_output/udp.c:98
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
-msgid "UDP"
 msgstr "UDP"
 
 #: modules/access/pvr.c:49
@@ -6298,7 +6292,7 @@ msgid ""
 "Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
 msgstr ""
 
-#: modules/access/v4l.c:100
+#: modules/access/v4l.c:100 modules/gui/qt4/ui/file_open.ui:825
 msgid "Audio Channel"
 msgstr "აუდიო არხი"
 
@@ -7579,7 +7573,7 @@ msgstr ""
 msgid "FFmpeg chroma conversion"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.c:131 modules/gui/qt4/ui/file_open.ui:157
+#: modules/codec/ffmpeg/ffmpeg.c:131
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:97
 msgid "Encoding"
 msgstr "კოდირება"
@@ -9080,6 +9074,11 @@ msgstr ""
 msgid "HTTP interace Certificates Revocation List file."
 msgstr "HTTP სერთიფიკატები სია ფაილი."
 
+#: modules/control/http/http.c:61
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
+msgid "HTTP"
+msgstr "HTTP"
+
 #: modules/control/http/http.c:62
 #, fuzzy
 msgid "HTTP remote control interface"
@@ -9093,12 +9092,16 @@ msgstr "HTTP SSL"
 msgid "Infrared remote control interface"
 msgstr ""
 
-#: modules/control/motion.c:62
+#: modules/control/motion.c:59
+msgid "Use the rotate video filter instead of transform"
+msgstr ""
+
+#: modules/control/motion.c:65
 #, fuzzy
 msgid "motion"
 msgstr "პოზიცია"
 
-#: modules/control/motion.c:64
+#: modules/control/motion.c:67
 #, fuzzy
 msgid "motion control interface"
 msgstr "დაშორებული კონტროლის ინტერფეისი"
@@ -9250,399 +9253,407 @@ msgstr "დაშორებული კონტროლის ინტე�
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr "დაშორებული ტიპი დახმარება დახმარება."
 
-#: modules/control/rc.c:847
+#: modules/control/rc.c:851
 #, fuzzy, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr "უცნობი ტიპი დახმარება დახმარება."
 
-#: modules/control/rc.c:880
-msgid "+----[ Remote control commands ]"
-msgstr ""
-
-#: modules/control/rc.c:882
-#, fuzzy
-msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
-msgstr "დამატება დამატება -სკენ სია"
-
-#: modules/control/rc.c:883
-#, fuzzy
-msgid "| enqueue XYZ  . . . . . . . queue XYZ to playlist"
-msgstr "დამატება დამატება -სკენ სია"
-
 #: modules/control/rc.c:884
-#, fuzzy
-msgid "| playlist . . .  show items currently in playlist"
-msgstr "სია დუიმი სია"
-
-#: modules/control/rc.c:885
-msgid "| play . . . . . . . . . . . . . . . . play stream"
+msgid "+----[ Remote control commands ]"
 msgstr ""
 
 #: modules/control/rc.c:886
 #, fuzzy
+msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
+msgstr "დამატება დამატება -სკენ სია"
+
+#: modules/control/rc.c:887
+#, fuzzy
+msgid "| enqueue XYZ  . . . . . . . queue XYZ to playlist"
+msgstr "დამატება დამატება -სკენ სია"
+
+#: modules/control/rc.c:888
+#, fuzzy
+msgid "| playlist . . .  show items currently in playlist"
+msgstr "სია დუიმი სია"
+
+#: modules/control/rc.c:889
+msgid "| play . . . . . . . . . . . . . . . . play stream"
+msgstr ""
+
+#: modules/control/rc.c:890
+#, fuzzy
 msgid "| stop . . . . . . . . . . . . . . . . stop stream"
 msgstr "შეჩერება შეჩერება"
 
-#: modules/control/rc.c:887
+#: modules/control/rc.c:891
 #, fuzzy
 msgid "| next . . . . . . . . . . . .  next playlist item"
 msgstr "სია"
 
-#: modules/control/rc.c:888
+#: modules/control/rc.c:892
 #, fuzzy
 msgid "| prev . . . . . . . . . .  previous playlist item"
 msgstr "სია"
 
-#: modules/control/rc.c:889
+#: modules/control/rc.c:893
 #, fuzzy
 msgid "| goto . . . . . . . . . . . .  goto item at index"
 msgstr "ინდექსი"
 
-#: modules/control/rc.c:890
+#: modules/control/rc.c:894
+msgid "| repeat [on|off] . .  toggle playlist item repeat"
+msgstr ""
+
+#: modules/control/rc.c:895
+msgid "| loop [on|off] . . . .  toggle playlist item loop"
+msgstr ""
+
+#: modules/control/rc.c:896
 #, fuzzy
 msgid "| clear . . . . . . . . . . .   clear the playlist"
 msgstr "გასუფთავება გასუფთავება სია"
 
-#: modules/control/rc.c:891
+#: modules/control/rc.c:897
 #, fuzzy
 msgid "| status . . . . . . . . . current playlist status"
 msgstr "სია"
 
-#: modules/control/rc.c:892
+#: modules/control/rc.c:898
 #, fuzzy
 msgid "| title [X]  . . . . set/get title in current item"
 msgstr "სათაური X სათაური დუიმი"
 
-#: modules/control/rc.c:893
+#: modules/control/rc.c:899
 #, fuzzy
 msgid "| title_n  . . . . . .  next title in current item"
 msgstr "სათაური n სათაური დუიმი"
 
-#: modules/control/rc.c:894
+#: modules/control/rc.c:900
 #, fuzzy
 msgid "| title_p  . . . .  previous title in current item"
 msgstr "სათაური სათაური დუიმი"
 
-#: modules/control/rc.c:895
+#: modules/control/rc.c:901
 #, fuzzy
 msgid "| chapter [X]  . . set/get chapter in current item"
 msgstr "X დუიმი"
 
-#: modules/control/rc.c:896
+#: modules/control/rc.c:902
 #, fuzzy
 msgid "| chapter_n  . . . .  next chapter in current item"
 msgstr "n დუიმი"
 
-#: modules/control/rc.c:897
+#: modules/control/rc.c:903
 #, fuzzy
 msgid "| chapter_p  . .  previous chapter in current item"
 msgstr "დუიმი"
 
-#: modules/control/rc.c:899
+#: modules/control/rc.c:905
 #, fuzzy
 msgid "| seek X . seek in seconds, for instance `seek 12'"
 msgstr "X დუიმი წამი"
 
-#: modules/control/rc.c:900
-msgid "| pause  . . . . . . . . . . . . . .  toggle pause"
-msgstr ""
-
-#: modules/control/rc.c:901
-#, fuzzy
-msgid "| fastforward  . . . . . .  .  set to maximum rate"
-msgstr "-სკენ"
-
-#: modules/control/rc.c:902
-#, fuzzy
-msgid "| rewind  . . . . . . . . . .  set to minimum rate"
-msgstr "-სკენ"
-
-#: modules/control/rc.c:903
-#, fuzzy
-msgid "| faster . . . . . . . .  faster playing of stream"
-msgstr "ის"
-
-#: modules/control/rc.c:904
-#, fuzzy
-msgid "| slower . . . . . . . .  slower playing of stream"
-msgstr "ის"
-
-#: modules/control/rc.c:905
-#, fuzzy
-msgid "| normal . . . . . . . .  normal playing of stream"
-msgstr "ის"
-
 #: modules/control/rc.c:906
-msgid "| f [on|off] . . . . . . . . . . toggle fullscreen"
+msgid "| pause  . . . . . . . . . . . . . .  toggle pause"
 msgstr ""
 
 #: modules/control/rc.c:907
 #, fuzzy
+msgid "| fastforward  . . . . . .  .  set to maximum rate"
+msgstr "-სკენ"
+
+#: modules/control/rc.c:908
+#, fuzzy
+msgid "| rewind  . . . . . . . . . .  set to minimum rate"
+msgstr "-სკენ"
+
+#: modules/control/rc.c:909
+#, fuzzy
+msgid "| faster . . . . . . . .  faster playing of stream"
+msgstr "ის"
+
+#: modules/control/rc.c:910
+#, fuzzy
+msgid "| slower . . . . . . . .  slower playing of stream"
+msgstr "ის"
+
+#: modules/control/rc.c:911
+#, fuzzy
+msgid "| normal . . . . . . . .  normal playing of stream"
+msgstr "ის"
+
+#: modules/control/rc.c:912
+msgid "| f [on|off] . . . . . . . . . . toggle fullscreen"
+msgstr ""
+
+#: modules/control/rc.c:913
+#, fuzzy
 msgid "| info . . .  information about the current stream"
 msgstr "შესახებ"
 
-#: modules/control/rc.c:908
+#: modules/control/rc.c:914
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr ""
 
-#: modules/control/rc.c:909
+#: modules/control/rc.c:915
 msgid "| is_playing . .  1 if a stream plays, 0 otherwise"
 msgstr ""
 
-#: modules/control/rc.c:910
+#: modules/control/rc.c:916
 #, fuzzy
 msgid "| get_title . . .  the title of the current stream"
 msgstr "სათაური X სათაური დუიმი"
 
-#: modules/control/rc.c:911
+#: modules/control/rc.c:917
 #, fuzzy
 msgid "| get_length . .  the length of the current stream"
 msgstr "შესახებ"
 
-#: modules/control/rc.c:913
+#: modules/control/rc.c:919
 #, fuzzy
 msgid "| volume [X] . . . . . . . .  set/get audio volume"
 msgstr "ხმის სიმაღლე X აუდიო ხმის სიმაღლე"
 
-#: modules/control/rc.c:914
+#: modules/control/rc.c:920
 #, fuzzy
 msgid "| volup [X]  . . . . .  raise audio volume X steps"
 msgstr "X აუდიო ხმის სიმაღლე X"
 
-#: modules/control/rc.c:915
+#: modules/control/rc.c:921
 #, fuzzy
 msgid "| voldown [X]  . . . .  lower audio volume X steps"
 msgstr "X აუდიო ხმის სიმაღლე X"
 
-#: modules/control/rc.c:916
+#: modules/control/rc.c:922
 #, fuzzy
 msgid "| adev [X] . . . . . . . . .  set/get audio device"
 msgstr "X აუდიო"
 
-#: modules/control/rc.c:917
+#: modules/control/rc.c:923
 #, fuzzy
 msgid "| achan [X]. . . . . . . .  set/get audio channels"
 msgstr "X აუდიო"
 
-#: modules/control/rc.c:918
+#: modules/control/rc.c:924
 #, fuzzy
 msgid "| atrack [X] . . . . . . . . . set/get audio track"
 msgstr "X აუდიო"
 
-#: modules/control/rc.c:919
+#: modules/control/rc.c:925
 #, fuzzy
 msgid "| vtrack [X] . . . . . . . . . set/get video track"
 msgstr "X აუდიო"
 
-#: modules/control/rc.c:920
+#: modules/control/rc.c:926
 #, fuzzy
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
 msgstr "X აუდიო"
 
-#: modules/control/rc.c:921
+#: modules/control/rc.c:927
 #, fuzzy
 msgid "| vcrop [X]  . . . . . . . . .  set/get video crop"
 msgstr "X აუდიო"
 
-#: modules/control/rc.c:922
+#: modules/control/rc.c:928
 #, fuzzy
 msgid "| vzoom [X]  . . . . . . . . .  set/get video zoom"
 msgstr "ხმის სიმაღლე X აუდიო ხმის სიმაღლე"
 
-#: modules/control/rc.c:923
+#: modules/control/rc.c:929
 #, fuzzy
 msgid "| strack [X] . . . . . . . set/get subtitles track"
 msgstr "X აუდიო"
 
-#: modules/control/rc.c:924
+#: modules/control/rc.c:930
 #, fuzzy
 msgid "| menu [on|off|up|down|left|right|select] use menu"
 msgstr "მენიუ მარცხენა მარჯვენა მენიუ"
 
-#: modules/control/rc.c:929
+#: modules/control/rc.c:935
 #, fuzzy
 msgid "| marq-marquee STRING  . . overlay STRING in video"
 msgstr "სტრინგი სტრინგი დუიმი ვიდეო"
 
-#: modules/control/rc.c:930
+#: modules/control/rc.c:936
 #, fuzzy
 msgid "| marq-x X . . . . . . . . . . . .offset from left"
 msgstr "X მარცხენა"
 
-#: modules/control/rc.c:931
+#: modules/control/rc.c:937
 #, fuzzy
 msgid "| marq-y Y . . . . . . . . . . . . offset from top"
 msgstr "დ Y ზემოთ"
 
-#: modules/control/rc.c:932
+#: modules/control/rc.c:938
 msgid "| marq-position #. . .  .relative position control"
 msgstr ""
 
-#: modules/control/rc.c:933
+#: modules/control/rc.c:939
 #, fuzzy
 msgid "| marq-color # . . . . . . . . . . font color, RGB"
 msgstr "RGB"
 
-#: modules/control/rc.c:934
+#: modules/control/rc.c:940
 msgid "| marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr ""
 
-#: modules/control/rc.c:935
+#: modules/control/rc.c:941
 #, fuzzy
 msgid "| marq-timeout T. . . . . . . . . . timeout, in ms"
 msgstr "დუიმი მწ"
 
-#: modules/control/rc.c:936
+#: modules/control/rc.c:942
 #, fuzzy
 msgid "| marq-size # . . . . . . . . font size, in pixels"
 msgstr "სიდიდე სიდიდე დუიმი პიქსელი"
 
-#: modules/control/rc.c:938
+#: modules/control/rc.c:944
 #, fuzzy
 msgid "| logo-file STRING . . .the overlay file path/name"
 msgstr "ფაილი სტრინგი ფაილი"
 
-#: modules/control/rc.c:939
+#: modules/control/rc.c:945
 #, fuzzy
 msgid "| logo-x X . . . . . . . . . . . .offset from left"
 msgstr "X მარცხენა"
 
-#: modules/control/rc.c:940
+#: modules/control/rc.c:946
 #, fuzzy
 msgid "| logo-y Y . . . . . . . . . . . . offset from top"
 msgstr "დ Y ზემოთ"
 
-#: modules/control/rc.c:941
+#: modules/control/rc.c:947
 msgid "| logo-position #. . . . . . . . relative position"
 msgstr ""
 
-#: modules/control/rc.c:942
+#: modules/control/rc.c:948
 #, fuzzy
 msgid "| logo-transparency #. . . . . . . . .transparency"
 msgstr "გამჭირვალობა გამჭირვალობა"
 
-#: modules/control/rc.c:944
-msgid "| mosaic-alpha # . . . . . . . . . . . . . . alpha"
-msgstr ""
-
-#: modules/control/rc.c:945
-#, fuzzy
-msgid "| mosaic-height #. . . . . . . . . . . . . .height"
-msgstr "სიმაღლე სიმაღლე"
-
-#: modules/control/rc.c:946
-#, fuzzy
-msgid "| mosaic-width # . . . . . . . . . . . . . . width"
-msgstr "სიგანე სიგანე"
-
-#: modules/control/rc.c:947
-#, fuzzy
-msgid "| mosaic-xoffset # . . . .top left corner position"
-msgstr "ზემოთ მარცხენა"
-
-#: modules/control/rc.c:948
-#, fuzzy
-msgid "| mosaic-yoffset # . . . .top left corner position"
-msgstr "ზემოთ მარცხენა"
-
-#: modules/control/rc.c:949
-#, fuzzy
-msgid "| mosaic-offsets x,y(,x,y)*. . . . list of offsets"
-msgstr "ზემოთ მარცხენა"
-
 #: modules/control/rc.c:950
-msgid "| mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
+msgid "| mosaic-alpha # . . . . . . . . . . . . . . alpha"
 msgstr ""
 
 #: modules/control/rc.c:951
 #, fuzzy
+msgid "| mosaic-height #. . . . . . . . . . . . . .height"
+msgstr "სიმაღლე სიმაღლე"
+
+#: modules/control/rc.c:952
+#, fuzzy
+msgid "| mosaic-width # . . . . . . . . . . . . . . width"
+msgstr "სიგანე სიგანე"
+
+#: modules/control/rc.c:953
+#, fuzzy
+msgid "| mosaic-xoffset # . . . .top left corner position"
+msgstr "ზემოთ მარცხენა"
+
+#: modules/control/rc.c:954
+#, fuzzy
+msgid "| mosaic-yoffset # . . . .top left corner position"
+msgstr "ზემოთ მარცხენა"
+
+#: modules/control/rc.c:955
+#, fuzzy
+msgid "| mosaic-offsets x,y(,x,y)*. . . . list of offsets"
+msgstr "ზემოთ მარცხენა"
+
+#: modules/control/rc.c:956
+msgid "| mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
+msgstr ""
+
+#: modules/control/rc.c:957
+#, fuzzy
 msgid "| mosaic-vborder # . . . . . . . . vertical border"
 msgstr "ვერტიკალური"
 
-#: modules/control/rc.c:952
+#: modules/control/rc.c:958
 #, fuzzy
 msgid "| mosaic-hborder # . . . . . . . horizontal border"
 msgstr "ჰორიზონტალური"
 
-#: modules/control/rc.c:953
+#: modules/control/rc.c:959
 #, fuzzy
 msgid "| mosaic-position {0=auto,1=fixed} . . . .position"
 msgstr "auto"
 
-#: modules/control/rc.c:954
+#: modules/control/rc.c:960
 #, fuzzy
 msgid "| mosaic-rows #. . . . . . . . . . .number of rows"
 msgstr "ხაზი რიცხვი ის ხაზი"
 
-#: modules/control/rc.c:955
+#: modules/control/rc.c:961
 #, fuzzy
 msgid "| mosaic-cols #. . . . . . . . . . .number of cols"
 msgstr "რიცხვი ის"
 
-#: modules/control/rc.c:956
+#: modules/control/rc.c:962
 #, fuzzy
 msgid "| mosaic-order id(,id)* . . . . order of pictures "
 msgstr "ჰორიზონტალური"
 
-#: modules/control/rc.c:957
+#: modules/control/rc.c:963
 msgid "| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 msgstr ""
 
-#: modules/control/rc.c:959
+#: modules/control/rc.c:965
 #, fuzzy
 msgid ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
 msgstr "n წყარო"
 
-#: modules/control/rc.c:963
+#: modules/control/rc.c:969
 #, fuzzy
 msgid "| help . . . . . . . . . . . . . this help message"
 msgstr "დახმარება დახმარება"
 
-#: modules/control/rc.c:964
+#: modules/control/rc.c:970
 #, fuzzy
 msgid "| longhelp . . . . . . . . . a longer help message"
 msgstr "a დახმარება"
 
-#: modules/control/rc.c:965
+#: modules/control/rc.c:971
 #, fuzzy
 msgid "| logout . . . . .  exit (if in socket connection)"
 msgstr "დუიმი"
 
-#: modules/control/rc.c:966
+#: modules/control/rc.c:972
 #, fuzzy
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr "დასრულება დასრულება"
 
-#: modules/control/rc.c:968
+#: modules/control/rc.c:974
 #, fuzzy
 msgid "+----[ end of help ]"
 msgstr "ის დახმარება"
 
-#: modules/control/rc.c:1075
+#: modules/control/rc.c:1081
 #, fuzzy
 msgid "Press menu select or pause to continue."
 msgstr "მენიუ -სკენ."
 
-#: modules/control/rc.c:1312 modules/control/rc.c:1747
-#: modules/control/rc.c:1817 modules/control/rc.c:1986
-#: modules/control/rc.c:2085
+#: modules/control/rc.c:1319 modules/control/rc.c:1798
+#: modules/control/rc.c:1868 modules/control/rc.c:2037
+#: modules/control/rc.c:2136
 #, fuzzy
 msgid "Type 'menu select' or 'pause' to continue."
 msgstr "ტიპი მენიუ -სკენ."
 
-#: modules/control/rc.c:1336
+#: modules/control/rc.c:1387
 #, fuzzy
 msgid "goto is deprecated"
 msgstr "შესავალი"
 
-#: modules/control/rc.c:1452
+#: modules/control/rc.c:1503
 #, fuzzy
 msgid "Type 'pause' to continue."
 msgstr "ტიპი -სკენ."
 
-#: modules/control/rc.c:2070 modules/control/rc.c:2109
+#: modules/control/rc.c:2121 modules/control/rc.c:2160
 #, fuzzy
 msgid "Please provide one of the following parameters:"
 msgstr "ის:"
@@ -9671,6 +9682,7 @@ msgstr "-სკენ ყველა -სკენ."
 
 #: modules/control/telnet.c:77 modules/gui/macosx/open.m:178
 #: modules/gui/macosx/open.m:180 modules/gui/macosx/output.m:147
+#: modules/gui/qt4/ui/file_open.ui:1074
 #: modules/gui/wxwidgets/dialogs/open.cpp:827
 #: modules/gui/wxwidgets/dialogs/open.cpp:854
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:531 modules/stream_out/rtp.c:82
@@ -9758,27 +9770,27 @@ msgstr ""
 msgid "AVI demuxer"
 msgstr "AVI დემუქსერი"
 
-#: modules/demux/avi/avi.c:557
+#: modules/demux/avi/avi.c:583
 msgid "AVI Index"
 msgstr "AVI ინდექსი"
 
-#: modules/demux/avi/avi.c:558
+#: modules/demux/avi/avi.c:584
 #, fuzzy
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to repair it (this might take a long time) ?"
 msgstr "AVI ფაილი არა -სკენ -სკენ a?"
 
-#: modules/demux/avi/avi.c:561
+#: modules/demux/avi/avi.c:587
 #, fuzzy
 msgid "Repair"
 msgstr "ნეპალური"
 
-#: modules/demux/avi/avi.c:561
+#: modules/demux/avi/avi.c:587
 msgid "Don't repair"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2278 modules/demux/avi/avi.c:2301
+#: modules/demux/avi/avi.c:2322 modules/demux/avi/avi.c:2345
 #, fuzzy
 msgid "Fixing AVI Index..."
 msgstr "AVI ინდექსი"
@@ -10419,16 +10431,16 @@ msgstr "სიდიდე და რიცხვი ის სიდიდე �
 msgid "MPEG Transport Stream demuxer"
 msgstr "ტრანსპორტი ნაკადი"
 
-#: modules/demux/ts.c:3144 modules/demux/ts.c:3178
+#: modules/demux/ts.c:3146 modules/demux/ts.c:3180
 #, fuzzy
 msgid "clean effects"
 msgstr "ეფექტი"
 
-#: modules/demux/ts.c:3148 modules/demux/ts.c:3182
+#: modules/demux/ts.c:3150 modules/demux/ts.c:3184
 msgid "hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3152 modules/demux/ts.c:3186
+#: modules/demux/ts.c:3154 modules/demux/ts.c:3188
 msgid "visual impaired commentary"
 msgstr ""
 
@@ -10469,7 +10481,9 @@ msgstr "გახსენი ყველა?"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
-#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:675
+#: modules/gui/macosx/open.m:784 modules/gui/qt4/ui/file_open.ui:231
+#: modules/gui/qt4/ui/file_open.ui:517 modules/gui/qt4/ui/file_open.ui:620
+#: modules/gui/wxwidgets/interface.cpp:675
 #: modules/gui/wxwidgets/interface.cpp:686 modules/gui/wxwidgets/menus.cpp:351
 #: modules/gui/wxwidgets/menus.cpp:407
 msgid "Open"
@@ -10491,7 +10505,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:265
 #: modules/gui/beos/PlayListWindow.cpp:87 modules/gui/macosx/open.m:439
 #: modules/gui/macosx/open.m:737 modules/gui/macosx/open.m:783
-#: modules/gui/wxwidgets/dialogs.cpp:430
+#: modules/gui/wxwidgets/dialogs.cpp:434
 #: modules/gui/wxwidgets/dialogs/open.cpp:1259
 msgid "Open File"
 msgstr "ფაილის გახსნა"
@@ -11071,7 +11085,7 @@ msgid ""
 "can be set in the Preferences, Video / Filters section."
 msgstr ""
 
-#: modules/gui/macosx/fspanel.m:297
+#: modules/gui/macosx/fspanel.m:288
 #, fuzzy
 msgid "(no item is being played)"
 msgstr "i დუიმი სია"
@@ -11116,7 +11130,7 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:489 modules/gui/macosx/intf.m:1030
 #: modules/gui/macosx/intf.m:1351 modules/gui/pda/pda_interface.c:212
-#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:105
+#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:108
 #: modules/gui/qt4/ui/main_interface.ui:24
 msgid "VLC media player"
 msgstr "VLC მედია დამკვრელი"
@@ -11422,6 +11436,7 @@ msgid "DVD"
 msgstr "DVD"
 
 #: modules/gui/macosx/open.m:179 modules/gui/macosx/output.m:146
+#: modules/gui/qt4/ui/file_open.ui:1094
 #: modules/gui/wxwidgets/dialogs/open.cpp:846
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:520
 msgid "Address"
@@ -11458,14 +11473,14 @@ msgstr "პარამეტრები..."
 msgid "Override parametters"
 msgstr ""
 
-#: modules/gui/macosx/open.m:244 modules/gui/qt4/ui/file_open.ui:130
+#: modules/gui/macosx/open.m:244
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:218
 #: modules/stream_out/bridge.c:41 modules/stream_out/display.c:41
 #: modules/video_filter/mosaic.c:149
 msgid "Delay"
 msgstr "დაყოვნება"
 
-#: modules/gui/macosx/open.m:246 modules/gui/qt4/ui/file_open.ui:117
+#: modules/gui/macosx/open.m:246
 msgid "FPS"
 msgstr "FPS"
 
@@ -11473,7 +11488,7 @@ msgstr "FPS"
 msgid "Subtitles encoding"
 msgstr "ტიტრების კოდირება"
 
-#: modules/gui/macosx/open.m:250 modules/gui/qt4/ui/file_open.ui:140
+#: modules/gui/macosx/open.m:250
 msgid "Font size"
 msgstr "შრიფტის სიდიდე"
 
@@ -11788,7 +11803,7 @@ msgid "Some options are hidden. Check \"Advanced\" to display them."
 msgstr "დამალული შემოწმება დამატებითი -სკენ."
 
 #: modules/gui/macosx/prefs_widgets.m:1222
-#: modules/gui/wxwidgets/dialogs.cpp:474
+#: modules/gui/wxwidgets/dialogs.cpp:478
 msgid "Select a directory"
 msgstr "დირექტორიის არჩევა"
 
@@ -12615,7 +12630,7 @@ msgstr "ფაილის სახელი"
 msgid "Permissions"
 msgstr "უფლებები"
 
-#: modules/gui/pda/pda.c:232
+#: modules/gui/pda/pda.c:232 modules/gui/qt4/ui/file_open.ui:322
 msgid "Size"
 msgstr "ზომა"
 
@@ -13087,33 +13102,208 @@ msgstr "ნაკადი ინფორმაცია"
 msgid "Qt interface"
 msgstr "ინტერფეისის ჩვენება"
 
-#: modules/gui/qt4/ui/file_open.ui:16 modules/gui/qt4/ui/input_stats.ui:16
-#, fuzzy
-msgid "Form"
-msgstr "ნორმა"
+#: modules/gui/qt4/ui/file_open.ui:43
+msgid "Personnalize"
+msgstr ""
 
-#: modules/gui/qt4/ui/file_open.ui:46 modules/gui/qt4/ui/file_open.ui:88
+#: modules/gui/qt4/ui/file_open.ui:104
+#: modules/gui/wxwidgets/dialogs/open.cpp:454
+msgid "Caching"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:285 modules/gui/qt4/ui/file_open.ui:571
+#: modules/gui/qt4/ui/file_open.ui:677 modules/gui/qt4/ui/file_open.ui:815
 #, fuzzy
 msgid "Browse"
 msgstr "მოძიება..."
 
-#: modules/gui/qt4/ui/file_open.ui:55
-#: modules/gui/wxwidgets/dialogs/subtitles.cpp:73
-msgid "Subtitles file"
-msgstr "ტიტრების ფაილი"
+#: modules/gui/qt4/ui/file_open.ui:343
+msgid "Very Small)</string>"
+msgstr ""
 
-#: modules/gui/qt4/ui/file_open.ui:97
-#: modules/gui/wxwidgets/dialogs/open.cpp:261
-#: modules/gui/wxwidgets/dialogs/open.cpp:272
-#: modules/gui/wxwidgets/dialogs/open.cpp:417
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:217
-msgid "Advanced options"
-msgstr "დამატებითი ოფციები"
-
-#: modules/gui/qt4/ui/file_open.ui:147
+#: modules/gui/qt4/ui/file_open.ui:347 modules/gui/qt4/ui/file_open.ui:352
+#: modules/gui/qt4/ui/file_open.ui:357 modules/gui/qt4/ui/file_open.ui:362
+#: modules/gui/qt4/ui/file_open.ui:388 modules/gui/qt4/ui/file_open.ui:442
+#: modules/gui/qt4/ui/file_open.ui:457 modules/gui/qt4/ui/file_open.ui:513
 #, fuzzy
-msgid "Justification"
-msgstr "გაძლიერება"
+msgid "text"
+msgstr "შემდეგი"
+
+#: modules/gui/qt4/ui/file_open.ui:348 modules/misc/freetype.c:105
+#: modules/misc/win32text.c:77
+msgid "Small"
+msgstr "პატარა"
+
+#: modules/gui/qt4/ui/file_open.ui:353
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
+#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
+#: modules/misc/win32text.c:77
+msgid "Normal"
+msgstr "ნორმალური"
+
+#: modules/gui/qt4/ui/file_open.ui:358
+msgid "Big"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:363
+msgid "Very Big"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:370 modules/gui/qt4/ui/file_open.ui:495
+#, fuzzy
+msgid "QWidget"
+msgstr "სიგანე"
+
+#: modules/gui/qt4/ui/file_open.ui:370
+msgid "layoutWidget"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:371 modules/gui/qt4/ui/file_open.ui:434
+#: modules/gui/qt4/ui/file_open.ui:449 modules/gui/qt4/ui/file_open.ui:462
+#: modules/gui/qt4/ui/file_open.ui:478 modules/gui/qt4/ui/file_open.ui:496
+#, fuzzy
+msgid "geometry"
+msgstr "სპექტრომეტრი"
+
+#: modules/gui/qt4/ui/file_open.ui:379 modules/gui/qt4/ui/file_open.ui:504
+msgid "QHBoxLayout"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:380 modules/gui/qt4/ui/file_open.ui:505
+#, fuzzy
+msgid "margin"
+msgstr "ამჰარული"
+
+#: modules/gui/qt4/ui/file_open.ui:383 modules/gui/qt4/ui/file_open.ui:508
+#, fuzzy
+msgid "spacing"
+msgstr "შეფასება"
+
+#: modules/gui/qt4/ui/file_open.ui:387 modules/gui/qt4/ui/file_open.ui:512
+msgid "QLabel"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:387
+msgid "alignSubLabel"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:389 modules/gui/qt4/ui/file_open.ui:514
+msgid "qrichtext"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:389 modules/gui/qt4/ui/file_open.ui:514
+msgid "1"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:389 modules/gui/qt4/ui/file_open.ui:514
+msgid "text/css"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:392
+#, fuzzy
+msgid "Alignment"
+msgstr "მონაცემი"
+
+#: modules/gui/qt4/ui/file_open.ui:426
+msgid "Right)</string>"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:433
+msgid "QToolButton"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:433
+msgid "optionsSubButton"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:448
+#, fuzzy
+msgid "QPushButton"
+msgstr "პუშტუ"
+
+#: modules/gui/qt4/ui/file_open.ui:448
+msgid "extraAudioButton"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:461
+#, fuzzy
+msgid "Line"
+msgstr "ლინეარული(Linear)"
+
+#: modules/gui/qt4/ui/file_open.ui:461
+#, fuzzy
+msgid "line"
+msgstr "გაწმენდა"
+
+#: modules/gui/qt4/ui/file_open.ui:470
+#, fuzzy
+msgid "orientation"
+msgstr "მეტი ინფორმაცია"
+
+#: modules/gui/qt4/ui/file_open.ui:474
+#, fuzzy
+msgid "QGroupBox"
+msgstr "ჯგუფი"
+
+#: modules/gui/qt4/ui/file_open.ui:474
+msgid "audioGroupBox"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:475
+#, fuzzy
+msgid "enabled"
+msgstr "აქტიური"
+
+#: modules/gui/qt4/ui/file_open.ui:487
+#, fuzzy
+msgid "Extra Audio File"
+msgstr "აუდიო ფილტრები"
+
+#: modules/gui/qt4/ui/file_open.ui:489
+msgid "checkable"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:492
+msgid "checked"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:495
+msgid "horizontalLayout_3"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:512
+msgid "audioOpenLabel"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:588
+#, fuzzy
+msgid "Media File"
+msgstr "ფაილები"
+
+#: modules/gui/qt4/ui/file_open.ui:687
+#, fuzzy
+msgid "Disk"
+msgstr "დისკი"
+
+#: modules/gui/qt4/ui/file_open.ui:699
+#, fuzzy
+msgid "Disc Type"
+msgstr "დისკის ტიპი"
+
+#: modules/gui/qt4/ui/file_open.ui:780
+#: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
+#, fuzzy
+msgid "Options"
+msgstr "ოფციები"
+
+#: modules/gui/qt4/ui/file_open.ui:801
+msgid "Peripheric Path"
+msgstr ""
+
+#: modules/gui/qt4/ui/input_stats.ui:16
+#, fuzzy
+msgid "Form"
+msgstr "ნორმა"
 
 #: modules/gui/qt4/ui/input_stats.ui:298
 #, fuzzy
@@ -13388,9 +13578,24 @@ msgstr ""
 msgid "Input has changed "
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs.cpp:433
+#: modules/gui/wxwidgets/dialogs.cpp:437
 #: modules/gui/wxwidgets/dialogs/open.cpp:1262
 msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:439
+#: modules/gui/wxwidgets/dialogs/open.cpp:1264
+msgid "|Video Files (*.avi, *.mpg, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:440
+#: modules/gui/wxwidgets/dialogs/open.cpp:1265
+msgid "|Playlist Files (*.m3u, *.pls, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:441
+#: modules/gui/wxwidgets/dialogs/open.cpp:1266
+msgid "|Subtitle Files (*.srt, *.sub, etc.)|"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
@@ -13449,6 +13654,13 @@ msgstr "შენახვა."
 msgid "Advanced options..."
 msgstr "დამატებითი ოფციები..."
 
+#: modules/gui/wxwidgets/dialogs/open.cpp:261
+#: modules/gui/wxwidgets/dialogs/open.cpp:272
+#: modules/gui/wxwidgets/dialogs/open.cpp:417
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:217
+msgid "Advanced options"
+msgstr "დამატებითი ოფციები"
+
 #: modules/gui/wxwidgets/dialogs/open.cpp:276
 msgid "Options:"
 msgstr "ოფციები:"
@@ -13466,10 +13678,6 @@ msgstr "ნაკადი/შენახვა"
 #, fuzzy
 msgid "Use VLC as a stream server"
 msgstr "a"
-
-#: modules/gui/wxwidgets/dialogs/open.cpp:454
-msgid "Caching"
-msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:455
 #, fuzzy
@@ -13745,12 +13953,6 @@ msgstr "დასაკრავი სია ცარიელია"
 msgid "Can't save"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
-#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
-#: modules/misc/win32text.c:77
-msgid "Normal"
-msgstr "ნორმალური"
-
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1418
 #, fuzzy
 msgid "One level"
@@ -13832,6 +14034,10 @@ msgstr "MMSH"
 msgid "RTP"
 msgstr "RTP"
 
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
+msgid "UDP"
+msgstr "UDP"
+
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:592
 msgid "Group name"
 msgstr "ჯგუფის სახელი"
@@ -13871,10 +14077,9 @@ msgstr "ფაილის შენახვა"
 msgid "Subtitle options"
 msgstr "ტიტრები"
 
-#: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
-#, fuzzy
-msgid "Options"
-msgstr "ოფციები"
+#: modules/gui/wxwidgets/dialogs/subtitles.cpp:73
+msgid "Subtitles file"
+msgstr "ტიტრების ფაილი"
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:211
 #, fuzzy
@@ -13951,6 +14156,11 @@ msgstr ""
 msgid "Loop"
 msgstr ""
 
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:415
+#, fuzzy
+msgid "Create"
+msgstr "შექმნა"
+
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:560
 msgid "VLM stream"
 msgstr "VLM ნაკადი"
@@ -14026,6 +14236,11 @@ msgid ""
 "about it."
 msgstr "არჩევა ვიდეო არჩევა a -სკენ შესახებ."
 
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
+#, fuzzy
+msgid "Transcode audio (if available)"
+msgstr "აუდიო"
+
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
 #, fuzzy
 msgid ""
@@ -14097,11 +14312,6 @@ msgstr "მეტი ინფორმაცია"
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1291
 msgid "Save to file"
 msgstr "შეინახე ფაილში"
-
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
-#, fuzzy
-msgid "Transcode audio (if available)"
-msgstr "აუდიო"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:41
 msgid ""
@@ -15101,10 +15311,6 @@ msgstr "ნაგულისხმევი სიდიდე ის ვიდ
 msgid "Smaller"
 msgstr "დაპატარავება"
 
-#: modules/misc/freetype.c:105 modules/misc/win32text.c:77
-msgid "Small"
-msgstr "პატარა"
-
 #: modules/misc/freetype.c:106 modules/misc/win32text.c:78
 msgid "Large"
 msgstr "დიდი"
@@ -15340,11 +15546,6 @@ msgstr "UDP"
 msgid "Growl UDP port on the server."
 msgstr "UDP."
 
-#: modules/misc/notify/growl.c:72
-#, fuzzy
-msgid "Growl"
-msgstr "TTL"
-
 #: modules/misc/notify/growl.c:73
 #, fuzzy
 msgid "Growl Notification Plugin"
@@ -15379,10 +15580,6 @@ msgid ""
 msgstr ""
 "ფორმატი ის -სკენ -სკენ MSN შემსრულებელი სათაური ალბომი -სკენ შემსრულებელი "
 "სათაური."
-
-#: modules/misc/notify/msn.c:70
-msgid "MSN"
-msgstr "MSN"
 
 #: modules/misc/notify/msn.c:71
 #, fuzzy
@@ -15949,7 +16146,7 @@ msgstr "WAV"
 msgid "Copy packetizer"
 msgstr "დააკოპირე"
 
-#: modules/packetizer/h264.c:47
+#: modules/packetizer/h264.c:48
 #, fuzzy
 msgid "H.264 video packetizer"
 msgstr "ვიდეო"
@@ -15997,6 +16194,8 @@ msgid "DAAP access"
 msgstr ""
 
 #: modules/services_discovery/hal.c:130
+#: modules/services_discovery/upnp_cc.cpp:109
+#: modules/services_discovery/upnp_intel.cpp:299
 msgid "Devices"
 msgstr "მოწყობილობები"
 
@@ -16159,7 +16358,7 @@ msgstr ""
 msgid "Universal Plug'n'Play discovery"
 msgstr "უნივერსალური n დაკვრა"
 
-#: modules/services_discovery/upnp_intel.cpp:260
+#: modules/services_discovery/upnp_intel.cpp:261
 #, fuzzy
 msgid "Universal Plug'n'Play discovery ( Intel SDK )"
 msgstr "უნივერსალური n დაკვრა"
@@ -16997,6 +17196,14 @@ msgstr "-სკენ"
 #: modules/video_chroma/i422_yuy2.c:63
 msgid "Conversions from "
 msgstr ""
+
+#: modules/video_chroma/i420_ymga.c:48 modules/video_chroma/i420_ymga.c:51
+#: modules/video_chroma/i420_yuy2.c:75 modules/video_chroma/i420_yuy2.c:78
+#: modules/video_chroma/i420_yuy2.c:86 modules/video_chroma/i422_yuy2.c:63
+#: modules/video_chroma/i422_yuy2.c:66
+#, fuzzy
+msgid " to "
+msgstr "მდე"
 
 #: modules/video_chroma/i420_ymga.c:51 modules/video_chroma/i420_yuy2.c:78
 #: modules/video_chroma/i422_yuy2.c:66
@@ -18956,6 +19163,17 @@ msgid "Spectrum analyser"
 msgstr "სპექტრის ანალიზატორი"
 
 #, fuzzy
+#~ msgid "Justification"
+#~ msgstr "გაძლიერება"
+
+#, fuzzy
+#~ msgid "Growl"
+#~ msgstr "TTL"
+
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
+#, fuzzy
 #~ msgid "Vertical border width"
 #~ msgstr "სიგანე"
 
@@ -19030,14 +19248,6 @@ msgstr "სპექტრის ანალიზატორი"
 
 #~ msgid "Video filters settings"
 #~ msgstr "ვიდეო ფილტრის პარამეტრები"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "შექმნა"
-
-#, fuzzy
-#~ msgid " to "
-#~ msgstr "მდე"
 
 #, fuzzy
 #~ msgid ""

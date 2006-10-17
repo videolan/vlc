@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-09 23:28+0100\n"
+"POT-Creation-Date: 2006-10-17 10:33+0200\n"
 "PO-Revision-Date: 2006-08-29 20:10+0700\n"
 "Last-Translator: Vladimir Yermolayev <init@siptelecom.ru>\n"
 "Language-Team: Russian\n"
@@ -66,7 +66,7 @@ msgstr "Настройки интерфейсов управления VLC"
 msgid "Hotkeys settings"
 msgstr "Настройка горячих клавиш"
 
-#: include/vlc_config_cat.h:54 src/input/es_out.c:1587 src/libvlc.h:1232
+#: include/vlc_config_cat.h:54 src/input/es_out.c:1590 src/libvlc.h:1232
 #: modules/gui/beos/InterfaceWindow.cpp:282 modules/gui/macosx/extended.m:81
 #: modules/gui/macosx/intf.m:556 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:96 modules/gui/macosx/wizard.m:421
@@ -121,7 +121,7 @@ msgstr "Прочее"
 msgid "Miscellaneous audio settings and modules."
 msgstr "Прочие настройки звука и модули."
 
-#: include/vlc_config_cat.h:75 src/input/es_out.c:1615 src/libvlc.h:1267
+#: include/vlc_config_cat.h:75 src/input/es_out.c:1618 src/libvlc.h:1267
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:569
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:86
 #: modules/gui/macosx/wizard.m:422 modules/gui/qt4/ui/input_stats.ui:335
@@ -408,6 +408,7 @@ msgstr "Другие дополнительные настройки"
 
 #: include/vlc_config_cat.h:203 modules/gui/macosx/open.m:162
 #: modules/gui/macosx/open.m:379 modules/gui/pda/pda_interface.c:548
+#: modules/gui/qt4/ui/file_open.ui:890
 #: modules/gui/wxwidgets/dialogs/open.cpp:503
 msgid "Network"
 msgstr "Сеть"
@@ -594,11 +595,12 @@ msgid "Setting"
 msgstr "Настройки"
 
 #: include/vlc_meta.h:39 modules/gui/macosx/open.m:181
+#: modules/gui/qt4/ui/file_open.ui:965 modules/gui/qt4/ui/file_open.ui:1043
 #: modules/gui/wxwidgets/dialogs/open.cpp:871
 msgid "URL"
 msgstr "URL"
 
-#: include/vlc_meta.h:40 src/input/es_out.c:1579 src/libvlc.h:97
+#: include/vlc_meta.h:40 src/input/es_out.c:1582 src/libvlc.h:97
 #: modules/gui/beos/InterfaceWindow.cpp:278
 msgid "Language"
 msgstr "Язык"
@@ -701,9 +703,10 @@ msgstr "Стерео"
 #: src/audio_output/output.c:107 src/audio_output/output.c:143
 #: src/libvlc.h:268 modules/audio_filter/channel_mixer/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
-#: modules/control/gestures.c:86 modules/video_filter/logo.c:97
-#: modules/video_filter/marq.c:130 modules/video_filter/mosaic.c:181
-#: modules/video_filter/osdmenu.c:78 modules/video_filter/rss.c:160
+#: modules/control/gestures.c:86 modules/gui/qt4/ui/file_open.ui:416
+#: modules/video_filter/logo.c:97 modules/video_filter/marq.c:130
+#: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:78
+#: modules/video_filter/rss.c:160
 msgid "Left"
 msgstr "Левый"
 
@@ -825,81 +828,81 @@ msgstr "Дорожка %i"
 msgid "Program"
 msgstr "Программа"
 
-#: src/input/es_out.c:1574 modules/codec/faad.c:329
+#: src/input/es_out.c:1577 modules/codec/faad.c:329
 #, c-format
 msgid "Stream %d"
 msgstr "Поток %d"
 
-#: src/input/es_out.c:1576 modules/gui/macosx/wizard.m:426
+#: src/input/es_out.c:1579 modules/gui/macosx/wizard.m:426
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:834
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:874
 msgid "Codec"
 msgstr "Кодек"
 
-#: src/input/es_out.c:1587 src/input/es_out.c:1615 src/input/es_out.c:1642
+#: src/input/es_out.c:1590 src/input/es_out.c:1618 src/input/es_out.c:1645
 #: modules/gui/macosx/output.m:153
 msgid "Type"
 msgstr "Тип"
 
-#: src/input/es_out.c:1590 modules/codec/faad.c:333
+#: src/input/es_out.c:1593 modules/codec/faad.c:333
 #: modules/gui/macosx/output.m:176
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:857
 msgid "Channels"
 msgstr "Каналы"
 
-#: src/input/es_out.c:1595 modules/codec/faad.c:335
+#: src/input/es_out.c:1598 modules/codec/faad.c:335
 msgid "Sample rate"
 msgstr "Частота дискретизации"
 
-#: src/input/es_out.c:1596 modules/codec/faad.c:335
+#: src/input/es_out.c:1599 modules/codec/faad.c:335
 #, c-format
 msgid "%d Hz"
 msgstr "%d Гц"
 
-#: src/input/es_out.c:1602
+#: src/input/es_out.c:1605
 msgid "Bits per sample"
 msgstr "Бит"
 
-#: src/input/es_out.c:1607 modules/access_output/shout.c:86
+#: src/input/es_out.c:1610 modules/access_output/shout.c:86
 #: modules/access/pvr.c:84
 msgid "Bitrate"
 msgstr "Битрейт"
 
-#: src/input/es_out.c:1608
+#: src/input/es_out.c:1611
 #, c-format
 msgid "%d kb/s"
 msgstr "%d кб/сек"
 
-#: src/input/es_out.c:1619
+#: src/input/es_out.c:1622
 msgid "Resolution"
 msgstr "Разрешение"
 
-#: src/input/es_out.c:1625
+#: src/input/es_out.c:1628
 msgid "Display resolution"
 msgstr "Разрешение монитора"
 
-#: src/input/es_out.c:1635 modules/access/screen/screen.c:41
+#: src/input/es_out.c:1638 modules/access/screen/screen.c:41
 msgid "Frame rate"
 msgstr "Частота кадров"
 
-#: src/input/es_out.c:1642
+#: src/input/es_out.c:1645
 msgid "Subtitle"
 msgstr "Субтитры"
 
-#: src/input/input.c:2056
+#: src/input/input.c:2055
 msgid "Your input can't be opened"
 msgstr ""
 
-#: src/input/input.c:2057
+#: src/input/input.c:2056
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/input.c:2132
+#: src/input/input.c:2131
 msgid "Can't recognize the input's format"
 msgstr ""
 
-#: src/input/input.c:2133
+#: src/input/input.c:2132
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -914,7 +917,8 @@ msgstr "Программы"
 
 #: src/input/var.c:143 modules/gui/beos/MediaControlView.cpp:1236
 #: modules/gui/macosx/intf.m:553 modules/gui/macosx/intf.m:554
-#: modules/gui/macosx/open.m:169 modules/gui/wxwidgets/dialogs/open.cpp:762
+#: modules/gui/macosx/open.m:169 modules/gui/qt4/ui/file_open.ui:835
+#: modules/gui/wxwidgets/dialogs/open.cpp:762
 msgid "Chapter"
 msgstr "Глава"
 
@@ -967,7 +971,7 @@ msgid "Previous chapter"
 msgstr "Предыдущая глава"
 
 #: src/interface/interaction.c:275 src/interface/interaction.c:371
-#: modules/demux/avi/avi.c:561 modules/gui/beos/InterfaceWindow.cpp:159
+#: modules/demux/avi/avi.c:587 modules/gui/beos/InterfaceWindow.cpp:159
 #: modules/gui/macosx/bookmarks.m:107 modules/gui/macosx/controls.m:58
 #: modules/gui/macosx/interaction.m:128 modules/gui/macosx/interaction.m:132
 #: modules/gui/macosx/interaction.m:135 modules/gui/macosx/open.m:158
@@ -1138,6 +1142,10 @@ msgstr "Грузинский"
 #: src/libvlc.h:41 src/misc/iso-639_def.h:111
 msgid "Korean"
 msgstr "Корейский"
+
+#: src/libvlc.h:41 src/misc/iso-639_def.h:125
+msgid "Malay"
+msgstr "Малайский"
 
 #: src/libvlc.h:41 src/misc/iso-639_def.h:69
 msgid "Dutch"
@@ -1599,9 +1607,9 @@ msgstr ""
 
 #: src/libvlc.h:268 modules/audio_filter/channel_mixer/mono.c:100
 #: modules/codec/dvbsub.c:64 modules/codec/subsdec.c:129
-#: modules/video_filter/logo.c:97 modules/video_filter/marq.c:130
-#: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:78
-#: modules/video_filter/rss.c:160
+#: modules/gui/qt4/ui/file_open.ui:421 modules/video_filter/logo.c:97
+#: modules/video_filter/marq.c:130 modules/video_filter/mosaic.c:181
+#: modules/video_filter/osdmenu.c:78 modules/video_filter/rss.c:160
 msgid "Center"
 msgstr "Центр"
 
@@ -3852,6 +3860,7 @@ msgstr "Слои"
 
 #: src/libvlc.h:1355 modules/codec/subsdec.c:144 modules/demux/subtitle.c:66
 #: modules/gui/beos/InterfaceWindow.cpp:279
+#: modules/gui/qt4/ui/file_open.ui:201 modules/gui/qt4/ui/file_open.ui:845
 msgid "Subtitles"
 msgstr "Субтитры"
 
@@ -4286,10 +4295,6 @@ msgstr "Маори"
 #: src/misc/iso-639_def.h:124
 msgid "Marathi"
 msgstr "Маратхи"
-
-#: src/misc/iso-639_def.h:125
-msgid "Malay"
-msgstr "Малайский"
 
 #: src/misc/iso-639_def.h:126
 msgid "Malagasy"
@@ -5633,7 +5638,7 @@ msgstr ""
 "сэтим методом. Это единственный метод, используемый libcss.\n"
 "Метод по-умолчанию: ключ."
 
-#: modules/access/dvdread.c:85
+#: modules/access/dvdread.c:85 modules/gui/qt4/ui/file_open.ui:486
 msgid "title"
 msgstr "Раздел"
 
@@ -5737,8 +5742,7 @@ msgstr "Ввод из файла"
 #: modules/gui/beos/PlayListWindow.cpp:85 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/open.m:371 modules/gui/macosx/output.m:142
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
-#: modules/gui/pda/pda_interface.c:366 modules/gui/qt4/ui/file_open.ui:36
-#: modules/gui/qt4/ui/file_open.ui:78
+#: modules/gui/pda/pda_interface.c:366 modules/gui/qt4/ui/file_open.ui:176
 #: modules/gui/wxwidgets/dialogs/open.cpp:499
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:471
 msgid "File"
@@ -6073,11 +6077,6 @@ msgstr "Оповещать о потоке с помощью протокола 
 msgid "HTTP stream output"
 msgstr "Вывод потока HTTP"
 
-#: modules/access_output/http.c:93 modules/control/http/http.c:61
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
-msgid "HTTP"
-msgstr "HTTP"
-
 #: modules/access_output/shout.c:58
 msgid "Stream name"
 msgstr "Имя потока"
@@ -6229,11 +6228,6 @@ msgstr ""
 #: modules/access_output/udp.c:97
 msgid "UDP stream output"
 msgstr "Вывод потока UDP"
-
-#: modules/access_output/udp.c:98
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
-msgid "UDP"
-msgstr "UDP"
 
 #: modules/access/pvr.c:49
 msgid ""
@@ -6592,7 +6586,7 @@ msgid ""
 "Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
 msgstr "Канал карты (обычно, 0 = тюнер, 1 = композитный вход, 2 - s-video)."
 
-#: modules/access/v4l.c:100
+#: modules/access/v4l.c:100 modules/gui/qt4/ui/file_open.ui:825
 msgid "Audio Channel"
 msgstr "Аудио канал"
 
@@ -7835,7 +7829,7 @@ msgstr "Декодирование"
 msgid "FFmpeg chroma conversion"
 msgstr "Преобразование цветности"
 
-#: modules/codec/ffmpeg/ffmpeg.c:131 modules/gui/qt4/ui/file_open.ui:157
+#: modules/codec/ffmpeg/ffmpeg.c:131
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:97
 msgid "Encoding"
 msgstr "Кодирование"
@@ -9386,6 +9380,11 @@ msgstr "Файл корневого сертификата x509 PEM (Root CA)."
 msgid "HTTP interace Certificates Revocation List file."
 msgstr "Список отозванных сертификатов (CRL)."
 
+#: modules/control/http/http.c:61
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
+msgid "HTTP"
+msgstr "HTTP"
+
 #: modules/control/http/http.c:62
 msgid "HTTP remote control interface"
 msgstr "Интерфейс управления HTTP"
@@ -9398,12 +9397,16 @@ msgstr "HTTP SSL"
 msgid "Infrared remote control interface"
 msgstr "Интерфейс управления через ИК-связь"
 
-#: modules/control/motion.c:62
+#: modules/control/motion.c:59
+msgid "Use the rotate video filter instead of transform"
+msgstr ""
+
+#: modules/control/motion.c:65
 #, fuzzy
 msgid "motion"
 msgstr "Позиция"
 
-#: modules/control/motion.c:64
+#: modules/control/motion.c:67
 #, fuzzy
 msgid "motion control interface"
 msgstr "Интерфейс дистанционного управления"
@@ -9546,298 +9549,308 @@ msgstr "Интерфейс дистанционного управления"
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr "Интерфейс удаленного управления запущен. Введите 'help' для справки."
 
-#: modules/control/rc.c:847
+#: modules/control/rc.c:851
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr "Неизвествая команда `%s'. Введите `help' для справки."
 
-#: modules/control/rc.c:880
+#: modules/control/rc.c:884
 msgid "+----[ Remote control commands ]"
 msgstr "+----[ Команды дистанционного управления ]"
 
-#: modules/control/rc.c:882
+#: modules/control/rc.c:886
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
 msgstr "| add XYZ  . . . . . . . . . . добавить XYZ в плейлист"
 
-#: modules/control/rc.c:883
+#: modules/control/rc.c:887
 #, fuzzy
 msgid "| enqueue XYZ  . . . . . . . queue XYZ to playlist"
 msgstr "| add XYZ  . . . . . . . . . . добавить XYZ в плейлист"
 
-#: modules/control/rc.c:884
+#: modules/control/rc.c:888
 msgid "| playlist . . .  show items currently in playlist"
 msgstr "| playlist . . .  показать элементы текушего плейлиста"
 
-#: modules/control/rc.c:885
+#: modules/control/rc.c:889
 msgid "| play . . . . . . . . . . . . . . . . play stream"
 msgstr "| play . . . . . . . . . . . . . . . . воспроизвести поток"
 
-#: modules/control/rc.c:886
+#: modules/control/rc.c:890
 msgid "| stop . . . . . . . . . . . . . . . . stop stream"
 msgstr "| stop . . . . . . . . . . . . . . . . остановить поток"
 
-#: modules/control/rc.c:887
+#: modules/control/rc.c:891
 msgid "| next . . . . . . . . . . . .  next playlist item"
 msgstr "| next . . . . . . . . . . . .  следующий элемент плейлиста"
 
-#: modules/control/rc.c:888
+#: modules/control/rc.c:892
 msgid "| prev . . . . . . . . . .  previous playlist item"
 msgstr "| prev . . . . . . . . . .  предыдущий элемент плейлиста"
 
-#: modules/control/rc.c:889
+#: modules/control/rc.c:893
 msgid "| goto . . . . . . . . . . . .  goto item at index"
 msgstr "| goto . . . . . . . . . . . .  перейти к элементу"
 
-#: modules/control/rc.c:890
+#: modules/control/rc.c:894
+#, fuzzy
+msgid "| repeat [on|off] . .  toggle playlist item repeat"
+msgstr "| f [on|off] . . . . . . . . . . переключить полноэкранный режим"
+
+#: modules/control/rc.c:895
+#, fuzzy
+msgid "| loop [on|off] . . . .  toggle playlist item loop"
+msgstr "| f [on|off] . . . . . . . . . . переключить полноэкранный режим"
+
+#: modules/control/rc.c:896
 msgid "| clear . . . . . . . . . . .   clear the playlist"
 msgstr "| clear . . . . . . . . . . .   очистить плейлист"
 
-#: modules/control/rc.c:891
+#: modules/control/rc.c:897
 msgid "| status . . . . . . . . . current playlist status"
 msgstr "| status . . . . . . . . . текущий статус плейлиста"
 
-#: modules/control/rc.c:892
+#: modules/control/rc.c:898
 msgid "| title [X]  . . . . set/get title in current item"
 msgstr "| title [X]  . . . . установить/получить раздел текущего элемента"
 
-#: modules/control/rc.c:893
+#: modules/control/rc.c:899
 msgid "| title_n  . . . . . .  next title in current item"
 msgstr "| title_n  . . . . . .  следующий раздел текущего элемента"
 
-#: modules/control/rc.c:894
+#: modules/control/rc.c:900
 msgid "| title_p  . . . .  previous title in current item"
 msgstr "| title_p  . . . .  предыдущий раздел текущего элемента"
 
-#: modules/control/rc.c:895
+#: modules/control/rc.c:901
 msgid "| chapter [X]  . . set/get chapter in current item"
 msgstr "| chapter [X]  . . установить/получить главу текущего элемента"
 
-#: modules/control/rc.c:896
+#: modules/control/rc.c:902
 msgid "| chapter_n  . . . .  next chapter in current item"
 msgstr "| chapter_n  . . . .  следующая глава текушего элемента"
 
-#: modules/control/rc.c:897
+#: modules/control/rc.c:903
 msgid "| chapter_p  . .  previous chapter in current item"
 msgstr "| chapter_p  . .  предыдущая глава текущего элемента"
 
-#: modules/control/rc.c:899
+#: modules/control/rc.c:905
 msgid "| seek X . seek in seconds, for instance `seek 12'"
 msgstr "| seek X . перемотать на X секунд, к примеру `seek 12'"
 
-#: modules/control/rc.c:900
+#: modules/control/rc.c:906
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause"
 msgstr "| pause  . . . . . . . . . . . . . .  переключить паузу"
 
-#: modules/control/rc.c:901
+#: modules/control/rc.c:907
 msgid "| fastforward  . . . . . .  .  set to maximum rate"
 msgstr "| fastforward  . . . . . .  .  установить максимальную скорость"
 
-#: modules/control/rc.c:902
+#: modules/control/rc.c:908
 msgid "| rewind  . . . . . . . . . .  set to minimum rate"
 msgstr "| rewind  . . . . . . . . . .  установить минимальную скорость"
 
-#: modules/control/rc.c:903
+#: modules/control/rc.c:909
 msgid "| faster . . . . . . . .  faster playing of stream"
 msgstr "| faster . . . . . . . .  воспроизводить быстрее"
 
-#: modules/control/rc.c:904
+#: modules/control/rc.c:910
 msgid "| slower . . . . . . . .  slower playing of stream"
 msgstr "| slower . . . . . . . .  воспроизводить медленнее"
 
-#: modules/control/rc.c:905
+#: modules/control/rc.c:911
 msgid "| normal . . . . . . . .  normal playing of stream"
 msgstr "| normal . . . . . . . .  обычное воспроизведение"
 
-#: modules/control/rc.c:906
+#: modules/control/rc.c:912
 msgid "| f [on|off] . . . . . . . . . . toggle fullscreen"
 msgstr "| f [on|off] . . . . . . . . . . переключить полноэкранный режим"
 
-#: modules/control/rc.c:907
+#: modules/control/rc.c:913
 msgid "| info . . .  information about the current stream"
 msgstr "| info . . .  информация о текущем потоке"
 
-#: modules/control/rc.c:908
+#: modules/control/rc.c:914
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr "| get_time . . показать секунды, прошедшие с начала воспроизведения"
 
-#: modules/control/rc.c:909
+#: modules/control/rc.c:915
 msgid "| is_playing . .  1 if a stream plays, 0 otherwise"
 msgstr "| is_playing . .  1, если поток воспроизводится, иначе 0"
 
-#: modules/control/rc.c:910
+#: modules/control/rc.c:916
 msgid "| get_title . . .  the title of the current stream"
 msgstr "| get_title . . .  заголовок текущего потока"
 
-#: modules/control/rc.c:911
+#: modules/control/rc.c:917
 msgid "| get_length . .  the length of the current stream"
 msgstr "| get_length . .  длительность текущего потока"
 
-#: modules/control/rc.c:913
+#: modules/control/rc.c:919
 msgid "| volume [X] . . . . . . . .  set/get audio volume"
 msgstr "| volume [X] . . . . . . . .  установить/получить громкость"
 
-#: modules/control/rc.c:914
+#: modules/control/rc.c:920
 msgid "| volup [X]  . . . . .  raise audio volume X steps"
 msgstr "| volup [X]  . . . . .  увеличить громкость на X шагов"
 
-#: modules/control/rc.c:915
+#: modules/control/rc.c:921
 msgid "| voldown [X]  . . . .  lower audio volume X steps"
 msgstr "| voldown [X]  . . . .  уменьшить громкость на X шагов"
 
-#: modules/control/rc.c:916
+#: modules/control/rc.c:922
 msgid "| adev [X] . . . . . . . . .  set/get audio device"
 msgstr "| adev [X] . . . . . . . . .  установить/получить аудио устройство"
 
-#: modules/control/rc.c:917
+#: modules/control/rc.c:923
 msgid "| achan [X]. . . . . . . .  set/get audio channels"
 msgstr "| achan [X]. . . . . . . .  установить/получить аудио каналы"
 
-#: modules/control/rc.c:918
+#: modules/control/rc.c:924
 #, fuzzy
 msgid "| atrack [X] . . . . . . . . . set/get audio track"
 msgstr "| adev [X] . . . . . . . . .  установить/получить аудио устройство"
 
-#: modules/control/rc.c:919
+#: modules/control/rc.c:925
 #, fuzzy
 msgid "| vtrack [X] . . . . . . . . . set/get video track"
 msgstr "| adev [X] . . . . . . . . .  установить/получить аудио устройство"
 
-#: modules/control/rc.c:920
+#: modules/control/rc.c:926
 #, fuzzy
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
 msgstr "| adev [X] . . . . . . . . .  установить/получить аудио устройство"
 
-#: modules/control/rc.c:921
+#: modules/control/rc.c:927
 #, fuzzy
 msgid "| vcrop [X]  . . . . . . . . .  set/get video crop"
 msgstr "| adev [X] . . . . . . . . .  установить/получить аудио устройство"
 
-#: modules/control/rc.c:922
+#: modules/control/rc.c:928
 #, fuzzy
 msgid "| vzoom [X]  . . . . . . . . .  set/get video zoom"
 msgstr "| volume [X] . . . . . . . .  установить/получить громкость"
 
-#: modules/control/rc.c:923
+#: modules/control/rc.c:929
 #, fuzzy
 msgid "| strack [X] . . . . . . . set/get subtitles track"
 msgstr "| achan [X]. . . . . . . .  установить/получить аудио каналы"
 
-#: modules/control/rc.c:924
+#: modules/control/rc.c:930
 msgid "| menu [on|off|up|down|left|right|select] use menu"
 msgstr "| menu [on|off|up|down|left|right|select] использовать меню"
 
-#: modules/control/rc.c:929
+#: modules/control/rc.c:935
 msgid "| marq-marquee STRING  . . overlay STRING in video"
 msgstr "| marq-marquee STRING  . . наложить STRING на видео"
 
-#: modules/control/rc.c:930
+#: modules/control/rc.c:936
 msgid "| marq-x X . . . . . . . . . . . .offset from left"
 msgstr "| marq-x X . . . . . . . . . . . . смещение слева"
 
-#: modules/control/rc.c:931
+#: modules/control/rc.c:937
 msgid "| marq-y Y . . . . . . . . . . . . offset from top"
 msgstr "| marq-y Y . . . . . . . . . . . . смещение сверху"
 
-#: modules/control/rc.c:932
+#: modules/control/rc.c:938
 msgid "| marq-position #. . .  .relative position control"
 msgstr "| marq-position #. . .  . относительная позиция"
 
-#: modules/control/rc.c:933
+#: modules/control/rc.c:939
 msgid "| marq-color # . . . . . . . . . . font color, RGB"
 msgstr "| marq-color # . . . . . . . . . . цвет шрифта, RGB"
 
-#: modules/control/rc.c:934
+#: modules/control/rc.c:940
 msgid "| marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr "| marq-opacity # . . . . . . . . . . . . . прозрачность"
 
-#: modules/control/rc.c:935
+#: modules/control/rc.c:941
 msgid "| marq-timeout T. . . . . . . . . . timeout, in ms"
 msgstr "| marq-timeout T. . . . . . . . . . таймаут, в мс"
 
-#: modules/control/rc.c:936
+#: modules/control/rc.c:942
 msgid "| marq-size # . . . . . . . . font size, in pixels"
 msgstr "| marq-size # . . . . . . . . размер шрифта, в пикселях"
 
-#: modules/control/rc.c:938
+#: modules/control/rc.c:944
 msgid "| logo-file STRING . . .the overlay file path/name"
 msgstr "| logo-file STRING . . . наложить файл"
 
-#: modules/control/rc.c:939
+#: modules/control/rc.c:945
 msgid "| logo-x X . . . . . . . . . . . .offset from left"
 msgstr "| logo-x X . . . . . . . . . . . . смещение слева"
 
-#: modules/control/rc.c:940
+#: modules/control/rc.c:946
 msgid "| logo-y Y . . . . . . . . . . . . offset from top"
 msgstr "| logo-y Y . . . . . . . . . . . . смещение сверху"
 
-#: modules/control/rc.c:941
+#: modules/control/rc.c:947
 msgid "| logo-position #. . . . . . . . relative position"
 msgstr "| logo-position #. . . . . . . . относительная позиция"
 
-#: modules/control/rc.c:942
+#: modules/control/rc.c:948
 msgid "| logo-transparency #. . . . . . . . .transparency"
 msgstr "| logo-transparency #. . . . . . . . . прозрачность"
 
-#: modules/control/rc.c:944
+#: modules/control/rc.c:950
 msgid "| mosaic-alpha # . . . . . . . . . . . . . . alpha"
 msgstr "| mosaic-alpha # . . . . . . . . . . . . . . прозрачность мозаики"
 
-#: modules/control/rc.c:945
+#: modules/control/rc.c:951
 msgid "| mosaic-height #. . . . . . . . . . . . . .height"
 msgstr "| mosaic-height #. . . . . . . . . . . . . . высота мозаики"
 
-#: modules/control/rc.c:946
+#: modules/control/rc.c:952
 msgid "| mosaic-width # . . . . . . . . . . . . . . width"
 msgstr "| mosaic-width # . . . . . . . . . . . . . . ширина мозаики"
 
-#: modules/control/rc.c:947
+#: modules/control/rc.c:953
 msgid "| mosaic-xoffset # . . . .top left corner position"
 msgstr "| mosaic-xoffset # . . . . верхний левый угол позиционирования"
 
-#: modules/control/rc.c:948
+#: modules/control/rc.c:954
 msgid "| mosaic-yoffset # . . . .top left corner position"
 msgstr "| mosaic-yoffset # . . . . верхний лейвый угол позиционирования"
 
-#: modules/control/rc.c:949
+#: modules/control/rc.c:955
 #, fuzzy
 msgid "| mosaic-offsets x,y(,x,y)*. . . . list of offsets"
 msgstr "| mosaic-xoffset # . . . . верхний левый угол позиционирования"
 
-#: modules/control/rc.c:950
+#: modules/control/rc.c:956
 msgid "| mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
 msgstr "| mosaic-align 0..2,4..6,8..10. . . выравнивание мозаики"
 
-#: modules/control/rc.c:951
+#: modules/control/rc.c:957
 msgid "| mosaic-vborder # . . . . . . . . vertical border"
 msgstr "| mosaic-vborder # . . . . . . . . вертикальный край"
 
-#: modules/control/rc.c:952
+#: modules/control/rc.c:958
 msgid "| mosaic-hborder # . . . . . . . horizontal border"
 msgstr "| mosaic-hborder # . . . . . . . горизонтальный край"
 
-#: modules/control/rc.c:953
+#: modules/control/rc.c:959
 msgid "| mosaic-position {0=auto,1=fixed} . . . .position"
 msgstr ""
 "| mosaic-position {0=автоматически,1=фиксированная} . . . . позиция мозаики"
 
-#: modules/control/rc.c:954
+#: modules/control/rc.c:960
 msgid "| mosaic-rows #. . . . . . . . . . .number of rows"
 msgstr "| mosaic-rows #. . . . . . . . . . . количество рядов"
 
-#: modules/control/rc.c:955
+#: modules/control/rc.c:961
 msgid "| mosaic-cols #. . . . . . . . . . .number of cols"
 msgstr "| mosaic-cols #. . . . . . . . . . . количество столбцов"
 
-#: modules/control/rc.c:956
+#: modules/control/rc.c:962
 #, fuzzy
 msgid "| mosaic-order id(,id)* . . . . order of pictures "
 msgstr "| mosaic-hborder # . . . . . . . горизонтальный край"
 
-#: modules/control/rc.c:957
+#: modules/control/rc.c:963
 msgid "| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 msgstr "| mosaic-keep-aspect-ratio {0,1} . . . сохранять соотношение сторон"
 
-#: modules/control/rc.c:959
+#: modules/control/rc.c:965
 msgid ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
@@ -9845,46 +9858,46 @@ msgstr ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
 
-#: modules/control/rc.c:963
+#: modules/control/rc.c:969
 msgid "| help . . . . . . . . . . . . . this help message"
 msgstr "| help . . . . . . . . . . . . . показать справку"
 
-#: modules/control/rc.c:964
+#: modules/control/rc.c:970
 msgid "| longhelp . . . . . . . . . a longer help message"
 msgstr "| longhelp . . . . . . . . . показать длинную справку"
 
-#: modules/control/rc.c:965
+#: modules/control/rc.c:971
 msgid "| logout . . . . .  exit (if in socket connection)"
 msgstr "| logout . . . . .  выйти (в случае с соединением через сокет)"
 
-#: modules/control/rc.c:966
+#: modules/control/rc.c:972
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr "| quit . . . . . . . . . . . . . . . . .  закрыть vlc"
 
-#: modules/control/rc.c:968
+#: modules/control/rc.c:974
 msgid "+----[ end of help ]"
 msgstr "+----[ конец справки ]"
 
-#: modules/control/rc.c:1075
+#: modules/control/rc.c:1081
 msgid "Press menu select or pause to continue."
 msgstr "Нажмите выбор меню или паузу для продожения."
 
-#: modules/control/rc.c:1312 modules/control/rc.c:1747
-#: modules/control/rc.c:1817 modules/control/rc.c:1986
-#: modules/control/rc.c:2085
+#: modules/control/rc.c:1319 modules/control/rc.c:1798
+#: modules/control/rc.c:1868 modules/control/rc.c:2037
+#: modules/control/rc.c:2136
 msgid "Type 'menu select' or 'pause' to continue."
 msgstr "Введите 'menu select' или 'pause' для продолжения."
 
-#: modules/control/rc.c:1336
+#: modules/control/rc.c:1387
 #, fuzzy
 msgid "goto is deprecated"
 msgstr "Следующий файл"
 
-#: modules/control/rc.c:1452
+#: modules/control/rc.c:1503
 msgid "Type 'pause' to continue."
 msgstr "Введите 'pause' для продолжения."
 
-#: modules/control/rc.c:2070 modules/control/rc.c:2109
+#: modules/control/rc.c:2121 modules/control/rc.c:2160
 msgid "Please provide one of the following parameters:"
 msgstr "Укажит один из следующих параметров:"
 
@@ -9912,6 +9925,7 @@ msgstr ""
 
 #: modules/control/telnet.c:77 modules/gui/macosx/open.m:178
 #: modules/gui/macosx/open.m:180 modules/gui/macosx/output.m:147
+#: modules/gui/qt4/ui/file_open.ui:1074
 #: modules/gui/wxwidgets/dialogs/open.cpp:827
 #: modules/gui/wxwidgets/dialogs/open.cpp:854
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:531 modules/stream_out/rtp.c:82
@@ -9998,11 +10012,11 @@ msgstr ""
 msgid "AVI demuxer"
 msgstr "Демултиплексор AVI"
 
-#: modules/demux/avi/avi.c:557
+#: modules/demux/avi/avi.c:583
 msgid "AVI Index"
 msgstr "Индексация AVI"
 
-#: modules/demux/avi/avi.c:558
+#: modules/demux/avi/avi.c:584
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to repair it (this might take a long time) ?"
@@ -10010,16 +10024,16 @@ msgstr ""
 "Этот AVI-файл испорчен. Перемотка не будет правильно работать.\n"
 "Попытаться исправить его (может занять длительное время)?"
 
-#: modules/demux/avi/avi.c:561
+#: modules/demux/avi/avi.c:587
 #, fuzzy
 msgid "Repair"
 msgstr "Следующий файл"
 
-#: modules/demux/avi/avi.c:561
+#: modules/demux/avi/avi.c:587
 msgid "Don't repair"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2278 modules/demux/avi/avi.c:2301
+#: modules/demux/avi/avi.c:2322 modules/demux/avi/avi.c:2345
 #, fuzzy
 msgid "Fixing AVI Index..."
 msgstr "Исправление индексов"
@@ -10624,16 +10638,16 @@ msgstr ""
 msgid "MPEG Transport Stream demuxer"
 msgstr "Демультиплексор MPEG TS"
 
-#: modules/demux/ts.c:3144 modules/demux/ts.c:3178
+#: modules/demux/ts.c:3146 modules/demux/ts.c:3180
 #, fuzzy
 msgid "clean effects"
 msgstr "Остановить поток"
 
-#: modules/demux/ts.c:3148 modules/demux/ts.c:3182
+#: modules/demux/ts.c:3150 modules/demux/ts.c:3184
 msgid "hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3152 modules/demux/ts.c:3186
+#: modules/demux/ts.c:3154 modules/demux/ts.c:3188
 msgid "visual impaired commentary"
 msgstr ""
 
@@ -10673,7 +10687,9 @@ msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
-#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:675
+#: modules/gui/macosx/open.m:784 modules/gui/qt4/ui/file_open.ui:231
+#: modules/gui/qt4/ui/file_open.ui:517 modules/gui/qt4/ui/file_open.ui:620
+#: modules/gui/wxwidgets/interface.cpp:675
 #: modules/gui/wxwidgets/interface.cpp:686 modules/gui/wxwidgets/menus.cpp:351
 #: modules/gui/wxwidgets/menus.cpp:407
 msgid "Open"
@@ -10695,7 +10711,7 @@ msgstr "Сообщения"
 #: modules/gui/beos/InterfaceWindow.cpp:265
 #: modules/gui/beos/PlayListWindow.cpp:87 modules/gui/macosx/open.m:439
 #: modules/gui/macosx/open.m:737 modules/gui/macosx/open.m:783
-#: modules/gui/wxwidgets/dialogs.cpp:430
+#: modules/gui/wxwidgets/dialogs.cpp:434
 #: modules/gui/wxwidgets/dialogs/open.cpp:1259
 msgid "Open File"
 msgstr "Открыть файл"
@@ -11269,7 +11285,7 @@ msgstr ""
 "Выбрать порядок применения фильтров можно также в Настройках, в разделе "
 "Видео/Фильтры."
 
-#: modules/gui/macosx/fspanel.m:297
+#: modules/gui/macosx/fspanel.m:288
 #, fuzzy
 msgid "(no item is being played)"
 msgstr "%i элемент(ов) в плейлисте"
@@ -11315,7 +11331,7 @@ msgstr "Открыть окно списка для воспроизведени
 
 #: modules/gui/macosx/intf.m:489 modules/gui/macosx/intf.m:1030
 #: modules/gui/macosx/intf.m:1351 modules/gui/pda/pda_interface.c:212
-#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:105
+#: modules/gui/pda/pda_interface.c:1355 modules/gui/qt4/main_interface.cpp:108
 #: modules/gui/qt4/ui/main_interface.ui:24
 msgid "VLC media player"
 msgstr "VLC media player"
@@ -11619,6 +11635,7 @@ msgid "DVD"
 msgstr "DVD"
 
 #: modules/gui/macosx/open.m:179 modules/gui/macosx/output.m:146
+#: modules/gui/qt4/ui/file_open.ui:1094
 #: modules/gui/wxwidgets/dialogs/open.cpp:846
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:520
 msgid "Address"
@@ -11655,14 +11672,14 @@ msgstr "Настройки..."
 msgid "Override parametters"
 msgstr "Остановить поток"
 
-#: modules/gui/macosx/open.m:244 modules/gui/qt4/ui/file_open.ui:130
+#: modules/gui/macosx/open.m:244
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:218
 #: modules/stream_out/bridge.c:41 modules/stream_out/display.c:41
 #: modules/video_filter/mosaic.c:149
 msgid "Delay"
 msgstr "Задержка"
 
-#: modules/gui/macosx/open.m:246 modules/gui/qt4/ui/file_open.ui:117
+#: modules/gui/macosx/open.m:246
 msgid "FPS"
 msgstr ""
 
@@ -11671,7 +11688,7 @@ msgstr ""
 msgid "Subtitles encoding"
 msgstr "Следующий файл"
 
-#: modules/gui/macosx/open.m:250 modules/gui/qt4/ui/file_open.ui:140
+#: modules/gui/macosx/open.m:250
 #, fuzzy
 msgid "Font size"
 msgstr "Следующий файл"
@@ -11983,7 +12000,7 @@ msgstr ""
 "параметры \", чтобы видеть их."
 
 #: modules/gui/macosx/prefs_widgets.m:1222
-#: modules/gui/wxwidgets/dialogs.cpp:474
+#: modules/gui/wxwidgets/dialogs.cpp:478
 msgid "Select a directory"
 msgstr "Выберите каталог"
 
@@ -12867,7 +12884,7 @@ msgstr "Имя файла"
 msgid "Permissions"
 msgstr "Воспр."
 
-#: modules/gui/pda/pda.c:232
+#: modules/gui/pda/pda.c:232 modules/gui/qt4/ui/file_open.ui:322
 msgid "Size"
 msgstr "Размер"
 
@@ -13379,33 +13396,210 @@ msgstr "Информация о потоке"
 msgid "Qt interface"
 msgstr "Открыть окно списка для воспроизведения"
 
-#: modules/gui/qt4/ui/file_open.ui:16 modules/gui/qt4/ui/input_stats.ui:16
-#, fuzzy
-msgid "Form"
-msgstr "Стандарт"
+#: modules/gui/qt4/ui/file_open.ui:43
+msgid "Personnalize"
+msgstr ""
 
-#: modules/gui/qt4/ui/file_open.ui:46 modules/gui/qt4/ui/file_open.ui:88
+#: modules/gui/qt4/ui/file_open.ui:104
+#: modules/gui/wxwidgets/dialogs/open.cpp:454
+msgid "Caching"
+msgstr "Кэширование"
+
+#: modules/gui/qt4/ui/file_open.ui:285 modules/gui/qt4/ui/file_open.ui:571
+#: modules/gui/qt4/ui/file_open.ui:677 modules/gui/qt4/ui/file_open.ui:815
 #, fuzzy
 msgid "Browse"
 msgstr "Обзор..."
 
-#: modules/gui/qt4/ui/file_open.ui:55
-#: modules/gui/wxwidgets/dialogs/subtitles.cpp:73
-msgid "Subtitles file"
-msgstr "Файл субтитров"
+#: modules/gui/qt4/ui/file_open.ui:343
+msgid "Very Small)</string>"
+msgstr ""
 
-#: modules/gui/qt4/ui/file_open.ui:97
-#: modules/gui/wxwidgets/dialogs/open.cpp:261
-#: modules/gui/wxwidgets/dialogs/open.cpp:272
-#: modules/gui/wxwidgets/dialogs/open.cpp:417
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:217
-msgid "Advanced options"
-msgstr "Расширенные параметры"
-
-#: modules/gui/qt4/ui/file_open.ui:147
+#: modules/gui/qt4/ui/file_open.ui:347 modules/gui/qt4/ui/file_open.ui:352
+#: modules/gui/qt4/ui/file_open.ui:357 modules/gui/qt4/ui/file_open.ui:362
+#: modules/gui/qt4/ui/file_open.ui:388 modules/gui/qt4/ui/file_open.ui:442
+#: modules/gui/qt4/ui/file_open.ui:457 modules/gui/qt4/ui/file_open.ui:513
 #, fuzzy
-msgid "Justification"
-msgstr "Усиление"
+msgid "text"
+msgstr "Следующий"
+
+#: modules/gui/qt4/ui/file_open.ui:348 modules/misc/freetype.c:105
+#: modules/misc/win32text.c:77
+msgid "Small"
+msgstr "Маленький"
+
+#: modules/gui/qt4/ui/file_open.ui:353
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
+#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
+#: modules/misc/win32text.c:77
+msgid "Normal"
+msgstr "Обычный"
+
+#: modules/gui/qt4/ui/file_open.ui:358
+#, fuzzy
+msgid "Big"
+msgstr "Мост"
+
+#: modules/gui/qt4/ui/file_open.ui:363
+msgid "Very Big"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:370 modules/gui/qt4/ui/file_open.ui:495
+#, fuzzy
+msgid "QWidget"
+msgstr "Ширина"
+
+#: modules/gui/qt4/ui/file_open.ui:370
+msgid "layoutWidget"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:371 modules/gui/qt4/ui/file_open.ui:434
+#: modules/gui/qt4/ui/file_open.ui:449 modules/gui/qt4/ui/file_open.ui:462
+#: modules/gui/qt4/ui/file_open.ui:478 modules/gui/qt4/ui/file_open.ui:496
+#, fuzzy
+msgid "geometry"
+msgstr "Спектрометр"
+
+#: modules/gui/qt4/ui/file_open.ui:379 modules/gui/qt4/ui/file_open.ui:504
+msgid "QHBoxLayout"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:380 modules/gui/qt4/ui/file_open.ui:505
+#, fuzzy
+msgid "margin"
+msgstr "Амхарский"
+
+#: modules/gui/qt4/ui/file_open.ui:383 modules/gui/qt4/ui/file_open.ui:508
+#, fuzzy
+msgid "spacing"
+msgstr "Кэширование"
+
+#: modules/gui/qt4/ui/file_open.ui:387 modules/gui/qt4/ui/file_open.ui:512
+msgid "QLabel"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:387
+msgid "alignSubLabel"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:389 modules/gui/qt4/ui/file_open.ui:514
+msgid "qrichtext"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:389 modules/gui/qt4/ui/file_open.ui:514
+msgid "1"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:389 modules/gui/qt4/ui/file_open.ui:514
+msgid "text/css"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:392
+#, fuzzy
+msgid "Alignment"
+msgstr "Выравнивание данных"
+
+#: modules/gui/qt4/ui/file_open.ui:426
+msgid "Right)</string>"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:433
+msgid "QToolButton"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:433
+msgid "optionsSubButton"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:448
+#, fuzzy
+msgid "QPushButton"
+msgstr "Пушту"
+
+#: modules/gui/qt4/ui/file_open.ui:448
+msgid "extraAudioButton"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:461
+#, fuzzy
+msgid "Line"
+msgstr "Linear"
+
+#: modules/gui/qt4/ui/file_open.ui:461
+#, fuzzy
+msgid "line"
+msgstr "Обвести"
+
+#: modules/gui/qt4/ui/file_open.ui:470
+#, fuzzy
+msgid "orientation"
+msgstr "Больше информации"
+
+#: modules/gui/qt4/ui/file_open.ui:474
+#, fuzzy
+msgid "QGroupBox"
+msgstr "Следующий файл"
+
+#: modules/gui/qt4/ui/file_open.ui:474
+msgid "audioGroupBox"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:475
+#, fuzzy
+msgid "enabled"
+msgstr "включить"
+
+#: modules/gui/qt4/ui/file_open.ui:487
+#, fuzzy
+msgid "Extra Audio File"
+msgstr "Аудио фильтры"
+
+#: modules/gui/qt4/ui/file_open.ui:489
+#, fuzzy
+msgid "checkable"
+msgstr "включить"
+
+#: modules/gui/qt4/ui/file_open.ui:492
+msgid "checked"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:495
+#, fuzzy
+msgid "horizontalLayout_3"
+msgstr "Повернуть по-горизонтали"
+
+#: modules/gui/qt4/ui/file_open.ui:512
+msgid "audioOpenLabel"
+msgstr ""
+
+#: modules/gui/qt4/ui/file_open.ui:588
+#, fuzzy
+msgid "Media File"
+msgstr "Поток: %s"
+
+#: modules/gui/qt4/ui/file_open.ui:687
+#, fuzzy
+msgid "Disk"
+msgstr "Диск"
+
+#: modules/gui/qt4/ui/file_open.ui:699
+#, fuzzy
+msgid "Disc Type"
+msgstr "Тип диска"
+
+#: modules/gui/qt4/ui/file_open.ui:780
+#: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
+msgid "Options"
+msgstr "Настройки"
+
+#: modules/gui/qt4/ui/file_open.ui:801
+msgid "Peripheric Path"
+msgstr ""
+
+#: modules/gui/qt4/ui/input_stats.ui:16
+#, fuzzy
+msgid "Form"
+msgstr "Стандарт"
 
 #: modules/gui/qt4/ui/input_stats.ui:298
 #, fuzzy
@@ -13686,9 +13880,24 @@ msgstr ""
 msgid "Input has changed "
 msgstr "Входной поток был изменен "
 
-#: modules/gui/wxwidgets/dialogs.cpp:433
+#: modules/gui/wxwidgets/dialogs.cpp:437
 #: modules/gui/wxwidgets/dialogs/open.cpp:1262
 msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:439
+#: modules/gui/wxwidgets/dialogs/open.cpp:1264
+msgid "|Video Files (*.avi, *.mpg, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:440
+#: modules/gui/wxwidgets/dialogs/open.cpp:1265
+msgid "|Playlist Files (*.m3u, *.pls, etc.)|"
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:441
+#: modules/gui/wxwidgets/dialogs/open.cpp:1266
+msgid "|Subtitle Files (*.srt, *.sub, etc.)|"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
@@ -13741,6 +13950,13 @@ msgstr "Сохранить сообщения как..."
 msgid "Advanced options..."
 msgstr "Расширенные параметры..."
 
+#: modules/gui/wxwidgets/dialogs/open.cpp:261
+#: modules/gui/wxwidgets/dialogs/open.cpp:272
+#: modules/gui/wxwidgets/dialogs/open.cpp:417
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:217
+msgid "Advanced options"
+msgstr "Расширенные параметры"
+
 #: modules/gui/wxwidgets/dialogs/open.cpp:276
 msgid "Options:"
 msgstr "Параметры:"
@@ -13757,10 +13973,6 @@ msgstr "Вещать/Сохранить"
 #: modules/gui/wxwidgets/dialogs/open.cpp:428
 msgid "Use VLC as a stream server"
 msgstr "Вещать поток в сеть или сохранить в файл"
-
-#: modules/gui/wxwidgets/dialogs/open.cpp:454
-msgid "Caching"
-msgstr "Кэширование"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:455
 msgid "Change the default caching value (in milliseconds)"
@@ -14023,12 +14235,6 @@ msgstr "Плейлист пуст"
 msgid "Can't save"
 msgstr "Невозможно сохранить"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
-#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
-#: modules/misc/win32text.c:77
-msgid "Normal"
-msgstr "Обычный"
-
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1418
 #, fuzzy
 msgid "One level"
@@ -14108,6 +14314,10 @@ msgstr "MMSH"
 msgid "RTP"
 msgstr "RTP"
 
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
+msgid "UDP"
+msgstr "UDP"
+
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:592
 msgid "Group name"
 msgstr "Имя группы"
@@ -14144,9 +14354,9 @@ msgstr "Сохранить файл"
 msgid "Subtitle options"
 msgstr "Настройки субтитров"
 
-#: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
-msgid "Options"
-msgstr "Настройки"
+#: modules/gui/wxwidgets/dialogs/subtitles.cpp:73
+msgid "Subtitles file"
+msgstr "Файл субтитров"
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:211
 msgid ""
@@ -14219,6 +14429,10 @@ msgstr "Вывод"
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:404
 msgid "Loop"
 msgstr "Зациклить"
+
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:415
+msgid "Create"
+msgstr "Создать"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:560
 msgid "VLM stream"
@@ -14302,6 +14516,10 @@ msgid ""
 "about it."
 msgstr "Выберите видео кодек."
 
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
+msgid "Transcode audio (if available)"
+msgstr "Кодировать аудио (если возможно)"
+
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
 msgid ""
 "Select the target audio codec. Choose a codec to display more information "
@@ -14374,10 +14592,6 @@ msgstr "Больше информации"
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1291
 msgid "Save to file"
 msgstr "Сохранить в файл"
-
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:134
-msgid "Transcode audio (if available)"
-msgstr "Кодировать аудио (если возможно)"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:41
 msgid ""
@@ -15340,10 +15554,6 @@ msgstr ""
 msgid "Smaller"
 msgstr "Меньше"
 
-#: modules/misc/freetype.c:105 modules/misc/win32text.c:77
-msgid "Small"
-msgstr "Маленький"
-
 #: modules/misc/freetype.c:106 modules/misc/win32text.c:78
 msgid "Large"
 msgstr "Большой"
@@ -15569,10 +15779,6 @@ msgstr "Порт UDP"
 msgid "Growl UDP port on the server."
 msgstr "Порт UDP на сервере Growl."
 
-#: modules/misc/notify/growl.c:72
-msgid "Growl"
-msgstr "Growl"
-
 #: modules/misc/notify/growl.c:73
 msgid "Growl Notification Plugin"
 msgstr "Оповещения Growl"
@@ -15601,10 +15807,6 @@ msgid ""
 msgstr ""
 "Формат строки, посылаемой в MSN. Допустимые значения: {0} Исполнитель, {1} "
 "Название, {2} Альбом. По-умолчанию \"Исполнитель - Название\""
-
-#: modules/misc/notify/msn.c:70
-msgid "MSN"
-msgstr "MSN"
 
 #: modules/misc/notify/msn.c:71
 msgid "MSN Now-Playing"
@@ -16141,7 +16343,7 @@ msgstr "Мультиплексор WAV"
 msgid "Copy packetizer"
 msgstr "Упаковщик копированием"
 
-#: modules/packetizer/h264.c:47
+#: modules/packetizer/h264.c:48
 msgid "H.264 video packetizer"
 msgstr "Видео упаковщик H.264"
 
@@ -16186,6 +16388,8 @@ msgid "DAAP access"
 msgstr "Доступ к DAAP"
 
 #: modules/services_discovery/hal.c:130
+#: modules/services_discovery/upnp_cc.cpp:109
+#: modules/services_discovery/upnp_intel.cpp:299
 msgid "Devices"
 msgstr "Устройства"
 
@@ -16341,7 +16545,7 @@ msgstr "Shoutcast"
 msgid "Universal Plug'n'Play discovery"
 msgstr "Обнаружение Universal Plug'n'Play"
 
-#: modules/services_discovery/upnp_intel.cpp:260
+#: modules/services_discovery/upnp_intel.cpp:261
 msgid "Universal Plug'n'Play discovery ( Intel SDK )"
 msgstr "Обнаружение Universal Plug'n'Play (Intel SDK)"
 
@@ -17087,6 +17291,13 @@ msgstr "MMX-преобразование I420,IYUV,YV12 в RGB2,RV15,RV16,RV24,R
 #: modules/video_chroma/i422_yuy2.c:63
 msgid "Conversions from "
 msgstr "Преобразование из "
+
+#: modules/video_chroma/i420_ymga.c:48 modules/video_chroma/i420_ymga.c:51
+#: modules/video_chroma/i420_yuy2.c:75 modules/video_chroma/i420_yuy2.c:78
+#: modules/video_chroma/i420_yuy2.c:86 modules/video_chroma/i422_yuy2.c:63
+#: modules/video_chroma/i422_yuy2.c:66
+msgid " to "
+msgstr " в "
 
 #: modules/video_chroma/i420_ymga.c:51 modules/video_chroma/i420_yuy2.c:78
 #: modules/video_chroma/i422_yuy2.c:66
@@ -19048,6 +19259,16 @@ msgstr "Фильтр визуализатора"
 msgid "Spectrum analyser"
 msgstr "Анализатор спектра"
 
+#, fuzzy
+#~ msgid "Justification"
+#~ msgstr "Усиление"
+
+#~ msgid "Growl"
+#~ msgstr "Growl"
+
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
 #~ msgid "Vertical border width"
 #~ msgstr "Ширина вертикальной границы"
 
@@ -19156,12 +19377,6 @@ msgstr "Анализатор спектра"
 
 #~ msgid "Video filters settings"
 #~ msgstr "Настройки видео фильтров"
-
-#~ msgid "Create"
-#~ msgstr "Создать"
-
-#~ msgid " to "
-#~ msgstr " в "
 
 #~ msgid "CDDB Artist"
 #~ msgstr "Исполнитель CDDB"
