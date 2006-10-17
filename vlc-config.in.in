@@ -204,6 +204,8 @@ while test $# -gt 0; do
       echo_builtin=yes
       cppflags="${cppflags} -D__VLC__ -D__BUILTIN__"
       ;;
+    pic)
+      ;;
     mozilla)
       ;;
     external)
