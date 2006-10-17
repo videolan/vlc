@@ -1091,6 +1091,12 @@ static struct
       AUDIO_ES, "Cook Audio" },
 #endif
 
+#if LIBAVCODEC_BUILD >= ((51<<16)+(4<<8)+0)
+    /* TTA: The Lossless True Audio */
+    { VLC_FOURCC('T','T','A','1'), CODEC_ID_TTA,
+      AUDIO_ES, "The Lossless True Audio" },
+#endif
+
 #if LIBAVCODEC_BUILD >= ((51<<16)+(8<<8)+0)
     /* Shorten */
     { VLC_FOURCC('s','h','n',' '), CODEC_ID_SHORTEN,

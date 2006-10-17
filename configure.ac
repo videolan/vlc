@@ -1148,7 +1148,7 @@ dnl
 dnl  default modules
 dnl
 VLC_ADD_PLUGINS([dummy logger memcpy])
-VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf mp4 rawdv nsv real aiff mjpeg demuxdump flac])
+VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf mp4 rawdv nsv real aiff mjpeg demuxdump flac tta])
 VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak flacdec])
 VLC_ADD_PLUGINS([deinterlace invert adjust transform wave ripple psychedelic gradient motionblur rv32 rotate noise])
 VLC_ADD_PLUGINS([fixed32tos16 s16tofixed32 u8tofixed32 mono])
