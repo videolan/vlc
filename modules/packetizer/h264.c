@@ -502,7 +502,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
             p_sps->i_pts = p_pps->i_pts = p_pic->i_pts;       \
             block_ChainAppend( &p_sps, p_pps );               \
             block_ChainAppend( &p_sps, p_pic );               \
-            p_pic = block_ChainGather( p_sps );               \
+            p_pic = p_sps;                                    \
             p_sys->b_header = VLC_TRUE;                       \
         }                                                     \
     } while(0)
