@@ -59,6 +59,7 @@ Interfaces:
 Localization:
  * Add Czech
  * Add Slovak
+ * Add Malay
 
 Developers:
  * Updates to the libvlc API
