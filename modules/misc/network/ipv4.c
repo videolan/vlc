@@ -222,7 +222,7 @@ static int OpenUDP( vlc_object_t * p_this )
 
         if( bind( i_handle, (struct sockaddr *)&stupid, sizeof( sock ) < 0 ) )
         {
-            msg_Warn( p_this, "cannot bind socket (%d)", WSA_GetLastError() );
+            msg_Warn( p_this, "cannot bind socket (%d)", WSAGetLastError() );
             close( i_handle );
             return 0;
         }
