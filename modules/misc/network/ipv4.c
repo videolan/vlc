@@ -169,39 +169,32 @@ static int OpenUDP( vlc_object_t * p_this )
 # define strerror( x ) winsock_strerror( strerror_buf )
 #endif
 
+    /* Build the local socket */
+    if( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )
+    {
+        msg_Dbg( p_this, "could not build local address" );
+        return 0;
+    }
+
     p_socket->i_handle = -1;
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
      * protocol */
     if( (i_handle = socket( AF_INET, SOCK_DGRAM, 0 )) == -1 )
     {
-        msg_Warn( p_this, "cannot create socket (%s)", strerror(errno) );
+        msg_Err( p_this, "cannot create socket (%s)", strerror(errno) );
         return 0;
     }
 
     /* We may want to reuse an already used socket */
-    i_opt = 1;
-    if( setsockopt( i_handle, SOL_SOCKET, SO_REUSEADDR,
-                    (void *) &i_opt, sizeof( i_opt ) ) == -1 )
-    {
-        msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR: %s)",
-                          strerror(errno));
-        close( i_handle );
-        return 0;
-    }
-
+    setsockopt( i_handle, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof( int ) );
 #ifdef SO_REUSEPORT
-    i_opt = 1;
-    if( setsockopt( i_handle, SOL_SOCKET, SO_REUSEPORT,
-                    (void *) &i_opt, sizeof( i_opt ) ) == -1 )
-    {
-        msg_Warn( p_this, "cannot configure socket (SO_REUSEPORT)" );
-    }
+    setsockopt( i_handle, SOL_SOCKET, SO_REUSEPORT, &(int){ 1 }, sizeof( int ) );
 #endif
 
     /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
      * packet loss caused by scheduling problems */
-#if !defined( SYS_BEOS )
+#ifdef SO_RCVBUF
     i_opt = 0x80000;
     if( setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF, (void *) &i_opt,
                     sizeof( i_opt ) ) == -1 )
@@ -213,14 +206,6 @@ static int OpenUDP( vlc_object_t * p_this )
         msg_Dbg( p_this, "cannot configure socket (SO_SNDBUF: %s)",
                           strerror(errno));
 #endif
-
-    /* Build the local socket */
-    if( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )
-    {
-        msg_Dbg( p_this, "could not build local address" );
-        close( i_handle );
-        return 0;
-    }
 
 #if defined( WIN32 ) || defined( UNDER_CE )
     /*
@@ -271,6 +256,7 @@ static int OpenUDP( vlc_object_t * p_this )
         /* Determine interface to be used for multicast */
         char * psz_if_addr = config_GetPsz( p_this, "miface-addr" );
 
+#ifdef IP_ADD_SOURCE_MEMBERSHIP
         /* If we have a source address, we use IP_ADD_SOURCE_MEMBERSHIP
            so that IGMPv3 aware OSes running on IGMPv3 aware networks
            will do an IGMPv3 query on the network */
@@ -307,6 +293,7 @@ static int OpenUDP( vlc_object_t * p_this )
          }
          /* If there is no source address, we use IP_ADD_MEMBERSHIP */
          else
+#endif
          {
              struct ip_mreq imr;
 
