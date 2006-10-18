@@ -269,38 +269,35 @@ static int OpenUDP( vlc_object_t * p_this )
 
             if( psz_if_addr != NULL && *psz_if_addr
                 && inet_addr(psz_if_addr) != INADDR_NONE )
-            {
                 imr.imr_interface.s_addr = inet_addr(psz_if_addr);
-            }
             else
-            {
                 imr.imr_interface.s_addr = INADDR_ANY;
-            }
-            if( psz_if_addr != NULL ) free( psz_if_addr );
 
-            msg_Dbg( p_this, "IP_ADD_SOURCE_MEMBERSHIP multicast request" );
+            if( psz_if_addr != NULL )
+                free( psz_if_addr );
+
             /* Join Multicast group with source filter */
             if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
                          (char*)&imr,
                          sizeof(struct ip_mreq_source) ) == -1 )
             {
-                msg_Err( p_this, "failed to join IP multicast group (%s)",
-                                  strerror(errno) );
-                msg_Err( p_this, "are you sure your OS supports IGMPv3?" );
-                close( i_handle );
-                return 0;
+                msg_Warn( p_this, "Source specific multicast failed (%s) -"
+                          "falling back to non-specific mode",
+                          strerror(errno) );
+                goto igmpv2;
             }
-         }
+        }
          /* If there is no source address, we use IP_ADD_MEMBERSHIP */
          else
 #endif
-         {
-             struct ip_mreq imr;
+        {
+            struct ip_mreq imr;
 
-             imr.imr_interface.s_addr = INADDR_ANY;
-             imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
-             if( psz_if_addr != NULL && *psz_if_addr
-                && inet_addr(psz_if_addr) != INADDR_NONE )
+        igmpv2:
+            imr.imr_interface.s_addr = INADDR_ANY;
+            imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
+            if( psz_if_addr != NULL && *psz_if_addr
+             && inet_addr(psz_if_addr) != INADDR_NONE )
             {
                 imr.imr_interface.s_addr = inet_addr(psz_if_addr);
             }
