@@ -169,18 +169,6 @@ static int OpenUDP( vlc_object_t * p_this )
 # define strerror( x ) winsock_strerror( strerror_buf )
 #endif
 
-    /* If IP_ADD_SOURCE_MEMBERSHIP is not defined in the headers
-       (because it's not in glibc for example), we have to define the
-       headers required for IGMPv3 here */
-#ifndef IP_ADD_SOURCE_MEMBERSHIP
-    #define IP_ADD_SOURCE_MEMBERSHIP  39
-    struct ip_mreq_source {
-        struct in_addr  imr_multiaddr;
-        struct in_addr  imr_interface;
-        struct in_addr  imr_sourceaddr;
-     };
-#endif
-
     p_socket->i_handle = -1;
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
