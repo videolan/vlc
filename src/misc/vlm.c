@@ -1745,8 +1745,8 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
             vlm_MessageAdd( msg_instance, vlm_MessageNew( a, psz_tmp ) ); \
             free( psz_tmp );
             APPEND_INPUT_INFO( "position", "%f", Float );
-            APPEND_INPUT_INFO( "time", "%d", Integer );
-            APPEND_INPUT_INFO( "length", "%d", Integer );
+            APPEND_INPUT_INFO( "time", I64Fi, Time );
+            APPEND_INPUT_INFO( "length", I64Fi, Time );
             APPEND_INPUT_INFO( "rate", "%d", Integer );
             APPEND_INPUT_INFO( "title", "%d", Integer );
             APPEND_INPUT_INFO( "chapter", "%d", Integer );
