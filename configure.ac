@@ -2876,9 +2876,6 @@ dnl Trying with pkg-config
         VLC_ADD_LDFLAGS([ffmpeg],[-lavutil])
         LDAVUTIL="-lavutil"])
 
-      AC_CHECK_LIB(postproc, pp_postprocess, [
-        VLC_ADD_LDFLAGS([ffmpeg],[-lpostproc])])
-
       AC_CHECK_LIB(avcodec, avcodec_init, [
         VLC_ADD_BUILTINS([ffmpeg])
         VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])
@@ -2888,6 +2885,11 @@ dnl Trying with pkg-config
          [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (svn version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ], [$LDAVUTIL])
 
       
+      AC_CHECK_LIB(postproc, pp_postprocess, [
+        VLC_ADD_LDFLAGS([ffmpeg],[-lpostproc])],
+	AC_MSG_ERROR([Could not find libpostproc inside FFmpeg. You should configure FFmpeg with --enable-gpl --enable-pp.]),
+	[$LDAVUTIL])
+
       AC_CHECK_LIB(avformat, av_open_input_stream, [
         VLC_ADD_LDFLAGS([ffmpeg],[-lavformat -lz]) ], [], [-lavcodec -lz $LDAVUTIL])
       LDFLAGS="${LDFLAGS_save}"
