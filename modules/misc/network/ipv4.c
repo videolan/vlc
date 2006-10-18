@@ -215,22 +215,35 @@ static int OpenUDP( vlc_object_t * p_this )
 #endif
 
     /* Build the local socket */
-
-#if defined( WIN32 ) || defined( UNDER_CE )
-    /* Under Win32 and for multicasting, we bind to INADDR_ANY,
-     * so let's call BuildAddr with "" instead of psz_bind_addr */
-    if( BuildAddr( p_this, &sock,
-        IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) ?
-                   "" : psz_bind_addr, i_bind_port ) == -1 )
-#else
     if( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )
-#endif
     {
         msg_Dbg( p_this, "could not build local address" );
         close( i_handle );
         return 0;
     }
 
+#if defined( WIN32 ) || defined( UNDER_CE )
+    /*
+     * Under Win32 and for multicasting, we bind to INADDR_ANY.
+     * This is of course a severe bug, since the socket would logically
+     * receive unicast traffic, and multicast traffic of groups subscribed
+     * to via other sockets. How this actually works in Winsock, I don't
+     * know.
+     */
+    if( IN_MULTICAST( ntohl( sock.sin_addr.s_addr ) ) )
+    {
+        struct sockaddr_in stupid = sock;
+        stupid.sin_addr.s_addr = INADDR_ANY;
+
+        if( bind( i_handle, (struct sockaddr *)&stupid, sizeof( sock ) < 0 ) )
+        {
+            msg_Warn( p_this, "cannot bind socket (%d)", WSA_GetLastError() );
+            close( i_handle );
+            return 0;
+        }
+    }
+    else
+#endif
     /* Bind it */
     if( bind( i_handle, (struct sockaddr *)&sock, sizeof( sock ) ) < 0 )
     {
@@ -238,19 +251,6 @@ static int OpenUDP( vlc_object_t * p_this )
         close( i_handle );
         return 0;
     }
-
-#if defined( WIN32 ) || defined( UNDER_CE )
-    /* Restore the sock struct so we can spare a few #ifdef WIN32 later on */
-    if( IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) )
-    {
-        if ( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )
-        {
-            msg_Dbg( p_this, "could not build local address" );
-            close( i_handle );
-            return 0;
-        }
-    }
-#endif
 
 #if !defined( SYS_BEOS )
     /* Allow broadcast reception if we bound on INADDR_ANY */
