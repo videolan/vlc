@@ -57,39 +57,31 @@
 #   define INADDR_NONE 0xFFFFFFFF
 #endif
 
-int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
-                int i_protocol )
-{
-    int fd, i_val;
-
-    fd = socket( i_family, i_socktype, i_protocol );
-    if( fd == -1 )
-    {
 #if defined(WIN32) || defined(UNDER_CE)
-        if( WSAGetLastError ( ) != WSAEAFNOSUPPORT )
-#else
-        if( errno != EAFNOSUPPORT )
+# undef EAFNOSUPPORT
+# define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
-            msg_Warn( p_this, "cannot create socket: %s",
-                      net_strerror(net_errno) );
+
+int net_Socket (vlc_object_t *p_this, int family, int socktype,
+                int protocol)
+{
+    int fd = socket (family, socktype, protocol);
+    if (fd == -1)
+    {
+        if (net_errno != EAFNOSUPPORT)
+            msg_Err (p_this, "cannot create socket: %s",
+                     net_strerror (net_errno));
         return -1;
     }
 
-#if defined( WIN32 ) || defined( UNDER_CE )
-    {
-        unsigned long i_dummy = 1;
-        if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
-            msg_Err( p_this, "cannot set socket to non-blocking mode" );
-    }
+#if defined (WIN32) || defined (UNDER_CE)
+    ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
 #else
-    fcntl( fd, F_SETFD, FD_CLOEXEC );
-    i_val = fcntl( fd, F_GETFL, 0 );
-    fcntl( fd, F_SETFL, ((i_val != -1) ? i_val : 0) | O_NONBLOCK );
+    fcntl (fd, F_SETFD, FD_CLOEXEC);
+    fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
 #endif
 
-    i_val = 1;
-    setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (void *)&i_val,
-                sizeof( i_val ) );
+    setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
 
 #ifdef IPV6_V6ONLY
     /*
@@ -100,22 +92,20 @@ int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
      * it makes sure that IPv4 addresses will be printed as w.x.y.z rather
      * than ::ffff:w.x.y.z
      */
-    if( i_family == AF_INET6 )
-        setsockopt( fd, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&i_val,
-                    sizeof( i_val ) );
+    if (family == AF_INET6)
+        setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 1 }, sizeof (int));
 #endif
 
-#if defined( WIN32 ) || defined( UNDER_CE )
+#if defined (WIN32) || defined (UNDER_CE)
 # ifndef IPV6_PROTECTION_LEVEL
 #  define IPV6_PROTECTION_LEVEL 23
+#  define PROTECTION_LEVEL_UNRESTRICTED 30
 # endif
-    if( i_family == AF_INET6 )
-    {
-        i_val = 30 /*PROTECTION_LEVEL_UNRESTRICTED*/;
-        setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL,
-                   (const char*)&i_val, sizeof( i_val ) );
-    }
+    if (family == AF_INET6)
+        setsockopt (fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL,
+                    &(int){ PROTECTION_LEVEL_UNRESTRICTED }, sizeof (int));
 #endif
+
     return fd;
 }
 
@@ -125,14 +115,14 @@ int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
  *****************************************************************************
  * Close a network handle
  *****************************************************************************/
-void net_Close( int fd )
+void net_Close (int fd)
 {
 #ifdef UNDER_CE
-    CloseHandle( (HANDLE)fd );
-#elif defined( WIN32 )
-    closesocket( fd );
+    CloseHandle ((HANDLE)fd);
+#elif defined (WIN32)
+    closesocket (fd);
 #else
-    close( fd );
+    (void)close (fd);
 #endif
 }
 
