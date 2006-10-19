@@ -5488,6 +5488,13 @@ then
   plugin_support=false
 fi
 
+AS_IF([${plugin_support}], [
+  AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1, Define if we have support for dynamic plugins)
+], [
+  VLC_ADD_BUILTINS([${PLUGINS}])
+  PLUGINS=""
+])
+
 dnl
 dnl Pic and shared libvlc stuff
 dnl
@@ -5496,7 +5503,7 @@ AM_CONDITIONAL(BUILD_SHARED, [test "${enable_shared_libvlc}" != "no"])
 AS_IF([test "${enable_shared_libvlc}" != "no" || test "${enable_libtool}" != "no"], [
   AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
   FILE_LIBVLC_DLL="!define LIBVLC_DLL libvlc.dll"
-  PLUGINS="${BUILTINS}"
+  VLC_ADD_PLUGINS([${BUILTINS}])
   BUILTINS=""
 ], [
   FILE_LIBVLC_DLL=""
