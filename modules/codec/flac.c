@@ -97,7 +97,7 @@ enum {
     STATE_SEND_DATA
 };
 
-static int pi_channels_maps[6] =
+static int pi_channels_maps[7] =
 {
     0,
     AOUT_CHAN_CENTER,
@@ -106,7 +106,9 @@ static int pi_channels_maps[6] =
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
      | AOUT_CHAN_REARRIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE
 };
 
 /*****************************************************************************
@@ -285,7 +287,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * ProcessHeader: processe Flac header.
+ * ProcessHeader: process Flac header.
  *****************************************************************************/
 static void ProcessHeader( decoder_t *p_dec )
 {
@@ -346,6 +348,12 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !pp_block || !*pp_block ) return NULL;
 
     if( !p_sys->b_stream_info ) ProcessHeader( p_dec );
+
+    if( p_sys->stream_info.channels > 6 )
+    {
+        msg_Err( p_dec, "This stream uses too many audio channels" );
+        return NULL;
+    }
 
     if( !aout_DateGet( &p_sys->end_date ) && !(*pp_block)->i_pts )
     {
