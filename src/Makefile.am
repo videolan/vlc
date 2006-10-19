@@ -124,15 +124,6 @@ misc/modules.c: misc/modules_builtin.h
 # need this workaround.
 
 stamp-builtins: Makefile ../vlc-config ../config.status
-if USE_LIBTOOL
-	@for c in `$(VLC_CONFIG) --libs builtin`; do \
-		case $$c in \
-        		../modules/*.a) echo $$c ;; \
-		esac ; \
-	done | \
-	sed -e 's,^\(.*\)/\([^/]*\)\.a$$,cd \1 \&\& $(MAKE) \2_builtin.la,g' | \
-	while read cmd; do echo $$cmd; eval "($$cmd)" || exit $$? ; done
-endif
 if BUILD_SHARED
 	@for c in `$(VLC_CONFIG) --libs builtin`; do \
 		case $$c in \
@@ -149,7 +140,7 @@ endif
 ###############################################################################
 
 libvlc_a_SOURCES = $(SOURCES_libvlc)
-libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic`
+libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic` -DUSE_BUILTINS
 libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc pic`
 libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc pic`
 
@@ -158,7 +149,7 @@ libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
-libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin|sed -e 's/\(modules\/[^ ]*\)\.a /\1_builtin.la /g'` -no-undefined -export-symbols libvlc.sym
+libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc` -no-undefined -export-symbols libvlc.sym
 libvlc_la_DEPENDENCIES = stamp-builtins stamp-api
 
 

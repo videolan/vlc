@@ -199,7 +199,7 @@ do
   for mod in $mods
   do
     extra_libs="${extra_libs} lib${mod}_plugin.a lib${mod}.a"
-    extra_ltlibs="${extra_ltlibs} lib${mod}_plugin.la lib${mod}_builtin.la"
+    extra_ltlibs="${extra_ltlibs} lib${mod}_plugin.la"
   done
   rm -f "${makf}" && cat > "${makf}" << EOF
 
@@ -241,8 +241,7 @@ nice:
 all-modules:
 if USE_LIBTOOL
 	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
-	if test "\$(plugin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin.la;; esac; done; fi; \\
-	if test "\$(builtin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_builtin.la;; esac; done; fi; \\
+	if test "\$(plugin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin.la;; esac; done; fi; \\
 	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
 	test -z "\$\$fail"
 else
@@ -288,7 +287,7 @@ clean-local: \$(clean_modules)
 install-exec-local: all-modules
 if USE_LIBTOOL
 	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
-	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
+	  z=\$\$(\$(VLC_CONFIG) --list builtin plugin); \
 	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
 	  test -z "\$\$m" || \
   	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" install-libvlcLTLIBRARIES || exit \$\$? ; \
@@ -304,21 +303,12 @@ else
 	      ;; \
 	  esac; \
 	done
-	@z=\$\$(\$(VLC_CONFIG) --list builtin); \
-	for mod in \$(mods); do \
-	  case "\$\$z " \
-	    in *\ \$\${mod}\ *) \
-	      echo \$(INSTALL_DATA) "lib\$\${mod}.a" "\$(DESTDIR)\$(libdir)/vlc/" ; \
-	      \$(INSTALL_DATA) "lib\$\${mod}.a" "\$(DESTDIR)\$(libdir)/vlc/" || exit \$\$?; \
-	      ;; \
-	  esac; \
-	done
 endif
 
 uninstall-local:
 if USE_LIBTOOL
 	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
-	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
+	  z=\$\$(\$(VLC_CONFIG) --list builtin plugin); \
 	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
 	  test -z "\$\$m" || \
 	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" uninstall-libvlcLTLIBRARIES || exit \$\$?; \
@@ -330,15 +320,6 @@ else
 	    in *\ \$\${mod}\ *) \
 	      echo rm -f "\$(DESTDIR)\$(libvlcdir)/lib\$\${mod}_plugin\$(LIBEXT)" ; \
 	      rm -f "\$(DESTDIR)\$(libvlcdir)/lib\$\${mod}_plugin\$(LIBEXT)" || true; \
-	      ;; \
-	  esac; \
-	done
-	@z=\$\$(\$(VLC_CONFIG) --list builtin); \
-	for mod in \$(mods); do \
-	  case "\$\$z " \
-	    in *\ \$\${mod}\ *) \
-	      echo rm -f "\$(DESTDIR)\$(libdir)/vlc/lib\$\${mod}.a" ; \
-	      rm -f "\$(DESTDIR)\$(libdir)/vlc/lib\$\${mod}.a" || true; \
 	      ;; \
 	  esac; \
 	done
@@ -397,20 +378,15 @@ lib${mod}_plugin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs plugin ${mod}\` \\
 lib${mod}_plugin_la_LIBADD = \$(LTLIBVLC)
 
 lib${mod}_a_SOURCES = \$(SOURCES_${mod})
-lib${mod}_builtin_la_SOURCES = \$(SOURCES_${mod})
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
 nodist_lib${mod}_a_SOURCES = \$(nodist_SOURCES_${mod})
-nodist_lib${mod}_builtin_la_SOURCES = \$(nodist_SOURCES_${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
 lib${mod}_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin pic ${mod}\`
 lib${mod}_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin pic ${mod}\`
 lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin pic ${mod}\`
-lib${mod}_builtin_la_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
-lib${mod}_builtin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
-lib${mod}_builtin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
 
 EOF
   done
