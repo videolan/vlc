@@ -39,6 +39,7 @@
 #include "vlc_playlist.h"
 #include "vlc_interface.h"
 #include "vlc_interaction.h"
+#include "vlc_url.h"
 
 #include "charset.h"
 
@@ -69,7 +70,6 @@ static int  UpdateMeta( input_thread_t * );
 
 static void UpdateItemLength( input_thread_t *, int64_t i_length );
 
-static void DecodeUrl( char * );
 static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
 static input_source_t *InputSourceNew( input_thread_t *);
@@ -2016,7 +2016,7 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Access failed, URL encoded ? */
         if( in->p_access == NULL && strchr( psz_path, '%' ) )
         {
-            DecodeUrl( psz_path );
+            decode_URI( psz_path );
 
             msg_Dbg( p_input, "retrying with access `%s' demux `%s' path `%s'",
                      psz_access, psz_demux, psz_path );
@@ -2299,44 +2299,6 @@ static void InputMetaUser( input_thread_t *p_input )
 #undef GET_META
 }
 
-/*****************************************************************************
- * DecodeUrl: decode a given encoded url
- *****************************************************************************/
-static void DecodeUrl( char *psz )
-{
-    char *dup = strdup( psz );
-    char *p = dup;
-
-    while( *p )
-    {
-        if( *p == '%' )
-        {
-            char val[3];
-            p++;
-            if( !*p )
-            {
-                break;
-            }
-
-            val[0] = *p++;
-            val[1] = *p++;
-            val[2] = '\0';
-
-            *psz++ = strtol( val, NULL, 16 );
-        }
-        else if( *p == '+' )
-        {
-            *psz++ = ' ';
-            p++;
-        }
-        else
-        {
-            *psz++ = *p++;
-        }
-    }
-    if( psz ) *psz++  ='\0';
-    if( dup ) free( dup );
-}
 
 /*****************************************************************************
  * MRLSplit: parse the access, demux and url part of the
