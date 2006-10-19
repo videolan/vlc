@@ -272,7 +272,7 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
 
 error:
     msg_Err( p_this, "Read error: %s", net_strerror (net_errno) );
-    return i_total ? (int)i_total : -1;
+    return i_total ? (ssize_t)i_total : -1;
 }
 
 
