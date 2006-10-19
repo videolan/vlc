@@ -12,7 +12,11 @@ export LD_LIBRARY_PATH=src/.libs/
 # Always dump core
 ulimit -c unlimited
 
-python test/test.py -v 2>&1|perl  -e \
+if [ "x$1" = "xdebug" ]
+then
+  gdb python "test/test.sh"
+else
+  python test/test.py -v 2>&1|perl  -e \
 '$bold = "\033[1m";
 $grey  = "\033[37m";
 $green  = "\033[32m";
@@ -42,4 +46,4 @@ while(<STDIN>)
         print $grey.$line."\n";
      }
 }'
-
+fi

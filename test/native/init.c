@@ -20,6 +20,7 @@ static PyMethodDef native_libvlc_test_methods[] = {
    DEF_METHOD( chains_test, "Test building of chains" )
    DEF_METHOD( gui_chains_test, "Test interactions between chains and GUI" )
    DEF_METHOD( psz_chains_test, "Test building of chain strings" )
+   DEF_METHOD( arrays_test, "Test arrays")
    DEF_METHOD( bsearch_direct_test, "Test Bsearch without structure" )
    DEF_METHOD( bsearch_member_test, "Test Bsearch with structure" )
    DEF_METHOD( dict_test, "Test dictionnaries" )

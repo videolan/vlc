@@ -3,6 +3,9 @@ import unittest
 import native_libvlc_test
 
 class NativeAlgoTestCase( unittest.TestCase ):
+    def test_arrays( self ):
+        """[Algo] Check dynamic arrays"""
+        native_libvlc_test.arrays_test()
     def test_bsearch_direct( self ):
         """[Algo] Check Bsearch with simple types"""
     	native_libvlc_test.bsearch_direct_test()

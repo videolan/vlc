@@ -23,6 +23,91 @@
 #include <vlc/vlc.h>
 
 /**********************************************************************
+ * Arrays
+ *********************************************************************/
+
+TYPEDEF_ARRAY(long,long_array_t);
+
+PyObject *arrays_test( PyObject *self, PyObject *args )
+{
+    mtime_t one, two;
+    int number = 1000000;
+    int number2 = 50000; /* For slow with memmove */
+    printf("\n");
+    {
+        int i_items = 0;
+        int *p_items = NULL;
+        int i;
+        one = mdate();
+        for( i = 0 ; i<number;i++) {
+            INSERT_ELEM(p_items,i_items, i_items, i+50);
+        }
+        two = mdate();
+        printf( " Std array %i items appended in "I64Fi" µs\n", number,
+                (two-one) );
+        for( i = number-1 ; i>=0; i--) {
+            REMOVE_ELEM( p_items, i_items, i );
+        }
+        one = mdate();
+        printf( " Std array %i items removed in  "I64Fi" µs\n", number,
+                (one-two) );
+
+        for( i = 0 ; i<number2;i++) {
+            int pos = i_items == 0  ? 0 : rand() % i_items;
+            INSERT_ELEM(p_items, i_items, pos, pos + 50);
+        }
+        two = mdate();
+        printf( " Std array %i items inserted in  "I64Fi" µs\n", number2,
+                (two-one) );
+    }
+    {
+        DECL_ARRAY(int) int_array;
+        int i = 0;
+        ARRAY_INIT(int_array);
+        ASSERT(int_array.i_size == 0, "" );
+        ASSERT(int_array.i_alloc == 0, "" );
+        ASSERT(int_array.p_elems == 0, "" );
+
+        ARRAY_APPEND(int_array, 42 );
+        ASSERT(int_array.i_size == 1, "" );
+        ASSERT(int_array.i_alloc > 1, "" );
+        ASSERT(int_array.p_elems[0] == 42, "" );
+        ARRAY_REMOVE(int_array,0);
+        ASSERT(int_array.i_size == 0, "" );
+
+        one = mdate();
+        for( i = 0 ; i<number;i++) {
+            ARRAY_APPEND(int_array, i+50);
+        }
+        two = mdate();
+        printf( " New array %i items appended in "I64Fi" µs\n", number,
+                (two-one) );
+        ASSERT(int_array.p_elems[1242] == 1292 , "");
+        for( i = number-1 ; i>=0; i--) {
+            ARRAY_REMOVE(int_array,i);
+        }
+        one = mdate();
+        printf( " New array %i items removed in  "I64Fi" µs\n", number,
+                (one-two) );
+
+        /* Now random inserts */
+        for( i = 0 ; i<number2;i++) {
+            int pos = int_array.i_size == 0  ? 0 : rand() % int_array.i_size;
+            ARRAY_INSERT(int_array, pos+50, pos);
+        }
+        two = mdate();
+        printf( " New array %i items inserted in  "I64Fi" µs\n", number2,
+                (two-one) );
+    }
+    {
+        long_array_t larray;
+        ARRAY_INIT(larray);
+    }
+    Py_INCREF( Py_None);
+    return Py_None;
+}
+
+/**********************************************************************
  * Binary search
  *********************************************************************/
 
@@ -66,7 +151,7 @@ PyObject *bsearch_member_test( PyObject *self, PyObject *args )
 {
     struct bsearch_tester array[] =
     {
-        { 0, 12 }, { 1, 22 } , { 2, 33 } , { 3, 68 } , { 4, 56 } 
+        { 0, 12 }, { 1, 22 } , { 2, 33 } , { 3, 68 } , { 4, 56 }
     };
 #define MEMBCHECK( checked, expected ) { \
     int answer = -1;  \
