@@ -394,11 +394,7 @@ Section "Start Menu Shortcut" SEC02a
   SectionIn 1 2 3
   CreateDirectory "$SMPROGRAMS\VideoLAN"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player.lnk" \
-    "$INSTDIR\vlc.exe" "--intf wx --wx-embed"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player (alt).lnk" \
-    "$INSTDIR\vlc.exe" "--intf wx --no-wx-embed"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player (skins).lnk" \
-    "$INSTDIR\vlc.exe" "--intf skins"
+    "$INSTDIR\vlc.exe" "" 
   CreateShortCut "$SMPROGRAMS\VideoLAN\Reset VLC defaults and quit.lnk" \
     "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache --save-config vlc:quit "
   CreateShortCut "$SMPROGRAMS\VideoLAN\${PRODUCT_NAME} Website.lnk" \
