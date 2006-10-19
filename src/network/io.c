@@ -169,6 +169,12 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         if( (wait_ms != -1) && (wait_ms < 500) )
             delay_ms = wait_ms;
 
+        if( p_this->b_die )
+        {
+            errno = EINTR;
+            goto error;
+        }
+
 #ifdef HAVE_POLL
         memset(ufd, 0, sizeof (ufd) );
 
@@ -178,10 +184,7 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             ufd[i].events = POLLIN;
         }
 
-        if( p_this->b_die )
-            return i_total;
-
-        n = poll( ufd, fdc, (wait_ms == -1) ? -1 : delay_ms );
+        n = poll( ufd, fdc, delay_ms );
         if( n == -1 )
             goto error;
 
