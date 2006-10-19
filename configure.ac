@@ -772,6 +772,7 @@ fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 AC_HEADER_TIME
 
+AC_CHECK_TYPE(ssize_t, int)
 AC_SEARCH_LIBS(poll, [poll], [AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS is usabl... err, has poll().])])
 
 dnl Check for dirent

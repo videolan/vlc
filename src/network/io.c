@@ -127,7 +127,7 @@ void net_Close (int fd)
 }
 
 
-static int
+static ssize_t
 net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                const v_socket_t *const *restrict vsv,
                uint8_t *restrict p_buf, size_t i_buflen,
@@ -135,10 +135,10 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
 {
     size_t i_total = 0;
 
-    do
+    while (i_buflen > 0)
     {
-        unsigned int i;
-        int n, delay_ms;
+        unsigned i;
+        ssize_t n;
 #ifdef HAVE_POLL
         struct pollfd ufd[fdc];
 #else
@@ -146,21 +146,18 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         fd_set set;
 #endif
 
-        if( i_buflen == 0 )
-            return i_total; // output buffer full
-
-        delay_ms = 500;
-        if( (wait_ms != -1) && (wait_ms < 500) )
+        int delay_ms = 500;
+        if ((wait_ms != -1) && (wait_ms < 500))
             delay_ms = wait_ms;
 
-        if( p_this->b_die )
+        if (p_this->b_die)
         {
             errno = EINTR;
             goto error;
         }
 
 #ifdef HAVE_POLL
-        memset(ufd, 0, sizeof (ufd) );
+        memset (ufd, 0, sizeof (ufd));
 
         for( i = 0; i < fdc; i++ )
         {
@@ -169,25 +166,6 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         }
 
         n = poll( ufd, fdc, delay_ms );
-        if( n == -1 )
-            goto error;
-
-        assert( (unsigned int)n <= fdc );
-
-        for( i = 0; n > 0; i++ )
-        {
-            if( (i_total > 0) && (ufd[i].revents & POLLERR) )
-                return i_total; // error will be dequeued on next run
-
-            if( ufd[i].revents )
-            {
-                fdc = 1;
-                fdv += i;
-                vsv += i;
-                n--;
-                goto receive;
-            }
-        }
 #else
         FD_ZERO (&set);
 
@@ -209,23 +187,32 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         n = select( maxfd + 1, &set, NULL, NULL,
                     (wait_ms == -1) ? NULL
                                   : &(struct timeval){ 0, delay_ms * 1000 } );
+#endif
         if( n == -1 )
             goto error;
 
-        for( i = 0; n > 0; i++ )
-            if( FD_ISSET (fdv[i], &set) )
-            {
-                fdc = 1;
-                fdv += i;
-                vsv += i;
-                n--;
-                goto receive;
-            }
+        assert ((unsigned)n <= fdc);
+
+        if (n == 0) // timeout
+            continue;
+
+        for (i = 0;; i++)
+        {
+#ifdef HAVE_POLL
+            if ((i_total > 0) && (ufd[i].revents & POLLERR))
+                return i_total; // error will be dequeued on next run
+
+            if ((ufd[i].revents & POLLIN) == 0)
+#else
+            if (!FD_ISSET (fdv[i], &set))
+                continue;
 #endif
+            fdc = 1;
+            fdv += i;
+            vsv += i;
+            break;
+        }
 
-        continue;
-
-receive:
         if( (*vsv) != NULL )
         {
             n = (*vsv)->pf_recv( (*vsv)->p_sys, p_buf, i_buflen );
@@ -272,19 +259,16 @@ receive:
         p_buf += n;
         i_buflen -= n;
 
-        if( wait_ms == -1 )
-        {
-            if( !waitall )
-                return i_total;
-        }
-        else
+        if (!waitall)
+            return i_total;
+
+        if (wait_ms != -1)
         {
             wait_ms -= delay_ms;
+            if (wait_ms == 0)
+                return i_total; // time's up!
         }
     }
-    while( wait_ms );
-
-    return i_total; // timeout
 
 error:
     msg_Err( p_this, "Read error: %s", net_strerror (net_errno) );
