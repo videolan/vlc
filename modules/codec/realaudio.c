@@ -185,6 +185,14 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    if( p_dec->fmt_in.audio.i_channels <= 0 ||
+        p_dec->fmt_in.audio.i_channels > 6 )
+    {
+        msg_Err( p_dec, "invalid number of channels (not between 1 and 6): %i",
+                 p_dec->fmt_in.audio.i_channels );
+        return VLC_EGENERIC;
+    }
+
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 

@@ -387,6 +387,15 @@ static int ProcessHeaders( decoder_t *p_dec )
     /* Setup the format */
     p_dec->fmt_out.audio.i_rate     = p_sys->vi.rate;
     p_dec->fmt_out.audio.i_channels = p_sys->vi.channels;
+
+    if( p_dec->fmt_out.audio.i_channels < 0 ||
+        p_dec->fmt_out.audio.i_channels > 6 )
+    {
+        msg_Err( p_dec, "invalid number of channels (not between 1 and 6): %i",
+                 p_dec->fmt_out.audio.i_channels );
+        return VLC_EGENERIC;
+    }
+
     p_dec->fmt_out.audio.i_physical_channels =
         p_dec->fmt_out.audio.i_original_channels =
             pi_channels_maps[p_sys->vi.channels];

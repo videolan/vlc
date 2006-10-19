@@ -383,6 +383,13 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
         callback.data = &p_sys->stereo;
         speex_decoder_ctl( p_state, SPEEX_SET_HANDLER, &callback );
     }
+    if( p_header->nb_channels <= 0 ||
+        p_header->nb_channels > 5 )
+    {
+        msg_Err( p_dec, "invalid number of channels (not between 1 and 5): %i",
+                 p_header->nb_channels );
+        return VLC_EGENERIC;
+    }
 
     /* Setup the format */
     p_dec->fmt_out.audio.i_physical_channels =
