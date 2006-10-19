@@ -5488,30 +5488,6 @@ then
   plugin_support=false
 fi
 
-dnl Export automake variables
-if ${plugin_support}
-then
-  AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1, Define if we have support for dynamic plugins)
-  for plugin in `echo ${PLUGINS}`
-  do
-    eval "${plugin}_p=yes"
-  done
-else
-  VLC_ADD_BUILTINS([${PLUGINS}])
-  PLUGINS=""
-fi
-AM_CONDITIONAL(HAVE_PLUGINS, ${plugin_support})
-
-[if echo "${BUILTINS}" | grep '[^ ]' >/dev/null 2>&1
-then
-  builtin_support=:
-  for builtin in `echo ${BUILTINS}`
-  do
-    eval "${builtin}_b=yes"
-  done
-fi]
-AM_CONDITIONAL(HAVE_BUILTINS, ${builtin_support})
-
 dnl
 dnl Pic and shared libvlc stuff
 dnl
