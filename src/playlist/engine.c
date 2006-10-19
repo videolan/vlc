@@ -225,7 +225,7 @@ void playlist_MainLoop( playlist_t *p_playlist )
 {
     playlist_item_t *p_item = NULL;
     vlc_bool_t b_playexit = var_GetBool( p_playlist, "play-and-exit" );
-    PL_LOCK
+    PL_LOCK;
 
     /* First, check if we have something to do */
     /* FIXME : this can be called several times */
@@ -348,6 +348,7 @@ void playlist_MainLoop( playlist_t *p_playlist )
          }
          else
          {
+             p_playlist->status.i_status = PLAYLIST_STOPPED;
              if( p_playlist->status.p_item &&
                  p_playlist->status.p_item->i_flags & PLAYLIST_REMOVE_FLAG )
              {

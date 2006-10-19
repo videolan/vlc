@@ -61,6 +61,7 @@ HEADERS_include = \
 	../include/variables.h \
 	../include/video_output.h \
 	../include/vlc_access.h \
+	../include/vlc_arrays.h \
 	../include/vlc_acl.h \
 	../include/vlc_bits.h \
 	../include/vlc_block.h \
