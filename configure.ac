@@ -12,6 +12,7 @@ CODENAME="Grishenko"
 AC_PREREQ(2.59)
 AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)
+AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([1.7 check-news dist-bzip2])
@@ -139,7 +140,7 @@ LDFLAGS_vlc="${LDFLAGS}"
 dnl
 dnl  Check the operating system
 dnl
-case "${target_os}" in
+case "${host_os}" in
   "")
     SYS=unknown
     ;;
@@ -152,9 +153,9 @@ case "${target_os}" in
     VLC_ADD_LDFLAGS([dvd dvdcss vcd cdda vcdx cddax],[-ldvd])
     ;;
   *bsd*)
-    SYS="${target_os}"
+    SYS="${host_os}"
     CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
-    case "${target_os}" in
+    case "${host_os}" in
       freebsd*)
         CPPFLAGS_save="${CPPFLAGS_save} -I/usr/local/include"
         CPPFLAGS="${CPPFLAGS_save}"
@@ -188,7 +189,7 @@ case "${target_os}" in
     AC_CHECK_TOOL(WINDRES, windres, :)
     enable_libtool="no"
 
-    case "${target_os}" in
+    case "${host_os}" in
       *mingw32*)
         SYS=mingw32
         ;;
@@ -257,7 +258,7 @@ case "${target_os}" in
     fi
     ;;
   *)
-    SYS="${target_os}"
+    SYS="${host_os}"
     ;;
 esac
 AM_CONDITIONAL(HAVE_BEOS, test "${SYS}" = "beos")
@@ -970,7 +971,7 @@ AC_CACHE_CHECK([if \$CC accepts -Os],
     [ac_cv_c_os],
     [CFLAGS="${CFLAGS_save} -Os"
      AC_TRY_COMPILE([],,ac_cv_c_os=yes, ac_cv_c_os=no)])
-if test "${ac_cv_c_os}" != "no" -a "${target_cpu}" = "mipsel"; then
+if test "${ac_cv_c_os}" != "no" -a "${host_cpu}" = "mipsel"; then
     CFLAGS_OPTIM="${CFLAGS_OPTIM} -Os"
 fi
 
@@ -978,7 +979,7 @@ AC_CACHE_CHECK([if \$CC accepts -O3],
     [ac_cv_c_o3],
     [CFLAGS="${CFLAGS_save} -O3"
      AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
-if test "${ac_cv_c_o3}" != "no" -a "${target_cpu}" != "mipsel"; then
+if test "${ac_cv_c_o3}" != "no" -a "${host_cpu}" != "mipsel"; then
     CFLAGS_OPTIM="${CFLAGS_OPTIM} -O3"
 fi
 
@@ -986,7 +987,7 @@ AC_CACHE_CHECK([if \$CC accepts -O2],
     [ac_cv_c_o2],
     [CFLAGS="${CFLAGS_save} -O2"
      AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
-if test "${ac_cv_c_o2}" != "no" -a "${target_cpu}" != "mipsel"; then
+if test "${ac_cv_c_o2}" != "no" -a "${host_cpu}" != "mipsel"; then
     if test "${ac_cv_c_o3}" = "no"; then
         CFLAGS_OPTIM="${CFLAGS_OPTIM} -O2"
     fi
@@ -996,7 +997,7 @@ else
         [ac_cv_c_o],
         [CFLAGS="${CFLAGS_save} -O"
          AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
-    if test "${ac_cv_c_o}" != "no" -a "${target_cpu}" != "mipsel"; then
+    if test "${ac_cv_c_o}" != "no" -a "${host_cpu}" != "mipsel"; then
         if test "${ac_cv_c_o3}" = "no"; then
             CFLAGS_OPTIM="${CFLAGS_OPTIM} -O"
 	fi
@@ -1126,12 +1127,12 @@ fi
 dnl
 dnl  Check the CPU
 dnl
-case "${target_cpu}" in
+case "${host_cpu}" in
   "")
     ARCH=unknown
     ;;
   *)
-    ARCH="${target_cpu}"
+    ARCH="${host_cpu}"
     ;;
 esac
 
@@ -1315,16 +1316,14 @@ dnl - Linux PPC, gcc 3.x: need <altivec.h> and -fvec
 dnl - Others: test should fail
 AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
   [ac_cv_c_altivec],
-  [AS_IF([test "${host_cpu}" != "ppc" -a "${host_cpu}" != "ppc64"], [
-    ac_cv_c_altivec="no"], [
-   # OS X/PPC test (gcc 4.x)
+  [# OS X/PPC test (gcc 4.x)
    CFLAGS="${CFLAGS_save} -mpim-altivec -force_cpusubtype_ALL"
-   AC_TRY_COMPILE([],
+   AC_TRY_COMPILE([vector unsigned char foo;],
      [vec_ld(0, (unsigned char *)0);],
      [ac_cv_c_altivec="-mpim-altivec -force_cpusubtype_ALL"],
      [# OS X/PPC test (gcc 3.x)
       CFLAGS="${CFLAGS_save} -faltivec"
-      AC_TRY_COMPILE([],
+      AC_TRY_COMPILE([vector unsigned char foo;],
         [vec_ld(1 * sizeof(vector float), (unsigned char *)0);],
         [ac_cv_c_altivec="-faltivec"],
         dnl Below this are the Linux tests
@@ -1394,13 +1393,13 @@ if test -n "${with_tuning}"; then
         CFLAGS_TUNING="-mtune=${with_tuning}"
     fi
 else
-    if test "${SYS}" = "darwin" -a "${target_cpu}" = "i686"; then
+    if test "${SYS}" = "darwin" -a "${host_cpu}" = "i686"; then
         CFLAGS_TUNING="-march=pentium-m -mtune=prescott"
-    elif test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "i486" -o "${target_cpu}" = "i386"; then
+    elif test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "i486" -o "${host_cpu}" = "i386"; then
         CFLAGS_TUNING="-mtune=pentium2"
-    elif test "${target_cpu}" = "x86_64"; then
+    elif test "${hostt_cpu}" = "x86_64"; then
         CFLAGS_TUNING="-mtune=athlon64"
-    elif test "${target_cpu}" = "powerpc"; then
+    elif test "${hostt_cpu}" = "powerpc"; then
         CFLAGS_TUNING="-mtune=G4";
     fi
 fi
@@ -1424,7 +1423,7 @@ AS_IF([test "${CFLAGS_TUNING}"],
 dnl
 dnl  x86 accelerations
 dnl
-if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "x86" -o "${target_cpu}" = "i386" -o "${target_cpu}" = "x86_64"
+if test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "x86" -o "${host_cpu}" = "i386" -o "${host_cpu}" = "x86_64"
 then
     ARCH="${ARCH} mmx"
     VLC_ADD_BUILTINS([${ACCEL_MODULES}])
@@ -1453,7 +1452,7 @@ AC_ARG_ENABLE(altivec,
 [  --disable-altivec       disable AltiVec optimizations (default enabled on PPC)],
 [ if test "${enable_altivec}" = "yes"; then ARCH="${ARCH} altivec";
     VLC_ADD_BUILTINS([${ACCEL_MODULES}]) fi ],
-[ if test "${target_cpu}" = "powerpc"; then ARCH="${ARCH} altivec";
+[ if test "${host_cpu}" = "powerpc"; then ARCH="${ARCH} altivec";
     VLC_ADD_BUILTINS([${ACCEL_MODULES}]) fi ])
 
 dnl
