@@ -434,7 +434,7 @@ static char *ppsz_clock_descriptions[] =
 #define TTL_TEXT N_("Hop limit (TTL)")
 #define TTL_LONGTEXT N_( \
     "This is the hop limit (also known as \"Time-To-Live\" or TTL) of " \
-    "the multicast packets sent by the stream output (0 = use operating "\
+    "the multicast packets sent by the stream output (0 = use operating " \
     "system built-in default).")
 
 #define MIFACE_TEXT N_("Multicast output interface")

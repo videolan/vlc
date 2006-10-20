@@ -77,9 +77,11 @@ static void Close( vlc_object_t * );
     "Default caching value for outbound UDP streams. This " \
     "value should be set in milliseconds." )
 
-#define TTL_TEXT N_("Time-To-Live (TTL)")
-#define TTL_LONGTEXT N_("Time-To-Live of the " \
-                        "outgoing stream.")
+#define TTL_TEXT N_("Hop limit (TTL)")
+#define TTL_LONGTEXT N_( \
+    "This is the hop limit (also known as \"Time-To-Live\" or TTL) of " \
+    "the multicast packets sent by the stream output (0 = use operating " \
+    "system built-in default).")
 
 #define GROUP_TEXT N_("Group packets")
 #define GROUP_LONGTEXT N_("Packets can be sent one by one at the right time " \
