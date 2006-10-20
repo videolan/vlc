@@ -951,7 +951,6 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
 #endif
         wxU(_("The VideoLAN team <videolan@videolan.org>\n"
               "http://www.videolan.org/\n\n")) );
-
     wxMessageBox( msg, wxString::Format(wxU(_("About %s")),
                   wxT("VLC media player")), wxOK | wxICON_INFORMATION, this );
 }

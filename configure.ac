@@ -12,7 +12,7 @@ CODENAME="Grishenko"
 AC_PREREQ(2.59)
 AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([1.7 check-news dist-bzip2])
 AM_CONFIG_HEADER(config.h)
@@ -1315,7 +1315,9 @@ dnl - Linux PPC, gcc 3.x: need <altivec.h> and -fvec
 dnl - Others: test should fail
 AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
   [ac_cv_c_altivec],
-  [# OS X/PPC test (gcc 4.x)
+  [AS_IF([test "${host_cpu}" != "ppc" -a "${host_cpu}" != "ppc64"], [
+    ac_cv_c_altivec="no"], [
+   # OS X/PPC test (gcc 4.x)
    CFLAGS="${CFLAGS_save} -mpim-altivec -force_cpusubtype_ALL"
    AC_TRY_COMPILE([],
      [vec_ld(0, (unsigned char *)0);],
@@ -1348,6 +1350,7 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
         ])
      ])
    CFLAGS="${CFLAGS_save}"
+   ])
   ])
 
 if test "${ac_cv_c_altivec}" != "no"; then
