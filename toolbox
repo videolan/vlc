@@ -740,6 +740,9 @@ then
   rm -f vlc vlc-config Makefile Modules.am
   rm -Rf autom4te.cache
   rm -f mozilla/vlcintf.h mozilla/vlcintf.xpt
+  echo "\`toolbox --distclean\' is known to be broken."
+  echo "Don't complain if it does not work, or better yet, don't use it."
+  echo "You were warned."
   # FIXME: a lot of Makefiles are still there
 fi
 
