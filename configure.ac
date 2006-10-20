@@ -1349,7 +1349,6 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
         ])
      ])
    CFLAGS="${CFLAGS_save}"
-   ])
   ])
 
 if test "${ac_cv_c_altivec}" != "no"; then
