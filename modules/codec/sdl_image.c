@@ -52,7 +52,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
     set_description( _("SDL_image video decoder") );
-    set_capability( "decoder", 900 );
+    set_capability( "decoder", 60 );
     set_callbacks( OpenDecoder, CloseDecoder );
     add_shortcut( "sdl_image" );
 vlc_module_end();
