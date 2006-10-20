@@ -137,7 +137,7 @@ dnl  Macros for shared object handling (TODO)
 
 AC_DEFUN([VLC_LIBRARY_SUFFIX], [
   AC_MSG_CHECKING(for shared objects suffix)
-  case "${target_os}" in
+  case "${host_os}" in
     darwin*)
       LIBEXT=".dylib"
       ;;
@@ -158,7 +158,7 @@ AC_DEFUN([VLC_LIBRARY_SUFFIX], [
 AC_DEFUN([VLC_SYMBOL_PREFIX], [
   AC_MSG_CHECKING(for prefix to exported symbols)
   SYMPREF=""
-  case "${target_os}" in
+  case "${host_os}" in
     darwin* | *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
       SYMPREF="_"
       ;;
