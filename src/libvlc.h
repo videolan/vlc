@@ -437,14 +437,19 @@ static char *ppsz_clock_descriptions[] =
     "the multicast packets sent by the stream output (0 = use operating "\
     "system built-in default).")
 
-#define MIFACE_TEXT N_("IPv6 multicast output interface")
+#define MIFACE_TEXT N_("Multicast output interface")
 #define MIFACE_LONGTEXT N_( \
-    "Default IPv6 multicast interface. This overrides the routing table.")
+    "Default multicast interface. This overrides the routing table.")
 
 #define MIFACE_ADDR_TEXT N_("IPv4 multicast output interface address")
 #define MIFACE_ADDR_LONGTEXT N_( \
     "IPv4 adress for the default multicast interface. This overrides " \
     "the routing table.")
+
+#define DSCP_TEXT N_("DiffServ Code Point")
+#define DSCP_LONGTEXT N_("Differentiated Services Code Point " \
+    "for outgoing UDP streams (or IPv4 Type Of Service, " \
+    "or IPv6 Traffic Class). This is used for network Quality of Service.")
 
 #define INPUT_PROGRAM_TEXT N_("Program")
 #define INPUT_PROGRAM_LONGTEXT N_( \
@@ -1535,6 +1540,7 @@ vlc_module_begin();
     add_integer( "ttl", 0, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
     add_string( "miface", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
     add_string( "miface-addr", NULL, NULL, MIFACE_ADDR_TEXT, MIFACE_ADDR_LONGTEXT, VLC_TRUE );
+    add_integer( "dscp", 0, NULL, DSCP_TEXT, DSCP_LONGTEXT, VLC_TRUE );
 
     set_subcategory( SUBCAT_SOUT_PACKETIZER );
     add_module( "packetizer","packetizer", NULL, NULL,

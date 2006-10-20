@@ -111,61 +111,81 @@ static int net_SetMcastHopLimit( vlc_object_t *p_this,
 }
 
 
-static int net_SetMcastIface( vlc_object_t *p_this,
-                              int fd, int family, const char *str )
+static int net_SetMcastOutIface (int fd, int family, int scope)
 {
-    switch( family )
+    switch (family)
     {
-#ifndef SYS_BEOS
-        case AF_INET:
-        {
-            struct in_addr addr;
-
-            if( inet_pton( AF_INET, str, &addr) <= 0 )
-            {
-                msg_Err( p_this, "Invalid multicast interface %s", str );
-                return VLC_EGENERIC;
-            }
-
-            if( setsockopt( fd, SOL_IP, IP_MULTICAST_IF, &addr,
-                            sizeof( addr ) ) < 0 )
-            {
-                msg_Err( p_this, "Cannot use %s as multicast interface: %s",
-                         str, strerror(errno) );
-                return VLC_EGENERIC;
-            }
-            break;
-        }
-#endif /* SYS_BEOS */
-
 #ifdef IPV6_MULTICAST_IF
         case AF_INET6:
-        {
-            int scope = if_nametoindex( str );
-
-            if( scope == 0 )
-            {
-                msg_Err( p_this, "Invalid multicast interface %s", str );
-                return VLC_EGENERIC;
-            }
-
-            if( setsockopt( fd, SOL_IPV6, IPV6_MULTICAST_IF,
-                            &scope, sizeof( scope ) ) < 0 )
-            {
-                msg_Err( p_this, "Cannot use %s as multicast interface: %s",
-                         str, strerror( errno ) );
-                return VLC_EGENERIC;
-            }
-            break;
-        }
+            return setsockopt (fd, SOL_IPV6, IPV6_MULTICAST_IF,
+                               &scope, sizeof (scope));
 #endif
 
-        default:
-            msg_Warn( p_this, "%s", strerror( EAFNOSUPPORT ) );
-            return VLC_EGENERIC;
+#ifdef __linux__
+        case AF_INET:
+        {
+            struct ip_mreqn req = { .imr_ifindex = scope };
+
+            return setsockopt (fd, SOL_IP, IP_MULTICAST_IF, &req,
+                               sizeof (req));
+        }
+#endif
     }
 
-    return VLC_SUCCESS;
+    errno = EAFNOSUPPORT;
+    return -1;
+}
+
+
+static inline int net_SetMcastOutIPv4 (int fd, struct in_addr ipv4)
+{
+#ifdef IP_MULTICAST_IF
+    return setsockopt( fd, SOL_IP, IP_MULTICAST_IF, &ipv4, sizeof (ipv4));
+#else
+    errno = EAFNOSUPPORT;
+    return -1;
+#endif
+}
+
+
+static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
+                            const char *iface, const char *addr)
+{
+    if (iface != NULL)
+    {
+        int scope = if_nametoindex (iface);
+        if (scope == 0)
+        {
+            msg_Err (p_this, "%s: invalid interface for multicast", iface);
+            return -1;
+        }
+
+        if (net_SetMcastOutIface (fd, family, scope) == 0)
+            return 0;
+
+        msg_Err (p_this, "%s: %s", iface, net_strerror (net_errno));
+    }
+
+    if (addr != NULL)
+    {
+        if (family == AF_INET)
+        {
+            struct in_addr ipv4;
+            if (inet_pton (AF_INET, addr, &ipv4) <= 0)
+            {
+                msg_Err (p_this, "%s: invalid IPv4 address for multicast",
+                         addr);
+                return -1;
+            }
+
+            if (net_SetMcastOutIPv4 (fd, ipv4) == 0)
+                return 0;
+
+            msg_Err (p_this, "%s: %s", addr, net_strerror (net_errno));
+        }
+    }
+
+    return -1;
 }
 
 
@@ -236,43 +256,40 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
 
     for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
     {
-        int fd;
-        char *psz_mif;
-
-        fd = net_Socket( p_this, ptr->ai_family, ptr->ai_socktype,
-                         ptr->ai_protocol );
-        if( fd == -1 )
+        char *str;
+        int fd = net_Socket (p_this, ptr->ai_family, ptr->ai_socktype,
+                             ptr->ai_protocol);
+        if (fd == -1)
             continue;
+
 #if !defined( SYS_BEOS )
-        else
-        {
-            int i_val;
+        /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
+        * to avoid packet loss caused by scheduling problems */
+        setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &(int){ 0x80000 }, sizeof (int));
+        setsockopt (fd, SOL_SOCKET, SO_SNDBUF, &(int){ 0x80000 }, sizeof (int));
 
-            /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
-             * to avoid packet loss caused by scheduling problems */
-            i_val = 0x80000;
-            setsockopt( fd, SOL_SOCKET, SO_RCVBUF, (void *)&i_val,
-                        sizeof( i_val ) );
-            i_val = 0x80000;
-            setsockopt( fd, SOL_SOCKET, SO_SNDBUF, (void *)&i_val,
-                        sizeof( i_val ) );
-
-            /* Allow broadcast sending */
-            i_val = 1;
-            setsockopt( fd, SOL_SOCKET, SO_BROADCAST, (void*)&i_val,
-                        sizeof( i_val ) );
-        }
+        /* Allow broadcast sending */
+        setsockopt (fd, SOL_SOCKET, SO_BROADCAST, &(int){ 1 }, sizeof (int));
 #endif
 
         if( i_hlim > 0 )
             net_SetMcastHopLimit( p_this, fd, ptr->ai_family, i_hlim );
-        psz_mif = config_GetPsz( p_this, (ptr->ai_family != AF_INET)
-                                            ? "miface" : "miface-addr" );
-        if( psz_mif != NULL )
+
+        str = var_CreateGetString (p_this, "miface");
+        if (str != NULL)
         {
-            net_SetMcastIface( p_this, fd, ptr->ai_family, psz_mif );
-            free( psz_mif );
+            net_SetMcastOut (p_this, fd, ptr->ai_family, str, NULL);
+            free (str);
         }
+
+        str = var_CreateGetString (p_this, "miface-addr");
+        if (str != NULL)
+        {
+            net_SetMcastOut (p_this, fd, ptr->ai_family, NULL, str);
+            free (str);
+        }
+
+        net_SetDSCP (fd, var_CreateGetInteger (p_this, "dscp"));
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) == 0 )
         {
