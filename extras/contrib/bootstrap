@@ -108,7 +108,7 @@ case $HOST in
                 echo "PATH = ${PATH}" >> config.mak
             fi
         ;;
-    i?86-mingw32*)
+    *mingw32*)
             echo "HAVE_WIN32 = 1" >> config.mak
             echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
         ;;
