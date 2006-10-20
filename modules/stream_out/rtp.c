@@ -89,9 +89,11 @@
 #define PORT_VIDEO_LONGTEXT N_( \
     "This allows you to specify the default video port for the RTP streaming." )
 
-#define TTL_TEXT N_("Time-To-Live (TTL)")
+#define TTL_TEXT N_("Hop limit (TTL)")
 #define TTL_LONGTEXT N_( \
-    "This allows you to specify the Time-To-Live for the output stream." )
+    "This is the hop limit (also known as \"Time-To-Live\" or TTL) of " \
+    "the multicast packets sent by the stream output (0 = use operating " \
+    "system built-in default).")
 
 #define RFC3016_TEXT N_("MP4A LATM")
 #define RFC3016_LONGTEXT N_( \
