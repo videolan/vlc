@@ -3193,7 +3193,7 @@ if test "${enable_dts}" != "no"; then
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_dtstofloat32}"
       AC_CHECK_LIB(dts_pic, dts_free, [
         VLC_ADD_PLUGINS([dtstofloat32])
-        VLC_ADD_LDFLAGS([dtstofloat32],[-ldts_pic])
+        VLC_ADD_LDFLAGS([dtstofloat32],[-ldts_pic -lm])
         ],[
         AC_CHECK_LIB(dts, dts_free, [
           VLC_ADD_BUILTINS([dtstofloat32])
@@ -3206,7 +3206,7 @@ if test "${enable_dts}" != "no"; then
             AC_MSG_ERROR([the specified tree hasn't been compiled])
           fi
         ])
-      ])
+      ], [-lm])
       LDFLAGS="${LDFLAGS_save}"
     else
       AC_MSG_RESULT(no)
@@ -3217,7 +3217,7 @@ if test "${enable_dts}" != "no"; then
     AC_CHECK_HEADERS(dts.h, [
       AC_CHECK_LIB(dts_pic, dts_free, [
         VLC_ADD_PLUGINS([dtstofloat32])
-        VLC_ADD_LDFLAGS([dtstofloat32],[-ldts_pic])
+        VLC_ADD_LDFLAGS([dtstofloat32],[-ldts_pic -lm])
       ],[
         AC_CHECK_LIB(dts, dts_free, [
           VLC_ADD_BUILTINS([dtstofloat32])
@@ -3227,7 +3227,7 @@ if test "${enable_dts}" != "no"; then
             AC_MSG_ERROR([Could not find libdts on your system: you may get it from http://www.videolan.org/dtsdec.html])
           fi
         ])
-      ])
+      ], [-lm])
     ])
     LDFLAGS="${LDFLAGS_save}"
   fi
