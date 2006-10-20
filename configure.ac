@@ -880,7 +880,7 @@ AC_CACHE_CHECK([for ntohl in sys/param.h],
     [ac_cv_c_ntohl_sys_param_h],
     [CFLAGS="${CFLAGS_save} -Wall -Werror"
      AC_TRY_COMPILE([#include <sys/param.h>],
-        [void foo() { int meuh; ntohl(meuh); }],
+        [int meuh; ntohl(meuh);],
         ac_cv_c_ntohl_sys_param_h=yes, ac_cv_c_ntohl_sys_param_h=no)])
 if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
     AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
@@ -4331,7 +4331,7 @@ then
     AC_TRY_COMPILE([#define ALSA_PCM_NEW_HW_PARAMS_API
                     #define ALSA_PCM_NEW_SW_PARAMS_API
                     #include <alsa/asoundlib.h>],
-       [void foo() { snd_pcm_hw_params_get_period_time(0,0,0); }],
+       [snd_pcm_hw_params_get_period_time(0,0,0);],
         AC_DEFINE(HAVE_ALSA_NEW_API, 1, Define if ALSA is at least rc4))
     VLC_ADD_PLUGINS([alsa])
     VLC_ADD_LDFLAGS([alsa],[-lasound -lm -ldl])
@@ -4972,7 +4972,7 @@ then
     AC_CHECK_LIB(xosd,xosd_set_horizontal_offset,
         AC_DEFINE(HAVE_XOSD_VERSION_2, 1, Define if <xosd.h> is 2.0.x),
       AC_TRY_COMPILE([#include <xosd.h>],
-         [void foo() { xosd_init("foo","bar",12,XOSD_top,2,12,42); }],,
+         [xosd_init("foo","bar",12,XOSD_top,2,12,42);],,
           AC_DEFINE(HAVE_XOSD_VERSION_0, 1, Define if <xosd.h> is pre-1.0.0))))
   if test "${have_xosd}" = "true"
   then
