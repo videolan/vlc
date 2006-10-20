@@ -533,17 +533,16 @@ DISTCLEAN_PKG += a52dec-$(A52DEC_VERSION).tar.gz
 #	cvs -d $(MPEG2DEC_CVSROOT) co mpeg2dec
 #	(cd $@; ./bootstrap)
 
-#mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
-#	$(WGET) $(MPEG2DEC_URL)
+mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
+	$(WGET) $(MPEG2DEC_URL)
 
 # It is easier to use bootstrapped versions...
-mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
-	$(WGET) $(MPEG2DEC_SNAPSHOT)
-	mv mpeg2dec-$(MPEG2DEC_DATE).tar.gz $@
+#mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
+#	$(WGET) $(MPEG2DEC_SNAPSHOT)
+#	mv mpeg2dec-$(MPEG2DEC_DATE).tar.gz $@
 
 mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/mpeg2dec.patch
 
 .mpeg2: mpeg2dec
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-sdl && cd libmpeg2 && make && make install && cd ../include && make && make install)
@@ -1285,7 +1284,7 @@ libcdio: libcdio-$(CDIO_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .cdio: libcdio
-	(cd $<; ./configure --prefix=$(PREFIX) --without-vcdinfo --disable-shared && make && make install)
+	(cd $<; sed -e 's%@ENABLE_CPP_TRUE@SUBDIRS = C++%@ENABLE_CPP_TRUE@SUBDIRS = %' -i.orig example/Makefile.in && ./configure --prefix=$(PREFIX) --without-vcdinfo --disable-shared && make && make install)
 	touch $@
 
 CLEAN_FILE += .cdio
