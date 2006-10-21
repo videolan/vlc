@@ -727,7 +727,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
     SetDWBE( p, ( i_qw >> 32)&0xffffffff );
 }
 
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 #   define hton16(i)   ( i )
 #   define hton32(i)   ( i )
 #   define hton64(i)   ( i )

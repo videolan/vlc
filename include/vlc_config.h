@@ -45,9 +45,9 @@
 #define THREAD_COND_TIMEOUT             1
 
 /* The configuration file and directory */
-#ifdef SYS_BEOS
+#if defined (SYS_BEOS)
 #  define CONFIG_DIR                    "config/settings/VideoLAN Client"
-#elif __APPLE__
+#elif defined (__APPLE__)
 #  define CONFIG_DIR                    "Library/Preferences/VLC"
 #elif defined( WIN32 ) || defined( UNDER_CE )
 #  define CONFIG_DIR                    "vlc"
