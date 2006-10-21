@@ -40,9 +40,6 @@ SUFFIXES =
 
 DISTCHECK_CONFIGURE_FLAGS = --disable-dvd --disable-mad --disable-libmpeg2 \
 	--disable-ffmpeg --disable-faad --disable-skins2
-if USE_LIBTOOL
-DISTCHECK_CONFIGURE_FLAGS += --enable-libtool
-endif
 
 # Tell aclocal to use -I m4. Wonder if it really works.
 ACLOCAL_AMFLAGS = -I m4
