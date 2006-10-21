@@ -281,6 +281,7 @@ vlc_LDADD = $(DATA_win32_rc) $(LIBVLC)
 
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 if USE_LIBTOOL
+vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc`
 LIB_libvlc = libvlc.la
 LIBVLC = src/$(LIB_libvlc)
 else
