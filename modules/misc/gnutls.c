@@ -24,11 +24,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#define _GNU_SOURCE
+
+#include <vlc/vlc.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <time.h>
-#include <vlc/vlc.h>
 
 #include <sys/types.h>
 #include <errno.h>
