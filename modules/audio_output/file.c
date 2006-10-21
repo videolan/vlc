@@ -90,9 +90,9 @@ static void    Play        ( aout_instance_t * );
 #define WAV_LONGTEXT N_("Instead of writing a raw file, you can add a WAV " \
                         "header to the file.")
 
-static char *format_list[] = { "u8", "s8", "u16", "s16", "u16_le", "s16_le",
-                               "u16_be", "s16_be", "fixed32", "float32",
-                               "spdif" };
+static const char *format_list[] = { "u8", "s8", "u16", "s16", "u16_le",
+                                     "s16_le", "u16_be", "s16_be", "fixed32",
+                                     "float32", "spdif" };
 static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
                             VLC_FOURCC('s','8',' ',' '),
                             AOUT_FMT_U16_NE, AOUT_FMT_S16_NE,
@@ -135,7 +135,7 @@ static int Open( vlc_object_t * p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     char * psz_name, * psz_format;
-    char ** ppsz_compare = format_list;
+    const char ** ppsz_compare = format_list;
     vlc_value_t val;
     int i_channels, i = 0;
 

@@ -290,7 +290,7 @@ static struct
 {
     uint16_t     i_tag;
     vlc_fourcc_t i_fourcc;
-    char         *psz_name;
+    const char  *psz_name;
 }
 wave_format_tag_to_fourcc[] =
 {
@@ -326,7 +326,7 @@ wave_format_tag_to_fourcc[] =
 };
 
 static inline void wf_tag_to_fourcc( uint16_t i_tag, vlc_fourcc_t *fcc,
-                                     char **ppsz_name )
+                                     const char **ppsz_name )
 {
     int i;
     for( i = 0; wave_format_tag_to_fourcc[i].i_tag != 0; i++ )
@@ -355,7 +355,7 @@ static struct
 {
     GUID         guid_tag;
     vlc_fourcc_t i_fourcc;
-    char         *psz_name;
+    const char  *psz_name;
 }
 sub_format_tag_to_fourcc[] =
 {
@@ -371,7 +371,7 @@ static inline int guidcmp( const GUID *s1, const GUID *s2 )
 }
 
 static inline void sf_tag_to_fourcc( GUID *guid_tag,
-                                     vlc_fourcc_t *fcc, char **ppsz_name )
+                                     vlc_fourcc_t *fcc, const char **ppsz_name )
 {
     int i;
 
@@ -390,7 +390,7 @@ static inline void sf_tag_to_fourcc( GUID *guid_tag,
  */
 typedef struct es_sys_t
 {
-    char        *psz_header; /* for 'ssa ' and 'subt' */
+    char               *psz_header; /* for 'ssa ' and 'subt' */
 
     /* for spudec */
     unsigned int        i_orig_height;
