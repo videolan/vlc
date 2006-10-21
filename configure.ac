@@ -5131,6 +5131,9 @@ AS_IF([test "${enable_gnutls}" != "no"], [
       AC_MSG_ERROR([gnutls not present or too old (version 1.2.9 required)])
     ])
   ])
+  AC_CHECK_LIB([gcrypt], [gcry_control], [
+    VLC_ADD_LDFLAGS([gnutls], [-lgcrypt])
+  ])
 ])
 
 
