@@ -598,10 +598,10 @@ NSLog( @"expandable" );
         /* Since outlineView: willDisplayCell:... may call this function with
            p_items that don't exist anymore, first check if the item is still
            in the playlist. Any cleaner solution welcomed. */
-            for( i = 0; i < p_playlist->i_all_size; i++ )
+            for( i = 0; i < p_playlist->all_items.i_size; i++ )
             {
-                if( p_playlist->pp_all_items[i] == p_item ) break;
-                else if ( i == p_playlist->i_all_size - 1 )
+                if( ARRAY_VAL( p_playlist->all_items, i) == p_item ) break;
+                else if ( i == p_playlist->all_items.i_size - 1 )
                 {
                     vlc_object_release( p_playlist );
                     vlc_mutex_unlock( &p_playlist->object_lock );

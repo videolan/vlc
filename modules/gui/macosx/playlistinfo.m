@@ -310,9 +310,9 @@
     playlist_t * p_playlist = pl_Yield( p_intf );
     int i;
 
-    for( i = 0 ; i < p_playlist->i_all_size ; i++ )
+    for( i = 0 ; i < p_playlist->all_items.i_size ; i++ )
     {
-        if( p_playlist->pp_all_items[i] == p_local_item )
+        if( ARRAY_VAL( p_playlist->all_items, i ) == p_local_item )
         {
             vlc_object_release( p_playlist );
             return YES;
