@@ -819,7 +819,7 @@ void KeySelectorControl::doApply()
 }
 
 KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
-                                char * _keyToChange ) :
+                                const char * _keyToChange ) :
                                                 QDialog(0), keyValue(0)
 {
     setModal( true );

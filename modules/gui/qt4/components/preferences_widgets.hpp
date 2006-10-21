@@ -55,7 +55,7 @@ public:
     }
     virtual ~ConfigControl() {};
     virtual int getType() = 0;
-    char * getName() { return  p_item->psz_name; }
+    const char * getName() { return  p_item->psz_name; }
     QWidget *getWidget() { assert( widget ); return widget; }
     bool isAdvanced() { return p_item->b_advanced; }
     virtual void hide() { getWidget()->hide(); };
@@ -315,14 +315,14 @@ private slot:
 class KeyInputDialog : public QDialog
 {
 public:
-    KeyInputDialog( QList<module_config_t *> &, char * );
+    KeyInputDialog( QList<module_config_t *> &, const char * );
     int keyValue;
     bool conflicts;
 private:
     void keyPressEvent( QKeyEvent *);
     QLabel *selected;
     QLabel *warning;
-    char * keyToChange;
+    const char * keyToChange;
     QList<module_config_t*> values;
 };
 
