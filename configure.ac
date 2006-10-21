@@ -3669,15 +3669,15 @@ if test "${enable_opengl}" != "no" &&
     AC_CHECK_HEADERS(GL/gl.h GL/glu.h, [
       VLC_ADD_PLUGINS([opengl])
       if test "${SYS}" != "mingw32"; then
-        VLC_ADD_LDFLAGS([opengl],[${X_LIBS} -lGL -lGLU])
+        VLC_ADD_LDFLAGS([opengl],[${X_LIBS} -lGL -lGLU -lm])
       else
-        VLC_ADD_LDFLAGS([opengl],[-lopengl32 -lglu32])
+        VLC_ADD_LDFLAGS([opengl],[-lopengl32 -lglu32 -lm])
       fi
     ])
   else
     dnl OS X special case (no GL/gl.h but OpenGL/gl.h)
     VLC_ADD_PLUGINS([opengl])
-    VLC_ADD_LDFLAGS([opengl],[-framework OpenGL])
+    VLC_ADD_LDFLAGS([opengl],[-framework OpenGL -lm])
   fi
 fi
 
