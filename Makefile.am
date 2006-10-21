@@ -430,7 +430,7 @@ VLC-release.app: vlc
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
-	case $(target_triplet) in \
+	case $(host_os) in \
 	  *darwin6*) cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
 	    cd ../../../; \
 	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
@@ -572,7 +572,7 @@ VLC.app: vlc
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
-	case $(target_triplet) in \
+	case $(host_os) in \
 	  *darwin6*) cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
 	    cd ../../../; \
 	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
