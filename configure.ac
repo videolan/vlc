@@ -887,18 +887,8 @@ if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
     AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
 fi
 
-RDC_PROG_CC_WFLAGS_IFELSE([all extra no-unused-parameter conversion unreachable-code sign-compare undef])
-
-dnl Check for -pipe
-AC_CACHE_CHECK([if \$CC accepts -pipe],
-    [ac_cv_c_pipe],
-    [CFLAGS="${CFLAGS_save} -pipe"
-     AC_TRY_COMPILE([],,ac_cv_c_pipe=yes, ac_cv_c_pipe=no)])
-if test "${ac_cv_c_pipe}" != "no"; then
-    CFLAGS_save="${CFLAGS_save} -pipe"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="${CXXFLAGS_save} -pipe"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="${OBJCFLAGS_save} -pipe"; OBJCFLAGS="${OBJCFLAGS_save}"
-fi
+RDC_PROG_CC_WFLAGS([all extra no-unused-parameter conversion unreachable-code sign-compare undef])
+RDC_PROG_CC_FLAGS_IFELSE([-pipe])
 
 dnl Check for various optimization flags
 AC_CACHE_CHECK([if \$CC accepts -Os],
