@@ -434,7 +434,7 @@ static char *ppsz_clock_descriptions[] =
 #define TTL_TEXT N_("Hop limit (TTL)")
 #define TTL_LONGTEXT N_( \
     "This is the hop limit (also known as \"Time-To-Live\" or TTL) of " \
-    "the multicast packets sent by the stream output (0 = use operating " \
+    "the multicast packets sent by the stream output (-1 = use operating " \
     "system built-in default).")
 
 #define MIFACE_TEXT N_("Multicast output interface")
@@ -1537,7 +1537,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_SOUT_ACO );
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
-    add_integer( "ttl", 0, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
+    add_integer( "ttl", -1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
     add_string( "miface", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
     add_string( "miface-addr", NULL, NULL, MIFACE_ADDR_TEXT, MIFACE_ADDR_LONGTEXT, VLC_TRUE );
     add_integer( "dscp", 0, NULL, DSCP_TEXT, DSCP_LONGTEXT, VLC_TRUE );

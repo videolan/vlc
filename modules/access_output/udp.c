@@ -77,12 +77,6 @@ static void Close( vlc_object_t * );
     "Default caching value for outbound UDP streams. This " \
     "value should be set in milliseconds." )
 
-#define TTL_TEXT N_("Hop limit (TTL)")
-#define TTL_LONGTEXT N_( \
-    "This is the hop limit (also known as \"Time-To-Live\" or TTL) of " \
-    "the multicast packets sent by the stream output (0 = use operating " \
-    "system built-in default).")
-
 #define GROUP_TEXT N_("Group packets")
 #define GROUP_LONGTEXT N_("Packets can be sent one by one at the right time " \
                           "or by groups. You can choose the number " \
@@ -101,8 +95,6 @@ vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );
     add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL,TTL_TEXT, TTL_LONGTEXT,
-                                 VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "group", 1, NULL, GROUP_TEXT, GROUP_LONGTEXT,
                                  VLC_TRUE );
     add_suppressed_integer( SOUT_CFG_PREFIX "late" );
@@ -121,9 +113,17 @@ vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
     "caching",
-    "ttl",
     "group",
     "raw",
+    NULL
+};
+
+/* Options handled by the libvlc network core */
+static const char *ppsz_core_options[] = {
+    "dscp",
+    "ttl",
+    "miface",
+    "miface-addr",
     NULL
 };
 
@@ -185,7 +185,9 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t         val;
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX,
-                   ppsz_sout_options, p_access->p_cfg );
+                       ppsz_sout_options, p_access->p_cfg );
+    config_ChainParse( p_access, "",
+                       ppsz_core_options, p_access->p_cfg );
 
     if( !( p_sys = malloc( sizeof( sout_access_out_sys_t ) ) ) )
     {
@@ -247,11 +249,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->p_fifo = block_FifoNew( p_access );
     p_sys->p_thread->p_empty_blocks = block_FifoNew( p_access );
 
-    var_Get( p_access, SOUT_CFG_PREFIX "ttl", &val );
-    i_handle = net_ConnectUDP( p_this, psz_dst_addr, i_dst_port, val.i_int );
+    i_handle = net_ConnectUDP( p_this, psz_dst_addr, i_dst_port, -1 );
     if( i_handle == -1 )
     {
-         msg_Err( p_access, "failed to open a connection (udp)" );
+         msg_Err( p_access, "failed to create UDP socket" );
          return VLC_EGENERIC;
     }
 
