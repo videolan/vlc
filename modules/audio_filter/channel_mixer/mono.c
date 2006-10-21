@@ -75,7 +75,7 @@ struct filter_sys_t
 {
     vlc_bool_t b_downmix;
 
-    int i_nb_channels; /* number of int16_t per sample */
+    unsigned int i_nb_channels; /* number of int16_t per sample */
     int i_channel_selected;
     int i_bitspersample;
 
@@ -697,7 +697,7 @@ static unsigned int stereo_to_mono( aout_instance_t * p_aout, aout_filter_t *p_f
             p_out[n] = p_out[n+1] = (p_in[n] + p_in[n+1]) >> 1;
             n++;
         }
-        else if( (n % p_sys->i_nb_channels) == p_sys->i_channel_selected )
+        else if( (n % p_sys->i_nb_channels) == (unsigned int) p_sys->i_channel_selected )
         {
             p_out[n] = p_out[n+1] = p_in[n];
         }
