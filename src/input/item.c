@@ -76,15 +76,10 @@ static void input_ItemDestroy ( gc_object_t *p_this )
     playlist_t *p_playlist = pl_Yield( p_obj );
     input_ItemClean( p_input );
 
-    for( i = 0 ; i< p_playlist->i_input_items ; i++ )
-    {
-        if( p_playlist->pp_input_items[i]->i_id == p_input->i_id )
-        {
-            REMOVE_ELEM( p_playlist->pp_input_items,
-                         p_playlist->i_input_items, i );
-            break;
-        }
-    }
+    ARRAY_BSEARCH( p_playlist->input_items,->i_id, int, p_input->i_id, i);
+    if( i != -1 )
+        ARRAY_REMOVE( p_playlist->input_items, i);
+
     pl_Release( p_obj );
     free( p_input );
 }
@@ -186,22 +181,10 @@ int input_ItemAddInfo( input_item_t *p_i,
 
 input_item_t *input_ItemGetById( playlist_t *p_playlist, int i_id )
 {
-    int i, i_top, i_bottom;
-    i_bottom = 0; i_top = p_playlist->i_input_items -1;
-    i = i_top  /2 ;
-    while( p_playlist->pp_input_items[i]->i_id != i_id &&
-           i_top > i_bottom )
-    {
-        if( p_playlist->pp_input_items[i]->i_id < i_id )
-            i_bottom = i + 1;
-        else
-            i_top = i - 1;
-        i = i_bottom + ( i_top - i_bottom ) / 2;
-    }
-    if( p_playlist->pp_input_items[i]->i_id == i_id )
-    {
-        return p_playlist->pp_input_items[i];
-    }
+    int i;
+    ARRAY_BSEARCH( p_playlist->input_items, ->i_id, int, i_id, i);
+    if( i != -1 )
+        return ARRAY_VAL( p_playlist->input_items, i);
     return NULL;
 }
 
@@ -228,9 +211,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
 
     PL_LOCK;
     p_input->i_id = ++p_playlist->i_last_input_id;
-    TAB_APPEND( p_playlist->i_input_items,
-                p_playlist->pp_input_items,
-                p_input );
+    ARRAY_APPEND( p_playlist->input_items, p_input );
     PL_UNLOCK;
     pl_Release( p_obj );
 

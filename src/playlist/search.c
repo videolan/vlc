@@ -38,22 +38,10 @@
  */
 playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id )
 {
-    int i, i_top, i_bottom;
-    i_bottom = 0; i_top = p_playlist->i_all_size - 1;
-    i = i_top / 2;
-    while( p_playlist->pp_all_items[i]->i_id != i_id &&
-           i_top > i_bottom )
-    {
-        if( p_playlist->pp_all_items[i]->i_id < i_id )
-            i_bottom = i + 1;
-        else
-            i_top = i - 1;
-        i = i_bottom + ( i_top - i_bottom ) / 2;
-    }
-    if( p_playlist->pp_all_items[i]->i_id == i_id )
-    {
-        return p_playlist->pp_all_items[i];
-    }
+    int i;
+    ARRAY_BSEARCH( p_playlist->all_items,->i_id, int, i_id, i );
+    if( i != -1 )
+        return ARRAY_VAL( p_playlist->all_items, i );
     return NULL;
 }
 
@@ -73,13 +61,11 @@ playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
     {
         return p_playlist->status.p_item;
     }
-
-    for( i =  0 ; i < p_playlist->i_all_size; i++ )
+    /** \todo Check if this is always incremental and whether we can bsearch */
+    for( i =  0 ; i < p_playlist->all_items.i_size; i++ )
     {
-        if( p_playlist->pp_all_items[i]->p_input->i_id == p_item->i_id )
-        {
-            return p_playlist->pp_all_items[i];
-        }
+        if( ARRAY_VAL(p_playlist->all_items, i)->p_input->i_id == p_item->i_id )
+            return ARRAY_VAL(p_playlist->all_items, i);
     }
     return NULL;
 }
@@ -92,7 +78,7 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
                                const char *psz_string )
 {
    int i;
-   p_playlist->b_reset_random = VLC_TRUE;
+   p_playlist->b_reset_currently_playing = VLC_TRUE;
    for( i = 0 ; i< p_root->i_children ; i ++ )
    {
         playlist_item_t *p_item = p_root->pp_children[i];

@@ -44,7 +44,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
     assert( PL );
     ///\todo Handle additionnal options
 
-    if( PL->i_size == 0 ) RAISEVOID( "Empty playlist" );
+    if( PL->items.i_size == 0 ) RAISEVOID( "Empty playlist" );
     if( i_id > 0 )
     {
         playlist_item_t *p_item = playlist_ItemGetById( PL,
@@ -136,7 +136,7 @@ int libvlc_playlist_items_count( libvlc_instance_t *p_instance,
                                  libvlc_exception_t *p_e )
 {
     assert( PL );
-    return PL->i_size;
+    return PL->items.i_size;
 }
 
 libvlc_input_t * libvlc_playlist_get_input( libvlc_instance_t *p_instance,

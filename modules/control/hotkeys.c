@@ -796,13 +796,13 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
     var_Get( p_intf, psz_bookmark_name, &val );
 
     char *psz_bookmark = strdup( val.psz_string );
-    for( i = 0; i < p_playlist->i_size; i++)
+    for( i = 0; i < p_playlist->items.i_size; i++)
     {
         if( !strcmp( psz_bookmark,
-                     p_playlist->pp_items[i]->p_input->psz_uri ) )
+                     ARRAY_VAL( p_playlist->items,i )->p_input->psz_uri ) )
         {
             playlist_LockControl( p_playlist, PLAYLIST_VIEWPLAY, NULL,
-                                  p_playlist->pp_items[i] );
+                                  ARRAY_VAL( p_playlist->items, i ) );
             break;
         }
     }

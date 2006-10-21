@@ -35,10 +35,8 @@ void CmdPlay::execute()
         return;
     }
 
-    if( pPlaylist->i_size )
-    {
+    if( !playlist_IsEmpty( pPlaylist ) )
         playlist_Play( pPlaylist );
-    }
     else
     {
         // If the playlist is empty, open a file requester instead

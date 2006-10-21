@@ -354,7 +354,7 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
         else \
             MIM_SADD( qtr("Pause"), "", "", togglePlayPause() ) \
     } \
-    else if( THEPL->i_size && THEPL->i_enabled ) \
+    else if( THEPL->items.i_size && THEPL->i_enabled ) \
         MIM_SADD( qtr("Play"), "", "", togglePlayPause() ) \
     \
     QMenu *intfmenu = InterfacesMenu( p_intf, NULL ); \

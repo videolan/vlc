@@ -26,13 +26,13 @@
 
 #include <assert.h>
 
+TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t);
+TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
 /**
- *  \file
- *  This file contain structures and function prototypes related
- *  to the playlist in vlc
- */
-
-/**
+ * \file
+ * This file contain structures and function prototypes related
+ * to the playlist in vlc
+ *
  * \defgroup vlc_playlist Playlist
  * @{
  */
@@ -102,20 +102,15 @@ struct playlist_t
 /*@{*/
     int                   i_enabled; /**< How many items are enabled ? */
 
-    /* Arrays of items */
-    int                   i_size;   /**< total size of the list */
-    playlist_item_t **    pp_items; /**< array of pointers to the
-                                     * playlist items */
-    int                   i_all_size; /**< size of list of items and nodes */
-    playlist_item_t **    pp_all_items; /**< array of pointers to the
-                                         * playlist items and nodes */
-    int                   i_input_items;
-    input_item_t **       pp_input_items;
+    playlist_item_array_t items; /**< Arrays of items */
+    playlist_item_array_t all_items; /**< Array of items and nodes */
 
-    int                   i_random;     /**< Number of candidates for random */
-    playlist_item_t **    pp_random;    /**< Random candidate items */
-    int                   i_random_index; /**< Current random item */
-    vlc_bool_t            b_reset_random; /**< Recreate random array ?*/
+    input_item_array_t    input_items; /**< Array of input items */
+
+    playlist_item_array_t current; /**< Items currently being played */
+    int                   i_current_index; /**< Index in current array */
+    /** Reset current item ? */
+    vlc_bool_t            b_reset_currently_playing;
 
     int                   i_last_playlist_id; /**< Last id to an item */
     int                   i_last_input_id ; /**< Last id on an input */
@@ -345,7 +340,7 @@ static inline int playlist_MLAddExt( playlist_t *p_playlist,
                             i_duration, ppsz_options, i_options, VLC_FALSE );
 }
 
-/** Add an input item to the playlist node 
+/** Add an input item to the playlist node
  * \see playlist_AddInput
  */
 static inline int playlist_PlaylistAddInput( playlist_t* p_playlist,
@@ -433,7 +428,7 @@ static inline vlc_bool_t playlist_IsEmpty( playlist_t * p_playlist )
 {
     vlc_bool_t b_empty;
     vlc_mutex_lock( &p_playlist->object_lock );
-    b_empty = p_playlist->i_size == 0;
+    b_empty = p_playlist->items.i_size == 0;
     vlc_mutex_unlock( &p_playlist->object_lock );
     return( b_empty );
 }

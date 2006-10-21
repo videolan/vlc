@@ -62,19 +62,12 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, char *psz_name,
     p_item = playlist_ItemNewFromInput( VLC_OBJECT(p_playlist), p_input );
     p_item->i_children = 0;
 
-    if( p_item == NULL )
-    {
-        return NULL;
-    }
-    INSERT_ELEM( p_playlist->pp_all_items,
-                 p_playlist->i_all_size,
-                 p_playlist->i_all_size,
-                 p_item );
+    if( p_item == NULL )  return NULL;
+
+    ARRAY_APPEND(p_playlist->all_items, p_item);
 
     if( p_parent != NULL )
-    {
         playlist_NodeAppend( p_playlist, p_item, p_parent );
-    }
 
     playlist_SendAddNotify( p_playlist, p_item->i_id,
                             p_parent ? p_parent->i_id : -1 );
@@ -156,23 +149,16 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     }
     else
     {
+        int i;
         var_SetInteger( p_playlist, "item-deleted", p_root->p_input->i_id );
-        for( i = 0 ; i< p_playlist->i_all_size; i ++ )
-        {
-            if( p_playlist->pp_all_items[i]->p_input->i_id ==
-                               p_root->p_input->i_id )
-            {
-                REMOVE_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size,
-                             i );
-                break;
-            }
-        }
+        ARRAY_BSEARCH( p_playlist->all_items, ->p_input->i_id, int,
+                       p_root->p_input->i_id, i );
+        if( i != -1 )
+            ARRAY_REMOVE( p_playlist->all_items, i );
 
         /* Remove the item from its parent */
         if( p_root->p_parent )
-        {
             playlist_NodeRemoveItem( p_playlist, p_root, p_root->p_parent );
-        }
 
         playlist_ItemDelete( p_root );
     }
@@ -430,7 +416,6 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
     {
         vlc_bool_t b_ena_ok = VLC_TRUE, b_unplayed_ok = VLC_TRUE;
         p_next = GetNextItem( p_playlist, p_root, p_next );
-        PL_DEBUG( "Got next item %s, testing suitability", PLI_NAME(p_next) );
         if( !p_next || p_next == p_root )
             break;
         if( p_next->i_children == -1 )
@@ -521,8 +506,6 @@ playlist_item_t *GetNextItem( playlist_t *p_playlist,
         p_parent = p_item->p_parent;
     else
         p_parent = p_root;
-    PL_DEBUG( "Parent %s has %i children", PLI_NAME(p_parent),
-                                           p_parent->i_children );
     for( i= 0 ; i < p_parent->i_children ; i++ )
     {
         if( p_item == NULL || p_parent->pp_children[i] == p_item )

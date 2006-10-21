@@ -670,7 +670,7 @@ int VLC_PlaylistNumberOfItems( int i_object )
 {
     int i_size;
     LIBVLC_PLAYLIST_FUNC;
-    i_size = p_libvlc->p_playlist->i_size;
+    i_size = p_libvlc->p_playlist->items.i_size;
     LIBVLC_PLAYLIST_FUNC_END;
     return i_size;
 }

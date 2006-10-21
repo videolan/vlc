@@ -1067,7 +1067,8 @@ static VLCMain *_o_sharedMainInstance = nil;
         vlc_bool_t b_chapters = VLC_FALSE;
 
         playlist_t * p_playlist = pl_Yield( p_intf );
-        b_plmul = p_playlist->i_size > 1;
+	/** \todo fix i_size use */
+        b_plmul = p_playlist->items.i_size > 1;
 
         vlc_object_release( p_playlist );
 

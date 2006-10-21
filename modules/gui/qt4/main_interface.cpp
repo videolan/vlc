@@ -556,7 +556,7 @@ void MainInterface::stop()
 }
 void MainInterface::play()
 {
-    if( !THEPL->i_size || !THEPL->i_enabled )
+    if( !playlist_IsEmpty(THEPL) || !THEPL->i_enabled )
     {
         /* The playlist is empty, open a file requester */
         THEDP->simpleOpenDialog();

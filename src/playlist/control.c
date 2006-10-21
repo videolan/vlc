@@ -84,10 +84,8 @@ int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
     playlist_item_t *p_item, *p_node;
     vlc_value_t val;
 
-    if( p_playlist->i_size <= 0 )
-    {
+    if( p_playlist->items.i_size <= 0 )
         return VLC_EGENERIC;
-    }
 
     switch( i_query )
     {
@@ -100,7 +98,6 @@ int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
     // Node can be null, it will keep the same. Use with care ...
     // Item null = take the first child of node
     case PLAYLIST_VIEWPLAY:
-        p_playlist->b_reset_random = VLC_TRUE;
         p_node = (playlist_item_t *)va_arg( args, playlist_item_t * );
         p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
         if ( p_node == NULL )
@@ -113,6 +110,8 @@ int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
         p_playlist->request.b_request = VLC_TRUE;
         p_playlist->request.p_node = p_node;
         p_playlist->request.p_item = p_item;
+        if( p_item && var_GetBool( p_playlist, "random" ) )
+            p_playlist->b_reset_currently_playing = VLC_TRUE;
         break;
 
     case PLAYLIST_PLAY:
@@ -261,6 +260,66 @@ void PreparseEnqueueItemSub( playlist_t *p_playlist,
  * Playback logic
  *****************************************************************************/
 
+static void ResyncCurrentIndex(playlist_t *p_playlist, playlist_item_t *p_cur )
+{
+     PL_DEBUG("resyncing on %s", PLI_NAME(p_cur) );
+     /* Simply resync index */
+     int i;
+     p_playlist->i_current_index = -1;
+     for( i = 0 ; i< p_playlist->current.i_size; i++ )
+     {
+          if( ARRAY_VAL(p_playlist->current, i) == p_cur )
+          {
+              p_playlist->i_current_index = i;
+              break;
+          }
+     }
+     PL_DEBUG("%s is at %i", PLI_NAME(p_cur), p_playlist->i_current_index );
+}
+
+static void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
+                                   playlist_item_t *p_cur )
+{
+    playlist_item_t *p_next = NULL;
+    PL_DEBUG("rebuilding array of current - root %s",
+              PLI_NAME(p_playlist->status.p_node) );
+    ARRAY_RESET(p_playlist->current);
+    p_playlist->i_current_index = -1;
+    while( 1 )
+    {
+        /** FIXME: this is *slow* */
+        p_next = playlist_GetNextLeaf( p_playlist,
+                                       p_playlist->status.p_node,
+                                       p_next, VLC_TRUE, VLC_FALSE );
+        if( p_next )
+        {
+            if( p_next == p_cur )
+                p_playlist->i_current_index = p_playlist->current.i_size;
+            ARRAY_APPEND( p_playlist->current, p_next);
+        }
+        else break;
+    }
+    PL_DEBUG("rebuild done - %i items, index %i", p_playlist->current.i_size,
+                                                  p_playlist->i_current_index);
+    if( b_random )
+    {
+        /* Shuffle the array */
+        srand( (unsigned int)mdate() );
+        int swap = 0;
+        int j;
+        for( j = p_playlist->current.i_size - 1; j > 0; j-- )
+        {
+            swap++;
+            int i = rand() % (j+1); /* between 0 and j */
+            playlist_item_t *p_tmp;
+            p_tmp = ARRAY_VAL(p_playlist->current, i);
+            ARRAY_VAL(p_playlist->current,i) = ARRAY_VAL(p_playlist->current,j);
+            ARRAY_VAL(p_playlist->current,j) = p_tmp;
+        }
+    }
+    p_playlist->b_reset_currently_playing = VLC_FALSE;
+}
+
 /** This function calculates the next playlist item, depending
  *  on the playlist course mode (forward, backward, random, view,...). */
 playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
@@ -275,7 +334,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 
     /* Handle quickly a few special cases */
     /* No items to play */
-    if( p_playlist->i_size == 0 )
+    if( p_playlist->items.i_size == 0 )
     {
         msg_Info( p_playlist, "playlist is empty" );
         return NULL;
@@ -308,74 +367,6 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
         }
     }
 
-    /* Random case. This is an exception: if request, but request is skip +- 1
-     * we don't go to next item but select a new random one. */
-    if( b_random &&
-        ( !p_playlist->request.b_request ||
-        ( p_playlist->request.b_request &&
-            ( p_playlist->request.p_item == NULL ||
-              p_playlist->request.i_skip == 1    ||
-              p_playlist->request.i_skip == -1 ) ) ) )
-    {
-       PL_DEBUG( "doing random, have %i items, currently at %i, reset %i\n",
-                        p_playlist->i_random, p_playlist->i_random_index,
-                        p_playlist->b_reset_random );
-       if( p_playlist->b_reset_random )
-        {
-            int j;
-            FREE( p_playlist->pp_random );
-            if( !p_playlist->b_reset_random &&  !b_loop ) goto end;
-            p_playlist->i_random = 0;
-            p_playlist->i_random_index = 0;
-            p_playlist->i_random = playlist_GetAllEnabledChildren(
-                                                p_playlist,
-                                                p_playlist->status.p_node,
-                                                &p_playlist->pp_random );
-            /* Shuffle the array */
-            srand( (unsigned int)mdate() );
-            int swap = 0;
-            for( j = p_playlist->i_random -1; j > 0; j-- )
-            {
-                swap++;
-                int i = rand() % (j+1); /* between 0 and j */
-                playlist_item_t *p_tmp;
-                p_tmp = p_playlist->pp_random[i];
-                p_playlist->pp_random[i] = p_playlist->pp_random[j];
-                p_playlist->pp_random[j] = p_tmp;
-            }
-            p_playlist->b_reset_random = VLC_FALSE;
-            PL_DEBUG( "random rebuilt, have %i items", p_playlist->i_random );
-        }
-        else
-        {
-            /* Go backward or forward */
-            if( !p_playlist->request.b_request || !p_playlist->request.p_item ||
-                                               p_playlist->request.i_skip == 1 )
-                p_playlist->i_random_index++;
-            else
-                p_playlist->i_random_index--;
-            /* Handle bounds situations */
-            if( p_playlist->i_random_index == -1 )
-            {
-                if( !b_loop || p_playlist->i_random == 0 ) goto end;
-                p_playlist->i_random_index = p_playlist->i_random - 1;
-            }
-            else if( p_playlist->i_random_index == p_playlist->i_random )
-            {
-                if( !b_loop || p_playlist->i_random == 0 ) goto end;
-                p_playlist->i_random_index = 0;
-            }
-        }
-        PL_DEBUG( "using random item %i", p_playlist->i_random_index );
-        if ( p_playlist->i_random == 0 ) goto end; /* Can this happen ?? */
-        p_new = p_playlist->pp_random[p_playlist->i_random_index];
-end:
-        if( !p_new ) p_playlist->b_reset_random = VLC_TRUE;
-        p_playlist->request.i_skip = 0;
-        p_playlist->request.b_request = VLC_FALSE;
-        return p_new;
-    }
-
     /* Start the real work */
     if( p_playlist->request.b_request )
     {
@@ -385,47 +376,51 @@ end:
                         PLI_NAME( p_playlist->request.p_item ),
                         PLI_NAME( p_playlist->request.p_node ), i_skip );
 
-        if( p_playlist->request.p_node )
+        if( p_playlist->request.p_node &&
+            p_playlist->request.p_node != p_playlist->status.p_node )
+        {
             p_playlist->status.p_node = p_playlist->request.p_node;
+            p_playlist->b_reset_currently_playing = VLC_TRUE;
+        }
 
         /* If we are asked for a node, dont take it */
         if( i_skip == 0 && ( p_new == NULL || p_new->i_children != -1 ) )
             i_skip++;
 
-        if( i_skip > 0 )
+        if( p_playlist->b_reset_currently_playing )
+            ResetCurrentlyPlaying( p_playlist, b_random, p_new );
+        else if( p_new )
+            ResyncCurrentIndex( p_playlist, p_new );
+        else
+            p_playlist->i_current_index = -1;
+
+        if( p_playlist->current.i_size && i_skip > 0 )
         {
             for( i = i_skip; i > 0 ; i-- )
             {
-                p_new = playlist_GetNextLeaf( p_playlist,
-                                              p_playlist->request.p_node,
-                                              p_new, VLC_TRUE, VLC_FALSE );
-                if( p_new == NULL )
+                p_playlist->i_current_index++;
+                if( p_playlist->i_current_index == p_playlist->current.i_size )
                 {
                     PL_DEBUG( "looping - restarting at beginning of node" );
-                    p_new = playlist_GetNextLeaf( p_playlist,
-                                                  p_playlist->request.p_node,
-                                                  NULL, VLC_TRUE, VLC_FALSE);
-                    if( p_new == NULL ) break;
+                    p_playlist->i_current_index = 0;
                 }
             }
+            p_new = ARRAY_VAL( p_playlist->current,
+                               p_playlist->i_current_index );
         }
-        else if( i_skip < 0 )
+        else if( p_playlist->current.i_size && i_skip < 0 )
         {
             for( i = i_skip; i < 0 ; i++ )
             {
-                p_new = playlist_GetPrevLeaf( p_playlist,
-                                              p_playlist->request.p_node,
-                                              p_new, VLC_FALSE, VLC_FALSE );
-                if( p_new == NULL )
+                p_playlist->i_current_index--;
+                if( p_playlist->i_current_index == -1 )
                 {
                     PL_DEBUG( "looping - restarting at end of node" );
-                    /** \bug This is needed because GetPrevLeaf does not loop
-                      * by itself */
-                    p_new = playlist_GetLastLeaf( p_playlist,
-                                                 p_playlist->request.p_node );
+                    p_playlist->i_current_index = p_playlist->current.i_size-1;
                 }
-                if( p_new == NULL ) break;
             }
+            p_new = ARRAY_VAL( p_playlist->current,
+                               p_playlist->i_current_index );
         }
         /* Clear the request */
         p_playlist->request.b_request = VLC_FALSE;
@@ -433,30 +428,30 @@ end:
     /* "Automatic" item change ( next ) */
     else
     {
-        PL_DEBUG( "changing item without a request" );
+        PL_DEBUG( "changing item without a request (current %i/%i)",
+                  p_playlist->i_current_index, p_playlist->current.i_size );
         /* Cant go to next from current item */
         if( p_playlist->status.p_item &&
             p_playlist->status.p_item->i_flags & PLAYLIST_SKIP_FLAG )
             return NULL;
 
-        p_new = playlist_GetNextLeaf( p_playlist,
-                                      p_playlist->status.p_node,
-                                      p_playlist->status.p_item,
-                                      VLC_TRUE, VLC_FALSE );
-        if( p_new == NULL && b_loop )
+        if( p_playlist->b_reset_currently_playing )
+            ResetCurrentlyPlaying( p_playlist, b_random,
+                                   p_playlist->status.p_item );
+
+        p_playlist->i_current_index++;
+        if( p_playlist->i_current_index == p_playlist->current.i_size )
         {
-            PL_DEBUG( "looping" );
-            p_new = playlist_GetNextLeaf( p_playlist,
-                                          p_playlist->status.p_node,
-                                          NULL, VLC_TRUE, VLC_FALSE );
+            if( !b_loop || p_playlist->current.i_size == 0 ) return NULL;
+            p_playlist->i_current_index = 0;
         }
+        PL_DEBUG( "using item %i", p_playlist->i_current_index );
+        if ( p_playlist->current.i_size == 0 ) return NULL;
+
+        p_new = ARRAY_VAL( p_playlist->current, p_playlist->i_current_index );
         /* The new item can't be autoselected  */
         if( p_new != NULL && p_new->i_flags & PLAYLIST_SKIP_FLAG )
             return NULL;
-    }
-    if( p_new == NULL )
-    {
-        msg_Dbg( p_playlist, "did not find something to play" );
     }
     return p_new;
 }

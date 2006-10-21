@@ -403,7 +403,7 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
             playlist_DeleteFromInput( p_playlist, p_item_in_one->p_input->i_id,
                                       p_playlist->p_root_onelevel, VLC_FALSE );
         }
-        p_playlist->b_reset_random = VLC_TRUE;
+        p_playlist->b_reset_currently_playing = VLC_TRUE;
         var_SetInteger( p_playlist, "item-change", p_item_in_category->
                                                         p_input->i_id );
         return p_item_in_category;
@@ -544,7 +544,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     p_add->i_item = i_item_id;
     p_add->i_node = i_node_id;
     val.p_address = p_add;
-    p_playlist->b_reset_random = VLC_TRUE;
+    p_playlist->b_reset_currently_playing = VLC_TRUE;
     var_Set( p_playlist, "item-append", val );
     free( p_add );
 }
@@ -610,20 +610,15 @@ void GoAndPreparse( playlist_t *p_playlist, int i_mode,
 void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
               playlist_item_t *p_node, int i_pos )
 {
-    INSERT_ELEM( p_playlist->pp_items, p_playlist->i_size,
-                 p_playlist->i_size, p_item );
-    INSERT_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size,
-                 p_playlist->i_all_size, p_item );
+    ARRAY_APPEND(p_playlist->items, p_item);
+    ARRAY_APPEND(p_playlist->all_items, p_item);
     p_playlist->i_enabled ++;
 
     if( i_pos == PLAYLIST_END )
-    {
         playlist_NodeAppend( p_playlist, p_item, p_node );
-    }
     else
-    {
         playlist_NodeInsert( p_playlist, p_item, p_node, i_pos );
-    }
+
     if( !p_playlist->b_doing_ml )
         playlist_SendAddNotify( p_playlist, p_item->i_id, p_node->i_id );
 }
@@ -636,20 +631,16 @@ void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item )
         p_item->i_children = 0;
 
     /* Remove it from the array of available items */
-    for( i = 0 ; i < p_playlist->i_size ; i++ )
-    {
-        if( p_item == p_playlist->pp_items[i] )
-        {
-            REMOVE_ELEM( p_playlist->pp_items, p_playlist->i_size, i );
-        }
-    }
+    ARRAY_BSEARCH( p_playlist->items,->i_id, int, p_item->i_id, i );
+    if( i != -1 )
+        ARRAY_REMOVE( p_playlist->items, i );
 }
 
 /* Do the actual removal */
 int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
                 vlc_bool_t b_stop )
 {
-    int i, i_top, i_bottom;
+    int i;
     int i_id = p_item->i_id;
     vlc_bool_t b_flag = VLC_FALSE;
 
@@ -657,29 +648,13 @@ int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
     {
         return playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_FALSE );
     }
-    p_playlist->b_reset_random = VLC_TRUE;
+    p_playlist->b_reset_currently_playing = VLC_TRUE;
     var_SetInteger( p_playlist, "item-deleted", i_id );
 
     /* Remove the item from the bank */
-    i_bottom = 0; i_top = p_playlist->i_all_size - 1;
-    i = i_top / 2;
-    while( p_playlist->pp_all_items[i]->i_id != i_id &&
-           i_top > i_bottom )
-    {
-        if( p_playlist->pp_all_items[i]->i_id < i_id )
-        {
-            i_bottom = i + 1;
-        }
-        else
-        {
-            i_top = i - 1;
-        }
-        i = i_bottom + ( i_top - i_bottom ) / 2;
-    }
-    if( p_playlist->pp_all_items[i]->i_id == i_id )
-    {
-        REMOVE_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size, i );
-    }
+    ARRAY_BSEARCH( p_playlist->all_items,->i_id, int, i_id, i );
+    if( i != -1 )
+        ARRAY_REMOVE( p_playlist->all_items, i );
 
     /* Check if it is the current item */
     if( p_playlist->status.p_item == p_item )

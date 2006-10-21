@@ -398,19 +398,20 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                         i_nb_items++;
                     }
 
-                    for( i = p_sys->p_playlist->i_size - 1 ; i >= 0; i-- )
+                    for( i = p_sys->p_playlist->items.i_size - 1 ; i >= 0; i-- )
                     {
                         /* Check if the item is in the keep list */
                         for( j = 0 ; j < i_nb_items ; j++ )
                         {
                             if( p_items[j] ==
-                                p_sys->p_playlist->pp_items[i]->p_input->i_id )
+                                 ARRAY_VAL(p_sys->p_playlist->items,i)
+                                                ->p_input->i_id)
                                 break;
                         }
                         if( j == i_nb_items )
                         {
                             playlist_LockDeleteAllFromInput( p_sys->p_playlist,
-                            p_sys->p_playlist->pp_items[i]->p_input->i_id );
+                           p_sys->p_playlist->items.p_elems[i]->p_input->i_id );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      i );
                         }

@@ -464,14 +464,15 @@ NSLog( @"expandable" );
 
     playlist_t *p_playlist = pl_Yield( VLCIntf );
 
-    if( p_playlist->i_size >= 2 )
+    /** \todo fix i_size use */
+    if( p_playlist->items.i_size >= 2 )
     {
         [o_status_field setStringValue: [NSString stringWithFormat:
-                    _NS("%i items in the playlist"), p_playlist->i_size]];
+                    _NS("%i items in the playlist"), p_playlist->items.i_size]];
     }
     else
     {
-        if( p_playlist->i_size == 0 )
+        if( playlist_IsEmpty( p_playlist ) )
         {
             [o_status_field setStringValue: _NS("No items in the playlist")];
         }
@@ -1366,15 +1367,15 @@ NSLog( @"expandable" );
 
     /* FIXME: playlist->i_size doesn't provide the correct number of items anymore
      * check the playlist API for the fixed function, once zorglub implemented it -- fpk, 9/17/06 */
-
-    if( p_playlist->i_size >= 2 )
+    /** \todo fix i_size use */
+    if( p_playlist->items.i_size >= 2 )
     {
         [o_status_field setStringValue: [NSString stringWithFormat:
-                    _NS("%i items in the playlist"), p_playlist->i_size]];
+                    _NS("%i items in the playlist"), p_playlist->items.i_size]];
     }
     else
     {
-        if( p_playlist->i_size == 0 )
+        if( playlist_IsEmpty( p_playlist ) )
         {
             [o_status_field setStringValue: _NS("No items in the playlist")];
         }

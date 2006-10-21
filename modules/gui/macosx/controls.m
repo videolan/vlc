@@ -68,7 +68,7 @@
     playlist_t * p_playlist = pl_Yield( p_intf );
 
     vlc_mutex_lock( &p_playlist->object_lock );
-    if( p_playlist->i_size <= 0 )
+    if( playlist_IsEmpty( p_playlist ) )
     {
         vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
@@ -812,7 +812,8 @@
     else if( [[o_mi title] isEqualToString: _NS("Previous")] ||
              [[o_mi title] isEqualToString: _NS("Next")] )
     {
-            bEnabled = p_playlist->i_size > 1;
+	    /** \todo fix i_size use */
+            bEnabled = p_playlist->items.i_size > 1;
     }
     else if( [[o_mi title] isEqualToString: _NS("Random")] )
     {

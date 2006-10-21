@@ -34,6 +34,13 @@
  *****************************************************************************/
 static void VariablesInit( playlist_t *p_playlist );
 
+static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval, void *a )
+{
+    ((playlist_t*)p_this)->b_reset_currently_playing = VLC_TRUE;
+    return VLC_SUCCESS;
+}
+
 /**
  * Create playlist
  *
@@ -66,18 +73,13 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->i_vout_destroyed_date = 0;
     p_playlist->i_sout_destroyed_date = 0;
 
-    p_playlist->i_size = 0;
-    p_playlist->pp_items = NULL;
-    p_playlist->i_all_size = 0;
-    p_playlist->pp_all_items = NULL;
+    ARRAY_INIT( p_playlist->items );
+    ARRAY_INIT( p_playlist->all_items );
+    ARRAY_INIT( p_playlist->input_items );
+    ARRAY_INIT( p_playlist->current );
 
-    p_playlist->i_input_items = 0;
-    p_playlist->pp_input_items = NULL;
-
-    p_playlist->i_random = 0;
-    p_playlist->pp_random = NULL;
-    p_playlist->i_random_index = 0;
-    p_playlist->b_reset_random = VLC_TRUE;
+    p_playlist->i_current_index = 0;
+    p_playlist->b_reset_currently_playing = VLC_TRUE;
 
     i_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
     p_playlist->b_always_tree = (i_tree == 1);
@@ -162,10 +164,24 @@ void playlist_Destroy( playlist_t *p_playlist )
     var_Destroy( p_playlist, "activity" );
 
     PL_LOCK;
-    playlist_NodeDelete( p_playlist, p_playlist->p_root_category, VLC_TRUE,
-                         VLC_TRUE );
-    playlist_NodeDelete( p_playlist, p_playlist->p_root_onelevel, VLC_TRUE,
-                         VLC_TRUE );
+    /* Go through all items, and simply free everything without caring
+     * about the tree structure. Do not decref, it will be done by doing
+     * the same thing on the input items array */
+    FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
+        free( p_del->pp_children );
+        free( p_del );
+    FOREACH_END();
+    ARRAY_RESET( p_playlist->all_items );
+
+    FOREACH_ARRAY( input_item_t *p_del, p_playlist->input_items )
+        input_ItemClean( p_del );
+        free( p_del );
+    FOREACH_END();
+    ARRAY_RESET( p_playlist->input_items );
+
+    ARRAY_RESET( p_playlist->items );
+    ARRAY_RESET( p_playlist->current );
+
     PL_UNLOCK;
 
     if( p_playlist->p_stats )
@@ -635,4 +651,6 @@ static void VariablesInit( playlist_t *p_playlist )
     var_CreateGetBool( p_playlist, "random" );
     var_CreateGetBool( p_playlist, "repeat" );
     var_CreateGetBool( p_playlist, "loop" );
+
+    var_AddCallback( p_playlist, "random", RandomCallback, NULL );
 }

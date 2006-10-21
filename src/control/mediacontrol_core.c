@@ -220,7 +220,7 @@ mediacontrol_start( mediacontrol_Instance *self,
     }
 
     vlc_mutex_lock( &p_playlist->object_lock );
-    if( p_playlist->i_size )
+    if( p_playlist->items.i_size )
     {
         int i_from;
         char *psz_from = NULL;
@@ -360,13 +360,13 @@ mediacontrol_playlist_get_list( mediacontrol_Instance *self,
     }
 
     vlc_mutex_lock( &p_playlist->object_lock );
-    i_playlist_size = p_playlist->i_size;
+    i_playlist_size = p_playlist->items.i_size;
 
     retval = mediacontrol_PlaylistSeq__alloc( i_playlist_size );
 
     for( i_index = 0 ; i_index < i_playlist_size ; i_index++ )
     {
-        retval->data[i_index] = strdup( p_playlist->pp_items[i_index]->p_input->psz_uri );
+        retval->data[i_index] = strdup( ARRAY_VAL(p_playlist->items, i_index)->p_input->psz_uri );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 

@@ -143,9 +143,15 @@ int playlist_ThreadDestroy( playlist_t * p_playlist )
 {
     p_playlist->b_die = VLC_TRUE;
     if( p_playlist->p_preparse )
+    {
         vlc_cond_signal( &p_playlist->p_preparse->object_wait );
+        free( p_playlist->p_preparse->pp_waiting );
+    }
     if( p_playlist->p_secondary_preparse )
+    {
         vlc_cond_signal( &p_playlist->p_secondary_preparse->object_wait );
+        free( p_playlist->p_secondary_preparse->p_waiting );
+    }
 
     DestroyInteraction( p_playlist );
     DestroyPlaylist( p_playlist );
