@@ -886,6 +886,7 @@ AC_CACHE_CHECK([for ntohl in sys/param.h],
 if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
     AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
 fi
+CFLAGS="${CFLAGS_save}"
 
 RDC_PROG_CC_WFLAGS([all extra no-unused-parameter sign-compare undef])
 RDC_PROG_CC_FLAGS_IFELSE([-pipe])
