@@ -263,7 +263,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
 static void GuessType( input_item_t *p_item)
 {
     int i;
-    static struct { char *psz_search; int i_type; }  types_array[] =
+    static struct { const char *psz_search; int i_type; }  types_array[] =
     {
         { "http", ITEM_TYPE_NET },
         { "dvd", ITEM_TYPE_DISC },

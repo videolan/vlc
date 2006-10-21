@@ -38,7 +38,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
                        stream_t *s, es_out_t *out, vlc_bool_t b_quick )
 {
     demux_t *p_demux = vlc_object_create( p_obj, VLC_OBJECT_DEMUX );
-    char *psz_module;
+    const char *psz_module;
 
     if( p_demux == NULL ) return NULL;
 
@@ -80,7 +80,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
         *     anyway
         *  - wav can't be added 'cause of a52 and dts in them as raw audio
          */
-         static struct { char *ext; char *demux; } exttodemux[] =
+         static struct { const char *ext; const char *demux; } exttodemux[] =
          {
             { "aac",  "aac" },
             { "aiff", "aiff" },
@@ -102,7 +102,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
             { NULL,  NULL },
         };
         /* Here, we don't mind if it does not work, it must be quick */
-        static struct { char *ext; char *demux; } exttodemux_quick[] =
+        static struct { const char *ext; const char *demux; } exttodemux_quick[] =
         {
             { "mp3", "mpga" },
             { "ogg", "ogg" },
@@ -110,7 +110,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
             { NULL, NULL }
         };
 
-        char *psz_ext = strrchr( p_demux->psz_path, '.' ) + 1;
+        const char *psz_ext = strrchr( p_demux->psz_path, '.' ) + 1;
         int  i;
 
         if( !b_quick )
