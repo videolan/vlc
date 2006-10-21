@@ -10,8 +10,8 @@ SUBDIRS =
 EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in
 
 BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES)
-DISTCLEANFILES = stamp-api
-CLEANFILES = misc/modules_builtin.h
+DISTCLEANFILES = stamp-api libvlc.sym
+CLEANFILES = misc/modules_builtin.h misc/version.c
 MOSTLYCLEANFILES = $(DATA_noinst_libvlc) stamp-builtins
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
@@ -354,7 +354,6 @@ SOURCES_libvlc = \
 if !USE_LIBTOOL
 if !BUILD_SHARED
 SOURCES_libvlc += misc/version.c
-CLEANFILES += misc/version.c
 endif
 
 # Install shared libvlc
