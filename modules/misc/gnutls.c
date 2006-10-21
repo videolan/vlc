@@ -255,52 +255,6 @@ gnutls_ContinueHandshake( tls_session_t *p_session)
     return 0;
 }
 
-static int
-gnutls_VerifyHostname( vlc_object_t *p_this, gnutls_session session,
-                       const char *psz_hostname )
-{
-    const gnutls_datum *p_data;
-    gnutls_x509_crt cert;
-    unsigned status;
-    int val;
-
-    /* certificate (host)name verification */
-    p_data = gnutls_certificate_get_peers( session, &status );
-    if( p_data == NULL )
-    {
-        msg_Err( p_this, "TLS peer certificate not available" );
-        return -1;
-    }
-
-    val = gnutls_x509_crt_init( &cert );
-    if( val )
-    {
-        msg_Err( p_this, "x509 fatal error: %s", gnutls_strerror( val ) );
-        return -1;
-    }
-
-    val = gnutls_x509_crt_import( cert, p_data, GNUTLS_X509_FMT_DER );
-    if( val )
-    {
-        msg_Err( p_this, "x509 certificate import error: %s",
-                gnutls_strerror( val ) );
-        gnutls_x509_crt_deinit( cert );
-        return -1;
-    }
-
-    if( gnutls_x509_crt_check_hostname( cert, psz_hostname ) == 0 )
-    {
-        msg_Err( p_this, "x509 certificate does not match \"%s\"",
-                psz_hostname );
-        gnutls_x509_crt_deinit( cert );
-        return -1;
-    }
-
-    gnutls_x509_crt_deinit( cert );
-    msg_Dbg( p_this, "x509 hostname matches %s", psz_hostname );
-    return 0;
-}
-
 
 typedef struct
 {
