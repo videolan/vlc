@@ -29,12 +29,12 @@
 #include "vlc_meta.h"
 
 #if defined (WIN32) || defined (__APPLE__)
-static char *ppsz_language[] =
+static const char *ppsz_language[] =
 { "auto", "en", "en_GB", "ca", "cs", "da", "de", "es", "fr", "gl", "he", "hu",
   "it", "ja", "ka", "ko", "ms", "nl", "oc", "pt_BR", "ro", "ru", "sk", "sv", "tr",
   "zh_CN", "zh_TW" };
 
-static char *ppsz_language_text[] =
+static const char *ppsz_language_text[] =
 { N_("Auto"), N_("American English"), N_("British English"),
 N_("Catalan"), N_("Czech"), N_("Danish"), N_("German"), N_("Spanish"),
 N_("French"), N_("Galician"), N_("Hebrew"), N_("Hungarian"),N_("Italian"),
@@ -44,7 +44,7 @@ N_("Slovak"), N_("Turkish"), N_("Simplified Chinese"),
 N_("Chinese Traditional") };
 #endif
 
-static char *ppsz_snap_formats[] =
+static const char *ppsz_snap_formats[] =
 { "png", "jpg" };
 
 /*****************************************************************************
@@ -199,7 +199,7 @@ static char *ppsz_snap_formats[] =
     "enhance your experience, especially when combined with the Headphone "\
     "Channel Mixer." )
 static int pi_force_dolby_values[] = { 0, 1, 2 };
-static char *ppsz_force_dolby_descriptions[] = { N_("Auto"), N_("On"), N_("Off") };
+static const char *ppsz_force_dolby_descriptions[] = { N_("Auto"), N_("On"), N_("Off") };
 
 
 #define AUDIO_FILTER_TEXT N_("Audio filters")
@@ -264,7 +264,7 @@ static char *ppsz_force_dolby_descriptions[] = { N_("Auto"), N_("On"), N_("Off")
     "will be centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
     "also use combinations of these values, like 6=4+2 meaning top-right).")
 static int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static char *ppsz_align_descriptions[] =
+static const char *ppsz_align_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
@@ -419,7 +419,7 @@ static char *ppsz_align_descriptions[] =
         "are available in Advanced / Network Sync." )
 
 static int pi_clock_values[] = { -1, 0, 1 };
-static char *ppsz_clock_descriptions[] =
+static const char *ppsz_clock_descriptions[] =
 { N_("Default"), N_("Disable"), N_("Enable") };
 
 #define SERVER_PORT_TEXT N_("UDP port")
@@ -948,7 +948,7 @@ static int pi_albumart_values[] = { ALBUM_ART_NEVER,
                                     ALBUM_ART_WHEN_ASKED,
                                     ALBUM_ART_WHEN_PLAYED,
                                     ALBUM_ART_ALL };
-static char *ppsz_albumart_descriptions[] =
+static const char *ppsz_albumart_descriptions[] =
     { N_("Never download"), N_("Download when asked"),
       N_("Download when track starts playing"),
       N_("Download everything ASAP") };
@@ -989,7 +989,7 @@ static char *ppsz_albumart_descriptions[] =
     "contents of a directory. \"Default\" means that the tree will only " \
     "be used when really needed." )
 static int pi_pltree_values[] = { 0, 1, 2 };
-static char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N_("Never") };
+static const char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N_("Never") };
 
 
 

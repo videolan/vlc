@@ -83,7 +83,7 @@
 
 typedef struct key_descriptor_s
 {
-    char *psz_key_string;
+    const char *psz_key_string;
     int i_key_code;
 } key_descriptor_t;
 
@@ -188,7 +188,7 @@ static const struct key_descriptor_s vlc_keys[] =
     { "Media Play Pause", KEY_MEDIA_PLAY_PAUSE }
 };
 
-static inline char *KeyToString( int i_key )
+static inline const char *KeyToString( int i_key )
 {
     unsigned int i = 0;
     for ( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++ )

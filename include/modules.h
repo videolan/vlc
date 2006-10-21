@@ -85,18 +85,18 @@ struct module_t
     /*
      * Variables set by the module to identify itself
      */
-    char *psz_shortname;                                      /* Module name */
-    char *psz_longname;                           /* Module descriptive name */
-    char *psz_help;                /* Long help string for "special" modules */
+    const char *psz_shortname;                                /* Module name */
+    const char *psz_longname;                     /* Module descriptive name */
+    const char *psz_help;          /* Long help string for "special" modules */
 
     /*
      * Variables set by the module to tell us what it can do
      */
-    char *psz_program;        /* Program name which will activate the module */
+    const char *psz_program;  /* Program name which will activate the module */
 
-    char *pp_shortcuts[ MODULE_SHORTCUT_MAX ];    /* Shortcuts to the module */
+    const char *pp_shortcuts[ MODULE_SHORTCUT_MAX ]; /* Shortcuts to the module */
 
-    char    *psz_capability;                                   /* Capability */
+    const char    *psz_capability;                             /* Capability */
     int      i_score;                           /* Score for each capability */
     uint32_t i_cpu;                             /* Required CPU capabilities */
 

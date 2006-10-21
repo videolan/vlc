@@ -113,18 +113,18 @@
 struct config_category_t
 {
     int         i_id;
-    char       *psz_name;
-    char       *psz_help;
+    const char *psz_name;
+    const char *psz_help;
 };
 
 struct module_config_t
 {
     int          i_type;                               /* Configuration type */
-    char        *psz_type;                          /* Configuration subtype */
-    char        *psz_name;                                    /* Option name */
+    const char  *psz_type;                          /* Configuration subtype */
+    const char  *psz_name;                                    /* Option name */
     char         i_short;                      /* Optional short option name */
-    char        *psz_text;      /* Short comment on the configuration option */
-    char        *psz_longtext;   /* Long comment on the configuration option */
+    const char  *psz_text;      /* Short comment on the configuration option */
+    const char  *psz_longtext;   /* Long comment on the configuration option */
     char        *psz_value;                                  /* Option value */
     int          i_value;                                    /* Option value */
     float        f_value;                                    /* Option value */
@@ -138,18 +138,18 @@ struct module_config_t
     void          *p_callback_data;
 
     /* Values list */
-    char       **ppsz_list;        /* List of possible values for the option */
+    const char **ppsz_list;        /* List of possible values for the option */
     int         *pi_list;          /* Idem for integers */
-    char       **ppsz_list_text;   /* Friendly names for list values */
+    const char **ppsz_list_text;   /* Friendly names for list values */
     int          i_list;           /* Options list size */
 
     /* Actions list */
     vlc_callback_t *ppf_action;    /* List of possible actions for a config */
-    char           **ppsz_action_text;         /* Friendly names for actions */
+    const char    **ppsz_action_text;         /* Friendly names for actions */
     int            i_action;                            /* actions list size */
 
     /* Deprecated */
-    char           *psz_current;   /* Good option name */
+    const char    *psz_current;   /* Good option name */
     vlc_bool_t     b_strict;      /* Transitionnal or strict */
     /* Misc */
     vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
@@ -160,12 +160,12 @@ struct module_config_t
                                /* to take effect */
 
     /* Original option values */
-    char        *psz_value_orig;
+    const char  *psz_value_orig;
     int          i_value_orig;
     float        f_value_orig;
 
     /* Option values loaded from config file */
-    char        *psz_value_saved;
+    const char  *psz_value_saved;
     int          i_value_saved;
     float        f_value_saved;
     vlc_bool_t   b_autosave;       /* Config will be auto-saved at exit time */
