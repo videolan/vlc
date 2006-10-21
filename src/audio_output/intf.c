@@ -24,11 +24,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#include <vlc/vlc.h>
+
 #include <stdio.h>
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
-
-#include <vlc/vlc.h>
 
 #include "audio_output.h"
 #include "aout_internal.h"
