@@ -464,11 +464,11 @@ NSLog( @"expandable" );
 
     playlist_t *p_playlist = pl_Yield( VLCIntf );
 
-    /** \todo fix i_size use */
-    if( p_playlist->items.i_size >= 2 )
+    if( playlist_CurrentSize( p_playlist ) >= 2 )
     {
         [o_status_field setStringValue: [NSString stringWithFormat:
-                    _NS("%i items in the playlist"), p_playlist->items.i_size]];
+                    _NS("%i items in the playlist"),
+				playlist_CurrentSize( p_playlist )]];
     }
     else
     {
@@ -1365,13 +1365,11 @@ NSLog( @"expandable" );
     id o_value = [super outlineView: outlineView child: index ofItem: item];
     playlist_t *p_playlist = pl_Yield( VLCIntf );
 
-    /* FIXME: playlist->i_size doesn't provide the correct number of items anymore
-     * check the playlist API for the fixed function, once zorglub implemented it -- fpk, 9/17/06 */
-    /** \todo fix i_size use */
-    if( p_playlist->items.i_size >= 2 )
+    if( playlist_CurrentSize( p_playlist )  >= 2 )
     {
         [o_status_field setStringValue: [NSString stringWithFormat:
-                    _NS("%i items in the playlist"), p_playlist->items.i_size]];
+                    _NS("%i items in the playlist"),
+	 		playlist_CurrentSize( p_playlist )]];
     }
     else
     {

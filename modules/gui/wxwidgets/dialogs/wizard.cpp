@@ -582,7 +582,7 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
 
     if( p_playlist )
     {
-        if( p_playlist->i_size > 0)
+        if( !playlist_IsEmpty( p_playlist ) )
         {
             listview = new wxListView( this, ListView_Event,
                                        wxDefaultPosition, wxDefaultSize,
@@ -591,19 +591,6 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
             listview->InsertColumn( 1, wxU(_("URI")) );
             listview->SetColumnWidth( 0, 250 );
             listview->SetColumnWidth( 1, 100 );
-#if 0
-            for( int i=0 ; i < p_playlist->i_size ; i++ )
-            {
-                wxString filename = wxL2U( p_playlist->pp_items[i]->input.
-                                                                    psz_name );
-                listview->InsertItem( i, filename );
-                listview->SetItem( i, 1, wxL2U( p_playlist->pp_items[i]->
-                                                            input.psz_uri) );
-                listview->SetItemData( i,
-                                  (long)p_playlist->pp_items[i]->input.i_id );
-            }
-            listview->Select( p_playlist->i_index , TRUE);
-#endif
             mainSizer->Add( listview, 1, wxALL|wxEXPAND, 5 );
 
             listview->Hide();

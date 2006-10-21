@@ -36,11 +36,9 @@ static void RunPreparse( playlist_preparse_t * );
 static void RunSecondaryPreparse( playlist_secondary_preparse_t * );
 
 static playlist_t * CreatePlaylist( vlc_object_t *p_parent );
-static void HandlePlaylist( playlist_t * );
 static void EndPlaylist( playlist_t * );
 static void DestroyPlaylist( playlist_t * );
 
-static void HandleInteraction( playlist_t * );
 static void DestroyInteraction( playlist_t * );
 
 /*****************************************************************************
@@ -174,8 +172,10 @@ static void RunControlThread ( playlist_t *p_playlist )
     {
         i_loops++;
 
-        HandleInteraction( p_playlist );
-        HandlePlaylist( p_playlist );
+        if( p_playlist->p_interaction )
+            intf_InteractionManage( p_playlist );
+
+        playlist_MainLoop( p_playlist );
         if( p_playlist->b_cant_sleep )
         {
             /* 100 ms is an acceptable delay for playlist operations */
@@ -204,11 +204,6 @@ static playlist_t * CreatePlaylist( vlc_object_t *p_parent )
 static void DestroyPlaylist( playlist_t *p_playlist )
 {
     playlist_Destroy( p_playlist );
-}
-
-static void HandlePlaylist( playlist_t *p_playlist )
-{
-    playlist_MainLoop( p_playlist );
 }
 
 static void EndPlaylist( playlist_t *p_playlist )
@@ -243,16 +238,5 @@ static void DestroyInteraction( playlist_t *p_playlist )
         intf_InteractionDestroy( p_playlist->p_interaction );
         fprintf( stderr, "NOW NULL ****\n" );
         p_playlist->p_interaction = NULL;
-    }
-}
-
-static void HandleInteraction( playlist_t *p_playlist )
-{
-    if( p_playlist->p_interaction )
-    {
-        stats_TimerStart( p_playlist, "Interaction thread",
-                          STATS_TIMER_INTERACTION );
-        intf_InteractionManage( p_playlist );
-        stats_TimerStop( p_playlist, STATS_TIMER_INTERACTION );
     }
 }

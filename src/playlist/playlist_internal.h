@@ -67,6 +67,8 @@ void playlist_LastLoop( playlist_t * );
 void playlist_PreparseLoop( playlist_preparse_t * );
 void playlist_SecondaryPreparseLoop( playlist_secondary_preparse_t * );
 
+void ResetCurrentlyPlaying( playlist_t *, vlc_bool_t, playlist_item_t * );
+
 /* Control */
 playlist_item_t * playlist_NextItem  ( playlist_t * );
 int playlist_PlayItem  ( playlist_t *, playlist_item_t * );
@@ -98,7 +100,8 @@ playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
  * @}
  */
 
-#define PLAYLIST_DEBUG 1
+//#define PLAYLIST_DEBUG 1
+#undef PLAYLIST_DEBUG
 
 #ifdef PLAYLIST_DEBUG
 #define PL_DEBUG( msg, args... ) msg_Dbg( p_playlist, msg, ## args )

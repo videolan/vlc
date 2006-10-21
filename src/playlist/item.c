@@ -404,6 +404,7 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
                                       p_playlist->p_root_onelevel, VLC_FALSE );
         }
         p_playlist->b_reset_currently_playing = VLC_TRUE;
+        vlc_cond_signal( &p_playlist->object_wait );
         var_SetInteger( p_playlist, "item-change", p_item_in_category->
                                                         p_input->i_id );
         return p_item_in_category;
@@ -492,6 +493,7 @@ static int TreeMove( playlist_t *p_playlist, playlist_item_t *p_item,
 int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
                        playlist_item_t *p_node, int i_newpos )
 {
+    int i_ret;
     /* Drop on a top level node. Move in the two trees */
     if( p_node->p_parent == p_playlist->p_root_category ||
         p_node->p_parent == p_playlist->p_root_onelevel )
@@ -529,10 +531,13 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
             if( p_node_category && p_item_category )
                 TreeMove( p_playlist, p_item_category, p_node_category, 0 );
         }
-        return VLC_SUCCESS;
+        i_ret = VLC_SUCCESS;
     }
     else
-        return TreeMove( p_playlist, p_item, p_node, i_newpos );
+        i_ret = TreeMove( p_playlist, p_item, p_node, i_newpos );
+    p_playlist->b_reset_currently_playing = VLC_TRUE;
+    vlc_cond_signal( &p_playlist->object_wait );
+    return i_ret;
 }
 
 /** Send a notification that an item has been added to a node */
@@ -545,6 +550,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     p_add->i_node = i_node_id;
     val.p_address = p_add;
     p_playlist->b_reset_currently_playing = VLC_TRUE;
+    vlc_cond_signal( &p_playlist->object_wait );
     var_Set( p_playlist, "item-append", val );
     free( p_add );
 }

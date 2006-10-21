@@ -38,6 +38,7 @@ static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
                            vlc_value_t oldval, vlc_value_t newval, void *a )
 {
     ((playlist_t*)p_this)->b_reset_currently_playing = VLC_TRUE;
+    playlist_Signal( ((playlist_t*)p_this) );
     return VLC_SUCCESS;
 }
 
@@ -80,6 +81,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     p_playlist->i_current_index = 0;
     p_playlist->b_reset_currently_playing = VLC_TRUE;
+    p_playlist->last_rebuild_date = 0;
 
     i_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
     p_playlist->b_always_tree = (i_tree == 1);
@@ -244,20 +246,24 @@ void playlist_MainLoop( playlist_t *p_playlist )
     vlc_bool_t b_playexit = var_GetBool( p_playlist, "play-and-exit" );
     PL_LOCK;
 
-    /* First, check if we have something to do */
-    if( p_playlist->request.b_request )
+    if( p_playlist->b_reset_currently_playing &&
+        mdate() - p_playlist->last_rebuild_date > 30000 ) // 30 ms
     {
-        /* Stop the existing input */
-        if( p_playlist->p_input && !p_playlist->p_input->b_die )
-        {
-            PL_DEBUG( "incoming request - stopping current input" );
-            input_StopThread( p_playlist->p_input );
-        }
+        ResetCurrentlyPlaying( p_playlist, var_GetBool( p_playlist, "random"),
+                             p_playlist->status.p_item );
+        p_playlist->last_rebuild_date = mdate();
     }
+
 check_input:
     /* If there is an input, check that it doesn't need to die. */
     if( p_playlist->p_input )
     {
+        if( p_playlist->request.b_request && !p_playlist->p_input->b_die )
+        {
+            PL_DEBUG( "incoming request - stopping current input" );
+            input_StopThread( p_playlist->p_input );
+        }
+
         /* This input is dead. Remove it ! */
         if( p_playlist->p_input->b_dead )
         {
@@ -340,10 +346,7 @@ check_input:
                 p_playlist->request.i_status != PLAYLIST_STOPPED ) )
          {
              msg_Dbg( p_playlist, "starting new item" );
-             stats_TimerStart( p_playlist, "Playlist walk",
-                                  STATS_TIMER_PLAYLIST_WALK );
              p_item = playlist_NextItem( p_playlist );
-             stats_TimerStop( p_playlist, STATS_TIMER_PLAYLIST_WALK );
 
              if( p_item == NULL )
              {

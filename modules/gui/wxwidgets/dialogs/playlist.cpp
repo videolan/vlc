@@ -938,7 +938,7 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
 
     wxString filter = wxT("");
 
-    if( p_playlist->i_size == 0 )
+    if( playlist_IsEmpty( p_playlist ) )
     {
         wxMessageBox( wxU(_("Playlist is empty") ), wxU(_("Can't save")),
                       wxICON_WARNING | wxOK, this );

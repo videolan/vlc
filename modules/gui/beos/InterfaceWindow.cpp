@@ -842,7 +842,7 @@ void InterfaceWindow::UpdateInterface()
             b_playlist_update = false;
         }
 #endif
-        p_mediaControl->SetEnabled( p_playlist->i_size );
+        p_mediaControl->SetEnabled( !playlist_IsEmpty( p_playlist ) );
     }
 
     if( p_input )

@@ -988,26 +988,20 @@ PlaylistView::SetPlaying( bool playing )
 void
 PlaylistView::RebuildList()
 {
-    playlist_t * p_playlist;
-    p_playlist = (playlist_t *) vlc_object_find( p_intf,
-        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( !p_playlist )
-    {
-        return;
-    }
+    playlist_t * p_playlist = pl_Yield( p_intf );
 
     // remove all items
     BListItem * item;
     int32 count = CountItems();
     while( ( item = RemoveItem( --count ) ) )
         delete item;
-    
+
     // rebuild listview from VLC's playlist
-    vlc_mutex_lock( &p_playlist->object_lock );
-    for( int i = 0; i < p_playlist->i_size; i++ )
-        AddItem( new PlaylistItem( p_playlist->pp_items[i]->input.psz_name ) );
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    PL_LOCK;
+    FOREACH_ARRAY( playlist_item_t *p_item, p_playlist->items )
+        AddItem( new PlaylistItem( p_item->p_input->psz_name ) );
+    FOREACH_END();
+    PL_UNLOCK;
 
     vlc_object_release( p_playlist );
 }

@@ -111,6 +111,7 @@ struct playlist_t
     int                   i_current_index; /**< Index in current array */
     /** Reset current item ? */
     vlc_bool_t            b_reset_currently_playing;
+    mtime_t               last_rebuild_date;
 
     int                   i_last_playlist_id; /**< Last id to an item */
     int                   i_last_input_id ; /**< Last id on an input */
@@ -431,6 +432,12 @@ static inline vlc_bool_t playlist_IsEmpty( playlist_t * p_playlist )
     b_empty = p_playlist->items.i_size == 0;
     vlc_mutex_unlock( &p_playlist->object_lock );
     return( b_empty );
+}
+
+/** Tell the number of items in the current playing context */
+static inline int playlist_CurrentSize( vlc_object_t *p_this )
+{
+    return p_this->p_libvlc->p_playlist->current.i_size;
 }
 
 /** Ask the playlist to do some work */

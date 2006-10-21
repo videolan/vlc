@@ -796,16 +796,14 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
     var_Get( p_intf, psz_bookmark_name, &val );
 
     char *psz_bookmark = strdup( val.psz_string );
-    for( i = 0; i < p_playlist->items.i_size; i++)
-    {
-        if( !strcmp( psz_bookmark,
-                     ARRAY_VAL( p_playlist->items,i )->p_input->psz_uri ) )
+    PL_LOCK;
+    FOREACH_ARRAY( playlist_item_t *p_item, p_playlist->items )
+        if( !strcmp( psz_bookmark, p_item->p_input->psz_uri ) )
         {
-            playlist_LockControl( p_playlist, PLAYLIST_VIEWPLAY, NULL,
-                                  ARRAY_VAL( p_playlist->items, i ) );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, NULL, p_item );
             break;
         }
-    }
+    FOREACH_END();
     vlc_object_release( p_playlist );
 }
 

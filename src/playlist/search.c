@@ -95,5 +95,6 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
         else
             p_item->i_flags |= PLAYLIST_DBL_FLAG;
    }
+   vlc_cond_signal( &p_playlist->object_wait );
    return VLC_SUCCESS;
 }

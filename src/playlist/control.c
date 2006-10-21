@@ -278,10 +278,12 @@ static void ResyncCurrentIndex(playlist_t *p_playlist, playlist_item_t *p_cur )
      PL_DEBUG("%s is at %i", PLI_NAME(p_cur), p_playlist->i_current_index );
 }
 
-static void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
-                                   playlist_item_t *p_cur )
+void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
+                            playlist_item_t *p_cur )
 {
     playlist_item_t *p_next = NULL;
+    stats_TimerStart( p_playlist, "Items array build",
+                      STATS_TIMER_PLAYLIST_BUILD );
     PL_DEBUG("rebuilding array of current - root %s",
               PLI_NAME(p_playlist->status.p_node) );
     ARRAY_RESET(p_playlist->current);
@@ -319,6 +321,7 @@ static void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
         }
     }
     p_playlist->b_reset_currently_playing = VLC_FALSE;
+    stats_TimerStop( p_playlist, STATS_TIMER_PLAYLIST_BUILD );
 }
 
 /** This function calculates the next playlist item, depending
@@ -389,6 +392,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
             i_skip++;
 
         if( p_playlist->b_reset_currently_playing )
+            /* A bit too bad to reset twice ... */
             ResetCurrentlyPlaying( p_playlist, b_random, p_new );
         else if( p_new )
             ResyncCurrentIndex( p_playlist, p_new );
