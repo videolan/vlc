@@ -752,21 +752,22 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 {
     /* Yes, there are two NULLs because we replace one with "plugin-path". */
 #if defined( WIN32 ) || defined( UNDER_CE )
-    char *path[] = { "modules", "", "plugins", 0, 0 };
+    const char *path[] = { "modules", "", "plugins", NULL, NULL };
 #else
-    char *path[] = { "modules", PLUGIN_PATH, "plugins", 0, 0 };
+    const char *path[] = { "modules", PLUGIN_PATH, "plugins", NULL, NULL };
 #endif
 
-    char **ppsz_path = path;
-    char *psz_fullpath;
+    const char *const *ppsz_path;
 
     /* If the user provided a plugin path, we add it to the list */
-    path[ sizeof(path)/sizeof(char*) - 2 ] =
-        config_GetPsz( p_this, "plugin-path" );
+    char *userpath = config_GetPsz( p_this, "plugin-path" );
+    path[sizeof(path)/sizeof(path[0]) - 2] = userpath;
 
-    for( ; *ppsz_path != NULL ; ppsz_path++ )
+    for (ppsz_path = path; *ppsz_path != NULL; ppsz_path++)
     {
-        if( !(*ppsz_path)[0] ) continue;
+        char *psz_fullpath;
+
+        if (!**ppsz_path) continue;
 
 #if defined( SYS_BEOS ) || defined( __APPLE__ ) || defined( WIN32 )
 
@@ -778,27 +779,16 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         if( (*ppsz_path)[0] != '/' )
 #endif
         {
-            int i_dirlen = strlen( *ppsz_path );
-            i_dirlen += strlen( p_this->p_libvlc_global->psz_vlcpath ) + 2;
-
-            psz_fullpath = malloc( i_dirlen );
-            if( psz_fullpath == NULL )
-            {
-                continue;
-            }
-#ifdef WIN32
-            sprintf( psz_fullpath, "%s\\%s",
-                     p_this->p_libvlc_global->psz_vlcpath, *ppsz_path );
-#else
-            sprintf( psz_fullpath, "%s/%s",
-                     p_this->p_libvlc_global->psz_vlcpath, *ppsz_path );
-#endif
+            if (asprintf( &psz_fullpath, "%s"DIR_SEP"%s",
+                          p_this->p_libvlc_global->psz_vlcpath, *ppsz_path ))
+                psz_fullpath = NULL;
         }
         else
 #endif
-        {
             psz_fullpath = strdup( *ppsz_path );
-        }
+
+        if( psz_fullpath == NULL )
+            continue;
 
         msg_Dbg( p_this, "recursively browsing `%s'", psz_fullpath );
 
@@ -809,9 +799,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     }
 
     /* Free plugin-path */
-    if( path[ sizeof(path)/sizeof(char*) - 2 ] )
-        free( path[ sizeof(path)/sizeof(char*) - 2 ] );
-    path[ sizeof(path)/sizeof(char*) - 2 ] = NULL;
+    if( userpath != NULL )
+        free( userpath );
 }
 
 /*****************************************************************************
