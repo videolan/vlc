@@ -308,9 +308,17 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    playlist_NodesCreate( p_sys->p_playlist, _("Bonjour"),
-                              &p_sys->p_node_cat,&p_sys->p_node_one,
-                              VLC_TRUE );
+    p_sys->p_node_cat = playlist_NodeCreate( p_sys->p_playlist, _("Bonjour"),
+                                             p_sys->p_playlist->p_root_category );
+    p_sys->p_node_one = playlist_NodeCreate( p_sys->p_playlist, _("Bonjour"),
+                                             p_sys->p_playlist->p_root_onelevel );
+    p_sys->p_node_one->p_input->i_id = p_sys->p_node_cat->p_input->i_id;
+
+    p_sys->p_node_one->i_flags |= PLAYLIST_RO_FLAG;
+    p_sys->p_node_cat->i_flags |= PLAYLIST_RO_FLAG;
+    p_sys->p_node_one->i_flags |= PLAYLIST_SKIP_FLAG;
+    p_sys->p_node_cat->i_flags |= PLAYLIST_SKIP_FLAG;
+
     p_sd->pf_run = Run;
 
     return VLC_SUCCESS;
