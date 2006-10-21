@@ -888,7 +888,7 @@ if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
 fi
 CFLAGS="${CFLAGS_save}"
 
-RDC_PROG_CC_WFLAGS([all extra no-unused-parameter sign-compare undef])
+RDC_PROG_CC_WFLAGS([all extra no-unused-parameter sign-compare undef pointer-arith bad-function-cast cast-align write-strings old-style-definition missing-prototypes packed volatile-register-var])
 RDC_PROG_CC_FLAGS_IFELSE([-pipe])
 
 dnl Check for various optimization flags
