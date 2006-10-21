@@ -3,7 +3,7 @@
 #######################################################################
 
 #SUBDIRS= src
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = src
 
 EXTRA_DIST= \
 	    FAQ \
