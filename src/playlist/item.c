@@ -594,10 +594,9 @@ void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         p_playlist->request.i_skip = 0;
         p_playlist->request.p_item = p_toplay;
         if( p_playlist->p_input )
-        {
             input_StopThread( p_playlist->p_input );
-        }
         p_playlist->request.i_status = PLAYLIST_RUNNING;
+        vlc_cond_signal( &p_playlist->object_wait );
     }
     if( i_mode & PLAYLIST_PREPARSE &&
         var_CreateGetBool( p_playlist, "auto-preparse" ) )
@@ -666,6 +665,7 @@ int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
             p_playlist->request.b_request = VLC_TRUE;
             p_playlist->request.p_item = NULL;
             msg_Info( p_playlist, "stopping playback" );
+            vlc_cond_signal( &p_playlist->object_wait );
         }
         b_flag = VLC_TRUE;
     }

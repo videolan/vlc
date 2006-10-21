@@ -137,8 +137,8 @@ struct playlist_t
                                      * with the current item */
     int                   i_sort; /**< Last sorting applied to the playlist */
     int                   i_order; /**< Last ordering applied to the playlist */
-    mtime_t               i_vout_destroyed_date;
-    mtime_t               i_sout_destroyed_date;
+    mtime_t               gc_date;
+    vlc_bool_t            b_cant_sleep;
     playlist_preparse_t  *p_preparse; /**< Preparser object */
     playlist_secondary_preparse_t *p_secondary_preparse;/**< Preparser object */
 
@@ -431,6 +431,14 @@ static inline vlc_bool_t playlist_IsEmpty( playlist_t * p_playlist )
     b_empty = p_playlist->items.i_size == 0;
     vlc_mutex_unlock( &p_playlist->object_lock );
     return( b_empty );
+}
+
+/** Ask the playlist to do some work */
+static inline void playlist_Signal( playlist_t *p_playlist )
+{
+    PL_LOCK;
+    vlc_cond_signal( &p_playlist->object_wait );
+    PL_UNLOCK;
 }
 
 /**

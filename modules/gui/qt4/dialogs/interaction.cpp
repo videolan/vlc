@@ -195,4 +195,5 @@ void InteractionDialog::Finish( int i_ret )
     p_dialog->i_return = i_ret;
     hide();
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
+    playlist_Signal( THEPL );
 }

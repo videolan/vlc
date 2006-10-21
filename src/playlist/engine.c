@@ -70,8 +70,8 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->i_last_input_id = 0;
     p_playlist->p_input = NULL;
 
-    p_playlist->i_vout_destroyed_date = 0;
-    p_playlist->i_sout_destroyed_date = 0;
+    p_playlist->gc_date = 0;
+    p_playlist->b_cant_sleep = VLC_FALSE;
 
     ARRAY_INIT( p_playlist->items );
     ARRAY_INIT( p_playlist->all_items );
@@ -194,46 +194,47 @@ void playlist_Destroy( playlist_t *p_playlist )
     vlc_object_destroy( p_playlist );
 
 }
+
 /* Destroy remaining objects */
-static mtime_t ObjectGarbageCollector( playlist_t *p_playlist, int i_type,
-                                       mtime_t destroy_date )
+static void ObjectGarbageCollector( playlist_t *p_playlist )
 {
     vlc_object_t *p_obj;
 
-    if( destroy_date > mdate() ) return destroy_date;
+    if( mdate() - p_playlist->gc_date < 1000000 )
+    {
+        p_playlist->b_cant_sleep = VLC_TRUE;
+        return;
+    }
+    else if( p_playlist->gc_date == 0 )
+        return;
 
-    if( destroy_date == 0 )
+    vlc_mutex_lock( &p_playlist->gc_lock );
+    while( ( p_obj = vlc_object_find( p_playlist, VLC_OBJECT_VOUT,
+                                                  FIND_CHILD ) ) )
     {
-        /* give a little time */
-        return mdate() + I64C(1000000);
-    }
-    else
-    {
-        vlc_mutex_lock( &p_playlist->gc_lock );
-        while( ( p_obj = vlc_object_find( p_playlist, i_type, FIND_CHILD ) ) )
+        if( p_obj->p_parent != (vlc_object_t*)p_playlist )
         {
-            if( p_obj->p_parent != (vlc_object_t*)p_playlist )
-            {
-                /* only first child (ie unused) */
-                vlc_object_release( p_obj );
-                break;
-            }
-            if( i_type == VLC_OBJECT_VOUT )
-            {
-                msg_Dbg( p_playlist, "garbage collector destroying 1 vout" );
-                vlc_object_detach( p_obj );
-                vlc_object_release( p_obj );
-                vout_Destroy( (vout_thread_t *)p_obj );
-            }
-            else if( i_type == VLC_OBJECT_SOUT )
-            {
-                vlc_object_release( p_obj );
-                sout_DeleteInstance( (sout_instance_t*)p_obj );
-            }
+            vlc_object_release( p_obj );
+            break;
         }
-        vlc_mutex_unlock( &p_playlist->gc_lock );
-        return 0;
+        msg_Dbg( p_playlist, "garbage collector destroying 1 vout" );
+        vlc_object_detach( p_obj );
+        vlc_object_release( p_obj );
+        vout_Destroy( (vout_thread_t *)p_obj );
     }
+    while( ( p_obj = vlc_object_find( p_playlist, VLC_OBJECT_SOUT,
+                                                  FIND_CHILD ) ) )
+    {
+        if( p_obj->p_parent != (vlc_object_t*)p_playlist )
+        {
+            vlc_object_release( p_obj );
+            break;
+        }
+        vlc_object_release( p_obj );
+        sout_DeleteInstance( (sout_instance_t*)p_obj );
+    }
+    p_playlist->b_cant_sleep = VLC_FALSE;
+    vlc_mutex_unlock( &p_playlist->gc_lock );
 }
 
 /** Main loop for the playlist */
@@ -244,7 +245,6 @@ void playlist_MainLoop( playlist_t *p_playlist )
     PL_LOCK;
 
     /* First, check if we have something to do */
-    /* FIXME : this can be called several times */
     if( p_playlist->request.b_request )
     {
         /* Stop the existing input */
@@ -254,7 +254,7 @@ void playlist_MainLoop( playlist_t *p_playlist )
             input_StopThread( p_playlist->p_input );
         }
     }
-
+check_input:
     /* If there is an input, check that it doesn't need to die. */
     if( p_playlist->p_input )
     {
@@ -282,8 +282,10 @@ void playlist_MainLoop( playlist_t *p_playlist )
             /* Destroy object */
             vlc_object_destroy( p_input );
 
-            p_playlist->i_vout_destroyed_date = 0;
-            p_playlist->i_sout_destroyed_date = 0;
+            PL_LOCK;
+
+            p_playlist->gc_date = mdate();
+            p_playlist->b_cant_sleep = VLC_TRUE;
 
             if( p_playlist->status.p_item->i_flags
                 & PLAYLIST_REMOVE_FLAG )
@@ -299,13 +301,14 @@ void playlist_MainLoop( playlist_t *p_playlist )
             i_activity= var_GetInteger( p_playlist, "activity") ;
             var_SetInteger( p_playlist, "activity", i_activity -
                             DEFAULT_INPUT_ACTIVITY );
-
-            return;
+            goto check_input;
         }
         /* This input is dying, let it do */
         else if( p_playlist->p_input->b_die )
         {
             PL_DEBUG( "dying input" );
+            msleep( 25000 ); // 25 ms
+            goto check_input;
         }
         /* This input has finished, ask it to die ! */
         else if( p_playlist->p_input->b_error
@@ -313,20 +316,14 @@ void playlist_MainLoop( playlist_t *p_playlist )
         {
             PL_DEBUG( "finished input" );
             input_StopThread( p_playlist->p_input );
-            /* Select the next playlist item */
-            PL_UNLOCK
-            return;
+            /* No need to wait here, we'll wait in the p_input->b_die case */
+            goto check_input;
         }
         else if( p_playlist->p_input->i_state != INIT_S )
         {
             PL_UNLOCK;
-            p_playlist->i_vout_destroyed_date =
-                ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
-                                        p_playlist->i_vout_destroyed_date );
-            p_playlist->i_sout_destroyed_date =
-                ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
-                                        p_playlist->i_sout_destroyed_date );
-            PL_LOCK
+            ObjectGarbageCollector( p_playlist );
+            PL_LOCK;
         }
     }
     else
@@ -364,23 +361,20 @@ void playlist_MainLoop( playlist_t *p_playlist )
          }
          else
          {
-             p_playlist->status.i_status = PLAYLIST_STOPPED;
-             if( p_playlist->status.p_item &&
-                 p_playlist->status.p_item->i_flags & PLAYLIST_REMOVE_FLAG )
-             {
-                 PL_DEBUG( "deleting item marked for deletion" );
-                 playlist_ItemDelete( p_playlist->status.p_item );
-                 p_playlist->status.p_item = NULL;
-             }
+            p_playlist->status.i_status = PLAYLIST_STOPPED;
+            if( p_playlist->status.p_item &&
+                p_playlist->status.p_item->i_flags & PLAYLIST_REMOVE_FLAG )
+            {
+                PL_DEBUG( "deleting item marked for deletion" );
+                playlist_ItemDelete( p_playlist->status.p_item );
+                p_playlist->status.p_item = NULL;
+            }
 
-             /* Collect garbage */
-             PL_UNLOCK
-             p_playlist->i_sout_destroyed_date =
-             ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT, mdate() );
-             p_playlist->i_vout_destroyed_date =
-             ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT, mdate() );
-             PL_LOCK
-         }
+            /* Collect garbage */
+            PL_UNLOCK;
+            ObjectGarbageCollector( p_playlist );
+            PL_LOCK;
+        }
     }
     PL_UNLOCK
 }

@@ -102,19 +102,13 @@ void intf_InteractionManage( playlist_t *p_playlist )
 
             // Pretend we have hidden and destroyed it
             if( p_dialog->i_status == HIDDEN_DIALOG )
-            {
                 p_dialog->i_status = DESTROYED_DIALOG;
-            }
             else
-            {
                 p_dialog->i_status = HIDING_DIALOG;
-            }
         }
     }
     else
-    {
         vlc_object_yield( p_interaction->p_intf );
-    }
 
     for( i_index = 0 ; i_index < p_interaction->i_dialogs; i_index ++ )
     {
@@ -525,11 +519,11 @@ static interaction_dialog_t *DialogGetById( interaction_t *p_interaction,
 /* Destroy a dialog */
 static void DialogDestroy( interaction_dialog_t *p_dialog )
 {
-    FREENULL( p_dialog->psz_title );
-    FREENULL( p_dialog->psz_description );
-    FREENULL( p_dialog->psz_default_button );
-    FREENULL( p_dialog->psz_alternate_button );
-    FREENULL( p_dialog->psz_other_button );
+    free( p_dialog->psz_title );
+    free( p_dialog->psz_description );
+    free( p_dialog->psz_default_button );
+    free( p_dialog->psz_alternate_button );
+    free( p_dialog->psz_other_button );
     free( p_dialog );
 }
 
@@ -575,6 +569,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 
         if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY ) // Wait for answer
         {
+            playlist_Signal( pl_Get(p_this) );
             while( p_dialog->i_status != ANSWERED_DIALOG &&
                    p_dialog->i_status != HIDING_DIALOG &&
                    p_dialog->i_status != HIDDEN_DIALOG &&
@@ -591,6 +586,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
             }
             p_dialog->i_flags |= DIALOG_GOT_ANSWER;
             vlc_mutex_unlock( &p_interaction->object_lock );
+            playlist_Signal( pl_Get(p_this) );
             return p_dialog->i_return;
         }
         else
@@ -598,6 +594,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
             // Pretend we already retrieved the "answer"
             p_dialog->i_flags |=  DIALOG_GOT_ANSWER;
             vlc_mutex_unlock( &p_interaction->object_lock );
+            playlist_Signal( pl_Get(p_this) );
             return VLC_SUCCESS;
         }
     }

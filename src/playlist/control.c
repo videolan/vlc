@@ -179,6 +179,7 @@ int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
         return VLC_EBADVAR;
         break;
     }
+    vlc_cond_signal( &p_playlist->object_wait );
 
     return VLC_SUCCESS;
 }

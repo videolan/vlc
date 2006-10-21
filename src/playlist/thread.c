@@ -142,6 +142,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 int playlist_ThreadDestroy( playlist_t * p_playlist )
 {
     p_playlist->b_die = VLC_TRUE;
+    playlist_Signal( p_playlist );
     if( p_playlist->p_preparse )
     {
         vlc_cond_signal( &p_playlist->p_preparse->object_wait );
@@ -175,9 +176,17 @@ static void RunControlThread ( playlist_t *p_playlist )
 
         HandleInteraction( p_playlist );
         HandlePlaylist( p_playlist );
-
-        /* 100 ms is an acceptable delay for playlist operations */
-        msleep( INTF_IDLE_SLEEP*2 );
+        if( p_playlist->b_cant_sleep )
+        {
+            /* 100 ms is an acceptable delay for playlist operations */
+            msleep( INTF_IDLE_SLEEP*2 );
+        }
+        else
+        {
+            PL_LOCK;
+            vlc_cond_wait( &p_playlist->object_wait, &p_playlist->object_lock );
+            PL_UNLOCK;
+        }
     }
 
     EndPlaylist( p_playlist );

@@ -380,7 +380,7 @@ void input_StopThread( input_thread_t *p_input )
     /* Set die for input */
     p_input->b_die = VLC_TRUE;
 
-    /* We cannot touch p_input fields directly (we can from another thread),
+    /* We cannot touch p_input fields directly (we come from another thread),
      * so use the vlc_object_find way, it's perfectly safe */
 
     /* Set die for all access */
@@ -442,6 +442,7 @@ static int Run( input_thread_t *p_input )
     {
         /* If we failed, wait before we are killed, and exit */
         p_input->b_error = VLC_TRUE;
+        playlist_Signal( pl_Get( p_input ) );
 
         Error( p_input );
 
@@ -468,6 +469,7 @@ static int Run( input_thread_t *p_input )
 
         /* We have finished */
         p_input->b_eof = VLC_TRUE;
+        playlist_Signal( pl_Get( p_input ) );
     }
 
     /* Wait until we are asked to die */
