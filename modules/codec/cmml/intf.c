@@ -27,6 +27,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
@@ -595,7 +596,6 @@ int GetCurrentTimeInSeconds( input_thread_t *p_input )
 
     var_Get( p_input, "time", &time );
     i_seconds = time.i_time / 1000000;
-
     return i_seconds;
 }
 
@@ -605,7 +605,6 @@ char *GetTimedURIFragmentForTime( int seconds )
     char *psz_time;
 
     asprintf( &psz_time, "%d", seconds );
-
     return psz_time;
 }
 
