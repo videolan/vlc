@@ -280,6 +280,7 @@ vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 if USE_LIBTOOL
 LIB_libvlc = libvlc.la
 LIBVLC = src/$(LIB_libvlc)
+vlc_LDFLAGS =
 else
 if BUILD_SHARED
 vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc` -Wl,-rpath $(libdir) -L$(top_builddir)/src -lvlc
