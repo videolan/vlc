@@ -26,5 +26,6 @@ EXTRA_DIST = \
 	uintmax_t.m4 \
 	ulonglong.m4 \
 	vlc.m4 \
+	flags.m4 \
 	$(NULL)
 

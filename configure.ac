@@ -887,73 +887,7 @@ if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
     AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
 fi
 
-# XXX: do this with an M4 macro?
-#dnl Check for various -W flags
-#for flag in "" all unreachable-code conversion sign-compare disabled-optimization
-#do
-#    AC_CACHE_CHECK([if \$CC accepts -W${flag}],
-#        [ac_cv_c_W${flag}],
-#        [CFLAGS="-W${flag} ${CFLAGS_save}"
-#         AC_TRY_COMPILE([],,ac_cv_c_W${flag}=yes, ac_cv_c_W${flag}=no)])
-#    if test "${ac_cv_c_W${flag}}" != "no"; then
-#        CFLAGS_save="-W${flag} ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-#        CXXFLAGS_save="-W${flag} ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-#        OBJCFLAGS_save="-W${flag} ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-#    fi
-#done
-
-AC_CACHE_CHECK([if $CC accepts -Wall],
-    [ac_cv_c_Wall],
-    [CFLAGS="-Wall ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wall=yes, ac_cv_c_Wall=no)])
-
-AC_CACHE_CHECK([if $CC accepts -Wextra],
-    [ac_cv_c_Wextra],
-    [CFLAGS="-Wextra ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wextra=yes, ac_cv_c_Wextra=no)])
-
-AC_CACHE_CHECK([if $CC accepts -Wno-unused-parameter],
-    [ac_cv_c_Wno_unused_parameter],
-    [CFLAGS="-Wno-unused-parameter ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wno_unused_parameter=yes, ac_cv_c_Wno_unused_parameter=no)])
-
-AC_CACHE_CHECK([if $CC accepts -Wconversion],
-    [ac_cv_c_Wconversion],
-    [CFLAGS="-Wconversion ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wconversion=yes, ac_cv_c_Wconversion=no)])
-
-AC_CACHE_CHECK([if $CC accepts -Wunreachable-code],
-    [ac_cv_c_Wunreachable_code],
-    [CFLAGS="-Wunreachable-code ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wunreachable_code=yes, ac_cv_c_Wunreachable_code=no)])
-
-AC_CACHE_CHECK([if $CC accepts -Wsign-compare],
-    [ac_cv_c_Wsign_compare],
-    [CFLAGS="-Wsign-compare ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wsign_compare=yes, ac_cv_c_Wsign_compare=no)])
-
-if test "${ac_cv_c_Wall}" != "no"; then
-    CFLAGS_save="-Wall ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="-Wall ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-fi
-
-if test "${ac_cv_c_Wextra}" != "no"; then
-    CFLAGS_save="-Wextra ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="-Wextra ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="-Wextra ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-fi
-
-if test "${ac_cv_c_Wno_unused_parameter}" != "no"; then
-    CFLAGS_save="${CFLAGS_save} -Wno-unused-parameter"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="${CFLAGS_save} -Wno-unused-parameter"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="${OBJCFLAGS_save} -Wno-unused-parameter "; OBJCFLAGS="${OBJCFLAGS_save}"
-fi
-
-if test "${ac_cv_c_Wsign_compare}" != "no"; then
-    CFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="-Wsign-compare ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-fi
+RDC_PROG_CC_WFLAGS_IFELSE([all extra no-unused-parameter conversion unreachable-code sign-compare undef])
 
 dnl Check for -pipe
 AC_CACHE_CHECK([if \$CC accepts -pipe],
