@@ -891,6 +891,10 @@ CFLAGS="${CFLAGS_save}"
 RDC_PROG_CC_WFLAGS([all extra no-unused-parameter sign-compare undef pointer-arith bad-function-cast cast-align write-strings old-style-definition missing-prototypes packed volatile-register-var])
 RDC_PROG_CC_FLAGS_IFELSE([-pipe])
 
+dnl This helps detect broken plugins with undefined symbols
+dnl Better fail loudly at build-time than silenty at run-time.
+RDC_PROG_LINK_FLAGS_IFELSE([-Wl,-z,defs])
+
 dnl Check for various optimization flags
 AC_CACHE_CHECK([if \$CC accepts -Os],
     [ac_cv_c_os],
