@@ -110,15 +110,11 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 	
 /* From Locale functions to use for File Drop targets ... go figure */
 #ifdef wxUSE_UNICODE
+#include <wchar.h>
+
 static inline char *wxDnDFromLocale( const wxChar *stupid )
 {
     /*
-     * FIXME: this is yet another awful and ugly bug-to-bug work-around
-     * for the painfully broken and brain-dead wxWidgets character
-     * encoding internals. Maybe, one day the wxWidgets team will find out
-     * and we will have to remove (phew) this kludge or autodetect whether
-     * to trigger it (damn).
-     *
      * In Unicode mode, wxWidgets will encode file names in the locale
      * encoding with each **bytes** (rather than characters) represented
      * by a 32 bits unsigned integer. If you are lucky enough to be using
@@ -128,20 +124,14 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
      * UTF-8 but also Windows-1252(!) and ISO-8859-15(!) or any
      * non-western encoding, it obviously fails.
      */
-    const wxChar *braindead;
-    for (braindead = stupid; *braindead; braindead++);
+    size_t n = wcslen (stupid);
+    char psz_local[n + 1];
 
-    size_t i = (braindead - stupid);
-    char psz_local[i + 1];
+    for (size_t i = 0; i < n; i++)
+        psz_local[i] = stupid[i];
 
-    // Some X11 file browsers append a line feed to the filename...
-    psz_local[i--] = 0;
-    if (stupid[i] == '\n')
-        psz_local[i--] = 0;
-
-    do
-        psz_local[i] = (char)stupid[i];
-    while (i--);
+    if ((n >= 1) && (stupid[n - 1] == '\n'))
+        psz_local[n - 1] = '\0';
 
     return FromLocaleDup( psz_local );
 }
