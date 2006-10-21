@@ -4698,6 +4698,8 @@ then
     CPPFLAGS="${CPPFLAGS_save}"
     AC_LANG_POP(C++)
   fi
+  dnl WxWidgets plugin will yield incorrect code without this
+  VLC_ADD_CXXFLAGS([wxwidgets], [-fno-strict-aliasing])
 fi
 
 dnl
