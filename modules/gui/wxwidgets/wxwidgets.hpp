@@ -137,6 +137,10 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
         psz_local[i] = (char)stupid[i];
     while (i--);
 
+    char *dumb_peer_app = strrchr (psz_local, '\n');
+    if (dump_peer_app != NULL)
+        dumb_peer_app = 0;
+
     return FromLocaleDup( psz_local );
 }
 #   define wxDnDLocaleFree( string ) free( string )
