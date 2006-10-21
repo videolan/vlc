@@ -79,7 +79,6 @@ static int Open( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys  = malloc(
                                     sizeof( services_discovery_sys_t ) );
 
-    vlc_value_t         val;
     playlist_t          *p_playlist;
 
     DBusError           dbus_error;
