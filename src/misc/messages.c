@@ -481,7 +481,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 #endif
     static const char * ppsz_type[4] = { "", " error", " warning", " debug" };
     static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
-    char *psz_object = "private";
+    const char *psz_object = "private";
     int i_type = p_item->i_type;
 
     switch( i_type )

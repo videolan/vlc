@@ -248,7 +248,7 @@ typedef struct
 
 } input_title_t;
 
-static inline input_title_t *vlc_input_title_New( )
+static inline input_title_t *vlc_input_title_New(void)
 {
     input_title_t *t = (input_title_t*)malloc( sizeof( input_title_t ) );
 

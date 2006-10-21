@@ -334,7 +334,7 @@ static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es,
     input_thread_t    *p_input = p_sys->p_input;
     vlc_value_t       val, text;
 
-    char *psz_var;
+    const char *psz_var;
 
     if( es->fmt.i_cat == AUDIO_ES )
         psz_var = "audio-es";
@@ -740,7 +740,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
     vlc_value_t    val;
-    char           *psz_var;
+    const char     *psz_var;
 
     if( es->p_dec )
     {
@@ -808,7 +808,7 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update )
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
     vlc_value_t    val;
-    char           *psz_var;
+    const char     *psz_var;
 
     if( es->p_dec == NULL )
     {

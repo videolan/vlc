@@ -6,7 +6,7 @@
  *
  * This is used in iso_lang.cpp and is taken from the GNU glibc 2.2.5
  * tarball. It has been partially completed with native language names.
- * Authors: St�hane Borel <stef@via.ecp.fr>
+ * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,9 +29,9 @@
  * If you find something missing or wrong contact <bug-glibc@gnu.org> */
 
 /* Some spellings were converted to pure ASCII:
- *  Proven�l -> Provencal
+ *  Provençal -> Provencal
  *  Volapk -> Volapuk
- *  Bokm� -> Bokmaal */
+ *  Bokm? -> Bokmaal */
 
 static const iso639_lang_t p_languages[] =
 {

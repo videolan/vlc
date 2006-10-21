@@ -24,11 +24,11 @@
 
 struct iso639_lang_t
 {
-    char * psz_eng_name;        /* Description in English */
-    char * psz_native_name;     /* Description in native language */
-    char * psz_iso639_1;        /* ISO-639-1 (2 characters) code */
-    char * psz_iso639_2T;       /* ISO-639-2/T (3 characters) English code */
-    char * psz_iso639_2B;       /* ISO-639-2/B (3 characters) native code */
+    const char * psz_eng_name;        /* Description in English */
+    const char * psz_native_name;     /* Description in native language */
+    const char * psz_iso639_1;        /* ISO-639-1 (2 characters) code */
+    const char * psz_iso639_2T;       /* ISO-639-2/T (3 characters) English code */
+    const char * psz_iso639_2B;       /* ISO-639-2/B (3 characters) native code */
 };
 
 #if defined( __cplusplus )

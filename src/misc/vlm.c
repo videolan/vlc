@@ -49,12 +49,12 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static vlm_message_t *vlm_Show( vlm_t *, vlm_media_t *, vlm_schedule_t *, char * );
+static vlm_message_t *vlm_Show( vlm_t *, vlm_media_t *, vlm_schedule_t *, const char * );
 static vlm_message_t *vlm_Help( vlm_t *, char * );
 
 static vlm_media_instance_t *vlm_MediaInstanceSearch( vlm_t *, vlm_media_t *, const char * );
 
-static vlm_message_t *vlm_MessageNew( char *, const char *, ... );
+static vlm_message_t *vlm_MessageNew( const char *, const char *, ... );
 static vlm_message_t *vlm_MessageAdd( vlm_message_t *, vlm_message_t * );
 
 static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *, const char * );
@@ -1347,7 +1347,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
 /*****************************************************************************
  * Schedule handling
  *****************************************************************************/
-static int64_t vlm_Date()
+static int64_t vlm_Date(void)
 {
 #ifdef WIN32
     struct timeb tm;
@@ -1610,7 +1610,7 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, const char *psz_cmd,
 /*****************************************************************************
  * Message handling functions
  *****************************************************************************/
-static vlm_message_t *vlm_MessageNew( char *psz_name,
+static vlm_message_t *vlm_MessageNew( const char *psz_name,
                                       const char *psz_format, ... )
 {
     vlm_message_t *p_message;
@@ -1673,7 +1673,8 @@ static vlm_message_t *vlm_MessageAdd( vlm_message_t *p_message,
  * Misc utility functions
  *****************************************************************************/
 static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
-                                vlm_schedule_t *schedule, char *psz_filter )
+                                vlm_schedule_t *schedule,
+                                const char *psz_filter )
 {
     if( media != NULL )
     {
