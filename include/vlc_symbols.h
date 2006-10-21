@@ -334,13 +334,13 @@ struct module_symbols_t
     int (*__vlc_threads_init_inner) (vlc_object_t *);
     int (*__vlc_threads_end_inner) (vlc_object_t *);
     int (*__vlc_mutex_init_inner) (vlc_object_t *, vlc_mutex_t *);
-    int (*__vlc_mutex_destroy_inner) (char *, int, vlc_mutex_t *);
+    int (*__vlc_mutex_destroy_inner) (const char *, int, vlc_mutex_t *);
     int (*__vlc_cond_init_inner) (vlc_object_t *, vlc_cond_t *);
-    int (*__vlc_cond_destroy_inner) (char *, int, vlc_cond_t *);
-    int (*__vlc_thread_create_inner) (vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), int, vlc_bool_t);
-    int (*__vlc_thread_set_priority_inner) (vlc_object_t *, char *, int, int);
+    int (*__vlc_cond_destroy_inner) (const char *, int, vlc_cond_t *);
+    int (*__vlc_thread_create_inner) (vlc_object_t *, const char *, int, const char *, void * ( * ) ( void * ), int, vlc_bool_t);
+    int (*__vlc_thread_set_priority_inner) (vlc_object_t *, const char *, int, int);
     void (*__vlc_thread_ready_inner) (vlc_object_t *);
-    void (*__vlc_thread_join_inner) (vlc_object_t *, char *, int);
+    void (*__vlc_thread_join_inner) (vlc_object_t *, const char *, int);
     void (*__vout_CopyPicture_inner) (vlc_object_t *p_this, picture_t *p_dst, picture_t *p_src);
     int (*__vout_InitPicture_inner) (vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_aspect);
     int (*__vout_AllocatePicture_inner) (vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_aspect);

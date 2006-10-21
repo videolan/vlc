@@ -50,19 +50,6 @@ static vlc_object_t *p_root;
 #endif
 
 /*****************************************************************************
- * Global variable for named mutexes
- *****************************************************************************/
-typedef struct vlc_namedmutex_t vlc_namedmutex_t;
-struct vlc_namedmutex_t
-{
-    vlc_mutex_t lock;
-
-    char *psz_name;
-    int i_usage;
-    vlc_namedmutex_t *p_next;
-};
-
-/*****************************************************************************
  * vlc_threads_init: initialize threads system
  *****************************************************************************
  * This function requires lazy initialization of a global lock in order to
@@ -304,7 +291,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
 /*****************************************************************************
  * vlc_mutex_destroy: destroy a mutex, inner version
  *****************************************************************************/
-int __vlc_mutex_destroy( char * psz_file, int i_line, vlc_mutex_t *p_mutex )
+int __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex )
 {
     int i_result;
     /* In case of error : */
@@ -461,7 +448,7 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
 /*****************************************************************************
  * vlc_cond_destroy: destroy a condition, inner version
  *****************************************************************************/
-int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
+int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar )
 {
     int i_result;
     /* In case of error : */
@@ -519,8 +506,8 @@ int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
  * Note that i_priority is only taken into account on platforms supporting
  * userland real-time priority threads.
  *****************************************************************************/
-int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
-                         char *psz_name, void * ( *func ) ( void * ),
+int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line,
+                         const char *psz_name, void * ( *func ) ( void * ),
                          int i_priority, vlc_bool_t b_wait )
 {
     int i_ret;
@@ -645,7 +632,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
  * vlc_thread_set_priority: set the priority of the current thread when we
  * couldn't set it in vlc_thread_create (for instance for the main thread)
  *****************************************************************************/
-int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
+int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
                                int i_line, int i_priority )
 {
 #if defined( PTH_INIT_IN_PTH_H ) || defined( ST_INIT_IN_ST_H )
@@ -707,7 +694,7 @@ void __vlc_thread_ready( vlc_object_t *p_this )
 /*****************************************************************************
  * vlc_thread_join: wait until a thread exits, inner version
  *****************************************************************************/
-void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
+void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line )
 {
     int i_ret = 0;
 
