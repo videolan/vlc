@@ -1571,7 +1571,7 @@ static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
                         + p_region->picture.p[0].i_pitch * 1 / 3;
         int i_tolerance = 0;
 
-#if DEBUG_DVBSUB
+#ifdef DEBUG_DVBSUB
         msg_Dbg( p_enc, "YuvaYuvp: i_pixels=%d, i_iterator=%d", i_pixels, i_iterator );
 #endif
         p_fmt->i_chroma = VLC_FOURCC('Y','U','V','P');
@@ -1648,7 +1648,7 @@ static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
             }
         }
 
-#if DEBUG_DVBSUB
+#ifdef DEBUG_DVBSUB
         msg_Dbg( p_enc, "best palette has %d colors", p_fmt->p_palette->i_entries );
 #endif
 
@@ -1742,7 +1742,7 @@ static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
             p_fmt->p_palette->palette[i][3] = 0;
         }
         p_fmt->p_palette->i_entries = i_max_entries;
-#if DEBUG_DVBSUB
+#ifdef DEBUG_DVBSUB
         msg_Dbg( p_enc, "best palette has %d colors", p_fmt->p_palette->i_entries );
 #endif
     }
@@ -1799,7 +1799,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     }
     /* End of hack */
 
-#if DEBUG_DVBSUB
+#ifdef DEBUG_DVBSUB
     msg_Dbg( p_enc, "encoding subpicture" );
 #endif
     p_block = block_New( p_enc, 64000 );
