@@ -124,7 +124,7 @@ static const char* vlc_charset_aliases( const char *psz_name )
         { "CP28605",    "ISO-8859-15" },
         { NULL,         NULL }
     };
-#elif SYS_AIX
+#elif defined (SYS_AIX)
     VLCCharsetAlias aliases[] =
     {
         { "IBM-850",    "CP850" },
@@ -143,7 +143,7 @@ static const char* vlc_charset_aliases( const char *psz_name )
         { "IBM-EUCTW",  "EUC-TW" },
         { NULL, NULL }
     };
-#elif SYS_HPUX
+#elif defined (SYS_HPUX)
     VLCCharsetAlias aliases[] =
     {
         { "ROMAN8",     "HP-ROMAN8" },
@@ -155,13 +155,13 @@ static const char* vlc_charset_aliases( const char *psz_name )
         { "HP15CN",     "GB2312" },
         { NULL, NULL }
     };
-#elif SYS_IRIX
+#elif defined (SYS_IRIX)
     VLCCharsetAlias aliases[] =
     {
         { "EUCCN",      "GB2312" },
         { NULL, NULL }
     };
-#elif SYS_OSF
+#elif defined (SYS_OSF)
     VLCCharsetAlias aliases[] =
     {
         { "KSC5601",    "CP949" },
@@ -169,18 +169,18 @@ static const char* vlc_charset_aliases( const char *psz_name )
         { "TACTIS",     "TIS-620" },
         { NULL, NULL }
     };
-#elif SYS_SOLARIS
+#elif defined (SYS_SOLARIS)
     VLCCharsetAlias aliases[] =
     {
-        { "646",        "ASCII" },
+        { "646", "ASCII" },
         { "CNS11643",   "EUC-TW" },
         { "5601",       "EUC-KR" },
         { "JOHAP92",    "JOHAB" },
-        { "PCK",        "SHIFT_JIS" },
+        { "PCK", "SHIFT_JIS" },
         { "2533",       "TIS-620" },
         { NULL, NULL }
     };
-#elif SYS_BSD
+#elif defined (SYS_BSD)
     VLCCharsetAlias aliases[] =
     {
         { "646", " ASCII" },
@@ -360,7 +360,7 @@ char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
         if( i_ret == (size_t)-1 || i_in )
         {
             msg_Warn( p_this,
-                      "failed to convert \"%s\" from HFS+ charset (%s)",
+               "failed to convert \"%s\" from HFS+ charset (%s)",
                       psz_string, strerror(errno) );
             free( psz_utf8 );
             return strdup( psz_string );
@@ -375,183 +375,143 @@ char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
     return strdup( psz_string );
 }
 
+static inline int locale_match (const char *tab, const char *locale)
+{
+    for (;*tab; tab += 2)
+        if (memcmp (tab, locale, 2) == 0)
+            return 0;
+    return 1;
+}
+
+
 /**
  * @return a fallback characters encoding to be used, given a locale.
  */
-const char *FindFallbackEncoding( const char *locale )
+static const char *FindFallbackEncoding (const char *locale)
 {
-    if( ( locale == NULL ) || ( strlen( locale ) < 2 ) )
+    if ((locale == NULL) || (strlen (locale) < 2))
         return "ASCII";
 
-    switch( U16_AT( locale ) )
+
+    /*** The ISO-8859 series (anything but Asia) ***/
+    // Latin-1 Western-European languages (ISO-8859-1)
+    static const char western[] =
+        "aa" "af" "an" "br" "ca" "da" "de" "en" "es" "et" "eu" "fi" "fo" "fr"
+        "ga" "gd" "gl" "gv" "id" "is" "it" "kl" "kw" "mg" "ms" "nb" "nl" "nn"
+        "no" "oc" "om" "pt" "so" "sq" "st" "sv" "tl" "uz" "wa" "xh" "zu"
+        "eo" "mt" "cy";
+    if (!locale_match (western, locale))
+        return "CP1252"; // Compatible Microsoft superset
+
+    // Latin-2 Slavic languages (ISO-8859-2)
+    static const char slavic[] = "bs" "cs" "hr" "hu" "pl" "ro" "sk" "sl";
+    if (!locale_match (slavic, locale))
+        return "CP1250"; // CP1250 is more common, but incompatible
+
+    // Latin-3 Southern European languages (ISO-8859-3)
+    // "eo" and "mt" -> Latin-1 instead, I presume(?).
+    // "tr" -> ISO-8859-9 instead
+
+    // Latin-4 North-European languages (ISO-8859-4)
+    // -> Latin-1 instead
+
+    /* Cyrillic alphabet languages (ISO-8859-5) */
+    static const char cyrillic[] = "be" "bg" "mk" "ru" "sr";
+    if (!locale_match (cyrillic, locale))
+        return "CP1251"; // KOI8, ISO-8859-5 and CP1251 are incompatible(?)
+
+    /* Arabic (ISO-8859-6) */
+    if (!locale_match ("ar", locale))
+        // FIXME: someone check if we should return CP1256 or ISO-8859-6
+        return "CP1256"; // CP1256 is(?) more common, but incompatible(?)
+
+    /* Greek (ISO-8859-7) */
+    if (!locale_match ("el", locale))
+        // FIXME: someone check if we should return CP1253 or ISO-8859-7
+        return "CP1253"; // CP1253 is(?) more common and less incompatible
+
+    /* Hebrew (ISO-8859-8) */
+    if (!locale_match ("he" "iw" "yi", locale))
+        return "CP1255"; // Compatible Microsoft superset
+
+    /* Latin-5 Turkish (ISO-8859-9) */
+    if (!locale_match ("tr" "ku", locale))
+        return "CP1254"; // Compatible Microsoft superset
+
+    /* Latin-6 “North-European” languages (ISO-8859-10) */
+    /* It is so much north European that glibc only uses that for Luganda
+     * which is spoken in Uganda... unless someone complains, I'm not
+     * using this one; let's fallback to CP1252 here. */
+
+    // ISO-8859-11 does arguably not exist. Thai is handled below.
+
+    // ISO-8859-12 really doesn't exist.
+
+    // Latin-7 Baltic languages (ISO-8859-13)
+    if (!locale_match ("lt" "lv" "mi", locale))
+        // FIXME: mi = New Zealand, doesn't sound baltic!
+        return "CP1257"; // Compatible Microsoft superset
+
+    // Latin-8 Celtic languages (ISO-8859-14)
+    // "cy" -> use Latin-1 instead (most likely English or French)
+
+    // Latin-9 (ISO-8859-15) -> see Latin-1
+
+    // Latin-10 (ISO-8859-16) does not seem to be used
+
+    /*** KOI series ***/
+    // For Russian, we use CP1251
+    if (!locale_match ("uk", locale))
+        return "KOI8-U";
+
+    if (!locale_match ("tg", locale))
+        return "KOI8-T";
+
+    /*** Asia ***/
+    // Japanese
+    if (!locale_match ("jp", locale))
+        return "SHIFT-JIS"; // Shift-JIS is way more common than EUC-JP
+
+    // Korean
+    if (!locale_match ("ko", locale))
+        return "EUC-KR";
+
+    // Thai
+    if (!locale_match ("th", locale))
+        return "TIS-620";
+
+    // Vietnamese (FIXME: more infos needed)
+    if (!locale_match ("vt", locale))
+        /* VISCII is probably a bad idea as it is not extended ASCII */
+        /* glibc has TCVN5712-1 */
+        return "CP1258";
+
+    /* Kazakh (FIXME: more infos needed) */
+    if (!locale_match ("kk", locale))
+        return "PT154";
+
+    // Chinese. The politically incompatible character sets.
+    if (!locale_match ("zh", locale))
     {
-        /*** The ISO-8859 series (anything but Asia) ***/
-        /* Latin-1 Western-European languages (ISO-8859-1) */
-        case 'aa':
-        case 'af':
-        case 'an':
-        case 'br':
-        case 'ca':
-        case 'da':
-        case 'de':
-        case 'en':
-        case 'es':
-        case 'et':
-        case 'eu':
-        case 'fi':
-        case 'fo':
-        case 'fr':
-        case 'ga':
-        case 'gd':
-        case 'gl':
-        case 'gv':
-        case 'id':
-        case 'is':
-        case 'it':
-        case 'kl':
-        case 'kw':
-        case 'mg':
-        case 'ms':
-        case 'nb':
-        case 'nl':
-        case 'nn':
-        case 'no':
-        case 'oc':
-        case 'om':
-        case 'pt':
-        case 'so':
-        case 'sq':
-        case 'st':
-        case 'sv':
-        case 'tl':
-        case 'uz':
-        case 'wa':
-        case 'xh':
-        case 'zu':
-            /* Compatible Microsoft superset */
-            return "CP1252";
+        if ((strlen (locale) >= 5) && (locale[2] != '_'))
+            locale += 3;
 
-        /* Latin-2 Slavic languages (ISO-8859-2) */
-        case 'bs':
-        case 'cs':
-        case 'hr':
-        case 'hu':
-        case 'pl':
-        case 'ro':
-        case 'sk':
-        case 'sl':
-            /* CP1250 is more common, but incompatible */
-            return "CP1250";
+        // Hong Kong
+        if (!locale_match ("HK", locale))
+            return "BIG5-HKSCS"; /* FIXME: use something else? */
 
-        /* Latin-3 Southern European languages (ISO-8859-3) */
-        case 'eo':
-        case 'mt':
-        /*case 'tr': Turkish uses ISO-8859-9 instead */
-            return "ISO-8859-3";
+        // Taiwan island
+        if (!locale_match ("TW", locale))
+            return "BIG5";
 
-        /* Latin-4 North-European languages (ISO-8859-4) */
-        /* All use Latin-1 or Latin-6 instead */
-
-        /* Cyrillic alphabet languages (ISO-8859-5) */
-        case 'be':
-        case 'bg':
-        case 'mk':
-        case 'ru':
-        case 'sr':
-            /* KOI8, ISO-8859-5 and CP1251 are supposedly incompatible */
-            return "CP1251";
-
-        /* Arabic (ISO-8859-6) */
-        case 'ar':
-            /* FIXME: someone check if we should return CP1256
-             * or ISO-8859-6 */
-            /* CP1256 is(?) more common, but incompatible(?) */
-            return "CP1256";
-
-        /* Greek (ISO-8859-7) */
-        case 'el':
-            /* FIXME: someone check if we should return CP1253
-            * or ISO-8859-7 */
-            /* CP1253 is(?) more common and partially compatible */
-            return "CP1253";
-
-        /* Hebrew (ISO-8859-8) */
-        case 'he':
-        case 'iw':
-        case 'yi':
-            /* Compatible Microsoft superset */
-            return "CP1255";
-
-        /* Latin-5 Turkish (ISO-8859-9) */
-        case 'tr':
-        case 'ku':
-            /* Compatible Microsoft superset */
-            return "CP1254";
-
-        /* Latin-6 “North-European” languages (ISO-8859-10) */
-        /* It is so much north European that glibc only uses that for Luganda
-         * which is spoken in Uganda... unless someone complains, I'm not
-         * using this one; let's fallback to CP1252 here. */
-        /* ISO-8859-11 does arguably not exist. Thai is handled below. */
-        /* ISO-8859-12 really doesn't exist. */
-
-        /* Latin-7 Baltic languages (ISO-8859-13) */
-        case 'lt':
-        case 'lv':
-        case 'mi': /* FIXME: ??? that's in New Zealand, doesn't sound baltic */
-            /* Compatible Microsoft superset */
-            return "CP1257";
-
-        /* Latin-8 Celtic languages (ISO-8859-14) */
-        case 'cy':
-            return "ISO-8859-14";
-
-        /* Latin-9 (ISO-8859-15) -> see Latin-1 */
-        /* Latin-10 (ISO-8859-16) does not seem to be used */
-
-        /* KOI series */
-        /* For Russian, we use CP1251 */
-        case 'uk':
-            return "KOI8-U";
-        case 'tg':
-            return "KOI8-T";
-
-        /*** Asia ***/
-        case 'jp': /* Japanese */
-            /* Shift-JIS is way more common than EUC-JP */
-            return "SHIFT-JIS";
-        case 'ko': /* Korean */
-            return "EUC-KR";
-        case 'th': /* Thai */
-            return "TIS-620";
-        case 'vt': /* Vietnamese FIXME: infos needed */
-            /* VISCII is probably a bad idea as it is not extended ASCII */
-            /* glibc has TCVN5712-1, but I could find no infos on this one */
-            return "CP1258";
-
-        case 'kk': /* Kazakh FIXME: infos needed */
-            return "PT154";
-
-        case 'zh': /* Chinese, charset is country dependant */
-            if( ( strlen( locale ) >= 5 ) && ( locale[2] != '_' ) )
-                switch( U16_AT( locale + 3 ) )
-                {
-                    case 'HK': /* Hong Kong */
-                        /* FIXME: use something else? */
-                        return "BIG5-HKSCS";
-
-                    case 'TW': /* Taiwan */
-                        return "BIG5";
-                }
-            /* People's Republic of China */
-            /* Singapore */
-            /*
-             * GB18030 can represent any Unicode code point
-             * (like UTF-8), while remaining compatible with GBK
-             * FIXME: is it compatible with GB2312? if not, should we
-             * use GB2312 instead?
-             */
-            return "GB18030";
+        // People's Republic of China and Singapore
+        /*
+         * GB18030 can represent any Unicode code point
+         * (like UTF-8), while remaining compatible with GBK
+         * FIXME: is it compatible with GB2312? if not, should we
+         * use GB2312 instead?
+         */
+        return "GB18030";
     }
 
     return "ASCII";
