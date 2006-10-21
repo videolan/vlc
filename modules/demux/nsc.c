@@ -246,7 +246,7 @@ char *nscdec( vlc_object_t *p_demux, char* p_encoded )
     p_buf8 = buf8;
     p_buf16 = (const char *)buf16;
 
-    if( vlc_iconv( conv, &p_buf16, &buf16_size, &p_buf8, &buf8_size ) < 0 )
+    if( vlc_iconv( conv, &p_buf16, &buf16_size, &p_buf8, &buf8_size ) == 0 )
     {
         msg_Err( p_demux, "iconv failed" );
         return NULL;
