@@ -132,11 +132,13 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
     for (braindead = stupid; *braindead; braindead++);
 
     size_t i = (braindead - stupid);
-    // Some X11 file browsers append a line feed to the filename...
-    if (stupid[i] == '\n')
-        stupid[i] = 0;
-
     char psz_local[i + 1];
+
+    // Some X11 file browsers append a line feed to the filename...
+    psz_local[i--] = 0;
+    if (stupid[i] == '\n')
+        psz_local[i--] = 0;
+
     do
         psz_local[i] = (char)stupid[i];
     while (i--);
