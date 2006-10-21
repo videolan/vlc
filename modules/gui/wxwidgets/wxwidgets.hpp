@@ -124,7 +124,7 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
      * UTF-8 but also Windows-1252(!) and ISO-8859-15(!) or any
      * non-western encoding, it obviously fails.
      */
-    size_t n = wcslen (stupid);
+    size_t n = wcslen ((const wchar_t *)stupid);
     char psz_local[n + 1];
 
     for (size_t i = 0; i < n; i++)
