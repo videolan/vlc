@@ -119,8 +119,6 @@ static int OpenTV( vlc_object_t *p_this )
 static int Open( vlc_object_t *p_this, int i_type )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    vlc_value_t         val;
-    playlist_view_t     *p_view;
     playlist_t          *p_playlist = pl_Yield( p_this );
     DECMALLOC_ERR( p_sys, services_discovery_sys_t );
     p_sd->p_sys  = p_sys;

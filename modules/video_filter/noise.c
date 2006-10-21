@@ -141,7 +141,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
         int i_line, i_num_lines, i_col, i_num_cols;
-        uint8_t black_pixel;
         uint8_t *p_in, *p_out;
 
         p_in = p_pic->p[i_index].p_pixels;
