@@ -1071,7 +1071,7 @@ void Interface::PlayStream()
                                        FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
 
-    if( p_playlist->i_size && p_playlist->i_enabled )
+    if( !playlist_IsEmpty(p_playlist) && p_playlist->i_enabled )
     {
         vlc_value_t state;
 

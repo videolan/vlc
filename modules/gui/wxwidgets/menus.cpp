@@ -271,7 +271,7 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf, ArrayOfInts &ri_objects,
     } \
     else \
     { \
-        if( p_playlist && !playlist_IsEmpty( p_playlist->i_size ) ) \
+        if( p_playlist && !playlist_IsEmpty( p_playlist ) ) \
         { \
             popupmenu.InsertSeparator( 0 ); \
             popupmenu.Insert( 0, Play_Event, wxU(_("Play")) ); \
