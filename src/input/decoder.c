@@ -55,7 +55,7 @@ static void vout_unlink_picture( decoder_t *, picture_t * );
 static subpicture_t *spu_new_buffer( decoder_t * );
 static void spu_del_buffer( decoder_t *, subpicture_t * );
 
-static es_format_t null_es_format = {0};
+static es_format_t null_es_format;
 
 struct decoder_owner_sys_t
 {
@@ -396,7 +396,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
    /* Initialize the decoder fifo */
     p_dec->p_module = NULL;
 
-
+    memset( &null_es_format, 0, sizeof(es_format_t) );
     es_format_Copy( &p_dec->fmt_in, fmt );
     es_format_Copy( &p_dec->fmt_out, &null_es_format );
 

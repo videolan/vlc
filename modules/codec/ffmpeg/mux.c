@@ -301,7 +301,9 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     block_t *p_data = block_FifoGet( p_input->p_fifo );
     int i_stream = *((int *)p_input->p_sys);
     AVStream *p_stream = p_sys->oc->streams[i_stream];
-    AVPacket pkt = {0};
+    AVPacket pkt;
+
+    memset( &pkt, 0, sizeof(AVPacket) );
 
     av_init_packet(&pkt);
     pkt.data = p_data->p_buffer;

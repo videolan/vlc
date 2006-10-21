@@ -221,15 +221,15 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
 
     xml_t *p_xml = NULL;
     xml_reader_t *p_xml_reader = NULL;
-
     char *psz_eltname = NULL;
     //char *psz_eltvalue = NULL;
     char *psz_name = NULL;
     char *psz_value = NULL;
-
-    struct update_mirror_t tmp_mirror = {0};
+    struct update_mirror_t tmp_mirror;
 
     vlc_mutex_lock( &p_update->lock );
+
+    memset( &tmp_mirror, 0, sizeof(struct update_mirror_t));
 
     if( p_update->b_mirrors && b_force == VLC_FALSE )
     {
@@ -399,10 +399,13 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
     char *psz_value = NULL;
 
     struct update_release_t *p_release = NULL;
-    struct update_release_t tmp_release = {0};
-    struct update_file_t tmp_file = {0};
+    struct update_release_t tmp_release;
+    struct update_file_t tmp_file;
 
     vlc_bool_t b_os = VLC_FALSE, b_arch = VLC_FALSE;
+
+    memset( &tmp_release, 0, sizeof(struct update_release_t) );
+    memset( &tmp_file, 0, sizeof(struct update_file_t) );
 
     tmp_release.i_type = UPDATE_RELEASE_TYPE_STABLE;
 
@@ -730,8 +733,10 @@ int CompareReleases( struct update_release_t *p1, struct update_release_t *p2 )
  */
 int CompareReleaseToCurrent( struct update_release_t *p )
 {
-    struct update_release_t c = {0};
+    struct update_release_t c;
     int r;
+
+    memset( &c, 0, sizeof(struct update_release_t) );
     c.psz_major = STRDUP( PACKAGE_VERSION_MAJOR );
     c.psz_minor = STRDUP( PACKAGE_VERSION_MINOR );
     c.psz_revision = STRDUP( PACKAGE_VERSION_REVISION );

@@ -749,6 +749,10 @@ static int Init( vout_thread_t *p_vout )
     {
         for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
         {
+            video_format_t fmt;
+
+            memset( &fmt, 0, sizeof(video_format_t) );
+
             if( i_col + 1 < p_vout->p_sys->i_col )
             {
                 i_width = ( p_vout->render.i_width
@@ -796,8 +800,6 @@ static int Init( vout_thread_t *p_vout )
                 p_vout->p_sys->i_vout++;
                 continue;
             }
-
-           video_format_t fmt = {0};
 
             fmt.i_width = fmt.i_visible_width = p_vout->render.i_width;
             fmt.i_height = fmt.i_visible_height = p_vout->render.i_height;

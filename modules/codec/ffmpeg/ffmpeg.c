@@ -466,7 +466,7 @@ static struct
     { VLC_FOURCC('R','V','3','2'), PIX_FMT_RGBA32 },
     { VLC_FOURCC('G','R','E','Y'), PIX_FMT_GRAY8 },
 
-    {0}
+    { 0, 0 }
 };
 
 int E_(GetFfmpegChroma)( vlc_fourcc_t i_chroma )
@@ -1142,7 +1142,7 @@ static struct
       AUDIO_ES, "WavPack" },
 #endif
 
-    {0}
+    { 0, 0, 0, 0 }
 };
 
 int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
