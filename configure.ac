@@ -887,7 +887,7 @@ if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
     AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
 fi
 
-RDC_PROG_CC_WFLAGS([all extra no-unused-parameter conversion unreachable-code sign-compare undef])
+RDC_PROG_CC_WFLAGS([all extra no-unused-parameter sign-compare undef])
 RDC_PROG_CC_FLAGS_IFELSE([-pipe])
 
 dnl Check for various optimization flags
