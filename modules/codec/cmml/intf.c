@@ -27,11 +27,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
+
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
-
-#include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
