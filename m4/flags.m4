@@ -13,7 +13,7 @@ AC_DEFUN([RDC_PROG_CC_FLAGS_IFELSE],
   CFLAGS_save="${CFLAGS}"
   as_ac_var=`echo "ac_cv_prog_cc_flags_$1" | $as_tr_sh`
   AC_CACHE_CHECK([if $CC accepts $1], [$as_ac_var], [
-    CFLAGS="${CFLAGS_save} $1"
+    CFLAGS="${CFLAGS} $1"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
       eval "$as_ac_var=yes"
     ],[
@@ -44,7 +44,7 @@ AC_DEFUN([RDC_PROG_LINK_FLAGS_IFELSE],
   LDFLAGS_save="${LDFLAGS}"
   as_ac_var=`echo "ac_cv_prog_link_flags_$1" | $as_tr_sh`
   AC_CACHE_CHECK([if $LINK accepts $1], [$as_ac_var], [
-    LDFLAGS="${LDFLAGS_save} $1"
+    LDFLAGS="${LDFLAGS} $1"
     AC_LINK_IFELSE([AC_LANG_PROGRAM()], [
       eval "$as_ac_var=yes"
     ],[
