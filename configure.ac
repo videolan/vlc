@@ -565,7 +565,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer param_eq vlc freetype mpc dmo quicktime realaudio galaktos],[-lm])
+  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer param_eq vlc freetype mpc dmo quicktime realaudio galaktos opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex],[-lm])
@@ -3669,15 +3669,15 @@ if test "${enable_opengl}" != "no" &&
     AC_CHECK_HEADERS(GL/gl.h GL/glu.h, [
       VLC_ADD_PLUGINS([opengl])
       if test "${SYS}" != "mingw32"; then
-        VLC_ADD_LDFLAGS([opengl],[${X_LIBS} -lGL -lGLU -lm])
+        VLC_ADD_LDFLAGS([opengl],[${X_LIBS} -lGL -lGLU])
       else
-        VLC_ADD_LDFLAGS([opengl],[-lopengl32 -lglu32 -lm])
+        VLC_ADD_LDFLAGS([opengl],[-lopengl32 -lglu32])
       fi
     ])
   else
     dnl OS X special case (no GL/gl.h but OpenGL/gl.h)
     VLC_ADD_PLUGINS([opengl])
-    VLC_ADD_LDFLAGS([opengl],[-framework OpenGL -lm])
+    VLC_ADD_LDFLAGS([opengl],[-framework OpenGL])
   fi
 fi
 
