@@ -70,12 +70,12 @@ static void ConfigTuner( vlc_object_t *, ICaptureGraphBuilder2 *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static char *ppsz_vdev[] = { "", "none" };
-static char *ppsz_vdev_text[] = { N_("Default"), N_("None") };
-static char *ppsz_adev[] = { "", "none" };
-static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
+static const char *ppsz_vdev[] = { "", "none" };
+static const char *ppsz_vdev_text[] = { N_("Default"), N_("None") };
+static const char *ppsz_adev[] = { "", "none" };
+static const char *ppsz_adev_text[] = { N_("Default"), N_("None") };
 static int  pi_tuner_input[] = { 0, 1, 2 };
-static char *ppsz_tuner_input_text[] =
+static const char *ppsz_tuner_input_text[] =
     {N_("Default"), N_("Cable"), N_("Antenna")};
 static int pi_amtuner_mode[] = { AMTUNER_MODE_DEFAULT,
                                  AMTUNER_MODE_TV,
