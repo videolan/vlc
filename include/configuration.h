@@ -125,7 +125,7 @@ struct module_config_t
     char         i_short;                      /* Optional short option name */
     const char  *psz_text;      /* Short comment on the configuration option */
     const char  *psz_longtext;   /* Long comment on the configuration option */
-    char        *psz_value;                                  /* Option value */
+    const char  *psz_value;                                  /* Option value */
     int          i_value;                                    /* Option value */
     float        f_value;                                    /* Option value */
     int         i_min;                               /* Option minimum value */
