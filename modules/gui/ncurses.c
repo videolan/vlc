@@ -523,7 +523,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->i_box_plidx = 0;
                 break;
             case KEY_END:
-                p_sys->i_box_plidx = p_sys->p_playlist->i_size - 1;
+                p_sys->i_box_plidx = p_sys->p_playlist->items.i_size - 1;
                 break;
             case KEY_UP:
                 p_sys->i_box_plidx--;
