@@ -73,7 +73,7 @@ void Popup::addSeparator( int pos )
 void Popup::handleEvent( const EvtMenu &rEvent )
 {
     unsigned int n = m_pOsPopup->getPosFromId( rEvent.getItemId() );
-    if( n >= 0 && n < m_actions.size() && m_actions[n] )
+    if( (n < m_actions.size()) && m_actions[n] )
     {
         m_actions[n]->execute();
     }
