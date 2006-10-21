@@ -1133,7 +1133,6 @@ static struct
     { VLC_FOURCC('u','3','2','b'), CODEC_ID_PCM_U32BE,
       AUDIO_ES, "PCM U32 BE" },
     { VLC_FOURCC('a','l','a','w'), CODEC_ID_PCM_ALAW,
-    { VLC_FOURCC('a','l','a','w'), CODEC_ID_PCM_ALAW,
       AUDIO_ES, "PCM ALAW" },
     { VLC_FOURCC('u','l','a','w'), CODEC_ID_PCM_MULAW,
       AUDIO_ES, "PCM ULAW" },
