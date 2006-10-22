@@ -4688,6 +4688,18 @@ then
     fi
     VLC_ADD_LDFLAGS([wxwidgets],[`${WX_CONFIG} --libs`])
     VLC_ADD_CXXFLAGS([wxwidgets],[`${WX_CONFIG} --cxxflags`])
+    # check if we must link against gtk2 libs
+    # if __WXGTK20__ && __WXGTK__ are defined
+    # for modules/gui/wxwidgets/video.cpp
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+#include <wx/wx.h>
+#ifdef __WXGTK20__
+#error ok, we need to link against gtk2
+#endif
+        ])],[WXGTK=no],[WXGTK=yes])
+    if test "$WXGTK" = "yes"; then
+      ${PKG_CONFIG} --exists gtk+-2.0 && VLC_ADD_LDFLAGS([wxwidgets],[`$PKG_CONFIG --libs gtk+-2.0`])
+    fi
     if ${WX_CONFIG} --unicode
     then 
       # wxwidgets should provide the following flags but does not
