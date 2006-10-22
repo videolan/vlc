@@ -565,7 +565,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer param_eq vlc freetype mpc dmo quicktime realaudio galaktos opengl],[-lm])
+  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer param_eq vlc vorbis freetype mpc dmo quicktime realaudio galaktos opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex],[-lm])
@@ -3290,10 +3290,10 @@ then
   else
     AC_CHECK_HEADERS(vorbis/codec.h, [
       VLC_ADD_PLUGINS([vorbis])
-      VLC_ADD_LDFLAGS([vorbis],[-lvorbis -logg]) ],[])
+      VLC_ADD_LDFLAGS([vorbis],[-lvorbis -logg -lm]) ],[])
 
     AC_CHECK_HEADERS(vorbis/vorbisenc.h, [
-      VLC_ADD_LDFLAGS([vorbis],[-lvorbisenc]) ],[])
+      VLC_ADD_LDFLAGS([vorbis],[-lvorbisenc -lm]) ],[])
   fi
 fi
 
@@ -3589,6 +3589,24 @@ if test "${enable_glx}" != "no" &&
       VLC_ADD_LDFLAGS([glx],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lGL -lGLU])
       VLC_ADD_CPPFLAGS([glx],[${X_CFLAGS}])
    ])
+  CPPFLAGS="${CPPFLAGS_save}"
+fi
+
+dnl
+dnl  XVMC module
+dnl  (enabled by default except on win32)
+dnl
+AC_ARG_ENABLE(xvmc,
+  [  --enable-xvmc            XVMC support (default disabled)])
+if test "${enable_xvmc}" = "yes" &&
+  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
+   test "${enable_xvmc}" = "yes"); then
+  CPPFLAGS="${CPPFLAGS_save} ${X_FLAGS}"
+  AC_CHECK_HEADERS(X11/extensions/vldXvMC.h, [
+    VLC_ADD_PLUGINS([xvmc])
+    VLC_ADD_LDFLAGS([xvmc],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
+    VLC_ADD_CPPFLAGS([xvmc],[${X_CFLAGS}])
+  ])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
