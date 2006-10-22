@@ -4436,7 +4436,7 @@ AS_IF([test "x${enable_upnp}" != "xno"], [
     AC_MSG_ERROR([cannot find Intel UPnP SDK (libupnp)])
   ])
   AS_IF([test "${has_upnp}" = "yes"], [
-    VLC_ADD_LDFLAGS([upnp_intel], [-lupnp])
+    VLC_ADD_LDFLAGS([upnp_intel], [-lupnp -lixml])
   ])
 ], [
   has_upnp="no"
