@@ -92,6 +92,11 @@
  * instance the module name, its shortcuts, its capabilities... we also create
  * a copy of its config because the module can be unloaded at any time.
  */
+#if defined (__PLUGIN__) || defined (__BUILTIN__)
+EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL
+E_(vlc_entry) ( module_t *p_module );
+#endif
+
 #define vlc_module_begin( )                                                   \
     DECLARE_SYMBOLS;                                                          \
     EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \

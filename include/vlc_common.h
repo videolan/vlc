@@ -58,7 +58,6 @@
 #endif
 
 #include "vlc_config.h"
-#include "modules_inner.h"
 
 /*****************************************************************************
  * Required system headers
@@ -460,6 +459,9 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 /*****************************************************************************
  * Plug-in stuff
  *****************************************************************************/
+
+#include "modules_inner.h"
+
 #if !defined (__PLUGIN__) || defined (HAVE_SHARED_LIBVLC)
 #   ifdef __cplusplus
 #      define VLC_EXPORT( type, name, args ) extern "C" type name args
