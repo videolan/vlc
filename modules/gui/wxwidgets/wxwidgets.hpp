@@ -130,6 +130,7 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
     for (size_t i = 0; i < n; i++)
         psz_local[i] = stupid[i];
 
+    psz_local[n] = '\0';
     if ((n >= 1) && (stupid[n - 1] == '\n'))
         psz_local[n - 1] = '\0';
 
