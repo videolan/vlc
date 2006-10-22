@@ -213,7 +213,7 @@ static void Run( intf_thread_t *p_intf )
             p_intf->p_sys->b_need_update = VLC_FALSE;
             p_playlist = pl_Yield( p_intf );
 
-            if( p_playlist->i_size < 0  )
+            if( !playlist_isEmpty( p_playlist ) )
             {
                 vlc_object_release( p_playlist );
                 continue;
