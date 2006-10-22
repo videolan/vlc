@@ -274,6 +274,8 @@ dnl
 AC_DISABLE_STATIC
 AC_LIBTOOL_DLOPEN
 dnl AC_LIBTOOL_WIN32_DLL - couldn't get libtool to work on Win32 so far
+m4_undefine([AC_PROG_F77])
+m4_defun([AC_PROG_F77],[])
 AC_PROG_LIBTOOL
 
 AC_ARG_ENABLE(libtool,
