@@ -567,7 +567,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer param_eq vlc vorbis freetype mpc dmo quicktime realaudio galaktos opengl],[-lm])
+  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer param_eq vlc vorbis freetype mod mpc dmo quicktime realaudio galaktos opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex],[-lm])
@@ -2454,8 +2454,8 @@ then
       dnl  Use a custom mod
       AC_MSG_RESULT(${real_mod_tree}/src/.libs/libmodplug.a)
       VLC_ADD_PLUGINS([mod])
-      VLC_ADD_LDFLAGS([mod],[${real_mod_tree}/src/.libs/libmodplug.a])
-      VLC_ADD_CFLAGS([mod],[-I${real_mod_tree}/include])
+      VLC_ADD_LDFLAGS([mod],[${real_mod_tree}/src/.libs/libmodplug.ah -lstdc++])
+      VLC_ADD_CXXFLAGS([mod],[-I${real_mod_tree}/include])
     else
       dnl  The given mod wasn't built
       AC_MSG_RESULT(no)
