@@ -110,8 +110,6 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 	
 /* From Locale functions to use for File Drop targets ... go figure */
 #ifdef wxUSE_UNICODE
-#include <wchar.h>
-
 static inline char *wxDnDFromLocale( const wxChar *stupid )
 {
     /*
@@ -124,15 +122,17 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
      * UTF-8 but also Windows-1252(!) and ISO-8859-15(!) or any
      * non-western encoding, it obviously fails.
      */
-    size_t n = wcslen ((const wchar_t *)stupid);
-    char psz_local[n + 1];
+    size_t i = 0;
+    while (stupid[i])
+        i++;
 
-    for (size_t i = 0; i < n; i++)
+    char psz_local[i + 1];
+    if ((i >= 1) && (stupid[i - 1] == '\n'))
+        i--;
+
+    do
         psz_local[i] = stupid[i];
-
-    psz_local[n] = '\0';
-    if ((n >= 1) && (stupid[n - 1] == '\n'))
-        psz_local[n - 1] = '\0';
+    while (n--);
 
     return FromLocaleDup( psz_local );
 }
