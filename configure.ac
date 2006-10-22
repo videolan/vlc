@@ -2454,7 +2454,7 @@ then
       dnl  Use a custom mod
       AC_MSG_RESULT(${real_mod_tree}/src/.libs/libmodplug.a)
       VLC_ADD_PLUGINS([mod])
-      VLC_ADD_LDFLAGS([mod],[${real_mod_tree}/src/.libs/libmodplug.ah -lstdc++])
+      VLC_ADD_LDFLAGS([mod],[${real_mod_tree}/src/.libs/libmodplug.a -lstdc++])
       VLC_ADD_CXXFLAGS([mod],[-I${real_mod_tree}/include])
     else
       dnl  The given mod wasn't built
@@ -2465,7 +2465,7 @@ then
     AC_CHECK_HEADERS(libmodplug/modplug.h, [
       VLC_ADD_PLUGINS([mod])
       VLC_ADD_CXXFLAGS([mod],[])
-      VLC_ADD_LDFLAGS([mod],[-lmodplug])])
+      VLC_ADD_LDFLAGS([mod],[-lmodplug -lstdc++])])
   fi
 fi
 
