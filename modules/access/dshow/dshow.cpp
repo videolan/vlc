@@ -77,12 +77,12 @@ static const char *ppsz_adev_text[] = { N_("Default"), N_("None") };
 static int  pi_tuner_input[] = { 0, 1, 2 };
 static const char *ppsz_tuner_input_text[] =
     {N_("Default"), N_("Cable"), N_("Antenna")};
-static int pi_amtuner_mode[] = { AMTUNER_MODE_DEFAULT,
+static const int pi_amtuner_mode[]  = { AMTUNER_MODE_DEFAULT,
                                  AMTUNER_MODE_TV,
                                  AMTUNER_MODE_FM_RADIO,
                                  AMTUNER_MODE_AM_RADIO,
                                  AMTUNER_MODE_DSS };
-static char *ppsz_amtuner_mode_text[] = { N_("Default"),
+static const char *ppsz_amtuner_mode_text[] = { N_("Default"),
                                           N_("TV"),
                                           N_("FM radio"),
                                           N_("AM radio"),
@@ -1817,8 +1817,8 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
         /* Keep the 2 first entries */
         for( i = 2; i < p_item->i_list; i++ )
         {
-            free( p_item->ppsz_list[i] );
-            free( p_item->ppsz_list_text[i] );
+            free( const_cast<char *>(p_item->ppsz_list[i]) );
+            free( const_cast<char *>(p_item->ppsz_list_text[i]) );
         }
         /* TODO: Remove when no more needed */
         p_item->ppsz_list[i] = NULL;
@@ -1840,10 +1840,10 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     if( !list_devices.size() ) return VLC_SUCCESS;
 
     p_item->ppsz_list =
-        (char **)realloc( p_item->ppsz_list,
+        (const char **)realloc( p_item->ppsz_list,
                           (list_devices.size()+3) * sizeof(char *) );
     p_item->ppsz_list_text =
-        (char **)realloc( p_item->ppsz_list_text,
+        (const char **)realloc( p_item->ppsz_list_text,
                           (list_devices.size()+3) * sizeof(char *) );
 
     list<string>::iterator iter;

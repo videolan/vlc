@@ -373,7 +373,7 @@ int config_AutoSaveConfigFile( vlc_object_t * );
 
 #define change_integer_list( list, list_text, list_update_func ) \
     p_config[i_config].i_list = sizeof(list)/sizeof(int); \
-    p_config[i_config].pi_list = list; \
+    p_config[i_config].pi_list = (int *)list; \
     p_config[i_config].ppsz_list_text = list_text;
 
 #define change_integer_range( min, max ) \
@@ -391,7 +391,7 @@ int config_AutoSaveConfigFile( vlc_object_t * );
     p_config[i_config].ppf_action = (vlc_callback_t *) \
       realloc( p_config[i_config].ppf_action, \
       (p_config[i_config].i_action + 1) * sizeof(void *) ); \
-    p_config[i_config].ppsz_action_text = (char **)\
+    p_config[i_config].ppsz_action_text = (const char **)\
       realloc( p_config[i_config].ppsz_action_text, \
       (p_config[i_config].i_action + 1) * sizeof(void *) ); \
     p_config[i_config].ppf_action[p_config[i_config].i_action] = pf_action; \
