@@ -132,7 +132,7 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
 
     do
         psz_local[i] = stupid[i];
-    while (n--);
+    while (i--);
 
     return FromLocaleDup( psz_local );
 }
