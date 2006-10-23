@@ -5175,7 +5175,7 @@ AS_IF([test "${enable_loader}" = "yes"],
     VLC_ADD_CPPFLAGS([quicktime],[-I../../@top_srcdir@/loader])
     VLC_ADD_LDFLAGS([quicktime],[../../loader/libloader.la])
     VLC_ADD_CPPFLAGS([realaudio],[-I../../@top_srcdir@/loader -DLOADER])
-    VLC_ADD_LDFLAGS([realaudio],[../../loader/libloader.la])
+    VLC_ADD_LDFLAGS([realaudio],[../../loader/libloader.la -ldl])
   ])
 
 dnl
