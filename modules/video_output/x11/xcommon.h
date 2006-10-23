@@ -27,7 +27,7 @@
 /*****************************************************************************
  * Defines
  *****************************************************************************/
-#ifdef MODULE_NAME_IS_xvideo
+#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
 #   define IMAGE_TYPE     XvImage
 #   define EXTRA_ARGS     int i_xvport, int i_chroma, int i_bits_per_pixel
 #   define EXTRA_ARGS_SHM int i_xvport, int i_chroma, XShmSegmentInfo *p_shm
@@ -50,6 +50,7 @@
 #define X112VLC_FOURCC( i ) \
         VLC_FOURCC( i & 0xff, (i >> 8) & 0xff, (i >> 16) & 0xff, \
                     (i >> 24) & 0xff )
+
 
 /*****************************************************************************
  * x11_window_t: X11 window descriptor
@@ -106,7 +107,7 @@ struct vout_sys_t
     vlc_bool_t          b_shm;               /* shared memory extension flag */
 #endif
 
-#ifdef MODULE_NAME_IS_xvideo
+#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
     int                 i_xvport;
 #else
     Colormap            colormap;               /* colormap used (8bpp only) */
@@ -149,6 +150,62 @@ struct vout_sys_t
     GLXContext          gwctx;
     GLXWindow           gwnd;
 #endif
+
+#ifdef MODULE_NAME_IS_xvmc
+    /* XvMC related stuff here */
+    xvmc_macroblocks_t  macroblocks;
+    xvmc_capabilities_t *xvmc_cap;
+    unsigned int        xvmc_num_cap;
+    unsigned int        xvmc_max_subpic_x;
+    unsigned int        xvmc_max_subpic_y;
+    int                 xvmc_eventbase;
+    int                 xvmc_errbase;
+    int                 hwSubpictures;
+    XvMCSubpicture      *old_subpic;
+    XvMCSubpicture      *new_subpic;
+    xx44_palette_t      palette;
+    int                 first_overlay;
+    float               cpu_saver;
+    int                 cpu_save_enabled;
+    int                 reverse_nvidia_palette;
+    int                 context_flags;
+
+    /*
+     * These variables are protected by the context lock:
+     */
+    unsigned            xvmc_cur_cap;
+    int                 xvmc_backend_subpic;
+    XvMCContext         context;
+    int                 contextActive;
+    xvmc_surface_handler_t xvmc_surf_handler;
+    unsigned            xvmc_mpeg;
+    unsigned            xvmc_accel;
+    unsigned            last_accel_request;
+    unsigned            xvmc_width;
+    unsigned            xvmc_height;
+    int                 have_xvmc_autopaint;
+    int                 xvmc_xoverlay_type;
+    int                 unsigned_intra;
+
+    /*
+     * Only creation and destruction of the below.
+     */
+    char                *xvmc_palette;
+    XvImage             *subImage;
+    XShmSegmentInfo     subShmInfo;
+
+    /*
+     * The mutex below is needed since XlockDisplay wasn't really enough
+     * to protect the XvMC Calls.
+     */
+    context_lock_t      xvmc_lock;
+    subpicture_t *      p_last_subtitle_save;
+    int                 xvmc_deinterlace_method;
+    int                 xvmc_crop_style;
+    mtime_t             last_date;
+
+    //alphablend_t       alphablend_extra_data;
+#endif
 };
 
 /*****************************************************************************
@@ -164,6 +221,14 @@ struct picture_sys_t
 #ifdef HAVE_SYS_SHM_H
     XShmSegmentInfo     shminfo;       /* shared memory zone information */
 #endif
+
+#ifdef MODULE_NAME_IS_xvmc
+    XvMCSurface         *xvmc_surf;
+    vlc_xxmc_t           xxmc_data;
+    int                  last_sw_format;
+    vout_thread_t        *p_vout;
+    int                  nb_display;
+#endif
 };
 
 /*****************************************************************************
@@ -174,6 +239,7 @@ struct picture_sys_t
  *****************************************************************************/
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
+
 typedef struct mwmhints_t
 {
     uint32_t flags;
@@ -181,7 +247,6 @@ typedef struct mwmhints_t
     uint32_t decorations;
     int32_t  input_mode;
     uint32_t status;
-
 } mwmhints_t;
 
 /*****************************************************************************
@@ -189,7 +254,125 @@ typedef struct mwmhints_t
  *****************************************************************************/
 #ifdef MODULE_NAME_IS_xvideo
 #   define MAX_DIRECTBUFFERS 10
+#elif defined(MODULE_NAME_IS_xvmc)
+#   define MAX_DIRECTBUFFERS 12
 #else
 #   define MAX_DIRECTBUFFERS 2
 #endif
 
+/*****************************************************************************
+ * Xxmc defines
+ *****************************************************************************/
+
+#ifdef MODULE_NAME_IS_xvmc
+
+typedef struct
+{         /* CLUT == Color LookUp Table */
+    uint8_t cb;
+    uint8_t cr;
+    uint8_t y;
+    uint8_t foo;
+} clut_t;
+
+#define XX44_PALETTE_SIZE 32
+#define OVL_PALETTE_SIZE 256
+#define XVMC_MAX_SURFACES 16
+#define XVMC_MAX_SUBPICTURES 4
+#define FOURCC_IA44 0x34344149
+#define FOURCC_AI44 0x34344941
+
+typedef struct
+{
+    unsigned size;
+    unsigned max_used;
+    uint32_t cluts[XX44_PALETTE_SIZE];
+    /* cache palette entries for both colors and clip_colors */
+    int lookup_cache[OVL_PALETTE_SIZE*2];
+} xx44_palette_t;
+
+/*
+ * Functions to handle the vlc-specific palette.
+ */
+
+void clear_xx44_palette( xx44_palette_t *p );
+
+/*
+ * Convert the xine-specific palette to something useful.
+ */
+
+void xx44_to_xvmc_palette( const xx44_palette_t *p,unsigned char *xvmc_palette,
+             unsigned first_xx44_entry, unsigned num_xx44_entries,
+             unsigned num_xvmc_components, char *xvmc_components );
+
+typedef struct
+{
+    vlc_macroblocks_t   vlc_mc;
+    XvMCBlockArray      blocks;            /* pointer to memory for dct block array  */
+    int                 num_blocks;
+    XvMCMacroBlock      *macroblockptr;     /* pointer to current macro block         */
+    XvMCMacroBlock      *macroblockbaseptr; /* pointer to base MacroBlock in MB array */
+    XvMCMacroBlockArray macro_blocks;      /* pointer to memory for macroblock array */
+    int                 slices;
+} xvmc_macroblocks_t;
+
+typedef struct
+{
+    unsigned int        mpeg_flags;
+    unsigned int        accel_flags;
+    unsigned int        max_width;
+    unsigned int        max_height;
+    unsigned int        sub_max_width;
+    unsigned int        sub_max_height;
+    int                 type_id;
+    XvImageFormatValues subPicType;
+    int                 flags;
+} xvmc_capabilities_t;
+
+typedef struct xvmc_surface_handler_s
+{
+    XvMCSurface         surfaces[XVMC_MAX_SURFACES];
+    int                 surfInUse[XVMC_MAX_SURFACES];
+    int                 surfValid[XVMC_MAX_SURFACES];
+    XvMCSubpicture      subpictures[XVMC_MAX_SUBPICTURES];
+    int                 subInUse[XVMC_MAX_SUBPICTURES];
+    int                 subValid[XVMC_MAX_SUBPICTURES];
+    pthread_mutex_t     mutex;
+} xvmc_surface_handler_t;
+
+typedef struct context_lock_s
+{
+    pthread_mutex_t     mutex;
+    pthread_cond_t      cond;
+    int                 num_readers;
+} context_lock_t;
+
+#define XVMCLOCKDISPLAY(display) XLockDisplay(display);
+#define XVMCUNLOCKDISPLAY(display) XUnlockDisplay(display);
+
+void xvmc_context_reader_unlock( context_lock_t *c );
+void xvmc_context_reader_lock( context_lock_t *c );
+void xvmc_context_writer_lock( context_lock_t *c );
+void xvmc_context_writer_unlock( context_lock_t *c );
+void free_context_lock( context_lock_t *c );
+void xxmc_dispose_context( vout_thread_t *p_vout );
+
+int xxmc_xvmc_surface_valid( vout_thread_t *p_vout, XvMCSurface *surf );
+void xxmc_xvmc_free_surface( vout_thread_t *p_vout, XvMCSurface *surf );
+
+void xvmc_vld_slice( picture_t *picture );
+void xvmc_vld_frame( picture_t *picture );
+
+void xxmc_do_update_frame( picture_t *picture, uint32_t width, uint32_t height,
+        double ratio, int format, int flags);
+
+int checkXvMCCap( vout_thread_t *p_vout);
+
+XvMCSubpicture *xxmc_xvmc_alloc_subpicture( vout_thread_t *p_vout,
+        XvMCContext *context, unsigned short width, unsigned short height,
+        int xvimage_id );
+
+void xxmc_xvmc_free_subpicture( vout_thread_t *p_vout, XvMCSubpicture *sub );
+void blend_xx44( uint8_t *dst_img, subpicture_t *sub_img, int dst_width,
+        int dst_height, int dst_pitch, xx44_palette_t *palette,int ia44);
+
+#endif

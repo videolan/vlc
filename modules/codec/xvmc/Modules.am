@@ -1,0 +1,19 @@
+SOURCES_xvmc = \
+	xxmc.c \
+	alloc.c \
+	cpu_accel.c \
+	cpu_state.c \
+	decode.c \
+	header.c \
+        motion_comp.c \
+        motion_comp_mmx.c \
+	slice.c \
+	slice_xvmc_vld.c \
+        accel_xvmc.h \
+        attributes.h \
+        xxmc-config.h \
+        mpeg2.h \
+        mpeg2_internal.h \
+        vlc.h \
+        xvmc_vld.h \
+	$(NULL)
