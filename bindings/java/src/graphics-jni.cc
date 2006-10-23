@@ -93,7 +93,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLCCanvas_paint (JNIEnv *env, job
 
   /* Now paint */
   value.i_int = reinterpret_cast<int>(dsi_win->hwnd); 
-  VLC_VariableSet( 1, "drawable", value );
+  VLC_VariableSet( 0, "drawable", value );
 
 #else // UNIX
   /* Get the platform-specific drawing info */
