@@ -1648,7 +1648,7 @@ static rtsp_client_t *RtspClientGet( sout_stream_t *p_stream, char *psz_session 
 {
     int i;
 
-    if( psz_session ) return NULL;
+    if( !psz_session ) return NULL;
 
     for( i = 0; i < p_stream->p_sys->i_rtsp; i++ )
     {
