@@ -474,11 +474,17 @@ VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, vlc_bool_t ) );
 VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
 
+typedef struct playlist_album_t
+{
+    char *psz_artist;
+    char *psz_album;
+    vlc_bool_t b_found;
+} playlist_album_t;
 
 int         input_MetaFetch     ( playlist_t *, input_item_t * );
-int         input_ArtFetch      ( playlist_t *, input_item_t * );
+int         input_ArtFind       ( playlist_t *, input_item_t * );
 vlc_bool_t  input_MetaSatisfied ( playlist_t*, input_item_t*,
-                                  uint32_t*, uint32_t*, vlc_bool_t );
+                                  uint32_t*, uint32_t* );
 int         input_DownloadAndCacheArt ( playlist_t *, input_item_t * );
 
 enum input_query_e

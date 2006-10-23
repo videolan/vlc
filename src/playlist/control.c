@@ -223,16 +223,16 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
     p.p_item = p_item;
     p.b_fetch_art = VLC_TRUE;
 
-    vlc_mutex_lock( &p_playlist->p_secondary_preparse->object_lock );
-    for( i = 0; i < p_playlist->p_secondary_preparse->i_waiting &&
-         p_playlist->p_secondary_preparse->p_waiting->b_fetch_art == VLC_TRUE;
+    vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
+    for( i = 0; i < p_playlist->p_fetcher->i_waiting &&
+         p_playlist->p_fetcher->p_waiting->b_fetch_art == VLC_TRUE;
          i++ );
     vlc_gc_incref( p_item );
-    INSERT_ELEM( p_playlist->p_secondary_preparse->p_waiting,
-                 p_playlist->p_secondary_preparse->i_waiting,
+    INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
+                 p_playlist->p_fetcher->i_waiting,
                  i, p );
-    vlc_mutex_unlock( &p_playlist->p_secondary_preparse->object_lock );
-    vlc_cond_signal( &p_playlist->p_secondary_preparse->object_wait );
+    vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
+    vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
     return VLC_SUCCESS;
 }
 

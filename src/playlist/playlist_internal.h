@@ -45,12 +45,15 @@ typedef struct preparse_item_t
     vlc_bool_t   b_fetch_art;
 } preparse_item_t;
 
-struct playlist_secondary_preparse_t
+struct playlist_fetcher_t
 {
     VLC_COMMON_MEMBERS
     vlc_mutex_t     lock;
+    int             i_art_policy;
     int             i_waiting;
     preparse_item_t *p_waiting;
+
+    DECL_ARRAY(playlist_album_t) albums;
 };
 
 /*****************************************************************************
@@ -65,7 +68,7 @@ void        playlist_Destroy  ( playlist_t * );
 void playlist_MainLoop( playlist_t * );
 void playlist_LastLoop( playlist_t * );
 void playlist_PreparseLoop( playlist_preparse_t * );
-void playlist_SecondaryPreparseLoop( playlist_secondary_preparse_t * );
+void playlist_FetcherLoop( playlist_fetcher_t * );
 
 void ResetCurrentlyPlaying( playlist_t *, vlc_bool_t, playlist_item_t * );
 
@@ -100,8 +103,8 @@ playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
  * @}
  */
 
-//#define PLAYLIST_DEBUG 1
-#undef PLAYLIST_DEBUG
+#define PLAYLIST_DEBUG 1
+//#undef PLAYLIST_DEBUG
 
 #ifdef PLAYLIST_DEBUG
 #define PL_DEBUG( msg, args... ) msg_Dbg( p_playlist, msg, ## args )

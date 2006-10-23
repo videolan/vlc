@@ -33,7 +33,7 @@
  *****************************************************************************/
 static void RunControlThread ( playlist_t * );
 static void RunPreparse( playlist_preparse_t * );
-static void RunSecondaryPreparse( playlist_secondary_preparse_t * );
+static void RunFetcher( playlist_fetcher_t * );
 
 static playlist_t * CreatePlaylist( vlc_object_t *p_parent );
 static void EndPlaylist( playlist_t * );
@@ -92,26 +92,28 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     }
 
     // Secondary Preparse
-    p_playlist->p_secondary_preparse = vlc_object_create( p_playlist,
-                              sizeof( playlist_secondary_preparse_t ) );
-    if( !p_playlist->p_secondary_preparse )
+    p_playlist->p_fetcher = vlc_object_create( p_playlist,
+                              sizeof( playlist_fetcher_t ) );
+    if( !p_playlist->p_fetcher )
     {
         msg_Err( p_playlist, "unable to create secondary preparser" );
         vlc_object_destroy( p_playlist );
         return;
     }
-    p_playlist->p_secondary_preparse->i_waiting = 0;
-    p_playlist->p_secondary_preparse->p_waiting = NULL;
+    p_playlist->p_fetcher->i_waiting = 0;
+    p_playlist->p_fetcher->p_waiting = NULL;
+    p_playlist->p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist,
+                                                                "album-art" );
 
-    vlc_object_attach( p_playlist->p_secondary_preparse, p_playlist );
-    if( vlc_thread_create( p_playlist->p_secondary_preparse,
-                           "secondary preparser",
-                           RunSecondaryPreparse,
+    vlc_object_attach( p_playlist->p_fetcher, p_playlist );
+    if( vlc_thread_create( p_playlist->p_fetcher,
+                           "fetcher",
+                           RunFetcher,
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {
         msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
-        vlc_object_detach( p_playlist->p_secondary_preparse );
-        vlc_object_destroy( p_playlist->p_secondary_preparse );
+        vlc_object_detach( p_playlist->p_fetcher );
+        vlc_object_destroy( p_playlist->p_fetcher );
         return;
     }
 
@@ -146,10 +148,10 @@ int playlist_ThreadDestroy( playlist_t * p_playlist )
         vlc_cond_signal( &p_playlist->p_preparse->object_wait );
         free( p_playlist->p_preparse->pp_waiting );
     }
-    if( p_playlist->p_secondary_preparse )
+    if( p_playlist->p_fetcher )
     {
-        vlc_cond_signal( &p_playlist->p_secondary_preparse->object_wait );
-        free( p_playlist->p_secondary_preparse->p_waiting );
+        vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
+        free( p_playlist->p_fetcher->p_waiting );
     }
 
     DestroyInteraction( p_playlist );
@@ -221,11 +223,11 @@ static void RunPreparse ( playlist_preparse_t *p_obj )
     playlist_PreparseLoop( p_obj );
 }
 
-static void RunSecondaryPreparse( playlist_secondary_preparse_t *p_obj )
+static void RunFetcher( playlist_fetcher_t *p_obj )
 {
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
-    playlist_SecondaryPreparseLoop( p_obj );
+    playlist_FetcherLoop( p_obj );
 }
 
 /*****************************************************************************

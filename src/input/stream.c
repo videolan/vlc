@@ -1416,7 +1416,7 @@ char * stream_ReadLine( stream_t *s )
         {
             int i_bom_size = 0;
             char *psz_encoding = NULL;
-            
+
             if( p_data[0] == 0xEF && p_data[1] == 0xBB && p_data[2] == 0xBF )
             {
                 psz_encoding = strdup( "UTF-8" );

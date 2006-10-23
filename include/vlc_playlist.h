@@ -141,7 +141,7 @@ struct playlist_t
     mtime_t               gc_date;
     vlc_bool_t            b_cant_sleep;
     playlist_preparse_t  *p_preparse; /**< Preparser object */
-    playlist_secondary_preparse_t *p_secondary_preparse;/**< Preparser object */
+    playlist_fetcher_t   *p_fetcher;/**< Meta and art fetcher object */
 
     vlc_mutex_t gc_lock;         /**< Lock to protect the garbage collection */
 

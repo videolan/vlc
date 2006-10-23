@@ -21,6 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/sout.h>
@@ -147,11 +148,11 @@ void playlist_Destroy( playlist_t *p_playlist )
     playlist_MLDump( p_playlist );
 
     vlc_thread_join( p_playlist->p_preparse );
-    vlc_thread_join( p_playlist->p_secondary_preparse );
+    vlc_thread_join( p_playlist->p_fetcher );
     vlc_thread_join( p_playlist );
 
     vlc_object_detach( p_playlist->p_preparse );
-    vlc_object_detach( p_playlist->p_secondary_preparse );
+    vlc_object_detach( p_playlist->p_fetcher );
 
     var_Destroy( p_playlist, "intf-change" );
     var_Destroy( p_playlist, "item-change" );
@@ -191,7 +192,7 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     vlc_mutex_destroy( &p_playlist->gc_lock );
     vlc_object_destroy( p_playlist->p_preparse );
-    vlc_object_destroy( p_playlist->p_secondary_preparse );
+    vlc_object_destroy( p_playlist->p_fetcher );
     vlc_object_detach( p_playlist );
     vlc_object_destroy( p_playlist );
 
@@ -511,29 +512,47 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
             PL_LOCK;
 
             /* If we haven't retrieved enough meta, add to secondary queue
-             * which will run the "meta fetchers"
-             * TODO:
-             *  don't do this for things we won't get meta for, like
-             *  videos
+             * which will run the "meta fetchers".
+             * This only checks for meta, not for art
+             * \todo don't do this for things we won't get meta for, like vids
              */
-            if( !input_MetaSatisfied( p_playlist, p_current, &i_m, &i_o,
-                                      VLC_TRUE ) )
+            if( !input_MetaSatisfied( p_playlist, p_current, &i_m, &i_o ) )
             {
                 preparse_item_t p;
+                PL_DEBUG("need to fetch meta for %s", p_current->psz_name );
                 p.p_item = p_current;
                 p.b_fetch_art = VLC_FALSE;
-                vlc_mutex_lock( &p_playlist->p_secondary_preparse->object_lock);
-                INSERT_ELEM( p_playlist->p_secondary_preparse->p_waiting,
-                             p_playlist->p_secondary_preparse->i_waiting,
-                             p_playlist->p_secondary_preparse->i_waiting,
+                vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
+                INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
+                             p_playlist->p_fetcher->i_waiting,
+                             p_playlist->p_fetcher->i_waiting,
                              p );
-                vlc_mutex_unlock(
-                            &p_playlist->p_secondary_preparse->object_lock);
-                vlc_cond_signal(
-                            &p_playlist->p_secondary_preparse->object_wait );
+                vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
+                vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
+            }
+            /* We already have all needed meta, but we need art right now */
+            else if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_ALL &&
+                     EMPTY_STR( p_current->p_meta->psz_arturl ) )
+            {
+                preparse_item_t p;
+                PL_DEBUG("meta ok for %s, need to fetch art",
+                                                         p_current->psz_name );
+                p.p_item = p_current;
+                p.b_fetch_art = VLC_TRUE;
+                vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
+                INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
+                             p_playlist->p_fetcher->i_waiting,
+                             p_playlist->p_fetcher->i_waiting,
+                             p );
+                vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
+                vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
             }
             else
+            {
+                PL_DEBUG( "no fetch required for %s (art currently %s)",
+                          p_current->psz_name, p_current->p_meta->psz_arturl );
                 vlc_gc_decref( p_current );
+            }
             PL_UNLOCK;
         }
         else
@@ -549,7 +568,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
 }
 
 /** Main loop for secondary preparser queue */
-void playlist_SecondaryPreparseLoop( playlist_secondary_preparse_t *p_obj )
+void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
 {
     playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
     vlc_bool_t b_fetch_art;
@@ -581,24 +600,43 @@ void playlist_SecondaryPreparseLoop( playlist_secondary_preparse_t *p_obj )
                 p_item->p_meta->i_status |= ITEM_META_FETCHED;
                 var_SetInteger( p_playlist, "item-change", p_item->i_id );
                 /*  Fetch right now */
-                if( var_GetInteger( p_playlist, "album-art" ) == ALBUM_ART_ALL )
+                if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_ALL )
                 {
                     vlc_mutex_lock( &p_obj->object_lock );
                     preparse_item_t p;
                     p.p_item = p_item;
                     p.b_fetch_art = VLC_TRUE;
-                    INSERT_ELEM( p_playlist->p_secondary_preparse->p_waiting,
-                                 p_playlist->p_secondary_preparse->i_waiting,
+                    INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
+                                 p_playlist->p_fetcher->i_waiting,
                                  0, p );
+                    PL_DEBUG("meta fetched for %s, get art", p_item->psz_name);
                     vlc_mutex_unlock( &p_obj->object_lock );
+                    continue;
                 }
                 else
                     vlc_gc_decref( p_item );
             }
             else
             {
-                input_ArtFetch( p_playlist, p_item );
-                p_item->p_meta->i_status |= ITEM_ART_FETCHED;
+                int i_ret = input_ArtFind( p_playlist, p_item );
+                if( i_ret == 1 )
+                {
+                    PL_DEBUG("downloading art for %s", p_item->psz_name );
+                    if( !input_DownloadAndCacheArt( p_playlist, p_item ) )
+                        p_item->p_meta->i_status |= ITEM_ART_NOTFOUND;
+                    else
+                        p_item->p_meta->i_status |= ITEM_ART_FETCHED;
+                }
+                else if( i_ret == 0 ) /* Was in cache */
+                {
+                    PL_DEBUG("found art for %s in cache", p_item->psz_name );
+                    p_item->p_meta->i_status |= ITEM_ART_FETCHED;
+                }
+                else
+                {
+                    PL_DEBUG("art not found for %s", p_item->psz_name );
+                    p_item->p_meta->i_status |= ITEM_ART_NOTFOUND;
+                }
                 vlc_gc_decref( p_item );
            }
         }

@@ -82,42 +82,37 @@ QSize savedVideoSize;
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
+    /* Configuration */
     settings = new QSettings( "VideoLAN", "VLC" );
     settings->beginGroup( "MainWindow" );
-
-    setAcceptDrops(true);
 
     need_components_update = false;
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
     embeddedPlaylistWasActive = videoIsActive = false;
 
-    /* Fetch configuration from settings and vlc config */
     videoEmbeddedFlag = false;
-    if( config_GetInt( p_intf, "embedded-video" ) )
-        videoEmbeddedFlag = true;
+    if( config_GetInt( p_intf, "embedded-video" ) ) videoEmbeddedFlag = true;
 
     alwaysVideoFlag = false;
     if( videoEmbeddedFlag && config_GetInt( p_intf, "qt-always-video" ))
         alwaysVideoFlag = true;
 
-    playlistEmbeddedFlag = settings->value( "playlist-embedded", true ).
-                                                                    toBool();
+    playlistEmbeddedFlag = settings->value("playlist-embedded", true).toBool();
     advControlsEnabled= settings->value( "adv-controls", false ).toBool();
     visualSelectorEnabled= settings->value( "visual-selector", false ).toBool();
 
+    /* UI */
     setWindowTitle( QString::fromUtf8( _("VLC media player") ) );
     handleMainUi( settings );
-
     QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag,
                              advControlsEnabled, visualSelectorEnabled );
-
-    /* Status bar */
     timeLabel = new QLabel( 0 );
     nameLabel = new QLabel( 0 );
     statusBar()->addWidget( nameLabel, 4 );
     statusBar()->addPermanentWidget( timeLabel, 1 );
 
     setFocusPolicy( Qt::StrongFocus );
+    setAcceptDrops(true);
 
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
@@ -139,51 +134,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
     p_intf->b_interaction = VLC_TRUE;
 }
-
-void MainInterface::dropEvent(QDropEvent *event)
-{
-     const QMimeData *mimeData = event->mimeData();
-
-     /* D&D of a subtitles file, add it on the fly */
-     if( mimeData->urls().size() == 1 )
-     {
-        if( THEMIM->getIM()->hasInput() )
-        {
-            if( input_AddSubtitles( THEMIM->getInput(),
-                                    qtu( mimeData->urls()[0].toString() ),
-                                    VLC_TRUE ) )
-            {
-                event->acceptProposedAction();
-                return;
-            }
-        }
-     }
-     bool first = true;
-     foreach( QUrl url, mimeData->urls() ) {
-        QString s = url.toString();
-        if( s.length() > 0 ) {
-            playlist_PlaylistAdd( THEPL, qtu(s), NULL,
-                                  PLAYLIST_APPEND | (first ? PLAYLIST_GO:0),
-                                  PLAYLIST_END );
-            first = false;
-        }
-     }
-     event->acceptProposedAction();
-}
-void MainInterface::dragEnterEvent(QDragEnterEvent *event)
-{
-     event->acceptProposedAction();
-}
-void MainInterface::dragMoveEvent(QDragMoveEvent *event)
-{
-     event->acceptProposedAction();
-}
-void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
-{
-     event->accept();
-}
-
-
 
 MainInterface::~MainInterface()
 {
@@ -389,8 +339,6 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
         {
             unsigned int i_width  = va_arg( args, unsigned int );
             unsigned int i_height = va_arg( args, unsigned int );
-//          if( !i_width && p_vout ) i_width = p_vout->i_window_width;
-//          if( !i_height && p_vout ) i_height = p_vout->i_window_height;
             videoWidget->widgetSize = QSize( i_width, i_height );
             videoWidget->updateGeometry();
             need_components_update = true;
@@ -462,8 +410,7 @@ void MainInterface::playlist()
                                                QSize( 650, 310 ) ).toSize();
         playlistWidget->hide();
     }
-    /// Todo, reset its size ?
-    if( VISIBLE( playlistWidget) )
+    if( VISIBLE( playlistWidget ) )
     {
         playlistWidget->hide();
         if( videoIsActive )
@@ -533,6 +480,53 @@ void MainInterface::customEvent( QEvent *event )
                                 visualSelectorEnabled);
         playlist();
     }
+}
+
+
+/************************************************************************
+ * D&D
+ ************************************************************************/
+void MainInterface::dropEvent(QDropEvent *event)
+{
+     const QMimeData *mimeData = event->mimeData();
+
+     /* D&D of a subtitles file, add it on the fly */
+     if( mimeData->urls().size() == 1 )
+     {
+        if( THEMIM->getIM()->hasInput() )
+        {
+            if( input_AddSubtitles( THEMIM->getInput(),
+                                    qtu( mimeData->urls()[0].toString() ),
+                                    VLC_TRUE ) )
+            {
+                event->acceptProposedAction();
+                return;
+            }
+        }
+     }
+     bool first = true;
+     foreach( QUrl url, mimeData->urls() ) {
+        QString s = url.toString();
+        if( s.length() > 0 ) {
+            playlist_PlaylistAdd( THEPL, qtu(s), NULL,
+                                  PLAYLIST_APPEND | (first ? PLAYLIST_GO:0),
+                                  PLAYLIST_END );
+            first = false;
+        }
+     }
+     event->acceptProposedAction();
+}
+void MainInterface::dragEnterEvent(QDragEnterEvent *event)
+{
+     event->acceptProposedAction();
+}
+void MainInterface::dragMoveEvent(QDragMoveEvent *event)
+{
+     event->acceptProposedAction();
+}
+void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
+{
+     event->accept();
 }
 
 /************************************************************************

@@ -51,6 +51,7 @@
 #define ITEM_META_FETCHED   0x02
 #define ITEM_ARTURL_FETCHED 0x04
 #define ITEM_ART_FETCHED    0x08
+#define ITEM_ART_NOTFOUND   0x10
 
 struct vlc_meta_t
 {
@@ -193,7 +194,8 @@ enum {
     ALBUM_ART_NEVER,
     ALBUM_ART_WHEN_ASKED,
     ALBUM_ART_WHEN_PLAYED,
-    ALBUM_ART_ALL };
+    ALBUM_ART_ALL
+};
 
 struct meta_export_t
 {

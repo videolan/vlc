@@ -236,7 +236,7 @@ typedef struct services_discovery_t services_discovery_t;
 typedef struct services_discovery_sys_t services_discovery_sys_t;
 typedef struct playlist_add_t playlist_add_t;
 typedef struct playlist_preparse_t playlist_preparse_t;
-typedef struct playlist_secondary_preparse_t playlist_secondary_preparse_t;
+typedef struct playlist_fetcher_t playlist_fetcher_t;
 
 /* Modules */
 typedef struct module_bank_t module_bank_t;
@@ -634,6 +634,8 @@ static int64_t GCD( int64_t a, int64_t b )
 
 #define FREENULL(a) if( a ) { free( a ); a = NULL; }
 #define FREE(a) if( a ) { free( a ); }
+
+#define EMPTY_STR(str) (!str || !*str)
 
 #include <vlc_arrays.h>
 
