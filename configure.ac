@@ -570,7 +570,7 @@ AC_CHECK_LIB(m,pow,[
   VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer param_eq vlc vorbis freetype mod mpc dmo quicktime realaudio galaktos opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
-  VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex],[-lm])
+  VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex mono],[-lm])
 ])
 AC_CHECK_LIB(m,ceil,[
   VLC_ADD_LDFLAGS([mosaic],[-lm])
