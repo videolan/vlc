@@ -217,3 +217,61 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1pauseMedia (JNIEnv *env, job
     }    
 }
 
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1seekMedia (JNIEnv *env, jobject _this, jstring name, jfloat percentage) 
+{
+    INIT_FUNCTION;
+    const char* psz_name = env->GetStringUTFChars( name, 0 );
+
+    libvlc_vlm_seek_media( (libvlc_instance_t *) instance, (char*)psz_name, (float)percentage, exception );
+    CHECK_EXCEPTION_FREE ;
+
+    if (psz_name != NULL) {
+        env->ReleaseStringUTFChars( name, psz_name );
+    }
+}
+
+JNIEXPORT jstring JNICALL Java_org_videolan_jvlc_VLM__1showMedia (JNIEnv *env, jobject _this, jstring name) 
+{
+    INIT_FUNCTION;
+    const char* psz_name = env->GetStringUTFChars( name, 0 );
+    char *psz_response;
+    jstring js_response;
+   
+    psz_response = libvlc_vlm_show_media( (libvlc_instance_t *) instance, (char*)psz_name, exception );
+    CHECK_EXCEPTION_FREE ;
+
+    if (psz_name != NULL) {
+        env->ReleaseStringUTFChars( name, psz_name );
+    }
+    js_response = env->NewStringUTF(psz_response);
+    if (psz_response != NULL) {
+        free(psz_response);
+    }
+    return js_response;
+}
+
+#define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, dummyGetType, dummyDefault)\
+JNIEXPORT j ## returnType JNICALL Java_org_videolan_jvlc_VLM__1getMedia ## attr(JNIEnv *env, jobject _this, jstring name, jint index) \
+{ \
+    INIT_FUNCTION; \
+    const char* psz_name = env->GetStringUTFChars( name, 0 ); \
+    returnType response; \
+    \
+    response = libvlc_vlm_get_media_ ## attr( (libvlc_instance_t *) instance, (char*)psz_name, (int)index, exception ); \
+    CHECK_EXCEPTION_FREE ; \
+    \
+    if (psz_name != NULL) { \
+        env->ReleaseStringUTFChars( name, psz_name ); \
+    } \
+    return response; \
+}
+
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( position, float, Float, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( time, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( length, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( rate, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( title, int, Integer, 0);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( chapter, int, Integer, 0);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
+
+#undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE

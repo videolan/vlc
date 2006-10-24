@@ -290,6 +290,141 @@ void libvlc_vlm_pause_media( libvlc_instance_t *p_instance, char *psz_name,
         libvlc_exception_raise( p_exception, "Unable to pause %s",
                                 psz_name );
     }
-    free( psz_message);
+    free( psz_message );
+#endif
+}
+
+void libvlc_vlm_seek_media( libvlc_instance_t *p_instance, char *psz_name,
+                            float f_percentage, libvlc_exception_t *p_exception )
+    
+{
+    char *psz_message;
+    vlm_message_t *answer;
+    CHECK_VLM;
+#ifdef ENABLE_VLM
+    asprintf( &psz_message, "control %s seek %f", psz_name, f_percentage );
+    vlm_ExecuteCommand( p_instance->p_vlm, psz_message, &answer );
+    if( answer->psz_value )
+    {
+        libvlc_exception_raise( p_exception, "Unable to seek %s to %f",
+                                psz_name, f_percentage );
+    }
+    free( psz_message );
+#endif
+}
+
+#ifdef ENABLE_VLM
+#define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, default)\
+returnType libvlc_vlm_get_media_## attr( libvlc_instance_t *p_instance, \
+                        char *psz_name, int i_instance, \
+                        libvlc_exception_t *p_exception ) \
+{ \
+    vlm_media_instance_t *p_media_instance; \
+    CHECK_VLM; \
+    vlm_media_t *p_media; \
+    p_media = vlm_MediaSearch( p_instance->p_vlm, psz_name ); \
+    if ( p_media == NULL ) \
+    { \
+        libvlc_exception_raise( p_exception, "Unable to find media %s", \
+                                psz_name); \
+    } \
+    else \
+    { \
+        if ( i_instance < p_media->i_instance ) \
+        { \
+            p_media_instance = p_media->instance[ i_instance ]; \
+            return var_Get ## getType( p_media_instance->p_input, #attr );\
+        } \
+        else \
+        { \
+            libvlc_exception_raise( p_exception, "Media index %i out of range",\
+                                    i_instance); \
+        } \
+    } \
+    return default; \
+}
+#else
+#define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, default)\
+returnType libvlc_vlm_get_media_## attr( libvlc_instance_t *p_instance, \
+                        char *psz_name, int i_instance, libvlc_exception_t *p_exception ) \
+{ \
+    char *psz_message; \
+    vlm_message_t *answer; \
+    CHECK_VLM; \
+    return default; \
+}
+#endif
+
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( position, float, Float, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( time, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( length, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( rate, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( title, int, Integer, 0);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( chapter, int, Integer, 0);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
+
+#undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
+
+char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
+                             libvlc_exception_t *p_exception )
+{
+    char* recurse_answer( char* psz_prefix, vlm_message_t *p_answer ) {
+        char* psz_childprefix;
+        char* psz_response="";
+        char* response_tmp;
+        int i;
+        vlm_message_t *aw_child, **paw_child;
+        
+        asprintf( &psz_childprefix, "%s%s.", psz_prefix, p_answer->psz_name );
+        
+        if ( p_answer->i_child )
+        {
+            paw_child = p_answer->child;
+            aw_child = *( paw_child );
+            for( i = 0; i < p_answer->i_child; i++ )
+            {
+                asprintf( &response_tmp, "%s%s%s:%s\n",
+                          psz_response, psz_prefix, aw_child->psz_name,
+                          aw_child->psz_value );
+                free( psz_response );
+                psz_response = response_tmp;
+                if ( aw_child->i_child )
+                {
+                    asprintf(&response_tmp, "%s%s", psz_response,
+                             recurse_answer(psz_childprefix, aw_child));
+                    free( psz_response );
+                    psz_response = response_tmp;
+                }
+                paw_child++;
+                aw_child = *( paw_child );
+            }
+        }
+        free( psz_childprefix );
+        return psz_response;
+    }
+    
+    char *psz_message;
+    vlm_message_t *answer;
+    char *psz_response;
+
+    CHECK_VLM;
+#ifdef ENABLE_VLM
+    asprintf( &psz_message, "show %s", psz_name );
+    asprintf( &psz_response, "", psz_name );
+    vlm_ExecuteCommand( p_instance->p_vlm, psz_message, &answer );
+    if( answer->psz_value )
+    {
+        libvlc_exception_raise( p_exception, "Unable to call show %s: %s",
+                                psz_name, answer->psz_value );
+    }
+    else
+    {
+        if ( answer->child )
+        {
+            psz_response = recurse_answer( "", answer );
+        }
+    }
+    free( psz_message );
+    return(psz_response );
 #endif
 }

@@ -19,6 +19,15 @@ public class VLM implements VLMIntf {
 	private native void _playMedia(String mediaName);
 	private native void _stopMedia(String mediaName);
 	private native void _pauseMedia(String mediaName);
+	private native void _seekMedia(String mediaName, float percentage);
+	private native String _showMedia(String mediaName);
+	private native float _getMediaposition(String name, int mediaInstance);
+	private native int _getMediatime(String name, int mediaInstance);
+	private native int _getMedialength(String name, int mediaInstance);
+	private native int _getMediarate(String name, int mediaInstance);
+	private native int _getMediatitle(String name, int mediaInstance);
+	private native int _getMediachapter(String name, int mediaInstance);
+	private native int _getMediaseekable(String name, int mediaInstance);
 
     public VLM( long instance ) {
     	this.libvlcInstance = instance;
@@ -68,6 +77,43 @@ public class VLM implements VLMIntf {
 		_pauseMedia(name);
 	}
 	
+	public void seekMedia(String name, float percentage) throws VLCException {
+		_seekMedia(name, percentage);
+	}
+
+	public String showMedia(String name) throws VLCException {
+		return _showMedia(name);
+	}
+	
+	public float getMediaPosition(String name, int mediaInstance) throws VLCException {
+		return _getMediaposition(name, mediaInstance);
+	}
+
+	public int getMediaTime(String name, int mediaInstance) throws VLCException {
+		return _getMediatime(name, mediaInstance);
+	}
+
+	public int getMediaLength(String name, int mediaInstance) throws VLCException {
+		return _getMedialength(name, mediaInstance);
+	}
+
+	public int getMediaRate(String name, int mediaInstance) throws VLCException {
+		return _getMediarate(name, mediaInstance);
+	}
+
+	public int getMediaTitle(String name, int mediaInstance) throws VLCException {
+		return _getMediatitle(name, mediaInstance);
+	}
+
+	public int getMediaChapter(String name, int mediaInstance) throws VLCException {
+		return _getMediachapter(name, mediaInstance);
+	}
+
+	public boolean getMediaSeekable(String name, int mediaInstance) throws VLCException {
+		return _getMediaseekable(name, mediaInstance) > 0;
+	}
+
+
 	public long getInstance() {
 		return libvlcInstance;
 	}

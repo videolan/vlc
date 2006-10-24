@@ -200,7 +200,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
     XSetBackground(dsi_x11->display, gc, 0);
 
     /* and reparent */
-    libvlc_video_reparent( input, dsi_x11->drawable, exception );
+    libvlc_video_reparent( input, (libvlc_drawable_t)dsi_x11->drawable, exception );
 
     CHECK_EXCEPTION_FREE ;
 

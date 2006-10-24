@@ -580,7 +580,37 @@ void libvlc_vlm_stop_media ( libvlc_instance_t *, char *, libvlc_exception_t * )
  */ 
 void libvlc_vlm_pause_media( libvlc_instance_t *, char *, libvlc_exception_t * );
     
-    
+/**
+ * Seeks in the named broadcast.
+ * \param p_instance the instance
+ * \param psz_name the name of the broadcast
+ * \param f_percentage the percentage to seek to
+ * \param p_exception an initialized exception
+ */ 
+void libvlc_vlm_seek_media( libvlc_instance_t *, char *,
+                            float, libvlc_exception_t * );
+   
+/**
+ * Return information of the named broadcast.
+ * \param p_instance the instance
+ * \param psz_name the name of the broadcast
+ * \param p_exception an initialized exception
+ */ 
+char* libvlc_vlm_show_media( libvlc_instance_t *, char *, libvlc_exception_t * );
+
+#define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, default)\
+returnType libvlc_vlm_get_media_## attr( libvlc_instance_t *, \
+                        char *, int , libvlc_exception_t * );
+
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( position, float, Float, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( time, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( length, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( rate, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( title, int, Integer, 0);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( chapter, int, Integer, 0);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
+
+#undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
 
 /** @} */
 /** @} */
