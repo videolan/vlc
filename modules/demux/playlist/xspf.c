@@ -43,6 +43,7 @@ struct demux_sys_t
     input_item_t **pp_tracklist;
     int i_tracklist_entries;
     int i_identifier;
+    char * psz_base;
 };
 
 static int Control( demux_t *, int, va_list );
@@ -61,6 +62,7 @@ int E_(Import_xspf)( vlc_object_t *p_this )
 void E_(Close_xspf)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
+    FREENULL( p_demux->p_sys->psz_base);
     free( p_demux->p_sys );
 }
 
@@ -79,6 +81,7 @@ int Demux( demux_t *p_demux )
     p_demux->p_sys->pp_tracklist = NULL;
     p_demux->p_sys->i_tracklist_entries = 0;
     p_demux->p_sys->i_identifier = -1;
+    p_demux->p_sys->psz_base = NULL;
 
     /* create new xml parser from stream */
     p_xml = xml_Create( p_demux );
@@ -188,6 +191,10 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
         /* attribute: xmlns */
         else if( !strcmp( psz_name, "xmlns" ) )
             ;
+        else if( !strcmp( psz_name, "xml:base" ) )
+        {
+            p_demux->p_sys->psz_base = decode_URI_duplicate( psz_value );
+        }
         /* unknown attribute */
         else
             msg_Warn( p_demux, "invalid <playlist> attribute:\"%s\"", psz_name);
@@ -526,6 +533,21 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
 
                     if( psz_uri )
                     {
+                        if( !strstr( psz_uri, "://" ) )
+                        {
+                           char* psz_tmp = malloc( 
+                                   strlen(p_demux->p_sys->psz_base) + 
+                                   strlen(psz_uri) +1 );
+                           if( !psz_tmp )
+                           {
+                               msg_Err( p_demux, "out of memory");
+                               return ENOMEM;
+                           }
+                           sprintf( psz_tmp, "%s%s", 
+                                    p_demux->p_sys->psz_base, psz_uri );
+                           free( psz_uri );
+                           psz_uri = psz_tmp;
+                        }
                         p_new_input = input_ItemNewExt( p_playlist, psz_uri,
                                                         NULL, 0, NULL, -1 );
                         p_new_input->p_meta = vlc_meta_New();
