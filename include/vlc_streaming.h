@@ -181,7 +181,7 @@ struct sout_chain_t
     sout_pcat_t **pp_pcats;
 };
 
-static inline sout_chain_t *streaming_ChainNew()
+static inline sout_chain_t *streaming_ChainNew(void)
 {
     DECMALLOC_NULL( p_chain, sout_chain_t );
     memset( p_chain, 0, sizeof( sout_chain_t ) );
