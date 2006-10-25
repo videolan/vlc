@@ -779,8 +779,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         if( (*ppsz_path)[0] != '/' )
 #endif
         {
-            if (asprintf( &psz_fullpath, "%s"DIR_SEP"%s",
-                          p_this->p_libvlc_global->psz_vlcpath, *ppsz_path ))
+            if( 0>= asprintf(&psz_fullpath, "%s"DIR_SEP"%s",
+                          p_this->p_libvlc_global->psz_vlcpath, *ppsz_path) )
                 psz_fullpath = NULL;
         }
         else
@@ -1117,7 +1117,7 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
  *****************************************************************************/
 static void DupModule( module_t *p_module )
 {
-    char **pp_shortcut;
+    const char **pp_shortcut;
     int i_submodule;
 
     for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
@@ -1151,7 +1151,7 @@ static void DupModule( module_t *p_module )
  *****************************************************************************/
 static void UndupModule( module_t *p_module )
 {
-    char **pp_shortcut;
+    const char **pp_shortcut;
     int i_submodule;
 
     for( i_submodule = 0; i_submodule < p_module->i_children; i_submodule++ )
@@ -1161,17 +1161,17 @@ static void UndupModule( module_t *p_module )
 
     for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
     {
-        free( *pp_shortcut );
+        free( (void *)*pp_shortcut );
     }
 
-    free( p_module->psz_object_name );
-    free( p_module->psz_capability );
-    if( p_module->psz_shortname ) free( p_module->psz_shortname );
-    free( p_module->psz_longname );
+    free( (void *)p_module->psz_object_name );
+    free( (void *)p_module->psz_capability );
+    if( p_module->psz_shortname ) free( (void *)p_module->psz_shortname );
+    free( (void *)p_module->psz_longname );
 
     if( p_module->psz_program != NULL )
     {
-        free( p_module->psz_program );
+        free( (void *)p_module->psz_program );
     }
 }
 
@@ -1265,7 +1265,7 @@ static int DeleteModule( module_t * p_module )
  *****************************************************************************/
 static int CallEntry( module_t * p_module )
 {
-    static char *psz_name = "vlc_entry" MODULE_SUFFIX;
+    static const char * const psz_name = "vlc_entry" MODULE_SUFFIX;
     int (* pf_symbol) ( module_t * p_module );
 
     /* Try to resolve the symbol */
@@ -1699,16 +1699,16 @@ static void CacheLoad( vlc_object_t *p_this )
                    malloc( i_cache * sizeof(void *) );
 
 #define LOAD_IMMEDIATE(a) \
-    if( fread( &a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
+    if( fread( (void *)&a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
 #define LOAD_STRING(a) \
     { if( fread( &i_size, sizeof(char), sizeof(i_size), file ) \
           != sizeof(i_size) ) goto error; \
       if( i_size && i_size < 16384 ) { \
           a = malloc( i_size ); \
-          if( fread( a, sizeof(char), i_size, file ) != (size_t)i_size ) \
+          if( fread( (void *)a, sizeof(char), i_size, file ) != (size_t)i_size ) \
               goto error; \
           if( a[i_size-1] ) { \
-              free( a ); a = 0; \
+              free( (void *)a ); a = 0; \
               goto error; } \
       } else a = 0; \
     } while(0)
@@ -2123,8 +2123,8 @@ static char *CacheName( void )
 
     /* Code int size, pointer size and endianness in the filename */
     int32_t x = 0xbe00001e;
-    sprintf( psz_cachename, "plugins-%.2x%.2x%.2x.dat", sizeof(int),
-             sizeof(void *), (unsigned int)((unsigned char *)&x)[0] );
+    sprintf( psz_cachename, "plugins-%.2x%.2x%.2x.dat", (int)sizeof(int),
+             (int)sizeof(void *), (unsigned int)((unsigned char *)&x)[0] );
     return psz_cachename;
 }
 
