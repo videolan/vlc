@@ -967,6 +967,11 @@ static struct
       VIDEO_ES, "BMP Image" },
 #endif
 
+#if LIBAVCODEC_BUILD >= ((51<<16)+(21<<8)+0)
+    { VLC_FOURCC('g','i','f',' '), CODEC_ID_GIF,
+      VIDEO_ES, "GIF Image" },
+#endif
+
     /*
      *  Audio Codecs
      */
