@@ -533,7 +533,8 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
 
                     if( psz_uri )
                     {
-                        if( !strstr( psz_uri, "://" ) )
+                        if( p_demux->p_sys->psz_base && 
+                            !strstr( psz_uri, "://" ) )
                         {
                            char* psz_tmp = malloc( 
                                    strlen(p_demux->p_sys->psz_base) + 
@@ -541,7 +542,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                            if( !psz_tmp )
                            {
                                msg_Err( p_demux, "out of memory");
-                               return ENOMEM;
+                               return VLC_FALSE;
                            }
                            sprintf( psz_tmp, "%s%s", 
                                     p_demux->p_sys->psz_base, psz_uri );
