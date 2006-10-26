@@ -126,7 +126,7 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
     while (stupid[n])
         n++;
 
-    char psz_local[i + 1];
+    char psz_local[n + 1];
     for (size_t i = 0; i < n; i++)
         psz_local[i] = stupid[i];
 
