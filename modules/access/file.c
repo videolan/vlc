@@ -227,14 +227,13 @@ static int Open( vlc_object_t *p_this )
             p_sys->b_seekable = VLC_TRUE;
         }
 #elif defined( HAVE_SYS_STAT_H )
-        else if( S_ISREG(stat_info.st_mode) || S_ISCHR(stat_info.st_mode) ||
-                 S_ISBLK(stat_info.st_mode) )
+        else if( S_ISREG(stat_info.st_mode) || S_ISBLK(stat_info.st_mode) )
         {
             p_sys->b_seekable = VLC_TRUE;
             p_access->info.i_size = stat_info.st_size;
         }
-        else if( S_ISFIFO(stat_info.st_mode)
-#   if !defined( SYS_BEOS ) && !defined( WIN32 )
+        else if( S_ISCHR(stat_info.st_mode) || S_ISFIFO(stat_info.st_mode)
+#   ifdef S_ISSOCK
                   || S_ISSOCK(stat_info.st_mode)
 #   endif
                )
