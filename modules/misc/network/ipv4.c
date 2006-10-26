@@ -219,7 +219,7 @@ static int OpenUDP( vlc_object_t * p_this )
     {
         struct sockaddr_in stupid = { .sin_family = AF_INET };
 
-        if( bind( i_handle, (struct sockaddr *)&stupid, sizeof( sock ) < 0 ) )
+        if( bind( i_handle, (struct sockaddr *)&stupid, sizeof( stupid ) ) < 0 )
         {
             msg_Warn( p_this, "cannot bind socket (%d)", WSAGetLastError() );
             close( i_handle );
