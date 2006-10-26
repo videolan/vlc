@@ -122,17 +122,17 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
      * UTF-8 but also Windows-1252(!) and ISO-8859-15(!) or any
      * non-western encoding, it obviously fails.
      */
-    size_t i = 0;
-    while (stupid[i])
-        i++;
+    size_t n = 0;
+    while (stupid[n])
+        n++;
 
     char psz_local[i + 1];
-    if ((i >= 1) && (stupid[i - 1] == '\n'))
-        i--;
-
-    do
+    for (size_t i = 0; i < n; i++)
         psz_local[i] = stupid[i];
-    while (i--);
+
+    // Kludge for (broken?) apps that adds a LF at the end of DnD
+    if ((n >= 1) && (strchr ("\n\r", stupid[n - 1]) != NULL))
+        psz_local[n - 1] = '\0';
 
     return FromLocaleDup( psz_local );
 }
