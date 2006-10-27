@@ -3061,5 +3061,27 @@ static int WindowOnTop( vout_thread_t *p_vout, vlc_bool_t b_on_top )
                     (XEvent*)&event );
     }
 
+    /* use _NET_WM_STATE_ABOVE if window manager
+     * doesn't handle _NET_WM_STATE_STAYS_ON_TOP */
+    else if( p_vout->p_sys->b_net_wm_state_above )
+    {
+        XClientMessageEvent event;
+
+        memset( &event, 0, sizeof( XClientMessageEvent ) );
+
+        event.type = ClientMessage;
+        event.message_type = p_vout->p_sys->net_wm_state;
+        event.display = p_vout->p_sys->p_display;
+        event.window = p_vout->p_sys->p_win->base_window;
+        event.format = 32;
+        event.data.l[ 0 ] = b_on_top; /* set property */
+        event.data.l[ 1 ] = p_vout->p_sys->net_wm_state_above;
+
+        XSendEvent( p_vout->p_sys->p_display,
+                    DefaultRootWindow( p_vout->p_sys->p_display ),
+                    False, SubstructureRedirectMask,
+                    (XEvent*)&event );
+    }
+
     return VLC_SUCCESS;
 }
