@@ -26,7 +26,7 @@ EXTRA_DIST = \
 	toolbox \
 	vlc-api.pl \
 	vlc-config.in.in \
-	vlc.fedora4.spec \
+	vlc.fedora.spec \
 	vlc.mandriva.spec \
 	vlc.altlinux.spec \
 	vlc.win32.nsi.in \
