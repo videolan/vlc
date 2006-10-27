@@ -26,8 +26,9 @@ EXTRA_DIST = \
 	toolbox \
 	vlc-api.pl \
 	vlc-config.in.in \
-	vlc.spec \
-	vlc.spec.mdk \
+	vlc.fedora4.spec \
+	vlc.mandriva.spec \
+	vlc.altlinux.spec \
 	vlc.win32.nsi.in \
 	$(NULL)
 
