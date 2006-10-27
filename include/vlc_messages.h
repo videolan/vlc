@@ -196,6 +196,7 @@ void __msg_Destroy ( vlc_object_t * );
 VLC_EXPORT( msg_subscription_t*, __msg_Subscribe, ( vlc_object_t *, int ) );
 VLC_EXPORT( void, __msg_Unsubscribe, ( vlc_object_t *, msg_subscription_t * ) );
 
+const char *msg_GetObjectTypeName(int i_object_type );
 
 /**
  * @}

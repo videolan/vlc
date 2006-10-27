@@ -194,6 +194,35 @@ void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
     UNLOCK_BANK;
 }
 
+const char *msg_GetObjectTypeName(int i_object_type )
+{
+    switch( i_object_type )
+    {
+        case VLC_OBJECT_ROOT: return "root";
+        case VLC_OBJECT_LIBVLC: return "libvlc";
+        case VLC_OBJECT_MODULE: return "module";
+        case VLC_OBJECT_INTF: return "interface";
+        case VLC_OBJECT_PLAYLIST: return "playlist";
+        case VLC_OBJECT_ITEM: return "item";
+        case VLC_OBJECT_INPUT: return "input";
+        case VLC_OBJECT_DECODER: return "decoder";
+        case VLC_OBJECT_PACKETIZER: return "packetizer";
+        case VLC_OBJECT_ENCODER: return "encoder";
+        case VLC_OBJECT_VOUT: return "video output";
+        case VLC_OBJECT_AOUT: return "audio output";
+        case VLC_OBJECT_SOUT: return "stream output";
+        case VLC_OBJECT_HTTPD: return "http server";
+        case VLC_OBJECT_HTTPD_HOST: return "http server";
+        case VLC_OBJECT_DIALOGS: return "dialogs provider";
+        case VLC_OBJECT_VLM: return "vlm";
+        case VLC_OBJECT_ANNOUNCE: return "announce handler";
+        case VLC_OBJECT_DEMUX: return "demuxer";
+        case VLC_OBJECT_ACCESS: return "access";
+        case VLC_OBJECT_META_ENGINE: return "meta engine";
+        default: return "private";
+    }
+}
+
 /*****************************************************************************
  * __msg_*: print a message
  *****************************************************************************
@@ -481,7 +510,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 #endif
     static const char * ppsz_type[4] = { "", " error", " warning", " debug" };
     static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
-    const char *psz_object = "private";
+    const char *psz_object;
     int i_type = p_item->i_type;
 
     switch( i_type )
@@ -500,30 +529,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
             break;
     }
 
-    switch( p_item->i_object_type )
-    {
-        case VLC_OBJECT_ROOT: psz_object = "root"; break;
-        case VLC_OBJECT_LIBVLC: psz_object = "libvlc"; break;
-        case VLC_OBJECT_MODULE: psz_object = "module"; break;
-        case VLC_OBJECT_INTF: psz_object = "interface"; break;
-        case VLC_OBJECT_PLAYLIST: psz_object = "playlist"; break;
-        case VLC_OBJECT_ITEM: psz_object = "item"; break;
-        case VLC_OBJECT_INPUT: psz_object = "input"; break;
-        case VLC_OBJECT_DECODER: psz_object = "decoder"; break;
-        case VLC_OBJECT_PACKETIZER: psz_object = "packetizer"; break;
-        case VLC_OBJECT_ENCODER: psz_object = "encoder"; break;
-        case VLC_OBJECT_VOUT: psz_object = "video output"; break;
-        case VLC_OBJECT_AOUT: psz_object = "audio output"; break;
-        case VLC_OBJECT_SOUT: psz_object = "stream output"; break;
-        case VLC_OBJECT_HTTPD: psz_object = "http server"; break;
-        case VLC_OBJECT_HTTPD_HOST: psz_object = "http server"; break;
-        case VLC_OBJECT_DIALOGS: psz_object = "dialogs provider"; break;
-        case VLC_OBJECT_VLM: psz_object = "vlm"; break;
-        case VLC_OBJECT_ANNOUNCE: psz_object = "announce handler"; break;
-        case VLC_OBJECT_DEMUX: psz_object = "demuxer"; break;
-        case VLC_OBJECT_ACCESS: psz_object = "access"; break;
-        case VLC_OBJECT_META_ENGINE: psz_object = "meta engine"; break;
-    }
+    psz_object = msg_GetObjectTypeName(p_item->i_object_type);
 
 #ifdef UNDER_CE
 #   define CE_WRITE(str) WriteFile( QUEUE(MSG_QUEUE_NORMAL).logfile, \
