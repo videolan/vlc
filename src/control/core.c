@@ -58,7 +58,7 @@ inline char* libvlc_exception_get_message( libvlc_exception_t *p_exception )
 }
 
 inline void libvlc_exception_raise( libvlc_exception_t *p_exception,
-                                    char *psz_format, ... )
+                                    const char *psz_format, ... )
 {
     va_list args;
 
