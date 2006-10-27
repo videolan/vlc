@@ -26,6 +26,26 @@ typedef interface IVLCAudio IVLCAudio;
 typedef interface IVLCInput IVLCInput;
 #endif
 
+#ifndef __IVLCLog_FWD_DEFINED__
+#define __IVLCLog_FWD_DEFINED__
+typedef interface IVLCLog IVLCLog;
+#endif
+
+#ifndef __IVLCMessage_FWD_DEFINED__
+#define __IVLCMessage_FWD_DEFINED__
+typedef interface IVLCMessage IVLCMessage;
+#endif
+
+#ifndef __IVLCMessageIterator_FWD_DEFINED__
+#define __IVLCMessageIterator_FWD_DEFINED__
+typedef interface IVLCMessageIterator IVLCMessageIterator;
+#endif
+
+#ifndef __IVLCMessages_FWD_DEFINED__
+#define __IVLCMessages_FWD_DEFINED__
+typedef interface IVLCMessages IVLCMessages;
+#endif
+
 #ifndef __IVLCPlaylist_FWD_DEFINED__
 #define __IVLCPlaylist_FWD_DEFINED__
 typedef interface IVLCPlaylist IVLCPlaylist;
@@ -786,10 +806,10 @@ interface IVLCAudio : public IDispatch
         VARIANT_BOOL muted) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_volume(
-        int* volume) = 0;
+        long* volume) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE put_volume(
-        int volume) = 0;
+        long volume) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE toggleMute(
         ) = 0;
@@ -852,11 +872,11 @@ typedef struct IVLCAudioVtbl {
 
     HRESULT (STDMETHODCALLTYPE *get_volume)(
         IVLCAudio* This,
-        int* volume);
+        long* volume);
 
     HRESULT (STDMETHODCALLTYPE *put_volume)(
         IVLCAudio* This,
-        int volume);
+        long volume);
 
     HRESULT (STDMETHODCALLTYPE *toggleMute)(
         IVLCAudio* This);
@@ -905,7 +925,7 @@ void __RPC_STUB IVLCAudio_put_mute_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCAudio_get_volume_Proxy(
     IVLCAudio* This,
-    int* volume);
+    long* volume);
 void __RPC_STUB IVLCAudio_get_volume_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -913,7 +933,7 @@ void __RPC_STUB IVLCAudio_get_volume_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCAudio_put_volume_Proxy(
     IVLCAudio* This,
-    int volume);
+    long volume);
 void __RPC_STUB IVLCAudio_put_volume_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -943,10 +963,10 @@ interface IVLCInput : public IDispatch
         double* length) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_position(
-        float* position) = 0;
+        double* position) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE put_position(
-        float position) = 0;
+        double position) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_time(
         double* time) = 0;
@@ -955,16 +975,16 @@ interface IVLCInput : public IDispatch
         double time) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_state(
-        int* state) = 0;
+        long* state) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_rate(
-        float* rate) = 0;
+        double* rate) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE put_rate(
-        float rate) = 0;
+        double rate) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_fps(
-        float* fps) = 0;
+        double* fps) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_hasVout(
         VARIANT_BOOL* hasVout) = 0;
@@ -1023,11 +1043,11 @@ typedef struct IVLCInputVtbl {
 
     HRESULT (STDMETHODCALLTYPE *get_position)(
         IVLCInput* This,
-        float* position);
+        double* position);
 
     HRESULT (STDMETHODCALLTYPE *put_position)(
         IVLCInput* This,
-        float position);
+        double position);
 
     HRESULT (STDMETHODCALLTYPE *get_time)(
         IVLCInput* This,
@@ -1039,19 +1059,19 @@ typedef struct IVLCInputVtbl {
 
     HRESULT (STDMETHODCALLTYPE *get_state)(
         IVLCInput* This,
-        int* state);
+        long* state);
 
     HRESULT (STDMETHODCALLTYPE *get_rate)(
         IVLCInput* This,
-        float* rate);
+        double* rate);
 
     HRESULT (STDMETHODCALLTYPE *put_rate)(
         IVLCInput* This,
-        float rate);
+        double rate);
 
     HRESULT (STDMETHODCALLTYPE *get_fps)(
         IVLCInput* This,
-        float* fps);
+        double* fps);
 
     HRESULT (STDMETHODCALLTYPE *get_hasVout)(
         IVLCInput* This,
@@ -1098,7 +1118,7 @@ void __RPC_STUB IVLCInput_get_length_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCInput_get_position_Proxy(
     IVLCInput* This,
-    float* position);
+    double* position);
 void __RPC_STUB IVLCInput_get_position_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1106,7 +1126,7 @@ void __RPC_STUB IVLCInput_get_position_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCInput_put_position_Proxy(
     IVLCInput* This,
-    float position);
+    double position);
 void __RPC_STUB IVLCInput_put_position_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1130,7 +1150,7 @@ void __RPC_STUB IVLCInput_put_time_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCInput_get_state_Proxy(
     IVLCInput* This,
-    int* state);
+    long* state);
 void __RPC_STUB IVLCInput_get_state_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1138,7 +1158,7 @@ void __RPC_STUB IVLCInput_get_state_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCInput_get_rate_Proxy(
     IVLCInput* This,
-    float* rate);
+    double* rate);
 void __RPC_STUB IVLCInput_get_rate_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1146,7 +1166,7 @@ void __RPC_STUB IVLCInput_get_rate_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCInput_put_rate_Proxy(
     IVLCInput* This,
-    float rate);
+    double rate);
 void __RPC_STUB IVLCInput_put_rate_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1154,7 +1174,7 @@ void __RPC_STUB IVLCInput_put_rate_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCInput_get_fps_Proxy(
     IVLCInput* This,
-    float* fps);
+    double* fps);
 void __RPC_STUB IVLCInput_get_fps_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1172,6 +1192,572 @@ void __RPC_STUB IVLCInput_get_hasVout_Stub(
 #endif  /* __IVLCInput_INTERFACE_DEFINED__ */
 
 /*****************************************************************************
+ * IVLCMessage interface
+ */
+#ifndef __IVLCMessage_INTERFACE_DEFINED__
+#define __IVLCMessage_INTERFACE_DEFINED__
+
+DEFINE_GUID(IID_IVLCMessage, 0x9ed00afa, 0x7bcd, 0x4fff, 0x8d,0x48, 0x7d,0xd4,0xdb,0x2c,0x80,0x0d);
+#if defined(__cplusplus) && !defined(CINTERFACE)
+interface IVLCMessage : public IDispatch
+{
+    virtual HRESULT STDMETHODCALLTYPE get__Value(
+        VARIANT* message) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_severity(
+        long* level) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_type(
+        BSTR* type) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_name(
+        BSTR* name) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_header(
+        BSTR* header) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_message(
+        BSTR* message) = 0;
+
+};
+#else
+typedef struct IVLCMessageVtbl {
+    BEGIN_INTERFACE
+
+    /*** IUnknown methods ***/
+    HRESULT (STDMETHODCALLTYPE *QueryInterface)(
+        IVLCMessage* This,
+        REFIID riid,
+        void** ppvObject);
+
+    ULONG (STDMETHODCALLTYPE *AddRef)(
+        IVLCMessage* This);
+
+    ULONG (STDMETHODCALLTYPE *Release)(
+        IVLCMessage* This);
+
+    /*** IDispatch methods ***/
+    HRESULT (STDMETHODCALLTYPE *GetTypeInfoCount)(
+        IVLCMessage* This,
+        UINT* pctinfo);
+
+    HRESULT (STDMETHODCALLTYPE *GetTypeInfo)(
+        IVLCMessage* This,
+        UINT iTInfo,
+        LCID lcid,
+        ITypeInfo** ppTInfo);
+
+    HRESULT (STDMETHODCALLTYPE *GetIDsOfNames)(
+        IVLCMessage* This,
+        REFIID riid,
+        LPOLESTR* rgszNames,
+        UINT cNames,
+        LCID lcid,
+        DISPID* rgDispId);
+
+    HRESULT (STDMETHODCALLTYPE *Invoke)(
+        IVLCMessage* This,
+        DISPID dispIdMember,
+        REFIID riid,
+        LCID lcid,
+        WORD wFlags,
+        DISPPARAMS* pDispParams,
+        VARIANT* pVarResult,
+        EXCEPINFO* pExcepInfo,
+        UINT* puArgErr);
+
+    /*** IVLCMessage methods ***/
+    HRESULT (STDMETHODCALLTYPE *get__Value)(
+        IVLCMessage* This,
+        VARIANT* message);
+
+    HRESULT (STDMETHODCALLTYPE *get_severity)(
+        IVLCMessage* This,
+        long* level);
+
+    HRESULT (STDMETHODCALLTYPE *get_type)(
+        IVLCMessage* This,
+        BSTR* type);
+
+    HRESULT (STDMETHODCALLTYPE *get_name)(
+        IVLCMessage* This,
+        BSTR* name);
+
+    HRESULT (STDMETHODCALLTYPE *get_header)(
+        IVLCMessage* This,
+        BSTR* header);
+
+    HRESULT (STDMETHODCALLTYPE *get_message)(
+        IVLCMessage* This,
+        BSTR* message);
+
+    END_INTERFACE
+} IVLCMessageVtbl;
+interface IVLCMessage {
+    const IVLCMessageVtbl* lpVtbl;
+};
+
+#ifdef COBJMACROS
+/*** IUnknown methods ***/
+#define IVLCMessage_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
+#define IVLCMessage_AddRef(p) (p)->lpVtbl->AddRef(p)
+#define IVLCMessage_Release(p) (p)->lpVtbl->Release(p)
+/*** IDispatch methods ***/
+#define IVLCMessage_GetTypeInfoCount(p,a) (p)->lpVtbl->GetTypeInfoCount(p,a)
+#define IVLCMessage_GetTypeInfo(p,a,b,c) (p)->lpVtbl->GetTypeInfo(p,a,b,c)
+#define IVLCMessage_GetIDsOfNames(p,a,b,c,d,e) (p)->lpVtbl->GetIDsOfNames(p,a,b,c,d,e)
+#define IVLCMessage_Invoke(p,a,b,c,d,e,f,g,h) (p)->lpVtbl->Invoke(p,a,b,c,d,e,f,g,h)
+/*** IVLCMessage methods ***/
+#define IVLCMessage_get__Value(p,a) (p)->lpVtbl->get__Value(p,a)
+#define IVLCMessage_get_severity(p,a) (p)->lpVtbl->get_severity(p,a)
+#define IVLCMessage_get_type(p,a) (p)->lpVtbl->get_type(p,a)
+#define IVLCMessage_get_name(p,a) (p)->lpVtbl->get_name(p,a)
+#define IVLCMessage_get_header(p,a) (p)->lpVtbl->get_header(p,a)
+#define IVLCMessage_get_message(p,a) (p)->lpVtbl->get_message(p,a)
+#endif
+
+#endif
+
+HRESULT CALLBACK IVLCMessage_get__Value_Proxy(
+    IVLCMessage* This,
+    VARIANT* message);
+void __RPC_STUB IVLCMessage_get__Value_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCMessage_get_severity_Proxy(
+    IVLCMessage* This,
+    long* level);
+void __RPC_STUB IVLCMessage_get_severity_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCMessage_get_type_Proxy(
+    IVLCMessage* This,
+    BSTR* type);
+void __RPC_STUB IVLCMessage_get_type_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCMessage_get_name_Proxy(
+    IVLCMessage* This,
+    BSTR* name);
+void __RPC_STUB IVLCMessage_get_name_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCMessage_get_header_Proxy(
+    IVLCMessage* This,
+    BSTR* header);
+void __RPC_STUB IVLCMessage_get_header_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCMessage_get_message_Proxy(
+    IVLCMessage* This,
+    BSTR* message);
+void __RPC_STUB IVLCMessage_get_message_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+
+#endif  /* __IVLCMessage_INTERFACE_DEFINED__ */
+
+/*****************************************************************************
+ * IVLCMessageIterator interface
+ */
+#ifndef __IVLCMessageIterator_INTERFACE_DEFINED__
+#define __IVLCMessageIterator_INTERFACE_DEFINED__
+
+DEFINE_GUID(IID_IVLCMessageIterator, 0x15179cd8, 0xcc12, 0x4242, 0xa5,0x8e, 0xe4,0x12,0x21,0x7f,0xf3,0x43);
+#if defined(__cplusplus) && !defined(CINTERFACE)
+interface IVLCMessageIterator : public IDispatch
+{
+    virtual HRESULT STDMETHODCALLTYPE get_hasNext(
+        VARIANT_BOOL* hasNext) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE next(
+        IVLCMessage** msg) = 0;
+
+};
+#else
+typedef struct IVLCMessageIteratorVtbl {
+    BEGIN_INTERFACE
+
+    /*** IUnknown methods ***/
+    HRESULT (STDMETHODCALLTYPE *QueryInterface)(
+        IVLCMessageIterator* This,
+        REFIID riid,
+        void** ppvObject);
+
+    ULONG (STDMETHODCALLTYPE *AddRef)(
+        IVLCMessageIterator* This);
+
+    ULONG (STDMETHODCALLTYPE *Release)(
+        IVLCMessageIterator* This);
+
+    /*** IDispatch methods ***/
+    HRESULT (STDMETHODCALLTYPE *GetTypeInfoCount)(
+        IVLCMessageIterator* This,
+        UINT* pctinfo);
+
+    HRESULT (STDMETHODCALLTYPE *GetTypeInfo)(
+        IVLCMessageIterator* This,
+        UINT iTInfo,
+        LCID lcid,
+        ITypeInfo** ppTInfo);
+
+    HRESULT (STDMETHODCALLTYPE *GetIDsOfNames)(
+        IVLCMessageIterator* This,
+        REFIID riid,
+        LPOLESTR* rgszNames,
+        UINT cNames,
+        LCID lcid,
+        DISPID* rgDispId);
+
+    HRESULT (STDMETHODCALLTYPE *Invoke)(
+        IVLCMessageIterator* This,
+        DISPID dispIdMember,
+        REFIID riid,
+        LCID lcid,
+        WORD wFlags,
+        DISPPARAMS* pDispParams,
+        VARIANT* pVarResult,
+        EXCEPINFO* pExcepInfo,
+        UINT* puArgErr);
+
+    /*** IVLCMessageIterator methods ***/
+    HRESULT (STDMETHODCALLTYPE *get_hasNext)(
+        IVLCMessageIterator* This,
+        VARIANT_BOOL* hasNext);
+
+    HRESULT (STDMETHODCALLTYPE *next)(
+        IVLCMessageIterator* This,
+        IVLCMessage** msg);
+
+    END_INTERFACE
+} IVLCMessageIteratorVtbl;
+interface IVLCMessageIterator {
+    const IVLCMessageIteratorVtbl* lpVtbl;
+};
+
+#ifdef COBJMACROS
+/*** IUnknown methods ***/
+#define IVLCMessageIterator_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
+#define IVLCMessageIterator_AddRef(p) (p)->lpVtbl->AddRef(p)
+#define IVLCMessageIterator_Release(p) (p)->lpVtbl->Release(p)
+/*** IDispatch methods ***/
+#define IVLCMessageIterator_GetTypeInfoCount(p,a) (p)->lpVtbl->GetTypeInfoCount(p,a)
+#define IVLCMessageIterator_GetTypeInfo(p,a,b,c) (p)->lpVtbl->GetTypeInfo(p,a,b,c)
+#define IVLCMessageIterator_GetIDsOfNames(p,a,b,c,d,e) (p)->lpVtbl->GetIDsOfNames(p,a,b,c,d,e)
+#define IVLCMessageIterator_Invoke(p,a,b,c,d,e,f,g,h) (p)->lpVtbl->Invoke(p,a,b,c,d,e,f,g,h)
+/*** IVLCMessageIterator methods ***/
+#define IVLCMessageIterator_get_hasNext(p,a) (p)->lpVtbl->get_hasNext(p,a)
+#define IVLCMessageIterator_next(p,a) (p)->lpVtbl->next(p,a)
+#endif
+
+#endif
+
+HRESULT CALLBACK IVLCMessageIterator_get_hasNext_Proxy(
+    IVLCMessageIterator* This,
+    VARIANT_BOOL* hasNext);
+void __RPC_STUB IVLCMessageIterator_get_hasNext_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCMessageIterator_next_Proxy(
+    IVLCMessageIterator* This,
+    IVLCMessage** msg);
+void __RPC_STUB IVLCMessageIterator_next_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+
+#endif  /* __IVLCMessageIterator_INTERFACE_DEFINED__ */
+
+/*****************************************************************************
+ * IVLCMessages interface
+ */
+#ifndef __IVLCMessages_INTERFACE_DEFINED__
+#define __IVLCMessages_INTERFACE_DEFINED__
+
+DEFINE_GUID(IID_IVLCMessages, 0x6c5ce55d, 0x2d6c, 0x4aad, 0x82,0x99, 0xc6,0x2d,0x23,0x71,0xf1,0x06);
+#if defined(__cplusplus) && !defined(CINTERFACE)
+interface IVLCMessages : public IDispatch
+{
+    virtual HRESULT STDMETHODCALLTYPE get__NewEnum(
+        IUnknown** _NewEnum) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE clear(
+        ) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_count(
+        long* count) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE iterator(
+        IVLCMessageIterator** iter) = 0;
+
+};
+#else
+typedef struct IVLCMessagesVtbl {
+    BEGIN_INTERFACE
+
+    /*** IUnknown methods ***/
+    HRESULT (STDMETHODCALLTYPE *QueryInterface)(
+        IVLCMessages* This,
+        REFIID riid,
+        void** ppvObject);
+
+    ULONG (STDMETHODCALLTYPE *AddRef)(
+        IVLCMessages* This);
+
+    ULONG (STDMETHODCALLTYPE *Release)(
+        IVLCMessages* This);
+
+    /*** IDispatch methods ***/
+    HRESULT (STDMETHODCALLTYPE *GetTypeInfoCount)(
+        IVLCMessages* This,
+        UINT* pctinfo);
+
+    HRESULT (STDMETHODCALLTYPE *GetTypeInfo)(
+        IVLCMessages* This,
+        UINT iTInfo,
+        LCID lcid,
+        ITypeInfo** ppTInfo);
+
+    HRESULT (STDMETHODCALLTYPE *GetIDsOfNames)(
+        IVLCMessages* This,
+        REFIID riid,
+        LPOLESTR* rgszNames,
+        UINT cNames,
+        LCID lcid,
+        DISPID* rgDispId);
+
+    HRESULT (STDMETHODCALLTYPE *Invoke)(
+        IVLCMessages* This,
+        DISPID dispIdMember,
+        REFIID riid,
+        LCID lcid,
+        WORD wFlags,
+        DISPPARAMS* pDispParams,
+        VARIANT* pVarResult,
+        EXCEPINFO* pExcepInfo,
+        UINT* puArgErr);
+
+    /*** IVLCMessages methods ***/
+    HRESULT (STDMETHODCALLTYPE *get__NewEnum)(
+        IVLCMessages* This,
+        IUnknown** _NewEnum);
+
+    HRESULT (STDMETHODCALLTYPE *clear)(
+        IVLCMessages* This);
+
+    HRESULT (STDMETHODCALLTYPE *get_count)(
+        IVLCMessages* This,
+        long* count);
+
+    HRESULT (STDMETHODCALLTYPE *iterator)(
+        IVLCMessages* This,
+        IVLCMessageIterator** iter);
+
+    END_INTERFACE
+} IVLCMessagesVtbl;
+interface IVLCMessages {
+    const IVLCMessagesVtbl* lpVtbl;
+};
+
+#ifdef COBJMACROS
+/*** IUnknown methods ***/
+#define IVLCMessages_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
+#define IVLCMessages_AddRef(p) (p)->lpVtbl->AddRef(p)
+#define IVLCMessages_Release(p) (p)->lpVtbl->Release(p)
+/*** IDispatch methods ***/
+#define IVLCMessages_GetTypeInfoCount(p,a) (p)->lpVtbl->GetTypeInfoCount(p,a)
+#define IVLCMessages_GetTypeInfo(p,a,b,c) (p)->lpVtbl->GetTypeInfo(p,a,b,c)
+#define IVLCMessages_GetIDsOfNames(p,a,b,c,d,e) (p)->lpVtbl->GetIDsOfNames(p,a,b,c,d,e)
+#define IVLCMessages_Invoke(p,a,b,c,d,e,f,g,h) (p)->lpVtbl->Invoke(p,a,b,c,d,e,f,g,h)
+/*** IVLCMessages methods ***/
+#define IVLCMessages_get__NewEnum(p,a) (p)->lpVtbl->get__NewEnum(p,a)
+#define IVLCMessages_clear(p) (p)->lpVtbl->clear(p)
+#define IVLCMessages_get_count(p,a) (p)->lpVtbl->get_count(p,a)
+#define IVLCMessages_iterator(p,a) (p)->lpVtbl->iterator(p,a)
+#endif
+
+#endif
+
+HRESULT CALLBACK IVLCMessages_get__NewEnum_Proxy(
+    IVLCMessages* This,
+    IUnknown** _NewEnum);
+void __RPC_STUB IVLCMessages_get__NewEnum_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCMessages_clear_Proxy(
+    IVLCMessages* This);
+void __RPC_STUB IVLCMessages_clear_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCMessages_get_count_Proxy(
+    IVLCMessages* This,
+    long* count);
+void __RPC_STUB IVLCMessages_get_count_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCMessages_iterator_Proxy(
+    IVLCMessages* This,
+    IVLCMessageIterator** iter);
+void __RPC_STUB IVLCMessages_iterator_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+
+#endif  /* __IVLCMessages_INTERFACE_DEFINED__ */
+
+/*****************************************************************************
+ * IVLCLog interface
+ */
+#ifndef __IVLCLog_INTERFACE_DEFINED__
+#define __IVLCLog_INTERFACE_DEFINED__
+
+DEFINE_GUID(IID_IVLCLog, 0x8e3bc3d9, 0x62e9, 0x48fb, 0x8a,0x6d, 0x99,0x3f,0x9a,0xbc,0x4a,0x0a);
+#if defined(__cplusplus) && !defined(CINTERFACE)
+interface IVLCLog : public IDispatch
+{
+    virtual HRESULT STDMETHODCALLTYPE get_messages(
+        IVLCMessages** iter) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_verbosity(
+        long* level) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_verbosity(
+        long level) = 0;
+
+};
+#else
+typedef struct IVLCLogVtbl {
+    BEGIN_INTERFACE
+
+    /*** IUnknown methods ***/
+    HRESULT (STDMETHODCALLTYPE *QueryInterface)(
+        IVLCLog* This,
+        REFIID riid,
+        void** ppvObject);
+
+    ULONG (STDMETHODCALLTYPE *AddRef)(
+        IVLCLog* This);
+
+    ULONG (STDMETHODCALLTYPE *Release)(
+        IVLCLog* This);
+
+    /*** IDispatch methods ***/
+    HRESULT (STDMETHODCALLTYPE *GetTypeInfoCount)(
+        IVLCLog* This,
+        UINT* pctinfo);
+
+    HRESULT (STDMETHODCALLTYPE *GetTypeInfo)(
+        IVLCLog* This,
+        UINT iTInfo,
+        LCID lcid,
+        ITypeInfo** ppTInfo);
+
+    HRESULT (STDMETHODCALLTYPE *GetIDsOfNames)(
+        IVLCLog* This,
+        REFIID riid,
+        LPOLESTR* rgszNames,
+        UINT cNames,
+        LCID lcid,
+        DISPID* rgDispId);
+
+    HRESULT (STDMETHODCALLTYPE *Invoke)(
+        IVLCLog* This,
+        DISPID dispIdMember,
+        REFIID riid,
+        LCID lcid,
+        WORD wFlags,
+        DISPPARAMS* pDispParams,
+        VARIANT* pVarResult,
+        EXCEPINFO* pExcepInfo,
+        UINT* puArgErr);
+
+    /*** IVLCLog methods ***/
+    HRESULT (STDMETHODCALLTYPE *get_messages)(
+        IVLCLog* This,
+        IVLCMessages** iter);
+
+    HRESULT (STDMETHODCALLTYPE *get_verbosity)(
+        IVLCLog* This,
+        long* level);
+
+    HRESULT (STDMETHODCALLTYPE *put_verbosity)(
+        IVLCLog* This,
+        long level);
+
+    END_INTERFACE
+} IVLCLogVtbl;
+interface IVLCLog {
+    const IVLCLogVtbl* lpVtbl;
+};
+
+#ifdef COBJMACROS
+/*** IUnknown methods ***/
+#define IVLCLog_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
+#define IVLCLog_AddRef(p) (p)->lpVtbl->AddRef(p)
+#define IVLCLog_Release(p) (p)->lpVtbl->Release(p)
+/*** IDispatch methods ***/
+#define IVLCLog_GetTypeInfoCount(p,a) (p)->lpVtbl->GetTypeInfoCount(p,a)
+#define IVLCLog_GetTypeInfo(p,a,b,c) (p)->lpVtbl->GetTypeInfo(p,a,b,c)
+#define IVLCLog_GetIDsOfNames(p,a,b,c,d,e) (p)->lpVtbl->GetIDsOfNames(p,a,b,c,d,e)
+#define IVLCLog_Invoke(p,a,b,c,d,e,f,g,h) (p)->lpVtbl->Invoke(p,a,b,c,d,e,f,g,h)
+/*** IVLCLog methods ***/
+#define IVLCLog_get_messages(p,a) (p)->lpVtbl->get_messages(p,a)
+#define IVLCLog_get_verbosity(p,a) (p)->lpVtbl->get_verbosity(p,a)
+#define IVLCLog_put_verbosity(p,a) (p)->lpVtbl->put_verbosity(p,a)
+#endif
+
+#endif
+
+HRESULT CALLBACK IVLCLog_get_messages_Proxy(
+    IVLCLog* This,
+    IVLCMessages** iter);
+void __RPC_STUB IVLCLog_get_messages_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCLog_get_verbosity_Proxy(
+    IVLCLog* This,
+    long* level);
+void __RPC_STUB IVLCLog_get_verbosity_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCLog_put_verbosity_Proxy(
+    IVLCLog* This,
+    long level);
+void __RPC_STUB IVLCLog_put_verbosity_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+
+#endif  /* __IVLCLog_INTERFACE_DEFINED__ */
+
+/*****************************************************************************
  * IVLCPlaylist interface
  */
 #ifndef __IVLCPlaylist_INTERFACE_DEFINED__
@@ -1182,7 +1768,7 @@ DEFINE_GUID(IID_IVLCPlaylist, 0x54613049, 0x40bf, 0x4035, 0x9e,0x70, 0x0a,0x93,0
 interface IVLCPlaylist : public IDispatch
 {
     virtual HRESULT STDMETHODCALLTYPE get_itemCount(
-        int* count) = 0;
+        long* count) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_isPlaying(
         VARIANT_BOOL* playing) = 0;
@@ -1191,13 +1777,13 @@ interface IVLCPlaylist : public IDispatch
         BSTR uri,
         VARIANT name,
         VARIANT options,
-        int* item) = 0;
+        long* item) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE play(
         ) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE playItem(
-        int item) = 0;
+        long item) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE togglePause(
         ) = 0;
@@ -1215,7 +1801,7 @@ interface IVLCPlaylist : public IDispatch
         ) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE removeItem(
-        int item) = 0;
+        long item) = 0;
 
 };
 #else
@@ -1267,7 +1853,7 @@ typedef struct IVLCPlaylistVtbl {
     /*** IVLCPlaylist methods ***/
     HRESULT (STDMETHODCALLTYPE *get_itemCount)(
         IVLCPlaylist* This,
-        int* count);
+        long* count);
 
     HRESULT (STDMETHODCALLTYPE *get_isPlaying)(
         IVLCPlaylist* This,
@@ -1278,14 +1864,14 @@ typedef struct IVLCPlaylistVtbl {
         BSTR uri,
         VARIANT name,
         VARIANT options,
-        int* item);
+        long* item);
 
     HRESULT (STDMETHODCALLTYPE *play)(
         IVLCPlaylist* This);
 
     HRESULT (STDMETHODCALLTYPE *playItem)(
         IVLCPlaylist* This,
-        int item);
+        long item);
 
     HRESULT (STDMETHODCALLTYPE *togglePause)(
         IVLCPlaylist* This);
@@ -1304,7 +1890,7 @@ typedef struct IVLCPlaylistVtbl {
 
     HRESULT (STDMETHODCALLTYPE *removeItem)(
         IVLCPlaylist* This,
-        int item);
+        long item);
 
     END_INTERFACE
 } IVLCPlaylistVtbl;
@@ -1340,7 +1926,7 @@ interface IVLCPlaylist {
 
 HRESULT CALLBACK IVLCPlaylist_get_itemCount_Proxy(
     IVLCPlaylist* This,
-    int* count);
+    long* count);
 void __RPC_STUB IVLCPlaylist_get_itemCount_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1359,7 +1945,7 @@ HRESULT CALLBACK IVLCPlaylist_add_Proxy(
     BSTR uri,
     VARIANT name,
     VARIANT options,
-    int* item);
+    long* item);
 void __RPC_STUB IVLCPlaylist_add_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1374,7 +1960,7 @@ void __RPC_STUB IVLCPlaylist_play_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCPlaylist_playItem_Proxy(
     IVLCPlaylist* This,
-    int item);
+    long item);
 void __RPC_STUB IVLCPlaylist_playItem_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1417,7 +2003,7 @@ void __RPC_STUB IVLCPlaylist_clear_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCPlaylist_removeItem_Proxy(
     IVLCPlaylist* This,
-    int item);
+    long item);
 void __RPC_STUB IVLCPlaylist_removeItem_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1443,10 +2029,10 @@ interface IVLCVideo : public IDispatch
         VARIANT_BOOL fullscreen) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_width(
-        int* width) = 0;
+        long* width) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_height(
-        int* height) = 0;
+        long* height) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE toggleFullscreen(
         ) = 0;
@@ -1509,11 +2095,11 @@ typedef struct IVLCVideoVtbl {
 
     HRESULT (STDMETHODCALLTYPE *get_width)(
         IVLCVideo* This,
-        int* width);
+        long* width);
 
     HRESULT (STDMETHODCALLTYPE *get_height)(
         IVLCVideo* This,
-        int* height);
+        long* height);
 
     HRESULT (STDMETHODCALLTYPE *toggleFullscreen)(
         IVLCVideo* This);
@@ -1562,7 +2148,7 @@ void __RPC_STUB IVLCVideo_put_fullscreen_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCVideo_get_width_Proxy(
     IVLCVideo* This,
-    int* width);
+    long* width);
 void __RPC_STUB IVLCVideo_get_width_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1570,7 +2156,7 @@ void __RPC_STUB IVLCVideo_get_width_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCVideo_get_height_Proxy(
     IVLCVideo* This,
-    int* height);
+    long* height);
 void __RPC_STUB IVLCVideo_get_height_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1615,10 +2201,10 @@ interface IVLCControl2 : public IDispatch
         BSTR url) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_StartTime(
-        int* seconds) = 0;
+        long* seconds) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE put_StartTime(
-        int seconds) = 0;
+        long seconds) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_MRL(
         BSTR* mrl) = 0;
@@ -1636,16 +2222,19 @@ interface IVLCControl2 : public IDispatch
         VARIANT_BOOL visible) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_Volume(
-        int* volume) = 0;
+        long* volume) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE put_Volume(
-        int volume) = 0;
+        long volume) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_audio(
         IVLCAudio** obj) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_input(
         IVLCInput** obj) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_log(
+        IVLCLog** obj) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_playlist(
         IVLCPlaylist** obj) = 0;
@@ -1727,11 +2316,11 @@ typedef struct IVLCControl2Vtbl {
 
     HRESULT (STDMETHODCALLTYPE *get_StartTime)(
         IVLCControl2* This,
-        int* seconds);
+        long* seconds);
 
     HRESULT (STDMETHODCALLTYPE *put_StartTime)(
         IVLCControl2* This,
-        int seconds);
+        long seconds);
 
     HRESULT (STDMETHODCALLTYPE *get_MRL)(
         IVLCControl2* This,
@@ -1755,11 +2344,11 @@ typedef struct IVLCControl2Vtbl {
 
     HRESULT (STDMETHODCALLTYPE *get_Volume)(
         IVLCControl2* This,
-        int* volume);
+        long* volume);
 
     HRESULT (STDMETHODCALLTYPE *put_Volume)(
         IVLCControl2* This,
-        int volume);
+        long volume);
 
     HRESULT (STDMETHODCALLTYPE *get_audio)(
         IVLCControl2* This,
@@ -1768,6 +2357,10 @@ typedef struct IVLCControl2Vtbl {
     HRESULT (STDMETHODCALLTYPE *get_input)(
         IVLCControl2* This,
         IVLCInput** obj);
+
+    HRESULT (STDMETHODCALLTYPE *get_log)(
+        IVLCControl2* This,
+        IVLCLog** obj);
 
     HRESULT (STDMETHODCALLTYPE *get_playlist)(
         IVLCControl2* This,
@@ -1811,6 +2404,7 @@ interface IVLCControl2 {
 #define IVLCControl2_put_Volume(p,a) (p)->lpVtbl->put_Volume(p,a)
 #define IVLCControl2_get_audio(p,a) (p)->lpVtbl->get_audio(p,a)
 #define IVLCControl2_get_input(p,a) (p)->lpVtbl->get_input(p,a)
+#define IVLCControl2_get_log(p,a) (p)->lpVtbl->get_log(p,a)
 #define IVLCControl2_get_playlist(p,a) (p)->lpVtbl->get_playlist(p,a)
 #define IVLCControl2_get_video(p,a) (p)->lpVtbl->get_video(p,a)
 #endif
@@ -1867,7 +2461,7 @@ void __RPC_STUB IVLCControl2_put_BaseURL_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCControl2_get_StartTime_Proxy(
     IVLCControl2* This,
-    int* seconds);
+    long* seconds);
 void __RPC_STUB IVLCControl2_get_StartTime_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1875,7 +2469,7 @@ void __RPC_STUB IVLCControl2_get_StartTime_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCControl2_put_StartTime_Proxy(
     IVLCControl2* This,
-    int seconds);
+    long seconds);
 void __RPC_STUB IVLCControl2_put_StartTime_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1923,7 +2517,7 @@ void __RPC_STUB IVLCControl2_put_Visible_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCControl2_get_Volume_Proxy(
     IVLCControl2* This,
-    int* volume);
+    long* volume);
 void __RPC_STUB IVLCControl2_get_Volume_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1931,7 +2525,7 @@ void __RPC_STUB IVLCControl2_get_Volume_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCControl2_put_Volume_Proxy(
     IVLCControl2* This,
-    int volume);
+    long volume);
 void __RPC_STUB IVLCControl2_put_Volume_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
@@ -1949,6 +2543,14 @@ HRESULT CALLBACK IVLCControl2_get_input_Proxy(
     IVLCControl2* This,
     IVLCInput** obj);
 void __RPC_STUB IVLCControl2_get_input_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCControl2_get_log_Proxy(
+    IVLCControl2* This,
+    IVLCLog** obj);
+void __RPC_STUB IVLCControl2_get_log_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,

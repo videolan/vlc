@@ -36,6 +36,10 @@ library AXVLC
     interface IVLCControl;
     interface IVLCAudio;
     interface IVLCInput;
+    interface IVLCLog;
+    interface IVLCMessage;
+    interface IVLCMessageIterator;
+    interface IVLCMessages;
     interface IVLCPlaylist;
     interface IVLCVideo;
     interface IVLCControl2;
@@ -192,9 +196,9 @@ library AXVLC
         HRESULT mute([in] VARIANT_BOOL muted);
 
         [propget, helpstring("Returns/sets audio volume as a percent value.")]
-        HRESULT volume([out, retval] int* volume);
+        HRESULT volume([out, retval] long* volume);
         [propput, helpstring("Returns/sets audio volume as a percent value.")]
-        HRESULT volume([in] int volume);
+        HRESULT volume([in] long volume);
 
         [helpstring("Mute/unmute audio playback.")]
         HRESULT toggleMute();
@@ -215,9 +219,9 @@ library AXVLC
         HRESULT length([out, retval] double* length);
 
         [propget, helpstring("Returns/sets playback position in current clip.  Position is ranging from 0.0 to 1.0.")]
-        HRESULT position([out, retval] float* position);
+        HRESULT position([out, retval] double* position);
         [propput, helpstring("Returns/sets playback position in the current clip.  Position ranging from 0.0 to 1.0.")]
-        HRESULT position([in] float position);
+        HRESULT position([in] double position);
 
         [propget, helpstring("Returns/sets playback time in current clip, in milliseconds.")]
         HRESULT time([out, retval] double* time);
@@ -225,18 +229,110 @@ library AXVLC
         HRESULT time([in] double time);
 
         [propget, helpstring("Returns current playback state.")]
-        HRESULT state([out, retval] int* state);
+        HRESULT state([out, retval] long* state);
 
         [propget, helpstring("Returns/sets current playback rate, normal rate is 1.0 ")]
-        HRESULT rate([out, retval] float* rate);
+        HRESULT rate([out, retval] double* rate);
         [propput, helpstring("Returns/sets current playback rate, normal rate is 1.0.")]
-        HRESULT rate([in] float rate);
+        HRESULT rate([in] double rate);
 
         [propget, helpstring("Returns current playback frames per seconds if available.")]
-        HRESULT fps([out, retval] float* fps);
+        HRESULT fps([out, retval] double* fps);
 
         [propget, helpstring("Returns whether current playback displays video.")]
         HRESULT hasVout([out, retval] VARIANT_BOOL* hasVout);
+    };
+
+    [
+      odl,
+      uuid(9ED00AFA-7BCD-4FFF-8D48-7DD4DB2C800D),
+      helpstring("VLC Log Message"),
+      hidden,
+      dual,
+      nonextensible,
+      oleautomation
+    ]
+    interface IVLCMessage: IDispatch
+    {
+        [id(DISPID_VALUE), propget]
+        HRESULT _Value([out, retval] VARIANT* message);
+
+        [propget, helpstring("Returns message severity.")]
+        HRESULT severity([out, retval] long* level);
+
+        [propget, helpstring("Returns message issuer type.")]
+        HRESULT type([out, retval] BSTR* type);
+
+        [propget, helpstring("Returns message issuer name.")]
+        HRESULT name([out, retval] BSTR* name);
+
+        [propget, helpstring("Returns message header.")]
+        HRESULT header([out, retval] BSTR* header);
+
+        [propget, helpstring("Returns message content.")]
+        HRESULT message([out, retval] BSTR* message);
+    };
+
+    [
+      odl,
+      uuid(15179CD8-CC12-4242-A58E-E412217FF343),
+      helpstring("VLC Log iterator"),
+      hidden,
+      dual,
+      nonextensible,
+      oleautomation
+    ]
+    interface IVLCMessageIterator : IDispatch
+    {
+        [propget, helpstring("Returns whether a message is available.")]
+        HRESULT hasNext([out, retval] VARIANT_BOOL* hasNext);
+
+        [helpstring("Returns next message.")]
+        HRESULT next([out, retval] IVLCMessage** msg);
+    };
+
+    [
+      odl,
+      uuid(6C5CE55D-2D6C-4AAD-8299-C62D2371F106),
+      helpstring("VLC Log APIs"),
+      hidden,
+      dual,
+      nonextensible,
+      oleautomation
+    ]
+    interface IVLCMessages : IDispatch
+    {
+        [id(DISPID_NEWENUM), propget]
+        HRESULT _NewEnum([out, retval] IUnknown** _NewEnum);
+
+        [helpstring("Clear all messages from log.")]
+        HRESULT clear();
+
+        [propget, helpstring("Returns the number of messages.")]
+        HRESULT count([out, retval] long* count);
+
+        [helpstring("Returns an iterator for messages in log")]
+        HRESULT iterator([out, retval] IVLCMessageIterator** iter);
+    };
+
+    [
+      odl,
+      uuid(8E3BC3D9-62E9-48FB-8A6D-993F9ABC4A0A),
+      helpstring("VLC Log APIs"),
+      hidden,
+      dual,
+      nonextensible,
+      oleautomation
+    ]
+    interface IVLCLog : IDispatch
+    {
+        [propget, helpstring("Returns messages in log")]
+        HRESULT messages([out, retval] IVLCMessages** iter);
+
+        [propget, helpstring("Returns/Sets the log versbosity level.")]
+        HRESULT verbosity([out, retval] long* level);
+        [propput, helpstring("Returns/Sets the log versbosity level.")]
+        HRESULT verbosity([in] long level);
     };
 
     [
@@ -251,19 +347,19 @@ library AXVLC
     interface IVLCPlaylist : IDispatch
     {
         [propget, helpstring("Returns number of items in playlist.")]
-        HRESULT itemCount([out, retval] int* count);
+        HRESULT itemCount([out, retval] long* count);
 
         [propget, helpstring("Returns whether playback displays video.")]
         HRESULT isPlaying([out, retval] VARIANT_BOOL* playing);
 
         [helpstring("Add a playlist item.")]
-        HRESULT add([in] BSTR uri, [in, optional] VARIANT name, [in, optional] VARIANT options, [out, retval] int* item);
+        HRESULT add([in] BSTR uri, [in, optional] VARIANT name, [in, optional] VARIANT options, [out, retval] long* item);
 
         [helpstring("Play/Resume the playlist.")]
         HRESULT play();
 
         [helpstring("Play item in playlist.")]
-        HRESULT playItem([in] int item);
+        HRESULT playItem([in] long item);
 
         [helpstring("Play/Pause current clip.")]
         HRESULT togglePause();
@@ -281,7 +377,7 @@ library AXVLC
         HRESULT clear();
 
         [helpstring("remove item from playlist.")]
-        HRESULT removeItem([in] int item);
+        HRESULT removeItem([in] long item);
     };
 
     [
@@ -301,10 +397,10 @@ library AXVLC
         HRESULT fullscreen([in] VARIANT_BOOL fullscreen);
 
         [propget, helpstring("Returns video original width.")]
-        HRESULT width([out, retval] int* width);
+        HRESULT width([out, retval] long* width);
 
         [propget, helpstring("Returns video original height.")]
-        HRESULT height([out, retval] int* height);
+        HRESULT height([out, retval] long* height);
 
         [helpstring("toggle fullscreen/windowed state.")]
         HRESULT toggleFullscreen();
@@ -336,9 +432,9 @@ library AXVLC
         HRESULT BaseURL([in] BSTR url);
 
         [id(DISPID_StartTime), propget, helpstring("Returns/sets playback start time of URL.")]
-        HRESULT StartTime([out, retval] int* seconds);
+        HRESULT StartTime([out, retval] long* seconds);
         [id(DISPID_StartTime), propput, helpstring("Returns/sets playback start time of URL.")]
-        HRESULT StartTime([in] int seconds);
+        HRESULT StartTime([in] long seconds);
 
         [id(DISPID_MRL), propget, helpstring("Returns/sets the default MRL in playlist")]
         HRESULT MRL([out, retval] BSTR* mrl);
@@ -354,15 +450,18 @@ library AXVLC
         HRESULT Visible([in] VARIANT_BOOL visible);
 
         [id(DISPID_Volume), propget, helpstring("Returns/sets default audio volume.")]
-        HRESULT Volume([out, retval] int* volume);
+        HRESULT Volume([out, retval] long* volume);
         [id(DISPID_Volume), propput, helpstring("Returns/sets default audio volume.")]
-        HRESULT Volume([in] int volume);
+        HRESULT Volume([in] long volume);
 
         [propget, helpstring("Returns the audio object.")]
         HRESULT audio([out, retval] IVLCAudio** obj);
 
         [propget, helpstring("Returns the audio object.")]
         HRESULT input([out, retval] IVLCInput** obj);
+
+        [propget, helpstring("Returns the log object.")]
+        HRESULT log([out, retval] IVLCLog** obj);
 
         [propget, helpstring("Returns the playlist object.")]
         HRESULT playlist([out, retval] IVLCPlaylist** obj);

@@ -81,54 +81,64 @@ function formatTime(timeVal)
     var timeHour = Math.round(timeVal / 1000);
     var timeSec = timeHour % 60;
     if( timeSec < 10 )
-	timeSec = '0'+timeSec;
+        timeSec = '0'+timeSec;
     timeHour = (timeHour - timeSec)/60;
     var timeMin = timeHour % 60;
     if( timeMin < 10 )
-	timeMin = '0'+timeMin;
+        timeMin = '0'+timeMin;
     timeHour = (timeHour - timeMin)/60;
     if( timeHour > 0 )
-	return timeHour+":"+timeMin+":"+timeSec;
+        return timeHour+":"+timeMin+":"+timeSec;
     else
-	return timeMin+":"+timeSec;
+        return timeMin+":"+timeSec;
 };
 function monitor()
 {
     var vlc = document.getElementById("vlc");
     var newState = vlc.input.state;
+    if( vlc.log.messages.count > 0 )
+    {
+        var iter = vlc.log.messages.iterator();
+        while( iter.hasNext )
+        {
+            var msg = iter.next();
+            alert( msg );
+        }
+        vlc.log.messages.clear();
+    }
     if( prevState != newState )
     {
-	if( newState == 0 )
-	{
-	    // current media has stopped 
-	    onStop();
-	}
-	else if( newState == 1 )
-	{
-	    // current media is openning/connecting
-	    onOpen();
-	}
-	else if( newState == 2 )
-	{
-	    // current media is buffering data
-	    onBuffer();
-	}
-	else if( newState == 3 )
-	{
-	    // current media is now playing
-	    onPlay();
-	}
-	else if( vlc.input.state == 4 )
-	{
-	    // current media is now paused
-	    onPause();
-	}
-	prevState = newState;
+        if( newState == 0 )
+        {
+            // current media has stopped 
+            onStop();
+        }
+        else if( newState == 1 )
+        {
+            // current media is openning/connecting
+            onOpen();
+        }
+        else if( newState == 2 )
+        {
+            // current media is buffering data
+            onBuffer();
+        }
+        else if( newState == 3 )
+        {
+            // current media is now playing
+            onPlay();
+        }
+        else if( vlc.input.state == 4 )
+        {
+            // current media is now paused
+            onPause();
+        }
+        prevState = newState;
     }
     else if( newState == 3 )
     {
-	// current media is playing
-	onPlaying();
+        // current media is playing
+        onPlaying();
     }
     monitorTimerId = setTimeout("monitor()", 1000);
 };
@@ -138,14 +148,16 @@ function monitor()
 function doGo(targetURL)
 {
     var vlc = document.getElementById("vlc");
-    var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
+    var options = new Array(":vout=directx");
     vlc.playlist.clear();
     //vlc.playlist.add(targetURL, null, options);
     vlc.playlist.add(targetURL);
     vlc.playlist.play();
+    vlc.log.verbosity = 3;
+    vlc.log.messages.clear();
     if( monitorTimerId == 0 )
     {
-	monitor();
+        monitor();
     }
 };
 function doPlayOrPause()
@@ -153,15 +165,16 @@ function doPlayOrPause()
     var vlc = document.getElementById("vlc");
     if( vlc.playlist.isPlaying )
     {
-	vlc.playlist.togglePause();
+        vlc.playlist.togglePause();
     }
     else
     {
-	vlc.playlist.play();
-	if( monitorTimerId == 0 )
-	{
-	    monitor();
-	}
+        vlc.log.messages.clear();
+        vlc.playlist.play();
+        if( monitorTimerId == 0 )
+        {
+            monitor();
+        }
     }
 };
 function doStop()
@@ -169,8 +182,8 @@ function doStop()
     document.getElementById("vlc").playlist.stop();
     if( monitorTimerId != 0 )
     {
-	clearTimeout(monitorTimerId);
-	monitorTimerId = 0;
+        clearTimeout(monitorTimerId);
+        monitorTimerId = 0;
     }
     onStop();
 };
@@ -208,28 +221,28 @@ function onPlaying()
 {
     if( ! sliderScrolling )
     {
-	var slider = document.getElementById("slider");
-	if( vlc.input.length > 0 )
-	{
-	    // seekable media
-	    slider.Enabled = true;
-	    slider.Max = slider.width;
-	    ignoreSliderChange = true;
-	    slider.Value = vlc.input.position*slider.width;
-	    ignoreSliderChange = false;
-	    document.getElementById("info").innerHTML = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
-	}
-	else
-	{
-	    // non-seekable "live" media
-	    if( slider.Enabled )
-	    {
-		slider.Value = slider.Min;
-		slider.Enabled = false;
-	    }
+        var slider = document.getElementById("slider");
+        if( vlc.input.length > 0 )
+        {
+            // seekable media
+            slider.Enabled = true;
+            slider.Max = slider.width;
+            ignoreSliderChange = true;
+            slider.Value = vlc.input.position*slider.width;
+            ignoreSliderChange = false;
+            document.getElementById("info").innerHTML = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
+        }
+        else
+        {
+            // non-seekable "live" media
+            if( slider.Enabled )
+            {
+                slider.Value = slider.Min;
+                slider.Enabled = false;
+            }
             liveFeedRoll = liveFeedRoll & 3;
             document.getElementById("info").innerHTML = liveFeedText[liveFeedRoll++];
-	}
+        }
     }
 };
 function onPause()
@@ -238,6 +251,7 @@ function onPause()
 };
 function onStop()
 {
+    vlc.log.verbosity = -1;
     if( slider.Enabled )
     {
         slider.Value = slider.Min;
@@ -268,8 +282,8 @@ function slider::Scroll()
     if( (vlc.input.state == 3) && (oldPos != newPos) )
     {
         vlc.input.position = newPos;
-	slider.Text = formatTime(vlc.input.time);
-	document.getElementById("info").innerHTML = slider.Text+"/"+formatTime(vlc.input.length);
+        slider.Text = formatTime(vlc.input.time);
+        document.getElementById("info").innerHTML = slider.Text+"/"+formatTime(vlc.input.length);
     }
     sliderScrolling = true;
 };

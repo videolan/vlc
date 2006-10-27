@@ -150,7 +150,7 @@ STDMETHODIMP VLCAudio::put_mute(VARIANT_BOOL mute)
     return hr;
 };
 
-STDMETHODIMP VLCAudio::get_volume(int* volume)
+STDMETHODIMP VLCAudio::get_volume(long* volume)
 {
     if( NULL == volume )
         return E_POINTER;
@@ -174,7 +174,7 @@ STDMETHODIMP VLCAudio::get_volume(int* volume)
     return hr;
 };
 
-STDMETHODIMP VLCAudio::put_volume(int volume)
+STDMETHODIMP VLCAudio::put_volume(long volume)
 {
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
@@ -324,7 +324,7 @@ STDMETHODIMP VLCInput::get_length(double* length)
     return hr;
 };
 
-STDMETHODIMP VLCInput::get_position(float* position)
+STDMETHODIMP VLCInput::get_position(double* position)
 {
     if( NULL == position )
         return E_POINTER;
@@ -353,7 +353,7 @@ STDMETHODIMP VLCInput::get_position(float* position)
     return hr;
 };
 
-STDMETHODIMP VLCInput::put_position(float position)
+STDMETHODIMP VLCInput::put_position(double position)
 {
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
@@ -434,7 +434,7 @@ STDMETHODIMP VLCInput::put_time(double time)
     return hr;
 };
 
-STDMETHODIMP VLCInput::get_state(int* state)
+STDMETHODIMP VLCInput::get_state(long* state)
 {
     if( NULL == state )
         return E_POINTER;
@@ -464,7 +464,7 @@ STDMETHODIMP VLCInput::get_state(int* state)
     return hr;
 };
 
-STDMETHODIMP VLCInput::get_rate(float* rate)
+STDMETHODIMP VLCInput::get_rate(double* rate)
 {
     if( NULL == rate )
         return E_POINTER;
@@ -493,7 +493,7 @@ STDMETHODIMP VLCInput::get_rate(float* rate)
     return hr;
 };
 
-STDMETHODIMP VLCInput::put_rate(float rate)
+STDMETHODIMP VLCInput::put_rate(double rate)
 {
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
@@ -519,7 +519,7 @@ STDMETHODIMP VLCInput::put_rate(float rate)
     return hr;
 };
 
-STDMETHODIMP VLCInput::get_fps(float* fps)
+STDMETHODIMP VLCInput::get_fps(double* fps)
 {
     if( NULL == fps )
         return E_POINTER;
@@ -575,6 +575,629 @@ STDMETHODIMP VLCInput::get_hasVout(VARIANT_BOOL* hasVout)
         return E_FAIL;
     }
     return hr;
+};
+
+/*******************************************************************************/
+
+VLCLog::~VLCLog()
+{
+    if( _p_log )
+        libvlc_log_close(_p_log, NULL);
+
+    if( _p_typeinfo )
+        _p_typeinfo->Release();
+};
+
+HRESULT VLCLog::loadTypeInfo(void)
+{
+    HRESULT hr = NOERROR;
+    if( NULL == _p_typeinfo )
+    {
+        ITypeLib *p_typelib;
+
+        hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_typelib->GetTypeInfoOfGuid(IID_IVLCLog, &_p_typeinfo);
+            if( FAILED(hr) )
+            {
+                _p_typeinfo = NULL;
+            }
+            p_typelib->Release();
+        }
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCLog::GetTypeInfoCount(UINT* pctInfo)
+{
+    if( NULL == pctInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+        *pctInfo = 1;
+    else
+        *pctInfo = 0;
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCLog::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
+{
+    if( NULL == ppTInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        _p_typeinfo->AddRef();
+        *ppTInfo = _p_typeinfo;
+        return NOERROR;
+    }
+    *ppTInfo = NULL;
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCLog::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+        UINT cNames, LCID lcid, DISPID* rgDispID)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCLog::Invoke(DISPID dispIdMember, REFIID riid,
+        LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
+        VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
+                pVarResult, pExcepInfo, puArgErr);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCLog::get_messages(IVLCMessages** obj)
+{
+    if( NULL == obj )
+        return E_POINTER;
+
+    *obj = _p_vlcmessages;
+    if( NULL != _p_vlcmessages )
+    {
+        _p_vlcmessages->AddRef();
+        return NOERROR;
+    }
+    return E_OUTOFMEMORY;
+};
+
+STDMETHODIMP VLCLog::get_verbosity(long* level)
+{
+    if( NULL == level )
+        return E_POINTER;
+
+    if( _p_log )
+    {
+        libvlc_instance_t* p_libvlc;
+        HRESULT hr = _p_instance->getVLC(&p_libvlc);
+        if( SUCCEEDED(hr) )
+        {
+            libvlc_exception_t ex;
+            libvlc_exception_init(&ex);
+
+            *level = libvlc_get_log_verbosity(p_libvlc, &ex);
+            if( libvlc_exception_raised(&ex) )
+            {
+                _p_instance->setErrorInfo(IID_IVLCLog, libvlc_exception_get_message(&ex));
+                libvlc_exception_clear(&ex);
+                return E_FAIL;
+            }
+        }
+        return hr;
+    }
+    else
+    {
+        /* log is not enabled, return -1 */
+        *level = -1;
+        return NOERROR;
+    }
+};
+
+STDMETHODIMP VLCLog::put_verbosity(long verbosity)
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        if( verbosity >= 0 )
+        {
+            if( ! _p_log )
+            {
+                _p_log = libvlc_log_open(p_libvlc, &ex);
+                if( libvlc_exception_raised(&ex) )
+                {
+                    _p_instance->setErrorInfo(IID_IVLCLog, libvlc_exception_get_message(&ex));
+                    libvlc_exception_clear(&ex);
+                    return E_FAIL;
+                }
+            }
+            libvlc_set_log_verbosity(p_libvlc, (unsigned)verbosity, &ex);
+            if( libvlc_exception_raised(&ex) )
+            {
+                _p_instance->setErrorInfo(IID_IVLCLog, libvlc_exception_get_message(&ex));
+                libvlc_exception_clear(&ex);
+                return E_FAIL;
+            }
+        }
+        else if( _p_log )
+        {
+            /* close log  when verbosity is set to -1 */
+            libvlc_log_close(_p_log, &ex);
+            _p_log = NULL;
+            if( libvlc_exception_raised(&ex) )
+            {
+                _p_instance->setErrorInfo(IID_IVLCLog, libvlc_exception_get_message(&ex));
+                libvlc_exception_clear(&ex);
+                return E_FAIL;
+            }
+        }
+    }
+    return hr;
+};
+
+/*******************************************************************************/
+
+VLCMessages::~VLCMessages()
+{
+    if( _p_typeinfo )
+        _p_typeinfo->Release();
+};
+
+HRESULT VLCMessages::loadTypeInfo(void)
+{
+    HRESULT hr = NOERROR;
+    if( NULL == _p_typeinfo )
+    {
+        ITypeLib *p_typelib;
+
+        hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_typelib->GetTypeInfoOfGuid(IID_IVLCMessages, &_p_typeinfo);
+            if( FAILED(hr) )
+            {
+                _p_typeinfo = NULL;
+            }
+            p_typelib->Release();
+        }
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMessages::GetTypeInfoCount(UINT* pctInfo)
+{
+    if( NULL == pctInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+        *pctInfo = 1;
+    else
+        *pctInfo = 0;
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCMessages::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
+{
+    if( NULL == ppTInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        _p_typeinfo->AddRef();
+        *ppTInfo = _p_typeinfo;
+        return NOERROR;
+    }
+    *ppTInfo = NULL;
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMessages::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+        UINT cNames, LCID lcid, DISPID* rgDispID)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMessages::Invoke(DISPID dispIdMember, REFIID riid,
+        LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
+        VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
+                pVarResult, pExcepInfo, puArgErr);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMessages::get__NewEnum(LPUNKNOWN* _NewEnum)
+{
+    if( NULL == _NewEnum )
+        return E_POINTER;
+
+    // TODO
+    *_NewEnum = NULL;
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMessages::clear()
+{
+    libvlc_log_t *p_log = _p_vlclog->_p_log;
+    if( p_log )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_log_clear(p_log, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCMessages, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+    }
+    return NOERROR;
+};
+
+STDMETHODIMP VLCMessages::get_count(long* count)
+{
+    if( NULL == count )
+        return E_POINTER;
+
+    libvlc_log_t *p_log = _p_vlclog->_p_log;
+    if( p_log )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        *count = libvlc_log_count(p_log, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCMessages, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+    }
+    else
+        *count = 0;
+    return S_OK;
+};
+
+STDMETHODIMP VLCMessages::iterator(IVLCMessageIterator** iter)
+{
+    if( NULL == iter )
+        return E_POINTER;
+
+    *iter = new VLCMessageIterator(_p_instance, _p_vlclog);
+
+    return *iter ? S_OK : E_OUTOFMEMORY;
+};
+
+/*******************************************************************************/
+
+VLCMessageIterator::VLCMessageIterator(VLCPlugin *p_instance, VLCLog* p_vlclog ) :
+    _p_instance(p_instance),
+    _p_typeinfo(NULL),
+    _refcount(1),
+    _p_vlclog(p_vlclog)
+{
+    if( p_vlclog->_p_log )
+    {
+        _p_iter = libvlc_log_get_iterator(p_vlclog->_p_log, NULL);
+    }
+    else
+        _p_iter = NULL;
+};
+
+VLCMessageIterator::~VLCMessageIterator()
+{
+    if( _p_iter )
+        libvlc_log_iterator_free(_p_iter, NULL);
+
+    if( _p_typeinfo )
+        _p_typeinfo->Release();
+};
+
+HRESULT VLCMessageIterator::loadTypeInfo(void)
+{
+    HRESULT hr = NOERROR;
+    if( NULL == _p_typeinfo )
+    {
+        ITypeLib *p_typelib;
+
+        hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_typelib->GetTypeInfoOfGuid(IID_IVLCMessageIterator, &_p_typeinfo);
+            if( FAILED(hr) )
+            {
+                _p_typeinfo = NULL;
+            }
+            p_typelib->Release();
+        }
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMessageIterator::GetTypeInfoCount(UINT* pctInfo)
+{
+    if( NULL == pctInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+        *pctInfo = 1;
+    else
+        *pctInfo = 0;
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCMessageIterator::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
+{
+    if( NULL == ppTInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        _p_typeinfo->AddRef();
+        *ppTInfo = _p_typeinfo;
+        return NOERROR;
+    }
+    *ppTInfo = NULL;
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMessageIterator::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+        UINT cNames, LCID lcid, DISPID* rgDispID)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMessageIterator::Invoke(DISPID dispIdMember, REFIID riid,
+        LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
+        VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
+                pVarResult, pExcepInfo, puArgErr);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMessageIterator::get_hasNext(VARIANT_BOOL* hasNext)
+{
+    if( NULL == hasNext )
+        return E_POINTER;
+
+    if( _p_iter &&  _p_vlclog->_p_log )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        *hasNext = libvlc_log_iterator_has_next(_p_iter, &ex) ? VARIANT_TRUE : VARIANT_FALSE;
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCMessageIterator, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+    }
+    else
+    {
+        *hasNext = VARIANT_FALSE;
+    }
+    return S_OK;
+};
+
+STDMETHODIMP VLCMessageIterator::next(IVLCMessage** message)
+{
+    if( NULL == message )
+        return E_POINTER;
+
+    if( _p_iter &&  _p_vlclog->_p_log )
+    {
+        struct libvlc_log_message_t buffer;
+
+        buffer.sizeof_msg = sizeof(buffer);
+
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_log_iterator_next(_p_iter, &buffer, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCMessageIterator, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        *message = new VLCMessage(_p_instance, buffer);
+        return *message ? NOERROR : E_OUTOFMEMORY;
+    }
+    return E_FAIL;
+};
+
+/*******************************************************************************/
+
+VLCMessage::~VLCMessage()
+{
+    if( _p_typeinfo )
+        _p_typeinfo->Release();
+};
+
+HRESULT VLCMessage::loadTypeInfo(void)
+{
+    HRESULT hr = NOERROR;
+    if( NULL == _p_typeinfo )
+    {
+        ITypeLib *p_typelib;
+
+        hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_typelib->GetTypeInfoOfGuid(IID_IVLCMessage, &_p_typeinfo);
+            if( FAILED(hr) )
+            {
+                _p_typeinfo = NULL;
+            }
+            p_typelib->Release();
+        }
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMessage::GetTypeInfoCount(UINT* pctInfo)
+{
+    if( NULL == pctInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+        *pctInfo = 1;
+    else
+        *pctInfo = 0;
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCMessage::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
+{
+    if( NULL == ppTInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        _p_typeinfo->AddRef();
+        *ppTInfo = _p_typeinfo;
+        return NOERROR;
+    }
+    *ppTInfo = NULL;
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMessage::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+        UINT cNames, LCID lcid, DISPID* rgDispID)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMessage::Invoke(DISPID dispIdMember, REFIID riid,
+        LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
+        VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
+                pVarResult, pExcepInfo, puArgErr);
+    }
+    return E_NOTIMPL;
+};
+
+inline const char *msgSeverity(int sev)
+{
+    switch( sev )
+    {
+        case 0:
+            return "info";
+        case 1:
+            return "error";
+        case 2:
+            return "warning";
+        default:
+            return "debug";
+    }
+};
+
+STDMETHODIMP VLCMessage::get__Value(VARIANT* _Value)
+{
+    if( NULL == _Value )
+        return E_POINTER;
+
+    char buffer[256];
+
+    snprintf(buffer, sizeof(buffer), "%s %s %s: %s",
+        _msg.psz_type, _msg.psz_name, msgSeverity(_msg.i_severity), _msg.psz_message);
+
+    V_VT(_Value) = VT_BSTR;
+    V_BSTR(_Value) = BSTRFromCStr(CP_UTF8, buffer);
+
+    return S_OK;
+};
+
+STDMETHODIMP VLCMessage::get_severity(long* level)
+{
+    if( NULL == level )
+        return E_POINTER;
+
+    *level = _msg.i_severity;
+
+    return S_OK;
+};
+
+STDMETHODIMP VLCMessage::get_type(BSTR* type)
+{
+    if( NULL == type )
+        return E_POINTER;
+
+    *type = BSTRFromCStr(CP_UTF8, _msg.psz_type);
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCMessage::get_name(BSTR* name)
+{
+    if( NULL == name )
+        return E_POINTER;
+
+    *name = BSTRFromCStr(CP_UTF8, _msg.psz_name);
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCMessage::get_header(BSTR* header)
+{
+    if( NULL == header )
+        return E_POINTER;
+
+    *header = BSTRFromCStr(CP_UTF8, _msg.psz_header);
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCMessage::get_message(BSTR* message)
+{
+    if( NULL == message )
+        return E_POINTER;
+
+    *message = BSTRFromCStr(CP_UTF8, _msg.psz_message);
+
+    return NOERROR;
 };
 
 /*******************************************************************************/
@@ -656,7 +1279,7 @@ STDMETHODIMP VLCPlaylist::Invoke(DISPID dispIdMember, REFIID riid,
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCPlaylist::get_itemCount(int* count)
+STDMETHODIMP VLCPlaylist::get_itemCount(long* count)
 {
     if( NULL == count )
         return E_POINTER;
@@ -706,7 +1329,7 @@ STDMETHODIMP VLCPlaylist::get_isPlaying(VARIANT_BOOL* isPlaying)
     return hr;
 };
 
-STDMETHODIMP VLCPlaylist::add(BSTR uri, VARIANT name, VARIANT options, int* item)
+STDMETHODIMP VLCPlaylist::add(BSTR uri, VARIANT name, VARIANT options, long* item)
 {
     if( NULL == item )
         return E_POINTER;
@@ -789,7 +1412,7 @@ STDMETHODIMP VLCPlaylist::play()
     return hr;
 };
 
-STDMETHODIMP VLCPlaylist::playItem(int item)
+STDMETHODIMP VLCPlaylist::playItem(long item)
 {
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
@@ -921,7 +1544,7 @@ STDMETHODIMP VLCPlaylist::clear()
     return hr;
 };
 
-STDMETHODIMP VLCPlaylist::removeItem(int item)
+STDMETHODIMP VLCPlaylist::removeItem(long item)
 {
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
@@ -1077,7 +1700,7 @@ STDMETHODIMP VLCVideo::put_fullscreen(VARIANT_BOOL fullscreen)
     return hr;
 };
 
-STDMETHODIMP VLCVideo::get_width(int* width)
+STDMETHODIMP VLCVideo::get_width(long* width)
 {
     if( NULL == width )
         return E_POINTER;
@@ -1106,7 +1729,7 @@ STDMETHODIMP VLCVideo::get_width(int* width)
     return hr;
 };
 
-STDMETHODIMP VLCVideo::get_height(int* height)
+STDMETHODIMP VLCVideo::get_height(long* height)
 {
     if( NULL == height )
         return E_POINTER;
@@ -1173,6 +1796,7 @@ VLCControl2::VLCControl2(VLCPlugin *p_instance) :
 {
     _p_vlcaudio     = new VLCAudio(p_instance);
     _p_vlcinput     = new VLCInput(p_instance);
+    _p_vlclog       = new VLCLog(p_instance);
     _p_vlcplaylist  = new VLCPlaylist(p_instance);
     _p_vlcvideo     = new VLCVideo(p_instance);
 };
@@ -1181,6 +1805,7 @@ VLCControl2::~VLCControl2()
 {
     delete _p_vlcvideo;
     delete _p_vlcplaylist;
+    delete _p_vlclog;
     delete _p_vlcinput;
     delete _p_vlcaudio;
     if( _p_typeinfo )
@@ -1322,7 +1947,7 @@ STDMETHODIMP VLCControl2::put_MRL(BSTR mrl)
     return S_OK;
 };
 
-STDMETHODIMP VLCControl2::get_StartTime(int *seconds)
+STDMETHODIMP VLCControl2::get_StartTime(long *seconds)
 {
     if( NULL == seconds )
         return E_POINTER;
@@ -1332,7 +1957,7 @@ STDMETHODIMP VLCControl2::get_StartTime(int *seconds)
     return S_OK;
 };
      
-STDMETHODIMP VLCControl2::put_StartTime(int seconds)
+STDMETHODIMP VLCControl2::put_StartTime(long seconds)
 {
     _p_instance->setStartTime(seconds);
 
@@ -1372,7 +1997,7 @@ STDMETHODIMP VLCControl2::put_Visible(VARIANT_BOOL isVisible)
     return NOERROR;
 };
 
-STDMETHODIMP VLCControl2::get_Volume(int *volume)
+STDMETHODIMP VLCControl2::get_Volume(long *volume)
 {
     if( NULL == volume )
         return E_POINTER;
@@ -1381,7 +2006,7 @@ STDMETHODIMP VLCControl2::get_Volume(int *volume)
     return NOERROR;
 };
         
-STDMETHODIMP VLCControl2::put_Volume(int volume)
+STDMETHODIMP VLCControl2::put_Volume(long volume)
 {
     _p_instance->setVolume(volume);
     return NOERROR;
@@ -1410,6 +2035,20 @@ STDMETHODIMP VLCControl2::get_input(IVLCInput** obj)
     if( NULL != _p_vlcinput )
     {
         _p_vlcinput->AddRef();
+        return NOERROR;
+    }
+    return E_OUTOFMEMORY;
+};
+
+STDMETHODIMP VLCControl2::get_log(IVLCLog** obj)
+{
+    if( NULL == obj )
+        return E_POINTER;
+
+    *obj = _p_vlclog;
+    if( NULL != _p_vlclog )
+    {
+        _p_vlclog->AddRef();
         return NOERROR;
     }
     return E_OUTOFMEMORY;
