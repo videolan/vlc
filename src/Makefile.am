@@ -141,11 +141,13 @@ endif
 ###############################################################################
 
 libvlc_a_SOURCES = $(SOURCES_libvlc)
+nodist_libvlc_a_SOURCES = $(SOURCES_libvlc)
 libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic` -DUSE_BUILTINS
 libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc pic`
 libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc pic`
 
 libvlc_la_SOURCES = $(SOURCES_libvlc)
+nodist_libvlc_la_SOURCES = $(SOURCES_libvlc)
 libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
@@ -354,7 +356,7 @@ SOURCES_libvlc = \
 
 if !USE_LIBTOOL
 if !BUILD_SHARED
-SOURCES_libvlc += misc/version.c
+SOURCES_nodist_libvlc += misc/version.c
 CLEANFILES += misc/version.c
 
 misc/version.c: FORCE
