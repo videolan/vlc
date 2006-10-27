@@ -73,7 +73,7 @@ int libvlc_exception_raised( libvlc_exception_t *p_exception );
  * \param p_exception the exception to raise
  * \param psz_message the exception message
  */
-void libvlc_exception_raise( libvlc_exception_t *p_exception, char *psz_format, ... );
+void libvlc_exception_raise( libvlc_exception_t *p_exception, const char *psz_format, ... );
 
 /**
  * Clear an exception object so it can be reused.
@@ -344,7 +344,7 @@ int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *);
 
     
 /**
- * Resize the video output window
+ * Resize the current video output window
  * \param p_instance libvlc instance
  * \param width new width for video output window
  * \param height new height for video output window
@@ -362,7 +362,7 @@ void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exception_t *);
 typedef int libvlc_drawable_t;
 
 /**
- * change the video output parent
+ * change the parent for the current the video output
  * \param p_instance libvlc instance
  * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
  * \param p_exception an initialized exception
@@ -371,7 +371,8 @@ typedef int libvlc_drawable_t;
 int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, libvlc_exception_t * );
 
 /**
- * Set the video output parent
+ * Set the default video output parent
+ *  this settings will be used as default for all video outputs
  * \param p_instance libvlc instance
  * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
  * \param p_exception an initialized exception
@@ -379,7 +380,8 @@ int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, libvlc_exception
 void libvlc_video_set_parent( libvlc_instance_t *, libvlc_drawable_t, libvlc_exception_t * );
 
 /**
- * Set the video output size
+ * Set the default video output size
+ *  this settings will be used as default for all video outputs
  * \param p_instance libvlc instance
  * \param width new width for video drawable
  * \param height new height for video drawable
@@ -401,7 +403,8 @@ typedef struct
 libvlc_rectangle_t;
 
 /**
- * Set the video output viewport for a windowless video output (MacOS X only)
+ * Set the default video output viewport for a windowless video output (MacOS X only)
+ *  this settings will be used as default for all video outputs
  * \param p_instance libvlc instance
  * \param view coordinates within video drawable
  * \param clip coordinates within video drawable
@@ -613,6 +616,107 @@ LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
 #undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
 
 /** @} */
+/** @} */
+
+/*****************************************************************************
+ * Message log handling
+ *****************************************************************************/
+
+/** defgroup libvlc_log Log
+ * \ingroup libvlc
+ * LibVLC Message Logging
+ * @{
+ */
+
+/** This structure is opaque. It represents a libvlc log instance */
+typedef struct libvlc_log_t libvlc_log_t;
+
+/** This structure is opaque. It represents a libvlc log iterator */
+typedef struct libvlc_log_iterator_t libvlc_log_iterator_t;
+
+typedef struct libvlc_log_message_t
+{
+    unsigned    sizeof_msg;   /* sizeof() of message structure, must be filled in by user */
+    int         i_severity;   /* 0=INFO, 1=ERR, 2=WARN, 3=DBG */
+    const char *psz_type;     /* module type */
+    const char *psz_name;     /* module name */
+    const char *psz_header;   /* optional header */
+    const char *psz_message;  /* message */
+} libvlc_log_message_t;
+/**
+ * Returns the VLC messaging verbosity level
+ * \param p_instance libvlc instance
+ * \param exception an initialized exception pointer
+ */
+unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance, libvlc_exception_t *p_e );
+
+/**
+ * Set the VLC messaging verbosity level
+ * \param p_log libvlc log instance
+ * \param exception an initialized exception pointer
+ */
+void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level, libvlc_exception_t *p_e );
+
+/**
+ * Open an instance to VLC message log 
+ * \param p_instance libvlc instance
+ * \param exception an initialized exception pointer
+ */
+libvlc_log_t *libvlc_log_open( const libvlc_instance_t *, libvlc_exception_t *);
+
+/**
+ * Close an instance of VLC message log 
+ * \param p_log libvlc log instance
+ * \param exception an initialized exception pointer
+ */
+void libvlc_log_close( libvlc_log_t *, libvlc_exception_t *);
+
+/**
+ * Returns the number of messages in log
+ * \param p_log libvlc log instance
+ * \param exception an initialized exception pointer
+ */
+unsigned libvlc_log_count( const libvlc_log_t *, libvlc_exception_t *);
+
+/**
+ * Clear all messages in log
+ *  the log should be cleared on a regular basis to avoid clogging
+ * \param p_log libvlc log instance
+ * \param exception an initialized exception pointer
+ */
+void libvlc_log_clear( libvlc_log_t *, libvlc_exception_t *);
+
+/**
+ * Allocate and returns a new iterator to messages in log
+ * \param p_log libvlc log instance
+ * \param exception an initialized exception pointer
+ */
+libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *, libvlc_exception_t *);
+
+/**
+ * Releases a previoulsy allocated iterator
+ * \param p_log libvlc log iterator 
+ * \param exception an initialized exception pointer
+ */
+void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter, libvlc_exception_t *p_e );
+
+/**
+ * Returns whether log iterator has more messages 
+ * \param p_log libvlc log iterator
+ * \param exception an initialized exception pointer
+ */
+int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter, libvlc_exception_t *p_e );
+
+/**
+ * Returns next log message
+ *   the content of message must not be freed
+ * \param p_log libvlc log iterator
+ * \param exception an initialized exception pointer
+ */
+libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
+                                                struct libvlc_log_message_t *buffer,
+                                                libvlc_exception_t *p_e );
+
 /** @} */
 
 # ifdef __cplusplus
