@@ -103,11 +103,12 @@ Lorena Gomes - Catalan translation
 Mahrazi Mohd Kamal <mahrazi at gmail.com> - Malay Translation
 Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input
 Marco Munderloh <Marco.Munderloh at web.de> - HTTP fix for Win32 to URL filenames
-Mari·n HikanÌk- <podnety _at_ mojepreklady _dot_ net> - Slovak localisation
+Mari√°n Hikan√≠k <podnety _at_ mojepreklady _dot_ net> - Slovak localisation
 Mark Gritter <mgritter at kealia.com> - fix for netlist packet leak in demuxPSI
 Markus Kern <markus-kern at gmx dot net> - video output window fixes (win32)
 Markus Kuespert <ltlBeBoy at beosmail.com> - BeOS CSS support
 Martin Kahr <martin --at-- martinkahr dot com> - Apple Remote support
+Matej Urbanƒçiƒç <matej.urban at gmail.com> - Slovenian translation
 Mateus Krepsky Ludwich <mateus @t csp dot com d.t br> - rc interface mosaic-order callback
 Mathias C. Berens | welcome-soft <berens at welcome-soft.de> - German translation
 Mathias Kretschmer <mathias at research.att.com> - IP Multicast support
@@ -142,7 +143,7 @@ Rudolf Cornelissen <rag.cornelissen at inter.nl.net> - BeOS fixes
 Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX 
 improvements
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
-Simon Damkjær Andersen <simondamkjaer at gmail.com>	- playmode icons and the entire Fullscreen Panel design for the OSX GUI (v0.9.0)
+Simon DamkjÔøΩr Andersen <simondamkjaer at gmail.com>	- playmode icons and the entire Fullscreen Panel design for the OSX GUI (v0.9.0)
 Steve Lhomme <steve dot lhomme at free dot fr> - MSVC fixes and Matroska enhancements
 Steve Brown <sbrown at cortland.com> - fix for optional PES size bug
 Steven M. Schultz <sms at TO.GD-ES.COM> - BSD/OS port

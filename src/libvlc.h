@@ -31,17 +31,17 @@
 #if defined (WIN32) || defined (__APPLE__)
 static const char *ppsz_language[] =
 { "auto", "en", "en_GB", "ca", "cs", "da", "de", "es", "fr", "gl", "he", "hu",
-  "it", "ja", "ka", "ko", "ms", "nl", "oc", "pt_BR", "ro", "ru", "sk", "sv", "tr",
-  "zh_CN", "zh_TW" };
+  "it", "ja", "ka", "ko", "ms", "nl", "oc", "pt_BR", "ro", "ru", "sk", "sl",
+  "sv", "tr", "zh_CN", "zh_TW" };
 
 static const char *ppsz_language_text[] =
 { N_("Auto"), N_("American English"), N_("British English"),
 N_("Catalan"), N_("Czech"), N_("Danish"), N_("German"), N_("Spanish"),
 N_("French"), N_("Galician"), N_("Hebrew"), N_("Hungarian"),N_("Italian"),
-N_("Japanese"),N_("Georgian"), N_("Korean"), N_("Malay"), N_("Dutch"), N_("Occitan"),
-N_("Brazilian Portuguese"), N_("Romanian"), N_("Russian"), N_("Swedish"),
-N_("Slovak"), N_("Turkish"), N_("Simplified Chinese"),
-N_("Chinese Traditional") };
+N_("Japanese"),N_("Georgian"), N_("Korean"), N_("Malay"), N_("Dutch"),
+N_("Occitan"), N_("Brazilian Portuguese"), N_("Romanian"), N_("Russian"),
+N_("Slovak"), N_("Slovenian"), N_("Swedish"), N_("Turkish"),
+N_("Simplified Chinese"), N_("Chinese Traditional") };
 #endif
 
 static const char *ppsz_snap_formats[] =
