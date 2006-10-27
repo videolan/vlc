@@ -356,7 +356,7 @@ SOURCES_libvlc = \
 
 if !USE_LIBTOOL
 if !BUILD_SHARED
-SOURCES_nodist_libvlc += misc/version.c
+SOURCES_nodist_libvlc = misc/version.c
 CLEANFILES += misc/version.c
 
 misc/version.c: FORCE
