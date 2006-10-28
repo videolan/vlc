@@ -5234,7 +5234,7 @@ if test "${enable_mozilla}" = "yes"
 then
   dnl currently vlc plugin only needs headers, no xpcom support apis are actually used
   need_xpcom_libs=false
-  if test "${with_mozilla_sdk_path}" = ""
+  if test "${with_mozilla_sdk_path}" = "" -o "${with_mozilla_sdk_path}" = "no"
   then
     AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
     if test "${MOZILLA_CONFIG}" = "no"
