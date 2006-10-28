@@ -88,7 +88,7 @@ static int ReadMeta( vlc_object_t *p_this )
         if( !p_demux->p_private )
             p_demux->p_private = (void*)vlc_meta_New();
         TagLib::FileRef f( p_demux->psz_path );
-        if( !f.isNull() && f.tag() )
+        if( !f.isNull() && f.tag() && !f.tag()->isEmpty() )
         {
             TagLib::Tag *tag = f.tag();
             vlc_meta_t *p_meta = (vlc_meta_t *)(p_demux->p_private );
