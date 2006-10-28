@@ -75,7 +75,7 @@ static void Close( vlc_object_t * );
 #define B_ADAPT_LONGTEXT N_( "Force the specified number of " \
     "consecutive B-frames to be used, except possibly before an I-frame." )
 
-#define B_BIAS_TEXT N_("B-frames usage")
+#define B_BIAS_TEXT N_("Influence (bias) B-frames usage")
 #define B_BIAS_LONGTEXT N_( "Bias the choice to use B-frames. Positive values " \
     "cause more B-frames, negative values cause less B-frames." )
 
@@ -240,7 +240,7 @@ static void Close( vlc_object_t * );
     "independently select a reference frame, as opposed to only one ref " \
     "per macroblock." )
 
-#define CHROMA_ME_TEXT N_("Ignore chroma in motion estimation")
+#define CHROMA_ME_TEXT N_("Chroma in motion estimation")
 #define CHROMA_ME_LONGTEXT N_( "Chroma ME for subpel and mode decision in " \
     "P-frames.")
 
