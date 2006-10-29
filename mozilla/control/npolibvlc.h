@@ -43,6 +43,8 @@ protected:
     static const int methodCount;
     static const NPUTF8 * const methodNames[];
 
+    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
+
     NPObject *audioObj;
     NPObject *inputObj;
     NPObject *logObj;

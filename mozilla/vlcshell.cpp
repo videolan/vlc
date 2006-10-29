@@ -177,7 +177,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
             }
 
             const NPWindow *npwindow = p_plugin->getWindow();
-                
+
             if( needsDisplay && npwindow->window )
             {
                 /* draw the beautiful "No Picture" */

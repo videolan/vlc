@@ -97,10 +97,45 @@ RuntimeNPObject::InvokeResult LibvlcRootNPObject::getProperty(int index, NPVaria
 
 const NPUTF8 * const LibvlcRootNPObject::methodNames[] =
 {
-    /* no methods */
+    "versionInfo",
 };
 
 const int LibvlcRootNPObject::methodCount = sizeof(LibvlcRootNPObject::methodNames)/sizeof(NPUTF8 *);
+
+enum LibvlcRootNPObjectMethodIds
+{
+    ID_version,
+};
+
+RuntimeNPObject::InvokeResult LibvlcRootNPObject::invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result)
+{
+    VlcPlugin *p_plugin = reinterpret_cast<VlcPlugin *>(_instance->pdata);
+    if( p_plugin )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        switch( index )
+        {
+            case ID_version:
+                if( argCount == 0 )
+                {
+                    NPUTF8 *versionStr = NULL;
+
+                    versionStr = strdup( VLC_Version() );
+                    if (!versionStr)
+                        return INVOKERESULT_GENERIC_ERROR;
+
+                    STRINGZ_TO_NPVARIANT(versionStr, result);
+                    return INVOKERESULT_NO_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            default:
+                return INVOKERESULT_NO_SUCH_METHOD;
+        }
+    }
+    return INVOKERESULT_GENERIC_ERROR;
+}
 
 /*
 ** implementation of libvlc audio object
