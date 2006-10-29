@@ -30,7 +30,7 @@
 
 #ifdef HAVE_STDINT_H
 #   include <stdint.h>                                         /* int16_t .. */
-#elif HAVE_INTTYPES_H
+#elif defined(HAVE_INTTYPES_H)
 #   include <inttypes.h>                                       /* int16_t .. */
 #endif
 
