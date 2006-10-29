@@ -149,7 +149,6 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     char *psz_name = strdup( p_access->psz_path );
-    char *psz;
 
 #ifdef HAVE_SYS_STAT_H
     struct stat         stat_info;
@@ -161,6 +160,8 @@ static int Open( vlc_object_t *p_this )
     {
         if( psz_name[0] == '~' && psz_name[1] == '/' )
         {
+           char *psz;
+
             /* This is incomplete : we should also support the ~cmassiot/
              * syntax. */
             asprintf( &psz, "%s/%s", p_access->p_libvlc->psz_homedir, psz_name + 2 );
@@ -286,10 +287,10 @@ static int Open( vlc_object_t *p_this )
     p_file->psz_name = psz_name;
     TAB_APPEND( p_sys->i_file, p_sys->file, p_file );
 
-    psz = var_CreateGetString( p_access, "file-cat" );
-    if( *psz )
+    psz_name = var_CreateGetString( p_access, "file-cat" );
+    if( *psz_name )
     {
-        char *psz_parser = psz_name = psz;
+        char *psz_parser = psz_name;
         int64_t i_size;
 
         while( psz_name && *psz_name )
@@ -325,7 +326,7 @@ static int Open( vlc_object_t *p_this )
             if( psz_name ) psz_name++;
         }
     }
-    free( psz );
+    free( psz_name );
 
     return VLC_SUCCESS;
 }
