@@ -365,44 +365,45 @@ LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
 
 #undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
 
+/* local function to be used in libvlc_vlm_show_media only */
+char* recurse_answer( char* psz_prefix, vlm_message_t *p_answer ) {
+    char* psz_childprefix;
+    char* psz_response="";
+    char* response_tmp;
+    int i;
+    vlm_message_t *aw_child, **paw_child;
+    
+    asprintf( &psz_childprefix, "%s%s.", psz_prefix, p_answer->psz_name );
+    
+    if ( p_answer->i_child )
+    {
+        paw_child = p_answer->child;
+        aw_child = *( paw_child );
+        for( i = 0; i < p_answer->i_child; i++ )
+        {
+            asprintf( &response_tmp, "%s%s%s:%s\n",
+                      psz_response, psz_prefix, aw_child->psz_name,
+                      aw_child->psz_value );
+            free( psz_response );
+            psz_response = response_tmp;
+            if ( aw_child->i_child )
+            {
+                asprintf(&response_tmp, "%s%s", psz_response,
+                         recurse_answer(psz_childprefix, aw_child));
+                free( psz_response );
+                psz_response = response_tmp;
+            }
+            paw_child++;
+            aw_child = *( paw_child );
+        }
+    }
+    free( psz_childprefix );
+    return psz_response;
+}
+
 char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
                              libvlc_exception_t *p_exception )
 {
-    char* recurse_answer( char* psz_prefix, vlm_message_t *p_answer ) {
-        char* psz_childprefix;
-        char* psz_response="";
-        char* response_tmp;
-        int i;
-        vlm_message_t *aw_child, **paw_child;
-        
-        asprintf( &psz_childprefix, "%s%s.", psz_prefix, p_answer->psz_name );
-        
-        if ( p_answer->i_child )
-        {
-            paw_child = p_answer->child;
-            aw_child = *( paw_child );
-            for( i = 0; i < p_answer->i_child; i++ )
-            {
-                asprintf( &response_tmp, "%s%s%s:%s\n",
-                          psz_response, psz_prefix, aw_child->psz_name,
-                          aw_child->psz_value );
-                free( psz_response );
-                psz_response = response_tmp;
-                if ( aw_child->i_child )
-                {
-                    asprintf(&response_tmp, "%s%s", psz_response,
-                             recurse_answer(psz_childprefix, aw_child));
-                    free( psz_response );
-                    psz_response = response_tmp;
-                }
-                paw_child++;
-                aw_child = *( paw_child );
-            }
-        }
-        free( psz_childprefix );
-        return psz_response;
-    }
-    
     char *psz_message;
     vlm_message_t *answer;
     char *psz_response;
