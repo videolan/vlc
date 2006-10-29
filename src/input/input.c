@@ -2202,7 +2202,7 @@ static void SlaveDemux( input_thread_t *p_input )
 {
     int64_t i_time;
     int i;
- 
+
     if( demux2_Control( p_input->input.p_demux, DEMUX_GET_TIME, &i_time ) )
     {
         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
