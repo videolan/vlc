@@ -63,6 +63,7 @@ const NPUTF8 * const LibvlcRootNPObject::propertyNames[] =
     "input",
     "playlist",
     "video",
+    "VersionInfo",
 };
 
 const int LibvlcRootNPObject::propertyCount = sizeof(LibvlcRootNPObject::propertyNames)/sizeof(NPUTF8 *);
@@ -73,6 +74,7 @@ enum LibvlcRootNPObjectPropertyIds
     ID_input,
     ID_playlist,
     ID_video,
+    ID_VersionInfo,
 };
 
 RuntimeNPObject::InvokeResult LibvlcRootNPObject::getProperty(int index, NPVariant &result)
@@ -90,6 +92,15 @@ RuntimeNPObject::InvokeResult LibvlcRootNPObject::getProperty(int index, NPVaria
             return INVOKERESULT_NO_ERROR;
         case ID_video:
             OBJECT_TO_NPVARIANT(NPN_RetainObject(videoObj), result);
+            return INVOKERESULT_NO_ERROR;
+        case ID_VersionInfo:
+            NPUTF8 *versionStr = NULL;
+
+            versionStr = strdup( VLC_Version() );
+            if (!versionStr)
+                return INVOKERESULT_GENERIC_ERROR;
+
+            STRINGZ_TO_NPVARIANT(versionStr, result);
             return INVOKERESULT_NO_ERROR;
     }
     return INVOKERESULT_GENERIC_ERROR;
