@@ -50,8 +50,7 @@
 #endif
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
-/* stat() support for large files on win32 */
-#   define stat _stati64
+/* fstat() support for large files on win32 */
 #   define fstat(a,b) _fstati64(a,b)
 #   ifdef lseek
 #      undef lseek
@@ -180,15 +179,6 @@ static int Open( vlc_object_t *p_this )
             strcpy( psz_name, p_access->psz_path + 1 );
         }
 #endif
-
-#ifdef HAVE_SYS_STAT_H
-        if( utf8_stat( psz_name, &stat_info ) )
-        {
-            msg_Warn( p_access, "%s: %s", psz_name, strerror( errno ) );
-            free( psz_name );
-            return VLC_EGENERIC;
-        }
-#endif
     }
 
     STANDARD_READ_ACCESS_INIT;
@@ -199,6 +189,31 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_index = 0;
 #ifndef UNDER_CE
     p_sys->fd = -1;
+#endif
+
+    msg_Dbg( p_access, "opening file `%s'", psz_name );
+
+    if( b_stdin )
+        p_sys->fd = dup(0);
+    else
+        _OpenFile( p_access, psz_name );
+
+    free( psz_name );
+
+    if( p_sys->fd == -1 )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+#ifdef HAVE_SYS_STAT_H
+    if( fstat( p_sys->fd, &stat_info ) )
+    {
+        msg_Err( p_access, "%s: %s", p_access->psz_path, strerror( errno ) );
+        close( p_sys->fd );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 #endif
 
     if( !strcasecmp( p_access->psz_access, "stream" ) )
@@ -218,61 +233,29 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_pace_control = VLC_TRUE;
 
         if( b_stdin )
-        {
             p_sys->b_seekable = VLC_FALSE;
-        }
-#ifdef UNDER_CE
-        else if( VLC_TRUE )
-        {
-            /* We'll update i_size after it's been opened */
-            p_sys->b_seekable = VLC_TRUE;
-        }
-#elif defined( HAVE_SYS_STAT_H )
-        else if( S_ISREG(stat_info.st_mode) || S_ISBLK(stat_info.st_mode)
+        else
+#if defined( HAVE_SYS_STAT_H )
+        if( S_ISREG(stat_info.st_mode) || S_ISBLK(stat_info.st_mode)
          || ( S_ISCHR(stat_info.st_mode) && (stat_info.st_size > 0) ) )
         {
             p_sys->b_seekable = VLC_TRUE;
             p_access->info.i_size = stat_info.st_size;
         }
-        else if( S_ISCHR(stat_info.st_mode) || S_ISFIFO(stat_info.st_mode)
-#   ifdef S_ISSOCK
-                  || S_ISSOCK(stat_info.st_mode)
-#   endif
-               )
-        {
-            p_sys->b_seekable = VLC_FALSE;
-        }
-#endif
         else
-        {
-            msg_Err( p_access, "unknown file type for `%s'", psz_name );
-            intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"), 
-                            _("\"%s\"'s file type is unknown."),
-                            psz_name );
-            free( psz_name );
-            return VLC_EGENERIC;
-        }
-    }
-
-    msg_Dbg( p_access, "opening file `%s'", psz_name );
-
-    if( b_stdin )
-    {
-        p_sys->fd = 0;
-    }
-    else if( _OpenFile( p_access, psz_name ) )
-    {
-        free( p_sys );
-        free( psz_name );
-        return VLC_EGENERIC;
+            p_sys->b_seekable = VLC_FALSE;
+#else
+            /* We'll update i_size after it's been opened */
+            p_sys->b_seekable = VLC_TRUE;
+#endif
     }
 
     if( p_sys->b_seekable && !p_access->info.i_size )
     {
         /* FIXME that's bad because all others access will be probed */
         msg_Err( p_access, "file %s is empty, aborting", psz_name );
+        close( p_sys->fd );
         free( p_sys );
-        free( psz_name );
         return VLC_EGENERIC;
     }
 
