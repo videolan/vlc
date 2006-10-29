@@ -1484,7 +1484,7 @@ dnl
 
 AC_ARG_ENABLE(notify,
   [  --enable-notify         libnotify notification plugin (default enabled)])
-AS_IF([test "${enable_notify}" != "no"], [
+AS_IF([test "${enable_notify}" != "no" -a "${SYS}" != "mingw32"], [
     PKG_CHECK_MODULES(NOTIFY, libnotify,
       [
         VLC_ADD_PLUGINS([notify])
