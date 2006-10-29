@@ -11,7 +11,7 @@ EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in
 
 BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES)
 DISTCLEANFILES = stamp-api libvlc.sym
-CLEANFILES = misc/modules_builtin.h
+CLEANFILES = misc/modules_builtin.h misc/version.c
 MOSTLYCLEANFILES = $(DATA_noinst_libvlc) stamp-builtins
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
@@ -358,9 +358,6 @@ if !USE_LIBTOOL
 if !BUILD_SHARED
 SOURCES_nodist_libvlc = misc/version.c
 CLEANFILES += misc/version.c
-
-misc/version.c: FORCE
-	$(TOOLBOX) --update-version
 endif
 
 # Install shared libvlc
@@ -371,6 +368,9 @@ install-exec-local:
 uninstall-local:
 	test -z "$(DATA_noinst_libvlc)" || rm -f "$(DESTDIR)$(libdir)/$(DATA_noinst_libvlc)"
 endif
+
+misc/version.c: FORCE
+	$(TOOLBOX) --update-version
 
 ###############################################################################
 # Stamp rules
