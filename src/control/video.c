@@ -5,7 +5,7 @@
  *
  * $Id: core.c 14187 2006-02-07 16:37:40Z courmisch $
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: Clï¿½ent Stenac <zorglub@videolan.org>
  *          Filippo Carone <littlejohn@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -62,7 +62,7 @@ static vout_thread_t *GetVout( libvlc_input_t *p_input,
         return NULL;
     }
     vlc_object_release( p_input_thread );
-    
+
     return p_vout;
 }
 /**********************************************************************
@@ -91,7 +91,6 @@ void libvlc_set_fullscreen( libvlc_input_t *p_input, int b_fullscreen,
                         "Unexpected error while setting fullscreen value" );
 
     vlc_object_release( p_vout1 );
-
 }
 
 int libvlc_get_fullscreen( libvlc_input_t *p_input,
@@ -136,7 +135,6 @@ void libvlc_toggle_fullscreen( libvlc_input_t *p_input,
                         "Unexpected error while setting fullscreen value" );
 
     vlc_object_release( p_vout1 );
-
 }
 
 void
@@ -145,7 +143,7 @@ libvlc_video_take_snapshot( libvlc_input_t *p_input, char *psz_filepath,
 {
     vout_thread_t *p_vout = GetVout( p_input, p_e );
     input_thread_t *p_input_thread;
-    
+
     char path[256];
 
     /* GetVout will raise the exception for us */
@@ -162,7 +160,7 @@ libvlc_video_take_snapshot( libvlc_input_t *p_input, char *psz_filepath,
         libvlc_exception_raise( p_e, "Input does not exist" );
         return;
     }
-   
+
     snprintf( path, 255, "%s", psz_filepath );
     var_SetString( p_vout, "snapshot-path", path );
     var_SetString( p_vout, "snapshot-format", "png" );
@@ -170,9 +168,6 @@ libvlc_video_take_snapshot( libvlc_input_t *p_input, char *psz_filepath,
     vout_Control( p_vout, VOUT_SNAPSHOT );
     vlc_object_release( p_vout );
     vlc_object_release( p_input_thread );
-
-    return;
-    
 }
 
 int libvlc_video_get_height( libvlc_input_t *p_input,
@@ -211,7 +206,7 @@ vlc_bool_t libvlc_input_has_vout( libvlc_input_t *p_input,
     }
 
     vlc_object_release( p_vout );
-    
+
     return VLC_TRUE;
 }
 
@@ -222,9 +217,8 @@ int libvlc_video_reparent( libvlc_input_t *p_input, libvlc_drawable_t d,
     vout_thread_t *p_vout = GetVout( p_input, p_e );
     vout_Control( p_vout , VOUT_REPARENT, d);
     vlc_object_release( p_vout );
-    
+
     return 0;
-    
 }
 
 void libvlc_video_resize( libvlc_input_t *p_input, int width, int height, libvlc_exception_t *p_e )
@@ -332,7 +326,6 @@ int libvlc_video_destroy( libvlc_input_t *p_input,
     vlc_object_detach( p_vout ); 
     vlc_object_release( p_vout );
     vout_Destroy( p_vout );
-    
+
     return 0;
-    
 }
