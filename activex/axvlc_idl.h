@@ -2034,6 +2034,12 @@ interface IVLCVideo : public IDispatch
     virtual HRESULT STDMETHODCALLTYPE get_height(
         long* height) = 0;
 
+    virtual HRESULT STDMETHODCALLTYPE get_aspectRatio(
+        BSTR* aspect) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_aspectRatio(
+        BSTR aspect) = 0;
+
     virtual HRESULT STDMETHODCALLTYPE toggleFullscreen(
         ) = 0;
 
@@ -2101,6 +2107,14 @@ typedef struct IVLCVideoVtbl {
         IVLCVideo* This,
         long* height);
 
+    HRESULT (STDMETHODCALLTYPE *get_aspectRatio)(
+        IVLCVideo* This,
+        BSTR* aspect);
+
+    HRESULT (STDMETHODCALLTYPE *put_aspectRatio)(
+        IVLCVideo* This,
+        BSTR aspect);
+
     HRESULT (STDMETHODCALLTYPE *toggleFullscreen)(
         IVLCVideo* This);
 
@@ -2125,6 +2139,8 @@ interface IVLCVideo {
 #define IVLCVideo_put_fullscreen(p,a) (p)->lpVtbl->put_fullscreen(p,a)
 #define IVLCVideo_get_width(p,a) (p)->lpVtbl->get_width(p,a)
 #define IVLCVideo_get_height(p,a) (p)->lpVtbl->get_height(p,a)
+#define IVLCVideo_get_aspectRatio(p,a) (p)->lpVtbl->get_aspectRatio(p,a)
+#define IVLCVideo_put_aspectRatio(p,a) (p)->lpVtbl->put_aspectRatio(p,a)
 #define IVLCVideo_toggleFullscreen(p) (p)->lpVtbl->toggleFullscreen(p)
 #endif
 
@@ -2158,6 +2174,22 @@ HRESULT CALLBACK IVLCVideo_get_height_Proxy(
     IVLCVideo* This,
     long* height);
 void __RPC_STUB IVLCVideo_get_height_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCVideo_get_aspectRatio_Proxy(
+    IVLCVideo* This,
+    BSTR* aspect);
+void __RPC_STUB IVLCVideo_get_aspectRatio_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT CALLBACK IVLCVideo_put_aspectRatio_Proxy(
+    IVLCVideo* This,
+    BSTR aspect);
+void __RPC_STUB IVLCVideo_put_aspectRatio_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,

@@ -402,6 +402,11 @@ library AXVLC
         [propget, helpstring("Returns video original height.")]
         HRESULT height([out, retval] long* height);
 
+        [propget, helpstring("Returns video aspect ratio.")]
+        HRESULT aspectRatio([out, retval] BSTR *aspect);
+        [propput, helpstring("Sets video aspect ratio.")]
+        HRESULT aspectRatio([in] BSTR aspect);
+
         [helpstring("toggle fullscreen/windowed state.")]
         HRESULT toggleFullscreen();
     };

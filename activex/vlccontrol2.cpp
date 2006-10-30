@@ -1758,6 +1758,88 @@ STDMETHODIMP VLCVideo::get_height(long* height)
     return hr;
 };
 
+STDMETHODIMP VLCVideo::get_aspectRatio(BSTR *aspect)
+{
+    if( NULL == *aspect )
+        return E_POINTER;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            char *psz_aspect = libvlc_video_get_aspect_ratio(p_input, &ex);
+
+            if( !psz_aspect )
+                return E_OUTOFMEMORY;
+
+            if( ! libvlc_exception_raised(&ex) )
+            {
+                *aspect = SysAllocStringByteLen(psz_aspect, strlen(psz_aspect));
+                free( psz_aspect );
+                psz_aspect = NULL;
+                libvlc_input_free(p_input);
+                if( ! libvlc_exception_raised(&ex) )
+                {
+                    return NOERROR;
+                }
+	    }
+	    if( psz_aspect ) free( psz_aspect );
+        }
+        _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCVideo::put_aspectRatio(BSTR aspect)
+{
+    if( NULL == aspect )
+        return E_POINTER;
+
+    if( 0 == SysStringLen(aspect) )
+        return E_INVALIDARG;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        char *psz_aspect = NULL;
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            psz_aspect = CStrFromBSTR(CP_UTF8, aspect);
+            if( NULL == psz_aspect )
+            {
+                return E_OUTOFMEMORY;
+            }
+
+            libvlc_video_set_aspect_ratio(p_input, psz_aspect, &ex);
+
+            CoTaskMemFree(psz_aspect);
+            libvlc_input_free(p_input);
+            if( libvlc_exception_raised(&ex) )
+            {
+                _p_instance->setErrorInfo(IID_IVLCPlaylist,
+                    libvlc_exception_get_message(&ex));
+                libvlc_exception_clear(&ex);
+                return E_FAIL;
+            }
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
 STDMETHODIMP VLCVideo::toggleFullscreen()
 {
     libvlc_instance_t* p_libvlc;
