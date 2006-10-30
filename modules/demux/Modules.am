@@ -1,6 +1,6 @@
 SOURCES_a52sys = a52.c
 SOURCES_dtssys = dts.c
-SOURCES_flac = flac.c
+SOURCES_flacsys = flac.c
 SOURCES_ogg = ogg.c
 SOURCES_demuxdump = demuxdump.c
 SOURCES_rawdv = rawdv.c

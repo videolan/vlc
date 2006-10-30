@@ -1144,8 +1144,8 @@ rm -fr %buildroot
 %files plugin-flac
 %defattr(-,root,root)
 %doc README
-%_libdir/vlc/demux/libflac_plugin.so
-%_libdir/vlc/codec/libflacdec_plugin.so
+%_libdir/vlc/demux/libflacsys_plugin.so
+%_libdir/vlc/codec/libflac_plugin.so
 %endif
 
 

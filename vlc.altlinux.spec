@@ -1491,8 +1491,8 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/codec/libvorbis_plugin.so*
 
 %files plugin-flac
-%_vlc_pluginsdir/demux/libflac_plugin.so*
-%_vlc_pluginsdir/codec/libflacdec_plugin.so*
+%_vlc_pluginsdir/demux/libflacsys_plugin.so*
+%_vlc_pluginsdir/codec/libflac_plugin.so*
 
 %files plugin-a52
 %_vlc_pluginsdir/audio_filter/liba52tofloat32_plugin.so*

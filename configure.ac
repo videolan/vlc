@@ -1083,8 +1083,8 @@ dnl
 dnl  default modules
 dnl
 VLC_ADD_PLUGINS([dummy logger memcpy])
-VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf mp4 rawdv nsv real aiff mjpeg demuxdump flac tta])
-VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak flacdec])
+VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf mp4 rawdv nsv real aiff mjpeg demuxdump flacsys tta])
+VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak flac])
 VLC_ADD_PLUGINS([deinterlace invert adjust transform wave ripple psychedelic gradient motionblur rv32 rotate noise])
 VLC_ADD_PLUGINS([fixed32tos16 s16tofixed32 u8tofixed32 mono])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler])
@@ -3173,7 +3173,7 @@ dnl
 dnl  Flac plugin
 dnl
 AC_ARG_ENABLE(flac,
-  [  --enable-flac           flac decoder support (default disabled)])
+  [  --enable-flac           libflac decoder/encoder support (default disabled)])
 if test "${enable_flac}" = "yes"
 then
   AC_ARG_WITH(flac-tree,
@@ -3192,8 +3192,8 @@ then
     then
       dnl  Use a custom flac
       AC_MSG_RESULT(${real_flac_tree}/src/libFLAC/.libs/libFLAC.a)
-      VLC_ADD_LDFLAGS([flacdec],[${real_flac_tree}/src/libFLAC/.libs/libFLAC.a])
-      VLC_ADD_CFLAGS([flacdec],[-I${real_flac_tree}/include])
+      VLC_ADD_LDFLAGS([flac],[${real_flac_tree}/src/libFLAC/.libs/libFLAC.a])
+      VLC_ADD_CFLAGS([flac],[-I${real_flac_tree}/include])
       AC_DEFINE(HAVE_FLAC_STREAM_DECODER_H, 1, [Define if you have FLAC])
     else
       dnl  The given flac wasn't built
@@ -3202,7 +3202,7 @@ then
     fi
   else
     AC_CHECK_HEADERS(FLAC/stream_decoder.h, [
-      VLC_ADD_LDFLAGS([flacdec],[-lFLAC])
+      VLC_ADD_LDFLAGS([flac],[-lFLAC])
      ],[])
   fi
 fi
