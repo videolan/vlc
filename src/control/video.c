@@ -327,7 +327,7 @@ char *libvlc_video_get_aspect_ratio( libvlc_input_t *p_input,
     if( !p_vout )
         return 0;
 
-    psz_aspect = var_GetString( p_vout1, "aspect-ratio" );
+    psz_aspect = var_GetString( p_vout, "aspect-ratio" );
     vlc_object_release( p_vout );
     return psz_aspect;
 }
