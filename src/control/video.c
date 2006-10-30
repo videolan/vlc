@@ -210,7 +210,6 @@ vlc_bool_t libvlc_input_has_vout( libvlc_input_t *p_input,
     return VLC_TRUE;
 }
 
-
 int libvlc_video_reparent( libvlc_input_t *p_input, libvlc_drawable_t d,
                            libvlc_exception_t *p_e )
 {
@@ -305,7 +304,7 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance,
         libvlc_input_t *p_input = libvlc_playlist_get_input(p_instance, p_e);
         if( p_input )
         {
-           vout_thread_t *p_vout = GetVout( p_input, p_e );
+            vout_thread_t *p_vout = GetVout( p_input, p_e );
             if( p_vout )
             {
                 /* change viewport for running vout */
@@ -317,6 +316,37 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance,
             libvlc_input_free(p_input);
         }
     }
+}
+
+char *libvlc_video_get_aspect_ratio( libvlc_input_t *p_input,
+                                   libvlc_exception_t *p_e )
+{
+    char *psz_aspect = 0;
+    vout_thread_t *p_vout = GetVout( p_input, p_e );
+
+    if( !p_vout )
+        return 0;
+
+    psz_aspect = var_GetString( p_vout1, "aspect-ratio" );
+    vlc_object_release( p_vout );
+    return psz_aspect;
+}
+
+void libvlc_video_set_aspect_ratio( libvlc_input_t *p_input,
+                                    char *psz_aspect, libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_input, p_e );
+    int i_ret = -1;
+
+    if( !p_vout )
+        return;
+
+    i_ret = var_SetString( p_vout, "aspect-ratio", psz_aspect );
+    if( i_ret )
+        libvlc_exception_raise( p_e,
+                        "Unexpected error while setting aspect-ratio value" );
+
+    vlc_object_release( p_vout );
 }
 
 int libvlc_video_destroy( libvlc_input_t *p_input,

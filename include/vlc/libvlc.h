@@ -137,10 +137,12 @@ void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
  * LibVLC Playlist handling
  * @{
  */
+
 /**
  * Set loop variable
  */
 void libvlc_playlist_loop( libvlc_instance_t* , vlc_bool_t, libvlc_exception_t * );
+
 /**
  * Start playing. You can give some additionnal playlist item options
  * that will be added to the item before playing it.
@@ -239,7 +241,7 @@ int libvlc_playlist_add_extended( libvlc_instance_t *, const char *,
  */
 int libvlc_playlist_delete_item( libvlc_instance_t *, int,
                                  libvlc_exception_t * );
-    
+
 typedef struct libvlc_input_t libvlc_input_t;
 
 /* Get the input that is currently being played by the playlist
@@ -276,7 +278,7 @@ vlc_bool_t  libvlc_input_will_play      ( libvlc_input_t *, libvlc_exception_t *
 float       libvlc_input_get_rate       ( libvlc_input_t *, libvlc_exception_t *);
 void        libvlc_input_set_rate       ( libvlc_input_t *, float, libvlc_exception_t *);
 int         libvlc_input_get_state      ( libvlc_input_t *, libvlc_exception_t *);
-        
+
 /** @} */
 
 /** defgroup libvlc_video Video
@@ -315,7 +317,7 @@ void libvlc_set_fullscreen( libvlc_input_t *, int, libvlc_exception_t * );
  * \return the fullscreen status (boolean)
  */
 int libvlc_get_fullscreen( libvlc_input_t *, libvlc_exception_t * );
-    
+
 /**
  * Get current video height
  * \param p_input the input
@@ -333,16 +335,31 @@ int libvlc_video_get_height( libvlc_input_t *, libvlc_exception_t * );
 int libvlc_video_get_width( libvlc_input_t *, libvlc_exception_t * );
 
 /**
+ * Get current video aspect ratio
+ * \param p_input the input
+ * \param p_exception an initialized exception
+ * \return the video aspect ratio
+ */
+char *libvlc_video_get_aspect_ratio( libvlc_input_t *, libvlc_exception_t * );
+
+/**
+ * Set new video aspect ratio
+ * \param p_input the input
+ * \param psz_aspect new video aspect-ratio
+ * \param p_exception an initialized exception
+ */
+void libvlc_video_set_aspect_ratio( libvlc_input_t *, char *, libvlc_exception_t * );
+
+/**
  * Take a snapshot of the current video window
  * \param p_input the input
  * \param psz_filepath the path where to save the screenshot to
  * \param p_exception an initialized exception
  */
 void libvlc_video_take_snapshot( libvlc_input_t *, char *, libvlc_exception_t * );
-    
+
 int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *);
 
-    
 /**
  * Resize the current video output window
  * \param p_instance libvlc instance
@@ -352,7 +369,7 @@ int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *);
  * \return the mute status (boolean)
  */
 void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exception_t *);
-    
+
 /**
 * Downcast to this general type as placeholder for a platform specific one, such as:
 *  Drawable on X11,
@@ -453,7 +470,6 @@ vlc_bool_t libvlc_audio_get_mute( libvlc_instance_t *, libvlc_exception_t * );
  */
 void libvlc_audio_set_mute( libvlc_instance_t *, vlc_bool_t , libvlc_exception_t * );
 
-
 /**
  * Get current audio level
  * \param p_instance libvlc instance
@@ -461,7 +477,6 @@ void libvlc_audio_set_mute( libvlc_instance_t *, vlc_bool_t , libvlc_exception_t
  * \return the audio level (int)
  */
 int libvlc_audio_get_volume( libvlc_instance_t *, libvlc_exception_t * );
-
 
 /**
  * Set current audio level
@@ -539,9 +554,6 @@ void libvlc_vlm_set_input( libvlc_instance_t *, char *, char*,
 void libvlc_vlm_set_loop( libvlc_instance_t *, char *, int,
                           libvlc_exception_t *);
 
-
-
-
 /**
  * Edit the parameters of a media. This will delete all existing inputs and
  * add the specified one.
@@ -563,7 +575,7 @@ void libvlc_vlm_change_media( libvlc_instance_t *, char *, char *, char* ,
  * \param p_instance the instance
  * \param psz_name the name of the broadcast
  * \param p_exception an initialized exception
- */ 
+ */
 void libvlc_vlm_play_media ( libvlc_instance_t *, char *, libvlc_exception_t * );
 
 /**
@@ -574,7 +586,6 @@ void libvlc_vlm_play_media ( libvlc_instance_t *, char *, libvlc_exception_t * )
  */ 
 void libvlc_vlm_stop_media ( libvlc_instance_t *, char *, libvlc_exception_t * );
 
-    
 /**
  * Pauses the named broadcast.
  * \param p_instance the instance
@@ -643,6 +654,7 @@ typedef struct libvlc_log_message_t
     const char *psz_header;   /* optional header */
     const char *psz_message;  /* message */
 } libvlc_log_message_t;
+
 /**
  * Returns the VLC messaging verbosity level
  * \param p_instance libvlc instance
