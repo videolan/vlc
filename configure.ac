@@ -2757,10 +2757,10 @@ dnl Look for a ffmpeg-config (we are on debian )
   AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no, ${FFMPEG_PATH})
   if test "${FFMPEG_CONFIG}" != "no"
   then
-    AC_CHECK_HEADERS(ffmpeg/avcodec.h)
+      AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
     AC_CHECK_HEADERS(ffmpeg/avformat.h)
     AC_CHECK_HEADERS(ffmpeg/avutil.h)
-    AC_CHECK_HEADERS(postproc/postprocess.h)
+    AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
     VLC_ADD_PLUGINS([ffmpeg])
     if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes"; then
         VLC_ADD_PLUGINS([stream_out_switcher])
@@ -2776,7 +2776,7 @@ dnl Trying with pkg-config
      AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
      AC_CHECK_HEADERS(ffmpeg/avformat.h)
      AC_CHECK_HEADERS(ffmpeg/avutil.h)
-     AC_CHECK_HEADERS(postproc/postprocess.hi, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
+     AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
      if test "${SYS}" = "darwin"; then
         VLC_ADD_BUILTINS([ffmpeg])
      else
