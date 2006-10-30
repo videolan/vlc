@@ -885,7 +885,11 @@ package-macosx:
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/";
 
 # Copy relevant files 
-	cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/vlc-${VERSION}/VLC.app"
+	@if test -e "$(top_builddir)/VLC-release.app/"; then \
+	  cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/vlc-${VERSION}/VLC.app"; \
+	else \
+	  cp -R "$(top_builddir)/VLC.app" "$(top_builddir)/vlc-${VERSION}/VLC.app"; \
+	fi
 	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/vlc-${VERSION}/ && cp -R extras/MacOSX/Delete_Preferences.app $(top_builddir)/vlc-${VERSION}/
 
 # Create disk image 
