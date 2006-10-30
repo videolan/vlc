@@ -2773,10 +2773,10 @@ dnl Look for a ffmpeg-config (we are on debian )
 dnl Trying with pkg-config
    PKG_CHECK_MODULES(FFMPEG,[libavcodec, libavformat],
     [
-     AC_CHECK_HEADERS(ffmpeg/avcodec.h)
+     AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
      AC_CHECK_HEADERS(ffmpeg/avformat.h)
      AC_CHECK_HEADERS(ffmpeg/avutil.h)
-     AC_CHECK_HEADERS(postproc/postprocess.h)
+     AC_CHECK_HEADERS(postproc/postprocess.hi, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
      if test "${SYS}" = "darwin"; then
         VLC_ADD_BUILTINS([ffmpeg])
      else
