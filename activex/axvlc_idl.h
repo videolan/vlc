@@ -2035,7 +2035,7 @@ interface IVLCVideo : public IDispatch
         long* height) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE get_aspectRatio(
-        BSTR* aspect) = 0;
+        BSTR aspect) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE put_aspectRatio(
         BSTR aspect) = 0;
@@ -2109,7 +2109,7 @@ typedef struct IVLCVideoVtbl {
 
     HRESULT (STDMETHODCALLTYPE *get_aspectRatio)(
         IVLCVideo* This,
-        BSTR* aspect);
+        BSTR aspect);
 
     HRESULT (STDMETHODCALLTYPE *put_aspectRatio)(
         IVLCVideo* This,
@@ -2180,7 +2180,7 @@ void __RPC_STUB IVLCVideo_get_height_Stub(
     DWORD* pdwStubPhase);
 HRESULT CALLBACK IVLCVideo_get_aspectRatio_Proxy(
     IVLCVideo* This,
-    BSTR* aspect);
+    BSTR aspect);
 void __RPC_STUB IVLCVideo_get_aspectRatio_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,

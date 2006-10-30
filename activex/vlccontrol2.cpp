@@ -1758,9 +1758,9 @@ STDMETHODIMP VLCVideo::get_height(long* height)
     return hr;
 };
 
-STDMETHODIMP VLCVideo::get_aspectRatio(BSTR *aspect)
+STDMETHODIMP VLCVideo::get_aspectRatio(BSTR aspect)
 {
-    if( NULL == *aspect )
+    if( NULL == aspect )
         return E_POINTER;
 
     libvlc_instance_t* p_libvlc;
@@ -1775,19 +1775,16 @@ STDMETHODIMP VLCVideo::get_aspectRatio(BSTR *aspect)
         {
             char *psz_aspect = libvlc_video_get_aspect_ratio(p_input, &ex);
 
-            if( !psz_aspect )
+            libvlc_input_free(p_input);
+            if( NULL == psz_aspect )
                 return E_OUTOFMEMORY;
 
             if( ! libvlc_exception_raised(&ex) )
             {
-                *aspect = SysAllocStringByteLen(psz_aspect, strlen(psz_aspect));
+                aspect = SysAllocStringByteLen(psz_aspect, strlen(psz_aspect));
                 free( psz_aspect );
                 psz_aspect = NULL;
-                libvlc_input_free(p_input);
-                if( ! libvlc_exception_raised(&ex) )
-                {
-                    return NOERROR;
-                }
+                return NOERROR;
 	    }
 	    if( psz_aspect ) free( psz_aspect );
         }
