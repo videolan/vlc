@@ -455,7 +455,6 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
 
     return p_block;
 
-
 trash:
     msg_Warn( p_access, "received a too short packet for RTP" );
     block_Release( p_block );
