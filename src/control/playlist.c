@@ -81,7 +81,7 @@ void libvlc_playlist_clear( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
     assert( PL );
-    playlist_Clear( PL );
+    playlist_LockClear( PL );
 }
 
 void libvlc_playlist_next( libvlc_instance_t *p_instance,
