@@ -108,7 +108,7 @@ static int  Seek( access_t *, int64_t );
 static int  Read( access_t *, uint8_t *, int );
 static int  Control( access_t *, int, va_list );
 
-static int  OpenFile( access_t *, const char * );
+static int  open_file( access_t *, const char * );
 
 struct access_sys_t
 {
@@ -213,7 +213,7 @@ static int Open( vlc_object_t *p_this )
             if (b_stdin)
                 fd = dup (0);
             else
-                fd = OpenFile (p_access, p_access->psz_path);
+                fd = open_file (p_access, p_access->psz_path);
         }
         else
         {
@@ -224,7 +224,7 @@ static int Open( vlc_object_t *p_this )
                 *ptr = 0;
 
             msg_Dbg (p_access, "opening additionnal file `%s'", filename);
-            fd = OpenFile (p_access, filename);
+            fd = open_file (p_access, filename);
             filename = ptr + 1;
         }
 
@@ -513,9 +513,9 @@ static char *expand_path (const access_t *p_access, const char *path)
 
 
 /*****************************************************************************
- * OpenFile: Opens a specific file
+ * open_file: Opens a specific file
  *****************************************************************************/
-static int OpenFile (access_t *p_access, const char *psz_name)
+static int open_file (access_t *p_access, const char *psz_name)
 {
     char *path = expand_path (p_access, psz_name);
 
