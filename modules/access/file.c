@@ -198,10 +198,9 @@ static int Open( vlc_object_t *p_this )
     else
         _OpenFile( p_access, psz_name );
 
-    free( psz_name );
-
     if( p_sys->fd == -1 )
     {
+        free( psz_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -211,6 +210,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_access, "%s: %s", p_access->psz_path, strerror( errno ) );
         close( p_sys->fd );
+        free( psz_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -256,6 +256,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "file %s is empty, aborting", psz_name );
         close( p_sys->fd );
         free( p_sys );
+        free( psz_name );
         return VLC_EGENERIC;
     }
 
