@@ -129,10 +129,8 @@ struct access_sys_t
     int  i_index;
 #ifndef UNDER_CE
     int  fd;
-    int  fd_backup;
 #else
     FILE *fd;
-    FILE *fd_backup;
 #endif
 
     /* */
@@ -253,7 +251,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->b_seekable && !p_access->info.i_size )
     {
         /* FIXME that's bad because all others access will be probed */
-        msg_Err( p_access, "file %s is empty, aborting", psz_name );
+        msg_Err( p_access, "file %s is empty, aborting", p_access->psz_path );
         close( p_sys->fd );
         free( p_sys );
         free( psz_name );
@@ -434,17 +432,17 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     if ( i_ret == 0 && p_sys->i_index + 1 < p_sys->i_file )
     {
         char *psz_name = p_sys->file[++p_sys->i_index]->psz_name;
-        p_sys->fd_backup = p_sys->fd;
+        int fd_backup = p_sys->fd;
 
         msg_Dbg( p_access, "opening file `%s'", psz_name );
 
         if ( _OpenFile( p_access, psz_name ) )
         {
-            p_sys->fd = p_sys->fd_backup;
+            p_sys->fd = fd_backup;
             return 0;
         }
 
-        close( p_sys->fd_backup );
+        close( fd_backup );
 
         /* We have to read some data */
         return Read( p_access, p_buffer, i_len );
@@ -471,7 +469,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
     {
         int i;
         char *psz_name;
-        p_sys->fd_backup = p_sys->fd;
+        int fd_backup = p_sys->fd;
 
         for( i = 0; i < p_sys->i_file - 1; i++ )
         {
@@ -486,12 +484,12 @@ static int Seek( access_t *p_access, int64_t i_pos )
         if ( i != p_sys->i_index && !_OpenFile( p_access, psz_name ) )
         {
             /* Close old file */
-            close( p_sys->fd_backup );
+            close( fd_backup );
             p_sys->i_index = i;
         }
         else
         {
-            p_sys->fd = p_sys->fd_backup;
+            p_sys->fd = fd_backup;
         }
     }
 
