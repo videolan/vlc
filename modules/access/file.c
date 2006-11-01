@@ -161,26 +161,8 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-/* returns early if psz_path is a directory */
-#ifdef HAVE_SYS_STAT_H
-        struct stat stat_info;
-
-        if( utf8_stat( p_access->psz_path, &stat_info ) )
-        {
-            msg_Warn( p_access, "%s: %s", p_access->psz_path,
-                    strerror( errno ) );
-            return VLC_EGENERIC;
-        }
-        if S_ISDIR(stat_info.st_mode)
-        {
-            msg_Warn( p_access, "%s is a directory", p_access->psz_path );
-            return VLC_EGENERIC;
-        }
-#endif
-
         p_sys->b_seekable = VLC_TRUE;
         p_sys->b_pace_control = VLC_TRUE;
-
     }
 
     /* Count number of files */
@@ -249,9 +231,17 @@ static int Open( vlc_object_t *p_this )
 #ifdef HAVE_SYS_STAT_H
         struct stat st;
 
-        if ((fd != -1) && fstat (fd, &st))
+        while (fd != -1)
         {
-            msg_Err (p_access, "fstat(%d): %s", fd, strerror (errno));
+            if (fstat (fd, &st))
+                msg_Err (p_access, "fstat(%d): %s", fd, strerror (errno));
+            else
+            if (S_ISDIR (st.st_mode))
+                /* The directory plugin takes care of that */
+                msg_Dbg (p_access, "file is a directory, aborting");
+            else
+                break; // success
+
             close (fd);
             fd = -1;
         }
@@ -285,7 +275,7 @@ static int Open( vlc_object_t *p_this )
     if (p_sys->b_seekable && !p_access->info.i_size)
     {
         /* FIXME that's bad because all others access will be probed */
-        msg_Err (p_access, "file %s is empty, aborting", p_access->psz_path);
+        msg_Err (p_access, "file is empty, aborting");
         Close (p_this);
         return VLC_EGENERIC;
     }
