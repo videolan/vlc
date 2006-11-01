@@ -92,7 +92,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    add_string( "file-cat", NULL, NULL, CAT_TEXT, CAT_LONGTEXT, VLC_TRUE );
+    add_deprecated( "file-cat", VLC_TRUE );
     set_capability( "access2", 50 );
     add_shortcut( "file" );
     add_shortcut( "stream" );
@@ -115,13 +115,7 @@ struct access_sys_t
     unsigned int i_nb_reads;
     vlc_bool_t   b_kfir;
 
-    /* Files list */
-    unsigned filec;
-    int     *filev;
-    int64_t *sizev;
-
-    /* Current file */
-    unsigned filep;
+    int fd;
 
     /* */
     vlc_bool_t b_seekable;
@@ -135,7 +129,6 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
-    char         *catlist;
 
     vlc_bool_t    b_stdin = !strcmp (p_access->psz_path, "-");
 
@@ -145,8 +138,7 @@ static int Open( vlc_object_t *p_this )
     STANDARD_READ_ACCESS_INIT;
     p_sys->i_nb_reads = 0;
     p_sys->b_kfir = VLC_FALSE;
-    p_sys->filec = 1;
-    p_sys->filep = 0;
+    int fd = p_sys->fd = -1;
 
     if (!strcasecmp (p_access->psz_access, "stream"))
     {
@@ -165,114 +157,50 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_pace_control = VLC_TRUE;
     }
 
-    /* Count number of files */
-    catlist = var_CreateGetString (p_access, "file-cat");
-    if (catlist == NULL)
+    /* Open file */
+    msg_Dbg (p_access, "opening file `%s'", p_access->psz_path);
+
+    if (b_stdin)
+        fd = dup (0);
+    else
+        fd = open_file (p_access, p_access->psz_path);
+
+#ifdef HAVE_SYS_STAT_H
+    struct stat st;
+
+    while (fd != -1)
     {
-        free (p_sys);
-        return VLC_ENOMEM;
-    }
-
-    if (*catlist)
-    {
-        for (const char *ptr = catlist; ptr != NULL; p_sys->filec++)
-        {
-            ptr = strchr (ptr, ',');
-            if (ptr != NULL)
-                ptr++;
-        }
-    }
-
-    p_sys->filev = calloc (p_sys->filec, sizeof (p_sys->filev[0]));
-    if (p_sys->filev == NULL)
-    {
-        free (catlist);
-        free (p_sys);
-        return VLC_ENOMEM;
-    }
-
-    p_sys->sizev = calloc (p_sys->filec, sizeof (p_sys->sizev[0]));
-    if (p_sys->sizev == NULL)
-    {
-        free (catlist);
-        free (p_sys->filev);
-        free (p_sys);
-        return VLC_ENOMEM;
-    }
-
-    /* Open files */
-    char *filename = catlist;
-    for (unsigned i = 0; i < p_sys->filec; i++)
-    {
-        int fd = -1;
-
-        if (i == 0)
-        {
-            msg_Dbg (p_access, "opening file `%s'", p_access->psz_path);
-
-            if (b_stdin)
-                fd = dup (0);
-            else
-                fd = open_file (p_access, p_access->psz_path);
-        }
+        if (fstat (fd, &st))
+            msg_Err (p_access, "fstat(%d): %s", fd, strerror (errno));
         else
-        {
-            assert (filename != NULL);
+        if (S_ISDIR (st.st_mode))
+            /* The directory plugin takes care of that */
+            msg_Dbg (p_access, "file is a directory, aborting");
+        else
+            break; // success
 
-            char *ptr = strchr (filename, ',');
-            if (ptr != NULL)
-                *ptr = 0;
-
-            msg_Dbg (p_access, "opening additionnal file `%s'", filename);
-            fd = open_file (p_access, filename);
-            filename = ptr + 1;
-        }
-
-#ifdef HAVE_SYS_STAT_H
-        struct stat st;
-
-        while (fd != -1)
-        {
-            if (fstat (fd, &st))
-                msg_Err (p_access, "fstat(%d): %s", fd, strerror (errno));
-            else
-            if (S_ISDIR (st.st_mode))
-                /* The directory plugin takes care of that */
-                msg_Dbg (p_access, "file is a directory, aborting");
-            else
-                break; // success
-
-            close (fd);
-            fd = -1;
-        }
-#endif
-
-        if (fd == -1)
-        {
-            free (catlist);
-            p_sys->filec = i;
-            Close (p_this);
-            return VLC_EGENERIC;
-        }
-        p_sys->filev[i] = fd;
-
-#ifdef HAVE_SYS_STAT_H
-        p_sys->sizev[i] = st.st_size;
-        p_access->info.i_size += st.st_size;
-
-        if (!S_ISREG (st.st_mode) && !S_ISBLK (st.st_mode)
-         && (!S_ISCHR (st.st_mode) || (st.st_size == 0)))
-            // If one file is not seekable, the concatenation is not either
-            p_sys->b_seekable = VLC_FALSE;
-#else
-        p_sys->b_seekable = !b_stdin;
-#endif
-
+        close (fd);
+        fd = -1;
     }
+#endif
 
-    free (catlist);
+    if (fd == -1)
+    {
+        free (p_sys);
+        return VLC_EGENERIC;
+    }
+    p_sys->fd = fd;
 
-    if (p_sys->b_seekable && !p_access->info.i_size)
+#ifdef HAVE_SYS_STAT_H
+    p_access->info.i_size = st.st_size;
+    if (!S_ISREG (st.st_mode) && !S_ISBLK (st.st_mode)
+     && (!S_ISCHR (st.st_mode) || (st.st_size == 0)))
+        p_sys->b_seekable = VLC_FALSE;
+#else
+    p_sys->b_seekable = !b_stdin;
+#endif
+
+    if (p_sys->b_seekable && (p_access->info.i_size == 0))
     {
         /* FIXME that's bad because all others access will be probed */
         msg_Err (p_access, "file is empty, aborting");
@@ -291,11 +219,7 @@ static void Close (vlc_object_t * p_this)
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    for (unsigned i = 0; i < p_sys->filec; i++)
-        close (p_sys->filev[i]);
-
-    free (p_sys->filev);
-    free (p_sys->sizev);
+    close (p_sys->fd);
     free (p_sys);
 }
 
@@ -306,7 +230,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_ret;
-    int fd = p_sys->filev[p_sys->filep];
+    int fd = p_sys->fd;
 
 #if !defined(WIN32) && !defined(UNDER_CE)
     if( !p_sys->b_pace_control )
@@ -373,27 +297,15 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         (p_sys->i_nb_reads % INPUT_FSTAT_NB_READS) == 0 )
     {
         struct stat st;
-        int i = p_sys->filep;
 
         if ((fstat (fd, &st) == 0)
-         && (p_sys->sizev[i] != st.st_size))
+         && (p_access->info.i_size != st.st_size))
         {
-            p_access->info.i_size += st.st_size - p_sys->sizev[i];
-            p_sys->sizev[i] = st.st_size;
+            p_access->info.i_size = st.st_size;
             p_access->info.i_update |= INPUT_UPDATE_SIZE;
         }
     }
 #endif
-
-    /* If we reached an EOF then switch to the next file in the list */
-    if (i_ret == 0)
-    {
-        if  (++p_sys->filep < p_sys->filec)
-            /* We have to read some data */
-            return Read (p_access, p_buffer, i_len);
-        else
-            p_sys->filep--;
-    }
 
     if( i_ret > 0 )
         p_access->info.i_pos += i_ret;
@@ -425,17 +337,7 @@ static int Seek (access_t *p_access, int64_t i_pos)
     p_access->info.b_eof = VLC_FALSE;
 
     /* Determine which file we need to access */
-    unsigned i = 0;
-    assert (p_sys->filec > 0);
-
-    while (i_pos > p_sys->sizev[i])
-    {
-        i_pos -= p_sys->sizev[i++];
-        assert (i < p_sys->filec);
-    }
-    p_sys->filep = i;
-
-    lseek (p_sys->filev[i], i_pos, SEEK_SET);
+    lseek (p_sys->fd, i_pos, SEEK_SET);
     return VLC_SUCCESS;
 }
 
