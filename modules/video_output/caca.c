@@ -299,39 +299,72 @@ static int Manage( vout_thread_t *p_vout )
 #else
     int ev;
 #endif
-    vlc_value_t val;
 
-    while( caca_get_event(p_vout->p_sys->p_dp,
-                          CACA_EVENT_KEY_PRESS | CACA_EVENT_RESIZE, &ev, 0) )
+    while( caca_get_event(p_vout->p_sys->p_dp, CACA_EVENT_ANY, &ev, 0) )
     {
-        /* Acknowledge the resize */
+        playlist_t *p_playlist;
+        vlc_value_t val;
+
 #ifdef CACA_API_VERSION_1
-        if( ev.type == CACA_EVENT_RESIZE )
+        switch( ev.type )
 #else
-        if( ev == CACA_EVENT_RESIZE )
+        switch( ev )
 #endif
         {
+        case CACA_EVENT_KEY_RELEASE:
+#ifdef CACA_API_VERSION_1
+            switch( ev.data.key.ch )
+#else
+            switch( ev & 0x00ffffff )
+#endif
+            {
+            case 'q':
+                val.i_int = KEY_MODIFIER_CTRL | 'q';
+                break;
+            case ' ':
+                val.i_int = KEY_SPACE;
+                break;
+            default:
+                continue;
+            }
+
+            var_Set( p_vout->p_libvlc, "key-pressed", val );
+            break;
+        case CACA_EVENT_RESIZE:
+            /* Acknowledge the resize */
             caca_refresh_display( p_vout->p_sys->p_dp );
-            continue;
-        }
-
+            break;
 #ifdef CACA_API_VERSION_1
-        switch( ev.data.key.ch )
-#else
-        switch( ev & 0x00ffffff )
-#endif
+        case  CACA_EVENT_MOUSE_MOTION:
+            val.i_int = ev.data.mouse.x * p_vout->render.i_width
+                         / cucul_get_canvas_width( p_vout->p_sys->p_cv );
+            var_Set( p_vout, "mouse-x", val );
+            val.i_int = ev.data.mouse.y * p_vout->render.i_height
+                         / cucul_get_canvas_height( p_vout->p_sys->p_cv );
+            var_Set( p_vout, "mouse-y", val );
+            val.b_bool = VLC_TRUE;
+            var_Set( p_vout, "mouse-moved", val );
+            break;
+        case CACA_EVENT_MOUSE_RELEASE:
+            val.b_bool = VLC_TRUE;
+            var_Set( p_vout, "mouse-clicked", val );
+            break;
+        case CACA_EVENT_QUIT:
         {
-        case 'q':
-            val.i_int = KEY_MODIFIER_CTRL | 'q';
+            p_playlist = vlc_object_find( p_vout,
+                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+            if( p_playlist )
+            {
+                playlist_Stop( p_playlist );
+                vlc_object_release( p_playlist );
+            }
+            p_vout->p_libvlc->b_die = VLC_TRUE;
             break;
-        case ' ':
-            val.i_int = KEY_SPACE;
-            break;
-        default:
-            continue;
         }
-
-        var_Set( p_vout->p_libvlc, "key-pressed", val );
+#endif
+        default:
+            break;
+        }
     }
 
     return VLC_SUCCESS;
