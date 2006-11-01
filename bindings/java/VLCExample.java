@@ -46,10 +46,14 @@ public class VLCExample
         		jvlc.video.setFullscreen(true);
         		Thread.sleep(3000);
         		System.out.println("real size.");
-        		jvlc.video.setFullscreen(false);
+                jvlc.video.setFullscreen(false);
             	System.out.print("Taking snapshot... ");
             	jvlc.video.getSnapshot( System.getProperty( "user.dir" ) + "/snap.png");
             	System.out.println("taken. (see " + System.getProperty( "user.dir" ) + "/snap.png )");
+        		Thread.sleep(2000);
+                System.out.println("Resizing to 300x300");
+                jvlc.video.setSize(300, 300);
+                                
         	}
             System.out.print("Muting...");
             jvlc.audio.setMute(true);

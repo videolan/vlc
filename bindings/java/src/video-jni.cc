@@ -221,7 +221,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
   awt.FreeDrawingSurface(ds);
 }
 
-JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1setSize__II (JNIEnv *env, jobject _this, jint width, jint height) 
+
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1setSize (JNIEnv *env, jobject _this, jint width, jint height) 
 {
     INIT_FUNCTION ;
 
