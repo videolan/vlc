@@ -256,7 +256,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
  * - block_FifoPut : put a block
  * - block_FifoGet : get a packet from the fifo (and wait if it is empty)
  * - block_FifoShow : show the first packet of the fifo (and wait if
- *      needed), becarefull, you can use it ONLY if you are sure to be the
+ *      needed), be carefull, you can use it ONLY if you are sure to be the
  *      only one getting data from the fifo.
  ****************************************************************************/
 struct block_fifo_t
