@@ -508,7 +508,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
 static char *expand_path (const access_t *p_access, const char *path)
 {
-    if ( ( strlen (path) >= 2 ) && ( strncmp (path, "~/", 2) == 0 ))
+    if (strncmp (path, "~/", 2) == 0)
     {
         char *res;
 
@@ -519,8 +519,7 @@ static char *expand_path (const access_t *p_access, const char *path)
     }
 
 #if defined(WIN32)
-    if ( ( strlen(p_access->psz_access ) >= 4 )
-      && !strcasecmp (p_access->psz_access, "file")
+    if (!strcasecmp (p_access->psz_access, "file")
       && ('/' == path[0]) && path[1] && (':' == path[2]) && ('/' == path[3]))
         // Explorer can open path such as file:/C:/ or file:///C:/
         // hence remove leading / if found
