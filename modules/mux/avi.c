@@ -473,6 +473,7 @@ static int Mux      ( sout_mux_t *p_mux )
                 if( p_data->i_buffer & 0x01 )
                 {
                     p_data = block_Realloc( p_data, 0, p_data->i_buffer + 1 );
+                    p_data->p_buffer[ p_data->i_buffer - 1 ] = '\0';
                 }
 
                 p_sys->i_movi_size += p_data->i_buffer;
