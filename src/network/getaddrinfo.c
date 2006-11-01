@@ -544,7 +544,7 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
                 *portnum = atoi( psz_serv );
             return i_val;
         }
-            
+
         FreeLibrary( module );
     }
 #endif
@@ -554,7 +554,7 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
     {
 # ifdef HAVE_USABLE_MUTEX_THAT_DONT_NEED_LIBVLC_POINTER
         static vlc_value_t lock;
-    
+
         /* my getnameinfo implementation is not thread-safe as it uses
          * gethostbyaddr and the likes */
         vlc_mutex_lock( lock.p_address );
@@ -620,7 +620,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 #endif
     }
 
-    /* 
+    /*
      * VLC extensions :
      * - accept "" as NULL
      * - ignore square brackets
@@ -649,29 +649,40 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     }
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
+    typedef int (CALLBACK * GETADDRINFO) (const char *, const char *,
+                                          const struct addrinfo *,
+                                          struct addrinfo **);
+    static GETADDRINFO ws2_getaddrinfo = NULL;
+
+    if (ws2_getaddrinfo == NULL)
     {
-        typedef int (CALLBACK * GETADDRINFO) ( const char *, const char *,
-                                            const struct addrinfo *,
-                                            struct addrinfo ** );
-        HINSTANCE module;
-        GETADDRINFO ws2_getaddrinfo;
+        static HINSTANCE module = NULL;
 
-        module = LoadLibrary( "ws2_32.dll" );
-        if( module != NULL )
+        if (module == NULL)
+            module = LoadLibrary( "ws2_32.dll" );
+
+        if (module != NULL)
+            ws2_getaddrinfo =
+                    (GETADDRINFO)GetProcAddress (module, "getaddrinfo");
+    }
+
+    if (ws2_getaddrinfo != NULL)
+    {
+        /*
+         * Winsock tries to resolve numerical IPv4 addresses as AAAA
+         * and IPv6 addresses as A... There comes the work around.
+         */
+        if ((hints.ai_flags & AI_NUMERICHOST) == 0)
         {
-            ws2_getaddrinfo = (GETADDRINFO)GetProcAddress( module, "getaddrinfo" );
+            hints.ai_flags |= AI_NUMERICHOST;
 
-            if( ws2_getaddrinfo != NULL )
-            {
-                int i_ret;
+            if (ws2_getaddrinfo (psz_node, psz_service, &hints, res) == 0)
+                return 0;
 
-                i_ret = ws2_getaddrinfo( psz_node, psz_service, &hints, res );
-                FreeLibrary( module ); /* is this wise ? */
-                return i_ret;
-            }
-
-            FreeLibrary( module );
+            hints.ai_flags &= ~AI_NUMERICHOST;
         }
+
+        return ws2_getaddrinfo (psz_node, psz_service, &hints, res);
     }
 #endif
 #if defined( HAVE_GETADDRINFO ) || defined( UNDER_CE )
