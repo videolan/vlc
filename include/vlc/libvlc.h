@@ -287,6 +287,8 @@ int         libvlc_input_get_state      ( libvlc_input_t *, libvlc_exception_t *
  * @{
  */
 
+typedef int libvlc_drawable_t;
+
 /**
  * Does this input have a video output ?
  * \param p_input the input
@@ -295,6 +297,14 @@ int         libvlc_input_get_state      ( libvlc_input_t *, libvlc_exception_t *
 vlc_bool_t  libvlc_input_has_vout       ( libvlc_input_t *, libvlc_exception_t *);
 float       libvlc_input_get_fps        ( libvlc_input_t *, libvlc_exception_t *);
 
+/**
+ * Toggle fullscreen status on video output
+ * \param p_input the input
+ * \param drawable the drawable where the video output thread will display the video
+ * \param p_exception an initialized exception
+ */
+void libvlc_set_video_drawable( libvlc_instance_t *, libvlc_drawable_t, libvlc_exception_t *);
+    
 /**
  * Toggle fullscreen status on video output
  * \param p_input the input
@@ -376,7 +386,6 @@ void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exception_t *);
 *  CGrafPort on MacOSX,
 *  HWND on win32
 */
-typedef int libvlc_drawable_t;
 
 /**
  * change the parent for the current the video output

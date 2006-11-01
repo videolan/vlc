@@ -69,6 +69,18 @@ static vout_thread_t *GetVout( libvlc_input_t *p_input,
  * Exported functions
  **********************************************************************/
 
+void libvlc_set_video_drawable( libvlc_instance_t *p_instance,
+                                libvlc_drawable_t drawable,
+                                libvlc_exception_t *p_e )
+{
+    vlc_value_t value;
+    value.i_int = drawable;
+    
+    var_Set( p_instance->p_libvlc_int, "drawable", value);
+}
+
+
+
 void libvlc_set_fullscreen( libvlc_input_t *p_input, int b_fullscreen,
                             libvlc_exception_t *p_e )
 {
