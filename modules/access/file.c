@@ -161,8 +161,26 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
+/* returns early if psz_path is a directory */
+#ifdef HAVE_SYS_STAT_H
+        struct stat stat_info;
+
+        if( utf8_stat( p_access->psz_path, &stat_info ) )
+        {
+            msg_Warn( p_access, "%s: %s", p_access->psz_path,
+                    strerror( errno ) );
+            return VLC_EGENERIC;
+        }
+        if S_ISDIR(stat_info.st_mode)
+        {
+            msg_Warn( p_access, "%s is a directory", p_access->psz_path );
+            return VLC_EGENERIC;
+        }
+#endif
+
         p_sys->b_seekable = VLC_TRUE;
         p_sys->b_pace_control = VLC_TRUE;
+
     }
 
     /* Count number of files */
@@ -490,7 +508,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
 static char *expand_path (const access_t *p_access, const char *path)
 {
-    if (strncmp (path, "~/", 2) == 0)
+    if ( ( strlen (path) >= 2 ) && ( strncmp (path, "~/", 2) == 0 ))
     {
         char *res;
 
@@ -501,7 +519,8 @@ static char *expand_path (const access_t *p_access, const char *path)
     }
 
 #if defined(WIN32)
-    if (!strcasecmp (p_access->psz_access, "file")
+    if ( ( strlen(p_access->psz_access ) >= 4 )
+      && !strcasecmp (p_access->psz_access, "file")
       && ('/' == path[0]) && path[1] && (':' == path[2]) && ('/' == path[3]))
         // Explorer can open path such as file:/C:/ or file:///C:/
         // hence remove leading / if found
