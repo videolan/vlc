@@ -444,8 +444,8 @@ static int Demux( demux_t *p_demux )
                     }
                     else continue;
                 }
-                if( ( psz_parse = strcasestr( psz_parse, "/>" ) ) )
-                    psz_parse += 2;
+                if( ( psz_parse = strcasestr( psz_parse, ">" ) ) )
+                    psz_parse++;
                 else continue;
             }
             else if( !strncasecmp( psz_parse, "</ASX", 5 ) )
