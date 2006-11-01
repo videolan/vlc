@@ -53,7 +53,7 @@ static void Close( vlc_object_t * );
 
 static int pi_index[] = {0,1,2};
 
-static char *ppsz_indexes[] = { N_("Ask"),N_("Always fix"),
+static const char *ppsz_indexes[] = { N_("Ask"), N_("Always fix"),
                                 N_("Never fix") };
 
 vlc_module_begin();
@@ -517,7 +517,7 @@ static int Open( vlc_object_t * p_this )
                     p_strh->i_handler == FOURCC_dvhd ||
                     p_strh->i_handler == FOURCC_dvsl )
                 {
-                    tk->p_out_muxed = stream_DemuxNew( p_demux, "rawdv", p_demux->out );
+                    tk->p_out_muxed = stream_DemuxNew( p_demux, (char *)"rawdv", p_demux->out );
                     if( !tk->p_out_muxed )
                         msg_Err( p_demux, "could not load the DV parser" );
                     else break;
@@ -833,7 +833,7 @@ static int Demux_Seekable( demux_t *p_demux )
             }
             if( toread[i].i_posf > 0 )
             {
-                if( i_pos == -1 || i_pos > toread[i_track].i_posf )
+                if( i_pos == -1 || i_pos > toread[i].i_posf )
                 {
                     i_track = i;
                     i_pos = toread[i].i_posf;
@@ -1349,7 +1349,7 @@ static double ControlGetPosition( demux_t *p_demux )
                 }
             }
         }
-        return (double)i64 / (double)stream_Size( p_demux->s );
+        return (double)i64 / stream_Size( p_demux->s );
     }
     return 0.0;
 }
