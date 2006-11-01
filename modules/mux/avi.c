@@ -625,8 +625,8 @@ static int avi_HeaderAdd_avih( sout_mux_t *p_mux,
         if( p_sys->stream[i_stream].i_duration > 0 )
         {
             i_maxbytespersec +=
-                p_sys->stream[p_sys->i_stream_video].i_totalsize /
-                p_sys->stream[p_sys->i_stream_video].i_duration;
+                p_sys->stream[i_stream].i_totalsize /
+                p_sys->stream[i_stream].i_duration;
         }
     }
 
