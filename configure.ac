@@ -5279,17 +5279,21 @@ then
          VLC_ADD_LDFLAGS([mozilla],[`${MOZILLA_CONFIG} --libs plugin`])
       fi
       CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mozilla}"
-      AC_CHECK_HEADERS(mozilla-config.h)
+      MOZILLA_REQUIRED_HEADERS=1
+      AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
+      AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
+      AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
+        [#if HAVE_NPAPI_H
+         # include <npapi.h>
+         #endif
+        ])
+      if test "${MOZILLA_REQUIRED_HEADERS}" = "0"
+      then
+        AC_MSG_ERROR([Please install the Mozilla development tools, required headers were not found.])
+      fi
+      MOZILLA_REQUIRED_HEADERS=
       CPPFLAGS="${CPPFLAGS_save}"
       MOZILLA_SDK_PATH="`${MOZILLA_CONFIG} --prefix`"
-      XPIDL_INCL="`${MOZILLA_CONFIG} --cflags plugin xpcom java` \
-      `${MOZILLA_CONFIG} --idlflags plugin xpcom java` "
-      if ${have_xul}
-      then
-        xpidl_path="`${MOZILLA_CONFIG} --prefix`/lib/xulrunner"
-      else
-        xpidl_path="`${MOZILLA_CONFIG} --prefix`/bin"
-      fi	
     dnl End of moz_sdk = ""
   else
     dnl special case for mingw32
@@ -5304,38 +5308,38 @@ then
   
     real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
     CPPFLAGS="${CPPFLAGS_save} -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include"
-    AC_CHECK_HEADERS(mozilla-config.h, [
-      mozilla=:
-      VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -DHAVE_CPP_MODERN_SPECIALIZE_TEMPLATE_SYNTAX -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
-      if ${need_xpcom_libs}; then
-         VLC_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -L${real_mozilla_sdk}/lib -lnspr4 -lplds4 -lplc4 -lxpcomglue])
-	 if test "${SYS}" = "mingw32"; then
-	   dnl latest gecko sdk does not have embedstring
-	   if test -d "${real_mozilla_sdk}/embedstring/bin"
-	   then
-	     VLC_ADD_LDFLAGS([mozilla],[-lembedstring -Wl,--kill-at])
-	   fi
-	 fi
-      fi
+    MOZILLA_REQUIRED_HEADERS=1
+    AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
+    AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
+    AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
+        [#if HAVE_NPAPI_H
+          # include <npapi.h>
+          #endif
+        ])
+    if test "${MOZILLA_REQUIRED_HEADERS}" = "0"
+    then
+        AC_MSG_ERROR([Please install the Mozilla development tools, required headers were not found.])
+    fi
+    MOZILLA_REQUIRED_HEADERS=
+    mozilla=:
+    VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -DHAVE_CPP_MODERN_SPECIALIZE_TEMPLATE_SYNTAX -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
+    if ${need_xpcom_libs}; then
+       VLC_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -L${real_mozilla_sdk}/lib -lnspr4 -lplds4 -lplc4 -lxpcomglue])
+      if test "${SYS}" = "mingw32"; then
+	    dnl latest gecko sdk does not have embedstring
+	    if test -d "${real_mozilla_sdk}/embedstring/bin"
+	    then
+	      VLC_ADD_LDFLAGS([mozilla],[-lembedstring -Wl,--kill-at])
+	    fi
+	  fi
+    fi
+    MOZILLA_SDK_PATH="${real_mozilla_sdk}"
   
-      MOZILLA_SDK_PATH="${real_mozilla_sdk}"
-      XPIDL_INCL="-I${real_mozilla_sdk}${mozilla_sdk_xpcom}/idl"
-      xpidl_path="${real_mozilla_sdk}${mozilla_sdk_xpcom}/bin"
-  
-      if test -n "${CYGPATH}"; then
-        real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
-        XPIDL_INCL="${XPIDL_INCL} -I\"${real_mozilla_sdk}${mozilla_sdk_xpcom}/idl\""
-      fi ])
+    if test -n "${CYGPATH}"; then
+      real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
+    fi
     CPPFLAGS="${CPPFLAGS_save}"
   fi
-  
-  if test "${enable_mozilla}" != "false"
-  then
-    AC_PATH_PROG(XPIDL, xpidl, no, ${xpidl_path}:/usr/lib/mozilla:/usr/lib64/mozilla:/usr/lib/xulrunner:/usr/lib64/xulrunner)
-    if test "${XPIDL}" = "no"; then
-      AC_MSG_ERROR([Please install the Mozilla development tools, xpidl was not found.])
-    fi
-  fi 
 fi
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
@@ -5544,8 +5548,6 @@ AC_SUBST(UIC)
 AC_SUBST(WINDRES)
 AC_SUBST(MOZILLA_SDK_PATH)
 AC_SUBST(WINE_SDK_PATH)
-AC_SUBST(XPIDL)
-AC_SUBST(XPIDL_INCL)
 AC_SUBST(LIBEXT)
 AC_SUBST(AM_CPPFLAGS)
 AC_SUBST(ALL_LINGUAS)
