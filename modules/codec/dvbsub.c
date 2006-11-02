@@ -419,8 +419,8 @@ static void default_clut_init( decoder_t *p_dec )
         else R = G = B = 0x7F;
 
         p_sys->default_clut.c_2b[i].Y = RGB_TO_Y(R,G,B);
-        p_sys->default_clut.c_2b[i].Cr = RGB_TO_U(R,G,B);
         p_sys->default_clut.c_2b[i].Cb = RGB_TO_V(R,G,B);
+        p_sys->default_clut.c_2b[i].Cr = RGB_TO_U(R,G,B);
         p_sys->default_clut.c_2b[i].T = T;
     }
 
@@ -450,8 +450,8 @@ static void default_clut_init( decoder_t *p_dec )
         }
 
         p_sys->default_clut.c_4b[i].Y = RGB_TO_Y(R,G,B);
-        p_sys->default_clut.c_4b[i].Cr = RGB_TO_U(R,G,B);
-        p_sys->default_clut.c_4b[i].Cb = RGB_TO_V(R,G,B);
+        p_sys->default_clut.c_4b[i].Cr = RGB_TO_V(R,G,B);
+        p_sys->default_clut.c_4b[i].Cb = RGB_TO_U(R,G,B);
         p_sys->default_clut.c_4b[i].T = T;
     }
 
@@ -1405,8 +1405,8 @@ static subpicture_t *render( decoder_t *p_dec )
         for( j = 0; j < fmt.p_palette->i_entries; j++ )
         {
             fmt.p_palette->palette[j][0] = p_color[j].Y;
-            fmt.p_palette->palette[j][1] = p_color[j].Cr;
-            fmt.p_palette->palette[j][2] = p_color[j].Cb;
+            fmt.p_palette->palette[j][1] = p_color[j].Cb; /* U == Cb */
+            fmt.p_palette->palette[j][2] = p_color[j].Cr; /* V == Cr */
             fmt.p_palette->palette[j][3] = 0xff - p_color[j].T;
         }
 
@@ -1464,6 +1464,8 @@ static subpicture_t *render( decoder_t *p_dec )
     p_spu->i_flags = p_sys->i_spu_position;
     p_spu->i_x = p_sys->i_spu_x;
     p_spu->i_y = p_sys->i_spu_y;
+    p_spu->i_original_picture_width = 720;
+    p_spu->i_original_picture_height = 576;
 
     return p_spu;
 }

@@ -202,7 +202,9 @@ static vlc_bool_t CheckMimeHeader( demux_t *p_demux, int *p_header_size )
         *p_header_size = -3;
         return VLC_FALSE;
     }
-    if( NULL == p_sys->psz_separator )
+
+    /* Read the separator and remember it if not yet stored */
+    if( p_sys->psz_separator == NULL )
     {
         p_sys->psz_separator = psz_line;
         msg_Dbg( p_demux, "Multipart MIME detected, using separator: %s",
@@ -215,8 +217,9 @@ static vlc_bool_t CheckMimeHeader( demux_t *p_demux, int *p_header_size )
             msg_Warn( p_demux, "separator %s does not match %s", psz_line,
                       p_sys->psz_separator );
         }
+        free( psz_line );
     }
-    free( psz_line );
+
     psz_line = GetLine( p_demux, &i_pos );
     while( psz_line && *psz_line )
     {
