@@ -1536,7 +1536,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 .gcrypt: libgcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) --program-prefix="" CFLAGS="$(CFLAGS)" && echo -n "#undef HAVE_GETTIMEOFDAY" >> config.h && make && make install)
+	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) --program-prefix="" CFLAGS="$(CFLAGS)" && sed -i 46s@sys/times.h@sys/time.h@ cipher/random.c && make && make install)
 else
 ifeq ($(HOST),i686-apple-darwin8)
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm CFLAGS="$(CFLAGS)" && make && make install)
