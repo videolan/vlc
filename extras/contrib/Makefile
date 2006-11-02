@@ -25,7 +25,7 @@
 
 include ./config.mak
 
-BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib tmp
+BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib tmp gecko-sdk
 
 all: FORCE
 #	@echo "Do you mean to make src or make bin ?"
