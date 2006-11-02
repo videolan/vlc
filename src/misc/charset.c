@@ -38,9 +38,7 @@
 # if HAVE_LANGINFO_CODESET
 #  include <langinfo.h>
 # endif
-# if HAVE_LOCALE_H
-#  include <locale.h>
-# endif
+# include <locale.h>
 #else
 # include <windows.h>
 #endif
