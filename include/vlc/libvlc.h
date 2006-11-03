@@ -300,14 +300,6 @@ float       libvlc_input_get_fps        ( libvlc_input_t *, libvlc_exception_t *
 /**
  * Toggle fullscreen status on video output
  * \param p_input the input
- * \param drawable the drawable where the video output thread will display the video
- * \param p_exception an initialized exception
- */
-void libvlc_set_video_drawable( libvlc_instance_t *, libvlc_drawable_t, libvlc_exception_t *);
-    
-/**
- * Toggle fullscreen status on video output
- * \param p_input the input
  * \param p_exception an initialized exception
  */
 void libvlc_toggle_fullscreen( libvlc_input_t *, libvlc_exception_t * );

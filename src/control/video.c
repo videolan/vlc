@@ -69,18 +69,6 @@ static vout_thread_t *GetVout( libvlc_input_t *p_input,
  * Exported functions
  **********************************************************************/
 
-void libvlc_set_video_drawable( libvlc_instance_t *p_instance,
-                                libvlc_drawable_t drawable,
-                                libvlc_exception_t *p_e )
-{
-    vlc_value_t value;
-    value.i_int = drawable;
-    
-    var_Set( p_instance->p_libvlc_int, "drawable", value);
-}
-
-
-
 void libvlc_set_fullscreen( libvlc_input_t *p_input, int b_fullscreen,
                             libvlc_exception_t *p_e )
 {
@@ -226,6 +214,13 @@ int libvlc_video_reparent( libvlc_input_t *p_input, libvlc_drawable_t d,
                            libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_input, p_e );
+
+    if ( p_vout == NULL)
+    {
+        /// \todo: set exception
+        return 0;
+    }
+    
     vout_Control( p_vout , VOUT_REPARENT, d);
     vlc_object_release( p_vout );
 
@@ -242,7 +237,7 @@ void libvlc_video_resize( libvlc_input_t *p_input, int width, int height, libvlc
 /* global video settings */
 
 void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d,
-                           libvlc_exception_t *p_e )
+                              libvlc_exception_t *p_e )
 {
     /* set as default for future vout instances */
     var_SetInteger(p_instance->p_libvlc_int, "drawable", (int)d);

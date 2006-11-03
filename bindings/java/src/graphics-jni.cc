@@ -97,7 +97,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLCCanvas_paint (JNIEnv *env, job
 
   drawable = reinterpret_cast<int>(dsi_win->hwnd);
   long vlcInstance = getJVLCInstance( env, canvas );
-  libvlc_set_video_drawable( (libvlc_instance_t *) vlcInstance, drawable, exception );
+  libvlc_video_set_parent( (libvlc_instance_t *) vlcInstance, drawable, exception );
 
 #else // UNIX
   /* Get the platform-specific drawing info */
@@ -109,7 +109,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLCCanvas_paint (JNIEnv *env, job
   
   drawable = dsi_x11->drawable;
   long vlcInstance = getJVLCInstance( env, canvas );
-  libvlc_set_video_drawable( (libvlc_instance_t *)vlcInstance, drawable, exception );
+  libvlc_video_set_parent( (libvlc_instance_t *)vlcInstance, drawable, exception );
 
   XFreeGC(dsi_x11->display, gc);
 

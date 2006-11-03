@@ -133,6 +133,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
     
     GET_INPUT_THREAD ;
 
+    libvlc_drawable_t drawable;
+
     JAWT awt;
     JAWT_DrawingSurface* ds;
     JAWT_DrawingSurfaceInfo* dsi;
@@ -144,8 +146,6 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
 #endif    
     jint lock;
     
-    vlc_value_t value;
-
     /* Get the AWT */
     awt.version = JAWT_VERSION_1_3;
     if (JAWT_GetAWT(env, &awt) == JNI_FALSE) {
@@ -181,15 +181,12 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
 #ifdef WIN32
     /* Get the platform-specific drawing info */
     dsi_win = (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
+    drawable = reinterpret_cast<int>(dsi_win->hwnd);
 
-    libvlc_video_reparent( input, (libvlc_drawable_t)dsi_win->hwnd, exception );
+    libvlc_video_reparent( input, drawable, exception );
 
     CHECK_EXCEPTION_FREE ;
     
-    /* Now paint */
-    value.i_int = reinterpret_cast<int>(dsi_win->hwnd); 
-    VLC_VariableSet( 1, "drawable", value );
-
 #else // UNIX
     /* Get the platform-specific drawing info */
 
@@ -200,14 +197,11 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
     XSetBackground(dsi_x11->display, gc, 0);
 
     /* and reparent */
-    libvlc_video_reparent( input, (libvlc_drawable_t)dsi_x11->drawable, exception );
+    drawable = dsi_x11->drawable;
+    libvlc_video_reparent( input, drawable, exception );
 
     CHECK_EXCEPTION_FREE ;
 
-    /* also update the drawable variable value */
-    value.i_int = dsi_x11->drawable;
-    VLC_VariableSet( 0, "drawable", value );
-    
     XFreeGC(dsi_x11->display, gc);
 
 #endif
