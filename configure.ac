@@ -5313,7 +5313,7 @@ then
     AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
     AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
         [#if HAVE_NPAPI_H
-          # include <npapi.h>
+          #include <npapi.h>
           #endif
         ])
     if test "${MOZILLA_REQUIRED_HEADERS}" = "0"
