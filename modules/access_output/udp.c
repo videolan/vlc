@@ -167,6 +167,7 @@ struct sout_access_out_sys_t
 };
 
 #define DEFAULT_PORT 1234
+#define RTP_HEADER_LENGTH 12
 
 /*****************************************************************************
  * Open: open the file
@@ -369,7 +370,11 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
 
         while( p_buffer->i_buffer )
         {
-            int i_write = __MIN( p_buffer->i_buffer, p_sys->i_mtu );
+            int i_payload_size = p_sys->i_mtu;
+            if( p_sys->b_rtpts )
+                i_payload_size -= RTP_HEADER_LENGTH;
+            
+            int i_write = __MIN( p_buffer->i_buffer, i_payload_size );
 
             i_packets++;
 
@@ -493,7 +498,7 @@ static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
         p_buffer->p_buffer[10] = ( p_sys->i_ssrc >>  8 )&0xff;
         p_buffer->p_buffer[11] = p_sys->i_ssrc&0xff;
 
-        p_buffer->i_buffer = 12;
+        p_buffer->i_buffer = RTP_HEADER_LENGTH;
     }
 
     return p_buffer;
