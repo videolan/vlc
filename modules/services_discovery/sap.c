@@ -1176,7 +1176,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
 
             case( 'c' ):
             {
-                if( p_sdp->i_media > 1 )
+                if( p_sdp->psz_connection != NULL ) // FIXME
                     break;
 
                 p_sdp->psz_connection = strdup( &psz_sdp[2] );
