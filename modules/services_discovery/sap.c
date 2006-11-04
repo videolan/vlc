@@ -665,8 +665,6 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
 
     assert (buf[len] == '\0');
 
-    msg_Dbg( p_sd, "SDP:\n%s", psz_sdp );
-
     /* Skip payload type */
     /* SAPv1 has implicit "application/sdp" payload type: first line is v=0 */
     if (strncmp (psz_sdp, "v=0", 3))
@@ -850,69 +848,43 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
 {
     char *psz_eof = NULL;
     char *psz_parse = NULL;
-    char *psz_uri = NULL;
+    char psz_uri[1026];
     char *psz_proto = NULL;
     int i_port = 0;
 
     /* Parse c= field */
     if( p_sdp->psz_connection )
     {
-        psz_parse = p_sdp->psz_connection;
+        char hostname[1024];
+        int ipv;
 
-        psz_eof = strchr( psz_parse, ' ' );
-
-        if( psz_eof )
+        /*
+         * NOTE: we ignore the TTL parameter on-purpose, as some SAP
+         * advertisers don't include it (and it is utterly useless).
+         */
+        if (sscanf (p_sdp->psz_connection, "IN IP%d %1023[^/]", &ipv,
+                    hostname) != 2)
         {
-            *psz_eof = '\0';
-            psz_parse = psz_eof + 1;
-        }
-        else
-        {
-            msg_Warn( p_obj, "unable to parse c field (1)");
+            msg_Warn (p_obj, "unable to parse c field: \"%s\"",
+                      p_sdp->psz_connection);
             return VLC_EGENERIC;
         }
 
-        psz_eof = strchr( psz_parse, ' ' );
-
-        if( psz_eof )
+        switch (ipv)
         {
-            *psz_eof = '\0';
-            if( !strncmp( psz_parse, "IP4", 3 ) )
-            {
-                p_sdp->i_in = 4;
-            }
-            else if( !strncmp( psz_parse, "IP6", 3 ) )
-            {
-                p_sdp->i_in = 6;
-            }
-            else
-            {
-                p_sdp->i_in = 0;
-            }
-            psz_parse = psz_eof + 1;
+            case 4:
+            case 6:
+                break;
+
+            default:
+                msg_Warn (p_obj, "unknown IP version %d", ipv);
+                return VLC_EGENERIC;
         }
+
+        if (strchr (hostname, ':') != NULL)
+            sprintf (psz_uri, "[%s]", hostname);
         else
-        {
-            msg_Warn( p_obj, "unable to parse c field (2)");
-            return VLC_EGENERIC;
-        }
-
-        psz_eof = strchr( psz_parse, '/' );
-
-        if( psz_eof )
-        {
-            *psz_eof = '\0';
-        }
-        else
-        {
-            msg_Dbg( p_obj, "incorrect c field, %s", p_sdp->psz_connection );
-        }
-        if( p_sdp->i_in == 6 && ( isxdigit( *psz_parse ) || *psz_parse == ':' ) )
-        {
-            asprintf( &psz_uri, "[%s]", psz_parse );
-        }
-        else psz_uri = strdup( psz_parse );
-
+            strcpy (psz_uri, hostname);
     }
 
     /* Parse m= field */
@@ -926,11 +898,16 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         {
             *psz_eof = '\0';
 
-            if( strncmp( psz_parse, "audio", 5 )  &&
-                strncmp( psz_parse, "video", 5 ) )
+            /*
+             * That's ugly. We should go through every media, and make sure
+             * at least one of them is audio or video. In the mean time, I
+             * need to accept data too.
+             */
+            if( strncmp( psz_parse, "audio", 5 )
+             && strncmp( psz_parse, "video", 5 )
+             && strncmp( psz_parse, "data", 4 ) )
             {
-                msg_Warn( p_obj, "unhandled media type -%s-", psz_parse );
-                FREENULL( psz_uri );
+                msg_Warn( p_obj, "unhandled media type \"%s\"", psz_parse );
                 return VLC_EGENERIC;
             }
 
@@ -939,7 +916,6 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         else
         {
             msg_Warn( p_obj, "unable to parse m field (1)");
-            FREENULL( psz_uri );
             return VLC_EGENERIC;
         }
 
@@ -962,7 +938,6 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         else
         {
             msg_Warn( p_obj, "unable to parse m field (2)");
-            FREENULL( psz_uri );
             return VLC_EGENERIC;
         }
 
@@ -1022,7 +997,6 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     asprintf( &p_sdp->psz_uri, "%s://%s@%s:%i", psz_proto, psz_source,
               psz_uri, i_port );
 
-    FREENULL( psz_uri );
     FREENULL( psz_proto );
     return VLC_SUCCESS;
 }
