@@ -169,14 +169,14 @@ static int OpenUDP( vlc_object_t * p_this )
 # define strerror( x ) winsock_strerror( strerror_buf )
 #endif
 
+    p_socket->i_handle = -1;
+
     /* Build the local socket */
     if( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )
     {
-        msg_Dbg( p_this, "could not build local address" );
+        msg_Dbg( p_this, "cannot build local address" );
         return 0;
     }
-
-    p_socket->i_handle = -1;
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
      * protocol */
