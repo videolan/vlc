@@ -25,6 +25,7 @@
 #define __VLC_CHARSET_H 1
 
 #include <stdarg.h>
+#include <sys/types.h>
 
 # ifdef __cplusplus
 extern "C" {
@@ -36,6 +37,7 @@ VLC_EXPORT( char *, FromLocale, ( const char * ) );
 VLC_EXPORT( char *, FromLocaleDup, ( const char * ) );
 VLC_EXPORT( char *, ToLocale, ( const char * ) );
 
+VLC_EXPORT( int, utf8_open, ( const char *filename, int flags, mode_t mode ) );
 VLC_EXPORT( FILE *, utf8_fopen, ( const char *filename, const char *mode ) );
 VLC_EXPORT( void *, utf8_opendir, ( const char *dirname ) );
 VLC_EXPORT( const char *, utf8_readdir, ( void *dir ) );

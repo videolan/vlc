@@ -2,6 +2,7 @@
  * unicode.c: Unicode <-> locale functions
  *****************************************************************************
  * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright © 2005-2006 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
@@ -45,6 +46,12 @@
 #endif
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
+#endif
+#ifdef HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+#ifdef WIN32
+# include <io.h>
 #endif
 
 #ifndef HAVE_LSTAT
@@ -302,20 +309,17 @@ void LocaleFree( const char *str )
 }
 
 /**
- * utf8_fopen: Calls fopen() after conversion of file name to OS locale
+ * utf8_open: open() wrapper for UTF-8 filenames
  */
-FILE *utf8_fopen( const char *filename, const char *mode )
+int utf8_open (const char *filename, int flags, mode_t mode)
 {
 #if defined (WIN32) || defined (UNDER_CE)
-    if( GetVersion() < 0x80000000 )
+    if (GetVersion() < 0x80000000)
     {
         /* for Windows NT and above */
         wchar_t wpath[MAX_PATH + 1];
-        size_t len = strlen( mode ) + 1;
-        wchar_t wmode[len];
 
-        if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH )
-         || !MultiByteToWideChar( CP_ACP, 0, mode, len, wmode, len ) )
+        if (!MultiByteToWideChar (CP_UTF8, 0, filename, -1, wpath, MAX_PATH))
         {
             errno = ENOENT;
             return NULL;
@@ -323,24 +327,73 @@ FILE *utf8_fopen( const char *filename, const char *mode )
         wpath[MAX_PATH] = L'\0';
 
         /*
-         * fopen() cannot open files with non-“ANSI” characters on Windows.
-         * We use _wfopen() instead. Same thing for mkdir() and stat().
+         * open() cannot open files with non-“ANSI” characters on Windows.
+         * We use _wopen() instead. Same thing for mkdir() and stat().
          */
-        return _wfopen( wpath, wmode );
+        return _wopen (wpath, flags, mode);
     }
 #endif
-    const char *local_name = ToLocale( filename );
+    const char *local_name = ToLocale (filename);
 
-    if( local_name != NULL )
+    if (local_name == NULL)
     {
-        FILE *stream = fopen( local_name, mode );
-        LocaleFree( local_name );
-        return stream;
-    }
-    else
         errno = ENOENT;
+        return NULL;
+    }
 
-    return NULL;
+    int fd = open (local_name, flags, mode);
+    LocaleFree (local_name);
+    return fd;
+}
+
+/**
+ * utf8_fopen: fopen() wrapper for UTF-8 filenames
+ */
+FILE *utf8_fopen (const char *filename, const char *mode)
+{
+    int rwflags = 0, oflags = 0;
+    vlc_bool_t append = VLC_FALSE;
+
+    for (const char *ptr = mode; *ptr; ptr++)
+    {
+        switch (*ptr)
+        {
+            case 'r':
+                rwflags = O_RDONLY;
+                break;
+
+            case 'a':
+                rwflags = O_WRONLY;
+                oflags |= O_CREAT;
+                append = VLC_TRUE;
+                break;
+
+            case 'w':
+                rwflags = O_WRONLY;
+                oflags |= O_CREAT | O_TRUNC;
+                break;
+
+            case '+':
+                rwflags = O_RDWR;
+                break;
+        }
+    }
+
+    int fd = utf8_open (filename, rwflags | oflags, 0666);
+    if (fd == -1)
+        return NULL;
+
+    if (append && (lseek (fd, 0, SEEK_END) == -1))
+    {
+        close (fd);
+        return NULL;
+    }
+
+    FILE *stream = fdopen (fd, mode);
+    if (stream == NULL)
+        close (fd);
+
+    return stream;
 }
 
 /**
