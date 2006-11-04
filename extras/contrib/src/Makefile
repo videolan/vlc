@@ -407,6 +407,7 @@ gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
 	(cd $@; ./autogen.sh)
+	patch -p 0 < Patches/gettext-macosx.patch 
 endif
 
 .intl: gettext .iconv
