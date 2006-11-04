@@ -256,7 +256,7 @@ struct demux_sys_t
 /* Main parsing functions */
     static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp );
     static int ParseSAP( services_discovery_t *p_sd, const uint8_t *p_buffer, size_t i_read );
-    static sdp_t *  ParseSDP( vlc_object_t *p_sd, char* psz_sdp );
+    static sdp_t *ParseSDP (vlc_object_t *p_sd, const char *psz_sdp);
     static sap_announce_t *CreateAnnounce( services_discovery_t *, uint16_t, sdp_t * );
     static int RemoveAnnounce( services_discovery_t *p_sd, sap_announce_t *p_announce );
 
@@ -1006,7 +1006,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
  * *********************************************************************
  * Validate SDP and parse all fields
  ***********************************************************************/
-static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
+static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
 {
     sdp_t *p_sdp;
     vlc_bool_t b_invalid = VLC_FALSE;
