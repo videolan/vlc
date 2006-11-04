@@ -129,10 +129,10 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        char *psz_localname = ToLocale( p_access->psz_name );
-        char *psz_tmp, *psz_tmp2, *psz_rewriten;
-        int fd, i, i_length = strlen( psz_localname );
-        for( i = 0, psz_tmp = psz_localname ;
+        const char *psz_tmp;
+	char *psz_tmp2, *psz_rewriten;
+        int fd, i, i_length = strlen( p_access->psz_name );
+        for( i = 0, psz_tmp = p_access->psz_name ;
              ( psz_tmp = strstr( psz_tmp, "%T" ) ) ; psz_tmp++, i++ )
             ;
         if( i )
@@ -141,7 +141,7 @@ static int Open( vlc_object_t *p_this )
             psz_rewriten = (char *) malloc( i_length );
             if( ! psz_rewriten )
                 return ( VLC_EGENERIC );
-            psz_tmp  = psz_localname;
+            psz_tmp  = p_access->psz_name;
             psz_tmp2 = psz_rewriten;
             while( *psz_tmp )
             {
@@ -156,15 +156,12 @@ static int Open( vlc_object_t *p_this )
                     *psz_tmp2++ = *psz_tmp++;
             }
             *psz_tmp2 = *psz_tmp;
-            fd = open( psz_rewriten, i_flags, 0666 );
-            LocaleFree( psz_localname );
+            fd = utf8_open( psz_rewriten, i_flags, 0666 );
             free( psz_rewriten );
         }
         else
-        {
-            fd = open( psz_localname, i_flags, 0666 );
-            LocaleFree( psz_localname );
-        }
+            fd = utf8_open( p_access->psz_name, i_flags, 0666 );
+
         if( fd == -1 )
         {
             msg_Err( p_access, "cannot open `%s' (%s)", p_access->psz_name,

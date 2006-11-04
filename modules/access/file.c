@@ -445,37 +445,7 @@ static int open_file (access_t *p_access, const char *psz_name)
     p_access->info.i_update |= INPUT_UPDATE_SIZE;
     fseek( p_sys->fd, 0, SEEK_SET );
 #else
-    int fd = -1;
-
-# if defined (WIN32)
-    if (GetVersion() < 0x80000000)
-    {
-        /* for Windows NT and above */
-        wchar_t wpath[MAX_PATH + 1];
-        if (!MultiByteToWideChar (CP_UTF8, 0, path, -1, wpath, MAX_PATH))
-        {
-            msg_Err (p_access, "incorrect file name %s", psz_name);
-            return VLC_EGENERIC;
-        }
-        wpath[MAX_PATH] = L'\0'; 
-        fd = _wopen( wpath, O_NONBLOCK );
-    }
-    else
-# endif
-    {
-        const char *psz_localname = ToLocale (path);
-        if (psz_localname == NULL)
-        {
-            msg_Err (p_access, "incorrect file name %s", psz_name);
-            free (path);
-            return -1;
-        }
-
-        fd = open (path, O_NONBLOCK /*| O_LARGEFILE*/);
-        LocaleFree (psz_localname);
-    }
-    free (path);
-
+    int fd = utf8_open (path, O_RDONLY | O_NONBLOCK /* O_LARGEFILE*/, 0666);
     if (fd == -1)
     {
         msg_Err (p_access, "cannot open file %s (%s)", psz_name,
