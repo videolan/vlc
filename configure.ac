@@ -5231,7 +5231,7 @@ AC_ARG_ENABLE(mozilla,
   [  --enable-mozilla        build a vlc-based Mozilla plugin (default disabled)])
 AC_ARG_WITH(mozilla-sdk-path,
   [    --with-mozilla-sdk-path=PATH path to mozilla sdk])
-
+AC_LANG_PUSH(C++)
 if test "${enable_mozilla}" = "yes" 
 then
   dnl currently vlc plugin only needs headers, no xpcom support apis are actually used
@@ -5341,6 +5341,7 @@ then
     CPPFLAGS="${CPPFLAGS_save}"
   fi
 fi
+AC_LANG_POP(C++)
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
 dnl
