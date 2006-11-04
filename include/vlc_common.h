@@ -643,40 +643,40 @@ static int64_t GCD( int64_t a, int64_t b )
  * MSB, and should be used for both network communications and files. Note that
  * byte orders other than little and big endians are not supported, but only
  * the VAX seems to have such exotic properties. */
-static inline uint16_t U16_AT( void const * _p )
+static inline uint16_t U16_AT( const void * _p )
 {
-    uint8_t * p = (uint8_t *)_p;
+    const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint16_t)p[0] << 8) | p[1] );
 }
-static inline uint32_t U32_AT( void const * _p )
+static inline uint32_t U32_AT( const void * _p )
 {
-    uint8_t * p = (uint8_t *)_p;
+    const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16)
               | ((uint32_t)p[2] << 8) | p[3] );
 }
-static inline uint64_t U64_AT( void const * _p )
+static inline uint64_t U64_AT( const void * _p )
 {
-    uint8_t * p = (uint8_t *)_p;
+    const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint64_t)p[0] << 56) | ((uint64_t)p[1] << 48)
               | ((uint64_t)p[2] << 40) | ((uint64_t)p[3] << 32)
               | ((uint64_t)p[4] << 24) | ((uint64_t)p[5] << 16)
               | ((uint64_t)p[6] << 8) | p[7] );
 }
 
-static inline uint16_t GetWLE( void const * _p )
+static inline uint16_t GetWLE( const void * _p )
 {
-    uint8_t * p = (uint8_t *)_p;
+    const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint16_t)p[1] << 8) | p[0] );
 }
-static inline uint32_t GetDWLE( void const * _p )
+static inline uint32_t GetDWLE( const void * _p )
 {
-    uint8_t * p = (uint8_t *)_p;
+    const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint32_t)p[3] << 24) | ((uint32_t)p[2] << 16)
               | ((uint32_t)p[1] << 8) | p[0] );
 }
-static inline uint64_t GetQWLE( void const * _p )
+static inline uint64_t GetQWLE( const void * _p )
 {
-    uint8_t * p = (uint8_t *)_p;
+    const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint64_t)p[7] << 56) | ((uint64_t)p[6] << 48)
               | ((uint64_t)p[5] << 40) | ((uint64_t)p[4] << 32)
               | ((uint64_t)p[3] << 24) | ((uint64_t)p[2] << 16)
