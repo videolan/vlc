@@ -255,7 +255,7 @@ struct demux_sys_t
 
 /* Main parsing functions */
     static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp );
-    static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read );
+    static int ParseSAP( services_discovery_t *p_sd, const uint8_t *p_buffer, size_t i_read );
     static sdp_t *  ParseSDP( vlc_object_t *p_sd, char* psz_sdp );
     static sap_announce_t *CreateAnnounce( services_discovery_t *, uint16_t, sdp_t * );
     static int RemoveAnnounce( services_discovery_t *p_sd, sap_announce_t *p_announce );
@@ -264,9 +264,7 @@ struct demux_sys_t
     static char *GetAttribute( sdp_t *p_sdp, const char *psz_search );
     static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
     static int InitSocket( services_discovery_t *p_sd, const char *psz_address, int i_port );
-#ifdef HAVE_ZLIB_H
-    static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len );
-#endif
+    static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len );
     static void FreeSDP( sdp_t *p_sdp );
 
 /*****************************************************************************
@@ -600,45 +598,37 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  **************************************************************/
 
 /* i_read is at least > 6 */
-static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
+static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
+                     size_t len )
 {
-    int                 i_version, i_address_type, i_hash, i;
-    char                *psz_sdp, *psz_foo, *psz_initial_sdp;
-    uint8_t             *p_decompressed_buffer = NULL;
+    int i;
+    const char          *psz_sdp;
+    const uint8_t *end = buf + len;
     sdp_t               *p_sdp;
-    vlc_bool_t          b_compressed;
-    vlc_bool_t          b_need_delete = VLC_FALSE;
+
+    assert (buf[len] == '\0');
+
+    if (len < 4)
+        return VLC_EGENERIC;
+
+    uint8_t flags = buf[0];
 
     /* First, check the sap announce is correct */
-    i_version = p_buffer[0] >> 5;
-    if( i_version != 1 )
-    {
-       msg_Dbg( p_sd, "strange sap version %d found", i_version );
-    }
-
-    i_address_type = p_buffer[0] & 0x10;
-
-    if( (p_buffer[0] & 0x08) != 0 )
-    {
-        msg_Dbg( p_sd, "reserved bit incorrectly set" );
+    if ((flags >> 5) != 1)
         return VLC_EGENERIC;
-    }
 
-    if( (p_buffer[0] & 0x04) != 0 )
-    {
-        msg_Dbg( p_sd, "session deletion packet" );
-        b_need_delete = VLC_TRUE;
-    }
+    vlc_bool_t b_ipv6 = (flags & 0x10) != 0;
+    vlc_bool_t b_need_delete = (flags & 0x04) != 0;
 
-    if( p_buffer[0] & 0x02  )
+    if (flags & 0x02)
     {
         msg_Dbg( p_sd, "encrypted packet, unsupported" );
         return VLC_EGENERIC;
     }
 
-    b_compressed = p_buffer[0] & 0x01;
+    vlc_bool_t b_compressed = (flags & 0x01) != 0;
 
-    i_hash = ( p_buffer[2] << 8 ) + p_buffer[3];
+    uint16_t i_hash = U16_AT (buf + 2);
 
     if( p_sd->p_sys->b_strict && i_hash == 0 )
     {
@@ -646,84 +636,55 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
         return VLC_EGENERIC;
     }
 
-    psz_sdp  = (char *)p_buffer + 4;
-    psz_initial_sdp = psz_sdp;
+    // Skips source address and auth data
+    buf += 4 + (b_ipv6 ? 16 : 4) + buf[1];
+    if (buf > end)
+        return VLC_EGENERIC;
 
-    if( i_address_type == 0 ) /* ipv4 source address */
+    uint8_t *decomp = NULL;
+    if (b_compressed)
     {
-        psz_sdp += 4;
-        if( i_read <= 9 )
-        {
-            msg_Warn( p_sd, "too short SAP packet" );
-            return VLC_EGENERIC;
-        }
-    }
-    else /* ipv6 source address */
-    {
-        psz_sdp += 16;
-        if( i_read <= 21 )
-        {
-            msg_Warn( p_sd, "too short SAP packet" );
-            return VLC_EGENERIC;
-        }
-    }
-
-    if( b_compressed )
-    {
-#ifdef HAVE_ZLIB_H
-        int      i_decompressed_size;
-
-        i_decompressed_size = Decompress( (uint8_t *)psz_sdp,
-                   &p_decompressed_buffer, i_read - ( psz_sdp - (char *)p_buffer ) );
-        if( i_decompressed_size > 0 )
-        {
-            psz_sdp = (char *)p_decompressed_buffer;
-            realloc( p_decompressed_buffer, i_decompressed_size++ );
-            psz_sdp[i_decompressed_size] = '\0';
-        }
-        else
+        int newsize = Decompress (buf, &decomp, end - buf);
+        if (newsize < 0)
         {
             msg_Warn( p_sd, "decompression of sap packet failed" );
             return VLC_EGENERIC;
         }
-#else
-        msg_Warn( p_sd, "ignoring compressed sap packet" );
-        return VLC_EGENERIC;
-#endif
+
+        decomp = realloc (decomp, newsize + 1);
+        decomp[newsize++] = '\0';
+
+        psz_sdp = (const char *)decomp;
+        len = newsize;
+    }
+    else
+    {
+        psz_sdp = (const char *)buf;
+        len = end - buf;
     }
 
-    /* Add the size of authentification info */
-    if( i_read < p_buffer[1] + (psz_sdp - psz_initial_sdp ) )
-    {
-        msg_Warn( p_sd, "too short SAP packet\n");
-        return VLC_EGENERIC;
-    }
-    psz_sdp += p_buffer[1];
-    psz_foo = psz_sdp;
+    assert (buf[len] == '\0');
+
+    msg_Dbg( p_sd, "SDP:\n%s", psz_sdp );
 
     /* Skip payload type */
-    /* Handle announces without \0 between SAP and SDP */
-    while( *psz_sdp != '\0' && ( psz_sdp[0] != 'v' && psz_sdp[1] != '=' ) )
+    /* SAPv1 has implicit "application/sdp" payload type: first line is v=0 */
+    if (strncmp (psz_sdp, "v=0", 3))
     {
-        if( psz_sdp - psz_initial_sdp >= i_read - 5 )
-        {
-            msg_Warn( p_sd, "empty SDP ?");
-        }
-        psz_sdp++;
-    }
+        size_t clen = strlen (psz_sdp) + 1;
 
-    if( *psz_sdp == '\0' )
-    {
-        psz_sdp++;
-    }
-    if( ( psz_sdp != psz_foo ) && strcasecmp( psz_foo, "application/sdp" ) )
-    {
-        msg_Dbg( p_sd, "unhandled content type: %s", psz_foo );
-    }
-    if( ( psz_sdp - (char *)p_buffer ) >= i_read )
-    {
-        msg_Warn( p_sd, "package without content" );
-        return VLC_EGENERIC;
+        if (strcmp (psz_sdp, "application/sdp"))
+        {
+            msg_Dbg (p_sd, "unsupported content type: %s", psz_sdp);
+            return VLC_EGENERIC;
+        }
+
+        // skips content type
+        if (len <= clen)
+            return VLC_EGENERIC;
+
+        len -= clen;
+        psz_sdp += clen;
     }
 
     /* Parse SDP info */
@@ -779,7 +740,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
 
     CreateAnnounce( p_sd, i_hash, p_sdp );
 
-    FREENULL( p_decompressed_buffer );
+    FREENULL (decomp);
     return VLC_SUCCESS;
 }
 
@@ -1280,9 +1241,9 @@ static int InitSocket( services_discovery_t *p_sd, const char *psz_address,
     return VLC_EGENERIC;
 }
 
-#ifdef HAVE_ZLIB_H
-static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len )
+static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len )
 {
+#ifdef HAVE_ZLIB_H
     int i_result, i_dstsize, n;
     unsigned char *psz_dst;
     z_stream d_stream;
@@ -1293,10 +1254,8 @@ static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len )
 
     i_result = inflateInit(&d_stream);
     if( i_result != Z_OK )
-    {
-        printf( "inflateInit() failed. Result: %d\n", i_result );
         return( -1 );
-    }
+
     d_stream.next_in = (Bytef *)psz_src;
     d_stream.avail_in = i_len;
     n = 0;
@@ -1312,10 +1271,7 @@ static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len )
 
         i_result = inflate(&d_stream, Z_NO_FLUSH);
         if( ( i_result != Z_OK ) && ( i_result != Z_STREAM_END ) )
-        {
-            printf( "Zlib decompression failed. Result: %d\n", i_result );
             return( -1 );
-        }
     }
     while( ( d_stream.avail_out == 0 ) && ( d_stream.avail_in != 0 ) &&
            ( i_result != Z_STREAM_END ) );
@@ -1326,8 +1282,13 @@ static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len )
     *_dst = (unsigned char *)realloc( psz_dst, i_dstsize );
 
     return i_dstsize;
-}
+#else
+    (void)psz_src;
+    (void)_dst;
+    (void)i_len;
+    return -1;
 #endif
+}
 
 
 static void FreeSDP( sdp_t *p_sdp )
