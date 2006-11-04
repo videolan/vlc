@@ -114,7 +114,8 @@ static int Open( vlc_object_t *p_this )
     access_sys_t *p_sys;
 
     char *psz_name = strdup( p_access->psz_path );
-    char *psz_parser, *psz_server_addr, *psz_bind_addr = "";
+    char *psz_parser;
+    const char *psz_server_addr, *psz_bind_addr = "";
     int  i_bind_port, i_server_port = 0;
 
     /* First set ipv4/ipv6 */
