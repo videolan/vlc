@@ -1081,7 +1081,7 @@ static int NetFillBuffer( access_t *p_access )
                            i_udp + MMS_BUFFER_SIZE/2, 0 );
     }
 
-#if MMS_DEBUG
+#ifdef MMS_DEBUG
     if( p_sys->i_proto == MMS_PROTO_UDP )
     {
         msg_Dbg( p_access, "filling buffer TCP:%d+%d UDP:%d+%d",
