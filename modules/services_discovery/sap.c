@@ -260,13 +260,10 @@ struct demux_sys_t
     static sap_announce_t *CreateAnnounce( services_discovery_t *, uint16_t, sdp_t * );
     static int RemoveAnnounce( services_discovery_t *p_sd, sap_announce_t *p_announce );
 
-/* Cache */
-    static void CacheLoad( services_discovery_t *p_sd );
-    static void CacheSave( services_discovery_t *p_sd );
 /* Helper functions */
     static char *GetAttribute( sdp_t *p_sdp, const char *psz_search );
     static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
-    static int InitSocket( services_discovery_t *p_sd, char *psz_address, int i_port );
+    static int InitSocket( services_discovery_t *p_sd, const char *psz_address, int i_port );
 #ifdef HAVE_ZLIB_H
     static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len );
 #endif
@@ -894,7 +891,6 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     char *psz_parse = NULL;
     char *psz_uri = NULL;
     char *psz_proto = NULL;
-    char psz_source[256];
     int i_port = 0;
 
     /* Parse c= field */
@@ -1048,9 +1044,19 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
 
     /* handle SSM case */
     psz_parse = GetAttribute( p_sdp, "source-filter" );
-    psz_source[0] = '\0';
+    char psz_source[258] = "";
+    if (psz_parse != NULL)
+    {
+        char psz_source_ip[256];
 
-    if( psz_parse ) sscanf( psz_parse, " incl IN IP%*s %*s %255s ", psz_source);
+        if (sscanf (psz_parse, " incl IN IP%*c %*s %255s ", psz_source_ip) == 1)
+        {
+            if (strchr (psz_source_ip, ':') != NULL)
+                sprintf (psz_source, "[%s]", psz_source_ip);
+            else
+                strcpy (psz_source, psz_source_ip);
+        }
+    }
 
     asprintf( &p_sdp->psz_uri, "%s://%s@%s:%i", psz_proto, psz_source,
               psz_uri, i_port );
@@ -1258,7 +1264,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
     return p_sdp;
 }
 
-static int InitSocket( services_discovery_t *p_sd, char *psz_address,
+static int InitSocket( services_discovery_t *p_sd, const char *psz_address,
                        int i_port )
 {
     int i_fd = net_OpenUDP( p_sd, psz_address, i_port, NULL, 0 );
@@ -1404,15 +1410,4 @@ static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 )
     {
         return VLC_FALSE;
     }
-}
-
-
-static void CacheLoad( services_discovery_t *p_sd )
-{
-    msg_Warn( p_sd, "cache not implemented") ;
-}
-
-static void CacheSave( services_discovery_t *p_sd )
-{
-    msg_Warn( p_sd, "cache not implemented") ;
 }
