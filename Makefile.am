@@ -303,14 +303,14 @@ endif
 # Shortcut for developpers to rebuild the core (libvlc + vlc)
 # Don't use it if you don't know what it is about.
 # Don't complain if it doesn't work. -- Courmisch
-core:
-	$(MAKE) $(AM_MAKEFLAGS) src/$(LIB_libvlc)
-	$(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
-
-.PHONY: core
-
-src/$(LIB_libvlc):
+libvlc:
 	cd src && $(MAKE) $(AM_MAKEFLAGS) $(LIB_libvlc)
+
+core: libvlc vlc$(EXEEXT)
+
+.PHONY: libvlc core
+
+src/$(LIB_libvlc): libvlc
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f vlc$(EXEEXT)
