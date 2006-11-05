@@ -55,6 +55,7 @@ AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(STRIP, strip, :)
 AC_CHECK_TOOL(AR, ar, :)
 AC_CHECK_TOOL(LD, ld, :)
+AC_CHECK_TOOL(DLLTOOL, dlltool, :)
 
 dnl Check for compiler properties
 AC_C_CONST
