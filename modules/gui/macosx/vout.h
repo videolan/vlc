@@ -121,6 +121,7 @@
     vout_thread_t * p_real_vout;
     vlc_bool_t      b_init_ok;
     vlc_bool_t      b_black;
+    vlc_bool_t      b_embedded;
 }
 
 - (id) initWithVout: (vout_thread_t *) p_vout view: (VLCVoutView *) view

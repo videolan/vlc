@@ -246,12 +246,14 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)closeVout
 {
+    [[[[VLCMain sharedInstance] getControls] getFSPanel] fadeOut];
+
     [o_view removeFromSuperview];
     o_view = nil;
     p_vout = NULL;
     s_frame = nil;
     o_window = nil;
-    p_real_vout = NULL;
+    p_real_vout = NULL;            
 }
 
 - (void)updateTitle
@@ -922,6 +924,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     p_real_vout = [VLCVoutView getRealVout: p_vout];
     i_device = var_GetInteger( p_real_vout->p_libvlc, "video-device" );
     b_black = var_GetBool( p_vout, "macosx-black" );
+    b_embedded = var_GetBool( p_vout, "macosx-embedded" );
 
     /* Find out on which screen to open the window */
     if( i_device <= 0 || i_device > (int)[o_screens count] )
@@ -1063,7 +1066,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     [o_view closeVout];
 }
 
-- (void) closeWindow
+- (void)closeWindow
 {
     /* XXX waitUntilDone = NO to avoid a possible deadlock when hitting
        Command-Q */
@@ -1072,7 +1075,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         withObject: NULL waitUntilDone: NO];
 }
 
-- (id) closeReal: (id) sender
+- (id)closeReal:(id)sender
 {
     if( b_black == VLC_TRUE )
     {
@@ -1084,6 +1087,10 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     }
     SetSystemUIMode( kUIModeNormal, 0);
     [super close];
+    /* this does only work in embedded mode */
+    if( b_embedded == VLC_TRUE )
+        [[[[VLCMain sharedInstance] getControls] getFSPanel] orderOut: self];
+
     return NULL;
 }
 
