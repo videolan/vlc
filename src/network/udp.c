@@ -31,6 +31,7 @@
 #include <vlc/vlc.h>
 
 #include <errno.h>
+#include <assert.h>
 
 #ifdef HAVE_SYS_TIME_H
 #    include <sys/time.h>
@@ -189,6 +190,80 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
 }
 
 
+int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
+                   socklen_t addrlen)
+{
+    switch (addr->sa_family)
+    {
+#ifdef IP_ADD_MEMBERSHIP
+        case AF_INET:
+        {
+            const struct sockaddr_in *v4 = (const struct sockaddr_in *)addr;
+            if (addrlen < sizeof (*v4))
+                return -1;
+
+            struct ip_mreq imr;
+            memset (&imr, 0, sizeof (imr));
+            memcpy (&imr.imr_multiaddr, &v4->sin_addr, 4);
+
+            /* FIXME: should use a different option for in and out */
+            char *iif = config_GetPsz (obj, "miface-addr");
+            if (iif != NULL)
+            {
+                if ((iif[0] != '\0') &&
+                    (inet_pton (AF_INET, iif, &imr.imr_interface) <= 0))
+                {
+                    msg_Err (obj, "invalid multicast interface address %s",
+                             iif);
+                    free (iif);
+                    return -1;
+                }
+                free (iif);
+            }
+
+            msg_Dbg (obj, "IP_ADD_MEMBERSHIP multicast request");
+
+            if (setsockopt (fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr,
+                            sizeof (imr)))
+            {
+                msg_Err (obj, "cannot join IPv4 multicast group (%s)",
+                         net_strerror (net_errno));
+                return -1;
+            }
+            return 0;
+        }
+#endif
+
+#ifdef IPV6_JOIN_GROUP
+        case AF_INET6:
+        {
+            const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *)addr;
+            if (addrlen < sizeof (*v6))
+                return -1;
+
+            struct ipv6_mreq imr;
+            memset (&imr, 0, sizeof (imr));
+            imr.ipv6mr_interface = v6->sin6_scope_id;
+            memcpy (&imr.ipv6mr_multiaddr, &v6->sin6_addr, 16);
+
+            if (setsockopt (fd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &imr,
+                            sizeof (imr)))
+            {
+                msg_Err (obj, "cannot join IPv6 multicast group (%s)",
+                         net_strerror (net_errno));
+                return -1;
+            }
+
+            return 0;
+        }
+#endif
+    }
+
+    msg_Err (obj, "Multicast not supported");
+    return -1;
+}
+
+
 int net_SetDSCP( int fd, uint8_t dscp )
 {
     struct sockaddr_storage addr;
@@ -325,6 +400,39 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
 
     return i_handle;
 }
+
+
+static inline
+int *__net_ListenUDP (vlc_object_t *obj, const char *host, int port)
+{
+    int *fdv = net_Listen (obj, host, port, 0, SOCK_DGRAM, IPPROTO_UDP);
+    if (fdv == NULL)
+        return NULL;
+
+    /* FIXME: handle multicast subscription */
+    return fdv;
+}
+
+
+int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port)
+{
+    int *fdv = __net_ListenUDP (obj, host, port);
+    if (fdv == NULL)
+        return -1;
+
+    for (unsigned i = 1; fdv[i] != -1; i++)
+    {
+        msg_Warn (obj, "A socket has been dropped!");
+        net_Close (fdv[i]);
+    }
+
+    int fd = fdv[0];
+    assert (fd != -1);
+
+    free (fdv);
+    return fd;
+}
+
 
 /*****************************************************************************
  * __net_OpenUDP:

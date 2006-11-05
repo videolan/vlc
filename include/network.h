@@ -83,12 +83,14 @@ struct network_socket_t
 };
 
 /* Portable networking layer communication */
+int net_Socket (vlc_object_t *obj, int family, int socktype, int proto);
+
 #define net_ConnectTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
 #define net_OpenTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_ConnectTCP, ( vlc_object_t *p_this, const char *psz_host, int i_port ) );
 
-VLC_EXPORT( int *, net_Listen, (vlc_object_t *p_this, const char *psz_host, int i_port,
-                 int family, int socktype, int protocol) );
+int *net_Listen (vlc_object_t *p_this, const char *psz_host, int i_port,
+                 int family, int socktype, int protocol);
 
 #define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int *, __net_ListenTCP, ( vlc_object_t *, const char *, int ) );
@@ -99,6 +101,8 @@ VLC_EXPORT( int, __net_Accept, ( vlc_object_t *, int *, mtime_t ) );
 #define net_ConnectUDP(a, b, c, d ) __net_ConnectUDP(VLC_OBJECT(a), b, c, d)
 VLC_EXPORT( int, __net_ConnectUDP, ( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim ) );
 
+int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port);
+
 #define net_OpenUDP(a, b, c, d, e ) __net_OpenUDP(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server ) );
 
@@ -106,6 +110,8 @@ VLC_EXPORT( void, net_Close, ( int fd ) );
 VLC_EXPORT( void, net_ListenClose, ( int *fd ) );
 
 VLC_EXPORT( int, net_SetDSCP, ( int fd, uint8_t dscp ) );
+int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
+                   socklen_t addrlen);
 
 /* Functions to read from or write to the networking layer */
 struct virtual_socket_t

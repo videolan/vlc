@@ -171,6 +171,15 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host, int i_port,
             }
         }
 
+        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen))
+        {
+            if (net_Subscribe (p_this, fd, ptr->ai_addr, ptr->ai_addrlen))
+            {
+                net_Close (fd);
+                continue;
+            }
+        }
+
         /* Listen */
         switch (ptr->ai_socktype)
         {
