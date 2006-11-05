@@ -23,8 +23,7 @@ Interfaces:
    * Brand new interface for Linux and Windows, based on the Qt toolkit
  * All
    * Improved user interaction
- * OS X
-   * Full Screen controller panel
+
 
 Changes between 0.8.5 and 0.8.6
 --------------------------------
@@ -37,32 +36,45 @@ Input:
  * Support for adding subtitles on the fly
  * Fixed MPEG-PS duration calculation
  * ATSC support for DVB
+ * Partial support for DVR-ms recordings
+ * Partial support for MXF fileformat
 
 Decoders:
  * Native WMV3 / VC-1 support
  * WMA Speech support (through binary codecs)
-
+ * VP5/VP6 - Flash Video support
+ * The True Audio Lossless codec support
+ * WavPack support
+ * Improved H.264 support (interlaced, speed improvements etc)
+ 
 Video output:
  * Additional OpenGL effects (cylinder, torus, sphere, ...)
  * Improved libcaca support
 
 Interfaces:
- * New hotkeys for crop and zoom
- * Systray support in skins (Windows only)
- * Notifications using notification-daemon on Linux
- * Support for snapshots from the HTTP interface
+ * All
+   * New hotkeys for crop and zoom
+   * Support for snapshots from the HTTP interface
+ * Windows
+   * Systray support in skins
  * OS X
-   - Support for Apple Remote control
-   - Right/ctrl-click menu in video outputs
-   - Main Menu keeps accessible when playing in fullscreen mode
+   * Support for Apple Remote control
+   * Fullscreen controller panel
+   * new playmode buttons
+   * right/ctrl-click menu in video outputs
+   * Main Menu keeps accessible when playing videos in fullscreen mode
+ * Linux
+   * Notifications using notification-daemon
 
 Localization:
  * Add Czech
  * Add Slovak
  * Add Malay
+ * Add Slovenian
 
 Developers:
  * Updates to the libvlc API
+ * Fixes for the mozilla and activeX plugins
 
 
 Changes between 0.8.4a and 0.8.5
