@@ -237,47 +237,63 @@ VLC_EXPORT( int, vlc_getnameinfo, ( const struct sockaddr *, int, char *, int, i
 VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** ) );
 VLC_EXPORT( void, vlc_freeaddrinfo, ( struct addrinfo * ) );
 
-/*****************************************************************************
- * net_AddressIsMulticast: This function returns VLC_FALSE if the psz_addr does
- * not specify a multicast address or if the address is not a valid address.
- *****************************************************************************/
+
+static inline vlc_bool_t
+net_SockAddrIsMulticast (const struct sockaddr *addr, socklen_t len)
+{
+    switch (addr->sa_family)
+    {
+#ifdef IN_MULTICAST
+        case AF_INET:
+        {
+            struct sockaddr_in *v4 = (struct sockaddr_in *)addr;
+            if (len < sizeof (*v4))
+                return VLC_FALSE;
+            return IN_MULTICAST (v4->sin_addr.s_addr) != 0;
+        }
+#endif
+
+#ifdef IN6_IS_ADDR_MULTICAST
+        case AF_INET6:
+        {
+            struct sockaddr_in6 *v6 = (struct sockaddr_in6 *)addr;
+            if (len < sizeof (*v6))
+                return VLC_FALSE;
+            return IN6_IS_ADDR_MULTICAST (&v6->sin6_addr) != 0;
+        }
+#endif
+    }
+
+    return VLC_FALSE;
+}
+
+
+
+/**
+ * net_AddressIsMulticast
+ * @return VLC_FALSE iff the psz_addr does not specify a multicast address,
+ * or the address is not a valid address.
+ */
 static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, const char *psz_addr )
 {
     struct addrinfo hints, *res;
-    vlc_bool_t b_multicast = VLC_FALSE;
-    int i;
 
-    memset( &hints, 0, sizeof( hints ) );
+    memset (&hints, 0, sizeof (hints));
     hints.ai_socktype = SOCK_DGRAM; /* UDP */
     hints.ai_flags = AI_NUMERICHOST;
 
-    i = vlc_getaddrinfo( p_object, psz_addr, 0,
-                         &hints, &res );
-    if( i )
+    int i = vlc_getaddrinfo (p_object, psz_addr, 0,
+                             &hints, &res);
+    if (i)
     {
-        msg_Err( p_object, "invalid address for net_AddressIsMulticast: %s : %s",
-                 psz_addr, vlc_gai_strerror( i ) );
+        msg_Err (p_object, "invalid address \"%s\" for net_AddressIsMulticast (%s)",
+                 psz_addr, vlc_gai_strerror (i));
         return VLC_FALSE;
     }
 
-    if( res->ai_family == AF_INET )
-    {
-#if !defined( SYS_BEOS )
-        struct sockaddr_in *v4 = (struct sockaddr_in *) res->ai_addr;
-        b_multicast = ( ntohl( v4->sin_addr.s_addr ) >= 0xe0000000 )
-                   && ( ntohl( v4->sin_addr.s_addr ) <= 0xefffffff );
-#endif
-    }
-#if defined( WIN32 ) || defined( HAVE_GETADDRINFO )
-    else if( res->ai_family == AF_INET6 )
-    {
-        struct sockaddr_in6 *v6 = (struct sockaddr_in6 *)res->ai_addr;
-        b_multicast = IN6_IS_ADDR_MULTICAST( &v6->sin6_addr );
-    }
-#endif
-
-    vlc_freeaddrinfo( res );
-    return b_multicast;
+    vlc_bool_t b = net_SockAddrIsMulticast (res->ai_addr, res->ai_addrlen);
+    vlc_freeaddrinfo (res);
+    return b;
 }
 
 static inline int net_GetSockAddress( int fd, char *address, int *port )
