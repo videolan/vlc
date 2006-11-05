@@ -5670,7 +5670,7 @@ dnl Shortcut to nice compile message
 rm -f compile
 echo '#! /bin/sh' >compile
 
-echo "PATH=$PATH LANG=C make \$* 2>&1| \\" >> compile
+echo "PATH=$PATH LANG=C make \$@ 2>&1| \\" >> compile
 echo '`sed -ne "s/^top_srcdir *= *//p" < Makefile`/extras/make.pl' >> compile
 chmod a+x compile
 

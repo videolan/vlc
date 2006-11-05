@@ -433,16 +433,16 @@ VLC-release.app: vlc
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
 	case $(host_os) in \
-	  *darwin6*) cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
-	    cd ../../../; \
+	  *darwin6*) cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
+	    cd ../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC-release.app;; \
-	  *darwin7*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
-	    cd ../../../; \
+	  *darwin7*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
+	    cd ../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC-release.app;; \
-	  *darwin8*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
-	    cd ../../../; \
+	  *darwin8*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
+	    cd ../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
 	          $(top_builddir)/VLC-release.app;; \
 	esac
@@ -575,16 +575,16 @@ VLC.app: vlc
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
 	case $(host_os) in \
-	  *darwin6*) cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
-	    cd ../../../; \
+	  *darwin6*) cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'&& \
+	    cd ../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC.app;; \
-	  *darwin7*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
-	    cd ../../../; \
+	  *darwin7*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'&& \
+	    cd ../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC.app;; \
-	  *darwin8*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
-	    cd ../../../; \
+	  *darwin8*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
+	    cd ../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
 	          $(top_builddir)/VLC.app;; \
 	esac
@@ -858,7 +858,7 @@ package-beos:
 	xres -o $(srcdir)/tmp/vlc/vlc $(srcdir)/share/vlc_beos.rsrc ;
 	find $(srcdir)/tmp/vlc -exec mimeset -f {} \; ;
 	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-${VERSION} ;
-	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS-debug.zip vlc-${VERSION} )
+	(cd $(srcdir)/tmp && zip -9 -r vlc-${VERSION}-BeOS-debug.zip vlc-${VERSION} )
 	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS-debug.zip $(srcdir)/ ;
 	mv $(srcdir)/tmp/vlc-${VERSION} $(srcdir)/tmp/vlc ;
 
@@ -869,7 +869,7 @@ package-beos:
 	xres -o $(srcdir)/tmp/vlc/vlc $(srcdir)/share/vlc_beos.rsrc ;
 	find $(srcdir)/tmp/vlc -exec mimeset -f {} \; ;
 	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-${VERSION} ;
-	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS.zip vlc-${VERSION} )
+	(cd $(srcdir)/tmp &&  zip -9 -r vlc-${VERSION}-BeOS.zip vlc-${VERSION} )
 	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS.zip $(srcdir)/ ;
 
 # Clean up
@@ -965,7 +965,7 @@ package-translations:
 update-po:
 	rm -f $(top_srcdir)/po/POTFILES.in
 	{ \
-	  cd $(top_srcdir) ; \
+	  cd $(top_srcdir) && \
 	  echo "# automatically created by make update-po" ; \
 	  echo "" ; \
 	  echo "# main sources" ; \
