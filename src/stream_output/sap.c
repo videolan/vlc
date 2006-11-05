@@ -664,7 +664,7 @@ static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
         i_read = net_ReadNonBlock( p_sap, p_address->i_rfd, NULL, buffer,
                                    SAP_MAX_BUFFER, 0 );
         i_tot += i_read;
-    } while( i_read > 0 && i_tot < SAP_MAX_BUFFER );
+    } while( i_read > 0 );
 
     i_temp = mdate();
 
