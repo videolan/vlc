@@ -257,7 +257,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "port", &val );
-    p_sys->i_fd = net_OpenUDP( p_stream, NULL, val.i_int, NULL, 0 );
+    p_sys->i_fd = net_ListenUDP1( p_stream, NULL, val.i_int );
     if ( p_sys->i_fd < 0 )
     {
         free( p_sys );

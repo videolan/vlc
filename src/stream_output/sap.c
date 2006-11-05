@@ -398,7 +398,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 
         if( p_sap->b_control == VLC_TRUE )
         {
-            p_address->i_rfd = net_OpenUDP( p_sap, psz_addr, SAP_PORT, "", 0 );
+            p_address->i_rfd = net_ListenUDP1( p_sap, psz_addr, SAP_PORT );
             if( p_address->i_rfd != -1 )
                 net_StopSend( p_address->i_rfd );
             p_address->i_buff = 0;

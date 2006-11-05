@@ -101,7 +101,7 @@ VLC_EXPORT( int, __net_Accept, ( vlc_object_t *, int *, mtime_t ) );
 #define net_ConnectUDP(a, b, c, d ) __net_ConnectUDP(VLC_OBJECT(a), b, c, d)
 VLC_EXPORT( int, __net_ConnectUDP, ( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim ) );
 
-int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port);
+VLC_EXPORT( int, net_ListenUDP1, (vlc_object_t *obj, const char *host, int port) );
 
 #define net_OpenUDP(a, b, c, d, e ) __net_OpenUDP(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server ) );

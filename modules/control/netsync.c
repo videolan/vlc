@@ -144,7 +144,7 @@ static void Run( intf_thread_t *p_intf )
     }
 
     if( b_master )
-        i_socket = net_OpenUDP( p_intf, NULL, NETSYNC_PORT, NULL, 0 );
+        i_socket = net_ListenUDP1( p_intf, NULL, NETSYNC_PORT );
     else
         i_socket = net_ConnectUDP( p_intf, psz_master, NETSYNC_PORT, 0 );
 

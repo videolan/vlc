@@ -480,8 +480,8 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
             return VLC_EGENERIC;
         }
 
-        p_sys->i_handle_udp = net_OpenUDP( p_access, p_sys->sz_bind_addr,
-                                           7000, "", 0 );
+        p_sys->i_handle_udp = net_ListenUDP1( p_access, p_sys->sz_bind_addr,
+                                              7000 );
         if( p_sys->i_handle_udp < 0 )
         {
             msg_Err( p_access, "failed to open a connection (udp)" );
