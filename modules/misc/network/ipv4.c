@@ -370,7 +370,7 @@ static int OpenUDP( vlc_object_t * p_this )
                 close( i_handle );
                 return 0;
             }
-         }
+        }
     }
     else
 #endif
