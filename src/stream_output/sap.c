@@ -240,6 +240,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     mtime_t i_hash;
     struct addrinfo hints, *res;
     struct sockaddr_storage addr;
+    socklen_t addrlen;
 
     vlc_mutex_lock( &p_sap->object_lock );
 
@@ -266,7 +267,8 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         return VLC_EGENERIC;
     }
 
-    if( (unsigned)res->ai_addrlen > sizeof( addr ) )
+    addrlen = res->ai_addrlen;
+    if ((unsigned)addrlen > sizeof (addr))
     {
         vlc_mutex_unlock( &p_sap->object_lock );
         vlc_freeaddrinfo( res );
@@ -275,7 +277,8 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         return VLC_EGENERIC;
     }
 
-    memcpy( &addr, res->ai_addr, res->ai_addrlen );
+    memcpy (&addr, res->ai_addr, addrlen);
+    vlc_freeaddrinfo (res);
 
     switch( addr.ss_family )
     {
@@ -328,7 +331,6 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                 msg_Err( p_sap, "Out-of-scope multicast address "
                         "not supported by SAP: %s", p_session->psz_uri );
                 vlc_mutex_unlock( &p_sap->object_lock );
-                vlc_freeaddrinfo( res );
                 return VLC_EGENERIC;
             }
 
@@ -338,15 +340,13 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 
         default:
             vlc_mutex_unlock( &p_sap->object_lock );
-            vlc_freeaddrinfo( res );
             msg_Err( p_sap, "Address family %d not supported by SAP",
                      addr.ss_family );
             return VLC_EGENERIC;
     }
 
-    i = vlc_getnameinfo( (struct sockaddr *)&addr, res->ai_addrlen,
+    i = vlc_getnameinfo( (struct sockaddr *)&addr, addrlen,
                          psz_addr, sizeof( psz_addr ), NULL, NI_NUMERICHOST );
-    vlc_freeaddrinfo( res );
 
     if( i )
     {
