@@ -304,7 +304,7 @@ endif
 # Don't use it if you don't know what it is about.
 # Don't complain if it doesn't work. -- Courmisch
 core:
-	rm -f src/$(LIB_libvlc)
+	$(MAKE) $(AM_MAKEFLAGS) src/$(LIB_libvlc)
 	$(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
 
 .PHONY: core
