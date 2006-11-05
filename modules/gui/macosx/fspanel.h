@@ -48,7 +48,6 @@
 
 - (void)focus:(NSTimer *)timer;
 - (void)unfocus:(NSTimer *)timer;
-- (void)mouseEntered:(NSEvent *)theEvent;
 - (void)mouseExited:(NSEvent *)theEvent;
 
 - (void)fadeIn;

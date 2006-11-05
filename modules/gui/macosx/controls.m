@@ -178,24 +178,18 @@
 /* three little ugly helpers */
 - (void)repeatOne
 {
-    [o_btn_repeat setImage: [[NSImage alloc] initWithContentsOfFile:
-    [[NSBundle mainBundle] pathForImageResource:@"repeat_single_embedded_blue.png"]]];
-    [o_btn_repeat setAlternateImage: [[NSImage alloc] initWithContentsOfFile:
-        [[NSBundle mainBundle] pathForImageResource:@"repeat_embedded_blue.png"]]];
+    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_single_embedded_blue"]];
+    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_embedded_blue"]];
 }
 - (void)repeatAll
 {
-    [o_btn_repeat setImage: [[NSImage alloc] initWithContentsOfFile:
-        [[NSBundle mainBundle] pathForImageResource:@"repeat_embedded_blue.png"]]];
-    [o_btn_repeat setAlternateImage: [[NSImage alloc] initWithContentsOfFile:
-        [[NSBundle mainBundle] pathForImageResource:@"repeat_embedded.png"]]];
+    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_embedded_blue"]];
+    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_embedded"]];
 }
 - (void)repeatOff
 {
-    [o_btn_repeat setImage: [[NSImage alloc] initWithContentsOfFile:
-        [[NSBundle mainBundle] pathForImageResource:@"repeat_embedded.png"]]];
-    [o_btn_repeat setAlternateImage: [[NSImage alloc] initWithContentsOfFile:
-    [[NSBundle mainBundle] pathForImageResource:@"repeat_single_embedded_blue.png"]]];
+    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_embedded"]];
+    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_single_embedded_blue"]];
 }
 - (void)shuffle
 {
@@ -214,9 +208,6 @@
 
     var_Get( p_playlist, "repeat", &repeating );
     var_Get( p_playlist, "loop", &looping );
-
-    [[o_btn_repeat image] release];
-    [[o_btn_repeat alternateImage] release];
 
     if( !repeating.b_bool && !looping.b_bool )
     {

@@ -181,7 +181,7 @@
 
 - (void)fadeOut
 {
-    if( ( [self alphaValue] > 0.0 ) && !NSPointInRect( [NSEvent mouseLocation], [self frame] ) )
+    if( ( [self alphaValue] > 0.0 ) )
     {
         if (![self fadeTimer])
             [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(unfocus:) userInfo:[NSNumber numberWithShort:0] repeats:YES]];
@@ -369,7 +369,6 @@
 
 - (void)setPlay
 {
-    NSBundle *bundle = [NSBundle mainBundle];
     NSImage *image;
     image = [NSImage imageNamed:@"fs_play"];
     [o_play setImage:image];
@@ -379,7 +378,6 @@
 
 - (void)setPause
 {
-    NSBundle *bundle = [NSBundle mainBundle];
     NSImage *image;
     image = [NSImage imageNamed:@"fs_pause"];
     [o_play setImage:image];
@@ -481,7 +479,6 @@
 @implementation VLCFSTimeSlider
 - (void)drawKnobInRect:(NSRect)knobRect
 {
-    NSBundle *bundle = [NSBundle mainBundle];
     NSRect image_rect;
     NSImage *img = [NSImage imageNamed:@"fs_time_slider_knob_highlight"];
     image_rect.size = [img size];
@@ -515,7 +512,6 @@
 @implementation VLCFSVolumeSlider
 - (void)drawKnobInRect:(NSRect) knobRect
 {
-    NSBundle *bundle = [NSBundle mainBundle];
     NSRect image_rect;
     NSImage *img = [NSImage imageNamed:@"fs_volume_slider_knob"];
     image_rect.size = [img size];
