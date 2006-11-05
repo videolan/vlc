@@ -381,10 +381,10 @@ DISTCLEAN_PKG += automake-$(AUTOMAKE_VERSION).tar.gz
 # pkgconfig
 # ***************************************************************************
 
-pkgconfig-$(PKGCFG_VERSION).tar.gz:
+pkg-config-$(PKGCFG_VERSION).tar.gz:
 	$(WGET) $(PKGCFG_URL)
 
-pkgconfig: pkgconfig-$(PKGCFG_VERSION).tar.gz
+pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -d pkgconfig/glib-1.2.8 -p 1 < Patches/glib.patch
 
