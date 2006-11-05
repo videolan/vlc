@@ -1690,7 +1690,7 @@ vlc_module_begin();
     add_bool( "file-logging", VLC_FALSE, NULL, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
               VLC_TRUE );
         change_need_restart();
-#if HAVE_SYSLOG_H
+#ifdef HAVE_SYSLOG_H
     add_bool ( "syslog", VLC_FALSE, NULL, SYSLOG_TEXT, SYSLOG_LONGTEXT,
                VLC_TRUE );
         change_need_restart();
