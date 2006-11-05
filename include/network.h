@@ -133,7 +133,7 @@ VLC_EXPORT( int, net_Printf, ( vlc_object_t *p_this, int fd, const v_socket_t *,
 VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args ) );
 
 
-#if !HAVE_INET_PTON
+#ifndef HAVE_INET_PTON
 /* only in core, so no need for C++ extern "C" */
 int inet_pton(int af, const char *src, void *dst);
 #endif
