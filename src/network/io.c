@@ -149,6 +149,25 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host, int i_port,
         }
 
         /* Bind the socket */
+#if 0//defined (WIN32) || defined (UNDER_CE)
+        /*
+         * Under Win32 and for multicasting, we bind to INADDR_ANY.
+         * This is of course a severe bug, since the socket would logically
+         * receive unicast traffic, and multicast traffic of groups subscribed
+         * to via other sockets.
+         */
+        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
+         && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
+        {
+            struct sockaddr_storage dumb =
+            {
+                .ss_family = ptr->ai_addr->sa_family
+            };
+
+            bind (fd, (struct sockaddr *)&dumb, ptr->ai_addrlen);
+        }
+        else
+#endif
         if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
         {
             int saved_errno = net_errno;
