@@ -387,9 +387,10 @@ pkg-config-$(PKGCFG_VERSION).tar.gz:
 pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -d pkgconfig/glib-1.2.8 -p 1 < Patches/glib.patch
+	patch -d pkgconfig -p0 < Patches/pkgcfg.patch
 
 .pkgcfg: pkgconfig
-	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	(cd pkgconfig; autoconf && ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
 	touch $@
 
 CLEAN_FILE += .pkgcfg
