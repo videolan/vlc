@@ -59,8 +59,6 @@ static int SocksHandshakeTCP( vlc_object_t *,
                               const char *psz_host, int i_port );
 extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
-extern int rootwrap_bind (int family, int socktype, int protocol,
-                          const struct sockaddr *addr, size_t alen);
 
 /*****************************************************************************
  * __net_ConnectTCP:
@@ -267,91 +265,10 @@ next_ai: /* failure */
  * Open TCP passive "listening" socket(s)
  * This function returns NULL in case of error.
  *****************************************************************************/
-int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
+int *__net_ListenTCP (vlc_object_t *p_this, const char *psz_host, int i_port)
 {
-    struct addrinfo hints, *res, *ptr;
-    int             i_val, *pi_handles, i_size;
-
-    memset( &hints, 0, sizeof( hints ) );
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;
-
-    msg_Dbg( p_this, "net: listening to %s port %d", psz_host, i_port );
-
-    i_val = vlc_getaddrinfo( p_this, psz_host, i_port, &hints, &res );
-    if( i_val )
-    {
-        msg_Err( p_this, "Cannot resolve %s port %d : %s", psz_host, i_port,
-                 vlc_gai_strerror( i_val ) );
-        return NULL;
-    }
-
-    pi_handles = NULL;
-    i_size = 1;
-
-    for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
-    {
-        int fd, *newpi;
-
-        fd = net_Socket( p_this, ptr->ai_family, ptr->ai_socktype,
-                         ptr->ai_protocol );
-        if( fd == -1 )
-        {
-            msg_Dbg( p_this, "socket error: %s", net_strerror( net_errno ) );
-            continue;
-        }
-
-        /* Bind the socket */
-        if( bind( fd, ptr->ai_addr, ptr->ai_addrlen ) )
-        {
-            int saved_errno;
-
-            saved_errno = net_errno;
-            net_Close( fd );
-#if !defined(WIN32) && !defined(UNDER_CE)
-            fd = rootwrap_bind( ptr->ai_family, ptr->ai_socktype,
-                                ptr->ai_protocol, ptr->ai_addr,
-                                ptr->ai_addrlen );
-            if( fd != -1 )
-            {
-                msg_Dbg( p_this, "got socket %d from rootwrap", fd );
-            }
-            else
-#endif
-            {
-                msg_Err( p_this, "cannot bind socket (%s)",
-                         net_strerror( saved_errno ) );
-                continue;
-            }
-        }
-
-        /* Listen */
-        if( listen( fd, 100 ) == -1 )
-        {
-            msg_Err( p_this, "cannot bring the socket in listening mode (%s)",
-                     net_strerror( net_errno ) );
-            net_Close( fd );
-            continue;
-        }
-
-        newpi = (int *)realloc( pi_handles, (++i_size) * sizeof( int ) );
-        if( newpi == NULL )
-        {
-            net_Close( fd );
-            break;
-        }
-        else
-        {
-            newpi[i_size - 2] = fd;
-            pi_handles = newpi;
-        }
-    }
-
-    vlc_freeaddrinfo( res );
-
-    if( pi_handles != NULL )
-        pi_handles[i_size - 1] = -1;
-    return pi_handles;
+    return net_Listen (p_this, psz_host, i_port, AF_UNSPEC, SOCK_STREAM,
+                       IPPROTO_TCP);
 }
 
 /*****************************************************************************

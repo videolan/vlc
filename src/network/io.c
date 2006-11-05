@@ -62,6 +62,9 @@
 # define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 
+extern int rootwrap_bind (int family, int socktype, int protocol,
+                          const struct sockaddr *addr, size_t alen);
+
 int net_Socket (vlc_object_t *p_this, int family, int socktype,
                 int protocol)
 {
@@ -107,6 +110,97 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
 #endif
 
     return fd;
+}
+
+
+int *net_Listen (vlc_object_t *p_this, const char *psz_host, int i_port,
+                 int family, int socktype, int protocol)
+{
+    struct addrinfo hints, *res;
+
+    memset (&hints, 0, sizeof( hints ));
+    hints.ai_family = family;
+    hints.ai_socktype = socktype;
+    hints.ai_protocol = protocol;
+    hints.ai_flags = AI_PASSIVE;
+
+    msg_Dbg (p_this, "net: listening to %s port %d", psz_host, i_port);
+
+    int i_val = vlc_getaddrinfo (p_this, psz_host, i_port, &hints, &res);
+    if (i_val)
+    {
+        msg_Err (p_this, "Cannot resolve %s port %d : %s", psz_host, i_port,
+                 vlc_gai_strerror (i_val));
+        return NULL;
+    }
+
+    int *sockv = NULL;
+    unsigned sockc = 0;
+
+    for (struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
+    {
+        int fd = net_Socket (p_this, ptr->ai_family, ptr->ai_socktype,
+                             ptr->ai_protocol);
+        if (fd == -1)
+        {
+            msg_Dbg (p_this, "socket error: %s", net_strerror (net_errno));
+            continue;
+        }
+
+        /* Bind the socket */
+        if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
+        {
+            int saved_errno = net_errno;
+
+            net_Close (fd);
+#if !defined(WIN32) && !defined(UNDER_CE)
+            fd = rootwrap_bind (ptr->ai_family, ptr->ai_socktype,
+                                ptr->ai_protocol, ptr->ai_addr,
+                                ptr->ai_addrlen);
+            if (fd != -1)
+            {
+                msg_Dbg (p_this, "got socket %d from rootwrap", fd);
+            }
+            else
+#endif
+            {
+                msg_Err (p_this, "socket bind error (%s)",
+                         net_strerror( saved_errno ) );
+                continue;
+            }
+        }
+
+        /* Listen */
+        switch (ptr->ai_socktype)
+        {
+            case SOCK_STREAM:
+            case SOCK_RDM:
+            case SOCK_SEQPACKET:
+                if (listen (fd, INT_MAX))
+                {
+                    msg_Err (p_this, "socket listen error (%s)",
+                            net_strerror (net_errno));
+                    net_Close (fd);
+                    continue;
+                }
+        }
+
+        int *nsockv = (int *)realloc (sockv, (sockc + 2) * sizeof (int));
+        if (nsockv != NULL)
+        {
+            nsockv[sockc++] = fd;
+            sockv = nsockv;
+        }
+        else
+            net_Close (fd);
+    }
+
+    vlc_freeaddrinfo (res);
+
+    if (sockv != NULL)
+        sockv[sockc] = -1;
+
+    return sockv;
 }
 
 

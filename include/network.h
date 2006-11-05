@@ -87,6 +87,9 @@ struct network_socket_t
 #define net_OpenTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_ConnectTCP, ( vlc_object_t *p_this, const char *psz_host, int i_port ) );
 
+VLC_EXPORT( int *, net_Listen, (vlc_object_t *p_this, const char *psz_host, int i_port,
+                 int family, int socktype, int protocol) );
+
 #define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int *, __net_ListenTCP, ( vlc_object_t *, const char *, int ) );
 
