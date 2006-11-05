@@ -1202,17 +1202,14 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
 static int InitSocket( services_discovery_t *p_sd, const char *psz_address,
                        int i_port )
 {
-    int i_fd = net_OpenUDP( p_sd, psz_address, i_port, NULL, 0 );
+    int i_fd = net_ListenUDP1 ((vlc_object_t *)p_sd, psz_address, i_port);
+    if (i_fd == -1)
+        return VLC_EGENERIC;
 
-    if( i_fd != -1 )
-    {
-        net_StopSend( i_fd );
-        INSERT_ELEM(  p_sd->p_sys->pi_fd, p_sd->p_sys->i_fd,
-                      p_sd->p_sys->i_fd, i_fd );
-        return VLC_SUCCESS;
-    }
-
-    return VLC_EGENERIC;
+    net_StopSend( i_fd );
+    INSERT_ELEM (p_sd->p_sys->pi_fd, p_sd->p_sys->i_fd,
+                 p_sd->p_sys->i_fd, i_fd);
+    return VLC_SUCCESS;
 }
 
 static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len )
