@@ -257,7 +257,6 @@
                 "o_mi_donation" = id; 
                 "o_mi_double_window" = id; 
                 "o_mi_equalizer" = id; 
-                "o_mi_errorsAndWarnings" = id; 
                 "o_mi_extended" = id; 
                 "o_mi_faster" = id; 
                 "o_mi_ffmpeg_pp" = id; 
