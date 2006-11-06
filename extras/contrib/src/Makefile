@@ -172,7 +172,7 @@ else
 
   ifdef HAVE_WIN32
 
-   all: .iconv .intl .pkgcfg .freetype .fribidi .zlib \
+   all: .iconv .intl .freetype .fribidi .zlib \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .shout .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
