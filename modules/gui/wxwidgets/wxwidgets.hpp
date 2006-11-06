@@ -95,10 +95,8 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
  * But heh, that's wxWidgets; you can't really expect it to actually
  * work, let alone work like its documentation says.
  *
- * Did it work, we would be able to catch non-ANSI characters on Windows
- * through wxString::wc_str(); while they are lost when using mb_str().
- * This would be particularly useful to open files whose names contain
- * non-ACP characters.
+ * Unicode needs to be enabled to catch non-ANSI characters on Windows
+ * through wxString::wc_str(); they are lost when using mb_str().
  */
 #if wxUSE_UNICODE
 #   define wxFromLocale(wxstring) FromWide(wxstring.wc_str())
@@ -109,7 +107,7 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 #endif
 	
 /* From Locale functions to use for File Drop targets ... go figure */
-#ifdef wxUSE_UNICODE
+#if defined( wxUSE_UNICODE ) && !defined( WIN32 )
 static inline char *wxDnDFromLocale( const wxChar *stupid )
 {
     /*

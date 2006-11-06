@@ -42,7 +42,7 @@ namespace wxvlc
         void SetTTL( int i_ttl );
         void SetPartial( int, int );
         void SetStream( char const *method, char const *address );
-        void SetTranscodeOut( char const *address );
+        void SetTranscodeOut( wxString address );
         void SetAction( int i_action );
         int  GetAction();
         void SetSAP( bool b_enabled, const char *psz_name );

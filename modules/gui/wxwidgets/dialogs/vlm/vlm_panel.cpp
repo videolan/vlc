@@ -441,9 +441,9 @@ void VLMAddStreamPanel::Load( VLMStream *p_stream )
 
 void VLMAddStreamPanel::OnCreate( wxCommandEvent &event )
 {
-    char *psz_name = FromLocale( name_text->GetValue().mb_str() );
-    char *psz_input = FromLocale(  input_text->GetValue().mb_str() );
-    char *psz_output = FromLocale( output_text->GetValue().mb_str() );
+    char *psz_name = wxFromLocale( name_text->GetValue() );
+    char *psz_input = wxFromLocale(  input_text->GetValue() );
+    char *psz_output = wxFromLocale( output_text->GetValue() );
     if( b_broadcast && ! b_edit )
     {
         p_vlm->AddBroadcast( psz_name, psz_input, psz_output,
@@ -468,8 +468,8 @@ void VLMAddStreamPanel::OnCreate( wxCommandEvent &event )
                         enabled_checkbox->IsChecked() ? VLC_TRUE: VLC_FALSE,
                         loop_checkbox->IsChecked() ? VLC_TRUE : VLC_FALSE );
     }
-    LocaleFree( psz_name) ; LocaleFree( psz_input ) ;
-    LocaleFree( psz_output);
+    wxLocaleFree( psz_name) ; wxLocaleFree( psz_input ) ;
+    wxLocaleFree( psz_output);
     if( !b_edit )
         OnClear( event );
     if( b_edit )
