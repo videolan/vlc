@@ -31,6 +31,7 @@
 #include <vlc/intf.h>
 
 #include "vlc_image.h"
+#include "vlc_strings.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -115,6 +116,9 @@ struct vout_sys_t
 
     vlc_bool_t  b_replace;
 
+    vlc_bool_t b_time;
+    vlc_bool_t b_meta;
+
     image_handler_t *p_image;
 };
 
@@ -134,6 +138,10 @@ static int Create( vlc_object_t *p_this )
 
     p_vout->p_sys->psz_prefix =
             var_CreateGetString( p_this, "image-out-prefix" );
+    p_vout->p_sys->b_time = strchr( p_vout->p_sys->psz_prefix, '%' )
+                            ? VLC_TRUE : VLC_FALSE;
+    p_vout->p_sys->b_meta = strchr( p_vout->p_sys->psz_prefix, '$' )
+                            ? VLC_TRUE : VLC_FALSE;
     p_vout->p_sys->psz_format =
             var_CreateGetString( p_this, "image-out-format" );
     p_vout->p_sys->i_width =
@@ -252,6 +260,8 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     video_format_t fmt_in = {0}, fmt_out = {0};
 
     char *psz_filename;
+    char *psz_prefix;
+    char *psz_tmp;
 
     if( p_vout->p_sys->i_frames % p_vout->p_sys->i_ratio != 0 )
     {
@@ -259,8 +269,6 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         return;
     }
     p_vout->p_sys->i_frames++;
-    psz_filename = (char *)malloc( 10 + strlen( p_vout->p_sys->psz_prefix )
-                                      + strlen( p_vout->p_sys->psz_format ) );
 
     fmt_in.i_chroma = p_vout->render.i_chroma;
     fmt_in.i_width = p_vout->render.i_width;
@@ -271,17 +279,33 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     fmt_out.i_height = p_vout->p_sys->i_height > 0 ? p_vout->p_sys->i_height :
                                                      p_vout->render.i_height;
 
+    if( p_vout->p_sys->b_time )
+        psz_tmp = str_format_time( p_vout->p_sys->psz_prefix );
+    else
+        psz_tmp = p_vout->p_sys->psz_prefix;
+    if( p_vout->p_sys->b_meta )
+    {
+        psz_prefix = str_format_meta( p_vout, psz_tmp );
+        if( p_vout->p_sys->b_time )
+            free( psz_tmp );
+    }
+    else
+        psz_prefix = psz_tmp;
+    psz_filename = (char *)malloc( 10 + strlen( psz_prefix )
+                                      + strlen( p_vout->p_sys->psz_format ) );
     if( p_vout->p_sys->b_replace )
     {
-        sprintf( psz_filename, "%s.%s", p_vout->p_sys->psz_prefix,
-                                            p_vout->p_sys->psz_format );
+        sprintf( psz_filename, "%s.%s", psz_prefix,
+                                        p_vout->p_sys->psz_format );
     }
     else
     {
-        sprintf( psz_filename, "%s%.6i.%s", p_vout->p_sys->psz_prefix,
+        sprintf( psz_filename, "%s%.6i.%s", psz_prefix,
                                             p_vout->p_sys->i_current,
                                             p_vout->p_sys->psz_format );
     }
+    if( p_vout->p_sys->b_time || p_vout->p_sys->b_meta )
+        free( psz_prefix );
     image_WriteUrl( p_vout->p_sys->p_image, p_pic,
                     &fmt_in, &fmt_out, psz_filename ) ;
     free( psz_filename );
