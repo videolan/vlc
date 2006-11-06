@@ -402,38 +402,6 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
 }
 
 
-static inline
-int *__net_ListenUDP (vlc_object_t *obj, const char *host, int port)
-{
-    int *fdv = net_Listen (obj, host, port, 0, SOCK_DGRAM, IPPROTO_UDP);
-    if (fdv == NULL)
-        return NULL;
-
-    /* FIXME: handle multicast subscription */
-    return fdv;
-}
-
-
-int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port)
-{
-    int *fdv = __net_ListenUDP (obj, host, port);
-    if (fdv == NULL)
-        return -1;
-
-    for (unsigned i = 1; fdv[i] != -1; i++)
-    {
-        msg_Warn (obj, "A socket has been dropped!");
-        net_Close (fdv[i]);
-    }
-
-    int fd = fdv[0];
-    assert (fd != -1);
-
-    free (fdv);
-    return fd;
-}
-
-
 /*****************************************************************************
  * __net_OpenUDP:
  *****************************************************************************

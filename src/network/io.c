@@ -114,8 +114,8 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
 }
 
 
-int *net_Listen (vlc_object_t *p_this, const char *psz_host, int i_port,
-                 int family, int socktype, int protocol)
+static int *net_Listen (vlc_object_t *p_this, const char *psz_host,
+                        int i_port, int family, int socktype, int protocol)
 {
     struct addrinfo hints, *res;
 
@@ -231,6 +231,28 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host, int i_port,
 
     return sockv;
 }
+
+
+int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
+                      int family, int socktype, int protocol)
+{
+    int *fdv = net_Listen (obj, host, port, family, socktype, protocol);
+    if (fdv == NULL)
+        return -1;
+
+    for (unsigned i = 1; fdv[i] != -1; i++)
+    {
+        msg_Warn (obj, "A socket has been dropped!");
+        net_Close (fdv[i]);
+    }
+
+    int fd = fdv[0];
+    assert (fd != -1);
+
+    free (fdv);
+    return fd;
+}
+
 
 
 /*****************************************************************************

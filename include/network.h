@@ -89,8 +89,10 @@ int net_Socket (vlc_object_t *obj, int family, int socktype, int proto);
 #define net_OpenTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_ConnectTCP, ( vlc_object_t *p_this, const char *psz_host, int i_port ) );
 
-int *net_Listen (vlc_object_t *p_this, const char *psz_host, int i_port,
-                 int family, int socktype, int protocol);
+/*int *net_Listen, (vlc_object_t *p_this, const char *psz_host, int i_port,
+                                int family, int socktype, int protocol);*/
+VLC_EXPORT( int, net_ListenSingle, (vlc_object_t *p_this, const char *psz_host, int i_port,
+                                    int family, int socktype, int protocol) );
 
 #define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int *, __net_ListenTCP, ( vlc_object_t *, const char *, int ) );
@@ -101,7 +103,10 @@ VLC_EXPORT( int, __net_Accept, ( vlc_object_t *, int *, mtime_t ) );
 #define net_ConnectUDP(a, b, c, d ) __net_ConnectUDP(VLC_OBJECT(a), b, c, d)
 VLC_EXPORT( int, __net_ConnectUDP, ( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim ) );
 
-VLC_EXPORT( int, net_ListenUDP1, (vlc_object_t *obj, const char *host, int port) );
+static inline int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port)
+{
+	return net_ListenSingle (obj, host, port, AF_UNSPEC, SOCK_DGRAM, IPPROTO_UDP);
+}
 
 #define net_OpenUDP(a, b, c, d, e ) __net_OpenUDP(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server ) );
