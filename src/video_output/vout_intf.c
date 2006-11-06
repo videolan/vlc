@@ -39,6 +39,7 @@
 #include "video_output.h"
 #include "vlc_image.h"
 #include "vlc_spu.h"
+#include "vlc_strings.h"
 
 #include <snapshot.h>
 
@@ -585,7 +586,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             if( SHGetFolderPath != NULL )
             {
                 p_mypicturesdir = (char *)malloc( MAX_PATH );
-                if( p_mypicturesdir ) 
+                if( p_mypicturesdir )
                 {
 
                     if( S_OK != SHGetFolderPath( NULL,
@@ -668,7 +669,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     }
     else // The user specified a full path name (including file name)
     {
-        asprintf ( &psz_filename, "%s", val.psz_string );
+        psz_filename = str_format_meta( p_vout, val.psz_string );
     }
 
     free( val.psz_string );
