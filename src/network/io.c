@@ -114,8 +114,8 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
 }
 
 
-static int *net_Listen (vlc_object_t *p_this, const char *psz_host,
-                        int i_port, int family, int socktype, int protocol)
+int *net_Listen (vlc_object_t *p_this, const char *psz_host,
+                 int i_port, int family, int socktype, int protocol)
 {
     struct addrinfo hints, *res;
 
