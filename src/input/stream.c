@@ -236,7 +236,7 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
     s->pf_block  = NULL;
     s->pf_read   = NULL;    /* Set up later */
     s->pf_peek   = NULL;
-    s->pf_control= AStreamControl;
+    s->pf_control = AStreamControl;
     s->pf_destroy = AStreamDestroy;
 
     s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
