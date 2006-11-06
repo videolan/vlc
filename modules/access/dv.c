@@ -295,14 +295,14 @@ static int Control( access_t *p_access, int i_query, va_list args )
     switch( i_query )
     {
         /* */
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
             pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
             *pb_bool = VLC_TRUE;
             break;
 
-        case ACCESS_CAN_CONTROL_PACE:
+       case ACCESS_CAN_SEEK:
+       case ACCESS_CAN_FASTSEEK:
+       case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
             *pb_bool = VLC_FALSE;
             break;
