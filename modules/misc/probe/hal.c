@@ -111,7 +111,7 @@ static void Close( vlc_object_t *p_this )
 
 static int GetAllDevices( device_probe_t *p_probe, device_t ***ppp_devices )
 {
-    /// \todo : fill the dst array 
+    /// \todo : fill the dst array
     return p_probe->p_sys->i_devices;
 }
 
@@ -127,8 +127,8 @@ static void Update( device_probe_t * p_probe )
 
     /* CD/DVD */
     if( ( devices = libhal_find_device_by_capability( p_sys->p_ctx,
-				    		      "storage.cdrom",
-						      &i_devices, NULL ) ) )
+                              "storage.cdrom",
+                              &i_devices, NULL ) ) )
     {
         for( i = 0; i < i_devices; i++ )
         {
@@ -169,9 +169,9 @@ static device_t * ParseDisc( device_probe_t *p_probe,  char *psz_device )
     device_t *p_dev;
     char *block_dev;
     dbus_bool_t b_dvd;
-    
+
     if( !libhal_device_property_exists( p_sys->p_ctx, psz_device,
-			   	       "storage.cdrom.dvd", NULL ) )
+                                        "storage.cdrom.dvd", NULL ) )
         return NULL;
 
     p_dev = (device_t *)malloc( sizeof( device_t ) );
@@ -208,17 +208,17 @@ static void UpdateMedia( device_probe_t *p_probe, device_t *p_dev )
 
     /* Find the media in the drive */
     matching_media = libhal_manager_find_device_string_match( p_sys->p_ctx,
-	                           				"block.device",	p_dev->psz_uri,
-                        					&i_matching, NULL );
+                                            "block.device", p_dev->psz_uri,
+                                            &i_matching, NULL );
     for( i = 0; i < i_matching; i++ )
     {
-    	if( libhal_device_property_exists( p_sys->p_ctx, matching_media[i],
+        if( libhal_device_property_exists( p_sys->p_ctx, matching_media[i],
                                            "volume.disc.type", NULL ) )
-    	{
-      	    char *psz_media_name = libhal_device_get_property_string(
-				                			p_sys->p_ctx,
-                							matching_media[i],
-                							"volume.label", NULL );
+        {
+            char *psz_media_name = libhal_device_get_property_string(
+                                            p_sys->p_ctx,
+                                            matching_media[i],
+                                            "volume.label", NULL );
             if( psz_media_name )
             {
                 if( p_dev->psz_name && strcmp( p_dev->psz_name, psz_media_name))
@@ -235,7 +235,7 @@ static void UpdateMedia( device_probe_t *p_probe, device_t *p_dev )
             if( libhal_device_get_property_bool( p_sys->p_ctx,
                                              matching_media[i],
                                              "volume.disc.is_videodvd", NULL) )
-           	    p_dev->i_media_type = MEDIA_TYPE_DVD;
+                p_dev->i_media_type = MEDIA_TYPE_DVD;
             else if( libhal_device_get_property_bool( p_sys->p_ctx,
                                              matching_media[i],
                                              "volume.disc.is_vcd", NULL) ||
