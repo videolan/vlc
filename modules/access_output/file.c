@@ -36,6 +36,7 @@
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
 #include "charset.h"
+#include "vlc_strings.h"
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -129,38 +130,13 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        const char *psz_tmp;
-	char *psz_tmp2, *psz_rewriten;
-        int fd, i, i_length = strlen( p_access->psz_name );
-        for( i = 0, psz_tmp = p_access->psz_name ;
-             ( psz_tmp = strstr( psz_tmp, "%T" ) ) ; psz_tmp++, i++ )
-            ;
-        if( i )
-        {
-            i_length += 32 * i;
-            psz_rewriten = (char *) malloc( i_length );
-            if( ! psz_rewriten )
-                return ( VLC_EGENERIC );
-            psz_tmp  = p_access->psz_name;
-            psz_tmp2 = psz_rewriten;
-            while( *psz_tmp )
-            {
-                if( ( *psz_tmp == '%' ) && ( *(psz_tmp+1) == 'T' ) )
-                {
-                    time_t t;
-                    time( &t );
-                    psz_tmp2 += sprintf( psz_tmp2, "%d", (int) t );
-                    psz_tmp+=2;
-                }
-                else
-                    *psz_tmp2++ = *psz_tmp++;
-            }
-            *psz_tmp2 = *psz_tmp;
-            fd = utf8_open( psz_rewriten, i_flags, 0666 );
-            free( psz_rewriten );
-        }
-        else
-            fd = utf8_open( p_access->psz_name, i_flags, 0666 );
+        int fd;
+        char *psz_tmp = str_format_time( p_access->psz_name );
+        char *psz_tmp2 = str_format_meta( p_access, psz_tmp );
+
+        free( psz_tmp );
+        fd = utf8_open( psz_tmp2, i_flags, 0666 );
+        free( psz_tmp2 );
 
         if( fd == -1 )
         {
