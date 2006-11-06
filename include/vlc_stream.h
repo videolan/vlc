@@ -203,7 +203,7 @@ VLC_EXPORT( char *, stream_ReadLine, ( stream_t * ) );
  * Create a special stream and a demuxer, this allows chaining demuxers
  */
 #define stream_DemuxNew( a, b, c ) __stream_DemuxNew( VLC_OBJECT(a), b, c)
-VLC_EXPORT( stream_t *,__stream_DemuxNew, ( vlc_object_t *p_obj, char *psz_demux, es_out_t *out ) );
+VLC_EXPORT( stream_t *,__stream_DemuxNew, ( vlc_object_t *p_obj, const char *psz_demux, es_out_t *out ) );
 VLC_EXPORT( void,      stream_DemuxSend,  ( stream_t *s, block_t *p_block ) );
 VLC_EXPORT( void,      stream_DemuxDelete,( stream_t *s ) );
 

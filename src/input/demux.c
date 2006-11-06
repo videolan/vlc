@@ -34,7 +34,8 @@ static void SkipID3Tag( demux_t * );
  *  if s is NULL then load a access_demux
  *****************************************************************************/
 demux_t *__demux2_New( vlc_object_t *p_obj,
-                       char *psz_access, char *psz_demux, char *psz_path,
+                       const char *psz_access, const char *psz_demux,
+                       const char *psz_path,
                        stream_t *s, es_out_t *out, vlc_bool_t b_quick )
 {
     demux_t *p_demux = vlc_object_create( p_obj, VLC_OBJECT_DEMUX );
@@ -301,7 +302,7 @@ static int DStreamControl( stream_t *, int i_query, va_list );
 static int DStreamThread ( stream_t * );
 
 
-stream_t *__stream_DemuxNew( vlc_object_t *p_obj, char *psz_demux,
+stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
                              es_out_t *out )
 {
     /* We create a stream reader, and launch a thread */

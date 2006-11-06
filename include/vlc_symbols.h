@@ -191,7 +191,7 @@ struct module_symbols_t
     size_t (*vlc_iconv_inner) (vlc_iconv_t, const char **, size_t *, char **, size_t *);
     int (*vlc_iconv_close_inner) (vlc_iconv_t);
     char * (*vlc_dgettext_inner) (const char *package, const char *msgid);
-    demux_t * (*__demux2_New_inner) (vlc_object_t *p_obj, char *psz_access, char *psz_demux, char *psz_path, stream_t *s, es_out_t *out, vlc_bool_t);
+    demux_t * (*__demux2_New_inner) (vlc_object_t *p_obj, const char *psz_access, const char *psz_demux, const char *psz_path, stream_t *s, es_out_t *out, vlc_bool_t);
     void (*demux2_Delete_inner) (demux_t *);
     int (*demux2_vaControlHelper_inner) (stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args);
     char const * (*vlc_error_inner) (int);
@@ -326,7 +326,7 @@ struct module_symbols_t
     subpicture_t * (*spu_SortSubpictures_inner) (spu_t *, mtime_t, vlc_bool_t);
     void (*spu_RenderSubpictures_inner) (spu_t *,  video_format_t *, picture_t *, picture_t *, subpicture_t *, int, int);
     char * (*stream_ReadLine_inner) (stream_t *);
-    stream_t * (*__stream_DemuxNew_inner) (vlc_object_t *p_obj, char *psz_demux, es_out_t *out);
+    stream_t * (*__stream_DemuxNew_inner) (vlc_object_t *p_obj, const char *psz_demux, es_out_t *out);
     void (*stream_DemuxSend_inner) (stream_t *s, block_t *p_block);
     void (*stream_DemuxDelete_inner) (stream_t *s);
     stream_t * (*__stream_MemoryNew_inner) (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, vlc_bool_t i_preserve_memory);
