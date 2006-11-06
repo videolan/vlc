@@ -56,7 +56,7 @@ typedef struct block_sys_t block_sys_t;
 #define BLOCK_FLAG_TYPE_B        0x0008
 /** For inter frame when you don't know the real type */
 #define BLOCK_FLAG_TYPE_PB       0x0010
-/** Warm that this block is a header one */
+/** Warn that this block is a header one */
 #define BLOCK_FLAG_HEADER        0x0020
 /** This is the last block of the frame */
 #define BLOCK_FLAG_END_OF_FRAME  0x0040
