@@ -325,12 +325,12 @@ static int Seek (access_t *p_access, int64_t i_pos)
     if (i_pos > p_access->info.i_size)
     {
         msg_Err (p_access, "seeking too far");
-        i_pos = p_access->info.i_pos = p_access->info.i_size;
+        i_pos =  p_access->info.i_size;
     }
     else if (i_pos < 0)
     {
         msg_Err (p_access, "seeking too early");
-        i_pos = p_access->info.i_pos = 0;
+        i_pos =  0;
     }
 
     p_access->info.i_pos = i_pos;
