@@ -1586,7 +1586,6 @@ static int Mux( sout_mux_t *p_mux )
             /* Select stream (lowest dts) */
             for( i = 0, i_stream = -1, i_dts = 0; i < p_mux->i_nb_inputs; i++ )
             {
-                p_input = p_mux->pp_inputs[i];
                 p_stream = (ts_stream_t*)p_mux->pp_inputs[i]->p_sys;
 
                 if( p_stream->i_pes_dts == 0 )
@@ -1606,6 +1605,7 @@ static int Mux( sout_mux_t *p_mux )
                 break;
             }
             p_stream = (ts_stream_t*)p_mux->pp_inputs[i_stream]->p_sys;
+            p_input = p_mux->pp_inputs[i_stream];
 
             /* do we need to issue pcr */
             b_pcr = VLC_FALSE;
