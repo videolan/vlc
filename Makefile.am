@@ -187,6 +187,7 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/fs_exit_fullscreen_highlight.png \
 	extras/MacOSX/Resources/fs_exit_fullscreen.png \
 	extras/MacOSX/Resources/fs_background.png \
+	extras/MacOSX/fullscreen_panel.svg \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
 	extras/MacOSX/Delete_Preferences.app/Contents/Info.plist \
 	extras/MacOSX/Delete_Preferences.app/Contents/PkgInfo \
