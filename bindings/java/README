@@ -7,7 +7,7 @@ Usage
 
  In order to use these bindings you have to compile vlc from source. I
 recommend you to take the latest version from videolan svn repository
-(or use at least revison 15823) by doing:
+(or use at least revison 17559) by doing:
 
 svn co svn://svn.videolan.org/vlc/trunk vlc-trunk
 
