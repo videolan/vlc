@@ -76,6 +76,14 @@ static inline string sFromLocale( const string &rLocale )
     return res;
 }
 
+/// Wrapper around FromWide, to avoid the need to call free()
+static inline string sFromWide( const wstring &rWide )
+{
+    char *s = FromWide( rWide.c_str() );
+    string res = s;
+    free( s );
+    return res;
+}
 
 /// Wrapper around ToLocale, to avoid the need to call LocaleFree()
 static inline string sToLocale( const string &rUTF8 )
