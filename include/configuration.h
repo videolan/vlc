@@ -334,7 +334,7 @@ int config_AutoSaveConfigFile( vlc_object_t * );
     add_typename_inner( CONFIG_ITEM_BOOL, name, text, longtext, advc, p_callback ); \
     p_config[i_config].i_value = value
 
-/* For option renamed */
+/* For renamed option */
 #define add_deprecated( name, strict ) \
     add_config_inner( ); \
     p_config[ i_config ].i_type = p_config[ i_config -1 ].i_type; \
@@ -344,7 +344,7 @@ int config_AutoSaveConfigFile( vlc_object_t * );
         ? p_config[ i_config-1 ].psz_current \
         : p_config[ i_config-1 ].psz_name;
 
-/* For option suppressed*/
+/* For removed option */
 #define add_suppressed_inner( name, type ) \
     add_type_inner( type ); \
     p_config[ i_config ].psz_name = name; \
