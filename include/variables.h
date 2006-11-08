@@ -282,10 +282,10 @@ static inline int __var_SetFloat( vlc_object_t *p_obj, const char *psz_name, flo
  * \param psz_name The name of the variable
  * \param psz_string The new string value of this variable
  */
-static inline int __var_SetString( vlc_object_t *p_obj, const char *psz_name, char *psz_string )
+static inline int __var_SetString( vlc_object_t *p_obj, const char *psz_name, const char *psz_string )
 {
     vlc_value_t val;
-    val.psz_string = psz_string;
+    val.psz_string = (char *)psz_string;
     return __var_Set( p_obj, psz_name, val );
 }
 
