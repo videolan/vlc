@@ -193,18 +193,19 @@ static int  ASeek( stream_t *s, int64_t i_pos );
  ****************************************************************************/
 stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 {
-    char *psz_access, *psz_demux, *psz_path, *psz_dup;
+    const char *psz_access, *psz_demux;
+    char *psz_path;
     access_t *p_access;
     stream_t *p_res;
 
     if( !psz_url ) return 0;
 
-    psz_dup = strdup( psz_url );
+    char psz_dup[strlen (psz_url) + 1];
+    strcpy (psz_dup, psz_url);;
     MRLSplit( p_parent, psz_dup, &psz_access, &psz_demux, &psz_path );
 
     /* Now try a real access */
     p_access = access2_New( p_parent, psz_access, psz_demux, psz_path, 0 );
-    free( psz_dup );
 
     if( p_access == NULL )
     {
@@ -1532,14 +1533,14 @@ char * stream_ReadLine( stream_t *s )
             const char * p_in = NULL;
             char * p_out = NULL;
             char * psz_new_line = NULL;
-            
+
             /* iconv */
             psz_new_line = malloc( i_line );
-            
+
             i_in = i_out = (size_t)i_line;
             p_in = p_line;
             p_out = psz_new_line;
-            
+
             if( vlc_iconv( s->conv, &p_in, &i_in, &p_out, &i_out ) == (size_t)-1 )
             {
                 msg_Err( s, "iconv failed" );
