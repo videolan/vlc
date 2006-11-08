@@ -74,7 +74,7 @@ static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
 static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *,
-                             char *, const char *psz_forced_demux );
+                             const char *, const char *psz_forced_demux );
 static void InputSourceClean( input_thread_t *, input_source_t * );
 
 static void SlaveDemux( input_thread_t *p_input );
@@ -1921,16 +1921,18 @@ static input_source_t *InputSourceNew( input_thread_t *p_input )
  * InputSourceInit:
  *****************************************************************************/
 static int InputSourceInit( input_thread_t *p_input,
-                            input_source_t *in, char *psz_mrl,
+                            input_source_t *in, const char *psz_mrl,
                             const char *psz_forced_demux )
 {
-    char *psz_dup = strdup( psz_mrl );
-    char *psz_access;
-    char *psz_demux;
+    char psz_dup[strlen (psz_mrl) + 1];
+    const char *psz_access;
+    const char *psz_demux;
     char *psz_path;
     char *psz_tmp;
     char *psz;
     vlc_value_t val;
+
+    strcpy (psz_dup, psz_mrl);
 
     if( !in ) return VLC_EGENERIC;
     if( !p_input ) return VLC_EGENERIC;
@@ -1986,7 +1988,7 @@ static int InputSourceInit( input_thread_t *p_input,
     }
     else
     {
-        psz_path = psz_mrl;
+        psz_path = psz_dup;
         msg_Dbg( p_input, "trying to pre-parse %s",  psz_path );
         psz_demux = "";
         psz_access = "file";
@@ -2048,8 +2050,7 @@ static int InputSourceInit( input_thread_t *p_input,
         if( in->p_access == NULL &&
             *psz_access == '\0' && ( *psz_demux || *psz_path ) )
         {
-            if( psz_dup ) free( psz_dup );
-            psz_dup = strdup( psz_mrl );
+            strcpy (psz_dup, psz_mrl);
             psz_access = "";
             if( psz_forced_demux && *psz_forced_demux )
             {
@@ -2170,7 +2171,6 @@ static int InputSourceInit( input_thread_t *p_input,
     if( var_GetInteger( p_input, "clock-synchro" ) != -1 )
         in->b_can_pace_control = !var_GetInteger( p_input, "clock-synchro" );
 
-    if( psz_dup ) free( psz_dup );
     return VLC_SUCCESS;
 
 error:
@@ -2184,7 +2184,6 @@ error:
 
     if( in->p_access )
         access2_Delete( in->p_access );
-    if( psz_dup ) free( psz_dup );
 
     return VLC_EGENERIC;
 }
@@ -2326,11 +2325,11 @@ static void InputMetaUser( input_thread_t *p_input )
  *****************************************************************************/
 void MRLSplit( vlc_object_t *p_input, char *psz_dup,
                const char **ppsz_access, const char **ppsz_demux,
-               const char **ppsz_path )
+               char **ppsz_path )
 {
-    char *psz_access = NULL;
-    char *psz_demux  = NULL;
-    char *psz_path   = NULL;
+    const char *psz_access = "";
+    const char *psz_demux  = "";
+    char *psz_path;
     char *psz, *psz_check;
 
     psz = strchr( psz_dup, ':' );
@@ -2369,14 +2368,9 @@ void MRLSplit( vlc_object_t *p_input, char *psz_dup,
         psz_path = psz_dup;
     }
 
-    if( !psz_access ) *ppsz_access = "";
-    else *ppsz_access = psz_access;
-
-    if( !psz_demux ) *ppsz_demux = "";
-    else *ppsz_demux = psz_demux;
-
-    if( !psz_path ) *ppsz_path = "";
-    else *ppsz_path = psz_path;
+    *ppsz_access = psz_access;
+    *ppsz_demux = psz_demux;
+    *ppsz_path = psz_path;
 }
 
 /*****************************************************************************

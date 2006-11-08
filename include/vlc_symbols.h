@@ -159,8 +159,8 @@ struct module_symbols_t
     void * (*vout_RequestWindow_inner) (vout_thread_t *, int *, int *, unsigned int *, unsigned int *);
     void (*vout_ReleaseWindow_inner) (vout_thread_t *, void *);
     int (*vout_ControlWindow_inner) (vout_thread_t *, void *, int, va_list);
-    access_t * (*__access2_New_inner) (vlc_object_t *p_obj, char *psz_access, char *psz_demux, char *psz_path, vlc_bool_t b_quick);
-    access_t * (*access2_FilterNew_inner) (access_t *p_source, char *psz_access_filter);
+    access_t * (*__access2_New_inner) (vlc_object_t *p_obj, const char *psz_access, const char *psz_demux, const char *psz_path, vlc_bool_t b_quick);
+    access_t * (*access2_FilterNew_inner) (access_t *p_source, const char *psz_access_filter);
     void (*access2_Delete_inner) (access_t *);
     block_t * (*__block_New_inner) (vlc_object_t *, int);
     block_t * (*block_Realloc_inner) (block_t *, int i_pre, int i_body);
