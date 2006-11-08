@@ -74,7 +74,7 @@ static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
 static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *,
-                             char *, char *psz_forced_demux );
+                             char *, const char *psz_forced_demux );
 static void InputSourceClean( input_thread_t *, input_source_t * );
 
 static void SlaveDemux( input_thread_t *p_input );
@@ -1922,7 +1922,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input )
  *****************************************************************************/
 static int InputSourceInit( input_thread_t *p_input,
                             input_source_t *in, char *psz_mrl,
-                            char *psz_forced_demux )
+                            const char *psz_forced_demux )
 {
     char *psz_dup = strdup( psz_mrl );
     char *psz_access;
@@ -2325,7 +2325,8 @@ static void InputMetaUser( input_thread_t *p_input )
  *           Media Resource Locator.
  *****************************************************************************/
 void MRLSplit( vlc_object_t *p_input, char *psz_dup,
-               char **ppsz_access, char **ppsz_demux, char **ppsz_path )
+               const char **ppsz_access, const char **ppsz_demux,
+               const char **ppsz_path )
 {
     char *psz_access = NULL;
     char *psz_demux  = NULL;

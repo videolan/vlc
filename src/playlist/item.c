@@ -42,7 +42,7 @@ playlist_item_t * playlist_ItemNewWithType( vlc_object_t *p_obj,
                                             const char *psz_uri,
                                             const char *psz_name,
                                             int i_options,
-                                            const char **ppsz_options,
+                                            const char *const *ppsz_options,
                                             int i_duration, int i_type )
 {
     input_item_t *p_input;
@@ -204,7 +204,7 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
 */
 int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
                      const char *psz_name, int i_mode, int i_pos,
-                     mtime_t i_duration, const char **ppsz_options,
+                     mtime_t i_duration, const char *const *ppsz_options,
                      int i_options, vlc_bool_t b_playlist )
 {
     input_item_t *p_input = input_ItemNewExt( p_playlist, psz_uri, psz_name,
@@ -560,7 +560,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
  *****************************************************************************/
 
 /** Set the name of a playlist item */
-int playlist_ItemSetName( playlist_item_t *p_item, char *psz_name )
+int playlist_ItemSetName( playlist_item_t *p_item, const char *psz_name )
 {
     if( psz_name && p_item )
     {

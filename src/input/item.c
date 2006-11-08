@@ -190,7 +190,7 @@ input_item_t *input_ItemGetById( playlist_t *p_playlist, int i_id )
 
 input_item_t *__input_ItemNewExt( vlc_object_t *p_obj, const char *psz_uri,
                                   const char *psz_name, int i_options,
-                                  const char **ppsz_options, int i_duration )
+                                  const char *const *ppsz_options, int i_duration )
 {
     return input_ItemNewWithType( p_obj, psz_uri, psz_name,
                                   i_options, ppsz_options,
@@ -200,7 +200,7 @@ input_item_t *__input_ItemNewExt( vlc_object_t *p_obj, const char *psz_uri,
 
 input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
                                 const char *psz_name, int i_options,
-                                const char **ppsz_options, int i_duration,
+                                const char *const *ppsz_options, int i_duration,
                                 int i_type )
 {
     playlist_t *p_playlist = pl_Yield( p_obj );
@@ -233,7 +233,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
     else if( p_input->i_type == ITEM_TYPE_AFILE
              || p_input->i_type == ITEM_TYPE_VFILE )
     {
-        char *psz_filename = strrchr( p_input->psz_uri, DIR_SEP_CHAR );
+        const char *psz_filename = strrchr( p_input->psz_uri, DIR_SEP_CHAR );
         if( psz_filename && *psz_filename == DIR_SEP_CHAR )
             psz_filename++;
         p_input->psz_name = strdup( psz_filename && *psz_filename

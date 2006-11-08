@@ -267,11 +267,11 @@ struct module_symbols_t
     vlc_bool_t (*playlist_IsServicesDiscoveryLoaded_inner) (playlist_t *,const char *);
     void *__playlist_ItemNew_deprecated;
     void *__playlist_ItemCopy_deprecated;
-    playlist_item_t* (*playlist_ItemNewWithType_inner) (vlc_object_t *,const char *,const char *, int , const char **, int, int);
+    playlist_item_t* (*playlist_ItemNewWithType_inner) (vlc_object_t *,const char *,const char *, int , const char *const *, int, int);
     int (*playlist_ItemDelete_inner) (playlist_item_t *);
     void *playlist_ItemAddParent_deprecated;
     void *playlist_CopyParents_deprecated;
-    int (*playlist_ItemSetName_inner) (playlist_item_t *,  char *);
+    int (*playlist_ItemSetName_inner) (playlist_item_t *, const char *);
     void *playlist_ItemSetDuration_deprecated;
     void *playlist_ViewInsert_deprecated;
     void *playlist_ViewDelete_deprecated;
@@ -288,7 +288,7 @@ struct module_symbols_t
     int (*playlist_NodeDelete_inner) (playlist_t *, playlist_item_t *, vlc_bool_t , vlc_bool_t);
     int (*playlist_NodeEmpty_inner) (playlist_t *, playlist_item_t *, vlc_bool_t);
     int (*playlist_Add_inner) (playlist_t *, const char *, const char *, int, int, vlc_bool_t);
-    int (*playlist_AddExt_inner) (playlist_t *, const char *, const char *, int, int, mtime_t, const char **,int, vlc_bool_t);
+    int (*playlist_AddExt_inner) (playlist_t *, const char *, const char *, int, int, mtime_t, const char *const *,int, vlc_bool_t);
     void *playlist_ItemAdd_deprecated;
     void (*playlist_NodeAddItem_inner) (playlist_t *, playlist_item_t *, playlist_item_t *,int , int);
     void *playlist_Delete_deprecated;
@@ -492,8 +492,8 @@ struct module_symbols_t
     char * (*encode_URI_component_inner) (const char *psz);
     size_t (*vlc_strlcpy_inner) (char *, const char *, size_t);
     void *playlist_ItemNewFromInput_deprecated;
-    input_item_t * (*__input_ItemNewExt_inner) (vlc_object_t *, const char *, const char*, int, const char **, int);
-    input_item_t * (*input_ItemNewWithType_inner) (vlc_object_t *, const char *, const char *e, int, const char **, int, int);
+    input_item_t * (*__input_ItemNewExt_inner) (vlc_object_t *, const char *, const char*, int, const char *const *, int);
+    input_item_t * (*input_ItemNewWithType_inner) (vlc_object_t *, const char *, const char *e, int, const char *const *, int, int);
     playlist_item_t * (*playlist_NodeAddInput_inner) (playlist_t *, input_item_t *,playlist_item_t *,int , int);
     void *playlist_PlaylistAdd_deprecated;
     void *playlist_PlaylistAddExt_deprecated;

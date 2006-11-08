@@ -259,7 +259,7 @@ VLC_EXPORT( int,  playlist_Export, ( playlist_t *, const char *, playlist_item_t
 
 /*************************** Item creation **************************/
 
-VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( vlc_object_t *,const char *,const char *, int , const char **, int, int) );
+VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( vlc_object_t *,const char *,const char *, int , const char *const *, int, int) );
 
 #define playlist_ItemNew( a , b, c ) __playlist_ItemNew(VLC_OBJECT(a) , b , c )
 /** Create a new item, without adding it to the playlist
@@ -287,11 +287,11 @@ VLC_EXPORT( int,  playlist_LockDelete, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_LockDeleteAllFromInput, ( playlist_t *, int ) );
 
 /*************************** Item fields accessors **************************/
-VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *,  char * ) );
+VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *, const char * ) );
 
 /******************** Item addition ********************/
 VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int, vlc_bool_t ) );
-VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, const char **,int, vlc_bool_t ) );
+VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, const char *const *,int, vlc_bool_t ) );
 VLC_EXPORT( int, playlist_AddInput, ( playlist_t *, input_item_t *,int , int, vlc_bool_t ) );
 VLC_EXPORT( playlist_item_t *, playlist_NodeAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int ) );
 VLC_EXPORT( void, playlist_NodeAddItem, ( playlist_t *, playlist_item_t *, playlist_item_t *,int , int ) );
