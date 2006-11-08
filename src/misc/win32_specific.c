@@ -39,6 +39,9 @@
 
 #include <winsock.h>
 
+extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
+                           int expand_wildcards, int *startupinfo);
+
 /*****************************************************************************
  * system_Init: initialize winsock and misc other things.
  *****************************************************************************/
@@ -203,24 +206,54 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
                 COPYDATASTRUCT wm_data;
                 int i_opt, i_data;
                 char *p_data;
+                wchar_t **wargv, **wenvp;
+                int si = { 0 };
 
                 i_data = sizeof(int);
-                for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
+                if( GetVersion() < 0x80000000 )
                 {
-                    i_data += sizeof(int);
-                    i_data += strlen( ppsz_argv[ i_opt ] ) + 1;
+                    /* use unicode argv[] for Windows NT and above */
+                    __wgetmainargs(&i_opt, &wargv, &wenvp, 0, &si);
+                    for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
+                    {
+                        i_data += sizeof(int);
+                        i_data += WideCharToMultiByte( CP_UTF8, 0,
+                             wargv[ i_opt ], -1, NULL, 0, NULL, NULL ) + 1;
+                    }
+                    p_data = (char *)malloc( i_data );
+                    *((int *)&p_data[0]) = *pi_argc - optind;
+                    i_data = sizeof(int);
+                    for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
+                    {
+                        int i_len = WideCharToMultiByte( CP_UTF8, 0,
+                             wargv[ i_opt ], -1, NULL, 0, NULL, NULL ) + 1;
+                        *((int *)&p_data[i_data]) = i_len;
+                        i_data += sizeof(int);
+                        WideCharToMultiByte( CP_UTF8, 0, wargv[ i_opt ], -1,
+                             &p_data[i_data], i_len, NULL, NULL );
+                        i_data += i_len;
+                    }
+
                 }
-
-                p_data = (char *)malloc( i_data );
-                *((int *)&p_data[0]) = *pi_argc - optind;
-                i_data = sizeof(int);
-                for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
+                else
                 {
-                    int i_len = strlen( ppsz_argv[ i_opt ] ) + 1;
-                    *((int *)&p_data[i_data]) = i_len;
-                    i_data += sizeof(int);
-                    memcpy( &p_data[i_data], ppsz_argv[ i_opt ], i_len );
-                    i_data += i_len;
+                    for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
+                    {
+                        i_data += sizeof(int);
+                        i_data += strlen( ppsz_argv[ i_opt ] ) + 1;
+                    }
+
+                    p_data = (char *)malloc( i_data );
+                    *((int *)&p_data[0]) = *pi_argc - optind;
+                    i_data = sizeof(int);
+                    for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
+                    {
+                        int i_len = strlen( ppsz_argv[ i_opt ] ) + 1;
+                        *((int *)&p_data[i_data]) = i_len;
+                        i_data += sizeof(int);
+                        memcpy( &p_data[i_data], ppsz_argv[ i_opt ], i_len );
+                        i_data += i_len;
+                    }
                 }
 
                 /* Send our playlist items to the 1st instance */
