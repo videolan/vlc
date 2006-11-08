@@ -95,6 +95,13 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1play (JNIEnv *env, jobj
 
     libvlc_playlist_play( ( libvlc_instance_t * ) instance, id, i_options, ( char **  ) ppsz_options, exception );
 
+    CHECK_EXCEPTION;
+    
+    while (! libvlc_playlist_isplaying( (libvlc_instance_t*) instance, exception ) )
+    {
+        usleep(100);
+    }
+
     CHECK_EXCEPTION_FREE;
 }
 
