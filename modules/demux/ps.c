@@ -56,7 +56,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "ps" );
 
-    add_integer( "ps-trust-timestamps", VLC_TRUE, NULL, TIME_TEXT,
+    add_bool( "ps-trust-timestamps", VLC_TRUE, NULL, TIME_TEXT,
                  TIME_LONGTEXT, VLC_TRUE );
 
     add_submodule();
