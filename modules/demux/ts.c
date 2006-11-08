@@ -3277,7 +3277,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             }
         }
 
-        if( DVBProgramIsSelected( p_demux, prg->i_number ) )
+        if( DVBProgramIsSelected( p_demux, prg->i_number )
+             && (pid->es->id != NULL || p_sys->b_udp_out) )
         {
             /* Set demux filter */
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
@@ -3474,7 +3475,9 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                         if( p_sys->i_dvb_program == 0 )
                             p_sys->i_dvb_program = p_program->i_number;
 
-                        if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, p_program->i_pid, VLC_TRUE ) )
+                        if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                            ACCESS_SET_PRIVATE_ID_STATE,
+                                            p_program->i_pid, VLC_TRUE ) )
                             p_sys->b_dvb_control = VLC_FALSE;
                     }
                 }
