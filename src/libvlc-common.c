@@ -111,6 +111,8 @@ static void Version       ( void );
 #ifdef WIN32
 static void ShowConsole   ( vlc_bool_t );
 static void PauseConsole  ( void );
+extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
+                           int expand_wildcards, int *startupinfo);
 #endif
 static int  ConsoleWidth  ( void );
 
@@ -1042,6 +1044,17 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, char *ppsz_argv[] )
 {
     int i_opt, i_options;
 
+#ifdef WIN32
+    wchar_t **wargv, **wenvp;
+    int si = { 0 };
+
+    if( GetVersion() < 0x80000000 )
+    {
+        /* fetch unicode argv[] for Windows NT and above */
+        __wgetmainargs(&i_opt, &wargv, &wenvp, 0, &si);
+    }
+#endif
+
     /* We assume that the remaining parameters are filenames
      * and their input options */
     for( i_opt = i_argc - 1; i_opt >= optind; i_opt-- )
@@ -1059,12 +1072,27 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, char *ppsz_argv[] )
         /* TODO: write an internal function of this one, to avoid
          *       unnecessary lookups. */
         /* FIXME: should we convert options to UTF-8 as well ?? */
-        psz_target = FromLocale( ppsz_argv[ i_opt ] );
-        VLC_AddTarget( p_vlc->i_object_id, psz_target,
+
+#ifdef WIN32
+        if( GetVersion() < 0x80000000 )
+        {
+            psz_target = FromWide( wargv[ i_opt ] );
+            VLC_AddTarget( p_vlc->i_object_id, psz_target,
                        (char const **)( i_options ? &ppsz_argv[i_opt + 1] :
                                         NULL ), i_options,
                        PLAYLIST_INSERT, 0 );
-        LocaleFree( psz_target );
+            free( psz_target );
+        }
+        else
+#endif
+        {
+            psz_target = FromLocale( ppsz_argv[ i_opt ] );
+            VLC_AddTarget( p_vlc->i_object_id, psz_target,
+                       (char const **)( i_options ? &ppsz_argv[i_opt + 1] :
+                                        NULL ), i_options,
+                       PLAYLIST_INSERT, 0 );
+            LocaleFree( psz_target );
+        }
     }
 
     return VLC_SUCCESS;
