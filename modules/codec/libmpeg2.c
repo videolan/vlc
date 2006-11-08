@@ -64,8 +64,9 @@ struct decoder_sys_t
     vlc_bool_t       b_after_sequence_header; /* is it the next frame after
                                                * the sequence header ?    */
     vlc_bool_t       b_slice_i;             /* intra-slice refresh stream */
+    vlc_bool_t       b_second_field;
 
-    vlc_bool_t      b_preroll;
+    vlc_bool_t       b_preroll;
 
     /*
      * Output properties
@@ -143,6 +144,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->p_picture_to_destroy = NULL;
     p_sys->b_garbage_pic = 0;
     p_sys->b_slice_i  = 0;
+    p_sys->b_second_field = 0;
     p_sys->b_skip     = 0;
     p_sys->b_preroll = VLC_FALSE;
 
@@ -339,20 +341,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         break;
 
         case STATE_PICTURE_2ND:
-            vout_SynchroNewPicture( p_sys->p_synchro,
-                p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
-                p_sys->p_info->current_picture->nb_fields,
-                0, 0, p_sys->i_current_rate,
-                p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
-
-            if( p_sys->b_skip )
-            {
-                vout_SynchroTrash( p_sys->p_synchro );
-            }
-            else
-            {
-                vout_SynchroDecode( p_sys->p_synchro );
-            }
+            p_sys->b_second_field = 1;
             break;
 
         case STATE_PICTURE:
@@ -408,8 +397,15 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                   p_sys->i_current_dts : p_sys->i_previous_dts ) : 0;
 #endif
 
+            /* If nb_fields == 1, it is a field picture, and it will be
+             * followed by another field picture for which we won't call
+             * vout_SynchroNewPicture() because this would have other 
+             * problems, so we take it into account here.
+             * This kind of sucks, but I didn't think better. --Meuuh
+             */
             vout_SynchroNewPicture( p_sys->p_synchro,
                 p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
+                p_sys->p_info->current_picture->nb_fields == 1 ? 2 :
                 p_sys->p_info->current_picture->nb_fields, i_pts, i_dts,
                 p_sys->i_current_rate,
                 p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );

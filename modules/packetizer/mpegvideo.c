@@ -118,6 +118,7 @@ struct decoder_sys_t
     mtime_t i_interpolated_dts;
     mtime_t i_old_duration;
     mtime_t i_last_ref_pts;
+    vlc_bool_t b_second_field;
 
     /* Number of pictures since last sequence header */
     int i_seq_old;
@@ -185,6 +186,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_interpolated_dts = 0;
     p_sys->i_old_duration = 0;
     p_sys->i_last_ref_pts = 0;
+    p_sys->b_second_field = 0;
 
     p_sys->b_discontinuity = VLC_FALSE;
     p_sys->b_sync_on_intra_frame = var_CreateGetBool( p_dec, "packetizer-mpegvideo-sync-iframe" );
@@ -433,14 +435,16 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         else
         {
             /* Correct interpolated dts when we receive a new pts/dts */
-            if( p_sys->i_last_ref_pts > 0 )
+            if( p_sys->i_last_ref_pts > 0 && !p_sys->b_second_field )
                 p_sys->i_interpolated_dts = p_sys->i_last_ref_pts;
             if( p_sys->i_dts > 0 ) p_sys->i_interpolated_dts = p_sys->i_dts;
 
-            p_sys->i_last_ref_pts = p_sys->i_pts;
+            if( !p_sys->b_second_field )
+                p_sys->i_last_ref_pts = p_sys->i_pts;
         }
 
         p_pic->i_dts = p_sys->i_interpolated_dts;
+        p_sys->i_interpolated_dts += i_duration;
 
         /* Set PTS only if we have a B frame or if it comes from the stream */
         if( p_sys->i_pts > 0 )
@@ -454,17 +458,6 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         else
         {
             p_pic->i_pts = 0;
-        }
-
-        if( p_sys->b_low_delay || p_sys->i_picture_type == 0x03 )
-        {
-            /* Trivial case (DTS == PTS) */
-            p_sys->i_interpolated_dts += i_duration;
-        }
-        else
-        {
-            p_sys->i_interpolated_dts += p_sys->i_old_duration;
-            p_sys->i_old_duration = i_duration;
         }
 
         switch ( p_sys->i_picture_type )
@@ -491,6 +484,15 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->p_frame = NULL;
         p_sys->pp_last = &p_sys->p_frame;
         p_sys->b_frame_slice = VLC_FALSE;
+
+        if( p_sys->i_picture_structure != 0x03 )
+        {
+            p_sys->b_second_field = !p_sys->b_second_field;
+        }
+        else
+        {
+            p_sys->b_second_field = 0;
+        }
     }
 
     /*
