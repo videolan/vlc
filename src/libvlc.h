@@ -1153,6 +1153,8 @@ static const char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N
 
 #define RECORD_KEY_TEXT N_("Record")
 #define RECORD_KEY_LONGTEXT N_("Record access filter start/stop.")
+#define DUMP_KEY_TEXT N_("Dump")
+#define DUMP_KEY_LONGTEXT N_("Media dump access filter trigger.")
 
 #define ZOOM_KEY_TEXT N_("Zoom")
 #define ZOOM_KEY_LONGTEXT N_("Zoom")
@@ -1845,6 +1847,7 @@ vlc_module_begin();
 #   define KEY_HISTORY_BACK       KEY_MODIFIER_COMMAND|'['
 #   define KEY_HISTORY_FORWARD    KEY_MODIFIER_COMMAND|']'
 #   define KEY_RECORD             KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'r'
+#   define KEY_DUMP               KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'d'
 
 #else
 #   define KEY_FULLSCREEN         'f'
@@ -1927,6 +1930,7 @@ vlc_module_begin();
 #   define KEY_HISTORY_BACK       KEY_MODIFIER_CTRL|'v'
 #   define KEY_HISTORY_FORWARD    KEY_MODIFIER_CTRL|'b'
 #   define KEY_RECORD             KEY_MODIFIER_CTRL|'r'
+#   define KEY_DUMP               KEY_MODIFIER_CTRL|KEY_MODIFIER_SHIFT|'d'
 #endif
 
     add_key( "key-fullscreen", KEY_FULLSCREEN, NULL, FULLSCREEN_KEY_TEXT,
@@ -2024,6 +2028,8 @@ vlc_module_begin();
              HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
     add_key( "key-record", KEY_RECORD, NULL,
              RECORD_KEY_TEXT, RECORD_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-dump", KEY_DUMP, NULL,
+             DUMP_KEY_TEXT, DUMP_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-zoom", KEY_ZOOM, NULL,
              ZOOM_KEY_TEXT, ZOOM_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-unzoom", KEY_UNZOOM, NULL,
@@ -2280,5 +2286,6 @@ static struct hotkey p_hotkeys[] =
     { "key-history-back", ACTIONID_HISTORY_BACK, 0, 0, 0, 0 },
     { "key-history-forward", ACTIONID_HISTORY_FORWARD, 0, 0, 0, 0 },
     { "key-record", ACTIONID_RECORD, 0, 0, 0, 0 },
+    { "key-dump", ACTIONID_DUMP, 0, 0, 0, 0 },
     { NULL, 0, 0, 0, 0, 0 }
 };
