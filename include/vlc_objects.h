@@ -32,7 +32,7 @@
  */
 
 /* Object types */
-#define VLC_OBJECT_ROOT        (-1)
+#define VLC_OBJECT_GLOBAL      (-1)
 #define VLC_OBJECT_LIBVLC      (-2)
 #define VLC_OBJECT_MODULE      (-3)
 #define VLC_OBJECT_INTF        (-4)

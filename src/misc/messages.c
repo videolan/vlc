@@ -198,7 +198,7 @@ const char *msg_GetObjectTypeName(int i_object_type )
 {
     switch( i_object_type )
     {
-        case VLC_OBJECT_ROOT: return "root";
+        case VLC_OBJECT_GLOBAL: return "global";
         case VLC_OBJECT_LIBVLC: return "libvlc";
         case VLC_OBJECT_MODULE: return "module";
         case VLC_OBJECT_INTF: return "interface";
@@ -333,7 +333,6 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
     while( p_obj != NULL )
     {
         char *psz_old = NULL;
-        if( p_obj == NULL ) break;
         if( p_obj->psz_header )
         {
             i_header_size += strlen( p_obj->psz_header ) + 4;

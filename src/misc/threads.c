@@ -117,7 +117,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( HAVE_CTHREADS_H )
 #endif
 
-        p_root = vlc_object_create( p_libvlc_global, VLC_OBJECT_ROOT );
+        p_root = vlc_object_create( p_libvlc_global, VLC_OBJECT_GLOBAL );
         if( p_root == NULL )
             i_ret = VLC_ENOMEM;
 

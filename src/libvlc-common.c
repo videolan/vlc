@@ -208,9 +208,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     vlc_thread_set_priority( p_libvlc, VLC_THREAD_PRIORITY_LOW );
 #endif
 
-    /* Store our newly allocated structure in the global list */
-    vlc_object_attach( p_libvlc, p_libvlc_global );
-
     /* Store data for the non-reentrant API */
     p_static_vlc = p_libvlc;
 
@@ -907,7 +904,6 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_libvlc->config_lock );
 
-    vlc_object_detach( p_libvlc );
     if( b_release ) vlc_object_release( p_libvlc );
     vlc_object_destroy( p_libvlc );
 

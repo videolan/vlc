@@ -82,19 +82,11 @@ static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
  *****************************************************************************/
 static vlc_mutex_t    structure_lock;
 
-/*****************************************************************************
- * vlc_object_create: initialize a vlc object
- *****************************************************************************
- * This function allocates memory for a vlc object and initializes it. If
- * i_type is not a known value such as VLC_OBJECT_ROOT, VLC_OBJECT_VOUT and
- * so on, vlc_object_create will use its value for the object size.
- *****************************************************************************/
-
 /**
  * Initialize a vlc object
  *
  * This function allocates memory for a vlc object and initializes it. If
- * i_type is not a known value such as VLC_OBJECT_ROOT, VLC_OBJECT_VOUT and
+ * i_type is not a known value such as VLC_OBJECT_LIBVLC, VLC_OBJECT_VOUT and
  * so on, vlc_object_create will use its value for the object size.
  */
 void * __vlc_object_create( vlc_object_t *p_this, int i_type )
@@ -105,9 +97,9 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
     switch( i_type )
     {
-        case VLC_OBJECT_ROOT:
+        case VLC_OBJECT_GLOBAL:
             i_size = sizeof(libvlc_global_data_t);
-            psz_type = "root";
+            psz_type = "global";
             break;
         case VLC_OBJECT_LIBVLC:
             i_size = sizeof(libvlc_int_t);
@@ -229,7 +221,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             break;
     }
 
-    if( i_type == VLC_OBJECT_ROOT )
+    if( i_type == VLC_OBJECT_GLOBAL )
     {
         p_new = p_this;
     }
@@ -266,14 +258,14 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
     if( !p_new->p_vars )
     {
-        if( i_type != VLC_OBJECT_ROOT )
+        if( i_type != VLC_OBJECT_GLOBAL )
             free( p_new );
         return NULL;
     }
 
-    if( i_type == VLC_OBJECT_ROOT )
+    if( i_type == VLC_OBJECT_GLOBAL )
     {
-        /* If i_type is root, then p_new is actually p_libvlc_global */
+        /* If i_type is global, then p_new is actually p_libvlc_global */
         p_new->p_libvlc_global = (libvlc_global_data_t*)p_new;
         p_new->p_libvlc = NULL;
 
@@ -317,7 +309,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     vlc_cond_init( p_new, &p_new->object_wait );
     vlc_mutex_init( p_new, &p_new->var_lock );
 
-    if( i_type == VLC_OBJECT_ROOT )
+    if( i_type == VLC_OBJECT_GLOBAL )
     {
         vlc_mutex_init( p_new, &structure_lock );
 
@@ -398,9 +390,9 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 
     if( p_this->psz_header ) free( p_this->psz_header );
 
-    if( p_this->i_object_type == VLC_OBJECT_ROOT )
+    if( p_this->i_object_type == VLC_OBJECT_GLOBAL )
     {
-        /* We are the root object ... no need to lock. */
+        /* We are the global object ... no need to lock. */
         free( p_this->p_libvlc_global->pp_objects );
         p_this->p_libvlc_global->pp_objects = NULL;
         p_this->p_libvlc_global->i_objects--;
@@ -426,8 +418,8 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     vlc_mutex_destroy( &p_this->object_lock );
     vlc_cond_destroy( &p_this->object_wait );
 
-    /* root is not dynamically allocated by vlc_object_create */
-    if( p_this->i_object_type != VLC_OBJECT_ROOT )
+    /* global is not dynamically allocated by vlc_object_create */
+    if( p_this->i_object_type != VLC_OBJECT_GLOBAL )
         free( p_this );
 }
 
