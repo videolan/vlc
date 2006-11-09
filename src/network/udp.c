@@ -246,6 +246,8 @@ int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
             imr.ipv6mr_interface = v6->sin6_scope_id;
             memcpy (&imr.ipv6mr_multiaddr, &v6->sin6_addr, 16);
 
+            msg_Dbg (obj, "IPV6_JOIN_GROUP multicast request");
+
             if (setsockopt (fd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &imr,
                             sizeof (imr)))
             {
