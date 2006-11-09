@@ -632,7 +632,7 @@ static char *SDPGenerate( sap_handler_t *p_sap,
                             psz_name, ipv, psz_uri,
                             /* FIXME: 1 is IPv4 default TTL, not that of IPv6 */
                             p_session->i_ttl ?: (config_GetInt( p_sap, "ttl" ) ?: 1),
-                            ipv, psz_uri,
+                            ipv, p_addr->psz_machine,
                             p_session->i_port, 
                             p_session->b_rtp ? "RTP/AVP" : "udp",
                             p_session->i_payload,
