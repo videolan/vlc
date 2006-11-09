@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>SPrefsVideo</class>
  <widget class="QWidget" name="SPrefsVideo" >
   <property name="geometry" >
@@ -64,8 +61,7 @@
       <item row="2" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
-         <string>Format
-</string>
+         <string>Format</string>
         </property>
        </widget>
       </item>
@@ -100,7 +96,7 @@
       <item row="2" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>Output module</string>
+         <string>Output</string>
         </property>
        </widget>
       </item>
@@ -128,7 +124,7 @@
       <item row="0" column="2" >
        <widget class="QCheckBox" name="overlay" >
         <property name="text" >
-         <string>Overlay video output</string>
+         <string>Accelerated video output</string>
         </property>
        </widget>
       </item>
@@ -144,7 +140,6 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections/>
 </ui>

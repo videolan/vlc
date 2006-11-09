@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>SPrefsInterface</class>
  <widget class="QWidget" name="SPrefsInterface" >
   <property name="geometry" >
@@ -37,7 +34,7 @@
       <item row="3" column="0" colspan="2" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
-         <string>This is VLC's skinable interface. You can download skins on http://www.videolan.org/ to customize your player.</string>
+         <string>This is VLC's skinnable interface. You can download skins on http://www.videolan.org/ to customize your player.</string>
         </property>
         <property name="wordWrap" >
          <bool>true</bool>
@@ -47,30 +44,10 @@
       <item row="1" column="0" colspan="2" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
-         <string>This is the new VLC default interface. Its dialogs give access to most VLC features.</string>
+         <string>VLC's default interface, with native look and feel</string>
         </property>
         <property name="wordWrap" >
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0" colspan="2" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
-         <string>This is the legacy VLC default interface. It will be removed once the Qt4 interface is completed and tested.</string>
-        </property>
-        <property name="textFormat" >
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" >
-       <widget class="QRadioButton" name="wxwidgets" >
-        <property name="text" >
-         <string>wxWidgets</string>
         </property>
        </widget>
       </item>
@@ -84,7 +61,7 @@
       <item row="0" column="0" >
        <widget class="QRadioButton" name="qt4" >
         <property name="text" >
-         <string>Qt4</string>
+         <string>Default</string>
         </property>
        </widget>
       </item>
@@ -103,7 +80,6 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections/>
 </ui>

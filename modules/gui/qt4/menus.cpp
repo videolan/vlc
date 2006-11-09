@@ -186,10 +186,12 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
                                         mi, SLOT( advanced() ) );
         adv->setCheckable( true );
         if( adv_controls_enabled ) adv->setChecked( true );
+#if 0
         adv = menu->addAction( qtr("Visualizations selector" ),
                                mi, SLOT( visual() ) );
         adv->setCheckable( true );
         if( visual_selector_enabled ) adv->setChecked( true );
+#endif
     }
     menu->addSeparator();
     DP_SADD( qtr("Preferences"), "", "", prefsDialog() );
