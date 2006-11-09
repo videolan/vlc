@@ -233,10 +233,21 @@ static int Seek (access_t *access, int64_t offset)
 }
 
 
-#ifdef WIN32
+#ifndef HAVE_LOCALTIME_R
 static inline struct tm *localtime_r (const time_t *now, struct tm *res)
 {
-    return _localtime_s (res, now) ? NULL : res;
+    struct tm *unsafe = localtime (now);
+    /*
+     * This is not thread-safe. Blame your C library.
+     * On Win32 there SHOULD be _localtime_s instead, but of course
+     * Cygwin and Mingw32 don't know about it. You're on your own if you
+     * this platform.
+     */
+    if (unsafe == NULL)
+        return NULL;
+
+    memcpy (res, unsafe, sizeof (*res));
+    return res;
 }
 #endif
 
