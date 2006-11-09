@@ -75,6 +75,7 @@ struct access_sys_t
 {
     FILE *stream;
     int64_t tmp_max;
+    int64_t dumpsize;
 };
 
 /**
@@ -145,8 +146,19 @@ static void Dump (access_t *access, const uint8_t *buffer, size_t len)
     access_sys_t *p_sys = access->p_sys;
     FILE *stream = p_sys->stream;
 
-    if ((stream == NULL) || (len == 0))
+    if ((stream == NULL) /* not dumping */
+     || (access->info.i_pos < p_sys->dumpsize) /* already known data */)
         return;
+
+    size_t needed = access->info.i_pos - p_sys->dumpsize;
+    if (len < needed)
+        return; /* gap between data and dump offset (seek too far ahead?) */
+
+    buffer += len - needed;
+    len = needed;
+
+    if (len == 0)
+        return; /* no useful data */
 
     if ((p_sys->tmp_max != -1) && (access->info.i_pos > p_sys->tmp_max))
     {
@@ -154,12 +166,14 @@ static void Dump (access_t *access, const uint8_t *buffer, size_t len)
         goto error;
     }
 
+    assert (len > 0);
     if (fwrite (buffer, len, 1, stream) != 1)
     {
         msg_Err (access, "cannot write to file: %s", strerror (errno));
         goto error;
     }
 
+    p_sys->dumpsize += len;
     return;
 
 error:
@@ -177,7 +191,6 @@ static int Read (access_t *access, uint8_t *buffer, int len)
     access->info = src->info;
 
     Dump (access, buffer, len);
-    //Trigger (access);
 
     return len;
 }
@@ -221,11 +234,7 @@ static int Seek (access_t *access, int64_t offset)
     }
 
     if (p_sys->stream != NULL)
-    {
-        msg_Dbg (access, "seeking - dump will not work");
-        fclose (p_sys->stream);
-        p_sys->stream = NULL;
-    }
+        msg_Dbg (access, "seeking - dump might not work");
 
     src->info.i_update = access->info.i_update;
     int ret = src->pf_seek (src, offset);
