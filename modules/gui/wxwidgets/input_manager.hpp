@@ -54,7 +54,6 @@ namespace wxvlc
         void ShowSlider( bool show = true );
 
         void OnSliderUpdate( wxScrollEvent& event );
-        void OnSliderClick( wxMouseEvent& event );
 
         void OnDiscMenu( wxCommandEvent& event );
         void OnDiscPrev( wxCommandEvent& event );
