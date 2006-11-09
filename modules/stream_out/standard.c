@@ -345,9 +345,7 @@ static int Open( vlc_object_t *p_this )
             p_session->psz_uri = strdup( url.psz_host );
             p_session->i_port = url.i_port;
             p_session->psz_sdp = NULL;
-
-            var_Get( p_access, "sout-udp-ttl", &val );
-            p_session->i_ttl = val.i_int;
+            p_session->i_ttl = var_CreateGetInteger (p_access, "ttl");
             p_session->i_payload = 33;
             p_session->b_rtp = strstr( psz_access, "rtp") ? 1 : 0;
 
