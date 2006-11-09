@@ -153,17 +153,10 @@ session_descriptor_t * sout_AnnounceSessionCreate(void)
     session_descriptor_t *p_session;
 
     p_session = (session_descriptor_t *)malloc( sizeof(session_descriptor_t));
+    if (p_session == NULL)
+        return NULL;
 
-    if( p_session)
-    {
-        p_session->p_sap = NULL;
-        p_session->psz_sdp = NULL;
-        p_session->psz_name = NULL;
-        p_session->psz_uri = NULL;
-        p_session->i_port = 0;
-        p_session->psz_group = NULL;
-    }
-
+    memset (p_session, 0, sizeof (*p_session));
     return p_session;
 }
 
