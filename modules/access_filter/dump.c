@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <time.h>
+#include <errno.h>
 
 #include "vlc_access.h"
 #include "vlc_block.h"
