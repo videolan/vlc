@@ -1,12 +1,13 @@
 /*****************************************************************************
  * open.h: MacOS X module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Felix KŸhne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,6 +96,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
     IBOutlet id o_output_ckbox;
     IBOutlet id o_sout_options;
+    
+    BOOL * b_autoplay;
 }
 
 + (VLCOpen *)sharedInstance;

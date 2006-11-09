@@ -1,13 +1,14 @@
 /*****************************************************************************
  * open.m: MacOS X module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *          Benjamin Pracht <bigben at videolan dot org>
+ *          Felix KŸhne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +43,7 @@
 #include "playlist.h"
 #include "open.h"
 #include "output.h"
+#import <vlc/intf.h>
 
 /*****************************************************************************
  * GetEjectableMediaOfClass 
@@ -304,6 +306,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (void)openTarget:(int)i_type
 {
     int i_result;
+    intf_thread_t * p_intf = VLCIntf;
+
+    b_autoplay = (BOOL *)config_GetInt( VLCIntf, "macosx-autoplay" );
 
     [o_tabview selectTabViewItemAtIndex: i_type];
     [o_file_sub_ckbox setState: NSOffState];
@@ -320,7 +325,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
         o_dic = [NSMutableDictionary dictionaryWithObject: [o_mrl stringValue] forKey: @"ITEM_URL"];
         if( [o_file_sub_ckbox state] == NSOnState )
         {
-            intf_thread_t * p_intf = VLCIntf;
             module_config_t * p_item;
 
             [o_options addObject: [NSString stringWithFormat: @"sub-file=%@", [o_file_sub_path stringValue]]];
@@ -360,7 +364,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
                                                 @"access-filter=timeshift"]];
         }
         [o_dic setObject: (NSArray *)[o_options copy] forKey: @"ITEM_OPTIONS"];
-        [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:NO];
+        if( b_autoplay )
+            [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:NO];
+        else
+            [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:YES];
     }
 }
 
@@ -731,6 +738,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
     int i;
+    b_autoplay = (BOOL *)config_GetInt( VLCIntf, "macosx-autoplay" );
     
     [o_open_panel setAllowsMultipleSelection: YES];
     [o_open_panel setCanChooseDirectories: YES];
@@ -750,7 +758,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
             o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];
             o_array = [o_array arrayByAddingObject: o_dic];
         }
-        [o_playlist appendArray: o_array atPos: -1 enqueue:NO];
+        if( b_autoplay )
+            [o_playlist appendArray: o_array atPos: -1 enqueue:NO];
+        else
+            [o_playlist appendArray: o_array atPos: -1 enqueue:YES];
     }
 }
 

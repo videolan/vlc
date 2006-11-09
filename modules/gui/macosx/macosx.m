@@ -78,6 +78,10 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 #define WIZARD_OPTIONS_SAVING_LONGTEXT N_("Remember the options in the " \
         "wizard during one session of VLC.") 
 
+#define AUTOPLAY_OSX_TEST N_("Auto-playback of new items")
+#define AUTOPLAY_OSX_LONGTEXT N_("Start playback of new items immediately " \
+        "once they were added." )
+
 vlc_module_begin();
     set_description( _("Mac OS X interface") );
     set_capability( "interface", 100 );
@@ -85,6 +89,8 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_bool( "macosx-embedded", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
+                     VLC_FALSE );
+    add_bool( "macosx-autoplay", 1, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
                      VLC_FALSE );
     add_bool( "macosx-wizard-keep", 1, NULL, WIZARD_OPTIONS_SAVING_TEXT,
                 WIZARD_OPTIONS_SAVING_LONGTEXT, VLC_TRUE );
