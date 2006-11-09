@@ -256,11 +256,15 @@ NSLog( @"expandable" );
     
     if( [[o_tc identifier] isEqualToString:@"1"] )
     {
-        o_value = [NSString stringWithUTF8String:
-            p_item->p_input->psz_name];
-        if( o_value == NULL )
-            o_value = [NSString stringWithCString:
-                p_item->p_input->psz_name];
+        /* sanity check to prevent the NSString class from crashing */
+        if( p_item->input.psz_name != NULL )
+        {
+            o_value = [NSString stringWithUTF8String:
+                p_item->input.psz_name];
+            if( o_value == NULL )
+                o_value = [NSString stringWithCString:
+                    p_item->input.psz_name];
+        }
     }
     else if( [[o_tc identifier] isEqualToString:@"2"] && p_item->p_input->p_meta &&
         p_item->p_input->p_meta->psz_artist && *p_item->p_input->p_meta->psz_artist )
