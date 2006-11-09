@@ -56,11 +56,8 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance (JNIEnv *env,
     argc = (int) env->GetArrayLength((jarray) args) + 1;
     argv = (const char **) malloc(argc * sizeof(char*));
 
-    argv[0] = "vlc";
-    
-    
-    for (int i = 0; i < argc - 1; i++) {
-        argv[i+1] = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, i),
+    for (int i = 0; i < argc; i++) {
+        argv[i] = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, i),
                                          0
         );
     }
@@ -68,8 +65,7 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance (JNIEnv *env,
     res = (long) libvlc_new(argc, (char**) argv, exception );
 
     free( exception );
-    free( argv );
-
+ 
     return res;
 
 }

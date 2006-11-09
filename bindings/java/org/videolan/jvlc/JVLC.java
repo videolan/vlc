@@ -72,7 +72,10 @@ public class JVLC implements Runnable {
     }
     
     public JVLC(String[] args) {
-        _instance	= createInstance( args );
+	String[] myargs = new String[args.length + 1];
+	myargs[0] = "jvlc";
+	System.arraycopy( args, 0, myargs, 1, args.length );
+        _instance	= createInstance( myargs );
         playlist	= new Playlist	( _instance );
         video		= new Video		( _instance );
         audio		= new Audio		( _instance );
