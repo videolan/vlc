@@ -233,6 +233,14 @@ static int Seek (access_t *access, int64_t offset)
 }
 
 
+#ifdef WIN32
+static inline struct tm *localtime_r (const time_t *now, struct tm *res)
+{
+    return _localtime_s (res, now) ? NULL : res;
+}
+#endif
+
+
 static void Trigger (access_t *access)
 {
     access_sys_t *p_sys = access->p_sys;
