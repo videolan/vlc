@@ -135,7 +135,7 @@ struct intf_sys_t
       __msg_rc( p_intf, psz_format, ## args )
 #endif
 
-void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
+static void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 {
     va_list args;
     va_start( args, psz_fmt );
@@ -167,10 +167,6 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 #define UNIX_LONGTEXT N_("Accept commands over a Unix socket rather than " \
                          "stdin." )
 
-#define OVERWRITE_TEXT N_("Over-write UNIX socket")
-#define OVERWRITE_LONGTEXT N_("If unable to bind RC interface to the specified " \
-			 " UNIX socket will attempt to unlink it then retry." )
-
 #define HOST_TEXT N_("TCP command input")
 #define HOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
             "You can set the address and port the interface will bind to." )
@@ -195,7 +191,6 @@ vlc_module_begin();
 #endif
     add_string( "rc-unix", 0, NULL, UNIX_TEXT, UNIX_LONGTEXT, VLC_TRUE );
     add_string( "rc-host", 0, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
-    add_bool( "rc-overwrite", 0, NULL, OVERWRITE_TEXT, OVERWRITE_LONGTEXT, VLC_TRUE );
 
 #ifdef WIN32
     add_bool( "rc-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_FALSE );
@@ -237,7 +232,6 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
 #else
         struct sockaddr_un addr;
-        int i_ret;
 
         memset( &addr, 0, sizeof(struct sockaddr_un) );
 
@@ -254,28 +248,25 @@ static int Activate( vlc_object_t *p_this )
         strncpy( addr.sun_path, psz_unix_path, sizeof( addr.sun_path ) );
         addr.sun_path[sizeof( addr.sun_path ) - 1] = '\0';
 
-        if( (i_ret = bind( i_socket, (struct sockaddr*)&addr,
-                           sizeof(struct sockaddr_un) ) ) < 0 )
+        if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr))
+         && (errno == EADDRINUSE)
+         && connect (i_socket, (struct sockaddr *)&addr, sizeof (addr))
+         && (errno == ECONNREFUSED))
         {
-	    if( i_overwrite )
+            msg_Info (p_intf, "Removing dead UNIX socket: %s", psz_unix_path);
+            unlink (psz_unix_path);
+
+            if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr)))
             {
-                msg_Warn( p_intf, "Found old UNIX socket: %s, deleting and re-trying", psz_unix_path );
-	        unlink( psz_unix_path ); 
-            }
-	    
-            if( !i_overwrite || bind( i_socket, (struct sockaddr*)&addr,
-                           sizeof(struct sockaddr_un) ) < 0 )
-            {
-            
-                msg_Warn( p_intf, "couldn't bind socket to address: %s",
-                           strerror(errno) );
-                free( psz_unix_path );
-                net_Close( i_socket );
+                msg_Err (p_intf, "cannot bind UNIX socket at %s: %s",
+                         psz_unix_path, strerror (errno));
+                free (psz_unix_path);
+                net_Close (i_socket);
                 return VLC_EGENERIC;
             }
         }
 
-        if( ( i_ret = listen( i_socket, 1 ) ) < 0 )
+        if( listen( i_socket, 1 ) )
         {
             msg_Warn( p_intf, "can't listen on socket: %s", strerror(errno));
             free( psz_unix_path );
