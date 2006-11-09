@@ -329,6 +329,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "bgcolor2", "#FFFFFF" );
         CheckDefault( "selcolor", "#0000FF" );
         CheckDefault( "help", "" );
+
         m_curTreeId = uniqueId( attr["id"] );
         const BuilderData::Tree treeData( m_curTreeId, atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["visible"],
@@ -433,8 +434,6 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "visible", "true" );
         CheckDefault( "x", "0" );
         CheckDefault( "y", "0" );
-        CheckDefault( "width", "0" );
-        CheckDefault( "height", "0" );
         CheckDefault( "lefttop", "lefttop" );
         CheckDefault( "rightbottom", "lefttop" );
         CheckDefault( "xkeepratio", "false" );
@@ -539,6 +538,10 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
     else if( rName == "ThemeInfo" )
     {
+        CheckDefault( "name", "" );
+        CheckDefault( "author", "" );
+        CheckDefault( "email", "" );
+        CheckDefault( "website", "" );
         msg_Info( getIntf(), "skin: %s  author: %s", attr["name"],
                   attr["author"] );
     }
