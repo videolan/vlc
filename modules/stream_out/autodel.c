@@ -50,10 +50,6 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static const char *ppsz_sout_options[] = {
-    NULL
-};
-
 static sout_stream_id_t *Add   ( sout_stream_t *, es_format_t * );
 static int               Del   ( sout_stream_t *, sout_stream_id_t * );
 static int               Send  ( sout_stream_t *, sout_stream_id_t *, block_t * );
@@ -92,9 +88,6 @@ static int Open( vlc_object_t *p_this )
     }
     p_sys->pp_es = NULL;
     p_sys->i_es_num = 0;
-
-    sout_CfgParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
-                   p_stream->p_cfg );
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
