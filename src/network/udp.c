@@ -353,14 +353,16 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
         str = var_CreateGetString (p_this, "miface");
         if (str != NULL)
         {
-            net_SetMcastOut (p_this, fd, ptr->ai_family, str, NULL);
+            if (*str)
+                net_SetMcastOut (p_this, fd, ptr->ai_family, str, NULL);
             free (str);
         }
 
         str = var_CreateGetString (p_this, "miface-addr");
         if (str != NULL)
         {
-            net_SetMcastOut (p_this, fd, ptr->ai_family, NULL, str);
+            if (*str)
+                net_SetMcastOut (p_this, fd, ptr->ai_family, NULL, str);
             free (str);
         }
 
