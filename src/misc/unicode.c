@@ -52,6 +52,8 @@
 #endif
 #ifdef WIN32
 # include <io.h>
+#else
+# include <unistd.h>
 #endif
 
 #ifndef HAVE_LSTAT
