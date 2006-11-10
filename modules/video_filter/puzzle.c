@@ -60,6 +60,8 @@ static int  MouseEvent   ( vlc_object_t *, char const *,
 #define ROWS_LONGTEXT N_("Number of puzzle rows")
 #define COLS_TEXT N_("Number of puzzle columns")
 #define COLS_LONGTEXT N_("Number of puzzle columns")
+#define BLACKSLOT_TEXT N_("Make one tile a black slot")
+#define BLACKSLOT_LONGTEXT N_("Make one slot black. Other tiles can only be swapped with the black slot.")
 
 vlc_module_begin();
     set_description( _("Puzzle interactive game video filter") );
@@ -72,6 +74,8 @@ vlc_module_begin();
                             ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
     add_integer_with_range( "puzzle-cols", 4, 1, 128, NULL,
                             COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
+    add_bool( "puzzle-black-slot", 0, NULL,
+              BLACKSLOT_TEXT, BLACKSLOT_LONGTEXT, VLC_FALSE );
 
     set_callbacks( Create, Destroy );
 vlc_module_end();
@@ -90,6 +94,8 @@ struct vout_sys_t
     int *pi_order;
     int i_selected;
     vlc_bool_t b_finished;
+
+    vlc_bool_t b_blackslot;
 };
 
 /*****************************************************************************
@@ -135,6 +141,24 @@ static void shuffle( vout_sys_t *p_sys )
         }
         p_sys->b_finished = finished( p_sys );
     } while( p_sys->b_finished == VLC_TRUE );
+
+    if( p_sys->b_blackslot == VLC_TRUE )
+    {
+        for( i = 0; i < p_sys->i_cols * p_sys->i_rows; i++ )
+        {
+            if( p_sys->pi_order[i] ==
+                ( p_sys->i_cols - 1 ) * p_sys->i_rows + 1 )
+            {
+                p_sys->i_selected = i;
+                break;
+            }
+        }
+    }
+    else
+    {
+        p_sys->i_selected = -1;
+    }
+    printf( "selected: %d\n", p_sys->i_selected );
 }
 
 /*****************************************************************************
@@ -156,7 +180,7 @@ static int Create( vlc_object_t *p_this )
 
     p_vout->p_sys->i_rows = config_GetInt( p_vout, "puzzle-rows" );
     p_vout->p_sys->i_cols = config_GetInt( p_vout, "puzzle-cols" );
-    p_vout->p_sys->i_selected = -1;
+    p_vout->p_sys->b_blackslot = config_GetInt( p_vout, "puzzle-black-slot" );
 
     p_vout->p_sys->pi_order = NULL;
     shuffle( p_vout->p_sys );
@@ -302,18 +326,33 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             i_row *= p_in->i_lines / i_rows;
             i_last_row *= p_in->i_lines / i_rows;
 
-            for( ; i_row < i_last_row; i_row++, i_orow++ )
+            if( p_vout->p_sys->b_blackslot == VLC_TRUE
+                && i == p_vout->p_sys->i_selected )
             {
-                memcpy( p_out->p_pixels + i_row * i_pitch
-                                        + i_col * i_pitch / i_cols,
-                        p_in->p_pixels + i_orow * i_pitch
-                                       + i_ocol * i_pitch / i_cols,
-                        i_pitch / i_cols );
+                uint8_t color = ( i_plane == Y_PLANE ? 0x0 : 0x80 );
+                for( ; i_row < i_last_row; i_row++, i_orow++ )
+                {
+                    memset( p_out->p_pixels + i_row * i_pitch
+                                            + i_col * i_pitch / i_cols,
+                            color, i_pitch / i_cols );
+                }
+            }
+            else
+            {
+                for( ; i_row < i_last_row; i_row++, i_orow++ )
+                {
+                    memcpy( p_out->p_pixels + i_row * i_pitch
+                                            + i_col * i_pitch / i_cols,
+                            p_in->p_pixels + i_orow * i_pitch
+                                           + i_ocol * i_pitch / i_cols,
+                            i_pitch / i_cols );
+                }
             }
         }
     }
 
-    if( p_vout->p_sys->i_selected != -1 )
+    if(    p_vout->p_sys->i_selected != -1
+        && p_vout->p_sys->b_blackslot == VLC_FALSE )
     {
         plane_t *p_in = p_pic->p+Y_PLANE;
         plane_t *p_out = p_outpic->p+Y_PLANE;
@@ -405,7 +444,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         {
             p_vout->p_sys->i_selected = i_pos;
         }
-        else if( p_vout->p_sys->i_selected == i_pos )
+        else if( p_vout->p_sys->i_selected == i_pos
+                 && p_vout->p_sys->b_blackslot == VLC_FALSE )
         {
             p_vout->p_sys->i_selected = -1;
         }
@@ -418,7 +458,10 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
             p_vout->p_sys->pi_order[ p_vout->p_sys->i_selected ] =
                 p_vout->p_sys->pi_order[ i_pos ];
             p_vout->p_sys->pi_order[ i_pos ] = a;
-            p_vout->p_sys->i_selected = -1;
+            if( p_vout->p_sys->b_blackslot == VLC_TRUE )
+                p_vout->p_sys->i_selected = i_pos;
+            else
+                p_vout->p_sys->i_selected = -1;
 
             p_vout->p_sys->b_finished = finished( p_vout->p_sys );
         }
