@@ -613,8 +613,7 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
             if( strcmp( ppsz_command[2], "play" ) &&
                 strcmp( ppsz_command[2], "stop" ) &&
                 strcmp( ppsz_command[2], "pause" ) &&
-                strcmp( ppsz_command[2], "seek" ) &&
-                strcmp( ppsz_command[2], "msecseek" ) )
+                strcmp( ppsz_command[2], "seek" ) )
             {
                 i_index++;
                 psz_instance = ppsz_command[2];
@@ -624,8 +623,7 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                 if( strcmp( ppsz_command[3], "play" ) &&
                     strcmp( ppsz_command[3], "stop" ) &&
                     strcmp( ppsz_command[3], "pause" ) &&
-                    strcmp( ppsz_command[3], "seek" ) &&
-                    strcmp( ppsz_command[3], "msecseek" ) )
+                    strcmp( ppsz_command[3], "seek" ) )
                     goto syntax_error;
             }
 
@@ -1268,33 +1266,62 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
 
     if( !strcmp( psz_command, "seek" ) )
     {
-        float f_percentage;
-
         if( psz_args )
         {
-            f_percentage = i18n_atof( psz_args );
-            if( f_percentage >= 0.0 && f_percentage <= 100.0 )
+            vlc_bool_t i_rel;
+            float f_value = i18n_atof( psz_args );
+            if( psz_args[0] == '+' || psz_args[0] == '-' )
+                i_rel = VLC_TRUE;
+            else
+                i_rel = VLC_FALSE;
+            if( strstr( psz_args, "ms" ) )
             {
-                var_SetFloat( p_instance->p_input, "position",
-                              f_percentage / 100.0 );
-                return VLC_SUCCESS;
+                /* milliseconds */
+                int64_t i_msec =  1000 * (int64_t)atoi( psz_args );
+                if( i_rel )
+                {
+                    var_SetTime( p_instance->p_input, "time-offset",
+                                 i_msec );
+                }
+                else if( i_msec >= 0
+                      && i_msec < var_GetTime( p_instance->p_input, "length" ) )
+                {
+                    var_SetTime( p_instance->p_input, "time",
+                                 i_msec );
+                }
             }
-        }
-    }
-    else if( !strcmp( psz_command, "msecseek" ) )
-    {
-        double d_msec;
-        int64_t i_time, i_current;
-
-        if( psz_args )
-        {
-            d_msec = i18n_atof( psz_args );
-            i_time = (int64_t)(d_msec * 1000);
-            i_current = var_GetTime( p_instance->p_input, "length" );
-            if( i_time >= 0 && i_time <= i_current )
+            else if( strchr( psz_args, 's' ) )
             {
-                var_SetTime( p_instance->p_input, "time", i_time );
-                return VLC_SUCCESS;
+                /* seconds */
+                int64_t i_sec = 1000000 * (int64_t)atoi( psz_args );
+                if( i_rel )
+                {
+                    var_SetTime( p_instance->p_input, "time-offset",
+                                 i_sec );
+                }
+                else if( i_sec >= 0
+                      && i_sec < var_GetTime( p_instance->p_input, "length" ) )
+                {
+                    var_SetTime( p_instance->p_input, "time",
+                                 i_sec );
+                }
+            }
+            else
+            {
+                /* percentage */
+                f_value /= 100.;
+                if( i_rel )
+                {
+                    float f_orig = var_GetFloat( p_instance->p_input,
+                                                 "position" );
+                    f_value += f_orig;
+                }
+                if( f_value >= 0.0 && f_value <= 1.0 )
+                {
+                    var_SetFloat( p_instance->p_input, "position",
+                                  f_value );
+                    return VLC_SUCCESS;
+                }
             }
         }
     }
@@ -2065,8 +2092,7 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
         MessageAddChild( "play" );
         MessageAddChild( "pause" );
         MessageAddChild( "stop" );
-        MessageAddChild( "seek (percentage)" );
-        MessageAddChild( "msecseek (time in milliseconds)" );
+        MessageAddChild( "seek [+-](percentage) | [+-](seconds)s | [+-](miliseconds)ms" );
 
         return message;
     }
