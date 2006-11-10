@@ -25,4 +25,5 @@ SOURCES_opencv_wrapper = opencv_wrapper.c
 SOURCES_opencv_example = opencv_example.cpp filter_event_info.h
 SOURCES_rotate = rotate.c
 SOURCES_noise = noise.c
+SOURCES_puzzle = puzzle.c
 noinst_HEADERS = filter_common.h
