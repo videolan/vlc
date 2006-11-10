@@ -1945,7 +1945,7 @@ static void ReadDir( intf_thread_t *p_intf )
                 ( strlen( psz_entry ) && psz_entry[0] == '.' ) &&
                 strcmp( psz_entry, ".." ) )
             {
-                LocaleFree( psz_entry );
+                free( psz_entry );
                 psz_entry = utf8_readdir( p_current_dir );
                 continue;
             }
@@ -1982,7 +1982,7 @@ static void ReadDir( intf_thread_t *p_intf )
             }
 
             free( psz_uri );
-            LocaleFree( psz_entry );
+            free( psz_entry );
             /* Read next entry */
             psz_entry = utf8_readdir( p_current_dir );
         }

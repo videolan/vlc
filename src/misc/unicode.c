@@ -470,7 +470,10 @@ void *utf8_opendir( const char *dirname )
     return NULL;
 }
 
-const char *utf8_readdir( void *dir )
+
+#define darwin_readdir_fix( a ) __vlc_fix_readdir_charset (NULL, a)
+
+char *utf8_readdir( void *dir )
 {
     struct dirent *ent;
 
@@ -478,7 +481,11 @@ const char *utf8_readdir( void *dir )
     if( ent == NULL )
         return NULL;
 
-    return FromLocale( ent->d_name );
+#ifdef __APPLE__
+    return darwin_readdir_fix( ent->d_name );
+#else
+    return strdup( ent->d_name );
+#endif
 }
 
 static int dummy_select( const char *str )
@@ -507,25 +514,21 @@ int utf8_scandir( const char *dirname, char ***namelist,
         while( ( entry = utf8_readdir( dir ) ) != NULL )
         {
             char **newtab;
-            char *utf_entry = strdup( entry );
-            LocaleFree( entry );
-            if( utf_entry == NULL )
-                goto error;
 
-            if( !select( utf_entry ) )
+            if( !select( entry ) )
             {
-                free( utf_entry );
+                free( entry );
                 continue;
             }
 
             newtab = realloc( tab, sizeof( char * ) * (num + 1) );
             if( newtab == NULL )
             {
-                free( utf_entry );
+                free( entry );
                 goto error;
             }
             tab = newtab;
-            tab[num++] = utf_entry;
+            tab[num++] = entry;
         }
         vlc_closedir_wrapper( dir );
 

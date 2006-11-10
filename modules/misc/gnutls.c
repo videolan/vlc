@@ -504,13 +504,13 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
         char *psz_filename;
         int check;
 
-        if( ( strcmp( ".", psz_dirent ) == 0 )
+        if( (psz_dirent == NULL)
+	 || ( strcmp( ".", psz_dirent ) == 0 )
          || ( strcmp( "..", psz_dirent ) == 0 ) )
             continue;
 
-        check = asprintf( &psz_filename, "%s/%s", psz_dirname,
-                              psz_dirent );
-        LocaleFree( psz_dirent );
+        check = asprintf( &psz_filename, "%s/%s", psz_dirname, psz_dirent );
+        free( psz_dirent );
         if( check == -1 )
             continue;
 
