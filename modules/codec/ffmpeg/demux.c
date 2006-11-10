@@ -221,10 +221,15 @@ int E_(OpenDemux)( vlc_object_t *p_this )
                 *fmt.video.p_palette = *(video_palette_t *)cc->palctrl;
             }
             break;
+        case CODEC_TYPE_SUBTITLE:
+            es_format_Init( &fmt, SPU_ES, fcc );
+            break;
         default:
+            msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
             break;
         }
 
+        fmt.psz_language = strdup( p_sys->ic->streams[i]->language );
         fmt.i_extra = cc->extradata_size;
         fmt.p_extra = cc->extradata;
         es = es_out_Add( p_demux->out, &fmt );
@@ -349,22 +354,25 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_POSITION:
             f = (double) va_arg( args, double );
             i64 = stream_Tell( p_demux->s );
-            if( i64 && p_sys->i_pcr > 0 )
+            if( p_sys->i_pcr > 0 )
             {
-                int64_t i_size = stream_Size( p_demux->s );
-
-                i64 = p_sys->i_pcr * i_size / i64 * f;
+                i64 = p_sys->ic->duration * f;
                 if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
                     i64 += p_sys->ic->start_time;
 
-                if( p_sys->ic->duration != (int64_t)AV_NOPTS_VALUE )
-                    i64 = p_sys->ic->duration * f;
-
                 msg_Warn( p_demux, "DEMUX_SET_POSITION: "I64Fd, i64 );
 
-                if( av_seek_frame( p_sys->ic, -1, i64, 0 ) < 0 )
+                /* If we have a duration, we prefer to seek by time
+                   but if we don't, or if the seek fails, try BYTE seeking */
+                if( p_sys->ic->duration == (int64_t)AV_NOPTS_VALUE ||
+                    (av_seek_frame( p_sys->ic, -1, i64, 0 ) < 0) )
                 {
-                    return VLC_EGENERIC;
+                    int64_t i_size = stream_Size( p_demux->s );
+                    i64 = (int64_t)i_size * f;
+
+                    msg_Warn( p_demux, "DEMUX_SET_BYTE_POSITION: "I64Fd, i64 );
+                    if( av_seek_frame( p_sys->ic, -1, i64, AVSEEK_FLAG_BYTE ) < 0 )
+                        return VLC_EGENERIC;
                 }
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 p_sys->i_pcr = -1; /* Invalidate time display */
@@ -444,7 +452,8 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
 {
     URLContext *p_url = opaque;
     demux_t *p_demux = p_url->priv_data;
-    int64_t i_absolute;
+    int64_t i_absolute = (int64_t)offset;
+    int64_t i_size = stream_Size( p_demux->s );
 
 #ifdef AVFORMAT_DEBUG
     msg_Warn( p_demux, "IOSeek offset: "I64Fd", whence: %i", offset, whence );
@@ -453,25 +462,28 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
     switch( whence )
     {
         case SEEK_SET:
-            i_absolute = offset;
             break;
         case SEEK_CUR:
             i_absolute = stream_Tell( p_demux->s ) + offset;
             break;
         case SEEK_END:
-            i_absolute = stream_Size( p_demux->s ) - offset;
+            i_absolute = i_size + offset;
             break;
         default:
             return -1;
 
     }
+    if( i_absolute < 0 )
+        i_absolute = 0;
+    if( i_size && i_absolute > i_size )
+        i_absolute = i_size;
 
     if( stream_Seek( p_demux->s, i_absolute ) )
     {
         return -1;
     }
 
-    return 0;
+    return stream_Tell( p_demux->s );
 }
 
 #else /* LIBAVFORMAT_BUILD >= 4611 */
