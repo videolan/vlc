@@ -74,9 +74,9 @@ static int  DemuxOpen ( vlc_object_t * );
         "collapse: subdirectories appear but are expanded on first play.\n" \
         "expand: all subdirectories are expanded.\n" )
 
-static char *psz_recursive_list[] = { "none", "collapse", "expand" };
-static char *psz_recursive_list_text[] = { N_("none"), N_("collapse"),
-                                           N_("expand") };
+static const char *psz_recursive_list[] = { "none", "collapse", "expand" };
+static const char *psz_recursive_list_text[] = { N_("none"), N_("collapse"),
+                                                 N_("expand") };
 
 #define IGNORE_TEXT N_("Ignored extensions")
 #define IGNORE_LONGTEXT N_( \
@@ -134,36 +134,17 @@ static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
 
-#ifdef HAVE_SYS_STAT_H
     struct stat stat_info;
-    char *psz_path = ToLocale( p_access->psz_path );
 
-    if( ( stat( psz_path, &stat_info ) == -1 ) ||
-        !S_ISDIR( stat_info.st_mode ) )
-#elif defined(WIN32)
-    int i_ret;
-
-#   ifdef UNICODE
-    wchar_t psz_path[MAX_PATH];
-    mbstowcs( psz_path, p_access->psz_path, MAX_PATH );
-    psz_path[MAX_PATH-1] = 0;
-#   else
-    char *psz_path = p_access->psz_path;
-#   endif /* UNICODE */
-
-    i_ret = GetFileAttributes( psz_path );
-    if( i_ret == -1 || !(i_ret & FILE_ATTRIBUTE_DIRECTORY) )
-
+#ifdef HAVE_SYS_STAT_H
+    if (utf8_stat (p_access->psz_path, &stat_info)
+     || !S_ISDIR (stat_info.st_mode))
 #else
     if( strcmp( p_access->psz_access, "dir") &&
         strcmp( p_access->psz_access, "directory") )
 #endif
-    {
-        LocaleFree( psz_path );
         return VLC_EGENERIC;
-    }
 
-    LocaleFree( psz_path );
     p_access->pf_read  = Read;
     p_access->pf_block = NULL;
     p_access->pf_seek  = NULL;
