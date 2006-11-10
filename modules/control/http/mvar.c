@@ -573,10 +573,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
         }
         f = E_(mvar_New)( name, "set" );
 
-        /* FIXME: merge vlc_fix_readdir_charset with utf8_readir */
-        psz_dummy = vlc_fix_readdir_charset( p_intf, psz_dir_content );
-        psz_name = E_(FromUTF8)( p_intf, psz_dummy );
-        free( psz_dummy );
+        psz_name = E_(FromUTF8)( p_intf, psz_dir_content );
 
         /* put lower-case file extension in 'ext' */
         psz_ext = strrchr( psz_name, '.' );

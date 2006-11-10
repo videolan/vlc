@@ -213,15 +213,10 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
             httpd_file_sys_t *f = NULL;
             httpd_handler_sys_t *h = NULL;
             vlc_bool_t b_index;
-            char *psz_tmp, *psz_file, *psz_name, *psz_ext;
+            char *psz_file, *psz_name, *psz_ext;
 
-            psz_tmp = vlc_fix_readdir_charset( p_intf, dir );
-            psz_file = E_(FromUTF8)( p_intf, psz_tmp );
-            free( psz_tmp );
-            psz_tmp = vlc_fix_readdir_charset( p_intf,
-                                               &dir[strlen( psz_root )] );
-            psz_name = E_(FileToUrl)( psz_tmp, &b_index );
-            free( psz_tmp );
+            psz_file = E_(FromUTF8)( p_intf, dir );
+            psz_name = E_(FileToUrl)( &dir[strlen( psz_root )], &b_index );
             psz_ext = strrchr( psz_file, '.' );
             if( psz_ext != NULL )
             {
