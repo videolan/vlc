@@ -279,7 +279,7 @@ struct module_symbols_t
     void *playlist_ViewUpdate_deprecated;
     void *playlist_ViewDump_deprecated;
     void *playlist_ViewEmpty_deprecated;
-    playlist_item_t * (*playlist_NodeCreate_inner) (playlist_t *, char *, playlist_item_t * p_parent);
+    playlist_item_t * (*playlist_NodeCreate_inner) (playlist_t *, const char *, playlist_item_t * p_parent);
     int (*playlist_NodeAppend_inner) (playlist_t *,playlist_item_t*,playlist_item_t *);
     int (*playlist_NodeInsert_inner) (playlist_t *,playlist_item_t*,playlist_item_t *, int);
     int (*playlist_NodeRemoveItem_inner) (playlist_t *,playlist_item_t*,playlist_item_t *);
@@ -536,7 +536,7 @@ struct module_symbols_t
     int (*net_SetDSCP_inner) (int fd, uint8_t dscp);
     void (*vout_EnableFilter_inner) (vout_thread_t *, char *,vlc_bool_t , vlc_bool_t);
     void (*aout_EnableFilter_inner) (vlc_object_t *, const char *, vlc_bool_t);
-    void (*playlist_NodesPairCreate_inner) (playlist_t *, char *, playlist_item_t **, playlist_item_t **, vlc_bool_t);
+    void (*playlist_NodesPairCreate_inner) (playlist_t *, const char *, playlist_item_t **, playlist_item_t **, vlc_bool_t);
     char * (*aout_VisualChange_inner) (vlc_object_t *, int);
     void *__input_SecondaryPreparse_deprecated;
     void (*input_ItemAddOption_inner) (input_item_t *, const char *);

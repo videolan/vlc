@@ -49,7 +49,7 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
  * \param p_parent the parent node to attach to or NULL if no attach
  * \return the new node
  */
-playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, char *psz_name,
+playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, const char *psz_name,
                                        playlist_item_t *p_parent )
 {
     input_item_t *p_input;
@@ -285,7 +285,7 @@ playlist_item_t *playlist_ChildSearchName( playlist_item_t *p_node,
  * \param pp_node_one pointer to return the node in onelevel tree
  * \param b_for_sd For Services Discovery ? (make node read-only and unskipping)
  */
-void playlist_NodesPairCreate( playlist_t *p_playlist, char *psz_name,
+void playlist_NodesPairCreate( playlist_t *p_playlist, const char *psz_name,
                                playlist_item_t **pp_node_cat,
                                playlist_item_t **pp_node_one,
                                vlc_bool_t b_for_sd )
