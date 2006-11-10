@@ -198,6 +198,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_seekable = VLC_FALSE;
 #else
     p_sys->b_seekable = !b_stdin;
+# warning File size not known!
 #endif
 
     if (p_sys->b_seekable && (p_access->info.i_size == 0))
@@ -320,8 +321,6 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
  *****************************************************************************/
 static int Seek (access_t *p_access, int64_t i_pos)
 {
-    access_sys_t *p_sys = p_access->p_sys;
-
     if (i_pos > p_access->info.i_size)
     {
         msg_Err (p_access, "seeking too far");
@@ -337,7 +336,7 @@ static int Seek (access_t *p_access, int64_t i_pos)
     p_access->info.b_eof = VLC_FALSE;
 
     /* Determine which file we need to access */
-    lseek (p_sys->fd, i_pos, SEEK_SET);
+    lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
     return VLC_SUCCESS;
 }
 
