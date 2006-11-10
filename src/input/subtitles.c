@@ -346,8 +346,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             msg_Dbg( p_this, "looking for a subtitle file in %s", psz_dir );
             for( a = 0; a < i_dir_content; a++ )
             {
-                char *psz_name = vlc_fix_readdir_charset( p_this,
-                                                          ppsz_dir_content[a] );
+                char *psz_name = ppsz_dir_content[a];
                 char tmp_fname_noext[strlen( psz_name ) + 1];
                 char tmp_fname_trim[strlen( psz_name ) + 1];
                 char tmp_fname_ext[strlen( psz_name ) + 1];
