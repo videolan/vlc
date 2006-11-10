@@ -415,7 +415,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     }
                 }
                 if( i_sub_count >= MAX_SUBTITLE_FILES ) break;
-                free( psz_name );
             }
             for( a = 0; a < i_dir_content; a++ )
                 free( ppsz_dir_content[a] );
