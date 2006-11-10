@@ -78,7 +78,7 @@ static void RunThread( vlc_object_t *p_this);
 static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address );
 static char *SDPGenerate( sap_handler_t *p_sap,
                           const session_descriptor_t *p_session,
-                          const sap_address_t *p_addr );
+                          const sap_address_t *p_addr, vlc_bool_t b_ssm );
 
 static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
                                      sap_session_t *p_session );
@@ -235,7 +235,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 {
     int i_header_size, i;
     char *psz_head, psz_addr[NI_MAXNUMERICHOST];
-    vlc_bool_t b_ipv6 = VLC_FALSE;
+    vlc_bool_t b_ipv6 = VLC_FALSE, b_ssm = VLC_FALSE;
     sap_session_t *p_sap_session;
     mtime_t i_hash;
     struct addrinfo hints, *res;
@@ -291,8 +291,13 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             memcpy( a6->s6_addr + 2, "\x00\x00\x00\x00\x00\x00"
                    "\x00\x00\x00\x00\x00\x02\x7f\xfe", 14 );
             if( IN6_IS_ADDR_MULTICAST( a6 ) )
-                 /* force flags to zero, preserve scope */
+            {
+                /* force flags to zero, preserve scope */
                 a6->s6_addr[1] &= 0xf;
+
+                /* SSM <=> ff3x::/32 */
+                b_ssm = (GetDWLE (a6->s6_addr) & 0xfff0ffff) == 0xff300000;
+            }
             else
                 /* Unicast IPv6 - assume global scope */
                 memcpy( a6->s6_addr, "\xff\x0e", 2 );
@@ -324,7 +329,12 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                 ipv4 = 0;
             else
             /* other addresses => 224.2.127.254 */
+            {
                 ipv4 = 0xe0027ffe;
+
+                /* SSM: 232.0.0.0/8 */
+                b_ssm = (ipv4 >> 24) == 232;
+            }
 
             if( ipv4 == 0 )
             {
@@ -468,7 +478,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     if( p_session->psz_sdp == NULL )
     {
         p_session->psz_sdp = SDPGenerate( p_sap, p_session,
-                                          p_sap_session->p_address );
+                                          p_sap_session->p_address, b_ssm );
         if( p_session->psz_sdp == NULL )
         {
             vlc_mutex_unlock( &p_sap->object_lock );
@@ -584,7 +594,7 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
 
 static char *SDPGenerate( sap_handler_t *p_sap,
                           const session_descriptor_t *p_session,
-                          const sap_address_t *p_addr )
+                          const sap_address_t *p_addr, vlc_bool_t b_ssm )
 {
     int64_t i_sdp_id = mdate();
     int     i_sdp_version = 1 + p_sap->i_sessions + (rand()&0xfff);
@@ -615,7 +625,7 @@ static char *SDPGenerate( sap_handler_t *p_sap,
         psz_uri = p_session->psz_uri;
 
     char *sfilter = NULL;
-    if (var_CreateGetBool (p_sap, "sap-source-filter"))
+    if (b_ssm)
     {
         if (asprintf (&sfilter, "a=source-filter: incl IN IP%c * %s\r\n",
                       ipv, p_addr->psz_machine) == -1)
