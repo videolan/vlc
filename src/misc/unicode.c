@@ -504,7 +504,7 @@ int utf8_scandir( const char *dirname, char ***namelist,
     else
     {
         char **tab = NULL;
-        const char *entry;
+        char *entry;
         unsigned num = 0;
 
         while( ( entry = utf8_readdir( dir ) ) != NULL )
