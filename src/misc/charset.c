@@ -340,10 +340,9 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
     return VLC_FALSE;
 }
 
-char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
-{
-    (void)p_this;
 
+char *vlc_fix_readdir( const char *psz_string )
+{
 #ifdef __APPLE__
     vlc_iconv_t hd = vlc_iconv_open( "UTF-8", "UTF-8-MAC" );
 
@@ -366,9 +365,11 @@ char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
         *psz_out = '\0';
         return psz_utf8;
     }
-#endif
+#else
     return strdup( psz_string );
+#endif
 }
+
 
 static inline int locale_match (const char *tab, const char *locale)
 {

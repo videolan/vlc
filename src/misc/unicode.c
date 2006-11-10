@@ -471,8 +471,6 @@ void *utf8_opendir( const char *dirname )
 }
 
 
-#define darwin_readdir_fix( a ) __vlc_fix_readdir_charset (NULL, a)
-
 char *utf8_readdir( void *dir )
 {
     struct dirent *ent;
@@ -481,11 +479,7 @@ char *utf8_readdir( void *dir )
     if( ent == NULL )
         return NULL;
 
-#ifdef __APPLE__
-    return darwin_readdir_fix( ent->d_name );
-#else
-    return strdup( ent->d_name );
-#endif
+    return vlc_fix_readdir( ent->d_name );
 }
 
 static int dummy_select( const char *str )

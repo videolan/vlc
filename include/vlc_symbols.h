@@ -390,7 +390,7 @@ struct module_symbols_t
     void (*LocaleFree_inner) (const char *);
     char * (*ToLocale_inner) (const char *);
     char * (*EnsureUTF8_inner) (char *);
-    char * (*__vlc_fix_readdir_charset_inner) (vlc_object_t *, const char *);
+    void *__vlc_fix_readdir_charset_deprecated;
     int (*vlc_scandir_inner) (const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ));
     int (*vlc_alphasort_inner) (const struct dirent **a, const struct dirent **b);
     osd_state_t * (*__osd_StateChange_inner) (osd_state_t *, const int);
@@ -898,7 +898,6 @@ struct module_symbols_t
 #  define LocaleFree (p_symbols)->LocaleFree_inner
 #  define ToLocale (p_symbols)->ToLocale_inner
 #  define EnsureUTF8 (p_symbols)->EnsureUTF8_inner
-#  define __vlc_fix_readdir_charset (p_symbols)->__vlc_fix_readdir_charset_inner
 #  define vlc_scandir (p_symbols)->vlc_scandir_inner
 #  define vlc_alphasort (p_symbols)->vlc_alphasort_inner
 #  define __osd_StateChange (p_symbols)->__osd_StateChange_inner
@@ -1381,7 +1380,6 @@ struct module_symbols_t
     ((p_symbols)->LocaleFree_inner) = LocaleFree; \
     ((p_symbols)->ToLocale_inner) = ToLocale; \
     ((p_symbols)->EnsureUTF8_inner) = EnsureUTF8; \
-    ((p_symbols)->__vlc_fix_readdir_charset_inner) = __vlc_fix_readdir_charset; \
     ((p_symbols)->vlc_scandir_inner) = vlc_scandir; \
     ((p_symbols)->vlc_alphasort_inner) = vlc_alphasort; \
     ((p_symbols)->__osd_StateChange_inner) = __osd_StateChange; \
@@ -1552,6 +1550,7 @@ struct module_symbols_t
     (p_symbols)->playlist_Move_deprecated = NULL; \
     (p_symbols)->playlist_NodeGroup_deprecated = NULL; \
     (p_symbols)->playlist_NodeRemoveParent_deprecated = NULL; \
+    (p_symbols)->__vlc_fix_readdir_charset_deprecated = NULL; \
     (p_symbols)->__intf_Interact_deprecated = NULL; \
     (p_symbols)->__intf_UserProgress_deprecated = NULL; \
     (p_symbols)->__intf_UserProgressUpdate_deprecated = NULL; \
