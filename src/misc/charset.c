@@ -356,6 +356,7 @@ char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
         char *psz_out = psz_utf8;
 
         size_t i_ret = vlc_iconv (hd, &psz_in, &i_in, &psz_out, &i_out);
+        vlc_iconv_close (fd);
         if( i_ret == (size_t)(-1) || i_in )
         {
             free( psz_utf8 );
