@@ -613,7 +613,8 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
             if( strcmp( ppsz_command[2], "play" ) &&
                 strcmp( ppsz_command[2], "stop" ) &&
                 strcmp( ppsz_command[2], "pause" ) &&
-                strcmp( ppsz_command[2], "seek" ) )
+                strcmp( ppsz_command[2], "seek" ) &&
+                strcmp( ppsz_command[2], "msecseek" ) )
             {
                 i_index++;
                 psz_instance = ppsz_command[2];
@@ -623,7 +624,8 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                 if( strcmp( ppsz_command[3], "play" ) &&
                     strcmp( ppsz_command[3], "stop" ) &&
                     strcmp( ppsz_command[3], "pause" ) &&
-                    strcmp( ppsz_command[3], "seek" ) )
+                    strcmp( ppsz_command[3], "seek" ) &&
+                    strcmp( ppsz_command[3], "msecseek" ) )
                     goto syntax_error;
             }
 
@@ -1266,7 +1268,6 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
 
     if( !strcmp( psz_command, "seek" ) )
     {
-        vlc_value_t val;
         float f_percentage;
 
         if( psz_args )
@@ -1274,8 +1275,25 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
             f_percentage = i18n_atof( psz_args );
             if( f_percentage >= 0.0 && f_percentage <= 100.0 )
             {
-                val.f_float = f_percentage / 100.0 ;
-                var_Set( p_instance->p_input, "position", val );
+                var_SetFloat( p_instance->p_input, "position",
+                              f_percentage / 100.0 );
+                return VLC_SUCCESS;
+            }
+        }
+    }
+    else if( !strcmp( psz_command, "msecseek" ) )
+    {
+        double d_msec;
+        int64_t i_time, i_current;
+
+        if( psz_args )
+        {
+            d_msec = i18n_atof( psz_args );
+            i_time = (int64_t)(d_msec * 1000);
+            i_current = var_GetTime( p_instance->p_input, "length" );
+            if( i_time >= 0 && i_time <= i_current )
+            {
+                var_SetTime( p_instance->p_input, "time", i_time );
                 return VLC_SUCCESS;
             }
         }
@@ -1284,16 +1302,15 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
     {
         float f_pos;
         float f_scale;
-        vlc_value_t val;
 
         if( psz_args )
         {
             f_scale = i18n_atof( psz_args );
             f_pos = var_GetFloat( p_instance->p_input, "position" );
-            val.f_float = f_pos - (f_scale / 1000.0);
-            if( val.f_float < 0.0 )
-                val.f_float = 0.0;
-            var_Set( p_instance->p_input, "position", val );
+            f_pos -= (f_scale / 1000.0);
+            if( f_pos < 0. )
+                f_pos = 0.;
+            var_SetFloat( p_instance->p_input, "position", f_pos );
             return VLC_SUCCESS;
         }
     }
@@ -1301,16 +1318,15 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
     {
         float f_pos;
         float f_scale;
-        vlc_value_t val;
 
         if( psz_args )
         {
             f_scale = i18n_atof( psz_args );
             f_pos = var_GetFloat( p_instance->p_input, "position" );
-            val.f_float = f_pos + (f_scale / 1000.0);
-            if( val.f_float > 1.0 )
-                val.f_float = 1.0;
-            var_Set( p_instance->p_input, "position", val );
+            f_pos += (f_scale / 1000.0);
+            if( f_pos > 1.0 )
+                f_pos = 1.0;
+            var_SetFloat( p_instance->p_input, "position", f_pos );
             return VLC_SUCCESS;
         }
     }
@@ -1334,15 +1350,15 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
     }
     else if( !strcmp( psz_command, "pause" ) )
     {
-        vlc_value_t val;
+        int i_state;
 
         if( !p_instance->p_input ) return VLC_SUCCESS;
 
-        var_Get( p_instance->p_input, "state", &val );
+        var_GetInteger( p_instance->p_input, "state" );
 
-        if( val.i_int == PAUSE_S ) val.i_int = PLAYING_S;
-        else val.i_int = PAUSE_S;
-        var_Set( p_instance->p_input, "state", val );
+        if( i_state == PAUSE_S ) i_state = PLAYING_S;
+        else i_state = PAUSE_S;
+        var_SetInteger( p_instance->p_input, "state", i_state );
 
         return VLC_SUCCESS;
     }
@@ -2050,6 +2066,7 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
         MessageAddChild( "pause" );
         MessageAddChild( "stop" );
         MessageAddChild( "seek (percentage)" );
+        MessageAddChild( "msecseek (time in milliseconds)" );
 
         return message;
     }
