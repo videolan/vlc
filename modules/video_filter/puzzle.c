@@ -147,7 +147,7 @@ static void shuffle( vout_sys_t *p_sys )
         for( i = 0; i < p_sys->i_cols * p_sys->i_rows; i++ )
         {
             if( p_sys->pi_order[i] ==
-                ( p_sys->i_cols - 1 ) * p_sys->i_rows + 1 )
+                ( p_sys->i_cols - 1 ) * p_sys->i_rows )
             {
                 p_sys->i_selected = i;
                 break;
