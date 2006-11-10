@@ -619,6 +619,12 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                 psz_instance = ppsz_command[2];
 
                 if( i_command < 4 ) goto syntax_error;
+
+                if( strcmp( ppsz_command[3], "play" ) &&
+                    strcmp( ppsz_command[3], "stop" ) &&
+                    strcmp( ppsz_command[3], "pause" ) &&
+                    strcmp( ppsz_command[3], "seek" ) )
+                    goto syntax_error;
             }
 
             psz_command = ppsz_command[i_index];
