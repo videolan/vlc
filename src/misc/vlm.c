@@ -1381,7 +1381,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
 
         if( !p_instance->p_input ) return VLC_SUCCESS;
 
-        var_GetInteger( p_instance->p_input, "state" );
+        i_state = var_GetInteger( p_instance->p_input, "state" );
 
         if( i_state == PAUSE_S ) i_state = PLAYING_S;
         else i_state = PAUSE_S;
