@@ -322,7 +322,7 @@ int utf8_open (const char *filename, int flags, mode_t mode)
         if (!MultiByteToWideChar (CP_UTF8, 0, filename, -1, wpath, MAX_PATH))
         {
             errno = ENOENT;
-            return NULL;
+            return -1;
         }
         wpath[MAX_PATH] = L'\0';
 
@@ -338,7 +338,7 @@ int utf8_open (const char *filename, int flags, mode_t mode)
     if (local_name == NULL)
     {
         errno = ENOENT;
-        return NULL;
+        return -1;
     }
 
     int fd = open (local_name, flags, mode);
