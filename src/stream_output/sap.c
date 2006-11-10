@@ -614,29 +614,41 @@ static char *SDPGenerate( sap_handler_t *p_sap,
     else
         psz_uri = p_session->psz_uri;
 
+    char *sfilter = NULL;
+    if (var_CreateGetBool (p_sap, "sap-source-filter"))
+    {
+        if (asprintf (&sfilter, "a=source-filter: incl IN IP%c * %s\r\n",
+                      ipv, p_addr->psz_machine) == -1)
+            return NULL;
+    }
+
     /* see the lists in modules/stream_out/rtp.c for compliance stuff */
-    if( asprintf( &psz_sdp,
-                            "v=0\r\n"
-                            "o=- "I64Fd" %d IN IP%c %s\r\n"
-                            "s=%s\r\n"
-                            "c=IN IP%c %s/%d\r\n"
-                            "t=0 0\r\n"
-                            "a=tool:"PACKAGE_STRING"\r\n"
-                            "a=recvonly\r\n"
-                            "a=type:broadcast\n"
-                            "a=source-filter: incl IN IP%c * %s\r\n"
-                            "m=video %d %s %d\r\n"
-                            "%s%s%s",
-                            i_sdp_id, i_sdp_version,
-                            ipv, p_addr->psz_machine,
-                            psz_name, ipv, psz_uri,
-                            (p_session->i_ttl != -1) ? p_session->i_ttl : 255,
-                            ipv, p_addr->psz_machine,
-                            p_session->i_port, 
-                            p_session->b_rtp ? "RTP/AVP" : "udp",
-                            p_session->i_payload,
-                            psz_group ? "a=x-plgroup:" : "",
-                            psz_group ? psz_group : "", psz_group ? "\r\n" : "" ) == -1 )
+    int res = asprintf (&psz_sdp,
+                        "v=0\r\n"
+                        "o=- "I64Fd" %d IN IP%c %s\r\n"
+                        "s=%s\r\n"
+                        "c=IN IP%c %s/%d\r\n"
+                        "t=0 0\r\n"
+                        "a=tool:"PACKAGE_STRING"\r\n"
+                        "a=recvonly\r\n"
+                        "a=type:broadcast\n"
+                        "%s"
+                        "m=video %d %s %d\r\n"
+                        "%s%s%s",
+                        i_sdp_id, i_sdp_version,
+                        ipv, p_addr->psz_machine,
+                        psz_name, ipv, psz_uri,
+                        (p_session->i_ttl != -1) ? p_session->i_ttl : 255,
+                        (sfilter != NULL) ? sfilter : "",
+                        p_session->i_port,
+                        p_session->b_rtp ? "RTP/AVP" : "udp",
+                        p_session->i_payload,
+                        psz_group ? "a=x-plgroup:" : "",
+                        psz_group ? psz_group : "", psz_group ? "\r\n" : "");
+    if (sfilter != NULL)
+        free (sfilter);
+
+    if (res == -1)
         return NULL;
 
     msg_Dbg( p_sap, "Generated SDP (%i bytes):\n%s", strlen(psz_sdp),

@@ -753,6 +753,10 @@ static const char *ppsz_clock_descriptions[] =
     "When the SAP flow control is disabled, " \
     "this lets you set the fixed interval between SAP announcements." )
 
+#define ANN_SAP_SFILTER_TEXT N_("Use SAP source filter")
+#define ANN_SAP_SFILTER_LONGTEXT N_( \
+    "When this is disabled, SAP announcements do not include a " \
+    "source-filter parameter and source-specific multicast is not used.")
 
 /*****************************************************************************
  * Advanced
@@ -1553,6 +1557,8 @@ vlc_module_begin();
                                ANN_SAPCTRL_LONGTEXT, VLC_TRUE );
     add_integer( "sap-interval", 5, NULL, ANN_SAPINTV_TEXT,
                                ANN_SAPINTV_LONGTEXT, VLC_TRUE );
+    add_bool( "sap-source-filter", VLC_TRUE, NULL, ANN_SAP_SFILTER_TEXT,
+              ANN_SAP_SFILTER_LONGTEXT, VLC_TRUE );
     set_subcategory( SUBCAT_SOUT_VOD );
 
 /* CPU options */
