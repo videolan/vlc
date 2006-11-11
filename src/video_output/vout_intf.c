@@ -40,6 +40,7 @@
 #include "vlc_image.h"
 #include "vlc_spu.h"
 #include "vlc_strings.h"
+#include "charset.h"
 
 #include <snapshot.h>
 
@@ -564,7 +565,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
         char *p_mypicturesdir = NULL;
         typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
-                                                   LPSTR );
+                                                   LPWSTR );
         #ifndef CSIDL_FLAG_CREATE
         #   define CSIDL_FLAG_CREATE 0x8000
         #endif
@@ -581,24 +582,16 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         /* load the shfolder dll to retrieve SHGetFolderPath */
         if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
         {
-            SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
-                                                      _T("SHGetFolderPathA") );
-            if( SHGetFolderPath != NULL )
-            {
-                p_mypicturesdir = (char *)malloc( MAX_PATH );
-                if( p_mypicturesdir )
-                {
+           wchar_t wdir[PATH_MAX];
+           SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
+                                                      _T("SHGetFolderPathW") );
+            if ((SHGetFolderPath != NULL )
+             && SUCCEEDED (SHGetFolderPath (NULL,
+                                           CSIDL_MYPICTURES | CSIDL_FLAG_CREATE,
+                                           NULL, SHGFP_TYPE_CURRENT,
+                                           wdir)))
+                p_mypictureswdir = FromWide (wdir);
 
-                    if( S_OK != SHGetFolderPath( NULL,
-                                        CSIDL_MYPICTURES | CSIDL_FLAG_CREATE,
-                                        NULL, SHGFP_TYPE_CURRENT,
-                                        p_mypicturesdir ) )
-                    {
-                        free( p_mypicturesdir );
-                        p_mypicturesdir = NULL;
-                    }
-                }
-            }
             FreeLibrary( shfolder_dll );
         }
 
@@ -637,7 +630,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     /*
      * Did the user specify a directory? If not, path = NULL.
      */
-    path = opendir ( (const char *)val.psz_string  );
+    path = utf8_opendir ( (const char *)val.psz_string  );
 
     if ( path != NULL )
     {
@@ -654,7 +647,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
                 asprintf( &psz_filename, "%s/%s%05d.%s", val.psz_string,
                           psz_prefix, i_num++, format.psz_string );
             }
-            while( ( p_file = fopen( psz_filename, "r" ) ) && !fclose( p_file ) );
+            while( ( p_file = utf8_fopen( psz_filename, "r" ) ) && !fclose( p_file ) );
             var_SetInteger( p_vout, "snapshot-num", i_num );
         }
         else
