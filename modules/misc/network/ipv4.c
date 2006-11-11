@@ -276,13 +276,15 @@ static int OpenUDP( vlc_object_t * p_this )
             if( psz_if_addr != NULL )
                 free( psz_if_addr );
 
+            msg_Dbg( p_this, "IP_ADD_SOURCE_MEMBERSHIP multicast request" );
+
             /* Join Multicast group with source filter */
             if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
                          (char*)&imr,
                          sizeof(struct ip_mreq_source) ) == -1 )
             {
                 msg_Warn( p_this, "Source specific multicast failed (%s) -"
-                          "falling back to non-specific mode",
+                          "check if your OS really supports IGMPv3",
                           strerror(errno) );
                 goto igmpv2;
             }
