@@ -52,15 +52,10 @@ VLC_EXPORT( int, utf8_fprintf, ( FILE *, const char *, ... ) );
 VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
 VLC_EXPORT( const char *, IsUTF8, ( const char * ) );
 
-VLC_EXPORT( char *, FromUTF32, ( const uint32_t * ) );
+#ifdef WIN32
 VLC_EXPORT( char *, FromUTF16, ( const uint16_t * ) );
-
-static inline char *FromWide( const wchar_t *in )
-{
-    return (sizeof( wchar_t ) == 2)
-        ? FromUTF16( (const uint16_t *)in )
-        : FromUTF32( (const uint32_t *)in );
-}
+#define FromWide FromUTF16
+#endif
 
 
 #if !defined (__PLUGIN__)

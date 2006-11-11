@@ -781,102 +781,12 @@ const char *IsUTF8( const char *str )
 
 
 /**
- * UTF32toUTF8(): converts an array from UTF-32 (host byte order)
- * to UTF-8.
- *
- * @param src the UTF-32 table to be converted
- * @param len the number of code points to be converted from src
- * (ie. the number of uint32_t in the table pointed to by src)
- * @param newlen an optional pointer. If not NULL, *newlen will
- * contain the total number of bytes written.
- *
- * @return the result of the conversion (must be free'd())
- * or NULL on error (in that case, *newlen is undefined).
- */
-static char *
-UTF32toUTF8( const uint32_t *src, size_t len, size_t *newlen )
-{
-    char *res, *out;
-
-    /* allocate memory */
-    out = res = (char *)malloc( 6 * len );
-    if( res == NULL )
-        return NULL;
-
-    while( len > 0 )
-    {
-        uint32_t uv = *src++;
-        len--;
-
-        if( uv < 0x80 )
-        {
-            *out++ = uv;
-            continue;
-        }
-        else
-        if( uv < 0x800 )
-        {
-            *out++ = (( uv >>  6)         | 0xc0);
-            *out++ = (( uv        & 0x3f) | 0x80);
-            continue;
-        }
-        else
-        if( uv < 0x10000 )
-        {
-            *out++ = (( uv >> 12)         | 0xe0);
-            *out++ = (((uv >>  6) & 0x3f) | 0x80);
-            *out++ = (( uv        & 0x3f) | 0x80);
-            continue;
-        }
-        else
-        if( uv < 0x110000 )
-        {
-            *out++ = (( uv >> 18)         | 0xf0);
-            *out++ = (((uv >> 12) & 0x3f) | 0x80);
-            *out++ = (((uv >>  6) & 0x3f) | 0x80);
-            *out++ = (( uv        & 0x3f) | 0x80);
-            continue;
-        }
-        else
-        {
-            free( res );
-            return NULL;
-        }
-    }
-    len = out - res;
-    res = realloc( res, len );
-    if( newlen != NULL )
-        *newlen = len;
-    return res;
-}
-
-/**
- * FromUTF32(): converts an UTF-32 string to UTF-8.
- *
- * @param src UTF-32 bytes sequence, aligned on a 32-bits boundary.
- *
- * @return the result of the conversion (must be free()'d),
- * or NULL in case of error.
- */
-char *FromUTF32( const uint32_t *src )
-{
-    const uint32_t *in;
-    size_t len;
-
-    /* determine the size of the string */
-    for( len = 1, in = src; *in; len++ )
-        in++;
-
-    return UTF32toUTF8( src, len, NULL );
-}
-
-/**
  * UTF16toUTF8: converts UTF-16 (host byte order) to UTF-8
  *
  * @param src UTF-16 bytes sequence, aligned on a 16-bits boundary
  * @param len number of uint16_t to convert
  */
-static char *
+static inline char *
 UTF16toUTF8( const uint16_t *in, size_t len, size_t *newlen )
 {
     char *res, *out;

@@ -426,7 +426,7 @@ struct module_symbols_t
     void (*osd_Message_inner) (spu_t *, int, char *, ...);
     int (*osd_ShowTextAbsolute_inner) (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t);
     char * (*config_GetUserDir_inner) (void);
-    char * (*FromUTF32_inner) (const uint32_t *);
+    void *FromUTF32_deprecated;
     int (*__input_Read_inner) (vlc_object_t *, input_item_t *, vlc_bool_t);
     int (*__net_ConnectUDP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int hlim);
     void *__intf_Interact_deprecated;
@@ -933,7 +933,6 @@ struct module_symbols_t
 #  define osd_Message (p_symbols)->osd_Message_inner
 #  define osd_ShowTextAbsolute (p_symbols)->osd_ShowTextAbsolute_inner
 #  define config_GetUserDir (p_symbols)->config_GetUserDir_inner
-#  define FromUTF32 (p_symbols)->FromUTF32_inner
 #  define __input_Read (p_symbols)->__input_Read_inner
 #  define __net_ConnectUDP (p_symbols)->__net_ConnectUDP_inner
 #  define intf_InteractionManage (p_symbols)->intf_InteractionManage_inner
@@ -1415,7 +1414,6 @@ struct module_symbols_t
     ((p_symbols)->osd_Message_inner) = osd_Message; \
     ((p_symbols)->osd_ShowTextAbsolute_inner) = osd_ShowTextAbsolute; \
     ((p_symbols)->config_GetUserDir_inner) = config_GetUserDir; \
-    ((p_symbols)->FromUTF32_inner) = FromUTF32; \
     ((p_symbols)->__input_Read_inner) = __input_Read; \
     ((p_symbols)->__net_ConnectUDP_inner) = __net_ConnectUDP; \
     ((p_symbols)->intf_InteractionManage_inner) = intf_InteractionManage; \
@@ -1551,6 +1549,7 @@ struct module_symbols_t
     (p_symbols)->playlist_NodeGroup_deprecated = NULL; \
     (p_symbols)->playlist_NodeRemoveParent_deprecated = NULL; \
     (p_symbols)->__vlc_fix_readdir_charset_deprecated = NULL; \
+    (p_symbols)->FromUTF32_deprecated = NULL; \
     (p_symbols)->__intf_Interact_deprecated = NULL; \
     (p_symbols)->__intf_UserProgress_deprecated = NULL; \
     (p_symbols)->__intf_UserProgressUpdate_deprecated = NULL; \
