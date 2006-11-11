@@ -152,7 +152,7 @@ static int compare_sub_priority( const void *a, const void *b )
 /*
  * Check if a file ends with a subtitle extension
  */
-int subtitles_Filter( const char *psz_dir_content )
+static int subtitles_Filter( const char *psz_dir_content )
 {
     const char *tmp = strrchr( psz_dir_content, '.');
     if( tmp == NULL )
