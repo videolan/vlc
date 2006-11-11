@@ -120,7 +120,7 @@ static vlc_bool_t finished( vout_sys_t *p_sys )
 }
 static vlc_bool_t is_valid( vout_sys_t *p_sys )
 {
-    int i, s;
+    int i, s=0;
     if( p_sys->b_blackslot == VLC_FALSE ) return VLC_TRUE;
     for( i = 0; i < p_sys->i_cols * p_sys->i_rows; i++ )
     {
@@ -340,6 +340,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             i_last_row *= p_in->i_lines / i_rows;
 
             if( p_vout->p_sys->b_blackslot == VLC_TRUE
+                && p_vout->p_sys->b_finished == VLC_FALSE
                 && i == p_vout->p_sys->i_selected )
             {
                 uint8_t color = ( i_plane == Y_PLANE ? 0x0 : 0x80 );
