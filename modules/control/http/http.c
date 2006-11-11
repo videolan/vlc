@@ -639,8 +639,7 @@ int  E_(HttpCallback)( httpd_file_sys_t *p_args,
     char **pp_data = (char **)_pp_data;
     FILE *f;
 
-    /* FIXME: do we need character encoding translation here? */
-    if( ( f = fopen( p_args->file, "r" ) ) == NULL )
+    if( ( f = utf8_fopen( p_args->file, "r" ) ) == NULL )
     {
         Callback404( p_args, pp_data, pi_data );
         return VLC_SUCCESS;
