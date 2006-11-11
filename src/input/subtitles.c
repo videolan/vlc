@@ -45,6 +45,7 @@
 #endif
 
 #include <ctype.h>
+#include "input_internal.h"
 
 /**
  * We are not going to autodetect more subtitle files than this.
@@ -152,7 +153,7 @@ static int compare_sub_priority( const void *a, const void *b )
 /*
  * Check if a file ends with a subtitle extension
  */
-static int subtitles_Filter( const char *psz_dir_content )
+int subtitles_Filter( const char *psz_dir_content )
 {
     const char *tmp = strrchr( psz_dir_content, '.');
     if( tmp == NULL )
