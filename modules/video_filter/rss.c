@@ -513,12 +513,8 @@ picture_t *LoadImage( filter_t *p_filter, const char *psz_url )
     picture_t *p_orig, *p_pic=NULL;
     image_handler_t *p_handler = image_HandlerCreate( p_filter );
 
-    char *psz_local;
-
-    psz_local = ToLocale( psz_url );
     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-    p_orig = image_ReadUrl( p_handler, psz_local, &fmt_in, &fmt_out );
-    LocaleFree( psz_local );
+    p_orig = image_ReadUrl( p_handler, psz_url, &fmt_in, &fmt_out );
 
     if( !p_orig )
     {
