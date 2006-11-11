@@ -162,7 +162,7 @@ libvlcplugin_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
 libvlcplugin_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla`
 libvlcplugin_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla`
 libvlcplugin_la_LDFLAGS = `$(VLC_CONFIG) --libs mozilla` -module -avoid-version -shrext $(LIBEXT)
-libvlcplugin_la_LIBADD = ../src/libvlc.la
+libvlcplugin_la_LIBADD = ../src/libvlc-control.la
 
 libnpvlc_a_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
 libnpvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla pic` \
