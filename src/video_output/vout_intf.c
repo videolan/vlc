@@ -590,7 +590,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
                                            CSIDL_MYPICTURES | CSIDL_FLAG_CREATE,
                                            NULL, SHGFP_TYPE_CURRENT,
                                            wdir)))
-                p_mypictureswdir = FromWide (wdir);
+                p_mypicturesdir = FromWide (wdir);
 
             FreeLibrary( shfolder_dll );
         }
