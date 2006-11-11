@@ -155,6 +155,15 @@ libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc` \
 	-no-undefined -export-symbols libvlc.sym -version-info 0:0:0
 libvlc_la_DEPENDENCIES = stamp-builtins stamp-api
 
+libvlc_control_la_SOURCES = control/core.c control/log.c control/playlist.c \
+	control/vlm.c control/input.c control/video.c control/audio.c \
+	control/mediacontrol_core.c control/mediacontrol_util.c \
+	control/mediacontrol_audio_video.c
+libvlc_control_la_LIBADD = libvlc.la
+libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
+libvlc_control_la_LDFLAGS = \
+	-no-undefined -export-symbols-regex '_?(libvlc|mediacontrol)_.*' \
+	-version-info 0:0:0
 
 if HAVE_BEOS
 OPT_SOURCES_libvlc_beos = $(SOURCES_libvlc_beos)
@@ -177,7 +186,7 @@ endif
 
 # Build libvlc as a shared library
 if USE_LIBTOOL
-lib_LTLIBRARIES = libvlc.la
+lib_LTLIBRARIES = libvlc.la libvlc-control.la
 else
 lib_LIBRARIES = libvlc.a
 endif
@@ -332,16 +341,6 @@ SOURCES_libvlc_common = \
 	misc/dict.c \
 	misc/devices.c \
 	extras/libc.c \
-	control/core.c \
-	control/log.c \
-	control/playlist.c \
-	control/vlm.c \
-	control/input.c \
-	control/video.c \
-	control/audio.c \
-	control/mediacontrol_core.c \
-	control/mediacontrol_util.c \
-	control/mediacontrol_audio_video.c \
 	$(NULL)
 
 SOURCES_libvlc = \
