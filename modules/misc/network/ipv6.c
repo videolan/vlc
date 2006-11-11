@@ -266,7 +266,7 @@ static int OpenUDP( vlc_object_t * p_this )
             p_sin6 = (struct sockaddr_in6 *)&imr.gsr_source;
             p_sin6->sin6_addr = sock.sin6_addr;
 
-            msg_Dbg( p_this, "IPV6_ADD_SOURCE_MEMBERSHIP multicast request" );
+            msg_Dbg( p_this, "MCAST_JOIN_SOURCE_GROUP multicast request" );
             if( setsockopt( i_handle, IPPROTO_IPV6, MCAST_JOIN_SOURCE_GROUP,
                           (char *)&imr, sizeof(struct group_source_req) ) == -1 )
             {
@@ -282,6 +282,7 @@ static int OpenUDP( vlc_object_t * p_this )
 
             imr.ipv6mr_interface = sock.sin6_scope_id;
             imr.ipv6mr_multiaddr = sock.sin6_addr;
+            msg_Dbg( p_this, "IPV6_JOIN_GROUP multicast request" );
             res = setsockopt(i_handle, IPPROTO_IPV6, IPV6_JOIN_GROUP, (void*) &imr,
 #if defined(WIN32)
                          sizeof(imr) + 4); /* Doesn't work without this */
