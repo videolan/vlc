@@ -566,26 +566,23 @@ static char *GetTmpFilePath( access_t *p_access )
 #ifdef WIN32
         DWORD ret = GetTempPathW (0, NULL);
         wchar_t wdir[ret + 3]; // can at least old "C:" + nul
-        wchar_t *pwdir = wdir, pwdir_free = NULL;
+        const wchar_t *pwdir = wdir;
+        wchar_t *pwdir_free = NULL;
 
         if (GetTempPathW (ret + 1, wdir) == 0)
         {
             pwdir_free = pwdir = _wgetcwd (NULL, 0);
             if (pwdir == NULL)
-                wcscpy (wdir, L"C:");
+                pwdir = L"C:";
         }
 
-        ret = WideCharToMultiByte (CP_UTF8, 0, pwdir, -1, NULL, 0);
-        char mbdir[ret];
-        WideCharToMultiByte (CP_UTF8, 0, pwdir, -1, mbdir, ret);
+        psz_dir = FromWide (pwdir);
         if (pwdir_free != NULL)
             free (pwdir_free);
 
-        /* remove last \\ if any */
-        if (mbdir[strlen (mbdir) - 1] == '\\')
-            mbdir[strlen (mbdit) - 1] = '\0';
-
-        psz_dir = strdup (mbdir);
+        /* remove trailing antislash if any */
+        if (mbdir[strlen (psz_dir) - 1] == '\\')
+            mbdir[strlen (psz_dir) - 1] = '\0';
 #else
         psz_dir = strdup( "/tmp" );
 #endif
