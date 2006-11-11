@@ -118,6 +118,18 @@ static vlc_bool_t finished( vout_sys_t *p_sys )
     }
     return VLC_TRUE;
 }
+static vlc_bool_t is_valid( vout_sys_t *p_sys )
+{
+    int i, s;
+    if( p_sys->b_blackslot == VLC_FALSE ) return VLC_TRUE;
+    for( i = 0; i < p_sys->i_cols * p_sys->i_rows; i++ )
+    {
+        if( (p_sys->i_cols*p_sys->i_rows+i-p_sys->pi_order[i])%2 ) s++;
+        else s--;
+    }
+    if( s!=0 ) return VLC_FALSE;
+    else return VLC_TRUE;
+}
 static void shuffle( vout_sys_t *p_sys )
 {
     int i, c;
@@ -140,7 +152,8 @@ static void shuffle( vout_sys_t *p_sys )
             }
         }
         p_sys->b_finished = finished( p_sys );
-    } while( p_sys->b_finished == VLC_TRUE );
+    } while(    p_sys->b_finished == VLC_TRUE
+             && is_valid( p_sys ) == VLC_FALSE );
 
     if( p_sys->b_blackslot == VLC_TRUE )
     {
