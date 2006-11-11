@@ -142,7 +142,8 @@ static int Activate( vlc_object_t *p_this )
 static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    uint8_t *p_line = p_dest->p->p_pixels;
+    uint8_t *p_pixels = p_dest->p->p_pixels;
+    int      i_pitch  = p_dest->p->i_pitch;
     uint8_t *p_y = p_source->Y_PIXELS;
     uint8_t *p_u = p_source->U_PIXELS;
     uint8_t *p_v = p_source->V_PIXELS;
@@ -151,6 +152,7 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 
     for( i_y = p_vout->render.i_height ; i_y-- ; )
     {
+	uint8_t *p_line = p_pixels;
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_i422_yuy2)
@@ -165,6 +167,7 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             p_line += 16; p_y += 8; p_u += 4; p_v += 4;
 #endif
         }
+	p_pixels += i_pitch;
     }
 }
 
@@ -174,7 +177,8 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    uint8_t *p_line = p_dest->p->p_pixels;
+    uint8_t *p_pixels = p_dest->p->p_pixels;
+    int      i_pitch  = p_dest->p->i_pitch;
     uint8_t *p_y = p_source->Y_PIXELS;
     uint8_t *p_u = p_source->U_PIXELS;
     uint8_t *p_v = p_source->V_PIXELS;
@@ -183,6 +187,7 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
 
     for( i_y = p_vout->render.i_height ; i_y-- ; )
     {
+	uint8_t *p_line = p_pixels;
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_i422_yuy2)
@@ -197,6 +202,7 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
             p_line += 16; p_y += 8; p_u += 4; p_v += 4;
 #endif
         }
+	p_pixels += i_pitch;
     }
 }
 
@@ -206,7 +212,8 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
 static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    uint8_t *p_line = p_dest->p->p_pixels;
+    uint8_t *p_pixels = p_dest->p->p_pixels;
+    int      i_pitch  = p_dest->p->i_pitch;
     uint8_t *p_y = p_source->Y_PIXELS;
     uint8_t *p_u = p_source->U_PIXELS;
     uint8_t *p_v = p_source->V_PIXELS;
@@ -215,6 +222,7 @@ static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
 
     for( i_y = p_vout->render.i_height ; i_y-- ; )
     {
+	uint8_t *p_line = p_pixels;
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_i422_yuy2)
@@ -229,6 +237,7 @@ static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
             p_line += 16; p_y += 8; p_u += 4; p_v += 4;
 #endif
         }
+	p_pixels += i_pitch;
     }
 }
 
