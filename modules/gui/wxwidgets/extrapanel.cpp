@@ -151,6 +151,7 @@ static const struct filter vfilters[] =
     { "motionblur", N_("Blurring"), N_("Adds motion blurring to the image") },
     { "transform",  N_("Transformation"), N_("Rotates or flips the image") },
     { "magnify",  N_("Magnify"), N_("Magnifies part of the image") },
+    { "puzzle",  N_("Puzzle"), N_("Turns the image into a puzzle") },
     { NULL, NULL, NULL } /* Do not remove this line */
 };
 
