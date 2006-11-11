@@ -1,4 +1,3 @@
-# This file is distributed under the same license as the VLC package.
 # Matej Urbančič <matej.urban@gmail.com>, 2006.
 #
 msgid ""
@@ -6,7 +5,7 @@ msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-10-17 10:33+0200\n"
-"PO-Revision-Date: 2006-10-27 14:50+0100\n"
+"PO-Revision-Date: 2006-11-11 08:45+0100\n"
 "Last-Translator: Matej Urbančič <matej.urban@gmail.com>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -895,8 +894,8 @@ msgstr "Dovoda ni mogoče odpreti"
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
-"Predvajalnik VLC ne more odpreti MRL '%s'. Podrobnosti so zabeležene v log "
-"datoteki."
+"Predvajalnik VLC ne more odpreti MRL '%s'. Podrobnosti so zabeležene v "
+"dnevniku."
 
 #: src/input/input.c:2131
 msgid "Can't recognize the input's format"
@@ -996,20 +995,24 @@ msgid "Add Interface"
 msgstr "Razširitve"
 
 #: src/interface/interface.c:374
+#, fuzzy
 msgid "Telnet Interface"
-msgstr "Telnet vmesnik"
+msgstr "Vmesnik"
 
 #: src/interface/interface.c:376
+#, fuzzy
 msgid "Web Interface"
-msgstr "Spletni vmesnik"
+msgstr "Vmesnik"
 
 #: src/interface/interface.c:378
+#, fuzzy
 msgid "Debug logging"
-msgstr "Beleženje razhroščevanja"
+msgstr "Beleženje dnevnika datotek"
 
 #: src/interface/interface.c:380
+#, fuzzy
 msgid "Mouse Gestures"
-msgstr "Gibi miške"
+msgstr "Gibi"
 
 #: src/libvlc-common.c:275 src/libvlc-common.c:443 src/misc/modules.c:1685
 #: src/misc/modules.c:1989
@@ -1901,8 +1904,8 @@ msgid ""
 "This avoids flooding the message log with debug output from the video output "
 "synchronization mechanism."
 msgstr ""
-"Nastavitev omogoča izogibanje beleženja sporočil s podatki razhroščevanja "
-"slike preko mehanizma usklajevanja."
+"Nastavitev omogoča izogibanje beleženja sporočil dnevnika s podatki "
+"razhroščevanja slike preko mehanizma usklajevanja."
 
 #: src/libvlc.h:397
 msgid ""
@@ -6672,11 +6675,12 @@ msgstr "[vcd:][naprava][@[naslov][,[poglavje]]]"
 
 #: modules/access/vcdx/access.c:104
 msgid "The above message had unknown log level"
-msgstr "Zgornje sporočilo je imelo neznano izravnavo beleženja."
+msgstr "Zgornje sporočilo je imelo neznano stopnjo beleženja dnevnika."
 
 #: modules/access/vcdx/access.c:130
 msgid "The above message had unknown vcdimager log level"
-msgstr "Zgornje sporočilo je imelo neznano vcdimager izravnavo beleženja."
+msgstr ""
+"Zgornje sporočilo je imelo neznano vcdimager stopnjo beleženja dnevnika."
 
 #: modules/access/vcdx/access.c:280 modules/access/vcdx/access.c:363
 #: modules/access/vcdx/access.c:689 modules/access/vcdx/info.c:290
@@ -7664,8 +7668,9 @@ msgid "AAC audio decoder (using libfaad2)"
 msgstr "AAC zvočni dekoder (uporaba libfaad2)"
 
 #: modules/codec/faad.c:331
+#, fuzzy
 msgid "AAC extension"
-msgstr "AACe razširitev"
+msgstr "Spregledane razširitve"
 
 #: modules/codec/fake.c:45 modules/video_output/image.c:79
 msgid "Image file"
@@ -8438,8 +8443,9 @@ msgstr ""
 "Poskusite ročno nastaviti kodiranje pred odpiranjem datoteke."
 
 #: modules/codec/svcdsub.c:42
+#, fuzzy
 msgid "Enable debug"
-msgstr "Omogoči razhroščevanje"
+msgstr "Omogoči sliko"
 
 #: modules/codec/svcdsub.c:45
 msgid ""
@@ -8721,8 +8727,9 @@ msgstr ""
 "vrednost 6 pa ostro."
 
 #: modules/codec/x264.c:106
+#, fuzzy
 msgid "H.264 level"
-msgstr "Stopnja H.264"
+msgstr "Najvišja izravnava"
 
 #: modules/codec/x264.c:107
 msgid ""
@@ -8730,17 +8737,16 @@ msgid ""
 "enforced; it's up to the user to select a level compatible with the rest of "
 "the encoding options. Range 1 to 5.1 (10 to 51 is also allowed)."
 msgstr ""
-"Določilo H.264 stopnje (kot je določeno v aneksu A standarda). Stopnje niso "
-"vsiljene; uporabnik sam določi stopnjo, ki je skladna s preostalimi "
-"kodirnimi možnostmi. Območje je med 1 in 5.1 (tudi 10 do 51)."
 
 #: modules/codec/x264.c:116
+#, fuzzy
 msgid "Interlaced mode"
-msgstr "Način prepletanja"
+msgstr "Modul vmesnika"
 
 #: modules/codec/x264.c:117
+#, fuzzy
 msgid "Pure-interlaced mode."
-msgstr "Način čistega prepletanja"
+msgstr "Razpleteni način"
 
 #: modules/codec/x264.c:122
 msgid "Set QP"
@@ -8903,8 +8909,9 @@ msgid "Direct MV prediction mode."
 msgstr "način Direct MV predvidevanja"
 
 #: modules/codec/x264.c:192
+#, fuzzy
 msgid "Direct prediction size"
-msgstr "Neposredna predvidena velikost"
+msgstr "način Direct MV predvidevanja"
 
 #: modules/codec/x264.c:193
 msgid ""
@@ -8912,9 +8919,6 @@ msgid ""
 " -  1: 8x8\n"
 " - -1: smallest possible according to level\n"
 msgstr ""
-"Velikost Direct MV predvidevanja:  -  0: 4x4\n"
-" -  1: 8x8\n"
-" - -1: najmanjši možen glede na lestvico\n"
 
 #: modules/codec/x264.c:199
 msgid "Weighted prediction for B-frames"
@@ -9082,20 +9086,22 @@ msgstr ""
 "Najkoristneše območje je od 10 do 1000."
 
 #: modules/codec/x264.c:274
+#, fuzzy
 msgid "Inter luma quantization deadzone"
-msgstr "Mrtvo območje inter luma deljenja"
+msgstr "Delitveni posrednik I"
 
 #: modules/codec/x264.c:275
 msgid "Set the size of the inter luma quantization deadzone. Range 0 to 32."
-msgstr "Določitev mrtvega območja deljenja inter lume. Območje je med 0 in 32."
+msgstr ""
 
 #: modules/codec/x264.c:278
+#, fuzzy
 msgid "Intra luma quantization deadzone"
-msgstr "Mrtvo območje intra luma deljenja"
+msgstr "Delitveni posrednik I"
 
 #: modules/codec/x264.c:279
 msgid "Set the size of the intra luma quantization deadzone. Range 0 to 32."
-msgstr "Določitev mrtvega območja deljenja intra lume. Območje je med 0 in 32."
+msgstr ""
 
 #: modules/codec/x264.c:285
 msgid "CPU optimizations"
@@ -9148,23 +9154,22 @@ msgstr "Izpiši podrobnosti vsake sličice."
 
 #: modules/codec/x264.c:303
 msgid "SPS and PPS id numbers"
-msgstr "SPS in PPS ID vrednosti"
+msgstr ""
 
 #: modules/codec/x264.c:304
 msgid ""
 "Set SPS and PPS id numbers to allow concatenating streams with different "
 "settings."
 msgstr ""
-"Določitev SPS in PPS ID vrednosti za spajanje pretokov z različnimi "
-"nastavitvami."
 
 #: modules/codec/x264.c:308
+#, fuzzy
 msgid "Access unit delimiters"
-msgstr "Ločila enot dostopa"
+msgstr "Filtri dostopa"
 
 #: modules/codec/x264.c:309
 msgid "Generate access unit delimiter NAL units."
-msgstr "Ustvari ločilo NAL enot dostopa."
+msgstr ""
 
 #: modules/codec/x264.c:315
 msgid "dia"
@@ -9363,7 +9368,7 @@ msgstr "Infrardeči vmesnik za oddaljeni nadzor"
 
 #: modules/control/motion.c:59
 msgid "Use the rotate video filter instead of transform"
-msgstr "Uporabi filter obračanja namesto pretvarjanja."
+msgstr ""
 
 #: modules/control/motion.c:65
 msgid "motion"
@@ -9554,12 +9559,14 @@ msgid "| goto . . . . . . . . . . . .  goto item at index"
 msgstr "| goto . . . . . . . . . . . .  skoči na predmet"
 
 #: modules/control/rc.c:894
+#, fuzzy
 msgid "| repeat [on|off] . .  toggle playlist item repeat"
-msgstr "| repeat [on|off] . .  preklop ponavljanja predmeta"
+msgstr "| f [on|off] . . . . . . . . . . preklop celotnega zaslona"
 
 #: modules/control/rc.c:895
+#, fuzzy
 msgid "| loop [on|off] . . . .  toggle playlist item loop"
-msgstr "| loop [on|off] . . . .  preklop kroženja predvajanja"
+msgstr "| f [on|off] . . . . . . . . . . preklop celotnega zaslona"
 
 #: modules/control/rc.c:896
 msgid "| clear . . . . . . . . . . .   clear the playlist"
@@ -9766,8 +9773,9 @@ msgid "| mosaic-yoffset # . . . .top left corner position"
 msgstr "| mosaic-yoffset # . . . .položaj zgornjega levega kota"
 
 #: modules/control/rc.c:955
+#, fuzzy
 msgid "| mosaic-offsets x,y(,x,y)*. . . . list of offsets"
-msgstr "| mosaic-offsets x,y(,x,y)*. . . . lista odmikov"
+msgstr "| mosaic-xoffset # . . . .položaj zgornjega levega kota"
 
 #: modules/control/rc.c:956
 msgid "| mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
@@ -10430,16 +10438,13 @@ msgstr "Real razvijalec"
 #: modules/demux/subtitle.c:50
 msgid "Apply a delay to all subtitles (in 1/10s, eg 100 means 10s)."
 msgstr ""
-"Določi časovni zamik za vse podnapise (v 1/10s, primer: 100 predstavlja 10 "
-"sekund)"
 
 #: modules/demux/subtitle.c:52
+#, fuzzy
 msgid ""
 "Override the normal frames per second settings. This will only work with "
 "MicroDVD and SubRIP (SRT) subtitles."
-msgstr ""
-"Prepis običajne nastavitve slik na sekundo. To deluje samo z MicroDVD in "
-"SubRIP (SRT) podnapisi."
+msgstr "Prepis slik na sekundo. Deluje samo z MicroDVD in SubRIP podnapisi."
 
 #: modules/demux/subtitle.c:55
 msgid ""
@@ -10447,9 +10452,6 @@ msgid ""
 "\"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" \"sami\", \"dvdsubtitle\" and "
 "\"auto\" (meaning autodetection, this should always work)."
 msgstr ""
-"Določevanje formata podnapisov. Veljavne vrednosti so: \"microdvd\", \"subrip"
-"\", \"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" \"sami\", \"dvdsubtitle\" in "
-"\"auto\" (predstavlja samodejno zaznavanje)."
 
 #: modules/demux/subtitle.c:67
 msgid "Text subtitles parser"
@@ -11182,7 +11184,7 @@ msgstr ""
 "V oknu lahko izberete slikovne učinke.\n"
 "Filtre lahko nastavite posamič med nastavitvami Slika/Filtri.\n"
 "Izbor vrstnega reda izvajanja filtrov lahko prav tako določite med "
-"nastavitvami.."
+"nastavitvami."
 
 #: modules/gui/macosx/fspanel.m:288
 msgid "(no item is being played)"
@@ -11231,7 +11233,7 @@ msgstr "Predvajalnik VLC"
 
 #: modules/gui/macosx/intf.m:505
 msgid "Open CrashLog"
-msgstr "Odpri beležko napak"
+msgstr "Odpri dnevnik napak"
 
 #: modules/gui/macosx/intf.m:510
 msgid "Check for Update..."
@@ -11387,7 +11389,7 @@ msgstr "Glasnost: %d%%"
 
 #: modules/gui/macosx/intf.m:1844
 msgid "No CrashLog found"
-msgstr "Ne najdem beležke napak."
+msgstr "Ne najdem dnevnika napak."
 
 #: modules/gui/macosx/intf.m:1844
 msgid "Couldn't find any trace of a previous crash."
@@ -13130,7 +13132,7 @@ msgstr "Qt vmesnik"
 
 #: modules/gui/qt4/ui/file_open.ui:43
 msgid "Personnalize"
-msgstr "Poosebi"
+msgstr ""
 
 #: modules/gui/qt4/ui/file_open.ui:104
 #: modules/gui/wxwidgets/dialogs/open.cpp:454
@@ -13144,7 +13146,7 @@ msgstr "Prebrskaj"
 
 #: modules/gui/qt4/ui/file_open.ui:343
 msgid "Very Small)</string>"
-msgstr "Zelo majhno)</string>"
+msgstr ""
 
 #: modules/gui/qt4/ui/file_open.ui:347 modules/gui/qt4/ui/file_open.ui:352
 #: modules/gui/qt4/ui/file_open.ui:357 modules/gui/qt4/ui/file_open.ui:362
@@ -13167,12 +13169,13 @@ msgid "Normal"
 msgstr "Običajno"
 
 #: modules/gui/qt4/ui/file_open.ui:358
+#, fuzzy
 msgid "Big"
-msgstr "Veliko"
+msgstr "Premoščanje"
 
 #: modules/gui/qt4/ui/file_open.ui:363
 msgid "Very Big"
-msgstr "Zelo veliko"
+msgstr ""
 
 #: modules/gui/qt4/ui/file_open.ui:370 modules/gui/qt4/ui/file_open.ui:495
 #, fuzzy
@@ -13225,12 +13228,13 @@ msgid "text/css"
 msgstr ""
 
 #: modules/gui/qt4/ui/file_open.ui:392
+#, fuzzy
 msgid "Alignment"
-msgstr "Postavitev"
+msgstr "Poravnava podatkov"
 
 #: modules/gui/qt4/ui/file_open.ui:426
 msgid "Right)</string>"
-msgstr "Desno)</string>"
+msgstr ""
 
 #: modules/gui/qt4/ui/file_open.ui:433
 msgid "QToolButton"
@@ -13279,8 +13283,9 @@ msgid "enabled"
 msgstr "omogoči"
 
 #: modules/gui/qt4/ui/file_open.ui:487
+#, fuzzy
 msgid "Extra Audio File"
-msgstr "Dodatna zvočna datoteka"
+msgstr "Zvočni filter"
 
 #: modules/gui/qt4/ui/file_open.ui:489
 #, fuzzy
@@ -13301,14 +13306,17 @@ msgid "audioOpenLabel"
 msgstr ""
 
 #: modules/gui/qt4/ui/file_open.ui:588
+#, fuzzy
 msgid "Media File"
 msgstr "Medijske datoteke"
 
 #: modules/gui/qt4/ui/file_open.ui:687
+#, fuzzy
 msgid "Disk"
 msgstr "Disk"
 
 #: modules/gui/qt4/ui/file_open.ui:699
+#, fuzzy
 msgid "Disc Type"
 msgstr "Tip diska"
 
@@ -13319,7 +13327,7 @@ msgstr "Možnosti"
 
 #: modules/gui/qt4/ui/file_open.ui:801
 msgid "Peripheric Path"
-msgstr "Zunanja pot"
+msgstr ""
 
 #: modules/gui/qt4/ui/input_stats.ui:16
 msgid "Form"
@@ -14375,15 +14383,14 @@ msgstr "Dvakrat uporabi filter uravnalca zvoka. Učinek bo ostrejši."
 
 #: modules/gui/wxwidgets/extrapanel.cpp:485
 msgid "Smooth :"
-msgstr "Glajenje:"
+msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:516
+#, fuzzy
 msgid ""
 "Preamp\n"
 "12.0dB"
-msgstr ""
-"Predojačevanje\n"
-"12.0dB"
+msgstr "Predojačanje"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:999
 msgid ""
@@ -14772,7 +14779,7 @@ msgstr "Enota wxWidgets vmesnika"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:165
 msgid "last config"
-msgstr "zadnje nastavitve"
+msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:171
 msgid "wxWidgets dialogs provider"
@@ -15088,11 +15095,11 @@ msgstr "Metapodatki MusicBrainz"
 
 #: modules/misc/audioscrobbler.c:124
 msgid "The username of your last.fm account"
-msgstr "Uporabniško ime zadnjega fm računa"
+msgstr ""
 
 #: modules/misc/audioscrobbler.c:126
 msgid "The password of your last.fm account"
-msgstr "Geslo zadnjega fm računa"
+msgstr ""
 
 #: modules/misc/audioscrobbler.c:153
 msgid "Audioscrobbler"
@@ -15104,24 +15111,21 @@ msgstr "Audioscrobbler vključek"
 
 #: modules/misc/audioscrobbler.c:333
 msgid "last.fm username not set"
-msgstr "Uporabniško ime zadnjega fm računa ni določeno"
+msgstr ""
 
 #: modules/misc/audioscrobbler.c:334
 msgid ""
 "You have to set a username, and then restart VLC.\n"
 "Visit https://www.last.fm/join/ if you don't have one."
 msgstr ""
-"Določiti morate uporabniško ime in potem ponovno zagnati predvajalnik VLC.\n"
-"Obiščite https://www.last.fm/join/, če še nimate računa."
 
 #: modules/misc/audioscrobbler.c:819
 msgid "Bad last.fm Username"
-msgstr "Neprimerno uporabniško ime zadnjega fm računa"
+msgstr ""
 
 #: modules/misc/audioscrobbler.c:820
 msgid "last.fm username is incorrect, please verify your settings"
 msgstr ""
-"Nepravilno uporabniško ime zadnjega fm računa. Prosim, preverite nastavitve."
 
 #: modules/misc/dummy/dummy.c:37
 msgid "Dummy image chroma format"
@@ -15391,14 +15395,14 @@ msgstr "Besedilo"
 
 #: modules/misc/logger.c:118
 msgid "Log format"
-msgstr "Format beleženja"
+msgstr "Format dnevnika"
 
 #: modules/misc/logger.c:120
 msgid ""
 "Specify the log format. Available choices are \"text\" (default), \"html\", "
 "and \"syslog\" (special mode to send to syslog instead of file."
 msgstr ""
-"Določitev formata beleženja. Možnosti so \"besedilo\" (privzeto), \"html\", "
+"Določitev formata dnevnika. Možnosti so \"besedilo\" (privzeto), \"html\", "
 "in \"syslog\"."
 
 #: modules/misc/logger.c:124
@@ -15406,23 +15410,23 @@ msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html"
 "\"."
 msgstr ""
-"Določitev formata beleženja. Možnosti so \"besedilo\" (privzeto), \"html\"."
+"Določitev formata dnevnika. Možnosti so \"besedilo\" (privzeto), \"html\"."
 
 #: modules/misc/logger.c:129
 msgid "Logging"
-msgstr "Beleženje"
+msgstr "Beleženje dnevnika"
 
 #: modules/misc/logger.c:130
 msgid "File logging"
-msgstr "Beleženje datotek"
+msgstr "Beleženje dnevnika datotek"
 
 #: modules/misc/logger.c:136
 msgid "Log filename"
-msgstr "Ime datoteke za beleženje"
+msgstr "Ime dnevniške datoteke"
 
 #: modules/misc/logger.c:136
 msgid "Specify the log filename."
-msgstr "Določitev datoteke za beleženje."
+msgstr "Določitev dnevniške datoteke."
 
 #: modules/misc/logger.c:141
 msgid "RRD output file"
@@ -17161,7 +17165,7 @@ msgstr "Popačen način"
 
 #: modules/video_filter/gradient.c:57
 msgid "Distort mode, one of \"gradient\", \"edge\" and \"hough\"."
-msgstr "Način popačenja \"gradient\", \"rob\" and \"zastavljanje\"."
+msgstr "Način popačenja \"gradient\", \"edge\" in \"hough\"."
 
 #: modules/video_filter/gradient.c:59
 msgid "Gradient image type"
@@ -17225,7 +17229,8 @@ msgstr "Animiraj logotipa s # kroženji"
 #: modules/video_filter/logo.c:73
 msgid "Number of loops for the logo animation.-1 = continuous, 0 = disabled"
 msgstr ""
-"Število kroženj pri animiranju logotipa. -1 je neprestano, 0 je onemogočeno."
+"Število kroženj pri animiranju logotipa. -1 je neprestano kroženje, 0 je "
+"onemogočeno."
 
 #: modules/video_filter/logo.c:75
 msgid "Logo individual image time in ms"
@@ -17304,15 +17309,6 @@ msgid ""
 "position (in %), $R = rate, $S = audio sample rate (in kHz), $T = time, $U = "
 "publisher, $V = volume, $_ = new line) "
 msgstr ""
-"Prikaz oznak. (Možne nastavitve so: Izdaja: %Y = leto, %m = mesec, %d = dan, "
-"%H = ure, %M = minute, %S = sekunde, ... Metapodatki: $a = izvajalec, $b = "
-"album, $c = avtorstvo, $d = opis, $e = kodiral, $g = žanr, $l = jezik, $n = "
-"številka sledi, $p = trenutno predvajan, $r = ocena, $s = jezik podnapisov, "
-"$t = naslov, $u = url, $A = datum, $B = bitna stopnja zvoka (kb/s), $C = "
-"poglavje,$D = trajanje, $F = ime in pot, $I = naslov, $L = preostali čas, $N "
-"= ime, $O = jazik zvoka, $P = položaj (%), $R = stopnja, $S = vzorčna "
-"stopnja zvoka (kHz), $T = čas, $U = izdajatelj, $V = glasnost, $_ = nova "
-"vrstica) "
 
 #: modules/video_filter/marq.c:101 modules/video_filter/rss.c:134
 msgid "X offset"
@@ -17430,20 +17426,24 @@ msgid "Y Coordinate of the top-left corner of the mosaic."
 msgstr "Točka Y osi zgornjega levega kota mozaika."
 
 #: modules/video_filter/mosaic.c:108
+#, fuzzy
 msgid "Border width"
-msgstr "Širina robu"
+msgstr "Širina slike"
 
 #: modules/video_filter/mosaic.c:109
+#, fuzzy
 msgid "Width in pixels of the border between miniatures."
-msgstr "Širina robov med miniaturami, v točkah."
+msgstr "Širina robov narisanih vodoravno med elementi mozaika, v točkah."
 
 #: modules/video_filter/mosaic.c:110
+#, fuzzy
 msgid "Border height"
-msgstr "Višina robu"
+msgstr "Višina slike"
 
 #: modules/video_filter/mosaic.c:111
+#, fuzzy
 msgid "Height in pixels of the border between miniatures."
-msgstr "Višina robov med miniaturami, v točkah."
+msgstr "Širina robov narisanih vodoravno med elementi mozaika, v točkah."
 
 #: modules/video_filter/mosaic.c:113
 msgid "Mosaic alignment"
@@ -17846,262 +17846,236 @@ msgid "On Screen Display menu"
 msgstr "Prikaz na zaslonu (OSD) menu"
 
 #: modules/video_filter/panoramix.c:81
+#, fuzzy
 msgid ""
 "Select the number of horizontal video windows in which to split the video"
-msgstr "Izberite število vodoravnih oken v katerih bo deljena slika."
+msgstr "Število vodoravnih oken v katerih bo ločen prikaz slike."
 
 #: modules/video_filter/panoramix.c:85
+#, fuzzy
 msgid "Select the number of vertical video windows in which to split the video"
-msgstr "Izberite število navpičnih oken v katerih bo deljena slika."
+msgstr "Število navpičnih oken v katerih bo ločen prikaz slike."
 
 #: modules/video_filter/panoramix.c:88 modules/video_filter/wall.c:61
 msgid "Active windows"
 msgstr "Aktivna okna"
 
 #: modules/video_filter/panoramix.c:89
+#, fuzzy
 msgid "Comma separated list of active windows, defaults to all"
-msgstr ""
-"Lista aktivnih oken zapisanih ločeno z vejico, privzeta vrednost je vse."
+msgstr "Lista aktivnih oken zapisanih ločeno z vejico."
 
 #: modules/video_filter/panoramix.c:93
 msgid "Panoramix: wall with overlap video filter"
-msgstr "Panoramix: prekrito predvajanje slike"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:94
+#, fuzzy
 msgid "Panoramix"
-msgstr "Panoramix"
+msgstr "Program"
 
 #: modules/video_filter/panoramix.c:103
 msgid "Offset X offset (automatic compensation)"
-msgstr "Odmik X (samodejno nadomeščanje)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:104
 msgid ""
 "Select if you want an automatic offset in horizontal (in case of "
 "misalignment due to autoratio control)"
 msgstr ""
-"Izberite, če želite samodejen vodoravni odmiki (v primeru neporavnanega "
-"območja)"
 
 #: modules/video_filter/panoramix.c:107
 msgid "length of the overlapping area (in %)"
-msgstr "dolžina prekrivajočega območja (v %)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:108
 msgid "Select in percent the length of the blended zone"
-msgstr "Izbor odstotka dolžine obledelega območja."
+msgstr ""
 
 #: modules/video_filter/panoramix.c:111
 msgid "height of the overlapping area (in %)"
-msgstr "višina območja prekrivanja (v %)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:112
 msgid "Select in percent the height of the blended zone (case of 2x2 wall)"
-msgstr "Izbor odstotne vrednosti višine pobledelega območja (primer 2x2 zidu)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:115
+#, fuzzy
 msgid "Attenuation"
-msgstr "Tanjšanje"
+msgstr "Nasičenost"
 
 #: modules/video_filter/panoramix.c:116
 msgid ""
 "Check this option if you want attenuate blended zone by this plug-in (if "
 "option is unchecked, attenuate is made by opengl)"
 msgstr ""
-"Izberite možnost, če želite stanjšati pobledelo območje z vključkom (če ni "
-"izbrano se tanjšanje izvaja preko openGL)"
 
 #: modules/video_filter/panoramix.c:119
 msgid "Attenuation, begin (in %)"
-msgstr "Tanjšanje, začetek (v %)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:120
 msgid "Select in percent the Lagrange coeff of the beginning blended zone"
 msgstr ""
-"Izberite odstotno vrednost Lagrange koeficienta za začetek obledelega "
-"območja."
 
 #: modules/video_filter/panoramix.c:123
 msgid "Attenuation, middle (in %)"
-msgstr "Tanjšanje, sredina (v %)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:124
 msgid "Select in percent the Lagrange coeff of the middle of blended zone"
 msgstr ""
-"Izberite odstotno vrednost Lagrange koeficienta za sredino obledelega "
-"območja."
 
 #: modules/video_filter/panoramix.c:127
 msgid "Attenuation, end (in %)"
-msgstr "Tanjšanje, konec (v %)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:128
 msgid "Select in percent the Lagrange coeff of the end of blended zone"
 msgstr ""
-"Izberite odstotno vrednost Lagrange koeficienta za zaključek obledelega "
-"območja."
 
 #: modules/video_filter/panoramix.c:131
 msgid "middle position (in %)"
-msgstr "srednji položaj (v %)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:132
 msgid ""
 "Select in percent (50 is center) the position of the middle point (Lagrange) "
 "of blended zone"
 msgstr ""
-"Izbor odstotne vrednosti (50% je sredina) položaja sredinske vrednosti "
-"(Lagrange) obledelega območja."
 
 #: modules/video_filter/panoramix.c:135
 msgid "Gamma (Red) correction"
-msgstr "Popravek barve (rdeča)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:136
 msgid ""
 "Select the gamma for the correction of blended zone (Red or Y component)"
-msgstr "Izbor popravka obarvanja za obledelo območje (rdeča ali Y komponenta)."
+msgstr ""
 
 #: modules/video_filter/panoramix.c:139
 msgid "Gamma (Green) correction"
-msgstr "Popravek barve (zelena)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:140
 msgid ""
 "Select the gamma for the correction of blended zone (Green or U component)"
 msgstr ""
-"Izbor popravka obarvanja za obledelo območje (zelena ali U komponenta)."
 
 #: modules/video_filter/panoramix.c:143
 msgid "Gamma (Blue) correction"
-msgstr "Popravek barve (modra)"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:144
 msgid ""
 "Select the gamma for the correction of blended zone (Blue or V component)"
-msgstr "Izbor popravka obarvanja za obledelo območje (modra ali V komponenta)."
+msgstr ""
 
 #: modules/video_filter/panoramix.c:147
 msgid "Black Crush for Red"
-msgstr "Počrnitev rdeče"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:148
 msgid "Select the Black Crush of blended zone (Red or Y component)"
 msgstr ""
-"Izbor počrnitve obarvanja za obledelo območje (rdeča ali Y komponenta)."
 
 #: modules/video_filter/panoramix.c:149
 msgid "Black Crush for Green"
-msgstr "Počrnitev zelene"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:150
 msgid "Select the Black Crush of blended zone (Green or U component)"
 msgstr ""
-"Izbor počrnitve obarvanja za obledelo območje (zelena ali U komponenta)."
 
 #: modules/video_filter/panoramix.c:151
 msgid "Black Crush for Blue"
-msgstr "Počrnitev modre"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:152
 msgid "Select the Black Crush of blended zone (Blue or V component)"
 msgstr ""
-"Izbor počrnitve obarvanja za obledelo območje (modra ali V komponenta)."
 
 #: modules/video_filter/panoramix.c:154
 msgid "White Crush for Red"
-msgstr "Pobleditev rdeče"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:155
 msgid "Select the White Crush of blended zone (Red or Y component)"
 msgstr ""
-"Izbor pobleditve obarvanja za obledelo območje (rdeča ali Y komponenta)."
 
 #: modules/video_filter/panoramix.c:156
 msgid "White Crush for Green"
-msgstr "Pobleditev zelene"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:157
 msgid "Select the White Crush of blended zone (Green or U component)"
 msgstr ""
-"Izbor pobleditve obarvanja za obledelo območje (zelena ali U komponenta)."
 
 #: modules/video_filter/panoramix.c:158
 msgid "White Crush for Blue"
-msgstr "Pobleditev modre"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:159
 msgid "Select the White Crush of blended zone (Blue or V component)"
 msgstr ""
-"Izbor pobleditve obarvanja za obledelo območje (modra ali V komponenta)."
 
 #: modules/video_filter/panoramix.c:161
 msgid "Black Level for Red"
-msgstr "Stopnja počrnitve za rdeče"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:162
 msgid "Select the Black Level of blended zone (Red or Y component)"
 msgstr ""
-"Izbor stopnje počrnitve obarvanja za obledelo območje (rdeča ali Y "
-"komponenta)."
 
 #: modules/video_filter/panoramix.c:163
 msgid "Black Level for Green"
-msgstr "Stopnja počrnitve za zeleno"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:164
 msgid "Select the Black Level of blended zone (Green or U component)"
 msgstr ""
-"Izbor stopnje počrnitve obarvanja za obledelo območje (zelena ali U "
-"komponenta)."
 
 #: modules/video_filter/panoramix.c:165
 msgid "Black Level for Blue"
-msgstr "Stopnja počrnitve za modro"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:166
 msgid "Select the Black Level of blended zone (Blue or V component)"
 msgstr ""
-"Izbor stopnje počrnitve obarvanja za obledelo območje (modra ali V "
-"komponenta)."
 
 #: modules/video_filter/panoramix.c:168
 msgid "White Level for Red"
-msgstr "Stopnja pobleditve za rdeče"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:169
 msgid "Select the White Level of blended zone (Red or Y component)"
 msgstr ""
-"Izbor stopnje pobleditve obarvanja za obledelo območje (rdeča ali Y "
-"komponenta)."
 
 #: modules/video_filter/panoramix.c:170
 msgid "White Level for Green"
-msgstr "Stopnja pobleditve za zeleno"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:171
 msgid "Select the White Level of blended zone (Green or U component)"
 msgstr ""
-"Izbor stopnje pobleditve obarvanja za obledelo območje (zelena ali U "
-"komponenta)."
 
 #: modules/video_filter/panoramix.c:172
 msgid "White Level for Blue"
-msgstr "Stopnja pobleditve za modro"
+msgstr ""
 
 #: modules/video_filter/panoramix.c:173
 msgid "Select the White Level of blended zone (Blue or V component)"
 msgstr ""
-"Izbor stopnje pobleditve obarvanja za obledelo območje (modra ali V "
-"komponenta)."
 
 #: modules/video_filter/panoramix.c:187
+#, fuzzy
 msgid "Xinerama option"
-msgstr "Možnosti Xinerama"
+msgstr "Možnosti izvrševanja"
 
 #: modules/video_filter/panoramix.c:188
 msgid "Uncheck if you have not used xinerama"
-msgstr "Odkljukajte, če niste uporabili xinerama enote"
+msgstr ""
 
 #: modules/video_filter/psychedelic.c:51
 msgid "Psychedelic video filter"
@@ -18958,137 +18932,6 @@ msgstr "Filter vizualizacije"
 msgid "Spectrum analyser"
 msgstr "Spektralna analiza"
 
-#~ msgid "Multicast output interface"
-#~ msgstr "Vmesnik skupinskega pošiljanja odvoda"
-
-#~ msgid "Default multicast interface. This overrides the routing table."
-#~ msgstr ""
-#~ "Privzeti vmesnik skupinskega pošiljanja. Nastavitev prepiše usmerjevalno "
-#~ "tabelo."
-
-#~ msgid "DiffServ Code Point"
-#~ msgstr "Kodna točka DiffServ"
-
-#~ msgid ""
-#~ "Differentiated Services Code Point for outgoing UDP streams (or IPv4 Type "
-#~ "Of Service, or IPv6 Traffic Class). This is used for network Quality of "
-#~ "Service."
-#~ msgstr ""
-#~ "Diferencialna kodna točka storitve za odhodni UDP pretok (IPv4 Tip "
-#~ "storitve ali IPv6 razred prometa). Uporablja se za kakovostne storitve "
-#~ "omrežja."
-
-#~ msgid "Video filters settings"
-#~ msgstr "Nastavitve filtrov slike"
-
-#~ msgid "CDDB Artist"
-#~ msgstr "CDDB Izvajalec"
-
-#~ msgid "CDDB Category"
-#~ msgstr "CDDB Kategorija"
-
-#~ msgid "CDDB Disc ID"
-#~ msgstr "CDDB ID diska"
-
-#~ msgid "CDDB Extended Data"
-#~ msgstr "CDDB razširjeni podatki"
-
-#~ msgid "CDDB Genre"
-#~ msgstr "CDDB Žanr"
-
-#~ msgid "CDDB Year"
-#~ msgstr "CDDB leto"
-
-#~ msgid "CDDB Title"
-#~ msgstr "CDDB Naslov"
-
-#~ msgid "CD-Text Arranger"
-#~ msgstr "CD-Texst urejanje"
-
-#~ msgid "CD-Text Composer"
-#~ msgstr "CD-Tekst sestavljanje"
-
-#~ msgid "CD-Text Disc ID"
-#~ msgstr "CD-Tekst ID diska"
-
-#~ msgid "CD-Text Genre"
-#~ msgstr "CD-Tekst žanr"
-
-#~ msgid "CD-Text Message"
-#~ msgstr "CD-Tekst sporočila"
-
-#~ msgid "CD-Text Songwriter"
-#~ msgstr "CD-Tekst pisec pesmi"
-
-#~ msgid "CD-Text Performer"
-#~ msgstr "CD-Tekst izvajalec"
-
-#~ msgid "CD-Text Title"
-#~ msgstr "CD-Tekst naslov"
-
-#~ msgid "ISO-9660 Application ID"
-#~ msgstr "ISO-9660 ID aplikacije"
-
-#~ msgid "ISO-9660 Preparer"
-#~ msgstr "ISO-9660 pripravljalec"
-
-#~ msgid "ISO-9660 Publisher"
-#~ msgstr "ISO-9660 izdajatelj"
-
-#~ msgid "ISO-9660 Volume"
-#~ msgstr "Enota ISO-9660"
-
-#~ msgid "ISO-9660 Volume Set"
-#~ msgstr "ISO-9660 nabor jakosti"
-
-#~ msgid "Login"
-#~ msgstr "Prijava"
-
-#~ msgid "Console"
-#~ msgstr "Konzola"
-
-#~ msgid "By category"
-#~ msgstr "Po kategoriji"
-
-#~ msgid "Manually added"
-#~ msgstr "Dodan ročno"
-
-#~ msgid "All items, unsorted"
-#~ msgstr "Vsi predmeti, nesortirano"
-
-#~ msgid ""
-#~ "This is the size of the temporary files tha will be used to store the "
-#~ "timeshifted streams."
-#~ msgstr ""
-#~ "Velikost začasnih datotek, ki bodo shranjevale pretoke s časovnim zamikom."
-
-#~ msgid "Name to give to this stream/channel on the icecast server."
-#~ msgstr "Ime, ki določa pretok/kanal na icecast strežniku."
-
-#~ msgid ""
-#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
-#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
-#~ "the icecast server."
-#~ msgstr ""
-#~ "Privzeto morate polniti shoutcast element z OGG pretokom. Možno je "
-#~ "uporabiti MP3 za dostavljanje pretoka na icecast strežnik."
-
-#~ msgid "Corba control"
-#~ msgstr "Corba nadzor"
-
-#~ msgid "Reactivity"
-#~ msgstr "Reaktivnost"
-
-#~ msgid ""
-#~ "The corba interface will handle events every 50ms/Reactivity. 5000 "
-#~ "appears to be a sensible value."
-#~ msgstr ""
-#~ "Corba vmesnik bo prevzel vodenje dogodkov vsakih 50ms/reaktvnost. 5000 je "
-#~ "smiselna vrednost."
-
-#~ msgid "corba control module"
-#~ msgstr "corba nadzorna enota"
-
 #~ msgid "| time-format STRING . . . overlay STRING in video"
 #~ msgstr "| time-format NIZ  . . NIZ prekrivanja oznak"
 
@@ -19110,155 +18953,34 @@ msgstr "Spektralna analiza"
 #~ msgid "| time-size # . . . . . . . . font size, in pixels"
 #~ msgstr "| time-size # . . . . . . . .velikost pisave v točkah"
 
-#~ msgid "Fixing AVI Index"
-#~ msgstr "Popravljam AVI indeks..."
+#~ msgid "Justification"
+#~ msgstr "Poravnavanje"
 
-#~ msgid "Creating AVI Index ..."
-#~ msgstr "Ustvarjam AVI indeks..."
+#~ msgid "Audioscrobbler username"
+#~ msgstr "Audioscrobbler uporabniško ime"
 
-#~ msgid "Playlist metademux"
-#~ msgstr "Metarazvijanje predvajalne liste"
+#~ msgid "Audioscrobbler password"
+#~ msgstr "Audioscrobbler geslo"
 
-#~ msgid "Segment filename"
-#~ msgstr "Ime datoteke dela"
+#~ msgid "Growl"
+#~ msgstr "Growl"
 
-#~ msgid "Muxing application"
-#~ msgstr "Aplikacija za zvijanje"
-
-#~ msgid "Writing application"
-#~ msgstr "Aplikacija za pisanje"
-
-#~ msgid "Listeners"
-#~ msgstr "Poslušalci"
-
-#~ msgid "Native playlist import"
-#~ msgstr "Uvoz privzete predvajalne liste"
-
-#~ msgid "Podcast Link"
-#~ msgstr "Podcast povezava"
-
-#~ msgid "Podcast Copyright"
-#~ msgstr "Podcast avtorske pravice"
-
-#~ msgid "Podcast Category"
-#~ msgstr "Podcast kategorija"
-
-#~ msgid "Podcast Keywords"
-#~ msgstr "Podcast ključne besede"
-
-#~ msgid "Podcast Subtitle"
-#~ msgstr "Podcast podnapis"
-
-#~ msgid "Podcast Publication Date"
-#~ msgstr "Podcast datum publikacije"
-
-#~ msgid "Podcast Author"
-#~ msgstr "Podcast izvajalec"
-
-#~ msgid "Podcast Subcategory"
-#~ msgstr "Podcast podkategorije"
-
-#~ msgid "Podcast Duration"
-#~ msgstr "Podcast trajanje"
-
-#~ msgid "Podcast Type"
-#~ msgstr "Tip Podcast"
-
-#~ msgid "Mime type"
-#~ msgstr "Mime tip"
-
-#~ msgid "TTA demuxer"
-#~ msgstr "TTA razvijalec"
-
-#~ msgid ""
-#~ "This panel allows to select video effects filters to apply.\n"
-#~ "The filters can be configured indivudually in the Preferences, in the "
-#~ "subsections of Video/Filters\n"
-#~ ".To choose the order in which the filter are applied, a filter option "
-#~ "string can be set in the Preferences, Video / Filters section."
-#~ msgstr ""
-#~ "V oknu lahko izberete slikovne učinke.\n"
-#~ "Filtre lahko nastavite posamič med nastavitvami Slika/Filtri.\n"
-#~ "Izbor vrstnega reda izvajanja filtrov lahko prav tako določite med "
-#~ "nastavitvami.."
-
-#~ msgid "Yes"
-#~ msgstr "Da"
-
-#~ msgid "No"
-#~ msgstr "Ne"
-
-#~ msgid ""
-#~ "An error has occurred which probably prevented the proper execution of "
-#~ "the program:"
-#~ msgstr "Prišlo je do napake, ki je preprečila pravilni zagon programa:"
-
-#~ msgid "If you believe that it is a bug, please follow the instructions at:"
-#~ msgstr "Če ste mnenja, da je to napaka, prosim, sledite navodilom na:"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "Odpri okno sporočil"
-
-#~ msgid "Dismiss"
-#~ msgstr "Razveljavi"
-
-#~ msgid "Do not display further errors"
-#~ msgstr "Ne prikaži nadaljnjih napak."
-
-#~ msgid "Crop borders in fullscreen"
-#~ msgstr "Obreži robove v celozaslonskem načinu"
-
-#~ msgid ""
-#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
-#~ "screen without black borders (OpenGL only)."
-#~ msgstr ""
-#~ "V celozaslonskem načinu obreži sliko, da bo prikaz brez črnega robu. "
-#~ "(samo OpenGL)."
-
-#~ msgid "Standard Play"
-#~ msgstr "Običajno predvajanje"
-
-#~ msgid "%i items in playlist (%i not shown)"
-#~ msgstr "%i predmetov v predvajalni listi (%i ni prikazanih)"
-
-#~ msgid "M3U file"
-#~ msgstr "Datoteka M3U"
-
-#~ msgid "Sorted by Artist"
-#~ msgstr "Sortiraj po izvajalcu"
-
-#~ msgid "Sorted by Album"
-#~ msgstr "Sortiraj po albumu"
-
-#~ msgid "Session Announcements (SAP)"
-#~ msgstr "Objave seje (SAP)"
-
-#~ msgid ""
-#~ "Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough"
-#~ "\" and \"psychedelic\"."
-#~ msgstr ""
-#~ "Način popačenja \"wave\", \"ripple\", \"gradient\", \"edge\" \"hough\" in "
-#~ "\"psychedelic\"."
-
-#~ msgid "Distort video filter"
-#~ msgstr "Filtri popačenja slike"
-
-#~ msgid "Number of loops for the logo animation.1 = continuous, 0 = disabled"
-#~ msgstr ""
-#~ "Število kroženj pri animiranju logotipa. -1 je neprestano, 0 je "
-#~ "onemogočeno."
+#~ msgid "MSN"
+#~ msgstr "MSN"
 
 #~ msgid "Marquee text to display."
 #~ msgstr "Prikaz besedila oznak"
 
+#~ msgid "Vertical border width"
+#~ msgstr "Navpična širina robu"
+
 #~ msgid ""
-#~ "Positioning method for the mosaic. auto: automatically choose the best "
-#~ "number of rows and columns. fixed: use the user-defined number of rows "
-#~ "and columns."
-#~ msgstr ""
-#~ "Metoda postavitve za mozaik. samodejno: samodejno izberi najprimernejšo "
-#~ "vrednost stolpcev in vrstic. določeno: uporabi uporabniško nastavitev "
-#~ "stolpcev in vrstic. odmik: uporabi uporabniški odmik za vsako sliko."
+#~ "Width in pixels of the border than can be drawn vertically around the "
+#~ "mosaic."
+#~ msgstr "Širina robov narisanih navpično med elementi mozaika, v točkah."
+
+#~ msgid "Horizontal border width"
+#~ msgstr "Vodoravna širina robu"
 
 #~ msgid "Time format string (%Y%m%d %H%M%S)"
 #~ msgstr "Oblika zapisa časa (%d%m%Y %H%M%S)"
