@@ -76,7 +76,7 @@ enum macroType
 /* Static mapping of macros type to macro strings */
 static struct
 {
-    char *psz_name;
+    const char *psz_name;
     int  i_type;
 }
 StrToMacroTypeTab [] =
