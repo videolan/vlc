@@ -489,6 +489,9 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     i_y = var_GetInteger( p_vout->p_sys->p_vout, "mouse-y" );
     i_x = var_GetInteger( p_vout->p_sys->p_vout, "mouse-x" );
 
+    if( i_y < 0 || i_x < 0 || i_y >= v_h || i_x >= v_w )
+        return VLC_SUCCESS;
+
     if( mouse & MOUSE_CLICKED )
     {
         i_pos = p_vout->p_sys->i_cols * ( ( p_vout->p_sys->i_rows * i_y ) / v_h ) + (p_vout->p_sys->i_cols * i_x ) / v_w;
