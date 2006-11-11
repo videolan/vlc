@@ -581,8 +581,8 @@ static char *GetTmpFilePath( access_t *p_access )
             free (pwdir_free);
 
         /* remove trailing antislash if any */
-        if (mbdir[strlen (psz_dir) - 1] == '\\')
-            mbdir[strlen (psz_dir) - 1] = '\0';
+        if (psz_dir[strlen (psz_dir) - 1] == '\\')
+            psz_dir[strlen (psz_dir) - 1] = '\0';
 #else
         psz_dir = strdup( "/tmp" );
 #endif
