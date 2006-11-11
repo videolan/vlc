@@ -279,6 +279,25 @@ static void End( vout_thread_t *p_vout )
     var_DelCallback( p_vout->p_sys->p_vout, "mouse-clicked", MouseEvent, p_vout);
 }
 
+#define SHUFFLE_WIDTH 81
+#define SHUFFLE_HEIGHT 13
+static char *shuffle_button[] =
+{
+".................................................................................",
+"..............  ............................   ........   ......  ...............",
+"..............  ...........................  .........  ........  ...............",
+"..............  ...........................  .........  ........  ...............",
+"..     .......  .    .......  ....  ......     ......     ......  ........    ...",
+".  .... ......   ...  ......  ....  .......  .........  ........  .......  ..  ..",
+".  ...........  ....  ......  ....  .......  .........  ........  ......  ....  .",
+".      .......  ....  ......  ....  .......  .........  ........  ......        .",
+"..      ......  ....  ......  ....  .......  .........  ........  ......  .......",
+"......  ......  ....  ......  ....  .......  .........  ........  ......  .......",
+". ....  ......  ....  ......  ...   .......  .........  ........  .......  .... .",
+"..     .......  ....  .......    .  .......  .........  ........  ........     ..",
+"................................................................................."};
+
+
 /*****************************************************************************
  * Destroy: destroy Magnify video thread output method
  *****************************************************************************/
@@ -400,6 +419,21 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 0xff, i_pitch / i_cols );
     }
 
+    if( p_vout->p_sys->b_finished == VLC_TRUE )
+    {
+        int i, j;
+        plane_t *p_out = p_outpic->p+Y_PLANE;
+        int i_pitch = p_out->i_pitch;
+        for( i = 0; i < SHUFFLE_HEIGHT; i++ )
+        {
+            for( j = 0; j < SHUFFLE_WIDTH; j++ )
+            {
+                if( shuffle_button[i][j] == '.' )
+                   p_out->p_pixels[ i * i_pitch + j ] = 0xff;
+            }
+        }
+    }
+
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
 }
 
@@ -458,7 +492,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     if( mouse & MOUSE_CLICKED )
     {
         i_pos = p_vout->p_sys->i_cols * ( ( p_vout->p_sys->i_rows * i_y ) / v_h ) + (p_vout->p_sys->i_cols * i_x ) / v_w;
-        if( p_vout->p_sys->b_finished == VLC_TRUE )
+        if( p_vout->p_sys->b_finished == VLC_TRUE
+            && i_x < SHUFFLE_WIDTH && i_y < SHUFFLE_HEIGHT )
         {
             shuffle( p_vout->p_sys );
         }
