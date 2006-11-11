@@ -4,7 +4,7 @@
  * Copyright (C) 2004 the VideoLAN team
  * $Id$
  *
- * Authors: Cl�ent Stenac <zorglub@videolan.org>
+ * Authors: Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,13 +54,8 @@ int Export_Old( vlc_object_t *p_this )
     fprintf( p_export->p_file , PLAYLIST_FILE_HEADER "\n" );
 
     for ( i = 0 ; i < p_export->p_root->i_children ; i++ )
-    {
-        char *psz_uri;
+        utf8_fprintf( p_export->p_file , "%s\n" ,
+                      p_export->p_root->pp_children[i]->p_input->psz_name );
 
-        psz_uri =
-             ToLocale( p_export->p_root->pp_children[i]->p_input->psz_name );
-        fprintf( p_export->p_file , "%s\n" , psz_uri );
-        LocaleFree( psz_uri );
-    }
     return VLC_SUCCESS;
 }
