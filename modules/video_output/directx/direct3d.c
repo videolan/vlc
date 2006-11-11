@@ -814,6 +814,7 @@ D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3DFORMAT 
             return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
         }
         case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','4','2','2'):
         case VLC_FOURCC('Y','V','1','2'):
         {
             /* typically 3D textures don't support planar format
@@ -849,7 +850,6 @@ D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3DFORMAT 
                 { D3DFMT_R8G8B8, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8 };
             return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
         }
-        case VLC_FOURCC('I', '4', '2', '2'):
         case VLC_FOURCC('R', 'V', '3', '2'):
         {
             static const D3DFORMAT formats[] = 
