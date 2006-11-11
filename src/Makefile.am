@@ -140,7 +140,7 @@ endif
 # Building libvlc
 ###############################################################################
 
-libvlc_a_SOURCES = $(SOURCES_libvlc)
+libvlc_a_SOURCES = $(SOURCES_libvlc) $(SOURCES_libvlc_control)
 nodist_libvlc_a_SOURCES = misc/version.c
 libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic` -DUSE_BUILTINS
 libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc pic`
@@ -155,10 +155,7 @@ libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc` \
 	-no-undefined -export-symbols libvlc.sym -version-info 0:0:0
 libvlc_la_DEPENDENCIES = stamp-builtins stamp-api
 
-libvlc_control_la_SOURCES = control/core.c control/log.c control/playlist.c \
-	control/vlm.c control/input.c control/video.c control/audio.c \
-	control/mediacontrol_core.c control/mediacontrol_util.c \
-	control/mediacontrol_audio_video.c
+libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_control_la_LIBADD = libvlc.la
 libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 libvlc_control_la_LDFLAGS = \
@@ -351,6 +348,18 @@ SOURCES_libvlc = \
 	$(OPT_SOURCES_libvlc_dirent) \
 	$(OPT_SOURCES_libvlc_getopt) \
 	$(NULL)
+
+SOURCES_libvlc_control = \
+	control/core.c \
+	control/log.c \
+	control/playlist.c \
+	control/vlm.c \
+	control/input.c \
+	control/video.c \
+	control/audio.c \
+	control/mediacontrol_core.c \
+	control/mediacontrol_util.c \
+	control/mediacontrol_audio_video.c
 
 if !USE_LIBTOOL
 if !BUILD_SHARED
