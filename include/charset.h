@@ -55,7 +55,17 @@ VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
 VLC_EXPORT( const char *, IsUTF8, ( const char * ) );
 
 #ifdef WIN32
-VLC_EXPORT( char *, FromWide, ( const wchar_t * ) );
+static inline char *FromWide (const wchar_t *wide)
+{
+    size_t len = WideCharToMultiByte (CP_UTF8, 0, wide, -1, NULL, 0, NULL, NULL);
+    if (len == 0)
+        return NULL;
+
+    char *out = malloc (len);
+
+    WideCharToMultiByte (CP_UTF8, 0, wide, -1, out, len, NULL, NULL);
+    return out;
+}
 #endif
 
 

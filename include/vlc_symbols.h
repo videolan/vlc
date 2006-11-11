@@ -557,7 +557,6 @@ struct module_symbols_t
     int (*net_ListenSingle_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int family, int socktype, int protocol);
     char * (*str_format_time_inner) (char *);
     char * (*__str_format_meta_inner) (vlc_object_t *, char *);
-    char * (*FromWide_inner) (const wchar_t *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1035,7 +1034,6 @@ struct module_symbols_t
 #  define net_ListenSingle (p_symbols)->net_ListenSingle_inner
 #  define str_format_time (p_symbols)->str_format_time_inner
 #  define __str_format_meta (p_symbols)->__str_format_meta_inner
-#  define FromWide (p_symbols)->FromWide_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1516,7 +1514,6 @@ struct module_symbols_t
     ((p_symbols)->net_ListenSingle_inner) = net_ListenSingle; \
     ((p_symbols)->str_format_time_inner) = str_format_time; \
     ((p_symbols)->__str_format_meta_inner) = __str_format_meta; \
-    ((p_symbols)->FromWide_inner) = FromWide; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__sout_CfgParse_deprecated = NULL; \
     (p_symbols)->sout_CfgCreate_deprecated = NULL; \
