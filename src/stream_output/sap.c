@@ -292,11 +292,11 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                    "\x00\x00\x00\x00\x00\x02\x7f\xfe", 14 );
             if( IN6_IS_ADDR_MULTICAST( a6 ) )
             {
-                /* force reserved bits in flags to zero, preserve scope */
-                a6->s6_addr[1] &= 0x3f;
-
                 /* SSM <=> ff3x::/32 */
                 b_ssm = (GetDWLE (a6->s6_addr) & 0xfff0ffff) == 0xff300000;
+
+		/* force flags to zero, preserve scope */
+                a6->s6_addr[1] &= 0xf;
             }
             else
                 /* Unicast IPv6 - assume global scope */
