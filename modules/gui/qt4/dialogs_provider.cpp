@@ -207,8 +207,8 @@ void DialogsProvider::simplePLAppendDialog()
     foreach( file, files )
     {
         const char * psz_utf8 = qtu( file );
-        playlist_PlaylistAdd( THEPL, psz_utf8, NULL,
-                     PLAYLIST_APPEND | PLAYLIST_PREPARSE, PLAYLIST_END );
+        playlist_Add( THEPL, psz_utf8, NULL,
+                PLAYLIST_APPEND | PLAYLIST_PREPARSE, PLAYLIST_END, VLC_TRUE );
     }
 }
 
@@ -219,8 +219,9 @@ void DialogsProvider::simpleMLAppendDialog()
     foreach( file, files )
     {
         const char * psz_utf8 =  qtu( file );
-        playlist_MLAdd( THEPL, psz_utf8, psz_utf8,
-                        PLAYLIST_APPEND | PLAYLIST_PREPARSE, PLAYLIST_END );
+        playlist_Add( THEPL, psz_utf8, psz_utf8,
+                      PLAYLIST_APPEND | PLAYLIST_PREPARSE, PLAYLIST_END,
+                      VLC_TRUE);
     }
 }
 
@@ -232,10 +233,10 @@ void DialogsProvider::simpleOpenDialog()
     {
         const char * psz_utf8 = qtu( files[i] );
         /* Play the first one, parse and enqueue the other ones */
-        playlist_PlaylistAdd( THEPL, psz_utf8, NULL,
-                     PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
-                     ( i ? PLAYLIST_PREPARSE : 0 ),
-                     PLAYLIST_END );
+        playlist_Add( THEPL, psz_utf8, NULL,
+                      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
+                      ( i ? PLAYLIST_PREPARSE : 0 ),
+                      PLAYLIST_END, VLC_TRUE );
     }
 }
 
@@ -246,8 +247,7 @@ void DialogsProvider::openPlaylist()
     for( size_t i = 0 ; i< files.size(); i++ )
     {
         const char * psz_utf8 = qtu( files[i] );
-        /* Play the first one, parse and enqueue the other ones */
-        playlist_Import( THEPL, psz_utf8, THEPL->p_root_category, VLC_FALSE );
+        playlist_Import( THEPL, psz_utf8 );
     }
 }
 
@@ -258,8 +258,7 @@ void DialogsProvider::openDirectory()
     const char *psz_utf8 = qtu( dir );
     input_item_t *p_input = input_ItemNewExt( THEPL, psz_utf8, NULL,
                                                0, NULL, -1 );
-    playlist_PlaylistAddInput( THEPL, p_input,
-                               PLAYLIST_APPEND, PLAYLIST_END );
+    playlist_AddInput( THEPL, p_input, PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE);
     input_Read( THEPL, p_input, VLC_FALSE );
 }
 void DialogsProvider::openMLDirectory()
@@ -269,7 +268,8 @@ void DialogsProvider::openMLDirectory()
     const char *psz_utf8 = qtu( dir );
     input_item_t *p_input = input_ItemNewExt( THEPL, psz_utf8, NULL,
                                                0, NULL, -1 );
-    playlist_MLAddInput( THEPL, p_input, PLAYLIST_APPEND, PLAYLIST_END );
+    playlist_AddInput( THEPL, p_input, PLAYLIST_APPEND, PLAYLIST_END,
+                        VLC_FALSE );
     input_Read( THEPL, p_input, VLC_FALSE );
 }
 

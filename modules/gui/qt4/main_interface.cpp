@@ -508,9 +508,9 @@ void MainInterface::dropEvent(QDropEvent *event)
      foreach( QUrl url, mimeData->urls() ) {
         QString s = url.toString();
         if( s.length() > 0 ) {
-            playlist_PlaylistAdd( THEPL, qtu(s), NULL,
-                                  PLAYLIST_APPEND | (first ? PLAYLIST_GO:0),
-                                  PLAYLIST_END );
+            playlist_Add( THEPL, qtu(s), NULL,
+                          PLAYLIST_APPEND | (first ? PLAYLIST_GO:0),
+                          PLAYLIST_END, VLC_TRUE );
             first = false;
         }
      }

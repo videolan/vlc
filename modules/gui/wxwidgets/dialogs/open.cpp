@@ -1203,15 +1203,15 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 
         if( b_start )
         {
-            playlist_PlaylistAddInput( p_playlist, p_input,
-                                       PLAYLIST_APPEND | PLAYLIST_GO,
-                                       PLAYLIST_END );
+            playlist_AddInput( p_playlist, p_input,
+                               PLAYLIST_APPEND | PLAYLIST_GO,
+                               PLAYLIST_END, VLC_TRUE );
         }
         else
         {
-            playlist_PlaylistAddInput( p_playlist, p_input,
+            playlist_AddInput( p_playlist, p_input,
                                        PLAYLIST_APPEND|PLAYLIST_PREPARSE,
-                                       PLAYLIST_END );
+                                       PLAYLIST_END, VLC_TRUE );
         }
     }
 

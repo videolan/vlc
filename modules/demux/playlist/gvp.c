@@ -62,7 +62,6 @@ struct demux_sys_t
     playlist_t *p_playlist;
     playlist_item_t *p_current;
     playlist_item_t *p_item_in_category;
-    int i_parent_id;
 };
 
 /*****************************************************************************
@@ -129,12 +128,12 @@ static int Demux( demux_t *p_demux )
     int i_duration = -1;
     char *psz_title = NULL;
     char *psz_description = NULL;
+    input_item_t *p_input;
 
     INIT_PLAYLIST_STUFF;
 
     p_sys->p_playlist = p_playlist;
     p_sys->p_current = p_current;
-    p_sys->i_parent_id = i_parent_id;
     p_sys->p_item_in_category = p_item_in_category;
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
@@ -214,10 +213,9 @@ static int Demux( demux_t *p_demux )
         SADD_INFO( "gvp_version", psz_version );
         SADD_INFO( "docid", psz_docid );
         SADD_INFO( "description", psz_description );
-        playlist_AddWhereverNeeded( p_sys->p_playlist, p_input,
-                            p_sys->p_current, p_sys->p_item_in_category,
-                            (p_sys->i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
-                            PLAYLIST_APPEND );
+        playlist_BothAddInput( p_sys->p_playlist, p_input,
+                               p_sys->p_item_in_category,
+                               PLAYLIST_APPEND, PLAYLIST_END );
     }
 
     HANDLE_PLAY_AND_RELEASE;

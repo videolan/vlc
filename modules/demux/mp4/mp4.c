@@ -415,8 +415,9 @@ static int Open( vlc_object_t * p_this )
                         p_input = input_ItemNewExt( p_playlist, psz_ref, NULL,
                                             0, NULL, -1 );
                         input_ItemCopyOptions( p_current->p_input, p_input );
-                        playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
-                                p_item_in_category, VLC_FALSE, PLAYLIST_APPEND );
+                        playlist_BothAddInput( p_playlist, p_input,
+                                               p_item_in_category,
+                                               PLAYLIST_APPEND, PLAYLIST_END );
                     }
                 }
                 else

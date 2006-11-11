@@ -37,13 +37,13 @@ void CmdAddItem::execute()
     if( m_playNow )
     {
         // Enqueue and play the item
-        playlist_PlaylistAdd( pPlaylist, m_name.c_str(), NULL,
-                              PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+        playlist_Add( pPlaylist, m_name.c_str(), NULL,
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, VLC_TRUE );
     }
     else
     {
         // Enqueue the item only
-        playlist_PlaylistAdd( pPlaylist, m_name.c_str(), NULL,
-                              PLAYLIST_APPEND, PLAYLIST_END );
+        playlist_Add( pPlaylist, m_name.c_str(), NULL,
+                      PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE );
     }
 }

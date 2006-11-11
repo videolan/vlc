@@ -1640,8 +1640,8 @@ void WizardDialog::Run()
             snprintf( psz_ttl, 20, "ttl=%i",i_ttl );
             input_ItemAddOption( p_input, psz_ttl );
 
-            playlist_PlaylistAddInput( p_playlist, p_input,
-                                       PLAYLIST_GO, PLAYLIST_END );
+            playlist_AddInput( p_playlist, p_input,
+                               PLAYLIST_GO, PLAYLIST_END, VLC_TRUE );
             vlc_object_release(p_playlist);
         }
         else

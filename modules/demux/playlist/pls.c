@@ -89,6 +89,7 @@ static int Demux( demux_t *p_demux )
     int            i_item = -1;
     int            i_new_item = 0;
     int            i_key_length;
+    input_item_t *p_input;
 
     INIT_PLAYLIST_STUFF;
 
@@ -155,9 +156,8 @@ static int Demux( demux_t *p_demux )
                 p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
                                             0, NULL, -1 );
                 input_ItemCopyOptions( p_current->p_input, p_input );
-                playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
-                                p_item_in_category, (i_parent_id > 0 ) ?
-                                VLC_TRUE: VLC_FALSE, PLAYLIST_APPEND );
+                playlist_BothAddInput( p_playlist, p_input, p_item_in_category,
+                                        PLAYLIST_APPEND, PLAYLIST_END );
             }
             else
             {
@@ -212,9 +212,8 @@ static int Demux( demux_t *p_demux )
     {
         p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,0, NULL, -1 );
         input_ItemCopyOptions( p_current->p_input, p_input );
-        playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
-                                p_item_in_category, (i_parent_id > 0 ) ?
-                                VLC_TRUE: VLC_FALSE, PLAYLIST_APPEND );
+        playlist_BothAddInput( p_playlist, p_input, p_item_in_category,
+                               PLAYLIST_APPEND, PLAYLIST_END );
         free( psz_mrl_orig );
         psz_mrl = NULL;
     }

@@ -354,17 +354,17 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                 }
                 if( i_opt || config_GetInt( p_this, "playlist-enqueue" ) )
                 {
-                  playlist_PlaylistAddExt( p_playlist, ppsz_argv[i_opt],
+                  playlist_AddExt( p_playlist, ppsz_argv[i_opt],
                     NULL, PLAYLIST_APPEND ,
                     PLAYLIST_END, -1,
                     (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                    i_options );
+                    i_options, VLC_TRUE );
                 } else {
-                  playlist_PlaylistAddExt( p_playlist, ppsz_argv[i_opt],
+                  playlist_AddExt( p_playlist, ppsz_argv[i_opt],
                     NULL, PLAYLIST_APPEND | PLAYLIST_GO,
                     PLAYLIST_END, -1,
                     (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                    i_options );
+                    i_options, VLC_TRUE );
                 }
 
                 i_opt += i_options;

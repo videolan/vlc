@@ -112,8 +112,8 @@ int E_(MMSHOpen)( access_t *p_access )
         msg_Dbg( p_access, "redirection to %s", psz_location );
 
         /** \bug we do not autodelete here */
-        playlist_PlaylistAdd( p_playlist, psz_location, psz_location,
-                              PLAYLIST_INSERT | PLAYLIST_GO, PLAYLIST_END );
+        playlist_Add( p_playlist, psz_location, psz_location,
+                      PLAYLIST_INSERT | PLAYLIST_GO, PLAYLIST_END, VLC_TRUE );
         vlc_object_release( p_playlist );
 
         free( psz_location );

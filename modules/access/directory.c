@@ -178,12 +178,23 @@ static int ReadNull( access_t *p_access, uint8_t *p_buffer, int i_len)
  *****************************************************************************/
 static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
 {
-    char *psz;
-    int  i_mode, i_activity;
+    char               *psz;
+    int                 i_mode, i_activity;
+    playlist_t         *p_playlist = pl_Yield( p_access );
+    playlist_item_t    *p_item_in_category;
+    input_item_t       *p_current_input = ( (input_thread_t*)p_access->p_parent)
+                                                       ->input.p_item;
+    playlist_item_t    *p_current =
+                playlist_LockItemGetByInput( p_playlist, p_current_input );
+    char               *psz_name = strdup (p_access->psz_path);
 
-    char *psz_name = strdup (p_access->psz_path);
-    if (psz_name == NULL)
+    if( psz_name == NULL )
         return VLC_ENOMEM;
+
+    if( p_current == NULL ) {
+        msg_Err( p_access, "unable to find item in playlist" );
+        return VLC_ENOOBJ;
+    }
 
     /* Remove the ending '/' char */
     if (psz_name[0])
@@ -197,9 +208,6 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
         }
     }
 
-    playlist_item_t *p_item, *p_root_category;
-    playlist_t *p_playlist = pl_Yield( p_access );
-
     /* Handle mode */
     psz = var_CreateGetString( p_access, "recursive" );
     if( *psz == '\0' || !strncmp( psz, "none" , 4 )  )
@@ -212,33 +220,19 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
 
     msg_Dbg( p_access, "opening directory `%s'", p_access->psz_path );
 
-    if( p_playlist->status.p_item && p_playlist->status.p_item->p_input ==
-        ((input_thread_t *)p_access->p_parent)->input.p_item )
-        p_item = p_playlist->status.p_item;
-    else
-    {
-        input_item_t *p_current = ( (input_thread_t*)p_access->p_parent)->
-                                                        input.p_item;
-        p_item = playlist_LockItemGetByInput( p_playlist, p_current );
-        if( !p_item )
-        {
-            msg_Dbg( p_playlist, "unable to find item in playlist");
-            return VLC_ENOOBJ;
-        }
-    }
-    p_item->p_input->i_type = ITEM_TYPE_DIRECTORY;
-
-    p_root_category = playlist_LockItemToNode( p_playlist, p_item );
+    p_current->p_input->i_type = ITEM_TYPE_DIRECTORY;
+    p_item_in_category = playlist_LockItemToNode( p_playlist, p_current );
 
     i_activity = var_GetInteger( p_playlist, "activity" );
     var_SetInteger( p_playlist, "activity", i_activity +
                     DIRECTORY_ACTIVITY );
 
-    ReadDir( p_playlist, psz_name, i_mode, p_item, p_root_category );
+    ReadDir( p_playlist, psz_name, i_mode, p_current, p_item_in_category );
 
     i_activity = var_GetInteger( p_playlist, "activity" );
     var_SetInteger( p_playlist, "activity", i_activity -
                     DIRECTORY_ACTIVITY );
+
     if( psz_name ) free( psz_name );
     vlc_object_release( p_playlist );
 
@@ -475,9 +469,10 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                                                  psz_uri, entry, 0, NULL,
                                                  -1, ITEM_TYPE_VFILE );
                 if (p_input != NULL)
-                    playlist_AddWhereverNeeded (p_playlist, p_input, p_parent,
-                                                p_parent_category, VLC_FALSE,
-                                                PLAYLIST_APPEND|PLAYLIST_PREPARSE);
+                    playlist_BothAddInput( p_playlist, p_input,
+                                           p_parent_category,
+                                           PLAYLIST_APPEND|PLAYLIST_PREPARSE,
+                                           PLAYLIST_END );
             }
         }
     }

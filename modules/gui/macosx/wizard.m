@@ -1314,7 +1314,8 @@ static VLCWizard *_o_sharedInstance = nil;
                 @"ttl=%@", [o_userSelections objectForKey:@"ttl"]] \
                 UTF8String] );
 
-            playlist_PlaylistAddInput( p_playlist, p_input, PLAYLIST_STOP, PLAYLIST_END );
+            playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP, 
+		    	PLAYLIST_END, VLC_TRUE );
 
             if( x == 0 )
             {

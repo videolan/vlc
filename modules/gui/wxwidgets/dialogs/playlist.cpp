@@ -978,9 +978,7 @@ void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
 
     if( dialog.ShowModal() == wxID_OK )
     {
-        playlist_Import( p_playlist, dialog.GetPath().mb_str(),
-                         /*FIXME: where do we want to insert ? */
-                         p_playlist->p_local_category, VLC_TRUE );
+        playlist_Import( p_playlist, dialog.GetPath().mb_str() );
     }
 }
 

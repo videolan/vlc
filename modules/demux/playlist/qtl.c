@@ -61,7 +61,6 @@ struct demux_sys_t
     playlist_t *p_playlist;
     playlist_item_t *p_current;
     playlist_item_t *p_item_in_category;
-    int i_parent_id;
 
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
@@ -119,6 +118,7 @@ static int Demux( demux_t *p_demux )
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
     char *psz_eltname = NULL;
+    input_item_t *p_input;
 
     /* List of all possible attributes. The only required one is "src" */
     vlc_bool_t b_autoplay = VLC_FALSE;
@@ -140,7 +140,6 @@ static int Demux( demux_t *p_demux )
 
     p_sys->p_playlist = p_playlist;
     p_sys->p_current = p_current;
-    p_sys->i_parent_id = i_parent_id;
     p_sys->p_item_in_category = p_item_in_category;
 
     p_xml = p_sys->p_xml = xml_Create( p_demux );
@@ -361,19 +360,16 @@ static int Demux( demux_t *p_demux )
                     p_input, "QuickTime Media Link", _(type), "%s", field ) ; }
         SADD_INFO( "href", psz_href );
         SADD_INFO( "mime type", psz_mimetype );
-        playlist_AddWhereverNeeded( p_sys->p_playlist, p_input,
-                            p_sys->p_current, p_sys->p_item_in_category,
-                            (p_sys->i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
-                            PLAYLIST_APPEND );
-
+        playlist_BothAddInput( p_sys->p_playlist, p_input,
+                               p_sys->p_item_in_category, PLAYLIST_APPEND,
+                               PLAYLIST_END );
         if( psz_qtnext )
         {
             p_input = input_ItemNewExt( p_sys->p_playlist,
                                         psz_qtnext, NULL, 0, NULL, -1 );
-            playlist_AddWhereverNeeded( p_sys->p_playlist, p_input,
-                            p_sys->p_current, p_sys->p_item_in_category,
-                            (p_sys->i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
-                            PLAYLIST_APPEND );
+            playlist_BothAddInput( p_sys->p_playlist, p_input,
+                                   p_sys->p_item_in_category,
+                                   PLAYLIST_APPEND, PLAYLIST_END );
         }
     }
 

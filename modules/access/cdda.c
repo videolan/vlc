@@ -501,8 +501,8 @@ static int GetTracks( access_t *p_access,
             }
         }
 #endif
-        playlist_AddWhereverNeeded( p_playlist, p_input_item, p_parent,
-                               p_item_in_category, VLC_FALSE, PLAYLIST_APPEND );
+        playlist_BothAddInput( p_playlist, p_input_item, p_item_in_category,
+                               PLAYLIST_APPEND, PLAYLIST_END );
         free( psz_uri ); free( psz_opt ); free( psz_name );
         free( psz_first ); free( psz_last );
     }

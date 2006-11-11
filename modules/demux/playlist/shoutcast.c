@@ -40,7 +40,6 @@ struct demux_sys_t
     playlist_t *p_playlist;
     playlist_item_t *p_current;
     playlist_item_t *p_item_in_category;
-    int i_parent_id;
 
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
@@ -111,7 +110,6 @@ static int Demux( demux_t *p_demux )
     INIT_PLAYLIST_STUFF;
     p_sys->p_playlist = p_playlist;
     p_sys->p_current = p_current;
-    p_sys->i_parent_id = i_parent_id;
     p_sys->p_item_in_category = p_item_in_category;
 
     p_xml = p_sys->p_xml = xml_Create( p_demux );
@@ -242,10 +240,9 @@ static int DemuxGenre( demux_t *p_demux )
                     input_ItemCopyOptions( p_sys->p_current->p_input,
                                                 p_input );
                     free( psz_mrl );
-                    playlist_AddWhereverNeeded( p_sys->p_playlist, p_input,
-                             p_sys->p_current, p_sys->p_item_in_category,
-                             (p_sys->i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
-                             PLAYLIST_APPEND );
+                    playlist_BothAddInput( p_sys->p_playlist, p_input,
+                                           p_sys->p_item_in_category,
+                                           PLAYLIST_APPEND, PLAYLIST_END );
                     FREENULL( psz_name );
                 }
                 FREENULL( psz_eltname );
@@ -434,10 +431,9 @@ static int DemuxStation( demux_t *p_demux )
                     if( psz_rt )
                         vlc_meta_SetRating( p_input->p_meta, psz_rt );
 
-                    playlist_AddWhereverNeeded( p_sys->p_playlist, p_input,
-                             p_sys->p_current, p_sys->p_item_in_category,
-                             (p_sys->i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
-                             PLAYLIST_APPEND );
+                    playlist_BothAddInput( p_sys->p_playlist, p_input,
+                                           p_sys->p_item_in_category,
+                                           PLAYLIST_APPEND, PLAYLIST_END );
 
                     FREENULL( psz_name );
                     FREENULL( psz_mt )

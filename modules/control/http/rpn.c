@@ -850,8 +850,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             }
             else
             {
-                i_id = playlist_PlaylistAddInput( p_sys->p_playlist, p_input,
-                                         PLAYLIST_APPEND, PLAYLIST_END );
+                i_id = playlist_AddInput( p_sys->p_playlist, p_input,
+                                   PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE );
                 msg_Dbg( p_intf, "requested mrl add: %s", mrl );
             }
             E_(SSPushN)( st, i_id );

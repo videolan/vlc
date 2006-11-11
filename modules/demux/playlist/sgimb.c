@@ -406,9 +406,8 @@ static int Demux ( demux_t *p_demux )
         free( psz_option );
     }
 
-    playlist_AddWhereverNeeded( p_playlist, p_child, p_current,
-                                 p_item_in_category, (i_parent_id > 0 )? VLC_TRUE : VLC_FALSE,
-                                 PLAYLIST_APPEND );
+    playlist_BothAddInput( p_playlist, p_child, p_item_in_category,
+                           PLAYLIST_APPEND, PLAYLIST_END );
     HANDLE_PLAY_AND_RELEASE
     return VLC_SUCCESS;
 }

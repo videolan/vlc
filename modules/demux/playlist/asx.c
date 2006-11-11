@@ -131,7 +131,7 @@ static int Demux( demux_t *p_demux )
     char        *psz_parse = NULL;
     char        *psz_backup = NULL;
     vlc_bool_t  b_entry = VLC_FALSE;
-
+    input_item_t *p_input;
     INIT_PLAYLIST_STUFF;
 
     /* init txt */
@@ -355,9 +355,10 @@ static int Demux( demux_t *p_demux )
                             psz_string[i_strlen] = '\0';
                             p_input = input_ItemNew( p_playlist, psz_string, psz_title_asx );
                             input_ItemCopyOptions( p_current->p_input, p_input );
-                            playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
-                                 p_item_in_category, (i_parent_id > 0 )? VLC_TRUE : VLC_FALSE,
-                                 PLAYLIST_APPEND );
+                            playlist_BothAddInput( p_playlist, p_input,
+                                                   p_item_in_category,
+                                                   PLAYLIST_APPEND,
+                                                   PLAYLIST_END );
                             free( psz_string );
                         }
                         else continue;
@@ -434,10 +435,9 @@ static int Demux( demux_t *p_demux )
                             if( psz_copyright_entry ) vlc_meta_SetCopyright( p_entry->p_meta, psz_copyright_entry );
                             if( psz_moreinfo_entry ) vlc_meta_SetURL( p_entry->p_meta, psz_moreinfo_entry );
                             if( psz_abstract_entry ) vlc_meta_SetDescription( p_entry->p_meta, psz_abstract_entry );
-                            
-                            playlist_AddWhereverNeeded( p_playlist, p_entry, p_current,
-                                p_item_in_category, (i_parent_id > 0 )? VLC_TRUE : VLC_FALSE,
-                                PLAYLIST_APPEND );
+                            playlist_BothAddInput( p_playlist, p_entry,
+                                                 p_item_in_category,
+                                                 PLAYLIST_APPEND, PLAYLIST_END);
                             free( psz_string );
                         }
                         else continue;

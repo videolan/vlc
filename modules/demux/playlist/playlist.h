@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_playlist.h>
 char *E_(ProcessMRL)( char *, char * );
 char *E_(FindPrefix)( demux_t * );
 
@@ -67,31 +68,21 @@ int E_(Import_GVP) ( vlc_object_t * );
 void E_(Close_GVP) ( vlc_object_t * );
 
 #define INIT_PLAYLIST_STUFF \
-    int i_parent_id; \
-    vlc_bool_t b_play; \
-    playlist_item_t *p_current, *p_item_in_category = NULL; \
-    input_item_t *p_input; \
     playlist_t *p_playlist = pl_Yield( p_demux ); \
-    i_parent_id = var_CreateGetInteger( p_demux, "parent-item" ); \
-    if( i_parent_id > 0 ) \
-    { \
-        b_play = VLC_FALSE;     \
-        p_current = playlist_ItemGetById( p_playlist, i_parent_id );    \
-    } \
-    else \
-    { \
-        b_play = E_(FindItem)( p_demux, p_playlist, &p_current ); \
-        p_item_in_category = playlist_ItemToNode( p_playlist, p_current ); \
-        p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;        \
-    }
+    vlc_bool_t b_play = var_CreateGetBool( p_demux, "playlist-autostart" ); \
+    input_item_t *p_current_input = ( (input_thread_t*)p_demux->p_parent)-> \
+                                                         input.p_item; \
+    playlist_item_t *p_current = \
+                 playlist_LockItemGetByInput( p_playlist, p_current_input ); \
+    playlist_item_t *p_item_in_category = \
+                            playlist_ItemToNode( p_playlist, p_current ); \
+    b_play = b_play && p_current == p_playlist->status.p_item; \
+    if( p_item_in_category ) \
+        p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;
 
 #define HANDLE_PLAY_AND_RELEASE \
     /* Go back and play the playlist */ \
-    if( b_play && p_playlist->status.p_item && \
-                  p_playlist->status.p_item->i_children > 0 ) \
-    { \
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,  \
-                          p_playlist->status.p_item, NULL ); \
-    } \
+    if( b_play && p_item_in_category && p_item_in_category->i_children > 0 ) \
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_item_in_category, \
+                          NULL ); \
     vlc_object_release( p_playlist );
-

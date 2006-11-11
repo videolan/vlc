@@ -25,6 +25,9 @@
 #define _VLC_PLAYLIST_H_
 
 #include <assert.h>
+#include <vlc_input.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t);
 TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
@@ -73,9 +76,7 @@ struct playlist_item_t
 #define PLAYLIST_REMOVE_FLAG    0x0010    /**< Remove this item at the end */
 #define PLAYLIST_EXPANDED_FLAG  0x0020    /**< Expanded node */
 
-/**
- * Playlist status
- */
+/** Playlist status */
 typedef enum
 { PLAYLIST_STOPPED,PLAYLIST_RUNNING,PLAYLIST_PAUSED } playlist_status_t;
 
@@ -95,11 +96,6 @@ struct services_discovery_t
 struct playlist_t
 {
     VLC_COMMON_MEMBERS
-/**
-   \name playlist_t
-   These members are uniq to playlist_t
-*/
-/*@{*/
     int                   i_enabled; /**< How many items are enabled ? */
 
     playlist_item_array_t items; /**< Arrays of items */
@@ -172,10 +168,9 @@ struct playlist_t
     /** The input thread computing stats */
     input_thread_t      *p_stats_computer;
     global_stats_t      *p_stats;             /**< Global statistics */
-    /*@}*/
 };
 
-/* Helper to add an item */
+/** Helper to add an item */
 struct playlist_add_t
 {
     int i_node;
@@ -250,7 +245,6 @@ VLC_EXPORT( int,  playlist_NodeSort, ( playlist_t *, playlist_item_t *,int, int 
 VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 
 /* Load/Save */
-VLC_EXPORT( int,  playlist_Import, ( playlist_t *, const char *, playlist_item_t *, vlc_bool_t ) );
 VLC_EXPORT( int,  playlist_Export, ( playlist_t *, const char *, playlist_item_t *, const char * ) );
 
 /********************************************************
@@ -296,68 +290,6 @@ VLC_EXPORT( int, playlist_AddInput, ( playlist_t *, input_item_t *,int , int, vl
 VLC_EXPORT( playlist_item_t *, playlist_NodeAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int ) );
 VLC_EXPORT( void, playlist_NodeAddItem, ( playlist_t *, playlist_item_t *, playlist_item_t *,int , int ) );
 VLC_EXPORT( int, playlist_BothAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int ) );
-VLC_EXPORT( void, playlist_AddWhereverNeeded, (playlist_t* , input_item_t*, playlist_item_t*,playlist_item_t*,vlc_bool_t, int ) );
-
-/** Add a MRL into the playlist.
- * \see playlist_Add
- */
-static inline int playlist_PlaylistAdd( playlist_t *p_playlist,
-                          const char *psz_uri, const char *psz_name,
-                          int i_mode, int i_pos )
-{
-    return playlist_Add( p_playlist, psz_uri, psz_name, i_mode, i_pos,
-                         VLC_TRUE);
-}
-
-/** Add a MRL to the media library
- * \see playlist_Add
- */
-static inline int playlist_MLAdd( playlist_t *p_playlist, const char *psz_uri,
-                                  const char *psz_name, int i_mode, int i_pos )
-{
-    return playlist_Add( p_playlist, psz_uri, psz_name, i_mode, i_pos,
-                         VLC_FALSE );
-}
-
-/** Add a MRL to the playlist, with duration and options given
- * \see playlist_AddExt
- */
-static inline int playlist_PlaylistAddExt( playlist_t *p_playlist,
-            const char * psz_uri, const char *psz_name, int i_mode, int i_pos,
-            mtime_t i_duration, const char **ppsz_options, int i_options ) 
-{
-    return playlist_AddExt( p_playlist, psz_uri, psz_name, i_mode, i_pos,
-                            i_duration, ppsz_options, i_options, VLC_TRUE );
-}
-
-/** Add a MRL to the media library, with duration and options given
- * \see playlist_AddExt
- */
-static inline int playlist_MLAddExt( playlist_t *p_playlist,
-            const char * psz_uri, const char *psz_name, int i_mode, int i_pos,
-            mtime_t i_duration, const char **ppsz_options, int i_options ) 
-{
-    return playlist_AddExt( p_playlist, psz_uri, psz_name, i_mode, i_pos,
-                            i_duration, ppsz_options, i_options, VLC_FALSE );
-}
-
-/** Add an input item to the playlist node
- * \see playlist_AddInput
- */
-static inline int playlist_PlaylistAddInput( playlist_t* p_playlist,
-                                input_item_t *p_input, int i_mode, int i_pos )
-{
-    return playlist_AddInput( p_playlist, p_input, i_mode, i_pos, VLC_TRUE );
-}
-
-/** Add an input item to the media library
- * \see playlist_AddInput
- */
-static inline int playlist_MLAddInput( playlist_t* p_playlist,
-                                input_item_t *p_input, int i_mode, int i_pos )
-{
-    return playlist_AddInput( p_playlist, p_input, i_mode, i_pos, VLC_FALSE );
-}
 
 /********************** Misc item operations **********************/
 VLC_EXPORT( playlist_item_t*, playlist_ItemToNode, (playlist_t *,playlist_item_t *) );
@@ -413,32 +345,27 @@ VLC_EXPORT( playlist_item_t *, playlist_GetPreferredNode, ( playlist_t *p_playli
 /***********************************************************************
  * Inline functions
  ***********************************************************************/
+/** Open a playlist file, add its content to the current playlist */
+static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file){
+    char psz_uri[256+10];
+    input_item_t *p_input;
+    snprintf( psz_uri, 256+9, "file/://%s", psz_file );
+    p_input = input_ItemNewExt( p_playlist, psz_uri, psz_file, 0, NULL, -1 );
+    playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
+                       VLC_TRUE );
+    input_Read( p_playlist, p_input, VLC_TRUE );
+    return VLC_SUCCESS;
+}
 
 /** Tell if the playlist is currently running */
-static inline vlc_bool_t playlist_IsPlaying( playlist_t * p_playlist )
-{
-    vlc_bool_t b_playing;
-    vlc_mutex_lock( &p_playlist->object_lock );
-    b_playing = p_playlist->status.i_status == PLAYLIST_RUNNING;
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    return( b_playing );
-}
+#define playlist_IsPlaying( pl ) ( pl->status.i_status == PLAYLIST_RUNNING )
 
 /** Tell if the playlist is empty */
-static inline vlc_bool_t playlist_IsEmpty( playlist_t * p_playlist )
-{
-    vlc_bool_t b_empty;
-    vlc_mutex_lock( &p_playlist->object_lock );
-    b_empty = p_playlist->items.i_size == 0;
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    return( b_empty );
-}
+#define playlist_IsEmpty( pl ) ( pl->items.i_size == 0 )
 
 /** Tell the number of items in the current playing context */
-static inline int playlist_CurrentSize( vlc_object_t *p_this )
-{
-    return p_this->p_libvlc->p_playlist->current.i_size;
-}
+#define playlist_CurrentSize( obj ) obj->p_libvlc->p_playlist->current.i_size
+
 
 /** Ask the playlist to do some work */
 static inline void playlist_Signal( playlist_t *p_playlist )

@@ -1303,9 +1303,9 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
     {
         char *psz_utf8 = wxDnDFromLocale( filenames[i] );
 
-        playlist_PlaylistAdd( p_playlist, psz_utf8, NULL,
+        playlist_Add( p_playlist, psz_utf8, NULL,
                       PLAYLIST_APPEND | ((i | b_enqueue) ? 0 : PLAYLIST_GO),
-                      PLAYLIST_END );
+                      PLAYLIST_END, VLC_TRUE );
 
         wxDnDLocaleFree( psz_utf8 );
     }

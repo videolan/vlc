@@ -180,7 +180,7 @@ void playlist_LockClear( playlist_t *p_playlist )
  */
 int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
                   const char *psz_name, int i_mode, int i_pos,
-                  vlc_bool_t b_playlist  )
+                  vlc_bool_t b_playlist )
 {
     return playlist_AddExt( p_playlist, psz_uri, psz_name,
                             i_mode, i_pos, -1, NULL, 0, b_playlist );
@@ -275,7 +275,8 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     }
     for( i_top = 0 ; i_top < p_playlist->p_root_onelevel->i_children; i_top++ )
     {
-        if( p_playlist->p_root_onelevel->pp_children[i_top]->p_input->i_id == p_up->p_input->i_id )
+        if( p_playlist->p_root_onelevel->pp_children[i_top]->p_input->i_id ==
+                             p_up->p_input->i_id )
         {
             AddItem( p_playlist, p_item_one,
                      p_playlist->p_root_onelevel->pp_children[i_top], i_pos );
@@ -287,39 +288,6 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     vlc_mutex_unlock( &p_playlist->object_lock );
     return VLC_SUCCESS;
 }
-
-/**
- * Add an item where it should be added, when adding from a node
- * (ex: directory access, playlist demuxers, services discovery, ... )
- * \param p_playlist the playlist
- * \param p_input the input to add
- * \param p_parent the direct node
- * \param p_item_in_category the item within category root (as returned by playlist_ItemToNode)
- * \param b_forced_parent Are we forced to add only to p_parent ?
- */
-void playlist_AddWhereverNeeded( playlist_t *p_playlist, input_item_t *p_input,
-                                 playlist_item_t *p_parent,
-                                 playlist_item_t *p_item_in_category,
-                                 vlc_bool_t b_forced_parent, int i_mode )
-{
-    /* If we have forced a parent :
-     *   - Just add the input to the forced parent (which should be p_parent)
-     * Else
-     *    - If we have item in category, add to it, and to onelevel (bothadd)
-     *    - If we don't, just add to p_parent
-     */
-    if( b_forced_parent == VLC_TRUE || !p_item_in_category  )
-    {
-        playlist_NodeAddInput( p_playlist, p_input, p_parent, i_mode,
-                               PLAYLIST_END );
-    }
-    else
-    {
-        playlist_BothAddInput( p_playlist, p_input, p_item_in_category,
-                               i_mode, PLAYLIST_END );
-    }
-}
-
 
 /** Add an input item to a given node */
 playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
@@ -340,15 +308,6 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
     vlc_mutex_unlock( &p_playlist->object_lock );
 
     return p_item;
-}
-
-/** Add a playlist item to a given node */
-void playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
-                           playlist_item_t *p_parent, int i_mode, int i_pos )
-{
-    vlc_mutex_lock( &p_playlist->object_lock );
-    AddItem( p_playlist, p_item, p_parent, i_pos );
-    vlc_mutex_unlock( &p_playlist->object_lock );
 }
 
 /*****************************************************************************
@@ -395,7 +354,9 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
                                             p_playlist, p_item->p_input->i_id,
                                             p_playlist->p_root_onelevel,
                                             VLC_TRUE );
+        assert( p_item_in_one );
         ChangeToNode( p_playlist, p_item_in_category );
+        /* Item in one is a root, change it to node */
         if( p_item_in_one->p_parent == p_playlist->p_root_onelevel )
             ChangeToNode( p_playlist, p_item_in_one );
         else

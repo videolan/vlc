@@ -56,15 +56,11 @@ int E_(Import_M3U)( vlc_object_t *p_this )
     uint8_t *p_peek;
     CHECK_PEEK( p_peek, 8 );
 
-    if( POKE( p_peek, "#EXTM3U", 7 ) || POKE( p_peek, "RTSPtext", 8 ) ||
-        isExtension( p_demux, ".m3u" ) || isExtension( p_demux, ".vlc" ) ||
-        /* A .ram file can contain a single rtsp link */
-        isExtension( p_demux, ".ram" ) || isExtension( p_demux, ".rm" ) ||
-        isDemux( p_demux,  "m3u" ) )
-    {
-        ;
-    }
-    else
+    if(! ( POKE( p_peek, "#EXTM3U", 7 ) || POKE( p_peek, "RTSPtext", 8 ) ||
+           isExtension( p_demux, ".m3u" ) || isExtension( p_demux, ".vlc" ) ||
+           /* A .ram file can contain a single rtsp link */
+           isExtension( p_demux, ".ram" ) || isExtension( p_demux, ".rm" ) ||
+           isDemux( p_demux,  "m3u" ) ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "found valid M3U playlist" );
@@ -79,8 +75,7 @@ int E_(Import_M3U)( vlc_object_t *p_this )
 void E_(Close_M3U)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-
-    if( p_demux->p_sys->psz_prefix ) free( p_demux->p_sys->psz_prefix );
+    free( p_demux->p_sys->psz_prefix );
     free( p_demux->p_sys );
 }
 
@@ -94,6 +89,7 @@ static int Demux( demux_t *p_demux )
     const char**ppsz_options = NULL;
     int        i_options = 0, i;
     vlc_bool_t b_cleanup = VLC_FALSE;
+    input_item_t *p_input;
 
     INIT_PLAYLIST_STUFF;
 
@@ -172,9 +168,8 @@ static int Demux( demux_t *p_demux )
             if ( psz_artist && *psz_artist )
                 input_ItemAddInfo( p_input, _(VLC_META_INFO_CAT),
                                         _(VLC_META_ARTIST), "%s", psz_artist );
-            playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
-                 p_item_in_category, (i_parent_id > 0 )? VLC_TRUE : VLC_FALSE,
-                 PLAYLIST_APPEND );
+            playlist_BothAddInput( p_playlist, p_input, p_item_in_category,
+                                   PLAYLIST_APPEND, PLAYLIST_END );
             free( psz_mrl );
         }
 

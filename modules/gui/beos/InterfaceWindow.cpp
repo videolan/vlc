@@ -436,8 +436,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                     char psz_uri[1024];
                     memset( psz_uri, 0, 1024 );
                     snprintf( psz_uri, 1024, "dvdnav:%s", psz_device );
-                    playlist_PlaylistAdd( p_playlist, psz_uri, psz_device,
-                                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+                    playlist_Add( p_playlist, psz_uri, psz_device,
+                        PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, VLC_TRUE );
                 }
                 UpdatePlaylist();
             }
@@ -749,8 +749,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
                 if( p_playlist )
                 {
-                    playlist_PlaylistAdd( p_playlist, path.Path(), NULL,
-                                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+                    playlist_Add( p_playlist, path.Path(), NULL,
+                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, VLC_TRUE );
                 }
             }
 

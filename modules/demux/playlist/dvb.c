@@ -95,6 +95,7 @@ void E_(Close_DVB)( vlc_object_t *p_this )
 static int Demux( demux_t *p_demux )
 {
     char       *psz_line;
+    input_item_t *p_input;
     INIT_PLAYLIST_STUFF;
 
     while( (psz_line = stream_ReadLine( p_demux->s )) )
@@ -117,10 +118,8 @@ static int Demux( demux_t *p_demux )
             EnsureUTF8( ppsz_options[i] );
             input_ItemAddOption( p_input, ppsz_options[i] );
         }
-        playlist_AddWhereverNeeded( p_playlist, p_input, p_current, 
-                                    p_item_in_category,
-                                    (i_parent_id > 0 ) ? VLC_TRUE: VLC_FALSE,
-                                    PLAYLIST_APPEND );
+        playlist_BothAddInput( p_playlist, p_input, p_item_in_category,
+                               PLAYLIST_APPEND, PLAYLIST_END );
 
         while( i_options-- ) free( ppsz_options[i_options] );
         if( ppsz_options ) free( ppsz_options );

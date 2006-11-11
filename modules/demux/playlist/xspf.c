@@ -39,7 +39,6 @@
 struct demux_sys_t
 {
     playlist_item_t *p_item_in_category;
-    int i_parent_id;
     input_item_t **pp_tracklist;
     int i_tracklist_entries;
     int i_identifier;
@@ -54,7 +53,7 @@ static int Demux( demux_t * );
  */
 int E_(Import_xspf)( vlc_object_t *p_this )
 {
-    DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".xspf", "xspf-open", 
+    DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".xspf", "xspf-open",
                                       "using XSPF playlist reader" );
     return VLC_SUCCESS;
 }
@@ -75,9 +74,9 @@ int Demux( demux_t *p_demux )
     xml_t *p_xml = NULL;
     xml_reader_t *p_xml_reader = NULL;
     char *psz_name = NULL;
+    input_item_t *p_input;
     INIT_PLAYLIST_STUFF;
     p_demux->p_sys->p_item_in_category = p_item_in_category;
-    p_demux->p_sys->i_parent_id = i_parent_id;
     p_demux->p_sys->pp_tracklist = NULL;
     p_demux->p_sys->i_tracklist_entries = 0;
     p_demux->p_sys->i_identifier = -1;
@@ -481,11 +480,9 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 if( !strcmp( psz_name, psz_element ) )
                 {
                     FREE_ATT();
-                    /* Add it */
-                    playlist_AddWhereverNeeded( p_playlist, p_new_input,
-                              p_item, p_demux->p_sys->p_item_in_category,
-                              (p_demux->p_sys->i_parent_id >0 ) ? VLC_TRUE:
-                              VLC_FALSE, PLAYLIST_APPEND );
+                    playlist_BothAddInput( p_playlist, p_new_input,
+                                           p_demux->p_sys->p_item_in_category,
+                                           PLAYLIST_APPEND, PLAYLIST_END );
                     if( p_demux->p_sys->i_identifier <
                         p_demux->p_sys->i_tracklist_entries )
                     {

@@ -84,8 +84,8 @@ void PlaylistDialog::dropEvent(QDropEvent *event)
      foreach( QUrl url, mimeData->urls() ) {
         QString s = url.toString();
         if( s.length() > 0 ) {
-            playlist_PlaylistAdd( THEPL, qtu(s), NULL,
-                                  PLAYLIST_APPEND, PLAYLIST_END );
+            playlist_Add( THEPL, qtu(s), NULL,
+                          PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE );
         }
      }
      event->acceptProposedAction();

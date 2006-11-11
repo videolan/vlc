@@ -28,33 +28,6 @@
 #include <errno.h>
 
 /**
- * Import a playlist file at a given point of a given view
- * \param p_playlist the playlist to which the new items will be added
- * \param psz_filename the name of the playlistfile to import
- * \return VLC_SUCCESS on success
- */
-int playlist_Import( playlist_t * p_playlist, const char *psz_filename,
-                     playlist_item_t *p_root, vlc_bool_t b_only_there )
-{
-    char *psz_uri, *psz_opt;
-    input_item_t *p_input;
-
-    asprintf( &psz_uri, "file/playlist://%s", psz_filename );
-    p_input = input_ItemNewExt( p_playlist, psz_uri, "playlist", 0, NULL, -1 );
-    if( b_only_there )
-    {
-        asprintf( &psz_opt, "parent-item=%i", p_root->i_id );
-        input_ItemAddOption( p_input, psz_opt );
-        free( psz_opt );
-    }
-    playlist_PlaylistAddInput( p_playlist, p_input, PLAYLIST_APPEND,
-                               PLAYLIST_END );
-    input_Read( p_playlist, p_input, VLC_TRUE );
-    free( psz_uri );
-    return VLC_SUCCESS;
-}
-
-/**
  * Export a node of the playlist to a certain type of playlistfile
  *
  * \param p_playlist the playlist to export

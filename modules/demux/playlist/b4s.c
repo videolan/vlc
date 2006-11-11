@@ -84,6 +84,7 @@ static int Demux( demux_t *p_demux )
     xml_reader_t *p_xml_reader;
     char *psz_elname = NULL;
     int i_type;
+    input_item_t *p_input;
     char *psz_mrl = NULL, *psz_name = NULL, *psz_genre = NULL;
     char *psz_now = NULL, *psz_listeners = NULL, *psz_bitrate = NULL;
 
@@ -265,10 +266,9 @@ static int Demux( demux_t *p_demux )
                     if( psz_bitrate )
                         msg_Err( p_playlist, "Unsupported meta bitrate" );
 
-                    playlist_AddWhereverNeeded( p_playlist, p_input, p_current,
-                         p_item_in_category, (i_parent_id > 0 ) ? VLC_TRUE:
-                                                 VLC_FALSE, PLAYLIST_APPEND );
-
+                    playlist_BothAddInput( p_playlist, p_input,
+                                           p_item_in_category,
+                                           PLAYLIST_APPEND, PLAYLIST_END );
                     FREENULL( psz_name );
                     FREENULL( psz_mrl );
                     FREENULL( psz_genre );
