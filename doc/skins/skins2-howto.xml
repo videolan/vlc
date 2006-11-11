@@ -607,7 +607,7 @@ difficulty to understand how VLC skins work.</para>
 
 <sect2 id="Slider">
   <title>Slider</title>
-  <para>Create a slider.</para>
+  <para>Create a slider. This element can be used alone, or can contain a <link linkend="SliderBackground">SliderBackground</link> element.</para>
   <para>See the <link linkend="commattr">common attributes</link>.</para>
   <sect3 id="sliderup">
     <title>up</title>
@@ -643,6 +643,38 @@ difficulty to understand how VLC skins work.</para>
     <title>tooltiptext</title>
     <para>Tooltip associated with the slider. See also <link linkend="textvars">Text variables</link>.</para>
     <para>Default value: </para>
+  </sect3>
+</sect2>
+
+
+<sect2 id="SliderBackground">
+  <title>SliderBackground</title>
+  <para>Set of background images associated to a slider (it must be a sub-element of a <link linkend="Slider">Slider</link>). The displayed image depends on the value of the corresponding slider; if the SliderBackground contains n images, the image #m will be displayed, where m = n * (slider value). A SliderBackground actually contains a single image, which is divided into a grid to build all the sub-images. All the sub-images of the grid have the same size, and can be separated by unused pixel lines or rows if needed (this is called "padding").</para>
+  <para>See the <link linkend="commattr">common attributes</link>.</para>
+  <sect3 id="sbg_image">
+    <title>image</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>; image containing the sub-images used to draw the background of the slider.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect3>
+  <sect3 id="nbhoriz">
+    <title>nbhoriz</title>
+    <para>Number of sub-images in the horizontal direction.</para>
+    <para>Default value: 1</para>
+  </sect3>
+  <sect3 id="nbvert">
+    <title>nbvert</title>
+    <para>Number of sub-images in the vertical direction.</para>
+    <para>Default value: 1</para>
+  </sect3>
+  <sect3 id="padhoriz">
+    <title>padhoriz</title>
+    <para>Horizontal padding: number of unused pixel rows between two sub-images.</para>
+    <para>Default value: 0</para>
+  </sect3>
+  <sect3 id="padvert">
+    <title>padvert</title>
+    <para>Vertical padding: number of unused pixel lines between two sub-images.</para>
+    <para>Default value: 0</para>
   </sect3>
 </sect2>
 
