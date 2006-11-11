@@ -76,6 +76,7 @@ static inline string sFromLocale( const string &rLocale )
     return res;
 }
 
+#ifdef WIN32
 /// Wrapper around FromWide, to avoid the need to call free()
 static inline string sFromWide( const wstring &rWide )
 {
@@ -84,6 +85,7 @@ static inline string sFromWide( const wstring &rWide )
     free( s );
     return res;
 }
+#endif
 
 /// Wrapper around ToLocale, to avoid the need to call LocaleFree()
 static inline string sToLocale( const string &rUTF8 )
