@@ -1779,30 +1779,35 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
     if( psz_ipod == NULL )
     {
 #ifdef WIN32
-        char *p_filename = "\\Apple Computer\\iTunes\\SC Info\\SC Info.sidb";
+        const wchar_t *wfile =
+                L"\\Apple Computer\\iTunes\\SC Info\\SC Info.sidb";
         typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
-                                                   LPSTR );
+                                                   LPWSTR );
         HINSTANCE shfolder_dll = NULL;
         SHGETFOLDERPATH dSHGetFolderPath = NULL;
+        wchar_t wpath[PATH_MAX];
 
         if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
         {
             dSHGetFolderPath =
                 (SHGETFOLDERPATH)GetProcAddress( shfolder_dll,
-                                                 _T("SHGetFolderPathA") );
+                                                 _T("SHGetFolderPathW") );
         }
 
         if( dSHGetFolderPath != NULL &&
             SUCCEEDED( dSHGetFolderPath( NULL, CSIDL_COMMON_APPDATA,
-                                         NULL, 0, p_tmp ) ) )
+                                         NULL, 0, wpath ) ) )
         {
-            strncat( p_tmp, p_filename, min( strlen( p_filename ),
-                     (sizeof(p_tmp) - 1) - strlen( p_tmp ) ) );
+            if (wcslen( wpath ) + wcslen( wfile ) >= PATH_MAX )
+            {
+                return -1;
+            }
+            wcscat( wpath, wfile );
 
-            psz_path = FromLocale( p_tmp );
+            psz_path = FromWide( wpath );
             strncpy( p_tmp, psz_path, sizeof( p_tmp ) - 1 );
             p_tmp[sizeof( p_tmp ) - 1] = '\0';
-            LocaleFree( psz_path );
+            free( psz_path );
             psz_path = p_tmp;
         }
 
