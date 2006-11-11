@@ -483,7 +483,7 @@ struct module_symbols_t
     char * (*convert_xml_special_chars_inner) (const char *psz_content);
     char * (*unescape_URI_duplicate_inner) (const char *psz);
     void (*resolve_xml_special_chars_inner) (char *psz_value);
-    char * (*FromUTF16_inner) (const uint16_t *);
+    void *FromUTF16_deprecated;
     const char * (*IsUTF8_inner) (const char *);
     const char * (*GetFallbackEncoding_inner) (void);
     int (*utf8_scandir_inner) (const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ));
@@ -557,6 +557,7 @@ struct module_symbols_t
     int (*net_ListenSingle_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int family, int socktype, int protocol);
     char * (*str_format_time_inner) (char *);
     char * (*__str_format_meta_inner) (vlc_object_t *, char *);
+    char * (*FromWide_inner) (const wchar_t *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -979,7 +980,6 @@ struct module_symbols_t
 #  define convert_xml_special_chars (p_symbols)->convert_xml_special_chars_inner
 #  define unescape_URI_duplicate (p_symbols)->unescape_URI_duplicate_inner
 #  define resolve_xml_special_chars (p_symbols)->resolve_xml_special_chars_inner
-#  define FromUTF16 (p_symbols)->FromUTF16_inner
 #  define IsUTF8 (p_symbols)->IsUTF8_inner
 #  define GetFallbackEncoding (p_symbols)->GetFallbackEncoding_inner
 #  define utf8_scandir (p_symbols)->utf8_scandir_inner
@@ -1035,6 +1035,7 @@ struct module_symbols_t
 #  define net_ListenSingle (p_symbols)->net_ListenSingle_inner
 #  define str_format_time (p_symbols)->str_format_time_inner
 #  define __str_format_meta (p_symbols)->__str_format_meta_inner
+#  define FromWide (p_symbols)->FromWide_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1460,7 +1461,6 @@ struct module_symbols_t
     ((p_symbols)->convert_xml_special_chars_inner) = convert_xml_special_chars; \
     ((p_symbols)->unescape_URI_duplicate_inner) = unescape_URI_duplicate; \
     ((p_symbols)->resolve_xml_special_chars_inner) = resolve_xml_special_chars; \
-    ((p_symbols)->FromUTF16_inner) = FromUTF16; \
     ((p_symbols)->IsUTF8_inner) = IsUTF8; \
     ((p_symbols)->GetFallbackEncoding_inner) = GetFallbackEncoding; \
     ((p_symbols)->utf8_scandir_inner) = utf8_scandir; \
@@ -1516,6 +1516,7 @@ struct module_symbols_t
     ((p_symbols)->net_ListenSingle_inner) = net_ListenSingle; \
     ((p_symbols)->str_format_time_inner) = str_format_time; \
     ((p_symbols)->__str_format_meta_inner) = __str_format_meta; \
+    ((p_symbols)->FromWide_inner) = FromWide; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__sout_CfgParse_deprecated = NULL; \
     (p_symbols)->sout_CfgCreate_deprecated = NULL; \
@@ -1560,6 +1561,7 @@ struct module_symbols_t
     (p_symbols)->vlc_HashInsert_deprecated = NULL; \
     (p_symbols)->vlc_HashLookup_deprecated = NULL; \
     (p_symbols)->vlc_HashRetrieve_deprecated = NULL; \
+    (p_symbols)->FromUTF16_deprecated = NULL; \
     (p_symbols)->playlist_ItemNewFromInput_deprecated = NULL; \
     (p_symbols)->playlist_PlaylistAdd_deprecated = NULL; \
     (p_symbols)->playlist_PlaylistAddExt_deprecated = NULL; \

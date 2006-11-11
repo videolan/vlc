@@ -2,9 +2,11 @@
  * charset.h: Determine a canonical name for the current locale's character encoding.
  *****************************************************************************
  * Copyright (C) 2003-2005 the VideoLAN team
+ * Copyright © 2005-2006 Rémi Denis-Courmont
  * $Id$
  *
- * Author: Derk-Jan Hartman <thedj at users.sourceforge.net>
+ * Authors: Rémi Denis-Courmont <rem # videolan,org>
+ *          Derk-Jan Hartman <thedj at users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,8 +55,7 @@ VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
 VLC_EXPORT( const char *, IsUTF8, ( const char * ) );
 
 #ifdef WIN32
-VLC_EXPORT( char *, FromUTF16, ( const uint16_t * ) );
-#define FromWide FromUTF16
+VLC_EXPORT( char *, FromWide, ( const wchar_t * ) );
 #endif
 
 
