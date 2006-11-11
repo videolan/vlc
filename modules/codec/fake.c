@@ -64,7 +64,7 @@ static picture_t *DecodeBlock  ( decoder_t *, block_t ** );
 #define DEINTERLACE_MODULE_LONGTEXT N_( \
     "Deinterlace module to use." )
 
-static char *ppsz_deinterlace_type[] =
+static const char *ppsz_deinterlace_type[] =
 {
     "deinterlace", "ffmpeg-deinterlace"
 };
@@ -106,7 +106,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     image_handler_t *p_handler;
     video_format_t fmt_in, fmt_out;
     picture_t *p_image;
-    char *psz_file, *psz_local;
+    char *psz_file;
     vlc_bool_t b_keep_ar;
     int i_aspect = 0;
 
@@ -161,9 +161,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     p_handler = image_HandlerCreate( p_dec );
-    psz_local = ToLocale( psz_file );
-    p_image = image_ReadUrl( p_handler, psz_local, &fmt_in, &fmt_out );
-    LocaleFree( psz_local );
+    p_image = image_ReadUrl( p_handler, psz_file, &fmt_in, &fmt_out );
     image_HandlerDelete( p_handler );
 
     if ( p_image == NULL )
