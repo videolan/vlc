@@ -564,21 +564,28 @@ static char *GetTmpFilePath( access_t *p_access )
     if( psz_dir == NULL )
     {
 #ifdef WIN32
-        char psz_local_dir[MAX_PATH];
-        int i_size;
+        DWORD ret = GetTempPathW (0, NULL);
+        wchar_t wdir[ret + 3]; // can at least old "C:" + nul
+        wchar_t *pwdir = wdir, pwdir_free = NULL;
 
-        i_size = GetTempPath( MAX_PATH, psz_local_dir );
-        if( i_size <= 0 || i_size > MAX_PATH )
+        if (GetTempPathW (ret + 1, wdir) == 0)
         {
-            if( !getcwd( psz_local_dir, MAX_PATH ) )
-                strcpy( psz_local_dir, "C:" );
+            pwdir_free = pwdir = _wgetcwd (NULL, 0);
+            if (pwdir == NULL)
+                wcscpy (wdir, L"C:");
         }
 
-        psz_dir = FromLocaleDup( psz_local_dir );
+        ret = WideCharToMultiByte (CP_UTF8, 0, pwdir, -1, NULL, 0);
+        char mbdir[ret];
+        WideCharToMultiByte (CP_UTF8, 0, pwdir, -1, mbdir, ret);
+        if (pwdir_free != NULL)
+            free (pwdir_free);
 
         /* remove last \\ if any */
-        if( psz_dir[strlen(psz_dir)-1] == '\\' )
-            psz_dir[strlen(psz_dir)-1] = '\0';
+        if (mbdir[strlen (mbdir) - 1] == '\\')
+            mbdir[strlen (mbdit) - 1] = '\0';
+
+        psz_dir = strdup (mbdir);
 #else
         psz_dir = strdup( "/tmp" );
 #endif
