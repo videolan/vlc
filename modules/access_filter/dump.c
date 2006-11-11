@@ -293,7 +293,7 @@ static void Trigger (access_t *access)
 
     msg_Info (access, "dumping media to \"%s\"...", filename);
 
-    FILE *newstream = fopen (filename, "wb");
+    FILE *newstream = utf8_fopen (filename, "wb");
     if (newstream == NULL)
     {
         msg_Err (access, "cannot create dump file \"%s\": %s", filename,
