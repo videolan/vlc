@@ -187,7 +187,7 @@ static int OpenUDP( vlc_object_t * p_this )
 #   define IPV6_PROTECTION_LEVEL 23
 #  endif
     {
-        int i_val = 30 /*PROTECTION_LEVEL_UNRESTRICTED*/;
+        int i_val = 10 /*PROTECTION_LEVEL_UNRESTRICTED*/;
         setsockopt( i_handle, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
                     sizeof( i_val ) );
     }
