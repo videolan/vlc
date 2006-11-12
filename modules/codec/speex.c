@@ -220,7 +220,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_dec->fmt_in.p_extra =
             realloc( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra +
                      oggpacket.bytes + 2 );
-        p_extra = p_dec->fmt_in.p_extra + p_dec->fmt_in.i_extra;
+        p_extra = ((uint8_t *)p_dec->fmt_in.p_extra) + p_dec->fmt_in.i_extra;
         *(p_extra++) = oggpacket.bytes >> 8;
         *(p_extra++) = oggpacket.bytes & 0xFF;
 
