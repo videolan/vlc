@@ -3594,7 +3594,7 @@ if test "${enable_glx}" != "no" &&
       VLC_ADD_PLUGINS([glx])
       VLC_ADD_LDFLAGS([glx],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lGL -lGLU])
       VLC_ADD_CPPFLAGS([glx],[${X_CFLAGS}])
-   ])
+   ],[AC_MSG_ERROR([Please install GL development package. Alternatively you can also configure with --disable-glx.])])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
