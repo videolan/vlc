@@ -519,7 +519,7 @@ struct module_symbols_t
     void (*__stats_TimersClean_inner) (vlc_object_t *);
     void *__intf_IntfProgressUpdate_deprecated;
     void *__intf_IntfProgress_deprecated;
-    void *streaming_ChainToPsz_deprecated;
+    char* (*streaming_ChainToPsz_inner) (sout_chain_t*);
     int (*__intf_UserWarn_inner) (vlc_object_t*, const char*, const char*, ...);
     vlc_bool_t (*__intf_UserProgressIsCancelled_inner) (vlc_object_t*, int);
     int (*__intf_Progress_inner) (vlc_object_t*, const char*, const char*, float, int);
@@ -558,6 +558,7 @@ struct module_symbols_t
     char * (*str_format_time_inner) (char *);
     char * (*__str_format_meta_inner) (vlc_object_t *, char *);
     int (*vout_Snapshot_inner) (vout_thread_t *p_vout, picture_t *p_pic);
+    void (*streaming_GuiDescToChain_inner) (vlc_object_t*, sout_chain_t*, sout_gui_descr_t*);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1001,6 +1002,7 @@ struct module_symbols_t
 #  define input_AddSubtitles (p_symbols)->input_AddSubtitles_inner
 #  define __stats_CounterCreate (p_symbols)->__stats_CounterCreate_inner
 #  define __stats_TimersClean (p_symbols)->__stats_TimersClean_inner
+#  define streaming_ChainToPsz (p_symbols)->streaming_ChainToPsz_inner
 #  define __intf_UserWarn (p_symbols)->__intf_UserWarn_inner
 #  define __intf_UserProgressIsCancelled (p_symbols)->__intf_UserProgressIsCancelled_inner
 #  define __intf_Progress (p_symbols)->__intf_Progress_inner
@@ -1033,6 +1035,7 @@ struct module_symbols_t
 #  define str_format_time (p_symbols)->str_format_time_inner
 #  define __str_format_meta (p_symbols)->__str_format_meta_inner
 #  define vout_Snapshot (p_symbols)->vout_Snapshot_inner
+#  define streaming_GuiDescToChain (p_symbols)->streaming_GuiDescToChain_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1479,6 +1482,7 @@ struct module_symbols_t
     ((p_symbols)->input_AddSubtitles_inner) = input_AddSubtitles; \
     ((p_symbols)->__stats_CounterCreate_inner) = __stats_CounterCreate; \
     ((p_symbols)->__stats_TimersClean_inner) = __stats_TimersClean; \
+    ((p_symbols)->streaming_ChainToPsz_inner) = streaming_ChainToPsz; \
     ((p_symbols)->__intf_UserWarn_inner) = __intf_UserWarn; \
     ((p_symbols)->__intf_UserProgressIsCancelled_inner) = __intf_UserProgressIsCancelled; \
     ((p_symbols)->__intf_Progress_inner) = __intf_Progress; \
@@ -1511,6 +1515,7 @@ struct module_symbols_t
     ((p_symbols)->str_format_time_inner) = str_format_time; \
     ((p_symbols)->__str_format_meta_inner) = __str_format_meta; \
     ((p_symbols)->vout_Snapshot_inner) = vout_Snapshot; \
+    ((p_symbols)->streaming_GuiDescToChain_inner) = streaming_GuiDescToChain; \
     (p_symbols)->vlc_current_charset_deprecated = NULL; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__sout_CfgParse_deprecated = NULL; \
@@ -1570,7 +1575,6 @@ struct module_symbols_t
     (p_symbols)->stats_TimersClean_deprecated = NULL; \
     (p_symbols)->__intf_IntfProgressUpdate_deprecated = NULL; \
     (p_symbols)->__intf_IntfProgress_deprecated = NULL; \
-    (p_symbols)->streaming_ChainToPsz_deprecated = NULL; \
     (p_symbols)->__input_SecondaryPreparse_deprecated = NULL; \
     (p_symbols)->__input_MetaFetch_deprecated = NULL; \
     (p_symbols)->input_DownloadAndCacheArt_deprecated = NULL; \

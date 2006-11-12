@@ -21,7 +21,8 @@ TOUI = 	\
 	ui/sprefs_playlist \
 	ui/sprefs_subtitles \
 	ui/sprefs_video \
-	ui/streampanel
+	ui/streampanel \
+	ui/sout
 
 
 UIH = $(TOUI:%=%.h)
@@ -38,6 +39,7 @@ TOMOC = main_interface \
 	dialogs/streaminfo \
 	dialogs/extended \
 	dialogs/interaction \
+	dialogs/sout \
 	components/extended_panels \
 	components/infopanels \
 	components/preferences_widgets \
@@ -64,6 +66,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/errors.moc.cpp \
 		dialogs/prefs_dialog.moc.cpp \
 		dialogs/interaction.moc.cpp \
+		dialogs/sout.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/infopanels.moc.cpp \
 	 	components/preferences_widgets.moc.cpp \
@@ -110,6 +113,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/messages.cpp \
 		dialogs/errors.cpp \
 		dialogs/interaction.cpp \
+		dialogs/sout.cpp \
 		components/extended_panels.cpp \
 		components/infopanels.cpp \
 		components/preferences_widgets.cpp \
@@ -138,6 +142,7 @@ EXTRA_DIST += \
 	dialogs/errors.hpp \
 	dialogs/prefs_dialog.hpp \
 	dialogs/interaction.hpp \
+	dialogs/sout.hpp \
 	components/extended_panels.hpp \
 	components/infopanels.hpp \
 	components/preferences_widgets.hpp \
@@ -161,6 +166,7 @@ EXTRA_DIST += \
 	ui/sprefs_subtitles.ui \
 	ui/sprefs_video.ui \
 	ui/streampanel.ui \
+	ui/sout.ui \
 	pixmaps/advanced.xpm \
 	pixmaps/audio.xpm \
 	pixmaps/codec.xpm \

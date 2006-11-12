@@ -36,6 +36,7 @@
 #include "dialogs/streaminfo.hpp"
 #include "dialogs/messages.hpp"
 #include "dialogs/extended.hpp"
+#include "dialogs/sout.hpp"
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -158,6 +159,7 @@ void DialogsProvider::quit()
 
 void DialogsProvider::streaminfoDialog()
 {
+    (new SoutDialog( p_intf ))->show();
     StreamInfoDialog::getInstance( p_intf )->toggleVisible();
 }
 

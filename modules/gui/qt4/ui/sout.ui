@@ -1,0 +1,1321 @@
+<ui version="4.0" >
+ <class>Sout</class>
+ <widget class="QWidget" name="Sout" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>630</width>
+    <height>660</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Outputs</string>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <layout class="QGridLayout" >
+        <property name="margin" >
+         <number>3</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item row="1" column="1" >
+         <widget class="QLabel" name="fileLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Filename</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" >
+         <widget class="QCheckBox" name="fileOutput" >
+          <property name="contextMenuPolicy" >
+           <enum>Qt::NoContextMenu</enum>
+          </property>
+          <property name="text" >
+           <string>File</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4" >
+         <widget class="QSpinBox" name="HTTPPort" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>90</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="maximum" >
+           <number>65535</number>
+          </property>
+          <property name="minimum" >
+           <number>1</number>
+          </property>
+          <property name="singleStep" >
+           <number>1</number>
+          </property>
+          <property name="value" >
+           <number>8080</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4" >
+         <widget class="QCheckBox" name="rawInput" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Dump raw input</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" >
+         <widget class="QLineEdit" name="fileEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3" >
+         <widget class="QLabel" name="MMSHPortLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Port</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" >
+         <widget class="QLabel" name="MMSHLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Address</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" >
+         <widget class="QCheckBox" name="localOutput" >
+          <property name="text" >
+           <string>Play locally</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" >
+         <widget class="QCheckBox" name="MMSHOutput" >
+          <property name="text" >
+           <string>MMSH</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" >
+         <widget class="QPushButton" name="fileSelectButton" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Browse</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2" >
+         <widget class="QLineEdit" name="HTTPEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" >
+         <widget class="QLabel" name="HTTPLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Address</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3" >
+         <widget class="QLabel" name="HTTPPortLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Port</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2" >
+         <widget class="QLineEdit" name="MMSHEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" >
+         <widget class="QCheckBox" name="HTTPOutput" >
+          <property name="text" >
+           <string>HTTP</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" >
+         <widget class="QCheckBox" name="UDPOutput" >
+          <property name="text" >
+           <string>UDP</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1" >
+         <widget class="QLabel" name="UDPLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Address</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="3" >
+         <widget class="QLabel" name="UDPPortLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Port</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2" >
+         <widget class="QLineEdit" name="UDPEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4" >
+         <widget class="QSpinBox" name="MMSHPort" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>90</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="maximum" >
+           <number>65535</number>
+          </property>
+          <property name="minimum" >
+           <number>1</number>
+          </property>
+          <property name="value" >
+           <number>1234</number>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="4" >
+         <widget class="QSpinBox" name="UDPPort" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>90</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="maximum" >
+           <number>65535</number>
+          </property>
+          <property name="minimum" >
+           <number>1</number>
+          </property>
+          <property name="value" >
+           <number>1234</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="Encapsulation" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" >
+      <string>Encapsulation</string>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QRadioButton" name="TSMux" >
+        <property name="text" >
+         <string>MPEG-TS</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="PSMux" >
+        <property name="text" >
+         <string>MPEG-PS</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="MPEG1Mux" >
+        <property name="text" >
+         <string>MPEG 1</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="OggMux" >
+        <property name="text" >
+         <string>Ogg</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="ASFMux" >
+        <property name="text" >
+         <string>ASF</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="MP4Mux" >
+        <property name="text" >
+         <string>MP4</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="MOVMux" >
+        <property name="text" >
+         <string>MOV</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="WAVMux" >
+        <property name="text" >
+         <string>WAV</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="RAWMux" >
+        <property name="text" >
+         <string>RAW</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>Transcoding</string>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <layout class="QGridLayout" >
+        <property name="margin" >
+         <number>3</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item row="1" column="5" >
+         <widget class="QSpinBox" name="aChannels" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="maximum" >
+           <number>10</number>
+          </property>
+          <property name="minimum" >
+           <number>1</number>
+          </property>
+          <property name="value" >
+           <number>2</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" >
+         <widget class="QLabel" name="aBitrateLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Bitrate (kb/s)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" >
+         <widget class="QCheckBox" name="transcodeVideo" >
+          <property name="text" >
+           <string>Video</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" >
+         <widget class="QCheckBox" name="transcodeAudio" >
+          <property name="text" >
+           <string>Audio</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2" >
+         <widget class="QLabel" name="vBitrateLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Bitrate (kb/s)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" >
+         <widget class="QComboBox" name="aCodec" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" >
+         <widget class="QComboBox" name="vCodec" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="editable" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5" >
+         <widget class="QComboBox" name="vScale" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="editable" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4" >
+         <widget class="QLabel" name="s_2" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Channels</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4" >
+         <widget class="QLabel" name="vScaleLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Scale</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" >
+         <widget class="QCheckBox" name="transcodeSubs" >
+          <property name="text" >
+           <string>Subtitles</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" >
+         <widget class="QComboBox" name="sCodec" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2" colspan="4" >
+         <widget class="QCheckBox" name="sOverlay" >
+          <property name="enabled" >
+           <bool>true</bool>
+          </property>
+          <property name="text" >
+           <string>Overlay subtitles on the video</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3" >
+         <widget class="QSpinBox" name="vBitrate" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="maximum" >
+           <number>8192</number>
+          </property>
+          <property name="minimum" >
+           <number>8</number>
+          </property>
+          <property name="value" >
+           <number>800</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" >
+         <widget class="QSpinBox" name="aBitrate" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="maximum" >
+           <number>512</number>
+          </property>
+          <property name="minimum" >
+           <number>8</number>
+          </property>
+          <property name="value" >
+           <number>128</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3" >
+     <property name="title" >
+      <string>Miscellaneous</string>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <layout class="QGridLayout" >
+        <property name="margin" >
+         <number>3</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="QCheckBox" name="sap" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>SAP announce</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3" >
+         <widget class="QLabel" name="sapGroupLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Group name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4" >
+         <widget class="QLineEdit" name="sapGroup" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4" >
+         <widget class="QSpinBox" name="ttl" >
+          <property name="maximum" >
+           <number>255</number>
+          </property>
+          <property name="minimum" >
+           <number>1</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2" >
+         <widget class="QLineEdit" name="sapName" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2" >
+         <widget class="QCheckBox" name="soutAll" >
+          <property name="text" >
+           <string>Stream all elementary streams</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" >
+         <widget class="QLabel" name="label_10" >
+          <property name="text" >
+           <string>Time-To-Live (TTL)</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" >
+      <string>Generated stream output string</string>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLineEdit" name="mrlEdit" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Stream output string. This is automatically generated when you change the above settings, but you can update it manually.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton" >
+       <property name="text" >
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="okButton" >
+       <property name="text" >
+        <string>OK</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>UDPOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>sap</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>68</x>
+     <y>175</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>80</x>
+     <y>467</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UDPOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>UDPLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>58</x>
+     <y>174</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>147</x>
+     <y>184</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UDPOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>UDPEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>63</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>244</x>
+     <y>186</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MMSHOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>MMSHLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>41</x>
+     <y>155</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>145</x>
+     <y>155</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MMSHOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>MMSHEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>65</x>
+     <y>155</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>270</x>
+     <y>155</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MMSHOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>MMSHPortLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>54</x>
+     <y>155</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>416</x>
+     <y>155</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UDPOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>UDPPortLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>54</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>426</x>
+     <y>186</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UDPOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>UDPPort</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>38</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>549</x>
+     <y>186</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MMSHOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>MMSHPort</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>51</x>
+     <y>155</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>549</x>
+     <y>155</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sap</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>sapName</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>98</x>
+     <y>474</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>198</x>
+     <y>466</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sap</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>sapGroupLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>41</x>
+     <y>465</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>335</x>
+     <y>472</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sap</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>sapGroup</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>33</x>
+     <y>470</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>459</x>
+     <y>464</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>HTTPOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>HTTPLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>49</x>
+     <y>105</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>155</x>
+     <y>117</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>HTTPOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>HTTPEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>34</x>
+     <y>104</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>264</x>
+     <y>115</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>HTTPOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>HTTPPortLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>26</x>
+     <y>108</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>425</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>HTTPOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>HTTPPort</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>67</x>
+     <y>104</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>543</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fileOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>fileLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>108</x>
+     <y>92</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>120</x>
+     <y>95</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeVideo</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>vCodec</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>60</x>
+     <y>323</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>180</x>
+     <y>322</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeVideo</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>vBitrateLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>96</x>
+     <y>311</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>249</x>
+     <y>324</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeVideo</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>vScaleLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>27</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>463</x>
+     <y>322</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeVideo</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>vScale</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>26</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>567</x>
+     <y>327</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeSubs</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>sOverlay</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>44</x>
+     <y>378</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>336</x>
+     <y>376</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sOverlay</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>transcodeSubs</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>404</x>
+     <y>374</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>92</x>
+     <y>386</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeSubs</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>sCodec</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>27</x>
+     <y>375</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>177</x>
+     <y>381</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeAudio</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>aCodec</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>40</x>
+     <y>353</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>133</x>
+     <y>346</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeAudio</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>aBitrateLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>31</x>
+     <y>357</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>264</x>
+     <y>355</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeAudio</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>s_2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>36</x>
+     <y>342</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>448</x>
+     <y>342</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeAudio</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>aChannels</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>26</x>
+     <y>343</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>574</x>
+     <y>347</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fileOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>fileEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>61</x>
+     <y>81</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>288</x>
+     <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fileOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>fileSelectButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>25</x>
+     <y>88</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>443</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fileOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>rawInput</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>25</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>552</x>
+     <y>90</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rawInput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>Encapsulation</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>579</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>271</x>
+     <y>225</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rawInput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>HTTPOutput</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>605</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>24</x>
+     <y>115</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rawInput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>groupBox_2</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>585</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>57</x>
+     <y>296</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rawInput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>groupBox_3</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>583</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>518</x>
+     <y>427</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rawInput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>UDPOutput</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>595</x>
+     <y>75</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>66</x>
+     <y>172</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rawInput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>MMSHOutput</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>485</x>
+     <y>92</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>46</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeVideo</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>vBitrate</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>28</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>365</x>
+     <y>316</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transcodeAudio</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>aBitrate</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>28</x>
+     <y>349</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>370</x>
+     <y>352</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

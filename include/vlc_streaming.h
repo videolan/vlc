@@ -120,7 +120,8 @@ struct sout_transcode_t
     int i_vb, i_ab, i_channels;
     float f_scale;
     vlc_bool_t b_soverlay;
-    char *psz_vcodec, *psz_acodec, *psz_scodec, *psz_venc, *psz_aenc;
+    char *psz_vcodec;
+    char *psz_acodec, *psz_scodec, *psz_venc, *psz_aenc;
     char *psz_additional;
 
     int i_params; sout_param_t **pp_params;
@@ -218,6 +219,9 @@ struct sout_gui_descr_t
     char *psz_group, *psz_name;
     int i_ttl;
 };
+
+VLC_EXPORT(void, streaming_GuiDescToChain,(vlc_object_t*, sout_chain_t*, sout_gui_descr_t*));
+VLC_EXPORT(char*, streaming_ChainToPsz,(sout_chain_t*));
 
 /***************** Profile parsing ***********************/
 

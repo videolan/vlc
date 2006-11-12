@@ -89,14 +89,14 @@ sout_transcode_t *streaming_ChainAddTranscode( sout_chain_t *p_chain,
     DECMALLOC_NULL( p_module, sout_module_t );
     MALLOC_NULL( TRAM, sout_transcode_t );
     p_module->i_type = SOUT_MOD_TRANSCODE;
-
+    memset( TRAM, 0, sizeof( sout_transcode_t ) );
     assert( !( b_soverlay && psz_scodec ) );
     if( psz_vcodec ) TRAM->psz_vcodec = strdup( psz_vcodec );
     if( psz_acodec ) TRAM->psz_acodec = strdup( psz_acodec );
     if( psz_scodec ) TRAM->psz_scodec = strdup( psz_scodec );
     TRAM->i_vb = i_vb; TRAM->i_ab = i_ab; TRAM->f_scale = f_scale;
     TRAM->i_channels = i_channels; TRAM->b_soverlay = b_soverlay;
-    if( TRAM->psz_additional ) TRAM->psz_additional = strdup( psz_additional );
+    if( psz_additional ) TRAM->psz_additional = strdup( psz_additional );
     TAB_APPEND( p_chain->i_modules, p_chain->pp_modules, p_module );
     return TRAM;
 }
@@ -353,7 +353,7 @@ vlc_bool_t streaming_ChainToGuiDesc( vlc_object_t *p_this,
 }
 
 #define HANDLE_GUI_URL( type, access ) if( pd->b_##type ) { \
-        streaming_DupAddChild( p_dup ); \
+        if( p_dup ) streaming_DupAddChild( p_dup ); \
         if( pd->i_##type > 0 ) \
         { \
             char *psz_url; \
@@ -379,6 +379,7 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
     /* Transcode */
     if( pd->psz_vcodec || pd->psz_acodec || pd->psz_scodec || pd->b_soverlay )
     {
+        fprintf( stderr, "382 vcodec %s\n", pd->psz_vcodec );
         streaming_ChainAddTranscode( p_chain, pd->psz_vcodec, pd->psz_acodec,
                                      pd->psz_scodec, pd->i_vb, pd->f_scale,
                                      pd->i_ab, pd->i_channels,
@@ -392,19 +393,19 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
     }
     if( pd->b_local )
     {
-        streaming_DupAddChild( p_dup );
-        streaming_ChainAddDisplay(  DUP_OR_CHAIN );
+        if( p_dup ) streaming_DupAddChild( p_dup );
+        streaming_ChainAddDisplay( DUP_OR_CHAIN );
     }
     if( pd->b_file )
     {
-        streaming_DupAddChild( p_dup );
+        if( p_dup ) streaming_DupAddChild( p_dup );
         streaming_ChainAddStd( DUP_OR_CHAIN, "file", pd->psz_mux,
                                pd->psz_file );
     }
     if( pd->b_udp )
     {
         sout_std_t *p_std;
-        streaming_DupAddChild( p_dup );
+        if( p_dup ) streaming_DupAddChild( p_dup );
         if( pd->i_udp > 0 )
         {
             char *psz_url;
@@ -434,17 +435,30 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
 /**********************************************************************
  * Create a sout string from a chain
  **********************************************************************/
-char * streaming_ChainToPsz( sout_chain_t *p_chain )
+static char * ChainToPsz( sout_chain_t *p_chain, vlc_bool_t b_root )
 {
-    int i;
+    int i, j;
     char psz_output[MAX_CHAIN];
     char psz_temp[MAX_CHAIN];
-    sprintf( psz_output, "#" );
+    if( b_root ) sprintf( psz_output, "#" );
+    else sprintf( psz_output, "" );
     for( i = 0 ; i< p_chain->i_modules; i++ )
     {
         sout_module_t *p_module = p_chain->pp_modules[i];
         switch( p_module->i_type )
         {
+        case SOUT_MOD_DUPLICATE:
+            CHAIN_APPEND( "duplicate{" );
+            for( j = 0 ; j < DUPM->i_children ; j ++ )
+            {
+                char *psz_child = ChainToPsz( DUPM->pp_children[j], VLC_FALSE);
+                fprintf(stderr, "child %s\n", psz_child);
+                CHAIN_APPEND( "dst=%s", psz_child );
+                free( psz_child );
+                if( j != DUPM->i_children - 1 ) CHAIN_APPEND( "," );
+            }
+            CHAIN_APPEND( "}" );
+            break;
         case SOUT_MOD_TRANSCODE:
             CHAIN_APPEND( "transcode{" );
             if( TRAM->psz_vcodec )
@@ -476,8 +490,14 @@ char * streaming_ChainToPsz( sout_chain_t *p_chain )
             CHAIN_APPEND( "std{access=%s,url=%s,mux=%s}", STDM->psz_access,
                           STDM->psz_url, STDM->psz_mux );
         }
+        if( i != p_chain->i_modules - 1 ) CHAIN_APPEND( ":" );
     }
     return strdup( psz_output );
+}
+
+char * streaming_ChainToPsz( sout_chain_t *p_chain )
+{
+    return ChainToPsz( p_chain, VLC_TRUE );
 }
 
 /**********************************************************************
