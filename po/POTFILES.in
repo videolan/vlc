@@ -585,7 +585,6 @@ modules/gui/qt4/ui/sprefs_audio.ui
 modules/gui/qt4/ui/sprefs_interface.ui
 modules/gui/qt4/ui/sprefs_playlist.ui
 modules/gui/qt4/ui/sprefs_subtitles.ui
-modules/gui/qt4/ui/sprefs_trivial.ui
 modules/gui/qt4/ui/sprefs_video.ui
 modules/gui/qt4/ui/streampanel.ui
 modules/gui/qt4/util/customwidgets.cpp
