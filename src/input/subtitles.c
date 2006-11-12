@@ -308,7 +308,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         f_dir = (char *)realloc(f_dir, dirlen +2 );
         f_dir[dirlen] = DIR_SEP_CHAR;
         f_dir[dirlen+1] = '\0';
-        f_fname = FromLocaleDup( psz_fname );
+        f_fname = strdup( psz_fname );
     }
 
     i_fname_len = strlen( f_fname );
