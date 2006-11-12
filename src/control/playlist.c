@@ -112,9 +112,13 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
                                   libvlc_exception_t *p_e )
 {
     assert( PL );
+#ifndef FIXME
+    return VLC_EGENERIC;
+#else
     return playlist_PlaylistAddExt( PL, psz_uri, psz_name,
                             PLAYLIST_INSERT, PLAYLIST_END, -1, ppsz_options,
                             i_options );
+#endif
 }
 
 int libvlc_playlist_delete_item( libvlc_instance_t *p_instance, int i_id,
