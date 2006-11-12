@@ -98,7 +98,7 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
  * Unicode needs to be enabled to catch non-ANSI characters on Windows
  * through wxString::wc_str(); they are lost when using mb_str().
  */
-#if wxUSE_UNICODE
+#if defined( wxUSE_UNICODE ) && defined( WIN32 )
 #   define wxFromLocale(wxstring) FromWide(wxstring.wc_str())
 #   define wxLocaleFree(string) free(string)
 #else
