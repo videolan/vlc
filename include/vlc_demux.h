@@ -137,15 +137,15 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
  * Miscellaneous helpers for demuxers
  *************************************************************************/
 
-static inline vlc_bool_t isExtension( demux_t *p_demux, char *psz_requested )
+static inline vlc_bool_t isExtension( demux_t *p_demux, const char *psz_requested )
 {
-    char    *psz_ext;
-    psz_ext = strrchr ( p_demux->psz_path, '.' );
+    const char *psz_ext = strrchr ( p_demux->psz_path, '.' );
     if( !psz_ext || strcmp( psz_ext, psz_requested ) )
         return VLC_FALSE;
     return VLC_TRUE;
 }
-static inline vlc_bool_t isDemux( demux_t *p_demux, char *psz_requested )
+
+static inline vlc_bool_t isDemux( demux_t *p_demux, const char *psz_requested )
 {
    if( !p_demux->psz_demux || strcmp( p_demux->psz_demux, psz_requested ) )
         return VLC_FALSE;

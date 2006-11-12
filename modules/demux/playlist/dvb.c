@@ -133,8 +133,8 @@ static int Demux( demux_t *p_demux )
 
 static struct
 {
-    char *psz_name;
-    char *psz_option;
+    const char *psz_name;
+    const char *psz_option;
 
 } dvb_options[] =
 {
@@ -204,7 +204,7 @@ static int ParseLine( char *psz_line, char **ppsz_name,
 
     while( psz_parse )
     {
-        char *psz_option = 0;
+        const char *psz_option = 0;
         char *psz_end = strchr( psz_parse, ':' );
         if( psz_end ) { *psz_end = 0; psz_end++; }
 
@@ -260,9 +260,10 @@ static int ParseLine( char *psz_line, char **ppsz_name,
 
         if( psz_option && pppsz_options && pi_options )
         {
-            psz_option = strdup( psz_option );
-            INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
-                         psz_option );
+            char *psz_dup = strdup( psz_option );
+            if (psz_dup != NULL)
+                INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
+                             psz_dup );
         }
 
         psz_parse = psz_end;
