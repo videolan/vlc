@@ -151,7 +151,7 @@ void    input_ClockSetPCR( input_thread_t *, input_clock_t *, mtime_t );
 mtime_t input_ClockGetTS( input_thread_t *, input_clock_t *, mtime_t );
 
 /* Subtitles */
-char **subtitles_Detect( input_thread_t *, char* path, char *fname );
+char **subtitles_Detect( input_thread_t *, char* path, const char *fname );
 int subtitles_Filter( const char *);
 
 void MRLSplit( vlc_object_t *, char *, const char **, const char **, char ** );

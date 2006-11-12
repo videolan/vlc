@@ -175,7 +175,7 @@ int subtitles_Filter( const char *psz_dir_content )
 /**
  * Convert a list of paths separated by ',' to a char**
  */
-static char **paths_to_list( char *psz_dir, char *psz_path )
+static char **paths_to_list( const char *psz_dir, char *psz_path )
 {
     unsigned int i, k, i_nb_subdirs;
     char **subdirs; /* list of subdirectories to look in */
@@ -256,7 +256,7 @@ static char **paths_to_list( char *psz_dir, char *psz_path )
  * The array contains max MAX_SUBTITLE_FILES items and you need to free it after use.
  */
 char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
-                         char *psz_name )
+                         const char *psz_name )
 {
     vlc_value_t fuzzy;
     int j, i_result2, i_sub_count = 0, i_fname_len = 0;
