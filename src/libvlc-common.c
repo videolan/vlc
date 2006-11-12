@@ -1147,6 +1147,11 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
      */
 #define LINE_START 8
 #define PADDING_SPACES 25
+#ifdef WIN32
+#   define OPTION_VALUE_SEP "="
+#else
+#   define OPTION_VALUE_SEP " "
+#endif
     vlc_list_t *p_list;
     module_t *p_parser;
     module_config_t *p_item;
@@ -1244,11 +1249,13 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             case CONFIG_ITEM_MODULE_CAT:
             case CONFIG_ITEM_MODULE_LIST:
             case CONFIG_ITEM_MODULE_LIST_CAT:
-                psz_bra = " <"; psz_type = _("string"); psz_ket = ">";
+                psz_bra = OPTION_VALUE_SEP "<";
+                psz_type = _("string");
+                psz_ket = ">";
 
                 if( p_item->ppsz_list )
                 {
-                    psz_bra = " {";
+                    psz_bra = OPTION_VALUE_SEP "{";
                     psz_type = psz_buffer;
                     psz_type[0] = '\0';
                     for( i = 0; p_item->ppsz_list[i]; i++ )
@@ -1261,11 +1268,13 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 break;
             case CONFIG_ITEM_INTEGER:
             case CONFIG_ITEM_KEY: /* FIXME: do something a bit more clever */
-                psz_bra = " <"; psz_type = _("integer"); psz_ket = ">";
+                psz_bra = OPTION_VALUE_SEP "<";
+                psz_type = _("integer");
+                psz_ket = ">";
 
                 if( p_item->i_list )
                 {
-                    psz_bra = " {";
+                    psz_bra = OPTION_VALUE_SEP "{";
                     psz_type = psz_buffer;
                     psz_type[0] = '\0';
                     for( i = 0; p_item->ppsz_list_text[i]; i++ )
@@ -1279,7 +1288,9 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 }
                 break;
             case CONFIG_ITEM_FLOAT:
-                psz_bra = " <"; psz_type = _("float"); psz_ket = ">";
+                psz_bra = OPTION_VALUE_SEP "<";
+                psz_type = _("float");
+                psz_ket = ">";
                 break;
             case CONFIG_ITEM_BOOL:
                 psz_bra = ""; psz_type = ""; psz_ket = "";
