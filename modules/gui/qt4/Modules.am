@@ -20,7 +20,6 @@ TOUI = 	\
 	ui/sprefs_interface \
 	ui/sprefs_playlist \
 	ui/sprefs_subtitles \
-	ui/sprefs_trivial \
 	ui/sprefs_video \
 	ui/streampanel
 

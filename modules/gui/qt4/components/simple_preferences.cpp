@@ -42,7 +42,6 @@
 #include "pixmaps/subtitles_50x50.xpm"
 #include "pixmaps/video_50x50.xpm"
 
-#include "ui/sprefs_trivial.h"
 #include "ui/sprefs_audio.h"
 #include "ui/sprefs_video.h"
 #include "ui/sprefs_subtitles.h"
