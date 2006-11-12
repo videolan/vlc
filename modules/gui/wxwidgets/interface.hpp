@@ -128,6 +128,8 @@ namespace wxvlc
         /* Event handlers (these functions should _not_ be virtual) */
         void OnExit( wxCommandEvent& event );
         void OnAbout( wxCommandEvent& event );
+        void OnWebLink( wxCommandEvent& event );
+        void OnWebHelp( wxCommandEvent& event );
 
         void OnOpenFileSimple( wxCommandEvent& event );
         void OnOpenDir( wxCommandEvent& event );
