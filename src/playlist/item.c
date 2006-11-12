@@ -310,6 +310,15 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
     return p_item;
 }
 
+/** Add a playlist item to a given node */
+void playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
+                           playlist_item_t *p_parent, int i_mode, int i_pos )
+{
+    vlc_mutex_lock( &p_playlist->object_lock );
+    AddItem( p_playlist, p_item, p_parent, i_pos );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+}
+
 /*****************************************************************************
  * Playlist item misc operations
  *****************************************************************************/
