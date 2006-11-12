@@ -74,7 +74,6 @@ int Demux( demux_t *p_demux )
     xml_t *p_xml = NULL;
     xml_reader_t *p_xml_reader = NULL;
     char *psz_name = NULL;
-    input_item_t *p_input;
     INIT_PLAYLIST_STUFF;
     p_demux->p_sys->p_item_in_category = p_item_in_category;
     p_demux->p_sys->pp_tracklist = NULL;
