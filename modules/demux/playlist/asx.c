@@ -1,7 +1,7 @@
 /*****************************************************************************
  * asx.c : ASX playlist format import
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -53,29 +53,42 @@ struct demux_sys_t
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
-static int StoreString( demux_t *p_demux, char **ppsz_string, char *psz_source_start, char *psz_source_end )
+static int StoreString( demux_t *p_demux, char **ppsz_string,
+                        const char *psz_source_start,
+                        const char *psz_source_end )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i_strlen = psz_source_end-psz_source_start;
-    if( i_strlen < 1 )
-        return VLC_EGENERIC;
+    unsigned len = psz_source_end - psz_source_start;
 
     if( *ppsz_string ) free( *ppsz_string );
-    *ppsz_string = malloc( i_strlen*sizeof( char ) +1);
-    memcpy( *ppsz_string, psz_source_start, i_strlen );
-    (*ppsz_string)[i_strlen] = '\0';
+
+    char *buf = *ppsz_string = malloc ((len * (1 + !p_sys->b_utf8)) + 1);
+    if (buf == NULL)
+        return VLC_ENOMEM;
 
     if( p_sys->b_utf8 )
-        EnsureUTF8( *ppsz_string );
+    {
+        memcpy (buf, psz_source_start, len);
+        (*ppsz_string)[len] = '\0';
+        EnsureUTF8 (*ppsz_string);
+    }
     else
     {
-        char *psz_temp;
-        psz_temp = FromLocaleDup( *ppsz_string );
-        if( psz_temp )
+        /* Latin-1 -> UTF-8 */
+        for (unsigned i = 0; i < len; i++)
         {
-            free( *ppsz_string );
-            *ppsz_string = psz_temp;
-        } else EnsureUTF8( *ppsz_string );
+            unsigned char c = psz_source_start[i];
+            if (c & 0x80)
+            {
+                *buf++ = 0xc0 | (c >> 6);
+                *buf++ = 0x80 | (c & 0x3f);
+            }
+            else
+                *buf++ = c;
+        }
+        *buf++ = '\0';
+
+        buf = *ppsz_string = realloc (*ppsz_string, buf - *ppsz_string);
     }
     return VLC_SUCCESS;
 }
@@ -102,13 +115,13 @@ int E_(Import_ASX)( vlc_object_t *p_this )
     }
     else
         return VLC_EGENERIC;
-    
+
     STANDARD_DEMUX_INIT_MSG( "found valid ASX playlist" );
     p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
     p_demux->p_sys->psz_data = NULL;
     p_demux->p_sys->i_data_len = -1;
     p_demux->p_sys->b_utf8 = VLC_FALSE;
-    
+
     return VLC_SUCCESS;
 }
 
