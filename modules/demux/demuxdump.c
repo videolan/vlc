@@ -88,7 +88,7 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    char        *psz_mode;
+    const char  *psz_mode;
     vlc_value_t val;
     vlc_bool_t  b_append;
 
