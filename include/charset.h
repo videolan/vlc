@@ -1,12 +1,11 @@
 /*****************************************************************************
- * charset.h: Determine a canonical name for the current locale's character encoding.
+ * charset.h: Unicode UTF-8 wrappers function
  *****************************************************************************
  * Copyright (C) 2003-2005 the VideoLAN team
  * Copyright © 2005-2006 Rémi Denis-Courmont
  * $Id$
  *
- * Authors: Rémi Denis-Courmont <rem # videolan,org>
- *          Derk-Jan Hartman <thedj at users.sourceforge.net>
+ * Author: Rémi Denis-Courmont <rem # videolan,org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,11 +33,6 @@
 struct stat { };
 #endif
 
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-VLC_EXPORT( vlc_bool_t, vlc_current_charset, ( char ** ) );
 VLC_EXPORT( void, LocaleFree, ( const char * ) );
 VLC_EXPORT( char *, FromLocale, ( const char * ) );
 VLC_EXPORT( char *, FromLocaleDup, ( const char * ) );
@@ -78,20 +72,14 @@ static inline char *FromWide (const wchar_t *wide)
 }
 #endif
 
-
-#if !defined (__PLUGIN__)
-extern char *vlc_fix_readdir ( const char * );
-#endif
+VLC_INTERNAL( char *, vlc_fix_readdir, ( const char * ) );
+VLC_INTERNAL( vlc_bool_t, vlc_current_charset, ( char ** ) );
 
 VLC_EXPORT( const char *, GetFallbackEncoding, ( void ) );
 
-extern double i18n_strtod( const char *, char ** );
-extern double i18n_atof( const char * );
+VLC_INTERNAL( double, i18n_strtod, ( const char *, char ** ) );
+VLC_INTERNAL( double, i18n_atof, ( const char * ) );
 VLC_EXPORT( double, us_strtod, ( const char *, char ** ) );
 VLC_EXPORT( double, us_atof, ( const char * ) );
-
-# ifdef __cplusplus
-}
-# endif
 
 #endif
