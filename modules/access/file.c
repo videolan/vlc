@@ -208,8 +208,6 @@ static int Open( vlc_object_t *p_this )
         Close (p_this);
         return VLC_EGENERIC;
     }
-    msg_Dbg (p_access, "opened file of size "I64Fd" (FIXME: remove this)",
-             p_access->info.i_size);
 
     return VLC_SUCCESS;
 }
