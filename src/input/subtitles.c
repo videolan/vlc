@@ -43,6 +43,7 @@
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
+#include <sys/stat.h>
 
 #include <ctype.h>
 #include "input_internal.h"
@@ -391,17 +392,16 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                 }
                 if( i_prio >= fuzzy.i_int )
                 {
-                    FILE *f;
                     char psz_path[strlen( psz_dir ) + strlen( psz_name ) + 1];
+                    struct stat st;
 
                     sprintf( psz_path, "%s%s", psz_dir, psz_name );
                     msg_Dbg( p_this,
                                 "autodetected subtitle: %s with priority %d",
                                 psz_path, i_prio );
-                    /* FIXME: a portable wrapper for stat() or access() would be more suited */
-                    if( ( f = utf8_fopen( psz_path, "rt" ) ) )
+
+                    if( utf8_stat( psz_path, &st ) && S_ISREG( st.st_mode ) )
                     {
-                        fclose( f );
                         msg_Dbg( p_this,
                                 "autodetected subtitle: %s with priority %d",
                                 psz_path, i_prio );
