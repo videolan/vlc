@@ -228,7 +228,7 @@ static int Demux( demux_t *p_demux )
 
     p_sys->p_playlist = NULL;
 
-    return VLC_SUCCESS;
+    return -1; /* Needed for correct operation of go back */
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )

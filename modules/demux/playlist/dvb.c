@@ -128,7 +128,7 @@ static int Demux( demux_t *p_demux )
     }
 
     HANDLE_PLAY_AND_RELEASE;
-    return VLC_SUCCESS;
+    return -1; /* Needed for correct operation of go back */
 }
 
 static struct

@@ -493,7 +493,7 @@ static int Demux( demux_t *p_demux )
 #endif
     }
     HANDLE_PLAY_AND_RELEASE;
-    return VLC_SUCCESS;
+    return -1; /* Needed for correct operation of go back */
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )

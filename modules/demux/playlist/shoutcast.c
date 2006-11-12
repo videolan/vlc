@@ -152,7 +152,7 @@ static int Demux( demux_t *p_demux )
 
     HANDLE_PLAY_AND_RELEASE;
     p_sys->p_playlist = NULL;
-    return VLC_SUCCESS;
+    return -1; /* Needed for correct operation of go back */
 }
 
 #define GET_VALUE( a ) \
