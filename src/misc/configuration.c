@@ -1713,7 +1713,7 @@ const char *config_GetDataDir( const vlc_object_t *p_this )
  *****************************************************************************/
 static char *GetDir( vlc_bool_t b_appdata )
 {
-    char *psz_localhome = NULL;
+    const char *psz_localhome = NULL;
 
 #if defined(HAVE_GETPWUID)
     struct passwd *p_pw = NULL;
@@ -1721,7 +1721,7 @@ static char *GetDir( vlc_bool_t b_appdata )
 
 #if defined(WIN32) && !defined(UNDER_CE)
     typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
-                                               LPSTR );
+                                               LPWSTR );
 #ifndef CSIDL_FLAG_CREATE
 #   define CSIDL_FLAG_CREATE 0x8000
 #endif
@@ -1742,20 +1742,20 @@ static char *GetDir( vlc_bool_t b_appdata )
     if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
     {
         SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
-                                                  _T("SHGetFolderPathA") );
+                                                  _T("SHGetFolderPathW") );
         if ( SHGetFolderPath != NULL )
         {
-            char psz_ACPhome[MAX_PATH];
+            wchar_t whomedir[MAX_PATH];
 
             /* get the "Application Data" folder for the current user */
             if( S_OK == SHGetFolderPath( NULL,
                                          (b_appdata ? CSIDL_APPDATA :
                                            CSIDL_PROFILE) | CSIDL_FLAG_CREATE,
                                          NULL, SHGFP_TYPE_CURRENT,
-                                         psz_ACPhome ) )
+                                         whomedir ) )
             {
                 FreeLibrary( shfolder_dll );
-                return FromLocaleDup( psz_ACPhome );
+                return FromWide( whomedir );
             }
         }
         FreeLibrary( shfolder_dll );
@@ -1767,16 +1767,11 @@ static char *GetDir( vlc_bool_t b_appdata )
 #   define CSIDL_APPDATA 0x1A
 #endif
 
-    wchar_t p_whomedir[MAX_PATH];
+    wchar_t whomedir[MAX_PATH];
 
     /* get the "Application Data" folder for the current user */
-    if( SHGetSpecialFolderPath( NULL, p_whomedir, CSIDL_APPDATA, 1 ) )
-    {
-        char psz_ACPhome[2 * MAX_PATH];
-
-        sprintf( psz_ACPhome, "%ls", p_whomedir );
-        return FromLocaleDup( psz_ACPhome );
-    }
+    if( SHGetSpecialFolderPath( NULL, whomedir, CSIDL_APPDATA, 1 ) )
+        return FromWide( whomedir );
 #endif
 
 #if defined(HAVE_GETPWUID)
