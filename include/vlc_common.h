@@ -447,6 +447,13 @@ typedef struct update_iterator_t update_iterator_t;
 /* Meta engine */
 typedef struct meta_engine_t meta_engine_t;
 
+/* stat/lstat/fstat */
+#ifdef WIN32
+struct _stati64;
+#else
+struct stat;
+#endif
+
 /*****************************************************************************
  * Variable callbacks
  *****************************************************************************/
