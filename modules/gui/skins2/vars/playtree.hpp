@@ -58,8 +58,6 @@ class Playtree: public VarTree
     private:
         /// VLC playlist object
         playlist_t *m_pPlaylist;
-        /// Iconv handle
-        vlc_iconv_t iconvHandle;
 
         /// Build the list from the VLC playlist
         void buildTree();

@@ -37,24 +37,11 @@ Playtree::Playtree( intf_thread_t *pIntf ): VarTree( pIntf )
 
     i_items_to_append = 0;
 
-    // Try to guess the current charset
-    char *pCharset;
-    vlc_current_charset( &pCharset );
-    iconvHandle = vlc_iconv_open( "UTF-8", pCharset );
-    msg_Dbg( pIntf, "using character encoding: %s", pCharset );
-    free( pCharset );
-
-    if( iconvHandle == (vlc_iconv_t) - 1 )
-    {
-        msg_Warn( pIntf, "unable to do requested conversion" );
-    }
-
     buildTree();
 }
 
 Playtree::~Playtree()
 {
-    if( iconvHandle != (vlc_iconv_t) - 1 ) vlc_iconv_close( iconvHandle );
 }
 
 void Playtree::delSelected()
