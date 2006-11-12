@@ -93,19 +93,22 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
  * Note that if you want to use non-ANSI code page characters on Windows,
  * you MUST build WxWidgets in “Unicode” mode.
  */
+static inline char *wxFromLocale (const wxString& string)
+{
 #if defined( wxUSE_UNICODE )
 # if defined( WIN32 )
-#  define wxFromLocale(wxstring) FromWide((wxstring).c_str())
-#  define wxLocaleFree(string) free(string)
+    return FromWide ((wchar_t *)string.c_str());
+#  define wxLocaleFree free
 # else
-#  define wxFromLocale(wxstring) FromLocale((wxstring).mb_str())
-#  define wxLocaleFree(string) LocaleFree(string)
+    return FromLocale (string.mb_str());
+#  define wxLocaleFree LocaleFree
 # endif
 #else
 # warning Please use WxWidgets with Unicode.
-# define wxFromLocale(wxstring) FromLocale((wxstring).c_str())
-# define wxLocaleFree(string) LocaleFree(string)
+    return FromLocale (string.c_str());
+# define wxLocaleFree LocaleFree
 #endif
+}
 	
 /* From Locale functions to use for File Drop targets ... go figure */
 #if defined( wxUSE_UNICODE ) && !defined( WIN32 )
@@ -135,10 +138,10 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
 
     return FromLocaleDup( psz_local );
 }
-#   define wxDnDLocaleFree( string ) free( string )
+#   define wxDnDLocaleFree free
 #else
-#   define wxDnDFromLocale( string ) wxFromLocale( string )
-#   define wxDnDLocaleFree( string ) wxLocaleFree( string )
+#   define wxDnDFromLocale wxFromLocale
+#   define wxDnDLocaleFree wxLocaleFree
 #endif
 
 #define WRAPCOUNT 80
