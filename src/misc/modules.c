@@ -113,6 +113,7 @@
 
 #include "vlc_update.h"
 #include "vlc_strings.h"
+#include "vlc_streaming.h"
 
 #if defined( _MSC_VER ) && defined( UNDER_CE )
 #    include "modules_builtin_evc.h"
