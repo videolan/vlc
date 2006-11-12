@@ -210,7 +210,7 @@ while test $# -gt 0; do
       ;;
     external)
       echo_external=yes
-      ldflags="${ldflags} -lvlc"
+      ldflags="${ldflags} -lvlc -lvlc-control"
       ;;      
     *)
       module="$1"
