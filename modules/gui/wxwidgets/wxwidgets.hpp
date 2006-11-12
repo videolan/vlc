@@ -99,10 +99,10 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
  * through wxString::wc_str(); they are lost when using mb_str().
  */
 #if defined( wxUSE_UNICODE ) && defined( WIN32 )
-#   define wxFromLocale(wxstring) FromWide(wxstring.wc_str())
+#   define wxFromLocale(wxstring) FromWide((wxstring).wc_str())
 #   define wxLocaleFree(string) free(string)
 #else
-#   define wxFromLocale(wxstring) FromLocale(wxstring.mb_str())
+#   define wxFromLocale(wxstring) FromLocale((wxstring).mb_str())
 #   define wxLocaleFree(string) LocaleFree(string)
 #endif
 	
