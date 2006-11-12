@@ -88,22 +88,23 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 
 /*
  * wxFromLocale() is a replacement for LibVLC FromLocale() that accepts
- * a wxString. It was originally introduced because wxString::mb_str()
- * sucks on Linux with Unicode wxWidgets. It then turned out wxWidgets
- * did not support wc_str() when Unicode was not enabled.
+ * a wxString.
  *
- * But heh, that's wxWidgets; you can't really expect it to actually
- * work, let alone work like its documentation says.
- *
- * Unicode needs to be enabled to catch non-ANSI characters on Windows
- * through wxString::wc_str(); they are lost when using mb_str().
+ * Note that if you want to use non-ANSI code page characters on Windows,
+ * you MUST build WxWidgets in “Unicode” mode.
  */
-#if defined( wxUSE_UNICODE ) && defined( WIN32 )
-#   define wxFromLocale(wxstring) FromWide((wxstring).wc_str())
-#   define wxLocaleFree(string) free(string)
+#if defined( wxUSE_UNICODE )
+# if defined( WIN32 )
+#  define wxFromLocale(wxstring) FromWide((wxstring).c_str())
+#  define wxLocaleFree(string) free(string)
+# else
+#  define wxFromLocale(wxstring) FromLocale((wxstring).mb_str())
+#  define wxLocaleFree(string) LocaleFree(string)
+# endif
 #else
-#   define wxFromLocale(wxstring) FromLocale((wxstring).mb_str())
-#   define wxLocaleFree(string) LocaleFree(string)
+# warning Please use WxWidgets with Unicode.
+# define wxFromLocale(wxstring) FromLocale((wxstring).c_str())
+# define wxLocaleFree(string) LocaleFree(string)
 #endif
 	
 /* From Locale functions to use for File Drop targets ... go figure */
