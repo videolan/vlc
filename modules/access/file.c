@@ -53,7 +53,6 @@
 #if defined( WIN32 ) && !defined( UNDER_CE )
 /* fstat() support for large files on win32 */
 #   define fstat(a,b) _fstati64(a,b)
-#   define FILESTAT _stati64 
 #   ifdef lseek
 #      undef lseek
 #   endif
@@ -68,8 +67,6 @@
 #      undef lseek
 #   endif
 #   define lseek fseek
-#else
-#   define FILESTAT stat
 #endif
 
 #include "charset.h"
@@ -169,7 +166,7 @@ static int Open( vlc_object_t *p_this )
         fd = open_file (p_access, p_access->psz_path);
 
 #ifdef HAVE_SYS_STAT_H
-    struct FILESTAT st;
+    struct stat st;
 
     while (fd != -1)
     {
@@ -302,7 +299,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     if( p_access->info.i_size != 0 &&
         (p_sys->i_nb_reads % INPUT_FSTAT_NB_READS) == 0 )
     {
-        struct FILESTAT st;
+        struct stat st;
 
         if ((fstat (fd, &st) == 0)
          && (p_access->info.i_size != st.st_size))

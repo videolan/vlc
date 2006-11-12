@@ -28,6 +28,11 @@
 
 #include <stdarg.h>
 #include <sys/types.h>
+#ifdef HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#else
+struct stat { };
+#endif
 
 # ifdef __cplusplus
 extern "C" {
@@ -44,8 +49,13 @@ VLC_EXPORT( FILE *, utf8_fopen, ( const char *filename, const char *mode ) );
 VLC_EXPORT( void *, utf8_opendir, ( const char *dirname ) );
 VLC_EXPORT( char *, utf8_readdir, ( void *dir ) );
 VLC_EXPORT( int, utf8_scandir, ( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
-VLC_EXPORT( int, utf8_stat, ( const char *filename, void *buf ) );
-VLC_EXPORT( int, utf8_lstat, ( const char *filename, void *buf ) );
+
+#ifdef WIN32
+# define stat _stati64
+#endif
+
+VLC_EXPORT( int, utf8_stat, ( const char *filename, struct stat *buf ) );
+VLC_EXPORT( int, utf8_lstat, ( const char *filename, struct stat *buf ) );
 VLC_EXPORT( int, utf8_mkdir, ( const char *filename ) );
 
 VLC_EXPORT( int, utf8_vfprintf, ( FILE *stream, const char *fmt, va_list ap ) );

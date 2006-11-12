@@ -518,7 +518,7 @@ int utf8_scandir( const char *dirname, char ***namelist,
 }
 
 
-static int utf8_statEx( const char *filename, void *buf,
+static int utf8_statEx( const char *filename, struct stat *buf,
                         vlc_bool_t deref )
 {
 #if defined (WIN32) || defined (UNDER_CE)
@@ -535,7 +535,7 @@ static int utf8_statEx( const char *filename, void *buf,
         }
         wpath[MAX_PATH] = L'\0';
 
-        return _wstati64( wpath, (struct _stati64 *)buf );
+        return _wstati64( wpath, buf );
     }
 #endif
 #ifdef HAVE_SYS_STAT_H
@@ -543,8 +543,8 @@ static int utf8_statEx( const char *filename, void *buf,
 
     if( local_name != NULL )
     {
-        int res = deref ? stat( local_name, (struct stat *)buf )
-                       : lstat( local_name, (struct stat *)buf );
+        int res = deref ? stat( local_name, buf )
+                       : lstat( local_name, buf );
         LocaleFree( local_name );
         return res;
     }
@@ -554,12 +554,12 @@ static int utf8_statEx( const char *filename, void *buf,
 }
 
 
-int utf8_stat( const char *filename, void *buf)
+int utf8_stat( const char *filename, struct stat *buf)
 {
     return utf8_statEx( filename, buf, VLC_TRUE );
 }
 
-int utf8_lstat( const char *filename, void *buf)
+int utf8_lstat( const char *filename, struct stat *buf)
 {
     return utf8_statEx( filename, buf, VLC_FALSE );
 }

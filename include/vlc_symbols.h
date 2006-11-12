@@ -469,8 +469,8 @@ struct module_symbols_t
     void * (*utf8_opendir_inner) (const char *dirname);
     FILE * (*utf8_fopen_inner) (const char *filename, const char *mode);
     char * (*utf8_readdir_inner) (void *dir);
-    int (*utf8_stat_inner) (const char *filename, void *buf);
-    int (*utf8_lstat_inner) (const char *filename, void *buf);
+    int (*utf8_stat_inner) (const char *filename, struct stat *buf);
+    int (*utf8_lstat_inner) (const char *filename, struct stat *buf);
     char * (*FromLocaleDup_inner) (const char *);
     int (*utf8_mkdir_inner) (const char *filename);
     vlm_media_t* (*vlm_MediaSearch_inner) (vlm_t *, const char *);
