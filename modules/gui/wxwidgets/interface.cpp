@@ -40,6 +40,8 @@
 
 #include <wx/splitter.h>
 
+#include <wx/utils.h>                             /* wxLaunchDefaultBrowser() */
+
 /* include the toolbar graphics */
 #include "bitmaps/play.xpm"
 #include "bitmaps/pause.xpm"
@@ -296,6 +298,8 @@ enum
      * this standard value as otherwise it won't be handled properly under Mac
      * (where it is special and put into the "Apple" menu) */
     About_Event = wxID_ABOUT,
+    OnWebLink_Event,
+    OnWebHelp_Event,
     UpdateVLC_Event,
     VLM_Event,
 
@@ -308,6 +312,8 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     /* Menu events */
     EVT_MENU(Exit_Event, Interface::OnExit)
     EVT_MENU(About_Event, Interface::OnAbout)
+    EVT_MENU(OnWebLink_Event, Interface::OnWebLink)
+    EVT_MENU(OnWebHelp_Event, Interface::OnWebHelp)
     EVT_MENU(UpdateVLC_Event, Interface::OnShowDialog)
     EVT_MENU(VLM_Event, Interface::OnShowDialog)
 
@@ -605,6 +611,9 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
+    help_menu->Append( OnWebLink_Event, wxU(_("VideoLAN's Website")) );
+    help_menu->Append( OnWebHelp_Event, wxU(_("Online Help")) );
+    help_menu->AppendSeparator();
     help_menu->Append( About_Event, wxU(_("About...")) );
     help_menu->AppendSeparator();
     help_menu->Append( UpdateVLC_Event, wxU(_("Check for Updates...")) );
@@ -953,6 +962,16 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
               "http://www.videolan.org/\n\n")) );
     wxMessageBox( msg, wxString::Format(wxU(_("About %s")),
                   wxT("VLC media player")), wxOK | wxICON_INFORMATION, this );
+}
+
+void Interface::OnWebLink( wxCommandEvent& WXUNUSED(event) )
+{
+    wxLaunchDefaultBrowser( wxU("http://videolan.org/") );
+}
+
+void Interface::OnWebHelp( wxCommandEvent& WXUNUSED(event) )
+{
+    wxLaunchDefaultBrowser( wxU("http://videolan.org/doc/") );
 }
 
 void Interface::OnShowDialog( wxCommandEvent& event )
