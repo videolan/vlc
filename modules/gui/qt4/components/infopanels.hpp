@@ -57,13 +57,25 @@ public:
     virtual ~MetaPanel();
 private:
     intf_thread_t *p_intf;
+    QLabel *uri_text;
+    QLabel *name_text;
+    QLabel *artist_text;
+    QLabel *genre_text;
+    QLabel *copyright_text;
+    QLabel *collection_text;
+    QLabel *seqnum_text;
+    QLabel *description_text;
+    QLabel *rating_text;
+    QLabel *date_text;
+    QLabel *setting_text;
+    QLabel *language_text;
+    QLabel *nowplaying_text;
+    QLabel *publisher_text;
+
 
 public slots:
     void update( input_item_t * );
     void clear();
-
-    char* getURI();
-    char* getName();
 };
 
 class InfoPanel: public QWidget

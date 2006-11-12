@@ -86,30 +86,67 @@ void InputStatsPanel::clear()
 MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
                                     QWidget( parent ), p_intf( _p_intf )
 {
-
+    int line = 0;
+    QGridLayout *l = new QGridLayout( this );
+#define ADD_META( string, widget ) {                            \
+    l->addWidget( new QLabel( qfu( string ) ), line, 0 );       \
+    widget = new QLabel( "" );                                  \
+    l->addWidget( widget, line, 1 );                            \
+    line++;            }
+    ADD_META( _( "Name" ), name_text );
+    ADD_META( _( "URI" ), uri_text );
+    ADD_META( VLC_META_ARTIST, artist_text );
+    ADD_META( VLC_META_GENRE, genre_text );
+    ADD_META( VLC_META_COPYRIGHT, copyright_text );
+    ADD_META( VLC_META_COLLECTION, collection_text );
+    ADD_META( VLC_META_SEQ_NUM, seqnum_text );
+    ADD_META( VLC_META_DESCRIPTION, description_text );
+    ADD_META( VLC_META_RATING, rating_text );
+    ADD_META( VLC_META_DATE, date_text );
+    ADD_META( VLC_META_LANGUAGE, language_text );
+    ADD_META( VLC_META_NOW_PLAYING, nowplaying_text );
+    ADD_META( VLC_META_PUBLISHER, publisher_text );
+    ADD_META( VLC_META_SETTING, setting_text );
 }
+
 MetaPanel::~MetaPanel()
 {
 }
+
 void MetaPanel::update( input_item_t *p_item )
 {
+#define UPDATE_META( meta, widget ) {               \
+    char* psz_meta = p_item->p_meta->psz_##meta;    \
+    if( !EMPTY_STR( psz_meta ) )                    \
+        widget->setText( qfu( psz_meta ) );         \
+    else                                            \
+        widget->setText( "" );          }
+
+    if( !EMPTY_STR( p_item->psz_name ) )
+        name_text->setText( qfu( p_item->psz_name ) );
+    else name_text->setText( "" );
+    if( !EMPTY_STR( p_item->psz_uri ) )
+        uri_text->setText( qfu( p_item->psz_uri ) );
+    else uri_text->setText( "" );
+    UPDATE_META( artist, artist_text );
+    UPDATE_META( genre, genre_text );
+    UPDATE_META( copyright, copyright_text );
+    UPDATE_META( album, collection_text );
+    UPDATE_META( tracknum, seqnum_text );
+    UPDATE_META( description, description_text );
+    UPDATE_META( rating, rating_text );
+    UPDATE_META( date, date_text );
+    UPDATE_META( language, language_text );
+    UPDATE_META( nowplaying, nowplaying_text );
+    UPDATE_META( publisher, publisher_text );
+    UPDATE_META( setting, setting_text );
+
+#undef UPDATE_META
 }
+
 void MetaPanel::clear()
 {
 }
-
-char* MetaPanel::getURI()
-{
-    char *URI;
-    return URI;
-}
-
-char* MetaPanel::getName()
-{
-    char *Name;
-    return Name;
-}
-
 
 InfoPanel::InfoPanel( QWidget *parent, intf_thread_t *_p_intf ) :
                                       QWidget( parent ), p_intf( _p_intf )
