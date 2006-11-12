@@ -60,7 +60,7 @@
 #define ENC_POSY_LONGTEXT N_("Y coordinate of the encoded subtitle" )
 
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static char *ppsz_pos_descriptions[] =
+static const char *ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
