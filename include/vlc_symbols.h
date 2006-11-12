@@ -55,7 +55,7 @@ struct module_symbols_t
     int (*aout_Restart_inner) (aout_instance_t * p_aout);
     int (*aout_FindAndRestart_inner) (vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void *);
     int (*aout_ChannelsRestart_inner) (vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void *);
-    vlc_bool_t (*vlc_current_charset_inner) (char **);
+    void *vlc_current_charset_deprecated;
     int (*__config_GetType_inner) (vlc_object_t *, const char *);
     int (*__config_GetInt_inner) (vlc_object_t *, const char *);
     void (*__config_PutInt_inner) (vlc_object_t *, const char *, int);
@@ -596,7 +596,6 @@ struct module_symbols_t
 #  define aout_Restart (p_symbols)->aout_Restart_inner
 #  define aout_FindAndRestart (p_symbols)->aout_FindAndRestart_inner
 #  define aout_ChannelsRestart (p_symbols)->aout_ChannelsRestart_inner
-#  define vlc_current_charset (p_symbols)->vlc_current_charset_inner
 #  define __config_GetType (p_symbols)->__config_GetType_inner
 #  define __config_GetInt (p_symbols)->__config_GetInt_inner
 #  define __config_PutInt (p_symbols)->__config_PutInt_inner
@@ -1075,7 +1074,6 @@ struct module_symbols_t
     ((p_symbols)->aout_Restart_inner) = aout_Restart; \
     ((p_symbols)->aout_FindAndRestart_inner) = aout_FindAndRestart; \
     ((p_symbols)->aout_ChannelsRestart_inner) = aout_ChannelsRestart; \
-    ((p_symbols)->vlc_current_charset_inner) = vlc_current_charset; \
     ((p_symbols)->__config_GetType_inner) = __config_GetType; \
     ((p_symbols)->__config_GetInt_inner) = __config_GetInt; \
     ((p_symbols)->__config_PutInt_inner) = __config_PutInt; \
@@ -1513,6 +1511,7 @@ struct module_symbols_t
     ((p_symbols)->str_format_time_inner) = str_format_time; \
     ((p_symbols)->__str_format_meta_inner) = __str_format_meta; \
     ((p_symbols)->vout_Snapshot_inner) = vout_Snapshot; \
+    (p_symbols)->vlc_current_charset_deprecated = NULL; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__sout_CfgParse_deprecated = NULL; \
     (p_symbols)->sout_CfgCreate_deprecated = NULL; \
