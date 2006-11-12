@@ -993,17 +993,19 @@ fi
 
 dnl Check for standard plugin linking flags
 dnl BeOS' gcc needs -nostart instead of -shared, even if -shared isn't harmful (just a warning)
-if test "${SYS}" = "beos"; then
-  VLC_ADD_LDFLAGS([plugin mozilla],[-nostart])
-else
-  AC_CACHE_CHECK([if \$CC accepts -shared],
-      [ac_cv_ld_plugins],
-      [CFLAGS="${CFLAGS_save} -shared"
-       AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
-  if test "${ac_cv_ld_plugins}" != "no"; then
-    VLC_ADD_LDFLAGS([plugin mozilla],[-shared])
-  fi
-fi
+AS_IF([test "${enable_libtool}" = "no"], [
+  AS_IF([test "${SYS}" = "beos"], [
+    VLC_ADD_LDFLAGS([plugin mozilla],[-nostart])
+  ], [
+    AC_CACHE_CHECK([if \$CC accepts -shared],
+          [ac_cv_ld_plugins],
+          [CFLAGS="${CFLAGS_save} -shared"
+         AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
+    AS_IF([test "${ac_cv_ld_plugins}" != "no"], [
+      VLC_ADD_LDFLAGS([plugin mozilla],[-shared])
+    ])
+  ])
+])
 
 dnl Check for variadic macros
 AC_CACHE_CHECK([for variadic cpp macros],
