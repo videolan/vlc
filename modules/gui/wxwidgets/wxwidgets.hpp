@@ -97,7 +97,7 @@ static inline char *wxFromLocale (const wxString& string)
 {
 #if defined( wxUSE_UNICODE )
 # if defined( WIN32 )
-    return FromWide ((wchar_t *)string.c_str());
+    return FromWide ((const wchar_t *)string.c_str());
 #  define wxLocaleFree free
 # else
     return FromLocale (string.mb_str());
