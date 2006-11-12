@@ -361,7 +361,8 @@ static int Demux( demux_t *p_demux )
         SADD_INFO( "href", psz_href );
         SADD_INFO( "mime type", psz_mimetype );
         playlist_BothAddInput( p_sys->p_playlist, p_input,
-                               p_sys->p_item_in_category, PLAYLIST_APPEND,
+                               p_sys->p_item_in_category,
+                               PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
                                PLAYLIST_END );
         if( psz_qtnext )
         {
@@ -369,7 +370,8 @@ static int Demux( demux_t *p_demux )
                                         psz_qtnext, NULL, 0, NULL, -1 );
             playlist_BothAddInput( p_sys->p_playlist, p_input,
                                    p_sys->p_item_in_category,
-                                   PLAYLIST_APPEND, PLAYLIST_END );
+                                   PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
+                                   PLAYLIST_END );
         }
     }
 

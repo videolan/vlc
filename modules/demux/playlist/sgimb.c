@@ -407,7 +407,7 @@ static int Demux ( demux_t *p_demux )
     }
 
     playlist_BothAddInput( p_playlist, p_child, p_item_in_category,
-                           PLAYLIST_APPEND, PLAYLIST_END );
+                           PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END );
     HANDLE_PLAY_AND_RELEASE
     return -1; /* Needed for correct operation of go back */
 }

@@ -119,7 +119,8 @@ static int Demux( demux_t *p_demux )
             input_ItemAddOption( p_input, ppsz_options[i] );
         }
         playlist_BothAddInput( p_playlist, p_input, p_item_in_category,
-                               PLAYLIST_APPEND, PLAYLIST_END );
+                               PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
+                               PLAYLIST_END );
 
         while( i_options-- ) free( ppsz_options[i_options] );
         if( ppsz_options ) free( ppsz_options );

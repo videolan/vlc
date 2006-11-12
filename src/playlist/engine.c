@@ -53,6 +53,7 @@ static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
 playlist_t * playlist_Create( vlc_object_t *p_parent )
 {
     playlist_t *p_playlist;
+    vlc_bool_t b_save;
     int i_tree;
 
     /* Allocate structure */
@@ -89,6 +90,9 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->b_never_tree = (i_tree == 2);
 
     p_playlist->b_doing_ml = VLC_FALSE;
+
+    p_playlist->b_auto_preparse =
+                        var_CreateGetBool( p_playlist, "auto-preparse") ;
 
     p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL);
     p_playlist->p_root_onelevel = playlist_NodeCreate( p_playlist, NULL, NULL);
@@ -132,8 +136,10 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->i_order = ORDER_NORMAL;
 
     vlc_object_attach( p_playlist, p_parent );
-
+    b_save = p_playlist->b_auto_preparse;
+    p_playlist->b_auto_preparse = VLC_FALSE;
     playlist_MLLoad( p_playlist );
+    p_playlist->b_auto_preparse = VLC_TRUE;
     return p_playlist;
 }
 

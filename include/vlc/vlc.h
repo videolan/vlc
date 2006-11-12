@@ -141,6 +141,7 @@ struct vlc_list_t
 #define PLAYLIST_APPEND          0x0002
 #define PLAYLIST_GO              0x0004
 #define PLAYLIST_PREPARSE        0x0008
+#define PLAYLIST_SPREPARSE       0x0010
 
 #define PLAYLIST_END           -666
 

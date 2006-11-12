@@ -574,11 +574,22 @@ void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         p_playlist->request.i_status = PLAYLIST_RUNNING;
         vlc_cond_signal( &p_playlist->object_wait );
     }
-    if( i_mode & PLAYLIST_PREPARSE &&
-        var_CreateGetBool( p_playlist, "auto-preparse" ) )
-    {
+    /* Preparse if PREPARSE or SPREPARSE & not enough meta */
+    if( p_playlist->b_auto_preparse &&
+          (i_mode & PLAYLIST_PREPARSE ||
+          ( i_mode & PLAYLIST_SPREPARSE &&
+            ( !p_item_cat->p_input->p_meta || (p_item_cat->p_input->p_meta &&
+              ( EMPTY_STR( p_item_cat->p_input->p_meta->psz_artist ) ||
+                EMPTY_STR( p_item_cat->p_input->p_meta->psz_album ) )
+              )
+            )
+          ) ) )
         playlist_PreparseEnqueue( p_playlist, p_item_cat->p_input );
-    }
+    /* If we already have it, signal it */
+    else if( p_item_cat->p_input->p_meta &&
+             !EMPTY_STR( p_item_cat->p_input->p_meta->psz_artist ) &&
+             !EMPTY_STR( p_item_cat->p_input->p_meta->psz_album ) )
+        p_item_cat->p_input->p_meta->i_status = ITEM_PREPARSED;
 }
 
 /* Add the playlist item to the requested node and fire a notification */

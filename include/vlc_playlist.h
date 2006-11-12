@@ -128,6 +128,7 @@ struct playlist_t
 
     vlc_bool_t            b_doing_ml; /**< Doing media library stuff, */
                                       /*get quicker */
+    vlc_bool_t            b_auto_preparse;
 
     /* Runtime */
     input_thread_t *      p_input;  /**< the input thread associated

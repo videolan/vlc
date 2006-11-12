@@ -481,7 +481,8 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                     FREE_ATT();
                     playlist_BothAddInput( p_playlist, p_new_input,
                                            p_demux->p_sys->p_item_in_category,
-                                           PLAYLIST_APPEND, PLAYLIST_END );
+                                           PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
+                                           PLAYLIST_END );
                     if( p_demux->p_sys->i_identifier <
                         p_demux->p_sys->i_tracklist_entries )
                     {
