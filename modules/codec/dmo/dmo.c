@@ -855,7 +855,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         if( i_result != S_FALSE )
             msg_Dbg( p_dec, "ProcessOutput(): failed" );
-#if DMO_DEBUG
+#ifdef DMO_DEBUG
         else
             msg_Dbg( p_dec, "ProcessOutput(): no output" );
 #endif
@@ -864,13 +864,13 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-#if DMO_DEBUG
+#ifdef DMO_DEBUG
     msg_Dbg( p_dec, "ProcessOutput(): success" );
 #endif
 
     if( !block_out.i_buffer )
     {
-#if DMO_DEBUG
+#ifdef DMO_DEBUG
         msg_Dbg( p_dec, "ProcessOutput(): no output (i_buffer_out == 0)" );
 #endif
         p_out->vt->Release( (IUnknown *)p_out );
@@ -1492,7 +1492,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
         return NULL;
     }
 
-#if DMO_DEBUG
+#ifdef DMO_DEBUG
     msg_Dbg( p_enc, "ProcessInput(): success" );
 #endif
 
@@ -1516,7 +1516,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
         {
             if( i_result != S_FALSE )
                 msg_Dbg( p_enc, "ProcessOutput(): failed: %x", i_result );
-#if DMO_DEBUG
+#ifdef DMO_DEBUG
             else
                 msg_Dbg( p_enc, "ProcessOutput(): no output" );
 #endif
@@ -1528,7 +1528,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
 
         if( !p_block_out->i_buffer )
         {
-#if DMO_DEBUG
+#ifdef DMO_DEBUG
             msg_Dbg( p_enc, "ProcessOutput(): no output (i_buffer_out == 0)" );
 #endif
             p_out->vt->Release( (IUnknown *)p_out );
@@ -1538,7 +1538,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
 
         if( db.dwStatus & DMO_OUTPUT_DATA_BUFFERF_TIME )
         {
-#if DMO_DEBUG
+#ifdef DMO_DEBUG
             msg_Dbg( p_enc, "ProcessOutput(): pts: "I64Fd", "I64Fd,
                      i_pts, db.rtTimestamp / 10 );
 #endif
@@ -1548,7 +1548,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
         if( db.dwStatus & DMO_OUTPUT_DATA_BUFFERF_TIMELENGTH )
         {
             p_block_out->i_length = db.rtTimelength / 10;
-#if DMO_DEBUG
+#ifdef DMO_DEBUG
             msg_Dbg( p_enc, "ProcessOutput(): length: "I64Fd,
                      p_block_out->i_length );
 #endif
