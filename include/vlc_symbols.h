@@ -550,9 +550,9 @@ struct module_symbols_t
     void *input_AskForArt_deprecated;
     int (*playlist_AskForArtEnqueue_inner) (playlist_t *, input_item_t *);
     uint32_t (*input_CurrentMetaFlags_inner) (vlc_meta_t *p_meta);
-    void (*__config_ChainParse_inner) (vlc_object_t *, char *psz_prefix, const char **ppsz_options, config_chain_t *);
+    void (*__config_ChainParse_inner) (vlc_object_t *, const char *psz_prefix, const char **ppsz_options, config_chain_t *);
     void (*config_ChainDestroy_inner) (config_chain_t *);
-    char * (*config_ChainCreate_inner) (char **, config_chain_t **, char *);
+    char * (*config_ChainCreate_inner) (char **, config_chain_t **, const char *);
     int (*utf8_open_inner) (const char *filename, int flags, mode_t mode);
     int (*net_ListenSingle_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int family, int socktype, int protocol);
     char * (*str_format_time_inner) (char *);

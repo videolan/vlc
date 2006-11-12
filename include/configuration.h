@@ -421,11 +421,11 @@ struct config_chain_t
 };
 
 #define config_ChainParse( a, b, c, d ) __config_ChainParse( VLC_OBJECT(a), b, c, d )
-VLC_EXPORT( void,   __config_ChainParse, ( vlc_object_t *, char *psz_prefix, const char **ppsz_options, config_chain_t * ) );
-VLC_EXPORT( char *, config_ChainCreate, ( char **, config_chain_t **, char * ) );
+VLC_EXPORT( void,   __config_ChainParse, ( vlc_object_t *, const char *psz_prefix, const char **ppsz_options, config_chain_t * ) );
+VLC_EXPORT( char *, config_ChainCreate, ( char **, config_chain_t **, const char * ) );
 VLC_EXPORT( void, config_ChainDestroy, ( config_chain_t * ) );
 
-static inline config_chain_t *config_chain_find( config_chain_t *p_cfg, char *psz_name )
+static inline config_chain_t *config_chain_find( config_chain_t *p_cfg, const char *psz_name )
 {
     while( p_cfg && strcmp( p_cfg->psz_name, psz_name ) )
     {
@@ -435,7 +435,7 @@ static inline config_chain_t *config_chain_find( config_chain_t *p_cfg, char *ps
     return p_cfg;
 }
 
-static inline char *config_chain_find_value( config_chain_t *p_cfg, char *psz_name )
+static inline char *config_chain_find_value( config_chain_t *p_cfg, const char *psz_name )
 {
     while( p_cfg && strcmp( p_cfg->psz_name, psz_name ) )
     {

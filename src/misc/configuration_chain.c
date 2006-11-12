@@ -45,9 +45,10 @@
     { while( e > p && ( *(e-1) == ' ' || *(e-1) == '\t' ) ) e--; }
 
 /* go accross " " and { } */
-static char *_get_chain_end( char *str )
+static const char *_get_chain_end( const char *str )
 {
-    char c, *p = str;
+    char c;
+    const char *p = str;
 
     SKIPSPACE( p );
 
@@ -76,10 +77,10 @@ static char *_get_chain_end( char *str )
     }
 }
 
-char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, char *psz_chain )
+char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, const char *psz_chain )
 {
     config_chain_t *p_cfg = NULL;
-    char       *p = psz_chain;
+    const char *p = psz_chain;
 
     *ppsz_name = NULL;
     *pp_cfg    = NULL;
@@ -98,7 +99,7 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, char *psz_c
 
     if( *p == '{' )
     {
-        char *psz_name;
+        const char *psz_name;
 
         p++;
 
@@ -126,7 +127,7 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, char *psz_c
 
             if( *p == '=' || *p == '{' )
             {
-                char *end;
+                const char *end;
                 vlc_bool_t b_keep_brackets = (*p == '{');
 
                 if( *p == '=' ) p++;
@@ -224,8 +225,8 @@ void config_ChainDestroy( config_chain_t *p_cfg )
     }
 }
 
-void __config_ChainParse( vlc_object_t *p_this, char *psz_prefix,
-                      const char **ppsz_options, config_chain_t *cfg )
+void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
+                          const char **ppsz_options, config_chain_t *cfg )
 {
     char *psz_name;
     int  i_type;
