@@ -472,6 +472,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #   define VLC_EXPORT( type, name, args ) struct _u_n_u_s_e_d_
     extern module_symbols_t* p_symbols;
 #endif
+#define VLC_INTERNAL( type, name, args ) VLC_EXPORT (type, name, args)
 
 /*****************************************************************************
  * OS-specific headers and thread types
