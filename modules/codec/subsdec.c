@@ -316,9 +316,11 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Check validity of packet data */
-    if( p_block->i_buffer <= 1 || p_block->p_buffer[0] == '\0' )
+    /* An "empty" line containing only \0 can be used to force
+       and ephemer picture from the screen */
+    if( p_block->i_buffer < 1 )
     {
-        msg_Warn( p_dec, "empty subtitle" );
+        msg_Warn( p_dec, "no subtitle data" );
         return NULL;
     }
 
