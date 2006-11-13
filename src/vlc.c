@@ -62,16 +62,16 @@ int main( int i_argc, char *ppsz_argv[] )
 #ifdef HAVE_PUTENV
 #   ifdef DEBUG
     /* Activate malloc checking routines to detect heap corruptions. */
-    putenv( "MALLOC_CHECK_=2" );
+    putenv( (char*)"MALLOC_CHECK_=2" );
 
     /* Disable the ugly Gnome crash dialog so that we properly segfault */
-    putenv( "GNOME_DISABLE_CRASH_DIALOG=1" );
+    putenv( (char *)"GNOME_DISABLE_CRASH_DIALOG=1" );
 #   endif
 
     /* If the user isn't using VLC_VERBOSE, set it to 0 by default */
     if( getenv( "VLC_VERBOSE" ) == NULL )
     {
-        putenv( "VLC_VERBOSE=0" );
+        putenv( (char *)"VLC_VERBOSE=0" );
     }
 #endif
 
