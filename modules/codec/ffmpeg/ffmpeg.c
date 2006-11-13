@@ -1108,6 +1108,11 @@ static struct
       AUDIO_ES, "Shorten Lossless Audio" },
 #endif
 
+#if LIBAVCODEC_BUILD >= ((51<<16)+(16<<8)+0)
+    { VLC_FOURCC('w','v','p','k'), CODEC_ID_WAVPACK,
+      AUDIO_ES, "WavPack" },
+#endif
+
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
       AUDIO_ES, "PCM S8" },
@@ -1141,11 +1146,6 @@ static struct
       AUDIO_ES, "PCM ALAW" },
     { VLC_FOURCC('u','l','a','w'), CODEC_ID_PCM_MULAW,
       AUDIO_ES, "PCM ULAW" },
-
-#if LIBAVCODEC_BUILD >= ((51<<16)+(15<<8)+1)
-    { VLC_FOURCC('w','v','p','k'), CODEC_ID_WAVPACK,
-      AUDIO_ES, "WavPack" },
-#endif
 
     { 0, 0, 0, 0 }
 };
