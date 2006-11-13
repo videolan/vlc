@@ -73,8 +73,8 @@ static void Display   ( vout_thread_t *, picture_t * );
                             "creating one file per image. In this case, " \
                              "the number is not appended to the filename." )
 
-static char *psz_format_list[] = { "png", "jpeg" };
-static char *psz_format_list_text[] = { "PNG", "JPEG" };
+static const char *psz_format_list[] = { "png", "jpeg" };
+static const char *psz_format_list_text[] = { "PNG", "JPEG" };
 
 vlc_module_begin( );
     set_shortname( _( "Image file" ) );
