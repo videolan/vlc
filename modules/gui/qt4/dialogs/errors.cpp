@@ -34,7 +34,7 @@ ErrorsDialog *ErrorsDialog::instance = NULL;
 
 ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
-    setWindowTitle( _("Errors" ) );
+    setWindowTitle( qtr( "Errors" ) );
     resize( 500 , 200 );
 
     QGridLayout *layout = new QGridLayout( this );

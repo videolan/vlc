@@ -29,7 +29,7 @@
 
 SoutDialog::SoutDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
-    setWindowTitle( _("Stream output") );
+    setWindowTitle( qtr( "Stream output") );
     main = new QWidget( this );
 
     /* UI stuff */

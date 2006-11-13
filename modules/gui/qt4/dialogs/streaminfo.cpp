@@ -37,7 +37,7 @@ StreamInfoDialog *StreamInfoDialog::instance = NULL;
 StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf ) :QVLCFrame( _p_intf )
 {
     i_runs = 0;
-    setWindowTitle( _("Stream information" ) );
+    setWindowTitle( qtr( "Stream information" ) );
     QGridLayout *layout = new QGridLayout(this);
 
     IT = new InfoTab( this, p_intf, true ) ;
