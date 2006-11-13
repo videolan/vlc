@@ -27,11 +27,6 @@
 
 #include <stdarg.h>
 #include <sys/types.h>
-#ifdef HAVE_SYS_STAT_H
-# include <sys/stat.h>
-#else
-struct stat { };
-#endif
 
 VLC_EXPORT( void, LocaleFree, ( const char * ) );
 VLC_EXPORT( char *, FromLocale, ( const char * ) );

@@ -449,7 +449,11 @@ typedef struct meta_engine_t meta_engine_t;
 
 /* stat/lstat/fstat */
 #ifdef WIN32
+#include <sys/stat.h>
 struct _stati64;
+#define stat _stati64
+#define fstat _fstati64
+/* You should otherwise use utf8_stat and utf8_lstat. */
 #else
 struct stat;
 #endif

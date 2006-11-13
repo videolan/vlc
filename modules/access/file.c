@@ -51,8 +51,6 @@
 #endif
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
-/* fstat() support for large files on win32 */
-#   define fstat(a,b) _fstati64(a,b)
 #   ifdef lseek
 #      undef lseek
 #   endif
