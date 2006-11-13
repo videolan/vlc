@@ -1205,8 +1205,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
              p_item++ )
         {
             char *psz_text, *psz_spaces = psz_spaces_text;
-            char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
-            char *psz_suf = "", *psz_prefix = NULL;
+            const char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
+            const char *psz_suf = "", *psz_prefix = NULL;
             signed int i;
 
             /* Skip deprecated options */
@@ -1243,11 +1243,11 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 {
                     psz_bra = OPTION_VALUE_SEP "{";
                     psz_type = psz_buffer;
-                    psz_type[0] = '\0';
+                    psz_buffer[0] = '\0';
                     for( i = 0; p_item->ppsz_list[i]; i++ )
                     {
-                        if( i ) strcat( psz_type, "," );
-                        strcat( psz_type, p_item->ppsz_list[i] );
+                        if( i ) strcat( psz_buffer, "," );
+                        strcat( psz_buffer, p_item->ppsz_list[i] );
                     }
                     psz_ket = "}";
                 }
@@ -1262,11 +1262,11 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 {
                     psz_bra = OPTION_VALUE_SEP "{";
                     psz_type = psz_buffer;
-                    psz_type[0] = '\0';
+                    psz_buffer[0] = '\0';
                     for( i = 0; p_item->ppsz_list_text[i]; i++ )
                     {
-                        if( i ) strcat( psz_type, ", " );
-                        sprintf( psz_type + strlen(psz_type), "%i (%s)",
+                        if( i ) strcat( psz_buffer, ", " );
+                        sprintf( psz_buffer + strlen(psz_buffer), "%i (%s)",
                                  p_item->pi_list[i],
                                  p_item->ppsz_list_text[i] );
                     }
