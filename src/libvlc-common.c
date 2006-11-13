@@ -745,7 +745,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
 #ifdef HAVE_SYSLOG_H
     if( config_GetInt( p_libvlc, "syslog" ) == 1 )
     {
-        char *psz_logmode = "logmode=syslog";
+        const char *psz_logmode = "logmode=syslog";
         libvlc_InternalAddIntf( 0, "logger,none", VLC_FALSE, VLC_FALSE,
                                 1, &psz_logmode );
     }
@@ -920,7 +920,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
                             char const *psz_module,
                             vlc_bool_t b_block, vlc_bool_t b_play,
-                            int i_options, char **ppsz_options )
+                            int i_options, const char *const *ppsz_options )
 {
     int i_err;
     intf_thread_t *p_intf;
@@ -977,7 +977,7 @@ static void SetLanguage ( char const *psz_lang )
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 
-    char *          psz_path;
+    const char *          psz_path;
 #if defined( __APPLE__ ) || defined ( WIN32 ) || defined( SYS_BEOS )
     char            psz_tmp[1024];
 #endif

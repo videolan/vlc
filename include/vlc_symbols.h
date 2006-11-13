@@ -234,7 +234,7 @@ struct module_symbols_t
     decoder_t * (*input_DecoderNew_inner) (input_thread_t *, es_format_t *, vlc_bool_t b_force_decoder);
     void (*input_DecoderDelete_inner) (decoder_t *);
     void (*input_DecoderDecode_inner) (decoder_t *, block_t *);
-    intf_thread_t * (*__intf_Create_inner) (vlc_object_t *, const char *, int, char **);
+    intf_thread_t * (*__intf_Create_inner) (vlc_object_t *, const char *, int, const char *const *);
     int (*intf_RunThread_inner) (intf_thread_t *);
     void (*intf_StopThread_inner) (intf_thread_t *);
     void (*intf_Destroy_inner) (intf_thread_t *);

@@ -39,8 +39,8 @@ int libvlc_InternalInit( libvlc_int_t *, int, char *ppsz_argv[] );
 int libvlc_InternalCleanup( libvlc_int_t * );
 int libvlc_InternalDestroy( libvlc_int_t *, vlc_bool_t );
 
-int libvlc_InternalAddIntf( libvlc_int_t *, char const *, vlc_bool_t,
-                            vlc_bool_t, int, char ** );
+int libvlc_InternalAddIntf( libvlc_int_t *, const char *, vlc_bool_t,
+                            vlc_bool_t, int, const char *const * );
 
 /***************************************************************************
  * Opaque structures for libvlc API

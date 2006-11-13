@@ -91,7 +91,7 @@ static void Manager( intf_thread_t *p_intf );
  * \return a pointer to the created interface thread, NULL on error
  */
 intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
-                              int i_options, char **ppsz_options  )
+                              int i_options, const char *const *ppsz_options  )
 {
     intf_thread_t * p_intf;
     int i;
@@ -320,7 +320,7 @@ static void Manager( intf_thread_t *p_intf )
  *****************************************************************************/
 static void RunInterface( intf_thread_t *p_intf )
 {
-    static char *ppsz_interfaces[] =
+    static const char *ppsz_interfaces[] =
     {
         "skins2", "Skins 2",
 #ifndef WIN32
@@ -328,7 +328,7 @@ static void RunInterface( intf_thread_t *p_intf )
 #endif
         NULL, NULL
     };
-    char **ppsz_parser;
+    const char **ppsz_parser;
 
     vlc_list_t *p_list;
     int i;
@@ -351,8 +351,8 @@ static void RunInterface( intf_thread_t *p_intf )
             module_t *p_module = (module_t *)p_list->p_values[i].p_object;
             if( !strcmp( p_module->psz_object_name, ppsz_parser[0] ) )
             {
-                val.psz_string = ppsz_parser[0];
-                text.psz_string = _(ppsz_parser[1]);
+                val.psz_string = (char *)ppsz_parser[0];
+                text.psz_string = (char *)_(ppsz_parser[1]);
                 var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE,
                             &val, &text );
                 break;
@@ -369,15 +369,19 @@ static void RunInterface( intf_thread_t *p_intf )
     text.psz_string = _("Add Interface");
     var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, &text, NULL );
 
-    val.psz_string = "rc"; text.psz_string = "Console";
+    val.psz_string = (char *)"rc"; text.psz_string = (char *)"Console";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "telnet"; text.psz_string = _("Telnet Interface");
+    val.psz_string = (char *)"telnet";
+    text.psz_string = (char *)_("Telnet Interface");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "http"; text.psz_string = _("Web Interface");
+    val.psz_string = (char *)"http";
+    text.psz_string = (char *)_("Web Interface");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "logger"; text.psz_string = _("Debug logging");
+    val.psz_string = (char *)"logger";
+    text.psz_string = (char *)_("Debug logging");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "gestures"; text.psz_string = _("Mouse Gestures");
+    val.psz_string = (char *)"gestures";
+    text.psz_string = (char *)_("Mouse Gestures");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
