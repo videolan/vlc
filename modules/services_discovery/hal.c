@@ -81,15 +81,17 @@ static int Open( vlc_object_t *p_this )
 
     playlist_t          *p_playlist;
 
+#ifdef HAVE_HAL_1
     DBusError           dbus_error;
     DBusConnection      *p_connection;
+#endif
 
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
+#ifdef HAVE_HAL_1
     dbus_error_init( &dbus_error );
 
-#ifdef HAVE_HAL_1
     p_sys->p_ctx = libhal_ctx_new();
     if( !p_sys->p_ctx )
     {
@@ -111,8 +113,12 @@ static int Open( vlc_object_t *p_this )
     if( !(p_sys->p_ctx = hal_initialize( NULL, FALSE ) ) )
 #endif
     {
+#ifdef HAVE_HAL_1
         msg_Err( p_sd, "hal not available : %s", dbus_error.message );
         dbus_error_free( &dbus_error );
+#else
+        msg_Err( p_sd, "hal not available" );
+#endif
         free( p_sys );
         return VLC_EGENERIC;
     }
