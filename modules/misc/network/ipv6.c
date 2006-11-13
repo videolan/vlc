@@ -271,8 +271,9 @@ static int OpenUDP( vlc_object_t * p_this )
                           (char *)&imr, sizeof(struct group_source_req) ) == -1 )
             {
 
-                msg_Err( p_this, "failed to join IP multicast group (%s)",
-                                                          strerror(errno) );
+                msg_Err( p_this, "Source specific multicast failed (%s) -"
+                          " check if your OS really supports MLDv2",
+                          strerror(errno) );
             }
         }
         else
