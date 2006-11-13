@@ -482,6 +482,19 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_TIME:
+            i64 = (int64_t)va_arg( args, int64_t );
+            if( p_sys->i_time_track >= 0 && p_sys->i_current_pts > 0 )
+            {
+                int64_t i_now = p_sys->i_current_pts - p_sys->tk[p_sys->i_time_track].i_first_pts;
+                int64_t i_pos = stream_Tell( p_demux->s );
+                int64_t i_offset = i_pos / (i_now / 1000000) * ((i64 - i_now) / 1000000);
+                stream_Seek( p_demux->s, i_pos + i_offset);
+
+                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+
         case DEMUX_GET_FPS:
         default:
             return VLC_EGENERIC;
