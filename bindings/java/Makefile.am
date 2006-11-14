@@ -3,6 +3,7 @@
 #######################################################################
 
 #SUBDIRS= src
+
 DIST_SUBDIRS = src
 
 EXTRA_DIST= \
@@ -33,33 +34,67 @@ EXTRA_DIST+= \
 	org/videolan/jvlc/VLMIntf.java \
 	org/videolan/jvlc/VLM.java 
 
+if BUILD_JAVA
+
 OBJECTS = org/videolan/jvlc/VLCException.class org/videolan/jvlc/Playlist.class org/videolan/jvlc/AudioIntf.class org/videolan/jvlc/Audio.class org/videolan/jvlc/InputIntf.class org/videolan/jvlc/Input.class org/videolan/jvlc/PlaylistIntf.class org/videolan/jvlc/VideoIntf.class org/videolan/jvlc/Video.class org/videolan/jvlc/JLibVLC.class org/videolan/jvlc/JVLC.class org/videolan/jvlc/JVLCCanvas.class org/videolan/jvlc/JVLCPanel.class org/videolan/jvlc/VLMIntf.class org/videolan/jvlc/VLM.class  org/videolan/jvlc/GenericVideoWidget.class
 
+OBJECTS_HEADER = src/../includes/VLCException.h src/../includes/Playlist.h src/../includes/AudioIntf.h src/../includes/Audio.h src/../includes/InputIntf.h src/../includes/Input.h src/../includes/PlaylistIntf.h src/../includes/VideoIntf.h src/../includes/Video.h src/../includes/JLibVLC.h src/../includes/JVLC.h src/../includes/JVLCCanvas.h src/../includes/JVLCPanel.h src/../includes/VLMIntf.h src/../includes/VLM.h  src/../includes/GenericVideoWidget.h
 
 COBJECTS = src/utils.o src/video-jni.o src/audio-jni.o src/input-jni.o src/playlist-jni.o src/vlm-jni.o src/core-jni.o src/graphics-jni.o
 
-if BUILD_JAVA
-# Include some JAVA stuff
 PROCESSOR_FAMILY = `uname -m | sed -e 's/^i.86/i386/' | sed -e 's/^x86_64/amd64/'`
 
 if HAVE_WIN32
 JINCLUDES = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/win32
 LIBJINCLUDES = -L${JAVA_HOME}/lib -ljawt
 JCH = javah
-JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
-JAVALDFLAGS = -mno-cygwin -L../../src -L../../src/.libs -lvlc-control `top_builddir=../.. ../../vlc-config --libs builtin vlc pic external` -Wl,--kill-at
 else
 JINCLUDES = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 LIBJINCLUDES = -L$(JAVA_HOME)/jre/lib/$(PROCESSOR_FAMILY) -ljawt
 JCH = gcjh -jni
+endif
+
+
+if USE_LIBTOOL
+jvlcdir = $(libdir)
+jvlc_LTLIBRARIES = libjvlc.la
+libjvlc_la_SOURCES = \
+	src/audio-jni.cc \
+	src/core-jni.cc \
+	src/graphics-jni.cc \
+	src/input-jni.cc \
+	src/playlist-jni.cc \
+	src/utils.cc \
+	src/utils.h \
+	src/video-jni.cc \
+	src/vlm-jni.cc
+
+libjvlc_la_LIBADD = ../../src/libvlc-control.la $(LIBJINCLUDES)
+
+if HAVE_WIN32
+libjvlc_la_JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
+libjvlc_la_JAVALDFLAGS = -mno-cygwin -L../../src -L../../src/.libs -lvlc-control `top_builddir=../.. ../../vlc-config --libs builtin vlc pic external` -Wl,--kill-at
+else
+libjvlc_la_JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
+libjvlc_la_JAVALDFLAGS = -L../../src -L../../src/.libs  -lvlc-control `top_builddir=../.. ../../vlc-config --libs builtin vlc pic external`
+endif
+
+else
+
+if HAVE_WIN32
+JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
+JAVALDFLAGS = -mno-cygwin -L../../src -L../../src/.libs -lvlc-control `top_builddir=../.. ../../vlc-config --libs builtin vlc pic external` -Wl,--kill-at
+else
 JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
 JAVALDFLAGS = -L../../src -L../../src/.libs  -lvlc-control `top_builddir=../.. ../../vlc-config --libs builtin vlc pic external`
+endif
+
 endif
 
 export JINCLUDES
 
 # Build targets
-all: libjvlc.so VlcClient VLCExample
+all: VlcClient VLCExample
 
 if HAVE_WIN32
 libjvlc.so: $(OBJECTS)
@@ -86,6 +121,8 @@ else
 	$(JAVAC) $?
 	$(JCH) $(@D)/$(*F) -o includes/$(*F).h
 endif
+
+$(OBJECTS_HEADER): $(OBJECTS)
 
 clean-local:
 	rm -f *.class *~ org/videolan/jvlc/*.class org_videolan*.h includes/*.h src/*.o *.so *.o *.dll
