@@ -678,12 +678,18 @@ VLC is the greatest thing since sliced bread!
 <Dnumgis_> use this money and your natural charm to get a girlfriend
 <Dnumgis_> make sure Meuuh sees it
 <Dnumgis_> Meuuh would become horribly jealous and try to repeat your trick
-           with great vigor and solv all remaining bugs with vlc
+           with great vigor and solve all remaining bugs with vlc
 <Dnumgis_> and the (vlc)world becomes a better place
 <j-b> Dnumgis_: do you have a girlfriend ?
 <Dnumgis_> j-b: not at the moment, no
 <j-b> Dnumgis_: so why don't you try this technick ?
 <Dnumgis_> j-b: I don't live close enough to Meuuh 
 <E-bola> thats some good norwegian reasoning
+  -- #videolan
+%
+<Meuuh> of course when using sout-ts-es-id-pid you can't have any stream with
+        an id < 16
+<Meuuh> so use fake-id=68 or whatever
+<Dnumgis> it's illegal to use fake id
   -- #videolan
 %
