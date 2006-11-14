@@ -642,7 +642,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         return VLC_EGENERIC;
 
     uint8_t *decomp = NULL;
-    if (b_compressed)
+    if( b_compressed )
     {
         int newsize = Decompress (buf, &decomp, end - buf);
         if (newsize < 0)
@@ -652,7 +652,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         }
 
         decomp = realloc (decomp, newsize + 1);
-        decomp[newsize++] = '\0';
+        decomp[newsize] = '\0';
 
         psz_sdp = (const char *)decomp;
         len = newsize;
@@ -663,7 +663,8 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         len = end - buf;
     }
 
-    assert (buf[len] == '\0');
+    /* len is a strlen here here. both buf and decomp are len+1 where the 1 should be a \0 */
+    assert( psz_sdp[len] == '\0');
 
     /* Skip payload type */
     /* SAPv1 has implicit "application/sdp" payload type: first line is v=0 */
@@ -1026,6 +1027,9 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
     if( p_sdp == NULL )
         return NULL;
 
+    /* init to 0 */
+    memset( p_sdp, 0, sizeof( sdp_t ) );
+
     p_sdp->psz_sdp = strdup( psz_sdp );
     if( p_sdp->psz_sdp == NULL )
     {
@@ -1033,23 +1037,12 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
         return NULL;
     }
 
-    p_sdp->psz_sessionname = NULL;
-    p_sdp->psz_media       = NULL;
-    p_sdp->psz_connection  = NULL;
-    p_sdp->psz_uri         = NULL;
-    p_sdp->psz_address     = NULL;
-    p_sdp->psz_address_type= NULL;
-
-    p_sdp->i_media         = 0;
-    p_sdp->i_attributes    = 0;
-    p_sdp->pp_attributes   = NULL;
-
     while( *psz_sdp != '\0' && b_end == VLC_FALSE  )
     {
-        char *psz_eol;
-        char *psz_eof;
-        char *psz_parse;
-        char *psz_sess_id;
+        char *psz_eol = NULL;
+        char *psz_eof = NULL;
+        char *psz_parse = NULL;
+        char *psz_sess_id = NULL;
 
         while( *psz_sdp == '\r' || *psz_sdp == '\n' ||
                *psz_sdp == ' ' || *psz_sdp == '\t' )
@@ -1059,7 +1052,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
 
         if( ( psz_eol = strchr( psz_sdp, '\n' ) ) == NULL )
         {
-            psz_eol = psz_sdp + strlen( psz_sdp );
+            psz_eol = (char *)psz_sdp + strlen( psz_sdp );
             b_end = VLC_TRUE;
         }
         if( psz_eol > psz_sdp && *( psz_eol - 1 ) == '\r' )
@@ -1115,7 +1108,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                 psz_parse = psz_eof + 1; i_field++;
 
 
-                psz_parse = &psz_sdp[2];
+                psz_parse = (char *)&psz_sdp[2];
                 GET_FIELD( p_sdp->psz_username );
                 GET_FIELD( psz_sess_id );
 
