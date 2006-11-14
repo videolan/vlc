@@ -26,24 +26,25 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <vlc/vlc.h>
-#include "charset.h"
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
 
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
-#ifdef HAVE_SYS_IOCTL_H
-#   include <sys/ioctl.h>
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+#ifdef HAVE_FCNTL_H 
+#   include <fcntl.h>
 #endif
 
 #if defined( SYS_BSDI )
@@ -70,6 +71,7 @@
 
 #include "cdrom_internals.h"
 #include "cdrom.h"
+#include "charset.h"
 
 /*****************************************************************************
  * ioctl_Open: Opens a VCD device or file and returns an opaque handle
@@ -831,13 +833,26 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     char *p_pos;
     char *psz_vcdfile = NULL;
     char *psz_cuefile = NULL;
-    FILE *cuefile;
+    FILE *cuefile     = NULL;
     char line[1024];
 
     /* Check if we are dealing with a .cue file */
     p_pos = strrchr( psz_dev, '.' );
     if( p_pos && !strcmp( p_pos, ".cue" ) )
     {
+        /* psz_dev must be the cue file. Let's assume there's a .bin
+         * file with the same filename */
+        if( p_pos )
+        {
+            psz_vcdfile = malloc( p_pos - psz_dev + 5 /* ".bin" */ );
+            strncpy( psz_vcdfile, psz_dev, p_pos - psz_dev );
+            strcpy( psz_vcdfile + (p_pos - psz_dev), ".bin");
+        }
+        else
+        {
+            psz_vcdfile = malloc( strlen(psz_dev) + 5 /* ".bin" */ );
+            sprintf( psz_vcdfile, "%s.bin", psz_dev );
+        }
         psz_cuefile = strdup( psz_dev );
     }
     else
@@ -855,14 +870,30 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
             psz_cuefile = malloc( strlen(psz_dev) + 5 /* ".cue" */ );
             sprintf( psz_cuefile, "%s.cue", psz_dev );
         }
+        /* If we need to look up the .cue file, then we don't have to look for the vcd */
+        psz_vcdfile = strdup( psz_dev );
     }
 
     /* Open the cue file and try to parse it */
     msg_Dbg( p_this,"trying .cue file: %s", psz_cuefile );
     cuefile = utf8_fopen( psz_cuefile, "rt" );
-    if( cuefile && fscanf( cuefile, "FILE %c", line ) &&
+    if( cuefile == NULL )
+    {
+        i_ret = -1;
+        msg_Dbg( p_this, "could not find .cue file" );
+        goto error;
+    }
+
+    msg_Dbg( p_this,"using vcd image file: %s", psz_vcdfile );
+    p_vcddev->i_vcdimage_handle = utf8_open( psz_vcdfile,
+                                    O_RDONLY | O_NONBLOCK | O_BINARY, 0666 );
+        
+    if( p_vcddev->i_vcdimage_handle == -1 && 
+        fscanf( cuefile, "FILE %c", line ) &&
         fgets( line, 1024, cuefile ) )
     {
+        /* We have a cue file, but no valid vcd file yet */
+        free( psz_vcdfile );
         p_pos = strchr( line, '"' );
         if( p_pos )
         {
@@ -879,15 +910,17 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
             }
             else psz_vcdfile = strdup( line );
         }
+        msg_Dbg( p_this,"using vcd image file: %s", psz_vcdfile );
+        p_vcddev->i_vcdimage_handle = utf8_open( psz_vcdfile,
+                                        O_RDONLY | O_NONBLOCK | O_BINARY, 0666 );
     }
 
-    if( psz_vcdfile )
+    if( p_vcddev->i_vcdimage_handle == -1)
     {
-        msg_Dbg( p_this,"using vcd image file: %s", psz_vcdfile );
-        p_vcddev->i_vcdimage_handle = open( psz_vcdfile,
-                                        O_RDONLY | O_NONBLOCK | O_BINARY );
-        i_ret = (p_vcddev->i_vcdimage_handle == -1) ? -1 : 0;
+        i_ret = -1;
+        goto error;
     }
+    else i_ret = 0;
 
     /* Try to parse the i_tracks and p_sectors info so we can just forget
      * about the cuefile */
@@ -933,6 +966,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
 
     }
 
+error:
     if( cuefile ) fclose( cuefile );
     if( psz_cuefile ) free( psz_cuefile );
     if( psz_vcdfile ) free( psz_vcdfile );
