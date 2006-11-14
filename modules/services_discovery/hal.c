@@ -81,7 +81,7 @@ static int Open( vlc_object_t *p_this )
 
     playlist_t          *p_playlist;
 
-#ifdef HAVE_HAL_1
+#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
     DBusError           dbus_error;
     DBusConnection      *p_connection;
 #endif
@@ -89,7 +89,7 @@ static int Open( vlc_object_t *p_this )
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
-#ifdef HAVE_HAL_1
+#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
     dbus_error_init( &dbus_error );
 
     p_sys->p_ctx = libhal_ctx_new();
@@ -113,7 +113,7 @@ static int Open( vlc_object_t *p_this )
     if( !(p_sys->p_ctx = hal_initialize( NULL, FALSE ) ) )
 #endif
     {
-#ifdef HAVE_HAL_1
+#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
         msg_Err( p_sd, "hal not available : %s", dbus_error.message );
         dbus_error_free( &dbus_error );
 #else
@@ -260,6 +260,12 @@ static void ParseDevice( services_discovery_t *p_sd, char *psz_device )
 #endif
         if( !strcmp( psz_disc_type, "dvd_rom" ) )
         {
+#ifdef HAVE_HAL_1
+            /* hal 0.2.9.7 (HAVE_HAL) has not is_videodvd
+             * but hal 0.5.0 (HAVE_HAL_1) has */
+            if (libhal_device_get_property_bool( p_sys->p_ctx, psz_device,
+                                         "volume.disc.is_videodvd", NULL ) )
+#endif
             AddDvd( p_sd, psz_device );
         }
         else if( !strcmp( psz_disc_type, "cd_rom" ) )
@@ -304,4 +310,70 @@ static void Run( services_discovery_t *p_sd )
             ParseDevice( p_sd, devices[ i ] );
         }
     }
+#ifdef HAVE_DBUS_2
+    /* We'll use D-Bus to listen for devices evenements */
+    /* TODO: Manage hot removal of devices */
+    DBusMessage*        dbus_message;
+    DBusMessageIter     dbus_args;
+    const char**        psz_dbus_value;
+    char*               psz_dbus_device;
+    DBusError           dbus_error;
+    DBusConnection*     p_connection;
+
+    dbus_error_init( &dbus_error );
+
+    /* connect to the system bus */
+    p_connection = dbus_bus_get( DBUS_BUS_SYSTEM, &dbus_error );
+    if ( dbus_error_is_set( &dbus_error ) )
+    {
+        msg_Err( p_sd, "D-Bus Connection Error (%s)\n", dbus_error.message);
+        dbus_error_free( &dbus_error );
+        return;
+    }
+
+    /* check for hal signals */
+    dbus_bus_add_match( p_connection,
+        "type='signal',interface='org.freedesktop.Hal.Manager'", &dbus_error );
+    dbus_connection_flush( p_connection );
+
+    /* an error ? oooh too bad :) */
+    if ( dbus_error_is_set( &dbus_error ) )
+    { 
+        msg_Err( p_sd, "D-Bus signal match Error (%s)\n", dbus_error.message);
+        return;
+    }
+
+    while( !p_sd->b_die )
+    {
+        /* read next available message */
+        dbus_connection_read_write( p_connection, 0 );
+        dbus_message = dbus_connection_pop_message( p_connection );
+
+        if( dbus_message == NULL )
+        {
+            /* we've worked really hard, now it's time to sleep */
+            msleep( 100000 );
+            continue;
+        }
+        /* check if the message is a signal from the correct interface */
+        if( dbus_message_is_signal( dbus_message, "org.freedesktop.Hal.Manager",
+                    "DeviceAdded" ) )
+        {
+            /* read the parameter (it must be an udi string) */
+            if( dbus_message_iter_init( dbus_message, &dbus_args ) &&
+                ( dbus_message_iter_get_arg_type( &dbus_args ) ==
+                        DBUS_TYPE_STRING )
+                )
+            {
+                dbus_message_iter_get_basic( &dbus_args, &psz_dbus_value );
+                /* psz_bus_value musn't be freed, but AddCdda will do it
+                 * so we allocate some memory, and copy it into psz_dbus_device
+                 */
+                psz_dbus_device = strdup( psz_dbus_value );
+                ParseDevice( p_sd, psz_dbus_device );
+            }
+        }
+        dbus_message_unref( dbus_message );
+    }
+#endif
 }
