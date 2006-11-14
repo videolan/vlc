@@ -304,9 +304,4 @@ static void Run( services_discovery_t *p_sd )
             ParseDevice( p_sd, devices[ i ] );
         }
     }
-
-    while( !p_sd->b_die )
-    {
-        msleep( 100000 );
-    }
 }
