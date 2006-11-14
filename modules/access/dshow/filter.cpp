@@ -147,6 +147,9 @@ const GUID FORMAT_MPEG2Video = {0xe06d80e3, 0xdb46, 0x11cf, {0xb4, 0xd1, 0x00, 0
 /* MJPG format */
 const GUID MEDIASUBTYPE_MJPG = {0x47504A4D, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
+/* DivX formats */
+const GUID MEDIASUBTYPE_DIVX = {0x58564944, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+
 /* Analog Video */
 const GUID FORMAT_AnalogVideo = {0x482dde0, 0x7817, 0x11cf, {0x8a, 0x3, 0x0, 0xaa, 0x0, 0x6e, 0xcb, 0x65}};
 
@@ -277,6 +280,10 @@ int GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
             /* MPEG2 video elementary stream */
             else if( media_type.subtype == MEDIASUBTYPE_MPEG2_VIDEO )
                i_fourcc = VLC_FOURCC( 'm', 'p', '2', 'v' );
+
+	    /* DivX video */
+            else if( media_type.subtype == MEDIASUBTYPE_DIVX )
+               i_fourcc = VLC_FOURCC( 'D', 'I', 'V', 'X' );
 
             /* DV formats */
             else if( media_type.subtype == MEDIASUBTYPE_dvsl )
