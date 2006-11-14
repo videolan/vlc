@@ -245,7 +245,7 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([beos],[-lbe -lmedia -ltranslation -ltracker -lgame])
     VLC_ADD_LDFLAGS([dvdnav dvdread],[-ldl])
     VLC_ADD_LDFLAGS([access_file],[-lpoll])
-    LDFLAGS_save="${LDFLAGS_save} -lintl"; LDFLAGS="${CFLAGS_save}"
+    LDFLAGS_save="${LDFLAGS_save} -lintl"; LDFLAGS="${LDFLAGS_save}"
     dnl Check for BONE
     if test -f /boot/beos/system/lib/libbind.so; then
         VLC_ADD_LDFLAGS([access_file access_ftp access_mms access_output_udp telnet netsync sap ipv4 vlc growl],[-lbind -lsocket])
