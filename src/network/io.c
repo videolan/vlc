@@ -150,7 +150,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         }
 
         /* Bind the socket */
-#if 0//defined (WIN32) || defined (UNDER_CE)
+#if defined (WIN32) || defined (UNDER_CE)
         /*
          * Under Win32 and for multicasting, we bind to INADDR_ANY.
          * This is of course a severe bug, since the socket would logically
