@@ -1208,13 +1208,11 @@ static int InitSocket( services_discovery_t *p_sd, const char *psz_address,
 static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len )
 {
 #ifdef HAVE_ZLIB_H
-    int i_result, i_dstsize, n;
-    unsigned char *psz_dst;
+    int i_result, i_dstsize, n = 0;
+    unsigned char *psz_dst = NULL;
     z_stream d_stream;
 
-    d_stream.zalloc = (alloc_func)0;
-    d_stream.zfree = (free_func)0;
-    d_stream.opaque = (voidpf)0;
+    memset (&d_stream, 0, sizeof (d_stream));
 
     i_result = inflateInit(&d_stream);
     if( i_result != Z_OK )
@@ -1222,9 +1220,6 @@ static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i
 
     d_stream.next_in = (Bytef *)psz_src;
     d_stream.avail_in = i_len;
-    n = 0;
-
-    psz_dst = NULL;
 
     do
     {
@@ -1235,7 +1230,10 @@ static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i
 
         i_result = inflate(&d_stream, Z_NO_FLUSH);
         if( ( i_result != Z_OK ) && ( i_result != Z_STREAM_END ) )
+        {
+            inflateEnd( &d_stream );
             return( -1 );
+        }
     }
     while( ( d_stream.avail_out == 0 ) && ( d_stream.avail_in != 0 ) &&
            ( i_result != Z_STREAM_END ) );
