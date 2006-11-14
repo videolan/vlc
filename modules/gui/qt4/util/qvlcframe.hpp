@@ -33,6 +33,7 @@
 #include <QPushButton>
 #include "qt4.hpp"
 #include <vlc/vlc.h>
+#include <charset.h>
 
 class QVLCFrame : public QWidget
 {
@@ -74,7 +75,7 @@ public:
 
         if( psz_default )
         {
-            fprintf( stderr, "Creating default button %s\n", psz_default );
+            utf8_fprintf( stderr, "Creating default button %s\n", psz_default );
             *defaul = new QPushButton(0);
             (*defaul)->setFocus();
             buttons_layout->addWidget( *defaul );
