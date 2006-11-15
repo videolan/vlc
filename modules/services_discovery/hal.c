@@ -194,11 +194,14 @@ static void Close( vlc_object_t *p_this )
     }
     free( p_sys );
 #if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
-    while( p_sys->i_devices_number > 0 );
+    struct udi_input_id_t *p_udi_entry;
+
+    while( p_sys->i_devices_number > 0 )
     {
-        struct udi_input_id_t *p_udi_entry = p_sys->pp_devices[0];
+        p_udi_entry = p_sys->pp_devices[0];
         if( p_udi_entry->psz_udi ) free( p_udi_entry->psz_udi );
-        TAB_REMOVE( p_sys->i_devices_number, p_sys->pp_devices, 0 );
+        TAB_REMOVE( p_sys->i_devices_number, p_sys->pp_devices,
+                p_sys->pp_devices[0] );
         if( p_udi_entry ) free( p_udi_entry );
     }
     p_sys->pp_devices = NULL;
@@ -293,6 +296,8 @@ static void DelItem( services_discovery_t *p_sd, char* psz_udi )
         if( strcmp( psz_udi, p_sys->pp_devices[i]->psz_udi ) == 0 )
         {
             playlist_DeleteFromItemId( p_playlist, p_sys->pp_devices[i]->i_id );
+            TAB_REMOVE( p_sys->i_devices_number, p_sys->pp_devices,
+                    p_sys->pp_devices[i] );
         }
     }
 
