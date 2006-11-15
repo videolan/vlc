@@ -871,7 +871,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #endif
 
 #if defined(SYS_BEOS) \
- || (defined (__FreeBSD__) && (__FreeBSD_version < 500000))
+ || (defined (__FreeBSD__) && (__FreeBSD_version__ < 500000))
     typedef struct {
         long long quot; /* Quotient. */
         long long rem;  /* Remainder. */
