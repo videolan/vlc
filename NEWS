@@ -66,6 +66,10 @@ Interfaces:
  * Linux
    * Notifications using notification-daemon
 
+Windows port:
+ * Support for Unicode filenames (Windows NT and above)
+ * Fixed IPv6 support on the client side
+
 Localization:
  * Add Czech
  * Add Slovak
