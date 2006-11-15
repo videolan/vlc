@@ -21,9 +21,6 @@ except KeyError:
 if not srcdir:
     srcdir = '.'
 
-vlclib="-lvlc"
-picflag=''
-
 def get_vlcconfig():
     vlcconfig=None
     for n in ( 'vlc-config',
@@ -51,7 +48,7 @@ def get_cflags():
     if vlcconfig is None:
         return []
     else:
-        cflags=os.popen('%s --cflags' % vlcconfig, 'r').readline().rstrip().split()
+        cflags=os.popen('%s --cflags vlc' % vlcconfig, 'r').readline().rstrip().split()
         return cflags
 
 def get_ldflags():
@@ -62,8 +59,7 @@ def get_ldflags():
 	ldflags = []
 	if os.sys.platform == 'darwin':
 	    ldflags = "-read_only_relocs warning".split()
-        ldflags.extend(os.popen('%s --libs vlc %s' % (vlcconfig,
-							      picflag), 
+        ldflags.extend(os.popen('%s --libs vlc external' % vlcconfig,
 				'r').readline().rstrip().split())
 	if os.sys.platform == 'darwin':
 	    ldflags.append('-lstdc++')
@@ -80,9 +76,9 @@ vlclocal = Extension('vlc',
                                       os.path.join( srcdir, '..', '..', 'include' ),
                                       srcdir,
                                       '/usr/win32/include' ],
-                extra_objects = [ vlclib ],
+                extra_objects = [ ],
                 extra_compile_args = get_cflags(),
-		extra_link_args = [ '-L' + os.path.join(top_builddir, 'src') ]  + get_ldflags(),
+		extra_link_args = [ '-L' + os.path.join(top_builddir, 'src', '.libs') ]  + get_ldflags(),
                 )
 
 setup (name = 'VLC Bindings',
