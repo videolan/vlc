@@ -161,7 +161,7 @@ case "${host_os}" in
         CPPFLAGS_save="${CPPFLAGS_save} -I/usr/local/include"
         CPPFLAGS="${CPPFLAGS_save}"
         LDFLAGS_save="${LDFLAGS_save} -L/usr/local/lib"
-        LDFLAGS="${LDLFAGS_save}"
+        LDFLAGS="${LDFLAGS_save}"
         ;;
     esac
     ;;
