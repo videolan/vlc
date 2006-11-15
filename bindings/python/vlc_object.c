@@ -127,10 +127,6 @@ vlcObject_find_object( PyObject *self, PyObject *args )
     {
         i_object_type = VLC_OBJECT_PLAYLIST;
     }
-    else if (! strncmp( psz_name, "root", 4 ) )
-    {
-        i_object_type = VLC_OBJECT_ROOT;
-    }
     else if (! strncmp( psz_name, "libvlc", 6 ) )
     {
         i_object_type = VLC_OBJECT_LIBVLC;
@@ -138,6 +134,66 @@ vlcObject_find_object( PyObject *self, PyObject *args )
     else if (! strncmp( psz_name, "vout", 4 ) )
     {
         i_object_type = VLC_OBJECT_VOUT;
+    }
+    else if (! strncmp( psz_name, "sout", 4 ) )
+    {
+        i_object_type = VLC_OBJECT_SOUT;
+    }
+    else if (! strncmp( psz_name, "global", 6 ) )
+    {
+        i_object_type = VLC_OBJECT_GLOBAL;
+    }
+    else if (! strncmp( psz_name, "packetizer", 10 ) )
+    {
+        i_object_type = VLC_OBJECT_PACKETIZER;
+    }
+    else if (! strncmp( psz_name, "encoder", 7 ) )
+    {
+        i_object_type = VLC_OBJECT_ENCODER;
+    }
+    else if (! strncmp( psz_name, "vlm", 3 ) )
+    {
+        i_object_type = VLC_OBJECT_VLM;
+    }
+    else if (! strncmp( psz_name, "announce", 8 ) )
+    {
+        i_object_type = VLC_OBJECT_ANNOUNCE;
+    }
+    else if (! strncmp( psz_name, "demux", 5 ) )
+    {
+        i_object_type = VLC_OBJECT_DEMUX;
+    }
+    else if (! strncmp( psz_name, "access", 6 ) )
+    {
+        i_object_type = VLC_OBJECT_ACCESS;
+    }
+    else if (! strncmp( psz_name, "stream", 6 ) )
+    {
+        i_object_type = VLC_OBJECT_STREAM;
+    }
+    else if (! strncmp( psz_name, "filter", 6 ) )
+    {
+        i_object_type = VLC_OBJECT_FILTER;
+    }
+    else if (! strncmp( psz_name, "vod", 3 ) )
+    {
+        i_object_type = VLC_OBJECT_VOD;
+    }
+    else if (! strncmp( psz_name, "xml", 3 ) )
+    {
+        i_object_type = VLC_OBJECT_XML;
+    }
+    else if (! strncmp( psz_name, "osdmenu", 7 ) )
+    {
+        i_object_type = VLC_OBJECT_OSDMENU;
+    }
+    else if (! strncmp( psz_name, "stats", 5 ) )
+    {
+        i_object_type = VLC_OBJECT_STATS;
+    }
+    else if (! strncmp( psz_name, "metaengine", 10 ) )
+    {
+        i_object_type = VLC_OBJECT_META_ENGINE;
     }
     else
     {
