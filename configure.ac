@@ -4147,7 +4147,7 @@ then
     ],[
       AC_MSG_ERROR([You don't have libglide. Install it or do not use --enable-glide])
      ])
-   CFAGS="${CFLAGS_save}"
+   CFLAGS="${CFLAGS_save}"
 fi
 
 dnl
