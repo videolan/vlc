@@ -351,7 +351,7 @@ vlc-bundle: vlc
 endif
 
 # Install the symlinks
-install-exec-local:
+install-exec-local: install-binPROGRAMS
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
 	  rm -f "$(DESTDIR)$(bindir)/$$i" && \
 	  ln -sf vlc "$(DESTDIR)$(bindir)/$$i" ; \
