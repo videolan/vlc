@@ -743,13 +743,13 @@ int CDDAOpen( vlc_object_t *p_this )
         char *psz_paranoia = config_GetPsz( p_access,
                                 MODULE_STRING "-paranoia" );
 
-        p_cdda->e_paranoia = paranoia_none;
+        p_cdda->e_paranoia = PARANOIA_MODE_DISABLE;
         if( psz_paranoia && *psz_paranoia )
         {
             if( !strncmp( psz_paranoia, "full", strlen("full") ) )
-                p_cdda->e_paranoia = paranoia_full;
+                p_cdda->e_paranoia = PARANOIA_MODE_FULL;
             else if( !strncmp(psz_paranoia, "overlap", strlen("overlap")) )
-                p_cdda->e_paranoia = paranoia_overlap;
+                p_cdda->e_paranoia = PARANOIA_MODE_OVERLAP;
 
             /* Use CD Paranoia? */
             if( p_cdda->e_paranoia )
@@ -764,7 +764,7 @@ int CDDAOpen( vlc_object_t *p_this )
                 {
                     msg_Warn( p_cdda_input, "unable to get paranoia support - "
                                 "continuing without it." );
-                    p_cdda->e_paranoia = paranoia_none;
+                    p_cdda->e_paranoia = PARANOIA_MODE_DISABLE;
                 }
                 else
                 {
@@ -775,7 +775,7 @@ int CDDAOpen( vlc_object_t *p_this )
                     /* Set reading mode for full or overlap paranoia,
                      * but allow skipping sectors. */
                     cdio_paranoia_modeset( p_cdda->paranoia,
-                        paranoia_full == p_cdda->e_paranoia ?
+                            PARANOIA_MODE_FULL == p_cdda->e_paranoia ?
                             PARANOIA_MODE_FULL^PARANOIA_MODE_NEVERSKIP :
                             PARANOIA_MODE_OVERLAP^PARANOIA_MODE_NEVERSKIP );
                 }
