@@ -1,11 +1,10 @@
 /*****************************************************************************
- * open.hpp : Panels for the open dialogs
+ * open.hpp : advanced open dialog
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
- * $Id$
+ * $Id: streaminfo.hpp 16806 2006-09-23 13:37:50Z zorglub $
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
- *          Jean-Baptiste Kempf <jb@videolan.org> 
+ * Authors: Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,46 +19,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
- *****************************************************************************/
+ ******************************************************************************/
 
-#ifndef _OPENPANELS_H_
-#define _OPENPANELS_H_
+#ifndef _OPEN_DIALOG_H_
+#define _OPEN_DIALOG_H_
 
 #include <vlc/vlc.h>
-#include <QWidget>
-#include <QString>
-#include "ui/open_file.h"
 
-class OpenPanel: public QWidget
+#include "ui/open.h"
+#include "util/qvlcframe.hpp"
+#include "components/open.hpp"
+
+#include <QTabWidget>
+#include <QBoxLayout>
+
+class InfoTab;
+
+class OpenDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
-    OpenPanel( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
+    static OpenDialog * getInstance( intf_thread_t *p_intf )
     {
-        p_intf = _p_intf;
+        if( !instance)
+            instance = new OpenDialog( p_intf);
+        return instance;
     }
-    virtual ~OpenPanel();
-    virtual QString getUpdatedMRL() = 0;
+    virtual ~OpenDialog();
 private:
-    intf_thread_t *p_intf;
+    OpenDialog( intf_thread_t * );
+    static OpenDialog *instance;
+    input_thread_t *p_input;
+    Ui::Open ui;
+    FileOpenPanel *fileOpenPanel;
 public slots:
-    virtual void sendUpdate() = 0;
-};
-
-class FileOpenPanel: public OpenPanel
-{
-    Q_OBJECT;
-public:
-    FileOpenPanel( QWidget *, intf_thread_t * );
-    virtual ~FileOpenPanel();
-    virtual QString getUpdatedMRL();
-private:
-    Ui::OpenFile ui;
-public slots:
-    virtual void sendUpdate() ;
-signals:
-    void dataUpdated( QString, QString ) ;
-
+    void cancel();
+    void ok();
 };
 
 #endif

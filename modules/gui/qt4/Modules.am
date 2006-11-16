@@ -13,7 +13,10 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 TOUI = 	\
 	ui/equalizer \
-	ui/file_open \
+	ui/open_file \
+	ui/open_disk \
+	ui/open_net \
+	ui/open \
 	ui/input_stats \
 	ui/main_interface \
 	ui/sprefs_audio \
@@ -40,6 +43,7 @@ TOMOC = main_interface \
 	dialogs/extended \
 	dialogs/interaction \
 	dialogs/sout \
+    dialogs/open \
 	components/extended_panels \
 	components/infopanels \
 	components/preferences_widgets \
@@ -67,6 +71,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/prefs_dialog.moc.cpp \
 		dialogs/interaction.moc.cpp \
 		dialogs/sout.moc.cpp \
+		dialogs/open.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/infopanels.moc.cpp \
 	 	components/preferences_widgets.moc.cpp \
@@ -114,6 +119,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/errors.cpp \
 		dialogs/interaction.cpp \
 		dialogs/sout.cpp \
+		dialogs/open.cpp \
 		components/extended_panels.cpp \
 		components/infopanels.cpp \
 		components/preferences_widgets.cpp \
@@ -143,6 +149,7 @@ EXTRA_DIST += \
 	dialogs/prefs_dialog.hpp \
 	dialogs/interaction.hpp \
 	dialogs/sout.hpp \
+	dialogs/open.hpp \
 	components/extended_panels.hpp \
 	components/infopanels.hpp \
 	components/preferences_widgets.hpp \
@@ -157,7 +164,10 @@ EXTRA_DIST += \
 	util/customwidgets.hpp \
 	util/qvlcframe.hpp \
 	ui/equalizer.ui \
-	ui/file_open.ui \
+	ui/open_file.ui \
+	ui/open_disk.ui \
+	ui/open_net.ui \
+	ui/open.ui \
 	ui/input_stats.ui \
 	ui/main_interface.ui \
 	ui/sprefs_audio.ui \

@@ -37,6 +37,7 @@
 #include "dialogs/messages.hpp"
 #include "dialogs/extended.hpp"
 #include "dialogs/sout.hpp"
+#include "dialogs/open.hpp"
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -117,6 +118,7 @@ void DialogsProvider::MLAppendDialog()
 }
 void DialogsProvider::openDialog( int i_dialog )
 {
+    OpenDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
