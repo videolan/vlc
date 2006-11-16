@@ -129,6 +129,7 @@ Olivier Pomel <pomel at via.ecp.fr> - original VLC code
 Ondrej Kuda aka Albert <kuda at natur dot cuni dot cz> - HTTP interface tips and fixes
 Øyvind Kolbu <oyvindk at world-online.no> - FreeBSD patches
 Patrick Horn <patrickd0thorn at mindspring d0t com> - DirectShow patch
+Patrick McLean <chutzpah at gentoo d0t org> - Libcdio update patch
 Paul Mackerras <paulus at linuxcare.com.au> - AltiVec IDCT and motion
 Pavlov Konstantin “thresh” - several Linux build system fixes
 Petr Vacek - FTP cleartext authentication

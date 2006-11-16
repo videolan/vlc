@@ -2102,16 +2102,16 @@ have_libcdio=no
 have_libvcdinfo=no
 if test "${enable_libcdio}" != "no"
 then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.72,
+  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.78.2,
      have_libcdio=yes
      AC_DEFINE(HAVE_LIBCDIO, [], 
-     [Define if you have libcdio 0.72 or greater installed]),
+     [Define if you have libcdio 0.78.2 or greater installed]),
      [AC_MSG_WARN(CD Reading and information library not found)])
 
-  PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.21,
+  PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.22,
      [have_libvcdinfo=yes
      AC_DEFINE(HAVE_VCDINFO, [], 
-     [Define if you have libvcdinfo 0.7.21 or greater installed])],
+     [Define if you have libvcdinfo 0.7.22 or greater installed])],
      [AC_MSG_WARN(VCD information library not found)])
 fi
 
