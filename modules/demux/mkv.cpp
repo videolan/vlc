@@ -2383,6 +2383,20 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
             memcpy( tracks[i_track]->fmt.p_extra, tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
         }
+        else if( !strcmp( tracks[i_track]->psz_codec, "A_WAVPACK4" ) )
+        {
+            tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'W', 'V', 'P', 'K' );
+            tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
+            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
+            memcpy( tracks[i_track]->fmt.p_extra, tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
+        }
+        else if( !strcmp( tracks[i_track]->psz_codec, "A_TTA1" ) )
+        {
+            tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'T', 'T', 'A', '1' );
+            tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
+            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
+            memcpy( tracks[i_track]->fmt.p_extra, tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
+        }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_PCM/INT/BIG" ) ||
                  !strcmp( tracks[i_track]->psz_codec, "A_PCM/INT/LIT" ) ||
                  !strcmp( tracks[i_track]->psz_codec, "A_PCM/FLOAT/IEEE" ) )
@@ -2396,18 +2410,6 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'a', 'r', 'a', 'w' );
             }
             tracks[i_track]->fmt.audio.i_blockalign = ( tracks[i_track]->fmt.audio.i_bitspersample + 7 ) / 8 * tracks[i_track]->fmt.audio.i_channels;
-        }
-        else if( !strcmp( tracks[i_track]->psz_codec, "A_TTA1" ) )
-        {
-            /* FIXME: support this codec */
-            msg_Err( &sys.demuxer, "TTA not supported yet[%d, n=%d]", (int)i_track, tracks[i_track]->i_number );
-            tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
-        }
-        else if( !strcmp( tracks[i_track]->psz_codec, "A_WAVPACK4" ) )
-        {
-            /* FIXME: support this codec */
-            msg_Err( &sys.demuxer, "Wavpack not supported yet[%d, n=%d]", (int)i_track, tracks[i_track]->i_number );
-            tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "S_TEXT/UTF8" ) )
         {
