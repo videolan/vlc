@@ -172,7 +172,7 @@ case "${host_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
     VLC_ADD_LDFLAGS([vlc ffmpeg ffmpegaltivec],[-all_load])
-    VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
+    VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc],[-x objective-c])
     VLC_ADD_CFLAGS([vlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-m -Wl,-multiply_defined -Wl,suppress])
@@ -183,6 +183,7 @@ case "${host_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
     VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
+    VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc],[-x objective-c])
     VLC_ADD_CFLAGS([vlc],[-x objective-c])
     ;;
@@ -2394,7 +2395,7 @@ if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
        #endif],
       [AC_MSG_RESULT([yes])
         AC_CHECK_HEADERS(matroska/KaxVersion.h, [
-          AC_MSG_CHECKING(for libmatroska version >= 0.7.5)
+          AC_MSG_CHECKING(for libmatroska version >= 0.7.7)
           AC_EGREP_CPP(yes,
             [#include <matroska/KaxVersion.h>
              #ifdef LIBMATROSKA_VERSION
@@ -2408,16 +2409,9 @@ if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
               if test "${SYS}" = "darwin"; then
                 VLC_ADD_CXXFLAGS([mkv],[-O1])
               fi
-              AC_CHECK_LIB(ebml_pic, main, [
-                # We have ebml_pic, that's good, we can build an mkv.so plugin !
+              AC_CHECK_LIB(ebml, main, [
                 VLC_ADD_PLUGINS([mkv])
-                VLC_ADD_LDFLAGS([mkv],[-lmatroska_pic -lebml_pic])
-              ], [
-                AC_CHECK_LIB(ebml, main, [
-                  # We only have libebml, make mkv.a a builtin
-                  VLC_ADD_BUILTINS([mkv])
-                  VLC_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
-                ])
+                VLC_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
               ])
             ],
             [AC_MSG_RESULT([no])
