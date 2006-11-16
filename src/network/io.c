@@ -160,9 +160,11 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
          && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
         {
-            struct sockaddr_storage dumb =
+            // This works for IPv4 too - don't worry!
+            struct sockaddr_in6 dumb =
             {
-                .ss_family = ptr->ai_addr->sa_family
+                .sin6_family = ptr->ai_addr->sa_family,
+                .sin6_port =  ((struct sockaddr_in *)(ptr->ai_addr))->sin_port
             };
 
             bind (fd, (struct sockaddr *)&dumb, ptr->ai_addrlen);
