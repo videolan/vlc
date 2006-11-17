@@ -28,12 +28,23 @@
 #include <vlc/decoder.h>
 #include "vlc_filter.h"
 
-#include <ffmpeg/swscale.h>
-#include <ffmpeg/avcodec.h>
-#include <ffmpeg/avutil.h>
+/* ffmpeg headers */
+#ifdef HAVE_FFMPEG_AVCODEC_H
+#   include <ffmpeg/avcodec.h>
+#else
+#   include <avcodec.h>
+#endif
+
+#ifdef HAVE_FFMPEG_SWSCALE_H
+#   include <ffmpeg/swscale.h>
+#else
+#   include <swscale.h>
+#endif
+
 #include "ffmpeg.h"
 
-void *( *swscale_fast_memcpy )( void *, const void *, size_t );
+/* Version checking */
+#if ( LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0) ) && (defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE))
 
 /*****************************************************************************
  * filter_sys_t : filter descriptor
@@ -52,6 +63,7 @@ struct filter_sys_t
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
+void *( *swscale_fast_memcpy )( void *, const void *, size_t );
 static picture_t *Filter( filter_t *, picture_t * );
 static int CheckInit( filter_t * );
 
@@ -287,4 +299,17 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     p_pic->pf_release( p_pic );
     return p_pic_dst;
 }
+
+#else /* LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0) */
+
+int E_(OpenScaler)( vlc_object_t *p_this )
+{
+    return VLC_EGENERIC;
+}
+
+void E_(CloseScaler)( vlc_object_t *p_this )
+{
+}
+
+#endif /* LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0) */
 
