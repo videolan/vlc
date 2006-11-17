@@ -37,7 +37,7 @@
 
 #ifdef HAVE_FFMPEG_SWSCALE_H
 #   include <ffmpeg/swscale.h>
-#else
+#elif defined(HAVE_LIBSWSCALE_TREE)
 #   include <swscale.h>
 #endif
 

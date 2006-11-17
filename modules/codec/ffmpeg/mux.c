@@ -33,7 +33,7 @@
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVFORMAT_H
 #   include <ffmpeg/avformat.h>
-#else
+#elif defined(HAVE_LIBAVFORMAT_TREE)
 #   include <avformat.h>
 #endif
 

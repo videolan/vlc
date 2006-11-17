@@ -2739,6 +2739,12 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
      VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat ${real_ffmpeg_tree}/libavformat/libavformat.a])
      VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavformat])
    fi
+
+   if test -f "${real_ffmpeg_tree}/libswscale/libswscale.a"; then
+     AC_DEFINE(HAVE_LIBSWSCALE_TREE, 1, [Define if you have ffmpeg's libswscale.])
+     VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libswscale ${real_ffmpeg_tree}/libswscale/libswscale.a])
+     VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libswscale])
+   fi
 else    
     
 dnl Look for a ffmpeg-config (we are on debian )
@@ -2753,7 +2759,7 @@ dnl Look for a ffmpeg-config (we are on debian )
   AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no, ${FFMPEG_PATH})
   if test "${FFMPEG_CONFIG}" != "no"
   then
-      AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
+    AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
     AC_CHECK_HEADERS(ffmpeg/avformat.h)
     AC_CHECK_HEADERS(ffmpeg/avutil.h)
     AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
@@ -2772,6 +2778,7 @@ dnl Trying with pkg-config
      AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
      AC_CHECK_HEADERS(ffmpeg/avformat.h)
      AC_CHECK_HEADERS(ffmpeg/avutil.h)
+     AC_CHECK_HEADERS(ffmpeg/swscale.h)
      AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
      if test "${SYS}" = "darwin"; then
         VLC_ADD_BUILTINS([ffmpeg])
@@ -2806,6 +2813,7 @@ dnl Trying with pkg-config
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
       AC_CHECK_HEADERS(ffmpeg/avformat.h)
+      AC_CHECK_HEADERS(ffmpeg/swscale.h)
       AC_CHECK_HEADERS(ffmpeg/avutil.h)
       AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
 
@@ -2829,6 +2837,11 @@ dnl Trying with pkg-config
 
       AC_CHECK_LIB(avformat, av_open_input_stream, [
         VLC_ADD_LDFLAGS([ffmpeg],[-lavformat -lz]) ], [], [-lavcodec -lz $LDAVUTIL])
+      LDFLAGS="${LDFLAGS_save}"
+      CPPFLAGS="${CPPFLAGS_save}"
+
+      AC_CHECK_LIB(swscale, sws_getContext, [
+        VLC_ADD_LDFLAGS([ffmpeg],[-lswscale]) ], [], [-lavcodec $LDAVUTIL])
       LDFLAGS="${LDFLAGS_save}"
       CPPFLAGS="${CPPFLAGS_save}"
     ])
