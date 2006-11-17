@@ -57,10 +57,11 @@ struct udi_input_id_t
 
 struct services_discovery_sys_t
 {
-    LibHalContext *p_ctx;
-    playlist_item_t *p_node_cat;
-    playlist_item_t *p_node_one;
+    LibHalContext           *p_ctx;
+    playlist_item_t         *p_node_cat;
+    playlist_item_t         *p_node_one;
 #ifdef HAVE_HAL_1
+    DBusConnection          *p_connection
     int                     i_devices_number;
     struct udi_input_id_t   **pp_devices;
 #endif
@@ -134,6 +135,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     libhal_ctx_set_dbus_connection( p_sys->p_ctx, p_connection );
+    p_sys->p_connection = p_connection;
     if( !libhal_ctx_init( p_sys->p_ctx, &dbus_error ) )
 #else
     if( !(p_sys->p_ctx = hal_initialize( NULL, FALSE ) ) )
@@ -407,8 +409,8 @@ static void Run( services_discovery_t *p_sd )
     while( !p_sd->b_die )
     {
     /* look for events on the bus, blocking 1 second */
-    dbus_connection_read_write_dispatch(
-            libhal_ctx_get_dbus_connection(p_sys->p_ctx), 1000 );
+    dbus_connection_read_write_dispatch( p_sys->p_connection, 1000 );
+    /* HAL 0.5.8.1 can use libhal_ctx_get_dbus_connection(p_sys->p_ctx) */
     }
 #endif
 
