@@ -9,6 +9,7 @@ SOURCES_ffmpeg = \
 	postprocess.c \
 	demux.c \
 	mux.c \
+	scale.c \
 	$(NULL)
 
 SOURCES_ffmpegaltivec = \

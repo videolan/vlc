@@ -76,6 +76,14 @@ static char *nloopf_list_text[] =
 
 static char *enc_hq_list[] = { "rd", "bits", "simple" };
 static char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
+
+static int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static char *ppsz_mode_descriptions[] =
+{ N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
+  N_("Experimental"), N_("Nearest neighbour (bad quality)"),
+  N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),
+  N_("SincR"), N_("Lanczos"), N_("Bicubic spline") };
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -215,6 +223,16 @@ vlc_module_begin();
     set_callbacks( E_(OpenDeinterlace), E_(CloseDeinterlace) );
     set_description( _("FFmpeg deinterlace video filter") );
     add_shortcut( "ffmpeg-deinterlace" );
+
+    /* video filter submodule */
+    add_submodule();
+    set_description( _("Video scaling filter") );
+    set_capability( "video filter2", 1000 );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VFILTER );
+    set_callbacks( E_(OpenScaler), E_(CloseScaler) );
+    add_integer( "swscale-mode", 0, NULL, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, VLC_TRUE );
+        change_integer_list( pi_mode_values, ppsz_mode_descriptions, 0 );
 
     var_Create( p_module->p_libvlc_global, "avcodec", VLC_VAR_MUTEX );
 vlc_module_end();
@@ -455,9 +473,8 @@ static struct
 
     /* Packed YUV formats */
     { VLC_FOURCC('Y','U','Y','2'), PIX_FMT_YUV422 },
-#if LIBAVCODEC_BUILD >= 4720
+    { VLC_FOURCC('Y','U','Y','V'), PIX_FMT_YUV422 },
     { VLC_FOURCC('U','Y','V','Y'), PIX_FMT_UYVY422 },
-#endif
 
     /* Packed RGB formats */
     { VLC_FOURCC('R','V','1','5'), PIX_FMT_RGB555 },

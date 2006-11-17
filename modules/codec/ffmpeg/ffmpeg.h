@@ -78,6 +78,8 @@ int  E_(OpenCropPadd)( vlc_object_t * );
 void E_(CloseFilter)( vlc_object_t * );
 int  E_(OpenDeinterlace)( vlc_object_t * );
 void E_(CloseDeinterlace)( vlc_object_t * );
+int  E_(OpenScaler)( vlc_object_t * );
+void E_(CloseScaler)( vlc_object_t * );
 
 /* Postprocessing module */
 void *E_(OpenPostproc)( decoder_t *, vlc_bool_t * );
@@ -297,3 +299,7 @@ N_("<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...
 #define ENC_CHROMA_ELIM_LONGTEXT N_( "Eliminates chrominance blocks when " \
   "the PSNR isn't much changed (default: 0.0). The H264 specification " \
   "recommends 7." )
+
+#define SCALEMODE_TEXT N_("Scaling mode")
+#define SCALEMODE_LONGTEXT N_("Scaling mode to use.")
+

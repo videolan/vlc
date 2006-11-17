@@ -2789,7 +2789,13 @@ dnl Trying with pkg-config
      VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_LIBS}])
      dnl newer ffmpeg have a separate libpostproc
      PKG_CHECK_MODULES(POSTPROC, libpostproc,[
+       VLC_ADD_CFLAGS([ffmpeg],[${POSTPROC_CFLAGS}]) 
        VLC_ADD_LDFLAGS([ffmpeg],[${POSTPROC_LIBS}]) 
+       ],[ true ])
+     dnl even newer ffmpeg has a libswscale
+     PKG_CHECK_MODULES(SWSCALE, libswscale,[
+       VLC_ADD_CFLAGS([ffmpeg],[${SWSCALE_CFLAGS}]) 
+       VLC_ADD_LDFLAGS([ffmpeg],[${SWSCALE_LIBS}]) 
        ],[ true ])
     ],[
      
@@ -5637,7 +5643,6 @@ AC_CONFIG_FILES([
   modules/stream_out/transrate/Makefile
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
-  modules/video_filter/swscale/Makefile
   modules/video_output/Makefile
   modules/video_output/directx/Makefile
   modules/video_output/qte/Makefile
