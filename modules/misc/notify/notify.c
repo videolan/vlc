@@ -44,6 +44,11 @@ static int ItemChange( vlc_object_t *, const char *,
 static int Notify( vlc_object_t *, const char * );
 #define MAX_LENGTH 256
 
+struct intf_sys_t
+{
+    vlc_mutex_t     lock;
+};
+
 /*****************************************************************************
  * Module descriptor
  ****************************************************************************/
@@ -71,14 +76,25 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    playlist_t *p_playlist;
+    intf_thread_t   *p_intf = (intf_thread_t *)p_this;
+    playlist_t      *p_playlist;
+    intf_sys_t      *p_sys  = malloc( sizeof( intf_sys_t ) );
+    
+    if( !p_sys )
+    {
+        msg_Err( p_intf, "Out of memory" );
+        return VLC_ENOMEM;
+    }
 
     if( !notify_init( APPLICATION_NAME ) )
     {
         msg_Err( p_intf, "can't find notification daemon" );
         return VLC_EGENERIC;
     }
+
+    vlc_mutex_init( p_this, &p_sys->lock );
+
+    p_intf->p_sys = p_sys;
 
     p_playlist = pl_Yield( p_intf );
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
@@ -92,10 +108,15 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
+    intf_thread_t   *p_intf = ( intf_thread_t* ) p_this;
+    intf_sys_t      *p_sys  = p_intf->p_sys;
+
     playlist_t *p_playlist = pl_Yield( p_this );
     var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
     pl_Release( p_this );
 
+    vlc_mutex_destroy( &p_sys->lock );
+    free( p_sys );
     notify_uninit();
 }
 
@@ -105,12 +126,14 @@ static void Close( vlc_object_t *p_this )
 static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
-    char psz_tmp[MAX_LENGTH];
-    char *psz_title = NULL;
-    char *psz_artist = NULL;
-    char *psz_album = NULL;
-    input_thread_t *p_input=NULL;
-    playlist_t * p_playlist = pl_Yield( p_this );
+    char                psz_tmp[MAX_LENGTH];
+    char                *psz_title      = NULL;
+    char                *psz_artist     = NULL;
+    char                *psz_album      = NULL;
+    input_thread_t      *p_input        = NULL;
+    playlist_t          * p_playlist    = pl_Yield( p_this );
+    intf_thread_t       *p_intf         = ( intf_thread_t* ) param;
+    intf_sys_t          *p_sys          = p_intf->p_sys;
 
     p_input = p_playlist->p_input;
     vlc_object_release( p_playlist );
@@ -133,6 +156,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                   strdup( p_input->input.p_item->p_meta->psz_album ) :
                   strdup( _("no album") );
     psz_title = strdup( p_input->input.p_item->psz_name );
+
+    vlc_object_release( p_input );
+
     if( psz_title == NULL ) psz_title = strdup( N_("(no title)") );
     snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\n%s - %s",
               psz_title, psz_artist, psz_album );
@@ -140,9 +166,12 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     free( psz_artist );
     free( psz_album );
 
+    vlc_mutex_lock( &p_sys->lock );
+
     Notify( p_this, psz_tmp );
 
-    vlc_object_release( p_input );
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }
 
