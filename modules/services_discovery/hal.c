@@ -46,7 +46,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
 /* store relation between item id and udi for ejection */
 struct udi_input_id_t
 {
@@ -60,7 +60,7 @@ struct services_discovery_sys_t
     LibHalContext *p_ctx;
     playlist_item_t *p_node_cat;
     playlist_item_t *p_node_one;
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     int                     i_devices_number;
     struct udi_input_id_t   **pp_devices;
 #endif
@@ -70,7 +70,7 @@ static void Run    ( services_discovery_t *p_intf );
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
 /* HAL callbacks */
 void DeviceAdded( LibHalContext *p_ctx, const char *psz_udi );
 void DeviceRemoved( LibHalContext *p_ctx, const char *psz_udi );
@@ -103,7 +103,7 @@ static int Open( vlc_object_t *p_this )
 
     playlist_t          *p_playlist;
 
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     DBusError           dbus_error;
     DBusConnection      *p_connection;
 
@@ -115,7 +115,7 @@ static int Open( vlc_object_t *p_this )
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     dbus_error_init( &dbus_error );
 
     p_sys->p_ctx = libhal_ctx_new();
@@ -139,7 +139,7 @@ static int Open( vlc_object_t *p_this )
     if( !(p_sys->p_ctx = hal_initialize( NULL, FALSE ) ) )
 #endif
     {
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
         msg_Err( p_sd, "hal not available : %s", dbus_error.message );
         dbus_error_free( &dbus_error );
 #else
@@ -149,7 +149,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
         if( !libhal_ctx_set_device_added( p_sys->p_ctx, DeviceAdded ) ||
                 !libhal_ctx_set_device_removed( p_sys->p_ctx, DeviceRemoved ) )
         {
@@ -193,7 +193,7 @@ static void Close( vlc_object_t *p_this )
         vlc_object_release( p_playlist );
     }
     free( p_sys );
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     struct udi_input_id_t *p_udi_entry;
 
     while( p_sys->i_devices_number > 0 )
@@ -209,7 +209,7 @@ static void Close( vlc_object_t *p_this )
 }
 
 static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
                 ,char* psz_device
 #endif
                     )
@@ -232,7 +232,7 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
 
     vlc_object_release( p_playlist );
 
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     struct udi_input_id_t *p_udi_entry;
     p_udi_entry = malloc( sizeof( struct udi_input_id_t ) );
     if( !p_udi_entry )
@@ -251,7 +251,7 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
     char *psz_uri;
     char *psz_blockdevice;
     input_item_t        *p_input;
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     psz_name = libhal_device_get_property_string( p_sd->p_sys->p_ctx,
                                         psz_device, "volume.label", NULL );
     psz_blockdevice = libhal_device_get_property_string( p_sd->p_sys->p_ctx,
@@ -270,14 +270,14 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
     {
         return;
     }
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     AddItem( p_sd, p_input, psz_device );
 #else
     AddItem( p_sd, p_input );
 #endif
 }
 
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
 static void DelItem( services_discovery_t *p_sd, char* psz_udi )
 {
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
@@ -310,7 +310,7 @@ static void AddCdda( services_discovery_t *p_sd, char *psz_device )
     char *psz_uri;
     char *psz_blockdevice;
     input_item_t     *p_input;
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     psz_blockdevice = libhal_device_get_property_string( p_sd->p_sys->p_ctx,
                                             psz_device, "block.device", NULL );
 #else
@@ -323,7 +323,7 @@ static void AddCdda( services_discovery_t *p_sd, char *psz_device )
     free( psz_uri );
     if( !p_input )
         return;
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     AddItem( p_sd, p_input, psz_device );
 #else
     AddItem( p_sd, p_input );
@@ -334,7 +334,7 @@ static void ParseDevice( services_discovery_t *p_sd, char *psz_device )
 {
     char *psz_disc_type;
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     if( libhal_device_property_exists( p_sys->p_ctx, psz_device,
                                        "volume.disc.type", NULL ) )
     {
@@ -352,7 +352,7 @@ static void ParseDevice( services_discovery_t *p_sd, char *psz_device )
 #endif
         if( !strcmp( psz_disc_type, "dvd_rom" ) )
         {
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
             /* hal 0.2.9.7 (HAVE_HAL) has not is_videodvd
              * but hal 0.5.0 (HAVE_HAL_1) has */
             if (libhal_device_get_property_bool( p_sys->p_ctx, psz_device,
@@ -362,7 +362,7 @@ static void ParseDevice( services_discovery_t *p_sd, char *psz_device )
         }
         else if( !strcmp( psz_disc_type, "cd_rom" ) )
         {
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
             if( libhal_device_get_property_bool( p_sys->p_ctx, psz_device,
                                          "volume.disc.has_audio" , NULL ) )
 #else
@@ -386,7 +386,7 @@ static void Run( services_discovery_t *p_sd )
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
 
     /* parse existing devices first */
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     if( ( devices = libhal_get_all_devices( p_sys->p_ctx, &i_devices, NULL ) ) )
 #else
     if( ( devices = hal_get_all_devices( p_sys->p_ctx, &i_devices ) ) )
@@ -395,7 +395,7 @@ static void Run( services_discovery_t *p_sd )
         for( i = 0; i < i_devices; i++ )
         {
             ParseDevice( p_sd, devices[ i ] );
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
             libhal_free_string( devices[ i ] );
 #else
             hal_free_string( devices[ i ] );
@@ -403,7 +403,7 @@ static void Run( services_discovery_t *p_sd )
 
         }
     }
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
     while( !p_sd->b_die )
     {
     /* look for events on the bus, blocking 1 second */
@@ -414,7 +414,7 @@ static void Run( services_discovery_t *p_sd )
 
 }
 
-#if defined( HAVE_HAL_1 ) && defined( HAVE_DBUS_2 )
+#ifdef HAVE_HAL_1
 void DeviceAdded( LibHalContext *p_ctx, const char *psz_udi )
 {
         ParseDevice( p_sd_global, (char*) psz_udi );
