@@ -1,0 +1,78 @@
+Index: libavcodec/vp3.c
+===================================================================
+--- libavcodec/vp3.c	(revision 6957)
++++ libavcodec/vp3.c	(working copy)
+@@ -1503,7 +1503,14 @@
+     int x;
+     int m, n;
+     int16_t *dequantizer;
+-    DECLARE_ALIGNED_16(DCTELEM, block[64]);
++
++    // TJ: force alignment to 16.
++    //DCTELEM is short
++    //DECLARE_ALIGNED_16(DCTELEM, block[64]);
++    DCTELEM block_[64+8];
++    DCTELEM* block = (DCTELEM*)((((unsigned long)block_)+0xf)&~0xf);
++    // end force
++
+     int motion_x = 0xdeadbeef, motion_y = 0xdeadbeef;
+     int motion_halfpel_index;
+     uint8_t *motion_source;
+Index: libavcodec/mpegvideo.c
+===================================================================
+--- libavcodec/mpegvideo.c	(revision 6957)
++++ libavcodec/mpegvideo.c	(working copy)
+@@ -6087,7 +6087,14 @@
+                         DCTELEM *block, int16_t *weight, DCTELEM *orig,
+                         int n, int qscale){
+     int16_t rem[64];
+-    DECLARE_ALIGNED_16(DCTELEM, d1[64]);
++
++    // TJ: force alignment to 16.
++    //DCTELEM is short
++    //DECLARE_ALIGNED_16(DCTELEM, d1[64]);
++    DCTELEM d1_[64+8];
++    DCTELEM* d1 = (DCTELEM*)((((unsigned long)d1_)+0xf)&~0xf);
++    // end force
++
+     const int *qmat;
+     const uint8_t *scantable= s->intra_scantable.scantable;
+     const uint8_t *perm_scantable= s->intra_scantable.permutated;
+Index: libavcodec/wmadec.c
+===================================================================
+--- libavcodec/wmadec.c	(revision 6957)
++++ libavcodec/wmadec.c	(working copy)
+@@ -717,7 +717,22 @@
+ {
+     int n, v, a, ch, code, bsize;
+     int coef_nb_bits, total_gain, parse_exponents;
+-    DECLARE_ALIGNED_16(float, window[BLOCK_MAX_SIZE * 2]);
++
++    // TJ: force alignment to 16.
++    //float is 4 bytes.
++    //DECLARE_ALIGNED_16(float, window[BLOCK_MAX_SIZE * 2]);
++    float window_[BLOCK_MAX_SIZE * 2 + 4];
++    float* window = (float*)((((unsigned long)window_)+0xf)&~0xf);
++    // end force
++
++    // TJ: force alignment to 16.
++    // moved to this block, so alignment must not be done over and over again
++    // FFTSample is float
++    //DECLARE_ALIGNED_16(FFTSample, output[BLOCK_MAX_SIZE * 2]);
++    FFTSample output_[BLOCK_MAX_SIZE * 2 + 4];
++    FFTSample* output = (FFTSample*)((((unsigned long)output_)+0xf)&~0xf);
++    // end force
++
+     int nb_coefs[MAX_CHANNELS];
+     float mdct_norm;
+ 
+@@ -1107,7 +1122,8 @@
+ 
+     for(ch = 0; ch < s->nb_channels; ch++) {
+         if (s->channel_coded[ch]) {
+-            DECLARE_ALIGNED_16(FFTSample, output[BLOCK_MAX_SIZE * 2]);
++/*          moved to the top
++ *          DECLARE_ALIGNED_16(FFTSample, output[BLOCK_MAX_SIZE * 2]);*/
+             float *ptr;
+             int n4, index, n;
+ 
