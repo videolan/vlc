@@ -42,7 +42,7 @@
 //#define AVFORMAT_DEBUG 1
 
 /* Version checking */
-#if (LIBAVFORMAT_BUILD >= 4687) && (defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE))
+#if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
 
 /*****************************************************************************
  * mux_sys_t: mux descriptor
@@ -443,7 +443,7 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
     return 0;
 }
 
-#else /* LIBAVFORMAT_BUILD >= 4687 */
+#else /* HAVE_FFMPEG_AVFORMAT_H */
 
 int E_(OpenMux)( vlc_object_t *p_this )
 {
@@ -454,4 +454,4 @@ void E_(CloseMux)( vlc_object_t *p_this )
 {
 }
 
-#endif /* LIBAVFORMAT_BUILD >= 4687 */
+#endif /* HAVE_FFMPEG_AVFORMAT_H */

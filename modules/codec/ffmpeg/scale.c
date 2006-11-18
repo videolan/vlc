@@ -67,7 +67,7 @@ void *( *swscale_fast_memcpy )( void *, const void *, size_t );
 static picture_t *Filter( filter_t *, picture_t * );
 static int CheckInit( filter_t * );
 
-static char *ppsz_mode_descriptions[] =
+static const char *ppsz_mode_descriptions[] =
 { N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
   N_("Experimental"), N_("Nearest neighbour (bad quality)"),
   N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),

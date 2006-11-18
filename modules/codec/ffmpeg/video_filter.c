@@ -38,6 +38,8 @@
 
 #include "ffmpeg.h"
 
+
+#if !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
 void E_(InitLibavcodec) ( vlc_object_t *p_object );
 static int CheckInit( filter_t *p_filter );
 static picture_t *Process( filter_t *p_filter, picture_t *p_pic );
@@ -287,7 +289,6 @@ static int CheckInit( filter_t *p_filter )
                                       - p_filter->fmt_out.video.i_x_offset;
             }
 
-#if LIBAVCODEC_BUILD >= 4708
             p_sys->p_rsc = img_resample_full_init( 
                                p_filter->fmt_out.video.i_width,
                                p_filter->fmt_out.video.i_height,
@@ -297,15 +298,7 @@ static int CheckInit( filter_t *p_filter )
                                i_cropleft,i_cropright,
                                i_paddtop,i_paddbottom,
                                i_paddleft,i_paddright );
-#else
-            p_sys->p_rsc = img_resample_full_init( 
-                               p_filter->fmt_out.video.i_width - i_paddleft - i_paddright,
-                               p_filter->fmt_out.video.i_height - i_paddtop - i_paddbottom,
-                               p_filter->fmt_in.video.i_width,
-                               p_filter->fmt_in.video.i_height,
-                               i_croptop,i_cropbottom,
-                               i_cropleft,i_cropright );
-#endif
+
             msg_Dbg( p_filter, "input: %ix%i -> %ix%i",
                 p_filter->fmt_out.video.i_width,
                 p_filter->fmt_out.video.i_height,
@@ -383,10 +376,7 @@ static void fill_pad_region( AVPicture* img, int height, int width,
     }
 }
 
-#if LIBAVCODEC_BUILD < 4708
-
 /* Workaround, because old libavcodec doesnt know how to padd */
-
 static void img_resample_padd( ImgReSampleContext *s, AVPicture *output, 
         const AVPicture *input, int padtop, int padleft )
 {
@@ -398,8 +388,6 @@ static void img_resample_padd( ImgReSampleContext *s, AVPicture *output,
     nopadd_pic.data[2] += ( nopadd_pic.linesize[2] * padtop + padleft ) >> 1;
     img_resample( s, &nopadd_pic, input );
 }
-#endif
-
 
 
 /*****************************************************************************
@@ -465,20 +453,7 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
         {
             if( p_sys->b_convert ) p_dst = &p_sys->tmp_pic;
 
-#if LIBAVCODEC_BUILD >= 4708
             img_resample( p_sys->p_rsc, p_dst, p_src );
-#else        
-            if ( p_sys->b_enable_croppadd )
-            {
-                img_resample_padd( p_sys->p_rsc, p_dst, p_src, 
-                    p_filter->fmt_out.video.i_y_offset, 
-                    p_filter->fmt_out.video.i_x_offset );
-            } 
-            else 
-            {
-                img_resample( p_sys->p_rsc, p_dst, p_src );
-            }
-#endif
 
             if (p_sys->b_enable_croppadd)
             {
@@ -526,20 +501,7 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
     {
         p_dst = &dest_pic;
 
-#if LIBAVCODEC_BUILD >= 4708
         img_resample( p_sys->p_rsc, p_dst, p_src );
-#else
-        if ( p_sys->b_enable_croppadd )
-        {
-            img_resample_padd( p_sys->p_rsc, p_dst, p_src, 
-                p_filter->fmt_out.video.i_y_offset, 
-                p_filter->fmt_out.video.i_x_offset );
-        } 
-        else 
-        {
-            img_resample( p_sys->p_rsc, p_dst, p_src );
-        }
-#endif
  
         if (p_sys->b_enable_croppadd)
         {
@@ -690,3 +652,5 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     p_pic->pf_release( p_pic );
     return p_pic_dst;
 }
+
+#endif /* ( (defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) */

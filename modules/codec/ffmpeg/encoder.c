@@ -43,13 +43,6 @@
 #   include <avcodec.h>
 #endif
 
-#if LIBAVCODEC_BUILD < 4704
-#   define AV_NOPTS_VALUE (int64_t)0
-#endif
-#if LIBAVCODEC_BUILD < 4684
-#    define FF_QP2LAMBDA 118
-#endif
-
 #include "ffmpeg.h"
 
 #define HURRY_UP_GUARD1 (450000)
@@ -76,7 +69,6 @@ static int FfmpegExecute( AVCodecContext *s,
 /*****************************************************************************
  * thread_context_t : for multithreaded encoding
  *****************************************************************************/
-#if LIBAVCODEC_BUILD >= 4702
 struct thread_context_t
 {
     VLC_COMMON_MEMBERS
@@ -90,7 +82,6 @@ struct thread_context_t
     vlc_cond_t      cond;
     vlc_bool_t      b_work, b_done;
 };
-#endif
 
 /*****************************************************************************
  * encoder_sys_t : ffmpeg encoder descriptor
@@ -202,7 +193,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     AVCodecContext *p_context;
     AVCodec *p_codec;
     int i_codec_id, i_cat;
-    char *psz_namecodec;
+    const char *psz_namecodec;
     vlc_value_t val;
     vlc_value_t lockval;
 
@@ -393,13 +384,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
              && (p_context->width > 720 || p_context->height > 576) )
             p_context->level = 4; /* High level */
 
-#if LIBAVCODEC_BUILD >= 4754
         p_context->time_base.num = p_enc->fmt_in.video.i_frame_rate_base;
         p_context->time_base.den = p_enc->fmt_in.video.i_frame_rate;
-#else
-        p_context->frame_rate = p_enc->fmt_in.video.i_frame_rate;
-        p_context->frame_rate_base= p_enc->fmt_in.video.i_frame_rate_base;
-#endif
 
         /* Defaults from ffmpeg.c */
         p_context->qblur = 0.5;
@@ -412,9 +398,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->lumi_masking = p_sys->f_lumi_masking;
         p_context->dark_masking = p_sys->f_dark_masking;
         p_context->p_masking = p_sys->f_p_masking;
-#if LIBAVCODEC_BUILD >= 4741
         p_context->border_masking = p_sys->f_border_masking;
-#endif
         p_context->luma_elim_threshold = p_sys->i_luma_elim;
         p_context->chroma_elim_threshold = p_sys->i_chroma_elim;
 
@@ -426,7 +410,6 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         if( !p_context->max_b_frames )
             p_context->flags |= CODEC_FLAG_LOW_DELAY;
 
-#if LIBAVCODEC_BUILD >= 4687
         av_reduce( &i_aspect_num, &i_aspect_den,
                    p_enc->fmt_in.video.i_aspect,
                    VOUT_ASPECT_FACTOR, 1 << 30 /* something big */ );
@@ -434,16 +417,11 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
                    &p_context->sample_aspect_ratio.den,
                    i_aspect_num * (int64_t)p_context->height,
                    i_aspect_den * (int64_t)p_context->width, 1 << 30 );
-#else
-        p_context->aspect_ratio = ((float)p_enc->fmt_in.video.i_aspect) /
-            VOUT_ASPECT_FACTOR;
-#endif
 
         p_sys->p_buffer_out = malloc( p_context->height * p_context->width * 3 );
 
         p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
         p_context->pix_fmt = E_(GetFfmpegChroma)( p_enc->fmt_in.i_codec );
-#if LIBAVCODEC_BUILD >= 4714
         if( p_codec->pix_fmts )
         {
             const enum PixelFormat *p = p_codec->pix_fmts;
@@ -454,9 +432,6 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             if( *p == -1 ) p_context->pix_fmt = p_codec->pix_fmts[0];
             p_enc->fmt_in.i_codec = E_(GetVlcChroma)( p_context->pix_fmt );
         }
-#else
-        p_enc->fmt_in.i_codec = E_(GetVlcChroma)( p_context->pix_fmt );
-#endif
 
         if ( p_sys->b_strict_rc )
         {
@@ -471,9 +446,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         if ( p_sys->f_i_quant_factor != 0.0 )
             p_context->i_quant_factor = p_sys->f_i_quant_factor;
 
-#if LIBAVCODEC_BUILD >= 4690
         p_context->noise_reduction = p_sys->i_noise_reduction;
-#endif
 
         if ( p_sys->b_mpeg4_matrix )
         {
@@ -499,11 +472,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             else
             {
                 p_context->flags |= CODEC_FLAG_INTERLACED_DCT;
-#if LIBAVCODEC_BUILD >= 4698
                 if ( p_sys->b_interlace_me )
                     p_context->flags |= CODEC_FLAG_INTERLACED_ME;
             }
-#endif
         }
 
         if ( p_sys->b_trellis )
@@ -512,10 +483,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         if ( p_sys->i_qmin > 0 && p_sys->i_qmin == p_sys->i_qmax )
             p_context->flags |= CODEC_FLAG_QSCALE;
 
-#if LIBAVCODEC_BUILD >= 4702
         if ( p_enc->i_threads >= 1 )
             p_context->thread_count = p_enc->i_threads;
-#endif
 
         if( p_sys->i_vtolerance > 0 )
             p_context->bit_rate_tolerance = p_sys->i_vtolerance;
@@ -531,9 +500,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         if( p_sys->i_quality )
         {
             p_context->flags |= CODEC_FLAG_QSCALE;
-#if LIBAVCODEC_BUILD >= 4668
             p_context->global_quality = p_sys->i_quality;
-#endif
         }
     }
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
@@ -661,7 +628,6 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 /****************************************************************************
  * Ffmpeg threading system
  ****************************************************************************/
-#if LIBAVCODEC_BUILD >= 4702
 static int FfmpegThread( struct thread_context_t *p_context )
 {
     while ( !p_context->b_die && !p_context->b_error )
@@ -730,7 +696,6 @@ static int FfmpegExecute( AVCodecContext *s,
 
     return 0;
 }
-#endif
 
 /****************************************************************************
  * EncodeVideo: the whole thing
@@ -741,7 +706,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     AVFrame frame;
     int i_out, i_plane;
 
-#if LIBAVCODEC_BUILD >= 4702
     if ( !p_sys->b_inited && p_enc->i_threads >= 1 )
     {
         struct thread_context_t ** pp_contexts;
@@ -771,7 +735,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
         p_sys->p_context->execute = FfmpegExecute;
     }
-#endif
 
     memset( &frame, 0, sizeof( AVFrame ) );
     for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
@@ -784,20 +747,13 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     frame.pict_type = 0;
 
     frame.repeat_pict = p_pict->i_nb_fields - 2;
-
-#if LIBAVCODEC_BUILD >= 4685
     frame.interlaced_frame = !p_pict->b_progressive;
     frame.top_field_first = !!p_pict->b_top_field_first;
-#endif
 
-#if LIBAVCODEC_BUILD < 4702
     /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
     if( p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', 'g', 'v' ) ||
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '1', 'v' ) ||
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '2', 'v' ) )
-#else
-    if( 1 )
-#endif
     {
         frame.pts = p_pict->date ? p_pict->date : (signed int) AV_NOPTS_VALUE;
 
@@ -818,20 +774,17 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                 if ( current_date + HURRY_UP_GUARD2 > frame.pts )
                 {
                     p_sys->p_context->flags &= ~CODEC_FLAG_TRELLIS_QUANT;
-#if LIBAVCODEC_BUILD >= 4690
                     p_sys->p_context->noise_reduction = p_sys->i_noise_reduction
                          + (HURRY_UP_GUARD2 + current_date - frame.pts) / 500;
-#endif
                     msg_Dbg( p_enc, "hurry up mode 2" );
                 }
                 else
                 {
                     if ( p_sys->b_trellis )
                         p_sys->p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
-#if LIBAVCODEC_BUILD >= 4690
+                        
                     p_sys->p_context->noise_reduction =
                         p_sys->i_noise_reduction;
-#endif
                 }
             }
 
@@ -871,14 +824,12 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     frame.quality = p_sys->i_quality;
 
     /* Ugly work-around for stupid libavcodec behaviour */
-#if LIBAVCODEC_BUILD >= 4722
     p_sys->i_framenum++;
     p_sys->pi_delay_pts[p_sys->i_framenum % MAX_FRAME_DELAY] = frame.pts;
     frame.pts = p_sys->i_framenum * AV_TIME_BASE *
         p_enc->fmt_in.video.i_frame_rate_base;
     frame.pts += p_enc->fmt_in.video.i_frame_rate - 1;
     frame.pts /= p_enc->fmt_in.video.i_frame_rate;
-#endif
     /* End work-around */
 
     i_out = avcodec_encode_video( p_sys->p_context, (uint8_t*)p_sys->p_buffer_out,
@@ -907,7 +858,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             p_block->i_pts = p_sys->p_context->coded_frame->pts;
 
             /* Ugly work-around for stupid libavcodec behaviour */
-#if LIBAVCODEC_BUILD >= 4722
             {
             int64_t i_framenum = p_block->i_pts *
                 p_enc->fmt_in.video.i_frame_rate /
@@ -915,7 +865,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
             p_block->i_pts = p_sys->pi_delay_pts[i_framenum % MAX_FRAME_DELAY];
             }
-#endif
             /* End work-around */
 
             if( p_sys->p_context->coded_frame->pict_type != FF_I_TYPE &&
@@ -1056,7 +1005,6 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
 
     var_Get( p_enc->p_libvlc_global, "avcodec", &lockval );
 
-#if LIBAVCODEC_BUILD >= 4702
     if ( p_sys->b_inited && p_enc->i_threads >= 1 )
     {
         int i;
@@ -1074,7 +1022,6 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
 
         free( pp_contexts );
     }
-#endif
 
     vlc_mutex_lock( lockval.p_address );
     avcodec_close( p_sys->p_context );

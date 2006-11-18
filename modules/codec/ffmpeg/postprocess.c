@@ -35,8 +35,6 @@
 
 #include "ffmpeg.h"
 
-#ifdef LIBAVCODEC_PP
-
 #ifdef HAVE_POSTPROC_POSTPROCESS_H
 #   include <postproc/postprocess.h>
 #else
@@ -265,5 +263,3 @@ static int PPQCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     return VLC_SUCCESS;
 }
-
-#endif /* LIBAVCODEC_PP */

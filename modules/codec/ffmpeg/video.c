@@ -46,7 +46,7 @@ struct decoder_sys_t
     /* Common part between video and audio decoder */
     int i_cat;
     int i_codec_id;
-    char *psz_namecodec;
+    const char *psz_namecodec;
 
     AVCodecContext      *p_context;
     AVCodec             *p_codec;
@@ -170,16 +170,12 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
     }
     else
     {
-#if LIBAVCODEC_BUILD >= 4687
         p_dec->fmt_out.video.i_aspect =
             VOUT_ASPECT_FACTOR * ( av_q2d(p_context->sample_aspect_ratio) *
                 p_context->width / p_context->height );
         p_dec->fmt_out.video.i_sar_num = p_context->sample_aspect_ratio.num;
         p_dec->fmt_out.video.i_sar_den = p_context->sample_aspect_ratio.den;
-#else
-        p_dec->fmt_out.video.i_aspect =
-            VOUT_ASPECT_FACTOR * p_context->aspect_ratio;
-#endif
+
         if( p_dec->fmt_out.video.i_aspect == 0 )
         {
             p_dec->fmt_out.video.i_aspect =
@@ -195,31 +191,20 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         p_dec->fmt_out.video.i_frame_rate_base =
             p_dec->fmt_out.video.i_frame_rate_base;
     }
-    else
-#if LIBAVCODEC_BUILD >= 4754
-    if( p_context->time_base.num > 0 && p_context->time_base.den > 0 )
+    else if( p_context->time_base.num > 0 && p_context->time_base.den > 0 )
     {
         p_dec->fmt_out.video.i_frame_rate = p_context->time_base.den;
         p_dec->fmt_out.video.i_frame_rate_base = p_context->time_base.num;
     }
-#else
-    if( p_context->frame_rate > 0 && p_context->frame_rate_base > 0 )
-    {
-        p_dec->fmt_out.video.i_frame_rate = p_context->frame_rate;
-        p_dec->fmt_out.video.i_frame_rate_base = p_context->frame_rate_base;
-    }
-#endif
 
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
 
-#ifdef LIBAVCODEC_PP
     if( p_sys->p_pp && p_sys->b_pp && !p_sys->b_pp_init )
     {
         E_(InitPostproc)( p_dec, p_sys->p_pp, p_context->width,
                           p_context->height, p_context->pix_fmt );
         p_sys->b_pp_init = VLC_TRUE;
     }
-#endif
 
     return p_pic;
 }
@@ -231,7 +216,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
  * opened (done after the first decoded frame).
  *****************************************************************************/
 int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
-                      AVCodec *p_codec, int i_codec_id, char *psz_namecodec )
+                      AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
     vlc_value_t lockval;
@@ -271,25 +256,19 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
 
     var_Create( p_dec, "ffmpeg-vismv", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-vismv", &val );
-#if LIBAVCODEC_BUILD >= 4698
     if( val.i_int ) p_sys->p_context->debug_mv = val.i_int;
-#endif
 
     var_Create( p_dec, "ffmpeg-lowres", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-lowres", &val );
-#if LIBAVCODEC_BUILD >= 4723
     if( val.i_int > 0 && val.i_int <= 2 ) p_sys->p_context->lowres = val.i_int;
-#endif
 
     var_Create( p_dec, "ffmpeg-skiploopfilter",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-skiploopfilter", &val );
-#if LIBAVCODEC_BUILD >= 4758
     if( val.i_int > 0 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONREF;
     if( val.i_int > 1 ) p_sys->p_context->skip_loop_filter = AVDISCARD_BIDIR;
     if( val.i_int > 2 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONKEY;
     if( val.i_int > 3 ) p_sys->p_context->skip_loop_filter = AVDISCARD_ALL;
-#endif
 
     /* ***** ffmpeg frame skipping ***** */
     var_Create( p_dec, "ffmpeg-hurry-up", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -305,22 +284,16 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->p_context->pix_fmt != PIX_FMT_YUV422P &&
         /* H264 uses too many reference frames */
         p_sys->i_codec_id != CODEC_ID_H264 &&
-#if LIBAVCODEC_BUILD >= 4698
         !p_sys->p_context->debug_mv )
-#else
-        1 )
-#endif
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
          * so we need to do another check in ffmpeg_GetFrameBuf() */
         p_sys->b_direct_rendering = 1;
     }
 
-#ifdef LIBAVCODEC_PP
     p_sys->p_pp = NULL;
     p_sys->b_pp = p_sys->b_pp_async = p_sys->b_pp_init = VLC_FALSE;
     p_sys->p_pp = E_(OpenPostproc)( p_dec, &p_sys->b_pp_async );
-#endif
 
     /* ffmpeg doesn't properly release old pictures when frames are skipped */
     //if( p_sys->b_hurry_up ) p_sys->b_direct_rendering = 0;
@@ -354,13 +327,11 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_dec->fmt_out.i_codec = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
 
     /* Setup palette */
-#if LIBAVCODEC_BUILD >= 4688
     if( p_dec->fmt_in.video.p_palette )
         p_sys->p_context->palctrl =
             (AVPaletteControl *)p_dec->fmt_in.video.p_palette;
     else
         p_sys->p_context->palctrl = &palette_control;
-#endif
 
     /* ***** Open the codec ***** */
     vlc_mutex_lock( lockval.p_address );
@@ -602,7 +573,6 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         if( !p_dec->fmt_in.video.i_aspect )
         {
             /* Fetch again the aspect ratio in case it changed */
-#if LIBAVCODEC_BUILD >= 4687
             p_dec->fmt_out.video.i_aspect =
                 VOUT_ASPECT_FACTOR
                     * ( av_q2d(p_sys->p_context->sample_aspect_ratio)
@@ -611,10 +581,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
                 = p_sys->p_context->sample_aspect_ratio.num;
             p_dec->fmt_out.video.i_sar_den
                 = p_sys->p_context->sample_aspect_ratio.den;
-#else
-            p_dec->fmt_out.video.i_aspect =
-                VOUT_ASPECT_FACTOR * p_sys->p_context->aspect_ratio;
-#endif
+
             if( p_dec->fmt_out.video.i_aspect == 0 )
             {
                 p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR
@@ -628,7 +595,6 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             p_pic->date = p_sys->i_pts;
 
             /* interpolate the next PTS */
-#if LIBAVCODEC_BUILD >= 4754
             if( p_dec->fmt_in.video.i_frame_rate > 0 &&
                 p_dec->fmt_in.video.i_frame_rate_base > 0 )
             {
@@ -646,16 +612,6 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
                     p_block->i_rate / INPUT_RATE_DEFAULT /
                     (2 * p_sys->p_context->time_base.den);
             }
-#else
-            if( p_sys->p_context->frame_rate > 0 )
-            {
-                p_sys->i_pts += I64C(1000000) *
-                    (2 + p_sys->p_ff_pic->repeat_pict) *
-                    p_sys->p_context->frame_rate_base *
-                    p_block->i_rate / INPUT_RATE_DEFAULT /
-                    (2 * p_sys->p_context->frame_rate);
-            }
-#endif
 
             if( p_sys->b_first_frame )
             {
@@ -665,10 +621,8 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             }
 
             p_pic->i_nb_fields = 2 + p_sys->p_ff_pic->repeat_pict;
-#if LIBAVCODEC_BUILD >= 4685
             p_pic->b_progressive = !p_sys->p_ff_pic->interlaced_frame;
             p_pic->b_top_field_first = p_sys->p_ff_pic->top_field_first;
-#endif
 
             return p_pic;
         }
@@ -693,11 +647,7 @@ void E_(EndVideoDec)( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
-
-#ifdef LIBAVCODEC_PP
     E_(ClosePostproc)( p_dec, p_sys->p_pp );
-#endif
-
     free( p_sys->p_buffer_orig );
 }
 
@@ -792,25 +742,25 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         uint8_t *p_dst, *p_src;
         int i_src_stride, i_dst_stride;
 
-#ifdef LIBAVCODEC_PP
         if( p_sys->p_pp && p_sys->b_pp )
             E_(PostprocPict)( p_dec, p_sys->p_pp, p_pic, p_ff_pic );
         else
-#endif
-        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
-            p_src  = p_ff_pic->data[i_plane];
-            p_dst = p_pic->p[i_plane].p_pixels;
-            i_src_stride = p_ff_pic->linesize[i_plane];
-            i_dst_stride = p_pic->p[i_plane].i_pitch;
-
-            i_size = __MIN( i_src_stride, i_dst_stride );
-            for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines;
-                 i_line++ )
+            for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
             {
-                p_dec->p_libvlc->pf_memcpy( p_dst, p_src, i_size );
-                p_src += i_src_stride;
-                p_dst += i_dst_stride;
+                p_src  = p_ff_pic->data[i_plane];
+                p_dst = p_pic->p[i_plane].p_pixels;
+                i_src_stride = p_ff_pic->linesize[i_plane];
+                i_dst_stride = p_pic->p[i_plane].i_pitch;
+
+                i_size = __MIN( i_src_stride, i_dst_stride );
+                for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines;
+                     i_line++ )
+                {
+                    p_dec->p_libvlc->pf_memcpy( p_dst, p_src, i_size );
+                    p_src += i_src_stride;
+                    p_dst += i_dst_stride;
+                }
             }
         }
     }
@@ -831,11 +781,13 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
                 dest_pic.data[i] = p_pic->p[i].p_pixels;
                 dest_pic.linesize[i] = p_pic->p[i].i_pitch;
             }
+#if !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
             img_convert( &dest_pic, PIX_FMT_YUV420P,
                          (AVPicture *)p_ff_pic,
                          p_sys->p_context->pix_fmt,
                          p_sys->p_context->width,
                          p_sys->p_context->height );
+#endif
             break;
         default:
             msg_Err( p_dec, "don't know how to convert chroma %i",

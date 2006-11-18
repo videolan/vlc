@@ -23,32 +23,26 @@
 
 #include "codecs.h"                                      /* BITMAPINFOHEADER */
 
-#if LIBAVCODEC_BUILD >= 4663
-#   define LIBAVCODEC_PP
-#else
-#   undef  LIBAVCODEC_PP
-#endif
-
 struct picture_t;
 struct AVFrame;
 struct AVCodecContext;
 struct AVCodec;
 
 void E_(InitLibavcodec)( vlc_object_t * );
-int E_(GetFfmpegCodec) ( vlc_fourcc_t, int *, int *, char ** );
-int E_(GetVlcFourcc)   ( int, int *, vlc_fourcc_t *, char ** );
+int E_(GetFfmpegCodec) ( vlc_fourcc_t, int *, int *, const char ** );
+int E_(GetVlcFourcc)   ( int, int *, vlc_fourcc_t *, const char ** );
 int E_(GetFfmpegChroma)( vlc_fourcc_t );
 vlc_fourcc_t E_(GetVlcChroma)( int );
 
 /* Video decoder module */
 int  E_( InitVideoDec )( decoder_t *, AVCodecContext *, AVCodec *,
-                         int, char * );
+                         int, const char * );
 void E_( EndVideoDec ) ( decoder_t * );
 picture_t *E_( DecodeVideo ) ( decoder_t *, block_t ** );
 
 /* Audio decoder module */
 int  E_( InitAudioDec )( decoder_t *, AVCodecContext *, AVCodec *,
-                         int, char * );
+                         int, const char * );
 void E_( EndAudioDec ) ( decoder_t * );
 aout_buffer_t *E_( DecodeAudio ) ( decoder_t *, block_t ** );
 

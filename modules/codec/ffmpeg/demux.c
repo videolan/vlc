@@ -43,7 +43,7 @@
 //#define AVFORMAT_DEBUG 1
 
 /* Version checking */
-#if (LIBAVFORMAT_BUILD >= 4629) && (defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE))
+#if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
 
 /*****************************************************************************
  * demux_sys_t: demux descriptor
@@ -486,7 +486,7 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
     return stream_Tell( p_demux->s );
 }
 
-#else /* LIBAVFORMAT_BUILD >= 4611 */
+#else /* HAVE_FFMPEG_AVFORMAT_H */
 
 int E_(OpenDemux)( vlc_object_t *p_this )
 {
@@ -497,4 +497,4 @@ void E_(CloseDemux)( vlc_object_t *p_this )
 {
 }
 
-#endif /* LIBAVFORMAT_BUILD >= 4629 */
+#endif /* HAVE_FFMPEG_AVFORMAT_H */

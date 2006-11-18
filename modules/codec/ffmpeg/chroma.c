@@ -36,6 +36,7 @@
 
 #include "ffmpeg.h"
 
+#if !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
 void E_(InitLibavcodec) ( vlc_object_t *p_object );
 static void ChromaConversion( vout_thread_t *, picture_t *, picture_t * );
 
@@ -188,3 +189,4 @@ void E_(CloseChroma)( vlc_object_t *p_this )
     }
     free( p_vout->chroma.p_sys );
 }
+#endif /* !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE) */
