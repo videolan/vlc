@@ -7,3 +7,4 @@ SOURCES_hotkeys = hotkeys.c
 SOURCES_lirc = lirc.c
 SOURCES_rc = rc.c
 SOURCES_motion = motion.c
+SOURCES_dbus = dbus.c dbus.h
