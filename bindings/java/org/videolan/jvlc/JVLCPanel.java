@@ -42,6 +42,15 @@ public class JVLCPanel extends JPanel {
         jvcc = new JVLCCanvas();
         add(jvcc);        
     }
+
+    /**
+     * @param args Arguments to initialize JVLC
+     */
+    public JVLCPanel(String[] args) 
+    {
+        jvcc = new JVLCCanvas(args);
+        add(jvcc);
+    }
     
     /**
      * @param width The width of the panel
