@@ -100,6 +100,12 @@ const char* psz_introspection_xml_data =
 "    </method>\n"
 "    <method name=\"Quit\">\n"
 "    </method>\n"
+"    <method name=\"Prev\">\n"
+"    </method>\n"
+"    <method name=\"Next\">\n"
+"    </method>\n"
+"    <method name=\"Stop\">\n"
+"    </method>\n"
 "  </interface>\n"
 "</node>\n"
 ;

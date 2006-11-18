@@ -109,6 +109,32 @@ DBUS_METHOD( Quit )
     REPLY_SEND;
 }
 
+DBUS_METHOD( Next )
+{ /* next playlist item */
+    REPLY_INIT;
+    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
+    playlist_Next( p_playlist );
+    pl_Release( ((vlc_object_t*) p_this) );
+    REPLY_SEND;
+}
+
+DBUS_METHOD( Prev )
+{ /* previous playlist item */
+    REPLY_INIT;
+    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
+    playlist_Prev( p_playlist );
+    pl_Release( ((vlc_object_t*) p_this) );
+    REPLY_SEND;
+}
+
+DBUS_METHOD( Stop )
+{ /* stop playing */
+    REPLY_INIT;
+    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
+    playlist_Stop( p_playlist );
+    pl_Release( ((vlc_object_t*) p_this) );
+    REPLY_SEND;
+}
 DBUS_METHOD( GetPlayStatus )
 { /* return a string */
     REPLY_INIT;
@@ -249,7 +275,10 @@ DBUS_METHOD( handle_messages )
     METHOD_FUNC( "AddMRL",          AddMRL );
     METHOD_FUNC( "TogglePause",     TogglePause );
     METHOD_FUNC( "Nothing",         Nothing );
+    METHOD_FUNC( "Prev",            Prev );
+    METHOD_FUNC( "Next",            Next );
     METHOD_FUNC( "Quit",            Quit );
+    METHOD_FUNC( "Stop",            Stop );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
