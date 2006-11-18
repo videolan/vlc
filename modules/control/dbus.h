@@ -97,6 +97,7 @@ const char* psz_introspection_xml_data =
 "      <arg type=\"b\" direction=\"in\" />\n"
 "    </method>\n"
 "    <method name=\"Nothing\">\n"
+"    <method name=\"Quit\">\n"
 "    </method>\n"
 "  </interface>\n"
 "</node>\n"
