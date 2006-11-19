@@ -436,6 +436,8 @@ static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
 #define SKINS2_TRANSPARENCY_LONG N_("You can disable all transparency effects"\
     " if you want. This is mainly useful when moving windows does not behave" \
     " correctly.")
+#define SKINS2_PLAYLIST N_("Use a skinned playlist")
+#define SKINS2_PLAYLIST_LONG N_("Use a skinned playlist")
 
 vlc_module_begin();
     set_category( CAT_INTERFACE );
@@ -456,8 +458,8 @@ vlc_module_begin();
               SKINS2_TRANSPARENCY_LONG, VLC_FALSE );
 #endif
 
-    add_bool( "skinned-playlist", VLC_TRUE, NULL, SKINS2_TRANSPARENCY,
-              SKINS2_TRANSPARENCY_LONG, VLC_FALSE );
+    add_bool( "skinned-playlist", VLC_TRUE, NULL, SKINS2_PLAYLIST,
+              SKINS2_PLAYLIST_LONG, VLC_FALSE );
     set_shortname( _("Skins"));
     set_description( _("Skinnable Interface") );
     set_capability( "interface", 30 );
