@@ -449,7 +449,6 @@ static int ReadNSVs( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_demux, "new NSVs chunk" );
     /* Video */
     switch( ( fcc = VLC_FOURCC( header[4], header[5], header[6], header[7] ) ) )
     {
@@ -457,10 +456,11 @@ static int ReadNSVs( demux_t *p_demux )
         case VLC_FOURCC( 'V', 'P', '3', '1' ):
             fcc = VLC_FOURCC( 'V', 'P', '3', '1' );
             break;
+        case VLC_FOURCC( 'V', 'P', '6', '2' ):
         case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
             break;
         default:
-            msg_Warn( p_demux, "unknown codec" );
+            msg_Warn( p_demux, "unknown codec %4.4s", (char *)&fcc );
             break;
     }
     if( fcc != VLC_FOURCC( 'N', 'O', 'N', 'E' ) && fcc != p_sys->fmt_video.i_codec  )
@@ -496,7 +496,7 @@ static int ReadNSVs( demux_t *p_demux )
         case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
             break;
         default:
-            msg_Warn( p_demux, "unknown codec" );
+            msg_Warn( p_demux, "unknown codec %4.4s", (char *)&fcc );
             break;
     }
 
@@ -546,7 +546,7 @@ static int ReadNSVs( demux_t *p_demux )
         msg_Dbg( p_demux, "invalid fps (0x00)" );
         p_sys->i_pcr_inc = 40000;
     }
-    msg_Dbg( p_demux, "    - fps=%.3f", 1000000.0 / (double)p_sys->i_pcr_inc );
+    //msg_Dbg( p_demux, "    - fps=%.3f", 1000000.0 / (double)p_sys->i_pcr_inc );
 
     return VLC_SUCCESS;
 }
