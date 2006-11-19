@@ -136,7 +136,7 @@ int libvlc_playlist_delete_item( libvlc_instance_t *p_instance, int i_id,
         }
     }
     libvlc_exception_raise( p_e, "item not found" );
-    vlc_mutex_unlokc( &PL->object_lock );
+    vlc_mutex_unlock( &PL->object_lock );
     return VLC_EGENERIC;
 }
 
