@@ -639,9 +639,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
         else
         {
             if( i_dbus_service != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER )
-                /* TODO: register a '/' object */
-            { /*23:08 < mjj29> it should reply immediately with <node name='/'></node>*/
-
+            {
                 if( config_GetInt( p_libvlc, "one-instance" ) )
                 {
                     msg_Warn( p_libvlc,
