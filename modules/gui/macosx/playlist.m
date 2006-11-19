@@ -855,7 +855,7 @@ NSLog( @"expandable" );
         }
         else
         {
-            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id );
+            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id, VLC_FALSE );
         }
     }
     [self playlistUpdated];
