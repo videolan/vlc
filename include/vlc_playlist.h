@@ -59,14 +59,14 @@ TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
  * several levels, while the onelevel tree contains only one level :), ie
  * it only contains "real" items, not nodes
  * For example, if you open a directory, you will have
- *
+ *\verbatim
  * Category tree:               Onevelel tree:
  * Playlist                     Playlist
  *  - Dir                         - item1
  *    - Subdir                    - item2
  *      - item1
  *      - item2
- *
+ *\endverbatim
  * The top-level items of both tree are the same, and they are reproduced
  * in the left-part of the playlist GUIs, they are the "sources" from the
  * source selectors. Top-level items include: playlist, media library, SAP,
@@ -79,7 +79,7 @@ TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
  * and nodes (both are represented by the same structure).
  *
  * So, here is an example:
- *
+ * \verbatim
  * Inputs array
  *  - input 1 -> name = foo 1 uri = ...
  *  - input 2 -> name = foo 2 uri = ...
@@ -90,7 +90,7 @@ TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
  *      - foo 2 (id 6 - input 2)       - media library (id 4)
  * - media library (id 2)                - foo 1 (id6 - input 1)
  *    - foo 1 (id 5 - input 1)
- *
+ * \endverbatim
  * Sometimes, an item must be transformed to a node. This happens for the
  * directory access for example. In that case, the item is removed from
  * the onelevel tree, as it is not a real item anymore.
