@@ -783,7 +783,7 @@ char *
 CDDAFormatTitle( const access_t *p_access, track_t i_track )
 { 
 
-    char *config_varname = MODULE_STRING "-title-format";
+    const char *config_varname = MODULE_STRING "-title-format";
     cdda_data_t *p_cdda = (cdda_data_t *) p_access->p_sys;
     char *psz_mrl = CDDAFormatMRL( p_access, i_track );
 
@@ -985,7 +985,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 	input_title_t *t;
 
 	if ( !p_cdda->b_nav_mode )
-	  playlist_ItemToNode( p_playlist, p_item );
+	  playlist_ItemToNode( p_playlist, p_item, VLC_FALSE );
 
         for( i = 0 ; i < p_cdda->i_tracks ; i++ )
         {
