@@ -177,15 +177,15 @@ void StandardPLPanel::add()
     if( currentRootId == THEPL->p_local_category->i_id ||
         currentRootId == THEPL->p_local_onelevel->i_id )
     {
-        popup->addAction( "Add file", THEDP, SLOT( simplePLAppendDialog() ) );
-        popup->addAction( "Advanced add", THEDP, SLOT( PLAppendDialog() ) );
+        popup->addAction( qtr("Add file"), THEDP, SLOT( simplePLAppendDialog() ) );
+        popup->addAction( qtr("Advanced add"), THEDP, SLOT( PLAppendDialog() ) );
     }
     else if( currentRootId == THEPL->p_ml_category->i_id ||
              currentRootId == THEPL->p_ml_onelevel->i_id )
     {
-        popup->addAction( "Add file", THEDP, SLOT( simpleMLAppendDialog() ) );
-        popup->addAction( "Advanced add", THEDP, SLOT( MLAppendDialog() ) );
-        popup->addAction( "Directory", THEDP, SLOT( openMLDirectory() ) );
+        popup->addAction( qtr("Add file"), THEDP, SLOT( simpleMLAppendDialog() ) );
+        popup->addAction( qtr("Advanced add"), THEDP, SLOT( MLAppendDialog() ) );
+        popup->addAction( qtr("Directory"), THEDP, SLOT( openMLDirectory() ) );
     }
     popup->popup( QCursor::pos() );
 }
