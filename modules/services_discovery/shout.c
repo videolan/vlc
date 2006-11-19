@@ -167,8 +167,8 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
     playlist_t *p_playlist =  pl_Yield( p_sd );
-    playlist_NodeDelete( p_playlist, p_sys->p_node_cat, VLC_TRUE, VLC_TRUE );
-    playlist_NodeDelete( p_playlist, p_sys->p_node_one, VLC_TRUE, VLC_TRUE );
+    playlist_NodeDelete( p_playlist, p_sys->p_node_cat, VLC_TRUE, VLC_FALSE );
+    playlist_NodeDelete( p_playlist, p_sys->p_node_one, VLC_TRUE, VLC_FALSE );
     pl_Release( p_sd );
     free( p_sys );
 }
