@@ -105,7 +105,7 @@ DBUS_METHOD( Quit )
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_Stop( p_playlist );
     pl_Release( ((vlc_object_t*) p_this) );
-    ((vlc_object_t*)p_this)->b_die = VLC_TRUE;
+    ((vlc_object_t*)p_this)->p_libvlc->b_die = VLC_TRUE;
     REPLY_SEND;
 }
 
@@ -135,6 +135,20 @@ DBUS_METHOD( Stop )
     pl_Release( ((vlc_object_t*) p_this) );
     REPLY_SEND;
 }
+
+DBUS_METHOD( GetPlayingItem )
+{ /* return the current item */
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    char psz_no_input = '\0';
+    char *p_psz_no_input = &psz_no_input;
+    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
+    input_thread_t *p_input = p_playlist->p_input;
+    ADD_STRING( ( p_input ) ? &p_input->input.p_item->psz_name : &p_psz_no_input );
+    pl_Release( ((vlc_object_t*) p_this) );
+    REPLY_SEND;
+}
+
 DBUS_METHOD( GetPlayStatus )
 { /* return a string */
     REPLY_INIT;
@@ -173,23 +187,26 @@ DBUS_METHOD( TogglePause )
 
     vlc_value_t val;
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    PL_LOCK;
     input_thread_t *p_input = p_playlist->p_input;
-
-    if( p_input )
+    if( p_input != NULL )
     {
         var_Get( p_input, "state", &val );
         if( val.i_int != PAUSE_S )
         {
             val.i_int = PAUSE_S;
+            playlist_Pause( p_playlist );
         }
         else
         {
             val.i_int = PLAYING_S;
+            playlist_Play( p_playlist );
         }
-        var_Set( p_input, "state", val );
     }
-    PL_UNLOCK;
+    else
+    {
+        val.i_int = PLAYING_S;
+        playlist_Play( p_playlist );
+    }
     pl_Release( p_playlist );
 
     dbus_bool_t pause = ( val.i_int == PLAYING_S ) ? TRUE : FALSE;
@@ -272,6 +289,7 @@ DBUS_METHOD( handle_messages )
     /* here D-Bus method's names are associated to an handler */
 
     METHOD_FUNC( "GetPlayStatus",   GetPlayStatus );
+    METHOD_FUNC( "GetPlayingItem",  GetPlayingItem );
     METHOD_FUNC( "AddMRL",          AddMRL );
     METHOD_FUNC( "TogglePause",     TogglePause );
     METHOD_FUNC( "Nothing",         Nothing );
