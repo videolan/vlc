@@ -875,13 +875,23 @@ static const char *ppsz_clock_descriptions[] =
 #define SYSLOG_LONGTEXT N_( \
     "Log all VLC messages to syslog (UNIX systems)." )
 
-#define ONEINSTANCE_TEXT N_("Allow only one running instance")
-#define ONEINSTANCE_LONGTEXT N_( \
+#define ONEINSTANCE_WIN_TEXT N_("Allow only one running instance")
+#define ONEINSTANCE_WIN_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
     "for example if you associated VLC with some media types and you " \
     "don't want a new instance of VLC to be opened each time you " \
     "double-click on a file in the explorer. This option will allow you " \
     "to play the file with the already running instance or enqueue it.")
+
+#define ONEINSTANCE_DBUS_TEXT ONEINSTANCE_WIN_TEXT
+#define ONEINSTANCE_DBUS_LONGTEXT N_( \
+    "Allowing only one running instance of VLC can sometimes be useful, " \
+    "for example if you associated VLC with some media types and you " \
+    "don't want a new instance of VLC to be opened each time you " \
+    "open a file in your file manager. This option will allow you " \
+    "to play the file with the already running instance or enqueue it." \
+    "This option require the D-Bus session daemon to be active " \
+    "and the running instance of VLC to use D-Bus control interface.")
 
 #define STARTEDFROMFILE_TEXT N_("VLC is started from file association")
 #define STARTEDFROMFILE_LONGTEXT N_( \
@@ -1612,9 +1622,16 @@ vlc_module_begin();
         change_need_restart();
 #endif
 
+#if defined(HAVE_DBUS_3)
+    add_bool( "one-instance", 0, NULL, ONEINSTANCE_DBUS_TEXT,
+              ONEINSTANCE_DBUS_LONGTEXT, VLC_TRUE );
+    add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
+              PLAYLISTENQUEUE_LONGTEXT, VLC_TRUE );
+#endif
+
 #if defined(WIN32)
-    add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT,
-              ONEINSTANCE_LONGTEXT, VLC_TRUE );
+    add_bool( "one-instance", 0, NULL, ONEINSTANCE_WIN_TEXT,
+              ONEINSTANCE_WIN_LONGTEXT, VLC_TRUE );
     add_bool( "started-from-file", 0, NULL, STARTEDFROMFILE_TEXT,
               STARTEDFROMFILE_LONGTEXT, VLC_TRUE );
     add_bool( "one-instance-when-started-from-file", 1, NULL,

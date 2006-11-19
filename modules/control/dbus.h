@@ -21,12 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* DBUS IDENTIFIERS */
-
-#define VLC_DBUS_SERVICE        "org.videolan.vlc"
-#define VLC_DBUS_INTERFACE      "org.videolan.vlc"
-#define VLC_DBUS_OBJECT_PATH    "/org/videolan/vlc"
-
 /* MACROS */
 
 #define DBUS_METHOD( method_function ) \

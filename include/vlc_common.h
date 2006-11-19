@@ -1176,3 +1176,10 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #   define DIR_SEP_CHAR '/'
 #   define DIR_SEP "/"
 #endif
+
+#ifdef HAVE_DBUS_3
+/* registered name on the session bus */
+#define VLC_DBUS_SERVICE        "org.videolan.vlc"
+#define VLC_DBUS_INTERFACE      "org.videolan.vlc"
+#define VLC_DBUS_OBJECT_PATH    "/org/videolan/vlc"
+#endif
