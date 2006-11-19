@@ -125,7 +125,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args );
 
 
 static int ReadDir( playlist_t *, const char *psz_name, int i_mode,
-                    playlist_item_t *, playlist_item_t * );
+                    playlist_item_t *, playlist_item_t *, input_item_t * );
 
 /*****************************************************************************
  * Open: open the directory
@@ -184,8 +184,9 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     playlist_item_t    *p_item_in_category;
     input_item_t       *p_current_input = ( (input_thread_t*)p_access->p_parent)
                                                        ->input.p_item;
-    playlist_item_t    *p_current =
-                    playlist_ItemGetByInput( p_playlist, p_current_input, VLC_FALSE );
+    playlist_item_t    *p_current = playlist_ItemGetByInput( p_playlist,
+                                                             p_current_input,
+                                                             VLC_FALSE );
     char               *psz_name = strdup (p_access->psz_path);
 
     if( psz_name == NULL )
@@ -221,13 +222,15 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     msg_Dbg( p_access, "opening directory `%s'", p_access->psz_path );
 
     p_current->p_input->i_type = ITEM_TYPE_DIRECTORY;
-    p_item_in_category = playlist_ItemToNode( p_playlist, p_current, VLC_FALSE );
+    p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
+                                              VLC_FALSE );
 
     i_activity = var_GetInteger( p_playlist, "activity" );
     var_SetInteger( p_playlist, "activity", i_activity +
                     DIRECTORY_ACTIVITY );
 
-    ReadDir( p_playlist, psz_name, i_mode, p_current, p_item_in_category );
+    ReadDir( p_playlist, psz_name, i_mode, p_current, p_item_in_category,
+             p_current_input );
 
     i_activity = var_GetInteger( p_playlist, "activity" );
     var_SetInteger( p_playlist, "activity", i_activity -
@@ -329,7 +332,8 @@ static int Sort (const char **a, const char **b)
  *****************************************************************************/
 static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                     int i_mode, playlist_item_t *p_parent,
-                    playlist_item_t *p_parent_category )
+                    playlist_item_t *p_parent_category,
+                    input_item_t *p_current_input )
 {
     char **pp_dir_content = NULL;
     int             i_dir_content, i, i_return = VLC_SUCCESS;
@@ -434,7 +438,8 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                     /* If we had the parent in category, the it is now node.
                      * Else, we still don't have  */
                     if( ReadDir( p_playlist, psz_uri , MODE_EXPAND,
-                                 p_node, p_parent_category ? p_node : NULL )
+                                 p_node, p_parent_category ? p_node : NULL,
+                                 p_current_input )
                           != VLC_SUCCESS )
                     {
                         i_return = VLC_EGENERIC;
@@ -469,10 +474,14 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                                                  psz_uri, entry, 0, NULL,
                                                  -1, ITEM_TYPE_VFILE );
                 if (p_input != NULL)
+                {
+                    if( p_current_input )
+                        input_ItemCopyOptions( p_current_input, p_input );
                     playlist_BothAddInput( p_playlist, p_input,
                                            p_parent_category,
                                            PLAYLIST_APPEND|PLAYLIST_PREPARSE,
                                            PLAYLIST_END, NULL, NULL );
+                }
             }
         }
     }
