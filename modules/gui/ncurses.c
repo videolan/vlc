@@ -549,7 +549,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 if( p_item->i_children == -1 )
                 {
                     playlist_DeleteFromInput( p_playlist,
-                                              p_item->p_input->i_id );
+                                              p_item->p_input->i_id, VLC_TRUE );
                 }
                 else
                 {
