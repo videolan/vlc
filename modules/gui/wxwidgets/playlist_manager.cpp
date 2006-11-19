@@ -281,7 +281,8 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
 
     LockPlaylist( p_intf->p_sys, p_playlist );
     playlist_item_t *p_item =
-        playlist_ItemGetById( p_playlist, ((PlaylistItem *)p_data)->i_id );
+        playlist_ItemGetById( p_playlist, ((PlaylistItem *)p_data)->i_id,
+                VLC_TRUE );
     if( !p_item )
     {
         UnlockPlaylist( p_intf->p_sys, p_playlist );
@@ -354,7 +355,7 @@ void PlaylistManager::AppendItem( wxCommandEvent& event )
     node = FindItem( treectrl->GetRootItem(), p_add->i_node );
     if( !node.IsOk() ) goto update;
 
-    p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
+    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, VLC_TRUE );
     if( !p_item ) goto update;
 
     item = FindItem( treectrl->GetRootItem(), p_add->i_item );
@@ -495,8 +496,8 @@ void PlaylistManager::OnActivateItem( wxTreeEvent& event )
     if( !p_wxparent ) return;
 
     LockPlaylist( p_intf->p_sys, p_playlist );
-    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id );
-    p_node = playlist_ItemGetById( p_playlist, p_wxparent->i_id );
+    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, VLC_TRUE );
+    p_node = playlist_ItemGetById( p_playlist, p_wxparent->i_id, VLC_TRUE );
     if( !p_item || p_item->i_children >= 0 )
     {
         p_node = p_item;

@@ -907,7 +907,7 @@ void Playlist::DeleteTreeItem( wxTreeItemId item )
 
 void Playlist::DeleteItem( int item_id )
 {
-    playlist_DeleteAllFromInput( p_playlist, item_id );
+    playlist_DeleteFromInput( p_playlist, item_id, VLC_TRUE );
 }
 
 void Playlist::DeleteNode( playlist_item_t *p_item )
