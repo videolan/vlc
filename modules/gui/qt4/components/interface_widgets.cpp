@@ -27,7 +27,6 @@
 #include "main_interface.hpp"
 #include "input_manager.hpp"
 
-#include "pixmaps/art.xpm"
 #include <vlc/vout.h>
 
 #include <QLabel>
@@ -286,10 +285,13 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
     left->addWidget( selector );
 
     art = new QLabel( "" );
+    art->setMinimumHeight( 128 );
+    art->setMinimumWidth( 128 );
     art->setMaximumHeight( 128 );
     art->setMaximumWidth( 128 );
     art->setScaledContents( true );
-    art->setPixmap( QPixmap( art_xpm ) ); //":/vlc128.png" ) );
+
+    art->setPixmap( QPixmap( ":/noart.png" ) );
     left->addWidget( art );
 
     playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
@@ -319,11 +321,11 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
 
 void PlaylistWidget::setArt( QString url )
 {
-    if( prevArt != url )
-    {
+    if( url.isNull() )
+        art->setPixmap( QPixmap( ":/noart.png" ) );
+    else if( prevArt != url )
         art->setPixmap( QPixmap( url ) );
-        prevArt = url;
-    }
+    prevArt = url;
 }
 
 PlaylistWidget::~PlaylistWidget()

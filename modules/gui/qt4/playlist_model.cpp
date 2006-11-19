@@ -133,12 +133,13 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     strings[2] = QString( psz_duration );
     type = p_item->p_input->i_type;
     current = iscurrent;
+
     if( current && p_item->p_input->p_meta &&
         p_item->p_input->p_meta->psz_arturl &&
         !strncmp( p_item->p_input->p_meta->psz_arturl, "file://", 7 ) )
-    {
         model->sendArt( qfu( p_item->p_input->p_meta->psz_arturl ) );
-    }
+    else if( current )
+        model->removeArt();
 }
 
 /*************************************************************************
@@ -727,6 +728,11 @@ void PLModel::sendArt( QString url )
 {
     QString arturl = url.replace( "file://",QString("" ) );
     emit artSet( arturl );
+}
+
+void PLModel::removeArt()
+{
+    emit artSet( QString() );
 }
 
 /**

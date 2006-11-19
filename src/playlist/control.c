@@ -188,7 +188,7 @@ int playlist_PreparseEnqueueItem( playlist_t *p_playlist,
 }
 
 int playlist_AskForArtEnqueue( playlist_t *p_playlist,
-                              input_item_t *p_item )
+                               input_item_t *p_item )
 {
     int i;
     preparse_item_t p;
@@ -437,21 +437,34 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
     vlc_value_t val;
+    input_item_t *p_input = p_item->p_input;
     int i_activity = var_GetInteger( p_playlist, "activity") ;
 
     msg_Dbg( p_playlist, "creating new input thread" );
 
-    p_item->p_input->i_nb_played++;
+    p_input->i_nb_played++;
     p_playlist->status.p_item = p_item;
 
     p_playlist->status.i_status = PLAYLIST_RUNNING;
 
     var_SetInteger( p_playlist, "activity", i_activity +
                     DEFAULT_INPUT_ACTIVITY );
-    p_playlist->p_input = input_CreateThread( p_playlist, p_item->p_input );
+    p_playlist->p_input = input_CreateThread( p_playlist, p_input );
 
-    val.i_int = p_item->p_input->i_id;
-    /* unlock the playlist to set the var...mmm */
+    if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
+    {
+        if( p_input->p_meta && EMPTY_STR( p_input->p_meta->psz_arturl ) )
+        {
+            PL_DEBUG( "requesting art for %s", p_input->psz_name );
+            playlist_AskForArtEnqueue( p_playlist, p_input );
+        }
+        else if( !p_input->p_meta )
+        {
+            PL_DEBUG2( "unable to request art for %s, no meta", p_input->psz_name );
+        }
+    }
+
+    val.i_int = p_input->i_id;
     vlc_mutex_unlock( &p_playlist->object_lock);
     var_Set( p_playlist, "playlist-current", val);
     vlc_mutex_lock( &p_playlist->object_lock);

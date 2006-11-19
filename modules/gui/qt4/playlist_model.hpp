@@ -133,6 +133,7 @@ public:
     QStringList mimeTypes() const;
 
     void sendArt( QString url );
+    void removeArt( );
 private:
     void addCallbacks();
     void delCallbacks();

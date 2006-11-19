@@ -8,5 +8,6 @@
   <file>pixmaps/volume-low.png</file>
   <file>pixmaps/volume-high.png</file>
   <file alias="vlc128.png">../../../share/vlc128x128.png</file>
+  <file alias="noart.png">pixmaps/noart.png</file>
  </qresource>
 </RCC>

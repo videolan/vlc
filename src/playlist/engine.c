@@ -558,9 +558,9 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 p.p_item = p_current;
                 p.b_fetch_art = VLC_TRUE;
                 vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
-                TAB_APPEND( p_playlist->p_fetcher->i_waiting,
-                            p_playlist->p_fetcher->p_waiting,
-                            p );
+                INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
+                             p_playlist->p_fetcher->i_waiting,
+                             p_playlist->p_fetcher->i_waiting, p);
                 vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
                 vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
             }
@@ -642,15 +642,19 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
                 if( i_ret == 1 )
                 {
                     PL_DEBUG("downloading art for %s", p_item->psz_name );
-                    if( !input_DownloadAndCacheArt( p_playlist, p_item ) )
+                    if( input_DownloadAndCacheArt( p_playlist, p_item ) )
                         p_item->p_meta->i_status |= ITEM_ART_NOTFOUND;
-                    else
+                    else {
                         p_item->p_meta->i_status |= ITEM_ART_FETCHED;
+                        var_SetInteger( p_playlist, "item-change",
+                                        p_item->i_id );
+                    }
                 }
                 else if( i_ret == 0 ) /* Was in cache */
                 {
                     PL_DEBUG("found art for %s in cache", p_item->psz_name );
                     p_item->p_meta->i_status |= ITEM_ART_FETCHED;
+                    var_SetInteger( p_playlist, "item-change", p_item->i_id );
                 }
                 else
                 {
