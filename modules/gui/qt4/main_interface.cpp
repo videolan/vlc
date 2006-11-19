@@ -173,7 +173,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     ui.volMuteLabel->installEventFilter(h);
     ui.volumeSlider->setFocusPolicy( Qt::NoFocus );
 
-    BUTTON_SET_IMG( ui.playlistButton, "" ,volume-low.png,
+    BUTTON_SET_IMG( ui.playlistButton, "" , playlist_icon.png,
                         playlistEmbeddedFlag ?  qtr( "Show playlist" ) :
                                                 qtr( "Open playlist" ) );
     BUTTONACT( ui.playlistButton, playlist() );

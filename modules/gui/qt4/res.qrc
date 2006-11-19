@@ -9,5 +9,6 @@
   <file>pixmaps/volume-high.png</file>
   <file alias="vlc128.png">../../../share/vlc128x128.png</file>
   <file alias="noart.png">pixmaps/noart.png</file>
+  <file>pixmaps/playlist_icon.png</file>
  </qresource>
 </RCC>
