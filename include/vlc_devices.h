@@ -20,7 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#if 0
 #ifndef _VLC_DEVICES_H
 #define _VLC_DEVICES_H 1
 
@@ -60,5 +59,4 @@ static inline void device_GetDVD(void)
 {
 }
 
-#endif
 #endif
