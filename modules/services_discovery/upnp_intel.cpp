@@ -49,8 +49,7 @@
 struct services_discovery_sys_t
 {
     playlist_item_t *p_node_cat;
-    playlist_item_t *p_node;
-    playlist_t *p_playlist;
+    playlist_item_t *p_node_one;
 };
 
 
@@ -287,17 +286,8 @@ static int Open( vlc_object_t *p_this )
     p_sd->p_sys = p_sys;
 
     /* Create our playlist node */
-    p_sys->p_playlist = ( playlist_t * )vlc_object_find( p_sd,
-                             VLC_OBJECT_PLAYLIST,
-                             FIND_ANYWHERE );
-    if( !p_sys->p_playlist )
-    {
-        msg_Warn( p_sd, "unable to find playlist, cancelling UPnP listening" );
-        return VLC_EGENERIC;
-    }
-
-    playlist_NodesPairCreate( p_sys->p_playlist, _("Devices"),
-                              &p_sys->p_node_cat, &p_sys->p_node,
+    playlist_NodesPairCreate( pl_Get( p_sd ), _("Devices"),
+                              &p_sys->p_node_cat, &p_sys->p_node_one,
                               VLC_TRUE );
 
     return VLC_SUCCESS;
@@ -308,14 +298,10 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    if( p_sys->p_playlist )
-    {
-        playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node, VLC_TRUE,
-                             VLC_TRUE );
-        playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node_cat, VLC_TRUE,
-                             VLC_TRUE );
-        vlc_object_release( p_sys->p_playlist );
-    }
+    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_one, VLC_TRUE,
+                         VLC_TRUE );
+    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_cat, VLC_TRUE,
+                         VLC_TRUE );
 
     free( p_sys );
 }
@@ -327,8 +313,8 @@ static void Run( services_discovery_t* p_sd )
     res = UpnpInit( 0, 0 );
     if( res != UPNP_E_SUCCESS )
     {
-    msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
-    return;
+        msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
+        return;
     }
 
     Cookie cookie;
@@ -340,21 +326,21 @@ static void Run( services_discovery_t* p_sd )
     res = UpnpRegisterClient( Callback, &cookie, &cookie.clientHandle );
     if( res != UPNP_E_SUCCESS )
     {
-    msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
-    goto shutDown;
+        msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
+        goto shutDown;
     }
 
     res = UpnpSearchAsync( cookie.clientHandle, 5, MEDIA_SERVER_DEVICE_TYPE, &cookie );
     if( res != UPNP_E_SUCCESS )
     {
-    msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
-    goto shutDown;
+        msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
+        goto shutDown;
     }
 
     msg_Dbg( p_sd, "UPnP discovery started" );
     while( !p_sd->b_die )
     {
-    msleep( 500 );
+        msleep( 500 );
     }
 
     msg_Dbg( p_sd, "UPnP discovery stopped" );
@@ -408,7 +394,7 @@ IXML_Document* parseBrowseResult( IXML_Document* doc )
 
     const char* resultString = ixmlNode_getNodeValue( textNode );
     char* resultXML = strdup( resultString );
-    
+
     resolve_xml_special_chars( resultXML );
 
     IXML_Document* browseDoc = ixmlParseBuffer( resultXML );
@@ -634,10 +620,8 @@ MediaServer::~MediaServer()
 {
     if ( _contents )
     {
-    playlist_NodeDelete( _cookie->serviceDiscovery->p_sys->p_playlist,
-                _playlistNode,
-                true,
-                true );
+        playlist_NodeDelete( pl_Get( _cookie->serviceDiscovery ) ,
+                             _playlistNode, VLC_TRUE, VLC_TRUE );
     }
 
     delete _contents;
@@ -770,19 +754,15 @@ IXML_Document* MediaServer::_browseAction( const char* pObjectID, const char* pB
 void MediaServer::fetchContents()
 {
     Container* root = new Container( 0, "0", getFriendlyName() );
+    playlist_t * p_playlist = pl_Get( _cookie->serviceDiscovery );
     _fetchContents( root );
 
     if ( _contents )
     {
-    vlc_mutex_lock( &_cookie->serviceDiscovery->p_sys->p_playlist->object_lock );
-
-    playlist_NodeEmpty( _cookie->serviceDiscovery->p_sys->p_playlist,
-               _playlistNode,
-               true );
-
-    vlc_mutex_unlock( &_cookie->serviceDiscovery->p_sys->p_playlist->object_lock );
-
-    delete _contents;
+        PL_LOCK;
+        playlist_NodeEmpty( p_playlist, _playlistNode, VLC_TRUE );
+        PL_UNLOCK;
+        delete _contents;
     }
 
     _contents = root;
@@ -868,35 +848,35 @@ bool MediaServer::_fetchContents( Container* parent )
 
 void MediaServer::_buildPlaylist( Container* parent )
 {
+    playlist_t *p_playlist = pl_Get( _cookie->serviceDiscovery );
     for ( unsigned int i = 0; i < parent->getNumContainers(); i++ )
     {
-    Container* container = parent->getContainer( i );
-    playlist_item_t* parentNode = parent->getPlaylistNode();
+        Container* container = parent->getContainer( i );
+        playlist_item_t* parentNode = parent->getPlaylistNode();
 
-    char* title = strdup( container->getTitle() );
-    playlist_item_t* node = playlist_NodeCreate( _cookie->serviceDiscovery->p_sys->p_playlist,
-                             title,
-                             parentNode );
-    free( title );
+        char* title = strdup( container->getTitle() );
+        playlist_item_t* node = playlist_NodeCreate( p_playlist, title, parentNode );
+        free( title );
 
-    container->setPlaylistNode( node );
-    _buildPlaylist( container );
+        container->setPlaylistNode( node );
+        _buildPlaylist( container );
     }
 
     for ( unsigned int i = 0; i < parent->getNumItems(); i++ )
     {
-    Item* item = parent->getItem( i );
-    playlist_item_t* parentNode = parent->getPlaylistNode();
+        Item* item = parent->getItem( i );
+        playlist_item_t* parentNode = parent->getPlaylistNode();
 
-    playlist_item_t* node = playlist_ItemNew( _cookie->serviceDiscovery,
-                         item->getResource(),
-                         item->getTitle() );
-
-    playlist_NodeAddItem( _cookie->serviceDiscovery->p_sys->p_playlist,
-                 node,
-                 parentNode, PLAYLIST_APPEND, PLAYLIST_END );
-
-    item->setPlaylistNode( node );
+        input_item_t* p_input = input_ItemNew( _cookie->serviceDiscovery,
+                                               item->getResource(),
+                                               item->getTitle() );
+        int i_cat;
+        playlist_BothAddInput( p_playlist, p_input, parentNode,
+                               PLAYLIST_APPEND, PLAYLIST_END, &i_cat, NULL );
+        /* TODO: do this better by storing ids */
+        playlist_item_t *p_node = playlist_ItemGetById( p_playlist, i_cat, VLC_FALSE );
+        assert( p_node );
+        item->setPlaylistNode( p_node );
     }
 }
 
@@ -935,9 +915,9 @@ bool MediaServerList::addServer( MediaServer* s )
     _list.push_back( s );
 
     char* name = strdup( s->getFriendlyName() );
-    playlist_item_t* node = playlist_NodeCreate( _cookie->serviceDiscovery->p_sys->p_playlist,
-                        name,
-                        _cookie->serviceDiscovery->p_sys->p_node );
+    playlist_item_t* node = playlist_NodeCreate( pl_Get( _cookie->serviceDiscovery ),
+                                                 name,
+                                          _cookie->serviceDiscovery->p_sys->p_node_cat );
     free( name );
     s->setPlaylistNode( node );
 

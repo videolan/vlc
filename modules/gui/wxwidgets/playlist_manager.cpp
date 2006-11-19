@@ -502,7 +502,7 @@ void PlaylistManager::OnActivateItem( wxTreeEvent& event )
         p_node = p_item;
         p_item = NULL;
     }
-    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_node, p_item );
+    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,  p_node, p_item );
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 }
 

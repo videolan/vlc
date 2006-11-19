@@ -71,11 +71,11 @@ typedef enum { FULLSCREEN_NORMAL,
                FULLSCREEN_HALF,
                FULLSCREEN_CURRENT,
                FULLSCREEN_FULL } qtl_fullscreen_t;
-char* ppsz_fullscreen[] = { "normal", "double", "half", "current", "full" };
+const char* ppsz_fullscreen[] = { "normal", "double", "half", "current", "full" };
 typedef enum { LOOP_TRUE,
                LOOP_FALSE,
                LOOP_PALINDROME } qtl_loop_t;
-char* ppsz_loop[] = { "true", "false", "palindrome" };
+const char* ppsz_loop[] = { "true", "false", "palindrome" };
 
 /*****************************************************************************
  * Local prototypes
@@ -363,7 +363,7 @@ static int Demux( demux_t *p_demux )
         playlist_BothAddInput( p_sys->p_playlist, p_input,
                                p_sys->p_item_in_category,
                                PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                               PLAYLIST_END );
+                               PLAYLIST_END, NULL, NULL );
         if( psz_qtnext )
         {
             p_input = input_ItemNewExt( p_sys->p_playlist,
@@ -371,7 +371,7 @@ static int Demux( demux_t *p_demux )
             playlist_BothAddInput( p_sys->p_playlist, p_input,
                                    p_sys->p_item_in_category,
                                    PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                   PLAYLIST_END );
+                                   PLAYLIST_END, NULL, NULL );
         }
     }
 

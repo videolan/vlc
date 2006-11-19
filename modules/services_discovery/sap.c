@@ -304,7 +304,7 @@ static int Open( vlc_object_t *p_this )
     playlist_NodesPairCreate( pl_Get( p_sd ), _("SAP sessions"),
                               &p_sys->p_node_cat, &p_sys->p_node_one,
                               VLC_TRUE );
-
+    p_sys->p_node_cat->p_input->b_prefers_tree = VLC_TRUE;
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;
 
@@ -577,7 +577,7 @@ static int Demux( demux_t *p_demux )
     if( p_playlist->status.p_item &&
              p_playlist->status.p_item->p_input == p_parent_input )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
                           p_playlist->status.p_node, p_playlist->status.p_item );
     }
 
@@ -1290,7 +1290,7 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
     }
 
     if( p_announce->i_input_id > -1 )
-        playlist_LockDeleteAllFromInput( pl_Get(p_sd), p_announce->i_input_id );
+        playlist_DeleteFromInput( pl_Get(p_sd), p_announce->i_input_id, VLC_FALSE );
 
     for( i = 0; i< p_sd->p_sys->i_announces; i++)
     {

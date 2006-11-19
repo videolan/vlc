@@ -185,7 +185,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     input_item_t       *p_current_input = ( (input_thread_t*)p_access->p_parent)
                                                        ->input.p_item;
     playlist_item_t    *p_current =
-                playlist_LockItemGetByInput( p_playlist, p_current_input );
+                    playlist_ItemGetByInput( p_playlist, p_current_input, VLC_FALSE );
     char               *psz_name = strdup (p_access->psz_path);
 
     if( psz_name == NULL )
@@ -221,7 +221,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     msg_Dbg( p_access, "opening directory `%s'", p_access->psz_path );
 
     p_current->p_input->i_type = ITEM_TYPE_DIRECTORY;
-    p_item_in_category = playlist_LockItemToNode( p_playlist, p_current );
+    p_item_in_category = playlist_ItemToNode( p_playlist, p_current, VLC_FALSE );
 
     i_activity = var_GetInteger( p_playlist, "activity" );
     var_SetInteger( p_playlist, "activity", i_activity +
@@ -472,7 +472,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                     playlist_BothAddInput( p_playlist, p_input,
                                            p_parent_category,
                                            PLAYLIST_APPEND|PLAYLIST_PREPARSE,
-                                           PLAYLIST_END );
+                                           PLAYLIST_END, NULL, NULL );
             }
         }
     }

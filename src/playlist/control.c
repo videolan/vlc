@@ -30,32 +30,13 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args );
+static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args );
 
-void PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
-
-playlist_item_t *playlist_RecursiveFindLast(playlist_t *p_playlist,
-                                            playlist_item_t *p_node );
+static void PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
 
 /*****************************************************************************
  * Playlist control
  *****************************************************************************/
-
-/**
- * Do a playlist action. Should be entered without playlist lock
- * \see playlist_Control
- */
-int playlist_LockControl( playlist_t * p_playlist, int i_query, ... )
-{
-    va_list args;
-    int i_result;
-    va_start( args, i_query );
-    vlc_mutex_lock( &p_playlist->object_lock );
-    i_result = PlaylistVAControl( p_playlist, i_query, args );
-    va_end( args );
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    return i_result;
-}
 
 /**
  * Do a playlist action.
@@ -68,23 +49,25 @@ int playlist_LockControl( playlist_t * p_playlist, int i_query, ... )
  * \param variable number of arguments
  * \return VLC_SUCCESS or an error
  */
-int playlist_Control( playlist_t * p_playlist, int i_query, ... )
+int playlist_Control( playlist_t * p_playlist, int i_query, vlc_bool_t b_locked, ... )
 {
     va_list args;
     int i_result;
-    va_start( args, i_query );
+    va_start( args, b_locked );
+    if( !b_locked ) PL_LOCK;
     i_result = PlaylistVAControl( p_playlist, i_query, args );
     va_end( args );
+    if( !b_locked ) PL_UNLOCK;
 
     return i_result;
 }
 
-int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
+static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
 {
     playlist_item_t *p_item, *p_node;
     vlc_value_t val;
 
-    if( p_playlist->items.i_size <= 0 )
+    if( playlist_IsEmpty( p_playlist ) )
         return VLC_EGENERIC;
 
     switch( i_query )
@@ -236,8 +219,8 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
     return VLC_SUCCESS;
 }
 
-void PreparseEnqueueItemSub( playlist_t *p_playlist,
-                             playlist_item_t *p_item )
+static void PreparseEnqueueItemSub( playlist_t *p_playlist,
+                                    playlist_item_t *p_item )
 {
     int i;
     if( p_item->i_children == -1 )

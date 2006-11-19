@@ -36,12 +36,17 @@
  * \param i_id the id to find
  * \return the item or NULL on failure
  */
-playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id )
+playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id,
+                                        vlc_bool_t b_locked )
 {
     int i;
+    if( !b_locked ) PL_LOCK;
     ARRAY_BSEARCH( p_playlist->all_items,->i_id, int, i_id, i );
-    if( i != -1 )
+    if( i != -1 ) {
+        if( !b_locked ) PL_UNLOCK;
         return ARRAY_VAL( p_playlist->all_items, i );
+    }
+    if( !b_locked ) PL_UNLOCK;
     return NULL;
 }
 
@@ -53,20 +58,27 @@ playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id )
  * \return the item, or NULL on failure
  */
 playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
-                                           input_item_t *p_item )
+                                           input_item_t *p_item,
+                                           vlc_bool_t b_locked )
 {
     int i;
+    if( !b_locked ) PL_LOCK;
     if( p_playlist->status.p_item &&
         p_playlist->status.p_item->p_input == p_item )
     {
+        if( !b_locked ) PL_UNLOCK;
         return p_playlist->status.p_item;
     }
     /** \todo Check if this is always incremental and whether we can bsearch */
     for( i =  0 ; i < p_playlist->all_items.i_size; i++ )
     {
         if( ARRAY_VAL(p_playlist->all_items, i)->p_input->i_id == p_item->i_id )
+        {
+            if( !b_locked ) PL_UNLOCK;
             return ARRAY_VAL(p_playlist->all_items, i);
+        }
     }
+    if( !b_locked ) PL_UNLOCK;
     return NULL;
 }
 

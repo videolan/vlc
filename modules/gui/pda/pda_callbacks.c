@@ -881,7 +881,7 @@ void onDeletePlaylist(GtkButton *button, gpointer user_data)
                         gint item;
 
                         gtk_tree_model_get(p_model, &iter, 2, &item, -1);
-                        playlist_LockDelete(p_playlist, item);
+                        msg_Err( p_playlist, "PDA delete broken");
                     }
                 }
             }
@@ -923,7 +923,7 @@ void onClearPlaylist(GtkButton *button, gpointer user_data)
 
     for(item = p_playlist->i_size - 1; item >= 0 ;item-- )
     {
-        playlist_LockDelete( p_playlist, item);
+        msg_Err( p_playlist "fix pda delete");
     }
     vlc_object_release( p_playlist );
 

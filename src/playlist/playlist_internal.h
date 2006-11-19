@@ -99,6 +99,8 @@ playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
 playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
                                     playlist_item_t *p_root );
 
+int playlist_DeleteFromItemId( playlist_t*, int );
+
 /**
  * @}
  */
@@ -107,9 +109,15 @@ playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
 //#undef PLAYLIST_DEBUG
 
 #ifdef PLAYLIST_DEBUG
-#define PL_DEBUG( msg, args... ) msg_Dbg( p_playlist, msg, ## args )
+ #define PL_DEBUG( msg, args... ) msg_Dbg( p_playlist, msg, ## args )
+ #ifdef PLAYLIST_DEBUG2
+  #define PL_DEBUG2( msg, args... ) msg_Dbg( p_playlist, msg, ## args )
+ #else
+  #define PL_DEBUG2( msg, args... ) {}
+ #endif
 #else
-#define PL_DEBUG( msg, args ... ) {}
+ #define PL_DEBUG( msg, args ... ) {}
+ #define PL_DEBUG2( msg, args... ) {}
 #endif
 
-#define PLI_NAME( p ) p ? p->p_input->psz_name : "null"
+#define PLI_NAME( p ) p && p->p_input ? p->p_input->psz_name : "null"

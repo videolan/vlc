@@ -364,7 +364,7 @@ static int Open( vlc_object_t * p_this )
         if( p_playlist )
         {
             b_play = FindItem( p_demux, p_playlist, &p_current );
-            p_item_in_category = playlist_ItemToNode( p_playlist, p_current );
+            p_item_in_category = playlist_ItemToNode( p_playlist, p_current, VLC_TRUE );
             p_current->p_input->i_type = ITEM_TYPE_PLAYLIST;
 
             for( i = 0; i < i_count; i++ )
@@ -417,7 +417,8 @@ static int Open( vlc_object_t * p_this )
                         input_ItemCopyOptions( p_current->p_input, p_input );
                         playlist_BothAddInput( p_playlist, p_input,
                                                p_item_in_category,
-                                               PLAYLIST_APPEND, PLAYLIST_END );
+                                               PLAYLIST_APPEND, PLAYLIST_END,
+                                               NULL, NULL);
                     }
                 }
                 else
@@ -430,7 +431,7 @@ static int Open( vlc_object_t * p_this )
             if( b_play && p_playlist->status.p_item &&
                   p_playlist->status.p_item->i_children > 0)
             {
-                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
                                   p_playlist->status.p_item, NULL );
             }
             vlc_object_release( p_playlist );
@@ -2225,7 +2226,7 @@ static vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
      {
          input_item_t *p_current = ( (input_thread_t*)p_demux->p_parent)->
                                                         input.p_item;
-         *pp_item = playlist_LockItemGetByInput( p_playlist, p_current );
+         *pp_item = playlist_ItemGetByInput( p_playlist, p_current, VLC_FALSE );
          if( !*pp_item )
          {
              msg_Dbg( p_playlist, "unable to find item in playlist");

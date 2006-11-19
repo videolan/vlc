@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
- * 
+ *
  * Based on original wxWindows patch for VLC, and dependant on CyberLink
  * UPnP library from :
  *          Satoshi Konno <skonno@cybergarage.org>
@@ -71,10 +71,8 @@ vlc_module_end();
 
 struct services_discovery_sys_t
 {
-    /* playlist node */
-    playlist_item_t *p_node;
+    playlist_item_t *p_node_one;
     playlist_item_t *p_node_cat;
-    playlist_t *p_playlist;
 };
 
 /*****************************************************************************
@@ -96,18 +94,8 @@ static int Open( vlc_object_t *p_this )
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
-    /* Create our playlist node */
-    p_sys->p_playlist = (playlist_t *)vlc_object_find( p_sd,
-                                                       VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( !p_sys->p_playlist )
-    {
-        msg_Warn( p_sd, "unable to find playlist, cancelling UPnP listening");
-        return VLC_EGENERIC;
-    }
-
-    playlist_NodesPairCreate( p_sys->p_playlist, _("Devices"),
-                              &p_sys->p_node_cat, &p_sys->p_node,
+    playlist_NodesPairCreate( pl_Get( p_sd ), _("Devices"),
+                              &p_sys->p_node_cat, &p_sys->p_node_one,
                               VLC_TRUE );
     return VLC_SUCCESS;
 }
@@ -120,16 +108,12 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
-
-    if( p_sys->p_playlist )
-    {
-        playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node, VLC_TRUE,
-                             VLC_TRUE );
-        playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node_cat, VLC_TRUE,
-                             VLC_TRUE );
-        vlc_object_release( p_sys->p_playlist );
-    }
-
+    playlist_t *p_playlist = pl_Yield( p_sd );
+    playlist_NodeDelete( p_playlist, p_sys->p_node_one, VLC_TRUE,
+                         VLC_TRUE );
+    playlist_NodeDelete( p_playlist, p_sys->p_node_cat, VLC_TRUE,
+                         VLC_TRUE );
+    pl_Release();
     free( p_sys );
 }
 
@@ -222,7 +206,7 @@ playlist_item_t *UPnPHandler::AddDevice( Device *dev )
      */
     char *str = strdup( dev->getFriendlyName( ) );
 
-    p_item = playlist_NodeCreate( p_sys->p_playlist, str, p_sys->p_node );
+    p_item = playlist_NodeCreate( p_sys->p_playlist, str, p_sys->p_node_cat );
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     msg_Dbg( p_sd, "device %s added", str );
     free( str );
@@ -251,29 +235,25 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
 
     msg_Dbg( p_sd, "title = %s", title );
 
-    if ( node->isItemNode() ) 
+    if ( node->isItemNode() )
     {
         ItemNode *iNode = (ItemNode *)node;
-
-	playlist_item_t *p_item;
-	p_item = playlist_ItemNew( p_sd, iNode->getResource(), title );
-    
-	playlist_NodeAddItem( p_sys->p_playlist, p_item,
-			      p_parent, PLAYLIST_APPEND, PLAYLIST_END );
-
-    } else if ( node->isContainerNode() ) 
+        input_item_t *p_input = input_ItemNew( p_sd, iNode->getResource(), title );
+        playlist_BothAddInput( p_sys->p_playlist, p_input, p_parent,
+                               PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL );
+    } else if ( node->isContainerNode() )
     {
         ContainerNode *conNode = (ContainerNode *)node;
 
-	char* p_name = strdup(title); /* See other comment on strdup */
-	playlist_item_t* p_node = playlist_NodeCreate( p_sys->p_playlist,
-						       p_name, p_parent );
-	free(p_name);
+        char* p_name = strdup(title); /* See other comment on strdup */
+        playlist_item_t* p_node = playlist_NodeCreate( p_sys->p_playlist,
+                                                       p_name, p_parent );
+        free(p_name);
 
-	unsigned nContentNodes = conNode->getNContentNodes();
+        unsigned nContentNodes = conNode->getNContentNodes();
 
-	for( unsigned n = 0; n < nContentNodes; n++ )
-	    AddContent( p_node, conNode->getContentNode( n ) );
+        for( unsigned n = 0; n < nContentNodes; n++ )
+           AddContent( p_node, conNode->getContentNode( n ) );
     }
 }
 

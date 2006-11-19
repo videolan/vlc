@@ -708,7 +708,7 @@ int VLC_PlaylistPrev( int i_object )
 int VLC_PlaylistClear( int i_object )
 {
     LIBVLC_PLAYLIST_FUNC;
-    playlist_Clear( p_libvlc->p_playlist );
+    playlist_Clear( p_libvlc->p_playlist, VLC_TRUE );
     LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }

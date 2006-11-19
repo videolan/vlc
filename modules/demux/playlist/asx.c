@@ -371,7 +371,7 @@ static int Demux( demux_t *p_demux )
                             playlist_BothAddInput( p_playlist, p_input,
                                                    p_item_in_category,
                                             PLAYLIST_APPEND|PLAYLIST_SPREPARSE,
-                                            PLAYLIST_END );
+                                            PLAYLIST_END, NULL, NULL );
                             free( psz_string );
                         }
                         else continue;
@@ -451,7 +451,7 @@ static int Demux( demux_t *p_demux )
                             playlist_BothAddInput( p_playlist, p_entry,
                                                  p_item_in_category,
                                                  PLAYLIST_APPEND | PLAYLIST_SPREPARSE
-                                                 , PLAYLIST_END);
+                                                 , PLAYLIST_END, NULL, NULL);
                             free( psz_string );
                         }
                         else continue;

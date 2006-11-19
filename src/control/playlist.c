@@ -47,12 +47,11 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
     if( PL->items.i_size == 0 ) RAISEVOID( "Empty playlist" );
     if( i_id > 0 )
     {
-        playlist_item_t *p_item = playlist_ItemGetById( PL,
-                                                        i_id );
+        playlist_item_t *p_item = playlist_ItemGetById( PL, i_id, VLC_TRUE );
         if( !p_item ) RAISEVOID( "Unable to find item" );
 
-        playlist_LockControl( PL, PLAYLIST_VIEWPLAY,
-                              PL->status.p_node, p_item );
+        playlist_Control( PL, PLAYLIST_VIEWPLAY, VLC_FALSE,
+                          PL->status.p_node, p_item );
     }
     else
     {
@@ -81,7 +80,7 @@ void libvlc_playlist_clear( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
     assert( PL );
-    playlist_LockClear( PL );
+    playlist_Clear( PL, VLC_FALSE );
 }
 
 void libvlc_playlist_next( libvlc_instance_t *p_instance,
@@ -120,8 +119,25 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
 int libvlc_playlist_delete_item( libvlc_instance_t *p_instance, int i_id,
                                  libvlc_exception_t *p_e )
 {
+    playlist_item_t *p_item;
     assert( PL );
-    return playlist_DeleteFromItemId( PL, i_id );
+    vlc_mutex_lock( &PL->object_lock );
+    p_item = playlist_ItemGetById( PL, i_id, VLC_TRUE );
+    if( p_item && p_item->p_input ) {
+        int i_ret = playlist_DeleteFromInput( PL, p_item->p_input->i_id, VLC_TRUE );
+        if( i_ret ) {
+            libvlc_exception_raise( p_e, "delete failed" );
+            vlc_mutex_unlock( &PL->object_lock );
+            return VLC_EGENERIC;
+        }
+        else {
+            vlc_mutex_unlock( &PL->object_lock );
+            return VLC_SUCCESS;
+        }
+    }
+    libvlc_exception_raise( p_e, "item not found" );
+    vlc_mutex_unlokc( &PL->object_lock );
+    return VLC_EGENERIC;
 }
 
 

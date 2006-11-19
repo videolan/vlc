@@ -844,12 +844,6 @@ CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
     free(psz_title);
 
     if( !p_child ) return NULL;
-#if 0
-    playlist_NodeAddItem( p_playlist, p_child,
-                          p_item->p_parent->i_view,
-                          p_item, PLAYLIST_APPEND, PLAYLIST_END );
-    playlist_CopyParents( p_item, p_child );
-#endif
     return p_child;
 }
 
@@ -945,8 +939,8 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
     if (p_playlist) {
 
-      p_item = playlist_LockItemGetByInput( p_playlist,
-                        ((input_thread_t *)p_access->p_parent)->input.p_item );
+      p_item = playlist_ItemGetByInput( p_playlist,
+                        ((input_thread_t *)p_access->p_parent)->input.p_item, VLC_FALSE );
 
       if( p_item == p_playlist->status.p_item && !b_single_track )
 	{
@@ -1030,7 +1024,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
     if( b_play )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
                           p_playlist->status.p_item, NULL );
     }
 

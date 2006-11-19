@@ -737,7 +737,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
             if( b_remove && p_playlist )
             {
-                playlist_Clear( p_playlist );
+                playlist_Clear( p_playlist, VLC_TRUE );
             }
 
             entry_ref ref;

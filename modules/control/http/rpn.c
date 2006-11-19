@@ -489,31 +489,31 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             int i_id = E_(SSPopN)( st, vars );
             int i_ret;
 
-            i_ret = playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
+            i_ret = playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
                                       NULL,
                                       playlist_ItemGetById( p_sys->p_playlist,
-                                      i_id ) );
+                                      i_id, VLC_TRUE ) );
             msg_Dbg( p_intf, "requested playlist item: %i", i_id );
             E_(SSPushN)( st, i_ret );
         }
         else if( !strcmp( s, "vlc_stop" ) )
         {
-            playlist_Control( p_sys->p_playlist, PLAYLIST_STOP );
+            playlist_Control( p_sys->p_playlist, VLC_TRUE, PLAYLIST_STOP );
             msg_Dbg( p_intf, "requested playlist stop" );
         }
         else if( !strcmp( s, "vlc_pause" ) )
         {
-            playlist_Control( p_sys->p_playlist, PLAYLIST_PAUSE );
+            playlist_Control( p_sys->p_playlist, VLC_TRUE, PLAYLIST_PAUSE );
             msg_Dbg( p_intf, "requested playlist pause" );
         }
         else if( !strcmp( s, "vlc_next" ) )
         {
-            playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, 1 );
+            playlist_Control( p_sys->p_playlist, VLC_TRUE, PLAYLIST_SKIP, 1 );
             msg_Dbg( p_intf, "requested playlist next" );
         }
         else if( !strcmp( s, "vlc_previous" ) )
         {
-            playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, -1 );
+            playlist_Control( p_sys->p_playlist, VLC_TRUE, PLAYLIST_SKIP, -1 );
             msg_Dbg( p_intf, "requested playlist previous" );
         }
         else if( !strcmp( s, "vlc_seek" ) )
@@ -861,13 +861,13 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "playlist_empty" ) )
         {
-            playlist_LockClear( p_sys->p_playlist );
+            playlist_Clear( p_sys->p_playlist, VLC_FALSE );
             msg_Dbg( p_intf, "requested playlist empty" );
         }
         else if( !strcmp( s, "playlist_delete" ) )
         {
             int i_id = E_(SSPopN)( st, vars );
-            playlist_LockDeleteAllFromInput( p_sys->p_playlist, i_id );
+            playlist_DeleteFromInput( p_sys->p_playlist, i_id, VLC_FALSE );
             msg_Dbg( p_intf, "requested playlist delete: %d", i_id );
         }
         else if( !strcmp( s, "playlist_move" ) )

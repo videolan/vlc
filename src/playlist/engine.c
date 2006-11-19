@@ -97,6 +97,9 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL);
     p_playlist->p_root_onelevel = playlist_NodeCreate( p_playlist, NULL, NULL);
 
+    if( !p_playlist->p_root_category || !p_playlist->p_root_onelevel )
+        return NULL;
+
     /* Create playlist and media library */
     p_playlist->p_local_category = playlist_NodeCreate( p_playlist,
                                  _( "Playlist" ),p_playlist->p_root_category );
@@ -104,6 +107,11 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
                                 _( "Playlist" ), p_playlist->p_root_onelevel );
     p_playlist->p_local_category->i_flags |= PLAYLIST_RO_FLAG;
     p_playlist->p_local_onelevel->i_flags |= PLAYLIST_RO_FLAG;
+
+    if( !p_playlist->p_local_category || !p_playlist->p_local_onelevel ||
+        !p_playlist->p_local_category->p_input ||
+        !p_playlist->p_local_onelevel->p_input )
+        return NULL;
 
     /* Link the nodes together. Todo: actually create them from the same input*/
     p_playlist->p_local_onelevel->p_input->i_id =
@@ -115,6 +123,10 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
                            _( "Media Library" ), p_playlist->p_root_category );
         p_playlist->p_ml_onelevel =  playlist_NodeCreate( p_playlist,
                            _( "Media Library" ), p_playlist->p_root_onelevel );
+
+        if(!p_playlist->p_ml_category || !p_playlist->p_ml_onelevel)
+            return NULL;
+
         p_playlist->p_ml_category->i_flags |= PLAYLIST_RO_FLAG;
         p_playlist->p_ml_onelevel->i_flags |= PLAYLIST_RO_FLAG;
         p_playlist->p_ml_onelevel->p_input->i_id =
@@ -201,7 +213,6 @@ void playlist_Destroy( playlist_t *p_playlist )
     vlc_object_destroy( p_playlist->p_fetcher );
     vlc_object_detach( p_playlist );
     vlc_object_destroy( p_playlist );
-
 }
 
 /* Destroy remaining objects */
@@ -522,7 +533,8 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
              * This only checks for meta, not for art
              * \todo don't do this for things we won't get meta for, like vids
              */
-            if( !input_MetaSatisfied( p_playlist, p_current, &i_m, &i_o ) )
+            if( p_current->p_meta &&
+                !input_MetaSatisfied( p_playlist, p_current, &i_m, &i_o ) )
             {
                 preparse_item_t p;
                 PL_DEBUG("need to fetch meta for %s", p_current->psz_name );
@@ -531,13 +543,13 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
                 INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
                              p_playlist->p_fetcher->i_waiting,
-                             p_playlist->p_fetcher->i_waiting,
-                             p );
+                             p_playlist->p_fetcher->i_waiting, p);
                 vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
                 vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
             }
             /* We already have all needed meta, but we need art right now */
-            else if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_ALL &&
+            else if( p_current->p_meta &&
+                     p_playlist->p_fetcher->i_art_policy == ALBUM_ART_ALL &&
                      EMPTY_STR( p_current->p_meta->psz_arturl ) )
             {
                 preparse_item_t p;
@@ -546,17 +558,18 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 p.p_item = p_current;
                 p.b_fetch_art = VLC_TRUE;
                 vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
-                INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
-                             p_playlist->p_fetcher->i_waiting,
-                             p_playlist->p_fetcher->i_waiting,
-                             p );
+                TAB_APPEND( p_playlist->p_fetcher->i_waiting,
+                            p_playlist->p_fetcher->p_waiting,
+                            p );
                 vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
                 vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
             }
             else
             {
                 PL_DEBUG( "no fetch required for %s (art currently %s)",
-                          p_current->psz_name, p_current->p_meta->psz_arturl );
+                          p_current->psz_name,
+                          p_current->p_meta ? p_current->p_meta->psz_arturl:
+                                              "null" );
                 vlc_gc_decref( p_current );
             }
             PL_UNLOCK;
@@ -600,6 +613,7 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
         vlc_mutex_unlock( &p_obj->object_lock );
         if( p_item )
         {
+            assert( p_item->p_meta );
             if( !b_fetch_art )
             {
                 input_MetaFetch( p_playlist, p_item );

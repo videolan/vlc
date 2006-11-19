@@ -1404,9 +1404,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if( !strcmp( psz_cmd, "clear" ) )
     {
         playlist_Stop( p_playlist );
-        vlc_mutex_lock( &p_playlist->object_lock );
-        playlist_Clear( p_playlist );
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        playlist_Clear( p_playlist, VLC_FALSE );
     }
     else if( !strcmp( psz_cmd, "add" ) &&
              newval.psz_string && *newval.psz_string )

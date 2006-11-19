@@ -239,8 +239,8 @@ static void browse_callback(
             msg_Err( p_sd, "failed to find service '%s' in playlist", name );
         else
         {
-            playlist_LockDeleteAllFromInput( p_sys->p_playlist,
-                                              p_item->p_input->i_id );
+            playlist_DeleteFromInput( p_sys->p_playlist, p_item->p_input->i_id,
+                                      VLC_FALSE );
         }
     }
 }

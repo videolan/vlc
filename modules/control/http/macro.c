@@ -197,26 +197,30 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                         break;
                     }
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
-                                      NULL,
+                                      VLC_TRUE, NULL,
                                       playlist_ItemGetById( p_sys->p_playlist,
-                                      i_item ) );
+                                      i_item, VLC_TRUE ) );
                     msg_Dbg( p_intf, "requested playlist item: %i", i_item );
                     break;
                 }
                 case MVLC_STOP:
-                    playlist_Control( p_sys->p_playlist, PLAYLIST_STOP );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_STOP,
+                                      VLC_TRUE );
                     msg_Dbg( p_intf, "requested playlist stop" );
                     break;
                 case MVLC_PAUSE:
-                    playlist_Control( p_sys->p_playlist, PLAYLIST_PAUSE );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_PAUSE,
+                                      VLC_TRUE );
                     msg_Dbg( p_intf, "requested playlist pause" );
                     break;
                 case MVLC_NEXT:
-                    playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, 1 );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP,
+                                      VLC_TRUE, 1 );
                     msg_Dbg( p_intf, "requested playlist next" );
                     break;
                 case MVLC_PREVIOUS:
-                    playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, -1 );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP,
+                                      VLC_TRUE, -1 );
                     msg_Dbg( p_intf, "requested playlist previous" );
                     break;
                 case MVLC_FULLSCREEN:
@@ -368,8 +372,8 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                         int i;
                         for( i = 0; i < i_nb_items; i++ )
                         {
-                            playlist_LockDeleteAllFromInput( p_sys->p_playlist,
-                                                             p_items[i] );
+                            playlist_DeleteFromInput( p_sys->p_playlist,
+                                                      p_items[i], VLC_FALSE );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      p_items[i] );
                             p_items[i] = -1;
@@ -410,8 +414,9 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                         }
                         if( j == i_nb_items )
                         {
-                            playlist_LockDeleteAllFromInput( p_sys->p_playlist,
-                           p_sys->p_playlist->items.p_elems[i]->p_input->i_id );
+                            playlist_DeleteFromInput( p_sys->p_playlist,
+                                     p_sys->p_playlist->items.p_elems[i]->p_input->i_id,
+                                                      VLC_FALSE );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      i );
                         }
@@ -422,7 +427,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                 }
                 case MVLC_EMPTY:
                 {
-                    playlist_LockClear( p_sys->p_playlist );
+                    playlist_Clear( p_sys->p_playlist, VLC_FALSE );
                     msg_Dbg( p_intf, "requested playlist empty" );
                     break;
                 }
@@ -444,7 +449,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
 
                     if( !strcmp( type , "title" ) )
                     {
-                        playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
+                        playlist_RecursiveNodeSort( p_sys->p_playlist,
                                                     /* Ugly hack,but not worse than before ... */
                                                     p_sys->p_playlist->p_root_onelevel,
                                                     SORT_TITLE_NODES_FIRST,

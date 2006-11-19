@@ -243,8 +243,10 @@ bool PLModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
 
             PL_LOCK;
             playlist_item_t *p_target =
-                        playlist_ItemGetById( p_playlist, targetItem->i_id );
-            playlist_item_t *p_src = playlist_ItemGetById( p_playlist, srcId );
+                        playlist_ItemGetById( p_playlist, targetItem->i_id,
+                                              VLC_TRUE );
+            playlist_item_t *p_src = playlist_ItemGetById( p_playlist, srcId,
+                                                           VLC_TRUE );
 
             if( !p_target || !p_src )
             {
@@ -256,7 +258,8 @@ bool PLModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
                 PLItem *parentItem = targetItem->parent();
                 assert( parentItem );
                 playlist_item_t *p_parent =
-                         playlist_ItemGetById( p_playlist, parentItem->i_id );
+                         playlist_ItemGetById( p_playlist, parentItem->i_id,
+                                               VLC_TRUE );
                 if( !p_parent )
                 {
                     PL_UNLOCK;
@@ -330,7 +333,8 @@ void PLModel::activateItem( const QModelIndex &index )
     PLItem *item = static_cast<PLItem*>(index.internalPointer());
     assert( item );
     PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id,
+                                                    VLC_TRUE);
     activateItem( p_item );
     PL_UNLOCK;
 }
@@ -345,7 +349,7 @@ void PLModel::activateItem( playlist_item_t *p_item )
         p_parent = p_parent->p_parent;
     }
     if( p_parent )
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_parent, p_item );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_parent, p_item );
 }
 
 /****************** Base model mandatory implementations *****************/
@@ -610,7 +614,7 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
     PL_LOCK;
     if( !nodeItem ) goto end;
 
-    p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
+    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, VLC_TRUE );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
     if( i_depth == 1 && p_item->p_parent &&
                         p_item->p_parent->i_id != rootItem->i_id )
@@ -678,7 +682,8 @@ void PLModel::rebuild( playlist_item_t *p_root )
 /* This function must be entered WITH the playlist lock */
 void PLModel::UpdateNodeChildren( PLItem *root )
 {
-    playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id );
+    playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id,
+                                                    VLC_TRUE );
     UpdateNodeChildren( p_node, root );
 }
 
@@ -699,7 +704,8 @@ void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
 /* This function must be entered WITH the playlist lock */
 void PLModel::UpdateTreeItem( PLItem *item, bool signal, bool force )
 {
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id,
+                                                    VLC_TRUE );
     UpdateTreeItem( p_item, item, signal, force );
 }
 
@@ -762,13 +768,14 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
     fullList->removeAll( deleteIndex );
 
     PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id,
+                                                    VLC_TRUE );
     if( !p_item )
     {
         PL_UNLOCK; return;
     }
     if( p_item->i_children == -1 )
-        playlist_DeleteAllFromInput( p_playlist, item->i_input_id );
+        playlist_DeleteFromInput( p_playlist, item->i_input_id, VLC_TRUE );
     else
         playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_FALSE );
     /* And finally, remove it from the tree */
@@ -780,19 +787,23 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
 void PLModel::sort( int column, Qt::SortOrder order )
 {
     PL_LOCK;
-    playlist_item_t *p_root = playlist_ItemGetById( p_playlist, rootItem->i_id );
-    int i_mode;
-    switch( column )
     {
-    case 0: i_mode = SORT_TITLE_NODES_FIRST;break;
-    case 1: i_mode = SORT_ARTIST;break;
-    case 2: i_mode = SORT_DURATION; break;
-    default: i_mode = SORT_TITLE_NODES_FIRST; break;
+        playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
+                                                        rootItem->i_id,
+                                                        VLC_TRUE );
+        int i_mode;
+        switch( column )
+        {
+        case 0: i_mode = SORT_TITLE_NODES_FIRST;break;
+        case 1: i_mode = SORT_ARTIST;break;
+        case 2: i_mode = SORT_DURATION; break;
+        default: i_mode = SORT_TITLE_NODES_FIRST; break;
+        }
+        if( p_root )
+            playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
+                                        order == Qt::AscendingOrder ?
+                                            ORDER_NORMAL : ORDER_REVERSE );
     }
-    if( p_root )
-        playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
-                                    order == Qt::AscendingOrder ? ORDER_NORMAL :
-                                                            ORDER_REVERSE );
     PL_UNLOCK
     rebuild();
 }
@@ -801,10 +812,14 @@ void PLModel::search( QString search_text )
 {
     /** \todo Fire the search with a small delay ? */
     PL_LOCK;
-    playlist_item_t *p_root = playlist_ItemGetById( p_playlist,rootItem->i_id );
-    assert( p_root );
-    char *psz_name = search_text.toUtf8().data();
-    playlist_LiveSearchUpdate( p_playlist , p_root, psz_name );
+    {
+        playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
+                                                        rootItem->i_id,
+                                                        VLC_TRUE );
+        assert( p_root );
+        char *psz_name = search_text.toUtf8().data();
+        playlist_LiveSearchUpdate( p_playlist , p_root, psz_name );
+    }
     PL_UNLOCK;
     rebuild();
 }
@@ -815,7 +830,7 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
     assert( index.isValid() );
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                    itemId( index ) );
+                                                    itemId( index ), VLC_TRUE );
     if( p_item )
     {
         i_popup_item = p_item->i_id;
@@ -849,8 +864,11 @@ void PLModel::popupDel()
 void PLModel::popupPlay()
 {
     PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_popup_item );
-    activateItem( p_item );
+    {
+        playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
+                                                        i_popup_item,VLC_TRUE );
+        activateItem( p_item );
+    }
     PL_UNLOCK;
 }
 

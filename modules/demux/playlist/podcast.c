@@ -294,7 +294,7 @@ static int Demux( demux_t *p_demux )
                     playlist_BothAddInput( p_playlist, p_input,
                                            p_item_in_category,
                                            PLAYLIST_APPEND | PLAYLIST_SPREPARSE
-                                           , PLAYLIST_END );
+                                           , PLAYLIST_END, NULL, NULL );
                     FREENULL( psz_item_name );
                     FREENULL( psz_item_mrl );
                     FREENULL( psz_item_size );

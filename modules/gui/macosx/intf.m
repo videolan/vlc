@@ -461,7 +461,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* Check if we need to start playing */
     if( p_intf->b_play )
     {
-        playlist_LockControl( p_playlist, PLAYLIST_AUTOPLAY );
+        playlist_Control( p_playlist, PLAYLIST_AUTOPLAY, VLC_FALSE );
     }
     var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     val.b_bool = VLC_FALSE;

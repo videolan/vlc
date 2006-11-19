@@ -87,30 +87,9 @@ int playlist_ItemDelete( playlist_item_t *p_item )
     return VLC_SUCCESS;
 }
 
-/** Remove an input item from ONELEVEL and CATEGORY */
-int playlist_DeleteAllFromInput( playlist_t *p_playlist, int i_input_id )
-{
-    playlist_DeleteFromInput( p_playlist, i_input_id,
-                              p_playlist->p_root_category, VLC_TRUE );
-    playlist_DeleteFromInput( p_playlist, i_input_id,
-                              p_playlist->p_root_onelevel, VLC_TRUE );
-    return VLC_SUCCESS;
-}
-
-/** Remove an input item from ONELEVEL and CATEGORY.
- * This function must be entered without the playlist lock */
-int playlist_LockDeleteAllFromInput( playlist_t * p_playlist, int i_id )
-{
-    int i_ret;
-    vlc_mutex_lock( &p_playlist->object_lock );
-    i_ret = playlist_DeleteAllFromInput( p_playlist, i_id );
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    return i_ret;
-}
-
 /** Remove an input item when it appears from a root playlist item */
-int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
-                              playlist_item_t *p_root, vlc_bool_t b_do_stop )
+static int DeleteFromInput( playlist_t *p_playlist, int i_input_id,
+                            playlist_item_t *p_root, vlc_bool_t b_do_stop )
 {
     int i;
     for( i = 0 ; i< p_root->i_children ; i++ )
@@ -123,45 +102,43 @@ int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
         }
         else if( p_root->pp_children[i]->i_children >= 0 )
         {
-            int i_ret = playlist_DeleteFromInput( p_playlist, i_input_id,
-                                        p_root->pp_children[i], b_do_stop );
+            int i_ret = DeleteFromInput( p_playlist, i_input_id,
+                                         p_root->pp_children[i], b_do_stop );
             if( i_ret == VLC_SUCCESS ) return VLC_SUCCESS;
         }
     }
     return VLC_EGENERIC;
 }
 
-/** Remove a playlist item from the playlist, given its id */
-int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
+/** Remove an input item from ONELEVEL and CATEGORY */
+int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
+                              vlc_bool_t b_locked )
 {
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
-    if( !p_item ) return VLC_EGENERIC;
-    return DeleteInner( p_playlist, p_item, VLC_TRUE );
-}
-
-/** Remove a playlist item from the playlist, given its id
- * This function should be entered without the playlist lock */
-int playlist_LockDelete( playlist_t * p_playlist, int i_id )
-{
-    int i_ret;
-    vlc_mutex_lock( &p_playlist->object_lock );
-    i_ret = playlist_DeleteFromItemId( p_playlist, i_id );
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    return i_ret;
+    if( !b_locked ) PL_LOCK;
+    DeleteFromInput( p_playlist, i_input_id,
+                     p_playlist->p_root_category, VLC_TRUE );
+    DeleteFromInput( p_playlist, i_input_id,
+                     p_playlist->p_root_onelevel, VLC_TRUE );
+    if( !b_locked ) PL_UNLOCK;
+    return VLC_SUCCESS;
 }
 
 /** Clear the playlist */
-void playlist_Clear( playlist_t * p_playlist )
+void playlist_Clear( playlist_t * p_playlist, vlc_bool_t b_locked )
 {
+    if( !b_locked ) PL_LOCK;
     playlist_NodeEmpty( p_playlist, p_playlist->p_root_category, VLC_TRUE );
     playlist_NodeEmpty( p_playlist, p_playlist->p_root_onelevel, VLC_TRUE );
+    if( !b_locked ) PL_UNLOCK;
 }
-/** Clear the playlist. This function must be entered without the lock */
-void playlist_LockClear( playlist_t *p_playlist )
+
+/** Remove a playlist item from the playlist, given its id
+ * This function is to be used only by the playlist */
+int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
 {
-    vlc_mutex_lock( &p_playlist->object_lock );
-    playlist_Clear( p_playlist );
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id,  VLC_TRUE );
+    if( !p_item ) return VLC_EGENERIC;
+    return DeleteInner( p_playlist, p_item, VLC_TRUE );
 }
 
 /***************************************************************************
@@ -251,7 +228,8 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
 int playlist_BothAddInput( playlist_t *p_playlist,
                            input_item_t *p_input,
                            playlist_item_t *p_direct_parent,
-                           int i_mode, int i_pos )
+                           int i_mode, int i_pos,
+                           int *i_cat, int *i_one )
 {
     playlist_item_t *p_item_cat, *p_item_one, *p_up;
     int i_top;
@@ -285,6 +263,9 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     }
     GoAndPreparse( p_playlist, i_mode, p_item_cat, p_item_one );
 
+    if( i_cat ) *i_cat = p_item_cat->i_id;
+    if( i_one ) *i_one = p_item_one->i_id;
+
     vlc_mutex_unlock( &p_playlist->object_lock );
     return VLC_SUCCESS;
 }
@@ -310,15 +291,6 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
     return p_item;
 }
 
-/** Add a playlist item to a given node */
-void playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
-                           playlist_item_t *p_parent, int i_mode, int i_pos )
-{
-    vlc_mutex_lock( &p_playlist->object_lock );
-    AddItem( p_playlist, p_item, p_parent, i_pos );
-    vlc_mutex_unlock( &p_playlist->object_lock );
-}
-
 /*****************************************************************************
  * Playlist item misc operations
  *****************************************************************************/
@@ -329,7 +301,8 @@ void playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
  * This function must be entered without the playlist lock
  */
 playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
-                                      playlist_item_t *p_item )
+                                      playlist_item_t *p_item,
+                                      vlc_bool_t b_locked )
 {
 
     playlist_item_t *p_item_in_category;
@@ -347,9 +320,13 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
      * useful for later BothAddInput )
      */
 
+    if( !b_locked ) PL_LOCK;
+
     /* Fast track the media library, no time to loose */
-    if( p_item == p_playlist->p_ml_category )
+    if( p_item == p_playlist->p_ml_category ) {
+        if( !b_locked ) PL_UNLOCK;
         return p_item;
+    }
 
     /** \todo First look if we don't already have it */
     p_item_in_category = playlist_ItemFindFromInputAndRoot(
@@ -370,34 +347,22 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
             ChangeToNode( p_playlist, p_item_in_one );
         else
         {
-            playlist_DeleteFromInput( p_playlist, p_item_in_one->p_input->i_id,
-                                      p_playlist->p_root_onelevel, VLC_FALSE );
+            DeleteFromInput( p_playlist, p_item_in_one->p_input->i_id,
+                             p_playlist->p_root_onelevel, VLC_FALSE );
         }
         p_playlist->b_reset_currently_playing = VLC_TRUE;
         vlc_cond_signal( &p_playlist->object_wait );
         var_SetInteger( p_playlist, "item-change", p_item_in_category->
                                                         p_input->i_id );
+        if( !b_locked ) PL_UNLOCK;
         return p_item_in_category;
     }
     else
     {
         ChangeToNode( p_playlist, p_item );
+        if( !b_locked ) PL_UNLOCK;
         return NULL;
     }
-}
-
-/** Transform an item to a node
- *  This function must be entered without the playlist lock
- *  \see playlist_ItemToNode
- */
-playlist_item_t * playlist_LockItemToNode( playlist_t *p_playlist,
-                                           playlist_item_t *p_item )
-{
-    playlist_item_t *p_ret;
-    vlc_mutex_lock( &p_playlist->object_lock );
-    p_ret = playlist_ItemToNode( p_playlist, p_item );
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    return p_ret;
 }
 
 /** Find an item within a root, given its input id.

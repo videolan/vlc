@@ -401,14 +401,8 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
 
     assert( p_root && p_root->i_children != -1 );
 
-#ifdef PLAYLIST_DEBUG
-    if( p_item != NULL )
-        msg_Dbg( p_playlist, "finding next of %s within %s",
-                        p_item->p_input->psz_name,  p_root->p_input->psz_name );
-    else
-        msg_Dbg( p_playlist, "finding something to play within %s",
-                         p_root->p_input->psz_name );
-#endif
+    PL_DEBUG2( "finding next of %s within %s",
+               PLI_NAME( p_item ), PLI_NAME( p_root ) );
 
     /* Now, walk the tree until we find a suitable next item */
     p_next = p_item;
@@ -427,10 +421,7 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
             if( b_ena_ok && b_unplayed_ok ) break;
         }
     }
-#ifdef PLAYLIST_DEBUG
-    if( p_next == NULL )
-        msg_Dbg( p_playlist, "At end of node" );
-#endif
+    if( p_next == NULL ) PL_DEBUG2( "at end of node" );
     return p_next;
 }
 
@@ -449,14 +440,8 @@ playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
 {
     playlist_item_t *p_prev;
 
-#ifdef PLAYLIST_DEBUG
-    if( p_item != NULL )
-        msg_Dbg( p_playlist, "finding previous of %s within %s",
-                        p_item->p_input->psz_name,  p_root->p_input->psz_name );
-    else
-        msg_Dbg( p_playlist, "finding previous to play within %s",
-                         p_root->p_input->psz_name );
-#endif
+    PL_DEBUG2( "finding previous os %s within %s", PLI_NAME( p_item ),
+                                                   PLI_NAME( p_root ) );
     assert( p_root && p_root->i_children != -1 );
 
     /* Now, walk the tree until we find a suitable previous item */
@@ -476,10 +461,7 @@ playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
             if( b_ena_ok && b_unplayed_ok ) break;
         }
     }
-#ifdef PLAYLIST_DEBUG
-    if( p_prev == NULL )
-        msg_Dbg( p_playlist, "At beginning of node" );
-#endif
+    if( p_prev == NULL ) PL_DEBUG2( "at beginning of node" );
     return p_prev;
 }
 
@@ -516,13 +498,13 @@ playlist_item_t *GetNextItem( playlist_t *p_playlist,
             if( i+1 >= p_parent->i_children )
             {
                 /* Was already the last sibling. Look for uncles */
-                PL_DEBUG( "Current item is the last of the node,"
-                          "looking for uncle from %s",
-                           p_parent->p_input->psz_name );
+                PL_DEBUG2( "Current item is the last of the node,"
+                           "looking for uncle from %s",
+                            p_parent->p_input->psz_name );
 
                 if( p_parent == p_root )
                 {
-                    PL_DEBUG( "already at root" );
+                    PL_DEBUG2( "already at root" );
                     return NULL;
                 }
                 return GetNextUncle( p_playlist, p_item, p_root );
@@ -553,9 +535,9 @@ playlist_item_t *GetNextUncle( playlist_t *p_playlist, playlist_item_t *p_item,
             {
                 if( p_parent == p_grandparent->pp_children[i] )
                 {
-                    PL_DEBUG( "parent %s found as child %i of grandparent %s",
-                              p_parent->p_input->psz_name, i,
-                              p_grandparent->p_input->psz_name );
+                    PL_DEBUG2( "parent %s found as child %i of grandparent %s",
+                               p_parent->p_input->psz_name, i,
+                               p_grandparent->p_input->psz_name );
                     b_found = VLC_TRUE;
                     break;
                 }
@@ -650,12 +632,12 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
             if( i-1 < 0 )
             {
                /* Was already the first sibling. Look for uncles */
-                PL_DEBUG( "current item is the first of its node,"
-                          "looking for uncle from %s",
-                          p_parent->p_input->psz_name );
+                PL_DEBUG2( "current item is the first of its node,"
+                           "looking for uncle from %s",
+                           p_parent->p_input->psz_name );
                 if( p_parent == p_root )
                 {
-                    PL_DEBUG( "already at root" );
+                    PL_DEBUG2( "already at root" );
                     return NULL;
                 }
                 return GetPrevUncle( p_playlist, p_item, p_root );

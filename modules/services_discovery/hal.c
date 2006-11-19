@@ -297,7 +297,8 @@ static void DelItem( services_discovery_t *p_sd, char* psz_udi )
     {
         if( strcmp( psz_udi, p_sys->pp_devices[i]->psz_udi ) == 0 )
         {
-            playlist_DeleteFromItemId( p_playlist, p_sys->pp_devices[i]->i_id );
+            msg_Err(p_sd, "HAL delete must be fixed");
+/*      playlist_DeleteFromItemId( p_playlist, p_sys->pp_devices[i]->i_id );*/
             TAB_REMOVE( p_sys->i_devices_number, p_sys->pp_devices,
                     p_sys->pp_devices[i] );
         }

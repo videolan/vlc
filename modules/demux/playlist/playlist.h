@@ -73,9 +73,10 @@ void E_(Close_GVP) ( vlc_object_t * );
     input_item_t *p_current_input = ( (input_thread_t*)p_demux->p_parent)-> \
                                                          input.p_item; \
     playlist_item_t *p_current = \
-                 playlist_LockItemGetByInput( p_playlist, p_current_input ); \
+                 playlist_ItemGetByInput( p_playlist, p_current_input, VLC_FALSE ); \
     playlist_item_t *p_item_in_category = \
-                            playlist_ItemToNode( p_playlist, p_current ); \
+                            playlist_ItemToNode( p_playlist, p_current, \
+                                                 VLC_TRUE ); \
     b_play = b_play && p_current == p_playlist->status.p_item; \
     if( p_item_in_category ) \
         p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;
@@ -83,6 +84,6 @@ void E_(Close_GVP) ( vlc_object_t * );
 #define HANDLE_PLAY_AND_RELEASE \
     /* Go back and play the playlist */ \
     if( b_play && p_item_in_category && p_item_in_category->i_children > 0 ) \
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_item_in_category, \
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_item_in_category, \
                           NULL ); \
     vlc_object_release( p_playlist );

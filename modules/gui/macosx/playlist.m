@@ -747,7 +747,7 @@ NSLog( @"expandable" );
                 p_item = NULL;
             }
         }
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_node, p_item );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_node, p_item );
     }
     vlc_object_release( p_playlist );
 }
@@ -855,7 +855,7 @@ NSLog( @"expandable" );
         }
         else
         {
-            playlist_LockDelete( p_playlist, p_item->i_id );
+            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id );
         }
     }
     [self playlistUpdated];
@@ -1017,14 +1017,14 @@ NSLog( @"expandable" );
         if( i_item == 0 && !b_enqueue )
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, NULL, p_item );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, NULL, p_item );
         }
         else
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input );
-            playlist_Control( p_playlist, PLAYLIST_PREPARSE, p_item );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
+            playlist_Control( p_playlist, PLAYLIST_PREPARSE, VLC_TRUE, p_item );
         }
     }
     [self playlistUpdated];
@@ -1059,14 +1059,14 @@ NSLog( @"expandable" );
         if( i_item == 0 && !b_enqueue )
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, NULL, p_item );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, NULL, p_item );
         }
         else
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input );
-            playlist_Control( p_playlist, PLAYLIST_PREPARSE, p_item );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
+            playlist_Control( p_playlist, PLAYLIST_PREPARSE, VLC_TRUE, p_item );
         }
     }
     [self playlistUpdated];

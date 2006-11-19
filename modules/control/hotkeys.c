@@ -800,10 +800,12 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
     FOREACH_ARRAY( playlist_item_t *p_item, p_playlist->items )
         if( !strcmp( psz_bookmark, p_item->p_input->psz_uri ) )
         {
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, NULL, p_item );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
+                              NULL, p_item );
             break;
         }
     FOREACH_END();
+    PL_UNLOCK;
     vlc_object_release( p_playlist );
 }
 

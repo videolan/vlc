@@ -158,7 +158,7 @@ static int Demux( demux_t *p_demux )
                 input_ItemCopyOptions( p_current->p_input, p_input );
                 playlist_BothAddInput( p_playlist, p_input, p_item_in_category,
                                        PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                       PLAYLIST_END );
+                                       PLAYLIST_END, NULL, NULL );
             }
             else
             {
@@ -215,7 +215,7 @@ static int Demux( demux_t *p_demux )
         input_ItemCopyOptions( p_current->p_input, p_input );
         playlist_BothAddInput( p_playlist, p_input, p_item_in_category,
                                PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                               PLAYLIST_END );
+                               PLAYLIST_END, NULL, NULL );
         free( psz_mrl_orig );
         psz_mrl = NULL;
     }

@@ -216,7 +216,7 @@ static int Demux( demux_t *p_demux )
         playlist_BothAddInput( p_sys->p_playlist, p_input,
                                p_sys->p_item_in_category,
                                PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                               PLAYLIST_END );
+                               PLAYLIST_END, NULL, NULL );
     }
 
     HANDLE_PLAY_AND_RELEASE;

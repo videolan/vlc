@@ -548,7 +548,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_item = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
                 if( p_item->i_children == -1 )
                 {
-                    playlist_DeleteFromItemId( p_playlist, p_item->i_id );
+                    playlist_DeleteFromInput( p_playlist,
+                                              p_item->p_input->i_id );
                 }
                 else
                 {
@@ -567,12 +568,13 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                         == -1 )
                 {
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
-                        NULL,
+                                      VLC_TRUE, NULL,
                         p_sys->pp_plist[p_sys->i_box_plidx]->p_item );
                 }
                 else
                 {
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
+                        VLC_TRUE,
                         p_sys->pp_plist[p_sys->i_box_plidx]->p_item,
                         NULL );
                 }
