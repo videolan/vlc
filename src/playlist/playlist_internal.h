@@ -60,6 +60,11 @@ struct playlist_fetcher_t
  * Prototypes
  *****************************************************************************/
 
+/* Global thread */
+#define playlist_ThreadCreate(a) __playlist_ThreadCreate(VLC_OBJECT(a))
+void        __playlist_ThreadCreate   ( vlc_object_t * );
+int           playlist_ThreadDestroy  ( playlist_t * );
+
 /* Creation/Deletion */
 playlist_t *playlist_Create   ( vlc_object_t * );
 void        playlist_Destroy  ( playlist_t * );
@@ -100,13 +105,14 @@ playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
                                     playlist_item_t *p_root );
 
 int playlist_DeleteFromItemId( playlist_t*, int );
+int playlist_ItemDelete ( playlist_item_t * );
 
 /**
  * @}
  */
 
 #define PLAYLIST_DEBUG 1
-//#undef PLAYLIST_DEBUG
+//#undef PLAYLIST_DEBUG2
 
 #ifdef PLAYLIST_DEBUG
  #define PL_DEBUG( msg, args... ) msg_Dbg( p_playlist, msg, ## args )

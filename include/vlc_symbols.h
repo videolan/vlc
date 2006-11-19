@@ -256,19 +256,19 @@ struct module_symbols_t
     void (*__vlc_object_release_inner) (vlc_object_t *);
     vlc_list_t * (*__vlc_list_find_inner) (vlc_object_t *, int, int);
     void (*vlc_list_release_inner) (vlc_list_t *);
-    int (*playlist_Control_inner) (playlist_t *, int, vlc_bool_t, ...);
+    int (*playlist_Control_inner) (playlist_t *p_playlist, int i_query, vlc_bool_t b_locked, ...);
     void *playlist_LockControl_deprecated;
     void (*playlist_Clear_inner) (playlist_t *, vlc_bool_t);
     void *playlist_LockClear_deprecated;
     int (*playlist_PreparseEnqueue_inner) (playlist_t *, input_item_t *);
     int (*playlist_ServicesDiscoveryAdd_inner) (playlist_t *, const char *);
     int (*playlist_ServicesDiscoveryRemove_inner) (playlist_t *, const char *);
-    int (*playlist_AddSDModules_inner) (playlist_t *, char *);
+    void *playlist_AddSDModules_deprecated;
     vlc_bool_t (*playlist_IsServicesDiscoveryLoaded_inner) (playlist_t *,const char *);
     void *__playlist_ItemNew_deprecated;
     void *__playlist_ItemCopy_deprecated;
     playlist_item_t* (*playlist_ItemNewWithType_inner) (vlc_object_t *,const char *,const char *, int , const char *const *, int, int);
-    int (*playlist_ItemDelete_inner) (playlist_item_t *);
+    void *playlist_ItemDelete_deprecated;
     void *playlist_ItemAddParent_deprecated;
     void *playlist_CopyParents_deprecated;
     int (*playlist_ItemSetName_inner) (playlist_item_t *, const char *);
@@ -313,7 +313,7 @@ struct module_symbols_t
     int (*playlist_NodeSort_inner) (playlist_t *, playlist_item_t *,int, int);
     int (*playlist_RecursiveNodeSort_inner) (playlist_t *, playlist_item_t *,int, int);
     void *playlist_Import_deprecated;
-    int (*playlist_Export_inner) (playlist_t *, const char *, playlist_item_t *, const char *);
+    int (*playlist_Export_inner) (playlist_t *p_playlist, const char *psz_name, playlist_item_t *p_export_root, const char *psz_type);
     spu_t * (*__spu_Create_inner) (vlc_object_t *);
     int (*spu_Init_inner) (spu_t *);
     void (*spu_Destroy_inner) (spu_t *);
@@ -797,10 +797,8 @@ struct module_symbols_t
 #  define playlist_PreparseEnqueue (p_symbols)->playlist_PreparseEnqueue_inner
 #  define playlist_ServicesDiscoveryAdd (p_symbols)->playlist_ServicesDiscoveryAdd_inner
 #  define playlist_ServicesDiscoveryRemove (p_symbols)->playlist_ServicesDiscoveryRemove_inner
-#  define playlist_AddSDModules (p_symbols)->playlist_AddSDModules_inner
 #  define playlist_IsServicesDiscoveryLoaded (p_symbols)->playlist_IsServicesDiscoveryLoaded_inner
 #  define playlist_ItemNewWithType (p_symbols)->playlist_ItemNewWithType_inner
-#  define playlist_ItemDelete (p_symbols)->playlist_ItemDelete_inner
 #  define playlist_ItemSetName (p_symbols)->playlist_ItemSetName_inner
 #  define playlist_NodeCreate (p_symbols)->playlist_NodeCreate_inner
 #  define playlist_NodeAppend (p_symbols)->playlist_NodeAppend_inner
@@ -1269,10 +1267,8 @@ struct module_symbols_t
     ((p_symbols)->playlist_PreparseEnqueue_inner) = playlist_PreparseEnqueue; \
     ((p_symbols)->playlist_ServicesDiscoveryAdd_inner) = playlist_ServicesDiscoveryAdd; \
     ((p_symbols)->playlist_ServicesDiscoveryRemove_inner) = playlist_ServicesDiscoveryRemove; \
-    ((p_symbols)->playlist_AddSDModules_inner) = playlist_AddSDModules; \
     ((p_symbols)->playlist_IsServicesDiscoveryLoaded_inner) = playlist_IsServicesDiscoveryLoaded; \
     ((p_symbols)->playlist_ItemNewWithType_inner) = playlist_ItemNewWithType; \
-    ((p_symbols)->playlist_ItemDelete_inner) = playlist_ItemDelete; \
     ((p_symbols)->playlist_ItemSetName_inner) = playlist_ItemSetName; \
     ((p_symbols)->playlist_NodeCreate_inner) = playlist_NodeCreate; \
     ((p_symbols)->playlist_NodeAppend_inner) = playlist_NodeAppend; \
@@ -1508,8 +1504,10 @@ struct module_symbols_t
     (p_symbols)->vlc_input_item_AddInfo_deprecated = NULL; \
     (p_symbols)->playlist_LockControl_deprecated = NULL; \
     (p_symbols)->playlist_LockClear_deprecated = NULL; \
+    (p_symbols)->playlist_AddSDModules_deprecated = NULL; \
     (p_symbols)->__playlist_ItemNew_deprecated = NULL; \
     (p_symbols)->__playlist_ItemCopy_deprecated = NULL; \
+    (p_symbols)->playlist_ItemDelete_deprecated = NULL; \
     (p_symbols)->playlist_ItemAddParent_deprecated = NULL; \
     (p_symbols)->playlist_CopyParents_deprecated = NULL; \
     (p_symbols)->playlist_ItemSetDuration_deprecated = NULL; \

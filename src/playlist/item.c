@@ -123,7 +123,6 @@ int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
     return VLC_SUCCESS;
 }
 
-/** Clear the playlist */
 void playlist_Clear( playlist_t * p_playlist, vlc_bool_t b_locked )
 {
     if( !b_locked ) PL_LOCK;

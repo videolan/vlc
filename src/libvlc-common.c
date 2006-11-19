@@ -88,6 +88,8 @@
 
 #include "libvlc.h"
 
+#include "playlist/playlist_internal.h"
+
 /*****************************************************************************
  * The evil global variable. We handle it with care, don't worry.
  *****************************************************************************/
@@ -676,7 +678,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     if( psz_modules && *psz_modules )
     {
         /* Add service discovery modules */
-        playlist_AddSDModules( p_playlist, psz_modules );
+        playlist_ServicesDiscoveryAdd( p_playlist, psz_modules );
     }
     if( psz_modules ) free( psz_modules );
 

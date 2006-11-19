@@ -31,6 +31,7 @@
 
 TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t);
 TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
+
 /**
  * \file
  * This file contain structures and function prototypes related
@@ -126,16 +127,13 @@ struct playlist_export_t
 /** playlist item / node */
 struct playlist_item_t
 {
-    input_item_t           *p_input;    /**< input item descriptor */
-
-    /* Tree specific fields */
-    int                    i_children;  /**< Number of children
-                                             -1 if not a node */
+    input_item_t           *p_input;    /**< Linked input item */
+    /** Number of children, -1 if not a node */
+    int                    i_children;
     playlist_item_t      **pp_children; /**< Children nodes/items */
     playlist_item_t       *p_parent;    /**< Item parent */
 
     int                    i_id;        /**< Playlist item specific id */
-
     uint8_t                i_flags;     /**< Flags */
 };
 
@@ -265,11 +263,6 @@ struct playlist_add_t
  * Prototypes
  *****************************************************************************/
 
-/* Global thread */
-#define playlist_ThreadCreate(a) __playlist_ThreadCreate(VLC_OBJECT(a))
-void        __playlist_ThreadCreate   ( vlc_object_t * );
-int           playlist_ThreadDestroy  ( playlist_t * );
-
 /* Helpers */
 #define PL_LOCK vlc_mutex_lock( &p_playlist->object_lock );
 #define PL_UNLOCK vlc_mutex_unlock( &p_playlist->object_lock );
@@ -292,19 +285,38 @@ static inline playlist_t *__pl_Yield( vlc_object_t *p_this )
 #define playlist_Prev(p) playlist_Control(p,PLAYLIST_SKIP, VLC_FALSE, -1)
 #define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP, VLC_FALSE,  i)
 
-VLC_EXPORT( int, playlist_Control, ( playlist_t *, int, vlc_bool_t, ...  ) );
+/**
+ * Do a playlist action.
+ * If there is something in the playlist then you can do playlist actions.
+ * Possible queries are listed in vlc_common.h
+ * \param p_playlist the playlist to do the command on
+ * \param i_query the command to do
+ * \param b_locked TRUE if playlist is locked when entering this function
+ * \param variable number of arguments
+ * \return VLC_SUCCESS or an error
+ */
+VLC_EXPORT( int, playlist_Control, ( playlist_t *p_playlist, int i_query, vlc_bool_t b_locked, ...  ) );
 
+/** Clear the playlist
+ * \param b_locked TRUE if playlist is locked when entering this function
+ */
 VLC_EXPORT( void,  playlist_Clear, ( playlist_t *, vlc_bool_t ) );
 
+/** Enqueue an input item for preparsing */
 VLC_EXPORT( int, playlist_PreparseEnqueue, (playlist_t *, input_item_t *) );
+
+/** Enqueue a playlist item and all of its children if any for preparsing */
 VLC_EXPORT( int, playlist_PreparseEnqueueItem, (playlist_t *, playlist_item_t *) );
+/** Request the art for an input item to be fetched */
 VLC_EXPORT( int, playlist_AskForArtEnqueue, (playlist_t *, input_item_t *) );
 
-/* Services discovery */
+/********************** Services discovery ***********************/
 
+/** Add a list of comma-separated service discovery modules */
 VLC_EXPORT( int, playlist_ServicesDiscoveryAdd, (playlist_t *, const char *));
+/** Remove a services discovery module by name */
 VLC_EXPORT( int, playlist_ServicesDiscoveryRemove, (playlist_t *, const char *));
-VLC_EXPORT( int, playlist_AddSDModules, (playlist_t *, char *));
+/** Check whether a given SD is loaded */
 VLC_EXPORT( vlc_bool_t, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const char *));
 
 /* Playlist sorting */
@@ -312,8 +324,15 @@ VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist
 VLC_EXPORT( int,  playlist_NodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 
-/* Save a playlist file */
-VLC_EXPORT( int,  playlist_Export, ( playlist_t *, const char *, playlist_item_t *, const char * ) );
+/**
+ * Export a node of the playlist to a certain type of playlistfile
+ * \param p_playlist the playlist to export
+ * \param psz_filename the location where the exported file will be saved
+ * \param p_export_root the root node to export
+ * \param psz_type the type of playlist file to create (m3u, pls, ..)
+ * \return VLC_SUCCESS on success
+ */
+VLC_EXPORT( int,  playlist_Export, ( playlist_t *p_playlist, const char *psz_name, playlist_item_t *p_export_root, const char *psz_type ) );
 
 /********************************************************
  * Item management
@@ -323,25 +342,19 @@ VLC_EXPORT( int,  playlist_Export, ( playlist_t *, const char *, playlist_item_t
 
 VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( vlc_object_t *,const char *,const char *, int , const char *const *, int, int) );
 
-#define playlist_ItemNew( a , b, c ) __playlist_ItemNew(VLC_OBJECT(a) , b , c )
 /** Create a new item, without adding it to the playlist
  * \param p_obj a vlc object (anyone will do)
  * \param psz_uri the mrl of the item
  * \param psz_name a text giving a name or description of the item
  * \return the new item or NULL on failure
  */
-static inline playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
-                                     const char *psz_uri, const char *psz_name )
-{
-    /* 0 = ITEM_TYPE_UNKNOWN */
-    return playlist_ItemNewWithType( p_obj, psz_uri,  psz_name, 0, NULL, -1,0);
-}
+#define playlist_ItemNew( a , b, c ) \
+    playlist_ItemNewWithType( VLC_OBJECT(a) , b , c, 0, NULL, -1, 0 )
 
 #define playlist_ItemNewFromInput(a,b) __playlist_ItemNewFromInput(VLC_OBJECT(a),b)
 VLC_EXPORT( playlist_item_t *, __playlist_ItemNewFromInput, ( vlc_object_t *p_obj,input_item_t *p_input ) );
 
 /*************************** Item deletion **************************/
-VLC_EXPORT( int, playlist_ItemDelete, ( playlist_item_t * ) );
 VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, int, vlc_bool_t ) );
 
 /*************************** Item fields accessors **************************/

@@ -38,17 +38,6 @@ static void PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
  * Playlist control
  *****************************************************************************/
 
-/**
- * Do a playlist action.
- * If there is something in the playlist then you can do playlist actions.
- * Should be entered with playlist lock. See include/vlc_playlist.h for
- * possible queries
- *
- * \param p_playlist the playlist to do the command on
- * \param i_query the command to do
- * \param variable number of arguments
- * \return VLC_SUCCESS or an error
- */
 int playlist_Control( playlist_t * p_playlist, int i_query, vlc_bool_t b_locked, ... )
 {
     va_list args;

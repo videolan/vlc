@@ -27,15 +27,6 @@
 #include "charset.h"
 #include <errno.h>
 
-/**
- * Export a node of the playlist to a certain type of playlistfile
- *
- * \param p_playlist the playlist to export
- * \param psz_filename the location where the exported file will be saved
- * \param p_export_root the root node to export
- * \param psz_type the type of playlist file to create.
- * \return VLC_SUCCESS on success
- */
 int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
                      playlist_item_t *p_export_root,const char *psz_type )
 {

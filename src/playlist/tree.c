@@ -68,7 +68,6 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, const char *psz_n
 
     if( p_parent != NULL )
         playlist_NodeAppend( p_playlist, p_item, p_parent );
-
     playlist_SendAddNotify( p_playlist, p_item->i_id,
                             p_parent ? p_parent->i_id : -1 );
     return p_item;
@@ -150,7 +149,7 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     else
     {
         int i;
-        var_SetInteger( p_playlist, "item-deleted", p_root->p_input->i_id );
+        var_SetInteger( p_playlist, "item-deleted", p_root->i_id );
         ARRAY_BSEARCH( p_playlist->all_items, ->p_input->i_id, int,
                        p_root->p_input->i_id, i );
         if( i != -1 )
