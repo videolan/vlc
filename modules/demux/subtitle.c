@@ -56,7 +56,7 @@ static void Close( vlc_object_t *p_this );
     "\"subrip\",  \"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" " \
     "\"sami\", \"dvdsubtitle\" and \"auto\" (meaning autodetection, this " \
     "should always work).")
-static char *ppsz_sub_type[] =
+static const char *ppsz_sub_type[] =
 {
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
     "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle"
@@ -76,7 +76,7 @@ vlc_module_begin();
                SUB_DELAY_LONGTEXT, VLC_TRUE );
     add_string( "sub-type", "auto", NULL, N_("Subtitles format"),
                 SUB_TYPE_LONGTEXT, VLC_TRUE );
-        change_string_list( ppsz_sub_type, 0, 0 );
+        change_string_list( ppsz_sub_type, NULL, NULL );
     set_callbacks( Open, Close );
 
     add_shortcut( "subtitle" );
@@ -144,9 +144,9 @@ static int  ParseDVDSubtitle( demux_t *, subtitle_t * );
 
 static struct
 {
-    char *psz_type_name;
+    const char *psz_type_name;
     int  i_type;
-    char *psz_name;
+    const char *psz_name;
     int  (*pf_read)( demux_t *, subtitle_t* );
 } sub_read_subtitle_function [] =
 {
@@ -1084,7 +1084,7 @@ static int  ParseVplayer( demux_t *p_demux, subtitle_t *p_subtitle )
     return( 0 );
 }
 
-static char *ParseSamiSearch( text_t *txt, char *psz_start, char *psz_str )
+static char *ParseSamiSearch( text_t *txt, char *psz_start, const char *psz_str )
 {
     if( psz_start )
     {
