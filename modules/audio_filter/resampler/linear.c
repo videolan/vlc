@@ -41,6 +41,8 @@ static int  Create    ( vlc_object_t * );
 static void Close     ( vlc_object_t * );
 static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                         aout_buffer_t * );
+static void DoWork_inner( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
+                        aout_buffer_t *, int );
 
 static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
@@ -102,12 +104,14 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_sys->p_prev_sample = malloc(
-        aout_FormatNbChannels( &p_filter->input ) * sizeof(int32_t) );
+        p_filter->input.i_channels * sizeof(int32_t) );
     if( p_sys->p_prev_sample == NULL )
     {
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
+
+    memset( p_sys->p_prev_sample, 0, aout_FormatNbChannels( &p_filter->input ) * sizeof(int32_t) );
 
     p_filter->pf_do_work = DoWork;
 
@@ -136,6 +140,13 @@ static void Close( vlc_object_t * p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
+    DoWork_inner( p_aout, p_filter, p_in_buf, p_out_buf, p_aout->mixer.mixer.i_rate );
+}
+
+static void DoWork_inner( aout_instance_t * p_aout, aout_filter_t * p_filter,
+                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf,
+                    int i_output_rate )
+{
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
 #ifndef HAVE_ALLOCA
     float *p_in_orig;
@@ -143,12 +154,14 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     float *p_in, *p_out = (float *)p_out_buf->p_buffer;
     float *p_prev_sample = (float *)p_sys->p_prev_sample;
 
-    int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
+    int i_nb_channels = p_filter->input.i_channels;
     int i_in_nb = p_in_buf->i_nb_samples;
     int i_chan, i_in, i_out = 0;
 
+
     /* Check if we really need to run the resampler */
-    if( p_aout->mixer.mixer.i_rate == p_filter->input.i_rate )
+    //if( p_aout->mixer.mixer.i_rate == p_filter->input.i_rate )
+    if( i_output_rate == p_filter->input.i_rate )
     {
         if( p_filter->b_continuity &&
             p_in_buf->i_size >=
@@ -286,6 +299,8 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
+    memset( p_sys->p_prev_sample, 0, p_filter->fmt_in.audio.i_channels * sizeof(int32_t) );
+
     p_filter->pf_audio_filter = Resample;
 
     msg_Dbg( p_this, "%4.4s/%iKHz/%i->%4.4s/%iKHz/%i",
@@ -360,7 +375,8 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     out_buf.i_nb_bytes = p_out->i_buffer;
     out_buf.i_nb_samples = p_out->i_samples;
 
-    DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
+    DoWork_inner( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf,
+                                            p_filter->fmt_out.audio.i_rate );
 
     p_block->pf_release( p_block );
 
