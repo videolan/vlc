@@ -182,18 +182,36 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     int i_status = VLC_EGENERIC;
     stream_t *p_stream;
     char psz_filename[MAX_PATH+1], psz_dir[MAX_PATH+1];
-    char *psz_artist;
-    char *psz_album;
+    char *psz_artist = NULL;
+    char *psz_album = NULL;
     char *psz_type;
-    psz_artist = p_item->p_meta->psz_artist;
-    psz_album = p_item->p_meta->psz_album;
+    int  i;
+    if( p_item->p_meta->psz_artist )
+        psz_artist = strdup( p_item->p_meta->psz_artist );
+    if( p_item->p_meta->psz_album )
+        psz_album = strdup( p_item->p_meta->psz_album );
 
     assert( p_item->p_meta && !EMPTY_STR(p_item->p_meta->psz_arturl) );
 
     /* FIXME: use an alternate saving filename scheme if we don't have
      * the artist or album name */
     if( !p_item->p_meta->psz_artist || !p_item->p_meta->psz_album )
+    {
+        free( psz_artist );
+        free( psz_album );
         return VLC_EGENERIC;
+    }
+
+    /* Doesn't create a filename with invalid characters
+     * TODO: several filesystems forbid several characters: list them all
+     */
+    for( i = 0 ; i < strlen( psz_artist ) ; i++ )
+        if( psz_artist[i] == '/' )
+            psz_artist[i] = ' ';
+
+    for( i = 0 ; i < strlen( psz_album ) ; i++ )
+        if( psz_album[i] == '/' )
+            psz_album[i] = ' ';
 
     psz_type = strrchr( p_item->p_meta->psz_arturl, '.' );
 
@@ -223,6 +241,8 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     if( !strncmp( p_item->p_meta->psz_arturl , "APIC", 4 ) )
     {
         msg_Warn( p_playlist, "APIC fetch not supported yet" );
+        free( psz_artist );
+        free( psz_album );
         return VLC_EGENERIC;
     }
 
@@ -244,6 +264,8 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
         p_item->p_meta->psz_arturl = strdup( psz_filename );
         i_status = VLC_SUCCESS;
     }
+    free( psz_artist );
+    free( psz_album );
     return i_status;
 }
 
