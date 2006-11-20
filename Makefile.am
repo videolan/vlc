@@ -204,7 +204,7 @@ EXTRA_DIST += \
 	$(NULL)
 
 ###############################################################################
-# Various utilities ( editor syntax files, ... )
+# Various utilities ( editor syntax files, D-Bus controller ... )
 ##############################################################################
 EXTRA_DIST += \
 	extras/Makefile \
@@ -214,6 +214,8 @@ EXTRA_DIST += \
 	extras/make.pl \
 	extras/valgrind.suppressions \
 	extras/m4/autoconf260.m4 \
+	extras/dbus-vlc.py \
+	extras/dbus-vlc.glade \
 	$(NULL)
 
 ###############################################################################
