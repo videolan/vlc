@@ -57,6 +57,7 @@ private:
 public slots:
     void cancel();
     void ok();
+    void toggleAdvancedPanel();
 };
 
 #endif

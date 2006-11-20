@@ -13,7 +13,46 @@
   <property name="windowTitle" >
    <string>Dialog</string>
   </property>
-  <widget class="QFrame" name="frame" >
+  <widget class="QPushButton" name="closeButton" >
+   <property name="geometry" >
+    <rect>
+     <x>520</x>
+     <y>540</y>
+     <width>91</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Close</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="cancelButton" >
+   <property name="geometry" >
+    <rect>
+     <x>400</x>
+     <y>540</y>
+     <width>101</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QTabWidget" name="Tab" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>601</width>
+     <height>371</height>
+    </rect>
+   </property>
+   <property name="currentIndex" >
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QFrame" name="advancedFrame" >
    <property name="geometry" >
     <rect>
      <x>10</x>
@@ -121,19 +160,6 @@ p, li { white-space: pre-wrap; }
     </item>
    </layout>
   </widget>
-  <widget class="QPushButton" name="closeButton" >
-   <property name="geometry" >
-    <rect>
-     <x>520</x>
-     <y>540</y>
-     <width>91</width>
-     <height>29</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>Close</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="advancedButton" >
    <property name="geometry" >
     <rect>
@@ -147,32 +173,6 @@ p, li { white-space: pre-wrap; }
     <string>More...</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="cancelButton" >
-   <property name="geometry" >
-    <rect>
-     <x>400</x>
-     <y>540</y>
-     <width>101</width>
-     <height>29</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>Cancel</string>
-   </property>
-  </widget>
-  <widget class="QTabWidget" name="Tab" >
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>601</width>
-     <height>371</height>
-    </rect>
-   </property>
-   <property name="currentIndex" >
-    <number>-1</number>
-   </property>
-  </widget>
  </widget>
  <tabstops>
   <tabstop>advancedButton</tabstop>
@@ -182,7 +182,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>closeButton</tabstop>
   <tabstop>cancelButton</tabstop>
  </tabstops>
- <includes/>
  <resources/>
  <connections/>
 </ui>

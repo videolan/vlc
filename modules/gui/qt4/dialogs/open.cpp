@@ -44,10 +44,25 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     ui.Tab->addTab(fileOpenPanel, "File");
     ui.Tab->addTab(diskOpenPanel, "Disk");
     ui.Tab->addTab(netOpenPanel, "Network");
+    ui.advancedFrame->hide();
+
+    BUTTONACT( ui.advancedButton , toggleAdvancedPanel()  );
 }
 
 OpenDialog::~OpenDialog()
 {
+}
+
+void OpenDialog::toggleAdvancedPanel()
+{
+    if (ui.advancedFrame->isVisible())
+    {
+        ui.advancedFrame->hide();
+    }
+    else
+    {
+        ui.advancedFrame->show();
+    }
 }
 
 void OpenDialog::cancel()
@@ -59,3 +74,4 @@ void OpenDialog::ok()
 {
     this->toggleVisible();
 }
+
