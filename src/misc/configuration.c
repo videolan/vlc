@@ -1184,6 +1184,10 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
             /* Ignore deprecated options */
             if( p_item->psz_current )
                 continue;
+            if( p_item->b_unsaveable )
+                /*obvious*/
+                continue;
+            
             if( b_autosave && !p_item->b_autosave )
             {
                 i_value = p_item->i_value_saved;

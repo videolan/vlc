@@ -169,6 +169,7 @@ struct module_config_t
     int          i_value_saved;
     float        f_value_saved;
     vlc_bool_t   b_autosave;       /* Config will be auto-saved at exit time */
+    vlc_bool_t   b_unsaveable;       /* confg should be saved*/
 };
 
 /*****************************************************************************
@@ -408,6 +409,8 @@ int config_AutoSaveConfigFile( vlc_object_t * );
 #define change_autosave() \
     p_config[i_config].b_autosave = VLC_TRUE;
 
+#define change_unsaveable() \
+    p_config[i_config].b_unsaveable = VLC_TRUE;
 
 /****************************************************************************
  * config_chain_t:
