@@ -144,7 +144,8 @@ DBUS_METHOD( GetPlayingItem )
     char *p_psz_no_input = &psz_no_input;
     playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
     input_thread_t *p_input = p_playlist->p_input;
-    ADD_STRING( ( p_input ) ? &p_input->input.p_item->psz_name : &p_psz_no_input );
+    ADD_STRING( ( p_input ) ? &p_input->input.p_item->psz_name :
+            &p_psz_no_input );
     pl_Release( ((vlc_object_t*) p_this) );
     REPLY_SEND;
 }
@@ -157,7 +158,6 @@ DBUS_METHOD( GetPlayStatus )
     char *psz_play;
     vlc_value_t val;
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    PL_LOCK;
     input_thread_t *p_input = p_playlist->p_input;
 
     if( !p_input )
@@ -172,7 +172,6 @@ DBUS_METHOD( GetPlayStatus )
         else psz_play = strdup( "unknown" );
     }
     
-    PL_UNLOCK;
     pl_Release( p_playlist );
 
     ADD_STRING( &psz_play );
@@ -230,7 +229,6 @@ DBUS_METHOD( AddMRL )
     DBusError error;
     dbus_error_init( &error );
 
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
     char *psz_mrl;
     dbus_bool_t b_play;
 
@@ -241,19 +239,15 @@ DBUS_METHOD( AddMRL )
 
     if( dbus_error_is_set( &error ) )
     {
-        printf("error: %s\n", error.message );
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+                error.message );
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    input_item_t *p_item = input_ItemNew( p_intf, psz_mrl, NULL );
-    if( p_item )
-    {
-        playlist_AddInput( p_playlist, p_item,
-            PLAYLIST_APPEND | ( ( b_play == TRUE ) ? PLAYLIST_GO : 0 ) ,
-            PLAYLIST_END, VLC_TRUE );
-    }
+    playlist_Add( p_playlist, psz_mrl, NULL, PLAYLIST_APPEND |
+            ( ( b_play == TRUE ) ? PLAYLIST_GO : 0 ) , PLAYLIST_END, VLC_TRUE );
     pl_Release( p_playlist );
 
     REPLY_SEND;
