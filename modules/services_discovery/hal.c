@@ -216,7 +216,7 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
 #endif
                     )
 {
-    playlist_item_t *p_item;
+    playlist_item_t *p_item_cat, *p_item_one;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_sd,
                                         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -225,12 +225,12 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
         msg_Err( p_sd, "playlist not found" );
         return;
     }
-    p_item = playlist_NodeAddInput( p_playlist, p_input,p_sd->p_sys->p_node_cat,
-                                    PLAYLIST_APPEND, PLAYLIST_END );
-    p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    p_item = playlist_NodeAddInput( p_playlist, p_input,p_sd->p_sys->p_node_one,
-                                    PLAYLIST_APPEND, PLAYLIST_END );
-    p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
+    p_item_cat = playlist_NodeAddInput( p_playlist,
+            p_input,p_sd->p_sys->p_node_cat, PLAYLIST_APPEND, PLAYLIST_END );
+    p_item_cat->i_flags &= ~PLAYLIST_SKIP_FLAG;
+    p_item_one = playlist_NodeAddInput( p_playlist,
+            p_input,p_sd->p_sys->p_node_one, PLAYLIST_APPEND, PLAYLIST_END );
+    p_item_one->i_flags &= ~PLAYLIST_SKIP_FLAG;
 
     vlc_object_release( p_playlist );
 
@@ -241,7 +241,7 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
     {
         return;
     }
-    p_udi_entry->i_id = p_item->i_id;
+    p_udi_entry->i_id = p_item_cat->i_id;
     p_udi_entry->psz_udi = strdup( psz_device );
     TAB_APPEND( p_sys->i_devices_number, p_sys->pp_devices, p_udi_entry );
 #endif
@@ -283,7 +283,8 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
 static void DelItem( services_discovery_t *p_sd, char* psz_udi )
 {
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
-    int                         i;
+    int                         i,j;
+    playlist_item_t             *p_pl_item;
 
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_sd,
                                         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -294,11 +295,32 @@ static void DelItem( services_discovery_t *p_sd, char* psz_udi )
     }
 
     for( i = 0; i < p_sys->i_devices_number; i++ )
-    {
+    { /*  looks for a matching udi */
         if( strcmp( psz_udi, p_sys->pp_devices[i]->psz_udi ) == 0 )
-        {
-            msg_Err(p_sd, "HAL delete must be fixed");
-/*      playlist_DeleteFromItemId( p_playlist, p_sys->pp_devices[i]->i_id );*/
+        { /* delete the corresponding item */
+            p_pl_item = playlist_ItemGetById( p_playlist,
+                p_sys->pp_devices[i]->i_id, VLC_FALSE );
+            if( p_pl_item )
+            {
+                j = 0;
+                while( p_pl_item->i_children > 0 )
+                { /* delete all childs */
+                    playlist_DeleteFromInput( p_playlist,
+                        p_pl_item->pp_children[j]->p_input->i_id, VLC_FALSE );
+                }
+                /* delete parent item */
+
+                /* HACK: if i_children == 0 the item won't be deleted 
+                 * That means that it _had_ children but they were deleted */
+                if( p_pl_item->i_children == 0 )
+                    p_pl_item->i_children = -1;
+
+                playlist_DeleteFromInput( p_playlist,
+                    p_pl_item->p_input->i_id, VLC_FALSE );
+            }
+
+            if( p_sys->pp_devices[i]->psz_udi )
+                free( p_sys->pp_devices[i]->psz_udi );
             TAB_REMOVE( p_sys->i_devices_number, p_sys->pp_devices,
                     p_sys->pp_devices[i] );
         }
@@ -353,7 +375,7 @@ static void ParseDevice( services_discovery_t *p_sd, char *psz_device )
                                                         psz_device,
                                                         "volume.disc.type" );
 #endif
-        if( !strcmp( psz_disc_type, "dvd_rom" ) )
+        if( !strncmp( psz_disc_type, "dvd_r", 5 ) )
         {
 #ifdef HAVE_HAL_1
             /* hal 0.2.9.7 (HAVE_HAL) has not is_videodvd
@@ -363,7 +385,7 @@ static void ParseDevice( services_discovery_t *p_sd, char *psz_device )
 #endif
             AddDvd( p_sd, psz_device );
         }
-        else if( !strcmp( psz_disc_type, "cd_rom" ) )
+        else if( !strncmp( psz_disc_type, "cd_r", 4 ) )
         {
 #ifdef HAVE_HAL_1
             if( libhal_device_get_property_bool( p_sys->p_ctx, psz_device,
