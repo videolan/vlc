@@ -12,7 +12,9 @@ I - Interfaces
     line.
 
  2) HTTP interface
-    Not finished yet. Please be a little more patient !
+    You can launch it as a common interface
+    Default port is 8080.
+    Access it from http://127.0.0.1:8080/vlm.html
 
 II - VLM Elements
  1) Medias
