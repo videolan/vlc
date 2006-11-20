@@ -52,6 +52,8 @@ private:
     input_thread_t *p_input;
     Ui::Open ui;
     FileOpenPanel *fileOpenPanel;
+    NetOpenPanel *netOpenPanel;
+    DiskOpenPanel *diskOpenPanel;
 public slots:
     void cancel();
     void ok();

@@ -29,6 +29,8 @@
 #include <QWidget>
 #include <QString>
 #include "ui/open_file.h"
+#include "ui/open_disk.h"
+#include "ui/open_net.h"
 
 class OpenPanel: public QWidget
 {
@@ -61,5 +63,39 @@ signals:
     void dataUpdated( QString, QString ) ;
 
 };
+
+class NetOpenPanel: public OpenPanel
+{
+    Q_OBJECT;
+public:
+    NetOpenPanel( QWidget *, intf_thread_t * );
+    virtual ~NetOpenPanel();
+    virtual QString getUpdatedMRL();
+private:
+    Ui::OpenNet ui;
+public slots:
+    virtual void sendUpdate() ;
+signals:
+    void dataUpdated( QString, QString ) ;
+
+};
+
+class DiskOpenPanel: public OpenPanel
+{
+    Q_OBJECT;
+public:
+    DiskOpenPanel( QWidget *, intf_thread_t * );
+    virtual ~DiskOpenPanel();
+    virtual QString getUpdatedMRL();
+private:
+    Ui::OpenDisk ui;
+public slots:
+    virtual void sendUpdate() ;
+signals:
+    void dataUpdated( QString, QString ) ;
+
+};
+
+
 
 #endif

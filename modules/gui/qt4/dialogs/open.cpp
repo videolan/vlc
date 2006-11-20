@@ -39,7 +39,11 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     setWindowTitle( _("Open" ) );
     ui.setupUi( this );
     fileOpenPanel = new FileOpenPanel(this , _p_intf );
-    ui.Tab->addTab(fileOpenPanel, "Test");
+    diskOpenPanel = new DiskOpenPanel(this , _p_intf );
+    netOpenPanel = new NetOpenPanel(this , _p_intf );
+    ui.Tab->addTab(fileOpenPanel, "File");
+    ui.Tab->addTab(diskOpenPanel, "Disk");
+    ui.Tab->addTab(netOpenPanel, "Network");
 }
 
 OpenDialog::~OpenDialog()

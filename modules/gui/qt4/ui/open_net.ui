@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <author>Jean-Baptiste Kempf</author>
- <class>OpenNetwork</class>
+ <class>OpenNet</class>
  <widget class="QWidget" name="OpenNetwork" >
   <property name="geometry" >
    <rect>

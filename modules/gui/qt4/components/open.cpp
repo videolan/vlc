@@ -51,10 +51,33 @@ QString FileOpenPanel::getUpdatedMRL()
     return ui.fileInput->currentText();
 }
 
+
+/**************************************************************************
+ * Disk open
+ **************************************************************************/
+DiskOpenPanel::DiskOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
+                                OpenPanel( _parent, _p_intf )
+{
+    ui.setupUi( this );
+}
+
+DiskOpenPanel::~DiskOpenPanel()
+{}
+
+void DiskOpenPanel::sendUpdate()
+{}
+
+QString DiskOpenPanel::getUpdatedMRL()
+{
+    //return ui.DiskInput->currentText();
+    return NULL;
+}
+
+
+
 /**************************************************************************
  * Net open
  **************************************************************************/
-#if 0
 NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
@@ -64,16 +87,20 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 NetOpenPanel::~NetOpenPanel()
 {}
 
-QString NetOpenPanel::getUpdatedMRL( )
-{
-
-}
-
+void NetOpenPanel::sendUpdate()
+{}
+/*
 void NetOpenPanel::sendUpdate()
 {
     QString *mrl = new QString();
     QString *cache = new QString();
     getUpdatedMRL( mrl, cache );,
     emit dataUpdated( mrl, cache );
+}*/
+
+QString NetOpenPanel::getUpdatedMRL()
+{
+//  return ui.NetInput->currentText();
+    return NULL;
 }
-#endif
+
