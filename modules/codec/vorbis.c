@@ -626,38 +626,59 @@ static void ParseVorbisComments( decoder_t *p_dec )
                            psz_name, psz_value );
             if( !strcasecmp( psz_name, "artist" ) )
             {
-                vlc_meta_SetArtist( p_input->input.p_item->p_meta,
-                                    psz_value );
-                input_ItemAddInfo( p_input->input.p_item,
-                                        _(VLC_META_INFO_CAT), _(VLC_META_ARTIST),
+                if( psz_value && ( *psz_value != '\0' ) )
+                {
+                    vlc_meta_SetArtist( p_input->input.p_item->p_meta,
+                                        psz_value );
+                    input_ItemAddInfo( p_input->input.p_item,
+                                        _(VLC_META_INFO_CAT),
+                                        _(VLC_META_ARTIST),
                                         "%s", psz_value );
+                }
             }
             else if( !strcasecmp( psz_name, "title" ) )
             {
-                vlc_meta_SetTitle( p_input->input.p_item->p_meta,
+                if( psz_value && ( *psz_value != '\0' ) )
+                {
+                    vlc_meta_SetTitle( p_input->input.p_item->p_meta,
                                     psz_value );
-                p_input->input.p_item->psz_name = strdup( psz_value );
+                    p_input->input.p_item->psz_name = strdup( psz_value );
+                }
             }
             else if( !strcasecmp( psz_name, "album" ) )
             {
-                vlc_meta_SetAlbum( p_input->input.p_item->p_meta,
+                if( psz_value && ( *psz_value != '\0' ) )
+                {
+                    vlc_meta_SetAlbum( p_input->input.p_item->p_meta,
                                     psz_value );
+                }
             }
             else if( !strcasecmp( psz_name, "musicbrainz_trackid" ) )
             {
-                vlc_meta_SetTrackID( p_input->input.p_item->p_meta,
+                if( psz_value && ( *psz_value != '\0' ) )
+                {
+                    vlc_meta_SetTrackID( p_input->input.p_item->p_meta,
                                     psz_value );
+                }
             }
+#if 0 //not used
             else if( !strcasecmp( psz_name, "musicbrainz_artistid" ) )
             {
-                vlc_meta_SetArtistID( p_input->input.p_item->p_meta,
+                if( psz_value && ( *psz_value != '\0' ) )
+                {
+                    vlc_meta_SetArtistID( p_input->input.p_item->p_meta,
                                     psz_value );
+                }
             }
             else if( !strcasecmp( psz_name, "musicbrainz_albumid" ) )
             {
-                vlc_meta_SetAlbumID( p_input->input.p_item->p_meta,
+                if( psz_value && ( *psz_value != '\0' ) )
+                {
+                    vlc_meta_SetAlbumID( p_input->input.p_item->p_meta,
                                     psz_value );
+                }
             }
+#endif
         }
         /* FIXME */
         var_SetInteger( p_input, "item-change", p_input->input.p_item->i_id );

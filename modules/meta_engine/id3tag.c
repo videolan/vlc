@@ -91,7 +91,7 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
         }
         i++;
     }
-
+#if 0 //not used
     i = 0;
 
     while( ( p_frame = id3_tag_findframe( p_id3_tag, "TXXX", i ) ) )
@@ -118,7 +118,7 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
         free( psz_desc );
         i++;
     }
-    
+#endif
     i = 0;
 
     while( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
