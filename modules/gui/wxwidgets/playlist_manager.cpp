@@ -355,7 +355,7 @@ void PlaylistManager::AppendItem( wxCommandEvent& event )
     node = FindItem( treectrl->GetRootItem(), p_add->i_node );
     if( !node.IsOk() ) goto update;
 
-    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, VLC_TRUE );
+    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, VLC_FALSE );
     if( !p_item ) goto update;
 
     item = FindItem( treectrl->GetRootItem(), p_add->i_item );

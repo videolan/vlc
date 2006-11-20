@@ -721,7 +721,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
                                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
             if( p_playlist )
             {
-                playlist_item_t * p_item = playlist_ItemGetById(                                                   p_playlist, (int)data, VLC_TRUE );
+                playlist_item_t * p_item = playlist_ItemGetById(                                                   p_playlist, (int)data, VLC_FALSE );
                 if( p_item )
                 {
                     p_parent->SetMrl( (const char*)p_item->p_input->psz_uri );
