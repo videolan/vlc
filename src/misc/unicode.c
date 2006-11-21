@@ -429,11 +429,7 @@ int utf8_mkdir( const char *dirname )
 
 void *utf8_opendir( const char *dirname )
 {
-
-#if defined (UNDER_CE) || defined (WIN32)
-    DIR *dir = vlc_opendir_wrapper( dirname );
-    return dir;
-#else
+    /* TODO: support for WinNT non-ACP filenames */
     const char *local_name = ToLocale( dirname );
 
     if( local_name != NULL )
@@ -444,8 +440,6 @@ void *utf8_opendir( const char *dirname )
     }
     else
         errno = ENOENT;
-#endif
-
     return NULL;
 }
 
@@ -458,11 +452,7 @@ char *utf8_readdir( void *dir )
     if( ent == NULL )
         return NULL;
 
-#if defined (UNDER_CE) || defined (WIN32)
-    return FromWide(ent->d_name);
-#else
     return vlc_fix_readdir( ent->d_name );
-#endif
 }
 
 static int dummy_select( const char *str )

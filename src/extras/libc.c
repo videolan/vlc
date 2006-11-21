@@ -416,13 +416,7 @@ void *vlc_opendir_wrapper( const char *psz_path )
         return (void *)p_dir;
     }
 
-    wchar_t wpath[MAX_PATH + 1];
-
-    if (!MultiByteToWideChar (CP_UTF8, 0, psz_path, -1, wpath, MAX_PATH))
-        return NULL;
-    wpath[MAX_PATH] = L'\0';
-    p_real_dir = _wopendir( wpath );
-
+    p_real_dir = opendir( psz_path );
     if ( p_real_dir == NULL )
         return NULL;
 
@@ -450,8 +444,8 @@ struct dirent *vlc_readdir_wrapper( void *_p_dir )
             p_dir->b_insert_back = VLC_FALSE;
             return &p_dir->dd_dir;
         }
-        
-        return _wreaddir( p_dir->p_real_dir );
+
+        return readdir( p_dir->p_real_dir );
     }
 
     /* Drive letters mode */
@@ -477,7 +471,7 @@ int vlc_closedir_wrapper( void *_p_dir )
 
     if ( p_dir->p_real_dir != NULL )
     {
-        int i_ret = _wclosedir( p_dir->p_real_dir );
+        int i_ret = closedir( p_dir->p_real_dir );
         free( p_dir );
         return i_ret;
     }
