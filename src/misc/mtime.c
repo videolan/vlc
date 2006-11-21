@@ -262,39 +262,8 @@ void mwait( mtime_t date )
                  - (mtime_t) tv_date.tv_usec
                  - 10000;
 
-    /* Linux/i386 has a granularity of 10 ms. It's better to be in advance
-     * than to be late. */
-    if( delay <= 0 )                 /* wished date is now or already passed */
-    {
-        return;
-    }
-
-#   if defined( PTH_INIT_IN_PTH_H )
-    pth_usleep( delay );
-
-#   elif defined( ST_INIT_IN_ST_H )
-    st_usleep( delay );
-
-#   else
-
-#       if defined( HAVE_NANOSLEEP )
-    {
-        struct timespec ts_delay;
-        ts_delay.tv_sec = delay / 1000000;
-        ts_delay.tv_nsec = (delay % 1000000) * 1000;
-
-        nanosleep( &ts_delay, NULL );
-    }
-
-#       else
-    tv_date.tv_sec = delay / 1000000;
-    tv_date.tv_usec = delay % 1000000;
-    /* see msleep() about select() errors */
-    select( 0, NULL, NULL, NULL, &tv_date );
-#       endif
-
-#   endif
-
+    if( delay > 0 )
+        msleep( delay );
 #endif
 }
 
