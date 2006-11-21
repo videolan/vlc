@@ -30,6 +30,10 @@
 #include <id3v2tag.h>
 #include <mpegfile.h>
 #include <flacfile.h>
+#include <uniquefileidentifierframe.h>
+#if 0 //for artist and album id
+#include <textidentificationframe.h>
+#endif
 
 static int  ReadMeta    ( vlc_object_t * );
 static int  DownloadArt ( vlc_object_t * );
@@ -103,6 +107,52 @@ static int ReadMeta( vlc_object_t *p_this )
 //            SET( Year, year ); Gra, this is an int, need to convert
 //            SET( Tracknum , track ); Same
 #undef SET
+
+    if( TagLib::MPEG::File *p_mpeg =
+        dynamic_cast<TagLib::MPEG::File *>(f.file() ) )
+    {
+        if( p_mpeg->ID3v2Tag() )
+        {
+            TagLib::ID3v2::Tag *tag = p_mpeg->ID3v2Tag();
+            TagLib::ID3v2::FrameList list = tag->frameListMap()["UFID"];
+            TagLib::ID3v2::UniqueFileIdentifierFrame* p_ufid;
+            for( TagLib::ID3v2::FrameList::Iterator iter = list.begin();
+                    iter != list.end(); iter++ )
+            {
+                p_ufid = dynamic_cast<TagLib::ID3v2::UniqueFileIdentifierFrame*>(*iter);
+                const char *owner = p_ufid->owner().toCString();
+                if (!strcmp( owner, "http://musicbrainz.org" ))
+                {
+                    /* ID3v2 UFID contains up to 64 bytes binary data
+                     * but in our case it will be a '\0' terminated string */
+                    char *psz_ufid = (char*) malloc( 64 );
+                    int j = 0;
+                    while( ( j < 63 ) && ( j < p_ufid->identifier().size() ) )
+                        psz_ufid[j] = p_ufid->identifier()[j++];
+                    psz_ufid[j] = '\0';
+                    vlc_meta_SetTrackID( p_meta, psz_ufid );
+                    free( psz_ufid );
+                }
+            }
+            /* musicbrainz artist and album id: not useful yet */
+#if 0
+            list = tag->frameListMap()["TXXX"];
+            TagLib::ID3v2::UserTextIdentificationFrame* p_txxx;
+            for( TagLib::ID3v2::FrameList::Iterator iter = list.begin();
+                    iter != list.end(); iter++ )
+            {
+                p_txxx = dynamic_cast<TagLib::ID3v2::UserTextIdentificationFrame*>(*iter);
+                const char *psz_desc = p_txxx->description().toCString();
+                if( !strncmp( psz_desc, "MusicBrainz Artist Id", 21 ) )
+                    vlc_meta_SetArtistID( p_meta,
+                            p_txxx->fieldList().toString().toCString() );
+                if( !strncmp( psz_desc, "MusicBrainz Album Id", 20 ) )
+                    vlc_meta_SetAlbumID( p_meta,
+                            p_txxx->fieldList().toString().toCString() );
+            }
+#endif
+        }
+    }
             DetectImage( f, p_meta );
 
             return VLC_SUCCESS;
