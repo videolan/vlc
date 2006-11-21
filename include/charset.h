@@ -27,6 +27,7 @@
 
 #include <stdarg.h>
 #include <sys/types.h>
+#include <dirent.h>
 
 VLC_EXPORT( void, LocaleFree, ( const char * ) );
 VLC_EXPORT( char *, FromLocale, ( const char * ) );
@@ -35,7 +36,7 @@ VLC_EXPORT( char *, ToLocale, ( const char * ) );
 
 VLC_EXPORT( int, utf8_open, ( const char *filename, int flags, mode_t mode ) );
 VLC_EXPORT( FILE *, utf8_fopen, ( const char *filename, const char *mode ) );
-VLC_EXPORT( void *, utf8_opendir, ( const char *dirname ) );
+VLC_EXPORT( DIR *, utf8_opendir, ( const char *dirname ) );
 VLC_EXPORT( char *, utf8_readdir, ( void *dir ) );
 VLC_EXPORT( int, utf8_scandir, ( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
 

@@ -466,7 +466,7 @@ struct module_symbols_t
     void *vlc_HashInsert_deprecated;
     void *vlc_HashLookup_deprecated;
     void *vlc_HashRetrieve_deprecated;
-    void * (*utf8_opendir_inner) (const char *dirname);
+    DIR * (*utf8_opendir_inner) (const char *dirname);
     FILE * (*utf8_fopen_inner) (const char *filename, const char *mode);
     char * (*utf8_readdir_inner) (void *dir);
     int (*utf8_stat_inner) (const char *filename, struct stat *buf);

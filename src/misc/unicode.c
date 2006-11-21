@@ -427,7 +427,7 @@ int utf8_mkdir( const char *dirname )
 }
 
 
-void *utf8_opendir( const char *dirname )
+DIR *utf8_opendir( const char *dirname )
 {
     /* TODO: support for WinNT non-ACP filenames */
     const char *local_name = ToLocale( dirname );
