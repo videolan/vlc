@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.0.2 on Tue Nov 21 15:28:41 2006 by fun@zod-->
+<!--Generated with glade3 3.0.2 on Tue Nov 21 16:05:19 2006 by fun@zod-->
 <glade-interface>
   <widget class="GtkWindow" id="window1">
     <property name="resizable">False</property>
@@ -141,14 +141,18 @@
                     <property name="visible">True</property>
                     <child>
                       <widget class="GtkHScale" id="time_s">
-                        <property name="width_request">107</property>
+                        <property name="width_request">183</property>
                         <property name="height_request">20</property>
                         <property name="visible">True</property>
-                        <property name="adjustment">0 0 100 1 10 10</property>
+                        <property name="adjustment">0 0 1000 10 100 0</property>
                         <property name="digits">-1</property>
                         <property name="draw_value">False</property>
                         <property name="value_pos">GTK_POS_RIGHT</property>
                       </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                      </packing>
                     </child>
                     <child>
                       <widget class="GtkSpinButton" id="vol">
@@ -164,10 +168,15 @@
                       </widget>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="fill">False</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkHBox" id="hbox4">

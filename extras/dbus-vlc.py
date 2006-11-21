@@ -30,6 +30,7 @@ import os
 
 global position
 global timer
+global playing
 
 def itemchange_handler(item):
     l_item.set_text(item)
@@ -52,15 +53,15 @@ def AddMRL(widget):
             interface.AddMRL("directory://" + mrl, True)
 
 def Next(widget):
-    interface.Next()
+    interface.Next(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     update(0)
 
 def Prev(widget):
-    interface.Prev()
+    interface.Prev(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     update(0)
 
 def Stop(widget):
-    interface.Stop()
+    interface.Stop(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     update(0)
 
 def update(widget):
@@ -69,17 +70,18 @@ def update(widget):
     GetPlayStatus(0)
 
 def GetPlayStatus(widget):
-    global timer
+    global playing
     status = str(interface.GetPlayStatus())
     if status == "playing":
         img_bt_toggle.set_from_stock("gtk-media-pause", gtk.ICON_SIZE_SMALL_TOOLBAR)
-        timer = gobject.timeout_add( 2000, timeset)
+        gobject.timeout_add( 2000, timeset)
+        playing = True
     else:
         img_bt_toggle.set_from_stock("gtk-media-play", gtk.ICON_SIZE_SMALL_TOOLBAR)
-        gobject.timeout_remove(timer)
+        playing = False
 
 def Quit(widget):
-    interface.Quit()
+    interface.Quit(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     l_item.set_text("")
 
 def TogglePause(widget):
@@ -90,14 +92,15 @@ def TogglePause(widget):
     update(0)
 
 def volchange(widget, data):
-    interface.VolumeSet(vol.get_value_as_int(), reply_handler=(lambda: None), error_handler=(lambda: None))
+    interface.VolumeSet(vol.get_value_as_int(), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
 
 def timechange(widget, x=None, y=None):
-    interface.PositionSet(time_s.get_value() * 10, reply_handler=(lambda: None), error_handler=(lambda: None))
+    interface.PositionSet(time_s.get_value(), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
 
 def timeset():
-    time_s.set_value(interface.PositionGet() / 10)
-    return True
+    global playing
+    time_s.set_value(interface.PositionGet())
+    return playing
 
 def expander(widget):
     if exp.get_expanded() == False:
