@@ -161,12 +161,12 @@ void DialogsProvider::quit()
 
 void DialogsProvider::streaminfoDialog()
 {
-    (new SoutDialog( p_intf ))->show();
     StreamInfoDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::streamingDialog()
 {
+    (new SoutDialog( p_intf ))->show();
 }
 
 void DialogsProvider::prefsDialog()
