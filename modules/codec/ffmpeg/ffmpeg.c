@@ -205,9 +205,6 @@ vlc_module_begin();
     set_callbacks( E_(OpenScaler), E_(CloseScaler) );
     add_integer( "swscale-mode", 0, NULL, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_mode_values, ppsz_mode_descriptions, 0 );
-
-    var_Create( p_module->p_libvlc_global, "avcodec", VLC_VAR_MUTEX );
-
 #else
     /* chroma conversion submodule */
     add_submodule();
@@ -234,6 +231,8 @@ vlc_module_begin();
     set_description( _("FFmpeg deinterlace video filter") );
     add_shortcut( "ffmpeg-deinterlace" );
 #endif
+
+    var_Create( p_module->p_libvlc_global, "avcodec", VLC_VAR_MUTEX );
 
 vlc_module_end();
 
