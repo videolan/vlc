@@ -23,6 +23,9 @@
 
 /* DBUS IDENTIFIERS */
 
+/* this is also defined in src/libvlc-common.c for one-instance mode */
+
+/* name registered on the session bus */
 #define VLC_DBUS_SERVICE        "org.videolan.vlc"
 #define VLC_DBUS_INTERFACE      "org.videolan.vlc"
 #define VLC_DBUS_OBJECT_PATH    "/org/videolan/vlc"
@@ -40,10 +43,9 @@
 #define REPLY_INIT \
     DBusMessage* p_msg = dbus_message_new_method_return( p_from ); \
     if( !p_msg ) return DBUS_HANDLER_RESULT_NEED_MEMORY; \
-    dbus_uint32_t i_serial = 0
 
 #define REPLY_SEND \
-    if( !dbus_connection_send( p_conn, p_msg, &i_serial ) ) \
+    if( !dbus_connection_send( p_conn, p_msg, NULL ) ) \
         return DBUS_HANDLER_RESULT_NEED_MEMORY; \
     dbus_connection_flush( p_conn ); \
     dbus_message_unref( p_msg ); \
@@ -53,10 +55,9 @@
     DBusMessage *p_msg = dbus_message_new_signal( VLC_DBUS_OBJECT_PATH, \
         VLC_DBUS_INTERFACE, signal ); \
     if( !p_msg ) return DBUS_HANDLER_RESULT_NEED_MEMORY; \
-    dbus_uint32_t i_serial = 0
 
 #define SIGNAL_SEND \
-    if( !dbus_connection_send( p_conn, p_msg, &i_serial ) ) \
+    if( !dbus_connection_send( p_conn, p_msg, NULL ) ) \
     return DBUS_HANDLER_RESULT_NEED_MEMORY; \
     dbus_message_unref( p_msg ); \
     dbus_connection_flush( p_conn ); \

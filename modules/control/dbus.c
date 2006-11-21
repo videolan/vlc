@@ -49,9 +49,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <sys/types.h> /* getpid() */
-#include <unistd.h> /* getpid() */
-
 #include "dbus.h"
 
 #include <vlc/vlc.h>
@@ -307,15 +304,6 @@ DBUS_METHOD( TogglePause )
     REPLY_SEND;
 }
 
-DBUS_SIGNAL( NewInstance )
-{ /* emits a signal with vlc pid */
-    SIGNAL_INIT( "NewInstance" );
-    OUT_ARGUMENTS;
-    dbus_uint32_t i_pid = (dbus_uint32_t) getpid();
-    ADD_UINT32( &i_pid );
-    SIGNAL_SEND;
-}
-
 DBUS_METHOD( AddMRL )
 { /* add the string to the playlist, and play it if the boolean is true */
     REPLY_INIT;
@@ -423,17 +411,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* we request the service org.videolan.vlc */    
-    dbus_bus_request_name( p_conn, VLC_DBUS_SERVICE,
-            DBUS_NAME_FLAG_REPLACE_EXISTING , &error );
-    if (dbus_error_is_set( &error ) )
-    { 
-        msg_Err( p_this, "Error requesting %s service: %s\n", VLC_DBUS_SERVICE,
-                error.message );
-        dbus_error_free( &error );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
+    /* we unregister the object /, registered by libvlc */
+    dbus_connection_unregister_object_path( p_conn, "/" );
 
     /* we register the object /org/videolan/vlc */
     dbus_connection_register_object_path( p_conn, VLC_DBUS_OBJECT_PATH,
@@ -479,8 +458,6 @@ static void Close   ( vlc_object_t *p_this )
 
 static void Run          ( intf_thread_t *p_intf )
 {
-    NewInstance( p_intf->p_sys->p_conn, NULL );
-
     while( !p_intf->b_die )
     {
         msleep( INTF_IDLE_SLEEP );
