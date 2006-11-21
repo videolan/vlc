@@ -920,12 +920,12 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 
                         if( p_item->psz_value_saved )
                             free( p_item->psz_value_saved );
-                        p_item->psz_value_saved = 0;
+                        p_item->psz_value_saved = NULL;
                         if( !p_item->psz_value || !p_item->psz_value_orig ||
                             (p_item->psz_value && p_item->psz_value_orig &&
                              strcmp(p_item->psz_value,p_item->psz_value_orig)))
                             p_item->psz_value_saved = p_item->psz_value ?
-                                strdup( p_item->psz_value ) : 0;
+                                strdup( p_item->psz_value ) : NULL;
 
                         vlc_mutex_unlock( p_item->p_lock );
 
@@ -1187,7 +1187,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
             if( p_item->b_unsaveable )
                 /*obvious*/
                 continue;
-            
+
             if( b_autosave && !p_item->b_autosave )
             {
                 i_value = p_item->i_value_saved;
