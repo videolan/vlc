@@ -33,6 +33,7 @@ global timer
 global playing
 
 def itemchange_handler(item):
+    gobject.timeout_add( 2000, timeset)
     l_item.set_text(item)
 
 bus = dbus.SessionBus()
@@ -74,7 +75,6 @@ def GetPlayStatus(widget):
     status = str(interface.GetPlayStatus())
     if status == "playing":
         img_bt_toggle.set_from_stock("gtk-media-pause", gtk.ICON_SIZE_SMALL_TOOLBAR)
-        gobject.timeout_add( 2000, timeset)
         playing = True
     else:
         img_bt_toggle.set_from_stock("gtk-media-play", gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -191,6 +191,7 @@ vol.connect('scroll-event',     volchange)
 time_s.connect('adjust-bounds', timechange)
 
 time_s.set_update_policy(gtk.UPDATE_DISCONTINUOUS)
+gobject.timeout_add( 2000, timeset)
 
 library = "/media/mp3"
 

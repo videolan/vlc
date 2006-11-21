@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.0.2 on Tue Nov 21 16:05:19 2006 by fun@zod-->
+<!--Generated with glade3 3.0.2 on Tue Nov 21 18:02:27 2006 by fun@zod-->
 <glade-interface>
   <widget class="GtkWindow" id="window1">
     <property name="resizable">False</property>
@@ -141,7 +141,7 @@
                     <property name="visible">True</property>
                     <child>
                       <widget class="GtkHScale" id="time_s">
-                        <property name="width_request">183</property>
+                        <property name="width_request">180</property>
                         <property name="height_request">20</property>
                         <property name="visible">True</property>
                         <property name="adjustment">0 0 1000 10 100 0</property>
@@ -165,6 +165,7 @@
                         <property name="snap_to_ticks">True</property>
                         <property name="numeric">True</property>
                         <property name="update_policy">GTK_UPDATE_IF_VALID</property>
+                        <property name="tooltip" translatable="yes">Volume in %</property>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
@@ -247,7 +248,7 @@
                     <property name="visible">True</property>
                     <child>
                       <widget class="GtkLabel" id="item">
-                        <property name="width_request">185</property>
+                        <property name="width_request">180</property>
                         <property name="height_request">20</property>
                         <property name="visible">True</property>
                         <property name="justify">GTK_JUSTIFY_CENTER</property>
