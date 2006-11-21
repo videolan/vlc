@@ -20,9 +20,7 @@ else
 COBJECTS = utils.o video-jni.o audio-jni.o input-jni.o playlist-jni.o vlm-jni.o core-jni.o graphics-jni.o
 
 JAVACXXFLAGS = -I. -Isrc -I../../ -I ../../include -I../../../include  $(JINCLUDES) `top_builddir=../../.. ../../../vlc-config --cflags pic` -c
-
-.cc.o:
-	$(CXX) $? $(CXXFLAGS) $(JAVACXXFLAGS) -o $@
+AM_CXXFLAGS = $(JAVACXXFLAGS)
 
 all-am: $(COBJECTS)
 
