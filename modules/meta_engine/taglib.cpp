@@ -30,7 +30,6 @@
 #include <id3v2tag.h>
 #include <mpegfile.h>
 #include <flacfile.h>
-#include <vorbisfile.h>
 #include <uniquefileidentifierframe.h>
 #if 0 //for artist and album id
 #include <textidentificationframe.h>
