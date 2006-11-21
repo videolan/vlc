@@ -46,7 +46,9 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     ui.Tab->addTab(netOpenPanel, "Network");
     ui.advancedFrame->hide();
 
-    BUTTONACT( ui.advancedButton , toggleAdvancedPanel()  );
+    BUTTONACT( ui.closeButton, ok());
+    BUTTONACT( ui.cancelButton, cancel());
+    BUTTONACT( ui.advancedButton , toggleAdvancedPanel() );
 }
 
 OpenDialog::~OpenDialog()

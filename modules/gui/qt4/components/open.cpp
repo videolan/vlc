@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+
+#include "qt4.hpp"
 #include "components/open.hpp"
 
 /**************************************************************************
@@ -38,6 +40,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
+    BUTTONACT( ui.extraAudioButton, toggleExtraAudio() );
 }
 
 FileOpenPanel::~FileOpenPanel()
@@ -49,6 +52,18 @@ void FileOpenPanel::sendUpdate()
 QString FileOpenPanel::getUpdatedMRL()
 {
     return ui.fileInput->currentText();
+}
+
+void FileOpenPanel::toggleExtraAudio()
+{
+   if (ui.audioGroupBox->isVisible())
+   {
+       ui.audioGroupBox->hide();
+   }
+   else
+   {
+      ui.audioGroupBox->show();
+   }
 }
 
 

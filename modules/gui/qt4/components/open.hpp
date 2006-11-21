@@ -59,9 +59,9 @@ private:
     Ui::OpenFile ui;
 public slots:
     virtual void sendUpdate() ;
+    void toggleExtraAudio() ;
 signals:
     void dataUpdated( QString, QString ) ;
-
 };
 
 class NetOpenPanel: public OpenPanel
