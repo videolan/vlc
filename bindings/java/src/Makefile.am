@@ -14,9 +14,7 @@ libjvlc_la_LIBADD = ../../../src/libvlc-control.la $(LIBJINCLUDES)
 if BUILD_JAVA
 
 if USE_LIBTOOL
-
-jvlcdir = $(libdir)
-jvlc_LTLIBRARIES = libjvlc.la
+lib_LTLIBRARIES = libjvlc.la
 else
 
 COBJECTS = utils.o video-jni.o audio-jni.o input-jni.o playlist-jni.o vlm-jni.o core-jni.o graphics-jni.o
