@@ -91,7 +91,7 @@ endif
 #
 # cross compiling
 #
-HOSTCONF=--host=$(HOST) --build=$(BUILD)
+HOSTCONF=--target=$(HOST) --host=$(HOST) --build=$(BUILD)
 ifneq ($(BUILD),$(HOST))
     #
     # Compiling for MinGW under Cygwin could be deemed as cross compiling
@@ -1540,7 +1540,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 .gcrypt: libgcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --program-prefix="" CFLAGS="$(CFLAGS)" && sed -i 46s@sys/times.h@sys/time.h@ cipher/random.c && make && make install)
+	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) --program-prefix="" CFLAGS="$(CFLAGS)" && sed -i 46s@sys/times.h@sys/time.h@ cipher/random.c && make && make install)
 else
 ifeq ($(HOST),i686-apple-darwin8)
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm CFLAGS="$(CFLAGS)" && make && make install)
@@ -1567,7 +1567,7 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 
 .gnutls: gnutls .gcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --program-prefix="" && cd gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc --program-prefix="" && cd gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && cd gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
 endif
@@ -1728,7 +1728,7 @@ tiff: tiff-$(TIFF_VERSION).tar.gz
 
 .tiff: tiff
 ifdef HAVE_WIN32
-	(cd $<; ./configure --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no --prefix=$(PREFIX) --host=$(HOST) &&make -C port && make -C libtiff && make -C libtiff install)
+	(cd $<; ./configure  --target=i586-mingw32msvc --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no --prefix=$(PREFIX) --host=$(HOST) &&make -C port && make -C libtiff && make -C libtiff install)
 else
 	(cd $<; ./configure --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no --prefix=$(PREFIX) && make -C port &&make -C libtiff && make -C libtiff install)
 endif
