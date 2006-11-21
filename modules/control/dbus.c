@@ -459,6 +459,8 @@ static void Close   ( vlc_object_t *p_this )
     PL_UNLOCK;
     pl_Release( p_playlist );
 
+    dbus_connection_unref( p_intf->p_sys->p_conn );
+
     free( p_intf->p_sys );
 }
 

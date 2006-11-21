@@ -1840,6 +1840,7 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
 
 #ifdef HAVE_HAL_1
         libhal_ctx_shutdown( ctx, NULL );
+        dbus_connection_unref( p_connection );
 #else
         hal_shutdown( ctx );
 #endif

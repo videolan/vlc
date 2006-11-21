@@ -32,6 +32,7 @@
  *****************************************************************************/
 struct probe_sys_t
 {
+    DBusConnection *p_connection;
     LibHalContext *p_ctx;
     int            i_devices;
     device_t     **pp_devices;
@@ -88,10 +89,12 @@ static int Open( vlc_object_t *p_this )
         free( p_probe->p_sys );
         return VLC_EGENERIC;
     }
+    p_sys->p_connection = p_connection;
     libhal_ctx_set_dbus_connection( p_probe->p_sys->p_ctx, p_connection );
     if( !libhal_ctx_init( p_probe->p_sys->p_ctx, &dbus_error ) )
     {
         msg_Err( p_probe, "hal not available : %s", dbus_error.message );
+        dbus_connection_unref( p_connection );
         dbus_error_free( &dbus_error );
         free( p_sys );
         return VLC_EGENERIC;
@@ -106,6 +109,7 @@ static void Close( vlc_object_t *p_this )
 {
     device_probe_t *p_probe = (device_probe_t *) p_this;
     probe_sys_t *p_sys = p_probe->p_sys;
+    dbus_connection_unref( p_sys->p_connection );
     free( p_sys );
 }
 

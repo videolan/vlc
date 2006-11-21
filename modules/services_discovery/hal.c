@@ -196,6 +196,8 @@ static void Close( vlc_object_t *p_this )
     }
     free( p_sys );
 #ifdef HAVE_HAL_1
+    dbus_connection_unref( p_sys->p_connection );
+
     struct udi_input_id_t *p_udi_entry;
 
     while( p_sys->i_devices_number > 0 )
