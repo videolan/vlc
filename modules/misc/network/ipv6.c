@@ -42,13 +42,13 @@
 static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 # define close closesocket
 
-#ifndef MCAST_JOIN_SOURCE_GROUP
+# ifndef MCAST_JOIN_SOURCE_GROUP
 /*
  * I hate manual definitions: Error-prone. Portability hell.
  * Developers shall use UP-TO-DATE compilers. Full point.
  * If you remove the warning, you remove the whole ifndef.
  */
-# warning Your C headers are out-of-date. Please update.
+#  warning Your C headers are out-of-date. Please update.
 
 /* Most (all?) Mingw32 versions in use are yet to pick up Vista stuff */
 #  define MCAST_JOIN_SOURCE_GROUP 45 /* from <ws2ipdef.h> */
@@ -58,8 +58,10 @@ struct group_source_req
        struct sockaddr_storage gsr_group;      /* group address */
        struct sockaddr_storage gsr_source;     /* source address */
 };
-#endif
-
+# endif
+# ifndef IPV6_PROTECTION_LEVEL
+#  warning Your C headers are out-of-date. Please update.
+# endif
 #else
 #   include <sys/types.h>
 #   include <unistd.h>
@@ -184,15 +186,9 @@ static int OpenUDP( vlc_object_t * p_this )
     p_socket->v6only = 1;
 #endif
 
-#ifdef WIN32
-# ifndef IPV6_PROTECTION_LEVEL
-#   define IPV6_PROTECTION_LEVEL 23
-#  endif
-    {
-        int i_val = 10 /*PROTECTION_LEVEL_UNRESTRICTED*/;
-        setsockopt( i_handle, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
-                    sizeof( i_val ) );
-    }
+#ifdef IPV6_PROTECTION_LEVEL
+    setsockopt (i_handle, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL,
+                &(int){ PROTECTION_LEVEL_UNRESTRICTED }, sizeof (int));
 #endif
 
     /* We may want to reuse an already used socket */
