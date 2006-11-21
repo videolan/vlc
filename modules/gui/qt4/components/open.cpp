@@ -40,6 +40,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
+    ui.audioGroupBox->hide();
     BUTTONACT( ui.extraAudioButton, toggleExtraAudio() );
 }
 
