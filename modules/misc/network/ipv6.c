@@ -38,6 +38,28 @@
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   define if_nametoindex( str ) atoi( str )
+
+static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
+# define close closesocket
+
+#ifndef MCAST_JOIN_SOURCE_GROUP
+/*
+ * I hate manual definitions: Error-prone. Portability hell.
+ * Developers shall use UP-TO-DATE compilers. Full point.
+ * If you remove the warning, you remove the whole ifndef.
+ */
+# warning Your C headers are out-of-date. Please update.
+
+/* Most (all?) Mingw32 versions in use are yet to pick up Vista stuff */
+#  define MCAST_JOIN_SOURCE_GROUP 45 /* from <ws2ipdef.h> */
+struct group_source_req
+{
+       uint32_t           gsr_interface;  /* interface index */
+       struct sockaddr_storage gsr_group;      /* group address */
+       struct sockaddr_storage gsr_source;     /* source address */
+};
+#endif
+
 #else
 #   include <sys/types.h>
 #   include <unistd.h>
@@ -48,26 +70,6 @@
 #endif
 
 #include "network.h"
-
-#if defined(WIN32)
-static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
-# define close closesocket
-#endif
-
-#ifndef MCAST_JOIN_SOURCE_GROUP
-# ifdef WIN32
-/* Most (all?) Mingw32 versions in use are yet to pick up Vista stuff */
-#  define MCAST_JOIN_SOURCE_GROUP 45 /* from <ws2ipdef.h> */
-# else
-#  define MCAST_JOIN_SOURCE_GROUP 46
-# endif
-struct group_source_req
-{
-       uint32_t           gsr_interface;  /* interface index */
-       struct sockaddr_storage gsr_group;      /* group address */
-       struct sockaddr_storage gsr_source;     /* source address */
-};
-#endif
 
 /*****************************************************************************
  * Local prototypes
