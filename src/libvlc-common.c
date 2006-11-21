@@ -66,10 +66,6 @@
 #   include <locale.h>
 #endif
 
-#ifdef HAVE_DBUS_3
-#   include <dbus/dbus.h>
-#endif
-
 #ifdef HAVE_HAL
 #   include <hal/libhal.h>
 #endif
@@ -218,41 +214,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     return p_libvlc;
 }
-
-/*
- * D-Bus callbacks needed in libvlc_InternalInit()
- */
-#ifdef HAVE_DBUS_3
-/* Handling of messages received on / object */
-static DBusHandlerResult handle_root
-    ( DBusConnection *p_conn, DBusMessage *p_from, void *p_data ) 
-{
-    DBusMessage* p_msg = dbus_message_new_method_return( p_from );
-    if( !p_msg ) return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    DBusMessageIter args;
-    dbus_message_iter_init_append( p_msg, &args );
-    dbus_uint32_t i_serial = 0;
-
-    char *p_root = malloc( strlen( "<node name='/'></node>" ) );
-    if (!p_root ) return DBUS_HANDLER_RESULT_NEED_MEMORY;
-    sprintf( p_root, "<node name='/'></node>" );
-
-    if( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &p_root ) )
-            return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    if( !dbus_connection_send( p_conn, p_msg, &i_serial ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-    dbus_connection_flush( p_conn );
-    dbus_message_unref( p_msg );
-    return DBUS_HANDLER_RESULT_HANDLED;
-}
-/* vtable passed to dbus_connection_register_object_path() */
-static DBusObjectPathVTable vlc_dbus_root_vtable = {
-    NULL, handle_root, NULL, NULL, NULL, NULL
-};
-
-#endif
 
 /**
  * Initialize a libvlc instance
@@ -607,138 +568,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
      * System specific configuration
      */
     system_Configure( p_libvlc, &i_argc, ppsz_argv );
-
-#ifdef HAVE_DBUS_3
-    /* Initialise D-Bus interface, check for other instances */
-    DBusConnection  *p_conn;
-    DBusError       dbus_error;
-    int             i_dbus_service;
-
-    dbus_threads_init_default();
-    dbus_error_init( &dbus_error );
-
-    /* connect to the session bus */
-    p_conn = dbus_bus_get( DBUS_BUS_SESSION, &dbus_error );
-    if( !p_conn )
-    {
-        msg_Err( p_libvlc, "Failed to connect to the D-Bus session daemon: %s",
-                dbus_error.message );
-        dbus_error_free( &dbus_error );
-    }
-    else
-    {
-        /* we request the service org.videolan.vlc */
-        i_dbus_service = dbus_bus_request_name( p_conn, VLC_DBUS_SERVICE, 0, 
-                &dbus_error );
-        if( dbus_error_is_set( &dbus_error ) )
-        { 
-            msg_Err( p_libvlc, "Error requesting %s service: %s\n",
-                    VLC_DBUS_SERVICE, dbus_error.message );
-            dbus_error_free( &dbus_error );
-        }
-        else
-        {
-            if( i_dbus_service != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER )
-            {
-                if( config_GetInt( p_libvlc, "one-instance" ) )
-                {
-                    msg_Warn( p_libvlc,
-                            "Another vlc instance exists: will now exit");
-
-                    int i_input;
-                    DBusMessage* p_dbus_msg;
-                    DBusMessageIter dbus_args;
-                    DBusPendingCall* p_dbus_pending;
-                    dbus_bool_t b_play;
-
-                    for( i_input = optind;i_input < i_argc;i_input++ )
-                    {
-                        msg_Dbg( p_libvlc,
-                                "Give %s to other vlc\n",ppsz_argv[i_input] );
-
-                        p_dbus_msg = dbus_message_new_method_call(
-                                VLC_DBUS_SERVICE, VLC_DBUS_OBJECT_PATH,
-                                VLC_DBUS_INTERFACE, "AddMRL" );
-
-                        if ( NULL == p_dbus_msg )
-                        {
-                            msg_Err( p_libvlc, "D-Bus problem" );
-                            system_End( p_libvlc );
-                            exit( 0 );
-                        }
-
-                        /* append MRLs */
-                        dbus_message_iter_init_append( p_dbus_msg, &dbus_args );
-                        if ( !dbus_message_iter_append_basic( &dbus_args, 
-                                    DBUS_TYPE_STRING, &ppsz_argv[i_input] ) )
-                        {
-                            msg_Err( p_libvlc, "Out of memory" );
-                            dbus_message_unref( p_dbus_msg );
-                            system_End( p_libvlc );
-                            exit( 0 );
-                        }
-                        b_play = TRUE;
-                        if( config_GetInt( p_libvlc, "playlist-enqueue" ) )
-                            b_play = FALSE;
-                        if ( !dbus_message_iter_append_basic( &dbus_args,
-                                    DBUS_TYPE_BOOLEAN, &b_play ) )
-                        {
-                            msg_Err( p_libvlc, "Out of memory" );
-                            dbus_message_unref( p_dbus_msg );
-                            system_End( p_libvlc );
-                            exit( 0 );
-                        }
-
-                        /* send message and get a handle for a reply */
-                        if ( !dbus_connection_send_with_reply ( p_conn,
-                                    p_dbus_msg, &p_dbus_pending, -1 ) )
-                        {
-                            msg_Err( p_libvlc, "D-Bus problem" );
-                            dbus_message_unref( p_dbus_msg );
-                            system_End( p_libvlc );
-                            exit( 0 );
-                        }
-
-                        if ( NULL == p_dbus_pending )
-                        {
-                            msg_Err( p_libvlc, "D-Bus problem" );
-                            dbus_message_unref( p_dbus_msg );
-                            system_End( p_libvlc );
-                            exit( 0 );
-                        }
-                        dbus_connection_flush( p_conn );
-                        dbus_message_unref( p_dbus_msg );
-                        /* block until we receive a reply */
-                        dbus_pending_call_block( p_dbus_pending );
-                        dbus_pending_call_unref( p_dbus_pending );
-                    }
-
-                    /* bye bye */
-                    system_End( p_libvlc );
-                    exit( 0 );
-                }
-                else
-                {
-                    msg_Warn( p_libvlc, 
-                            "Name %s is already owned on the session bus",
-                            VLC_DBUS_SERVICE );
-                }
-            }
-            else
-            {
-                /* register "/" object */
-                if( !dbus_connection_register_object_path( p_conn, "/", 
-                        &vlc_dbus_root_vtable, NULL ) )
-                {
-                    msg_Err( p_libvlc, "Out of memory" );
-                }
-                msg_Dbg( p_libvlc, 
-                        "We are the primary owner of %s on the session bus",
-                        VLC_DBUS_SERVICE );
-            }
-        }
-    }
-#endif
 
     /*
      * Message queue options

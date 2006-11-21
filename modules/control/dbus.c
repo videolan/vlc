@@ -423,8 +423,17 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* we unregister the object /, registered by libvlc */
-    dbus_connection_unregister_object_path( p_conn, "/" );
+    /* we request the service org.videolan.vlc */    
+    dbus_bus_request_name( p_conn, VLC_DBUS_SERVICE,
+            DBUS_NAME_FLAG_REPLACE_EXISTING , &error );
+    if (dbus_error_is_set( &error ) )
+    { 
+        msg_Err( p_this, "Error requesting %s service: %s\n", VLC_DBUS_SERVICE,
+                error.message );
+        dbus_error_free( &error );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     /* we register the object /org/videolan/vlc */
     dbus_connection_register_object_path( p_conn, VLC_DBUS_OBJECT_PATH,
