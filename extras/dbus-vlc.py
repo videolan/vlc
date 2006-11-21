@@ -63,6 +63,7 @@ def Stop(widget):
 
 def update(widget):
     itemchange_handler(str(interface.GetPlayingItem()))
+    vol.set_value(interface.VolumeGet())
     GetPlayStatus(0)
 
 def GetPlayStatus(widget):
@@ -83,8 +84,11 @@ def TogglePause(widget):
         img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PLAY, gtk.ICON_SIZE_SMALL_TOOLBAR)
     update(0)
 
+def volchange(widget):
+    interface.VolumeSet(vol.get_value_as_int())
+
 def expander(widget):
-    if exp.get_label() == "More":
+    if exp.get_expanded() == False:
         exp.set_label("Less")
     else:
         exp.set_label("More")
@@ -133,7 +137,7 @@ expvbox     = xml.get_widget('expandvbox')
 menu        = xml.get_widget('menu1')
 menuitem    = xml.get_widget('menuquit')
 vlcicon     = xml.get_widget('eventicon')
-
+vol         = xml.get_widget('vol')
 
 window.connect('delete_event',  delete_event)
 window.connect('destroy',       destroy)
@@ -168,6 +172,7 @@ exp.connect('activate',         expander)
 menuitem.connect('activate',    destroy)
 vlcicon.set_events(gtk.gdk.BUTTON_PRESS_MASK)
 vlcicon.connect('button_press_event', icon_clicked)
+vol.connect('value-changed',    volchange)
 
 library = "/media/mp3"
 

@@ -67,6 +67,7 @@
 #define ADD_STRING( s ) DBUS_ADD( DBUS_TYPE_STRING, s )
 #define ADD_BOOL( b ) DBUS_ADD( DBUS_TYPE_BOOLEAN, b )
 #define ADD_UINT32( i ) DBUS_ADD( DBUS_TYPE_UINT32, i )
+#define ADD_UINT16( i ) DBUS_ADD( DBUS_TYPE_UINT16, i )
 
 /* XML data to answer org.freedesktop.DBus.Introspectable.Introspect requests */
 
@@ -102,6 +103,12 @@ const char* psz_introspection_xml_data =
 "    <method name=\"Next\">\n"
 "    </method>\n"
 "    <method name=\"Stop\">\n"
+"    </method>\n"
+"    <method name=\"VolumeSet\">\n"
+"      <arg type=\"q\" direction=\"in\" />\n"
+"    </method>\n"
+"    <method name=\"VolumeGet\">\n"
+"      <arg type=\"q\" direction=\"out\" />\n"
 "    </method>\n"
 "  </interface>\n"
 "</node>\n"

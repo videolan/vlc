@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.0.2 on Mon Nov 20 00:07:47 2006 by fun@zod-->
+<!--Generated with glade3 3.0.2 on Tue Nov 21 12:55:24 2006 by fun@zod-->
 <glade-interface>
   <widget class="GtkWindow" id="window1">
     <property name="resizable">False</property>
@@ -132,10 +132,54 @@
         <child>
           <widget class="GtkExpander" id="expander2">
             <property name="visible">True</property>
+            <property name="expanded">True</property>
             <property name="tooltip" translatable="yes">Show more options</property>
             <child>
               <widget class="GtkVBox" id="vbox2">
                 <property name="visible">True</property>
+                <child>
+                  <widget class="GtkHBox" id="hbox2">
+                    <property name="visible">True</property>
+                    <child>
+                      <widget class="GtkHScale" id="times">
+                        <property name="width_request">107</property>
+                        <property name="height_request">20</property>
+                        <property name="visible">True</property>
+                        <property name="adjustment">0 0 100 1 10 10</property>
+                        <property name="digits">-1</property>
+                        <property name="draw_value">False</property>
+                        <property name="value_pos">GTK_POS_RIGHT</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="timel">
+                        <property name="width_request">30</property>
+                        <property name="height_request">20</property>
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">time</property>
+                      </widget>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkSpinButton" id="vol">
+                        <property name="width_request">42</property>
+                        <property name="height_request">20</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="adjustment">100 0 100 1 10 10</property>
+                        <property name="snap_to_ticks">True</property>
+                        <property name="numeric">True</property>
+                        <property name="wrap">True</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                  </widget>
+                </child>
                 <child>
                   <widget class="GtkHBox" id="hbox4">
                     <property name="visible">True</property>
@@ -196,6 +240,9 @@
                       </packing>
                     </child>
                   </widget>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkHBox" id="hbox3">
@@ -230,7 +277,7 @@
                     </child>
                   </widget>
                   <packing>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </widget>

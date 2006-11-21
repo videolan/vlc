@@ -55,6 +55,7 @@
 #include "dbus.h"
 
 #include <vlc/vlc.h>
+#include <vlc/aout.h>
 #include <vlc/intf.h>
 #include <vlc_meta.h>
 #include <vlc_input.h>
@@ -106,6 +107,44 @@ DBUS_METHOD( Quit )
     playlist_Stop( p_playlist );
     pl_Release( ((vlc_object_t*) p_this) );
     ((vlc_object_t*)p_this)->p_libvlc->b_die = VLC_TRUE;
+    REPLY_SEND;
+}
+
+DBUS_METHOD( VolumeGet )
+{ /* get volume in percentage */
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    dbus_uint16_t i_vol;
+    /* 2nd argument of aout_VolumeGet is uint16 */
+    aout_VolumeGet( (vlc_object_t*) p_this, &i_vol );
+    i_vol = ( 100 * i_vol ) / AOUT_VOLUME_MAX;
+    ADD_UINT16( &i_vol );
+    REPLY_SEND;
+}
+
+DBUS_METHOD( VolumeSet )
+{ /* set volume in percentage */
+    REPLY_INIT;
+
+    DBusError error;
+    dbus_error_init( &error );
+
+    dbus_uint16_t i_vol;
+
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_UINT16, &i_vol,
+            DBUS_TYPE_INVALID );
+
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+                error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    aout_VolumeSet( (vlc_object_t*) p_this, ( AOUT_VOLUME_MAX / 100 ) * i_vol );
+
     REPLY_SEND;
 }
 
@@ -291,6 +330,8 @@ DBUS_METHOD( handle_messages )
     METHOD_FUNC( "Next",            Next );
     METHOD_FUNC( "Quit",            Quit );
     METHOD_FUNC( "Stop",            Stop );
+    METHOD_FUNC( "VolumeSet",       VolumeSet );
+    METHOD_FUNC( "VolumeGet",       VolumeGet );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
