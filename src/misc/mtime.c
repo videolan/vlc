@@ -329,7 +329,7 @@ void msleep( mtime_t delay )
     lldiv_t d = lldiv( delay, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
 
-# if (_POSIX_CLOCK_MONOTONIC - 0 >= 0)
+# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
     if( clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, NULL ) )
 # endif
         clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
