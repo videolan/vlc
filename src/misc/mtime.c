@@ -242,20 +242,13 @@ void mwait( mtime_t date )
     msleep( delay );
 
 #elif defined (HAVE_CLOCK_NANOSLEEP)
-# if defined (HAVE_TIMER_ABSTIME_THAT_ACTUALLY_WORKS_WELL)
     lldiv_t d = lldiv( date, 1000000 );
-    struct timespec ts = { d.quot, d.rem };
+    struct timespec ts = { d.quot, d.rem * 1000 };
 
-#  if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
+# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
     if( clock_nanosleep( CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL ) )
-#  endif
-        clock_nanosleep( CLOCK_REALTIME, TIMER_ABSTIME, &ts, NULL );
-# else
-    date -= mdate ();
-    if( date <= 0)
-        return;
-    msleep( date );
 # endif
+        clock_nanosleep( CLOCK_REALTIME, TIMER_ABSTIME, &ts, NULL );
 #else
 
     struct timeval tv_date;
