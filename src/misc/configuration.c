@@ -483,7 +483,7 @@ module_t *config_FindModule( vlc_object_t *p_this, const char *psz_name )
  * this module might be unloaded from memory at any time (remember HideModule).
  * This is why we need to create an exact copy of the config data.
  *****************************************************************************/
-void config_Duplicate( module_t *p_module, module_config_t *p_orig )
+void config_Duplicate( module_t *p_module, const module_config_t *p_orig )
 {
     int i, j, i_lines = 1;
     module_config_t *p_item;

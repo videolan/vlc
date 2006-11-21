@@ -195,7 +195,7 @@ VLC_EXPORT( void,   __config_ResetAll, ( vlc_object_t * ) );
 VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) );
 VLC_EXPORT( module_t *, config_FindModule,( vlc_object_t *, const char * ) );
 
-VLC_EXPORT( void, config_Duplicate, ( module_t *, module_config_t * ) );
+VLC_EXPORT( void, config_Duplicate, ( module_t *, const module_config_t * ) );
             void  config_Free       ( module_t * );
 
 VLC_EXPORT( void, config_SetCallbacks, ( module_config_t *, module_config_t * ) );

@@ -70,7 +70,7 @@ struct module_symbols_t
     void (*__config_ResetAll_inner) (vlc_object_t *);
     module_config_t * (*config_FindConfig_inner) (vlc_object_t *, const char *);
     module_t * (*config_FindModule_inner) (vlc_object_t *, const char *);
-    void (*config_Duplicate_inner) (module_t *, module_config_t *);
+    void (*config_Duplicate_inner) (module_t *, const module_config_t *);
     void (*config_SetCallbacks_inner) (module_config_t *, module_config_t *);
     void (*config_UnsetCallbacks_inner) (module_config_t *);
     int (*__intf_Eject_inner) (vlc_object_t *, const char *);
