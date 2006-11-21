@@ -65,8 +65,11 @@
 #elif defined( WIN32 )
 #   include <windows.h>
 #   include <winioctl.h>
-#else
+#elif defined (__linux__)
+#   include <sys/ioctl.h>
 #   include <linux/cdrom.h>
+#else
+#   error FIXME
 #endif
 
 #include "cdrom_internals.h"
