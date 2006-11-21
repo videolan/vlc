@@ -25,9 +25,11 @@ import dbus.glib
 import gtk
 import gtk.glade
 import egg.trayicon
+import gobject
 import os
 
 global position
+global timer
 
 def itemchange_handler(item):
     l_item.set_text(item)
@@ -67,11 +69,14 @@ def update(widget):
     GetPlayStatus(0)
 
 def GetPlayStatus(widget):
+    global timer
     status = str(interface.GetPlayStatus())
     if status == "playing":
         img_bt_toggle.set_from_stock("gtk-media-pause", gtk.ICON_SIZE_SMALL_TOOLBAR)
+        timer = gobject.timeout_add( 2000, timeset)
     else:
         img_bt_toggle.set_from_stock("gtk-media-play", gtk.ICON_SIZE_SMALL_TOOLBAR)
+        gobject.timeout_remove(timer)
 
 def Quit(widget):
     interface.Quit()
@@ -84,8 +89,15 @@ def TogglePause(widget):
         img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PLAY, gtk.ICON_SIZE_SMALL_TOOLBAR)
     update(0)
 
-def volchange(widget):
-    interface.VolumeSet(vol.get_value_as_int())
+def volchange(widget, data):
+    interface.VolumeSet(vol.get_value_as_int(), reply_handler=(lambda: None), error_handler=(lambda: None))
+
+def timechange(widget, x=None, y=None):
+    interface.PositionSet(time_s.get_value() * 10, reply_handler=(lambda: None), error_handler=(lambda: None))
+
+def timeset():
+    time_s.set_value(interface.PositionGet() / 10)
+    return True
 
 def expander(widget):
     if exp.get_expanded() == False:
@@ -138,6 +150,8 @@ menu        = xml.get_widget('menu1')
 menuitem    = xml.get_widget('menuquit')
 vlcicon     = xml.get_widget('eventicon')
 vol         = xml.get_widget('vol')
+time_s      = xml.get_widget('time_s')
+time_l      = xml.get_widget('time_l')
 
 window.connect('delete_event',  delete_event)
 window.connect('destroy',       destroy)
@@ -153,13 +167,10 @@ eventbox.add(image)
 image.set_from_icon_name("vlc", gtk.ICON_SIZE_MENU)
 tray.show_all()
 
-def fuck():
-    return
-
 def icon_clicked(widget, event):
     update(0)
 
-menu.attach_to_widget(eventbox, fuck)
+menu.attach_to_widget(eventbox,None)
 
 bt_close.connect('clicked',     destroy)
 bt_quit.connect('clicked',      Quit)
@@ -172,7 +183,11 @@ exp.connect('activate',         expander)
 menuitem.connect('activate',    destroy)
 vlcicon.set_events(gtk.gdk.BUTTON_PRESS_MASK)
 vlcicon.connect('button_press_event', icon_clicked)
-vol.connect('value-changed',    volchange)
+vol.connect('change-value',     volchange)
+vol.connect('scroll-event',     volchange)
+time_s.connect('adjust-bounds', timechange)
+
+time_s.set_update_policy(gtk.UPDATE_DISCONTINUOUS)
 
 library = "/media/mp3"
 

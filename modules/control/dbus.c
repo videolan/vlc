@@ -110,8 +110,63 @@ DBUS_METHOD( Quit )
     REPLY_SEND;
 }
 
+DBUS_METHOD( PositionGet )
+{ /* returns position as an int in the range [0;1000] */
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    vlc_value_t position;
+    dbus_uint16_t i_pos;
+
+    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
+    input_thread_t *p_input = p_playlist->p_input;
+
+    if( !p_input )
+        i_pos = 0;
+    else
+    {
+        var_Get( p_input, "position", &position );
+        i_pos = position.f_float * 1000 ;
+    }
+    ADD_UINT16( &i_pos );
+    pl_Release( ((vlc_object_t*) p_this) );
+    REPLY_SEND;
+}
+
+DBUS_METHOD( PositionSet )
+{ /* set position from an int in the range [0;1000] */
+
+    REPLY_INIT;
+    vlc_value_t position;
+    dbus_uint16_t i_pos;
+
+    DBusError error;
+    dbus_error_init( &error );
+
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_UINT16, &i_pos,
+            DBUS_TYPE_INVALID );
+
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+                error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
+    input_thread_t *p_input = p_playlist->p_input;
+
+    if( p_input )
+    {
+        position.f_float = ((float)i_pos) / 1000;
+        var_Set( p_input, "position", position );
+    }
+    pl_Release( ((vlc_object_t*) p_this) );
+    REPLY_SEND;
+}
+
 DBUS_METHOD( VolumeGet )
-{ /* get volume in percentage */
+{ /* returns volume in percentage */
     REPLY_INIT;
     OUT_ARGUMENTS;
     dbus_uint16_t i_vol;
@@ -332,6 +387,8 @@ DBUS_METHOD( handle_messages )
     METHOD_FUNC( "Stop",            Stop );
     METHOD_FUNC( "VolumeSet",       VolumeSet );
     METHOD_FUNC( "VolumeGet",       VolumeGet );
+    METHOD_FUNC( "PositionSet",     PositionSet );
+    METHOD_FUNC( "PositionGet",     PositionGet );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
