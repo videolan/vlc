@@ -63,7 +63,7 @@
 #include <tchar.h>
 #endif
 
-static int ConfigStringToKey( char * );
+static int ConfigStringToKey( const char * );
 static char *ConfigKeyToString( int );
 
 /*****************************************************************************
@@ -754,29 +754,24 @@ void __config_ResetAll( vlc_object_t *p_this )
 int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     vlc_list_t *p_list;
-    module_t *p_parser;
-    module_config_t *p_item;
     FILE *file;
-    char line[1024];
-    char *p_index, *psz_option_name, *psz_option_value;
-    char *psz_filename, *psz_homedir, *psz_configfile;
+    char *p_index;
+    char *psz_filename;
     int i_index;
 
-    psz_configfile = p_this->p_libvlc->psz_configfile;
+    const char *psz_configfile = p_this->p_libvlc->psz_configfile;
     if( !psz_configfile || !psz_configfile )
     {
-        psz_homedir = p_this->p_libvlc->psz_homedir;
+        const char *psz_homedir = p_this->p_libvlc->psz_homedir;
         if( !psz_homedir )
         {
             msg_Err( p_this, "psz_homedir is null" );
             return -1;
         }
-        psz_filename = (char *)malloc( sizeof("/" CONFIG_DIR "/" CONFIG_FILE) +
-                                       strlen(psz_homedir) );
-        if( psz_filename )
-            sprintf( psz_filename,
-                     "%s" DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE,
-                     psz_homedir );
+
+        if( asprintf( &psz_filename, "%s" DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE,
+                      psz_homedir ) == -1 )
+            psz_filename = NULL;
     }
     else
     {
@@ -795,20 +790,22 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     vlc_mutex_lock( &p_this->p_libvlc->config_lock );
 
     file = utf8_fopen( psz_filename, "rt" );
-    if( !file )
+    if( file == NULL )
     {
         msg_Warn( p_this, "config file %s does not exist yet", psz_filename );
         free( psz_filename );
         vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
         return -1;
     }
+    free( psz_filename );
 
     /* Look for the selected module, if NULL then save everything */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        char line[1024];
 
         if( psz_module_name
              && strcmp( psz_module_name, p_parser->psz_object_name ) )
@@ -841,6 +838,9 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         /* Now try to load the options in this section */
         while( fgets( line, 1024, file ) )
         {
+            const char *psz_option_name, *psz_option_value;
+            module_config_t *p_item;
+
             if( line[0] == '[' ) break; /* end of section */
 
             /* ignore comments or empty lines */
@@ -945,7 +945,6 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     vlc_list_release( p_list );
 
     fclose( file );
-    free( psz_filename );
 
     vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
 
@@ -1809,11 +1808,11 @@ char *config_GetUserDir( void )
 }
 
 
-static int ConfigStringToKey( char *psz_key )
+static int ConfigStringToKey( const char *psz_key )
 {
     int i_key = 0;
     unsigned int i;
-    char *psz_parser = strchr( psz_key, '-' );
+    const char *psz_parser = strchr( psz_key, '-' );
     while( psz_parser && psz_parser != psz_key )
     {
         for( i = 0; i < sizeof(vlc_modifiers) / sizeof(key_descriptor_t); i++ )
