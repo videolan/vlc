@@ -44,7 +44,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
 
             if( *psz_parser == '\0' )
                 break;
-            fprintf(stderr,"Add %s\n", psz_parser);
+            msg_Dbg( p_playlist, "Add services_discovery %s", psz_parser );
             /* Perform the addition */
             {
                 services_discovery_t *p_sd = vlc_object_create( p_playlist,
