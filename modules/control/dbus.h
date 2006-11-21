@@ -87,7 +87,7 @@ const char* psz_introspection_xml_data =
 "      <arg type=\"s\" direction=\"out\" />\n"
 "    </method>\n"
 "    <method name=\"TogglePause\">\n"
-"      <arg type=\"s\" direction=\"out\" />\n"
+"      <arg type=\"b\" direction=\"out\" />\n"
 "    </method>\n"
 "    <method name=\"AddMRL\">\n"
 "      <arg type=\"s\" direction=\"in\" />\n"
