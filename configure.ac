@@ -854,8 +854,8 @@ then
       AC_DEFINE( HAVE_DBUS_2, 1, [Define if you have the D-BUS library API >= 0.92] )
       AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30] )
       AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
-      VLC_ADD_LDFLAGS([screensaver libvlc],[$DBUS_LIBS])
-      VLC_ADD_CFLAGS([screensaver libvlc],[$DBUS_CFLAGS])
+      VLC_ADD_LDFLAGS([screensaver vlc],[$DBUS_LIBS])
+      VLC_ADD_CFLAGS([screensaver vlc],[$DBUS_CFLAGS])
       dnl Check for dbus control interface
         AC_ARG_ENABLE(dbus-control, [  --enable-dbus-control   D-BUS control interface (default disabled)])
         if test "${enable_dbus_control}" = "yes"
