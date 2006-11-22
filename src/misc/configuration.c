@@ -66,6 +66,27 @@
 static int ConfigStringToKey( const char * );
 static char *ConfigKeyToString( int );
 
+static inline void freenull (const void *p)
+{
+    if (p != NULL)
+        free ((void *)p);
+}
+
+static inline char *strdupnull (const char *src)
+{
+    if (src == NULL)
+        return NULL;
+    return strdup (src);
+}
+
+static inline char *_strdupnull (const char *src)
+{
+    if (src == NULL)
+        return NULL;
+    return strdup (_(src));
+}
+
+
 /*****************************************************************************
  * config_GetType: get the type of a variable (bool, int, float, string)
  *****************************************************************************
@@ -145,15 +166,14 @@ int __config_GetInt( vlc_object_t *p_this, const char *psz_name )
         msg_Err( p_this, "option %s does not exist", psz_name );
         return -1;
     }
-    if( (p_config->i_type!=CONFIG_ITEM_INTEGER) &&
-        (p_config->i_type!=CONFIG_ITEM_KEY) &&
-        (p_config->i_type!=CONFIG_ITEM_BOOL) )
+
+    if (!IsConfigIntegerType (p_config->i_type))
     {
         msg_Err( p_this, "option %s does not refer to an int", psz_name );
         return -1;
     }
 
-    return p_config->i_value;
+    return p_config->value.i;
 }
 
 /*****************************************************************************
@@ -174,13 +194,14 @@ float __config_GetFloat( vlc_object_t *p_this, const char *psz_name )
         msg_Err( p_this, "option %s does not exist", psz_name );
         return -1;
     }
-    if( p_config->i_type != CONFIG_ITEM_FLOAT )
+
+    if (!IsConfigFloatType (p_config->i_type))
     {
         msg_Err( p_this, "option %s does not refer to a float", psz_name );
         return -1;
     }
 
-    return p_config->f_value;
+    return p_config->value.f;
 }
 
 /*****************************************************************************
@@ -197,7 +218,6 @@ float __config_GetFloat( vlc_object_t *p_this, const char *psz_name )
 char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
 {
     module_config_t *p_config;
-    char *psz_value = NULL;
 
     p_config = config_FindConfig( p_this, psz_name );
 
@@ -207,22 +227,16 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
         msg_Err( p_this, "option %s does not exist", psz_name );
         return NULL;
     }
-    if( (p_config->i_type!=CONFIG_ITEM_STRING) &&
-        (p_config->i_type!=CONFIG_ITEM_FILE) &&
-        (p_config->i_type!=CONFIG_ITEM_DIRECTORY) &&
-        (p_config->i_type!=CONFIG_ITEM_MODULE_LIST) &&
-        (p_config->i_type!=CONFIG_ITEM_MODULE_LIST_CAT) &&
-        (p_config->i_type!=CONFIG_ITEM_MODULE_CAT) &&
-        (p_config->i_type!=CONFIG_ITEM_MODULE) )
+
+    if (!IsConfigStringType (p_config->i_type))
     {
         msg_Err( p_this, "option %s does not refer to a string", psz_name );
         return NULL;
     }
 
-
     /* return a copy of the string */
     vlc_mutex_lock( p_config->p_lock );
-    if( p_config->psz_value ) psz_value = strdup( p_config->psz_value );
+    char *psz_value = strdupnull (p_config->value.psz);
     vlc_mutex_unlock( p_config->p_lock );
 
     return psz_value;
@@ -250,13 +264,8 @@ void __config_PutPsz( vlc_object_t *p_this,
         msg_Warn( p_this, "option %s does not exist", psz_name );
         return;
     }
-    if( (p_config->i_type!=CONFIG_ITEM_STRING) &&
-        (p_config->i_type!=CONFIG_ITEM_FILE) &&
-        (p_config->i_type!=CONFIG_ITEM_DIRECTORY) &&
-        (p_config->i_type!=CONFIG_ITEM_MODULE_LIST) &&
-        (p_config->i_type!=CONFIG_ITEM_MODULE_CAT) &&
-        (p_config->i_type!=CONFIG_ITEM_MODULE_LIST_CAT) &&
-        (p_config->i_type!=CONFIG_ITEM_MODULE) )
+
+    if (!IsConfigStringType (p_config->i_type))
     {
         msg_Err( p_this, "option %s does not refer to a string", psz_name );
         return;
@@ -265,14 +274,16 @@ void __config_PutPsz( vlc_object_t *p_this,
     vlc_mutex_lock( p_config->p_lock );
 
     /* backup old value */
-    oldval.psz_string = p_config->psz_value;
+    oldval.psz_string = (char *)p_config->value.psz;
 
-    if( psz_value && *psz_value ) p_config->psz_value = strdup( psz_value );
-    else p_config->psz_value = NULL;
+    if ((psz_value != NULL) && *psz_value)
+        p_config->value.psz = strdup (psz_value);
+    else
+        p_config->value.psz = NULL;
 
     p_config->b_dirty = VLC_TRUE;
 
-    val.psz_string = p_config->psz_value;
+    val.psz_string = (char *)p_config->value.psz;
 
     vlc_mutex_unlock( p_config->p_lock );
 
@@ -306,38 +317,37 @@ void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
         msg_Warn( p_this, "option %s does not exist", psz_name );
         return;
     }
-    if( (p_config->i_type!=CONFIG_ITEM_INTEGER) &&
-        (p_config->i_type!=CONFIG_ITEM_KEY) &&
-        (p_config->i_type!=CONFIG_ITEM_BOOL) )
+
+    if (!IsConfigIntegerType (p_config->i_type))
     {
         msg_Err( p_this, "option %s does not refer to an int", psz_name );
         return;
     }
 
     /* backup old value */
-    oldval.i_int = p_config->i_value;
+    oldval.i_int = p_config->value.i;
 
     /* if i_min == i_max == 0, then do not use them */
-    if ((p_config->i_min == 0) && (p_config->i_max == 0))
+    if ((p_config->min.i == 0) && (p_config->max.i == 0))
     {
-        p_config->i_value = i_value;
+        p_config->value.i = i_value;
     }
-    else if (i_value < p_config->i_min)
+    else if (i_value < p_config->min.i)
     {
-        p_config->i_value = p_config->i_min;
+        p_config->value.i = p_config->min.i;
     }
-    else if (i_value > p_config->i_max)
+    else if (i_value > p_config->max.i)
     {
-        p_config->i_value = p_config->i_max;
+        p_config->value.i = p_config->max.i;
     }
     else
     {
-        p_config->i_value = i_value;
+        p_config->value.i = i_value;
     }
 
     p_config->b_dirty = VLC_TRUE;
 
-    val.i_int = p_config->i_value;
+    val.i_int = p_config->value.i;
 
     if( p_config->pf_callback )
     {
@@ -366,36 +376,37 @@ void __config_PutFloat( vlc_object_t *p_this,
         msg_Warn( p_this, "option %s does not exist", psz_name );
         return;
     }
-    if( p_config->i_type != CONFIG_ITEM_FLOAT )
+
+    if (!IsConfigFloatType (p_config->i_type))
     {
         msg_Err( p_this, "option %s does not refer to a float", psz_name );
         return;
     }
 
     /* backup old value */
-    oldval.f_float = p_config->f_value;
+    oldval.f_float = p_config->value.f;
 
     /* if f_min == f_max == 0, then do not use them */
-    if ((p_config->f_min == 0) && (p_config->f_max == 0))
+    if ((p_config->min.f == 0) && (p_config->max.f == 0))
     {
-        p_config->f_value = f_value;
+        p_config->value.f = f_value;
     }
-    else if (f_value < p_config->f_min)
+    else if (f_value < p_config->min.f)
     {
-        p_config->f_value = p_config->f_min;
+        p_config->value.f = p_config->min.f;
     }
-    else if (f_value > p_config->f_max)
+    else if (f_value > p_config->max.f)
     {
-        p_config->f_value = p_config->f_max;
+        p_config->value.f = p_config->max.f;
     }
     else
     {
-        p_config->f_value = f_value;
+        p_config->value.f = f_value;
     }
 
     p_config->b_dirty = VLC_TRUE;
 
-    val.f_float = p_config->f_value;
+    val.f_float = p_config->value.f;
 
     if( p_config->pf_callback )
     {
@@ -486,7 +497,7 @@ module_t *config_FindModule( vlc_object_t *p_this, const char *psz_name )
 void config_Duplicate( module_t *p_module, const module_config_t *p_orig )
 {
     int i, j, i_lines = 1;
-    module_config_t *p_item;
+    const module_config_t *p_item;
 
     /* Calculate the structure length */
     p_module->i_config_items = 0;
@@ -521,26 +532,30 @@ void config_Duplicate( module_t *p_module, const module_config_t *p_orig )
     {
         p_module->p_config[i] = p_orig[i];
 
-        p_module->p_config[i].i_value_orig = p_orig[i].i_value;
-        p_module->p_config[i].f_value_orig = p_orig[i].f_value;
-        p_module->p_config[i].i_value_saved = p_orig[i].i_value;
-        p_module->p_config[i].f_value_saved = p_orig[i].f_value;
-        p_module->p_config[i].psz_value_saved = 0;
+        if (IsConfigIntegerType (p_module->p_config[i].i_type))
+        {
+            p_module->p_config[i].orig.i = p_orig[i].value.i;
+            p_module->p_config[i].saved.i = p_orig[i].value.i;
+        }
+        else
+        if (IsConfigFloatType (p_module->p_config[i].i_type))
+        {
+            p_module->p_config[i].orig.f = p_orig[i].value.f;
+            p_module->p_config[i].saved.f = p_orig[i].value.f;
+        }
+        else
+        if (IsConfigStringType (p_module->p_config[i].i_type))
+        {
+            p_module->p_config[i].value.psz = strdupnull (p_orig[i].value.psz);
+            p_module->p_config[i].orig.psz = strdupnull (p_orig[i].value.psz);
+            p_module->p_config[i].saved.psz = NULL;
+        }
 
-        p_module->p_config[i].psz_type = p_orig[i].psz_type ?
-                                   strdup( p_orig[i].psz_type ) : NULL;
-        p_module->p_config[i].psz_name = p_orig[i].psz_name ?
-                                   strdup( p_orig[i].psz_name ) : NULL;
-        p_module->p_config[i].psz_current = p_orig[i].psz_current?
-                                   strdup( p_orig[i].psz_current ) : NULL;
-        p_module->p_config[i].psz_text = p_orig[i].psz_text ?
-                                   strdup( _(p_orig[i].psz_text) ) : NULL;
-        p_module->p_config[i].psz_longtext = p_orig[i].psz_longtext ?
-                                   strdup( _(p_orig[i].psz_longtext) ) : NULL;
-        p_module->p_config[i].psz_value = p_orig[i].psz_value ?
-                                   strdup( p_orig[i].psz_value ) : NULL;
-        p_module->p_config[i].psz_value_orig = p_orig[i].psz_value ?
-                                   strdup( p_orig[i].psz_value ) : NULL;
+        p_module->p_config[i].psz_type = strdupnull (p_orig[i].psz_type);
+        p_module->p_config[i].psz_name = strdupnull (p_orig[i].psz_name);
+        p_module->p_config[i].psz_current = strdupnull (p_orig[i].psz_current);
+        p_module->p_config[i].psz_text = _strdupnull (p_orig[i].psz_text);
+        p_module->p_config[i].psz_longtext = _strdupnull (p_orig[i].psz_longtext);
 
         p_module->p_config[i].p_lock = &p_module->object_lock;
 
@@ -554,20 +569,20 @@ void config_Duplicate( module_t *p_module, const module_config_t *p_orig )
                 if( p_module->p_config[i].ppsz_list )
                 {
                     for( j = 0; j < p_orig[i].i_list; j++ )
-                        p_module->p_config[i].ppsz_list[j] = p_orig[i].ppsz_list[j] ?
-                            strdup( p_orig[i].ppsz_list[j] ) : NULL ;
+                        p_module->p_config[i].ppsz_list[j] =
+                                strdupnull (p_orig[i].ppsz_list[j]);
                     p_module->p_config[i].ppsz_list[j] = NULL;
                 }
             }
             if( p_orig[i].ppsz_list_text )
             {
                 p_module->p_config[i].ppsz_list_text =
-                    malloc( (p_orig[i].i_list + 1) * sizeof(char *) );
+                    calloc( (p_orig[i].i_list + 1), sizeof(char *) );
                 if( p_module->p_config[i].ppsz_list_text )
                 {
                     for( j = 0; j < p_orig[i].i_list; j++ )
-                        p_module->p_config[i].ppsz_list_text[j] = _(p_orig[i].ppsz_list_text[j]) ?
-                            strdup( _(p_orig[i].ppsz_list_text[j] ) ) : NULL ;
+                        p_module->p_config[i].ppsz_list_text[j] =
+                                strdupnull (_(p_orig[i].ppsz_list_text[j]));
                     p_module->p_config[i].ppsz_list_text[j] = NULL;
                 }
             }
@@ -599,14 +614,14 @@ void config_Duplicate( module_t *p_module, const module_config_t *p_orig )
                 p_module->p_config[i].ppf_action[j] =
                     p_orig[i].ppf_action[j];
                 p_module->p_config[i].ppsz_action_text[j] =
-                    p_orig[i].ppsz_action_text[j] ?
-                    strdup( p_orig[i].ppsz_action_text[j] ) : NULL;
+                    strdupnull (p_orig[i].ppsz_action_text[j]);
             }
         }
 
         p_module->p_config[i].pf_callback = p_orig[i].pf_callback;
     }
 }
+
 
 /*****************************************************************************
  * config_Free: frees a duplicated module's configuration data.
@@ -640,14 +655,12 @@ void config_Free( module_t *p_module )
         if( p_item->psz_longtext )
             free( p_item->psz_longtext );
 
-        if( p_item->psz_value )
-            free( p_item->psz_value );
-
-        if( p_item->psz_value_orig )
-            free( p_item->psz_value_orig );
-
-        if( p_item->psz_value_saved )
-            free( p_item->psz_value_saved );
+        if (IsConfigStringType (p_item->i_type))
+        {
+            freenull (p_item->value.psz);
+            freenull (p_item->orig.psz);
+            freenull (p_item->saved.psz);
+        }
 
         if( p_item->i_list )
         {
@@ -731,13 +744,18 @@ void __config_ResetAll( vlc_object_t *p_this )
 
         for( i = 0; p_module->p_config[i].i_type != CONFIG_HINT_END; i++ )
         {
-            p_module->p_config[i].i_value = p_module->p_config[i].i_value_orig;
-            p_module->p_config[i].f_value = p_module->p_config[i].f_value_orig;
-            if( p_module->p_config[i].psz_value )
-                free( p_module->p_config[i].psz_value );
-            p_module->p_config[i].psz_value =
-                p_module->p_config[i].psz_value_orig ?
-                strdup( p_module->p_config[i].psz_value_orig ) : NULL;
+            if (IsConfigIntegerType (p_module->p_config[i].i_type))
+                p_module->p_config[i].value.i = p_module->p_config[i].orig.i;
+            else
+            if (IsConfigFloatType (p_module->p_config[i].i_type))
+                p_module->p_config[i].value.f = p_module->p_config[i].orig.f;
+            else
+            if (IsConfigStringType (p_module->p_config[i].i_type))
+            {
+                freenull (p_module->p_config[i].value.psz);
+                p_module->p_config[i].value.psz =
+                        strdupnull (p_module->p_config[i].orig.psz);
+            }
         }
     }
 
@@ -823,7 +841,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 
         if ((fread (bom, 1, 3, file) == 3)
          && (memcmp (bom, "\xEF\xBB\xBF", 3) == 0))
-            convert = strdup;
+            convert = strdupnull;
         else
             rewind (file); // no BOM, rewind
 
@@ -894,8 +912,8 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     case CONFIG_ITEM_INTEGER:
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
-                        p_item->i_value = strtol( psz_option_value, 0, 0 );
-                        p_item->i_value_saved = p_item->i_value;
+                        p_item->value.i = strtol( psz_option_value, 0, 0 );
+                        p_item->saved.i = p_item->value.i;
 #if 0
                         msg_Dbg( p_this, "option \"%s\", value %i",
                                  p_item->psz_name, p_item->i_value );
@@ -905,8 +923,8 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     case CONFIG_ITEM_FLOAT:
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
-                        p_item->f_value = (float)i18n_atof( psz_option_value);
-                        p_item->f_value_saved = p_item->f_value;
+                        p_item->value.f = (float)i18n_atof( psz_option_value);
+                        p_item->saved.f = p_item->value.f;
 #if 0
                         msg_Dbg( p_this, "option \"%s\", value %f",
                                  p_item->psz_name, (double)p_item->f_value );
@@ -915,28 +933,25 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     case CONFIG_ITEM_KEY:
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
-                        p_item->i_value = ConfigStringToKey(psz_option_value);
-                        p_item->i_value_saved = p_item->i_value;
+                        p_item->value.i = ConfigStringToKey(psz_option_value);
+                        p_item->saved.i = p_item->value.i;
                         break;
 
                     default:
                         vlc_mutex_lock( p_item->p_lock );
 
                         /* free old string */
-                        if( p_item->psz_value )
-                            free( p_item->psz_value );
+                        freenull (p_item->value.psz);
 
-                        p_item->psz_value = *psz_option_value ?
-                            convert( psz_option_value ) : NULL;
+                        p_item->value.psz = convert (psz_option_value);
 
-                        if( p_item->psz_value_saved )
-                            free( p_item->psz_value_saved );
-                        p_item->psz_value_saved = NULL;
-                        if( !p_item->psz_value || !p_item->psz_value_orig ||
-                            (p_item->psz_value && p_item->psz_value_orig &&
-                             strcmp(p_item->psz_value,p_item->psz_value_orig)))
-                            p_item->psz_value_saved = p_item->psz_value ?
-                                convert( p_item->psz_value ) : NULL;
+                        freenull (p_item->saved.psz);
+                        p_item->saved.psz = NULL;
+
+                        if( !p_item->value.psz || !p_item->orig.psz ||
+                            (p_item->value.psz && p_item->orig.psz &&
+                             strcmp(p_item->value.psz, p_item->orig.psz)))
+                            p_item->saved.psz = convert (p_item->value.psz);
 
                         vlc_mutex_unlock( p_item->p_lock );
 
@@ -1184,9 +1199,9 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
              p_item++ )
         {
             char  *psz_key;
-            int   i_value = p_item->i_value;
-            float f_value = p_item->f_value;
-            const char  *psz_value = p_item->psz_value;
+            int   i_value = p_item->value.i;
+            float f_value = p_item->value.f;
+            const char  *psz_value = p_item->value.psz;
 
             if( p_item->i_type & CONFIG_HINT )
                 /* ignore hints */
@@ -1200,10 +1215,10 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
             if( b_autosave && !p_item->b_autosave )
             {
-                i_value = p_item->i_value_saved;
-                f_value = p_item->f_value_saved;
-                psz_value = p_item->psz_value_saved;
-                if( !psz_value ) psz_value = p_item->psz_value_orig;
+                i_value = p_item->saved.i;
+                f_value = p_item->saved.f;
+                psz_value = p_item->saved.psz;
+                if( !psz_value ) psz_value = p_item->orig.psz;
             }
             else
             {
@@ -1218,57 +1233,58 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              (p_item->i_type == CONFIG_ITEM_BOOL) ?
                              _("boolean") : _("integer") );
-                if( i_value == p_item->i_value_orig )
+                if( i_value == p_item->orig.i )
                     fputc ('#', file);
                 fprintf( file, "%s=%i\n", p_item->psz_name, i_value );
 
-                p_item->i_value_saved = i_value;
+                p_item->saved.i = i_value;
                 break;
 
             case CONFIG_ITEM_KEY:
                 if( p_item->psz_text )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              _("key") );
-                if( i_value == p_item->i_value_orig )
+                if( i_value == p_item->orig.i )
                     fputc ('#', file);
                 psz_key = ConfigKeyToString( i_value );
                 fprintf( file, "%s=%s\n", p_item->psz_name,
                          psz_key ? psz_key : "" );
-                if ( psz_key ) free( psz_key );
+                freenull (psz_key);
 
-                p_item->i_value_saved = i_value;
+                p_item->saved.i = i_value;
                 break;
 
             case CONFIG_ITEM_FLOAT:
                 if( p_item->psz_text )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              _("float") );
-                if( f_value == p_item->f_value_orig )
+                if( f_value == p_item->orig.f )
                     fputc ('#', file);
                 fprintf( file, "%s=%f\n", p_item->psz_name, (double)f_value );
 
-                p_item->f_value_saved = f_value;
+                p_item->saved.f = f_value;
                 break;
 
             default:
                 if( p_item->psz_text )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              _("string") );
-                if( (!psz_value && !p_item->psz_value_orig) ||
-                    (psz_value && p_item->psz_value_orig &&
-                     !strcmp( psz_value, p_item->psz_value_orig )) )
+                if( (!psz_value && !p_item->orig.psz) ||
+                    (psz_value && p_item->orig.psz &&
+                     !strcmp( psz_value, p_item->orig.psz )) )
                     fputc ('#', file);
                 fprintf( file, "%s=%s\n", p_item->psz_name,
-                         psz_value ? psz_value : "" );
+                         psz_value ?: "" );
 
                 if( b_autosave && !p_item->b_autosave ) break;
 
-                if( p_item->psz_value_saved ) free( p_item->psz_value_saved );
-                p_item->psz_value_saved = 0;
-                if( (psz_value && p_item->psz_value_orig &&
-                     strcmp( psz_value, p_item->psz_value_orig )) ||
-                    !psz_value || !p_item->psz_value_orig)
-                    p_item->psz_value_saved = psz_value ? strdup(psz_value):0;
+                freenull (p_item->saved.psz);
+                if( (psz_value && p_item->orig.psz &&
+                     strcmp( psz_value, p_item->orig.psz )) ||
+                    !psz_value || !p_item->orig.psz)
+                    p_item->saved.psz = strdupnull (psz_value);
+                else
+                    p_item->saved.psz = NULL;
             }
         }
 

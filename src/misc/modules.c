@@ -1714,7 +1714,6 @@ static void CacheLoad( vlc_object_t *p_this )
       } else a = 0; \
     } while(0)
 
-
     for( i = 0; i < i_cache; i++ )
     {
         int16_t i_size;
@@ -1793,6 +1792,7 @@ static void CacheLoad( vlc_object_t *p_this )
     return;
 }
 
+
 int CacheLoadConfig( module_t *p_module, FILE *file )
 {
     int i, j, i_lines;
@@ -1823,16 +1823,23 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
         LOAD_STRING( p_module->p_config[i].psz_text );
         LOAD_STRING( p_module->p_config[i].psz_longtext );
         LOAD_STRING( p_module->p_config[i].psz_current );
-        LOAD_STRING( p_module->p_config[i].psz_value_orig );
 
-        p_module->p_config[i].psz_value =
-            p_module->p_config[i].psz_value_orig ?
-                strdup( p_module->p_config[i].psz_value_orig ) : 0;
-        p_module->p_config[i].i_value = p_module->p_config[i].i_value_orig;
-        p_module->p_config[i].f_value = p_module->p_config[i].f_value_orig;
-        p_module->p_config[i].i_value_saved = p_module->p_config[i].i_value;
-        p_module->p_config[i].f_value_saved = p_module->p_config[i].f_value;
-        p_module->p_config[i].psz_value_saved = 0;
+        if (IsConfigStringType (p_module->p_config[i].i_type))
+        {
+            LOAD_STRING (p_module->p_config[i].orig.psz);
+            p_module->p_config[i].value.psz =
+                    (p_module->p_config[i].orig.psz != NULL)
+                        ? strdup (p_module->p_config[i].orig.psz) : NULL;
+            p_module->p_config[i].saved.psz = NULL;
+        }
+        else
+        {
+            memcpy (&p_module->p_config[i].value, &p_module->p_config[i].orig,
+                    sizeof (p_module->p_config[i].value));
+            memcpy (&p_module->p_config[i].saved, &p_module->p_config[i].orig,
+                    sizeof (p_module->p_config[i].saved));
+        }
+
         p_module->p_config[i].b_dirty = VLC_FALSE;
 
         p_module->p_config[i].p_lock = &p_module->object_lock;
@@ -2086,7 +2093,8 @@ void CacheSaveConfig( module_t *p_module, FILE *file )
         SAVE_STRING( p_module->p_config[i].psz_text );
         SAVE_STRING( p_module->p_config[i].psz_longtext );
         SAVE_STRING( p_module->p_config[i].psz_current );
-        SAVE_STRING( p_module->p_config[i].psz_value_orig );
+        if (IsConfigStringType (p_module->p_config[i].i_type))
+            SAVE_STRING( p_module->p_config[i].orig.psz );
 
         if( p_module->p_config[i].i_list )
         {

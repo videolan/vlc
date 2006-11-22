@@ -1488,7 +1488,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 psz_bra = ""; psz_type = ""; psz_ket = "";
                 if( !b_help_module )
                 {
-                    psz_suf = p_item->i_value ? _(" (default enabled)") :
+                    psz_suf = p_item->value.i ? _(" (default enabled)") :
                                                 _(" (default disabled)");
                 }
                 break;

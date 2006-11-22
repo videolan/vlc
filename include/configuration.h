@@ -57,6 +57,34 @@
 
 #define CONFIG_ITEM                         0x00F0
 
+/* Item types that use a string value (i.e. serialized in the module cache) */
+#define CONFIG_STRING_TYPES \
+    { \
+        CONFIG_ITEM_STRING, CONFIG_ITEM_FILE, CONFIG_ITEM_MODULE, \
+        CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_MODULE_CAT, \
+        CONFIG_ITEM_MODULE_LIST, CONFIG_ITEM_MODULE_LIST_CAT \
+    }
+
+static inline int IsConfigStringType (int type)
+{
+    const unsigned char config_string_types[] = CONFIG_STRING_TYPES;
+
+    /* NOTE: this needs to be changed if we ever get more than 255 types */
+    return memchr (config_string_types, type, sizeof (config_string_types))
+            != NULL;
+}
+
+static inline int IsConfigIntegerType (int type)
+{
+    return (type == CONFIG_ITEM_INTEGER) || (type == CONFIG_ITEM_KEY)
+        || (type == CONFIG_ITEM_BOOL);
+}
+
+static inline int IsConfigFloatType (int type)
+{
+    return type == CONFIG_ITEM_FLOAT;
+}
+
 /*******************************************************************
  * All predefined categories and subcategories
  *******************************************************************/
@@ -117,6 +145,19 @@ struct config_category_t
     const char *psz_help;
 };
 
+typedef union
+{
+    const char *psz;
+    int         i;
+    float       f;
+} module_value_t;
+
+typedef union
+{
+    int         i;
+    float       f;
+} module_nvalue_t;
+
 struct module_config_t
 {
     int          i_type;                               /* Configuration type */
@@ -125,13 +166,11 @@ struct module_config_t
     char         i_short;                      /* Optional short option name */
     const char  *psz_text;      /* Short comment on the configuration option */
     const char  *psz_longtext;   /* Long comment on the configuration option */
-    const char  *psz_value;                                  /* Option value */
-    int          i_value;                                    /* Option value */
-    float        f_value;                                    /* Option value */
-    int         i_min;                               /* Option minimum value */
-    int         i_max;                               /* Option maximum value */
-    float       f_min;                               /* Option minimum value */
-    float       f_max;                               /* Option maximum value */
+    module_value_t value;                                    /* Option value */
+    module_value_t orig;
+    module_value_t saved;
+    module_nvalue_t min;
+    module_nvalue_t max;
 
     /* Function to call when commiting a change */
     vlc_callback_t pf_callback;
@@ -148,9 +187,6 @@ struct module_config_t
     const char    **ppsz_action_text;         /* Friendly names for actions */
     int            i_action;                            /* actions list size */
 
-    /* Deprecated */
-    const char    *psz_current;   /* Good option name */
-    vlc_bool_t     b_strict;      /* Transitionnal or strict */
     /* Misc */
     vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
     vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
@@ -159,15 +195,11 @@ struct module_config_t
     vlc_bool_t   b_restart;    /* Flag to indicate the option need a restart */
                                /* to take effect */
 
-    /* Original option values */
-    const char  *psz_value_orig;
-    int          i_value_orig;
-    float        f_value_orig;
+    /* Deprecated */
+    const char    *psz_current;   /* Good option name */
+    vlc_bool_t     b_strict;      /* Transitionnal or strict */
 
     /* Option values loaded from config file */
-    const char  *psz_value_saved;
-    int          i_value_saved;
-    float        f_value_saved;
     vlc_bool_t   b_autosave;       /* Config will be auto-saved at exit time */
     vlc_bool_t   b_unsaveable;       /* confg should be saved*/
 };
@@ -256,22 +288,22 @@ int config_AutoSaveConfigFile( vlc_object_t * );
     p_config[i_config].psz_name = name; \
     p_config[i_config].pf_callback = cb
 
-#define add_string_inner( type, name, text, longtext, advc, cb, value ) \
+#define add_string_inner( type, name, text, longtext, advc, cb, v ) \
     add_typename_inner( type, name, text, longtext, advc, cb ); \
-    p_config[i_config].psz_value = value
+    p_config[i_config].value.psz = v
 
-#define add_int_inner( type, name, text, longtext, advc, cb, value ) \
+#define add_int_inner( type, name, text, longtext, advc, cb, v ) \
     add_typename_inner( type, name, text, longtext, advc, cb ); \
-    p_config[i_config].i_value = value
+    p_config[i_config].value.i = v
 
 
 #define set_category( i_id ) \
     add_type_inner( CONFIG_CATEGORY ); \
-    p_config[i_config].i_value = i_id
+    p_config[i_config].value.i = i_id
 
 #define set_subcategory( i_id ) \
     add_type_inner( CONFIG_SUBCATEGORY ); \
-    p_config[i_config].i_value = i_id
+    p_config[i_config].value.i = i_id
 
 #define set_section( text, longtext ) \
     add_typedesc_inner( CONFIG_SECTION, text, longtext )
@@ -303,7 +335,7 @@ int config_AutoSaveConfigFile( vlc_object_t * );
 
 #define add_module_cat( name, i_subcategory, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE_CAT, name, text, longtext, advc, p_callback, value ); \
-    p_config[i_config].i_min = i_subcategory /* gruik */
+    p_config[i_config].min.i = i_subcategory /* gruik */
 
 #define add_module_list( name, psz_caps, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE_LIST, name, text, longtext, advc, p_callback, value ); \
@@ -311,7 +343,7 @@ int config_AutoSaveConfigFile( vlc_object_t * );
 
 #define add_module_list_cat( name, i_subcategory, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE_LIST_CAT, name, text, longtext, advc, p_callback, value ); \
-    p_config[i_config].i_min = i_subcategory /* gruik */
+    p_config[i_config].min.i = i_subcategory /* gruik */
 
 #define add_integer( name, value, p_callback, text, longtext, advc ) \
     add_int_inner( CONFIG_ITEM_INTEGER, name, text, longtext, advc, p_callback, value )
@@ -323,17 +355,17 @@ int config_AutoSaveConfigFile( vlc_object_t * );
     add_integer( name, value, p_callback, text, longtext, advc ); \
     change_integer_range( i_min, i_max )
 
-#define add_float( name, value, p_callback, text, longtext, advc ) \
+#define add_float( name, v, p_callback, text, longtext, advc ) \
     add_typename_inner( CONFIG_ITEM_FLOAT, name, text, longtext, advc, p_callback ); \
-    p_config[i_config].f_value = value
+    p_config[i_config].value.f = v
 
 #define add_float_with_range( name, value, f_min, f_max, p_callback, text, longtext, advc ) \
     add_float( name, value, p_callback, text, longtext, advc ); \
     change_float_range( f_min, f_max )
 
-#define add_bool( name, value, p_callback, text, longtext, advc ) \
+#define add_bool( name, v, p_callback, text, longtext, advc ) \
     add_typename_inner( CONFIG_ITEM_BOOL, name, text, longtext, advc, p_callback ); \
-    p_config[i_config].i_value = value
+    p_config[i_config].value.i = v
 
 /* For renamed option */
 #define add_deprecated( name, strict ) \
@@ -377,13 +409,13 @@ int config_AutoSaveConfigFile( vlc_object_t * );
     p_config[i_config].pi_list = (int *)list; \
     p_config[i_config].ppsz_list_text = list_text;
 
-#define change_integer_range( min, max ) \
-    p_config[i_config].i_min = min; \
-    p_config[i_config].i_max = max;
+#define change_integer_range( minv, maxv ) \
+    p_config[i_config].min.i = minv; \
+    p_config[i_config].max.i = maxv;
 
-#define change_float_range( min, max ) \
-    p_config[i_config].f_min = min; \
-    p_config[i_config].f_max = max;
+#define change_float_range( minv, maxv ) \
+    p_config[i_config].min.f = minv; \
+    p_config[i_config].max.f = maxv;
 
 #define change_action_add( pf_action, action_text ) \
     if( !p_config[i_config].i_action ) \
