@@ -124,8 +124,9 @@ misc/modules.c: misc/modules_builtin.h
 # shared object, which will make builtins fairly redumdant. Until then, we
 # need this workaround.
 
-stamp-builtins: Makefile ../vlc-config ../config.status
+
 if BUILD_SHARED
+stamp-builtins: Makefile ../vlc-config ../config.status
 	@for c in `$(VLC_CONFIG) --libs builtin`; do \
 		case $$c in \
 			../modules/*.a) echo $$c ;; \
@@ -133,8 +134,8 @@ if BUILD_SHARED
 	done | \
 	sed -e 's,^\(.*\)/\([^/]*\)\.a$$,cd \1 \&\& $(MAKE) \2,g' | \
 	while read cmd; do echo $$cmd.a; eval "($$cmd.a)" || exit $$? ; done
-endif
 	touch $@
+endif
 
 ###############################################################################
 # Building libvlc
@@ -153,7 +154,7 @@ libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
 libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc` \
 	-no-undefined -export-symbols libvlc.sym -version-info 0:0:0
-libvlc_la_DEPENDENCIES = stamp-builtins stamp-api
+libvlc_la_DEPENDENCIES = libvlc.sym
 
 libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_control_la_LIBADD = libvlc.la
