@@ -170,7 +170,7 @@ case "${host_os}" in
     SYS=darwin
     CFLAGS_save="${CFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
+    OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS -std=gnu99"; OBJCFLAGS="${OBJCFLAGS_save}"
     VLC_ADD_LDFLAGS([vlc ffmpeg ffmpegaltivec],[-all_load])
     VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc],[-x objective-c])
@@ -181,7 +181,7 @@ case "${host_os}" in
     SYS=darwin
     CFLAGS_save="${CFLAGS_save} -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
+    OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS -std=gnu99"; OBJCFLAGS="${OBJCFLAGS_save}"
     VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc],[-x objective-c])
