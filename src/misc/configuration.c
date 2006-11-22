@@ -762,6 +762,42 @@ void __config_ResetAll( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
 }
 
+
+static FILE *config_OpenConfigFile (vlc_object_t *obj, const char *mode)
+{
+    static const char subpath[] = DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE;
+    const char *filename = obj->p_libvlc->psz_configfile;
+    const char *homedir;
+    size_t buflen = 0;
+
+    if (filename == NULL)
+    {
+        homedir = obj->p_libvlc->psz_homedir;
+        if (homedir == NULL)
+        {
+            msg_Err (obj, "no home directory defined");
+            return NULL;
+        }
+
+        buflen = strlen (homedir) + sizeof (subpath);
+    }
+
+    char buf[buflen];
+    if (filename == NULL)
+    {
+        sprintf (buf, "%s%s", homedir, subpath);
+        filename = buf;
+    }
+
+    msg_Dbg (obj, "opening config file (%s)", filename);
+    FILE *stream = utf8_fopen (filename, mode);
+    if ((stream == NULL) && (errno != ENOENT))
+        msg_Err (obj, "cannot open config file (%s): %s", strerror (errno));
+
+    return stream;
+}
+
+
 /*****************************************************************************
  * config_LoadConfigFile: loads the configuration file.
  *****************************************************************************
@@ -773,48 +809,14 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     vlc_list_t *p_list;
     FILE *file;
     char *p_index;
-    char *psz_filename;
     int i_index;
 
-    const char *psz_configfile = p_this->p_libvlc->psz_configfile;
-    if( !psz_configfile || !psz_configfile )
-    {
-        const char *psz_homedir = p_this->p_libvlc->psz_homedir;
-        if( !psz_homedir )
-        {
-            msg_Err( p_this, "psz_homedir is null" );
-            return -1;
-        }
-
-        if( asprintf( &psz_filename, "%s" DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE,
-                      psz_homedir ) == -1 )
-            psz_filename = NULL;
-    }
-    else
-    {
-        psz_filename = strdup( psz_configfile );
-    }
-
-    if( !psz_filename )
-    {
-        msg_Err( p_this, "out of memory" );
-        return -1;
-    }
-
-    msg_Dbg( p_this, "opening config file %s", psz_filename );
+    file = config_OpenConfigFile (p_this, "rt");
+    if (file == NULL)
+        return VLC_EGENERIC;
 
     /* Acquire config file lock */
     vlc_mutex_lock( &p_this->p_libvlc->config_lock );
-
-    file = utf8_fopen( psz_filename, "rt" );
-    if( file == NULL )
-    {
-        msg_Warn( p_this, "config file %s does not exist yet", psz_filename );
-        free( psz_filename );
-        vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
-        return -1;
-    }
-    free( psz_filename );
 
     /* Look for the selected module, if NULL then save everything */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -972,7 +974,6 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     fclose( file );
 
     vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
-
     return 0;
 }
 
@@ -1022,58 +1023,28 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     int i_sizebuf = 0;
     char *p_bigbuffer, *p_index;
     vlc_bool_t b_backup;
-    char *psz_filename, *psz_homedir, *psz_configfile;
     int i_index;
 
     /* Acquire config file lock */
     vlc_mutex_lock( &p_this->p_libvlc->config_lock );
 
-    psz_configfile = p_this->p_libvlc->psz_configfile;
-    if( !psz_configfile || !psz_configfile )
+    if (p_this->p_libvlc->psz_configfile == NULL)
     {
-        psz_homedir = p_this->p_libvlc->psz_homedir;
+        const char *psz_homedir = p_this->p_libvlc->psz_homedir;
         if( !psz_homedir )
         {
-            msg_Err( p_this, "psz_homedir is null" );
-            vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
-            return -1;
-        }
-        psz_filename = (char *)malloc( sizeof("/" CONFIG_DIR "/" CONFIG_FILE) +
-                                       strlen(psz_homedir) );
-
-        if( psz_filename )
-            sprintf( psz_filename, "%s" DIR_SEP CONFIG_DIR, psz_homedir );
-
-        if( !psz_filename )
-        {
-            msg_Err( p_this, "out of memory" );
+            msg_Err( p_this, "no home directory defined" );
             vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
             return -1;
         }
 
-        config_CreateDir( p_this, psz_filename );
-
-        strcat( psz_filename, DIR_SEP CONFIG_FILE );
-    }
-    else
-    {
-        psz_filename = strdup( psz_configfile );
-        if( !psz_filename )
-        {
-            msg_Err( p_this, "out of memory" );
-            vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
-            return -1;
-        }
+        char dirname[strlen (psz_homedir) + sizeof (DIR_SEP CONFIG_DIR)];
+        sprintf (dirname, "%s" DIR_SEP CONFIG_DIR, psz_homedir);
+        config_CreateDir (p_this, dirname);
     }
 
-    msg_Dbg( p_this, "opening config file %s", psz_filename );
-
-    file = utf8_fopen( psz_filename, "rt" );
-    if( !file )
-    {
-        msg_Warn( p_this, "config file %s does not exist yet", psz_filename );
-    }
-    else
+    file = config_OpenConfigFile (p_this, "rt");
+    if (file != NULL)
     {
         /* look for file size */
         fseek( file, 0L, SEEK_END );
@@ -1086,7 +1057,6 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     {
         msg_Err( p_this, "out of memory" );
         if( file ) fclose( file );
-        free( psz_filename );
         vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
         return -1;
     }
@@ -1156,12 +1126,9 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
      * Save module config in file
      */
 
-    file = utf8_fopen( psz_filename, "wt" );
+    file = config_OpenConfigFile (p_this, "wt");
     if( !file )
     {
-        msg_Warn( p_this, "could not open config file %s for writing",
-                          psz_filename );
-        free( psz_filename );
         vlc_list_release( p_list );
         vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
         return -1;
@@ -1299,7 +1266,6 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     free( p_bigbuffer );
 
     fclose( file );
-    free( psz_filename );
     vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
 
     return 0;
