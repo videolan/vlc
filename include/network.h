@@ -33,6 +33,7 @@
 #   if defined(UNDER_CE)
 #       define HAVE_STRUCT_ADDRINFO
 #   else
+#       define _NO_OLDNAMES 1
 #       include <io.h>
 #   endif
 #   include <winsock2.h>
