@@ -1149,6 +1149,9 @@ VLC_EXPORT( const char *, VLC_Error, ( int ) );
  * Additional vlc stuff
  *****************************************************************************/
 #ifndef HAVE_SHARED_LIBVLC
+#   ifdef HAVE_DIRENT_H
+#   include <dirent.h>  /* for DIR typedef in vlc_symbols.h */
+#   endif
 VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #   include "vlc_symbols.h"
 #else
