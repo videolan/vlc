@@ -808,8 +808,6 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     vlc_list_t *p_list;
     FILE *file;
-    char *p_index;
-    int i_index;
 
     file = config_OpenConfigFile (p_this, "rt");
     if (file == NULL)
@@ -821,152 +819,142 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     /* Look for the selected module, if NULL then save everything */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    /* Look for UTF-8 Byte Order Mark */
+    char * (*convert) (const char *) = strdupnull;
+    char bom[3];
+
+    if ((fread (bom, 1, 3, file) != 3)
+     || memcmp (bom, "\xEF\xBB\xBF", 3))
     {
-        module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-        char line[1024];
+        convert = FromLocaleDup;
+        rewind (file); // no BOM, rewind
+    }
 
-        if( psz_module_name
-             && strcmp( psz_module_name, p_parser->psz_object_name ) )
+    module_t *module = NULL;
+    char line[1024], section[1022];
+    section[0] = '\0';
+
+    while (fgets (line, 1024, file) != NULL)
+    {
+        // Ignore comments and empty lines
+        switch (line[0])
         {
-            continue;
+            case '#':
+            case '\n':
+            case '\0':
+                continue;
         }
 
-        /* The config file is organized in sections, one per module. Look for
-         * the interesting section ( a section is of the form [foo] ) */
-        fseek( file, 0L, SEEK_SET );
-
-        /* Look for UTF-8 Byte Order Mark */
-        char * (*convert) (const char *) = FromLocaleDup;
-        char bom[3];
-
-        if ((fread (bom, 1, 3, file) == 3)
-         && (memcmp (bom, "\xEF\xBB\xBF", 3) == 0))
-            convert = strdupnull;
-        else
-            rewind (file); // no BOM, rewind
-
-        while( fgets( line, 1024, file ) )
+        if (line[0] == '[')
         {
-            if( (line[0] == '[')
-               && (p_index = strchr(line,']'))
-               && (p_index - &line[1]
-                    == (int)strlen(p_parser->psz_object_name))
-               && !memcmp( &line[1], p_parser->psz_object_name,
-                           strlen(p_parser->psz_object_name) ) )
+            char *ptr = strchr (line, ']');
+            if (ptr == NULL)
+                continue; // syntax error;
+            *ptr = '\0';
+
+            // New section ( = a given module)
+            strcpy (section, line + 1);
+            module = NULL;
+
+            if ((psz_module_name == NULL)
+             || (strcmp (psz_module_name, section) == 0))
             {
-#if 0
-                msg_Dbg( p_this, "loading config for module \"%s\"",
-                                 p_parser->psz_object_name );
-#endif
-
-                break;
-            }
-        }
-        /* either we found the section or we're at the EOF */
-
-        /* Now try to load the options in this section */
-        while( fgets( line, 1024, file ) )
-        {
-            const char *psz_option_name, *psz_option_value;
-            module_config_t *p_item, *p_end;
-
-            if( line[0] == '[' ) break; /* end of section */
-
-            /* ignore comments or empty lines */
-            if( (line[0] == '#') || (line[0] == '\n') || (line[0] == (char)0) )
-                continue;
-
-            /* get rid of line feed */
-            if( line[strlen(line)-1] == '\n' )
-                line[strlen(line)-1] = (char)0;
-
-            /* look for option name */
-            psz_option_name = line;
-            psz_option_value = NULL;
-            p_index = strchr( line, '=' );
-            if( !p_index ) break; /* this ain't an option!!! */
-
-            *p_index = (char)0;
-            psz_option_value = p_index + 1;
-
-            if( !p_parser->i_config_items )
-            {
-                continue;
-            }
-
-            /* try to match this option with one of the module's options */
-            for( p_item = p_parser->p_config, p_end = p_item + p_parser->confsize;
-                 p_item < p_end;
-                 p_item++ )
-            {
-                if( p_item->i_type & CONFIG_HINT )
-                    /* ignore hints */
-                    continue;
-
-                if( !strcmp( p_item->psz_name, psz_option_name ) )
+                for (int i = 0; i < p_list->i_count; i++)
                 {
-                    /* We found it */
-                    switch( p_item->i_type )
+                    module_t *m = (module_t *)p_list->p_values[i].p_object;
+
+                    if ((strcmp (section, m->psz_object_name) == 0)
+                     && (m->i_config_items > 0)) // ignore config-less modules
                     {
-                    case CONFIG_ITEM_BOOL:
-                    case CONFIG_ITEM_INTEGER:
-                        if( !*psz_option_value )
-                            break;                    /* ignore empty option */
-                        p_item->value.i = strtol( psz_option_value, 0, 0 );
-                        p_item->saved.i = p_item->value.i;
-#if 0
-                        msg_Dbg( p_this, "option \"%s\", value %i",
-                                 p_item->psz_name, p_item->i_value );
-#endif
-                        break;
-
-                    case CONFIG_ITEM_FLOAT:
-                        if( !*psz_option_value )
-                            break;                    /* ignore empty option */
-                        p_item->value.f = (float)i18n_atof( psz_option_value);
-                        p_item->saved.f = p_item->value.f;
-#if 0
-                        msg_Dbg( p_this, "option \"%s\", value %f",
-                                 p_item->psz_name, (double)p_item->f_value );
-#endif
-                        break;
-                    case CONFIG_ITEM_KEY:
-                        if( !*psz_option_value )
-                            break;                    /* ignore empty option */
-                        p_item->value.i = ConfigStringToKey(psz_option_value);
-                        p_item->saved.i = p_item->value.i;
-                        break;
-
-                    default:
-                        vlc_mutex_lock( p_item->p_lock );
-
-                        /* free old string */
-                        freenull (p_item->value.psz);
-
-                        p_item->value.psz = convert (psz_option_value);
-
-                        freenull (p_item->saved.psz);
-                        p_item->saved.psz = NULL;
-
-                        if( !p_item->value.psz || !p_item->orig.psz ||
-                            (p_item->value.psz && p_item->orig.psz &&
-                             strcmp(p_item->value.psz, p_item->orig.psz)))
-                            p_item->saved.psz = convert (p_item->value.psz);
-
-                        vlc_mutex_unlock( p_item->p_lock );
-
-#if 0
-                        msg_Dbg( p_this, "option \"%s\", value \"%s\"",
-                                 p_item->psz_name,
-                                 p_item->psz_value ? p_item->psz_value : "" );
-#endif
+                        module = m;
+                        if (psz_module_name != NULL)
+                            msg_Dbg (p_this,
+                                     "loading config for module \"%s\"",
+                                     section);
                         break;
                     }
                 }
             }
+
+            continue;
         }
 
+        if (module == NULL)
+            continue; // no need to parse if there is no matching module
+
+        char *ptr = strchr (line, '\n');
+        if (ptr != NULL)
+            *ptr = '\0';
+
+        /* look for option name */
+        const char *psz_option_name = line;
+
+        ptr = strchr (line, '=');
+        if (ptr == NULL)
+            continue; // syntax error
+
+        *ptr = '\0';
+        const char *psz_option_value = ptr + 1;
+
+        /* try to match this option with one of the module's options */
+        for (size_t i = 0; i < module->confsize; i++)
+        {
+            module_config_t *p_item = module->p_config + i;
+
+            if ((p_item->i_type & CONFIG_HINT)
+             || strcmp (p_item->psz_name, psz_option_name))
+                continue;
+
+            /* We found it */
+            switch( p_item->i_type )
+            {
+                case CONFIG_ITEM_BOOL:
+                case CONFIG_ITEM_INTEGER:
+                    if( !*psz_option_value )
+                        break;                    /* ignore empty option */
+                    p_item->value.i = strtol( psz_option_value, 0, 0 );
+                    p_item->saved.i = p_item->value.i;
+
+                    /*msg_Dbg (p_this, "option \"%s\", value %i",
+                             psz_option_name, p_item->value.i);*/
+                    break;
+
+                case CONFIG_ITEM_FLOAT:
+                    if( !*psz_option_value )
+                        break;                    /* ignore empty option */
+                    p_item->value.f = (float)i18n_atof( psz_option_value);
+                    p_item->saved.f = p_item->value.f;
+
+                    /*msg_Dbg (p_this, "option \"%s\", value %f",
+                             psz_option_name, (double)p_item->value.f);*/
+                    break;
+
+                case CONFIG_ITEM_KEY:
+                    if( !*psz_option_value )
+                        break;                    /* ignore empty option */
+                    p_item->value.i = ConfigStringToKey(psz_option_value);
+                    p_item->saved.i = p_item->value.i;
+                    break;
+
+                default:
+                    vlc_mutex_lock( p_item->p_lock );
+
+                    /* free old string */
+                    free (p_item->value.psz);
+                    free (p_item->saved.psz);
+
+                    p_item->value.psz = convert (psz_option_value);
+                    p_item->saved.psz = strdupnull (p_item->value.psz);
+
+                    vlc_mutex_unlock( p_item->p_lock );
+
+                    /*msg_Dbg (p_this, "option \"%s\", value \"%s\"",
+                             psz_option_name, psz_option_value ?: "");*/
+                    break;
+            }
+
+            break;
+        }
     }
 
     vlc_list_release( p_list );
