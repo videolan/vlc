@@ -336,8 +336,6 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                         PrefsItemData * data ) :
                         QWidget( _parent ), p_intf( _p_intf )
 {
-    module_config_t *p_item;
-
     /* Find our module */
     module_t *p_module = NULL;
     if( data->i_type == TYPE_CATEGORY )
@@ -351,14 +349,16 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         vlc_object_yield( p_module );
     }
 
-    if( p_module->b_submodule )
-        p_item = ((module_t *)p_module->p_parent)->p_config;
-    else
-        p_item = p_module->p_config;
+    module_t *p_realmodule = p_module->b_submodule
+            ? (module_t *)(p_module->p_parent)
+            : p_module;
+
+    module_config_t *p_item = p_realmodule->p_config;
+    module_config_t *p_end = p_item + p_realmodule->confsize;
 
     if( data->i_type == TYPE_SUBCATEGORY || data->i_type ==  TYPE_CATSUBCAT )
     {
-        do
+        while (p_item < p_end)
         {
             if( p_item->i_type == CONFIG_SUBCATEGORY &&
                             ( data->i_type == TYPE_SUBCATEGORY &&
@@ -366,8 +366,8 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             ( data->i_type == TYPE_CATSUBCAT &&
                               p_item->value.i == data->i_subcat_id ) )
                 break;
-            if( p_item->i_type == CONFIG_HINT_END ) break;
-        } while( p_item++ );
+            p_item++;
+        }
     }
 
     global_layout = new QVBoxLayout();
@@ -460,11 +460,11 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         else i_line++;
         controls.append( control );
     }
-    while( !(p_item->i_type == CONFIG_HINT_END ||
-           ( ( data->i_type == TYPE_SUBCATEGORY ||
+    while( !( ( data->i_type == TYPE_SUBCATEGORY ||
                data->i_type == TYPE_CATSUBCAT ) &&
              ( p_item->i_type == CONFIG_CATEGORY ||
-               p_item->i_type == CONFIG_SUBCATEGORY ) ) ) && p_item++ );
+               p_item->i_type == CONFIG_SUBCATEGORY ) )
+        && ( ++p_item < p_end ) );
 
     if( box )
     {
