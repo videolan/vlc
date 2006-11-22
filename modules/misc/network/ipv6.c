@@ -243,6 +243,7 @@ static int OpenUDP( vlc_object_t * p_this )
     {
         if(*psz_server_addr)
         {
+#ifdef MCAST_JOIN_SOURCE_GROUP
             struct group_source_req imr;
             struct sockaddr_in6 *p_sin6;
 
@@ -267,6 +268,9 @@ static int OpenUDP( vlc_object_t * p_this )
             msg_Dbg( p_this, "MCAST_JOIN_SOURCE_GROUP multicast request" );
             if( setsockopt( i_handle, IPPROTO_IPV6, MCAST_JOIN_SOURCE_GROUP,
                           (char *)&imr, sizeof(struct group_source_req) ) == -1 )
+#else
+            errno = ENOSYS;
+#endif
             {
 
                 msg_Err( p_this, "Source specific multicast failed (%s) -"
