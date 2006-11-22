@@ -192,10 +192,10 @@ else
    all: .iconv .intl .freetype .fribidi .zlib \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
-	.live .goom2k4 .caca .mod .x264  .xml .twolame\
-	.png .gpg-error .gcrypt .gnutls .mpcdec\
+	.live .goom2k4 .caca .mod .x264  .xml .twolame \
+	.png .gpg-error .gcrypt .gnutls .mpcdec \
 	.dvdnav .dvbpsi .wxwidgets .dirac \
-	.aclocal .libdca
+	.aclocal .libdca .libraw1394 .libdc1394
 #	.png .gpg-error .gcrypt .gnutls .mpcdec\
 #	.SDL_image  .daap .cddb .cdio .vcdimager 
    endif
@@ -1511,6 +1511,68 @@ DISTCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
 # gpg-error 
 # ***************************************************************************
 
+# libraw1394
+# ***************************************************************************
+
+#ifdef SVN
+#libraw1394:
+#	$(SVN) co -r 325 $(LIBDC1394_SVN)/libraw1394/trunk/libraw1394  libraw1394
+#        (cd $<; libtoolize --copy --force; \
+#                autopoint -f; \
+#                aclocal -I extras/contrib/share/aclocal; \
+#                autoconf; \
+#                autoheader; \
+#                automake --add-missing --copy -Wall)
+#
+#else
+libraw1394-$(LIBRAW1394_VERSION).tar.gz:
+	$(WGET) $(LIBRAW1394_URL)
+
+libraw1394: libraw1394-$(LIBRAW1394_VERSION).tar.gz
+	$(EXTRACT_GZ)
+#endif
+
+.libraw1394: libraw1394
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make DESTDIR=$(PRFIX) install)
+	touch $@
+	
+CLEAN_file += .libraw1394
+CLEAN_PKG += libraw1394
+DISTCLEAN_PKG += libraw1394-$(LIBRAW1394_VERSION)
+
+# ***************************************************************************
+# libdc1394
+# ***************************************************************************
+
+#ifdef SVN
+#libdc1394:
+#	$(SVN) co -r 325 $(LIBDC1394_SVN)/libdc1394/trunk/libdc1394  libdc1394
+#        (cd $<; libtoolize --copy --force; \
+#                autopoint -f; \
+#                aclocal -I extras/contrib/share/aclocal; \
+#                autoconf; \
+#                autoheader; \
+#                automake --add-missing --copy -Wall)
+#
+#else
+libdc1394-$(LIBDC1394_VERSION).tar.gz:
+	$(WGET) $(LIBDC1394_URL)
+
+libdc1394: libdc1394-$(LIBDC1394_VERSION).tar.gz
+	$(EXTRACT_GZ)
+#endif
+
+.libdc1394: libdc1394
+	(cd $<; ./configure --prefix=$(PREFIX) && \
+	 patch -p1 < ../Patches/libdc1394-noexamples.patch && \
+	 make && make DESTDIR=$(PRFIX) install)
+	touch $@
+	
+CLEAN_file += .libdc1394
+CLEAN_PKG += libdc1394
+DISTCLEAN_PKG += libdc1394-$(LIBDC1394_VERSION)
+
+# ***************************************************************************
 libgpg-error-$(GPGERROR_VERSION).tar.gz:
 	$(WGET) $(GPGERROR_URL)
 
