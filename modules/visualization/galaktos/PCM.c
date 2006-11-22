@@ -32,6 +32,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 double **PCMd;    //data structure to store PCM data  PCM[channels][maxsamples]
 int maxsamples;   //size of PCM buffer
