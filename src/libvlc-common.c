@@ -1346,7 +1346,6 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 #   define OPTION_VALUE_SEP " "
 #endif
     vlc_list_t *p_list;
-    module_t *p_parser;
     char psz_spaces_text[PADDING_SPACES+LINE_START+1];
     char psz_spaces_longtext[LINE_START+3];
     char psz_format[sizeof(FORMAT_STRING)];
