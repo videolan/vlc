@@ -270,7 +270,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         }
         [o_file_sub_encoding_pop selectItemWithTitle:
                 [NSString stringWithCString:
-                p_item->psz_value]];
+                p_item->value.psz]];
     }
 
     p_item = config_FindConfig( VLC_OBJECT(p_intf), "subsdec-align" );
@@ -283,7 +283,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
                 [NSString stringWithUTF8String:
                 p_item->ppsz_list_text[i_index]]];
         }
-        [o_file_sub_align_pop selectItemAtIndex: p_item->i_value];
+        [o_file_sub_align_pop selectItemAtIndex: p_item->value.i];
     }
 
     p_item = config_FindConfig( VLC_OBJECT(p_intf), "freetype-rel-fontsize" );
@@ -295,7 +295,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             [o_file_sub_size_pop addItemWithTitle:
                 [NSString stringWithUTF8String:
                 p_item->ppsz_list_text[i_index]]];
-            if ( p_item->i_value == p_item->pi_list[i_index] )
+            if ( p_item->value.i == p_item->pi_list[i_index] )
             {
                 [o_file_sub_size_pop selectItemAtIndex: i_index];
             }
