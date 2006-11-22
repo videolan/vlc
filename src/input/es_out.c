@@ -38,7 +38,7 @@
 #include "vlc_playlist.h"
 #include "iso_lang.h"
 /* FIXME we should find a better way than including that */
-#include "../misc/iso-639_def.h"
+#include "../text/iso-639_def.h"
 
 /*****************************************************************************
  * Local prototypes

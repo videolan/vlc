@@ -47,7 +47,7 @@
 #include "iso_lang.h"
 
 /* FIXME we should find a better way than including that */
-#include "../../src/misc/iso-639_def.h"
+#include "../../src/text/iso-639_def.h"
 
 
 #include <dvdnav/dvdnav.h>

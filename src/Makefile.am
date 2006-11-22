@@ -314,21 +314,21 @@ SOURCES_libvlc_common = \
 	network/httpd.c \
 	network/rootwrap.c \
 	network/tls.c \
-	misc/charset.c \
+	text/charset.c \
+	text/strings.c \
+	text/unicode.c \
+	text/iso_lang.c \
+	text/iso-639_def.h \
 	misc/md5.c \
 	misc/mtime.c \
 	misc/block.c \
 	misc/modules.c \
 	misc/threads.c \
 	misc/stats.c \
-	misc/strings.c \
-	misc/unicode.c \
 	misc/cpu.c \
 	misc/configuration.c \
 	misc/configuration_chain.c \
 	misc/image.c \
-	misc/iso_lang.c \
-	misc/iso-639_def.h \
 	misc/messages.c \
 	misc/objects.c \
 	misc/variables.c \
