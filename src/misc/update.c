@@ -1231,7 +1231,7 @@ void update_download( update_iterator_t *p_uit, char *psz_dest )
  * \param l_size the size in bytes
  * \return the size as a string
  */
-char *size_str( long int l_size )
+static char *size_str( long int l_size )
 {
     char *psz_tmp;
     if( l_size>> 30 )
