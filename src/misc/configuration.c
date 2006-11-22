@@ -618,6 +618,7 @@ int config_Duplicate( module_t *p_module, const module_config_t *p_orig,
 
         p_module->p_config[i].pf_callback = p_orig[i].pf_callback;
     }
+    return VLC_SUCCESS;
 }
 
 

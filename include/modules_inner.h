@@ -102,7 +102,7 @@ E_(vlc_entry) ( module_t *p_module );
     EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
-        int i_shortcut = 1;                                                   \
+        int i_shortcut = 1, res;                                              \
         size_t i_config = (size_t)(-1);                                       \
         module_config_t *p_config = NULL;                                     \
         STORE_SYMBOLS;                                                        \
@@ -126,8 +126,7 @@ E_(vlc_entry) ( module_t *p_module );
 #define vlc_module_end( )                                                     \
             p_submodule->pp_shortcuts[ i_shortcut ] = NULL;                   \
         }                                                                     \
-        if (config_Duplicate( p_module, p_config, ++i_config ))               \
-            return VLC_ENOMEM;                                                \
+        res = config_Duplicate( p_module, p_config, ++i_config );             \
         for( size_t i = 0; i < i_config; i++ )                                \
         {                                                                     \
             if( p_config[ i ].i_action )                                      \
@@ -137,8 +136,8 @@ E_(vlc_entry) ( module_t *p_module );
             }                                                                 \
         }                                                                     \
         free( p_config );                                                     \
-        if( p_module->p_config == NULL )                                      \
-            return VLC_EGENERIC;                                              \
+        if (res)                                                              \
+            return res;                                                       \
         (void)i_shortcut;                                                     \
         return VLC_SUCCESS;                                                   \
     }                                                                         \
