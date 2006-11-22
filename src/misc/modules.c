@@ -1014,7 +1014,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
         }
         else
         {
-            module_config_t *p_item;
+            module_config_t *p_item, *p_end;
 
             p_module = p_cache_entry->p_module;
             p_module->b_loaded = VLC_FALSE;
@@ -1022,8 +1022,8 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
             /* For now we force loading if the module's config contains
              * callbacks or actions.
              * Could be optimized by adding an API call.*/
-            for( p_item = p_module->p_config;
-                 p_item->i_type != CONFIG_HINT_END; p_item++ )
+            for( p_item = p_module->p_config, p_end = p_item + p_module->confsize;
+                 p_item < p_end; p_item++ )
             {
                 if( p_item->pf_callback || p_item->i_action )
                     p_module = AllocatePlugin( p_this, psz_file );
@@ -1809,12 +1809,15 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
     LOAD_IMMEDIATE( i_lines );
 
     /* Allocate memory */
-    p_module->p_config =
-        (module_config_t *)malloc( sizeof(module_config_t) * (i_lines + 1));
-    if( p_module->p_config == NULL )
+    if (i_lines)
     {
-        msg_Err( p_module, "config error: can't duplicate p_config" );
-        return VLC_ENOMEM;
+        p_module->p_config =
+            (module_config_t *)calloc( i_lines, sizeof(module_config_t) );
+        if( p_module->p_config == NULL )
+        {
+            msg_Err( p_module, "config error: can't duplicate p_config" );
+            return VLC_ENOMEM;
+        }
     }
 
     /* Do the duplication job */
@@ -1900,8 +1903,6 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
 
         LOAD_IMMEDIATE( p_module->p_config[i].pf_callback );
     }
-
-    p_module->p_config[i].i_type = CONFIG_HINT_END;
 
     return VLC_SUCCESS;
 
@@ -2078,13 +2079,14 @@ static void CacheSave( vlc_object_t *p_this )
 void CacheSaveConfig( module_t *p_module, FILE *file )
 {
     int i, j, i_lines = 0;
-    module_config_t *p_item;
+    module_config_t *p_item, *p_end;
     uint16_t i_size;
 
     SAVE_IMMEDIATE( p_module->i_config_items );
     SAVE_IMMEDIATE( p_module->i_bool_items );
 
-    for( p_item = p_module->p_config; p_item->i_type != CONFIG_HINT_END;
+    for( p_item = p_module->p_config, p_end = p_item + p_module->confsize;
+         p_item < p_end;
          p_item++ ) i_lines++;
 
     SAVE_IMMEDIATE( i_lines );

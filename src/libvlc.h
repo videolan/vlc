@@ -2213,8 +2213,7 @@ static module_config_t p_help_config[] =
         .i_type   = CONFIG_ITEM_BOOL,
         .psz_name = "version",
         .psz_text = N_("print version information")
-    },
-    { .i_type = CONFIG_HINT_END }
+    }
 };
 
 /*****************************************************************************

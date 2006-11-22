@@ -333,7 +333,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     }
     p_help_module->psz_object_name = "help";
     p_help_module->psz_longname = N_("Help options");
-    config_Duplicate( p_help_module, p_help_config );
+    config_Duplicate( p_help_module, p_help_config,
+                      sizeof (p_help_config) / sizeof (p_help_config[0]) );
     vlc_object_attach( p_help_module, libvlc_global.p_module_bank );
     /* End hack */
 
@@ -1346,7 +1347,6 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 #endif
     vlc_list_t *p_list;
     module_t *p_parser;
-    module_config_t *p_item;
     char psz_spaces_text[PADDING_SPACES+LINE_START+1];
     char psz_spaces_longtext[LINE_START+3];
     char psz_format[sizeof(FORMAT_STRING)];
@@ -1371,8 +1371,9 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
         vlc_bool_t b_help_module;
-
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object;
+        module_config_t *p_item,
+                        *p_end = p_parser->p_config + p_parser->confsize;
 
         if( psz_module_name && strcmp( psz_module_name,
                                        p_parser->psz_object_name ) )
@@ -1390,13 +1391,12 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
         if( !b_advanced )
         {
             for( p_item = p_parser->p_config;
-                 p_item->i_type != CONFIG_HINT_END;
+                 p_item < p_end;
                  p_item++ )
             {
                 if( (p_item->i_type & CONFIG_ITEM) &&
                     !p_item->b_advanced ) break;
             }
-            if( p_item->i_type == CONFIG_HINT_END ) continue;
         }
 
         /* Print name of module */
@@ -1407,7 +1407,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 
         /* Print module options */
         for( p_item = p_parser->p_config;
-             p_item->i_type != CONFIG_HINT_END;
+             p_item < p_end;
              p_item++ )
         {
             char *psz_text, *psz_spaces = psz_spaces_text;

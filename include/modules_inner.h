@@ -102,10 +102,9 @@ E_(vlc_entry) ( module_t *p_module );
     EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
-        int i_shortcut = 1, i_config = -1;                                    \
+        int i_shortcut = 1;                                                   \
+        size_t i_config = (size_t)(-1);                                       \
         module_config_t *p_config = NULL;                                     \
-        static const module_config_t config_end = {                           \
-            .i_type = CONFIG_HINT_END };                                      \
         STORE_SYMBOLS;                                                        \
         p_module->b_submodule = VLC_FALSE;                                    \
         p_module->b_unloadable = VLC_TRUE;                                    \
@@ -127,27 +126,21 @@ E_(vlc_entry) ( module_t *p_module );
 #define vlc_module_end( )                                                     \
             p_submodule->pp_shortcuts[ i_shortcut ] = NULL;                   \
         }                                                                     \
-        if( p_config )                                                        \
+        if (config_Duplicate( p_module, p_config, ++i_config ))               \
+            return VLC_ENOMEM;                                                \
+        for( size_t i = 0; i < i_config; i++ )                                \
         {                                                                     \
-            int i;                                                            \
-            p_config[ ++i_config ] = config_end;                              \
-            config_Duplicate( p_module, p_config );                           \
-            for( i = 0; i < i_config; i++ )                                   \
+            if( p_config[ i ].i_action )                                      \
             {                                                                 \
-                if( p_config[ i ].i_action )                                  \
-                {                                                             \
-                    free( p_config[ i ].ppf_action );                         \
-                    free( p_config[ i ].ppsz_action_text );                   \
-                }                                                             \
+                free( p_config[ i ].ppf_action );                             \
+                free( p_config[ i ].ppsz_action_text );                       \
             }                                                                 \
-            free( p_config );                                                 \
         }                                                                     \
-        else config_Duplicate( p_module, &config_end );                       \
+        free( p_config );                                                     \
         if( p_module->p_config == NULL )                                      \
-        {                                                                     \
             return VLC_EGENERIC;                                              \
-        }                                                                     \
-        return VLC_SUCCESS && i_shortcut;                                     \
+        (void)i_shortcut;                                                     \
+        return VLC_SUCCESS;                                                   \
     }                                                                         \
     struct _u_n_u_s_e_d_ /* the ; gets added */
 

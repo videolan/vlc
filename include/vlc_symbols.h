@@ -9,7 +9,6 @@
 # ifdef HAVE_SHARED_LIBVLC
 #  error You are not supposed to include this file!
 # endif
-
 /*
  * This is the big VLC API structure for plugins :
  * Changing its layout breaks plugin's binary compatibility,
@@ -71,9 +70,9 @@ struct module_symbols_t
     void (*__config_ResetAll_inner) (vlc_object_t *);
     module_config_t * (*config_FindConfig_inner) (vlc_object_t *, const char *);
     module_t * (*config_FindModule_inner) (vlc_object_t *, const char *);
-    void (*config_Duplicate_inner) (module_t *, const module_config_t *);
-    void (*config_SetCallbacks_inner) (module_config_t *, module_config_t *);
-    void (*config_UnsetCallbacks_inner) (module_config_t *);
+    int (*config_Duplicate_inner) (module_t *, const module_config_t *, size_t);
+    void (*config_SetCallbacks_inner) (module_config_t *, module_config_t *, size_t);
+    void (*config_UnsetCallbacks_inner) (module_config_t *, size_t);
     int (*__intf_Eject_inner) (vlc_object_t *, const char *);
     const iso639_lang_t * (*GetLang_1_inner) (const char *);
     const iso639_lang_t * (*GetLang_2T_inner) (const char *);

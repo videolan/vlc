@@ -112,6 +112,7 @@ struct module_t
      * Variables set by the module to store its config options
      */
     module_config_t *p_config;             /* Module configuration structure */
+    size_t           confsize;            /* Number of module_config_t items */
     unsigned int     i_config_items;        /* number of configuration items */
     unsigned int     i_bool_items;            /* number of bool config items */
 

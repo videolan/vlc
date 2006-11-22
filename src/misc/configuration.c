@@ -424,8 +424,6 @@ void __config_PutFloat( vlc_object_t *p_this,
 module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
 {
     vlc_list_t *p_list;
-    module_t *p_parser;
-    module_config_t *p_item;
     int i_index;
 
     if( !psz_name ) return NULL;
@@ -434,13 +432,14 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
 
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        module_config_t *p_item, *p_end;
+        module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object;
 
         if( !p_parser->i_config_items )
             continue;
 
-        for( p_item = p_parser->p_config;
-             p_item->i_type != CONFIG_HINT_END;
+        for( p_item = p_parser->p_config, p_end = p_item + p_parser->confsize;
+             p_item < p_end;
              p_item++ )
         {
             if( p_item->i_type & CONFIG_HINT )
@@ -494,19 +493,18 @@ module_t *config_FindModule( vlc_object_t *p_this, const char *psz_name )
  * this module might be unloaded from memory at any time (remember HideModule).
  * This is why we need to create an exact copy of the config data.
  *****************************************************************************/
-void config_Duplicate( module_t *p_module, const module_config_t *p_orig )
+int config_Duplicate( module_t *p_module, const module_config_t *p_orig,
+                      size_t n )
 {
-    int i, j, i_lines = 1;
-    const module_config_t *p_item;
+    int j;
+    const module_config_t *p_item, *p_end = p_orig + n;
 
     /* Calculate the structure length */
     p_module->i_config_items = 0;
     p_module->i_bool_items = 0;
 
-    for( p_item = p_orig; p_item->i_type != CONFIG_HINT_END; p_item++ )
+    for( p_item = p_orig; p_item < p_end; p_item++ )
     {
-        i_lines++;
-
         if( p_item->i_type & CONFIG_ITEM )
         {
             p_module->i_config_items++;
@@ -519,16 +517,16 @@ void config_Duplicate( module_t *p_module, const module_config_t *p_orig )
     }
 
     /* Allocate memory */
-    p_module->p_config = (module_config_t *)malloc( sizeof(module_config_t)
-                                                     * i_lines );
+    p_module->p_config = (module_config_t *)calloc( n, sizeof(*p_orig) );
     if( p_module->p_config == NULL )
     {
         msg_Err( p_module, "config error: can't duplicate p_config" );
-        return;
+        return VLC_ENOMEM;
     }
+    p_module->confsize = n;
 
     /* Do the duplication job */
-    for( i = 0; i < i_lines ; i++ )
+    for( size_t i = 0; i < n ; i++ )
     {
         p_module->p_config[i] = p_orig[i];
 
@@ -630,16 +628,12 @@ void config_Duplicate( module_t *p_module, const module_config_t *p_orig )
  *****************************************************************************/
 void config_Free( module_t *p_module )
 {
-    module_config_t *p_item = p_module->p_config;
     int i;
 
-    if( p_item == NULL )
+    for (size_t j = 0; j < p_module->confsize; j++)
     {
-        return;
-    }
+        module_config_t *p_item = p_module->p_config + j;
 
-    for( ; p_item->i_type != CONFIG_HINT_END ; p_item++ )
-    {
         if( p_item->psz_type )
             free( p_item->psz_type );
 
@@ -688,8 +682,11 @@ void config_Free( module_t *p_module )
         }
     }
 
-    free( p_module->p_config );
-    p_module->p_config = NULL;
+    if (p_module->p_config != NULL)
+    {
+        free (p_module->p_config);
+        p_module->p_config = NULL;
+    }
 }
 
 /*****************************************************************************
@@ -699,9 +696,10 @@ void config_Free( module_t *p_module )
  * this module might be unloaded from memory at any time (remember HideModule).
  * This is why we need to duplicate callbacks each time we reload the module.
  *****************************************************************************/
-void config_SetCallbacks( module_config_t *p_new, module_config_t *p_orig )
+void config_SetCallbacks( module_config_t *p_new, module_config_t *p_orig,
+                          size_t n )
 {
-    while( p_new->i_type != CONFIG_HINT_END )
+    for (size_t i = 0; i < n; i++)
     {
         p_new->pf_callback = p_orig->pf_callback;
         p_new++;
@@ -714,9 +712,9 @@ void config_SetCallbacks( module_config_t *p_new, module_config_t *p_orig )
  *****************************************************************************
  * We simply undo what we did in config_SetCallbacks.
  *****************************************************************************/
-void config_UnsetCallbacks( module_config_t *p_new )
+void config_UnsetCallbacks( module_config_t *p_new, size_t n )
 {
-    while( p_new->i_type != CONFIG_HINT_END )
+    for (size_t i = 0; i < n; i++)
     {
         p_new->pf_callback = NULL;
         p_new++;
@@ -728,7 +726,7 @@ void config_UnsetCallbacks( module_config_t *p_new )
  *****************************************************************************/
 void __config_ResetAll( vlc_object_t *p_this )
 {
-    int i_index, i;
+    int i_index;
     vlc_list_t *p_list;
     module_t *p_module;
 
@@ -742,7 +740,7 @@ void __config_ResetAll( vlc_object_t *p_this )
         p_module = (module_t *)p_list->p_values[i_index].p_object ;
         if( p_module->b_submodule ) continue;
 
-        for( i = 0; p_module->p_config[i].i_type != CONFIG_HINT_END; i++ )
+        for (size_t i = 0; i < p_module->confsize; i++ )
         {
             if (IsConfigIntegerType (p_module->p_config[i].i_type))
                 p_module->p_config[i].value.i = p_module->p_config[i].orig.i;
@@ -868,7 +866,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         while( fgets( line, 1024, file ) )
         {
             const char *psz_option_name, *psz_option_value;
-            module_config_t *p_item;
+            module_config_t *p_item, *p_end;
 
             if( line[0] == '[' ) break; /* end of section */
 
@@ -895,8 +893,8 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
             }
 
             /* try to match this option with one of the module's options */
-            for( p_item = p_parser->p_config;
-                 p_item->i_type != CONFIG_HINT_END;
+            for( p_item = p_parser->p_config, p_end = p_item + p_parser->confsize;
+                 p_item < p_end;
                  p_item++ )
             {
                 if( p_item->i_type & CONFIG_HINT )
@@ -1018,7 +1016,6 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 {
     module_t *p_parser;
     vlc_list_t *p_list;
-    module_config_t *p_item;
     FILE *file;
     char p_line[1024], *p_index2;
     int i_sizebuf = 0;
@@ -1175,6 +1172,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     /* Look for the selected module, if NULL then save everything */
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
+        module_config_t *p_item, *p_end;
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( psz_module_name && strcmp( psz_module_name,
@@ -1194,8 +1192,8 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         else
             fprintf( file, "\n\n" );
 
-        for( p_item = p_parser->p_config;
-             p_item->i_type != CONFIG_HINT_END;
+        for( p_item = p_parser->p_config, p_end = p_item + p_parser->confsize;
+             p_item < p_end;
              p_item++ )
         {
             char  *psz_key;
@@ -1309,8 +1307,6 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 int config_AutoSaveConfigFile( vlc_object_t *p_this )
 {
     vlc_list_t *p_list;
-    module_t *p_parser;
-    module_config_t *p_item;
     int i_index, i_count;
 
     /* Check if there's anything to save */
@@ -1319,17 +1315,18 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
     i_count = p_list->i_count;
     for( i_index = 0; i_index < i_count; i_index++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        module_config_t *p_item, *p_end;
 
         if( !p_parser->i_config_items ) continue;
 
-        for( p_item = p_parser->p_config;
-             p_item->i_type != CONFIG_HINT_END;
+        for( p_item = p_parser->p_config, p_end = p_item + p_parser->confsize;
+             p_item < p_end;
              p_item++ )
         {
             if( p_item->b_autosave && p_item->b_dirty ) break;
         }
-        if( p_item->i_type != CONFIG_HINT_END ) break;
+        break;
     }
     vlc_list_release( p_list );
     vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
@@ -1358,7 +1355,6 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
     module_t *p_parser;
     vlc_list_t *p_list;
-    module_config_t *p_item;
     struct option *p_longopts;
     int i_modules_index;
 
@@ -1456,13 +1452,14 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
     for( i_modules_index = 0; i_modules_index < p_list->i_count;
          i_modules_index++ )
     {
+        module_config_t *p_item, *p_end;
         p_parser = (module_t *)p_list->p_values[i_modules_index].p_object ;
 
         if( !p_parser->i_config_items )
             continue;
 
-        for( p_item = p_parser->p_config;
-             p_item->i_type != CONFIG_HINT_END;
+        for( p_item = p_parser->p_config, p_end = p_item + p_parser->confsize;
+             p_item < p_end;
              p_item++ )
         {
             /* Ignore hints */
