@@ -466,7 +466,6 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
                          vlc_bool_t b_priv )
 {
     DIR* dir;
-    const char *psz_dirent;
 
     if( *psz_dirname == '\0' )
         psz_dirname = ".";
@@ -499,23 +498,20 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
     }
 #endif
 
-    while( ( psz_dirent = utf8_readdir( dir ) ) != NULL )
+    for (;;)
     {
-        char *psz_filename;
-        int check;
+        char *ent = utf8_readdir (dir);
+        if (ent == NULL)
+            break;
 
-        if( (psz_dirent == NULL)
-	 || ( strcmp( ".", psz_dirent ) == 0 )
-         || ( strcmp( "..", psz_dirent ) == 0 ) )
+        if ((strcmp (ent, ".") == 0) || (strcmp (ent, "..") == 0))
             continue;
 
-        check = asprintf( &psz_filename, "%s/%s", psz_dirname, psz_dirent );
-        free( psz_dirent );
-        if( check == -1 )
-            continue;
+        char path[strlen (psz_dirname) + strlen (ent) + 2];
+        sprintf (path, "%s"DIR_SEP"%s", psz_dirname, ent);
+        free (ent);
 
-        gnutls_Addx509File( p_this, cred, psz_filename, b_priv );
-        free( psz_filename );
+        gnutls_Addx509File( p_this, cred, path, b_priv );
     }
 
     closedir( dir );
