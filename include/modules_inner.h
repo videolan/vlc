@@ -105,11 +105,7 @@ E_(vlc_entry) ( module_t *p_module );
         int i_shortcut = 1, i_config = -1;                                    \
         module_config_t *p_config = NULL;                                     \
         static const module_config_t config_end = {                           \
-            CONFIG_HINT_END, NULL, NULL, 0, NULL, NULL, NULL, 0, 0., 0, 0,    \
-            0., 0., NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, 0, NULL,     \
-            VLC_FALSE, NULL, VLC_FALSE, VLC_FALSE, VLC_FALSE, VLC_FALSE,      \
-            NULL, 0, 0., NULL, 0, 0., VLC_FALSE, VLC_FALSE                    \
-        };                                                                    \
+            .i_type = CONFIG_HINT_END };                                      \
         STORE_SYMBOLS;                                                        \
         p_module->b_submodule = VLC_FALSE;                                    \
         p_module->b_unloadable = VLC_TRUE;                                    \
