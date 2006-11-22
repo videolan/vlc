@@ -1,7 +1,7 @@
 Index: os.h
 ===================================================================
---- os.h	(revision 10420)
-+++ os.h	(working copy)
+--- os.h	(révision 12136)
++++ os.h	(copie de travail)
 @@ -20,6 +20,14 @@
  #include <math.h>
  #include "os_types.h"
@@ -19,9 +19,9 @@ Index: os.h
  
 Index: synthesis.c
 ===================================================================
---- synthesis.c	(revision 10420)
-+++ synthesis.c	(working copy)
-@@ -33,7 +33,7 @@
+--- synthesis.c	(révision 12136)
++++ synthesis.c	(copie de travail)
+@@ -34,7 +34,7 @@
   
    /* first things first.  Make sure decode is ready */
    _vorbis_block_ripcord(vb);
@@ -30,7 +30,7 @@ Index: synthesis.c
  
    /* Check the packet type */
    if(oggpack_read(opb,1)!=0){
-@@ -86,7 +86,7 @@
+@@ -87,7 +87,7 @@
    oggpack_buffer       opb;
    int                  mode;
   
@@ -41,8 +41,8 @@ Index: synthesis.c
    if(oggpack_read(&opb,1)!=0){
 Index: info.c
 ===================================================================
---- info.c	(revision 10420)
-+++ info.c	(working copy)
+--- info.c	(révision 12136)
++++ info.c	(copie de travail)
 @@ -299,7 +299,7 @@
    oggpack_buffer opb;
    
@@ -54,8 +54,8 @@ Index: info.c
      /* Also verify header-ness, vorbis */
 Index: ivorbiscodec.h
 ===================================================================
---- ivorbiscodec.h	(revision 10420)
-+++ ivorbiscodec.h	(working copy)
+--- ivorbiscodec.h	(révision 12136)
++++ ivorbiscodec.h	(copie de travail)
 @@ -23,7 +23,7 @@
  {
  #endif /* __cplusplus */
@@ -67,8 +67,8 @@ Index: ivorbiscodec.h
    int version;
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 10420)
-+++ Makefile.am	(working copy)
+--- Makefile.am	(révision 12136)
++++ Makefile.am	(copie de travail)
 @@ -8,11 +8,11 @@
                          synthesis.c info.c \
                          floor1.c floor0.c vorbisfile.c \
@@ -76,7 +76,7 @@ Index: Makefile.am
 -			sharedbook.c framing.c bitwise.c \
 +			sharedbook.c \
                          codebook.h misc.h mdct_lookup.h\
-                         os.h mdct.h ivorbisfile.h lsp_lookup.h\
+                         os.h mdct.h block.h ivorbisfile.h lsp_lookup.h\
                          registry.h window.h window_lookup.h\
 -                        codec_internal.h backends.h ogg.h \
 +                        codec_internal.h backends.h \
@@ -92,17 +92,3 @@ Index: Makefile.am
  
  example:
  	-ln -fs . vorbis
-Index: configure.in
-===================================================================
---- orig/configure.in	2006-02-01 12:56:54.000000000 +0100
-+++ configure.in	2006-02-01 13:02:36.000000000 +0100
-@@ -54,8 +54,7 @@ else
- 
-         case $host in 
-         arm-*-*)
--                DEBUG="-g -Wall -D__NO_MATH_INLINES -fsigned-char 
---D_ARM_ASSEM_"
-+                DEBUG="-g -Wall -D__NO_MATH_INLINES -fsigned-char -D_ARM_ASSEM_"
-                 CFLAGS="-O2 -D_ARM_ASSEM_ -fsigned-char"
-                 PROFILE="-W -pg -g -O2 -D_ARM_ASSEM_ -fsigned-char -fno-inline-functions";;
- 
