@@ -801,7 +801,7 @@ DISTCLEAN_PKG += speex-$(SPEEX_VERSION).tar.gz
 #	@echo "*** Please type return here : ***"
 #	cvs -d $(FAAD2_CVSROOT) login
 #	cvs -d $(FAAD2_CVSROOT) co faad2
-#	(cd $@; patch -p0 < ../Patches/faad2.patch)
+#	(cd $@; patch -p1 < ../Patches/faad2.patch)
 #	(cd $@; sh ./bootstrap)
 
 faad2-$(FAAD2_VERSION).tar.bz2:
@@ -809,7 +809,7 @@ faad2-$(FAAD2_VERSION).tar.bz2:
 
 faad: faad2-$(FAAD2_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	(cd $@; patch -p0  < ../Patches/faad2.patch && ./bootstrap)
+	(cd $@; patch -p1 < ../Patches/faad2.patch && ./bootstrap)
 
 .faad: faad
 	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && sed -i.orig "s/shrext_cmds/shrext/g" libtool && make -C libfaad && make -C libfaad install)
