@@ -395,32 +395,32 @@ Section "Start Menu Shortcut" SEC02a
   CreateDirectory "$SMPROGRAMS\VideoLAN"
   CreateDirectory "$SMPROGRAMS\VideoLAN\Utilities"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Utilities\Reset VLC media player preferences and cache files.lnk" \
-    "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache --save-config vlc:quit "
+    "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Utilities\Set Audio mode to DirectX (default).lnk" \
-    "$INSTDIR\vlc.exe" "--aout aout_directx --save-config vlc:quit "
+    "$INSTDIR\vlc.exe" "--aout aout_directx --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Utilities\Set Audio mode to Waveout.lnk" \
-    "$INSTDIR\vlc.exe" "--aout waveout --save-config vlc:quit "
+    "$INSTDIR\vlc.exe" "--aout waveout --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Utilities\Set Main Interface to Skinnable.lnk" \
-    "$INSTDIR\vlc.exe" "-I skins --save-config vlc:quit "
+    "$INSTDIR\vlc.exe" "-I skins --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Utilities\Set Main Interface to wxWidgets (default).lnk" \
-    "$INSTDIR\vlc.exe" "-I wxwin --save-config vlc:quit "
+    "$INSTDIR\vlc.exe" "-I wxwin --save-config vlc:quit"
   ; FIXME add detection for Vista. Direct3D will be default there, for all others it's DirectX
   CreateShortCut "$SMPROGRAMS\VideoLAN\Utilities\Set Video mode to Direct3D.lnk" \
-    "$INSTDIR\vlc.exe" "--vout direct3d --overlay --save-config vlc:quit "
+    "$INSTDIR\vlc.exe" "--vout direct3d --overlay --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Utilities\Set Video mode to DirectX.lnk" \
-    "$INSTDIR\vlc.exe" "--vout directx --overlay --save-config vlc:quit "
+    "$INSTDIR\vlc.exe" "--vout directx --overlay --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Utilities\Set Video mode to DirectX (no hardware acceleration).lnk" \
-    "$INSTDIR\vlc.exe" "--vout directx --no-overlay --save-config vlc:quit "
+    "$INSTDIR\vlc.exe" "--vout directx --no-overlay --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Utilities\Set Video mode to OpenGL.lnk" \
-    "$INSTDIR\vlc.exe" "--vout opengl --overlay --save-config vlc:quit "    
+    "$INSTDIR\vlc.exe" "--vout opengl --overlay --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Documentation.lnk" \
     "$INSTDIR\Documentation.url"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Release Notes.lnk" \
-    "$INSTDIR\NEWS.txt" "" 
+    "$INSTDIR\NEWS.txt" ""
   CreateShortCut "$SMPROGRAMS\VideoLAN\${PRODUCT_GROUP} Website.lnk" \
     "$INSTDIR\${PRODUCT_GROUP} Website.url"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player.lnk" \
-    "$INSTDIR\vlc.exe" "" 
+    "$INSTDIR\vlc.exe" ""
 SectionEnd
 
 Section "Desktop Shortcut" SEC02b
