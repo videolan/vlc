@@ -32,18 +32,14 @@ my $srcdir = $ENV{'top_srcdir'};
 #
 my %new_APIs;
 my $new_sym = IO::Handle->new();
-open $new_sym, '> libvlc.sym' or die "libvlc.sym: $!\n";
 
 while (<STDIN>)
 {
 	if (/VLC_EXPORT\(\s*(\w.*\S)\s*,\s*(\w*)\s*,\s*\(\s*(\w.*\S)\s*\)\s*\)[^)]*$/)
 	{
 		$new_APIs{$2} = [ ( $1, $3 ) ];
-		print { $new_sym } "$2\n";
 	} 
 }
-
-close $new_sym;
 
 #
 # Write header's header

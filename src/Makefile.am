@@ -386,9 +386,11 @@ stamp-api: Makefile.in $(HEADERS_include) ../vlc-api.pl
 	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
 	touch stamp-api
 
-libvlc.sym:
-	rm -f stamp-api
-	$(MAKE) stamp-api
+libvlc.sym: $(HEADERS_include)
+	rm -f libvlc.sym
+	(cd $(srcdir) && cat $(HEADERS_include) ) | \
+	sed -ne 's/^.*VLC_EXPORT\s*(\s*\w.*\S\s*,\s*\(\w*\)\s*,\s*(\s*\w.*\S\s*)\s*)[^)]*$$/\1/p' \
+		> libvlc.sym
 
 ###############################################################################
 # Unit/regression test
