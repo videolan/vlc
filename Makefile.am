@@ -309,7 +309,8 @@ endif
 libvlc:
 	cd src && $(MAKE) $(AM_MAKEFLAGS) $(LIB_libvlc)
 
-core: libvlc vlc$(EXEEXT)
+core: libvlc
+	$(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
 
 .PHONY: libvlc core
 
