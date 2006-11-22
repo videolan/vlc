@@ -1702,21 +1702,25 @@ static void CacheLoad( vlc_object_t *p_this )
 #define LOAD_IMMEDIATE(a) \
     if( fread( (void *)&a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
 #define LOAD_STRING(a) \
-    { if( fread( &i_size, sizeof(char), sizeof(i_size), file ) \
+    a = NULL; \
+    if( fread( &i_size, sizeof(char), sizeof(i_size), file ) \
           != sizeof(i_size) ) goto error; \
-      if( i_size && i_size < 16384 ) { \
-          a = malloc( i_size ); \
-          if( fread( (void *)a, sizeof(char), i_size, file ) != (size_t)i_size ) \
-              goto error; \
-          if( a[i_size-1] ) { \
-              free( (void *)a ); a = 0; \
-              goto error; } \
-      } else a = 0; \
-    } while(0)
+    if( i_size && i_size < 16384 ) { \
+        char *psz = malloc( i_size ); \
+        if( fread( psz, i_size, 1, file ) != 1 ) { \
+            free( psz ); \
+            goto error; \
+        } \
+        if( psz[i_size-1] ) { \
+            free( psz ); \
+            goto error; \
+        } \
+        a = psz; \
+    }
 
     for( i = 0; i < i_cache; i++ )
     {
-        int16_t i_size;
+        uint16_t i_size;
         int i_submodules;
 
         pp_cache[i] = malloc( sizeof(module_cache_t) );
@@ -1796,7 +1800,7 @@ static void CacheLoad( vlc_object_t *p_this )
 int CacheLoadConfig( module_t *p_module, FILE *file )
 {
     int i, j, i_lines;
-    int16_t i_size;
+    uint16_t i_size;
 
     /* Calculate the structure length */
     LOAD_IMMEDIATE( p_module->i_config_items );
@@ -2004,8 +2008,8 @@ static void CacheSave( vlc_object_t *p_this )
 
     for( i = 0; i < i_cache; i++ )
     {
-        int16_t i_size;
-        int32_t i_submodule;
+        uint16_t i_size;
+        uint32_t i_submodule;
 
         /* Save common info */
         SAVE_STRING( pp_cache[i]->psz_file );
@@ -2038,7 +2042,8 @@ static void CacheSave( vlc_object_t *p_this )
 
         i_submodule = pp_cache[i]->p_module->i_children;
         SAVE_IMMEDIATE( i_submodule );
-        for( i_submodule = 0; i_submodule < pp_cache[i]->p_module->i_children;
+        for( i_submodule = 0;
+             i_submodule < (unsigned)pp_cache[i]->p_module->i_children;
              i_submodule++ )
         {
             module_t *p_module =
@@ -2074,7 +2079,7 @@ void CacheSaveConfig( module_t *p_module, FILE *file )
 {
     int i, j, i_lines = 0;
     module_config_t *p_item;
-    int16_t i_size;
+    uint16_t i_size;
 
     SAVE_IMMEDIATE( p_module->i_config_items );
     SAVE_IMMEDIATE( p_module->i_bool_items );
