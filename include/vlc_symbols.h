@@ -9,6 +9,15 @@
 # ifdef HAVE_SHARED_LIBVLC
 #  error You are not supposed to include this file!
 # endif
+
+#include <stdio.h>      /* for FILE typedef */
+
+#ifdef HAVE_DIRENT_H
+#   include <dirent.h>  /* for DIR typedef */
+#else
+    typedef void DIR;
+#endif
+
 /*
  * This is the big VLC API structure for plugins :
  * Changing its layout breaks plugin's binary compatibility,
