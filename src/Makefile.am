@@ -153,7 +153,7 @@ libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
 libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc` \
-	-no-undefined -export-symbols libvlc.sym -version-info 0:0:0
+	-no-undefined -export-symbols libvlc.sym -version-info 1:0:0
 libvlc_la_DEPENDENCIES = libvlc.sym
 
 libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
