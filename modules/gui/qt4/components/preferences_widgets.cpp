@@ -92,7 +92,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         if( p_item->i_list )
             p_control = new IntegerListConfigControl( p_this, p_item,
                                             parent, false, l, line );
-        else if( p_item->i_min || p_item->i_max )
+        else if( p_item->min.i || p_item->max.i )
             p_control = new IntegerRangeConfigControl( p_this, p_item, parent,
                                                        l, line );
         else
@@ -112,7 +112,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         p_control = new BoolConfigControl( p_this, p_item, parent, l, line );
         break;
     case CONFIG_ITEM_FLOAT:
-        if( p_item->f_min || p_item->f_max )
+        if( p_item->min.f || p_item->max.f )
             p_control = new FloatRangeConfigControl( p_this, p_item, parent,
                                                      l, line );
         else
@@ -173,7 +173,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
                            VStringConfigControl( _p_this, _p_item, _parent )
 {
     label = new QLabel( qfu(p_item->psz_text) );
-    text = new QLineEdit( qfu(p_item->psz_value) );
+    text = new QLineEdit( qfu(p_item->value.psz) );
     finish();
 
     if( !l )
@@ -200,7 +200,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
 
 void StringConfigControl::finish()
 {
-    text->setText( qfu(p_item->psz_value) );
+    text->setText( qfu(p_item->value.psz) );
     text->setToolTip( qfu(p_item->psz_longtext) );
     if( label )
         label->setToolTip( qfu(p_item->psz_longtext) );
@@ -246,7 +246,7 @@ void StringListConfigControl::finish( bool bycat )
                             p_item->ppsz_list_text[i_index] :
                             p_item->ppsz_list[i_index] ),
                         QVariant( p_item->ppsz_list[i_index] ) );
-        if( p_item->psz_value && !strcmp( p_item->psz_value,
+        if( p_item->value.psz && !strcmp( p_item->value.psz,
                                           p_item->ppsz_list[i_index] ) )
             combo->setCurrentIndex( combo->count() - 1 );
     }
@@ -308,24 +308,24 @@ void ModuleConfigControl::finish( bool bycat )
         {
             if( !strcmp( p_parser->psz_object_name, "main" ) ) continue;
 
-            module_config_t *p_config = p_parser->p_config;
-            if( p_config ) do
+            for (size_t i = 0; i < p_parser->confsize; i++)
             {
+                module_config_t *p_config = p_parser->p_config + i;
                 /* Hack: required subcategory is stored in i_min */
                 if( p_config->i_type == CONFIG_SUBCATEGORY &&
-                    p_config->i_value == p_item->i_min )
+                    p_config->value.i == p_item->min.i )
                     combo->addItem( qfu(p_parser->psz_longname),
                                     QVariant( p_parser->psz_object_name ) );
-                if( p_item->psz_value && !strcmp( p_item->psz_value,
+                if( p_item->value.psz && !strcmp( p_item->value.psz,
                                                   p_parser->psz_object_name) )
                     combo->setCurrentIndex( combo->count() - 1 );
-            } while( p_config->i_type != CONFIG_HINT_END && p_config++ );
+            }
         }
         else if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
         {
             combo->addItem( qfu(p_parser->psz_longname),
                             QVariant( p_parser->psz_object_name ) );
-            if( p_item->psz_value && !strcmp( p_item->psz_value,
+            if( p_item->value.psz && !strcmp( p_item->value.psz,
                                               p_parser->psz_object_name) )
                 combo->setCurrentIndex( combo->count() - 1 );
         }
@@ -405,19 +405,19 @@ void ModuleListConfigControl::finish( bool bycat )
         {
             if( !strcmp( p_parser->psz_object_name, "main" ) ) continue;
 
-            module_config_t *p_config = p_parser->p_config;
-            if( p_config ) do
+            for (size_t i = 0; i < p_parser->confsize; i++)
             {
+                module_config_t *p_config = p_parser->p_config + i;
                 /* Hack: required subcategory is stored in i_min */
                 if( p_config->i_type == CONFIG_SUBCATEGORY &&
-                    p_config->i_value == p_item->i_min )
+                    p_config->value.i == p_item->min.i )
                 {
                     QCheckBox *cb =
                         new QCheckBox( qfu( p_parser->psz_object_name ) );
                     cb->setToolTip( qfu(p_parser->psz_longname) );
                     modules.push_back( cb );
                 }
-            } while( p_config->i_type != CONFIG_HINT_END && p_config++ );
+            }
         }
         else if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
         {
@@ -512,7 +512,7 @@ void IntegerConfigControl::finish()
 {
     spin->setMaximum( 2000000000 );
     spin->setMinimum( -2000000000 );
-    spin->setValue( p_item->i_value );
+    spin->setValue( p_item->value.i );
     spin->setToolTip( qfu(p_item->psz_longtext) );
     if( label )
         label->setToolTip( qfu(p_item->psz_longtext) );
@@ -543,8 +543,8 @@ IntegerRangeConfigControl::IntegerRangeConfigControl( vlc_object_t *_p_this,
 
 void IntegerRangeConfigControl::finish()
 {
-    spin->setMaximum( p_item->i_max );
-    spin->setMinimum( p_item->i_min );
+    spin->setMaximum( p_item->max.i );
+    spin->setMinimum( p_item->min.i );
 }
 
 /********* Integer / choice list **********/
@@ -585,7 +585,7 @@ void IntegerListConfigControl::finish( bool bycat )
     {
         combo->addItem( qfu(p_item->ppsz_list_text[i_index] ),
                         QVariant( p_item->pi_list[i_index] ) );
-        if( p_item->i_value == p_item->pi_list[i_index] )
+        if( p_item->value.i == p_item->pi_list[i_index] )
             combo->setCurrentIndex( combo->count() - 1 );
     }
     combo->setToolTip( qfu(p_item->psz_longtext) );
@@ -632,7 +632,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
 
 void BoolConfigControl::finish()
 {
-    checkbox->setCheckState( p_item->i_value == VLC_TRUE ? Qt::Checked
+    checkbox->setCheckState( p_item->value.i == VLC_TRUE ? Qt::Checked
                                                         : Qt::Unchecked );
     checkbox->setToolTip( qfu(p_item->psz_longtext) );
 }
@@ -687,7 +687,7 @@ void FloatConfigControl::finish()
     spin->setMaximum( 2000000000. );
     spin->setMinimum( -2000000000. );
     spin->setSingleStep( 0.1 );
-    spin->setValue( (double)p_item->f_value );
+    spin->setValue( (double)p_item->value.f );
     spin->setToolTip( qfu(p_item->psz_longtext) );
     if( label )
         label->setToolTip( qfu(p_item->psz_longtext) );
@@ -719,8 +719,8 @@ FloatRangeConfigControl::FloatRangeConfigControl( vlc_object_t *_p_this,
 
 void FloatRangeConfigControl::finish()
 {
-    spin->setMaximum( (double)p_item->f_max );
-    spin->setMinimum( (double)p_item->f_min );
+    spin->setMaximum( (double)p_item->max.f );
+    spin->setMinimum( (double)p_item->min.f );
 }
 
 
@@ -762,22 +762,23 @@ void KeySelectorControl::finish()
 
     module_t *p_main = config_FindModule( p_this, "main" );
     assert( p_main );
-    module_config_t *p_item = p_main->p_config;
 
-    if( p_item ) do
+    for (size_t i = 0; i < p_main->confsize; i++)
     {
+        module_config_t *p_item = p_main->p_config + i;
+
         if( p_item->i_type & CONFIG_ITEM && p_item->psz_name &&
             strstr( p_item->psz_name , "key-" ) )
         {
             QTreeWidgetItem *treeItem = new QTreeWidgetItem();
             treeItem->setText( 0, qfu( p_item->psz_text ) );
-            treeItem->setText( 1, VLCKeyToString( p_item->i_value ) );
+            treeItem->setText( 1, VLCKeyToString( p_item->value.i ) );
             treeItem->setData( 0, Qt::UserRole,
                                   QVariant::fromValue( (void*)p_item ) );
             values += p_item;
             table->addTopLevelItem( treeItem );
         }
-    } while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+    }
     table->resizeColumnToContents( 0 );
 
     CONNECT( table, itemDoubleClicked( QTreeWidgetItem *, int ),
@@ -793,7 +794,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
     d->exec();
     if( d->result() == QDialog::Accepted )
     {
-        p_keyItem->i_value = d->keyValue;
+        p_keyItem->value.i = d->keyValue;
         if( d->conflicts )
         {
             for( int i = 0; i < table->topLevelItemCount() ; i++ )
@@ -801,11 +802,11 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
                 QTreeWidgetItem *it = table->topLevelItem(i);
                 module_config_t *p_item = static_cast<module_config_t*>
                               (it->data( 0, Qt::UserRole ).value<void*>());
-                it->setText( 1, VLCKeyToString( p_item->i_value ) );
+                it->setText( 1, VLCKeyToString( p_item->value.i ) );
             }
         }
         else
-            keyItem->setText( 1, VLCKeyToString( p_keyItem->i_value ) );
+            keyItem->setText( 1, VLCKeyToString( p_keyItem->value.i ) );
     }
     delete d;
 }
@@ -814,7 +815,7 @@ void KeySelectorControl::doApply()
 {
     foreach( module_config_t *p_current, values )
     {
-        config_PutInt( p_this, p_current->psz_name, p_current->i_value );
+        config_PutInt( p_this, p_current->psz_name, p_current->value.i );
     }
 }
 
@@ -855,10 +856,10 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
     module_config_t *p_current = NULL;
     foreach( p_current, values )
     {
-        if( p_current->i_value == i_vlck && strcmp( p_current->psz_text,
+        if( p_current->value.i == i_vlck && strcmp( p_current->psz_text,
                                                     keyToChange ) )
         {
-            p_current->i_value = 0;
+            p_current->value.i = 0;
             conflicts = true;
             break;
         }

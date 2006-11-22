@@ -77,44 +77,42 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 #undef BI
 
     /* Build the tree for the main module */
-    int i_index;
-    module_t *p_module;
+    module_t *p_module = NULL;
     vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
                                         FIND_ANYWHERE );
-    bool found = true;
     if( !p_list ) return;
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    for( int i_index = 0; p_module == NULL; i_index++ )
     {
-        p_module = (module_t *)p_list->p_values[i_index].p_object;
-        if( !strcmp( p_module->psz_object_name, "main" ) ) {
-            found = true; break;
-        }
-    }
-    assert( found );
+        assert (i_index < p_list->i_count);
 
-    module_config_t *p_item = p_module->p_config;
+        p_module = (module_t *)p_list->p_values[i_index].p_object;
+        if( strcmp( p_module->psz_object_name, "main" ) )
+            p_module = NULL;
+    }
+
     PrefsItemData *data = NULL;
     QTreeWidgetItem *current_item = NULL;
-    if( p_item ) do
+    for (size_t i = 0; i < p_module->confsize; i++)
     {
+        module_config_t *p_item = p_module->p_config + i;
         char *psz_help;
         QIcon icon;
         switch( p_item->i_type )
         {
         case CONFIG_CATEGORY:
-            if( p_item->i_value == -1 ) break;
+            if( p_item->value.i == -1 ) break;
             data = new PrefsItemData();
             data->name = QString( qfu( config_CategoryNameGet
-                                           ( p_item->i_value ) ) );
-            psz_help = config_CategoryHelpGet( p_item->i_value );
+                                           ( p_item->value.i ) ) );
+            psz_help = config_CategoryHelpGet( p_item->value.i );
             if( psz_help )
                 data->help = QString( qfu(psz_help) );
             else
                 data->help.clear();
             data->i_type = TYPE_CATEGORY;
-            data->i_object_id = p_item->i_value;
+            data->i_object_id = p_item->value.i;
 
-            switch( p_item->i_value )
+            switch( p_item->value.i )
             {
 #define CI(a,b) case a: icon = b##_icon;break
             CI( CAT_AUDIO, audio );
@@ -135,22 +133,22 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             addTopLevelItem( current_item );
             break;
         case CONFIG_SUBCATEGORY:
-            if( p_item->i_value == -1 ) break;
+            if( p_item->value.i == -1 ) break;
             if( data &&
-                ( p_item->i_value == SUBCAT_VIDEO_GENERAL ||
-                  p_item->i_value == SUBCAT_ADVANCED_MISC ||
-                  p_item->i_value == SUBCAT_INPUT_GENERAL ||
-                  p_item->i_value == SUBCAT_INTERFACE_GENERAL ||
-                  p_item->i_value == SUBCAT_SOUT_GENERAL||
-                  p_item->i_value == SUBCAT_PLAYLIST_GENERAL||
-                  p_item->i_value == SUBCAT_AUDIO_GENERAL ) )
+                ( p_item->value.i == SUBCAT_VIDEO_GENERAL ||
+                  p_item->value.i == SUBCAT_ADVANCED_MISC ||
+                  p_item->value.i == SUBCAT_INPUT_GENERAL ||
+                  p_item->value.i == SUBCAT_INTERFACE_GENERAL ||
+                  p_item->value.i == SUBCAT_SOUT_GENERAL||
+                  p_item->value.i == SUBCAT_PLAYLIST_GENERAL||
+                  p_item->value.i == SUBCAT_AUDIO_GENERAL ) )
             {
                 // Data still contains the correct thing
                 data->i_type = TYPE_CATSUBCAT;
-                data->i_subcat_id = p_item->i_value;
+                data->i_subcat_id = p_item->value.i;
                 data->name = QString( qfu( config_CategoryNameGet(
-                                            p_item->i_value )) );
-                psz_help = config_CategoryHelpGet( p_item->i_value );
+                                            p_item->value.i )) );
+                psz_help = config_CategoryHelpGet( p_item->value.i );
                 if( psz_help )
                     data->help = QString( qfu(psz_help) );
                 else
@@ -161,14 +159,14 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             }
             data = new PrefsItemData();
             data->name = QString( qfu( config_CategoryNameGet(
-                                                        p_item->i_value)) );
-            psz_help = config_CategoryHelpGet( p_item->i_value );
+                                                        p_item->value.i)) );
+            psz_help = config_CategoryHelpGet( p_item->value.i );
             if( psz_help )
                 data->help = QString( qfu(psz_help) );
             else
                 data->help.clear();
             data->i_type = TYPE_SUBCATEGORY;
-            data->i_object_id = p_item->i_value;
+            data->i_object_id = p_item->value.i;
 
             assert( current_item );
 
@@ -182,12 +180,11 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             current_item->addChild( subcat_item );
             break;
         }
-    } while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+    }
 
     /* Build the tree of plugins */
     for( int i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        module_config_t *p_item;
         int i_subcategory = -1, i_category = -1, i_options = 0;
         p_module = (module_t *)p_list->p_values[i_index].p_object;
 
@@ -198,20 +195,20 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
          * are stored in the parent module) */
         if( p_module->b_submodule ) continue;
 
-        p_item = p_module->p_config;
-        if( !p_item ) continue;
+        for (size_t i = 0; i < p_module->confsize; i++)
+        {
+            module_config_t *p_item = p_module->p_config + i;
 
-        do {
             if( p_item->i_type == CONFIG_CATEGORY )
-                i_category = p_item->i_value;
+                i_category = p_item->value.i;
             else if( p_item->i_type == CONFIG_SUBCATEGORY )
-                i_subcategory = p_item->i_value;
+                i_subcategory = p_item->value.i;
             if( p_item->i_type & CONFIG_ITEM )
                 i_options++;
 
             if( i_options > 0 && i_category >= 0 && i_subcategory >= 0 )
                 break;
-        } while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+        }
 
         if( !i_options ) continue; // Nothing to display
 
@@ -365,9 +362,9 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         {
             if( p_item->i_type == CONFIG_SUBCATEGORY &&
                             ( data->i_type == TYPE_SUBCATEGORY &&
-                              p_item->i_value == data->i_object_id ) ||
+                              p_item->value.i == data->i_object_id ) ||
                             ( data->i_type == TYPE_CATSUBCAT &&
-                              p_item->i_value == data->i_subcat_id ) )
+                              p_item->value.i == data->i_subcat_id ) )
                 break;
             if( p_item->i_type == CONFIG_HINT_END ) break;
         } while( p_item++ );
@@ -415,9 +412,9 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     if( p_item ) do
     {
         if( ( ( data->i_type == TYPE_SUBCATEGORY &&
-                p_item->i_value != data->i_object_id ) ||
+                p_item->value.i != data->i_object_id ) ||
               ( data->i_type == TYPE_CATSUBCAT  &&
-                p_item->i_value != data->i_subcat_id ) ) &&
+                p_item->value.i != data->i_subcat_id ) ) &&
             ( p_item->i_type == CONFIG_CATEGORY ||
               p_item->i_type == CONFIG_SUBCATEGORY ) )
             break;
