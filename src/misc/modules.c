@@ -1702,10 +1702,12 @@ static void CacheLoad( vlc_object_t *p_this )
 #define LOAD_IMMEDIATE(a) \
     if( fread( (void *)&a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
 #define LOAD_STRING(a) \
+{ \
     a = NULL; \
-    if( fread( &i_size, sizeof(char), sizeof(i_size), file ) \
-          != sizeof(i_size) ) goto error; \
-    if( i_size && i_size < 16384 ) { \
+    if( ( fread( &i_size, sizeof(i_size), 1, file ) != 1 ) \
+     || ( i_size > 16384 ) ) \
+        goto error; \
+    if( i_size ) { \
         char *psz = malloc( i_size ); \
         if( fread( psz, i_size, 1, file ) != 1 ) { \
             free( psz ); \
@@ -1716,7 +1718,8 @@ static void CacheLoad( vlc_object_t *p_this )
             goto error; \
         } \
         a = psz; \
-    }
+    } \
+}
 
     for( i = 0; i < i_cache; i++ )
     {
