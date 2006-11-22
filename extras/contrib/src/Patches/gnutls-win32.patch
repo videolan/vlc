@@ -27,3 +27,22 @@
  	      session->internals.record_send_buffer_prev_size += n - left;
  
  	      retval =
+--- gnutls-1.4.0/gl/gai_strerror.c	2006-05-12 06:02:19.000000000 -0400
++++ gnutls/gl/gai_strerror.c	2006-11-22 10:28:13.937500000 -0500
+@@ -64,7 +64,7 @@
+     { EAI_IDN_ENCODE, N_("Parameter string not correctly encoded") }
+ #endif
+   };
+-
++#if !defined _WIN32
+ const char *
+ gai_strerror (int code)
+ {
+@@ -75,6 +75,7 @@
+ 
+   return _("Unknown error");
+ }
++#endif
+ #ifdef _LIBC
+ libc_hidden_def (gai_strerror)
+ #endif
