@@ -407,10 +407,10 @@ gettext-$(GETTEXT_VERSION).tar.gz:
 gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
-	patch -p 0 < Patches/gettext-macosx.patch 
+	patch -p0 < Patches/gettext-macosx.patch 
 endif
 ifdef HAVE_WIN32
-	patch -p 0 < Patches/gettext-win32.patch
+	patch -p0 < Patches/gettext-win32.patch
 endif
 
 .intl: gettext .iconv
@@ -452,7 +452,7 @@ libiconv-$(LIBICONV_VERSION).tar.gz:
 libiconv: libiconv-$(LIBICONV_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
-	patch -p 0 < Patches/libiconv.patch
+	patch -p0 < Patches/libiconv.patch
 endif
 
 ifdef HAVE_DARWIN_OS
@@ -497,9 +497,9 @@ fribidi-$(FRIBIDI_VERSION).tar.gz:
 
 fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/fribidi.patch.real
+	patch -p0 < Patches/fribidi.patch.real
 ifdef HAVE_WIN32
-	patch -p 0 <Patches/fribidi-win32.patch
+	patch -p0 <Patches/fribidi-win32.patch
 endif
 .fribidi: fribidi .iconv
 	(cd $<; rm -f configure; ./bootstrap && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  && make && make install)
@@ -611,10 +611,10 @@ libogg-$(OGG_VERSION).tar.gz:
 
 libogg: libogg-$(OGG_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/ogg.patch
-	patch -p 0 < Patches/libogg-1.1.patch
+	patch -p0 < Patches/ogg.patch
+	patch -p0 < Patches/libogg-1.1.patch
 ifdef HAVE_WINCE
-	patch -p 0 < Patches/libogg-wince.patch
+	patch -p0 < Patches/libogg-wince.patch
 endif
 	(cd $@; autoconf)
 
@@ -636,14 +636,14 @@ DISTCLEAN_PKG += libogg-$(OGG_VERSION).tar.gz
 #	cvs -d $(OGG_CVSROOT) login
 #	cvs -d $(OGG_CVSROOT) co vorbis
 #	(cd $@; ./autogen.sh)
-#	patch -p 0 < Patches/vorbis.patch
+#	patch -p0 < Patches/vorbis.patch
 
 libvorbis-$(VORBIS_VERSION).tar.gz:
 	$(WGET) $(VORBIS_URL)
 
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/libvorbis-1.1.patch
+	patch -p0 < Patches/libvorbis-1.1.patch
 	(cd $@; autoconf)
 
 .vorbis: libvorbis .ogg
@@ -747,10 +747,10 @@ flac-$(FLAC_VERSION).tar.gz:
 flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
-	patch -p 0 < Patches/flac-mactel.patch
+	patch -p0 < Patches/flac-mactel.patch
 endif
 ifneq ($(HOST),$(BUILD))
-	(patch -p 0 < Patches/flac-cross.patch && cd $@ && autoconf)
+	(patch -p0 < Patches/flac-cross.patch && cd $@ && autoconf)
 endif
 
 .FLAC: flac 
@@ -801,7 +801,7 @@ DISTCLEAN_PKG += speex-$(SPEEX_VERSION).tar.gz
 #	@echo "*** Please type return here : ***"
 #	cvs -d $(FAAD2_CVSROOT) login
 #	cvs -d $(FAAD2_CVSROOT) co faad2
-#	(cd $@; patch -p 0 < ../Patches/faad2.patch)
+#	(cd $@; patch -p0 < ../Patches/faad2.patch)
 #	(cd $@; sh ./bootstrap)
 
 faad2-$(FAAD2_VERSION).tar.bz2:
@@ -809,7 +809,7 @@ faad2-$(FAAD2_VERSION).tar.bz2:
 
 faad: faad2-$(FAAD2_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	(cd $@; patch -p 0  < ../Patches/faad2.patch && ./bootstrap)
+	(cd $@; patch -p0  < ../Patches/faad2.patch && ./bootstrap)
 
 .faad: faad
 	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && sed -i.orig "s/shrext_cmds/shrext/g" libtool && make -C libfaad && make -C libfaad install)
@@ -829,7 +829,7 @@ faac-$(FAAC_VERSION).tar.bz2:
 
 faac: faac-$(FAAC_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/faac.patch
+	patch -p0 < Patches/faac.patch
 
 .faac: faac
 	(cd $<; rm -f install-sh mkinstalldirs missing && ./bootstrap && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install)
@@ -873,7 +873,7 @@ libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 endif
 ifdef HAVE_WIN32
-	(cd $@; patch -p 0 < ../Patches/libebml-svn-win32.patch)
+	(cd $@; patch -p0 < ../Patches/libebml-svn-win32.patch)
 endif
 
 .ebml: libebml
@@ -904,7 +904,7 @@ libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 endif
 ifdef HAVE_WIN32
-	(cd $@; patch -p 0 < ../Patches/libmatroska-win32.patch)
+	(cd $@; patch -p0 < ../Patches/libmatroska-win32.patch)
 endif
 
 .matroska: libmatroska .ebml
@@ -927,13 +927,13 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 ffmpeg:
 	$(SVN) co $(FFMPEG_SVN)  ffmpeg
 ifeq ($(HOST),i586-pc-beos)
-	(cd $@; patch -p 0 < ../Patches/ffmpeg-svn-beos.patch)
+	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-beos.patch)
 endif
 ifdef HAVE_WINCE
-	patch -p 1 < Patches/ffmpeg-svn-wince.patch
+	patch -p1 < Patches/ffmpeg-svn-wince.patch
 endif
 ifdef HAVE_WIN32
-	(cd $@; patch -p 0 < ../Patches/ffmpeg-alignment.patch)
+	(cd $@; patch -p0 < ../Patches/ffmpeg-alignment.patch)
 endif
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
@@ -941,7 +941,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 
 #ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
 #	$(EXTRACT_GZ)
-#	patch -p 0 < Patches/ffmpeg.patch
+#	patch -p0 < Patches/ffmpeg.patch
 
 ifdef HAVE_WINCE
 .ffmpeg: ffmpeg .zlib
@@ -996,7 +996,7 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 #		rm -rf $@ \
 #		exit 1; \
 #	fi
-#	(cd libdvdread; patch -p 0 < ../Patches/libdvdread-20041028-win32.patch; ./bootstrap)
+#	(cd libdvdread; patch -p0 < ../Patches/libdvdread-20041028-win32.patch; ./bootstrap)
 #endif
 
 #.dvdread: libdvdread .dvdcss
@@ -1027,8 +1027,8 @@ libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 
 libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/dvdnav.patch
-	patch -p 0 < Patches/libdvdnav-mactel.patch
+	patch -p0 < Patches/dvdnav.patch
+	patch -p0 < Patches/libdvdnav-mactel.patch
 	(cd $@; ./autogen.sh noconfig)
 
 .dvdnav: libdvdnav .dvdcss
@@ -1072,9 +1072,9 @@ live555-$(LIVEDOTCOM_VERSION).tar.gz:
 
 live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/live.patch
-	patch -p 0 < Patches/livedotcom-win32.patch
-	patch -p 0 < Patches/live-osx.patch
+	patch -p0 < Patches/live.patch
+	patch -p0 < Patches/livedotcom-win32.patch
+	patch -p0 < Patches/live-osx.patch
 
 .live: live
 ifdef HAVE_WIN32 
@@ -1127,13 +1127,13 @@ goom$(GOOM2k4_VERSION).tar.gz:
 goom: goom$(GOOM2k4_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
-	patch -p 0 < Patches/goom.patch
+	patch -p0 < Patches/goom.patch
 endif
 ifdef HAVE_WIN32
 	(cd $@; dos2unix configure.in)
-	patch -p 0 < Patches/goom2k4-0-win32.patch
+	patch -p0 < Patches/goom2k4-0-win32.patch
 else
-	patch -p 0 < Patches/goom2k4-0-mmx.patch
+	patch -p0 < Patches/goom2k4-0-mmx.patch
 endif
 
 .goom2k4: goom
@@ -1193,7 +1193,7 @@ ifdef SVN
 x264: 
 	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
 ifdef HAVE_WIN32
-	(cd x264; patch -p 0 < ../Patches/x264-svn-win32.patch )
+	(cd x264; patch -p0 < ../Patches/x264-svn-win32.patch )
 endif
 else
 x264-$(X264_VERSION).tar.gz:
@@ -1202,9 +1202,9 @@ x264-$(X264_VERSION).tar.gz:
 x264: x264-$(X264_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
-	(cd x264;patch -p 0 <../Patches/x264-20050624-win32.patch)
+	(cd x264;patch -p0 <../Patches/x264-20050624-win32.patch)
 else
-	patch -p 0 < Patches/x264.patch
+	patch -p0 < Patches/x264.patch
 	rm x264/x264.c
 endif
 endif
@@ -1366,7 +1366,7 @@ zlib-$(ZLIB_VERSION).tar.gz:
 
 zlib: zlib-$(ZLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/zlib.patch
+	patch -p0 < Patches/zlib.patch
 
 .zlib: zlib
 	(cd zlib; $(HOSTCC2) ./configure --prefix=$(PREFIX) && make install)
@@ -1388,7 +1388,7 @@ pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz:
 portaudio: pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifneq ($(HOST),$(BUILD))
-	(patch -p 0 < Patches/portaudio-cross.patch;cd $@;  autoconf)
+	(patch -p0 < Patches/portaudio-cross.patch;cd $@;  autoconf)
 endif
 
 .portaudio: portaudio 
@@ -1411,7 +1411,7 @@ libxml2-$(XML_VERSION).tar.gz:
 xml: libxml2-$(XML_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
-	patch -p 0 < Patches/xml2-win32.patch
+	patch -p0 < Patches/xml2-win32.patch
 	rm -f xml/aclocal.m4
 endif
 
@@ -1437,7 +1437,7 @@ twolame-$(TWOLAME_VERSION).tar.gz:
 twolame: twolame-$(TWOLAME_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_BEOS
-	patch -p 0 < Patches/twolame-BeOS.patch
+	patch -p0 < Patches/twolame-BeOS.patch
 endif
 
 .twolame: twolame
@@ -1463,9 +1463,9 @@ ifdef HAVE_WIN32
 else
 	(cat Patches/libpng-osx.patch | sed -e 's%??PREFIX??%$(PREFIX)%' -e 's%??EXTRA_CFLAGS??%$(EXTRA_CFLAGS)%' -e 's%??EXTRA_LDFLAGS??%$(EXTRA_LDFLAGS)%' | patch -p0)
 endif
-	(patch -p 0 < Patches/libpng-makefile.patch)
+	(patch -p0 < Patches/libpng-makefile.patch)
 ifeq ($(HOST),i686-apple-darwin8)
-	(patch -p 0 < Patches/libpng-darwin-mactel.patch)
+	(patch -p0 < Patches/libpng-darwin-mactel.patch)
 endif
 
 .png: libpng 
@@ -1516,9 +1516,9 @@ libgpg-error-$(GPGERROR_VERSION).tar.gz:
 
 libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/libgpg-error.patch
+	patch -p0 < Patches/libgpg-error.patch
 ifdef HAVE_WIN32
-	patch -p 0 < Patches/libgpg-error-win32.patch
+	patch -p0 < Patches/libgpg-error-win32.patch
 endif
 
 .gpg-error: libgpg-error
@@ -1542,7 +1542,7 @@ libgcrypt-$(GCRYPT_VERSION).tar.bz2:
 
 libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/gcrypt.patch
+	patch -p0 < Patches/gcrypt.patch
 
 .gcrypt: libgcrypt .gpg-error
 ifdef HAVE_WIN32
@@ -1593,7 +1593,7 @@ libopendaap-$(DAAP_VERSION).tar.bz2:
 
 libopendaap: libopendaap-$(DAAP_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/daap.patch
+	patch -p0 < Patches/daap.patch
 
 .opendaap: libopendaap
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make install)
@@ -1613,7 +1613,7 @@ glib-$(GLIB_VERSION).tar.gz:
 
 glib: glib-$(GLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/glib.patch
+	patch -p0 < Patches/glib.patch
 
 .glib: glib
 	(cd $<; ./configure --prefix=$(PREFIX) --host=powerpc-apple-macos && make && make install)
@@ -1772,7 +1772,7 @@ SDL_image-$(SDL_IMAGE_VERSION).tar.gz:
 
 SDL_image: SDL_image-$(SDL_IMAGE_VERSION).tar.gz 
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/SDL_image.patch
+	patch -p0 < Patches/SDL_image.patch
 
 .SDL_image: SDL_image .SDL .png .jpeg .tiff
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --enable-tif --disable-sdltest && make && make install)
@@ -1792,7 +1792,7 @@ libmpcdec-$(MUSE_VERSION).tar.bz2:
 
 mpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2 
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/mpcdec.patch
+	patch -p0 < Patches/mpcdec.patch
 ifdef HAVE_WIN32
 	(cd $@; ./autogen.sh)
 endif
@@ -1822,10 +1822,10 @@ dirac-$(DIRAC_VERSION).tar.gz:
 dirac: dirac-$(DIRAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
-	patch -p 0 <Patches/dirac-osx.patch
+	patch -p0 <Patches/dirac-osx.patch
 endif
 ifneq ($(HOST),$(BUILD))
-	patch -p 0 <Patches/dirac-cross.patch
+	patch -p0 <Patches/dirac-cross.patch
 	(cd $@; aclocal && autoconf && automake)
 endif
 
@@ -1900,9 +1900,9 @@ clinkcc: clinkcc$(CLINKCC_VERSION).tar.gz
 	tar xzf $<
 	mv $(patsubst %.tar.gz,Cyberlink,$(patsubst %.tgz,Cyberlink,$(notdir $<))) $@ || true
 	touch $@
-	patch -p 0 < Patches/clinkcc.patch
+	patch -p0 < Patches/clinkcc.patch
 ifdef HAVE_DARWIN_OS
-	patch -p 0 < Patches/clinkcc_osx.patch
+	patch -p0 < Patches/clinkcc_osx.patch
 endif
 
 .clinkcc: clinkcc
