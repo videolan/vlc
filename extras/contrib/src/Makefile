@@ -409,6 +409,9 @@ gettext: gettext-$(GETTEXT_VERSION).tar.gz
 ifdef HAVE_DARWIN_OS
 	patch -p 0 < Patches/gettext-macosx.patch 
 endif
+ifdef HAVE_WIN32
+	patch -p 0 < Patches/gettext-win32.patch
+endif
 
 .intl: gettext .iconv
 ifdef HAVE_WIN32
@@ -1514,6 +1517,9 @@ libgpg-error-$(GPGERROR_VERSION).tar.gz:
 libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/libgpg-error.patch
+ifdef HAVE_WIN32
+	patch -p 0 < Patches/libgpg-error-win32.patch
+endif
 
 .gpg-error: libgpg-error
 ifeq ($(HOST),i686-apple-darwin8)
