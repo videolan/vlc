@@ -224,7 +224,8 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
     p_intf( _p_intf ), p_open_dialog( dialog ), p_advanced_dialog( NULL )
 {
     wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
-    module_config_t *p_item = p_module->p_config;
+    module_config_t *p_item = p_module->p_config,
+                    *p_end = p_item + p_module->confsize;
     bool b_advanced = false;
 
     if( p_item ) do
@@ -247,7 +248,7 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
 
         sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
     }
-    while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+    while( p_item < p_end && p_item++ );
 
     if( b_advanced )
     {
@@ -303,7 +304,7 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
 
             sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
         }
-        while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+        while( p_item < p_end && p_item++ );
 
         /* Separation */
         wxPanel *dummy_panel = new wxPanel( p_advanced_dialog, -1 );

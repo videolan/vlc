@@ -77,7 +77,7 @@ ConfigControl *CreateConfigControl( vlc_object_t *p_this,
         {
             p_control = new IntegerListConfigControl( p_this, p_item, parent );
         }
-        else if( p_item->i_min != 0 || p_item->i_max != 0 )
+        else if( p_item->min.i != 0 || p_item->max.i != 0 )
         {
             p_control = new RangedIntConfigControl( p_this, p_item, parent );
         }
@@ -194,11 +194,11 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
 
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     alt = new wxCheckBox( this, -1, wxU(_("Alt")) );
-    alt->SetValue( p_item->i_value & KEY_MODIFIER_ALT );
+    alt->SetValue( p_item->value.i & KEY_MODIFIER_ALT );
     ctrl = new wxCheckBox( this, -1, wxU(_("Ctrl")) );
-    ctrl->SetValue( p_item->i_value & KEY_MODIFIER_CTRL );
+    ctrl->SetValue( p_item->value.i & KEY_MODIFIER_CTRL );
     shift = new wxCheckBox( this, -1, wxU(_("Shift")) );
-    shift->SetValue( p_item->i_value & KEY_MODIFIER_SHIFT );
+    shift->SetValue( p_item->value.i & KEY_MODIFIER_SHIFT );
     combo = new wxComboBox( this, -1, wxT(""), wxDefaultPosition,
                             wxDefaultSize, i_keys, m_keysList,
                             wxCB_READONLY );
@@ -206,7 +206,7 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
     {
         combo->SetClientData( i, (void*)vlc_keys[i].i_key_code );
         if( (unsigned int)vlc_keys[i].i_key_code ==
-            ( ((unsigned int)p_item->i_value) & ~KEY_MODIFIER ) )
+            ( ((unsigned int)p_item->value.i) & ~KEY_MODIFIER ) )
         {
             combo->SetSelection( i );
             combo->SetValue( wxU(_(vlc_keys[i].psz_key_string)) );
@@ -266,7 +266,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
     module_t *p_parser;
 
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
-    combo = new wxComboBox( this, -1, wxL2U(p_item->psz_value),
+    combo = new wxComboBox( this, -1, wxL2U(p_item->value.psz),
                             wxDefaultPosition, wxDefaultSize,
                             0, NULL, wxCB_READONLY | wxCB_SORT );
 
@@ -282,7 +282,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
         {
             combo->Append( wxU(p_parser->psz_longname),
                            p_parser->psz_object_name );
-            if( p_item->psz_value && !strcmp(p_item->psz_value,
+            if( p_item->value.psz && !strcmp(p_item->value.psz,
                                              p_parser->psz_object_name) )
                 combo->SetValue( wxU(p_parser->psz_longname) );
         }
@@ -318,7 +318,7 @@ ModuleCatConfigControl::ModuleCatConfigControl( vlc_object_t *p_this,
     module_t *p_parser;
 
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
-    combo = new wxComboBox( this, -1, wxL2U(p_item->psz_value),
+    combo = new wxComboBox( this, -1, wxL2U(p_item->value.psz),
                             wxDefaultPosition, wxDefaultSize,
                             0, NULL, wxCB_READONLY | wxCB_SORT );
 
@@ -335,19 +335,21 @@ ModuleCatConfigControl::ModuleCatConfigControl( vlc_object_t *p_this,
               continue;
 
         module_config_t *p_config = p_parser->p_config;
+        module_config_t *p_end = p_config + p_parser->confsize;
+
         if( p_config ) do
         {
-            /* Hack: required subcategory is stored in i_min */
+            /* Hack: required subcategory is stored in min.i */
             if( p_config->i_type == CONFIG_SUBCATEGORY &&
-                p_config->i_value == p_item->i_min )
+                p_config->value.i == p_item->min.i )
             {
                 combo->Append( wxU(p_parser->psz_longname),
                                    p_parser->psz_object_name );
-                if( p_item->psz_value && !strcmp(p_item->psz_value,
+                if( p_item->value.psz && !strcmp(p_item->value.psz,
                                         p_parser->psz_object_name) )
                 combo->SetValue( wxU(p_parser->psz_longname) );
             }
-        } while( p_config->i_type != CONFIG_HINT_END && p_config++ );
+        } while( p_config < p_end && p_config++ );
     }
     vlc_list_release( p_list );
 
@@ -390,7 +392,7 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label );
 
-    text = new wxTextCtrl( this, -1, wxU(p_item->psz_value),
+    text = new wxTextCtrl( this, -1, wxU(p_item->value.psz),
                            wxDefaultPosition,wxSize( 300, 20 ) );
 
 
@@ -403,17 +405,18 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
         if( !strcmp( p_parser->psz_object_name, "main" ) )
               continue;
 
-        module_config_t *p_config;
+        module_config_t *p_config, *p_end;
         if( p_parser->b_submodule )
             p_config = ((module_t*)p_parser->p_parent)->p_config;
         else
             p_config = p_parser->p_config;
+            p_end = p_config + p_parser->confsize;
 
         if( p_config ) do
         {
-            /* Hack: required subcategory is stored in i_min */
+            /* Hack: required subcategory is stored in min.i */
             if( p_config->i_type == CONFIG_SUBCATEGORY &&
-                p_config->i_value == p_item->i_min )
+                p_config->value.i == p_item->min.i )
             {
                 moduleCheckBox *mc = new moduleCheckBox;
                 mc->checkbox = new wxCheckBox( this, wxID_HIGHEST,
@@ -426,14 +429,14 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
                                          :p_parser->psz_object_name );
                 pp_checkboxes.push_back( mc );
 
-                if( p_item->psz_value &&
-                    strstr( p_item->psz_value, mc->psz_module ) )
+                if( p_item->value.psz &&
+                    strstr( p_item->value.psz, mc->psz_module ) )
                 {
                     mc->checkbox->SetValue( true );
                 }
                 sizer->Add( mc->checkbox );
             }
-        } while( p_config->i_type != CONFIG_HINT_END && p_config++ );
+        } while( p_config < p_end && p_config++ );
     }
     vlc_list_release( p_list );
 
@@ -523,7 +526,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *p_this,
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     textctrl = new wxTextCtrl( this, -1,
-                               wxL2U(p_item->psz_value),
+                               wxL2U(p_item->value.psz),
                                wxDefaultPosition,
                                wxDefaultSize,
                                wxTE_PROCESS_ENTER);
@@ -556,7 +559,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
                                                   wxWindow *parent )
   : ConfigControl( p_this, p_item, parent )
 {
-    psz_default_value = p_item->psz_value;
+    psz_default_value = p_item->value.psz;
     if( psz_default_value ) psz_default_value = strdup( psz_default_value );
 
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
@@ -599,9 +602,9 @@ void StringListConfigControl::UpdateCombo( module_config_t *p_item )
                        wxU(p_item->ppsz_list_text[i_index]) :
                        wxL2U(p_item->ppsz_list[i_index]) );
         combo->SetClientData( i_index, (void *)p_item->ppsz_list[i_index] );
-        if( ( p_item->psz_value &&
-              !strcmp( p_item->psz_value, p_item->ppsz_list[i_index] ) ) ||
-             ( !p_item->psz_value && !*p_item->ppsz_list[i_index] ) )
+        if( ( p_item->value.psz &&
+              !strcmp( p_item->value.psz, p_item->ppsz_list[i_index] ) ) ||
+             ( !p_item->value.psz && !*p_item->ppsz_list[i_index] ) )
         {
             combo->SetSelection( i_index );
             combo->SetValue( ( p_item->ppsz_list_text &&
@@ -612,13 +615,13 @@ void StringListConfigControl::UpdateCombo( module_config_t *p_item )
         }
     }
 
-    if( p_item->psz_value && !b_found )
+    if( p_item->value.psz && !b_found )
     {
         /* Add custom entry to list */
-        combo->Append( wxL2U(p_item->psz_value) );
+        combo->Append( wxL2U(p_item->value.psz) );
         combo->SetClientData( i_index, (void *)psz_default_value );
         combo->SetSelection( i_index );
-        combo->SetValue( wxL2U(p_item->psz_value) );
+        combo->SetValue( wxL2U(p_item->value.psz) );
     }
 }
 
@@ -674,7 +677,7 @@ FileConfigControl::FileConfigControl( vlc_object_t *p_this,
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     textctrl = new wxTextCtrl( this, -1,
-                               wxL2U(p_item->psz_value),
+                               wxL2U(p_item->value.psz),
                                wxDefaultPosition,
                                wxDefaultSize,
                                wxTE_PROCESS_ENTER);
@@ -745,16 +748,16 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *p_this,
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     spin = new wxSpinCtrl( this, -1,
                            wxString::Format(wxT("%d"),
-                                            p_item->i_value),
+                                            p_item->value.i),
                            wxDefaultPosition, wxDefaultSize,
                            wxSP_ARROW_KEYS,
-                           -100000000, 100000000, p_item->i_value);
+                           -100000000, 100000000, p_item->value.i);
     spin->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     sizer->Layout();
     this->SetSizerAndFit( sizer );
-    i_value = p_item->i_value;
+    i_value = p_item->value.i;
 }
 
 IntegerConfigControl::~IntegerConfigControl()
@@ -822,7 +825,7 @@ void IntegerListConfigControl::UpdateCombo( module_config_t *p_item )
                                             p_item->pi_list[i_index]) );
         }
         combo->SetClientData( i_index, (void *)p_item->pi_list[i_index] );
-        if( p_item->i_value == p_item->pi_list[i_index] )
+        if( p_item->value.i == p_item->pi_list[i_index] )
         {
             combo->SetSelection( i_index );
             if( p_item->ppsz_list_text && p_item->ppsz_list_text[i_index] )
@@ -891,8 +894,8 @@ RangedIntConfigControl::RangedIntConfigControl( vlc_object_t *p_this,
   : ConfigControl( p_this, p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
-    slider = new wxSlider( this, -1, p_item->i_value, p_item->i_min,
-                           p_item->i_max, wxDefaultPosition, wxDefaultSize,
+    slider = new wxSlider( this, -1, p_item->value.i, p_item->min.i,
+                           p_item->max.i, wxDefaultPosition, wxDefaultSize,
                            wxSL_LABELS | wxSL_HORIZONTAL );
     slider->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
@@ -927,7 +930,7 @@ FloatConfigControl::FloatConfigControl( vlc_object_t *p_this,
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     textctrl = new wxTextCtrl( this, -1,
                                wxString::Format(wxT("%f"),
-                                                p_item->f_value),
+                                                p_item->value.f),
                                wxDefaultPosition, wxDefaultSize,
                                wxTE_PROCESS_ENTER );
     textctrl->SetToolTip( wxU(p_item->psz_longtext) );
@@ -963,7 +966,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *p_this,
   : ConfigControl( p_this, p_item, parent )
 {
     checkbox = new wxCheckBox( this, -1, wxU(p_item->psz_text) );
-    if( p_item->i_value ) checkbox->SetValue(TRUE);
+    if( p_item->value.i ) checkbox->SetValue(TRUE);
     checkbox->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( checkbox, 0, wxALL, 5 );
     sizer->Layout();

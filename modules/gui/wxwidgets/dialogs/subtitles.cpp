@@ -99,7 +99,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
                                                             wxHORIZONTAL );
         wxStaticText *label =
             new wxStaticText(panel, -1, wxU(p_item->psz_text));
-        encoding_combo = new wxComboBox( panel, -1, wxU(p_item->psz_value),
+        encoding_combo = new wxComboBox( panel, -1, wxU(p_item->value.psz),
                                          wxDefaultPosition, wxDefaultSize,
                                          0, NULL, wxCB_READONLY );
 
@@ -108,13 +108,13 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
              i_index++ )
         {
             encoding_combo->Append( wxU(p_item->ppsz_list[i_index]) );
-            if( p_item->psz_value && !strcmp( p_item->psz_value,
+            if( p_item->value.psz && !strcmp( p_item->value.psz,
                                               p_item->ppsz_list[i_index] ) )
                 encoding_combo->SetSelection( i_index );
         }
 
-        if( p_item->psz_value )
-        encoding_combo->SetValue( wxU(p_item->psz_value) );
+        if( p_item->value.psz )
+        encoding_combo->SetValue( wxU(p_item->value.psz) );
         encoding_combo->SetToolTip( wxU(p_item->psz_longtext) );
 
         enc_sizer->Add( label, 0, wxALL | wxALIGN_CENTER, 5 );
@@ -150,7 +150,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
         {
             size_combo->Append( wxU(p_item->ppsz_list_text[i_index]),
                                 (void *)p_item->pi_list[i_index] );
-            if( p_item->i_value == p_item->pi_list[i_index] )
+            if( p_item->value.i == p_item->pi_list[i_index] )
             {
                 size_combo->SetSelection( i_index );
                 size_combo->SetValue(wxU(p_item->ppsz_list_text[i_index]));
@@ -180,7 +180,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
         {
             align_combo->Append( wxU(p_item->ppsz_list_text[i_index]),
                                 (void *)p_item->pi_list[i_index] );
-            if( p_item->i_value == p_item->pi_list[i_index] )
+            if( p_item->value.i == p_item->pi_list[i_index] )
             {
                 align_combo->SetSelection( i_index );
                 align_combo->SetValue(wxU(p_item->ppsz_list_text[i_index]));

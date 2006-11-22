@@ -325,7 +325,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 {
     vlc_list_t      *p_list = NULL;;
     module_t        *p_module;
-    module_config_t *p_item;
+    module_config_t *p_item, *p_end;
     int i_index, i_image=0;
 
     /* Initializations */
@@ -368,6 +368,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         /* Enumerate config categories and store a reference so we can
          * generate their config panel them when it is asked by the user. */
         p_item = p_module->p_config;
+        p_end = p_item + p_module->confsize;
 
         if( p_item ) do
         {
@@ -376,10 +377,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             {
             case CONFIG_CATEGORY:
                 config_data = new ConfigTreeData;
-                if( p_item->i_value == -1 )   break; // Don't display it
+                if( p_item->value.i == -1 )   break; // Don't display it
                 config_data->psz_name = strdup( config_CategoryNameGet(
-                                                            p_item->i_value ) );
-                psz_help = config_CategoryHelpGet( p_item->i_value );
+                                                            p_item->value.i ) );
+                psz_help = config_CategoryHelpGet( p_item->value.i );
                 if( psz_help )
                 {
                     config_data->psz_help = wraptext( strdup( psz_help ), 72 );
@@ -389,10 +390,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                     config_data->psz_help = NULL;
                 }
                 config_data->i_type = TYPE_CATEGORY;
-                config_data->i_object_id = p_item->i_value;
+                config_data->i_object_id = p_item->value.i;
 
                 /* Add the category to the tree */
-                switch( p_item->i_value )
+                switch( p_item->value.i )
                 {
                     case CAT_AUDIO:
                         i_image = 0; break;
@@ -415,26 +416,26 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
                 break;
             case CONFIG_SUBCATEGORY:
-                if( p_item->i_value == -1 ) break; // Don't display it
+                if( p_item->value.i == -1 ) break; // Don't display it
                 /* Special case: move the "general" subcategories to their
                  * parent category */
-                if( p_item->i_value == SUBCAT_VIDEO_GENERAL ||
-                    p_item->i_value == SUBCAT_ADVANCED_MISC ||
-                    p_item->i_value == SUBCAT_INPUT_GENERAL ||
-                    p_item->i_value == SUBCAT_INTERFACE_GENERAL ||
-                    p_item->i_value == SUBCAT_SOUT_GENERAL||
-                    p_item->i_value == SUBCAT_PLAYLIST_GENERAL||
-                    p_item->i_value == SUBCAT_AUDIO_GENERAL )
+                if( p_item->value.i == SUBCAT_VIDEO_GENERAL ||
+                    p_item->value.i == SUBCAT_ADVANCED_MISC ||
+                    p_item->value.i == SUBCAT_INPUT_GENERAL ||
+                    p_item->value.i == SUBCAT_INTERFACE_GENERAL ||
+                    p_item->value.i == SUBCAT_SOUT_GENERAL||
+                    p_item->value.i == SUBCAT_PLAYLIST_GENERAL||
+                    p_item->value.i == SUBCAT_AUDIO_GENERAL )
                 {
                     ConfigTreeData *cd = (ConfigTreeData *)
                                             GetItemData( current_item );
                     cd->i_type = TYPE_CATSUBCAT;
-                    cd->i_subcat_id = p_item->i_value;
+                    cd->i_subcat_id = p_item->value.i;
                     if( cd->psz_name ) free( cd->psz_name );
                     cd->psz_name = strdup(  config_CategoryNameGet(
-                                                      p_item->i_value ) );
+                                                      p_item->value.i ) );
                     if( cd->psz_help ) free( cd->psz_help );
-                    char *psz_help = config_CategoryHelpGet( p_item->i_value );
+                    char *psz_help = config_CategoryHelpGet( p_item->value.i );
                     if( psz_help )
                     {
                         cd->psz_help = wraptext( strdup( psz_help ), 72 );
@@ -449,8 +450,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 config_data = new ConfigTreeData;
 
                 config_data->psz_name = strdup(  config_CategoryNameGet(
-                                                           p_item->i_value ) );
-                psz_help = config_CategoryHelpGet( p_item->i_value );
+                                                           p_item->value.i ) );
+                psz_help = config_CategoryHelpGet( p_item->value.i );
                 if( psz_help )
                 {
                     config_data->psz_help = wraptext( strdup( psz_help ), 72 );
@@ -460,10 +461,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                     config_data->psz_help = NULL;
                 }
                 config_data->i_type = TYPE_SUBCATEGORY;
-                config_data->i_object_id = p_item->i_value;
+                config_data->i_object_id = p_item->value.i;
                 /* WXMSW doesn't know image -1 ... FIXME */
                 #ifdef __WXMSW__
-                switch( p_item->i_value / 100 )
+                switch( p_item->value.i / 100 )
                 {
                     case CAT_AUDIO:
                         i_image = 0; break;
@@ -488,7 +489,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 break;
             }
         }
-        while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+        while( p_item < p_end && p_item++ );
 
     }
 
@@ -515,18 +516,18 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 //            p_item = ((module_t *)p_module->p_parent)->p_config;
         else
             p_item = p_module->p_config;
-
+            p_end = p_item + p_module->confsize;
 
         if( !p_item ) continue;
         do
         {
             if( p_item->i_type == CONFIG_CATEGORY )
             {
-                i_category = p_item->i_value;
+                i_category = p_item->value.i;
             }
             else if( p_item->i_type == CONFIG_SUBCATEGORY )
             {
-                i_subcategory = p_item->i_value;
+                i_subcategory = p_item->value.i;
             }
             if( p_item->i_type & CONFIG_ITEM )
                 i_options ++;
@@ -535,7 +536,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 break;
             }
         }
-        while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+        while( p_item < p_end && p_item++ );
 
         if( !i_options ) continue;
 
@@ -857,7 +858,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                         ConfigTreeData *config_data )
   :  wxPanel( parent, -1, wxDefaultPosition, wxDefaultSize )
 {
-    module_config_t *p_item;
+    module_config_t *p_item, *p_end;
     vlc_list_t *p_list = NULL;;
 
     wxStaticText *label;
@@ -940,6 +941,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         else
             p_item = p_module->p_config;
 
+        p_end = p_item + p_module->confsize;
+
         /* Find the category if it has been specified */
         if( config_data->i_type == TYPE_SUBCATEGORY ||
             config_data->i_type == TYPE_CATSUBCAT )
@@ -948,13 +951,13 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             {
                 if( p_item->i_type == CONFIG_SUBCATEGORY &&
                     ( config_data->i_type == TYPE_SUBCATEGORY &&
-                      p_item->i_value == config_data->i_object_id ) ||
+                      p_item->value.i == config_data->i_object_id ) ||
                     ( config_data->i_type == TYPE_CATSUBCAT &&
-                      p_item->i_value == config_data->i_subcat_id ) )
+                      p_item->value.i == config_data->i_subcat_id ) )
                 {
                     break;
                 }
-                if( p_item->i_type == CONFIG_HINT_END )
+                if( p_item < p_end )
                     break;
             } while( p_item++ );
         }
@@ -992,9 +995,9 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         {
             /* If a category has been specified, check we finished the job */
             if( ( ( config_data->i_type == TYPE_SUBCATEGORY &&
-                    p_item->i_value != config_data->i_object_id ) ||
+                    p_item->value.i != config_data->i_object_id ) ||
                   ( config_data->i_type == TYPE_CATSUBCAT  &&
-                    p_item->i_value != config_data->i_subcat_id ) ) &&
+                    p_item->value.i != config_data->i_subcat_id ) ) &&
                 (p_item->i_type == CONFIG_CATEGORY ||
                   p_item->i_type == CONFIG_SUBCATEGORY ) )
                 break;
@@ -1013,11 +1016,11 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
             config_sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
         }
-        while( !( p_item->i_type == CONFIG_HINT_END ||
+        while( !( p_item < p_end )||
                ( ( config_data->i_type == TYPE_SUBCATEGORY ||
                    config_data->i_type == TYPE_CATSUBCAT ) &&
                  ( p_item->i_type == CONFIG_CATEGORY ||
-                   p_item->i_type == CONFIG_SUBCATEGORY ) ) ) && p_item++ );
+                   p_item->i_type == CONFIG_SUBCATEGORY ) ) && p_item++ );
 
 
         config_sizer->Layout();
