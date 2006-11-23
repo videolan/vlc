@@ -428,11 +428,11 @@ static int Open( vlc_object_t * p_this )
                 }
                 if( psz_ref ) free( psz_ref );
             }
-            if( b_play && p_playlist->status.p_item &&
-                  p_playlist->status.p_item->i_children > 0)
+            if( b_play && p_item_in_category &&
+                p_item_in_category->i_children > 0 )
             {
                 playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
-                                  p_playlist->status.p_item, NULL );
+                                  p_item_in_category, NULL );
             }
             vlc_object_release( p_playlist );
         }
