@@ -173,17 +173,14 @@ static int OpenUDP( vlc_object_t * p_this )
 
     /* Build the local socket */
     if( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )
-    {
-        msg_Dbg( p_this, "cannot build local address" );
-        return 0;
-    }
+        return VLC_EGENERIC;
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
      * protocol */
     if( (i_handle = socket( AF_INET, SOCK_DGRAM, 0 )) == -1 )
     {
         msg_Err( p_this, "cannot create socket (%s)", strerror(errno) );
-        return 0;
+        return VLC_EGENERIC;
     }
 
     /* We may want to reuse an already used socket */
@@ -226,9 +223,8 @@ static int OpenUDP( vlc_object_t * p_this )
 
         if( bind( i_handle, (struct sockaddr *)&stupid, sizeof( stupid ) ) < 0 )
         {
-            msg_Warn( p_this, "cannot bind socket (%d)", WSAGetLastError() );
-            close( i_handle );
-            return 0;
+            msg_Err( p_this, "cannot bind socket (%d)", WSAGetLastError() );
+            goto error;
         }
     }
     else
@@ -236,9 +232,8 @@ static int OpenUDP( vlc_object_t * p_this )
     /* Bind it */
     if( bind( i_handle, (struct sockaddr *)&sock, sizeof( sock ) ) < 0 )
     {
-        msg_Warn( p_this, "cannot bind socket (%s)", strerror(errno) );
-        close( i_handle );
-        return 0;
+        msg_Err( p_this, "cannot bind socket (%s)", strerror(errno) );
+        goto error;
     }
 
 #if !defined( SYS_BEOS )
@@ -253,153 +248,63 @@ static int OpenUDP( vlc_object_t * p_this )
     }
 #endif
 
-#if !defined( SYS_BEOS )
+#ifdef IP_ADD_SOURCE_MEMBERSHIP
     /* Join the multicast group if the socket is a multicast address */
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
         /* Determine interface to be used for multicast */
         char * psz_if_addr = config_GetPsz( p_this, "miface-addr" );
 
-#ifdef IP_ADD_SOURCE_MEMBERSHIP
         /* If we have a source address, we use IP_ADD_SOURCE_MEMBERSHIP
            so that IGMPv3 aware OSes running on IGMPv3 aware networks
            will do an IGMPv3 query on the network */
-        if( *psz_server_addr )
+        struct ip_mreq_source imr =
         {
-            struct ip_mreq_source imr;
+            .imr_multiaddr.s_addr = sock.sin_addr.s_addr,
+            .imr_sourceaddr.s_addr = inet_addr(psz_server_addr)
+        };
 
-            imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
-            imr.imr_sourceaddr.s_addr = inet_addr(psz_server_addr);
-
-            if( psz_if_addr != NULL && *psz_if_addr
-                && inet_addr(psz_if_addr) != INADDR_NONE )
-                imr.imr_interface.s_addr = inet_addr(psz_if_addr);
-            else
-                imr.imr_interface.s_addr = INADDR_ANY;
-
-            if( psz_if_addr != NULL )
-                free( psz_if_addr );
-
-            msg_Dbg( p_this, "IP_ADD_SOURCE_MEMBERSHIP multicast request" );
-
-            /* Join Multicast group with source filter */
-            if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
-                         (char*)&imr,
-                         sizeof(struct ip_mreq_source) ) == -1 )
-            {
-                msg_Warn( p_this, "Source specific multicast failed (%s) -"
-                          "check if your OS really supports IGMPv3",
-                          strerror(errno) );
-                goto igmpv2;
-            }
-        }
-         /* If there is no source address, we use IP_ADD_MEMBERSHIP */
-         else
-#endif
-        {
-            struct ip_mreq imr;
-
-        igmpv2:
+        if( psz_if_addr != NULL && *psz_if_addr
+            && inet_addr(psz_if_addr) != INADDR_NONE )
+            imr.imr_interface.s_addr = inet_addr(psz_if_addr);
+        else
             imr.imr_interface.s_addr = INADDR_ANY;
-            imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
-            if( psz_if_addr != NULL && *psz_if_addr
-             && inet_addr(psz_if_addr) != INADDR_NONE )
-            {
-                imr.imr_interface.s_addr = inet_addr(psz_if_addr);
-            }
-#if defined (WIN32) || defined (UNDER_CE)
-            else
-            {
-                typedef DWORD (CALLBACK * GETBESTINTERFACE) ( IPAddr, PDWORD );
-                typedef DWORD (CALLBACK * GETIPADDRTABLE) ( PMIB_IPADDRTABLE, PULONG, BOOL );
 
-                GETBESTINTERFACE OurGetBestInterface;
-                GETIPADDRTABLE OurGetIpAddrTable;
-                HINSTANCE hiphlpapi = LoadLibrary(_T("Iphlpapi.dll"));
-                DWORD i_index;
+        if( psz_if_addr != NULL )
+            free( psz_if_addr );
 
-                if( hiphlpapi )
-                {
-                    OurGetBestInterface =
-                        (void *)GetProcAddress( hiphlpapi,
-                                                _T("GetBestInterface") );
-                    OurGetIpAddrTable =
-                        (void *)GetProcAddress( hiphlpapi,
-                                                _T("GetIpAddrTable") );
-                }
+        msg_Dbg( p_this, "IP_ADD_SOURCE_MEMBERSHIP multicast request" );
 
-                if( hiphlpapi && OurGetBestInterface && OurGetIpAddrTable &&
-                    OurGetBestInterface( sock.sin_addr.s_addr,
-                                         &i_index ) == NO_ERROR )
-                {
-                    PMIB_IPADDRTABLE p_table;
-                    DWORD i = 0;
-
-                    msg_Dbg( p_this, "Winsock best interface is %lu",
-                             (unsigned long)i_index );
-                    OurGetIpAddrTable( NULL, &i, 0 );
-
-                    p_table = (PMIB_IPADDRTABLE)malloc( i );
-                    if( p_table != NULL )
-                    {
-                        if( OurGetIpAddrTable( p_table, &i, 0 ) == NO_ERROR )
-                        {
-                            for( i = 0; i < p_table->dwNumEntries; i-- )
-                            {
-                                if( p_table->table[i].dwIndex == i_index )
-                                {
-                                    imr.imr_interface.s_addr =
-                                                     p_table->table[i].dwAddr;
-                                    msg_Dbg( p_this, "using interface 0x%08x",
-                                             p_table->table[i].dwAddr );
-                                }
-                            }
-                        }
-                        else msg_Warn( p_this, "GetIpAddrTable failed" );
-                        free( p_table );
-                    }
-                }
-                else msg_Dbg( p_this, "GetBestInterface failed" );
-
-                if( hiphlpapi ) FreeLibrary( hiphlpapi );
-            }
-#endif
-            if( psz_if_addr != NULL ) free( psz_if_addr );
-
-            msg_Dbg( p_this, "IP_ADD_MEMBERSHIP multicast request" );
-            /* Join Multicast group without source filter */
-            if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                            (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
-            {
-                msg_Err( p_this, "failed to join IP multicast group (%s)",
-                                  strerror(errno) );
-                close( i_handle );
-                return 0;
-            }
+        /* Join Multicast group with source filter */
+        if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
+                        (void*)&imr,
+                        sizeof(struct ip_mreq_source) ) == -1 )
+        {
+            msg_Err( p_this, "Source specific multicast failed (%s) -"
+                              "check if your OS really supports IGMPv3",
+                      strerror(errno) );
+            goto error;
         }
     }
     else
 #endif
-    if( *psz_server_addr )
     {
         /* Build socket for remote connection */
         if ( BuildAddr( p_this, &sock, psz_server_addr, i_server_port ) == -1 )
         {
-            msg_Warn( p_this, "cannot build remote address" );
-            close( i_handle );
-            return 0;
+            msg_Err( p_this, "cannot build remote address" );
+            goto error;
         }
 
         /* Connect the socket */
         if( connect( i_handle, (struct sockaddr *) &sock,
                      sizeof( sock ) ) == (-1) )
         {
-            msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
-            close( i_handle );
-            return 0;
+            msg_Err( p_this, "cannot connect socket (%s)", strerror(errno) );
+            goto error;
         }
 
-#if !defined( SYS_BEOS )
+#ifdef IP_MULTICAST_IF
         if( IN_MULTICAST( ntohl(inet_addr(psz_server_addr) ) ) )
         {
             /* set the time-to-live */
@@ -416,9 +321,8 @@ static int OpenUDP( vlc_object_t * p_this )
                 if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_IF,
                                 &intf, sizeof( intf ) ) < 0 )
                 {
-                    msg_Dbg( p_this, "failed to set multicast interface (%s).", strerror(errno) );
-                    close( i_handle );
-                    return 0;
+                    msg_Err( p_this, "failed to set multicast interface (%s).", strerror(errno) );
+                    goto error;
                 }
             }
 
@@ -443,8 +347,7 @@ static int OpenUDP( vlc_object_t * p_this )
                     {
                         msg_Err( p_this, "failed to set ttl (%s)",
                                 strerror(errno) );
-                        close( i_handle );
-                        return 0;
+                        goto error;
                     }
                 }
             }
@@ -462,4 +365,8 @@ static int OpenUDP( vlc_object_t * p_this )
     p_socket->i_mtu = val.i_int;
 
     return 0;
+
+error:
+    close (i_handle);
+    return VLC_EGENERIC;
 }
