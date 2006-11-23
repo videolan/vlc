@@ -204,7 +204,7 @@ static int OpenUDP( vlc_object_t * p_this )
         if( bind( i_handle, (struct sockaddr *)&sockany, sizeof( sock ) ) < 0 )
         {
             msg_Warn( p_this, "cannot bind socket (%s)", strerror(errno) );
-            goto errror;
+            goto error;
         }
     }
     else
@@ -302,7 +302,7 @@ static int OpenUDP( vlc_object_t * p_this )
                 if( intf != 0 )
                 {
                     if( setsockopt( i_handle, IPPROTO_IPV6, IPV6_MULTICAST_IF,
-                        &intf, sizeof( intf ) ) < 0 )
+                        (void *)&intf, sizeof( intf ) ) < 0 )
                     {
                         msg_Err( p_this, "%s as multicast interface: %s",
                                  psz_mif, strerror(errno) );
