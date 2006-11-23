@@ -981,7 +981,7 @@ void ExtraPanel::OnAdjustUpdate( wxScrollEvent &event)
 /* FIXME */
 void ExtraPanel::OnRatio( wxCommandEvent& event )
 {
-   config_PutPsz( p_intf, "aspect-ratio", ratio_combo->GetValue().mb_str() );
+   config_PutPsz( p_intf, "aspect-ratio", ratio_combo->GetValue().mb_str(wxConvUTF8) );
 }
 
 

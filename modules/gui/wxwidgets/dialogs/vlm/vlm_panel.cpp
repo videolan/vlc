@@ -217,7 +217,7 @@ void VLMPanel::OnLoad( wxCommandEvent &event )
     p_file_dialog->SetTitle( wxU(_("Load Configuration") ) );
     if( p_file_dialog->ShowModal() == wxID_OK )
     {
-        vlm_Load( p_vlm->GetVLM(), p_file_dialog->GetPath().mb_str() );
+        vlm_Load( p_vlm->GetVLM(), p_file_dialog->GetPath().mb_str(wxConvUTF8) );
     }
     Update();
 }
@@ -231,7 +231,7 @@ void VLMPanel::OnSave( wxCommandEvent &event )
     p_file_dialog->SetTitle( wxU(_("Save Configuration") ) );
     if( p_file_dialog->ShowModal() == wxID_OK )
     {
-        vlm_Save( p_vlm->GetVLM(), p_file_dialog->GetPath().mb_str() );
+        vlm_Save( p_vlm->GetVLM(), p_file_dialog->GetPath().mb_str(wxConvUTF8) );
     }
 }
 

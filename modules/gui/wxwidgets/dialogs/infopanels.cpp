@@ -147,12 +147,12 @@ void MetaDataPanel::Update( input_item_t *p_item )
 
 char* MetaDataPanel::GetURI( )
 {
-    return  strdup( uri_text->GetLineText(0).mb_str() );
+    return  strdup( uri_text->GetLineText(0).mb_str(wxConvUTF8) );
 }
 
 char* MetaDataPanel::GetName( )
 {
-    return  strdup( name_text->GetLineText(0).mb_str() );
+    return  strdup( name_text->GetLineText(0).mb_str(wxConvUTF8) );
 }
 
 void MetaDataPanel::Clear()

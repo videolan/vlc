@@ -1129,7 +1129,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
         }
         else
         {
-            int i_value = config_GetInt( p_intf, caching_name.mb_str() );
+            int i_value = config_GetInt( p_intf, caching_name.mb_str(wxConvUTF8) );
             caching_value->SetValue( i_value );
         }
     }
@@ -1172,7 +1172,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 
         /* Insert options */
         while( i + 1 < (int)mrl.GetCount() &&
-               ((const char *)mrl[i + 1].mb_str())[0] == ':' )
+               ((const char *)mrl[i + 1].mb_str(wxConvUTF8))[0] == ':' )
         {
             psz_utf8 = wxFromLocale( mrl[i + 1] );
             input_ItemAddOption( p_input, psz_utf8 );

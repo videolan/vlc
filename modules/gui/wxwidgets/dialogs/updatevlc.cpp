@@ -200,7 +200,7 @@ void UpdateVLC::OnChooseItem( wxListEvent& event )
                         wxSAVE | wxOVERWRITE_PROMPT );
         if( filedialog->ShowModal() == wxID_OK )
         {
-            update_download( p_uit, filedialog->GetPath().mb_str() );
+            update_download( p_uit, filedialog->GetPath().mb_str(wxConvUTF8) );
         }
         update_iterator_Delete( p_uit );
         delete filedialog;

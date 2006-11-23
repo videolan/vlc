@@ -396,7 +396,7 @@ void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
                                               sizeof(char *) );
         for( size_t i = 0; i < paths.GetCount(); i++ )
         {
-            p_arg->psz_results[i] = strdup( paths[i].mb_str() );
+            p_arg->psz_results[i] = strdup( paths[i].mb_str(wxConvUTF8) );
         }
     }
 

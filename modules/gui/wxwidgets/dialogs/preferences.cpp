@@ -1074,20 +1074,20 @@ void PrefsPanel::ApplyChanges()
         case CONFIG_ITEM_MODULE_CAT:
         case CONFIG_ITEM_MODULE_LIST:
         case CONFIG_ITEM_MODULE_LIST_CAT:
-            config_PutPsz( p_intf, control->GetName().mb_str(),
-                           control->GetPszValue().mb_str() );
+            config_PutPsz( p_intf, control->GetName().mb_str(wxConvUTF8),
+                           control->GetPszValue().mb_str(wxConvUTF8) );
             break;
         case CONFIG_ITEM_KEY:
             /* So you don't need to restart to have the changes take effect */
             val.i_int = control->GetIntValue();
-            var_Set( p_intf->p_libvlc, control->GetName().mb_str(), val );
+            var_Set( p_intf->p_libvlc, control->GetName().mb_str(wxConvUTF8), val );
         case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_BOOL:
-            config_PutInt( p_intf, control->GetName().mb_str(),
+            config_PutInt( p_intf, control->GetName().mb_str(wxConvUTF8),
                            control->GetIntValue() );
             break;
         case CONFIG_ITEM_FLOAT:
-            config_PutFloat( p_intf, control->GetName().mb_str(),
+            config_PutFloat( p_intf, control->GetName().mb_str(wxConvUTF8),
                              control->GetFloatValue() );
             break;
         }

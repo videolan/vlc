@@ -957,12 +957,12 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
 
     if( dialog.ShowModal() == wxID_OK )
     {
-        if( dialog.GetPath().mb_str() )
+        if( dialog.GetPath().mb_str(wxConvUTF8) )
         {
             /* what root should we export? */
             if( p_playlist->p_root_category->i_children > 0 )
             {
-                playlist_Export( p_playlist, dialog.GetPath().mb_str(),
+                playlist_Export( p_playlist, dialog.GetPath().mb_str(wxConvUTF8),
                                  p_playlist->p_root_category->pp_children[0],
                                  formats[dialog.GetFilterIndex()].psz_module );
             }
@@ -978,7 +978,7 @@ void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
 
     if( dialog.ShowModal() == wxID_OK )
     {
-        playlist_Import( p_playlist, dialog.GetPath().mb_str() );
+        playlist_Import( p_playlist, dialog.GetPath().mb_str(wxConvUTF8) );
     }
 }
 

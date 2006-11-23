@@ -592,7 +592,7 @@ WindowSettings::~WindowSettings( )
                                      size[i].x, size[i].y );
     }
 
-    config_PutPsz( p_intf, "wx-config-last", sCfg.mb_str() );
+    config_PutPsz( p_intf, "wx-config-last", sCfg.mb_str(wxConvUTF8) );
 }
 
 void WindowSettings::SetScreen( int i_screen_w, int i_screen_h )

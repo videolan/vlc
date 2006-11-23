@@ -261,7 +261,7 @@ void InteractionDialog::Finish( int i_ret )
     while ( it < input_widgets.end() )
     {
         if( (*it).i_type == WIDGET_INPUT_TEXT )
-            (*it).val->psz_string = strdup( (*it).control->GetValue().mb_str());
+            (*it).val->psz_string = strdup( (*it).control->GetValue().mb_str(wxConvUTF8));
         it++;
     }
     Hide();
