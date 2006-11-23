@@ -74,7 +74,7 @@ private:
 public slots:
     void playlistDialog();
     void bookmarksDialog();
-    void streaminfoDialog();
+    void MediaInfoDialog();
     void prefsDialog();
     void extendedDialog();
     void messagesDialog();

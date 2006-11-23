@@ -61,7 +61,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
 DialogsProvider::~DialogsProvider()
 {
     PlaylistDialog::killInstance();
-    StreamInfoDialog::killInstance();
+    MediaInfoDialog::killInstance();
 }
 
 void DialogsProvider::customEvent( QEvent *event )
@@ -88,7 +88,7 @@ void DialogsProvider::customEvent( QEvent *event )
             case INTF_DIALOG_MISCPOPUPMENU:
                popupMenu( de->i_dialog ); break;
             case INTF_DIALOG_FILEINFO:
-               streaminfoDialog(); break;
+               MediaInfoDialog(); break;
             case INTF_DIALOG_INTERACTION:
                doInteraction( de->p_arg ); break;
             case INTF_DIALOG_VLM:
@@ -159,9 +159,9 @@ void DialogsProvider::quit()
     QApplication::quit();
 }
 
-void DialogsProvider::streaminfoDialog()
+void DialogsProvider::MediaInfoDialog()
 {
-    StreamInfoDialog::getInstance( p_intf )->toggleVisible();
+    MediaInfoDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::streamingDialog()

@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  ******************************************************************************/
 
-#ifndef _STREAMINFO_DIALOG_H_
-#define _STREAMINFO_DIALOG_H_
+#ifndef _MEDIAINFO_DIALOG_H_
+#define _MEDIAINFO_DIALOG_H_
 
 #include "util/qvlcframe.hpp"
 #include <QTabWidget>
@@ -30,14 +31,14 @@
 
 class InfoTab;
 
-class StreamInfoDialog : public QVLCFrame
+class MediaInfoDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
-    static StreamInfoDialog * getInstance( intf_thread_t *p_intf )
+    static MediaInfoDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new StreamInfoDialog( p_intf);
+            instance = new MediaInfoDialog( p_intf);
         return instance;
     }
     static void killInstance()
@@ -45,13 +46,13 @@ public:
         if( instance ) delete instance;
         instance= NULL;
     }
-    virtual ~StreamInfoDialog();
+    virtual ~MediaInfoDialog();
     bool need_update;
 private:
-    StreamInfoDialog( intf_thread_t * );
+    MediaInfoDialog( intf_thread_t * );
     input_thread_t *p_input;
     InfoTab *IT;
-    static StreamInfoDialog *instance;
+    static MediaInfoDialog *instance;
     int i_runs;
 public slots:
     void update();

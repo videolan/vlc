@@ -176,7 +176,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         menu->addSeparator();
     }
     DP_SADD( qtr("Messages" ), "", "", messagesDialog() );
-    DP_SADD( qtr("Information") , "", "", streaminfoDialog() );
+    DP_SADD( qtr("Information") , "", "", MediaInfoDialog() );
     DP_SADD( qtr("Bookmarks"), "", "", bookmarksDialog() );
     DP_SADD( qtr("Extended settings"), "","",extendedDialog() );
     if( mi )

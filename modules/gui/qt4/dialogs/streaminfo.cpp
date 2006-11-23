@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,29 +33,30 @@
 
 static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param );
-StreamInfoDialog *StreamInfoDialog::instance = NULL;
+MediaInfoDialog *MediaInfoDialog::instance = NULL;
 
-StreamInfoDialog::StreamInfoDialog( intf_thread_t *_p_intf ) :QVLCFrame( _p_intf )
+MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf ) :QVLCFrame( _p_intf )
 {
     i_runs = 0;
-    setWindowTitle( qtr( "Stream information" ) );
-    QGridLayout *layout = new QGridLayout(this);
+    p_input = NULL;
 
+    setWindowTitle( qtr( "Media information" ) );
+
+    QGridLayout *layout = new QGridLayout(this);
     IT = new InfoTab( this, p_intf, true ) ;
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
+
     layout->addWidget(IT,0,0,1,3);
     layout->addWidget(closeButton,1,2);
 
     BUTTONACT( closeButton, close() );
     ON_TIMEOUT( update() );
-    p_input = NULL;
 
     var_AddCallback( THEPL, "item-change", ItemChanged, this );
-
     readSettings( "StreamInfo" , QSize( 500, 450 ) );
 }
 
-StreamInfoDialog::~StreamInfoDialog()
+MediaInfoDialog::~MediaInfoDialog()
 {
     var_DelCallback( THEPL, "item-change", ItemChanged, this );
     writeSettings( "StreamInfo" );
@@ -63,12 +65,12 @@ StreamInfoDialog::~StreamInfoDialog()
 static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
-    StreamInfoDialog *p_d = (StreamInfoDialog *)param;
+    MediaInfoDialog *p_d = (MediaInfoDialog *)param;
     p_d->need_update = VLC_TRUE;
     return VLC_SUCCESS;
 }
 
-void StreamInfoDialog::update()
+void MediaInfoDialog::update()
 {
     // Timer runs at 150 ms, dont' update more than 2 times per second
     i_runs++;
@@ -91,7 +93,7 @@ void StreamInfoDialog::update()
     vlc_object_release( p_input );
 }
 
-void StreamInfoDialog::close()
+void MediaInfoDialog::close()
 {
     this->toggleVisible();
 }
