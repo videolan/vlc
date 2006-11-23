@@ -47,9 +47,9 @@ using namespace std;
 /*
 ** MingW headers & libs do not declare those
 */
-DEFINE_GUID(CATID_InternetAware,       0x0DE86A58, 0x2BAA, 0x11CF, 0xA2, 0x29, 0x00,0xAA,0x00,0x3D,0x73,0x52);
-DEFINE_GUID(CATID_SafeForInitializing, 0x7DD95802, 0x9882, 0x11CF, 0x9F, 0xA9, 0x00,0xAA,0x00,0x6C,0x42,0xC4);
-DEFINE_GUID(CATID_SafeForScripting,    0x7DD95801, 0x9882, 0x11CF, 0x9F, 0xA9, 0x00,0xAA,0x00,0x6C,0x42,0xC4);
+static DEFINE_GUID(_CATID_InternetAware,       0x0DE86A58, 0x2BAA, 0x11CF, 0xA2, 0x29, 0x00,0xAA,0x00,0x3D,0x73,0x52);
+static DEFINE_GUID(_CATID_SafeForInitializing, 0x7DD95802, 0x9882, 0x11CF, 0x9F, 0xA9, 0x00,0xAA,0x00,0x6C,0x42,0xC4);
+static DEFINE_GUID(_CATID_SafeForScripting,    0x7DD95801, 0x9882, 0x11CF, 0x9F, 0xA9, 0x00,0xAA,0x00,0x6C,0x42,0xC4);
 
 static LONG i_class_ref= 0;
 static HINSTANCE h_instance= 0;
@@ -153,9 +153,9 @@ STDAPI DllUnregisterServer(VOID)
         CATID implCategories[] = {
             CATID_Control,
             CATID_PersistsToPropertyBag,
-            CATID_InternetAware,
-            CATID_SafeForInitializing,
-            CATID_SafeForScripting,
+            _CATID_InternetAware,
+            _CATID_SafeForInitializing,
+            _CATID_SafeForScripting,
         };
 
         pcr->UnRegisterClassImplCategories(CLSID_VLCPlugin,
@@ -322,9 +322,9 @@ STDAPI DllRegisterServer(VOID)
         CATID implCategories[] = {
             CATID_Control,
             CATID_PersistsToPropertyBag,
-            CATID_InternetAware,
-            CATID_SafeForInitializing,
-            CATID_SafeForScripting,
+            _CATID_InternetAware,
+            _CATID_SafeForInitializing,
+            _CATID_SafeForScripting,
         };
 
         pcr->RegisterClassImplCategories(CLSID_VLCPlugin,
