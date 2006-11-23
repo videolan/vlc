@@ -187,9 +187,13 @@ static int OpenUDP( vlc_object_t * p_this )
     }
 
     /* We may want to reuse an already used socket */
-    setsockopt( i_handle, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof( int ) );
+    i_opt = 1;
+    setsockopt( i_handle, SOL_SOCKET, SO_REUSEADDR, (void *) &i_opt,
+                    sizeof( i_opt ) );
 #ifdef SO_REUSEPORT
-    setsockopt( i_handle, SOL_SOCKET, SO_REUSEPORT, &(int){ 1 }, sizeof( int ) );
+    i_opt = 1;
+    setsockopt( i_handle, SOL_SOCKET, SO_REUSEPORT, (void *) &i_opt,
+                    sizeof( i_opt ) );
 #endif
 
     /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
