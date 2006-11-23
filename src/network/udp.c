@@ -414,7 +414,6 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
 int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
                    const char *psz_server, int i_server )
 {
-    vlc_value_t      v4, v6;
     void            *private;
     network_socket_t sock;
     module_t         *p_network = NULL;
@@ -444,23 +443,17 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
     sock.psz_server_addr = psz_server;
     sock.i_server_port   = i_server;
     sock.i_ttl           = 0;
-    sock.v6only          = 0;
     sock.i_handle        = -1;
 
     msg_Dbg( p_this, "net: connecting to '[%s]:%d@[%s]:%d'",
              psz_server, i_server, psz_bind, i_bind );
 
     /* Check if we have force ipv4 or ipv6 */
-    var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "ipv4", &v4 );
-    var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "ipv6", &v6 );
+    vlc_bool_t v4 = var_CreateGetBool (p_this, "ipv4");
+    vlc_bool_t v6 = var_CreateGetBool (p_this, "ipv6");
 
-    if( !v4.b_bool )
+    if( !v4 )
     {
-        if( v6.b_bool )
-            sock.v6only = 1;
-
         /* try IPv6 first (unless IPv4 forced) */
         private = p_this->p_private;
         p_this->p_private = (void*)&sock;
@@ -470,21 +463,10 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
             module_Unneed( p_this, p_network );
 
         p_this->p_private = private;
-
-        /*
-         * Check if the IP stack can receive IPv4 packets on IPv6 sockets.
-         * If yes, then it is better to use the IPv6 socket.
-         * Otherwise, if we also get an IPv4, we have to choose, so we use
-         * IPv4 only.
-         */
-        if( ( sock.i_handle != -1 ) && ( ( sock.v6only == 0 ) || v6.b_bool ) )
-            return sock.i_handle;
     }
 
-    if( !v6.b_bool )
+    if ((sock.i_handle == -1) && !v6)
     {
-        int fd6 = sock.i_handle;
-
         /* also try IPv4 (unless IPv6 forced) */
         private = p_this->p_private;
         p_this->p_private = (void*)&sock;
@@ -494,18 +476,6 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
             module_Unneed( p_this, p_network );
 
         p_this->p_private = private;
-
-        if( fd6 != -1 )
-        {
-            if( sock.i_handle != -1 )
-            {
-                msg_Warn( p_this, "net: lame IPv6/IPv4 dual-stack present, "
-                                  "using only IPv4." );
-                net_Close( fd6 );
-            }
-            else
-                sock.i_handle = fd6;
-        }
     }
 
     if( sock.i_handle == -1 )

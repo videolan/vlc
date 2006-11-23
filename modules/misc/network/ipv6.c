@@ -173,19 +173,6 @@ static int OpenUDP( vlc_object_t * p_this )
         return 0;
     }
 
-#ifdef IPV6_V6ONLY
-    val.i_int = p_socket->v6only;
-
-    if( setsockopt( i_handle, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&val.i_int,
-                    sizeof( val.i_int ) ) )
-    {
-        msg_Warn( p_this, "IPV6_V6ONLY: %s", strerror( errno ) );
-        p_socket->v6only = 1;
-    }
-#else
-    p_socket->v6only = 1;
-#endif
-
 #ifdef IPV6_PROTECTION_LEVEL
     setsockopt (i_handle, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL,
                 &(int){ PROTECTION_LEVEL_UNRESTRICTED }, sizeof (int));
