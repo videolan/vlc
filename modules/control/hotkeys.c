@@ -135,6 +135,7 @@ static void Close( vlc_object_t *p_this )
     {
         vlc_object_release( p_intf->p_sys->p_vout );
     }
+    vlc_mutex_destroy( &p_intf->p_sys->change_lock );
     /* Destroy structure */
     free( p_intf->p_sys );
 }

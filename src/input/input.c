@@ -859,7 +859,7 @@ static int Init( input_thread_t * p_input )
 
         if( p_input->i_start > 0 )
         {
-            if( p_input->i_start >= val.i_time )
+            if( p_input->i_start >= p_input->input.p_item->i_duration )
             {
                 msg_Warn( p_input, "invalid start-time ignored" );
             }
@@ -1184,6 +1184,7 @@ static void End( input_thread_t * p_input )
         CL_CO( decoded_audio) ;
         CL_CO( decoded_video );
         CL_CO( decoded_sub) ;
+        vlc_mutex_destroy( &p_input->counters.counters_lock );
     }
 
     /* Close optional stream output instance */

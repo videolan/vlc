@@ -1109,6 +1109,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_libvlc->config_lock );
+    vlc_mutex_destroy( &p_libvlc->timer_lock );
 
     if( b_release ) vlc_object_release( p_libvlc );
     vlc_object_destroy( p_libvlc );
