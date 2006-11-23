@@ -418,20 +418,20 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
     network_socket_t sock;
     module_t         *p_network = NULL;
 
-    if (((psz_bind == NULL) || (psz_bind[0] == '\0')) && (i_bind == 0))
-    {
-        msg_Warn (p_this,
-                  "Obsolete net_OpenUDP with no local endpoint; "
-                  "Use net_ConnectUDP instead");
-        return net_ConnectUDP (p_this, psz_server, i_server, -1);
-    }
-
     if (((psz_server == NULL) || (psz_server[0] == '\0')) && (i_server == 0))
     {
         msg_Warn (p_this,
                   "Obsolete net_OpenUDP with no remote endpoint; "
                   "Use net_ListenUDP instead");
         return net_ListenUDP1 (p_this, psz_bind, i_bind);
+    }
+
+    if (((psz_bind == NULL) || (psz_bind[0] == '\0')) && (i_bind == 0))
+    {
+        msg_Warn (p_this,
+                  "Obsolete net_OpenUDP with no local endpoint; "
+                  "Use net_ConnectUDP instead");
+        return net_ConnectUDP (p_this, psz_server, i_server, -1);
     }
 
     if( psz_server == NULL ) psz_server = "";
