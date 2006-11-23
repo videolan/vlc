@@ -109,7 +109,7 @@ HEADERS_include = \
 	../include/mediacontrol_internal.h
 	$(NULL)
 
-misc/modules_builtin.h: Makefile misc/modules_builtin.h.in ../vlc-config
+misc/modules_builtin.h: misc/modules_builtin.h.in
 	$(TOOLBOX) --update-includes
 	touch $@
 
