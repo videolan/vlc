@@ -1,5 +1,5 @@
 /*****************************************************************************
- * streaminfo.cpp : Information about an item
+ * mediainfo.cpp : Information about an item
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
@@ -24,7 +24,7 @@
 #include <QTabWidget>
 #include <QGridLayout>
 
-#include "dialogs/streaminfo.hpp"
+#include "dialogs/mediainfo.hpp"
 #include "input_manager.hpp"
 #include "dialogs_provider.hpp"
 #include "util/qvlcframe.hpp"
@@ -53,13 +53,13 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf ) :QVLCFrame( _p_intf )
     ON_TIMEOUT( update() );
 
     var_AddCallback( THEPL, "item-change", ItemChanged, this );
-    readSettings( "StreamInfo" , QSize( 500, 450 ) );
+    readSettings( "mediainfo" , QSize( 500, 450 ) );
 }
 
 MediaInfoDialog::~MediaInfoDialog()
 {
     var_DelCallback( THEPL, "item-change", ItemChanged, this );
-    writeSettings( "StreamInfo" );
+    writeSettings( "mediainfo" );
 }
 
 static int ItemChanged( vlc_object_t *p_this, const char *psz_var,

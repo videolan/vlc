@@ -1,5 +1,5 @@
 /*****************************************************************************
- * streaminfo.hpp : Information about a stream
+ * mediainfo.hpp : Information about a stream
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
