@@ -256,9 +256,10 @@ int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
     {
 #ifdef IPV6_V6ONLY
         struct sockaddr_storage addr;
-        getsockname (fd, (struct sockaddr *)&addr,
-                     &(socklen_t){ sizeof (addr) });
-        if ((addr.ss_family == AF_INET6)
+
+        if ((getsockname (fd, (struct sockaddr *)&addr,
+                          &(socklen_t){ sizeof (addr) }) == 0)
+         && (addr.ss_family == AF_INET6)
          && setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 0 },
                         sizeof (int)))
 #endif
