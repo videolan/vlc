@@ -1802,7 +1802,7 @@ static void CacheLoad( vlc_object_t *p_this )
 
 int CacheLoadConfig( module_t *p_module, FILE *file )
 {
-    int i, j, i_lines;
+    uint32_t i_lines;
     uint16_t i_size;
 
     /* Calculate the structure length */
@@ -1818,13 +1818,15 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
             (module_config_t *)calloc( i_lines, sizeof(module_config_t) );
         if( p_module->p_config == NULL )
         {
+            p_module->confsize = 0;
             msg_Err( p_module, "config error: can't duplicate p_config" );
             return VLC_ENOMEM;
         }
     }
+    p_module->confsize = i_lines;
 
     /* Do the duplication job */
-    for( i = 0; i < i_lines ; i++ )
+    for (size_t i = 0; i < i_lines; i++ )
     {
         LOAD_IMMEDIATE( p_module->p_config[i] );
 
@@ -1858,6 +1860,7 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
         {
             if( p_module->p_config[i].ppsz_list )
             {
+                int j;
                 p_module->p_config[i].ppsz_list =
                     malloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
                 if( p_module->p_config[i].ppsz_list )
@@ -1869,6 +1872,7 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
             }
             if( p_module->p_config[i].ppsz_list_text )
             {
+                int j;
                 p_module->p_config[i].ppsz_list_text =
                     malloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
                 if( p_module->p_config[i].ppsz_list_text )
@@ -1884,7 +1888,7 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
                     malloc( (p_module->p_config[i].i_list + 1) * sizeof(int) );
                 if( p_module->p_config[i].pi_list )
                 {
-                    for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                    for (int j = 0; j < p_module->p_config[i].i_list; j++)
                         LOAD_IMMEDIATE( p_module->p_config[i].pi_list[j] );
                 }
             }
@@ -1897,7 +1901,7 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
             p_module->p_config[i].ppsz_action_text =
                 malloc( p_module->p_config[i].i_action * sizeof(char *) );
 
-            for( j = 0; j < p_module->p_config[i].i_action; j++ )
+            for (int j = 0; j < p_module->p_config[i].i_action; j++)
             {
                 p_module->p_config[i].ppf_action[j] = 0;
                 LOAD_STRING( p_module->p_config[i].ppsz_action_text[j] );
@@ -2081,20 +2085,14 @@ static void CacheSave( vlc_object_t *p_this )
 
 void CacheSaveConfig( module_t *p_module, FILE *file )
 {
-    int i, j, i_lines = 0;
-    module_config_t *p_item, *p_end;
+    uint32_t i_lines = p_module->confsize;
     uint16_t i_size;
 
     SAVE_IMMEDIATE( p_module->i_config_items );
     SAVE_IMMEDIATE( p_module->i_bool_items );
-
-    for( p_item = p_module->p_config, p_end = p_item + p_module->confsize;
-         p_item < p_end;
-         p_item++ ) i_lines++;
-
     SAVE_IMMEDIATE( i_lines );
 
-    for( i = 0; i < i_lines ; i++ )
+    for (size_t i = 0; i < i_lines ; i++)
     {
         SAVE_IMMEDIATE( p_module->p_config[i] );
 
@@ -2110,23 +2108,23 @@ void CacheSaveConfig( module_t *p_module, FILE *file )
         {
             if( p_module->p_config[i].ppsz_list )
             {
-                for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                for (int j = 0; j < p_module->p_config[i].i_list; j++)
                     SAVE_STRING( p_module->p_config[i].ppsz_list[j] );
             }
 
             if( p_module->p_config[i].ppsz_list_text )
             {
-                for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                for (int j = 0; j < p_module->p_config[i].i_list; j++)
                     SAVE_STRING( p_module->p_config[i].ppsz_list_text[j] );
             }
             if( p_module->p_config[i].pi_list )
             {
-                for( j = 0; j < p_module->p_config[i].i_list; j++ )
+                for (int j = 0; j < p_module->p_config[i].i_list; j++)
                     SAVE_IMMEDIATE( p_module->p_config[i].pi_list[j] );
             }
         }
 
-        for( j = 0; j < p_module->p_config[i].i_action; j++ )
+        for (int j = 0; j < p_module->p_config[i].i_action; j++)
             SAVE_STRING( p_module->p_config[i].ppsz_action_text[j] );
 
         SAVE_IMMEDIATE( p_module->p_config[i].pf_callback );
