@@ -33,7 +33,7 @@
 /* The dialogs */
 #include "dialogs/playlist.hpp"
 #include "dialogs/prefs_dialog.hpp"
-#include "dialogs/streaminfo.hpp"
+#include "dialogs/mediainfo.hpp"
 #include "dialogs/messages.hpp"
 #include "dialogs/extended.hpp"
 #include "dialogs/sout.hpp"
