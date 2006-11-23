@@ -207,7 +207,7 @@ int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
             memcpy (&imr.imr_multiaddr, &v4->sin_addr, 4);
 
             /* FIXME: should use a different option for in and out */
-            char *iif = config_GetPsz (obj, "miface-addr");
+            char *iif = var_CreateGetString (obj, "miface-addr");
             if (iif != NULL)
             {
                 if ((iif[0] != '\0') &&
@@ -420,16 +420,20 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
     module_t         *p_network = NULL;
 
     if (((psz_bind == NULL) || (psz_bind[0] == '\0')) && (i_bind == 0))
+    {
         msg_Warn (p_this,
                   "Obsolete net_OpenUDP with no local endpoint; "
                   "Use net_ConnectUDP instead");
+        return net_ConnectUDP (p_this, psz_server, i_server, -1);
+    }
 
-#if 0
     if (((psz_server == NULL) || (psz_server[0] == '\0')) && (i_server == 0))
+    {
         msg_Warn (p_this,
                   "Obsolete net_OpenUDP with no remote endpoint; "
                   "Use net_ListenUDP instead");
-#endif
+        return net_ListenUDP1 (p_this, psz_bind, i_bind);
+    }
 
     if( psz_server == NULL ) psz_server = "";
     if( psz_bind == NULL ) psz_bind = "";
