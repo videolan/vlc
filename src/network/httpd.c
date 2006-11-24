@@ -267,7 +267,7 @@ static const char *httpd_MimeFromUrl( const char *psz_url )
     return "application/octet-stream";
 }
 
-#if 0
+
 typedef struct
 {
     int i_code;
@@ -347,7 +347,38 @@ static const char *httpd_ReasonFromCode( int i_code )
     assert( ( i_code >= 100 ) && ( i_code <= 599 ) );
     return psz_fallback_reason[(i_code / 100) - 1];
 }
-#endif
+
+
+static size_t httpd_HtmlError (char **body, int code, const char *url)
+{
+    const char *errname = httpd_ReasonFromCode (code);
+    assert (errname != NULL);
+
+    int res = asprintf (body,
+        "<?xml version=\"1.0\" encoding=\"ascii\" ?>\n"
+        "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\""
+        " \"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
+        "<html lang=\"en\">\n"
+        "<head>\n"
+        "<title>%s</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "<h1>%d %s%s%s%s</h1>\n"
+        "<hr />\n"
+        "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
+        "</body>\n"
+        "</html>\n", errname, code, errname,
+        (url ? " (" : ""), (url ?: ""), (url ? ")" : ""));
+
+    if (res == -1)
+    {
+        *body = NULL;
+        return 0;
+    }
+
+    return (size_t)res;
+}
+
 
 /*****************************************************************************
  * High Level Functions: httpd_file_t
@@ -637,22 +668,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
     answer->i_status = 301;
     answer->psz_status = strdup( "Moved Permanently" );
 
-    answer->i_body = asprintf( &p_body,
-        "<?xml version=\"1.0\" encoding=\"ascii\" ?>\n"
-        "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
-        "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
-        "<html>\n"
-        "<head>\n"
-        "<title>Redirection</title>\n"
-        "</head>\n"
-        "<body>\n"
-        "<h1>You should be "
-        "<a href=\"%s\">redirected</a></h1>\n"
-        "<hr />\n"
-        "<p><a href=\"http://www.videolan.org\">VideoLAN</a>\n</p>"
-        "<hr />\n"
-        "</body>\n"
-        "</html>\n", rdir->psz_dst );
+    answer->i_body = httpd_HtmlError (&p_body, 301, rdir->psz_dst);
     answer->p_body = (unsigned char *)p_body;
 
     /* XXX check if it's ok or we need to set an absolute url */
@@ -2097,7 +2113,7 @@ static void httpd_HostThread( httpd_host_t *host )
                     }
                     else
                     {
-                        uint8_t *p;
+                        char *p;
 
                         /* unimplemented */
                         answer->i_proto  = query->i_proto ;
@@ -2106,24 +2122,8 @@ static void httpd_HostThread( httpd_host_t *host )
                         answer->i_status = 501;
                         answer->psz_status = strdup( "Unimplemented" );
 
-                        p = answer->p_body = malloc( 1000 );
-
-                        p += sprintf( (char *)p,
-                            "<?xml version=\"1.0\" encoding=\"ascii\" ?>"
-                            "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
-                            "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
-                            "<html>\n"
-                            "<head>\n"
-                            "<title>Error 501</title>\n"
-                            "</head>\n"
-                            "<body>\n"
-                            "<h1>501 Unimplemented</h1>\n"
-                            "<hr />\n"
-                            "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
-                            "</body>\n"
-                            "</html>\n" );
-
-                        answer->i_body = p - answer->p_body;
+                        answer->i_body = httpd_HtmlError (&p, 501, NULL);
+                        answer->p_body = (uint8_t *)p;
                         httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
 
                         cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
@@ -2222,77 +2222,34 @@ static void httpd_HostThread( httpd_host_t *host )
 
                     if( answer )
                     {
-                        uint8_t *p;
+                        char *p;
 
                         answer->i_proto  = query->i_proto;
                         answer->i_type   = HTTPD_MSG_ANSWER;
                         answer->i_version= 0;
-                        p = answer->p_body = malloc( 1000 + strlen(query->psz_url) );
 
                         if( b_hosts_failed )
                         {
                             answer->i_status = 403;
                             answer->psz_status = strdup( "Forbidden" );
-
-                            /* FIXME: lots of code duplication */
-                            p += sprintf( (char *)p,
-                                "<?xml version=\"1.0\" encoding=\"us-ascii\" ?>"
-                                "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
-                                "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
-                                "<html>\n"
-                                "<head>\n"
-                                "<title>Error 403</title>\n"
-                                "</head>\n"
-                                "<body>\n"
-                                "<h1>403 Forbidden (%s)</h1>\n"
-                                "<hr />\n"
-                                "<p><a href=\"http://www.videolan.org\">VideoLAN</a></p>\n"
-                                "</body>\n"
-                                "</html>\n", query->psz_url );
                         }
                         else if( b_auth_failed )
                         {
                             answer->i_status = 401;
                             answer->psz_status = strdup( "Authorization Required" );
-
-                            p += sprintf( (char *)p,
-                                "<?xml version=\"1.0\" encoding=\"us-ascii\" ?>"
-                                "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
-                                "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
-                                "<html>\n"
-                                "<head>\n"
-                                "<title>Error 401</title>\n"
-                                "</head>\n"
-                                "<body>\n"
-                                "<h1>401 Authorization Required (%s)</h1>\n"
-                                "<hr />\n"
-                                "<p><a href=\"http://www.videolan.org\">VideoLAN</a></p>\n"
-                                "</body>\n"
-                                "</html>\n", query->psz_url );
                         }
                         else
                         {
                             /* no url registered */
                             answer->i_status = 404;
                             answer->psz_status = strdup( "Not found" );
-
-                            p += sprintf( (char *)p,
-                                "<?xml version=\"1.0\" encoding=\"us-ascii\" ?>"
-                                "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
-                                "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
-                                "<html>\n"
-                                "<head>\n"
-                                "<title>Error 404</title>\n"
-                                "</head>\n"
-                                "<body>\n"
-                                "<h1>404 Resource not found(%s)</h1>\n"
-                                "<hr />\n"
-                                "<p><a href=\"http://www.videolan.org\"> VideoLAN</a></p>\n"
-                                "</body>\n"
-                                "</html>\n", query->psz_url );
                         }
 
-                        answer->i_body = p - answer->p_body;
+                        answer->i_body = httpd_HtmlError (&p,
+                                                          answer->i_status,
+                                                          query->psz_url);
+                        answer->p_body = (uint8_t *)p;
+
                         cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
                         httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
                         httpd_MsgAdd( answer, "Content-Type", "%s", "text/html" );
