@@ -316,21 +316,7 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
                      const struct sockaddr *src, socklen_t srclen,
                      const struct sockaddr *grp, socklen_t grplen)
 {
-    /* Agnostic ASM/SSM multicast join */
-#ifdef MCAST_JOIN_SOURCE_GROUP
-    union
-    {
-        struct group_req gr;
-        struct group_source_req gsr;
-    } opt;
-    socklen_t optlen;
     int level, iid = 0;
-    vlc_bool_t ssm = VLC_TRUE;
-
-    if (src == NULL)
-        ssm = VLC_FALSE;
-
-    memset (&opt, 0, sizeof (opt));
 
     char *iface = var_CreateGetString (obj, "miface");
     if (iface != NULL)
@@ -350,23 +336,25 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
 
     switch (grp->sa_family)
     {
+#ifdef AF_INET6
         case AF_INET6:
             level = SOL_IPV6;
-            if (ssm
+            if ((src != NULL)
              && memcmp (&((const struct sockaddr_in6 *)src)->sin6_addr,
                         &in6addr_any, sizeof (in6addr_any)) == 0)
-                ssm = VLC_FALSE;
+                src = NULL;
 
             if (((const struct sockaddr_in6 *)src)->sin6_scope_id)
                 iid = ((const struct sockaddr_in6 *)src)->sin6_scope_id;
             break;
+#endif
 
         case AF_INET:
             level = SOL_IP;
-            if (ssm
+            if ((src != NULL)
              && ((const struct sockaddr_in *)src)->sin_addr.s_addr
                   == INADDR_ANY)
-                ssm = VLC_FALSE;
+                src = NULL;
             break;
 
         default:
@@ -374,7 +362,18 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
             return -1;
     }
 
-    if (ssm)
+    /* Agnostic ASM/SSM multicast join */
+#ifdef MCAST_JOIN_SOURCE_GROUP
+    union
+    {
+        struct group_req gr;
+        struct group_source_req gsr;
+    } opt;
+    socklen_t optlen;
+
+    memset (&opt, 0, sizeof (opt));
+
+    if (src != NULL)
     {
         if ((grplen > sizeof (opt.gsr.gsr_group))
          || (srclen > sizeof (opt.gsr.gsr_source)))
@@ -395,23 +394,23 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
         optlen = sizeof (opt.gr);
     }
 
-    msg_Dbg (obj, "Multicast %sgroup join request", ssm ? "source " : "");
+    msg_Dbg (obj, "Multicast %sgroup join request", src ? "source " : "");
 
-    if (setsockopt (fd, level,
-                    ssm ? MCAST_JOIN_SOURCE_GROUP : MCAST_JOIN_GROUP,
+    if (setsockopt (fd, level, 
+                    src ? MCAST_JOIN_SOURCE_GROUP : MCAST_JOIN_GROUP,
                     (void *)&opt, optlen) == 0)
         return 0;
 #endif
 
     /* Fallback to IPv-specific APIs */
-    if (ssm && (src->sa_family != grp->sa_family))
+    if ((src != NULL) && (src->sa_family != grp->sa_family))
         return -1;
 
     switch (grp->sa_family)
     {
         case AF_INET:
             if ((grplen < sizeof (struct sockaddr_in))
-             || (ssm && (srclen < sizeof (struct sockaddr_in))))
+             || ((src != NULL) && (srclen < sizeof (struct sockaddr_in))))
                 return -1;
 
             if (net_IPv4Join (obj, fd, (const struct sockaddr_in *)src,
@@ -422,7 +421,7 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
 #ifdef AF_INET6
         case AF_INET6:
             if ((grplen < sizeof (struct sockaddr_in6))
-             || (ssm && (srclen < sizeof (struct sockaddr_in6))))
+             || ((src != NULL) && (srclen < sizeof (struct sockaddr_in6))))
                 return -1;
 
             /* We don't provide IPv6-specific SSM at the moment.
@@ -437,7 +436,7 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
     msg_Err (obj, "Multicast group join error (%s)",
              net_strerror (net_errno));
 
-    if (ssm)
+    if (src != NULL)
     {
         msg_Warn (obj, "Trying ASM instead of SSM...");
         return net_Subscribe (obj, fd, grp, grplen);
