@@ -69,6 +69,11 @@ extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
 
 
+/*
+ * XXX: I am too lazy to put all these dual functions in “next generation”
+ * network plugins.
+ */
+
 static int net_SetMcastHopLimit( vlc_object_t *p_this,
                                  int fd, int family, int hlim )
 {
@@ -158,7 +163,7 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
         int scope = if_nametoindex (iface);
         if (scope == 0)
         {
-            msg_Err (p_this, "%s: invalid interface for multicast", iface);
+            msg_Err (p_this, "invalid multicast interface: %s", iface);
             return -1;
         }
 
@@ -175,7 +180,7 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
             struct in_addr ipv4;
             if (inet_pton (AF_INET, addr, &ipv4) <= 0)
             {
-                msg_Err (p_this, "%s: invalid IPv4 address for multicast",
+                msg_Err (p_this, "invalid IPv4 address for multicast: %s",
                          addr);
                 return -1;
             }
@@ -191,79 +196,262 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
 }
 
 
-int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
-                   socklen_t addrlen)
+/**
+ * Old-style any-source multicast join.
+ * In use on Windows XP/2003 and older.
+ */
+static int
+net_IPv4Join (vlc_object_t *obj, int fd,
+              const struct sockaddr_in *src, const struct sockaddr_in *grp)
 {
-    switch (addr->sa_family)
-    {
 #ifdef IP_ADD_MEMBERSHIP
-        case AF_INET:
+    union
+    {
+        struct ip_mreq gr4;
+# ifdef IP_ADD_SOURCE_MEMBERSHIP
+        struct ip_mreq_source gsr4;
+# endif
+    } opt;
+    int cmd;
+    struct in_addr id;
+    socklen_t optlen;
+
+    /* Multicast interface IPv4 address */
+    char *iface = var_CreateGetString (obj, "miface-addr");
+    if (iface != NULL)
+    {
+        if ((*iface)
+         && (inet_pton (AF_INET, iface, &id) <= 0))
         {
-            const struct sockaddr_in *v4 = (const struct sockaddr_in *)addr;
-            if (addrlen < sizeof (*v4))
-                return -1;
-
-            struct ip_mreq imr;
-            memset (&imr, 0, sizeof (imr));
-            memcpy (&imr.imr_multiaddr, &v4->sin_addr, 4);
-
-            /* FIXME: should use a different option for in and out */
-            char *iif = var_CreateGetString (obj, "miface-addr");
-            if (iif != NULL)
-            {
-                if ((iif[0] != '\0') &&
-                    (inet_pton (AF_INET, iif, &imr.imr_interface) <= 0))
-                {
-                    msg_Err (obj, "invalid multicast interface address %s",
-                             iif);
-                    free (iif);
-                    return -1;
-                }
-                free (iif);
-            }
-
-            msg_Dbg (obj, "IP_ADD_MEMBERSHIP multicast request");
-
-            if (setsockopt (fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr,
-                            sizeof (imr)))
-            {
-                msg_Err (obj, "cannot join IPv4 multicast group (%s)",
-                         net_strerror (net_errno));
-                return -1;
-            }
-            return 0;
+            msg_Err (obj, "invalid multicast interface address %s", iface);
+            free (iface);
+            goto error;
         }
+    }
+
+    memset (&opt, 0, sizeof (opt));
+    if (src != NULL)
+    {
+# ifdef IP_ADD_SOURCE_MEMBERSHIP
+        cmd = IP_ADD_SOURCE_MEMBERSHIP;
+        opt.gsr4.imr_multiaddr = grp->sin_addr;
+        opt.gsr4.imr_sourceaddr = src->sin_addr;
+        opt.gsr4.imr_interface = id;
+        optlen = sizeof (opt.gsr4);
+# else
+        errno = ENOSYS;
+        goto error;
+# endif
+    }
+    else
+    {
+        cmd = IP_ADD_MEMBERSHIP;
+        opt.gr4.imr_multiaddr = grp->sin_addr;
+        opt.gr4.imr_interface = id;
+        optlen = sizeof (opt.gr4);
+    }
+
+    msg_Dbg (obj, "IP_ADD_%sMEMBERSHIP multicast request",
+             (src != NULL) ? "SOURCE_" : "");
+
+    if (setsockopt (fd, SOL_IP, cmd, &opt, optlen) == 0)
+        return 0;
+
+error:
 #endif
 
+    msg_Err (obj, "cannot join IPv4 multicast group (%s)",
+             net_strerror (net_errno));
+    return -1;
+}
+
+
+static int
+net_IPv6Join (vlc_object_t *obj, int fd, const struct sockaddr_in6 *src)
+{
 #ifdef IPV6_JOIN_GROUP
-        case AF_INET6:
+    struct ipv6_mreq gr6;
+    memset (&gr6, 0, sizeof (gr6));
+    gr6.ipv6mr_interface = src->sin6_scope_id;
+    memcpy (&gr6.ipv6mr_multiaddr, &src->sin6_addr, 16);
+
+    msg_Dbg (obj, "IPV6_JOIN_GROUP multicast request");
+
+    if (!setsockopt (fd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &gr6, sizeof (gr6)))
+        return 0;
+#else
+    errno = ENOSYS;
+#endif
+
+    msg_Err (obj, "cannot join IPv6 any-source multicast group (%s)",
+             net_strerror (net_errno));
+    return -1;
+}
+
+
+#if defined (WIN32) && !defined (MCAST_JOIN_SOURCE_GROUP)
+/*
+ * I hate manual definitions: Error-prone. Portability hell.
+ * Developers shall use UP-TO-DATE compilers. Full point.
+ * If you remove the warning, you remove the whole ifndef.
+ */
+#  warning Your C headers are out-of-date. Please update.
+
+/* Most (all?) Mingw32 versions in use are yet to pick up Vista stuff */
+#  define MCAST_JOIN_SOURCE_GROUP 45 /* from <ws2ipdef.h> */
+struct group_source_req
+{
+    uint32_t gsr_interface;
+    struct sockaddr_storage gsr_group;
+    struct sockaddr_storage gsr_source;
+};
+# endif
+
+/**
+ * IP-agnostic multicast join,
+ * with fallback to old APIs, and fallback from SSM to ASM.
+ */
+static int
+net_SourceSubscribe (vlc_object_t *obj, int fd,
+                     const struct sockaddr *src, socklen_t srclen,
+                     const struct sockaddr *grp, socklen_t grplen)
+{
+    /* Agnostic ASM/SSM multicast join */
+#ifdef MCAST_JOIN_SOURCE_GROUP
+    union
+    {
+        struct group_req gr;
+        struct group_source_req gsr;
+    } opt;
+    socklen_t optlen;
+    int level, iid = 0;
+    vlc_bool_t ssm = VLC_TRUE;
+
+    if (src == NULL)
+        ssm = VLC_FALSE;
+
+    memset (&opt, 0, sizeof (opt));
+
+    char *iface = var_CreateGetString (obj, "miface");
+    if (iface != NULL)
+    {
+        if (*iface)
         {
-            const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *)addr;
-            if (addrlen < sizeof (*v6))
-                return -1;
-
-            struct ipv6_mreq imr;
-            memset (&imr, 0, sizeof (imr));
-            imr.ipv6mr_interface = v6->sin6_scope_id;
-            memcpy (&imr.ipv6mr_multiaddr, &v6->sin6_addr, 16);
-
-            msg_Dbg (obj, "IPV6_JOIN_GROUP multicast request");
-
-            if (setsockopt (fd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &imr,
-                            sizeof (imr)))
+            iid = if_nametoindex (iface);
+            if (iid == 0)
             {
-                msg_Err (obj, "cannot join IPv6 multicast group (%s)",
-                         net_strerror (net_errno));
+                msg_Err (obj, "invalid multicast interface: %s", iface);
+                free (iface);
                 return -1;
             }
-
-            return 0;
         }
+        free (iface);
+    }
+
+    switch (grp->sa_family)
+    {
+        case AF_INET6:
+            level = SOL_IPV6;
+            if (ssm
+             && memcmp (&((const struct sockaddr_in6 *)src)->sin6_addr,
+                        &in6addr_any, sizeof (in6addr_any)) == 0)
+                ssm = VLC_FALSE;
+
+            if (((const struct sockaddr_in6 *)src)->sin6_scope_id)
+                iid = ((const struct sockaddr_in6 *)src)->sin6_scope_id;
+            break;
+
+        case AF_INET:
+            level = SOL_IP;
+            if (ssm
+             && ((const struct sockaddr_in *)src)->sin_addr.s_addr
+                  == INADDR_ANY)
+                ssm = VLC_FALSE;
+            break;
+
+        default:
+            errno = EAFNOSUPPORT;
+            return -1;
+    }
+
+    if (ssm)
+    {
+        if ((grplen > sizeof (opt.gsr.gsr_group))
+         || (srclen > sizeof (opt.gsr.gsr_source)))
+            return -1;
+
+        opt.gsr.gsr_interface = iid;
+        memcpy (&opt.gsr.gsr_source, src, srclen);
+        memcpy (&opt.gsr.gsr_group,  grp, grplen);
+        optlen = sizeof (opt.gsr);
+    }
+    else
+    {
+        if (grplen > sizeof (opt.gr.gr_group))
+            return -1;
+
+        opt.gr.gr_interface = iid;
+        memcpy (&opt.gr.gr_group, grp, grplen);
+        optlen = sizeof (opt.gr);
+    }
+
+    msg_Dbg (obj, "Multicast %sgroup join request", ssm ? "source " : "");
+
+    if (setsockopt (fd, level,
+                    ssm ? MCAST_JOIN_SOURCE_GROUP : MCAST_JOIN_GROUP,
+                    (void *)&opt, optlen) == 0)
+        return 0;
 #endif
+
+    /* Fallback to IPv-specific APIs */
+    if (ssm && (src->sa_family != grp->sa_family))
+        return -1;
+
+    switch (grp->sa_family)
+    {
+        case AF_INET:
+            if ((grplen < sizeof (struct sockaddr_in))
+             || (ssm && (srclen < sizeof (struct sockaddr_in))))
+                return -1;
+
+            if (net_IPv4Join (obj, fd, (const struct sockaddr_in *)src,
+                              (const struct sockaddr_in *)grp) == 0)
+                return 0;
+            break;
+
+#ifdef AF_INET6
+        case AF_INET6:
+            if ((grplen < sizeof (struct sockaddr_in6))
+             || (ssm && (srclen < sizeof (struct sockaddr_in6))))
+                return -1;
+
+            /* We don't provide IPv6-specific SSM at the moment.
+             * It seems all the OSes with IPv6 SSM have the new API anyway. */
+
+            if (net_IPv6Join (obj, fd, (const struct sockaddr_in6 *)grp) == 0)
+                return 0;
+            break;
+#endif
+    }
+
+    msg_Err (obj, "Multicast group join error (%s)",
+             net_strerror (net_errno));
+
+    if (ssm)
+    {
+        msg_Warn (obj, "Trying ASM instead of SSM...");
+        return net_Subscribe (obj, fd, grp, grplen);
     }
 
     msg_Err (obj, "Multicast not supported");
     return -1;
+}
+
+
+int net_Subscribe (vlc_object_t *obj, int fd,
+                   const struct sockaddr *addr, socklen_t addrlen)
+{
+    return net_SourceSubscribe (obj, fd, NULL, 0, addr, addrlen);
 }
 
 
@@ -412,76 +600,110 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
  *****************************************************************************
  * Open a UDP connection and return a handle
  *****************************************************************************/
-int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
+int __net_OpenUDP( vlc_object_t *obj, const char *psz_bind, int i_bind,
                    const char *psz_server, int i_server )
 {
-    void            *private;
-    network_socket_t sock;
-    module_t         *p_network = NULL;
+    struct addrinfo hints, *loc, *rem;
+    int val;
 
-    if (((psz_server == NULL) || (psz_server[0] == '\0')) && (i_server == 0))
-    {
-        msg_Warn (p_this,
-                  "Obsolete net_OpenUDP with no remote endpoint; "
-                  "Use net_ListenUDP instead");
-        return net_ListenUDP1 (p_this, psz_bind, i_bind);
-    }
-
-    if (((psz_bind == NULL) || (psz_bind[0] == '\0')) && (i_bind == 0))
-    {
-        msg_Warn (p_this,
-                  "Obsolete net_OpenUDP with no local endpoint; "
-                  "Use net_ConnectUDP instead");
-        return net_ConnectUDP (p_this, psz_server, i_server, -1);
-    }
-
-    if( psz_server == NULL ) psz_server = "";
-    if( psz_bind == NULL ) psz_bind = "";
-
-    /* Prepare the network_socket_t structure */
-    sock.psz_bind_addr   = psz_bind;
-    sock.i_bind_port     = i_bind;
-    sock.psz_server_addr = psz_server;
-    sock.i_server_port   = i_server;
-    sock.i_ttl           = 0;
-    sock.i_handle        = -1;
-
-    msg_Dbg( p_this, "net: connecting to '[%s]:%d@[%s]:%d'",
+    msg_Dbg( obj, "net: connecting to '[%s]:%d@[%s]:%d'",
              psz_server, i_server, psz_bind, i_bind );
 
-    /* Check if we have force ipv4 or ipv6 */
-    vlc_bool_t v4 = var_CreateGetBool (p_this, "ipv4");
-    vlc_bool_t v6 = var_CreateGetBool (p_this, "ipv6");
+    memset (&hints, 0, sizeof (hints));
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_protocol = IPPROTO_UDP;
+    hints.ai_flags = AI_PASSIVE;
 
-    if( !v4 )
+    val = vlc_getaddrinfo (obj, psz_server, i_server, &hints, &rem);
+    if (val)
     {
-        /* try IPv6 first (unless IPv4 forced) */
-        private = p_this->p_private;
-        p_this->p_private = (void*)&sock;
-        p_network = module_Need( p_this, "network", "ipv6", VLC_TRUE );
-
-        if( p_network != NULL )
-            module_Unneed( p_this, p_network );
-
-        p_this->p_private = private;
+        msg_Err (obj, "cannot resolve %s port %d : %s", psz_bind, i_bind,
+                 vlc_gai_strerror (val));
+        return -1;
     }
 
-    if ((sock.i_handle == -1) && !v6)
+    val = vlc_getaddrinfo (obj, psz_bind, i_bind, &hints, &loc);
+    if (val)
     {
-        /* also try IPv4 (unless IPv6 forced) */
-        private = p_this->p_private;
-        p_this->p_private = (void*)&sock;
-        p_network = module_Need( p_this, "network", "ipv4", VLC_TRUE );
-
-        if( p_network != NULL )
-            module_Unneed( p_this, p_network );
-
-        p_this->p_private = private;
+        msg_Err (obj, "cannot resolve %s port %d : %s", psz_bind, i_bind,
+                 vlc_gai_strerror (val));
+        vlc_freeaddrinfo (rem);
+        return -1;
     }
 
-    if( sock.i_handle == -1 )
-        msg_Dbg( p_this, "net: connection to '[%s]:%d@[%s]:%d' failed",
-                psz_server, i_server, psz_bind, i_bind );
+    for (struct addrinfo *ptr = loc; ptr != NULL; ptr = ptr->ai_next)
+    {
+        int fd = net_Socket (obj, ptr->ai_family, ptr->ai_socktype,
+                             ptr->ai_protocol);
+        if (fd == -1)
+            continue; // usually, address family not supported
 
-    return sock.i_handle;
+#ifdef SO_REUSEPORT
+        setsockopt (fd, SOL_SOCKET, SO_REUSEPORT, &(int){ 1 }, sizeof (int));
+#endif
+
+#ifdef SO_RCVBUF
+        /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
+         * to avoid packet loss caused in case of scheduling hiccups */
+        setsockopt (fd, SOL_SOCKET, SO_RCVBUF,
+                    (void *)&(int){ 0x80000 }, sizeof (int));
+        setsockopt (fd, SOL_SOCKET, SO_SNDBUF,
+                    (void *)&(int){ 0x80000 }, sizeof (int));
+#endif
+
+#if defined (WIN32) || defined (UNDER_CE)
+        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
+         && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
+        {
+            // This works for IPv4 too - don't worry!
+            struct sockaddr_in6 dumb =
+            {
+                .sin6_family = ptr->ai_addr->sa_family,
+                .sin6_port =  ((struct sockaddr_in *)(ptr->ai_addr))->sin_port
+            };
+
+            bind (fd, (struct sockaddr *)&dumb, ptr->ai_addrlen);
+        }
+        else
+#endif
+        if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
+        {
+            net_Close (fd);
+            continue;
+        }
+
+        struct addrinfo *ptr2;
+        for (ptr2 = rem; ptr2 != NULL; ptr2 = ptr2->ai_next)
+        {
+            if ((ptr2->ai_family != ptr->ai_family)
+             || (ptr2->ai_socktype != ptr->ai_socktype)
+             || (ptr2->ai_protocol != ptr->ai_protocol))
+                continue;
+
+            if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen))
+            {
+                if (net_SourceSubscribe (obj, fd,
+                                         ptr2->ai_addr, ptr2->ai_addrlen,
+                                         ptr->ai_addr, ptr->ai_addrlen) == 0)
+                    break;
+            }
+            else
+            {
+                if (connect (fd, ptr2->ai_addr, ptr2->ai_addrlen) == 0)
+                    break;
+            }
+        }
+
+        if (ptr2 == NULL)
+        {
+            msg_Err (obj, "cannot connect to %s port %d: %s",
+                     psz_server, i_server, net_strerror (net_errno));
+            close (fd);
+            continue;
+        }
+
+        return fd;
+    }
+
+    return -1;
 }
