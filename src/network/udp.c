@@ -72,7 +72,6 @@ extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
 static int net_SetMcastHopLimit( vlc_object_t *p_this,
                                  int fd, int family, int hlim )
 {
-#ifndef SYS_BEOS
     int proto, cmd;
 
     /* There is some confusion in the world whether IP_MULTICAST_TTL 
@@ -81,10 +80,12 @@ static int net_SetMcastHopLimit( vlc_object_t *p_this,
      * int as a fallback to be safe */
     switch( family )
     {
+#ifdef IP_MULTICAST_TTL
         case AF_INET:
             proto = SOL_IP;
             cmd = IP_MULTICAST_TTL;
             break;
+#endif
 
 #ifdef IPV6_MULTICAST_HOPS
         case AF_INET6:
@@ -107,7 +108,7 @@ static int net_SetMcastHopLimit( vlc_object_t *p_this,
         if( setsockopt( fd, proto, cmd, &buf, sizeof( buf ) ) )
             return VLC_EGENERIC;
     }
-#endif
+
     return VLC_SUCCESS;
 }
 
