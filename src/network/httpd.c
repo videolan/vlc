@@ -142,7 +142,7 @@ struct httpd_client_t
  * Various functions
  *****************************************************************************/
 /*char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";*/
-static void b64_decode( char *dest, char *src )
+static void b64_decode( char *restrict dest, const char *restrict src )
 {
     int  i_level;
     int  last = 0;
@@ -369,7 +369,7 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
     httpd_file_t *file = (httpd_file_t*)p_sys;
     uint8_t *psz_args = query->psz_args;
     uint8_t **pp_body, *p_body;
-    char *psz_connection = NULL;
+    const char *psz_connection;
     int *pi_body, i_body;
 
     if( answer == NULL || query == NULL )
@@ -532,7 +532,8 @@ static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *c
     if( strncmp( (char *)answer->p_body, "HTTP/1.", 7 ) )
     {
         int i_status, i_headers;
-        char *psz_headers, *psz_new, *psz_status;
+        char *psz_headers, *psz_new;
+        const char *psz_status;
 
         if( !strncmp( (char *)answer->p_body, "Status: ", 8 ) )
         {
@@ -1336,7 +1337,7 @@ void httpd_MsgClean( httpd_message_t *msg )
     httpd_MsgInit( msg );
 }
 
-char *httpd_MsgGet( httpd_message_t *msg, char *name )
+const char *httpd_MsgGet( httpd_message_t *msg, const char *name )
 {
     int i;
 
@@ -1350,7 +1351,7 @@ char *httpd_MsgGet( httpd_message_t *msg, char *name )
     return NULL;
 }
 
-void httpd_MsgAdd( httpd_message_t *msg, char *name, char *psz_value, ... )
+void httpd_MsgAdd( httpd_message_t *msg, const char *name, const char *psz_value, ... )
 {
     va_list args;
     char *value = NULL;
@@ -1581,7 +1582,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                 {
                     static const struct
                     {
-                        char *name;
+                        const char *name;
                         int  i_type;
                         int  i_proto;
                     }
@@ -2058,7 +2059,7 @@ static void httpd_HostThread( httpd_host_t *host )
                 }
                 else if( i_msg == HTTPD_MSG_OPTIONS )
                 {
-                    char *psz_cseq = NULL;
+                    const char *psz_cseq;
                     int i_cseq;
 
                     /* unimplemented */
@@ -2163,14 +2164,11 @@ static void httpd_HostThread( httpd_host_t *host )
                                 if( answer && ( *url->psz_user || *url->psz_password ) )
                                 {
                                     /* create the headers */
-                                    char *b64 = httpd_MsgGet( query, "Authorization" ); /* BASIC id */
+                                    const char *b64 = httpd_MsgGet( query, "Authorization" ); /* BASIC id */
                                     char *auth;
                                     char *id;
 
                                     asprintf( &id, "%s:%s", url->psz_user, url->psz_password );
-                                    if( b64 ) auth = malloc( strlen(b64) + 1 );
-                                    else auth = malloc( strlen("") + 1 );
-
                                     if( b64 != NULL
                                          && !strncasecmp( b64, "BASIC", 5 ) )
                                     {
@@ -2179,11 +2177,12 @@ static void httpd_HostThread( httpd_host_t *host )
                                         {
                                             b64++;
                                         }
+                                        auth = malloc( strlen(b64) + 1 );
                                         b64_decode( auth, b64 );
                                     }
                                     else
                                     {
-                                        strcpy( auth, "" );
+                                        auth = strdup( "" );
                                     }
 
                                     if( strcmp( id, auth ) )
@@ -2306,8 +2305,8 @@ static void httpd_HostThread( httpd_host_t *host )
             {
                 if( cl->i_mode == HTTPD_CLIENT_FILE || cl->answer.i_body_offset == 0 )
                 {
-                    char *psz_connection = httpd_MsgGet( &cl->answer, "Connection" );
-                    char *psz_query = httpd_MsgGet( &cl->query, "Connection" );
+                    const char *psz_connection = httpd_MsgGet( &cl->answer, "Connection" );
+                    const char *psz_query = httpd_MsgGet( &cl->query, "Connection" );
                     vlc_bool_t b_connection = VLC_FALSE;
                     vlc_bool_t b_keepalive = VLC_FALSE;
                     vlc_bool_t b_query = VLC_FALSE;
@@ -2666,13 +2665,13 @@ void httpd_MsgInit ( httpd_message_t *a )
 {
 }
 
-void httpd_MsgAdd  ( httpd_message_t *a, char *b, char *c, ... )
+void httpd_MsgAdd  ( httpd_message_t *a, const char *b, const char *c, ... )
 {
 }
 
-char *httpd_MsgGet ( httpd_message_t *a, char *b )
+const char *httpd_MsgGet ( httpd_message_t *a, const char *b )
 {
-    return NULL;
+    return "";
 }
 
 void httpd_MsgClean( httpd_message_t *a )

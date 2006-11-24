@@ -214,8 +214,8 @@ struct module_symbols_t
     int (*httpd_StreamHeader_inner) (httpd_stream_t *, uint8_t *p_data, int i_data);
     int (*httpd_StreamSend_inner) (httpd_stream_t *, uint8_t *p_data, int i_data);
     void (*httpd_MsgInit_inner) (httpd_message_t *);
-    void (*httpd_MsgAdd_inner) (httpd_message_t *, char *psz_name, char *psz_value, ...);
-    char * (*httpd_MsgGet_inner) (httpd_message_t *, char *psz_name);
+    void (*httpd_MsgAdd_inner) (httpd_message_t *, const char *psz_name, const char *psz_value, ...);
+    const char * (*httpd_MsgGet_inner) (httpd_message_t *, const char *psz_name);
     void (*httpd_MsgClean_inner) (httpd_message_t *);
     tls_server_t * (*tls_ServerCreate_inner) (vlc_object_t *, const char *, const char *);
     void (*tls_ServerDelete_inner) (tls_server_t *);

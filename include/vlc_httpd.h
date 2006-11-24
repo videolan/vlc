@@ -183,9 +183,9 @@ VLC_EXPORT( int,              httpd_StreamSend,   ( httpd_stream_t *, uint8_t *p
 
 /* Msg functions facilities */
 VLC_EXPORT( void,         httpd_MsgInit, ( httpd_message_t * )  );
-VLC_EXPORT( void,         httpd_MsgAdd, ( httpd_message_t *, char *psz_name, char *psz_value, ... ) );
+VLC_EXPORT( void,         httpd_MsgAdd, ( httpd_message_t *, const char *psz_name, const char *psz_value, ... ) );
 /* return "" if not found. The string is not allocated */
-VLC_EXPORT( char *,       httpd_MsgGet, ( httpd_message_t *, char *psz_name ) );
+VLC_EXPORT( const char *, httpd_MsgGet, ( httpd_message_t *, const char *psz_name ) );
 VLC_EXPORT( void,         httpd_MsgClean, ( httpd_message_t * ) );
 
 #endif /* _VLC_HTTPD_H */
