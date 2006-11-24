@@ -122,7 +122,6 @@ src/libvlc-common.c
 src/libvlc.h
 src/misc/beos_specific.cpp
 src/misc/block.c
-src/misc/charset.c
 src/misc/configuration.c
 src/misc/configuration_chain.c
 src/misc/cpu.c
@@ -131,17 +130,13 @@ src/misc/devices.c
 src/misc/dict.c
 src/misc/error.c
 src/misc/image.c
-src/misc/iso-639_def.h
-src/misc/iso_lang.c
 src/misc/md5.c
 src/misc/messages.c
 src/misc/modules.c
 src/misc/mtime.c
 src/misc/objects.c
 src/misc/stats.c
-src/misc/strings.c
 src/misc/threads.c
-src/misc/unicode.c
 src/misc/update.c
 src/misc/variables.c
 src/misc/vlm.c
@@ -176,6 +171,11 @@ src/stream_output/sap.c
 src/stream_output/stream_output.c
 src/test/i18n_atof.c
 src/test/url.c
+src/text/charset.c
+src/text/iso-639_def.h
+src/text/iso_lang.c
+src/text/strings.c
+src/text/unicode.c
 src/video_output/video_output.c
 src/video_output/video_text.c
 src/video_output/video_widgets.c
@@ -581,6 +581,8 @@ modules/gui/qt4/dialogs/extended.cpp
 modules/gui/qt4/dialogs/extended.hpp
 modules/gui/qt4/dialogs/interaction.cpp
 modules/gui/qt4/dialogs/interaction.hpp
+modules/gui/qt4/dialogs/mediainfo.cpp
+modules/gui/qt4/dialogs/mediainfo.hpp
 modules/gui/qt4/dialogs/messages.cpp
 modules/gui/qt4/dialogs/messages.hpp
 modules/gui/qt4/dialogs/open.cpp
@@ -593,8 +595,6 @@ modules/gui/qt4/dialogs_provider.cpp
 modules/gui/qt4/dialogs_provider.hpp
 modules/gui/qt4/dialogs/sout.cpp
 modules/gui/qt4/dialogs/sout.hpp
-modules/gui/qt4/dialogs/streaminfo.cpp
-modules/gui/qt4/dialogs/streaminfo.hpp
 modules/gui/qt4/input_manager.cpp
 modules/gui/qt4/input_manager.hpp
 modules/gui/qt4/main_interface.cpp

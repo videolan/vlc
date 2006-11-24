@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-11-19 23:15+0000\n"
+"POT-Creation-Date: 2006-11-24 18:25+0100\n"
 "PO-Revision-Date: 2006-04-07 11:52+0000\n"
 "Last-Translator: Jonas Slivka <jonas.slivka@gmail.com>\n"
 "Language-Team: Lithuanian <lt@li.org>\n"
@@ -312,7 +312,7 @@ msgstr ""
 msgid "VLC's implementation of Video On Demand"
 msgstr ""
 
-#: include/vlc_config_cat.h:182 src/libvlc.h:1656 src/playlist/engine.c:105
+#: include/vlc_config_cat.h:182 src/libvlc.h:1657 src/playlist/engine.c:105
 #: src/playlist/engine.c:107 modules/demux/playlist/playlist.c:56
 #: modules/demux/playlist/playlist.c:57
 #: modules/gui/beos/InterfaceWindow.cpp:231
@@ -373,7 +373,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:203 modules/gui/macosx/open.m:164
 #: modules/gui/macosx/open.m:386 modules/gui/pda/pda_interface.c:548
-#: modules/gui/wxwidgets/dialogs/open.cpp:503
+#: modules/gui/wxwidgets/dialogs/open.cpp:504
 msgid "Network"
 msgstr ""
 
@@ -488,7 +488,7 @@ msgid "Save..."
 msgstr ""
 
 #: include/vlc_intf_strings.h:45
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:1027
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:1030
 msgid ""
 "Some options are available but hidden. Check \"Advanced options\" to see "
 "them."
@@ -502,8 +502,8 @@ msgstr ""
 #: modules/gui/beos/MediaControlView.cpp:1235 modules/gui/macosx/intf.m:551
 #: modules/gui/macosx/intf.m:552 modules/gui/macosx/open.m:170
 #: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/wizard.m:391
-#: modules/gui/wxwidgets/dialogs/open.cpp:757
-#: modules/gui/wxwidgets/dialogs/open.cpp:1658 modules/mux/asf.c:48
+#: modules/gui/wxwidgets/dialogs/open.cpp:758
+#: modules/gui/wxwidgets/dialogs/open.cpp:1659 modules/mux/asf.c:48
 msgid "Title"
 msgstr ""
 
@@ -546,7 +546,7 @@ msgstr ""
 
 #: include/vlc_meta.h:39 modules/gui/macosx/open.m:183
 #: modules/gui/qt4/ui/open_net.ui:89 modules/gui/qt4/ui/open_net.ui:167
-#: modules/gui/wxwidgets/dialogs/open.cpp:871
+#: modules/gui/wxwidgets/dialogs/open.cpp:872
 msgid "URL"
 msgstr ""
 
@@ -830,20 +830,20 @@ msgstr ""
 msgid "Subtitle"
 msgstr ""
 
-#: src/input/input.c:2072
+#: src/input/input.c:2073
 msgid "Your input can't be opened"
 msgstr ""
 
-#: src/input/input.c:2073
+#: src/input/input.c:2074
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/input.c:2148
+#: src/input/input.c:2149
 msgid "Can't recognize the input's format"
 msgstr ""
 
-#: src/input/input.c:2149
+#: src/input/input.c:2150
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -859,7 +859,7 @@ msgstr ""
 #: src/input/var.c:143 modules/gui/beos/MediaControlView.cpp:1236
 #: modules/gui/macosx/intf.m:553 modules/gui/macosx/intf.m:554
 #: modules/gui/macosx/open.m:171 modules/gui/qt4/ui/open_disk.ui:188
-#: modules/gui/wxwidgets/dialogs/open.cpp:762
+#: modules/gui/wxwidgets/dialogs/open.cpp:763
 msgid "Chapter"
 msgstr ""
 
@@ -953,62 +953,62 @@ msgstr ""
 msgid "Mouse Gestures"
 msgstr ""
 
-#: src/libvlc-common.c:314 src/libvlc-common.c:482 src/misc/modules.c:1675
-#: src/misc/modules.c:1979
+#: src/libvlc-common.c:319 src/libvlc-common.c:488 src/misc/modules.c:1675
+#: src/misc/modules.c:1998
 msgid "C"
 msgstr ""
 
-#: src/libvlc-common.c:330
+#: src/libvlc-common.c:335
 msgid "Help options"
 msgstr ""
 
-#: src/libvlc-common.c:1412 src/misc/configuration.c:1242
+#: src/libvlc-common.c:1445 src/misc/configuration.c:1225
 msgid "string"
 msgstr ""
 
-#: src/libvlc-common.c:1431 src/misc/configuration.c:1206
+#: src/libvlc-common.c:1464 src/misc/configuration.c:1189
 msgid "integer"
 msgstr ""
 
-#: src/libvlc-common.c:1451 src/misc/configuration.c:1231
+#: src/libvlc-common.c:1484 src/misc/configuration.c:1214
 msgid "float"
 msgstr ""
 
-#: src/libvlc-common.c:1458
+#: src/libvlc-common.c:1491
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc-common.c:1459
+#: src/libvlc-common.c:1492
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc-common.c:1641
+#: src/libvlc-common.c:1674
 #, c-format
 msgid "VLC version %s\n"
 msgstr ""
 
-#: src/libvlc-common.c:1642
+#: src/libvlc-common.c:1675
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
 msgstr ""
 
-#: src/libvlc-common.c:1644
+#: src/libvlc-common.c:1677
 #, c-format
 msgid "Compiler: %s\n"
 msgstr ""
 
-#: src/libvlc-common.c:1647
+#: src/libvlc-common.c:1680
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
 msgstr ""
 
-#: src/libvlc-common.c:1679
+#: src/libvlc-common.c:1712
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 
-#: src/libvlc-common.c:1700
+#: src/libvlc-common.c:1733
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -1026,27 +1026,27 @@ msgstr ""
 msgid "British English"
 msgstr ""
 
-#: src/libvlc.h:39 src/misc/iso-639_def.h:59
+#: src/libvlc.h:39 src/text/iso-639_def.h:59
 msgid "Catalan"
 msgstr ""
 
-#: src/libvlc.h:39 src/misc/iso-639_def.h:67
+#: src/libvlc.h:39 src/text/iso-639_def.h:67
 msgid "Czech"
 msgstr ""
 
-#: src/libvlc.h:39 src/misc/iso-639_def.h:68
+#: src/libvlc.h:39 src/text/iso-639_def.h:68
 msgid "Danish"
 msgstr ""
 
-#: src/libvlc.h:39 src/misc/iso-639_def.h:80
+#: src/libvlc.h:39 src/text/iso-639_def.h:80
 msgid "German"
 msgstr ""
 
-#: src/libvlc.h:39 src/misc/iso-639_def.h:169
+#: src/libvlc.h:39 src/text/iso-639_def.h:169
 msgid "Spanish"
 msgstr ""
 
-#: src/libvlc.h:40 src/misc/iso-639_def.h:77
+#: src/libvlc.h:40 src/text/iso-639_def.h:77
 msgid "French"
 msgstr ""
 
@@ -1054,35 +1054,35 @@ msgstr ""
 msgid "Galician"
 msgstr ""
 
-#: src/libvlc.h:40 src/misc/iso-639_def.h:88
+#: src/libvlc.h:40 src/text/iso-639_def.h:88
 msgid "Hebrew"
 msgstr ""
 
-#: src/libvlc.h:40 src/misc/iso-639_def.h:92
+#: src/libvlc.h:40 src/text/iso-639_def.h:92
 msgid "Hungarian"
 msgstr ""
 
-#: src/libvlc.h:40 src/misc/iso-639_def.h:99
+#: src/libvlc.h:40 src/text/iso-639_def.h:99
 msgid "Italian"
 msgstr ""
 
-#: src/libvlc.h:41 src/misc/iso-639_def.h:101
+#: src/libvlc.h:41 src/text/iso-639_def.h:101
 msgid "Japanese"
 msgstr ""
 
-#: src/libvlc.h:41 src/misc/iso-639_def.h:79
+#: src/libvlc.h:41 src/text/iso-639_def.h:79
 msgid "Georgian"
 msgstr ""
 
-#: src/libvlc.h:41 src/misc/iso-639_def.h:111
+#: src/libvlc.h:41 src/text/iso-639_def.h:111
 msgid "Korean"
 msgstr ""
 
-#: src/libvlc.h:41 src/misc/iso-639_def.h:125
+#: src/libvlc.h:41 src/text/iso-639_def.h:125
 msgid "Malay"
 msgstr ""
 
-#: src/libvlc.h:41 src/misc/iso-639_def.h:69
+#: src/libvlc.h:41 src/text/iso-639_def.h:69
 msgid "Dutch"
 msgstr ""
 
@@ -1094,27 +1094,27 @@ msgstr ""
 msgid "Brazilian Portuguese"
 msgstr ""
 
-#: src/libvlc.h:42 src/misc/iso-639_def.h:153
+#: src/libvlc.h:42 src/text/iso-639_def.h:153
 msgid "Romanian"
 msgstr ""
 
-#: src/libvlc.h:42 src/misc/iso-639_def.h:155
+#: src/libvlc.h:42 src/text/iso-639_def.h:155
 msgid "Russian"
 msgstr ""
 
-#: src/libvlc.h:43 src/misc/iso-639_def.h:161
+#: src/libvlc.h:43 src/text/iso-639_def.h:161
 msgid "Slovak"
 msgstr ""
 
-#: src/libvlc.h:43 src/misc/iso-639_def.h:162
+#: src/libvlc.h:43 src/text/iso-639_def.h:162
 msgid "Slovenian"
 msgstr ""
 
-#: src/libvlc.h:43 src/misc/iso-639_def.h:174
+#: src/libvlc.h:43 src/text/iso-639_def.h:174
 msgid "Swedish"
 msgstr ""
 
-#: src/libvlc.h:43 src/misc/iso-639_def.h:187
+#: src/libvlc.h:43 src/text/iso-639_def.h:187
 msgid "Turkish"
 msgstr ""
 
@@ -1788,7 +1788,7 @@ msgstr ""
 #: src/video_output/vout_intf.c:353 modules/access/dshow/dshow.cpp:74
 #: modules/access/dshow/dshow.cpp:76 modules/access/dshow/dshow.cpp:79
 #: modules/access/dshow/dshow.cpp:85 modules/audio_output/alsa.c:102
-#: modules/gui/macosx/prefs_widgets.m:1292 modules/gui/macosx/sfilters.m:120
+#: modules/gui/macosx/prefs_widgets.m:1293 modules/gui/macosx/sfilters.m:120
 #: modules/gui/macosx/vout.m:201
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:275
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:325
@@ -1875,7 +1875,7 @@ msgid ""
 "(like DVB streams for example)."
 msgstr ""
 
-#: src/libvlc.h:468 modules/gui/wxwidgets/dialogs/open.cpp:776
+#: src/libvlc.h:468 modules/gui/wxwidgets/dialogs/open.cpp:777
 msgid "Audio track"
 msgstr ""
 
@@ -1883,7 +1883,7 @@ msgstr ""
 msgid "Stream number of the audio track to use (from 0 to n)."
 msgstr ""
 
-#: src/libvlc.h:473 modules/gui/wxwidgets/dialogs/open.cpp:768
+#: src/libvlc.h:473 modules/gui/wxwidgets/dialogs/open.cpp:769
 msgid "Subtitles track"
 msgstr ""
 
@@ -2009,7 +2009,7 @@ msgstr ""
 msgid "You can completely disable the sub-picture processing."
 msgstr ""
 
-#: src/libvlc.h:543 src/libvlc.h:1363 src/misc/iso-639_def.h:143
+#: src/libvlc.h:543 src/libvlc.h:1363 src/text/iso-639_def.h:143
 #: modules/stream_out/transcode.c:281
 msgid "On Screen Display"
 msgstr ""
@@ -2127,7 +2127,7 @@ msgstr ""
 msgid "This is the default Audio CD device to use."
 msgstr ""
 
-#: src/libvlc.h:613 modules/gui/wxwidgets/dialogs/open.cpp:838
+#: src/libvlc.h:613 modules/gui/wxwidgets/dialogs/open.cpp:839
 msgid "Force IPv6"
 msgstr ""
 
@@ -2855,7 +2855,7 @@ msgstr ""
 msgid "Select the hotkey to use to play."
 msgstr ""
 
-#: src/libvlc.h:1021 modules/control/hotkeys.c:620
+#: src/libvlc.h:1021 modules/control/hotkeys.c:621
 #: modules/gui/macosx/controls.m:783 modules/gui/macosx/intf.m:539
 #: modules/gui/wxwidgets/interface.cpp:704
 msgid "Faster"
@@ -2865,7 +2865,7 @@ msgstr ""
 msgid "Select the hotkey to use for fast forward playback."
 msgstr ""
 
-#: src/libvlc.h:1023 modules/control/hotkeys.c:626
+#: src/libvlc.h:1023 modules/control/hotkeys.c:627
 #: modules/gui/macosx/controls.m:784 modules/gui/macosx/intf.m:540
 #: modules/gui/wxwidgets/interface.cpp:703
 msgid "Slower"
@@ -2875,7 +2875,7 @@ msgstr ""
 msgid "Select the hotkey to use for slow motion playback."
 msgstr ""
 
-#: src/libvlc.h:1025 modules/control/hotkeys.c:603
+#: src/libvlc.h:1025 modules/control/hotkeys.c:604
 #: modules/gui/macosx/controls.m:804 modules/gui/macosx/intf.m:497
 #: modules/gui/macosx/intf.m:542 modules/gui/macosx/intf.m:618
 #: modules/gui/macosx/intf.m:626 modules/gui/macosx/wizard.m:313
@@ -2890,7 +2890,7 @@ msgstr ""
 msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr ""
 
-#: src/libvlc.h:1027 modules/control/hotkeys.c:609
+#: src/libvlc.h:1027 modules/control/hotkeys.c:610
 #: modules/gui/macosx/controls.m:803 modules/gui/macosx/intf.m:492
 #: modules/gui/macosx/intf.m:541 modules/gui/macosx/intf.m:619
 #: modules/gui/macosx/intf.m:625 modules/gui/wxwidgets/interface.cpp:701
@@ -3026,7 +3026,7 @@ msgstr ""
 msgid "Long jump length, in seconds."
 msgstr ""
 
-#: src/libvlc.h:1069 modules/control/hotkeys.c:243
+#: src/libvlc.h:1069 modules/control/hotkeys.c:244
 #: modules/gui/beos/InterfaceWindow.cpp:276
 msgid "Quit"
 msgstr ""
@@ -3569,649 +3569,69 @@ msgstr ""
 msgid "Performance options"
 msgstr ""
 
-#: src/libvlc.h:1757
+#: src/libvlc.h:1758
 msgid "Hot keys"
 msgstr ""
 
-#: src/libvlc.h:2072
+#: src/libvlc.h:2073
 msgid "Jump sizes"
 msgstr ""
 
-#: src/libvlc.h:2151
+#: src/libvlc.h:2152
 msgid "main program"
 msgstr ""
 
-#: src/libvlc.h:2161
+#: src/libvlc.h:2162
 msgid "print help for VLC (can be combined with --advanced)"
 msgstr ""
 
-#: src/libvlc.h:2167
+#: src/libvlc.h:2168
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced)"
 msgstr ""
 
-#: src/libvlc.h:2172
+#: src/libvlc.h:2173
 msgid "print help for the advanced options"
 msgstr ""
 
-#: src/libvlc.h:2177
+#: src/libvlc.h:2178
 msgid "ask for extra verbosity when displaying help"
 msgstr ""
 
-#: src/libvlc.h:2183
+#: src/libvlc.h:2184
 msgid "print a list of available modules"
 msgstr ""
 
-#: src/libvlc.h:2189
+#: src/libvlc.h:2190
 msgid "print help on a specific module (can be combined with --advanced)"
 msgstr ""
 
-#: src/libvlc.h:2194
+#: src/libvlc.h:2195
 msgid "save the current command line options in the config"
 msgstr ""
 
-#: src/libvlc.h:2199
+#: src/libvlc.h:2200
 msgid "reset the current config to the default values"
 msgstr ""
 
-#: src/libvlc.h:2204
+#: src/libvlc.h:2205
 msgid "use alternate config file"
 msgstr ""
 
-#: src/libvlc.h:2209
+#: src/libvlc.h:2210
 msgid "resets the current plugins cache"
 msgstr ""
 
-#: src/libvlc.h:2214
+#: src/libvlc.h:2215
 msgid "print version information"
 msgstr ""
 
-#: src/misc/configuration.c:1206
+#: src/misc/configuration.c:1189
 msgid "boolean"
 msgstr ""
 
-#: src/misc/configuration.c:1217
+#: src/misc/configuration.c:1200
 msgid "key"
-msgstr ""
-
-#: src/misc/iso-639_def.h:38
-msgid "Afar"
-msgstr ""
-
-#: src/misc/iso-639_def.h:39
-msgid "Abkhazian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:40
-msgid "Afrikaans"
-msgstr ""
-
-#: src/misc/iso-639_def.h:41
-msgid "Albanian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:42
-msgid "Amharic"
-msgstr ""
-
-#: src/misc/iso-639_def.h:43
-msgid "Arabic"
-msgstr ""
-
-#: src/misc/iso-639_def.h:44
-msgid "Armenian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:45
-msgid "Assamese"
-msgstr ""
-
-#: src/misc/iso-639_def.h:46
-msgid "Avestan"
-msgstr ""
-
-#: src/misc/iso-639_def.h:47
-msgid "Aymara"
-msgstr ""
-
-#: src/misc/iso-639_def.h:48
-msgid "Azerbaijani"
-msgstr ""
-
-#: src/misc/iso-639_def.h:49
-msgid "Bashkir"
-msgstr ""
-
-#: src/misc/iso-639_def.h:50
-msgid "Basque"
-msgstr ""
-
-#: src/misc/iso-639_def.h:51
-msgid "Belarusian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:52
-msgid "Bengali"
-msgstr ""
-
-#: src/misc/iso-639_def.h:53
-msgid "Bihari"
-msgstr ""
-
-#: src/misc/iso-639_def.h:54
-msgid "Bislama"
-msgstr ""
-
-#: src/misc/iso-639_def.h:55
-msgid "Bosnian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:56
-msgid "Breton"
-msgstr ""
-
-#: src/misc/iso-639_def.h:57
-msgid "Bulgarian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:58
-msgid "Burmese"
-msgstr ""
-
-#: src/misc/iso-639_def.h:60
-msgid "Chamorro"
-msgstr ""
-
-#: src/misc/iso-639_def.h:61
-msgid "Chechen"
-msgstr ""
-
-#: src/misc/iso-639_def.h:62
-msgid "Chinese"
-msgstr ""
-
-#: src/misc/iso-639_def.h:63
-msgid "Church Slavic"
-msgstr ""
-
-#: src/misc/iso-639_def.h:64
-msgid "Chuvash"
-msgstr ""
-
-#: src/misc/iso-639_def.h:65
-msgid "Cornish"
-msgstr ""
-
-#: src/misc/iso-639_def.h:66
-msgid "Corsican"
-msgstr ""
-
-#: src/misc/iso-639_def.h:70
-msgid "Dzongkha"
-msgstr ""
-
-#: src/misc/iso-639_def.h:71
-msgid "English"
-msgstr ""
-
-#: src/misc/iso-639_def.h:72
-msgid "Esperanto"
-msgstr ""
-
-#: src/misc/iso-639_def.h:73
-msgid "Estonian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:74
-msgid "Faroese"
-msgstr ""
-
-#: src/misc/iso-639_def.h:75
-msgid "Fijian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:76
-msgid "Finnish"
-msgstr ""
-
-#: src/misc/iso-639_def.h:78
-msgid "Frisian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:81
-msgid "Gaelic (Scots)"
-msgstr ""
-
-#: src/misc/iso-639_def.h:82
-msgid "Irish"
-msgstr ""
-
-#: src/misc/iso-639_def.h:83
-msgid "Gallegan"
-msgstr ""
-
-#: src/misc/iso-639_def.h:84
-msgid "Manx"
-msgstr ""
-
-#: src/misc/iso-639_def.h:85
-msgid "Greek, Modern ()"
-msgstr ""
-
-#: src/misc/iso-639_def.h:86
-msgid "Guarani"
-msgstr ""
-
-#: src/misc/iso-639_def.h:87
-msgid "Gujarati"
-msgstr ""
-
-#: src/misc/iso-639_def.h:89
-msgid "Herero"
-msgstr ""
-
-#: src/misc/iso-639_def.h:90
-msgid "Hindi"
-msgstr ""
-
-#: src/misc/iso-639_def.h:91
-msgid "Hiri Motu"
-msgstr ""
-
-#: src/misc/iso-639_def.h:93
-msgid "Icelandic"
-msgstr ""
-
-#: src/misc/iso-639_def.h:94
-msgid "Inuktitut"
-msgstr ""
-
-#: src/misc/iso-639_def.h:95
-msgid "Interlingue"
-msgstr ""
-
-#: src/misc/iso-639_def.h:96
-msgid "Interlingua"
-msgstr ""
-
-#: src/misc/iso-639_def.h:97
-msgid "Indonesian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:98
-msgid "Inupiaq"
-msgstr ""
-
-#: src/misc/iso-639_def.h:100
-msgid "Javanese"
-msgstr ""
-
-#: src/misc/iso-639_def.h:102
-msgid "Kalaallisut (Greenlandic)"
-msgstr ""
-
-#: src/misc/iso-639_def.h:103
-msgid "Kannada"
-msgstr ""
-
-#: src/misc/iso-639_def.h:104
-msgid "Kashmiri"
-msgstr ""
-
-#: src/misc/iso-639_def.h:105
-msgid "Kazakh"
-msgstr ""
-
-#: src/misc/iso-639_def.h:106
-msgid "Khmer"
-msgstr ""
-
-#: src/misc/iso-639_def.h:107
-msgid "Kikuyu"
-msgstr ""
-
-#: src/misc/iso-639_def.h:108
-msgid "Kinyarwanda"
-msgstr ""
-
-#: src/misc/iso-639_def.h:109
-msgid "Kirghiz"
-msgstr ""
-
-#: src/misc/iso-639_def.h:110
-msgid "Komi"
-msgstr ""
-
-#: src/misc/iso-639_def.h:112
-msgid "Kuanyama"
-msgstr ""
-
-#: src/misc/iso-639_def.h:113
-msgid "Kurdish"
-msgstr ""
-
-#: src/misc/iso-639_def.h:114
-msgid "Lao"
-msgstr ""
-
-#: src/misc/iso-639_def.h:115
-msgid "Latin"
-msgstr ""
-
-#: src/misc/iso-639_def.h:116
-msgid "Latvian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:117
-msgid "Lingala"
-msgstr ""
-
-#: src/misc/iso-639_def.h:118
-msgid "Lithuanian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:119
-msgid "Letzeburgesch"
-msgstr ""
-
-#: src/misc/iso-639_def.h:120
-msgid "Macedonian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:121
-msgid "Marshall"
-msgstr ""
-
-#: src/misc/iso-639_def.h:122
-msgid "Malayalam"
-msgstr ""
-
-#: src/misc/iso-639_def.h:123
-msgid "Maori"
-msgstr ""
-
-#: src/misc/iso-639_def.h:124
-msgid "Marathi"
-msgstr ""
-
-#: src/misc/iso-639_def.h:126
-msgid "Malagasy"
-msgstr ""
-
-#: src/misc/iso-639_def.h:127
-msgid "Maltese"
-msgstr ""
-
-#: src/misc/iso-639_def.h:128
-msgid "Moldavian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:129
-msgid "Mongolian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:130
-msgid "Nauru"
-msgstr ""
-
-#: src/misc/iso-639_def.h:131
-msgid "Navajo"
-msgstr ""
-
-#: src/misc/iso-639_def.h:132
-msgid "Ndebele, South"
-msgstr ""
-
-#: src/misc/iso-639_def.h:133
-msgid "Ndebele, North"
-msgstr ""
-
-#: src/misc/iso-639_def.h:134
-msgid "Ndonga"
-msgstr ""
-
-#: src/misc/iso-639_def.h:135
-msgid "Nepali"
-msgstr ""
-
-#: src/misc/iso-639_def.h:136
-msgid "Norwegian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:137
-msgid "Norwegian Nynorsk"
-msgstr ""
-
-#: src/misc/iso-639_def.h:138
-msgid "Norwegian Bokmaal"
-msgstr ""
-
-#: src/misc/iso-639_def.h:139
-msgid "Chichewa; Nyanja"
-msgstr ""
-
-#: src/misc/iso-639_def.h:140
-msgid "Occitan (post 1500); Provencal"
-msgstr ""
-
-#: src/misc/iso-639_def.h:141
-msgid "Oriya"
-msgstr ""
-
-#: src/misc/iso-639_def.h:142
-msgid "Oromo"
-msgstr ""
-
-#: src/misc/iso-639_def.h:144
-msgid "Ossetian; Ossetic"
-msgstr ""
-
-#: src/misc/iso-639_def.h:145
-msgid "Panjabi"
-msgstr ""
-
-#: src/misc/iso-639_def.h:146
-msgid "Persian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:147
-msgid "Pali"
-msgstr ""
-
-#: src/misc/iso-639_def.h:148
-msgid "Polish"
-msgstr ""
-
-#: src/misc/iso-639_def.h:149
-msgid "Portuguese"
-msgstr ""
-
-#: src/misc/iso-639_def.h:150
-msgid "Pushto"
-msgstr ""
-
-#: src/misc/iso-639_def.h:151
-msgid "Quechua"
-msgstr ""
-
-#: src/misc/iso-639_def.h:152
-msgid "Raeto-Romance"
-msgstr ""
-
-#: src/misc/iso-639_def.h:154
-msgid "Rundi"
-msgstr ""
-
-#: src/misc/iso-639_def.h:156
-msgid "Sango"
-msgstr ""
-
-#: src/misc/iso-639_def.h:157
-msgid "Sanskrit"
-msgstr ""
-
-#: src/misc/iso-639_def.h:158
-msgid "Serbian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:159
-msgid "Croatian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:160
-msgid "Sinhalese"
-msgstr ""
-
-#: src/misc/iso-639_def.h:163
-msgid "Northern Sami"
-msgstr ""
-
-#: src/misc/iso-639_def.h:164
-msgid "Samoan"
-msgstr ""
-
-#: src/misc/iso-639_def.h:165
-msgid "Shona"
-msgstr ""
-
-#: src/misc/iso-639_def.h:166
-msgid "Sindhi"
-msgstr ""
-
-#: src/misc/iso-639_def.h:167
-msgid "Somali"
-msgstr ""
-
-#: src/misc/iso-639_def.h:168
-msgid "Sotho, Southern"
-msgstr ""
-
-#: src/misc/iso-639_def.h:170
-msgid "Sardinian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:171
-msgid "Swati"
-msgstr ""
-
-#: src/misc/iso-639_def.h:172
-msgid "Sundanese"
-msgstr ""
-
-#: src/misc/iso-639_def.h:173
-msgid "Swahili"
-msgstr ""
-
-#: src/misc/iso-639_def.h:175
-msgid "Tahitian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:176
-msgid "Tamil"
-msgstr ""
-
-#: src/misc/iso-639_def.h:177
-msgid "Tatar"
-msgstr ""
-
-#: src/misc/iso-639_def.h:178
-msgid "Telugu"
-msgstr ""
-
-#: src/misc/iso-639_def.h:179
-msgid "Tajik"
-msgstr ""
-
-#: src/misc/iso-639_def.h:180
-msgid "Tagalog"
-msgstr ""
-
-#: src/misc/iso-639_def.h:181
-msgid "Thai"
-msgstr ""
-
-#: src/misc/iso-639_def.h:182
-msgid "Tibetan"
-msgstr ""
-
-#: src/misc/iso-639_def.h:183
-msgid "Tigrinya"
-msgstr ""
-
-#: src/misc/iso-639_def.h:184
-msgid "Tonga (Tonga Islands)"
-msgstr ""
-
-#: src/misc/iso-639_def.h:185
-msgid "Tswana"
-msgstr ""
-
-#: src/misc/iso-639_def.h:186
-msgid "Tsonga"
-msgstr ""
-
-#: src/misc/iso-639_def.h:188
-msgid "Turkmen"
-msgstr ""
-
-#: src/misc/iso-639_def.h:189
-msgid "Twi"
-msgstr ""
-
-#: src/misc/iso-639_def.h:190
-msgid "Uighur"
-msgstr ""
-
-#: src/misc/iso-639_def.h:191
-msgid "Ukrainian"
-msgstr ""
-
-#: src/misc/iso-639_def.h:192
-msgid "Urdu"
-msgstr ""
-
-#: src/misc/iso-639_def.h:193
-msgid "Uzbek"
-msgstr ""
-
-#: src/misc/iso-639_def.h:194
-msgid "Vietnamese"
-msgstr ""
-
-#: src/misc/iso-639_def.h:195
-msgid "Volapuk"
-msgstr ""
-
-#: src/misc/iso-639_def.h:196
-msgid "Welsh"
-msgstr ""
-
-#: src/misc/iso-639_def.h:197
-msgid "Wolof"
-msgstr ""
-
-#: src/misc/iso-639_def.h:198
-msgid "Xhosa"
-msgstr ""
-
-#: src/misc/iso-639_def.h:199
-msgid "Yiddish"
-msgstr ""
-
-#: src/misc/iso-639_def.h:200
-msgid "Yoruba"
-msgstr ""
-
-#: src/misc/iso-639_def.h:201
-msgid "Zhuang"
-msgstr ""
-
-#: src/misc/iso-639_def.h:202
-msgid "Zulu"
-msgstr ""
-
-#: src/misc/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:976
-msgid "Unknown"
 msgstr ""
 
 #: src/misc/vlm.c:1144 src/misc/vlm.c:1251
@@ -4226,6 +3646,586 @@ msgstr ""
 
 #: src/playlist/tree.c:58
 msgid "Undefined"
+msgstr ""
+
+#: src/text/iso-639_def.h:38
+msgid "Afar"
+msgstr ""
+
+#: src/text/iso-639_def.h:39
+msgid "Abkhazian"
+msgstr ""
+
+#: src/text/iso-639_def.h:40
+msgid "Afrikaans"
+msgstr ""
+
+#: src/text/iso-639_def.h:41
+msgid "Albanian"
+msgstr ""
+
+#: src/text/iso-639_def.h:42
+msgid "Amharic"
+msgstr ""
+
+#: src/text/iso-639_def.h:43
+msgid "Arabic"
+msgstr ""
+
+#: src/text/iso-639_def.h:44
+msgid "Armenian"
+msgstr ""
+
+#: src/text/iso-639_def.h:45
+msgid "Assamese"
+msgstr ""
+
+#: src/text/iso-639_def.h:46
+msgid "Avestan"
+msgstr ""
+
+#: src/text/iso-639_def.h:47
+msgid "Aymara"
+msgstr ""
+
+#: src/text/iso-639_def.h:48
+msgid "Azerbaijani"
+msgstr ""
+
+#: src/text/iso-639_def.h:49
+msgid "Bashkir"
+msgstr ""
+
+#: src/text/iso-639_def.h:50
+msgid "Basque"
+msgstr ""
+
+#: src/text/iso-639_def.h:51
+msgid "Belarusian"
+msgstr ""
+
+#: src/text/iso-639_def.h:52
+msgid "Bengali"
+msgstr ""
+
+#: src/text/iso-639_def.h:53
+msgid "Bihari"
+msgstr ""
+
+#: src/text/iso-639_def.h:54
+msgid "Bislama"
+msgstr ""
+
+#: src/text/iso-639_def.h:55
+msgid "Bosnian"
+msgstr ""
+
+#: src/text/iso-639_def.h:56
+msgid "Breton"
+msgstr ""
+
+#: src/text/iso-639_def.h:57
+msgid "Bulgarian"
+msgstr ""
+
+#: src/text/iso-639_def.h:58
+msgid "Burmese"
+msgstr ""
+
+#: src/text/iso-639_def.h:60
+msgid "Chamorro"
+msgstr ""
+
+#: src/text/iso-639_def.h:61
+msgid "Chechen"
+msgstr ""
+
+#: src/text/iso-639_def.h:62
+msgid "Chinese"
+msgstr ""
+
+#: src/text/iso-639_def.h:63
+msgid "Church Slavic"
+msgstr ""
+
+#: src/text/iso-639_def.h:64
+msgid "Chuvash"
+msgstr ""
+
+#: src/text/iso-639_def.h:65
+msgid "Cornish"
+msgstr ""
+
+#: src/text/iso-639_def.h:66
+msgid "Corsican"
+msgstr ""
+
+#: src/text/iso-639_def.h:70
+msgid "Dzongkha"
+msgstr ""
+
+#: src/text/iso-639_def.h:71
+msgid "English"
+msgstr ""
+
+#: src/text/iso-639_def.h:72
+msgid "Esperanto"
+msgstr ""
+
+#: src/text/iso-639_def.h:73
+msgid "Estonian"
+msgstr ""
+
+#: src/text/iso-639_def.h:74
+msgid "Faroese"
+msgstr ""
+
+#: src/text/iso-639_def.h:75
+msgid "Fijian"
+msgstr ""
+
+#: src/text/iso-639_def.h:76
+msgid "Finnish"
+msgstr ""
+
+#: src/text/iso-639_def.h:78
+msgid "Frisian"
+msgstr ""
+
+#: src/text/iso-639_def.h:81
+msgid "Gaelic (Scots)"
+msgstr ""
+
+#: src/text/iso-639_def.h:82
+msgid "Irish"
+msgstr ""
+
+#: src/text/iso-639_def.h:83
+msgid "Gallegan"
+msgstr ""
+
+#: src/text/iso-639_def.h:84
+msgid "Manx"
+msgstr ""
+
+#: src/text/iso-639_def.h:85
+msgid "Greek, Modern ()"
+msgstr ""
+
+#: src/text/iso-639_def.h:86
+msgid "Guarani"
+msgstr ""
+
+#: src/text/iso-639_def.h:87
+msgid "Gujarati"
+msgstr ""
+
+#: src/text/iso-639_def.h:89
+msgid "Herero"
+msgstr ""
+
+#: src/text/iso-639_def.h:90
+msgid "Hindi"
+msgstr ""
+
+#: src/text/iso-639_def.h:91
+msgid "Hiri Motu"
+msgstr ""
+
+#: src/text/iso-639_def.h:93
+msgid "Icelandic"
+msgstr ""
+
+#: src/text/iso-639_def.h:94
+msgid "Inuktitut"
+msgstr ""
+
+#: src/text/iso-639_def.h:95
+msgid "Interlingue"
+msgstr ""
+
+#: src/text/iso-639_def.h:96
+msgid "Interlingua"
+msgstr ""
+
+#: src/text/iso-639_def.h:97
+msgid "Indonesian"
+msgstr ""
+
+#: src/text/iso-639_def.h:98
+msgid "Inupiaq"
+msgstr ""
+
+#: src/text/iso-639_def.h:100
+msgid "Javanese"
+msgstr ""
+
+#: src/text/iso-639_def.h:102
+msgid "Kalaallisut (Greenlandic)"
+msgstr ""
+
+#: src/text/iso-639_def.h:103
+msgid "Kannada"
+msgstr ""
+
+#: src/text/iso-639_def.h:104
+msgid "Kashmiri"
+msgstr ""
+
+#: src/text/iso-639_def.h:105
+msgid "Kazakh"
+msgstr ""
+
+#: src/text/iso-639_def.h:106
+msgid "Khmer"
+msgstr ""
+
+#: src/text/iso-639_def.h:107
+msgid "Kikuyu"
+msgstr ""
+
+#: src/text/iso-639_def.h:108
+msgid "Kinyarwanda"
+msgstr ""
+
+#: src/text/iso-639_def.h:109
+msgid "Kirghiz"
+msgstr ""
+
+#: src/text/iso-639_def.h:110
+msgid "Komi"
+msgstr ""
+
+#: src/text/iso-639_def.h:112
+msgid "Kuanyama"
+msgstr ""
+
+#: src/text/iso-639_def.h:113
+msgid "Kurdish"
+msgstr ""
+
+#: src/text/iso-639_def.h:114
+msgid "Lao"
+msgstr ""
+
+#: src/text/iso-639_def.h:115
+msgid "Latin"
+msgstr ""
+
+#: src/text/iso-639_def.h:116
+msgid "Latvian"
+msgstr ""
+
+#: src/text/iso-639_def.h:117
+msgid "Lingala"
+msgstr ""
+
+#: src/text/iso-639_def.h:118
+msgid "Lithuanian"
+msgstr ""
+
+#: src/text/iso-639_def.h:119
+msgid "Letzeburgesch"
+msgstr ""
+
+#: src/text/iso-639_def.h:120
+msgid "Macedonian"
+msgstr ""
+
+#: src/text/iso-639_def.h:121
+msgid "Marshall"
+msgstr ""
+
+#: src/text/iso-639_def.h:122
+msgid "Malayalam"
+msgstr ""
+
+#: src/text/iso-639_def.h:123
+msgid "Maori"
+msgstr ""
+
+#: src/text/iso-639_def.h:124
+msgid "Marathi"
+msgstr ""
+
+#: src/text/iso-639_def.h:126
+msgid "Malagasy"
+msgstr ""
+
+#: src/text/iso-639_def.h:127
+msgid "Maltese"
+msgstr ""
+
+#: src/text/iso-639_def.h:128
+msgid "Moldavian"
+msgstr ""
+
+#: src/text/iso-639_def.h:129
+msgid "Mongolian"
+msgstr ""
+
+#: src/text/iso-639_def.h:130
+msgid "Nauru"
+msgstr ""
+
+#: src/text/iso-639_def.h:131
+msgid "Navajo"
+msgstr ""
+
+#: src/text/iso-639_def.h:132
+msgid "Ndebele, South"
+msgstr ""
+
+#: src/text/iso-639_def.h:133
+msgid "Ndebele, North"
+msgstr ""
+
+#: src/text/iso-639_def.h:134
+msgid "Ndonga"
+msgstr ""
+
+#: src/text/iso-639_def.h:135
+msgid "Nepali"
+msgstr ""
+
+#: src/text/iso-639_def.h:136
+msgid "Norwegian"
+msgstr ""
+
+#: src/text/iso-639_def.h:137
+msgid "Norwegian Nynorsk"
+msgstr ""
+
+#: src/text/iso-639_def.h:138
+msgid "Norwegian Bokmaal"
+msgstr ""
+
+#: src/text/iso-639_def.h:139
+msgid "Chichewa; Nyanja"
+msgstr ""
+
+#: src/text/iso-639_def.h:140
+msgid "Occitan (post 1500); Provencal"
+msgstr ""
+
+#: src/text/iso-639_def.h:141
+msgid "Oriya"
+msgstr ""
+
+#: src/text/iso-639_def.h:142
+msgid "Oromo"
+msgstr ""
+
+#: src/text/iso-639_def.h:144
+msgid "Ossetian; Ossetic"
+msgstr ""
+
+#: src/text/iso-639_def.h:145
+msgid "Panjabi"
+msgstr ""
+
+#: src/text/iso-639_def.h:146
+msgid "Persian"
+msgstr ""
+
+#: src/text/iso-639_def.h:147
+msgid "Pali"
+msgstr ""
+
+#: src/text/iso-639_def.h:148
+msgid "Polish"
+msgstr ""
+
+#: src/text/iso-639_def.h:149
+msgid "Portuguese"
+msgstr ""
+
+#: src/text/iso-639_def.h:150
+msgid "Pushto"
+msgstr ""
+
+#: src/text/iso-639_def.h:151
+msgid "Quechua"
+msgstr ""
+
+#: src/text/iso-639_def.h:152
+msgid "Raeto-Romance"
+msgstr ""
+
+#: src/text/iso-639_def.h:154
+msgid "Rundi"
+msgstr ""
+
+#: src/text/iso-639_def.h:156
+msgid "Sango"
+msgstr ""
+
+#: src/text/iso-639_def.h:157
+msgid "Sanskrit"
+msgstr ""
+
+#: src/text/iso-639_def.h:158
+msgid "Serbian"
+msgstr ""
+
+#: src/text/iso-639_def.h:159
+msgid "Croatian"
+msgstr ""
+
+#: src/text/iso-639_def.h:160
+msgid "Sinhalese"
+msgstr ""
+
+#: src/text/iso-639_def.h:163
+msgid "Northern Sami"
+msgstr ""
+
+#: src/text/iso-639_def.h:164
+msgid "Samoan"
+msgstr ""
+
+#: src/text/iso-639_def.h:165
+msgid "Shona"
+msgstr ""
+
+#: src/text/iso-639_def.h:166
+msgid "Sindhi"
+msgstr ""
+
+#: src/text/iso-639_def.h:167
+msgid "Somali"
+msgstr ""
+
+#: src/text/iso-639_def.h:168
+msgid "Sotho, Southern"
+msgstr ""
+
+#: src/text/iso-639_def.h:170
+msgid "Sardinian"
+msgstr ""
+
+#: src/text/iso-639_def.h:171
+msgid "Swati"
+msgstr ""
+
+#: src/text/iso-639_def.h:172
+msgid "Sundanese"
+msgstr ""
+
+#: src/text/iso-639_def.h:173
+msgid "Swahili"
+msgstr ""
+
+#: src/text/iso-639_def.h:175
+msgid "Tahitian"
+msgstr ""
+
+#: src/text/iso-639_def.h:176
+msgid "Tamil"
+msgstr ""
+
+#: src/text/iso-639_def.h:177
+msgid "Tatar"
+msgstr ""
+
+#: src/text/iso-639_def.h:178
+msgid "Telugu"
+msgstr ""
+
+#: src/text/iso-639_def.h:179
+msgid "Tajik"
+msgstr ""
+
+#: src/text/iso-639_def.h:180
+msgid "Tagalog"
+msgstr ""
+
+#: src/text/iso-639_def.h:181
+msgid "Thai"
+msgstr ""
+
+#: src/text/iso-639_def.h:182
+msgid "Tibetan"
+msgstr ""
+
+#: src/text/iso-639_def.h:183
+msgid "Tigrinya"
+msgstr ""
+
+#: src/text/iso-639_def.h:184
+msgid "Tonga (Tonga Islands)"
+msgstr ""
+
+#: src/text/iso-639_def.h:185
+msgid "Tswana"
+msgstr ""
+
+#: src/text/iso-639_def.h:186
+msgid "Tsonga"
+msgstr ""
+
+#: src/text/iso-639_def.h:188
+msgid "Turkmen"
+msgstr ""
+
+#: src/text/iso-639_def.h:189
+msgid "Twi"
+msgstr ""
+
+#: src/text/iso-639_def.h:190
+msgid "Uighur"
+msgstr ""
+
+#: src/text/iso-639_def.h:191
+msgid "Ukrainian"
+msgstr ""
+
+#: src/text/iso-639_def.h:192
+msgid "Urdu"
+msgstr ""
+
+#: src/text/iso-639_def.h:193
+msgid "Uzbek"
+msgstr ""
+
+#: src/text/iso-639_def.h:194
+msgid "Vietnamese"
+msgstr ""
+
+#: src/text/iso-639_def.h:195
+msgid "Volapuk"
+msgstr ""
+
+#: src/text/iso-639_def.h:196
+msgid "Welsh"
+msgstr ""
+
+#: src/text/iso-639_def.h:197
+msgid "Wolof"
+msgstr ""
+
+#: src/text/iso-639_def.h:198
+msgid "Xhosa"
+msgstr ""
+
+#: src/text/iso-639_def.h:199
+msgid "Yiddish"
+msgstr ""
+
+#: src/text/iso-639_def.h:200
+msgid "Yoruba"
+msgstr ""
+
+#: src/text/iso-639_def.h:201
+msgid "Zhuang"
+msgstr ""
+
+#: src/text/iso-639_def.h:202
+msgid "Zulu"
+msgstr ""
+
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+msgid "Unknown"
 msgstr ""
 
 #: src/video_output/video_output.c:400 modules/gui/macosx/intf.m:587
@@ -4309,7 +4309,7 @@ msgstr ""
 
 #: modules/access/cdda.c:65 modules/gui/macosx/open.m:178
 #: modules/gui/macosx/open.m:503 modules/gui/macosx/open.m:594
-#: modules/gui/wxwidgets/dialogs/open.cpp:696
+#: modules/gui/wxwidgets/dialogs/open.cpp:697
 msgid "Audio CD"
 msgstr ""
 
@@ -4564,7 +4564,7 @@ msgstr ""
 #: modules/access/cdda/info.c:328 modules/access/cdda/info.c:333
 #: modules/access/cdda/info.c:337 modules/access/dvdread.c:85
 #: modules/access/vcdx/info.c:88 modules/gui/macosx/open.m:163
-#: modules/gui/macosx/open.m:382 modules/gui/wxwidgets/dialogs/open.cpp:501
+#: modules/gui/macosx/open.m:382 modules/gui/wxwidgets/dialogs/open.cpp:502
 msgid "Disc"
 msgstr ""
 
@@ -4584,8 +4584,8 @@ msgstr ""
 #: modules/access/cdda/info.c:393 modules/access/cdda/info.c:815
 #: modules/access/cdda/info.c:856 modules/access/vcdx/access.c:471
 #: modules/access/vcdx/info.c:286 modules/access/vcdx/info.c:287
-#: modules/gui/wxwidgets/dialogs/open.cpp:1707
-#: modules/gui/wxwidgets/dialogs/open.cpp:1727
+#: modules/gui/wxwidgets/dialogs/open.cpp:1708
+#: modules/gui/wxwidgets/dialogs/open.cpp:1728
 msgid "Track"
 msgstr ""
 
@@ -5264,7 +5264,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:378 modules/gui/macosx/output.m:142
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
 #: modules/gui/pda/pda_interface.c:366
-#: modules/gui/wxwidgets/dialogs/open.cpp:499
+#: modules/gui/wxwidgets/dialogs/open.cpp:500
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:471
 msgid "File"
 msgstr ""
@@ -5980,7 +5980,7 @@ msgstr ""
 
 #: modules/access/udp.c:61 modules/gui/macosx/open.m:185
 #: modules/gui/macosx/open.m:661 modules/gui/macosx/open.m:699
-#: modules/gui/wxwidgets/dialogs/open.cpp:801
+#: modules/gui/wxwidgets/dialogs/open.cpp:802
 msgid "UDP/RTP"
 msgstr ""
 
@@ -5989,7 +5989,7 @@ msgid "UDP/RTP input"
 msgstr ""
 
 #: modules/access/v4l2.c:52 modules/gui/macosx/open.m:169
-#: modules/gui/wxwidgets/dialogs/open.cpp:720
+#: modules/gui/wxwidgets/dialogs/open.cpp:721
 msgid "Device name"
 msgstr ""
 
@@ -6148,7 +6148,7 @@ msgstr ""
 
 #: modules/access/vcd/vcd.c:46 modules/gui/macosx/open.m:177
 #: modules/gui/macosx/open.m:496 modules/gui/macosx/open.m:586
-#: modules/gui/wxwidgets/dialogs/open.cpp:695
+#: modules/gui/wxwidgets/dialogs/open.cpp:696
 msgid "VCD"
 msgstr ""
 
@@ -6728,8 +6728,8 @@ msgstr ""
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr ""
 
-#: modules/audio_filter/resampler/linear.c:65
-#: modules/audio_filter/resampler/linear.c:72
+#: modules/audio_filter/resampler/linear.c:67
+#: modules/audio_filter/resampler/linear.c:74
 msgid "Audio filter for linear interpolation resampling"
 msgstr ""
 
@@ -7284,19 +7284,19 @@ msgstr ""
 msgid "Video scaling filter"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.c:216
+#: modules/codec/ffmpeg/ffmpeg.c:213
 msgid "FFmpeg chroma conversion"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.c:222
+#: modules/codec/ffmpeg/ffmpeg.c:219
 msgid "FFmpeg video filter"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.c:228
+#: modules/codec/ffmpeg/ffmpeg.c:225
 msgid "FFmpeg crop padd filter"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.c:234
+#: modules/codec/ffmpeg/ffmpeg.c:231
 msgid "FFmpeg deinterlace video filter"
 msgstr ""
 
@@ -8523,11 +8523,11 @@ msgstr ""
 msgid "MPEG I/II hw video decoder (using libmpeg2)"
 msgstr ""
 
-#: modules/control/dbus.c:84
+#: modules/control/dbus.c:82
 msgid "dbus"
 msgstr ""
 
-#: modules/control/dbus.c:87
+#: modules/control/dbus.c:85
 #, fuzzy
 msgid "D-Bus control interface"
 msgstr "Išvaizda"
@@ -8572,36 +8572,36 @@ msgstr ""
 msgid "Hotkeys management interface"
 msgstr ""
 
-#: modules/control/hotkeys.c:430
+#: modules/control/hotkeys.c:431
 #, c-format
 msgid "Audio track: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:445 modules/control/hotkeys.c:474
+#: modules/control/hotkeys.c:446 modules/control/hotkeys.c:475
 #, c-format
 msgid "Subtitle track: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:445
+#: modules/control/hotkeys.c:446
 msgid "N/A"
 msgstr ""
 
-#: modules/control/hotkeys.c:498
+#: modules/control/hotkeys.c:499
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:524
+#: modules/control/hotkeys.c:525
 #, c-format
 msgid "Crop: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:550
+#: modules/control/hotkeys.c:551
 #, c-format
 msgid "Deinterlace mode: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:580
+#: modules/control/hotkeys.c:581
 #, c-format
 msgid "Zoom mode: %s"
 msgstr ""
@@ -9171,8 +9171,8 @@ msgstr ""
 #: modules/control/telnet.c:77 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/open.m:182 modules/gui/macosx/output.m:147
 #: modules/gui/qt4/ui/open_net.ui:198
-#: modules/gui/wxwidgets/dialogs/open.cpp:827
-#: modules/gui/wxwidgets/dialogs/open.cpp:854
+#: modules/gui/wxwidgets/dialogs/open.cpp:828
+#: modules/gui/wxwidgets/dialogs/open.cpp:855
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:531 modules/stream_out/rtp.c:82
 msgid "Port"
 msgstr ""
@@ -9905,7 +9905,7 @@ msgstr ""
 #: modules/gui/beos/PlayListWindow.cpp:87 modules/gui/macosx/open.m:446
 #: modules/gui/macosx/open.m:745 modules/gui/macosx/open.m:794
 #: modules/gui/wxwidgets/dialogs.cpp:434
-#: modules/gui/wxwidgets/dialogs/open.cpp:1259
+#: modules/gui/wxwidgets/dialogs/open.cpp:1260
 msgid "Open File"
 msgstr ""
 
@@ -10731,9 +10731,9 @@ msgstr ""
 #: modules/gui/macosx/open.m:244 modules/gui/macosx/output.m:145
 #: modules/gui/macosx/prefs_widgets.m:1183 modules/gui/macosx/sfilters.m:75
 #: modules/gui/wince/preferences_widgets.cpp:512
-#: modules/gui/wxwidgets/dialogs/open.cpp:628
-#: modules/gui/wxwidgets/dialogs/open.cpp:662
-#: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:683
+#: modules/gui/wxwidgets/dialogs/open.cpp:629
+#: modules/gui/wxwidgets/dialogs/open.cpp:663
+#: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:686
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:501
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:82
 msgid "Browse..."
@@ -10752,19 +10752,19 @@ msgid "VIDEO_TS directory"
 msgstr ""
 
 #: modules/gui/macosx/open.m:176 modules/gui/macosx/open.m:602
-#: modules/gui/wxwidgets/dialogs/open.cpp:694
+#: modules/gui/wxwidgets/dialogs/open.cpp:695
 msgid "DVD"
 msgstr ""
 
 #: modules/gui/macosx/open.m:181 modules/gui/macosx/output.m:146
 #: modules/gui/qt4/ui/open_net.ui:218
-#: modules/gui/wxwidgets/dialogs/open.cpp:846
+#: modules/gui/wxwidgets/dialogs/open.cpp:847
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:520
 msgid "Address"
 msgstr ""
 
 #: modules/gui/macosx/open.m:186 modules/gui/macosx/open.m:662
-#: modules/gui/macosx/open.m:711 modules/gui/wxwidgets/dialogs/open.cpp:802
+#: modules/gui/macosx/open.m:711 modules/gui/wxwidgets/dialogs/open.cpp:803
 msgid "UDP/RTP Multicast"
 msgstr ""
 
@@ -10773,7 +10773,7 @@ msgstr ""
 msgid "HTTP/FTP/MMS/RTSP"
 msgstr ""
 
-#: modules/gui/macosx/open.m:188 modules/gui/wxwidgets/dialogs/open.cpp:820
+#: modules/gui/macosx/open.m:188 modules/gui/wxwidgets/dialogs/open.cpp:821
 #: modules/services_discovery/sap.c:113
 msgid "Allow timeshifting"
 msgstr ""
@@ -10783,7 +10783,7 @@ msgid "Load subtitles file:"
 msgstr ""
 
 #: modules/gui/macosx/open.m:243 modules/gui/macosx/output.m:137
-#: modules/gui/wxwidgets/dialogs/open.cpp:433
+#: modules/gui/wxwidgets/dialogs/open.cpp:434
 msgid "Settings..."
 msgstr ""
 
@@ -11080,7 +11080,7 @@ msgid ""
 "Are you sure you want to continue?"
 msgstr ""
 
-#: modules/gui/macosx/prefs.m:719
+#: modules/gui/macosx/prefs.m:726
 msgid "Some options are hidden. Check \"Advanced\" to display them."
 msgstr ""
 
@@ -12365,11 +12365,11 @@ msgstr ""
 msgid "Very Small)</string>"
 msgstr ""
 
-#: modules/gui/qt4/ui/open.ui:44
+#: modules/gui/qt4/ui/open.ui:83
 msgid "Personnalize"
 msgstr ""
 
-#: modules/gui/qt4/ui/open.ui:105 modules/gui/wxwidgets/dialogs/open.cpp:454
+#: modules/gui/qt4/ui/open.ui:144 modules/gui/wxwidgets/dialogs/open.cpp:455
 msgid "Caching"
 msgstr ""
 
@@ -12501,7 +12501,7 @@ msgid ""
 "http://www.videolan.org/"
 msgstr ""
 
-#: modules/gui/wince/open.cpp:134 modules/gui/wxwidgets/dialogs/open.cpp:623
+#: modules/gui/wince/open.cpp:134 modules/gui/wxwidgets/dialogs/open.cpp:624
 msgid "Open:"
 msgstr ""
 
@@ -12512,12 +12512,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wince/preferences_widgets.cpp:527
-#: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:698
+#: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:701
 msgid "Choose directory"
 msgstr ""
 
 #: modules/gui/wince/preferences_widgets.cpp:536
-#: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:707
+#: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:710
 msgid "Choose file"
 msgstr ""
 
@@ -12550,8 +12550,8 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:105
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:78
-#: modules/gui/wxwidgets/dialogs/open.cpp:317
-#: modules/gui/wxwidgets/dialogs/open.cpp:487
+#: modules/gui/wxwidgets/dialogs/open.cpp:318
+#: modules/gui/wxwidgets/dialogs/open.cpp:488
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:195
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:242
 msgid "&OK"
@@ -12560,8 +12560,8 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:108
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:174
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:81
-#: modules/gui/wxwidgets/dialogs/open.cpp:320
-#: modules/gui/wxwidgets/dialogs/open.cpp:490
+#: modules/gui/wxwidgets/dialogs/open.cpp:321
+#: modules/gui/wxwidgets/dialogs/open.cpp:491
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:211
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:198
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:245
@@ -12625,7 +12625,7 @@ msgid "Input has changed "
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs.cpp:437
-#: modules/gui/wxwidgets/dialogs/open.cpp:1262
+#: modules/gui/wxwidgets/dialogs/open.cpp:1263
 msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
 msgstr ""
 
@@ -12675,78 +12675,78 @@ msgstr ""
 msgid "Save Messages As..."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:256
+#: modules/gui/wxwidgets/dialogs/open.cpp:257
 msgid "Advanced options..."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:261
-#: modules/gui/wxwidgets/dialogs/open.cpp:272
-#: modules/gui/wxwidgets/dialogs/open.cpp:417
+#: modules/gui/wxwidgets/dialogs/open.cpp:262
+#: modules/gui/wxwidgets/dialogs/open.cpp:273
+#: modules/gui/wxwidgets/dialogs/open.cpp:418
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:217
 msgid "Advanced options"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:276
+#: modules/gui/wxwidgets/dialogs/open.cpp:277
 msgid "Options:"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:385
-#: modules/gui/wxwidgets/dialogs/open.cpp:393
+#: modules/gui/wxwidgets/dialogs/open.cpp:386
+#: modules/gui/wxwidgets/dialogs/open.cpp:394
 msgid "Open..."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:427
+#: modules/gui/wxwidgets/dialogs/open.cpp:428
 msgid "Stream/Save"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:428
+#: modules/gui/wxwidgets/dialogs/open.cpp:429
 msgid "Use VLC as a stream server"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:455
+#: modules/gui/wxwidgets/dialogs/open.cpp:456
 msgid "Change the default caching value (in milliseconds)"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:468
+#: modules/gui/wxwidgets/dialogs/open.cpp:469
 msgid "Customize:"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:472
+#: modules/gui/wxwidgets/dialogs/open.cpp:473
 msgid ""
 "You can use this field directly by typing the full MRL you want to open.\n"
 "Alternatively, the field will be filled automatically when you use the "
 "controls above."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:635
+#: modules/gui/wxwidgets/dialogs/open.cpp:636
 msgid "Use a subtitles file"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:636
+#: modules/gui/wxwidgets/dialogs/open.cpp:637
 msgid "Use an external subtitles file."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:640
+#: modules/gui/wxwidgets/dialogs/open.cpp:641
 msgid "Advanced Settings..."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:656
+#: modules/gui/wxwidgets/dialogs/open.cpp:657
 msgid "File:"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:693
+#: modules/gui/wxwidgets/dialogs/open.cpp:694
 msgid "DVD (menus)"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:699
+#: modules/gui/wxwidgets/dialogs/open.cpp:700
 msgid "Disc type"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:706
+#: modules/gui/wxwidgets/dialogs/open.cpp:707
 msgid "Probe Disc(s)"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:707
+#: modules/gui/wxwidgets/dialogs/open.cpp:708
 msgid ""
 "Probe for a DVD, VCD or audio CD. First try the Device name entered for the "
 "selected Disc type (DVD, DVD Menu, VCD, audio CD). If that doesn't find "
@@ -12755,84 +12755,84 @@ msgid ""
 "parameter ranges are set based on media we find."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:803
+#: modules/gui/wxwidgets/dialogs/open.cpp:804
 msgid "HTTP/HTTPS/FTP/MMS"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:804
+#: modules/gui/wxwidgets/dialogs/open.cpp:805
 msgid "RTSP"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:924
+#: modules/gui/wxwidgets/dialogs/open.cpp:925
 msgid "DVD device to use"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:954
+#: modules/gui/wxwidgets/dialogs/open.cpp:955
 msgid ""
 "Name of CD-ROM device to read Video CD from. If this field is left empty, we "
 "will scan for a CD-ROM with a VCD in it."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:963
-#: modules/gui/wxwidgets/dialogs/open.cpp:986
+#: modules/gui/wxwidgets/dialogs/open.cpp:964
+#: modules/gui/wxwidgets/dialogs/open.cpp:987
 msgid "CD-ROM device to use"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:981
+#: modules/gui/wxwidgets/dialogs/open.cpp:982
 msgid ""
 "Name of CD-ROM device to read audio CD from. If this field is left empty, we "
 "will scan for a CD-ROM with an audio CD in it."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1292
+#: modules/gui/wxwidgets/dialogs/open.cpp:1293
 msgid "Open subtitles file"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1669
+#: modules/gui/wxwidgets/dialogs/open.cpp:1670
 msgid "Title number."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1672
+#: modules/gui/wxwidgets/dialogs/open.cpp:1673
 msgid ""
 "DVD's can have up to 32 subtitles numbered 0..31. Note this is not the same "
 "thing as a subtitle name (e.g. 'en'). If a value -1 is used, no subtitle "
 "will be shown."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1676
+#: modules/gui/wxwidgets/dialogs/open.cpp:1677
 msgid "Audio track number. DVD's can have up to 8 audio tracks numbered 0..7."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1697
+#: modules/gui/wxwidgets/dialogs/open.cpp:1698
 msgid "Playback control (PBC) usually starts with number 1."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1703
+#: modules/gui/wxwidgets/dialogs/open.cpp:1704
 msgid "The first entry (the beginning of the first MPEG track) is 0."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1708
+#: modules/gui/wxwidgets/dialogs/open.cpp:1709
 msgid "Track number."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1715
+#: modules/gui/wxwidgets/dialogs/open.cpp:1716
 msgid ""
 "SVCD's can have up to 4 subtitles numbered 0..3. If a value -1 is used, no "
 "subtitle will be shown."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1718
+#: modules/gui/wxwidgets/dialogs/open.cpp:1719
 msgid ""
 "Audio track number. VCD's can have up to 2 audio tracks numbered 0 or 1. "
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1730
+#: modules/gui/wxwidgets/dialogs/open.cpp:1731
 msgid ""
 "Audio CDs can have up to 100 tracks, the first track is usually 1. If 0 is "
 "given, then all tracks are played."
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:1734
+#: modules/gui/wxwidgets/dialogs/open.cpp:1735
 msgid "Audio CDs can have up to 100 tracks, the first track is usually 1."
 msgstr ""
 
@@ -12977,7 +12977,7 @@ msgstr ""
 msgid "Shift"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:443
+#: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:446
 msgid ""
 "Select the desired modules. For more advanced control, the resulting \"chain"
 "\" can be modified."
@@ -14352,7 +14352,7 @@ msgstr ""
 msgid "UDP/IPv4 network abstraction layer"
 msgstr ""
 
-#: modules/misc/network/ipv6.c:81
+#: modules/misc/network/ipv6.c:85
 msgid "UDP/IPv6 network abstraction layer"
 msgstr ""
 
@@ -14488,7 +14488,7 @@ msgstr ""
 msgid "XSPF playlist export"
 msgstr ""
 
-#: modules/misc/probe/hal.c:52 modules/services_discovery/hal.c:86
+#: modules/misc/probe/hal.c:53 modules/services_discovery/hal.c:86
 msgid "HAL devices detection"
 msgstr ""
 
