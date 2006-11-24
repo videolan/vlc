@@ -2794,10 +2794,19 @@ dnl Look for a ffmpeg-config (we are on debian )
 dnl Trying with pkg-config
    PKG_CHECK_MODULES(FFMPEG,[libavcodec, libavformat],
     [
+     VLC_SAVE_FLAGS
+     CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS}"
+     CFLAGS="${CFLAGS} ${FFMPEG_CFLAGS}"
      AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
      AC_CHECK_HEADERS(ffmpeg/avformat.h)
      AC_CHECK_HEADERS(ffmpeg/avutil.h)
-     AC_CHECK_HEADERS(ffmpeg/swscale.h)
+     dnl newer ffmpeg have a separate libpostproc
+     PKG_CHECK_MODULES(POSTPROC, libpostproc,[
+       VLC_ADD_CFLAGS([ffmpeg],[${POSTPROC_CFLAGS}]) 
+       VLC_ADD_LDFLAGS([ffmpeg],[${POSTPROC_LIBS}]) 
+       ],[ true ])
+     CPPFLAGS="${CPPFLAGS} ${POSTPROC_CFLAGS}"
+     CFLAGS="${CFLAGS} ${POSTPROC_CFLAGS}"
      AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
      if test "${SYS}" = "darwin"; then
         VLC_ADD_BUILTINS([ffmpeg])
@@ -2813,16 +2822,13 @@ dnl Trying with pkg-config
      fi
      VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_CFLAGS}])
      VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_LIBS}])
-     dnl newer ffmpeg have a separate libpostproc
-     PKG_CHECK_MODULES(POSTPROC, libpostproc,[
-       VLC_ADD_CFLAGS([ffmpeg],[${POSTPROC_CFLAGS}]) 
-       VLC_ADD_LDFLAGS([ffmpeg],[${POSTPROC_LIBS}]) 
-       ],[ true ])
      dnl even newer ffmpeg has a libswscale
      PKG_CHECK_MODULES(SWSCALE, libswscale,[
        VLC_ADD_CFLAGS([ffmpeg],[${SWSCALE_CFLAGS}]) 
        VLC_ADD_LDFLAGS([ffmpeg],[${SWSCALE_LIBS}]) 
+       AC_CHECK_HEADERS(ffmpeg/swscale.h)
        ],[ true ])
+     VLC_RESTORE_FLAGS
     ],[
      
     dnl
