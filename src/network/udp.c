@@ -297,7 +297,17 @@ net_IPv6Join (vlc_object_t *obj, int fd, const struct sockaddr_in6 *src)
  */
 #  warning Your C headers are out-of-date. Please update.
 
-/* Most (all?) Mingw32 versions in use are yet to pick up Vista stuff */
+/* No, I won't guess the layout of these two.
+ * No, I don't want another socket protection level type-of obnoxious bug. */
+#  error Hmmm? This needs fixing.
+#  define MCAST_JOIN_GROUP XXX
+struct group_req
+{
+    uint32_t gr_interface; FIXME
+    struct sockaddr_storage gr_group; FIXME
+};
+
+
 #  define MCAST_JOIN_SOURCE_GROUP 45 /* from <ws2ipdef.h> */
 struct group_source_req
 {
@@ -305,7 +315,7 @@ struct group_source_req
     struct sockaddr_storage gsr_group;
     struct sockaddr_storage gsr_source;
 };
-# endif
+#endif
 
 /**
  * IP-agnostic multicast join,
