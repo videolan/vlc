@@ -214,14 +214,14 @@ case "${host_os}" in
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
         VLC_ADD_LDFLAGS([vlc],[-lws2_32 -lnetapi32 -lwinmm -mwindows])
         VLC_ADD_LDFLAGS([cdda vcdx cddax],[-lwinmm])
-        VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap slp http stream_out_standard stream_out_rtp vod_rtsp telnet netsync growl],[-lws2_32])
+        VLC_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp access_output_udp sap slp http stream_out_standard stream_out_rtp vod_rtsp telnet netsync growl],[-lws2_32])
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
         VLC_ADD_CPPFLAGS([vlc],[-Dmain(a,b)=maince(a,b)])
         VLC_ADD_LDFLAGS([vlc],[-lws2 -e WinMainCRTStartup])
-        VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap http netsync],[-lws2])
+        VLC_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp access_output_udp sap http netsync],[-lws2])
    fi
     ;;
   *nto*)
@@ -249,9 +249,9 @@ case "${host_os}" in
     LDFLAGS_save="${LDFLAGS_save} -lintl"; LDFLAGS="${LDFLAGS_save}"
     dnl Check for BONE
     if test -f /boot/beos/system/lib/libbind.so; then
-        VLC_ADD_LDFLAGS([access_file access_ftp access_mms access_output_udp telnet netsync sap ipv4 vlc growl],[-lbind -lsocket])
+        VLC_ADD_LDFLAGS([access_file access_ftp access_mms access_output_udp telnet netsync sap vlc growl],[-lbind -lsocket])
     else
-        VLC_ADD_LDFLAGS([access_file access_ftp access_mms access_output_udp telnet netsync sap ipv4 vlc growl],[-lnet])
+        VLC_ADD_LDFLAGS([access_file access_ftp access_mms access_output_udp telnet netsync sap vlc growl],[-lnet])
     fi
 
     dnl Ugly check for Zeta
@@ -444,7 +444,7 @@ fi
 
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
-    VLC_ADD_LDFLAGS([vlc ipv4 ipv6 cdda cddax],-lsocket)
+    VLC_ADD_LDFLAGS([vlc cdda cddax],-lsocket)
     LIBS_socket="-lsocket"
   ])
 ])
@@ -457,10 +457,10 @@ AC_CHECK_FUNCS(send,,[
 
 AC_CHECK_FUNCS(gethostbyname,,[
   AC_CHECK_LIB(nsl,gethostbyname,[
-    VLC_ADD_LDFLAGS([cdda cddax ipv4 ipv6 vlc],[-lnsl])
+    VLC_ADD_LDFLAGS([cdda cddax vlc],[-lnsl])
   ],[
     AC_CHECK_LIB(bind,gethostbyname,[
-      VLC_ADD_LDFLAGS([ipv4 access_mms],[-lbind])
+      VLC_ADD_LDFLAGS([access_mms],[-lbind])
     ])
   ])
 ])
@@ -545,7 +545,7 @@ fi
 
 AC_CHECK_FUNCS(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,[
-    VLC_ADD_LDFLAGS([ipv4 vlc],[-lresolv])
+    VLC_ADD_LDFLAGS([vlc],[-lresolv])
   ])
 ])
 
@@ -1115,7 +1115,7 @@ VLC_ADD_PLUGINS([playlist export sgimb nsc xtag])
 VLC_ADD_PLUGINS([i420_rgb rawvideo blend scale image logo magnify puzzle colorthres])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au ty voc xa nuv])
 VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp])
-VLC_ADD_PLUGINS([access_http access_mms access_ftp ipv4])
+VLC_ADD_PLUGINS([access_http access_mms access_ftp])
 VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
 VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 
@@ -2333,22 +2333,6 @@ AC_CHECK_FUNCS(inet_pton,[have_ipv6=yes],[
 
 AS_IF([test "${have_ipv6}" = "yes"], [
   AC_DEFINE(HAVE_INET_PTON, 1, [Define to 1 if you have inet_pton().])])
-
-if test "${SYS}" != "nto" &&
-   test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
-then
-  AC_MSG_CHECKING(for sockaddr_in6 in netinet/in.h)
-  AC_EGREP_HEADER(sockaddr_in6,netinet/in.h,
-    [AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no); have_ipv6=no])
-  AS_IF([test "${have_ipv6}" != "no"], [
-    VLC_ADD_PLUGINS([ipv6])])
-fi
-if test "${SYS}" = "mingw32"
-then
-  AC_MSG_CHECKING(for getaddrinfo in ws2tcpip.h)
-  AC_EGREP_HEADER(addrinfo,ws2tcpip.h,[AC_MSG_RESULT(yes)
-    VLC_ADD_PLUGINS([ipv6])],[AC_MSG_RESULT(no)])
-fi
 
 dnl
 dnl  ogg demux plugin
@@ -5653,7 +5637,6 @@ AC_CONFIG_FILES([
   modules/misc/Makefile
   modules/misc/dummy/Makefile
   modules/misc/memcpy/Makefile
-  modules/misc/network/Makefile
   modules/misc/notify/Makefile
   modules/misc/testsuite/Makefile
   modules/misc/playlist/Makefile

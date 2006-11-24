@@ -1,2 +1,0 @@
-SOURCES_ipv4 = ipv4.c
-SOURCES_ipv6 = ipv6.c

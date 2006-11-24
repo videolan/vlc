@@ -62,25 +62,6 @@ extern const char *net_strerror( int val );
 extern "C" {
 # endif
 
-/*****************************************************************************
- * network_socket_t: structure passed to a network plug-in to define the
- *                   kind of socket we want
- *****************************************************************************/
-struct network_socket_t
-{
-    const char *psz_bind_addr;
-    int i_bind_port;
-
-    const char *psz_server_addr;
-    int i_server_port;
-
-    int i_ttl;
-
-    /* Return values */
-    int i_handle;
-    size_t i_mtu;
-};
-
 /* Portable networking layer communication */
 int net_Socket (vlc_object_t *obj, int family, int socktype, int proto);
 
