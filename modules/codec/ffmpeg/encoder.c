@@ -407,7 +407,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->max_b_frames =
             __MAX( __MIN( p_sys->i_b_frames, FF_MAX_B_FRAMES ), 0 );
         p_context->b_frame_strategy = 0;
-        if( !p_context->max_b_frames )
+        if( !p_context->max_b_frames  && 
+            (  p_enc->fmt_out.i_codec == VLC_FOURCC('m', 'p', '2', 'v') ||
+               p_enc->fmt_out.i_codec == VLC_FOURCC('m', 'p', '1', 'v') ) )
             p_context->flags |= CODEC_FLAG_LOW_DELAY;
 
         av_reduce( &i_aspect_num, &i_aspect_den,
