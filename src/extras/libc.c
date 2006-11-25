@@ -393,21 +393,23 @@ extern size_t vlc_strlcpy (char *tgt, const char *src, size_t bufsize)
  * when called with an empty argument or just '\'
  *****************************************************************************/
 #if defined(WIN32) && !defined(UNDER_CE)
+#   include <assert.h>
+
 typedef struct vlc_DIR
 {
-    DIR *p_real_dir;
+    _WDIR *p_real_dir;
     int i_drives;
-    struct dirent dd_dir;
+    struct _wdirent dd_dir;
     vlc_bool_t b_insert_back;
 } vlc_DIR;
 
-void *vlc_opendir_wrapper( const char *psz_path )
+void *vlc_wopendir( const wchar_t *wpath )
 {
     vlc_DIR *p_dir;
-    DIR *p_real_dir;
+    _WDIR *p_real_dir;
 
-    if ( psz_path == NULL || psz_path[0] == '\0'
-          || (psz_path[0] == '\\' && psz_path[1] == '\0') )
+    if ( wpath == NULL || wpath[0] == '\0'
+          || (wcscmp (wpath, L"\\") == 0) )
     {
         /* Special mode to list drive letters */
         p_dir = malloc( sizeof(vlc_DIR) );
@@ -416,18 +418,19 @@ void *vlc_opendir_wrapper( const char *psz_path )
         return (void *)p_dir;
     }
 
-    p_real_dir = opendir( psz_path );
+    p_real_dir = _wopendir( wpath );
     if ( p_real_dir == NULL )
         return NULL;
 
     p_dir = malloc( sizeof(vlc_DIR) );
     p_dir->p_real_dir = p_real_dir;
-    p_dir->b_insert_back = ( psz_path[1] == ':' && psz_path[2] == '\\'
-                              && psz_path[3] =='\0' );
+
+    assert (wpath[0]); // wpath[1] is defined
+    p_dir->b_insert_back = !wcscmp (wpath + 1, L":\\");
     return (void *)p_dir;
 }
 
-struct dirent *vlc_readdir_wrapper( void *_p_dir )
+struct _wdirent *vlc_wreaddir( void *_p_dir )
 {
     vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
     unsigned int i;
@@ -437,15 +440,16 @@ struct dirent *vlc_readdir_wrapper( void *_p_dir )
     {
         if ( p_dir->b_insert_back )
         {
+            /* Adds "..", gruik! */
             p_dir->dd_dir.d_ino = 0;
             p_dir->dd_dir.d_reclen = 0;
             p_dir->dd_dir.d_namlen = 2;
-            strcpy( p_dir->dd_dir.d_name, ".." );
+            wcscpy( p_dir->dd_dir.d_name, L".." );
             p_dir->b_insert_back = VLC_FALSE;
             return &p_dir->dd_dir;
         }
 
-        return readdir( p_dir->p_real_dir );
+        return _wreaddir( p_dir->p_real_dir );
     }
 
     /* Drive letters mode */
@@ -459,38 +463,22 @@ struct dirent *vlc_readdir_wrapper( void *_p_dir )
     if ( i >= 26 )
         return NULL; /* this should not happen */
 
-    sprintf( p_dir->dd_dir.d_name, "%c:\\", 'A' + i );
-    p_dir->dd_dir.d_namlen = strlen(p_dir->dd_dir.d_name);
+    swprintf( p_dir->dd_dir.d_name, L"%c:\\", 'A' + i );
+    p_dir->dd_dir.d_namlen = wcslen(p_dir->dd_dir.d_name);
     p_dir->i_drives &= ~(1UL << i);
     return &p_dir->dd_dir;
 }
 
-int vlc_closedir_wrapper( void *_p_dir )
+int vlc_wclosedir( void *_p_dir )
 {
     vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
+    int i_ret = 0;
 
     if ( p_dir->p_real_dir != NULL )
-    {
-        int i_ret = closedir( p_dir->p_real_dir );
-        free( p_dir );
-        return i_ret;
-    }
+        i_ret = _wclosedir( p_dir->p_real_dir );
 
     free( p_dir );
-    return 0;
-}
-#else
-void *vlc_opendir_wrapper( const char *psz_path )
-{
-    return (void *)opendir( psz_path );
-}
-struct dirent *vlc_readdir_wrapper( void *_p_dir )
-{
-    return readdir( (DIR *)_p_dir );
-}
-int vlc_closedir_wrapper( void *_p_dir )
-{
-    return closedir( (DIR *)_p_dir );
+    return i_ret;
 }
 #endif
 
@@ -498,6 +486,12 @@ int vlc_closedir_wrapper( void *_p_dir )
  * scandir: scan a directory alpha-sorted
  *****************************************************************************/
 #if !defined( HAVE_SCANDIR )
+/* FIXME: I suspect this is dead code -> utf8_scandir */
+#ifdef WIN32
+# undef opendir
+# undef readdir
+# undef closedir
+#endif
 int vlc_alphasort( const struct dirent **a, const struct dirent **b )
 {
     return strcoll( (*a)->d_name, (*b)->d_name );
@@ -513,11 +507,11 @@ int vlc_scandir( const char *name, struct dirent ***namelist,
     struct dirent ** pp_list;
     int              ret, size;
 
-    if( !namelist || !( p_dir = vlc_opendir_wrapper( name ) ) ) return -1;
+    if( !namelist || !( p_dir = opendir( name ) ) ) return -1;
 
     ret     = 0;
     pp_list = NULL;
-    while( ( p_content = vlc_readdir_wrapper( p_dir ) ) )
+    while( ( p_content = readdir( p_dir ) ) )
     {
         if( filter && !filter( p_content ) )
         {
@@ -530,7 +524,7 @@ int vlc_scandir( const char *name, struct dirent ***namelist,
         ret++;
     }
 
-    vlc_closedir_wrapper( p_dir );
+    closedir( p_dir );
 
     if( compar )
     {

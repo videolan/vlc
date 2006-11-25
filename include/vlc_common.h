@@ -969,9 +969,18 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   endif
 #endif
 
-VLC_INTERNAL( void *, vlc_opendir_wrapper, ( const char * ) );
-VLC_INTERNAL( struct dirent *, vlc_readdir_wrapper, ( void * ) );
-VLC_INTERNAL( int, vlc_closedir_wrapper, ( void * ) );
+#if defined (WIN32)
+#   include <dirent.h>
+VLC_INTERNAL( void *, vlc_wopendir, ( const wchar_t * ) );
+VLC_INTERNAL( struct _wdirent *, vlc_wreaddir, ( void * ) );
+VLC_INTERNAL( int, vlc_wclosedir, ( void * ) );
+#   define opendir Use_utf8_opendir_or_vlc_wopendir_instead!
+#   define readdir Use_utf8_readdir_or_vlc_wreaddir_instead!
+#   define closedir vlc_wclosedir
+#   define _wopendir vlc_wopendir
+#   define _wreaddir vlc_wreaddir
+#   define _wclosedir vlc_wclosedir
+#endif
 
 /* Format type specifiers for 64 bits numbers */
 #if defined(__CYGWIN32__) || (!defined(WIN32) && !defined(UNDER_CE))

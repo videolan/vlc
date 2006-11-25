@@ -810,6 +810,12 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
                                int i_maxdepth )
 {
+/* FIXME: Needs to be ported to wide char on ALL Windows builds */
+#ifdef WIN32
+# undef opendir
+# undef closedir
+# undef readdir
+#endif
 #if defined( UNDER_CE ) || defined( _MSC_VER )
 #ifdef UNDER_CE
     wchar_t psz_wpath[MAX_PATH + 256];
