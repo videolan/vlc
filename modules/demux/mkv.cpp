@@ -110,7 +110,7 @@ extern "C" {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #undef ATTRIBUTE_PACKED
-#undef PRAGMA_PACK_BEGIN 
+#undef PRAGMA_PACK_BEGIN
 #undef PRAGMA_PACK_END
 
 #if defined(__GNUC__)
@@ -219,7 +219,7 @@ typedef struct {
 #define COMMAND_DATA_SIZE 8
 
 /**
- * PCI General Information 
+ * PCI General Information
  */
 typedef struct {
   uint32_t nv_pck_lbn;      /**< sector address of this nav pack */
@@ -240,8 +240,8 @@ typedef struct {
   uint32_t nsml_agl_dsta[9];  /**< address of destination vobu in AGL_C#n */
 } ATTRIBUTE_PACKED nsml_agli_t;
 
-/** 
- * Highlight General Information 
+/**
+ * Highlight General Information
  *
  * For btngrX_dsp_ty the bits have the following meaning:
  * 000b: normal 4/3 only buttons
@@ -274,7 +274,7 @@ typedef struct {
   unsigned char zero3 : 1;
 #endif
   uint8_t btn_ofn;     /**< button offset number range 0-255 */
-  uint8_t btn_ns;      /**< number of valid buttons  <= 36/18/12 (low 6 bits) */  
+  uint8_t btn_ns;      /**< number of valid buttons  <= 36/18/12 (low 6 bits) */
   uint8_t nsl_btn_ns;  /**< number of buttons selectable by U_BTNNi (low 6 bits)   nsl_btn_ns <= btn_ns */
   uint8_t zero5;       /**< reserved */
   uint8_t fosl_btnn;   /**< forcedly selected button  (low 6 bits) */
@@ -347,7 +347,7 @@ typedef struct {
 } ATTRIBUTE_PACKED btni_t;
 
 /**
- * Highlight Information 
+ * Highlight Information
  */
 typedef struct {
   hl_gi_t     hl_gi;
@@ -478,7 +478,7 @@ block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
 /**
  * Helper function to print the mkv parse tree
  */
-static void MkvTree( demux_t & demuxer, int i_level, char *psz_format, ... )
+static void MkvTree( demux_t & demuxer, int i_level, const char *psz_format, ... )
 {
     va_list args;
     if( i_level > 9 )
@@ -487,7 +487,7 @@ static void MkvTree( demux_t & demuxer, int i_level, char *psz_format, ... )
         return;
     }
     va_start( args, psz_format );
-    static char *psz_foo = "|   |   |   |   |   |   |   |   |   |";
+    static const char psz_foo[] = "|   |   |   |   |   |   |   |   |   |";
     char *psz_foo2 = (char*)malloc( ( i_level * 4 + 3 + strlen( psz_format ) ) * sizeof(char) );
     strncpy( psz_foo2, psz_foo, 4 * i_level );
     psz_foo2[ 4 * i_level ] = '+';
@@ -497,7 +497,7 @@ static void MkvTree( demux_t & demuxer, int i_level, char *psz_format, ... )
     free( psz_foo2 );
     va_end( args );
 }
-    
+
 /*****************************************************************************
  * Stream managment
  *****************************************************************************/
@@ -603,11 +603,11 @@ typedef struct
     vlc_bool_t      b_silent;
 
     /* informative */
-    char         *psz_codec_name;
-    char         *psz_codec_settings;
-    char         *psz_codec_info_url;
-    char         *psz_codec_download_url;
-    
+    const char   *psz_codec_name;
+    const char   *psz_codec_settings;
+    const char   *psz_codec_info_url;
+    const char   *psz_codec_download_url;
+
     /* encryption/compression */
     int                    i_compression_type;
     KaxContentCompSettings *p_compression_data;
@@ -644,7 +644,7 @@ public:
     ,sys( demuxer )
     {}
         
-    virtual ~chapter_codec_cmds_c() 
+    virtual ~chapter_codec_cmds_c()
     {
         delete p_private_data;
         std::vector<KaxChapterProcessData*>::iterator indexe = enter_cmds.begin();
@@ -897,7 +897,7 @@ public:
     bool Leave();
 
 protected:
-    matroska_script_interpretor_c interpretor; 
+    matroska_script_interpretor_c interpretor;
 };
 
 class chapter_translation_c
@@ -953,9 +953,9 @@ public:
     virtual chapter_item_c * FindTimecode( mtime_t i_timecode, const chapter_item_c * p_current, bool & b_found );
     void Append( const chapter_item_c & edition );
     chapter_item_c * FindChapter( int64_t i_find_uid );
-    virtual chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
-                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
-                                    const void *p_cookie, 
+    virtual chapter_item_c *BrowseCodecPrivate( unsigned int codec_id,
+                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
+                                    const void *p_cookie,
                                     size_t i_cookie_size );
     std::string                 GetCodecName( bool f_for_title = false ) const;
     bool                        ParentOf( const chapter_item_c & item ) const;
@@ -1241,9 +1241,9 @@ public:
     bool UpdateCurrentToChapter( demux_t & demux );
     void PrepareChapters( );
 
-    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
-                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
-                                        const void *p_cookie, 
+    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id,
+                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
+                                        const void *p_cookie,
                                         size_t i_cookie_size );
     chapter_item_c *FindChapter( int64_t i_find_uid );
 
@@ -1359,10 +1359,10 @@ public:
     float                   f_duration;
 
     matroska_segment_c *FindSegment( const EbmlBinary & uid ) const;
-    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
-                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
-                                        const void *p_cookie, 
-                                        size_t i_cookie_size, 
+    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id,
+                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
+                                        const void *p_cookie,
+                                        size_t i_cookie_size,
                                         virtual_segment_c * & p_segment_found );
     chapter_item_c *FindChapter( int64_t i_find_uid, virtual_segment_c * & p_segment_found );
 
@@ -1486,7 +1486,7 @@ static int Open( vlc_object_t * p_this )
             }
             else
             {
-                if (s_path.find_last_of(DIRECTORY_SEPARATOR) > 0) 
+                if (s_path.find_last_of(DIRECTORY_SEPARATOR) > 0)
                 {
                     s_path = s_path.substr(0,s_path.find_last_of(DIRECTORY_SEPARATOR));
                 }
@@ -1511,10 +1511,10 @@ static int Open( vlc_object_t * p_this )
                             continue; // don't reuse the original opened file
 
 #if defined(__GNUC__) && (__GNUC__ < 3)
-                        if (!s_filename.compare("mkv", s_filename.length() - 3, 3) || 
+                        if (!s_filename.compare("mkv", s_filename.length() - 3, 3) ||
                             !s_filename.compare("mka", s_filename.length() - 3, 3))
 #else
-                        if (!s_filename.compare(s_filename.length() - 3, 3, "mkv") || 
+                        if (!s_filename.compare(s_filename.length() - 3, 3, "mkv") ||
                             !s_filename.compare(s_filename.length() - 3, 3, "mka"))
 #endif
                         {
@@ -1856,7 +1856,7 @@ static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, int i_mem, size_t 
 }
 
 #if LIBMATROSKA_VERSION >= 0x000800
-static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock, 
+static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
                          mtime_t i_pts, mtime_t i_duration, bool f_mandatory )
 #else
 static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
@@ -1924,7 +1924,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 
 
 #if LIBMATROSKA_VERSION >= 0x000800
-    for( i = 0; 
+    for( i = 0;
         (block != NULL && i < block->NumberFrames()) || (simpleblock != NULL && i < simpleblock->NumberFrames());
         i++ )
 #else
@@ -2425,7 +2425,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 's', 's', 'a', ' ' );
             tracks[i_track]->fmt.subs.psz_encoding = strdup( "UTF-8" );
-            if( tracks[i_track]->i_extra_data ) 
+            if( tracks[i_track]->i_extra_data )
             {
                 tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
                 tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
@@ -2758,14 +2758,14 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                 // get current button
                 best = 0;
                 dist = 0x08000000; /* >> than  (720*720)+(567*567); */
-                for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++) 
+                for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++)
                 {
                     btni_t *button_ptr = &(pci->hli.btnit[button-1]);
 
                     if(((unsigned)valx.i_int >= button_ptr->x_start)
                      && ((unsigned)valx.i_int <= button_ptr->x_end)
                      && ((unsigned)valy.i_int >= button_ptr->y_start)
-                     && ((unsigned)valy.i_int <= button_ptr->y_end)) 
+                     && ((unsigned)valy.i_int <= button_ptr->y_end))
                     {
                         mx = (button_ptr->x_start + button_ptr->x_end)/2;
                         my = (button_ptr->y_start + button_ptr->y_end)/2;
@@ -3029,9 +3029,9 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     return false;
 }
 
-chapter_item_c *virtual_segment_c::BrowseCodecPrivate( unsigned int codec_id, 
-                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
-                                    const void *p_cookie, 
+chapter_item_c *virtual_segment_c::BrowseCodecPrivate( unsigned int codec_id,
+                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
+                                    const void *p_cookie,
                                     size_t i_cookie_size )
 {
     // FIXME don't assume it is the first edition
@@ -3058,9 +3058,9 @@ chapter_item_c *virtual_segment_c::FindChapter( int64_t i_find_uid )
     return NULL;
 }
 
-chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id, 
-                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
-                                    const void *p_cookie, 
+chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
+                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
+                                    const void *p_cookie,
                                     size_t i_cookie_size )
 {
     // this chapter
@@ -4079,7 +4079,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         }
         else  if( MKV_IS_ID( l, KaxTrackType ) )
         {
-            char *psz_type;
+            const char *psz_type;
             KaxTrackType &ttype = *(KaxTrackType*)l;
 
             switch( uint8(ttype) )
@@ -4244,7 +4244,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                                     KaxContentCompAlgo &compalg = *(KaxContentCompAlgo*)l4;
                                     MkvTree( sys.demuxer, 6, "Compression Algorithm: %i", uint32(compalg) );
                                     tk->i_compression_type = uint32( compalg );
-                                    if ( ( tk->i_compression_type != MATROSKA_COMPRESSION_ZLIB ) && 
+                                    if ( ( tk->i_compression_type != MATROSKA_COMPRESSION_ZLIB ) &&
                                          ( tk->i_compression_type != MATROSKA_COMPRESSION_HEADER ) )
                                     {
                                         msg_Err( &sys.demuxer, "Track Compression method %d not supported", tk->i_compression_type );
@@ -4261,20 +4261,17 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                                 }
                             }
                         }
-
                         else
                         {
                             MkvTree( sys.demuxer, 5, "Unknown (%s)", typeid(*l3).name() );
                         }
                     }
-                    
                 }
                 else
                 {
                     MkvTree( sys.demuxer, 4, "Unknown (%s)", typeid(*l2).name() );
                 }
             }
-                
         }
 //        else if( EbmlId( *l ) == KaxCodecSettings::ClassInfos.GlobalId )
 //        {
@@ -5077,8 +5074,8 @@ chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode, const cha
     if ( p_current == this )
         b_found = true;
 
-    if ( i_user_timecode >= i_user_start_time && 
-        ( i_user_timecode < i_user_end_time || 
+    if ( i_user_timecode >= i_user_start_time &&
+        ( i_user_timecode < i_user_end_time ||
           ( i_user_start_time == i_user_end_time && i_user_timecode == i_user_end_time )))
     {
         std::vector<chapter_item_c*>::iterator index = sub_chapters.begin();
@@ -5381,10 +5378,10 @@ matroska_segment_c *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
     return NULL;
 }
 
-chapter_item_c *demux_sys_t::BrowseCodecPrivate( unsigned int codec_id, 
-                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
-                                        const void *p_cookie, 
-                                        size_t i_cookie_size, 
+chapter_item_c *demux_sys_t::BrowseCodecPrivate( unsigned int codec_id,
+                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
+                                        const void *p_cookie,
+                                        size_t i_cookie_size,
                                         virtual_segment_c * &p_segment_found )
 {
     chapter_item_c *p_result = NULL;
@@ -5433,7 +5430,7 @@ size_t virtual_segment_c::AddSegment( matroska_segment_c *p_segment )
     // check if it's not already in here
     for ( i=0; i<linked_segments.size(); i++ )
     {
-        if ( linked_segments[i]->p_segment_uid != NULL 
+        if ( linked_segments[i]->p_segment_uid != NULL
             && p_segment->p_segment_uid != NULL
             && *p_segment->p_segment_uid == *linked_segments[i]->p_segment_uid )
             return 0;
@@ -5610,7 +5607,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
                     BlockDecode( &sys.demuxer, block, sys.i_pts, 0, i_block_ref1 >= 0 || i_block_ref2 > 0 );
 #endif
                 }
-            } 
+            }
         }
 
         delete block;
@@ -6403,7 +6400,7 @@ bool matroska_script_codec_c::Leave()
     return f_result;
 }
 
-// see http://www.matroska.org/technical/specs/chapters/index.html#mscript 
+// see http://www.matroska.org/technical/specs/chapters/index.html#mscript
 //  for a description of existing commands
 bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t i_size )
 {
