@@ -289,6 +289,7 @@ net_IPv6Join (vlc_object_t *obj, int fd, const struct sockaddr_in6 *src)
 }
 
 
+#if 0
 #if defined (WIN32) && !defined (MCAST_JOIN_SOURCE_GROUP)
 /*
  * I hate manual definitions: Error-prone. Portability hell.
@@ -315,6 +316,7 @@ struct group_source_req
     struct sockaddr_storage gsr_group;
     struct sockaddr_storage gsr_source;
 };
+#endif
 #endif
 
 /**
