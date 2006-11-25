@@ -160,7 +160,7 @@ mtime_t mdate( void )
 
         freq = ( QueryPerformanceFrequency( &buf ) &&
                  (freq == I64C(1193182) || freq == I64C(3579545) ) )
-               ? buf : 0;
+               ? buf.QuadPart : 0;
     }
 
     if( freq != 0 )
@@ -231,27 +231,10 @@ void mwait( mtime_t date )
         clock_nanosleep( CLOCK_REALTIME, TIMER_ABSTIME, &ts, NULL );
 #else
 
-    mtime_t usec_time, delay;
-
-    usec_time = mdate();
-    delay = date - usec_time;
+    mtime_t delay = mdate() - date;
     if( delay > 0 )
         msleep( delay );
 
-
-    struct timeval tv_date;
-    mtime_t        delay;          /* delay in msec, signed to detect errors */
-
-    /* see mdate() about gettimeofday() possible errors */
-    gettimeofday( &tv_date, NULL );
-
-    /* calculate delay and check if current date is before wished date */
-    delay = date - (mtime_t) tv_date.tv_sec * 1000000
-                 - (mtime_t) tv_date.tv_usec
-                 - 10000;
-
-    if( delay > 0 )
-        msleep( delay );
 #endif
 }
 
