@@ -38,6 +38,7 @@
 #include <codecs.h>                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "iso_lang.h"
 #include "vlc_meta.h"
+#include "charset.h"
 
 #include <iostream>
 #include <cassert>
@@ -1491,16 +1492,16 @@ static int Open( vlc_object_t * p_this )
                 }
             }
 
-            struct dirent *p_file_item;
-            DIR *p_src_dir = opendir(s_path.c_str());
+            DIR *p_src_dir = utf8_opendir(s_path.c_str());
 
             if (p_src_dir != NULL)
             {
-                while ((p_file_item = (dirent *) readdir(p_src_dir)))
+                char *psz_file;
+                while ((psz_file = utf8_readdir(p_src_dir)) != NULL)
                 {
-                    if (strlen(p_file_item->d_name) > 4)
+                    if (strlen(psz_file) > 4)
                     {
-                        s_filename = s_path + DIRECTORY_SEPARATOR + p_file_item->d_name;
+                        s_filename = s_path + DIRECTORY_SEPARATOR + psz_file;
 
 #ifdef WIN32
                         if (!strcasecmp(s_filename.c_str(), p_demux->psz_path))
@@ -1545,6 +1546,7 @@ static int Open( vlc_object_t * p_this )
                             }
                         }
                     }
+                    free (psz_file);
                 }
                 closedir( p_src_dir );
             }
