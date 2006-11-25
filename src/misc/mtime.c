@@ -134,7 +134,6 @@ mtime_t mdate( void )
 #elif defined( WIN32 ) || defined( UNDER_CE )
     /* We don't need the real date, just the value of a high precision timer */
     static mtime_t freq = I64C(-1);
-    mtime_t usec_time;
 
     if( freq == I64C(-1) )
     {
@@ -165,9 +164,15 @@ mtime_t mdate( void )
 
     if( freq != 0 )
     {
-        /* Microsecond resolution */
-        QueryPerformanceCounter( (LARGE_INTEGER *)&usec_time );
-        return ( usec_time * 1000000 ) / freq;
+        LARGE_INTEGER counter;
+        QueryPerformanceCounter (&counter);
+
+        /* Convert to from (1/freq) to microsecond resolution */
+        /* We need to split the division to avoid 63-bits overflow */
+        lldiv_t d = lldiv (counter.QuadPart, freq);
+
+        return (d.quot * 1000000)
+             + ((d.rem * 1000000) / freq);
     }
     else
     {
@@ -179,6 +184,7 @@ mtime_t mdate( void )
         static CRITICAL_SECTION date_lock;
         static mtime_t i_previous_time = I64C(-1);
         static int i_wrap_counts = -1;
+        mtime_t usec_time;
 
         if( i_wrap_counts == -1 )
         {
