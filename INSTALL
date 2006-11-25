@@ -25,6 +25,13 @@ symbols:
 
    make distclean ; ./configure --prefix=/usr --enable-wxwindows --enable-debug
 
+We recommend using GCC (versions 3.3 or later) to build VLC, though some
+people reported success with the Intel C compiler (version 8) as well. As of
+VLC version 0.9.0, GCC 2.95 is not supported anymore; if this is the default
+compiler on your system (e.g. FreeBSD 4.x), please select a more recent
+version manually by setting the CC and CXX environment variables
+appropriately while running the ./configure shell script.
+
 
 Building VLC
 ============
