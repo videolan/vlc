@@ -951,8 +951,6 @@ modules/misc/logger.c
 modules/misc/memcpy/fastmemcpy.h
 modules/misc/memcpy/memcpyaltivec.c
 modules/misc/memcpy/memcpy.c
-modules/misc/network/ipv4.c
-modules/misc/network/ipv6.c
 modules/misc/notify/growl.c
 modules/misc/notify/msn.c
 modules/misc/notify/notify.c
