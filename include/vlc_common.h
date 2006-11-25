@@ -980,6 +980,8 @@ VLC_EXPORT( int, vlc_wclosedir, ( void * ) );
 #   define _wopendir vlc_wopendir
 #   define _wreaddir vlc_wreaddir
 #   define _wclosedir vlc_wclosedir
+#else
+#   define vlc_wclosedir NULL
 #endif
 
 /* Format type specifiers for 64 bits numbers */
