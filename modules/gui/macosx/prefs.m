@@ -442,11 +442,11 @@ static VLCTreeItem *o_root_item = nil;
 
                 [p_subcategory_item->o_children addObject:[[VLCTreeItem alloc]
                     initWithName:[[VLCMain sharedInstance]
-                        localizedString: p_module->psz_shortname ?
-                        p_module->psz_shortname : p_module->psz_object_name ]
+                        localizedString: (char *)p_module->psz_shortname ?
+                        (char *)p_module->psz_shortname : (char *)p_module->psz_object_name ]
                     withTitle:[[VLCMain sharedInstance]
-                        localizedString: p_module->psz_longname ?
-                        p_module->psz_longname : p_module->psz_object_name ]
+                        localizedString: (char *)p_module->psz_longname ?
+                        (char *)p_module->psz_longname : (char *)p_module->psz_object_name ]
                     withHelp: @""
                     ID: p_module->i_object_id
                     parent:p_subcategory_item
