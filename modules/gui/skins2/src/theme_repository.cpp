@@ -95,16 +95,18 @@ ThemeRepository::~ThemeRepository()
 }
 
 
-void ThemeRepository::parseDirectory( const string &rDir )
+void ThemeRepository::parseDirectory( const string &rDir_locale )
 {
     DIR *pDir;
-    struct dirent *pDirContent;
+    char *pszDirContent;
     vlc_value_t val, text;
     // Path separator
     const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
 
     // Open the dir
-    pDir = opendir( rDir.c_str() );
+    // FIXME: parseDirectory should be invoked with UTF-8 input instead!!
+    string rDir = sFromLocale( rDir_locale );
+    pDir = utf8_opendir( rDir.c_str() );
 
     if( pDir == NULL )
     {
@@ -113,13 +115,10 @@ void ThemeRepository::parseDirectory( const string &rDir )
         return;
     }
 
-    // Get the first directory entry
-    pDirContent = (dirent*)readdir( pDir );
-
     // While we still have entries in the directory
-    while( pDirContent != NULL )
+    while( ( pszDirContent = utf8_readdir( pDir ) ) != NULL )
     {
-        string name = pDirContent->d_name;
+        string name = pszDirContent;
         string extension;
         if( name.size() > 4 )
         {
@@ -142,7 +141,7 @@ void ThemeRepository::parseDirectory( const string &rDir )
             delete[] text.psz_string;
         }
 
-        pDirContent = (dirent*)readdir( pDir );
+        free( pszDirContent );
     }
 
     closedir( pDir );
