@@ -415,7 +415,7 @@ struct module_symbols_t
     const char * (*VLC_Version_inner) (void);
     int (*playlist_PreparseEnqueueItem_inner) (playlist_t *, playlist_item_t *);
     void *vlc_readdir_wrapper_deprecated;
-    void *vlc_closedir_wrapper_deprecated;
+    int (*vlc_wclosedir_inner) (void *);
     void *vlc_opendir_wrapper_deprecated;
     void (*httpd_HandlerDelete_inner) (httpd_handler_t *);
     int (*__vlc_execve_inner) (vlc_object_t *p_object, int i_argc, char **pp_argv, char **pp_env, char *psz_cwd, char *p_in, int i_in, char **pp_data, int *pi_data);
@@ -914,6 +914,7 @@ struct module_symbols_t
 #  define VLC_CompileHost (p_symbols)->VLC_CompileHost_inner
 #  define VLC_Version (p_symbols)->VLC_Version_inner
 #  define playlist_PreparseEnqueueItem (p_symbols)->playlist_PreparseEnqueueItem_inner
+#  define vlc_wclosedir (p_symbols)->vlc_wclosedir_inner
 #  define httpd_HandlerDelete (p_symbols)->httpd_HandlerDelete_inner
 #  define __vlc_execve (p_symbols)->__vlc_execve_inner
 #  define httpd_HandlerNew (p_symbols)->httpd_HandlerNew_inner
@@ -1381,6 +1382,7 @@ struct module_symbols_t
     ((p_symbols)->VLC_CompileHost_inner) = VLC_CompileHost; \
     ((p_symbols)->VLC_Version_inner) = VLC_Version; \
     ((p_symbols)->playlist_PreparseEnqueueItem_inner) = playlist_PreparseEnqueueItem; \
+    ((p_symbols)->vlc_wclosedir_inner) = vlc_wclosedir; \
     ((p_symbols)->httpd_HandlerDelete_inner) = httpd_HandlerDelete; \
     ((p_symbols)->__vlc_execve_inner) = __vlc_execve; \
     ((p_symbols)->httpd_HandlerNew_inner) = httpd_HandlerNew; \
@@ -1533,7 +1535,6 @@ struct module_symbols_t
     (p_symbols)->playlist_NodeRemoveParent_deprecated = NULL; \
     (p_symbols)->__vlc_fix_readdir_charset_deprecated = NULL; \
     (p_symbols)->vlc_readdir_wrapper_deprecated = NULL; \
-    (p_symbols)->vlc_closedir_wrapper_deprecated = NULL; \
     (p_symbols)->vlc_opendir_wrapper_deprecated = NULL; \
     (p_symbols)->FromUTF32_deprecated = NULL; \
     (p_symbols)->__intf_Interact_deprecated = NULL; \
