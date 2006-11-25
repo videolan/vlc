@@ -434,7 +434,7 @@ DIR *utf8_opendir( const char *dirname )
 
     if( local_name != NULL )
     {
-        DIR *dir = vlc_opendir_wrapper( local_name );
+        DIR *dir = opendir( local_name );
         LocaleFree( local_name );
         return dir;
     }
@@ -448,7 +448,7 @@ char *utf8_readdir( void *dir )
 {
     struct dirent *ent;
 
-    ent = vlc_readdir_wrapper( (DIR *)dir );
+    ent = readdir( (DIR *)dir );
     if( ent == NULL )
         return NULL;
 
