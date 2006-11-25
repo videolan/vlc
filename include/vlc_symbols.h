@@ -414,9 +414,9 @@ struct module_symbols_t
     const char * (*VLC_CompileHost_inner) (void);
     const char * (*VLC_Version_inner) (void);
     int (*playlist_PreparseEnqueueItem_inner) (playlist_t *, playlist_item_t *);
-    struct dirent * (*vlc_readdir_wrapper_inner) (void *);
-    int (*vlc_closedir_wrapper_inner) (void *);
-    void * (*vlc_opendir_wrapper_inner) (const char *);
+    void *vlc_readdir_wrapper_deprecated;
+    void *vlc_closedir_wrapper_deprecated;
+    void *vlc_opendir_wrapper_deprecated;
     void (*httpd_HandlerDelete_inner) (httpd_handler_t *);
     int (*__vlc_execve_inner) (vlc_object_t *p_object, int i_argc, char **pp_argv, char **pp_env, char *psz_cwd, char *p_in, int i_in, char **pp_data, int *pi_data);
     httpd_handler_t * (*httpd_HandlerNew_inner) (httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_handler_callback_t pf_fill, httpd_handler_sys_t *);
@@ -914,9 +914,6 @@ struct module_symbols_t
 #  define VLC_CompileHost (p_symbols)->VLC_CompileHost_inner
 #  define VLC_Version (p_symbols)->VLC_Version_inner
 #  define playlist_PreparseEnqueueItem (p_symbols)->playlist_PreparseEnqueueItem_inner
-#  define vlc_readdir_wrapper (p_symbols)->vlc_readdir_wrapper_inner
-#  define vlc_closedir_wrapper (p_symbols)->vlc_closedir_wrapper_inner
-#  define vlc_opendir_wrapper (p_symbols)->vlc_opendir_wrapper_inner
 #  define httpd_HandlerDelete (p_symbols)->httpd_HandlerDelete_inner
 #  define __vlc_execve (p_symbols)->__vlc_execve_inner
 #  define httpd_HandlerNew (p_symbols)->httpd_HandlerNew_inner
@@ -1384,9 +1381,6 @@ struct module_symbols_t
     ((p_symbols)->VLC_CompileHost_inner) = VLC_CompileHost; \
     ((p_symbols)->VLC_Version_inner) = VLC_Version; \
     ((p_symbols)->playlist_PreparseEnqueueItem_inner) = playlist_PreparseEnqueueItem; \
-    ((p_symbols)->vlc_readdir_wrapper_inner) = vlc_readdir_wrapper; \
-    ((p_symbols)->vlc_closedir_wrapper_inner) = vlc_closedir_wrapper; \
-    ((p_symbols)->vlc_opendir_wrapper_inner) = vlc_opendir_wrapper; \
     ((p_symbols)->httpd_HandlerDelete_inner) = httpd_HandlerDelete; \
     ((p_symbols)->__vlc_execve_inner) = __vlc_execve; \
     ((p_symbols)->httpd_HandlerNew_inner) = httpd_HandlerNew; \
@@ -1538,6 +1532,9 @@ struct module_symbols_t
     (p_symbols)->playlist_Import_deprecated = NULL; \
     (p_symbols)->playlist_NodeRemoveParent_deprecated = NULL; \
     (p_symbols)->__vlc_fix_readdir_charset_deprecated = NULL; \
+    (p_symbols)->vlc_readdir_wrapper_deprecated = NULL; \
+    (p_symbols)->vlc_closedir_wrapper_deprecated = NULL; \
+    (p_symbols)->vlc_opendir_wrapper_deprecated = NULL; \
     (p_symbols)->FromUTF32_deprecated = NULL; \
     (p_symbols)->__intf_Interact_deprecated = NULL; \
     (p_symbols)->__intf_UserProgress_deprecated = NULL; \
