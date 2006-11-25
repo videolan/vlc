@@ -497,7 +497,7 @@ int utf8_scandir( const char *dirname, char ***namelist,
             tab = newtab;
             tab[num++] = entry;
         }
-        vlc_closedir_wrapper( dir );
+        closedir( dir );
 
         if( compar != NULL )
             qsort( tab, num, sizeof( tab[0] ),
