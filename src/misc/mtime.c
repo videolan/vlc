@@ -115,7 +115,20 @@ char *secstotimestr( char *psz_buffer, int i_seconds )
  */
 mtime_t mdate( void )
 {
-#if defined( HAVE_KERNEL_OS_H )
+#if defined (HAVE_CLOCK_NANOSLEEP)
+    struct timespec ts;
+
+# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
+    /* Try to use POSIX monotonic clock if available */
+    if( clock_gettime( CLOCK_MONOTONIC, &ts ) )
+# endif
+        /* Run-time fallback to real-time clock (always available) */
+        (void)clock_gettime( CLOCK_REALTIME, &ts );
+
+    return ((mtime_t)ts.tv_sec * (mtime_t)1000000)
+           + (mtime_t)(ts.tv_nsec / 1000);
+
+#elif defined( HAVE_KERNEL_OS_H )
     return( real_time_clock_usecs() );
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
@@ -188,19 +201,6 @@ mtime_t mdate( void )
 
         return usec_time;
     }
-
-#elif defined (HAVE_CLOCK_NANOSLEEP)
-    struct timespec ts;
-
-# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
-    /* Try to use POSIX monotonic clock if available */
-    if( clock_gettime( CLOCK_MONOTONIC, &ts ) )
-# endif
-        /* Run-time fallback to real-time clock (always available) */
-        (void)clock_gettime( CLOCK_REALTIME, &ts );
-
-    return ((mtime_t)ts.tv_sec * (mtime_t)1000000)
-           + (mtime_t)(ts.tv_nsec / 1000);
 #else
     struct timeval tv_date;
 
@@ -220,28 +220,7 @@ mtime_t mdate( void )
  */
 void mwait( mtime_t date )
 {
-#if defined( HAVE_KERNEL_OS_H )
-    mtime_t delay;
-
-    delay = date - real_time_clock_usecs();
-    if( delay <= 0 )
-    {
-        return;
-    }
-    snooze( delay );
-
-#elif defined( WIN32 ) || defined( UNDER_CE )
-    mtime_t usec_time, delay;
-
-    usec_time = mdate();
-    delay = date - usec_time;
-    if( delay <= 0 )
-    {
-        return;
-    }
-    msleep( delay );
-
-#elif defined (HAVE_CLOCK_NANOSLEEP)
+#if defined (HAVE_CLOCK_NANOSLEEP)
     lldiv_t d = lldiv( date, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
 
@@ -250,6 +229,14 @@ void mwait( mtime_t date )
 # endif
         clock_nanosleep( CLOCK_REALTIME, TIMER_ABSTIME, &ts, NULL );
 #else
+
+    mtime_t usec_time, delay;
+
+    usec_time = mdate();
+    delay = date - usec_time;
+    if( delay > 0 )
+        msleep( delay );
+
 
     struct timeval tv_date;
     mtime_t        delay;          /* delay in msec, signed to detect errors */
@@ -275,7 +262,16 @@ void mwait( mtime_t date )
  */
 void msleep( mtime_t delay )
 {
-#if defined( HAVE_KERNEL_OS_H )
+#if defined( HAVE_CLOCK_NANOSLEEP ) 
+    lldiv_t d = lldiv( delay, 1000000 );
+    struct timespec ts = { d.quot, d.rem * 1000 };
+
+# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
+    if( clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, NULL ) )
+# endif
+        clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
+
+#elif defined( HAVE_KERNEL_OS_H )
     snooze( delay );
 
 #elif defined( PTH_INIT_IN_PTH_H )
@@ -286,15 +282,6 @@ void msleep( mtime_t delay )
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
     Sleep( (int) (delay / 1000) );
-
-#elif defined( HAVE_CLOCK_NANOSLEEP ) 
-    lldiv_t d = lldiv( delay, 1000000 );
-    struct timespec ts = { d.quot, d.rem * 1000 };
-
-# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
-    if( clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, NULL ) )
-# endif
-        clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
 
 #elif defined( HAVE_NANOSLEEP )
     struct timespec ts_delay;
@@ -315,7 +302,6 @@ void msleep( mtime_t delay )
      * (i.e. when a signal is sent to the thread, or when memory is full), and
      * can be ignored. */
     select( 0, NULL, NULL, NULL, &tv_delay );
-
 #endif
 }
 
