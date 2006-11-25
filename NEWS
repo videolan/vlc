@@ -17,6 +17,7 @@ Decoders:
 Video output:
  * Adjust, Invert and Distort (now splited into Wave, Ripple, Gradient
    and Psychedelic) video filters can now be streamed
+ * New puzzle video output filter
 
 Interfaces:
  * Windows/Linux
