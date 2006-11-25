@@ -2037,7 +2037,7 @@ static int GetiPodID( int64_t *p_ipod_id )
         mach_port_deallocate( mach_task_self(), port );
     }
 
-#elif HAVE_SYSFS_LIBSYSFS_H
+#elif defined (HAVE_SYSFS_LIBSYSFS_H)
     struct sysfs_bus *bus = NULL;
     struct dlist *devlist = NULL;
     struct dlist *attributes = NULL;
