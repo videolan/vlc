@@ -859,7 +859,7 @@ static int Init( input_thread_t * p_input )
 
         if( p_input->i_start > 0 )
         {
-            if( p_input->i_start >= p_input->input.p_item->i_duration )
+            if( p_input->i_start >= val.i_time )
             {
                 msg_Warn( p_input, "invalid start-time ignored" );
             }

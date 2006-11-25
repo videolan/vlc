@@ -205,6 +205,7 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     PL_UNLOCK;
 
+    vlc_mutex_destroy( &p_playlist->p_stats->lock );
     if( p_playlist->p_stats )
         free( p_playlist->p_stats );
 

@@ -27,6 +27,7 @@ Basil Achermann <vlc at acherma dot com> - Patch to handle esc and space key eve
 Barak Ori <barakori at gmail dot com> - Bidi fixes
 Benjamin Mironer <bmironer at noos.fr> - Mac OS X fixes
 Benoit Steiner <benny at via.ecp.fr> - MPEG system input, network input
+Bill <wenwuangel at hotmail .com> - memleak fixes
 Bill Eldridge <bill at rfa.org> - documentation
 Bob Maguire <maguirer at rjmaguire dot com> - addition of some controls to the OSX interface
 Brian Robb <vascy at hotmail dot com> - win32 CD/DVD drive detection in wx, bug fixes
@@ -55,7 +56,7 @@ Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
 Dennis van Amerongen <Dennis dot vanAmerongen at nob dot nl> - x264 options unification
 Dennis Lou <dlou99 at yahoo dot com> - ATSC support in the DVB module
 Dermot McGahon <dermot at dspsrv dot com> - Bug fixes, RC interface loop and repeat
-Diego Petteno <flameeyes at gentoo dot org> - remove usage of internal ffmpeg symbols
+Diego Petteno <flameeyes at gentoo dot org> - remove usage of internal ffmpeg symbols, configure fixes
 DirektX <direktx at freemail.hu> - Hungarian translation
 Dugal Harris - DirectShow fixes and MJPEG patches
 Emmanuel Blindauer <manu at agat.net> - aRts audio output
