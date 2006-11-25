@@ -972,8 +972,6 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         psz_proto = strdup( "udp" );
     }
 
-    /* FIXME: HTTP support */
-
     if( i_port == 0 )
     {
         i_port = 1234;
