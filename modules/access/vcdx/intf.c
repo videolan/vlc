@@ -27,7 +27,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
-#include <<vlc_input.h>>
+#include <vlc_access.h>
 
 #include "vlc_keys.h"
 

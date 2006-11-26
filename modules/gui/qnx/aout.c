@@ -35,8 +35,7 @@
 #   include <alloca.h>
 #endif
 
-#include <<vlc_aout.h>>
-#include "aout_internal.h"
+#include <vlc_aout.h>
 
 #include <sys/asoundlib.h>
 

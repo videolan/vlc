@@ -27,7 +27,9 @@
 #define _VCDPLAYER_H_
 
 #include <libvcd/info.h>
-#include "vlc_meta.h"
+#include <vlc_meta.h>
+#include <vlc_input.h>
+#include <vlc_access.h>
 
 #define INPUT_DBG_META        1 /* Meta information */
 #define INPUT_DBG_EVENT       2 /* input (keyboard/mouse) events */

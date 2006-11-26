@@ -33,7 +33,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
-#include <<vlc_input.h>>
+#include <vlc_input.h>
 
 #include "transrate.h"
 

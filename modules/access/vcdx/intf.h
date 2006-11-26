@@ -23,6 +23,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc_input.h>
+#include "vcdplayer.h"
 
 /*****************************************************************************
  * intf_sys_t: description and status of interface

@@ -29,10 +29,9 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
-#include <vlc/decoder.h>
-
-#include "vlc_filter.h"
+#include <vlc_sout.h>
+#include <vlc_vout.h>
+#include <vlc_filter.h>
 
 /*****************************************************************************
  * Local protypes

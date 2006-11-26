@@ -38,9 +38,11 @@
 
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
-#include <<vlc_vout.h>>
-#include <<vlc_aout.h>>
+#include <vlc_vout.h>
+#include <vlc_aout.h>
 #include <vlc_charset.h>
+#include <vlc_input.h>
+#include <vlc_playlist.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>

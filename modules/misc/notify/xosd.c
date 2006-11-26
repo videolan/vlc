@@ -30,7 +30,7 @@
 #include <xosd.h>
 #include <vlc/vlc.h>
 #include <vlc_playlist.h>
-#include <vlc_item.h>
+#include <vlc_input.h>
 #include <vlc_interface.h>
 
 #ifdef HAVE_UNISTD_H

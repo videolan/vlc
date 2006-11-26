@@ -22,11 +22,11 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <<vlc_input.h>>
-
+#include <vlc_input.h>
+#include <vlc_access.h>
 #include "vcd.h"
-#include <vlc_playlist.h> 
-#include "vlc_keys.h"
+#include <vlc_playlist.h>
+#include <vlc_keys.h>
 #include "info.h"
 
 #include <cdio/cdio.h>

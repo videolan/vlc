@@ -28,7 +28,8 @@
 #include <stdlib.h>
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
-#include <<vlc_vout.h>>
+#include <vlc_playlist.h>
+#include <vlc_vout.h>
 
 #include <stdio.h>
 #include <string.h>

@@ -18,7 +18,7 @@
  */
  
 #include <vlc/vlc.h>
-#include <<vlc_vout.h>>
+#include <vlc_vout.h>
 #include <vlc_codec.h>
 
 #include "mpeg2.h"
