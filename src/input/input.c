@@ -137,7 +137,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* Init Common fields */
     p_input->b_eof = VLC_FALSE;
-    p_input->p->b_can_pace_control = VLC_TRUE;
+    p_input->b_can_pace_control = VLC_TRUE;
     p_input->p->i_start = 0;
     p_input->i_time  = 0;
     p_input->p->i_stop  = 0;
@@ -809,7 +809,7 @@ static int Init( input_thread_t * p_input )
         }
 
         /* Global flag */
-        p_input->p->b_can_pace_control = p_input->p->input.b_can_pace_control;
+        p_input->b_can_pace_control = p_input->p->input.b_can_pace_control;
         p_input->p->b_can_pause        = p_input->p->input.b_can_pause;
 
         /* Fix pts delay */
@@ -1044,7 +1044,7 @@ static int Init( input_thread_t * p_input )
                 p_input->p->b_out_pace_control = VLC_TRUE;
             }
 
-            if( p_input->p->b_can_pace_control && p_input->p->b_out_pace_control )
+            if( p_input->b_can_pace_control && p_input->p->b_out_pace_control )
             {
                 /* We don't want a high input priority here or we'll
                  * end-up sucking up all the CPU time */
@@ -1498,7 +1498,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 i_rate = INPUT_RATE_MAX;
             }
             if( i_rate != INPUT_RATE_DEFAULT &&
-                ( !p_input->p->b_can_pace_control ||
+                ( !p_input->b_can_pace_control ||
                   ( p_input->p->p_sout && !p_input->p->b_out_pace_control ) ) )
             {
                 msg_Dbg( p_input, "cannot change rate" );

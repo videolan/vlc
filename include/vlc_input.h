@@ -351,8 +351,11 @@ struct input_thread_t
 
     vlc_bool_t  b_eof;
     vlc_bool_t b_preparsing;
+
     int i_state;
+    vlc_bool_t b_can_pace_control;
     int64_t     i_time;     /* Current time */
+
     /* Internal caching common to all inputs */
     int i_pts_delay;
 

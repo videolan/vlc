@@ -247,7 +247,7 @@ void input_ClockSetPCR( input_thread_t *p_input,
                      cl->last_pts + CR_MEAN_PTS_GAP : mdate() );
         cl->i_synchro_state = SYNCHRO_OK;
 
-        if( p_input->p->b_can_pace_control && cl->b_master )
+        if( p_input->b_can_pace_control && cl->b_master )
         {
             cl->last_cr = i_clock;
             if( !p_input->p->b_out_pace_control )
@@ -288,7 +288,7 @@ void input_ClockSetPCR( input_thread_t *p_input,
 
         cl->last_cr = i_clock;
 
-        if( p_input->p->b_can_pace_control && cl->b_master )
+        if( p_input->b_can_pace_control && cl->b_master )
         {
             /* Wait a while before delivering the packets to the decoder.
              * In case of multiple programs, we arbitrarily follow the

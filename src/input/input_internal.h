@@ -69,7 +69,6 @@ typedef struct
 struct input_thread_private_t
 {
     /* Global properties */
-    vlc_bool_t  b_can_pace_control;
     vlc_bool_t  b_can_pause;
 
     int         i_rate;
