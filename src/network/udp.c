@@ -351,28 +351,38 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
 #ifdef AF_INET6
         case AF_INET6:
             level = SOL_IPV6;
-            if ((src != NULL)
-             && memcmp (&((const struct sockaddr_in6 *)src)->sin6_addr,
-                        &in6addr_any, sizeof (in6addr_any)) == 0)
-                src = NULL;
-
-            if (((const struct sockaddr_in6 *)src)->sin6_scope_id)
-                iid = ((const struct sockaddr_in6 *)src)->sin6_scope_id;
+            if (((const struct sockaddr_in6 *)grp)->sin6_scope_id)
+                iid = ((const struct sockaddr_in6 *)grp)->sin6_scope_id;
             break;
 #endif
 
         case AF_INET:
             level = SOL_IP;
-            if ((src != NULL)
-             && ((const struct sockaddr_in *)src)->sin_addr.s_addr
-                  == INADDR_ANY)
-                src = NULL;
             break;
 
         default:
             errno = EAFNOSUPPORT;
             return -1;
     }
+
+    if (src != NULL)
+        switch (src->sa_family)
+        {
+#ifdef AF_INET6
+            case AF_INET6:
+                if (memcmp (&((const struct sockaddr_in6 *)src)->sin6_addr,
+                            &in6addr_any, sizeof (in6addr_any)) == 0)
+                    src = NULL;
+            break;
+#endif
+
+            case AF_INET:
+                if (((const struct sockaddr_in *)src)->sin_addr.s_addr
+                     == INADDR_ANY)
+                    src = NULL;
+                break;
+        }
+
 
     /* Agnostic ASM/SSM multicast join */
 #ifdef MCAST_JOIN_SOURCE_GROUP
