@@ -296,7 +296,6 @@
     id view = [super initWithFrame:frameRect];
     fillColor = [[NSColor clearColor] retain];
     NSRect s_rc = [self frame];
-    NSImage * image;
     addButton( o_prev, @"fs_skip_previous" , @"fs_skip_previous_highlight", 174, 15, prev );
     addButton( o_slow, @"fs_rewind"        , @"fs_rewind_highlight"       , 211, 14, slower );
     addButton( o_play, @"fs_play"          , @"fs_play_highlight"         , 267, 10, play );

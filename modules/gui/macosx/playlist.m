@@ -242,7 +242,6 @@ NSLog( @"expandable" );
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)o_tc byItem:(id)item
 {
     id o_value = nil;
-    intf_thread_t *p_intf = VLCIntf;
     playlist_item_t *p_item;
     
     if( item == nil || ![item isKindOfClass: [NSValue class]] ) return( @"error" );
@@ -380,7 +379,7 @@ NSLog( @"expandable" );
             while( p_parser->pp_shortcuts[++i] != NULL ); i--;
 
             /* Check whether to enable these menuitems */
-            objectname = i>=0 ? p_parser->pp_shortcuts[i] : p_parser->psz_object_name;
+            objectname = i>=0 ? (char *)p_parser->pp_shortcuts[i] : (char *)p_parser->psz_object_name;
             b_enabled = playlist_IsServicesDiscoveryLoaded( p_playlist, objectname );
             
             /* Create the menu entries used in the playlist menu */

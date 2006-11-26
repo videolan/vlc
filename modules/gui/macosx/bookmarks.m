@@ -37,7 +37,7 @@
 #import "bookmarks.h"
 #import "intf.h"
 #import "wizard.h"
-#import <vlc/intf.h>
+#import <vlc_interface.h>
 
 /*****************************************************************************
  * VLCExtended implementation
@@ -171,10 +171,6 @@ static VLCBookmarks *_o_sharedInstance = nil;
         VLC_OBJECT_INPUT, FIND_ANYWHERE );
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
-    char * toBeReturned;
-    toBeReturned = "";
-    int i_toBeReturned;
-    i_toBeReturned = 0;
     int row;
     row = [o_tbl_dataTable selectedRow];
     
@@ -346,7 +342,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
             to: [[NSNumber numberWithInt:
             (pp_bookmarks[i_second]->i_time_offset/1000000)] stringValue]
             ofItem: [NSString stringWithUTF8String:
-            p_input->input.p_item->psz_uri]];
+            input_GetItem(p_input)->psz_uri]];
     vlc_object_release( p_input );
     msg_Dbg(p_intf, "released input");
 }
@@ -436,10 +432,8 @@ static VLCBookmarks *_o_sharedInstance = nil;
         VLC_OBJECT_INPUT, FIND_ANYWHERE );
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
-    char * toBeReturned;
-    toBeReturned = "";
-    int i_toBeReturned;
-    i_toBeReturned = 0;
+    char *toBeReturned;
+    int i_toBeReturned = 0;
     
     if( !p_input )
     {

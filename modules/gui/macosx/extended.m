@@ -39,10 +39,9 @@
 #import "extended.h"
 #import "intf.h"
 #import "vout.h"
-#import <vlc/aout.h>
-#import <aout_internal.h>
-#import <vlc/vout.h>
-#import <vlc/intf.h>
+#import <vlc_aout.h>
+#import <vlc_vout.h>
+#import <vlc_interface.h>
 
 /*****************************************************************************
  * VLCExtended implementation

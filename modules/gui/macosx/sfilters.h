@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <vlc_interface.h>
+#import <vlc/vlc.h>
 
 @interface VLCsFilters : NSObject
 {

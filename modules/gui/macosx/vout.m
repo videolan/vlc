@@ -273,17 +273,19 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         return;
     }
 
-    if( p_input->input.p_item->psz_name != NULL )
+    if( input_GetItem(p_input)->psz_name != NULL )
         o_title = [NSMutableString stringWithUTF8String:
-            p_input->input.p_item->psz_name];
-    if( p_input->input.p_item->psz_uri != NULL )
+            input_GetItem(p_input)->psz_name];
+    if( input_GetItem(p_input)->psz_uri != NULL )
         o_mrl = [NSMutableString stringWithUTF8String:
-            p_input->input.p_item->psz_uri];
+            input_GetItem(p_input)->psz_uri];
     if( o_title == nil )
         o_title = o_mrl;
 
     if( o_mrl != nil )
     {
+        /* FIXME once psz_access is exported, since that syntax is no longer valid */
+#if 0
         if( p_input->input.p_access && !strcmp( p_input->input.p_access->p_module->psz_shortname, "File" ) )
         {
             NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
@@ -291,6 +293,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                 [o_mrl deleteCharactersInRange: prefix_range];
             [o_window setRepresentedFilename: o_mrl];
         }
+#endif
         [o_window setTitle: o_title];
     }
     else

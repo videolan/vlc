@@ -31,7 +31,7 @@
 
 #import "sfilters.h"
 #import "intf.h"
-#import <vlc/vout.h>
+#import <vlc_vout.h>
 
 /* TODO:
     - check for memory leaks
@@ -298,13 +298,24 @@ static VLCsFilters *_o_sharedInstance = nil;
     psz_subfilters = config_GetPsz( p_intf, "sub-filter" );
     if( psz_subfilters )
     {
-        [o_marq_enabled_ckb setState: (bool)strstr( psz_subfilters, "marq")];
-        [o_logo_enabled_ckb setState: (bool)strstr( psz_subfilters, "logo")];
-        [o_time_enabled_ckb setState: (bool)strstr( psz_subfilters, "time")];
+        if( strstr( psz_subfilters, "marq") )
+            [o_marq_enabled_ckb setState: YES];
+        else
+            [o_marq_enabled_ckb setState: NO];
+        
+        if( strstr( psz_subfilters, "logo") )
+            [o_logo_enabled_ckb setState: YES];
+        else
+            [o_logo_enabled_ckb setState: NO];
+        
+        if( strstr( psz_subfilters, "time") )
+            [o_time_enabled_ckb setState: YES];
+        else
+            [o_time_enabled_ckb setState: NO];
     }
-        [self enableMarq];
-        [self enableLogo];
-        [self enableTime];
+    [self enableMarq];
+    [self enableLogo];
+    [self enableTime];
 }
 
 - (IBAction)logo_selectFile:(id)sender
@@ -344,7 +355,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     {
         if( [[o_marq_marq_fld stringValue] length] == 0 )
         {
-            val.psz_string = "";
+            val.psz_string = (char *)"";
         }
         else
         {
@@ -414,7 +425,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     {
         if( [[o_time_stamp_fld stringValue] length] == 0 )
         {
-            val.psz_string = "";
+            val.psz_string = (char *)"";
         }
         else
         {
@@ -508,11 +519,11 @@ static VLCsFilters *_o_sharedInstance = nil;
     {
         if( [o_marq_enabled_ckb state] == NSOnState )
         {
-            [self changeFiltersString:"marq" onOrOff:VLC_TRUE];
+            [self changeFiltersString:(char *)"marq" onOrOff:VLC_TRUE];
         }
         else
         {
-            [self changeFiltersString:"marq" onOrOff:VLC_FALSE];
+            [self changeFiltersString:(char *)"marq" onOrOff:VLC_FALSE];
         }
         [self enableMarq];
     }
@@ -520,11 +531,11 @@ static VLCsFilters *_o_sharedInstance = nil;
     {
         if( [o_logo_enabled_ckb state] == NSOnState )
         {
-            [self changeFiltersString:"logo" onOrOff:VLC_TRUE];
+            [self changeFiltersString:(char *)"logo" onOrOff:VLC_TRUE];
         }
         else
         {
-            [self changeFiltersString:"logo" onOrOff:VLC_FALSE];
+            [self changeFiltersString:(char *)"logo" onOrOff:VLC_FALSE];
         }
         [self enableLogo];
     }
@@ -532,11 +543,11 @@ static VLCsFilters *_o_sharedInstance = nil;
     {
         if( [o_time_enabled_ckb state] == NSOnState )
         {
-            [self changeFiltersString:"time" onOrOff:VLC_TRUE];
+            [self changeFiltersString:(char *)"time" onOrOff:VLC_TRUE];
         }
         else
         {
-            [self changeFiltersString:"time" onOrOff:VLC_FALSE];
+            [self changeFiltersString:(char *)"time" onOrOff:VLC_FALSE];
         }
         [self enableTime];
     }    

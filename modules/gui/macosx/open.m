@@ -43,7 +43,7 @@
 #include "playlist.h"
 #include "open.h"
 #include "output.h"
-#import <vlc/intf.h>
+#import <vlc_interface.h>
 
 /*****************************************************************************
  * GetEjectableMediaOfClass 

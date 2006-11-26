@@ -33,9 +33,8 @@
  *****************************************************************************/
 #import "wizard.h"
 #import "intf.h"
-#import "network.h"
 #import "playlist.h"
-#import <vlc/intf.h>
+#import <vlc_interface.h>
 
 /*****************************************************************************
  * VLCWizard implementation
@@ -306,7 +305,7 @@ static VLCWizard *_o_sharedInstance = nil;
 - (void)resetWizard
 {
     /* get the current state of our setting to keep the selections or not */
-    keepSettingsOrNot = (BOOL *)config_GetInt( VLCIntf, "macosx-wizard-keep" );
+    b_keepSettingsOrNot = (BOOL)config_GetInt( VLCIntf, "macosx-wizard-keep" );
 
     /* go to the front page and clean up a bit */
     [o_userSelections removeAllObjects];
@@ -314,7 +313,7 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_tab_pageHolder selectFirstTabViewItem:self];
 
     
-    if( keepSettingsOrNot )
+    if( b_keepSettingsOrNot )
         return;
     
     /* reset the wizard-window to its default values if wanted */
@@ -1198,10 +1197,10 @@ static VLCWizard *_o_sharedInstance = nil;
                     /* check whether the extension is hidden or not. 
                      * if not, remove it
                      * we need the casting to make GCC4 happy */
-                    if( (int)[[[NSFileManager defaultManager] fileAttributesAtPath: \
+                    if( [[[NSFileManager defaultManager] fileAttributesAtPath: \
                         [[o_userSelections objectForKey:@"pathToStrm"] \
                         objectAtIndex: x] traverseLink: NO] objectForKey: \
-                        NSFileExtensionHidden] == YES )
+                        NSFileExtensionHidden] )
                         fileNameToUse = [NSString stringWithString:
                             [[NSFileManager defaultManager] displayNameAtPath:
                             [[o_userSelections objectForKey:@"pathToStrm"]
@@ -1321,7 +1320,7 @@ static VLCWizard *_o_sharedInstance = nil;
             {
                 /* play the first item and add the others afterwards */
                 playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
-                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, NULL,
+                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, NULL,
                           p_item );
             }
 
@@ -1348,7 +1347,7 @@ static VLCWizard *_o_sharedInstance = nil;
             objectAtIndex:0]];
         x += 1;
     }
-    if( keepSettingsOrNot && savePreviousSel >= 0 )
+    if( b_keepSettingsOrNot && savePreviousSel >= 0 )
         [o_t4_pop_videoCodec selectItemAtIndex: savePreviousSel];
 
     savePreviousSel = [o_t4_pop_audioCodec indexOfSelectedItem];
@@ -1360,7 +1359,7 @@ static VLCWizard *_o_sharedInstance = nil;
             objectAtIndex:0]];
         x += 1;
     }
-    if( keepSettingsOrNot && savePreviousSel >= 0 )
+    if( b_keepSettingsOrNot && savePreviousSel >= 0 )
         [o_t4_pop_audioCodec selectItemAtIndex: savePreviousSel];
 }
 
