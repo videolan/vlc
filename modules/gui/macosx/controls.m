@@ -39,6 +39,9 @@
 #import "playlist.h"
 #include <vlc_osd.h>
 
+/* UGLY UGLY UGLY FIXME FIXME FIXME. Need solution for b_can_pace_control.
+ * Put it public ? Is it needed here ?*/
+#include "../../../src/input/input_internal.h"
 
 /*****************************************************************************
  * VLCControls implementation 
@@ -785,7 +788,7 @@
     {
         if( p_input != NULL )
         {
-            bEnabled = p_input->input.b_can_pace_control;
+            bEnabled = p_input->p->input.b_can_pace_control;
         }
         else
         {
