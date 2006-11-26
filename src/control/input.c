@@ -25,6 +25,7 @@
 #include <vlc/libvlc.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
+#include "input/input_internal.h"
 
 void libvlc_input_free( libvlc_input_t *p_input )
 {
