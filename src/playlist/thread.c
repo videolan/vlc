@@ -27,6 +27,7 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include "playlist_internal.h"
+#include "interface/interface.h"
 
 /*****************************************************************************
  * Local prototypes

@@ -27,7 +27,7 @@
 #include <vlc_input.h>
 #include <vlc_vlm.h>
 
-void InitVLM( libvlc_instance_t *p_instance )
+static void InitVLM( libvlc_instance_t *p_instance )
 {
 #ifdef ENABLE_VLM
     if( p_instance->p_vlm ) return;

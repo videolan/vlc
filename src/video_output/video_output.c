@@ -46,7 +46,7 @@
 #include <vlc_osd.h>
 
 #if defined( __APPLE__ )
-#include "darwin_specific.h"
+/* Include darwin_specific.h here if needed */
 #endif
 
 /** FIXME This is quite ugly but needed while we don't have counters
