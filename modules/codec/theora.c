@@ -28,7 +28,7 @@
 #include <vlc_codec.h>
 #include <vlc_vout.h>
 #include <vlc_sout.h>
-
+#include <vlc_input.h>
 #include <ogg/ogg.h>
 
 #include <theora/theora.h>

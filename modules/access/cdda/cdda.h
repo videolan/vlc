@@ -30,8 +30,8 @@
 #include <cdio/mmc.h>
 #endif
 
-#include "vlc_meta.h"
-#include "codecs.h"
+#include <vlc_meta.h>
+#include <vlc_codecs.h>
 
 #ifdef HAVE_LIBCDDB
 #include <cddb/cddb.h>

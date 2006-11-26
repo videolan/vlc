@@ -37,7 +37,7 @@
 #include <vlc_demux.h>
 #include <vlc_access.h>
 #include <vlc_vout.h>
-#include <codecs.h>
+#include <vlc_codecs.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
