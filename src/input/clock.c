@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <vlc/vlc.h>
 
-#include <vlc/input.h>
 #include "input_internal.h"
 
 /*
@@ -58,7 +57,7 @@
  * in all the FIFOs, but it may be not enough.
  */
 
-/* p_input->i_cr_average : Maximum number of samples used to compute the
+/* p_input->p->i_cr_average : Maximum number of samples used to compute the
  * dynamic average value.
  * We use the following formula :
  * new_average = (old_average * c_average + new_sample_value) / (c_average +1)
@@ -90,7 +89,7 @@ static mtime_t ClockToSysdate( input_thread_t *p_input,
     if( cl->i_synchro_state == SYNCHRO_OK )
     {
         i_sysdate = (mtime_t)(i_clock - cl->cr_ref)
-                        * (mtime_t)p_input->i_rate
+                        * (mtime_t)p_input->p->i_rate
                         * (mtime_t)300;
         i_sysdate /= 27;
         i_sysdate /= 1000;
@@ -109,7 +108,7 @@ static mtime_t ClockCurrent( input_thread_t *p_input,
                              input_clock_t *cl )
 {
     return( (mdate() - cl->sysdate_ref) * 27 * INPUT_RATE_DEFAULT
-             / p_input->i_rate / 300
+             / p_input->p->i_rate / 300
              + cl->cr_ref );
 }
 
@@ -157,31 +156,31 @@ int input_ClockManageControl( input_thread_t * p_input,
     vlc_value_t val;
     int i_return_value = UNDEF_S;
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
+    vlc_mutex_lock( &p_input->p->stream.stream_lock );
 
-    if( p_input->stream.i_new_status == PAUSE_S )
+    if( p_input->p->stream.i_new_status == PAUSE_S )
     {
         int i_old_status;
 
-        vlc_mutex_lock( &p_input->stream.control.control_lock );
-        i_old_status = p_input->stream.control.i_status;
-        p_input->stream.control.i_status = PAUSE_S;
-        vlc_mutex_unlock( &p_input->stream.control.control_lock );
+        vlc_mutex_lock( &p_input->p->stream.control.control_lock );
+        i_old_status = p_input->p->stream.control.i_status;
+        p_input->p->stream.control.i_status = PAUSE_S;
+        vlc_mutex_unlock( &p_input->p->stream.control.control_lock );
 
-        vlc_cond_wait( &p_input->stream.stream_wait,
-                       &p_input->stream.stream_lock );
+        vlc_cond_wait( &p_input->p->stream.stream_wait,
+                       &p_input->p->stream.stream_lock );
         ClockNewRef( p_pgrm, i_clock, p_pgrm->last_pts > mdate() ?
                                       p_pgrm->last_pts : mdate() );
 
-        if( p_input->stream.i_new_status == PAUSE_S )
+        if( p_input->p->stream.i_new_status == PAUSE_S )
         {
             /* PAUSE_S undoes the pause state: Return to old state. */
-            vlc_mutex_lock( &p_input->stream.control.control_lock );
-            p_input->stream.control.i_status = i_old_status;
-            vlc_mutex_unlock( &p_input->stream.control.control_lock );
+            vlc_mutex_lock( &p_input->p->stream.control.control_lock );
+            p_input->p->stream.control.i_status = i_old_status;
+            vlc_mutex_unlock( &p_input->p->stream.control.control_lock );
 
-            p_input->stream.i_new_status = UNDEF_S;
-            p_input->stream.i_new_rate = UNDEF_S;
+            p_input->p->stream.i_new_status = UNDEF_S;
+            p_input->p->stream.i_new_rate = UNDEF_S;
         }
 
         /* We handle i_new_status != PAUSE_S below... */
@@ -189,43 +188,43 @@ int input_ClockManageControl( input_thread_t * p_input,
         i_return_value = PAUSE_S;
     }
 
-    if( p_input->stream.i_new_status != UNDEF_S )
+    if( p_input->p->stream.i_new_status != UNDEF_S )
     {
-        vlc_mutex_lock( &p_input->stream.control.control_lock );
+        vlc_mutex_lock( &p_input->p->stream.control.control_lock );
 
-        p_input->stream.control.i_status = p_input->stream.i_new_status;
+        p_input->p->stream.control.i_status = p_input->stream.i_new_status;
 
         ClockNewRef( p_pgrm, i_clock,
                      ClockToSysdate( p_input, p_pgrm, i_clock ) );
 
-        if( p_input->stream.control.i_status == PLAYING_S )
+        if( p_input->p->stream.control.i_status == PLAYING_S )
         {
-            p_input->stream.control.i_rate = DEFAULT_RATE;
-            p_input->stream.control.b_mute = 0;
+            p_input->p->stream.control.i_rate = DEFAULT_RATE;
+            p_input->p->stream.control.b_mute = 0;
         }
         else
         {
-            p_input->stream.control.i_rate = p_input->stream.i_new_rate;
-            p_input->stream.control.b_mute = 1;
+            p_input->p->stream.control.i_rate = p_input->stream.i_new_rate;
+            p_input->p->stream.control.b_mute = 1;
 
             /* Feed the audio decoders with a NULL packet to avoid
              * discontinuities. */
             input_EscapeAudioDiscontinuity( p_input );
         }
 
-        val.i_int = p_input->stream.control.i_rate;
+        val.i_int = p_input->p->stream.control.i_rate;
         var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
 
-        val.i_int = p_input->stream.control.i_status;
+        val.i_int = p_input->p->stream.control.i_status;
         var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
-        p_input->stream.i_new_status = UNDEF_S;
-        p_input->stream.i_new_rate = UNDEF_S;
+        p_input->p->stream.i_new_status = UNDEF_S;
+        p_input->p->stream.i_new_rate = UNDEF_S;
 
-        vlc_mutex_unlock( &p_input->stream.control.control_lock );
+        vlc_mutex_unlock( &p_input->p->stream.control.control_lock );
     }
 
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    vlc_mutex_unlock( &p_input->p->stream.stream_lock );
 
     return( i_return_value );
 #endif
@@ -248,10 +247,10 @@ void input_ClockSetPCR( input_thread_t *p_input,
                      cl->last_pts + CR_MEAN_PTS_GAP : mdate() );
         cl->i_synchro_state = SYNCHRO_OK;
 
-        if( p_input->b_can_pace_control && cl->b_master )
+        if( p_input->p->b_can_pace_control && cl->b_master )
         {
             cl->last_cr = i_clock;
-            if( !p_input->b_out_pace_control )
+            if( !p_input->p->b_out_pace_control )
             {
                 mtime_t i_wakeup = ClockToSysdate( p_input, cl, i_clock );
                 while( (i_wakeup - mdate()) / CLOCK_FREQ > 1 )
@@ -289,12 +288,12 @@ void input_ClockSetPCR( input_thread_t *p_input,
 
         cl->last_cr = i_clock;
 
-        if( p_input->b_can_pace_control && cl->b_master )
+        if( p_input->p->b_can_pace_control && cl->b_master )
         {
             /* Wait a while before delivering the packets to the decoder.
              * In case of multiple programs, we arbitrarily follow the
              * clock of the selected program. */
-            if( !p_input->b_out_pace_control )
+            if( !p_input->p->b_out_pace_control )
             {
                 mtime_t i_wakeup = ClockToSysdate( p_input, cl, i_clock );
                 while( (i_wakeup - mdate()) / CLOCK_FREQ > 1 )

@@ -23,12 +23,12 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/sout.h>
-#include <vlc/input.h>
-#include "vlc_playlist.h"
-#include "vlc_interaction.h"
+#include <vlc_vout.h>
+#include <vlc_sout.h>
+#include <vlc_playlist.h>
+#include <vlc_interface.h>
 #include "playlist_internal.h"
+#include "stream_output/stream_output.h" /* sout_DeleteInstance */
 
 /*****************************************************************************
  * Local prototypes

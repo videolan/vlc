@@ -37,13 +37,11 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 
-#include "audio_output.h"
+#include <vlc_aout.h>
+#include <vlc_vout.h>
 
 #include "vlc_interface.h"
-#include "vlc_video.h"
-#include "video_output.h"
 
 #ifdef __APPLE__
 #    include <Cocoa/Cocoa.h>

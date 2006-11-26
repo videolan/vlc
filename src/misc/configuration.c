@@ -23,7 +23,7 @@
 
 #include <vlc/vlc.h>
 #include "vlc_keys.h"
-#include "charset.h"
+#include "vlc_charset.h"
 
 #include <stdio.h>                                              /* sprintf() */
 #include <stdlib.h>                                      /* free(), strtol() */
@@ -62,6 +62,8 @@
 #   endif
 #include <tchar.h>
 #endif
+
+#include "configuration.h"
 
 static int ConfigStringToKey( const char * );
 static char *ConfigKeyToString( int );

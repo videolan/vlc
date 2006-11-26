@@ -502,21 +502,21 @@ vlcObject_config_get( PyObject *self, PyObject *args )
     switch ( p_config->i_type )
     {
     case CONFIG_ITEM_BOOL      :
-        p_retval = PyBool_FromLong( p_config->i_value );
+        p_retval = PyBool_FromLong( p_config->value.i );
         break;
     case CONFIG_ITEM_INTEGER   :
-        p_retval = PyInt_FromLong( ( long )p_config->i_value );
+        p_retval = PyInt_FromLong( ( long )p_config->value.i );
         break;
     case CONFIG_ITEM_KEY   :
-        p_retval = PyString_FromFormat( "A hotkey variable ( %d )", p_config->i_value );
+        p_retval = PyString_FromFormat( "A hotkey variable ( %d )", p_config->value.i );
         break;
     case CONFIG_ITEM_FILE      :
     case CONFIG_ITEM_STRING    :
     case CONFIG_ITEM_DIRECTORY :
     case CONFIG_ITEM_MODULE    :
         vlc_mutex_lock( p_config->p_lock );
-        if( p_config->psz_value )
-            p_retval = PyString_FromString( p_config->psz_value );
+        if( p_config->value.psz )
+            p_retval = PyString_FromString( p_config->value.psz );
         else
             p_retval = PyString_FromString( "" );
         vlc_mutex_unlock( p_config->p_lock );
@@ -525,7 +525,7 @@ vlcObject_config_get( PyObject *self, PyObject *args )
         ( ( vlcObject* )p_retval )->p_object = value.p_object;
         break;
     case CONFIG_ITEM_FLOAT     :
-        p_retval = PyFloat_FromDouble( ( double )p_config->f_value );
+        p_retval = PyFloat_FromDouble( ( double )p_config->value.f );
         break;
     default:
         p_retval = Py_None;

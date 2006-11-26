@@ -70,8 +70,8 @@ void E_(Close_GVP) ( vlc_object_t * );
 #define INIT_PLAYLIST_STUFF \
     playlist_t *p_playlist = pl_Yield( p_demux ); \
     vlc_bool_t b_play = var_CreateGetBool( p_demux, "playlist-autostart" ); \
-    input_item_t *p_current_input = ( (input_thread_t*)p_demux->p_parent)-> \
-                                                         input.p_item; \
+    input_item_t *p_current_input = input_GetItem( \
+                                     (input_thread_t*)p_demux->p_parent); \
     playlist_item_t *p_current = \
                  playlist_ItemGetByInput( p_playlist, p_current_input, VLC_FALSE ); \
     playlist_item_t *p_item_in_category = \

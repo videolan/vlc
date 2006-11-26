@@ -26,7 +26,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include "charset.h"
+#include <vlc_charset.h>
 
 #include <assert.h>
 

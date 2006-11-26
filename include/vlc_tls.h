@@ -24,7 +24,7 @@
 #ifndef _VLC_TLS_H
 # define _VLC_TLS_H
 
-# include "network.h"
+# include <vlc_network.h>
 
 struct tls_t
 {

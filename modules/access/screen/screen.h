@@ -21,6 +21,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_input.h>
+#include <vlc_access.h>
+#include <vlc_demux.h>
+
 typedef struct screen_data_t screen_data_t;
 
 struct demux_sys_t

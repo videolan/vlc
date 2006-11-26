@@ -29,11 +29,11 @@
 #include <math.h>
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
-#include <vlc/vout.h>
+#include <vlc_sout.h>
+#include <vlc_vout.h>
 
-#include <charset.h>
-#include <network.h>
+#include <vlc_charset.h>
+#include <vlc_network.h>
 
 #define HAVE_MMX
 #ifdef HAVE_FFMPEG_AVCODEC_H

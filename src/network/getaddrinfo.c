@@ -42,7 +42,7 @@
 #   include <unistd.h>
 #endif
 
-#include "network.h"
+#include <vlc_network.h>
 
 #ifndef NO_ADDRESS
 #   define NO_ADDRESS  NO_DATA

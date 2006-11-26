@@ -30,7 +30,7 @@
 #include <math.h>                                            /* sin(), cos() */
 
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
+#include <vlc_vout.h>
 
 #include "vlc_filter.h"
 

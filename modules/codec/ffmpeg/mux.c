@@ -27,8 +27,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
+#include <vlc_block.h>
+#include <vlc_sout.h>
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVFORMAT_H

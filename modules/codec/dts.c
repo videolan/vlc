@@ -26,9 +26,9 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-
-#include "vlc_block_helper.h"
+#include <vlc_codec.h>
+#include <vlc_aout.h>
+#include <vlc_block_helper.h>
 
 #define DTS_HEADER_SIZE 14
 

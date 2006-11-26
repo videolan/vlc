@@ -25,10 +25,9 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <aout_internal.h>
-#include <vlc/vout.h>
-#include <vlc/intf.h>
+#include <vlc_aout.h>
+#include <vlc_vout.h>
+#include <vlc_interface.h>
 
 #include <math.h>
 

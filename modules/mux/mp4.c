@@ -29,8 +29,9 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_block.h>
+#include <vlc_codecs.h>
 
 #ifdef HAVE_TIME_H
 #include <time.h>

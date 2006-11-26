@@ -30,7 +30,7 @@
 #include <fcntl.h>
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 #include <lirc/lirc_client.h>
 

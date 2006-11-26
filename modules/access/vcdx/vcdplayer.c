@@ -30,8 +30,8 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/intf.h>
+#include <<vlc_input.h>>
+#include <vlc_interface.h>
 
 #include "vcd.h"
 #include "vcdplayer.h"

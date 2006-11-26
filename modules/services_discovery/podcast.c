@@ -28,11 +28,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-
-#include <vlc/input.h>
-
-#include "network.h"
+#include <vlc_playlist.h>
+#include <vlc_network.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 

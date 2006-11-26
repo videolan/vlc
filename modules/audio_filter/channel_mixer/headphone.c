@@ -30,8 +30,7 @@
 #include <math.h>                                        /* sqrt */
 
 #include <vlc/vlc.h>
-#include <audio_output.h>
-#include <aout_internal.h>
+#include <vlc_aout.h>
 #include <vlc_filter.h>
 #include <vlc_block.h>
 

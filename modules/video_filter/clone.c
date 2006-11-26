@@ -28,7 +28,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #include "filter_common.h"
 

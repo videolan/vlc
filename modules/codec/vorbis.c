@@ -25,9 +25,10 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
+#include <vlc_codec.h>
+#include <vlc_aout.h>
+#include <vlc_input.h>
+#include <vlc_sout.h>
 
 #include <ogg/ogg.h>
 
@@ -604,9 +605,12 @@ static void ParseVorbisComments( decoder_t *p_dec )
 {
     input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
     char *psz_name, *psz_value, *psz_comment;
+    input_item_t *p_item;
     int i = 0;
 
     if( p_input->i_object_type != VLC_OBJECT_INPUT ) return;
+
+    p_item = input_GetItem( p_input );
 
     while( i < p_dec->p_sys->vc.comments )
     {
@@ -628,9 +632,9 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetArtist( p_input->input.p_item->p_meta,
+                    vlc_meta_SetArtist( p_item->p_meta,
                                         psz_value );
-                    input_ItemAddInfo( p_input->input.p_item,
+                    input_ItemAddInfo( p_item,
                                         _(VLC_META_INFO_CAT),
                                         _(VLC_META_ARTIST),
                                         "%s", psz_value );
@@ -640,16 +644,16 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetTitle( p_input->input.p_item->p_meta,
+                    vlc_meta_SetTitle( p_item->p_meta,
                                     psz_value );
-                    p_input->input.p_item->psz_name = strdup( psz_value );
+                    p_item->psz_name = strdup( psz_value );
                 }
             }
             else if( !strcasecmp( psz_name, "album" ) )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetAlbum( p_input->input.p_item->p_meta,
+                    vlc_meta_SetAlbum( p_item->p_meta,
                                     psz_value );
                 }
             }
@@ -657,7 +661,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetTrackID( p_input->input.p_item->p_meta,
+                    vlc_meta_SetTrackID( p_item->p_meta,
                                     psz_value );
                 }
             }
@@ -666,7 +670,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetArtistID( p_input->input.p_item->p_meta,
+                    vlc_meta_SetArtistID( p_item->p_meta,
                                     psz_value );
                 }
             }
@@ -674,14 +678,14 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetAlbumID( p_input->input.p_item->p_meta,
+                    vlc_meta_SetAlbumID( p_item->p_meta,
                                     psz_value );
                 }
             }
 #endif
         }
         /* FIXME */
-        var_SetInteger( p_input, "item-change", p_input->input.p_item->i_id );
+        var_SetInteger( p_input, "item-change", p_item->i_id );
         free( psz_comment );
         i++;
     }

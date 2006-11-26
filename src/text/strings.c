@@ -36,14 +36,14 @@
 #include <time.h>
 
 /* Needed by str_format_meta */
-#include "vlc_input.h"
-#include "vlc_meta.h"
-#include "vlc_playlist.h"
-#include <vlc/aout.h>
+#include <vlc_input.h>
+#include <vlc_meta.h>
+#include <vlc_playlist.h>
+#include <vlc_aout.h>
 
-#include "vlc_strings.h"
-#include "vlc_url.h"
-#include "charset.h"
+#include <vlc_strings.h>
+#include <vlc_url.h>
+#include <vlc_charset.h>
 
 /**
  * Unescape URI encoded string
@@ -385,7 +385,7 @@ char *__str_format_meta( vlc_object_t *p_object, char *string )
     if( p_input )
     {
         vlc_object_yield( p_input );
-        p_item = p_input->input.p_item;
+        p_item = input_GetItem(p_input);
         if( p_item )
             vlc_mutex_lock( &p_item->lock );
     }

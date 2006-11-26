@@ -37,11 +37,11 @@
 #    include <unistd.h>
 #endif
 
-#include <vlc/decoder.h>
-#include <vlc/input.h>
-#include <vlc/intf.h>
-#include <vlc/vout.h>
-
+#include <vlc_codec.h>
+#include <vlc_input.h>
+#include <vlc_interface.h>
+#include <vlc_vout.h>
+#include <vlc_playlist.h>
 #include <vlc_osd.h>
 
 #include "vlc_keys.h"

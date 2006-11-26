@@ -31,7 +31,7 @@
 #include <math.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #ifdef HAVE_LIMITS_H
 #   include <limits.h> /* INT_MAX */

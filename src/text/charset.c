@@ -48,7 +48,7 @@
 #   include <string.h>
 #endif
 
-#include "charset.h"
+#include <vlc_charset.h>
 
 typedef struct VLCCharsetAlias
 {

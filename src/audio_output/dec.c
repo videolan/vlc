@@ -33,13 +33,13 @@
 #   include <alloca.h>
 #endif
 
-#include "audio_output.h"
-#include "aout_internal.h"
-#include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
+#include <vlc_aout.h>
+#include <vlc_input.h>
 
-/*
- * Creation/Deletion
- */
+#include "aout_internal.h"
+
+/** FIXME: Ugly but needed to access the counters */
+#include "input/input_internal.h"
 
 /*****************************************************************************
  * aout_DecNew : create a decoder
@@ -312,11 +312,11 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   p_buffer->start_date - mdate());
         if( p_input->p_input_thread )
         {
-            vlc_mutex_lock( &p_input->p_input_thread->counters.counters_lock);
+            vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
             stats_UpdateInteger( p_aout,
-                           p_input->p_input_thread->counters.p_lost_abuffers,
+                           p_input->p_input_thread->p->counters.p_lost_abuffers,
                            1, NULL );
-            vlc_mutex_unlock( &p_input->p_input_thread->counters.counters_lock);
+            vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
         }
         aout_BufferFree( p_buffer );
         return -1;
@@ -370,11 +370,11 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     aout_MixerRun( p_aout );
     if( p_input->p_input_thread )
     {
-        vlc_mutex_lock( &p_input->p_input_thread->counters.counters_lock);
+        vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
         stats_UpdateInteger( p_aout,
-                             p_input->p_input_thread->counters.p_played_abuffers,
+                             p_input->p_input_thread->p->counters.p_played_abuffers,
                              1, NULL );
-        vlc_mutex_unlock( &p_input->p_input_thread->counters.counters_lock);
+        vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
     }
     vlc_mutex_unlock( &p_aout->mixer_lock );
 

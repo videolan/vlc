@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_codec.h: codec related structures
+ * vlc_codec.h: Definition of the decoder and encoder structures
  *****************************************************************************
  * Copyright (C) 1999-2003 the VideoLAN team
  * $Id$
@@ -22,6 +22,9 @@
  *****************************************************************************/
 #ifndef _VLC_CODEC_H
 #define _VLC_CODEC_H 1
+
+#include <vlc_block.h>
+#include <vlc_es.h>
 
 /**
  * \file

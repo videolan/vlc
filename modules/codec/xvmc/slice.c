@@ -1,4 +1,4 @@
-/* $Id:$
+/* $Id$
  * slice.c
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 2003      Peter Gubanov <peter@elecard.net.ru>

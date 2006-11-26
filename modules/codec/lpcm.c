@@ -28,7 +28,8 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
+#include <vlc_codec.h>
+#include <vlc_aout.h>
 
 /*****************************************************************************
  * decoder_sys_t : lpcm decoder descriptor

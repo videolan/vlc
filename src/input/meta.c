@@ -23,10 +23,11 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_input.h>
+#include <vlc_stream.h>
 #include <vlc_meta.h>
-#include "vlc_playlist.h"
-#include "charset.h"
+#include <vlc_playlist.h>
+#include <vlc_charset.h>
 #include "../playlist/playlist_internal.h"
 
 #ifdef HAVE_SYS_STAT_H
@@ -185,7 +186,7 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     char *psz_artist = NULL;
     char *psz_album = NULL;
     char *psz_type;
-    int  i;
+    unsigned int  i;
     if( p_item->p_meta->psz_artist )
         psz_artist = strdup( p_item->p_meta->psz_artist );
     if( p_item->p_meta->psz_album )

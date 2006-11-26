@@ -25,12 +25,6 @@ pkgincludedir = $(includedir)/vlc
 dist_pkginclude_HEADERS = \
 	../include/vlc/vlc.h \
 	../include/vlc/libvlc.h \
-	../include/vlc/aout.h \
-	../include/vlc/vout.h \
-	../include/vlc/sout.h \
-	../include/vlc/decoder.h \
-	../include/vlc/input.h \
-	../include/vlc/intf.h \
 	../include/vlc/mediacontrol.h \
 	../include/vlc/mediacontrol_structures.h \
 	$(NULL)
@@ -39,27 +33,21 @@ noinst_HEADERS = $(HEADERS_include)
 noinst_DATA = $(DATA_noinst_libvlc)
 
 HEADERS_include = \
-	../include/aout_internal.h \
-	../include/audio_output.h \
-	../include/beos_specific.h \
-	../include/charset.h \
-	../include/codecs.h \
-	../include/configuration.h \
-	../include/darwin_specific.h \
-	../include/intf_eject.h \
 	../include/iso_lang.h \
 	../include/main.h \
 	../include/mmx.h \
-	../include/modules.h \
-	../include/modules_inner.h \
-	../include/mtime.h \
-	../include/network.h \
-	../include/os_specific.h \
-	../include/snapshot.h \
-	../include/stream_output.h \
+	../include/vlc_modules.h \
+	../include/vlc_modules_macros.h \
+	../include/vlc_os_specific.h \
+	../include/vlc_mtime.h \
+	../include/vlc_network.h \
+	../include/vlc_codecs.h \
+	../include/vlc_configuration.h \
+	../include/vlc_charset.h \
+	../include/vlc_sout.h \
 	../include/vlc_streaming.h \
-	../include/variables.h \
-	../include/video_output.h \
+	../include/vlc_variables.h \
+	../include/vlc_aout.h \
 	../include/vlc_access.h \
 	../include/vlc_arrays.h \
 	../include/vlc_acl.h \
@@ -69,9 +57,7 @@ HEADERS_include = \
 	../include/vlc_codec.h \
 	../include/vlc_common.h \
 	../include/vlc_config.h \
-	../include/vlc_cpu.h \
 	../include/vlc_demux.h \
-	../include/vlc_error.h \
 	../include/vlc_es.h \
 	../include/vlc_es_out.h \
 	../include/vlc_filter.h \
@@ -82,7 +68,6 @@ HEADERS_include = \
 	../include/vlc_devices.h \
 	../include/vlc_image.h \
 	../include/vlc_input.h \
-	../include/vlc_interaction.h \
 	../include/vlc_interface.h \
 	../include/vlc_intf_strings.h \
 	../include/vlc_keys.h \
@@ -91,7 +76,6 @@ HEADERS_include = \
 	../include/vlc_objects.h \
 	../include/vlc_osd.h \
 	../include/vlc_playlist.h \
-	../include/vlc_spu.h \
 	../include/vlc_stream.h \
 	../include/vlc_strings.h \
 	../include/vlc_symbols.h \
@@ -99,14 +83,11 @@ HEADERS_include = \
 	../include/vlc_threads.h \
 	../include/vlc_update.h \
 	../include/vlc_url.h \
-	../include/vlc_video.h \
+	../include/vlc_vout.h \
 	../include/vlc_vlm.h \
 	../include/vlc_vod.h \
 	../include/vlc_xml.h \
-	../include/vout_synchro.h \
-	../include/win32_specific.h \
-	../include/libvlc_internal.h \
-	../include/mediacontrol_internal.h
+	../include/vlc_vout_synchro.h \
 	$(NULL)
 
 misc/modules_builtin.h: misc/modules_builtin.h.in
@@ -255,6 +236,7 @@ SOURCES_libvlc_common = \
 	libvlc.c \
 	libvlc-common.c \
 	libvlc.h \
+	interface/interface.h \
 	interface/interface.c \
 	interface/intf_eject.c \
 	interface/interaction.c \
@@ -290,6 +272,7 @@ SOURCES_libvlc_common = \
 	video_output/vout_subpictures.c \
 	video_output/vout_synchro.c \
 	video_output/vout_intf.c \
+	audio_output/aout_internal.h \
 	audio_output/common.c \
 	audio_output/dec.c \
 	audio_output/filters.c \
@@ -298,6 +281,7 @@ SOURCES_libvlc_common = \
 	audio_output/output.c \
 	audio_output/intf.c \
 	stream_output/stream_output.c \
+	stream_output/stream_output.h \
 	stream_output/announce.c \
 	stream_output/profiles.c \
 	stream_output/sap.c \
@@ -322,15 +306,18 @@ SOURCES_libvlc_common = \
 	misc/md5.c \
 	misc/mtime.c \
 	misc/block.c \
+	misc/modules.h \
 	misc/modules.c \
 	misc/threads.c \
 	misc/stats.c \
 	misc/cpu.c \
+	misc/configuration.h \
 	misc/configuration.c \
 	misc/configuration_chain.c \
 	misc/image.c \
 	misc/messages.c \
 	misc/objects.c \
+	misc/variables.h \
 	misc/variables.c \
 	misc/error.c \
 	misc/update.c \
@@ -351,6 +338,7 @@ SOURCES_libvlc = \
 	$(NULL)
 
 SOURCES_libvlc_control = \
+	control/libvlc_internal.h \
 	control/core.c \
 	control/log.c \
 	control/playlist.c \
@@ -358,6 +346,7 @@ SOURCES_libvlc_control = \
 	control/input.c \
 	control/video.c \
 	control/audio.c \
+	control/mediacontrol_internal.h \
 	control/mediacontrol_core.c \
 	control/mediacontrol_util.c \
 	control/mediacontrol_audio_video.c

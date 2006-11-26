@@ -27,7 +27,7 @@
 #include "main_interface.hpp"
 #include "input_manager.hpp"
 
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #include <QLabel>
 #include <QSpacerItem>

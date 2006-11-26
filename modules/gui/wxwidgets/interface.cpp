@@ -31,12 +31,12 @@
 #include "video.hpp"
 #include <vlc_keys.h>
 
-#include "charset.h"
+#include "vlc_charset.h"
 
-#include <vlc/aout.h>
-#include "charset.h"
+#include <vlc_aout.h>
+#include "vlc_charset.h"
 
-#include <vlc_interaction.h>
+#include <vlc_interface.h>
 
 #include <wx/splitter.h>
 

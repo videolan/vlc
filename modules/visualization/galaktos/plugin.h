@@ -25,8 +25,8 @@
 #define _GALAKTOS_PLUGIN_H_
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <vlc/vout.h>
+#include <vlc_aout.h>
+#include <vlc_vout.h>
 
 #define MAX_BLOCKS 10
 

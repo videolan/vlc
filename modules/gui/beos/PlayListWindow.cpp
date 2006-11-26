@@ -32,7 +32,7 @@
 
 /* VLC headers */
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 /* BeOS interface headers */
 #include "InterfaceWindow.h"

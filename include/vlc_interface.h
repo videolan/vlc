@@ -23,6 +23,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _VLC_INTF_H_
+#define _VLC_INTF_H_
+
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 typedef struct intf_dialog_args_t intf_dialog_args_t;
 
@@ -32,19 +38,13 @@ typedef struct intf_dialog_args_t intf_dialog_args_t;
  * interface management in vlc
  */
 
-
-/*****************************************************************************
- * intf_thread_t: describe an interface thread
- *****************************************************************************
- * This struct describes all interface-specific data of the main (interface)
- * thread.
- *****************************************************************************/
-
 /**
  * \defgroup vlc_interface Interface
  * These functions and structures are for interface management
  * @{
  */
+
+/** Describe all interface-specific data of the interface thread */
 struct intf_thread_t
 {
     VLC_COMMON_MEMBERS
@@ -84,12 +84,10 @@ struct intf_thread_t
     char *psz_switch_intf;
 };
 
-/*****************************************************************************
- * intf_dialog_args_t: arguments structure passed to a dialogs provider.
- *****************************************************************************
- * This struct describes the arguments passed to the dialogs provider.
- * For now they are only used with INTF_DIALOG_FILE_GENERIC.
- *****************************************************************************/
+/** \brief Arguments passed to a dialogs provider
+ *  This describes the arguments passed to the dialogs provider. They are
+ *  mainly iused with INTF_DIALOG_FILE_GENERIC
+ */
 struct intf_dialog_args_t
 {
     intf_thread_t *p_intf;
@@ -123,6 +121,9 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
  * p_intf->b_die and p_libvlc->b_die */
 #define intf_ShouldDie( p_intf ) (p_intf->b_die || (p_intf->b_block && p_intf->p_libvlc->b_die ) )
 
+#define intf_Eject(a,b) __intf_Eject(VLC_OBJECT(a),b)
+VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
+
 /*@}*/
 
 /*****************************************************************************
@@ -153,7 +154,6 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 #define INTF_DIALOG_NET         4
 #define INTF_DIALOG_CAPTURE     5
 #define INTF_DIALOG_SAT         6
-
 #define INTF_DIALOG_DIRECTORY   7
 
 #define INTF_DIALOG_STREAMWIZARD 8
@@ -194,3 +194,137 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
                           EXTENSIONS_PLAYLIST
 
 #define EXTENSIONS_SUBTITLE "*.idx;*.srt;*.sub;*.utf"
+
+/** \defgroup vlc_interaction Interaction
+ * \ingroup vlc_interface
+ * Interaction between user and modules
+ * @{
+ */
+
+/**
+ * This structure describes a piece of interaction with the user
+ */
+struct interaction_dialog_t
+{
+    int             i_id;               ///< Unique ID
+    int             i_type;             ///< Type identifier
+    char           *psz_title;          ///< Title
+    char           *psz_description;    ///< Descriptor string
+    char           *psz_default_button;  ///< default button title (~OK)
+    char           *psz_alternate_button;///< alternate button title (~NO)
+    /// other button title (optional,~Cancel)
+    char           *psz_other_button;
+
+    char           *psz_returned[1];    ///< returned responses from the user
+
+    vlc_value_t     val;                ///< value coming from core for dialogue
+    int             i_timeToGo;         ///< time (in sec) until shown progress is finished
+    vlc_bool_t      b_cancelled;        ///< was the dialogue cancelled ?
+
+    void *          p_private;          ///< Private interface data
+
+    int             i_status;           ///< Dialog status;
+    int             i_action;           ///< Action to perform;
+    int             i_flags;            ///< Misc flags
+    int             i_return;           ///< Return status
+
+    interaction_t  *p_interaction;      ///< Parent interaction object
+    vlc_object_t   *p_parent;           ///< The vlc object that asked
+                                        //for interaction
+};
+/**
+ * Possible flags . Dialog types
+ */
+#define DIALOG_GOT_ANSWER           0x01
+#define DIALOG_YES_NO_CANCEL        0x02
+#define DIALOG_LOGIN_PW_OK_CANCEL   0x04
+#define DIALOG_PSZ_INPUT_OK_CANCEL  0x08
+#define DIALOG_BLOCKING_ERROR       0x10
+#define DIALOG_NONBLOCKING_ERROR    0x20
+#define DIALOG_WARNING              0x40
+#define DIALOG_USER_PROGRESS        0x80
+#define DIALOG_INTF_PROGRESS        0x100
+
+/** Possible return codes */
+enum
+{
+    DIALOG_DEFAULT,
+    DIALOG_OK_YES,
+    DIALOG_NO,
+    DIALOG_CANCELLED
+};
+
+/** Possible status  */
+enum
+{
+    NEW_DIALOG,                 ///< Just created
+    SENT_DIALOG,                ///< Sent to interface
+    UPDATED_DIALOG,             ///< Update to send
+    ANSWERED_DIALOG,            ///< Got "answer"
+    HIDING_DIALOG,              ///< Hiding requested
+    HIDDEN_DIALOG,              ///< Now hidden. Requesting destruction
+    DESTROYED_DIALOG,           ///< Interface has destroyed it
+};
+
+/** Possible interaction types */
+enum
+{
+    INTERACT_DIALOG_ONEWAY,     ///< Dialog box without feedback
+    INTERACT_DIALOG_TWOWAY,     ///< Dialog box with feedback
+};
+
+/** Possible actions */
+enum
+{
+    INTERACT_NEW,
+    INTERACT_UPDATE,
+    INTERACT_HIDE,
+    INTERACT_DESTROY
+};
+
+/**
+ * This structure contains the active interaction dialogs, and is
+ * used by the manager
+ */
+struct interaction_t
+{
+    VLC_COMMON_MEMBERS
+
+    int                         i_dialogs;      ///< Number of dialogs
+    interaction_dialog_t      **pp_dialogs;     ///< Dialogs
+    intf_thread_t              *p_intf;         ///< Interface to use
+    int                         i_last_id;      ///< Last attributed ID
+};
+
+/***************************************************************************
+ * Exported symbols
+ ***************************************************************************/
+
+#define intf_UserFatal( a, b, c, d, e... ) __intf_UserFatal( VLC_OBJECT(a),b,c,d, ## e )
+VLC_EXPORT( int, __intf_UserFatal,( vlc_object_t*, vlc_bool_t, const char*, const char*, ...) );
+#define intf_UserWarn( a, c, d, e... ) __intf_UserWarn( VLC_OBJECT(a),c,d, ## e )
+VLC_EXPORT( int, __intf_UserWarn,( vlc_object_t*, const char*, const char*, ...) );
+#define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( VLC_OBJECT(a),b,c,d,e)
+VLC_EXPORT( int, __intf_UserLoginPassword,( vlc_object_t*, const char*, const char*, char **, char **) );
+#define intf_UserYesNo( a, b, c, d, e, f ) __intf_UserYesNo( VLC_OBJECT(a),b,c, d, e, f )
+VLC_EXPORT( int, __intf_UserYesNo,( vlc_object_t*, const char*, const char*, const char*, const char*, const char*) );
+#define intf_UserStringInput( a, b, c, d ) __intf_UserStringInput( VLC_OBJECT(a),b,c,d )
+VLC_EXPORT( int, __intf_UserStringInput,(vlc_object_t*, const char*, const char*, char **) );
+
+#define intf_IntfProgress( a, b, c ) __intf_Progress( VLC_OBJECT(a), NULL, b,c, -1 )
+#define intf_UserProgress( a, b, c, d, e ) __intf_Progress( VLC_OBJECT(a),b,c,d,e )
+VLC_EXPORT( int, __intf_Progress,( vlc_object_t*, const char*, const char*, float, int) );
+#define intf_ProgressUpdate( a, b, c, d, e ) __intf_ProgressUpdate( VLC_OBJECT(a),b,c,d,e )
+VLC_EXPORT( void, __intf_ProgressUpdate,( vlc_object_t*, int, const char*, float, int) );
+#define intf_ProgressIsCancelled( a, b ) __intf_UserProgressIsCancelled( VLC_OBJECT(a),b )
+VLC_EXPORT( vlc_bool_t, __intf_UserProgressIsCancelled,( vlc_object_t*, int ) );
+#define intf_UserHide( a, b ) __intf_UserHide( VLC_OBJECT(a), b )
+VLC_EXPORT( void, __intf_UserHide,( vlc_object_t *, int ));
+
+/** @} */
+/** @} */
+
+# ifdef __cplusplus
+}
+# endif
+#endif

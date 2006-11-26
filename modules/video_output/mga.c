@@ -34,7 +34,7 @@
 #include <sys/mman.h>                                          /* PROT_WRITE */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #ifdef SYS_BSD
 #include <sys/types.h>                                     /* typedef ushort */

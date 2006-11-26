@@ -21,6 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_demux.h>
+
 #define PS_TK_COUNT (512 - 0xc0)
 #define PS_ID_TO_TK( id ) ((id) <= 0xff ? (id) - 0xc0 : \
                                           ((id)&0xff) + (256 - 0xc0))

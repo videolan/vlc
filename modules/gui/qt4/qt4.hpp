@@ -24,7 +24,8 @@
 #define _QVLC_H_
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
 #include <QEvent>
 
 class QApplication;

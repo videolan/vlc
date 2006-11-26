@@ -30,8 +30,8 @@ extern "C" {
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/intf.h>
+#include <vlc_vout.h>
+#include <vlc_playlist.h>
 }
 
 #include <cascade/graphics/CascadeBitmap.h>

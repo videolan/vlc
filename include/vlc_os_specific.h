@@ -1,8 +1,11 @@
 /*****************************************************************************
- * decoder.h: header for vlc decoders
+ * os_specific.h: OS specific features
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2001 the VideoLAN team
  * $Id$
+ *
+ * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,28 +22,37 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_DECODER_H
-#define _VLC_DECODER_H 1
+#ifndef _NEED_OS_SPECIFIC_H
+#   define _NEED_OS_SPECIFIC_H 1
+#endif
 
-# ifdef __cplusplus
+#if defined( SYS_BEOS )
+/* Nothing at the moment, create beos_specific.h when needed */
+#elif defined( __APPLE__ )
+/* Nothing at the moment, create darwin_specific.h when needed */
+#elif defined( WIN32 ) || defined( UNDER_CE )
+/* Nothing at the moment, create win32_specific.h when needed */
+#else
+#   undef _NEED_OS_SPECIFIC_H
+#endif
+
+#   ifdef __cplusplus
 extern "C" {
-# endif
+#   endif
 
 /*****************************************************************************
- * Required public headers
+ * Prototypes
  *****************************************************************************/
-#include <vlc/vlc.h>
+#ifdef _NEED_OS_SPECIFIC_H
+    void system_Init       ( libvlc_int_t *, int *, char *[] );
+    void system_Configure  ( libvlc_int_t *, int *, char *[] );
+    void system_End        ( libvlc_int_t * );
+#else
+#   define system_Init( a, b, c ) {}
+#   define system_Configure( a, b, c ) {}
+#   define system_End( a ) {}
+#endif
 
-/*****************************************************************************
- * Required internal headers
- *****************************************************************************/
-#include "vlc_block.h"
-#include "vlc_video.h"
-#include "audio_output.h"
-#include "vlc_codec.h"
-
-# ifdef __cplusplus
+#   ifdef __cplusplus
 }
-# endif
-
-#endif /* <vlc/decoder.h> */
+#   endif

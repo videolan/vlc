@@ -28,7 +28,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_playlist.h>
 
 #include <avahi-client/client.h>
 #ifdef HAVE_AVAHI_06
@@ -252,8 +252,6 @@ static int Open( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys;
-    playlist_view_t *p_view;
-    vlc_value_t val;
     int err;
 
     p_sd->p_sys = p_sys = (services_discovery_sys_t *)malloc(

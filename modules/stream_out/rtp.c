@@ -34,13 +34,13 @@
 #include <errno.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_block.h>
 
-#include "vlc_httpd.h"
-#include "vlc_url.h"
-#include "network.h"
-#include "charset.h"
+#include <vlc_httpd.h>
+#include <vlc_url.h>
+#include <vlc_network.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Module descriptor

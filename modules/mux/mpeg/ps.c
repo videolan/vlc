@@ -30,10 +30,10 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_codecs.h>
+#include <vlc_block.h>
 
-#include "codecs.h"
 #include "bits.h"
 #include "pes.h"
 

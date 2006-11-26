@@ -28,7 +28,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #if defined (MODULE_NAME_IS_i420_yuy2_altivec) && defined(HAVE_ALTIVEC_H)
 #   include <altivec.h>

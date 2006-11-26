@@ -58,6 +58,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
                                       interaction_dialog_t *_p_dialog )
   : wxDialog( p_parent, -1, wxU( _p_dialog->psz_title ) )
 {
+#if 0
     /* Initializations */
     p_intf = _p_intf;
     p_dialog = _p_dialog;
@@ -79,6 +80,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
 
     b_noshow = false;
     Render();
+#endif
 }
 
 InteractionDialog::~InteractionDialog()
@@ -87,6 +89,7 @@ InteractionDialog::~InteractionDialog()
 
 void InteractionDialog::Update( )
 {
+#if 0
     widgets_panel->DestroyChildren();
     /* FIXME: Needed for the spacer */
     buttons_sizer->Remove( 1 );buttons_sizer->Remove( 2 );buttons_sizer->Remove( 3 );
@@ -97,11 +100,13 @@ void InteractionDialog::Update( )
     {
         Show();
     }
+#endif
 }
 
 /// \todo Dirty - Clean that up
 void InteractionDialog::Render()
 {
+#if 0
     wxStaticText *label;
     wxTextCtrl   *input;
     wxGauge      *gauge;
@@ -176,7 +181,6 @@ void InteractionDialog::Render()
         buttons_sizer->AddButton( no );
         buttons_sizer->AddButton( cancel );
     }
-#if 0
     else if( p_dialog->i_flags & DIALOG_CLEAR_NOSHOW )
     {
         wxCheckBox *noshow = new wxCheckBox( buttons_panel,
@@ -195,13 +199,13 @@ void InteractionDialog::Render()
         buttons_sizer->AddButton( close );
         buttons_sizer->SetAffirmativeButton( close );
     }
-#endif
     widgets_sizer->Layout();
     widgets_panel->SetSizerAndFit( widgets_sizer );
     buttons_sizer->Realize();
     buttons_panel->SetSizerAndFit( buttons_sizer );
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
+#endif
 }
 
 /*****************************************************************************
@@ -229,6 +233,7 @@ void InteractionDialog::OnOkYes( wxCommandEvent& event )
 
 void InteractionDialog::OnClear( wxCommandEvent& event )
 {
+#if 0
     int i;
     vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
     for( i = p_dialog->i_widgets - 1 ; i >= 0 ; i-- )
@@ -247,6 +252,7 @@ void InteractionDialog::OnClear( wxCommandEvent& event )
     input_widgets.clear();
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
     Render();
+#endif
 }
 
 void InteractionDialog::OnNoShow( wxCommandEvent& event )
@@ -256,6 +262,7 @@ void InteractionDialog::OnNoShow( wxCommandEvent& event )
 
 void InteractionDialog::Finish( int i_ret )
 {
+#if 0
     vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
     vector<InputWidget>::iterator it = input_widgets.begin();
     while ( it < input_widgets.end() )
@@ -268,4 +275,5 @@ void InteractionDialog::Finish( int i_ret )
     p_dialog->i_status = ANSWERED_DIALOG;
     p_dialog->i_return = i_ret;
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
+#endif
 }

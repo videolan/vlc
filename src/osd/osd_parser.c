@@ -28,13 +28,13 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
+#include <vlc_vout.h>
 #include <vlc_config.h>
-#include <vlc_video.h>
 
 #include <vlc_keys.h>
 #include <vlc_image.h>
 #include <vlc_osd.h>
-#include <charset.h>
+#include <vlc_charset.h>
 
 
 #undef OSD_MENU_DEBUG

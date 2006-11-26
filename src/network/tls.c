@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <vlc/vlc.h>
 
-#include "vlc_tls.h"
+#include <vlc_tls.h>
 
 static tls_t *
 tls_Init( vlc_object_t *p_this )

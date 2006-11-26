@@ -41,7 +41,7 @@
 #   include <unistd.h>
 #endif
 
-#include "network.h"
+#include <vlc_network.h>
 #if defined (WIN32) || defined (UNDER_CE)
 #   undef EINPROGRESS
 #   define EINPROGRESS WSAEWOULDBLOCK

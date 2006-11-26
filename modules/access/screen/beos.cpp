@@ -24,7 +24,6 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 
 #include <Screen.h>
 #include <Bitmap.h>

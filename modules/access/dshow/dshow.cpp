@@ -30,8 +30,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 #include <vlc_interaction.h>
 
 #include "common.h"

@@ -29,12 +29,16 @@
 #include <stdlib.h>
 #include <vlc/vlc.h>
 
-#include <vlc/decoder.h>
-#include <vlc/vout.h>
-#include <vlc/input.h>
-#include <vlc_interaction.h>
+#include <vlc_block.h>
+#include <vlc_vout.h>
+#include <vlc_aout.h>
+#include <vlc_sout.h>
+#include <vlc_codec.h>
+#include <vlc_osd.h>
 
-#include "stream_output.h"
+#include <vlc_interface.h>
+#include "audio_output/aout_internal.h"
+#include "stream_output/stream_output.h"
 #include "input_internal.h"
 
 static decoder_t * CreateDecoder( input_thread_t *, es_format_t *, int );
@@ -103,7 +107,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
     vlc_value_t val;
 
     /* If we are in sout mode, search for packetizer module */
-    if( p_input->p_sout && !b_force_decoder )
+    if( p_input->p->p_sout && !b_force_decoder )
     {
         /* Create the decoder configuration structure */
         p_dec = CreateDecoder( p_input, fmt, VLC_OBJECT_PACKETIZER );
@@ -143,7 +147,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         return NULL;
     }
 
-    if( p_input->p_sout && p_input->input.b_can_pace_control &&
+    if( p_input->p->p_sout && p_input->p->input.b_can_pace_control &&
         !b_force_decoder )
     {
         msg_Dbg( p_input, "stream out mode -> no decoder thread" );
@@ -227,7 +231,7 @@ void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
 {
     if( p_dec->p_owner->b_own_thread )
     {
-        if( p_dec->p_owner->p_input->b_out_pace_control )
+        if( p_dec->p_owner->p_input->p->b_out_pace_control )
         {
             /* FIXME !!!!! */
             while( !p_dec->b_die && !p_dec->b_error &&
@@ -326,9 +330,9 @@ void input_EscapeDiscontinuity( input_thread_t * p_input )
 #if 0
     unsigned int i_es, i;
 
-    for( i_es = 0; i_es < p_input->stream.i_selected_es_number; i_es++ )
+    for( i_es = 0; i_es < p_input->p->stream.i_selected_es_number; i_es++ )
     {
-        es_descriptor_t * p_es = p_input->stream.pp_selected_es[i_es];
+        es_descriptor_t * p_es = p_input->p->stream.pp_selected_es[i_es];
 
         if( p_es->p_dec != NULL )
         {
@@ -352,9 +356,9 @@ void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
 #if 0
     unsigned int i_es, i;
 
-    for( i_es = 0; i_es < p_input->stream.i_selected_es_number; i_es++ )
+    for( i_es = 0; i_es < p_input->p->stream.i_selected_es_number; i_es++ )
     {
-        es_descriptor_t * p_es = p_input->stream.pp_selected_es[i_es];
+        es_descriptor_t * p_es = p_input->p->stream.pp_selected_es[i_es];
 
         if( p_es->p_dec != NULL && p_es->i_cat == AUDIO_ES )
         {
@@ -415,7 +419,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->p_owner->p_vout = NULL;
     p_dec->p_owner->p_spu_vout = NULL;
     p_dec->p_owner->i_spu_channel = 0;
-    p_dec->p_owner->p_sout = p_input->p_sout;
+    p_dec->p_owner->p_sout = p_input->p->p_sout;
     p_dec->p_owner->p_sout_input = NULL;
     p_dec->p_owner->p_packetizer = NULL;
 
@@ -587,16 +591,16 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 
             /* For now it's enough, as only sout inpact on this flag */
             if( p_dec->p_owner->p_sout->i_out_pace_nocontrol > 0 &&
-                p_dec->p_owner->p_input->b_out_pace_control )
+                p_dec->p_owner->p_input->p->b_out_pace_control )
             {
                 msg_Dbg( p_dec, "switching to sync mode" );
-                p_dec->p_owner->p_input->b_out_pace_control = VLC_FALSE;
+                p_dec->p_owner->p_input->p->b_out_pace_control = VLC_FALSE;
             }
             else if( p_dec->p_owner->p_sout->i_out_pace_nocontrol <= 0 &&
-                     !p_dec->p_owner->p_input->b_out_pace_control )
+                     !p_dec->p_owner->p_input->p->b_out_pace_control )
             {
                 msg_Dbg( p_dec, "switching to async mode" );
-                p_dec->p_owner->p_input->b_out_pace_control = VLC_TRUE;
+                p_dec->p_owner->p_input->p->b_out_pace_control = VLC_TRUE;
             }
         }
     }
@@ -631,10 +635,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                                                        &p_packetized_block )) )
                     {
                         input_thread_t *p_i =(input_thread_t*)(p_dec->p_parent);
-                        vlc_mutex_lock( &p_i->counters.counters_lock );
+                        vlc_mutex_lock( &p_i->p->counters.counters_lock );
                         stats_UpdateInteger( p_dec,
-                               p_i->counters.p_decoded_audio, 1, NULL );
-                        vlc_mutex_unlock( &p_i->counters.counters_lock );
+                               p_i->p->counters.p_decoded_audio, 1, NULL );
+                        vlc_mutex_unlock( &p_i->p->counters.counters_lock );
 
                         /* FIXME the best would be to handle the case
                          * start_date < preroll < end_date
@@ -661,10 +665,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         else while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
         {
             input_thread_t *p_i = (input_thread_t*)(p_dec->p_parent);
-            vlc_mutex_lock( &p_i->counters.counters_lock );
+            vlc_mutex_lock( &p_i->p->counters.counters_lock );
             stats_UpdateInteger( p_dec,
-                               p_i->counters.p_decoded_audio, 1, NULL );
-            vlc_mutex_unlock( &p_i->counters.counters_lock );
+                               p_i->p->counters.p_decoded_audio, 1, NULL );
+            vlc_mutex_unlock( &p_i->p->counters.counters_lock );
 
             if( p_dec->p_owner->i_preroll_end > 0 &&
                 p_aout_buf->start_date < p_dec->p_owner->i_preroll_end )
@@ -712,10 +716,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                                                        &p_packetized_block )) )
                     {
                         input_thread_t *p_i =(input_thread_t*)(p_dec->p_parent);
-                        vlc_mutex_lock( &p_i->counters.counters_lock );
+                        vlc_mutex_lock( &p_i->p->counters.counters_lock );
                         stats_UpdateInteger( p_dec,
-                               p_i->counters.p_decoded_video, 1, NULL );
-                        vlc_mutex_unlock( &p_i->counters.counters_lock );
+                               p_i->p->counters.p_decoded_video, 1, NULL );
+                        vlc_mutex_unlock( &p_i->p->counters.counters_lock );
 
                         if( p_dec->p_owner->i_preroll_end > 0 &&
                             p_pic->date < p_dec->p_owner->i_preroll_end )
@@ -738,10 +742,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         else while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
         {
             input_thread_t *p_i = (input_thread_t*)(p_dec->p_parent);
-            vlc_mutex_lock( &p_i->counters.counters_lock );
+            vlc_mutex_lock( &p_i->p->counters.counters_lock );
             stats_UpdateInteger( p_dec,
-                               p_i->counters.p_decoded_video, 1, NULL );
-            vlc_mutex_unlock( &p_i->counters.counters_lock );
+                               p_i->p->counters.p_decoded_video, 1, NULL );
+            vlc_mutex_unlock( &p_i->p->counters.counters_lock );
 
             if( p_dec->p_owner->i_preroll_end > 0 &&
                 p_pic->date < p_dec->p_owner->i_preroll_end )
@@ -763,10 +767,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         while( (p_spu = p_dec->pf_decode_sub( p_dec, &p_block ) ) )
         {
             input_thread_t *p_i = (input_thread_t*)(p_dec->p_parent);
-            vlc_mutex_lock( &p_i->counters.counters_lock );
+            vlc_mutex_lock( &p_i->p->counters.counters_lock );
             stats_UpdateInteger( p_dec,
-                               p_i->counters.p_decoded_sub, 1, NULL );
-            vlc_mutex_unlock( &p_i->counters.counters_lock );
+                               p_i->p->counters.p_decoded_sub, 1, NULL );
+            vlc_mutex_unlock( &p_i->p->counters.counters_lock );
 
             if( p_dec->p_owner->i_preroll_end > 0 &&
                 p_spu->i_start < p_dec->p_owner->i_preroll_end &&

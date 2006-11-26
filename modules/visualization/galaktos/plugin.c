@@ -34,9 +34,8 @@
 #include "video_init.h"
 #include <GL/glu.h>
 
-#include <vlc/input.h>
-#include <vlc/vout.h>
-#include "aout_internal.h"
+#include <vlc_input.h>
+#include <vlc_playlist.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -304,7 +303,7 @@ static char *TitleGet( vlc_object_t *p_this )
 
     if( p_input )
     {
-        char *psz = strrchr( p_input->input.p_item->psz_uri, '/' );
+        char *psz = strrchr( input_GetItem(p_input)->psz_uri, '/' );
 
         if( psz )
         {
@@ -312,7 +311,7 @@ static char *TitleGet( vlc_object_t *p_this )
         }
         else
         {
-            psz = p_input->input.p_item->psz_uri;
+            psz = input_GetItem(p_input)->psz_uri;
         }
         if( psz && *psz )
         {

@@ -27,7 +27,8 @@
 #include <stdio.h>                                               /* required */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+
+#include "input/input_internal.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -137,52 +138,52 @@ void stats_ComputeInputStats( input_thread_t *p_input, input_stats_t *p_stats )
 {
     if( !p_input->p_libvlc->b_stats ) return;
 
-    vlc_mutex_lock( &p_input->counters.counters_lock );
+    vlc_mutex_lock( &p_input->p->counters.counters_lock );
     vlc_mutex_lock( &p_stats->lock );
 
     /* Input */
-    stats_GetInteger( p_input, p_input->counters.p_read_packets,
+    stats_GetInteger( p_input, p_input->p->counters.p_read_packets,
                       &p_stats->i_read_packets );
-    stats_GetInteger( p_input, p_input->counters.p_read_bytes,
+    stats_GetInteger( p_input, p_input->p->counters.p_read_bytes,
                       &p_stats->i_read_bytes );
-    stats_GetFloat( p_input, p_input->counters.p_input_bitrate,
+    stats_GetFloat( p_input, p_input->p->counters.p_input_bitrate,
                     &p_stats->f_input_bitrate );
-    stats_GetInteger( p_input, p_input->counters.p_demux_read,
+    stats_GetInteger( p_input, p_input->p->counters.p_demux_read,
                       &p_stats->i_demux_read_bytes );
-    stats_GetFloat( p_input, p_input->counters.p_demux_bitrate,
+    stats_GetFloat( p_input, p_input->p->counters.p_demux_bitrate,
                     &p_stats->f_demux_bitrate );
 
     /* Decoders */
-    stats_GetInteger( p_input, p_input->counters.p_decoded_video,
+    stats_GetInteger( p_input, p_input->p->counters.p_decoded_video,
                       &p_stats->i_decoded_video );
-    stats_GetInteger( p_input, p_input->counters.p_decoded_audio,
+    stats_GetInteger( p_input, p_input->p->counters.p_decoded_audio,
                       &p_stats->i_decoded_audio );
 
     /* Sout */
-    if( p_input->counters.p_sout_send_bitrate )
+    if( p_input->p->counters.p_sout_send_bitrate )
     {
-        stats_GetInteger( p_input, p_input->counters.p_sout_sent_packets,
+        stats_GetInteger( p_input, p_input->p->counters.p_sout_sent_packets,
                           &p_stats->i_sent_packets );
-        stats_GetInteger( p_input, p_input->counters.p_sout_sent_bytes,
+        stats_GetInteger( p_input, p_input->p->counters.p_sout_sent_bytes,
                           &p_stats->i_sent_bytes );
-        stats_GetFloat  ( p_input, p_input->counters.p_sout_send_bitrate,
+        stats_GetFloat  ( p_input, p_input->p->counters.p_sout_send_bitrate,
                           &p_stats->f_send_bitrate );
     }
 
     /* Aout */
-    stats_GetInteger( p_input, p_input->counters.p_played_abuffers,
+    stats_GetInteger( p_input, p_input->p->counters.p_played_abuffers,
                       &p_stats->i_played_abuffers );
-    stats_GetInteger( p_input, p_input->counters.p_lost_abuffers,
+    stats_GetInteger( p_input, p_input->p->counters.p_lost_abuffers,
                       &p_stats->i_lost_abuffers );
 
     /* Vouts */
-    stats_GetInteger( p_input, p_input->counters.p_displayed_pictures,
+    stats_GetInteger( p_input, p_input->p->counters.p_displayed_pictures,
                       &p_stats->i_displayed_pictures );
-    stats_GetInteger( p_input, p_input->counters.p_lost_pictures,
+    stats_GetInteger( p_input, p_input->p->counters.p_lost_pictures,
                       &p_stats->i_lost_pictures );
 
     vlc_mutex_unlock( &p_stats->lock );
-    vlc_mutex_unlock( &p_input->counters.counters_lock );
+    vlc_mutex_unlock( &p_input->p->counters.counters_lock );
 }
 
 void stats_ReinitInputStats( input_stats_t *p_stats )
@@ -236,14 +237,14 @@ void __stats_ComputeGlobalStats( vlc_object_t *p_obj, global_stats_t *p_stats )
             float f_in = 0, f_out = 0, f_demux = 0;
             input_thread_t *p_input = (input_thread_t *)
                              p_list->p_values[i_index].p_object;
-            vlc_mutex_lock( &p_input->counters.counters_lock );
-            stats_GetFloat( p_obj, p_input->counters.p_input_bitrate, &f_in );
-            if( p_input->counters.p_sout_send_bitrate )
-                stats_GetFloat( p_obj, p_input->counters.p_sout_send_bitrate,
+            vlc_mutex_lock( &p_input->p->counters.counters_lock );
+            stats_GetFloat( p_obj, p_input->p->counters.p_input_bitrate, &f_in );
+            if( p_input->p->counters.p_sout_send_bitrate )
+                stats_GetFloat( p_obj, p_input->p->counters.p_sout_send_bitrate,
                                     &f_out );
-            stats_GetFloat( p_obj, p_input->counters.p_demux_bitrate,
+            stats_GetFloat( p_obj, p_input->p->counters.p_demux_bitrate,
                                 &f_demux );
-            vlc_mutex_unlock( &p_input->counters.counters_lock );
+            vlc_mutex_unlock( &p_input->p->counters.counters_lock );
             f_total_in += f_in; f_total_out += f_out;f_total_demux += f_demux;
         }
         p_stats->f_input_bitrate = f_total_in;

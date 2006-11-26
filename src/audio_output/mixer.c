@@ -32,10 +32,8 @@
 #ifdef HAVE_ALLOCA_H
 #   include <alloca.h>
 #endif
-
-#include "audio_output.h"
+#include <vlc_aout.h>
 #include "aout_internal.h"
-
 /*****************************************************************************
  * aout_MixerNew: prepare a mixer plug-in
  *****************************************************************************

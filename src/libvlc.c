@@ -36,16 +36,13 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 
-#include <libvlc_internal.h>
+#include "control/libvlc_internal.h"
 
-#include <vlc_error.h>
 #include <vlc_playlist.h>
 
-#include "audio_output.h"
-#include "vlc_video.h"
-#include "video_output.h"
+#include <vlc_aout.h>
+#include <vlc_vout.h>
 
 /*****************************************************************************
  * VLC_Version: return the libvlc version.

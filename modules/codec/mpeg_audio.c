@@ -28,10 +28,10 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/aout.h>
+#include <vlc_codec.h>
+#include <vlc_aout.h>
 
-#include "vlc_block_helper.h"
+#include <vlc_block_helper.h>
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor

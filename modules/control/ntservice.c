@@ -26,7 +26,7 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 #define VLCSERVICENAME "VLC media player"
 

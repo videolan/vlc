@@ -24,7 +24,7 @@
 /* This is not WX-specific */
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 #include <vlc_vlm.h>
 #include "dialogs/vlm/vlm_stream.hpp"
 

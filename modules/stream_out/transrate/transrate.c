@@ -32,8 +32,8 @@
 #include <math.h>
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
-#include <vlc/input.h>
+#include <vlc_sout.h>
+#include <<vlc_input.h>>
 
 #include "transrate.h"
 

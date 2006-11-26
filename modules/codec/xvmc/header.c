@@ -1,4 +1,4 @@
-/* $Id:$
+/* $Id$
  * header.c
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 2003      Regis Duchesne <hpreg@zoy.org>

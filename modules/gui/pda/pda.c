@@ -31,7 +31,7 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 #include <gtk/gtk.h>
 

@@ -23,15 +23,14 @@
  *****************************************************************************/
 
 #include "cmd_playlist.hpp"
+#include <vlc_playlist.h>
 #include "../src/vlcproc.hpp"
 #include "../utils/var_bool.hpp"
-
 
 void CmdPlaylistDel::execute()
 {
     m_rList.delSelected();
 }
-
 
 void CmdPlaylistNext::execute()
 {

@@ -374,7 +374,7 @@ void BookmarksDialog::OnExtract( wxCommandEvent& event )
     if( i_first < i_bookmarks && i_second <= i_bookmarks )
     {
         WizardDialog *p_wizard_dialog = new WizardDialog( p_intf, this,
-                               p_input->input.p_item->psz_uri,
+                               input_GetItem(p_input)->psz_uri,
                                pp_bookmarks[i_first]->i_time_offset/1000000,
                                pp_bookmarks[i_second]->i_time_offset/1000000 );
         vlc_object_release( p_input );

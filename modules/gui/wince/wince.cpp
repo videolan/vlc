@@ -26,7 +26,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 #if defined( UNDER_CE ) && defined(__MINGW32__)
 /* This is a gross hack for the wince gcc cross-compiler */

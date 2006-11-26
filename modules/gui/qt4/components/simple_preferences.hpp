@@ -26,7 +26,7 @@
 
 #include <QListWidget>
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 enum {
     SPrefsVideo = 0,

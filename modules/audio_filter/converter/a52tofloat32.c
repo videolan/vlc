@@ -47,9 +47,9 @@
 #   include "a52dec/a52.h"
 #endif
 
-#include <vlc/decoder.h>
-#include "aout_internal.h"
-#include "vlc_filter.h"
+#include <vlc_aout.h>
+#include <vlc_block.h>
+#include <vlc_filter.h>
 
 /*****************************************************************************
  * Local prototypes

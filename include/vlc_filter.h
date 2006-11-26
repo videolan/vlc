@@ -23,6 +23,8 @@
 #ifndef _VLC_FILTER_H
 #define _VLC_FILTER_H 1
 
+#include <vlc_es.h>
+
 /**
  * \file
  * This file defines the structure and types used by video and audio filters
@@ -30,18 +32,10 @@
 
 typedef struct filter_owner_sys_t filter_owner_sys_t;
 
-/**
- * \defgroup filter Filter
- *
- * The structure describing a filter
- *
- * @{
- */
-
-/*
- * BIG FAT WARNING : the code relies in the first 4 members of filter_t
- * and decoder_t to be the same, so if you have anything to add, do it
- * at the end of the structure.
+/** Structure describing a filter
+ * @warning BIG FAT WARNING : the code relies in the first 4 members of
+ * filter_t and decoder_t to be the same, so if you have anything to add,
+ * do it at the end of the structure.
  */
 struct filter_t
 {
@@ -67,7 +61,8 @@ struct filter_t
                                                 int, int, int );
 
     subpicture_t *      ( *pf_sub_filter ) ( filter_t *, mtime_t );
-    int                 ( *pf_render_text ) ( filter_t *, subpicture_region_t *, subpicture_region_t * );
+    int                 ( *pf_render_text ) ( filter_t *, subpicture_region_t *,
+                                              subpicture_region_t * );
 
     /*
      * Buffers allocation
@@ -89,9 +84,5 @@ struct filter_t
     /* Private structure for the owner of the decoder */
     filter_owner_sys_t *p_owner;
 };
-
-/**
- * @}
- */
 
 #endif /* _VLC_FILTER_H */

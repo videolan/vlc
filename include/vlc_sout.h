@@ -24,15 +24,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * sout_instance_t: stream output thread descriptor
- *****************************************************************************/
+#ifndef _VLC_SOUT_H_
+#define _VLC_SOUT_H_
 
-#include "vlc_es.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/****************************************************************************
- * sout_instance_t: p_sout
- ****************************************************************************/
+#include <vlc_es.h>
+
+/** Stream output instance */
 struct sout_instance_t
 {
     VLC_COMMON_MEMBERS
@@ -43,12 +44,13 @@ struct sout_instance_t
     /* meta data (Read only) XXX it won't be set before the first packet received */
     vlc_meta_t          *p_meta;
 
-    int                 i_out_pace_nocontrol;   /* count of output that can't control the space */
+    /** count of output that can't control the space */
+    int                 i_out_pace_nocontrol;
 
     vlc_mutex_t         lock;
     sout_stream_t       *p_stream;
 
-    /* sout private */
+    /** Private */
     sout_instance_sys_t *p_sys;
 };
 
@@ -57,29 +59,7 @@ struct sout_instance_t
  ****************************************************************************/
 typedef struct sout_stream_id_t  sout_stream_id_t;
 
-/****************************************************************************
- * sout_packetizer_input_t: p_sout <-> p_packetizer
- ****************************************************************************/
-struct sout_packetizer_input_t
-{
-    sout_instance_t     *p_sout;
-
-    es_format_t         *p_fmt;
-
-    sout_stream_id_t    *id;
-};
-
-#define sout_NewInstance(a,b) __sout_NewInstance(VLC_OBJECT(a),b)
-VLC_EXPORT( sout_instance_t *,  __sout_NewInstance,  ( vlc_object_t *, char * ) );
-VLC_EXPORT( void,               sout_DeleteInstance, ( sout_instance_t * ) );
-
-VLC_EXPORT( sout_packetizer_input_t *, sout_InputNew,( sout_instance_t *, es_format_t * ) );
-VLC_EXPORT( int,                sout_InputDelete,      ( sout_packetizer_input_t * ) );
-VLC_EXPORT( int,                sout_InputSendBuffer,  ( sout_packetizer_input_t *, block_t* ) );
-
-/****************************************************************************
- * sout_access_out_t:
- ****************************************************************************/
+/** Stream output access_output */
 struct sout_access_out_t
 {
     VLC_COMMON_MEMBERS
@@ -92,8 +72,8 @@ struct sout_access_out_t
     config_chain_t              *p_cfg;
 
     int                      i_writes;
-    int64_t                  i_sent_bytes;      ///< This is a "local" counter that is reset each
-                                                // time it is transferred to stats
+    /** Local counter reset each time it is transferred to stats */
+    int64_t                  i_sent_bytes;
 
     char                    *psz_name;
     sout_access_out_sys_t   *p_sys;
@@ -108,9 +88,7 @@ VLC_EXPORT( int,                sout_AccessOutSeek,   ( sout_access_out_t *, off
 VLC_EXPORT( int,                sout_AccessOutRead,   ( sout_access_out_t *, block_t * ) );
 VLC_EXPORT( int,                sout_AccessOutWrite,  ( sout_access_out_t *, block_t * ) );
 
-/****************************************************************************
- * mux:
- ****************************************************************************/
+/** Muxer structure */
 struct  sout_mux_t
 {
     VLC_COMMON_MEMBERS
@@ -131,7 +109,6 @@ struct  sout_mux_t
     /* here are all inputs accepted by muxer */
     int                 i_nb_inputs;
     sout_input_t        **pp_inputs;
-
 
     /* mux private */
     sout_mux_sys_t      *p_sys;
@@ -252,52 +229,6 @@ struct announce_method_t
     int i_type;
 };
 
-
-/* A SAP session descriptor, enqueued in the SAP handler queue */
-struct sap_session_t
-{
-    char          *psz_sdp;
-    uint8_t       *psz_data;
-    unsigned      i_length;
-    sap_address_t *p_address;
-
-    /* Last and next send */
-    mtime_t        i_last;
-    mtime_t        i_next;
-};
-
-/* The SAP handler, running in a separate thread */
-struct sap_handler_t
-{
-    VLC_COMMON_MEMBERS /* needed to create a thread */
-
-    sap_session_t **pp_sessions;
-    sap_address_t **pp_addresses;
-
-    vlc_bool_t b_control;
-
-    int i_sessions;
-    int i_addresses;
-
-    int i_current_session;
-
-    int (*pf_add)  ( sap_handler_t*, session_descriptor_t *);
-    int (*pf_del)  ( sap_handler_t*, session_descriptor_t *);
-
-    /* private data, not in p_sys as there is one kind of sap_handler_t */
-};
-
-/* The main announce handler object */
-struct announce_handler_t
-{
-    VLC_COMMON_MEMBERS
-
-    sap_handler_t *p_sap;
-};
-
-/* End */
-
-/* Announce system */
 VLC_EXPORT( int,                sout_AnnounceRegister, (sout_instance_t *,session_descriptor_t*, announce_method_t* ) );
 VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, (sout_instance_t *,const char *, const char *, announce_method_t* ) );
 VLC_EXPORT( int,                sout_AnnounceUnRegister, (sout_instance_t *,session_descriptor_t* ) );
@@ -306,16 +237,8 @@ VLC_EXPORT(session_descriptor_t*,sout_AnnounceSessionCreate, (void) );
 VLC_EXPORT(void,                 sout_AnnounceSessionDestroy, (session_descriptor_t *) );
 VLC_EXPORT(announce_method_t*,   sout_AnnounceMethodCreate, (int) );
 
-#define announce_HandlerCreate(a) __announce_HandlerCreate(VLC_OBJECT(a))
-announce_handler_t*  __announce_HandlerCreate( vlc_object_t *);
+#ifdef __cplusplus
+}
+#endif
 
-/* Private functions for the announce handler */
-int announce_HandlerDestroy( announce_handler_t * );
-int announce_Register( announce_handler_t *p_announce,
-                session_descriptor_t *p_session,
-                announce_method_t *p_method );
-int announce_UnRegister( announce_handler_t *p_announce,
-                session_descriptor_t *p_session );
-
-sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce );
-void announce_SAPHandlerDestroy( sap_handler_t *p_sap );
+#endif

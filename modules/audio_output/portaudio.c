@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -29,10 +29,10 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <portaudio.h>
+#include <vlc_aout.h>
 
-#include "aout_internal.h"
+
+#include <portaudio.h>
 
 #define FRAME_SIZE 1024              /* The size is in samples, not in bytes */
 

@@ -49,7 +49,7 @@
 #   include <poll.h>
 #endif
 
-#include "network.h"
+#include <vlc_network.h>
 
 #ifndef INADDR_ANY
 #   define INADDR_ANY  0x00000000

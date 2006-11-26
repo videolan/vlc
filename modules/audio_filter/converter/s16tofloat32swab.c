@@ -38,8 +38,7 @@
 #   include <alloca.h>
 #endif
 
-#include "audio_output.h"
-#include "aout_internal.h"
+#include <vlc_aout.h>
 
 /*****************************************************************************
  * Local prototypes

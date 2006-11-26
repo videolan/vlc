@@ -28,7 +28,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <ctype.h>
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_demux.h>
 #include <vlc_playlist.h>
 
 #define MAX_LINE 16024

@@ -26,7 +26,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
+#include <vlc_codec.h>
 
 #include "spudec.h"
 

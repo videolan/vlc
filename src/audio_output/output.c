@@ -28,8 +28,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-
-#include "audio_output.h"
+#include <vlc_aout.h>
 #include "aout_internal.h"
 
 /*****************************************************************************

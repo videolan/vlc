@@ -31,14 +31,19 @@
 #include <math.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
-#include <vlc/vout.h>
-#include <vlc/decoder.h>
+#include <vlc_input.h>
+#include <vlc_sout.h>
+#include <vlc_aout.h>
+#include <vlc_vout.h>
+#include <vlc_codec.h>
+#include <vlc_block.h>
 #include <vlc_filter.h>
 #include <vlc_osd.h>
 
 #define MASTER_SYNC_MAX_DRIFT 100000
+
+/* FIXME Ugly */
+#include "../../src/input/input_internal.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -1515,7 +1520,7 @@ static int transcode_audio_process( sout_stream_t *p_stream,
                                                           &in )) )
     {
         if( p_input )
-            stats_UpdateInteger( p_input, p_input->counters.p_decoded_audio,
+            stats_UpdateInteger( p_input, p_input->p->counters.p_decoded_audio,
                                  1, NULL );
         if( p_sys->b_master_sync )
         {
@@ -2109,7 +2114,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
     {
         subpicture_t *p_subpic = 0;
         if( p_input )
-            stats_UpdateInteger( p_input, p_input->counters.p_decoded_video,
+            stats_UpdateInteger( p_input, p_input->p->counters.p_decoded_video,
                                  1, NULL );
 
         if( p_stream->p_sout->i_out_pace_nocontrol && p_sys->b_hurry_up )

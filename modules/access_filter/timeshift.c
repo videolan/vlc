@@ -32,8 +32,8 @@
 
 #include <errno.h>
 
-#include <vlc/input.h>
-#include "charset.h"
+#include <vlc_access.h>
+#include <vlc_charset.h>
 
 #include <unistd.h>
 

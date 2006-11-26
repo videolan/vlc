@@ -1,4 +1,4 @@
-/* $Id:$
+/* $Id$
  * Copyright (c) 2004 The Unichrome project. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -18,8 +18,8 @@
  */
  
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/decoder.h>
+#include <<vlc_vout.h>>
+#include <vlc_codec.h>
 
 #include "mpeg2.h"
 #include "mpeg2_internal.h"

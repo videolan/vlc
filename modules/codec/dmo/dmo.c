@@ -29,8 +29,9 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/vout.h>
+#include <vlc_codec.h>
+#include <vlc_vout.h>
+#include <vlc_aout.h>
 
 #ifndef WIN32
 #    define LOADER
@@ -45,7 +46,7 @@
 #   include <wine/windef.h>
 #endif
 
-#include "codecs.h"
+#include <vlc_codecs.h>
 #include "dmo.h"
 
 //#define DMO_DEBUG 1

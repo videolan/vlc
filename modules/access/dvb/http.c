@@ -25,7 +25,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_access.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>

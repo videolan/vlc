@@ -27,8 +27,9 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <vlc/vlc.h>
+#include <vlc_access.h>
+
 #include <string.h>
-#include <vlc/input.h>
 #include <errno.h>
 
 #ifdef HAVE_UNISTD_H
@@ -40,14 +41,14 @@
 #ifdef HAVE_SYS_TIME_H
 #   include <sys/time.h>
 #endif
-#ifdef HAVE_SYS_TYPES_H 
+#ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif
 
-#include "network.h"
+#include <vlc_network.h>
 #include "vlc_url.h"
 #include "asf.h"
 #include "buffer.h"

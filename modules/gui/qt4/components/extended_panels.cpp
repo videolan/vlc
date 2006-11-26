@@ -31,8 +31,7 @@
 #include "qt4.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
-#include <audio_output.h>
-#include <aout_internal.h>
+#include <vlc_aout.h>
 #include <vlc_intf_strings.h>
 #include <assert.h>
 

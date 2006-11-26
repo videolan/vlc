@@ -32,9 +32,8 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-
-#include "network.h"
+#include <vlc_access.h>
+#include <vlc_network.h>
 
 /*****************************************************************************
  * Module descriptor

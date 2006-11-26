@@ -28,11 +28,12 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/intf.h>
+#include <vlc_vout.h>
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
 
 #include "filter_common.h"
-#include "charset.h"
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Local prototypes

@@ -33,14 +33,14 @@
 #include <fcntl.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_block.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
 
-#include "codecs.h"
+#include <vlc_codecs.h>
 #include "pes.h"
 #include "bits.h"
 

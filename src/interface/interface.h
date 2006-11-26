@@ -1,10 +1,12 @@
 /*****************************************************************************
- * darwin_specific.h: Darwin specific features
+ * interface.h: Internal interface prototypes and structures
  *****************************************************************************
- * Copyright (C) 2001 the VideoLAN team
- * $Id$
+ * Copyright (C) 1998-2006 the VideoLAN team
+ * $Id: interface.c 17743 2006-11-13 15:43:19Z courmisch $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ *          Clément Stenac <zorglub@videolan.org>
+ *          Felix Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,3 +22,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
+/**********************************************************************
+ * Interaction
+ **********************************************************************/
+
+void intf_InteractionManage( playlist_t *);
+void intf_InteractionDestroy( interaction_t *);

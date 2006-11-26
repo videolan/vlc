@@ -84,12 +84,12 @@ void MediaInfoDialog::update()
     }
 
     vlc_object_yield( p_input );
-    vlc_mutex_lock( &p_input->input.p_item->lock );
+    vlc_mutex_lock( &input_GetItem(p_input)->lock );
 
-    IT->update( p_input->input.p_item, need_update, need_update );
+    IT->update( input_GetItem(p_input), need_update, need_update );
     need_update = false;
 
-    vlc_mutex_unlock( &p_input->input.p_item->lock );
+    vlc_mutex_unlock( &input_GetItem(p_input)->lock );
     vlc_object_release( p_input );
 }
 

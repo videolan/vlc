@@ -26,8 +26,8 @@
 #define SKIN_COMMON_HPP
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include "charset.h"
+#include <vlc_interface.h>
+#include "vlc_charset.h"
 
 #include <string>
 using namespace std;

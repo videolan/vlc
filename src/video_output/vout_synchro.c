@@ -98,10 +98,9 @@
 #include <string.h>                                    /* memcpy(), memset() */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/input.h>
-
-#include "vout_synchro.h"
+#include <vlc_vout.h>
+#include <vlc_input.h>
+#include <vlc_vout_synchro.h>
 
 /*
  * Local prototypes

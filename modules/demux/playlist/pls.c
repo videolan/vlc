@@ -26,8 +26,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/intf.h>
+#include <vlc_demux.h>
 
 #include "playlist.h"
 

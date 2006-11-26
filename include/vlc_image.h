@@ -24,7 +24,7 @@
 #ifndef _VLC_IMAGE_H
 #define _VLC_IMAGE_H 1
 
-#include "vlc_video.h"
+#include <vlc_vout.h>
 
 # ifdef __cplusplus
 extern "C" {

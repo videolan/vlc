@@ -28,9 +28,7 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-
-#include "aout_internal.h"
+#include <vlc_aout.h>
 
 #define FRAME_SIZE 2048
 #define A52_FRAME_NB 1536

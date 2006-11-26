@@ -31,11 +31,12 @@
  *****************************************************************************/
 #include <ctype.h>
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
+#include <vlc_codec.h>
 #include <vlc_filter.h>
+#include <vlc_es.h>
 #include <vlc_image.h>
 #include <vlc_stream.h>
-#include <charset.h>
+#include <vlc_charset.h>
 
 static picture_t *ImageRead( image_handler_t *, block_t *,
                              video_format_t *, video_format_t * );

@@ -27,12 +27,12 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/decoder.h>
+#include <vlc_vout.h>
+#include <vlc_codec.h>
 
-#include "vlc_osd.h"
-#include "vlc_filter.h"
-#include "charset.h"
+#include <vlc_osd.h>
+#include <vlc_filter.h>
+#include <vlc_charset.h>
 
 typedef struct
 {

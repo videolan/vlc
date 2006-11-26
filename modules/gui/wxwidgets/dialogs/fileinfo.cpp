@@ -122,7 +122,7 @@ void FileInfo::Update()
 
     input_thread_t *p_input = p_playlist->p_input ;
 
-    if( !p_input || p_input->b_dead || !p_input->input.p_item->psz_name )
+    if( !p_input || p_input->b_dead || !input_GetItem(p_input)->psz_name )
     {
         item_info->Clear();
         advanced_info->Clear();
@@ -133,17 +133,17 @@ void FileInfo::Update()
     }
 
     vlc_object_yield( p_input );
-    vlc_mutex_lock( &p_input->input.p_item->lock );
+    vlc_mutex_lock( &input_GetItem(p_input)->lock );
     if( b_need_update == VLC_TRUE )
     {
-        vlc_mutex_unlock( &p_input->input.p_item->lock  );
-        item_info->Update( p_input->input.p_item );
-        vlc_mutex_lock( &p_input->input.p_item->lock  );
-        advanced_info->Update( p_input->input.p_item );
+        vlc_mutex_unlock( &input_GetItem(p_input)->lock  );
+        item_info->Update( input_GetItem(p_input) );
+        vlc_mutex_lock( &input_GetItem(p_input)->lock  );
+        advanced_info->Update( input_GetItem(p_input) );
     }
     if( b_stats )
-        stats_info->Update( p_input->input.p_item );
-    vlc_mutex_unlock( &p_input->input.p_item->lock );
+        stats_info->Update( input_GetItem(p_input) );
+    vlc_mutex_unlock( &input_GetItem(p_input)->lock );
 
     vlc_object_release(p_input);
     vlc_object_release( p_playlist );

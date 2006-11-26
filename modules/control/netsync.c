@@ -26,8 +26,9 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/input.h>
+#include <vlc_interface.h>
+#include <vlc_input.h>
+#include <vlc_es_out.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -39,7 +40,7 @@
 #   include <sys/types.h>
 #endif
 
-#include "network.h"
+#include <vlc_network.h>
 
 #define NETSYNC_PORT 9875
 
@@ -47,6 +48,9 @@
 #ifndef INADDR_NONE
 #define INADDR_NONE 0xffffffff
 #endif
+
+/* FIXME: UGLY UGLY !! Netsync should be totally reworked */
+#include "../../src/input/input_internal.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -313,9 +317,9 @@ static mtime_t GetClockRef( intf_thread_t *p_intf, mtime_t i_pts )
     input_thread_t *p_input = p_intf->p_sys->p_input;
     mtime_t i_ts;
 
-    if( !p_input || !p_input->p_es_out ) return 0;
+    if( !p_input || !p_input->p->p_es_out ) return 0;
 
-    if( es_out_Control( p_input->p_es_out, ES_OUT_GET_TS, i_pts, &i_ts ) ==
+    if( es_out_Control( p_input->p->p_es_out, ES_OUT_GET_TS, i_pts, &i_ts ) ==
         VLC_SUCCESS )
     {
         return i_ts;

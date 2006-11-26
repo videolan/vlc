@@ -144,19 +144,19 @@ void InputManager::UpdateInput()
 
 void InputManager::UpdateNowPlaying()
 {
-    char *psz_now_playing = p_input->input.p_item->p_meta->psz_nowplaying ?
-                    strdup( p_input->input.p_item->p_meta->psz_nowplaying ):
+    char *psz_now_playing = input_GetItem(p_input)->p_meta->psz_nowplaying ?
+                    strdup( input_GetItem(p_input)->p_meta->psz_nowplaying ):
                     strdup( "" );
     if( psz_now_playing && *psz_now_playing )
     {
         p_main_intf->statusbar->SetStatusText(
                     wxString(wxU(psz_now_playing)) + wxT( " - " ) +
-                    wxU(p_input->input.p_item->psz_name), 2 );
+                    wxU(input_GetItem(p_input)->psz_name), 2 );
     }
     else
     {
         p_main_intf->statusbar->SetStatusText(
-                   wxU(p_input->input.p_item->psz_name), 2 );
+                   wxU(input_GetItem(p_input)->psz_name), 2 );
     }
     free( psz_now_playing );
 }
@@ -202,7 +202,7 @@ void InputManager::UpdateButtons( vlc_bool_t b_play )
         if( p_main_intf->p_systray )
         {
             p_main_intf->p_systray->UpdateTooltip(
-                wxU(p_input->input.p_item->psz_name) + wxString(wxT(" - ")) +
+                wxU(input_GetItem(p_input)->psz_name) + wxString(wxT(" - ")) +
                 (val.i_int == PAUSE_S ? wxU(_("Paused")) : wxU(_("Playing"))));
         }
 #endif

@@ -28,11 +28,11 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/intf.h>
+#include <vlc_playlist.h>
+#include <vlc_demux.h>
 
-#include <network.h>
-#include <charset.h>
+#include <vlc_network.h>
+#include <vlc_charset.h>
 
 #include <ctype.h>
 #include <errno.h>
@@ -565,7 +565,7 @@ static int Demux( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    p_parent_input = p_input->input.p_item;
+    p_parent_input = input_GetItem(p_input);
 
     vlc_mutex_lock( &p_parent_input->lock );
     FREENULL( p_parent_input->psz_uri );

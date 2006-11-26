@@ -21,21 +21,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <mediacontrol_internal.h>
+#include "mediacontrol_internal.h"
 #include <vlc/mediacontrol.h>
 
-#include <vlc/intf.h>
-#include <vlc/vout.h>
-#include <vlc/aout.h>
+#include <vlc_interface.h>
+#include <vlc_aout.h>
+#include <vlc_input.h>
 #include <vlc_demux.h>
 
+#include <vlc_vout.h>
 #include <vlc_osd.h>
-
-#define HAS_SNAPSHOT 1
-
-#ifdef HAS_SNAPSHOT
-#include <snapshot.h>
-#endif
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
@@ -56,6 +51,9 @@
 
 #define RAISE( c, m )  exception->code = c; \
                        exception->message = strdup(m);
+
+/* FIXME: Need to stop accessing private input structures !! */
+#include "input/input_internal.h"
 
 vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
                                        mediacontrol_PositionKey from,
@@ -83,7 +81,7 @@ vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
         {
             double f_fps;
 
-            if( demux2_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
+            if( demux2_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
                 return 0;
             else
                 return( value * f_fps / 1000.0 );
@@ -96,7 +94,7 @@ vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
     {
         double f_fps;
 
-        if( demux2_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) ||
+        if( demux2_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) ||
                                 f_fps < 0.1 )
             return 0;
 

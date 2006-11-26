@@ -27,7 +27,9 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_block.h>
+#include <vlc_codecs.h>
 
 #define SEPARATOR_TEXT N_( "Multipart separator string" )
 #define SEPARATOR_LONGTEXT N_( "Multipart strings like MPJPEG use a " \

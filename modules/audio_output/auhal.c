@@ -29,10 +29,8 @@
 #include <unistd.h>
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <vlc_interaction.h>
-
-#include "aout_internal.h"
+#include <vlc_interface.h>
+#include <vlc_aout.h>
 
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnitProperties.h>

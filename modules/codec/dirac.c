@@ -26,8 +26,9 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/sout.h>
+#include <vlc_codec.h>
+#include <vlc_sout.h>
+#include <vlc_vout.h>
 
 #include <libdirac_decoder/dirac_parser.h>
 #include <libdirac_encoder/dirac_encoder.h>

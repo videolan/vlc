@@ -29,7 +29,7 @@
 #include "../src/dialogs.hpp"
 #include "cmd_change_skin.hpp"
 
-#include <vlc_interaction.h>
+#include <vlc_interface.h>
 
 template<int TYPE = 0> class CmdDialogs;
 

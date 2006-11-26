@@ -50,7 +50,7 @@
 #import "controls.h"
 #import "vlc_osd.h"
 #import "misc.h"
-#import <vlc_interaction.h>
+#import <vlc_interface.h>
 
 /*****************************************************************************
  * VLCPlaylistView implementation 

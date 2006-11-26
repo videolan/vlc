@@ -28,11 +28,13 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_block.h>
+
+#include <vlc_input.h>
+#include <vlc_playlist.h>
 
 #ifdef HAVE_AVAHI_CLIENT
-    #include <vlc/intf.h>
-
     #include "bonjour.h"
 
     #if defined( WIN32 )

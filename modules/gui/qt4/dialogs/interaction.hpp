@@ -24,7 +24,7 @@
 #define _INTERACTION_H_
 
 #include <vlc/vlc.h>
-#include <vlc_interaction.h>
+#include <vlc_interface.h>
 #include <QWidget>
 
 class QPushButton;

@@ -34,7 +34,7 @@
 
 #include <stdlib.h>
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_demux.h>
 #include "vlc_codec.h"
 
 #define SERIES1_PES_LENGTH  (11)

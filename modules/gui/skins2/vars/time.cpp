@@ -25,8 +25,7 @@
 #include <stdio.h>  // snprintf
 
 #include "time.hpp"
-#include <vlc/input.h>
-
+#include <vlc_input.h>
 
 void StreamTime::set( float percentage, bool updateVLC )
 {

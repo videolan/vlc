@@ -23,8 +23,8 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
+#include <vlc_playlist.h>
 #include "cmd_add_item.hpp"
-
 
 void CmdAddItem::execute()
 {

@@ -27,9 +27,9 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <vlc/vout.h>
-#include <vlc/decoder.h>
+#include <vlc_aout.h>
+#include <vlc_vout.h>
+#include <vlc_codec.h>
 
 #if !defined (__APPLE__) && !defined(WIN32)
 # define LOADER 1

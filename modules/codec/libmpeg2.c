@@ -26,12 +26,12 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/decoder.h>
+#include <vlc_vout.h>
+#include <vlc_codec.h>
 
 #include <mpeg2dec/mpeg2.h>
 
-#include "vout_synchro.h"
+#include <vlc_vout_synchro.h>
 
 /* Aspect ratio (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
 #define AR_SQUARE_PICTURE       1                           /* square pixels */

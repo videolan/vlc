@@ -118,17 +118,17 @@ void InputManager::update()
 
     /* Update text */
     QString text;
-    if( p_input->input.p_item->p_meta &&
-        p_input->input.p_item->p_meta->psz_nowplaying &&
-        *p_input->input.p_item->p_meta->psz_nowplaying )
+    if( input_GetItem(p_input)->p_meta &&
+        input_GetItem(p_input)->p_meta->psz_nowplaying &&
+        *input_GetItem(p_input)->p_meta->psz_nowplaying )
     {
         text.sprintf( "%s - %s",
-                  p_input->input.p_item->p_meta->psz_nowplaying,
-                  p_input->input.p_item->psz_name );
+                  input_GetItem(p_input)->p_meta->psz_nowplaying,
+                  input_GetItem(p_input)->psz_name );
     }
     else
     {
-        text.sprintf( "%s", p_input->input.p_item->psz_name );
+        text.sprintf( "%s", input_GetItem(p_input)->psz_name );
     }
     emit nameChanged( text );
 

@@ -30,8 +30,7 @@
 
 /* VLC headers */
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/input.h>
+#include <vlc_interface.h>
 extern "C"
 {
   #include <audio_output.h>

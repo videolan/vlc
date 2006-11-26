@@ -40,8 +40,11 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <libvlc_internal.h>
-#include <vlc/input.h>
+#include "control/libvlc_internal.h"
+#include <vlc_input.h>
+
+#include "misc/modules.h"
+#include "misc/configuration.h"
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>                                              /* sprintf() */
@@ -80,21 +83,20 @@
 #   include <hal/libhal.h>
 #endif
 
-#include "vlc_cpu.h"                                        /* CPU detection */
-#include "os_specific.h"
+#include "vlc_os_specific.h"
 
-#include "vlc_error.h"
+#include <vlc_playlist.h>
+#include <vlc_interface.h>
 
-#include "vlc_playlist.h"
-#include "vlc_interface.h"
+#include <vlc_aout.h>
+#include "audio_output/aout_internal.h"
 
-#include "audio_output.h"
+#include <vlc_vout.h>
 
-#include "vlc_video.h"
-#include "video_output.h"
+#include <vlc_sout.h>
+#include "stream_output/stream_output.h"
 
-#include "stream_output.h"
-#include "charset.h"
+#include <vlc_charset.h>
 
 #include "libvlc.h"
 
@@ -130,6 +132,9 @@ static int  VerboseCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
 
 static void InitDeviceValues( libvlc_int_t * );
+
+/* Refs misc/cpu.c */
+uint32_t CPUCapabilities( void );
 
 /*****************************************************************************
  * vlc_current_object: return the current object.

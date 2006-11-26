@@ -31,10 +31,10 @@
 
 #include <assert.h>
 
-#include "vlc_httpd.h"
-#include "network.h"
-#include "vlc_tls.h"
-#include "vlc_acl.h"
+#include <vlc_httpd.h>
+#include <vlc_network.h>
+#include <vlc_tls.h>
+#include <vlc_acl.h>
 
 #include <string.h>
 #include <errno.h>

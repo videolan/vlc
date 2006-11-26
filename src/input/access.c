@@ -23,7 +23,6 @@
 
 #include <stdlib.h>
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 
 #include "input_internal.h"
 

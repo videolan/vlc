@@ -30,8 +30,9 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_codec.h>
+#include <vlc_block.h>
 
 #include "vlc_block_helper.h"
 #include "vlc_bits.h"

@@ -27,9 +27,9 @@
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <vlc/input.h>
+#include <vlc_demux.h>
 
-#include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
+#include <vlc_codecs.h>                   /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "libasf.h"
 
 #define ASF_DEBUG 1

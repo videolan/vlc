@@ -21,11 +21,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <libvlc_internal.h>
+#include "libvlc_internal.h"
 #include <vlc/libvlc.h>
 
-#include <audio_output.h> /* for audio_volume_t, AOUT_VOLUME_MAX */
-#include <vlc/intf.h>
+#include <vlc_aout.h>
 
 /*****************************************************************************
  * libvlc_audio_get_mute : Get the volume state, true if muted

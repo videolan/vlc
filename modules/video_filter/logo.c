@@ -29,7 +29,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #include "vlc_filter.h"
 #include "filter_common.h"

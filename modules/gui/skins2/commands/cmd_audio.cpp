@@ -22,8 +22,7 @@
  *****************************************************************************/
 
 #include "cmd_audio.hpp"
-#include <vlc/aout.h>
-#include "aout_internal.h"
+#include <vlc_aout.h>
 #include <string>
 
 void CmdSetEqualizer::execute()

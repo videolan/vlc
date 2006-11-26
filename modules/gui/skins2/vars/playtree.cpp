@@ -25,9 +25,10 @@
 #include <vlc/vlc.h>
 
 #include "playtree.hpp"
+#include <vlc_playlist.h>
 #include "../utils/ustring.hpp"
 
-#include "charset.h"
+#include "vlc_charset.h"
 
 
 Playtree::Playtree( intf_thread_t *pIntf ): VarTree( pIntf )

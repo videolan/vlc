@@ -27,8 +27,9 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc_interaction.h>
+#include <vlc_input.h>
+#include <vlc_access.h>
+#include <vlc_interface.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -67,7 +68,7 @@
 #   define lseek fseek
 #endif
 
-#include "charset.h"
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Module descriptor

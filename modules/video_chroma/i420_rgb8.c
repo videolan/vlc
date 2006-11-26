@@ -28,7 +28,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #include "i420_rgb.h"
 #include "i420_rgb_c.h"

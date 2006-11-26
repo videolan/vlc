@@ -28,12 +28,13 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/input.h>
+#include <vlc_interface.h>
+#include <vlc_demux.h>
+#include <vlc_playlist.h>
 
 #include <sys/types.h>
 
-#include "vlc_meta.h"
+#include <vlc_meta.h>
 
 #include <id3tag.h>
 #include "id3genres.h"

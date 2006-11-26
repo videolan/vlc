@@ -30,10 +30,10 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <vlc/intf.h>
+#include <vlc_aout.h>
+#include <vlc_interface.h>
 
-#include "charset.h"
+#include "vlc_charset.h"
 
 #include "dialogs/vlm/vlm_panel.hpp"
 #include "dialogs/bookmarks.hpp"

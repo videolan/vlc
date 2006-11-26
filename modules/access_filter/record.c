@@ -29,13 +29,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <vlc/input.h>
-#include <vlc/vout.h>
+#include <vlc_input.h>
+#include <vlc_access.h>
 
 #include "vlc_keys.h"
 #include <vlc_osd.h>
-#include "charset.h"
+#include <vlc_charset.h>
 #include <errno.h>
 #include <time.h>
 
@@ -379,19 +378,20 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
         p_input = vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
         if( p_input )
         {
-            vlc_mutex_lock( &p_input->input.p_item->lock );
-            if( p_input->input.p_item->psz_name )
+            input_item_t * p_item = input_GetItem( p_input );
+            vlc_mutex_lock( &p_item->lock );
+            if( p_item->psz_name )
             {
-                char *p = strrchr( p_input->input.p_item->psz_name, '/' );
+                char *p = strrchr( p_item->psz_name, '/' );
                 if( p == NULL )
-                    p = strrchr( p_input->input.p_item->psz_name, '\\' );
+                    p = strrchr( p_item->psz_name, '\\' );
 
                 if( p == NULL )
-                    psz_name = strdup( p_input->input.p_item->psz_name );
+                    psz_name = strdup( p_item->psz_name );
                 else if( p[1] != '\0' )
                     psz_name = strdup( &p[1] );
             }
-            vlc_mutex_unlock( &p_input->input.p_item->lock );
+            vlc_mutex_unlock( &p_item->lock );
 
             vlc_object_release( p_input );
         }

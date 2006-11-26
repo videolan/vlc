@@ -24,6 +24,10 @@
 #ifndef _VLC_DEMUX_H
 #define _VLC_DEMUX_H 1
 
+#include <vlc_es.h>
+#include <vlc_stream.h>
+#include <vlc_es_out.h>
+
 /**
  * \defgroup demux Demux
  * @{
@@ -108,30 +112,7 @@ enum demux_query_e
     DEMUX_SET_PAUSE_STATE       /* arg1= vlc_bool_t     can fail */
 };
 
-/* stream_t *s could be null and then it mean a access+demux in one */
-#define demux2_New( a, b, c, d, e, f,g ) __demux2_New(VLC_OBJECT(a),b,c,d,e,f,g)
-VLC_EXPORT( demux_t *, __demux2_New,  ( vlc_object_t *p_obj, const char *psz_access, const char *psz_demux, const char *psz_path, stream_t *s, es_out_t *out, vlc_bool_t ) );
-VLC_EXPORT( void,      demux2_Delete, ( demux_t * ) );
 VLC_EXPORT( int,       demux2_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args ) );
-
-static inline int demux2_Demux( demux_t *p_demux )
-{
-    return p_demux->pf_demux( p_demux );
-}
-static inline int demux2_vaControl( demux_t *p_demux, int i_query, va_list args )
-{
-    return p_demux->pf_control( p_demux, i_query, args );
-}
-static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
-{
-    va_list args;
-    int     i_result;
-
-    va_start( args, i_query );
-    i_result = demux2_vaControl( p_demux, i_query, args );
-    va_end( args );
-    return i_result;
-}
 
 /*************************************************************************
  * Miscellaneous helpers for demuxers

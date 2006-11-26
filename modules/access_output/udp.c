@@ -33,7 +33,8 @@
 #include <fcntl.h>
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_block.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -49,7 +50,7 @@
 #   include <sys/socket.h>
 #endif
 
-#include "network.h"
+#include <vlc_network.h>
 
 #define MAX_EMPTY_BLOCKS 200
 

@@ -39,7 +39,7 @@ static uint64_t DoHash    ( const char *, int );
 #define DARRAY p_dict->p_entries
 #define DSIZE p_dict->i_entries
 
-dict_t *vlc_DictNew()
+dict_t *vlc_DictNew(void)
 {
     DECMALLOC_NULL( p_dict, dict_t );
     p_dict->i_entries = 0;

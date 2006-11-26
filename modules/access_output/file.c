@@ -34,8 +34,9 @@
 #include <errno.h>
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
-#include "charset.h"
+#include <vlc_sout.h>
+#include <vlc_block.h>
+#include <vlc_charset.h>
 #include "vlc_strings.h"
 
 #ifdef HAVE_UNISTD_H

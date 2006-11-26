@@ -585,7 +585,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
 #define p_sys p_args->p_intf->p_sys
     if( p_sys->p_input )
     {
-        input_item_t *p_item = p_sys->p_input->input.p_item;
+        input_item_t *p_item = input_GetItem( p_sys->p_input );
         if( p_item )
         {
             vlc_mutex_lock( &p_item->p_stats->lock );

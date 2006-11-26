@@ -29,7 +29,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #define SRC_FOURCC  "I420,IYUV,YV12"
 #define DEST_FOURCC "YMGA"

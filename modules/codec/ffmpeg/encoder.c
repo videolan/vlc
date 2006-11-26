@@ -29,11 +29,11 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/aout.h>
-#include <vlc/sout.h>
-#include <vlc/decoder.h>
-#include <vlc_interaction.h>
+#include <vlc_vout.h>
+#include <vlc_aout.h>
+#include <vlc_sout.h>
+#include <vlc_codec.h>
+#include <vlc_interface.h>
 
 /* ffmpeg header */
 #define HAVE_MMX 1

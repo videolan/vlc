@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <<vlc_input.h>>
 
 #include "vcd.h"
 #include <vlc_playlist.h> 

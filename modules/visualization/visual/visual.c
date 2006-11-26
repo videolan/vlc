@@ -27,9 +27,8 @@
 #define _GNU_SOURCE
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include "audio_output.h"
-#include "aout_internal.h"
+#include <vlc_vout.h>
+#include <vlc_aout.h>
 
 #include "visual.h"
 

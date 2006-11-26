@@ -27,10 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-
+#include <vlc_vout.h>
 #include <vlc_filter.h>
-#include <vlc_video.h>
 
 #include <vlc_osd.h>
 

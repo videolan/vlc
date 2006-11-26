@@ -23,8 +23,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include "codecs.h"                                      /* BITMAPINFOHEADER */
+#include <vlc_demux.h>
+#include <vlc_codecs.h>                                /* BITMAPINFOHEADER */
 
 #include "libavi.h"
 

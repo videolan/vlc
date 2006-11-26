@@ -47,8 +47,7 @@
 
 #include <assert.h>
 
-#include "vlc_interface.h"
-#include "charset.h"
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Local macros

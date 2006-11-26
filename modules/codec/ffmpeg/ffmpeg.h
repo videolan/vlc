@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "codecs.h"                                      /* BITMAPINFOHEADER */
+#include <vlc_codecs.h>                               /* BITMAPINFOHEADER */
 
 struct picture_t;
 struct AVFrame;

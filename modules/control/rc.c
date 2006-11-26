@@ -35,11 +35,11 @@
 #include <ctype.h>
 #include <signal.h>
 
-#include <vlc/intf.h>
-#include <vlc/aout.h>
-#include <vlc/vout.h>
-#include <vlc_video.h>
+#include <vlc_interface.h>
+#include <vlc_aout.h>
+#include <vlc_vout.h>
 #include <vlc_osd.h>
+#include <vlc_playlist.h>
 #include <vlc_update.h>
 
 #ifdef HAVE_UNISTD_H
@@ -51,11 +51,10 @@
 #endif
 #include <sys/types.h>
 
-#include "vlc_error.h"
-#include "network.h"
+#include <vlc_network.h>
 #include "vlc_url.h"
 
-#include "charset.h"
+#include <vlc_charset.h>
 
 #if defined(AF_UNIX) && !defined(AF_LOCAL)
 #    define AF_LOCAL AF_UNIX
@@ -597,7 +596,7 @@ static void Run( intf_thread_t *p_intf )
             {
                 if( !p_input->b_dead || !p_input->b_die )
                 {
-                    msg_rc( STATUS_CHANGE "( new input: %s )", p_input->input.p_item->psz_uri );
+                    msg_rc( STATUS_CHANGE "( new input: %s )", input_GetItem(p_input)->psz_uri );
                     msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_intf, "volume" ));
                 }
                 var_AddCallback( p_input, "state", StateChanged, p_intf );
@@ -729,11 +728,11 @@ static void Run( intf_thread_t *p_intf )
             if( p_input )
             {
                 int i, j;
-                vlc_mutex_lock( &p_input->input.p_item->lock );
-                for ( i = 0; i < p_input->input.p_item->i_categories; i++ )
+                vlc_mutex_lock( &input_GetItem(p_input)->lock );
+                for ( i = 0; i < input_GetItem(p_input)->i_categories; i++ )
                 {
-                    info_category_t *p_category =
-                        p_input->input.p_item->pp_categories[i];
+                    info_category_t *p_category = input_GetItem(p_input)
+                                                        ->pp_categories[i];
 
                     msg_rc( "+----[ %s ]", p_category->psz_name );
                     msg_rc( "| " );
@@ -746,7 +745,7 @@ static void Run( intf_thread_t *p_intf )
                     msg_rc( "| " );
                 }
                 msg_rc( "+----[ end of stream info ]" );
-                vlc_mutex_unlock( &p_input->input.p_item->lock );
+                vlc_mutex_unlock( &input_GetItem(p_input)->lock );
             }
             else
             {
@@ -798,7 +797,7 @@ static void Run( intf_thread_t *p_intf )
             }
             else
             {
-                msg_rc( "%s", p_input->input.p_item->psz_name );
+                msg_rc( "%s", input_GetItem(p_input)->psz_name );
             }
         }
         else if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "h", 1 )
@@ -1447,7 +1446,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( p_playlist->p_input )
         {
             /* Replay the current state of the system. */
-            msg_rc( STATUS_CHANGE "( new input: %s )", p_playlist->p_input->input.p_item->psz_uri );
+            msg_rc( STATUS_CHANGE "( new input: %s )", input_GetItem(p_playlist->p_input)->psz_uri );
             msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_intf, "volume" ));
 
             vlc_mutex_lock( &p_playlist->object_lock );

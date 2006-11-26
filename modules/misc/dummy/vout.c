@@ -28,7 +28,7 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #define DUMMY_WIDTH 16
 #define DUMMY_HEIGHT 16

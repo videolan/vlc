@@ -21,22 +21,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <mediacontrol_internal.h>
+#include "mediacontrol_internal.h"
 #include <vlc/mediacontrol.h>
 
 #include <vlc/libvlc.h>
-#include <vlc/intf.h>
-#include <vlc/vout.h>
-#include <vlc/aout.h>
-#include <vlc_demux.h>
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
 
+#include <vlc_vout.h>
+#include <vlc_aout.h>
+#include <vlc_input.h>
 #include <vlc_osd.h>
-
-#define HAS_SNAPSHOT 1
-
-#ifdef HAS_SNAPSHOT
-#include <snapshot.h>
-#endif
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
@@ -158,7 +153,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
     }
     else
     {
-        if( ! self->p_playlist->p_input ) 
+        if( ! self->p_playlist->p_input )
         {
             libvlc_input_free( p_input );
             RAISE_NULL( mediacontrol_InternalException,
@@ -423,7 +418,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
             break;
         }
 
-        retval->url = strdup( p_input->input.p_item->psz_uri );
+        retval->url = strdup( input_GetItem(p_input)->psz_uri );
 
         /* TIME and LENGTH are in microseconds. We want them in ms */
         var_Get( p_input, "time", &val);

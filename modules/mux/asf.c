@@ -28,10 +28,10 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_block.h>
+#include <vlc_codecs.h>
 
-#include "codecs.h"
 typedef GUID guid_t;
 
 #define MAX_ASF_TRACKS 128

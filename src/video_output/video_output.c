@@ -39,17 +39,19 @@
 #   include <sys/times.h>
 #endif
 
-#include "vlc_video.h"
-#include "video_output.h"
-#include "vlc_spu.h"
-#include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
-#include "vlc_playlist.h"
+#include <vlc_vout.h>
+#include <vlc_playlist.h>
 
-#include "vlc_filter.h"
+#include <vlc_filter.h>
+#include <vlc_osd.h>
 
 #if defined( __APPLE__ )
 #include "darwin_specific.h"
 #endif
+
+/** FIXME This is quite ugly but needed while we don't have counters
+ * helpers */
+#include "input/input_internal.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -776,14 +778,14 @@ static void RunThread( vout_thread_t *p_vout)
             }
             if( p_input )
             {
-                vlc_mutex_lock( &p_input->counters.counters_lock );
-                stats_UpdateInteger( p_vout, p_input->counters.p_lost_pictures,
+                vlc_mutex_lock( &p_input->p->counters.counters_lock );
+                stats_UpdateInteger( p_vout, p_input->p->counters.p_lost_pictures,
                                      i_lost , NULL);
                 stats_UpdateInteger( p_vout,
-                                     p_input->counters.p_displayed_pictures,
+                                     p_input->p->counters.p_displayed_pictures,
                                      i_displayed , NULL);
                 i_displayed = i_lost = 0;
-                vlc_mutex_unlock( &p_input->counters.counters_lock );
+                vlc_mutex_unlock( &p_input->p->counters.counters_lock );
             }
         }
 #if 0

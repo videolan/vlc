@@ -34,9 +34,9 @@
  * character table identified in the subtitle descriptor.
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/decoder.h>
-#include <vlc/sout.h>
+#include <vlc_vout.h>
+#include <vlc_codec.h>
+#include <vlc_sout.h>
 
 #include "vlc_bits.h"
 

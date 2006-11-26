@@ -28,8 +28,8 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc_interaction.h>
+#include <vlc_vout.h>
+#include <vlc_interface.h>
 
 #include "filter_common.h"
 

@@ -29,8 +29,8 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <vlc/intf.h>
+#include <vlc_aout.h>
+#include <vlc_interface.h>
 
 #include "wince.h"
 

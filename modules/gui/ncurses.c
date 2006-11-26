@@ -37,10 +37,10 @@
 #include <curses.h>
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/vout.h>
-#include <vlc/aout.h>
-#include "charset.h"
+#include <vlc_interface.h>
+#include <<vlc_vout.h>>
+#include <<vlc_aout.h>>
+#include <vlc_charset.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>

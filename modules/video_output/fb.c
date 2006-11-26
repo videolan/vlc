@@ -40,7 +40,7 @@
 #include <linux/kd.h>                                                 /* KD* */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 /*****************************************************************************
  * Local prototypes

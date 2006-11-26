@@ -25,6 +25,12 @@
 #ifndef _VLC_VLM_H
 #define _VLC_VLM_H 1
 
+#ifdef __cpluplus
+extern "C" {
+#endif
+
+#include <vlc_input.h>
+
 /* VLM specific - structures and functions */
 enum
 {
@@ -145,5 +151,9 @@ VLC_EXPORT( int, vlm_ScheduleSetup, ( vlm_schedule_t *, const char *, const char
 VLC_EXPORT( int, vlm_MediaVodControl, ( void *, vod_media_t *, const char *, int, va_list ) );
 VLC_EXPORT( int, vlm_Save, ( vlm_t *, const char * ) );
 VLC_EXPORT( int, vlm_Load, ( vlm_t *, const char * ) );
+
+#ifdef __cpluplus
+}
+#endif
 
 #endif

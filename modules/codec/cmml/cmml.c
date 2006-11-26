@@ -28,13 +28,11 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/intf.h>
-
+#include <vlc_input.h>
+#include <vlc_codec.h>
 #include <vlc_osd.h>
-
-#include "charset.h"
-
+#include <vlc_charset.h>
+#include <vlc_interface.h>
 #include "xtag.h"
 
 #undef  CMML_DEBUG

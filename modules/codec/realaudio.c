@@ -23,9 +23,8 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <vlc/vout.h>
-#include <vlc/decoder.h>
+#include <vlc_aout.h>
+#include <vlc_codec.h>
 
 #ifdef LOADER
 /* Need the w32dll loader from mplayer */

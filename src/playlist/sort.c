@@ -21,18 +21,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 #include "vlc_playlist.h"
 #include "playlist_internal.h"
 
 
-int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
-                playlist_item_t **pp_items, int i_mode,
-                int i_type );
+static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
+                                   playlist_item_t **pp_items, int i_mode,
+                                   int i_type );
 
 /**
  * Sort a node.
- *
  * This function must be entered with the playlist lock !
  *
  * \param p_playlist the playlist
@@ -41,8 +39,8 @@ int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
  * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
  * \return VLC_SUCCESS on success
  */
-int playlist_NodeSort( playlist_t * p_playlist , playlist_item_t *p_node,
-                       int i_mode, int i_type )
+static int playlist_NodeSort( playlist_t * p_playlist , playlist_item_t *p_node,
+                              int i_mode, int i_type )
 {
     playlist_ItemArraySort( p_playlist,p_node->i_children,
                             p_node->pp_children, i_mode, i_type );
@@ -77,9 +75,9 @@ int playlist_RecursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
 }
 
 
-int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
-                            playlist_item_t **pp_items, int i_mode,
-                            int i_type )
+static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
+                                   playlist_item_t **pp_items, int i_mode,
+                                   int i_type )
 {
     int i , i_small , i_position;
     playlist_item_t *p_temp;

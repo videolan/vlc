@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_access.h>
 
 #include <sys/ioctl.h>
 #include <errno.h>
@@ -65,7 +65,7 @@
 
 #include "dvb.h"
 
-#include "charset.h"
+#include <vlc_charset.h>
 
 #undef DEBUG_TPDU
 #define HLCI_WAIT_CAM_READY 0

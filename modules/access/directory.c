@@ -26,9 +26,10 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 #include <vlc_playlist.h>
 #include <vlc_input.h>
+#include <vlc_access.h>
+#include <vlc_demux.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -57,7 +58,7 @@
 #   include <dirent.h>
 #endif
 
-#include "charset.h"
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -182,8 +183,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     int                 i_mode, i_activity;
     playlist_t         *p_playlist = pl_Yield( p_access );
     playlist_item_t    *p_item_in_category;
-    input_item_t       *p_current_input = ( (input_thread_t*)p_access->p_parent)
-                                                       ->input.p_item;
+    input_item_t       *p_current_input = input_GetItem(
+                                    (input_thread_t*)p_access->p_parent);
     playlist_item_t    *p_current = playlist_ItemGetByInput( p_playlist,
                                                              p_current_input,
                                                              VLC_FALSE );

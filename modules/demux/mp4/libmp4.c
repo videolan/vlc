@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <vlc/input.h>
+#include <vlc_demux.h>
 
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>                                  /* for compressed moov */

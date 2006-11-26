@@ -32,7 +32,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #ifdef __APPLE__
 #include <OpenGL/gl.h>

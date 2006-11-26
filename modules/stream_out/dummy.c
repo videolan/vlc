@@ -28,7 +28,8 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
+#include <vlc_block.h>
+#include <vlc_sout.h>
 
 /*****************************************************************************
  * Exported prototypes

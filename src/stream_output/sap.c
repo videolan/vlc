@@ -33,10 +33,11 @@
 #include <string.h>                                            /* strerror() */
 #include <ctype.h>                                  /* tolower(), isxdigit() */
 
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_network.h>
+#include <vlc_charset.h>
 
-#include "network.h"
-#include "charset.h"
+#include "stream_output.h"
 
 /* SAP is always on that port */
 #define SAP_PORT 9875

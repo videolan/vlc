@@ -29,8 +29,9 @@
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <vlc/input.h>
-#include "charset.h"
+#include <vlc_demux.h>
+#include <vlc_charset.h>
+#include <vlc_meta.h>
 
 /*****************************************************************************
  * Module descriptor

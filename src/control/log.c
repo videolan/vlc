@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <libvlc_internal.h>
+#include "libvlc_internal.h"
 #include <vlc/libvlc.h>
 
 struct libvlc_log_t

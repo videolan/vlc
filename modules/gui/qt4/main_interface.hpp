@@ -23,8 +23,8 @@
 #ifndef _MAIN_INTERFACE_H_
 #define _MAIN_INTERFACE_H_
 
-#include <vlc/intf.h>
-#include <vlc/aout.h>
+#include "qt4.hpp"
+#include <vlc_aout.h>
 #include "ui/main_interface.h"
 #include "util/qvlcframe.hpp"
 

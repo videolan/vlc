@@ -31,7 +31,7 @@ extern "C"
 #include <errno.h>
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
+#include <vlc_aout.h>
 
 #include "aout_internal.h"
 }

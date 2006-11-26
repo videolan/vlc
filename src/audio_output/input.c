@@ -31,14 +31,17 @@
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
+#include <vlc_input.h>                 /* for input_thread_t and i_pts_delay */
 
 #ifdef HAVE_ALLOCA_H
 #   include <alloca.h>
 #endif
+#include <vlc_aout.h>
 
-#include "audio_output.h"
 #include "aout_internal.h"
+
+/** FIXME: Ugly but needed to access the counters */
+#include "input/input_internal.h"
 
 static void inputFailure( aout_instance_t *, aout_input_t *, char * );
 static int VisualizationCallback( vlc_object_t *, char const *,
@@ -452,9 +455,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         start_date = 0;
         if( p_input->p_input_thread )
         {
-            vlc_mutex_lock( &p_input->p_input_thread->counters.counters_lock);
-            stats_UpdateInteger( p_aout, p_input->p_input_thread->counters.p_lost_abuffers, 1, NULL );
-            vlc_mutex_unlock( &p_input->p_input_thread->counters.counters_lock);
+            vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
+            stats_UpdateInteger( p_aout, p_input->p_input_thread->p->counters.p_lost_abuffers, 1, NULL );
+            vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
         }
     }
 
@@ -466,9 +469,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   mdate() - p_buffer->start_date );
         if( p_input->p_input_thread )
         {
-            vlc_mutex_lock( &p_input->p_input_thread->counters.counters_lock);
-            stats_UpdateInteger( p_aout, p_input->p_input_thread->counters.p_lost_abuffers, 1, NULL );
-            vlc_mutex_unlock( &p_input->p_input_thread->counters.counters_lock);
+            vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
+            stats_UpdateInteger( p_aout, p_input->p_input_thread->p->counters.p_lost_abuffers, 1, NULL );
+            vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
         }
         aout_BufferFree( p_buffer );
         p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
@@ -509,9 +512,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         aout_BufferFree( p_buffer );
         if( p_input->p_input_thread )
         {
-            vlc_mutex_lock( &p_input->p_input_thread->counters.counters_lock);
-            stats_UpdateInteger( p_aout, p_input->p_input_thread->counters.p_lost_abuffers, 1, NULL );
-            vlc_mutex_unlock( &p_input->p_input_thread->counters.counters_lock);
+            vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
+            stats_UpdateInteger( p_aout, p_input->p_input_thread->p->counters.p_lost_abuffers, 1, NULL );
+            vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
         }
         return 0;
     }

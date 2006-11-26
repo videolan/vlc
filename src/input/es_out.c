@@ -30,8 +30,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <vlc/input.h>
-#include <vlc/decoder.h>
+#include <vlc_input.h>
+#include <vlc_es_out.h>
+#include <vlc_block.h>
 
 #include "input_internal.h"
 
@@ -492,7 +493,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->i_es = 0;
     p_pgrm->b_selected = VLC_FALSE;
     p_pgrm->psz_now_playing = NULL;
-    input_ClockInit( &p_pgrm->clock, VLC_FALSE, p_input->input.i_cr_average );
+    input_ClockInit( &p_pgrm->clock, VLC_FALSE, p_input->p->input.i_cr_average );
 
     /* Append it */
     TAB_APPEND( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
@@ -629,7 +630,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
 
         if( p_sys->p_pgrm == p_pgrm )
         {
-            vlc_meta_SetNowPlaying( p_input->input.p_item->p_meta,
+            vlc_meta_SetNowPlaying( p_input->p->input.p_item->p_meta,
                                     psz_now_playing );
         }
     }
@@ -751,7 +752,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
     {
         if( !var_GetBool( p_input, "video" ) ||
-            ( p_input->p_sout && !var_GetBool( p_input, "sout-video" ) ) )
+            ( p_input->p->p_sout && !var_GetBool( p_input, "sout-video" ) ) )
         {
             msg_Dbg( p_input, "video is disabled, not selecting ES 0x%x",
                      es->i_id );
@@ -762,7 +763,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     {
         var_Get( p_input, "audio", &val );
         if( !var_GetBool( p_input, "audio" ) ||
-            ( p_input->p_sout && !var_GetBool( p_input, "sout-audio" ) ) )
+            ( p_input->p->p_sout && !var_GetBool( p_input, "sout-audio" ) ) )
         {
             msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
                      es->i_id );
@@ -773,7 +774,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     {
         var_Get( p_input, "spu", &val );
         if( !var_GetBool( p_input, "spu" ) ||
-            ( p_input->p_sout && !var_GetBool( p_input, "sout-spu" ) ) )
+            ( p_input->p->p_sout && !var_GetBool( p_input, "sout-spu" ) ) )
         {
             msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
                      es->i_id );
@@ -1031,12 +1032,12 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
     if( p_input->p_libvlc->b_stats )
     {
-        vlc_mutex_lock( &p_input->counters.counters_lock );
-        stats_UpdateInteger( p_input, p_input->counters.p_demux_read,
+        vlc_mutex_lock( &p_input->p->counters.counters_lock );
+        stats_UpdateInteger( p_input, p_input->p->counters.p_demux_read,
                              p_block->i_buffer, &i_total );
-        stats_UpdateFloat( p_input , p_input->counters.p_demux_bitrate,
+        stats_UpdateFloat( p_input , p_input->p->counters.p_demux_bitrate,
                            (float)i_total, NULL );
-        vlc_mutex_unlock( &p_input->counters.counters_lock );
+        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
     }
 
     /* Mark preroll blocks */
@@ -1079,11 +1080,11 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         }
     }
 
-    p_block->i_rate = p_input->i_rate;
+    p_block->i_rate = p_input->p->i_rate;
 
     /* TODO handle mute */
     if( es->p_dec && ( es->fmt.i_cat != AUDIO_ES ||
-        p_input->i_rate == INPUT_RATE_DEFAULT ) )
+        p_input->p->i_rate == INPUT_RATE_DEFAULT ) )
     {
         input_DecoderDecode( es->p_dec, p_block );
     }

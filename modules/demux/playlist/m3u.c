@@ -28,9 +28,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/intf.h>
-#include "charset.h"
+#include <vlc_demux.h>
+#include <vlc_charset.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 #include "playlist.h"

@@ -23,10 +23,9 @@
  *****************************************************************************/
 
 #include <stdio.h>  // snprintf
-
-#include <vlc/aout.h>
+#include <vlc/vlc.h>
+#include <vlc_aout.h>
 #include "volume.hpp"
-
 
 Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
 {

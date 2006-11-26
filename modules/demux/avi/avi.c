@@ -26,13 +26,13 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_demux.h>
 
-#include <vlc_interaction.h>
+#include <vlc_interface.h>
 
-#include "vlc_meta.h"
-#include "codecs.h"
-#include "charset.h"
+#include <vlc_meta.h>
+#include <vlc_codecs.h>
+#include <vlc_charset.h>
 
 #include "libavi.h"
 

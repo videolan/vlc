@@ -27,8 +27,11 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc_interaction.h>
+#include <vlc_input.h>
+#include <vlc_access.h>
+#include <vlc_demux.h>
+
+#include <vlc_interface.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>

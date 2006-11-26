@@ -25,7 +25,7 @@
 #define _EQUALIZER_H_
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
+#include <vlc_aout.h>
 #include "ui/equalizer.h"
 
 #define BANDS 10

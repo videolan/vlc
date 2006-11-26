@@ -26,8 +26,8 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/intf.h>
+#include <vlc_vout.h>
+#include <vlc_interface.h>
 
 #include "wince.h"
 

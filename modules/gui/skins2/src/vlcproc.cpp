@@ -22,9 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc/aout.h>
-#include <vlc/vout.h>
-#include <aout_internal.h>
+#include <vlc/vlc.h>
+#include <vlc_aout.h>
+#include <vlc_vout.h>
+#include <vlc_playlist.h>
 
 #include "vlcproc.hpp"
 #include "os_factory.hpp"
@@ -566,7 +567,7 @@ void VlcProc::updateStreamName( playlist_t *p_playlist )
     if( p_playlist && p_playlist->p_input )
     {
         // Get playlist item information
-        input_item_t *pItem = p_playlist->p_input->input.p_item;
+        input_item_t *pItem = input_GetItem(p_playlist->p_input);
 
         VarText &rStreamName = getStreamNameVar();
         VarText &rStreamURI = getStreamURIVar();

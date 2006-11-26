@@ -26,6 +26,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
+#include <vlc_input.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -36,9 +37,8 @@
 #endif
 #include <ctype.h>
 
-#include <vlc/input.h>
-#include "vlc_video.h"
-#include "charset.h"
+#include <vlc_demux.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Module descriptor

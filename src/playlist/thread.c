@@ -24,8 +24,8 @@
 #include <vlc/vlc.h>
 #include <vlc_es.h>
 #include <vlc_input.h>
-#include "vlc_playlist.h"
-#include "vlc_interaction.h"
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
 #include "playlist_internal.h"
 
 /*****************************************************************************

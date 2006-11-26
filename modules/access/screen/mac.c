@@ -27,7 +27,6 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 
 #include <Carbon/Carbon.h>
 #include <ApplicationServices/ApplicationServices.h>

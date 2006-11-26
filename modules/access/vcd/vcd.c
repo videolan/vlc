@@ -27,7 +27,8 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_input.h>
+#include <vlc_access.h>
 
 #include "cdrom.h"
 

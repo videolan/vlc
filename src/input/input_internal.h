@@ -1,7 +1,7 @@
 /*****************************************************************************
- * input_internal.h:
+ * input_internal.h: Internal input structures
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -24,6 +24,118 @@
 #ifndef _INPUT_INTERNAL_H
 #define _INPUT_INTERNAL_H 1
 
+#include <vlc_access.h>
+#include <vlc_demux.h>
+#include <vlc_input.h>
+
+/*****************************************************************************
+ *  Private input fields
+ *****************************************************************************/
+/* input_source_t: gathers all information per input source */
+typedef struct
+{
+    /* Input item description */
+    input_item_t *p_item;
+
+    /* Access/Stream/Demux plugins */
+    access_t *p_access;
+    stream_t *p_stream;
+    demux_t  *p_demux;
+
+    /* Title infos for that input */
+    vlc_bool_t   b_title_demux; /* Titles/Seekpoints provided by demux */
+    int          i_title;
+    input_title_t **title;
+
+    int i_title_offset;
+    int i_seekpoint_offset;
+
+    int i_title_start;
+    int i_title_end;
+    int i_seekpoint_start;
+    int i_seekpoint_end;
+
+    /* Properties */
+    vlc_bool_t b_can_pace_control;
+    vlc_bool_t b_can_pause;
+    vlc_bool_t b_eof;   /* eof of demuxer */
+
+    /* Clock average variation */
+    int     i_cr_average;
+
+} input_source_t;
+
+/** Private input fields */
+struct input_thread_private_t
+{
+    /* Global properties */
+    vlc_bool_t  b_can_pace_control;
+    vlc_bool_t  b_can_pause;
+
+    int         i_rate;
+    /* */
+    int64_t     i_start;    /* :start-time,0 by default */
+    int64_t     i_stop;     /* :stop-time, 0 if none */
+
+    /* Title infos FIXME multi-input (not easy) ? */
+    int          i_title;
+    input_title_t **title;
+
+    int i_title_offset;
+    int i_seekpoint_offset;
+
+    /* User bookmarks FIXME won't be easy with multiples input */
+    int         i_bookmark;
+    seekpoint_t **bookmark;
+
+    /* Global meta datas FIXME move to input_item_t ? */
+    vlc_meta_t  *p_meta;
+
+    /* Output */
+    es_out_t    *p_es_out;
+    sout_instance_t *p_sout;            /* XXX Move it to es_out ? */
+    vlc_bool_t      b_out_pace_control; /*     idem ? */
+
+    /* Main input properties */
+    input_source_t input;
+    /* Slave demuxers (subs, and others) */
+    int            i_slave;
+    input_source_t **slave;
+
+    /* Stats counters */
+    struct {
+        counter_t *p_read_packets;
+        counter_t *p_read_bytes;
+        counter_t *p_input_bitrate;
+        counter_t *p_demux_read;
+        counter_t *p_demux_bitrate;
+        counter_t *p_decoded_audio;
+        counter_t *p_decoded_video;
+        counter_t *p_decoded_sub;
+        counter_t *p_sout_sent_packets;
+        counter_t *p_sout_sent_bytes;
+        counter_t *p_sout_send_bitrate;
+        counter_t *p_played_abuffers;
+        counter_t *p_lost_abuffers;
+        counter_t *p_displayed_pictures;
+        counter_t *p_lost_pictures;
+        vlc_mutex_t counters_lock;
+    } counters;
+
+    /* Buffer of pending actions */
+    vlc_mutex_t lock_control;
+    int i_control;
+    struct
+    {
+        /* XXX: val isn't duplicated so it won't works with string */
+        int         i_type;
+        vlc_value_t val;
+    } control[INPUT_CONTROL_FIFO_SIZE];
+};
+
+/***************************************************************************
+ * Internal control helpers
+ ***************************************************************************/
 enum input_control_e
 {
     INPUT_CONTROL_SET_DIE,
@@ -64,34 +176,54 @@ enum input_control_e
 static inline void input_ControlPush( input_thread_t *p_input,
                                       int i_type, vlc_value_t *p_val )
 {
-    vlc_mutex_lock( &p_input->lock_control );
+    vlc_mutex_lock( &p_input->p->lock_control );
     if( i_type == INPUT_CONTROL_SET_DIE )
     {
         /* Special case, empty the control */
-        p_input->i_control = 1;
-        p_input->control[0].i_type = i_type;
-        memset( &p_input->control[0].val, 0, sizeof( vlc_value_t ) );
+        p_input->p->i_control = 1;
+        p_input->p->control[0].i_type = i_type;
+        memset( &p_input->p->control[0].val, 0, sizeof( vlc_value_t ) );
     }
     else
     {
-        if( p_input->i_control >= INPUT_CONTROL_FIFO_SIZE )
+        if( p_input->p->i_control >= INPUT_CONTROL_FIFO_SIZE )
         {
             msg_Err( p_input, "input control fifo overflow, trashing type=%d",
                      i_type );
-            vlc_mutex_unlock( &p_input->lock_control );
+            vlc_mutex_unlock( &p_input->p->lock_control );
             return;
         }
-        p_input->control[p_input->i_control].i_type = i_type;
+        p_input->p->control[p_input->p->i_control].i_type = i_type;
         if( p_val )
-            p_input->control[p_input->i_control].val = *p_val;
+            p_input->p->control[p_input->p->i_control].val = *p_val;
         else
-            memset( &p_input->control[p_input->i_control].val, 0,
+            memset( &p_input->p->control[p_input->p->i_control].val, 0,
                     sizeof( vlc_value_t ) );
 
-        p_input->i_control++;
+        p_input->p->i_control++;
     }
-    vlc_mutex_unlock( &p_input->lock_control );
+    vlc_mutex_unlock( &p_input->p->lock_control );
 }
+
+/**********************************************************************
+ * Item metadata
+ **********************************************************************/
+typedef struct playlist_album_t
+{
+    char *psz_artist;
+    char *psz_album;
+    vlc_bool_t b_found;
+} playlist_album_t;
+
+int         input_MetaFetch     ( playlist_t *, input_item_t * );
+int         input_ArtFind       ( playlist_t *, input_item_t * );
+vlc_bool_t  input_MetaSatisfied ( playlist_t*, input_item_t*,
+                                  uint32_t*, uint32_t* );
+int         input_DownloadAndCacheArt ( playlist_t *, input_item_t * );
+
+/***************************************************************************
+ * Internal prototypes
+ ***************************************************************************/
 
 /* var.c */
 void input_ControlVarInit ( input_thread_t * );
@@ -161,6 +293,44 @@ static inline void input_ChangeState( input_thread_t *p_input, int state )
     vlc_value_t val;
     val.i_int = p_input->i_state = state;
     var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
+}
+
+/* Access */
+
+#define access2_New( a, b, c, d, e ) __access2_New(VLC_OBJECT(a), b, c, d, e )
+access_t * __access2_New( vlc_object_t *p_obj, const char *psz_access,
+                          const char *psz_demux, const char *psz_path,
+                          vlc_bool_t b_quick );
+access_t * access2_FilterNew( access_t *p_source,
+                              const char *psz_access_filter );
+void access2_Delete( access_t * );
+
+/* Demuxer */
+#include <vlc_demux.h>
+
+/* stream_t *s could be null and then it mean a access+demux in one */
+#define demux2_New( a, b, c, d, e, f,g ) __demux2_New(VLC_OBJECT(a),b,c,d,e,f,g)
+demux_t *__demux2_New(vlc_object_t *p_obj, const char *psz_access, const char *psz_demux, const char *psz_path, stream_t *s, es_out_t *out, vlc_bool_t );
+
+void demux2_Delete(demux_t *);
+
+static inline int demux2_Demux( demux_t *p_demux )
+{
+    return p_demux->pf_demux( p_demux );
+}
+static inline int demux2_vaControl( demux_t *p_demux, int i_query, va_list args )
+{
+    return p_demux->pf_control( p_demux, i_query, args );
+}
+static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
+{
+    va_list args;
+    int     i_result;
+
+    va_start( args, i_query );
+    i_result = demux2_vaControl( p_demux, i_query, args );
+    va_end( args );
+    return i_result;
 }
 
 #endif

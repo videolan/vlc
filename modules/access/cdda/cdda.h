@@ -21,7 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc/input.h>
+#include <vlc_input.h>
+#include <vlc_access.h>
 #include <cdio/cdio.h>
 #include <cdio/cdtext.h>
 #if LIBCDIO_VERSION_NUM >= 73

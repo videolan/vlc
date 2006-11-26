@@ -22,11 +22,21 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 #include "vlc_playlist.h"
 #include "vlc_interface.h"
 
+#include "input_internal.h"
+
 static void GuessType( input_item_t *p_item );
+
+/**
+ * Get the item from an input thread
+ */
+input_item_t *input_GetItem( input_thread_t *p_input )
+{
+    assert( p_input && p_input->p );
+    return p_input->p->input.p_item;
+}
 
 /**
  * Get a info item from a given category in a given input item.

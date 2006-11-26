@@ -22,10 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc/aout.h>
 #include "cmd_input.hpp"
 #include "cmd_dialogs.hpp"
-
+#include <vlc_aout.h>
+#include <vlc_input.h>
+#include <vlc_playlist.h>
 
 void CmdPlay::execute()
 {

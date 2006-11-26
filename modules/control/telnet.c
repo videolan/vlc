@@ -28,9 +28,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-
-#include <vlc/input.h>
+#include <vlc_interface.h>
+#include <vlc_input.h>
 
 #include <sys/stat.h>
 
@@ -45,10 +44,9 @@
 #   include <unistd.h>
 #endif
 
-#include "network.h"
-#include "vlc_url.h"
-
-#include "vlc_vlm.h"
+#include <vlc_network.h>
+#include <vlc_url.h>
+#include <vlc_vlm.h>
 
 #define READ_MODE_PWD 1
 #define READ_MODE_CMD 2

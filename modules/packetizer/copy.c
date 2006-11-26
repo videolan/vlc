@@ -28,8 +28,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/input.h>
+#include <vlc_codec.h>
+#include <vlc_block.h>
 
 /*****************************************************************************
  * Module descriptor

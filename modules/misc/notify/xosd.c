@@ -29,7 +29,7 @@
 
 #include <xosd.h>
 
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>

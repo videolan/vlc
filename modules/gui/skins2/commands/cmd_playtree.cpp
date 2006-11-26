@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include "cmd_playtree.hpp"
+#include <vlc_playlist.h>
 #include "../src/vlcproc.hpp"
 #include "../utils/var_bool.hpp"
 

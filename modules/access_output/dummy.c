@@ -28,7 +28,8 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include <vlc_block.h>
 
 /*****************************************************************************
  * Module descriptor

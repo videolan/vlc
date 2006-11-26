@@ -1,10 +1,12 @@
 /*****************************************************************************
- * vlc_osd.h - OSD menu definitions and function prototypes
+ * vlc_osd.h - OSD menu and subpictures definitions and function prototypes
  *****************************************************************************
+ * Copyright (Cà 1999-2006 the VideoLAN team
  * Copyright (C) 2004-2005 M2X
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * Added code from include/osd.h written by:
  * Copyright (C) 2003-2005 the VideoLAN team
@@ -25,8 +27,106 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _VLC_OSD_H
+#define _VLC_OSD_H 1
+
+#include "vlc_vout.h"
+
+# ifdef __cplusplus
+extern "C" {
+# endif
+
+/**********************************************************************
+ * Base SPU structures
+ **********************************************************************/
 /**
- * \file
+ * \defgroup spu Subpicture Unit
+ * This module describes the programming interface for the subpicture unit.
+ * It includes functions allowing to create/destroy an spu, create/destroy
+ * subpictures and render them.
+ * @{
+ */
+
+#include <vlc_vout.h>
+
+/**
+ * Subpicture unit descriptor
+ */
+struct spu_t
+{
+    VLC_COMMON_MEMBERS
+
+    vlc_mutex_t  subpicture_lock;                  /**< subpicture heap lock */
+    subpicture_t p_subpicture[VOUT_MAX_SUBPICTURES];        /**< subpictures */
+    int i_channel;             /**< number of subpicture channels registered */
+
+    filter_t *p_blend;                            /**< alpha blending module */
+    filter_t *p_text;                              /**< text renderer module */
+    filter_t *p_scale;                                   /**< scaling module */
+    vlc_bool_t b_force_crop;               /**< force cropping of subpicture */
+    int i_crop_x, i_crop_y, i_crop_width, i_crop_height;       /**< cropping */
+
+    int i_margin;                        /**< force position of a subpicture */
+    vlc_bool_t b_force_palette;             /**< force palette of subpicture */
+    uint8_t palette[4][4];                               /**< forced palette */
+
+    int ( *pf_control ) ( spu_t *, int, va_list );
+
+    /* Supciture filters */
+    filter_t *pp_filter[10];
+    int      i_filter;
+};
+
+static inline int spu_vaControl( spu_t *p_spu, int i_query, va_list args )
+{
+    if( p_spu->pf_control )
+        return p_spu->pf_control( p_spu, i_query, args );
+    else
+        return VLC_EGENERIC;
+}
+static inline int spu_Control( spu_t *p_spu, int i_query, ... )
+{
+    va_list args;
+    int i_result;
+
+    va_start( args, i_query );
+    i_result = spu_vaControl( p_spu, i_query, args );
+    va_end( args );
+    return i_result;
+}
+
+enum spu_query_e
+{
+    SPU_CHANNEL_REGISTER,         /* arg1= int *   res=    */
+    SPU_CHANNEL_CLEAR             /* arg1= int     res=    */
+};
+
+#define spu_Create(a) __spu_Create(VLC_OBJECT(a))
+VLC_EXPORT( spu_t *, __spu_Create, ( vlc_object_t * ) );
+VLC_EXPORT( int, spu_Init, ( spu_t * ) );
+VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
+void spu_Attach( spu_t *, vlc_object_t *, vlc_bool_t );
+
+VLC_EXPORT( subpicture_t *, spu_CreateSubpicture, ( spu_t * ) );
+VLC_EXPORT( void, spu_DestroySubpicture, ( spu_t *, subpicture_t * ) );
+VLC_EXPORT( void, spu_DisplaySubpicture, ( spu_t *, subpicture_t * ) );
+
+#define spu_CreateRegion(a,b) __spu_CreateRegion(VLC_OBJECT(a),b)
+VLC_EXPORT( subpicture_region_t *,__spu_CreateRegion, ( vlc_object_t *, video_format_t * ) );
+#define spu_MakeRegion(a,b,c) __spu_MakeRegion(VLC_OBJECT(a),b,c)
+VLC_EXPORT( subpicture_region_t *,__spu_MakeRegion, ( vlc_object_t *, video_format_t *, picture_t * ) );
+#define spu_DestroyRegion(a,b) __spu_DestroyRegion(VLC_OBJECT(a),b)
+VLC_EXPORT( void, __spu_DestroyRegion, ( vlc_object_t *, subpicture_region_t * ) );
+VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t, vlc_bool_t ) );
+VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  video_format_t *, picture_t *, picture_t *, subpicture_t *, int, int ) );
+
+/** @}*/
+
+/**********************************************************************
+ * OSD Menu
+ **********************************************************************/
+/**
+ * \defgroup osdmenu OSD Menu
  * The OSD menu core creates the OSD menu structure in memory. It parses a
  * configuration file that defines all elements that are part of the menu. The
  * core also handles all actions and menu structure updates on behalf of video
@@ -34,9 +134,9 @@
  *
  * The file modules/video_filters/osdmenu.c implements a subpicture filter that
  * specifies the final information on positioning of the current state image.
- * A subpicture filter is called each time a video picture has to be rendered, it
- * also gives a start and end date to the subpicture. The subpicture can be streamed
- * if used inside a transcoding command. For example:
+ * A subpicture filter is called each time a video picture has to be rendered,
+ * it also gives a start and end date to the subpicture. The subpicture can be
+ * streamed if used inside a transcoding command. For example:
  *
  *  vlc dvdsimple:///dev/dvd --extraintf rc
  *  --sout='#transcode{osd}:std{access=udp,mux=ts,dst=dest_ipaddr}'
@@ -54,17 +154,10 @@
  * on the rc interface.
  *
  * The OSD menu configuration file uses a very simple syntax and basic parser.
- * A configuration file has the ".cfg". An example is "share/osdmenu/dvd256.cfg".
+ * A configuration file has the ".cfg".
+ * An example is "share/osdmenu/dvd256.cfg".
+ * @{
  */
-
-#ifndef _VLC_OSD_H
-#define _VLC_OSD_H 1
-
-#include "vlc_video.h"
-
-# ifdef __cplusplus
-extern "C" {
-# endif
 
 /**
  * \brief The OSD Menu configuration file format.
@@ -479,6 +572,78 @@ VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, int, int, s
  */
 VLC_EXPORT( int,  osd_ConfigLoader, ( vlc_object_t *, const char *, osd_menu_t ** ) );
 VLC_EXPORT( void, osd_ConfigUnload, ( vlc_object_t *, osd_menu_t ** ) );
+
+/** @} */
+
+/**********************************************************************
+ * Vout text and widget overlays
+ **********************************************************************/
+
+/**
+ * Show text on the video for some time
+ * \param p_vout pointer to the vout the text is to be showed on
+ * \param i_channel Subpicture channel
+ * \param psz_string The text to be shown
+ * \param p_style Pointer to a struct with text style info
+ * \param i_flags flags for alignment and such
+ * \param i_hmargin horizontal margin in pixels
+ * \param i_vmargin vertical margin in pixels
+ * \param i_duration Amount of time the text is to be shown.
+ */
+VLC_EXPORT( int, vout_ShowTextRelative, ( vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t ) );
+
+/**
+ * Show text on the video from a given start date to a given end date
+ * \param p_vout pointer to the vout the text is to be showed on
+ * \param i_channel Subpicture channel
+ * \param psz_string The text to be shown
+ * \param p_style Pointer to a struct with text style info
+ * \param i_flags flags for alignment and such
+ * \param i_hmargin horizontal margin in pixels
+ * \param i_vmargin vertical margin in pixels
+ * \param i_start the time when this string is to appear on the video
+ * \param i_stop the time when this string should stop to be displayed
+ *               if this is 0 the string will be shown untill the next string
+ *               is about to be shown
+ */
+VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
+
+/**
+ * Write an informative message at the default location,
+ * for the default duration and only if the OSD option is enabled.
+ * \param p_caller The object that called the function.
+ * \param i_channel Subpicture channel
+ * \param psz_format printf style formatting
+ **/
+VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, int, char *, ... ) );
+
+/**
+ * Same as __vlc_OSDMessage() but with automatic casting
+ */
+#if defined(HAVE_VARIADIC_MACROS)
+#    define vout_OSDMessage( obj, chan, fmt, args...) __vout_OSDMessage( VLC_OBJECT(obj), chan, fmt, ## args )
+#else
+#    define vout_OSDMessage __vout_OSDMessage
+#endif
+
+/**
+ * Display a slider on the video output.
+ * \param p_this    The object that called the function.
+ * \param i_channel Subpicture channel
+ * \param i_postion Current position in the slider
+ * \param i_type    Types are: OSD_HOR_SLIDER and OSD_VERT_SLIDER.
+ * @see vlc_osd.h
+ */
+VLC_EXPORT( void, vout_OSDSlider, ( vlc_object_t *, int, int , short ) );
+
+/**
+ * Display an Icon on the video output.
+ * \param p_this    The object that called the function.
+ * \param i_channel Subpicture channel
+ * \param i_type    Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON, OSD_SPEAKER_ICON, OSD_MUTE_ICON
+ * @see vlc_osd.h
+ */
+VLC_EXPORT( void, vout_OSDIcon, ( vlc_object_t *, int, short ) );
 
 # ifdef __cplusplus
 }

@@ -28,8 +28,8 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/vout.h>
+#include <vlc_interface.h>
+#include <vlc_vout.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>

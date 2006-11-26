@@ -23,7 +23,8 @@
  *****************************************************************************/
 
 #include "cmd_fullscreen.hpp"
-#include <vlc/vout.h>
+#include <vlc_input.h>
+#include <vlc_vout.h>
 
 
 void CmdFullscreen::execute()

@@ -25,10 +25,10 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/vout.h>
-#include <vlc/aout.h>
-#include <vlc/input.h>
+#include <vlc_interface.h>
+#include <vlc_vout.h>
+#include <vlc_aout.h>
+#include <vlc_input.h>
 
 #include <Cocoa/Cocoa.h>
 

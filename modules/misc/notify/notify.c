@@ -30,7 +30,8 @@
 #include <libnotify/notify.h>
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
 #include <vlc_meta.h>
 
 /*****************************************************************************
@@ -141,7 +142,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( !p_input ) return VLC_SUCCESS;
     vlc_object_yield( p_input );
 
-    if( p_input->b_dead || !p_input->input.p_item->psz_name )
+    if( p_input->b_dead || !input_GetItem(p_input)->psz_name )
     {
         /* Not playing anything ... */
         vlc_object_release( p_input );
@@ -149,13 +150,13 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     /* Playing something ... */
-    psz_artist = p_input->input.p_item->p_meta->psz_artist ?
-                  strdup( p_input->input.p_item->p_meta->psz_artist ) :
+    psz_artist = input_GetItem(p_input)->p_meta->psz_artist ?
+                  strdup( input_GetItem(p_input)->p_meta->psz_artist ) :
                   strdup( _("no artist") );
-    psz_album = p_input->input.p_item->p_meta->psz_album ?
-                  strdup( p_input->input.p_item->p_meta->psz_album ) :
+    psz_album = input_GetItem(p_input)->p_meta->psz_album ?
+                  strdup( input_GetItem(p_input)->p_meta->psz_album ) :
                   strdup( _("no album") );
-    psz_title = strdup( p_input->input.p_item->psz_name );
+    psz_title = strdup( input_GetItem(p_input)->psz_name );
 
     vlc_object_release( p_input );
 

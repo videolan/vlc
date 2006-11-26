@@ -31,9 +31,8 @@
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include "audio_output.h"
+#include <vlc_aout.h>
 #include "aout_internal.h"
-
 
 /*
  * Volume management

@@ -29,9 +29,9 @@
 #include <time.h>
 #include <errno.h>
 
-#include "vlc_access.h"
-#include "vlc_block.h"
-#include "charset.h"
+#include <vlc_access.h>
+
+#include <vlc_charset.h>
 #include "vlc_keys.h"
 
 #define DEFAULT_MARGIN 32 // megabytes

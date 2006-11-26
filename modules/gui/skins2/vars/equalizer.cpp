@@ -21,15 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
-#include "vlc/aout.h"
-#include "aout_internal.h"
+#include <vlc/vlc.h>
+#include <vlc_aout.h>
 #include "equalizer.hpp"
 #include "../utils/var_percent.hpp"
 #include <ios>
 #include <iomanip>
 #include <sstream>
-
 
 EqualizerBands::EqualizerBands( intf_thread_t *pIntf ): SkinObject( pIntf ),
     m_isUpdating( false )

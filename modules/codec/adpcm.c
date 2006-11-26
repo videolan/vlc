@@ -28,7 +28,8 @@
  * Documentation: http://www.pcisys.net/~melanson/codecs/adpcm.txt
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
+#include <vlc_aout.h>
+#include <vlc_codec.h>
 
 /*****************************************************************************
  * Module descriptor

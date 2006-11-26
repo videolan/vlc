@@ -33,10 +33,9 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
-#include <vlc/aout.h>
-#include <vlc_interaction.h>
+#include <vlc_interface.h>
 
-#include "aout_internal.h"
+#include <vlc_aout.h>
 
 /* ALSA part
    Note: we use the new API which is available since 0.9.0beta10a. */

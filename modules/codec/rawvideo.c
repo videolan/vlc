@@ -25,8 +25,8 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/vout.h>
+#include <vlc_codec.h>
+#include <vlc_vout.h>
 
 /*****************************************************************************
  * decoder_sys_t : raw video decoder descriptor

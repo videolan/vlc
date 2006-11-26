@@ -26,8 +26,8 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/input.h>
+#include <vlc_interface.h>
+#include <<vlc_input.h>>
 
 #include "vlc_keys.h"
 

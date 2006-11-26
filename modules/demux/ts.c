@@ -32,11 +32,13 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <ctype.h>
 
-#include <vlc/input.h>
+#include <vlc_access.h> /* DVB-specific things */
+#include <vlc_demux.h>
+#include <vlc_meta.h>
 
 #include "iso_lang.h"
-#include "network.h"
-#include "charset.h"
+#include <vlc_network.h>
+#include <vlc_charset.h>
 
 #include "../mux/mpeg/csa.h"
 

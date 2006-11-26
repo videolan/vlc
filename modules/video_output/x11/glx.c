@@ -30,8 +30,8 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/vout.h>
+#include <vlc_interface.h>
+#include <vlc_vout.h>
 
 #ifdef HAVE_SYS_SHM_H
 #   include <sys/shm.h>                                /* shmget(), shmctl() */

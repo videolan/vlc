@@ -29,7 +29,8 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
+#include <vlc_aout.h>
+#include <vlc_block.h>
 #include "vlc_filter.h"
 
 #ifdef WORDS_BIGENDIAN

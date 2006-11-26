@@ -150,8 +150,6 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
 
 /*****************************************************************************
  * vlc_UrlClean:
- *****************************************************************************
- *
  *****************************************************************************/
 static inline void vlc_UrlClean( vlc_url_t *url )
 {
@@ -181,13 +179,10 @@ static inline char *vlc_UrlEncode( const char *psz_url )
     return encode_URI_component( psz_url );
 }
 
-/*****************************************************************************
- * vlc_UrlIsNotEncoded:
- *****************************************************************************
- * check if given string is not a valid URL and must hence be encoded
- *****************************************************************************/
 #include <ctype.h>
 
+/** Check whether a given string is not a valid URL and must hence be
+ *  encoded */
 static inline int vlc_UrlIsNotEncoded( const char *psz_url )
 {
     const char *ptr;
@@ -212,11 +207,7 @@ static inline int vlc_UrlIsNotEncoded( const char *psz_url )
     return 0; /* looks fine - but maybe it is not encoded */
 }
 
-/*****************************************************************************
- * vlc_b64_encode:
- *****************************************************************************
- *
- *****************************************************************************/
+/* Base64 encoding */
 static inline char *vlc_b64_encode( const char *src )
 {
     static const char b64[] =

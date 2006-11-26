@@ -27,8 +27,8 @@
 #include <ctype.h>                                              /* isspace() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/intf.h>
+#include <vlc_demux.h>
+#include <vlc_interface.h>
 
 #include "playlist.h"
 #include "vlc_xml.h"

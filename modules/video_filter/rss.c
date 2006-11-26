@@ -33,7 +33,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #include "vlc_filter.h"
 #include "vlc_block.h"
@@ -42,7 +42,7 @@
 #include "vlc_block.h"
 #include "vlc_stream.h"
 #include "vlc_xml.h"
-#include "charset.h"
+#include <vlc_charset.h>
 
 #include "vlc_image.h"
 

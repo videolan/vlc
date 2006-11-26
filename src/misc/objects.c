@@ -31,19 +31,21 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 
 #ifdef HAVE_STDLIB_H
 #   include <stdlib.h>                                          /* realloc() */
 #endif
 
-#include "vlc_video.h"
-#include "video_output.h"
-#include "vlc_spu.h"
+#include <vlc_vout.h>
+#include <vlc_aout.h>
+#include "audio_output/aout_internal.h"
 
-#include "audio_output.h"
-#include "aout_internal.h"
-#include "stream_output.h"
+#include <vlc_access.h>
+#include <vlc_demux.h>
+#include <vlc_stream.h>
+
+#include <vlc_sout.h>
+#include "stream_output/stream_output.h"
 
 #include "vlc_playlist.h"
 #include "vlc_interface.h"
@@ -57,6 +59,8 @@
 #include "vlc_xml.h"
 #include "vlc_osd.h"
 #include "vlc_meta.h"
+
+#include "variables.h"
 
 /*****************************************************************************
  * Local prototypes

@@ -20,7 +20,7 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include "charset.h"
+#include "vlc_charset.h"
 
 #undef NDEBUG
 #include <assert.h>

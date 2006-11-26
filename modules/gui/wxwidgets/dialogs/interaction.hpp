@@ -25,7 +25,7 @@
 #define _WXVLC_INTERACTION_H_
 
 #include "wxwidgets.hpp"
-#include <vlc_interaction.h>
+#include <vlc_interface.h>
 
 #include <vector>
 using namespace std;

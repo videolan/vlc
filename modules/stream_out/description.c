@@ -28,8 +28,9 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
+#include <vlc_input.h>
+#include <vlc_block.h>
+#include <vlc_sout.h>
 
 /*****************************************************************************
  * Exported prototypes
@@ -97,16 +98,17 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id;
     es_format_t *p_fmt_copy = malloc(sizeof(es_format_t));
+    input_item_t *p_item = input_GetItem(p_sys->p_input);
 
     id = malloc( sizeof( sout_stream_id_t ) );
     id->i_d_u_m_m_y = 0;
 
     es_format_Copy( p_fmt_copy, p_fmt );
 
-    vlc_mutex_lock( &p_sys->p_input->input.p_item->lock );
-    TAB_APPEND( p_sys->p_input->input.p_item->i_es,
-                p_sys->p_input->input.p_item->es, p_fmt_copy );
-    vlc_mutex_unlock( &p_sys->p_input->input.p_item->lock );
+    vlc_mutex_lock( &p_item->lock );
+    TAB_APPEND( p_item->i_es,
+                p_item->es, p_fmt_copy );
+    vlc_mutex_unlock( &p_item->lock );
 
     if( p_sys->i_stream_start <= 0 ) p_sys->i_stream_start = mdate();
 

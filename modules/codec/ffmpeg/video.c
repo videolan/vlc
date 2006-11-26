@@ -26,8 +26,9 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/input.h>                  /* hmmm, just for INPUT_RATE_DEFAULT */
+#include <vlc_codec.h>
+#include <vlc_vout.h>
+#include <vlc_input.h>                  /* hmmm, just for INPUT_RATE_DEFAULT */
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H

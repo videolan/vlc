@@ -21,9 +21,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
 #include <stdlib.h>
-#include <vlc/input.h>
+
+#include <vlc/vlc.h>
+#include <vlc_input.h>
+#include <vlc_demux.h>
+#include <vlc_playlist.h>
+
 #include "dialogs.hpp"
 #include "os_factory.hpp"
 #include "os_loop.hpp"
@@ -37,7 +41,6 @@
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_dialogs.hpp"
 #include "../commands/cmd_minimize.hpp"
-
 
 //---------------------------------------------------------------------------
 // Exported interface functions.

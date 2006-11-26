@@ -24,6 +24,10 @@
 #ifndef _VLC_PLAYLIST_H_
 #define _VLC_PLAYLIST_H_
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 #include <assert.h>
 #include <vlc_input.h>
 #include <stdio.h>
@@ -321,7 +325,6 @@ VLC_EXPORT( vlc_bool_t, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const
 
 /* Playlist sorting */
 VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );
-VLC_EXPORT( int,  playlist_NodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 
 /**
@@ -430,5 +433,8 @@ static inline void playlist_Signal( playlist_t *p_playlist )
 }
 
 /** @} */
+# ifdef __cplusplus
+}
+# endif
 
 #endif

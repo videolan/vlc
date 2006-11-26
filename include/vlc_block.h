@@ -270,7 +270,6 @@ struct block_fifo_t
     int                 i_size;
 };
 
-
 #define block_FifoNew( a ) __block_FifoNew( VLC_OBJECT(a) )
 VLC_EXPORT( block_fifo_t *, __block_FifoNew,    ( vlc_object_t * ) );
 VLC_EXPORT( void,           block_FifoRelease,  ( block_fifo_t * ) );

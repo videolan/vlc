@@ -27,7 +27,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_access.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -74,7 +74,7 @@
 
 #include "cdrom_internals.h"
 #include "cdrom.h"
-#include "charset.h"
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * ioctl_Open: Opens a VCD device or file and returns an opaque handle

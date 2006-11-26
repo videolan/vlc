@@ -27,7 +27,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 
 #include "Nsf_Emu.h"
 #include "Gbs_Emu.h"

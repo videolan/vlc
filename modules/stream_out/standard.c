@@ -28,9 +28,9 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
 
-#include "network.h"
+#include <vlc_network.h>
 #include "vlc_url.h"
 
 /*****************************************************************************

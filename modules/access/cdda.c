@@ -35,9 +35,10 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_input.h>
+#include <vlc_access.h>
 
-#include "codecs.h"
+#include <vlc_codecs.h> /* For WAVEHEADER */
 #include "vcd/cdrom.h"
 
 #include <vlc_playlist.h>
@@ -189,12 +190,12 @@ static int Open( vlc_object_t *p_this )
    {
         p_playlist = pl_Yield( p_access );
         if( p_playlist->status.p_item->p_input ==
-             ((input_thread_t *)p_access->p_parent)->input.p_item )
+             input_GetItem( (input_thread_t *)p_access->p_parent))
             p_item = p_playlist->status.p_item;
         else
         {
-            input_item_t *p_current = ( (input_thread_t*)p_access->p_parent)->
-                                         input.p_item;
+            input_item_t *p_current = input_GetItem(
+                                        (input_thread_t*)p_access->p_parent);
             p_item = playlist_ItemGetByInput( p_playlist, p_current, VLC_FALSE );
 
             if( !p_item )

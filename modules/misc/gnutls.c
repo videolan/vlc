@@ -44,7 +44,7 @@
 
 
 #include "vlc_tls.h"
-#include "charset.h"
+#include <vlc_charset.h>
 
 #include <gcrypt.h>
 #include <gnutls/gnutls.h>

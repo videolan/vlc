@@ -967,9 +967,9 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         {
             char *psz_meta = E_(SSPop)( st );
             char *psz_val = NULL;
-            if( p_sys->p_input && p_sys->p_input->input.p_item )
+            if( p_sys->p_input && input_GetItem(p_sys->p_input) )
             {
-#define p_item  p_sys->p_input->input.p_item
+#define p_item input_GetItem( p_sys->p_input )
                 if( !strcmp( psz_meta, "ARTIST" ) )
                 {
                     psz_val = input_ItemGetInfo( p_item,

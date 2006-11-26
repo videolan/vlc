@@ -29,12 +29,12 @@
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <vlc/input.h>
+#include <vlc_demux.h>
 #include <vlc_playlist.h>
 #include <vlc_md5.h>
-#include "charset.h"
+#include <vlc_charset.h>
 #include "iso_lang.h"
-#include "vlc_meta.h"
+#include <vlc_meta.h>
 
 #include "libmp4.h"
 #include "drms.h"
@@ -2216,7 +2216,7 @@ static vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
 
      if( b_play && p_playlist->status.p_item &&
              p_playlist->status.p_item->p_input ==
-                ((input_thread_t *)p_demux->p_parent)->input.p_item )
+                input_GetItem((input_thread_t *)p_demux->p_parent))
      {
          msg_Dbg( p_playlist, "starting playlist playback" );
          *pp_item = p_playlist->status.p_item;
@@ -2224,8 +2224,8 @@ static vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
      }
      else
      {
-         input_item_t *p_current = ( (input_thread_t*)p_demux->p_parent)->
-                                                        input.p_item;
+         input_item_t *p_current = input_GetItem(
+                                    (input_thread_t*)p_demux->p_parent);
          *pp_item = playlist_ItemGetByInput( p_playlist, p_current, VLC_FALSE );
          if( !*pp_item )
          {

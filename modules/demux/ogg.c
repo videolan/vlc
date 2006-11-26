@@ -26,12 +26,13 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_input.h>
+#include <vlc_demux.h>
 
 #include <ogg/ogg.h>
 
-#include "codecs.h"
-#include "vlc_bits.h"
+#include <vlc_codecs.h>
+#include <vlc_bits.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -207,8 +208,7 @@ static int Open( vlc_object_t * p_this )
         module_t *p_meta = module_Need( p_demux, "meta reader", NULL, 0 );
         if( p_meta )
         {
-            vlc_meta_Merge( ((input_thread_t* )(p_demux->p_parent ))->
-                                                input.p_item->p_meta,
+            vlc_meta_Merge( input_GetItem((input_thread_t* )(p_demux->p_parent ))->p_meta,
                                 (vlc_meta_t*)(p_demux->p_private ) );
             module_Unneed( p_demux, p_meta );
         }

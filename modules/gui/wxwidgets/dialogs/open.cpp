@@ -29,7 +29,7 @@
 #include "dialogs/preferences_widgets.h"
 #include "dialogs/subtitles.hpp"
 
-#include "charset.h"
+#include "vlc_charset.h"
 
 #undef HAVE_LIBCDIO // Disable broken code
 

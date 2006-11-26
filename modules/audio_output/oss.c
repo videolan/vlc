@@ -39,9 +39,7 @@
 #   include <alloca.h>
 #endif
 
-#include <vlc/aout.h>
-
-#include "aout_internal.h"
+#include <vlc_aout.h>
 
 /* SNDCTL_DSP_RESET, SNDCTL_DSP_SETFMT, SNDCTL_DSP_STEREO, SNDCTL_DSP_SPEED,
  * SNDCTL_DSP_GETOSPACE */

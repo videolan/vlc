@@ -47,7 +47,7 @@
 #include <wx/imaglist.h>
 
 #include <vlc_meta.h>
-#include "charset.h"
+#include "vlc_charset.h"
 
 #define HELP_SHUFFLE N_( "Shuffle" )
 #define HELP_LOOP N_( "Repeat All" )

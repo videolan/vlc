@@ -25,14 +25,15 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_access.h>
+
 #include <libgnomevfs/gnome-vfs.h>
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-#include "charset.h"
+#include <vlc_charset.h>
 #include "vlc_url.h"
 
 /*****************************************************************************

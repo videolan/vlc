@@ -44,10 +44,9 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/input.h>
-
-#include "vlc_block_helper.h"
+#include <vlc_block.h>
+#include <vlc_codec.h>
+#include <vlc_block_helper.h>
 
 #define SYNC_INTRAFRAME_TEXT N_("Sync on Intra Frame")
 #define SYNC_INTRAFRAME_LONGTEXT N_("Normally the packetizer would " \

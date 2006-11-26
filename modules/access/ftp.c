@@ -32,12 +32,12 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <vlc/input.h>
-#include <vlc_interaction.h>
+#include <vlc_access.h>
+#include <vlc_interface.h>
 
-#include "network.h"
+#include <vlc_network.h>
 #include "vlc_url.h"
-#include "stream_output.h"
+#include <vlc_sout.h>
 
 #ifndef IPPORT_FTP
 # define IPPORT_FTP 21u

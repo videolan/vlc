@@ -36,7 +36,7 @@
 
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
+#include <vlc_aout.h>
 extern "C"
 {
     #include <aout_internal.h>

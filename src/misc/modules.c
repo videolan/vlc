@@ -36,8 +36,6 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
 
-#include <vlc/input.h>
-
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
 #endif
@@ -77,23 +75,16 @@
 #   endif
 #endif
 
-#include "vlc_error.h"
-
 #include "vlc_interface.h"
-#include "vlc_interaction.h"
-#include "intf_eject.h"
 
 #include "vlc_playlist.h"
 
-#include "vlc_video.h"
-#include "video_output.h"
-#include "vout_synchro.h"
-#include "vlc_spu.h"
+#include "vlc_vout.h"
+#include "vlc_vout_synchro.h"
 
-#include "audio_output.h"
-#include "aout_internal.h"
+#include "vlc_aout.h"
 
-#include "stream_output.h"
+#include "vlc_sout.h"
 #include "vlc_httpd.h"
 #include "vlc_acl.h"
 #include "vlc_tls.h"
@@ -102,7 +93,7 @@
 #include "vlc_url.h"
 
 #include "iso_lang.h"
-#include "charset.h"
+#include "vlc_charset.h"
 
 #include "vlc_block.h"
 
@@ -115,6 +106,8 @@
 #include "vlc_strings.h"
 #include "vlc_streaming.h"
 
+#include "modules.h"
+
 #if defined( _MSC_VER ) && defined( UNDER_CE )
 #    include "modules_builtin_evc.h"
 #elif defined( _MSC_VER )
@@ -122,7 +115,7 @@
 #else
 #    include "modules_builtin.h"
 #endif
-#include "network.h"
+#include "vlc_network.h"
 
 #if defined( WIN32 ) || defined( UNDER_CE )
     /* Avoid name collisions */

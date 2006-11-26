@@ -30,7 +30,7 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 #ifdef HAVE_LOCALE_H
 #   include <locale.h>

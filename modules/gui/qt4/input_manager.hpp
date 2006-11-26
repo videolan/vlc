@@ -26,7 +26,7 @@
 
 #include <QObject>
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_input.h>
 
 class InputManager : public QObject
 {

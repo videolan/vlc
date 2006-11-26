@@ -28,8 +28,6 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-
 #include "screen.h"
 
 /*****************************************************************************

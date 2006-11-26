@@ -34,17 +34,17 @@
 
 #ifdef ENABLE_VLM
 
-#include <vlc/intf.h>
-#include <vlc/input.h>
 
 #ifdef HAVE_TIME_H
 #   include <time.h>                                              /* ctime() */
 #   include <sys/timeb.h>                                         /* ftime() */
 #endif
 
+#include <vlc_input.h>
+#include <vlc_stream.h>
 #include <vlc_vlm.h>
 #include <vlc_vod.h>
-#include <charset.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Local prototypes.

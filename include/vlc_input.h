@@ -192,7 +192,6 @@ VLC_EXPORT( input_item_t *, input_ItemNewWithType, ( vlc_object_t *, const char 
 
 VLC_EXPORT( input_item_t *, input_ItemGetById, (playlist_t *, int ) );
 
-
 /*****************************************************************************
  * Seek point: (generalisation of chapters)
  *****************************************************************************/
@@ -326,40 +325,6 @@ enum input_state_e
 #define INPUT_RATE_MIN       125            /* Up to 8/1 */
 #define INPUT_RATE_MAX      8000            /* Up to 1/8 */
 
-/* input_source_t: gathers all information per input source */
-typedef struct
-{
-    /* Input item description */
-    input_item_t *p_item;
-
-    /* Access/Stream/Demux plugins */
-    access_t *p_access;
-    stream_t *p_stream;
-    demux_t  *p_demux;
-
-    /* Title infos for that input */
-    vlc_bool_t   b_title_demux; /* Titles/Seekpoints provided by demux */
-    int          i_title;
-    input_title_t **title;
-
-    int i_title_offset;
-    int i_seekpoint_offset;
-
-    int i_title_start;
-    int i_title_end;
-    int i_seekpoint_start;
-    int i_seekpoint_end;
-
-    /* Properties */
-    vlc_bool_t b_can_pace_control;
-    vlc_bool_t b_can_pause;
-    vlc_bool_t b_eof;   /* eof of demuxer */
-
-    /* Clock average variation */
-    int     i_cr_average;
-
-} input_source_t;
-
 /* i_update field of access_t/demux_t */
 #define INPUT_UPDATE_NONE       0x0000
 #define INPUT_UPDATE_SIZE       0x0001
@@ -370,94 +335,30 @@ typedef struct
 /* Input control XXX: internal */
 #define INPUT_CONTROL_FIFO_SIZE    100
 
-/*****************************************************************************
- * input_thread_t
- *****************************************************************************
- * XXX: this strucrures is *PRIVATE* so nobody can touch it out of src/input.
- * I plan to move it to src/input/input_internal.h anyway
- *
- * XXX: look at src/input/input.c:input_CreateThread for accessible variables
- *      YOU CANNOT HAVE ACCESS TO THE CONTENT OF input_thread_t except
- *      p_input->input.p_item (and it's only temporary).
- * XXX: move the docs somewhere (better than src/input )
- *****************************************************************************/
+/** Get the input item for an input thread */
+VLC_EXPORT(input_item_t*, input_GetItem, (input_thread_t*));
+
+typedef struct input_thread_private_t input_thread_private_t;
+
+/**
+ * Main structure representing an input thread. This structure is mostly
+ * private. The only public fields are READ-ONLY. You must use the helpers
+ * to modify them
+ */
 struct input_thread_t
 {
-    VLC_COMMON_MEMBERS
+    VLC_COMMON_MEMBERS;
 
-     /* Global properties */
     vlc_bool_t  b_eof;
-    vlc_bool_t  b_can_pace_control;
-    vlc_bool_t  b_can_pause;
-    vlc_bool_t  b_preparsing;
-
-    /* Global state */
-    int         i_state;
-    int         i_rate;
-
-    /* */
-    int64_t     i_start;    /* :start-time,0 by default */
+    vlc_bool_t b_preparsing;
+    int i_state;
     int64_t     i_time;     /* Current time */
-    int64_t     i_stop;     /* :stop-time, 0 if none */
+    /* Internal caching common to all inputs */
+    int i_pts_delay;
 
-    /* Title infos FIXME multi-input (not easy) ? */
-    int          i_title;
-    input_title_t **title;
-
-    int i_title_offset;
-    int i_seekpoint_offset;
-
-    /* User bookmarks FIXME won't be easy with multiples input */
-    int         i_bookmark;
-    seekpoint_t **bookmark;
-
-    /* Global meta datas FIXME move to input_item_t ? */
-    vlc_meta_t  *p_meta;
-
-    /* Output */
-    es_out_t    *p_es_out;
-    sout_instance_t *p_sout;            /* XXX Move it to es_out ? */
-    vlc_bool_t      b_out_pace_control; /*     idem ? */
-
-    /* Internal caching common for all inputs */
-    int64_t i_pts_delay;
-
-    /* Main input properties */
-    input_source_t input;
-
-    /* Slave demuxers (subs, and others) */
-    int            i_slave;
-    input_source_t **slave;
-
-    /* Stats counters */
-    struct {
-        counter_t *p_read_packets;
-        counter_t *p_read_bytes;
-        counter_t *p_input_bitrate;
-        counter_t *p_demux_read;
-        counter_t *p_demux_bitrate;
-        counter_t *p_decoded_audio;
-        counter_t *p_decoded_video;
-        counter_t *p_decoded_sub;
-        counter_t *p_sout_sent_packets;
-        counter_t *p_sout_sent_bytes;
-        counter_t *p_sout_send_bitrate;
-        counter_t *p_played_abuffers;
-        counter_t *p_lost_abuffers;
-        counter_t *p_displayed_pictures;
-        counter_t *p_lost_pictures;
-        vlc_mutex_t counters_lock;
-    } counters;
-
-    /* Buffer of pending actions */
-    vlc_mutex_t lock_control;
-    int i_control;
-    struct
-    {
-        /* XXX: val isn't duplicated so it won't works with string */
-        int         i_type;
-        vlc_value_t val;
-    } control[INPUT_CONTROL_FIFO_SIZE];
+    /* All other data is input_thread is PRIVATE. You can't access it
+     * outside of src/input */
+    input_thread_private_t *p;
 };
 
 /*****************************************************************************
@@ -474,19 +375,6 @@ VLC_EXPORT( int, __input_Preparse, ( vlc_object_t *, input_item_t * ) );
 VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, vlc_bool_t ) );
 VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
-
-typedef struct playlist_album_t
-{
-    char *psz_artist;
-    char *psz_album;
-    vlc_bool_t b_found;
-} playlist_album_t;
-
-int         input_MetaFetch     ( playlist_t *, input_item_t * );
-int         input_ArtFind       ( playlist_t *, input_item_t * );
-vlc_bool_t  input_MetaSatisfied ( playlist_t*, input_item_t*,
-                                  uint32_t*, uint32_t* );
-int         input_DownloadAndCacheArt ( playlist_t *, input_item_t * );
 
 enum input_query_e
 {
@@ -548,7 +436,5 @@ VLC_EXPORT( void, input_DecoderDelete, ( decoder_t * ) );
 VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
 
 VLC_EXPORT( vlc_bool_t, input_AddSubtitles, ( input_thread_t *, char *, vlc_bool_t ) );
-
-
 
 #endif

@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 #include <vlc_devices.h>
 
 #include <hal/libhal.h>

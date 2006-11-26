@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_help.h: Help strings
+ * vlc_config_cat.h : Definition of configuration categories
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
  * $Id$
@@ -234,61 +234,11 @@
 #define UNKNOWN_TITLE N_("No help available" )
 #define UNKNOWN_HELP N_("There is no help available for these modules.")
 
-/*****************************************************************************
- * GetCapabilityHelp: Display the help for one capability.
- *****************************************************************************/
+/* This function is deprecated and is kept only for compatibility */
 static inline char * GetCapabilityHelp( char *psz_capability, int i_type)
 {
-/*
-    if( psz_capability == NULL) return " ";
-
-    if( !strcasecmp(psz_capability,"access_demux") )
-        return i_type == 1 ? ACCESS_TITLE : ACCESS_HELP;
-    if( !strcasecmp(psz_capability,"access2") )
-        return i_type == 1 ? ACCESS_TITLE : ACCESS_HELP;
-    if( !strcasecmp(psz_capability,"audio filter") )
-        return i_type == 1 ? AUDIO_FILTER_TITLE : AUDIO_FILTER_HELP;
-    if( !strcasecmp(psz_capability,"audio filter2") )
-        return i_type == 1 ? AUDIO_FILTER2_TITLE : AUDIO_FILTER2_HELP;
-    if( !strcasecmp(psz_capability,"audio output") )
-        return i_type == 1 ? AOUT_TITLE : AOUT_HELP;
-    if( !strcasecmp(psz_capability,"chroma") )
-        return i_type == 1 ? CHROMA_TITLE : CHROMA_HELP;
-    if( !strcasecmp(psz_capability,"decoder") )
-        return i_type == 1 ? DECODER_TITLE : DECODER_HELP;
-    if( !strcasecmp(psz_capability,"packetizer") )
-        return i_type == 1 ? PACKETIZER_TITLE : PACKETIZER_HELP;
-    if( !strcasecmp(psz_capability,"encoder") )
-        return i_type == 1 ? ENCODER_TITLE : ENCODER_HELP;
-    if( !strcasecmp(psz_capability,"demux2") )
-        return i_type == 1 ? DEMUX_TITLE : DEMUX_HELP;
-    if( !strcasecmp(psz_capability,"interface") )
-        return i_type == 1 ? INTERFACE_TITLE : INTERFACE_HELP;
-    if( !strcasecmp(psz_capability,"dialogs provider") )
-        return i_type == 1 ? DIALOGS_TITLE : DIALOGS_HELP;
-    if( !strcasecmp(psz_capability,"network") )
-        return i_type == 1 ? NETWORK_TITLE : NETWORK_HELP;
-    if( !strcasecmp(psz_capability,"sout access") )
-        return i_type == 1 ? SOUT_ACCESS_TITLE : SOUT_ACCESS_HELP;
-    if( !strcasecmp(psz_capability,"sout mux") )
-        return i_type == 1 ? SOUT_MUX_TITLE : SOUT_MUX_HELP;
-    if( !strcasecmp(psz_capability,"sout stream") )
-        return i_type == 1 ? SOUT_STREAM_TITLE : SOUT_STREAM_HELP;
-    if( !strcasecmp(psz_capability,"subtitle demux") )
-        return i_type == 1 ? SUBTITLE_DEMUX_TITLE : SUBTITLE_DEMUX_HELP;
-    if( !strcasecmp(psz_capability,"text renderer") )
-        return i_type == 1 ? TEXT_TITLE : TEXT_HELP;
-    if( !strcasecmp(psz_capability,"video output") )
-        return i_type == 1 ? _VOUT_TITLE : VOUT_HELP;
-    if( !strcasecmp(psz_capability,"video filter") )
-        return i_type == 1 ? VIDEO_FILTER_TITLE : VIDEO_FILTER_HELP;
-    if( !strcasecmp(psz_capability,"video filter2") )
-        return i_type == 1 ? VIDEO_FILTER2_TITLE : VIDEO_FILTER2_HELP;
-
-    */
     return " ";
 }
-
 
 static struct config_category_t categories_array[] =
 {
@@ -341,8 +291,7 @@ static struct config_category_t categories_array[] =
     { -1, NULL, NULL }
 };
 
-
-inline char *config_CategoryNameGet( int i_value )
+static inline char *config_CategoryNameGet( int i_value )
 {
     int i = 0 ;
     while( categories_array[i].psz_name != NULL )
@@ -356,7 +305,7 @@ inline char *config_CategoryNameGet( int i_value )
     return NULL;
 }
 
-inline char *config_CategoryHelpGet( int i_value )
+static inline char *config_CategoryHelpGet( int i_value )
 {
     int i = 0 ;
     while( categories_array[i].psz_help != NULL )

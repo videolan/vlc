@@ -29,8 +29,8 @@
 
 #include <stdlib.h>
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include "charset.h"
+#include <vlc_input.h>
+#include <vlc_charset.h>
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>

@@ -32,10 +32,10 @@
 #include <ctype.h>                                              /* isspace() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
+#include <vlc_demux.h>
 
 #include <errno.h>                                                 /* ENOMEM */
-#include "charset.h"
+#include <vlc_charset.h>
 #include "playlist.h"
 #include "vlc_meta.h"
 

@@ -29,7 +29,8 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
+#include "stream_output.h"
 
 /****************************************************************************
  * Sout-side functions

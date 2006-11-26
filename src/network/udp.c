@@ -37,7 +37,7 @@
 #    include <sys/time.h>
 #endif
 
-#include "network.h"
+#include <vlc_network.h>
 
 #ifdef WIN32
 #   if defined(UNDER_CE)

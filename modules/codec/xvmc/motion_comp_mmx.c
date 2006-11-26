@@ -1,4 +1,4 @@
-/* $Id:$
+/* $Id$
  * motion_comp_mmx.c
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>

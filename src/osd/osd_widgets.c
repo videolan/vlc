@@ -25,10 +25,9 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                                /* free() */
-#include <vlc/vout.h>
+#include <vlc/vlc.h>
 #include <vlc_osd.h>
-
-#include <vlc_video.h>
+#include <vlc_vout.h>
 #include <vlc_filter.h>
 
 #define STYLE_EMPTY 0

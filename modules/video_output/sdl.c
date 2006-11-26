@@ -31,9 +31,9 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/vout.h>
-#include <vlc/aout.h>
+#include <vlc_interface.h>
+#include <vlc_vout.h>
+#include <<vlc_aout.h>>
 
 #include <sys/types.h>
 #ifndef WIN32

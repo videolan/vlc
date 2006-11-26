@@ -30,10 +30,10 @@
 #include <errno.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/aout.h>
-#include <vlc/vout.h>
-#include "aout_internal.h"
+#include <vlc_aout.h>
+#include <vlc_vout.h>
+#include <vlc_block.h>
+#include <vlc_input.h>
 
 #ifdef USE_GOOM_TREE
 #   ifdef OLD_GOOM
@@ -413,14 +413,14 @@ static char *TitleGet( vlc_object_t *p_this )
 
     if( p_input )
     {
-        if( p_input->input.p_item->p_meta->psz_title &&
-                *p_input->input.p_item->p_meta->psz_title )
+        if( input_GetItem(p_input)->p_meta->psz_title &&
+                *input_GetItem(p_input)->p_meta->psz_title )
         {
-            psz_title = strdup( p_input->input.p_item->p_meta->psz_title );
+            psz_title = strdup( input_GetItem(p_input)->p_meta->psz_title );
         }
         else
         {
-            char *psz = strrchr( p_input->input.p_item->psz_uri, '/' );
+            char *psz = strrchr( input_GetItem(p_input)->psz_uri, '/' );
 
             if( psz )
             {
@@ -428,7 +428,7 @@ static char *TitleGet( vlc_object_t *p_this )
             }
             else
             {
-                psz = p_input->input.p_item->psz_uri;
+                psz = input_GetItem(p_input)->psz_uri;
             }
             if( psz && *psz )
             {

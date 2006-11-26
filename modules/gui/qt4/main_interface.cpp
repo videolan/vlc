@@ -40,8 +40,7 @@
 
 #include <assert.h>
 #include <vlc_keys.h>
-#include <vlc/vout.h>
-#include <aout_internal.h>
+#include <vlc_vout.h>
 
 #ifdef WIN32
     #define PREF_W 410

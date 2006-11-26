@@ -28,7 +28,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 /*****************************************************************************
  * Open: initialize dummy interface

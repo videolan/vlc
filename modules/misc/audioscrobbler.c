@@ -41,14 +41,15 @@
  * check meta_engine's state, and remove delaying of metadata reading
  */
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 #include <vlc_meta.h>
 #include <vlc_md5.h>
 #include <vlc_block.h>
 #include <vlc_stream.h>
 #include <vlc_url.h>
-#include <network.h>
-#include <vlc_interaction.h>
+#include <vlc_network.h>
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -623,7 +624,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     p_sys->p_current_song->psz_i = encode_URI_component( psz_date );
     p_sys->p_current_song->time_playing = epoch;
 
-    p_sys->b_paused = ( p_input->b_dead || !p_input->input.p_item->psz_name )
+    p_sys->b_paused = ( p_input->b_dead || !input_GetItem(p_input)->psz_name )
                       ? VLC_TRUE : VLC_FALSE;
 
     vlc_mutex_unlock( &p_sys->lock );
@@ -988,7 +989,7 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &video_val, NULL );
     if( ( video_val.i_int > 0 ) || \
-        ( p_input->input.p_item->i_type == ITEM_TYPE_NET ) )
+        ( input_GetItem(p_input)->i_type == ITEM_TYPE_NET ) )
     {
         msg_Dbg( p_this, "Not an audio only local file -> no submission");
         vlc_object_release( p_input );
@@ -1018,7 +1019,7 @@ static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input )
     intf_sys_t          *p_sys          = p_this->p_sys;
     int                 i_status;
 
-    i_status = p_input->input.p_item->p_meta->i_status;
+    i_status = input_GetItem(p_input)->p_meta->i_status;
 
     #define FREE_INPUT_AND_CHARS \
         vlc_object_release( p_input ); \
@@ -1043,10 +1044,10 @@ static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input )
         }
 
     #define ALLOC_ITEM_META( a, b ) \
-        if ( p_input->input.p_item->b ) \
+        if ( input_GetItem(p_input)->b ) \
         { \
             a = encode_URI_component( \
-                p_input->input.p_item->b ); \
+                input_GetItem(p_input)->b ); \
             if( !a ) \
             { \
                 FREE_INPUT_AND_CHARS \
@@ -1084,7 +1085,7 @@ static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input )
         else
             psz_trackid = calloc( 1, 1 );
 
-        i_length = p_input->input.p_item->i_duration / 1000000;
+        i_length = input_GetItem(p_input)->i_duration / 1000000;
 
         vlc_mutex_lock ( &p_sys->lock );
 

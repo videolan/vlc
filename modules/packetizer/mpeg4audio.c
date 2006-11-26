@@ -29,11 +29,11 @@
 #include <string.h>                                              /* strdup() */
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <vlc/decoder.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
-#include "codecs.h"
+#include <vlc_aout.h>
+#include <vlc_codec.h>
+#include <vlc_block.h>
+#include <vlc_sout.h>
+#include <vlc_codecs.h>
 
 #include "vlc_block_helper.h"
 

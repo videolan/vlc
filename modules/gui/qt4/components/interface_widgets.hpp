@@ -25,7 +25,7 @@
 #define _INTFWIDGETS_H_
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 #include "qt4.hpp"
 

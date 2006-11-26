@@ -31,7 +31,7 @@
 
 #include <assert.h>
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 
 class QEvent;
 class QSignalMapper;

@@ -27,10 +27,9 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/aout.h>
-
-#include <codecs.h>
+#include <vlc_demux.h>
+#include <vlc_aout.h>
+#include <vlc_codecs.h>
 
 /*****************************************************************************
  * Module descriptor

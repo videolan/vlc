@@ -22,8 +22,8 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc_playlist.h>
-#include <vlc/input.h>
 #include <vlc_meta.h>
+#include <vlc_demux.h>
 
 #include <fileref.h>
 #include <tag.h>

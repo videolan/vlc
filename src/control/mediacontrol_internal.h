@@ -30,7 +30,7 @@ extern "C" {
 
 #include <vlc/vlc.h>
 #include <vlc/mediacontrol_structures.h>
-#include <libvlc_internal.h>
+#include "libvlc_internal.h"
 #include <vlc/libvlc.h>
 
 struct mediacontrol_Instance {

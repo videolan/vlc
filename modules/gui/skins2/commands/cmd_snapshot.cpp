@@ -22,8 +22,8 @@
  *****************************************************************************/
 
 #include "cmd_snapshot.hpp"
-#include <vlc/vout.h>
-
+#include <vlc_input.h>
+#include <vlc_vout.h>
 
 void CmdSnapshot::execute()
 {

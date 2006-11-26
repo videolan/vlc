@@ -29,8 +29,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #ifndef _MSC_VER
     /* Work-around a bug in w32api-2.5 */

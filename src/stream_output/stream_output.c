@@ -33,10 +33,13 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
-#include <vlc/sout.h>
-#include <vlc/input.h>
+#include <vlc_sout.h>
 
-#include "vlc_meta.h"
+#include "stream_output.h"
+
+#include <vlc_meta.h>
+
+#include "input/input_internal.h"
 
 #undef DEBUG_BUFFER
 /*****************************************************************************
@@ -369,11 +372,11 @@ int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
                                                FIND_PARENT );
         if( p_input )
         {
-            stats_UpdateInteger( p_input, p_input->counters.p_sout_sent_packets,
+            stats_UpdateInteger( p_input, p_input->p->counters.p_sout_sent_packets,
 			         30, NULL );
-            stats_UpdateInteger( p_input, p_input->counters.p_sout_sent_bytes,
+            stats_UpdateInteger( p_input, p_input->p->counters.p_sout_sent_bytes,
                                  p_access->i_sent_bytes, &i_total );
-            stats_UpdateFloat( p_input, p_input->counters.p_sout_send_bitrate,
+            stats_UpdateFloat( p_input, p_input->p->counters.p_sout_send_bitrate,
 			   	 (float)i_total, NULL );
             p_access->i_sent_bytes = 0;
             vlc_object_release( p_input );

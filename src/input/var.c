@@ -27,7 +27,6 @@
 #include <vlc/vlc.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <vlc/input.h>
 
 #include "input_internal.h"
 
@@ -84,7 +83,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
 
     /* Rate */
     var_Create( p_input, "rate", VLC_VAR_INTEGER );
-    val.i_int = p_input->i_rate;
+    val.i_int = p_input->p->i_rate;
     var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
     var_AddCallback( p_input, "rate", RateCallback, NULL );
 
@@ -214,14 +213,14 @@ void input_ControlVarClean( input_thread_t *p_input )
     var_Destroy( p_input, "bookmark" );
 
     var_Destroy( p_input, "program" );
-    if( p_input->i_title > 1 )
+    if( p_input->p->i_title > 1 )
     {
         /* TODO Destroy sub navigation var ? */
 
         var_Destroy( p_input, "next-title" );
         var_Destroy( p_input, "prev-title" );
     }
-    if( p_input->i_title > 0 )
+    if( p_input->p->i_title > 0 )
     {
         /* FIXME title > 0 doesn't mean current title has more than 1 seekpoint */
         var_Destroy( p_input, "next-chapter" );
@@ -251,7 +250,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
     int  i;
 
     /* Create more command variables */
-    if( p_input->i_title > 1 )
+    if( p_input->p->i_title > 1 )
     {
         var_Create( p_input, "next-title", VLC_VAR_VOID );
         text.psz_string = _("Next title");
@@ -266,7 +265,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
 
     /* Create title and navigation */
     val.psz_string = malloc( sizeof("title ") + 5 );
-    for( i = 0; i < p_input->i_title; i++ )
+    for( i = 0; i < p_input->p->i_title; i++ )
     {
         vlc_value_t val2, text, text2;
         int j;
@@ -279,15 +278,15 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         var_AddCallback( p_input, val.psz_string,
                          NavigationCallback, (void *)i );
 
-        if( p_input->title[i]->psz_name == NULL ||
-            *p_input->title[i]->psz_name == '\0' )
+        if( p_input->p->title[i]->psz_name == NULL ||
+            *p_input->p->title[i]->psz_name == '\0' )
         {
             asprintf( &text.psz_string, _("Title %i"),
-                      i + p_input->i_title_offset );
+                      i + p_input->p->i_title_offset );
         }
         else
         {
-            text.psz_string = strdup( p_input->title[i]->psz_name );
+            text.psz_string = strdup( p_input->p->title[i]->psz_name );
         }
         var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val, &text );
 
@@ -297,21 +296,21 @@ void input_ControlVarNavigation( input_thread_t *p_input )
 
         free( text.psz_string );
 
-        for( j = 0; j < p_input->title[i]->i_seekpoint; j++ )
+        for( j = 0; j < p_input->p->title[i]->i_seekpoint; j++ )
         {
             val2.i_int = j;
 
-            if( p_input->title[i]->seekpoint[j]->psz_name == NULL ||
-                *p_input->title[i]->seekpoint[j]->psz_name == '\0' )
+            if( p_input->p->title[i]->seekpoint[j]->psz_name == NULL ||
+                *p_input->p->title[i]->seekpoint[j]->psz_name == '\0' )
             {
                 /* Default value */
                 asprintf( &text2.psz_string, _("Chapter %i"),
-                          j + p_input->i_seekpoint_offset );
+                          j + p_input->p->i_seekpoint_offset );
             }
             else
             {
                 text2.psz_string =
-                    strdup( p_input->title[i]->seekpoint[j]->psz_name );
+                    strdup( p_input->p->title[i]->seekpoint[j]->psz_name );
             }
 
             var_Change( p_input, val.psz_string, VLC_VAR_ADDCHOICE,
@@ -329,7 +328,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
  *****************************************************************************/
 void input_ControlVarTitle( input_thread_t *p_input, int i_title )
 {
-    input_title_t *t = p_input->title[i_title];
+    input_title_t *t = p_input->p->title[i_title];
     vlc_value_t val;
     int  i;
 
@@ -366,7 +365,7 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
         {
             /* Default value */
             asprintf( &text.psz_string, _("Chapter %i"),
-                      i + p_input->i_seekpoint_offset );
+                      i + p_input->p->i_seekpoint_offset );
         }
         else
         {

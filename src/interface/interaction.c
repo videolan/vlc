@@ -37,12 +37,11 @@
 #include <stdio.h>                                                   /* FILE */
 #include <string.h>                                            /* strerror() */
 
-#include <vlc/input.h>
 #include <assert.h>
 
-#include "vlc_interaction.h"
-#include "vlc_interface.h"
-#include "vlc_playlist.h"
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
+#include "interface.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -468,10 +467,9 @@ static void InteractionInit( playlist_t *p_playlist )
     p_interaction->i_dialogs = 0;
     p_interaction->pp_dialogs = NULL;
     p_interaction->p_intf = NULL;
-    p_interaction->i_last_id = DIALOG_LAST_PREDEFINED + 1;
+    p_interaction->i_last_id = 0;
 
     vlc_mutex_init( p_interaction , &p_interaction->object_lock );
-
     p_playlist->p_interaction  = p_interaction;
 }
 

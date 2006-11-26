@@ -27,12 +27,12 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc_interaction.h>
+#include <vlc_demux.h>
+#include <vlc_interface.h>
 
-#include "vlc_meta.h"
-
-#include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
+#include <vlc_meta.h>
+#include <vlc_access.h>                /* GET_PRIVATE_ID_STATE */
+#include <vlc_codecs.h>                /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "libasf.h"
 
 /* TODO

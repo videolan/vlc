@@ -30,11 +30,8 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-
-#include "vlc_video.h"
-#include "video_output.h"
-#include "vlc_spu.h"
-
+#include <vlc_vout.h>
+#include <vlc_osd.h>
 #include "vout_pictures.h"
 
 /**

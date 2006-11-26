@@ -24,7 +24,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
 /**
  * \file
  * This file is a collection of common definitions and types
@@ -471,7 +470,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * Plug-in stuff
  *****************************************************************************/
 
-#include "modules_inner.h"
+#include "vlc_modules_macros.h"
 
 #if !defined (__PLUGIN__) || defined (HAVE_SHARED_LIBVLC)
 #   ifdef __cplusplus
@@ -648,6 +647,8 @@ static int64_t GCD( int64_t a, int64_t b )
 #define FREE(a) if( a ) { free( a ); }
 
 #define EMPTY_STR(str) (!str || !*str)
+
+VLC_EXPORT( char const *, vlc_error, ( int ) );
 
 #include <vlc_arrays.h>
 
@@ -1168,15 +1169,15 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #else
 #   define VLC_Changeset( ) ("exported")
 #endif
-#include "os_specific.h"
+#include "vlc_os_specific.h"
 #include "vlc_messages.h"
-#include "variables.h"
+#include "vlc_variables.h"
 #include "vlc_objects.h"
 #include "vlc_threads_funcs.h"
-#include "mtime.h"
-#include "modules.h"
+#include "vlc_mtime.h"
+#include "vlc_modules.h"
 #include "main.h"
-#include "configuration.h"
+#include "vlc_configuration.h"
 
 #if defined( __BORLANDC__ )
 #   undef PACKAGE

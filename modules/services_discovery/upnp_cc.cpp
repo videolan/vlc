@@ -34,7 +34,7 @@
 
 #undef PACKAGE_NAME
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <vlc_playlist.h>
 
 /* FIXME: thread-safety ?? */
 /* FIXME: playlist locking */

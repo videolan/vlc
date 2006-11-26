@@ -951,16 +951,15 @@ static const char *ppsz_clock_descriptions[] =
 
 #define ALBUM_ART_TEXT N_( "Album art policy" )
 #define ALBUM_ART_LONGTEXT N_( \
-    "Choose when to download and cache album art." )
+    "Choose how album art will be downloaded." );
 
-static int pi_albumart_values[] = { ALBUM_ART_NEVER,
-                                    ALBUM_ART_WHEN_ASKED,
+static int pi_albumart_values[] = { ALBUM_ART_WHEN_ASKED,
                                     ALBUM_ART_WHEN_PLAYED,
                                     ALBUM_ART_ALL };
 static const char *ppsz_albumart_descriptions[] =
-    { N_("Never download"), N_("Download when asked"),
-      N_("Download when track starts playing"),
-      N_("Download everything ASAP") };
+    { N_("Manual download only"),
+      N_("When track starts playing"),
+      N_("As soon as track is added") };
 
 #define SD_TEXT N_( "Services discovery modules")
 #define SD_LONGTEXT N_( \

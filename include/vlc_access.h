@@ -24,6 +24,8 @@
 #ifndef _VLC_ACCESS_H
 #define _VLC_ACCESS_H 1
 
+#include <vlc_block.h>
+
 /**
  * \defgroup access Access
  * @{
@@ -109,16 +111,12 @@ struct access_t
     access_sys_t *p_sys;
 };
 
-#define access2_New( a, b, c, d, e ) __access2_New(VLC_OBJECT(a), b, c, d, e )
-VLC_EXPORT( access_t *, __access2_New,  ( vlc_object_t *p_obj, const char *psz_access, const char *psz_demux, const char *psz_path, vlc_bool_t b_quick ) );
-VLC_EXPORT( access_t *, access2_FilterNew, ( access_t *p_source, const char *psz_access_filter ) );
-VLC_EXPORT( void,      access2_Delete, ( access_t * ) );
-
 static inline int access2_vaControl( access_t *p_access, int i_query, va_list args )
 {
     if( !p_access ) return VLC_EGENERIC;
     return p_access->pf_control( p_access, i_query, args );
 }
+
 static inline int access2_Control( access_t *p_access, int i_query, ... )
 {
     va_list args;

@@ -29,9 +29,10 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/sout.h>
-#include <vlc/input.h>                  /* hmmm, just for INPUT_RATE_DEFAULT */
+#include <vlc_sout.h>
+#include <vlc_codec.h>
+#include <vlc_block.h>
+#include <vlc_input.h>                  /* hmmm, just for INPUT_RATE_DEFAULT */
 
 #include "vlc_bits.h"
 #include "vlc_block_helper.h"

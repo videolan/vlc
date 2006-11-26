@@ -98,7 +98,6 @@ struct httpd_host_t
 };
 
 
-
 enum
 {
     HTTPD_PROTO_NONE,

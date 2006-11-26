@@ -33,12 +33,13 @@
 #   include <time.h>                                               /* time() */
 #endif
 
-#include <vlc/input.h>
 
-#include <codecs.h>                        /* BITMAPINFOHEADER, WAVEFORMATEX */
+#include <vlc_codecs.h>               /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "iso_lang.h"
 #include "vlc_meta.h"
-#include "charset.h"
+#include <vlc_charset.h>
+#include <vlc_input.h>
+#include <vlc_demux.h>
 
 #include <iostream>
 #include <cassert>

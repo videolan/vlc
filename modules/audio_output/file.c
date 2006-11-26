@@ -30,11 +30,8 @@
 #include <errno.h>
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include "charset.h"
-
-#include "aout_internal.h"
-#include "codecs.h"
+#include <vlc_aout.h>
+#include <vlc_codecs.h> /* WAVEHEADER */
 
 #define FRAME_SIZE 2048
 #define A52_FRAME_NB 1536

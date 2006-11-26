@@ -32,14 +32,14 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <vlc/input.h>
+#include <vlc_access.h>
 
-#include "vlc_interaction.h"
-#include "vlc_playlist.h"
-#include "vlc_meta.h"
-#include "network.h"
-#include "vlc_url.h"
-#include "vlc_tls.h"
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
+#include <vlc_meta.h>
+#include <vlc_network.h>
+#include <vlc_url.h>
+#include <vlc_tls.h>
 
 /*****************************************************************************
  * Module descriptor

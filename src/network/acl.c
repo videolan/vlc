@@ -29,12 +29,12 @@
 #include <ctype.h>
 #include <vlc/vlc.h>
 
-#include "vlc_acl.h"
+#include <vlc_acl.h>
 
 #include <errno.h>
 
-#include "network.h"
-#include "charset.h"
+#include <vlc_network.h>
+#include <vlc_charset.h>
 
 /* FIXME: rwlock on acl, but libvlc doesn't implement rwlock */
 typedef struct vlc_acl_entry_t

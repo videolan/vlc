@@ -164,7 +164,6 @@ VLC_EXPORT( void, vlc_DictInsert, (dict_t *, int, const char *, void * ) );
 VLC_EXPORT( void*, vlc_DictGet, (dict_t *, int, const char * ) );
 VLC_EXPORT( int, vlc_DictLookup, (dict_t *, int, const char * ) );
 
-
 /************************************************************************
  * Dynamic arrays with progressive allocation
  ************************************************************************/

@@ -27,7 +27,7 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
+#include <vlc_vout.h>
 
 #include <vga.h>
 #include <vgagl.h>

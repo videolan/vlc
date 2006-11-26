@@ -31,6 +31,8 @@
  * @{
  */
 
+#include "input/input_internal.h"
+
 struct playlist_preparse_t
 {
     VLC_COMMON_MEMBERS

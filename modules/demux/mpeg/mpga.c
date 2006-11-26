@@ -28,9 +28,9 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include "vlc_codec.h"
-#include "vlc_meta.h"
+#include <vlc_demux.h>
+#include <vlc_codec.h>
+#include <vlc_meta.h>
 
 #define MPGA_PACKET_SIZE 1024
 

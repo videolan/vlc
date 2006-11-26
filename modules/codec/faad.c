@@ -23,9 +23,9 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <vlc/decoder.h>
-#include <vlc/input.h>
+#include <vlc_aout.h>
+#include <vlc_codec.h>
+#include <vlc_input.h>
 
 #include <faad.h>
 

@@ -32,8 +32,8 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include <vlc/vout.h>
+#include <vlc_interface.h>
+#include <<vlc_vout.h>>
 #include <vlc_keys.h>
 
 #ifdef HAVE_MACHINE_PARAM_H

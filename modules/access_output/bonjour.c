@@ -29,8 +29,7 @@
 #include <vlc/vlc.h>
 
 #ifdef HAVE_AVAHI_CLIENT
-#include <vlc/intf.h>
-#include <vlc/sout.h>
+#include <vlc_sout.h>
 
 #include <avahi-client/client.h>
 #ifdef HAVE_AVAHI_06

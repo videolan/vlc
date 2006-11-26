@@ -28,13 +28,13 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc_interaction.h>
+#include <vlc_interface.h>
 
 #ifdef HAVE_ALLOCA_H
 #   include <alloca.h>
 #endif
 
-#include "audio_output.h"
+#include <vlc_aout.h>
 #include "aout_internal.h"
 
 /*****************************************************************************

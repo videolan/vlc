@@ -33,8 +33,8 @@
 
 #include <dts.h>                                       /* libdca header file */
 
-#include <vlc/decoder.h>
-#include "aout_internal.h"
+#include <vlc_aout.h>
+#include <vlc_block.h>
 #include "vlc_filter.h"
 
 /*****************************************************************************

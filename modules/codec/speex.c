@@ -25,8 +25,9 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/input.h>
+#include <vlc_input.h>
+#include <vlc_codec.h>
+#include <vlc_aout.h>
 
 #include <ogg/ogg.h>
 #include <speex/speex.h>

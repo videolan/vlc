@@ -25,7 +25,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
+#include <vlc_codec.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h> /* write(), close() */

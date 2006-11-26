@@ -27,7 +27,6 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

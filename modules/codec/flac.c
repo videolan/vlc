@@ -27,7 +27,8 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
+#include <vlc_codec.h>
+#include <vlc_aout.h>
 
 #ifdef HAVE_FLAC_STREAM_DECODER_H
 #   include <FLAC/stream_decoder.h>
@@ -35,8 +36,8 @@
 #   define USE_LIBFLAC
 #endif
 
-#include "vlc_block_helper.h"
-#include "vlc_bits.h"
+#include <vlc_block_helper.h>
+#include <vlc_bits.h>
 
 #define MAX_FLAC_HEADER_SIZE 16
 

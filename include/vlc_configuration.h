@@ -23,6 +23,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 /*****************************************************************************
  * Macros used to build the configuration structure.
  *****************************************************************************/
@@ -215,22 +219,15 @@ VLC_EXPORT( void,   __config_PutFloat, (vlc_object_t *, const char *, float) );
 VLC_EXPORT( char *, __config_GetPsz,   (vlc_object_t *, const char *) );
 VLC_EXPORT( void,   __config_PutPsz,   (vlc_object_t *, const char *, const char *) );
 
-VLC_EXPORT( int,    __config_LoadCmdLine,  ( vlc_object_t *, int *, char *[], vlc_bool_t ) );
-VLC_EXPORT( char *,   config_GetHomeDir,     ( void ) );
-VLC_EXPORT( char *,   config_GetUserDir,     ( void ) );
-VLC_EXPORT( const char *, config_GetDataDir, ( const vlc_object_t * ) );
-VLC_EXPORT( int,    __config_LoadConfigFile, ( vlc_object_t *, const char * ) );
+#define config_SaveConfigFile(a,b) __config_SaveConfigFile(VLC_OBJECT(a),b)
 VLC_EXPORT( int,    __config_SaveConfigFile, ( vlc_object_t *, const char * ) );
+#define config_ResetAll(a) __config_ResetAll(VLC_OBJECT(a))
 VLC_EXPORT( void,   __config_ResetAll, ( vlc_object_t * ) );
 
 VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) );
 VLC_EXPORT( module_t *, config_FindModule,( vlc_object_t *, const char * ) );
 
-VLC_EXPORT( int, config_Duplicate, ( module_t *, const module_config_t *, size_t ) );
-            void  config_Free       ( module_t * );
-
-VLC_EXPORT( void, config_SetCallbacks, ( module_config_t *, module_config_t *, size_t ) );
-VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t *, size_t ) );
+VLC_EXPORT( int, config_Duplicate,( module_t *, const module_config_t *, size_t ));
 
 #define config_GetType(a,b) __config_GetType(VLC_OBJECT(a),b)
 #define config_GetInt(a,b) __config_GetInt(VLC_OBJECT(a),b)
@@ -240,14 +237,6 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t *, size_t ) );
 #define config_GetPsz(a,b) __config_GetPsz(VLC_OBJECT(a),b)
 #define config_PutPsz(a,b,c) __config_PutPsz(VLC_OBJECT(a),b,c)
 
-#define config_LoadCmdLine(a,b,c,d) __config_LoadCmdLine(VLC_OBJECT(a),b,c,d)
-#define config_LoadConfigFile(a,b) __config_LoadConfigFile(VLC_OBJECT(a),b)
-#define config_SaveConfigFile(a,b) __config_SaveConfigFile(VLC_OBJECT(a),b)
-#define config_ResetAll(a) __config_ResetAll(VLC_OBJECT(a))
-
-/* internal only */
-int config_CreateDir( vlc_object_t *, const char * );
-int config_AutoSaveConfigFile( vlc_object_t * );
 
 /*****************************************************************************
  * Macros used to build the configuration structure.
@@ -483,3 +472,7 @@ static inline char *config_chain_find_value( config_chain_t *p_cfg, const char *
 
     return NULL;
 }
+
+# ifdef __cplusplus
+}
+# endif

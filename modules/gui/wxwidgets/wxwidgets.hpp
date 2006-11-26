@@ -38,9 +38,9 @@
 #define WXINTL_NO_GETTEXT_MACRO
 
 #include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include "charset.h"
-
+#include <vlc_interface.h>
+#include "vlc_charset.h"
+#include <vlc_playlist.h>
 #include <wx/wx.h>
 #define SLIDER_MAX_POS 10000
 

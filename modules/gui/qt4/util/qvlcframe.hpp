@@ -33,7 +33,7 @@
 #include <QPushButton>
 #include "qt4.hpp"
 #include <vlc/vlc.h>
-#include <charset.h>
+#include <vlc_charset.h>
 
 class QVLCFrame : public QWidget
 {

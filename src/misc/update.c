@@ -42,13 +42,13 @@
 #include <ctype.h>                                              /* tolower() */
 
 
-#include "vlc_update.h"
+#include <vlc_update.h>
 
-#include "vlc_block.h"
-#include "vlc_stream.h"
-#include "vlc_xml.h"
-#include "vlc_interaction.h"
-#include "charset.h"
+#include <vlc_block.h>
+#include <vlc_stream.h>
+#include <vlc_xml.h>
+#include <vlc_interface.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Misc defines

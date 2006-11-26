@@ -26,7 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <errno.h>
-#include "network.h"
+#include <vlc_network.h>
 
 #if defined (WIN32) || defined (UNDER_CE)
 typedef struct

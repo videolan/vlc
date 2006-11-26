@@ -26,9 +26,9 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/decoder.h>
-#include <vlc/sout.h>
-#include <vlc/aout.h>
+#include <vlc_codec.h>
+#include <vlc_sout.h>
+#include <vlc_aout.h>
 
 #include <twolame.h>
 

@@ -32,17 +32,16 @@
 #include <sys/types.h>                                          /* opendir() */
 #include <dirent.h>                                             /* opendir() */
 
-#include <vlc/intf.h>
+#include <vlc_interface.h>
 #include <vlc_block.h>
+#include <vlc_playlist.h>
 
-#include "vlc_video.h"
-#include "video_output.h"
-#include "vlc_image.h"
-#include "vlc_spu.h"
-#include "vlc_strings.h"
-#include "charset.h"
+#include <vlc_vout.h>
+#include <vlc_image.h>
+#include <vlc_osd.h>
 
-#include <snapshot.h>
+#include <vlc_strings.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Local prototypes
