@@ -177,7 +177,7 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
     char *psz_bands, *psz_bands_init, *p_next;
     vlc_bool_t b_2p;
     int i;
-    vlc_bool_t b_enabled = GetFiltersStatus( p_intf, "equalizer" );
+    vlc_bool_t b_enabled = GetFiltersStatus( p_intf, (char *)"equalizer" );
     vlc_object_t *p_object = vlc_object_find( p_intf,
                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
@@ -320,7 +320,7 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
 
 - (IBAction)enable:(id)sender
 {
-    ChangeFiltersString( VLCIntf, "equalizer", [sender state] );
+    ChangeFiltersString( VLCIntf, (char *)"equalizer", [sender state] );
 }
 
 - (IBAction)preampSliderUpdated:(id)sender

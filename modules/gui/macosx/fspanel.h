@@ -30,6 +30,9 @@
     BOOL b_keptVisible;
     BOOL b_alreadyCounting;
     int i_timeToKeepVisibleInSec;
+
+    BOOL b_displayed;
+    BOOL b_voutWasUpdated;
 }
 - (id)initWithContentRect: (NSRect)contentRect 
                 styleMask: (unsigned int)aStyle 
@@ -61,6 +64,8 @@
 - (void)mouseDown:(NSEvent *)theEvent;
 - (void)mouseDragged:(NSEvent *)theEvent;
 
+- (BOOL)isDisplayed;
+- (void)setVoutWasUpdated;
 @end
 
 @interface VLCFSPanelView : NSView
