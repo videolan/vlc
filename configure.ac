@@ -1108,7 +1108,7 @@ VLC_ADD_PLUGINS([dummy logger memcpy])
 VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf mp4 rawdv nsv real aiff mjpeg demuxdump flacsys tta])
 VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak flac])
 VLC_ADD_PLUGINS([deinterlace invert adjust transform wave ripple psychedelic gradient motionblur rv32 rotate noise])
-VLC_ADD_PLUGINS([fixed32tos16 s16tofixed32 u8tofixed32 mono])
+VLC_ADD_PLUGINS([converter_fixed mono])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler])
 VLC_ADD_PLUGINS([trivial_channel_mixer trivial_mixer])
 VLC_ADD_PLUGINS([playlist export sgimb nsc xtag])
@@ -1128,7 +1128,7 @@ if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGINS([aout_file linear_resampler bandlimited_resampler])
   VLC_ADD_PLUGINS([float32_mixer spdif_mixer simple_channel_mixer])
   VLC_ADD_PLUGINS([dolby_surround_decoder headphone_channel_mixer normvol equalizer param_eq])
-  VLC_ADD_PLUGINS([fixed32tofloat32 float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif s16tofloat32 s16tofloat32swab s8tofloat32 u8tofloat32 audio_format])
+  VLC_ADD_PLUGINS([converter_float a52tospdif dtstospdif audio_format])
 fi
 
 dnl
