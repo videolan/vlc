@@ -26,7 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc_access.h>
-#include <vlc_interaction.h>
+#include <vlc_interface.h>
 
 #include <vlc_network.h>
 #include "rtsp.h"

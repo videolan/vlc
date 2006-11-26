@@ -25,8 +25,8 @@
 #include <stdlib.h>                                                /* free() */
 
 #include <vlc/vlc.h>
-#include "vlc_playlist.h"
-#include "charset.h"
+#include <vlc_playlist.h>
+#include <vlc_charset.h>
 
 #ifdef WIN32                       /* optind, getopt(), included in unistd.h */
 #   include "../extras/getopt.h"

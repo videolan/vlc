@@ -31,7 +31,7 @@
 #include "info.h"          /* headers for meta info retrieval */
 #include <vlc_playlist.h>  /* Has to come *after* cdda.h */
 #include "vlc_keys.h"
-#include <vlc_interaction.h>
+#include <vlc_interface.h>
 
 #include <cdio/cdio.h>
 #include <cdio/logging.h>
