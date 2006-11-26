@@ -373,20 +373,22 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 uint8_t color = ( i_plane == Y_PLANE ? 0x0 : 0x80 );
                 for( ; i_row < i_last_row; i_row++, i_orow++ )
                 {
-                    memset( p_out->p_pixels + i_row * i_pitch
-                                            + i_col * i_pitch / i_cols,
-                            color, i_pitch / i_cols );
+                    p_vout->p_libvlc->
+                    pf_memset( p_out->p_pixels + i_row * i_pitch
+                                               + i_col * i_pitch / i_cols,
+                               color, i_pitch / i_cols );
                 }
             }
             else
             {
                 for( ; i_row < i_last_row; i_row++, i_orow++ )
                 {
-                    memcpy( p_out->p_pixels + i_row * i_pitch
-                                            + i_col * i_pitch / i_cols,
-                            p_in->p_pixels + i_orow * i_pitch
-                                           + i_ocol * i_pitch / i_cols,
-                            i_pitch / i_cols );
+                    p_vout->p_libvlc->
+                    pf_memcpy( p_out->p_pixels + i_row * i_pitch
+                                               + i_col * i_pitch / i_cols,
+                               p_in->p_pixels + i_orow * i_pitch
+                                              + i_ocol * i_pitch / i_cols,
+                               i_pitch / i_cols );
                 }
             }
         }
@@ -403,9 +405,10 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         int i_last_row = i_row + 1;
         i_row *= p_in->i_lines / i_rows;
         i_last_row *= p_in->i_lines / i_rows;
-        memset( p_out->p_pixels + i_row * i_pitch
-                                + i_col * i_pitch / i_cols,
-                0xff, i_pitch / i_cols );
+        p_vout->p_libvlc->
+        pf_memset( p_out->p_pixels + i_row * i_pitch
+                                   + i_col * i_pitch / i_cols,
+                   0xff, i_pitch / i_cols );
         for( ; i_row < i_last_row; i_row++ )
         {
             p_out->p_pixels[   i_row * i_pitch
@@ -414,9 +417,10 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                              + (i_col+1) * i_pitch / i_cols - 1 ] = 0xff;
         }
         i_row--;
-        memset( p_out->p_pixels + i_row * i_pitch
-                                + i_col * i_pitch / i_cols,
-                0xff, i_pitch / i_cols );
+        p_vout->p_libvlc->
+        pf_memset( p_out->p_pixels + i_row * i_pitch
+                                   + i_col * i_pitch / i_cols,
+                   0xff, i_pitch / i_cols );
     }
 
     if( p_vout->p_sys->b_finished == VLC_TRUE )

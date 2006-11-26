@@ -169,14 +169,16 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     p_out_v = p_outpic->p[V_PLANE].p_pixels;
 
     /* Create grayscale version of input */
-    memcpy( p_out_y, p_in_y, p_pic->p[Y_PLANE].i_visible_lines
-            * p_pic->p[Y_PLANE].i_pitch - 8 );
-    memset( p_out_u, 0x80, p_pic->p[U_PLANE].i_visible_lines
-            * p_pic->p[U_PLANE].i_pitch - 8 );
-    memset( p_out_v, 0x80, p_pic->p[U_PLANE].i_visible_lines
-            * p_pic->p[U_PLANE].i_pitch - 8 );
+    p_filter->p_libvlc->
+    pf_memcpy( p_out_y, p_in_y, p_pic->p[Y_PLANE].i_visible_lines
+               * p_pic->p[Y_PLANE].i_pitch - 8 );
+    p_filter->p_libvlc->
+    pf_memset( p_out_u, 0x80, p_pic->p[U_PLANE].i_visible_lines
+               * p_pic->p[U_PLANE].i_pitch - 8 );
+    p_filter->p_libvlc->
+    pf_memset( p_out_v, 0x80, p_pic->p[U_PLANE].i_visible_lines
+               * p_pic->p[U_PLANE].i_pitch - 8 );
 
-   
     /*
      * Do the U and V planes
      */

@@ -164,13 +164,15 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                              p_pic->p[i_index].i_visible_pitch + i_offset );
                     p_in += p_pic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
-                    memset( p_out + i_offset, black_pixel, -i_offset );
+                    p_filter->p_libvlc->pf_memset( p_out + i_offset,
+                                                   black_pixel, -i_offset );
                 }
                 else
                 {
                     p_filter->p_libvlc->pf_memcpy( p_out + i_offset, p_in,
                              p_pic->p[i_index].i_visible_pitch - i_offset );
-                    memset( p_out, black_pixel, i_offset );
+                    p_filter->p_libvlc->pf_memset( p_out, black_pixel,
+                                                   i_offset );
                     p_in += p_pic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
                 }

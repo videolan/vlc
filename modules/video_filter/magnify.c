@@ -261,7 +261,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     else
     {
 #define copy( plane ) \
-        memcpy( p_outpic->p[plane].p_pixels, p_pic->p[plane].p_pixels, \
+        p_vout->p_libvlc-> \
+        pf_memcpy( p_outpic->p[plane].p_pixels, p_pic->p[plane].p_pixels, \
             p_outpic->p[plane].i_lines * p_outpic->p[plane].i_pitch );
         copy( Y_PLANE );
         copy( U_PLANE );
@@ -280,7 +281,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     #define copyimage( plane ) \
         for( y=0; y<p_converted->p[plane].i_visible_lines; y++) \
         { \
-            memcpy( p_outpic->p[plane].p_pixels+y*p_outpic->p[plane].i_pitch, \
+            p_vout->p_libvlc->pf_memcpy( \
+            p_outpic->p[plane].p_pixels+y*p_outpic->p[plane].i_pitch, \
             p_converted->p[plane].p_pixels+y*p_converted->p[plane].i_pitch, \
             p_converted->p[plane].i_visible_pitch ); \
         }
@@ -294,9 +296,9 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         v_w = p_oyp->i_pitch*ZOOM_FACTOR/(VIS_ZOOM*o_zoom);
         v_h = (o_y+p_oyp->i_lines*ZOOM_FACTOR/o_zoom)/VIS_ZOOM;
         /* top line */
-        memset( p_oyp->p_pixels
-                + o_y/VIS_ZOOM*p_oyp->i_pitch
-                + o_x/VIS_ZOOM, 0xff, v_w+1 );
+        p_vout->p_libvlc->pf_memset( p_oyp->p_pixels
+                                     + o_y/VIS_ZOOM*p_oyp->i_pitch
+                                     + o_x/VIS_ZOOM, 0xff, v_w+1 );
 
         for( y = o_y/VIS_ZOOM+1; y < v_h; y++ )
         {
@@ -310,9 +312,9 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             ] = 0xff;
         }
         /* bottom line */
-        memset( p_oyp->p_pixels
-                + v_h*p_oyp->i_pitch
-                + o_x/VIS_ZOOM, 0xff, v_w+1 );
+        p_vout->p_libvlc->pf_memset( p_oyp->p_pixels
+                                     + v_h*p_oyp->i_pitch
+                                     + o_x/VIS_ZOOM, 0xff, v_w+1 );
 
         /* */
         v_h = p_oyp->i_lines/VIS_ZOOM;
@@ -353,18 +355,18 @@ o o X o o o X X X X X o o X X X X o o o X X X X X o o X X X o o o X X X o o X o 
     if( p_vout->p_sys->b_visible )
     {
         /* zoom gauge */
-        memset( p_oyp->p_pixels
-                    + (v_h+9)*p_oyp->i_pitch,
-                    0xff, 41 );
+        p_vout->p_libvlc->pf_memset( p_oyp->p_pixels
+                                     + (v_h+9)*p_oyp->i_pitch,
+                                     0xff, 41 );
         for( y = v_h + 10; y < v_h + 90; y++ )
         {
             int width = v_h + 90 - y;
             width = (width*width)/160;
             if( (80 - y + v_h)*10 < o_zoom )
             {
-                memset( p_oyp->p_pixels
-                    + y*p_oyp->i_pitch,
-                    0xff, width );
+                p_vout->p_libvlc->pf_memset( p_oyp->p_pixels
+                                             + y*p_oyp->i_pitch,
+                                             0xff, width );
             }
             else
             {
