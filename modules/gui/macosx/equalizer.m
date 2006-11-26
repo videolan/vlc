@@ -25,8 +25,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <aout_internal.h>
+#include <vlc_aout.h>
 
 #include "intf.h"
 

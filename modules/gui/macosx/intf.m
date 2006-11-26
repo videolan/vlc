@@ -49,6 +49,8 @@
 #import "update.h"
 #import "AppleRemote.h"
 
+#import <vlc_input.h>
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -1079,7 +1081,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             b_seekable = var_GetBool( p_intf->p_sys->p_input, "seekable" );
 
             /* check wether slow/fast motion is possible*/
-            b_control = p_intf->p_sys->p_input->input.b_can_pace_control;
+            b_control = p_intf->p_sys->p_input->b_can_pace_control;
 
             /* chapters & titles */
             //b_chapters = p_intf->p_sys->p_input->stream.i_area_nb > 1;
