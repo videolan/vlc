@@ -167,8 +167,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
               MSN_MAX_LENGTH,
               "\\0Music\\01\\0%s\\0%s\\0%s\\0%s\\0\\0\\0",
               p_intf->p_sys->psz_format,
-              psz_title,
               psz_artist,
+              psz_title,
               psz_album );
     free( psz_title );
     free( psz_artist );
