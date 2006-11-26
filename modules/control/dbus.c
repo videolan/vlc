@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 /*
- * D-Bus Specification: 
+ * D-Bus Specification:
  *      http://dbus.freedesktop.org/doc/dbus-specification.html
  * D-Bus low-level C API (libdbus)
  *      http://dbus.freedesktop.org/doc/dbus/api/html/index.html
@@ -56,6 +56,7 @@
 #include <vlc_interface.h>
 #include <vlc_meta.h>
 #include <vlc_input.h>
+#include <vlc_playlist.h>
 
 /*****************************************************************************
  * Local prototypes.
@@ -235,7 +236,7 @@ DBUS_METHOD( GetPlayingItem )
     char *p_psz_no_input = &psz_no_input;
     playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
     input_thread_t *p_input = p_playlist->p_input;
-    ADD_STRING( ( p_input ) ? &p_input->input.p_item->psz_name :
+    ADD_STRING( ( p_input ) ? &input_GetItem(p_input)->psz_name :
             &p_psz_no_input );
     pl_Release( ((vlc_object_t*) p_this) );
     REPLY_SEND;
@@ -262,7 +263,7 @@ DBUS_METHOD( GetPlayStatus )
             psz_play = strdup( "playing" );
         else psz_play = strdup( "unknown" );
     }
-    
+
     pl_Release( p_playlist );
 
     ADD_STRING( &psz_play );
@@ -397,9 +398,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     dbus_threads_init_default();
-    
+
     dbus_error_init( &error );
-    
+
     /* connect to the session bus */
     p_conn = dbus_bus_get( DBUS_BUS_SESSION, &error );
     if( !p_conn )
@@ -453,7 +454,7 @@ static void Close   ( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Run: main loop    
+ * Run: main loop
  *****************************************************************************/
 
 static void Run          ( intf_thread_t *p_intf )
@@ -475,7 +476,7 @@ DBUS_SIGNAL( ItemChangeSignal )
     OUT_ARGUMENTS;
 
     input_thread_t *p_input = (input_thread_t*) p_data;
-    ADD_STRING( &p_input->input.p_item->psz_name );
+    ADD_STRING( &input_GetItem(p_input)->psz_name );
 
     SIGNAL_SEND;
 }
