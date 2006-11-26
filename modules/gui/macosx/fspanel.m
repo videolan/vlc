@@ -42,13 +42,33 @@
                   backing:(NSBackingStoreType)bufferingType 
                     defer:(BOOL)flag
 {
-    id win=[super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:bufferingType defer:flag];
+    id win=[super initWithContentRect:contentRect styleMask:NSTexturedBackgroundWindowMask backing:bufferingType defer:flag];
     [win setOpaque:NO];
     [win setHasShadow: NO];
     [win setBackgroundColor:[NSColor clearColor]];
+    
     /* let the window sit on top of everything else and start out completely transparent */
     [win setLevel:NSFloatingWindowLevel];
     [win setAlphaValue:0.0];
+    
+    /* centre the panel in the lower third of the screen */
+    NSPoint theCoordinate;
+    NSRect theScreensFrame;
+    NSRect theWindowsFrame;
+    int i_outputScreen;
+    
+    i_outputScreen = var_GetInteger( VLCIntf, "video-device" );
+    if( i_outputScreen <=0 || i_outputScreen > (signed int)[[NSScreen screens] count] )
+        /* invalid preferences or none specified, using main screen */
+        theScreensFrame = [[NSScreen mainScreen] frame];
+    else
+        /* user-defined screen */
+        theScreensFrame = [[[NSScreen screens] objectAtIndex: i_outputScreen] frame];
+    
+    theWindowsFrame = [win frame];
+    theCoordinate.x = (theScreensFrame.size.width - theWindowsFrame.size.width) / 2;
+    theCoordinate.y = (theScreensFrame.size.height / 3) - theWindowsFrame.size.height;
+    [win setFrameTopLeftPoint: theCoordinate];
     return win;
 }
 
