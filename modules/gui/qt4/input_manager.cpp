@@ -107,7 +107,9 @@ void InputManager::update()
         vlc_value_t val;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
         if( val.i_int > 0 )
+        {
             emit navigationChanged( 1 ); // 1 = chapter, 2 = title, 0 = NO
+        }
         else
             emit navigationChanged( 2 );
     }
@@ -164,6 +166,34 @@ void InputManager::togglePlayPause()
     }
     var_Set( p_input, "state", state );
     emit statusChanged( state.i_int );
+}
+
+void InputManager::sectionPrev()
+{
+    if( hasInput() )
+    {
+        int i_type = var_Type( p_input, "prev-chapter" );
+        vlc_value_t val; val.b_bool = VLC_TRUE;
+        var_Set( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "prev-chapter":"prev-title", val );
+    }
+}
+
+void InputManager::sectionNext()
+{
+    if( hasInput() )
+    {
+        int i_type = var_Type( p_input, "prev-chapter" );
+        vlc_value_t val; val.b_bool = VLC_TRUE;
+        var_Set( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "next-chapter":"next-title", val );
+    }
+}
+
+void InputManager::sectionMenu()
+{
+    if( hasInput() )
+        var_SetInteger( p_input, "title 0", 2);
 }
 
 void InputManager::slower()

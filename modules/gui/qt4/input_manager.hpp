@@ -53,11 +53,16 @@ public slots:
     void slower();
     void faster();
     void normalRate();
+    void sectionNext();
+    void sectionPrev();
+    void sectionMenu();
 signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int, int );
     void nameChanged( QString );
+    /// Used to signal whether we should show navigation buttons
     void navigationChanged( int );
+    /// Play/pause status
     void statusChanged( int );
     void audioStarted();
     void videoStarted();

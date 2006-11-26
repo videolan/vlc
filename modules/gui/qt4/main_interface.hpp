@@ -99,6 +99,7 @@ private:
 public slots:
     void undockPlaylist();
 private slots:
+    void setNavigation( int );
     void setStatus( int );
     void setName( QString );
     void setDisplay( float, int, int );

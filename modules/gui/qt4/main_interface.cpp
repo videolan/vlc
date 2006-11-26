@@ -126,8 +126,16 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              this, setDisplay( float, int, int ) );
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,setName( QString ) );
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
+    CONNECT( THEMIM->getIM(), navigationChanged( int ), this, setNavigation(int) );
     CONNECT( slider, sliderDragged( float ),
              THEMIM->getIM(), sliderUpdate( float ) );
+
+    CONNECT( ui.prevSectionButton, clicked(), THEMIM->getIM(),
+             sectionPrev() );
+    CONNECT( ui.nextSectionButton, clicked(), THEMIM->getIM(),
+             sectionNext() );
+    CONNECT( ui.menuButton, clicked(), THEMIM->getIM(),
+             sectionMenu() );
 
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
@@ -157,6 +165,10 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     slider = new InputSlider( Qt::Horizontal, NULL );
     ui.hboxLayout->insertWidget( 0, slider );
+    ui.discFrame->hide();
+    BUTTON_SET_IMG( ui.prevSectionButton, "", previous.png, "" );
+    BUTTON_SET_IMG( ui.nextSectionButton, "", next.png, "" );
+    BUTTON_SET_IMG( ui.menuButton, "", previous.png, "" );
 
     BUTTON_SET_ACT_I( ui.prevButton, "" , previous.png,
                       qtr("Previous"), prev() );
@@ -588,6 +600,35 @@ void MainInterface::setStatus( int status )
         ui.playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
     else
         ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
+}
+
+#define HELP_MENU N_("Menu")
+#define HELP_PCH N_("Previous chapter")
+#define HELP_NCH N_("Next chapter")
+#define HELP_PTR N_("Previous track")
+#define HELP_NTR N_("Next track")
+
+void MainInterface::setNavigation( int navigation )
+{
+    // 1 = chapter, 2 = title, 0 = no
+    if( navigation == 0 )
+    {
+        ui.discFrame->hide();
+    } else if( navigation == 1 ) {
+        ui.prevSectionButton->show();
+        ui.prevSectionButton->setToolTip( qfu(HELP_PCH) );
+        ui.nextSectionButton->show();
+        ui.nextSectionButton->setToolTip( qfu(HELP_NCH) );
+        ui.menuButton->show();
+        ui.discFrame->show();
+    } else {
+        ui.prevSectionButton->show();
+        ui.prevSectionButton->setToolTip( qfu(HELP_PCH) );
+        ui.nextSectionButton->show();
+        ui.nextSectionButton->setToolTip( qfu(HELP_NCH) );
+        ui.menuButton->hide();
+        ui.discFrame->show();
+    }
 }
 
 static bool b_my_volume;
