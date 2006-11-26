@@ -237,7 +237,7 @@ void mwait( mtime_t date )
         clock_nanosleep( CLOCK_REALTIME, TIMER_ABSTIME, &ts, NULL );
 #else
 
-    mtime_t delay = mdate() - date;
+    mtime_t delay = date - mdate();
     if( delay > 0 )
         msleep( delay );
 
