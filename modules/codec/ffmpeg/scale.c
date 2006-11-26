@@ -26,7 +26,8 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc_codec.h>
-#include "vlc_filter.h"
+#include <vlc_vout.h>
+#include <vlc_filter.h>
 
 /* ffmpeg headers */
 #ifdef HAVE_FFMPEG_AVCODEC_H
