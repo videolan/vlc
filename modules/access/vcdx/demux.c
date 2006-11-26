@@ -29,7 +29,8 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <<vlc_input.h>>
+#include <vlc_input.h>
+#include <vlc_access.h>
 #include <vlc_interface.h>
 
 #ifdef HAVE_UNISTD_H

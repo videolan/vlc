@@ -14,5 +14,4 @@ void config_UnsetCallbacks ( module_config_t *, size_t );
 int   __config_LoadCmdLine  ( vlc_object_t *, int *, char *[], vlc_bool_t );
 char *   config_GetHomeDir     ( void );
 char *   config_GetUserDir     ( void );
-const char * config_GetDataDir ( const vlc_object_t * );
 int    __config_LoadConfigFile ( vlc_object_t *, const char * );

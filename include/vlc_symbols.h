@@ -452,6 +452,7 @@ struct module_symbols_t
     int (*vout_Snapshot_inner) (vout_thread_t *p_vout, picture_t *p_pic);
     void (*streaming_GuiDescToChain_inner) (vlc_object_t*, sout_chain_t*, sout_gui_descr_t*);
     input_item_t* (*input_GetItem_inner) (input_thread_t*);
+    const char * (*config_GetDataDir_inner) (const vlc_object_t *);
 };
 # if defined (__PLUGIN__)
 #  define aout_OutputNextBuffer (p_symbols)->aout_OutputNextBuffer_inner
@@ -887,6 +888,7 @@ struct module_symbols_t
 #  define vout_Snapshot (p_symbols)->vout_Snapshot_inner
 #  define streaming_GuiDescToChain (p_symbols)->streaming_GuiDescToChain_inner
 #  define input_GetItem (p_symbols)->input_GetItem_inner
+#  define config_GetDataDir (p_symbols)->config_GetDataDir_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1325,6 +1327,7 @@ struct module_symbols_t
     ((p_symbols)->vout_Snapshot_inner) = vout_Snapshot; \
     ((p_symbols)->streaming_GuiDescToChain_inner) = streaming_GuiDescToChain; \
     ((p_symbols)->input_GetItem_inner) = input_GetItem; \
+    ((p_symbols)->config_GetDataDir_inner) = config_GetDataDir; \
 
 # endif /* __PLUGIN__ */
 #endif /* __VLC_SYMBOLS_H */
