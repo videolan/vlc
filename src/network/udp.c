@@ -213,7 +213,7 @@ net_IPv4Join (vlc_object_t *obj, int fd,
 # endif
     } opt;
     int cmd;
-    struct in_addr id;
+    struct in_addr id = { .s_addr = INADDR_ANY };
     socklen_t optlen;
 
     /* Multicast interface IPv4 address */
