@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
+ *          Antoine Cellerier <dionoea &t videolan d.t org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,352 +29,211 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc_vout.h>
+#include <vlc/sout.h>
+#include <vlc/decoder.h>
 
-#include "filter_common.h"
+#include "vlc_filter.h"
 
 /*****************************************************************************
  * Local protypes
  *****************************************************************************/
-static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
-
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static void Render    ( vout_thread_t *, picture_t * );
-
-static void RenderBlur    ( vout_thread_t *, picture_t *, picture_t *, picture_t * );
-static void CopyPicture ( vout_thread_t*, picture_t *, picture_t * );
-
-static int  SendEvents( vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void * );
+static int  Create       ( vlc_object_t * );
+static void Destroy      ( vlc_object_t * );
+static picture_t *Filter ( filter_t *, picture_t * );
+static void RenderBlur   ( filter_sys_t *, picture_t *, picture_t * );
+static void Copy         ( filter_t *, uint8_t **, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define MODE_TEXT N_("Blur factor (1-127)")
-#define MODE_LONGTEXT N_("The degree of blurring from 1 to 127.")
+#define FACTOR_TEXT N_("Blur factor (1-127)")
+#define FACTOR_LONGTEXT N_("The degree of blurring from 1 to 127.")
+
+#define PERSISTANT_TEXT N_("Keep inifinte memory of past images")
+#define PERSISTANT_LONGTEXT N_("Use \"Result = ( new image * ( 128 - factor ) + factor * old result ) / 128\" instead of \"Result = ( new image * ( 128 - factor ) + factor * old image ) / 128\".")
+
+#define FILTER_PREFIX "blur-"
 
 vlc_module_begin();
     set_shortname( _("Motion blur") );
     set_description( _("Motion blur filter") );
-    set_capability( "video filter", 0 );
+    set_capability( "video filter2", 0 );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
-    add_integer_with_range( "blur-factor", 80, 1, 127, NULL,
-        MODE_TEXT, MODE_LONGTEXT, VLC_FALSE );
-    
+    add_integer_with_range( FILTER_PREFIX "factor", 80, 1, 127, NULL,
+                            FACTOR_TEXT, FACTOR_LONGTEXT, VLC_FALSE );
+    add_bool( FILTER_PREFIX "persistant", 0, NULL, PERSISTANT_TEXT,
+              PERSISTANT_LONGTEXT, VLC_FALSE );
+
+    add_shortcut( "blur" );
+
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
-/*****************************************************************************
- * vout_sys_t: Deinterlace video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the Deinterlace specific properties of an output thread.
- *****************************************************************************/
-struct vout_sys_t
-{
-    int        i_factor;        /* Deinterlace mode */
-    vlc_bool_t b_double_rate; /* Shall we double the framerate? */
-
-    mtime_t    last_date;
-    mtime_t    next_date;
-
-    vout_thread_t *p_vout;
-    picture_t *p_lastpic;
+static const char *ppsz_filter_options[] = {
+    "factor", "persistant", NULL
 };
 
 /*****************************************************************************
- * Control: control facility for the vout (forwards to child vout)
+ * filter_sys_t
  *****************************************************************************/
-static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+struct filter_sys_t
 {
-    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
-}
+    int        i_factor;
+    vlc_bool_t b_persistant;
+
+    uint8_t  **pp_planes;
+    int        i_planes;
+};
 
 /*****************************************************************************
- * Create: allocates Deinterlace video thread output method
- *****************************************************************************
- * This function allocates and initializes a Deinterlace vout method.
+ * Create
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 
     /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
+    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
+    if( p_filter->p_sys == NULL )
     {
-        msg_Err( p_vout, "out of memory" );
+        msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
 
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
-    p_vout->pf_render = Render;
-    p_vout->pf_display = NULL;
-    p_vout->pf_control = Control;
+    p_filter->pf_video_filter = Filter;
 
-    p_vout->p_sys->i_factor = config_GetInt( p_vout, "blur-factor" );
-    p_vout->p_sys->b_double_rate = 0;
-    p_vout->p_sys->last_date = 0;
-    p_vout->p_sys->p_lastpic = NULL;
+    config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
+                       p_filter->p_cfg );
 
-    return VLC_SUCCESS;
-}
+    var_Create( p_filter, FILTER_PREFIX "factor",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    p_filter->p_sys->i_factor =
+        var_GetInteger( p_filter, FILTER_PREFIX "factor" );
+    var_Create( p_filter, FILTER_PREFIX "persistant",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    p_filter->p_sys->b_persistant =
+        var_GetBool( p_filter, FILTER_PREFIX "persistant" );
 
-/*****************************************************************************
- * Init: initialize Deinterlace video thread output method
- *****************************************************************************/
-static int Init( vout_thread_t *p_vout )
-{
-    int i_index;
-    picture_t *p_pic;
-    video_format_t fmt = {0};
+    printf("factor: %d\npersitant: %d\n", p_filter->p_sys->i_factor, p_filter->p_sys->b_persistant );
 
-    I_OUTPUTPICTURES = 0;
-
-    /* Initialize the output structure, full of directbuffers since we want
-     * the decoder to output directly to our structures. */
-    switch( p_vout->render.i_chroma )
-    {
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('Y','V','1','2'):
-        case VLC_FOURCC('I','4','2','2'):
-            p_vout->output.i_chroma = p_vout->render.i_chroma;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->render.i_aspect;
-            p_vout->fmt_out = p_vout->fmt_in;
-            fmt = p_vout->fmt_out;
-            break;
-
-        default:
-            return VLC_EGENERIC; /* unknown chroma */
-            break;
-    }
-
-    msg_Dbg( p_vout, "spawning the real video output" );
-
-    switch( p_vout->render.i_chroma )
-    {
-    case VLC_FOURCC('I','4','2','0'):
-    case VLC_FOURCC('I','Y','U','V'):
-    case VLC_FOURCC('Y','V','1','2'):
-        p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
-        break;
-    default:
-        break;
-    }
-
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout == NULL )
-    {
-        msg_Err( p_vout, "cannot open vout, aborting" );
-
-        return VLC_EGENERIC;
-    }
-
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
-
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
+    p_filter->p_sys->pp_planes = NULL;
+    p_filter->p_sys->i_planes = 0;
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * End: terminate Deinterlace video thread output method
- *****************************************************************************/
-static void End( vout_thread_t *p_vout )
-{
-    int i_index;
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
-    {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
-    }
-}
-
-/*****************************************************************************
- * Destroy: destroy Deinterlace video thread output method
- *****************************************************************************
- * Terminate an output method created by DeinterlaceCreateOutputMethod
+ * Destroy
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
 
-    if( p_vout->p_sys->p_vout )
-    {
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-        vlc_object_detach( p_vout->p_sys->p_vout );
-        vout_Destroy( p_vout->p_sys->p_vout );
-    }
-
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
-
-    free( p_vout->p_sys );
+    while( p_filter->p_sys->i_planes-- )
+        free( p_filter->p_sys->pp_planes[p_filter->p_sys->i_planes] );
+    free( p_filter->p_sys->pp_planes );
+    free( p_filter->p_sys );
 }
+
+#define RELEASE( pic ) \
+        if( pic ->pf_release ) \
+            pic ->pf_release( pic );
+
+#define INITPIC( dst, src ) \
+    dst ->date = src ->date; \
+    dst ->b_force = src ->b_force; \
+    dst ->i_nb_fields = src ->i_nb_fields; \
+    dst ->b_progressive = src->b_progressive; \
+    dst ->b_top_field_first = src ->b_top_field_first;
 
 /*****************************************************************************
- * Render: displays previously rendered output
- *****************************************************************************
- * This function send the currently rendered image to Deinterlace image,
- * waits until it is displayed and switch the two rendering buffers, preparing
- * next frame.
+ * Filter
  *****************************************************************************/
-static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
+static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t * p_outpic;
-    while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
-           == NULL )
-    {
-        if( p_vout->b_die || p_vout->b_error )
-        {
-            return;
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
-    }
-    vout_DatePicture( p_vout, p_outpic, p_pic->date );
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    if ( p_vout->p_sys->p_lastpic == NULL )
+    if( !p_pic ) return NULL;
+
+    p_outpic = p_filter->pf_vout_buffer_new( p_filter );
+    if( !p_outpic )
     {
-        /* Get a new picture */
-        while( ( p_vout->p_sys->p_lastpic =
-                 vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
-               == NULL )
+        msg_Warn( p_filter, "can't get output picture" );
+        RELEASE( p_pic );
+        return NULL;
+    }
+    INITPIC( p_outpic, p_pic );
+
+    if( !p_sys->pp_planes )
+    {
+        /* initialise our picture buffer */
+        int i_plane;
+        p_sys->i_planes = p_pic->i_planes;
+        p_sys->pp_planes =
+            (uint8_t**)malloc( p_sys->i_planes * sizeof( uint8_t * ) );
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
-            if( p_vout->b_die || p_vout->b_error )
-            {
-                return;
-            }
-            msleep( VOUT_OUTMEM_SLEEP );
+            p_sys->pp_planes[i_plane] = (uint8_t*)malloc(
+                p_pic->p[i_plane].i_pitch * p_pic->p[i_plane].i_visible_lines );
         }
-        CopyPicture( p_vout, p_vout->p_sys->p_lastpic, p_pic );
-        CopyPicture( p_vout, p_outpic, p_pic );
-        vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
-        return;
+        Copy( p_filter, p_sys->pp_planes, p_pic );
     }
 
     /* Get a new picture */
-    RenderBlur( p_vout, p_vout->p_sys->p_lastpic, p_pic, p_outpic );
-    vout_DestroyPicture( p_vout, p_vout->p_sys->p_lastpic );
+    RenderBlur( p_sys, p_pic, p_outpic );
+    Copy( p_filter, p_sys->pp_planes, p_sys->b_persistant ? p_outpic : p_pic );
 
-
-    /* Get a new picture */
-    while( ( p_vout->p_sys->p_lastpic =
-             vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
-           == NULL )
-    {
-        if( p_vout->b_die || p_vout->b_error )
-        {
-            return;
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
-    }
-    CopyPicture( p_vout, p_vout->p_sys->p_lastpic, p_outpic );
-    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
-}
-
-/* FIXME: this is a verbatim copy from src/video_output/vout_pictures.c */
-/* XXX: the order is fucked up!! */
-static void CopyPicture( vout_thread_t * p_vout,
-                         picture_t *p_dest, picture_t *p_src )
-{
-    int i;
-
-    for( i = 0; i < p_src->i_planes ; i++ )
-    {
-        if( p_src->p[i].i_pitch == p_dest->p[i].i_pitch )
-        {
-            /* There are margins, but with the same width : perfect ! */
-            p_vout->p_libvlc->pf_memcpy(
-                         p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
-                         p_src->p[i].i_pitch * p_src->p[i].i_visible_lines );
-        }
-        else
-        {
-            /* We need to proceed line by line */
-            uint8_t *p_in = p_src->p[i].p_pixels;
-            uint8_t *p_out = p_dest->p[i].p_pixels;
-            int i_line;
-
-            for( i_line = p_src->p[i].i_visible_lines; i_line--; )
-            {
-                p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                          p_src->p[i].i_visible_pitch );
-                p_in += p_src->p[i].i_pitch;
-                p_out += p_dest->p[i].i_pitch;
-            }
-        }
-    }
+    RELEASE( p_pic );
+    return p_outpic;
 }
 
 /*****************************************************************************
  * RenderBlur: renders a blurred picture
  *****************************************************************************/
-static void RenderBlur( vout_thread_t *p_vout, picture_t *p_oldpic,
-                        picture_t *p_newpic, picture_t *p_outpic )
+static void RenderBlur( filter_sys_t *p_sys, picture_t *p_newpic,
+                        picture_t *p_outpic )
 {
     int i_plane;
-    int i_oldfactor = p_vout->p_sys->i_factor;
-    int i_newfactor = 128 - p_vout->p_sys->i_factor;
+    int i_oldfactor = p_sys->i_factor;
+    int i_newfactor = 128 - i_oldfactor;
     for( i_plane = 0; i_plane < p_outpic->i_planes; i_plane++ )
     {
         uint8_t *p_old, *p_new, *p_out, *p_out_end, *p_out_line_end;
+        const int i_pitch = p_outpic->p[i_plane].i_pitch;
+        const int i_visible_pitch = p_outpic->p[i_plane].i_visible_pitch;
+        const int i_visible_lines = p_outpic->p[i_plane].i_visible_lines;
+
         p_out = p_outpic->p[i_plane].p_pixels;
         p_new = p_newpic->p[i_plane].p_pixels;
-        p_old = p_oldpic->p[i_plane].p_pixels;
-        p_out_end = p_out + p_outpic->p[i_plane].i_pitch *
-                             p_outpic->p[i_plane].i_visible_lines;
+        p_old = p_sys->pp_planes[i_plane];
+        p_out_end = p_out + i_pitch * i_visible_lines;
         while ( p_out < p_out_end )
         {
-            p_out_line_end = p_out + p_outpic->p[i_plane].i_visible_pitch;
+            p_out_line_end = p_out + i_visible_pitch;
 
             while ( p_out < p_out_line_end )
             {
                 *p_out++ = (((*p_old++) * i_oldfactor) +
                             ((*p_new++) * i_newfactor)) >> 7;
-
-//                *p_out++ = (*p_old++ >> 1) + (*p_new++ >> 1);
             }
 
-            p_old += p_oldpic->p[i_plane].i_pitch
-                      - p_oldpic->p[i_plane].i_visible_pitch;
-            p_new += p_newpic->p[i_plane].i_pitch
-                      - p_newpic->p[i_plane].i_visible_pitch;
-            p_out += p_outpic->p[i_plane].i_pitch
-                      - p_outpic->p[i_plane].i_visible_pitch;
+            p_old += i_pitch - i_visible_pitch;
+            p_new += i_pitch - i_visible_pitch;
+            p_out += i_pitch - i_visible_pitch;
         }
     }
 }
 
-/*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static void Copy( filter_t *p_filter, uint8_t **pp_planes, picture_t *p_pic )
 {
-    var_Set( (vlc_object_t *)p_data, psz_var, newval );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
-    return VLC_SUCCESS;
+    int i_plane;
+    for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+    {
+        p_filter->p_libvlc->pf_memcpy(
+            p_filter->p_sys->pp_planes[i_plane], p_pic->p[i_plane].p_pixels,
+            p_pic->p[i_plane].i_pitch * p_pic->p[i_plane].i_visible_lines );
+    }
 }
