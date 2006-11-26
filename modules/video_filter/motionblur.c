@@ -48,9 +48,6 @@ static void Copy         ( filter_t *, uint8_t **, picture_t * );
 #define FACTOR_TEXT N_("Blur factor (1-127)")
 #define FACTOR_LONGTEXT N_("The degree of blurring from 1 to 127.")
 
-#define PERSISTANT_TEXT N_("Keep inifinte memory of past images")
-#define PERSISTANT_LONGTEXT N_("Use \"Result = ( new image * ( 128 - factor ) + factor * old result ) / 128\" instead of \"Result = ( new image * ( 128 - factor ) + factor * old image ) / 128\".")
-
 #define FILTER_PREFIX "blur-"
 
 vlc_module_begin();
@@ -62,8 +59,6 @@ vlc_module_begin();
 
     add_integer_with_range( FILTER_PREFIX "factor", 80, 1, 127, NULL,
                             FACTOR_TEXT, FACTOR_LONGTEXT, VLC_FALSE );
-    add_bool( FILTER_PREFIX "persistant", 0, NULL, PERSISTANT_TEXT,
-              PERSISTANT_LONGTEXT, VLC_FALSE );
 
     add_shortcut( "blur" );
 
@@ -71,7 +66,7 @@ vlc_module_begin();
 vlc_module_end();
 
 static const char *ppsz_filter_options[] = {
-    "factor", "persistant", NULL
+    "factor", NULL
 };
 
 /*****************************************************************************
@@ -80,7 +75,6 @@ static const char *ppsz_filter_options[] = {
 struct filter_sys_t
 {
     int        i_factor;
-    vlc_bool_t b_persistant;
 
     uint8_t  **pp_planes;
     int        i_planes;
@@ -110,10 +104,6 @@ static int Create( vlc_object_t *p_this )
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     p_filter->p_sys->i_factor =
         var_GetInteger( p_filter, FILTER_PREFIX "factor" );
-    var_Create( p_filter, FILTER_PREFIX "persistant",
-                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    p_filter->p_sys->b_persistant =
-        var_GetBool( p_filter, FILTER_PREFIX "persistant" );
 
     p_filter->p_sys->pp_planes = NULL;
     p_filter->p_sys->i_planes = 0;
@@ -181,7 +171,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     /* Get a new picture */
     RenderBlur( p_sys, p_pic, p_outpic );
-    Copy( p_filter, p_sys->pp_planes, p_sys->b_persistant ? p_outpic : p_pic );
+    Copy( p_filter, p_sys->pp_planes, p_outpic );
 
     RELEASE( p_pic );
     return p_outpic;
