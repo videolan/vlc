@@ -115,8 +115,6 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys->b_persistant =
         var_GetBool( p_filter, FILTER_PREFIX "persistant" );
 
-    printf("factor: %d\npersitant: %d\n", p_filter->p_sys->i_factor, p_filter->p_sys->b_persistant );
-
     p_filter->p_sys->pp_planes = NULL;
     p_filter->p_sys->i_planes = 0;
 
