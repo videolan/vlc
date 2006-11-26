@@ -115,10 +115,18 @@
 /* This routine is called repeatedly to fade in the window */
 - (void)focus:(NSTimer *)timer
 {
+    /* we need to push ourselves to front if the vout window was closed since our last display */
+    if( b_voutWasUpdated )
+    {
+        [self orderFront: self];
+        b_voutWasUpdated = NO;
+    }
+
     if( [self alphaValue] < 1.0 )
         [self setAlphaValue:[self alphaValue]+0.1];
     if( [self alphaValue] >= 1.0 )
     {
+        b_displayed = YES;
         [self setAlphaValue: 1.0];
         [self setFadeTimer:nil];
         if( b_fadeQueued )
@@ -145,6 +153,7 @@
         [self setAlphaValue:[self alphaValue]-0.1];
     if( [self alphaValue] <= 0.1 )
     {
+        b_displayed = NO;
         [self setAlphaValue:0.0];
         [self setFadeTimer:nil];
         if( b_fadeQueued )
@@ -256,6 +265,16 @@
     point.x -= mouseClic.x;
     point.y -= mouseClic.y;
     [self setFrameOrigin:point];
+}
+
+- (BOOL)isDisplayed
+{
+    return b_displayed;
+}
+
+- (void)setVoutWasUpdated
+{
+    b_voutWasUpdated = YES;
 }
 @end
 
