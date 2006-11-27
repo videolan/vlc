@@ -1523,8 +1523,8 @@ dnl Audioscrobbler plugin
 dnl
 
 AC_ARG_ENABLE(audioscrobbler,
-  [  --enable-audioscrobbler Last.fm submission plugin (default disabled)])
-AS_IF([test "${enable_audioscrobbler}" = "yes"], [
+  [  --disable-audioscrobbler Last.fm submission plugin (default enabled)])
+AS_IF([test "${enable_audioscrobbler}" != "no"], [
         VLC_ADD_PLUGINS([audioscrobbler])
   ])
 
