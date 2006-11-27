@@ -6,6 +6,28 @@
     <string>VLC suite</string>
     <key>Description</key>
     <string>VLC commands.</string>
+    <key>Classes</key>
+    <dict>
+        <key>VLCApplication</key>
+        <dict>
+            <key>Description</key>
+            <string>VLC's top level scripting object</string>
+            <key>Name</key>
+            <string>application</string>
+            <key>PluralName</key>
+            <string>applications</string>
+            <key>Attributes</key>
+            <dict>
+                <key>scriptFullscreenMode</key>
+                <dict>
+                    <key>Description</key>
+                    <string>indicates wheter fullscreen is enabled or not</string>
+                    <key>Name</key>
+                    <string>fullscreen mode</string>
+                </dict>
+            </dict>         
+        </dict>
+    </dict>
     <key>Commands</key>
     <dict>
         <key>OpenURL</key>

@@ -78,6 +78,9 @@
 - (IBAction)mute:(id)sender;
 - (IBAction)volumeSliderUpdated:(id)sender;
 
+- (IBAction)showPosition: (id)sender;
+- (IBAction)toogleFullscreen:(id)sender;
+- (BOOL) isFullscreen;
 - (IBAction)windowAction:(id)sender;
 - (BOOL)keyEvent:(NSEvent *)o_event;
 

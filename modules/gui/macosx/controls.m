@@ -383,6 +383,33 @@
     [o_main manageVolumeSlider];
 }
 
+- (IBAction)showPosition: (id)sender
+{
+    vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT,
+                                             FIND_ANYWHERE );
+    if( p_vout != NULL )
+    {
+        vlc_value_t val;
+        intf_thread_t * p_intf = VLCIntf;
+        val.i_int = config_GetInt( p_intf, "key-position" );
+        var_Set( p_intf, "key-pressed", val );
+    }
+}
+
+- (IBAction)toogleFullscreen:(id)sender {
+    NSMenuItem *o_mi = [[NSMenuItem alloc] initWithTitle: _NS("Fullscreen") action: nil keyEquivalent:@""];             
+    [self windowAction: [o_mi autorelease]]; 
+}
+
+- (BOOL) isFullscreen {
+    id o_vout_view = [self getVoutView];
+    if( o_vout_view )
+    {
+        return [o_vout_view isFullscreen];
+    }
+    return NO;
+}
+
 - (IBAction)windowAction:(id)sender
 {
     NSString *o_title = [sender title];

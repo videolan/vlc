@@ -6,6 +6,26 @@
     <string>vlc</string>
     <key>AppleEventCode</key>
     <string>VLC#</string>
+    <key>Classes</key>
+    <dict>
+        <key>VLCApplication</key>
+        <dict>
+            <key>AppleEventCode</key>
+            <string>capp</string>
+            <key>Attributes</key>
+            <dict>
+                <key>scriptFullscreenMode</key>
+                <dict>
+                    <key>AppleEventCode</key>
+                    <string>pFsC</string>
+                    <key>Type</key>
+                    <string>NSNumber&lt;Bool&gt;</string>
+                </dict>             
+            </dict>
+            <key>Superclass</key>
+            <string>NSCoreSuite.NSApplication</string>          
+        </dict>
+    </dict> 
     <key>Commands</key>
     <dict>
         <key>OpenURL</key>
