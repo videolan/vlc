@@ -5,12 +5,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>630</width>
-    <height>660</height>
+    <width>601</width>
+    <height>611</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Form</string>
+   <string>Stream Output</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >

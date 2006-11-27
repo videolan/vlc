@@ -36,7 +36,6 @@ class SoutDialog : public QVLCFrame
     Q_OBJECT;
 public:
     SoutDialog( intf_thread_t * );
-    QWidget *main;
 private:
     Ui::Sout ui;
 public slots:

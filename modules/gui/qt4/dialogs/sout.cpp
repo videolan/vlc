@@ -29,11 +29,10 @@
 
 SoutDialog::SoutDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
-    setWindowTitle( qtr( "Stream output") );
-    main = new QWidget( this );
+    //setWindowTitle( qtr( "Stream output") );
 
     /* UI stuff */
-    ui.setupUi( main );
+    ui.setupUi( this );
 #define ADD_VCODEC( name, fcc) ui.vCodec->addItem( name, QVariant( fcc ) );
     ADD_VCODEC( "MPEG-1", "mp1v" );
     ADD_VCODEC( "MPEG-2", "mp2v" );
