@@ -36,10 +36,7 @@
 #if defined( WIN32 )
 #include <time.h>
 #endif
-/*
- * TODO :
- * check meta_engine's state, and remove delaying of metadata reading
- */
+
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 #include <vlc_meta.h>
@@ -82,8 +79,7 @@ struct intf_sys_t
     vlc_mutex_t             lock;               /* p_sys mutex            */
 
     /* data about audioscrobbler session */
-    int                     i_interval;         /* last interval recorded */
-    time_t                  time_last_interval; /* when was it recorded ? */
+    time_t                  time_next_exchange; /* when can we send data? */
     char                    *psz_submit_host;   /* where to submit data ? */
     int                     i_submit_port;      /* at which port ?        */
     char                    *psz_submit_file;   /* in which file ?        */
@@ -113,7 +109,6 @@ static int PlayingChange( vlc_object_t *, const char *, vlc_value_t,
 static int AddToQueue   ( intf_thread_t *p_this );
 static int Handshake    ( intf_thread_t *p_sd );
 static int ReadMetaData ( intf_thread_t *p_this );
-static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input );
 void DeleteQueue        ( audioscrobbler_queue_t *p_queue );
 
 /*****************************************************************************
@@ -185,14 +180,15 @@ static int Open( vlc_object_t *p_this )
         MEM_ERROR
     }
 
+    p_intf->p_sys = p_sys;
+
     vlc_mutex_init( p_this, &p_sys->lock );
 
     p_sys_global = p_sys;
     p_sys->psz_submit_host = NULL;
     p_sys->psz_submit_file = NULL;
     p_sys->b_handshaked = VLC_FALSE;
-    p_sys->i_interval = 0;
-    p_sys->time_last_interval = time( NULL );
+    p_sys->time_next_exchange = time( NULL );
     p_sys->psz_username = NULL;
     p_sys->b_paused = VLC_FALSE;
 
@@ -211,6 +207,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_current_song = malloc( sizeof( audioscrobbler_song_t ) );
     MALLOC_CHECK( p_sys->p_current_song )
+    time( &p_sys->p_current_song->time_playing );
 
     /* queues can't contain more than 10 songs */
     p_sys->p_first_queue->p_queue =
@@ -300,7 +297,6 @@ static void Run( intf_thread_t *p_this )
     char                    *p_buffer_pos       = NULL;
     audioscrobbler_queue_t  *p_first_queue;
     int                     i_post_socket;
-    /* TODO: remove when meta_engine works */
     time_t                  played_time;
 
     p_this->p_sys = p_sys_global;
@@ -328,8 +324,7 @@ static void Run( intf_thread_t *p_this )
         /* verify if there is data to submit 
          * and if waiting interval is elapsed */
         if ( ( p_sys->p_first_queue->i_songs_nb > 0 ) &&
-            ( time( NULL ) >=
-            ( p_sys->time_last_interval + p_sys->i_interval )  ) )
+            ( time( NULL ) >= p_sys->time_next_exchange ) )
         {
             /* handshake if needed */
             if( p_sys->b_handshaked == VLC_FALSE )
@@ -347,7 +342,7 @@ static void Run( intf_thread_t *p_this )
                         vlc_mutex_unlock ( &p_sys->lock );
                         intf_UserFatal( p_this, VLC_FALSE,
                             _("Last.fm username not set"),
-                            _("Please set an username or disable"
+                            _("Please set an username or disable "
                             "audioscrobbler plugin, and then restart VLC.\n"
                             "Visit https://www.last.fm/join/ to get an account")
                         );
@@ -368,8 +363,8 @@ static void Run( intf_thread_t *p_this )
                     default:
                         /* protocol error : we'll try later */
                         vlc_mutex_lock ( &p_sys->lock );
-                        p_sys->i_interval = DEFAULT_INTERVAL;
-                        time( &p_sys->time_last_interval );
+                        time( &p_sys->time_next_exchange );
+                        p_sys->time_next_exchange += DEFAULT_INTERVAL;
                         vlc_mutex_unlock ( &p_sys->lock );
                         break;
                 }
@@ -410,8 +405,8 @@ static void Run( intf_thread_t *p_this )
             if ( i_net_ret == -1 )
             {
                 /* If connection fails, we assume we must handshake again */
-                p_sys->i_interval = DEFAULT_INTERVAL;
-                time( &p_sys->time_last_interval );
+                time( &p_sys->time_next_exchange );
+                p_sys->time_next_exchange += DEFAULT_INTERVAL;
                 p_sys->b_handshaked = VLC_FALSE;
                 vlc_mutex_unlock( &p_sys->lock );
                 continue;
@@ -434,9 +429,9 @@ static void Run( intf_thread_t *p_this )
             p_buffer_pos = strstr( ( char * ) p_buffer, "INTERVAL" );
             if ( p_buffer_pos )
             {
-                p_sys->i_interval = atoi( p_buffer_pos +
+                time( &p_sys->time_next_exchange );
+                p_sys->time_next_exchange += atoi( p_buffer_pos +
                                             strlen( "INTERVAL " ) );
-                time( &p_sys->time_last_interval );
             }
 
             p_buffer_pos = strstr( ( char * ) p_buffer, "FAILED" );
@@ -497,15 +492,15 @@ static void Run( intf_thread_t *p_this )
         if( p_sys->b_metadata_read == VLC_FALSE )
         {
             /* we read the metadata of the playing song */
-            /* TODO: remove when meta_engine works */
             time( &played_time );
             played_time -= p_sys->p_current_song->time_playing;
             played_time -= p_sys->time_total_pauses;
 
             vlc_mutex_unlock( &p_sys->lock );
 
-            /* TODO: remove when meta_engine works */
-            if( played_time > 10 )
+            if( played_time > 20 )
+            /* wait at least 20 secondes before reading the meta data
+             * since the songs must be at least 30s */
             {
                 if ( ReadMetaData( p_this ) == VLC_ENOMEM )
                 {
@@ -591,12 +586,14 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     {
         PL_UNLOCK;
         pl_Release( p_playlist );
+
         vlc_mutex_lock( &p_sys->lock );
 
         p_sys->b_queued = VLC_TRUE;
         p_sys->b_metadata_read = VLC_TRUE;
 
         vlc_mutex_unlock( &p_sys->lock );
+
         return VLC_SUCCESS;
     }
 
@@ -810,8 +807,9 @@ static int Handshake( intf_thread_t *p_this )
     p_buffer_pos = strstr( ( char* ) p_buffer, "INTERVAL" );
     if ( p_buffer_pos )
     {
-        p_sys->i_interval = atoi( p_buffer_pos + strlen( "INTERVAL " ) );
-        time( &p_sys->time_last_interval );
+        time( &p_sys->time_next_exchange );
+        p_sys->time_next_exchange +=
+                atoi( p_buffer_pos + strlen( "INTERVAL " ) );
     }
 
     p_buffer_pos = strstr( ( char* ) p_buffer, "FAILED" );
@@ -967,10 +965,17 @@ void DeleteQueue( audioscrobbler_queue_t *p_queue )
 static int ReadMetaData( intf_thread_t *p_this )
 {
     playlist_t          *p_playlist;
-    input_thread_t      *p_input    = NULL;
+    input_thread_t      *p_input        = NULL;
     vlc_value_t         video_val;
 
-    intf_sys_t          *p_sys      = p_this->p_sys;
+    char                *psz_title      = NULL;
+    char                *psz_artist     = NULL;
+    char                *psz_album      = NULL;
+    char                *psz_trackid    = NULL;
+    int                 i_length        = -1;
+    vlc_bool_t          b_waiting;
+    intf_sys_t          *p_sys          = p_this->p_sys;
+    int                 i_status;
 
     p_playlist = pl_Yield( p_this );
     PL_LOCK;
@@ -1001,25 +1006,6 @@ static int ReadMetaData( intf_thread_t *p_this )
 
         return VLC_SUCCESS;
     }
-
-    return ReadLocalMetaData( p_this, p_input );    
-}
-
-/*****************************************************************************
- * ReadLocalMetaData : Puts current song's meta data in p_sys->p_current_song
- *****************************************************************************/
-static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input )
-{
-    char                *psz_title      = NULL;
-    char                *psz_artist     = NULL;
-    char                *psz_album      = NULL;
-    char                *psz_trackid    = NULL;
-    int                 i_length        = -1;
-    vlc_bool_t          b_waiting;
-    intf_sys_t          *p_sys          = p_this->p_sys;
-    int                 i_status;
-
-    i_status = input_GetItem(p_input)->p_meta->i_status;
 
     #define FREE_INPUT_AND_CHARS \
         vlc_object_release( p_input ); \
@@ -1055,13 +1041,19 @@ static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input )
             } \
         }
 
+    i_status = input_GetItem(p_input)->p_meta->i_status;
+
+    b_waiting = VLC_TRUE;
+/*  TODO: meta data fetching doesn't work atm
     vlc_mutex_lock( &p_sys->lock );
     b_waiting = p_sys->b_waiting_meta;
     vlc_mutex_unlock( &p_sys->lock );
+*/
 
-    /* TODO : replace 1 with ( i_status & ITEM_PREPARSED )
-     * when meta_engine works */
-    if ( ( b_waiting == VLC_FALSE ) ? 1 : ( i_status & ITEM_META_FETCHED ) )
+    /* TODO: item preparsing is buggy on drag&drop and command line arguments
+    if( i_status & ( !b_waiting ? ITEM_PREPARSED : ITEM_META_FETCHED ) )
+    */
+    if( 1 )
     {
         ALLOC_ITEM_META( psz_artist, p_meta->psz_artist )
         else
@@ -1100,11 +1092,9 @@ static int ReadLocalMetaData( intf_thread_t *p_this, input_thread_t  *p_input )
         vlc_mutex_unlock( &p_sys->lock );
 
         msg_Dbg( p_this, "Meta data registered, waiting to be queued" );
-
-        FREE_INPUT_AND_CHARS
     }
-    
-    vlc_object_release( p_input );
+   
+    FREE_INPUT_AND_CHARS 
     return VLC_SUCCESS;
 #undef FREE_INPUT_AND_CHARS
 #undef ALLOC_ITEM_META
