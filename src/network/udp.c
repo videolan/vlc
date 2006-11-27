@@ -446,8 +446,9 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
              || ((src != NULL) && (srclen < sizeof (struct sockaddr_in6))))
                 return -1;
 
-            /* We don't provide IPv6-specific SSM at the moment.
-             * It seems all the OSes with IPv6 SSM have the new API anyway. */
+            /* IPv6-specific SSM API does not exist. So if we're here
+             * it means IPv6 SSM is not supported on this OS and we
+             * directly fallback to ASM */
 
             if (net_IPv6Join (obj, fd, (const struct sockaddr_in6 *)grp) == 0)
                 return 0;
