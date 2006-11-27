@@ -102,6 +102,7 @@ Kevin H. Patterson <kevpatt at khptech dot com> - Theora framesize calculation p
 K. Staring <qdk at quickdekay dot net> - RTSP rewind and fast-forward support
 Laurent Jonqueres <laurent_jonqueres at yahoo.fr> - Occitan localization
 Laurent Mutricy <laurent.mutricy at ecl2005 dot ec-lyon dot fr> - HTTP interface fixes
+Leo Spalteholz <leo dot spalteholz at gmail dot com> - Qt interface design
 Lorena Gomes - Catalan translation
 Mahrazi Mohd Kamal <mahrazi at gmail.com> - Malay Translation
 Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input

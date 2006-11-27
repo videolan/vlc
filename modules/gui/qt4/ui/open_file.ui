@@ -1,163 +1,49 @@
 <ui version="4.0" >
  <author>Jean-Baptiste Kempf</author>
  <class>OpenFile</class>
- <widget class="QWidget" name="Form" >
+ <widget class="QWidget" name="OpenFile" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>429</height>
+    <width>433</width>
+    <height>421</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <widget class="Line" name="line" >
-   <property name="geometry" >
-    <rect>
-     <x>140</x>
-     <y>100</y>
-     <width>320</width>
-     <height>16</height>
-    </rect>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
    </property>
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
+   <property name="spacing" >
+    <number>6</number>
    </property>
-  </widget>
-  <widget class="QGroupBox" name="subGroupBox" >
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>110</y>
-     <width>581</width>
-     <height>111</height>
-    </rect>
-   </property>
-   <property name="title" >
-    <string>_("Subtitles")</string>
-   </property>
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <property name="checked" >
-    <bool>false</bool>
-   </property>
-   <widget class="QWidget" native="1" name="horizontalLayout_2" >
-    <property name="geometry" >
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>561</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="subOpenLabel" >
-       <property name="text" >
-        <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-style:italic;">_("Open") :&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType" >
-        <enum>QSizePolicy::Minimum</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>10</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QComboBox" name="subInput" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>7</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="editable" >
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType" >
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>15</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="subBrowseButton" >
-       <property name="text" >
-        <string>_("Browse")</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" native="1" name="horizontalLayout_4" >
-    <property name="geometry" >
-     <rect>
-      <x>20</x>
-      <y>60</y>
-      <width>571</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <widget class="QWidget" native="1" name="layoutWidget" >
-     <property name="geometry" >
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>181</width>
-       <height>28</height>
-      </rect>
+   <item>
+    <widget class="QGroupBox" name="fileGroupBox" >
+     <property name="title" >
+      <string>Media File</string>
      </property>
      <layout class="QHBoxLayout" >
       <property name="margin" >
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="spacing" >
-       <number>0</number>
+       <number>6</number>
       </property>
       <item>
-       <widget class="QLabel" name="sizeSubLabel" >
+       <widget class="QLabel" name="fileOpenLabel" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>1</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-style:italic;">_("Size") :&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+         <string>Open:</string>
         </property>
        </widget>
       </item>
@@ -166,71 +52,32 @@ p, li { white-space: pre-wrap; }
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Minimum</enum>
+        </property>
         <property name="sizeHint" >
          <size>
-          <width>10</width>
-          <height>20</height>
+          <width>16</width>
+          <height>51</height>
          </size>
         </property>
        </spacer>
       </item>
       <item>
-       <widget class="QComboBox" name="sizeComboBox" >
-        <item>
-         <property name="text" >
-          <string>_("Very Small)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>_("Small")</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>_("Normal")</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>_("Big")</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>_("Very Big")</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" native="1" name="layoutWidget" >
-     <property name="geometry" >
-      <rect>
-       <x>220</x>
-       <y>10</y>
-       <width>201</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
-      <property name="spacing" >
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="alignSubLabel" >
-        <property name="text" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-style:italic;">_("Alignment") :&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+       <widget class="QComboBox" name="fileInput" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="buddy" >
-         <cstring>alignSubLabel</cstring>
+        <property name="editable" >
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems" >
+         <number>7</number>
         </property>
        </widget>
       </item>
@@ -239,93 +86,228 @@ p, li { white-space: pre-wrap; }
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Minimum</enum>
+        </property>
         <property name="sizeHint" >
          <size>
-          <width>10</width>
-          <height>21</height>
+          <width>16</width>
+          <height>51</height>
          </size>
         </property>
        </spacer>
       </item>
       <item>
-       <widget class="QComboBox" name="alignSubComboBox" >
-        <item>
-         <property name="text" >
-          <string>_("Left")</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>_("Center")</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>_("Right)</string>
-         </property>
-        </item>
+       <widget class="QPushButton" name="fileBrowseButton" >
+        <property name="text" >
+         <string>Browse</string>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
-    <widget class="QToolButton" name="optionsSubButton" >
-     <property name="geometry" >
-      <rect>
-       <x>470</x>
-       <y>10</y>
-       <width>81</width>
-       <height>26</height>
-      </rect>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="subGroupBox" >
+     <property name="title" >
+      <string>Subtitles</string>
      </property>
-     <property name="text" >
-      <string>Options</string>
+     <property name="checkable" >
+      <bool>true</bool>
      </property>
+     <property name="checked" >
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="subOpenLabel" >
+          <property name="text" >
+           <string>Open:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Minimum</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>16</width>
+            <height>51</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QComboBox" name="subInput" >
+          <property name="sizePolicy" >
+           <sizepolicy>
+            <hsizetype>7</hsizetype>
+            <vsizetype>0</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="editable" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>16</width>
+            <height>51</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="subBrowseButton" >
+          <property name="text" >
+           <string>Browse</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="sizeSubLabel" >
+          <property name="text" >
+           <string>Size:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="sizeComboBox" >
+          <item>
+           <property name="text" >
+            <string>Very Small</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>Small</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>Normal</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>Big</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>Very Big</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>16</width>
+            <height>28</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="alignSubLabel" >
+          <property name="text" >
+           <string>Alignment:</string>
+          </property>
+          <property name="buddy" >
+           <cstring>alignSubLabel</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="alignSubComboBox" >
+          <item>
+           <property name="text" >
+            <string>Left</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>Center</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>Right</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>16</width>
+            <height>28</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="optionsSubButton" >
+          <property name="text" >
+           <string>Options</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
-   </widget>
-  </widget>
-  <widget class="Line" name="line" >
-   <property name="geometry" >
-    <rect>
-     <x>150</x>
-     <y>230</y>
-     <width>320</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="audioGroupBox" >
-   <property name="enabled" >
-    <bool>true</bool>
-   </property>
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>260</y>
-     <width>581</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="title" >
-    <string>_("Extra Audio File")</string>
-   </property>
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <property name="checked" >
-    <bool>false</bool>
-   </property>
-   <widget class="QWidget" native="1" name="horizontalLayout_3" >
-    <property name="geometry" >
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>561</width>
-      <height>51</height>
-     </rect>
-    </property>
+   </item>
+   <item>
     <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>
@@ -334,12 +316,9 @@ p, li { white-space: pre-wrap; }
       <number>6</number>
      </property>
      <item>
-      <widget class="QLabel" name="audioOpenLabel" >
+      <widget class="QPushButton" name="extraAudioButton" >
        <property name="text" >
-        <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-style:italic;">_("Open") :&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+        <string>Extra Audio...</string>
        </property>
       </widget>
      </item>
@@ -348,179 +327,116 @@ p, li { white-space: pre-wrap; }
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeType" >
-        <enum>QSizePolicy::Minimum</enum>
-       </property>
        <property name="sizeHint" >
         <size>
-         <width>15</width>
+         <width>40</width>
          <height>20</height>
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QComboBox" name="audioFileInput" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>7</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="editable" >
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType" >
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>15</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="audioBrowsButton" >
-       <property name="text" >
-        <string>_("Browse")</string>
-       </property>
-      </widget>
      </item>
     </layout>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="fileGroupBox" >
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>581</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="title" >
-    <string>_("Media File")</string>
-   </property>
-   <widget class="QWidget" native="1" name="layoutWidget" >
-    <property name="geometry" >
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>561</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="audioGroupBox" >
+     <property name="enabled" >
+      <bool>true</bool>
      </property>
-     <property name="spacing" >
-      <number>6</number>
+     <property name="title" >
+      <string>Extra Audio File</string>
      </property>
-     <item>
-      <widget class="QLabel" name="fileOpenLabel" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>5</hsizetype>
-         <vsizetype>1</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text" >
-        <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-style:italic;">_("Open") :&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType" >
-        <enum>QSizePolicy::Minimum</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>10</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QComboBox" name="fileInput" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>7</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="editable" >
-        <bool>true</bool>
-       </property>
-       <property name="maxVisibleItems" >
-        <number>7</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType" >
-        <enum>QSizePolicy::Minimum</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>15</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="fileBrowseButton" >
-       <property name="text" >
-        <string>_("Browse")</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QPushButton" name="extraAudioButton" >
-   <property name="geometry" >
-    <rect>
-     <x>500</x>
-     <y>250</y>
-     <width>81</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>Extra Audio</string>
-   </property>
-  </widget>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <property name="checked" >
+      <bool>false</bool>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="audioOpenLabel" >
+        <property name="text" >
+         <string>Open:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Minimum</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>16</width>
+          <height>51</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QComboBox" name="audioFileInput" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="editable" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>16</width>
+          <height>51</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="audioBrowsButton" >
+        <property name="text" >
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
- <includes/>
  <resources/>
  <connections/>
 </ui>
