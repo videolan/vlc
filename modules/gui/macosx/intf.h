@@ -286,7 +286,7 @@ struct intf_sys_t
     int     i_lastShownVolume;
 
     AppleRemote * o_remote;
-    BOOL b_left_right_remote_button_hold; /* true as long as the user holds the left or right button on the remote control */
+    BOOL b_remote_button_hold; /* true as long as the user holds the left,right,plus or minus on the remote control */
 }
 
 + (VLCMain *)sharedInstance;

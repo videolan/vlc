@@ -350,6 +350,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     i_lastShownVolume = -1;
 
     o_remote = [[AppleRemote alloc] init];
+	[o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
     [o_remote setDelegate: _o_sharedMainInstance];
     
     return _o_sharedMainInstance;
@@ -706,52 +707,56 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_remote stopListening: self];
 }
 
-/* Helper method for the remote control interface in order to trigger forward/backward as long
-   as the user holds the left/right button */
-- (void) triggerMovieStepForRemoteButton: (NSNumber*) buttonIdentifierNumber 
+/* Helper method for the remote control interface in order to trigger forward/backward and volume
+   increase/decrease as long as the user holds the left/right, plus/minus button */
+- (void) executeHoldActionForRemoteButton: (NSNumber*) buttonIdentifierNumber 
 {
-    if (b_left_right_remote_button_hold) {
-        switch([buttonIdentifierNumber intValue]) {
+    if (b_remote_button_hold) 
+    {
+        switch([buttonIdentifierNumber intValue]) 
+        {
             case kRemoteButtonRight_Hold:       
-                [o_controls forward: self];
+                  [o_controls forward: self];
             break;
             case kRemoteButtonLeft_Hold:
-                [o_controls backward: self];
-            break;          
+                  [o_controls backward: self];
+            break;
+            case kRemoteButtonVolume_Plus_Hold:
+                [o_controls volumeUp: self];
+            break;
+            case kRemoteButtonVolume_Minus_Hold:
+                [o_controls volumeDown: self];
+            break;              
         }
-        if (b_left_right_remote_button_hold) {
+        if (b_remote_button_hold) 
+        {
             /* trigger event */
-            [self performSelector:@selector(triggerMovieStepForRemoteButton:) 
-                       withObject:buttonIdentifierNumber
-                       afterDelay:0.25];         
+            [self performSelector:@selector(executeHoldActionForRemoteButton:) 
+                         withObject:buttonIdentifierNumber
+                         afterDelay:0.25];         
         }
     }
 }
 
 /* Apple Remote callback */
-- (void)appleRemoteButton:(AppleRemoteEventIdentifier)buttonIdentifier
-    pressedDown:(BOOL)pressedDown
+- (void) appleRemoteButton: (AppleRemoteEventIdentifier)buttonIdentifier 
+               pressedDown: (BOOL) pressedDown 
+                clickCount: (unsigned int) count 
 {
     switch( buttonIdentifier )
     {
         case kRemoteButtonPlay:
-            [o_controls play: self];
+            if (count >= 2) {
+                [o_controls toogleFullscreen:self];
+            } else {
+                [o_controls play: self];
+            }            
             break;
         case kRemoteButtonVolume_Plus:
-            /* there are two events when the plus or minus button is pressed
-               one when the button is pressed down and one when the button is released */
-            if( pressedDown )
-            {
-                [o_controls volumeUp: self];
-            }
+            [o_controls volumeUp: self];
             break;
         case kRemoteButtonVolume_Minus:
-            /* there are two events when the plus or minus button is pressed
-               one when the button is pressed down and one when the button is released */
-            if( pressedDown )
-            {
-                [o_controls volumeDown: self];
-            }
+            [o_controls volumeDown: self];
             break;
         case kRemoteButtonRight:
             [o_controls next: self];
@@ -761,17 +766,19 @@ static VLCMain *_o_sharedMainInstance = nil;
             break;
         case kRemoteButtonRight_Hold:
         case kRemoteButtonLeft_Hold:
+        case kRemoteButtonVolume_Plus_Hold:
+        case kRemoteButtonVolume_Minus_Hold:
             /* simulate an event as long as the user holds the button */
-            b_left_right_remote_button_hold = pressedDown;
+            b_remote_button_hold = pressedDown;
             if( pressedDown )
             {                
-                NSNumber* buttonIdentifierNumber = [NSNumber numberWithInt: buttonIdentifier];	
-                [self performSelector:@selector(triggerMovieStepForRemoteButton:) 
+                NSNumber* buttonIdentifierNumber = [NSNumber numberWithInt: buttonIdentifier];  
+                [self performSelector:@selector(executeHoldActionForRemoteButton:) 
                            withObject:buttonIdentifierNumber];
             }
             break;
         case kRemoteButtonMenu:
-            [o_controls windowAction: self];
+            [o_controls showPosition: self];
             break;
         default:
             /* Add here whatever you want other buttons to do */
