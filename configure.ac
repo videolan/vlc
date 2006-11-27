@@ -1671,19 +1671,19 @@ dnl         AC_CHECK_LIB( dc1394_control, dc1394_setup_capture, [
               VLC_ADD_LDFLAGS([dc1394],[-ldc1394_control -lraw1394])
 dnl         ],
 dnl         [
-dnl           AC_MSG_ERROR([libdc1394 are mandatory for dc1394 input module. try --disable-dc1394 or install those libraries])
+dnl           AC_MSG_ERROR([libdc1394 is mandatory for the dc1394 input module. try --disable-dc1394 or install this library])
 dnl         ])
       ],
       [
-        AC_MSG_ERROR([libdc1394 are mandatory for dc1394 input module. try --disable-dc1394 or install those libraries])
+        AC_MSG_ERROR([libdc1394 is mandatory for the dc1394 input module. try --disable-dc1394 or install this library])
       ])
     ],
     [
-      AC_MSG_ERROR([libraw1394 are mandatory for dc1394 input module. try --disable-dc1394 or install those libraries])
+      AC_MSG_ERROR([libraw1394 is mandatory for the dc1394 input module. try --disable-dc1394 or install this library])
     ])
   ],
   [
-    AC_MSG_ERROR([libraw1394 is mandatory for dc1394 input module. try --disable-dc1394 or install those libraries])
+    AC_MSG_ERROR([libraw1394 is mandatory for the dc1394 input module. try --disable-dc1394 or install this library])
   ])
 fi
 
