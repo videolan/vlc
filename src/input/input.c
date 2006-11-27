@@ -1183,7 +1183,6 @@ static void End( input_thread_t * p_input )
         CL_CO( decoded_audio) ;
         CL_CO( decoded_video );
         CL_CO( decoded_sub) ;
-        vlc_mutex_destroy( &p_input->p->counters.counters_lock );
     }
 
     /* Close optional stream output instance */
