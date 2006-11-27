@@ -11,6 +11,7 @@ The VideoLAN team would like to thank the following contributors:
 Alex Antropoff <alant at transtelecom dot md> - RFC3016 (LATM) RTP packetizer extension
 Alexander Didebulidze <alexander.didebulidze at stusta dot mhn dot de> - Georgian localization
 Alexander Gall <gall at switch dot ch> - Solaris fixes and CDDB fixes
+Andrea Guzzo <xant at xant dot net> - dc1394 firewire support
 Alex Izvorski <aizvorski at gmail dot com> - some more x264 options
 André de Barros Martins Ribeiro <andrerib at ajato.com.br> - Brazilian portuguese localization
 Andre Pang <adre.pang at csiro dot au> - Annodex support

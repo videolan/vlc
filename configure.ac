@@ -1657,6 +1657,37 @@ if test "${enable_live555}" != "no"; then
 fi
 
 dnl
+dnl  special access module for dc1394 input
+dnl
+AC_ARG_ENABLE(dc1394,
+  [  --enable-dc1394       dc1394 access module (default disabled)])
+if test "${enable_dc1394}" = "yes"
+then
+  AC_CHECK_HEADERS(libraw1394/raw1394.h, [
+    AC_CHECK_LIB( raw1394, raw1394_get_nodecount, [
+        AC_CHECK_HEADERS(libdc1394/dc1394_control.h , [
+dnl         AC_CHECK_LIB( dc1394_control, dc1394_setup_capture, [
+              VLC_ADD_PLUGINS([dc1394])
+              VLC_ADD_LDFLAGS([dc1394],[-ldc1394_control -lraw1394])
+dnl         ],
+dnl         [
+dnl           AC_MSG_ERROR([libdc1394 are mandatory for dc1394 input module. try --disable-dc1394 or install those libraries])
+dnl         ])
+      ],
+      [
+        AC_MSG_ERROR([libdc1394 are mandatory for dc1394 input module. try --disable-dc1394 or install those libraries])
+      ])
+    ],
+    [
+      AC_MSG_ERROR([libraw1394 are mandatory for dc1394 input module. try --disable-dc1394 or install those libraries])
+    ])
+  ],
+  [
+    AC_MSG_ERROR([libraw1394 is mandatory for dc1394 input module. try --disable-dc1394 or install those libraries])
+  ])
+fi
+
+dnl
 dnl dv module: digital video module check for libraw1394
 dnl
 AC_ARG_ENABLE(dv,
