@@ -122,8 +122,7 @@
         }
         else if ( [o_command isEqualToString:@"fullscreen"] )
         {
-            NSMenuItem *o_mi = [[NSMenuItem alloc] initWithTitle: _NS("Fullscreen") action: nil keyEquivalent:@""];
-            [o_controls windowAction:[o_mi autorelease]];
+            [o_controls toogleFullscreen: self];
             return nil;
         }
         else if ( [o_command isEqualToString:@"mute"] )
@@ -144,6 +143,24 @@
     }
     vlc_object_release( p_playlist );
     return nil;
+}
+
+@end
+
+/*****************************************************************************
+ * Category that adds AppleScript support to NSApplication
+ *****************************************************************************/
+@implementation NSApplication(ScriptSupport)
+
+- (BOOL) scriptFullscreenMode {	
+    VLCControls * o_controls = (VLCControls *)[[self delegate] getControls];
+
+    return [o_controls isFullscreen];
+}
+- (void) setScriptFullscreenMode: (BOOL) mode {
+    VLCControls * o_controls = (VLCControls *)[[self delegate] getControls];
+    if (mode == [o_controls isFullscreen]) return;
+    [o_controls toogleFullscreen: self];
 }
 
 @end

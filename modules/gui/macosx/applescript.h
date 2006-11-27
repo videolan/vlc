@@ -32,3 +32,13 @@
  *****************************************************************************/
 @interface VLControlScriptCommand : NSScriptCommand
 @end
+
+/*****************************************************************************
+* Category that adds AppleScript support to NSApplication
+*****************************************************************************/
+@interface NSApplication(ScriptSupport)
+
+- (BOOL) scriptFullscreenMode;
+- (void) setScriptFullscreenMode: (BOOL) mode;
+
+@end
