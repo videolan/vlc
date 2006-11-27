@@ -1489,16 +1489,70 @@ char * stream_ReadLine( stream_t *s )
 
         if( i_data % s->i_char_width )
         {
+            /* keep i_char_width boundary */
+            i_data = i_data - ( i_data % s->i_char_width );
             msg_Warn( s, "the read is not i_char_width compatible");
         }
 
+        if( i_data == 0 )
+            break;
+
         /* Check if there is an EOL */
-        if( ( psz_eol = memchr( p_data, '\n', i_data ) ) )
+        if( s->i_char_width == 1 )
         {
-            if( s->b_little_endian == VLC_TRUE && s->i_char_width > 1 )
+            /* UTF-8: 0A <LF> */
+            psz_eol = memchr( p_data, '\n', i_data );
+        }
+        else
+        {
+            uint8_t *p = p_data;
+            uint8_t *p_last = p + i_data - s->i_char_width;
+
+            if( s->i_char_width == 2 )
             {
-                psz_eol += ( s->i_char_width - 1 );
+                if( s->b_little_endian == VLC_TRUE)
+                {
+                    /* UTF-16LE: 0A 00 <LF> */
+                    while( p <= p_last && ( p[0] != 0x0A || p[1] != 0x00 ) )
+                        p += 2;
+                }
+                else
+                {
+                    /* UTF-16BE: 00 0A <LF> */
+                    while( p <= p_last && ( p[1] != 0x0A || p[0] != 0x00 ) )
+                        p += 2;
+                }
             }
+            else if( s->i_char_width == 4 )
+            {
+                if( s->b_little_endian == VLC_TRUE)
+                {
+                    /* UTF-32LE: 0A 00 00 00 <LF> */
+                    while( p <= p_last && ( p[0] != 0x0A || p[1] != 0x00 ||
+                           p[2] != 0x00 || p[3] != 0x00 ) )
+                        p += 4;
+                }
+                else
+                {
+                    /* UTF-32BE: 00 00 00 0A <LF> */
+                    while( p <= p_last && ( p[3] != 0x0A || p[2] != 0x00 ||
+                           p[1] != 0x00 || p[0] != 0x00 ) )
+                        p += 4;
+                }
+            }
+
+            if( p > p_last )
+            {
+                psz_eol = NULL;
+            }
+            else
+            {
+                psz_eol = (char *)p + ( s->i_char_width - 1 );
+            }
+        }
+
+        if(psz_eol)
+        {
             i_data = (psz_eol - (char *)p_data) + 1;
             p_line = realloc( p_line, i_line + i_data + s->i_char_width ); /* add \0 */
             i_data = stream_Read( s, &p_line[i_line], i_data );
