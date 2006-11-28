@@ -55,7 +55,7 @@ export LIBJINCLUDES
 if HAVE_WIN32
 %.class: %.java 
 	$(JAVAC) $? 
-	$(JCH) org.videolan.jvlc.$(*F)
+	$(JCH) -o includes/$(*F).h org.videolan.jvlc.$(*F)
 else
 %.class: %.java
 	$(JAVAC) $?
