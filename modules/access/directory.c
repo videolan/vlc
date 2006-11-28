@@ -393,10 +393,11 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     {
         const char *entry = pp_dir_content[i];
         int i_size_entry = strlen( psz_name ) +
-                           strlen( entry ) + 9; /* "file://" + "/" + '\0' */
+                           strlen( entry ) + 2;
         char psz_uri[i_size_entry];
+        char psz_mrl[i_size_entry + 7]; /* "file://psz_uri" */
 
-        sprintf( psz_uri, "file://%s/%s", psz_name, entry);
+        sprintf( psz_uri, "%s/%s", psz_name, entry);
 
         /* if it starts with '.' then forget it */
         if (entry[0] != '.')
@@ -471,8 +472,9 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                     }
                 }
 
+                sprintf( &psz_mrl, "file://%s", psz_uri );
                 p_input = input_ItemNewWithType( VLC_OBJECT(p_playlist),
-                                                 psz_uri, entry, 0, NULL,
+                                                 psz_mrl, entry, 0, NULL,
                                                  -1, ITEM_TYPE_VFILE );
                 if (p_input != NULL)
                 {
