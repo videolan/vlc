@@ -98,6 +98,57 @@ DBUS_METHOD( Nothing )
     REPLY_SEND;
 }
 
+DBUS_METHOD( PlaylistExport_XSPF )
+{ /* export playlist to an xspf file */
+
+  /* reads the filename to export to */
+  /* returns the status as uint16:
+   *    0 : success
+   *    1 : error
+   *    2 : playlist empty
+   */
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    DBusError error; 
+    dbus_error_init( &error );
+
+    char *psz_file;
+    dbus_uint16_t i_ret;
+
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_STRING, &psz_file,
+            DBUS_TYPE_INVALID );
+
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+                error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+
+    if( ( !playlist_IsEmpty( p_playlist ) ) &&
+            ( p_playlist->p_root_category->i_children > 0 ) )
+    {
+        if( playlist_Export( p_playlist, psz_file,
+                         p_playlist->p_root_category->pp_children[0],
+                         "export-xspf" ) == VLC_SUCCESS )
+            i_ret = 0;
+        else
+            i_ret = 1;
+    }
+    else
+        i_ret = 2;
+
+    pl_Release( ((vlc_object_t*) p_this ) );
+
+    ADD_UINT16( &i_ret );
+    REPLY_SEND;
+}
+
 DBUS_METHOD( Quit )
 { /* exits vlc */
     REPLY_INIT;
@@ -365,19 +416,20 @@ DBUS_METHOD( handle_messages )
 
     /* here D-Bus method's names are associated to an handler */
 
-    METHOD_FUNC( "GetPlayStatus",   GetPlayStatus );
-    METHOD_FUNC( "GetPlayingItem",  GetPlayingItem );
-    METHOD_FUNC( "AddMRL",          AddMRL );
-    METHOD_FUNC( "TogglePause",     TogglePause );
-    METHOD_FUNC( "Nothing",         Nothing );
-    METHOD_FUNC( "Prev",            Prev );
-    METHOD_FUNC( "Next",            Next );
-    METHOD_FUNC( "Quit",            Quit );
-    METHOD_FUNC( "Stop",            Stop );
-    METHOD_FUNC( "VolumeSet",       VolumeSet );
-    METHOD_FUNC( "VolumeGet",       VolumeGet );
-    METHOD_FUNC( "PositionSet",     PositionSet );
-    METHOD_FUNC( "PositionGet",     PositionGet );
+    METHOD_FUNC( "GetPlayStatus",           GetPlayStatus );
+    METHOD_FUNC( "GetPlayingItem",          GetPlayingItem );
+    METHOD_FUNC( "AddMRL",                  AddMRL );
+    METHOD_FUNC( "TogglePause",             TogglePause );
+    METHOD_FUNC( "Nothing",                 Nothing );
+    METHOD_FUNC( "Prev",                    Prev );
+    METHOD_FUNC( "Next",                    Next );
+    METHOD_FUNC( "Quit",                    Quit );
+    METHOD_FUNC( "Stop",                    Stop );
+    METHOD_FUNC( "VolumeSet",               VolumeSet );
+    METHOD_FUNC( "VolumeGet",               VolumeGet );
+    METHOD_FUNC( "PositionSet",             PositionSet );
+    METHOD_FUNC( "PositionGet",             PositionGet );
+    METHOD_FUNC( "PlaylistExport_XSPF",     PlaylistExport_XSPF );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }

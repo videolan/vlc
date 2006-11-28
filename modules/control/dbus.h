@@ -124,6 +124,10 @@ const char* psz_introspection_xml_data =
 "    <method name=\"PositionGet\">\n"
 "      <arg type=\"q\" direction=\"out\" />\n"
 "    </method>\n"
+"    <method name=\"PlaylistExport_XSPF\">\n"
+"      <arg type=\"s\" direction=\"in\" />\n"
+"      <arg type=\"q\" direction=\"out\" />\n"
+"    </method>\n"
 "  </interface>\n"
 "</node>\n"
 ;
