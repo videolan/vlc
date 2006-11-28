@@ -64,12 +64,18 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 #define vlc_mutex_lock( P_MUTEX )                                           \
     __vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
 
+#ifdef __APPLE__
+#   define CAST_PTHREAD_TO_INT(t) (unsigned long int)(uintptr_t)(void *)t
+#else
+#   define CAST_PTHREAD_TO_INT(t) (unsigned long int)t
+#endif
+
 static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
                                     vlc_mutex_t * p_mutex )
 {
     int i_result;
     /* In case of error : */
-    int i_thread = -1;
+    unsigned long int i_thread = 0;
     const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
@@ -111,7 +117,7 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
     i_result = pthread_mutex_lock( &p_mutex->mutex );
     if ( i_result )
     {
-        i_thread = (int)pthread_self();
+        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
         psz_error = strerror(i_result);
     }
 
@@ -124,7 +130,7 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
     if( i_result )
     {
         msg_Err( p_mutex->p_this,
-                 "thread %u: mutex_lock failed at %s:%d (%d:%s)",
+                 "thread %li: mutex_lock failed at %s:%d (%d:%s)",
                  i_thread, psz_file, i_line, i_result, psz_error );
     }
     return i_result;
@@ -141,7 +147,7 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
 {
     int i_result;
     /* In case of error : */
-    int i_thread = -1;
+    unsigned long int i_thread = 0;
     const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
@@ -184,7 +190,7 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
     i_result = pthread_mutex_unlock( &p_mutex->mutex );
     if ( i_result )
     {
-        i_thread = (int)pthread_self();
+        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
         psz_error = strerror(i_result);
     }
 
@@ -197,7 +203,7 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
     if( i_result )
     {
         msg_Err( p_mutex->p_this,
-                 "thread %u: mutex_unlock failed at %s:%d (%d:%s)",
+                 "thread %li: mutex_unlock failed at %s:%d (%d:%s)",
                  i_thread, psz_file, i_line, i_result, psz_error );
     }
 
@@ -227,7 +233,7 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
 {
     int i_result;
     /* In case of error : */
-    int i_thread = -1;
+    unsigned long int i_thread = 0;
     const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
@@ -322,7 +328,7 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
     i_result = pthread_cond_signal( &p_condvar->cond );
     if ( i_result )
     {
-        i_thread = (int)pthread_self();
+        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
         psz_error = strerror(i_result);
     }
 
@@ -339,7 +345,7 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
     if( i_result )
     {
         msg_Err( p_condvar->p_this,
-                 "thread %u: cond_signal failed at %s:%d (%d:%s)",
+                 "thread %li: cond_signal failed at %s:%d (%d:%s)",
                  i_thread, psz_file, i_line, i_result, psz_error );
     }
 
@@ -357,7 +363,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
 {
     int i_result;
     /* In case of error : */
-    int i_thread = -1;
+    unsigned long int i_thread = 0;
     const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
@@ -499,8 +505,8 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     {
         /* People keep pissing me off with this. --Meuuh */
         msg_Dbg( p_condvar->p_this,
-                  "thread %u: secret message triggered "
-                  "at %s:%d (%s)", (int)pthread_self(),
+                  "thread %li: secret message triggered "
+                  "at %s:%d (%s)", CAST_PTHREAD_TO_INT(pthread_self()),
                   psz_file, i_line, strerror(i_result) );
 
         i_result = pthread_cond_wait( &p_condvar->cond, &p_mutex->mutex );
@@ -512,7 +518,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
 
     if ( i_result )
     {
-        i_thread = (int)pthread_self();
+        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
         psz_error = strerror(i_result);
     }
 
@@ -525,7 +531,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     if( i_result )
     {
         msg_Err( p_condvar->p_this,
-                 "thread %u: cond_wait failed at %s:%d (%d:%s)",
+                 "thread %li: cond_wait failed at %s:%d (%d:%s)",
                  i_thread, psz_file, i_line, i_result, psz_error );
     }
 
