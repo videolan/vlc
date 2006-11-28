@@ -78,7 +78,7 @@ if test "${amvers}" = "no" && automake --version > /dev/null 2>&1; then
 fi
 
 case "${amvers}" in
-  no|1.[0123456]|1.[0123456].*|1[0123456])
+  no|1.[0123456]|1.[0123456].*|1[0123456]|1.[0123456]-*)
     set +x
     echo "$0: you need automake version 1.7 or later"
     exit 1
