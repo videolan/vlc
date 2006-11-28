@@ -396,7 +396,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                            strlen( entry ) + 2;
         char psz_uri[i_size_entry];
 
-        sprintf( psz_uri, "%s/%s", psz_name, entry);
+        sprintf( psz_uri, "file://%s/%s", psz_name, entry);
 
         /* if it starts with '.' then forget it */
         if (entry[0] != '.')
