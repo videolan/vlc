@@ -119,6 +119,12 @@ static int Demux( demux_t *p_demux )
             free( psz_line );
             continue;
         }
+        if( !strcasecmp( psz_key, "numberofentries" ) )
+        {
+            msg_Dbg( p_demux, "pls should have %d entries", atoi(psz_value) ); 
+            free( psz_line);
+            continue;
+        }
         /* find the number part of of file1, title1 or length1 etc */
         i_key_length = strlen( psz_key );
         if( i_key_length >= 4 ) /* Ref1 type case */
