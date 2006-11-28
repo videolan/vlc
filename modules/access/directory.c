@@ -393,7 +393,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     {
         const char *entry = pp_dir_content[i];
         int i_size_entry = strlen( psz_name ) +
-                           strlen( entry ) + 2;
+                           strlen( entry ) + 9; /* "file://" + "/" + '\0' */
         char psz_uri[i_size_entry];
 
         sprintf( psz_uri, "file://%s/%s", psz_name, entry);
