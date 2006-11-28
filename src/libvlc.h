@@ -1633,6 +1633,7 @@ vlc_module_begin();
               ONEINSTANCE_WIN_LONGTEXT, VLC_TRUE );
     add_bool( "started-from-file", 0, NULL, STARTEDFROMFILE_TEXT,
               STARTEDFROMFILE_LONGTEXT, VLC_TRUE );
+        change_internal();
         change_unsaveable();
     add_bool( "one-instance-when-started-from-file", 1, NULL,
               ONEINSTANCEWHENSTARTEDFROMFILE_TEXT,
