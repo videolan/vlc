@@ -43,6 +43,7 @@ TOMOC = main_interface \
 	dialogs/extended \
 	dialogs/interaction \
 	dialogs/sout \
+	dialogs/help \
     dialogs/open \
 	components/extended_panels \
 	components/infopanels \
@@ -71,6 +72,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/prefs_dialog.moc.cpp \
 		dialogs/interaction.moc.cpp \
 		dialogs/sout.moc.cpp \
+		dialogs/help.moc.cpp \
 		dialogs/open.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/infopanels.moc.cpp \
@@ -119,6 +121,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/errors.cpp \
 		dialogs/interaction.cpp \
 		dialogs/sout.cpp \
+		dialogs/help.cpp \
 		dialogs/open.cpp \
 		components/extended_panels.cpp \
 		components/infopanels.cpp \
@@ -149,6 +152,7 @@ EXTRA_DIST += \
 	dialogs/prefs_dialog.hpp \
 	dialogs/interaction.hpp \
 	dialogs/sout.hpp \
+	dialogs/help.hpp \
 	dialogs/open.hpp \
 	components/extended_panels.hpp \
 	components/infopanels.hpp \

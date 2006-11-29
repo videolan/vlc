@@ -70,6 +70,7 @@ public:
     static QMenu *VideoMenu( intf_thread_t * , QMenu * );
     static QMenu *AudioMenu( intf_thread_t * , QMenu * );
     static QMenu *InterfacesMenu( intf_thread_t *p_intf, QMenu * );
+    static QMenu *HelpMenu();
 
     /* Popups */
     static void AudioPopupMenu( intf_thread_t * );

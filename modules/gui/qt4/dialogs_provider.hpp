@@ -96,6 +96,8 @@ public slots:
     void openMLDirectory();
     void quit();
     void switchToSkins();
+    void helpDialog();
+    void aboutDialog();
 };
 
 #endif

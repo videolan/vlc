@@ -38,6 +38,7 @@
 #include "dialogs/extended.hpp"
 #include "dialogs/sout.hpp"
 #include "dialogs/open.hpp"
+#include "dialogs/help.hpp"
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -116,9 +117,9 @@ void DialogsProvider::PLAppendDialog()
 void DialogsProvider::MLAppendDialog()
 {
 }
-void DialogsProvider::openDialog( int i_dialog )
+void DialogsProvider::openDialog( int i_tab )
 {
-    OpenDialog::getInstance( p_intf )->toggleVisible();
+    OpenDialog::getInstance( p_intf )->showTab( i_tab );
 }
 
 void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
@@ -181,6 +182,16 @@ void DialogsProvider::extendedDialog()
 void DialogsProvider::messagesDialog()
 {
     MessagesDialog::getInstance( p_intf )->toggleVisible();
+}
+
+void DialogsProvider::helpDialog()
+{
+    HelpDialog::getInstance( p_intf )->toggleVisible();
+}
+
+void DialogsProvider::aboutDialog()
+{
+    AboutDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::menuAction( QObject *data )

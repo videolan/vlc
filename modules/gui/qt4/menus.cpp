@@ -135,7 +135,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr("Audio"), 2 );
     BAR_DADD( NavigMenu( p_intf, NULL ), qtr("Navigation"), 3 );
 
-    //    BAR_ADD( HelpMenu(), qtr("Help" ) );
+    BAR_ADD( HelpMenu(), qtr("Help" ) );
 }
 QMenu *QVLCMenu::FileMenu()
 {
@@ -325,6 +325,16 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
     vlc_list_release( p_list );
     return menu;
 }
+
+QMenu *QVLCMenu::HelpMenu()
+{
+    QMenu *menu = new QMenu();
+    DP_SADD( qtr("Help") , "", "", helpDialog() );
+                menu->addSeparator();
+    DP_SADD( qtr("About VLC media player..."), "", "", aboutDialog() );
+    return menu;
+}
+
 
 /*****************************************************************************
  * Popup menus
