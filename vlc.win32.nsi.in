@@ -409,11 +409,11 @@ Section "Start Menu Shortcut" SEC02a
   CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to Direct3D.lnk" \
     "$INSTDIR\vlc.exe" "--vout direct3d --overlay --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to DirectX.lnk" \
-    "$INSTDIR\vlc.exe" "--vout directx --overlay --save-config vlc:quit"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to DirectX (no overlay).lnk" \
-    "$INSTDIR\vlc.exe" "--vout directx --no-overlay --save-config vlc:quit"
+    "$INSTDIR\vlc.exe" "--vout directx --overlay --directx-hw-yuv --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to DirectX (no hardware acceleration).lnk" \
     "$INSTDIR\vlc.exe" "--vout directx --no-overlay --no-directx-hw-yuv --save-config vlc:quit"
+  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to DirectX (no video overlay).lnk" \
+    "$INSTDIR\vlc.exe" "--vout directx --no-overlay --directx-hw-yuv --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to OpenGL.lnk" \
     "$INSTDIR\vlc.exe" "--vout opengl --overlay --save-config vlc:quit"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Reset VLC media player preferences and cache files.lnk" \
