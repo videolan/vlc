@@ -839,7 +839,7 @@ CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
                psz_mrl, psz_title, (long int) i_mduration / 1000000 );
 
     p_child = playlist_ItemNew( p_playlist, psz_mrl, psz_title );
-    p_child->p_input->i_duration = (mtime_t) i_mduration;
+    input_GetItem(p_child)->i_duration = (mtime_t) i_mduration;
     free(psz_mrl);
     free(psz_title);
 
@@ -940,7 +940,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
     if (p_playlist) {
 
       p_item = playlist_ItemGetByInput( p_playlist,
-                        ((input_thread_t *)p_access->p_parent)->input.p_item, VLC_FALSE );
+                        input_GetItem(((input_thread_t *)p_access->p_parent)), VLC_FALSE );
 
       if( p_item == p_playlist->status.p_item && !b_single_track )
 	{
