@@ -22,6 +22,7 @@
 
 #include <QTabWidget>
 #include <QGridLayout>
+#include <QFileDialog>
 
 #include "dialogs/open.hpp"
 #include "components/open.hpp"
@@ -36,7 +37,7 @@ OpenDialog *OpenDialog::instance = NULL;
 
 OpenDialog::OpenDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
-    setWindowTitle( _("Open" ) );
+    setWindowTitle( qtr("Open" ) );
     ui.setupUi( this );
     fileOpenPanel = new FileOpenPanel(this , _p_intf );
     diskOpenPanel = new DiskOpenPanel(this , _p_intf );
@@ -46,12 +47,46 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     ui.Tab->addTab(netOpenPanel, "Network");
     ui.advancedFrame->hide();
 
+    connect( fileOpenPanel, SIGNAL(mrlUpdated( QString )),
+            this, SLOT( updateMRL(QString)));
     BUTTONACT( ui.closeButton, ok());
     BUTTONACT( ui.cancelButton, cancel());
     BUTTONACT( ui.advancedButton , toggleAdvancedPanel() );
 }
 
 OpenDialog::~OpenDialog()
+{
+}
+
+void OpenDialog::showTab(int i_tab=0)
+{
+    this->show();
+    ui.Tab->setCurrentIndex(i_tab);
+}
+
+void OpenDialog::cancel()
+{
+    fileOpenPanel->clear();
+    this->toggleVisible();
+}
+
+void OpenDialog::ok()
+{
+    QStringList tempMRL = MRL.split(" ");
+    for( size_t i = 0 ; i< tempMRL.size(); i++ )
+    {
+         const char * psz_utf8 = qtu( tempMRL[i] );
+         /* Play the first one, parse and enqueue the other ones */
+         playlist_Add( THEPL, psz_utf8, NULL,
+                       PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
+                       ( i ? PLAYLIST_PREPARSE : 0 ),
+                       PLAYLIST_END, VLC_TRUE );
+      }
+
+    this->toggleVisible();
+}
+
+void OpenDialog::changedTab()
 {
 }
 
@@ -67,13 +102,9 @@ void OpenDialog::toggleAdvancedPanel()
     }
 }
 
-void OpenDialog::cancel()
+void OpenDialog::updateMRL(QString tempMRL)
 {
-    this->toggleVisible();
-}
-
-void OpenDialog::ok()
-{
-    this->toggleVisible();
+    MRL = tempMRL;
+    ui.advancedLineInput->setText(MRL);
 }
 

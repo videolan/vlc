@@ -26,6 +26,7 @@
 #include "qt4.hpp"
 #include "components/open.hpp"
 
+#include <QFileDialog>
 /**************************************************************************
  * Open panel
  ***************************************************************************/
@@ -41,7 +42,12 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 {
     ui.setupUi( this );
     ui.audioGroupBox->hide();
+
     BUTTONACT( ui.extraAudioButton, toggleExtraAudio() );
+    BUTTONACT( ui.fileBrowseButton, browseFile() );
+    BUTTONACT( ui.subBrowseButton, browseFileSub() );
+    BUTTONACT( ui.audioBrowseButton, browseFileAudio() );
+    CONNECT( ui.fileInput, editTextChanged(QString ), this, updateMRL());
 }
 
 FileOpenPanel::~FileOpenPanel()
@@ -49,6 +55,53 @@ FileOpenPanel::~FileOpenPanel()
 
 void FileOpenPanel::sendUpdate()
 {}
+
+QStringList FileOpenPanel::browse()
+{
+    return QFileDialog::getOpenFileNames( this, qtr("Open File"), "", "" );
+}
+
+void FileOpenPanel::browseFile()
+{
+    //FIXME ! files with spaces
+    QString files = browse().join(" ");
+    ui.fileInput->setEditText( files );
+    ui.fileInput->addItem( files );
+
+    if ( ui.fileInput->count() > 8 ) ui.fileInput->removeItem(0);
+
+    updateMRL();
+}
+
+void FileOpenPanel::browseFileSub()
+{
+    ui.subInput->setEditText( browse().join(" ") );
+
+    updateSubsMRL();
+}
+
+void FileOpenPanel::browseFileAudio()
+{
+    ui.audioFileInput->setEditText( browse().join(" ") );
+}
+
+void FileOpenPanel::updateSubsMRL()
+{
+    QStringList* subsMRL = new QStringList("sub-file=");
+    subsMRL->append( ui.subInput->currentText() );
+    //FIXME !!
+    subsMRL->append( "subsdec-align=" + ui.alignSubComboBox->currentText() );
+    subsMRL->append( "sub-rel-fontsize=" + ui.sizeSubComboBox->currentText() );
+
+    subsMRL->join(" ");
+}
+
+void FileOpenPanel::updateMRL()
+{
+    QString MRL = ui.fileInput->currentText();
+
+    emit(mrlUpdated(MRL));
+}
 
 QString FileOpenPanel::getUpdatedMRL()
 {
@@ -66,6 +119,14 @@ void FileOpenPanel::toggleExtraAudio()
       ui.audioGroupBox->show();
    }
 }
+
+void FileOpenPanel::clear()
+{
+    ui.fileInput->setEditText( "");
+    ui.subInput->setEditText( "");
+    ui.audioFileInput->setEditText( "");
+}
+
 
 
 /**************************************************************************
@@ -85,6 +146,7 @@ void DiskOpenPanel::sendUpdate()
 
 QString DiskOpenPanel::getUpdatedMRL()
 {
+
     //return ui.DiskInput->currentText();
     return NULL;
 }

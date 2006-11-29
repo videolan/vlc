@@ -31,6 +31,7 @@
 #include "components/infopanels.hpp"
 #include "qt4.hpp"
 
+
 static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param );
 MediaInfoDialog *MediaInfoDialog::instance = NULL;

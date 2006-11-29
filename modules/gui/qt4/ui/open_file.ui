@@ -212,7 +212,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="sizeComboBox" >
+         <widget class="QComboBox" name="sizeSubComboBox" >
           <item>
            <property name="text" >
             <string>Very Small</string>
@@ -265,6 +265,15 @@
         </item>
         <item>
          <widget class="QComboBox" name="alignSubComboBox" >
+          <property name="currentIndex" >
+           <number>0</number>
+          </property>
+          <property name="insertPolicy" >
+           <enum>QComboBox::NoInsert</enum>
+          </property>
+          <property name="minimumContentsLength" >
+           <number>0</number>
+          </property>
           <item>
            <property name="text" >
             <string>Left</string>
@@ -413,7 +422,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="audioBrowsButton" >
+       <widget class="QPushButton" name="audioBrowseButton" >
         <property name="text" >
          <string>Browse</string>
         </property>

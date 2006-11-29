@@ -32,6 +32,7 @@
 
 #include <QTabWidget>
 #include <QBoxLayout>
+#include <QString>
 
 class InfoTab;
 
@@ -46,10 +47,16 @@ public:
         return instance;
     }
     virtual ~OpenDialog();
+
+    void showTab( int);
+
+    QString MRL;
 private:
     OpenDialog( intf_thread_t * );
     static OpenDialog *instance;
     input_thread_t *p_input;
+    QString mrlSub;
+
     Ui::Open ui;
     FileOpenPanel *fileOpenPanel;
     NetOpenPanel *netOpenPanel;
@@ -57,7 +64,9 @@ private:
 public slots:
     void cancel();
     void ok();
+    void changedTab();
     void toggleAdvancedPanel();
+    void updateMRL(QString);
 };
 
 #endif

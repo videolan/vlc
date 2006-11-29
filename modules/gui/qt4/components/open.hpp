@@ -55,13 +55,20 @@ public:
     FileOpenPanel( QWidget *, intf_thread_t * );
     virtual ~FileOpenPanel();
     virtual QString getUpdatedMRL();
+    void clear();
 private:
     Ui::OpenFile ui;
+    QStringList browse();
+    void updateSubsMRL();
 public slots:
     virtual void sendUpdate() ;
     void toggleExtraAudio() ;
+    void updateMRL();
+    void browseFile();
+    void browseFileSub();
+    void browseFileAudio();
 signals:
-    void dataUpdated( QString, QString ) ;
+    void mrlUpdated( QString ) ;
 };
 
 class NetOpenPanel: public OpenPanel
