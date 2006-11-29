@@ -481,7 +481,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
             return VLC_EGENERIC;
         }
 
-        p_sys->i_handle_udp = net_ListenUDP1( p_access, p_sys->sz_bind_addr,
+        p_sys->i_handle_udp = net_ListenUDP1( (vlc_object_t *)p_access, p_sys->sz_bind_addr,
                                               7000 );
         if( p_sys->i_handle_udp < 0 )
         {

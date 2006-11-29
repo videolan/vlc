@@ -401,19 +401,19 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     var_Create( p_vout, "deinterlace", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
     text.psz_string = _("Deinterlace");
     var_Change( p_vout, "deinterlace", VLC_VAR_SETTEXT, &text, NULL );
-    val.psz_string = ""; text.psz_string = _("Disable");
+    val.psz_string = (char *)""; text.psz_string = _("Disable");
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "discard"; text.psz_string = _("Discard");
+    val.psz_string = (char *)"discard"; text.psz_string = _("Discard");
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "blend"; text.psz_string = _("Blend");
+    val.psz_string = (char *)"blend"; text.psz_string = _("Blend");
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "mean"; text.psz_string = _("Mean");
+    val.psz_string = (char *)"mean"; text.psz_string = _("Mean");
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "bob"; text.psz_string = _("Bob");
+    val.psz_string = (char *)"bob"; text.psz_string = _("Bob");
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "linear"; text.psz_string = _("Linear");
+    val.psz_string = (char *)"linear"; text.psz_string = _("Linear");
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "x"; text.psz_string = "X";
+    val.psz_string = (char *)"x"; text.psz_string = (char *)"X";
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
 
     if( var_Get( p_vout, "deinterlace-mode", &val ) == VLC_SUCCESS )

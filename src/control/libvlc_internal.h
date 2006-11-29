@@ -34,7 +34,7 @@ extern "C" {
 /***************************************************************************
  * Internal creation and destruction functions
  ***************************************************************************/
-libvlc_int_t *libvlc_InternalCreate();
+libvlc_int_t *libvlc_InternalCreate( void );
 int libvlc_InternalInit( libvlc_int_t *, int, char *ppsz_argv[] );
 int libvlc_InternalCleanup( libvlc_int_t * );
 int libvlc_InternalDestroy( libvlc_int_t *, vlc_bool_t );
