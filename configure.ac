@@ -864,28 +864,49 @@ then
           VLC_ADD_LDFLAGS([dbus],[$DBUS_LIBS])
           VLC_ADD_CFLAGS([dbus],[$DBUS_CFLAGS])
         fi],
-    dnl not too old dbus
-    [ PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.92,
-      [ AC_DEFINE( HAVE_DBUS_2, 1, [Define if you have the D-BUS library API >= 0.92] )
-        AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30] )
-        AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
-        VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
-        VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
-      dnl older dbus
-      [ PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.30,
-        [ AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30 ] )
-          AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
-          VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
-          VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
-        dnl much older dbus
-        [ PKG_CHECK_MODULES( DBUS, dbus-1, 
-           [AC_DEFINE(HAVE_DBUS, 1, [Define if you have the D-BUS library])
+
+    if ${PKG_CONFIG} --exists dbus-1
+    then
+      [AC_ARG_ENABLE(old-dbus,
+        [  --enable-old-dbus      Deprecated D-Bus support (default disabled)])]
+
+      if test "${enable_old_dbus}" != "yes"
+      then
+        echo ""
+        echo "****** WARNING **** WARNING ***** WARNING *************"
+        echo "*** Your D-Bus version is < 1.0.0"
+        echo "*** You are using old and buggy software and so"
+        echo "*** D-Bus support has been disabled."
+        echo "*** Please upgrade D-Bus : http://dbus.freedesktop.org"
+        echo "*** Alternatively you can force the use of your old and"
+        echo "*** buggy D-Bus version by specifying --enable-old-dbus"
+        echo "*******************************************************"
+        echo ""
+      else
+        dnl not too old dbus
+        [ PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.92,
+          [ AC_DEFINE( HAVE_DBUS_2, 1, [Define if you have the D-BUS library API >= 0.92] )
+            AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30] )
+            AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
             VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
             VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
-           [AC_MSG_WARN(DBUS library not found)])
-        ]
-      )]
-    )]
+          dnl older dbus
+          [ PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.30,
+            [ AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30 ] )
+              AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
+              VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
+              VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
+            dnl much older dbus
+            [ PKG_CHECK_MODULES( DBUS, dbus-1, 
+               [AC_DEFINE(HAVE_DBUS, 1, [Define if you have the D-BUS library])
+                VLC_ADD_LDFLAGS([screensaver],[$DBUS_LIBS])
+                VLC_ADD_CFLAGS([screensaver],[$DBUS_CFLAGS])],
+               [AC_MSG_WARN(DBUS library not found)])
+            ]
+          )]
+        )]
+      fi
+    fi
   )
 fi
 
