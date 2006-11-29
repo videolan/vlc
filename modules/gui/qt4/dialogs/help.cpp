@@ -27,15 +27,21 @@
 #include "util/qvlcframe.hpp"
 #include "qt4.hpp"
 
+#include <QTextBrowser>
+
 HelpDialog *HelpDialog::instance = NULL;
 
 HelpDialog::HelpDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Help" ) );
-    resize(600, 400);
+    resize(450, 500);
 
     QGridLayout *layout = new QGridLayout(this);
+    QTextBrowser *helpBrowser = new QTextBrowser(this);
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
+
+    layout->addWidget(helpBrowser, 0, 0, 1, 0);
+    layout->addWidget(closeButton, 1, 3);
 
     BUTTONACT( closeButton, close() );
 }
@@ -53,11 +59,12 @@ AboutDialog *AboutDialog::instance = NULL;
 AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "About" ) );
-    resize(600, 400);
+    resize(250, 250);
 
     QGridLayout *layout = new QGridLayout(this);
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
 
+    layout->addWidget(closeButton, 1, 3);
     BUTTONACT( closeButton, close() );
 }
 
