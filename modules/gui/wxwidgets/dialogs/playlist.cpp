@@ -1059,16 +1059,23 @@ void Playlist::RecursiveDeleteSelection(  wxTreeItemId root )
 {
     wxTreeItemIdValue cookie;
     wxTreeItemId child = treectrl->GetFirstChild( root, cookie );
+    wxTreeItemId nextchild;
+    bool childIsSelected = FALSE;
+    bool nextchildIsSelected = FALSE;
+
+    if( child.IsOk() ) childIsSelected = treectrl->IsSelected( child );
+
     while( child.IsOk() )
     {
-        if( treectrl->ItemHasChildren( child ) )
-        {
-            RecursiveDeleteSelection( child );
-            if( treectrl->IsSelected(child ) ) DeleteTreeItem( child );
-        }
-        else if( treectrl->IsSelected( child ) )
+        nextchild = treectrl->GetNextChild( root, cookie );
+        if( nextchild.IsOk() )
+            nextchildIsSelected = treectrl->IsSelected( nextchild );
+        if( childIsSelected )
             DeleteTreeItem( child );
-        child = treectrl->GetNextChild( root, cookie );
+        else if( treectrl->ItemHasChildren( child ) )
+            RecursiveDeleteSelection( child );
+        child = nextchild;
+        childIsSelected = nextchildIsSelected;
     }
 }
 
