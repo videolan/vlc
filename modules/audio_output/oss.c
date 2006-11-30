@@ -80,7 +80,7 @@ struct aout_sys_t
 
 /* This must be a power of 2. */
 #define FRAME_SIZE 1024
-#define FRAME_COUNT 4
+#define FRAME_COUNT 32
 
 /*****************************************************************************
  * Local prototypes
@@ -104,7 +104,7 @@ static mtime_t BufferDuration( aout_instance_t * p_aout );
 
 vlc_module_begin();
     set_shortname( "OSS" );
-    set_description( _("Linux OSS audio output") );
+    set_description( _("UNIX OSS audio output") );
 
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
@@ -472,9 +472,9 @@ static int Open( vlc_object_t *p_this )
 
         /* i_fragment = xxxxyyyy where: xxxx        is fragtotal
          *                              1 << yyyy   is fragsize */
-        i_fragments = 0;
-        i_frame_size = FRAME_SIZE * p_aout->output.output.i_bytes_per_frame;
-        while( i_frame_size >>= 1 )
+        i_frame_size = ((uint64_t)p_aout->output.output.i_bytes_per_frame * p_aout->output.output.i_rate * 65536) / (48000 * 2 * 2) / FRAME_COUNT;
+        i_fragments = 4;
+        while( i_fragments < 12 && (1U << i_fragments) < i_frame_size )
         {
             ++i_fragments;
         }
