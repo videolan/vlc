@@ -194,16 +194,9 @@ static int Open ( vlc_object_t *p_this )
     p_sys->i_subtitle         = 0;
     p_sys->i_subtitles        = 0;
     p_sys->subtitle           = NULL;
-    p_sys->i_microsecperframe = 0;
+    p_sys->i_microsecperframe = 40000;
 
     /* Get the FPS */
-    f_fps = var_CreateGetFloat( p_demux, "sub-fps" );
-    if( f_fps >= 1.0 )
-    {
-        p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
-        msg_Dbg( p_demux, "Override subtitle fps %f", f_fps );
-    }
-
     p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
     if( p_input )
     {
@@ -220,6 +213,7 @@ static int Open ( vlc_object_t *p_this )
     if( f_fps >= 1.0 )
     {
         p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
+        msg_Dbg( p_demux, "Override subtitle fps %f", f_fps );
     }
 
     /* Get or probe the type */
@@ -709,11 +703,6 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
     int    i_start;
     int    i_stop;
     unsigned int i;
-
-    /* Try sub-fps value if set, movie rate if know, else 25fps (40000) */
-    int i_microsecperframe = p_sys->i_original_mspf > 0 ? p_sys->i_original_mspf : 40000;
-    if( p_sys->i_microsecperframe > 0 )
-        i_microsecperframe = p_sys->i_microsecperframe;
 
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
