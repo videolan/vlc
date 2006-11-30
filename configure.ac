@@ -2464,10 +2464,15 @@ if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
               if test "${SYS}" = "darwin"; then
                 VLC_ADD_CXXFLAGS([mkv],[-O1])
               fi
-              AC_CHECK_LIB(ebml, main, [
+              AC_CHECK_LIB(ebml_pic, main, [
                 VLC_ADD_PLUGINS([mkv])
-                VLC_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
-              ])
+                VLC_ADD_LDFLAGS([mkv],[-lmatroska -lebml_pic])
+              ],
+                AC_CHECK_LIB(ebml, main, [
+                  VLC_ADD_PLUGINS([mkv])
+                  VLC_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
+                ]) 
+	      )
             ],
             [AC_MSG_RESULT([no])
               AC_MSG_ERROR([Your libmatroska is too old: you may get a more recent one from http://dl.matroska.org/downloads/libmatroska/. Alternatively you can use --disable-mkv to disable the matroska plugin.])
