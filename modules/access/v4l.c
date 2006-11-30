@@ -237,7 +237,9 @@ static struct
     { VIDEO_PALETTE_RGB555, VLC_FOURCC( 'R', 'V', '1', '5' ) },
     { VIDEO_PALETTE_RGB24, VLC_FOURCC( 'R', 'V', '2', '4' ) },
     { VIDEO_PALETTE_RGB32, VLC_FOURCC( 'R', 'V', '3', '2' ) },
-    { VIDEO_PALETTE_YUV422, VLC_FOURCC( 'I', '4', '2', '2' ) },
+    { VIDEO_PALETTE_YUV422, VLC_FOURCC( 'Y', 'U', 'Y', '2' ) },
+    { VIDEO_PALETTE_YUV422, VLC_FOURCC( 'Y', 'U', 'Y', 'V' ) },
+    { VIDEO_PALETTE_YUYV, VLC_FOURCC( 'Y', 'U', 'Y', '2' ) },
     { VIDEO_PALETTE_YUYV, VLC_FOURCC( 'Y', 'U', 'Y', 'V' ) },
     { VIDEO_PALETTE_UYVY, VLC_FOURCC( 'U', 'Y', 'V', 'Y' ) },
     { VIDEO_PALETTE_YUV420, VLC_FOURCC( 'I', '4', '2', 'N' ) },
@@ -1173,12 +1175,12 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
             char *psz;
             int i;
 
-            vid_picture.palette = 0;
             p_sys->i_fourcc = 0;
 
             psz = var_CreateGetString( p_demux, "v4l-chroma" );
             if( strlen( psz ) >= 4 )
             {
+                vid_picture.palette = 0;
                 int i_chroma = VLC_FOURCC( psz[0], psz[1], psz[2], psz[3] );
 
                 /* Find out v4l chroma code */
