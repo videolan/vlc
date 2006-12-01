@@ -53,6 +53,7 @@
 #include "vlc_filter.h"
 
 #include "vlc_httpd.h"
+#include "../network/httpd.h"
 #include "vlc_vlm.h"
 #include "vlc_vod.h"
 #include "vlc_tls.h"

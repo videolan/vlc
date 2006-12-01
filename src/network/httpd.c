@@ -35,6 +35,7 @@
 #include <vlc_network.h>
 #include <vlc_tls.h>
 #include <vlc_acl.h>
+#include "httpd.h"
 
 #include <string.h>
 #include <errno.h>
