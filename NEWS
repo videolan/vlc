@@ -8,14 +8,10 @@ Playlist:
     * Media library support
     * "Live search"
     * Shoutcast TV listings
-    * Audioscrobbler / last.fm support
-
-Decoders:
- * VP5/VP6 - Flash Video support
- * WavPack
+    * Audioscrobbler/last.fm support
 
 Video output:
- * Adjust, Invert and Distort (now splited into Wave, Ripple, Gradient
+ * Adjust, Invert and Distort (now splitted into Wave, Ripple, Gradient
    and Psychedelic) video filters can now be streamed
  * New puzzle video output filter
 
@@ -36,9 +32,10 @@ Input:
  * Support for RTSP authentication
  * Support for adding subtitles on the fly
  * Fixed MPEG-PS duration calculation
- * ATSC support for DVB
- * Partial support for DVR-ms recordings
- * Partial support for MXF and GXF fileformat
+ * ATSC support for DVB input
+ * Partial reading support for DVR-ms recordings
+ * Partial reading support for MXF and GXF fileformat
+ * Improved support for Flash Video files
 
 Decoders:
  * Native WMV9/VC-1 support
@@ -47,9 +44,12 @@ Decoders:
  * The True Audio Lossless codec support
  * WavPack support
  * Improved H.264 support (interlaced, speed improvements etc)
+ * Fixed a problem with MPEG2 field pictures
+ * Fixed swapped colors on DVB subtitles
  
 Video output:
  * Additional OpenGL effects (cylinder, torus, sphere, ...)
+ * Experimental Direct3D 9 video output (win32). Best served on Vista :)
  * Improved libcaca support
 
 Interfaces:
@@ -60,10 +60,10 @@ Interfaces:
    * Systray support in skins
  * OS X
    * Support for Apple Remote control
-   * Fullscreen controller panel
-   * new playmode buttons
+   * Fullscreen controller panel (artwork by Simon Damkjær Andersen)
+   * New playmode buttons (artwork by Simon Damkjær Andersen)
    * right/ctrl-click menu in video outputs
-   * Main Menu keeps accessible when playing videos in fullscreen mode
+   * Main Menu uses autohide when playing videos in fullscreen mode
  * Linux
    * Notifications using notification-daemon
 
@@ -77,6 +77,7 @@ Windows port:
        Download the MSLU package (unicows) and extract the content into the folder
        C:\Windows\System
  * Fixed IPv6 support on the client side
+ * Fixed disable screensaver (Direct3D and DirectX video output)
 
 Localization:
  * Add Czech
