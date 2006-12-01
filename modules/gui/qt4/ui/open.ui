@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>339</height>
+    <height>441</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -25,6 +25,20 @@
    </property>
    <item>
     <widget class="QTabWidget" name="Tab" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>0</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize" >
+      <size>
+       <width>417</width>
+       <height>290</height>
+      </size>
+     </property>
      <property name="currentIndex" >
       <number>-1</number>
      </property>

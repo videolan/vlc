@@ -41,9 +41,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
-    ui.audioGroupBox->hide();
 
-    BUTTONACT( ui.extraAudioButton, toggleExtraAudio() );
     BUTTONACT( ui.fileBrowseButton, browseFile() );
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
     BUTTONACT( ui.audioBrowseButton, browseFileAudio() );
@@ -106,18 +104,6 @@ void FileOpenPanel::updateMRL()
 QString FileOpenPanel::getUpdatedMRL()
 {
     return ui.fileInput->currentText();
-}
-
-void FileOpenPanel::toggleExtraAudio()
-{
-   if (ui.audioGroupBox->isVisible())
-   {
-       ui.audioGroupBox->hide();
-   }
-   else
-   {
-      ui.audioGroupBox->show();
-   }
 }
 
 void FileOpenPanel::clear()

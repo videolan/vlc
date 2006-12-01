@@ -39,6 +39,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr("Open" ) );
     ui.setupUi( this );
+    ui.vboxLayout->setSizeConstraint(QLayout::SetFixedSize);
     fileOpenPanel = new FileOpenPanel(this , _p_intf );
     diskOpenPanel = new DiskOpenPanel(this , _p_intf );
     netOpenPanel = new NetOpenPanel(this , _p_intf );

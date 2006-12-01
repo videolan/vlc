@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>819</width>
-    <height>384</height>
+    <width>502</width>
+    <height>201</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -93,7 +93,7 @@
        </property>
        <property name="maximumSize" >
         <size>
-         <width>35</width>
+         <width>45</width>
          <height>26</height>
         </size>
        </property>
@@ -117,7 +117,7 @@
        </property>
        <property name="maximumSize" >
         <size>
-         <width>35</width>
+         <width>45</width>
          <height>26</height>
         </size>
        </property>
@@ -144,7 +144,7 @@
        </property>
        <property name="maximumSize" >
         <size>
-         <width>35</width>
+         <width>45</width>
          <height>26</height>
         </size>
        </property>
@@ -171,7 +171,7 @@
        </property>
        <property name="maximumSize" >
         <size>
-         <width>35</width>
+         <width>45</width>
          <height>26</height>
         </size>
        </property>
@@ -193,8 +193,8 @@
        </property>
        <property name="sizeHint" >
         <size>
-         <width>40</width>
-         <height>20</height>
+         <width>80</width>
+         <height>27</height>
         </size>
        </property>
       </spacer>
@@ -229,6 +229,20 @@
      </item>
      <item>
       <widget class="QPushButton" name="playlistButton" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>4</hsizetype>
+         <vsizetype>0</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize" >
+        <size>
+         <width>45</width>
+         <height>26</height>
+        </size>
+       </property>
        <property name="text" >
         <string/>
        </property>

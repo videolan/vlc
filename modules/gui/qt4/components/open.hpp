@@ -62,7 +62,6 @@ private:
     void updateSubsMRL();
 public slots:
     virtual void sendUpdate() ;
-    void toggleExtraAudio() ;
     void updateMRL();
     void browseFile();
     void browseFileSub();
@@ -79,7 +78,7 @@ public:
     virtual ~NetOpenPanel();
     virtual QString getUpdatedMRL();
 private:
-    Ui::OpenNet ui;
+    Ui::OpenNetwork ui;
 public slots:
     virtual void sendUpdate() ;
 signals:
@@ -102,7 +101,5 @@ signals:
     void dataUpdated( QString, QString ) ;
 
 };
-
-
 
 #endif
