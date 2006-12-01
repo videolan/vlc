@@ -30,13 +30,6 @@
  */
 
 /*****************************************************************************
- * Pretend we are a builtin module
- *****************************************************************************/
-#define MODULE_NAME main
-#define MODULE_PATH main
-#define __BUILTIN__
-
-/*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
@@ -338,8 +331,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     }
     p_help_module->psz_object_name = "help";
     p_help_module->psz_longname = N_("Help options");
-    config_Duplicate( p_help_module, p_help_config,
-                      sizeof (p_help_config) / sizeof (p_help_config[0]) );
+    config_Duplicate( p_help_module, libvlc_config, libvlc_config_count );
     vlc_object_attach( p_help_module, libvlc_global.p_module_bank );
     /* End hack */
 
@@ -866,9 +858,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
      * Initialize hotkey handling
      */
     var_Create( p_libvlc, "key-pressed", VLC_VAR_INTEGER );
-    p_libvlc->p_hotkeys = malloc( sizeof(p_hotkeys) );
+    p_libvlc->p_hotkeys = malloc( libvlc_hotkeys_size );
     /* Do a copy (we don't need to modify the strings) */
-    memcpy( p_libvlc->p_hotkeys, p_hotkeys, sizeof(p_hotkeys) );
+    memcpy( p_libvlc->p_hotkeys, libvlc_hotkeys, libvlc_hotkeys_size );
 
     /* Initialize playlist and get commandline files */
     playlist_ThreadCreate( p_libvlc );
@@ -1306,13 +1298,13 @@ static void Help( libvlc_int_t *p_this, char const *psz_help_name )
 
     if( psz_help_name && !strcmp( psz_help_name, "help" ) )
     {
-        utf8_fprintf( stdout, VLC_USAGE, p_this->psz_object_name );
+        utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
         Usage( p_this, "help" );
         Usage( p_this, "main" );
     }
     else if( psz_help_name && !strcmp( psz_help_name, "longhelp" ) )
     {
-        utf8_fprintf( stdout, VLC_USAGE, p_this->psz_object_name );
+        utf8_fprintf( stdout, vlc_usage, p_this->psz_object_name );
         Usage( p_this, NULL );
     }
     else if( psz_help_name )
