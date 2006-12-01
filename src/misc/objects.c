@@ -36,6 +36,7 @@
 #   include <stdlib.h>                                          /* realloc() */
 #endif
 
+#include "../libvlc.h"
 #include <vlc_vout.h>
 #include <vlc_aout.h>
 #include "audio_output/aout_internal.h"
@@ -53,7 +54,6 @@
 #include "vlc_filter.h"
 
 #include "vlc_httpd.h"
-#include "../network/httpd.h"
 #include "vlc_vlm.h"
 #include "vlc_vod.h"
 #include "vlc_tls.h"
@@ -87,7 +87,7 @@ static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
  *****************************************************************************/
 static vlc_mutex_t    structure_lock;
 
-static vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
+vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
                                  int i_type, const char *psz_type )
 {
     vlc_object_t * p_new;
@@ -284,14 +284,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_SOUT:
             i_size = sizeof(sout_instance_t);
             psz_type = "stream output";
-            break;
-        case VLC_OBJECT_HTTPD:
-            i_size = sizeof( httpd_t );
-            psz_type = "http server";
-            break;
-        case VLC_OBJECT_HTTPD_HOST:
-            i_size = sizeof( httpd_host_t );
-            psz_type = "http server";
             break;
         case VLC_OBJECT_VLM:
             i_size = sizeof( vlm_t );

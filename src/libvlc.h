@@ -32,4 +32,8 @@ extern const size_t libvlc_config_count;
 extern const struct hotkey libvlc_hotkeys[];
 extern const size_t libvlc_hotkeys_size;
 
+extern vlc_object_t *
+vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
+                   const char *psz_type);
+
 #endif

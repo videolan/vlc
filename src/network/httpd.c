@@ -35,7 +35,7 @@
 #include <vlc_network.h>
 #include <vlc_tls.h>
 #include <vlc_acl.h>
-#include "httpd.h"
+#include "../libvlc.h"
 
 #include <string.h>
 #include <errno.h>
@@ -64,6 +64,51 @@
 #endif
 
 static void httpd_ClientClean( httpd_client_t *cl );
+
+struct httpd_t
+{
+    VLC_COMMON_MEMBERS
+
+    int          i_host;
+    httpd_host_t **host;
+};
+
+
+/* each host run in his own thread */
+struct httpd_host_t
+{
+    VLC_COMMON_MEMBERS
+
+    httpd_t     *httpd;
+
+    /* ref count */
+    int         i_ref;
+
+    /* address/port and socket for listening at connections */
+    char        *psz_hostname;
+    int         i_port;
+    int         *fd;
+
+    /* Statistics */
+    counter_t *p_active_counter;
+    counter_t *p_total_counter;
+
+    vlc_mutex_t lock;
+
+    /* all registered url (becarefull that 2 httpd_url_t could point at the same url)
+     * This will slow down the url research but make my live easier
+     * All url will have their cb trigger, but only the first one can answer
+     * */
+    int         i_url;
+    httpd_url_t **url;
+
+    int            i_client;
+    httpd_client_t **client;
+
+    /* TLS data */
+    tls_server_t *p_tls;
+};
+
 
 struct httpd_url_t
 {
@@ -981,6 +1026,8 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, const char *psz_host,
                            );
 }
 
+static const char psz_object_type[] = "http server";
+
 httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
                                 int i_port,
                                 const char *psz_cert, const char *psz_key,
@@ -1011,7 +1058,10 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     if( !(httpd = vlc_object_find( p_this, VLC_OBJECT_HTTPD, FIND_ANYWHERE )) )
     {
         msg_Info( p_this, "creating httpd" );
-        if( ( httpd = vlc_object_create( p_this, VLC_OBJECT_HTTPD ) ) == NULL )
+        httpd = (httpd_t *)vlc_custom_create( p_this, sizeof (*httpd),
+                                              VLC_OBJECT_HTTPD,
+                                              psz_object_type );
+        if (httpd == NULL)
         {
             vlc_mutex_unlock( lockval.p_address );
             free( psz_host );
@@ -1071,7 +1121,12 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         p_tls = NULL;
 
     /* create the new host */
-    host = vlc_object_create( p_this, VLC_OBJECT_HTTPD_HOST );
+    host = (httpd_host_t *)vlc_custom_create( p_this, sizeof (*host),
+                                              VLC_OBJECT_HTTPD_HOST,
+                                              psz_object_type );
+    if (host == NULL)
+        goto error;
+
     host->httpd = httpd;
     vlc_mutex_init( httpd, &host->lock );
     host->i_ref = 1;
