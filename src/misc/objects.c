@@ -204,7 +204,6 @@ static vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
  */
 void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 {
-    vlc_object_t * p_new;
     const char   * psz_type;
     size_t         i_size;
 
