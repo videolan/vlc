@@ -295,6 +295,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             break;
 
 #ifdef STATE_SEQUENCE_MODIFIED
+/* FIXME - the above ifdef is always FALSE, even with libmpeg2-0.5.0
+ * Need to improve the implementation to avoid invalid/unref pictures */
+
         case STATE_SEQUENCE_MODIFIED:
             GetAR( p_dec );
             break;
