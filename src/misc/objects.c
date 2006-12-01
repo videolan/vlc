@@ -87,12 +87,120 @@ static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
  *****************************************************************************/
 static vlc_mutex_t    structure_lock;
 
+static vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
+                                 int i_type, const char *psz_type )
+{
+    vlc_object_t * p_new;
+
+    if( i_type == VLC_OBJECT_GLOBAL )
+    {
+        p_new = p_this;
+    }
+    else
+    {
+        p_new = malloc( i_size );
+        if( !p_new ) return NULL;
+        memset( p_new, 0, i_size );
+    }
+
+    p_new->i_object_type = i_type;
+    p_new->psz_object_type = psz_type;
+
+    p_new->psz_object_name = NULL;
+
+    p_new->b_die = VLC_FALSE;
+    p_new->b_error = VLC_FALSE;
+    p_new->b_dead = VLC_FALSE;
+    p_new->b_attached = VLC_FALSE;
+    p_new->b_force = VLC_FALSE;
+
+    p_new->psz_header = NULL;
+
+    p_new->i_flags = 0;
+    if( p_this->i_flags & OBJECT_FLAGS_NODBG )
+        p_new->i_flags |= OBJECT_FLAGS_NODBG;
+    if( p_this->i_flags & OBJECT_FLAGS_QUIET )
+        p_new->i_flags |= OBJECT_FLAGS_QUIET;
+    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
+        p_new->i_flags |= OBJECT_FLAGS_NOINTERACT;
+
+    p_new->i_vars = 0;
+    p_new->p_vars = (variable_t *)malloc( 16 * sizeof( variable_t ) );
+
+    if( !p_new->p_vars )
+    {
+        if( i_type != VLC_OBJECT_GLOBAL )
+            free( p_new );
+        return NULL;
+    }
+
+    if( i_type == VLC_OBJECT_GLOBAL )
+    {
+        /* If i_type is global, then p_new is actually p_libvlc_global */
+        p_new->p_libvlc_global = (libvlc_global_data_t*)p_new;
+        p_new->p_libvlc = NULL;
+
+        p_new->p_libvlc_global->i_counter = 0;
+        p_new->i_object_id = 0;
+
+        p_new->p_libvlc_global->i_objects = 1;
+        p_new->p_libvlc_global->pp_objects = malloc( sizeof(vlc_object_t *) );
+        p_new->p_libvlc_global->pp_objects[0] = p_new;
+        p_new->b_attached = VLC_TRUE;
+    }
+    else
+    {
+        p_new->p_libvlc_global = p_this->p_libvlc_global;
+        p_new->p_libvlc = ( i_type == VLC_OBJECT_LIBVLC ) ? (libvlc_int_t*)p_new
+                                                       : p_this->p_libvlc;
+
+        vlc_mutex_lock( &structure_lock );
+
+        p_new->p_libvlc_global->i_counter++;
+        p_new->i_object_id = p_new->p_libvlc_global->i_counter;
+
+        /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
+         * useless to try and recover anything if pp_objects gets smashed. */
+        TAB_APPEND( p_new->p_libvlc_global->i_objects,
+                    p_new->p_libvlc_global->pp_objects,
+                    p_new );
+
+        vlc_mutex_unlock( &structure_lock );
+    }
+
+    p_new->i_refcount = 0;
+    p_new->p_parent = NULL;
+    p_new->pp_children = NULL;
+    p_new->i_children = 0;
+
+    p_new->p_private = NULL;
+
+    /* Initialize mutexes and condvars */
+    vlc_mutex_init( p_new, &p_new->object_lock );
+    vlc_cond_init( p_new, &p_new->object_wait );
+    vlc_mutex_init( p_new, &p_new->var_lock );
+
+    if( i_type == VLC_OBJECT_GLOBAL )
+    {
+        vlc_mutex_init( p_new, &structure_lock );
+
+        var_Create( p_new, "list", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+        var_AddCallback( p_new, "list", DumpCommand, NULL );
+        var_Create( p_new, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+        var_AddCallback( p_new, "tree", DumpCommand, NULL );
+    }
+
+    return p_new;
+}
+
+
 /**
- * Initialize a vlc object
+ * Allocates and initializes a vlc object.
  *
- * This function allocates memory for a vlc object and initializes it. If
- * i_type is not a known value such as VLC_OBJECT_LIBVLC, VLC_OBJECT_VOUT and
- * so on, vlc_object_create will use its value for the object size.
+ * @param i_type known object type (all of them are negative integer values),
+ *               or object byte size (always positive).
+ *
+ * @return the new object, or NULL on error.
  */
 void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 {
@@ -226,106 +334,9 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             break;
     }
 
-    if( i_type == VLC_OBJECT_GLOBAL )
-    {
-        p_new = p_this;
-    }
-    else
-    {
-        p_new = malloc( i_size );
-        if( !p_new ) return NULL;
-        memset( p_new, 0, i_size );
-    }
-
-    p_new->i_object_type = i_type;
-    p_new->psz_object_type = psz_type;
-
-    p_new->psz_object_name = NULL;
-
-    p_new->b_die = VLC_FALSE;
-    p_new->b_error = VLC_FALSE;
-    p_new->b_dead = VLC_FALSE;
-    p_new->b_attached = VLC_FALSE;
-    p_new->b_force = VLC_FALSE;
-
-    p_new->psz_header = NULL;
-
-    p_new->i_flags = 0;
-    if( p_this->i_flags & OBJECT_FLAGS_NODBG )
-        p_new->i_flags |= OBJECT_FLAGS_NODBG;
-    if( p_this->i_flags & OBJECT_FLAGS_QUIET )
-        p_new->i_flags |= OBJECT_FLAGS_QUIET;
-    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
-        p_new->i_flags |= OBJECT_FLAGS_NOINTERACT;
-
-    p_new->i_vars = 0;
-    p_new->p_vars = (variable_t *)malloc( 16 * sizeof( variable_t ) );
-
-    if( !p_new->p_vars )
-    {
-        if( i_type != VLC_OBJECT_GLOBAL )
-            free( p_new );
-        return NULL;
-    }
-
-    if( i_type == VLC_OBJECT_GLOBAL )
-    {
-        /* If i_type is global, then p_new is actually p_libvlc_global */
-        p_new->p_libvlc_global = (libvlc_global_data_t*)p_new;
-        p_new->p_libvlc = NULL;
-
-        p_new->p_libvlc_global->i_counter = 0;
-        p_new->i_object_id = 0;
-
-        p_new->p_libvlc_global->i_objects = 1;
-        p_new->p_libvlc_global->pp_objects = malloc( sizeof(vlc_object_t *) );
-        p_new->p_libvlc_global->pp_objects[0] = p_new;
-        p_new->b_attached = VLC_TRUE;
-    }
-    else
-    {
-        p_new->p_libvlc_global = p_this->p_libvlc_global;
-        p_new->p_libvlc = ( i_type == VLC_OBJECT_LIBVLC ) ? (libvlc_int_t*)p_new
-                                                       : p_this->p_libvlc;
-
-        vlc_mutex_lock( &structure_lock );
-
-        p_new->p_libvlc_global->i_counter++;
-        p_new->i_object_id = p_new->p_libvlc_global->i_counter;
-
-        /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
-         * useless to try and recover anything if pp_objects gets smashed. */
-        TAB_APPEND( p_new->p_libvlc_global->i_objects,
-                    p_new->p_libvlc_global->pp_objects,
-                    p_new );
-
-        vlc_mutex_unlock( &structure_lock );
-    }
-
-    p_new->i_refcount = 0;
-    p_new->p_parent = NULL;
-    p_new->pp_children = NULL;
-    p_new->i_children = 0;
-
-    p_new->p_private = NULL;
-
-    /* Initialize mutexes and condvars */
-    vlc_mutex_init( p_new, &p_new->object_lock );
-    vlc_cond_init( p_new, &p_new->object_wait );
-    vlc_mutex_init( p_new, &p_new->var_lock );
-
-    if( i_type == VLC_OBJECT_GLOBAL )
-    {
-        vlc_mutex_init( p_new, &structure_lock );
-
-        var_Create( p_new, "list", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-        var_AddCallback( p_new, "list", DumpCommand, NULL );
-        var_Create( p_new, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-        var_AddCallback( p_new, "tree", DumpCommand, NULL );
-    }
-
-    return p_new;
+    return vlc_custom_create( p_this, i_size, i_type, psz_type );
 }
+
 
 /**
  ****************************************************************************
