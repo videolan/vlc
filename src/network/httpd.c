@@ -1975,7 +1975,7 @@ static void httpd_HostThread( httpd_host_t *host )
         fd_set          fds_write;
         /* FIXME: (too) many int variables */
         int             fd, i_fd;
-        int             i_handle_max = 0;
+        int             i_handle_max = -1;
         int             i_ret;
         int             i_client;
         int             b_low_delay = 0;
@@ -1990,8 +1990,6 @@ static void httpd_HostThread( httpd_host_t *host )
         /* built a set of handle to select */
         FD_ZERO( &fds_read );
         FD_ZERO( &fds_write );
-
-        i_handle_max = -1;
 
         for( i_fd = 0; (fd = host->fd[i_fd]) != -1; i_fd++ )
         {
