@@ -270,11 +270,11 @@ void FreeLogoList( logo_list_t *p_logo_list )
     for( i = 0; i < p_logo_list->i_count; i++ )
     {
         logo_t *p_logo = &p_logo_list->p_logo[i];
-        FREENULL( p_logo[i].psz_file );
-        if( p_logo[i].p_pic )
+        FREENULL( p_logo->psz_file );
+        if( p_logo->p_pic )
         {
-            p_logo[i].p_pic->pf_release( p_logo[i].p_pic );
-            p_logo[i].p_pic = NULL;
+            p_logo->p_pic->pf_release( p_logo->p_pic );
+            p_logo->p_pic = NULL;
         }
     }
 }
