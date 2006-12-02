@@ -5,6 +5,8 @@
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          mod by Cedric Cocquebert <Cedric.Cocquebert@supelec.fr>
+ *          based of DScaler idea (M. Samblanet)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +35,11 @@
 
 #include "filter_common.h"
 
+#define BEST_AUTOCROP 1
+#ifdef BEST_AUTOCROP
+    #define RATIO_MAX 15000  // 10*4/3 for a 360°
+#endif
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -49,6 +56,14 @@ static void UpdateStats    ( vout_thread_t *, picture_t * );
 static int  SendEvents( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
 
+#ifdef BEST_AUTOCROP
+/*****************************************************************************
+ * Callback prototypes
+ *****************************************************************************/
+static int FilterCallback ( vlc_object_t *, char const *,
+                            vlc_value_t, vlc_value_t, void * );
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -56,7 +71,31 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define GEOMETRY_LONGTEXT N_("Set the geometry of the zone to crop. This is set as <width> x <height> + <left offset> + <top offset>.")
 
 #define AUTOCROP_TEXT N_("Automatic cropping")
-#define AUTOCROP_LONGTEXT N_("Automatic black border cropping.")
+#define AUTOCROP_LONGTEXT N_("Automatically detect black borders and crop them.")
+
+#ifdef BEST_AUTOCROP
+#define RATIOMAX_TEXT N_("Ratio max (x 1000)")
+#define RATIOMAX_LONGTEXT N_("Maximum image ratio. The crop plugin will never automatically crop to a higher ratio (ie, to a more \"flat\" image). The value is x1000: 1333 means 4/3.")
+
+#define RATIO_TEXT N_("Manual ratio")
+#define RATIO_LONGTEXT N_("Force a ratio (0 for automatic). Value is x1000: 1333 means 4/3.")
+
+#define TIME_TEXT N_("Number of images for change")
+#define TIME_LONGTEXT N_("The number of consecutive images with the same detected ratio (different from the previously detected ratio) to consider that ratio chnged and trigger recrop.")
+
+#define DIFF_TEXT N_("Number of lines for change")
+#define DIFF_LONGTEXT N_("The minimum difference in the number of detected black lines to consider that ratio changed and trigger recrop.")
+
+#define NBP_TEXT N_("Number of non black pixels ")
+#define NBP_LONGTEXT N_("The maximum of non-black pixels in a line to consider"\
+                        " that the line is black.")
+
+#define SKIP_TEXT N_("Skip percentage (%)")
+#define SKIP_LONGTEXT N_("Percentage of the line to consider while checking for black lines. This allows to skip logos in black borders and crop them anyway.")
+
+#define LUM_TEXT N_("Luminance threshold ")
+#define LUM_LONGTEXT N_("Maximum luminance to consider a pixel as black (0-255).")
+#endif
 
 vlc_module_begin();
     set_description( _("Crop video filter") );
@@ -65,8 +104,31 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter", 0 );
 
-    add_string( "crop-geometry", NULL, NULL, GEOMETRY_TEXT, GEOMETRY_LONGTEXT, VLC_FALSE );
-    add_bool( "autocrop", 0, NULL, AUTOCROP_TEXT, AUTOCROP_LONGTEXT, VLC_FALSE );
+    add_string( "crop-geometry", NULL, NULL, GEOMETRY_TEXT,
+                                             GEOMETRY_LONGTEXT, VLC_FALSE );
+    add_bool( "autocrop", 0, NULL, AUTOCROP_TEXT,
+                                   AUTOCROP_LONGTEXT, VLC_FALSE );
+
+#ifdef BEST_AUTOCROP
+    add_integer_with_range( "autocrop-ratio-max", 2405, 0, RATIO_MAX, NULL,
+                            RATIOMAX_TEXT, RATIOMAX_LONGTEXT, VLC_TRUE );
+
+    add_integer_with_range( "crop-ratio", 0, 0, RATIO_MAX, NULL, RATIO_TEXT,
+                            RATIO_LONGTEXT, VLC_FALSE );
+    add_integer( "autocrop-time", 25, NULL, TIME_TEXT,
+                 TIME_LONGTEXT, VLC_TRUE );
+    add_integer( "autocrop-diff", 16, NULL, DIFF_TEXT,
+                                            DIFF_LONGTEXT, VLC_TRUE );
+
+    add_integer( "autocrop-non-black-pixels", 3, NULL,
+                 NBP_TEXT, NBP_LONGTEXT, VLC_TRUE );
+
+    add_integer_with_range( "autocrop-skip-percent", 17, 0, 100, NULL,
+                            SKIP_TEXT, SKIP_LONGTEXT, VLC_TRUE );
+
+    add_integer_with_range( "autocrop-luminance-threshold", 40, 0, 128, NULL,
+                            LUM_TEXT, LUM_LONGTEXT, VLC_TRUE );
+#endif //BEST_AUTOCROP
 
     add_shortcut( "crop" );
     set_callbacks( Create, Destroy );
@@ -90,6 +152,12 @@ struct vout_sys_t
     /* Autocrop specific variables */
     unsigned int i_lastchange;
     vlc_bool_t   b_changed;
+#ifdef BEST_AUTOCROP
+    unsigned int i_ratio_max;
+    unsigned int i_threshold, i_skipPercent, i_nonBlackPixel, i_diff, i_time;
+    unsigned int i_ratio;
+#endif
+
 };
 
 /*****************************************************************************
@@ -151,6 +219,32 @@ static int Init( vout_thread_t *p_vout )
 
     /* Shall we use autocrop ? */
     p_vout->p_sys->b_autocrop = config_GetInt( p_vout, "autocrop" );
+#ifdef BEST_AUTOCROP
+    p_vout->p_sys->i_ratio_max = config_GetInt( p_vout, "autocrop-ratio-max" );
+    p_vout->p_sys->i_threshold =
+                    config_GetInt( p_vout, "autocrop-luminance-threshold" );
+    p_vout->p_sys->i_skipPercent =
+                    config_GetInt( p_vout, "autocrop-skip-percent" );
+    p_vout->p_sys->i_nonBlackPixel =
+                    config_GetInt( p_vout, "autocrop-non-black-pixels" );
+    p_vout->p_sys->i_diff = config_GetInt( p_vout, "autocrop-diff" );
+    p_vout->p_sys->i_time = config_GetInt( p_vout, "autocrop-time" );
+    vlc_value_t val={0};
+    var_Get( p_vout, "ratio-crop", &val );
+    val.psz_string = "0";
+    var_SetString( p_vout, "ratio-crop", val.psz_string);
+
+    if (p_vout->p_sys->b_autocrop)
+        p_vout->p_sys->i_ratio = 0;
+    else
+    {
+        p_vout->p_sys->i_ratio = config_GetInt( p_vout, "ratio" );
+        // ratio < width / height => ratio = 0 (unchange ratio)
+        if (p_vout->p_sys->i_ratio < (p_vout->output.i_width * 1000) / p_vout->output.i_height)
+            p_vout->p_sys->i_ratio = 0;
+    }
+#endif
+
 
     /* Get geometry value from the user */
     psz_var = config_GetPsz( p_vout, "crop-geometry" );
@@ -233,6 +327,20 @@ static int Init( vout_thread_t *p_vout )
         free( psz_var );
     }
     else
+#ifdef BEST_AUTOCROP
+    if (p_vout->p_sys->i_ratio)
+    {
+        p_vout->p_sys->i_aspect    =  p_vout->p_sys->i_ratio * 432;
+        p_vout->p_sys->i_width  = p_vout->fmt_out.i_visible_width;
+        p_vout->p_sys->i_height = p_vout->output.i_aspect
+                                * p_vout->output.i_height / p_vout->p_sys->i_aspect
+                                * p_vout->p_sys->i_width / p_vout->output.i_width;
+        p_vout->p_sys->i_height += p_vout->p_sys->i_height % 2;
+        p_vout->p_sys->i_x = p_vout->fmt_out.i_x_offset;
+        p_vout->p_sys->i_y = (p_vout->output.i_height - p_vout->p_sys->i_height) / 2;
+    }
+    else
+#endif
     {
         p_vout->p_sys->i_width  = p_vout->fmt_out.i_visible_width;
         p_vout->p_sys->i_height = p_vout->fmt_out.i_visible_height;
@@ -245,6 +353,9 @@ static int Init( vout_thread_t *p_vout )
                      p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                      p_vout->p_sys->i_x, p_vout->p_sys->i_y,
                      p_vout->p_sys->b_autocrop ? "" : "not " );
+#ifdef BEST_AUTOCROP
+    msg_Info( p_vout, "ratio %d",  p_vout->p_sys->i_aspect / 432);
+#endif
 
     /* Set current output image properties */
     p_vout->p_sys->i_aspect = p_vout->fmt_out.i_aspect
@@ -264,7 +375,7 @@ static int Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        intf_UserFatal( p_vout, VLC_FALSE, _("Cropping failed"), 
+        intf_UserFatal( p_vout, VLC_FALSE, _("Cropping failed"),
                         _("VLC could not open the video output module.") );
         return VLC_EGENERIC;
     }
@@ -272,6 +383,10 @@ static int Init( vout_thread_t *p_vout )
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
     ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+
+#ifdef BEST_AUTOCROP
+    var_AddCallback( p_vout, "ratio-crop", FilterCallback, NULL );
+#endif
 
     ADD_PARENT_CALLBACKS( SendEventsToChild );
 
@@ -329,6 +444,15 @@ static int Manage( vout_thread_t *p_vout )
         return VLC_SUCCESS;
     }
 
+#ifdef BEST_AUTOCROP
+    msg_Dbg( p_vout, "cropping at %ix%i+%i+%i, %sautocropping",
+                     p_vout->p_sys->i_width, p_vout->p_sys->i_height,
+                     p_vout->p_sys->i_x, p_vout->p_sys->i_y,
+                     p_vout->p_sys->b_autocrop ? "" : "not " );
+
+    msg_Info( p_vout, "ratio %d",  p_vout->p_sys->i_aspect / 432);
+#endif
+
     vout_Destroy( p_vout->p_sys->p_vout );
 
     fmt.i_width = fmt.i_visible_width = p_vout->p_sys->i_width;
@@ -343,7 +467,7 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        intf_UserFatal( p_vout, VLC_FALSE, _("Cropping failed"), 
+        intf_UserFatal( p_vout, VLC_FALSE, _("Cropping failed"),
                         _("VLC could not open the video output module.") );
         return VLC_EGENERIC;
     }
@@ -422,14 +546,198 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     }
 }
 
+#ifdef BEST_AUTOCROP
+static vlc_bool_t NonBlackLine(uint8_t *p_in, int i_line, int i_pitch,
+                               int i_visible_pitch, int i_lines,
+                               int i_lumThreshold, int i_skipCountPercent,
+                               int i_nonBlackPixel, int i_chroma)
+{
+    const int i_col = i_line * i_pitch / i_lines;
+    int i_index, i_count = 0;
+    int i_skipCount = 0;
+
+    switch(i_chroma)
+    {
+    // planar YUV
+        case VLC_FOURCC('I','4','4','4'):
+        case VLC_FOURCC('I','4','2','2'):
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','Y','U','V'):
+        case VLC_FOURCC('I','4','1','1'):
+        case VLC_FOURCC('I','4','1','0'):
+        case VLC_FOURCC('Y','V','U','9'):
+        case VLC_FOURCC('Y','U','V','A'):
+            i_skipCount = (i_pitch * i_skipCountPercent) / 100;
+            for (i_index = i_col/2 + i_skipCount/2;
+                 i_index <= i_visible_pitch/2 + i_col/2 - i_skipCount/2;
+                 i_index++)
+            {
+                 i_count += (p_in[i_index] > i_lumThreshold);
+            if (i_count > i_nonBlackPixel) break;
+            }
+            break;
+    // packed RGB
+        case VLC_FOURCC('R','G','B','2'):    // packed by 1
+            i_skipCount = (i_pitch * i_skipCountPercent) / 100;
+            for (i_index = i_col/2 + i_skipCount/2;
+                 i_index <= i_visible_pitch/2 + i_col/2 - i_skipCount/2;
+                 i_index++)
+            {
+                 i_count += (p_in[i_index] > i_lumThreshold);
+            if (i_count > i_nonBlackPixel) break;
+            }
+            break;
+        case VLC_FOURCC('R','V','1','5'):    // packed by 2
+        case VLC_FOURCC('R','V','1','6'):    // packed by 2
+            i_skipCount = (i_pitch * i_skipCountPercent) / 100;
+            for (i_index = i_col/2 + i_skipCount/2 -
+                                (i_col/2 + i_skipCount/2) % 2;
+                 i_index <= i_visible_pitch/2 + i_col/2 - i_skipCount/2;
+                 i_index+=2)
+            {
+                 i_count += (p_in[i_index] > i_lumThreshold) &&
+                            (p_in[i_index + 1] > i_lumThreshold);
+            if (i_count > i_nonBlackPixel) break;
+            }
+            break;
+        case VLC_FOURCC('R','V','2','4'):    // packed by 3
+            i_skipCount = (i_pitch * i_skipCountPercent) / 100;
+            for (i_index = i_col/2 + i_skipCount/2 - (i_col/2 + i_skipCount/2) % 3; i_index <= i_visible_pitch/2 + i_col/2 - i_skipCount/2; i_index+=3)
+            {
+                 i_count += (p_in[i_index] > i_lumThreshold) &&
+                            (p_in[i_index + 1] > i_lumThreshold) &&
+                            (p_in[i_index + 2] > i_lumThreshold);
+            if (i_count > i_nonBlackPixel) break;
+            }
+            break;
+        case VLC_FOURCC('R','V','3','2'):    // packed by 4
+            i_skipCount = (i_pitch * i_skipCountPercent) / 100;
+            for (i_index = i_col/2 + i_skipCount/2 - (i_col/2 + i_skipCount/2) % 4; i_index <= i_visible_pitch/2 + i_col/2 - i_skipCount/2; i_index+=4)
+            {
+                 i_count += (uint32_t)(*(p_in + i_index)) > (uint32_t)i_lumThreshold;
+            if (i_count > i_nonBlackPixel) break;
+            }
+            break;
+    // packed YUV
+        case VLC_FOURCC('Y','U','Y','2'):    // packed by 2
+        case VLC_FOURCC('Y','U','N','V'):    // packed by 2
+        case VLC_FOURCC('U','Y','V','Y'):    // packed by 2
+        case VLC_FOURCC('U','Y','N','V'):    // packed by 2
+        case VLC_FOURCC('Y','4','2','2'):    // packed by 2
+            i_skipCount = (i_pitch * i_skipCountPercent) / 100;
+            for (i_index = (i_col/2 + i_skipCount/2) -
+                           (i_col/2 + i_skipCount/2) % 2;
+                 i_index <= i_visible_pitch/2 + i_col/2 - i_skipCount/2;
+                 i_index+=2)
+            {
+                 i_count += (p_in[i_index] > i_lumThreshold);
+            if (i_count > i_nonBlackPixel) break;
+            }
+            break;
+        default :
+            break;
+    }
+    return (i_count > i_nonBlackPixel);
+}
+#endif
+
 static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    uint8_t *p_in = p_pic->p[0].p_pixels;
+   uint8_t *p_in = p_pic->p[0].p_pixels;
     int i_pitch = p_pic->p[0].i_pitch;
     int i_visible_pitch = p_pic->p[0].i_visible_pitch;
     int i_lines = p_pic->p[0].i_visible_lines;
     int i_firstwhite = -1, i_lastwhite = -1, i;
+#ifdef BEST_AUTOCROP
+    int i_time = p_vout->p_sys->i_time;
+    int i_diff = p_vout->p_sys->i_diff;
 
+    if (!p_vout->p_sys->i_ratio)
+    {
+        /* Determine where black borders are */
+        for( i = 0 ; i < i_lines ; i++)
+        {
+                   if (NonBlackLine(p_in, i, i_pitch, i_visible_pitch, i_lines,
+                            p_vout->p_sys->i_threshold,
+                            p_vout->p_sys->i_skipPercent,
+                            p_vout->p_sys->i_nonBlackPixel,
+                            p_vout->output.i_chroma))
+                {
+                    i_firstwhite = i;
+                    i_lastwhite = i_lines - i;
+                    break;
+                }
+                p_in += i_pitch;
+        }
+
+        /* Decide whether it's worth changing the size */
+        if( i_lastwhite == -1 )
+        {
+            p_vout->p_sys->i_lastchange = 0;
+            return;
+        }
+
+        if( (i_lastwhite - i_firstwhite) < (int) (p_vout->p_sys->i_height / 2) )
+        {
+            p_vout->p_sys->i_lastchange = 0;
+            return;
+        }
+
+        if (p_vout->output.i_aspect
+                            * p_vout->output.i_height /
+                                (i_lastwhite - i_firstwhite + 1)
+                            * p_vout->p_sys->i_width /
+                               p_vout->output.i_width >
+                                    p_vout->p_sys->i_ratio_max * 432)
+        {
+            int i_height = ((p_vout->output.i_aspect / 432) *
+                           p_vout->output.i_height * p_vout->p_sys->i_width) /
+                          (p_vout->output.i_width * p_vout->p_sys->i_ratio_max);
+            i_firstwhite = (p_vout->output.i_height - i_height) / 2;
+            i_lastwhite =  p_vout->output.i_height - i_firstwhite;
+/*
+            p_vout->p_sys->i_lastchange = 0;
+            return;
+*/
+        }
+
+        if( (i_lastwhite - i_firstwhite) <
+                        (int) (p_vout->p_sys->i_height + i_diff)
+             && (i_lastwhite - i_firstwhite + i_diff) >
+                        (int) p_vout->p_sys->i_height )
+        {
+            p_vout->p_sys->i_lastchange = 0;
+            return;
+        }
+
+        /* We need at least 'i_time' images to make up our mind */
+        p_vout->p_sys->i_lastchange++;
+        if( p_vout->p_sys->i_lastchange < (unsigned int)i_time )
+        {
+            return;
+        }
+    }
+    else
+    {
+        if ( p_vout->p_sys->i_lastchange >= (unsigned int)i_time )
+        {
+            p_vout->p_sys->i_aspect    =  p_vout->p_sys->i_ratio * 432;
+            int i_height = p_vout->output.i_aspect
+                                    * p_vout->output.i_height /
+                                        p_vout->p_sys->i_aspect
+                                    * p_vout->p_sys->i_width /
+                                        p_vout->output.i_width;
+            i_firstwhite = (p_vout->output.i_height - i_height) / 2;
+            i_lastwhite =  p_vout->output.i_height - i_firstwhite;
+        }
+        else
+        {
+            return;
+        }
+    }
+
+#else
     /* Determine where black borders are */
     switch( p_vout->output.i_chroma )
     {
@@ -487,6 +795,7 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
     {
         return;
     }
+#endif //BEST_AUTOCROP
 
     /* Tune a few values */
     if( i_firstwhite & 1 )
@@ -502,6 +811,11 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
     /* Change size */
     p_vout->p_sys->i_y = i_firstwhite;
     p_vout->p_sys->i_height = i_lastwhite - i_firstwhite + 1;
+#ifdef BEST_AUTOCROP
+    // check p_vout->p_sys->i_height <= p_vout->output.i_height
+    if (p_vout->p_sys->i_height > p_vout->output.i_height)
+        p_vout->p_sys->i_height = p_vout->output.i_height;
+#endif
 
     p_vout->p_sys->i_aspect = p_vout->output.i_aspect
                             * p_vout->output.i_height / p_vout->p_sys->i_height
@@ -544,3 +858,37 @@ static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
     var_Set( p_vout->p_sys->p_vout, psz_var, newval );
     return VLC_SUCCESS;
 }
+
+#ifdef BEST_AUTOCROP
+/*****************************************************************************
+ * FilterCallback: called when changing the ratio on the fly.
+ *****************************************************************************/
+static int FilterCallback( vlc_object_t *p_this, char const *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+
+    if( !strcmp( psz_var, "ratio-crop" ) )
+    {
+        if ( !strcmp( newval.psz_string, "Auto" ) )
+            p_vout->p_sys->i_ratio = 0;
+        else
+        {
+            p_vout->p_sys->i_ratio = (unsigned int)atoi(newval.psz_string);
+            p_vout->p_sys->i_lastchange = p_vout->p_sys->i_time;
+            p_vout->p_sys->b_autocrop = VLC_TRUE;
+        }
+        if (p_vout->p_sys->i_ratio)
+        {
+            if (p_vout->p_sys->i_ratio < (p_vout->output.i_width * 1000) /
+                                    p_vout->output.i_height)
+                p_vout->p_sys->i_ratio = (p_vout->output.i_width * 1000) /
+                                    p_vout->output.i_height;
+            if (p_vout->p_sys->i_ratio < p_vout->output.i_aspect / 432)
+                p_vout->p_sys->i_ratio = p_vout->output.i_aspect / 432;
+        }
+     }
+    return VLC_SUCCESS;
+}
+#endif
