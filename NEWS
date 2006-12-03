@@ -3,6 +3,21 @@ $Id$
 Changes between 0.8.6 and 0.9.0-svn (not released yet)
 -------------------------------------------------------
 
+Important notes:
+----------------
+ * The HTTP interface is now only available on the local machine by default.
+   If you want to make it available from other machines, you will have to
+   edit the ".hosts" file.
+   XXX: DETAILED INSTRUCTIONS HERE :XXX
+ * This version of VLC contains a new interface for Windows and Linux. This
+   interface lacks a few features that used to be present in vlc 0.8.6: 
+   "Streaming wizard" and "VLM control". These features will be replaced
+   by a better alternative in the next version. If you absolutely need these
+   features, we advise you to keep vlc 0.8.6
+
+Changes:
+--------
+
 Playlist:
  * Vastly improved playlist support:
     * Media library support
