@@ -100,11 +100,14 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
 #define META_MATCHES( field ) ( p_item->p_input->p_meta && \
                                 p_item->p_input->p_meta->psz_##field && \
                                 strcasestr( p_item->p_input->p_meta->psz_##field, psz_string ) )
-        if( strcasestr( p_item->p_input->psz_name, psz_string ) ||
-            META_MATCHES( artist ) || META_MATCHES( album ) )
-            p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
         else
-            p_item->i_flags |= PLAYLIST_DBL_FLAG;
+        {
+            if( strcasestr( p_item->p_input->psz_name, psz_string ) ||
+                META_MATCHES( artist ) || META_MATCHES( album ) )
+                p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
+            else
+                p_item->i_flags |= PLAYLIST_DBL_FLAG;
+        }
    }
    vlc_cond_signal( &p_playlist->object_wait );
    return VLC_SUCCESS;
