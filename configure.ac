@@ -313,9 +313,9 @@ AS_IF([test "${nls_cv_force_use_gnu_gettext}" = "yes"], [
   ])
 ], [
   AS_IF([test "${enable_libtool}" != "no"], [
-    VLC_ADD_LDFLAGS([libvlc], [${LTLIBINTL}])
+    VLC_ADD_LDFLAGS([libvlc vlc], [${LTLIBINTL}])
   ], [
-    VLC_ADD_LDFLAGS([libvlc], [${LIBINTL}])
+    VLC_ADD_LDFLAGS([libvlc vlc], [${LIBINTL}])
   ])
 ])
 AC_SUBST(INCLUDED_LIBINTL)
@@ -330,9 +330,9 @@ AS_IF([test "$am_cv_func_iconv" != "yes"],
 fi
 VLC_ADD_CFLAGS([libvlc],[${INCICONV}])
 AS_IF([test "${enable_libtool}" != "no"], [
-  VLC_ADD_LDFLAGS([libvlc],[${LIBICONV}])
+  VLC_ADD_LDFLAGS([libvlc vlc],[${LIBICONV}])
 ],[
-  VLC_ADD_LDFLAGS([libvlc],[${LTLIBICONV}])
+  VLC_ADD_LDFLAGS([libvlc vlc],[${LTLIBICONV}])
 ])
 
 dnl Check for the need to include the mingwex lib for mingw32
