@@ -289,9 +289,6 @@ void ACL_Destroy( vlc_acl_t *p_acl )
     }
 }
 
-#ifndef isblank 
-#   define isblank(c) ((c) == ' ' || (c) == '\t')
-#endif
 
 /**
  * Reads ACL entries from a file.
