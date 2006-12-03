@@ -88,26 +88,6 @@ static int  mms_HeaderMediaRead( access_t *, int );
 static int  mms_ReceivePacket( access_t * );
 
 
-/*
- * XXX DON'T FREE MY MEMORY !!! XXX
- * non mais :P
- */
-/*
- * Ok, ok, j'le ferai plus...
- */
-/*
- * Merci :))
- */
-/*
- * Vous pourriez signer vos commentaires (m�e si on voit bien qui peut
- * �rire ce genre de trucs :p), et �rire en anglais, bordel de
- * merde :p.
- */
-/*
- * Alors la ouai �est fou les gens qui �rivent des commentaires sans les
- * signer. Ca m�iterait un coup de pied dans le cul � :)
- */
-
 int  E_(MMSTUOpen)( access_t *p_access )
 {
     access_sys_t   *p_sys;
@@ -173,6 +153,7 @@ int  E_(MMSTUOpen)( access_t *p_access )
     {
         msg_Err( p_access, "cannot connect to server" );
         vlc_UrlClean( &p_sys->url );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -203,8 +184,7 @@ int  E_(MMSTUOpen)( access_t *p_access )
     if( MMSStart( p_access, 0xffffffff ) < 0 )
     {
         msg_Err( p_access, "cannot start stream" );
-        MMSClose( p_access );
-        vlc_UrlClean( &p_sys->url );
+        E_(MMSTUClose) ( p_access );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
