@@ -171,11 +171,10 @@ case "${host_os}" in
     CFLAGS_save="${CFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS -std=gnu99"; OBJCFLAGS="${OBJCFLAGS_save}"
-    VLC_ADD_LDFLAGS([vlc ffmpeg ffmpegaltivec],[-all_load])
+    VLC_ADD_LDFLAGS([libvlc ffmpeg ffmpegaltivec],[-all_load])
     VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
-    VLC_ADD_CFLAGS([libvlc],[-x objective-c])
-    VLC_ADD_CFLAGS([vlc],[-x objective-c])
-    VLC_ADD_LDFLAGS([vlc],[-Wl,-m -Wl,-multiply_defined -Wl,suppress])
+    VLC_ADD_CFLAGS([libvlc vlc],[-x objective-c])
+    VLC_ADD_LDFLAGS([libvlc vlc],[-Wl,-m -Wl,-multiply_defined -Wl,suppress])
     ;;
   darwin*)
     SYS=darwin
@@ -184,8 +183,7 @@ case "${host_os}" in
     OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS -std=gnu99"; OBJCFLAGS="${OBJCFLAGS_save}"
     VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
-    VLC_ADD_CFLAGS([libvlc],[-x objective-c])
-    VLC_ADD_CFLAGS([vlc],[-x objective-c])
+    VLC_ADD_CFLAGS([libvlc vlc],[-x objective-c])
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
     AC_CHECK_TOOL(WINDRES, windres, :)
@@ -212,15 +210,15 @@ case "${host_os}" in
     if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
-        VLC_ADD_LDFLAGS([vlc],[-lws2_32 -lnetapi32 -lwinmm -mwindows])
+        VLC_ADD_LDFLAGS([libvlc],[-lws2_32 -lnetapi32 -lwinmm -mwindows])
         VLC_ADD_LDFLAGS([cdda vcdx cddax],[-lwinmm])
         VLC_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp access_output_udp sap slp http stream_out_standard stream_out_rtp vod_rtsp telnet netsync growl],[-lws2_32])
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
-        VLC_ADD_CPPFLAGS([vlc],[-Dmain(a,b)=maince(a,b)])
-        VLC_ADD_LDFLAGS([vlc],[-lws2 -e WinMainCRTStartup])
+        VLC_ADD_CPPFLAGS([libvlc vlc],[-Dmain(a,b)=maince(a,b)])
+        VLC_ADD_LDFLAGS([libvlc vlc],[-lws2 -e WinMainCRTStartup])
         VLC_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp access_output_udp sap http netsync],[-lws2])
    fi
     ;;
@@ -242,7 +240,7 @@ case "${host_os}" in
     CFLAGS_save="${CFLAGS_save} -Wno-multichar"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
     VLC_ADD_CXXFLAGS([beos],[])
-    VLC_ADD_LDFLAGS([vlc logger],[-lbe])
+    VLC_ADD_LDFLAGS([vlc libvlc logger],[-lbe])
     VLC_ADD_LDFLAGS([beos],[-lbe -lmedia -ltranslation -ltracker -lgame])
     VLC_ADD_LDFLAGS([dvdnav dvdread],[-ldl])
     VLC_ADD_LDFLAGS([access_file],[-lpoll])
@@ -315,9 +313,9 @@ AS_IF([test "${nls_cv_force_use_gnu_gettext}" = "yes"], [
   ])
 ], [
   AS_IF([test "${enable_libtool}" != "no"], [
-    VLC_ADD_LDFLAGS([vlc], [${LTLIBINTL}])
+    VLC_ADD_LDFLAGS([libvlc], [${LTLIBINTL}])
   ], [
-    VLC_ADD_LDFLAGS([vlc], [${LIBINTL}])
+    VLC_ADD_LDFLAGS([libvlc], [${LIBINTL}])
   ])
 ])
 AC_SUBST(INCLUDED_LIBINTL)
@@ -330,19 +328,19 @@ if test "${SYS}" != "mingwce"; then
 AS_IF([test "$am_cv_func_iconv" != "yes"],
 	[AC_MSG_ERROR([libiconv is needed for VLC to work properly])])
 fi
-VLC_ADD_CFLAGS([vlc],[${INCICONV}])
+VLC_ADD_CFLAGS([libvlc],[${INCICONV}])
 AS_IF([test "${enable_libtool}" != "no"], [
-  VLC_ADD_LDFLAGS([vlc],[${LIBICONV}])
+  VLC_ADD_LDFLAGS([libvlc],[${LIBICONV}])
 ],[
-  VLC_ADD_LDFLAGS([vlc],[${LTLIBICONV}])
+  VLC_ADD_LDFLAGS([libvlc],[${LTLIBICONV}])
 ])
 
 dnl Check for the need to include the mingwex lib for mingw32
 if test "${SYS}" = "mingw32"
 then
     AC_CHECK_LIB(mingwex,opendir,
-        AC_CHECK_LIB(mingw32,opendir,VLC_ADD_LDFLAGS([vlc],[]),
-            [VLC_ADD_LDFLAGS([vlc gtk],[-lmingwex])])
+        AC_CHECK_LIB(mingw32,opendir,VLC_ADD_LDFLAGS([libvlc],[]),
+            [VLC_ADD_LDFLAGS([libvlc gtk],[-lmingwex])])
     )
 fi
 
@@ -444,7 +442,7 @@ fi
 
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
-    VLC_ADD_LDFLAGS([vlc cdda cddax],-lsocket)
+    VLC_ADD_LDFLAGS([libvlc cdda cddax],-lsocket)
     LIBS_socket="-lsocket"
   ])
 ])
@@ -457,7 +455,7 @@ AC_CHECK_FUNCS(send,,[
 
 AC_CHECK_FUNCS(gethostbyname,,[
   AC_CHECK_LIB(nsl,gethostbyname,[
-    VLC_ADD_LDFLAGS([cdda cddax vlc],[-lnsl])
+    VLC_ADD_LDFLAGS([cdda cddax libvlc],[-lnsl])
   ],[
     AC_CHECK_LIB(bind,gethostbyname,[
       VLC_ADD_LDFLAGS([access_mms],[-lbind])
@@ -545,7 +543,7 @@ fi
 
 AC_CHECK_FUNCS(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,[
-    VLC_ADD_LDFLAGS([vlc],[-lresolv])
+    VLC_ADD_LDFLAGS([libvlc],[-lresolv])
   ])
 ])
 
@@ -558,7 +556,7 @@ AC_CHECK_FUNCS(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
 [ # FreeBSD has a gnugetopt library for this:
   AC_CHECK_LIB([gnugetopt],[getopt_long],
     [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support)
-     VLC_ADD_LDFLAGS([vlc],[-lgnugetopt])],
+     VLC_ADD_LDFLAGS([libvlc],[-lgnugetopt])],
     [need_getopt=:])])
 fi
 AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
@@ -599,7 +597,7 @@ if test "${ac_cv_have_plugins}" = "no"; then
    [ac_cv_my_have_shl_load=yes,
     AC_CHECK_LIB(dld, shl_load,
      [ac_cv_my_have_shl_load=yes
-      VLC_ADD_LDFLAGS([vlc],[-ldld])])])
+      VLC_ADD_LDFLAGS([libvlc],[-ldld])])])
   if test "${ac_cv_my_have_shl_load}" = "yes"; then
     AC_DEFINE(HAVE_DL_SHL_LOAD, 1, [Define if you have the shl_load API])
     ac_cv_have_plugins=yes
@@ -609,7 +607,7 @@ fi
 # Whatever style
 if test "${ac_cv_have_plugins}" = "no"; then
   AC_CHECK_LIB(dld, dld_link,
-   [VLC_ADD_LDFLAGS([vlc],[-ldld])
+   [VLC_ADD_LDFLAGS([libvlc],[-ldld])
     AC_DEFINE(HAVE_DL_DLD_LINK, 1, [Define if you have the GNU dld library])
     ac_cv_have_plugins=yes])
 fi
@@ -618,7 +616,7 @@ fi
 if test "${ac_cv_have_plugins}" = "no"; then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
     AC_CHECK_LIB(kernel32, main,
-     [VLC_ADD_LDFLAGS([vlc],[-lkernel32])
+     [VLC_ADD_LDFLAGS([libvlc],[-lkernel32])
       AC_DEFINE(HAVE_DL_WINDOWS, 1, [Define if you have Windows' LoadLibrary])
       ac_cv_have_plugins=yes])
   fi
@@ -648,10 +646,10 @@ if test "${ac_cv_have_plugins}" = "no"; then
     ac_cv_my_have_dlopen=yes,
     AC_CHECK_LIB(dl, dlopen,
       ac_cv_my_have_dlopen=yes
-      VLC_ADD_LDFLAGS([vlc],[-ldl]),
+      VLC_ADD_LDFLAGS([libvlc],[-ldl]),
       AC_CHECK_LIB(svld, dlopen,
         ac_cv_my_have_dlopen=yes
-        VLC_ADD_LDFLAGS([vlc],[-lsvld]))))
+        VLC_ADD_LDFLAGS([libvlc],[-lsvld]))))
   if test "${ac_cv_my_have_dlopen}" = "yes"; then
     AC_DEFINE(HAVE_DL_DLOPEN, 1, [Define if you have the dlopen API])
     ac_cv_have_plugins=yes
@@ -716,24 +714,24 @@ AC_ARG_ENABLE(st,
     fi
 ])
 
-VLC_ADD_LDFLAGS([vlc plugin],[${THREAD_LIB}])
+VLC_ADD_LDFLAGS([libvlc plugin],[${THREAD_LIB}])
 
 dnl Don't link with rt when using GNU-pth
 if test "${THREAD_LIB}" != "-lpth" && test "${THREAD_LIB}" != "-lst"; then
   AC_CHECK_LIB(rt, clock_nanosleep, [
-    VLC_ADD_LDFLAGS([vlc],[-lrt])
+    VLC_ADD_LDFLAGS([libvlc],[-lrt])
     AC_DEFINE(HAVE_CLOCK_NANOSLEEP, 1, [Define to 1 if you have clock_nanosleep.])
   ], [
     dnl HP/UX port
-    AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LDFLAGS([vlc],[-lrt])])
+    AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LDFLAGS([libvlc],[-lrt])])
   ])
 
   have_nanosleep=false
   AC_CHECK_FUNCS(nanosleep,have_nanosleep=:,[
     AC_CHECK_LIB(rt,nanosleep,
-      [VLC_ADD_LDFLAGS([vlc],[-lrt]) have_nanosleep=:],
+      [VLC_ADD_LDFLAGS([libvlc],[-lrt]) have_nanosleep=:],
       [AC_CHECK_LIB(posix4,nanosleep,
-          [VLC_ADD_LDFLAGS([vlc],[-lposix4]) have_nanosleep=:])]
+          [VLC_ADD_LDFLAGS([libvlc],[-lposix4]) have_nanosleep=:])]
     )
   ])
   if ${have_nanosleep}; then
@@ -829,14 +827,14 @@ then
     [ AC_DEFINE( HAVE_HAL_1, [] , [Define if you have the new HAL library API])
       AC_DEFINE( HAVE_HAL, [], [Define if you have the HAL library] )
       VLC_ADD_PLUGINS([hal probe_hal]) 
-      VLC_ADD_LDFLAGS([vlc hal probe_hal],[$HAL_LIBS])
-      VLC_ADD_CFLAGS([vlc hal probe_hal],[$HAL_CFLAGS])],   
+      VLC_ADD_LDFLAGS([libvlc hal probe_hal],[$HAL_LIBS])
+      VLC_ADD_CFLAGS([libvlc hal probe_hal],[$HAL_CFLAGS])],   
     dnl No hal 0.5 Test for 0.2
     [ PKG_CHECK_MODULES( HAL, hal >= 0.2.97, 
        [AC_DEFINE(HAVE_HAL, [], [Define if you have the HAL library])
         VLC_ADD_PLUGINS([hal])
-        VLC_ADD_LDFLAGS([vlc hal],[$HAL_LIBS])
-        VLC_ADD_CFLAGS([vlc hal],[$HAL_CFLAGS])],
+        VLC_ADD_LDFLAGS([libvlc hal],[$HAL_LIBS])
+        VLC_ADD_CFLAGS([libvlc hal],[$HAL_CFLAGS])],
        [AC_MSG_WARN(HAL library not found)])
     ]
   )
@@ -854,8 +852,8 @@ then
       AC_DEFINE( HAVE_DBUS_2, 1, [Define if you have the D-BUS library API >= 0.92] )
       AC_DEFINE( HAVE_DBUS_1, 1, [Define if you have the D-BUS library API >= 0.30] )
       AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
-      VLC_ADD_LDFLAGS([screensaver vlc],[$DBUS_LIBS])
-      VLC_ADD_CFLAGS([screensaver vlc],[$DBUS_CFLAGS])
+      VLC_ADD_LDFLAGS([screensaver libvlc],[$DBUS_LIBS])
+      VLC_ADD_CFLAGS([screensaver libvlc],[$DBUS_CFLAGS])
       dnl Check for dbus control interface
         AC_ARG_ENABLE(dbus-control, [  --enable-dbus-control   D-BUS control interface (default disabled)])
         if test "${enable_dbus_control}" = "yes"
@@ -1274,7 +1272,7 @@ if test "${ac_cv_altivec_inline}" != "no"; then
     VLC_ADD_CFLAGS([motionaltivec],[${ac_cv_altivec_inline}])
     VLC_ADD_CFLAGS([memcpyaltivec],[${ac_cv_altivec_inline}])
     VLC_ADD_CFLAGS([i420_yuy2_altivec],[${ac_cv_altivec_inline}])
-    VLC_ADD_CFLAGS([vlc],[${ac_cv_altivec_inline}])
+    VLC_ADD_CFLAGS([libvlc],[${ac_cv_altivec_inline}])
   fi
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
@@ -1334,7 +1332,7 @@ CPPFLAGS="${CPPFLAGS_save}"
 
 if test "${ac_cv_c_altivec}" != "no"; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C AltiVec extensions.)
-  VLC_ADD_CFLAGS([vlc],[${ac_cv_c_altivec}])
+  VLC_ADD_CFLAGS([libvlc],[${ac_cv_c_altivec}])
   VLC_ADD_CFLAGS([idctaltivec motionaltivec],[${ac_cv_c_altivec}])
   VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
   if test "${ac_cv_altivec_inline}" = "no"; then
@@ -1349,7 +1347,7 @@ AC_CACHE_CHECK([if linker needs -framework vecLib],
      LDFLAGS="${LDFLAGS_save}"
     ])
 if test "${ac_cv_ld_altivec}" != "no"; then
-  VLC_ADD_LDFLAGS([vlc idctaltivec motionaltivec memcpyaltivec],[-framework vecLib])
+  VLC_ADD_LDFLAGS([libvlc idctaltivec motionaltivec memcpyaltivec],[-framework vecLib])
 fi
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
@@ -5458,7 +5456,7 @@ dnl
 if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
 then
     AC_CHECK_LIB(unicows, LoadUnicowsSymbol, [
-        VLC_ADD_LDFLAGS([vlc],[-Wl,--exclude-libs,libunicows.a -lunicows])
+        VLC_ADD_LDFLAGS([vlc libvlc],[-Wl,--exclude-libs,libunicows.a -lunicows])
     ])
 fi
 
@@ -5600,7 +5598,7 @@ VLC_RESTORE_FLAGS
 dnl
 dnl  Create the vlc-config script
 dnl
-LDFLAGS_libvlc="${LDFLAGS_vlc} ${LDFLAGS_builtin}"
+LDFLAGS_libvlc="${LDFLAGS_libvlc} ${LDFLAGS_builtin}"
 for i in `echo "${BUILTINS}" | sed -e 's@[^ ]*/@@g'` ; do LDFLAGS_libvlc="${LDFLAGS_libvlc} ${libdir}/vlc/${i}.a `eval echo '$'{LDFLAGS_${i}}`" ; done
 
 dnl

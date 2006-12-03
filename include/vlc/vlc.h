@@ -148,14 +148,14 @@ struct vlc_list_t
 /*****************************************************************************
  * Required internal headers
  *****************************************************************************/
-#if defined( __VLC__ )
+#if defined( __LIBVLC__ )
 #   include "vlc_common.h"
 #endif
 
 /*****************************************************************************
  * Exported libvlc API
  *****************************************************************************/
-#if !defined( __VLC__ )
+#if !defined( __LIBVLC__ )
 /* Otherwise they are declared and exported in vlc_common.h */
 /**
  * Retrieve libvlc version
@@ -214,7 +214,7 @@ char const * VLC_Changeset ( void );
  */
 char const * VLC_Error ( int i_err );
 
-#endif /* __VLC__ */
+#endif /* __LIBVLC__ */
 
 /**
  * Initialize libvlc

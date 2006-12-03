@@ -193,16 +193,16 @@ while test $# -gt 0; do
     -*)
       usage 1 1>&1
       ;;
-    vlc)
-      cppflags="${cppflags} -D__VLC__ -I${top_builddir}src/misc"
+    libvlc)
+      cppflags="${cppflags} -D__LIBVLC__ -I${top_builddir}src/misc"
       ;;
     plugin)
       echo_plugin=yes
-      cppflags="${cppflags} -D__VLC__ -D__PLUGIN__"
+      cppflags="${cppflags} -D__LIBVLC__ -D__PLUGIN__"
       ;;
     builtin)
       echo_builtin=yes
-      cppflags="${cppflags} -D__VLC__ -D__BUILTIN__"
+      cppflags="${cppflags} -D__LIBVLC__ -D__BUILTIN__"
       ;;
     pic)
       ;;

@@ -124,22 +124,22 @@ endif
 
 libvlc_a_SOURCES = $(SOURCES_libvlc) $(SOURCES_libvlc_control)
 nodist_libvlc_a_SOURCES = misc/version.c
-libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic` -DUSE_BUILTINS
-libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc pic`
-libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc pic`
+libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags libvlc pic` -DUSE_BUILTINS
+libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc pic`
+libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc pic`
 
 libvlc_la_SOURCES = $(SOURCES_libvlc)
 libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
-libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
-libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
-libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
-libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc` \
+libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
+libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
+libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
+libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs libvlc` \
 	-no-undefined -export-symbols libvlc.sym -version-info 1:0:0
 libvlc_la_DEPENDENCIES = libvlc.sym
 
 libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_control_la_LIBADD = libvlc.la
-libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
+libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_control_la_LDFLAGS = \
 	-no-undefined -export-symbols-regex '_?(libvlc|mediacontrol)_.*' \
 	-version-info 0:0:0
@@ -390,7 +390,7 @@ if USE_LIBTOOL
 check_PROGRAMS = test_i18n_atof test_url
 TESTS = $(check_PROGRAMS)
 
-CFLAGS_tests = `$(VLC_CONFIG) --cflags vlc`
+CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
 
 test_i18n_atof_SOURCES = test/i18n_atof.c
 test_i18n_atof_LDADD = libvlc.la

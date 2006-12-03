@@ -30,7 +30,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
 {
     if( psz_modules && *psz_modules )
     {
-        char *psz_parser = psz_modules;
+        const char *psz_parser = psz_modules;
         char *psz_next;
 
         while( psz_parser && *psz_parser )

@@ -1,5 +1,6 @@
 /*****************************************************************************
- * mtime.h: high resolution time management functions
+ * vlc_mtime.h: high resolution time management functions
+ *****************************************************************************
  * This header provides portable high precision time management functions,
  * which should be the only ones used in other segments of the program, since
  * functions like gettimeofday() and ftime() are not always supported.
@@ -27,6 +28,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
+#if !defined( __LIBVLC__ )
+  #error You are not libvlc or one of its plugins. You cannot include this file
+#endif
 
 /*****************************************************************************
  * LAST_MDATE: date which will never happen

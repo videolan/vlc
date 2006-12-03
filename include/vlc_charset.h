@@ -22,6 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if !defined( __LIBVLC__ )
+  #error You are not libvlc or one of its plugins. You cannot include this file
+#endif
+
 #ifndef __VLC_CHARSET_H
 #define __VLC_CHARSET_H 1
 

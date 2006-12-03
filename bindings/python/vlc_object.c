@@ -22,7 +22,11 @@
  *****************************************************************************/
 
 /* We need to access some internal features of VLC */
-#define __VLC__
+/* Gruik ! */
+#define __LIBVLC__
+
+/* Even gruiker ! We access variable_t ! */
+#include "../../src/misc/variables.h"
 
 #include "vlcglue.h"
 

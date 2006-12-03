@@ -30,7 +30,7 @@
 #   include <stdio.h>
 #endif
 
-#ifdef __VLC__
+#ifdef __LIBVLC__
 #   include <vlc/vlc.h>
 #   include <vlc_md5.h>
 #   include "libmp4.h"
@@ -90,7 +90,7 @@ struct aes_s
     uint32_t pp_dec_keys[ AES_KEY_COUNT + 1 ][ 4 ];
 };
 
-#ifdef __VLC__
+#ifdef __LIBVLC__
 # define Digest DigestMD5
 #else
 /*****************************************************************************
@@ -146,7 +146,7 @@ struct drms_s
 static void InitAES       ( struct aes_s *, uint32_t * );
 static void DecryptAES    ( struct aes_s *, uint32_t *, const uint32_t * );
 
-#ifndef __VLC__
+#ifndef __LIBVLC__
 static void InitMD5       ( struct md5_s * );
 static void AddMD5        ( struct md5_s *, const uint8_t *, uint32_t );
 static void EndMD5        ( struct md5_s * );
@@ -504,7 +504,7 @@ static void DecryptAES( struct aes_s *p_aes,
     }
 }
 
-#ifndef __VLC__
+#ifndef __LIBVLC__
 /*****************************************************************************
  * InitMD5: initialise an MD5 message
  *****************************************************************************

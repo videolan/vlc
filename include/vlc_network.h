@@ -1,5 +1,5 @@
 /*****************************************************************************
- * network.h: interface to communicate with network plug-ins
+ * vlc_network.h: interface to communicate with network plug-ins
  *****************************************************************************
  * Copyright (C) 2002-2005 the VideoLAN team
  * $Id$
@@ -22,6 +22,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
+#if !defined( __LIBVLC__ )
+  #error You are not libvlc or one of its plugins. You cannot include this file
+#endif
 
 #ifndef __VLC_NETWORK_H
 # define __VLC_NETWORK_H

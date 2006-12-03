@@ -21,6 +21,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if !defined( __LIBVLC__ )
+  #error You are not libvlc or one of its plugins. You cannot include this file
+#endif
+
 #define KEY_MODIFIER         0xFF000000
 #define KEY_MODIFIER_ALT     0x01000000
 #define KEY_MODIFIER_SHIFT   0x02000000

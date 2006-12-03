@@ -22,6 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if !defined( __LIBVLC__ )
+  #error You are not libvlc or one of its plugins. You cannot include this file
+#endif
+
 struct iso639_lang_t
 {
     const char * psz_eng_name;        /* Description in English */

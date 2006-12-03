@@ -22,7 +22,8 @@
  *****************************************************************************/
 
 /* We need to access some internal features of VLC (for vlc_object) */
-#define __VLC__
+/* This is gruik as we are not libvlc at all */
+#define __LIBVLC__
 
 
 #include "vlcglue.h"

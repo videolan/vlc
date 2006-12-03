@@ -21,7 +21,7 @@ def get_cflags():
         return []
     else:
         cflags=os.popen('%s --cflags' % vlcconfig, 'r').readline().rstrip().split()
-	cflags.append( "-D__VLC__")
+	cflags.append( "-D__LIBVLC__")
         return cflags
 
 def get_ldflags():

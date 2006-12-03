@@ -24,6 +24,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if !defined( __LIBVLC__ )
+  #error You are not libvlc or one of its plugins. You cannot include this file
+#endif
+
+#ifndef _VLC_MESSAGES_H_
+#define _VLC_MESSAGES_H_
+
 #include <stdarg.h>
 
 int vlc_mutex_lock(  vlc_mutex_t * ) ;
@@ -409,3 +416,5 @@ VLC_EXPORT( void,__stats_TimerDump, (vlc_object_t*, unsigned int) );
 VLC_EXPORT( void,__stats_TimersDumpAll, (vlc_object_t*) );
 #define stats_TimersClean(a) __stats_TimersClean( VLC_OBJECT(a) )
 VLC_EXPORT( void, __stats_TimersClean, (vlc_object_t * ) );
+
+#endif

@@ -22,6 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if !defined( __LIBVLC__ )
+  #error You are not libvlc or one of its plugins. You cannot include this file
+#endif
+
 /* __ is need because conflict with <vlc/input.h> */
 #ifndef _VLC__INPUT_H
 #define _VLC__INPUT_H 1
