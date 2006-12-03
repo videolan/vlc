@@ -257,27 +257,29 @@ static const char quotes[] = "\"'";
 /**
  * FindCommandEnd: look for the end of a possibly quoted string
  * @return NULL on mal-formatted string,
- * pointer paste the last character otherwise.
+ * pointer past the last character otherwise.
  */
 static const char *FindCommandEnd (const char *psz_sent)
 {
     const char quote = strchr (quotes, psz_sent[0]) ? psz_sent[0] : 0;
     char c;
 
+    if (quote)
+        psz_sent++; // skip opening quote
+
     while ((c = *psz_sent) != '\0')
     {
         if ((quote == '"') && (c == '\\'))
         {
+            psz_sent++; // move past backslash
             if (*psz_sent == '\0')
                 return NULL; // cannot escape "nothing"
-
-            psz_sent++; // skips escaped character
         }
         else
         if (c == quote) // non-escaped matching quote
             return psz_sent + 1;
         else
-        if (isblank (c)) // non-escaped blank
+        if ((!quote) && isspace(c)) // non-escaped blank
             return psz_sent;
 
         psz_sent++;
@@ -315,23 +317,20 @@ static int Unescape (char *out, const char *in)
         {
             switch (c = *in++)
             {
-                case 'n':
-                    *out++ = '\n';
+                case '"':
+                    *out++ = '"';
                     continue;
 
-                case 't':
-                    *out++ = '\t';
+                case '\\':
+                    *out++ = '\\';
                     continue;
 
-                case 'r':
-                    *out++ = '\r';
-                    continue;
+                case '\0':   // should never happen
+                    *out = '\0';
+                    return -1;
             }
-
-            // Only allow printable ASCII characters
-            // (in particular, no nul nor extended characters)
-            if (c < 32)
-                return -1;
+            /* None of the special cases - copy the backslash */
+            *out++ = '\\';
         }
         *out++ = c;
     }
@@ -359,7 +358,7 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
     {
         const char *psz_temp;
 
-        if(isblank (*psz_command))
+        if(isspace (*psz_command))
         {
             psz_command++;
             continue;
