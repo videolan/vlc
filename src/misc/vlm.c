@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <ctype.h>                                              /* tolower() */
+#include <assert.h>
 
 #ifdef ENABLE_VLM
 
@@ -343,48 +344,50 @@ static int Unescape (char *out, const char *in)
 static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                            vlm_message_t **pp_message )
 {
-    int i_command = 0;
-    char **ppsz_command = NULL;
-    const char *psz_cmd = psz_command;
+    size_t i_command = 0;
+    char buf[strlen (psz_command) + 1], *psz_buf = buf;
+    char *ppsz_command[sizeof (buf) / 2];
     vlm_message_t *p_message = NULL;
-    int i, j;
 
     /* First, parse the line and cut it */
-    while( *psz_cmd != '\0' )
+    while( *psz_command != '\0' )
     {
-        if( *psz_cmd == ' ' || *psz_cmd == '\t' )
+        const char *psz_temp;
+
+        if(isblank (*psz_command))
         {
-            psz_cmd++;
+            psz_command++;
+            continue;
         }
-        else
+
+        /* support for comments */
+        if( i_command == 0 && *psz_command == '#')
         {
-            const char *psz_temp;
-
-            /* support for comments */
-            if( i_command == 0 && *psz_cmd == '#')
-            {
-                p_message = vlm_MessageNew( "", NULL );
-                goto success;
-            }
-
-            psz_temp = FindCommandEnd( psz_cmd );
-
-            if( psz_temp == NULL )
-            {
-                p_message = vlm_MessageNew( "Incomplete command", psz_cmd );
-                goto error;
-            }
-
-            ppsz_command = realloc( ppsz_command, (i_command + 1) *
-                                    sizeof(char*) );
-            ppsz_command[i_command] = strndup (psz_cmd, psz_temp - psz_cmd);
-
-            /* unescape ", ' and \ ... and everything else */
-            Unescape (ppsz_command[i_command], ppsz_command[i_command]);
-
-            i_command++;
-            psz_cmd = psz_temp;
+            p_message = vlm_MessageNew( "", NULL );
+            goto success;
         }
+
+        psz_temp = FindCommandEnd( psz_command );
+
+        if( psz_temp == NULL )
+        {
+            p_message = vlm_MessageNew( "Incomplete command", psz_command );
+            goto error;
+        }
+
+        assert (i_command < (sizeof (ppsz_command) / sizeof (ppsz_command[0])));
+
+        ppsz_command[i_command] = psz_buf;
+        memcpy (psz_buf, psz_command, psz_temp - psz_command);
+        psz_buf[psz_temp - psz_command] = '\0';
+
+        Unescape (psz_buf, psz_buf);
+
+        i_command++;
+        psz_buf += psz_temp - psz_command + 1;
+        psz_command = psz_temp;
+
+        assert (buf + sizeof (buf) >= psz_buf);
     }
 
     /*
@@ -585,7 +588,7 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
         else
         {
             char *psz_command, *psz_arg = 0, *psz_instance = 0;
-            int i_index = 2;
+            size_t i_index = 2;
 
             if( strcmp( ppsz_command[2], "play" ) &&
                 strcmp( ppsz_command[2], "stop" ) &&
@@ -676,7 +679,7 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
     if( !strcmp(ppsz_command[0], "new") ||
         !strcmp(ppsz_command[0], "setup") )
     {
-        int i_command_start = strcmp(ppsz_command[0], "new") ? 2 : 3;
+        size_t i_command_start = strcmp(ppsz_command[0], "new") ? 2 : 3;
         vlm_media_t *p_media;
         vlm_schedule_t *p_schedule;
 
@@ -694,6 +697,8 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
 
         if( p_schedule != NULL )
         {
+            size_t i;
+
             for( i = i_command_start ; i < i_command ; i++ )
             {
                 if( !strcmp( ppsz_command[i], "enabled" ) ||
@@ -706,6 +711,8 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                  * command line */
                 else if( !strcmp( ppsz_command[i], "append" ) )
                 {
+                    size_t j;
+
                     if( ++i >= i_command ) break;
 
                     for( j = i + 1; j < i_command; j++ )
@@ -748,6 +755,8 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
 
         else if( p_media != NULL )
         {
+            size_t i;
+
             for( i = i_command_start ; i < i_command ; i++ )
             {
                 if( !strcmp( ppsz_command[i], "enabled" ) ||
@@ -814,20 +823,14 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
     }
 
 success:
-    for( i = 0 ; i < i_command ; i++ ) FREENULL( ppsz_command[i] );
-    FREENULL( ppsz_command );
     *pp_message = p_message;
-
     return VLC_SUCCESS;
 
 syntax_error:
     p_message = vlm_MessageNew( ppsz_command[0], "Wrong command syntax" );
 
 error:
-    for( i = 0 ; i < i_command ; i++ ) FREENULL( ppsz_command[i] );
-    FREENULL( ppsz_command );
     *pp_message = p_message;
-
     return VLC_EGENERIC;
 }
 
@@ -1642,7 +1645,7 @@ static vlm_message_t *vlm_MessageNew( const char *psz_name,
     vlm_message_t *p_message;
     va_list args;
 
-    if( !psz_name ) return 0;
+    if( !psz_name ) return NULL;
 
     p_message = malloc( sizeof(vlm_message_t) );
     if( !p_message)
@@ -1655,11 +1658,11 @@ static vlm_message_t *vlm_MessageNew( const char *psz_name,
     if( psz_format )
     {
         va_start( args, psz_format );
-        if( vasprintf( &p_message->psz_value, psz_format, args ) < 0 )
+        if( vasprintf( &p_message->psz_value, psz_format, args ) == -1 )
         {
             va_end( args );
             free( p_message );
-            return 0;
+            return NULL;
         }
         va_end( args );
     }
