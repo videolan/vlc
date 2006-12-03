@@ -224,6 +224,10 @@ int         input_DownloadAndCacheArt ( playlist_t *, input_item_t * );
  * Internal prototypes
  ***************************************************************************/
 
+/* input.c */
+#define input_CreateThread2(a,b,c) __input_CreateThread2(VLC_OBJECT(a),b,c)
+input_thread_t *__input_CreateThread2 ( vlc_object_t *, input_item_t *, const char * );
+
 /* var.c */
 void input_ControlVarInit ( input_thread_t * );
 void input_ControlVarClean( input_thread_t * );

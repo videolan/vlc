@@ -1456,7 +1456,7 @@ static void CloseModule( module_handle_t handle )
     FreeLibrary( handle );
 
 #elif defined(HAVE_DL_DLOPEN)
-    dlclose( handle );
+    //dlclose( handle );
 
 #elif defined(HAVE_DL_SHL_LOAD)
     shl_unload( handle );

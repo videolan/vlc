@@ -42,6 +42,7 @@
 #endif
 
 #include <vlc_input.h>
+#include "input_internal.h"
 #include <vlc_stream.h>
 #include <vlc_vlm.h>
 #include <vlc_vod.h>

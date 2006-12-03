@@ -51,8 +51,8 @@
 static  int Run  ( input_thread_t *p_input );
 static  int RunAndClean  ( input_thread_t *p_input );
 
-static input_thread_t * Create  ( vlc_object_t *, input_item_t *, char *,
-                                  vlc_bool_t );
+static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
+                                  const char *, vlc_bool_t );
 static  int             Init    ( input_thread_t *p_input );
 static void             Error   ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
@@ -105,7 +105,7 @@ static void InputMetaUser( input_thread_t *p_input );
  * TODO complete this list (?)
  *****************************************************************************/
 static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
-                               char *psz_header, vlc_bool_t b_quick )
+                               const char *psz_header, vlc_bool_t b_quick )
 {
     input_thread_t *p_input = NULL;                 /* thread descriptor */
     vlc_value_t val;
@@ -272,7 +272,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 /* Gruik ! */
 input_thread_t *__input_CreateThread2( vlc_object_t *p_parent,
                                        input_item_t *p_item,
-                                       char *psz_header )
+                                       const char *psz_header )
 {
     input_thread_t *p_input = NULL;      /* thread descriptor */
 
@@ -290,6 +290,7 @@ input_thread_t *__input_CreateThread2( vlc_object_t *p_parent,
         input_ChangeState( p_input, ERROR_S );
         msg_Err( p_input, "cannot create input thread" );
         vlc_object_detach( p_input );
+        free( p_input->p );
         vlc_object_destroy( p_input );
         return NULL;
     }
@@ -331,6 +332,7 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
             input_ChangeState( p_input, ERROR_S );
             msg_Err( p_input, "cannot create input thread" );
             vlc_object_detach( p_input );
+	    free( p_input->p );
             vlc_object_destroy( p_input );
             return VLC_EGENERIC;
         }
@@ -370,6 +372,7 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
     if( p_input->p->p_es_out ) input_EsOutDelete( p_input->p->p_es_out );
 
     vlc_object_detach( p_input );
+    free( p_input->p );
     vlc_object_destroy( p_input );
 
     return VLC_SUCCESS;
@@ -532,6 +535,7 @@ static int RunAndClean( input_thread_t *p_input )
 
     /* Release memory */
     vlc_object_detach( p_input );
+    free( p_input->p );
     vlc_object_destroy( p_input );
 
     return 0;
