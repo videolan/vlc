@@ -3667,11 +3667,16 @@ if test "${enable_glx}" != "no" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
    test "${enable_glx}" = "yes"); then
   CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
-  AC_CHECK_HEADERS(X11/Xlib.h GL/glu.h GL/glx.h, [
+  AC_CHECK_HEADERS(X11/Xlib.h GL/glu.h GL/glx.h)
+  AC_COMPILE_IFELSE(AC_LANG_PROGRAM(
+    [[#if !defined(HAVE_X11_XLIB_H) || !defined(HAVE_GL_GLU_H) || !defined(HAVE_GL_GLX_H)
+    choke me
+    #endif]]),
+    [
       VLC_ADD_PLUGINS([glx])
       VLC_ADD_LDFLAGS([glx],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lGL -lGLU])
       VLC_ADD_CPPFLAGS([glx],[${X_CFLAGS}])
-   ],[AC_MSG_ERROR([Please install GL development package. Alternatively you can also configure with --disable-glx.])])
+    ],[AC_MSG_ERROR([Please install GL development package. Alternatively you can also configure with --disable-glx.])])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
