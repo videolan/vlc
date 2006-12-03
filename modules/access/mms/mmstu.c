@@ -114,6 +114,7 @@ int  E_(MMSTUOpen)( access_t *p_access )
     {
         msg_Err( p_access, "invalid server name" );
         vlc_UrlClean( &p_sys->url );
+        free( p_sys );
         return VLC_EGENERIC;
     }
     if( p_sys->url.i_port <= 0 )
