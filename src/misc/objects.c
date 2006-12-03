@@ -928,7 +928,7 @@ static void SetAttachment( vlc_object_t *p_this, vlc_bool_t b_attached )
 
 static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 {
-    char psz_children[20], psz_refcount[20], psz_thread[20], psz_name[50];
+    char psz_children[20], psz_refcount[20], psz_thread[30], psz_name[50];
 
     psz_name[0] = '\0';
     if( p_this->psz_object_name )
@@ -963,8 +963,8 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
     psz_thread[0] = '\0';
     if( p_this->b_thread )
     {
-        snprintf( psz_thread, 20, " (thread %d)", (int)p_this->thread_id );
-        psz_thread[19] = '\0';
+        snprintf( psz_thread, 30, " (thread %d)", (int)p_this->thread_id );
+        psz_thread[29] = '\0';
     }
 
     printf( " %so %.8i %s%s%s%s%s\n", psz_prefix,
