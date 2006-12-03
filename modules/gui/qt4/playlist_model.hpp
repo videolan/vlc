@@ -96,7 +96,8 @@ class PLModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    PLModel( playlist_t *, playlist_item_t *, int, QObject *parent = 0);
+    PLModel( playlist_t *, intf_thread_t *,
+             playlist_item_t *, int, QObject *parent = 0);
     ~PLModel();
 
     /* All types of lookups / QModel stuff */
@@ -142,6 +143,7 @@ private:
     PLItem *rootItem;
 
     playlist_t *p_playlist;
+    intf_thread_t *p_intf;
     int i_depth;
 
     static QIcon icons[ITEM_TYPE_NUMBER];

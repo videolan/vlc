@@ -35,10 +35,11 @@ class MediaInfoDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
+    MediaInfoDialog( intf_thread_t *, bool mainInput = false );
     static MediaInfoDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new MediaInfoDialog( p_intf);
+            instance = new MediaInfoDialog( p_intf, true);
         return instance;
     }
     static void killInstance()
@@ -48,12 +49,13 @@ public:
     }
     virtual ~MediaInfoDialog();
     bool need_update;
+    void setInput( input_item_t * );
 private:
-    MediaInfoDialog( intf_thread_t * );
     input_thread_t *p_input;
     InfoTab *IT;
     static MediaInfoDialog *instance;
     int i_runs;
+    bool mainInput;
 public slots:
     void update();
     void close();

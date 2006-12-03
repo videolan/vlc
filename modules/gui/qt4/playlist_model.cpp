@@ -30,6 +30,7 @@
 
 #include "qt4.hpp"
 #include "playlist_model.hpp"
+#include "dialogs/mediainfo.hpp"
 #include <vlc_intf_strings.h>
 
 #include "pixmaps/type_unknown.xpm"
@@ -146,12 +147,13 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
  * Playlist model implementation
  *************************************************************************/
 
-PLModel::PLModel( playlist_t *_p_playlist,
+PLModel::PLModel( playlist_t *_p_playlist, intf_thread_t *_p_intf,
                   playlist_item_t * p_root, int _i_depth, QObject *parent)
                                     : QAbstractItemModel(parent)
 {
     i_depth = _i_depth;
     assert( i_depth == 1 || i_depth == -1 );
+    p_intf = _p_intf;
     p_playlist= _p_playlist;
     i_items_to_append = 0;
     b_need_update     = false;
@@ -880,7 +882,14 @@ void PLModel::popupPlay()
 
 void PLModel::popupInfo()
 {
-    fprintf( stderr, "Popup Info is NOT implemented\n" );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
+                                                    i_popup_item,VLC_TRUE );
+    if( p_item )
+    {
+        MediaInfoDialog *mid = new MediaInfoDialog( p_intf );
+        mid->setInput( p_item->p_input );
+        mid->show();
+    }
 }
 
 void PLModel::popupStream()

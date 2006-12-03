@@ -19,7 +19,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ ******************************************************************************/
 
 #include <QTabWidget>
 #include <QGridLayout>
@@ -36,7 +37,8 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param );
 MediaInfoDialog *MediaInfoDialog::instance = NULL;
 
-MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf ) :QVLCFrame( _p_intf )
+MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput ) :
+                                    QVLCFrame( _p_intf ), mainInput(_mainInput)
 {
     i_runs = 0;
     p_input = NULL;
@@ -51,15 +53,19 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf ) :QVLCFrame( _p_intf )
     layout->addWidget(closeButton,1,2);
 
     BUTTONACT( closeButton, close() );
-    ON_TIMEOUT( update() );
 
-    var_AddCallback( THEPL, "item-change", ItemChanged, this );
+    if( mainInput ) {
+        ON_TIMEOUT( update() );
+        var_AddCallback( THEPL, "item-change", ItemChanged, this );
+    }
     readSettings( "mediainfo" , QSize( 500, 450 ) );
 }
 
 MediaInfoDialog::~MediaInfoDialog()
 {
-    var_DelCallback( THEPL, "item-change", ItemChanged, this );
+    if( mainInput ) {
+        var_DelCallback( THEPL, "item-change", ItemChanged, this );
+    }
     writeSettings( "mediainfo" );
 }
 
@@ -71,13 +77,22 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
+void MediaInfoDialog::setInput(input_item_t *p_input)
+{
+    IT->clear();
+    vlc_mutex_lock( &p_input->lock );
+    IT->update( p_input, true, true );
+    vlc_mutex_unlock( &p_input->lock );
+}
+
 void MediaInfoDialog::update()
 {
     // Timer runs at 150 ms, dont' update more than 2 times per second
     i_runs++;
     if( i_runs % 3 != 0 ) return;
 
-    input_thread_t *p_input = MainInputManager::getInstance( p_intf )->getInput();
+    input_thread_t *p_input =
+             MainInputManager::getInstance( p_intf )->getInput();
     if( !p_input || p_input->b_dead )
     {
         IT->clear();
@@ -97,4 +112,8 @@ void MediaInfoDialog::update()
 void MediaInfoDialog::close()
 {
     this->toggleVisible();
+
+    if( mainInput == false ) {
+        deleteLater();
+    }
 }

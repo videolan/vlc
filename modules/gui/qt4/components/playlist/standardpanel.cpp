@@ -47,7 +47,7 @@ StandardPLPanel::StandardPLPanel( BasePlaylistWidget *_parent,
                                   playlist_item_t *p_root ):
                                   PLPanel( _parent, _p_intf )
 {
-    model = new PLModel( p_playlist, p_root, -1, this );
+    model = new PLModel( p_playlist, p_intf, p_root, -1, this );
     view = new QVLCTreeView( 0 );
     view->setModel(model);
     view->setIconSize( QSize(20,20) );

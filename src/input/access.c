@@ -53,8 +53,16 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
     else
     {
         p_access->psz_path   = strdup( psz_path );
-        p_access->psz_access =
-            b_quick ? strdup( "file" ) : strdup( psz_access );
+        if( b_quick )
+        {
+            if( strstr( psz_path, "file://" ) )
+                p_access->psz_access = strdup( "" );
+            else
+                p_access->psz_access = strdup( "file" );
+        }
+        else
+            p_access->psz_access = strdup( psz_access );
+
         p_access->psz_demux  = strdup( psz_demux );
 
         if( !b_quick )
