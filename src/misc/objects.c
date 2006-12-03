@@ -761,12 +761,14 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
 
             PrintObject( p_object, "" );
 
+            if( !p_object->i_vars )
+                printf( " `-o No variables\n" );
             for( i = 0; i < p_object->i_vars; i++ )
             {
                 variable_t *p_var = p_object->p_vars + i;
 
                 const char *psz_type = "unknown";
-                switch( p_var->i_type & 0x00ff )
+                switch( p_var->i_type & VLC_VAR_TYPE )
                 {
 #define MYCASE( type, nice )                \
                     case VLC_VAR_ ## type:  \
@@ -794,6 +796,8 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                 if( p_var->psz_text )
                     printf( ", %s", p_var->psz_text );
                 printf( ")" );
+                if( p_var->i_type & VLC_VAR_ISCOMMAND )
+                    printf( ", command" );
                 if( p_var->i_entries )
                     printf( ", %d callbacks", p_var->i_entries );
                 switch( p_var->i_type & 0x00f0 )

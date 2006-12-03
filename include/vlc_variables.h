@@ -55,7 +55,6 @@
 
 #define VLC_VAR_ISLIST    0x1000
 #define VLC_VAR_ISCOMMAND 0x2000
-#define VLC_VAR_ISCONFIG  0x2000
 
 /** Creation flag */
 #define VLC_VAR_DOINHERIT 0x8000
