@@ -398,7 +398,7 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "status", Playlist, NULL );
 
     /* marquee on the fly items */
-    var_Create( p_intf, "marq-marquee", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_Create( p_intf, "marq-marquee", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "marq-marquee", Other, NULL );
     var_Create( p_intf, "marq-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "marq-x", Other, NULL );
@@ -440,14 +440,14 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "mosaic-rows", Other, NULL );
     var_Create( p_intf, "mosaic-cols", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "mosaic-cols", Other, NULL );
-    var_Create( p_intf, "mosaic-order", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_Create( p_intf, "mosaic-order", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "mosaic-order", Other, NULL );
     var_Create( p_intf, "mosaic-keep-aspect-ratio",
                      VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "mosaic-keep-aspect-ratio", Other, NULL );
 
     /* logo on the fly items */
-    var_Create( p_intf, "logo-file", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_Create( p_intf, "logo-file", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "logo-file", Other, NULL );
     var_Create( p_intf, "logo-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "logo-x", Other, NULL );
@@ -1515,16 +1515,6 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     /* Parse miscellaneous commands */
-    if( !strcmp( psz_cmd, "marq-marquee" ) )
-    {
-        var_SetString( p_input->p_libvlc_global, "marq-marquee", newval.psz_string );
-    }
-    else
-    if( strlen( newval.psz_string ) == 0)
-    {
-        /* All the variable above expects strlen > 0 */
-    }
-    else
     {
         static const char vars[] =
             "marq-x\0" "marq-y\0" "marq-position\0" "marq-color\0"
@@ -1536,19 +1526,34 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
             "mosaic-offsets\0" "mosaic-keep-aspect-ratio\0"
             "logo-file\0" "logo-x\0" "logo-y\0" "logo-position\0"
             "logo-transparency\0";
-        const char *name;
+        const char *psz_name;
 
-        for (name = vars; *name; name += strlen (name) + 1)
+        for( psz_name = vars; *psz_name; psz_name += strlen( psz_name ) + 1 )
         {
-            if (strcmp (name, psz_cmd) == 0)
+            if( strcmp( psz_name, psz_cmd ) == 0 )
             {
-                val.i_int = atoi (newval.psz_string);
-                var_Set (p_input->p_libvlc_global, name, val);
-                break;
+                switch( var_Type( p_input->p_libvlc_global, psz_name ) )
+                {
+                    case VLC_VAR_INTEGER:
+                        if( !strlen( newval.psz_string ) ) break;
+                        var_SetInteger( p_input->p_libvlc_global, psz_name,
+                                        atoi( newval.psz_string ) );
+                        break;
+
+                    case VLC_VAR_STRING:
+                        if( !strlen( newval.psz_string ) ) break;
+                        var_SetInteger( p_input->p_libvlc_global, psz_name,
+                                        newval.psz_string );
+                        break;
+
+                    default:
+                        msg_Err( p_intf, "unknown variable type" );
+                        break;
+                }
             }
         }
 
-        if (*name == '\0')
+        if( *psz_name == '\0' )
             msg_rc( "Unknown command!" );
     }
 
