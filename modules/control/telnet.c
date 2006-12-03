@@ -126,31 +126,31 @@ struct intf_sys_t
    vlm_t           *mediatheque;
 };
 
-/* 
+/*
  * getPort: Decide which port to use. There are two possibilities to
  * specify a port: integrated in the --telnet-host option with :PORT
  * or using the --telnet-port option. The --telnet-port option has
- * precedence. 
- * This code relies upon the fact the url.i_port is 0 if the :PORT 
+ * precedence.
+ * This code relies upon the fact the url.i_port is 0 if the :PORT
  * option is missing from --telnet-host.
  */
 static int getPort(intf_thread_t *p_intf, vlc_url_t url, int i_port)
 {
     // Print error if two different ports have been specified
     if (url.i_port != 0  &&
-        i_port != TELNETPORT_DEFAULT && 
+        i_port != TELNETPORT_DEFAULT &&
         url.i_port != i_port )
     {
-	    msg_Err( p_intf, "ignoring port %d and using %d", url.i_port,
+        msg_Err( p_intf, "ignoring port %d and using %d", url.i_port,
                  i_port);
     }
     if (i_port != TELNETPORT_DEFAULT)
     {
-	    return i_port;
+        return i_port;
     }
     if (url.i_port != 0)
     {
- 	    return url.i_port;
+         return url.i_port;
     }
     return i_port;
 }
@@ -193,7 +193,7 @@ static int Open( vlc_object_t *p_this )
         free( p_intf->p_sys );
         return VLC_EGENERIC;
     }
-    msg_Info( p_intf, 
+    msg_Info( p_intf,
               "telnet interface started on interface %s %d",
               url.psz_host, url.i_port );
 
@@ -444,8 +444,19 @@ static void Run( intf_thread_t *p_intf )
 
                     vlm_ExecuteCommand( p_sys->mediatheque, cl->buffer_read,
                                         &message );
+                    if( !strncmp( cl->buffer_read, "help", 4 ) )
+                    {
+                        vlm_message_t *p_my_help =
+                            vlm_MessageNew( "Telnet Specific Commands:", NULL );
+                        vlm_MessageAdd( p_my_help,
+                            vlm_MessageNew( "logout, quit, exit" , NULL ) );
+                        vlm_MessageAdd( p_my_help,
+                            vlm_MessageNew( "shutdown" , NULL ) );
+                        vlm_MessageAdd( message, p_my_help );
+                    }
                     Write_message( cl, message, NULL, WRITE_MODE_CMD );
                     vlm_MessageDelete( message );
+
                 }
             }
         }
