@@ -188,6 +188,8 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         var_AddCallback( p_new, "list", DumpCommand, NULL );
         var_Create( p_new, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
         var_AddCallback( p_new, "tree", DumpCommand, NULL );
+        var_Create( p_new, "vars", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+        var_AddCallback( p_new, "vars", DumpCommand, NULL );
     }
 
     return p_new;
@@ -699,42 +701,11 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    if( *psz_cmd == 't' )
+    if( *psz_cmd == 'l' )
     {
-        char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
-        vlc_object_t *p_object;
-
-        if( *newval.psz_string )
-        {
-            p_object = vlc_object_get( p_this, atoi(newval.psz_string) );
-
-            if( !p_object )
-            {
-                return VLC_ENOOBJ;
-            }
-        }
-        else
-        {
-            p_object = p_this->p_libvlc ? VLC_OBJECT(p_this->p_libvlc) : p_this;
-        }
-
         vlc_mutex_lock( &structure_lock );
 
-        psz_foo[0] = '|';
-        DumpStructure( p_object, 0, psz_foo );
-
-        vlc_mutex_unlock( &structure_lock );
-
-        if( *newval.psz_string )
-        {
-            vlc_object_release( p_this );
-        }
-    }
-    else if( *psz_cmd == 'l' )
-    {
         vlc_object_t **pp_current, **pp_end;
-
-        vlc_mutex_lock( &structure_lock );
 
         pp_current = p_this->p_libvlc_global->pp_objects;
         pp_end = pp_current + p_this->p_libvlc_global->i_objects;
@@ -754,6 +725,111 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
         }
 
         vlc_mutex_unlock( &structure_lock );
+    }
+    else
+    {
+        vlc_object_t *p_object = NULL;
+
+        if( *newval.psz_string )
+        {
+            p_object = vlc_object_get( p_this, atoi(newval.psz_string) );
+
+            if( !p_object )
+            {
+                return VLC_ENOOBJ;
+            }
+        }
+
+        vlc_mutex_lock( &structure_lock );
+
+        if( *psz_cmd == 't' )
+        {
+            char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
+
+            if( !p_object )
+                p_object = p_this->p_libvlc ? VLC_OBJECT(p_this->p_libvlc) : p_this;
+
+            psz_foo[0] = '|';
+            DumpStructure( p_object, 0, psz_foo );
+        }
+        else if( *psz_cmd == 'v' )
+        {
+            int i;
+
+            if( !p_object )
+                p_object = p_this->p_libvlc ? VLC_OBJECT(p_this->p_libvlc) : p_this;
+
+            PrintObject( p_object, "" );
+
+            for( i = 0; i < p_object->i_vars; i++ )
+            {
+                variable_t *p_var = p_object->p_vars + i;
+
+                const char *psz_type = "unknown";
+                switch( p_var->i_type & 0x00ff )
+                {
+#define MYCASE( type, nice )                \
+                    case VLC_VAR_ ## type:  \
+                        psz_type = nice;    \
+                        break;
+                    MYCASE( VOID, "void" );
+                    MYCASE( BOOL, "bool" );
+                    MYCASE( INTEGER, "integer" );
+                    MYCASE( HOTKEY, "hotkey" );
+                    MYCASE( STRING, "string" );
+                    MYCASE( MODULE, "module" );
+                    MYCASE( FILE, "file" );
+                    MYCASE( DIRECTORY, "directory" );
+                    MYCASE( VARIABLE, "variable" );
+                    MYCASE( FLOAT, "float" );
+                    MYCASE( TIME, "time" );
+                    MYCASE( ADDRESS, "address" );
+                    MYCASE( MUTEX, "mutex" );
+                    MYCASE( LIST, "list" );
+#undef MYCASE
+                }
+                printf( " %c-o \"%s\" (%s), %d callbacks: ",
+                        i + 1 == p_object->i_vars ? '`' : '|',
+                        p_var->psz_name, psz_type,
+                        p_var->i_entries );
+                switch( p_var->i_type & 0x00f0 )
+                {
+                    case VLC_VAR_VOID:
+                    case VLC_VAR_MUTEX:
+                        printf( "not available" );
+                        break;
+                    case VLC_VAR_BOOL:
+                        printf( p_var->val.b_bool ? "true" : "false" );
+                        break;
+                    case VLC_VAR_INTEGER:
+                        printf( "%d", p_var->val.i_int );
+                        break;
+                    case VLC_VAR_STRING:
+                        printf( "%s", p_var->val.psz_string );
+                        break;
+                    case VLC_VAR_FLOAT:
+                        printf( "%f", p_var->val.f_float );
+                        break;
+                    case VLC_VAR_TIME:
+                        printf( I64Fi, p_var->val.i_time );
+                        break;
+                    case VLC_VAR_ADDRESS:
+                        printf( "%p", p_var->val.p_address );
+                        break;
+                    case VLC_VAR_LIST:
+                        printf( "TODO" );
+                        break;
+                }
+                printf( "\n" );
+            }
+        }
+
+        vlc_mutex_unlock( &structure_lock );
+
+        if( *newval.psz_string )
+        {
+            vlc_object_release( p_this );
+        }
     }
 
     return VLC_SUCCESS;
@@ -971,6 +1047,7 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
         psz_thread[29] = '\0';
     }
 
+    psz_parent[0] = '\0';
     if( p_this->p_parent )
     {
         snprintf( psz_parent, 20, ", parent %i", p_this->p_parent->i_object_id );
