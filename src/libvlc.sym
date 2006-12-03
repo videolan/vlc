@@ -389,6 +389,8 @@ vlm_MediaSearch
 vlm_MediaSetup
 vlm_MediaVodControl
 vlm_MessageDelete
+vlm_MessageNew
+vlm_MessageAdd
 __vlm_New
 vlm_Save
 vlm_ScheduleDelete
