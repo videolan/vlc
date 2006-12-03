@@ -222,8 +222,7 @@ static int Activate( vlc_object_t *p_this )
     {
         int i_socket, i_overwrite;
 
-	i_overwrite = config_GetInt( p_intf, "rc-overwrite" );
-
+        i_overwrite = config_GetInt( p_intf, "rc-overwrite" );
 
 #if !defined(AF_LOCAL) || defined(WIN32)
         msg_Warn( p_intf, "your OS doesn't support filesystem sockets" );
@@ -365,158 +364,94 @@ static void Deactivate( vlc_object_t *p_this )
 static void RegisterCallbacks( intf_thread_t *p_intf )
 {
     /* Register commands that will be cleaned up upon object destruction */
-    var_Create( p_intf, "quit", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "quit", Quit, NULL );
-    var_Create( p_intf, "intf", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "intf", Intf, NULL );
+#define ADD( name, type, target )                                   \
+    var_Create( p_intf, name, VLC_VAR_ ## type | VLC_VAR_ISCOMMAND ); \
+    var_AddCallback( p_intf, name, target, NULL );
+    ADD( "quit", VOID, Quit )
+    ADD( "intf", STRING, Intf )
 
-    var_Create( p_intf, "add", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "add", Playlist, NULL );
-    var_Create( p_intf, "repeat", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "repeat", Playlist, NULL );
-    var_Create( p_intf, "loop", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "loop", Playlist, NULL );
-    var_Create( p_intf, "enqueue", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "enqueue", Playlist, NULL );
-    var_Create( p_intf, "playlist", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "playlist", Playlist, NULL );
-    var_Create( p_intf, "sort", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "sort", Playlist, NULL );
-    var_Create( p_intf, "play", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "play", Playlist, NULL );
-    var_Create( p_intf, "stop", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "stop", Playlist, NULL );
-    var_Create( p_intf, "clear", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "clear", Playlist, NULL );
-    var_Create( p_intf, "prev", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "prev", Playlist, NULL );
-    var_Create( p_intf, "next", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "next", Playlist, NULL );
-    var_Create( p_intf, "goto", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "goto", Playlist, NULL );
-    var_Create( p_intf, "status", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "status", Playlist, NULL );
+    ADD( "add", STRING, Playlist )
+    ADD( "repeat", STRING, Playlist )
+    ADD( "loop", STRING, Playlist )
+    ADD( "enqueue", STRING, Playlist )
+    ADD( "playlist", VOID, Playlist )
+    ADD( "sort", VOID, Playlist )
+    ADD( "play", VOID, Playlist )
+    ADD( "stop", VOID, Playlist )
+    ADD( "clear", VOID, Playlist )
+    ADD( "prev", VOID, Playlist )
+    ADD( "next", VOID, Playlist )
+    ADD( "goto", INTEGER, Playlist )
+    ADD( "status", INTEGER, Playlist )
 
     /* marquee on the fly items */
-    var_Create( p_intf, "marq-marquee", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-marquee", Other, NULL );
-    var_Create( p_intf, "marq-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-x", Other, NULL );
-    var_Create( p_intf, "marq-y", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-y", Other, NULL );
-    var_Create( p_intf, "marq-position", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-position", Other, NULL );
-    var_Create( p_intf, "marq-color", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-color", Other, NULL );
-    var_Create( p_intf, "marq-opacity", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-opacity", Other, NULL );
-    var_Create( p_intf, "marq-timeout", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-timeout", Other, NULL );
-    var_Create( p_intf, "marq-size", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-size", Other, NULL );
+    ADD( "marq-marquee", STRING, Other )
+    ADD( "marq-x", INTEGER, Other )
+    ADD( "marq-y", INTEGER, Other )
+    ADD( "marq-position", INTEGER, Other )
+    ADD( "marq-color", INTEGER, Other )
+    ADD( "marq-opacity", INTEGER, Other )
+    ADD( "marq-timeout", INTEGER, Other )
+    ADD( "marq-size", INTEGER, Other )
 
-    var_Create( p_intf, "mosaic-alpha", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-alpha", Other, NULL );
-    var_Create( p_intf, "mosaic-height", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-height", Other, NULL );
-    var_Create( p_intf, "mosaic-width", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-width", Other, NULL );
-    var_Create( p_intf, "mosaic-xoffset", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-xoffset", Other, NULL );
-    var_Create( p_intf, "mosaic-yoffset", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-yoffset", Other, NULL );
-    var_Create( p_intf, "mosaic-offsets", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-offsets", Other, NULL );
-    var_Create( p_intf, "mosaic-align", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-align", Other, NULL );
-    var_Create( p_intf, "mosaic-vborder", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-vborder", Other, NULL );
-    var_Create( p_intf, "mosaic-hborder", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-hborder", Other, NULL );
-    var_Create( p_intf, "mosaic-position",
-                     VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-position", Other, NULL );
-    var_Create( p_intf, "mosaic-rows", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-rows", Other, NULL );
-    var_Create( p_intf, "mosaic-cols", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-cols", Other, NULL );
-    var_Create( p_intf, "mosaic-order", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-order", Other, NULL );
-    var_Create( p_intf, "mosaic-keep-aspect-ratio",
-                     VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "mosaic-keep-aspect-ratio", Other, NULL );
+    ADD( "mosaic-alpha", INTEGER, Other )
+    ADD( "mosaic-height", INTEGER, Other )
+    ADD( "mosaic-width", INTEGER, Other )
+    ADD( "mosaic-xoffset", INTEGER, Other )
+    ADD( "mosaic-yoffset", INTEGER, Other )
+    ADD( "mosaic-offsets", STRING, Other )
+    ADD( "mosaic-align", INTEGER, Other )
+    ADD( "mosaic-vborder", INTEGER, Other )
+    ADD( "mosaic-hborder", INTEGER, Other )
+    ADD( "mosaic-position", INTEGER, Other )
+    ADD( "mosaic-rows", INTEGER, Other )
+    ADD( "mosaic-cols", INTEGER, Other )
+    ADD( "mosaic-order", STRING, Other )
+    ADD( "mosaic-keep-aspect-ratio", INTEGER, Other )
 
     /* logo on the fly items */
-    var_Create( p_intf, "logo-file", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "logo-file", Other, NULL );
-    var_Create( p_intf, "logo-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "logo-x", Other, NULL );
-    var_Create( p_intf, "logo-y", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "logo-y", Other, NULL );
-    var_Create( p_intf, "logo-position", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "logo-position", Other, NULL );
-    var_Create( p_intf, "logo-transparency", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "logo-transparency", Other, NULL );
+    ADD( "logo-file", STRING, Other )
+    ADD( "logo-x", INTEGER, Other )
+    ADD( "logo-y", INTEGER, Other )
+    ADD( "logo-position", INTEGER, Other )
+    ADD( "logo-transparency", INTEGER, Other )
 
     /* OSD menu commands */
-    var_Create( p_intf, "menu", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "menu", Menu, NULL );
+    ADD(  "menu", STRING, Menu )
 
     /* DVD commands */
-    var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "pause", Input, NULL );
-    var_Create( p_intf, "seek", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "seek", Input, NULL );
-    var_Create( p_intf, "title", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "title", Input, NULL );
-    var_Create( p_intf, "title_n", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "title_n", Input, NULL );
-    var_Create( p_intf, "title_p", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "title_p", Input, NULL );
-    var_Create( p_intf, "chapter", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "chapter", Input, NULL );
-    var_Create( p_intf, "chapter_n", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "chapter_n", Input, NULL );
-    var_Create( p_intf, "chapter_p", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "chapter_p", Input, NULL );
+    ADD( "pause", VOID, Input )
+    ADD( "seek", INTEGER, Input )
+    ADD( "title", STRING, Input )
+    ADD( "title_n", VOID, Input )
+    ADD( "title_p", VOID, Input )
+    ADD( "chapter", STRING, Input )
+    ADD( "chapter_n", VOID, Input )
+    ADD( "chapter_p", VOID, Input )
 
-    var_Create( p_intf, "fastforward", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "fastforward", Input, NULL );
-    var_Create( p_intf, "rewind", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "rewind", Input, NULL );
-    var_Create( p_intf, "faster", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "faster", Input, NULL );
-    var_Create( p_intf, "slower", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "slower", Input, NULL );
-    var_Create( p_intf, "normal", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "normal", Input, NULL );
+    ADD( "fastforward", VOID, Input )
+    ADD( "rewind", VOID, Input )
+    ADD( "faster", VOID, Input )
+    ADD( "slower", VOID, Input )
+    ADD( "normal", VOID, Input )
 
-    var_Create( p_intf, "atrack", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "atrack", Input, NULL );
-    var_Create( p_intf, "vtrack", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "vtrack", Input, NULL );
-    var_Create( p_intf, "strack", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "strack", Input, NULL );
+    ADD( "atrack", STRING, Input )
+    ADD( "vtrack", STRING, Input )
+    ADD( "strack", STRING, Input )
 
     /* video commands */
-    var_Create( p_intf, "vratio", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "vratio", VideoConfig, NULL );
-    var_Create( p_intf, "vcrop", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "vcrop", VideoConfig, NULL );
-    var_Create( p_intf, "vzoom", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "vzoom", VideoConfig, NULL );
+    ADD( "vratio", STRING, VideoConfig )
+    ADD( "vcrop", STRING, VideoConfig )
+    ADD( "vzoom", STRING, VideoConfig )
 
     /* audio commands */
-    var_Create( p_intf, "volume", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "volume", Volume, NULL );
-    var_Create( p_intf, "volup", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "volup", VolumeMove, NULL );
-    var_Create( p_intf, "voldown", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "voldown", VolumeMove, NULL );
-    var_Create( p_intf, "adev", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "adev", AudioConfig, NULL );
-    var_Create( p_intf, "achan", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "achan", AudioConfig, NULL );
+    ADD( "volume", STRING, Volume )
+    ADD( "volup", STRING, VolumeMove )
+    ADD( "voldown", STRING, VolumeMove )
+    ADD( "adev", STRING, AudioConfig )
+    ADD( "achan", STRING, AudioConfig )
+
+#undef ADD
 }
 
 /*****************************************************************************
