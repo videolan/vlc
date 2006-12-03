@@ -444,6 +444,7 @@ static int open_file (access_t *p_access, const char *psz_name)
     fseek( p_sys->fd, 0, SEEK_SET );
 #else
     int fd = utf8_open (path, O_RDONLY | O_NONBLOCK /* O_LARGEFILE*/, 0666);
+    free (path);
     if (fd == -1)
     {
         msg_Err (p_access, "cannot open file %s (%s)", psz_name,
