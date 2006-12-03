@@ -53,7 +53,6 @@
 #define VLC_VAR_HASMAX    0x0400
 #define VLC_VAR_HASSTEP   0x0800
 
-#define VLC_VAR_ISLIST    0x1000
 #define VLC_VAR_ISCOMMAND 0x2000
 
 /** Creation flag */
