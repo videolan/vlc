@@ -91,9 +91,9 @@ endif
 #
 # cross compiling
 #
-HOSTCONF=--target=$(HOST) --host=$(HOST) --build=$(BUILD)
+#This should be inside the if block but some config scripts are buggy
+HOSTCONF=--target=$(HOST) --host=$(HOST) --build=$(BUILD) --program-prefix=""
 ifneq ($(BUILD),$(HOST))
-    HOSTCONF+=--program-prefix=""
     #
     # Compiling for MinGW under Cygwin could be deemed as cross compiling
     # unfortunately there isn't a complete separate GCC toolchain for MinGW under Cygwin
