@@ -531,14 +531,17 @@ static void Run( intf_thread_t *p_intf )
             {
                 if( !p_input->b_dead || !p_input->b_die )
                 {
-                    msg_rc( STATUS_CHANGE "( new input: %s )", input_GetItem(p_input)->psz_uri );
-                    msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_intf, "volume" ));
+                    msg_rc( STATUS_CHANGE "( new input: %s )",
+                            input_GetItem(p_input)->psz_uri );
+                    msg_rc( STATUS_CHANGE "( audio volume: %d )",
+                            config_GetInt( p_intf, "volume" ));
                 }
                 var_AddCallback( p_input, "state", StateChanged, p_intf );
                 var_AddCallback( p_input, "rate-faster", RateChanged, p_intf );
                 var_AddCallback( p_input, "rate-slower", RateChanged, p_intf );
                 var_AddCallback( p_input, "rate", RateChanged, p_intf );
-                var_AddCallback( p_input, "time-offset", TimeOffsetChanged, p_intf );
+                var_AddCallback( p_input, "time-offset", TimeOffsetChanged,
+                                 p_intf );
             }
         }
         else if( p_input->b_dead )
@@ -547,7 +550,8 @@ static void Run( intf_thread_t *p_intf )
             var_DelCallback( p_input, "rate-faster", RateChanged, p_intf );
             var_DelCallback( p_input, "rate-slower", RateChanged, p_intf );
             var_DelCallback( p_input, "rate", RateChanged, p_intf );
-            var_DelCallback( p_input, "time-offset", TimeOffsetChanged, p_intf );
+            var_DelCallback( p_input, "time-offset", TimeOffsetChanged,
+                             p_intf );
             vlc_object_release( p_input );
             p_input = NULL;
 
@@ -570,13 +574,15 @@ static void Run( intf_thread_t *p_intf )
                 p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
                 msg_rc( STATUS_CHANGE "( stop state: 0 )" );
             }
-            else if( (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
+            else if(
+                (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
                 (p_playlist->status.i_status == PLAYLIST_RUNNING) )
             {
                 p_intf->p_sys->i_last_state = p_playlist->status.i_status;
                 msg_rc( STATUS_CHANGE "( play state: 1 )" );
             }
-            else if( (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
+            else if(
+                (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
                 (p_playlist->status.i_status == PLAYLIST_PAUSED) )
             {
                 p_intf->p_sys->i_last_state = p_playlist->status.i_status;
@@ -764,17 +770,20 @@ static void Run( intf_thread_t *p_intf )
                     vlc_bool_t b_update = VLC_FALSE;
                     var_Get( p_vout, "fullscreen", &val );
                     val.b_bool = !val.b_bool;
-                    if( !strncmp(psz_arg, "on", 2) && (val.b_bool == VLC_TRUE) )
+                    if( !strncmp( psz_arg, "on", 2 )
+                        && ( val.b_bool == VLC_TRUE ) )
                     {
                         b_update = VLC_TRUE;
                         val.b_bool = VLC_TRUE;
                     }
-                    else if( !strncmp(psz_arg, "off", 3)  && (val.b_bool == VLC_FALSE) )
+                    else if( !strncmp( psz_arg, "off", 3 )
+                             && ( val.b_bool == VLC_FALSE ) )
                     {
                         b_update = VLC_TRUE;
                         val.b_bool = VLC_FALSE;
                     }
-                    else if( strncmp(psz_arg, "off", 3) && strncmp(psz_arg, "on", 2) )
+                    else if( strncmp( psz_arg, "off", 3 )
+                             && strncmp( psz_arg, "on", 2 ) )
                         b_update = VLC_TRUE;
                     if( b_update ) var_Set( p_vout, "fullscreen", val );
                     vlc_object_release( p_vout );
@@ -931,7 +940,8 @@ static int TimeOffsetChanged( vlc_object_t *p_this, char const *psz_cmd,
     p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input )
     {
-        msg_rc( STATUS_CHANGE "( time-offset: %d )", var_GetInteger( p_input, "time-offset" ) );
+        msg_rc( STATUS_CHANGE "( time-offset: %d )",
+                var_GetInteger( p_input, "time-offset" ) );
         vlc_object_release( p_input );
     }
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
@@ -944,7 +954,8 @@ static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
 
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
-    msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_this, "volume") );
+    msg_rc( STATUS_CHANGE "( audio volume: %d )",
+            config_GetInt( p_this, "volume") );
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
     return VLC_SUCCESS;
 }
@@ -998,7 +1009,8 @@ static int RateChanged( vlc_object_t *p_this, char const *psz_cmd,
     p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input )
     {
-        msg_rc( STATUS_CHANGE "( new rate: %d )", var_GetInteger( p_input, "rate" ) );
+        msg_rc( STATUS_CHANGE "( new rate: %d )",
+                var_GetInteger( p_input, "rate" ) );
         vlc_object_release( p_input );
     }
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
@@ -1373,7 +1385,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "sort" ))
     {
-        playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_onelevel, 
+        playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_onelevel,
                                     SORT_ARTIST, ORDER_NORMAL );
     }
     else if( !strcmp( psz_cmd, "status" ) )
@@ -1381,8 +1393,10 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( p_playlist->p_input )
         {
             /* Replay the current state of the system. */
-            msg_rc( STATUS_CHANGE "( new input: %s )", input_GetItem(p_playlist->p_input)->psz_uri );
-            msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_intf, "volume" ));
+            msg_rc( STATUS_CHANGE "( new input: %s )",
+                    input_GetItem(p_playlist->p_input)->psz_uri );
+            msg_rc( STATUS_CHANGE "( audio volume: %d )",
+                    config_GetInt( p_intf, "volume" ));
 
             vlc_mutex_lock( &p_playlist->object_lock );
             switch( p_playlist->status.i_status )
@@ -1467,23 +1481,19 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         {
             if( strcmp( psz_name, psz_cmd ) == 0 )
             {
-                switch( var_Type( p_input->p_libvlc_global, psz_name ) )
+                int i_type = var_Type( p_input->p_libvlc_global, psz_name );
+
+                if( i_type & VLC_VAR_INTEGER )
                 {
-                    case VLC_VAR_INTEGER:
-                        if( !strlen( newval.psz_string ) ) break;
-                        var_SetInteger( p_input->p_libvlc_global, psz_name,
-                                        atoi( newval.psz_string ) );
-                        break;
-
-                    case VLC_VAR_STRING:
-                        if( !strlen( newval.psz_string ) ) break;
-                        var_SetInteger( p_input->p_libvlc_global, psz_name,
-                                        newval.psz_string );
-                        break;
-
-                    default:
-                        msg_Err( p_intf, "unknown variable type" );
-                        break;
+                    if( !strlen( newval.psz_string ) ) break;
+                    var_SetInteger( p_input->p_libvlc_global, psz_name,
+                                    atoi( newval.psz_string ) );
+                }
+                else if( i_type & VLC_VAR_STRING )
+                {
+                    if( !strlen( newval.psz_string ) ) break;
+                    var_SetInteger( p_input->p_libvlc_global, psz_name,
+                                    newval.psz_string );
                 }
             }
         }
