@@ -436,7 +436,7 @@ Section "Desktop Shortcut" SEC02b
     "$INSTDIR\vlc.exe" ""
 SectionEnd
 
-Section /o "Mozilla plugin" SEC03
+Section "Mozilla plugin" SEC03
   SectionIn 1 3
 
   !insertmacro OpenUninstallLog
@@ -480,7 +480,7 @@ Section /o "Mozilla plugin" SEC03
 
 SectionEnd
 
-Section /o "ActiveX plugin" SEC04
+Section "ActiveX plugin" SEC04
   SectionIn 1 3
   SetOutPath "$INSTDIR"
   !insertmacro OpenUninstallLog
@@ -705,7 +705,7 @@ Section "Uninstall" SEC91
   SetAutoClose true
 SectionEnd
 
-Section /o "un.Delete preferences and cache" SEC92
+Section "un.Delete preferences and cache" SEC92
   SectionIn 1 3
   !insertmacro delprefs
 SectionEnd
