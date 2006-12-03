@@ -928,14 +928,18 @@ static void SetAttachment( vlc_object_t *p_this, vlc_bool_t b_attached )
 
 static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 {
-    char psz_children[20], psz_refcount[20], psz_thread[30], psz_name[50];
+    char psz_children[20], psz_refcount[20], psz_thread[30], psz_name[50],
+         psz_parent[20];
 
     psz_name[0] = '\0';
     if( p_this->psz_object_name )
     {
         snprintf( psz_name, 50, " \"%s\"", p_this->psz_object_name );
-        psz_name[48] = '\"';
-        psz_name[49] = '\0';
+        if( psz_name[48] )
+        {
+            psz_name[48] = '\"';
+            psz_name[49] = '\0';
+        }
     }
 
     psz_children[0] = '\0';
@@ -967,9 +971,16 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
         psz_thread[29] = '\0';
     }
 
-    printf( " %so %.8i %s%s%s%s%s\n", psz_prefix,
+    if( p_this->p_parent )
+    {
+        snprintf( psz_parent, 20, ", parent %i", p_this->p_parent->i_object_id );
+        psz_parent[19] = '\0';
+    }
+
+    printf( " %so %.8i %s%s%s%s%s%s\n", psz_prefix,
             p_this->i_object_id, p_this->psz_object_type,
-            psz_name, psz_thread, psz_refcount, psz_children );
+            psz_name, psz_thread, psz_refcount, psz_children,
+            psz_parent );
 }
 
 static void DumpStructure( vlc_object_t *p_this, int i_level, char *psz_foo )
