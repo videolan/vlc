@@ -158,6 +158,8 @@ static char * GetWindowsError  ( void );
 #endif
 #endif
 
+static void module_LoadMain( vlc_object_t *p_this );
+
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
@@ -307,7 +309,7 @@ void __module_EndBank( vlc_object_t *p_this )
  * as another module, and for instance the configuration options of main will
  * be available in the module bank structure just as for every other module.
  *****************************************************************************/
-void __module_LoadMain( vlc_object_t *p_this )
+static void module_LoadMain( vlc_object_t *p_this )
 {
     vlc_value_t lockval;
 

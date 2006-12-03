@@ -71,8 +71,6 @@ struct module_cache_t
 
 #define module_InitBank(a)     __module_InitBank(VLC_OBJECT(a))
 void  __module_InitBank        ( vlc_object_t * );
-#define module_LoadMain(a)     __module_LoadMain(VLC_OBJECT(a))
-void  __module_LoadMain        ( vlc_object_t * );
 #define module_LoadBuiltins(a) __module_LoadBuiltins(VLC_OBJECT(a))
 void  __module_LoadBuiltins    ( vlc_object_t * );
 #define module_LoadPlugins(a)  __module_LoadPlugins(VLC_OBJECT(a))
