@@ -254,6 +254,8 @@ int vlm_Load( vlm_t *p_vlm, const char *psz_file )
     return 0;
 }
 
+
+static const char quotes[] = "\"'";
 /**
  * FindCommandEnd: look for the end of a possibly quoted string
  * @return NULL on mal-formatted string,
@@ -261,15 +263,12 @@ int vlm_Load( vlm_t *p_vlm, const char *psz_file )
  */
 static const char *FindCommandEnd (const char *psz_sent)
 {
-    char quote = psz_sent[0], c;
-    static const char quotes[] = "'\"";
-
-    if (quote && (strchr (quotes, quote) == NULL))
-        quote = '\0';
+    const char quote = strchr (quotes, psz_sent[0]) ? psz_sent[0] : 0;
+    char c;
 
     while ((c = *psz_sent) != '\0')
     {
-        if (c == '\\')
+        if ((quote == '"') && (c == '\\'))
         {
             if (*psz_sent == '\0')
                 return NULL; // cannot escape "nothing"
@@ -292,7 +291,7 @@ static const char *FindCommandEnd (const char *psz_sent)
 
 
 /**
- * Unescape (C-style) a nul-terminated string.
+ * Unescape a nul-terminated string.
  * Note that in and out can be identical.
  *
  * @param out output buffer (at least <strlen (in) + 1> characters long)
@@ -302,11 +301,19 @@ static const char *FindCommandEnd (const char *psz_sent)
  */
 static int Unescape (char *out, const char *in)
 {
-    char c;
+    const char quote = strchr (quotes, in[0]) ? in[0] : 0;
 
-    while ((c = *in++) != '\0')
+    if (quote)
+        in++; // skips opening quote
+
+    for (;;)
     {
-        if (c == '\\')
+        char c = *in++;
+
+        if ((c == '\0') || (c == quote))
+            break;
+
+        if ((quote == '"') && (c == '\\'))
         {
             switch (c = *in++)
             {
@@ -324,7 +331,7 @@ static int Unescape (char *out, const char *in)
             }
 
             // Only allow printable ASCII characters
-            // (in particular, no nul and no extended characters)
+            // (in particular, no nul nor extended characters)
             if (c < 32)
                 return -1;
         }
