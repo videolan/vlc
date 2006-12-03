@@ -1492,8 +1492,8 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
                 }
                 else if( i_type & VLC_VAR_STRING )
                 {
-                    var_SetInteger( p_input->p_libvlc_global, psz_name,
-                                    newval.psz_string );
+                    var_SetString( p_input->p_libvlc_global, psz_name,
+                                   newval.psz_string );
                     break;
                 }
             }
