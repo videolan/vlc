@@ -9,10 +9,9 @@ SUBDIRS =
 
 EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in
 
-BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES)
-DISTCLEANFILES = stamp-api
+BUILT_SOURCES = $(CLEANFILES)
 CLEANFILES = misc/modules_builtin.h
-MOSTLYCLEANFILES = $(DATA_noinst_libvlc) stamp-builtins
+MOSTLYCLEANFILES = $(DATA_noinst_libvlc)
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
 
@@ -97,28 +96,6 @@ misc/modules_builtin.h: misc/modules_builtin.h.in
 misc/modules.c: misc/modules_builtin.h
 
 ###############################################################################
-# Building builtin modules
-###############################################################################
-#
-# As long as we use builtins with a shared libvlc, we must build them before
-# we build libvlc. Maybe one day, libvlc will handle multiple modules per
-# shared object, which will make builtins fairly redumdant. Until then, we
-# need this workaround.
-
-
-if BUILD_SHARED
-stamp-builtins: Makefile ../vlc-config ../config.status
-	@for c in `$(VLC_CONFIG) --libs builtin`; do \
-		case $$c in \
-			../modules/*.a) echo $$c ;; \
-		esac ; \
-	done | \
-	sed -e 's,^\(.*\)/\([^/]*\)\.a$$,cd \1 \&\& $(MAKE) \2,g' | \
-	while read cmd; do echo $$cmd.a; eval "($$cmd.a)" || exit $$? ; done
-	touch $@
-endif
-
-###############################################################################
 # Building libvlc
 ###############################################################################
 
@@ -134,7 +111,7 @@ libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
 libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs libvlc` \
-	-no-undefined -export-symbols libvlc.sym -version-info 1:0:0
+	-no-undefined -export-symbols $(srcdir)/libvlc.sym -version-info 1:0:0
 libvlc_la_DEPENDENCIES = libvlc.sym
 
 libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
@@ -184,9 +161,9 @@ endif
 libvlc.dll.a: libvlc$(LIBEXT)
 	$(DLLTOOL) --export-all-symbols -l $@ -D $< $(libvlc_a_OBJECTS)
 
-libvlc$(LIBEXT): $(OBJECTS_libvlc_so) stamp-builtins
-	@ldfl="`$(VLC_CONFIG) --libs plugin vlc builtin pic` $(INCLUDED_LIBINTL)" ; \
-	case `$(VLC_CONFIG) --linkage vlc builtin` in \
+libvlc$(LIBEXT): $(OBJECTS_libvlc_so)
+	@ldfl="`$(VLC_CONFIG) --libs plugin vlc pic` $(INCLUDED_LIBINTL)" ; \
+	case `$(VLC_CONFIG) --linkage vlc` in \
 	  c++)  ld="$(CXXLINK)" ;; \
 	  objc) ld="$(OBJCLINK)" ;; \
 	  c|*)  ld="$(LINK)" ;; \
@@ -372,10 +349,17 @@ misc/version.c: FORCE
 ###############################################################################
 # Stamp rules
 ###############################################################################
+
+if !USE_LIBTOOL
+if !BUILD_SHARED
 stamp-api: Makefile.in $(HEADERS_include) ../vlc-api.pl
 	( cd $(srcdir) && cat $(HEADERS_include) ) | \
 	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
 	touch stamp-api
+
+CLEANFILES += stamp-api
+endif
+endif
 
 ###############################################################################
 # Unit/regression test
