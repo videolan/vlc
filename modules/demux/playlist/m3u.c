@@ -78,6 +78,29 @@ void E_(Close_M3U)( vlc_object_t *p_this )
     free( p_demux->p_sys );
 }
 
+
+/* Gruik! */
+static inline char *MaybeFromLocaleDup (const char *str)
+{
+    if (str == NULL)
+        return NULL;
+
+    return IsUTF8 (str) ? strdup (str) : FromLocaleDup (str);
+}
+
+
+static inline void MaybeFromLocaleRep (char **str)
+{
+    char *const orig_str = *str;
+
+    if ((orig_str != NULL) && !IsUTF8 (orig_str))
+    {
+        *str = FromLocaleDup (orig_str);
+        free (orig_str);
+    }
+}
+
+
 static int Demux( demux_t *p_demux )
 {
     char       *psz_line;
@@ -86,7 +109,7 @@ static int Demux( demux_t *p_demux )
     int        i_parsed_duration = 0;
     mtime_t    i_duration = -1;
     const char**ppsz_options = NULL;
-    int        i_options = 0, i;
+    int        i_options = 0;
     vlc_bool_t b_cleanup = VLC_FALSE;
     input_item_t *p_input;
 
@@ -128,11 +151,11 @@ static int Demux( demux_t *p_demux )
                                    sizeof("EXTVLCOPT:") -1 ) )
             {
                 /* VLC Option */
-                const char *psz_option;
+                char *psz_option;
                 psz_parse += sizeof("EXTVLCOPT:") -1;
                 if( !*psz_parse ) goto error;
 
-                psz_option = strdup( psz_parse );
+                psz_option = MaybeFromLocaleDup( psz_parse );
                 if( psz_option )
                     INSERT_ELEM( ppsz_options, i_options, i_options,
                                  psz_option );
@@ -148,19 +171,14 @@ static int Demux( demux_t *p_demux )
             if( !psz_name || !*psz_name )
             {
                 /* Use filename as name for relative entries */
-                psz_name = strdup( psz_parse );
+                psz_name = MaybeFromLocaleDup( psz_parse );
             }
 
             psz_mrl = E_(ProcessMRL)( psz_parse, p_demux->p_sys->psz_prefix );
+            MaybeFromLocaleRep( &psz_mrl );
 
             b_cleanup = VLC_TRUE;
             if( !psz_mrl ) goto error;
-
-            EnsureUTF8( psz_name );
-            EnsureUTF8( psz_mrl );
-
-            for( i = 0; i< i_options; i++ )
-                EnsureUTF8( (char*)ppsz_options[i] );
 
             p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
                                         i_options, ppsz_options, i_duration );
@@ -171,6 +189,7 @@ static int Demux( demux_t *p_demux )
                                    PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
                                    PLAYLIST_END, NULL, NULL );
             free( psz_mrl );
+            // XXX Not to be a scare monger, but I suspect options are leaked
         }
 
  error:
