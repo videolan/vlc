@@ -503,9 +503,8 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
 
     if( i_result == ETIMEDOUT )
     {
-        /* People keep pissing me off with this. --Meuuh */
         msg_Dbg( p_condvar->p_this,
-                  "thread %li: secret message triggered "
+                  "thread %li: probable condition deadlock "
                   "at %s:%d (%s)", CAST_PTHREAD_TO_INT(pthread_self()),
                   psz_file, i_line, strerror(i_result) );
 
