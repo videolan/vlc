@@ -193,7 +193,7 @@ void __module_InitBank( vlc_object_t *p_this )
     p_bank->psz_object_name = "module bank";
     p_bank->i_usage = 1;
     p_bank->i_cache = p_bank->i_loaded_cache = 0;
-    p_bank->pp_cache = p_bank->pp_loaded_cache = 0;
+    p_bank->pp_cache = p_bank->pp_loaded_cache = NULL;
     p_bank->b_cache = p_bank->b_cache_dirty =
         p_bank->b_cache_delete = VLC_FALSE;
 
@@ -261,6 +261,7 @@ void __module_EndBank( vlc_object_t *p_this )
     if( p_bank->b_cache ) CacheSave( p_this );
     while( p_bank->i_loaded_cache-- )
     {
+        DeleteModule (p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module);
         free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
         free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
     }
