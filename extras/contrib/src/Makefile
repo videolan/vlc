@@ -93,6 +93,7 @@ endif
 #
 HOSTCONF=--target=$(HOST) --host=$(HOST) --build=$(BUILD)
 ifneq ($(BUILD),$(HOST))
+    HOSTCONF+=--program-prefix=""
     #
     # Compiling for MinGW under Cygwin could be deemed as cross compiling
     # unfortunately there isn't a complete separate GCC toolchain for MinGW under Cygwin
@@ -1607,7 +1608,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 .gcrypt: libgcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) --program-prefix="" CFLAGS="$(CFLAGS)" && sed -i 46s@sys/times.h@sys/time.h@ cipher/random.c && make && make install)
+	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && sed -i 46s@sys/times.h@sys/time.h@ cipher/random.c && make && make install)
 else
 ifeq ($(HOST),i686-apple-darwin8)
 	(cd $<; $(HOSTCC) ./configure --host=$(HOST) --build=$(BUILD) --prefix=$(PREFIX) --disable-asm CFLAGS="$(CFLAGS)" && make && make install)
@@ -1636,7 +1637,7 @@ endif
 
 .gnutls: gnutls .gcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc --program-prefix="" && cd gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc && cd gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && cd gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
 endif
