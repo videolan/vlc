@@ -1477,6 +1477,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
             "logo-transparency\0";
         const char *psz_name;
 
+        if( newval.psz_string )
         for( psz_name = vars; *psz_name; psz_name += strlen( psz_name ) + 1 )
         {
             if( strcmp( psz_name, psz_cmd ) == 0 )
@@ -1485,15 +1486,15 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
 
                 if( i_type & VLC_VAR_INTEGER )
                 {
-                    if( !strlen( newval.psz_string ) ) break;
                     var_SetInteger( p_input->p_libvlc_global, psz_name,
                                     atoi( newval.psz_string ) );
+                    break;
                 }
                 else if( i_type & VLC_VAR_STRING )
                 {
-                    if( !strlen( newval.psz_string ) ) break;
                     var_SetInteger( p_input->p_libvlc_global, psz_name,
                                     newval.psz_string );
+                    break;
                 }
             }
         }
