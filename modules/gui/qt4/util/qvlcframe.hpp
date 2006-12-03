@@ -24,6 +24,7 @@
 #define _QVLCFRAME_H_
 
 #include <QWidget>
+#include <QDialog>
 #include <QSpacerItem>
 #include <QHBoxLayout>
 #include <QApplication>
@@ -38,28 +39,6 @@
 class QVLCFrame : public QWidget
 {
 public:
-    static void fixStyle( QWidget *w)
-    {
-         QStyle *style = qApp->style();
-#if 0
-        // Plastique is too dark.
-        /// theming ? getting KDE data ? ?
-        if( qobject_cast<QPlastiqueStyle *>(style) )
-        {
-            QPalette plt( w->palette() );
-            plt.setColor( QPalette::Active, QPalette::Highlight, Qt::gray );
-            QColor vlg = (Qt::lightGray);
-            vlg = vlg.toHsv();
-            vlg.setHsv( vlg.hue(), vlg.saturation(), 235  );
-            plt.setColor( QPalette::Active, QPalette::Window, vlg );
-            plt.setColor( QPalette::Inactive, QPalette::Window, vlg );
-            plt.setColor( QPalette::Inactive, QPalette::Button, vlg );
-            plt.setColor( QPalette::Active, QPalette::Button, vlg );
-            plt.setColor( QPalette::Active, QPalette::Text, Qt::yellow );
-            w->setPalette( plt );
-        }
-#endif
-    }
     static QHBoxLayout* doButtons( QWidget *w, QBoxLayout *l,
                                QPushButton **defaul, char *psz_default,
                                QPushButton **alt, char *psz_alt,
@@ -98,9 +77,7 @@ public:
     };
 
     QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
-    {
-        fixStyle( this );
-    };
+    {    };
     virtual ~QVLCFrame()   {};
 
     void toggleVisible()
@@ -129,13 +106,28 @@ protected:
     }
 };
 
+class QVLCDialog : public QDialog
+{
+public:
+    QVLCDialog( QWidget* parent, intf_thread_t *_p_intf ) :
+                                    QDialog( parent ), p_intf( _p_intf )
+    {}
+    virtual ~QVLCDialog() {};
+    void toggleVisible()
+    {
+        if( isVisible() ) hide();
+        else show();
+    }
+
+protected:
+    intf_thread_t *p_intf;
+};
+
 class QVLCMW : public QMainWindow
 {
 public:
     QVLCMW( intf_thread_t *_p_intf ) : QMainWindow( NULL ), p_intf( _p_intf )
-    {
-        QVLCFrame::fixStyle( this );
-    }
+    {    }
     virtual ~QVLCMW() {};
     void toggleVisible()
     {

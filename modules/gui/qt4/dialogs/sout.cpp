@@ -27,10 +27,11 @@
 
 #include <QFileDialog>
 
-SoutDialog::SoutDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf ) :
+                                                QVLCDialog( parent,  _p_intf )
 {
     //setWindowTitle( qtr( "Stream output") );
-
+    setModal( true );
     /* UI stuff */
     ui.setupUi( this );
 #define ADD_VCODEC( name, fcc) ui.vCodec->addItem( name, QVariant( fcc ) );
@@ -88,6 +89,9 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     CB( soutAll ); CS( ttl ); CT( sapName ); CT( sapGroup );
 
     CONNECT( ui.fileSelectButton, clicked(), this, fileBrowse() );
+
+    BUTTONACT( ui.okButton, ok());
+    BUTTONACT( ui.cancelButton, cancel());
 }
 
 void SoutDialog::fileBrowse()
@@ -99,9 +103,13 @@ void SoutDialog::fileBrowse()
 
 void SoutDialog::ok()
 {
+    mrl = ui.mrlEdit->text();
+    accept();
 }
 void SoutDialog::cancel()
 {
+    mrl = ui.mrlEdit->text();
+    reject();
 }
 
 void SoutDialog::updateMRL()
@@ -169,6 +177,7 @@ end:
     sout_chain_t* p_chain = streaming_ChainNew();
     streaming_GuiDescToChain( VLC_OBJECT(p_intf), p_chain, &pd );
     char *psz_mrl = streaming_ChainToPsz( p_chain );
+
     ui.mrlEdit->setText( qfu( strdup(psz_mrl) ) );
     free( pd.psz_acodec ); free( pd.psz_vcodec ); free( pd.psz_scodec );
     free( pd.psz_file );free( pd.psz_http ); free( pd.psz_mms );

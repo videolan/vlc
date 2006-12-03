@@ -35,9 +35,11 @@
 
 OpenDialog *OpenDialog::instance = NULL;
 
-OpenDialog::OpenDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
+                                                QVLCDialog( parent, _p_intf )
 {
     setWindowTitle( qtr("Open" ) );
+    setModal( modal );
     ui.setupUi( this );
     fileOpenPanel = new FileOpenPanel(this , p_intf );
     diskOpenPanel = new DiskOpenPanel(this , p_intf );
@@ -96,27 +98,30 @@ void OpenDialog::cancel()
 {
     fileOpenPanel->clear();
     this->toggleVisible();
+    if( isModal() )
+        reject();
 }
 
 void OpenDialog::ok()
 {
-    QString mrl = ui.advancedLineInput->text();
-    QStringList tempMRL = mrl.split(" ");
-    for( size_t i = 0 ; i< tempMRL.size(); i++ )
-    {
-         const char * psz_utf8 = qtu( tempMRL[i] );
-         /* Play the first one, parse and enqueue the other ones */
-         playlist_Add( THEPL, psz_utf8, NULL,
-                       PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
-                       ( i ? PLAYLIST_PREPARSE : 0 ),
-                       PLAYLIST_END, VLC_TRUE );
-      }
-
     this->toggleVisible();
-}
+    mrl = ui.advancedLineInput->text();
+    QStringList tempMRL = mrl.split(" ");
+    if( !isModal() )
+    {
+        for( size_t i = 0 ; i< tempMRL.size(); i++ )
+        {
+             const char * psz_utf8 = qtu( tempMRL[i] );
+             /* Play the first one, parse and enqueue the other ones */
+             playlist_Add( THEPL, psz_utf8, NULL,
+                           PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
+                           ( i ? PLAYLIST_PREPARSE : 0 ),
+                           PLAYLIST_END, VLC_TRUE );
+         }
 
-void OpenDialog::changedTab()
-{
+    }
+    else
+        accept();
 }
 
 void OpenDialog::toggleAdvancedPanel()
@@ -139,7 +144,7 @@ void OpenDialog::toggleAdvancedPanel()
 }
 
 void OpenDialog::updateMRL() {
-    QString mrl = mainMRL;
+    mrl = mainMRL;
     if( ui.slaveCheckbox->isChecked() ) {
         mrl += " :input-slave=" + ui.slaveText->text();
     }

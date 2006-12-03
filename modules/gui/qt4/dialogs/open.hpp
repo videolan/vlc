@@ -34,23 +34,24 @@
 #include <QBoxLayout>
 #include <QString>
 
-class OpenDialog : public QVLCFrame
+class OpenDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
-    static OpenDialog * getInstance( intf_thread_t *p_intf )
+    static OpenDialog * getInstance( QWidget *parent, intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new OpenDialog( p_intf);
+            instance = new OpenDialog( parent, p_intf, false );
         return instance;
     }
+    OpenDialog( QWidget *parent, intf_thread_t *, bool modal );
     virtual ~OpenDialog();
 
     void showTab( int );
 
+    QString mrl;
     QString mainMRL;
 private:
-    OpenDialog( intf_thread_t * );
     static OpenDialog *instance;
     input_thread_t *p_input;
     QString mrlSub;
@@ -65,7 +66,6 @@ private:
 private slots:
     void cancel();
     void ok();
-    void changedTab();
     void toggleAdvancedPanel();
     void updateMRL(QString);
     void updateMRL();

@@ -27,6 +27,7 @@
 
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
+#include "main_interface.hpp"
 #include "menus.hpp"
 #include <vlc_intf_strings.h>
 
@@ -119,7 +120,7 @@ void DialogsProvider::MLAppendDialog()
 }
 void DialogsProvider::openDialog( int i_tab )
 {
-    OpenDialog::getInstance( p_intf )->showTab( i_tab );
+    OpenDialog::getInstance( p_intf->p_sys->p_mi  , p_intf )->showTab( i_tab );
 }
 
 void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
@@ -167,7 +168,25 @@ void DialogsProvider::MediaInfoDialog()
 
 void DialogsProvider::streamingDialog()
 {
-    (new SoutDialog( p_intf ))->show();
+    OpenDialog *o = new OpenDialog( p_intf->p_sys->p_mi, p_intf, true );
+    if ( o->exec() == QDialog::Accepted )
+    {
+        SoutDialog *s = new SoutDialog( p_intf->p_sys->p_mi, p_intf );
+        if( s->exec() == QDialog::Accepted )
+        {
+            msg_Err(p_intf, "mrl %s\n", qta(s->mrl));
+            /* Just do it */
+            int i_len = strlen( qtu(s->mrl) ) + 10;
+            char *psz_option = (char*)malloc(i_len);
+            snprintf( psz_option, i_len - 1, ":sout=%s", qtu(s->mrl));
+
+            playlist_AddExt( THEPL, qtu( o->mrl ), "Streaming",
+                             PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
+                             -1, &psz_option, 1, VLC_TRUE );
+        }
+        delete s;
+    }
+    delete o;
 }
 
 void DialogsProvider::prefsDialog()

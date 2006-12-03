@@ -31,11 +31,14 @@ class QCheckBox;
 class QGridLayout;
 class QTextEdit;
 
-class SoutDialog : public QVLCFrame
+class SoutDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
-    SoutDialog( intf_thread_t * );
+    SoutDialog( QWidget* parent, intf_thread_t * );
+    virtual ~SoutDialog() {}
+
+    QString mrl;
 private:
     Ui::Sout ui;
 public slots:
