@@ -788,36 +788,39 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                     MYCASE( LIST, "list" );
 #undef MYCASE
                 }
-                printf( " %c-o \"%s\" (%s), %d callbacks: ",
+                printf( " %c-o \"%s\" (%s",
                         i + 1 == p_object->i_vars ? '`' : '|',
-                        p_var->psz_name, psz_type,
-                        p_var->i_entries );
+                        p_var->psz_name, psz_type );
+                if( p_var->psz_text )
+                    printf( ", %s", p_var->psz_text );
+                printf( ")" );
+                if( p_var->i_entries )
+                    printf( ", %d callbacks", p_var->i_entries );
                 switch( p_var->i_type & 0x00f0 )
                 {
                     case VLC_VAR_VOID:
                     case VLC_VAR_MUTEX:
-                        printf( "not available" );
                         break;
                     case VLC_VAR_BOOL:
-                        printf( p_var->val.b_bool ? "true" : "false" );
+                        printf( ": %s", p_var->val.b_bool ? "true" : "false" );
                         break;
                     case VLC_VAR_INTEGER:
-                        printf( "%d", p_var->val.i_int );
+                        printf( ": %d", p_var->val.i_int );
                         break;
                     case VLC_VAR_STRING:
-                        printf( "%s", p_var->val.psz_string );
+                        printf( ": \"%s\"", p_var->val.psz_string );
                         break;
                     case VLC_VAR_FLOAT:
-                        printf( "%f", p_var->val.f_float );
+                        printf( ": %f", p_var->val.f_float );
                         break;
                     case VLC_VAR_TIME:
-                        printf( I64Fi, p_var->val.i_time );
+                        printf( ": " I64Fi, p_var->val.i_time );
                         break;
                     case VLC_VAR_ADDRESS:
-                        printf( "%p", p_var->val.p_address );
+                        printf( ": %p", p_var->val.p_address );
                         break;
                     case VLC_VAR_LIST:
-                        printf( "TODO" );
+                        printf( ": TODO" );
                         break;
                 }
                 printf( "\n" );
