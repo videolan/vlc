@@ -10,7 +10,7 @@ SUBDIRS =
 EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in
 
 BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES)
-DISTCLEANFILES = stamp-api libvlc.sym
+DISTCLEANFILES = stamp-api
 CLEANFILES = misc/modules_builtin.h
 MOSTLYCLEANFILES = $(DATA_noinst_libvlc) stamp-builtins
 
@@ -376,12 +376,6 @@ stamp-api: Makefile.in $(HEADERS_include) ../vlc-api.pl
 	( cd $(srcdir) && cat $(HEADERS_include) ) | \
 	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
 	touch stamp-api
-
-libvlc.sym: $(HEADERS_include)
-	rm -f libvlc.sym
-	(cd $(srcdir) && cat $(HEADERS_include) ) | \
-	sed -ne 's/^.*VLC_EXPORT\s*(\s*\w.*\S\s*,\s*\(\w*\)\s*,\s*(\s*\w.*\S\s*)\s*)[^)]*$$/\1/p' \
-		> libvlc.sym
 
 ###############################################################################
 # Unit/regression test
