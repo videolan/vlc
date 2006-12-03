@@ -156,6 +156,9 @@ VLC_EXPORT( int, vlm_MediaVodControl, ( void *, vod_media_t *, const char *, int
 VLC_EXPORT( int, vlm_Save, ( vlm_t *, const char * ) );
 VLC_EXPORT( int, vlm_Load, ( vlm_t *, const char * ) );
 
+VLC_EXPORT( vlm_message_t *, vlm_MessageNew, ( const char *, const char *, ... ) );
+VLC_EXPORT( vlm_message_t *, vlm_MessageAdd, ( vlm_message_t *, vlm_message_t * ) );
+
 #ifdef __cpluplus
 }
 #endif

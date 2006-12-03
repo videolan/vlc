@@ -56,9 +56,6 @@ static vlm_message_t *vlm_Help( vlm_t *, char * );
 
 static vlm_media_instance_t *vlm_MediaInstanceSearch( vlm_t *, vlm_media_t *, const char * );
 
-static vlm_message_t *vlm_MessageNew( const char *, const char *, ... );
-static vlm_message_t *vlm_MessageAdd( vlm_message_t *, vlm_message_t * );
-
 static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *, const char * );
 
 static char *Save( vlm_t * );
@@ -1647,8 +1644,8 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, const char *psz_cmd,
 /*****************************************************************************
  * Message handling functions
  *****************************************************************************/
-static vlm_message_t *vlm_MessageNew( const char *psz_name,
-                                      const char *psz_format, ... )
+vlm_message_t *vlm_MessageNew( const char *psz_name,
+                               const char *psz_format, ... )
 {
     vlm_message_t *p_message;
     va_list args;
@@ -1693,8 +1690,8 @@ void vlm_MessageDelete( vlm_message_t *p_message )
 }
 
 /* Add a child */
-static vlm_message_t *vlm_MessageAdd( vlm_message_t *p_message,
-                                      vlm_message_t *p_child )
+vlm_message_t *vlm_MessageAdd( vlm_message_t *p_message,
+                               vlm_message_t *p_child )
 {
     if( p_message == NULL ) return NULL;
 
