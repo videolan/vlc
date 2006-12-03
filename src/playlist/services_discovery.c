@@ -28,59 +28,62 @@ static void RunSD( services_discovery_t *p_sd );
 
 int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modules )
 {
-    if( psz_modules && *psz_modules )
+    const char *psz_parser = psz_modules ?: "";
+    int retval = VLC_SUCCESS;
+
+    for (;;)
     {
-        const char *psz_parser = psz_modules;
-        char *psz_next;
+        while( *psz_parser == ' ' || *psz_parser == ':' || *psz_parser == ',' )
+            psz_parser++;
 
-        while( psz_parser && *psz_parser )
+        if( *psz_parser == '\0' )
+            break;
+
+        const char *psz_next = strchr( psz_parser, ':' );
+        if( psz_next == NULL )
+            psz_next = psz_parser + strlen( psz_parser );
+
+        char psz_plugin[psz_next - psz_parser + 1];
+        memcpy (psz_plugin, psz_parser, sizeof (psz_plugin) - 1);
+        psz_plugin[sizeof (psz_plugin) - 1] = '\0';
+        psz_parser = psz_next;
+
+        /* Perform the addition */
+        msg_Dbg( p_playlist, "Add services_discovery %s", psz_plugin );
+        services_discovery_t *p_sd = vlc_object_create( p_playlist,
+                                                        VLC_OBJECT_SD );
+        if( p_sd == NULL )
+            return VLC_ENOMEM;
+
+        p_sd->pf_run = NULL;
+        p_sd->p_module = module_Need( p_sd, "services_discovery", psz_plugin, 0 );
+
+        if( p_sd->p_module == NULL )
         {
-            while( *psz_parser == ' ' || *psz_parser == ':' || *psz_parser == ',' )
-                psz_parser++;
+            msg_Err( p_playlist, "no suitable services discovery module" );
+            vlc_object_destroy( p_sd );
+            retval = VLC_EGENERIC;
+            continue;
+        }
+        p_sd->psz_module = strdup( psz_plugin );
+        p_sd->b_die = VLC_FALSE;
 
-            if( (psz_next = strchr( psz_parser, ':' ) ) )
-                *psz_next++ = '\0';
+        PL_LOCK;
+        TAB_APPEND( p_playlist->i_sds, p_playlist->pp_sds, p_sd );
+        PL_UNLOCK;
 
-            if( *psz_parser == '\0' )
-                break;
-            msg_Dbg( p_playlist, "Add services_discovery %s", psz_parser );
-            /* Perform the addition */
-            {
-                services_discovery_t *p_sd = vlc_object_create( p_playlist,
-                                                                VLC_OBJECT_SD );
-                p_sd->pf_run = NULL;
-                p_sd->p_module = module_Need( p_sd, "services_discovery", psz_parser, 0 );
-
-                if( p_sd->p_module == NULL )
-                {
-                    msg_Err( p_playlist, "no suitable services discovery module" );
-                    vlc_object_destroy( p_sd );
-                    return VLC_EGENERIC;
-                }
-                p_sd->psz_module = strdup( psz_parser );
-                p_sd->b_die = VLC_FALSE;
-
-                PL_LOCK;
-                TAB_APPEND( p_playlist->i_sds, p_playlist->pp_sds, p_sd );
-                PL_UNLOCK;
-
-                if( !p_sd->pf_run ) {
-                    psz_parser = psz_next;
-                    continue;
-                }
-
-                if( vlc_thread_create( p_sd, "services_discovery", RunSD,
-                                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
-                {
-                    msg_Err( p_sd, "cannot create services discovery thread" );
-                    vlc_object_destroy( p_sd );
-                    return VLC_EGENERIC;
-                }
-            }
-            psz_parser = psz_next;
+        if ((p_sd->pf_run != NULL)
+         && vlc_thread_create( p_sd, "services_discovery", RunSD,
+                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE))
+        {
+            msg_Err( p_sd, "cannot create services discovery thread" );
+            vlc_object_destroy( p_sd );
+            retval = VLC_EGENERIC;
+            continue;
         }
     }
-    return VLC_SUCCESS;
+
+    return retval;
 }
 
 int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
