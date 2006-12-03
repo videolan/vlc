@@ -247,9 +247,9 @@ case "${host_os}" in
     LDFLAGS_save="${LDFLAGS_save} -lintl"; LDFLAGS="${LDFLAGS_save}"
     dnl Check for BONE
     if test -f /boot/beos/system/lib/libbind.so; then
-        VLC_ADD_LDFLAGS([access_file access_ftp access_mms access_output_udp telnet netsync sap vlc growl],[-lbind -lsocket])
+        VLC_ADD_LDFLAGS([access_file access_ftp access_mms access_output_udp telnet netsync sap libvlc growl],[-lbind -lsocket])
     else
-        VLC_ADD_LDFLAGS([access_file access_ftp access_mms access_output_udp telnet netsync sap vlc growl],[-lnet])
+        VLC_ADD_LDFLAGS([access_file access_ftp access_mms access_output_udp telnet netsync sap libvlc growl],[-lnet])
     fi
 
     dnl Ugly check for Zeta
@@ -567,7 +567,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer param_eq vlc vorbis freetype mod mpc dmo quicktime realaudio galaktos opengl],[-lm])
+  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer param_eq libvlc vorbis freetype mod mpc dmo quicktime realaudio galaktos opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex mono colorthres],[-lm])
