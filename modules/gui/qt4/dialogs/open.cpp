@@ -39,20 +39,41 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr("Open" ) );
     ui.setupUi( this );
-    ui.vboxLayout->setSizeConstraint(QLayout::SetFixedSize);
-    fileOpenPanel = new FileOpenPanel(this , _p_intf );
-    diskOpenPanel = new DiskOpenPanel(this , _p_intf );
-    netOpenPanel = new NetOpenPanel(this , _p_intf );
-    ui.Tab->addTab(fileOpenPanel, "File");
-    ui.Tab->addTab(diskOpenPanel, "Disk");
-    ui.Tab->addTab(netOpenPanel, "Network");
+    fileOpenPanel = new FileOpenPanel(this , p_intf );
+    diskOpenPanel = new DiskOpenPanel(this , p_intf );
+    netOpenPanel = new NetOpenPanel(this , p_intf );
+    ui.Tab->addTab(fileOpenPanel, qtr("File"));
+    ui.Tab->addTab(diskOpenPanel, qtr("Disk"));
+    ui.Tab->addTab(netOpenPanel, qtr("Network"));
+
     ui.advancedFrame->hide();
 
-    connect( fileOpenPanel, SIGNAL(mrlUpdated( QString )),
-            this, SLOT( updateMRL(QString)));
+    /* Force MRL update on tab change */
+    CONNECT( ui.Tab, currentChanged(int), this, signalCurrent());
+
+    CONNECT( fileOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
+    CONNECT( netOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
+    CONNECT( diskOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
+
+    CONNECT( fileOpenPanel, methodChanged( QString ),
+             this, newMethod(QString) );
+    CONNECT( netOpenPanel, methodChanged( QString ),
+             this, newMethod(QString) );
+    CONNECT( diskOpenPanel, methodChanged( QString ),
+             this, newMethod(QString) );
+
+    CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
+    CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL());
+
     BUTTONACT( ui.closeButton, ok());
     BUTTONACT( ui.cancelButton, cancel());
-    BUTTONACT( ui.advancedButton , toggleAdvancedPanel() );
+    BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
+
+    /* Initialize caching */
+    storedMethod = "";
+    newMethod("file-caching");
+
+    mainHeight = advHeight = 0;
 }
 
 OpenDialog::~OpenDialog()
@@ -65,6 +86,12 @@ void OpenDialog::showTab(int i_tab=0)
     ui.Tab->setCurrentIndex(i_tab);
 }
 
+void OpenDialog::signalCurrent() {
+    if (ui.Tab->currentWidget() != NULL) {
+        (dynamic_cast<OpenPanel*>(ui.Tab->currentWidget()))->updateMRL();
+    }
+}
+
 void OpenDialog::cancel()
 {
     fileOpenPanel->clear();
@@ -73,7 +100,8 @@ void OpenDialog::cancel()
 
 void OpenDialog::ok()
 {
-    QStringList tempMRL = MRL.split(" ");
+    QString mrl = ui.advancedLineInput->text();
+    QStringList tempMRL = mrl.split(" ");
     for( size_t i = 0 ; i< tempMRL.size(); i++ )
     {
          const char * psz_utf8 = qtu( tempMRL[i] );
@@ -93,19 +121,47 @@ void OpenDialog::changedTab()
 
 void OpenDialog::toggleAdvancedPanel()
 {
-    if (ui.advancedFrame->isVisible())
-    {
+    if (ui.advancedFrame->isVisible()) {
         ui.advancedFrame->hide();
-    }
-    else
-    {
+        setMinimumHeight(1);
+        resize( width(), mainHeight );
+
+    } else {
+        if( mainHeight == 0 )
+            mainHeight = height();
+
         ui.advancedFrame->show();
+        if( advHeight == 0 ) {
+            advHeight = height() - mainHeight;
+        }
+        resize( width(), mainHeight + advHeight );
     }
+}
+
+void OpenDialog::updateMRL() {
+    QString mrl = mainMRL;
+    if( ui.slaveCheckbox->isChecked() ) {
+        mrl += " :input-slave=" + ui.slaveText->text();
+    }
+    int i_cache = config_GetInt( p_intf, qta(storedMethod) );
+    if( i_cache != ui.cacheSpinBox->value() ) {
+        mrl += QString(" :%1=%2").arg(storedMethod).
+                                  arg(ui.cacheSpinBox->value());
+    }
+    ui.advancedLineInput->setText(mrl);
 }
 
 void OpenDialog::updateMRL(QString tempMRL)
 {
-    MRL = tempMRL;
-    ui.advancedLineInput->setText(MRL);
+    mainMRL = tempMRL;
+    updateMRL();
 }
 
+void OpenDialog::newMethod(QString method)
+{
+    if( method != storedMethod ) {
+        storedMethod = method;
+        int i_value = config_GetInt( p_intf, qta(storedMethod) );
+        ui.cacheSpinBox->setValue(i_value);
+    }
+}

@@ -34,8 +34,6 @@
 #include <QBoxLayout>
 #include <QString>
 
-class InfoTab;
-
 class OpenDialog : public QVLCFrame
 {
     Q_OBJECT;
@@ -48,9 +46,9 @@ public:
     }
     virtual ~OpenDialog();
 
-    void showTab( int);
+    void showTab( int );
 
-    QString MRL;
+    QString mainMRL;
 private:
     OpenDialog( intf_thread_t * );
     static OpenDialog *instance;
@@ -61,12 +59,18 @@ private:
     FileOpenPanel *fileOpenPanel;
     NetOpenPanel *netOpenPanel;
     DiskOpenPanel *diskOpenPanel;
-public slots:
+
+    QString storedMethod;
+    int advHeight, mainHeight;
+private slots:
     void cancel();
     void ok();
     void changedTab();
     void toggleAdvancedPanel();
     void updateMRL(QString);
+    void updateMRL();
+    void newMethod(QString);
+    void signalCurrent();
 };
 
 #endif

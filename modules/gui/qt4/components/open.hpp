@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
- *          Jean-Baptiste Kempf <jb@videolan.org> 
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,12 +40,15 @@ public:
     {
         p_intf = _p_intf;
     }
-    virtual ~OpenPanel();
-    virtual QString getUpdatedMRL() = 0;
-private:
+    virtual ~OpenPanel() {};
+    virtual void clear() = 0;
+protected:
     intf_thread_t *p_intf;
 public slots:
-    virtual void sendUpdate() = 0;
+    virtual void updateMRL() = 0;
+signals:
+    void mrlUpdated(QString);
+    void methodChanged( QString method );
 };
 
 class FileOpenPanel: public OpenPanel
@@ -54,20 +57,15 @@ class FileOpenPanel: public OpenPanel
 public:
     FileOpenPanel( QWidget *, intf_thread_t * );
     virtual ~FileOpenPanel();
-    virtual QString getUpdatedMRL();
-    void clear();
+    virtual void clear() ;
 private:
     Ui::OpenFile ui;
-    QStringList browse();
-    void updateSubsMRL();
+    QStringList browse( QString );
 public slots:
-    virtual void sendUpdate() ;
-    void updateMRL();
+    virtual void updateMRL();
+private slots:
     void browseFile();
     void browseFileSub();
-    void browseFileAudio();
-signals:
-    void mrlUpdated( QString ) ;
 };
 
 class NetOpenPanel: public OpenPanel
@@ -76,14 +74,14 @@ class NetOpenPanel: public OpenPanel
 public:
     NetOpenPanel( QWidget *, intf_thread_t * );
     virtual ~NetOpenPanel();
-    virtual QString getUpdatedMRL();
+    virtual void clear() ;
 private:
     Ui::OpenNetwork ui;
 public slots:
-    virtual void sendUpdate() ;
-signals:
-    void dataUpdated( QString, QString ) ;
-
+    virtual void updateMRL();
+private slots:
+    void updateProtocol(int);
+    void updateAddress();
 };
 
 class DiskOpenPanel: public OpenPanel
@@ -92,14 +90,11 @@ class DiskOpenPanel: public OpenPanel
 public:
     DiskOpenPanel( QWidget *, intf_thread_t * );
     virtual ~DiskOpenPanel();
-    virtual QString getUpdatedMRL();
+    virtual void clear() ;
 private:
     Ui::OpenDisk ui;
 public slots:
-    virtual void sendUpdate() ;
-signals:
-    void dataUpdated( QString, QString ) ;
-
+    virtual void updateMRL() ;
 };
 
 #endif
