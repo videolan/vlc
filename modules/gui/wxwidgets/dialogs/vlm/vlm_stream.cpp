@@ -52,7 +52,7 @@ void VLMStream::Disable()
 void VLMStream::Delete()
 {
     vlm_message_t *message;
-    string command = "del " + string( p_media->psz_name );
+    string command = "del \"" + string( p_media->psz_name ) + "\"";
     /* FIXME: Should be moved to vlm_Wrapper */
     vlm_ExecuteCommand( p_vlm->GetVLM(), (char*)command.c_str(), & message );
     vlm_MessageDelete( message );
@@ -74,7 +74,7 @@ VLMBroadcastStream::~VLMBroadcastStream()
 void VLMBroadcastStream::Play()
 {
     vlm_message_t *message;
-    string command = "control " + string( p_media->psz_name ) + " play";
+    string command = "control \"" + string( p_media->psz_name ) + "\" play";
     /* FIXME: Should be moved to vlm_Wrapper */
     vlm_ExecuteCommand( p_vlm->GetVLM(), (char*)command.c_str(), & message );
     vlm_MessageDelete( message );
@@ -83,7 +83,7 @@ void VLMBroadcastStream::Play()
 void VLMBroadcastStream::Stop()
 {
     vlm_message_t *message;
-    string command = "control " + string( p_media->psz_name ) + " stop";
+    string command = "control \"" + string( p_media->psz_name ) + "\" stop";
     vlm_ExecuteCommand( p_vlm->GetVLM(), (char*)command.c_str(), & message );
     vlm_MessageDelete( message );
 }
@@ -91,7 +91,7 @@ void VLMBroadcastStream::Stop()
 void VLMBroadcastStream::Pause()
 {
     vlm_message_t *message;
-    string command = "control " + string( p_media->psz_name ) + " pause";
+    string command = "control \"" + string( p_media->psz_name ) + "\" pause";
     vlm_ExecuteCommand( p_vlm->GetVLM(), (char*)command.c_str(), & message );
     vlm_MessageDelete( message );
 }

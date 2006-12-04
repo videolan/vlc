@@ -60,7 +60,7 @@ void VLMWrapper::AddBroadcast( const char* name, const char* input,
                                vlc_bool_t b_enabled, vlc_bool_t b_loop  )
 {
     vlm_message_t *message;
-    string command = "new " + string(name) + " broadcast";
+    string command = "new \"" + string(name) + "\" broadcast";
     vlm_ExecuteCommand( p_vlm, command.c_str(), &message );
     vlm_MessageDelete( message );
     EditBroadcast( name, input, output, b_enabled, b_loop );
@@ -72,27 +72,27 @@ void VLMWrapper::EditBroadcast( const char* name, const char* input,
 {
     vlm_message_t *message;
     string command;
-    command = "setup " + string(name) + " inputdel all";
+    command = "setup \"" + string(name) + "\" inputdel all";
     vlm_ExecuteCommand( p_vlm, command.c_str(), &message );
     vlm_MessageDelete( message );
-    command = "setup " + string(name) + " input " + string(input);
+    command = "setup \"" + string(name) + "\" input \"" + string(input) + "\"";
     vlm_ExecuteCommand( p_vlm, command.c_str(), &message );
     vlm_MessageDelete( message );
     if( strlen(output) > 0 )
     {
-        command = "setup " + string(name) + " output " + string(output);
+        command = "setup \"" + string(name) + "\" output \"" + string(output) + "\"";
         vlm_ExecuteCommand( p_vlm, (char*)command.c_str(), &message );
         vlm_MessageDelete( message );
     }
     if( b_enabled )
     {
-        command = "setup " + string(name) + " enabled";
+        command = "setup \"" + string(name) + "\" enabled";
         vlm_ExecuteCommand( p_vlm, command.c_str(), &message );
         vlm_MessageDelete( message );
     }
     if( b_loop )
     {
-        command = "setup " + string(name) + " loop";
+        command = "setup \"" + string(name) + "\" loop";
         vlm_ExecuteCommand( p_vlm, command.c_str(), &message );
         vlm_MessageDelete( message );
     }
@@ -103,7 +103,7 @@ void VLMWrapper::AddVod( const char* name, const char* input,
                          vlc_bool_t b_enabled, vlc_bool_t b_loop  )
 {
     vlm_message_t *message;
-    string command = "new " + string(name) + " vod";
+    string command = "new \"" + string(name) + "\" vod";
     vlm_ExecuteCommand( p_vlm, command.c_str(), &message );
     vlm_MessageDelete( message );
     EditVod( name, input, output, b_enabled, b_loop );
@@ -115,18 +115,18 @@ void VLMWrapper::EditVod( const char* name, const char* input,
 {
     vlm_message_t *message;
     string command;
-    command = "setup " + string(name) + " input " + string(input);
+    command = "setup \"" + string(name) + "\" input \"" + string(input) + "\"";
     vlm_ExecuteCommand( p_vlm, command.c_str(), &message );
     vlm_MessageDelete( message );
     if( strlen(output) > 0 )
     {
-        command = "setup " + string(name) + " output " + string(output);
+        command = "setup \"" + string(name) + "\" output \"" + string(output) + "\"";
         vlm_ExecuteCommand( p_vlm, (char*)command.c_str(), &message );
         vlm_MessageDelete( message );
     }
     if( b_enabled )
     {
-        command = "setup " + string(name) + " enabled";
+        command = "setup \"" + string(name) + "\" enabled";
         vlm_ExecuteCommand( p_vlm, command.c_str(), &message );
         vlm_MessageDelete( message );
     }
