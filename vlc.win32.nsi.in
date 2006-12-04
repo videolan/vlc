@@ -436,8 +436,8 @@ Section "Desktop Shortcut" SEC02b
     "$INSTDIR\vlc.exe" ""
 SectionEnd
 
-Section "Mozilla plugin" SEC03
-  SectionIn 1 3
+Section /o "Mozilla plugin" SEC03
+  SectionIn 3
 
   !insertmacro OpenUninstallLog
   !insertmacro InstallFolder mozilla
