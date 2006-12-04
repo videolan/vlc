@@ -5552,6 +5552,7 @@ AS_IF([test "${enable_shared_libvlc}" != "no" || test "${enable_libtool}" != "no
   VLC_ADD_PLUGINS([${BUILTINS}])
   BUILTINS=""
 ], [
+  LDFLAGS_vlc="${LDFLAGS_vlc} ${LDFLAGS_libvlc}"
   FILE_LIBVLC_DLL=""
 ])
 
