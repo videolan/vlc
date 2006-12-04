@@ -261,26 +261,37 @@ static const char quotes[] = "\"'";
  */
 static const char *FindCommandEnd (const char *psz_sent)
 {
-    const char quote = strchr (quotes, psz_sent[0]) ? psz_sent[0] : 0;
-    char c;
-
-    if (quote)
-        psz_sent++; // skip opening quote
+    char c, quote = 0;
 
     while ((c = *psz_sent) != '\0')
     {
-        if ((quote == '"') && (c == '\\'))
+        if (!quote)
         {
-            psz_sent++; // move past backslash
-            if (*psz_sent == '\0')
-                return NULL; // cannot escape "nothing"
+            if (strchr(quotes,c))   // opening quote
+                quote = c;
+            else
+            if (isspace(c))         // non-escaped space
+                return psz_sent;
+            else
+            if( c == '\\' )
+            {
+                psz_sent++;         // skip escaped character
+                if (*psz_sent == '\0')
+                    return psz_sent;
+            }
         }
         else
-        if (c == quote) // non-escaped matching quote
-            return psz_sent + 1;
-        else
-        if ((!quote) && isspace(c)) // non-escaped blank
-            return psz_sent;
+        {
+            if (c == quote)         // non-escaped matching quote
+                quote = 0;
+            else
+            if ((quote == '"') && (c == '\\'))
+            {
+                psz_sent++;         // skip escaped character
+                if (*psz_sent == '\0')
+                    return NULL;    // error, closing quote missing
+            }
+        }
 
         psz_sent++;
     }
@@ -301,36 +312,64 @@ static const char *FindCommandEnd (const char *psz_sent)
  */
 static int Unescape (char *out, const char *in)
 {
-    const char quote = strchr (quotes, in[0]) ? in[0] : 0;
+    char c, quote = 0;
 
-    if (quote)
-        in++; // skips opening quote
-
-    for (;;)
+    while ((c = *in++) != '\0')
     {
-        char c = *in++;
-
-        if ((c == '\0') || (c == quote))
-            break;
-
-        if ((quote == '"') && (c == '\\'))
+        if (!quote)
         {
-            switch (c = *in++)
+            if (strchr(quotes,c))   // opening quote
             {
-                case '"':
-                    *out++ = '"';
-                    continue;
-
-                case '\\':
-                    *out++ = '\\';
-                    continue;
-
-                case '\0':   // should never happen
-                    *out = '\0';
-                    return -1;
+                quote = c;
+                continue;
             }
-            /* None of the special cases - copy the backslash */
-            *out++ = '\\';
+            else
+            if( c == '\\' )
+            {
+                switch (c = *in++)
+                {
+                    case '"':
+                    case '\'':
+                    case '\\':
+                        *out++ = c;
+                        continue;
+
+                    case '\0':
+                        *out = '\0';
+                        return 0;
+                }
+                if (isspace(c))
+                {
+                    *out++ = c;
+                    continue;
+                }
+                /* None of the special cases - copy the backslash */
+                *out++ = '\\';
+            }
+        }
+        else
+        {
+            if (c == quote)         // non-escaped matching quote
+            {
+                quote = 0;
+                continue;
+            }
+            if ((quote == '"') && (c == '\\'))
+            {
+                switch (c = *in++)
+                {
+                    case '"':
+                    case '\\':
+                        *out++ = c;
+                        continue;
+
+                    case '\0':   // should never happen
+                        *out = '\0';
+                        return -1;
+                }
+                /* None of the special cases - copy the backslash */
+                *out++ = '\\';
+            }
         }
         *out++ = c;
     }
