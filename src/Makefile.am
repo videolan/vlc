@@ -162,8 +162,8 @@ libvlc.dll.a: libvlc$(LIBEXT)
 	$(DLLTOOL) --export-all-symbols -l $@ -D $< $(libvlc_a_OBJECTS)
 
 libvlc$(LIBEXT): $(OBJECTS_libvlc_so)
-	@ldfl="`$(VLC_CONFIG) --libs plugin vlc pic` $(INCLUDED_LIBINTL)" ; \
-	case `$(VLC_CONFIG) --linkage vlc` in \
+	@ldfl="`$(VLC_CONFIG) --libs plugin libvlc pic` $(INCLUDED_LIBINTL)" ; \
+	case `$(VLC_CONFIG) --linkage libvlc` in \
 	  c++)  ld="$(CXXLINK)" ;; \
 	  objc) ld="$(OBJCLINK)" ;; \
 	  c|*)  ld="$(LINK)" ;; \
