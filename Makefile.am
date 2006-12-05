@@ -267,7 +267,7 @@ bin_PROGRAMS = vlc
 
 vlc_SOURCES = src/vlc.c
 # Ugly kludge so that automake defines $(CXXLINK)
-EXTRA_vlc_SOURCES = extras/zsh.cpp
+EXTRA_vlc_SOURCES = extras/zsh.cpp misc/darwin_specific.m
 
 # Work around a bug in the arm-wince-pe linker
 if HAVE_WINCE
