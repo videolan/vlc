@@ -5605,7 +5605,9 @@ dnl
 dnl  Create the vlc-config script
 dnl
 LDFLAGS_libvlc="${LDFLAGS_libvlc} ${LDFLAGS_builtin}"
-for i in `echo "${BUILTINS}" | sed -e 's@[^ ]*/@@g'` ; do LDFLAGS_libvlc="${LDFLAGS_libvlc} ${libdir}/vlc/${i}.a `eval echo '$'{LDFLAGS_${i}}`" ; done
+
+dnl following used to be the external libvlc target, what's replacing it now ?
+dnl for i in `echo "${BUILTINS}" | sed -e 's@[^ ]*/@@g'` ; do LDFLAGS_libvlc="${LDFLAGS_libvlc} ${libdir}/vlc/${i}.a `eval echo '$'{LDFLAGS_${i}}`" ; done
 
 dnl
 dnl  Configuration is finished
