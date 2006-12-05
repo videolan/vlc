@@ -3,16 +3,17 @@
  */
 package org.videolan.jvlc;
 
-import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 
 public final class Video implements VideoIntf {
 	
 	private long libvlcInstance;
 	
+    private JVLCCanvas actualCanvas;
+    
 	public Video( long libvlcInstance) {
 		this.libvlcInstance = libvlcInstance;
-		
 	}
 
 	/*
@@ -25,9 +26,10 @@ public final class Video implements VideoIntf {
     private native int			_getWidth();
     private native void			_getSnapshot(String filename);
     private native void			_destroyVideo();
-    private native void			_reparent(Component component);
+    private native void			_reparent(JVLCCanvas component);
     private native void			_setSize(int width, int height);
-	
+    private native void			_paint(JVLCCanvas canvas, Graphics g);
+
 	/* (non-Javadoc)
 	 * @see org.videolan.jvlc.VideoIntf#destroyVideo()
 	 */
@@ -66,8 +68,9 @@ public final class Video implements VideoIntf {
 	/* (non-Javadoc)
 	 * @see org.videolan.jvlc.VideoIntf#reparentVideo(java.awt.Component)
 	 */
-	public void reparent(Component c) throws VLCException {
+	public void reparent(JVLCCanvas c) throws VLCException {
 		_reparent(c);
+		setActualCanvas(c);
 	}
 
 	/* (non-Javadoc)
@@ -75,7 +78,6 @@ public final class Video implements VideoIntf {
 	 */
 	public void setSize(int width, int height) throws VLCException {
 		_setSize( width, height );
-
 	}
 
 	/* (non-Javadoc)
@@ -105,7 +107,15 @@ public final class Video implements VideoIntf {
 	public void setSize(Dimension d) throws VLCException {
 		setSize(d.width, d.height);
 	}
+	
+	public void paint(Graphics g) {
+		_paint(actualCanvas, g);
+	}
 
+	public void setActualCanvas(JVLCCanvas canvas) {
+		actualCanvas = canvas;
+	}
+	
 	public long getInstance() {
 		return libvlcInstance;
 	}

@@ -82,6 +82,9 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1destroy (JNIEnv *env, jobje
 }
 
 
+//JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLC__1paint (JNIEnv *env, jobject _this, jobject canvas, jobject graphics)
+
+
 /*
  * Utility functions
  */

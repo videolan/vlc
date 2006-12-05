@@ -14,7 +14,7 @@ public class Input implements InputIntf {
     private native void		_setTime(long value);
     private native void		_setPosition(float value);
     private native boolean  _isPlaying();
-    private native boolean  _hasVout();
+    private native boolean  _hasVout() throws VLCException;
 
     
     public Input( long instance ) {
@@ -51,7 +51,7 @@ public class Input implements InputIntf {
     }
 
     public boolean hasVout() throws VLCException {
-        return _hasVout();
+    	return _hasVout();
     }
     
 	public long getInstance() {

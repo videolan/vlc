@@ -39,91 +39,91 @@
 
 jlong getJVLCInstance (JNIEnv *env, jobject _this);
 
-JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLCCanvas_paint (JNIEnv *env, jobject canvas, jobject graphics) {
+// JNIEXPORT void JNICALL Java_org_videolan_jvlc_JVLCCanvas_paint (JNIEnv *env, jobject canvas, jobject graphics) {
 
-  JAWT awt;
-  JAWT_DrawingSurface* ds;
-  JAWT_DrawingSurfaceInfo* dsi;
-#ifdef WIN32
-  JAWT_Win32DrawingSurfaceInfo* dsi_win;
-#else
-  JAWT_X11DrawingSurfaceInfo* dsi_x11;
-  GC gc;
-#endif
+//   JAWT awt;
+//   JAWT_DrawingSurface* ds;
+//   JAWT_DrawingSurfaceInfo* dsi;
+// #ifdef WIN32
+//   JAWT_Win32DrawingSurfaceInfo* dsi_win;
+// #else
+//   JAWT_X11DrawingSurfaceInfo* dsi_x11;
+//   GC gc;
+// #endif
   
-  jint lock;
+//   jint lock;
     
-  libvlc_drawable_t drawable;
-  libvlc_exception_t *exception = ( libvlc_exception_t * ) malloc( sizeof( libvlc_exception_t ));
-  libvlc_exception_init( exception );
+//   libvlc_drawable_t drawable;
+//   libvlc_exception_t *exception = ( libvlc_exception_t * ) malloc( sizeof( libvlc_exception_t ));
+//   libvlc_exception_init( exception );
 
-  /* Get the AWT */
-  awt.version = JAWT_VERSION_1_3;
-  if (JAWT_GetAWT(env, &awt) == JNI_FALSE) {
-    printf("AWT Not found\n");
-    return;
-  }
+//   /* Get the AWT */
+//   awt.version = JAWT_VERSION_1_3;
+//   if (JAWT_GetAWT(env, &awt) == JNI_FALSE) {
+//     printf("AWT Not found\n");
+//     return;
+//   }
 
-  /* Get the drawing surface */
-  ds = awt.GetDrawingSurface(env, canvas);
-  if (ds == NULL) {
-    printf("NULL drawing surface\n");
-    return;
-  }
+//   /* Get the drawing surface */
+//   ds = awt.GetDrawingSurface(env, canvas);
+//   if (ds == NULL) {
+//     printf("NULL drawing surface\n");
+//     return;
+//   }
 
-  /* Lock the drawing surface */
-  lock = ds->Lock(ds);
-  if((lock & JAWT_LOCK_ERROR) != 0) {
-    printf("Error locking surface\n");
-    awt.FreeDrawingSurface(ds);
-    return;
-  }
+//   /* Lock the drawing surface */
+//   lock = ds->Lock(ds);
+//   if((lock & JAWT_LOCK_ERROR) != 0) {
+//     printf("Error locking surface\n");
+//     awt.FreeDrawingSurface(ds);
+//     return;
+//   }
 
-  /* Get the drawing surface info */
-  dsi = ds->GetDrawingSurfaceInfo(ds);
-  if (dsi == NULL) {
-    printf("Error getting surface info\n");
-    ds->Unlock(ds);
-    awt.FreeDrawingSurface(ds);
-    return;
-  }
+//   /* Get the drawing surface info */
+//   dsi = ds->GetDrawingSurfaceInfo(ds);
+//   if (dsi == NULL) {
+//     printf("Error getting surface info\n");
+//     ds->Unlock(ds);
+//     awt.FreeDrawingSurface(ds);
+//     return;
+//   }
 
 
-#ifdef WIN32
-  /* Get the platform-specific drawing info */
-  dsi_win = (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
+// #ifdef WIN32
+//   /* Get the platform-specific drawing info */
+//   dsi_win = (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
 
-  /* Now paint */
+//   /* Now paint */
 
-  drawable = reinterpret_cast<int>(dsi_win->hwnd);
-  long vlcInstance = getJVLCInstance( env, canvas );
-  libvlc_video_set_parent( (libvlc_instance_t *) vlcInstance, drawable, exception );
+//   drawable = reinterpret_cast<int>(dsi_win->hwnd);
+//   long vlcInstance = getJVLCInstance( env, canvas );
+//   libvlc_video_set_parent( (libvlc_instance_t *) vlcInstance, drawable, exception );
 
-#else // UNIX
-  /* Get the platform-specific drawing info */
-  dsi_x11 = (JAWT_X11DrawingSurfaceInfo*)dsi->platformInfo;
+// #else // UNIX
+//   /* Get the platform-specific drawing info */
+//   dsi_x11 = (JAWT_X11DrawingSurfaceInfo*)dsi->platformInfo;
 
-  /* Now paint */
-  gc = XCreateGC(dsi_x11->display, dsi_x11->drawable, 0, 0);
-  XSetBackground(dsi_x11->display, gc, 0);
+//   /* Now paint */
+//   gc = XCreateGC(dsi_x11->display, dsi_x11->drawable, 0, 0);
+//   XSetBackground(dsi_x11->display, gc, 0);
   
-  drawable = dsi_x11->drawable;
-  long vlcInstance = getJVLCInstance( env, canvas );
-  libvlc_video_set_parent( (libvlc_instance_t *)vlcInstance, drawable, exception );
+//   drawable = dsi_x11->drawable;
+//   long vlcInstance = getJVLCInstance( env, canvas );
+//   libvlc_video_set_parent( (libvlc_instance_t *)vlcInstance, drawable, exception );
 
-  XFreeGC(dsi_x11->display, gc);
+//   XFreeGC(dsi_x11->display, gc);
 
-#endif
+// #endif
 
-  /* Free the drawing surface info */
-  ds->FreeDrawingSurfaceInfo(dsi);
+//   /* Free the drawing surface info */
+//   ds->FreeDrawingSurfaceInfo(dsi);
 
-  /* Unlock the drawing surface */
-  ds->Unlock(ds);
+//   /* Unlock the drawing surface */
+//   ds->Unlock(ds);
 
-  /* Free the drawing surface */
-  awt.FreeDrawingSurface(ds);
-}
+//   /* Free the drawing surface */
+//   awt.FreeDrawingSurface(ds);
+// }
 
 /*
  * Utility functions

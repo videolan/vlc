@@ -29,7 +29,6 @@
 
 package org.videolan.jvlc;
 
-import java.awt.Component;
 import java.awt.Dimension;
 
 
@@ -91,7 +90,7 @@ public interface VideoIntf {
      * @param c
      * @throws VLCException
      */
-    void reparent(Component c) throws VLCException;
+    void reparent(JVLCCanvas c) throws VLCException;
     
     /**
      * Resizes video output to width and height. This operation could be necessary

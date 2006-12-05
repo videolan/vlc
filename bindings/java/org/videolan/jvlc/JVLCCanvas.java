@@ -33,7 +33,9 @@ import java.awt.Graphics;
 
 public class JVLCCanvas extends Canvas {
 
-    public native void paint(Graphics g);
+	public void paint(Graphics g) {
+		jvlc.video.paint(g);
+	}
 
     private final JVLC jvlc;
     
@@ -41,12 +43,16 @@ public class JVLCCanvas extends Canvas {
      * Default constructor. The canvas is set a dimension of 200x200
      */
     public JVLCCanvas() {
+    	super();
         jvlc = new JVLC();
+    	jvlc.video.setActualCanvas(this);
         setSize(200, 200);
     }
     
     public JVLCCanvas(String[] args) {
+    	super();
     	jvlc = new JVLC(args);
+    	jvlc.video.setActualCanvas(this);
     	setSize(200, 200);
     }
     
@@ -55,17 +61,23 @@ public class JVLCCanvas extends Canvas {
      * @param height The initial canvas height
      */
     public JVLCCanvas(int width, int height) {
+    	super();
         jvlc = new JVLC();
+    	jvlc.video.setActualCanvas(this);        
         setSize(width, height);
     }
     
     public JVLCCanvas(String[] args, int width, int height) {
+    	super();
         jvlc = new JVLC(args);
+    	jvlc.video.setActualCanvas(this);        
         setSize(width, height);
     }
 
     public JVLCCanvas(JVLC jvlc) {
+    	super();
         this.jvlc = jvlc;
+    	jvlc.video.setActualCanvas(this);        
     }
     
     public JVLC getJVLC() {

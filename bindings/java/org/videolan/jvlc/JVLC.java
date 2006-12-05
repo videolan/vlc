@@ -30,13 +30,12 @@
 
 package org.videolan.jvlc;
 
-
 public class JVLC implements Runnable {
     
     static {
         System.loadLibrary("jvlc" );
     }
-
+    
     /**
      * These are set as final since they live along the jvlc object
      */
@@ -92,7 +91,10 @@ public class JVLC implements Runnable {
      */
     public void destroy() {
     	beingDestroyed = true;
-    	_destroy();
+    	if (!beingDestroyed)
+    	{
+    		_destroy();
+    	}
     }
  
 
@@ -138,37 +140,33 @@ public class JVLC implements Runnable {
 	 * In this thread we check the playlist and input status.
 	 */
 	public void run() {
-		while (! beingDestroyed) {
-			try {
-				while (playlist.isRunning()) {
-					if (input.isPlaying()) {
-						inputPlaying = true;
-					}
-					else {
-						inputPlaying = false;
-				    }
-				            
-					if (input.hasVout()) {
-						inputVout = true;
-				    }
-					else {
-						inputVout = false;
-				    }
-					try {
+		try {
+			while (!beingDestroyed) {
+				try {
+					while (playlist.isRunning()) {
+						inputPlaying = input.isPlaying();
+						inputVout = input.hasVout();        
 						Thread.sleep(resolution);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					} 
+					} // while playlist running
+				} catch (VLCException e) {
+					e.printStackTrace();
 				}
-			} catch (VLCException e1) { } // while playlist running
-	           inputPlaying = false;
-	           inputVout = false;
-			try {
+				inputPlaying = false;
+				inputVout = false;
 				Thread.sleep(resolution);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} // try
-		} // while ! being destroyed
-	} // run
+			} // while ! being destroyed
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#finalize()
+	 */
+	protected void finalize() throws Throwable {
+		destroy();
+		super.finalize();
+	}
+
 }
 
