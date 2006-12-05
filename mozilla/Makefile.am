@@ -169,7 +169,7 @@ libnpvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla pic` \
 	             $(CPPFLAGS_mozilla_EXTRA)
 libnpvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla pic` \
 	               $(CPPFLAGS_mozilla_EXTRA)
-LDFLAGS_libnpvlc = $(LDFLAGS_npvlc) `$(VLC_CONFIG) --libs mozilla vlc builtin pic`
+LDFLAGS_libnpvlc = $(LDFLAGS_npvlc) `$(VLC_CONFIG) --libs mozilla libvlc builtin pic`
 libnpvlc_a_DEPENDENCIES = $(DATA_npvlc_rc)
 
 $(npvlc): $(libnpvlc_a_OBJECTS) $(libnpvlc_a_DEPENDENCIES) stamp-pic

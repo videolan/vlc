@@ -75,7 +75,7 @@ noinst_LIBRARIES_activex = libaxvlc.a
 axvlc_DATA = axvlc$(LIBEXT)
 axvlcdir = $(libdir)
 
-LDFLAGS_activex = `$(VLC_CONFIG) --libs activex vlc builtin`
+LDFLAGS_activex = `$(VLC_CONFIG) --libs activex libvlc builtin`
 
 libaxvlc_a_SOURCES = $(SOURCES_activex) $(SOURCE_dll)
 libaxvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags activex`
