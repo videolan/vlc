@@ -197,11 +197,13 @@ vlc_bool_t libvlc_input_has_vout( libvlc_input_t *p_input,
                                   libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_input, p_e );
-
-    /* GetVout will raise the exception for us */
-    if( !p_vout )
+    if ( libvlc_exception_raised( p_e ) )
     {
-        return VLC_FALSE;
+        if ( strcmp( "No active video output", libvlc_exception_get_message( p_e ) ) == 0 )
+	{
+	    libvlc_exception_clear( p_e );
+	}
+	return VLC_FALSE;
     }
 
     vlc_object_release( p_vout );
