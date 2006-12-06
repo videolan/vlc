@@ -1045,20 +1045,7 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
     {
         char *input;
 
-        if( psz_value != NULL && strlen(psz_value) > 1 &&
-            ( psz_value[0] == '\'' || psz_value[0] == '\"' ) &&
-            ( psz_value[ strlen(psz_value) - 1 ] == '\'' ||
-              psz_value[ strlen(psz_value) - 1 ] == '\"' )  )
-        {
-            input = malloc( strlen(psz_value) - 1 );
-
-            memcpy( input, psz_value + 1, strlen(psz_value) - 2 );
-            input[ strlen(psz_value) - 2 ] = '\0';
-        }
-        else
-        {
-            input = strdup( psz_value );
-        }
+        input = strdup( psz_value );
 
         TAB_APPEND( media->i_input, media->input, input );
     }
@@ -1074,20 +1061,7 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
         char *input;
         int i;
 
-        if( psz_value != NULL && strlen(psz_value) > 1 &&
-            ( psz_value[0] == '\'' || psz_value[0] == '\"' ) &&
-            ( psz_value[ strlen(psz_value) - 1 ] == '\'' ||
-              psz_value[ strlen(psz_value) - 1 ] == '\"' )  )
-        {
-            input = malloc( strlen(psz_value) - 1 );
-
-            memcpy( input, psz_value + 1, strlen(psz_value) - 2 );
-            input[ strlen(psz_value) - 2 ] = '\0';
-        }
-        else
-        {
-            input = strdup( psz_value );
-        }
+        input = strdup( psz_value );
 
         for( i = 0; i < media->i_input; i++ )
         {
