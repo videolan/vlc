@@ -575,7 +575,7 @@ gnutls_ClientCreate( tls_t *p_tls )
     tls_session_t *p_session = NULL;
     tls_client_sys_t *p_sys = NULL;
     int i_val;
-    const int cert_type_priority[3] =
+    static const int cert_type_priority[3] =
     {
         GNUTLS_CRT_X509,
         0
