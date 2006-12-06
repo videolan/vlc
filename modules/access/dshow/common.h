@@ -34,6 +34,9 @@ using namespace std;
 #   include <unknwn.h>
 #   include <ole2.h>
 #   include <limits.h>
+#   ifdef _WINGDI_
+#      undef _WINGDI_
+#   endif
 #   define _WINGDI_ 1
 #   define AM_NOVTABLE
 #   define _OBJBASE_H_
