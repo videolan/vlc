@@ -98,6 +98,7 @@ src/input/meta.c
 src/input/stream.c
 src/input/subtitles.c
 src/input/var.c
+src/input/vlm.c
 src/interface/interaction.c
 src/interface/interface.c
 src/interface/interface.h
@@ -105,6 +106,7 @@ src/interface/intf_eject.c
 src/libvlc.c
 src/libvlc-common.c
 src/libvlc.h
+src/libvlc-module.c
 src/misc/beos_specific.cpp
 src/misc/block.c
 src/misc/configuration.c
@@ -127,7 +129,6 @@ src/misc/threads.c
 src/misc/update.c
 src/misc/variables.c
 src/misc/variables.h
-src/misc/vlm.c
 src/misc/win32_specific.c
 src/misc/xml.c
 src/network/acl.c
@@ -559,6 +560,8 @@ modules/gui/qt4/dialogs/errors.cpp
 modules/gui/qt4/dialogs/errors.hpp
 modules/gui/qt4/dialogs/extended.cpp
 modules/gui/qt4/dialogs/extended.hpp
+modules/gui/qt4/dialogs/help.cpp
+modules/gui/qt4/dialogs/help.hpp
 modules/gui/qt4/dialogs/interaction.cpp
 modules/gui/qt4/dialogs/interaction.hpp
 modules/gui/qt4/dialogs/mediainfo.cpp
