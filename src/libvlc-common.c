@@ -63,13 +63,8 @@
 #endif
 
 #ifdef HAVE_DBUS_3
+/* used for one-instance mode */
 #   include <dbus/dbus.h>
-
-/* this is also defined in modules/control/dbus.h */
-/* names registered on the session bus */
-#define VLC_DBUS_SERVICE        "org.videolan.vlc"
-#define VLC_DBUS_INTERFACE      "org.videolan.vlc"
-#define VLC_DBUS_OBJECT_PATH    "/org/videolan/vlc"
 #endif
 
 #ifdef HAVE_HAL
@@ -632,12 +627,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     else
     {
         /* we request the service org.videolan.vlc */
-        i_dbus_service = dbus_bus_request_name( p_conn, VLC_DBUS_SERVICE, 0, 
+        i_dbus_service = dbus_bus_request_name( p_conn, "org.videolan.vlc", 0, 
                 &dbus_error );
         if( dbus_error_is_set( &dbus_error ) )
         { 
-            msg_Err( p_libvlc, "Error requesting %s service: %s\n",
-                    VLC_DBUS_SERVICE, dbus_error.message );
+            msg_Err( p_libvlc, "Error requesting org.videolan.vlc service: "
+                    "%s\n", dbus_error.message );
             dbus_error_free( &dbus_error );
         }
         else
@@ -646,14 +641,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
             { /* the name is already registered by another instance of vlc */
                 if( config_GetInt( p_libvlc, "one-instance" ) )
                 {
-                    /* check if /org/videolan/vlc exists
+                    /* check if a Media Player is available
                      * if not: D-Bus control is not enabled on the other
                      * instance and we can't pass MRLs to it */
                     DBusMessage *p_test_msg, *p_test_reply;
                     p_test_msg =  dbus_message_new_method_call(
-                            VLC_DBUS_SERVICE, VLC_DBUS_OBJECT_PATH,
-                            VLC_DBUS_INTERFACE, "Nothing" );
-                    /* block unti a reply arrives */
+                            "org.freedesktop.MediaPlayer", "/",
+                            "org.freedesktop.MediaPlayer", "Identity" );
+                    /* block until a reply arrives */
                     p_test_reply = dbus_connection_send_with_reply_and_block(
                             p_conn, p_test_msg, -1, &dbus_error );
                     dbus_message_unref( p_test_msg );
@@ -683,8 +678,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
                                     ppsz_argv[i_input] );
 
                             p_dbus_msg = dbus_message_new_method_call(
-                                    VLC_DBUS_SERVICE, VLC_DBUS_OBJECT_PATH,
-                                    VLC_DBUS_INTERFACE, "AddMRL" );
+                                    "org.freedesktop.MediaPlayer", "/TrackList",
+                                    "org.freedesktop.MediaPlayer", "AddTrack" );
 
                             if ( NULL == p_dbus_msg )
                             {
@@ -748,9 +743,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
                 } /* we're not in one-instance mode */
                 else
                 {
-                    msg_Dbg( p_libvlc, 
-                            "%s is already registered on the session bus\n",
-                            VLC_DBUS_SERVICE );
+                    msg_Dbg( p_libvlc, "org.videolan.vlc is already registered "
+                            "on the session bus\n" );
                 }
             } /* the named is owned by something else */
             else
@@ -762,8 +756,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
                     msg_Err( p_libvlc, "Out of memory" );
                 }
                 msg_Dbg( p_libvlc, 
-                        "We are the primary owner of %s on the session bus",
-                        VLC_DBUS_SERVICE );
+                        "We are the primary owner of org.videolan.vlc on the "
+                        " session bus" );
             }
         } /* no error when requesting the name on the bus */
         /* we unreference the connection when we've finished with it */

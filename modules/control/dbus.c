@@ -67,7 +67,7 @@ static void Close   ( vlc_object_t * );
 static void Run        ( intf_thread_t * );
 
 
-static int ItemChange( vlc_object_t *p_this, const char *psz_var,
+static int TrackChange( vlc_object_t *p_this, const char *psz_var,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
 struct intf_sys_t
@@ -91,18 +91,12 @@ vlc_module_end();
 /*****************************************************************************
  * Methods
  *****************************************************************************/
-
-DBUS_METHOD( Nothing )
-{ /* do nothing */
-    REPLY_INIT;
-    REPLY_SEND;
-}
-
+#if 0
 DBUS_METHOD( PlaylistExport_XSPF )
-{ /* export playlist to an xspf file */
+{ /*export playlist to an xspf file */
 
   /* reads the filename to export to */
-  /* returns the status as uint16:
+  /* returns the status as int32:
    *    0 : success
    *    1 : error
    *    2 : playlist empty
@@ -114,7 +108,7 @@ DBUS_METHOD( PlaylistExport_XSPF )
     dbus_error_init( &error );
 
     char *psz_file;
-    dbus_uint16_t i_ret;
+    dbus_int32_t i_ret;
 
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_STRING, &psz_file,
@@ -145,9 +139,12 @@ DBUS_METHOD( PlaylistExport_XSPF )
 
     pl_Release( ((vlc_object_t*) p_this ) );
 
-    ADD_UINT16( &i_ret );
+    ADD_INT32( &i_ret );
     REPLY_SEND;
 }
+#endif
+
+/* Player */
 
 DBUS_METHOD( Quit )
 { /* exits vlc */
@@ -164,7 +161,7 @@ DBUS_METHOD( PositionGet )
     REPLY_INIT;
     OUT_ARGUMENTS;
     vlc_value_t position;
-    dbus_uint16_t i_pos;
+    dbus_int32_t i_pos;
 
     playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
     input_thread_t *p_input = p_playlist->p_input;
@@ -176,7 +173,7 @@ DBUS_METHOD( PositionGet )
         var_Get( p_input, "position", &position );
         i_pos = position.f_float * 1000 ;
     }
-    ADD_UINT16( &i_pos );
+    ADD_INT32( &i_pos );
     pl_Release( ((vlc_object_t*) p_this) );
     REPLY_SEND;
 }
@@ -186,13 +183,13 @@ DBUS_METHOD( PositionSet )
 
     REPLY_INIT;
     vlc_value_t position;
-    dbus_uint16_t i_pos;
+    dbus_int32_t i_pos;
 
     DBusError error;
     dbus_error_init( &error );
 
     dbus_message_get_args( p_from, &error,
-            DBUS_TYPE_UINT16, &i_pos,
+            DBUS_TYPE_INT32, &i_pos,
             DBUS_TYPE_INVALID );
 
     if( dbus_error_is_set( &error ) )
@@ -218,11 +215,12 @@ DBUS_METHOD( VolumeGet )
 { /* returns volume in percentage */
     REPLY_INIT;
     OUT_ARGUMENTS;
-    dbus_uint16_t i_vol;
-    /* 2nd argument of aout_VolumeGet is uint16 */
+    dbus_int32_t i_dbus_vol;
+    audio_volume_t i_vol;
+    /* 2nd argument of aout_VolumeGet is int32 */
     aout_VolumeGet( (vlc_object_t*) p_this, &i_vol );
-    i_vol = ( 100 * i_vol ) / AOUT_VOLUME_MAX;
-    ADD_UINT16( &i_vol );
+    i_dbus_vol = ( 100 * i_vol ) / AOUT_VOLUME_MAX;
+    ADD_INT32( &i_dbus_vol );
     REPLY_SEND;
 }
 
@@ -233,10 +231,11 @@ DBUS_METHOD( VolumeSet )
     DBusError error;
     dbus_error_init( &error );
 
-    dbus_uint16_t i_vol;
+    dbus_int32_t i_dbus_vol;
+    audio_volume_t i_vol;
 
     dbus_message_get_args( p_from, &error,
-            DBUS_TYPE_UINT16, &i_vol,
+            DBUS_TYPE_INT32, &i_dbus_vol,
             DBUS_TYPE_INVALID );
 
     if( dbus_error_is_set( &error ) )
@@ -247,7 +246,8 @@ DBUS_METHOD( VolumeSet )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    aout_VolumeSet( (vlc_object_t*) p_this, ( AOUT_VOLUME_MAX / 100 ) * i_vol );
+    i_vol = ( AOUT_VOLUME_MAX / 100 ) *i_dbus_vol;
+    aout_VolumeSet( (vlc_object_t*) p_this, i_vol );
 
     REPLY_SEND;
 }
@@ -279,84 +279,67 @@ DBUS_METHOD( Stop )
     REPLY_SEND;
 }
 
-DBUS_METHOD( GetPlayingItem )
-{ /* return the current item */
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-    char psz_no_input = '\0';
-    char *p_psz_no_input = &psz_no_input;
-    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
-    input_thread_t *p_input = p_playlist->p_input;
-    ADD_STRING( ( p_input ) ? &input_GetItem(p_input)->psz_name :
-            &p_psz_no_input );
-    pl_Release( ((vlc_object_t*) p_this) );
-    REPLY_SEND;
-}
-
-DBUS_METHOD( GetPlayStatus )
-{ /* return a string */
+DBUS_METHOD( GetStatus )
+{ /* returns an int: 0=playing 1=paused 2=stopped */
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    char *psz_play;
+    dbus_int32_t i_status;
     vlc_value_t val;
+
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     input_thread_t *p_input = p_playlist->p_input;
 
-    if( !p_input )
-        psz_play = strdup( "stopped" );
-    else
+    i_status = 2;
+    if( p_input )
     {
         var_Get( p_input, "state", &val );
         if( val.i_int == PAUSE_S )
-            psz_play = strdup( "pause" );
+            i_status = 1;
         else if( val.i_int == PLAYING_S )
-            psz_play = strdup( "playing" );
-        else psz_play = strdup( "unknown" );
+            i_status = 0;
     }
 
     pl_Release( p_playlist );
 
-    ADD_STRING( &psz_play );
-    free( psz_play );
+    ADD_INT32( &i_status );
     REPLY_SEND;
 }
 
-DBUS_METHOD( TogglePause )
-{ /* return a bool: true if playing */
+DBUS_METHOD( Pause )
+{
+    REPLY_INIT;
+    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    playlist_Pause( p_playlist );
+    pl_Release( p_playlist );
+    REPLY_SEND;
+}
+
+DBUS_METHOD( Play )
+{
+    REPLY_INIT;
+    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    playlist_Play( p_playlist );
+    pl_Release( p_playlist );
+    REPLY_SEND;
+}
+
+/* Media Player information */
+
+DBUS_METHOD( Identity )
+{
     REPLY_INIT;
     OUT_ARGUMENTS;
-
-    vlc_value_t val;
-    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    input_thread_t *p_input = p_playlist->p_input;
-    if( p_input != NULL )
-    {
-        var_Get( p_input, "state", &val );
-        if( val.i_int != PAUSE_S )
-        {
-            val.i_int = PAUSE_S;
-            playlist_Pause( p_playlist );
-        }
-        else
-        {
-            val.i_int = PLAYING_S;
-            playlist_Play( p_playlist );
-        }
-    }
-    else
-    {
-        val.i_int = PLAYING_S;
-        playlist_Play( p_playlist );
-    }
-    pl_Release( p_playlist );
-
-    dbus_bool_t pause = ( val.i_int == PLAYING_S ) ? TRUE : FALSE;
-    ADD_BOOL( &pause );
+    char *psz_identity = malloc( strlen( PACKAGE ) + strlen( VERSION ) + 1 );
+    sprintf( psz_identity, "%s %s", PACKAGE, VERSION );
+    ADD_STRING( &psz_identity );
+    free( psz_identity );
     REPLY_SEND;
 }
 
-DBUS_METHOD( AddMRL )
+/* TrackList */
+
+DBUS_METHOD( AddTrack )
 { /* add the string to the playlist, and play it if the boolean is true */
     REPLY_INIT;
 
@@ -387,49 +370,165 @@ DBUS_METHOD( AddMRL )
     REPLY_SEND;
 }
 
-/*****************************************************************************
- * Introspection method
- *****************************************************************************/
-
-DBUS_METHOD( handle_introspect )
-{ /* handles introspection of /org/videolan/vlc */
+DBUS_METHOD( GetCurrentTrack )
+{ //TODO
     REPLY_INIT;
     OUT_ARGUMENTS;
-    ADD_STRING( &psz_introspection_xml_data );
+    dbus_int32_t i_position = 0;
+    //TODO get position of playing element
+    ADD_INT32( &i_position );
+    REPLY_SEND;
+}
+
+DBUS_METHOD( GetMetadata )
+{ //TODO reads int, returns a{sv}
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    DBusError error;
+    dbus_error_init( &error );
+
+    dbus_int32_t i_position;
+
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_INT32, &i_position,
+            DBUS_TYPE_INVALID );
+
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+                error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    //TODO return a{sv}
+
+    REPLY_SEND;
+}
+
+DBUS_METHOD( GetLength )
+{ //TODO
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    dbus_int32_t i_elements = 0;
+    //TODO: return number of elements in playlist
+    ADD_INT32( &i_elements );
+    REPLY_SEND;
+}
+
+DBUS_METHOD( DelTrack )
+{ //TODO
+    REPLY_INIT;
+
+    DBusError error;
+    dbus_error_init( &error );
+
+    dbus_int32_t i_position;
+
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_INT32, &i_position,
+            DBUS_TYPE_INVALID );
+
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+                error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    //TODO delete the element
+
     REPLY_SEND;
 }
 
 /*****************************************************************************
- * handle_messages: answer to incoming messages
+ * Introspection method
+ *****************************************************************************/
+
+DBUS_METHOD( handle_introspect_root )
+{ /* handles introspection of /org/videolan/vlc */
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    ADD_STRING( &psz_introspection_xml_data_root );
+    REPLY_SEND;
+}
+
+DBUS_METHOD( handle_introspect_player )
+{
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    ADD_STRING( &psz_introspection_xml_data_player );
+    REPLY_SEND;
+}
+
+DBUS_METHOD( handle_introspect_tracklist )
+{
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    ADD_STRING( &psz_introspection_xml_data_tracklist );
+    REPLY_SEND;
+}
+
+/*****************************************************************************
+ * handle_*: answer to incoming messages
  *****************************************************************************/
 
 #define METHOD_FUNC( method, function ) \
     else if( dbus_message_is_method_call( p_from, VLC_DBUS_INTERFACE, method ) )\
         return function( p_conn, p_from, p_this )
 
-DBUS_METHOD( handle_messages )
-{ /* the main handler, that call methods */
+DBUS_METHOD( handle_root )
+{
 
     if( dbus_message_is_method_call( p_from,
                 DBUS_INTERFACE_INTROSPECTABLE, "Introspect" ) )
-        return handle_introspect( p_conn, p_from, p_this );
+        return handle_introspect_root( p_conn, p_from, p_this );
 
     /* here D-Bus method's names are associated to an handler */
 
-    METHOD_FUNC( "GetPlayStatus",           GetPlayStatus );
-    METHOD_FUNC( "GetPlayingItem",          GetPlayingItem );
-    METHOD_FUNC( "AddMRL",                  AddMRL );
-    METHOD_FUNC( "TogglePause",             TogglePause );
-    METHOD_FUNC( "Nothing",                 Nothing );
+    METHOD_FUNC( "Identity",                Identity );
+
+    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+}
+
+
+DBUS_METHOD( handle_player )
+{
+    if( dbus_message_is_method_call( p_from,
+                DBUS_INTERFACE_INTROSPECTABLE, "Introspect" ) )
+    return handle_introspect_player( p_conn, p_from, p_this );
+
+    /* here D-Bus method's names are associated to an handler */
+
     METHOD_FUNC( "Prev",                    Prev );
     METHOD_FUNC( "Next",                    Next );
     METHOD_FUNC( "Quit",                    Quit );
     METHOD_FUNC( "Stop",                    Stop );
+    METHOD_FUNC( "Play",                    Play );
+    METHOD_FUNC( "Pause",                   Pause );
     METHOD_FUNC( "VolumeSet",               VolumeSet );
     METHOD_FUNC( "VolumeGet",               VolumeGet );
     METHOD_FUNC( "PositionSet",             PositionSet );
     METHOD_FUNC( "PositionGet",             PositionGet );
-    METHOD_FUNC( "PlaylistExport_XSPF",     PlaylistExport_XSPF );
+    METHOD_FUNC( "GetStatus",               GetStatus );
+
+    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+}
+
+DBUS_METHOD( handle_tracklist )
+{
+    if( dbus_message_is_method_call( p_from,
+                DBUS_INTERFACE_INTROSPECTABLE, "Introspect" ) )
+    return handle_introspect_tracklist( p_conn, p_from, p_this );
+
+    /* here D-Bus method's names are associated to an handler */
+
+    METHOD_FUNC( "GetMetadata",             GetMetadata );
+    METHOD_FUNC( "GetCurrentTrack",         GetCurrentTrack );
+    METHOD_FUNC( "GetLength",               GetLength );
+    METHOD_FUNC( "AddTrack",                AddTrack );
+    METHOD_FUNC( "DelTrack",                DelTrack );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
@@ -464,18 +563,32 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    /* register a well-known name on the bus */
+    dbus_bus_request_name( p_conn, "org.freedesktop.MediaPlayer", 0, &error );
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( p_this, "Error requesting org.freedesktop.MediaPlayer service:"                " %s\n", error.message );
+        dbus_error_free( &error );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
     /* we unregister the object /, registered by libvlc */
     dbus_connection_unregister_object_path( p_conn, "/" );
 
-    /* we register the object /org/videolan/vlc */
-    dbus_connection_register_object_path( p_conn, VLC_DBUS_OBJECT_PATH,
-            &vlc_dbus_vtable, p_this );
+    /* we register the objects */
+    dbus_connection_register_object_path( p_conn, VLC_DBUS_ROOT_PATH,
+            &vlc_dbus_root_vtable, p_this );
+    dbus_connection_register_object_path( p_conn, VLC_DBUS_PLAYER_PATH,
+            &vlc_dbus_player_vtable, p_this );
+    dbus_connection_register_object_path( p_conn, VLC_DBUS_TRACKLIST_PATH,
+            &vlc_dbus_tracklist_vtable, p_this );
 
     dbus_connection_flush( p_conn );
 
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
-    var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+    var_AddCallback( p_playlist, "playlist-current", TrackChange, p_intf );
     PL_UNLOCK;
     pl_Release( p_playlist );
 
@@ -496,7 +609,7 @@ static void Close   ( vlc_object_t *p_this )
     playlist_t      *p_playlist = pl_Yield( p_intf );;
 
     PL_LOCK;
-    var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+    var_DelCallback( p_playlist, "playlist-current", TrackChange, p_intf );
     PL_UNLOCK;
     pl_Release( p_playlist );
 
@@ -519,12 +632,12 @@ static void Run          ( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * ItemChange: Playlist item change callback
+ * TrackChange: Playlist item change callback
  *****************************************************************************/
 
-DBUS_SIGNAL( ItemChangeSignal )
+DBUS_SIGNAL( TrackChangeSignal )
 { /* emit the name of the new item */
-    SIGNAL_INIT( "ItemChange" );
+    SIGNAL_INIT( "TrackChange" );
     OUT_ARGUMENTS;
 
     input_thread_t *p_input = (input_thread_t*) p_data;
@@ -533,7 +646,7 @@ DBUS_SIGNAL( ItemChangeSignal )
     SIGNAL_SEND;
 }
 
-static int ItemChange( vlc_object_t *p_this, const char *psz_var,
+static int TrackChange( vlc_object_t *p_this, const char *psz_var,
             vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
@@ -557,7 +670,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     PL_UNLOCK;
     pl_Release( p_playlist );
 
-    ItemChangeSignal( p_sys->p_conn, p_input );
+    TrackChangeSignal( p_sys->p_conn, p_input );
 
     vlc_object_release( p_input );
     return VLC_SUCCESS;

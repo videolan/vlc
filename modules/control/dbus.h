@@ -23,12 +23,12 @@
 
 /* DBUS IDENTIFIERS */
 
-/* this is also defined in src/libvlc-common.c for one-instance mode */
-
 /* name registered on the session bus */
-#define VLC_DBUS_SERVICE        "org.videolan.vlc"
-#define VLC_DBUS_INTERFACE      "org.videolan.vlc"
-#define VLC_DBUS_OBJECT_PATH    "/org/videolan/vlc"
+#define VLC_DBUS_SERVICE        "org.freedesktop.MediaPlayer"
+#define VLC_DBUS_INTERFACE      "org.freedesktop.MediaPlayer"
+#define VLC_DBUS_ROOT_PATH      "/"
+#define VLC_DBUS_PLAYER_PATH    "/Player"
+#define VLC_DBUS_TRACKLIST_PATH "/TrackList"
 
 /* MACROS */
 
@@ -52,7 +52,7 @@
     return DBUS_HANDLER_RESULT_HANDLED
 
 #define SIGNAL_INIT( signal ) \
-    DBusMessage *p_msg = dbus_message_new_signal( VLC_DBUS_OBJECT_PATH, \
+    DBusMessage *p_msg = dbus_message_new_signal( VLC_DBUS_PLAYER_PATH, \
         VLC_DBUS_INTERFACE, signal ); \
     if( !p_msg ) return DBUS_HANDLER_RESULT_NEED_MEMORY; \
 
@@ -73,13 +73,29 @@
 
 #define ADD_STRING( s ) DBUS_ADD( DBUS_TYPE_STRING, s )
 #define ADD_BOOL( b ) DBUS_ADD( DBUS_TYPE_BOOLEAN, b )
-#define ADD_UINT32( i ) DBUS_ADD( DBUS_TYPE_UINT32, i )
-#define ADD_UINT16( i ) DBUS_ADD( DBUS_TYPE_UINT16, i )
+#define ADD_INT32( i ) DBUS_ADD( DBUS_TYPE_INT32, i )
 #define ADD_BYTE( b ) DBUS_ADD( DBUS_TYPE_BYTE, b )
 
 /* XML data to answer org.freedesktop.DBus.Introspectable.Introspect requests */
 
-const char* psz_introspection_xml_data =
+const char* psz_introspection_xml_data_root =
+"<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN\"\n"
+"\"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n"
+"<node>"
+"  <interface name=\"org.freedesktop.DBus.Introspectable\">\n"
+"    <method name=\"Introspect\">\n"
+"      <arg name=\"data\" direction=\"out\" type=\"s\"/>\n"
+"    </method>\n"
+"  </interface>\n"
+"  <interface name=\"org.freedesktop.MediaPlayer\">\n"
+"    <method name=\"Identity\">\n"
+"      <arg type=\"s\" direction=\"out\" />\n"
+"    </method>\n"
+"  </interface>\n"
+"</node>\n"
+;
+
+const char* psz_introspection_xml_data_player =
 "<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN\"\n"
 "\"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n"
 "<node>"
@@ -89,20 +105,8 @@ const char* psz_introspection_xml_data =
 "    </method>\n"
 "  </interface>\n"
 "  <interface name=\"org.videolan.vlc\">\n"
-"    <method name=\"GetPlayStatus\">\n"
-"      <arg type=\"s\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"GetPlayingItem\">\n"
-"      <arg type=\"s\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"TogglePause\">\n"
-"      <arg type=\"b\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"AddMRL\">\n"
-"      <arg type=\"s\" direction=\"in\" />\n"
-"      <arg type=\"b\" direction=\"in\" />\n"
-"    </method>\n"
-"    <method name=\"Nothing\">\n"
+"    <method name=\"GetStatus\">\n"
+"      <arg type=\"i\" direction=\"out\" />\n"
 "    </method>\n"
 "    <method name=\"Quit\">\n"
 "    </method>\n"
@@ -112,36 +116,78 @@ const char* psz_introspection_xml_data =
 "    </method>\n"
 "    <method name=\"Stop\">\n"
 "    </method>\n"
+"    <method name=\"Play\">\n"
+"    </method>\n"
+"    <method name=\"Pause\">\n"
+"    </method>\n"
 "    <method name=\"VolumeSet\">\n"
-"      <arg type=\"q\" direction=\"in\" />\n"
+"      <arg type=\"i\" direction=\"in\" />\n"
 "    </method>\n"
 "    <method name=\"VolumeGet\">\n"
-"      <arg type=\"q\" direction=\"out\" />\n"
+"      <arg type=\"i\" direction=\"out\" />\n"
 "    </method>\n"
 "    <method name=\"PositionSet\">\n"
-"      <arg type=\"q\" direction=\"in\" />\n"
+"      <arg type=\"i\" direction=\"in\" />\n"
 "    </method>\n"
 "    <method name=\"PositionGet\">\n"
-"      <arg type=\"q\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"PlaylistExport_XSPF\">\n"
-"      <arg type=\"s\" direction=\"in\" />\n"
-"      <arg type=\"q\" direction=\"out\" />\n"
+"      <arg type=\"i\" direction=\"out\" />\n"
 "    </method>\n"
 "  </interface>\n"
 "</node>\n"
 ;
 
-/* Handling of messages received onn VLC_DBUS_OBJECT_PATH */
-DBUS_METHOD( handle_messages ); /* handler function */
+const char* psz_introspection_xml_data_tracklist =
+"<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN\"\n"
+"\"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n"
+"<node>"
+"  <interface name=\"org.freedesktop.DBus.Introspectable\">\n"
+"    <method name=\"Introspect\">\n"
+"      <arg name=\"data\" direction=\"out\" type=\"s\"/>\n"
+"    </method>\n"
+"  </interface>\n"
+"  <interface name=\"org.videolan.vlc\">\n"
+"    <method name=\"AddTrack\">\n"
+"      <arg type=\"s\" direction=\"in\" />\n"
+"      <arg type=\"b\" direction=\"in\" />\n"
+"    </method>\n"
+"    <method name=\"DelTrack\">\n"
+"      <arg type=\"i\" direction=\"in\" />\n"
+"    </method>\n"
+"    <method name=\"GetMetadata\">\n"
+"      <arg type=\"i\" direction=\"in\" />\n"
+"      <arg type=\"a{sv}\" direction=\"out\" />\n"
+"    </method>\n"
+"    <method name=\"GetCurrentTrack\">\n"
+"      <arg type=\"i\" direction=\"out\" />\n"
+"    </method>\n"
+"    <method name=\"GetLength\">\n"
+"      <arg type=\"i\" direction=\"out\" />\n"
+"    </method>\n"
+"  </interface>\n"
+"</node>\n"
+;
 
-/* vtable passed to dbus_connection_register_object_path() */
-static DBusObjectPathVTable vlc_dbus_vtable = {
-        NULL, /* Called when vtable is unregistered or its connection is freed*/
-        handle_messages, /* handler function */
-        NULL,
-        NULL,
-        NULL,
-        NULL
+#define VLC_DBUS_ROOT_PATH      "/"
+#define VLC_DBUS_PLAYER_PATH    "/Player"
+#define VLC_DBUS_TRACKLIST_PATH "/TrackList"
+
+/* Handle  messages reception */
+DBUS_METHOD( handle_root );
+DBUS_METHOD( handle_player );
+DBUS_METHOD( handle_tracklist );
+
+static DBusObjectPathVTable vlc_dbus_root_vtable = {
+        NULL, handle_root, /* handler function */
+        NULL, NULL, NULL, NULL
+};
+
+static DBusObjectPathVTable vlc_dbus_player_vtable = {
+        NULL, handle_player, /* handler function */
+        NULL, NULL, NULL, NULL
+};
+
+static DBusObjectPathVTable vlc_dbus_tracklist_vtable = {
+        NULL, handle_tracklist, /* handler function */
+        NULL, NULL, NULL, NULL
 };
 

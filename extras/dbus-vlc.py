@@ -30,50 +30,53 @@ import os
 
 global position
 global timer
-global playing
+#global playing
 
 def itemchange_handler(item):
     gobject.timeout_add( 2000, timeset)
     l_item.set_text(item)
 
 bus = dbus.SessionBus()
-remote_object = bus.get_object("org.videolan.vlc", "/org/videolan/vlc")
-interface  = dbus.Interface(remote_object, "org.videolan.vlc")
+player_o = bus.get_object("org.freedesktop.MediaPlayer", "/Player")
+tracklist_o = bus.get_object("org.freedesktop.MediaPlayer", "/TrackList")
+
+tracklist  = dbus.Interface(tracklist_o, "org.freedesktop.MediaPlayer")
+player = dbus.Interface(player_o, "org.freedesktop.MediaPlayer")
 try:
-    remote_object.connect_to_signal("ItemChange", itemchange_handler, dbus_interface="org.videolan.vlc")
+    player_o.connect_to_signal("TrackChange", itemchange_handler, dbus_interface="org.freedesktop.MediaPlayer")
 except:
     True
 
-def AddMRL(widget):
+def AddTrack(widget):
     mrl = e_mrl.get_text()
     if mrl != None and mrl != "":
-        interface.AddMRL(mrl, True)
+        tracklist.AddTrack(mrl, True)
     else:
         mrl = bt_file.get_filename()
         if mrl != None and mrl != "":
-            interface.AddMRL("directory://" + mrl, True)
+            tracklist.AddTrack("directory://" + mrl, True)
 
 def Next(widget):
-    interface.Next(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
+    player.Next(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     update(0)
 
 def Prev(widget):
-    interface.Prev(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
+    player.Prev(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     update(0)
 
 def Stop(widget):
-    interface.Stop(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
+    player.Stop(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     update(0)
 
 def update(widget):
-    itemchange_handler(str(interface.GetPlayingItem()))
-    vol.set_value(interface.VolumeGet())
+#    itemchange_handler(str(player.GetPlayingItem()))
+    vol.set_value(player.VolumeGet())
     GetPlayStatus(0)
 
 def GetPlayStatus(widget):
     global playing
-    status = str(interface.GetPlayStatus())
-    if status == "playing":
+    status = str(player.GetStatus())
+    if status == 0:
         img_bt_toggle.set_from_stock("gtk-media-pause", gtk.ICON_SIZE_SMALL_TOOLBAR)
         playing = True
     else:
@@ -81,26 +84,25 @@ def GetPlayStatus(widget):
         playing = False
 
 def Quit(widget):
-    interface.Quit(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
+    player.Quit(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     l_item.set_text("")
 
-def TogglePause(widget):
-    if interface.TogglePause() == True:
-        img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_SMALL_TOOLBAR)
-    else:
-        img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PLAY, gtk.ICON_SIZE_SMALL_TOOLBAR)
+def Pause(widget):
+    player.Pause()
+#        img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_SMALL_TOOLBAR)
+#        img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PLAY, gtk.ICON_SIZE_SMALL_TOOLBAR)
     update(0)
 
 def volchange(widget, data):
-    interface.VolumeSet(vol.get_value_as_int(), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
+    player.VolumeSet(vol.get_value_as_int(), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
 
 def timechange(widget, x=None, y=None):
-    interface.PositionSet(time_s.get_value(), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
+    player.PositionSet(time_s.get_value(), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
 
 def timeset():
-    global playing
-    time_s.set_value(interface.PositionGet())
-    return playing
+#    global playing
+    time_s.set_value(player.PositionGet())
+#    return playing
 
 def expander(widget):
     if exp.get_expanded() == False:
@@ -177,8 +179,8 @@ menu.attach_to_widget(eventbox,None)
 
 bt_close.connect('clicked',     destroy)
 bt_quit.connect('clicked',      Quit)
-bt_mrl.connect('clicked',       AddMRL)
-bt_toggle.connect('clicked',    TogglePause)
+bt_mrl.connect('clicked',       AddTrack)
+bt_toggle.connect('clicked',    Pause)
 bt_next.connect('clicked',      Next)
 bt_prev.connect('clicked',      Prev)
 bt_stop.connect('clicked',      Stop)
