@@ -201,17 +201,14 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     wxStaticText *label =
         new wxStaticText(panel, -1, wxU(_("Frames per second")));
 
-    float f_fps = config_GetFloat( p_intf, "sub-fps" );
-    /* Outside the new wxSpinCtrl to avoid an internal error in gcc2.95 ! */
-    wxString format_fps(wxString::Format(wxT("%d"),(int)f_fps));
-    fps_spinctrl = new wxSpinCtrl( panel, -1, format_fps,
-                                   wxDefaultPosition, wxDefaultSize,
-                                   wxSP_ARROW_KEYS,
-                                   0, 16000, (int)f_fps );
-    fps_spinctrl->SetToolTip( wxU(_("Override frames per second. "
+    fps_ctrl = new wxTextCtrl( panel, -1,
+                           wxString::Format(wxT("%.3f"),
+                                 config_GetFloat( p_intf, "sub-fps" )),
+                           wxDefaultPosition, wxDefaultSize);
+    fps_ctrl->SetToolTip( wxU(_("Override frames per second. "
                "It will only work with MicroDVD and SubRIP subtitles.")) );
     grid_sizer->Add( label, 0, wxALIGN_CENTER, 5 );
-    grid_sizer->Add( fps_spinctrl, 0,wxALIGN_CENTER, 5 );
+    grid_sizer->Add( fps_ctrl, 0,wxALIGN_CENTER, 5 );
 
 
     wxStaticText *label_delay =

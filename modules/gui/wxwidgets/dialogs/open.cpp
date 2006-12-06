@@ -1838,8 +1838,8 @@ void OpenDialog::OnSubsFileSettings( wxCommandEvent& WXUNUSED(event) )
                         (int)subsfile_dialog->size_combo->GetClientData(
                         subsfile_dialog->size_combo->GetSelection()) ) );
         }
-        subsfile_mrl.Add( wxString::Format( wxT("sub-fps=%i"),
-                          subsfile_dialog->fps_spinctrl->GetValue() ) );
+        subsfile_mrl.Add( wxString( wxT("sub-fps="))+
+                                    subsfile_dialog->fps_ctrl->GetValue()  );
         subsfile_mrl.Add( wxString::Format( wxT("sub-delay=%i"),
                           subsfile_dialog->delay_spinctrl->GetValue() ) );
     }

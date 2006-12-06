@@ -41,7 +41,7 @@ public:
     wxComboBox *encoding_combo;
     wxComboBox *size_combo;
     wxComboBox *align_combo;
-    wxSpinCtrl *fps_spinctrl;
+    wxTextCtrl *fps_ctrl;
     wxSpinCtrl *delay_spinctrl;
 
 private:
