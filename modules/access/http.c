@@ -265,18 +265,28 @@ static int Open( vlc_object_t *p_this )
 
 connect:
     /* Connect */
-    if( Connect( p_access, 0 ) )
+    switch( Connect( p_access, 0 ) )
     {
-        /* Retry with http 1.0 */
-        msg_Dbg( p_access, "switching to HTTP version 1.0" );
-        p_sys->i_version = 0;
-        p_sys->b_seekable = VLC_FALSE;
-
-        if( p_access->b_die ||
-            Connect( p_access, 0 ) )
-        {
+        case -1:
             goto error;
-        }
+
+        case -2:
+            /* Retry with http 1.0 */
+            msg_Dbg( p_access, "switching to HTTP version 1.0" );
+            p_sys->i_version = 0;
+            p_sys->b_seekable = VLC_FALSE;
+
+            if( p_access->b_die || Connect( p_access, 0 ) )
+                goto error;
+
+#ifdef DEBUG
+        case 0:
+            break;
+
+        default:
+            msg_Err( p_access, "You should not be here" );
+            abort();
+#endif
     }
 
     if( p_sys->i_code == 401 )
@@ -787,10 +797,10 @@ static int Connect( access_t *p_access, int64_t i_tell )
 
     /* Open connection */
     p_sys->fd = net_ConnectTCP( p_access, srv.psz_host, srv.i_port );
-    if( p_sys->fd < 0 )
+    if( p_sys->fd == -1 )
     {
         msg_Err( p_access, "cannot connect to %s:%d", srv.psz_host, srv.i_port );
-        return VLC_EGENERIC;
+        return -1;
     }
 
     /* Initialize TLS/SSL session */
@@ -806,7 +816,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
             {
                 /* CONNECT is not in HTTP/1.0 */
                 Disconnect( p_access );
-                return VLC_EGENERIC;
+                return -1;
             }
 
             net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
@@ -820,7 +830,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
             {
                 msg_Err( p_access, "cannot establish HTTP/TLS tunnel" );
                 Disconnect( p_access );
-                return VLC_EGENERIC;
+                return -1;
             }
 
             sscanf( psz, "HTTP/%*u.%*u %3u", &i_status );
@@ -830,7 +840,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
             {
                 msg_Err( p_access, "HTTP/TLS tunnel through proxy denied" );
                 Disconnect( p_access );
-                return VLC_EGENERIC;
+                return -1;
             }
 
             do
@@ -840,7 +850,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
                 {
                     msg_Err( p_access, "HTTP proxy connection failed" );
                     Disconnect( p_access );
-                    return VLC_EGENERIC;
+                    return -1;
                 }
 
                 if( *psz == '\0' )
@@ -858,12 +868,12 @@ static int Connect( access_t *p_access, int64_t i_tell )
         {
             msg_Err( p_access, "cannot establish HTTP/TLS session" );
             Disconnect( p_access );
-            return VLC_EGENERIC;
+            return -1;
         }
         p_sys->p_vs = &p_sys->p_tls->sock;
     }
 
-    return Request( p_access, i_tell );
+    return Request( p_access, i_tell ) ? -2 : 0;
 }
 
 
