@@ -573,9 +573,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* we unregister the object /, registered by libvlc */
-    dbus_connection_unregister_object_path( p_conn, "/" );
-
     /* we register the objects */
     dbus_connection_register_object_path( p_conn, VLC_DBUS_ROOT_PATH,
             &vlc_dbus_root_vtable, p_this );

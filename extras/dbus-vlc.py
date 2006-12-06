@@ -20,6 +20,13 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 #
 
+#
+# NOTE: this controller is a SAMPLE, and thus doesn't implement all the D-Bus Media Player specification. http://wiki.videolan.org/index.php/DBus-spec
+# This is an unfinished document (on the 12/06/2006) and has been designed to be as general as possible.
+# So don't expect that much from this, but basic capabilities should work out of the box (Play/Pause/Next/Add)
+#
+# Also notice it has been designed first for a previous specificaiton, and thus some code may not work/be disabled
+#
 import dbus
 import dbus.glib
 import gtk
