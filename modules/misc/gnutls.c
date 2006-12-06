@@ -430,6 +430,7 @@ gnutls_SetPriority (vlc_object_t *restrict obj, const char *restrict name,
 static int
 gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
 {
+    /* Note that ordering matters (on the client side) */
     static const int protos[] =
     {
         GNUTLS_TLS1_1,
@@ -439,8 +440,29 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
     };
     static const int comps[] =
     {
-        GNUTLS_COMP_ZLIB,
+        GNUTLS_COMP_DEFLATE,
         GNUTLS_COMP_NULL,
+        0
+    };
+    static const int macs[] =
+    {
+        GNUTLS_MAC_SHA1,
+        GNUTLS_MAC_RMD160, // RIPEMD
+        GNUTLS_MAC_MD5,
+        //GNUTLS_MAC_MD2,
+        //GNUTLS_MAC_NULL,
+        0
+    };
+    static const int ciphers[] =
+    {
+        GNUTLS_CIPHER_AES_256_CBC,
+        GNUTLS_CIPHER_AES_128_CBC,
+        GNUTLS_CIPHER_3DES_CBC,
+        GNUTLS_CIPHER_ARCFOUR_128,
+        //GNUTLS_CIPHER_DES_CBC,
+        //GNUTLS_CIPHER_ARCFOUR_40,
+        //GNUTLS_CIPHER_RC2_40_CBC,
+        //GNUTLS_CIPHER_NULL,
         0
     };
     static const int cert_types[] =
@@ -462,6 +484,10 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
                             gnutls_protocol_set_priority, session, protos)
      || gnutls_SetPriority (obj, "compressions",
                             gnutls_compression_set_priority, session, comps)
+     || gnutls_SetPriority (obj, "MAC",
+                            gnutls_mac_set_priority, session, macs)
+     || gnutls_SetPriority (obj, "ciphers",
+                            gnutls_cipher_set_priority, session, ciphers)
      || gnutls_SetPriority (obj, "certificate types",
                             gnutls_certificate_type_set_priority, session,
                             cert_types))
