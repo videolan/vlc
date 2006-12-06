@@ -196,7 +196,7 @@ NoOwn:
 FunctionEnd
 
 !macro RegisterExtensionSection EXT
-  Section /o ${EXT}
+  Section ${EXT}
     SectionIn 1 3
     Push $R0
     StrCpy $R0 ${EXT}
@@ -238,7 +238,6 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 !macro delprefs
-  SectionIn 1 3
   StrCpy $0 0
   !define Index 'Line${__LINE__}'
   "${Index}-Loop:"
@@ -439,44 +438,43 @@ SectionEnd
 Section /o "Mozilla plugin" SEC03
   SectionIn 3
 
+  SetOutPath "$INSTDIR"
   !insertmacro OpenUninstallLog
-  !insertmacro InstallFolder mozilla
+  !insertmacro InstallFile mozilla\npvlc.dll
   !insertmacro CloseUninstallLog
 
-  ; doesn't work. bug in mozilla/mozilla firefox or moz documentation (xpt file isn't loaded)
-  ; see mozilla bugs 184506 and 159445
-  ;!define Moz "SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION}"
-  ;WriteRegStr HKLM ${Moz} "Description" "VideoLAN VLC plugin for Mozilla"
-  ;WriteRegStr HKLM ${Moz} "Path" "$INSTDIR\mozilla\npvlc.dll"
-  ;WriteRegStr HKLM ${Moz} "Product" "VLC media player"
-  ;WriteRegStr HKLM ${Moz} "Vendor" "VideoLAN"
-  ;WriteRegStr HKLM ${Moz} "Version" "${VERSION}"
-  ;WriteRegStr HKLM ${Moz} "XPTPath" "$INSTDIR\mozilla\vlcintf.xpt"
+  !define Moz "SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION}"
+  WriteRegStr HKLM ${Moz} "Description" "VLC Multimedia Plugin"
+  WriteRegStr HKLM ${Moz} "Path" "$INSTDIR\npvlc.dll"
+  WriteRegStr HKLM ${Moz} "Product" "VLC media player"
+  WriteRegStr HKLM ${Moz} "Vendor" "VideoLAN"
+  WriteRegStr HKLM ${Moz} "Version" "${VERSION}"
 
-  Push $R0
-  Push $R1
-  Push $R2
+ ; for very old version of mozilla, these lines may be needed 
+ ;Push $R0
+ ;Push $R1
+ ;Push $R2
 
-  !define Index 'Line${__LINE__}'
-  StrCpy $R1 "0"
+ ;!define Index 'Line${__LINE__}'
+ ;StrCpy $R1 "0"
 
-  "${Index}-Loop:"
+ ;"${Index}-Loop:"
 
-    ; Check for Key
-    EnumRegKey $R0 HKLM "SOFTWARE\Mozilla" "$R1"
-    StrCmp $R0 "" "${Index}-End"
-    IntOp $R1 $R1 + 1
-    ReadRegStr $R2 HKLM "SOFTWARE\Mozilla\$R0\Extensions" "Plugins"
-    StrCmp $R2 "" "${Index}-Loop" ""
+ ;  ; Check for Key
+ ;  EnumRegKey $R0 HKLM "SOFTWARE\Mozilla" "$R1"
+ ;  StrCmp $R0 "" "${Index}-End"
+ ;  IntOp $R1 $R1 + 1
+ ;  ReadRegStr $R2 HKLM "SOFTWARE\Mozilla\$R0\Extensions" "Plugins"
+ ;  StrCmp $R2 "" "${Index}-Loop" ""
 
-    CopyFiles "$INSTDIR\mozilla\*" "$R2"
-    !ifdef LIBVLC_DLL
-    CopyFiles ${LIBVLC_DLL} "$R2"
-    !endif
-    Goto "${Index}-Loop"
+ ;  CopyFiles "$INSTDIR\npvlc.dll" "$R2"
+ ;  !ifdef LIBVLC_DLL
+ ;  CopyFiles ${LIBVLC_DLL} "$R2"
+ ;  !endif
+ ;  Goto "${Index}-Loop"
 
-  "${Index}-End:"
-  !undef Index
+ ;"${Index}-End:"
+ ;!undef Index
 
 SectionEnd
 
@@ -634,6 +632,7 @@ Section "Uninstall" SEC91
   !insertmacro MacroAllExtensions UnRegisterExtensionSection
   !insertmacro DeleteContextMenu "Directory"
 
+  ;remove activex plugin
   UnRegDLL "$INSTDIR\axvlc.dll"
   Delete /REBOOTOK "$INSTDIR\axvlc.dll"
 
@@ -654,11 +653,15 @@ Section "Uninstall" SEC91
     ReadRegStr $R2 HKLM "SOFTWARE\Mozilla\$R0\Extensions" "Plugins"
     StrCmp $R2 "" "${Index}-Loop" ""
 
-    Delete "$R2\npvlc.dll"
+    ; old files (0.8.5 and before) that may be lying around
+    Delete /REBOOTOK "$R2\npvlc.dll"
+    Delete /REBOOTOK "$R2\libvlc.dll"
+    Delete /REBOOTOK "$R2\vlcintf.xpt"
     Goto "${Index}-Loop"
 
   "${Index}-End:"
   !undef Index
+  Delete /REBOOTOK "$INSTDIR\npvlc.dll"
 
   RMDir "$SMPROGRAMS\VideoLAN"
   RMDir /r $SMPROGRAMS\VideoLAN
@@ -705,8 +708,7 @@ Section "Uninstall" SEC91
   SetAutoClose true
 SectionEnd
 
-Section "un.Delete preferences and cache" SEC92
-  SectionIn 1 3
+Section /o "un.Delete preferences and cache" SEC92
   !insertmacro delprefs
 SectionEnd
 
