@@ -24,14 +24,13 @@
 /*****************************************************************************
  * Preamble:
  *
- * This plugin will use YUV overlay if supported, using overlay will result in
+ * This plugin will use YUV surface if supported, using YUV will result in
  * the best video quality (hardware filering when rescaling the picture)
  * and the fastest display as it requires less processing.
  *
  * If YUV overlay is not supported this plugin will use RGB offscreen video
  * surfaces that will be blitted onto the primary surface (display) to
- * effectively display the pictures. This fallback method also enables us to
- * display video in window mode.
+ * effectively display the pictures.
  *
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
@@ -73,7 +72,7 @@ static void Direct3DVoutReleasePictures ( vout_thread_t * );
 static int Direct3DVoutLockSurface  ( vout_thread_t *, picture_t * );
 static int Direct3DVoutUnlockSurface( vout_thread_t *, picture_t * );
 
-static void Direct3DVoutRenderDefault   ( vout_thread_t *, picture_t * );
+static void Direct3DVoutRenderSurface   ( vout_thread_t *, picture_t * );
 
 static int Direct3DVoutCreateScene      ( vout_thread_t * );
 static void Direct3DVoutReleaseScene    ( vout_thread_t * );
@@ -82,12 +81,30 @@ static void Direct3DVoutRenderScene     ( vout_thread_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+
+static int get_capability_for_osversion()
+{
+    OSVERSIONINFO winVer;
+    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    if( GetVersionEx(&winVer) )
+    {
+        if( winVer.dwMajorVersion > 5 )
+        {
+            /* Windows Vista or above, make this module the default */
+            return 150;
+        }
+    }
+    /* Windows XP or lower, make sure this module isn't the default */
+    return 50;
+}
+
 vlc_module_begin();
     set_shortname( "Direct3D" );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     set_description( _("DirectX 3D video output") );
-    set_capability( "video output", 150 );
+    set_capability( "video output", get_capability_for_osversion() );
     add_shortcut( "direct3d" );
     set_callbacks( OpenVideo, CloseVideo );
 
@@ -120,7 +137,7 @@ typedef struct
 /*****************************************************************************
  * OpenVideo: allocate DirectX video thread output method
  *****************************************************************************
- * This function allocates and initialize the DirectX vout method.
+ * This function allocates and initialize the Direct3D vout method.
  *****************************************************************************/
 static int OpenVideo( vlc_object_t *p_this )
 {
@@ -157,8 +174,16 @@ static int OpenVideo( vlc_object_t *p_this )
     SetRectEmpty( &p_vout->p_sys->rect_display );
     SetRectEmpty( &p_vout->p_sys->rect_parent );
 
+    var_Create( p_vout, "directx-hw-yuv", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+
     p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
+
+    var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Set main window's size */
     p_vout->p_sys->i_window_width = p_vout->i_window_width;
@@ -287,6 +312,10 @@ static void CloseVideo( vlc_object_t *p_this )
 static int Init( vout_thread_t *p_vout )
 {
     int i_ret;
+    vlc_value_t val;
+
+    var_Get( p_vout, "directx-hw-yuv", &val );
+    p_vout->p_sys->b_hw_yuv = val.b_bool;
 
     /* Initialise Direct3D */
     if( VLC_SUCCESS != Direct3DVoutOpen( p_vout ) )
@@ -320,6 +349,9 @@ static int Init( vout_thread_t *p_vout )
         Direct3DVoutReleasePictures(p_vout);
         return i_ret;
     }
+
+    /* Change the window title bar text */
+    PostMessage( p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
 
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
     return VLC_SUCCESS;
@@ -587,7 +619,8 @@ static int Manage( vout_thread_t *p_vout )
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     LPDIRECT3DDEVICE9       p_d3ddev = p_vout->p_sys->p_d3ddev;
-    // Present the backbuffer contents to the display
+    // Present the back buffer contents to the display
+    // stretching and filtering happens here
     HRESULT hr = IDirect3DDevice9_Present(p_d3ddev, NULL, NULL, NULL, NULL);
     if( FAILED(hr) )
         msg_Dbg( p_vout, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
@@ -605,8 +638,26 @@ static int Direct3DVoutCreate( vout_thread_t *p_vout )
     LPDIRECT3D9 p_d3dobj;
     D3DCAPS9 d3dCaps;
 
+    LPDIRECT3D9 (WINAPI *OurDirect3DCreate9)(UINT SDKVersion);
+
+    p_vout->p_sys->hd3d9_dll = LoadLibrary(TEXT("D3D9.DLL"));
+    if( NULL == p_vout->p_sys->hd3d9_dll )
+    {
+        msg_Warn( p_vout, "cannot load d3d9.dll, aborting" );
+        return VLC_EGENERIC;
+    }
+
+    OurDirect3DCreate9 =
+      (void *)GetProcAddress( p_vout->p_sys->hd3d9_dll,
+                              TEXT("Direct3DCreate9") );
+    if( OurDirect3DCreate9 == NULL )
+    {
+        msg_Err( p_vout, "Cannot locate reference to Direct3DCreate9 ABI in DLL" );
+        return VLC_EGENERIC;
+    }
+
     /* Create the D3D object. */
-    p_d3dobj = Direct3DCreate9( D3D_SDK_VERSION );
+    p_d3dobj = OurDirect3DCreate9( D3D_SDK_VERSION );
     if( NULL == p_d3dobj )
     {
        msg_Err( p_vout, "Could not create Direct3D9 instance.");
@@ -639,6 +690,11 @@ static void Direct3DVoutRelease( vout_thread_t *p_vout )
     {
        IDirect3D9_Release(p_vout->p_sys->p_d3dobj);
        p_vout->p_sys->p_d3dobj = NULL;
+    }
+    if( NULL != p_vout->p_sys->hd3d9_dll )
+    {
+        FreeLibrary(p_vout->p_sys->hd3d9_dll);
+        p_vout->p_sys->hd3d9_dll = NULL;
     }
 }
        
@@ -804,35 +860,41 @@ static D3DFORMAT Direct3DVoutSelectFormat( vout_thread_t *p_vout, D3DFORMAT targ
 
 D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3DFORMAT target)
 {
+    if( p_vout->p_sys->b_hw_yuv )
+    {
+        switch( i_chroma )
+        {
+            case VLC_FOURCC('U','Y','V','Y'):
+            case VLC_FOURCC('U','Y','N','V'):
+            case VLC_FOURCC('Y','4','2','2'):
+            {
+                static const D3DFORMAT formats[] =
+                    { D3DFMT_UYVY, D3DFMT_YUY2, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
+                return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
+            }
+            case VLC_FOURCC('I','4','2','0'):
+            case VLC_FOURCC('I','4','2','2'):
+            case VLC_FOURCC('Y','V','1','2'):
+            {
+                /* typically 3D textures don't support planar format
+                ** fallback to packed version and use CPU for the conversion
+                */
+                static const D3DFORMAT formats[] = 
+                    { D3DFMT_YUY2, D3DFMT_UYVY, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
+                return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
+            }
+            case VLC_FOURCC('Y','U','Y','2'):
+            case VLC_FOURCC('Y','U','N','V'):
+            {
+                static const D3DFORMAT formats[] = 
+                    { D3DFMT_YUY2, D3DFMT_UYVY, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
+                return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
+            }
+        }
+    }
+
     switch( i_chroma )
     {
-        case VLC_FOURCC('U','Y','V','Y'):
-        case VLC_FOURCC('U','Y','N','V'):
-        case VLC_FOURCC('Y','4','2','2'):
-        {
-            static const D3DFORMAT formats[] =
-                { D3DFMT_UYVY, D3DFMT_YUY2, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
-            return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-        }
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('Y','V','1','2'):
-        {
-            /* typically 3D textures don't support planar format
-            ** fallback to packed version and use pixel
-            ** shader or CPU for the conversion
-            */
-            static const D3DFORMAT formats[] = 
-                { D3DFMT_YUY2, D3DFMT_UYVY, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
-            return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-        }
-        case VLC_FOURCC('Y','U','Y','2'):
-        case VLC_FOURCC('Y','U','N','V'):
-        {
-            static const D3DFORMAT formats[] = 
-                { D3DFMT_YUY2, D3DFMT_UYVY, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
-            return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-        }
         case VLC_FOURCC('R', 'V', '1', '5'):
         {
             static const D3DFORMAT formats[] = 
@@ -858,7 +920,36 @@ D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3DFORMAT 
             return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
         }
         default:
-            ;
+        {
+            /* use display default format */
+            LPDIRECT3D9 p_d3dobj = p_vout->p_sys->p_d3dobj;
+            D3DDISPLAYMODE d3ddm;
+
+            HRESULT hr = IDirect3D9_GetAdapterDisplayMode(p_d3dobj, D3DADAPTER_DEFAULT, &d3ddm );
+            if( SUCCEEDED(hr))
+            {
+                /*
+                ** some professional cards could use some advanced pixel format as default, 
+                ** make sure we stick with chromas that we can handle internally
+                */
+                switch( d3ddm.Format )
+                {
+                    case D3DFMT_R8G8B8:
+                    case D3DFMT_X8R8G8B8:
+                    case D3DFMT_A8R8G8B8:
+                        msg_Dbg( p_vout, "defaulting to adpater pixel format");
+                        return Direct3DVoutSelectFormat(p_vout, target, &d3ddm.Format, 1);
+                    default:
+                    {
+                        /* if we fall here, that probably means that we need to render some YUV format */
+                        static const D3DFORMAT formats[] = 
+                            { D3DFMT_R8G8B8, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8 };
+                        msg_Dbg( p_vout, "defaulting to built-in pixel format");
+                        return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
+                    }
+                }
+            }
+        }
     }
     return D3DFMT_UNKNOWN;
 }
@@ -873,62 +964,75 @@ static int Direct3DVoutSetOutputFormat(vout_thread_t *p_vout, D3DFORMAT format)
         case D3DFMT_UYVY:
             p_vout->output.i_chroma = VLC_FOURCC('U', 'Y', 'V', 'Y');
             break;
+        case D3DFMT_R8G8B8:
+            p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '2', '4');
+            break;
         case D3DFMT_X8R8G8B8:
         case D3DFMT_A8R8G8B8:
-/*
-** FIXME: some custom masks are not handled properly in rgb_yuv converter,
-**        ARGB do NOT work !
-*/
             p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '3', '2');
-            p_vout->output.i_rmask = 0x000000ff;
+            p_vout->output.i_rmask = 0x00ff0000;
             p_vout->output.i_gmask = 0x0000ff00;
-            p_vout->output.i_bmask = 0x00ff0000;
-            p_vout->output.i_lrshift = 8;
+            p_vout->output.i_bmask = 0x000000ff;
+#       if defined( WORDS_BIGENDIAN )
+            p_vout->output.i_rrshift = 0;
+            p_vout->output.i_lrshift = 24;
+            p_vout->output.i_rgshift = 0;
             p_vout->output.i_lgshift = 16;
+            p_vout->output.i_rbshift = 0;
+            p_vout->output.i_lbshift = 8;
+#       else
+            p_vout->output.i_rrshift = 0;
+            p_vout->output.i_lrshift = 8;
+            p_vout->output.i_rgshift = 0;
+            p_vout->output.i_lgshift = 16;
+            p_vout->output.i_rbshift = 0;
             p_vout->output.i_lbshift = 24;
+#       endif
             break;
         case D3DFMT_R5G6B5:
             p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '1', '6');
-#       if defined( WORDS_BIGENDIAN )
             p_vout->output.i_rmask = (0x1fL)<<11;
             p_vout->output.i_gmask = (0x3fL)<<5;
             p_vout->output.i_bmask = (0x1fL)<<0;
-            //p_vout->output.i_rshift = 11;
-            //p_vout->output.i_gshift = 5;
-            //p_vout->output.i_bshift = 0;
+#       if defined( WORDS_BIGENDIAN )
+            p_vout->output.i_rrshift = 0;
+            p_vout->output.i_lrshift = 11;
+            p_vout->output.i_rgshift = 0;
+            p_vout->output.i_lgshift = 5;
+            p_vout->output.i_rbshift = 0;
+            p_vout->output.i_lbshift = 0;
 #       else
-/*
-** FIXME: in little endian mode, following masking is not byte aligned,
-**        therefore green bits will not be sequentially merged !
-*/
-            p_vout->output.i_rmask = (0x1fL)<<0;
-            p_vout->output.i_gmask = (0x3fL)<<5;
-            p_vout->output.i_bmask = (0x1fL)<<11;
-            //p_vout->output.i_rshift = 0;
-            //p_vout->output.i_gshift = 5;
-            //p_vout->output.i_bshift = 11;
+	    /* FIXME: since components are not byte aligned,
+	              there is not chance that this will work */
+            p_vout->output.i_rrshift = 0;
+            p_vout->output.i_lrshift = 0;
+            p_vout->output.i_rgshift = 0;
+            p_vout->output.i_lgshift = 5;
+            p_vout->output.i_rbshift = 0;
+            p_vout->output.i_lbshift = 11;
 #       endif
             break;
         case D3DFMT_X1R5G5B5:
             p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '1', '5');
-#       if defined( WORDS_BIGENDIAN )
             p_vout->output.i_rmask = (0x1fL)<<10;
             p_vout->output.i_gmask = (0x1fL)<<5;
             p_vout->output.i_bmask = (0x1fL)<<0;
-            //p_vout->output.i_rshift = 10;
-            //p_vout->output.i_gshift = 5;
-            //p_vout->output.i_bshift = 0;
+#       if defined( WORDS_BIGENDIAN )
+            p_vout->output.i_rrshift = 0;
+            p_vout->output.i_lrshift = 10;
+            p_vout->output.i_rgshift = 0;
+            p_vout->output.i_lgshift = 5;
+            p_vout->output.i_rbshift = 0;
+            p_vout->output.i_lbshift = 0;
 #       else
-/*
-** FIXME: in little endian mode, following masking is not byte aligned,
-**        therefore green bits will not be sequentially merged !
-*/
-            p_vout->output.i_rmask = (0x1fL)<<1;
-            p_vout->output.i_gmask = (0x1fL)<<6;
-            p_vout->output.i_bmask = (0x1fL)<<11;
-            //p_vout->output.i_rshift = 1;
-            //p_vout->output.i_gshift = 5;
-            //p_vout->output.i_bshift = 11;
+	    /* FIXME: since components are not byte aligned,
+	              there is not chance that this will work */
+            p_vout->output.i_rrshift = 0;
+            p_vout->output.i_lrshift = 1;
+            p_vout->output.i_rgshift = 0;
+            p_vout->output.i_lgshift = 5;
+            p_vout->output.i_rbshift = 0;
+            p_vout->output.i_lbshift = 11;
 #       endif
             break;
         default:
@@ -986,7 +1090,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
             return VLC_EGENERIC;
         }
 
-        /* fill surface with default color */
+        /* fill surface with black color */
         IDirect3DDevice9_ColorFill(p_d3ddev, p_d3dsurf, NULL, D3DCOLOR_ARGB(0xFF, 0, 0, 0) );
         
         /* assign surface to internal structure */
@@ -1267,7 +1371,7 @@ static void Direct3DVoutReleaseScene( vout_thread_t *p_vout )
  * This function is intented for lower end video cards, without pixel shader 
  * support or low video RAM
  *****************************************************************************/
-static void Direct3DVoutRenderDefault( vout_thread_t *p_vout, picture_t *p_pic )
+static void Direct3DVoutRenderSurface( vout_thread_t *p_vout, picture_t *p_pic )
 {
     LPDIRECT3DDEVICE9       p_d3ddev  = p_vout->p_sys->p_d3ddev;
     LPDIRECT3DSURFACE9      p_d3dsrc, p_d3ddest;
@@ -1312,7 +1416,7 @@ static void Direct3DVoutRenderDefault( vout_thread_t *p_vout, picture_t *p_pic )
             continue;
         }
 
-        /* Copy picture surface into texture surface, color space conversion happens here */
+        /* Copy picture surface into back buffer surface, color space conversion happens here */
         hr = IDirect3DDevice9_StretchRect(p_d3ddev, p_d3dsrc, NULL, p_d3ddest, NULL, D3DTEXF_NONE);
         IDirect3DSurface9_Release(p_d3ddest);
         if( FAILED(hr) )

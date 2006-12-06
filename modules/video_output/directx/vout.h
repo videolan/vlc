@@ -88,6 +88,8 @@ struct vout_sys_t
     RECT         rect_dest;
     RECT         rect_dest_clipped;
 
+    vlc_bool_t   b_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
+
 #ifdef MODULE_NAME_IS_vout_directx
     /* Overlay alignment restrictions */
     int          i_align_src_boundary;
@@ -97,7 +99,6 @@ struct vout_sys_t
 
     vlc_bool_t   b_using_overlay;         /* Are we using an overlay surface */
     vlc_bool_t   b_use_sysmem;   /* Should we use system memory for surfaces */
-    vlc_bool_t   b_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
     vlc_bool_t   b_3buf_overlay;   /* Should we use triple buffered overlays */
 
     /* DDraw capabilities */
@@ -123,6 +124,7 @@ struct vout_sys_t
 
 #ifdef MODULE_NAME_IS_direct3d
     // core objects
+    HINSTANCE               hd3d9_dll;       /* handle of the opened d3d9 dll */
     LPDIRECT3D9	            p_d3dobj;
     LPDIRECT3DDEVICE9	    p_d3ddev;
     D3DPRESENT_PARAMETERS   d3dpp;

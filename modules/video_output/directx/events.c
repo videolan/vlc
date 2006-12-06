@@ -433,7 +433,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
          * then fine, otherwise return with an error. */
         if( !GetClassInfo( hInstance, _T("VLC DirectX"), &wndclass ) )
         {
-            msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED" );
+            msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
             return VLC_EGENERIC;
         }
     }
@@ -448,7 +448,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
          * then fine, otherwise return with an error. */
         if( !GetClassInfo( hInstance, _T("VLC DirectX video"), &wndclass ) )
         {
-            msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED" );
+            msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
             return VLC_EGENERIC;
         }
     }
@@ -505,7 +505,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     if( !p_vout->p_sys->hwnd )
     {
-        msg_Warn( p_vout, "DirectXCreateWindow create window FAILED" );
+        msg_Warn( p_vout, "DirectXCreateWindow create window FAILED (err=%lu)", GetLastError() );
         return VLC_EGENERIC;
     }
 
@@ -541,19 +541,19 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
      * the size of the video, which allows us to use crazy overlay colorkeys
      * without having them shown outside of the video area. */
     p_vout->p_sys->hvideownd =
-	CreateWindow( _T("VLC DirectX video"), _T(""),   /* window class */
-		WS_CHILD | WS_VISIBLE,                   /* window style */
-		0, 0,
-		p_vout->render.i_width,			/* default width */
-		p_vout->render.i_height,		/* default height */
-		p_vout->p_sys->hwnd,                    /* parent window */
-		NULL, hInstance,
-		(LPVOID)p_vout );            /* send p_vout to WM_CREATE */
+    CreateWindow( _T("VLC DirectX video"), _T(""),   /* window class */
+        WS_CHILD | WS_VISIBLE,                   /* window style */
+        0, 0,
+        p_vout->render.i_width,         /* default width */
+        p_vout->render.i_height,        /* default height */
+        p_vout->p_sys->hwnd,                    /* parent window */
+        NULL, hInstance,
+        (LPVOID)p_vout );            /* send p_vout to WM_CREATE */
 
     if( !p_vout->p_sys->hvideownd )
-	msg_Warn( p_vout, "can't create video sub-window" );
+    msg_Warn( p_vout, "can't create video sub-window" );
     else
-	msg_Dbg( p_vout, "created video sub-window" );
+    msg_Dbg( p_vout, "created video sub-window" );
 
     /* Now display the window */
     ShowWindow( p_vout->p_sys->hwnd, SW_SHOW );
@@ -768,10 +768,17 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         /* Store p_vout for future use */
         p_vout = (vout_thread_t *)((CREATESTRUCT *)lParam)->lpCreateParams;
         SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)p_vout );
+        return TRUE;
     }
     else
     {
         p_vout = (vout_thread_t *)GetWindowLongPtr( hwnd, GWLP_USERDATA );
+        if( !p_vout )
+        {
+            /* Hmmm mozilla does manage somehow to save the pointer to our
+             * windowproc and still calls it after the vout has been closed. */
+            return DefWindowProc(hwnd, message, wParam, lParam);
+        }
     }
 
     /* Catch the screensaver and the monitor turn-off */
@@ -780,13 +787,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     {
         //if( p_vout ) msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND screensaver" );
         return 0; /* this stops them from happening */
-    }
-
-    if( !p_vout )
-    {
-        /* Hmmm mozilla does manage somehow to save the pointer to our
-         * windowproc and still calls it after the vout has been closed. */
-        return DefWindowProc(hwnd, message, wParam, lParam);
     }
 
     if( hwnd == p_vout->p_sys->hvideownd )
@@ -845,7 +845,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         /* We do not want to relay these messages to the parent window
          * because we rely on the background color for the overlay. */
         return DefWindowProc(hwnd, message, wParam, lParam);
-        break;
 
     default:
         //msg_Dbg( p_vout, "WinProc WM Default %i", message );
