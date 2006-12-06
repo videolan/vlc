@@ -111,6 +111,23 @@ vlc_module_end();
 #define MAX_SESSION_ID    32
 #define MAX_SESSION_DATA  1024
 
+static const int proto_priority[] =
+{
+    GNUTLS_TLS1_1,
+    GNUTLS_TLS1_0,
+    GNUTLS_SSL3,
+    0
+};
+
+
+static const int cert_type_priority[] =
+{
+    GNUTLS_CRT_X509,
+    //GNUTLS_CRT_OPENPGP, TODO
+    0
+};
+
+
 typedef struct saved_session_t
 {
     char id[MAX_SESSION_ID];
@@ -148,38 +165,6 @@ typedef struct tls_client_sys_t
     struct tls_session_sys_t       session;
     gnutls_certificate_credentials x509_cred;
 } tls_client_sys_t;
-
-
-static int
-_get_Int( vlc_object_t *p_this, const char *var )
-{
-    vlc_value_t value;
-
-    if( var_Get( p_this, var, &value ) != VLC_SUCCESS )
-    {
-        var_Create( p_this, var, VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-        var_Get( p_this, var, &value );
-    }
-
-    return value.i_int;
-}
-
-static int
-_get_Bool( vlc_object_t *p_this, const char *var )
-{
-    vlc_value_t value;
-
-    if( var_Get( p_this, var, &value ) != VLC_SUCCESS )
-    {
-        var_Create( p_this, var, VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-        var_Get( p_this, var, &value );
-    }
-
-    return value.b_bool;
-}
-
-#define get_Int( a, b ) _get_Int( (vlc_object_t *)(a), (b) )
-#define get_Bool( a, b ) _get_Bool( (vlc_object_t *)(a), (b) )
 
 
 /**
@@ -402,7 +387,7 @@ gnutls_BeginHandshake( tls_session_t *p_session, int fd,
     {
         gnutls_server_name_set( p_sys->session, GNUTLS_NAME_DNS, psz_hostname,
                                 strlen( psz_hostname ) );
-        if( get_Bool( p_session, "tls-check-hostname" ) )
+        if (var_CreateGetBool (p_session, "tls-check-hostname"))
         {
             p_sys->psz_hostname = strdup( psz_hostname );
             if( p_sys->psz_hostname == NULL )
@@ -439,6 +424,40 @@ gnutls_SessionClose( tls_session_t *p_session )
 
     free( p_sys );
 }
+
+
+static int
+gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
+{
+    int val;
+
+    val = gnutls_set_default_priority (session);
+    if (val < 0)
+    {
+        msg_Err (obj, "cannot set TLS priorities: %s",
+                 gnutls_strerror (val));
+        return VLC_EGENERIC;
+    }
+
+    val = gnutls_protocol_set_priority (session, proto_priority);
+    if (val < 0)
+    {
+        msg_Err (obj, "cannot set protocols priorities: %s",
+                 gnutls_strerror (val));
+        return VLC_EGENERIC;
+    }
+
+    val = gnutls_certificate_type_set_priority (session, cert_type_priority);
+    if (val < 0)
+    {
+        msg_Err (obj, "cannot set certificate type priorities: %s",
+                 gnutls_strerror (val));
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
 
 static void
 gnutls_ClientDelete( tls_session_t *p_session )
@@ -575,11 +594,6 @@ gnutls_ClientCreate( tls_t *p_tls )
     tls_session_t *p_session = NULL;
     tls_client_sys_t *p_sys = NULL;
     int i_val;
-    static const int cert_type_priority[3] =
-    {
-        GNUTLS_CRT_X509,
-        0
-    };
 
     p_sys = (tls_client_sys_t *)malloc( sizeof(struct tls_client_sys_t) );
     if( p_sys == NULL )
@@ -604,6 +618,13 @@ gnutls_ClientCreate( tls_t *p_tls )
 
     vlc_object_attach( p_session, p_tls );
 
+    const char *homedir = p_tls->p_libvlc->psz_homedir,
+               *datadir = config_GetDataDir ((vlc_object_t *)p_session);
+    size_t l1 = strlen (homedir), l2 = strlen (datadir);
+    char path[((l1 > l2) ? l1 : l2) + sizeof ("/"CONFIG_DIR"/ssl/private")];
+    //                              > sizeof ("/"CONFIG_DIR"/ssl/certs")
+    //                              > sizeof ("/ca-certificates.crt")
+
     i_val = gnutls_certificate_allocate_credentials( &p_sys->x509_cred );
     if( i_val != 0 )
     {
@@ -612,45 +633,23 @@ gnutls_ClientCreate( tls_t *p_tls )
         goto error;
     }
 
-    if( get_Bool( p_tls, "tls-check-cert" ) )
+    if (var_CreateGetBool (p_tls, "tls-check-cert"))
     {
-        char *psz_path;
+        sprintf (path, "%s/"CONFIG_DIR"/ssl/certs", homedir);
+        gnutls_Addx509Directory ((vlc_object_t *)p_session,
+                                  p_sys->x509_cred, path, VLC_FALSE);
 
-        if( asprintf( &psz_path, "%s/"CONFIG_DIR"/ssl/certs",
-                      p_tls->p_libvlc->psz_homedir ) != -1 )
-        {
-            gnutls_Addx509Directory( (vlc_object_t *)p_session,
-                                     p_sys->x509_cred, psz_path, VLC_FALSE );
-            free( psz_path );
-        }
-
-        if( asprintf( &psz_path, "%s/ca-certificates.crt",
-            config_GetDataDir ( (vlc_object_t *)p_session) ) != -1 )
-        {
-            gnutls_Addx509File( (vlc_object_t *)p_session,
-                                p_sys->x509_cred, psz_path, VLC_FALSE );
-            free( psz_path );
-        }
+        sprintf (path, "%s/ca-certificates.crt", datadir);
+        gnutls_Addx509File ((vlc_object_t *)p_session,
+                            p_sys->x509_cred, path, VLC_FALSE);
         p_session->pf_handshake2 = gnutls_HandshakeAndValidate;
     }
     else
         p_session->pf_handshake2 = gnutls_ContinueHandshake;
 
-    {
-        char *psz_path;
-
-        if( asprintf( &psz_path, "%s/"CONFIG_DIR"/ssl/private",
-                      p_tls->p_libvlc->psz_homedir ) == -1 )
-        {
-            gnutls_certificate_free_credentials( p_sys->x509_cred );
-            goto error;
-        }
-
-        gnutls_Addx509Directory( (vlc_object_t *)p_session, p_sys->x509_cred,
-                                 psz_path, VLC_TRUE );
-
-        free( psz_path );
-    }
+    sprintf (path, "%s/"CONFIG_DIR"/ssl/private", homedir);
+    gnutls_Addx509Directory ((vlc_object_t *)p_session, p_sys->x509_cred,
+                             path, VLC_TRUE);
 
     i_val = gnutls_init( &p_sys->session.session, GNUTLS_CLIENT );
     if( i_val != 0 )
@@ -661,26 +660,9 @@ gnutls_ClientCreate( tls_t *p_tls )
         goto error;
     }
 
-    i_val = gnutls_set_default_priority( p_sys->session.session );
-    if( i_val < 0 )
-    {
-        msg_Err( p_tls, "cannot set ciphers priorities: %s",
-                 gnutls_strerror( i_val ) );
-        gnutls_deinit( p_sys->session.session );
-        gnutls_certificate_free_credentials( p_sys->x509_cred );
-        goto error;
-    }
-
-    i_val = gnutls_certificate_type_set_priority( p_sys->session.session,
-                                                  cert_type_priority );
-    if( i_val < 0 )
-    {
-        msg_Err( p_tls, "cannot set certificate type priorities: %s",
-                 gnutls_strerror( i_val ) );
-        gnutls_deinit( p_sys->session.session );
-        gnutls_certificate_free_credentials( p_sys->x509_cred );
-        goto error;
-    }
+    if (gnutls_SessionPrioritize (VLC_OBJECT (p_session),
+                                  p_sys->session.session))
+        goto s_error;
 
     i_val = gnutls_credentials_set( p_sys->session.session,
                                     GNUTLS_CRD_CERTIFICATE,
@@ -689,12 +671,14 @@ gnutls_ClientCreate( tls_t *p_tls )
     {
         msg_Err( p_tls, "cannot set TLS session credentials: %s",
                  gnutls_strerror( i_val ) );
-        gnutls_deinit( p_sys->session.session );
-        gnutls_certificate_free_credentials( p_sys->x509_cred );
-        goto error;
+        goto s_error;
     }
 
     return p_session;
+
+s_error:
+    gnutls_deinit( p_sys->session.session );
+    gnutls_certificate_free_credentials( p_sys->x509_cred );
 
 error:
     vlc_object_detach( p_session );
@@ -849,10 +833,8 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     ((tls_session_sys_t *)p_session->p_sys)->session = session;
 
     i_val = gnutls_set_default_priority( session );
-    if( i_val < 0 )
+    if (gnutls_SessionPrioritize (VLC_OBJECT (p_session), session))
     {
-        msg_Err( p_server, "cannot set ciphers priorities: %s",
-                 gnutls_strerror( i_val ) );
         gnutls_deinit( session );
         goto error;
     }
@@ -870,11 +852,12 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     if( p_session->pf_handshake2 == gnutls_HandshakeAndValidate )
         gnutls_certificate_server_set_request( session, GNUTLS_CERT_REQUIRE );
 
-    gnutls_dh_set_prime_bits( session, get_Int( p_server, "gnutls-dh-bits" ) );
+    i_val = config_GetInt (p_server, "gnutls-dh-bits");
+    gnutls_dh_set_prime_bits (session, i_val);
 
     /* Session resumption support */
-    gnutls_db_set_cache_expiration( session, get_Int( p_server,
-                                    "gnutls-cache-expiration" ) );
+    i_val = config_GetInt (p_server, "gnutls-cache-expiration");
+    gnutls_db_set_cache_expiration (session, i_val);
     gnutls_db_set_retrieve_function( session, cb_fetch );
     gnutls_db_set_remove_function( session, cb_delete );
     gnutls_db_set_store_function( session, cb_store );
@@ -997,7 +980,7 @@ gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
     if( p_sys == NULL )
         return NULL;
 
-    p_sys->i_cache_size = get_Int( p_tls, "gnutls-cache-size" );
+    p_sys->i_cache_size = config_GetInt (p_tls, "gnutls-cache-size");
     p_sys->p_cache = (struct saved_session_t *)calloc( p_sys->i_cache_size,
                                            sizeof( struct saved_session_t ) );
     if( p_sys->p_cache == NULL )
@@ -1061,7 +1044,7 @@ gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
     {
         msg_Dbg( p_server, "computing Diffie Hellman ciphers parameters" );
         val = gnutls_dh_params_generate2( p_sys->dh_params,
-                                          get_Int( p_tls, "gnutls-dh-bits" ) );
+                                          config_GetInt( p_tls, "gnutls-dh-bits" ) );
     }
     if( val < 0 )
     {
