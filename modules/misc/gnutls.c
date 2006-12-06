@@ -111,23 +111,6 @@ vlc_module_end();
 #define MAX_SESSION_ID    32
 #define MAX_SESSION_DATA  1024
 
-static const int proto_priority[] =
-{
-    GNUTLS_TLS1_1,
-    GNUTLS_TLS1_0,
-    GNUTLS_SSL3,
-    0
-};
-
-
-static const int cert_type_priority[] =
-{
-    GNUTLS_CRT_X509,
-    //GNUTLS_CRT_OPENPGP, TODO
-    0
-};
-
-
 typedef struct saved_session_t
 {
     char id[MAX_SESSION_ID];
@@ -426,34 +409,63 @@ gnutls_SessionClose( tls_session_t *p_session )
 }
 
 
+typedef int (*tls_prio_func) (gnutls_session_t, const int *);
+
+static int
+gnutls_SetPriority (vlc_object_t *restrict obj, const char *restrict name,
+                    tls_prio_func func, gnutls_session_t session,
+                    const int *restrict values)
+{
+    int val = func (session, values);
+    if (val < 0)
+    {
+        msg_Err (obj, "cannot set %s priorities: %s", name,
+                 gnutls_strerror (val));
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
+
 static int
 gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
 {
-    int val;
+    static const int protos[] =
+    {
+        GNUTLS_TLS1_1,
+        GNUTLS_TLS1_0,
+        GNUTLS_SSL3,
+        0
+    };
+    static const int comps[] =
+    {
+        GNUTLS_COMP_ZLIB,
+        GNUTLS_COMP_NULL,
+        0
+    };
+    static const int cert_types[] =
+    {
+        GNUTLS_CRT_X509,
+        //GNUTLS_CRT_OPENPGP, TODO
+        0
+    };
 
-    val = gnutls_set_default_priority (session);
+    int val = gnutls_set_default_priority (session);
     if (val < 0)
     {
-        msg_Err (obj, "cannot set TLS priorities: %s",
+        msg_Err (obj, "cannot set default TLS priorities: %s",
                  gnutls_strerror (val));
         return VLC_EGENERIC;
     }
 
-    val = gnutls_protocol_set_priority (session, proto_priority);
-    if (val < 0)
-    {
-        msg_Err (obj, "cannot set protocols priorities: %s",
-                 gnutls_strerror (val));
+    if (gnutls_SetPriority (obj, "protocols",
+                            gnutls_protocol_set_priority, session, protos)
+     || gnutls_SetPriority (obj, "compressions",
+                            gnutls_compression_set_priority, session, comps)
+     || gnutls_SetPriority (obj, "certificate types",
+                            gnutls_certificate_type_set_priority, session,
+                            cert_types))
         return VLC_EGENERIC;
-    }
-
-    val = gnutls_certificate_type_set_priority (session, cert_type_priority);
-    if (val < 0)
-    {
-        msg_Err (obj, "cannot set certificate type priorities: %s",
-                 gnutls_strerror (val));
-        return VLC_EGENERIC;
-    }
 
     return VLC_SUCCESS;
 }
