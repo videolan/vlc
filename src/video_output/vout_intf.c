@@ -1119,15 +1119,9 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     /* Disable "always on top" in fullscreen mode */
     var_Get( p_vout, "video-on-top", &val );
-    if( newval.b_bool && val.b_bool )
-    {
-        val.b_bool = VLC_FALSE;
-        vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, val.b_bool );
-    }
-    else if( !newval.b_bool && val.b_bool )
-    {
-        vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, val.b_bool );
-    }
+    if( val.b_bool )
+        vout_Control( p_vout, VOUT_SET_STAY_ON_TOP,
+                      (vlc_bool_t)!newval.b_bool );
 
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );
