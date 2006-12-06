@@ -7,7 +7,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 NULL =
 SUBDIRS =
 
-EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in
+EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in libvlc.sym
 
 BUILT_SOURCES = $(CLEANFILES)
 CLEANFILES = misc/modules_builtin.h
