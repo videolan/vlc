@@ -4791,6 +4791,8 @@ then
       # wxwidgets should provide the following flags but does not
       # the following is required to compile for win32
       VLC_ADD_CXXFLAGS([wxwidgets],[-D_UNICODE -DUNICODE])
+    else
+      AC_MSG_ERROR([You need a unicode build of wxWidgets. Please upgrade and try again. Alternatively you can also configure with --disable-wxwidgets.])
     fi
     if test "$have_libcdio" = "yes"
     then 
@@ -5605,9 +5607,6 @@ dnl
 dnl  Create the vlc-config script
 dnl
 LDFLAGS_libvlc="${LDFLAGS_libvlc} ${LDFLAGS_builtin}"
-
-dnl following used to be the external libvlc target, what's replacing it now ?
-dnl for i in `echo "${BUILTINS}" | sed -e 's@[^ ]*/@@g'` ; do LDFLAGS_libvlc="${LDFLAGS_libvlc} ${libdir}/vlc/${i}.a `eval echo '$'{LDFLAGS_${i}}`" ; done
 
 dnl
 dnl  Configuration is finished
