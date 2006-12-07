@@ -355,7 +355,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         new_frame.origin.x = topleftscreen.x;
         new_frame.origin.y = topleftscreen.y - new_frame.size.height;
 
-        [o_window setFrame: new_frame display: YES];
+        [o_window setFrame: new_frame display: NO];
 
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
     }
