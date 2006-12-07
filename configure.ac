@@ -4101,7 +4101,7 @@ then
       ])
       AC_CHECK_HEADERS(d3d9.h,
       [ VLC_ADD_PLUGINS([direct3d])
-        VLC_ADD_LDFLAGS([direct3d],[-ld3d9 -lgdi32])
+        VLC_ADD_LDFLAGS([direct3d],[-lgdi32])
       ])
     else
       AC_MSG_CHECKING(for directX headers in ${with_directx})
@@ -5274,7 +5274,8 @@ then
     fi
     AC_LANG_PUSH(C++)
     AC_CHECK_HEADERS(ole2.h olectl.h,
-      [ VLC_ADD_CXXFLAGS([activex],[-fno-exceptions])
+      [ VLC_ADD_CPPFLAGS([activex],[-D_MIDL_USE_GUIDDEF_])
+        VLC_ADD_CXXFLAGS([activex],[-fno-exceptions])
         VLC_ADD_LDFLAGS([activex],[-lole32 -loleaut32 -luuid -lshlwapi]) 
         AC_CHECK_HEADERS(objsafe.h,
           VLC_ADD_CXXFLAGS([activex],[-DHAVE_OBJSAFE_HEADER]),,
@@ -5328,20 +5329,20 @@ then
         MOZILLA_CONFIG="${SEAMONKEY_CONFIG}"
       fi
     fi
-    
+
     if ${MOZILLA_CONFIG} --defines | grep -q 'MOZ_X11=1'; then
       LDFLAGS="${LDFLAGS_save} ${X_LIBS} ${X_PRE_LIBS}"
       AC_CHECK_LIB(Xt,XtStrings,
        [
          VLC_ADD_CPPFLAGS([mozilla],[${X_CFLAGS}])
          VLC_ADD_LDFLAGS([mozilla],[${X_LIBS} ${X_PRE_LIBS} -lXt -lX11 -lSM -lICE])
-],
+       ],
        [],
        [[${X_LIBS} ${X_PRE_LIBS} -lX11 -lSM -lICE]
       ])
       LDFLAGS="${LDFLAGS_save}"
     fi
-    
+
       mozilla=:
       dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
       VLC_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`]])
@@ -5377,7 +5378,7 @@ then
           mozilla_sdk_xpcom="/xpcom"
       fi
     fi
-  
+
     real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
     CPPFLAGS="${CPPFLAGS_save} -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include"
     MOZILLA_REQUIRED_HEADERS=1
