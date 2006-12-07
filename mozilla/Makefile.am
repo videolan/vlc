@@ -6,7 +6,7 @@ noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
 
 MOSTLYCLEANFILES = $(npvlc_DATA)
 CLEANFILES = stamp-pic $(BUILT_SOURCES)
-EXTRA_DIST = $(DIST_sources) npvlc_rc.rc vlc.r
+EXTRA_DIST = $(DIST_sources) install.js npvlc_rc.rc vlc.r
 
 SOURCES_mozilla_common = \
 	vlcshell.cpp \

@@ -110,4 +110,3 @@ bool RuntimeNPObject::returnInvokeResult(RuntimeNPObject::InvokeResult result)
     }
     return false;
 }
-

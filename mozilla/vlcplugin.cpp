@@ -35,16 +35,20 @@
 #include "control/npovlc.h"
 #include "control/npolibvlc.h"
 
+#include <ctype.h>
+
 /*****************************************************************************
  * VlcPlugin constructor and destructor
  *****************************************************************************/
 VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
     i_npmode(mode),
     b_stream(0),
-    b_autoplay(0),
+    b_autoplay(1),
     psz_target(NULL),
     libvlc_instance(NULL),
-    scriptClass(NULL),
+    libvlc_log(NULL),
+    p_scriptClass(NULL),
+    p_scriptObject(NULL),
     p_browser(instance),
     psz_baseURL(NULL)
 #if XP_WIN
@@ -58,7 +62,7 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
     memset(&npwindow, 0, sizeof(NPWindow));
 }
 
-static int boolValue(const char *value) {
+static bool boolValue(const char *value) {
     return ( !strcmp(value, "1") || 
              !strcasecmp(value, "true") ||
              !strcasecmp(value, "yes") );
@@ -123,7 +127,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     ppsz_argv[ppsz_argc++] = "--intf";
     ppsz_argv[ppsz_argc++] = "dummy";
 
-    const char *version = NULL;
+    const char *progid = NULL;
 
     /* parse plugin arguments */
     for( int i = 0; i < argc ; i++ )
@@ -172,9 +176,10 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
                 ppsz_argv[ppsz_argc++] = "--no-loop";
             }
         }
-        else if( !strcmp( argn[i], "version") )
+        else if( !strcmp( argn[i], "version")
+              || !strcmp( argn[i], "progid") )
         {
-            version = argv[i];
+            progid = argv[i];
         }
     }
 
@@ -224,19 +229,20 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     if( psz_target )
     {
         // get absolute URL from src
-        psz_target = getAbsoluteURL(psz_target);
+        char *psz_absurl = getAbsoluteURL(psz_target);
+        psz_target = psz_absurl ? psz_absurl : strdup(psz_target);
     }
 
     /* assign plugin script root class */
-    if( (NULL != version) && (!strcmp(version, "VideoLAN.VLCPlugin.2")) )
+    if( (NULL != progid) && (!strcmp(progid, "VideoLAN.VLCPlugin.2")) )
     {
         /* new APIs */
-        scriptClass = RuntimeNPClass<LibvlcRootNPObject>::getClass();
+        p_scriptClass = RuntimeNPClass<LibvlcRootNPObject>::getClass();
     }
     else
     {
         /* legacy APIs */
-        scriptClass = RuntimeNPClass<VlcNPObject>::getClass();
+        p_scriptClass = RuntimeNPClass<VlcNPObject>::getClass();
     }
 
     return NPERR_NO_ERROR;
@@ -279,6 +285,10 @@ VlcPlugin::~VlcPlugin()
 {
     delete psz_baseURL;
     delete psz_target;
+    if( p_scriptObject )
+        NPN_ReleaseObject(p_scriptObject);
+    if( libvlc_log )
+        libvlc_log_close(libvlc_log, NULL);
     if( libvlc_instance )
         libvlc_destroy(libvlc_instance, NULL );
 }
@@ -298,20 +308,22 @@ char *VlcPlugin::getAbsoluteURL(const char *url)
             // validate protocol header
             const char *start = url;
             while( start != end ) {
-                char c = *start | 0x20;
+                char c = tolower(*start);
                 if( (c < 'a') || (c > 'z') )
                     // not valid protocol header, assume relative URL
-                    break;
+                    goto relativeurl;
                 ++start;
             }
             /* we have a protocol header, therefore URL is absolute */
             return strdup(url);
         }
 
+relativeurl:
+
         if( psz_baseURL )
         {
             size_t baseLen = strlen(psz_baseURL);
-            char *href = new char[baseLen+strlen(url)];
+            char *href = new char[baseLen+strlen(url)+1];
             if( href )
             {
                 /* prepend base URL */
@@ -331,21 +343,35 @@ char *VlcPlugin::getAbsoluteURL(const char *url)
                 /* skip over protocol part  */
                 char *pathstart = strchr(href, ':');
                 char *pathend;
-                if( '/' == *(++pathstart) )
+                if( pathstart )
                 {
                     if( '/' == *(++pathstart) )
                     {
-                        ++pathstart;
+                        if( '/' == *(++pathstart) )
+                        {
+                            ++pathstart;
+                        }
+                    }
+                    /* skip over host part */
+                    pathstart = strchr(pathstart, '/');
+                    pathend = href+baseLen;
+                    if( ! pathstart )
+                    {
+                        // no path, add a / past end of url (over '\0')
+                        pathstart = pathend;
+                        *pathstart = '/';
                     }
                 }
-                /* skip over host part */
-                pathstart = strchr(pathstart, '/');
-                pathend = href+baseLen;
-                if( ! pathstart )
+                else
                 {
-                    // no path, add a / past end of url (over '\0')
-                    pathstart = pathend;
-                    *pathstart = '/';
+                    /* baseURL is just a UNIX path */
+                    if( '/' != *href )
+                    {
+                        /* baseURL is not an absolute path */
+                        return NULL;
+                    }
+                    pathstart = href;
+                    pathend = href+baseLen;
                 }
 
                 /* relative URL made of an absolute path ? */
@@ -357,7 +383,8 @@ char *VlcPlugin::getAbsoluteURL(const char *url)
                 }
 
                 /* find last path component and replace it */ 
-                while( '/' != *pathend) --pathend;
+                while( '/' != *pathend)
+                    --pathend;
 
                 /*
                 ** if relative url path starts with one or more '../',
@@ -370,22 +397,57 @@ char *VlcPlugin::getAbsoluteURL(const char *url)
                     if( '.' != *p )
                         break;
                     ++p;
+                    if( '\0' == *p  )
+                    {
+                        /* relative url is just '.' */
+                        url = p;
+                        break;
+                    }
+                    if( '/' == *p  )
+                    {
+                        /* relative url starts with './' */
+                        url = ++p;
+                        continue;
+                    }
                     if( '.' != *p ) 
                         break;
                     ++p;
-                    if( '/' != *p ) 
-                        break;
-                    ++p;
+                    if( '\0' == *p )
+                    {
+                        /* relative url is '..' */
+                    }
+                    else
+                    {
+                        if( '/' != *p ) 
+                            break;
+                        /* relative url starts with '../' */
+                        ++p;
+                    }
                     url = p;
-                    while( '/' != *pathend ) --pathend;
+                    do
+                    {
+                        --pathend;
+                    }
+                    while( '/' != *pathend );
                 }
+                /* skip over '/' separator */
+                ++pathend;
                 /* concatenate remaining base URL and relative URL */
-                strcpy(pathend+1, url);
+                strcpy(pathend, url);
             }
             return href;
         }
     }
     return NULL;
+}
+
+NPObject* VlcPlugin::getScriptObject()
+{
+    if( NULL == p_scriptObject )
+    {
+        p_scriptObject = NPN_CreateObject(p_browser, p_scriptClass);
+    }
+    return NPN_RetainObject(p_scriptObject);
 }
 
 #if XP_UNIX

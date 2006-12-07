@@ -97,7 +97,7 @@
 #if defined(XP_MACOSX) && defined(__POWERPC__) && (!defined(TARGET_RT_MAC_CFM))
 
 // glue for mapping outgoing Macho function pointers to TVectors
-struct TFPtoTVGlue{
+struct TFPtoTVGlue {
     void* glue[2];
 };
 
@@ -235,7 +235,7 @@ NPError NPN_GetURLNotify(NPP instance, const char* url, const char* window, void
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     NPError err;
-    
+
     if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
     {
         err = CallNPN_GetURLNotifyProc(gNetscapeFuncs.geturlnotify, instance, url, window, notifyData);
@@ -256,7 +256,7 @@ NPError NPN_PostURLNotify(NPP instance, const char* url, const char* window, uin
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     NPError err;
-    
+
     if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
     {
         err = CallNPN_PostURLNotifyProc(gNetscapeFuncs.posturlnotify, instance, url, 
@@ -283,7 +283,7 @@ NPError NPN_NewStream(NPP instance, NPMIMEType type, const char* window, NPStrea
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     NPError err;
-    
+
     if( navMinorVers >= NPVERS_HAS_STREAMOUTPUT )
     {
         err = CallNPN_NewStreamProc(gNetscapeFuncs.newstream, instance, type, window, stream);
@@ -299,7 +299,7 @@ int32 NPN_Write(NPP instance, NPStream* stream, int32 len, void* buffer)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     NPError err;
-    
+
     if( navMinorVers >= NPVERS_HAS_STREAMOUTPUT )
     {
         err = CallNPN_WriteProc(gNetscapeFuncs.write, instance, stream, len, buffer);
@@ -315,7 +315,7 @@ NPError    NPN_DestroyStream(NPP instance, NPStream* stream, NPError reason)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     NPError err;
-    
+
     if( navMinorVers >= NPVERS_HAS_STREAMOUTPUT )
     {
         err = CallNPN_DestroyStreamProc(gNetscapeFuncs.destroystream, instance, stream, reason);
@@ -398,7 +398,7 @@ NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_GetStringIdentifierProc( gNetscapeFuncs.getstringidentifier, name);
     }
     return NULL;
@@ -408,7 +408,7 @@ void NPN_GetStringIdentifiers(const NPUTF8 **names, int32_t nameCount, NPIdentif
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         CallNPN_GetStringIdentifiersProc( gNetscapeFuncs.getstringidentifiers, names, nameCount, identifiers);
     }
 }
@@ -417,7 +417,7 @@ NPIdentifier NPN_GetIntIdentifier(int32_t intid)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_GetIntIdentifierProc( gNetscapeFuncs.getintidentifier, intid);
     }
     return NULL;
@@ -427,7 +427,7 @@ bool NPN_IdentifierIsString(NPIdentifier identifier)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_IdentifierIsStringProc( gNetscapeFuncs.identifierisstring, identifier);
     }
     return false;
@@ -437,7 +437,7 @@ NPUTF8 *NPN_UTF8FromIdentifier(NPIdentifier identifier)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_UTF8FromIdentifierProc( gNetscapeFuncs.utf8fromidentifier, identifier);
     }
     return NULL;
@@ -447,7 +447,7 @@ int32_t NPN_IntFromIdentifier(NPIdentifier identifier)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_IntFromIdentifierProc( gNetscapeFuncs.intfromidentifier, identifier);
     }
     return 0;
@@ -457,7 +457,7 @@ NPObject *NPN_CreateObject(NPP instance, NPClass *aClass)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_CreateObjectProc( gNetscapeFuncs.createobject, instance, aClass);
     }
     return NULL;
@@ -467,7 +467,7 @@ NPObject *NPN_RetainObject(NPObject *npobj)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_RetainObjectProc( gNetscapeFuncs.retainobject, npobj);
     }
     return NULL;
@@ -477,7 +477,7 @@ void NPN_ReleaseObject(NPObject *npobj)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         CallNPN_ReleaseObjectProc( gNetscapeFuncs.releaseobject, npobj);
     }
 }
@@ -486,7 +486,7 @@ bool NPN_Invoke(NPP instance, NPObject *npobj, NPIdentifier methodName, const NP
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_InvokeProc( gNetscapeFuncs.invoke, instance, npobj, methodName, args, argCount, result);
     }
     return false;
@@ -496,7 +496,7 @@ bool NPN_InvokeDefault(NPP instance, NPObject *npobj, const NPVariant *args, uin
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_InvokeDefaultProc( gNetscapeFuncs.invokeDefault, instance, npobj, args, argCount, result);
     }
     return false;
@@ -506,7 +506,7 @@ bool NPN_Evaluate(NPP instance, NPObject *npobj, NPString *script, NPVariant *re
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_EvaluateProc( gNetscapeFuncs.evaluate, instance, npobj, script, result);
     }
     return false;
@@ -516,7 +516,7 @@ bool NPN_GetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, N
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_GetPropertyProc( gNetscapeFuncs.getproperty, instance, npobj, propertyName, result);
     }
     return false;
@@ -526,7 +526,7 @@ bool NPN_SetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, c
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_SetPropertyProc( gNetscapeFuncs.setproperty, instance, npobj, propertyName, value);
     }
     return false;
@@ -536,7 +536,7 @@ bool NPN_RemoveProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_RemovePropertyProc( gNetscapeFuncs.removeproperty, instance, npobj, propertyName);
     }
     return false;
@@ -546,7 +546,7 @@ bool NPN_HasProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_HasPropertyProc( gNetscapeFuncs.hasproperty, instance, npobj, propertyName);
     }
     return false;
@@ -556,7 +556,7 @@ bool NPN_HasMethod(NPP instance, NPObject *npobj, NPIdentifier methodName)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return CallNPN_HasMethodProc( gNetscapeFuncs.hasmethod, instance, npobj, methodName);
     }
     return false;
@@ -566,7 +566,7 @@ void NPN_ReleaseVariantValue(NPVariant *variant)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         CallNPN_ReleaseVariantValueProc( gNetscapeFuncs.releasevariantvalue, variant);
     }
 }
@@ -575,7 +575,7 @@ void NPN_SetException(NPObject *npobj, const NPUTF8 *message)
 {
     int navMinorVers = gNetscapeFuncs.version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         CallNPN_SetExceptionProc( gNetscapeFuncs.setexception, npobj, message);
     }
 }
@@ -632,7 +632,6 @@ void Private_Shutdown(void)
 
     ExitCodeResource();
 }
-
 
 NPError    Private_New(NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc, char* argn[], char* argv[], NPSavedData* saved)
 {
@@ -721,7 +720,6 @@ void Private_StreamAsFile(NPP instance, NPStream* stream, const char* fname)
     ExitCodeResource();
 }
 
-
 NPError Private_DestroyStream(NPP instance, NPStream* stream, NPError reason)
 {
     NPError err;
@@ -786,14 +784,14 @@ void SetUpQD(void)
     OSErr               result = noErr;
     CFragConnectionID   connID;
     Str255              errName;
-#endif    
+#endif
 
     //
     // Memorize the plugin’s resource file 
     // refnum for later use.
     //
     gResFile = CurResFile();
-    
+
 #if !TARGET_API_MAC_CARBON
     //
     // Ask the system if CFM is available.
@@ -815,11 +813,11 @@ void SetUpQD(void)
         infoRec.processInfoLength = sizeof(ProcessInfoRec);
         infoRec.processName = name;
         infoRec.processAppSpec = &myFSSpec;
-        
+
         ProcessSerialNumber PSN;
         PSN.highLongOfPSN = 0;
         PSN.lowLongOfPSN = kCurrentProcess;
-        
+
         result = GetProcessInformation(&PSN, &infoRec);
         if (result != noErr)
             PLUGINDEBUGSTR("\pFailed in GetProcessInformation");
@@ -828,8 +826,8 @@ void SetUpQD(void)
         //
         // If no CFM installed, assume it must be a 68K app.
         //
-        result = -1;        
-        
+        result = -1;
+
     CFragConnectionID connID;
     if (result == noErr)
     {
@@ -839,7 +837,7 @@ void SetUpQD(void)
         // return the address of “main” in app, which we ignore).  If GetDiskFragment 
         // returns an error, we assume the app must be 68K.
         //
-        Ptr mainAddr;   
+        Ptr mainAddr;
         Str255 errName;
         result =  GetDiskFragment(infoRec.processAppSpec, 0L, 0L, infoRec.processName,
                                   kLoadCFrag, &connID, (Ptr*)&mainAddr, errName);
@@ -903,13 +901,13 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
 #endif
 
     NPError err = NPERR_NO_ERROR;
-    
+
     //
     // Ensure that everything Netscape passed us is valid!
     //
     if ((nsTable == NULL) || (pluginFuncs == NULL) || (unloadUpp == NULL))
         err = NPERR_INVALID_FUNCTABLE_ERROR;
-    
+
     //
     // Check the “major” version passed in Netscape’s function table.
     // We won’t load if the major version is newer than what we expect.
@@ -922,8 +920,7 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
         if ((nsTable->version >> 8) > NP_VERSION_MAJOR)     // Major version is in high byte
             err = NPERR_INCOMPATIBLE_VERSION_ERROR;
     }
-        
-    
+
     if (err == NPERR_NO_ERROR)
     {
         //
@@ -933,7 +930,7 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
         // the whole structure, because the Netscape function table
         // could actually be bigger than what we expect.
         //
-        
+
         int navMinorVers = nsTable->version & 0xFF;
 
         gNetscapeFuncs.version          = nsTable->version;
@@ -956,7 +953,7 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
             gNetscapeFuncs.getJavaPeer  = (NPN_GetJavaPeerUPP)HOST_TO_PLUGIN_GLUE(getJavaPeer, nsTable->getJavaPeer);
         }
         if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
-        {   
+        {
             gNetscapeFuncs.geturlnotify = (NPN_GetURLNotifyUPP)HOST_TO_PLUGIN_GLUE(geturlnotify, nsTable->geturlnotify);
             gNetscapeFuncs.posturlnotify    = (NPN_PostURLNotifyUPP)HOST_TO_PLUGIN_GLUE(posturlnotify, nsTable->posturlnotify);
         }
@@ -966,7 +963,7 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
         gNetscapeFuncs.invalidateregion = (NPN_InvalidateRegionUPP)HOST_TO_PLUGIN_GLUE(invalidateregion, nsTable->invalidateregion);
         gNetscapeFuncs.forceredraw      = (NPN_ForceRedrawUPP)HOST_TO_PLUGIN_GLUE(forceredraw, nsTable->forceredraw);
         if( navMinorVers >= 14 )
-        {   
+        {
             // NPRuntime support 
             gNetscapeFuncs.getstringidentifier  = (NPN_GetStringIdentifierUPP)HOST_TO_PLUGIN_GLUE(getstringidentifier, nsTable->getstringidentifier);
             gNetscapeFuncs.getstringidentifiers = (NPN_GetStringIdentifiersUPP)HOST_TO_PLUGIN_GLUE(getstringidentifiers, nsTable->getstringidentifiers);
@@ -1005,11 +1002,11 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
         pluginFuncs->writeready     = NewNPP_WriteReadyProc(PLUGIN_TO_HOST_GLUE(writeready, Private_WriteReady));
         pluginFuncs->write          = NewNPP_WriteProc(PLUGIN_TO_HOST_GLUE(write, Private_Write));
         pluginFuncs->print          = NewNPP_PrintProc(PLUGIN_TO_HOST_GLUE(print, Private_Print));
-        pluginFuncs->event          = NewNPP_HandleEventProc(PLUGIN_TO_HOST_GLUE(event, Private_HandleEvent));  
-        pluginFuncs->getvalue       = NewNPP_GetValueProc(PLUGIN_TO_HOST_GLUE(getvalue, Private_GetValue)); 
+        pluginFuncs->event          = NewNPP_HandleEventProc(PLUGIN_TO_HOST_GLUE(event, Private_HandleEvent));
+        pluginFuncs->getvalue       = NewNPP_GetValueProc(PLUGIN_TO_HOST_GLUE(getvalue, Private_GetValue));
         if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
-        {   
-            pluginFuncs->urlnotify = NewNPP_URLNotifyProc(PLUGIN_TO_HOST_GLUE(urlnotify, Private_URLNotify));           
+        {
+            pluginFuncs->urlnotify = NewNPP_URLNotifyProc(PLUGIN_TO_HOST_GLUE(urlnotify, Private_URLNotify));
         }
 #ifdef OJI
         if( navMinorVers >= NPVERS_HAS_LIVECONNECT )
@@ -1024,7 +1021,7 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
         SetUpQD();
         err = Private_Initialize();
     }
-    
+
     ExitCodeResource();
     return err;
 }
@@ -1048,12 +1045,12 @@ extern "C" {
 NPError NP_Initialize(NPNetscapeFuncs* nsTable)
 {
     PLUGINDEBUGSTR("\pNP_Initialize");
-    
+
     /* validate input parameters */
 
     if( NULL == nsTable  )
         return NPERR_INVALID_FUNCTABLE_ERROR;
-    
+
     /*
      * Check the major version passed in Netscape's function table.
      * We won't load if the major version is newer than what we expect.
@@ -1068,8 +1065,7 @@ NPError NP_Initialize(NPNetscapeFuncs* nsTable)
 
     if (nsTable->size < sizeof(NPNetscapeFuncs))
         return NPERR_INVALID_FUNCTABLE_ERROR;
-        
-    
+
     int navMinorVers = nsTable->version & 0xFF;
 
     /*
@@ -1099,7 +1095,7 @@ NPError NP_Initialize(NPNetscapeFuncs* nsTable)
         gNetscapeFuncs.getJavaPeer  = nsTable->getJavaPeer;
     }
     if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
-    {    
+    {
         gNetscapeFuncs.geturlnotify     = nsTable->geturlnotify;
         gNetscapeFuncs.posturlnotify    = nsTable->posturlnotify;
     }
@@ -1110,7 +1106,7 @@ NPError NP_Initialize(NPNetscapeFuncs* nsTable)
     gNetscapeFuncs.invalidateregion = nsTable->invalidateregion;
     gNetscapeFuncs.forceredraw      = nsTable->forceredraw;
     if( navMinorVers >= 14 )
-    {   
+    {
         // NPRuntime support 
         gNetscapeFuncs.getstringidentifier  = nsTable->getstringidentifier;
         gNetscapeFuncs.getstringidentifiers = nsTable->getstringidentifiers;
@@ -1169,8 +1165,8 @@ NPError NP_GetEntryPoints(NPPluginFuncs* pluginFuncs)
     pluginFuncs->getvalue   = NewNPP_GetValueProc(Private_GetValue);
     pluginFuncs->setvalue   = NewNPP_SetValueProc(Private_SetValue);
     if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
-    {    
-        pluginFuncs->urlnotify = Private_URLNotify;         
+    {
+        pluginFuncs->urlnotify = Private_URLNotify;
     }
 #ifdef OJI
     if( navMinorVers >= NPVERS_HAS_LIVECONNECT )
