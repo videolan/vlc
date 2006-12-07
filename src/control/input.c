@@ -144,7 +144,7 @@ float libvlc_input_get_fps( libvlc_input_t *p_input,
     if ( libvlc_exception_raised( p_e ) )
         return 0.0;
 
-    if( demux2_Control( input_GetItem(p_input_thread), DEMUX_GET_FPS, &f_fps )
+    if( demux2_Control( p_input_thread->p->input.p_demux, DEMUX_GET_FPS, &f_fps )
         || f_fps < 0.1 )
     {
         vlc_object_release( p_input_thread );
