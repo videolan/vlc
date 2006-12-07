@@ -33,6 +33,7 @@
 
     BOOL b_displayed;
     BOOL b_voutWasUpdated;
+    int i_device;
 }
 - (id)initWithContentRect: (NSRect)contentRect 
                 styleMask: (unsigned int)aStyle 
@@ -65,7 +66,7 @@
 - (void)mouseDragged:(NSEvent *)theEvent;
 
 - (BOOL)isDisplayed;
-- (void)setVoutWasUpdated;
+- (void)setVoutWasUpdated: (int) i_screen;
 @end
 
 @interface VLCFSPanelView : NSView

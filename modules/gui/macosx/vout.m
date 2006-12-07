@@ -946,17 +946,17 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     if( p_vout->b_fullscreen )
     {
+        CGDisplayFadeReservationToken token;
+        NSRect screen_rect = [o_screen frame];
+        screen_rect.origin.x = screen_rect.origin.y = 0;
+
         /* move the FSPanel to front in case that it is currently shown
          * this won't and is not supposed to work when it's fading right now */
         if( [[[[VLCMain sharedInstance] getControls] getFSPanel] isDisplayed] )
             [[[[VLCMain sharedInstance] getControls] getFSPanel] orderFront: self];
         
         /* tell the fspanel to move itself to front next time it's triggered */
-        [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated];
-
-        CGDisplayFadeReservationToken token;
-        NSRect screen_rect = [o_screen frame];
-        screen_rect.origin.x = screen_rect.origin.y = 0;
+        [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: i_device];
 
         /* Creates a window with size: screen_rect on o_screen */
         [self initWithContentRect: screen_rect
