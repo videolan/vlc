@@ -30,7 +30,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc_aout.h>
-
 #include <vlc_filter.h>
 #include <vlc_block.h>
 
@@ -41,8 +40,6 @@ static int  Create    ( vlc_object_t * );
 static void Close     ( vlc_object_t * );
 static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                         aout_buffer_t * );
-static void DoWork_inner( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                        aout_buffer_t *, int );
 
 static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
@@ -83,7 +80,7 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
     struct filter_sys_t * p_sys;
-
+    
     if ( p_filter->input.i_rate == p_filter->output.i_rate
           || p_filter->input.i_format != p_filter->output.i_format
           || p_filter->input.i_physical_channels
@@ -111,8 +108,6 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    memset( p_sys->p_prev_sample, 0, aout_FormatNbChannels( &p_filter->input ) * sizeof(int32_t) );
-
     p_filter->pf_do_work = DoWork;
 
     /* We don't want a new buffer to be created because we're not sure we'll
@@ -129,7 +124,7 @@ static void Close( vlc_object_t * p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
-
+    
     free( p_sys->p_prev_sample );
     free( p_sys );
 }
@@ -139,13 +134,6 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
-{
-    DoWork_inner( p_aout, p_filter, p_in_buf, p_out_buf, p_aout->mixer.mixer.i_rate );
-}
-
-static void DoWork_inner( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf,
-                    int i_output_rate )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
 #ifndef HAVE_ALLOCA
@@ -158,10 +146,8 @@ static void DoWork_inner( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i_in_nb = p_in_buf->i_nb_samples;
     int i_chan, i_in, i_out = 0;
 
-
     /* Check if we really need to run the resampler */
-    //if( p_aout->mixer.mixer.i_rate == p_filter->input.i_rate )
-    if( i_output_rate == p_filter->input.i_rate )
+    if( p_aout->mixer.mixer.i_rate == p_filter->input.i_rate )
     {
         if( p_filter->b_continuity &&
             p_in_buf->i_size >=
@@ -281,7 +267,7 @@ static int OpenFilter( vlc_object_t *p_this )
     {
         return VLC_EGENERIC;
     }
-
+    
     /* Allocate the memory needed to store the module's structure */
     p_filter->p_sys = p_sys = malloc( sizeof(struct filter_sys_t) );
     if( p_sys == NULL )
@@ -298,8 +284,6 @@ static int OpenFilter( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
-
-    memset( p_sys->p_prev_sample, 0, p_filter->fmt_in.audio.i_channels * sizeof(int32_t) );
 
     p_filter->pf_audio_filter = Resample;
 
@@ -343,10 +327,10 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
         if( p_block ) p_block->pf_release( p_block );
         return NULL;
     }
-
+    
     i_bytes_per_frame = p_filter->fmt_out.audio.i_channels *
                   p_filter->fmt_out.audio.i_bitspersample / 8;
-
+    
     i_out_size = i_bytes_per_frame * ( 1 + (p_block->i_samples * 
         p_filter->fmt_out.audio.i_rate / p_filter->fmt_in.audio.i_rate));
 
@@ -375,11 +359,10 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     out_buf.i_nb_bytes = p_out->i_buffer;
     out_buf.i_nb_samples = p_out->i_samples;
 
-    DoWork_inner( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf,
-                                            p_filter->fmt_out.audio.i_rate );
+    DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
 
     p_block->pf_release( p_block );
-
+    
     p_out->i_buffer = out_buf.i_nb_bytes;
     p_out->i_samples = out_buf.i_nb_samples;
 
