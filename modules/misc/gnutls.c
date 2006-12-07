@@ -222,7 +222,6 @@ gnutls_ContinueHandshake( tls_session_t *p_session)
 
     p_sys = (tls_session_sys_t *)(p_session->p_sys);
 
-     /* TODO: handle fatal error */
 #ifdef WIN32
     WSASetLastError( 0 );
 #endif
