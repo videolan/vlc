@@ -487,6 +487,20 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
         //GNUTLS_CIPHER_NULL,
         0
     };
+    static const int kx[] =
+    {
+        GNUTLS_KX_DHE_RSA,
+        GNUTLS_KX_DHE_DSS,
+        GNUTLS_KX_RSA,
+        //GNUTLS_KX_RSA_EXPORT,
+        //GNUTLS_KX_DHE_PSK, TODO
+        //GNUTLS_KX_PSK,     TODO
+        //GNUTLS_KX_SRP_RSA, TODO
+        //GNUTLS_KX_SRP_DSS, TODO
+        //GNUTLS_KX_SRP,     TODO
+        //GNUTLS_KX_ANON_DH,
+        0
+    };
     static const int cert_types[] =
     {
         GNUTLS_CRT_X509,
@@ -504,12 +518,14 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
 
     if (gnutls_SetPriority (obj, "protocols",
                             gnutls_protocol_set_priority, session, protos)
-     || gnutls_SetPriority (obj, "compressions",
+     || gnutls_SetPriority (obj, "compression algorithms",
                             gnutls_compression_set_priority, session, comps)
-     || gnutls_SetPriority (obj, "MAC",
+     || gnutls_SetPriority (obj, "MAC algorithms",
                             gnutls_mac_set_priority, session, macs)
      || gnutls_SetPriority (obj, "ciphers",
                             gnutls_cipher_set_priority, session, ciphers)
+     || gnutls_SetPriority (obj, "key exchange algorithms",
+                            gnutls_kx_set_priority, session, kx)
      || gnutls_SetPriority (obj, "certificate types",
                             gnutls_certificate_type_set_priority, session,
                             cert_types))
