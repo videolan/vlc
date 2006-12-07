@@ -48,9 +48,8 @@ public:
 
     AxVLCVariant(VARIANTARG &v)
     {
-        //VariantInit(&_v);
-        //VariantCopy(&_v, &v);
-        _v = v;
+        VariantInit(&_v);
+        VariantCopy(&_v, &v);
     };
 
     AxVLCVariant(VARIANTARG *v)
@@ -276,7 +275,7 @@ public:
             (*p.first).second = val.second;
         return S_OK;
     };
-   
+
     // custom methods
 
     HRESULT Load(LPSTREAM pStm)
@@ -292,7 +291,7 @@ public:
         {
             if( (val->first == L"(Count)") && (VT_I4 == V_VT(val->second.variantArg())) )
             {
-                size_t count =  V_I4(val->second.variantArg());
+                size_t count = V_I4(val->second.variantArg());
                 delete val;
                 while( count-- )
                 {
@@ -551,7 +550,7 @@ STDMETHODIMP VLCPersistStreamInit::IsDirty(void)
 STDMETHODIMP VLCPersistStreamInit::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
     pcbSize->HighPart = 0UL;
-    pcbSize->LowPart  = 4096UL; // just a guess
+    pcbSize->LowPart  = 16384UL; // just a guess
 
     return S_OK;
 };

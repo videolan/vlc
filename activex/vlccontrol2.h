@@ -261,9 +261,9 @@ class VLCMessages : public IVLCMessages
 public:
 
     VLCMessages(VLCPlugin *p_instance, VLCLog *p_vlclog) :
+        _p_vlclog(p_vlclog),
         _p_instance(p_instance),
-        _p_typeinfo(NULL),
-        _p_vlclog(p_vlclog) {};
+        _p_typeinfo(NULL) {}
     virtual ~VLCMessages();
 
     // IUnknown methods
@@ -316,9 +316,10 @@ public:
     friend class VLCMessageIterator;
 
     VLCLog(VLCPlugin *p_instance) :
+        _p_log(NULL),
         _p_instance(p_instance),
         _p_typeinfo(NULL),
-        _p_log(NULL)
+        _p_vlcmessages(NULL)
     {
         _p_vlcmessages = new VLCMessages(p_instance, this);
     };
@@ -367,11 +368,63 @@ private:
     VLCMessages*    _p_vlcmessages;
 };
  
+class VLCPlaylistItems : public IVLCPlaylistItems
+{
+public:
+    VLCPlaylistItems(VLCPlugin *p_instance) :
+        _p_instance(p_instance), _p_typeinfo(NULL) {};
+    virtual ~VLCPlaylistItems();
+
+    // IUnknown methods
+    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
+    {
+        if( NULL == ppv )
+          return E_POINTER;
+        if( (IID_IUnknown == riid)
+         || (IID_IDispatch == riid)
+         || (IID_IVLCPlaylistItems == riid) )
+        {
+            AddRef();
+            *ppv = reinterpret_cast<LPVOID>(this);
+            return NOERROR;
+        }
+        // behaves as a standalone object
+        return E_NOINTERFACE;
+    };
+
+    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
+    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
+
+    // IDispatch methods
+    STDMETHODIMP GetTypeInfoCount(UINT*);
+    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
+    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
+    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+
+    // IVLCPlaylistItems methods
+    STDMETHODIMP get_count(long*);
+    STDMETHODIMP clear();
+    STDMETHODIMP remove(long);
+ 
+protected:
+    HRESULT loadTypeInfo();
+
+private:
+    VLCPlugin*  _p_instance;
+    ITypeInfo*  _p_typeinfo;
+
+};
+ 
 class VLCPlaylist : public IVLCPlaylist
 {
 public:
     VLCPlaylist(VLCPlugin *p_instance) :
-        _p_instance(p_instance), _p_typeinfo(NULL) {};
+        _p_instance(p_instance),
+        _p_typeinfo(NULL),
+        _p_vlcplaylistitems(NULL)
+    {
+        _p_vlcplaylistitems = new VLCPlaylistItems(p_instance);
+    };
     virtual ~VLCPlaylist();
 
     // IUnknown methods
@@ -412,6 +465,7 @@ public:
     STDMETHODIMP prev();
     STDMETHODIMP clear();
     STDMETHODIMP removeItem(long);
+    STDMETHODIMP get_items(IVLCPlaylistItems**);
  
 protected:
     HRESULT loadTypeInfo();
@@ -420,6 +474,7 @@ private:
     VLCPlugin*  _p_instance;
     ITypeInfo*  _p_typeinfo;
 
+    VLCPlaylistItems*    _p_vlcplaylistitems;
 };
  
 class VLCVideo : public IVLCVideo
@@ -460,7 +515,7 @@ public:
     STDMETHODIMP put_fullscreen(VARIANT_BOOL);
     STDMETHODIMP get_width(long*);
     STDMETHODIMP get_height(long*);
-    STDMETHODIMP get_aspectRatio(BSTR);
+    STDMETHODIMP get_aspectRatio(BSTR*);
     STDMETHODIMP put_aspectRatio(BSTR);
     STDMETHODIMP toggleFullscreen();
  

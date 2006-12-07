@@ -37,7 +37,7 @@ public:
         if( NULL == ppv )
             return E_POINTER;
         if( (IID_IUnknown == riid)
-         || (IID_IOleObject == riid) ) 
+         || (IID_IOleObject == riid) )
         {
             AddRef();
             *ppv = reinterpret_cast<LPVOID>(this);

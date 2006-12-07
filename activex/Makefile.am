@@ -46,6 +46,7 @@ SOURCES_activex = \
     plugin.h \
     axvlc_idl.c \
     axvlc_idl.h \
+    guiddef.h \
     $(NULL)
 
 DIST_rsrc = \
@@ -137,7 +138,7 @@ endif
 ###############################################################################
 
 clean-stamp:
-	rm -f stamp-pic
+	rm -f stamp-builtin
 
 if BUILD_SHARED
 stamp-builtin:

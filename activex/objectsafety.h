@@ -42,13 +42,13 @@ extern "C" const IID IID_IObjectSafety;
 
 struct IObjectSafety : public IUnknown
 {
-    virtual STDMETHODIMP GetInterfaceSafetyOptions(      
+    virtual STDMETHODIMP GetInterfaceSafetyOptions(
         REFIID riid,
         DWORD __RPC_FAR *pdwSupportedOptions,
         DWORD __RPC_FAR *pdwEnabledOptions
     ) = 0;
 
-    virtual STDMETHODIMP SetInterfaceSafetyOptions(      
+    virtual STDMETHODIMP SetInterfaceSafetyOptions(
         REFIID riid,
         DWORD dwSupportedOptions,
         DWORD dwOptionSetMask
@@ -83,19 +83,19 @@ public:
     STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
 
     // IUnknown methods
-    STDMETHODIMP GetInterfaceSafetyOptions(      
+    STDMETHODIMP GetInterfaceSafetyOptions(
         REFIID riid,
         DWORD *pdwSupportedOptions,
         DWORD *pdwEnabledOptions
     );
 
-    STDMETHODIMP SetInterfaceSafetyOptions(      
+    STDMETHODIMP SetInterfaceSafetyOptions(
         REFIID riid,
         DWORD dwOptionSetMask,
         DWORD dwEnabledOptions
     );
 
-private: 
+private:
 
     VLCPlugin *_p_instance;
 };

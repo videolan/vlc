@@ -35,7 +35,7 @@ struct VLCEnumConnectionsDereference
     CONNECTDATA operator()(const map<DWORD,LPUNKNOWN>::iterator& i)
     {
         CONNECTDATA cd;
-        
+
         cd.dwCookie = i->first;
         cd.pUnk     = i->second;
         return cd;

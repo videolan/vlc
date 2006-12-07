@@ -37,6 +37,7 @@ STDMETHODIMP VLCSupportErrorInfo::InterfaceSupportsErrorInfo(REFIID  riid)
      || (riid == IID_IVLCMessageIterator)
      || (riid == IID_IVLCMessages)
      || (riid == IID_IVLCPlaylist)
+     || (riid == IID_IVLCPlaylistItems)
      || (riid == IID_IVLCVideo)
      || (riid == IID_IVLCControl2) )
     {

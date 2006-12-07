@@ -98,7 +98,7 @@ VLCPluginClass::VLCPluginClass(LONG *p_class_ref, HINSTANCE hInstance, REFCLSID 
         wClass.hbrBackground  = NULL;
         wClass.lpszMenuName   = NULL;
         wClass.lpszClassName  = getInPlaceWndClassName();
-       
+
         _inplace_wndclass_atom = RegisterClass(&wClass);
     }
     else
@@ -258,6 +258,7 @@ VLCPlugin::~VLCPlugin()
         _p_pict->Release();
 
     SysFreeString(_bstr_mrl);
+    SysFreeString(_bstr_baseurl);
 
     _p_class->Release();
 };
@@ -434,17 +435,17 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\\VideoLAN\\VLC",
                           0, KEY_READ, &h_key ) == ERROR_SUCCESS )
         {
-             if( RegQueryValueEx( h_key, "InstallDir", 0, &i_type,
-                                  (LPBYTE)p_data, &i_data ) == ERROR_SUCCESS )
-             {
-                 if( i_type == REG_SZ )
-                 {
-                     strcat( p_data, "\\plugins" );
-                     //ppsz_argv[ppsz_argc++] = "--plugin-path";
-                     //ppsz_argv[ppsz_argc++] = p_data;
-                 }
-             }
-             RegCloseKey( h_key );
+            if( RegQueryValueEx( h_key, "InstallDir", 0, &i_type,
+                                 (LPBYTE)p_data, &i_data ) == ERROR_SUCCESS )
+            {
+                if( i_type == REG_SZ )
+                {
+                    strcat( p_data, "\\plugins" );
+                    ppsz_argv[ppsz_argc++] = "--plugin-path";
+                    ppsz_argv[ppsz_argc++] = p_data;
+                }
+            }
+            RegCloseKey( h_key );
         }
 
         char p_path[MAX_PATH+1];
@@ -496,7 +497,7 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         {
             libvlc_audio_set_mute(_p_libvlc, TRUE, NULL);
         }
-            
+
         // initial playlist item
         if( SysStringLen(_bstr_mrl) > 0 )
         {
@@ -504,23 +505,18 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
 
             if( SysStringLen(_bstr_baseurl) > 0 )
             {
-                DWORD len = INTERNET_MAX_URL_LENGTH;
-                LPOLESTR abs_url = (LPOLESTR)CoTaskMemAlloc(sizeof(OLECHAR)*len);
+                /*
+                ** if the MRL a relative URL, we should end up with an absolute URL
+                */
+                LPWSTR abs_url = CombineURL(_bstr_baseurl, _bstr_mrl);
                 if( NULL != abs_url )
                 {
-                    /*
-                    ** if the MRL a relative URL, we should end up with an absolute URL
-                    */
-                    if( SUCCEEDED(UrlCombineW(_bstr_baseurl, _bstr_mrl, abs_url, &len,
-                                    URL_ESCAPE_UNSAFE|URL_PLUGGABLE_PROTOCOL)) )
-                    {
-                        psz_mrl = CStrFromBSTR(CP_UTF8, abs_url);
-                    }
-                    else
-                    {
-                        psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
-                    }
+                    psz_mrl = CStrFromWSTR(CP_UTF8, abs_url, wcslen(abs_url));
                     CoTaskMemFree(abs_url);
+                }
+                else
+                {
+                    psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
                 }
             }
             else
@@ -648,6 +644,14 @@ HRESULT VLCPlugin::onClose(DWORD dwSaveOption)
     {
         libvlc_instance_t* p_libvlc = _p_libvlc;
 
+        IVLCLog *p_log;
+    	if( SUCCEEDED(vlcControl2->get_log(&p_log)) )
+        {
+            // make sure the log is disabled
+            p_log->put_verbosity(-1);
+            p_log->Release();
+        }
+
         _p_libvlc = NULL;
         vlcDataObject->onClose();
 
@@ -741,7 +745,7 @@ HRESULT VLCPlugin::onInPlaceDeactivate(void)
 
     DestroyWindow(_inplacewnd);
     _inplacewnd = NULL;
- 
+
     return S_OK;
 };
 
@@ -984,4 +988,3 @@ void VLCPlugin::fireOnStopEvent(void)
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
     vlcConnectionPointContainer->fireEvent(DISPID_StopEvent, &dispparamsNoArgs); 
 };
-

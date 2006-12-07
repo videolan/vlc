@@ -57,4 +57,3 @@ STDMETHODIMP VLCProvideClassInfo::GetGUID(DWORD dwGuidKind, GUID *pGUID)
 
     return S_OK;
 };
-

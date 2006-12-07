@@ -35,10 +35,10 @@ public:
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
     {
         if( NULL == ppv )
-    	    return E_POINTER;
+            return E_POINTER;
         if( (IID_IUnknown == riid)
          || (IID_IOleWindow == riid)
-         || (IID_IOleInPlaceObject == riid) ) 
+         || (IID_IOleInPlaceObject == riid) )
         {
             AddRef();
             *ppv = reinterpret_cast<LPVOID>(this);
@@ -66,4 +66,3 @@ private:
 };
 
 #endif
-

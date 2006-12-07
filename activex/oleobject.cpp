@@ -30,7 +30,7 @@
 using namespace std;
 
 VLCOleObject::VLCOleObject(VLCPlugin *p_instance) :
-_p_clientsite(NULL), _p_instance(p_instance) 
+_p_clientsite(NULL), _p_instance(p_instance)
 {
     CreateOleAdviseHolder(&_p_advise_holder);
 };
@@ -242,7 +242,7 @@ STDMETHODIMP VLCOleObject::GetClientSite(LPOLECLIENTSITE *ppClientSite)
 {
     if( NULL == ppClientSite )
         return E_POINTER;
- 
+
     if( NULL != _p_clientsite )
         _p_clientsite->AddRef(); 
 
@@ -295,7 +295,7 @@ STDMETHODIMP VLCOleObject::GetMoniker(DWORD dwAssign, DWORD dwWhichMoniker, LPMO
 {
     if( NULL != _p_clientsite )
         return _p_clientsite->GetMoniker(dwAssign,dwWhichMoniker, ppMoniker);
- 
+
     return E_UNEXPECTED;
 };
 

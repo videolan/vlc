@@ -79,7 +79,6 @@ library AXVLC
       uuid(C2FA41D0-B113-476e-AC8C-9BD14999C1C1),
       helpstring("VLC Control (deprecated)"),
       dual,
-      hidden,
       oleautomation
     ]
     interface IVLCControl : IDispatch
@@ -165,7 +164,6 @@ library AXVLC
     [
       uuid(DF48072F-5EF8-434e-9B40-E2F3AE759B5F),
       helpstring("Event interface for VLC control"),
-      hidden
     ]
     dispinterface DVLCEvents
     {
@@ -183,9 +181,7 @@ library AXVLC
       odl,
       uuid(9E0BD17B-2D3C-4656-B94D-03084F3FD9D4),
       helpstring("VLC Audio APIs"),
-      hidden,
       dual,
-      nonextensible,
       oleautomation
     ]
     interface IVLCAudio : IDispatch
@@ -208,9 +204,7 @@ library AXVLC
       odl,
       uuid(49E0DBD1-9440-466C-9C97-95C67190C603),
       helpstring("VLC Input APIs"),
-      hidden,
       dual,
-      nonextensible,
       oleautomation
     ]
     interface IVLCInput : IDispatch
@@ -247,9 +241,7 @@ library AXVLC
       odl,
       uuid(9ED00AFA-7BCD-4FFF-8D48-7DD4DB2C800D),
       helpstring("VLC Log Message"),
-      hidden,
       dual,
-      nonextensible,
       oleautomation
     ]
     interface IVLCMessage: IDispatch
@@ -277,9 +269,7 @@ library AXVLC
       odl,
       uuid(15179CD8-CC12-4242-A58E-E412217FF343),
       helpstring("VLC Log iterator"),
-      hidden,
       dual,
-      nonextensible,
       oleautomation
     ]
     interface IVLCMessageIterator : IDispatch
@@ -294,10 +284,8 @@ library AXVLC
     [
       odl,
       uuid(6C5CE55D-2D6C-4AAD-8299-C62D2371F106),
-      helpstring("VLC Log APIs"),
-      hidden,
+      helpstring("VLC Log Messages Collection."),
       dual,
-      nonextensible,
       oleautomation
     ]
     interface IVLCMessages : IDispatch
@@ -319,9 +307,7 @@ library AXVLC
       odl,
       uuid(8E3BC3D9-62E9-48FB-8A6D-993F9ABC4A0A),
       helpstring("VLC Log APIs"),
-      hidden,
       dual,
-      nonextensible,
       oleautomation
     ]
     interface IVLCLog : IDispatch
@@ -337,29 +323,46 @@ library AXVLC
 
     [
       odl,
+      uuid(FD37FE32-82BC-4A25-B056-315F4DBB194D),
+      helpstring("VLC Playlist Items collection"),
+      dual,
+      oleautomation
+    ]
+    interface IVLCPlaylistItems : IDispatch
+    {
+        [propget, helpstring("Returns number of items in playlist.")]
+        HRESULT count([out, retval] long* count);
+
+        [helpstring("Remove all items from playlist.")]
+        HRESULT clear();
+
+        [helpstring("remove item from playlist.")]
+        HRESULT remove([in] long itemId);
+    };
+
+    [
+      odl,
       uuid(54613049-40BF-4035-9E70-0A9312C0188D),
       helpstring("VLC Playlist APIs"),
-      hidden,
       dual,
-      nonextensible,
       oleautomation
     ]
     interface IVLCPlaylist : IDispatch
     {
-        [propget, helpstring("Returns number of items in playlist.")]
+        [hidden, propget, helpstring("Returns number of items in playlist. (deprecated)")]
         HRESULT itemCount([out, retval] long* count);
 
         [propget, helpstring("Returns whether playback displays video.")]
         HRESULT isPlaying([out, retval] VARIANT_BOOL* playing);
 
         [helpstring("Add a playlist item.")]
-        HRESULT add([in] BSTR uri, [in, optional] VARIANT name, [in, optional] VARIANT options, [out, retval] long* item);
+        HRESULT add([in] BSTR uri, [in, optional] VARIANT name, [in, optional] VARIANT options, [out, retval] long* itemId);
 
         [helpstring("Play/Resume the playlist.")]
         HRESULT play();
 
         [helpstring("Play item in playlist.")]
-        HRESULT playItem([in] long item);
+        HRESULT playItem([in] long itemId);
 
         [helpstring("Play/Pause current clip.")]
         HRESULT togglePause();
@@ -373,20 +376,21 @@ library AXVLC
         [helpstring("Advance to previous item in playlist.")]
         HRESULT prev();
 
-        [helpstring("Remove all items from playlist.")]
+        [hidden, helpstring("Remove all items from playlist. (deprecated)")]
         HRESULT clear();
 
-        [helpstring("remove item from playlist.")]
+        [hidden, helpstring("Remove item from playlist. (deprecated)")]
         HRESULT removeItem([in] long item);
+
+        [propget, helpstring("Returns the playlist items collection object.")]
+        HRESULT items([out, retval] IVLCPlaylistItems** obj);
     };
 
     [
       odl,
       uuid(0AAEDF0B-D333-4B27-A0C6-BBF31413A42E),
       helpstring("VLC Video APIs"),
-      hidden,
       dual,
-      nonextensible,
       oleautomation
     ]
     interface IVLCVideo : IDispatch
@@ -403,7 +407,7 @@ library AXVLC
         HRESULT height([out, retval] long* height);
 
         [propget, helpstring("Returns video aspect ratio.")]
-        HRESULT aspectRatio([out, retval] BSTR aspect);
+        HRESULT aspectRatio([out, retval] BSTR* aspect);
         [propput, helpstring("Sets video aspect ratio.")]
         HRESULT aspectRatio([in] BSTR aspect);
 
@@ -415,7 +419,6 @@ library AXVLC
       odl,
       uuid(2D719729-5333-406C-BF12-8DE787FD65E3),
       helpstring("VLC Control"),
-      hidden,
       dual,
       oleautomation
     ]
@@ -496,6 +499,5 @@ library AXVLC
     {
         [default] interface IVLCControl2;
         interface IVLCControl;
-        [default, source] dispinterface DVLCEvents;
     };
 };

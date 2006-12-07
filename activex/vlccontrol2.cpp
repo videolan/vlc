@@ -26,6 +26,9 @@
 
 #include "utils.h"
 
+#include <shlwapi.h>
+#include <wininet.h>
+
 using namespace std;
 
 VLCAudio::~VLCAudio()
@@ -581,6 +584,7 @@ STDMETHODIMP VLCInput::get_hasVout(VARIANT_BOOL* hasVout)
 
 VLCLog::~VLCLog()
 {
+    delete _p_vlcmessages;
     if( _p_log )
         libvlc_log_close(_p_log, NULL);
 
@@ -1202,8 +1206,157 @@ STDMETHODIMP VLCMessage::get_message(BSTR* message)
 
 /*******************************************************************************/
 
+VLCPlaylistItems::~VLCPlaylistItems()
+{
+    if( _p_typeinfo )
+        _p_typeinfo->Release();
+};
+
+HRESULT VLCPlaylistItems::loadTypeInfo(void)
+{
+    HRESULT hr = NOERROR;
+    if( NULL == _p_typeinfo )
+    {
+        ITypeLib *p_typelib;
+
+        hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_typelib->GetTypeInfoOfGuid(IID_IVLCPlaylistItems, &_p_typeinfo);
+            if( FAILED(hr) )
+            {
+                _p_typeinfo = NULL;
+            }
+            p_typelib->Release();
+        }
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCPlaylistItems::GetTypeInfoCount(UINT* pctInfo)
+{
+    if( NULL == pctInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+        *pctInfo = 1;
+    else
+        *pctInfo = 0;
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCPlaylistItems::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
+{
+    if( NULL == ppTInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        _p_typeinfo->AddRef();
+        *ppTInfo = _p_typeinfo;
+        return NOERROR;
+    }
+    *ppTInfo = NULL;
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCPlaylistItems::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+        UINT cNames, LCID lcid, DISPID* rgDispID)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCPlaylistItems::Invoke(DISPID dispIdMember, REFIID riid,
+        LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
+        VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
+                pVarResult, pExcepInfo, puArgErr);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCPlaylistItems::get_count(long* count)
+{
+    if( NULL == count )
+        return E_POINTER;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        *count = libvlc_playlist_items_count(p_libvlc, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCPlaylistItems,
+                libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCPlaylistItems::clear()
+{
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_playlist_clear(p_libvlc, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCPlaylistItems,
+                libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCPlaylistItems::remove(long item)
+{
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_playlist_delete_item(p_libvlc, item, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCPlaylistItems,
+                libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+/*******************************************************************************/
+
 VLCPlaylist::~VLCPlaylist()
 {
+    delete _p_vlcplaylistitems;
     if( _p_typeinfo )
         _p_typeinfo->Release();
 };
@@ -1344,18 +1497,44 @@ STDMETHODIMP VLCPlaylist::add(BSTR uri, VARIANT name, VARIANT options, long* ite
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
+        char *psz_uri = NULL;
+        if( SysStringLen(_p_instance->getBaseURL()) > 0 )
+        {
+            /*
+            ** if the MRL a relative URL, we should end up with an absolute URL
+            */
+            LPWSTR abs_url = CombineURL(_p_instance->getBaseURL(), uri);
+            if( NULL != abs_url )
+            {
+                psz_uri = CStrFromWSTR(CP_UTF8, abs_url, wcslen(abs_url));
+                CoTaskMemFree(abs_url);
+            }
+            else
+            {
+                psz_uri = CStrFromBSTR(CP_UTF8, uri);
+            }
+        }
+        else
+        {
+            /*
+            ** baseURL is empty, assume MRL is absolute
+            */
+            psz_uri = CStrFromBSTR(CP_UTF8, uri);
+        }
+
+        if( NULL == psz_uri )
+        {
+            return E_OUTOFMEMORY;
+        }
+
         int i_options;
         char **ppsz_options;
 
         hr = VLCControl::CreateTargetOptions(CP_UTF8, &options, &ppsz_options, &i_options);
         if( FAILED(hr) )
-            return hr;
-
-        char *psz_uri = CStrFromBSTR(CP_UTF8, uri);
-        if( NULL == psz_uri )
         {
-            VLCControl::FreeTargetOptions(ppsz_options, i_options);
-            return E_OUTOFMEMORY;
+            CoTaskMemFree(psz_uri);
+            return hr;
         }
 
         char *psz_name = NULL;
@@ -1566,6 +1745,20 @@ STDMETHODIMP VLCPlaylist::removeItem(long item)
     return hr;
 };
 
+STDMETHODIMP VLCPlaylist::get_items(IVLCPlaylistItems** obj)
+{
+    if( NULL == obj )
+        return E_POINTER;
+
+    *obj = _p_vlcplaylistitems;
+    if( NULL != _p_vlcplaylistitems )
+    {
+        _p_vlcplaylistitems->AddRef();
+        return NOERROR;
+    }
+    return E_OUTOFMEMORY;
+};
+
 /*******************************************************************************/
 
 VLCVideo::~VLCVideo()
@@ -1758,7 +1951,7 @@ STDMETHODIMP VLCVideo::get_height(long* height)
     return hr;
 };
 
-STDMETHODIMP VLCVideo::get_aspectRatio(BSTR aspect)
+STDMETHODIMP VLCVideo::get_aspectRatio(BSTR* aspect)
 {
     if( NULL == aspect )
         return E_POINTER;
@@ -1776,17 +1969,17 @@ STDMETHODIMP VLCVideo::get_aspectRatio(BSTR aspect)
             char *psz_aspect = libvlc_video_get_aspect_ratio(p_input, &ex);
 
             libvlc_input_free(p_input);
-            if( NULL == psz_aspect )
-                return E_OUTOFMEMORY;
-
             if( ! libvlc_exception_raised(&ex) )
             {
-                aspect = SysAllocStringByteLen(psz_aspect, strlen(psz_aspect));
+                if( NULL == psz_aspect )
+                    return E_OUTOFMEMORY;
+
+                *aspect = SysAllocStringByteLen(psz_aspect, strlen(psz_aspect));
                 free( psz_aspect );
                 psz_aspect = NULL;
                 return NOERROR;
-	    }
-	    if( psz_aspect ) free( psz_aspect );
+            }
+            if( psz_aspect ) free( psz_aspect );
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -1826,7 +2019,7 @@ STDMETHODIMP VLCVideo::put_aspectRatio(BSTR aspect)
             libvlc_input_free(p_input);
             if( libvlc_exception_raised(&ex) )
             {
-                _p_instance->setErrorInfo(IID_IVLCPlaylist,
+                _p_instance->setErrorInfo(IID_IVLCVideo,
                     libvlc_exception_get_message(&ex));
                 libvlc_exception_clear(&ex);
                 return E_FAIL;

@@ -243,4 +243,3 @@ STDMETHODIMP VLCPersistPropertyBag::Save(LPPROPERTYBAG pPropBag, BOOL fClearDirt
 
     return S_OK;
 };
-

@@ -132,7 +132,7 @@ STDMETHODIMP VLCControl::play(void)
     }
     return result;
 };
- 
+
 STDMETHODIMP VLCControl::pause(void)
 {
     int i_vlc;
@@ -144,7 +144,7 @@ STDMETHODIMP VLCControl::pause(void)
     }
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::stop(void)
 {
     int i_vlc;
@@ -156,7 +156,7 @@ STDMETHODIMP VLCControl::stop(void)
     }
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::get_Playing(VARIANT_BOOL *isPlaying)
 {
     if( NULL == isPlaying )
@@ -176,7 +176,7 @@ STDMETHODIMP VLCControl::get_Playing(VARIANT_BOOL *isPlaying)
     *isPlaying = VARIANT_FALSE;
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::get_Position(float *position)
 {
     if( NULL == position )
@@ -196,7 +196,7 @@ STDMETHODIMP VLCControl::get_Position(float *position)
     *position = 0.0f;
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::put_Position(float position)
 {
     HRESULT result = E_UNEXPECTED;
@@ -211,7 +211,7 @@ STDMETHODIMP VLCControl::put_Position(float position)
     }
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::get_Time(int *seconds)
 {
     if( NULL == seconds )
@@ -232,14 +232,14 @@ STDMETHODIMP VLCControl::get_Time(int *seconds)
 
     return result;
 };
-     
+
 STDMETHODIMP VLCControl::put_Time(int seconds)
 {
     _p_instance->setTime(seconds);
 
     return NOERROR;
 };
-        
+
 STDMETHODIMP VLCControl::shuttle(int seconds)
 {
     HRESULT result = E_UNEXPECTED;
@@ -254,7 +254,7 @@ STDMETHODIMP VLCControl::shuttle(int seconds)
     }
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::fullscreen(void)
 {
     HRESULT result = E_UNEXPECTED;
@@ -269,7 +269,7 @@ STDMETHODIMP VLCControl::fullscreen(void)
     }
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::get_Length(int *seconds)
 {
     if( NULL == seconds )
@@ -289,7 +289,7 @@ STDMETHODIMP VLCControl::get_Length(int *seconds)
     *seconds = 0;
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::playFaster(void)
 {
     HRESULT result = E_UNEXPECTED;
@@ -304,7 +304,7 @@ STDMETHODIMP VLCControl::playFaster(void)
     }
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::playSlower(void)
 {
     HRESULT result = E_UNEXPECTED;
@@ -319,7 +319,7 @@ STDMETHODIMP VLCControl::playSlower(void)
     }
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::get_Volume(int *volume)
 {
     if( NULL == volume )
@@ -328,13 +328,13 @@ STDMETHODIMP VLCControl::get_Volume(int *volume)
     *volume  = _p_instance->getVolume();
     return NOERROR;
 };
-        
+
 STDMETHODIMP VLCControl::put_Volume(int volume)
 {
     _p_instance->setVolume(volume);
     return NOERROR;
 };
-        
+
 STDMETHODIMP VLCControl::toggleMute(void)
 {
     int i_vlc;
@@ -362,7 +362,7 @@ STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
 
         int i_type;
         vlc_value_t val;
-        
+
         if( VLC_SUCCESS == VLC_VariableType(i_vlc, psz_varname, &i_type) )
         {
             VARIANT arg;
@@ -771,7 +771,7 @@ STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistM
     }
     return hr;
 };
-        
+
 STDMETHODIMP VLCControl::get_PlaylistIndex(int *index)
 {
     if( NULL == index )
@@ -787,7 +787,7 @@ STDMETHODIMP VLCControl::get_PlaylistIndex(int *index)
     *index = 0;
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::get_PlaylistCount(int *count)
 {
     int i_vlc;
@@ -800,7 +800,7 @@ STDMETHODIMP VLCControl::get_PlaylistCount(int *count)
     *count = 0;
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::playlistNext(void)
 {
     int i_vlc;
@@ -812,7 +812,7 @@ STDMETHODIMP VLCControl::playlistNext(void)
     }
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::playlistPrev(void)
 {
     int i_vlc;
@@ -824,7 +824,7 @@ STDMETHODIMP VLCControl::playlistPrev(void)
     }
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::playlistClear(void)
 {
     int i_vlc;
@@ -836,7 +836,7 @@ STDMETHODIMP VLCControl::playlistClear(void)
     }
     return result;
 };
-        
+
 STDMETHODIMP VLCControl::get_VersionInfo(BSTR *version)
 {
     if( NULL == version )
@@ -852,7 +852,7 @@ STDMETHODIMP VLCControl::get_VersionInfo(BSTR *version)
     *version = NULL;
     return E_FAIL;
 };
- 
+
 STDMETHODIMP VLCControl::get_MRL(BSTR *mrl)
 {
     if( NULL == mrl )
@@ -899,4 +899,3 @@ STDMETHODIMP VLCControl::put_AutoLoop(VARIANT_BOOL autoloop)
     _p_instance->setAutoLoop((VARIANT_FALSE != autoloop) ? TRUE: FALSE);
     return S_OK;
 };
-

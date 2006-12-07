@@ -22,24 +22,26 @@
 
 #include "utils.h"
 
+#include <wchar.h>
+#include <wctype.h>
+
 /*
 ** conversion facilities
 */
 
 using namespace std;
 
-char *CStrFromBSTR(UINT codePage, BSTR bstr)
+char *CStrFromWSTR(UINT codePage, LPCWSTR wstr, UINT len)
 {
-    UINT len = SysStringLen(bstr);
     if( len > 0 )
     {
         size_t mblen = WideCharToMultiByte(codePage,
-                0, bstr, len, NULL, 0, NULL, NULL);
+                0, wstr, len, NULL, 0, NULL, NULL);
         if( mblen > 0 )
         {
             char *buffer = (char *)CoTaskMemAlloc(mblen+1);
             ZeroMemory(buffer, mblen+1);
-            if( WideCharToMultiByte(codePage, 0, bstr, len, buffer, mblen, NULL, NULL) )
+            if( WideCharToMultiByte(codePage, 0, wstr, len, buffer, mblen, NULL, NULL) )
             {
                 buffer[mblen] = '\0';
                 return buffer;
@@ -47,6 +49,11 @@ char *CStrFromBSTR(UINT codePage, BSTR bstr)
         }
     }
     return NULL;
+};
+
+char *CStrFromBSTR(UINT codePage, BSTR bstr)
+{
+    return CStrFromWSTR(codePage, bstr, SysStringLen(bstr));
 };
 
 BSTR BSTRFromCStr(UINT codePage, LPCSTR s)
@@ -61,7 +68,7 @@ BSTR BSTRFromCStr(UINT codePage, LPCSTR s)
 
             ZeroMemory(wideStr, wideLen*sizeof(WCHAR));
             MultiByteToWideChar(codePage, 0, s, -1, wideStr, wideLen);
-            bstr = SysAllocStringLen(wideStr, wideLen);
+            bstr = SysAllocStringLen(wideStr, wideLen-1);
             CoTaskMemFree(wideStr);
 
             return bstr;
@@ -126,11 +133,11 @@ HRESULT GetObjectProperty(LPUNKNOWN object, DISPID dispID, VARIANT& v)
 
 HDC CreateDevDC(DVTARGETDEVICE *ptd)
 {
-	HDC hdc=NULL;
-	if( NULL == ptd )
+    HDC hdc=NULL;
+    if( NULL == ptd )
     {
-		hdc = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
-	}
+        hdc = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
+    }
     else
     {
         LPDEVNAMES lpDevNames;
@@ -156,7 +163,7 @@ HDC CreateDevDC(DVTARGETDEVICE *ptd)
 
         hdc = CreateDC(lpszDriverName, lpszDeviceName, lpszPortName, lpDevMode);
     }
-	return hdc;
+        return hdc;
 };
 
 #define HIMETRIC_PER_INCH 2540
@@ -184,4 +191,156 @@ void HimetricFromDP(HDC hdc, LPPOINT pt, int count)
         ++pt;
     }
 };
+
+
+LPWSTR CombineURL(LPCWSTR baseUrl, LPCWSTR url)
+{
+    if( NULL != url )
+    {
+        // check whether URL is already absolute
+        const wchar_t *end=wcschr(url, L':');
+        if( (NULL != end) && (end != url) )
+        {
+            // validate protocol header
+            const wchar_t *start = url;
+            while( start != end ) {
+                wchar_t c = towlower(*start);
+                if( (c < L'a') || (c > L'z') )
+                    // not a valid protocol header, assume relative URL
+                    goto relativeurl;
+                ++start;
+            }
+            /* we have a protocol header, therefore URL is absolute */
+            UINT len = wcslen(url);
+            wchar_t *href = (LPWSTR)CoTaskMemAlloc((len+1)*sizeof(wchar_t));
+            if( href )
+            {
+                memcpy(href, url, len*sizeof(wchar_t));
+                href[len] = L'\0';
+            }
+            return href;
+        }
+
+relativeurl:
+
+        if( baseUrl )
+        {
+            size_t baseLen = wcslen(baseUrl);
+            wchar_t *href = (LPWSTR)CoTaskMemAlloc((baseLen+wcslen(url)+1)*sizeof(wchar_t));
+            if( href )
+            {
+                /* prepend base URL */
+                wcscpy(href, baseUrl);
+
+                /*
+                ** relative url could be empty,
+                ** in which case return base URL
+                */
+                if( L'\0' == *url )
+                    return href;
+
+                /*
+                ** locate pathname part of base URL
+                */
+
+                /* skip over protocol part  */
+                wchar_t *pathstart = wcschr(href, L':');
+                wchar_t *pathend;
+                if( pathstart )
+                {
+                    if( L'/' == *(++pathstart) )
+                    {
+                        if( L'/' == *(++pathstart) )
+                        {
+                            ++pathstart;
+                        }
+                    }
+                    /* skip over host part */
+                    pathstart = wcschr(pathstart, L'/');
+                    pathend = href+baseLen;
+                    if( ! pathstart )
+                    {
+                        // no path, add a / past end of url (over '\0')
+                        pathstart = pathend;
+                        *pathstart = L'/';
+                    }
+                }
+                else
+                {
+                    /* baseURL is just a UNIX file path */
+                    if( L'/' != *href )
+                    {
+                        /* baseURL is not an absolute path */
+                        return NULL;
+                    }
+                    pathstart = href;
+                    pathend = href+baseLen;
+                }
+
+                /* relative URL made of an absolute path ? */
+                if( L'/' == *url )
+                {
+                    /* replace path completely */
+                    wcscpy(pathstart, url);
+                    return href;
+                }
+
+                /* find last path component and replace it */ 
+                while( L'/' != *pathend )
+                    --pathend;
+
+                /*
+                ** if relative url path starts with one or more './' or '../',
+                ** factor them out of href so that we return a
+                ** normalized URL
+                */
+                while( pathend > pathstart )
+                {
+                    const wchar_t *p = url;
+                    if( L'.' != *p )
+                        break;
+                    ++p;
+                    if( L'\0' == *p  )
+                    {
+                        /* relative url is just '.' */
+                        url = p;
+                        break;
+                    }
+                    if( L'/' == *p  )
+                    {
+                        /* relative url starts with './' */
+                        url = ++p;
+                        continue;
+                    }
+                    if( L'.' != *p ) 
+                        break;
+                    ++p;
+                    if( L'\0' == *p )
+                    {
+                        /* relative url is '..' */
+                    }
+                    else
+                    {
+                        if( L'/' != *p ) 
+                            break;
+                        /* relative url starts with '../' */
+                        ++p;
+                    }
+                    url = p;
+                    do
+                    {
+                        --pathend;
+                    }
+                    while( L'/' != *pathend );
+                }
+                /* skip over '/' separator */
+                ++pathend;
+                /* concatenate remaining base URL and relative URL */
+                wcscpy(pathend, url);
+            }
+            return href;
+        }
+    }
+    return NULL;
+}
 

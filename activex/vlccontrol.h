@@ -27,7 +27,6 @@
 
 class VLCControl : public IVLCControl
 {
-    
 public:
 
     VLCControl(VLCPlugin *p_instance) :  _p_instance(p_instance), _p_typeinfo(NULL) {};
@@ -92,7 +91,7 @@ public:
     STDMETHODIMP put_AutoLoop(VARIANT_BOOL autoloop);
     STDMETHODIMP get_AutoPlay(VARIANT_BOOL *autoplay);
     STDMETHODIMP put_AutoPlay(VARIANT_BOOL autoplay);
- 
+
     static HRESULT CreateTargetOptions(int codePage, VARIANT *options, char ***cOptions, int *cOptionCount);
     static void FreeTargetOptions(char **cOptions, int cOptionCount);
 
@@ -102,8 +101,6 @@ private:
 
     VLCPlugin *_p_instance;
     ITypeInfo *_p_typeinfo;
-
 };
- 
-#endif
 
+#endif

@@ -28,6 +28,7 @@
 #include <vector>
 
 // utilities
+extern char *CStrFromWSTR(UINT codePage, LPCWSTR wstr, UINT len);
 extern char *CStrFromBSTR(UINT codePage, BSTR bstr);
 extern BSTR BSTRFromCStr(UINT codePage, LPCSTR s);
 
@@ -40,6 +41,9 @@ extern HRESULT GetObjectProperty(LPUNKNOWN object, DISPID dispID, VARIANT& v);
 extern HDC CreateDevDC(DVTARGETDEVICE *ptd);
 extern void DPFromHimetric(HDC hdc, LPPOINT pt, int count);
 extern void HimetricFromDP(HDC hdc, LPPOINT pt, int count);
+
+// URL
+extern LPWSTR CombineURL(LPCWSTR baseUrl, LPCWSTR url);
 
 /**************************************************************************************************/
 
