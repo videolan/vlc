@@ -907,7 +907,6 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
 
     ((tls_session_sys_t *)p_session->p_sys)->session = session;
 
-    i_val = gnutls_set_default_priority( session );
     if (gnutls_SessionPrioritize (VLC_OBJECT (p_session), session))
     {
         gnutls_deinit( session );
