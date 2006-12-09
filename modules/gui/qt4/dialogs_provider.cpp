@@ -273,7 +273,7 @@ void DialogsProvider::savePlaylist()
                     file.append( ".m3u" );
             }
 
-            playlist_Export( THEPL, qtu(file), THEPL->p_playlist_category,
+            playlist_Export( THEPL, qtu(file), THEPL->p_local_category,
                              psz_module);
         }
     }
