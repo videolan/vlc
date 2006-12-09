@@ -156,7 +156,7 @@ bool MessagesDialog::save()
             p_intf->p_libvlc->psz_homedir,
             "Texts / Logs (*.log *.txt);; All (*.*) ");
 
-    if( saveLogFileName != NULL )
+    if( !saveLogFileName.isNull() )
     {
         QFile file(saveLogFileName);
         if (!file.open(QFile::WriteOnly | QFile::Text)) {

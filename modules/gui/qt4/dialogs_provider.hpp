@@ -70,11 +70,12 @@ private:
     intf_thread_t *p_intf;
     static DialogsProvider *instance;
     QStringList showSimpleOpen();
+    void addFromSimple( bool, bool );
 
 public slots:
     void playlistDialog();
     void bookmarksDialog();
-    void MediaInfoDialog();
+    void mediaInfoDialog();
     void prefsDialog();
     void extendedDialog();
     void messagesDialog();
@@ -92,8 +93,9 @@ public slots:
     void SDMenuAction( QString );
     void streamingDialog();
     void openPlaylist();
-    void openDirectory();
-    void openMLDirectory();
+    void savePlaylist();
+    void PLAppendDir();
+    void MLAppendDir();
     void quit();
     void switchToSkins();
     void helpDialog();

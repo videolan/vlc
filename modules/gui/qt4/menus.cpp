@@ -27,8 +27,9 @@
 #include <QActionGroup>
 #include <QSignalMapper>
 
-#include "main_interface.hpp"
+#include <vlc_intf_strings.h>
 
+#include "main_interface.hpp"
 #include "menus.hpp"
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"
@@ -155,8 +156,8 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
     menu->addMenu( SDMenu( p_intf ) );
     menu->addSeparator();
 
-    DP_SADD( qtr( "Open playlist file"), "", "", openPlaylist() );
-//    DP_SADD( qtr( "Save playlist to file" ), "", "", savePlaylist() );
+    DP_SADD( qtr(I_PL_LOAD), "", "", openPlaylist() );
+    DP_SADD( qtr(I_PL_SAVE), "", "", savePlaylist() );
     menu->addSeparator();
     menu->addAction( qtr("Undock from interface"), mi,
                      SLOT( undockPlaylist() ) );
@@ -175,10 +176,9 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         menu->addMenu( intfmenu );
         menu->addSeparator();
     }
-    DP_SADD( qtr("Messages" ), "", "", messagesDialog() );
-    DP_SADD( qtr("Information") , "", "", MediaInfoDialog() );
-    DP_SADD( qtr("Bookmarks"), "", "", bookmarksDialog() );
-    DP_SADD( qtr("Extended settings"), "","",extendedDialog() );
+    DP_SADD( qtr(I_MENU_MSG), "", "", messagesDialog() );
+    DP_SADD( qtr(I_MENU_INFO) , "", "", mediaInfoDialog() );
+    DP_SADD( qtr(I_MENU_EXT), "","",extendedDialog() );
     if( mi )
     {
         menu->addSeparator();
@@ -290,7 +290,7 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *current )
 QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
-    menu->setTitle( qtr( "Additional sources" ) );
+    menu->setTitle( qtr(I_PL_SD) );
     vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
                                         FIND_ANYWHERE );
     int i_num = 0;
@@ -331,7 +331,7 @@ QMenu *QVLCMenu::HelpMenu()
     QMenu *menu = new QMenu();
     DP_SADD( qtr("Help") , "", "", helpDialog() );
                 menu->addSeparator();
-    DP_SADD( qtr("About VLC media player..."), "", "", aboutDialog() );
+    DP_SADD( qtr(I_MENU_ABOUT), "", "", aboutDialog() );
     return menu;
 }
 

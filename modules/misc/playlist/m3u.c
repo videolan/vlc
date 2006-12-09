@@ -42,23 +42,25 @@ int Export_M3U ( vlc_object_t * );
 /*****************************************************************************
  * Export_M3U: main export function
  *****************************************************************************/
-int Export_M3U( vlc_object_t *p_this )
+static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
+                        playlist_item_t *p_root )
 {
-    playlist_t *p_playlist = (playlist_t*)p_this;
-    playlist_export_t *p_export = (playlist_export_t *)p_playlist->p_private;
     int i, j;
 
-    msg_Dbg(p_playlist, "saving using M3U format");
-
-    /* Write header */
-    fprintf( p_export->p_file, "#EXTM3U\n" );
-
     /* Go through the playlist and add items */
-    for( i = 0; i< p_export->p_root->i_children ; i++)
+    for( i = 0; i< p_root->i_children ; i++)
     {
-        playlist_item_t *p_current = p_export->p_root->pp_children[i];
+        playlist_item_t *p_current = p_root->pp_children[i];
         if( p_current->i_flags & PLAYLIST_SAVE_FLAG )
             continue;
+
+        if( p_current->i_children >= 0 )
+        {
+            DoChildren( p_playlist, p_export, p_current );
+            continue;
+        }
+
+        assert( p_current->p_input->psz_uri );
 
         /* General info */
         if( p_current->p_input->psz_name &&
@@ -99,5 +101,19 @@ int Export_M3U( vlc_object_t *p_this )
         fprintf( p_export->p_file, "%s\n",
                  p_current->p_input->psz_uri );
     }
+}
+
+int Export_M3U( vlc_object_t *p_this )
+{
+    playlist_t *p_playlist = (playlist_t*)p_this;
+    playlist_export_t *p_export = (playlist_export_t *)p_playlist->p_private;
+
+    msg_Dbg(p_playlist, "saving using M3U format");
+
+    /* Write header */
+    fprintf( p_export->p_file, "#EXTM3U\n" );
+
+    DoChildren( p_playlist, p_export, p_export->p_root );
     return VLC_SUCCESS;
 }
+

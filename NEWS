@@ -11,9 +11,11 @@ Important notes:
    XXX: DETAILED INSTRUCTIONS HERE :XXX
  * This version of VLC contains a new interface for Windows and Linux. This
    interface lacks a few features that used to be present in vlc 0.8.6: 
-   "Streaming wizard" and "VLM control". These features will be replaced
-   by a better alternative in the next version. If you absolutely need these
-   features, we advise you to keep vlc 0.8.6
+   - "Streaming wizard" and "VLM control". These features will be replaced
+     by a better alternative in the next version. If you absolutely need these
+     features, we advise you to keep vlc 0.8.6
+   - Similarly, "Bookmarks" will be reintroduced in an improved version at a 
+     later point
 
 Changes:
 --------

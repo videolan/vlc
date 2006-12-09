@@ -30,9 +30,19 @@
 
 /*************** Open dialogs **************/
 
-#define I_POP_SEL_FILES N_("Select one or more files to open")
+#define I_OP_OPF        N_("Quick &Open File...")
+#define I_OP_ADVOP      N_("&Advanced Open...")
+#define I_OP_OPDIR      N_("Open &Directory...")
+
+#define I_OP_SEL_FILES  N_("Select one or more files to open")
 
 /******************* Menus *****************/
+
+#define I_MENU_INFO  N_("Information...")
+#define I_MENU_MSG   N_("Messages...")
+#define I_MENU_EXT   N_("Extended settings...")
+
+#define I_MENU_ABOUT N_("About VLC media player...")
 
 /* Playlist popup */
 #define I_POP_PLAY N_("Play")
@@ -43,6 +53,30 @@
 #define I_POP_ADD N_("Add node")
 #define I_POP_STREAM N_("Stream...")
 #define I_POP_SAVE N_("Save...")
+
+/*************** Playlist *************/
+
+#define I_PL_LOOP       N_("Repeat all")
+#define I_PL_REPEAT     N_("Repeat one")
+#define I_PL_NOREPEAT   N_("No repeat")
+
+#define I_PL_RANDOM     N_("Random")
+#define I_PL_NORANDOM   N_("No random")
+
+#define I_PL_ADDPL      N_("Add to playlist")
+#define I_PL_ADDML      N_("Add to media library")
+
+#define I_PL_ADDF       N_("Add file...")
+#define I_PL_ADVADD     N_("Advanced open...")
+#define I_PL_ADDDIR     N_("Add directory...")
+
+#define I_PL_SAVE       N_("Save playlist to file...")
+#define I_PL_LOAD       N_("Load playlist file...")
+
+#define I_PL_SEARCH     N_("Search")
+#define I_PL_FILTER     N_("Search filter")
+
+#define I_PL_SD         N_("Additional sources")
 
 /*************** Preferences *************/
 

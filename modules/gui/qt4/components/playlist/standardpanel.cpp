@@ -27,6 +27,8 @@
 #include "components/playlist/panels.hpp"
 #include "util/customwidgets.hpp"
 
+#include <vlc_intf_strings.h>
+
 #include <QTreeView>
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -53,7 +55,7 @@ StandardPLPanel::StandardPLPanel( BasePlaylistWidget *_parent,
     view->setIconSize( QSize(20,20) );
     view->setAlternatingRowColors( true );
     view->header()->resizeSection( 0, 230 );
-    view->header()->resizeSection( 2, 60 );
+    view->header()->resizeSection( 1, 170 );
     view->header()->setSortIndicatorShown( true );
     view->header()->setClickable( true );
 
@@ -95,9 +97,9 @@ StandardPLPanel::StandardPLPanel( BasePlaylistWidget *_parent,
 
     QSpacerItem *spacer = new QSpacerItem( 10, 20 );buttons->addItem( spacer );
 
-    QLabel *filter = new QLabel( qfu( "&Search:" ) + " " );
+    QLabel *filter = new QLabel( qtr(I_PL_SEARCH) + " " );
     buttons->addWidget( filter );
-    searchLine = new  ClickLineEdit( qfu( "Playlist filter" ), 0 );
+    searchLine = new  ClickLineEdit( qtr(I_PL_FILTER), 0 );
     CONNECT( searchLine, textChanged(QString), this, search(QString));
     buttons->addWidget( searchLine ); filter->setBuddy( searchLine );
 
@@ -117,17 +119,17 @@ void StandardPLPanel::toggleRepeat()
     if( model->hasRepeat() )
     {
         model->setRepeat( false ); model->setLoop( true );
-        repeatButton->setText( qtr( "Repeat All" ) );
+        repeatButton->setText( qtr(I_PL_LOOP) );
     }
     else if( model->hasLoop() )
     {
         model->setRepeat( false ) ; model->setLoop( false );
-        repeatButton->setText( qtr( "No Repeat" ) );
+        repeatButton->setText( qtr(I_PL_NOREPEAT) );
     }
     else
     {
         model->setRepeat( true );
-        repeatButton->setText( qtr( "Repeat One" ) );
+        repeatButton->setText( qtr(I_PL_REPEAT) );
     }
 }
 
@@ -135,7 +137,7 @@ void StandardPLPanel::toggleRandom()
 {
     bool prev = model->hasRandom();
     model->setRandom( !prev );
-    randomButton->setText( prev ? qtr( "No Random" ) : qtr( "Random" ) );
+    randomButton->setText( prev ? qtr(I_PL_NORANDOM) : qtr(I_PL_RANDOM) );
 }
 
 void StandardPLPanel::handleExpansion( const QModelIndex &index )
@@ -159,13 +161,13 @@ void StandardPLPanel::setCurrentRootId( int _new )
         currentRootId == THEPL->p_local_onelevel->i_id  )
     {
         addButton->setEnabled( true );
-        addButton->setToolTip( qtr("Add to playlist" ) );
+        addButton->setToolTip( qtr(I_PL_ADDPL) );
     }
     else if( currentRootId == THEPL->p_ml_category->i_id ||
              currentRootId == THEPL->p_ml_onelevel->i_id )
     {
         addButton->setEnabled( true );
-        addButton->setToolTip( qtr("Add to media library" ) );
+        addButton->setToolTip( qtr(I_PL_ADDML) );
     }
     else
         addButton->setEnabled( false );
@@ -177,15 +179,16 @@ void StandardPLPanel::add()
     if( currentRootId == THEPL->p_local_category->i_id ||
         currentRootId == THEPL->p_local_onelevel->i_id )
     {
-        popup->addAction( qtr("Add file"), THEDP, SLOT( simplePLAppendDialog() ) );
-        popup->addAction( qtr("Advanced add"), THEDP, SLOT( PLAppendDialog() ) );
+        popup->addAction( qtr(I_PL_ADDF), THEDP, SLOT(simplePLAppendDialog()));
+        popup->addAction( qtr(I_PL_ADVADD), THEDP, SLOT(PLAppendDialog()) );
+        popup->addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
     }
     else if( currentRootId == THEPL->p_ml_category->i_id ||
              currentRootId == THEPL->p_ml_onelevel->i_id )
     {
-        popup->addAction( qtr("Add file"), THEDP, SLOT( simpleMLAppendDialog() ) );
-        popup->addAction( qtr("Advanced add"), THEDP, SLOT( MLAppendDialog() ) );
-        popup->addAction( qtr("Directory"), THEDP, SLOT( openMLDirectory() ) );
+        popup->addAction( qtr(I_PL_ADDF), THEDP, SLOT(simpleMLAppendDialog()));
+        popup->addAction( qtr(I_PL_ADVADD), THEDP, SLOT( MLAppendDialog() ) );
+        popup->addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
     }
     popup->popup( QCursor::pos() );
 }
