@@ -1146,7 +1146,7 @@ void Playlist::OnKeyDown( wxTreeEvent& event )
 {
     long keycode = event.GetKeyCode();
     /* Delete selected items */
-    if( keycode == WXK_BACK || keycode == WXK_DELETE )
+    if( keycode == WXK_BACK || keycode == WXK_DELETE || keycode == WXK_NUMPAD_DELETE )
     {
         /* We send a dummy event */
         OnDeleteSelection( event );
