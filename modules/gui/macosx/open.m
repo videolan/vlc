@@ -308,7 +308,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     int i_result;
     intf_thread_t * p_intf = VLCIntf;
 
-    b_autoplay = (BOOL *)config_GetInt( VLCIntf, "macosx-autoplay" );
+    b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
 
     [o_tabview selectTabViewItemAtIndex: i_type];
     [o_file_sub_ckbox setState: NSOffState];
@@ -738,7 +738,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
     int i;
-    b_autoplay = (BOOL *)config_GetInt( VLCIntf, "macosx-autoplay" );
+    b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
     
     [o_open_panel setAllowsMultipleSelection: YES];
     [o_open_panel setCanChooseDirectories: YES];

@@ -97,7 +97,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_output_ckbox;
     IBOutlet id o_sout_options;
     
-    BOOL * b_autoplay;
+    BOOL b_autoplay;
 }
 
 + (VLCOpen *)sharedInstance;
