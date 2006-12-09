@@ -275,7 +275,7 @@ static VLCTreeItem *o_root_item = nil;
         module_t        *p_parser;
         module_config_t *p_item,
                         *p_end;
-        int             i_index;
+        int             i_index = 0;
 
         /* List the modules */
         p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -540,7 +540,7 @@ static VLCTreeItem *o_root_item = nil;
         vlc_list_t      *p_list;
         module_t        *p_parser = NULL;
         module_config_t *p_item,
-                        *p_end = p_parser->p_config + p_parser->confsize; 
+                        *p_end; 
 
         o_subviews = [[NSMutableArray alloc] initWithCapacity:10];
         /* Get a pointer to the module */
@@ -552,6 +552,9 @@ static VLCTreeItem *o_root_item = nil;
                 /* 0OOoo something went really bad */
                 return nil;
             }
+            
+            p_end = p_parser->p_config + p_parser->confsize;
+            
             p_item = p_parser->p_config;
 
             p_item = p_parser->p_config + 1;
@@ -613,6 +616,8 @@ static VLCTreeItem *o_root_item = nil;
                 msg_Err( p_intf, "could not load preferences" );
                 return o_view;
             }
+            p_end = p_parser->p_config + p_parser->confsize;
+            
             p_item = (p_parser->p_config + i_object_category);
             if( ( p_item->i_type == CONFIG_CATEGORY ) &&
               ( ( p_item->value.i == CAT_PLAYLIST )  ||
