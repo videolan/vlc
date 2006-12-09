@@ -666,9 +666,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
 {
+    BOOL b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
     NSDictionary *o_dic = [NSDictionary dictionaryWithObjectsAndKeys: o_filename, @"ITEM_URL", nil];
-    [o_playlist appendArray:
-        [NSArray arrayWithObject: o_dic] atPos: -1 enqueue: NO];
+    if( b_autoplay )
+        [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue: NO];
+    else
+        [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue: YES];
 
     return( TRUE );
 }

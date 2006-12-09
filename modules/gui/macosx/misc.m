@@ -175,6 +175,7 @@
     NSArray *o_types = [NSArray arrayWithObjects: NSFilenamesPboardType, nil];
     NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
     NSData *o_carried_data = [o_paste dataForType:o_desired_type];
+    BOOL b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
 
     if( o_carried_data )
     {
@@ -191,7 +192,10 @@
                 o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];
                 o_array = [o_array arrayByAddingObject: o_dic];
             }
-            [[[VLCMain sharedInstance] getPlaylist] appendArray: o_array atPos: -1 enqueue:NO];
+            if( b_autoplay )
+                [[[VLCMain sharedInstance] getPlaylist] appendArray: o_array atPos: -1 enqueue:NO];
+            else
+                [[[VLCMain sharedInstance] getPlaylist] appendArray: o_array atPos: -1 enqueue:YES];
             return YES;
         }
     }
