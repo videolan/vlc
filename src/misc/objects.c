@@ -1015,12 +1015,9 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
     psz_name[0] = '\0';
     if( p_this->psz_object_name )
     {
-        snprintf( psz_name, 50, " \"%s\"", p_this->psz_object_name );
+        snprintf( psz_name, 49, " \"%s\"", p_this->psz_object_name );
         if( psz_name[48] )
-        {
             psz_name[48] = '\"';
-            psz_name[49] = '\0';
-        }
     }
 
     psz_children[0] = '\0';
@@ -1032,32 +1029,21 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
             strcpy( psz_children, ", 1 child" );
             break;
         default:
-            snprintf( psz_children, 20,
-                      ", %i children", p_this->i_children );
-            psz_children[19] = '\0';
+            snprintf( psz_children, 19, ", %i children", p_this->i_children );
             break;
     }
 
     psz_refcount[0] = '\0';
     if( p_this->i_refcount )
-    {
-        snprintf( psz_refcount, 20, ", refcount %i", p_this->i_refcount );
-        psz_refcount[19] = '\0';
-    }
+        snprintf( psz_refcount, 19, ", refcount %i", p_this->i_refcount );
 
     psz_thread[0] = '\0';
     if( p_this->b_thread )
-    {
-        snprintf( psz_thread, 30, " (thread %d)", (int)p_this->thread_id );
-        psz_thread[29] = '\0';
-    }
+        snprintf( psz_thread, 29, " (thread %d)", (int)p_this->thread_id );
 
     psz_parent[0] = '\0';
     if( p_this->p_parent )
-    {
-        snprintf( psz_parent, 20, ", parent %i", p_this->p_parent->i_object_id );
-        psz_parent[19] = '\0';
-    }
+        snprintf( psz_parent, 19, ", parent %i", p_this->p_parent->i_object_id );
 
     printf( " %so %.8i %s%s%s%s%s%s\n", psz_prefix,
             p_this->i_object_id, p_this->psz_object_type,
