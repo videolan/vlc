@@ -347,11 +347,13 @@ void DialogsProvider::menuUpdateAction( QObject *data )
 
 void DialogsProvider::SDMenuAction( QString data )
 {
-    char *psz_sd = data.toUtf8().data();
+    char *psz_sd = strdup( qtu( data ) );
     if( !playlist_IsServicesDiscoveryLoaded( THEPL, psz_sd ) )
         playlist_ServicesDiscoveryAdd( THEPL, psz_sd );
     else
         playlist_ServicesDiscoveryRemove( THEPL, psz_sd );
+
+    free( psz_sd );
 }
 
 
