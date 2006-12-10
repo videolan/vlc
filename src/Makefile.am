@@ -154,9 +154,7 @@ pic = pic
 endif
 
 if HAVE_WIN32
-if BUILD_SHARED
 DATA_noinst_libvlc = libvlc$(LIBEXT) libvlc$(LIBEXT).a
-endif
 
 libvlc.dll.a: libvlc$(LIBEXT)
 	$(DLLTOOL) --export-all-symbols -l $@ -D $< $(libvlc_a_OBJECTS)
@@ -330,7 +328,7 @@ SOURCES_libvlc_control = \
 	control/mediacontrol_audio_video.c
 
 if !USE_LIBTOOL
-if !BUILD_SHARED
+if !HAVE_WIN32
 CLEANFILES += misc/version.c
 endif
 
@@ -351,7 +349,7 @@ misc/version.c: FORCE
 ###############################################################################
 
 if !USE_LIBTOOL
-if !BUILD_SHARED
+if !HAVE_WIN32
 stamp-api: Makefile.in $(HEADERS_include) ../vlc-api.pl
 	( cd $(srcdir) && cat $(HEADERS_include) ) | \
 	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl

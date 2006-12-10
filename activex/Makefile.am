@@ -64,11 +64,7 @@ DIST_misc = \
     test.html \
     $(NULL)
 
-if BUILD_SHARED
 LIBRARIES_libvlc = $(top_builddir)/src/libvlc.dll.a
-else
-LIBRARIES_libvlc = $(top_builddir)/src/libvlc.a
-endif
 
 if BUILD_ACTIVEX
 
@@ -76,7 +72,7 @@ noinst_LIBRARIES_activex = libaxvlc.a
 axvlc_DATA = axvlc$(LIBEXT)
 axvlcdir = $(libdir)
 
-LDFLAGS_activex = `$(VLC_CONFIG) --libs activex libvlc builtin`
+LDFLAGS_activex = `$(VLC_CONFIG) --libs activex libvlc`
 
 libaxvlc_a_SOURCES = $(SOURCES_activex) $(SOURCE_dll)
 libaxvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags activex`
@@ -84,7 +80,7 @@ libaxvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags activex`
 libaxvlc_a_DEPENDENCIES = axvlc.def $(DATA_axvlc_rc) $(LIBRARIES_libvlc)
 
 axvlc$(LIBEXT): $(libaxvlc_a_OBJECTS) \
-	              $(libaxvlc_a_DEPENDENCIES) stamp-builtin
+	              $(libaxvlc_a_DEPENDENCIES)
 	$(CXXLINK) $(libaxvlc_a_OBJECTS) $(DATA_axvlc_rc) \
 	$(srcdir)/axvlc.def \
 	  $(LIBRARIES_libvlc) -shared $(LIBRARIES_libvlc) $(LDFLAGS_activex) \
@@ -132,21 +128,6 @@ else
 clean-tlb:
 
 endif
-
-###############################################################################
-# Stamp rules
-###############################################################################
-
-clean-stamp:
-	rm -f stamp-builtin
-
-if BUILD_SHARED
-stamp-builtin:
-else
-stamp-builtin: $(shell ${VLC_CONFIG} --target builtin)
-endif
-	@touch $@
-
 
 ###############################################################################
 # Clean rules

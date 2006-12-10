@@ -286,13 +286,9 @@ LIB_libvlc = libvlc.la
 LIBVLC = src/$(LIB_libvlc)
 vlc_LDFLAGS =
 else
-if BUILD_SHARED
-vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc` -Wl,-rpath $(libdir) -L$(top_builddir)/src -lvlc
 if HAVE_WIN32
+vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc` -Wl,-rpath $(libdir) -L$(top_builddir)/src -lvlc
 LIB_libvlc = libvlc.dll.a
-else
-LIB_libvlc = libvlc$(LIBEXT)
-endif
 LIBVLC =
 else
 vlc_LDFLAGS = $(vlc_WORKAROUNDLFDLAGS) `$(VLC_CONFIG) --libs vlc builtin`
@@ -670,9 +666,7 @@ package-win-common:
 # Copy relevant files
 	cp "$(top_builddir)/vlc$(EXEEXT)" "$(top_builddir)/vlc-${VERSION}/"
 	cp "$(top_srcdir)/vlc.exe.manifest" "$(top_builddir)/vlc-${VERSION}/"
-if BUILD_SHARED
 	cp "src/libvlc$(LIBEXT)" "vlc-${VERSION}/"
-endif
 
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; \
@@ -739,9 +733,7 @@ endif
 
 package-win-common-strip:
 	$(STRIP) "$(top_builddir)/vlc-${VERSION}/vlc$(EXEEXT)"
-if BUILD_SHARED
 	$(STRIP) "vlc-${VERSION}/libvlc$(LIBEXT)"
-endif
 if BUILD_MOZILLA
 	$(STRIP) $(top_builddir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
 endif

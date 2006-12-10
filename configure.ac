@@ -279,7 +279,7 @@ m4_defun([AC_PROG_F77],[])
 AC_PROG_LIBTOOL
 
 AC_ARG_ENABLE(libtool,
-    [  --enable-libtool        use libtool (default disabled)])
+    [  --enable-libtool        use libtool (default enabled)])
 AM_CONDITIONAL(USE_LIBTOOL, [test "x${enable_libtool}" != "xno"])
 
 
@@ -1443,15 +1443,6 @@ dnl
 AC_ARG_ENABLE(release,
 [  --enable-release        activate extra optimizations (default disabled)])
 test "${enable_release}" != "yes" && enable_release="no"
-
-dnl
-dnl  Is the shared libvlc forced ?
-dnl
-AC_ARG_ENABLE(shared-libvlc,
-  [  --enable-shared-libvlc  Win32 libvlc.dll build (default disabled)])
-AS_IF([test "${enable_libtool}" != "no" && test "${enable_shared_libvlc}"], [
-  AC_MSG_ERROR([--enable-shared-libvlc and --enable-libtool are mutually exclusive])
-])
 
 dnl
 dnl Stream output
@@ -5547,9 +5538,7 @@ AS_IF([${plugin_support}], [
 dnl
 dnl Pic and shared libvlc stuff
 dnl
-AS_IF([test "x${enable_shared_libvlc}" = "x"], [enable_shared_libvlc=no])
-AM_CONDITIONAL(BUILD_SHARED, [test "${enable_shared_libvlc}" != "no"])
-AS_IF([test "${enable_shared_libvlc}" != "no" || test "${enable_libtool}" != "no"], [
+AS_IF([test "${SYS}" = "mingw32" || test "${enable_libtool}" != "no"], [
   AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
   FILE_LIBVLC_DLL="!define LIBVLC_DLL libvlc.dll"
   VLC_ADD_PLUGINS([${BUILTINS}])

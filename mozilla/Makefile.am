@@ -23,13 +23,8 @@ SOURCES_mozilla_common = \
 DIST_sources = $(SOURCES_mozilla_common) \
 	support/npwin.cpp support/npmac.cpp support/npunix.c
 
-if BUILD_SHARED
 LIBRARIES_libvlc_pic = -Wl,-rpath '$(libdir)' -L$(top_builddir)/src -lvlc
 LIBRARIES_libvlc_nopic = $(LIBRARIES_libvlc_pic)
-else
-LIBRARIES_libvlc_pic = $(top_builddir)/src/libvlc.a
-LIBRARIES_libvlc_nopic = $(top_builddir)/src/libvlc.a
-endif
 
 if BUILD_MOZILLA
 
