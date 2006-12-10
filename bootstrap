@@ -227,7 +227,7 @@ include Modules.am
 
 LTLIBVLC = \$(top_builddir)/src/libvlc.la
 
-if BUILD_SHARED
+if HAVE_WIN32
 LIBVLC = -L\$(top_builddir)/src -lvlc
 LIBADD = \$(LIBVLC)
 endif
