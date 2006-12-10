@@ -149,7 +149,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->i_sort = SORT_ID;
     p_playlist->i_order = ORDER_NORMAL;
 
-    vlc_object_attach( p_playlist, p_parent );
     b_save = p_playlist->b_auto_preparse;
     p_playlist->b_auto_preparse = VLC_FALSE;
     playlist_MLLoad( p_playlist );
