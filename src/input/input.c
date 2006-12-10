@@ -197,7 +197,9 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_ConfigVarInit( p_input );
 
     /* Create Objects variables for public Get and Set */
-    input_ControlVarInit( p_input );
+    if( !p_input->b_preparsing )
+        input_ControlVarInit( p_input );
+
     p_input->p->input.i_cr_average = var_GetInteger( p_input, "cr-average" );
 
     if( !p_input->b_preparsing )
@@ -1147,7 +1149,8 @@ static void End( input_thread_t * p_input )
     input_ChangeState( p_input, END_S );
 
     /* Clean control variables */
-    input_ControlVarClean( p_input );
+    if( !p_input->b_preparsing )
+        input_ControlVarClean( p_input );
 
     /* Clean up master */
     InputSourceClean( p_input, &p_input->p->input );

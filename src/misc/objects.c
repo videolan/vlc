@@ -852,14 +852,12 @@ void vlc_list_release( vlc_list_t *p_list )
 {
     int i_index;
 
+    vlc_mutex_lock( &structure_lock );
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        vlc_mutex_lock( &structure_lock );
-
         p_list->p_values[i_index].p_object->i_refcount--;
-
-        vlc_mutex_unlock( &structure_lock );
     }
+    vlc_mutex_unlock( &structure_lock );
 
     free( p_list->p_values );
     free( p_list );

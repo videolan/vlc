@@ -26,13 +26,13 @@
 #include <vlc_playlist.h>
 #include "playlist_internal.h"
 
-void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
-              playlist_item_t *p_node, int i_pos );
-void GoAndPreparse( playlist_t *p_playlist, int i_mode,
-                    playlist_item_t *, playlist_item_t * );
-void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
-int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
-                          vlc_bool_t b_stop );
+static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
+                     playlist_item_t *p_node, int i_mode, int i_pos );
+static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
+                           playlist_item_t *, playlist_item_t * );
+static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
+static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
+                        vlc_bool_t b_stop );
 
 /*****************************************************************************
  * Playlist item creation
@@ -206,14 +206,14 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
     if( p_item_one == NULL ) return VLC_EGENERIC;
     AddItem( p_playlist, p_item_one,
              b_playlist ? p_playlist->p_local_onelevel :
-                          p_playlist->p_ml_onelevel , i_pos );
+                          p_playlist->p_ml_onelevel , i_mode, i_pos );
 
     /* Add to CATEGORY */
     p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item_cat == NULL ) return VLC_EGENERIC;
     AddItem( p_playlist, p_item_cat,
              b_playlist ? p_playlist->p_local_category :
-                          p_playlist->p_ml_category , i_pos );
+                          p_playlist->p_ml_category , i_mode, i_pos );
 
     GoAndPreparse( p_playlist, i_mode, p_item_cat, p_item_one );
 
@@ -237,7 +237,7 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     /* Add to category */
     p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item_cat == NULL ) return VLC_EGENERIC;
-    AddItem( p_playlist, p_item_cat, p_direct_parent, i_pos );
+    AddItem( p_playlist, p_item_cat, p_direct_parent, i_mode, i_pos );
 
     /* Add to onelevel */
     /** \todo make a faster case for ml import */
@@ -255,7 +255,8 @@ int playlist_BothAddInput( playlist_t *p_playlist,
                              p_up->p_input->i_id )
         {
             AddItem( p_playlist, p_item_one,
-                     p_playlist->p_root_onelevel->pp_children[i_top], i_pos );
+                     p_playlist->p_root_onelevel->pp_children[i_top],
+                     i_mode, i_pos );
             break;
         }
     }
@@ -282,7 +283,7 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
 
     p_item = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item == NULL ) return NULL;
-    AddItem( p_playlist, p_item, p_parent, i_pos );
+    AddItem( p_playlist, p_item, p_parent, i_mode, i_pos );
 
     vlc_mutex_unlock( &p_playlist->object_lock );
 
@@ -475,7 +476,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
 
 /** Send a notification that an item has been added to a node */
 void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
-                             int i_node_id )
+                             int i_node_id, vlc_bool_t b_signal )
 {
     vlc_value_t val;
     playlist_add_t *p_add = (playlist_add_t *)malloc(sizeof( playlist_add_t));
@@ -483,7 +484,8 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     p_add->i_node = i_node_id;
     val.p_address = p_add;
     p_playlist->b_reset_currently_playing = VLC_TRUE;
-    vlc_cond_signal( &p_playlist->object_wait );
+    if( b_signal )
+        vlc_cond_signal( &p_playlist->object_wait );
     var_Set( p_playlist, "item-append", val );
     free( p_add );
 }
@@ -509,8 +511,9 @@ int playlist_ItemSetName( playlist_item_t *p_item, const char *psz_name )
  ***************************************************************************/
 
 /* Enqueue an item for preparsing, and play it, if needed */
-void GoAndPreparse( playlist_t *p_playlist, int i_mode,
-                    playlist_item_t *p_item_cat, playlist_item_t *p_item_one )
+static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
+                           playlist_item_t *p_item_cat,
+                           playlist_item_t *p_item_one )
 {
     if( (i_mode & PLAYLIST_GO ) )
     {
@@ -556,8 +559,8 @@ void GoAndPreparse( playlist_t *p_playlist, int i_mode,
 }
 
 /* Add the playlist item to the requested node and fire a notification */
-void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
-              playlist_item_t *p_node, int i_pos )
+static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
+                     playlist_item_t *p_node, int i_mode, int i_pos )
 {
     ARRAY_APPEND(p_playlist->items, p_item);
     ARRAY_APPEND(p_playlist->all_items, p_item);
@@ -569,11 +572,12 @@ void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         playlist_NodeInsert( p_playlist, p_item, p_node, i_pos );
 
     if( !p_playlist->b_doing_ml )
-        playlist_SendAddNotify( p_playlist, p_item->i_id, p_node->i_id );
+        playlist_SendAddNotify( p_playlist, p_item->i_id, p_node->i_id,
+                                 !( i_mode & PLAYLIST_NO_REBUILD ) );
 }
 
 /* Actually convert an item to a node */
-void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item )
+static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item )
 {
     int i;
     if( p_item->i_children == -1 )
@@ -586,8 +590,8 @@ void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item )
 }
 
 /* Do the actual removal */
-int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
-                vlc_bool_t b_stop )
+static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
+                        vlc_bool_t b_stop )
 {
     int i;
     int i_id = p_item->i_id;

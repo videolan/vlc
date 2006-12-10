@@ -1636,7 +1636,7 @@ void Playlist::OnPopupAddNode( wxCommandEvent& event )
 
     p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, VLC_TRUE );
 
-    playlist_NodeCreate( p_playlist, psz_name, p_item );
+    playlist_NodeCreate( p_playlist, psz_name, p_item, 0 );
 
     UnlockPlaylist( p_intf->p_sys, p_playlist );
     Rebuild( VLC_TRUE );

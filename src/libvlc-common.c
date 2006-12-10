@@ -579,7 +579,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
         /* Initialise D-Bus interface, check for other instances */
         DBusConnection  *p_conn;
         DBusError       dbus_error;
-        int             i_dbus_service;
 
         dbus_threads_init_default();
         dbus_error_init( &dbus_error );

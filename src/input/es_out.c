@@ -177,25 +177,33 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     var_Get( p_input, "sub-track", &val );
     p_sys->i_sub_last = val.i_int;
 
-    var_Get( p_input, "audio-language", &val );
-    p_sys->ppsz_audio_language = LanguageSplit(val.psz_string);
-    if( p_sys->ppsz_audio_language )
+    if( !p_input->b_preparsing )
     {
-        for( i = 0; p_sys->ppsz_audio_language[i]; i++ )
-            msg_Dbg( p_input, "selected audio language[%d] %s",
-                     i, p_sys->ppsz_audio_language[i] );
-    }
-    if( val.psz_string ) free( val.psz_string );
+        var_Get( p_input, "audio-language", &val );
+        p_sys->ppsz_audio_language = LanguageSplit(val.psz_string);
+        if( p_sys->ppsz_audio_language )
+        {
+            for( i = 0; p_sys->ppsz_audio_language[i]; i++ )
+                msg_Dbg( p_input, "selected audio language[%d] %s",
+                         i, p_sys->ppsz_audio_language[i] );
+        }
+        if( val.psz_string ) free( val.psz_string );
 
-    var_Get( p_input, "sub-language", &val );
-    p_sys->ppsz_sub_language = LanguageSplit(val.psz_string);
-    if( p_sys->ppsz_sub_language )
-    {
-        for( i = 0; p_sys->ppsz_sub_language[i]; i++ )
-            msg_Dbg( p_input, "selected subtitle language[%d] %s",
-                     i, p_sys->ppsz_sub_language[i] );
+        var_Get( p_input, "sub-language", &val );
+        p_sys->ppsz_sub_language = LanguageSplit(val.psz_string);
+        if( p_sys->ppsz_sub_language )
+        {
+            for( i = 0; p_sys->ppsz_sub_language[i]; i++ )
+                msg_Dbg( p_input, "selected subtitle language[%d] %s",
+                         i, p_sys->ppsz_sub_language[i] );
+        }
+        if( val.psz_string ) free( val.psz_string );
     }
-    if( val.psz_string ) free( val.psz_string );
+    else
+    {
+        p_sys->ppsz_sub_language = NULL;
+        p_sys->ppsz_audio_language = NULL;
+    }
 
     var_Get( p_input, "audio-track-id", &val );
     p_sys->i_audio_id = val.i_int;

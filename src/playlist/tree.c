@@ -46,10 +46,12 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
  * \param p_playlist the playlist
  * \paam psz_name the name of the node
  * \param p_parent the parent node to attach to or NULL if no attach
+ * \param p_flags miscellaneous flags
  * \return the new node
  */
-playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, const char *psz_name,
-                                       playlist_item_t *p_parent )
+playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
+                                       const char *psz_name,
+                                       playlist_item_t *p_parent, int i_flags )
 {
     input_item_t *p_input;
     playlist_item_t *p_item;
@@ -68,7 +70,8 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, const char *psz_n
     if( p_parent != NULL )
         playlist_NodeAppend( p_playlist, p_item, p_parent );
     playlist_SendAddNotify( p_playlist, p_item->i_id,
-                            p_parent ? p_parent->i_id : -1 );
+                            p_parent ? p_parent->i_id : -1,
+                            !( i_flags & PLAYLIST_NO_REBUILD ));
     return p_item;
 }
 
@@ -289,9 +292,9 @@ void playlist_NodesPairCreate( playlist_t *p_playlist, const char *psz_name,
                                vlc_bool_t b_for_sd )
 {
     *pp_node_cat = playlist_NodeCreate( p_playlist, psz_name,
-                                        p_playlist->p_root_category );
+                                        p_playlist->p_root_category, 0 );
     *pp_node_one = playlist_NodeCreate( p_playlist, psz_name,
-                                        p_playlist->p_root_onelevel );
+                                        p_playlist->p_root_onelevel, 0 );
     (*pp_node_one)->p_input->i_id = (*pp_node_cat)->p_input->i_id;
     if( b_for_sd )
     {

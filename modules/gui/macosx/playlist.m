@@ -1343,10 +1343,10 @@ NSLog( @"expandable" );
         _("Please enter a name for the new node."), &psz_name );
     if( psz_name != NULL && psz_name != "" )
         p_item = playlist_NodeCreate( p_playlist, psz_name, 
-                                            p_playlist->p_local_category );
+                                            p_playlist->p_local_category, 0 );
     else
         p_item = playlist_NodeCreate( p_playlist, _("Empty Folder"), 
-                                            p_playlist->p_local_category );
+                                            p_playlist->p_local_category, 0 );
 
     if(! p_item )
         msg_Warn( VLCIntf, "node creation failed" );

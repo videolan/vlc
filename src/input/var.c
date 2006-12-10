@@ -386,55 +386,67 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     vlc_value_t val;
 
     /* Create Object Variables for private use only */
-    var_Create( p_input, "video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "spu", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
-    var_Create( p_input, "audio-track", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sub-track", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    if( !p_input->b_preparsing )
+    {
+        var_Create( p_input, "video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "spu", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
-    var_Create( p_input, "audio-language", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sub-language", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "audio-track", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sub-track", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
-    var_Create( p_input, "audio-track-id", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sub-track-id", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "audio-language",
+                    VLC_VAR_STRING|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sub-language",
+                    VLC_VAR_STRING|VLC_VAR_DOINHERIT );
 
-    var_Create( p_input, "sub-file", VLC_VAR_FILE | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sub-autodetect-file", VLC_VAR_BOOL |
-                VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sub-autodetect-path", VLC_VAR_STRING |
-                VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sub-autodetect-fuzzy", VLC_VAR_INTEGER |
-                VLC_VAR_DOINHERIT );
+        var_Create( p_input, "audio-track-id",
+                    VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sub-track-id",
+                    VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
-    var_Create( p_input, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sout-all",   VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sout-video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sout-spu", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sout-keep",  VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sub-file", VLC_VAR_FILE | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sub-autodetect-file", VLC_VAR_BOOL |
+                    VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sub-autodetect-path", VLC_VAR_STRING |
+                    VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sub-autodetect-fuzzy", VLC_VAR_INTEGER |
+                    VLC_VAR_DOINHERIT );
 
-    var_Create( p_input, "input-repeat", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sout-all",   VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sout-video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sout-spu", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "sout-keep",  VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
-    var_Create( p_input, "start-time", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_input, "stop-time", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "input-repeat",
+                    VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "start-time", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "stop-time", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
-    var_Create( p_input, "minimize-threads", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "input-slave",
+                    VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+
+        var_Create( p_input, "minimize-threads",
+                    VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+
+        var_Create( p_input, "audio-desync",
+                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "cr-average",
+                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "clock-synchro",
+                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    }
 
     var_Create( p_input, "demuxed-id3", VLC_VAR_BOOL ); /* FIXME beurk */
     val.b_bool = VLC_FALSE;
     var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
 
-    var_Create( p_input, "audio-desync", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
-    var_Create( p_input, "cr-average", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "clock-synchro", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-
     var_Create( p_input, "seekable", VLC_VAR_BOOL );
     val.b_bool = VLC_TRUE; /* Fixed later*/
     var_Change( p_input, "seekable", VLC_VAR_SETVALUE, &val, NULL );
-
-    var_Create( p_input, "input-slave", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     /* */
     var_Create( p_input, "access-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );

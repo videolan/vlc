@@ -91,7 +91,8 @@ int playlist_MLDump( playlist_t *p_playlist );
  * Item management
  **********************************************************************/
 
-void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id, int i_node_id );
+void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
+                             int i_node_id, vlc_bool_t b_signal );
 
 /* Tree walking */
 int playlist_GetAllEnabledChildren( playlist_t *p_playlist,

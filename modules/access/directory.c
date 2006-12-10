@@ -237,6 +237,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     var_SetInteger( p_playlist, "activity", i_activity -
                     DIRECTORY_ACTIVITY );
 
+    playlist_Signal( p_playlist );
+
     if( psz_name ) free( psz_name );
     vlc_object_release( p_playlist );
 
@@ -433,8 +435,9 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                 {
                     msg_Dbg(p_playlist, "creading subdirectory %s", psz_uri );
 
-                    p_node = playlist_NodeCreate (p_playlist, entry,
-                                                  p_parent_category);
+                    p_node = playlist_NodeCreate( p_playlist, entry,
+                                                  p_parent_category,
+                                                  PLAYLIST_NO_REBUILD );
 
                     /* If we had the parent in category, the it is now node.
                      * Else, we still don't have  */
@@ -482,7 +485,8 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                         input_ItemCopyOptions( p_current_input, p_input );
                     playlist_BothAddInput( p_playlist, p_input,
                                            p_parent_category,
-                                           PLAYLIST_APPEND|PLAYLIST_PREPARSE,
+                                           PLAYLIST_APPEND|PLAYLIST_PREPARSE|
+                                           PLAYLIST_NO_REBUILD,
                                            PLAYLIST_END, NULL, NULL );
                 }
             }

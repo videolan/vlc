@@ -307,9 +307,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->p_node_cat = playlist_NodeCreate( p_sys->p_playlist, _("Bonjour"),
-                                             p_sys->p_playlist->p_root_category );
+                                       p_sys->p_playlist->p_root_category, 0 );
     p_sys->p_node_one = playlist_NodeCreate( p_sys->p_playlist, _("Bonjour"),
-                                             p_sys->p_playlist->p_root_onelevel );
+                                       p_sys->p_playlist->p_root_onelevel, 0 );
     p_sys->p_node_one->p_input->i_id = p_sys->p_node_cat->p_input->i_id;
 
     p_sys->p_node_one->i_flags |= PLAYLIST_RO_FLAG;

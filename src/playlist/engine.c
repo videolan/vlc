@@ -94,17 +94,19 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->b_auto_preparse =
                         var_CreateGetBool( p_playlist, "auto-preparse") ;
 
-    p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL);
-    p_playlist->p_root_onelevel = playlist_NodeCreate( p_playlist, NULL, NULL);
+    p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL,
+                                                       0 );
+    p_playlist->p_root_onelevel = playlist_NodeCreate( p_playlist, NULL, NULL,
+                                                       0 );
 
     if( !p_playlist->p_root_category || !p_playlist->p_root_onelevel )
         return NULL;
 
     /* Create playlist and media library */
     p_playlist->p_local_category = playlist_NodeCreate( p_playlist,
-                                 _( "Playlist" ),p_playlist->p_root_category );
+                              _( "Playlist" ),p_playlist->p_root_category, 0 );
     p_playlist->p_local_onelevel =  playlist_NodeCreate( p_playlist,
-                                _( "Playlist" ), p_playlist->p_root_onelevel );
+                              _( "Playlist" ), p_playlist->p_root_onelevel, 0 );
     p_playlist->p_local_category->i_flags |= PLAYLIST_RO_FLAG;
     p_playlist->p_local_onelevel->i_flags |= PLAYLIST_RO_FLAG;
 
@@ -120,9 +122,9 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     if( config_GetInt( p_playlist, "media-library") )
     {
         p_playlist->p_ml_category =   playlist_NodeCreate( p_playlist,
-                           _( "Media Library" ), p_playlist->p_root_category );
+                         _( "Media Library" ), p_playlist->p_root_category, 0 );
         p_playlist->p_ml_onelevel =  playlist_NodeCreate( p_playlist,
-                           _( "Media Library" ), p_playlist->p_root_onelevel );
+                         _( "Media Library" ), p_playlist->p_root_onelevel, 0 );
 
         if(!p_playlist->p_ml_category || !p_playlist->p_ml_onelevel)
             return NULL;

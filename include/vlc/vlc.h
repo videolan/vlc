@@ -142,6 +142,7 @@ struct vlc_list_t
 #define PLAYLIST_GO              0x0004
 #define PLAYLIST_PREPARSE        0x0008
 #define PLAYLIST_SPREPARSE       0x0010
+#define PLAYLIST_NO_REBUILD      0x0020
 
 #define PLAYLIST_END           -666
 

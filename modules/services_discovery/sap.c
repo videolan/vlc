@@ -802,7 +802,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
         if( p_child == NULL )
         {
             p_child = playlist_NodeCreate( pl_Get( p_sd ), psz_value,
-                                           p_sys->p_node_cat );
+                                           p_sys->p_node_cat, 0 );
             p_child->i_flags &= ~PLAYLIST_SKIP_FLAG;
         }
     }
