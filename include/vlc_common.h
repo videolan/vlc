@@ -974,15 +974,13 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   include <dirent.h>
 VLC_INTERNAL( void *, vlc_wopendir, ( const wchar_t * ) );
 VLC_INTERNAL( struct _wdirent *, vlc_wreaddir, ( void * ) );
-VLC_EXPORT( int, vlc_wclosedir, ( void * ) );
+VLC_INTERNAL( int, vlc_wclosedir, ( void * ) );
 #   define opendir Use_utf8_opendir_or_vlc_wopendir_instead!
 #   define readdir Use_utf8_readdir_or_vlc_wreaddir_instead!
 #   define closedir vlc_wclosedir
 #   define _wopendir vlc_wopendir
 #   define _wreaddir vlc_wreaddir
 #   define _wclosedir vlc_wclosedir
-#else
-#   define vlc_wclosedir NULL
 #endif
 
 /* Format type specifiers for 64 bits numbers */
