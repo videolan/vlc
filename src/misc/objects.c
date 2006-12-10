@@ -835,7 +835,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
 
         if( *newval.psz_string )
         {
-            vlc_object_release( p_this );
+            vlc_object_release( p_object );
         }
     }
 
