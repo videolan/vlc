@@ -249,7 +249,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
             if( !f->name )
             {
                 msg_Err( p_intf , "unable to parse directory" );
-                vlc_closedir_wrapper( p_dir );
+                closedir( p_dir );
                 free( f );
                 return( VLC_ENOMEM );
             }
