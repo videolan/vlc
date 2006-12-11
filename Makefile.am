@@ -821,7 +821,9 @@ package-win32-7zip: package-win32-base-7zip
 # Clean up
 	rm -Rf $(top_builddir)/vlc-${VERSION}
 
-package-win32: package-win32-base-exe package-win32-base-zip
+package-win32-no-clean: package-win32-base-exe package-win32-base-zip package-win32-base-7zip
+
+package-win32: package-win32-no-clean
 # Clean up
 	rm -Rf $(top_builddir)/vlc-${VERSION}
 
