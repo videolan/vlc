@@ -39,7 +39,7 @@ Interfaces:
    * Improved user interaction
 
 
-Changes between 0.8.5 and 0.8.6
+Changes between 0.8.5 and 0.8.6:
 --------------------------------
 
 Playlist:
@@ -57,10 +57,10 @@ Input:
 Decoders:
  * Native WMV9/VC-1 support
  * WMA Speech support (through binary codecs)
- * VP5/VP6 - Flash Video support
+ * VP5/VP6 - Flash Video support (not VP61)
  * The True Audio Lossless codec support
- * WavPack support
- * Improved H.264 support (interlaced, speed improvements etc)
+ * Matroska WavPack support
+ * Improved H.264 support (interlaced, speed improvements etc but no PAFF)
  * Fixed a problem with MPEG2 field pictures
  * Fixed swapped colors on DVB subtitles
  
@@ -105,6 +105,7 @@ Localization:
 Developers:
  * Updates to the libvlc API
  * Fixes for the mozilla and activeX plugins
+
 
 
 Changes between 0.8.4a and 0.8.5
