@@ -1549,7 +1549,7 @@ static int Open( vlc_object_t * p_this )
                     }
                     LocaleFree (psz_file);
                 }
-                closedir( p_src_dir );
+                vlc_closedir_wrapper( p_src_dir );
             }
         }
 

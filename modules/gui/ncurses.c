@@ -1995,7 +1995,7 @@ static void ReadDir( intf_thread_t *p_intf )
         qsort( p_sys->pp_dir_entries, p_sys->i_dir_entries,
                sizeof(struct dir_entry_t*), &comp_dir_entries );
 
-        closedir( p_current_dir );
+        vlc_closedir_wrapper( p_current_dir );
         return;
     }
     else

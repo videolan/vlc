@@ -39,6 +39,7 @@
 #include <vlc_vout.h>
 #include <vlc_image.h>
 #include <vlc_osd.h>
+#include "charset.h"
 
 #include <vlc_strings.h>
 #include <vlc_charset.h>
@@ -636,7 +637,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         char *psz_prefix = var_GetString( p_vout, "snapshot-prefix" );
         if( !psz_prefix ) psz_prefix = strdup( "vlcsnap-" );
 
-        closedir( path );
+        vlc_closedir_wrapper( path );
         if( var_GetBool( p_vout, "snapshot-sequential" ) == VLC_TRUE )
         {
             int i_num = var_GetInteger( p_vout, "snapshot-num" );
