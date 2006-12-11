@@ -371,6 +371,11 @@ FILE *utf8_fopen (const char *filename, const char *mode)
 
 /**
  * utf8_mkdir: Calls mkdir() after conversion of file name to OS locale
+ *
+ * @param dirname a UTF-8 string with the name of the directory that you
+ *        want to create.
+ * @return A 0 return value indicates success. A -1 return value indicates an
+ *        error, and an error code is stored in errno
  */
 int utf8_mkdir( const char *dirname )
 {
@@ -426,7 +431,12 @@ int utf8_mkdir( const char *dirname )
 #endif
 }
 
-
+/**
+ * utf8_opendir: wrapper that converts dirname to the locale in use by the OS
+ *
+ * @param dirname UTF-8 representation of the directory name
+ *
+ * @return a pointer to the DIR struct. Use vlc_closedir_wrapper() once you are done.
 DIR *utf8_opendir( const char *dirname )
 {
 #ifdef WIN32
@@ -452,7 +462,14 @@ DIR *utf8_opendir( const char *dirname )
     return NULL;
 }
 
-
+/**
+ * utf8_readdir: a readdir wrapper that returns the name of the next entry
+ *     in the directory as a UTF-8 string.
+ *
+ * @param dir The directory that is being read
+ *
+ * @return a UTF-8 string of the directory entry. Use LocaleFree() to free this memory
+ */
 char *utf8_readdir( DIR *dir )
 {
 #ifdef WIN32
@@ -514,7 +531,7 @@ int utf8_scandir( const char *dirname, char ***namelist,
             tab = newtab;
             tab[num++] = entry;
         }
-        closedir( dir );
+        vlc_closedir_wrapper( dir );
 
         if( compar != NULL )
             qsort( tab, num, sizeof( tab[0] ),
