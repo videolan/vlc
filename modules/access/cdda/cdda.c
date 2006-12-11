@@ -38,8 +38,8 @@
  *****************************************************************************/
 
 #if LIBCDIO_VERSION_NUM >= 72
-static char *psz_paranoia_list[] = { "none", "overlap", "full" };
-static char *psz_paranoia_list_text[] = { N_("none"), N_("overlap"),
+static const char *psz_paranoia_list[] = { "none", "overlap", "full" };
+static const char *psz_paranoia_list_text[] = { N_("none"), N_("overlap"),
                                           N_("full") };
 #endif
 

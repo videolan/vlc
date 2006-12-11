@@ -479,7 +479,7 @@ static int GetTracks( access_t *p_access,
         /* If we have CDDB info, change the name */
         if( p_sys->p_disc )
         {
-            char *psz_result;
+            const char *psz_result;
             cddb_track_t *t = cddb_disc_get_track( p_sys->p_disc, i );
             if( t!= NULL )
             {

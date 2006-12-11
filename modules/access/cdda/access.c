@@ -29,6 +29,7 @@
 #include "callback.h"      /* FIXME - reorganize callback.h, cdda.h better */
 #include "cdda.h"          /* private structures. Also #includes vlc things */
 #include "info.h"          /* headers for meta info retrieval */
+#include "access.h"
 #include <vlc_playlist.h>  /* Has to come *after* cdda.h */
 #include "vlc_keys.h"
 #include <vlc_interface.h>

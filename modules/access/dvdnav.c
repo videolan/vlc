@@ -252,7 +252,7 @@ static int Open( vlc_object_t *p_this )
     /* Set menu language ("en")
      * XXX: maybe it would be better to set it like audio/spu
      * or to create a --menu-language option */
-    if( dvdnav_menu_language_select( p_sys->dvdnav,LANGUAGE_DEFAULT ) !=
+    if( dvdnav_menu_language_select( p_sys->dvdnav, LANGUAGE_DEFAULT ) !=
         DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "can't set menu language to '%s' (%s)",
