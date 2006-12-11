@@ -27,6 +27,7 @@
 #include "os_factory.hpp"
 #include "os_graphics.hpp"
 #include "var_manager.hpp"
+#include "anchor.hpp"
 #include "../controls/ctrl_generic.hpp"
 #include "../controls/ctrl_video.hpp"
 #include "../utils/var_bool.hpp"
@@ -56,6 +57,11 @@ GenericLayout::~GenericLayout()
     if( m_pImage )
     {
         delete m_pImage;
+    }
+    list<Anchor*>::const_iterator it;
+    for( it = m_anchorList.begin(); it != m_anchorList.end(); it++ )
+    {
+        delete *it;
     }
 }
 
