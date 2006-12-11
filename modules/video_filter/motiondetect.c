@@ -408,7 +408,7 @@ static void MotionDetect( vout_thread_t *p_vout, picture_t *p_inpic,
                     msg_Dbg( p_vout, "Area(%d) matched, going to %s\n", i_area,
                                         pp_curent_area->psz_mrl );
                     playlist_Control( p_vout->p_sys->p_playlist,
-                                        PLAYLIST_VIEWPLAY, NULL, p_item );
+                                        PLAYLIST_VIEWPLAY, VLC_TRUE, NULL, p_item );
                     pp_curent_area->i_matches = 0;
                 }
             }

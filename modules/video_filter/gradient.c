@@ -64,8 +64,8 @@ static void FilterHough   ( filter_t *, picture_t *, picture_t * );
 #define CARTOON_LONGTEXT N_("Apply cartoon effect. It is only used by " \
     "\"gradient\" and \"edge\".")
 
-static char *mode_list[] = { "gradient", "edge", "hough" };
-static char *mode_list_text[] = { N_("Gradient"), N_("Edge"), N_("Hough") };
+static const char *mode_list[] = { "gradient", "edge", "hough" };
+static const char *mode_list_text[] = { N_("Gradient"), N_("Edge"), N_("Hough") };
 
 #define FILTER_PREFIX "gradient-"
 

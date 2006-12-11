@@ -173,11 +173,11 @@ struct filter_sys_t
         "seems sensible." )
 
 static int pi_pos_values[] = { 0, 1, 2 };
-static char * ppsz_pos_descriptions[] =
+static const char * ppsz_pos_descriptions[] =
 { N_("auto"), N_("fixed"), N_("offsets") };
 
 static int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static char *ppsz_align_descriptions[] =
+static const char *ppsz_align_descriptions[] =
      { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
      N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
@@ -241,7 +241,7 @@ static const char *ppsz_filter_options[] = {
  * parse the "--mosaic-offsets x1,y1,x2,y2,x3,y3" parameter
  * and set the corresponding struct filter_sys_t entries.
  *****************************************************************************/
-void mosaic_ParseSetOffsets( vlc_object_t *p_this, filter_sys_t *p_sys, char *psz_offsets )
+static void mosaic_ParseSetOffsets( vlc_object_t *p_this, filter_sys_t *p_sys, char *psz_offsets )
 {
     if( psz_offsets[0] != 0 )
     {

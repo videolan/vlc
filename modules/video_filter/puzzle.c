@@ -281,7 +281,7 @@ static void End( vout_thread_t *p_vout )
 
 #define SHUFFLE_WIDTH 81
 #define SHUFFLE_HEIGHT 13
-static char *shuffle_button[] =
+static const char *shuffle_button[] =
 {
 ".................................................................................",
 "..............  ............................   ........   ......  ...............",

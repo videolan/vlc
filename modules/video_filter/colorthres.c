@@ -54,7 +54,7 @@ static picture_t *Filter( filter_t *, picture_t * );
 static int pi_color_values[] = {
   0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x0000FF00, 0x000000FF, 0x0000FFFF };
 
-static char *ppsz_color_descriptions[] = {
+static const char *ppsz_color_descriptions[] = {
   N_("Red"), N_("Fuchsia"), N_("Yellow"), N_("Lime"), N_("Blue"), N_("Aqua") };
 
 

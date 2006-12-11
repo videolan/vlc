@@ -57,8 +57,8 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define TYPE_TEXT N_("Transform type")
 #define TYPE_LONGTEXT N_("One of '90', '180', '270', 'hflip' and 'vflip'")
 
-static char *type_list[] = { "90", "180", "270", "hflip", "vflip" };
-static char *type_list_text[] = { N_("Rotate by 90 degrees"),
+static const char *type_list[] = { "90", "180", "270", "hflip", "vflip" };
+static const char *type_list_text[] = { N_("Rotate by 90 degrees"),
   N_("Rotate by 180 degrees"), N_("Rotate by 270 degrees"),
   N_("Flip horizontally"), N_("Flip vertically") };
 

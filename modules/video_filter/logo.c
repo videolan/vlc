@@ -93,7 +93,7 @@ static int LogoCallback( vlc_object_t *, char const *,
 #define CFG_PREFIX "logo-"
 
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static char *ppsz_pos_descriptions[] =
+static const char *ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
@@ -190,7 +190,7 @@ static picture_t *LoadImage( vlc_object_t *p_this, char *psz_filename )
  * logo-transparency values.
  *****************************************************************************/
 #define LoadLogoList( a, b ) __LoadLogoList( VLC_OBJECT( a ), b )
-void __LoadLogoList( vlc_object_t *p_this, logo_list_t *p_logo_list )
+static void __LoadLogoList( vlc_object_t *p_this, logo_list_t *p_logo_list )
 {
     char *psz_list; /* the list: <logo>[,[<delay>[,[<alpha>]]]][;...] */
     unsigned int i;
@@ -263,7 +263,7 @@ void __LoadLogoList( vlc_object_t *p_this, logo_list_t *p_logo_list )
 /*****************************************************************************
  * FreeLogoList
  *****************************************************************************/
-void FreeLogoList( logo_list_t *p_logo_list )
+static void FreeLogoList( logo_list_t *p_logo_list )
 {
     unsigned int i;
     FREENULL( p_logo_list->psz_filename );

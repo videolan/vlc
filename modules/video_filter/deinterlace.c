@@ -113,8 +113,8 @@ static int FilterCallback ( vlc_object_t *, char const *,
 
 #define FILTER_CFG_PREFIX "sout-deinterlace-"
 
-static char *mode_list[] = { "discard", "blend", "mean", "bob", "linear", "x" };
-static char *mode_list_text[] = { N_("Discard"), N_("Blend"), N_("Mean"),
+static const char *mode_list[] = { "discard", "blend", "mean", "bob", "linear", "x" };
+static const char *mode_list_text[] = { N_("Discard"), N_("Blend"), N_("Mean"),
                                   N_("Bob"), N_("Linear"), "X" };
 
 vlc_module_begin();
