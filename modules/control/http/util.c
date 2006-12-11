@@ -332,7 +332,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
     }
 
     ACL_Destroy( p_acl );
-    vlc_closedir_wrapper( p_dir );
+    closedir( p_dir );
 
     return VLC_SUCCESS;
 }
