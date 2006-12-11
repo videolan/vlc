@@ -1547,9 +1547,9 @@ static int Open( vlc_object_t * p_this )
                             }
                         }
                     }
-                    LocaleFree (psz_file);
+                    free (psz_file);
                 }
-                vlc_closedir_wrapper( p_src_dir );
+                closedir( p_src_dir );
             }
         }
 

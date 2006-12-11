@@ -436,7 +436,8 @@ int utf8_mkdir( const char *dirname )
  *
  * @param dirname UTF-8 representation of the directory name
  *
- * @return a pointer to the DIR struct. Use vlc_closedir_wrapper() once you are done.
+ * @return a pointer to the DIR struct. Release with closedir().
+ */
 DIR *utf8_opendir( const char *dirname )
 {
 #ifdef WIN32
@@ -531,7 +532,7 @@ int utf8_scandir( const char *dirname, char ***namelist,
             tab = newtab;
             tab[num++] = entry;
         }
-        vlc_closedir_wrapper( dir );
+        closedir( dir );
 
         if( compar != NULL )
             qsort( tab, num, sizeof( tab[0] ),

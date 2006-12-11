@@ -597,7 +597,7 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
          || fstat( fd, &st1 ) || utf8_lstat( psz_dirname, &st2 )
          || S_ISLNK( st2.st_mode ) || ( st1.st_ino != st2.st_ino ) )
         {
-            vlc_closedir_wrapper( dir );
+            closedir( dir );
             return VLC_EGENERIC;
         }
     }
@@ -619,7 +619,7 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
         gnutls_Addx509File( p_this, cred, path, b_priv );
     }
 
-    vlc_closedir_wrapper( dir );
+    closedir( dir );
     return VLC_SUCCESS;
 }
 

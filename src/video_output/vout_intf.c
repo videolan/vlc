@@ -637,7 +637,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         char *psz_prefix = var_GetString( p_vout, "snapshot-prefix" );
         if( !psz_prefix ) psz_prefix = strdup( "vlcsnap-" );
 
-        vlc_closedir_wrapper( path );
+        closedir( path );
         if( var_GetBool( p_vout, "snapshot-sequential" ) == VLC_TRUE )
         {
             int i_num = var_GetInteger( p_vout, "snapshot-num" );
