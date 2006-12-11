@@ -1214,7 +1214,7 @@ endif
 endif
 
 .x264: x264
-	(cd $<; ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; ./configure $(X264CONF) --prefix="$(PREFIX)" --enable-pic && make && make install)
 	touch $@
 
 CLEAN_FILE += .x264
