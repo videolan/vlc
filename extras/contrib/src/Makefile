@@ -1802,6 +1802,7 @@ ifdef HAVE_WIN32
 else
 	(cd $<; ./configure --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no --prefix=$(PREFIX) && make -C port &&make -C libtiff && make -C libtiff install)
 endif
+	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .tiff
