@@ -1,6 +1,6 @@
 diff -ruN libpng-1.2.12/scripts/makefile.darwin libpng/scripts/makefile.darwin
 --- libpng-1.2.12/scripts/makefile.darwin	2006-06-27 22:22:40.000000000 +0200
-+++ libpng/scripts/makefile.darwin	2006-07-27 12:07:18.000000000 +0200
++++ libpng/scripts/makefile.darwin	2006-12-08 18:15:36.000000000 +0100
 @@ -7,14 +7,14 @@
  # For conditions of distribution and use, see copyright notice in png.h
  
@@ -32,6 +32,15 @@ diff -ruN libpng-1.2.12/scripts/makefile.darwin libpng/scripts/makefile.darwin
  
  INCPATH=$(prefix)/include
  LIBPATH=$(exec_prefix)/lib
+@@ -72,7 +72,7 @@
+ .c.pic.o:
+ 	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
+ 
+-all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
++all: libpng.a $(LIBSO) libpng.pc libpng-config
+ 
+ libpng.a: $(OBJS)
+ 	$(AR_RC) $@ $(OBJS)
 @@ -178,7 +178,7 @@
  	chmod 755 $(DB)/$(LIBNAME)-config
  	(cd $(DB); $(LN_SF) $(LIBNAME)-config libpng-config)
