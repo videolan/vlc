@@ -39,7 +39,7 @@
 #include <vlc_vout.h>
 #include <vlc_image.h>
 #include <vlc_osd.h>
-#include "charset.h"
+#include <vlc_charset.h>
 
 #include <vlc_strings.h>
 #include <vlc_charset.h>
