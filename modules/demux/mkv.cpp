@@ -1497,7 +1497,7 @@ static int Open( vlc_object_t * p_this )
 
             if (p_src_dir != NULL)
             {
-                const char *psz_file;
+                char *psz_file;
                 while ((psz_file = utf8_readdir(p_src_dir)) != NULL)
                 {
                     if (strlen(psz_file) > 4)
