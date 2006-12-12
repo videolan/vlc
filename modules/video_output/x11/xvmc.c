@@ -212,9 +212,9 @@ void xvmc_context_writer_unlock( context_lock_t *c )
 
 void clear_xx44_palette( xx44_palette_t *p )
 {
-    register int i;
-    register uint32_t *cluts = p->cluts;
-    register int *ids = p->lookup_cache;
+    int i;
+    uint32_t *cluts = p->cluts;
+    int *ids = p->lookup_cache;
 
     i= p->size;
     while(i--)
