@@ -177,6 +177,8 @@ const NPUTF8 * const LibvlcAudioNPObject::propertyNames[] =
 {
     "mute",
     "volume",
+    "track",
+    "channel",
 };
 
 const int LibvlcAudioNPObject::propertyCount = sizeof(LibvlcAudioNPObject::propertyNames)/sizeof(NPUTF8 *);
@@ -185,6 +187,8 @@ enum LibvlcAudioNPObjectPropertyIds
 {
     ID_audio_mute,
     ID_audio_volume,
+    ID_audio_track,
+    ID_audio_channel,
 };
 
 RuntimeNPObject::InvokeResult LibvlcAudioNPObject::getProperty(int index, NPVariant &result)
@@ -220,6 +224,46 @@ RuntimeNPObject::InvokeResult LibvlcAudioNPObject::getProperty(int index, NPVari
                 }
                 INT32_TO_NPVARIANT(volume, result);
                 return INVOKERESULT_NO_ERROR;
+            }
+            case ID_audio_track:
+            {
+                int track = libvlc_audio_get_track(p_plugin->getVLC(), &ex);
+                if( libvlc_exception_raised(&ex) )
+                {
+                    NPN_SetException(this, libvlc_exception_get_message(&ex));
+                    libvlc_exception_clear(&ex);
+                    return INVOKERESULT_GENERIC_ERROR;
+                }
+                INT32_TO_NPVARIANT(track, result);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_audio_channel:
+            {
+                char *channel = libvlc_audio_get_channel(p_plugin->getVLC(), &ex);
+                if( libvlc_exception_raised(&ex) )
+                {
+                    NPN_SetException(this, libvlc_exception_get_message(&ex));
+                    libvlc_exception_clear(&ex);
+                    return INVOKERESULT_GENERIC_ERROR;
+                }
+                if( channel )
+                {
+                    int len = strlen(channel);
+                    NPUTF8 *retval = (NPUTF8*)NPN_MemAlloc(len);
+                    if( retval )
+                    {
+                        memcpy(retval, channel, len);
+                        STRINGN_TO_NPVARIANT(retval, len, result);
+                    }
+                    else
+                    {
+                        NULL_TO_NPVARIANT(result);
+                    }
+                    free( channel );
+                    channel = NULL;
+                    return INVOKERESULT_NO_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
             }
             default:
                 ;
@@ -266,6 +310,45 @@ RuntimeNPObject::InvokeResult LibvlcAudioNPObject::setProperty(int index, const 
                     return INVOKERESULT_NO_ERROR;
                 }
                 return INVOKERESULT_INVALID_VALUE;
+            case ID_audio_track:
+                if( isNumberValue(value) )
+                {
+                    libvlc_audio_set_track(p_plugin->getVLC(),
+                                           numberValue(value), &ex);
+                    if( libvlc_exception_raised(&ex) )
+                    {
+                        NPN_SetException(this, libvlc_exception_get_message(&ex));
+                        libvlc_exception_clear(&ex);
+                        return INVOKERESULT_GENERIC_ERROR;
+                    }
+                    return INVOKERESULT_NO_ERROR;
+                }
+                return INVOKERESULT_INVALID_VALUE;
+            case ID_audio_channel:
+            {
+                char *psz_channel = NULL;
+
+                if( ! NPVARIANT_IS_STRING(value) )
+                {
+                    return INVOKERESULT_INVALID_VALUE;
+                }
+
+                psz_channel = stringValue(NPVARIANT_TO_STRING(value));
+                if( !psz_channel )
+                    return INVOKERESULT_GENERIC_ERROR;
+
+                libvlc_audio_set_channel(p_plugin->getVLC(), psz_channel, &ex);
+                if( psz_channel )
+                    free( psz_channel );
+
+                if( libvlc_exception_raised(&ex) )
+                {
+                    NPN_SetException(this, libvlc_exception_get_message(&ex));
+                    libvlc_exception_clear(&ex);
+                    return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_ERROR;
+            }
             default:
                 ;
         }

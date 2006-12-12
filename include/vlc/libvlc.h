@@ -5,6 +5,7 @@
  * $Id: vlc.h 13701 2005-12-12 17:58:56Z zorglub $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -486,7 +487,41 @@ int libvlc_audio_get_volume( libvlc_instance_t *, libvlc_exception_t * );
  * \param p_exception an initialized exception
  * \return void
  */
-void libvlc_audio_set_volume( libvlc_instance_t *, int , libvlc_exception_t *);
+void libvlc_audio_set_volume( libvlc_instance_t *, int, libvlc_exception_t *);
+
+/**
+ * Get current audio track
+ * \param p_instance libvlc instance
+ * \param p_exception an initialized exception
+ * \return the audio track (int)
+ */
+int libvlc_audio_get_track( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Set current audio track
+ * \param p_instance libvlc instance
+ * \param i_track the track (int)
+ * \param p_exception an initialized exception
+ * \return void
+ */
+void libvlc_audio_set_track( libvlc_instance_t *, int, libvlc_exception_t * );
+
+/**
+ * Get current audio channel
+ * \param p_instance libvlc instance
+ * \param p_exception an initialized exception
+ * \return the audio channel (char *)
+ */
+char *libvlc_audio_get_channel( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Set current audio track
+ * \param p_instance libvlc instance
+ * \param psz_channel the audio channel (char *)
+ * \param p_exception an initialized exception
+ * \return void
+ */
+void libvlc_audio_set_channel( libvlc_instance_t *, char *, libvlc_exception_t * );
 
 /** @} */
 

@@ -4,6 +4,7 @@
  * Copyright (C) 2006 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
+ *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -198,6 +199,16 @@ library AXVLC
 
         [helpstring("Mute/unmute audio playback.")]
         HRESULT toggleMute();
+
+        [propget, helpstring("Returns/sets audio track used/to use.")]
+        HRESULT track([out, retval] long* track);
+        [propput, helpstring("Returns/sets audio track used/to use.")]
+        HRESULT track([in] long track);
+
+        [propget, helpstring("Returns audio channel: reverse, stereo, left, right, dolby.")]
+        HRESULT channel([out, retval] BSTR* channel);
+        [propput, helpstring("Sets audio channel to: reverse, stereo, left, right, dolby.")]
+        HRESULT channel([in] BSTR channel);
     };
 
     [

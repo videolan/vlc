@@ -4,6 +4,7 @@
  * Copyright (C) 2006 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
+ *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -190,6 +191,119 @@ STDMETHODIMP VLCAudio::put_volume(long volume)
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCAudio::get_track(long* track)
+{
+    if( NULL == track )
+        return E_POINTER;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        *track = libvlc_audio_get_track(p_libvlc, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCAudio::put_track(long track)
+{
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_audio_set_track(p_libvlc, track, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCAudio::get_channel(BSTR *channel)
+{
+    if( NULL == channel )
+        return E_POINTER;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        char *psz_channel = NULL;
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        psz_channel = libvlc_audio_get_channel(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            if( NULL == psz_channel )
+                return E_OUTOFMEMORY;
+
+            *channel = SysAllocStringByteLen(psz_channel, strlen(psz_channel));
+            free( psz_channel );
+            psz_channel = NULL;
+            return NOERROR;
+        }
+        if( psz_channel ) free( psz_channel );
+        _p_instance->setErrorInfo(IID_IVLCAudio,
+                    libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCAudio::put_channel(BSTR channel)
+{
+    if( NULL == channel )
+        return E_POINTER;
+
+    if( 0 == SysStringLen(channel) )
+        return E_INVALIDARG;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        char *psz_channel = NULL;
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        psz_channel = CStrFromBSTR(CP_UTF8, channel);
+        if( NULL == psz_channel )
+            return E_OUTOFMEMORY;
+
+        libvlc_audio_set_channel(p_libvlc, psz_channel, &ex);
+
+        CoTaskMemFree(psz_channel);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCAudio,
+                         libvlc_exception_get_message(&ex));
             libvlc_exception_clear(&ex);
             return E_FAIL;
         }
@@ -2261,7 +2375,7 @@ STDMETHODIMP VLCControl2::get_Visible(VARIANT_BOOL *isVisible)
 
     return NOERROR;
 };
-        
+
 STDMETHODIMP VLCControl2::put_Visible(VARIANT_BOOL isVisible)
 {
     _p_instance->setVisible(isVisible != VARIANT_FALSE);
@@ -2277,7 +2391,7 @@ STDMETHODIMP VLCControl2::get_Volume(long *volume)
     *volume  = _p_instance->getVolume();
     return NOERROR;
 };
-        
+
 STDMETHODIMP VLCControl2::put_Volume(long volume)
 {
     _p_instance->setVolume(volume);

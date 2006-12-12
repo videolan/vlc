@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Filippo Carone <filippo@carone.org>
+ *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,3 +91,99 @@ void libvlc_audio_set_volume( libvlc_instance_t *p_instance, int i_volume,
     }
 }
 
+/*****************************************************************************
+ * libvlc_audio_get_track : Get the current audio track
+ *****************************************************************************/
+int libvlc_audio_get_track( libvlc_instance_t *p_instance,
+                            libvlc_exception_t *p_e )
+{
+    int i_track = 0;
+
+    i_track = var_GetInteger( p_instance->p_libvlc_int, "audio-track" );
+
+    return i_track;
+}
+
+/*****************************************************************************
+ * libvlc_audio_set_track : Set the current audio track
+ *****************************************************************************/
+void libvlc_audio_set_track( libvlc_instance_t *p_instance, int i_track,
+                             libvlc_exception_t *p_e )
+{
+    int i_ret = -1;
+
+    i_ret = var_SetInteger( p_instance->p_libvlc_int, "audio-track", i_track );
+
+    if( i_ret < 0 )
+    {
+        libvlc_exception_raise( p_e, "Audio track out of range" );
+    }
+}
+
+/*****************************************************************************
+ * libvlc_audio_get_channel : Get the current audio channel
+ *****************************************************************************/
+char *libvlc_audio_get_channel( libvlc_instance_t *p_instance,
+                                libvlc_exception_t *p_e )
+{
+    char *psz_channel = NULL;
+    int i_channel = 0;
+
+    i_channel = var_GetInteger( p_instance->p_libvlc_int, "audio-channel" );
+    switch( i_channel )
+    {
+        case AOUT_VAR_CHAN_RSTEREO:
+            psz_channel = strdup("reverse");
+            break;
+        case AOUT_VAR_CHAN_STEREO:
+            psz_channel = strdup("stereo");
+            break;
+        case AOUT_VAR_CHAN_LEFT:
+            psz_channel = strdup("left");
+            break;
+        case AOUT_VAR_CHAN_RIGHT:
+            psz_channel = strdup("right");
+            break;
+        case AOUT_VAR_CHAN_DOLBYS:
+            psz_channel = strdup("dolby");
+            break;
+        default:
+            psz_channel = strdup("disabled");
+            break;
+    }
+    return psz_channel;
+}
+
+/*****************************************************************************
+ * libvlc_audio_set_channel : Set the current audio channel
+ *****************************************************************************/
+void libvlc_audio_set_channel( libvlc_instance_t *p_instance, char *psz_channel,
+                               libvlc_exception_t *p_e )
+{
+    int i_ret = -1;
+    int i_channel = 0;
+
+    if( !psz_channel )
+    {
+        libvlc_exception_raise( p_e, "Audio track out of range" );
+    }
+    else
+    {
+        if( strncmp( psz_channel, "reverse", 7 ) == 0 )
+            i_channel = AOUT_VAR_CHAN_RSTEREO;
+        else if( strncmp( psz_channel, "stereo", 6 ) == 0 )
+            i_channel = AOUT_VAR_CHAN_STEREO;
+        else if( strncmp( psz_channel, "left", 4 ) == 0 )
+            i_channel = AOUT_VAR_CHAN_LEFT;
+        else if( strncmp( psz_channel, "right", 5 ) == 0 )
+            i_channel = AOUT_VAR_CHAN_RIGHT;
+        else if( strncmp( psz_channel, "dolby", 5 ) == 0 )
+            i_channel = AOUT_VAR_CHAN_DOLBYS;
+
+        i_ret = var_SetInteger( p_instance->p_libvlc_int, "audio-channel", i_channel );
+        if( i_ret < 0 )
+        {
+            libvlc_exception_raise( p_e, "Audio track out of range" );
+        }
+    }
+}
