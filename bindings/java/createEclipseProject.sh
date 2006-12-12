@@ -1,17 +1,17 @@
 #!/bin/sh
 
-mkdir -p jvlc-eclipse/src
+mkdir -p jvlc-eclipse/src/main/java
 mkdir jvlc-eclipse/bin
 
-echo "<?xml version="1.0" encoding="UTF-8"?>" > jvlc-eclipse/.classpath
+echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > jvlc-eclipse/.classpath
 echo "<classpath>"  >> jvlc-eclipse/.classpath
-echo "	<classpathentry kind="src" path="src"/>" >> jvlc-eclipse/.classpath
-echo "	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>" >> jvlc-eclipse/.classpath
-echo "	<classpathentry kind="output" path="bin"/>" >> jvlc-eclipse/.classpath
+echo "	<classpathentry kind=\"src\" path=\"src/main/java\"/>" >> jvlc-eclipse/.classpath
+echo "	<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>" >> jvlc-eclipse/.classpath
+echo "	<classpathentry kind=\"output\" path=\"bin\"/>" >> jvlc-eclipse/.classpath
 echo "</classpath>" >> jvlc-eclipse/.classpath
 
 
-echo "<?xml version="1.0" encoding="UTF-8"?>" > jvlc-eclipse/.project
+echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > jvlc-eclipse/.project
 echo "<projectDescription>" >> jvlc-eclipse/.project
 echo "	<name>jvlc-eclipse</name>" >> jvlc-eclipse/.project
 echo "	<comment></comment>" >> jvlc-eclipse/.project
@@ -44,7 +44,11 @@ echo "		<nature>org.eclipse.jdt.core.javanature</nature>" >> jvlc-eclipse/.proje
 echo "	</natures>" >> jvlc-eclipse/.project
 echo "</projectDescription>" >> jvlc-eclipse/.project
 
-cd jvlc-eclipse/src
-ln -s ../../org
+cd jvlc-eclipse/src/main/java
+ln -s ../../../../org
+ln -s ../../../../VlcClient.java
+ln -s ../../../../VLCExample.java
+
+echo "Project created in jvlc-eclipse folder. Import as existing project into eclipse."
 
 
