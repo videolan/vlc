@@ -183,7 +183,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
     dsi_win = (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
     drawable = reinterpret_cast<int>(dsi_win->hwnd);
 
-    libvlc_video_set_parent( input, drawable, exception );
+    libvlc_video_set_parent((libvlc_instance_t *) instance, drawable, exception );
 
     CHECK_EXCEPTION_FREE ;
     
@@ -269,7 +269,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1paint (JNIEnv *env, jobjec
     dsi_win = (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
     drawable = reinterpret_cast<int>(dsi_win->hwnd);
 
-    libvlc_video_set_parent( input, drawable, exception );
+    libvlc_video_set_parent( (libvlc_instance_t *) instance, drawable, exception );
 
     CHECK_EXCEPTION_FREE ;
     
