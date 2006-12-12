@@ -72,7 +72,7 @@
 @interface VLCFSPanelView : NSView
 {
     NSColor *fillColor;
-    NSButton *o_prev, *o_next, *o_slow, *o_fast, *o_play, *o_fullscreen;
+    NSButton *o_prev, *o_next, *o_bwd, *o_fwd, *o_play, *o_fullscreen;
     NSTextField *o_streamTitle_txt, *o_streamPosition_txt;
     NSSlider *o_fs_timeSlider, *o_fs_volumeSlider;
 }
@@ -88,8 +88,8 @@
 - (IBAction)play:(id)sender;
 - (IBAction)prev:(id)sender;
 - (IBAction)next:(id)sender;
-- (IBAction)faster:(id)sender;
-- (IBAction)slower:(id)sender;
+- (IBAction)forward:(id)sender;
+- (IBAction)backward:(id)sender;
 - (IBAction)fsTimeSliderUpdate:(id)sender;
 - (IBAction)fsVolumeSliderUpdate:(id)sender;
 

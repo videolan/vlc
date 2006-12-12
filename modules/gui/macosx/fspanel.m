@@ -349,9 +349,9 @@
     fillColor = [[NSColor clearColor] retain];
     NSRect s_rc = [self frame];
     addButton( o_prev, @"fs_skip_previous" , @"fs_skip_previous_highlight", 174, 15, prev );
-    addButton( o_slow, @"fs_rewind"        , @"fs_rewind_highlight"       , 211, 14, slower );
+    addButton( o_bwd, @"fs_rewind"        , @"fs_rewind_highlight"       , 211, 14, backward );
     addButton( o_play, @"fs_play"          , @"fs_play_highlight"         , 267, 10, play );
-    addButton( o_fast, @"fs_forward"       , @"fs_forward_highlight"      , 313, 14, faster );
+    addButton( o_fwd, @"fs_forward"       , @"fs_forward_highlight"      , 313, 14, forward );
     addButton( o_next, @"fs_skip_next"     , @"fs_skip_next_highlight"    , 365, 15, next );
     addButton( o_fullscreen, @"fs_exit_fullscreen", @"fs_exit_fullscreen_hightlight", 507, 13, windowAction );
 /*
@@ -409,9 +409,9 @@
     [o_fs_volumeSlider release];
     [o_prev release];
     [o_next release];
-    [o_slow release];
+    [o_bwd release];
     [o_play release];
-    [o_fast release];
+    [o_fwd release];
     [o_fullscreen release];
     [o_streamTitle_txt release];
     [o_streamPosition_txt release];
@@ -443,8 +443,8 @@
 
 - (void)setSeekable:(BOOL)b_seekable
 {
-    [o_slow setEnabled: b_seekable];
-    [o_fast setEnabled: b_seekable];
+    [o_bwd setEnabled: b_seekable];
+    [o_fwd setEnabled: b_seekable];
     [o_fs_timeSlider setEnabled: b_seekable];
 }
 
@@ -458,14 +458,14 @@
     [[[VLCMain sharedInstance] getControls] play: sender];
 }
 
-- (IBAction)faster:(id)sender
+- (IBAction)forward:(id)sender
 {
-    [[[VLCMain sharedInstance] getControls] faster: sender];
+    [[[VLCMain sharedInstance] getControls] forward: sender];
 }
 
-- (IBAction)slower:(id)sender
+- (IBAction)backward:(id)sender
 {
-    [[[VLCMain sharedInstance] getControls] slower: sender];
+    [[[VLCMain sharedInstance] getControls] backward: sender];
 }
 
 - (IBAction)prev:(id)sender
