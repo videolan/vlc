@@ -699,8 +699,9 @@ static block_t *ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_blo
 
         /* Skip blocks with SPS/PPS */ 
         if( (last[4]&0x1f) == 7 || (last[4]&0x1f) == 8 )
+        {
             ; // FIXME Find a way to skip dat without frelling everything
-
+        }
         last = dat;
         dat += 4;
     }
