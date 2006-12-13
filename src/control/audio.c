@@ -116,7 +116,7 @@ void libvlc_audio_set_track( libvlc_instance_t *p_instance, int i_track,
 
     if( i_ret < 0 )
     {
-        libvlc_exception_raise( p_e, "Audio track out of range" );
+        libvlc_exception_raise( p_e, "Setting audio track failed" );
     }
 }
 
