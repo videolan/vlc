@@ -10,6 +10,7 @@
  *          Damien LUCAS <damien.lucas@anevia.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
+ *          Derk-Jan Hartman <hartman #at# videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +32,12 @@
  * FIXME:
  * DVB subtitles coded as strings of characters are not handled correctly.
  * The character codes in the string should actually be indexes referring to a
- * character table identified in the subtitle descriptor.
+ * character table identified in the subtitle descriptor. 
+ *
+ * The spec is quite vague in this area, but what is meant is perhaps that it
+ * refers to the character index in the codepage belonging to the language specified
+ * in the subtitle descriptor. Potentially it's designed for widechar
+ * (but not for UTF-*) codepages.
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
@@ -107,7 +113,7 @@ static const char *ppsz_enc_options[] = { "x", "y", NULL };
  * Those structures refer closely to the ETSI 300 743 Object model
  ****************************************************************************/
 
-/* The object definition gives the position of the object in a region */
+/* The object definition gives the position of the object in a region [7.2.5] */
 typedef struct dvbsub_objectdef_s
 {
     int i_id;
@@ -130,7 +136,24 @@ typedef struct
 
 } dvbsub_color_t;
 
-/* */
+/* The displays dimensions [7.2.1] */
+typedef struct dvbsub_display_s
+{
+    uint8_t                 i_id;
+    uint8_t                 i_version;
+
+    int                     i_width;
+    int                     i_height;
+
+    vlc_bool_t              b_windowed;
+    int                     i_x;
+    int                     i_y;
+    int                     i_max_x;
+    int                     i_max_y;
+
+} dvbsub_display_t;
+
+/* [7.2.4] */
 typedef struct dvbsub_clut_s
 {
     uint8_t                 i_id;
@@ -143,7 +166,7 @@ typedef struct dvbsub_clut_s
 
 } dvbsub_clut_t;
 
-/* The Region is an aera on the image
+/* The Region is an aera on the image [7.2.3]
  * with a list of the object definitions associated and a CLUT */
 typedef struct dvbsub_region_s
 {
@@ -175,7 +198,7 @@ typedef struct dvbsub_regiondef_s
 
 } dvbsub_regiondef_t;
 
-/* The page defines the list of regions */
+/* The page defines the list of regions [7.2.2] */
 typedef struct
 {
     int i_id;
@@ -206,7 +229,8 @@ struct decoder_sys_t
     dvbsub_page_t   *p_page;
     dvbsub_region_t *p_regions;
     dvbsub_clut_t   *p_cluts;
-    dvbsub_clut_t   default_clut;
+    dvbsub_display_t *p_display;
+    dvbsub_clut_t    default_clut;
 };
 
 
@@ -216,6 +240,7 @@ struct decoder_sys_t
 #define DVBSUB_ST_REGION_COMPOSITION    0x11
 #define DVBSUB_ST_CLUT_DEFINITION       0x12
 #define DVBSUB_ST_OBJECT_DATA           0x13
+#define DVBSUB_ST_DISPLAY_DEFINITION    0x14
 #define DVBSUB_ST_ENDOFDISPLAY          0x80
 #define DVBSUB_ST_STUFFING              0xff
 /* List of different OBJECT TYPES */
@@ -244,6 +269,7 @@ static void decode_segment( decoder_t *, bs_t * );
 static void decode_page_composition( decoder_t *, bs_t * );
 static void decode_region_composition( decoder_t *, bs_t * );
 static void decode_object( decoder_t *, bs_t * );
+static void decode_display_definition( decoder_t *, bs_t * );
 static void decode_clut( decoder_t *, bs_t * );
 static void free_all( decoder_t * );
 
@@ -280,6 +306,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_regions      = NULL;
     p_sys->p_cluts        = NULL;
     p_sys->p_page         = NULL;
+    p_sys->p_display      = NULL;
 
     var_Create( p_this, DVBSUB_CFG_PREFIX "position",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -534,6 +561,13 @@ static void decode_segment( decoder_t *p_dec, bs_t *s )
         msg_Dbg( p_dec, "decode_object" );
 #endif
         decode_object( p_dec, s );
+        break;
+
+    case DVBSUB_ST_DISPLAY_DEFINITION:
+#ifdef DEBUG_DVBSUB
+        msg_Dbg( p_dec, "decode_display_definition" );
+#endif
+        decode_display_definition( p_dec, s );
         break;
 
     case DVBSUB_ST_ENDOFDISPLAY:
@@ -894,6 +928,67 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
     }
 }
 
+/* ETSI 300 743 [7.2.1] */
+static void decode_display_definition( decoder_t *p_dec, bs_t *s )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    uint16_t      i_segment_length;
+    uint16_t      i_processed_length = 40;
+    dvbsub_display_t *p_display;
+    dvbsub_display_t *p_old = p_sys->p_display;
+    int           i_version;
+
+    i_segment_length = bs_read( s, 16 );
+    i_version        = bs_read( s, 4 );
+
+    /* Check version number */
+    if( p_old && p_old->i_version == i_version )
+    {
+        /* The definition did not change */
+        bs_skip( s, 8*i_segment_length - 4 );
+        return;
+    }
+
+#ifdef DEBUG_DVBSUB
+    msg_Dbg( p_dec, "new display definition: %i", i_version );
+#endif
+    p_display = malloc( sizeof(dvbsub_display_t) );
+
+    /* We don't have this version of the display definition: Parse it */
+    p_display->i_version = i_version;
+    p_display->b_windowed = bs_read( s, 1 );
+    bs_skip( s, 3 ); /* Reserved bits */
+    p_display->i_width = bs_read( s, 16 )+1;
+    p_display->i_height = bs_read( s, 16 )+1;
+
+    if( p_display->b_windowed )
+    {
+#ifdef DEBUG_DVBSUB
+        msg_Dbg( p_dec, "display definition with offsets (windowed)" );
+#endif
+        /* Coordinates are measured from the top left corner */
+        p_display->i_x     = bs_read( s, 16 );
+        p_display->i_max_x = bs_read( s, 16 );
+        p_display->i_y     = bs_read( s, 16 );
+        p_display->i_max_y = bs_read( s, 16 );
+        i_processed_length += 64;  
+    }
+
+    p_sys->p_display = p_display;
+    if( p_old ) free( p_old );
+
+    if( i_processed_length != i_segment_length*8 )
+    {
+        msg_Err( p_dec, "processed length %d != segment length %d", i_processed_length, i_segment_length );
+    }
+
+#ifdef DEBUG_DVBSUB
+    msg_Dbg( p_dec, "version: %d, width: %d, height: %d", p_display->i_version, p_display->i_width, p_display->i_height );
+    if( p_display->b_windowed )
+        msg_Dbg( p_dec, "xmin: %d, xmax: %d, ymin: %d, ymax: %d", p_display->i_x, p_display->i_max_x, p_display->i_y, p_display->i_max_y );
+#endif
+}
+
 static void dvbsub_render_pdata( decoder_t *, dvbsub_region_t *, int, int,
                                  uint8_t *, int );
 static void dvbsub_pdata2bpp( bs_t *, uint8_t *, int, int * );
@@ -1022,9 +1117,10 @@ static void decode_object( decoder_t *p_dec, bs_t *s )
                     realloc( p_region->p_object_defs[i].psz_text,
                              i_number_of_codes + 1 );
 
+                /* FIXME 16bits -> char ??? See Preamble */
                 for( j = 0; j < i_number_of_codes; j++ )
                 {
-                    p_region->p_object_defs[i].psz_text[j] = bs_read( s, 16 );
+                    p_region->p_object_defs[i].psz_text[j] = (char)(bs_read( s, 16 ) & 0xFF);
                 }
                 p_region->p_object_defs[i].psz_text[j] = 0;
             }
@@ -1286,6 +1382,8 @@ static void free_all( decoder_t *p_dec )
     dvbsub_region_t *p_reg, *p_reg_next;
     dvbsub_clut_t *p_clut, *p_clut_next;
 
+    if( p_sys->p_display ) free( p_sys->p_display );
+
     for( p_clut = p_sys->p_cluts; p_clut != NULL; p_clut = p_clut_next )
     {
         p_clut_next = p_clut->p_next;
@@ -1455,9 +1553,10 @@ static subpicture_t *render( decoder_t *p_dec )
 
     /* Set the pf_render callback */
     p_spu->i_start = p_sys->i_pts;
-    p_spu->i_stop = p_spu->i_start + (mtime_t) (i_timeout * 1000000);
     p_spu->b_ephemer = VLC_TRUE;
-    p_spu->b_fade = VLC_TRUE;
+    p_spu->b_pausable = VLC_TRUE;
+    //p_spu->b_fade = VLC_TRUE;
+    //p_spu->i_stop = p_spu->i_start + (mtime_t) (i_timeout * 1000000);
 
     /* Correct positioning of SPU */
     p_spu->b_absolute = p_sys->b_absolute;
@@ -1466,6 +1565,21 @@ static subpicture_t *render( decoder_t *p_dec )
     p_spu->i_y = p_sys->i_spu_y;
     p_spu->i_original_picture_width = 720;
     p_spu->i_original_picture_height = 576;
+
+    if( p_sys->p_display )
+    {
+        p_spu->i_original_picture_width = p_sys->p_display->i_width;
+        p_spu->i_original_picture_height = p_sys->p_display->i_height;
+
+        if( p_sys->p_display->b_windowed )
+        {
+            /* TODO: check that this actually works */
+            p_spu->i_original_picture_width = p_sys->p_display->i_max_x - p_sys->p_display->i_x;
+            p_spu->i_original_picture_height = p_sys->p_display->i_max_y - p_sys->p_display->i_y;
+            p_spu->i_x += p_sys->p_display->i_x;
+            p_spu->i_y += p_sys->p_display->i_y;
+        }
+    }
 
     return p_spu;
 }
