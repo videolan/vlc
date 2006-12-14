@@ -275,6 +275,14 @@ mediacontrol_PlaylistSeq *
   mediacontrol_playlist_get_list( mediacontrol_Instance *self,
                                   mediacontrol_Exception *exception );
 
+/**
+ * Play the next item
+ * \param self the mediacontrol instance
+ * \param exception an initialized exception pointer
+ */
+void
+mediacontrol_playlist_next_item( mediacontrol_Instance *self,
+                                 mediacontrol_Exception *exception );
 
 /*****************************************************************************
  * A/V functions
