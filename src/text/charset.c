@@ -365,9 +365,8 @@ char *vlc_fix_readdir( const char *psz_string )
         *psz_out = '\0';
         return psz_utf8;
     }
-#else
-    return strdup( psz_string );
 #endif
+    return strdup( psz_string );
 }
 
 

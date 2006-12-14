@@ -441,7 +441,8 @@ static char * ChainToPsz( sout_chain_t *p_chain, vlc_bool_t b_root )
     char psz_output[MAX_CHAIN];
     char psz_temp[MAX_CHAIN];
     if( b_root ) sprintf( psz_output, "#" );
-    else sprintf( psz_output, "" );
+    else psz_output[0] = '\0';
+
     for( i = 0 ; i< p_chain->i_modules; i++ )
     {
         sout_module_t *p_module = p_chain->pp_modules[i];

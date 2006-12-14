@@ -650,8 +650,8 @@ static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
     p_input->b_error = 1;
 }
 
-static int ChangeFiltersString( aout_instance_t * p_aout, char* psz_variable,
-                                 char *psz_name, vlc_bool_t b_add )
+static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,
+                                 const char *psz_name, vlc_bool_t b_add )
 {
     vlc_value_t val;
     char *psz_parser;

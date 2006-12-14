@@ -242,7 +242,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
  *
  */
 
-void PicRelease( picture_t *p_pic ){};
+static void PicRelease( picture_t *p_pic ){};
 
 static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
                             video_format_t *p_fmt_in,
@@ -500,7 +500,7 @@ static picture_t *ImageFilter( image_handler_t *p_image, picture_t *p_pic,
 static struct
 {
     vlc_fourcc_t i_codec;
-    char *psz_ext;
+    const char *psz_ext;
 
 } ext_table[] =
 {

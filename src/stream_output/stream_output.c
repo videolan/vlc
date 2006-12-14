@@ -62,7 +62,7 @@ typedef struct
 } mrl_t;
 
 /* mrl_Parse: parse psz_mrl and fill p_mrl */
-static int  mrl_Parse( mrl_t *p_mrl, char *psz_mrl );
+static int  mrl_Parse( mrl_t *p_mrl, const char *psz_mrl );
 /* mrl_Clean: clean p_mrl  after a call to mrl_Parse */
 static void mrl_Clean( mrl_t *p_mrl );
 
@@ -605,13 +605,13 @@ void sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
 /*****************************************************************************
  *
  *****************************************************************************/
-static int mrl_Parse( mrl_t *p_mrl, char *psz_mrl )
+static int mrl_Parse( mrl_t *p_mrl, const char *psz_mrl )
 {
     char * psz_dup = strdup( psz_mrl );
     char * psz_parser = psz_dup;
-    char * psz_access = "";
-    char * psz_way = "";
-    char * psz_name = "";
+    char * psz_access;
+    char * psz_way;
+    char * psz_name;
 
     /* *** first parse psz_dest */
     while( *psz_parser && *psz_parser != ':' )

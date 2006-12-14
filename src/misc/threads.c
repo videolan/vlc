@@ -332,7 +332,7 @@ int __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex
     i_result = pthread_mutex_destroy( &p_mutex->mutex );
     if( i_result )
     {
-        i_thread = (int)pthread_self();
+        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
         psz_error = strerror(i_result);
     }
 
@@ -482,7 +482,7 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
     i_result = pthread_cond_destroy( &p_condvar->cond );
     if( i_result )
     {
-        i_thread = (int)pthread_self();
+        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
         psz_error = strerror(i_result);
     }
 
