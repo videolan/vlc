@@ -117,6 +117,7 @@ mediacontrol_all_snapshots( mediacontrol_Instance *self,
     RAISE_NULL( mediacontrol_InternalException, "unsupported method" );
 }
 
+static
 int mediacontrol_showtext( vout_thread_t *p_vout, int i_channel,
                            char *psz_string, text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
