@@ -263,9 +263,8 @@ STDMETHODIMP VLCAudio::get_channel(BSTR *channel)
             if( NULL == psz_channel )
                 return E_OUTOFMEMORY;
 
-            *channel = SysAllocStringByteLen(psz_channel, strlen(psz_channel));
+            *channel = BSTRFromCStr(CP_UTF8, psz_channel);
             free( psz_channel );
-            psz_channel = NULL;
             return NOERROR;
         }
         if( psz_channel ) free( psz_channel );
@@ -2358,7 +2357,7 @@ STDMETHODIMP VLCControl2::get_VersionInfo(BSTR *version)
     const char *versionStr = VLC_Version();
     if( NULL != versionStr )
     {
-        *version = BSTRFromCStr(_p_instance->getCodePage(), versionStr);
+        *version = BSTRFromCStr(CP_UTF8, versionStr);
         
         return NULL == *version ? E_OUTOFMEMORY : NOERROR;
     }
