@@ -320,9 +320,9 @@ static void Notify( access_t *p_access, vlc_bool_t b_dump )
     if( p_sys->i_vout_chan != -1 )
     {
         if( b_dump )
-            vout_OSDMessage( p_vout, p_sys->i_vout_chan, "Recording" );
+            vout_OSDMessage( p_vout, p_sys->i_vout_chan, _("Recording") );
         else
-            vout_OSDMessage( p_vout, p_sys->i_vout_chan, "Recording done" );
+            vout_OSDMessage( p_vout, p_sys->i_vout_chan, _("Recording done") );
     }
     vlc_object_release( p_vout );
 }

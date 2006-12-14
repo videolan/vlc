@@ -61,7 +61,7 @@ vlc_module_end();
 static const struct supported_fmt_t
 {
     vlc_fourcc_t i_fourcc;
-    char *psz_sdl_type;
+    const char *psz_sdl_type;
 } p_supported_fmt[] =
 {
     { VLC_FOURCC('t','g','a',' '), "TGA" },

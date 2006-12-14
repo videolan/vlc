@@ -309,26 +309,26 @@ static void Close( vlc_object_t * );
 #define AUD_LONGTEXT N_( "Generate access unit delimiter NAL units.")
 
 #if X264_BUILD >= 24
-static char *enc_me_list[] =
+static const char *enc_me_list[] =
   { "dia", "hex", "umh", "esa" };
-static char *enc_me_list_text[] =
+static const char *enc_me_list_text[] =
   { N_("dia"), N_("hex"), N_("umh"), N_("esa") };
 #endif
 
-static char *enc_analyse_list[] =
+static const char *enc_analyse_list[] =
   { "none", "fast", "normal", "slow", "all" };
-static char *enc_analyse_list_text[] =
+static const char *enc_analyse_list_text[] =
   { N_("none"), N_("fast"), N_("normal"), N_("slow"), N_("all") };
 
 #if X264_BUILD >= 45 /* r457 */
-static char *direct_pred_list[] =
+static const char *direct_pred_list[] =
   { "none", "spatial", "temporal", "auto" };
-static char *direct_pred_list_text[] =
+static const char *direct_pred_list_text[] =
   { N_("none"), N_("spatial"), N_("temporal"), N_("auto") };
 #else
-static char *direct_pred_list[] =
+static const char *direct_pred_list[] =
   { "none", "spatial", "temporal" };
-static char *direct_pred_list_text[] =
+static const char *direct_pred_list_text[] =
   { N_("none"), N_("spatial"), N_("temporal") };
 #endif
 

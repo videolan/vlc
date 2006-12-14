@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "xstrcat.h"
+#include "browser_open.h"
 
 int browser_Open( const char *psz_url )
 {

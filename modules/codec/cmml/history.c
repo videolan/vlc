@@ -49,7 +49,7 @@ static void history_Dump( history_t *p_history );
  * Actual history code
  *****************************************************************************/
 
-history_t *history_New()
+history_t *history_New( void )
 {
    history_t *p_new_history;
    

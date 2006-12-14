@@ -31,12 +31,12 @@
 #define EQZ_BANDS_MAX 10
 
 #define NB_PRESETS 18
-static char *preset_list[] = {
+static const char *preset_list[] = {
     "flat", "classical", "club", "dance", "fullbass", "fullbasstreble",
     "fulltreble", "headphones","largehall", "live", "party", "pop", "reggae",
     "rock", "ska", "soft", "softrock", "techno"
 };
-static char *preset_list_text[] = {
+static const char *preset_list_text[] = {
     N_("Flat"), N_("Classical"), N_("Club"), N_("Dance"), N_("Full bass"),
     N_("Full bass and treble"), N_("Full treble"), N_("Headphones"),
     N_("Large Hall"), N_("Live"), N_("Party"), N_("Pop"), N_("Reggae"),
@@ -45,7 +45,7 @@ static char *preset_list_text[] = {
 
 typedef struct
 {
-    char *psz_name;
+    const char *psz_name;
     int  i_band;
     float f_preamp;
     float f_amp[EQZ_BANDS_MAX];

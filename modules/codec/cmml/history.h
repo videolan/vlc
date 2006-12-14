@@ -49,7 +49,7 @@ typedef struct history_t history_t;
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-history_t       * history_New                        ();
+history_t       * history_New                        ( void );
 vlc_bool_t        history_GoBackSavingCurrentItem    ( history_t *,
                                                        history_item_t * );
 vlc_bool_t        history_GoForwardSavingCurrentItem ( history_t *,
