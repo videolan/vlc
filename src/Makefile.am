@@ -363,8 +363,9 @@ endif
 # Unit/regression test
 ###############################################################################
 if USE_LIBTOOL
-check_PROGRAMS = test_i18n_atof test_url
+check_PROGRAMS = test_i18n_atof test_url test_utf8
 TESTS = $(check_PROGRAMS)
+endif
 
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
 
@@ -375,6 +376,9 @@ test_i18n_atof_CFLAGS = $(CFLAGS_tests)
 test_url_SOURCES = test/url.c
 test_url_LDADD = libvlc.la
 test_url_CFLAGS = $(CFLAGS_tests)
-endif
+
+test_utf8_SOURCES = test/utf8.c
+test_utf8_LDADD = libvlc.la
+test_utf8_CFLAGS = $(CFLAGS_tests)
 
 FORCE:

@@ -639,147 +639,63 @@ int utf8_fprintf( FILE *stream, const char *fmt, ... )
 
 
 static char *CheckUTF8( char *str, char rep )
-#define isutf8cont( c ) (((c) >= 0x80) && ((c) <= 0xBF)) 
 {
-    unsigned char *ptr, c;
-
+    uint8_t *ptr = (uint8_t *)str;
     assert (str != NULL);
 
-    ptr = (unsigned char *)str;
-    while( (c = *ptr) != '\0' )
+    for (;;)
     {
-        /* US-ASCII, 1 byte */
-        if( c <= 0x7F )
-            ptr++; /* OK */
-        else
-        /* 2 bytes */
-        if( ( c >= 0xC2 ) && ( c <= 0xDF ) )
-        {
-            c = ptr[1];
-            if( isutf8cont( c ) )
-                ptr += 2; /* OK */
-            else
-                goto error;
-        }
-        else
-        /* 3 bytes */
-        if( c == 0xE0 )
-        {
-            c = ptr[1];
-            if( ( c >= 0xA0 ) && ( c <= 0xBF ) )
+        uint8_t c = ptr[0];
+        int charlen = -1;
+
+        if (c == '\0')
+            break;
+
+        for (int i = 0; i < 7; i++)
+            if ((c >> (7 - i)) == ((0xff >> (7 - i)) ^ 1))
             {
-                c = ptr[2];
-                if( isutf8cont( c ) )
-                    ptr += 3; /* OK */
-                else
-                    goto error;
+                charlen = i;
+                break;
             }
-            else
-                goto error;
-        }
-        else
-        if( ( ( c >= 0xE1 ) && ( c <= 0xEC ) ) || ( c == 0xEC )
-         || ( c == 0xEE ) || ( c == 0xEF ) )
+
+        switch (charlen)
         {
-            c = ptr[1];
-            if( isutf8cont( c ) )
-            {
-                c = ptr[2];
-                if( isutf8cont( c ) )
-                    ptr += 3; /* OK */
-                else
-                    goto error;
-            }
-            else
+            case 0: // 7-bit ASCII character -> OK
+                ptr++;
+                continue;
+
+            case -1: // 1111111x -> error
+            case 1: // continuation byte -> error
                 goto error;
         }
-        else
-        if( c == 0xED )
+
+        assert (charlen >= 2);
+
+        uint32_t cp = c & ~((0xff >> (7 - charlen)) << (7 - charlen));
+        for (int i = 1; i < charlen; i++)
         {
-            c = ptr[1];
-            if( ( c >= 0x80 ) && ( c <= 0x9F ) )
-            {
-                c = ptr[2];
-                if( isutf8cont( c ) )
-                    ptr += 3; /* OK */
-                else
-                    goto error;
-            }
-            else
+            assert (cp < (1 << 26));
+            c = ptr[i];
+
+            if ((c == '\0') // unexpected end of string
+             || ((c >> 6) != 2)) // not a continuation byte
                 goto error;
+
+            cp = (cp << 6) | (ptr[i] & 0x3f);
         }
-        else
-        /* 4 bytes */
-        if( c == 0xF0 )
-        {
-            c = ptr[1];
-            if( ( c >= 0x90 ) && ( c <= 0xBF ) )
-            {
-                c = ptr[2];
-                if( isutf8cont( c ) )
-                {
-                    c = ptr[3];
-                    if( isutf8cont( c ) )
-                        ptr += 4; /* OK */
-                    else
-                        goto error;
-                }
-                else
-                    goto error;
-            }
-            else
-                goto error;
-        }
-        else
-        if( ( c >= 0xF1 ) && ( c <= 0xF3 ) )
-        {
-            c = ptr[1];
-            if( isutf8cont( c ) )
-            {
-                c = ptr[2];
-                if( isutf8cont( c ) )
-                {
-                    c = ptr[3];
-                    if( isutf8cont( c ) )
-                        ptr += 4; /* OK */
-                    goto error;
-                }
-                else
-                    goto error;
-            }
-            else
-                goto error;
-        }
-        else
-        if( c == 0xF4 )
-        {
-            c = ptr[1];
-            if( ( c >= 0x80 ) && ( c <= 0x8F ) )
-            {
-                c = ptr[2];
-                if( isutf8cont( c ) )
-                {
-                    c = ptr[3];
-                    if( isutf8cont( c ) )
-                        ptr += 4; /* OK */
-                    else
-                        goto error;
-                }
-                else
-                    goto error;
-            }
-            else
-                goto error;
-        }
-        else
+
+        if (cp < 128) // overlong (special case for ASCII)
+            goto error;
+        if (cp < (1u << (5 * charlen - 3))) // overlong
             goto error;
 
+        ptr += charlen;
         continue;
 
-error:
-        if( rep == 0 )
+    error:
+        if (rep == 0)
             return NULL;
-        *ptr++ = '?';
+        *ptr++ = rep;
         str = NULL;
     }
 
