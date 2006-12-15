@@ -84,6 +84,5 @@ void E_(Close_GVP) ( vlc_object_t * );
 #define HANDLE_PLAY_AND_RELEASE \
     /* Go back and play the playlist */ \
     if( b_play && p_item_in_category ) \
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_item_in_category, \
-                          VLC_TRUE ); \
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_item_in_category, NULL ); \
     vlc_object_release( p_playlist );
