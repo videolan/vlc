@@ -27,8 +27,9 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
-#include <vlc/vout.h>
+#include <vlc_input.h>
+#include <vlc_vout.h>
+#include <vlc_demux.h>
 
 #include <stdio.h>
 #include <stdlib.h>
