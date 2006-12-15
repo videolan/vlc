@@ -44,7 +44,7 @@ native_libvlc_test = Extension( 'native_libvlc_test',
 			    'native/stats.c', 'native/libvlc.c', 'native/profiles.c',
                 'native/algo.c'],
                 include_dirs = ['../include', '../', '/usr/win32/include' ],
-                extra_objects = [ '../src/.libs/libvlc.so' ],
+                extra_objects = [ '../src/.libs/libvlc.so', '../src/.libs/libvlc-control.so' ],
                 extra_compile_args = get_cflags(),
        		    extra_link_args = [ '-L../..' ]  + get_ldflags(),
                 )

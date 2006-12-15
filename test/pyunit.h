@@ -2,7 +2,7 @@
 
 extern int asserts;
 
-#define ASSERT( a, message ) asserts++;if( !(a) ) { PyErr_SetString( PyExc_AssertionError, message " - " #a ); return NULL; }
+#define ASSERT( a, message ) asserts++;if( !(a) ) { fprintf( stderr, "Assert failed at %s:%i\n", __FILE__, __LINE__); PyErr_SetString( PyExc_AssertionError, message  " - " #a ); return NULL; }
 
 #define DECLARE_MODULE( module ) PyMODINIT_FUNC init##module( void ) {  \
         Py_InitModule( #module, module##_methods );                     \

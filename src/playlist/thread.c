@@ -239,7 +239,6 @@ static void DestroyInteraction( playlist_t *p_playlist )
     if( p_playlist->p_interaction )
     {
         intf_InteractionDestroy( p_playlist->p_interaction );
-        fprintf( stderr, "NOW NULL ****\n" );
         p_playlist->p_interaction = NULL;
     }
 }

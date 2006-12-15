@@ -172,17 +172,19 @@ PyObject *bsearch_member_test( PyObject *self, PyObject *args )
 /**********************************************************************
  * Dictionnary
  *********************************************************************/
-static void DumpDict( dict_t *p_dict )
+DICT_TYPE( test, int );
+
+static void DumpDict( dict_test_t *p_dict )
 {
     int i = 0;
     fprintf( stderr, "**** Begin Dump ****\n" );
     for( i = 0 ; i < p_dict->i_entries; i++ )
     {
-        fprintf( stderr, "Entry %i - hash %lli int %i string %s data %p\n", 
+        fprintf( stderr, "Entry %i - hash %lli int %i string %s data %i\n", 
                         i, p_dict->p_entries[i].i_hash,
                         p_dict->p_entries[i].i_int,
                         p_dict->p_entries[i].psz_string,
-                        p_dict->p_entries[i].p_data );
+                        p_dict->p_entries[i].data );
     }
     fprintf( stderr, "**** End Dump ****\n" );
 }
@@ -190,42 +192,59 @@ static void DumpDict( dict_t *p_dict )
 PyObject *dict_test( PyObject *self, PyObject *args )
 {
     int i42 = 42,i40 = 40,i12 = 12, i0 = 0, i00 = 0;
+    int answer;
 
-    dict_t *p_dict = vlc_DictNew();
+    printf("\n");
+
+    dict_test_t *p_dict;
+    DICT_NEW( p_dict );
     ASSERT( p_dict->i_entries == 0, "" );
     ASSERT( p_dict->p_entries == NULL, "" );
 
-    vlc_DictInsert( p_dict, 0, NULL, (void*)(&i42) );
+    DICT_INSERT( p_dict, 0, NULL, i42 );
     ASSERT( p_dict->i_entries == 1, "" );
-    ASSERT( p_dict->p_entries[0].p_data == (void*)(&i42), "" );
+    ASSERT( p_dict->p_entries[0].data == i42, "" );
 
-    vlc_DictInsert( p_dict, 1, "42", (void*)(&i42) );
+    DICT_INSERT( p_dict, 1, "42", i42 );
     ASSERT( p_dict->i_entries == 2, "" );
-    ASSERT( vlc_DictGet( p_dict, 1, "42" ) == (void*)(&i42), "" );
-    ASSERT( vlc_DictGet( p_dict, 0, "42" ) == NULL , "");
-    ASSERT( vlc_DictGet( p_dict, 1, " 42" ) == NULL , "");
 
-    vlc_DictInsert( p_dict, 1, "12", (void*)(&i12) );
-    ASSERT( vlc_DictGet( p_dict, 1, "12") == (void*)(&i12), "" );
+    DICT_LOOKUP( p_dict, 1, "42", answer );
+    DICT_GET( p_dict, 1, "42", answer );
+    ASSERT( answer == i42, "" );
+    DICT_LOOKUP( p_dict, 0, "42", answer ); ASSERT( answer == -1, "" );
+    DICT_LOOKUP( p_dict, 1, " 42", answer ); ASSERT( answer == -1, "" );
 
-    vlc_DictInsert( p_dict, 3, "40", (void*)(&i40) );
-    ASSERT( vlc_DictGet( p_dict, 3, "40") == (void*)(&i40), "" );
-    ASSERT( vlc_DictGet( p_dict, 1, "12") == (void*)(&i12), "" );
-    ASSERT( vlc_DictGet( p_dict, 1, "42") == (void*)(&i42), "" );
+    DICT_INSERT( p_dict, 1, "12", i12 );
+    DICT_GET( p_dict, 1, "12", answer ) ; ASSERT( answer == i12, "" );
 
-    vlc_DictInsert( p_dict, 12, "zero-1", (void*)(&i0) );
-    vlc_DictInsert( p_dict, 5, "zero-0", (void*)(&i00) );
-    ASSERT( vlc_DictGet( p_dict, 12, "zero-1") == (void*)(&i0), "" );
-    ASSERT( vlc_DictGet( p_dict, 5, "zero-0") == (void*)(&i00), "" );
-    ASSERT( vlc_DictGet( p_dict, 12, "zero-0") == NULL, "" );
+    DICT_INSERT( p_dict, 3, "40", i40 );
+    DICT_GET( p_dict, 1, "42", answer ); ASSERT( answer == i42, "" );
+    DICT_GET( p_dict, 3, "40", answer ); ASSERT( answer == i40, "" );
+    DICT_GET( p_dict, 1, "12", answer ); ASSERT( answer == i12, "" );
 
-    vlc_DictInsert( p_dict, 0, "12", (void*)(&i12) );
-    vlc_DictInsert( p_dict, 0, "thisisaverylongstringwith12", (void*)(&i12) );
-    ASSERT( vlc_DictGet( p_dict, 0, "thisisaverylongstringwith12" ) ==
-                    (void*)(&i12),"" );
-    ASSERT( vlc_DictGet( p_dict, 0, "thisisaverylongstringwith13" ) == NULL,"");
+    DICT_INSERT( p_dict, 12, "zero-1", i0 );
+    DICT_INSERT( p_dict, 5, "zero-0", i00 );
+    DICT_GET( p_dict, 12, "zero-1", answer ); ASSERT( answer == i0, "" );
+    DICT_GET( p_dict, 5, "zero-0", answer ); ASSERT( answer == i00, "" );
+    answer = -1;
+    DICT_GET( p_dict, 12, "zero-0", answer ); ASSERT( answer == -1, "" );
+    DICT_GET( p_dict, 1, "12", answer ); ASSERT( answer == i12, "" );
 
-    vlc_DictClear( p_dict );
+    DICT_INSERT( p_dict, 0, "zero", 17 );
+    DICT_GET( p_dict, 1, "12", answer ); ASSERT( answer == i12, "" );
+    DICT_GET( p_dict, 12, "zero-1", answer ); ASSERT( answer == i0, "" );
+    DICT_GET( p_dict, 0, "zero", answer ); ASSERT( answer == 17, "" );
+
+    DICT_INSERT( p_dict, 0, "12", i12 );
+    DICT_INSERT( p_dict, 0, "thisisaverylongstringwith12", i12 );
+    answer = -1;
+    DICT_GET( p_dict, 0, "thisisaverylongstringwith12", answer );
+    ASSERT( answer == i12, "" );
+    answer = -1;
+    DICT_GET( p_dict, 0, "thisisaverylongstringwith13", answer );
+    ASSERT( answer == -1, "" );
+
+    DICT_CLEAR( p_dict );
 
     Py_INCREF( Py_None);
     return Py_None;

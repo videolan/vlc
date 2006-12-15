@@ -21,7 +21,7 @@
 
 #include "../pyunit.h"
 #include <vlc/vlc.h>
-#include "charset.h"
+#include <vlc_charset.h>
 
 PyObject *i18n_atof_test( PyObject *self, PyObject *args )
 {

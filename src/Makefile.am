@@ -299,7 +299,6 @@ SOURCES_libvlc_common = \
 	misc/update.c \
 	input/vlm.c \
 	misc/xml.c \
-	misc/dict.c \
 	misc/devices.c \
 	extras/libc.c \
 	$(NULL)

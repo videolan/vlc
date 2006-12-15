@@ -147,33 +147,164 @@
     } \
 }
 
-/* Dictionnary handling */
-struct dict_entry_t
-{
-    int       i_int;
-    char     *psz_string;
-    uint64_t  i_hash;
-    void     *p_data;
-};
+/************************************************************************
+ * Dictionaries
+ ************************************************************************/
 
-struct dict_t
+/* This function is not intended to be crypto-secure, we only want it to be
+ * fast and not suck too much. This one is pretty fast and did 0 collisions
+ * in wenglish's dictionary.
+ */
+static inline uint64_t DictHash( const char *psz_string, int i_int )
 {
-    dict_entry_t *p_entries;
-    int i_entries;
-};
+    uint64_t i_hash = 0;
+    if( psz_string )
+    {
+        while( *psz_string )
+        {
+            i_hash += *psz_string++;
+            i_hash += i_hash << 10;
+            i_hash ^= i_hash >> 8;
+        }
+    }
+    return i_hash + ( (uint64_t)i_int << 32 );
+}
 
-VLC_EXPORT( dict_t *, vlc_DictNew, (void) );
-VLC_EXPORT( void, vlc_DictClear, (dict_t * ) );
-VLC_EXPORT( void, vlc_DictInsert, (dict_t *, int, const char *, void * ) );
-VLC_EXPORT( void*, vlc_DictGet, (dict_t *, int, const char * ) );
-VLC_EXPORT( int, vlc_DictLookup, (dict_t *, int, const char * ) );
+#define DICT_TYPE(name,type)                                                  \
+    typedef struct dict_entry_##name##_t {                                    \
+        int i_int;                                                            \
+        char *psz_string;                                                     \
+        uint64_t i_hash;                                                      \
+        type data;                                                            \
+    } dict_entry_##name##_t;                                                  \
+    typedef struct dict_##name##_t {                                          \
+        dict_entry_##name##_t *p_entries;                                     \
+        int i_entries;                                                        \
+    } dict_##name##_t;
+
+#define DICT_NEW( p_dict ) {                                                  \
+    p_dict = malloc( sizeof(int)+sizeof(void*) );                             \
+    p_dict->i_entries = 0;                                                    \
+    p_dict->p_entries = NULL;                                                 \
+}
+
+#define DICT_CLEAR( zdict ) {                                                 \
+    int _i_dict = 0;                                                          \
+    for ( _i_dict = 0; _i_dict < zdict->i_entries; _i_dict++ )                \
+    {                                                                         \
+        FREE( zdict->p_entries[_i_dict].psz_string );                         \
+    }                                                                         \
+    FREE( zdict->p_entries );                                                 \
+    free( zdict );                                                            \
+}
+
+#define DICT_INSERT( zdict, zint, zstring, zdata ) {                          \
+    uint64_t i_hash = DictHash( (zstring), (zint) );                          \
+    int i_new;                                                                \
+    /* Find a free slot */                                                    \
+    if( zdict->i_entries == 0 || i_hash <= zdict->p_entries[0].i_hash )       \
+        i_new = 0;                                                            \
+    else if( i_hash >= zdict->p_entries[zdict->i_entries-1].i_hash )          \
+        i_new = zdict->i_entries;\
+    else                                                                      \
+    {                                                                         \
+        int i_low = 0, i_high = zdict->i_entries - 1;                         \
+        while( i_high - i_low > 1 )                                           \
+        {                                                                     \
+            int i_mid = (i_low + i_high)/2;                                   \
+            fprintf(stderr, "Low %i, high %i\n", i_low, i_high);              \
+            if( zdict->p_entries[i_mid].i_hash < i_hash ) {                   \
+                i_low = i_mid;                                                \
+            } else if( zdict->p_entries[i_mid].i_hash > i_hash ) {            \
+                i_high = i_mid;                                               \
+            }                                                                 \
+        }                                                                     \
+        if( zdict->p_entries[i_low].i_hash < i_hash )                         \
+            i_new = i_high;                                                   \
+        else                                                                  \
+            i_new = i_low;                                                    \
+    }                                                                         \
+    zdict->p_entries = realloc( zdict->p_entries, (zdict->i_entries + 1) *    \
+        ( sizeof(zdata) + sizeof(int) + sizeof(void*) + sizeof(uint64_t) ) ); \
+    zdict->i_entries++;                                                       \
+    if( i_new != zdict->i_entries -1 )                                        \
+        memmove( &zdict->p_entries[i_new+1], &zdict->p_entries[i_new],        \
+         ( zdict->i_entries - i_new - 1 ) *                                   \
+         ( sizeof(zdata) + sizeof(int) + sizeof(void*) + sizeof(uint64_t) ) );\
+                                                                              \
+    zdict->p_entries[i_new].i_hash = i_hash;                                  \
+    zdict->p_entries[i_new].i_int = (zint);                                   \
+    if( (zstring) ) {                                                         \
+        zdict->p_entries[i_new].psz_string = strdup( (zstring) );             \
+    } else {                                                                  \
+        zdict->p_entries[i_new].psz_string = NULL;                            \
+    }                                                                         \
+    zdict->p_entries[i_new].data = zdata;                                     \
+}
+
+#define DICT_LOOKUP( zdict, zint, zstring, answer ) do {                      \
+    uint64_t i_hash;                                                          \
+    int i, i_pos;                                                             \
+    vlc_bool_t b_found = VLC_FALSE;                                           \
+    if( zdict->i_entries == 0 ) {                                             \
+        answer = -1;                                                          \
+        break;                                                                \
+    }                                                                         \
+                                                                              \
+    i_hash = DictHash( (zstring), (zint) );                                   \
+    BSEARCH( zdict->p_entries, zdict->i_entries, .i_hash, uint64_t,           \
+             i_hash, i_pos );                                                 \
+    if( i_pos == -1 ) {                                                       \
+        answer = -1;                                                          \
+        break;                                                                \
+    }                                                                         \
+                                                                              \
+    /* Hash found, let's check it looks like the entry */                     \
+    if( !strcmp( (zstring), zdict->p_entries[i_pos].psz_string ) ) {          \
+        answer = i_pos;                                                       \
+        break;                                                                \
+    }                                                                         \
+                                                                              \
+    /* Hash collision! This should be very rare, but we cannot guarantee      \
+     * it will never happen. Just do an exhaustive search amongst all         \
+     * entries with the same hash. */                                         \
+    for( i = i_pos - 1 ; i > 0 && i_hash == zdict->p_entries[i].i_hash ; i-- )\
+    {                                                                         \
+        if( !strcmp( (zstring), zdict->p_entries[i].psz_string ) &&           \
+                   zdict->p_entries[i].i_int == (zint) ) {                    \
+            b_found = VLC_TRUE;                                               \
+            answer = i;                                                       \
+            break;                                                            \
+        }                                                                     \
+    }                                                                         \
+    if( b_found == VLC_TRUE )                                                 \
+        break;                                                                \
+    for( i = i_pos + 1 ; i < zdict->i_entries &&                              \
+                         i_hash == zdict->p_entries[i].i_hash ; i++ )         \
+    {                                                                         \
+         if( !strcmp( (zstring), zdict->p_entries[i].psz_string ) &&          \
+                      zdict->p_entries[i].i_int == (zint) ) {                 \
+            b_found = VLC_TRUE;                                               \
+            answer = i;                                                       \
+            break;                                                            \
+        }                                                                     \
+    }                                                                         \
+    /* Hash found, but entry not found (quite strange !) */                   \
+    assert( 0 );                                                              \
+} while(0)
+
+#define DICT_GET( zdict, i_int, psz_string, answer ) {                        \
+    int int_answer;                                                           \
+    DICT_LOOKUP( zdict, i_int, psz_string, int_answer );                      \
+    if( int_answer >=  0 )                                                    \
+        answer = zdict->p_entries[int_answer].data;                           \
+}
 
 /************************************************************************
  * Dynamic arrays with progressive allocation
  ************************************************************************/
 
 /* Internal functions */
-//printf("Realloc from %i to %i\n", array.i_alloc, newsize);
 #define _ARRAY_ALLOC(array, newsize) {                                      \
     array.i_alloc = newsize;                                                \
     array.p_elems = VLCCVP realloc( array.p_elems, array.i_alloc *          \
