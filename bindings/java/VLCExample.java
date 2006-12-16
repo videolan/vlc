@@ -10,7 +10,8 @@ public class VLCExample
     	boolean videoInput = false;
         JVLC jvlc = new JVLC(args);
         try {
-        jvlc.playlist.add("file://" + System.getProperty( "user.dir" ) + "/a.avi", "a.avi");
+        //jvlc.playlist.add("file://" + System.getProperty( "user.dir" ) + "/a.avi", "a.avi");
+        	jvlc.playlist.add("file:///home/little/a.avi", "a.avi");
     	jvlc.playlist.add("file://" + System.getProperty( "user.dir" ) + "/a.mp3", "a.mp3");
         jvlc.playlist.play( -1 , null );
         } catch (VLCException e) {
@@ -65,6 +66,15 @@ public class VLCExample
             System.out.print("Setting volume to 150... ");
             jvlc.audio.setVolume(150);
             System.out.println("done");
+            System.out.println("Audio channel info: " + jvlc.audio.getChannel());
+            System.out.println("Audio track info: " + jvlc.audio.getTrack());
+            System.out.print("Setting left channel... ");
+            jvlc.audio.setChannel("left");
+            System.out.print("done.");
+            Thread.sleep(3000);
+            System.out.print("Setting right channel... ");
+            jvlc.audio.setChannel("right");
+            System.out.print("done.");
             Thread.sleep(3000);
             System.out.println("INPUT INFORMATION");
             System.out.println("-----------------");
@@ -81,6 +91,7 @@ public class VLCExample
         {
         	System.out.println("Something was wrong. I die :(.");
             jvlc.destroy();
+            e.printStackTrace();
         }
         
     	System.out.println("Everything fine ;)");

@@ -30,6 +30,56 @@
 package org.videolan.jvlc;
 
 public interface AudioIntf {
+	
+	
+	/**
+	 * Constant for left channel audio 
+	 */
+	final String LEFT_CHANNEL		= "left";
+	
+	/**
+	 * Constant for right channel audio 
+	 */
+	final String RIGHT_CHANNEL		= "right";
+
+	/**
+	 * Constant for reverse channel audio 
+	 */
+	final String REVERSE_CHANNEL 	= "reverse";
+	/**
+	 * Constant for stereo channel audio 
+	 */
+	final String STEREO_CHANNEL 	= "stereo";
+	/**
+	 * Constant for dolby channel audio 
+	 */
+	final String DOLBY_CHANNEL		= "dolby";
+
+	/**
+	 * @return audio track
+	 * @throws VLCException
+	 */
+	int getTrack() throws VLCException;
+
+	/**
+	 * @param audio track
+	 * @throws VLCException
+	 */
+	void setTrack(int track) throws VLCException;
+
+	/**
+	 * @return channel
+	 * @throws VLCException
+	 */
+	String getChannel() throws VLCException;
+
+	/**
+	 * @param channel
+	 * @throws VLCException
+	 */
+	void setChannel(String channel) throws VLCException;
+
+
     /**
      * @return True if input is currently muted.
      * @throws VLCException

@@ -4,6 +4,10 @@ public class Audio implements AudioIntf {
     
 	private long libvlcInstance;
 
+	private native int      _getTrack();
+	private native void     _setTrack(int track);
+	private native String   _getChannel();
+	private native void     _setChannel(String channel);
 	private native boolean	_getMute();
     private native void		_setMute( boolean value );
     private native void		_toggleMute();
@@ -14,11 +18,27 @@ public class Audio implements AudioIntf {
     	this.libvlcInstance = instance;
     }
     
+	public int getTrack() throws VLCException {
+		return _getTrack();
+	}
+
+	public void setTrack( int track ) throws VLCException {
+		_setTrack(track);
+	}
+
+	public String getChannel() throws VLCException {
+		return _getChannel();
+	}
+
+	public void setChannel( String channel ) throws VLCException {
+		_setChannel(channel);
+	}    
+    
     public boolean getMute() throws VLCException {
         return _getMute();
     }
 
-    public void setMute(boolean value) throws VLCException {
+    public void setMute( boolean value ) throws VLCException {
         _setMute( value );
         
     }

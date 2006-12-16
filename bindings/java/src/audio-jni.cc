@@ -4,6 +4,7 @@
  * Copyright (C) 1998-2006 the VideoLAN team
  *
  * Authors: Filippo Carone <filippo@carone.org>
+ *          Philippe Morin <phmorin@free.fr>
  *
  *
  * $Id $
@@ -32,6 +33,54 @@
 #include "../includes/Audio.h"
 #include "utils.h"
 
+JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getTrack (JNIEnv *env, jobject _this)
+{
+    INIT_FUNCTION;
+    jint res = 0;
+    
+    res = libvlc_audio_get_track( ( libvlc_instance_t * ) instance, exception );
+    
+    CHECK_EXCEPTION_FREE;
+    
+    return res;
+}
+
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setTrack (JNIEnv *env, jobject _this, jint value)
+{
+    INIT_FUNCTION;
+
+    libvlc_audio_set_track( ( libvlc_instance_t * ) instance, value, exception );
+
+    CHECK_EXCEPTION_FREE;
+}
+
+JNIEXPORT jstring JNICALL Java_org_videolan_jvlc_Audio__1getChannel (JNIEnv *env, jobject _this)
+{
+    INIT_FUNCTION;
+
+    char* res;
+
+    res = libvlc_audio_get_channel( (libvlc_instance_t *) instance, exception);
+
+    CHECK_EXCEPTION_FREE;
+
+    return env->NewStringUTF(res);
+}
+
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setChannel (JNIEnv *env, jobject _this, jstring channel)
+{
+    INIT_FUNCTION;
+
+    const char* value = env->GetStringUTFChars( channel, 0 );
+
+    libvlc_audio_set_channel( (libvlc_instance_t *) instance, (char *) value, exception);
+
+    env->ReleaseStringUTFChars( channel, value );
+    
+    CHECK_EXCEPTION_FREE;
+}
+
+
 JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Audio__1getMute (JNIEnv *env, jobject _this) 
 {
     INIT_FUNCTION;
@@ -39,7 +88,7 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Audio__1getMute (JNIEnv *env, 
 
     res = (jboolean) libvlc_audio_get_mute( ( libvlc_instance_t * ) instance, exception );
 
-    CHECK_EXCEPTION;
+    CHECK_EXCEPTION_FREE;
 
     return res;
     
@@ -50,8 +99,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setMute (JNIEnv *env, jobj
     INIT_FUNCTION;
 
     libvlc_audio_set_mute( ( libvlc_instance_t * ) instance, value, exception );
-
-    CHECK_EXCEPTION;
+  
+    CHECK_EXCEPTION_FREE;
 }
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1toggleMute (JNIEnv *env, jobject _this) 
@@ -60,7 +109,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1toggleMute (JNIEnv *env, j
 
     libvlc_audio_get_mute( ( libvlc_instance_t * ) instance, exception );
     
-    CHECK_EXCEPTION;
+    CHECK_EXCEPTION_FREE;
 }
 
 JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getVolume (JNIEnv *env, jobject _this)
@@ -70,7 +119,7 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getVolume (JNIEnv *env, jo
 
     res = libvlc_audio_get_volume( ( libvlc_instance_t * ) instance, exception );
 
-    CHECK_EXCEPTION;
+    CHECK_EXCEPTION_FREE;
 
     return res;
 }
@@ -81,6 +130,5 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setVolume (JNIEnv *env, jo
 
     libvlc_audio_set_volume( ( libvlc_instance_t * ) instance, volume, exception );
 
-    CHECK_EXCEPTION;
+    CHECK_EXCEPTION_FREE;
 }
-
