@@ -43,6 +43,7 @@
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
 #include <vlc_interface.h>
+#include <vlc_input.h>
 
 /*****************************************************************************
  * Local prototypes
