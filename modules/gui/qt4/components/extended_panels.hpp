@@ -27,8 +27,26 @@
 #include <vlc/vlc.h>
 #include <vlc_aout.h>
 #include "ui/equalizer.h"
+#include "ui/video_effects.h"
 
 #define BANDS 10
+
+class QSignalMapper;
+
+class ExtVideo: public QWidget
+{
+    Q_OBJECT
+public:
+    ExtVideo(  intf_thread_t *, QWidget * );
+    virtual ~ExtVideo();
+    void gotoConf( QObject* );
+private:
+    Ui::ExtVideoWidget ui;
+    QSignalMapper* filterMapper;
+    intf_thread_t *p_intf;
+private slots:
+    void updateFilters( );
+};
 
 class Equalizer: public QWidget
 {

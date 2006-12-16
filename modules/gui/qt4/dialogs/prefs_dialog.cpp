@@ -75,7 +75,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      setSmall();
 
      QPushButton *save, *cancel;
-     QHBoxLayout *buttonsLayout = QVLCFrame::doButtons( this, NULL, 
+     QHBoxLayout *buttonsLayout = QVLCFrame::doButtons( this, NULL,
                                                         &save, _("Save"),
                                                         &cancel, _("Cancel"),
                                                         NULL, NULL );
@@ -177,6 +177,37 @@ void PrefsDialog::changePanel( QTreeWidgetItem *item )
     advanced_panel = data->panel;
     main_panel_l->addWidget( advanced_panel );
     advanced_panel->show();
+}
+
+void PrefsDialog::showModulePrefs( char *psz_module )
+{
+    setAll();
+    all->setChecked( true );
+    for( int i_cat_index = 0 ; i_cat_index < advanced_tree->topLevelItemCount();
+         i_cat_index++ )
+    {
+        QTreeWidgetItem *cat_item = advanced_tree->topLevelItem( i_cat_index );
+        PrefsItemData *data = cat_item->data( 0, Qt::UserRole ).
+                                                   value<PrefsItemData *>();
+        for( int i_sc_index = 0; i_sc_index < cat_item->childCount();
+                                  i_sc_index++ )
+        {
+            QTreeWidgetItem *subcat_item = cat_item->child( i_sc_index );
+            PrefsItemData *sc_data = subcat_item->data(0, Qt::UserRole).
+                                                    value<PrefsItemData *>();
+            for( int i_module = 0; i_module < subcat_item->childCount();
+                                   i_module++ )
+            {
+                QTreeWidgetItem *module_item = subcat_item->child( i_module );
+                PrefsItemData *mod_data = module_item->data(0, Qt::UserRole).
+                                                    value<PrefsItemData *>();
+                if( !strcmp( mod_data->psz_name, psz_module ) ) {
+                    advanced_tree->setCurrentItem( module_item );
+                }
+            }
+        }
+    }
+    show();
 }
 
 void PrefsDialog::save()

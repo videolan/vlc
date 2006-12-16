@@ -82,4 +82,33 @@
 
 #define I_HIDDEN_ADV N_( "Some options are available but hidden. "\
                          "Check \"Advanced options\" to see them." )
+
+/*************** Video filters **************/
+
+#define I_CLONE     N_("Image clone")
+#define I_CLONE_TIP N_("Clone the image")
+
+#define I_MAGNIFY       N_("Magnification")
+#define I_MAGNIFY_TIP   N_("Magnify a part of the video. You can select " \
+                           "which part of the image should be magnified." )
+
+#define I_WAVE      N_("Waves")
+#define I_WAVE_TIP  N_("\"Waves\" video distortion effect")
+
+#define I_RIPPLE_TIP N_("\"Water surface\" video distortion effect")
+
+#define I_INVERT_TIP N_("Image colors inversion")
+
+#define I_WALL_TIP N_("Split the image to make an image wall")
+
+#define I_PUZZLE_TIP N_("Create a \"puzzle game\" with the video.\n" \
+                        "The video gets split in parts that you must sort.")
+
+#define I_GRADIENT_TIP N_("\"Edge detection\" video distortion effect.\n" \
+                    "Try changing the various settings for different effects" )
+
+#define I_COLORTHRES_TIP N_("\"Color detection\" effect. The whole image " \
+                  "will be turned to black and white, except the parts that "\
+                  "are of the color that you select in the settings.")
+
 #endif

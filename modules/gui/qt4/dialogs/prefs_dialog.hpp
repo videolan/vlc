@@ -53,6 +53,8 @@ public:
         return instance;
     }
     virtual ~PrefsDialog() {};
+
+    void showModulePrefs( char* );
 private:
     PrefsDialog( intf_thread_t * );
 

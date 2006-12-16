@@ -44,13 +44,14 @@ class PrefsItemData : public QObject
 {
 public:
     PrefsItemData()
-    { panel = NULL; i_object_id = 0; i_subcat_id = -1; };
-    virtual ~PrefsItemData() {};
+    { panel = NULL; i_object_id = 0; i_subcat_id = -1; psz_name = NULL; };
+    virtual ~PrefsItemData() { free( psz_name ); };
     PrefsPanel *panel;
     int i_object_id;
     int i_subcat_id;
     int i_type;
     bool b_submodule;
+    char *psz_name;
     QString name;
     QString help;
 };

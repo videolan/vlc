@@ -62,9 +62,9 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                             QTreeWidget( _parent ), p_intf( _p_intf )
 {
     setColumnCount( 1 );
-    setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
     setAlternatingRowColors( true );
     header()->hide();
+    setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
 
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b##_xpm ))
     BI( audio, audio );
@@ -128,6 +128,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             current_item = new QTreeWidgetItem();
             current_item->setText( 0, data->name );
             current_item->setIcon( 0 , icon );
+            current_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
             current_item->setData( 0, Qt::UserRole,
                                    qVariantFromValue( data ) );
             addTopLevelItem( current_item );
@@ -209,7 +210,6 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             if( i_options > 0 && i_category >= 0 && i_subcategory >= 0 )
                 break;
         }
-
         if( !i_options ) continue; // Nothing to display
 
         // Locate the category item;
@@ -248,6 +248,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         PrefsItemData *module_data = new PrefsItemData();
         module_data->b_submodule = p_module->b_submodule;
         module_data->i_type = TYPE_MODULE;
+        module_data->psz_name = strdup( p_module->psz_object_name );
         module_data->i_object_id = p_module->b_submodule ?
                          ((module_t *)p_module->p_parent)->i_object_id :
                          p_module->i_object_id;

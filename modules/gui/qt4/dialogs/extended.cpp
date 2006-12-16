@@ -39,9 +39,12 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     l->addWidget( tab );
 
     setWindowTitle( qtr( "Extended controls" ) );
-    Equalizer *foo = new Equalizer( p_intf, this );
 
-    tab->addTab( foo, qtr( "Equalizer" ) );
+    Equalizer *foo = new Equalizer( p_intf, this );
+    tab->addTab( foo, qtr( "Eqqualizer" ) );
+
+    ExtVideo *bar = new ExtVideo( p_intf, this );
+    tab->addTab( bar, qtr( "Video effects" ) );
 }
 
 ExtendedDialog::~ExtendedDialog()

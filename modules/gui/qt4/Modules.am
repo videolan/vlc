@@ -13,6 +13,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 TOUI = 	\
 	ui/equalizer \
+	ui/video_effects \
 	ui/open_file \
 	ui/open_disk \
 	ui/open_net \
@@ -168,6 +169,7 @@ EXTRA_DIST += \
 	util/customwidgets.hpp \
 	util/qvlcframe.hpp \
 	ui/equalizer.ui \
+	ui/video_effects.ui \
 	ui/open_file.ui \
 	ui/open_disk.ui \
 	ui/open_net.ui \

@@ -26,14 +26,167 @@
 #include <QString>
 #include <QFont>
 #include <QGridLayout>
+#include <QSignalMapper>
 
 #include "components/extended_panels.hpp"
+#include "dialogs/prefs_dialog.hpp"
+#include "dialogs_provider.hpp"
 #include "qt4.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
 #include <vlc_aout.h>
 #include <vlc_intf_strings.h>
+#include <vlc_vout.h>
 #include <assert.h>
+
+class ConfClickHandler : public QObject
+{
+public:
+    ConfClickHandler( intf_thread_t *_p_intf, ExtVideo *_e ) : QObject (_e) {
+        e = _e; p_intf = _p_intf;
+    }
+    virtual ~ConfClickHandler() {}
+    bool eventFilter( QObject *obj, QEvent *evt )
+    {
+        if( evt->type() == QEvent::MouseButtonPress )
+        {
+            e->gotoConf( obj );
+            return true;
+        }
+        return false;
+    }
+private:
+    ExtVideo* e;
+    intf_thread_t *p_intf;
+};
+
+#define SETUP_VFILTER( widget, conf, tooltip, labtooltip ) \
+    ui.widget##Check->setToolTip( tooltip ); \
+    if (conf ) {\
+        ui.widget##Label->setToolTip( labtooltip ); \
+        ui.widget##Label->setPixmap( QPixmap(":/pixmaps/go-next.png") ); \
+        ui.widget##Label->installEventFilter(h); \
+    } \
+    CONNECT( ui.widget##Check, clicked(), this, updateFilters() ); \
+
+ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
+                           QWidget( _parent ) , p_intf( _p_intf )
+{
+    ConfClickHandler* h = new ConfClickHandler( p_intf, this );
+
+    ui.setupUi( this );
+
+    SETUP_VFILTER( clone, true, qtr(I_CLONE_TIP),
+                                qtr("Configure the clone filter") );
+    SETUP_VFILTER( magnify, false, qtr(I_MAGNIFY_TIP),
+                                qtr("Configure the magnification effect"));
+    SETUP_VFILTER( wave, false, qtr(I_WAVE_TIP),
+                                qtr("Configure the waves effect"));
+    SETUP_VFILTER( ripple, false, qtr(I_RIPPLE_TIP),
+                                  qtr("Configure the \"water\" effect"));
+    SETUP_VFILTER( invert, false, qtr(I_INVERT_TIP),
+                                  qtr("Configure the color inversion effect"));
+    SETUP_VFILTER( puzzle, true, qtr(I_PUZZLE_TIP),
+                                  qtr("Configure the puzzle effect"));
+    SETUP_VFILTER( wall, true, qtr(I_WALL_TIP),
+                               qtr("Configure the wall filter") );
+    SETUP_VFILTER( gradient, true, qtr(I_GRADIENT_TIP),
+                                   qtr("Configure the \"gradient\" effect"));
+    SETUP_VFILTER( colorthres, true, qtr(I_COLORTHRES_TIP),
+                                   qtr("Configure the color detection effect"));
+}
+
+ExtVideo::~ExtVideo()
+{
+}
+
+static void ChangeVFiltersString( intf_thread_t *p_intf,
+                                 char *psz_name, vlc_bool_t b_add )
+{
+    vout_thread_t *p_vout;
+    char *psz_parser, *psz_string;
+
+    psz_string = config_GetPsz( p_intf, "video-filter" );
+
+    if( !psz_string ) psz_string = strdup("");
+
+    psz_parser = strstr( psz_string, psz_name );
+
+    if( b_add )
+    {
+        if( !psz_parser )
+        {
+            psz_parser = psz_string;
+            asprintf( &psz_string, (*psz_string) ? "%s:%s" : "%s%s",
+                            psz_string, psz_name );
+            free( psz_parser );
+        }
+        else
+        {
+            return;
+        }
+    }
+    else
+    {
+        if( psz_parser )
+        {
+            memmove( psz_parser, psz_parser + strlen(psz_name) +
+                            (*(psz_parser + strlen(psz_name)) == ':' ? 1 : 0 ),
+                            strlen(psz_parser + strlen(psz_name)) + 1 );
+
+            /* Remove trailing : : */
+            if( *(psz_string+strlen(psz_string ) -1 ) == ':' )
+            {
+                *(psz_string+strlen(psz_string ) -1 ) = '\0';
+            }
+         }
+         else
+         {
+             free( psz_string );
+             return;
+         }
+    }
+    /* Vout is not kept, so put that in the config */
+    config_PutPsz( p_intf, "video-filter", psz_string );
+
+    /* Try to set on the fly */
+    p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
+    if( p_vout )
+    {
+        var_SetString( p_vout, "video-filter", psz_string );
+        vlc_object_release( p_vout );
+    }
+
+    free( psz_string );
+}
+
+void ExtVideo::updateFilters()
+{
+    QCheckBox* filter = qobject_cast<QCheckBox*>(sender());
+    QString module = filter->objectName().replace("Check", "");
+
+    ChangeVFiltersString( p_intf, qtu(module), filter->isChecked() );
+}
+
+void ExtVideo::gotoConf( QObject* src )
+{
+#define SHOWCONF(module) \
+    if( src->objectName().contains(module) ) \
+    { \
+        PrefsDialog::getInstance( p_intf )->showModulePrefs( module ); \
+        return; \
+    }
+    SHOWCONF( "clone" );
+    SHOWCONF( "magnify" );
+    SHOWCONF( "wave" );
+    SHOWCONF( "ripple" );
+    SHOWCONF( "invert" );
+    SHOWCONF( "puzzle" );
+    SHOWCONF( "wall" );
+    SHOWCONF( "gradient" );
+    SHOWCONF( "colorthres" )
+}
 
 /**********************************************************************
  * Equalizer
