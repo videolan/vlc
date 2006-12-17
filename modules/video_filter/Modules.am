@@ -27,4 +27,5 @@ SOURCES_rotate = rotate.c
 SOURCES_noise = noise.c
 SOURCES_puzzle = puzzle.c
 SOURCES_colorthres = colorthres.c
+SOURCES_extract = extract.c
 noinst_HEADERS = filter_common.h

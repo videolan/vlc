@@ -31,6 +31,8 @@ Video output:
  * Adjust, Invert and Distort (now splitted into Wave, Ripple, Gradient
    and Psychedelic) video filters can now be streamed
  * New puzzle video output filter
+ * Rewrite motion detection video filter
+ * New extract video filter (extract Red, Green and Blue components from a video)
 
 Interfaces:
  * Windows/Linux
