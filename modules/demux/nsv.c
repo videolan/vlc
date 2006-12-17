@@ -456,6 +456,8 @@ static int ReadNSVs( demux_t *p_demux )
         case VLC_FOURCC( 'V', 'P', '3', '1' ):
             fcc = VLC_FOURCC( 'V', 'P', '3', '1' );
             break;
+        case VLC_FOURCC( 'V', 'P', '6', '0' ):
+        case VLC_FOURCC( 'V', 'P', '6', '1' ):
         case VLC_FOURCC( 'V', 'P', '6', '2' ):
         case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
             break;

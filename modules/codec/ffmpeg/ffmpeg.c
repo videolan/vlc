@@ -820,6 +820,13 @@ static struct
       VIDEO_ES, "On2's VP6.2 Video (Flash)" },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(27<<8)+0)
+    { VLC_FOURCC('V','P','6','0'), CODEC_ID_VP6,
+      VIDEO_ES, "On2's VP6.0 Video" },
+    { VLC_FOURCC('V','P','6','1'), CODEC_ID_VP6,
+      VIDEO_ES, "On2's VP6.1 Video" },
+#endif
+
     /* Xiph.org theora */
     { VLC_FOURCC('t','h','e','o'), CODEC_ID_THEORA,
       VIDEO_ES, "Xiph.org's Theora Video" },
