@@ -31,6 +31,7 @@
     BOOL b_alreadyCounting;
     int i_timeToKeepVisibleInSec;
 
+    BOOL b_nonActive;
     BOOL b_displayed;
     BOOL b_voutWasUpdated;
     int i_device;
@@ -49,6 +50,9 @@
 - (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time;
 - (void)setSeekable:(BOOL) b_seekable;
 - (void)setVolumeLevel: (float)f_volumeLevel;
+
+- (void)setNonActive:(id)noData;
+- (void)setActive:(id)noData;
 
 - (void)focus:(NSTimer *)timer;
 - (void)unfocus:(NSTimer *)timer;

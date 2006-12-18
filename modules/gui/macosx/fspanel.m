@@ -65,6 +65,20 @@
         [self mouseEntered:NULL];
     if (!isInside)
         [self mouseExited:NULL];
+    
+    /* get a notification if VLC isn't the active app anymore */
+    [[NSNotificationCenter defaultCenter]
+    addObserver: self
+       selector: @selector(setNonActive:)
+           name: NSApplicationDidResignActiveNotification
+         object: NSApp];
+    
+    /* get a notification if VLC is the active app again */
+    [[NSNotificationCenter defaultCenter]
+    addObserver: self
+       selector: @selector(setActive:)
+           name: NSApplicationDidBecomeActiveNotification
+         object: NSApp];
 }
 
 /* Windows created with NSBorderlessWindowMask normally can't be key, but we want ours to be */
@@ -80,6 +94,8 @@
 
 -(void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
     if( hideAgainTimer )
         [hideAgainTimer release];
     [self setFadeTimer:nil];
@@ -135,6 +151,18 @@
 - (void)setVolumeLevel: (float)f_volumeLevel
 {
     [[self contentView] setVolumeLevel: f_volumeLevel];
+}
+
+- (void)setNonActive:(id)noData
+{
+    b_nonActive = YES;
+    [self orderOut: self];
+}
+
+- (void)setActive:(id)noData
+{
+    b_nonActive = NO;
+    [self orderFront: self];
 }
 
 /* This routine is called repeatedly to fade in the window */
@@ -204,7 +232,7 @@
 - (void)fadeIn
 {
     /* in case that the user don't want us to appear, just return here */
-    if(! config_GetInt( VLCIntf, "macosx-fspanel" ) )
+    if(! config_GetInt( VLCIntf, "macosx-fspanel" ) || b_nonActive )
         return;
     
     if( [self alphaValue] < 1.0 )
