@@ -73,7 +73,11 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 #define BACKGROUND_TEXT N_("Use as Desktop Background")
 #define BACKGROUND_LONGTEXT N_("Use the video as the Desktop Background " \
         "Desktop icons cannot be interacted with in this mode." )
-        
+
+#define FSPANEL_TEXT N_("Show Fullscreen controller")
+#define FSPANEL_LONGTEXT N_("Shows a lucent controller when moving the mouse " \
+                            "in fullscreen mode.") 
+
 #define WIZARD_OPTIONS_SAVING_TEXT N_("Remember wizard options")
 #define WIZARD_OPTIONS_SAVING_LONGTEXT N_("Remember the options in the " \
         "wizard during one session of VLC.") 
@@ -91,6 +95,8 @@ vlc_module_begin();
     add_bool( "macosx-embedded", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
                      VLC_FALSE );
     add_bool( "macosx-autoplay", 1, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
+                     VLC_FALSE );
+    add_bool( "macosx-fspanel", 1, NULL, FSPANEL_TEXT, FSPANEL_LONGTEXT,
                      VLC_FALSE );
     add_bool( "macosx-wizard-keep", 1, NULL, WIZARD_OPTIONS_SAVING_TEXT,
                 WIZARD_OPTIONS_SAVING_LONGTEXT, VLC_TRUE );

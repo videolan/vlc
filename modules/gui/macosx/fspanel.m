@@ -203,6 +203,10 @@
 
 - (void)fadeIn
 {
+    /* in case that the user don't want us to appear, just return here */
+    if(! config_GetInt( VLCIntf, "macosx-fspanel" ) )
+        return;
+    
     if( [self alphaValue] < 1.0 )
     {
         if (![self fadeTimer])
