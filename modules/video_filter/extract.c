@@ -325,11 +325,6 @@ static void get_custom_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
         y2out = y1out + i_pitch;
         while( y1in < y1end )
         {
-/*
-38470   -13239  -27473
--21710  7471    15504
--27439  9443    19595
-*/
             *uout++ = crop( (*y1in * m[3] + (*uin-U) * m[4] + (*vin-V) * m[5])
                       / 65536 + U );
             *vout++ = crop( (*y1in * m[6] + (*uin-U) * m[7] + (*vin-V) * m[8])
@@ -375,11 +370,6 @@ static void get_custom_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
         const uint8_t *y1end = y1in + i_visible_pitch;
         while( y1in < y1end )
         {
-/*
-38470   -13239  -27473
--21710  7471    15504
--27439  9443    19595
-*/
             *uout++ = crop( (*y1in * m[3] + (*uin-U) * m[4] + (*vin-V) * m[5])
                       / 65536 + U );
             *vout++ = crop( (*y1in * m[6] + (*uin-U) * m[7] + (*vin-V) * m[8])
