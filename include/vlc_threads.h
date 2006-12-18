@@ -139,6 +139,9 @@ typedef struct
     pth_cond_t cond;
     vlc_object_t * p_this;
 } vlc_cond_t;
+typedef struct
+{
+} vlc_threadvar_t;
 
 #elif defined( ST_INIT_IN_ST_H )
 typedef st_thread_t      vlc_thread_t;
@@ -152,6 +155,9 @@ typedef struct
     st_cond_t cond;
     vlc_object_t * p_this;
 } vlc_cond_t;
+typedef struct
+{
+} vlc_threadvar_t;
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
 typedef HANDLE vlc_thread_t;
@@ -182,6 +188,11 @@ typedef struct
     vlc_object_t * p_this;
 } vlc_cond_t;
 
+typedef struct
+{
+    DWORD   handle;
+} vlc_threadvar_t;
+
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 /* This is the BeOS implementation of the vlc threads, note that the mutex is
  * not a real mutex and the cond_var is not like a pthread cond_var but it is
@@ -205,6 +216,11 @@ typedef struct
     vlc_object_t * p_this;
 } vlc_cond_t;
 
+typedef struct
+{
+} vlc_threadvar_t;
+
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 typedef pthread_t       vlc_thread_t;
 typedef struct
@@ -217,6 +233,11 @@ typedef struct
     pthread_cond_t cond;
     vlc_object_t * p_this;
 } vlc_cond_t;
+
+typedef struct
+{
+    pthread_key_t handle;
+} vlc_threadvar_t;
 
 #elif defined( HAVE_CTHREADS_H )
 typedef cthread_t       vlc_thread_t;
@@ -243,6 +264,11 @@ typedef struct
 
     vlc_object_t * p_this;
 } vlc_cond_t;
+
+typedef struct
+{
+    cthread_key_t handle;
+} vlc_threadvar_t;
 
 #endif
 

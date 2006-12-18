@@ -6,6 +6,8 @@ PyObject *create_destroy( PyObject *self, PyObject *args );
 PyObject *playlist_test( PyObject *self, PyObject *args );
 PyObject *vlm_test( PyObject *self, PyObject *args );
 
+PyObject *threadvar_test( PyObject *self, PyObject *args );
+
 /* Stats */
 PyObject *timers_test( PyObject *self, PyObject *args );
 

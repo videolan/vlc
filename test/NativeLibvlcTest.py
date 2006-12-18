@@ -3,6 +3,9 @@ import unittest
 import native_libvlc_test
 
 class NativeLibvlcTestCase( unittest.TestCase ):
+    def testTls( self ):
+        """[Thread] Set TLS"""
+        native_libvlc_test.threadvar_test()
     def test1Exception( self ):
         """[LibVLC] Checks libvlc_exception"""
 #    	native_libvlc_test.exception_test()

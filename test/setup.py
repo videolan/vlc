@@ -42,7 +42,7 @@ def get_ldflags():
 native_libvlc_test = Extension( 'native_libvlc_test',
                 sources = ['native/init.c', 'native/url.c', 'native/i18n.c',
 			    'native/stats.c', 'native/libvlc.c', 'native/profiles.c',
-                'native/algo.c'],
+                'native/algo.c', 'native/threads.c'],
                 include_dirs = ['../include', '../', '/usr/win32/include' ],
                 extra_objects = [ '../src/.libs/libvlc.so', '../src/.libs/libvlc-control.so' ],
                 extra_compile_args = get_cflags(),

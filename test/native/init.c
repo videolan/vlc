@@ -24,6 +24,7 @@ static PyMethodDef native_libvlc_test_methods[] = {
    DEF_METHOD( bsearch_direct_test, "Test Bsearch without structure" )
    DEF_METHOD( bsearch_member_test, "Test Bsearch with structure" )
    DEF_METHOD( dict_test, "Test dictionnaries" )
+   DEF_METHOD( threadvar_test, "Test TLS" )
    { NULL, NULL, 0, NULL }
 };
 
