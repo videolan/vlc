@@ -27,13 +27,15 @@
 
 #include <assert.h>
 
+#include "../playlist/playlist_internal.h"
+
 #define PL p_instance->p_libvlc_int->p_playlist
 
 void libvlc_playlist_loop( libvlc_instance_t *p_instance, vlc_bool_t loop,
                            libvlc_exception_t *p_e)
 {
     assert( PL );
-    var_SetBool(PL,"loop",loop);
+    var_SetBool( PL, "loop", loop );
 }
 
 void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
@@ -46,7 +48,8 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
     if( PL->items.i_size == 0 ) RAISEVOID( "Empty playlist" );
     if( i_id > 0 )
     {
-        playlist_item_t *p_item = playlist_ItemGetById( PL, i_id, VLC_TRUE );
+        playlist_item_t *p_item = playlist_ItemGetByInputId( PL, i_id,
+                                                           PL->status.p_node );
         if( !p_item ) RAISEVOID( "Unable to find item" );
 
         playlist_Control( PL, PLAYLIST_VIEWPLAY, VLC_FALSE,
@@ -115,30 +118,20 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
                             i_options, 1 );
 }
 
+
+
 int libvlc_playlist_delete_item( libvlc_instance_t *p_instance, int i_id,
                                  libvlc_exception_t *p_e )
 {
-    playlist_item_t *p_item;
     assert( PL );
-    vlc_mutex_lock( &PL->object_lock );
-    p_item = playlist_ItemGetById( PL, i_id, VLC_TRUE );
-    if( p_item && p_item->p_input ) {
-        int i_ret = playlist_DeleteFromInput( PL, p_item->p_input->i_id, VLC_TRUE );
-        if( i_ret ) {
-            libvlc_exception_raise( p_e, "delete failed" );
-            vlc_mutex_unlock( &PL->object_lock );
-            return VLC_EGENERIC;
-        }
-        else {
-            vlc_mutex_unlock( &PL->object_lock );
-            return VLC_SUCCESS;
-        }
-    }
-    libvlc_exception_raise( p_e, "item not found" );
-    vlc_mutex_unlock( &PL->object_lock );
-    return VLC_EGENERIC;
-}
 
+    if( playlist_DeleteFromInput( PL, i_id, VLC_FALSE ) )
+    {
+        libvlc_exception_raise( p_e, "deletion failed" );
+        return VLC_ENOITEM;
+    }
+    return VLC_SUCCESS;
+}
 
 int libvlc_playlist_isplaying( libvlc_instance_t *p_instance,
                                libvlc_exception_t *p_e )

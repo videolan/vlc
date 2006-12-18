@@ -51,6 +51,7 @@ extern "C" {
 struct libvlc_exception_t
 {
     int b_raised;
+    int i_code;
     char *psz_message;
 };
 typedef struct libvlc_exception_t libvlc_exception_t;
@@ -142,7 +143,8 @@ void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
 /**
  * Set loop variable
  */
-void libvlc_playlist_loop( libvlc_instance_t* , vlc_bool_t, libvlc_exception_t * );
+void libvlc_playlist_loop( libvlc_instance_t* , vlc_bool_t,
+                           libvlc_exception_t * );
 
 /**
  * Start playing. You can give some additionnal playlist item options
@@ -233,7 +235,7 @@ int libvlc_playlist_add_extended( libvlc_instance_t *, const char *,
                                   const char *, int, const char **,
                                   libvlc_exception_t * );
 
-/** 
+/**
  * Delete the playlist item with the given ID.
  * \param p_instance the instance
  * \param i_id the id to remove

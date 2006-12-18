@@ -110,6 +110,8 @@ playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
 int playlist_DeleteFromItemId( playlist_t*, int );
 int playlist_ItemDelete ( playlist_item_t * );
 
+playlist_item_t *playlist_ItemGetByInputId( playlist_t*, int, playlist_item_t*);
+
 /**
  * @}
  */
