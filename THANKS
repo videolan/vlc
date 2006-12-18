@@ -59,6 +59,7 @@ Dennis Lou <dlou99 at yahoo dot com> - ATSC support in the DVB module
 Dermot McGahon <dermot at dspsrv dot com> - Bug fixes, RC interface loop and repeat
 Diego Petteno <flameeyes at gentoo dot org> - remove usage of internal ffmpeg symbols, configure fixes
 DirektX <direktx at freemail.hu> - Hungarian translation
+Dominique Leuenberger <dominique-vlc dot suse at leuenberger dot net> - SuSE packaging
 Dugal Harris - DirectShow fixes and MJPEG patches
 Emmanuel Blindauer <manu at agat.net> - aRts audio output
 Enrico Gueli <e_gueli at yahoo.it> - Brightness threshold in adjust video filter
