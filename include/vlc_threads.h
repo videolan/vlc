@@ -141,6 +141,7 @@ typedef struct
 } vlc_cond_t;
 typedef struct
 {
+    int handle;
 } vlc_threadvar_t;
 
 #elif defined( ST_INIT_IN_ST_H )
@@ -157,6 +158,7 @@ typedef struct
 } vlc_cond_t;
 typedef struct
 {
+    int handle;
 } vlc_threadvar_t;
 
 #elif defined( WIN32 ) || defined( UNDER_CE )

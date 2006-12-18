@@ -565,12 +565,15 @@ static inline int __vlc_threadvar_set( char* psz_file, int line,
 {
     int i_ret;
 
-#if defined( PTH_INIT_IN_PTH_H ) || \
-    defined( ST_INIT_IN_ST_H ) || defined( HAVE_KERNEL_SCHEDULER_H )
+#if defined( PTH_INIT_IN_PTH_H )
+    return pth_key_setdata( p_tls->handle, p_value );
+#elif  defined( ST_INIT_IN_ST_H )
+    return st_thread_setspecific( p_tls->handle, p_value );
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
     return -1;
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    i_ret = ( TlsSetValue( &p_tls->handle, p_value ) != 0 );
+    i_ret = ( TlsSetValue( p_tls->handle, p_value ) != 0 );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret = pthread_setspecific( p_tls->handle, p_value );
@@ -593,10 +596,12 @@ static inline void* __vlc_threadvar_get( char* psz_file, int line,
 {
     void* p_ret;
 
-#if defined( PTH_INIT_IN_PTH_H ) || \
-    defined( ST_INIT_IN_ST_H ) || defined( HAVE_KERNEL_SCHEDULER_H )
-    return NULL;
-
+#if defined( PTH_INIT_IN_PTH_H )
+    p_ret = pth_key_getdata( p_handle->key );
+#elif defined( ST_INIT_IN_ST_H )
+    p_ret = st_thread_getspecific( p_handle->key );
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    p_ret = NULL;
 #elif defined( UNDER_CE ) || defined( WIN32 )
     p_ret = TlsGetValue( &p_tls->handle );
 

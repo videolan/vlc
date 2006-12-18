@@ -506,11 +506,12 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
 int __vlc_threadvar_create( vlc_object_t *p_this, vlc_threadvar_t *p_tls )
 {
 #if defined( PTH_INIT_IN_PTH_H )
+    return pth_key_create( &p_tls->handle, NULL );
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-#elif defined( ST_INIT_IN_ST_H )
     msg_Err( p_this, "TLS not implemented" );
     return VLC_EGENERIC;
-
+#elif defined( ST_INIT_IN_ST_H )
+    return st_key_create( &p_tls->handle, NULL );
 #elif defined( UNDER_CE ) || defined( WIN32 )
 #elif defined( WIN32 )
     p_tls->handle = TlsAlloc();
