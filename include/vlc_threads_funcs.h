@@ -603,7 +603,7 @@ static inline void* __vlc_threadvar_get( char* psz_file, int line,
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_ret = NULL;
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    p_ret = TlsGetValue( &p_tls->handle );
+    p_ret = TlsGetValue( p_tls->handle );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     p_ret = pthread_getspecific( p_tls->handle );
