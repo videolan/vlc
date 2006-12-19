@@ -2060,7 +2060,7 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 	$(EXTRACT_GZ)
 
 .pthreads: pthreads
-	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC-inlined)
+	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC-inlined; cp pthread.h ../../include/; cp *.dll *.a ../../lib/)
 	$(INSTALL_NAME)
 	touch $@
 
