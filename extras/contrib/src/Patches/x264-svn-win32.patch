@@ -1,7 +1,18 @@
 Index: configure
 ===================================================================
---- configure	(revision 590)
+--- configure	(revision 612)
 +++ configure	(working copy)
+@@ -55,8 +55,8 @@
+ shared="no"
+ 
+ CC="${CC-gcc}"
+-CFLAGS="-Wall -I. -D__X264__"
+-LDFLAGS=""
++CFLAGS="$CFLAGS -Wall -I. -D__X264__"
++LDFLAGS="$LDFLAGS"
+ HAVE_GETOPT_LONG=1
+ 
+ AS="nasm"
 @@ -64,8 +64,101 @@
  
  EXE=""
@@ -104,7 +115,7 @@ Index: configure
  case "${MACHINE#*-*-}" in
    beos*)
      SYS="BEOS"
-@@ -178,88 +271,6 @@
+@@ -183,88 +276,6 @@
  esac
  
  CFLAGS="$CFLAGS -DARCH_$ARCH -DSYS_$SYS"
@@ -151,7 +162,7 @@ Index: configure
 -            LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
 -            ;;
 -        --enable-pthread)
--            pthread="yes"
+-            pthread="auto" # can't skip detection, since it differs by OS
 -            ;;
 -        --disable-pthread)
 -            pthread="no"
@@ -192,8 +203,8 @@ Index: configure
 -
  # autodetect options that weren't forced nor disabled
  
- if test "$pthread" = "auto" ; then
-@@ -349,6 +360,9 @@
+ libpthread=""
+@@ -363,6 +374,9 @@
  ASFLAGS=$ASFLAGS
  GTK=$gtk
  EXE=$EXE

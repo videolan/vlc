@@ -1214,7 +1214,11 @@ else
 endif
 endif
 
+ifdef HAVE_WIN32
+.x264: x264 .pthreads
+else
 .x264: x264
+endif
 	(cd $<; ./configure $(X264CONF) --prefix="$(PREFIX)" --enable-pic && make && make install)
 	touch $@
 
