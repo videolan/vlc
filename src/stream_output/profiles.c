@@ -40,7 +40,7 @@
 /** Add a new duplicate element to a streaming chain
  * \return the new element
  */
-sout_duplicate_t *streaming_ChainAddDup( sout_chain_t *p_chain )
+static sout_duplicate_t *streaming_ChainAddDup( sout_chain_t *p_chain )
 {
     DECMALLOC_NULL( p_module, sout_module_t );
     MALLOC_NULL( DUPM, sout_duplicate_t );
@@ -54,8 +54,10 @@ sout_duplicate_t *streaming_ChainAddDup( sout_chain_t *p_chain )
 /** Add a new standard element to a streaming chain
  * \return the new element
  */
-sout_std_t *streaming_ChainAddStd( sout_chain_t *p_chain, char *psz_access,
-                                   char *psz_mux, char *psz_url )
+static sout_std_t *streaming_ChainAddStd( sout_chain_t *p_chain,
+                                          const char *psz_access,
+                                          const char *psz_mux,
+                                          const char *psz_url )
 {
     DECMALLOC_NULL( p_module, sout_module_t );
     MALLOC_NULL( STDM, sout_std_t );
@@ -66,10 +68,11 @@ sout_std_t *streaming_ChainAddStd( sout_chain_t *p_chain, char *psz_access,
     TAB_APPEND( p_chain->i_modules, p_chain->pp_modules, p_module );
     return STDM;
 }
+
 /** Add a new display element to a streaming chain
  * \return the new element
  */
-sout_display_t *streaming_ChainAddDisplay( sout_chain_t *p_chain )
+static sout_display_t *streaming_ChainAddDisplay( sout_chain_t *p_chain )
 {
     DECMALLOC_NULL( p_module, sout_module_t );
     MALLOC_NULL( DISM, sout_display_t );
@@ -81,7 +84,7 @@ sout_display_t *streaming_ChainAddDisplay( sout_chain_t *p_chain )
 /** Add a new transcode element to a streaming chain
  * \return the new element
  */
-sout_transcode_t *streaming_ChainAddTranscode( sout_chain_t *p_chain,
+static sout_transcode_t *streaming_ChainAddTranscode( sout_chain_t *p_chain,
                         char *psz_vcodec, char * psz_acodec, char * psz_scodec,
                         int i_vb, float f_scale, int i_ab, int i_channels,
                         vlc_bool_t b_soverlay, char *psz_additional )
@@ -102,7 +105,7 @@ sout_transcode_t *streaming_ChainAddTranscode( sout_chain_t *p_chain,
 }
 
 /** Add a new clean child chain to an existing duplicate element */
-void streaming_DupAddChild( sout_duplicate_t *p_dup )
+static void streaming_DupAddChild( sout_duplicate_t *p_dup )
 {
     assert( p_dup );
     sout_chain_t * p_child = streaming_ChainNew();
@@ -118,7 +121,7 @@ void streaming_DupAddChild( sout_duplicate_t *p_dup )
     free( psz_opt ); }
 
 /** Clean up a chain (recursively if it has some children) */
-void streaming_ChainClean( sout_chain_t *p_chain )
+static void streaming_ChainClean( sout_chain_t *p_chain )
 {
     int i,j;
     sout_module_t *p_module;
