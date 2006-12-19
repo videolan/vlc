@@ -24,9 +24,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
+
 #include <vlc_demux.h>
 #include <vlc_interface.h>
 #include <vlc_network.h>
