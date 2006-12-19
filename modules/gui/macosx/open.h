@@ -105,6 +105,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (void)setSubPanel;
 - (void)openTarget:(int)i_type;
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi;
+- (void)textFieldWasClicked:(NSNotification *)o_notification;
 
 - (void)openFileGeneric;
 - (void)openFilePathChanged:(NSNotification *)o_notification;
@@ -136,4 +137,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (IBAction)panelOk:(id)sender;
 
 - (void)openFile;
+@end
+
+@interface VLCOpenTextField : NSTextField
+{
+}
+- (void)mouseDown:(NSEvent *)theEvent;
 @end

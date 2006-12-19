@@ -231,6 +231,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
         selector: @selector(openNetInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: o_net_http_url];
+    
+    /* register clicks on text fields */
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(textFieldWasClicked:)
+                                                 name: @"VLCOpenTextFieldWasClicked"
+                                               object: nil];
 }
 
 - (void)setSubPanel
@@ -385,7 +391,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
     else if( [o_label isEqualToString: _NS("Network")] )
     {
-        [self openNetModeChanged: nil];
+        [self openNetInfoChanged: nil];
     }  
 }
 
@@ -403,7 +409,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)openNet
 {
-    [self openNetModeChanged: nil];
+    [self openNetInfoChanged: nil];
     [self openTarget: 2];
 }
 
@@ -649,25 +655,27 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
 }
 
+- (void)textFieldWasClicked:(NSNotification *)o_notification
+{
+    if( [o_notification object] == o_net_udp_port )
+        [o_net_mode selectCellAtRow: 0 column: 0];
+    else if( [o_notification object] == o_net_udpm_addr ||
+             [o_notification object] == o_net_udpm_port )
+        [o_net_mode selectCellAtRow: 1 column: 0];
+    else
+        [o_net_mode selectCellAtRow: 2 column: 0];
+
+    [self openNetInfoChanged: nil];
+}
+
 - (IBAction)openNetModeChanged:(id)sender
 {
-    NSString *o_mode;
-    BOOL b_udp = FALSE;
-    BOOL b_udpm = FALSE;
-    BOOL b_http = FALSE;
-
-    o_mode = [[o_net_mode selectedCell] title];
-
-    if( [o_mode isEqualToString: _NS("UDP/RTP")] ) b_udp = TRUE;
-    else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] ) b_udpm = TRUE;
-    else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS/RTSP")] ) b_http = TRUE;
-
-    [o_net_udp_port setEnabled: b_udp];
-    [o_net_udp_port_stp setEnabled: b_udp];
-    [o_net_udpm_addr setEnabled: b_udpm];
-    [o_net_udpm_port setEnabled: b_udpm];
-    [o_net_udpm_port_stp setEnabled: b_udpm];
-    [o_net_http_url setEnabled: b_http];
+    if( [[sender selectedCell] tag] == 0 )
+        [o_panel makeFirstResponder: o_net_udp_port];
+    else if ( [[sender selectedCell] tag] == 1 )
+        [o_panel makeFirstResponder: o_net_udpm_addr];
+    else
+        [o_panel makeFirstResponder: o_net_http_url];
 
     [self openNetInfoChanged: nil];
 }
@@ -679,10 +687,16 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if( i_tag == 0 )
     {
         [o_net_udp_port setIntValue: [o_net_udp_port_stp intValue]];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCOpenTextFieldWasClicked" 
+                                                            object: o_net_udp_port];
+        [o_panel makeFirstResponder: o_net_udp_port];
     }
     else if( i_tag == 1 )
     {
         [o_net_udpm_port setIntValue: [o_net_udpm_port_stp intValue]];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCOpenTextFieldWasClicked" 
+                                                            object: o_net_udpm_port];
+        [o_panel makeFirstResponder: o_net_udpm_port];
     }
 
     [self openNetInfoChanged: nil];
@@ -845,3 +859,15 @@ static VLCOpen *_o_sharedMainInstance = nil;
 }
 
 @end
+
+@implementation VLCOpenTextField
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCOpenTextFieldWasClicked"
+                                                        object: self];
+    [super mouseDown: theEvent];
+}
+
+@end
+        

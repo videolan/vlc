@@ -324,6 +324,7 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
+        {CLASS = VLCOpenTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
         {
             ACTIONS = {
                 announceChanged = id; 
