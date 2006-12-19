@@ -24,8 +24,6 @@ AC_DEFUN([RDC_PROG_CC_FLAGS_IFELSE],
   ac_res=`eval echo '${'$as_ac_var'}'`
   AS_IF([test "${ac_res}" != "no"], [
     CFLAGS="${CFLAGS_save} $1"
-    CXXFLAGS="${CXXFLAGS} $1"
-    OBJCFLAGS="${OBJCFLAGS} $1"
     $2
   ], [
     CFLAGS="${CFLAGS_save}"
