@@ -102,6 +102,7 @@ ifneq ($(BUILD),$(HOST))
         # We are REALLY cross compiling
         FFMPEGCONF=--cross-prefix=$(HOST)-
         X264CONF=--crosscompile=$(HOST)
+	PTHREADSCONF="CROSS=$(HOST)-"
     endif
 endif
 
@@ -2046,6 +2047,19 @@ taglib: taglib-$(TAGLIB_VERSION).tar.gz
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
+
+
+pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz:
+	$(WGET) $(PTHREADS_URL)
+
+pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
+	$(EXTRACT_GZ)
+
+.pthreads: pthreads
+	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC-inlined)
+	$(INSTALL_NAME)
+	touch $@
+
 
 # ***************************************************************************
 # Some cleansing
