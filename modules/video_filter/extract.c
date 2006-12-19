@@ -379,8 +379,8 @@ static void get_custom_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
             *y1out++ = crop( (*y1in++ * m[0] + (*uin++ -U) * m[1] + (*vin++ -V) * m[2])
                        / 65536 );
         }
-        y1in  += 2*i_pitch - i_visible_pitch;
-        y1out += 2*i_pitch - i_visible_pitch;
+        y1in  += i_pitch - i_visible_pitch;
+        y1out += i_pitch - i_visible_pitch;
         uin   += i_uv_pitch - i_uv_visible_pitch;
         uout  += i_uv_pitch - i_uv_visible_pitch;
         vin   += i_uv_pitch - i_uv_visible_pitch;
