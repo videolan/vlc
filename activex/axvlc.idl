@@ -205,9 +205,9 @@ library AXVLC
         [propput, helpstring("Returns/sets audio track used/to use.")]
         HRESULT track([in] long track);
 
-        [propget, helpstring("Returns audio channel: reverse, stereo, left, right, dolby.")]
+        [propget, helpstring("Returns audio channel: reverse stereo, stereo, left, right, dolby.")]
         HRESULT channel([out, retval] BSTR* channel);
-        [propput, helpstring("Sets audio channel to: reverse, stereo, left, right, dolby.")]
+        [propput, helpstring("Sets audio channel to: reverse stereo, stereo, left, right, dolby.")]
         HRESULT channel([in] BSTR channel);
     };
 

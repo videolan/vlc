@@ -200,10 +200,10 @@ vlc_bool_t libvlc_input_has_vout( libvlc_input_t *p_input,
     if ( libvlc_exception_raised( p_e ) )
     {
         if ( strcmp( "No active video output", libvlc_exception_get_message( p_e ) ) == 0 )
-	{
-	    libvlc_exception_clear( p_e );
-	}
-	return VLC_FALSE;
+        {
+            libvlc_exception_clear( p_e );
+        }
+        return VLC_FALSE;
     }
 
     vlc_object_release( p_vout );
@@ -221,7 +221,7 @@ int libvlc_video_reparent( libvlc_input_t *p_input, libvlc_drawable_t d,
         /// \todo: set exception
         return 0;
     }
-    
+
     vout_Control( p_vout , VOUT_REPARENT, d);
     vlc_object_release( p_vout );
 

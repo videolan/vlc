@@ -80,7 +80,7 @@ protected:
 
     LibvlcInputNPObject(NPP instance, const NPClass *aClass) :
         RuntimeNPObject(instance, aClass) {};
-        
+
     virtual ~LibvlcInputNPObject() {};
 
     static const int propertyCount;
@@ -106,7 +106,7 @@ protected:
 
     LibvlcMessageNPObject(NPP instance, const NPClass *aClass) :
         RuntimeNPObject(instance, aClass) {};
-        
+
     virtual ~LibvlcMessageNPObject() {};
 
     static const int propertyCount;
@@ -152,7 +152,7 @@ protected:
 
     LibvlcMessagesNPObject(NPP instance, const NPClass *aClass) :
         RuntimeNPObject(instance, aClass) {};
-        
+
     virtual ~LibvlcMessagesNPObject() {};
 
     static const int propertyCount;

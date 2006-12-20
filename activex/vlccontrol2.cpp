@@ -211,7 +211,9 @@ STDMETHODIMP VLCAudio::get_track(long* track)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        *track = libvlc_audio_get_track(p_libvlc, &ex);
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        *track = libvlc_audio_get_track(p_input, &ex);
+        libvlc_input_free(p_input);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
@@ -232,7 +234,9 @@ STDMETHODIMP VLCAudio::put_track(long track)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_audio_set_track(p_libvlc, track, &ex);
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_audio_set_track(p_input, track, &ex);
+        libvlc_input_free(p_input);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
@@ -265,9 +269,11 @@ STDMETHODIMP VLCAudio::get_channel(BSTR *channel)
 
             *channel = BSTRFromCStr(CP_UTF8, psz_channel);
             free( psz_channel );
-            return NOERROR;
+            psz_channel = NULL;
+            return (NULL == *channel) ? E_OUTOFMEMORY : NOERROR;
         }
         if( psz_channel ) free( psz_channel );
+        psz_channel = NULL;
         _p_instance->setErrorInfo(IID_IVLCAudio,
                     libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -297,7 +303,6 @@ STDMETHODIMP VLCAudio::put_channel(BSTR channel)
             return E_OUTOFMEMORY;
 
         libvlc_audio_set_channel(p_libvlc, psz_channel, &ex);
-
         CoTaskMemFree(psz_channel);
         if( libvlc_exception_raised(&ex) )
         {
@@ -2087,12 +2092,13 @@ STDMETHODIMP VLCVideo::get_aspectRatio(BSTR* aspect)
                 if( NULL == psz_aspect )
                     return E_OUTOFMEMORY;
 
-                *aspect = SysAllocStringByteLen(psz_aspect, strlen(psz_aspect));
+                *aspect = BSTRFromCStr(CP_UTF8, psz_aspect);
                 free( psz_aspect );
                 psz_aspect = NULL;
-                return NOERROR;
+                return (NULL == *aspect) ? E_OUTOFMEMORY : NOERROR;
             }
             if( psz_aspect ) free( psz_aspect );
+            psz_aspect = NULL;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -2466,4 +2472,3 @@ STDMETHODIMP VLCControl2::get_video(IVLCVideo** obj)
     }
     return E_OUTOFMEMORY;
 };
-

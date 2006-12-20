@@ -492,33 +492,33 @@ int libvlc_audio_get_volume( libvlc_instance_t *, libvlc_exception_t * );
 void libvlc_audio_set_volume( libvlc_instance_t *, int, libvlc_exception_t *);
 
 /**
- * Get current audio track
- * \param p_instance libvlc instance
- * \param p_exception an initialized exception
- * \return the audio track (int)
- */
-int libvlc_audio_get_track( libvlc_instance_t *, libvlc_exception_t * );
++  * Get current audio track
++  * \param p_input input instance
++  * \param p_exception an initialized exception
++  * \return the audio track (int)
++  */
+int libvlc_audio_get_track( libvlc_input_t *, libvlc_exception_t * );
 
 /**
  * Set current audio track
- * \param p_instance libvlc instance
+ * \param p_input input instance
  * \param i_track the track (int)
  * \param p_exception an initialized exception
  * \return void
  */
-void libvlc_audio_set_track( libvlc_instance_t *, int, libvlc_exception_t * );
+void libvlc_audio_set_track( libvlc_input_t *, int, libvlc_exception_t * );
 
 /**
  * Get current audio channel
- * \param p_instance libvlc instance
+ * \param p_instance input instance
  * \param p_exception an initialized exception
  * \return the audio channel (char *)
  */
 char *libvlc_audio_get_channel( libvlc_instance_t *, libvlc_exception_t * );
 
 /**
- * Set current audio track
- * \param p_instance libvlc instance
+ * Set current audio channel
+ * \param p_instance input instance
  * \param psz_channel the audio channel (char *)
  * \param p_exception an initialized exception
  * \return void
