@@ -80,10 +80,13 @@ void DialogsProvider::customEvent( QEvent *event )
         switch( de->i_dialog )
         {
             case INTF_DIALOG_FILE:
+                openDialog(); break;
             case INTF_DIALOG_DISC:
+                openDiscDialog(); break;
             case INTF_DIALOG_NET:
+                openNetDialog(); break;
             case INTF_DIALOG_CAPTURE:
-                openDialog( de->i_dialog ); break;
+                openDialog(); break;
             case INTF_DIALOG_PLAYLIST:
                 playlistDialog(); break;
             case INTF_DIALOG_MESSAGES:
@@ -158,16 +161,26 @@ void DialogsProvider::openDialog()
 {
     openDialog( 0 );
 }
+void DialogsProvider::openDiscDialog()
+{
+    openDialog( 1 );
+}
+void DialogsProvider::openNetDialog()
+{
+    openDialog( 2 );
+}
+void DialogsProvider::openDialog( int i_tab )
+{
+    OpenDialog::getInstance( p_intf->p_sys->p_mi  , p_intf )->showTab( i_tab );
+}
+
 void DialogsProvider::PLAppendDialog()
 {
 }
 void DialogsProvider::MLAppendDialog()
 {
 }
-void DialogsProvider::openDialog( int i_tab )
-{
-    OpenDialog::getInstance( p_intf->p_sys->p_mi  , p_intf )->showTab( i_tab );
-}
+
 
 /**** Simple open ****/
 

@@ -83,9 +83,11 @@ public slots:
     void simpleMLAppendDialog();
     void simpleOpenDialog();
     void openDialog();
+    void openDialog(int );
+    void openNetDialog();
+    void openDiscDialog();
     void PLAppendDialog();
     void MLAppendDialog();
-    void openDialog( int );
     void popupMenu( int );
     void doInteraction( intf_dialog_args_t * );
     void menuAction( QObject *);
