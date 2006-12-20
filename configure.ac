@@ -844,7 +844,7 @@ dnl Check for dbus
 AC_ARG_ENABLE(dbus,
   [  --enable-dbus           Linux D-BUS message bus system (default enabled)])
  
-if test "${enable_dbus}" != "no"
+if test "${enable_dbus}" != "no" -a "$SYS" = "Linux"
 then
   dnl api stable dbus
   PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.0.0,
@@ -5279,6 +5279,7 @@ then
 	     ]
           )
           activex=:
+  	  PLUGINS_BINDINGS="${PLUGINS_BINDINGS} activex"
         ],
         [ AC_MSG_ERROR([required OLE headers are missing from your system]) ]
       )],
@@ -5341,6 +5342,7 @@ then
     fi
 
       mozilla=:
+      PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
       dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
       VLC_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`]])
       if ${need_xpcom_libs}; then
@@ -5392,6 +5394,7 @@ then
     fi
     MOZILLA_REQUIRED_HEADERS=
     mozilla=:
+    PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
     VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -DHAVE_CPP_MODERN_SPECIALIZE_TEMPLATE_SYNTAX -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
     if ${need_xpcom_libs}; then
        VLC_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -L${real_mozilla_sdk}/lib -lnspr4 -lplds4 -lplc4 -lxpcomglue])
@@ -5420,6 +5423,10 @@ dnl
 AC_ARG_ENABLE(python-bindings,
   [  --enable-python-bindings    Enable Python bindings (default disabled)])
 dnl TODO: look for python dev headers
+AS_IF([test "${enable_python_bindings}" = "yes"],
+      PLUGINS_BINDINGS="${PLUGINS_BINDINGS} python"
+     ) 
+
 AM_CONDITIONAL(BUILD_PYTHON, [test "${enable_python_bindings}" = "yes"])
 
 dnl
@@ -5433,6 +5440,7 @@ then
 	[AC_MSG_ERROR([Please set the JAVA_HOME variable to your JDK environment])])
   AC_PROG_JAVAC
   AC_PROG_JAVA
+  PLUGINS_BINDINGS="${PLUGINS_BINDINGS} java"
 fi
 AM_CONDITIONAL(BUILD_JAVA, [test "${enable_java_bindings}" = "yes"])
 
@@ -5754,6 +5762,7 @@ test "${enable_optimizations}" = "yes" && printf "optim "
 test "${enable_release}" = "yes" && printf "release " || printf "devel "
 echo "
 vlc aliases           :${ALIASES}
+plugins/bindings      :${PLUGINS_BINDINGS}
 
 You can tune the compiler flags in vlc-config.
 To build vlc and its plugins, type \`./compile' or \`make'.
