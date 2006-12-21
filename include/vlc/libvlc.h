@@ -371,7 +371,7 @@ int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *);
  * \param width new width for video output window
  * \param height new height for video output window
  * \param p_exception an initialized exception
- * \return the mute status (boolean)
+ * \return the success status (boolean)
  */
 void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exception_t *);
 
@@ -387,7 +387,7 @@ void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exception_t *);
  * \param p_instance libvlc instance
  * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
  * \param p_exception an initialized exception
- * \return the mute status (boolean)
+ * \return the success status (boolean)
  */
 int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, libvlc_exception_t * );
 
@@ -487,7 +487,6 @@ int libvlc_audio_get_volume( libvlc_instance_t *, libvlc_exception_t * );
  * \param p_instance libvlc instance
  * \param i_volume the volume (int)
  * \param p_exception an initialized exception
- * \return void
  */
 void libvlc_audio_set_volume( libvlc_instance_t *, int, libvlc_exception_t *);
 
@@ -504,7 +503,6 @@ int libvlc_audio_get_track( libvlc_input_t *, libvlc_exception_t * );
  * \param p_input input instance
  * \param i_track the track (int)
  * \param p_exception an initialized exception
- * \return void
  */
 void libvlc_audio_set_track( libvlc_input_t *, int, libvlc_exception_t * );
 
@@ -521,7 +519,6 @@ char *libvlc_audio_get_channel( libvlc_instance_t *, libvlc_exception_t * );
  * \param p_instance input instance
  * \param psz_channel the audio channel (char *)
  * \param p_exception an initialized exception
- * \return void
  */
 void libvlc_audio_set_channel( libvlc_instance_t *, char *, libvlc_exception_t * );
 
