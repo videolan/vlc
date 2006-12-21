@@ -27,6 +27,9 @@ Playlist:
     * Shoutcast TV listings
     * Audioscrobbler/last.fm support
 
+Decoders:
+ * VP60/VP61 codecs support
+
 Video output:
  * Adjust, Invert and Distort (now splitted into Wave, Ripple, Gradient
    and Psychedelic) video filters can now be streamed
