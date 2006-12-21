@@ -1549,7 +1549,11 @@ static int ParseVideoFilter2Chain( vout_thread_t *p_vout, char *psz_vfilters )
         struct config_chain_t *p_cfg =
             p_vout->p_vfilters_cfg[p_vout->i_vfilters_cfg];
         config_ChainDestroy( p_cfg );
-        free( p_vout->psz_vfilters[p_vout->i_vfilters_cfg] );
+        if( p_vout->psz_vfilters[p_vout->i_vfilters_cfg] )
+        {
+            free( p_vout->psz_vfilters[p_vout->i_vfilters_cfg] );
+            p_vout->psz_vfilters[p_vout->i_vfilters_cfg] = NULL;
+        }
     }
     p_vout->i_vfilters_cfg = 0;
     if( psz_vfilters && *psz_vfilters )

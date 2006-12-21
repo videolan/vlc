@@ -130,21 +130,28 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
     {
         if( psz_parser )
         {
-            memmove( psz_parser, psz_parser + strlen(psz_name) +
-                            (*(psz_parser + strlen(psz_name)) == ':' ? 1 : 0 ),
-                            strlen(psz_parser + strlen(psz_name)) + 1 );
+            if( *(psz_parser + strlen(psz_name)) == ':' )
+            {
+                memmove( psz_parser, psz_parser + strlen(psz_name) + 1,
+                         strlen(psz_parser + strlen(psz_name) + 1 ) + 1 );
+            }
+            else
+            {
+                *psz_parser = '\0';
+            }
 
             /* Remove trailing : : */
-            if( *(psz_string+strlen(psz_string ) -1 ) == ':' )
+            if( strlen( psz_string ) > 0 &&
+                *( psz_string + strlen( psz_string ) -1 ) == ':' )
             {
-                *(psz_string+strlen(psz_string ) -1 ) = '\0';
+                *( psz_string + strlen( psz_string ) -1 ) = '\0';
             }
-         }
-         else
-         {
-             free( psz_string );
-             return;
-         }
+        }
+        else
+        {
+            free( psz_string );
+            return;
+        }
     }
     /* Vout is not kept, so put that in the config */
     config_PutPsz( p_intf, "video-filter", psz_string );
