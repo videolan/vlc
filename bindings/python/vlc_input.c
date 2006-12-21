@@ -162,10 +162,183 @@ vlcInput_get_fps( PyObject *self, PyObject *args )
     return Py_BuildValue( "f", f_ret );
 }
 
+static PyObject *
+vlcInput_audio_get_track( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_ret;
+
+    LIBVLC_TRY;
+    i_ret = libvlc_audio_get_track( LIBVLC_INPUT->p_input, &ex );
+    LIBVLC_EXCEPT;
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcInput_audio_set_track( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_track;
+
+    if( !PyArg_ParseTuple( args, "i", &i_track ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_audio_set_track( LIBVLC_INPUT->p_input, i_track, &ex );
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInput_toggle_fullscreen( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+
+    LIBVLC_TRY;
+    libvlc_toggle_fullscreen( LIBVLC_INPUT->p_input, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;    
+}
+
+static PyObject *
+vlcInput_set_fullscreen( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_fullscreen;
+
+    if( !PyArg_ParseTuple( args, "i", &i_fullscreen ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_set_fullscreen( LIBVLC_INPUT->p_input, i_fullscreen, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInput_get_fullscreen( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_ret;
+
+    LIBVLC_TRY;
+    i_ret = libvlc_get_fullscreen( LIBVLC_INPUT->p_input, &ex);
+    LIBVLC_EXCEPT;
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcInput_get_height( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_ret;
+
+    LIBVLC_TRY;
+    i_ret = libvlc_video_get_height( LIBVLC_INPUT->p_input, &ex);
+    LIBVLC_EXCEPT;
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcInput_get_width( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_ret;
+
+    LIBVLC_TRY;
+    i_ret = libvlc_video_get_width( LIBVLC_INPUT->p_input, &ex);
+    LIBVLC_EXCEPT;
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcInput_get_aspect_ratio( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    char* psz_ret;
+    PyObject* o_ret;
+
+    LIBVLC_TRY;
+    psz_ret = libvlc_video_get_aspect_ratio( LIBVLC_INPUT->p_input, &ex);
+    LIBVLC_EXCEPT;
+    o_ret=Py_BuildValue( "s", psz_ret );
+    free( psz_ret );
+    return o_ret;
+}
+
+static PyObject *
+vlcInput_set_aspect_ratio( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    char* psz_ratio;
+
+    if( !PyArg_ParseTuple( args, "s", &psz_ratio ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_video_set_aspect_ratio( LIBVLC_INPUT->p_input, psz_ratio, &ex);
+    LIBVLC_EXCEPT;
+    free( psz_ratio );
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInput_video_take_snapshot( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    char* psz_filename;
+
+    if( !PyArg_ParseTuple( args, "s", &psz_filename ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_video_take_snapshot( LIBVLC_INPUT->p_input, psz_filename, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInput_video_resize( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    int i_width;
+    int i_height;
+
+    if( !PyArg_ParseTuple( args, "ii", &i_width, &i_height ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_video_resize( LIBVLC_INPUT->p_input, i_width, i_height, &ex);
+    LIBVLC_EXCEPT;
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcInput_video_reparent( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    WINDOWHANDLE i_visual;
+    int i_ret;
+
+    if( !PyArg_ParseTuple( args, "i", &i_visual ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    i_ret = libvlc_video_reparent( LIBVLC_INPUT->p_input, i_visual, &ex);
+    LIBVLC_EXCEPT;
+    return Py_BuildValue( "i", i_ret );
+}
+
 static PyMethodDef vlcInput_methods[] =
 {
     { "get_length", vlcInput_get_length, METH_VARARGS,
-      "get_length() -> long" },
+      "get_length() -> long    " },
     { "get_time", vlcInput_get_time, METH_VARARGS,
       "get_time() -> long" },
     { "set_time", vlcInput_set_time, METH_VARARGS,
@@ -186,6 +359,31 @@ static PyMethodDef vlcInput_methods[] =
       "has_vout() -> int" },
     { "get_fps", vlcInput_get_fps, METH_VARARGS,
       "get_fps() -> float" },
+    { "audio_get_track", vlcInput_audio_get_track, METH_VARARGS,
+      "audio_get_track() -> int    Get current audio track" },
+    { "audio_set_track", vlcInput_audio_set_track, METH_VARARGS,
+      "audio_set_track(int)        Set current audio track" },
+    { "toggle_fullscreen", vlcInput_toggle_fullscreen, METH_VARARGS,
+      "toggle_fullscreen()    Toggle fullscreen status on video output" },
+    { "set_fullscreen", vlcInput_set_fullscreen, METH_VARARGS,
+      "set_fullscreen(bool)    Enable or disable fullscreen on a video output" },
+    { "get_fullscreen", vlcInput_get_fullscreen, METH_VARARGS,
+      "get_fullscreen() -> bool    Get current fullscreen status" },
+    { "get_height", vlcInput_get_height, METH_VARARGS,
+      "get_height() -> int           Get current video height" },
+    { "get_width", vlcInput_get_width, METH_VARARGS,
+      "get_width() -> int           Get current video width" },
+    { "get_aspect_ratio", vlcInput_get_aspect_ratio, METH_VARARGS,
+      "get_aspect_ratio() -> str    Get current video aspect ratio" },
+    { "set_aspect_ratio", vlcInput_set_aspect_ratio, METH_VARARGS,
+      "set_aspect_ratio(str)        Set new video aspect ratio" },
+    { "video_take_snapshot", vlcInput_video_take_snapshot, METH_VARARGS,
+      "video_take_snapshot(filename=str)        Take a snapshot of the current video window" },
+    { "video_resize", vlcInput_video_resize, METH_VARARGS,
+      "video_resize(width=int, height=int)      Resize the current video output window" },
+    { "video_reparent", vlcInput_video_reparent, METH_VARARGS,
+      "video_reparent(visual=int)               change the parent for the current video output" },
+
     { NULL }  /* Sentinel */
 };
 
