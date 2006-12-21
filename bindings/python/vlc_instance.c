@@ -2,7 +2,7 @@
  * vlc_instance.c: vlc.Instance binding
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
- * $Id: $
+ * $Id$
  *
  * Authors: Olivier Aubert <oaubert at bat710.univ-lyon1.fr>
  *

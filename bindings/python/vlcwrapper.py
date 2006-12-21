@@ -1,5 +1,7 @@
 """Wrapper around vlc module in order to ease the use of vlc.Object
 class (completion in ipython, access variable as attributes, etc).
+
+$Id$
 """
 import vlc
 

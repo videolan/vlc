@@ -8,6 +8,8 @@ VLC component inside a pygtk application.
 VLCWidget is a simple VLC widget.
 
 DecoratedVLCWidget provides simple player controls.
+
+$Id$
 """
 
 import gtk
