@@ -6,7 +6,7 @@ VERSION_MINOR="9"
 VERSION_REVISION="0"
 VERSION_EXTRA="svn"
 
-CONFIGURE_LINE="$0 $ac_configure_args"
+CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="Grishenko"
 
 AC_PREREQ(2.59)
