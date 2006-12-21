@@ -364,9 +364,9 @@ void Equalizer::setValues( char *psz_bands, float f_preamp )
             sprintf( psz_val, "% 5.1f", f );
             band_texts[i]->setText( band_frequencies[i] + "\n" + psz_val +
                                     "dB" );
-            if( p == NULL ) break;
+            if( p == NULL || *p == '\0' ) break;
             p++;
-            if( *p == 0 )  break;
+            if( *p == '\0' )  break;
         }
     }
     char psz_val[5];
