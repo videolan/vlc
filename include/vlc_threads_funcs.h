@@ -29,6 +29,9 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
+#ifndef _VLC_THREADFUNCS_H_
+#define _VLC_THREADFUNCS_H_
+
 /*****************************************************************************
  * Function definitions
  *****************************************************************************/
@@ -557,11 +560,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
 /*****************************************************************************
  * vlc_threadvar_set: create: set the value of a thread-local variable
  *****************************************************************************/
-#define vlc_threadvar_set( P_TLS , P_VAL )                                   \
-   __vlc_threadvar_set( __FILE__, __LINE__, P_TLS, P_VAL )
-
-static inline int __vlc_threadvar_set( char* psz_file, int line,
-                                        vlc_threadvar_t * p_tls, void *p_value )
+static inline int vlc_threadvar_set( vlc_threadvar_t * p_tls, void *p_value )
 {
     int i_ret;
 
@@ -588,11 +587,7 @@ static inline int __vlc_threadvar_set( char* psz_file, int line,
 /*****************************************************************************
  * vlc_threadvar_get: create: get the value of a thread-local variable
  *****************************************************************************/
-#define vlc_threadvar_get( P_TLS )                                         \
-   __vlc_threadvar_get( __FILE__, __LINE__, P_TLS )
-
-static inline void* __vlc_threadvar_get( char* psz_file, int line,
-                                         vlc_threadvar_t * p_tls )
+static inline void* vlc_threadvar_get( vlc_threadvar_t * p_tls )
 {
     void* p_ret;
 
@@ -641,3 +636,5 @@ static inline void* __vlc_threadvar_get( char* psz_file, int line,
  *****************************************************************************/
 #define vlc_thread_join( P_THIS )                                           \
     __vlc_thread_join( VLC_OBJECT(P_THIS), __FILE__, __LINE__ )
+
+#endif

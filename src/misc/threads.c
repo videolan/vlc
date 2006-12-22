@@ -49,6 +49,8 @@ static vlc_object_t *p_root;
 #elif defined( HAVE_CTHREADS_H )
 #endif
 
+vlc_threadvar_t msg_context_global_key;
+
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
  *****************************************************************************
@@ -130,6 +132,8 @@ int __vlc_threads_init( vlc_object_t *p_this )
             i_initializations++;
             i_status = VLC_THREADS_READY;
         }
+
+        vlc_threadvar_create( p_root, &msg_context_global_key );
     }
     else
     {
@@ -505,30 +509,25 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
  *****************************************************************************/
 int __vlc_threadvar_create( vlc_object_t *p_this, vlc_threadvar_t *p_tls )
 {
+    int i_ret;
 #if defined( PTH_INIT_IN_PTH_H )
-    return pth_key_create( &p_tls->handle, NULL );
+    i_ret = pth_key_create( &p_tls->handle, NULL );
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     msg_Err( p_this, "TLS not implemented" );
-    return VLC_EGENERIC;
+    i_ret VLC_EGENERIC;
 #elif defined( ST_INIT_IN_ST_H )
-    return st_key_create( &p_tls->handle, NULL );
+    i_ret = st_key_create( &p_tls->handle, NULL );
 #elif defined( UNDER_CE ) || defined( WIN32 )
 #elif defined( WIN32 )
     p_tls->handle = TlsAlloc();
-    if( p_tls->handle == 0xFFFFFFFF )
-    {
-        return VLC_EGENERIC;
-    }
-
-    msg_Err( p_this, "TLS not implemented" );
-    return VLC_EGENERIC;
+    i_ret = !( p_tls->handle == 0xFFFFFFFF );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    return pthread_key_create( &p_tls->handle, NULL );
-
+    i_ret =  pthread_key_create( &p_tls->handle, NULL );
 #elif defined( HAVE_CTHREADS_H )
-    return cthread_keycreate( &p_tls-handle );
+    i_ret = cthread_keycreate( &p_tls-handle );
 #endif
+    return i_ret;
 }
 
 /*****************************************************************************

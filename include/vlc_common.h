@@ -1177,6 +1177,14 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #include "main.h"
 #include "vlc_configuration.h"
 
+/** The global thread var for msg stack context
+ *  We store this as a static global variable so we don't need a vlc_object_t
+ *  everywhere.
+ *  This key is created in vlc_threads_init and is therefore ready to use at
+ *  the very beginning of the universe */
+extern vlc_threadvar_t msg_context_global_key;
+
+
 #if defined( __BORLANDC__ )
 #   undef PACKAGE
 #   define PACKAGE

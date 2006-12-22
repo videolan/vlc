@@ -44,9 +44,19 @@ int vlc_mutex_unlock(  vlc_mutex_t * ) ;
  * @{
  */
 
+/** Internal message stack context */
+typedef struct
+{
+    int i_code;
+    char * psz_message;
+} msg_context_t;
+
+VLC_EXPORT( void,  msg_StackSet, ( int, const char*, ... ) );
+VLC_EXPORT( void,  msg_StackAdd, ( const char*, ... ) );
+VLC_EXPORT( const char*, msg_StackMsg, ( void ) );
 
 /**
- * Store a single message.
+ * Store a single message sent to user.
  */
 typedef struct
 {

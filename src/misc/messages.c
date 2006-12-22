@@ -583,3 +583,64 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 #   endif
 #endif
 }
+
+static msg_context_t* GetContext(void)
+{
+    msg_context_t *p_ctx = vlc_threadvar_get( &msg_context_global_key );
+    if( p_ctx == NULL )
+    {
+        MALLOC_NULL( p_ctx, msg_context_t );
+        p_ctx->psz_message = NULL;
+        vlc_threadvar_set( &msg_context_global_key, p_ctx );
+    }
+    return p_ctx;
+}
+
+void msg_StackSet( int i_code, const char *psz_message, ... )
+{
+    va_list ap;
+    msg_context_t *p_ctx = GetContext();
+    assert( p_ctx );
+    va_start( ap, psz_message );
+    if( p_ctx->psz_message != NULL )
+    {
+        free( p_ctx->psz_message );
+    }
+
+    vasprintf( &p_ctx->psz_message, psz_message, ap );
+    va_end( ap );
+    p_ctx->i_code = i_code;
+}
+
+void msg_StackAdd( const char *psz_message, ... )
+{
+    char *psz_tmp;
+    va_list ap;
+    msg_context_t *p_ctx = GetContext();
+    assert( p_ctx );
+
+    va_start( ap, psz_message );
+    vasprintf( &psz_tmp, psz_message, ap );
+    va_end( ap );
+
+    if( !p_ctx->psz_message )
+        p_ctx->psz_message = psz_tmp;
+    else
+    {
+        char *psz_old = malloc( strlen( p_ctx->psz_message ) + 1 );
+        memcpy( psz_old, p_ctx->psz_message, strlen( p_ctx->psz_message ) + 1 );
+        p_ctx->psz_message = realloc( p_ctx->psz_message,
+                                      strlen( p_ctx->psz_message ) +
+                                      /* ':', ' ', '0' */
+                                      strlen( psz_tmp ) + 3 );
+        sprintf( p_ctx->psz_message, "%s: %s", psz_tmp, psz_old );
+        free( psz_tmp ); free( psz_old );
+    }
+}
+
+const char* msg_StackMsg( void )
+{
+    msg_context_t *p_ctx = GetContext();
+    assert( p_ctx );
+    return p_ctx->psz_message;
+}

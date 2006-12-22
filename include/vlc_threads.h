@@ -29,6 +29,9 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
+#ifndef _VLC_THREADS_H_
+#define _VLC_THREADS_H_
+
 #include <stdio.h>
 
 #if defined(DEBUG) && defined(HAVE_SYS_TIME_H)
@@ -274,3 +277,4 @@ typedef struct
 
 #endif
 
+#endif

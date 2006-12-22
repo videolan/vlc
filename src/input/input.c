@@ -2073,7 +2073,8 @@ static int InputSourceInit( input_thread_t *p_input,
 
         if( in->p_access == NULL )
         {
-            msg_Err( p_input, "no suitable access module for `%s'", psz_mrl );
+            msg_Err( p_input, "open of `%s' failed: %s", psz_mrl,
+                                                         msg_StackMsg() );
             intf_UserFatal( VLC_OBJECT( p_input), VLC_FALSE,
                             _("Your input can't be opened"),
                             _("VLC is unable to open the MRL '%s'."
