@@ -158,21 +158,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
 void playlist_Destroy( playlist_t *p_playlist )
 {
-    while( p_playlist->i_sds )
-    {
-        playlist_ServicesDiscoveryRemove( p_playlist,
-                                          p_playlist->pp_sds[0]->psz_module );
-    }
-
-    playlist_MLDump( p_playlist );
-
-    vlc_thread_join( p_playlist->p_preparse );
-    vlc_thread_join( p_playlist->p_fetcher );
-    vlc_thread_join( p_playlist );
-
-    vlc_object_detach( p_playlist->p_preparse );
-    vlc_object_detach( p_playlist->p_fetcher );
-
     var_Destroy( p_playlist, "intf-change" );
     var_Destroy( p_playlist, "item-change" );
     var_Destroy( p_playlist, "playlist-current" );
@@ -185,34 +170,7 @@ void playlist_Destroy( playlist_t *p_playlist )
     var_Destroy( p_playlist, "loop" );
     var_Destroy( p_playlist, "activity" );
 
-    PL_LOCK;
-    /* Go through all items, and simply free everything without caring
-     * about the tree structure. Do not decref, it will be done by doing
-     * the same thing on the input items array */
-    FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
-        free( p_del->pp_children );
-        free( p_del );
-    FOREACH_END();
-    ARRAY_RESET( p_playlist->all_items );
-
-    FOREACH_ARRAY( input_item_t *p_del, p_playlist->input_items )
-        input_ItemClean( p_del );
-        free( p_del );
-    FOREACH_END();
-    ARRAY_RESET( p_playlist->input_items );
-
-    ARRAY_RESET( p_playlist->items );
-    ARRAY_RESET( p_playlist->current );
-
-    PL_UNLOCK;
-
-    vlc_mutex_destroy( &p_playlist->p_stats->lock );
-    if( p_playlist->p_stats )
-        free( p_playlist->p_stats );
-
     vlc_mutex_destroy( &p_playlist->gc_lock );
-    vlc_object_destroy( p_playlist->p_preparse );
-    vlc_object_destroy( p_playlist->p_fetcher );
     vlc_object_detach( p_playlist );
     vlc_object_destroy( p_playlist );
 }
@@ -474,6 +432,35 @@ void playlist_LastLoop( playlist_t *p_playlist )
         vlc_object_release( p_obj );
         vout_Destroy( (vout_thread_t *)p_obj );
     }
+
+    while( p_playlist->i_sds )
+    {
+        playlist_ServicesDiscoveryRemove( p_playlist,
+                                          p_playlist->pp_sds[0]->psz_module );
+    }
+
+    playlist_MLDump( p_playlist );
+
+    PL_LOCK;
+    /* Go through all items, and simply free everything without caring
+     * about the tree structure. Do not decref, it will be done by doing
+     * the same thing on the input items array */
+    FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
+        free( p_del->pp_children );
+        free( p_del );
+    FOREACH_END();
+    ARRAY_RESET( p_playlist->all_items );
+
+    FOREACH_ARRAY( input_item_t *p_del, p_playlist->input_items )
+        input_ItemClean( p_del );
+        free( p_del );
+    FOREACH_END();
+    ARRAY_RESET( p_playlist->input_items );
+
+    ARRAY_RESET( p_playlist->items );
+    ARRAY_RESET( p_playlist->current );
+
+    PL_UNLOCK;
 }
 
 /** Main loop for preparser queue */

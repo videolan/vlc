@@ -36,10 +36,6 @@ static void RunControlThread ( playlist_t * );
 static void RunPreparse( playlist_preparse_t * );
 static void RunFetcher( playlist_fetcher_t * );
 
-static playlist_t * CreatePlaylist( vlc_object_t *p_parent );
-static void EndPlaylist( playlist_t * );
-static void DestroyPlaylist( playlist_t * );
-
 static void DestroyInteraction( playlist_t * );
 
 /*****************************************************************************
@@ -57,9 +53,7 @@ static void DestroyInteraction( playlist_t * );
  */
 void __playlist_ThreadCreate( vlc_object_t *p_parent )
 {
-    playlist_t *p_playlist;
-    p_playlist = CreatePlaylist( p_parent );
-
+    playlist_t *p_playlist = playlist_Create( p_parent );
     if( !p_playlist ) return;
 
     // Stats
@@ -142,21 +136,41 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
  */
 int playlist_ThreadDestroy( playlist_t * p_playlist )
 {
+    // Tell playlist to go to last loop
     p_playlist->b_die = VLC_TRUE;
     playlist_Signal( p_playlist );
+
+    // Kill preparser
     if( p_playlist->p_preparse )
     {
         vlc_cond_signal( &p_playlist->p_preparse->object_wait );
         free( p_playlist->p_preparse->pp_waiting );
     }
+    vlc_thread_join( p_playlist->p_preparse );
+    vlc_object_detach( p_playlist->p_preparse );
+    vlc_object_destroy( p_playlist->p_preparse );
+
+    // Kill meta fetcher
     if( p_playlist->p_fetcher )
     {
         vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
         free( p_playlist->p_fetcher->p_waiting );
     }
+    vlc_thread_join( p_playlist->p_fetcher );
+    vlc_object_detach( p_playlist->p_fetcher );
+    vlc_object_destroy( p_playlist->p_fetcher );
+
+    // Wait for thread to complete
+    vlc_thread_join( p_playlist );
+
+    // Stats
+    vlc_mutex_destroy( &p_playlist->p_stats->lock );
+    if( p_playlist->p_stats )
+        free( p_playlist->p_stats );
 
     DestroyInteraction( p_playlist );
-    DestroyPlaylist( p_playlist );
+
+    playlist_Destroy( p_playlist );
 
     return VLC_SUCCESS;
 }
@@ -192,25 +206,6 @@ static void RunControlThread ( playlist_t *p_playlist )
         }
     }
 
-    EndPlaylist( p_playlist );
-}
-
-
-/*****************************************************************************
- * Playlist-specific functions
- *****************************************************************************/
-static playlist_t * CreatePlaylist( vlc_object_t *p_parent )
-{
-    return playlist_Create( p_parent );
-}
-
-static void DestroyPlaylist( playlist_t *p_playlist )
-{
-    playlist_Destroy( p_playlist );
-}
-
-static void EndPlaylist( playlist_t *p_playlist )
-{
     playlist_LastLoop( p_playlist );
 }
 
