@@ -100,7 +100,7 @@ $(MOCCPP): %.moc.cpp: %.hpp
 	$(MOC) -o $@ $<
 
 $(UIH): %.h: %.ui
-	$(install_sh) -d ui
+	mkdir -p -- ui
 	@echo "$(UIC) $< -> $@"
 	rm -f $@
 	echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@
