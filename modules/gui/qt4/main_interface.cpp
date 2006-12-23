@@ -1,5 +1,5 @@
 /*****************************************************************************
- * main_inteface.cpp : Main interface
+ * main_interface.cpp : Main interface
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
@@ -564,7 +564,7 @@ void MainInterface::play()
     if( playlist_IsEmpty(THEPL) )
     {
         /* The playlist is empty, open a file requester */
-        THEDP->simpleOpenDialog();
+        THEDP->openFileDialog();
         setStatus( 0 );
         return;
     }
