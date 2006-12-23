@@ -77,11 +77,12 @@ void InputManager::delInput()
 void InputManager::update()
 {
     /// \todo Emit the signals only if it changed
-    if( !p_input  ) return;
+    if( !p_input ) return;
 
     if( p_input->b_dead || p_input->b_die )
     {
         emit positionUpdated( 0.0, 0, 0 );
+        msg_Dbg( p_intf, "*********** NAV 0");
         emit navigationChanged( 0 );
         emit statusChanged( 0 ); // 0 = STOPPED, 1 = PLAY, 2 = PAUSE
     }
@@ -100,21 +101,26 @@ void InputManager::update()
     emit positionUpdated( f_pos, i_time, i_length );
 
     /* Update disc status */
-    vlc_value_t val;
+    vlc_value_t val; val.i_int = 0;
     var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
     if( val.i_int > 0 )
     {
-        vlc_value_t val;
+        val.i_int = 0;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
         if( val.i_int > 0 )
         {
+            msg_Dbg( p_intf, "******* CHAPTER");
             emit navigationChanged( 1 ); // 1 = chapter, 2 = title, 0 = NO
         }
         else
+        {
+            msg_Dbg( p_intf, "******* TITLE");
             emit navigationChanged( 2 );
+        }
     }
     else
     {
+        msg_Dbg( p_intf, "******** NONE" );
         emit navigationChanged( 0 );
     }
 
