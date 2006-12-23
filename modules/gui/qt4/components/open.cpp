@@ -59,13 +59,8 @@ void FileOpenPanel::browseFile()
     QString fileString = "";
     QStringList files = browse( qtr("Open File") );
     foreach( QString file, files) {
-        if( file.contains(" ") ) {
-            fileString += "\"" + file + "\"";
-        } else {
-            fileString += file;
-        }
+        fileString += "\"" + file + "\" ";
     }
-
     ui.fileInput->setEditText( fileString );
     ui.fileInput->addItem( fileString );
     if ( ui.fileInput->count() > 8 ) ui.fileInput->removeItem(0);

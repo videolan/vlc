@@ -23,6 +23,7 @@
 #include <QTabWidget>
 #include <QGridLayout>
 #include <QFileDialog>
+#include <QRegExp>
 
 #include "dialogs/open.hpp"
 #include "components/open.hpp"
@@ -107,11 +108,14 @@ void OpenDialog::ok()
 {
     this->toggleVisible();
     mrl = ui.advancedLineInput->text();
-    QStringList tempMRL = mrl.split(" ");
+    QStringList tempMRL = mrl.split( QRegExp("\"\\s+\""),
+                                     QString::SkipEmptyParts );
     if( !isModal() )
     {
         for( size_t i = 0 ; i< tempMRL.size(); i++ )
         {
+             QString mrli = tempMRL[i].remove( QRegExp( "^\"" ) ).
+                                       remove( QRegExp( "\"\\s+$" ) );
              const char * psz_utf8 = qtu( tempMRL[i] );
              /* Play the first one, parse and enqueue the other ones */
              playlist_Add( THEPL, psz_utf8, NULL,
