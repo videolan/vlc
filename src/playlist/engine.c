@@ -291,7 +291,9 @@ check_input:
         else if( p_playlist->p_input->b_die )
         {
             PL_DEBUG( "dying input" );
+            PL_UNLOCK;
             msleep( 25000 ); // 25 ms
+            PL_LOCK;
             goto check_input;
         }
         /* This input has finished, ask it to die ! */
