@@ -351,7 +351,7 @@ endif
 
 # Install the symlinks
 install-exec-local: install-binPROGRAMS
-        inst="`echo vlc | sed -e '$(transform)'`" ; \
+	inst="`echo vlc | sed -e '$(transform)'`" ; \
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
 	  rm -f "$(DESTDIR)$(bindir)/$$i" && \
 	  ln -sf "$${inst}" "$(DESTDIR)$(bindir)/$$i" ; \
