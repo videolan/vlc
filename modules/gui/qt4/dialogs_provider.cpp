@@ -161,6 +161,10 @@ void DialogsProvider::openDialog()
 {
     openDialog( 0 );
 }
+void DialogsProvider::openFileDialog()
+{
+    openDialog( 0 );
+}
 void DialogsProvider::openDiscDialog()
 {
     openDialog( 1 );
@@ -184,30 +188,43 @@ void DialogsProvider::MLAppendDialog()
 
 /**** Simple open ****/
 
-QStringList DialogsProvider::showSimpleOpen()
+QStringList DialogsProvider::showSimpleOpen(QString help, bool all,
+                                            bool audio, bool video,
+                                            bool subs, bool pls)
 {
-    QString FileTypes;
-    FileTypes = _("Media Files");
-    FileTypes += " ( ";
-    FileTypes += EXTENSIONS_MEDIA;
-    FileTypes += ");;";
-    FileTypes += _("Video Files");
-    FileTypes += " ( ";
-    FileTypes += EXTENSIONS_VIDEO;
-    FileTypes += ");;";
-    FileTypes += _("Sound Files");
-    FileTypes += " ( ";
-    FileTypes += EXTENSIONS_AUDIO;
-    FileTypes += ");;";
-    FileTypes += _("PlayList Files");
-    FileTypes += " ( ";
-    FileTypes += EXTENSIONS_PLAYLIST;
-    FileTypes += ");;";
-    FileTypes += _("All Files");
-    FileTypes += " (*.*)";
-    FileTypes.replace(QString(";*"), QString(" *"));
-    return QFileDialog::getOpenFileNames( NULL, qfu(I_OP_SEL_FILES ),
-                    p_intf->p_libvlc->psz_homedir, FileTypes );
+    QString fileTypes;
+    if( all ) {
+        fileTypes = _("Media Files");
+        fileTypes += " ( ";
+        fileTypes += EXTENSIONS_MEDIA;
+        fileTypes += ");;";
+    }
+    if( video ) {
+        fileTypes += _("Video Files");
+        fileTypes += " ( ";
+        fileTypes += EXTENSIONS_VIDEO;
+        fileTypes += ");;";
+    }
+    if( audio ) {
+        fileTypes += _("Sound Files");
+        fileTypes += " ( ";
+        fileTypes += EXTENSIONS_AUDIO;
+        fileTypes += ");;";
+    }
+    if( pls ) {
+        fileTypes += _("PlayList Files");
+        fileTypes += " ( ";
+        fileTypes += EXTENSIONS_PLAYLIST;
+        fileTypes += ");;";
+    }
+    fileTypes += _("All Files");
+    fileTypes += " (*.*)";
+    fileTypes.replace(QString(";*"), QString(" *"));
+    return QFileDialog::getOpenFileNames( NULL,
+                                          help.isNull() ?
+                                              qfu(I_OP_SEL_FILES ) : help,
+                                          p_intf->p_libvlc->psz_homedir,
+                                          fileTypes );
 }
 
 void DialogsProvider::addFromSimple( bool pl, bool go)
@@ -244,7 +261,8 @@ void DialogsProvider::simpleOpenDialog()
 
 void DialogsProvider::openPlaylist()
 {
-    QStringList files = showSimpleOpen();
+    QStringList files = showSimpleOpen( qtr( "Open playlist file" ), false,
+                                        false, false, false );
     foreach( QString file, files )
     {
         playlist_Import( THEPL, qtu(file) );

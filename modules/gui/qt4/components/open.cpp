@@ -25,8 +25,7 @@
 
 #include "qt4.hpp"
 #include "components/open.hpp"
-
-#include <QFileDialog>
+#include "dialogs_provider.hpp"
 
 /**************************************************************************
  * File open
@@ -52,7 +51,7 @@ FileOpenPanel::~FileOpenPanel()
 
 QStringList FileOpenPanel::browse(QString help)
 {
-    return QFileDialog::getOpenFileNames( this, help, "", "" );
+    return THEDP->showSimpleOpen( help );
 }
 
 void FileOpenPanel::browseFile()

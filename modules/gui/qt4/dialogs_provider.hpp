@@ -59,6 +59,10 @@ public:
     }
     virtual ~DialogsProvider();
     QTimer *fixed_timer;
+
+    QStringList showSimpleOpen( QString help = QString(), bool all = true,
+                                bool video = true, bool audio = true,
+                                bool subs = true, bool pls = true );
 protected:
     friend class QVLCMenu;
     QSignalMapper *menusMapper;
@@ -69,7 +73,6 @@ private:
     DialogsProvider( intf_thread_t *);
     intf_thread_t *p_intf;
     static DialogsProvider *instance;
-    QStringList showSimpleOpen();
     void addFromSimple( bool, bool );
 
 public slots:
@@ -84,6 +87,7 @@ public slots:
     void simpleOpenDialog();
     void openDialog();
     void openDialog(int );
+    void openFileDialog();
     void openNetDialog();
     void openDiscDialog();
     void PLAppendDialog();
