@@ -139,7 +139,7 @@ static const char *ppsz_amtuner_mode_text[] = { N_("Default"),
 #define VIDEO_IN_TEXT N_("Video input pin")
 #define VIDEO_IN_LONGTEXT N_( \
   "Select the video input source, such as composite, s-video, " \
-  "or tuner. Since these settings are hardware-specfic, you should find good " \
+  "or tuner. Since these settings are hardware-specific, you should find good " \
   "settings in the \"Device config\" area, and use those numbers here. -1 " \
   "means that settings will not be changed.")
 #define AUDIO_IN_TEXT N_("Audio input pin")
