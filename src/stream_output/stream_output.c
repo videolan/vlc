@@ -609,8 +609,8 @@ static int mrl_Parse( mrl_t *p_mrl, const char *psz_mrl )
 {
     char * psz_dup = strdup( psz_mrl );
     char * psz_parser = psz_dup;
-    char * psz_access;
-    char * psz_way;
+    const char * psz_access;
+    const char * psz_way;
     char * psz_name;
 
     /* *** first parse psz_dest */

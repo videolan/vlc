@@ -637,20 +637,11 @@ void config_Free( module_t *p_module )
     {
         module_config_t *p_item = p_module->p_config + j;
 
-        if( p_item->psz_type )
-            free( p_item->psz_type );
-
-        if( p_item->psz_name )
-            free( p_item->psz_name );
-
-        if( p_item->psz_current )
-            free( p_item->psz_current );
-
-        if( p_item->psz_text )
-            free( p_item->psz_text );
-
-        if( p_item->psz_longtext )
-            free( p_item->psz_longtext );
+        free( (char*) p_item->psz_type );
+        free( (char*) p_item->psz_name );
+        free( (char*) p_item->psz_current );
+        free( (char*) p_item->psz_text );
+        free( (char*) p_item->psz_longtext );
 
         if (IsConfigStringType (p_item->i_type))
         {
@@ -664,9 +655,9 @@ void config_Free( module_t *p_module )
             for( i = 0; i < p_item->i_list; i++ )
             {
                 if( p_item->ppsz_list && p_item->ppsz_list[i] )
-                    free( p_item->ppsz_list[i] );
+                    free( (char*) p_item->ppsz_list[i] );
                 if( p_item->ppsz_list_text && p_item->ppsz_list_text[i] )
-                    free( p_item->ppsz_list_text[i] );
+                    free( (char*) p_item->ppsz_list_text[i] );
             }
             if( p_item->ppsz_list ) free( p_item->ppsz_list );
             if( p_item->ppsz_list_text ) free( p_item->ppsz_list_text );
@@ -677,8 +668,7 @@ void config_Free( module_t *p_module )
         {
             for( i = 0; i < p_item->i_action; i++ )
             {
-                if( p_item->ppsz_action_text[i] )
-                    free( p_item->ppsz_action_text[i] );
+                free( (char*) p_item->ppsz_action_text[i] );
             }
             if( p_item->ppf_action ) free( p_item->ppf_action );
             if( p_item->ppsz_action_text ) free( p_item->ppsz_action_text );
@@ -942,8 +932,8 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     vlc_mutex_lock( p_item->p_lock );
 
                     /* free old string */
-                    free (p_item->value.psz);
-                    free (p_item->saved.psz);
+                    free( (char*) p_item->value.psz );
+                    free( (char*) p_item->saved.psz );
 
                     p_item->value.psz = convert (psz_option_value);
                     p_item->saved.psz = strdupnull (p_item->value.psz);
@@ -1543,7 +1533,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                                 "You should use --%s instead.\n",
                                 p_conf->psz_name, p_conf->psz_current);
                     }
-                    psz_name=p_conf->psz_current;
+                    psz_name = p_conf->psz_current;
                     p_conf = config_FindConfig( p_this, psz_name );
                 }
 

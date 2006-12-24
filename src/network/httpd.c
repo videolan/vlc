@@ -1443,7 +1443,7 @@ void httpd_MsgAdd( httpd_message_t *msg, const char *name, const char *psz_value
 
     name = strdup( name );
 
-    TAB_APPEND( msg->i_name,  msg->name,  name );
+    TAB_APPEND( msg->i_name,  msg->name,  (char*)name );
     TAB_APPEND( msg->i_value, msg->value, value );
 }
 

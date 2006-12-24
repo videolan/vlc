@@ -256,14 +256,6 @@ void __stats_ComputeGlobalStats( vlc_object_t *p_obj, global_stats_t *p_stats )
     vlc_mutex_unlock( &p_stats->lock );
 }
 
-void stats_ReinitGlobalStats( global_stats_t *p_stats )
-{
-    vlc_mutex_lock( &p_stats->lock );
-    p_stats->f_input_bitrate = p_stats->f_output_bitrate = 0.0;
-    vlc_mutex_unlock( &p_stats->lock );
-}
-
-
 void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name,
                          unsigned int i_id )
 {

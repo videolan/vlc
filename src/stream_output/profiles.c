@@ -281,7 +281,7 @@ void streaming_ParameterApply( sout_param_t *p_param, char **ppsz_dest,
         msg_Err( p_this, "unahandled access %s", STDM->psz_access ); \
     }
 
-
+#if 0
 /**
  * Try to convert a chain to a gui descriptor. This is only possible for
  * "simple" chains.
@@ -354,6 +354,7 @@ vlc_bool_t streaming_ChainToGuiDesc( vlc_object_t *p_this,
     return VLC_TRUE;
 
 }
+#endif
 
 #define HANDLE_GUI_URL( type, access ) if( pd->b_##type ) { \
         if( p_dup ) streaming_DupAddChild( p_dup ); \
@@ -508,6 +509,7 @@ char * streaming_ChainToPsz( sout_chain_t *p_chain )
  * Handle streaming profiles
  **********************************************************************/
 
+#if 0
 /**
  * List the available profiles. Fills the pp_profiles list with preinitialized
  * values.
@@ -543,3 +545,4 @@ int streaming_ProfileParse( vlc_object_t *p_this,streaming_profile_t *p_profile,
     }
     return VLC_SUCCESS;
 }
+#endif
