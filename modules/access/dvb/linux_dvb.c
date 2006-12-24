@@ -118,8 +118,8 @@ int E_(FrontendOpen)( access_t *p_access )
 
     if( b_probe )
     {
-        char * psz_expected = NULL;
-        char * psz_real;
+        const char * psz_expected = NULL;
+        const char * psz_real;
 
         if( FrontendInfo( p_access ) < 0 )
         {

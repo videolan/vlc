@@ -206,7 +206,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
             continue;
 
         sprintf( dir, "%s%c%s", psz_dir, sep, psz_filename );
-        free( psz_filename );
+        free( (char*) psz_filename );
 
         if( E_(ParseDirectory)( p_intf, psz_root, dir ) )
         {

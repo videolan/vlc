@@ -82,7 +82,7 @@
 
 
 #define MP4_READBOX_ENTER( MP4_Box_data_TYPE_t ) \
-    uint64_t  i_read = p_box->i_size; \
+    int64_t  i_read = p_box->i_size; \
     uint8_t *p_peek, *p_buff; \
     int i_actually_read; \
     if( !( p_peek = p_buff = malloc( i_read ) ) ) \
@@ -90,7 +90,7 @@
         return( 0 ); \
     } \
     i_actually_read = stream_Read( p_stream, p_peek, i_read ); \
-    if( i_actually_read < 0 || (uint64_t)i_actually_read < i_read )\
+    if( i_actually_read < 0 || (int64_t)i_actually_read < i_read )\
     { \
         free( p_buff ); \
         return( 0 ); \
@@ -2055,7 +2055,7 @@ static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
         }
         if( i_ret )
         {
-            char *psz_error;
+            const char *psz_error;
 
             switch( i_ret )
             {

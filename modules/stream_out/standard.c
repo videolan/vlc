@@ -158,7 +158,7 @@ static int Open( vlc_object_t *p_this )
     if( psz_url && strrchr( psz_url, '.' ) )
     {
         /* by extension */
-        static struct { char *ext; char *mux; } exttomux[] =
+        static struct { const char *ext; const char *mux; } exttomux[] =
         {
             { "avi", "avi" },
             { "ogg", "ogg" },

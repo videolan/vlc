@@ -388,7 +388,7 @@ static int Open( vlc_object_t *p_this )
     int          i_packet_size;
 
     ts_pid_t    *pat;
-    char        *psz_mode;
+    const char  *psz_mode;
     vlc_bool_t   b_append;
     vlc_bool_t   b_topfield = VLC_FALSE;
 

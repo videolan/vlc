@@ -68,7 +68,8 @@ struct decoder_sys_t
     audio_date_t end_date;
     mtime_t i_pts;
 
-    int i_frame_size, i_raw_blocks;
+    int i_frame_size;
+    unsigned int i_raw_blocks;
     unsigned int i_channels;
     unsigned int i_rate, i_frame_length, i_header_size;
 };

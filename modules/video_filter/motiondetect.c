@@ -137,7 +137,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     const uint8_t *p_inpix_u = p_inpic->p[U_PLANE].p_pixels;
     const uint8_t *p_inpix_v = p_inpic->p[V_PLANE].p_pixels;
     const int i_src_pitch_u = p_inpic->p[U_PLANE].i_pitch;
-    const int i_src_visible_u = p_inpic->p[U_PLANE].i_visible_pitch;
     const int i_num_lines_u = p_inpic->p[U_PLANE].i_visible_lines;
 
     uint8_t *p_oldpix;
@@ -257,7 +256,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
                         p_buf2[(2*line+1)*i_src_pitch+2*col+1] += diff;
                         break;
 
-                    case2:
+                    case 2:
                         p_buf2[line*i_src_pitch+2*col] += diff;
                         p_buf2[line*i_src_pitch+2*col+1] += diff;
                         break;

@@ -59,7 +59,7 @@ static void csa_BlockCypher( uint8_t kk[57], uint8_t bd[8], uint8_t ib[8] );
 /*****************************************************************************
  * csa_New:
  *****************************************************************************/
-csa_t *csa_New()
+csa_t *csa_New( void )
 {
     csa_t *c = malloc( sizeof( csa_t ) );
     memset( c, 0, sizeof( csa_t ) );

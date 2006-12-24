@@ -566,7 +566,7 @@ static void AVI_ChunkFree_indx( avi_chunk_t *p_chk )
 static struct
 {
     vlc_fourcc_t i_fourcc;
-    char *psz_type;
+    const char *psz_type;
 } AVI_strz_type[] =
 {
     { AVIFOURCC_IARL, "archive location" },

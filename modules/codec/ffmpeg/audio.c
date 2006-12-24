@@ -166,7 +166,7 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
  * SplitBuffer: Needed because aout really doesn't like big audio chunk and
  * wma produces easily > 30000 samples...
  *****************************************************************************/
-aout_buffer_t *SplitBuffer( decoder_t *p_dec )
+static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_samples = __MIN( p_sys->i_samples, 4096 );

@@ -1363,7 +1363,7 @@ static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
 static const struct
 {
     const guid_t *p_id;
-    char *psz_name;
+    const char *psz_name;
 } ASF_ObjectDumpDebugInfo[] =
 {
     { &asf_object_header_guid, "Header" },

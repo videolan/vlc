@@ -658,7 +658,8 @@ static void Run( intf_thread_t *p_intf )
                 i_delay -= 50000;    /* 50 ms */
                 var_SetTime( p_input, "spu-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
+                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                                 _( "Subtitle delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
             else if( i_action == ACTIONID_SUBDELAY_UP )
@@ -667,7 +668,8 @@ static void Run( intf_thread_t *p_intf )
                 i_delay += 50000;    /* 50 ms */
                 var_SetTime( p_input, "spu-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
+                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                                _( "Subtitle delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
             else if( i_action == ACTIONID_AUDIODELAY_DOWN )
@@ -676,7 +678,8 @@ static void Run( intf_thread_t *p_intf )
                 i_delay -= 50000;    /* 50 ms */
                 var_SetTime( p_input, "audio-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Audio delay %i ms",
+                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                                _( "Audio delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
             else if( i_action == ACTIONID_AUDIODELAY_UP )
@@ -685,7 +688,8 @@ static void Run( intf_thread_t *p_intf )
                 i_delay += 50000;    /* 50 ms */
                 var_SetTime( p_input, "audio-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Audio delay %i ms",
+                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                                _( "Audio delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
             else if( i_action == ACTIONID_PLAY )
@@ -788,7 +792,6 @@ static int ActionKeyCB( vlc_object_t *p_this, char const *psz_var,
 static void PlayBookmark( intf_thread_t *p_intf, int i_num )
 {
     vlc_value_t val;
-    int i;
     char psz_bookmark_name[11];
     playlist_t *p_playlist = pl_Yield( p_intf );
 
@@ -848,7 +851,7 @@ static void DisplayPosition( intf_thread_t *p_intf, vout_thread_t *p_vout,
     if( time.i_time > 0 )
     {
         secstotimestr( psz_duration, time.i_time / 1000000 );
-        vout_OSDMessage( p_input, POSITION_TEXT_CHAN, "%s / %s",
+        vout_OSDMessage( p_input, POSITION_TEXT_CHAN, (char *) "%s / %s",
                          psz_time, psz_duration );
     }
     else if( i_seconds > 0 )
@@ -880,7 +883,7 @@ static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
     }
     else
     {
-        vout_OSDMessage( p_vout, VOLUME_TEXT_CHAN, "Volume %d%%",
+        vout_OSDMessage( p_vout, VOLUME_TEXT_CHAN, _( "Volume %d%%" ),
                          i_vol*400/AOUT_VOLUME_MAX );
     }
 }

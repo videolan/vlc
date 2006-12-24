@@ -150,7 +150,7 @@ static void RunIntf( intf_thread_t *p_intf )
 #define LOW_THRESHOLD 80
 #define HIGH_THRESHOLD 100
         vout_thread_t *p_vout;
-        char *psz_filter, *psz_type;
+        const char *psz_filter, *psz_type;
         vlc_bool_t b_change = VLC_FALSE;
 
         /* Wait a bit, get orientation, change filter if necessary */

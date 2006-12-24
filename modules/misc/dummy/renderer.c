@@ -26,6 +26,8 @@
 #include <vlc_block.h>
 #include <vlc_filter.h>
 
+#include "dummy.h"
+
 static int RenderText( filter_t *, subpicture_region_t *,
                        subpicture_region_t * );
 

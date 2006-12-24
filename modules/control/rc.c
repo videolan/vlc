@@ -1181,7 +1181,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
              || !strcmp( psz_cmd, "vtrack" )
              || !strcmp( psz_cmd, "strack" ) )
     {
-        char *psz_variable;
+        const char *psz_variable;
         vlc_value_t val_name;
         int i_error;
 
@@ -1475,7 +1475,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
             "mosaic-offsets\0" "mosaic-keep-aspect-ratio\0"
             "logo-file\0" "logo-x\0" "logo-y\0" "logo-position\0"
             "logo-transparency\0";
-        const char *psz_name;
+        const char *psz_name = NULL;
 
         if( newval.psz_string )
         for( psz_name = vars; *psz_name; psz_name += strlen( psz_name ) + 1 )
