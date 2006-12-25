@@ -398,6 +398,7 @@ struct vout_thread_t
     vlc_mutex_t         picture_lock;                 /**< picture heap lock */
     vlc_mutex_t         subpicture_lock;           /**< subpicture heap lock */
     vlc_mutex_t         change_lock;                 /**< thread change lock */
+    vlc_mutex_t         vfilter_lock;         /**< video filter2 change lock */
     vout_sys_t *        p_sys;                     /**< system output method */
     /**@}*/
 

@@ -308,6 +308,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     /* Initialize locks */
     vlc_mutex_init( p_vout, &p_vout->picture_lock );
     vlc_mutex_init( p_vout, &p_vout->change_lock );
+    vlc_mutex_init( p_vout, &p_vout->vfilter_lock );
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );
@@ -942,6 +943,7 @@ static void RunThread( vout_thread_t *p_vout)
         if( p_vout->b_vfilter_change == VLC_TRUE )
         {
             int i;
+            vlc_mutex_lock( &p_vout->vfilter_lock );
             RemoveVideoFilters2( p_vout );
             for( i = 0; i < p_vout->i_vfilters_cfg; i++ )
             {
@@ -988,6 +990,7 @@ static void RunThread( vout_thread_t *p_vout)
                 }
             }
             p_vout->b_vfilter_change = VLC_FALSE;
+            vlc_mutex_unlock( &p_vout->vfilter_lock );
         }
 
         if( p_picture )
@@ -1284,6 +1287,7 @@ static void DestroyThread( vout_thread_t *p_vout )
     /* Destroy the locks */
     vlc_mutex_destroy( &p_vout->picture_lock );
     vlc_mutex_destroy( &p_vout->change_lock );
+    vlc_mutex_destroy( &p_vout->vfilter_lock );
 
     /* Release the module */
     if( p_vout && p_vout->p_module )
@@ -1589,8 +1593,10 @@ static int VideoFilter2Callback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
+    vlc_mutex_lock( &p_vout->vfilter_lock );
     ParseVideoFilter2Chain( p_vout, newval.psz_string );
     p_vout->b_vfilter_change = VLC_TRUE;
+    vlc_mutex_unlock( &p_vout->vfilter_lock );
 
     return VLC_SUCCESS;
 }
