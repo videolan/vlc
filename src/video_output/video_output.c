@@ -1573,7 +1573,7 @@ static int ParseVideoFilter2Chain( vout_thread_t *p_vout, char *psz_vfilters )
             msg_Dbg( p_vout, "adding vfilter: %s",
                      p_vout->psz_vfilters[p_vout->i_vfilters_cfg] );
             p_vout->i_vfilters_cfg++;
-            if( psz_parser && psz_parser )
+            if( psz_parser && *psz_parser )
             {
                 if( p_vout->i_vfilters_cfg == MAX_VFILTERS )
                 {
