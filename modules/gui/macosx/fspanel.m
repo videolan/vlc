@@ -157,12 +157,21 @@
 {
     b_nonActive = YES;
     [self orderOut: self];
+    
+    /* here's fadeOut, just without visibly fading */
+    b_displayed = NO;
+    [self setAlphaValue:0.0];
+    [self setFadeTimer:nil];
+    b_fadeQueued = NO;
 }
 
 - (void)setActive:(id)noData
 {
-    b_nonActive = NO;
-    [self orderFront: self];
+    if( [[[[VLCMain sharedInstance] getControls] getVoutView] isFullscreen] )
+    {
+        b_nonActive = NO;
+        [self fadeIn];
+    }
 }
 
 /* This routine is called repeatedly to fade in the window */
@@ -235,7 +244,9 @@
     if(! config_GetInt( VLCIntf, "macosx-fspanel" ) || b_nonActive )
         return;
     
-    if( [self alphaValue] < 1.0 )
+    [self orderFront: nil];
+    
+    if( [self alphaValue] < 1.0 || b_displayed != YES )
     {
         if (![self fadeTimer])
             [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(focus:) userInfo:[NSNumber numberWithShort:1] repeats:YES]];
