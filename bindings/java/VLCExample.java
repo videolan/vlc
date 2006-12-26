@@ -1,3 +1,4 @@
+import org.videolan.jvlc.AudioIntf;
 import org.videolan.jvlc.JVLC;
 import org.videolan.jvlc.VLCException;
 
@@ -73,7 +74,7 @@ public class VLCExample
             System.out.print("done.");
             Thread.sleep(3000);
             System.out.print("Setting right channel... ");
-            jvlc.audio.setChannel("right");
+            jvlc.audio.setChannel(AudioIntf.RIGHT_CHANNEL);
             System.out.print("done.");
             Thread.sleep(3000);
             System.out.println("INPUT INFORMATION");
@@ -92,6 +93,7 @@ public class VLCExample
         	System.out.println("Something was wrong. I die :(.");
             jvlc.destroy();
             e.printStackTrace();
+            System.exit(0);
         }
         
     	System.out.println("Everything fine ;)");

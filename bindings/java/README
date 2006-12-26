@@ -7,34 +7,26 @@ Usage
 
  In order to use these bindings you have to compile vlc from source. I
 recommend you to take the latest version from videolan svn repository
-(or use at least revison 17559) by doing:
+(or use at least revison 18443) by doing:
 
 svn co svn://svn.videolan.org/vlc/trunk vlc-trunk
 
  bootstrap, clean, set environment variables, configure and build:
 
-./bootstrap && make distclean
+./bootstrap
 
 export JAVA_HOME=/path/to/jvm 
-(for example i have JAVA_HOME=/usr/lib/j2sdk1.5-sun)
+(for example i have JAVA_HOME=/usr/lib/jvm/java-1.5.0-sun)
 
 ./configure --enable-java-bindings && make && make install
 
- If you give a prefix be sure to change the PREFIX variable in the Makefile
-from /usr/local to your prefix.
+ To run a Java VLC example issue (be sure you have an a.avi and a.mp3 files
+in your user.dir folder):
 
- Once you've done with vlc you can run make in jvlc directory. Be sure
-you have gcj, gcjh and if you want to use the SUN Java compiler,
-change the Makefile accordingly. You will probably need to change also 
+java -Djava.library.path=/usr/local/lib VLCExample
 
-JINCLUDES
-LIBJINCLUDES
-
- In the next releases I will automate this process.
-
- To run a Java VLC example issue:
-
-java -Djava.library.path=. VlcClient
+(if you have specified a prefix in configure, change /usr/local/lib to 
+PREFIX/lib)
 
  Be sure your ldconfig can find libjawt.so and libmawt.so or you will
 get linking errors when you run the program.

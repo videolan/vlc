@@ -36,9 +36,11 @@
 JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getTrack (JNIEnv *env, jobject _this)
 {
     INIT_FUNCTION;
+    GET_INPUT_THREAD;
+    
     jint res = 0;
     
-    res = libvlc_audio_get_track( ( libvlc_instance_t * ) instance, exception );
+    res = libvlc_audio_get_track( input, exception );
     
     CHECK_EXCEPTION_FREE;
     
@@ -48,8 +50,9 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getTrack (JNIEnv *env, job
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setTrack (JNIEnv *env, jobject _this, jint value)
 {
     INIT_FUNCTION;
+    GET_INPUT_THREAD;
 
-    libvlc_audio_set_track( ( libvlc_instance_t * ) instance, value, exception );
+    libvlc_audio_set_track( input, value, exception );
 
     CHECK_EXCEPTION_FREE;
 }
@@ -60,7 +63,7 @@ JNIEXPORT jstring JNICALL Java_org_videolan_jvlc_Audio__1getChannel (JNIEnv *env
 
     char* res;
 
-    res = libvlc_audio_get_channel( (libvlc_instance_t *) instance, exception);
+    res = libvlc_audio_get_channel( ( libvlc_instance_t * ) instance, exception);
 
     CHECK_EXCEPTION_FREE;
 

@@ -149,7 +149,8 @@ public class JVLC implements Runnable {
 						Thread.sleep(resolution);
 					} // while playlist running
 				} catch (VLCException e) {
-					e.printStackTrace();
+					// it is non-sense to show the stacktrace here
+					// e.printStackTrace();
 				}
 				inputPlaying = false;
 				inputVout = false;

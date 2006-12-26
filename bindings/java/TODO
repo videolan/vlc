@@ -1,21 +1,8 @@
-[MediaControl - in progress]
-* enums will be final classes with private constructor, for type safety
-
-[JNI]
-* mediacontrol
-
 [general]
 * JUnit testing
 
-* configure / make install 
-
-* find a good way to divide CNI and JNI versions (same Java classes,
-  different interfaces) maybe: two JVLC.java classes, one with the
-  System.loadLibray for jni and the other without
-
-[CNI]
-* mediacontrol
-
+[build system]
+* Detect SWT to add the SWTVideoWidget
 
 
 Items are ordered by priority, the first having the highest priority
