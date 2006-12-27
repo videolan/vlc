@@ -254,6 +254,7 @@ DIST_osdmenu_dvd = \
 
 DIST_applications = \
 	applications/vlc.desktop \
+	applications/gnome-vlc-default.sh \
 	$(NULL)
 
 skins2/default.vlt:
