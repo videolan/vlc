@@ -1,6 +1,6 @@
 #!/bin/sh
 # share/applications/gnome-vlc-default.sh
-# $Id:$
+# $Id$
 #
 # Copyright (C) 2006, VideoLAN team
 # Authors: Torsten Spindler
@@ -9,6 +9,7 @@
 # Set vlc as default player on the gnome desktop
 # Tested on Ubuntu 6.10 Edgy
 #
+GCONFTOOL=gconftool
 if test -x /usr/bin/gconftool; then
 	GCONFTOOL=/usr/bin/gconftool
 	OPTS="-t string -s"
