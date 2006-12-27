@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2006, VideoLAN team
 # Authors: Torsten Spindler
-#          Jean-Paul Saman
+#          Jean-Paul Saman <jpsaman _at_ videolan dot org>
 #
 # Set vlc as default player on the gnome desktop
 # Tested on Ubuntu 6.10 Edgy
