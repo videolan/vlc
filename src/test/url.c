@@ -81,10 +81,12 @@ int main (void)
 
     /* Base 64 tests */
     test_b64 ("", "");
-    test_b64 ("d", "ZA==");
-    test_b64 ("ab", "YWI=");
-    test_b64 ("abc", "YWJj");
-    test_b64 ("abcd", "YWJjZA==");
+    test_b64 ("f", "Zg==");
+    test_b64 ("fo", "Zm8=");
+    test_b64 ("foo", "Zm9v");
+    test_b64 ("foob", "Zm9vYg==");
+    test_b64 ("fooba", "Zm9vYmE=");
+    test_b64 ("foobar", "Zm9vYmFy");
 
     return 0;
 }
