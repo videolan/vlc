@@ -103,6 +103,9 @@ ifneq ($(BUILD),$(HOST))
         FFMPEGCONF=--cross-prefix=$(HOST)-
         X264CONF=--crosscompile=$(HOST)
 	PTHREADSCONF="CROSS=$(HOST)-"
+    else
+        # We are compiling for MinGW on Cygwin
+	PTHREADSCONF=$(HOSTCC)
     endif
 endif
 
