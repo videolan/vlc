@@ -2197,6 +2197,76 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'v' );
         }
+        else if( !strncmp( tracks[i_track]->psz_codec, "V_THEORA", 8 ) )
+        {
+            uint8_t *p_data = tracks[i_track]->p_extra_data;
+            tracks[i_track]->fmt.i_codec = VLC_FOURCC( 't', 'h', 'e', 'o' );
+            if( tracks[i_track]->i_extra_data >= 4 ) {
+                if( p_data[0] == 2 ) {
+                    int i = 1;
+                    int i_size1 = 0, i_size2 = 0;
+                    p_data++;
+                    /* read size of first header packet */
+                    while( *p_data == 0xFF &&
+                           i < tracks[i_track]->i_extra_data )
+                    {
+                        i_size1 += *p_data;
+                        p_data++;
+                        i++;
+                    }
+                    i_size1 += *p_data;
+                    p_data++;
+                    i++;
+                    msg_Dbg( &sys.demuxer, "first theora header size %d", i_size1 );
+                    /* read size of second header packet */
+                    while( *p_data == 0xFF &&
+                           i < tracks[i_track]->i_extra_data )
+                    {
+                        i_size2 += *p_data;
+                        p_data++;
+                        i++;
+                    }
+                    i_size2 += *p_data;
+                    p_data++;
+                    i++;
+                    int i_size3 = tracks[i_track]->i_extra_data - i - i_size1
+                        - i_size2;
+                    msg_Dbg( &sys.demuxer, "second theora header size %d", i_size2 );
+                    msg_Dbg( &sys.demuxer, "third theora header size %d", i_size3 );
+                    tracks[i_track]->fmt.i_extra = i_size1 + i_size2 + i_size3
+                        + 6;
+                    if( i_size1 > 0 && i_size2 > 0 && i_size3 > 0  ) {
+                        tracks[i_track]->fmt.p_extra =
+                            malloc( tracks[i_track]->fmt.i_extra );
+                        uint8_t *p_out = (uint8_t*)tracks[i_track]->fmt.p_extra;
+                        *p_out++ = (i_size1>>8) & 0xFF;
+                        *p_out++ = i_size1 & 0xFF;
+                        memcpy( p_out, p_data, i_size1 );
+                        p_data += i_size1;
+                        p_out += i_size1;
+                        
+                        *p_out++ = (i_size2>>8) & 0xFF;
+                        *p_out++ = i_size2 & 0xFF;
+                        memcpy( p_out, p_data, i_size2 );
+                        p_data += i_size2;
+                        p_out += i_size2;
+
+                        *p_out++ = (i_size3>>8) & 0xFF;
+                        *p_out++ = i_size3 & 0xFF;
+                        memcpy( p_out, p_data, i_size3 );
+                        p_data += i_size3;
+                        p_out += i_size3;
+                    }
+                    else
+                    {
+                        msg_Err( &sys.demuxer, "inconsistant theora extradata" );
+                    }
+                }
+                else {
+                    msg_Err( &sys.demuxer, "Wrong number of ogg packets with theora headers (%d)", p_data[0] + 1 );
+                }
+            }
+        }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_MPEG4", 7 ) )
         {
             if( !strcmp( tracks[i_track]->psz_codec, "V_MPEG4/MS/V3" ) )
