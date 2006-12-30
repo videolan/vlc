@@ -492,6 +492,11 @@ static int  Open ( vlc_object_t *p_this )
                     p_sys->p_out_asf = stream_DemuxNew( p_demux, "asf",
                                                         p_demux->out );
             }
+            else if( !strcmp( sub->codecName(), "X-QT" ) ||
+                     !strcmp( sub->codecName(), "X-QUICKTIME" ) )
+            {
+                tk->b_quicktime = VLC_TRUE;
+            }
         }
         else if( !strcmp( sub->mediumName(), "video" ) )
         {
@@ -1324,21 +1329,33 @@ static void StreamRead( void *p_private, unsigned int i_size,
         QuickTimeGenericRTPSource::QTState &qtState = qtRTPSource->qtState;
         uint8_t *sdAtom = (uint8_t*)&qtState.sdAtom[4];
 
-        if( qtState.sdAtomSize < 16 + 32 )
-        {
-            /* invalid */
-            p_sys->event = 0xff;
-            tk->waiting = 0;
-            return;
+        if( tk->fmt.i_cat == VIDEO_ES ) {
+            if( qtState.sdAtomSize < 16 + 32 )
+            {
+                /* invalid */
+                p_sys->event = 0xff;
+                tk->waiting = 0;
+                return;
+            }
+            tk->fmt.i_codec = VLC_FOURCC(sdAtom[0],sdAtom[1],sdAtom[2],sdAtom[3]);
+            tk->fmt.video.i_width  = (sdAtom[28] << 8) | sdAtom[29];
+            tk->fmt.video.i_height = (sdAtom[30] << 8) | sdAtom[31];
+
+            tk->fmt.i_extra        = qtState.sdAtomSize - 16;
+            tk->fmt.p_extra        = malloc( tk->fmt.i_extra );
+            memcpy( tk->fmt.p_extra, &sdAtom[12], tk->fmt.i_extra );
+
         }
-        tk->fmt.i_codec = VLC_FOURCC(sdAtom[0],sdAtom[1],sdAtom[2],sdAtom[3]);
-        tk->fmt.video.i_width  = (sdAtom[28] << 8) | sdAtom[29];
-        tk->fmt.video.i_height = (sdAtom[30] << 8) | sdAtom[31];
-
-        tk->fmt.i_extra        = qtState.sdAtomSize - 16;
-        tk->fmt.p_extra        = malloc( tk->fmt.i_extra );
-        memcpy( tk->fmt.p_extra, &sdAtom[12], tk->fmt.i_extra );
-
+        else {
+            if( qtState.sdAtomSize < 4 )
+            {
+                /* invalid */
+                p_sys->event = 0xff;
+                tk->waiting = 0;
+                return;
+            }
+            tk->fmt.i_codec = VLC_FOURCC(sdAtom[0],sdAtom[1],sdAtom[2],sdAtom[3]);
+        }
         tk->p_es = es_out_Add( p_demux->out, &tk->fmt );
     }
 
