@@ -270,7 +270,7 @@ STDMETHODIMP VLCAudio::get_channel(BSTR *channel)
             *channel = BSTRFromCStr(CP_UTF8, psz_channel);
             free( psz_channel );
             psz_channel = NULL;
-            return (NULL == *channel) ? E_OUTOFMEMORY : NOERROR;
+            return (NULL == channel) ? E_OUTOFMEMORY : NOERROR;
         }
         if( psz_channel ) free( psz_channel );
         psz_channel = NULL;
@@ -2095,7 +2095,7 @@ STDMETHODIMP VLCVideo::get_aspectRatio(BSTR* aspect)
                 *aspect = BSTRFromCStr(CP_UTF8, psz_aspect);
                 free( psz_aspect );
                 psz_aspect = NULL;
-                return (NULL == *aspect) ? E_OUTOFMEMORY : NOERROR;
+                return (NULL == aspect) ? E_OUTOFMEMORY : NOERROR;
             }
             if( psz_aspect ) free( psz_aspect );
             psz_aspect = NULL;
@@ -2347,14 +2347,14 @@ STDMETHODIMP VLCControl2::get_StartTime(long *seconds)
 
     return S_OK;
 };
-     
+
 STDMETHODIMP VLCControl2::put_StartTime(long seconds)
 {
     _p_instance->setStartTime(seconds);
 
     return NOERROR;
 };
-        
+
 STDMETHODIMP VLCControl2::get_VersionInfo(BSTR *version)
 {
     if( NULL == version )
@@ -2364,7 +2364,6 @@ STDMETHODIMP VLCControl2::get_VersionInfo(BSTR *version)
     if( NULL != versionStr )
     {
         *version = BSTRFromCStr(CP_UTF8, versionStr);
-        
         return NULL == *version ? E_OUTOFMEMORY : NOERROR;
     }
     *version = NULL;
