@@ -257,6 +257,7 @@ static int Demux( demux_t *p_demux )
                 {
                     p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
                                                 0, NULL, -1 );
+                    p_input->p_meta = vlc_meta_New();
                     if( psz_now )
                         vlc_meta_SetNowPlaying( p_input->p_meta, psz_now );
                     if( psz_genre )
