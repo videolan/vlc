@@ -1222,7 +1222,7 @@ ifdef HAVE_WIN32
 	(cd $<; ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 else
 .x264: x264
-	(cd $<; ./configure $(X264CONF) --prefix="$(PREFIX)"  --enable-pic && make && make install)
+	(cd $<; ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 endif
 	touch $@
 
