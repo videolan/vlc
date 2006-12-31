@@ -1,6 +1,131 @@
 {
     IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                alignCenter = id; 
+                alignJustified = id; 
+                alignLeft = id; 
+                alignRight = id; 
+                arrangeInFront = id; 
+                centerSelectionInVisibleArea = id; 
+                changeFont = id; 
+                checkSpelling = id; 
+                clear = id; 
+                clearRecentDocuments = id; 
+                complete = id; 
+                copy = id; 
+                copyFont = id; 
+                copyRuler = id; 
+                cut = id; 
+                delete = id; 
+                deminiaturize = id; 
+                fax = id; 
+                hide = id; 
+                hideOtherApplications = id; 
+                loosenKerning = id; 
+                lowerBaseline = id; 
+                makeKeyAndOrderFront = id; 
+                miniaturize = id; 
+                newDocument = id; 
+                openDocument = id; 
+                orderBack = id; 
+                orderFront = id; 
+                orderFrontColorPanel = id; 
+                orderFrontHelpPanel = id; 
+                orderOut = id; 
+                outline = id; 
+                paste = id; 
+                pasteAsPlainText = id; 
+                pasteAsRichText = id; 
+                pasteFont = id; 
+                pasteRuler = id; 
+                pause = id; 
+                performClose = id; 
+                performFindPanelAction = id; 
+                performMiniaturize = id; 
+                performZoom = id; 
+                play = id; 
+                print = id; 
+                printDocument = id; 
+                raiseBaseline = id; 
+                record = id; 
+                redo = id; 
+                resume = id; 
+                revertDocumentToSaved = id; 
+                run = id; 
+                runPageLayout = id; 
+                runToolbarCustomizationPalette = id; 
+                saveAllDocuments = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+                saveDocumentTo = id; 
+                selectAll = id; 
+                selectText = id; 
+                showGuessPanel = id; 
+                showHelp = id; 
+                start = id; 
+                startSpeaking = id; 
+                stop = id; 
+                stopSpeaking = id; 
+                subscript = id; 
+                superscript = id; 
+                terminate = id; 
+                tightenKerning = id; 
+                toggleContinuousSpellChecking = id; 
+                toggleRuler = id; 
+                toggleToolbarShown = id; 
+                turnOffKerning = id; 
+                turnOffLigatures = id; 
+                underline = id; 
+                undo = id; 
+                unhideAllApplications = id; 
+                unscript = id; 
+                useAllLigatures = id; 
+                useStandardKerning = id; 
+                useStandardLigatures = id; 
+            }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = IBInspector; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {inspectorView = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = IBLibraryObjectTemplate; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {draggedView = NSView; representedObject = NSObject; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = NSDateFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {CLASS = NSFormatter; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSNumberFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            CLASS = PDFThumbnailView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {pdfView = PDFView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                goBack = id; 
+                goForward = id; 
+                goToFirstPage = id; 
+                goToLastPage = id; 
+                goToNextPage = id; 
+                goToPreviousPage = id; 
+                selectAll = id; 
+                takeBackgroundColorFrom = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = PDFView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSView; 
+        }, 
         {
             ACTIONS = {
                 "adjImg_Enbl" = id; 
@@ -42,8 +167,6 @@
                 "o_expBtn_adjustImage" = id; 
                 "o_expBtn_audioFlts" = id; 
                 "o_expBtn_videoFlts" = id; 
-                "o_extWin_adjImg_sepe" = id; 
-                "o_extWin_vidFlts_sepe" = id; 
                 "o_extended_window" = id; 
                 "o_lbl_adjustImage" = id; 
                 "o_lbl_audio" = id; 

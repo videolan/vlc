@@ -81,7 +81,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_lbl_audioFlts setStringValue: _NS("Audio filters")];
     [o_lbl_videoFlts setStringValue: _NS("Video filters")];
     [o_lbl_adjustImage setStringValue: _NS("Image adjustment")];
-    [o_btn_vidFlts_mrInfo setTitle: _NS("More Info")];
+    [o_btn_vidFlts_mrInfo setToolTip: _NS("Shows more information about the available video filters.")];
     [o_ckb_wave setTitle: _NS("Wave")];
     [o_ckb_ripple setTitle: _NS("Ripple")];
     [o_ckb_psycho setTitle: _NS("Psychedelic")];
@@ -614,10 +614,10 @@ static VLCExtended *_o_sharedInstance = nil;
 - (IBAction)vidFlts_mrInfo:(id)sender
 {
     /* show info sheet */
-    NSBeginInformationalAlertSheet(_NS("More Information"), _NS("OK"), @"", @"",
-        o_extended_window, nil, nil, nil, nil, _NS("This panel allows to "
-        "select video effects filters to apply.\n"
-        "The filters can be configured individually in the Preferences, in "
+    NSBeginInformationalAlertSheet(_NS("About the video filters"), _NS("OK"), @"", @"",
+        o_extended_window, nil, nil, nil, nil, _NS("This panel allows "
+        "on-the-fly selection of various video effects.\n"
+        "These filters can be configured individually in the Preferences, in "
         "the subsections of Video/Filters.\n"
         "To choose the order in which the filter are applied, a filter "
         "option string can be set in the Preferences, Video / Filters section."));
