@@ -196,6 +196,8 @@ static int DecoderOpen( vlc_object_t *p_this )
     case VLC_FOURCC('s','1','6','b'):
     case VLC_FOURCC('s','8',' ',' '):
     case VLC_FOURCC('u','8',' ',' '):
+    case VLC_FOURCC('i','n','2','4'): /* Quicktime in24, bigendian int24 */
+    case VLC_FOURCC('i','n','3','2'): /* Quicktime in32, bigendian int32 */
         break;
 
     default:
@@ -246,10 +248,24 @@ static int DecoderOpen( vlc_object_t *p_this )
         p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
         p_dec->fmt_in.audio.i_bitspersample = 32;
     }
+    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'i', 'n', '3', '2' ) )
+    {
+        /* FIXME: mplayer uses bigendian for in24 .... but here it works
+         * with little endian ... weird */
+        p_dec->fmt_out.i_codec = VLC_FOURCC( 's', '3', '2', 'l' );
+        p_dec->fmt_in.audio.i_bitspersample = 32;
+    }
     else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 's', '2', '4', 'l' ) ||
              p_dec->fmt_in.i_codec == VLC_FOURCC( 's', '2', '4', 'b' ) )
     {
         p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
+        p_dec->fmt_in.audio.i_bitspersample = 24;
+    }
+    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'i', 'n', '2', '4' ) )
+    {
+        /* FIXME: mplayer uses bigendian for in24 .... but here it works
+         * with little endian ... weird */
+        p_dec->fmt_out.i_codec = VLC_FOURCC( 's', '2', '4', 'l' );
         p_dec->fmt_in.audio.i_bitspersample = 24;
     }
     else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 's', '1', '6', 'l' ) ||
@@ -1372,7 +1388,8 @@ static int EncoderOpen( vlc_object_t *p_this )
     else if( p_enc->fmt_out.i_codec == VLC_FOURCC('u','2','4','l') ||
              p_enc->fmt_out.i_codec == VLC_FOURCC('u','2','4','b') ||
              p_enc->fmt_out.i_codec == VLC_FOURCC('s','2','4','l') ||
-             p_enc->fmt_out.i_codec == VLC_FOURCC('s','2','4','b') )
+             p_enc->fmt_out.i_codec == VLC_FOURCC('s','2','4','b') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('i','n','2','4') )
     {
         p_enc->fmt_out.audio.i_bitspersample = 24;
     }
@@ -1380,6 +1397,7 @@ static int EncoderOpen( vlc_object_t *p_this )
              p_enc->fmt_out.i_codec == VLC_FOURCC('u','3','2','b') ||
              p_enc->fmt_out.i_codec == VLC_FOURCC('s','3','2','l') ||
              p_enc->fmt_out.i_codec == VLC_FOURCC('s','3','2','b') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('i','n','3','2') ||
              p_enc->fmt_out.i_codec == VLC_FOURCC('f','i','3','2') ||
              p_enc->fmt_out.i_codec == VLC_FOURCC('f','l','3','2') )
     {
