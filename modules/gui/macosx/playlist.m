@@ -1341,15 +1341,19 @@ NSLog( @"expandable" );
     playlist_item_t * p_item;
     ret_v = intf_UserStringInput( p_playlist, _("New Node"), 
         _("Please enter a name for the new node."), &psz_name );
+
     if( psz_name != NULL && psz_name != "" )
         p_item = playlist_NodeCreate( p_playlist, psz_name, 
                                             p_playlist->p_local_category, 0 );
-    else
+    else if(! config_GetInt( p_playlist, "interact" ) )
+    {
+        /* in case that the interaction is disabled, just give it a bogus name */
         p_item = playlist_NodeCreate( p_playlist, _("Empty Folder"), 
                                             p_playlist->p_local_category, 0 );
+    }
 
     if(! p_item )
-        msg_Warn( VLCIntf, "node creation failed" );
+        msg_Warn( VLCIntf, "node creation failed or cancelled by user" );
 
     vlc_object_release( p_playlist );
     [ourPool release];
