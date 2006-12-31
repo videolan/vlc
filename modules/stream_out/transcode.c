@@ -1701,7 +1701,11 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
      * We'll open it only when we have the first frame. */
     module_Unneed( id->p_encoder, id->p_encoder->p_module );
     if( id->p_encoder->fmt_out.p_extra )
+    {
         free( id->p_encoder->fmt_out.p_extra );
+        id->p_encoder->fmt_out.p_extra = NULL;
+        id->p_encoder->fmt_out.i_extra = 0;
+    }
     id->p_encoder->p_module = NULL;
 
     if( p_sys->i_threads >= 1 )
