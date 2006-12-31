@@ -433,24 +433,10 @@ VLC-release.app: vlc
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
-	case $(host_os) in \
-	  *darwin6*) cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
-	    cd ../../../ && \
-	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
-	          $(top_builddir)/VLC-release.app;; \
-	  *darwin7*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
-	    cd ../../../ && \
-	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
-	          $(top_builddir)/VLC-release.app;; \
-	  *darwin8*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
+	cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
 	    cd ../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
-	          $(top_builddir)/VLC-release.app;; \
-	  *darwin9*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
-	    cd ../../../ && \
-	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
-	          $(top_builddir)/VLC-release.app;; \
-	esac
+	          $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
 	$(INSTALL) $(top_builddir)/vlc \
@@ -579,24 +565,10 @@ VLC.app: vlc
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
-	case $(host_os) in \
-	  *darwin6*) cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'&& \
-	    cd ../../../ && \
-	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
-	          $(top_builddir)/VLC.app;; \
-	  *darwin7*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'&& \
-	    cd ../../../ && \
-	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
-	          $(top_builddir)/VLC.app;; \
-	  *darwin8*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
+	cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
 	    cd ../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
-	          $(top_builddir)/VLC.app;; \
-	  *darwin9*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
-	    cd ../../../ && \
-	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
-	          $(top_builddir)/VLC.app;; \
-	esac
+	          $(top_builddir)/VLC.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
 	$(INSTALL) $(top_builddir)/vlc \
