@@ -5299,7 +5299,7 @@ dnl  Mozilla plugin
 dnl
 mozilla=false
 AC_ARG_ENABLE(mozilla,
-  [  --enable-mozilla        build a vlc-based Mozilla plugin (default disabled)])
+  [  --enable-mozilla        build a vlc-based Firefox/Mozilla plugin (default disabled)])
 AC_ARG_WITH(mozilla-sdk-path,
   [    --with-mozilla-sdk-path=PATH path to mozilla sdk])
 AC_LANG_PUSH(C++)
@@ -5307,39 +5307,94 @@ if test "${enable_mozilla}" = "yes"
 then
   dnl currently vlc plugin only needs headers, no xpcom support apis are actually used
   need_xpcom_libs=false
+
   if test "${with_mozilla_sdk_path}" = "" -o "${with_mozilla_sdk_path}" = "no"
   then
-    AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
-    if test "${MOZILLA_CONFIG}" = "no"
-    then
-      AC_PATH_PROG(SEAMONKEY_CONFIG, seamonkey-config, no)
-      if test "${SEAMONKEY_CONFIG}" = "no"
-      then
-        AC_PATH_PROG(XULRUNNER_CONFIG, xulrunner-config, no)
-        if test "${XULRUNNER_CONFIG}" = "no"
-        then
-          AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
-        else
-          have_xul=true
-          MOZILLA_CONFIG="${XULRUNNER_CONFIG}"
+    dnl New firefox-1.5 SDK api
+    PKG_CHECK_MODULES([firefox], [firefox-plugin],
+      [
+        PKG_CHECK_MODULES(
+            [xpcom],
+            [firefox-xpcom],
+            [VLC_ADD_CFLAGS([mozilla], [${XPCOM_CFLAGS}])],
+            [AC_MSG_ERROR([Please install the Firefox development tools, XPCOM wax not found.])]
+        )
+        firefox_include=`pkg-config --variable=includedir firefox-plugin`
+        MOZILLA_CONFIG_H=1
+dnl        CPPFLAGS="${CPPFLAGS_save} ${firefox_include} ${FIREFOX_CPPFLAGS}"
+dnl        AC_CHECK_HEADERS(mozilla-config.h,[MOZILLA_CONFIG_H=1],[MOZILLA_CONFIG_H=0],[#include <mozilla-config.h>])
+dnl        CPPFLAGS="${CPPFLAGS_save}"
+        dnl HACK Test for mozilla-config.h headerfile existence
+        if test -f "${firefox_include}/mozilla-config.h"; then
+            MOZILLA_CONFIG_H=1
         fi
-      else
-        MOZILLA_CONFIG="${SEAMONKEY_CONFIG}"
-      fi
-    fi
+        if test "${MOZILLA_CONFIG_H}" = "0"; then
+            AC_MSG_ERROR([Please install the Firefox development tools, mozilla-config.h was not found.])
+        fi
+        MOZILLA_CONFIG_H="${firefox_include}/mozilla-config.h"
+        XPIDL_INCL=`pkg-config --variable=idldir firefox-xpcom`
+        xpcom_lib_path=`pkg-config --variable=libdir firefox-xpcom`
+        AC_PATH_PROG(
+            [XPIDL],
+            [xpidl],
+            [ no ],
+            [${xpidl_path}:${xpcom_lib_path}:${PATH}]
+        )
+        if test "${XPIDL}" = "no"; then
+            AC_MSG_ERROR([Please install the Firefox development tools, xpidl not found!])
+        fi
+        if test "${need_xpcom_libs}" = "false"; then
+            REAL_FIREFOX_LIBS=`echo ${FIREFOX_LDFLAGS} | sed -e 's|-lxpcom||'`
+            FIREFOX_LDFLAGS=${REAL_FIREFOX_LIBS}
+        fi
+        if test -f ${MOZILLA_CONFIG_H}; then
+            VLC_ADD_CFLAGS([mozilla],[${firefox_include}])
+            if grep '^#define HAVE_MOZ_X11 1' ${MOZILLA_CONFIG_H} 2>&1 > /dev/null ; then
+              VLC_ADD_LDFLAGS([mozilla], [${X_LIBS} ${X_PRE_LIBS}])
+            fi
+        fi
+        VLC_ADD_CFLAGS([mozilla],[${FIREFOX_CPPFLAGS}])
+        VLC_ADD_CXXFLAGS([mozilla],[$XPCOM_CFLAGS, " ", ${FIREFOX_CPPFLAGS}])
+        VLC_ADD_LDFLAGS([mozilla],[${FIREFOX_LDFLAGS}])
+        VLC_ADD_PLUGINS([mozilla])
+        MOZILLA_CONFIG=
+      ],
+      [
+        AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
+        if test "${MOZILLA_CONFIG}" = "no"
+        then
+          AC_PATH_PROG(SEAMONKEY_CONFIG, seamonkey-config, no)
+          if test "${SEAMONKEY_CONFIG}" = "no"
+          then
+            AC_PATH_PROG(XULRUNNER_CONFIG, xulrunner-config, no)
+            if test "${XULRUNNER_CONFIG}" = "no"
+            then
+              AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
+            else
+              have_xul=true
+              MOZILLA_CONFIG="${XULRUNNER_CONFIG}"
+            fi
+          else
+            MOZILLA_CONFIG="${SEAMONKEY_CONFIG}"
+          fi
+        fi
+      ]
+    )
 
-    if ${MOZILLA_CONFIG} --defines | grep -q 'MOZ_X11=1'; then
-      LDFLAGS="${LDFLAGS_save} ${X_LIBS} ${X_PRE_LIBS}"
-      AC_CHECK_LIB(Xt,XtStrings,
-       [
-         VLC_ADD_CPPFLAGS([mozilla],[${X_CFLAGS}])
-         VLC_ADD_LDFLAGS([mozilla],[${X_LIBS} ${X_PRE_LIBS} -lXt -lX11 -lSM -lICE])
-       ],
-       [],
-       [[${X_LIBS} ${X_PRE_LIBS} -lX11 -lSM -lICE]
-      ])
-      LDFLAGS="${LDFLAGS_save}"
-    fi
+    if test ! -z "${MOZILLA_CONFIG}"
+    then
+      if ${MOZILLA_CONFIG} --defines | grep -q 'MOZ_X11=1'; then
+        LDFLAGS="${LDFLAGS_save} ${X_LIBS} ${X_PRE_LIBS}"
+        AC_CHECK_LIB(Xt,XtStrings,
+         [
+           VLC_ADD_CPPFLAGS([mozilla],[${X_CFLAGS}])
+           VLC_ADD_LDFLAGS([mozilla],[${X_LIBS} ${X_PRE_LIBS} -lXt -lX11 -lSM -lICE])
+         ],
+         [],
+         [[${X_LIBS} ${X_PRE_LIBS} -lX11 -lSM -lICE]
+        ])
+        LDFLAGS="${LDFLAGS_save}"
+      fi
 
       mozilla=:
       PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
@@ -5366,6 +5421,7 @@ then
       MOZILLA_REQUIRED_HEADERS=
       CPPFLAGS="${CPPFLAGS_save}"
       MOZILLA_SDK_PATH="`${MOZILLA_CONFIG} --prefix`"
+    fi
     dnl End of moz_sdk = ""
   else
     dnl special case for mingw32
@@ -5399,15 +5455,15 @@ then
     if ${need_xpcom_libs}; then
        VLC_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -L${real_mozilla_sdk}/lib -lnspr4 -lplds4 -lplc4 -lxpcomglue])
       if test "${SYS}" = "mingw32"; then
-	    dnl latest gecko sdk does not have embedstring
-	    if test -d "${real_mozilla_sdk}/embedstring/bin"
-	    then
-	      VLC_ADD_LDFLAGS([mozilla],[-lembedstring -Wl,--kill-at])
-	    fi
-	  fi
+        dnl latest gecko sdk does not have embedstring
+        if test -d "${real_mozilla_sdk}/embedstring/bin"
+        then
+          VLC_ADD_LDFLAGS([mozilla],[-lembedstring -Wl,--kill-at])
+        fi
+      fi
     fi
     MOZILLA_SDK_PATH="${real_mozilla_sdk}"
-  
+
     if test -n "${CYGPATH}"; then
       real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
     fi
