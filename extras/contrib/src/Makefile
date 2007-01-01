@@ -149,17 +149,17 @@ ifdef HAVE_DARWIN_OS
         .a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
         .FLAC .speex .shout .faad .faac .lame .ebml .matroska .ffmpeg \
         .dvdcss .dvdnav .dvdread .dvbpsi .live .caca .mod \
-        .png .gpg-error .gcrypt .gnutls .opendaap .SDL_image \
-        .glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder \
-            .libdca .tag .goom2k4 .aclocal
+        .png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager \
+        .SDL_image .glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder \
+        .libdca .tag .goom2k4 .aclocal
   else
      all: .autoconf .automake .libtool .intl .pkgcfg .freetype .fribidi \
         .a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
         .FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
         .dvdcss .dvdnav .dvdread .dvbpsi .live .caca .mod \
-        .png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
-        .glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder \
-            .libdca .tag .x264 .goom2k4 .aclocal
+        .png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager \
+        .SDL_image .glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder \
+        .libdca .tag .x264 .goom2k4 .aclocal
   endif
 # .expat .clinkcc don't work with SDK yet
 # .glib .libidl .gecko are required to build the mozilla plugin
