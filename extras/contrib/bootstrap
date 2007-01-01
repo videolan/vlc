@@ -134,6 +134,10 @@ case $HOST in
         ;;
 esac
 
+if test `uname -r` = "9.0.0d5"; then
+echo "HAVE_FUTURE_DARWIN_OS = 1" >> config.mak
+fi
+
 echo "BUILD = $BUILD" >> config.mak
 echo "HOST = $HOST" >> config.mak
 
