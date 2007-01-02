@@ -92,17 +92,17 @@ cdio_log_handler( cdio_log_level_t level, const char message[] )
         case CDIO_LOG_DEBUG:
         case CDIO_LOG_INFO:
             if (p_cdda->i_debug & INPUT_DBG_CDIO)
-            msg_Dbg( p_cdda_input, message);
+            msg_Dbg( p_cdda_input, "%s", message);
             break;
         case CDIO_LOG_WARN:
-            msg_Warn( p_cdda_input, message);
+            msg_Warn( p_cdda_input, "%s", message);
             break;
         case CDIO_LOG_ERROR:
         case CDIO_LOG_ASSERT:
-            msg_Err( p_cdda_input, message);
+            msg_Err( p_cdda_input, "%s", message);
             break;
         default:
-            msg_Warn( p_cdda_input, message,
+            msg_Warn( p_cdda_input, "%s\n%s %d", message,
                     "the above message had unknown cdio log level",
                     level);
             break;
