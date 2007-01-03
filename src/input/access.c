@@ -95,8 +95,7 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
     else
     {
         p_access->p_module =
-            module_Need( p_access, "access2", p_access->psz_access,
-                         b_quick ? VLC_TRUE : VLC_FALSE );
+            module_Need( p_access, "access2", p_access->psz_access, b_quick );
     }
 
     if( p_access->p_module == NULL )
