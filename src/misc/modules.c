@@ -503,60 +503,41 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         if( i_shortcuts > 0 )
         {
             vlc_bool_t b_trash;
-            int i_dummy, i_short = i_shortcuts;
-            char *psz_name = psz_shortcuts;
+            const char *psz_name = psz_shortcuts;
 
             /* Let's drop modules with a <= 0 score (unless they are
              * explicitly requested) */
             b_trash = p_module->i_score <= 0;
 
-            while( i_short > 0 )
+            for( unsigned i_short = i_shortcuts; i_short > 0; i_short-- )
             {
-                for( i_dummy = 0; p_module->pp_shortcuts[i_dummy]; i_dummy++ )
+                for( unsigned i = 0; p_module->pp_shortcuts[i]; i++ )
                 {
-                    if( !strcasecmp( psz_name,
-                                     p_module->pp_shortcuts[i_dummy] ) )
+                    if( !strcasecmp( psz_name, p_module->pp_shortcuts[i] ) )
                     {
                         /* Found it */
-                        b_trash = VLC_FALSE;
                         i_shortcut_bonus = i_short * 10000;
-                        break;
+                        goto found_shortcut;
                     }
                 }
 
-                if( i_shortcut_bonus )
-                {
-                    /* We found it... remember ? */
-                    break;
-                }
-
                 /* Go to the next shortcut... This is so lame! */
-                while( *psz_name )
-                {
-                    psz_name++;
-                }
-                psz_name++;
-                i_short--;
+                psz_name += strlen( psz_name ) + 1;
             }
 
             /* If we are in "strict" mode and we couldn't
              * find the module in the list of provided shortcuts,
              * then kick the bastard out of here!!! */
-            if( i_short == 0 && b_strict )
-            {
-                b_trash = VLC_TRUE;
-            }
-
-            if( b_trash )
-            {
+            if( b_strict )
                 continue;
-            }
         }
         /* If we didn't require a shortcut, trash <= 0 scored plugins */
         else if( p_module->i_score <= 0 )
         {
             continue;
         }
+
+found_shortcut:
 
         /* Special case: test if we requested a particular intf plugin */
         if( !i_shortcuts && p_module->psz_program
@@ -636,8 +617,10 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     {
 #ifdef HAVE_DYNAMIC_PLUGINS
         /* Make sure the module is loaded in mem */
-        module_t *p_module = p_tmp->p_module->b_submodule ?
-            (module_t *)p_tmp->p_module->p_parent : p_tmp->p_module;
+        module_t *p_module = p_tmp->p_module;
+        if( p_module->b_submodule )
+            p_module = (module_t *)p_module->p_parent;
+
         if( !p_module->b_builtin && !p_module->b_loaded )
         {
             module_t *p_new_module =
