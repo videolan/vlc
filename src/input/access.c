@@ -55,7 +55,7 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
         p_access->psz_path   = strdup( psz_path );
         if( b_quick )
         {
-            if( strstr( psz_path, "file://" ) )
+            if( strncmp( psz_path, "file://", 7 ) == 0 )
                 p_access->psz_access = strdup( "" );
             else
                 p_access->psz_access = strdup( "file" );
