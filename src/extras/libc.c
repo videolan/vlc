@@ -52,6 +52,9 @@
 #endif
 
 #if defined(WIN32) || defined(UNDER_CE)
+#   undef _wopendir
+#   undef _wreaddir
+#   undef _wclosedir
 #   define WIN32_LEAN_AND_MEAN
 #   include <windows.h>
 #endif
