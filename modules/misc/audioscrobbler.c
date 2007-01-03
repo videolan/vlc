@@ -438,7 +438,7 @@ static void Run( intf_thread_t *p_this )
             if ( p_buffer_pos )
             {
                 /* woops, submission failed */
-                msg_Dbg( p_this, p_buffer_pos );
+                msg_Dbg( p_this, "%s", p_buffer_pos );
                 vlc_mutex_unlock ( &p_sys->lock );
                 continue;
             }
@@ -816,7 +816,7 @@ static int Handshake( intf_thread_t *p_this )
     if ( p_buffer_pos )
     {
         /* handshake request failed, sorry */
-        msg_Dbg( p_this, p_buffer_pos );
+        msg_Dbg( p_this, "%s", p_buffer_pos );
         PROTOCOL_ERROR
     }
 
@@ -835,7 +835,7 @@ static int Handshake( intf_thread_t *p_this )
     {
         /* protocol has been updated, time to update the code */
         msg_Dbg( p_intf, "Protocol updated : plugin may be outdated" );
-        msg_Dbg( p_intf, p_buffer_pos );
+        msg_Dbg( p_intf, "%s", p_buffer_pos );
     }
 
     else
