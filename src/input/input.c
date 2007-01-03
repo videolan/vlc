@@ -2049,27 +2049,6 @@ static int InputSourceInit( input_thread_t *p_input,
                                         psz_access, psz_demux, psz_path,
                                         p_input->b_preparsing );
         }
-#ifndef WIN32      /* Remove this gross hack from the win32 build as colons
-                        * are forbidden in filenames on Win32. */
-
-        /* Maybe we got something like: /Volumes/toto:titi/gabu.mpg */
-        if( in->p_access == NULL &&
-            *psz_access == '\0' && ( *psz_demux || *psz_path ) )
-        {
-            strcpy (psz_dup, psz_mrl);
-            psz_access = "";
-            if( psz_forced_demux && *psz_forced_demux )
-            {
-                psz_demux = psz_forced_demux;
-            }
-            else psz_demux = "";
-            psz_path = psz_dup;
-
-            in->p_access = access2_New( p_input,
-                                        psz_access, psz_demux, psz_path,
-                                        p_input->b_preparsing );
-        }
-#endif
 
         if( in->p_access == NULL )
         {
