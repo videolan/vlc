@@ -305,7 +305,7 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
         {
             if( status & e->flag )
             {
-                msg_Err( session, e->msg );
+                msg_Err( session, "%s", e->msg );
                 status &= ~e->flag;
             }
         }
