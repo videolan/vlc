@@ -5313,49 +5313,27 @@ then
     dnl New firefox-1.5 SDK api
     PKG_CHECK_MODULES([firefox], [firefox-plugin],
       [
-        PKG_CHECK_MODULES(
-            [xpcom],
-            [firefox-xpcom],
-            [VLC_ADD_CFLAGS([mozilla], [${XPCOM_CFLAGS}])],
-            [AC_MSG_ERROR([Please install the Firefox development tools, XPCOM wax not found.])]
-        )
         firefox_include=`pkg-config --variable=includedir firefox-plugin`
-        MOZILLA_CONFIG_H=1
-dnl        CPPFLAGS="${CPPFLAGS_save} ${firefox_include} ${FIREFOX_CPPFLAGS}"
-dnl        AC_CHECK_HEADERS(mozilla-config.h,[MOZILLA_CONFIG_H=1],[MOZILLA_CONFIG_H=0],[#include <mozilla-config.h>])
-dnl        CPPFLAGS="${CPPFLAGS_save}"
-        dnl HACK Test for mozilla-config.h headerfile existence
-        if test -f "${firefox_include}/mozilla-config.h"; then
-            MOZILLA_CONFIG_H=1
-        fi
-        if test "${MOZILLA_CONFIG_H}" = "0"; then
-            AC_MSG_ERROR([Please install the Firefox development tools, mozilla-config.h was not found.])
+        firefox_libs=`pkg-config --variable=libdir firefox-plugin`
+        CPPFLAGS="${CPPFLAGS_save} -I${firefox_include} -I${firefox_include}/plugin ${MOZILLA_CPPFLAGS}"
+        MOZILLA_REQUIRED_HEADERS=1
+        AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
+dnl        AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
+dnl        AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
+dnl          [#if HAVE_NPAPI_H
+dnl           # include <npapi.h>
+dnl           #endif
+dnl          ])
+        CPPFLAGS="${CPPFLAGS_save}"
+        if test "${MOZILLA_CONFIG_HEADERS}" = "0"; then
+            AC_MSG_ERROR([Please install the Firefox development tools; mozilla-config.h, plugin/npapi.h and plugin/npruntime.h were not found.])
         fi
         MOZILLA_CONFIG_H="${firefox_include}/mozilla-config.h"
-        XPIDL_INCL=`pkg-config --variable=idldir firefox-xpcom`
-        xpcom_lib_path=`pkg-config --variable=libdir firefox-xpcom`
-        AC_PATH_PROG(
-            [XPIDL],
-            [xpidl],
-            [ no ],
-            [${xpidl_path}:${xpcom_lib_path}:${PATH}]
-        )
-        if test "${XPIDL}" = "no"; then
-            AC_MSG_ERROR([Please install the Firefox development tools, xpidl not found!])
+        if grep '^#define HAVE_MOZ_X11 1' ${MOZILLA_CONFIG_H} 2>&1 > /dev/null ; then
+            VLC_ADD_LDFLAGS([mozilla], [${X_LIBS} ${X_PRE_LIBS}])
         fi
-        if test "${need_xpcom_libs}" = "false"; then
-            REAL_FIREFOX_LIBS=`echo ${FIREFOX_LDFLAGS} | sed -e 's|-lxpcom||'`
-            FIREFOX_LDFLAGS=${REAL_FIREFOX_LIBS}
-        fi
-        if test -f ${MOZILLA_CONFIG_H}; then
-            VLC_ADD_CFLAGS([mozilla],[${firefox_include}])
-            if grep '^#define HAVE_MOZ_X11 1' ${MOZILLA_CONFIG_H} 2>&1 > /dev/null ; then
-              VLC_ADD_LDFLAGS([mozilla], [${X_LIBS} ${X_PRE_LIBS}])
-            fi
-        fi
-        VLC_ADD_CFLAGS([mozilla],[${FIREFOX_CPPFLAGS}])
-        VLC_ADD_CXXFLAGS([mozilla],[$XPCOM_CFLAGS, " ", ${FIREFOX_CPPFLAGS}])
-        VLC_ADD_LDFLAGS([mozilla],[${FIREFOX_LDFLAGS}])
+        VLC_ADD_CPPFLAGS([mozilla],[-I${firefox_include} -I${firefox_include}/plugin ${MOZILLA_CPPFLAGS}])
+        VLC_ADD_LDFLAGS([mozilla],[-L${firefox_libs}, ${MOZILLA_LDFLAGS}])
         VLC_ADD_PLUGINS([mozilla])
         MOZILLA_CONFIG=
       ],
@@ -5380,7 +5358,6 @@ dnl        CPPFLAGS="${CPPFLAGS_save}"
         fi
       ]
     )
-
     if test ! -z "${MOZILLA_CONFIG}"
     then
       if ${MOZILLA_CONFIG} --defines | grep -q 'MOZ_X11=1'; then
