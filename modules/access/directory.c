@@ -364,6 +364,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     char *psz_ignore;
 
     struct stat_list_t stself;
+#ifndef WIN32
     int fd = dirfd (handle);
 
     if ((fd == -1) || fstat (fd, &stself.st))
@@ -375,7 +376,6 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
 
     for (stat_list_t *stats = stparent; stats != NULL; stats = stats->parent)
     {
-#ifndef WIN32
         if ((stself.st.st_ino == stats->st.st_ino)
          && (stself.st.st_dev == stats->st.st_dev))
         {
@@ -384,11 +384,12 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                       psz_name);
             return VLC_SUCCESS;
         }
+    }
 #else
         /* Windows has st_dev (driver letter - 'A'), but it zeroes st_ino,
-         * so that the test above will always incorrectly succeed. */
+         * so that the test above will always incorrectly succeed.
+         * Besides, Windows does not have dirfd(). */
 #endif
-    }
 
     stself.parent = stparent;
 
