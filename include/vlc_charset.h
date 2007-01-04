@@ -38,10 +38,12 @@ VLC_EXPORT( char *, FromLocale, ( const char * ) );
 VLC_EXPORT( char *, FromLocaleDup, ( const char * ) );
 VLC_EXPORT( char *, ToLocale, ( const char * ) );
 
+/* TODO: move all of this to "vlc_fs.h" or something like that */
 VLC_EXPORT( int, utf8_open, ( const char *filename, int flags, mode_t mode ) );
 VLC_EXPORT( FILE *, utf8_fopen, ( const char *filename, const char *mode ) );
 VLC_EXPORT( DIR *, utf8_opendir, ( const char *dirname ) );
 VLC_EXPORT( char *, utf8_readdir, ( DIR *dir ) );
+VLC_EXPORT( int, utf8_loaddir, ( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
 VLC_EXPORT( int, utf8_scandir, ( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
 
 #ifdef WIN32

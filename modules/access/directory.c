@@ -1,10 +1,11 @@
 /*****************************************************************************
  * directory.c: expands a directory (directory: access plug-in)
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
+ *          Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,9 +115,14 @@ vlc_module_end();
  * Local prototypes, constants, structures
  *****************************************************************************/
 
-#define MODE_EXPAND 0
-#define MODE_COLLAPSE 1
-#define MODE_NONE 2
+enum
+{
+    MODE_EXPAND,
+    MODE_COLLAPSE,
+    MODE_NONE
+};
+
+typedef struct stat_list_t stat_list_t;
 
 static int Read( access_t *, uint8_t *, int );
 static int ReadNull( access_t *, uint8_t *, int );
@@ -127,7 +133,10 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args );
 
 
 static int ReadDir( playlist_t *, const char *psz_name, int i_mode,
-                    playlist_item_t *, playlist_item_t *, input_item_t * );
+                    playlist_item_t *, playlist_item_t *, input_item_t *,
+                    DIR *handle, stat_list_t *stats );
+
+static DIR *OpenDir (vlc_object_t *obj, const char *psz_name);
 
 /*****************************************************************************
  * Open: open the directory
@@ -136,16 +145,11 @@ static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
 
-    struct stat stat_info;
-
-#ifdef S_ISDIR
-    if (utf8_stat (p_access->psz_path, &stat_info)
-     || !S_ISDIR (stat_info.st_mode))
-#else
-    if( strcmp( p_access->psz_access, "dir") &&
-        strcmp( p_access->psz_access, "directory") )
-#endif
+    DIR *handle = OpenDir (p_this, p_access->psz_path);
+    if (handle == NULL)
         return VLC_EGENERIC;
+
+    p_access->p_sys = (access_sys_t *)handle;
 
     p_access->pf_read  = Read;
     p_access->pf_block = NULL;
@@ -163,6 +167,9 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
+    access_t *p_access = (access_t*)p_this;
+    DIR *handle = (DIR *)p_access->p_sys;
+    closedir (handle);
 }
 
 /*****************************************************************************
@@ -224,8 +231,6 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
         i_mode = MODE_EXPAND;
     free( psz );
 
-    msg_Dbg( p_access, "opening directory `%s'", p_access->psz_path );
-
     p_current->p_input->i_type = ITEM_TYPE_DIRECTORY;
     p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
                                               VLC_FALSE );
@@ -235,7 +240,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
                     DIRECTORY_ACTIVITY );
 
     ReadDir( p_playlist, psz_name, i_mode, p_current, p_item_in_category,
-             p_current_input );
+             p_current_input, (DIR *)p_access->p_sys, NULL );
 
     i_activity = var_GetInteger( p_playlist, "activity" );
     var_SetInteger( p_playlist, "activity", i_activity -
@@ -334,13 +339,21 @@ static int Sort (const char **a, const char **b)
     return strcoll (*a, *b);
 }
 
+struct stat_list_t
+{
+    stat_list_t *parent;
+    struct stat st;
+};
+
+
 /*****************************************************************************
  * ReadDir: read a directory and add its content to the list
  *****************************************************************************/
 static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                     int i_mode, playlist_item_t *p_parent,
                     playlist_item_t *p_parent_category,
-                    input_item_t *p_current_input )
+                    input_item_t *p_current_input,
+                    DIR *handle, stat_list_t *stparent )
 {
     char **pp_dir_content = NULL;
     int             i_dir_content, i, i_return = VLC_SUCCESS;
@@ -350,17 +363,48 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     int i_extensions = 0;
     char *psz_ignore;
 
+    struct stat_list_t stself;
+    int fd = dirfd (handle);
+
+    if ((fd == -1) || fstat (fd, &stself.st))
+    {
+        msg_Err (p_playlist, "cannot stat `%s': %s", psz_name,
+                 strerror (errno));
+        return VLC_EGENERIC;
+    }
+
+    for (stat_list_t *stats = stparent; stats != NULL; stats = stats->parent)
+    {
+#ifndef WIN32
+        if ((stself.st.st_ino == stats->st.st_ino)
+         && (stself.st.st_dev == stats->st.st_dev))
+        {
+            msg_Warn (p_playlist,
+                      "ignoring infinitely recursive directory `%s'",
+                      psz_name);
+            return VLC_SUCCESS;
+        }
+#else
+        /* Windows has st_dev (driver letter - 'A'), but it zeroes st_ino,
+         * so that the test above will always incorrectly succeed. */
+#endif
+    }
+
+    stself.parent = stparent;
+
     /* Get the first directory entry */
-    i_dir_content = utf8_scandir (psz_name, &pp_dir_content, NULL, Sort);
+    i_dir_content = utf8_loaddir (handle, &pp_dir_content, NULL, Sort);
     if( i_dir_content == -1 )
     {
-        msg_Warn( p_playlist, "failed to read directory" );
+        msg_Err (p_playlist, "cannot read `%s': %s", psz_name,
+                 strerror (errno));
         return VLC_EGENERIC;
     }
     else if( i_dir_content <= 0 )
     {
         /* directory is empty */
-        if( pp_dir_content ) free( pp_dir_content );
+        msg_Dbg( p_playlist, "%s directory is empty", psz_name );
+        free( pp_dir_content );
         return VLC_SUCCESS;
     }
 
@@ -407,53 +451,33 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
         /* if it starts with '.' then forget it */
         if (entry[0] != '.')
         {
-#if defined( S_ISDIR )
-            struct stat stat_data;
+            DIR *subdir = (i_mode != MODE_COLLAPSE)
+                    ? OpenDir (VLC_OBJECT (p_playlist), psz_uri) : NULL;
 
-            if (!utf8_stat (psz_uri, &stat_data)
-             && S_ISDIR(stat_data.st_mode) && i_mode != MODE_COLLAPSE )
-#else
-            if( 0 )
-#endif
+            if (subdir != NULL) /* Recurse into subdirectory */
             {
-#if defined( S_ISLNK )
-/*
- * FIXME: there is a ToCToU race condition here; but it is rather tricky
- * impossible to fix while keeping some kind of portable code, and maybe even
- * in a non-portable way.
- */
-                if (utf8_lstat (psz_uri, &stat_data)
-                 || S_ISLNK(stat_data.st_mode) )
-                {
-                    msg_Dbg( p_playlist, "skipping directory symlink %s",
-                             psz_uri );
-                    continue;
-                }
-#endif
                 if( i_mode == MODE_NONE )
                 {
-                    msg_Dbg( p_playlist, "skipping subdirectory %s", psz_uri );
+                    msg_Dbg( p_playlist, "skipping subdirectory `%s'",
+                             psz_uri );
+                    closedir (subdir);
                     continue;
                 }
-                else if( i_mode == MODE_EXPAND )
-                {
-                    msg_Dbg(p_playlist, "creading subdirectory %s", psz_uri );
 
-                    p_node = playlist_NodeCreate( p_playlist, entry,
-                                                  p_parent_category,
-                                                  PLAYLIST_NO_REBUILD );
+                msg_Dbg (p_playlist, "creating subdirectory %s", psz_uri);
 
-                    /* If we had the parent in category, the it is now node.
-                     * Else, we still don't have  */
-                    if( ReadDir( p_playlist, psz_uri , MODE_EXPAND,
-                                 p_node, p_parent_category ? p_node : NULL,
-                                 p_current_input )
-                          != VLC_SUCCESS )
-                    {
-                        i_return = VLC_EGENERIC;
-                        break;
-                    }
-                }
+                p_node = playlist_NodeCreate( p_playlist, entry,
+                                              p_parent_category,
+                                              PLAYLIST_NO_REBUILD );
+
+                /* If we had the parent in category, the it is now node.
+                 * Else, we still don't have  */
+                i_return = ReadDir( p_playlist, psz_uri , MODE_EXPAND,
+                                    p_node, p_parent_category ? p_node : NULL,
+                                    p_current_input, subdir, &stself );
+                closedir (subdir);
+                if (i_return)
+                    break; // error :-(
             }
             else
             {
@@ -506,4 +530,23 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     if( pp_dir_content ) free( pp_dir_content );
 
     return i_return;
+}
+
+
+static DIR *OpenDir (vlc_object_t *obj, const char *path)
+{
+    msg_Dbg (obj, "opening directory `%s'", path);
+    DIR *handle = utf8_opendir (path);
+    if (handle == NULL)
+    {
+        int err = errno;
+        if (err != ENOTDIR)
+            msg_Err (obj, "%s: %s", path, strerror (err));
+        else
+            msg_Dbg (obj, "skipping non-directory `%s'", path);
+        errno = err;
+
+        return NULL;
+    }
+    return handle;
 }

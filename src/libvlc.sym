@@ -302,6 +302,7 @@ utf8_mkdir
 utf8_open
 utf8_opendir
 utf8_readdir
+utf8_loaddir
 utf8_scandir
 utf8_stat
 utf8_vfprintf

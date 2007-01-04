@@ -496,12 +496,10 @@ static int dummy_select( const char *str )
     return 1;
 }
 
-int utf8_scandir( const char *dirname, char ***namelist,
+int utf8_loaddir( DIR *dir, char ***namelist,
                   int (*select)( const char * ),
                   int (*compar)( const char **, const char ** ) )
 {
-    DIR *dir = utf8_opendir( dirname );
-
     if( select == NULL )
         select = dummy_select;
 
@@ -512,6 +510,8 @@ int utf8_scandir( const char *dirname, char ***namelist,
         char **tab = NULL;
         char *entry;
         unsigned num = 0;
+
+        rewinddir( dir );
 
         while( ( entry = utf8_readdir( dir ) ) != NULL )
         {
@@ -532,7 +532,6 @@ int utf8_scandir( const char *dirname, char ***namelist,
             tab = newtab;
             tab[num++] = entry;
         }
-        closedir( dir );
 
         if( compar != NULL )
             qsort( tab, num, sizeof( tab[0] ),
@@ -548,10 +547,25 @@ int utf8_scandir( const char *dirname, char ***namelist,
             free( tab[i] );
         if( tab != NULL )
             free( tab );
-        return -1;}
+        }
     }
+    return -1;
 }
 
+int utf8_scandir( const char *dirname, char ***namelist,
+                  int (*select)( const char * ),
+                  int (*compar)( const char **, const char ** ) )
+{
+    DIR *dir = utf8_opendir (dirname);
+    int val = -1;
+
+    if (dir != NULL)
+    {
+        val = utf8_loaddir (dir, namelist, select, compar);
+        closedir (dir);
+    }
+    return val;
+}
 
 static int utf8_statEx( const char *filename, struct stat *buf,
                         vlc_bool_t deref )
