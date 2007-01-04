@@ -182,6 +182,11 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
 {
     char               *psz;
     int                 i_mode, i_activity;
+    char               *psz_name = strdup (p_access->psz_path);
+
+    if( psz_name == NULL )
+        return VLC_ENOMEM;
+
     playlist_t         *p_playlist = pl_Yield( p_access );
     playlist_item_t    *p_item_in_category;
     input_item_t       *p_current_input = input_GetItem(
@@ -189,13 +194,11 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     playlist_item_t    *p_current = playlist_ItemGetByInput( p_playlist,
                                                              p_current_input,
                                                              VLC_FALSE );
-    char               *psz_name = strdup (p_access->psz_path);
 
-    if( psz_name == NULL )
-        return VLC_ENOMEM;
-
-    if( p_current == NULL ) {
+    if( p_current == NULL )
+    {
         msg_Err( p_access, "unable to find item in playlist" );
+        vlc_object_release( p_playlist );
         return VLC_ENOOBJ;
     }
 
