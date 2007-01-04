@@ -94,6 +94,7 @@ vlc_module_begin();
     set_capability( "access2", 55 );
     add_shortcut( "directory" );
     add_shortcut( "dir" );
+    add_shortcut( "file" );
     add_string( "recursive", "expand" , NULL, RECURSIVE_TEXT,
                 RECURSIVE_LONGTEXT, VLC_FALSE );
       change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
