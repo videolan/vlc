@@ -80,7 +80,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
         *     anyway
         *  - wav can't be added 'cause of a52 and dts in them as raw audio
          */
-         static struct { const char *ext; const char *demux; } exttodemux[] =
+         static const struct { char ext[5]; char demux[9]; } exttodemux[] =
          {
             { "aac",  "aac" },
             { "aiff", "aiff" },
@@ -99,15 +99,15 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
             { "rm",   "rm" },
             { "m4v",  "m4v" },
             { "h264",  "h264" },
-            { NULL,  NULL },
+            { "",  "" },
         };
         /* Here, we don't mind if it does not work, it must be quick */
-        static struct { const char *ext; const char *demux; } exttodemux_quick[] =
+        static const struct { char ext[4]; char demux[5]; } exttodemux_quick[] =
         {
             { "mp3", "mpga" },
             { "ogg", "ogg" },
             { "wma", "asf" },
-            { NULL, NULL }
+            { "", "" }
         };
 
         const char *psz_ext = strrchr( p_demux->psz_path, '.' ) + 1;
@@ -115,7 +115,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
 
         if( !b_quick )
         {
-            for( i = 0; exttodemux[i].ext != NULL; i++ )
+            for( i = 0; exttodemux[i].ext[0]; i++ )
             {
                 if( !strcasecmp( psz_ext, exttodemux[i].ext ) )
                 {
@@ -126,7 +126,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
         }
         else
         {
-            for( i = 0; exttodemux_quick[i].ext != NULL; i++ )
+            for( i = 0; exttodemux_quick[i].ext[0]; i++ )
             {
                 if( !strcasecmp( psz_ext, exttodemux_quick[i].ext ) )
                 {
