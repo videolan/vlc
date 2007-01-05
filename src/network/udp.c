@@ -628,7 +628,10 @@ int __net_OpenUDP( vlc_object_t *obj, const char *psz_bind, int i_bind,
     struct addrinfo hints, *loc, *rem;
     int val;
 
-    msg_Dbg( obj, "net: connecting to '[%s]:%d@[%s]:%d'",
+    if( !*psz_server )
+        return net_ListenUDP1 (obj, psz_bind, i_bind);
+
+    msg_Dbg( obj, "net: connecting to [%s]:%d from [%s]:%d",
              psz_server, i_server, psz_bind, i_bind );
 
     memset (&hints, 0, sizeof (hints));
