@@ -349,6 +349,12 @@ FILE *utf8_fopen (const char *filename, const char *mode)
             case '+':
                 rwflags = O_RDWR;
                 break;
+
+#ifdef O_TEXT
+            case 't':
+                oflags |= O_TEXT;
+                break;
+#endif
         }
     }
 
