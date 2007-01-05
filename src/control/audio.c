@@ -248,11 +248,11 @@ void libvlc_audio_set_channel( libvlc_instance_t *p_instance, char *psz_channel,
             i_ret = var_Set( p_aout, "audio-channels", val );
             if( i_ret < 0 )
             {
-		libvlc_exception_raise( p_e, "failed setting audio range" );
-    	    	vlc_object_release( p_aout );
+                libvlc_exception_raise( p_e, "failed setting audio range" );
+                vlc_object_release( p_aout );
                 return;
             }
-    	    vlc_object_release( p_aout );
+            vlc_object_release( p_aout );
             return; /* Found */
         }
     }
