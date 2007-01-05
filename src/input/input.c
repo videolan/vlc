@@ -2035,7 +2035,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
         /* Now try a real access */
         in->p_access = access2_New( p_input, psz_access, psz_demux, psz_path,
-                                    VLC_TRUE );
+                                    p_input->b_preparsing );
 
         /* Access failed, URL encoded ? */
         if( in->p_access == NULL && strchr( psz_path, '%' ) )
