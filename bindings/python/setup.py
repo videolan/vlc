@@ -65,7 +65,7 @@ def get_ldflags():
 	    ldflags.append('-lstdc++')
         return ldflags
 
-#source_files = [ 'vlc_module.c', 'vlc_object.c', 'vlc_mediacontrol.c',
+#source_files = [ 'vlc_module.c', 'vlc_mediacontrol.c',
 #                 'vlc_position.c', 'vlc_instance.c', 'vlc_input.c' ]
 source_files = [ 'vlc_module.c' ]
 
@@ -91,9 +91,6 @@ setup (name = 'VLC Bindings',
 This module provides bindings for the native libvlc API of the VLC
 video player. Documentation can be found on the VLC wiki : 
 http://wiki.videolan.org/index.php/ExternalAPI
-
-The module also provides a Object type, which gives a low-level access
-to the vlc objects and their variables.
 
 This module also provides a MediaControl object, which implements an
 API inspired from the OMG Audio/Video Stream 1.0 specification.
@@ -124,13 +121,5 @@ mc.pause(0)
 
 # Get status information
 mc.get_stream_information()
-
-# Access lowlevel objets
-o=vlc.Object(1)
-o.info()
-i=o.find_object('input')
-i.list()
-i.get('time')
-
        """,
        ext_modules = [ vlclocal ])

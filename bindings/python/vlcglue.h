@@ -74,21 +74,6 @@ PyObject *MediaControl_PlaylistException;
 PyObject *vlcInstance_Exception;
 
 /**********************************************************************
- * VLC Object
- **********************************************************************/
-#define VLCSELF ( ( vlcObject* )self )
-
-/**********************************************************************
- * VLCObject Object
- **********************************************************************/
-typedef struct
-{
-    PyObject_HEAD
-    vlc_object_t* p_object;
-    int b_released;
-} vlcObject;
-
-/**********************************************************************
  * MediaControl Object
  **********************************************************************/
 typedef struct
@@ -129,7 +114,6 @@ typedef struct
 } vlcInput;
 
 /* Forward declarations */
-staticforward PyTypeObject vlcObject_Type;
 staticforward PyTypeObject MediaControl_Type;
 staticforward PyTypeObject PyPosition_Type;
 staticforward PyTypeObject vlcInstance_Type;

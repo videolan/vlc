@@ -21,11 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* We need to access some internal features of VLC (for vlc_object) */
-/* This is gruik as we are not libvlc at all */
-#define __LIBVLC__
-
-
 #include "vlcglue.h"
 
 /**************************************************************************
@@ -67,8 +62,6 @@ initvlc( void )
     if( PyType_Ready( &PyPosition_Type ) < 0 )
         return;
     if( PyType_Ready( &MediaControl_Type ) < 0 )
-        return;
-    if( PyType_Ready( &vlcObject_Type ) < 0 )
         return;
     if( PyType_Ready( &vlcInstance_Type ) < 0 )
         return;
@@ -122,9 +115,6 @@ initvlc( void )
     PyModule_AddObject( p_module, "MediaControl",
                         ( PyObject * )&MediaControl_Type );
 
-    Py_INCREF( &vlcObject_Type );
-    PyModule_AddObject( p_module, "Object",
-                        ( PyObject * )&vlcObject_Type );
     Py_INCREF( &vlcInstance_Type );
     PyModule_AddObject( p_module, "Instance",
                         ( PyObject * )&vlcInstance_Type );
@@ -180,4 +170,3 @@ void * fast_memcpy( void * to, const void * from, size_t len )
 #include "vlc_position.c"
 #include "vlc_instance.c"
 #include "vlc_input.c"
-#include "vlc_object.c"
