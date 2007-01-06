@@ -57,9 +57,9 @@ fi
 case $HOST in
     ppc-darwin)
 # Mac OS X < 10.4
-	    echo "HAVE_DARWIN_OS = 1" >> config.mak
-	    EXTRA_CPPFLAGS=" -no-cpp-precomp"
-	    echo "PATH = /bin:/usr/bin" >> config.mak
+	    echo "Your version of Mac OS X is too old!" >&2
+	    echo "Compiling VLC requires 10.4.x or later" >&2
+	    exit 1
 	;;
     powerpc-apple-darwin8)
 # Mac OS X 10.4
@@ -133,10 +133,6 @@ case $HOST in
     *)
         ;;
 esac
-
-if test `uname -r` = "9.0.0d5"; then
-echo "HAVE_FUTURE_DARWIN_OS = 1" >> config.mak
-fi
 
 echo "BUILD = $BUILD" >> config.mak
 echo "HOST = $HOST" >> config.mak
