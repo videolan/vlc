@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-12-19 22:58+0100\n"
+"POT-Creation-Date: 2007-01-06 01:51+0000\n"
 "PO-Revision-Date: 2006-05-18 19:31+0100\n"
 "Last-Translator: Miroslav Oujeský <oujesky@mail.muni.cz>\n"
 "Language-Team: \n"
@@ -71,7 +71,7 @@ msgstr ""
 msgid "Hotkeys settings"
 msgstr "Nastavení klávesových zkratek"
 
-#: include/vlc_config_cat.h:58 src/input/es_out.c:1599
+#: include/vlc_config_cat.h:58 src/input/es_out.c:1607
 #: src/libvlc-module.c:1256 modules/gui/beos/InterfaceWindow.cpp:281
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:559
 #: modules/gui/macosx/output.m:170 modules/gui/macosx/playlistinfo.m:96
@@ -92,7 +92,7 @@ msgid "General audio settings"
 msgstr "Nastavení zvukových kodeků"
 
 #: include/vlc_config_cat.h:64 include/vlc_config_cat.h:89
-#: src/video_output/video_output.c:428
+#: src/video_output/video_output.c:429
 msgid "Filters"
 msgstr "Filtry"
 
@@ -129,7 +129,7 @@ msgstr "Různé"
 msgid "Miscellaneous audio settings and modules."
 msgstr ""
 
-#: include/vlc_config_cat.h:79 src/input/es_out.c:1627
+#: include/vlc_config_cat.h:79 src/input/es_out.c:1635
 #: src/libvlc-module.c:1291 modules/gui/macosx/extended.m:79
 #: modules/gui/macosx/intf.m:572 modules/gui/macosx/output.m:160
 #: modules/gui/macosx/playlistinfo.m:86 modules/gui/macosx/wizard.m:421
@@ -748,7 +748,7 @@ msgstr "Nastavuji balík %s (%s) ...\n"
 msgid "URL"
 msgstr "URL"
 
-#: include/vlc_meta.h:44 src/input/es_out.c:1591 src/libvlc-module.c:106
+#: include/vlc_meta.h:44 src/input/es_out.c:1599 src/libvlc-module.c:106
 #: modules/gui/beos/InterfaceWindow.cpp:277
 msgid "Language"
 msgstr "Jazyk"
@@ -800,7 +800,7 @@ msgstr ""
 
 #: src/audio_output/input.c:86 src/audio_output/input.c:132
 #: src/input/es_out.c:372 src/libvlc-module.c:432
-#: src/video_output/video_output.c:404 modules/codec/ffmpeg/postprocess.c:92
+#: src/video_output/video_output.c:405 modules/codec/ffmpeg/postprocess.c:92
 msgid "Disable"
 msgstr "Vypnout"
 
@@ -849,7 +849,7 @@ msgstr "Stereo"
 #: src/audio_output/output.c:106 src/audio_output/output.c:142
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:129
-#: modules/control/gestures.c:87 modules/video_filter/logo.c:97
+#: modules/control/gestures.c:88 modules/video_filter/logo.c:97
 #: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:181
 #: modules/video_filter/osdmenu.c:76 modules/video_filter/rss.c:160
 msgid "Left"
@@ -858,7 +858,7 @@ msgstr "Vlevo"
 #: src/audio_output/output.c:108 src/audio_output/output.c:144
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:129
-#: modules/control/gestures.c:87 modules/video_filter/logo.c:97
+#: modules/control/gestures.c:88 modules/video_filter/logo.c:97
 #: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:181
 #: modules/video_filter/osdmenu.c:76 modules/video_filter/rss.c:160
 msgid "Right"
@@ -975,83 +975,83 @@ msgid "Program"
 msgstr "Program"
 
 # stream?
-#: src/input/es_out.c:1586 modules/codec/faad.c:329
+#: src/input/es_out.c:1594 modules/codec/faad.c:329
 #, c-format
 msgid "Stream %d"
 msgstr "Proud %d"
 
-#: src/input/es_out.c:1588 modules/gui/macosx/wizard.m:425
+#: src/input/es_out.c:1596 modules/gui/macosx/wizard.m:425
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:820
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:860
 msgid "Codec"
 msgstr "kodek"
 
-#: src/input/es_out.c:1599 src/input/es_out.c:1627 src/input/es_out.c:1654
+#: src/input/es_out.c:1607 src/input/es_out.c:1635 src/input/es_out.c:1662
 #: modules/gui/macosx/output.m:153
 msgid "Type"
 msgstr "Typ"
 
-#: src/input/es_out.c:1602 modules/codec/faad.c:333
+#: src/input/es_out.c:1610 modules/codec/faad.c:333
 #: modules/gui/macosx/output.m:176
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:857
 msgid "Channels"
 msgstr "Kanály"
 
-#: src/input/es_out.c:1607 modules/codec/faad.c:335
+#: src/input/es_out.c:1615 modules/codec/faad.c:335
 msgid "Sample rate"
 msgstr "Vzorkovací kmitočet"
 
-#: src/input/es_out.c:1608 modules/codec/faad.c:335
+#: src/input/es_out.c:1616 modules/codec/faad.c:335
 #, c-format
 msgid "%d Hz"
 msgstr "%d Hz"
 
-#: src/input/es_out.c:1614
+#: src/input/es_out.c:1622
 msgid "Bits per sample"
 msgstr "Bitů na vzorek"
 
-#: src/input/es_out.c:1619 modules/access_output/shout.c:87
+#: src/input/es_out.c:1627 modules/access_output/shout.c:87
 #: modules/access/pvr.c:84
 msgid "Bitrate"
 msgstr "Bitrate"
 
-#: src/input/es_out.c:1620
+#: src/input/es_out.c:1628
 #, c-format
 msgid "%d kb/s"
 msgstr "%d kb/s"
 
-#: src/input/es_out.c:1631
+#: src/input/es_out.c:1639
 msgid "Resolution"
 msgstr "Rozlišení"
 
-#: src/input/es_out.c:1637
+#: src/input/es_out.c:1645
 #, fuzzy
 msgid "Display resolution"
 msgstr "Zobrazí zkrácený seznam rozlišení"
 
-#: src/input/es_out.c:1647 modules/access/screen/screen.c:40
+#: src/input/es_out.c:1655 modules/access/screen/screen.c:40
 #, fuzzy
 msgid "Frame rate"
 msgstr "frekvence rámců"
 
-#: src/input/es_out.c:1654
+#: src/input/es_out.c:1662
 msgid "Subtitle"
 msgstr "Titulky"
 
-#: src/input/input.c:2078
+#: src/input/input.c:2058
 msgid "Your input can't be opened"
 msgstr ""
 
-#: src/input/input.c:2079
+#: src/input/input.c:2059
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/input.c:2154
+#: src/input/input.c:2134
 msgid "Can't recognize the input's format"
 msgstr ""
 
-#: src/input/input.c:2155
+#: src/input/input.c:2135
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -1169,8 +1169,8 @@ msgstr "Přihlašuji se"
 msgid "Mouse Gestures"
 msgstr "Gesta"
 
-#: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1682
-#: src/misc/modules.c:2005
+#: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
+#: src/misc/modules.c:1993
 msgid "C"
 msgstr "C"
 
@@ -1178,15 +1178,15 @@ msgstr "C"
 msgid "Help options"
 msgstr "Volby nápovědy"
 
-#: src/libvlc-common.c:1364 src/misc/configuration.c:1227
+#: src/libvlc-common.c:1364 src/misc/configuration.c:1217
 msgid "string"
 msgstr "string"
 
-#: src/libvlc-common.c:1383 src/misc/configuration.c:1191
+#: src/libvlc-common.c:1383 src/misc/configuration.c:1181
 msgid "integer"
 msgstr "integer"
 
-#: src/libvlc-common.c:1403 src/misc/configuration.c:1216
+#: src/libvlc-common.c:1403 src/misc/configuration.c:1206
 msgid "float"
 msgstr "float"
 
@@ -3998,11 +3998,11 @@ msgstr ""
 msgid "print version information"
 msgstr "vypsání informací o verzi"
 
-#: src/misc/configuration.c:1191
+#: src/misc/configuration.c:1181
 msgid "boolean"
 msgstr "boolean"
 
-#: src/misc/configuration.c:1202
+#: src/misc/configuration.c:1192
 msgid "key"
 msgstr "klíč"
 
@@ -4595,28 +4595,28 @@ msgstr "Zulu"
 msgid "Unknown"
 msgstr "Neznámý"
 
-#: src/video_output/video_output.c:402 modules/gui/macosx/intf.m:590
+#: src/video_output/video_output.c:403 modules/gui/macosx/intf.m:590
 #: modules/gui/macosx/intf.m:591 modules/video_filter/deinterlace.c:122
 msgid "Deinterlace"
 msgstr "Odstranění prokládání"
 
-#: src/video_output/video_output.c:406 modules/video_filter/deinterlace.c:117
+#: src/video_output/video_output.c:407 modules/video_filter/deinterlace.c:117
 msgid "Discard"
 msgstr "Zahodit"
 
-#: src/video_output/video_output.c:408 modules/video_filter/deinterlace.c:117
+#: src/video_output/video_output.c:409 modules/video_filter/deinterlace.c:117
 msgid "Blend"
 msgstr "Mísení"
 
-#: src/video_output/video_output.c:410 modules/video_filter/deinterlace.c:117
+#: src/video_output/video_output.c:411 modules/video_filter/deinterlace.c:117
 msgid "Mean"
 msgstr "Průměr"
 
-#: src/video_output/video_output.c:412 modules/video_filter/deinterlace.c:118
+#: src/video_output/video_output.c:413 modules/video_filter/deinterlace.c:118
 msgid "Bob"
 msgstr ""
 
-#: src/video_output/video_output.c:414 modules/video_filter/deinterlace.c:118
+#: src/video_output/video_output.c:415 modules/video_filter/deinterlace.c:118
 msgid "Linear"
 msgstr "Lineární"
 
@@ -4715,7 +4715,7 @@ msgstr "Audio CD - Stopa"
 msgid "Audio CD - Track %i"
 msgstr "Audio CD - Stopa %i"
 
-#: modules/access/cdda/cdda.c:42 modules/access/directory.c:79
+#: modules/access/cdda/cdda.c:42 modules/access/directory.c:80
 #: modules/codec/x264.c:321 modules/codec/x264.c:327 modules/codec/x264.c:332
 msgid "none"
 msgstr "nic"
@@ -4980,11 +4980,11 @@ msgstr "Číslo stopy"
 msgid "dc1394 input"
 msgstr "Žádný vstup"
 
-#: modules/access/directory.c:71
+#: modules/access/directory.c:72
 msgid "Subdirectory behavior"
 msgstr "Chování složek"
 
-#: modules/access/directory.c:73
+#: modules/access/directory.c:74
 msgid ""
 "Select whether subdirectories must be expanded.\n"
 "none: subdirectories do not appear in the playlist.\n"
@@ -4992,19 +4992,19 @@ msgid ""
 "expand: all subdirectories are expanded.\n"
 msgstr ""
 
-#: modules/access/directory.c:79
+#: modules/access/directory.c:80
 msgid "collapse"
 msgstr "sbalit"
 
-#: modules/access/directory.c:80
+#: modules/access/directory.c:81
 msgid "expand"
 msgstr "rozbalit"
 
-#: modules/access/directory.c:82
+#: modules/access/directory.c:83
 msgid "Ignored extensions"
 msgstr "Ignorovaná rozšíření"
 
-#: modules/access/directory.c:84
+#: modules/access/directory.c:85
 msgid ""
 "Files with these extensions will not be added to playlist when opening a "
 "directory.\n"
@@ -5012,11 +5012,11 @@ msgid ""
 "instance. Use a comma-separated list of extensions."
 msgstr ""
 
-#: modules/access/directory.c:91
+#: modules/access/directory.c:92
 msgid "Directory"
 msgstr "Adresář"
 
-#: modules/access/directory.c:93
+#: modules/access/directory.c:94
 #, fuzzy
 msgid "Standard filesystem directory input"
 msgstr "standardní vstup je uzavřen"
@@ -5165,7 +5165,7 @@ msgstr "Zařízení vstupu videa"
 #: modules/access/dshow/dshow.cpp:141
 msgid ""
 "Select the video input source, such as composite, s-video, or tuner. Since "
-"these settings are hardware-specfic, you should find good settings in the "
+"these settings are hardware-specific, you should find good settings in the "
 "\"Device config\" area, and use those numbers here. -1 means that settings "
 "will not be changed."
 msgstr ""
@@ -5911,7 +5911,7 @@ msgstr "HTTP(S)"
 msgid "HTTP authentication"
 msgstr "HTTP autentikace"
 
-#: modules/access/http.c:298 modules/demux/live555.cpp:754
+#: modules/access/http.c:298 modules/demux/live555.cpp:759
 msgid "Please enter a valid login name and a password."
 msgstr ""
 
@@ -5976,7 +5976,7 @@ msgid "User name that will be requested to access the stream."
 msgstr ""
 
 #: modules/access_output/http.c:63 modules/control/telnet.c:79
-#: modules/misc/audioscrobbler.c:120
+#: modules/control/telnet.c:256 modules/misc/audioscrobbler.c:120
 msgid "Password"
 msgstr "Heslo"
 
@@ -6659,7 +6659,7 @@ msgstr "Segmenty"
 
 #: modules/access/vcdx/access.c:428 modules/access/vcdx/access.c:709
 #: modules/access/vcdx/info.c:294 modules/access/vcdx/info.c:295
-#: modules/demux/mkv.cpp:5190
+#: modules/demux/mkv.cpp:5260
 msgid "Segment"
 msgstr "Segment"
 
@@ -9185,15 +9185,15 @@ msgstr "tlačítko"
 msgid "Trigger button for mouse gestures."
 msgstr "Poskytuje podporu pro gesta myši"
 
-#: modules/control/gestures.c:87
+#: modules/control/gestures.c:88
 msgid "Middle"
 msgstr "Uprostřed"
 
-#: modules/control/gestures.c:90
+#: modules/control/gestures.c:91
 msgid "Gestures"
 msgstr "Gesta"
 
-#: modules/control/gestures.c:98
+#: modules/control/gestures.c:99
 #, fuzzy
 msgid "Mouse gestures control interface"
 msgstr "Provádět akce gesty myši"
@@ -9245,6 +9245,21 @@ msgstr "chyba \"%mode:1\""
 #, c-format
 msgid "Zoom mode: %s"
 msgstr "Režim zoomu: %s"
+
+#: modules/control/hotkeys.c:662 modules/control/hotkeys.c:672
+#, fuzzy, c-format
+msgid "Subtitle delay %i ms"
+msgstr "Zvýšit zpoždění titulků"
+
+#: modules/control/hotkeys.c:682 modules/control/hotkeys.c:692
+#, fuzzy, c-format
+msgid "Audio delay %i ms"
+msgstr "Zvýšit zpoždění titulků"
+
+#: modules/control/hotkeys.c:886
+#, fuzzy, c-format
+msgid "Volume %d%%"
+msgstr "Hlasitost: %d%%"
 
 #: modules/control/http/http.c:34
 #, fuzzy
@@ -9903,6 +9918,21 @@ msgstr ""
 msgid "VLM remote control interface"
 msgstr "Rozumí Vzdálenému ovládání _Netscape"
 
+#: modules/control/telnet.c:382
+msgid "Line too long\r\n"
+msgstr ""
+
+#: modules/control/telnet.c:412
+msgid "Welcome, Master"
+msgstr ""
+
+#: modules/control/telnet.c:424
+msgid ""
+"\r\n"
+"Wrong password.\r\n"
+"Password: "
+msgstr ""
+
 #: modules/demux/a52.c:44
 #, fuzzy
 msgid "Raw A/52 demuxer"
@@ -10105,7 +10135,7 @@ msgstr "Port HTTP proxy"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr ""
 
-#: modules/demux/live555.cpp:753
+#: modules/demux/live555.cpp:758
 #, fuzzy
 msgid "RTSP authentication"
 msgstr "HTTP autentikace"
@@ -10174,20 +10204,20 @@ msgstr "XSLT - Elementy"
 msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
 
-#: modules/demux/mkv.cpp:3164
+#: modules/demux/mkv.cpp:3234
 msgid "---  DVD Menu"
 msgstr "---  DVD Menu"
 
-#: modules/demux/mkv.cpp:3170
+#: modules/demux/mkv.cpp:3240
 #, fuzzy
 msgid "First Played"
 msgstr "N_aposledy hrané"
 
-#: modules/demux/mkv.cpp:3172
+#: modules/demux/mkv.cpp:3242
 msgid "Video Manager"
 msgstr "Správce videa"
 
-#: modules/demux/mkv.cpp:3178
+#: modules/demux/mkv.cpp:3248
 msgid "----- Title"
 msgstr "----- Titul"
 
@@ -11083,15 +11113,9 @@ msgstr "Použít _filtry"
 msgid "Image adjustment"
 msgstr "Vodorovné zarovnání"
 
-#: modules/gui/macosx/extended.m:84 modules/gui/macosx/wizard.m:370
-#: modules/gui/macosx/wizard.m:371 modules/gui/macosx/wizard.m:442
-#: modules/gui/macosx/wizard.m:444 modules/gui/macosx/wizard.m:446
-#: modules/gui/macosx/wizard.m:455
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:477
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:484
-#: modules/gui/wxwidgets/extrapanel.cpp:317
-msgid "More Info"
-msgstr "Více informací"
+#: modules/gui/macosx/extended.m:84
+msgid "Shows more information about the available video filters."
+msgstr ""
 
 #: modules/gui/macosx/extended.m:85 modules/video_filter/wave.c:51
 msgid "Wave"
@@ -11211,20 +11235,21 @@ msgstr "Sytost"
 msgid "Opaqueness"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:617 modules/gui/wxwidgets/extrapanel.cpp:1007
-msgid "More Information"
-msgstr "Více informací"
+#: modules/gui/macosx/extended.m:617
+#, fuzzy
+msgid "About the video filters"
+msgstr "Horní propust"
 
 #: modules/gui/macosx/extended.m:618
 msgid ""
-"This panel allows to select video effects filters to apply.\n"
-"The filters can be configured individually in the Preferences, in the "
+"This panel allows on-the-fly selection of various video effects.\n"
+"These filters can be configured individually in the Preferences, in the "
 "subsections of Video/Filters.\n"
 "To choose the order in which the filter are applied, a filter option string "
 "can be set in the Preferences, Video / Filters section."
 msgstr ""
 
-#: modules/gui/macosx/fspanel.m:372
+#: modules/gui/macosx/fspanel.m:383
 #, fuzzy
 msgid "(no item is being played)"
 msgstr "%i položek v seznamu skladeb"
@@ -11843,7 +11868,7 @@ msgid "Sort Node by Author"
 msgstr "Seřadit uzel podle autora"
 
 #: modules/gui/macosx/playlist.m:436 modules/gui/macosx/playlist.m:479
-#: modules/gui/macosx/playlist.m:1377
+#: modules/gui/macosx/playlist.m:1381
 msgid "No items in the playlist"
 msgstr "Žádné položky v seznamu skladeb"
 
@@ -11868,12 +11893,12 @@ msgstr "Soubor M3U"
 msgid "XML Shareable Playlist Format (XSPF)"
 msgstr ""
 
-#: modules/gui/macosx/playlist.m:473 modules/gui/macosx/playlist.m:1370
+#: modules/gui/macosx/playlist.m:473 modules/gui/macosx/playlist.m:1374
 #, c-format
 msgid "%i items in the playlist"
 msgstr "%i položek v seznamu skladeb"
 
-#: modules/gui/macosx/playlist.m:481 modules/gui/macosx/playlist.m:1381
+#: modules/gui/macosx/playlist.m:481 modules/gui/macosx/playlist.m:1385
 msgid "1 item in the playlist"
 msgstr "1 položka v seznamu skladeb"
 
@@ -11891,7 +11916,7 @@ msgstr "Nový uzel"
 msgid "Please enter a name for the new node."
 msgstr "Zadejte prosím název uzlu"
 
-#: modules/gui/macosx/playlist.m:1348
+#: modules/gui/macosx/playlist.m:1351
 msgid "Empty Folder"
 msgstr "Prázdná složka"
 
@@ -12324,6 +12349,15 @@ msgstr "Spustit průvodce firewallem"
 #: modules/gui/macosx/wizard.m:368
 msgid "This wizard allows to configure simple streaming or transcoding setups."
 msgstr ""
+
+#: modules/gui/macosx/wizard.m:370 modules/gui/macosx/wizard.m:371
+#: modules/gui/macosx/wizard.m:442 modules/gui/macosx/wizard.m:444
+#: modules/gui/macosx/wizard.m:446 modules/gui/macosx/wizard.m:455
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:477
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:484
+#: modules/gui/wxwidgets/extrapanel.cpp:317
+msgid "More Info"
+msgstr "Více informací"
 
 #: modules/gui/macosx/wizard.m:372
 msgid ""
@@ -13143,32 +13177,32 @@ msgstr "Nemohu nalézt soubor pixmapy: %s"
 msgid "QNX RTOS video and audio output"
 msgstr ""
 
-#: modules/gui/qt4/dialogs_provider.cpp:177
+#: modules/gui/qt4/dialogs_provider.cpp:197
 #, fuzzy
 msgid "Media Files"
 msgstr "Médium: %s"
 
-#: modules/gui/qt4/dialogs_provider.cpp:181
+#: modules/gui/qt4/dialogs_provider.cpp:203
 #, fuzzy
 msgid "Video Files"
 msgstr "Použít _filtry"
 
-#: modules/gui/qt4/dialogs_provider.cpp:185
+#: modules/gui/qt4/dialogs_provider.cpp:209
 #, fuzzy
 msgid "Sound Files"
 msgstr "Zvukový klip"
 
-#: modules/gui/qt4/dialogs_provider.cpp:189
+#: modules/gui/qt4/dialogs_provider.cpp:215
 #, fuzzy
 msgid "PlayList Files"
 msgstr "Sestavuji pohled"
 
-#: modules/gui/qt4/dialogs_provider.cpp:193
+#: modules/gui/qt4/dialogs_provider.cpp:220
 #, fuzzy
 msgid "All Files"
 msgstr "Soubory"
 
-#: modules/gui/qt4/dialogs_provider.cpp:286
+#: modules/gui/qt4/dialogs_provider.cpp:317
 #, fuzzy
 msgid "Open directory"
 msgstr "Otevřít &složku..."
@@ -14243,6 +14277,10 @@ msgid ""
 "control the order in which they are applied, enter a filters string in the "
 "Video Filter Module inside the preferences."
 msgstr ""
+
+#: modules/gui/wxwidgets/extrapanel.cpp:1007
+msgid "More Information"
+msgstr "Více informací"
 
 #: modules/gui/wxwidgets/input_manager.cpp:181
 msgid "Stopped"
@@ -15876,7 +15914,7 @@ msgstr "Kopirovat menu"
 msgid "H.264 video packetizer"
 msgstr "Začít _videokonferenci"
 
-#: modules/packetizer/mpeg4audio.c:118
+#: modules/packetizer/mpeg4audio.c:119
 #, fuzzy
 msgid "MPEG4 audio packetizer"
 msgstr "Zásuvný modul zvuku v textu"
@@ -18912,6 +18950,10 @@ msgstr "režim filtru"
 #, fuzzy
 msgid "Spectrum analyser"
 msgstr "Analyzátor spektra"
+
+#, fuzzy
+#~ msgid "Password: "
+#~ msgstr "Heslo:"
 
 #~ msgid "Description file"
 #~ msgstr "Soubor s popisem"
