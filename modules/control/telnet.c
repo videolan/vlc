@@ -253,6 +253,7 @@ static void Run( intf_thread_t *p_intf )
         fd = net_Accept( p_intf, p_sys->pi_fd, p_sys->i_clients > 0 ? 0 : -1 );
         if( fd > 0 )
         {
+            char   *psz_pwd = strdup( _("Password"));
             telnet_client_t *cl;
 
             /* to be non blocking */
@@ -269,9 +270,10 @@ static void Run( intf_thread_t *p_intf )
             cl->fd = fd;
             cl->buffer_write = NULL;
             cl->p_buffer_write = cl->buffer_write;
-            Write_message( cl, NULL,
-                           _( "Password: \xff\xfb\x01" ), WRITE_MODE_PWD );
-
+            realloc( psz_pwd, strlen(psz_pwd)+ 5 + 1 );
+            strncat( psz_pwd, ": \xff\xfb\x01", 5);
+            Write_message( cl, NULL, psz_pwd, WRITE_MODE_PWD );
+            free( psz_pwd );
             TAB_APPEND( p_sys->i_clients, p_sys->clients, cl );
         }
 
@@ -407,8 +409,13 @@ static void Run( intf_thread_t *p_intf )
                 *cl->p_buffer_read = '\0';
                 if( strcmp( psz_password, cl->buffer_read ) == 0 )
                 {
-                    Write_message( cl, NULL, _( "\xff\xfc\x01\r\nWelcome, "
-                                   "Master\r\n> " ), WRITE_MODE_CMD );
+                    char *psz_tmp=strdup( _("Welcome, Master") );
+                    realloc(psz_tmp, 5 + strlen(psz_tmp) + 4 + 1);
+                    memmove( psz_tmp + 5, psz_tmp, strlen(psz_tmp) + 1 ); 
+                    memcpy( psz_tmp, "\xff\xfc\x01\r\n",5);
+                    strncat( psz_tmp, "\r\n> ", 4 );
+                    Write_message( cl, NULL, psz_tmp, WRITE_MODE_CMD );
+                    free( psz_tmp);
                 }
                 else
                 {
