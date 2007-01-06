@@ -3,7 +3,7 @@
 ###############################################################################
 
 EXTRA_DIST = vlcglue.h setup.py vlcwrapper.py vlcwidget.py \
-	vlc_module.c vlc_object.c \
+	vlc_module.c \
 	vlc_mediacontrol.c vlc_position.c \
 	vlc_instance.c vlc_input.c
 
