@@ -245,26 +245,12 @@ int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
 
     for (unsigned i = 1; fdv[i] != -1; i++)
     {
-        msg_Warn (obj, "A socket has been dropped!");
+        msg_Warn (obj, "Multiple sockets opened. Dropping extra ones!");
         net_Close (fdv[i]);
     }
 
     int fd = fdv[0];
     assert (fd != -1);
-
-    if (fdv[1] != -1)
-    {
-#ifdef IPV6_V6ONLY
-        struct sockaddr_storage addr;
-
-        if ((getsockname (fd, (struct sockaddr *)&addr,
-                          &(socklen_t){ sizeof (addr) }) == 0)
-         && (addr.ss_family == AF_INET6)
-         && setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 0 },
-                        sizeof (int)))
-#endif
-            msg_Err (obj, "Lame IP dual-stack: IPv4 connections might fail.");
-    }
 
     free (fdv);
     return fd;
