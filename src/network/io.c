@@ -97,8 +97,7 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
      * than ::ffff:w.x.y.z
      */
     if (family == AF_INET6)
-        setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 1 },
-                    &(socklen_t){ sizeof (int) });
+        setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 1 }, sizeof (int));
 #endif
 
 #if defined (WIN32) || defined (UNDER_CE)
@@ -262,7 +261,7 @@ int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
                           &(socklen_t){ sizeof (addr) }) == 0)
          && (addr.ss_family == AF_INET6)
          && setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 0 },
-                        &(socklen_t){ sizeof (int) }))
+                        sizeof (int)))
 #endif
             msg_Err (obj, "Lame IP dual-stack: IPv4 connections might fail.");
     }
