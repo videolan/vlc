@@ -510,17 +510,17 @@ void libvlc_audio_set_track( libvlc_input_t *, int, libvlc_exception_t * );
  * Get current audio channel
  * \param p_instance input instance
  * \param p_exception an initialized exception
- * \return the audio channel (char *)
+ * \return the audio channel (int)
  */
-char *libvlc_audio_get_channel( libvlc_instance_t *, libvlc_exception_t * );
+int libvlc_audio_get_channel( libvlc_instance_t *, libvlc_exception_t * );
 
 /**
  * Set current audio channel
  * \param p_instance input instance
- * \param psz_channel the audio channel (char *)
+ * \param i_channel the audio channel (int)
  * \param p_exception an initialized exception
  */
-void libvlc_audio_set_channel( libvlc_instance_t *, char *, libvlc_exception_t * );
+void libvlc_audio_set_channel( libvlc_instance_t *, int, libvlc_exception_t * );
 
 /** @} */
 

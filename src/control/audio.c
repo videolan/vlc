@@ -187,76 +187,47 @@ void libvlc_audio_set_track( libvlc_input_t *p_input, int i_track,
 /*****************************************************************************
  * libvlc_audio_get_channel : Get the current audio channel
  *****************************************************************************/
-char *libvlc_audio_get_channel( libvlc_instance_t *p_instance,
+int libvlc_audio_get_channel( libvlc_instance_t *p_instance,
                                 libvlc_exception_t *p_e )
 {
     aout_instance_t *p_aout = GetAOut( p_instance, p_e );
-    char *psz_channel = NULL;
     vlc_value_t val;
 
     var_Get( p_aout, "audio-channels", &val );
-    switch( val.i_int )
-    {
-        case AOUT_VAR_CHAN_RSTEREO:
-            psz_channel = strdup("reverse stereo");
-            break;
-        case AOUT_VAR_CHAN_STEREO:
-            psz_channel = strdup("stereo");
-            break;
-        case AOUT_VAR_CHAN_LEFT:
-            psz_channel = strdup("left");
-            break;
-        case AOUT_VAR_CHAN_RIGHT:
-            psz_channel = strdup("right");
-            break;
-        case AOUT_VAR_CHAN_DOLBYS:
-            psz_channel = strdup("dolby");
-            break;
-        default:
-            psz_channel = strdup("disabled");
-            break;
-    }
     vlc_object_release( p_aout );
-    return psz_channel;
+    return val.i_int;
 }
 
 /*****************************************************************************
  * libvlc_audio_set_channel : Set the current audio channel
  *****************************************************************************/
-void libvlc_audio_set_channel( libvlc_instance_t *p_instance, char *psz_channel,
+void libvlc_audio_set_channel( libvlc_instance_t *p_instance, int i_channel,
                                libvlc_exception_t *p_e )
 {
     aout_instance_t *p_aout = GetAOut( p_instance, p_e );
-    vlc_value_t val_list, text_list;
-    int i_ret = -1, i;
+    vlc_value_t val;
+    int i_ret = -1;
 
-    i_ret = var_Change( p_aout, "audio-channels", VLC_VAR_GETCHOICES, &val_list, &text_list );
-    if( (i_ret < 0) || !psz_channel )
+    val.i_int = i_channel;
+    switch( i_channel )
     {
-        libvlc_exception_raise( p_e, "Audio channel out of range" );
-        vlc_object_release( p_aout );
-        return;
-    }
-
-    for( i = 0; i < val_list.p_list->i_count; i++ )
-    {
-        vlc_value_t val = val_list.p_list->p_values[i];
-        vlc_value_t text = text_list.p_list->p_values[i];
-
-        if( strncasecmp( psz_channel, text.psz_string, strlen(text.psz_string) ) == 0 )
-        {
+        case AOUT_VAR_CHAN_RSTEREO:
+        case AOUT_VAR_CHAN_STEREO:
+        case AOUT_VAR_CHAN_LEFT:
+        case AOUT_VAR_CHAN_RIGHT:
+        case AOUT_VAR_CHAN_DOLBYS:
             i_ret = var_Set( p_aout, "audio-channels", val );
             if( i_ret < 0 )
             {
-                libvlc_exception_raise( p_e, "failed setting audio range" );
+                libvlc_exception_raise( p_e, "Failed setting audio channel" );
                 vlc_object_release( p_aout );
                 return;
             }
             vlc_object_release( p_aout );
             return; /* Found */
-        }
+        default:
+            libvlc_exception_raise( p_e, "Audio channel out of range" );
+            break;
     }
-    libvlc_exception_raise( p_e, "Audio channel out of range" );
     vlc_object_release( p_aout );
 }
-

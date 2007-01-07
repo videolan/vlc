@@ -68,8 +68,8 @@ public:
     STDMETHODIMP put_volume(long);
     STDMETHODIMP get_track(long*);
     STDMETHODIMP put_track(long);
-    STDMETHODIMP get_channel(BSTR*);
-    STDMETHODIMP put_channel(BSTR);
+    STDMETHODIMP get_channel(long*);
+    STDMETHODIMP put_channel(long);
     STDMETHODIMP toggleMute();
 
 protected:

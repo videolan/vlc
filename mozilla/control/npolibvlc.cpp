@@ -250,7 +250,7 @@ RuntimeNPObject::InvokeResult LibvlcAudioNPObject::getProperty(int index, NPVari
             }
             case ID_audio_channel:
             {
-                NPUTF8 *psz_channel = libvlc_audio_get_channel(p_plugin->getVLC(), &ex);
+                int channel = libvlc_audio_get_channel(p_plugin->getVLC(), &ex);
                 libvlc_input_free(p_input);
                 if( libvlc_exception_raised(&ex) )
                 {
@@ -258,10 +258,7 @@ RuntimeNPObject::InvokeResult LibvlcAudioNPObject::getProperty(int index, NPVari
                     libvlc_exception_clear(&ex);
                     return INVOKERESULT_GENERIC_ERROR;
                 }
-                if( !psz_channel )
-                    return INVOKERESULT_GENERIC_ERROR;
-
-                STRINGZ_TO_NPVARIANT(psz_channel, result);
+                INT32_TO_NPVARIANT(channel, result);
                 return INVOKERESULT_NO_ERROR;
             }
             default:
@@ -338,27 +335,20 @@ RuntimeNPObject::InvokeResult LibvlcAudioNPObject::setProperty(int index, const 
                 return INVOKERESULT_INVALID_VALUE;
             case ID_audio_channel:
             {
-                char *psz_channel = NULL;
-
                 libvlc_input_free(p_input);
-                if( ! NPVARIANT_IS_STRING(value) )
-                    return INVOKERESULT_INVALID_VALUE;
-
-                psz_channel = stringValue(NPVARIANT_TO_STRING(value));
-                if( !psz_channel )
-                    return INVOKERESULT_GENERIC_ERROR;
-
-                libvlc_audio_set_channel(p_plugin->getVLC(), psz_channel, &ex);
-                if( psz_channel )
-                    free( psz_channel );
-
-                if( libvlc_exception_raised(&ex) )
+                if( isNumberValue(value) )
                 {
-                    NPN_SetException(this, libvlc_exception_get_message(&ex));
-                    libvlc_exception_clear(&ex);
-                    return INVOKERESULT_GENERIC_ERROR;
+                    libvlc_audio_set_channel(p_plugin->getVLC(),
+                                         numberValue(value), &ex);
+                    if( libvlc_exception_raised(&ex) )
+                    {
+                        NPN_SetException(this, libvlc_exception_get_message(&ex));
+                        libvlc_exception_clear(&ex);
+                        return INVOKERESULT_GENERIC_ERROR;
+                    }
+                    return INVOKERESULT_NO_ERROR;
                 }
-                return INVOKERESULT_NO_ERROR;
+                return INVOKERESULT_INVALID_VALUE;
             }
             default:
                 ;

@@ -248,7 +248,7 @@ STDMETHODIMP VLCAudio::put_track(long track)
     return hr;
 };
 
-STDMETHODIMP VLCAudio::get_channel(BSTR *channel)
+STDMETHODIMP VLCAudio::get_channel(long *channel)
 {
     if( NULL == channel )
         return E_POINTER;
@@ -257,53 +257,32 @@ STDMETHODIMP VLCAudio::get_channel(BSTR *channel)
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
     {
-        char *psz_channel = NULL;
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        psz_channel = libvlc_audio_get_channel(p_libvlc, &ex);
-        if( ! libvlc_exception_raised(&ex) )
+        *channel = libvlc_audio_get_channel(p_libvlc, &ex);
+        if( libvlc_exception_raised(&ex) )
         {
-            if( NULL == psz_channel )
-                return E_OUTOFMEMORY;
-
-            *channel = BSTRFromCStr(CP_UTF8, psz_channel);
-            free( psz_channel );
-            psz_channel = NULL;
-            return (NULL == channel) ? E_OUTOFMEMORY : NOERROR;
+            _p_instance->setErrorInfo(IID_IVLCAudio,
+                        libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
         }
-        if( psz_channel ) free( psz_channel );
-        psz_channel = NULL;
-        _p_instance->setErrorInfo(IID_IVLCAudio,
-                    libvlc_exception_get_message(&ex));
-        libvlc_exception_clear(&ex);
-        return E_FAIL;
+        return NOERROR;
     }
     return hr;
 };
 
-STDMETHODIMP VLCAudio::put_channel(BSTR channel)
+STDMETHODIMP VLCAudio::put_channel(long channel)
 {
-    if( NULL == channel )
-        return E_POINTER;
-
-    if( 0 == SysStringLen(channel) )
-        return E_INVALIDARG;
-
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
     {
-        char *psz_channel = NULL;
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        psz_channel = CStrFromBSTR(CP_UTF8, channel);
-        if( NULL == psz_channel )
-            return E_OUTOFMEMORY;
-
-        libvlc_audio_set_channel(p_libvlc, psz_channel, &ex);
-        CoTaskMemFree(psz_channel);
+        libvlc_audio_set_channel(p_libvlc, channel, &ex);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCAudio,
