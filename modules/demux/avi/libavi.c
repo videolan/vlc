@@ -728,8 +728,10 @@ int  _AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
     {
         return AVI_Chunk_Function[i_index].AVI_ChunkRead_function( s, p_chk );
     }
-    else if( ((char*)&p_chk->common.i_chunk_fourcc)[0] == 'i' &&
-             ((char*)&p_chk->common.i_chunk_fourcc)[1] == 'x' )
+    else if( ( ((char*)&p_chk->common.i_chunk_fourcc)[0] == 'i' &&
+               ((char*)&p_chk->common.i_chunk_fourcc)[1] == 'x' ) || 
+             ( ((char*)&p_chk->common.i_chunk_fourcc)[2] == 'i' &&
+               ((char*)&p_chk->common.i_chunk_fourcc)[3] == 'x' ) )
     {
         p_chk->common.i_chunk_fourcc = AVIFOURCC_indx;
         return AVI_ChunkRead_indx( s, p_chk );
