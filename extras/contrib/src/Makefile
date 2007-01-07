@@ -1453,7 +1453,10 @@ ifdef HAVE_DARWIN_OS
 endif
 
 .twolame: twolame
-	(cd twolame; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+ifdef HAVE_WIN32
+	(cd twolame/win32; wget "http://twolame.svn.sourceforge.net/viewvc/*checkout*/twolame/trunk/win32/winutil.h")
+endif	
+	(cd twolame; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd libtwolame &&  make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
