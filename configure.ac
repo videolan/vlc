@@ -5315,7 +5315,7 @@ then
       [
         firefox_libs=`pkg-config --libs firefox-plugin`
         firefox_cflags=`pkg-config --cflags firefox-plugin`
-        PKG_CHECK_MODULES([nspr], [nspr], [ ],
+        PKG_CHECK_MODULES([nspr], [nspr], [ nspr= ],
           [
             AC_MSG_ERROR([Please install the nspr development tools.])
           ]
