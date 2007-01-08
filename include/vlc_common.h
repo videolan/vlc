@@ -989,6 +989,7 @@ VLC_INTERNAL( long, vlc_telldir, ( void * ) );
 #   define closedir vlc_wclosedir
 #   define _wopendir vlc_wopendir
 #   define _wreaddir vlc_wreaddir
+#   define _wclosedir vlc_wclosedir
 #   define rewinddir vlc_rewinddir
 #   define seekdir vlc_seekdir
 #   define telldir vlc_telldir
