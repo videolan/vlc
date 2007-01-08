@@ -522,6 +522,9 @@ public:
     STDMETHODIMP get_height(long*);
     STDMETHODIMP get_aspectRatio(BSTR*);
     STDMETHODIMP put_aspectRatio(BSTR);
+    STDMETHODIMP get_crop(BSTR*);
+    STDMETHODIMP put_crop(BSTR);
+    STDMETHODIMP takeSnapshot(BSTR);
     STDMETHODIMP toggleFullscreen();
 
 protected:

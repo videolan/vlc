@@ -422,8 +422,16 @@ library AXVLC
         [propput, helpstring("Sets video aspect ratio.")]
         HRESULT aspectRatio([in] BSTR aspect);
 
+        [propget, helpstring("Returns crop filter geometry.")]
+        HRESULT crop([out, retval] BSTR* geometry);
+        [propput, helpstring("Sets crop filter geometry.")]
+        HRESULT crop([in] BSTR geometry);
+
         [helpstring("toggle fullscreen/windowed state.")]
         HRESULT toggleFullscreen();
+
+        [helpstring("take video snapshot and save into into filePath.")]
+        HRESULT takeSnapshot(BSTR filePath);
     };
 
     [

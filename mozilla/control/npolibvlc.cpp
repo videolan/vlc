@@ -1761,7 +1761,8 @@ const NPUTF8 * const LibvlcVideoNPObject::propertyNames[] =
     "fullscreen",
     "height",
     "width",
-    "aspectRatio"
+    "aspectRatio",
+    "crop"
 };
 
 enum LibvlcVideoNPObjectPropertyIds
@@ -1769,7 +1770,8 @@ enum LibvlcVideoNPObjectPropertyIds
     ID_video_fullscreen,
     ID_video_height,
     ID_video_width,
-    ID_video_aspectratio
+    ID_video_aspectratio,
+    ID_video_crop
 };
 
 const int LibvlcVideoNPObject::propertyCount = sizeof(LibvlcVideoNPObject::propertyNames)/sizeof(NPUTF8 *);
@@ -1847,6 +1849,22 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::getProperty(int index, NPVari
                 STRINGZ_TO_NPVARIANT(psz_aspect, result);
                 return INVOKERESULT_NO_ERROR;
             }
+            case ID_video_crop:
+            {
+                NPUTF8 *psz_geometry = libvlc_video_get_crop_geometry(p_input, &ex);
+                libvlc_input_free(p_input);
+                if( libvlc_exception_raised(&ex) )
+                {
+                    NPN_SetException(this, libvlc_exception_get_message(&ex));
+                    libvlc_exception_clear(&ex);
+                    return INVOKERESULT_GENERIC_ERROR;
+                }
+                if( !psz_geometry )
+                    return INVOKERESULT_GENERIC_ERROR;
+
+                STRINGZ_TO_NPVARIANT(psz_geometry, result);
+                return INVOKERESULT_NO_ERROR;
+            }
         }
         libvlc_input_free(p_input);
     }
@@ -1882,6 +1900,7 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::setProperty(int index, const 
                 int val = NPVARIANT_TO_BOOLEAN(value);
                 libvlc_set_fullscreen(p_input, val, &ex);
                 libvlc_input_free(p_input);
+
                 if( libvlc_exception_raised(&ex) )
                 {
                     NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -1908,10 +1927,38 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::setProperty(int index, const 
                 }
 
                 libvlc_video_set_aspect_ratio(p_input, psz_aspect, &ex);
-                if( psz_aspect )
-                    free(psz_aspect );
-
+                free(psz_aspect );
                 libvlc_input_free(p_input);
+
+                if( libvlc_exception_raised(&ex) )
+                {
+                    NPN_SetException(this, libvlc_exception_get_message(&ex));
+                    libvlc_exception_clear(&ex);
+                    return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_video_crop:
+            {
+                char *psz_geometry = NULL;
+
+                if( ! NPVARIANT_IS_STRING(value) )
+                {
+                    libvlc_input_free(p_input);
+                    return INVOKERESULT_INVALID_VALUE;
+                }
+
+                psz_geometry = stringValue(NPVARIANT_TO_STRING(value));
+                if( !psz_geometry )
+                {
+                    libvlc_input_free(p_input);
+                    return INVOKERESULT_GENERIC_ERROR;
+                }
+
+                libvlc_video_set_crop_geometry(p_input, psz_geometry, &ex);
+                free(psz_geometry );
+                libvlc_input_free(p_input);
+
                 if( libvlc_exception_raised(&ex) )
                 {
                     NPN_SetException(this, libvlc_exception_get_message(&ex));

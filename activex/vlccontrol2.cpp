@@ -2098,14 +2098,13 @@ STDMETHODIMP VLCVideo::put_aspectRatio(BSTR aspect)
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
     {
-        char *psz_aspect = NULL;
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
         libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            psz_aspect = CStrFromBSTR(CP_UTF8, aspect);
+            char *psz_aspect = CStrFromBSTR(CP_UTF8, aspect);
             if( NULL == psz_aspect )
             {
                 return E_OUTOFMEMORY;
@@ -2124,6 +2123,124 @@ STDMETHODIMP VLCVideo::put_aspectRatio(BSTR aspect)
             }
         }
         return NOERROR;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCVideo::get_crop(BSTR* geometry)
+{
+    if( NULL == geometry )
+        return E_POINTER;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            char *psz_geometry = libvlc_video_get_crop_geometry(p_input, &ex);
+
+            libvlc_input_free(p_input);
+            if( ! libvlc_exception_raised(&ex) )
+            {
+                if( NULL == psz_geometry )
+                    return E_OUTOFMEMORY;
+
+                *geometry = BSTRFromCStr(CP_UTF8, psz_geometry);
+                free( psz_geometry );
+                psz_geometry = NULL;
+                return (NULL == geometry) ? E_OUTOFMEMORY : NOERROR;
+            }
+            if( psz_geometry ) free( psz_geometry );
+            psz_geometry = NULL;
+        }
+        _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCVideo::put_crop(BSTR geometry)
+{
+    if( NULL == geometry )
+        return E_POINTER;
+
+    if( 0 == SysStringLen(geometry) )
+        return E_INVALIDARG;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            char *psz_geometry = CStrFromBSTR(CP_UTF8, geometry);
+            if( NULL == psz_geometry )
+            {
+                return E_OUTOFMEMORY;
+            }
+
+            libvlc_video_set_crop_geometry(p_input, psz_geometry, &ex);
+
+            CoTaskMemFree(psz_geometry);
+            libvlc_input_free(p_input);
+            if( libvlc_exception_raised(&ex) )
+            {
+                _p_instance->setErrorInfo(IID_IVLCVideo,
+                    libvlc_exception_get_message(&ex));
+                libvlc_exception_clear(&ex);
+                return E_FAIL;
+            }
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCVideo::takeSnapshot(BSTR filePath)
+{
+    if( NULL == filePath )
+        return E_POINTER;
+
+    if( 0 == SysStringLen(filePath) )
+        return E_INVALIDARG;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            char *psz_filepath = CStrFromBSTR(CP_UTF8, filePath);
+            if( NULL == psz_filepath )
+            {
+                return E_OUTOFMEMORY;
+            }
+            /* TODO: check file security */
+
+            libvlc_video_take_snapshot(p_input, psz_filepath, &ex);
+            libvlc_input_free(p_input);
+            if( ! libvlc_exception_raised(&ex) )
+            {
+                return NOERROR;
+            }
+        }
+        _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
     }
     return hr;
 };
