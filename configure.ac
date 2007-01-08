@@ -5338,7 +5338,7 @@ then
         firefox_include=`pkg-config --variable=includedir firefox-plugin`
         MOZILLA_CONFIG_H="${firefox_include}/mozilla-config.h"
         if grep '^#define MOZ_X11 1' ${MOZILLA_CONFIG_H} 2>&1 > /dev/null ; then
-            VLC_ADD_LDFLAGS([mozilla], [-lX11 -lXt ${X_LIBS} ${X_PRE_LIBS}])
+            VLC_ADD_LDFLAGS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt])
         fi
         VLC_ADD_CPPFLAGS([mozilla],[${firefox_cflags} ${MOZILLA_CPPFLAGS}])
         VLC_ADD_LDFLAGS([mozilla],[${firefox_libs} ${MOZILLA_LDFLAGS}])
