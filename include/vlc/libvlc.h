@@ -290,7 +290,23 @@ int         libvlc_input_get_state      ( libvlc_input_t *, libvlc_exception_t *
  * @{
  */
 
+/**
+* Downcast to this general type as placeholder for a platform specific one, such as:
+*  Drawable on X11,
+*  CGrafPort on MacOSX,
+*  HWND on win32
+*/
 typedef int libvlc_drawable_t;
+
+/**
+* Rectangle type for video geometry
+*/
+typedef struct
+{
+    int top, left;
+    int bottom, right;
+}
+libvlc_rectangle_t;
 
 /**
  * Does this input have a video output ?
@@ -356,6 +372,22 @@ char *libvlc_video_get_aspect_ratio( libvlc_input_t *, libvlc_exception_t * );
 void libvlc_video_set_aspect_ratio( libvlc_input_t *, char *, libvlc_exception_t * );
 
 /**
+ * Get current crop filter geometry
+ * \param p_input the input
+ * \param p_exception an initialized exception
+ * \return the crop filter geometry
+ */
+char *libvlc_video_get_crop_geometry( libvlc_input_t *, libvlc_exception_t * );
+
+/**
+ * Set new crop filter geometry
+ * \param p_input the input
+ * \param psz_geometry new crop filter geometry
+ * \param p_exception an initialized exception
+ */
+void libvlc_video_set_crop_geometry( libvlc_input_t *, char *, libvlc_exception_t * );
+
+/**
  * Take a snapshot of the current video window
  * \param p_input the input
  * \param psz_filepath the path where to save the screenshot to
@@ -374,13 +406,6 @@ int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *);
  * \return the success status (boolean)
  */
 void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exception_t *);
-
-/**
-* Downcast to this general type as placeholder for a platform specific one, such as:
-*  Drawable on X11,
-*  CGrafPort on MacOSX,
-*  HWND on win32
-*/
 
 /**
  * change the parent for the current the video output
@@ -409,19 +434,6 @@ void libvlc_video_set_parent( libvlc_instance_t *, libvlc_drawable_t, libvlc_exc
  * \param p_exception an initialized exception
  */
 void libvlc_video_set_size( libvlc_instance_t *, int, int, libvlc_exception_t * );
-
-/**
-* Downcast to this general type as placeholder for a platform specific one, such as:
-*  Drawable on X11,
-*  CGrafPort on MacOSX,
-*  HWND on win32
-*/
-typedef struct
-{
-    int top, left;
-    int bottom, right;
-}
-libvlc_rectangle_t;
 
 /**
  * Set the default video output viewport for a windowless video output (MacOS X only)

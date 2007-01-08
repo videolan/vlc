@@ -357,6 +357,37 @@ void libvlc_video_set_aspect_ratio( libvlc_input_t *p_input,
     vlc_object_release( p_vout );
 }
 
+char *libvlc_video_get_crop_geometry( libvlc_input_t *p_input,
+                                   libvlc_exception_t *p_e )
+{
+    char *psz_geometry = 0;
+    vout_thread_t *p_vout = GetVout( p_input, p_e );
+
+    if( !p_vout )
+        return 0;
+
+    psz_geometry = var_GetString( p_vout, "crop" );
+    vlc_object_release( p_vout );
+    return psz_geometry;
+}
+
+void libvlc_video_set_crop_geometry( libvlc_input_t *p_input,
+                                    char *psz_geometry, libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_input, p_e );
+    int i_ret = -1;
+
+    if( !p_vout )
+        return;
+
+    i_ret = var_SetString( p_vout, "crop", psz_geometry );
+    if( i_ret )
+        libvlc_exception_raise( p_e,
+                        "Unexpected error while setting crop geometry" );
+
+    vlc_object_release( p_vout );
+}
+
 int libvlc_video_destroy( libvlc_input_t *p_input,
                           libvlc_exception_t *p_e )
 {
