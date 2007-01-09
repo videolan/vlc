@@ -23,7 +23,7 @@ SOURCES_mozilla_common = \
 DIST_sources = $(SOURCES_mozilla_common) \
 	support/npwin.cpp support/npmac.cpp support/npunix.c
 
-LIBRARIES_libvlc_pic = -Wl,-rpath '$(libdir)' -L$(top_builddir)/src -lvlc
+LIBRARIES_libvlc_pic = -L$(top_builddir)/src -lvlc
 LIBRARIES_libvlc_nopic = $(LIBRARIES_libvlc_pic)
 
 if BUILD_MOZILLA
@@ -126,7 +126,7 @@ VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
 
 else
 
-LIBRARIES_libvlc = $(LIBRARIES_libvlc_pic)
+LIBRARIES_libvlc = -Wl,-rpath '$(libdir)' $(LIBRARIES_libvlc_pic)
 npvlc = libvlcplugin$(LIBEXT)
 npvlcdir = $(libdir)/mozilla/plugins
 SOURCES_support = support/npunix.c
