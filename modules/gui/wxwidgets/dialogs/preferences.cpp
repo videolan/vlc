@@ -367,11 +367,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
         /* Enumerate config categories and store a reference so we can
          * generate their config panel them when it is asked by the user. */
-        p_item = p_module->p_config;
-        p_end = p_item + p_module->confsize;
 
-        if( p_item ) do
+        for (size_t i = 0; i < p_module->confsize; i++)
         {
+            module_config_t *p_item = p_module->p_config + i;
             ConfigTreeData *config_data;
             switch( p_item->i_type )
             {
@@ -434,6 +433,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                     if( cd->psz_name ) free( cd->psz_name );
                     cd->psz_name = strdup(  config_CategoryNameGet(
                                                       p_item->value.i ) );
+                    msg_Err(p_intf, "found a subcategory %s", cd->psz_name );
                     if( cd->psz_help ) free( cd->psz_help );
                     char *psz_help = config_CategoryHelpGet( p_item->value.i );
                     if( psz_help )
@@ -489,7 +489,6 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 break;
             }
         }
-        while( p_item < p_end && p_item++ );
 
     }
 
@@ -508,19 +507,18 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         /* Exclude the main module */
         if( !strcmp( p_module->psz_object_name, "main" ) )
             continue;
-
+        msg_Err(p_intf, "processing %s", p_module->psz_object_name);
         /* Exclude empty plugins (submodules don't have config options, they
          * are stored in the parent module) */
         if( p_module->b_submodule )
               continue;
 //            p_item = ((module_t *)p_module->p_parent)->p_config;
         else
-            p_item = p_module->p_config;
-            p_end = p_item + p_module->confsize;
-
-        if( !p_item ) continue;
-        do
+//msg_Err(p_intf,"1p_item=0x%x, p_end=0x%x, i_optoin=%i", p_item, p_end, i_options);
+        for (size_t i = 0; i < p_module->confsize; i++)
         {
+            module_config_t *p_item = p_module->p_config + i;
+            msg_Err(p_intf,"i_type=0x%x, value=%i", p_item->i_type, p_item->value.i);
             if( p_item->i_type == CONFIG_CATEGORY )
             {
                 i_category = p_item->value.i;
@@ -533,10 +531,11 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 i_options ++;
             if( i_options > 0 && i_category >= 0 && i_subcategory >= 0 )
             {
+                msg_Err(p_intf,"break");
                 break;
             }
         }
-        while( p_item < p_end && p_item++ );
+msg_Err(p_intf,"p_item=0x%x, p_end=0x%x, i_optoin=%i, i_category=%i", p_item, p_end, i_options, i_category);
 
         if( !i_options ) continue;
 
@@ -549,6 +548,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         {
             ConfigTreeData *config_data =
                     (ConfigTreeData *)GetItemData( category_item );
+//            msg_Err(p_intf,"%i, %i", config_data->i_object_id, i_category);
             if( config_data->i_object_id == i_category )
             {
                 b_found = VLC_TRUE;
@@ -556,7 +556,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             }
             category_item = GetNextChild( root_item, cookie );
         }
-
+msg_Err(p_intf, "found=%i", b_found);
         if( !b_found ) continue;
 
         /* Find subcategory item */
@@ -585,7 +585,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         config_data->i_type = TYPE_MODULE;
         config_data->i_object_id = p_module->b_submodule ?
             ((module_t *)p_module->p_parent)->i_object_id :
-            p_module->i_object_id;
+        p_module->i_object_id;
         config_data->psz_help = NULL;
 
         /* WXMSW doesn't know image -1 ... FIXME */
@@ -610,6 +610,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         #else
         i_image = -1;
         #endif
+        msg_Err(p_intf, "adding %s with image %i ", p_module->psz_shortname ?                                       p_module->psz_shortname : p_module->psz_object_name, i_image);
         AppendItem( subcategory_item, wxU( p_module->psz_shortname ?
                        p_module->psz_shortname : p_module->psz_object_name )
                                     , i_image, -1,
@@ -1016,11 +1017,10 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
             config_sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
         }
-        while( !( p_item < p_end )||
-               ( ( config_data->i_type == TYPE_SUBCATEGORY ||
+        while( !( ( config_data->i_type == TYPE_SUBCATEGORY ||
                    config_data->i_type == TYPE_CATSUBCAT ) &&
                  ( p_item->i_type == CONFIG_CATEGORY ||
-                   p_item->i_type == CONFIG_SUBCATEGORY ) ) && p_item++ );
+                   p_item->i_type == CONFIG_SUBCATEGORY )) && ( ++p_item < p_end) );
 
 
         config_sizer->Layout();
