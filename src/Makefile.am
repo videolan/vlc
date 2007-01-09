@@ -159,14 +159,14 @@ DATA_noinst_libvlc = libvlc$(LIBEXT) libvlc$(LIBEXT).a
 libvlc.dll.a: libvlc$(LIBEXT)
 	$(DLLTOOL) --export-all-symbols -l $@ -D $< $(libvlc_a_OBJECTS)
 
-libvlc$(LIBEXT): $(OBJECTS_libvlc_so)
+libvlc$(LIBEXT): $(libvlc_a_OBJECTS)
 	@ldfl="`$(VLC_CONFIG) --libs plugin libvlc pic` $(INCLUDED_LIBINTL)" ; \
 	case `$(VLC_CONFIG) --linkage libvlc` in \
 	  c++)  ld="$(CXXLINK)" ;; \
 	  objc) ld="$(OBJCLINK)" ;; \
 	  c|*)  ld="$(LINK)" ;; \
 	esac ; \
-	echo $$ld $(OBJECTS_libvlc_so) $(LDFLAGS_libvlc_so) $$ldfl; \
+	echo $$ld $(libvlc_a_OBJECTS) $$ldfl; \
 	$$ld $(libvlc_a_OBJECTS) \
 		$$ldfl
 # It sucks big time, but we have to do that to link vlc properly
