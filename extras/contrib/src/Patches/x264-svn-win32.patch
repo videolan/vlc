@@ -2,17 +2,6 @@ Index: configure
 ===================================================================
 --- configure	(revision 612)
 +++ configure	(working copy)
-@@ -55,8 +55,8 @@
- shared="no"
- 
- CC="${CC-gcc}"
--CFLAGS="-Wall -I. -D__X264__"
--LDFLAGS=""
-+CFLAGS="$CFLAGS -Wall -I. -D__X264__"
-+LDFLAGS="$LDFLAGS"
- HAVE_GETOPT_LONG=1
- 
- AS="nasm"
 @@ -64,8 +64,101 @@
  
  EXE=""
