@@ -5315,12 +5315,24 @@ then
       [
         firefox_libs=`pkg-config --libs firefox-plugin`
         firefox_cflags=`pkg-config --cflags firefox-plugin`
-        PKG_CHECK_MODULES([nspr], [nspr], [ nspr= ],
+        PKG_CHECK_MODULES([mozilla-nspr], [mozilla-nspr],
           [
-            AC_MSG_ERROR([Please install the nspr development tools.])
+            nspr_libs=`pkg-config --libs mozilla-nspr`
+            npsr_cflags=`pkg-config --cflags mozilla-nspr`
+          ],
+          [
+            PKG_CHECK_MODULES([nspr], [nspr],
+              [
+                nspr_libs=`pkg-config --libs nspr`
+                npsr_cflags=`pkg-config --cflags nspr`
+              ],
+              [
+                AC_MSG_ERROR([Please install the nspr development tools.])
+              ]
+            )
           ]
         )
-        CPPFLAGS="${CPPFLAGS_save} ${firefox_cflags} ${MOZILLA_CPPFLAGS}"
+        CPPFLAGS="${CPPFLAGS_save} ${firefox_cflags} ${nspr_cflags} ${MOZILLA_CPPFLAGS}"
         MOZILLA_REQUIRED_HEADERS=1
         AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
         AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
@@ -5340,8 +5352,8 @@ then
         if grep '^#define MOZ_X11 1' ${MOZILLA_CONFIG_H} 2>&1 > /dev/null ; then
             VLC_ADD_LDFLAGS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt])
         fi
-        VLC_ADD_CPPFLAGS([mozilla],[${firefox_cflags} ${MOZILLA_CPPFLAGS}])
-        VLC_ADD_LDFLAGS([mozilla],[${firefox_libs} ${MOZILLA_LDFLAGS}])
+        VLC_ADD_CPPFLAGS([mozilla],[${firefox_cflags} ${nspr_cflags} ${MOZILLA_CPPFLAGS}])
+        VLC_ADD_LDFLAGS([mozilla],[${firefox_libs} ${nspr_libs} ${MOZILLA_LDFLAGS}])
         VLC_ADD_PLUGINS([mozilla])
         MOZILLA_CONFIG=
       ],
