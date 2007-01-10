@@ -220,9 +220,7 @@ static int Activate( vlc_object_t *p_this )
     psz_unix_path = config_GetPsz( p_intf, "rc-unix" );
     if( psz_unix_path )
     {
-        int i_socket, i_overwrite;
-
-        i_overwrite = config_GetInt( p_intf, "rc-overwrite" );
+        int i_socket;
 
 #if !defined(AF_LOCAL) || defined(WIN32)
         msg_Warn( p_intf, "your OS doesn't support filesystem sockets" );
