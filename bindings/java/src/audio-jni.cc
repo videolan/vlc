@@ -57,29 +57,23 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setTrack (JNIEnv *env, job
     CHECK_EXCEPTION_FREE;
 }
 
-JNIEXPORT jstring JNICALL Java_org_videolan_jvlc_Audio__1getChannel (JNIEnv *env, jobject _this)
+JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getChannel (JNIEnv *env, jobject _this)
 {
     INIT_FUNCTION;
 
-    char* res;
-
-    res = libvlc_audio_get_channel( ( libvlc_instance_t * ) instance, exception);
+    int res = libvlc_audio_get_channel( ( libvlc_instance_t * ) instance, exception);
 
     CHECK_EXCEPTION_FREE;
 
-    return env->NewStringUTF(res);
+    return res;
 }
 
-JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setChannel (JNIEnv *env, jobject _this, jstring channel)
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setChannel (JNIEnv *env, jobject _this, jint channel)
 {
     INIT_FUNCTION;
 
-    const char* value = env->GetStringUTFChars( channel, 0 );
+    libvlc_audio_set_channel( (libvlc_instance_t *) instance, channel, exception);
 
-    libvlc_audio_set_channel( (libvlc_instance_t *) instance, (char *) value, exception);
-
-    env->ReleaseStringUTFChars( channel, value );
-    
     CHECK_EXCEPTION_FREE;
 }
 

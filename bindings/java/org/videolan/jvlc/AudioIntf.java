@@ -71,13 +71,13 @@ public interface AudioIntf {
 	 * @return channel
 	 * @throws VLCException
 	 */
-	String getChannel() throws VLCException;
+	int getChannel() throws VLCException;
 
 	/**
 	 * @param channel
 	 * @throws VLCException
 	 */
-	void setChannel(String channel) throws VLCException;
+	void setChannel(int channel) throws VLCException;
 
 
     /**

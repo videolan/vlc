@@ -6,8 +6,8 @@ public class Audio implements AudioIntf {
 
 	private native int      _getTrack();
 	private native void     _setTrack(int track);
-	private native String   _getChannel();
-	private native void     _setChannel(String channel);
+	private native int	    _getChannel();
+	private native void     _setChannel(int channel);
 	private native boolean	_getMute();
     private native void		_setMute( boolean value );
     private native void		_toggleMute();
@@ -26,11 +26,11 @@ public class Audio implements AudioIntf {
 		_setTrack(track);
 	}
 
-	public String getChannel() throws VLCException {
+	public int getChannel() throws VLCException {
 		return _getChannel();
 	}
 
-	public void setChannel( String channel ) throws VLCException {
+	public void setChannel( int channel ) throws VLCException {
 		_setChannel(channel);
 	}    
     
