@@ -154,15 +154,15 @@ static int Demux( demux_t *p_demux )
         p_sys->i_data_len = stream_Size( p_demux->s ) +1; /* This is a cheat to prevent unnecessary realloc */
         if( p_sys->i_data_len <= 0 && p_sys->i_data_len < 16384 ) p_sys->i_data_len = 1024;
         p_sys->psz_data = malloc( p_sys->i_data_len * sizeof(char) +1);
-        
+
         /* load the complete file */
         for( ;; )
         {
             int i_read = stream_Read( p_demux->s, &p_sys->psz_data[i_pos], p_sys->i_data_len - i_pos );
             p_sys->psz_data[i_read] = '\0';
-           
+
             if( i_read < p_sys->i_data_len - i_pos ) break; /* Done */
-            
+
             i_pos += i_read;
             p_sys->i_data_len += 1024;
             p_sys->psz_data = realloc( p_sys->psz_data, p_sys->i_data_len * sizeof( char * ) +1 );
@@ -184,7 +184,7 @@ static int Demux( demux_t *p_demux )
         char *psz_copyright_asx = NULL;
         char *psz_moreinfo_asx = NULL;
         char *psz_abstract_asx = NULL;
-        
+
         char *psz_base_entry = NULL;
         char *psz_title_entry = NULL;
         char *psz_artist_entry = NULL;
@@ -192,7 +192,7 @@ static int Demux( demux_t *p_demux )
         char *psz_moreinfo_entry = NULL;
         char *psz_abstract_entry = NULL;
         int i_entry_count = 0;
-    
+
         psz_parse = strcasestr( psz_parse, ">" );
 
         while( ( psz_parse = strcasestr( psz_parse, "<" ) ) && psz_parse && *psz_parse )
@@ -420,7 +420,7 @@ static int Demux( demux_t *p_demux )
                     msg_Err( p_demux, "A ref outside an entry section" );
                     continue;
                 }
-                
+
                 if( !strncasecmp( psz_parse, "HREF", 4 ) )
                 {
                     if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
@@ -440,7 +440,7 @@ static int Demux( demux_t *p_demux )
                             asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current->p_input->psz_name ) );
                             p_entry = input_ItemNew( p_playlist, psz_string, psz_name );
                             FREENULL( psz_name );
-                            
+
                             input_ItemCopyOptions( p_current->p_input, p_entry );
                             p_entry->p_meta = vlc_meta_New();
                             if( psz_title_entry ) vlc_meta_SetTitle( p_entry->p_meta, psz_title_entry );
