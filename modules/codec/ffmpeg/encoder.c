@@ -802,7 +802,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         frame.pts = AV_NOPTS_VALUE;
     }
 
-    if ( frame.pts != (signed int) AV_NOPTS_VALUE && frame.pts != 0 )
+    if ( frame.pts !=  AV_NOPTS_VALUE && frame.pts != 0 )
     {
         if ( p_sys->i_last_pts == frame.pts )
         {
