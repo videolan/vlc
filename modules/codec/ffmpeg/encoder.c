@@ -757,9 +757,9 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '1', 'v' ) ||
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '2', 'v' ) )
     {
-        frame.pts = p_pict->date ? p_pict->date : (signed int) AV_NOPTS_VALUE;
+        frame.pts = p_pict->date ? p_pict->date : (int64_t)AV_NOPTS_VALUE;
 
-        if ( p_sys->b_hurry_up && frame.pts != (signed int) AV_NOPTS_VALUE )
+        if ( p_sys->b_hurry_up && frame.pts != (int64_t)AV_NOPTS_VALUE )
         {
             mtime_t current_date = mdate();
 
