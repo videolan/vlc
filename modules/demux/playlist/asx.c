@@ -195,7 +195,7 @@ static int Demux( demux_t *p_demux )
 
         psz_parse = strcasestr( psz_parse, ">" );
 
-        while( ( psz_parse = strcasestr( psz_parse, "<" ) ) && psz_parse && *psz_parse )
+        while( psz_parse && ( psz_parse = strcasestr( psz_parse, "<" ) ) )
         {
             if( !strncasecmp( psz_parse, "<!--", 4 ) )
             {
