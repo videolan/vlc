@@ -1292,7 +1292,7 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
     }
 
     /* link this object with father */
-    if( p_father )
+    if( p_father && ! i_result )
     {
         if( p_father->common.p_first )
         {
