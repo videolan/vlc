@@ -73,18 +73,18 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 
     // Changing decorations
     struct {
-        unsigned long flags;
-        unsigned long functions;
-        unsigned long decorations;
-        long input_mode;
-        unsigned long status;
+        uint32_t flags;
+        uint32_t functions;
+        uint32_t decorations;
+        int32_t  input_mode;
+        uint32_t status;
     } motifWmHints;
     Atom hints_atom = XInternAtom( XDISPLAY, "_MOTIF_WM_HINTS", False );
     motifWmHints.flags = 2;    // MWM_HINTS_DECORATIONS;
     motifWmHints.decorations = 0;
     XChangeProperty( XDISPLAY, m_wnd, hints_atom, hints_atom, 32,
                      PropModeReplace, (unsigned char *)&motifWmHints,
-                     sizeof( motifWmHints ) / sizeof( long ) );
+                     sizeof( motifWmHints ) / sizeof( uint32_t ) );
 
     // Drag & drop
     if( m_dragDrop )
