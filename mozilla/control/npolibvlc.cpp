@@ -334,12 +334,11 @@ RuntimeNPObject::InvokeResult LibvlcAudioNPObject::setProperty(int index, const 
                 libvlc_input_free(p_input);
                 return INVOKERESULT_INVALID_VALUE;
             case ID_audio_channel:
-            {
                 libvlc_input_free(p_input);
                 if( isNumberValue(value) )
                 {
                     libvlc_audio_set_channel(p_plugin->getVLC(),
-                                         numberValue(value), &ex);
+                                             numberValue(value), &ex);
                     if( libvlc_exception_raised(&ex) )
                     {
                         NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -349,7 +348,6 @@ RuntimeNPObject::InvokeResult LibvlcAudioNPObject::setProperty(int index, const 
                     return INVOKERESULT_NO_ERROR;
                 }
                 return INVOKERESULT_INVALID_VALUE;
-            }
             default:
                 ;
         }
