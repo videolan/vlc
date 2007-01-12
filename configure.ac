@@ -3020,19 +3020,20 @@ then
       AC_MSG_RESULT(${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a)
       VLC_ADD_BUILTINS([twolame])
       VLC_ADD_LDFLAGS([twolame],[${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a])
-      VLC_ADD_CPPFLAGS([twolame],[-I${real_twolame_tree}/src/libtwolame])
+      VLC_ADD_CPPFLAGS([twolame],[-I${real_twolame_tree}/src/libtwolame -DLIBTWOLAME_STATIC])
     else
       dnl  The given libtwolame wasn't built
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot find ${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a, make sure you compiled libtwolame in ${with_twolame_tree}])
     fi
   else
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_twolame}"
+    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_twolame} -DLIBTWOLAME_STATIC"
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_twolame}"
     AC_CHECK_HEADERS(twolame.h, ,
       [ AC_MSG_ERROR([Cannot find development header for libtwolame...]) ])
     AC_CHECK_LIB(twolame, twolame_init, [
       VLC_ADD_PLUGINS([twolame])
+      VLC_ADD_CPPFLAGS([twolame],[-DLIBTWOLAME_STATIC])
       VLC_ADD_LDFLAGS([twolame],[-ltwolame]) ],
         [ AC_MSG_ERROR([Cannot find libtwolame library...]) ])
     LDFLAGS="${LDFLAGS_save}"  
