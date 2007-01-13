@@ -29,7 +29,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <vlc_codecs.h>
 #include <vlc_demux.h>
 #include <vlc_interface.h>
 #include <vlc_network.h>
@@ -1352,7 +1351,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
                     if( atomLength == 0 || atomLength > endpos-pos) break;
                     if( memcmp(pos+4, "avcC", 4) == 0 &&
                         atomLength > 8 &&
-                        atomLength <= INT_MAX-sizeof(BITMAPINFOHEADER))
+                        atomLength <= INT_MAX )
                     {
                         tk->fmt.i_extra = atomLength-8;
                         tk->fmt.p_extra = malloc( tk->fmt.i_extra );
