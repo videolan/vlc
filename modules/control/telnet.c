@@ -219,9 +219,9 @@ static void Close( vlc_object_t *p_this )
     for( i = 0; i < p_sys->i_clients; i++ )
     {
         telnet_client_t *cl = p_sys->clients[i];
-
         net_Close( cl->fd );
         free( cl );
+        p_sys->clients[i] = NULL;
     }
     if( p_sys->clients != NULL ) free( p_sys->clients );
 
@@ -253,8 +253,7 @@ static void Run( intf_thread_t *p_intf )
         fd = net_Accept( p_intf, p_sys->pi_fd, p_sys->i_clients > 0 ? 0 : -1 );
         if( fd > 0 )
         {
-            char   *psz_pwd = strdup( _("Password"));
-            telnet_client_t *cl;
+            telnet_client_t *cl = NULL;
 
             /* to be non blocking */
 #if defined( WIN32 ) || defined( UNDER_CE )
@@ -266,15 +265,32 @@ static void Run( intf_thread_t *p_intf )
             fcntl( fd, F_SETFL, O_NONBLOCK );
 #endif
             cl = malloc( sizeof( telnet_client_t ));
-            cl->i_tel_cmd = 0;
-            cl->fd = fd;
-            cl->buffer_write = NULL;
-            cl->p_buffer_write = cl->buffer_write;
-            realloc( psz_pwd, strlen(psz_pwd)+ 5 + 1 );
-            strncat( psz_pwd, ": \xff\xfb\x01", 5);
-            Write_message( cl, NULL, psz_pwd, WRITE_MODE_PWD );
-            free( psz_pwd );
-            TAB_APPEND( p_sys->i_clients, p_sys->clients, cl );
+            if( cl )
+            {
+                char   *psz_pwd = strdup( _("Password") );
+                char   *psz_tmp = NULL;
+                size_t ctrl_len = strlen( ": \xff\xfb\x01" );
+                size_t passwd_len = strlen( psz_pwd );
+
+                memset( cl, 0, sizeof(telnet_client_t) );
+                cl->i_tel_cmd = 0;
+                cl->fd = fd;
+                cl->buffer_write = NULL;
+                cl->p_buffer_write = cl->buffer_write;
+                psz_tmp = malloc( passwd_len + ctrl_len + 1 );
+                if( !psz_tmp )
+                {
+                    free( psz_pwd );
+                    continue;
+                }
+                memset( psz_tmp, 0, passwd_len + ctrl_len + 1 );
+                memcpy( psz_tmp, psz_pwd, passwd_len );
+                memcpy( psz_tmp + passwd_len, ": \xff\xfb\x01", ctrl_len );
+                Write_message( cl, NULL, psz_tmp, WRITE_MODE_PWD );
+                TAB_APPEND( p_sys->i_clients, p_sys->clients, cl );
+                free( psz_pwd );
+                free( psz_tmp );
+            }
         }
 
         /* to do a proper select */
@@ -285,7 +301,7 @@ static void Run( intf_thread_t *p_intf )
         {
             telnet_client_t *cl = p_sys->clients[i];
 
-            if( cl->i_mode == WRITE_MODE_PWD || cl->i_mode == WRITE_MODE_CMD )
+            if( (cl->i_mode == WRITE_MODE_PWD) || (cl->i_mode == WRITE_MODE_CMD) )
             {
                 FD_SET( cl->fd , &fds_write );
             }
@@ -300,7 +316,7 @@ static void Run( intf_thread_t *p_intf )
         timeout.tv_usec = 500*1000;
 
         i_ret = select( i_handle_max + 1, &fds_read, &fds_write, 0, &timeout );
-        if( i_ret == -1 && errno != EINTR )
+        if( (i_ret == -1) && (errno != EINTR) )
         {
             msg_Warn( p_intf, "cannot select sockets" );
             msleep( 1000 );
@@ -316,10 +332,10 @@ static void Run( intf_thread_t *p_intf )
         {
             telnet_client_t *cl = p_sys->clients[i];
 
-            if( FD_ISSET(cl->fd , &fds_write) && cl->i_buffer_write > 0 )
+            if( FD_ISSET(cl->fd , &fds_write) && (cl->i_buffer_write > 0) )
             {
-                i_len = send( cl->fd , cl->p_buffer_write ,
-                              cl->i_buffer_write , 0 );
+                i_len = send( cl->fd, cl->p_buffer_write ,
+                              cl->i_buffer_write, 0 );
                 if( i_len > 0 )
                 {
                     cl->p_buffer_write += i_len;
@@ -331,8 +347,8 @@ static void Run( intf_thread_t *p_intf )
                 int i_end = 0;
                 int i_recv;
 
-                while( (i_recv=recv( cl->fd, cl->p_buffer_read, 1, 0 )) > 0 &&
-                       cl->p_buffer_read - cl->buffer_read < 999 )
+                while( ((i_recv=recv( cl->fd, cl->p_buffer_read, 1, 0 )) > 0) &&
+                       ((cl->p_buffer_read - cl->buffer_read) < 999) )
                 {
                     switch( cl->i_tel_cmd )
                     {
@@ -377,13 +393,13 @@ static void Run( intf_thread_t *p_intf )
                     if( i_end != 0 ) break;
                 }
 
-                if( cl->p_buffer_read - cl->buffer_read == 999 )
+                if( (cl->p_buffer_read - cl->buffer_read) == 999 )
                 {
                     Write_message( cl, NULL, _( "Line too long\r\n" ),
                                    cl->i_mode + 2 );
                 }
 
-                if (i_recv == 0)
+                if( i_recv == 0 )
                 {
                     net_Close( cl->fd );
                     TAB_REMOVE( p_intf->p_sys->i_clients ,
@@ -398,24 +414,35 @@ static void Run( intf_thread_t *p_intf )
         {
             telnet_client_t *cl = p_sys->clients[i];
 
-            if( cl->i_mode >= WRITE_MODE_PWD && cl->i_buffer_write == 0 )
+            if( (cl->i_mode >= WRITE_MODE_PWD) && (cl->i_buffer_write == 0) )
             {
                // we have finished to send
                cl->i_mode -= 2; // corresponding READ MODE
             }
-            else if( cl->i_mode == READ_MODE_PWD &&
-                     *cl->p_buffer_read == '\n' )
+            else if( (cl->i_mode == READ_MODE_PWD) &&
+                     (*cl->p_buffer_read == '\n') )
             {
                 *cl->p_buffer_read = '\0';
                 if( strcmp( psz_password, cl->buffer_read ) == 0 )
                 {
-                    char *psz_tmp=strdup( _("Welcome, Master") );
-                    realloc(psz_tmp, 5 + strlen(psz_tmp) + 4 + 1);
-                    memmove( psz_tmp + 5, psz_tmp, strlen(psz_tmp) + 1 ); 
-                    memcpy( psz_tmp, "\xff\xfc\x01\r\n",5);
-                    strncat( psz_tmp, "\r\n> ", 4 );
+                    char *psz_welcome = strdup( _("Welcome, Master") );
+                    char *psz_tmp = NULL;
+                    size_t welcome_len = strlen( psz_welcome );
+                    size_t ctrl_len = strlen("\xff\xfc\x01\r\n");
+
+                    psz_tmp = malloc( welcome_len + ctrl_len + 4 + 1 );
+                    if( !psz_tmp )
+                    {
+                        free( psz_welcome );
+                        continue;
+                    }
+                    memset( psz_tmp, 0, welcome_len + ctrl_len + 4 + 1 );
+                    memcpy( psz_tmp, "\xff\xfc\x01\r\n", ctrl_len );
+                    memcpy( psz_tmp + ctrl_len, psz_welcome, welcome_len );
+                    memcpy( psz_tmp + ctrl_len + welcome_len, "\r\n> ", 4 );
                     Write_message( cl, NULL, psz_tmp, WRITE_MODE_CMD );
-                    free( psz_tmp);
+                    free( psz_welcome );
+                    free( psz_tmp );
                 }
                 else
                 {
@@ -425,8 +452,8 @@ static void Run( intf_thread_t *p_intf )
                                    WRITE_MODE_PWD );
                 }
             }
-            else if( cl->i_mode == READ_MODE_CMD &&
-                     *cl->p_buffer_read == '\n' )
+            else if( (cl->i_mode == READ_MODE_CMD) &&
+                     (*cl->p_buffer_read == '\n') )
             {
                 /* ok, here is a command line */
                 if( !strncmp( cl->buffer_read, "logout", 6 ) ||
