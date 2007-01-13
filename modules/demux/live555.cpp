@@ -29,6 +29,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
+#include <vlc_codecs.h>
 #include <vlc_demux.h>
 #include <vlc_interface.h>
 #include <vlc_network.h>
@@ -1341,10 +1342,32 @@ static void StreamRead( void *p_private, unsigned int i_size,
             tk->fmt.video.i_width  = (sdAtom[28] << 8) | sdAtom[29];
             tk->fmt.video.i_height = (sdAtom[30] << 8) | sdAtom[31];
 
-            tk->fmt.i_extra        = qtState.sdAtomSize - 16;
-            tk->fmt.p_extra        = malloc( tk->fmt.i_extra );
-            memcpy( tk->fmt.p_extra, &sdAtom[12], tk->fmt.i_extra );
-
+            if( tk->fmt.i_codec == VLC_FOURCC('a', 'v', 'c', '1') )
+            {
+                uint8_t *pos = (uint8_t*)qtRTPSource->qtState.sdAtom + 86;
+                uint8_t *endpos = (uint8_t*)qtRTPSource->qtState.sdAtom
+                                  + qtRTPSource->qtState.sdAtomSize;
+                while (pos+8 < endpos) {
+                    unsigned atomLength = pos[0]<<24 | pos[1]<<16 | pos[2]<<8 | pos[3];
+                    if( atomLength == 0 || atomLength > endpos-pos) break;
+                    if( memcmp(pos+4, "avcC", 4) == 0 &&
+                        atomLength > 8 &&
+                        atomLength <= INT_MAX-sizeof(BITMAPINFOHEADER))
+                    {
+                        tk->fmt.i_extra = atomLength-8;
+                        tk->fmt.p_extra = malloc( tk->fmt.i_extra );
+                        memcpy(tk->fmt.p_extra, pos+8, atomLength-8);
+                        break;
+                    }
+                    pos += atomLength;
+                }
+            }
+            else
+            {
+                tk->fmt.i_extra        = qtState.sdAtomSize - 16;
+                tk->fmt.p_extra        = malloc( tk->fmt.i_extra );
+                memcpy( tk->fmt.p_extra, &sdAtom[12], tk->fmt.i_extra );
+            }
         }
         else {
             if( qtState.sdAtomSize < 4 )
