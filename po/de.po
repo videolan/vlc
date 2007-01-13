@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-11 17:18+0100\n"
+"POT-Creation-Date: 2007-01-13 00:44+0000\n"
 "PO-Revision-Date: 2006-11-25 13:07+0100\n"
 "Last-Translator: Felix Kühne <fkuehne at users.sf.net>\n"
 "Language-Team: German\n"
@@ -785,7 +785,7 @@ msgstr "URL"
 msgid "Language"
 msgstr "Sprache"
 
-#: include/vlc_meta.h:45 modules/misc/notify/notify.c:182
+#: include/vlc_meta.h:45 modules/misc/notify/notify.c:184
 msgid "Now Playing"
 msgstr "Gerade läuft"
 
@@ -873,7 +873,7 @@ msgstr "Audiokanäle"
 #: src/audio_output/output.c:104 src/audio_output/output.c:139
 #: modules/access/v4l.c:128 modules/audio_output/alsa.c:191
 #: modules/audio_output/alsa.c:222 modules/audio_output/directx.c:464
-#: modules/audio_output/oss.c:203 modules/audio_output/portaudio.c:408
+#: modules/audio_output/oss.c:203 modules/audio_output/portaudio.c:412
 #: modules/audio_output/sdl.c:181 modules/audio_output/sdl.c:198
 #: modules/audio_output/waveout.c:419 modules/codec/twolame.c:66
 msgid "Stereo"
@@ -7605,7 +7605,7 @@ msgstr "ALSA Devicename"
 
 #: modules/audio_output/alsa.c:128 modules/audio_output/auhal.c:128
 #: modules/audio_output/auhal.c:972 modules/audio_output/directx.c:400
-#: modules/audio_output/oss.c:130 modules/audio_output/portaudio.c:394
+#: modules/audio_output/oss.c:130 modules/audio_output/portaudio.c:398
 #: modules/audio_output/sdl.c:176 modules/audio_output/sdl.c:194
 #: modules/audio_output/waveout.c:370 modules/gui/macosx/intf.m:567
 #: modules/gui/macosx/intf.m:568
@@ -7613,14 +7613,14 @@ msgid "Audio Device"
 msgstr "Audiodevice"
 
 #: modules/audio_output/alsa.c:185 modules/audio_output/directx.c:477
-#: modules/audio_output/oss.c:223 modules/audio_output/portaudio.c:400
+#: modules/audio_output/oss.c:223 modules/audio_output/portaudio.c:404
 #: modules/audio_output/sdl.c:182 modules/audio_output/sdl.c:201
 #: modules/audio_output/waveout.c:432
 msgid "Mono"
 msgstr "Mono"
 
 #: modules/audio_output/alsa.c:198 modules/audio_output/directx.c:450
-#: modules/audio_output/oss.c:179 modules/audio_output/portaudio.c:419
+#: modules/audio_output/oss.c:179 modules/audio_output/portaudio.c:423
 #: modules/audio_output/waveout.c:404
 msgid "2 Front 2 Rear"
 msgstr "2 Vorder- und 2 Rückseiten"
@@ -7728,7 +7728,7 @@ msgstr ""
 msgid "DirectX audio output"
 msgstr "DirectX Audioausgabe"
 
-#: modules/audio_output/directx.c:432 modules/audio_output/portaudio.c:427
+#: modules/audio_output/directx.c:432 modules/audio_output/portaudio.c:431
 msgid "3 Front 2 Rear"
 msgstr "3 Vorder- und 2 Rückseiten"
 
@@ -7821,7 +7821,7 @@ msgstr "OSS DSP-Device"
 msgid "Portaudio identifier for the output device"
 msgstr "Portaudio-Kennung für das Ausgabedevice"
 
-#: modules/audio_output/portaudio.c:112
+#: modules/audio_output/portaudio.c:113 modules/audio_output/portaudio.c:115
 msgid "PORTAUDIO audio output"
 msgstr "PORTAUDIO Audioausgabe"
 
@@ -8636,6 +8636,10 @@ msgstr "Flac Audiopacketizer"
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "MPEG I/II - Video Dekoder (benutzt libmpeg2)"
 
+#: modules/codec/libvc1.c:54
+msgid "VC-1 decoder module"
+msgstr "VC-1 Dekodermodul"
+
 #: modules/codec/lpcm.c:83
 msgid "Linear PCM audio decoder"
 msgstr "Linearer PCM Audiodekoder"
@@ -8785,6 +8789,31 @@ msgstr "Philips OGT (SVCD-Untertitel) Packetizer"
 #: modules/codec/tarkin.c:75
 msgid "Tarkin decoder module"
 msgstr "Tarkin Dekodermodul"
+
+#: modules/codec/telx.c:56
+msgid "Teletext page"
+msgstr ""
+
+#: modules/codec/telx.c:57
+msgid ""
+"Set displayed teletext page for subtitles, 0 for all pages, 888 should be a "
+"standard value. Just leave it to zero if your stream has only one language "
+"for subtitles."
+msgstr ""
+
+#: modules/codec/telx.c:59
+#, fuzzy
+msgid "Ignore subtitle flag"
+msgstr "Untertiteldatei benutzen"
+
+#: modules/codec/telx.c:60
+msgid "Ignore the subtitle flag, try this if your subtitles don't appear."
+msgstr ""
+
+#: modules/codec/telx.c:64
+#, fuzzy
+msgid "Teletext subtitles decoder"
+msgstr "Textuntertitel-Dekoder"
 
 #: modules/codec/theora.c:92 modules/codec/vorbis.c:158
 msgid ""
@@ -9899,310 +9928,310 @@ msgstr "RC"
 msgid "Remote control interface"
 msgstr "Remote-Control-Interface"
 
-#: modules/control/rc.c:336
+#: modules/control/rc.c:334
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr "Remote-Control-Interface initialisiert. Geben Sie `h' für Hilfe ein."
 
-#: modules/control/rc.c:804
+#: modules/control/rc.c:802
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr "Unbekannter Befehl `%s'. Geben Sie `help' für Hilfe ein."
 
-#: modules/control/rc.c:837
+#: modules/control/rc.c:835
 msgid "+----[ Remote control commands ]"
 msgstr "+----[ Remote-Control-Befehle ]"
 
-#: modules/control/rc.c:839
+#: modules/control/rc.c:837
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
 msgstr "| add XYZ  . . . . . . . . .  XYZ der Wiedergabeliste hinzufügen"
 
-#: modules/control/rc.c:840
+#: modules/control/rc.c:838
 #, fuzzy
 msgid "| enqueue XYZ  . . . . . . . queue XYZ to playlist"
 msgstr "| add XYZ  . . . . . . . . .  XYZ der Wiedergabeliste hinzufügen"
 
-#: modules/control/rc.c:841
+#: modules/control/rc.c:839
 msgid "| playlist . . .  show items currently in playlist"
 msgstr "| playlist . . . . . aktuelle Objekte der Wiedergabeliste zeigen"
 
-#: modules/control/rc.c:842
+#: modules/control/rc.c:840
 msgid "| play . . . . . . . . . . . . . . . . play stream"
 msgstr "| play . . . . . . . . . . . . . . . . . . .  Stream wiedergeben"
 
-#: modules/control/rc.c:843
+#: modules/control/rc.c:841
 msgid "| stop . . . . . . . . . . . . . . . . stop stream"
 msgstr "| stop . . . . . . . . . . . . . . . . . . . . .  Stream stoppen"
 
-#: modules/control/rc.c:844
+#: modules/control/rc.c:842
 msgid "| next . . . . . . . . . . . .  next playlist item"
 msgstr "| next . . . . . . . . . . . . . nächstes Wiedergabelistenobjekt"
 
-#: modules/control/rc.c:845
+#: modules/control/rc.c:843
 msgid "| prev . . . . . . . . . .  previous playlist item"
 msgstr "| prev . . . . . . . . . . . . vorheriges Wiedergabelistenobjekt"
 
-#: modules/control/rc.c:846
+#: modules/control/rc.c:844
 msgid "| goto . . . . . . . . . . . .  goto item at index"
 msgstr "| gehe zu. . . . . . . . . .  gehe zu Objekt bei gegebenem Index"
 
-#: modules/control/rc.c:847
+#: modules/control/rc.c:845
 #, fuzzy
 msgid "| repeat [on|off] . .  toggle playlist item repeat"
 msgstr "| f [on|off] . . . . . . . . . . . . . . . . Vollbild umschalten"
 
-#: modules/control/rc.c:848
+#: modules/control/rc.c:846
 #, fuzzy
 msgid "| loop [on|off] . . . .  toggle playlist item loop"
 msgstr "| f [on|off] . . . . . . . . . . . . . . . . Vollbild umschalten"
 
-#: modules/control/rc.c:849
+#: modules/control/rc.c:847
 msgid "| clear . . . . . . . . . . .   clear the playlist"
 msgstr "| clear . . . . . . . . . . . . . . . . . Wiedergabeliste leeren"
 
-#: modules/control/rc.c:850
+#: modules/control/rc.c:848
 msgid "| status . . . . . . . . . current playlist status"
 msgstr "| status . . . . . . . . . . .  aktueller Wiedergabelistenstatus"
 
-#: modules/control/rc.c:851
+#: modules/control/rc.c:849
 msgid "| title [X]  . . . . set/get title in current item"
 msgstr "| title [X] . . . . .  Titel im aktuellen Objekt ein-/darstellen"
 
-#: modules/control/rc.c:852
+#: modules/control/rc.c:850
 msgid "| title_n  . . . . . .  next title in current item"
 msgstr "| title_n  . . . . . . . . .  nächster Titel im aktuellen Objekt"
 
-#: modules/control/rc.c:853
+#: modules/control/rc.c:851
 msgid "| title_p  . . . .  previous title in current item"
 msgstr "| title_p  . . . . . . . .  vorheriger Titel im aktuellen Objekt"
 
-#: modules/control/rc.c:854
+#: modules/control/rc.c:852
 msgid "| chapter [X]  . . set/get chapter in current item"
 msgstr "| chapter [X]  . . . Kapitel im aktuellen Objekt ein-/darstellen"
 
-#: modules/control/rc.c:855
+#: modules/control/rc.c:853
 msgid "| chapter_n  . . . .  next chapter in current item"
 msgstr "| chapter_n  . . . . . . .  nächstes Kapitel im aktuellen Objekt"
 
-#: modules/control/rc.c:856
+#: modules/control/rc.c:854
 msgid "| chapter_p  . .  previous chapter in current item"
 msgstr "| chapter_p  . . . . . .  vorheriges Kapitel im aktuellen Objekt"
 
-#: modules/control/rc.c:858
+#: modules/control/rc.c:856
 msgid "| seek X . seek in seconds, for instance `seek 12'"
 msgstr "| seek X . . . . .  Suchen in Sekunden, beispielsweise `seek 12'"
 
-#: modules/control/rc.c:859
+#: modules/control/rc.c:857
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause"
 msgstr "| pause  . . . . . . . . . . . . . . . . . . .  Pause umschalten"
 
-#: modules/control/rc.c:860
+#: modules/control/rc.c:858
 msgid "| fastforward  . . . . . .  .  set to maximum rate"
 msgstr "| fastforward . . . . . . . . . . . . auf maximale Rate schalten"
 
-#: modules/control/rc.c:861
+#: modules/control/rc.c:859
 msgid "| rewind  . . . . . . . . . .  set to minimum rate"
 msgstr "| rewind . . . . . . . . . . . . . .  auf minimale Rate schalten"
 
-#: modules/control/rc.c:862
+#: modules/control/rc.c:860
 msgid "| faster . . . . . . . .  faster playing of stream"
 msgstr "| faster . . . . . . . . . . . schnellere Wiedergabe des Streams"
 
-#: modules/control/rc.c:863
+#: modules/control/rc.c:861
 msgid "| slower . . . . . . . .  slower playing of stream"
 msgstr "| slower . . . . . . . . . . . langsamere Wiedergabe des Streams"
 
-#: modules/control/rc.c:864
+#: modules/control/rc.c:862
 msgid "| normal . . . . . . . .  normal playing of stream"
 msgstr "| normal . . . . . . . . . . . .  normale Wiedergabe des Streams"
 
-#: modules/control/rc.c:865
+#: modules/control/rc.c:863
 msgid "| f [on|off] . . . . . . . . . . toggle fullscreen"
 msgstr "| f [on|off] . . . . . . . . . . . . . . . . Vollbild umschalten"
 
-#: modules/control/rc.c:866
+#: modules/control/rc.c:864
 msgid "| info . . .  information about the current stream"
 msgstr "| info . . . . . . . . . Informationen über den aktuellen Stream"
 
-#: modules/control/rc.c:867
+#: modules/control/rc.c:865
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr "| get_time . . Sekunden, die seit Beginn des Streams vergangen sind"
 
-#: modules/control/rc.c:868
+#: modules/control/rc.c:866
 msgid "| is_playing . .  1 if a stream plays, 0 otherwise"
 msgstr "| is_playing . .  1 falls der Stream gerade läuft, andernfalls 0"
 
-#: modules/control/rc.c:869
+#: modules/control/rc.c:867
 msgid "| get_title . . .  the title of the current stream"
 msgstr "| title [X] . . . . .  Titel des aktuellen Streams"
 
-#: modules/control/rc.c:870
+#: modules/control/rc.c:868
 msgid "| get_length . .  the length of the current stream"
 msgstr "| info . . . . . . . . . Länge des aktuellen Streams"
 
-#: modules/control/rc.c:872
+#: modules/control/rc.c:870
 msgid "| volume [X] . . . . . . . .  set/get audio volume"
 msgstr "| volume [X] . . . . . . . . . . . . Lautstärke zeigen/festlegen"
 
-#: modules/control/rc.c:873
+#: modules/control/rc.c:871
 msgid "| volup [X]  . . . . .  raise audio volume X steps"
 msgstr "| volup [X]  . . . . . . . . . .  Lautstärke um X Stufen erhöhen"
 
-#: modules/control/rc.c:874
+#: modules/control/rc.c:872
 msgid "| voldown [X]  . . . .  lower audio volume X steps"
 msgstr "| voldown [X]  . . . . . . . . Lautstärke um X Stufen verringern"
 
-#: modules/control/rc.c:875
+#: modules/control/rc.c:873
 msgid "| adev [X] . . . . . . . . .  set/get audio device"
 msgstr "| adev [X] . . . . . . . . . . . . .  Ton-Device dar-/einstellen"
 
-#: modules/control/rc.c:876
+#: modules/control/rc.c:874
 msgid "| achan [X]. . . . . . . .  set/get audio channels"
 msgstr "| achan [X]. . . . . . . . . . . . . Tonkanäle zeigen/einstellen"
 
-#: modules/control/rc.c:877
+#: modules/control/rc.c:875
 #, fuzzy
 msgid "| atrack [X] . . . . . . . . . set/get audio track"
 msgstr "| adev [X] . . . . . . . . . . . . .  Ton-Device dar-/einstellen"
 
-#: modules/control/rc.c:878
+#: modules/control/rc.c:876
 #, fuzzy
 msgid "| vtrack [X] . . . . . . . . . set/get video track"
 msgstr "| adev [X] . . . . . . . . . . . . .  Ton-Device dar-/einstellen"
 
-#: modules/control/rc.c:879
+#: modules/control/rc.c:877
 #, fuzzy
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
 msgstr "| title [X] . . . . .  Titel im aktuellen Objekt ein-/darstellen"
 
-#: modules/control/rc.c:880
+#: modules/control/rc.c:878
 #, fuzzy
 msgid "| vcrop [X]  . . . . . . . . .  set/get video crop"
 msgstr "| adev [X] . . . . . . . . . . . . .  Ton-Device dar-/einstellen"
 
-#: modules/control/rc.c:881
+#: modules/control/rc.c:879
 #, fuzzy
 msgid "| vzoom [X]  . . . . . . . . .  set/get video zoom"
 msgstr "| volume [X] . . . . . . . . . . . . Lautstärke zeigen/festlegen"
 
-#: modules/control/rc.c:882
+#: modules/control/rc.c:880
 #, fuzzy
 msgid "| strack [X] . . . . . . . set/get subtitles track"
 msgstr "| achan [X]. . . . . . . . . . . . . Tonkanäle zeigen/einstellen"
 
-#: modules/control/rc.c:883
+#: modules/control/rc.c:881
 msgid "| menu [on|off|up|down|left|right|select] use menu"
 msgstr "| menu [on|off|up|down|left|right|select] use menu"
 
-#: modules/control/rc.c:888
+#: modules/control/rc.c:886
 msgid "| marq-marquee STRING  . . overlay STRING in video"
 msgstr "| marq-marquee ZEICHENKETTE . . ZEICHENKETTE im Video einblenden"
 
-#: modules/control/rc.c:889
+#: modules/control/rc.c:887
 msgid "| marq-x X . . . . . . . . . . . .offset from left"
 msgstr "| marq-x X . . . . . . . . . . . . . . . . . . Abstand von links"
 
-#: modules/control/rc.c:890
+#: modules/control/rc.c:888
 msgid "| marq-y Y . . . . . . . . . . . . offset from top"
 msgstr "| marq-y Y  . . . . . . . . . . . . . . . . . . Abstand von oben"
 
-#: modules/control/rc.c:891
+#: modules/control/rc.c:889
 msgid "| marq-position #. . .  .relative position control"
 msgstr "| marq-position #. . . . . . . . . . relative Positionskontrolle"
 
-#: modules/control/rc.c:892
+#: modules/control/rc.c:890
 msgid "| marq-color # . . . . . . . . . . font color, RGB"
 msgstr "| marq-color # . . . . . . . . . . . . . . . . Schriftfarbe, RGB"
 
-#: modules/control/rc.c:893
+#: modules/control/rc.c:891
 msgid "| marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr "| marq-opacity # . . . . . . . . . . . . . . . . . . . Deckkraft"
 
-#: modules/control/rc.c:894
+#: modules/control/rc.c:892
 msgid "| marq-timeout T. . . . . . . . . . timeout, in ms"
 msgstr "| marq-timeout T . . . . . . . .  Timeout der Einblendung, in ms"
 
-#: modules/control/rc.c:895
+#: modules/control/rc.c:893
 msgid "| marq-size # . . . . . . . . font size, in pixels"
 msgstr "| marq-size #  . . . . . . . . . . . . . Schriftgröße, in Pixeln"
 
-#: modules/control/rc.c:897
+#: modules/control/rc.c:895
 msgid "| logo-file STRING . . .the overlay file path/name"
 msgstr "| logo-file ZEICHENKETTE . . . die überlagerte Datei (Pfad/Name)"
 
-#: modules/control/rc.c:898
+#: modules/control/rc.c:896
 msgid "| logo-x X . . . . . . . . . . . .offset from left"
 msgstr "| logo-x X . . . . . . . . . . . . . . . . . . Abstand von links"
 
-#: modules/control/rc.c:899
+#: modules/control/rc.c:897
 msgid "| logo-y Y . . . . . . . . . . . . offset from top"
 msgstr "| logo-y Y . . . . . . . . . . . . . . . . . .  Abstand von oben"
 
-#: modules/control/rc.c:900
+#: modules/control/rc.c:898
 msgid "| logo-position #. . . . . . . . relative position"
 msgstr "| logo-position # . . . . . . . . . . . . . .  relative Position"
 
-#: modules/control/rc.c:901
+#: modules/control/rc.c:899
 msgid "| logo-transparency #. . . . . . . . .transparency"
 msgstr "| logo-transparency # . . . . . . . . . . . . . . .  Transparenz"
 
-#: modules/control/rc.c:903
+#: modules/control/rc.c:901
 msgid "| mosaic-alpha # . . . . . . . . . . . . . . alpha"
 msgstr "| mosaic-alpha #. . . . . . . . . . . . . . . . . . . . .  Alpha"
 
-#: modules/control/rc.c:904
+#: modules/control/rc.c:902
 msgid "| mosaic-height #. . . . . . . . . . . . . .height"
 msgstr "| mosaic-height # . . . . . . . . . . . . . . . . . . . . . Höhe"
 
-#: modules/control/rc.c:905
+#: modules/control/rc.c:903
 msgid "| mosaic-width # . . . . . . . . . . . . . . width"
 msgstr "| mosaic-width # . . . . . . . . . . . . . . . . . . . .  Breite"
 
-#: modules/control/rc.c:906
+#: modules/control/rc.c:904
 msgid "| mosaic-xoffset # . . . .top left corner position"
 msgstr "| mosaic-xoffset # . . . . . . . Position der linken oberen Ecke"
 
-#: modules/control/rc.c:907
+#: modules/control/rc.c:905
 msgid "| mosaic-yoffset # . . . .top left corner position"
 msgstr "| mosaic-yoffset # . . . . . . . Position der linken oberen Ecke"
 
-#: modules/control/rc.c:908
+#: modules/control/rc.c:906
 #, fuzzy
 msgid "| mosaic-offsets x,y(,x,y)*. . . . list of offsets"
 msgstr "| mosaic-xoffset # . . . . . . . Position der linken oberen Ecke"
 
-#: modules/control/rc.c:909
+#: modules/control/rc.c:907
 msgid "| mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
 msgstr "| mosaic-align 0..2,4..6,8..10. . . . . . . . Mosaik-Ausrichtung"
 
-#: modules/control/rc.c:910
+#: modules/control/rc.c:908
 msgid "| mosaic-vborder # . . . . . . . . vertical border"
 msgstr "| mosaic-vborder # . . . . . . . . . . . . . . . vertikaler Rand"
 
-#: modules/control/rc.c:911
+#: modules/control/rc.c:909
 msgid "| mosaic-hborder # . . . . . . . horizontal border"
 msgstr "| mosaic-hborder # . . . . . . . . . . . . . . horizontaler Rand"
 
-#: modules/control/rc.c:912
+#: modules/control/rc.c:910
 msgid "| mosaic-position {0=auto,1=fixed} . . . .position"
 msgstr "| mosaic-position {0=auto,1=fest} . . . . . . . . . . . Position"
 
-#: modules/control/rc.c:913
+#: modules/control/rc.c:911
 msgid "| mosaic-rows #. . . . . . . . . . .number of rows"
 msgstr "| mosaic-rows #. . . . . . . . . . . . . . . . Anzahl von Reihen"
 
-#: modules/control/rc.c:914
+#: modules/control/rc.c:912
 msgid "| mosaic-cols #. . . . . . . . . . .number of cols"
 msgstr "| mosaic-cols # . . . . . . . . . . . . . . . Anzahl von Spalten"
 
-#: modules/control/rc.c:915
+#: modules/control/rc.c:913
 msgid "| mosaic-order id(,id)* . . . . order of pictures "
 msgstr "| mosaic-order id(,id)* . . . . Reihenfolge von Bildern"
 
-#: modules/control/rc.c:916
+#: modules/control/rc.c:914
 msgid "| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 msgstr "| mosaic-keep-aspect-ratio {0,1} . . . . . . .  Seitenverhältnis"
 
-#: modules/control/rc.c:918
+#: modules/control/rc.c:916
 msgid ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
@@ -10210,46 +10239,46 @@ msgstr ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
 
-#: modules/control/rc.c:922
+#: modules/control/rc.c:920
 msgid "| help . . . . . . . . . . . . . this help message"
 msgstr "| help . . . . . . . . . . . . . . . . . . diese Hilfsmitteilung"
 
-#: modules/control/rc.c:923
+#: modules/control/rc.c:921
 msgid "| longhelp . . . . . . . . . a longer help message"
 msgstr "| longhelp . . . . . . . . . . . .  eine längere Hilfsmitteilung"
 
-#: modules/control/rc.c:924
+#: modules/control/rc.c:922
 msgid "| logout . . . . .  exit (if in socket connection)"
 msgstr "| logout . . . . . . . . . . .  Abmelden (bei Socket-Verbindung)"
 
-#: modules/control/rc.c:925
+#: modules/control/rc.c:923
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr "| quit . . . . . . . . . . . . . . . . . . . . . . . VLC beenden"
 
-#: modules/control/rc.c:927
+#: modules/control/rc.c:925
 msgid "+----[ end of help ]"
 msgstr "+----[ Ende der Hilfe ]"
 
-#: modules/control/rc.c:1037
+#: modules/control/rc.c:1035
 msgid "Press menu select or pause to continue."
 msgstr "Drücken Sie Menüauswahl oder Pause um fortzufahren."
 
-#: modules/control/rc.c:1275 modules/control/rc.c:1563
-#: modules/control/rc.c:1633 modules/control/rc.c:1802
-#: modules/control/rc.c:1901
+#: modules/control/rc.c:1273 modules/control/rc.c:1561
+#: modules/control/rc.c:1631 modules/control/rc.c:1800
+#: modules/control/rc.c:1899
 msgid "Type 'menu select' or 'pause' to continue."
 msgstr "Geben Sie 'menu select' oder 'pause' ein, um fortzufahren."
 
-#: modules/control/rc.c:1343
+#: modules/control/rc.c:1341
 #, fuzzy
 msgid "goto is deprecated"
 msgstr "Input hat gewechselt"
 
-#: modules/control/rc.c:1459
+#: modules/control/rc.c:1457
 msgid "Type 'pause' to continue."
 msgstr "Geben Sie 'pause' ein, um fortzufahren."
 
-#: modules/control/rc.c:1886 modules/control/rc.c:1925
+#: modules/control/rc.c:1884 modules/control/rc.c:1923
 msgid "Please provide one of the following parameters:"
 msgstr "Bitte gib einen der folgenden Parameter an:"
 
@@ -11296,7 +11325,7 @@ msgid "Extract"
 msgstr "Extrahieren"
 
 #: modules/gui/macosx/bookmarks.m:103 modules/gui/macosx/bookmarks.m:109
-#: modules/gui/macosx/sfilters.m:72 modules/gui/pda/pda.c:281
+#: modules/gui/macosx/sfilters.m:72 modules/gui/pda/pda.c:285
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:99
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:198
 msgid "Time"
@@ -13161,32 +13190,32 @@ msgid "Automatically play a file when selected in the file selection list"
 msgstr ""
 "Automatisch die Datei abspielen, wenn sie in der Dateiliste ausgewählt wird"
 
-#: modules/gui/pda/pda.c:66
+#: modules/gui/pda/pda.c:67 modules/gui/pda/pda.c:69
 msgid "PDA Linux Gtk2+ interface"
 msgstr "PDA Linux Gtk2+ Interface"
 
-#: modules/gui/pda/pda.c:220 modules/gui/pda/pda.c:275
+#: modules/gui/pda/pda.c:224 modules/gui/pda/pda.c:279
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:497
 msgid "Filename"
 msgstr "Dateiname"
 
-#: modules/gui/pda/pda.c:226
+#: modules/gui/pda/pda.c:230
 msgid "Permissions"
 msgstr "Rechte"
 
-#: modules/gui/pda/pda.c:232
+#: modules/gui/pda/pda.c:236
 msgid "Size"
 msgstr "Größe"
 
-#: modules/gui/pda/pda.c:238
+#: modules/gui/pda/pda.c:242
 msgid "Owner"
 msgstr "Eigentümer"
 
-#: modules/gui/pda/pda.c:244
+#: modules/gui/pda/pda.c:248
 msgid "Group"
 msgstr "Gruppe"
 
-#: modules/gui/pda/pda.c:288
+#: modules/gui/pda/pda.c:292
 msgid "Index"
 msgstr "Index"
 
@@ -15864,7 +15893,7 @@ msgid "Growl Notification Plugin"
 msgstr "Growl-Benachrichtigungs Plugin"
 
 #: modules/misc/notify/growl.c:146 modules/misc/notify/msn.c:163
-#: modules/misc/notify/notify.c:163
+#: modules/misc/notify/notify.c:165
 msgid "(no title)"
 msgstr "(kein Titel)"
 
@@ -15909,12 +15938,12 @@ msgstr "Benachrichtigung"
 msgid "LibNotify Notification Plugin"
 msgstr "Growl-Benachrichtigungs Plugin"
 
-#: modules/misc/notify/notify.c:155
+#: modules/misc/notify/notify.c:157
 #, fuzzy
 msgid "no artist"
 msgstr "(kein Künstler)"
 
-#: modules/misc/notify/notify.c:158
+#: modules/misc/notify/notify.c:160
 #, fuzzy
 msgid "no album"
 msgstr "(kein Album)"
@@ -20162,9 +20191,6 @@ msgstr "Spektrum-Analysierer"
 #, fuzzy
 #~ msgid "Small playlist"
 #~ msgstr "Wiedergabeliste sichern"
-
-#~ msgid "VC-1 decoder module"
-#~ msgstr "VC-1 Dekodermodul"
 
 #~ msgid "M3U file|*.m3u"
 #~ msgstr "M3U Datei|*.m3u"

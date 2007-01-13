@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLAN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-11 17:18+0100\n"
+"POT-Creation-Date: 2007-01-13 00:44+0000\n"
 "PO-Revision-Date: 2006-11-11 06:08+0100\n"
 "Last-Translator: Gabor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team: Hungarian <gnome@gnome.hu>\n"
@@ -779,7 +779,7 @@ msgstr "URL"
 msgid "Language"
 msgstr "Nyelv"
 
-#: include/vlc_meta.h:45 modules/misc/notify/notify.c:182
+#: include/vlc_meta.h:45 modules/misc/notify/notify.c:184
 msgid "Now Playing"
 msgstr "Most játszott"
 
@@ -867,7 +867,7 @@ msgstr "Hangcsatornák"
 #: src/audio_output/output.c:104 src/audio_output/output.c:139
 #: modules/access/v4l.c:128 modules/audio_output/alsa.c:191
 #: modules/audio_output/alsa.c:222 modules/audio_output/directx.c:464
-#: modules/audio_output/oss.c:203 modules/audio_output/portaudio.c:408
+#: modules/audio_output/oss.c:203 modules/audio_output/portaudio.c:412
 #: modules/audio_output/sdl.c:181 modules/audio_output/sdl.c:198
 #: modules/audio_output/waveout.c:419 modules/codec/twolame.c:66
 msgid "Stereo"
@@ -7626,7 +7626,7 @@ msgstr "ALSA eszköz neve"
 
 #: modules/audio_output/alsa.c:128 modules/audio_output/auhal.c:128
 #: modules/audio_output/auhal.c:972 modules/audio_output/directx.c:400
-#: modules/audio_output/oss.c:130 modules/audio_output/portaudio.c:394
+#: modules/audio_output/oss.c:130 modules/audio_output/portaudio.c:398
 #: modules/audio_output/sdl.c:176 modules/audio_output/sdl.c:194
 #: modules/audio_output/waveout.c:370 modules/gui/macosx/intf.m:567
 #: modules/gui/macosx/intf.m:568
@@ -7634,14 +7634,14 @@ msgid "Audio Device"
 msgstr "Hangeszköz"
 
 #: modules/audio_output/alsa.c:185 modules/audio_output/directx.c:477
-#: modules/audio_output/oss.c:223 modules/audio_output/portaudio.c:400
+#: modules/audio_output/oss.c:223 modules/audio_output/portaudio.c:404
 #: modules/audio_output/sdl.c:182 modules/audio_output/sdl.c:201
 #: modules/audio_output/waveout.c:432
 msgid "Mono"
 msgstr "Mono"
 
 #: modules/audio_output/alsa.c:198 modules/audio_output/directx.c:450
-#: modules/audio_output/oss.c:179 modules/audio_output/portaudio.c:419
+#: modules/audio_output/oss.c:179 modules/audio_output/portaudio.c:423
 #: modules/audio_output/waveout.c:404
 msgid "2 Front 2 Rear"
 msgstr "2 első, 2 hátsó"
@@ -7749,7 +7749,7 @@ msgstr ""
 msgid "DirectX audio output"
 msgstr "DirectX hangkimenet"
 
-#: modules/audio_output/directx.c:432 modules/audio_output/portaudio.c:427
+#: modules/audio_output/directx.c:432 modules/audio_output/portaudio.c:431
 msgid "3 Front 2 Rear"
 msgstr "3 első, 2 hátsó"
 
@@ -7840,7 +7840,7 @@ msgstr "OSS DSP eszköz"
 msgid "Portaudio identifier for the output device"
 msgstr "A kimeneti eszköz Portaudio azonosítója"
 
-#: modules/audio_output/portaudio.c:112
+#: modules/audio_output/portaudio.c:113 modules/audio_output/portaudio.c:115
 msgid "PORTAUDIO audio output"
 msgstr "Portaudio hangkimenet"
 
@@ -8662,6 +8662,11 @@ msgstr "Flac hangdaraboló"
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "MPEG I/II videó dekódoló (libmpeg2 használatával)"
 
+#: modules/codec/libvc1.c:54
+#, fuzzy
+msgid "VC-1 decoder module"
+msgstr "Tarkin dekódoló modul"
+
 #: modules/codec/lpcm.c:83
 msgid "Linear PCM audio decoder"
 msgstr "Lineáris PCM hang dekódoló"
@@ -8811,6 +8816,31 @@ msgstr "Philips OGT (SVCD felirat) daraboló"
 #: modules/codec/tarkin.c:75
 msgid "Tarkin decoder module"
 msgstr "Tarkin dekódoló modul"
+
+#: modules/codec/telx.c:56
+msgid "Teletext page"
+msgstr ""
+
+#: modules/codec/telx.c:57
+msgid ""
+"Set displayed teletext page for subtitles, 0 for all pages, 888 should be a "
+"standard value. Just leave it to zero if your stream has only one language "
+"for subtitles."
+msgstr ""
+
+#: modules/codec/telx.c:59
+#, fuzzy
+msgid "Ignore subtitle flag"
+msgstr "Feliratfájl használata"
+
+#: modules/codec/telx.c:60
+msgid "Ignore the subtitle flag, try this if your subtitles don't appear."
+msgstr ""
+
+#: modules/codec/telx.c:64
+#, fuzzy
+msgid "Teletext subtitles decoder"
+msgstr "Feliratszöveg dekódoló"
 
 #: modules/codec/theora.c:92 modules/codec/vorbis.c:158
 msgid ""
@@ -9867,350 +9897,350 @@ msgstr "RC"
 msgid "Remote control interface"
 msgstr "Távirányító felület"
 
-#: modules/control/rc.c:336
+#: modules/control/rc.c:334
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr ""
 "Távirányító felület elindítva, segítségért adja ki a \"help\" parancsot."
 
-#: modules/control/rc.c:804
+#: modules/control/rc.c:802
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr "`%s': ismeretlen parancs, segítségért adja ki a \"help\" parancsot."
 
-#: modules/control/rc.c:837
+#: modules/control/rc.c:835
 msgid "+----[ Remote control commands ]"
 msgstr "+----[ Távirányító parancsok ]"
 
-#: modules/control/rc.c:839
+#: modules/control/rc.c:837
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
 msgstr "| add XYZ . . . . . . . . . . XYZ hozzáadása a lejátszási listához"
 
-#: modules/control/rc.c:840
+#: modules/control/rc.c:838
 msgid "| enqueue XYZ  . . . . . . . queue XYZ to playlist"
 msgstr "| enqueue XYZ . . . . . . . . . . XYZ hozzáadása a lejátszási listához"
 
-#: modules/control/rc.c:841
+#: modules/control/rc.c:839
 msgid "| playlist . . .  show items currently in playlist"
 msgstr "| playlist . . . a lejátszólista elemeinek megjelenítése"
 
-#: modules/control/rc.c:842
+#: modules/control/rc.c:840
 msgid "| play . . . . . . . . . . . . . . . . play stream"
 msgstr "| play . . . . . . . . . . . . . . . . adatfolyam lejátszása"
 
-#: modules/control/rc.c:843
+#: modules/control/rc.c:841
 msgid "| stop . . . . . . . . . . . . . . . . stop stream"
 msgstr "| stop . . . . . . . . . . . . . . . . adatfolyam leállítása"
 
-#: modules/control/rc.c:844
+#: modules/control/rc.c:842
 msgid "| next . . . . . . . . . . . .  next playlist item"
 msgstr "| next . . . . . . . . . . . . a lejátszólista következő eleme"
 
-#: modules/control/rc.c:845
+#: modules/control/rc.c:843
 msgid "| prev . . . . . . . . . .  previous playlist item"
 msgstr "| prev . . . . . . . . . . a lejátszólista előző eleme"
 
-#: modules/control/rc.c:846
+#: modules/control/rc.c:844
 msgid "| goto . . . . . . . . . . . .  goto item at index"
 msgstr "| goto . . . . . . . . . . . . adott sorszámú elemhez ugrás"
 
-#: modules/control/rc.c:847
+#: modules/control/rc.c:845
 #, fuzzy
 msgid "| repeat [on|off] . .  toggle playlist item repeat"
 msgstr "| f . . . . . . . . . . . . . . átváltás teljes képernyőre"
 
-#: modules/control/rc.c:848
+#: modules/control/rc.c:846
 #, fuzzy
 msgid "| loop [on|off] . . . .  toggle playlist item loop"
 msgstr "| f . . . . . . . . . . . . . . átváltás teljes képernyőre"
 
-#: modules/control/rc.c:849
+#: modules/control/rc.c:847
 msgid "| clear . . . . . . . . . . .   clear the playlist"
 msgstr "| clear . . . . . . . . . . . . a lejátszólista törlése"
 
-#: modules/control/rc.c:850
+#: modules/control/rc.c:848
 msgid "| status . . . . . . . . . current playlist status"
 msgstr "| status . . . . . . . . . . . . a lejátszólista állapota"
 
-#: modules/control/rc.c:851
+#: modules/control/rc.c:849
 msgid "| title [X]  . . . . set/get title in current item"
 msgstr "| title [X] . . . . aktuális elem címének beállítása/lekérdezése"
 
-#: modules/control/rc.c:852
+#: modules/control/rc.c:850
 msgid "| title_n  . . . . . .  next title in current item"
 msgstr "| title_n . . . . . . a következő cím a kijelölt elemben"
 
-#: modules/control/rc.c:853
+#: modules/control/rc.c:851
 msgid "| title_p  . . . .  previous title in current item"
 msgstr "| title_p . . . . az előző cím a kijelölt elemben"
 
-#: modules/control/rc.c:854
+#: modules/control/rc.c:852
 msgid "| chapter [X]  . . set/get chapter in current item"
 msgstr "| chapter [X]..a fejezet beállítása/lekérése az aktuális elemben"
 
-#: modules/control/rc.c:855
+#: modules/control/rc.c:853
 msgid "| chapter_n  . . . .  next chapter in current item"
 msgstr "| chapter_n . . . . következő fejezet a jelenlegi elemben"
 
-#: modules/control/rc.c:856
+#: modules/control/rc.c:854
 msgid "| chapter_p  . .  previous chapter in current item"
 msgstr "| chapter_p . . előző fejezet a jelenlegi elemben"
 
-#: modules/control/rc.c:858
+#: modules/control/rc.c:856
 msgid "| seek X . seek in seconds, for instance `seek 12'"
 msgstr "| seek X . tekerés másodpercekben, például `seek 12'"
 
-#: modules/control/rc.c:859
+#: modules/control/rc.c:857
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause"
 msgstr "| pause . . . . . . . . . . . . . . szünet átváltása"
 
-#: modules/control/rc.c:860
+#: modules/control/rc.c:858
 msgid "| fastforward  . . . . . .  .  set to maximum rate"
 msgstr "| fastforward . . . . . . . beállítás maximális sebességre"
 
-#: modules/control/rc.c:861
+#: modules/control/rc.c:859
 msgid "| rewind  . . . . . . . . . .  set to minimum rate"
 msgstr "| rewind . . . . . . . . . . beállítása minimális sebességre"
 
-#: modules/control/rc.c:862
+#: modules/control/rc.c:860
 msgid "| faster . . . . . . . .  faster playing of stream"
 msgstr "| faster . . . . . . . . az adatfolyam gyorsabb lejátszása"
 
-#: modules/control/rc.c:863
+#: modules/control/rc.c:861
 msgid "| slower . . . . . . . .  slower playing of stream"
 msgstr "| slower . . . . . . . . az adatfolyam lassabb lejátszása"
 
-#: modules/control/rc.c:864
+#: modules/control/rc.c:862
 msgid "| normal . . . . . . . .  normal playing of stream"
 msgstr "| normal . . . . . . . . az adatfolyam normális lejátszása"
 
-#: modules/control/rc.c:865
+#: modules/control/rc.c:863
 msgid "| f [on|off] . . . . . . . . . . toggle fullscreen"
 msgstr "| f [on|off] . . . . . . . . . . . átváltás teljes képernyőre"
 
-#: modules/control/rc.c:866
+#: modules/control/rc.c:864
 msgid "| info . . .  information about the current stream"
 msgstr "| info . . . információk az aktuális adatfolyamról"
 
-#: modules/control/rc.c:867
+#: modules/control/rc.c:865
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr ""
 
-#: modules/control/rc.c:868
+#: modules/control/rc.c:866
 msgid "| is_playing . .  1 if a stream plays, 0 otherwise"
 msgstr ""
 
-#: modules/control/rc.c:869
+#: modules/control/rc.c:867
 msgid "| get_title . . .  the title of the current stream"
 msgstr "| get_title  . . . . aktuális adatfolyam címének lekérdezése"
 
-#: modules/control/rc.c:870
+#: modules/control/rc.c:868
 msgid "| get_length . .  the length of the current stream"
 msgstr "| get_length . . . az aktuális adatfolyam hossza"
 
-#: modules/control/rc.c:872
+#: modules/control/rc.c:870
 msgid "| volume [X] . . . . . . . .  set/get audio volume"
 msgstr "| volume [X] . . . . . . . . hangerő beállítása"
 
-#: modules/control/rc.c:873
+#: modules/control/rc.c:871
 msgid "| volup [X]  . . . . .  raise audio volume X steps"
 msgstr "| volup [X] . . . . . hangerő növelése X egységgel"
 
-#: modules/control/rc.c:874
+#: modules/control/rc.c:872
 msgid "| voldown [X]  . . . .  lower audio volume X steps"
 msgstr "| voldown [X] . . . . hangerő csökkentése X egységgel"
 
-#: modules/control/rc.c:875
+#: modules/control/rc.c:873
 msgid "| adev [X] . . . . . . . . .  set/get audio device"
 msgstr "| adev [X] . . . . . . . . . hangeszköz beállítása/lekérése"
 
-#: modules/control/rc.c:876
+#: modules/control/rc.c:874
 msgid "| achan [X]. . . . . . . .  set/get audio channels"
 msgstr "| achan [X]. . . . . . . . hangcsatorna beállítása/lekérése"
 
-#: modules/control/rc.c:877
+#: modules/control/rc.c:875
 msgid "| atrack [X] . . . . . . . . . set/get audio track"
 msgstr "| atrack [X] . . . . . . . . . hangsáv beállítása/lekérése"
 
-#: modules/control/rc.c:878
+#: modules/control/rc.c:876
 msgid "| vtrack [X] . . . . . . . . . set/get video track"
 msgstr "| vtrack [X] . . . . . . . . . videosáv beállítása/lekérése"
 
-#: modules/control/rc.c:879
+#: modules/control/rc.c:877
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
 msgstr "| vratio [X] . . . . a videó méretarányának beállítása/lekérdezése"
 
-#: modules/control/rc.c:880
+#: modules/control/rc.c:878
 msgid "| vcrop [X]  . . . . . . . . .  set/get video crop"
 msgstr "| vcrop [X] . . . . . . . . . videolevágás beállítása/lekérése"
 
-#: modules/control/rc.c:881
+#: modules/control/rc.c:879
 msgid "| vzoom [X]  . . . . . . . . .  set/get video zoom"
 msgstr "| vzoom [X] . . . . . . . . videonagyítás beállítása/lekérése"
 
-#: modules/control/rc.c:882
+#: modules/control/rc.c:880
 msgid "| strack [X] . . . . . . . set/get subtitles track"
 msgstr "| strack [X]. . . . . . . . feliratsáv beállítása/lekérése"
 
-#: modules/control/rc.c:883
+#: modules/control/rc.c:881
 msgid "| menu [on|off|up|down|left|right|select] use menu"
 msgstr "| menu [on|off|up|down|left|right|select] menü használata"
 
-#: modules/control/rc.c:888
+#: modules/control/rc.c:886
 msgid "| marq-marquee STRING  . . overlay STRING in video"
 msgstr "| marq-marquee STRING . . a STRING kijelzése a videón"
 
-#: modules/control/rc.c:889
+#: modules/control/rc.c:887
 msgid "| marq-x X . . . . . . . . . . . .offset from left"
 msgstr "| marq-x X . . . . . . . . . . . .eltolás balról"
 
-#: modules/control/rc.c:890
+#: modules/control/rc.c:888
 msgid "| marq-y Y . . . . . . . . . . . . offset from top"
 msgstr "| marq-y Y . . . . . . . . . . . . eltolás fentről"
 
-#: modules/control/rc.c:891
+#: modules/control/rc.c:889
 msgid "| marq-position #. . .  .relative position control"
 msgstr "| marq-position #. . . .relatív pozíció szabályozása"
 
-#: modules/control/rc.c:892
+#: modules/control/rc.c:890
 msgid "| marq-color # . . . . . . . . . . font color, RGB"
 msgstr "| marq-color # . . . . . . . . . . betűszín, RGB"
 
-#: modules/control/rc.c:893
+#: modules/control/rc.c:891
 msgid "| marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr "| marq-opacity # . . . . . . . . . . . . . átlátszatlanság"
 
-#: modules/control/rc.c:894
+#: modules/control/rc.c:892
 msgid "| marq-timeout T. . . . . . . . . . timeout, in ms"
 msgstr "| marq-timeout T. . . . . . . . . . időtúllépés, ezredmásodpercben"
 
-#: modules/control/rc.c:895
+#: modules/control/rc.c:893
 msgid "| marq-size # . . . . . . . . font size, in pixels"
 msgstr "| marq-size # . . . . . . . . betűméret, képpontban"
 
-#: modules/control/rc.c:897
+#: modules/control/rc.c:895
 msgid "| logo-file STRING . . .the overlay file path/name"
 msgstr "| logo-file KARAKTERLÁNC . . . az átlapolandó fájl útvonala/neve"
 
-#: modules/control/rc.c:898
+#: modules/control/rc.c:896
 msgid "| logo-x X . . . . . . . . . . . .offset from left"
 msgstr "| logo-x X . . . . . . . . . . . .eltolás balról"
 
-#: modules/control/rc.c:899
+#: modules/control/rc.c:897
 msgid "| logo-y Y . . . . . . . . . . . . offset from top"
 msgstr "| logo-y Y . . . . . . . . . . . . eltolás fentről"
 
-#: modules/control/rc.c:900
+#: modules/control/rc.c:898
 msgid "| logo-position #. . . . . . . . relative position"
 msgstr "| logo-position #. . . . . . . . relatív pozíció"
 
-#: modules/control/rc.c:901
+#: modules/control/rc.c:899
 msgid "| logo-transparency #. . . . . . . . .transparency"
 msgstr "| logo-transparency #. . . . . . . . .áttetszőség"
 
-#: modules/control/rc.c:903
+#: modules/control/rc.c:901
 msgid "| mosaic-alpha # . . . . . . . . . . . . . . alpha"
 msgstr "| mosaic-alpha # . . . . . . . . . . . . . . alfa"
 
-#: modules/control/rc.c:904
+#: modules/control/rc.c:902
 msgid "| mosaic-height #. . . . . . . . . . . . . .height"
 msgstr "| mosaic-height #. . . . . . . . . . . . . .magasság"
 
-#: modules/control/rc.c:905
+#: modules/control/rc.c:903
 msgid "| mosaic-width # . . . . . . . . . . . . . . width"
 msgstr "| mosaic-width # . . . . . . . . . . . . . . szélesség"
 
-#: modules/control/rc.c:906
+#: modules/control/rc.c:904
 msgid "| mosaic-xoffset # . . . .top left corner position"
 msgstr "| mosaic-xoffset # . . . .bal felső sarok pozíciója"
 
-#: modules/control/rc.c:907
+#: modules/control/rc.c:905
 msgid "| mosaic-yoffset # . . . .top left corner position"
 msgstr "| mosaic-yoffset # . . . .bal felső sarok pozíciója"
 
-#: modules/control/rc.c:908
+#: modules/control/rc.c:906
 #, fuzzy
 msgid "| mosaic-offsets x,y(,x,y)*. . . . list of offsets"
 msgstr "| mosaic-xoffset # . . . .bal felső sarok pozíciója"
 
-#: modules/control/rc.c:909
+#: modules/control/rc.c:907
 msgid "| mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
 msgstr "| mosaic-align 0..2,4..6,8..10. . .mozaik elrendezés"
 
-#: modules/control/rc.c:910
+#: modules/control/rc.c:908
 msgid "| mosaic-vborder # . . . . . . . . vertical border"
 msgstr "| mosaic-vborder # . . . . . . . . függőleges szegély"
 
-#: modules/control/rc.c:911
+#: modules/control/rc.c:909
 msgid "| mosaic-hborder # . . . . . . . horizontal border"
 msgstr "| mosaic-hborder # . . . . . . . vízszintes szegély"
 
-#: modules/control/rc.c:912
+#: modules/control/rc.c:910
 msgid "| mosaic-position {0=auto,1=fixed} . . . .position"
 msgstr "| mosaic-position {0=automatikus,1=rögzített} . . . .pozíció"
 
-#: modules/control/rc.c:913
+#: modules/control/rc.c:911
 msgid "| mosaic-rows #. . . . . . . . . . .number of rows"
 msgstr "| mosaic-rows #. . . . . . . . . . .sorok száma"
 
-#: modules/control/rc.c:914
+#: modules/control/rc.c:912
 msgid "| mosaic-cols #. . . . . . . . . . .number of cols"
 msgstr "| mosaic-cols #. . . . . . . . . . .oszlopok száma"
 
-#: modules/control/rc.c:915
+#: modules/control/rc.c:913
 #, fuzzy
 msgid "| mosaic-order id(,id)* . . . . order of pictures "
 msgstr "| mosaic-hborder # . . . . . . . vízszintes szegély"
 
-#: modules/control/rc.c:916
+#: modules/control/rc.c:914
 msgid "| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 msgstr "| mosaic-keep-aspect-ratio {0,1} . . .méretarány"
 
-#: modules/control/rc.c:918
+#: modules/control/rc.c:916
 msgid ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
 msgstr ""
 
-#: modules/control/rc.c:922
+#: modules/control/rc.c:920
 msgid "| help . . . . . . . . . . . . . this help message"
 msgstr "| help . . . . . . . . . . . . . ez a súgóüzenet"
 
-#: modules/control/rc.c:923
+#: modules/control/rc.c:921
 msgid "| longhelp . . . . . . . . . a longer help message"
 msgstr "| longhelp . . . . . . . . . hosszabb súgóüzenet"
 
-#: modules/control/rc.c:924
+#: modules/control/rc.c:922
 msgid "| logout . . . . .  exit (if in socket connection)"
 msgstr "| logout . . . . . kilépés (foglalat kapcsolat esetén)"
 
-#: modules/control/rc.c:925
+#: modules/control/rc.c:923
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr "| quit . . . . . . . . . . . . . . . . . kilépés a vlc-ből"
 
-#: modules/control/rc.c:927
+#: modules/control/rc.c:925
 msgid "+----[ end of help ]"
 msgstr "+----[ súgó vége ]"
 
-#: modules/control/rc.c:1037
+#: modules/control/rc.c:1035
 msgid "Press menu select or pause to continue."
 msgstr "Nyomja meg a menü választás vagy szünet gombját a folytatáshoz."
 
-#: modules/control/rc.c:1275 modules/control/rc.c:1563
-#: modules/control/rc.c:1633 modules/control/rc.c:1802
-#: modules/control/rc.c:1901
+#: modules/control/rc.c:1273 modules/control/rc.c:1561
+#: modules/control/rc.c:1631 modules/control/rc.c:1800
+#: modules/control/rc.c:1899
 msgid "Type 'menu select' or 'pause' to continue."
 msgstr "Írja be a 'menu select' vagy 'pause' kifejezést a folytatáshoz."
 
-#: modules/control/rc.c:1343
+#: modules/control/rc.c:1341
 #, fuzzy
 msgid "goto is deprecated"
 msgstr "Fájl megnyitása"
 
-#: modules/control/rc.c:1459
+#: modules/control/rc.c:1457
 msgid "Type 'pause' to continue."
 msgstr "Írja be a 'pause' kifejezést a folytatáshoz."
 
-#: modules/control/rc.c:1886 modules/control/rc.c:1925
+#: modules/control/rc.c:1884 modules/control/rc.c:1923
 msgid "Please provide one of the following parameters:"
 msgstr "Adja meg a következő paraméterek egyikét:"
 
@@ -11255,7 +11285,7 @@ msgid "Extract"
 msgstr "Kicsomagolás"
 
 #: modules/gui/macosx/bookmarks.m:103 modules/gui/macosx/bookmarks.m:109
-#: modules/gui/macosx/sfilters.m:72 modules/gui/pda/pda.c:281
+#: modules/gui/macosx/sfilters.m:72 modules/gui/pda/pda.c:285
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:99
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:198
 msgid "Time"
@@ -13131,32 +13161,32 @@ msgstr "Kijelölt fájl automatikus lejátszása"
 msgid "Automatically play a file when selected in the file selection list"
 msgstr "A fájllistában kijelölt fájl automatikus lejátszása"
 
-#: modules/gui/pda/pda.c:66
+#: modules/gui/pda/pda.c:67 modules/gui/pda/pda.c:69
 msgid "PDA Linux Gtk2+ interface"
 msgstr "PDA Linux Gtk2+ felület"
 
-#: modules/gui/pda/pda.c:220 modules/gui/pda/pda.c:275
+#: modules/gui/pda/pda.c:224 modules/gui/pda/pda.c:279
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:497
 msgid "Filename"
 msgstr "Fájlnév"
 
-#: modules/gui/pda/pda.c:226
+#: modules/gui/pda/pda.c:230
 msgid "Permissions"
 msgstr "Jogosultságok"
 
-#: modules/gui/pda/pda.c:232
+#: modules/gui/pda/pda.c:236
 msgid "Size"
 msgstr "Méret"
 
-#: modules/gui/pda/pda.c:238
+#: modules/gui/pda/pda.c:242
 msgid "Owner"
 msgstr "Tulajdonos"
 
-#: modules/gui/pda/pda.c:244
+#: modules/gui/pda/pda.c:248
 msgid "Group"
 msgstr "Csoport"
 
-#: modules/gui/pda/pda.c:288
+#: modules/gui/pda/pda.c:292
 msgid "Index"
 msgstr "Tárgymutató"
 
@@ -15808,7 +15838,7 @@ msgid "Growl Notification Plugin"
 msgstr ""
 
 #: modules/misc/notify/growl.c:146 modules/misc/notify/msn.c:163
-#: modules/misc/notify/notify.c:163
+#: modules/misc/notify/notify.c:165
 #, fuzzy
 msgid "(no title)"
 msgstr "Névtelen"
@@ -15853,12 +15883,12 @@ msgstr ""
 msgid "LibNotify Notification Plugin"
 msgstr ""
 
-#: modules/misc/notify/notify.c:155
+#: modules/misc/notify/notify.c:157
 #, fuzzy
 msgid "no artist"
 msgstr "Előadó"
 
-#: modules/misc/notify/notify.c:158
+#: modules/misc/notify/notify.c:160
 #, fuzzy
 msgid "no album"
 msgstr "Album"
