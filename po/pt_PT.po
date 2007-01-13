@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pt_PT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2006-09-20 10:30+0100\n"
 "Last-Translator: Ari Constâncio <ari.constancio at gmail dot com>\n"
 "Language-Team: Portuguese\n"
@@ -4458,7 +4458,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr ""
 

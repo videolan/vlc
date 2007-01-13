@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2004-05-16 00:41+0200\n"
 "Last-Translator: Derk-Jan Hartman <hartman at videolan dot org>\n"
 "Language-Team: Nederlands <www-doc@videolan.org>\n"
@@ -392,7 +392,7 @@ msgstr "Geavanceerd"
 
 #: include/vlc_config_cat.h:198
 msgid "Advanced settings. Use with care."
-msgstr ""
+msgstr "Geadvanceerde instellingen. Voorzichtigheid geboden."
 
 #: include/vlc_config_cat.h:200
 msgid "CPU features"
@@ -453,7 +453,7 @@ msgstr "Instellingen van audio codeer modules"
 
 #: include/vlc_config_cat.h:227
 msgid "Dialog providers can be configured here."
-msgstr ""
+msgstr "Vraagvensters kunnen hier ingesteld worden."
 
 #: include/vlc_config_cat.h:229
 msgid "Subtitle demuxer settings"
@@ -1249,6 +1249,8 @@ msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
+"\n"
+"Inhoud tijdelijk opgeslagen in het bestand vlc-help.txt.\n"
 
 #: src/libvlc-common.c:1652
 msgid ""
@@ -1368,7 +1370,7 @@ msgstr "Turks"
 
 #: src/libvlc-module.c:53
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Vereenvoudigd Chinees"
 
 #: src/libvlc-module.c:53
 msgid "Chinese Traditional"
@@ -3263,6 +3265,8 @@ msgid ""
 "When using the one instance only option, enqueue items to playlist and keep "
 "playing current item."
 msgstr ""
+"Wanneer het gebruiken van de één instantie slechts optie, enqueue houden de "
+"punten aan playlist en speel huidig punt."
 
 #: src/libvlc-module.c:953
 msgid ""
@@ -4159,7 +4163,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:579 modules/gui/macosx/intf.m:634
 #: modules/video_output/snapshot.c:76
 msgid "Snapshot"
-msgstr ""
+msgstr "Momentopname"
 
 #: src/libvlc-module.c:1329
 msgid "Window properties"
@@ -4189,7 +4193,7 @@ msgstr "Instellingen voor sporen"
 
 #: src/libvlc-module.c:1428
 msgid "Playback control"
-msgstr ""
+msgstr "Playback bediening"
 
 #: src/libvlc-module.c:1443
 msgid "Default devices"
@@ -4460,7 +4464,7 @@ msgstr "Fins"
 
 #: src/text/iso-639_def.h:78
 msgid "Frisian"
-msgstr ""
+msgstr "Fries"
 
 #: src/text/iso-639_def.h:81
 msgid "Gaelic (Scots)"
@@ -4620,7 +4624,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:126
 msgid "Malagasy"
-msgstr ""
+msgstr "Malagassisch"
 
 #: src/text/iso-639_def.h:127
 msgid "Maltese"
@@ -4894,7 +4898,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Onbekend"
 
@@ -9164,9 +9168,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/x264.c:106
-#, fuzzy
 msgid "H.264 level"
-msgstr "Surround niveau (0-100)"
+msgstr ""
 
 #: modules/codec/x264.c:107
 msgid ""
@@ -10924,8 +10927,9 @@ msgid "Shoutcast"
 msgstr ""
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Start positie"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -11099,7 +11103,7 @@ msgstr "MPEG Transport Stream"
 #: modules/demux/ts.c:3148 modules/demux/ts.c:3182
 #, fuzzy
 msgid "clean effects"
-msgstr "Effect"
+msgstr "Sterren effect"
 
 #: modules/demux/ts.c:3152 modules/demux/ts.c:3186
 msgid "hearing impaired"
@@ -13701,7 +13705,6 @@ msgid "Next track"
 msgstr "Volgend Hoofdstuk"
 
 #: modules/gui/qt4/qt4.cpp:47
-#, fuzzy
 msgid "Qt interface"
 msgstr "Qt interface"
 
@@ -17357,7 +17360,7 @@ msgstr "Formaat ondertiteling"
 #: modules/stream_out/transcode.c:154
 #, fuzzy
 msgid "This is the subtitles codec that will be used."
-msgstr "Standaard DVD apparaat dat gebruikt wordt."
+msgstr "Standaard CD Audio apparaat dat gebruikt wordt."
 
 #: modules/stream_out/transcode.c:158
 #, fuzzy
@@ -19069,8 +19072,9 @@ msgid "Cylinder"
 msgstr "Verwijder"
 
 #: modules/video_output/opengl.c:123
+#, fuzzy
 msgid "Torus"
-msgstr ""
+msgstr "House"
 
 #: modules/video_output/opengl.c:123
 #, fuzzy
@@ -19590,368 +19594,8 @@ msgstr "Visuele effecten filter"
 msgid "Spectrum analyser"
 msgstr "Spectrum analyser"
 
-#~ msgid "History parameter"
-#~ msgstr "Historie"
-
-#, fuzzy
-#~ msgid "The umber of frames used for detection."
-#~ msgstr "Aantal beelden dat gebruikt word voor de detectie"
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32<->float32 conversion"
-#~ msgstr "audio filter voor fixed32<->float32 conversie"
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32->s16 conversion"
-#~ msgstr "audio filter voor fixed32->s16 conversie"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s16 conversion"
-#~ msgstr "audio filter voor float32->s16 conversie"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s8 conversion"
-#~ msgstr "audio filter voor float32->s8 conversio"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u16 conversion"
-#~ msgstr "audio filter voor float32->u16 conversie"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u8 conversion"
-#~ msgstr "audio filter voor float32->u8 conversie"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->fixed32 conversion"
-#~ msgstr "audio filter voor s16->fixed32 conversie"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 conversion"
-#~ msgstr "audio filter voor s16->float32 conversie"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 with endianness conversion"
-#~ msgstr "audio filter voor s16->float32 met endianness conversie"
-
-#, fuzzy
-#~ msgid "Audio filter for s8->float32 conversion"
-#~ msgstr "audio filter voor s8->float32 conversie"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->fixed32 conversion"
-#~ msgstr "audio filter voor u8->fixed32 conversie"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->float32 conversion"
-#~ msgstr "audio filter voor u8->float32 conversie"
-
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Disk type"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "Blader..."
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "Mozaïek uitlijning"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Audio filters"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "Meditative"
-
-#, fuzzy
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "IPv4 network abstractie laag"
-
-#, fuzzy
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "IPv6 network abstractie laag"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "Volgende"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "Breedte"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Spectrum"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Buffering"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Linear"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "Olijf"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Meer informatie"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "Groep"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "schakel in"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "schakel in"
-
-#, fuzzy
-#~ msgid "horizontalLayout_3"
-#~ msgstr "Horizontaal"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Disk"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Framerate"
-
-#~ msgid "DAAP access"
-#~ msgstr "DAAP toegang"
-
-#~ msgid " to "
-#~ msgstr " naar "
-
-#, fuzzy
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "De levenstijd van de uitgaande stream."
-
-#, fuzzy
-#~ msgid "Errors"
-#~ msgstr "Fout"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Metadata"
-
-#, fuzzy
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr "De levenstijd (TTL) van de uitgaande stream."
-
-#, fuzzy
-#~ msgid "Justification"
-#~ msgstr "Versterking"
-
-#, fuzzy
-#~ msgid "Growl"
-#~ msgstr "Groep"
-
-#, fuzzy
-#~ msgid "MSN"
-#~ msgstr "MMS"
-
-#, fuzzy
-#~ msgid "Vertical border width"
-#~ msgstr "Verticale randbreedte in pixels"
-
-#, fuzzy
-#~ msgid "Horizontal border width"
-#~ msgstr "Horizontale randbreedte in pixels"
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "Audio apparaat naam"
-
-#, fuzzy
-#~ msgid "Audioscrobbler password"
-#~ msgstr "FTP wachtwoord"
-
-#, fuzzy
-#~ msgid "Marquee text to display."
-#~ msgstr "Tekst overlay sub filter"
-
-#~ msgid "Time format string (%Y%m%d %H%M%S)"
-#~ msgstr "Formaat tijd (%Y%m%d %H%M%S)"
-
-#, fuzzy
-#~ msgid ""
-#~ "Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = "
-#~ "minute, %S = second)."
-#~ msgstr ""
-#~ "Tijdformaat (%Y = jaar, %m = maand, %d = dag, %H = uur, %M = minuut, %S = "
-#~ "seconden"
-
-#, fuzzy
-#~ msgid ""
-#~ "You can enforce the text position on the video (0=center, 1=left, "
-#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-#~ "e.g. 6 = top-right)."
-#~ msgstr ""
-#~ "De oriëntatie/positionering van de tijd in het venster kan hier bepaald "
-#~ "worden. Standaard (0) zal het beeld gecentreerd zijn. (0=center, 1=links, "
-#~ "2=rechts, 4=boven, 8=beneden. Combinaties van deze waarden zijn ook "
-#~ "mogelijk.)"
-
-#~ msgid "Time overlay"
-#~ msgstr "Tijd overlap"
-
-#~ msgid "Time display sub filter"
-#~ msgstr "Tijd afbeeldingsfilter"
-
-#~ msgid "Corba control"
-#~ msgstr "Corba Bediening"
-
-#~ msgid "corba control module"
-#~ msgstr "corba bedieningsmodule"
-
-#~ msgid ""
-#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
-#~ "screen without black borders (OpenGL only)."
-#~ msgstr "Crop het beeld als het in fullscreen zwarte randen heeft. "
-
-#~ msgid "Standard Play"
-#~ msgstr "Normaal Afspelen"
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "Instellingen..."
-
-#, fuzzy
-#~ msgid "Filters (v2)"
-#~ msgstr "Filters"
-
 #~ msgid "Video filters settings"
 #~ msgstr "Video filter instelling"
-
-#, fuzzy
-#~ msgid "Yes"
-#~ msgstr "Blues"
-
-#, fuzzy
-#~ msgid "No"
-#~ msgstr "Standaard"
-
-#, fuzzy
-#~ msgid ""
-#~ "An error has occurred which probably prevented the proper execution of "
-#~ "the program:"
-#~ msgstr ""
-#~ "Er is een fout opgetreden die het onmogelijk maakte om uw verzoek af te "
-#~ "handelen :"
-
-#~ msgid "If you believe that it is a bug, please follow the instructions at:"
-#~ msgstr ""
-#~ "Mocht u van mening zijn dat het een software fout betreft, volg dan de "
-#~ "instructies op:"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "Open het berichten venster"
-
-#~ msgid "Dismiss"
-#~ msgstr "Dismiss"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "Herhaal Alles"
-
-#, fuzzy
-#~ msgid "Podcast Link"
-#~ msgstr "Positie"
-
-#, fuzzy
-#~ msgid "Podcast Copyright"
-#~ msgstr "Auteursrechten"
-
-#, fuzzy
-#~ msgid "Podcast Category"
-#~ msgstr "CDDB Categorie"
-
-#, fuzzy
-#~ msgid "Podcast Subtitle"
-#~ msgstr "Ondertiteling"
-
-#, fuzzy
-#~ msgid "Podcast Publication Date"
-#~ msgstr "Modulatie type"
-
-#, fuzzy
-#~ msgid "Podcast Author"
-#~ msgstr "Auteur"
-
-#, fuzzy
-#~ msgid "Podcast Subcategory"
-#~ msgstr "Per Categorie"
-
-#, fuzzy
-#~ msgid "Podcast Duration"
-#~ msgstr "Verzadiging"
-
-#, fuzzy
-#~ msgid "Dummy video filter"
-#~ msgstr "ffmpeg video filter"
-
-#~ msgid "Playlist metademux"
-#~ msgstr "Afspeellijst metademux"
-
-#, fuzzy
-#~ msgid "Native playlist import"
-#~ msgstr "M3U speellijst importeren"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "Disk type"
-
-#, fuzzy
-#~ msgid "Listeners"
-#~ msgstr "Linear"
-
-#, fuzzy
-#~ msgid "Center-Center"
-#~ msgstr "Gecentreerd"
-
-#, fuzzy
-#~ msgid "Left-Center"
-#~ msgstr "Gecentreerd"
-
-#, fuzzy
-#~ msgid "Right-Center"
-#~ msgstr "Gecentreerd"
-
-#, fuzzy
-#~ msgid "Center-Top"
-#~ msgstr "Gecentreerd"
-
-#, fuzzy
-#~ msgid "Left-Top"
-#~ msgstr "Linker"
-
-#, fuzzy
-#~ msgid "Right-Top"
-#~ msgstr "Rechter"
-
-#, fuzzy
-#~ msgid "Center-Bottom"
-#~ msgstr "Gecentreerd"
-
-#, fuzzy
-#~ msgid "Left-Bottom"
-#~ msgstr "Beneden"
-
-#, fuzzy
-#~ msgid "Right-Bottom"
-#~ msgstr "Beneden"
-
-#~ msgid "M3U file"
-#~ msgstr "M3U bestand"
 
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB Artiest"
@@ -20013,6 +19657,28 @@ msgstr "Spectrum analyser"
 #~ msgid "ISO-9660 Volume Set"
 #~ msgstr "ISO-9660 Set"
 
+#, fuzzy
+#~ msgid "Errors"
+#~ msgstr "Fout"
+
+#, fuzzy
+#~ msgid "Login"
+#~ msgstr "Herhaal Alles"
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "Control"
+
+#, fuzzy
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "Multicast netwerkinterface"
+
+#, fuzzy
+#~ msgid "Default IPv6 multicast interface. This overrides the routing table."
+#~ msgstr ""
+#~ "De interface te gebruiken voor multicast. Dit negeert de standaard "
+#~ "routing instellingen van het OS."
+
 #~ msgid "By category"
 #~ msgstr "Per Categorie"
 
@@ -20021,6 +19687,76 @@ msgstr "Spectrum analyser"
 
 #~ msgid "All items, unsorted"
 #~ msgstr "Alle elementen, ongesorteerd"
+
+#, fuzzy
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr "Videofilters worden gebruikt om het beeld te bewerken"
+
+#, fuzzy
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "De levenstijd van de uitgaande stream."
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32<->float32 conversion"
+#~ msgstr "audio filter voor fixed32<->float32 conversie"
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32->s16 conversion"
+#~ msgstr "audio filter voor fixed32->s16 conversie"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s16 conversion"
+#~ msgstr "audio filter voor float32->s16 conversie"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s8 conversion"
+#~ msgstr "audio filter voor float32->s8 conversio"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u16 conversion"
+#~ msgstr "audio filter voor float32->u16 conversie"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u8 conversion"
+#~ msgstr "audio filter voor float32->u8 conversie"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->fixed32 conversion"
+#~ msgstr "audio filter voor s16->fixed32 conversie"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 conversion"
+#~ msgstr "audio filter voor s16->float32 conversie"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 with endianness conversion"
+#~ msgstr "audio filter voor s16->float32 met endianness conversie"
+
+#, fuzzy
+#~ msgid "Audio filter for s8->float32 conversion"
+#~ msgstr "audio filter voor s8->float32 conversie"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->fixed32 conversion"
+#~ msgstr "audio filter voor u8->fixed32 conversie"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->float32 conversion"
+#~ msgstr "audio filter voor u8->float32 conversie"
+
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Linux OSS audio uitvoer"
+
+#~ msgid "Corba control"
+#~ msgstr "Corba Bediening"
+
+#~ msgid "corba control module"
+#~ msgstr "corba bedieningsmodule"
+
+#~ msgid "Playlist metademux"
+#~ msgstr "Afspeellijst metademux"
 
 #~ msgid "Segment filename"
 #~ msgstr "Bestandsnaam van segment"
@@ -20032,8 +19768,95 @@ msgstr "Spectrum analyser"
 #~ msgstr "Schrijf applicatie"
 
 #, fuzzy
+#~ msgid "Listeners"
+#~ msgstr "Linear"
+
+#, fuzzy
+#~ msgid "Native playlist import"
+#~ msgstr "M3U speellijst importeren"
+
+#, fuzzy
+#~ msgid "Podcast Link"
+#~ msgstr "Positie"
+
+#, fuzzy
+#~ msgid "Podcast Copyright"
+#~ msgstr "Auteursrechten"
+
+#, fuzzy
+#~ msgid "Podcast Category"
+#~ msgstr "CDDB Categorie"
+
+#, fuzzy
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Ondertiteling"
+
+#, fuzzy
+#~ msgid "Podcast Publication Date"
+#~ msgstr "Modulatie type"
+
+#, fuzzy
+#~ msgid "Podcast Author"
+#~ msgstr "Auteur"
+
+#, fuzzy
+#~ msgid "Podcast Subcategory"
+#~ msgstr "Per Categorie"
+
+#, fuzzy
+#~ msgid "Podcast Duration"
+#~ msgstr "Verzadiging"
+
+#, fuzzy
+#~ msgid "Mime type"
+#~ msgstr "Disk type"
+
+#, fuzzy
+#~ msgid "Yes"
+#~ msgstr "Blues"
+
+#, fuzzy
+#~ msgid "No"
+#~ msgstr "Standaard"
+
+#, fuzzy
+#~ msgid ""
+#~ "An error has occurred which probably prevented the proper execution of "
+#~ "the program:"
+#~ msgstr ""
+#~ "Er is een fout opgetreden die het onmogelijk maakte om uw verzoek af te "
+#~ "handelen :"
+
+#~ msgid "If you believe that it is a bug, please follow the instructions at:"
+#~ msgstr ""
+#~ "Mocht u van mening zijn dat het een software fout betreft, volg dan de "
+#~ "instructies op:"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Open het berichten venster"
+
+#~ msgid "Dismiss"
+#~ msgstr "Dismiss"
+
+#, fuzzy
+#~ msgid "Do not display further errors"
+#~ msgstr "Verberg verdere foutmeldingen"
+
+#~ msgid ""
+#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
+#~ "screen without black borders (OpenGL only)."
+#~ msgstr "Crop het beeld als het in fullscreen zwarte randen heeft. "
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "%i elementen in afspeellijst"
+
+#, fuzzy
 #~ msgid "%i items in playlist (%i not shown)"
 #~ msgstr "%i elementen in afspeellijst"
+
+#~ msgid "M3U file"
+#~ msgstr "M3U bestand"
 
 #, fuzzy
 #~ msgid "Sorted by Artist"
@@ -20044,12 +19867,159 @@ msgstr "Spectrum analyser"
 #~ msgstr "Sorteer op Naam"
 
 #, fuzzy
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "IPv4 network abstractie laag"
+
+#, fuzzy
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "IPv6 network abstractie laag"
+
+#~ msgid "DAAP access"
+#~ msgstr "DAAP toegang"
+
+#, fuzzy
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr "De levenstijd (TTL) van de uitgaande stream."
+
+#, fuzzy
+#~ msgid "Automatic black border cropping."
+#~ msgstr "Automatische verwijdering van zwarte randen"
+
+#, fuzzy
+#~ msgid ""
+#~ "Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough"
+#~ "\" and \"psychedelic\"."
+#~ msgstr "Verstoringsmethode, of \"wave\" of \"ripple\""
+
+#~ msgid "Distort video filter"
+#~ msgstr "Verstorings video filter"
+
+#, fuzzy
+#~ msgid "Marquee text to display."
+#~ msgstr "Tekst overlay sub filter"
+
+#, fuzzy
+#~ msgid ""
+#~ "Positioning method for the mosaic. auto: automatically choose the best "
+#~ "number of rows and columns. fixed: use the user-defined number of rows "
+#~ "and columns."
+#~ msgstr ""
+#~ "Positioneringsmethode:\n"
+#~ "auto: Kies automatisch het beste aantal rijen en kolommen.\n"
+#~ "absoluut: Gebruik het aantal rijen en kolommen dat de gebruiker heeft "
+#~ "ingesteld."
+
+#~ msgid "History parameter"
+#~ msgstr "Historie"
+
+#, fuzzy
+#~ msgid "The umber of frames used for detection."
+#~ msgstr "Aantal beelden dat gebruikt word voor de detectie"
+
+#~ msgid "Motion detect"
+#~ msgstr "Modulatie type"
+
+#~ msgid "Time format string (%Y%m%d %H%M%S)"
+#~ msgstr "Formaat tijd (%Y%m%d %H%M%S)"
+
+#, fuzzy
+#~ msgid ""
+#~ "Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = "
+#~ "minute, %S = second)."
+#~ msgstr ""
+#~ "Tijdformaat (%Y = jaar, %m = maand, %d = dag, %H = uur, %M = minuut, %S = "
+#~ "seconden"
+
+#, fuzzy
+#~ msgid ""
+#~ "You can enforce the text position on the video (0=center, 1=left, "
+#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+#~ "e.g. 6 = top-right)."
+#~ msgstr ""
+#~ "De oriëntatie/positionering van de tijd in het venster kan hier bepaald "
+#~ "worden. Standaard (0) zal het beeld gecentreerd zijn. (0=center, 1=links, "
+#~ "2=rechts, 4=boven, 8=beneden. Combinaties van deze waarden zijn ook "
+#~ "mogelijk.)"
+
+#~ msgid "Time overlay"
+#~ msgstr "Tijd overlap"
+
+#~ msgid "Time display sub filter"
+#~ msgstr "Tijd afbeeldingsfilter"
+
+#~ msgid "Standard Play"
+#~ msgstr "Normaal Afspelen"
+
+#, fuzzy
+#~ msgid "Growl"
+#~ msgstr "Groep"
+
+#, fuzzy
+#~ msgid "MSN"
+#~ msgstr "MMS"
+
+#, fuzzy
+#~ msgid "Vertical border width"
+#~ msgstr "Verticale randbreedte in pixels"
+
+#, fuzzy
+#~ msgid "Horizontal border width"
+#~ msgstr "Horizontale randbreedte in pixels"
+
+#, fuzzy
+#~ msgid "Create"
+#~ msgstr "Framerate"
+
+#~ msgid " to "
+#~ msgstr " naar "
+
+#, fuzzy
 #~ msgid "Number of streams"
 #~ msgstr "Aantal threads"
 
 #, fuzzy
 #~ msgid "Maximum number of Shoutcast radio streams which would be listed."
 #~ msgstr "Maximum aantal weer te geven shoutcast servers."
+
+#, fuzzy
+#~ msgid "Image"
+#~ msgstr "Afbeeldingsbestand"
+
+#, fuzzy
+#~ msgid "Center-Center"
+#~ msgstr "Gecentreerd"
+
+#, fuzzy
+#~ msgid "Left-Center"
+#~ msgstr "Gecentreerd"
+
+#, fuzzy
+#~ msgid "Right-Center"
+#~ msgstr "Gecentreerd"
+
+#, fuzzy
+#~ msgid "Center-Top"
+#~ msgstr "Gecentreerd"
+
+#, fuzzy
+#~ msgid "Left-Top"
+#~ msgstr "Linker"
+
+#, fuzzy
+#~ msgid "Right-Top"
+#~ msgstr "Rechter"
+
+#, fuzzy
+#~ msgid "Center-Bottom"
+#~ msgstr "Gecentreerd"
+
+#, fuzzy
+#~ msgid "Left-Bottom"
+#~ msgstr "Beneden"
+
+#, fuzzy
+#~ msgid "Right-Bottom"
+#~ msgstr "Beneden"
 
 #~ msgid "Adjust Image"
 #~ msgstr "Beeldaanpassingen"
@@ -20245,6 +20215,10 @@ msgstr "Spectrum analyser"
 
 #~ msgid "Allows you to give the mime returned by the server."
 #~ msgstr "Forceer de MIME voor de te verzenden HTTP stream."
+
+#, fuzzy
+#~ msgid "DTS"
+#~ msgstr "TS"
 
 #~ msgid "Output channels number"
 #~ msgstr "Uitvoer kanalen nummers"
@@ -20501,6 +20475,10 @@ msgstr "Spectrum analyser"
 #~ msgstr "Specificeer het bestandsformaat voor de uitgaande stream."
 
 #, fuzzy
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "Uitvoer naar bestand"
+
+#, fuzzy
 #~ msgid ""
 #~ "Allows you to specify the output destination used for the streaming "
 #~ "output."
@@ -20570,6 +20548,9 @@ msgstr "Spectrum analyser"
 #~ msgid "Subpictures filter"
 #~ msgstr "Ondertitelingsfilter"
 
+#~ msgid "List of video output modules"
+#~ msgstr "Lijst van video output modules"
+
 #~ msgid "Select the specific video output modules that you want to activate."
 #~ msgstr "Selecteer de specifieke video uitvoer modules die u wilt activeren."
 
@@ -20620,6 +20601,9 @@ msgstr "Spectrum analyser"
 #~ msgid ""
 #~ "If the OpenGL cube effect is enabled, this controls its rotation speed."
 #~ msgstr "Dit bepaald de rotatie snelheid van het OpenGL-kubus effect."
+
+#~ msgid "Select effect"
+#~ msgstr "Effect"
 
 #~ msgid "Allows you to select different visual effects."
 #~ msgstr "Selecteer een van de visuele effecten"
@@ -20857,6 +20841,9 @@ msgstr "Spectrum analyser"
 #~ "Zonder deze instellingen worden geen beelden overgeslagen in MPEG-w "
 #~ "streams."
 
+#~ msgid "Network interface address"
+#~ msgstr "Netwerk interface adres"
+
 #~ msgid ""
 #~ "If you have several interfaces on your machine and use the multicast "
 #~ "solution, you will probably have to indicate the IP address of your "
@@ -20931,9 +20918,6 @@ msgstr "Spectrum analyser"
 
 #~ msgid "Controls"
 #~ msgstr "Bediening"
-
-#~ msgid "Random effect"
-#~ msgstr "Sterren effect"
 
 #~ msgid "SLP attribute identifiers"
 #~ msgstr "SLP attribuut identifiers"
@@ -21034,6 +21018,9 @@ msgstr "Spectrum analyser"
 #~ msgid "Joystick control interface"
 #~ msgstr "joystick bediening interface"
 
+#~ msgid "Show tooltips"
+#~ msgstr "Toon tooltips"
+
 #~ msgid "Show tooltips for configuration options."
 #~ msgstr "Toon tooltips voor configuratie opties."
 
@@ -21062,6 +21049,9 @@ msgstr "Spectrum analyser"
 
 #~ msgid "_Open File..."
 #~ msgstr "_Open Bestand..."
+
+#~ msgid "Open a file"
+#~ msgstr "Open een bestand"
 
 #~ msgid "Open _Disc..."
 #~ msgstr "Open _Disk..."
@@ -21119,6 +21109,9 @@ msgstr "Spectrum analyser"
 
 #~ msgid "_Language"
 #~ msgstr "_Taal"
+
+#~ msgid "Select audio channel"
+#~ msgstr "Selecteer een audio kanaal"
 
 #~ msgid "_Subtitles"
 #~ msgstr "_Ondertiteling"
@@ -21223,6 +21216,9 @@ msgstr "Spectrum analyser"
 #~ msgid "Vertical"
 #~ msgstr "Vertikaal"
 
+#~ msgid "Horizontal"
+#~ msgstr "Horizontaal"
+
 #~ msgid "Satellite"
 #~ msgstr "Satelliet"
 
@@ -21241,6 +21237,9 @@ msgstr "Spectrum analyser"
 
 #~ msgid "Item"
 #~ msgstr "Onderdeel"
+
+#~ msgid "Invert"
+#~ msgstr "Inverteer"
 
 #~ msgid "stream output (MRL)"
 #~ msgstr "stroom output (MRL)"
@@ -21262,6 +21261,9 @@ msgstr "Spectrum analyser"
 
 #~ msgid "_Close"
 #~ msgstr "_Sluit"
+
+#~ msgid "Close the window"
+#~ msgstr "Sluit het venster"
 
 #~ msgid "E_xit"
 #~ msgstr "Af_sluiten"
@@ -21497,6 +21499,9 @@ msgstr "Spectrum analyser"
 #~ msgid "Port "
 #~ msgstr "Poort"
 
+#~ msgid "Video Filters"
+#~ msgstr "Video Filters"
+
 #~ msgid "Demux number"
 #~ msgstr "Demux nummer"
 
@@ -21705,9 +21710,6 @@ msgstr "Spectrum analyser"
 #~ msgid "MPEG-TS"
 #~ msgstr "MPEG1"
 
-#~ msgid "Control"
-#~ msgstr "Control"
-
 #~ msgid "Option/Alt"
 #~ msgstr "Optie/Alt"
 
@@ -21818,6 +21820,9 @@ msgstr "Spectrum analyser"
 #~ "© (C) 1996-2004 - het VideoLAN Team\n"
 #~ "\n"
 
+#~ msgid "Repeat"
+#~ msgstr "Herhaal"
+
 #~ msgid "SAP interface"
 #~ msgstr "SAP interface"
 
@@ -21905,6 +21910,9 @@ msgstr "Spectrum analyser"
 
 #~ msgid "Stream output modules settings"
 #~ msgstr "Instellingen van stream uitvoer modules"
+
+#~ msgid "Text renderer settings"
+#~ msgstr "Tekst afbeeld instellingen"
 
 #~ msgid "Video output modules settings"
 #~ msgstr "Instellingen van video uitvoer modules"
@@ -22067,6 +22075,9 @@ msgstr "Spectrum analyser"
 #~ msgid "&Groups"
 #~ msgstr "&Groepen"
 
+#~ msgid "Enter a name for the new group:"
+#~ msgstr "Voer de naam in voor de nieuwe groep"
+
 #, fuzzy
 #~ msgid "| no entries\n"
 #~ msgstr "Onderdeel"
@@ -22100,3 +22111,118 @@ msgstr "Spectrum analyser"
 
 #~ msgid "Telnet interface started on port: %d"
 #~ msgstr "Telnet interface gestart op poort: %d"
+
+#~ msgid "Stop Stream"
+#~ msgstr "Stop Stream"
+
+#~ msgid "_About..."
+#~ msgstr "_Over..."
+
+#~ msgid "Play stream"
+#~ msgstr "Start stream"
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "Logo overlay filter"
+
+#~ msgid "Random effect"
+#~ msgstr "Sterren effect"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Disk type"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "Blader..."
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "Mozaïek uitlijning"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Audio filters"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "Meditative"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "Volgende"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "Breedte"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Spectrum"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Buffering"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Linear"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "Olijf"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Meer informatie"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "Groep"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "schakel in"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "schakel in"
+
+#, fuzzy
+#~ msgid "horizontalLayout_3"
+#~ msgstr "Horizontaal"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "Disk"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Metadata"
+
+#, fuzzy
+#~ msgid "Justification"
+#~ msgstr "Versterking"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "Audio apparaat naam"
+
+#, fuzzy
+#~ msgid "Audioscrobbler password"
+#~ msgstr "FTP wachtwoord"
+
+#, fuzzy
+#~ msgid "Connecting..."
+#~ msgstr "Instellingen..."
+
+#, fuzzy
+#~ msgid "Filters (v2)"
+#~ msgstr "Filters"
+
+#, fuzzy
+#~ msgid "Dummy video filter"
+#~ msgstr "ffmpeg video filter"
+
+#~ msgid "Control"
+#~ msgstr "Control"

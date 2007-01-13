@@ -1,16 +1,15 @@
 # Korean translation for VLC
-# Copyright (C) 2005 the VideoLAN team
+# Copyright (C) 2006 the VideoLAN team
 # $Id$
-#
 #
 # Han HoJoong <0demon0@paran.com>, 2005.
 msgid ""
 msgstr ""
-"Project-Id-Version: ko\n"
+"Project-Id-Version: vlc 0.8.6-svn20061012\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
-"PO-Revision-Date: 2005-09-07 06:05+0900\n"
-"Last-Translator: Han HoJoong <0demon0@paran.com>\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
+"PO-Revision-Date: 2006-11-11 18:47+0900\n"
+"Last-Translator: Kang Jeong-Hee <keizie@gmail.com>\n"
 "Language-Team: Korean Linux User Group\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,7 +21,7 @@ msgstr "VLC 설정"
 
 #: include/vlc_config_cat.h:38
 msgid "Select \"Advanced Options\" to see all options."
-msgstr ""
+msgstr "모든 선택사항을 보려면 \"고급 선택사항\"을 켜세요."
 
 #: include/vlc_config_cat.h:40 include/vlc_config_cat.h:131
 #: modules/gui/macosx/playlistinfo.m:62 modules/gui/wince/playlist.cpp:674
@@ -36,9 +35,8 @@ msgid "Interface"
 msgstr "인터페이스"
 
 #: include/vlc_config_cat.h:44
-#, fuzzy
 msgid "Settings for VLC's interfaces"
-msgstr "네트워크·인터페이스"
+msgstr ""
 
 #: include/vlc_config_cat.h:46
 #, fuzzy
@@ -68,7 +66,7 @@ msgstr "네트워크·인터페이스"
 #: include/vlc_config_cat.h:54 include/vlc_config_cat.h:55
 #, fuzzy
 msgid "Hotkeys settings"
-msgstr "오디오 인코더 설정"
+msgstr "음성 인코더 설정"
 
 #: include/vlc_config_cat.h:58 src/input/es_out.c:1607
 #: src/libvlc-module.c:1256 modules/gui/beos/InterfaceWindow.cpp:281
@@ -79,12 +77,11 @@ msgstr "오디오 인코더 설정"
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:850
 #: modules/gui/wxwidgets/extrapanel.cpp:178 modules/stream_out/transcode.c:258
 msgid "Audio"
-msgstr "오디오"
+msgstr "음성"
 
 #: include/vlc_config_cat.h:59
-#, fuzzy
 msgid "Audio settings"
-msgstr "오디오 필터 설정"
+msgstr "음성 설정"
 
 #: include/vlc_config_cat.h:61 include/vlc_config_cat.h:62
 #, fuzzy
@@ -140,12 +137,11 @@ msgstr "그 외의 옵션"
 #: modules/gui/wxwidgets/extrapanel.cpp:176 modules/misc/dummy/dummy.c:95
 #: modules/stream_out/transcode.c:202
 msgid "Video"
-msgstr "비디오"
+msgstr "영상"
 
 #: include/vlc_config_cat.h:80
-#, fuzzy
 msgid "Video settings"
-msgstr "비디오 필터 설정"
+msgstr "영상 설정"
 
 #: include/vlc_config_cat.h:82 include/vlc_config_cat.h:83
 #, fuzzy
@@ -215,18 +211,16 @@ msgid "Demuxers are used to separate audio and video streams."
 msgstr ""
 
 #: include/vlc_config_cat.h:122
-#, fuzzy
 msgid "Video codecs"
-msgstr "비디오 코덱"
+msgstr "영상 코덱"
 
 #: include/vlc_config_cat.h:123
 msgid "Settings for the video-only decoders and encoders."
 msgstr ""
 
 #: include/vlc_config_cat.h:125
-#, fuzzy
 msgid "Audio codecs"
-msgstr "오디오 코덱"
+msgstr "음성 코덱"
 
 #: include/vlc_config_cat.h:126
 msgid "Settings for the audio-only decoders and encoders."
@@ -242,9 +236,8 @@ msgid "Settings for audio+video and miscellaneous decoders and encoders."
 msgstr ""
 
 #: include/vlc_config_cat.h:132
-#, fuzzy
 msgid "General input settings. Use with care."
-msgstr "ALSA 오디오·모듈"
+msgstr ""
 
 #: include/vlc_config_cat.h:135 src/libvlc-module.c:1530
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:152
@@ -283,7 +276,7 @@ msgstr ""
 #: include/vlc_config_cat.h:155
 #, fuzzy
 msgid "Access output"
-msgstr "오디오 출력 모듈 액세스"
+msgstr "음성 출력 모듈 액세스"
 
 #: include/vlc_config_cat.h:157
 msgid ""
@@ -380,7 +373,7 @@ msgstr ""
 #: include/vlc_config_cat.h:198
 #, fuzzy
 msgid "Advanced settings. Use with care."
-msgstr "ALSA 오디오·모듈"
+msgstr "ALSA 음성·모듈"
 
 #: include/vlc_config_cat.h:200
 msgid "CPU features"
@@ -395,12 +388,12 @@ msgstr ""
 #: include/vlc_config_cat.h:204
 #, fuzzy
 msgid "Advanced settings"
-msgstr "고도의 옵션..."
+msgstr "고급 선택사항..."
 
 #: include/vlc_config_cat.h:205
 #, fuzzy
 msgid "Other advanced settings"
-msgstr "ALSA 오디오·모듈"
+msgstr "ALSA 음성·모듈"
 
 #: include/vlc_config_cat.h:207 modules/gui/macosx/open.m:164
 #: modules/gui/macosx/open.m:392 modules/gui/pda/pda_interface.c:548
@@ -428,7 +421,7 @@ msgstr "디코드 모듈 설정"
 #: include/vlc_config_cat.h:220
 #, fuzzy
 msgid "Encoders settings"
-msgstr "오디오 인코더 설정"
+msgstr "음성 인코더 설정"
 
 #: include/vlc_config_cat.h:222
 msgid "These are general settings for video/audio/subtitles encoding modules."
@@ -437,12 +430,12 @@ msgstr ""
 #: include/vlc_config_cat.h:225
 #, fuzzy
 msgid "Dialog providers settings"
-msgstr "오디오 인코더 설정"
+msgstr "음성 인코더 설정"
 
 #: include/vlc_config_cat.h:227
 #, fuzzy
 msgid "Dialog providers can be configured here."
-msgstr "오디오 인코더 설정"
+msgstr "음성 인코더 설정"
 
 #: include/vlc_config_cat.h:229
 #, fuzzy
@@ -457,12 +450,11 @@ msgstr ""
 
 #: include/vlc_config_cat.h:238
 msgid "No help available"
-msgstr "유효한 도움말이 없습니다. "
+msgstr "해당하는 도움말이 없습니다. "
 
 #: include/vlc_config_cat.h:239
-#, fuzzy
 msgid "There is no help available for these modules."
-msgstr "유효한 모듈의 재생목록를 인쇄"
+msgstr "이 모듈에 해당하는 도움말이 없습니다."
 
 #: include/vlc_interface.h:146
 #, fuzzy
@@ -552,7 +544,7 @@ msgstr "소트(&O)"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
 #, fuzzy
 msgid "Add node"
-msgstr "오디오 인코더"
+msgstr "음성 인코더"
 
 #: include/vlc_intf_strings.h:54
 #, fuzzy
@@ -565,9 +557,8 @@ msgid "Save..."
 msgstr "이름을 붙여 보존..."
 
 #: include/vlc_intf_strings.h:59 src/libvlc-module.c:982
-#, fuzzy
 msgid "Repeat all"
-msgstr "모두 반복한다"
+msgstr "전체 반복"
 
 #: include/vlc_intf_strings.h:60
 #, fuzzy
@@ -813,7 +804,7 @@ msgstr ""
 #: src/audio_output/filters.c:224
 #, fuzzy
 msgid "Audio filtering failed"
-msgstr "오디오 필터"
+msgstr "음성 필터"
 
 #: src/audio_output/filters.c:155 src/audio_output/filters.c:202
 #: src/audio_output/filters.c:225
@@ -843,20 +834,19 @@ msgstr "스펙트럼"
 #: src/audio_output/input.c:129 modules/audio_filter/equalizer.c:70
 #: modules/gui/macosx/equalizer.m:139 modules/gui/macosx/equalizer.m:154
 #: modules/gui/macosx/intf.m:599 modules/gui/wxwidgets/extrapanel.cpp:177
-#, fuzzy
 msgid "Equalizer"
-msgstr "비디오·필터·모듈"
+msgstr ""
 
 #: src/audio_output/input.c:151 src/libvlc-module.c:214
 #: modules/gui/macosx/extended.m:81 modules/gui/wxwidgets/extrapanel.cpp:390
 msgid "Audio filters"
-msgstr "오디오 필터"
+msgstr "음성 필터"
 
 #: src/audio_output/output.c:101 src/audio_output/output.c:128
 #: modules/access/vcdx/info.c:118 modules/gui/macosx/intf.m:565
 #: modules/gui/macosx/intf.m:566
 msgid "Audio Channels"
-msgstr "오디오 채널"
+msgstr "음성 채널"
 
 #: src/audio_output/output.c:104 src/audio_output/output.c:139
 #: modules/access/v4l.c:128 modules/audio_output/alsa.c:191
@@ -1098,12 +1088,12 @@ msgstr "네비게이션"
 #: src/input/var.c:163 modules/gui/macosx/intf.m:580
 #: modules/gui/macosx/intf.m:581
 msgid "Video Track"
-msgstr "비디오 트랙"
+msgstr "영상 트랙"
 
 #: src/input/var.c:169 modules/gui/macosx/intf.m:563
 #: modules/gui/macosx/intf.m:564
 msgid "Audio Track"
-msgstr "오디오 트랙"
+msgstr "음성 트랙"
 
 #: src/input/var.c:175 modules/gui/macosx/intf.m:588
 #: modules/gui/macosx/intf.m:589
@@ -1192,7 +1182,7 @@ msgstr "장르"
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "ja"
+msgstr "ko"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -1472,7 +1462,7 @@ msgstr ""
 
 #: src/libvlc-module.c:116
 msgid "Show advanced options"
-msgstr "고도의 옵션을 표시한다"
+msgstr "고급 선택사항을 표시한다"
 
 #: src/libvlc-module.c:118
 msgid ""
@@ -1512,7 +1502,7 @@ msgstr ""
 
 #: src/libvlc-module.c:145
 msgid "Audio output module"
-msgstr "오디오 출력 모듈"
+msgstr "음성 출력 모듈"
 
 #: src/libvlc-module.c:147
 #, fuzzy
@@ -1520,11 +1510,11 @@ msgid ""
 "This is the audio output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
-"오디오 출력 방법이 선택 가능합니다. 디폴트로 자동적으로 최적인 방법이 선택. "
+"음성 출력 방법이 선택 가능합니다. 디폴트로 자동적으로 최적인 방법이 선택. "
 
 #: src/libvlc-module.c:151 modules/stream_out/display.c:38
 msgid "Enable audio"
-msgstr "오디오를 유효하게 한다"
+msgstr "음성 켜기"
 
 #: src/libvlc-module.c:153
 #, fuzzy
@@ -1532,33 +1522,29 @@ msgid ""
 "You can completely disable the audio output. The audio decoding stage will "
 "not take place, thus saving some processing power."
 msgstr ""
-"오디오 출력을 완전하게 무효로 합니다. 오디오는 디코드되지 않습니다. 이것에, "
-"얼마인가의 처리 파워를 세이브할 수가 있습니다. "
+"음성을 아주 끌 수 있습니다. 음성을 추출하는 과정이 생략되기 때문에, 처리량이 "
+"어느 정도 줄어듭니다."
 
 #: src/libvlc-module.c:156
 msgid "Force mono audio"
-msgstr "강제적으로 단청의 음성"
+msgstr "강제 모노 출력"
 
 #: src/libvlc-module.c:157
-#, fuzzy
 msgid "This will force a mono audio output."
-msgstr "오디오 출력을 강제적으로 단청의로 합니다. "
+msgstr "음성을 모노로 바꾸어 출력합니다."
 
 #: src/libvlc-module.c:159
-#, fuzzy
 msgid "Default audio volume"
-msgstr "오디오·채널의 선택"
+msgstr "기본 음량"
 
 #: src/libvlc-module.c:161
-#, fuzzy
 msgid ""
 "You can set the default audio output volume here, in a range from 0 to 1024."
-msgstr "오디오·볼륨의 기정치를 0에서 1024의 사이에 설정 가능합니다. "
+msgstr "0에서 1024까지 기본 음량을 정합니다."
 
 #: src/libvlc-module.c:164
-#, fuzzy
 msgid "Audio output saved volume"
-msgstr "오디오·볼륨"
+msgstr ""
 
 #: src/libvlc-module.c:166
 msgid ""
@@ -1567,19 +1553,18 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:169
-#, fuzzy
 msgid "Audio output volume step"
-msgstr "오디오 출력 볼륨"
+msgstr "음량 조절 단계"
 
 #: src/libvlc-module.c:171
 msgid ""
 "The step size of the volume is adjustable using this option, in a range from "
 "0 to 1024."
-msgstr ""
+msgstr "0에서 1024까지 음량 조절 단계를 정합니다."
 
 #: src/libvlc-module.c:174
 msgid "Audio output frequency (Hz)"
-msgstr "오디오 출력 주파수(Hz)"
+msgstr "음성 출력 주파수(Hz)"
 
 #: src/libvlc-module.c:176
 #, fuzzy
@@ -1587,7 +1572,7 @@ msgid ""
 "You can force the audio output frequency here. Common values are -1 "
 "(default), 48000, 44100, 32000, 22050, 16000, 11025, 8000."
 msgstr ""
-"오디오 출력의 주파수를 강제적으로 설정 가능합니다. \n"
+"음성 출력의 주파수를 강제적으로 설정 가능합니다. \n"
 "일반적인 값은, 48000, 44100, 32000, 22050, 16000, 11025, 8000입니다. "
 
 #: src/libvlc-module.c:180
@@ -1612,8 +1597,8 @@ msgid ""
 "This delays the audio output. The delay must be given in milliseconds.This "
 "can be handy if you notice a lag between the video and the audio."
 msgstr ""
-"오디오 출력의 지연을 설정합니다. 비디오와 음성의 엇갈림이 있는 경우에는, 적절"
-"한 값(을)를 설정할 수 있습니다. "
+"음성 출력의 지연을 설정합니다. 영상과 음성의 엇갈림이 있는 경우에는, 적절한 "
+"값을 설정할 수 있습니다. "
 
 #: src/libvlc-module.c:192
 #, fuzzy
@@ -1627,24 +1612,21 @@ msgid ""
 "possible (ie. if your hardware supports it as well as the audio stream being "
 "played)."
 msgstr ""
-"오디오 출력 방법이 선택 가능합니다. 디폴트로 자동적으로 최적인 방법이 선택. "
+"음성 출력 방법이 선택 가능합니다. 디폴트로 자동적으로 최적인 방법이 선택. "
 
 #: src/libvlc-module.c:198
-#, fuzzy
 msgid "Use S/PDIF when available"
-msgstr "유효하면 S/PDIF 오디오 출력을 사용한다"
+msgstr "S/PDIF가 있으면 쓰기"
 
 #: src/libvlc-module.c:200
-#, fuzzy
 msgid ""
 "S/PDIF can be used by default when your hardware supports it as well as the "
 "audio stream being played."
-msgstr ""
-"오디오 출력 방법이 선택 가능합니다. 디폴트로 자동적으로 최적인 방법이 선택. "
+msgstr "하드웨어가 S/PDIF를 지원하면 음성을 출력할 때 기본으로 사용합니다"
 
 #: src/libvlc-module.c:203
 msgid "Force detection of Dolby Surround"
-msgstr ""
+msgstr "돌비 서라운드 강제 검출"
 
 #: src/libvlc-module.c:205
 msgid ""
@@ -1687,7 +1669,7 @@ msgstr ""
 
 #: src/libvlc-module.c:235
 msgid "Video output module"
-msgstr "비디오 출력 모듈"
+msgstr "영상 출력 모듈"
 
 #: src/libvlc-module.c:237
 #, fuzzy
@@ -1695,27 +1677,26 @@ msgid ""
 "This is the the video output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
-"이 옵션은 사용하는 비디오 출력 방법을 선택할 수 있습니다. 디폴트로 자동적으"
-"로 최적인 방법이 선택됩니다. "
+"이 옵션은 사용하는 영상 출력 방법을 선택할 수 있습니다. 디폴트로 자동적으로 "
+"최적인 방법이 선택됩니다. "
 
 #: src/libvlc-module.c:240 modules/stream_out/display.c:40
 msgid "Enable video"
-msgstr "비디오를 유효하게 한다"
+msgstr "영상 켜기"
 
 #: src/libvlc-module.c:242
-#, fuzzy
 msgid ""
 "You can completely disable the video output. The video decoding stage will "
 "not take place, thus saving some processing power."
 msgstr ""
-"비디오 출력을 완전하게 무효화합니다. 비디오는 디코드되지 않습니다. 이것에 의"
-"해, 간다들인가의 처리 파워를 세이브할 수가 있습니다. "
+"영상을 아주 끌 수 있습니다. 영상을 추출하는 과정이 생략되기 때문에, 처리량이 "
+"어느 정도 줄어듭니다."
 
 #: src/libvlc-module.c:245 modules/codec/fake.c:48
 #: modules/stream_out/mosaic_bridge.c:108 modules/stream_out/transcode.c:73
 #: modules/visualization/visual/visual.c:43
 msgid "Video width"
-msgstr "비디오의 폭"
+msgstr "영상 너비"
 
 #: src/libvlc-module.c:247
 #, fuzzy
@@ -1723,14 +1704,14 @@ msgid ""
 "You can enforce the video width. By default (-1) VLC will adapt to the video "
 "characteristics."
 msgstr ""
-"비디오의 폭을 강제적으로 지정할 수가 있습니다. \n"
-"※VLC는 디폴트로 비디오의 특성에 맞춥니다. "
+"영상의 너비를 강제적으로 지정할 수가 있습니다. \n"
+"디폴트 값인 -1은 영상의 특성에 맞춥니다. "
 
 #: src/libvlc-module.c:250 modules/codec/fake.c:51
 #: modules/stream_out/mosaic_bridge.c:111 modules/stream_out/transcode.c:76
 #: modules/visualization/visual/visual.c:47
 msgid "Video height"
-msgstr "비디오의 높이"
+msgstr "영상 높이"
 
 #: src/libvlc-module.c:252
 #, fuzzy
@@ -1738,13 +1719,12 @@ msgid ""
 "You can enforce the video height. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"비디오의 높이를 강제적으로 지정할 수가 있습니다. \n"
-"※VLC는 디폴트로 비디오의 특성에 맞춥니다. "
+"영상의 높이를 강제적으로 지정할 수가 있습니다. \n"
+"디폴트 값인 -1은 영상의 특성에 맞춥니다. "
 
 #: src/libvlc-module.c:255
-#, fuzzy
 msgid "Video X coordinate"
-msgstr "비디오 y 코디네이터"
+msgstr ""
 
 #: src/libvlc-module.c:257
 msgid ""
@@ -1753,9 +1733,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:260
-#, fuzzy
 msgid "Video Y coordinate"
-msgstr "비디오 y 코디네이터"
+msgstr ""
 
 #: src/libvlc-module.c:262
 msgid ""
@@ -1765,7 +1744,7 @@ msgstr ""
 
 #: src/libvlc-module.c:265
 msgid "Video title"
-msgstr "비디오 제목"
+msgstr "영상 제목"
 
 #: src/libvlc-module.c:267
 msgid ""
@@ -1837,16 +1816,15 @@ msgstr "우하"
 
 #: src/libvlc-module.c:280
 msgid "Zoom video"
-msgstr "비디오 줌"
+msgstr "영상 확대/축소"
 
 #: src/libvlc-module.c:282
-#, fuzzy
 msgid "You can zoom the video by the specified factor."
-msgstr "임의에 비디오를 줌 할 수가 있습니다. "
+msgstr "원하는 비율로 영상을 확대/축소할 수 있습니다. "
 
 #: src/libvlc-module.c:284
 msgid "Grayscale video output"
-msgstr "그레이 스케일 비디오 출력"
+msgstr "회색조 영상 출력"
 
 #: src/libvlc-module.c:286
 #, fuzzy
@@ -1869,16 +1847,15 @@ msgstr "인터페이스의 비디오 편입"
 
 #: src/libvlc-module.c:293
 msgid "Fullscreen video output"
-msgstr "풀 스크린 비디오 출력"
+msgstr "전체화면 영상 출력"
 
 #: src/libvlc-module.c:295
-#, fuzzy
 msgid "Start video in fullscreen mode"
-msgstr "대체네풀 스크린"
+msgstr "전체화면 상태로 영상 시작"
 
 #: src/libvlc-module.c:297
 msgid "Overlay video output"
-msgstr "오버레이 비디오 출력"
+msgstr "오버레이 영상 출력"
 
 #: src/libvlc-module.c:299
 msgid ""
@@ -1891,9 +1868,8 @@ msgid "Always on top"
 msgstr "항상 맨 앞면"
 
 #: src/libvlc-module.c:304
-#, fuzzy
 msgid "Always place the video window on top of other windows."
-msgstr "비디오를 클론 하기 위해서 비디오·윈도우수를 선택한다"
+msgstr "항상 영상 출력창을 다른 창보다 위에 둡니다."
 
 #: src/libvlc-module.c:306
 msgid "Disable screensaver"
@@ -1912,12 +1888,11 @@ msgstr ""
 msgid ""
 "VLC can avoid creating window caption, frames, etc... around the video, "
 "giving a \"minimal\" window."
-msgstr "이 옵션을 지정하면(자), VLC는 항상 비디오를 풀 스크린·모드로 합니다. "
+msgstr "이 옵션을 지정하면(자), VLC는 항상 영상을 풀 스크린·모드로 합니다. "
 
 #: src/libvlc-module.c:314
-#, fuzzy
 msgid "Video output filter module"
-msgstr "비디오 출력 모듈"
+msgstr "영상 출력 필터 모듈"
 
 #: src/libvlc-module.c:316
 #, fuzzy
@@ -1925,12 +1900,12 @@ msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or to clone or distort the video window."
 msgstr ""
-"noninterplace의 인스턴스 또는, 클론, 만곡화 된 비디오·윈도우우의 영상 퀄리티"
-"에 효과를 더하는 필터를 지정할 수 있습니다. "
+"noninterplace의 인스턴스 또는, 클론, 만곡화 된 영상·윈도우의 영상 퀄리티에 효"
+"과를 더하는 필터를 지정할 수 있습니다. "
 
 #: src/libvlc-module.c:320
 msgid "Video filter module"
-msgstr "비디오 필터 모듈"
+msgstr "영상 필터 모듈"
 
 #: src/libvlc-module.c:322
 #, fuzzy
@@ -1938,13 +1913,12 @@ msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distortthe video."
 msgstr ""
-"noninterplace의 인스턴스 또는, 클론, 만곡화 된 비디오·윈도우우의 영상 퀄리티"
-"에 효과를 더하는 필터를 지정할 수 있습니다. "
+"noninterplace의 인스턴스 또는, 클론, 만곡화 된 영상·윈도우우의 영상 퀄리티에 "
+"효과를 더하는 필터를 지정할 수 있습니다. "
 
 #: src/libvlc-module.c:326
-#, fuzzy
 msgid "Video snapshot directory (or filename)"
-msgstr "비디오 입력의 크로마포맛트"
+msgstr "영상 순간포착을 저장할 경로 (혹은 파일명)"
 
 #: src/libvlc-module.c:328
 #, fuzzy
@@ -1952,14 +1926,12 @@ msgid "Directory where the video snapshots will be stored."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
 #: src/libvlc-module.c:330 src/libvlc-module.c:332
-#, fuzzy
 msgid "Video snapshot file prefix"
-msgstr "비디오 입력의 크로마포맛트"
+msgstr "영상 순간포착 파일명 머릿말"
 
 #: src/libvlc-module.c:334
-#, fuzzy
 msgid "Video snapshot format"
-msgstr "비디오 입력의 크로마포맛트"
+msgstr "영상 순간포착 파일 형식"
 
 #: src/libvlc-module.c:336
 msgid "Image format which will be used to store the video snapshots"
@@ -1983,9 +1955,8 @@ msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
 
 #: src/libvlc-module.c:346
-#, fuzzy
 msgid "Video cropping"
-msgstr "비디오의 높이"
+msgstr "영상 잘라내기"
 
 #: src/libvlc-module.c:348
 msgid ""
@@ -2008,7 +1979,7 @@ msgid ""
 msgstr ""
 "이 옵션은 소스에 대해서, 강제적으로 설정합니다. 인스턴스에서는, 몇개인가의 "
 "DVD는,4:3의 것에서도16:9로 설정합니다. 이것은, 어스펙트·레시오 정보를 지선반 "
-"있고 무비의 힌트로서 사용하는 일도 가능합니다. 지정할 수 있는 포맷은,x:y "
+"있고 무비의 힌트로서 사용하는 일도 가능합니다. 지정할 수 있는 형식은,x:y "
 "(4:3, 16:9, etc. )의 형식에서 어스펙트를 지정하는지, 부동 소수점치 (1.25, "
 "1.3333, etc. )의 형식에서 픽셀의 구형을 지정합니다. "
 
@@ -2143,7 +2114,7 @@ msgstr ""
 #: modules/video_filter/marq.c:56 modules/video_filter/rss.c:63
 #: modules/video_output/directx/directx.c:158
 msgid "Default"
-msgstr "디폴트"
+msgstr "기본"
 
 #: src/libvlc-module.c:432 modules/gui/macosx/equalizer.m:144
 #: modules/gui/macosx/extended.m:112 modules/gui/macosx/wizard.m:394
@@ -2151,7 +2122,7 @@ msgstr "디폴트"
 #: modules/gui/wxwidgets/extrapanel.cpp:216
 #: modules/gui/wxwidgets/extrapanel.cpp:465
 msgid "Enable"
-msgstr "유효"
+msgstr "켜기"
 
 #: src/libvlc-module.c:434
 #, fuzzy
@@ -2233,15 +2204,14 @@ msgid ""
 msgstr "주어진 서비스 ID를 선택하기 위한 프로그램을 지정합니다. "
 
 #: src/libvlc-module.c:477 modules/gui/wxwidgets/dialogs/open.cpp:777
-#, fuzzy
 msgid "Audio track"
-msgstr "오디오 트랙"
+msgstr "음성 트랙"
 
 #: src/libvlc-module.c:479
 #, fuzzy
 msgid "Stream number of the audio track to use (from 0 to n)."
 msgstr ""
-"DVD 안에서 사용하고 싶은 오디오의 채널 번호를 지정합니다. (1으로부터 n까지)"
+"DVD 안에서 사용하고 싶은 음성의 채널 번호를 지정합니다. (1으로부터 n까지)"
 
 #: src/libvlc-module.c:482 modules/gui/wxwidgets/dialogs/open.cpp:769
 #, fuzzy
@@ -2255,41 +2225,32 @@ msgstr ""
 "DVD 안에서 사용하고 싶은 자막의 채널 번호를 지정합니다. (1으로부터 n까지)"
 
 #: src/libvlc-module.c:487
-#, fuzzy
 msgid "Audio language"
-msgstr "오디오 채널의 선택"
+msgstr "음성 언어"
 
 #: src/libvlc-module.c:489
-#, fuzzy
 msgid ""
 "Language of the audio track you want to use (comma separated, two or three "
 "letter country code)."
 msgstr ""
-"DVD 안에서 사용하고 싶은 오디오의 채널 번호를 지정합니다. (1으로부터 n까지)"
 
 #: src/libvlc-module.c:492
-#, fuzzy
 msgid "Subtitle language"
-msgstr "오디오 채널의 선택"
+msgstr "자막 언어"
 
 #: src/libvlc-module.c:494
-#, fuzzy
 msgid ""
 "Language of the subtitle track you want to use (comma separated, two or tree "
 "letter country code)."
 msgstr ""
-"DVD 안에서 사용하고 싶은 자막의 채널 번호를 지정합니다. (1으로부터 n까지)"
 
 #: src/libvlc-module.c:498
-#, fuzzy
 msgid "Audio track ID"
-msgstr "오디오 트랙"
+msgstr ""
 
 #: src/libvlc-module.c:500
-#, fuzzy
 msgid "Stream ID of the audio track to use."
 msgstr ""
-"DVD 안에서 사용하고 싶은 오디오의 채널 번호를 지정합니다. (1으로부터 n까지)"
 
 #: src/libvlc-module.c:502
 #, fuzzy
@@ -2417,9 +2378,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:562
-#, fuzzy
 msgid "Subpictures filter module"
-msgstr "비디오 필터 모듈"
+msgstr ""
 
 #: src/libvlc-module.c:564
 msgid ""
@@ -2509,9 +2469,8 @@ msgid "This is the default VCD device to use."
 msgstr "VCD 디바이스의 기정치를 지정합니다. "
 
 #: src/libvlc-module.c:612
-#, fuzzy
 msgid "Audio CD device"
-msgstr "오디오 CD 디바이스"
+msgstr "음악 CD 장치"
 
 #: src/libvlc-module.c:615
 msgid ""
@@ -2725,20 +2684,17 @@ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
 #: src/libvlc-module.c:720
 msgid "Enable video stream output"
-msgstr "비디오 스트림의 출력을 유효하게 한다"
+msgstr "영상 출력 켜기"
 
 #: src/libvlc-module.c:722
-#, fuzzy
 msgid ""
 "Choose whether the video stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"비디오·스트림 출력 기구의 마지막 것이 유효하게 되어 있으면 비디오·스트림하지"
-"만 출력 기구에 리디렉트 되어야 할 경우, 선택 가능합니다. "
 
 #: src/libvlc-module.c:725
 msgid "Enable audio stream output"
-msgstr "오디오 스트림의 출력을 유효하게 한다"
+msgstr "음성 출력 켜기"
 
 #: src/libvlc-module.c:727
 #, fuzzy
@@ -2746,22 +2702,18 @@ msgid ""
 "Choose whether the audio stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"비디오·스트림 출력 기구의 마지막 것이 유효하게 되어 있으면출력 기구에 리디렉"
-"트 되어야 할 경우, 선택 가능합니다. "
+"영상·스트림 출력 기구의 마지막 것이 유효하게 되어 있으면출력 기구에 리디렉트 "
+"되어야 할 경우, 선택 가능합니다. "
 
 #: src/libvlc-module.c:730
-#, fuzzy
 msgid "Enable SPU stream output"
-msgstr "오디오 스트림의 출력을 유효하게 한다"
+msgstr ""
 
 #: src/libvlc-module.c:732
-#, fuzzy
 msgid ""
 "Choose whether the SPU streams should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"비디오·스트림 출력 기구의 마지막 것이 유효하게 되어 있으면출력 기구에 리디렉"
-"트 되어야 할 경우, 선택 가능합니다. "
 
 #: src/libvlc-module.c:735
 #, fuzzy
@@ -2796,7 +2748,7 @@ msgstr "mux 모듈을 설정하는 유산·엔트리입니다. "
 
 #: src/libvlc-module.c:750
 msgid "Access output module"
-msgstr "오디오 출력 모듈 액세스"
+msgstr "음성 출력 모듈 액세스"
 
 #: src/libvlc-module.c:752
 msgid "This is a legacy entry to let you configure access output modules"
@@ -2829,104 +2781,80 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:774
-#, fuzzy
 msgid "Enable FPU support"
-msgstr "CPU 의 MMX 서포트를 유효하게 한다"
+msgstr "부동소수점 연산 기능 켜기"
 
 #: src/libvlc-module.c:776
-#, fuzzy
 msgid ""
 "If your processor has a floating point calculation unit, VLC can take "
 "advantage of it."
-msgstr ""
-"프로세서가 AltiVec의 기능 세트를 서포트하고 있는 경우에는, 그 어드밴티지를 이"
-"용할 수가 있습니다. "
+msgstr "부동소수점 연산 기능을 씁니다."
 
 #: src/libvlc-module.c:779
 msgid "Enable CPU MMX support"
-msgstr "CPU 의 MMX 서포트를 유효하게 한다"
+msgstr "MMX 기능 켜기"
 
 #: src/libvlc-module.c:781
-#, fuzzy
 msgid ""
 "If your processor supports the MMX instructions set, VLC can take advantage "
 "of them."
-msgstr ""
-"프로세서가 MMX의 기능 세트를 서포트하고 있는 경우에는, VLC는 그 아드반테이지"
-"를 이용할 수 있습니다. "
+msgstr "MMX 기능을 씁니다."
 
 #: src/libvlc-module.c:784
-#, fuzzy
 msgid "Enable CPU 3D Now! support"
-msgstr "CPU 의 3D Now!  서포트를 유효하게 한다"
+msgstr "3D Now! 지원 켜기"
 
 #: src/libvlc-module.c:786
-#, fuzzy
 msgid ""
 "If your processor supports the 3D Now! instructions set, VLC can take "
 "advantage of them."
-msgstr ""
-"프로세서가 3D Now! 기능을 서포트하고 있는 경우에는, VLC는 그 어드밴티지를이용"
-"할 수 있습니다. "
+msgstr "3D Now! 기능을 씁니다."
 
 #: src/libvlc-module.c:789
 msgid "Enable CPU MMX EXT support"
-msgstr "CPU 의 MMX 확장 기능 서포트를 유효하게 한다"
+msgstr "확장 MMX 기능 켜기"
 
 #: src/libvlc-module.c:791
-#, fuzzy
 msgid ""
 "If your processor supports the MMX EXT instructions set, VLC can take "
 "advantage of them."
-msgstr ""
-"프로세서가 MMX의 확장 기능 세트를 서포트하고 있는 경우에는, VLC는 그 아드반테"
-"이지를 이용할 수가 있습니다. "
+msgstr "확장 MMX 기능을 씁니다."
 
 #: src/libvlc-module.c:794
 msgid "Enable CPU SSE support"
-msgstr "CPU 의 SSE 서포트를 유효하게 한다"
+msgstr "SSE 기능 켜기"
 
 #: src/libvlc-module.c:796
-#, fuzzy
 msgid ""
 "If your processor supports the SSE instructions set, VLC can take advantage "
 "of them."
-msgstr ""
-"프로세서가 SSE의 기능 세트를 서포트하고 있는 경우에는, VLC는 그 아드반테이지"
-"를 이용할 수가 있습니다. "
+msgstr "SSE 기능을 씁니다."
 
 #: src/libvlc-module.c:799
 msgid "Enable CPU SSE2 support"
-msgstr "CPU 의 SSE2 서포트를 유효하게 한다"
+msgstr "SSE2 기능 켜기"
 
 #: src/libvlc-module.c:801
-#, fuzzy
 msgid ""
 "If your processor supports the SSE2 instructions set, VLC can take advantage "
 "of them."
-msgstr ""
-"프로세서가 SSE의 기능 세트를 서포트하고 있는 경우에는, VLC는 그 아드반테이지"
-"를 이용할 수가 있습니다. "
+msgstr "SSE2 기능을 씁니다."
 
 #: src/libvlc-module.c:804
-#, fuzzy
 msgid "Enable CPU AltiVec support"
-msgstr "CPU 의 AltiVec 서포트를 유효하게 한다"
+msgstr "AltiVec 기능 켜기"
 
 #: src/libvlc-module.c:806
-#, fuzzy
 msgid ""
 "If your processor supports the AltiVec instructions set, VLC can take "
 "advantage of them."
-msgstr ""
-"프로세서가 AltiVec의 기능 세트를 서포트하고 있는 경우에는, 그 어드밴티지를 이"
-"용할 수가 있습니다. "
+msgstr "AltiVec 기능을 씁니다."
 
 #: src/libvlc-module.c:811
 msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
-msgstr ""
+msgstr "기본 모듈을 고를 수 있습니다. 모르겠으면 그냥 두세요."
 
 #: src/libvlc-module.c:814
 msgid "Memory copy module"
@@ -2953,9 +2881,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:825
-#, fuzzy
 msgid "Access filter module"
-msgstr "액세스 모듈"
+msgstr ""
 
 #: src/libvlc-module.c:827
 msgid ""
@@ -2964,7 +2891,6 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:830
-#, fuzzy
 msgid "Demux module"
 msgstr "demux 모듈"
 
@@ -3179,15 +3105,14 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:956
-#, fuzzy
 msgid "Automatically preparse files"
-msgstr "파일의 자동 재생"
+msgstr "미리 읽기"
 
 #: src/libvlc-module.c:958
 msgid ""
 "Automatically preparse files added to the playlist (to retrieve some "
 "metadata)."
-msgstr ""
+msgstr "재생목록에 들어온 파일을 미리 읽어서 정보를 파악합니다."
 
 #: src/libvlc-module.c:961
 msgid "Album art policy"
@@ -3210,9 +3135,8 @@ msgid "As soon as track is added"
 msgstr ""
 
 #: src/libvlc-module.c:973
-#, fuzzy
 msgid "Services discovery modules"
-msgstr "MPEG 1/2비디오·디코더·모듈"
+msgstr "자동 검색 모듈"
 
 #: src/libvlc-module.c:975
 msgid ""
@@ -3221,40 +3145,32 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:978
-#, fuzzy
 msgid "Play files randomly forever"
-msgstr "파일을 랜덤에 재생"
+msgstr "임의 반복"
 
 #: src/libvlc-module.c:980
-#, fuzzy
 msgid "VLC will randomly play files in the playlist until interrupted."
-msgstr "이 옵션이 선택되면 VLC는 플레이 재생목록의 파일을 랜덤 재생. "
+msgstr "사용자가 직접 멈출 때까지 임의 파일을 반복 재생합니다."
 
 #: src/libvlc-module.c:984
-#, fuzzy
 msgid "VLC will keep playing the playlist indefinitely."
-msgstr ""
-"플레이 재생목록의 재생을 반복해 실시하고 싶은 경우에는, 이 옵션을 선택합니"
-"다. "
+msgstr "순서대로 반복 재생합니다."
 
 #: src/libvlc-module.c:986
-#, fuzzy
 msgid "Repeat current item"
-msgstr "현재의 항목을 반복한다"
+msgstr "현재 항목 반복"
 
 #: src/libvlc-module.c:988
-#, fuzzy
 msgid "VLC will keep playing the current playlist item."
-msgstr "플레이 재생목록를 연다"
+msgstr "지금 재생중인 항목을 반복합니다."
 
 #: src/libvlc-module.c:990
-#, fuzzy
 msgid "Play and stop"
-msgstr "항상 맨 앞면"
+msgstr "재생 후 멈춤"
 
 #: src/libvlc-module.c:992
 msgid "Stop the playlist after each played playlist item."
-msgstr ""
+msgstr "재생목록 항목이 하나 끝날 때마다 멈춥니다."
 
 #: src/libvlc-module.c:994
 #, fuzzy
@@ -3310,7 +3226,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:501 modules/gui/macosx/intf.m:577
 #: modules/gui/macosx/intf.m:633
 msgid "Fullscreen"
-msgstr "전화면화"
+msgstr "전체화면"
 
 #: src/libvlc-module.c:1022
 #, fuzzy
@@ -3423,9 +3339,8 @@ msgid "Position"
 msgstr "위치"
 
 #: src/libvlc-module.c:1040
-#, fuzzy
 msgid "Select the hotkey to display the position."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1042
 msgid "Very short backwards jump"
@@ -3541,9 +3456,8 @@ msgid "Quit"
 msgstr "종료"
 
 #: src/libvlc-module.c:1078
-#, fuzzy
 msgid "Select the hotkey to quit the application."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1079
 #, fuzzy
@@ -3551,9 +3465,8 @@ msgid "Navigate up"
 msgstr "네비게이션(_N)"
 
 #: src/libvlc-module.c:1080
-#, fuzzy
 msgid "Select the key to move the selector up in DVD menus."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1081
 #, fuzzy
@@ -3561,9 +3474,8 @@ msgid "Navigate down"
 msgstr "네비게이션(_N)"
 
 #: src/libvlc-module.c:1082
-#, fuzzy
 msgid "Select the key to move the selector down in DVD menus."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1083
 #, fuzzy
@@ -3571,9 +3483,8 @@ msgid "Navigate left"
 msgstr "네비게이션(_N)"
 
 #: src/libvlc-module.c:1084
-#, fuzzy
 msgid "Select the key to move the selector left in DVD menus."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1085
 #, fuzzy
@@ -3581,18 +3492,16 @@ msgid "Navigate right"
 msgstr "네비게이션(_N)"
 
 #: src/libvlc-module.c:1086
-#, fuzzy
 msgid "Select the key to move the selector right in DVD menus."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1087
 msgid "Activate"
 msgstr ""
 
 #: src/libvlc-module.c:1088
-#, fuzzy
 msgid "Select the key to activate selected item in DVD menus."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1089
 #, fuzzy
@@ -3600,9 +3509,8 @@ msgid "Go to the DVD menu"
 msgstr "DVD 메뉴를 사용"
 
 #: src/libvlc-module.c:1090
-#, fuzzy
 msgid "Select the key to take you to the DVD menu"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1091
 #, fuzzy
@@ -3610,9 +3518,8 @@ msgid "Select previous DVD title"
 msgstr "이전의 제목을 선택"
 
 #: src/libvlc-module.c:1092
-#, fuzzy
 msgid "Select the key to choose the previous title from the DVD"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1093
 #, fuzzy
@@ -3620,9 +3527,8 @@ msgid "Select next DVD title"
 msgstr "파일의 선택"
 
 #: src/libvlc-module.c:1094
-#, fuzzy
 msgid "Select the key to choose the next title from the DVD"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1095
 #, fuzzy
@@ -3630,9 +3536,8 @@ msgid "Select prev DVD chapter"
 msgstr "이전의 Chapter를 선택"
 
 #: src/libvlc-module.c:1096
-#, fuzzy
 msgid "Select the key to choose the previous chapter from the DVD"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1097
 #, fuzzy
@@ -3640,27 +3545,24 @@ msgid "Select next DVD chapter"
 msgstr "다음의 Chapter를 선택"
 
 #: src/libvlc-module.c:1098
-#, fuzzy
 msgid "Select the key to choose the next chapter from the DVD"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1099
 msgid "Volume up"
 msgstr "볼륨을 올린다"
 
 #: src/libvlc-module.c:1100
-#, fuzzy
 msgid "Select the key to increase audio volume."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1101
 msgid "Volume down"
 msgstr "볼륨을 내린다"
 
 #: src/libvlc-module.c:1102
-#, fuzzy
 msgid "Select the key to decrease audio volume."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1103 modules/gui/macosx/controls.m:867
 #: modules/gui/macosx/intf.m:562 modules/gui/macosx/intf.m:623
@@ -3679,9 +3581,8 @@ msgid "Subtitle delay up"
 msgstr "자막"
 
 #: src/libvlc-module.c:1106
-#, fuzzy
 msgid "Select the key to increase the subtitle delay."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1107
 #, fuzzy
@@ -3689,9 +3590,8 @@ msgid "Subtitle delay down"
 msgstr "자막·디코더·모듈"
 
 #: src/libvlc-module.c:1108
-#, fuzzy
 msgid "Select the key to decrease the subtitle delay."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1109
 #, fuzzy
@@ -3699,9 +3599,8 @@ msgid "Audio delay up"
 msgstr "자막"
 
 #: src/libvlc-module.c:1110
-#, fuzzy
 msgid "Select the key to increase the audio delay."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1111
 #, fuzzy
@@ -3709,9 +3608,8 @@ msgid "Audio delay down"
 msgstr "자막·디코더·모듈"
 
 #: src/libvlc-module.c:1112
-#, fuzzy
 msgid "Select the key to decrease the audio delay."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1113
 msgid "Play playlist bookmark 1"
@@ -3754,64 +3652,52 @@ msgid "Play playlist bookmark 10"
 msgstr ""
 
 #: src/libvlc-module.c:1123
-#, fuzzy
 msgid "Select the key to play this bookmark."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1124
-#, fuzzy
 msgid "Set playlist bookmark 1"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1125
-#, fuzzy
 msgid "Set playlist bookmark 2"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1126
-#, fuzzy
 msgid "Set playlist bookmark 3"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1127
-#, fuzzy
 msgid "Set playlist bookmark 4"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1128
-#, fuzzy
 msgid "Set playlist bookmark 5"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1129
-#, fuzzy
 msgid "Set playlist bookmark 6"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1130
-#, fuzzy
 msgid "Set playlist bookmark 7"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1131
-#, fuzzy
 msgid "Set playlist bookmark 8"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1132
-#, fuzzy
 msgid "Set playlist bookmark 9"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1133
-#, fuzzy
 msgid "Set playlist bookmark 10"
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1134
-#, fuzzy
 msgid "Select the key to set this playlist bookmark."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: src/libvlc-module.c:1136 modules/control/hotkeys.c:84
 #, fuzzy
@@ -3891,7 +3777,7 @@ msgstr ""
 #: src/libvlc-module.c:1154
 #, fuzzy
 msgid "Cycle audio track"
-msgstr "오디오 트랙"
+msgstr "음성 트랙"
 
 #: src/libvlc-module.c:1155
 msgid "Cycle through the available audio tracks(languages)."
@@ -3918,9 +3804,8 @@ msgid "Cycle through a predefined list of source aspect ratios."
 msgstr "소스의 어스펙트비"
 
 #: src/libvlc-module.c:1160
-#, fuzzy
 msgid "Cycle video crop"
-msgstr "그레이 스케일 비디오 출력"
+msgstr "영상 원형 잘라내기"
 
 #: src/libvlc-module.c:1161
 msgid "Cycle through a predefined list of crop formats."
@@ -4064,17 +3949,17 @@ msgid ""
 "  vlc:quit                       Special item to quit VLC\n"
 msgstr ""
 "\n"
-"플레이 재생목록 항목 :\n"
+"재생목록 항목 :\n"
 "  *. mpg, *. vob                   MPEG-1/2 파일 \n"
 "  [dvd://][device][@raw_device][@[title][,[chapter][, angle]]\n"
 "                                 DVD 디바이스 \n"
 "  [vcd://][device][@{S|T|E|P}[number]]\n"
 "                                 VCD 디바이스 \n"
 "  [cdda://][device][@[T][track-number]]\n"
-"                                 오디오 CD 디바이스 \n"
+"                                 음성 CD 디바이스 \n"
 "  udpstream:[[<source address>]@[<bind address>][:<bind port>]]\n"
 "                                 스트리밍 서버로부터 송신된 UDP 스트림 \n"
-"  vlc:pause                      플레이 재생목록 항목의 재생 정지 \n"
+"  vlc:pause                      재생목록 항목의 재생 정지 \n"
 "  vlc:quit                       VLC 를 종료 \n"
 
 #: src/libvlc-module.c:1316 src/video_output/vout_intf.c:425
@@ -4113,7 +3998,7 @@ msgstr "트랜스"
 #: src/libvlc-module.c:1406
 #, fuzzy
 msgid "Track settings"
-msgstr "오디오 인코더 설정"
+msgstr "음성 인코더 설정"
 
 #: src/libvlc-module.c:1428
 #, fuzzy
@@ -4190,54 +4075,49 @@ msgid "main program"
 msgstr "메인 프로그램"
 
 #: src/libvlc-module.c:2171
-#, fuzzy
 msgid "print help for VLC (can be combined with --advanced)"
-msgstr "헬프를 표시한다 (--advanced 와 병용 할 수 있습니다)"
+msgstr "도움말 출력 (--advanced 와 병용 할 수 있습니다)"
 
 #: src/libvlc-module.c:2177
-#, fuzzy
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced)"
-msgstr "모듈의 헬프를 표시한다 (--advanced 와 병용 할 수 있습니다)"
+msgstr "모듈을 포함한 도움말 출력 (--advanced 와 병용 할 수 있습니다)"
 
 #: src/libvlc-module.c:2182
-#, fuzzy
 msgid "print help for the advanced options"
-msgstr "고도의 옵션을 표시한다"
+msgstr "고급 선택사항의 도움말 출력"
 
 #: src/libvlc-module.c:2187
 msgid "ask for extra verbosity when displaying help"
-msgstr ""
+msgstr "도움말을 나타낼 때 더 많이 보여줍니다"
 
 #: src/libvlc-module.c:2193
 msgid "print a list of available modules"
-msgstr "유효한 모듈의 재생목록를 인쇄"
+msgstr "쓸 수 있는 모듈 목록을 출력한다"
 
 #: src/libvlc-module.c:2199
-#, fuzzy
 msgid "print help on a specific module (can be combined with --advanced)"
-msgstr "모듈의 헬프를 표시한다 (--advanced 와 병용 할 수 있습니다)"
+msgstr "지정한 모듈의 도움말 출력 (--advanced 와 병용 할 수 있습니다)"
 
 #: src/libvlc-module.c:2204
 msgid "save the current command line options in the config"
-msgstr ""
+msgstr "현재 선택사항을 기억"
 
 #: src/libvlc-module.c:2209
 msgid "reset the current config to the default values"
-msgstr ""
+msgstr "설정 초기화"
 
 #: src/libvlc-module.c:2214
 msgid "use alternate config file"
-msgstr ""
+msgstr "다른 설정 파일 쓰기"
 
 #: src/libvlc-module.c:2219
-#, fuzzy
 msgid "resets the current plugins cache"
-msgstr "현재의 항목을 반복한다"
+msgstr "플러그인 기록 초기화"
 
 #: src/libvlc-module.c:2224
 msgid "print version information"
-msgstr "버젼 정보의 인쇄"
+msgstr "버전 정보 출력"
 
 #: src/misc/configuration.c:1181
 msgid "boolean"
@@ -4273,18 +4153,16 @@ msgid "Albanian"
 msgstr ""
 
 #: src/text/iso-639_def.h:42
-#, fuzzy
 msgid "Amharic"
-msgstr "수직"
+msgstr ""
 
 #: src/text/iso-639_def.h:43
 msgid "Arabic"
 msgstr ""
 
 #: src/text/iso-639_def.h:44
-#, fuzzy
 msgid "Armenian"
-msgstr "수직"
+msgstr ""
 
 #: src/text/iso-639_def.h:45
 #, fuzzy
@@ -4300,9 +4178,8 @@ msgid "Aymara"
 msgstr ""
 
 #: src/text/iso-639_def.h:48
-#, fuzzy
 msgid "Azerbaijani"
-msgstr "수직"
+msgstr ""
 
 #: src/text/iso-639_def.h:49
 msgid "Bashkir"
@@ -4317,9 +4194,8 @@ msgid "Belarusian"
 msgstr ""
 
 #: src/text/iso-639_def.h:52
-#, fuzzy
 msgid "Bengali"
-msgstr "비디오를 유효하게 한다"
+msgstr ""
 
 #: src/text/iso-639_def.h:53
 msgid "Bihari"
@@ -4371,9 +4247,8 @@ msgid "Cornish"
 msgstr "카피"
 
 #: src/text/iso-639_def.h:66
-#, fuzzy
 msgid "Corsican"
-msgstr "수직"
+msgstr ""
 
 #: src/text/iso-639_def.h:70
 msgid "Dzongkha"
@@ -4656,9 +4531,8 @@ msgid "Panjabi"
 msgstr ""
 
 #: src/text/iso-639_def.h:146
-#, fuzzy
 msgid "Persian"
-msgstr "수직"
+msgstr ""
 
 #: src/text/iso-639_def.h:147
 #, fuzzy
@@ -4690,7 +4564,7 @@ msgstr ""
 #: src/text/iso-639_def.h:154
 #, fuzzy
 msgid "Rundi"
-msgstr "오디오"
+msgstr "음성"
 
 #: src/text/iso-639_def.h:156
 msgid "Sango"
@@ -4701,9 +4575,8 @@ msgid "Sanskrit"
 msgstr ""
 
 #: src/text/iso-639_def.h:158
-#, fuzzy
 msgid "Serbian"
-msgstr "수직"
+msgstr ""
 
 #: src/text/iso-639_def.h:159
 #, fuzzy
@@ -4871,7 +4744,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr ""
 
@@ -4965,11 +4838,11 @@ msgstr ""
 #: modules/gui/macosx/open.m:509 modules/gui/macosx/open.m:600
 #: modules/gui/wxwidgets/dialogs/open.cpp:697
 msgid "Audio CD"
-msgstr "오디오 CD"
+msgstr "음성 CD"
 
 #: modules/access/cdda.c:67
 msgid "Audio CD input"
-msgstr "오디오 CD 입력"
+msgstr "음성 CD 입력"
 
 #: modules/access/cdda.c:73
 #, fuzzy
@@ -4999,12 +4872,12 @@ msgstr "CDDB 서버 포토"
 #: modules/access/cdda.c:451
 #, fuzzy
 msgid "Audio CD - Track "
-msgstr "오디오 트랙"
+msgstr "음성 트랙"
 
 #: modules/access/cdda.c:468
 #, fuzzy, c-format
 msgid "Audio CD - Track %i"
-msgstr "오디오 트랙"
+msgstr "음성 트랙"
 
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:80
 #: modules/codec/x264.c:321 modules/codec/x264.c:327 modules/codec/x264.c:332
@@ -5106,12 +4979,12 @@ msgstr "cddax://[device-or-file][@[T]num]"
 
 #: modules/access/cdda/cdda.c:113
 msgid "Compact Disc Digital Audio (CD-DA) input"
-msgstr "콤팩트 디스크 디지털 오디오 (CD-DA) 입력"
+msgstr "콤팩트 디스크 디지털 음성 (CD-DA) 입력"
 
 #: modules/access/cdda/cdda.c:115
 #, fuzzy
 msgid "Audio Compact Disc"
-msgstr "오디오 옵션"
+msgstr "음성 옵션"
 
 #: modules/access/cdda/cdda.c:124
 msgid "Additional debug"
@@ -5129,12 +5002,11 @@ msgstr "thread의 수"
 
 #: modules/access/cdda/cdda.c:139
 msgid "Format to use in playlist \"title\" field when no CDDB"
-msgstr "CDDB 가 없는 경우의 플레이 재생목록의 \"title\" 필드에서 사용하는 포맷"
+msgstr "CDDB 가 없는 경우의 재생목록의 \"title\" 필드에서 사용하는 형식"
 
 #: modules/access/cdda/cdda.c:144
-#, fuzzy
 msgid "Use CD audio controls and output?"
-msgstr "오디오 스트림의 출력을 유효하게 한다"
+msgstr ""
 
 #: modules/access/cdda/cdda.c:145
 msgid "If set, audio controls and audio jack output are used"
@@ -5159,13 +5031,12 @@ msgid "Tracks are navigated via Navagation rather than a playlist entries"
 msgstr ""
 
 #: modules/access/cdda/cdda.c:174
-#, fuzzy
 msgid "CDDB"
-msgstr "서버 없음"
+msgstr ""
 
 #: modules/access/cdda/cdda.c:177
 msgid "Format to use in playlist \"title\" field when using CDDB"
-msgstr "CDDB 가 있는 경우의 플레이 재생목록의 \"title\" 필드에서 사용하는 포맷"
+msgstr "CDDB 가 있는 경우의 재생목록의 \"title\" 필드에서 사용하는 형식"
 
 #: modules/access/cdda/cdda.c:181
 #, fuzzy
@@ -5329,9 +5200,8 @@ msgid "None"
 msgstr "없음"
 
 #: modules/access/dshow/dshow.cpp:81
-#, fuzzy
 msgid "Cable"
-msgstr "유효"
+msgstr ""
 
 #: modules/access/dshow/dshow.cpp:81
 msgid "Antenna"
@@ -5342,19 +5212,16 @@ msgid "TV"
 msgstr ""
 
 #: modules/access/dshow/dshow.cpp:89
-#, fuzzy
 msgid "FM radio"
-msgstr "암호 오디오 오디오"
+msgstr "FM 라디오"
 
 #: modules/access/dshow/dshow.cpp:90
-#, fuzzy
 msgid "AM radio"
-msgstr "암호 오디오 오디오"
+msgstr "AM 라디오"
 
 #: modules/access/dshow/dshow.cpp:91
-#, fuzzy
 msgid "DSS"
-msgstr "TS"
+msgstr "DSS"
 
 #: modules/access/dshow/dshow.cpp:95
 #, fuzzy
@@ -5365,7 +5232,7 @@ msgstr "파일·스트림의 기정의 캐싱치를 변경할 수 있습니다. 
 
 #: modules/access/dshow/dshow.cpp:97 modules/access/v4l.c:80
 msgid "Video device name"
-msgstr "비디오 디바이스명"
+msgstr "영상 장치명"
 
 #: modules/access/dshow/dshow.cpp:99
 msgid ""
@@ -5375,7 +5242,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:103 modules/access/v4l.c:84
 msgid "Audio device name"
-msgstr "오디오 디바이스명"
+msgstr "음성 디바이스명"
 
 #: modules/access/dshow/dshow.cpp:105
 msgid ""
@@ -5386,7 +5253,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:108
 msgid "Video size"
-msgstr "비디오 사이즈"
+msgstr "영상 크기"
 
 #: modules/access/dshow/dshow.cpp:110
 msgid ""
@@ -5405,9 +5272,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/dshow/dshow.cpp:117
-#, fuzzy
 msgid "Video input frame rate"
-msgstr "비디오 bit rate"
+msgstr "입력되는 영상 프레임 수"
 
 #: modules/access/dshow/dshow.cpp:119
 msgid ""
@@ -5464,9 +5330,8 @@ msgid "Select the tuner input type (Cable/Antenna)."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
 #: modules/access/dshow/dshow.cpp:139
-#, fuzzy
 msgid "Video input pin"
-msgstr "비디오 옵션"
+msgstr ""
 
 #: modules/access/dshow/dshow.cpp:141
 msgid ""
@@ -5479,16 +5344,15 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:145
 #, fuzzy
 msgid "Audio input pin"
-msgstr "오디오 CD 입력"
+msgstr "음성 CD 입력"
 
 #: modules/access/dshow/dshow.cpp:147
 msgid "Select the audio input source. See the \"video input\" option."
 msgstr ""
 
 #: modules/access/dshow/dshow.cpp:148
-#, fuzzy
 msgid "Video output pin"
-msgstr "비디오 출력 URL"
+msgstr ""
 
 #: modules/access/dshow/dshow.cpp:150
 msgid "Select the video output type. See the \"video input\" option."
@@ -5497,7 +5361,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:151
 #, fuzzy
 msgid "Audio output pin"
-msgstr "오디오 출력 URL"
+msgstr "음성 출력 URL"
 
 #: modules/access/dshow/dshow.cpp:153
 msgid "Select the audio output type. See the \"video input\" option."
@@ -5798,7 +5662,7 @@ msgstr "HTTP 유저명"
 #: modules/access/dvb/access.c:716
 #, fuzzy
 msgid "Input syntax is deprecated"
-msgstr "출력 포맷"
+msgstr "출력 형식"
 
 #: modules/access/dvb/access.c:717
 msgid ""
@@ -6047,7 +5911,7 @@ msgstr ""
 #: modules/access_filter/dump.c:39
 #, fuzzy
 msgid "Force use of dump module"
-msgstr "오디오 출력 모듈 액세스"
+msgstr "음성 출력 모듈 액세스"
 
 #: modules/access_filter/dump.c:40
 msgid "Activate the dump module even for media with fast seeking."
@@ -6237,7 +6101,7 @@ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 #: modules/access/http.c:65
 #, fuzzy
 msgid "Auto re-connect"
-msgstr "오디오 코덱"
+msgstr "음성 코덱"
 
 #: modules/access/http.c:67
 msgid ""
@@ -6485,7 +6349,7 @@ msgstr ""
 #: modules/access_output/shout.c:106
 #, fuzzy
 msgid "IceCAST output"
-msgstr "오디오 출력 모듈 액세스"
+msgstr "음성 출력 모듈 액세스"
 
 #: modules/access_output/udp.c:76 modules/access/rtsp/access.c:41
 #: modules/demux/live555.cpp:64
@@ -6639,7 +6503,7 @@ msgstr ""
 #: modules/access/pvr.c:94
 #, fuzzy
 msgid "Audio bitmask"
-msgstr "오디오 bit rate"
+msgstr "음성 bit rate"
 
 #: modules/access/pvr.c:95
 msgid "Bitmask that will get used by the audio part of the card."
@@ -6910,7 +6774,7 @@ msgstr ""
 #: modules/access/v4l.c:102
 #, fuzzy
 msgid "Audio Channel"
-msgstr "오디오 채널"
+msgstr "음성 채널"
 
 #: modules/access/v4l.c:104
 msgid "Audio Channel to use, if there are several audio inputs."
@@ -6940,9 +6804,8 @@ msgid "Hue"
 msgstr "닫는다"
 
 #: modules/access/v4l.c:116
-#, fuzzy
 msgid "Hue of the video input."
-msgstr "비디오·스트림의 출력을 유효하게 한다"
+msgstr ""
 
 #: modules/access/v4l.c:117 modules/misc/notify/xosd.c:80
 #: modules/video_filter/colorthres.c:49 modules/video_filter/marq.c:112
@@ -6952,9 +6815,8 @@ msgid "Color"
 msgstr "국"
 
 #: modules/access/v4l.c:119
-#, fuzzy
 msgid "Color of the video input."
-msgstr "ASCII 아트·비디오 출력 모듈"
+msgstr ""
 
 #: modules/access/v4l.c:120 modules/gui/macosx/extended.m:114
 #: modules/gui/wxwidgets/extrapanel.cpp:229
@@ -7073,7 +6935,7 @@ msgstr "PBC LID"
 
 #: modules/access/vcdx/info.c:90
 msgid "VCD Format"
-msgstr "VCD 포맷"
+msgstr "VCD 형식"
 
 #: modules/access/vcdx/info.c:91 modules/demux/mpc.c:56
 msgid "Album"
@@ -7209,14 +7071,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/vcdx/vcd.c:137
-#, fuzzy
 msgid "Format to use in the playlist's \"author\" field."
-msgstr "플레이 재생목록의 \"author\" 필드에서 사용하는 포맷"
+msgstr "재생목록의 \"author\" 필드에서 사용하는 형식"
 
 #: modules/access/vcdx/vcd.c:143
-#, fuzzy
 msgid "Format to use in the playlist's \"title\" field."
-msgstr "플레이 재생목록의 \"author\" 필드에서 사용하는 포맷"
+msgstr "재생목록의 \"title\" 필드에서 사용하는 형식"
 
 #: modules/audio_filter/channel_mixer/dolby.c:46
 msgid "Simple decoder for Dolby Surround encoded streams"
@@ -7239,7 +7099,7 @@ msgstr ""
 "이 옵션은 완전한 5.1 채널·스피커가 설정된 방에서 (듣)묻고 있을까의같은 효과"
 "를 헤드폰의 음성에 여네보다 실제감을 갖게합니다. 또, 장시간의 리스닝에서도 안"
 "심하고 (들)물어 있을 수 있습니다. \n"
-"이 기능은, 단청의로부터 5.1 채널까지의 모든 소스·포맷으로 동작합니다. "
+"이 기능은, 단청의로부터 5.1 채널까지의 모든 소스·형식으로 동작합니다. "
 
 #: modules/audio_filter/channel_mixer/headphone.c:62
 #, fuzzy
@@ -7247,11 +7107,8 @@ msgid "Characteristic dimension"
 msgstr "공간의 특성"
 
 #: modules/audio_filter/channel_mixer/headphone.c:64
-#, fuzzy
 msgid "Distance between front left speaker and listener in meters."
-msgstr ""
-"헤드폰의 가상적인 소리의 확대 효과：프런트 좌측 스피커와 청취자의 사이의 며느"
-"리발톱리를 미터로 지정합니다. "
+msgstr "전면 왼쪽 스피커까지 미터 단위 거리"
 
 #: modules/audio_filter/channel_mixer/headphone.c:66
 msgid "Compensate delay"
@@ -7277,9 +7134,8 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:78
 #: modules/audio_filter/channel_mixer/headphone.c:97
-#, fuzzy
 msgid "Headphone virtual spatialization effect"
-msgstr "헤드폰의 가상적인 소리의 확대 효과"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:79
 #, fuzzy
@@ -7325,17 +7181,17 @@ msgstr ""
 #: modules/audio_filter/channel_mixer/mono.c:112
 #, fuzzy
 msgid "Audio filter for stereo to mono conversion"
-msgstr "float32->s8변환을 위한 오디오·필터"
+msgstr "float32->s8변환을 위한 음성·필터"
 
 #: modules/audio_filter/channel_mixer/simple.c:45
 #, fuzzy
 msgid "Audio filter for simple channel mixing"
-msgstr "미묘한 채널·믹싱을 위한 오디오·필터"
+msgstr "미묘한 채널·믹싱을 위한 음성·필터"
 
 #: modules/audio_filter/channel_mixer/trivial.c:45
 #, fuzzy
 msgid "Audio filter for trivial channel mixing"
-msgstr "미묘한 채널·믹싱을 위한 오디오·필터"
+msgstr "미묘한 채널·믹싱을 위한 음성·필터"
 
 #: modules/audio_filter/converter/a52tofloat32.c:94
 msgid "A/52 dynamic range compression"
@@ -7368,12 +7224,12 @@ msgstr ""
 #: modules/audio_filter/converter/a52tofloat32.c:116
 #, fuzzy
 msgid "ATSC A/52 (AC-3) audio decoder"
-msgstr "a52 ATSC A/52(AC-3) 오디오·디코더·모듈"
+msgstr "a52 ATSC A/52(AC-3) 음성·디코더·모듈"
 
 #: modules/audio_filter/converter/a52tospdif.c:52
 #, fuzzy
 msgid "Audio filter for A/52->S/PDIF encapsulation"
-msgstr "A/52->S/PDIF의 캡슐화를 위한 오디오·필터"
+msgstr "A/52->S/PDIF의 캡슐화를 위한 음성·필터"
 
 #: modules/audio_filter/converter/dtstofloat32.c:81
 msgid "DTS dynamic range compression"
@@ -7388,7 +7244,7 @@ msgstr "자막·디코더·모듈"
 #: modules/audio_filter/converter/dtstospdif.c:69
 #, fuzzy
 msgid "Audio filter for DTS->S/PDIF encapsulation"
-msgstr "A/52->S/PDIF의 캡슐화를 위한 오디오·필터"
+msgstr "A/52->S/PDIF의 캡슐화를 위한 음성·필터"
 
 #: modules/audio_filter/converter/fixed.c:54
 #, fuzzy
@@ -7403,12 +7259,11 @@ msgstr "float32->s8변환을 위한 오디오·필터"
 #: modules/audio_filter/converter/mpgatofixed32.c:67
 #: modules/audio_filter/converter/mpgatofixed32.c:72
 msgid "MPEG audio decoder"
-msgstr "MPEG 오디오 디코더"
+msgstr "MPEG 음성 디코더"
 
 #: modules/audio_filter/equalizer.c:51
-#, fuzzy
 msgid "Equalizer preset"
-msgstr "비디오·필터·모듈"
+msgstr ""
 
 #: modules/audio_filter/equalizer.c:52
 msgid "Preset to use for the equalizer."
@@ -7443,9 +7298,8 @@ msgid "Set the global gain in dB (-20 ... 20)."
 msgstr ""
 
 #: modules/audio_filter/equalizer.c:69
-#, fuzzy
 msgid "Equalizer with 10 bands"
-msgstr "비디오·필터·모듈"
+msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:40
 #, fuzzy
@@ -7476,18 +7330,16 @@ msgid "Full bass and treble"
 msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:41
-#, fuzzy
 msgid "Full treble"
-msgstr "전화면화"
+msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:41
 msgid "Headphones"
 msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:42
-#, fuzzy
 msgid "Large Hall"
-msgstr "크다"
+msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:42
 #, fuzzy
@@ -7520,9 +7372,8 @@ msgid "Ska"
 msgstr "스카"
 
 #: modules/audio_filter/equalizer_presets.h:43
-#, fuzzy
 msgid "Soft"
-msgstr "소트(&O)"
+msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:43
 #, fuzzy
@@ -7537,7 +7388,7 @@ msgstr "테크노"
 #: modules/audio_filter/format.c:202
 #, fuzzy
 msgid "Audio filter for PCM format conversion"
-msgstr "float32->s8변환을 위한 오디오·필터"
+msgstr "float32->s8변환을 위한 음성·필터"
 
 #: modules/audio_filter/normvol.c:68
 #, fuzzy
@@ -7568,9 +7419,8 @@ msgid "Volume normalizer"
 msgstr ""
 
 #: modules/audio_filter/param_eq.c:47 modules/audio_filter/param_eq.c:48
-#, fuzzy
 msgid "Parametric Equalizer"
-msgstr "비디오·필터·모듈"
+msgstr ""
 
 #: modules/audio_filter/param_eq.c:53
 msgid "Low freq (Hz)"
@@ -7630,38 +7480,38 @@ msgstr ""
 #: modules/audio_filter/resampler/bandlimited.c:84
 #, fuzzy
 msgid "Audio filter for band-limited interpolation resampling"
-msgstr "미묘한 재샘플링을 위한 오디오·필터"
+msgstr "미묘한 재샘플링을 위한 음성·필터"
 
 #: modules/audio_filter/resampler/linear.c:64
 #: modules/audio_filter/resampler/linear.c:71
 #, fuzzy
 msgid "Audio filter for linear interpolation resampling"
-msgstr "미묘한 재샘플링을 위한 오디오·필터"
+msgstr "미묘한 재샘플링을 위한 음성·필터"
 
 #: modules/audio_filter/resampler/trivial.c:45
 #, fuzzy
 msgid "Audio filter for trivial resampling"
-msgstr "미묘한 재샘플링을 위한 오디오·필터"
+msgstr "미묘한 재샘플링을 위한 음성·필터"
 
 #: modules/audio_filter/resampler/ugly.c:45
 #, fuzzy
 msgid "Audio filter for ugly resampling"
-msgstr "거칠어진 재샘플링을 위한 오디오·필터"
+msgstr "거칠어진 재샘플링을 위한 음성·필터"
 
 #: modules/audio_mixer/float32.c:46
 #, fuzzy
 msgid "Float32 audio mixer"
-msgstr "float32 오디오·믹서·모듈"
+msgstr "float32 음성·믹서·모듈"
 
 #: modules/audio_mixer/spdif.c:46
 #, fuzzy
 msgid "Dummy S/PDIF audio mixer"
-msgstr "더미의 spdif 오디오·믹서·모듈"
+msgstr "더미의 spdif 음성·믹서·모듈"
 
 #: modules/audio_mixer/trivial.c:46
 #, fuzzy
 msgid "Trivial audio mixer"
-msgstr "미묘한 오디오·믹서·모듈"
+msgstr "미묘한 음성·믹서·모듈"
 
 #: modules/audio_output/alsa.c:84
 msgid "default"
@@ -7670,7 +7520,7 @@ msgstr "디폴트"
 #: modules/audio_output/alsa.c:104
 #, fuzzy
 msgid "ALSA audio output"
-msgstr "ALSA 오디오·모듈"
+msgstr "ALSA 음성·모듈"
 
 #: modules/audio_output/alsa.c:108
 msgid "ALSA Device Name"
@@ -7683,7 +7533,7 @@ msgstr "ALSA 디바이스명"
 #: modules/audio_output/waveout.c:370 modules/gui/macosx/intf.m:567
 #: modules/gui/macosx/intf.m:568
 msgid "Audio Device"
-msgstr "오디오 디바이스"
+msgstr "음성 디바이스"
 
 #: modules/audio_output/alsa.c:185 modules/audio_output/directx.c:477
 #: modules/audio_output/oss.c:223 modules/audio_output/portaudio.c:400
@@ -7706,7 +7556,7 @@ msgstr "A/52 over S/PDIF"
 #: modules/audio_output/alsa.c:325
 #, fuzzy
 msgid "No Audio Device"
-msgstr "오디오 디바이스"
+msgstr "음성 디바이스"
 
 #: modules/audio_output/alsa.c:326
 msgid "No audio device name was given. You might want to enter \"default\"."
@@ -7716,7 +7566,7 @@ msgstr ""
 #: modules/audio_output/alsa.c:484 modules/audio_output/auhal.c:242
 #, fuzzy
 msgid "Audio output failed"
-msgstr "오디오 출력 URL"
+msgstr "음성 출력 URL"
 
 #: modules/audio_output/alsa.c:434 modules/audio_output/alsa.c:485
 #, c-format
@@ -7735,7 +7585,7 @@ msgstr ""
 #: modules/audio_output/arts.c:63
 #, fuzzy
 msgid "aRts audio output"
-msgstr "aRts 오디오·모듈"
+msgstr "aRts 음성·모듈"
 
 #: modules/audio_output/auhal.c:129
 msgid ""
@@ -7747,7 +7597,7 @@ msgstr ""
 #: modules/audio_output/auhal.c:135
 #, fuzzy
 msgid "HAL AudioUnit output"
-msgstr "ALSA 오디오·모듈"
+msgstr "ALSA 음성·모듈"
 
 #: modules/audio_output/auhal.c:243
 msgid ""
@@ -7757,7 +7607,7 @@ msgstr ""
 #: modules/audio_output/auhal.c:427
 #, fuzzy
 msgid "Audio device is not configured"
-msgstr "오디오 디바이스명"
+msgstr "음성 디바이스명"
 
 #: modules/audio_output/auhal.c:428
 msgid ""
@@ -7771,9 +7621,8 @@ msgid "%s (Encoded Output)"
 msgstr ""
 
 #: modules/audio_output/directx.c:204 modules/audio_output/portaudio.c:107
-#, fuzzy
 msgid "Output device"
-msgstr "출력 포맷"
+msgstr "출력 장치"
 
 #: modules/audio_output/directx.c:206
 msgid ""
@@ -7794,7 +7643,7 @@ msgstr ""
 
 #: modules/audio_output/directx.c:214
 msgid "DirectX audio output"
-msgstr "DirectX 오디오 출력"
+msgstr "DirectX 음성 출력"
 
 #: modules/audio_output/directx.c:432 modules/audio_output/portaudio.c:427
 msgid "3 Front 2 Rear"
@@ -7802,7 +7651,7 @@ msgstr "프런트 3, 리어 2"
 
 #: modules/audio_output/esd.c:67
 msgid "EsounD audio output"
-msgstr "EsounD 오디오 출력"
+msgstr "EsounD 음성 출력"
 
 #: modules/audio_output/esd.c:70
 #, fuzzy
@@ -7811,7 +7660,7 @@ msgstr "서버 없음"
 
 #: modules/audio_output/file.c:78
 msgid "Output format"
-msgstr "출력 포맷"
+msgstr "출력 형식"
 
 #: modules/audio_output/file.c:79
 msgid ""
@@ -7842,7 +7691,7 @@ msgstr "raw 파일을 써내는 대신에, wav 헤더를 파일에 추가한다.
 
 #: modules/audio_output/file.c:104
 msgid "Output file"
-msgstr "출력 포맷"
+msgstr "출력 파일"
 
 #: modules/audio_output/file.c:105
 msgid "File to which the audio samples will be written to."
@@ -7850,17 +7699,17 @@ msgstr ""
 
 #: modules/audio_output/file.c:108
 msgid "File audio output"
-msgstr "파일 오디오 출력"
+msgstr "파일 음성 출력"
 
 #: modules/audio_output/hd1000a.cpp:76
 #, fuzzy
 msgid "Roku HD1000 audio output"
-msgstr "HD1000 오디오 출력"
+msgstr "HD1000 음성 출력"
 
 #: modules/audio_output/jack.c:62
 #, fuzzy
 msgid "JACK audio output"
-msgstr "ALSA 오디오·모듈"
+msgstr "ALSA 음성·모듈"
 
 #: modules/audio_output/oss.c:99
 msgid "Try to work around buggy OSS drivers"
@@ -7875,7 +7724,7 @@ msgid ""
 msgstr ""
 "몇개의 불안정한 OSS 드라이버는 내부 버퍼를 완전하게 다 써 버립니다. (사운드"
 "(은)는 꽤 중단되어 들립니다) 만약, 이러한 드라이버를 사용하고 있는 경우, 이옵"
-"션을 유효하게 할 필요가 있습니다. "
+"션을 켜야 합니다. "
 
 #: modules/audio_output/oss.c:107
 #, fuzzy
@@ -7893,12 +7742,12 @@ msgstr ""
 #: modules/audio_output/portaudio.c:112
 #, fuzzy
 msgid "PORTAUDIO audio output"
-msgstr "ALSA 오디오·모듈"
+msgstr "ALSA 음성·모듈"
 
 #: modules/audio_output/sdl.c:66
 #, fuzzy
 msgid "Simple DirectMedia Layer audio output"
-msgstr "심플 DirectMedia 레이어 오디오 출력"
+msgstr "심플 DirectMedia 레이어 음성 출력"
 
 #: modules/audio_output/waveout.c:143
 msgid "Win32 waveOut extension output"
@@ -7918,25 +7767,25 @@ msgstr ""
 
 #: modules/codec/adpcm.c:43
 msgid "ADPCM audio decoder"
-msgstr "ADPCM 오디오 디코더"
+msgstr "ADPCM 음성 디코더"
 
 #: modules/codec/araw.c:44
 msgid "Raw/Log Audio decoder"
-msgstr "Raw/Log 오디오 디코더"
+msgstr "Raw/Log 음성 디코더"
 
 #: modules/codec/araw.c:53
 msgid "Raw audio encoder"
-msgstr "생 오디오 디코더"
+msgstr "생 음성 디코더"
 
 #: modules/codec/cinepak.c:38
 #, fuzzy
 msgid "Cinepak video decoder"
-msgstr "시네 팩 비디오 디코더"
+msgstr "시네 팩 영상 디코더"
 
 #: modules/codec/cmml/cmml.c:68
 #, fuzzy
 msgid "CMML annotations decoder"
-msgstr "유사 AC3 오디오·디코더"
+msgstr "유사 AC3 음성·디코더"
 
 #: modules/codec/cvdsub.c:46
 msgid "CVD subtitle decoder"
@@ -7960,12 +7809,11 @@ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 #: modules/codec/dirac.c:74
 #, fuzzy
 msgid "Dirac video decoder"
-msgstr "DV 비디오 디코더"
+msgstr "Dirac 영상 디코더"
 
 #: modules/codec/dirac.c:80
-#, fuzzy
 msgid "Dirac video encoder"
-msgstr "DV비디오·디코더"
+msgstr ""
 
 #: modules/codec/dmo/dmo.c:100
 msgid "DirectMedia Object decoder"
@@ -7983,7 +7831,7 @@ msgstr "DTS 퍼서"
 #: modules/codec/dts.c:100
 #, fuzzy
 msgid "DTS audio packetizer"
-msgstr "DTS 오디오 디코더"
+msgstr "DTS 음성 디코더"
 
 #: modules/codec/dvbsub.c:51
 #, fuzzy
@@ -8016,18 +7864,16 @@ msgid ""
 msgstr ""
 
 #: modules/codec/dvbsub.c:63
-#, fuzzy
 msgid "Encoding X coordinate"
-msgstr "비디오 y 코디네이터"
+msgstr ""
 
 #: modules/codec/dvbsub.c:64
 msgid "X coordinate of the encoded subtitle"
 msgstr ""
 
 #: modules/codec/dvbsub.c:65
-#, fuzzy
 msgid "Encoding Y coordinate"
-msgstr "비디오 y 코디네이터"
+msgstr ""
 
 #: modules/codec/dvbsub.c:66
 msgid "Y coordinate of the encoded subtitle"
@@ -8046,7 +7892,7 @@ msgstr "DVB 자막 디코더"
 #: modules/codec/faad.c:39
 #, fuzzy
 msgid "AAC audio decoder (using libfaad2)"
-msgstr "AAC 오디오 디코더 (libfaad2)"
+msgstr "AAC 음성 디코더 (libfaad2)"
 
 #: modules/codec/faad.c:331
 msgid "AAC extension"
@@ -8063,15 +7909,13 @@ msgstr ""
 
 #: modules/codec/fake.c:50 modules/stream_out/mosaic_bridge.c:110
 #: modules/stream_out/transcode.c:75
-#, fuzzy
 msgid "Output video width."
-msgstr "비디오의 폭"
+msgstr ""
 
 #: modules/codec/fake.c:53 modules/stream_out/mosaic_bridge.c:113
 #: modules/stream_out/transcode.c:78
-#, fuzzy
 msgid "Output video height."
-msgstr "비디오의 높이"
+msgstr ""
 
 #: modules/codec/fake.c:54 modules/video_filter/mosaic.c:133
 #, fuzzy
@@ -8112,9 +7956,8 @@ msgid "Deinterlace module to use."
 msgstr "noninterplace화 모드"
 
 #: modules/codec/fake.c:76
-#, fuzzy
 msgid "Fake video decoder"
-msgstr "시네 팩 비디오 디코더"
+msgstr ""
 
 #: modules/codec/ffmpeg/encoder.c:219
 #, fuzzy, c-format
@@ -8124,7 +7967,7 @@ msgstr "DV비디오·디코더"
 #: modules/codec/ffmpeg/encoder.c:227
 #, fuzzy, c-format
 msgid "\"%s\" is no audio encoder."
-msgstr "Vorbis 오디오 인코더"
+msgstr "Vorbis 음성 인코더"
 
 #: modules/codec/ffmpeg/encoder.c:239
 #, c-format
@@ -8218,12 +8061,12 @@ msgstr ""
 #, fuzzy
 msgid ""
 "AltiVec FFmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
-msgstr "ffmpeg 오디오/비디오 디코더((MS) MPEG4, SVQ1, H263, WMV, WMA)"
+msgstr "ffmpeg 음성/영상 디코더((MS) MPEG4, SVQ1, H263, WMV, WMA)"
 
 #: modules/codec/ffmpeg/ffmpeg.c:99
 #, fuzzy
 msgid "FFmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
-msgstr "ffmpeg 오디오/비디오 디코더((MS) MPEG4, SVQ1, H263, WMV, WMA)"
+msgstr "ffmpeg 음성/영상 디코더((MS) MPEG4, SVQ1, H263, WMV, WMA)"
 
 #: modules/codec/ffmpeg/ffmpeg.c:102
 #, fuzzy
@@ -8239,17 +8082,17 @@ msgstr "자막 엔콘코드중"
 #: modules/codec/ffmpeg/ffmpeg.c:130
 #, fuzzy
 msgid "FFmpeg audio/video encoder"
-msgstr "유사 AC3 오디오·디코더"
+msgstr "유사 AC3 음성·디코더"
 
 #: modules/codec/ffmpeg/ffmpeg.c:188
 #, fuzzy
 msgid "FFmpeg demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/codec/ffmpeg/ffmpeg.c:194
 #, fuzzy
 msgid "FFmpeg muxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/codec/ffmpeg/ffmpeg.c:201 modules/video_filter/scale.c:53
 #, fuzzy
@@ -8261,19 +8104,16 @@ msgid "FFmpeg chroma conversion"
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:219
-#, fuzzy
 msgid "FFmpeg video filter"
-msgstr "비디오·필터·모듈"
+msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:225
-#, fuzzy
 msgid "FFmpeg crop padd filter"
-msgstr "비디오·필터·모듈"
+msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:231
-#, fuzzy
 msgid "FFmpeg deinterlace video filter"
-msgstr "비디오 역전 모듈"
+msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:87 modules/codec/ffmpeg/ffmpeg.h:89
 msgid "Direct rendering"
@@ -8446,12 +8286,12 @@ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 #: modules/codec/ffmpeg/ffmpeg.h:195
 #, fuzzy
 msgid "Video bitrate tolerance"
-msgstr "오디오"
+msgstr "음성"
 
 #: modules/codec/ffmpeg/ffmpeg.h:196
 #, fuzzy
 msgid "Video bitrate tolerance in kbit/s."
-msgstr "오디오"
+msgstr "음성"
 
 #: modules/codec/ffmpeg/ffmpeg.h:198
 #, fuzzy
@@ -8693,12 +8533,12 @@ msgstr "6 (높다)"
 #: modules/codec/flac.c:174
 #, fuzzy
 msgid "Flac audio decoder"
-msgstr "유사 AC3 오디오·디코더"
+msgstr "유사 AC3 음성·디코더"
 
 #: modules/codec/flac.c:179
 #, fuzzy
 msgid "Flac audio encoder"
-msgstr "유사 AC3 오디오·디코더"
+msgstr "유사 AC3 음성·디코더"
 
 #: modules/codec/flac.c:185
 #, fuzzy
@@ -8706,39 +8546,36 @@ msgid "Flac audio packetizer"
 msgstr "자막·디코더·모듈"
 
 #: modules/codec/libmpeg2.c:97
-#, fuzzy
 msgid "MPEG I/II video decoder (using libmpeg2)"
-msgstr "MPEG 1/2비디오·디코더·모듈"
+msgstr ""
 
 #: modules/codec/lpcm.c:83
 #, fuzzy
 msgid "Linear PCM audio decoder"
-msgstr "리니어 PCM 오디오·디코더"
+msgstr "리니어 PCM 음성·디코더"
 
 #: modules/codec/lpcm.c:88
 #, fuzzy
 msgid "Linear PCM audio packetizer"
-msgstr "리니어 PCM 오디오·디코더"
+msgstr "리니어 PCM 음성·디코더"
 
 #: modules/codec/mash.cpp:66
-#, fuzzy
 msgid "Video decoder using openmash"
-msgstr "비디오 디코더에 openmash 를 사용한다"
+msgstr "영상 디코더에 openmash 를 사용한다"
 
 #: modules/codec/mpeg_audio.c:106
 #, fuzzy
 msgid "MPEG audio layer I/II/III decoder"
-msgstr "MPEG 오디오 레이어 I/II/III 퍼서"
+msgstr "MPEG 음성 레이어 I/II/III 퍼서"
 
 #: modules/codec/mpeg_audio.c:117
 #, fuzzy
 msgid "MPEG audio layer I/II/III packetizer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/codec/png.c:54
-#, fuzzy
 msgid "PNG video decoder"
-msgstr "DV 비디오 디코더"
+msgstr "PNG 영상 디코더"
 
 #: modules/codec/quicktime.c:63
 msgid "QuickTime library decoder"
@@ -8747,27 +8584,26 @@ msgstr ""
 #: modules/codec/rawvideo.c:68
 #, fuzzy
 msgid "Pseudo raw video decoder"
-msgstr "유사 AC3 오디오·디코더"
+msgstr "유사 AC3 음성·디코더"
 
 #: modules/codec/rawvideo.c:75
 #, fuzzy
 msgid "Pseudo raw video packetizer"
-msgstr "유사 AC3 오디오·디코더"
+msgstr "유사 AC3 음성·디코더"
 
 #: modules/codec/realaudio.c:60
 #, fuzzy
 msgid "RealAudio library decoder"
-msgstr "Raw/Log 오디오 디코더"
+msgstr "Raw/Log 음성 디코더"
 
 #: modules/codec/sdl_image.c:55
-#, fuzzy
 msgid "SDL_image video decoder"
-msgstr "DV 비디오 디코더"
+msgstr "SDL_image 영상 디코더"
 
 #: modules/codec/speex.c:106
 #, fuzzy
 msgid "Speex audio decoder"
-msgstr "유사 AC3 오디오·디코더"
+msgstr "유사 AC3 음성·디코더"
 
 #: modules/codec/speex.c:111
 #, fuzzy
@@ -8777,7 +8613,7 @@ msgstr "자막·디코더·모듈"
 #: modules/codec/speex.c:116
 #, fuzzy
 msgid "Speex audio encoder"
-msgstr "유사 AC3 오디오·디코더"
+msgstr "유사 AC3 음성·디코더"
 
 #: modules/codec/speex.c:560 modules/codec/speex.c:577
 #, fuzzy
@@ -8852,9 +8688,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/svcdsub.c:42
-#, fuzzy
 msgid "Enable debug"
-msgstr "비디오를 유효하게 한다"
+msgstr "디버그 켜기"
 
 #: modules/codec/svcdsub.c:45
 msgid ""
@@ -8879,9 +8714,8 @@ msgid "Philips OGT (SVCD subtitle) packetizer"
 msgstr "자막·디코더·모듈"
 
 #: modules/codec/tarkin.c:75
-#, fuzzy
 msgid "Tarkin decoder module"
-msgstr "MPEG 1/2비디오·디코더·모듈"
+msgstr ""
 
 #: modules/codec/theora.c:92 modules/codec/vorbis.c:158
 #, fuzzy
@@ -8891,19 +8725,16 @@ msgid ""
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
 #: modules/codec/theora.c:99
-#, fuzzy
 msgid "Theora video decoder"
-msgstr "DV비디오·디코더"
+msgstr "Theora 영상 디코더"
 
 #: modules/codec/theora.c:105
-#, fuzzy
 msgid "Theora video packetizer"
-msgstr "DV비디오·디코더"
+msgstr ""
 
 #: modules/codec/theora.c:111
-#, fuzzy
 msgid "Theora video encoder"
-msgstr "DV비디오·디코더"
+msgstr ""
 
 #: modules/codec/theora.c:512
 msgid "Theora comment"
@@ -8955,7 +8786,7 @@ msgstr "스테레오"
 #: modules/codec/twolame.c:71
 #, fuzzy
 msgid "Libtwolame audio encoder"
-msgstr "유사 AC3 오디오·디코더"
+msgstr "유사 AC3 음성·디코더"
 
 #: modules/codec/vorbis.c:160
 msgid "Maximum encoding bitrate"
@@ -8987,7 +8818,7 @@ msgstr ""
 
 #: modules/codec/vorbis.c:172
 msgid "Vorbis audio decoder"
-msgstr "Vorbis 오디오 디코더"
+msgstr "Vorbis 음성 디코더"
 
 #: modules/codec/vorbis.c:183
 #, fuzzy
@@ -8996,7 +8827,7 @@ msgstr "자막·디코더·모듈"
 
 #: modules/codec/vorbis.c:190
 msgid "Vorbis audio encoder"
-msgstr "Vorbis 오디오 인코더"
+msgstr "Vorbis 음성 인코더"
 
 #: modules/codec/vorbis.c:629
 msgid "Vorbis comment"
@@ -9109,9 +8940,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/x264.c:98
-#, fuzzy
 msgid "Skip loop filter"
-msgstr "로고 비디오 필터"
+msgstr ""
 
 #: modules/codec/x264.c:99
 msgid "Deactivate the deblocking loop filter (decreases quality)."
@@ -9194,7 +9024,7 @@ msgstr ""
 #: modules/codec/x264.c:140
 #, fuzzy
 msgid "Average bitrate tolerance"
-msgstr "오디오"
+msgstr "음성"
 
 #: modules/codec/x264.c:141
 #, fuzzy
@@ -9505,7 +9335,7 @@ msgstr ""
 #: modules/codec/x264.c:296
 #, fuzzy
 msgid "Quiet mode"
-msgstr "네트워크"
+msgstr "만곡 모드"
 
 #: modules/codec/x264.c:297
 #, fuzzy
@@ -9591,9 +9421,8 @@ msgid "auto"
 msgstr "자동"
 
 #: modules/codec/x264.c:336
-#, fuzzy
 msgid "H.264/MPEG4 AVC encoder (using x264 library)"
-msgstr "h264 비디오 encode에 x264 라이브러리를 사용한다"
+msgstr "h264 영상 encode에 x264 라이브러리를 사용한다"
 
 #: modules/codec/xvmc/xxmc.c:100
 #, fuzzy
@@ -9641,9 +9470,8 @@ msgid "Mouse gestures control interface"
 msgstr "적외선 리모트·컨트롤·모듈"
 
 #: modules/control/hotkeys.c:94
-#, fuzzy
 msgid "Define playlist bookmarks."
-msgstr "플레이 재생목록를 연다"
+msgstr ""
 
 #: modules/control/hotkeys.c:97
 #, fuzzy
@@ -9658,7 +9486,7 @@ msgstr "Gtk+인터페이스·모듈"
 #: modules/control/hotkeys.c:431
 #, c-format
 msgid "Audio track: %s"
-msgstr "오디오 트랙: %s"
+msgstr "음성 트랙: %s"
 
 #: modules/control/hotkeys.c:446 modules/control/hotkeys.c:475
 #, c-format
@@ -9687,7 +9515,7 @@ msgstr "noninterplace화 모드"
 #: modules/control/hotkeys.c:581
 #, fuzzy, c-format
 msgid "Zoom mode: %s"
-msgstr "비디오 줌"
+msgstr "확대 상태: %s"
 
 #: modules/control/hotkeys.c:662 modules/control/hotkeys.c:672
 #, fuzzy, c-format
@@ -9779,9 +9607,8 @@ msgid "Use the rotate video filter instead of transform"
 msgstr ""
 
 #: modules/control/motion.c:65
-#, fuzzy
 msgid "motion"
-msgstr "선택"
+msgstr "동작"
 
 #: modules/control/motion.c:67
 #, fuzzy
@@ -9949,19 +9776,17 @@ msgstr "+----[ 리모트 제어 커멘드 ]\n"
 #: modules/control/rc.c:839
 #, fuzzy
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:840
 #, fuzzy
 msgid "| enqueue XYZ  . . . . . . . queue XYZ to playlist"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:841
 #, fuzzy
 msgid "| playlist . . .  show items currently in playlist"
-msgstr "| playlist .  .  .  현재의 플레이 재생목록중의 항목을 표시 \n"
+msgstr "| playlist .  .  .  현재의 재생목록중의 항목을 표시 \n"
 
 #: modules/control/rc.c:842
 #, fuzzy
@@ -9976,14 +9801,12 @@ msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 
 #: modules/control/rc.c:844
 #, fuzzy
 msgid "| next . . . . . . . . . . . .  next playlist item"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:845
 #, fuzzy
 msgid "| prev . . . . . . . . . .  previous playlist item"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:846
 #, fuzzy
@@ -10003,14 +9826,12 @@ msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 
 #: modules/control/rc.c:849
 #, fuzzy
 msgid "| clear . . . . . . . . . . .   clear the playlist"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:850
 #, fuzzy
 msgid "| status . . . . . . . . . current playlist status"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:851
 msgid "| title [X]  . . . . set/get title in current item"
@@ -10048,14 +9869,12 @@ msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 
 #: modules/control/rc.c:860
 #, fuzzy
 msgid "| fastforward  . . . . . .  .  set to maximum rate"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:861
 #, fuzzy
 msgid "| rewind  . . . . . . . . . .  set to minimum rate"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:862
 msgid "| faster . . . . . . . .  faster playing of stream"
@@ -10117,38 +9936,31 @@ msgstr ""
 #: modules/control/rc.c:877
 #, fuzzy
 msgid "| atrack [X] . . . . . . . . . set/get audio track"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:878
 #, fuzzy
 msgid "| vtrack [X] . . . . . . . . . set/get video track"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:879
-#, fuzzy
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
 msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
 
 #: modules/control/rc.c:880
 #, fuzzy
 msgid "| vcrop [X]  . . . . . . . . .  set/get video crop"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:881
 #, fuzzy
 msgid "| vzoom [X]  . . . . . . . . .  set/get video zoom"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
 #: modules/control/rc.c:882
 #, fuzzy
 msgid "| strack [X] . . . . . . . set/get subtitles track"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:883
 msgid "| menu [on|off|up|down|left|right|select] use menu"
@@ -10161,8 +9973,7 @@ msgstr ""
 #: modules/control/rc.c:889
 #, fuzzy
 msgid "| marq-x X . . . . . . . . . . . .offset from left"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:890
 #, fuzzy
@@ -10192,8 +10003,7 @@ msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 
 #: modules/control/rc.c:895
 #, fuzzy
 msgid "| marq-size # . . . . . . . . font size, in pixels"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:897
 msgid "| logo-file STRING . . .the overlay file path/name"
@@ -10254,8 +10064,7 @@ msgstr ""
 #: modules/control/rc.c:910
 #, fuzzy
 msgid "| mosaic-vborder # . . . . . . . . vertical border"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:911
 msgid "| mosaic-hborder # . . . . . . . horizontal border"
@@ -10268,20 +10077,17 @@ msgstr ""
 #: modules/control/rc.c:913
 #, fuzzy
 msgid "| mosaic-rows #. . . . . . . . . . .number of rows"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:914
 #, fuzzy
 msgid "| mosaic-cols #. . . . . . . . . . .number of cols"
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:915
 #, fuzzy
 msgid "| mosaic-order id(,id)* . . . . order of pictures "
-msgstr ""
-"| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
+msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
 #: modules/control/rc.c:916
 msgid "| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
@@ -10413,17 +10219,17 @@ msgstr ""
 #: modules/demux/a52.c:44
 #, fuzzy
 msgid "Raw A/52 demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/aiff.c:45
 #, fuzzy
 msgid "AIFF demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/asf/asf.c:52
 #, fuzzy
 msgid "ASF v1.0 demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/asf/asf.c:168
 msgid "Could not demux ASF stream"
@@ -10521,17 +10327,17 @@ msgstr ""
 #: modules/demux/demuxdump.c:52
 #, fuzzy
 msgid "File dumpper"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/dts.c:40
 #, fuzzy
 msgid "Raw DTS demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/flac.c:39
 #, fuzzy
 msgid "FLAC demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/gme.cpp:51
 msgid "GME demuxer (Game_Music_Emu)"
@@ -10592,9 +10398,8 @@ msgid "Use RTP over RTSP (TCP)"
 msgstr "RTP 오버 RTSP (TCP)를 사용한다"
 
 #: modules/demux/live555.cpp:101
-#, fuzzy
 msgid "Client port"
-msgstr "비디오 bit rate"
+msgstr ""
 
 #: modules/demux/live555.cpp:102
 msgid "Port to use for the RTP source of the session"
@@ -10632,12 +10437,12 @@ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 #: modules/demux/mjpeg.c:50
 #, fuzzy
 msgid "M-JPEG camera demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/mkv.cpp:396
 #, fuzzy
 msgid "Matroska stream demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/mkv.cpp:403
 #, fuzzy
@@ -10695,9 +10500,8 @@ msgid "First Played"
 msgstr ""
 
 #: modules/demux/mkv.cpp:3242
-#, fuzzy
 msgid "Video Manager"
-msgstr "비디오 인코더"
+msgstr "영상 관리자"
 
 #: modules/demux/mkv.cpp:3248
 #, fuzzy
@@ -10709,9 +10513,8 @@ msgid "Enable noise reduction algorithm"
 msgstr ""
 
 #: modules/demux/mod.c:49
-#, fuzzy
 msgid "Enable reverberation"
-msgstr "오디오를 유효하게 한다"
+msgstr ""
 
 #: modules/demux/mod.c:50
 #, fuzzy
@@ -10723,9 +10526,8 @@ msgid "Reverberation delay, in ms. Usual values are from to 40 to 200ms."
 msgstr ""
 
 #: modules/demux/mod.c:54
-#, fuzzy
 msgid "Enable megabass mode"
-msgstr "피크를 유효하게 한다"
+msgstr ""
 
 #: modules/demux/mod.c:55
 #, fuzzy
@@ -10794,7 +10596,7 @@ msgstr "환경 지연 (밀리 세컨드)"
 #: modules/demux/mp4/mp4.c:55
 #, fuzzy
 msgid "MP4 stream demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/mpc.c:47
 #, fuzzy
@@ -10810,7 +10612,7 @@ msgstr ""
 #: modules/demux/mpc.c:60
 #, fuzzy
 msgid "MusePack demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/mpeg/h264.c:40
 #, fuzzy
@@ -10820,27 +10622,27 @@ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 #: modules/demux/mpeg/h264.c:47
 #, fuzzy
 msgid "H264 video demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/mpeg/m4a.c:42
 #, fuzzy
 msgid "MPEG-4 audio demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/mpeg/m4v.c:42
 #, fuzzy
 msgid "MPEG-4 video demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/mpeg/mpga.c:46
 #, fuzzy
 msgid "MPEG audio / MP3 demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/mpeg/mpgv.c:42
 #, fuzzy
 msgid "MPEG-I/II video demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/nsc.c:43
 msgid "Windows Media NSC metademux"
@@ -10853,17 +10655,16 @@ msgstr ""
 #: modules/demux/nuv.c:46
 #, fuzzy
 msgid "Nuv demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/ogg.c:45
 #, fuzzy
 msgid "OGG demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/playlist/gvp.c:211
-#, fuzzy
 msgid "Google Video"
-msgstr "비디오 줌"
+msgstr "구글 비디오"
 
 #: modules/demux/playlist/playlist.c:36
 #, fuzzy
@@ -10884,21 +10685,21 @@ msgstr ""
 
 #: modules/demux/playlist/playlist.c:59
 msgid "M3U playlist import"
-msgstr "M3U 플레이 재생목록로부터 임포트"
+msgstr "M3U 재생목록로부터 임포트"
 
 #: modules/demux/playlist/playlist.c:64
 msgid "PLS playlist import"
-msgstr "PLS 플레이 재생목록로부터 임포트"
+msgstr "PLS 재생목록로부터 임포트"
 
 #: modules/demux/playlist/playlist.c:69
 #, fuzzy
 msgid "B4S playlist import"
-msgstr "PLS 플레이 재생목록로부터 임포트"
+msgstr "PLS 재생목록로부터 임포트"
 
 #: modules/demux/playlist/playlist.c:75
 #, fuzzy
 msgid "DVB playlist import"
-msgstr "PLS 플레이 재생목록로부터 임포트"
+msgstr "PLS 재생목록로부터 임포트"
 
 #: modules/demux/playlist/playlist.c:80
 #, fuzzy
@@ -10908,7 +10709,7 @@ msgstr "CDDB 디스크 카테고리"
 #: modules/demux/playlist/playlist.c:85
 #, fuzzy
 msgid "XSPF playlist import"
-msgstr "PLS 플레이 재생목록로부터 임포트"
+msgstr "PLS 재생목록로부터 임포트"
 
 #: modules/demux/playlist/playlist.c:90
 msgid "New winamp 5.2 shoutcast import"
@@ -10917,7 +10718,7 @@ msgstr ""
 #: modules/demux/playlist/playlist.c:97
 #, fuzzy
 msgid "ASX playlist import"
-msgstr "PLS 플레이 재생목록로부터 임포트"
+msgstr "PLS 재생목록로부터 임포트"
 
 #: modules/demux/playlist/playlist.c:102
 msgid "Kasenna MediaBase parser"
@@ -10954,8 +10755,9 @@ msgid "Shoutcast"
 msgstr "멀티 캐스트"
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "수직 방향 위치"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -10967,12 +10769,12 @@ msgstr ""
 #: modules/demux/ps.c:52 modules/demux/ps.c:63
 #, fuzzy
 msgid "MPEG-PS demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/pva.c:39
 #, fuzzy
 msgid "PVA demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/rawdv.c:40
 msgid "DV (Digital Video) demuxer"
@@ -10981,7 +10783,7 @@ msgstr ""
 #: modules/demux/real.c:43
 #, fuzzy
 msgid "Real demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/subtitle.c:50
 msgid "Apply a delay to all subtitles (in 1/10s, eg 100 means 10s)."
@@ -11130,7 +10932,7 @@ msgstr "스트림의 재생"
 #: modules/demux/ts.c:3148 modules/demux/ts.c:3182
 #, fuzzy
 msgid "clean effects"
-msgstr "다음의 Chapter를 선택"
+msgstr "스코프 효과"
 
 #: modules/demux/ts.c:3152 modules/demux/ts.c:3186
 msgid "hearing impaired"
@@ -11143,12 +10945,12 @@ msgstr ""
 #: modules/demux/tta.c:40
 #, fuzzy
 msgid "TTA demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/ty.c:70
 #, fuzzy
 msgid "TY Stream audio/video demux"
-msgstr "유사 AC3 오디오·디코더"
+msgstr "유사 AC3 음성·디코더"
 
 #: modules/demux/vobsub.c:49
 #, fuzzy
@@ -11158,7 +10960,7 @@ msgstr "자막의 선택"
 #: modules/demux/voc.c:42
 #, fuzzy
 msgid "VOC demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/demux/wav.c:41
 msgid "WAV demuxer"
@@ -11167,7 +10969,7 @@ msgstr ""
 #: modules/demux/xa.c:41
 #, fuzzy
 msgid "XA demuxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/gui/beos/BeOS.cpp:52
 msgid "Use DVD Menus"
@@ -11308,15 +11110,15 @@ msgstr "선택 없음"
 
 #: modules/gui/beos/PlayListWindow.cpp:111
 msgid "Sort Reverse"
-msgstr "역소트"
+msgstr "역정렬"
 
 #: modules/gui/beos/PlayListWindow.cpp:114
 msgid "Sort by Name"
-msgstr "이름으로 소트"
+msgstr "이름으로 정렬"
 
 #: modules/gui/beos/PlayListWindow.cpp:118
 msgid "Sort by Path"
-msgstr "패스로 소트"
+msgstr "경로로 정렬"
 
 #: modules/gui/beos/PlayListWindow.cpp:122
 msgid "Randomize"
@@ -11383,9 +11185,8 @@ msgid "Vertical Sync"
 msgstr "수직 동기"
 
 #: modules/gui/beos/VideoOutput.cpp:1068
-#, fuzzy
 msgid "Correct Aspect Ratio"
-msgstr "소스의 어스펙트·레시오"
+msgstr "화면 비율 조정"
 
 #: modules/gui/beos/VideoOutput.cpp:1097
 msgid "Stay On Top"
@@ -11393,11 +11194,11 @@ msgstr "항상 맨 앞면"
 
 #: modules/gui/beos/VideoOutput.cpp:1103
 msgid "Take Screen Shot"
-msgstr "screen shot를 취한다"
+msgstr "스크린샷 찍기"
 
 #: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:511
 msgid "About VLC media player"
-msgstr "VLC 미디어·플레이어에 대해"
+msgstr "VLC 미디어 플레이어에 대해"
 
 #: modules/gui/macosx/about.m:81
 #, c-format
@@ -11405,9 +11206,9 @@ msgid "Compiled by %s, based on SVN revision %s"
 msgstr ""
 
 #: modules/gui/macosx/about.m:85
-#, fuzzy, c-format
+#, c-format
 msgid "Compiled by %s"
-msgstr "코메디"
+msgstr ""
 
 #: modules/gui/macosx/bookmarks.m:92 modules/gui/macosx/intf.m:601
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:139
@@ -11601,9 +11402,8 @@ msgid "Extended controls"
 msgstr "리모트·컨트롤"
 
 #: modules/gui/macosx/extended.m:82 modules/gui/wxwidgets/extrapanel.cpp:300
-#, fuzzy
 msgid "Video filters"
-msgstr "비디오 제목"
+msgstr "영상 필터"
 
 #: modules/gui/macosx/extended.m:83 modules/gui/wxwidgets/extrapanel.cpp:204
 msgid "Image adjustment"
@@ -11640,14 +11440,12 @@ msgid "General editing filters"
 msgstr "일반 설정"
 
 #: modules/gui/macosx/extended.m:90
-#, fuzzy
 msgid "Distortion filters"
-msgstr "비디오 역전 모듈"
+msgstr "왜곡 필터"
 
 #: modules/gui/macosx/extended.m:91
-#, fuzzy
 msgid "Blur"
-msgstr "블루스"
+msgstr "흐리게"
 
 #: modules/gui/macosx/extended.m:92 modules/gui/wxwidgets/extrapanel.cpp:150
 msgid "Adds motion blurring to the image"
@@ -11667,9 +11465,8 @@ msgid "Crops a defined part of the image"
 msgstr ""
 
 #: modules/gui/macosx/extended.m:98
-#, fuzzy
 msgid "Invert colors"
-msgstr "역전"
+msgstr "역상"
 
 #: modules/gui/macosx/extended.m:99 modules/gui/wxwidgets/extrapanel.cpp:149
 msgid "Inverts the colors of the image"
@@ -11704,9 +11501,8 @@ msgid "Prevents the audio output from going over a predefined value."
 msgstr ""
 
 #: modules/gui/macosx/extended.m:107 modules/gui/wxwidgets/extrapanel.cpp:396
-#, fuzzy
 msgid "Headphone virtualization"
-msgstr "헤드폰의 가상적인 소리의 확대 효과"
+msgstr ""
 
 #: modules/gui/macosx/extended.m:108 modules/gui/wxwidgets/extrapanel.cpp:397
 msgid "Imitates the effect of surround sound when using headphones."
@@ -11753,7 +11549,7 @@ msgstr ""
 #: modules/gui/macosx/fspanel.m:383
 #, fuzzy
 msgid "(no item is being played)"
-msgstr "디폴트로 플레이 재생목록에 추가"
+msgstr "디폴트로 재생목록에 추가"
 
 #: modules/gui/macosx/interaction.m:130
 #, fuzzy
@@ -11782,7 +11578,7 @@ msgstr ""
 #: modules/gui/macosx/interaction.m:390
 #, fuzzy
 msgid "Clean up"
-msgstr " 클리어 "
+msgstr "메뉴를 클리어 한다"
 
 #: modules/gui/macosx/interaction.m:391
 #, fuzzy
@@ -11895,7 +11691,7 @@ msgstr "볼륨을 내린다"
 #: modules/gui/macosx/intf.m:586 modules/gui/macosx/intf.m:587
 #: modules/gui/macosx/vout.m:195
 msgid "Video Device"
-msgstr "비디오 디바이스"
+msgstr "영상 장치"
 
 #: modules/gui/macosx/intf.m:596
 msgid "Minimize Window"
@@ -11927,7 +11723,7 @@ msgstr "모두를 앞에 두고"
 
 #: modules/gui/macosx/intf.m:609
 msgid "Help"
-msgstr "헬프"
+msgstr "도움말"
 
 #: modules/gui/macosx/intf.m:610
 msgid "ReadMe..."
@@ -11985,7 +11781,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:54
 msgid "Video device"
-msgstr "비디오 디바이스"
+msgstr "영상 장치"
 
 #: modules/gui/macosx/macosx.m:55
 msgid ""
@@ -12285,7 +12081,7 @@ msgstr "작성자"
 #: modules/gui/macosx/playlistinfo.m:63
 #, fuzzy
 msgid "Advanced Information"
-msgstr "고도의 옵션"
+msgstr "고급 선택사항"
 
 #: modules/gui/macosx/playlistinfo.m:81 modules/gui/qt4/ui/input_stats.ui:381
 msgid "Read at media"
@@ -12356,7 +12152,7 @@ msgstr ""
 
 #: modules/gui/macosx/playlist.m:425
 msgid "Save Playlist..."
-msgstr "플레이 재생목록를 보존..."
+msgstr "재생목록 저장..."
 
 #: modules/gui/macosx/playlist.m:428
 msgid "Expand Node"
@@ -12368,30 +12164,26 @@ msgid "Get Stream Information"
 msgstr "버젼 정보의 인쇄"
 
 #: modules/gui/macosx/playlist.m:432
-#, fuzzy
 msgid "Sort Node by Name"
-msgstr "이름으로 소트"
+msgstr ""
 
 #: modules/gui/macosx/playlist.m:433
-#, fuzzy
 msgid "Sort Node by Author"
-msgstr "작성자로 소트(&A)"
+msgstr ""
 
 #: modules/gui/macosx/playlist.m:436 modules/gui/macosx/playlist.m:479
 #: modules/gui/macosx/playlist.m:1381
 #, fuzzy
 msgid "No items in the playlist"
-msgstr "디폴트로 플레이 재생목록에 추가"
+msgstr "디폴트로 재생목록에 추가"
 
 #: modules/gui/macosx/playlist.m:441
-#, fuzzy
 msgid "Search in Playlist"
-msgstr "플레이 재생목록를 연다"
+msgstr "재생목록 검색"
 
 #: modules/gui/macosx/playlist.m:442
-#, fuzzy
 msgid "Add Folder to Playlist"
-msgstr "플레이 재생목록에 추가"
+msgstr "재생목록에 폴더 추가"
 
 #: modules/gui/macosx/playlist.m:444
 #, fuzzy
@@ -12410,16 +12202,16 @@ msgstr ""
 #: modules/gui/macosx/playlist.m:473 modules/gui/macosx/playlist.m:1374
 #, fuzzy, c-format
 msgid "%i items in the playlist"
-msgstr "디폴트로 플레이 재생목록에 추가"
+msgstr "디폴트로 재생목록에 추가"
 
 #: modules/gui/macosx/playlist.m:481 modules/gui/macosx/playlist.m:1385
 #, fuzzy
 msgid "1 item in the playlist"
-msgstr "디폴트로 플레이 재생목록에 추가"
+msgstr "디폴트로 재생목록에 추가"
 
 #: modules/gui/macosx/playlist.m:666
 msgid "Save Playlist"
-msgstr "플레이 재생목록를 보존"
+msgstr "재생목록 저장"
 
 #: modules/gui/macosx/playlist.m:1342
 #, fuzzy
@@ -12433,7 +12225,7 @@ msgstr "구획으로부터 인연 잡기까지의 지오메트리를 지정"
 
 #: modules/gui/macosx/playlist.m:1351
 msgid "Empty Folder"
-msgstr ""
+msgstr "빈 폴더"
 
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:213
@@ -12489,21 +12281,18 @@ msgid "Marquee"
 msgstr ""
 
 #: modules/gui/macosx/sfilters.m:74
-#, fuzzy
 msgid "Save settings"
-msgstr "비디오 필터 설정"
+msgstr "설정 저장"
 
 #: modules/gui/macosx/sfilters.m:76 modules/gui/macosx/sfilters.m:80
 #: modules/gui/macosx/sfilters.m:87
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:399
-#, fuzzy
 msgid "Enabled"
-msgstr "유효"
+msgstr "켜기"
 
 #: modules/gui/macosx/sfilters.m:77
-#, fuzzy
 msgid "Image:"
-msgstr "사이즈"
+msgstr "이미지:"
 
 #: modules/gui/macosx/sfilters.m:78 modules/gui/macosx/sfilters.m:85
 #: modules/gui/macosx/sfilters.m:93
@@ -12765,7 +12554,7 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:195 modules/gui/wxwidgets/streamdata.cpp:99
 #, fuzzy
 msgid "Vorbis is a free audio codec (useable with OGG)"
-msgstr "Vorbis 오디오 디코더"
+msgstr "Vorbis 음성 디코더"
 
 #: modules/gui/macosx/wizard.m:198 modules/gui/wxwidgets/streamdata.cpp:101
 msgid "FLAC is a lossless audio codec (useable with OGG and RAW)"
@@ -12792,9 +12581,8 @@ msgid "MPEG Transport Stream"
 msgstr "스트림의 재생"
 
 #: modules/gui/macosx/wizard.m:238 modules/gui/wxwidgets/streamdata.cpp:150
-#, fuzzy
 msgid "MPEG 1 Format"
-msgstr "VCD 포맷"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:257
 msgid ""
@@ -12929,9 +12717,8 @@ msgstr "넷트워크스트림을 선택한다"
 
 #: modules/gui/macosx/wizard.m:387
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:110
-#, fuzzy
 msgid "Existing playlist item"
-msgstr "플레이 재생목록를 연다"
+msgstr "재생목록에 있는 항목"
 
 #: modules/gui/macosx/wizard.m:388 modules/gui/macosx/wizard.m:453
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:573
@@ -12941,7 +12728,7 @@ msgstr "선택..."
 #: modules/gui/macosx/wizard.m:393 modules/gui/macosx/wizard.m:467
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:614
 msgid "Partial Extract"
-msgstr ""
+msgstr "부분 사용"
 
 #: modules/gui/macosx/wizard.m:395
 msgid ""
@@ -12949,17 +12736,19 @@ msgid ""
 "control the incoming stream (for example, a file or a disc, but not an UDP "
 "network stream.) The starting and ending times can be given in seconds."
 msgstr ""
+"스트림의 일부를 읽어올 때 씁니다. 읽어오는 스트림을 제어할 수 있어야 합니다. "
+"예를 들어, 파일이나 디스크는 되고, UDP 네트워크 스트림은 안 됩니다. 시작과 "
+"끝 시각은 초 단위입니다."
 
 #: modules/gui/macosx/wizard.m:399
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:625
 msgid "From"
-msgstr ""
+msgstr "시작"
 
 #: modules/gui/macosx/wizard.m:400
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:630
-#, fuzzy
 msgid "To"
-msgstr "상"
+msgstr "끝"
 
 #: modules/gui/macosx/wizard.m:404
 #, fuzzy
@@ -13034,7 +12823,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:148
 #, fuzzy
 msgid "Encapsulation format"
-msgstr "출력 포맷"
+msgstr "출력 형식"
 
 #: modules/gui/macosx/wizard.m:433
 msgid ""
@@ -13101,7 +12890,7 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:463
 #, fuzzy
 msgid "Encap. format"
-msgstr "출력 포맷"
+msgstr "출력 형식"
 
 #: modules/gui/macosx/wizard.m:465
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:107
@@ -13188,21 +12977,19 @@ msgid "Finish"
 msgstr "디스크"
 
 #: modules/gui/macosx/wizard.m:1373
-#, fuzzy, c-format
+#, c-format
 msgid "%i items"
-msgstr "비디오 제목"
+msgstr "%i개 항목"
 
 #: modules/gui/macosx/wizard.m:1381 modules/gui/macosx/wizard.m:1435
-#, fuzzy
 msgid "yes"
-msgstr "블루스"
+msgstr "예"
 
 #: modules/gui/macosx/wizard.m:1383 modules/gui/macosx/wizard.m:1393
 #: modules/gui/macosx/wizard.m:1406 modules/gui/macosx/wizard.m:1418
 #: modules/gui/macosx/wizard.m:1438
-#, fuzzy
 msgid "no"
-msgstr "단청의"
+msgstr "아니오"
 
 #: modules/gui/macosx/wizard.m:1389
 #, objc-format
@@ -13327,7 +13114,7 @@ msgstr ""
 #: modules/gui/pda/pda_interface.c:361 modules/gui/pda/pda_interface.c:543
 #: modules/gui/pda/pda_interface.c:869 modules/gui/pda/pda_interface.c:1216
 msgid "Add to Playlist"
-msgstr "플레이 재생목록에 추가"
+msgstr "재생목록에 추가"
 
 #: modules/gui/pda/pda_interface.c:384
 msgid "MRL:"
@@ -13391,23 +13178,22 @@ msgid "Protocol:"
 msgstr "프로토콜:"
 
 #: modules/gui/pda/pda_interface.c:522 modules/gui/pda/pda_interface.c:848
-#, fuzzy
 msgid "Transcode:"
-msgstr "캔슬"
+msgstr ""
 
 #: modules/gui/pda/pda_interface.c:531 modules/gui/pda/pda_interface.c:833
 #: modules/gui/pda/pda_interface.c:857 modules/gui/pda/pda_interface.c:1098
 #: modules/gui/pda/pda_interface.c:1166 modules/gui/pda/pda_interface.c:1173
 msgid "enable"
-msgstr "유효"
+msgstr "켜기"
 
 #: modules/gui/pda/pda_interface.c:575
 msgid "Video:"
-msgstr "비디오:"
+msgstr "영상:"
 
 #: modules/gui/pda/pda_interface.c:584
 msgid "Audio:"
-msgstr "오디오:"
+msgstr "음성:"
 
 #: modules/gui/pda/pda_interface.c:593
 msgid "Channel:"
@@ -13511,7 +13297,7 @@ msgstr "카메라"
 
 #: modules/gui/pda/pda_interface.c:901
 msgid "Video Codec:"
-msgstr "비디오 코덱:"
+msgstr "영상 코덱:"
 
 #: modules/gui/pda/pda_interface.c:918
 msgid "huffyuv"
@@ -13543,12 +13329,12 @@ msgstr "WMV2"
 
 #: modules/gui/pda/pda_interface.c:933
 msgid "Video Bitrate:"
-msgstr "비디오 bit rate:"
+msgstr "영상 bit rate:"
 
 #: modules/gui/pda/pda_interface.c:942
 #, fuzzy
 msgid "Bitrate Tolerance:"
-msgstr "오디오"
+msgstr "음성"
 
 #: modules/gui/pda/pda_interface.c:951
 msgid "Keyframe Interval:"
@@ -13556,7 +13342,7 @@ msgstr "키 프레임 간격:"
 
 #: modules/gui/pda/pda_interface.c:960
 msgid "Audio Codec:"
-msgstr "오디오 코덱"
+msgstr "음성 코덱"
 
 #: modules/gui/pda/pda_interface.c:969
 msgid "Deinterlace:"
@@ -13663,7 +13449,7 @@ msgstr "bits/초"
 
 #: modules/gui/pda/pda_interface.c:1134
 msgid "Audio Bitrate :"
-msgstr "오디오 bit rate :"
+msgstr "음성 bit rate :"
 
 #: modules/gui/pda/pda_interface.c:1157
 msgid "SAP Announce:"
@@ -13728,7 +13514,7 @@ msgstr "픽스맙·파일 %s 가 발견되지 않습니다. "
 #: modules/gui/qnx/qnx.c:44
 #, fuzzy
 msgid "QNX RTOS video and audio output"
-msgstr "오디오 출력을 강제적으로 단청의로 합니다. "
+msgstr "음성 출력을 강제적으로 단청의로 합니다. "
 
 #: modules/gui/qt4/dialogs_provider.cpp:197
 #, fuzzy
@@ -13774,9 +13560,8 @@ msgstr "이전의 Chapter"
 
 #: modules/gui/qt4/main_interface.cpp:609
 #: modules/gui/wxwidgets/input_manager.cpp:225
-#, fuzzy
 msgid "Next track"
-msgstr "비디오"
+msgstr "다음 트랙"
 
 #: modules/gui/qt4/qt4.cpp:47
 #, fuzzy
@@ -13810,7 +13595,7 @@ msgstr "스킨 파일 (*. vlt)|*. vlt|Skin files (*. xml)|*. xml|"
 #: modules/gui/skins2/src/dialogs.cpp:230
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:976
 msgid "Open playlist"
-msgstr "플레이 재생목록를 연다"
+msgstr "재생목록 열기"
 
 #: modules/gui/skins2/src/dialogs.cpp:231
 msgid ""
@@ -13821,7 +13606,7 @@ msgstr ""
 #: modules/gui/skins2/src/dialogs.cpp:240
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:955
 msgid "Save playlist"
-msgstr "플레이 재생목록를 보존"
+msgstr "재생목록 저장"
 
 #: modules/gui/skins2/src/dialogs.cpp:240
 msgid "M3U file|*.m3u|XSPF playlist|*.xspf"
@@ -13962,9 +13747,8 @@ msgid "Choose file"
 msgstr "파일을 선택한다"
 
 #: modules/gui/wince/wince.cpp:55 modules/gui/wxwidgets/wxwidgets.cpp:86
-#, fuzzy
 msgid "Embed video in interface"
-msgstr "인터페이스의 비디오 편입"
+msgstr "인터페이스 안에 영상 포함"
 
 #: modules/gui/wince/wince.cpp:56 modules/gui/wxwidgets/wxwidgets.cpp:87
 msgid ""
@@ -14086,7 +13870,7 @@ msgstr "스트림과 미디어의 정보"
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:83
 #, fuzzy
 msgid "Advanced information"
-msgstr "고도의 옵션"
+msgstr "고급 선택사항"
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:93
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:192
@@ -14119,7 +13903,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:58
 msgid "Playlist item info"
-msgstr "플레이 재생목록 항목 정보"
+msgstr "재생목록 항목 정보"
 
 #: modules/gui/wxwidgets/dialogs/messages.cpp:81
 #, fuzzy
@@ -14133,14 +13917,14 @@ msgstr "메세지..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:257
 msgid "Advanced options..."
-msgstr "고도의 옵션..."
+msgstr "고급 선택사항..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:262
 #: modules/gui/wxwidgets/dialogs/open.cpp:273
 #: modules/gui/wxwidgets/dialogs/open.cpp:418
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:217
 msgid "Advanced options"
-msgstr "고도의 옵션"
+msgstr "고급 선택사항"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:277
 msgid "Options:"
@@ -14191,9 +13975,8 @@ msgid "Use an external subtitles file."
 msgstr "자막 파일을 사용한다"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:641
-#, fuzzy
 msgid "Advanced Settings..."
-msgstr "고도의 옵션..."
+msgstr "고급 선택사항..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:657
 #, fuzzy
@@ -14332,30 +14115,27 @@ msgstr "원본 디렉토리"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:250
 msgid "&Open Playlist..."
-msgstr "플레이 재생목록를 연다(&O)"
+msgstr "재생목록 열기(&O)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:251
 msgid "&Save Playlist..."
-msgstr "플레이 재생목록를 보존(&S)..."
+msgstr "재생목록 저장(&S)..."
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:257
-#, fuzzy
 msgid "Sort by &Title"
-msgstr "제목로 소트(&T)"
+msgstr "제목으로 정렬(&T)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:258
-#, fuzzy
 msgid "&Reverse Sort by Title"
-msgstr "제목로 역소트(&R)"
+msgstr "제목로 역정렬(&R)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:260
-#, fuzzy
 msgid "&Shuffle"
-msgstr "플레이 재생목록를 상훌(&S)"
+msgstr "섞기(&S)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:264
 msgid "D&elete"
-msgstr "삭제(&E)"
+msgstr "지우기(&E)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:271
 msgid "&Manage"
@@ -14363,16 +14143,15 @@ msgstr "관리(&M)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:272
 msgid "S&ort"
-msgstr "소트(&O)"
+msgstr "정렬(&O)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:273
 msgid "&Selection"
 msgstr "선택(&S)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:274
-#, fuzzy
 msgid "&View items"
-msgstr "비디오 제목"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:282
 msgid "Play this Branch"
@@ -14396,7 +14175,7 @@ msgstr "정보"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:287
 #, fuzzy
 msgid "Add Node"
-msgstr "오디오 인코더"
+msgstr "음성 인코더"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:370
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:833
@@ -14409,16 +14188,15 @@ msgstr "루트"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:844
 #, fuzzy, c-format
 msgid "%i items in playlist"
-msgstr "디폴트로 플레이 재생목록에 추가"
+msgstr "디폴트로 재생목록에 추가"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:936
-#, fuzzy
 msgid "XSPF playlist"
-msgstr "플레이 재생목록를 보존"
+msgstr "XSPF 재생목록"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:943
 msgid "Playlist is empty"
-msgstr "플레이 재생목록가 하늘입니다"
+msgstr "재생목록이 비었습니다"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:943
 msgid "Can't save"
@@ -14527,11 +14305,11 @@ msgstr "넷트워크스트림을 선택한다"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:768
 msgid "Video codec"
-msgstr "비디오 코덱"
+msgstr "영상 코덱"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:838
 msgid "Audio codec"
-msgstr "오디오 코덱"
+msgstr "음성 코덱"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:888
 #, fuzzy
@@ -14631,12 +14409,11 @@ msgstr "출력 URL"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:404
 msgid "Loop"
-msgstr "루프"
+msgstr "반복"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:560
-#, fuzzy
 msgid "VLM stream"
-msgstr "스트림의 정지"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:86
 #, fuzzy
@@ -14679,7 +14456,7 @@ msgstr "스트림의 출력처의 선택"
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:113
 #, fuzzy
 msgid "Unable to find playlist"
-msgstr "디폴트로 플레이 재생목록에 추가"
+msgstr "디폴트로 재생목록에 추가"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:115
 msgid ""
@@ -14827,7 +14604,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:270
 msgid "Video Options"
-msgstr "비디오 옵션"
+msgstr "영상 선택사항"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:284
 msgid "Aspect Ratio"
@@ -14926,7 +14703,7 @@ msgstr "종료(&X) \tCtrl-X"
 
 #: modules/gui/wxwidgets/interface.cpp:598
 msgid "&Playlist...\tCtrl-P"
-msgstr "플레이 재생목록(&P)...\tCtrl-P"
+msgstr "재생목록(&P)...\tCtrl-P"
 
 #: modules/gui/wxwidgets/interface.cpp:600
 msgid "&Messages...\tCtrl-M"
@@ -14974,11 +14751,11 @@ msgstr "설정(&S)"
 
 #: modules/gui/wxwidgets/interface.cpp:626
 msgid "&Audio"
-msgstr "오디오(&A)"
+msgstr "음성(&A)"
 
 #: modules/gui/wxwidgets/interface.cpp:627
 msgid "&Video"
-msgstr "비디오(&I)"
+msgstr "영상(&V)"
 
 #: modules/gui/wxwidgets/interface.cpp:628
 msgid "&Navigation"
@@ -14986,34 +14763,32 @@ msgstr "네비게이션(&N)"
 
 #: modules/gui/wxwidgets/interface.cpp:629
 msgid "&Help"
-msgstr "헬프(&H)"
+msgstr "도움말(&H)"
 
 #: modules/gui/wxwidgets/interface.cpp:689
 #: modules/gui/wxwidgets/interface.cpp:700
-#, fuzzy
 msgid "Embedded playlist"
-msgstr "플레이 재생목록를 연다"
+msgstr "내장 재생목록"
 
 #: modules/gui/wxwidgets/interface.cpp:690
 msgid "Previous playlist item"
-msgstr "이전의 플레이 재생목록 항목"
+msgstr "이전의 재생목록 항목"
 
 #: modules/gui/wxwidgets/interface.cpp:691
 msgid "Next playlist item"
-msgstr "다음의 플레이 재생목록 항목 플레이 재생목록를 연다"
+msgstr "다음의 재생목록 항목"
 
 #: modules/gui/wxwidgets/interface.cpp:692
 msgid "Play slower"
-msgstr "슬로우 재생"
+msgstr "느리게"
 
 #: modules/gui/wxwidgets/interface.cpp:693
 msgid "Play faster"
-msgstr "빨리 감기 재생"
+msgstr "빠르게"
 
 #: modules/gui/wxwidgets/interface.cpp:890
-#, fuzzy
 msgid "Extended &GUI\tCtrl-G"
-msgstr "GUI 확장(&E)"
+msgstr "확장 기능(&G)"
 
 #: modules/gui/wxwidgets/interface.cpp:893
 #, fuzzy
@@ -15021,17 +14796,15 @@ msgid "&Bookmarks...\tCtrl-B"
 msgstr "북마크(&B)"
 
 #: modules/gui/wxwidgets/interface.cpp:895
-#, fuzzy
 msgid "Preference&s...\tCtrl-S"
-msgstr "설정..."
+msgstr "설정...(&S)"
 
 #: modules/gui/wxwidgets/interface.cpp:948
-#, fuzzy
 msgid ""
 " (wxWidgets interface)\n"
 "\n"
 msgstr ""
-"(wxWindows 인터페이스) \n"
+"(wxWidgets 인터페이스)\n"
 "\n"
 
 #: modules/gui/wxwidgets/interface.cpp:961
@@ -15088,7 +14861,7 @@ msgstr "설정(&P)..."
 
 #: modules/gui/wxwidgets/menus.cpp:575 modules/gui/wxwidgets/menus.cpp:602
 msgid "Empty"
-msgstr "하늘"
+msgstr "비었음"
 
 #: modules/gui/wxwidgets/streamdata.cpp:31
 msgid "MPEG-1 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
@@ -15202,9 +14975,8 @@ msgid "Use minimal interface, with no toolbar and fewer menus."
 msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:99
-#, fuzzy
 msgid "Size to video"
-msgstr "비디오 줌"
+msgstr "영상 크기에 맞추기"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:100
 msgid "Resize VLC to match the video resolution."
@@ -15390,7 +15162,7 @@ msgstr "게임"
 
 #: modules/meta_engine/id3genres.h:65
 msgid "Sound clip"
-msgstr "오디오 클립 오디오"
+msgstr "음성 클립"
 
 #: modules/meta_engine/id3genres.h:66
 msgid "Gospel"
@@ -15625,7 +15397,7 @@ msgid ""
 "instead of trying to improve performances by using the most efficient one."
 msgstr ""
 "가장 효과적인 것을 사용해 퍼포먼스를 개선하는 대신에, 특정의 색채 포매트를 사"
-"용해 이미지를 작성하기 위해서, 더미의 비디오 출력을 강제적으로 선택해. "
+"용해 이미지를 작성하기 위해서, 더미의 영상 출력을 강제적으로 선택해. "
 
 #: modules/misc/dummy/dummy.c:43
 msgid "Save raw codec data"
@@ -15637,8 +15409,8 @@ msgid ""
 "Save the raw codec data if you have selected/forced the dummy decoder in the "
 "main options."
 msgstr ""
-"오디오 출력의 지연을 설정합니다. 비디오와 음성의 엇갈림이 있는 경우에는, 적절"
-"한 값(을)를 설정할 수 있습니다. "
+"음성 출력의 지연을 설정합니다. 영상과 음성의 엇갈림이 있는 경우에는, 적절한 "
+"값(을)를 설정할 수 있습니다. "
 
 #: modules/misc/dummy/dummy.c:51
 msgid ""
@@ -15680,11 +15452,11 @@ msgstr "더미의 인코더 기능"
 
 #: modules/misc/dummy/dummy.c:87
 msgid "Dummy audio output function"
-msgstr "더미의 오디오 출력 기능 더미의 기능 모듈"
+msgstr "더미의 음성 출력 기능 더미의 기능 모듈"
 
 #: modules/misc/dummy/dummy.c:91
 msgid "Dummy video output function"
-msgstr "더미의 비디오 출력 기능"
+msgstr "더미의 영상 출력 기능"
 
 #: modules/misc/dummy/dummy.c:92
 #, fuzzy
@@ -15705,7 +15477,7 @@ msgstr "폰트"
 #, fuzzy
 msgid "Filename for the font you want to use"
 msgstr ""
-"DVD 안에서 사용하고 싶은 오디오의 채널 번호를 지정합니다. (1으로부터 n까지)"
+"DVD 안에서 사용하고 싶은 음성의 채널 번호를 지정합니다. (1으로부터 n까지)"
 
 #: modules/misc/freetype.c:85 modules/misc/win32text.c:56
 msgid "Font size in pixels"
@@ -15880,21 +15652,21 @@ msgstr "텍스트"
 
 #: modules/misc/logger.c:119
 msgid "Log format"
-msgstr "로그 포맷"
+msgstr "로그 형식"
 
 #: modules/misc/logger.c:121
 #, fuzzy
 msgid ""
 "Specify the log format. Available choices are \"text\" (default), \"html\", "
 "and \"syslog\" (special mode to send to syslog instead of file."
-msgstr "로그·포맷을 지정합니다. \"text\" (디폴트) and \"html\"가 선택 성과. "
+msgstr "로그 형식을 지정합니다. \"text\" (디폴트) and \"html\"가 선택 성과. "
 
 #: modules/misc/logger.c:125
 #, fuzzy
 msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html"
 "\"."
-msgstr "로그·포맷을 지정합니다. \"text\" (디폴트) and \"html\"가 선택 성과. "
+msgstr "로그·형식을 지정합니다. \"text\" (디폴트) and \"html\"가 선택 성과. "
 
 #: modules/misc/logger.c:130
 msgid "Logging"
@@ -15910,14 +15682,12 @@ msgid "Log filename"
 msgstr "로그 파일명"
 
 #: modules/misc/logger.c:137
-#, fuzzy
 msgid "Specify the log filename."
-msgstr "로그·파일명을 지정합니다. "
+msgstr "로그 파일명을 지정합니다. "
 
 #: modules/misc/logger.c:142
-#, fuzzy
 msgid "RRD output file"
-msgstr "출력 포맷"
+msgstr ""
 
 #: modules/misc/logger.c:143
 msgid "Output data for RRDTool in this file."
@@ -16090,7 +15860,7 @@ msgstr "낡은 플레이 재생목록를 export 한다"
 #: modules/misc/playlist/export.c:56
 #, fuzzy
 msgid "XSPF playlist export"
-msgstr "M3U 플레이 재생목록를 export 한다"
+msgstr "M3U 재생목록를 export 한다"
 
 #: modules/misc/probe/hal.c:53 modules/services_discovery/hal.c:84
 #, fuzzy
@@ -16113,9 +15883,8 @@ msgid "Qt Embedded GUI helper"
 msgstr "QT 매입 GUI 헬퍼"
 
 #: modules/misc/qte_main.cpp:184
-#, fuzzy
 msgid "video"
-msgstr "비디오"
+msgstr "영상"
 
 #: modules/misc/rtsp.c:49
 #, fuzzy
@@ -16172,11 +15941,11 @@ msgstr ""
 
 #: modules/misc/testsuite/test1.c:33
 msgid "C module that does nothing"
-msgstr "C모듈(아무것도 하지 않습니다)"
+msgstr "기능 없는 C 모듈"
 
 #: modules/misc/testsuite/test4.c:63
 msgid "Miscellaneous stress tests"
-msgstr "그 외 부하 테스트"
+msgstr "그 외 부하 시험"
 
 #: modules/misc/win32text.c:58
 msgid ""
@@ -16238,16 +16007,16 @@ msgstr ""
 #: modules/mux/asf.c:62
 #, fuzzy
 msgid "ASF muxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/mux/asf.c:540
 msgid "Unknown Video"
-msgstr "불명의 비디오"
+msgstr "알 수 없는 영상"
 
 #: modules/mux/avi.c:43
 #, fuzzy
 msgid "AVI muxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/mux/dummy.c:41
 msgid "Dummy/Raw muxer"
@@ -16293,7 +16062,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:84
 msgid "Video PID"
-msgstr "비디오 PID"
+msgstr "영상 PID"
 
 #: modules/mux/mpeg/ts.c:85
 msgid ""
@@ -16303,7 +16072,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:87
 msgid "Audio PID"
-msgstr "오디오 PID"
+msgstr "음성 PID"
 
 #: modules/mux/mpeg/ts.c:88
 msgid "Assign a fixed PID to the audio stream."
@@ -16450,21 +16219,19 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:150
 msgid "Crypt audio"
-msgstr "암호 오디오 오디오"
+msgstr "음성 변조"
 
 #: modules/mux/mpeg/ts.c:151
 msgid "Crypt audio using CSA"
-msgstr "암호 오디오에 CVS 를 사용한다"
+msgstr "CSA 방식으로 음성을 바꿉니다"
 
 #: modules/mux/mpeg/ts.c:152
-#, fuzzy
 msgid "Crypt video"
-msgstr "암호 오디오 오디오"
+msgstr "영상 변조"
 
 #: modules/mux/mpeg/ts.c:153
-#, fuzzy
 msgid "Crypt video using CSA"
-msgstr "암호 오디오에 CVS 를 사용한다"
+msgstr "CSA 방식으로 영상을 바꿉니다"
 
 #: modules/mux/mpeg/ts.c:155
 msgid "CSA Key"
@@ -16500,28 +16267,26 @@ msgid ""
 msgstr ""
 
 #: modules/mux/mpjpeg.c:52
-#, fuzzy
 msgid "Multipart JPEG muxer"
-msgstr "출력 포맷"
+msgstr ""
 
 #: modules/mux/ogg.c:49
 #, fuzzy
 msgid "Ogg/OGM muxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/mux/wav.c:42
 #, fuzzy
 msgid "WAV muxer"
-msgstr "MPEG 1/2레이어1/2오디오·디코더"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #: modules/packetizer/copy.c:43
 msgid "Copy packetizer"
 msgstr ""
 
 #: modules/packetizer/h264.c:49
-#, fuzzy
 msgid "H.264 video packetizer"
-msgstr "MPEG 1/2비디오·디코더·모듈"
+msgstr ""
 
 #: modules/packetizer/mpeg4audio.c:119
 #, fuzzy
@@ -16529,9 +16294,8 @@ msgid "MPEG4 audio packetizer"
 msgstr "자막·디코더·모듈"
 
 #: modules/packetizer/mpeg4video.c:49
-#, fuzzy
 msgid "MPEG4 video packetizer"
-msgstr "MPEG 1/2비디오·디코더·모듈"
+msgstr ""
 
 #: modules/packetizer/mpegvideo.c:51
 #, fuzzy
@@ -16545,9 +16309,8 @@ msgid ""
 msgstr ""
 
 #: modules/packetizer/mpegvideo.c:65
-#, fuzzy
 msgid "MPEG-I/II video packetizer"
-msgstr "MPEG 1/2비디오·디코더·모듈"
+msgstr ""
 
 #: modules/services_discovery/bonjour.c:52
 msgid "Bonjour services"
@@ -16774,14 +16537,12 @@ msgid "Description stream output"
 msgstr "스트림의 출력처의 선택"
 
 #: modules/stream_out/display.c:39
-#, fuzzy
 msgid "Enable/disable audio rendering."
-msgstr "비디오 렌더링의 유효/무효"
+msgstr ""
 
 #: modules/stream_out/display.c:41
-#, fuzzy
 msgid "Enable/disable video rendering."
-msgstr "비디오 렌더링의 유효/무효"
+msgstr ""
 
 #: modules/stream_out/display.c:43
 msgid "Introduces a delay in the display of the stream."
@@ -16811,7 +16572,7 @@ msgstr "VCD 디바이스의 기정치를 지정합니다. "
 
 #: modules/stream_out/es.c:42
 msgid "Audio output access method"
-msgstr "오디오 출력의 액세스 방법"
+msgstr "음성 출력의 액세스 방법"
 
 #: modules/stream_out/es.c:44
 #, fuzzy
@@ -16820,7 +16581,7 @@ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
 #: modules/stream_out/es.c:45
 msgid "Video output access method"
-msgstr "비디오 출력의 액세스 방법"
+msgstr "영상 출력의 액세스 방법"
 
 #: modules/stream_out/es.c:47
 #, fuzzy
@@ -16830,7 +16591,7 @@ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 #: modules/stream_out/es.c:49 modules/stream_out/standard.c:43
 #, fuzzy
 msgid "Output muxer"
-msgstr "출력 포맷"
+msgstr "출력 형식"
 
 #: modules/stream_out/es.c:51
 #, fuzzy
@@ -16840,7 +16601,7 @@ msgstr "VCD 디바이스의 기정치를 지정합니다. "
 #: modules/stream_out/es.c:52
 #, fuzzy
 msgid "Audio output muxer"
-msgstr "오디오 출력 모듈"
+msgstr "음성 출력 모듈"
 
 #: modules/stream_out/es.c:54
 #, fuzzy
@@ -16848,9 +16609,8 @@ msgid "This is the muxer that will be used for audio."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
 #: modules/stream_out/es.c:55
-#, fuzzy
 msgid "Video output muxer"
-msgstr "비디오 출력 모듈"
+msgstr "영상 출력 muxer"
 
 #: modules/stream_out/es.c:57
 #, fuzzy
@@ -16868,7 +16628,7 @@ msgstr "VCD 디바이스의 기정치를 지정합니다. "
 
 #: modules/stream_out/es.c:62
 msgid "Audio output URL"
-msgstr "오디오 출력 URL"
+msgstr "음성 출력 URL"
 
 #: modules/stream_out/es.c:64
 #, fuzzy
@@ -16877,7 +16637,7 @@ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
 #: modules/stream_out/es.c:65
 msgid "Video output URL"
-msgstr "비디오 출력 URL"
+msgstr "영상 출력 URL"
 
 #: modules/stream_out/es.c:67
 #, fuzzy
@@ -17012,9 +16772,8 @@ msgid ""
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
 #: modules/stream_out/rtp.c:88
-#, fuzzy
 msgid "Video port"
-msgstr "비디오 bit rate"
+msgstr "영상 포트"
 
 #: modules/stream_out/rtp.c:90
 #, fuzzy
@@ -17162,22 +16921,20 @@ msgid "Fixed quantizer scale to use."
 msgstr ""
 
 #: modules/stream_out/switcher.c:102
-#, fuzzy
 msgid "Mute audio"
-msgstr "암호 오디오 오디오"
+msgstr "소리 끄기"
 
 #: modules/stream_out/switcher.c:104
 msgid "Mute audio when command is not 0."
 msgstr ""
 
 #: modules/stream_out/switcher.c:107
-#, fuzzy
 msgid "MPEG2 video switcher stream output"
-msgstr "비디오·스트림의 출력을 유효하게 한다"
+msgstr ""
 
 #: modules/stream_out/transcode.c:51
 msgid "Video encoder"
-msgstr "비디오 인코더"
+msgstr "영상 인코더"
 
 #: modules/stream_out/transcode.c:53
 #, fuzzy
@@ -17198,7 +16955,7 @@ msgstr "DVD 디바이스의 기정치를 설정합니다. "
 
 #: modules/stream_out/transcode.c:58
 msgid "Video bitrate"
-msgstr "비디오 bit rate"
+msgstr "영상 bitrate"
 
 #: modules/stream_out/transcode.c:60
 #, fuzzy
@@ -17215,9 +16972,8 @@ msgid "Scale factor to apply to the video while transcoding (eg: 0.25)"
 msgstr ""
 
 #: modules/stream_out/transcode.c:64
-#, fuzzy
 msgid "Video frame-rate"
-msgstr "비디오 bit rate"
+msgstr ""
 
 #: modules/stream_out/transcode.c:66
 #, fuzzy
@@ -17235,29 +16991,24 @@ msgid "Specify the deinterlace module to use."
 msgstr "noninterplace화 모드"
 
 #: modules/stream_out/transcode.c:79
-#, fuzzy
 msgid "Maximum video width"
-msgstr "비디오의 폭"
+msgstr "영상 최대 너비"
 
 #: modules/stream_out/transcode.c:81
-#, fuzzy
 msgid "Maximum output video width."
-msgstr "비디오의 폭"
+msgstr "출력되는 영상의 최대 너비."
 
 #: modules/stream_out/transcode.c:82
-#, fuzzy
 msgid "Maximum video height"
-msgstr "비디오의 높이"
+msgstr "영상 최대 높이"
 
 #: modules/stream_out/transcode.c:84
-#, fuzzy
 msgid "Maximum output video height."
-msgstr "비디오의 높이"
+msgstr "출력되는 영상의 최대 높이."
 
 #: modules/stream_out/transcode.c:85
-#, fuzzy
 msgid "Video filter"
-msgstr "비디오 제목"
+msgstr "영상 필터"
 
 #: modules/stream_out/transcode.c:87
 msgid ""
@@ -17293,9 +17044,8 @@ msgid "Number of pixels to crop at the bottom of the video."
 msgstr ""
 
 #: modules/stream_out/transcode.c:99
-#, fuzzy
 msgid "Video crop (right)"
-msgstr "비디오의 높이"
+msgstr ""
 
 #: modules/stream_out/transcode.c:101
 msgid "Number of pixels to crop at the right of the video."
@@ -17329,27 +17079,24 @@ msgid "Size of the black border to add at the bottom of the video."
 msgstr ""
 
 #: modules/stream_out/transcode.c:112
-#, fuzzy
 msgid "Video padding (right)"
-msgstr "비디오의 높이"
+msgstr ""
 
 #: modules/stream_out/transcode.c:114
 msgid "Size of the black border to add at the right of the video."
 msgstr ""
 
 #: modules/stream_out/transcode.c:116
-#, fuzzy
 msgid "Video canvas width"
-msgstr "비디오의 폭"
+msgstr ""
 
 #: modules/stream_out/transcode.c:118
 msgid "This will automatically crod and pad the video to a specified width."
 msgstr ""
 
 #: modules/stream_out/transcode.c:119
-#, fuzzy
 msgid "Video canvas height"
-msgstr "비디오의 높이"
+msgstr ""
 
 #: modules/stream_out/transcode.c:121
 msgid "This will automatically crod and pad the video to a specified height."
@@ -17368,7 +17115,7 @@ msgstr ""
 
 #: modules/stream_out/transcode.c:127
 msgid "Audio encoder"
-msgstr "오디오 인코더"
+msgstr "음성 인코더"
 
 #: modules/stream_out/transcode.c:129
 #, fuzzy
@@ -17389,7 +17136,7 @@ msgstr "VCD 디바이스의 기정치를 지정합니다. "
 
 #: modules/stream_out/transcode.c:134
 msgid "Audio bitrate"
-msgstr "오디오 bit rate"
+msgstr "음성 bit rate"
 
 #: modules/stream_out/transcode.c:136
 #, fuzzy
@@ -17407,7 +17154,7 @@ msgstr ""
 
 #: modules/stream_out/transcode.c:140
 msgid "Audio channels"
-msgstr "오디오 채널수"
+msgstr "음성 채널수"
 
 #: modules/stream_out/transcode.c:142
 msgid "Number of audio channels in the transcoded streams."
@@ -17416,7 +17163,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:143
 #, fuzzy
 msgid "Audio filter"
-msgstr "오디오 필터"
+msgstr "음성 필터"
 
 #: modules/stream_out/transcode.c:145
 msgid ""
@@ -17444,7 +17191,7 @@ msgstr "송신지의 어스펙트·레시오"
 #: modules/stream_out/transcode.c:154
 #, fuzzy
 msgid "This is the subtitles codec that will be used."
-msgstr "DVD 디바이스의 기정치를 설정합니다. "
+msgstr "VCD 디바이스의 기정치를 지정합니다. "
 
 #: modules/stream_out/transcode.c:158
 msgid ""
@@ -17509,9 +17256,8 @@ msgid "Overlays/Subtitles"
 msgstr "자막을 연다"
 
 #: modules/stream_out/transrate/transrate.c:58
-#, fuzzy
 msgid "MPEG2 video transrating stream output"
-msgstr "비디오·스트림의 출력을 유효하게 한다"
+msgstr ""
 
 #: modules/video_chroma/i420_rgb.c:67
 #, fuzzy
@@ -17599,23 +17345,20 @@ msgid "Image adjust"
 msgstr ""
 
 #: modules/video_filter/blend.c:67
-#, fuzzy
 msgid "Video pictures blending"
-msgstr "비디오 필터 설정"
+msgstr ""
 
 #: modules/video_filter/clone.c:55
 msgid "Number of clones"
-msgstr "클론의 수"
+msgstr "복제 갯수"
 
 #: modules/video_filter/clone.c:56
-#, fuzzy
 msgid "Number of video windows in which to clone the video."
-msgstr "비디오를 클론 하기 위해서 비디오·윈도우수를 선택한다"
+msgstr "영상을 복제할 창의 갯수."
 
 #: modules/video_filter/clone.c:59
-#, fuzzy
 msgid "Video output modules"
-msgstr "비디오 출력 모듈"
+msgstr "영상 출력 모듈"
 
 #: modules/video_filter/clone.c:60
 msgid ""
@@ -17624,9 +17367,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/clone.c:64
-#, fuzzy
 msgid "Clone video filter"
-msgstr "이미지·클론·비디오·모듈"
+msgstr ""
 
 #: modules/video_filter/clone.c:66
 #, fuzzy
@@ -17745,9 +17487,8 @@ msgid "Maximum luminance to consider a pixel as black (0-255)."
 msgstr ""
 
 #: modules/video_filter/crop.c:101
-#, fuzzy
 msgid "Crop video filter"
-msgstr "비디오·필터·모듈"
+msgstr ""
 
 #: modules/video_filter/crop.c:378 modules/video_filter/crop.c:470
 #, fuzzy
@@ -17755,9 +17496,8 @@ msgid "Cropping failed"
 msgstr "비디오·필터·모듈"
 
 #: modules/video_filter/crop.c:379 modules/video_filter/crop.c:471
-#, fuzzy
 msgid "VLC could not open the video output module."
-msgstr "비디오 출력 모듈"
+msgstr "영상 출력 모듈을 못 열었습니다."
 
 #: modules/video_filter/deinterlace.c:108 modules/video_output/x11/xvmc.c:127
 msgid "Deinterlace mode"
@@ -17779,9 +17519,8 @@ msgid "Deinterlace method to use for streaming."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
 #: modules/video_filter/deinterlace.c:121
-#, fuzzy
 msgid "Deinterlacing video filter"
-msgstr "비디오 역전 모듈"
+msgstr ""
 
 #: modules/video_filter/extract.c:54
 msgid "RGB component to extract"
@@ -17845,9 +17584,8 @@ msgid "Gradient video filter"
 msgstr "비디오 역전 모듈"
 
 #: modules/video_filter/invert.c:47
-#, fuzzy
 msgid "Invert video filter"
-msgstr "비디오 역전 모듈"
+msgstr "영상 역상 모듈"
 
 #: modules/video_filter/invert.c:48
 #, fuzzy
@@ -17883,18 +17621,16 @@ msgid "Individual image display time of 0 - 60000 ms."
 msgstr ""
 
 #: modules/video_filter/logo.c:78 modules/video_filter/osdmenu.c:49
-#, fuzzy
 msgid "X coordinate"
-msgstr "비디오 y 코디네이터"
+msgstr ""
 
 #: modules/video_filter/logo.c:79
 msgid "X coordinate of the logo. You can move the logo by left-clicking it."
 msgstr ""
 
 #: modules/video_filter/logo.c:81 modules/video_filter/osdmenu.c:52
-#, fuzzy
 msgid "Y coordinate"
-msgstr "비디오 y 코디네이터"
+msgstr ""
 
 #: modules/video_filter/logo.c:82
 msgid "Y coordinate of the logo. You can move the logo by left-clicking it."
@@ -17923,22 +17659,20 @@ msgstr ""
 
 #: modules/video_filter/logo.c:101
 msgid "Logo video filter"
-msgstr "로고 비디오 필터"
+msgstr "로고 영상 필터"
 
 #: modules/video_filter/logo.c:103
 #, fuzzy
 msgid "Logo overlay"
-msgstr "로그 포맷"
+msgstr "로그 형식"
 
 #: modules/video_filter/logo.c:124
-#, fuzzy
 msgid "Logo sub filter"
-msgstr "로고 비디오 필터"
+msgstr ""
 
 #: modules/video_filter/magnify.c:59
-#, fuzzy
 msgid "Magnify/Zoom interactive video filter"
-msgstr "비디오 역전 모듈"
+msgstr ""
 
 #: modules/video_filter/marq.c:82
 msgid ""
@@ -18065,7 +17799,7 @@ msgstr ""
 #: modules/video_filter/mosaic.c:108
 #, fuzzy
 msgid "Border width"
-msgstr "비디오의 폭"
+msgstr "영상 너비"
 
 #: modules/video_filter/mosaic.c:109
 msgid "Width in pixels of the border between miniatures."
@@ -18074,7 +17808,7 @@ msgstr ""
 #: modules/video_filter/mosaic.c:110
 #, fuzzy
 msgid "Border height"
-msgstr "비디오의 높이"
+msgstr "영상 높이"
 
 #: modules/video_filter/mosaic.c:111
 msgid "Height in pixels of the border between miniatures."
@@ -18205,7 +17939,7 @@ msgstr ""
 #: modules/video_filter/mosaic.c:166
 #, fuzzy
 msgid "Bluescreen U tolerance"
-msgstr "오디오"
+msgstr "음성"
 
 #: modules/video_filter/mosaic.c:167
 msgid ""
@@ -18216,7 +17950,7 @@ msgstr ""
 #: modules/video_filter/mosaic.c:170
 #, fuzzy
 msgid "Bluescreen V tolerance"
-msgstr "오디오"
+msgstr "음성"
 
 #: modules/video_filter/mosaic.c:171
 msgid ""
@@ -18235,19 +17969,16 @@ msgid "offsets"
 msgstr "시간 오프셋(offset)"
 
 #: modules/video_filter/mosaic.c:187
-#, fuzzy
 msgid "Mosaic video sub filter"
-msgstr "비디오·필터·모듈"
+msgstr ""
 
 #: modules/video_filter/mosaic.c:188
-#, fuzzy
 msgid "Mosaic"
-msgstr "뮤지컬"
+msgstr "모자이크"
 
 #: modules/video_filter/motionblur.c:48
-#, fuzzy
 msgid "Blur factor (1-127)"
-msgstr "퇴색하게 하는 요소"
+msgstr "흐린 정도 (1-127)"
 
 #: modules/video_filter/motionblur.c:49
 #, fuzzy
@@ -18265,9 +17996,8 @@ msgid "Motion blur filter"
 msgstr "모션을 퇴색하게 하는 필터"
 
 #: modules/video_filter/motiondetect.c:54
-#, fuzzy
 msgid "Motion detect video filter"
-msgstr "이미지·클론·비디오·모듈"
+msgstr ""
 
 #: modules/video_filter/motiondetect.c:55
 #, fuzzy
@@ -18851,14 +18581,12 @@ msgid "Video transformation filter"
 msgstr "이미지 변환 모듈"
 
 #: modules/video_filter/wall.c:54
-#, fuzzy
 msgid "Number of horizontal windows in which to split the video."
-msgstr "비디오에 분할하는 수평 방향의 비디오·윈도우수"
+msgstr "분할하는 수평 방향의 영상·윈도우수"
 
 #: modules/video_filter/wall.c:58
-#, fuzzy
 msgid "Number of vertical windows in which to split the video."
-msgstr "비디오에 분할하는 수직 방향의 비디오·윈도우수"
+msgstr "분할하는 수직 방향의 영상·윈도우수"
 
 #: modules/video_filter/wall.c:62
 #, fuzzy
@@ -18875,9 +18603,8 @@ msgid "Aspect ratio of the individual displays building the wall."
 msgstr ""
 
 #: modules/video_filter/wall.c:70
-#, fuzzy
 msgid "Wall video filter"
-msgstr "비디오·필터·모듈"
+msgstr ""
 
 #: modules/video_filter/wall.c:71
 #, fuzzy
@@ -18894,14 +18621,12 @@ msgid "ASCII Art"
 msgstr ""
 
 #: modules/video_output/aa.c:58
-#, fuzzy
 msgid "ASCII-art video output"
-msgstr "ASCII 아트·비디오 출력 모듈"
+msgstr "ASCII 아트 영상 출력"
 
 #: modules/video_output/caca.c:81
-#, fuzzy
 msgid "Color ASCII art video output"
-msgstr "ASCII 아트·비디오 출력 모듈"
+msgstr "색상 ASCII 아트 영상 출력"
 
 #: modules/video_output/directfb.c:69
 msgid "DirectFB video output http://www.directfb.org/"
@@ -18910,7 +18635,7 @@ msgstr ""
 #: modules/video_output/directx/direct3d.c:106
 #, fuzzy
 msgid "DirectX 3D video output"
-msgstr "DirectX 비디오·모듈"
+msgstr "DirectX 3D 영상 출력"
 
 #: modules/video_output/directx/directx.c:128
 #, fuzzy
@@ -18927,9 +18652,8 @@ msgstr ""
 "무슨 효과도 없습니다. "
 
 #: modules/video_output/directx/directx.c:133
-#, fuzzy
 msgid "Use video buffers in system memory"
-msgstr "시스템메모리중의 비디오 버퍼를 사용한다"
+msgstr "시스템메모리중의 영상 버퍼를 사용한다"
 
 #: modules/video_output/directx/directx.c:135
 #, fuzzy
@@ -18939,7 +18663,7 @@ msgid ""
 "hardware acceleration (like rescaling or YUV->RGB conversions). This option "
 "doesn't have any effect when using overlays."
 msgstr ""
-"비데오메모리의 대신에 시스템메모리중에 비디오 버퍼를 작성합니다. 비데오메모리"
+"비데오메모리의 대신에 시스템메모리중에 영상 버퍼를 작성합니다. 비데오메모리"
 "를 사용한 하드웨어·가속화에 의한 효과를 유효하게 하기 위한(해), 이옵션은 추"
 "천 하지 않습니다. (리스케이링이나 YUV->RGB 변환) 오버레이를 사용한다경우에는 "
 "무슨 효과도 없습니다. "
@@ -18977,9 +18701,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/directx/directx.c:179
-#, fuzzy
 msgid "DirectX video output"
-msgstr "DirectX 비디오·모듈"
+msgstr "DirectX 영상 출력"
 
 #: modules/video_output/directx/directx.c:319
 #, fuzzy
@@ -18987,13 +18710,12 @@ msgid "Wallpaper"
 msgstr "매우 작다"
 
 #: modules/video_output/directx/glwin32.c:65 modules/video_output/opengl.c:183
-#, fuzzy
 msgid "OpenGL video output"
-msgstr "오버레이 비디오 출력"
+msgstr "OpenGL 영상 출력"
 
 #: modules/video_output/fb.c:67
 msgid "Framebuffer device"
-msgstr "frame buffer 디바이스"
+msgstr "Framebuffer 장치"
 
 #: modules/video_output/fb.c:69
 msgid "Framebuffer device to use for rendering (usually /dev/fb0)."
@@ -19027,12 +18749,12 @@ msgstr "풀 스크린 출력"
 #: modules/video_output/hd1000v.cpp:57
 #, fuzzy
 msgid "HD1000 video output"
-msgstr "HD1000 오디오 출력"
+msgstr "HD1000 음성 출력"
 
 #: modules/video_output/image.c:49
 #, fuzzy
 msgid "Image format"
-msgstr "로그 포맷"
+msgstr "로그 형식"
 
 #: modules/video_output/image.c:50
 #, fuzzy
@@ -19042,30 +18764,23 @@ msgstr "스트림을 안내한다"
 #: modules/video_output/image.c:52
 #, fuzzy
 msgid "Image width"
-msgstr "사이즈"
+msgstr "크다"
 
 #: modules/video_output/image.c:53
-#, fuzzy
 msgid ""
 "You can enforce the image width. By default (-1) VLC will adapt to the video "
 "characteristics."
 msgstr ""
-"비디오의 폭을 강제적으로 지정할 수가 있습니다. \n"
-"※VLC는 디폴트로 비디오의 특성에 맞춥니다. "
 
 #: modules/video_output/image.c:57
-#, fuzzy
 msgid "Image height"
-msgstr "비디오의 높이"
+msgstr ""
 
 #: modules/video_output/image.c:58
-#, fuzzy
 msgid ""
 "You can enforce the image height. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"비디오의 높이를 강제적으로 지정할 수가 있습니다. \n"
-"※VLC는 디폴트로 비디오의 특성에 맞춥니다. "
 
 #: modules/video_output/image.c:62
 msgid "Recording ratio"
@@ -19098,14 +18813,12 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/image.c:81
-#, fuzzy
 msgid "Image video output"
-msgstr "X11 비디오 출력"
+msgstr "파일로 영상 출력"
 
 #: modules/video_output/mga.c:59
-#, fuzzy
 msgid "Matrox Graphic Array video output"
-msgstr "Matrox 그래픽·어레이·비디오·모듈"
+msgstr ""
 
 #: modules/video_output/opengl.c:122 modules/video_output/opengl.c:176
 msgid "Cube"
@@ -19121,8 +18834,9 @@ msgid "Cylinder"
 msgstr "리니어"
 
 #: modules/video_output/opengl.c:123
+#, fuzzy
 msgid "Torus"
-msgstr ""
+msgstr "하우스"
 
 #: modules/video_output/opengl.c:123
 #, fuzzy
@@ -19286,14 +19000,12 @@ msgid "SVGAlib video output"
 msgstr "오버레이"
 
 #: modules/video_output/wingdi.c:221
-#, fuzzy
 msgid "Windows GAPI video output"
-msgstr "비디오 출력 모듈"
+msgstr ""
 
 #: modules/video_output/wingdi.c:225
-#, fuzzy
 msgid "Windows GDI video output"
-msgstr "비디오 출력 모듈"
+msgstr ""
 
 #: modules/video_output/x11/glx.c:87 modules/video_output/x11/xvideo.c:44
 msgid "XVideo adaptor number"
@@ -19325,12 +19037,9 @@ msgid ""
 "2) Completely bypass the window manager, but then nothing will be able to "
 "show on top of the video."
 msgstr ""
-"풀 스크린·윈도우로 하려면  2개의 방법이 있습니다. 공교롭게도 모두 결점(이)가 "
-"있습니다. \n"
-"1) 윈도우·매니저가 제어하는 풀 스크린·모드 \n"
-"   태스크바가 비디오 위에 표시되어 버립니다. \n"
-"2) 완전하게 윈도우·매니저를 우회도로 하는 풀 스크린·모드 \n"
-"   비디오 위에 아무것도 표시되지 않습니다. "
+"전체화면을 쓰려면 두 가지 방법이 있습니다. 공교롭게도 모두 단점이 있습니다.\n"
+"1) 창 관리자가 제어하면 태스크바가 영상 위에 나옵니다. \n"
+"2) 창 관리자를 거치지 않으면 영상 위에 아무 것도 나올 수 없습니다. \n"
 
 #: modules/video_output/x11/glx.c:103 modules/video_output/x11/x11.c:54
 #: modules/video_output/x11/xvideo.c:60
@@ -19344,9 +19053,8 @@ msgstr ""
 
 #: modules/video_output/x11/glx.c:106 modules/video_output/x11/x11.c:61
 #: modules/video_output/x11/xvideo.c:72
-#, fuzzy
 msgid "Screen for fullscreen mode."
-msgstr "전화면 표시의 변환"
+msgstr "전체화면 전환시 화면 번호"
 
 #: modules/video_output/x11/glx.c:108 modules/video_output/x11/x11.c:63
 #: modules/video_output/x11/xvideo.c:74
@@ -19354,6 +19062,8 @@ msgid ""
 "Screen to use in fullscreen mode. For instance set it to 0 for first screen, "
 "1 for the second."
 msgstr ""
+"전체화면 상태에서 쓸 화면입니다. 이를 테면 첫째 화면은 0번, 둘째 화면은 1번입"
+"니다."
 
 #: modules/video_output/x11/glx.c:115
 msgid "OpenGL(GLX) provider"
@@ -19372,9 +19082,8 @@ msgid "Use shared memory to communicate between VLC and the X server."
 msgstr "공유 메모리를 VLC와 X서버의 통신을 위해서(때문에) 사용합니다. "
 
 #: modules/video_output/x11/x11.c:78
-#, fuzzy
 msgid "X11 video output"
-msgstr "X11 비디오 출력"
+msgstr "X11 영상 출력"
 
 #: modules/video_output/x11/xvideo.c:46
 #, fuzzy
@@ -19387,7 +19096,7 @@ msgstr ""
 
 #: modules/video_output/x11/xvideo.c:63 modules/video_output/x11/xvmc.c:113
 msgid "XVimage chroma format"
-msgstr "XVimage 색채 포맷"
+msgstr "XVimage 색채 형식"
 
 #: modules/video_output/x11/xvideo.c:65 modules/video_output/x11/xvmc.c:115
 #, fuzzy
@@ -19558,9 +19267,8 @@ msgid "Enable the \"flat\" spectrum analyzer in the spectrometer."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:73
-#, fuzzy
 msgid "Enable bands"
-msgstr "오디오를 유효하게 한다"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:75
 msgid "Draw bands in the spectrometer."
@@ -19593,9 +19301,8 @@ msgid "Determines how many sections of spectrum will exist."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:89
-#, fuzzy
 msgid "Peak height"
-msgstr "비디오의 높이"
+msgstr ""
 
 #: modules/visualization/visual/visual.c:91
 #, fuzzy
@@ -19641,383 +19348,8 @@ msgstr "시각화 필터"
 msgid "Spectrum analyser"
 msgstr "스펙트럼"
 
-#, fuzzy
-#~ msgid "Description file"
-#~ msgstr "설명"
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32<->float32 conversion"
-#~ msgstr "fixed32<->float32 변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32->s16 conversion"
-#~ msgstr "fixed32->s16 변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s16 conversion"
-#~ msgstr "float32->s16 변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s8 conversion"
-#~ msgstr "float32->s8변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u16 conversion"
-#~ msgstr "float32->u16 변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u8 conversion"
-#~ msgstr "float32->u8변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->fixed32 conversion"
-#~ msgstr "s16->float32 변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 conversion"
-#~ msgstr "s16->float32 변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 with endianness conversion"
-#~ msgstr "s16->float32 변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for s8->float32 conversion"
-#~ msgstr "s16->float32 변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->fixed32 conversion"
-#~ msgstr "fixed32->s16 변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->float32 conversion"
-#~ msgstr "s16->float32 변환을 위한 오디오·필터"
-
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "디스크 타입"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "브라우즈..."
-
-#, fuzzy
-#~ msgid "Big"
-#~ msgstr "휘도"
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "설정"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "오디오 필터"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "미디어"
-
-#, fuzzy
-#~ msgid "Never download"
-#~ msgstr "디바이스명"
-
-#, fuzzy
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "IPv4 네트워크 추상 레이어"
-
-#, fuzzy
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "IPv6 네트워크 추상 레이어"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "다음"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "휘도"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "스펙트럼"
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr "캐릭터 라인"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "평가"
-
-#, fuzzy
-#~ msgid "QPushButton"
-#~ msgstr "작성자"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "리니어"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "oldies"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "버젼 정보의 인쇄"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "그룹"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "유효"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "유효"
-
-#, fuzzy
-#~ msgid "horizontalLayout_3"
-#~ msgstr "수평"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "디스크"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "심볼·레이트"
-
-#, fuzzy
-#~ msgid "Playlist stress tests"
-#~ msgstr "플레이 재생목록가 하늘입니다"
-
-#, fuzzy
-#~ msgid "DAAP access"
-#~ msgstr "액세스:"
-
-#~ msgid " to "
-#~ msgstr " 처 "
-
-#, fuzzy
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
-
-#, fuzzy
-#~ msgid "Errors"
-#~ msgstr "에러"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "버젼 정보의 인쇄"
-
-#, fuzzy
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
-
-#, fuzzy
-#~ msgid "Justification"
-#~ msgstr "이 어플리케이션에 대해"
-
-#, fuzzy
-#~ msgid "Growl"
-#~ msgstr "그룹"
-
-#, fuzzy
-#~ msgid "Vertical border width"
-#~ msgstr "수직 오프셋(offset)"
-
-#, fuzzy
-#~ msgid "Horizontal border width"
-#~ msgstr "수평"
-
-#, fuzzy
-#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
-#~ msgstr ""
-#~ "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
-
-#, fuzzy
-#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
-#~ msgstr ""
-#~ "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
-
-#, fuzzy
-#~ msgid "| time-position #. . . . . . . . relative position"
-#~ msgstr ""
-#~ "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
-
-#, fuzzy
-#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
-#~ msgstr ""
-#~ "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
-
-#, fuzzy
-#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
-#~ msgstr ""
-#~ "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
-
-#, fuzzy
-#~ msgid "| time-size # . . . . . . . . font size, in pixels"
-#~ msgstr ""
-#~ "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "오디오 디바이스명"
-
-#, fuzzy
-#~ msgid "Audioscrobbler password"
-#~ msgstr "FTP 패스워드"
-
-#, fuzzy
-#~ msgid "Time overlay"
-#~ msgstr "수직 오프셋(offset)"
-
-#, fuzzy
-#~ msgid "Corba control"
-#~ msgstr "컨트롤"
-
-#, fuzzy
-#~ msgid "corba control module"
-#~ msgstr "자막·디코더·모듈"
-
-#, fuzzy
-#~ msgid "Crop borders in fullscreen"
-#~ msgstr "전화면 표시의 변환"
-
-#~ msgid "Standard Play"
-#~ msgstr "표준 재생"
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "설정..."
-
-#, fuzzy
-#~ msgid "Filters (v2)"
-#~ msgstr "필터"
-
 #~ msgid "Video filters settings"
-#~ msgstr "비디오 필터 설정"
-
-#, fuzzy
-#~ msgid "Yes"
-#~ msgstr "블루스"
-
-#, fuzzy
-#~ msgid "No"
-#~ msgstr "없음"
-
-#, fuzzy
-#~ msgid ""
-#~ "An error has occurred which probably prevented the proper execution of "
-#~ "the program:"
-#~ msgstr "요구된 처리의 실행으로 에러가 발생했습니다 :"
-
-#, fuzzy
-#~ msgid "If you believe that it is a bug, please follow the instructions at:"
-#~ msgstr "만약, 버그이다고 생각된다면, 이하의 순서에 따라 주세요 :"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "메세지 윈도우를 표시"
-
-#~ msgid "Dismiss"
-#~ msgstr "재시도"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "루프"
-
-#, fuzzy
-#~ msgid "Podcast Link"
-#~ msgstr "위치"
-
-#, fuzzy
-#~ msgid "Podcast Copyright"
-#~ msgstr "저작권"
-
-#, fuzzy
-#~ msgid "Podcast Category"
-#~ msgstr "CDDB 디스크 카테고리"
-
-#, fuzzy
-#~ msgid "Podcast Subtitle"
-#~ msgstr "자막"
-
-#, fuzzy
-#~ msgid "Podcast Publication Date"
-#~ msgstr "모듈레이션 타입"
-
-#, fuzzy
-#~ msgid "Podcast Author"
-#~ msgstr "작성자"
-
-#, fuzzy
-#~ msgid "Podcast Subcategory"
-#~ msgstr "CDDB 디스크 카테고리"
-
-#, fuzzy
-#~ msgid "Podcast Duration"
-#~ msgstr "지속 기간"
-
-#, fuzzy
-#~ msgid "Dummy video filter"
-#~ msgstr "비디오·필터·모듈"
-
-#, fuzzy
-#~ msgid "Playlist metademux"
-#~ msgstr "플레이 재생목록를 연다"
-
-#, fuzzy
-#~ msgid "Native playlist import"
-#~ msgstr "플레이 재생목록를 연다"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "디스크 타입"
-
-#, fuzzy
-#~ msgid "Listeners"
-#~ msgstr "리니어"
-
-#, fuzzy
-#~ msgid "Center-Center"
-#~ msgstr "중앙"
-
-#, fuzzy
-#~ msgid "Left-Center"
-#~ msgstr "중앙"
-
-#, fuzzy
-#~ msgid "Right-Center"
-#~ msgstr "중앙"
-
-#, fuzzy
-#~ msgid "Center-Top"
-#~ msgstr "중앙"
-
-#, fuzzy
-#~ msgid "Left-Top"
-#~ msgstr "왼쪽"
-
-#, fuzzy
-#~ msgid "Right-Top"
-#~ msgstr "오른쪽"
-
-#, fuzzy
-#~ msgid "Center-Bottom"
-#~ msgstr "중앙"
-
-#, fuzzy
-#~ msgid "Left-Bottom"
-#~ msgstr "하"
-
-#, fuzzy
-#~ msgid "Right-Bottom"
-#~ msgstr "하"
-
-#~ msgid "M3U file"
-#~ msgstr "M3U 파일"
+#~ msgstr "영상 필터 설정"
 
 #, fuzzy
 #~ msgid "CDDB Artist"
@@ -20067,8 +19399,116 @@ msgstr "스펙트럼"
 #~ msgstr "음량 설정"
 
 #, fuzzy
+#~ msgid "Errors"
+#~ msgstr "에러"
+
+#, fuzzy
+#~ msgid "Login"
+#~ msgstr "루프"
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "제어"
+
+#, fuzzy
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "리모트·컨트롤·인터페이스·모듈"
+
+#, fuzzy
 #~ msgid "By category"
 #~ msgstr "CDDB 디스크 카테고리"
+
+#, fuzzy
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32<->float32 conversion"
+#~ msgstr "fixed32<->float32 변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32->s16 conversion"
+#~ msgstr "fixed32->s16 변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s16 conversion"
+#~ msgstr "float32->s16 변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s8 conversion"
+#~ msgstr "float32->s8변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u16 conversion"
+#~ msgstr "float32->u16 변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u8 conversion"
+#~ msgstr "float32->u8변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->fixed32 conversion"
+#~ msgstr "s16->float32 변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 conversion"
+#~ msgstr "s16->float32 변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 with endianness conversion"
+#~ msgstr "s16->float32 변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for s8->float32 conversion"
+#~ msgstr "s16->float32 변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->fixed32 conversion"
+#~ msgstr "fixed32->s16 변환을 위한 음성·필터"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->float32 conversion"
+#~ msgstr "s16->float32 변환을 위한 음성·필터"
+
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Linux OSS 음성 출력"
+
+#, fuzzy
+#~ msgid "Corba control"
+#~ msgstr "컨트롤"
+
+#, fuzzy
+#~ msgid "corba control module"
+#~ msgstr "자막·디코더·모듈"
+
+#, fuzzy
+#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
+#~ msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
+
+#, fuzzy
+#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
+#~ msgstr ""
+#~ "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
+
+#, fuzzy
+#~ msgid "| time-position #. . . . . . . . relative position"
+#~ msgstr ""
+#~ "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
+
+#, fuzzy
+#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
+#~ msgstr ""
+#~ "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
+
+#, fuzzy
+#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
+#~ msgstr ""
+#~ "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
+
+#, fuzzy
+#~ msgid "| time-size # . . . . . . . . font size, in pixels"
+#~ msgstr ""
+#~ "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
 #~ msgid "Segment filename"
 #~ msgstr "분할 파일명"
@@ -20082,20 +19522,204 @@ msgstr "스펙트럼"
 #~ msgstr "수직 방향 위치"
 
 #, fuzzy
+#~ msgid "Listeners"
+#~ msgstr "리니어"
+
+#, fuzzy
+#~ msgid "Podcast Link"
+#~ msgstr "위치"
+
+#, fuzzy
+#~ msgid "Podcast Copyright"
+#~ msgstr "저작권"
+
+#, fuzzy
+#~ msgid "Podcast Category"
+#~ msgstr "CDDB 디스크 카테고리"
+
+#, fuzzy
+#~ msgid "Podcast Subtitle"
+#~ msgstr "자막"
+
+#, fuzzy
+#~ msgid "Podcast Publication Date"
+#~ msgstr "모듈레이션 타입"
+
+#, fuzzy
+#~ msgid "Podcast Author"
+#~ msgstr "작성자"
+
+#, fuzzy
+#~ msgid "Podcast Subcategory"
+#~ msgstr "CDDB 디스크 카테고리"
+
+#, fuzzy
+#~ msgid "Podcast Duration"
+#~ msgstr "지속 기간"
+
+#, fuzzy
+#~ msgid "Mime type"
+#~ msgstr "디스크 타입"
+
+#, fuzzy
+#~ msgid "Yes"
+#~ msgstr "블루스"
+
+#, fuzzy
+#~ msgid "No"
+#~ msgstr "없음"
+
+#, fuzzy
+#~ msgid ""
+#~ "An error has occurred which probably prevented the proper execution of "
+#~ "the program:"
+#~ msgstr "요구된 처리의 실행으로 에러가 발생했습니다 :"
+
+#, fuzzy
+#~ msgid "If you believe that it is a bug, please follow the instructions at:"
+#~ msgstr "만약, 버그이다고 생각된다면, 이하의 순서에 따라 주세요 :"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "메세지 윈도우를 표시"
+
+#~ msgid "Dismiss"
+#~ msgstr "재시도"
+
+#, fuzzy
+#~ msgid "Crop borders in fullscreen"
+#~ msgstr "전화면 표시의 변환"
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "디폴트로 재생목록에 추가"
+
+#, fuzzy
 #~ msgid "%i items in playlist (%i not shown)"
-#~ msgstr "디폴트로 플레이 재생목록에 추가"
+#~ msgstr "디폴트로 재생목록에 추가"
 
-#, fuzzy
-#~ msgid "Sorted by Artist"
-#~ msgstr "작성자로 소트(&A)"
+#~ msgid "M3U file"
+#~ msgstr "M3U 파일"
 
-#, fuzzy
 #~ msgid "Sorted by Album"
-#~ msgstr "이름으로 소트"
+#~ msgstr "앨범으로 정렬"
+
+#, fuzzy
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "IPv4 네트워크 추상 레이어"
+
+#, fuzzy
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "IPv6 네트워크 추상 레이어"
+
+#~ msgid "Playlist stress tests"
+#~ msgstr "재생목록 부하 시험"
+
+#, fuzzy
+#~ msgid "DAAP access"
+#~ msgstr "액세스:"
 
 #, fuzzy
 #~ msgid "Session Announcements (SAP)"
 #~ msgstr "세션·어나운스먼트·프로토콜을 서포트한다"
+
+#, fuzzy
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
+
+#, fuzzy
+#~ msgid "Automatic black border cropping."
+#~ msgstr "흑연을 자동적으로 액티브하게 한다"
+
+#, fuzzy
+#~ msgid ""
+#~ "Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough"
+#~ "\" and \"psychedelic\"."
+#~ msgstr "만곡 모드(\"wave\", \"ripple\")"
+
+#, fuzzy
+#~ msgid "Description file"
+#~ msgstr "설명"
+
+#, fuzzy
+#~ msgid "Motion detect"
+#~ msgstr "모듈레이션 타입"
+
+#, fuzzy
+#~ msgid "Time overlay"
+#~ msgstr "수직 오프셋(offset)"
+
+#~ msgid "Standard Play"
+#~ msgstr "표준 재생"
+
+#, fuzzy
+#~ msgid "Vertical border width"
+#~ msgstr "수직 오프셋(offset)"
+
+#, fuzzy
+#~ msgid "Horizontal border width"
+#~ msgstr "수평"
+
+#, fuzzy
+#~ msgid "Growl"
+#~ msgstr "그룹"
+
+#, fuzzy
+#~ msgid "Filters (v2)"
+#~ msgstr "필터"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "버젼 정보의 인쇄"
+
+#, fuzzy
+#~ msgid "QT interface"
+#~ msgstr "Qt인터페이스·모듈"
+
+#, fuzzy
+#~ msgid "Connecting..."
+#~ msgstr "설정..."
+
+#, fuzzy
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr "모듈의 헬프를 표시한다 (--advanced 와 병용 할 수 있습니다)"
+
+#, fuzzy
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "thread의 수"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr "thread의 수"
+
+#, fuzzy
+#~ msgid "Allowed variance in average. bitrate (in kbits/s)."
+#~ msgstr "넷트워크스트림을 선택한다"
+
+#, fuzzy
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "넷트워크스트림을 선택한다"
+
+#, fuzzy
+#~ msgid "Averaging period for the maximum local bitrate in kbits."
+#~ msgstr "넷트워크스트림을 선택한다"
+
+#, fuzzy
+#~ msgid "QP curve compression. (0.0=CBR to 1.0=QCP)"
+#~ msgstr "DTS 다이나믹·레인지 압축"
+
+#, fuzzy
+#~ msgid "PSNR calculation"
+#~ msgstr "지속 기간"
+
+#, fuzzy
+#~ msgid "Create"
+#~ msgstr "심볼·레이트"
+
+#~ msgid " to "
+#~ msgstr " 처 "
 
 #, fuzzy
 #~ msgid "Number of streams"
@@ -20104,6 +19728,46 @@ msgstr "스펙트럼"
 #, fuzzy
 #~ msgid "Maximum number of Shoutcast radio streams which would be listed."
 #~ msgstr "로그·윈도우의 최대행수"
+
+#, fuzzy
+#~ msgid "Image"
+#~ msgstr "사이즈"
+
+#, fuzzy
+#~ msgid "Center-Center"
+#~ msgstr "중앙"
+
+#, fuzzy
+#~ msgid "Left-Center"
+#~ msgstr "중앙"
+
+#, fuzzy
+#~ msgid "Right-Center"
+#~ msgstr "중앙"
+
+#, fuzzy
+#~ msgid "Center-Top"
+#~ msgstr "중앙"
+
+#, fuzzy
+#~ msgid "Left-Top"
+#~ msgstr "왼쪽"
+
+#, fuzzy
+#~ msgid "Right-Top"
+#~ msgstr "오른쪽"
+
+#, fuzzy
+#~ msgid "Center-Bottom"
+#~ msgstr "중앙"
+
+#, fuzzy
+#~ msgid "Left-Bottom"
+#~ msgstr "하"
+
+#, fuzzy
+#~ msgid "Right-Bottom"
+#~ msgstr "하"
 
 #~ msgid "Adjust Image"
 #~ msgstr "화상 조정"
@@ -20134,8 +19798,7 @@ msgstr "스펙트럼"
 #~ msgid ""
 #~ "If this option is enabled, VLC will always start a video in fullscreen "
 #~ "mode."
-#~ msgstr ""
-#~ "이 옵션을 지정하면(자), VLC는 항상 비디오를 풀 스크린·모드로 합니다. "
+#~ msgstr "이 옵션을 지정하면, 항상 영상을 전체화면으로 시작합니다. "
 
 #, fuzzy
 #~ msgid ""
@@ -20249,6 +19912,10 @@ msgstr "스펙트럼"
 #~ msgid "Allows you to give the mime returned by the server."
 #~ msgstr "파일을 찾아낼 때 오픈되는 인터페이스의 기정의 패스를 설정 섬. "
 
+#, fuzzy
+#~ msgid "DTS"
+#~ msgstr "TS"
+
 #~ msgid "Output channels number"
 #~ msgstr "출력 채널수"
 
@@ -20317,7 +19984,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "Advanced output:"
-#~ msgstr "ALSA 오디오·모듈"
+#~ msgstr "ALSA 음성·모듈"
 
 #~ msgid "Output Options"
 #~ msgstr "출력 옵션"
@@ -20430,6 +20097,10 @@ msgstr "스펙트럼"
 #~ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
 #, fuzzy
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "출력 형식"
+
+#, fuzzy
 #~ msgid ""
 #~ "Allows you to specify the output destination used for the streaming "
 #~ "output."
@@ -20510,6 +20181,9 @@ msgstr "스펙트럼"
 #~ msgid "Subpictures filter"
 #~ msgstr "자막 파일"
 
+#~ msgid "List of video output modules"
+#~ msgstr "영상 출력 모듈 목록"
+
 #, fuzzy
 #~ msgid "Height in pixels"
 #~ msgstr "픽셀중의 font size"
@@ -20519,12 +20193,12 @@ msgstr "스펙트럼"
 #~ msgstr "픽셀중의 font size"
 
 #, fuzzy
-#~ msgid "Top left corner y coordinate"
-#~ msgstr "비디오 y 코디네이터"
-
-#, fuzzy
 #~ msgid "OSD menu configuration file"
 #~ msgstr "configuration·옵션에 툴 팁을 표시"
+
+#, fuzzy
+#~ msgid "Select effect"
+#~ msgstr "다음의 Chapter를 선택"
 
 #, fuzzy
 #~ msgid "Allows you to select different visual effects."
@@ -20535,10 +20209,6 @@ msgstr "스펙트럼"
 
 #~ msgid "Offset in pixels of the shadow"
 #~ msgstr "그늘의 오프셋(offset)(픽셀)"
-
-#, fuzzy
-#~ msgid "Small playlist"
-#~ msgstr "플레이 재생목록를 보존"
 
 #, fuzzy
 #~ msgid "VC-1 decoder module"
@@ -20557,19 +20227,19 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "MPEG-I/II audio demuxer"
-#~ msgstr "MPEG 1/2레이어1/2오디오·디코더"
+#~ msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #, fuzzy
 #~ msgid "Ogg stream demuxer"
-#~ msgstr "MPEG 1/2레이어1/2오디오·디코더"
+#~ msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #, fuzzy
 #~ msgid "Podcast playlist import"
-#~ msgstr "PLS 플레이 재생목록로부터 임포트"
+#~ msgstr "PLS 재생목록로부터 임포트"
 
 #, fuzzy
 #~ msgid "raw DV demuxer"
-#~ msgstr "MPEG 1/2레이어1/2오디오·디코더"
+#~ msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #, fuzzy
 #~ msgid "Text subtitles demux"
@@ -20617,13 +20287,12 @@ msgstr "스펙트럼"
 #~ msgid "URL : "
 #~ msgstr "URL:"
 
-#, fuzzy
 #~ msgid "file size : "
-#~ msgstr "비디오 사이즈"
+#~ msgstr "파일 크기 : "
 
 #, fuzzy
 #~ msgid "Choose a mirror"
-#~ msgstr "오디오의 선택"
+#~ msgstr "음성의 선택"
 
 #, fuzzy
 #~ msgid "Time To Live"
@@ -20635,10 +20304,10 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "audio filter using CoreAudio for resampling"
-#~ msgstr "거칠어진 재샘플링을 위한 오디오·필터"
+#~ msgstr "거칠어진 재샘플링을 위한 음성·필터"
 
 #~ msgid "CoreAudio output"
-#~ msgstr "코어 오디오 출력"
+#~ msgstr "코어 음성 출력"
 
 #~ msgid "SLP announce"
 #~ msgstr "SLP 아나운스"
@@ -20658,9 +20327,9 @@ msgstr "스펙트럼"
 #~ "\n"
 #~ "For more information, have a look at the web site."
 #~ msgstr ""
-#~ "VLC 는 open source로 여러가지 오디오와 비디오 포맷(MPEG-1, MPEG-2, MPEG-"
-#~ "4, DivX, mp3,Ogg, ...)뿐만 아니라 DVD·VCD·CD 오디오를 위한 여러가지 스트리"
-#~ "밍 프로토콜을 위한 크로스 플랫폼 멀티미디어 플레이어이다. \n"
+#~ "VLC 는 open source로 여러가지 음성과 영상 형식(MPEG-1, MPEG-2, MPEG-4, "
+#~ "DivX, mp3,Ogg, ...)뿐만 아니라 DVD·VCD·CD 음성을 위한 여러가지 스트리밍 프"
+#~ "로토콜을 위한 크로스 플랫폼 멀티미디어 플레이어이다. \n"
 #~ "\n"
 #~ "게다가 VLC 는, 고대역 네트워크용에 주로 설계된, 전송 능력(UDP 유니캐스트 "
 #~ "및 멀티 캐스트(HTTP)...)를 갖춘 스트리밍 서버입니다. \n"
@@ -20736,7 +20405,10 @@ msgstr "스펙트럼"
 #~ msgstr "연다"
 
 #~ msgid "Audio output volume"
-#~ msgstr "오디오 출력 볼륨"
+#~ msgstr "음성 출력 볼륨"
+
+#~ msgid "Network interface address"
+#~ msgstr "네트워크 인터페이스 주소"
 
 #, fuzzy
 #~ msgid ""
@@ -20757,7 +20429,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "Choose audio track"
-#~ msgstr "오디오 트랙"
+#~ msgstr "음성 트랙"
 
 #, fuzzy
 #~ msgid "Choose subtitles track"
@@ -20773,7 +20445,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "Old playlist open"
-#~ msgstr "플레이 재생목록의 최후로 루프"
+#~ msgstr "재생목록의 최후로 루프"
 
 #, fuzzy
 #~ msgid "Current version"
@@ -20857,6 +20529,9 @@ msgstr "스펙트럼"
 #~ msgid "Joystick control interface"
 #~ msgstr "리모트·컨트롤·인터페이스·모듈"
 
+#~ msgid "Show tooltips"
+#~ msgstr "툴 팁을 표시"
+
 #~ msgid "Show tooltips for configuration options. "
 #~ msgstr "configuration·옵션에 툴 팁을 표시"
 
@@ -20885,6 +20560,10 @@ msgstr "스펙트럼"
 #~ msgid "_Open File..."
 #~ msgstr "파일을 연다(_O)..."
 
+#, fuzzy
+#~ msgid "Open a file"
+#~ msgstr "파일을 연다"
+
 #~ msgid "Open _Disc..."
 #~ msgstr "디스크를 연다(_D)..."
 
@@ -20904,7 +20583,7 @@ msgstr "스펙트럼"
 #~ msgstr "디스크의 꺼내기"
 
 #~ msgid "Progr_am"
-#~ msgstr "프로그램(_a)"
+#~ msgstr "프로그램(_A)"
 
 #~ msgid "Choose the program"
 #~ msgstr "프로그램의 선택"
@@ -20922,10 +20601,10 @@ msgstr "스펙트럼"
 #~ msgstr "Chapter의 선택"
 
 #~ msgid "_Playlist..."
-#~ msgstr "플레이 재생목록(_P)..."
+#~ msgstr "재생목록(_P)..."
 
 #~ msgid "Open the playlist window"
-#~ msgstr "플레이 재생목록를 연다"
+#~ msgstr "재생목록 창을 엽니다"
 
 #~ msgid "_Modules..."
 #~ msgstr "모듈(_M)..."
@@ -20940,6 +20619,9 @@ msgstr "스펙트럼"
 #~ msgid "_Language"
 #~ msgstr "언어"
 
+#~ msgid "Select audio channel"
+#~ msgstr "음성·채널의 선택"
+
 #~ msgid "_Subtitles"
 #~ msgstr "자막(_S)"
 
@@ -20947,13 +20629,13 @@ msgstr "스펙트럼"
 #~ msgstr "자막의 선택"
 
 #~ msgid "_Fullscreen"
-#~ msgstr "전화면화(_F)"
+#~ msgstr "전체화면(_F)"
 
 #~ msgid "_Audio"
-#~ msgstr "오디오(_A)"
+#~ msgstr "음성(_A)"
 
 #~ msgid "_Video"
-#~ msgstr "비디오"
+#~ msgstr "영상(_V)"
 
 #~ msgid "Open disc"
 #~ msgstr "디스크를 연다"
@@ -21019,7 +20701,7 @@ msgstr "스펙트럼"
 #~ msgstr "메인 윈도우의 표시/비표시(_I)"
 
 #~ msgid "Playlist..."
-#~ msgstr "플레이 재생목록..."
+#~ msgstr "재생목록..."
 
 #, fuzzy
 #~ msgid ""
@@ -21057,6 +20739,9 @@ msgstr "스펙트럼"
 #~ msgid "Item"
 #~ msgstr "항목"
 
+#~ msgid "Invert"
+#~ msgstr "역전"
+
 #~ msgid "stream output (MRL)"
 #~ msgstr "스트림의 출력 (MRL)"
 
@@ -21080,8 +20765,11 @@ msgstr "스펙트럼"
 #~ msgid "_Close"
 #~ msgstr "닫는다(_C)"
 
+#~ msgid "Close the window"
+#~ msgstr "윈도우를 닫는다"
+
 #~ msgid "E_xit"
-#~ msgstr "종료(_x)"
+#~ msgstr "종료(_X)"
 
 #~ msgid "Exit the program"
 #~ msgstr "프로그램의 종료"
@@ -21105,7 +20793,7 @@ msgstr "스펙트럼"
 #~ msgstr "어플리케이션의 설정"
 
 #~ msgid "_Help"
-#~ msgstr "헬프(_H)"
+#~ msgstr "도움말(_H)"
 
 #~ msgid "_About..."
 #~ msgstr "VideoLAN 에 대해(_A)..."
@@ -21132,7 +20820,7 @@ msgstr "스펙트럼"
 #~ msgstr "빨리 감기 재생"
 
 #~ msgid "Open Playlist"
-#~ msgstr "플레이 재생목록를 연다"
+#~ msgstr "재생목록 열기"
 
 #~ msgid "Previous File"
 #~ msgstr "이전의 파일"
@@ -21317,28 +21005,16 @@ msgstr "스펙트럼"
 #~ msgstr "I263"
 
 #, fuzzy
-#~ msgid "MPEG-1 Video codec"
-#~ msgstr "비디오 코덱"
-
-#, fuzzy
-#~ msgid "MPEG-2 Video codec"
-#~ msgstr "비디오 코덱"
-
-#, fuzzy
-#~ msgid "MPEG-4 Video codec"
-#~ msgstr "비디오 코덱"
-
-#, fuzzy
 #~ msgid "DivX second version"
 #~ msgstr "MMX 변환원 "
 
 #, fuzzy
 #~ msgid "MPEG Audio Layer 3"
-#~ msgstr "MPEG 오디오 디코더"
+#~ msgstr "MPEG 음성 디코더"
 
 #, fuzzy
 #~ msgid "DVD audio format"
-#~ msgstr "VCD 포맷"
+#~ msgstr "VCD 형식"
 
 #, fuzzy
 #~ msgid "MPEG4"
@@ -21352,9 +21028,8 @@ msgstr "스펙트럼"
 #~ msgid "SAP IPv6 announcing"
 #~ msgstr "스트림 출력"
 
-#, fuzzy
 #~ msgid "Random effect"
-#~ msgstr "랜덤 오프"
+#~ msgstr "랜덤 효과"
 
 #, fuzzy
 #~ msgid "Pashto"
@@ -21376,9 +21051,8 @@ msgstr "스펙트럼"
 #~ msgid "DirectX"
 #~ msgstr "DirectShow"
 
-#, fuzzy
 #~ msgid "XVideo"
-#~ msgstr "비디오"
+#~ msgstr "XVideo"
 
 #, fuzzy
 #~ msgid "Toolame"
@@ -21400,9 +21074,6 @@ msgstr "스펙트럼"
 #~ msgid "MPEG-TS"
 #~ msgstr "MPEG1"
 
-#~ msgid "Control"
-#~ msgstr "제어"
-
 #~ msgid "&Invert"
 #~ msgstr "역전"
 
@@ -21417,12 +21088,8 @@ msgstr "스펙트럼"
 #~ msgstr "자막"
 
 #, fuzzy
-#~ msgid "VLC internal picture video output"
-#~ msgstr "DirectX 비디오·모듈"
-
-#, fuzzy
 #~ msgid "AAC demuxer"
-#~ msgstr "MPEG 1/2레이어1/2오디오·디코더"
+#~ msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #~ msgid "Simple id3 tag skipper"
 #~ msgstr "심플한 id3 태그·스킵파"
@@ -21444,7 +21111,7 @@ msgstr "스펙트럼"
 #~ msgstr "[모듈]          [설명]\n"
 
 #~ msgid "Choose audio channel"
-#~ msgstr "오디오 채널의 선택"
+#~ msgstr "음성 채널의 선택"
 
 #~ msgid "Choose subtitle track"
 #~ msgstr "자막 트랙의 선택"
@@ -21456,10 +21123,10 @@ msgstr "스펙트럼"
 #~ msgstr "출력 스트림이 없는 경우, 비운다"
 
 #~ msgid "Loop playlist on end"
-#~ msgstr "플레이 재생목록의 최후로 루프"
+#~ msgstr "재생목록의 최후로 루프"
 
 #~ msgid "print detailed help (can be combined with --advanced)"
-#~ msgstr "상세한 헬프를 표시한다 (--advanced 와 병용 할 수 있습니다)"
+#~ msgstr "상세한 도움말을 표시한다 (--advanced 와 병용 할 수 있습니다)"
 
 #~ msgid "Vol %%%d"
 #~ msgstr "음량 %%%d"
@@ -21498,6 +21165,10 @@ msgstr "스펙트럼"
 #~ msgid "vlc preferences"
 #~ msgstr "VLC 설정..."
 
+#, fuzzy
+#~ msgid "Repeat"
+#~ msgstr "파일의 선택"
+
 #~ msgid "SAP interface"
 #~ msgstr "SAP 인터페이스"
 
@@ -21518,7 +21189,7 @@ msgstr "스펙트럼"
 #~ msgstr "액세스 모듈 설정"
 
 #~ msgid "Audio output modules settings"
-#~ msgstr "오디오 출력 모듈 설정"
+#~ msgstr "음성 출력 모듈 설정"
 
 #~ msgid "Decoder modules settings"
 #~ msgstr "디코드 모듈 설정"
@@ -21529,24 +21200,27 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "Stream output access modules settings"
-#~ msgstr "오디오 출력 모듈"
+#~ msgstr "음성 출력 모듈"
 
 #, fuzzy
 #~ msgid "Stream output muxer modules settings"
-#~ msgstr "오디오 출력 모듈"
+#~ msgstr "음성 출력 모듈"
 
 #, fuzzy
 #~ msgid "Stream output modules settings"
-#~ msgstr "오디오 출력 모듈"
+#~ msgstr "음성 출력 모듈"
+
+#~ msgid "Text renderer settings"
+#~ msgstr "텍스트 렌더러 설정"
 
 #~ msgid "Video output modules settings"
-#~ msgstr "비디오 출력 모듈 설정"
+#~ msgstr "영상 출력 모듈 설정"
 
 #, fuzzy
 #~ msgid ""
 #~ "Give the default type of audio you want to use in a DVD.  (Developers "
 #~ "only)"
-#~ msgstr "DVD 안에서 사용하고 싶은 오디오의 기정의 타입을 지정합니다. "
+#~ msgstr "DVD 안에서 사용하고 싶은 음성의 기정의 타입을 지정합니다. "
 
 #, fuzzy
 #~ msgid "DVDRead Input"
@@ -21556,13 +21230,6 @@ msgstr "스펙트럼"
 #~ msgid "Subtitle aspect-ratio correction"
 #~ msgstr "자막"
 
-#, fuzzy
-#~ msgid "Xvid video decoder"
-#~ msgstr "DV비디오·디코더"
-
-#~ msgid "Item Enabled"
-#~ msgstr "항목 유효"
-
 #~ msgid "Delete Group"
 #~ msgstr "그룹을 삭제"
 
@@ -21570,37 +21237,38 @@ msgstr "스펙트럼"
 #~ msgstr "그룹을 추가"
 
 #~ msgid "Sort by &author"
-#~ msgstr "작성자로 소트(&A)"
+#~ msgstr "작성자로 정렬(&A)"
 
 #~ msgid "Reverse sort by author"
-#~ msgstr "작성자로 역소트"
+#~ msgstr "작성자로 역정렬"
 
 #~ msgid "&Enable"
-#~ msgstr "유효(&E)"
+#~ msgstr "켜기(&E)"
 
 #~ msgid "&Disable"
-#~ msgstr "무효(&D)"
+#~ msgstr "끄기(&D)"
 
 #~ msgid "Enable/Disable"
-#~ msgstr "유효/무효"
+#~ msgstr "켜기/끄기"
 
 #~ msgid "New Group"
 #~ msgstr "신규 그룹"
 
 #~ msgid "Sort by &group"
-#~ msgstr "그룹에서 소트"
+#~ msgstr "그룹으로 정렬"
 
 #~ msgid "Reverse sort by group"
-#~ msgstr "그룹에서 역소트"
-
-#~ msgid "&Enable all group items"
-#~ msgstr "모든 그룹 항목을 유효하게 한다(&E)"
+#~ msgstr "그룹으로 역정렬"
 
 #~ msgid "&Disable all group items"
 #~ msgstr "모든 그룹 항목을 무효로 한다(&D)<"
 
 #~ msgid "&Groups"
 #~ msgstr "그룹(&G)"
+
+#, fuzzy
+#~ msgid "Enter a name for the new group:"
+#~ msgstr "구획으로부터 인연 잡기까지의 지오메트리를 지정"
 
 #~ msgid "| no entries\n"
 #~ msgstr "| 엔트리가 없습니다. \n"
@@ -21686,9 +21354,9 @@ msgstr "스펙트럼"
 #~ "x and 0.4.  By default VLC assumes you have the latest VLS.  In case "
 #~ "you're using an old version, select this option. "
 #~ msgstr ""
-#~ "A/52 오디오·스트림의 프로토콜은, vls 0.3. x와 0.4의 사이에 변경에했다. 디"
-#~ "폴트에서는, VLC는 최신의 vls를 상정합니다. 만약, 낡은 버젼의vls를 사용하"
-#~ "고 있는 경우에는, 이 옵션을 선택합니다. "
+#~ "A/52 음성·스트림의 프로토콜은, vls 0.3. x와 0.4의 사이에 변경에했다. 디폴"
+#~ "트에서는, VLC는 최신의 vls를 상정합니다. 만약, 낡은 버젼의vls를 사용하고 "
+#~ "있는 경우에는, 이 옵션을 선택합니다. "
 
 #, fuzzy
 #~ msgid "Output MRL"
@@ -21731,25 +21399,23 @@ msgstr "스펙트럼"
 #~ msgid "Jump -10 Seconds"
 #~ msgstr "-10 초 날린다"
 
-#, fuzzy
 #~ msgid "video rendering mode"
-#~ msgstr "비디오 렌더링 모드"
-
-#, fuzzy
-#~ msgid "OpenGL effect"
-#~ msgstr "스코프 효과"
+#~ msgstr "영상 렌더링 모드"
 
 #~ msgid "New Wizard..."
 #~ msgstr "신규 위저드..."
 
 #~ msgid "Audio menu"
-#~ msgstr "오디오 메뉴"
+#~ msgstr "음성 메뉴"
 
 #~ msgid "Video menu"
-#~ msgstr "비디오 메뉴"
+#~ msgstr "영상 메뉴"
 
 #~ msgid "Input menu"
 #~ msgstr "입력 메뉴"
+
+#~ msgid "Interface menu"
+#~ msgstr "인터페이스 메뉴"
 
 #~ msgid "DVD (test)"
 #~ msgstr "DVD(test)"
@@ -21825,13 +21491,8 @@ msgstr "스펙트럼"
 #~ msgid "Allows you to pecify the output URL used for the streaming output. "
 #~ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#, fuzzy
-#~ msgid "Toggle enabled"
-#~ msgstr " (디폴트：유효)"
-
-#, fuzzy
-#~ msgid "Streaming/Transcoding wizard"
-#~ msgstr "스트림의 정보..."
+#~ msgid "Welcome, streaming wizard"
+#~ msgstr "안녕하세요, 스트리밍 마법사입니다"
 
 #~ msgid ""
 #~ "This will force the destination pixel size.  By default VLC assumes your "
@@ -21871,12 +21532,20 @@ msgstr "스펙트럼"
 #~ msgstr "디바이스명"
 
 #, fuzzy
+#~ msgid "Codec download"
+#~ msgstr "디바이스명"
+
+#, fuzzy
 #~ msgid "ftp://"
 #~ msgstr "파일"
 
 #, fuzzy
 #~ msgid "Open a skin file. "
 #~ msgstr "파일을 연다"
+
+#, fuzzy
+#~ msgid "Advanced open"
+#~ msgstr "ALSA 음성·모듈"
 
 #, fuzzy
 #~ msgid "Open a network stream"
@@ -21890,9 +21559,8 @@ msgstr "스펙트럼"
 #~ msgid "Exit this program"
 #~ msgstr "프로그램의 종료"
 
-#, fuzzy
 #~ msgid "Open the playlist"
-#~ msgstr "플레이 재생목록를 연다"
+#~ msgstr "재생목록을 연다"
 
 #, fuzzy
 #~ msgid "Show the program logs"
@@ -21908,11 +21576,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "E&xit"
-#~ msgstr "종료(_x)"
-
-#, fuzzy
-#~ msgid "Video for Linux"
-#~ msgstr "설정"
+#~ msgstr "종료(&X)"
 
 #, fuzzy
 #~ msgid "Video device type"
@@ -21920,7 +21584,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "Advanced video device options"
-#~ msgstr "ALSA 오디오·모듈"
+#~ msgstr "ALSA 음성·모듈"
 
 #, fuzzy
 #~ msgid "Video device MRL"
@@ -21983,7 +21647,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "mka/mkv stream demuxer"
-#~ msgstr "MPEG 1/2레이어1/2오디오·디코더"
+#~ msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #, fuzzy
 #~ msgid "Play List"
@@ -22001,9 +21665,8 @@ msgstr "스펙트럼"
 #~ msgid "Repeat Item"
 #~ msgstr "파일의 선택"
 
-#, fuzzy
 #~ msgid "Repeat Playlist"
-#~ msgstr "플레이 재생목록를 연다"
+#~ msgstr "재생목록 반복"
 
 #, fuzzy
 #~ msgid "VLC Media Player"
@@ -22033,9 +21696,8 @@ msgstr "스펙트럼"
 #~ msgid "Simple &Open ..."
 #~ msgstr "파일을 연다..."
 
-#, fuzzy
 #~ msgid "&Randomize Playlist"
-#~ msgstr "플레이 재생목록를 연다"
+#~ msgstr "재생목록 임의 재생(&R)"
 
 #, fuzzy
 #~ msgid "Fonts"
@@ -22054,7 +21716,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "miscellaneous distort video effects filter"
-#~ msgstr "그 외의 비디오 효과 모듈"
+#~ msgstr "그 외의 영상 효과 모듈"
 
 #, fuzzy
 #~ msgid "xosd interface"
@@ -22094,7 +21756,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "Video Device Advanced Options"
-#~ msgstr "ALSA 오디오·모듈"
+#~ msgstr "ALSA 음성·모듈"
 
 #, fuzzy
 #~ msgid "VCD device name"
@@ -22102,10 +21764,6 @@ msgstr "스펙트럼"
 
 #~ msgid "Open a DVD or VCD"
 #~ msgstr "DVD 또는 VCD를 연다"
-
-#, fuzzy
-#~ msgid "Let the video window float on top of other windows. "
-#~ msgstr "비디오를 클론 하기 위해서 비디오·윈도우수를 선택한다"
 
 #, fuzzy
 #~ msgid "Open a DVD or (S) VCD"
@@ -22139,7 +21797,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "MPEG-4 video elementary stream demuxer"
-#~ msgstr "MPEG 1/2레이어1/2오디오·디코더"
+#~ msgstr "MPEG 1/2레이어1/2음성·디코더"
 
 #~ msgid "ISO 13818-1 MPEG Elementary Stream input"
 #~ msgstr "ISO 13818-1 MPEG 기본 스트림 입력"
@@ -22147,6 +21805,10 @@ msgstr "스펙트럼"
 #, fuzzy
 #~ msgid "Speex"
 #~ msgstr "선택이 끝난 상태"
+
+#, fuzzy
+#~ msgid "tarkin"
+#~ msgstr "캐릭터 라인"
 
 #~ msgid ""
 #~ "This allows you to select the order in which VLC will choose its codecs.  "
@@ -22158,9 +21820,9 @@ msgstr "스펙트럼"
 #~ msgstr ""
 #~ "VLC가 사용하는 코덱의 순서를 선택할 수가 있습니다. 'a52old, a52, any'는보"
 #~ "다 새로운 코덱보다, 낡은 a52 코덱의 사용을 우선적으로 시도합니다. VLC(은)"
-#~ "는 오디오와 비디오의 코덱으로 어떠한 차이도 가지지 않는 것에 주의해 관이야"
-#~ "있고. 타입이 지정되지 않았던 경우의 폴 백을 위해서(때문에), 재생목록의 마"
-#~ "지막에 상에'any'를 지정하지 않으면 안됩니다. "
+#~ "는 음성과 영상의 코덱으로 어떠한 차이도 가지지 않는 것에 주의해 관이야있"
+#~ "고. 타입이 지정되지 않았던 경우의 폴 백을 위해서(때문에), 재생목록의 마지"
+#~ "막에 상에'any'를 지정하지 않으면 안됩니다. "
 
 #, fuzzy
 #~ msgid ""
@@ -22170,10 +21832,6 @@ msgstr "스펙트럼"
 #, fuzzy
 #~ msgid "Choose preferred audio encoder list"
 #~ msgstr "준비되어 있는 코덱의 일람의 선택"
-
-#, fuzzy
-#~ msgid "ffmpeg video encoder"
-#~ msgstr "DV비디오·디코더"
 
 #, fuzzy
 #~ msgid "Antenna lnb_lof1 (KHz)"
@@ -22193,7 +21851,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "Only enqueue in playlist, do not play"
-#~ msgstr "디폴트로 플레이 재생목록에 추가"
+#~ msgstr "디폴트로 재생목록에 추가"
 
 #, fuzzy
 #~ msgid "Stream:"
@@ -22212,13 +21870,13 @@ msgstr "스펙트럼"
 #~ msgstr "디스크의 꺼내기(_E)"
 
 #~ msgid "print help"
-#~ msgstr "헬프의 인쇄"
+#~ msgstr "도움말 출력"
 
 #~ msgid "print detailed help"
-#~ msgstr "상세한 헬프의 인쇄"
+#~ msgstr "상세한 도움말 출력"
 
 #~ msgid "print help on module"
-#~ msgstr "모듈상의 헬프를 인쇄 <캐릭터 라인>"
+#~ msgstr "모듈 도움말 출력"
 
 #~ msgid "A52 downmix module"
 #~ msgstr "AC3 다운 믹스·모듈"
@@ -22240,10 +21898,6 @@ msgstr "스펙트럼"
 
 #~ msgid "3D Now!  A52 IMDCT module"
 #~ msgstr "3D Now!  AC3 IMDCT 모듈"
-
-#, fuzzy
-#~ msgid "MPEG I/II layer 1/2 audio decoder"
-#~ msgstr "MPEG 1/2비디오·디코더·모듈"
 
 #, fuzzy
 #~ msgid "AltiVec IDCT"
@@ -22281,8 +21935,8 @@ msgstr "스펙트럼"
 #~ "decoder.  The default behavior is to automatically select the best module "
 #~ "available. "
 #~ msgstr ""
-#~ "비디오·디코더에 의해 사용되는 IDCT 모듈을 선택 가능하게 합니다. 데포르트"
-#~ "로 자동적으로 최적인 모듈이 사용됩니다. "
+#~ "영상·디코더에 의해 사용되는 IDCT 모듈을 선택 가능하게 합니다. 데포르트로 "
+#~ "자동적으로 최적인 모듈이 사용됩니다. "
 
 #, fuzzy
 #~ msgid "Motion compensation module"
@@ -22293,8 +21947,8 @@ msgstr "스펙트럼"
 #~ "this video decoder.  The default behavior is to automatically select the "
 #~ "best module available. "
 #~ msgstr ""
-#~ "비디오·디코더에 의해 사용되는 모션 보정 모듈을 선택 가능하게 섬. 디폴트로 "
-#~ "자동적으로 최적인 모듈이 사용됩니다. "
+#~ "영상·디코더에 의해 사용되는 모션 보정 모듈을 선택 가능하게 섬. 디폴트로 자"
+#~ "동적으로 최적인 모듈이 사용됩니다. "
 
 #~ msgid ""
 #~ "This video decoder can benefit from a multiprocessor computer.  If you "
@@ -22317,24 +21971,12 @@ msgstr "스펙트럼"
 #~ "은 데코드의 화상 타입을 지정할 수 있습니다. CPU의 디코드 능력을 넘어 사용"
 #~ "하는 것은할 수 없습니다. "
 
-#, fuzzy
-#~ msgid "MPEG I/II video decoder"
-#~ msgstr "MPEG 1/2비디오·디코더·모듈"
-
 #~ msgid ""
 #~ "If you want VLC to add items to the playlist as you open them, then "
 #~ "enable this option. "
 #~ msgstr ""
-#~ "플레이 재생목록에 오픈하고 있는 항목을 추가하고 싶은 경우에는, 이 옵션을 "
-#~ "선거택 합니다. "
-
-#, fuzzy
-#~ msgid "Audio encoding codec"
-#~ msgstr "MPEG 1/2비디오·디코더·모듈"
-
-#, fuzzy
-#~ msgid "XviD video encoder (MPEG-4)"
-#~ msgstr "DV비디오·디코더"
+#~ "재생목록에 오픈하고 있는 항목을 추가하고 싶은 경우에는, 이 옵션을 선거택 "
+#~ "합니다. "
 
 #, fuzzy
 #~ msgid "Close Menu"
@@ -22394,15 +22036,13 @@ msgstr "스펙트럼"
 #~ "X11가 묘화 하는 로컬의 디스플레이·포토를 지정합니다. 인스턴스(은)는,:0. 1"
 #~ "입니다. "
 
-#, fuzzy
 #~ msgid "Launch playlist on startup"
-#~ msgstr "기동시에 플레이 재생목록를 연다"
+#~ msgstr "기동시에 재생목록을 연다"
 
 #~ msgid ""
 #~ "If you want VLC to start playing on startup, then enable this option. "
 #~ msgstr ""
-#~ "VLC의 기동시에 플레이 재생목록를 기동하고 싶은 경우에는, 이 옵션을 선택 "
-#~ "섬. "
+#~ "VLC의 기동시에 재생목록를 기동하고 싶은 경우에는, 이 옵션을 선택 섬. "
 
 #, fuzzy
 #~ msgid "Device &name:"
@@ -22494,7 +22134,7 @@ msgstr "스펙트럼"
 
 #, fuzzy
 #~ msgid "Exit"
-#~ msgstr "종료(_x)"
+#~ msgstr "종료"
 
 #, fuzzy
 #~ msgid "&Fullscreen"
@@ -22616,6 +22256,14 @@ msgstr "스펙트럼"
 #~ msgstr "스트림 출력"
 
 #, fuzzy
+#~ msgid "All files"
+#~ msgstr "파일"
+
+#, fuzzy
+#~ msgid "Add file"
+#~ msgstr "자막"
+
+#, fuzzy
 #~ msgid "Stream Output"
 #~ msgstr "스트림 출력"
 
@@ -22636,17 +22284,18 @@ msgstr "스펙트럼"
 #~ msgid "Linux OSS /dev/dsp module"
 #~ msgstr "Linux OSS /dev/dsp 모듈"
 
+#, fuzzy
+#~ msgid "libmpeg2 decoder module"
+#~ msgstr "자막·디코더·모듈"
+
 #~ msgid "QNX RTOS module"
 #~ msgstr "QNX RTOS 모듈"
 
 #~ msgid "image crop video module"
-#~ msgstr "이미지인연 잡기 비디오·모듈"
+#~ msgstr "영상 잘라내기 모듈"
 
 #~ msgid "One of \"discard\", \"blend\", \"mean\", \"bob\" or \"linear\""
 #~ msgstr "\"discard\", \"blend\", \"mean\", \"bob\" 또는 \"linear\"로부터 1개"
-
-#~ msgid "image wall video module"
-#~ msgstr "이미지·월·비디오·모듈"
 
 #~ msgid "3dfx Glide module"
 #~ msgstr "3dfx Glide 모듈"
@@ -22688,7 +22337,11 @@ msgstr "스펙트럼"
 #~ "은 위험하기 때문에, 이용에는 주의가 필요합니다. "
 
 #~ msgid "A_udio"
-#~ msgstr "오디오(_u)"
+#~ msgstr "음성(_U)"
+
+#, fuzzy
+#~ msgid "Slowmotion"
+#~ msgstr "선택"
 
 #, fuzzy
 #~ msgid "Open disc..."
@@ -22708,3 +22361,183 @@ msgstr "스펙트럼"
 #, fuzzy
 #~ msgid "Jump to next chapter"
 #~ msgstr "다음의 Chapter를 선택"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "디스크 타입"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "브라우즈..."
+
+#, fuzzy
+#~ msgid "Big"
+#~ msgstr "휘도"
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "설정"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "오디오 필터"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "미디어"
+
+#, fuzzy
+#~ msgid "Never download"
+#~ msgstr "디바이스명"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "다음"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "휘도"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "스펙트럼"
+
+#, fuzzy
+#~ msgid "margin"
+#~ msgstr "캐릭터 라인"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "평가"
+
+#, fuzzy
+#~ msgid "QPushButton"
+#~ msgstr "작성자"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "리니어"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "oldies"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "버젼 정보의 인쇄"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "그룹"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "유효"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "유효"
+
+#, fuzzy
+#~ msgid "horizontalLayout_3"
+#~ msgstr "수평"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "디스크"
+
+#, fuzzy
+#~ msgid "Justification"
+#~ msgstr "이 어플리케이션에 대해"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "오디오 디바이스명"
+
+#, fuzzy
+#~ msgid "Audioscrobbler password"
+#~ msgstr "FTP 패스워드"
+
+#, fuzzy
+#~ msgid "Dummy video filter"
+#~ msgstr "비디오·필터·모듈"
+
+#, fuzzy
+#~ msgid "Top left corner y coordinate"
+#~ msgstr "비디오 y 코디네이터"
+
+#, fuzzy
+#~ msgid "Small playlist"
+#~ msgstr "플레이 재생목록를 보존"
+
+#, fuzzy
+#~ msgid "MPEG-1 Video codec"
+#~ msgstr "비디오 코덱"
+
+#, fuzzy
+#~ msgid "MPEG-2 Video codec"
+#~ msgstr "비디오 코덱"
+
+#, fuzzy
+#~ msgid "MPEG-4 Video codec"
+#~ msgstr "비디오 코덱"
+
+#~ msgid "Control"
+#~ msgstr "제어"
+
+#, fuzzy
+#~ msgid "VLC internal picture video output"
+#~ msgstr "DirectX 비디오·모듈"
+
+#, fuzzy
+#~ msgid "Xvid video decoder"
+#~ msgstr "DV비디오·디코더"
+
+#~ msgid "Item Enabled"
+#~ msgstr "항목 유효"
+
+#~ msgid "&Enable all group items"
+#~ msgstr "모든 그룹 항목을 유효하게 한다(&E)"
+
+#, fuzzy
+#~ msgid "OpenGL effect"
+#~ msgstr "스코프 효과"
+
+#, fuzzy
+#~ msgid "Toggle enabled"
+#~ msgstr " (디폴트：유효)"
+
+#, fuzzy
+#~ msgid "Streaming/Transcoding wizard"
+#~ msgstr "스트림의 정보..."
+
+#, fuzzy
+#~ msgid "Video for Linux"
+#~ msgstr "설정"
+
+#, fuzzy
+#~ msgid "Let the video window float on top of other windows. "
+#~ msgstr "비디오를 클론 하기 위해서 비디오·윈도우수를 선택한다"
+
+#, fuzzy
+#~ msgid "ffmpeg video encoder"
+#~ msgstr "DV비디오·디코더"
+
+#, fuzzy
+#~ msgid "MPEG I/II layer 1/2 audio decoder"
+#~ msgstr "MPEG 1/2비디오·디코더·모듈"
+
+#, fuzzy
+#~ msgid "MPEG I/II video decoder"
+#~ msgstr "MPEG 1/2비디오·디코더·모듈"
+
+#, fuzzy
+#~ msgid "Audio encoding codec"
+#~ msgstr "MPEG 1/2비디오·디코더·모듈"
+
+#, fuzzy
+#~ msgid "XviD video encoder (MPEG-4)"
+#~ msgstr "DV비디오·디코더"
+
+#~ msgid "image wall video module"
+#~ msgstr "이미지·월·비디오·모듈"

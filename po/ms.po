@@ -1,14 +1,15 @@
-# translation of vlc090.po to Malay
-# Copyright (C) YEAR VideoLAN
-# This file is distributed under the same license as the PACKAGE package.
-#
+# translation of VLC to Malay
+# Copyright (C) 2006 VideoLAN
+# $Id: $
+# This file is distributed under the same license as the VLC package.
 # Mahrazi Mohd Kamal <mahrazi@gmail.com>, 2006.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc090\n"
+"Project-Id-Version: ms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
-"PO-Revision-Date: 2006-10-17 10:29+0800\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
+"PO-Revision-Date: 2006-10-29 00:05+0800\n"
 "Last-Translator: Mahrazi Mohd Kamal <mahrazi@gmail.com>\n"
 "Language-Team: Malay <ms@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +25,7 @@ msgstr "Keutamaan VLC"
 
 #: include/vlc_config_cat.h:38
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "Pilih \"Pilihan Lanjutan\" untuk melihat semua pilihan."
+msgstr "Pilih \"Pilihan Lanjutan\" untuk melihan semua pilihan."
 
 #: include/vlc_config_cat.h:40 include/vlc_config_cat.h:131
 #: modules/gui/macosx/playlistinfo.m:62 modules/gui/wince/playlist.cpp:674
@@ -47,7 +48,7 @@ msgstr "Tetapan antaramuka am"
 
 #: include/vlc_config_cat.h:48
 msgid "Main interfaces"
-msgstr "Antaramuka utama"
+msgstr "Antamuka utama"
 
 #: include/vlc_config_cat.h:49
 msgid "Settings for the main interface"
@@ -565,9 +566,8 @@ msgid "Repeat all"
 msgstr "Ulang semua"
 
 #: include/vlc_intf_strings.h:60
-#, fuzzy
 msgid "Repeat one"
-msgstr "Ulang Sekali"
+msgstr "Repeat one"
 
 #: include/vlc_intf_strings.h:61
 msgid "No repeat"
@@ -1177,7 +1177,7 @@ msgstr "Gerakan Tetikus"
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "ms"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -3182,12 +3182,11 @@ msgid ""
 "robust. Currently you can choose between implementation 0 (which is the "
 "fastest but slightly incorrect), 1 (default) and 2."
 msgstr ""
-"Pada Windows 9x/ME anda boleh gunakan yang cepat tetapi implementasi "
-"pembolehubah berkeadaan salah (atau lebih tepat di sana terdapat kemungkinan "
-"keadaan berlumba akan berlaku). Bagaimanapun adalah mungkin untuk "
-"menggunakan alternatif lebih lambat yang mana lebih kuat. Kini anda boleh "
-"pilih antara implementasi 0 (terpantas tetapi terdapat sedikit kesilapan), 1 "
-"(lalai) dan 2."
+"Pasa Windows 9x/ME anda boleh gunakan cepat tetapi implementasi pembolehubah "
+"keadaan yang salah (lebih tepat di sini adalah terdapat kemungkinan keadaan "
+"berlumba akan berlaku). Bagaimanapun ia mungkin akan menggunakan alternatif "
+"lebih lambat yang mana lebih kuat. Kini anda boleh pili antaraimplementasi 0 "
+"(terpantas tetapi terdapat sedikit kesilapan), 1 (lalai) dan 2."
 
 #: src/libvlc-module.c:942
 msgid "Enqueue items to playlist when in one instance mode"
@@ -4780,7 +4779,7 @@ msgstr "Zhuang"
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Tidak Diketahui"
 
@@ -8690,7 +8689,7 @@ msgstr ""
 
 #: modules/codec/svcdsub.c:42
 msgid "Enable debug"
-msgstr "Bolehkan nyahpijat"
+msgstr "Benarkan nyahpijat"
 
 #: modules/codec/svcdsub.c:45
 msgid ""
@@ -8777,7 +8776,7 @@ msgstr "Integer dari -1 (no model) hingga 4."
 
 #: modules/codec/twolame.c:66
 msgid "Dual mono"
-msgstr "Dua mono"
+msgstr "Dwi mono"
 
 #: modules/codec/twolame.c:66
 msgid "Joint stereo"
@@ -8995,10 +8994,10 @@ msgid ""
 "enforced; it's up to the user to select a level compatible with the rest of "
 "the encoding options. Range 1 to 5.1 (10 to 51 is also allowed)."
 msgstr ""
-"Tetapkan paras H.264 (sebagaimana yang ditentukan oleh piawai A Annex), "
-"Paras tidak dikuatkuasakan; ia bergantung kepada pengguna untuk memilih "
-"paras yang serasi dengan pilihan mengkod yang lain. Julat 1 hingga 5.1 (10 "
-"hingga 51 tidak dibenarkan)."
+"Tentukan paras H.264 (seperti yang ditakrifkan oleh piawai Annex A). Paras "
+"tidak diwartakan; ia bergantung kepada pengguna untuk memilih paras serasi "
+"dengan pilihan mengkod yang lain. Julat 1 hingga 5.1 (10 hingga 51 juga "
+"dibenarkan)."
 
 #: modules/codec/x264.c:116
 msgid "Interlaced mode"
@@ -9426,12 +9425,12 @@ msgid ""
 "Set SPS and PPS id numbers to allow concatenating streams with different "
 "settings."
 msgstr ""
-"Tetapkan nombor id SPS dan PPS untuk membenarkan pencantuman strim dengan "
+"Tetapkan nombor id SPS dan PPS untuk membenarkan pencantuman strin dengan "
 "tetapan berbeza."
 
 #: modules/codec/x264.c:308
 msgid "Access unit delimiters"
-msgstr "Sempadan unit capaian"
+msgstr "Penghad unit capaian"
 
 #: modules/codec/x264.c:309
 msgid "Generate access unit delimiter NAL units."
@@ -10148,7 +10147,7 @@ msgstr "goto telah dimansuhkan"
 
 #: modules/control/rc.c:1459
 msgid "Type 'pause' to continue."
-msgstr "Taip 'pause' untuk menyambung."
+msgstr "Taip 'jeda' untuk mengambung."
 
 #: modules/control/rc.c:1886 modules/control/rc.c:1925
 msgid "Please provide one of the following parameters:"
@@ -10759,8 +10758,8 @@ msgid ""
 "Override the normal frames per second settings. This will only work with "
 "MicroDVD and SubRIP (SRT) subtitles."
 msgstr ""
-"Tindih tetapan bingkai per saat piawai. Ini hanya akan berfungsi dengan "
-"sarikata MicroDVD dan SubRIP (SRT)."
+"Tindih bingkai normal per saat. Ia hanya akan berfungsi dengan sarikata "
+"MicroDVD dan SubRIP (SRT)."
 
 #: modules/demux/subtitle.c:55
 msgid ""
@@ -10770,7 +10769,7 @@ msgid ""
 msgstr ""
 "Paksa format sarikata. Nilai sah adalah : \"microdvd\", \"subrip\",  \"ssa1"
 "\", \"ssa2-4\", \"ass\", \"vplayer\" \"sami\", \"dvdsubtitle\" dan \"auto"
-"\" (bermaksud autokesan, ini selalunya berfungsi)."
+"\" (bermakna autokesan, ini sepatutnya sentiasa berfungsi)."
 
 #: modules/demux/subtitle.c:67
 msgid "Text subtitles parser"
@@ -10913,9 +10912,8 @@ msgid "visual impaired commentary"
 msgstr "visual dirosakkan komentar"
 
 #: modules/demux/tta.c:40
-#, fuzzy
 msgid "TTA demuxer"
-msgstr "Demuxer AU"
+msgstr "Demuxer TTA"
 
 #: modules/demux/ty.c:70
 msgid "TY Stream audio/video demux"
@@ -11779,9 +11777,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "Mod skrin penuh untuk skrin."
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 msgid "Remember wizard options"
@@ -12985,7 +12982,7 @@ msgstr ""
 "pengumuman SAP/SDP. Cara ini, klien tidak perlu taip alamat multicast, ia "
 "akan muncul pada senarai tayangnya jika mereka membolahkan antaramuka "
 "tambahan SAP.\n"
-"Jika anda ingin beri nama pada strim anda, masukkannya di sini, ataupun, "
+"Jika anda ingin beri naka pada strim anda, masukkannya di sini, ataupun, "
 "nama lalai akan digunakan."
 
 #: modules/gui/macosx/wizard.m:1869
@@ -14422,7 +14419,7 @@ msgid ""
 "Select the target video codec. Choose a codec to display more information "
 "about it."
 msgstr ""
-"Pilih sasaran kodek video. Pilih kodek untuk memaparkan maklumat lanjut "
+"Pilih sasaran kodek video. PIlih kodek untuk memaparkan maklumat lanjunt "
 "tentangnya."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:135
@@ -14430,7 +14427,7 @@ msgid ""
 "Select the target audio codec. Choose a codec to display more information "
 "about it."
 msgstr ""
-"Pilih sasaran kodek audio. Pilih kodek untuk memaparkan maklumat lanjut "
+"Pilih sasaran kodek audio. PIlih kodek untuk memaparkan maklumat lanjunt "
 "tentangnya."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:140
@@ -14485,11 +14482,11 @@ msgid ""
 "If you want to give a name to your stream, enter it here. Otherwise, a "
 "default name will be used."
 msgstr ""
-"Apabila strim menggunakan RTP, anda boleh umumkan strim anda menggunakan "
-"protokol pengumuman SAP/SDP. Cara ini, klien tidak perlu taip alamat "
-"multicast, ia akan muncul pada senarai tayangnya jika mereka membolahkan "
-"antaramuka tambahan SAP.\n"
-"Jika anda ingin beri nama pada strim anda, masukkannya di sini. Ataupun, "
+"Apabila strim menggunakan UDP, strim boleh diumumkan menggunakan protokol "
+"pengumuman SAP/SDP. Cara ini, klien tidak perlu taip alamat multicast, ia "
+"akan muncul pada senarai tayangnya jika mereka membolahkan antaramuka "
+"tambahan SAP.\n"
+"Jika anda ingin beri naka pada strim anda, masukkannya di sini, ataupun, "
 "nama lalai akan digunakan."
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:506
@@ -14526,7 +14523,7 @@ msgstr "Tambah kesan herotan"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:149
 msgid "Image inversion"
-msgstr "Balikan imej"
+msgstr "Balikan ime"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:150
 msgid "Blurring"
@@ -14575,7 +14572,7 @@ msgstr "Terapkan penapis penyama dua kali. Kesannya akan menjadi lebih tajam."
 
 #: modules/gui/wxwidgets/extrapanel.cpp:485
 msgid "Smooth :"
-msgstr "Licin :"
+msgstr "Licin:"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:516
 msgid ""
@@ -14681,7 +14678,7 @@ msgstr "About..."
 
 #: modules/gui/wxwidgets/interface.cpp:619
 msgid "Check for Updates..."
-msgstr "Periksa Kemaskini..."
+msgstr "Periksa Kemaskinian..."
 
 #: modules/gui/wxwidgets/interface.cpp:623
 msgid "&File"
@@ -14697,11 +14694,11 @@ msgstr "&Tetapan"
 
 #: modules/gui/wxwidgets/interface.cpp:626
 msgid "&Audio"
-msgstr "&Audio"
+msgstr "Audio"
 
 #: modules/gui/wxwidgets/interface.cpp:627
 msgid "&Video"
-msgstr "&Video"
+msgstr "Video"
 
 #: modules/gui/wxwidgets/interface.cpp:628
 msgid "&Navigation"
@@ -14976,7 +14973,7 @@ msgstr "Modul antaramuka wxWidgets"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:165
 msgid "last config"
-msgstr "konfig terakhir"
+msgstr "konfig akhir"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:171
 msgid "wxWidgets dialogs provider"
@@ -15474,7 +15471,7 @@ msgstr ""
 
 #: modules/misc/freetype.c:105 modules/misc/win32text.c:77
 msgid "Smaller"
-msgstr "Llebih Kecil"
+msgstr "lebih kecil"
 
 #: modules/misc/freetype.c:105 modules/misc/win32text.c:77
 msgid "Small"
@@ -15486,7 +15483,7 @@ msgstr "Besar"
 
 #: modules/misc/freetype.c:106 modules/misc/win32text.c:78
 msgid "Larger"
-msgstr "Lebih Besar"
+msgstr "lebih besar"
 
 #: modules/misc/freetype.c:107
 msgid "Use YUVP renderer"
@@ -15522,7 +15519,7 @@ msgstr "Panduan"
 
 #: modules/misc/freetype.c:120
 msgid "Fat Outline"
-msgstr "Outline Tebal"
+msgstr "Outline Gemuk"
 
 #: modules/misc/freetype.c:132 modules/misc/win32text.c:90
 msgid "Text renderer"
@@ -15886,7 +15883,7 @@ msgstr "Lokasi fail yang memegang tempat SVG untuk penukaran automatik string"
 
 #: modules/misc/testsuite/test1.c:33
 msgid "C module that does nothing"
-msgstr "Modul C yang tidak melakukan apa-apa"
+msgstr "Modul C yang tidak melakukan apa-apa."
 
 #: modules/misc/testsuite/test4.c:63
 msgid "Miscellaneous stress tests"
@@ -16048,7 +16045,7 @@ msgstr "ID TS"
 
 #: modules/mux/mpeg/ts.c:94
 msgid "Assign a fixed Transport Stream ID."
-msgstr "Berikan ID Strim Pengangkutan tetap."
+msgstr "Berikan ID Strim Pengankutan tetap."
 
 #: modules/mux/mpeg/ts.c:95
 msgid "NET ID"
@@ -17082,7 +17079,7 @@ msgstr "Kadar bit audio"
 
 #: modules/stream_out/transcode.c:136
 msgid "Target bitrate of the transcoded audio stream."
-msgstr "Kadar bit sasaran strim audio tertranskod."
+msgstr "Kadar bit sasaran strimaudio tertranskod."
 
 #: modules/stream_out/transcode.c:137
 msgid "Audio sample rate"
@@ -17255,7 +17252,7 @@ msgstr "Tetapkan hue imej, antara 0 dan 360. Lalai kepada 0."
 
 #: modules/video_filter/adjust.c:65
 msgid "Image saturation (0-3)"
-msgstr "Kepekatan imej (0-3)"
+msgstr "Kepekatan imeh (0-3)"
 
 #: modules/video_filter/adjust.c:66
 msgid "Set the image saturation, between 0 and 3. Defaults to 1."
@@ -17528,7 +17525,7 @@ msgstr "Penapis video terbalik"
 
 #: modules/video_filter/invert.c:48
 msgid "Color inversion"
-msgstr "Pembalikan warna"
+msgstr "Pembalikan wana"
 
 #: modules/video_filter/logo.c:68
 msgid "Logo filenames"
@@ -17754,7 +17751,7 @@ msgstr "Lebar sempadan"
 
 #: modules/video_filter/mosaic.c:109
 msgid "Width in pixels of the border between miniatures."
-msgstr "Lebar piksel sempadan antara gambar kecil."
+msgstr "Lebar dalam piksel untuk sempadan di antara miniatur."
 
 #: modules/video_filter/mosaic.c:110
 msgid "Border height"
@@ -17762,7 +17759,7 @@ msgstr "Tinggi sempadan"
 
 #: modules/video_filter/mosaic.c:111
 msgid "Height in pixels of the border between miniatures."
-msgstr "Tinggi piksel sempadan antara gambar kecil."
+msgstr "Tinggi dalam piksel untuk sempadan di antara miniatur."
 
 #: modules/video_filter/mosaic.c:113
 msgid "Mosaic alignment"
@@ -18044,7 +18041,7 @@ msgid ""
 "Ammount by which to scale the picture before sending it to the internal "
 "OpenCV filter"
 msgstr ""
-"Amaun yang menskala gambar sebelum menghantarnya kepada penapis OpenCV "
+"Amoun yang menskala gambar sebelum menghantarnya kepada penapis OpenCV "
 "dalaman"
 
 #: modules/video_filter/opencv_wrapper.c:91
@@ -19286,17 +19283,125 @@ msgstr "Penapis penvisual"
 msgid "Spectrum analyser"
 msgstr "Penganalisa spektrum"
 
-#~ msgid "Description file"
-#~ msgstr "Takrifan fail"
+#~ msgid "Video filters settings"
+#~ msgstr "Tetapan penapis video"
 
-#~ msgid "A file containing a simple playlist"
-#~ msgstr "Fail mengandungi senarai tayang mudah"
+#~ msgid "CDDB Artist"
+#~ msgstr "CDDB Artist"
 
-#~ msgid "History parameter"
-#~ msgstr "Parameter sejarah"
+#~ msgid "CDDB Category"
+#~ msgstr "CDDB Category"
 
-#~ msgid "The umber of frames used for detection."
-#~ msgstr "Bingkai berwarna serbuk kopi diguna untuk mengesan."
+#~ msgid "CDDB Disc ID"
+#~ msgstr "CDDB Disc ID"
+
+#~ msgid "CDDB Extended Data"
+#~ msgstr "CDDB Extended Data"
+
+#~ msgid "CDDB Genre"
+#~ msgstr "CDDB Genre"
+
+#~ msgid "CDDB Year"
+#~ msgstr "CDDB Year"
+
+#~ msgid "CDDB Title"
+#~ msgstr "CDDB Title"
+
+#~ msgid "CD-Text Arranger"
+#~ msgstr "CD-Text Arranger"
+
+#~ msgid "CD-Text Composer"
+#~ msgstr "CD-Text Composer"
+
+#~ msgid "CD-Text Disc ID"
+#~ msgstr "ID Cakera CD-Text"
+
+#~ msgid "CD-Text Genre"
+#~ msgstr "CD-Text Genre"
+
+#~ msgid "CD-Text Message"
+#~ msgstr "CD-Text Message"
+
+#~ msgid "CD-Text Songwriter"
+#~ msgstr "CD-Text Songwriter"
+
+#~ msgid "CD-Text Performer"
+#~ msgstr "CD-Text Performer"
+
+#~ msgid "CD-Text Title"
+#~ msgstr "CD-Text Title"
+
+#~ msgid "ISO-9660 Application ID"
+#~ msgstr "ID Aplikasi ISO-9660"
+
+#~ msgid "ISO-9660 Preparer"
+#~ msgstr "ISO-9660 Preparer"
+
+#~ msgid "ISO-9660 Publisher"
+#~ msgstr "ISO-9660 Publisher"
+
+#~ msgid "ISO-9660 Volume"
+#~ msgstr "ISO-9660 Volume"
+
+#~ msgid "ISO-9660 Volume Set"
+#~ msgstr "Set Volum ISO-9660"
+
+#~ msgid "Errors"
+#~ msgstr "Ralat"
+
+#~ msgid "Login"
+#~ msgstr "Logmasuk"
+
+#~ msgid "Console"
+#~ msgstr "Konsol"
+
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "Antaramuka output IPv6 multicast"
+
+#~ msgid "Default IPv6 multicast interface. This overrides the routing table."
+#~ msgstr "IPv6 lalai antaramuka multicast . Ini akan tindan jadual laluan."
+
+#~ msgid "By category"
+#~ msgstr "Dengan kategori"
+
+#~ msgid "Manually added"
+#~ msgstr "Manual ditambah"
+
+#~ msgid "All items, unsorted"
+#~ msgstr "Semua item, bertabur"
+
+#~ msgid ""
+#~ "Select the video input source, such as composite, s-video, or tuner. "
+#~ "Since these settings are hardware-specfic, you should find good settings "
+#~ "in the \"Device config\" area, and use those numbers here. -1 means that "
+#~ "settings will not be changed."
+#~ msgstr ""
+#~ "Pilihh sumber input video, seumpama komposit, s-video, atau penala. Oleh "
+#~ "kerana tetapan ini adalah spesifik-perkakasan, anda perlu cari tetapan "
+#~ "bagus dalam kawasan \"Device config\", dan gunakan nombor berkenaan di "
+#~ "sini. -1 bermakna yang tetapan tidak akan diubah."
+
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr ""
+#~ "Ini adalah saiz fail sementara yang akan digunakan untuk menyimpan strim "
+#~ "masa ganti."
+
+#~ msgid "Name to give to this stream/channel on the icecast server."
+#~ msgstr "Nama diberi  untuk strim/saluran pada pelayan icecast."
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the icecast server."
+#~ msgstr ""
+#~ "Kebiasaannya anda perlu suap modul shoutcast dengan strim Ogg. Adalah "
+#~ "mungkin untuk strim MP3, maka and aboleh majukan strim MP3 kepada pelayan "
+#~ "icecast."
+
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "Time-To-Live strim keluar"
 
 #~ msgid "Audio filter for fixed32<->float32 conversion"
 #~ msgstr "Penapis audio untuk pertukaran fixed32<->float32"
@@ -19334,12 +19439,1373 @@ msgstr "Penganalisa spektrum"
 #~ msgid "Audio filter for u8->float32 conversion"
 #~ msgstr "Penapis audio untuk pertukaran u8->float32"
 
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Output audio Linux OSS"
+
+#~ msgid "Corba control"
+#~ msgstr "Kawalan Corba"
+
+#~ msgid "Reactivity"
+#~ msgstr "Reaktiviti"
+
+#~ msgid ""
+#~ "The corba interface will handle events every 50ms/Reactivity. 5000 "
+#~ "appears to be a sensible value."
+#~ msgstr ""
+#~ "Antaramuka corba akan mengawal peristiwa setiap 50ms/Reaktiviti. 5000 "
+#~ "kelihatan seperti nilai yang munasabah."
+
+#~ msgid "corba control module"
+#~ msgstr "modul kawalan corba"
+
+#~ msgid "| time-format STRING . . . overlay STRING in video"
+#~ msgstr "| time-format STRING . . . lapisan STRING dalam video"
+
+#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
+#~ msgstr "| time-x X . . . . . . . . . . . .offset dari kiri"
+
+#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
+#~ msgstr "| time-y Y . . . . . . . . . . . . offset dari atas"
+
+#~ msgid "| time-position #. . . . . . . . relative position"
+#~ msgstr "| posisi-masa #. . . . . . . . posisi berhubung"
+
+#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
+#~ msgstr "| warna-masa # . . . . . . . . . . warna fon, RGB"
+
+#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
+#~ msgstr "| kelegapan-masa # . . . . . . . . . . . . . kelegapan"
+
+#~ msgid "| time-size # . . . . . . . . font size, in pixels"
+#~ msgstr "| time-size # . . . . . . . . saiz font, dalam piksel"
+
+#~ msgid "Fixing AVI Index"
+#~ msgstr "Membaiki Indeks AVI"
+
+#~ msgid "Creating AVI Index ..."
+#~ msgstr "Mencipta Indeks AVI ..."
+
+#~ msgid "Playlist metademux"
+#~ msgstr "Senarai tayang metademux"
+
+#~ msgid "Segment filename"
+#~ msgstr "Namafail segmen"
+
+#~ msgid "Muxing application"
+#~ msgstr "Menggandakan(mux) aplikasi"
+
+#~ msgid "Writing application"
+#~ msgstr "Menulis Aplikasi"
+
+#~ msgid "Listeners"
+#~ msgstr "Pendengar"
+
+#~ msgid "Native playlist import"
+#~ msgstr "Import senarai tayang asli"
+
+#~ msgid "Podcast Link"
+#~ msgstr "Pautan Podcast"
+
+#~ msgid "Podcast Copyright"
+#~ msgstr "Hakcipta Podcast"
+
+#~ msgid "Podcast Category"
+#~ msgstr "Kategori Podcast"
+
+#~ msgid "Podcast Keywords"
+#~ msgstr "Katakunci Podcast"
+
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Sarikata Podcast"
+
+#~ msgid "Podcast Publication Date"
+#~ msgstr "Tarikh Penerbitan Podcast"
+
+#~ msgid "Podcast Author"
+#~ msgstr "Pengarang Podcast"
+
+#~ msgid "Podcast Subcategory"
+#~ msgstr "Subkategori Podcast"
+
+#~ msgid "Podcast Duration"
+#~ msgstr "Tempoh Podcast"
+
+#~ msgid "Podcast Type"
+#~ msgstr "Jenis Podcast"
+
+#~ msgid "Mime type"
+#~ msgstr "Jenis mime"
+
+#~ msgid ""
+#~ "This panel allows to select video effects filters to apply.\n"
+#~ "The filters can be configured indivudually in the Preferences, in the "
+#~ "subsections of Video/Filters\n"
+#~ ".To choose the order in which the filter are applied, a filter option "
+#~ "string can be set in the Preferences, Video / Filters section."
+#~ msgstr ""
+#~ "Panel ini membenarkan untuk memilih penapis kesan video untuk "
+#~ "diterapkan.\n"
+#~ "Penapis boleh dikonfigur individu dalam Keutamaan, dalam subseksyen Video/"
+#~ "Penapis\n"
+#~ ".Untuk memilih urutan bbagaimana penapis diterapkan, rentetan pilihan "
+#~ "penapis boleh ditetapkan dalam Keutamaan, Video / Seksyen Penapis."
+
+#~ msgid "Yes"
+#~ msgstr "Yes"
+
+#~ msgid "No"
+#~ msgstr "No"
+
+#~ msgid ""
+#~ "An error has occurred which probably prevented the proper execution of "
+#~ "the program:"
+#~ msgstr ""
+#~ "Ralat berlaku yang mungkin mencegah pelaksanaa program dengan betul:"
+
+#~ msgid "If you believe that it is a bug, please follow the instructions at:"
+#~ msgstr "Jika anda percaya yang ia adalah pijat, sila ikut arahan pada:"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Buka Tetingkap Mesej"
+
+#~ msgid "Dismiss"
+#~ msgstr "Surai"
+
+#~ msgid "Do not display further errors"
+#~ msgstr "Jangan papar ralat lagi"
+
+#~ msgid "Crop borders in fullscreen"
+#~ msgstr "Cantas sempadan pada skrin penuh"
+
+#~ msgid ""
+#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
+#~ "screen without black borders (OpenGL only)."
+#~ msgstr ""
+#~ "Dalam mod skrin penuh, cantas gambar jika perlu untuk penuhkan skrin "
+#~ "tanpa semadan hitam (hanya OpenGL)."
+
 #, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Jenis cakera"
+#~ msgid "Enable skinned playlist"
+#~ msgstr "Gagal menemui senarai tayang"
+
+#~ msgid "%i items in playlist (%i not shown)"
+#~ msgstr "%i items in playlist (%i not shown)"
+
+#~ msgid "M3U file"
+#~ msgstr "Fail M3U"
+
+#~ msgid "Sorted by Artist"
+#~ msgstr "Sorted by Artist"
+
+#~ msgid "Sorted by Album"
+#~ msgstr "Isih dengan Album"
+
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "Lapisan abstrak rangkaian UDP/IPv4"
+
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "Lapisan abstrak rangkaian UDP/IPv6"
+
+#~ msgid "Playlist stress tests"
+#~ msgstr "Senarai tayang ujian tekanan"
+
+#~ msgid "DAAP shares"
+#~ msgstr "Kongsi DAAP"
+
+#~ msgid "DAAP access"
+#~ msgstr "Capaian DAAP"
+
+#~ msgid "Session Announcements (SAP)"
+#~ msgstr "Pemberitahuan Sessi (SAP)"
+
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr ""
+#~ "Ini akan membenarkan anda menentukan Masa-Untuk-Hidup untuk strim output."
+
+#~ msgid "Automatic black border cropping."
+#~ msgstr "Pemangkas sempadan hitam automatik"
+
+#~ msgid ""
+#~ "Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough"
+#~ "\" and \"psychedelic\"."
+#~ msgstr ""
+#~ "Mod herotan, salah satu dari \"gelombang\", \"riak\", \"curam\", \"bucu"
+#~ "\", \"hough\" dan \"berkilau\"."
+
+#~ msgid "Distort video filter"
+#~ msgstr "Penapis video herot"
+
+#~ msgid "Number of loops for the logo animation.1 = continuous, 0 = disabled"
+#~ msgstr "Bilangan gelung untuk animasi logo. 1 = berterisan, 0 = lumpuh"
+
+#~ msgid "Marquee text to display."
+#~ msgstr "Ukiran teks untuk dipaparkan."
+
+#~ msgid ""
+#~ "Positioning method for the mosaic. auto: automatically choose the best "
+#~ "number of rows and columns. fixed: use the user-defined number of rows "
+#~ "and columns."
+#~ msgstr ""
+#~ "Metod kedudukan untuk mozek. auto: automatik pilih nombor terbaik baris "
+#~ "dan lajur. tetap: guna nombor pra-takrif untuk baris dan lajur."
+
+#~ msgid "Description file"
+#~ msgstr "Takrifan fail"
+
+#~ msgid "A file containing a simple playlist"
+#~ msgstr "Fail mengandungi senarai tayang mudah"
+
+#~ msgid "History parameter"
+#~ msgstr "Parameter sejarah"
+
+#~ msgid "The umber of frames used for detection."
+#~ msgstr "Bingkai berwarna serbuk kopi diguna untuk mengesan."
+
+#~ msgid "Motion detect"
+#~ msgstr "Kesan gerak"
+
+#~ msgid "Time format string (%Y%m%d %H%M%S)"
+#~ msgstr "Rentetan format masa (%Y%m%d %H%M%S)"
+
+#~ msgid ""
+#~ "Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = "
+#~ "minute, %S = second)."
+#~ msgstr ""
+#~ "Rentetan format masa  (%Y = tahun, %m = bulan, %d = hari, %H = jam, %M = "
+#~ "minit, %S = saat)."
+
+#~ msgid "X offset, from the left screen edge"
+#~ msgstr "Offset Y, dari sudut kiri skrin"
+
+#~ msgid "Y offset, down from the top"
+#~ msgstr "Offset Y, turun dari atas"
+
+#~ msgid ""
+#~ "You can enforce the text position on the video (0=center, 1=left, "
+#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+#~ "e.g. 6 = top-right)."
+#~ msgstr ""
+#~ "Anda boleh paksa posisi teks pada video (0=tengah, 1=kiri, 2=kanan, "
+#~ "4=atas, 8=bawah, anda juga boleh gunakan kombinasi nilai, cth. 6=atas-"
+#~ "kanan)."
+
+#~ msgid "Time overlay"
+#~ msgstr "lapisan masa"
+
+#~ msgid "Time display sub filter"
+#~ msgstr "Paparan masa suub penapis"
+
+#~ msgid "Standard Play"
+#~ msgstr "Tayang Piawai"
+
+#~ msgid "Choose when to download and cache album art."
+#~ msgstr "Pilih bila hendak muat turun dan cache album seni."
+
+#~ msgid "Never download"
+#~ msgstr "Jangan muat turun"
+
+#~ msgid "Download when asked"
+#~ msgstr "Muat turun apabila ditanya"
+
+#~ msgid "Download when track starts playing"
+#~ msgstr "Muat turun apabila trek mula menayangkan"
+
+#~ msgid "Download everything ASAP"
+#~ msgstr "Muat turun kesemuanya ASAP"
+
+#~ msgid "\"%s\"'s file type is unknown."
+#~ msgstr "Jenis fail \"%s\" tidak diketahui."
+
+#~ msgid "Stream information"
+#~ msgstr "Maklumat Strim"
 
 #~ msgid "Browse"
 #~ msgstr "Lungsur"
+
+#~ msgid "Justification"
+#~ msgstr "Pembuktian"
+
+#~ msgid "last.fm username not set"
+#~ msgstr "nama pengguna last.fm tidak ditetapkan"
+
+#~ msgid ""
+#~ "You have to set a username, and then restart VLC.\n"
+#~ "Visit https://www.last.fm/join/ if you don't have one."
+#~ msgstr ""
+#~ "Anda perlu menetapkan nama pengguna, dan kemudian mulakan semula VLC.\n"
+#~ "Lawati https://www.last.fm/join/ jika anda tidak memilikinya."
+
+#~ msgid "Growl"
+#~ msgstr "Growl"
+
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
+#~ msgid "Vertical border width"
+#~ msgstr "Lebar sempadan mengufuk"
+
+#~ msgid ""
+#~ "Width in pixels of the border than can be drawn vertically around the "
+#~ "mosaic."
+#~ msgstr ""
+#~ "Lebar piksel sempadan kemudiannya boleh dilukis menegak keliling mozek."
+
+#~ msgid "Horizontal border width"
+#~ msgstr "Lebar sempadan mendatar"
+
+#~ msgid "DCA"
+#~ msgstr "DCA"
+
+#~ msgid ""
+#~ "Subpictures get a default timeout of 15 seconds added to their remaining "
+#~ "time.This will ensure that they are at least the specified time visible."
+#~ msgstr ""
+#~ "Subgambar dapat hadmasa lalai sebanyak 15 saat ditambah kepada masa yang "
+#~ "tinggal. Ini bagi memastikan sekurang-kurangnya masa ditentukan tampak."
+
+#~ msgid ""
+#~ "This has no effect on actual encoding quality, it just prevents the stats "
+#~ "from being calculated (for speed)."
+#~ msgstr ""
+#~ "Tidak terdapat kesan pada kualiti mengkod sebenar, ia hanyalah untuk "
+#~ "mengelak stat daripada dikira (untuk kelajuan)."
+
+#~ msgid "Image"
+#~ msgstr "Imej"
+
+#~ msgid "Center-Center"
+#~ msgstr "Center-Center"
+
+#~ msgid "Left-Center"
+#~ msgstr "Left-Center"
+
+#~ msgid "Right-Center"
+#~ msgstr "Right-Center"
+
+#~ msgid "Center-Top"
+#~ msgstr "Center-Top"
+
+#~ msgid "Left-Top"
+#~ msgstr "Left-Top"
+
+#~ msgid "Right-Top"
+#~ msgstr "Right-Top"
+
+#~ msgid "Center-Bottom"
+#~ msgstr "Center-Bottom"
+
+#~ msgid "Left-Bottom"
+#~ msgstr "Left-Bottom"
+
+#~ msgid "Right-Bottom"
+#~ msgstr "Right-Bottom"
+
+#~ msgid "Create"
+#~ msgstr "Cipta"
+
+#~ msgid "Number of streams"
+#~ msgstr "Bilangan strim"
+
+#~ msgid "Maximum number of Shoutcast radio streams which would be listed."
+#~ msgstr "Bilangan maksima strim radio Shoutcast yang mana disenaraikan."
+
+#~ msgid " to "
+#~ msgstr " kepada "
+
+#~ msgid "Adjust Image"
+#~ msgstr "Adjust Image"
+
+#~ msgid "Check for updates..."
+#~ msgstr "Check for updates..."
+
+#~ msgid "delay"
+#~ msgstr "delay"
+
+#~ msgid "fps"
+#~ msgstr "fps"
+
+#~ msgid "More info"
+#~ msgstr "More info"
+
+#~ msgid "Control interface settings"
+#~ msgstr "Control interface settings"
+
+#~ msgid ""
+#~ "Use the settings of the \"freetype\" module to choose the font you  want "
+#~ "VLC to use for text rendering (to display subtitles for example)."
+#~ msgstr ""
+#~ "Use the settings of the \"freetype\" module to choose the font you  want "
+#~ "VLC to use for text rendering (to display subtitles for example)."
+
+#~ msgid ""
+#~ "You can enforce the position of the top left corner of the video window "
+#~ "here (x coordinate)."
+#~ msgstr ""
+#~ "You can enforce the position of the top left corner of the video window "
+#~ "here (x coordinate)."
+
+#~ msgid "You can specify a custom video window title here."
+#~ msgstr "You can specify a custom video window title here."
+
+#~ msgid "Program to select"
+#~ msgstr "Program to select"
+
+#~ msgid "Programs to select"
+#~ msgstr "Programs to select"
+
+#~ msgid "Interfaces"
+#~ msgstr "Interfaces"
+
+#~ msgid "DTS"
+#~ msgstr "DTS"
+
+#~ msgid "By default the encoding is CBR."
+#~ msgstr "By default the encoding is CBR."
+
+#~ msgid "Default to 4212"
+#~ msgstr "Default to 4212"
+
+#~ msgid "Go To Position"
+#~ msgstr "Go To Position"
+
+#~ msgid "Fill fullscreen"
+#~ msgstr "Fill fullscreen"
+
+#~ msgid "VIDEO_TS folder"
+#~ msgstr "VIDEO_TS folder"
+
+#~ msgid "Name of DVD device to read from."
+#~ msgstr "Name of DVD device to read from."
+
+#~ msgid "Name of CD-ROM device to read Video CD from."
+#~ msgstr "Name of CD-ROM device to read Video CD from."
+
+#~ msgid "Name of CD-ROM device to read audio CD from."
+#~ msgstr "Name of CD-ROM device to read audio CD from."
+
+#~ msgid "&Shuffle Playlist"
+#~ msgstr "&Shuffle Playlist"
+
+#~ msgid "VLC media player - Updates"
+#~ msgstr "VLC media player - Updates"
+
+#~ msgid "Check for updates now !"
+#~ msgstr "Check for updates now !"
+
+#~ msgid "VLM configuration"
+#~ msgstr "VLM configuration"
+
+#~ msgid "Font filename"
+#~ msgstr "Font filename"
+
+#~ msgid "Podcast Service Discovery"
+#~ msgstr "Podcast Service Discovery"
+
+#~ msgid "IPv4-SAP listening"
+#~ msgstr "IPv4-SAP listening"
+
+#~ msgid "IPv6-SAP listening"
+#~ msgstr "IPv6-SAP listening"
+
+#~ msgid "Height in pixels"
+#~ msgstr "Height in pixels"
+
+#~ msgid "Width in pixels"
+#~ msgstr "Width in pixels"
+
+#~ msgid "Ascii Art"
+#~ msgstr "Ascii Art"
+
+#~ msgid "Small playlist"
+#~ msgstr "Small playlist"
+
+#~ msgid "VC-1 decoder module"
+#~ msgstr "VC-1 decoder module"
+
+#~ msgid "M3U file|*.m3u"
+#~ msgstr "M3U file|*.m3u"
+
+#~ msgid "raw DV demuxer"
+#~ msgstr "raw DV demuxer"
+
+#~ msgid "Enable CABAC"
+#~ msgstr "Enable CABAC"
+
+#~ msgid "Enable loop filter"
+#~ msgstr "Enable loop filter"
+
+#~ msgid "Analyse mode"
+#~ msgstr "Analyse mode"
+
+#~ msgid "Properties"
+#~ msgstr "Properties"
+
+#~ msgid "from "
+#~ msgstr "from "
+
+#~ msgid "type : "
+#~ msgstr "type : "
+
+#~ msgid "URL : "
+#~ msgstr "URL : "
+
+#~ msgid "file size : "
+#~ msgstr "file size : "
+
+#~ msgid "file md5 hash : "
+#~ msgstr "file md5 hash : "
+
+#~ msgid "Choose a mirror"
+#~ msgstr "Choose a mirror"
+
+#~ msgid "Downloading..."
+#~ msgstr "Downloading..."
+
+#~ msgid " "
+#~ msgstr " "
+
+#~ msgid ""
+#~ "VLC is an open-source and cross-platform multimedia player for various "
+#~ "audio and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, etc.) as "
+#~ "well as DVDs, VCDs, CD audio, and various streaming protocols.\n"
+#~ "\n"
+#~ "VLC is also a streaming server with transcoding capabilities (UDP unicast "
+#~ "and multicast, HTTP, etc.) mainly designed for high-bandwidth networks.\n"
+#~ "\n"
+#~ "For more information, have a look at the web site."
+#~ msgstr ""
+#~ "VLC asalah pemain multimedia sumber-terbuka dan platform-silang untuk "
+#~ "pelbagai firmat audio dan video (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, "
+#~ "dll.) begitu juga DVD, VCD, CD audio, dan pelbagai protokol pengaliran.\n"
+#~ "\n"
+#~ "VLC juga sebagai pelayan pengaliran dengan keupayaan pemindahan antara "
+#~ "kod (unikas dan multikas UDP, HTTP, dll.) paling utama direka untuk "
+#~ "rangkaian jalurlebar-tinggi.\n"
+#~ "\n"
+#~ "For more information, have a look at the web site."
+
+#~ msgid "Jump 3 seconds backwards"
+#~ msgstr "Jump 3 seconds backwards"
+
+#~ msgid "Jump 10 seconds backwards"
+#~ msgstr "Jump 10 seconds backwards"
+
+#~ msgid "Jump 1 minute backwards"
+#~ msgstr "Jump 1 minute backwards"
+
+#~ msgid "Jump 5 minutes backwards"
+#~ msgstr "Jump 5 minutes backwards"
+
+#~ msgid "Jump 3 seconds forward"
+#~ msgstr "Jump 3 seconds forward"
+
+#~ msgid "Jump 10 seconds forward"
+#~ msgstr "Jump 10 seconds forward"
+
+#~ msgid "Jump 1 minute forward"
+#~ msgstr "Jump 1 minute forward"
+
+#~ msgid "Jump 5 minutes forward"
+#~ msgstr "Jump 5 minutes forward"
+
+#~ msgid "HTTP/HTTPS"
+#~ msgstr "HTTP/HTTPS"
+
+#~ msgid "Settings related to the various access filter used by VLC.\n"
+#~ msgstr "Settings related to the various access filter used by VLC.\n"
+
+#~ msgid "Open MRL"
+#~ msgstr "Open MRL"
+
+#~ msgid "Channel mixer"
+#~ msgstr "Channel mixer"
+
+#~ msgid "Choose program (SID)"
+#~ msgstr "Choose program (SID)"
+
+#~ msgid "Choose programs"
+#~ msgstr "Choose programs"
+
+#~ msgid "Choose audio track"
+#~ msgstr "Choose audio track"
+
+#~ msgid "Choose subtitles track"
+#~ msgstr "Choose subtitles track"
+
+#~ msgid "Shout"
+#~ msgstr "Shout"
+
+#~ msgid "Segment "
+#~ msgstr "Segment "
+
+#~ msgid "Track "
+#~ msgstr "Track "
+
+#~ msgid "[0=stereo, 1=dual-mono, 2=joint-stereo]"
+#~ msgstr "[0=stereo, 1=dual-mono, 2=joint-stereo]"
+
+#~ msgid "Current version"
+#~ msgstr "Current version"
+
+#~ msgid "Released on"
+#~ msgstr "Released on"
+
+#~ msgid "Your version"
+#~ msgstr "Your version"
+
+#~ msgid "Mirror"
+#~ msgstr "Mirror"
+
+#~ msgid "UPnP"
+#~ msgstr "UPnP"
+
+#~ msgid "Streamming"
+#~ msgstr "Streamming"
+
+#~ msgid "RSS"
+#~ msgstr "RSS"
+
+#~ msgid "Windows GAPI"
+#~ msgstr "Windows GAPI"
+
+#~ msgid "Windows GDI"
+#~ msgstr "Windows GDI"
+
+#~ msgid "Access modules settings"
+#~ msgstr "Access modules settings"
+
+#~ msgid "Audio output modules settings"
+#~ msgstr "Audio output modules settings"
+
+#~ msgid "Decoder modules settings"
+#~ msgstr "Decoder modules settings"
+
+#~ msgid "Demuxers settings"
+#~ msgstr "Demuxers settings"
+
+#~ msgid "Stream output access modules settings"
+#~ msgstr "Stream output access modules settings"
+
+#~ msgid "Text renderer settings"
+#~ msgstr "Text renderer settings"
+
+#~ msgid "Video track"
+#~ msgstr "Video track"
+
+#~ msgid "Next Chapter"
+#~ msgstr "Next Chapter"
+
+#~ msgid "Previous Chapter"
+#~ msgstr "Previous Chapter"
+
+#~ msgid ""
+#~ "Usage: %s [options] [items]...\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Usage: %s [options] [items]...\n"
+#~ "\n"
+
+#~ msgid "[module]              [description]\n"
+#~ msgstr "[module]              [description]\n"
+
+#~ msgid "Choose channel"
+#~ msgstr "Choose channel"
+
+#~ msgid "Choose a stream output"
+#~ msgstr "Choose a stream output"
+
+#~ msgid "Loop playlist on end"
+#~ msgstr "Loop playlist on end"
+
+#~ msgid "CD Audio demux"
+#~ msgstr "CD Audio demux"
+
+#~ msgid "file"
+#~ msgstr "file"
+
+#~ msgid "Dummy stream ouput"
+#~ msgstr "Dummy stream ouput"
+
+#~ msgid "File stream ouput"
+#~ msgstr "File stream ouput"
+
+#~ msgid "UDP stream ouput"
+#~ msgstr "UDP stream ouput"
+
+#~ msgid "udp stream output"
+#~ msgstr "udp stream output"
+
+#~ msgid "Truncated stream"
+#~ msgstr "Truncated stream"
+
+#~ msgid "Stream "
+#~ msgstr "Stream "
+
+#~ msgid "Codec name"
+#~ msgstr "Codec name"
+
+#~ msgid "Planes"
+#~ msgstr "Planes"
+
+#~ msgid "Number of Streams"
+#~ msgstr "Number of Streams"
+
+#~ msgid "Flags"
+#~ msgstr "Flags"
+
+#~ msgid "Audio Bitrate"
+#~ msgstr "Audio Bitrate"
+
+#~ msgid "playlist metademux"
+#~ msgstr "playlist metademux"
+
+#~ msgid "Segment Filename"
+#~ msgstr "Segment Filename"
+
+#~ msgid "Muxing Application"
+#~ msgstr "Muxing Application"
+
+#~ msgid "Writing Application"
+#~ msgstr "Writing Application"
+
+#~ msgid "Codec Setting"
+#~ msgstr "Codec Setting"
+
+#~ msgid "Codec Info"
+#~ msgstr "Codec Info"
+
+#~ msgid "Codec Download"
+#~ msgstr "Codec Download"
+
+#~ msgid "Display Resolution"
+#~ msgstr "Display Resolution"
+
+#~ msgid "Instrumental Pop"
+#~ msgstr "Instrumental Pop"
+
+#~ msgid "Instrumental Rock"
+#~ msgstr "Instrumental Rock"
+
+#~ msgid "Pop/Funk"
+#~ msgstr "Pop/Funk"
+
+#~ msgid "Psychadelic"
+#~ msgstr "Psychadelic"
+
+#~ msgid "Acid Punk"
+#~ msgstr "Acid Punk"
+
+#~ msgid "Acid Jazz"
+#~ msgstr "Acid Jazz"
+
+#~ msgid "Rock & Roll"
+#~ msgstr "Rock & Roll"
+
+#~ msgid "Hard Rock"
+#~ msgstr "Hard Rock"
+
+#~ msgid "Prev Chapter"
+#~ msgstr "Prev Chapter"
+
+#~ msgid "Play List"
+#~ msgstr "Play List"
+
+#~ msgid "VideoLAN Client: Open Subtitle File"
+#~ msgstr "VideoLAN Client: Open Subtitle File"
+
+#~ msgid "<unknown>"
+#~ msgstr "<unknown>"
+
+#~ msgid "GNOME"
+#~ msgstr "GNOME"
+
+#~ msgid "GNOME interface"
+#~ msgstr "GNOME interface"
+
+#~ msgid "_Open File..."
+#~ msgstr "_Open File..."
+
+#~ msgid "Open a file"
+#~ msgstr "Open a file"
+
+#~ msgid "Open _Disc..."
+#~ msgstr "Open _Disc..."
+
+#~ msgid "Open a DVD or VCD"
+#~ msgstr "Open a DVD or VCD"
+
+#~ msgid "_Network Stream..."
+#~ msgstr "_Network Stream..."
+
+#~ msgid "Select a network stream"
+#~ msgstr "Select a network stream"
+
+#~ msgid "_Eject Disc"
+#~ msgstr "_Eject Disc"
+
+#~ msgid "Eject disc"
+#~ msgstr "Eject disc"
+
+#~ msgid "_Title"
+#~ msgstr "_Title"
+
+#~ msgid "_Chapter"
+#~ msgstr "_Chapter"
+
+#~ msgid "_Language"
+#~ msgstr "_Language"
+
+#~ msgid "_Subtitles"
+#~ msgstr "_Subtitles"
+
+#~ msgid "_Fullscreen"
+#~ msgstr "_Fullscreen"
+
+#~ msgid "_Audio"
+#~ msgstr "_Audio"
+
+#~ msgid "_Video"
+#~ msgstr "_Video"
+
+#~ msgid "Net"
+#~ msgstr "Net"
+
+#~ msgid "Stop Stream"
+#~ msgstr "Stop Stream"
+
+#~ msgid "Play Stream"
+#~ msgstr "Play Stream"
+
+#~ msgid "Pause Stream"
+#~ msgstr "Pause Stream"
+
+#~ msgid "Play Slower"
+#~ msgstr "Play Slower"
+
+#~ msgid "Fast"
+#~ msgstr "Fast"
+
+#~ msgid "Play Faster"
+#~ msgstr "Play Faster"
+
+#~ msgid "Prev"
+#~ msgstr "Prev"
+
+#~ msgid "Previous file"
+#~ msgstr "Previous file"
+
+#~ msgid "Next File"
+#~ msgstr "Next File"
+
+#~ msgid "Title:"
+#~ msgstr "Title:"
+
+#~ msgid "Chapter:"
+#~ msgstr "Chapter:"
+
+#~ msgid "(c) 1996-2003 the VideoLAN team"
+#~ msgstr "(c) 1996-2003 the VideoLAN team"
+
+#~ msgid "HTTP/FTP/MMS"
+#~ msgstr "HTTP/FTP/MMS"
+
+#~ msgid "FEC"
+#~ msgstr "FEC"
+
+#~ msgid "Vertical"
+#~ msgstr "Vertical"
+
+#~ msgid "Url"
+#~ msgstr "Url"
+
+#~ msgid "Path:"
+#~ msgstr "Path:"
+
+#~ msgid "Gtk+"
+#~ msgstr "Gtk+"
+
+#~ msgid "Gtk+ interface"
+#~ msgstr "Gtk+ interface"
+
+#~ msgid "_File"
+#~ msgstr "_File"
+
+#~ msgid "_Close"
+#~ msgstr "_Close"
+
+#~ msgid "E_xit"
+#~ msgstr "E_xit"
+
+#~ msgid "Exit the program"
+#~ msgstr "Exit the program"
+
+#~ msgid "_View"
+#~ msgstr "_View"
+
+#~ msgid "_Settings"
+#~ msgstr "_Settings"
+
+#~ msgid "_Help"
+#~ msgstr "_Help"
+
+#~ msgid "_About..."
+#~ msgstr "_About..."
+
+#~ msgid "About this application"
+#~ msgstr "About this application"
+
+#~ msgid "_Play"
+#~ msgstr "_Play"
+
+#~ msgid "Authors"
+#~ msgstr "Authors"
+
+#~ msgid "Select a subtitles file"
+#~ msgstr "Select a subtitles file"
+
+#~ msgid "Select File"
+#~ msgstr "Select File"
+
+#~ msgid "Go to:"
+#~ msgstr "Go to:"
+
+#~ msgid "_Invert"
+#~ msgstr "_Invert"
+
+#~ msgid "_Select"
+#~ msgstr "_Select"
+
+#~ msgid "Title %d (%d)"
+#~ msgstr "Title %d (%d)"
+
+#~ msgid "Chapter %d"
+#~ msgstr "Chapter %d"
+
+#~ msgid "Selected:"
+#~ msgstr "Selected:"
+
+#~ msgid "Gtk2 interface"
+#~ msgstr "Gtk2 interface"
+
+#~ msgid "_New"
+#~ msgstr "_New"
+
+#~ msgid "window1"
+#~ msgstr "window1"
+
+#~ msgid "_Edit"
+#~ msgstr "_Edit"
+
+#~ msgid "_About"
+#~ msgstr "_About"
+
+#~ msgid "Languages"
+#~ msgstr "Languages"
+
+#~ msgid "KDE interface"
+#~ msgstr "KDE interface"
+
+#~ msgid "Fit To Screen"
+#~ msgstr "Fit To Screen"
+
+#~ msgid "Repeat Playlist"
+#~ msgstr "Repeat Playlist"
+
+#~ msgid "Controls"
+#~ msgstr "Controls"
+
+#~ msgid "TTL"
+#~ msgstr "TTL"
+
+#~ msgid "Ogg"
+#~ msgstr "Ogg"
+
+#~ msgid "MPEG PS"
+#~ msgstr "MPEG PS"
+
+#~ msgid "MPEG 4"
+#~ msgstr "MPEG 4"
+
+#~ msgid "MPEG 1"
+#~ msgstr "MPEG 1"
+
+#~ msgid "Quicktime"
+#~ msgstr "Quicktime"
+
+#~ msgid "ncurses interface"
+#~ msgstr "ncurses interface"
+
+#~ msgid "Pause stream"
+#~ msgstr "Pause stream"
+
+#~ msgid "Play stream"
+#~ msgstr "Play stream"
+
+#~ msgid "MRL :"
+#~ msgstr "MRL :"
+
+#~ msgid "FTP"
+#~ msgstr "FTP"
+
+#~ msgid "0:00:00"
+#~ msgstr "0:00:00"
+
+#~ msgid "file://"
+#~ msgstr "file://"
+
+#~ msgid "ftp://"
+#~ msgstr "ftp://"
+
+#~ msgid "http://"
+#~ msgstr "http://"
+
+#~ msgid "udp://@:1234"
+#~ msgstr "udp://@:1234"
+
+#~ msgid "udp6://@:1234"
+#~ msgstr "udp6://@:1234"
+
+#~ msgid "rtp://"
+#~ msgstr "rtp://"
+
+#~ msgid "rtp6://"
+#~ msgstr "rtp6://"
+
+#~ msgid "Stream:"
+#~ msgstr "Stream:"
+
+#~ msgid "client"
+#~ msgstr "client"
+
+#~ msgid "/dev/dsp"
+#~ msgstr "/dev/dsp"
+
+#~ msgid "/dev/video"
+#~ msgstr "/dev/video"
+
+#~ msgid "Device :"
+#~ msgstr "Device :"
+
+#~ msgid "Codec :"
+#~ msgstr "Codec :"
+
+#~ msgid "huff"
+#~ msgstr "huff"
+
+#~ msgid "Server"
+#~ msgstr "Server"
+
+#~ msgid "http://www.videolan.org"
+#~ msgstr "http://www.videolan.org"
+
+#~ msgid "FileInfo"
+#~ msgstr "FileInfo"
+
+#~ msgid "Open a DVD or (S)VCD"
+#~ msgstr "Open a DVD or (S)VCD"
+
+#~ msgid "Open a network stream"
+#~ msgstr "Open a network stream"
+
+#~ msgid "Eject the DVD/CD"
+#~ msgstr "Eject the DVD/CD"
+
+#~ msgid "Exit this program"
+#~ msgstr "Exit this program"
+
+#~ msgid "Show the program logs"
+#~ msgstr "Show the program logs"
+
+#~ msgid "About this program"
+#~ msgstr "About this program"
+
+#~ msgid "Simple &Open ..."
+#~ msgstr "Simple &Open ..."
+
+#~ msgid "Open &Satellite Stream..."
+#~ msgstr "Open &Satellite Stream..."
+
+#~ msgid "&Eject Disc"
+#~ msgstr "&Eject Disc"
+
+#~ msgid "E&xit"
+#~ msgstr "E&xit"
+
+#~ msgid "&File info..."
+#~ msgstr "&File info..."
+
+#~ msgid "&About..."
+#~ msgstr "&About..."
+
+#~ msgid ""
+#~ " (wxWindows interface)\n"
+#~ "\n"
+#~ msgstr ""
+#~ " (wxWindows interface)\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "(C) 1996-2003 - the VideoLAN Team\n"
+#~ "\n"
+#~ msgstr ""
+#~ "(C) 1996-2003 - the VideoLAN Team\n"
+#~ "\n"
+
+#~ msgid "Playlist Item options"
+#~ msgstr "Playlist Item options"
+
+#~ msgid "Group Info"
+#~ msgstr "Group Info"
+
+#~ msgid "Audio menu"
+#~ msgstr "Audio menu"
+
+#~ msgid "Capture input stream"
+#~ msgstr "Capture input stream"
+
+#~ msgid "Video For Linux"
+#~ msgstr "Video For Linux"
+
+#~ msgid "CD Audio"
+#~ msgstr "CD Audio"
+
+#~ msgid "WebCam"
+#~ msgstr "WebCam"
+
+#~ msgid "TV Card"
+#~ msgstr "TV Card"
+
+#~ msgid "Kfir"
+#~ msgstr "Kfir"
+
+#~ msgid "&Simple Add..."
+#~ msgstr "&Simple Add..."
+
+#~ msgid "&Disable"
+#~ msgstr "&Disable"
+
+#~ msgid "&Select All"
+#~ msgstr "&Select All"
+
+#~ msgid "Item Infos"
+#~ msgstr "Item Infos"
+
+#~ msgid "no info"
+#~ msgstr "no info"
+
+#~ msgid "General Settings"
+#~ msgstr "General Settings"
+
+#~ msgid "Delay subtitles (in 1/10s)"
+#~ msgstr "Delay subtitles (in 1/10s)"
+
+#~ msgid "Video Device Advanced Options"
+#~ msgstr "Video Device Advanced Options"
+
+#~ msgid "Audio Options"
+#~ msgstr "Audio Options"
+
+#~ msgid "Bitrate Options"
+#~ msgstr "Bitrate Options"
+
+#~ msgid "Filename of Font"
+#~ msgstr "Filename of Font"
+
+#~ msgid "Fonts"
+#~ msgstr "Fonts"
+
+#~ msgid "HTTP 1.0 daemon"
+#~ msgstr "HTTP 1.0 daemon"
+
+#~ msgid "log filename"
+#~ msgstr "log filename"
+
+#~ msgid "file logging interface"
+#~ msgstr "file logging interface"
+
+#~ msgid "SAP interface"
+#~ msgstr "SAP interface"
+
+#~ msgid "Dummy stream"
+#~ msgstr "Dummy stream"
+
+#~ msgid "Standard stream"
+#~ msgstr "Standard stream"
+
+#~ msgid "Transcode stream"
+#~ msgstr "Transcode stream"
+
+#~ msgid "Adjust"
+#~ msgstr "Adjust"
+
+#~ msgid "List of vout modules"
+#~ msgstr "List of vout modules"
+
+#~ msgid "logo"
+#~ msgstr "logo"
+
+#~ msgid "logo video filter"
+#~ msgstr "logo video filter"
+
+#~ msgid "X11"
+#~ msgstr "X11"
+
+#~ msgid "XOSD module"
+#~ msgstr "XOSD module"
+
+#~ msgid "xosd interface"
+#~ msgstr "xosd interface"
+
+#~ msgid "Close Menu"
+#~ msgstr "Close Menu"
+
+#~ msgid "Advanced open options"
+#~ msgstr "Advanced open options"
+
+#~ msgid "subtitles"
+#~ msgstr "subtitles"
+
+#~ msgid "SAP interface module"
+#~ msgstr "SAP interface module"
+
+#~ msgid "HTTP interface bind port"
+#~ msgstr "HTTP interface bind port"
+
+#~ msgid "osd text filter"
+#~ msgstr "osd text filter"
+
+#~ msgid "&Title:"
+#~ msgstr "&Title:"
+
+#~ msgid "&Chapter:"
+#~ msgstr "&Chapter:"
+
+#~ msgid "Open &file..."
+#~ msgstr "Open &file..."
+
+#~ msgid "Open &disc..."
+#~ msgstr "Open &disc..."
+
+#~ msgid "&Network stream..."
+#~ msgstr "&Network stream..."
+
+#~ msgid "&Hide interface"
+#~ msgstr "&Hide interface"
+
+#~ msgid "&Add interface"
+#~ msgstr "&Add interface"
+
+#~ msgid "Spawn a new interface"
+#~ msgstr "Spawn a new interface"
+
+#~ msgid "&Controls"
+#~ msgstr "&Controls"
+
+#~ msgid "C&hannels"
+#~ msgstr "C&hannels"
+
+#~ msgid "Sc&reen"
+#~ msgstr "Sc&reen"
+
+#~ msgid "&Title"
+#~ msgstr "&Title"
+
+#~ msgid "&Chapter"
+#~ msgstr "&Chapter"
+
+#~ msgid "Select angle"
+#~ msgstr "Select angle"
+
+#~ msgid "&Language"
+#~ msgstr "&Language"
+
+#~ msgid "&Subtitles"
+#~ msgstr "&Subtitles"
+
+#~ msgid "New stream"
+#~ msgstr "New stream"
+
+#~ msgid "Network Stream..."
+#~ msgstr "Network Stream..."
+
+#~ msgid "Next file"
+#~ msgstr "Next file"
+
+#~ msgid "&Add subtitles..."
+#~ msgstr "&Add subtitles..."
+
+#~ msgid "Exit"
+#~ msgstr "Exit"
+
+#~ msgid "&Fullscreen"
+#~ msgstr "&Fullscreen"
+
+#~ msgid "Select next title"
+#~ msgstr "Select next title"
+
+#~ msgid "&Mute"
+#~ msgstr "&Mute"
+
+#~ msgid "Open network"
+#~ msgstr "Open network"
+
+#~ msgid "&Disc..."
+#~ msgstr "&Disc..."
+
+#~ msgid "&Network..."
+#~ msgstr "&Network..."
+
+#~ msgid "Delete &all"
+#~ msgstr "Delete &all"
+
+#~ msgid "Play the selected stream"
+#~ msgstr "Play the selected stream"
+
+#~ msgid "Add subtitles"
+#~ msgstr "Add subtitles"
+
+#~ msgid "Native Windows interface"
+#~ msgstr "Native Windows interface"
+
+#~ msgid "Language 0x%x"
+#~ msgstr "Language 0x%x"
+
+#~ msgid "Screen %d"
+#~ msgstr "Screen %d"
+
+#~ msgid "Open skin"
+#~ msgstr "Open skin"
+
+#~ msgid "Skin files"
+#~ msgstr "Skin files"
+
+#~ msgid "All files"
+#~ msgstr "All files"
+
+#~ msgid "Add file"
+#~ msgstr "Add file"
+
+#~ msgid "Stream Output MRL"
+#~ msgstr "Stream Output MRL"
+
+#~ msgid "A_udio"
+#~ msgstr "A_udio"
+
+#~ msgid "Open a File"
+#~ msgstr "Open a File"
+
+#~ msgid "Open file..."
+#~ msgstr "Open file..."
+
+#~ msgid "Open disc..."
+#~ msgstr "Open disc..."
+
+#~ msgid "Network stream..."
+#~ msgstr "Network stream..."
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Jenis cakera"
 
 #, fuzzy
 #~ msgid "Big"
@@ -19356,24 +20822,6 @@ msgstr "Penganalisa spektrum"
 #, fuzzy
 #~ msgid "Media File"
 #~ msgstr "Fail Media"
-
-#~ msgid "Choose when to download and cache album art."
-#~ msgstr "Pilih bila hendak muat turun dan cache album seni."
-
-#~ msgid "Never download"
-#~ msgstr "Jangan muat turun"
-
-#~ msgid "Download when asked"
-#~ msgstr "Muat turun apabila ditanya"
-
-#~ msgid "Download everything ASAP"
-#~ msgstr "Muat turun kesemuanya ASAP"
-
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "Lapisan abstrak rangkaian UDP/IPv4"
-
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "Lapisan abstrak rangkaian UDP/IPv6"
 
 #, fuzzy
 #~ msgid "text"
@@ -19438,41 +20886,3 @@ msgstr "Penganalisa spektrum"
 #, fuzzy
 #~ msgid "|Playlist Files (*.m3u, *.pls, etc.)|"
 #~ msgstr "Semua Fail (*.*)|*|Fail Bunyi (*.mp3, *.ogg, dll.)|"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Kadar kerangka"
-
-#~ msgid "Playlist stress tests"
-#~ msgstr "Senarai tayang ujian tekanan"
-
-#~ msgid "DAAP shares"
-#~ msgstr "Kongsi DAAP"
-
-#~ msgid "DAAP access"
-#~ msgstr "Capaian DAAP"
-
-#~ msgid "\"%s\"'s file type is unknown."
-#~ msgstr "Jenis fail \"%s\" tidak diketahui."
-
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "Time-To-Live strim keluar"
-
-#~ msgid "Errors"
-#~ msgstr "Ralat"
-
-#~ msgid "Stream information"
-#~ msgstr "Maklumat Strim"
-
-#~ msgid "Justification"
-#~ msgstr "Pembuktian"
-
-#~ msgid "Growl"
-#~ msgstr "Growl"
-
-#~ msgid "MSN"
-#~ msgstr "MSN"
-
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr ""
-#~ "Ini akan membenarkan anda menentukan Masa-Untuk-Hidup untuk strim output."

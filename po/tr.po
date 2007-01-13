@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.8.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2005-06-25 12:34+0200\n"
 "Last-Translator: xLeopar <xleopar@yahoo.com>\n"
 "Language-Team: Turkish\n"
@@ -20,7 +20,6 @@ msgid "VLC preferences"
 msgstr "VLC tercihleri"
 
 #: include/vlc_config_cat.h:38
-#, fuzzy
 msgid "Select \"Advanced Options\" to see all options."
 msgstr "Tüm seçenekleri görmek için \"Gelişmiş Seçenekler\"i tıklayın."
 
@@ -36,7 +35,6 @@ msgid "Interface"
 msgstr "Arayüz"
 
 #: include/vlc_config_cat.h:44
-#, fuzzy
 msgid "Settings for VLC's interfaces"
 msgstr "VLC arayüzleri için ayarlar"
 
@@ -46,23 +44,20 @@ msgid "General interface settings"
 msgstr "Genel arayüz ayarları"
 
 #: include/vlc_config_cat.h:48
-#, fuzzy
 msgid "Main interfaces"
-msgstr "Arayüzü Göster/Gizle"
+msgstr "Ana arayüzler"
 
 #: include/vlc_config_cat.h:49
-#, fuzzy
 msgid "Settings for the main interface"
-msgstr "VLC arayüzleri için ayarlar"
+msgstr "VLC ana arayüz için ayarlar"
 
 #: include/vlc_config_cat.h:51 src/libvlc-module.c:89
 msgid "Control interfaces"
 msgstr "Kontrol arayüzleri"
 
 #: include/vlc_config_cat.h:52
-#, fuzzy
 msgid "Settings for VLC's control interfaces"
-msgstr "VLC arayüzleri için ayarlar"
+msgstr "VLC kontrol arayüzleri için ayarlar"
 
 #: include/vlc_config_cat.h:54 include/vlc_config_cat.h:55
 msgid "Hotkeys settings"
@@ -4513,7 +4508,7 @@ msgstr "Zhuang"
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Bilinmeyen"
 
@@ -10141,8 +10136,9 @@ msgid "Shoutcast"
 msgstr ""
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Zaman kaydırma"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -11186,9 +11182,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "Tam ekran modu geçiş"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 #, fuzzy
@@ -12858,7 +12853,6 @@ msgid "Next track"
 msgstr "Sonraki iz"
 
 #: modules/gui/qt4/qt4.cpp:47
-#, fuzzy
 msgid "Qt interface"
 msgstr "Qt arayüzü"
 
@@ -18406,227 +18400,8 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr "Spektrum analizörü"
 
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Disc türü"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "Gözat..."
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "Video hizalama"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Ses süzgeçleri"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "Dosya Aç"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "Sonraki"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "Genişlik"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Spektrum"
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr "Amharic"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Arabellek"
-
-#, fuzzy
-#~ msgid "QPushButton"
-#~ msgstr "Pushto"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Lineer"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "Eskiler"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Daha fazla bilgi"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "Grubu"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "etkin"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "etkin"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Disc"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Çerçeve oranı"
-
-#, fuzzy
-#~ msgid "Errors"
-#~ msgstr "Hata"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Üst-veri"
-
-#, fuzzy
-#~ msgid "Growl"
-#~ msgstr "Grubu"
-
-#, fuzzy
-#~ msgid "MSN"
-#~ msgstr "MMS"
-
-#, fuzzy
-#~ msgid "Vertical border width"
-#~ msgstr "Dikey kayıklık"
-
-#, fuzzy
-#~ msgid "Horizontal border width"
-#~ msgstr "Yatay"
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "Ses aygıtı ismi"
-
-#, fuzzy
-#~ msgid "Audioscrobbler password"
-#~ msgstr "FTP parolası"
-
-#~ msgid "Standard Play"
-#~ msgstr "Standard Oynat"
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "Ayarlar..."
-
-#, fuzzy
-#~ msgid "Filters (v2)"
-#~ msgstr "Süzgeçler"
-
 #~ msgid "Video filters settings"
 #~ msgstr "Video süzgeçleri ayarları"
-
-#, fuzzy
-#~ msgid "Yes"
-#~ msgstr "Byte"
-
-#, fuzzy
-#~ msgid "No"
-#~ msgstr "Norm"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "Mesaj Penceresini Aç"
-
-#~ msgid "Dismiss"
-#~ msgstr "Reddet"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "Georgian"
-
-#, fuzzy
-#~ msgid "Podcast Link"
-#~ msgstr "Konum"
-
-#, fuzzy
-#~ msgid "Podcast Copyright"
-#~ msgstr "Telif hakkı"
-
-#, fuzzy
-#~ msgid "Podcast Category"
-#~ msgstr "CDDB Kategori"
-
-#, fuzzy
-#~ msgid "Podcast Subtitle"
-#~ msgstr "Altyazı"
-
-#, fuzzy
-#~ msgid "Podcast Publication Date"
-#~ msgstr "Modülasyon türü"
-
-#, fuzzy
-#~ msgid "Podcast Author"
-#~ msgstr "Yazar"
-
-#, fuzzy
-#~ msgid "Podcast Subcategory"
-#~ msgstr "Kategoriye göre"
-
-#, fuzzy
-#~ msgid "Podcast Duration"
-#~ msgstr "Doyma/Doygunluk"
-
-#, fuzzy
-#~ msgid "Dummy VF"
-#~ msgstr "Boş/Aptal"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "Disc türü"
-
-#~ msgid "Listeners"
-#~ msgstr "Dinleyiciler"
-
-#, fuzzy
-#~ msgid "Center-Center"
-#~ msgstr "Merkez"
-
-#, fuzzy
-#~ msgid "Left-Center"
-#~ msgstr "Merkez"
-
-#, fuzzy
-#~ msgid "Right-Center"
-#~ msgstr "Merkez"
-
-#, fuzzy
-#~ msgid "Center-Top"
-#~ msgstr "Merkez"
-
-#, fuzzy
-#~ msgid "Left-Top"
-#~ msgstr "Sol"
-
-#, fuzzy
-#~ msgid "Right-Top"
-#~ msgstr "Sağ"
-
-#, fuzzy
-#~ msgid "Center-Bottom"
-#~ msgstr "Merkez"
-
-#, fuzzy
-#~ msgid "Left-Bottom"
-#~ msgstr "Alt"
-
-#, fuzzy
-#~ msgid "Right-Bottom"
-#~ msgstr "Alt"
-
-#~ msgid "M3U file"
-#~ msgstr "M3U dosyası"
 
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB Sanatçı"
@@ -18688,6 +18463,18 @@ msgstr "Spektrum analizörü"
 #~ msgid "ISO-9660 Volume Set"
 #~ msgstr "ISO-9660 Birim Kümesi"
 
+#, fuzzy
+#~ msgid "Errors"
+#~ msgstr "Hata"
+
+#, fuzzy
+#~ msgid "Login"
+#~ msgstr "Georgian"
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "Denetim"
+
 #~ msgid "By category"
 #~ msgstr "Kategoriye göre"
 
@@ -18697,8 +18484,78 @@ msgstr "Spektrum analizörü"
 #~ msgid "All items, unsorted"
 #~ msgstr "Tüm ögeler, sırasız"
 
+#, fuzzy
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr "Video süzgeçleri, video akışlarını son-işleme için kullanılırlar"
+
 #~ msgid "Segment filename"
 #~ msgstr "Parça dosya adı"
+
+#~ msgid "Listeners"
+#~ msgstr "Dinleyiciler"
+
+#, fuzzy
+#~ msgid "Podcast Link"
+#~ msgstr "Konum"
+
+#, fuzzy
+#~ msgid "Podcast Copyright"
+#~ msgstr "Telif hakkı"
+
+#, fuzzy
+#~ msgid "Podcast Category"
+#~ msgstr "CDDB Kategori"
+
+#, fuzzy
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Altyazı"
+
+#, fuzzy
+#~ msgid "Podcast Publication Date"
+#~ msgstr "Modülasyon türü"
+
+#, fuzzy
+#~ msgid "Podcast Author"
+#~ msgstr "Yazar"
+
+#, fuzzy
+#~ msgid "Podcast Subcategory"
+#~ msgstr "Kategoriye göre"
+
+#, fuzzy
+#~ msgid "Podcast Duration"
+#~ msgstr "Doyma/Doygunluk"
+
+#, fuzzy
+#~ msgid "Mime type"
+#~ msgstr "Disc türü"
+
+#, fuzzy
+#~ msgid "Yes"
+#~ msgstr "Byte"
+
+#, fuzzy
+#~ msgid "No"
+#~ msgstr "Norm"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Mesaj Penceresini Aç"
+
+#~ msgid "Dismiss"
+#~ msgstr "Reddet"
+
+#, fuzzy
+#~ msgid "Do not display further errors"
+#~ msgstr "Fazla hataları bastır"
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "Listede %i öge"
+
+#~ msgid "M3U file"
+#~ msgstr "M3U dosyası"
 
 #, fuzzy
 #~ msgid "Sorted by Artist"
@@ -18708,12 +18565,78 @@ msgstr "Spektrum analizörü"
 #~ msgid "Sorted by Album"
 #~ msgstr "İsme göre Sırala"
 
+#~ msgid "Standard Play"
+#~ msgstr "Standard Oynat"
+
+#, fuzzy
+#~ msgid "Growl"
+#~ msgstr "Grubu"
+
+#, fuzzy
+#~ msgid "MSN"
+#~ msgstr "MMS"
+
+#, fuzzy
+#~ msgid "Vertical border width"
+#~ msgstr "Dikey kayıklık"
+
+#, fuzzy
+#~ msgid "Horizontal border width"
+#~ msgstr "Yatay"
+
+#, fuzzy
+#~ msgid "Create"
+#~ msgstr "Çerçeve oranı"
+
 #, fuzzy
 #~ msgid "Number of streams"
 #~ msgstr "İş parçacık sayısını minimumda tut"
 
+#, fuzzy
+#~ msgid "Image"
+#~ msgstr "Resim çoğalt"
+
+#, fuzzy
+#~ msgid "Center-Center"
+#~ msgstr "Merkez"
+
+#, fuzzy
+#~ msgid "Left-Center"
+#~ msgstr "Merkez"
+
+#, fuzzy
+#~ msgid "Right-Center"
+#~ msgstr "Merkez"
+
+#, fuzzy
+#~ msgid "Center-Top"
+#~ msgstr "Merkez"
+
+#, fuzzy
+#~ msgid "Left-Top"
+#~ msgstr "Sol"
+
+#, fuzzy
+#~ msgid "Right-Top"
+#~ msgstr "Sağ"
+
+#, fuzzy
+#~ msgid "Center-Bottom"
+#~ msgstr "Merkez"
+
+#, fuzzy
+#~ msgid "Left-Bottom"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Right-Bottom"
+#~ msgstr "Alt"
+
 #~ msgid "Creates a motion blurring on the image"
 #~ msgstr "Resmin üzerinde bir hareket bulanıklığı yaratır"
+
+#~ msgid "Inverts the image colors"
+#~ msgstr "Resmin renklerini ters çevirir"
 
 #~ msgid "delay"
 #~ msgstr "gecikme"
@@ -18749,6 +18672,9 @@ msgstr "Spektrum analizörü"
 #, fuzzy
 #~ msgid "Interfaces"
 #~ msgstr "Arayüz"
+
+#~ msgid "DTS"
+#~ msgstr "DTS"
 
 #~ msgid "Output channels number"
 #~ msgstr "Çıktı kanalları numarası"
@@ -18848,6 +18774,9 @@ msgstr "Spektrum analizörü"
 
 #~ msgid "Enable CABAC"
 #~ msgstr "CABAC etkin"
+
+#~ msgid "Analyse mode"
+#~ msgstr "Analiz modu"
 
 #~ msgid "B pyramid"
 #~ msgstr "B piramidi"
@@ -19008,11 +18937,17 @@ msgstr "Spektrum analizörü"
 #~ msgid "Wait time (ms)"
 #~ msgstr "Bekleme süresi (ms)"
 
+#~ msgid "Show tooltips"
+#~ msgstr "İpuçlarını göster"
+
 #~ msgid "GNOME interface"
 #~ msgstr "GNOME arayüzü"
 
 #~ msgid "_Open File..."
 #~ msgstr "_Dosya Aç..."
+
+#~ msgid "Select audio channel"
+#~ msgstr "Ses kanalı seçin"
 
 #~ msgid "_Subtitles"
 #~ msgstr "_Altyazılar"
@@ -19077,6 +19012,9 @@ msgstr "Spektrum analizörü"
 #~ msgid "(c) 1996-2004 the VideoLAN team"
 #~ msgstr "(c) 1996-2004 VideoLAN Ekibi"
 
+#~ msgid "Open Stream"
+#~ msgstr "Akış Aç"
+
 #~ msgid "Symbol Rate"
 #~ msgstr "Sembol Oranı"
 
@@ -19118,6 +19056,9 @@ msgstr "Spektrum analizörü"
 
 #~ msgid "_Close"
 #~ msgstr "_Kapat"
+
+#~ msgid "Close the window"
+#~ msgstr "Pencereyi kapat"
 
 #~ msgid "Exit the program"
 #~ msgstr "Programdan çıkış"
@@ -19290,6 +19231,9 @@ msgstr "Spektrum analizörü"
 #~ msgid "Port "
 #~ msgstr "Port"
 
+#~ msgid "Video Filters"
+#~ msgstr "Video Süzgeçleri"
+
 #~ msgid "Demux number"
 #~ msgstr "Ayırıcı numarası"
 
@@ -19330,3 +19274,130 @@ msgstr "Spektrum analizörü"
 
 #~ msgid "I263"
 #~ msgstr "I263"
+
+#~ msgid "Stop Stream"
+#~ msgstr "Akış Durdur"
+
+#~ msgid "_About..."
+#~ msgstr "_Hakkında..."
+
+#~ msgid "Play stream"
+#~ msgstr "Akışı oynat"
+
+#~ msgid "All files"
+#~ msgstr "Tüm dosyalar"
+
+#~ msgid "Add file"
+#~ msgstr "Dosya ekle"
+
+#~ msgid "A_udio"
+#~ msgstr "Ses"
+
+#~ msgid "Open a File"
+#~ msgstr "Bir dosya aç"
+
+#~ msgid "Open file..."
+#~ msgstr "Dosya aç"
+
+#~ msgid "Open disc..."
+#~ msgstr "Disk aç"
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "Başlığa Git"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Disc türü"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "Gözat..."
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "Video hizalama"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Ses süzgeçleri"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "Dosya Aç"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "Sonraki"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "Genişlik"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Spektrum"
+
+#, fuzzy
+#~ msgid "margin"
+#~ msgstr "Amharic"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Arabellek"
+
+#, fuzzy
+#~ msgid "QPushButton"
+#~ msgstr "Pushto"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Lineer"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "Eskiler"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Daha fazla bilgi"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "Grubu"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "etkin"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "etkin"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "Disc"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Üst-veri"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "Ses aygıtı ismi"
+
+#, fuzzy
+#~ msgid "Audioscrobbler password"
+#~ msgstr "FTP parolası"
+
+#, fuzzy
+#~ msgid "Connecting..."
+#~ msgstr "Ayarlar..."
+
+#, fuzzy
+#~ msgid "Filters (v2)"
+#~ msgstr "Süzgeçler"
+
+#, fuzzy
+#~ msgid "Dummy VF"
+#~ msgstr "Boş/Aptal"

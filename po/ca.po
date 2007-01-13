@@ -9,12 +9,12 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.8.2-svn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2005-04-28 19:16+0100\n"
 "Last-Translator: Lorena Gomes i Xènia Albà\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: include/vlc_config_cat.h:36
@@ -175,7 +175,6 @@ msgid "Input / Codecs"
 msgstr "Entrada / Còdecs"
 
 #: include/vlc_config_cat.h:104
-#, fuzzy
 msgid ""
 "These are the settings for the input, demultiplexing and decoding parts of "
 "VLC. Encoder settings can also be found here."
@@ -775,11 +774,11 @@ msgstr "Copyright:"
 
 #: include/vlc_meta.h:37
 msgid "Album/movie/show title"
-msgstr ""
+msgstr "Àlbum/Pel·lícula/Títol de la Pel·lícula"
 
 #: include/vlc_meta.h:38
 msgid "Track number/position in set"
-msgstr ""
+msgstr "Nº de pista / Posició"
 
 #: include/vlc_meta.h:39 modules/gui/macosx/bookmarks.m:99
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:195
@@ -810,7 +809,7 @@ msgstr "Idioma"
 
 #: include/vlc_meta.h:45 modules/misc/notify/notify.c:182
 msgid "Now Playing"
-msgstr ""
+msgstr "S'està reproduint"
 
 #: include/vlc_meta.h:46 modules/access/vcdx/info.c:98
 msgid "Publisher"
@@ -1175,7 +1174,7 @@ msgstr "Capítol anterior"
 #: src/input/vlm.c:1141 src/input/vlm.c:1248
 #, c-format
 msgid "Media: %s"
-msgstr ""
+msgstr "Mèdia: %s"
 
 #: src/interface/interaction.c:268 src/interface/interaction.c:364
 #: modules/demux/avi/avi.c:587 modules/gui/beos/InterfaceWindow.cpp:158
@@ -1224,7 +1223,7 @@ msgstr "Gènere"
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "ca"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -1258,12 +1257,12 @@ msgstr "Inversió dels colors"
 #: src/libvlc-common.c:1594
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
-msgstr ""
+msgstr "Compilat per %s@%s.%s\n"
 
 #: src/libvlc-common.c:1596
 #, c-format
 msgid "Compiler: %s\n"
-msgstr ""
+msgstr "Compilador: %s\n"
 
 #: src/libvlc-common.c:1599
 #, c-format
@@ -1361,7 +1360,7 @@ msgstr "Holandès"
 
 #: src/libvlc-module.c:51
 msgid "Occitan"
-msgstr ""
+msgstr "Occità"
 
 #: src/libvlc-module.c:51
 #, fuzzy
@@ -1394,11 +1393,11 @@ msgstr "Turc "
 
 #: src/libvlc-module.c:53
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Xinès Simplificat"
 
 #: src/libvlc-module.c:53
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "Xinès Tradicional"
 
 #: src/libvlc-module.c:72
 #, fuzzy
@@ -1477,7 +1476,7 @@ msgstr "Per defecte a l’Admin"
 
 #: src/libvlc-module.c:104
 msgid "This stream will always be opened at VLC startup."
-msgstr ""
+msgstr "Aquest flux sempre serà obert quan s'inicii VLC"
 
 #: src/libvlc-module.c:107
 #, fuzzy
@@ -1963,11 +1962,11 @@ msgstr "Posa sempre la finestra de vídeo sobre les altres finestres."
 
 #: src/libvlc-module.c:306
 msgid "Disable screensaver"
-msgstr ""
+msgstr "Inhabilita el protector de pantalla"
 
 #: src/libvlc-module.c:307
 msgid "Disable the screensaver during video playback."
-msgstr ""
+msgstr "Inhabilita el protector de pantalla durant la reproducció de video."
 
 #: src/libvlc-module.c:309
 msgid "Window decorations"
@@ -2108,7 +2107,7 @@ msgstr ""
 
 #: src/libvlc-module.c:371
 msgid "Fix HDTV height"
-msgstr ""
+msgstr "Fixar alçada HDTV"
 
 #: src/libvlc-module.c:373
 msgid ""
@@ -2152,7 +2151,7 @@ msgstr ""
 
 #: src/libvlc-module.c:395
 msgid "Quiet synchro"
-msgstr ""
+msgstr "Sincronització silenciosa"
 
 #: src/libvlc-module.c:397
 msgid ""
@@ -2255,7 +2254,7 @@ msgstr ""
 
 #: src/libvlc-module.c:443 modules/stream_out/rtp.c:92
 msgid "Hop limit (TTL)"
-msgstr ""
+msgstr "Límit Hop (TTL)"
 
 #: src/libvlc-module.c:445
 #, fuzzy
@@ -3172,7 +3171,7 @@ msgstr ""
 
 #: src/libvlc-module.c:867
 msgid "Collect statistics"
-msgstr ""
+msgstr "Recull Estadístiques"
 
 #: src/libvlc-module.c:869
 #, fuzzy
@@ -3206,7 +3205,7 @@ msgstr ""
 
 #: src/libvlc-module.c:883
 msgid "Log to syslog"
-msgstr ""
+msgstr "Registra-ho a syslog"
 
 #: src/libvlc-module.c:885
 msgid "Log all VLC messages to syslog (UNIX systems)."
@@ -3339,7 +3338,7 @@ msgstr ""
 
 #: src/libvlc-module.c:956
 msgid "Automatically preparse files"
-msgstr ""
+msgstr "Automàticament preparseja arxius"
 
 #: src/libvlc-module.c:958
 msgid ""
@@ -3685,11 +3684,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1072
 msgid "Medium jump length"
-msgstr ""
+msgstr "Llargada del salt mitjà"
 
 #: src/libvlc-module.c:1073
 msgid "Medium jump length, in seconds."
-msgstr ""
+msgstr "Llargada del salt mitjà, en segons."
 
 #: src/libvlc-module.c:1074
 #, fuzzy
@@ -3698,7 +3697,7 @@ msgstr "Mida de la lletra"
 
 #: src/libvlc-module.c:1075
 msgid "Long jump length, in seconds."
-msgstr ""
+msgstr "Llargada del salt llarg, en segons."
 
 #: src/libvlc-module.c:1077 modules/control/hotkeys.c:244
 #: modules/gui/beos/InterfaceWindow.cpp:275
@@ -4105,7 +4104,7 @@ msgstr "Pren una instantània de vídeo i l'escriu al disc"
 #: src/libvlc-module.c:1171 modules/access_filter/record.c:53
 #: modules/access_filter/record.c:54
 msgid "Record"
-msgstr ""
+msgstr "Enregistra"
 
 #: src/libvlc-module.c:1172
 msgid "Record access filter start/stop."
@@ -4291,7 +4290,7 @@ msgstr "Llista d'entrada"
 #: src/libvlc-module.c:1546
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:522
 msgid "VLM"
-msgstr ""
+msgstr "VLM"
 
 #: src/libvlc-module.c:1579
 #, fuzzy
@@ -4967,7 +4966,7 @@ msgstr "Zhuang"
 msgid "Zulu"
 msgstr "Zulú"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Desconegut"
 
@@ -5110,7 +5109,7 @@ msgstr "Superposats"
 
 #: modules/access/cdda/cdda.c:43
 msgid "full"
-msgstr ""
+msgstr "complet"
 
 #: modules/access/cdda/cdda.c:47
 msgid ""
@@ -6571,7 +6570,7 @@ msgstr ""
 
 #: modules/access_output/http.c:88
 msgid "Advertise with Bonjour"
-msgstr ""
+msgstr "Anuncia't amb Bonjour"
 
 #: modules/access_output/http.c:89
 msgid "Advertise the stream with the Bonjour protocol."
@@ -6859,7 +6858,7 @@ msgstr "Volum"
 
 #: modules/access/pvr.c:99
 msgid "Audio volume (0-65535)."
-msgstr ""
+msgstr "Volum de l`àudio (0-65535)."
 
 #: modules/access/pvr.c:101 modules/access/v4l.c:95
 msgid "Channel"
@@ -7478,7 +7477,7 @@ msgstr "Distància entre l'altaveu frontal esquerre i el receptor, en metres."
 
 #: modules/audio_filter/channel_mixer/headphone.c:66
 msgid "Compensate delay"
-msgstr ""
+msgstr "Compensa el retard"
 
 #: modules/audio_filter/channel_mixer/headphone.c:68
 msgid ""
@@ -7789,27 +7788,27 @@ msgstr "Equalitzador"
 
 #: modules/audio_filter/param_eq.c:53
 msgid "Low freq (Hz)"
-msgstr ""
+msgstr "Baixa freq (Hz)"
 
 #: modules/audio_filter/param_eq.c:56
 msgid "Low freq gain (Db)"
-msgstr ""
+msgstr "guany de la Baixa freq (Db)"
 
 #: modules/audio_filter/param_eq.c:57
 msgid "High freq (Hz)"
-msgstr ""
+msgstr "Alta freq (Hz)"
 
 #: modules/audio_filter/param_eq.c:60
 msgid "High freq gain (Db)"
-msgstr ""
+msgstr "guany alta freq (Db)"
 
 #: modules/audio_filter/param_eq.c:61
 msgid "Freq 1 (Hz)"
-msgstr ""
+msgstr "Freq 1 (Hz)"
 
 #: modules/audio_filter/param_eq.c:64
 msgid "Freq 1 gain (Db)"
-msgstr ""
+msgstr "guany Freq 1 (Db)"
 
 #: modules/audio_filter/param_eq.c:66
 msgid "Freq 1 Q"
@@ -9791,7 +9790,7 @@ msgstr ""
 #: modules/codec/x264.c:296
 #, fuzzy
 msgid "Quiet mode"
-msgstr "Mode econòmic"
+msgstr "Mode silenciós"
 
 #: modules/codec/x264.c:297
 #, fuzzy
@@ -10436,7 +10435,7 @@ msgstr "| adev [X] . . . . . . . . . defineix/reb el dispositiu d'àudio\n"
 #: modules/control/rc.c:879
 #, fuzzy
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
-msgstr "| adev [X] . . . . . . . . . defineix/reb el dispositiu d'àudio\n"
+msgstr "| title [X]  . . . . defineix/reb el títol en l'element actual\n"
 
 #: modules/control/rc.c:880
 #, fuzzy
@@ -11267,8 +11266,9 @@ msgid "Shoutcast"
 msgstr "multidifusió"
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Hora"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -11447,7 +11447,7 @@ msgstr "MPEG Transport Stream"
 #: modules/demux/ts.c:3148 modules/demux/ts.c:3182
 #, fuzzy
 msgid "clean effects"
-msgstr "Selecciona efecte"
+msgstr "Efecte aleatòri"
 
 #: modules/demux/ts.c:3152 modules/demux/ts.c:3186
 msgid "hearing impaired"
@@ -14144,7 +14144,6 @@ msgid "Next track"
 msgstr "Pista següent"
 
 #: modules/gui/qt4/qt4.cpp:47
-#, fuzzy
 msgid "Qt interface"
 msgstr "Interfície Qt"
 
@@ -17961,7 +17960,7 @@ msgstr "Còdec de subtítols de destí"
 #: modules/stream_out/transcode.c:154
 #, fuzzy
 msgid "This is the subtitles codec that will be used."
-msgstr "Unitat DVD a utilitzar per defecte."
+msgstr "Unitat Àudio CD a utilitzar per defecte."
 
 #: modules/stream_out/transcode.c:158
 #, fuzzy
@@ -19676,8 +19675,9 @@ msgid "Cylinder"
 msgstr "Bilineal"
 
 #: modules/video_output/opengl.c:123
+#, fuzzy
 msgid "Torus"
-msgstr ""
+msgstr "House"
 
 #: modules/video_output/opengl.c:123
 #, fuzzy
@@ -20207,440 +20207,8 @@ msgstr "Visualitza el filtre"
 msgid "Spectrum analyser"
 msgstr "Analitzador d'espectre"
 
-#, fuzzy
-#~ msgid "Password: "
-#~ msgstr "Contrasenya"
-
-#~ msgid "Description file"
-#~ msgstr "Fitxer de descripció"
-
-#, fuzzy
-#~ msgid "A file containing a simple playlist"
-#~ msgstr ""
-#~ "Fitxer de descripció, fitxer que conté la llista de reproducció simple."
-
-#~ msgid "History parameter"
-#~ msgstr "Paràmetre del historial"
-
-#, fuzzy
-#~ msgid "The umber of frames used for detection."
-#~ msgstr ""
-#~ "Paràmetre de l'historial, nombre de segments utilitzats per a la detecció."
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32<->float32 conversion"
-#~ msgstr "Filtre d'àudio per conversió fixed32<->float32"
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32->s16 conversion"
-#~ msgstr "Filtre d'àudio per conversió fixed32->s16"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s16 conversion"
-#~ msgstr "Filtre d'àudio per conversió float32->s16"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s8 conversion"
-#~ msgstr "Filtre d'àudio per conversió float32->s8"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u16 conversion"
-#~ msgstr "Filtre d'àudio per conversió float32->u16"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u8 conversion"
-#~ msgstr "Filtre d'àudio per conversió float32->u8"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->fixed32 conversion"
-#~ msgstr "Filtre d'àudio per conversió s16->fixed32"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 conversion"
-#~ msgstr "Filtre d'àudio per conversió s16->float32"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 with endianness conversion"
-#~ msgstr "Filtre d'àudio per la conversió s16->float32 començant pel final"
-
-#, fuzzy
-#~ msgid "Audio filter for s8->float32 conversion"
-#~ msgstr "Filtre d'àudio per conversió s8->float32"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->fixed32 conversion"
-#~ msgstr "Filtre d'àudio per conversió u8->fixed32"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->float32 conversion"
-#~ msgstr "Filtre d'àudio per conversió u8->float32"
-
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Tipus de disc"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "Navega..."
-
-#, fuzzy
-#~ msgid "Big"
-#~ msgstr "Brillantor"
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "Alineació del vídeo"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Filtres d'àudio"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "Meditative"
-
-#, fuzzy
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "Capa d'abstracció de xarxa IPv4"
-
-#, fuzzy
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "Capa d'abstracció de xarxa IPv6"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "Següent"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "Amplada"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Espectre "
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr "Amhàric"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Memòria cau"
-
-#, fuzzy
-#~ msgid "QPushButton"
-#~ msgstr "Paixtú"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Lineal"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "Oldies"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Més informació"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "Grup"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "Habilita"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "Habilita"
-
-#, fuzzy
-#~ msgid "horizontalLayout_3"
-#~ msgstr "Inverteix horitzontalment"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Disc"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Velocitat de fotogrames"
-
-#~ msgid "Playlist stress tests"
-#~ msgstr "Proves d'esforç de la llista de reproducció"
-
-#~ msgid "DAAP shares"
-#~ msgstr "Accions DAAP"
-
-#~ msgid "DAAP access"
-#~ msgstr "Accés DAAP"
-
-#~ msgid " to "
-#~ msgstr "a"
-
-#, fuzzy
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "Us permet definir el temps de vida del flux de sortida."
-
-#, fuzzy
-#~ msgid "Errors"
-#~ msgstr "Error"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Metainformació"
-
-#, fuzzy
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr "Us permet especificar el temps de viure pel flux de sortida. "
-
-#, fuzzy
-#~ msgid "Justification"
-#~ msgstr "Amplificació"
-
-#, fuzzy
-#~ msgid "Growl"
-#~ msgstr "Grup"
-
-#, fuzzy
-#~ msgid "MSN"
-#~ msgstr "MMS"
-
-#, fuzzy
-#~ msgid "Vertical border width"
-#~ msgstr "Desplaçament vertical"
-
-#, fuzzy
-#~ msgid "Horizontal border width"
-#~ msgstr "Horitzontal"
-
-#, fuzzy
-#~ msgid "| time-format STRING . . . overlay STRING in video"
-#~ msgstr "| marq-marquee STRING  . . superposar STRING en el vídeo\n"
-
-#, fuzzy
-#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
-#~ msgstr ""
-#~ "| marq-x X . . . . .  desplaçament de la marquesina, des de l'esquerra\n"
-
-#, fuzzy
-#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
-#~ msgstr ""
-#~ "| marq-y Y . . . . . . temps d'espera de la marquesina, des de la part "
-#~ "superior\n"
-
-#, fuzzy
-#~ msgid "| time-position #. . . . . . . . relative position"
-#~ msgstr "| goto . . . . . . . . . . . .  vés a l'element de l'índex\n"
-
-#, fuzzy
-#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
-#~ msgstr ""
-#~ "| next . . . . . . . . . . . .  següent element de la llista de "
-#~ "reproducció\n"
-
-#, fuzzy
-#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
-#~ msgstr "| play. . . . . . . . . . . . . . . . reprodueix el flux\n"
-
-#, fuzzy
-#~ msgid "| time-size # . . . . . . . . font size, in pixels"
-#~ msgstr "| title_n  . . . . . .  el títol següent en l'element actual\n"
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "Nom del dispositiu de àudio"
-
-#, fuzzy
-#~ msgid "Audioscrobbler password"
-#~ msgstr "Contrasenya de l'FTP"
-
-#, fuzzy
-#~ msgid "Marquee text to display."
-#~ msgstr "Text de la marquesina a mostrar"
-
-#~ msgid "Time format string (%Y%m%d %H%M%S)"
-#~ msgstr "Cadena del format del temps (%Y%m%d %H%M%S)"
-
-#, fuzzy
-#~ msgid ""
-#~ "Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = "
-#~ "minute, %S = second)."
-#~ msgstr ""
-#~ "Sèrie de format de temps (%Y = any, %m = mes, %d = dia, %H = hora, %M = "
-#~ "minut, %S = segon)"
-
-#~ msgid "X offset, from the left screen edge"
-#~ msgstr "Ajust de X, des de la vora esquerra de la pantalla"
-
-#~ msgid "Y offset, down from the top"
-#~ msgstr "Ajust de Y, de sota a dalt."
-
-#, fuzzy
-#~ msgid ""
-#~ "You can enforce the text position on the video (0=center, 1=left, "
-#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-#~ "e.g. 6 = top-right)."
-#~ msgstr ""
-#~ "Podeu reforçar la posició del logotip en el vídeo (0=centre, 1=esquerre, "
-#~ "2=dret, 4=superior, 8=inferior, també podeu utilitzar combinacions "
-#~ "d’aquests valors)."
-
-#~ msgid "Time overlay"
-#~ msgstr "Superposició del temps"
-
-#~ msgid "Time display sub filter"
-#~ msgstr "Subfiltre visualitzador de temps"
-
-#~ msgid "Corba control"
-#~ msgstr "Control corba"
-
-#~ msgid "corba control module"
-#~ msgstr "Mòdul de control corba"
-
-#~ msgid ""
-#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
-#~ "screen without black borders (OpenGL only)."
-#~ msgstr ""
-#~ "En el mode pantalla completa, retalla la imatge si és necessari per tal "
-#~ "d'omplir la pantalla sense marges negres (només OpenGL)."
-
-#~ msgid "Standard Play"
-#~ msgstr " Reproducció estàndard"
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "Paràmetres..."
-
-#, fuzzy
-#~ msgid "Filters (v2)"
-#~ msgstr "Filtres"
-
 #~ msgid "Video filters settings"
 #~ msgstr "Paràmetres dels filtres de vídeo"
-
-#, fuzzy
-#~ msgid "Yes"
-#~ msgstr "Bytes"
-
-#, fuzzy
-#~ msgid "No"
-#~ msgstr "Norma"
-
-#, fuzzy
-#~ msgid ""
-#~ "An error has occurred which probably prevented the proper execution of "
-#~ "the program:"
-#~ msgstr ""
-#~ "S'ha produït un error que probablement evitarà l'execució de la vostra "
-#~ "petició."
-
-#~ msgid "If you believe that it is a bug, please follow the instructions at:"
-#~ msgstr "Si creieu que és un error, si us plau seguiu les intruccions a:"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "Obre la finestra de missatges"
-
-#~ msgid "Dismiss"
-#~ msgstr "Descarta"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "S'esta registrant"
-
-#, fuzzy
-#~ msgid "Podcast Link"
-#~ msgstr "Posició"
-
-#, fuzzy
-#~ msgid "Podcast Copyright"
-#~ msgstr "Copyright:"
-
-#, fuzzy
-#~ msgid "Podcast Category"
-#~ msgstr "CDDB Categoria "
-
-#, fuzzy
-#~ msgid "Podcast Subtitle"
-#~ msgstr "Subtítol"
-
-#, fuzzy
-#~ msgid "Podcast Publication Date"
-#~ msgstr "Tipus de modulació"
-
-#, fuzzy
-#~ msgid "Podcast Author"
-#~ msgstr "Autor:"
-
-#, fuzzy
-#~ msgid "Podcast Subcategory"
-#~ msgstr "Per categoria"
-
-#, fuzzy
-#~ msgid "Podcast Duration"
-#~ msgstr "Saturació"
-
-#, fuzzy
-#~ msgid "Dummy video filter"
-#~ msgstr "Filtre de vídeo ffmpeg"
-
-#, fuzzy
-#~ msgid "Dummy VF"
-#~ msgstr "Dummy"
-
-#~ msgid "Playlist metademux"
-#~ msgstr "Metademultiplexor de la llista de reproducció"
-
-#~ msgid "Native playlist import"
-#~ msgstr "Importa la llista de reproducció nativa"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "Tipus de disc"
-
-#, fuzzy
-#~ msgid "Listeners"
-#~ msgstr "Lineal"
-
-#, fuzzy
-#~ msgid "Center-Center"
-#~ msgstr "Centre"
-
-#, fuzzy
-#~ msgid "Left-Center"
-#~ msgstr "Centre"
-
-#, fuzzy
-#~ msgid "Right-Center"
-#~ msgstr "Centre"
-
-#, fuzzy
-#~ msgid "Center-Top"
-#~ msgstr "Centre"
-
-#, fuzzy
-#~ msgid "Left-Top"
-#~ msgstr "Esquerra"
-
-#, fuzzy
-#~ msgid "Right-Top"
-#~ msgstr "Dreta"
-
-#, fuzzy
-#~ msgid "Center-Bottom"
-#~ msgstr "Centre"
-
-#, fuzzy
-#~ msgid "Left-Bottom"
-#~ msgstr "Part inferior"
-
-#, fuzzy
-#~ msgid "Right-Bottom"
-#~ msgstr "Part inferior"
-
-#~ msgid "M3U file"
-#~ msgstr "Fitxer M3U"
 
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB Artista"
@@ -20702,6 +20270,22 @@ msgstr "Analitzador d'espectre"
 #~ msgid "ISO-9660 Volume Set"
 #~ msgstr "ISO-9660 Conjunt de volum"
 
+#, fuzzy
+#~ msgid "Errors"
+#~ msgstr "Error"
+
+#, fuzzy
+#~ msgid "Login"
+#~ msgstr "S'esta registrant"
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "Control"
+
+#, fuzzy
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "Interfície de control del joystick"
+
 #~ msgid "By category"
 #~ msgstr "Per categoria"
 
@@ -20710,6 +20294,110 @@ msgstr "Analitzador d'espectre"
 
 #~ msgid "All items, unsorted"
 #~ msgstr "Mostra tots elements, sense ordenar"
+
+#, fuzzy
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr ""
+#~ "Els filtres de vídeo s'utilitzen pel post-processament del flux de vídeo"
+
+#, fuzzy
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "Us permet definir el temps de vida del flux de sortida."
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32<->float32 conversion"
+#~ msgstr "Filtre d'àudio per conversió fixed32<->float32"
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32->s16 conversion"
+#~ msgstr "Filtre d'àudio per conversió fixed32->s16"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s16 conversion"
+#~ msgstr "Filtre d'àudio per conversió float32->s16"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s8 conversion"
+#~ msgstr "Filtre d'àudio per conversió float32->s8"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u16 conversion"
+#~ msgstr "Filtre d'àudio per conversió float32->u16"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u8 conversion"
+#~ msgstr "Filtre d'àudio per conversió float32->u8"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->fixed32 conversion"
+#~ msgstr "Filtre d'àudio per conversió s16->fixed32"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 conversion"
+#~ msgstr "Filtre d'àudio per conversió s16->float32"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 with endianness conversion"
+#~ msgstr "Filtre d'àudio per la conversió s16->float32 començant pel final"
+
+#, fuzzy
+#~ msgid "Audio filter for s8->float32 conversion"
+#~ msgstr "Filtre d'àudio per conversió s8->float32"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->fixed32 conversion"
+#~ msgstr "Filtre d'àudio per conversió u8->fixed32"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->float32 conversion"
+#~ msgstr "Filtre d'àudio per conversió u8->float32"
+
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Sortida d’àudio Linux OSS"
+
+#~ msgid "Corba control"
+#~ msgstr "Control corba"
+
+#~ msgid "corba control module"
+#~ msgstr "Mòdul de control corba"
+
+#, fuzzy
+#~ msgid "| time-format STRING . . . overlay STRING in video"
+#~ msgstr "| marq-marquee STRING  . . superposar STRING en el vídeo\n"
+
+#, fuzzy
+#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
+#~ msgstr ""
+#~ "| marq-x X . . . . .  desplaçament de la marquesina, des de l'esquerra\n"
+
+#, fuzzy
+#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
+#~ msgstr ""
+#~ "| marq-y Y . . . . . . temps d'espera de la marquesina, des de la part "
+#~ "superior\n"
+
+#, fuzzy
+#~ msgid "| time-position #. . . . . . . . relative position"
+#~ msgstr "| goto . . . . . . . . . . . .  vés a l'element de l'índex\n"
+
+#, fuzzy
+#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
+#~ msgstr ""
+#~ "| next . . . . . . . . . . . .  següent element de la llista de "
+#~ "reproducció\n"
+
+#, fuzzy
+#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
+#~ msgstr "| play. . . . . . . . . . . . . . . . reprodueix el flux\n"
+
+#, fuzzy
+#~ msgid "| time-size # . . . . . . . . font size, in pixels"
+#~ msgstr "| title_n  . . . . . .  el títol següent en l'element actual\n"
+
+#~ msgid "Playlist metademux"
+#~ msgstr "Metademultiplexor de la llista de reproducció"
 
 #~ msgid "Segment filename"
 #~ msgstr "Nom del fitxer del segment"
@@ -20720,8 +20408,94 @@ msgstr "Analitzador d'espectre"
 #~ msgid "Writing application"
 #~ msgstr "Aplicació d’escriptura"
 
+#, fuzzy
+#~ msgid "Listeners"
+#~ msgstr "Lineal"
+
+#~ msgid "Native playlist import"
+#~ msgstr "Importa la llista de reproducció nativa"
+
+#, fuzzy
+#~ msgid "Podcast Link"
+#~ msgstr "Posició"
+
+#, fuzzy
+#~ msgid "Podcast Copyright"
+#~ msgstr "Copyright:"
+
+#, fuzzy
+#~ msgid "Podcast Category"
+#~ msgstr "CDDB Categoria "
+
+#, fuzzy
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Subtítol"
+
+#, fuzzy
+#~ msgid "Podcast Publication Date"
+#~ msgstr "Tipus de modulació"
+
+#, fuzzy
+#~ msgid "Podcast Author"
+#~ msgstr "Autor:"
+
+#, fuzzy
+#~ msgid "Podcast Subcategory"
+#~ msgstr "Per categoria"
+
+#, fuzzy
+#~ msgid "Podcast Duration"
+#~ msgstr "Saturació"
+
+#, fuzzy
+#~ msgid "Mime type"
+#~ msgstr "Tipus de disc"
+
+#, fuzzy
+#~ msgid "Yes"
+#~ msgstr "Bytes"
+
+#, fuzzy
+#~ msgid "No"
+#~ msgstr "Norma"
+
+#, fuzzy
+#~ msgid ""
+#~ "An error has occurred which probably prevented the proper execution of "
+#~ "the program:"
+#~ msgstr ""
+#~ "S'ha produït un error que probablement evitarà l'execució de la vostra "
+#~ "petició."
+
+#~ msgid "If you believe that it is a bug, please follow the instructions at:"
+#~ msgstr "Si creieu que és un error, si us plau seguiu les intruccions a:"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Obre la finestra de missatges"
+
+#~ msgid "Dismiss"
+#~ msgstr "Descarta"
+
+#, fuzzy
+#~ msgid "Do not display further errors"
+#~ msgstr "Suprimeix els errors addicionals"
+
+#~ msgid ""
+#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
+#~ "screen without black borders (OpenGL only)."
+#~ msgstr ""
+#~ "En el mode pantalla completa, retalla la imatge si és necessari per tal "
+#~ "d'omplir la pantalla sense marges negres (només OpenGL)."
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "No s'ha pogut trobar la llista de reproducció."
+
 #~ msgid "%i items in playlist (%i not shown)"
 #~ msgstr "%i elements en la llista de reproducció (%i no mostrats)"
+
+#~ msgid "M3U file"
+#~ msgstr "Fitxer M3U"
 
 #, fuzzy
 #~ msgid "Sorted by Artist"
@@ -20732,8 +20506,163 @@ msgstr "Analitzador d'espectre"
 #~ msgstr "Ordena per nom"
 
 #, fuzzy
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "Capa d'abstracció de xarxa IPv4"
+
+#, fuzzy
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "Capa d'abstracció de xarxa IPv6"
+
+#~ msgid "Playlist stress tests"
+#~ msgstr "Proves d'esforç de la llista de reproducció"
+
+#~ msgid "DAAP shares"
+#~ msgstr "Accions DAAP"
+
+#~ msgid "DAAP access"
+#~ msgstr "Accés DAAP"
+
+#, fuzzy
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr "Us permet especificar el temps de viure pel flux de sortida. "
+
+#, fuzzy
+#~ msgid "Automatic black border cropping."
+#~ msgstr "Activa retall de marge negre automàtic. "
+
+#, fuzzy
+#~ msgid ""
+#~ "Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough"
+#~ "\" and \"psychedelic\"."
+#~ msgstr "Mode de distorsió, un de \"ona\" i \"arrissat\" "
+
+#~ msgid "Distort video filter"
+#~ msgstr "Filtre de distorsió de vídeo "
+
+#, fuzzy
+#~ msgid "Marquee text to display."
+#~ msgstr "Text de la marquesina a mostrar"
+
+#~ msgid "Description file"
+#~ msgstr "Fitxer de descripció"
+
+#, fuzzy
+#~ msgid "A file containing a simple playlist"
+#~ msgstr ""
+#~ "Fitxer de descripció, fitxer que conté la llista de reproducció simple."
+
+#~ msgid "History parameter"
+#~ msgstr "Paràmetre del historial"
+
+#, fuzzy
+#~ msgid "The umber of frames used for detection."
+#~ msgstr ""
+#~ "Paràmetre de l'historial, nombre de segments utilitzats per a la detecció."
+
+#~ msgid "Motion detect"
+#~ msgstr "Detecció de moviment"
+
+#~ msgid "Time format string (%Y%m%d %H%M%S)"
+#~ msgstr "Cadena del format del temps (%Y%m%d %H%M%S)"
+
+#, fuzzy
+#~ msgid ""
+#~ "Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = "
+#~ "minute, %S = second)."
+#~ msgstr ""
+#~ "Sèrie de format de temps (%Y = any, %m = mes, %d = dia, %H = hora, %M = "
+#~ "minut, %S = segon)"
+
+#~ msgid "X offset, from the left screen edge"
+#~ msgstr "Ajust de X, des de la vora esquerra de la pantalla"
+
+#~ msgid "Y offset, down from the top"
+#~ msgstr "Ajust de Y, de sota a dalt."
+
+#, fuzzy
+#~ msgid ""
+#~ "You can enforce the text position on the video (0=center, 1=left, "
+#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+#~ "e.g. 6 = top-right)."
+#~ msgstr ""
+#~ "Podeu reforçar la posició del logotip en el vídeo (0=centre, 1=esquerre, "
+#~ "2=dret, 4=superior, 8=inferior, també podeu utilitzar combinacions "
+#~ "d’aquests valors)."
+
+#~ msgid "Time overlay"
+#~ msgstr "Superposició del temps"
+
+#~ msgid "Time display sub filter"
+#~ msgstr "Subfiltre visualitzador de temps"
+
+#~ msgid "Standard Play"
+#~ msgstr " Reproducció estàndard"
+
+#, fuzzy
+#~ msgid "Growl"
+#~ msgstr "Grup"
+
+#, fuzzy
+#~ msgid "MSN"
+#~ msgstr "MMS"
+
+#, fuzzy
+#~ msgid "Vertical border width"
+#~ msgstr "Desplaçament vertical"
+
+#, fuzzy
+#~ msgid "Horizontal border width"
+#~ msgstr "Horitzontal"
+
+#, fuzzy
+#~ msgid "Create"
+#~ msgstr "Velocitat de fotogrames"
+
+#~ msgid " to "
+#~ msgstr "a"
+
+#, fuzzy
 #~ msgid "Number of streams"
 #~ msgstr "Nombre de fils"
+
+#~ msgid "Image"
+#~ msgstr "Imatge"
+
+#, fuzzy
+#~ msgid "Center-Center"
+#~ msgstr "Centre"
+
+#, fuzzy
+#~ msgid "Left-Center"
+#~ msgstr "Centre"
+
+#, fuzzy
+#~ msgid "Right-Center"
+#~ msgstr "Centre"
+
+#, fuzzy
+#~ msgid "Center-Top"
+#~ msgstr "Centre"
+
+#, fuzzy
+#~ msgid "Left-Top"
+#~ msgstr "Esquerra"
+
+#, fuzzy
+#~ msgid "Right-Top"
+#~ msgstr "Dreta"
+
+#, fuzzy
+#~ msgid "Center-Bottom"
+#~ msgstr "Centre"
+
+#, fuzzy
+#~ msgid "Left-Bottom"
+#~ msgstr "Part inferior"
+
+#, fuzzy
+#~ msgid "Right-Bottom"
+#~ msgstr "Part inferior"
 
 #~ msgid "Adjust Image"
 #~ msgstr "Ajusta la imatge"
@@ -20743,6 +20672,9 @@ msgstr "Analitzador d'espectre"
 
 #~ msgid "Adds distorsion effects"
 #~ msgstr "Afegeix  efectes de distorsió"
+
+#~ msgid "Inverts the image colors"
+#~ msgstr "Inverteix els colors de la imatge"
 
 #, fuzzy
 #~ msgid ""
@@ -21003,6 +20935,10 @@ msgstr "Analitzador d'espectre"
 #~ msgid "Allows you to give the mime returned by the server."
 #~ msgstr "Us permet donar el mime retornat pel servidor."
 
+#, fuzzy
+#~ msgid "DTS"
+#~ msgstr "TS"
+
 #~ msgid "Override preset bands gain in dB (-20 ... 20)"
 #~ msgstr "Substitueix el guany predeterminat de les bandes en dB (-20 ... 20)"
 
@@ -21118,6 +21054,9 @@ msgstr "Analitzador d'espectre"
 #~ msgstr ""
 #~ "Si habiliteu aquest paràmetre, el filtre de l'equalitzador s'aplicarà dos "
 #~ "vegades. L'efecte serà més pronunciat."
+
+#~ msgid "Crops the image"
+#~ msgstr "Retalla la imatge"
 
 #~ msgid "Suppress further errors"
 #~ msgstr "Suprimeix els errors addicionals"
@@ -21322,6 +21261,10 @@ msgstr "Analitzador d'espectre"
 #~ "flux de sortida."
 
 #, fuzzy
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "Nombre mínim de fotogrames B (desestimat)"
+
+#, fuzzy
 #~ msgid ""
 #~ "Allows you to specify the output destination used for the streaming "
 #~ "output."
@@ -21405,6 +21348,9 @@ msgstr "Analitzador d'espectre"
 #~ msgid "Subpictures filter"
 #~ msgstr "Filtre de subimatges"
 
+#~ msgid "List of video output modules"
+#~ msgstr "Llista dels mòduls de sortida de vídeo"
+
 #~ msgid "Select the specific video output modules that you want to activate."
 #~ msgstr ""
 #~ "Selecciona els mòduls de sortida de vídeo específics que voleu activar."
@@ -21459,11 +21405,17 @@ msgstr "Analitzador d'espectre"
 #~ msgid "On Screen Display menu subfilter"
 #~ msgstr "En pantalla"
 
+#~ msgid "You can choose the default scaling mode."
+#~ msgstr "Podeu triar el mode d’escalat per defecte."
+
 #~ msgid ""
 #~ "If the OpenGL cube effect is enabled, this controls its rotation speed."
 #~ msgstr ""
 #~ "Si l’efecte de cub d’OpenGL està habilitat, controla la seva velocitat de "
 #~ "rotació."
+
+#~ msgid "Select effect"
+#~ msgstr "Selecciona efecte"
 
 #~ msgid "Allows you to select different visual effects."
 #~ msgstr "Us permet seleccionar efectes visuals diferents."
@@ -21538,6 +21490,9 @@ msgstr "Analitzador d'espectre"
 
 #~ msgid "Enable loop filter"
 #~ msgstr "Habilita el filtre de bucle"
+
+#~ msgid "Analyse mode"
+#~ msgstr "Mode d'anàlisi"
 
 #~ msgid "This selects the analysing mode."
 #~ msgstr "Selecciona el mode d'anàlisi."
@@ -21717,6 +21672,9 @@ msgstr "Analitzador d'espectre"
 #~ "Inhabilita aquesta opció per inhabilitar fotogrames perduts en els fluxos "
 #~ "de MPEG-2."
 
+#~ msgid "Network interface address"
+#~ msgstr "Adreça de la interfície de xarxa"
+
 #~ msgid ""
 #~ "If you have several interfaces on your machine and use the multicast "
 #~ "solution, you will probably have to indicate the IP address of your "
@@ -21793,9 +21751,6 @@ msgstr "Analitzador d'espectre"
 #~ msgid "Controls"
 #~ msgstr "Controls"
 
-#~ msgid "Random effect"
-#~ msgstr "Efecte aleatòri"
-
 #~ msgid "SLP attribute identifiers"
 #~ msgstr "Identificadors d'atribut SLP"
 
@@ -21853,6 +21808,9 @@ msgstr "Analitzador d'espectre"
 #~ msgid "SLP input"
 #~ msgstr "Entrada SLP"
 
+#~ msgid "Motion threshold"
+#~ msgstr "Llindar de moviment"
+
 #~ msgid ""
 #~ "Amount of joystick movement required for a movement to be recorded (0-"
 #~ ">32767)."
@@ -21898,6 +21856,9 @@ msgstr "Analitzador d'espectre"
 #~ msgid "Joystick control interface"
 #~ msgstr "Interfície de control del joystick"
 
+#~ msgid "Show tooltips"
+#~ msgstr "Mostra els rètols indicadors de la funció"
+
 #~ msgid "Show tooltips for configuration options."
 #~ msgstr ""
 #~ "Mostra els rètols indicadors de funció per les opcions de configuració."
@@ -21927,6 +21888,9 @@ msgstr "Analitzador d'espectre"
 
 #~ msgid "_Open File..."
 #~ msgstr "_Obre un fitxer..."
+
+#~ msgid "Open a file"
+#~ msgstr "Obre un fitxer"
 
 #~ msgid "Open _Disc..."
 #~ msgstr "Obre _Disc..."
@@ -21984,6 +21948,9 @@ msgstr "Analitzador d'espectre"
 
 #~ msgid "_Language"
 #~ msgstr "_Idioma"
+
+#~ msgid "Select audio channel"
+#~ msgstr "Selecciona el canal d'àudio"
 
 #~ msgid "_Subtitles"
 #~ msgstr "_Subtítols"
@@ -22372,6 +22339,9 @@ msgstr "Analitzador d'espectre"
 #~ msgid "Port "
 #~ msgstr "Port"
 
+#~ msgid "Video Filters"
+#~ msgstr "Filtres de vídeo"
+
 #~ msgid "Demux number"
 #~ msgstr "Nombre del demultiplexor"
 
@@ -22716,9 +22686,6 @@ msgstr "Analitzador d'espectre"
 #~ msgid "Mac OS X interface, sound and video"
 #~ msgstr "Interfíce Mac OS X, so i vídeo"
 
-#~ msgid "Control"
-#~ msgstr "Control"
-
 #~ msgid "Option/Alt"
 #~ msgstr "Opció/Alt"
 
@@ -22731,6 +22698,9 @@ msgstr "Analitzador d'espectre"
 #~ msgstr ""
 #~ "(c) 1996-2004 - L'equip de VideoLAN\n"
 #~ "\n"
+
+#~ msgid "Repeat"
+#~ msgstr "Repeteix"
 
 #~ msgid "&Invert"
 #~ msgstr "In&verteix"
@@ -22746,3 +22716,149 @@ msgstr "Analitzador d'espectre"
 
 #~ msgid "Win32 OpenGL provider"
 #~ msgstr "Proveïdor Win32 OpenGL"
+
+#~ msgid "DCA"
+#~ msgstr "DCA"
+
+#~ msgid " "
+#~ msgstr " "
+
+#~ msgid "Stop Stream"
+#~ msgstr "Atura el flux"
+
+#~ msgid "_About..."
+#~ msgstr "_Quant a..."
+
+#~ msgid "Play stream"
+#~ msgstr "Reprodueix el flux"
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "Subfiltre del logo"
+
+#, fuzzy
+#~ msgid "Deblocking loop filter (increases quality)."
+#~ msgstr ""
+#~ "Utilitza el filtre en bucle de desblocatge (incrementa la qualitat)."
+
+#~ msgid "Random effect"
+#~ msgstr "Efecte aleatòri"
+
+#, fuzzy
+#~ msgid "Password: "
+#~ msgstr "Contrasenya"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Tipus de disc"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "Navega..."
+
+#, fuzzy
+#~ msgid "Big"
+#~ msgstr "Brillantor"
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "Alineació del vídeo"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Filtres d'àudio"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "Meditative"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "Següent"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "Amplada"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Espectre "
+
+#, fuzzy
+#~ msgid "margin"
+#~ msgstr "Amhàric"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Memòria cau"
+
+#, fuzzy
+#~ msgid "QPushButton"
+#~ msgstr "Paixtú"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Lineal"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "Oldies"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Més informació"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "Grup"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "Habilita"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "Habilita"
+
+#, fuzzy
+#~ msgid "horizontalLayout_3"
+#~ msgstr "Inverteix horitzontalment"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "Disc"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Metainformació"
+
+#, fuzzy
+#~ msgid "Justification"
+#~ msgstr "Amplificació"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "Nom del dispositiu de àudio"
+
+#, fuzzy
+#~ msgid "Audioscrobbler password"
+#~ msgstr "Contrasenya de l'FTP"
+
+#, fuzzy
+#~ msgid "Connecting..."
+#~ msgstr "Paràmetres..."
+
+#, fuzzy
+#~ msgid "Filters (v2)"
+#~ msgstr "Filtres"
+
+#, fuzzy
+#~ msgid "Dummy video filter"
+#~ msgstr "Filtre de vídeo ffmpeg"
+
+#, fuzzy
+#~ msgid "Dummy VF"
+#~ msgstr "Dummy"
+
+#~ msgid "Control"
+#~ msgstr "Control"

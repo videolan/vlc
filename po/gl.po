@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLC-0.8.4-test2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2006-04-17 18:37+0100\n"
 "Last-Translator: Iván Seoane Pardo <talivan.ivan@gmail.com>\n"
 "Language-Team: Galician\n"
@@ -1189,7 +1189,7 @@ msgstr "Xestos"
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "gl"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4865,7 +4865,7 @@ msgstr "Chuan"
 msgid "Zulu"
 msgstr "Zulú"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Descoñecido"
 
@@ -9492,7 +9492,7 @@ msgstr ""
 #: modules/codec/x264.c:296
 #, fuzzy
 msgid "Quiet mode"
-msgstr "Modo económico"
+msgstr "Modo silencioso"
 
 #: modules/codec/x264.c:297
 #, fuzzy
@@ -10079,7 +10079,7 @@ msgstr "| adev [X] . . . . . . . . . poñer/obter dispositivo de audio"
 #: modules/control/rc.c:879
 #, fuzzy
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
-msgstr "| adev [X] . . . . . . . . . poñer/obter dispositivo de audio"
+msgstr "| title [X] . . . . poñer/obter título en elemento actual"
 
 #: modules/control/rc.c:880
 #, fuzzy
@@ -10834,8 +10834,9 @@ msgid "Shoutcast"
 msgstr "SHOUTcast"
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Timeshift"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -11893,9 +11894,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "Pantalla pró modo pantalla completa."
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 msgid "Remember wizard options"
@@ -17254,7 +17254,7 @@ msgstr "Códec dos subtítulos de destino"
 #: modules/stream_out/transcode.c:154
 #, fuzzy
 msgid "This is the subtitles codec that will be used."
-msgstr "Este é o códec de vídeo que se usará."
+msgstr "Este é o códec de audio que se usará."
 
 #: modules/stream_out/transcode.c:158
 #, fuzzy
@@ -18948,8 +18948,9 @@ msgid "Cylinder"
 msgstr "Biliñal"
 
 #: modules/video_output/opengl.c:123
+#, fuzzy
 msgid "Torus"
-msgstr ""
+msgstr "House"
 
 #: modules/video_output/opengl.c:123
 #, fuzzy
@@ -19437,387 +19438,8 @@ msgstr "Filtro do visualizador"
 msgid "Spectrum analyser"
 msgstr "Analisador de espectro"
 
-#~ msgid "Description file"
-#~ msgstr "Arquivo de descrición"
-
-#~ msgid "A file containing a simple playlist"
-#~ msgstr "Un arquivo que contén unha lista de reprodución simple"
-
-#~ msgid "History parameter"
-#~ msgstr "Parámetro de historia"
-
-#, fuzzy
-#~ msgid "The umber of frames used for detection."
-#~ msgstr "Parámetro de historia, número de fotogramas usados prá detección"
-
-#~ msgid "Audio filter for fixed32<->float32 conversion"
-#~ msgstr "Filtro de audio pra conversión fixed32<->float32"
-
-#~ msgid "Audio filter for fixed32->s16 conversion"
-#~ msgstr "Filtro de audio pra conversión fixed32->s16"
-
-#~ msgid "Audio filter for float32->s16 conversion"
-#~ msgstr "Filtro de audio pra conversión float32->s16"
-
-#~ msgid "Audio filter for float32->s8 conversion"
-#~ msgstr "Filtro de audio pra conversión float32->s8"
-
-#~ msgid "Audio filter for float32->u16 conversion"
-#~ msgstr "Filtro de audio pra conversión float32->u16"
-
-#~ msgid "Audio filter for float32->u8 conversion"
-#~ msgstr "Filtro de audio pra conversión float32->u8"
-
-#~ msgid "Audio filter for s16->fixed32 conversion"
-#~ msgstr "Filtro de audio pra conversión s16->fixed32"
-
-#~ msgid "Audio filter for s16->float32 conversion"
-#~ msgstr "Filtro de audio pra conversión s16->float32"
-
-#~ msgid "Audio filter for s16->float32 with endianness conversion"
-#~ msgstr ""
-#~ "Filtro de audio pra conversión s16->float32 con endianess (formato no que "
-#~ "se almacenan os enteiros de máis dun byte)"
-
-#~ msgid "Audio filter for s8->float32 conversion"
-#~ msgstr "Filtro de audio pra conversión s8->float32"
-
-#~ msgid "Audio filter for u8->fixed32 conversion"
-#~ msgstr "Filtro de audio pra conversión u8->fixed32"
-
-#~ msgid "Audio filter for u8->float32 conversion"
-#~ msgstr "Filtro de audio pra conversión u8->float32"
-
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Tipo de disco"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "Explorar..."
-
-#, fuzzy
-#~ msgid "Big"
-#~ msgstr "Ponte"
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "Aliñación de datos"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Filtros de audio"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "Medios: %s"
-
-#, fuzzy
-#~ msgid "Download when asked"
-#~ msgstr "Baixar agora"
-
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "Capa de abstracción da rede UDP/IPv4"
-
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "Capa de abstracción da rede UDP/IPv6"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "Seguinte"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "Ancho"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Espectrómetro"
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr "Amhárico"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Caché"
-
-#, fuzzy
-#~ msgid "QPushButton"
-#~ msgstr "Pushto"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Liñal"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "Contorno"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Máis información"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "Grupo"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "habilitar"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "habilitar"
-
-#, fuzzy
-#~ msgid "horizontalLayout_3"
-#~ msgstr "Virar horizontalmente"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Disco"
-
-#~ msgid "Create"
-#~ msgstr "Crear"
-
-#~ msgid "Playlist stress tests"
-#~ msgstr "Probas de esgotamento da lista de reprodución"
-
-#~ msgid "DAAP shares"
-#~ msgstr "Partes DAAP"
-
-#~ msgid "DAAP access"
-#~ msgstr "Acceso DAAP"
-
-#~ msgid " to "
-#~ msgstr "pra"
-
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "Tempo de vida (TTL) do fluxo saínte."
-
-#~ msgid "Errors"
-#~ msgstr "Erros"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Metainformación"
-
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr "Permíteche especifica-lo tempo de vida (TTL) pró fluxo de saída."
-
-#, fuzzy
-#~ msgid "Justification"
-#~ msgstr "Amplificación"
-
-#~ msgid "MSN"
-#~ msgstr "MSN"
-
-#~ msgid "Vertical border width"
-#~ msgstr "Ancho do límite vertical"
-
-#~ msgid "Horizontal border width"
-#~ msgstr "Ancho do límite horizontal"
-
-#~ msgid "| time-format STRING . . . overlay STRING in video"
-#~ msgstr "| time-format STRING . . . superpor CADEA en vídeo"
-
-#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
-#~ msgstr "| time-x X . . . . . . . . . . . . compensación dende a esquerda"
-
-#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
-#~ msgstr "| time-y Y . . . . . . . . . . . . compensación dende arriba"
-
-#~ msgid "| time-position #. . . . . . . . relative position"
-#~ msgstr "| time-position #. . . . . . . . posición relativa"
-
-#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
-#~ msgstr "| time-color # . . . . . . . . . . cor de fonte, RGB"
-
-#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
-#~ msgstr "| time-opacity # . . . . . . . . . . . . . opacidade"
-
-#~ msgid "| time-size # . . . . . . . . font size, in pixels"
-#~ msgstr "| time-size # . . . . . . . . tamaño de fonte, en píxeles"
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "Nome do dispositivo de audio"
-
-#, fuzzy
-#~ msgid "Audioscrobbler password"
-#~ msgstr "Contrasinal do FTP"
-
-#, fuzzy
-#~ msgid "Marquee text to display."
-#~ msgstr "Texto da marquesiña a amosar"
-
-#~ msgid "Time format string (%Y%m%d %H%M%S)"
-#~ msgstr "Cadea de formato de tempo (%Y%m%d %H%M%S)"
-
-#, fuzzy
-#~ msgid ""
-#~ "Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = "
-#~ "minute, %S = second)."
-#~ msgstr ""
-#~ "Cadea de formato de tempo (%Y = ano, %m = mes, %d = día, %H = hora, %M = "
-#~ "minuto, %S = segundo)"
-
-#~ msgid "X offset, from the left screen edge"
-#~ msgstr "Desprazamento X, dende a beira esquerda da pantalla"
-
-#~ msgid "Y offset, down from the top"
-#~ msgstr "Desprazamento Y, de baixo a riba"
-
-#, fuzzy
-#~ msgid ""
-#~ "You can enforce the text position on the video (0=center, 1=left, "
-#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-#~ "e.g. 6 = top-right)."
-#~ msgstr ""
-#~ "Podes forza-la posición do tempo no vídeo (0=centro, 1=esquerda, "
-#~ "2=dereita, 4=enriba, 8=embaixo, tamén podes usar combinacións destes "
-#~ "valores, engadíndoos)."
-
-#~ msgid "Time overlay"
-#~ msgstr "Superposición do tempo"
-
-#~ msgid "Time display sub filter"
-#~ msgstr "Subfiltro visualizador de tempo"
-
-#~ msgid ""
-#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
-#~ "screen without black borders (OpenGL only)."
-#~ msgstr ""
-#~ "En modo a pantalla completa, recorta a imaxe se é necesario pra enche-la "
-#~ "pantalla sen beiras negras (só OpenGL)."
-
-#~ msgid "Standard Play"
-#~ msgstr "Reprodución estándar"
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "Axustes..."
-
-#, fuzzy
-#~ msgid "Filters (v2)"
-#~ msgstr "Filtros"
-
 #~ msgid "Video filters settings"
 #~ msgstr "Axustes dos filtros de vídeo"
-
-#, fuzzy
-#~ msgid "Yes"
-#~ msgstr "&Si"
-
-#, fuzzy
-#~ msgid "No"
-#~ msgstr "&No"
-
-#, fuzzy
-#~ msgid ""
-#~ "An error has occurred which probably prevented the proper execution of "
-#~ "the program:"
-#~ msgstr ""
-#~ "Aconteceu un erro que probablemente evitou a execución da túa petición:"
-
-#~ msgid "If you believe that it is a bug, please follow the instructions at:"
-#~ msgstr ""
-#~ "Se cres que isto é un erro do programa, por favor sigue as instrucións:"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "Abri-la ventá das mensaxes"
-
-#~ msgid "Dismiss"
-#~ msgstr "Desbotar"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "Acceso"
-
-#~ msgid "Podcast Link"
-#~ msgstr "Ligazón do Podcast"
-
-#~ msgid "Podcast Copyright"
-#~ msgstr "Dereitos de autor do Podcast"
-
-#~ msgid "Podcast Category"
-#~ msgstr "Categoría do Podcast"
-
-#~ msgid "Podcast Keywords"
-#~ msgstr "Palabras clave do Podcast"
-
-#~ msgid "Podcast Subtitle"
-#~ msgstr "Subtítulos do Podcast"
-
-#~ msgid "Podcast Publication Date"
-#~ msgstr "Data de publicación do Podcast"
-
-#~ msgid "Podcast Author"
-#~ msgstr "Autor do Podcast"
-
-#~ msgid "Podcast Subcategory"
-#~ msgstr "Subcategoría do Podcast"
-
-#~ msgid "Podcast Duration"
-#~ msgstr "Duración do Podcast"
-
-#~ msgid "Podcast Type"
-#~ msgstr "Tipo de Podcast"
-
-#, fuzzy
-#~ msgid "Dummy video filter"
-#~ msgstr "Filtro de vídeo FFmpeg"
-
-#, fuzzy
-#~ msgid "Dummy VF"
-#~ msgstr "Dummy"
-
-#~ msgid "Creating AVI Index ..."
-#~ msgstr "Creando índice AVI..."
-
-#~ msgid "Playlist metademux"
-#~ msgstr "Metadesmultiplexador da lista de reprodución"
-
-#~ msgid "Native playlist import"
-#~ msgstr "Importar lista de reprodución nativa"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "Tipo de disco"
-
-#~ msgid "Listeners"
-#~ msgstr "Oíntes"
-
-#~ msgid "Center-Center"
-#~ msgstr "Centro"
-
-#~ msgid "Left-Center"
-#~ msgstr "Centro á esquerda"
-
-#~ msgid "Right-Center"
-#~ msgstr "Centro á dereita"
-
-#~ msgid "Center-Top"
-#~ msgstr "Enriba ó centro"
-
-#~ msgid "Left-Top"
-#~ msgstr "Enriba á esquerda"
-
-#~ msgid "Right-Top"
-#~ msgstr "Enriba á dereita"
-
-#~ msgid "Center-Bottom"
-#~ msgstr "Embaixo ó centro"
-
-#~ msgid "Left-Bottom"
-#~ msgstr "Embaixo á esquerda"
-
-#~ msgid "Right-Bottom"
-#~ msgstr "Embaixo á dereita"
-
-#~ msgid "M3U file"
-#~ msgstr "Arquivo M3U"
 
 #~ msgid "CDDB Artist"
 #~ msgstr "Artista CDDB"
@@ -19879,6 +19501,24 @@ msgstr "Analisador de espectro"
 #~ msgid "ISO-9660 Volume Set"
 #~ msgstr "Sistema de volume ISO-9660"
 
+#~ msgid "Errors"
+#~ msgstr "Erros"
+
+#~ msgid "Login"
+#~ msgstr "Acceso"
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "Controlador"
+
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "Interface de saída multiemisión IPv6"
+
+#~ msgid "Default IPv6 multicast interface. This overrides the routing table."
+#~ msgstr ""
+#~ "Interface multiemisión IPv6 por defecto. Isto anula a táboa de "
+#~ "encamiñamento."
+
 #~ msgid "By category"
 #~ msgstr "Por categoría"
 
@@ -19887,6 +19527,102 @@ msgstr "Analisador de espectro"
 
 #~ msgid "All items, unsorted"
 #~ msgstr "Tódolos elementos, sen orde"
+
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr ""
+#~ "Este é o tamaño dos arquivos temporais que se usarán pra almacena-los "
+#~ "fluxos timeshifted."
+
+#~ msgid "Name to give to this stream/channel on the icecast server."
+#~ msgstr ""
+#~ "Nome a dar a este fluxo ou a esta canle no servidor Icecast (servidor de "
+#~ "medios de fluxo)."
+
+#, fuzzy
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the icecast server."
+#~ msgstr ""
+#~ "Xeralmente tés que alimenta-lo módulo SHOUTcast con fluxos Ogg. Esta "
+#~ "opción permíteche alimenta-los fluxos MP3 en lugar do outro, polo que os "
+#~ "podes remitir ó servidor Icecast (servidor de medios de fluxo)."
+
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "Tempo de vida (TTL) do fluxo saínte."
+
+#~ msgid "Audio filter for fixed32<->float32 conversion"
+#~ msgstr "Filtro de audio pra conversión fixed32<->float32"
+
+#~ msgid "Audio filter for fixed32->s16 conversion"
+#~ msgstr "Filtro de audio pra conversión fixed32->s16"
+
+#~ msgid "Audio filter for float32->s16 conversion"
+#~ msgstr "Filtro de audio pra conversión float32->s16"
+
+#~ msgid "Audio filter for float32->s8 conversion"
+#~ msgstr "Filtro de audio pra conversión float32->s8"
+
+#~ msgid "Audio filter for float32->u16 conversion"
+#~ msgstr "Filtro de audio pra conversión float32->u16"
+
+#~ msgid "Audio filter for float32->u8 conversion"
+#~ msgstr "Filtro de audio pra conversión float32->u8"
+
+#~ msgid "Audio filter for s16->fixed32 conversion"
+#~ msgstr "Filtro de audio pra conversión s16->fixed32"
+
+#~ msgid "Audio filter for s16->float32 conversion"
+#~ msgstr "Filtro de audio pra conversión s16->float32"
+
+#~ msgid "Audio filter for s16->float32 with endianness conversion"
+#~ msgstr ""
+#~ "Filtro de audio pra conversión s16->float32 con endianess (formato no que "
+#~ "se almacenan os enteiros de máis dun byte)"
+
+#~ msgid "Audio filter for s8->float32 conversion"
+#~ msgstr "Filtro de audio pra conversión s8->float32"
+
+#~ msgid "Audio filter for u8->fixed32 conversion"
+#~ msgstr "Filtro de audio pra conversión u8->fixed32"
+
+#~ msgid "Audio filter for u8->float32 conversion"
+#~ msgstr "Filtro de audio pra conversión u8->float32"
+
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Saída de audio OSS Linux"
+
+#~ msgid "| time-format STRING . . . overlay STRING in video"
+#~ msgstr "| time-format STRING . . . superpor CADEA en vídeo"
+
+#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
+#~ msgstr "| time-x X . . . . . . . . . . . . compensación dende a esquerda"
+
+#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
+#~ msgstr "| time-y Y . . . . . . . . . . . . compensación dende arriba"
+
+#~ msgid "| time-position #. . . . . . . . relative position"
+#~ msgstr "| time-position #. . . . . . . . posición relativa"
+
+#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
+#~ msgstr "| time-color # . . . . . . . . . . cor de fonte, RGB"
+
+#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
+#~ msgstr "| time-opacity # . . . . . . . . . . . . . opacidade"
+
+#~ msgid "| time-size # . . . . . . . . font size, in pixels"
+#~ msgstr "| time-size # . . . . . . . . tamaño de fonte, en píxeles"
+
+#~ msgid "Fixing AVI Index"
+#~ msgstr "Arranxando índice AVI"
+
+#~ msgid "Creating AVI Index ..."
+#~ msgstr "Creando índice AVI..."
+
+#~ msgid "Playlist metademux"
+#~ msgstr "Metadesmultiplexador da lista de reprodución"
 
 #~ msgid "Segment filename"
 #~ msgstr "Nome de arquivo do segmento"
@@ -19897,8 +19633,91 @@ msgstr "Analisador de espectro"
 #~ msgid "Writing application"
 #~ msgstr "Aplicación de escritura"
 
+#~ msgid "Listeners"
+#~ msgstr "Oíntes"
+
+#~ msgid "Native playlist import"
+#~ msgstr "Importar lista de reprodución nativa"
+
+#~ msgid "Podcast Link"
+#~ msgstr "Ligazón do Podcast"
+
+#~ msgid "Podcast Copyright"
+#~ msgstr "Dereitos de autor do Podcast"
+
+#~ msgid "Podcast Category"
+#~ msgstr "Categoría do Podcast"
+
+#~ msgid "Podcast Keywords"
+#~ msgstr "Palabras clave do Podcast"
+
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Subtítulos do Podcast"
+
+#~ msgid "Podcast Publication Date"
+#~ msgstr "Data de publicación do Podcast"
+
+#~ msgid "Podcast Author"
+#~ msgstr "Autor do Podcast"
+
+#~ msgid "Podcast Subcategory"
+#~ msgstr "Subcategoría do Podcast"
+
+#~ msgid "Podcast Duration"
+#~ msgstr "Duración do Podcast"
+
+#~ msgid "Podcast Type"
+#~ msgstr "Tipo de Podcast"
+
+#, fuzzy
+#~ msgid "Mime type"
+#~ msgstr "Tipo de disco"
+
+#, fuzzy
+#~ msgid "Yes"
+#~ msgstr "&Si"
+
+#, fuzzy
+#~ msgid "No"
+#~ msgstr "&No"
+
+#, fuzzy
+#~ msgid ""
+#~ "An error has occurred which probably prevented the proper execution of "
+#~ "the program:"
+#~ msgstr ""
+#~ "Aconteceu un erro que probablemente evitou a execución da túa petición:"
+
+#~ msgid "If you believe that it is a bug, please follow the instructions at:"
+#~ msgstr ""
+#~ "Se cres que isto é un erro do programa, por favor sigue as instrucións:"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Abri-la ventá das mensaxes"
+
+#~ msgid "Dismiss"
+#~ msgstr "Desbotar"
+
+#, fuzzy
+#~ msgid "Do not display further errors"
+#~ msgstr "Suprimir erros adicionais"
+
+#~ msgid ""
+#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
+#~ "screen without black borders (OpenGL only)."
+#~ msgstr ""
+#~ "En modo a pantalla completa, recorta a imaxe se é necesario pra enche-la "
+#~ "pantalla sen beiras negras (só OpenGL)."
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "Incapaz de atopa-la lista de reprodución"
+
 #~ msgid "%i items in playlist (%i not shown)"
 #~ msgstr "%i obxectos na lista de reprodución (%i non amosados)"
+
+#~ msgid "M3U file"
+#~ msgstr "Arquivo M3U"
 
 #~ msgid "Sorted by Artist"
 #~ msgstr "Ordenado por artista"
@@ -19906,8 +19725,114 @@ msgstr "Analisador de espectro"
 #~ msgid "Sorted by Album"
 #~ msgstr "Ordenado por álbum"
 
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "Capa de abstracción da rede UDP/IPv4"
+
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "Capa de abstracción da rede UDP/IPv6"
+
+#~ msgid "Playlist stress tests"
+#~ msgstr "Probas de esgotamento da lista de reprodución"
+
+#~ msgid "DAAP shares"
+#~ msgstr "Partes DAAP"
+
+#~ msgid "DAAP access"
+#~ msgstr "Acceso DAAP"
+
 #~ msgid "Session Announcements (SAP)"
 #~ msgstr "Anunciós de sesión (SAP)"
+
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr "Permíteche especifica-lo tempo de vida (TTL) pró fluxo de saída."
+
+#, fuzzy
+#~ msgid "Automatic black border cropping."
+#~ msgstr "Activar recorte automático da beira negra."
+
+#~ msgid "Distort video filter"
+#~ msgstr "Filtro de vídeo pra distorsionar"
+
+#, fuzzy
+#~ msgid "Marquee text to display."
+#~ msgstr "Texto da marquesiña a amosar"
+
+#, fuzzy
+#~ msgid ""
+#~ "Positioning method for the mosaic. auto: automatically choose the best "
+#~ "number of rows and columns. fixed: use the user-defined number of rows "
+#~ "and columns."
+#~ msgstr ""
+#~ "Método de posicionamento. automático: automaticamente escolle o millor "
+#~ "número de ringleiras e columnas. fixo: usa o número de ringleiras e "
+#~ "columnas definido polo usuario."
+
+#~ msgid "Description file"
+#~ msgstr "Arquivo de descrición"
+
+#~ msgid "A file containing a simple playlist"
+#~ msgstr "Un arquivo que contén unha lista de reprodución simple"
+
+#~ msgid "History parameter"
+#~ msgstr "Parámetro de historia"
+
+#, fuzzy
+#~ msgid "The umber of frames used for detection."
+#~ msgstr "Parámetro de historia, número de fotogramas usados prá detección"
+
+#~ msgid "Motion detect"
+#~ msgstr "Detectar movemento"
+
+#~ msgid "Time format string (%Y%m%d %H%M%S)"
+#~ msgstr "Cadea de formato de tempo (%Y%m%d %H%M%S)"
+
+#, fuzzy
+#~ msgid ""
+#~ "Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = "
+#~ "minute, %S = second)."
+#~ msgstr ""
+#~ "Cadea de formato de tempo (%Y = ano, %m = mes, %d = día, %H = hora, %M = "
+#~ "minuto, %S = segundo)"
+
+#~ msgid "X offset, from the left screen edge"
+#~ msgstr "Desprazamento X, dende a beira esquerda da pantalla"
+
+#~ msgid "Y offset, down from the top"
+#~ msgstr "Desprazamento Y, de baixo a riba"
+
+#, fuzzy
+#~ msgid ""
+#~ "You can enforce the text position on the video (0=center, 1=left, "
+#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+#~ "e.g. 6 = top-right)."
+#~ msgstr ""
+#~ "Podes forza-la posición do tempo no vídeo (0=centro, 1=esquerda, "
+#~ "2=dereita, 4=enriba, 8=embaixo, tamén podes usar combinacións destes "
+#~ "valores, engadíndoos)."
+
+#~ msgid "Time overlay"
+#~ msgstr "Superposición do tempo"
+
+#~ msgid "Time display sub filter"
+#~ msgstr "Subfiltro visualizador de tempo"
+
+#~ msgid "Standard Play"
+#~ msgstr "Reprodución estándar"
+
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
+#~ msgid "Vertical border width"
+#~ msgstr "Ancho do límite vertical"
+
+#~ msgid "Horizontal border width"
+#~ msgstr "Ancho do límite horizontal"
+
+#~ msgid "Create"
+#~ msgstr "Crear"
+
+#~ msgid " to "
+#~ msgstr "pra"
 
 #~ msgid "Number of streams"
 #~ msgstr "Número de fluxos"
@@ -19925,3 +19850,149 @@ msgstr "Analisador de espectro"
 #~ "As subimaxes acadan por defecto un retardo de 15 segundos engadidos ó seu "
 #~ "tempo restante. Isto asegurará que estarán visibles polo menos, o tempo "
 #~ "especificado."
+
+#~ msgid "Image"
+#~ msgstr "Imaxe"
+
+#~ msgid "Center-Center"
+#~ msgstr "Centro"
+
+#~ msgid "Left-Center"
+#~ msgstr "Centro á esquerda"
+
+#~ msgid "Right-Center"
+#~ msgstr "Centro á dereita"
+
+#~ msgid "Center-Top"
+#~ msgstr "Enriba ó centro"
+
+#~ msgid "Left-Top"
+#~ msgstr "Enriba á esquerda"
+
+#~ msgid "Right-Top"
+#~ msgstr "Enriba á dereita"
+
+#~ msgid "Center-Bottom"
+#~ msgstr "Embaixo ó centro"
+
+#~ msgid "Left-Bottom"
+#~ msgstr "Embaixo á esquerda"
+
+#~ msgid "Right-Bottom"
+#~ msgstr "Embaixo á dereita"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Tipo de disco"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "Explorar..."
+
+#, fuzzy
+#~ msgid "Big"
+#~ msgstr "Ponte"
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "Aliñación de datos"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Filtros de audio"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "Medios: %s"
+
+#, fuzzy
+#~ msgid "Download when asked"
+#~ msgstr "Baixar agora"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "Seguinte"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "Ancho"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Espectrómetro"
+
+#, fuzzy
+#~ msgid "margin"
+#~ msgstr "Amhárico"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Caché"
+
+#, fuzzy
+#~ msgid "QPushButton"
+#~ msgstr "Pushto"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Liñal"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "Contorno"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Máis información"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "Grupo"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "habilitar"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "habilitar"
+
+#, fuzzy
+#~ msgid "horizontalLayout_3"
+#~ msgstr "Virar horizontalmente"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "Disco"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Metainformación"
+
+#, fuzzy
+#~ msgid "Justification"
+#~ msgstr "Amplificación"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "Nome do dispositivo de audio"
+
+#, fuzzy
+#~ msgid "Audioscrobbler password"
+#~ msgstr "Contrasinal do FTP"
+
+#, fuzzy
+#~ msgid "Connecting..."
+#~ msgstr "Axustes..."
+
+#, fuzzy
+#~ msgid "Filters (v2)"
+#~ msgstr "Filtros"
+
+#, fuzzy
+#~ msgid "Dummy video filter"
+#~ msgstr "Filtro de vídeo FFmpeg"
+
+#, fuzzy
+#~ msgid "Dummy VF"
+#~ msgstr "Dummy"

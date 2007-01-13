@@ -20,12 +20,12 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2002-04-22 09:56+0200\n"
 "Last-Translator: Sam Hocevar <sam@zoy.org>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: include/vlc_config_cat.h:36
@@ -41,11 +41,11 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:82
 #: modules/visualization/visual/visual.c:113
 msgid "General"
-msgstr ""
+msgstr "General"
 
 #: include/vlc_config_cat.h:43 modules/misc/dummy/dummy.c:65
 msgid "Interface"
-msgstr ""
+msgstr "Interface"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for VLC's interfaces"
@@ -4843,7 +4843,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr ""
 
@@ -9119,9 +9119,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/x264.c:106
-#, fuzzy
 msgid "H.264 level"
-msgstr "Dolby Surround"
+msgstr ""
 
 #: modules/codec/x264.c:107
 msgid ""
@@ -10863,8 +10862,9 @@ msgid "Shoutcast"
 msgstr ""
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Options"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -11038,7 +11038,7 @@ msgstr "ISO 13818-1 MPEG Transport Stream demuxstream"
 #: modules/demux/ts.c:3148 modules/demux/ts.c:3182
 #, fuzzy
 msgid "clean effects"
-msgstr "Next file"
+msgstr "Random Off"
 
 #: modules/demux/ts.c:3152 modules/demux/ts.c:3186
 msgid "hearing impaired"
@@ -19401,74 +19401,32 @@ msgstr "visualiser filter"
 msgid "Spectrum analyser"
 msgstr "Spectrum"
 
-#, fuzzy
-#~ msgid "Description file"
-#~ msgstr "Description"
+#~ msgid "Video filters settings"
+#~ msgstr "Video filters settings"
 
 #, fuzzy
-#~ msgid "History parameter"
-#~ msgstr "visualiser"
+#~ msgid "CDDB Artist"
+#~ msgstr "Artist"
 
 #, fuzzy
-#~ msgid "The umber of frames used for detection."
-#~ msgstr ""
-#~ "Allows you to modify the user name that will be used for the connection."
+#~ msgid "CDDB Genre"
+#~ msgstr "Genre"
 
 #, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Type"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "Browse…"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Audio filters"
-
-#, fuzzy
-#~ msgid "Media File"
+#~ msgid "CDDB Title"
 #~ msgstr "Title"
 
 #, fuzzy
-#~ msgid "text"
+#~ msgid "CD-Text Title"
 #~ msgstr "Next file"
 
 #, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Spectrum"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Rating"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Title"
-
-#, fuzzy
-#~ msgid "line"
+#~ msgid "Console"
 #~ msgstr "Codec"
 
 #, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Visualisations"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "Group packets"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "Disable"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "Disable"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Sample rate"
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "Remote control interface"
 
 #, fuzzy
 #~ msgid "Time-To-Live of the outgoing stream."
@@ -19476,34 +19434,16 @@ msgstr "Spectrum"
 #~ "Allows you to modify the user name that will be used for the connection."
 
 #, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Visualisations"
+#~ msgid "Linux OSS audio output"
+#~ msgstr "File audio output"
 
 #, fuzzy
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr ""
-#~ "Allows you to modify the user name that will be used for the connection."
+#~ msgid "Listeners"
+#~ msgstr "Licence"
 
 #, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "Audio Device"
-
-#, fuzzy
-#~ msgid ""
-#~ "You can enforce the text position on the video (0=center, 1=left, "
-#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-#~ "e.g. 6 = top-right)."
-#~ msgstr ""
-#~ "You can enforce the video alignment in its window. By default (0) it will "
-#~ "be centred (0=centre, 1=left, 2=right, 4=top, 8=bottom, you can also use "
-#~ "combinations of these values)."
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "Settings…"
-
-#~ msgid "Video filters settings"
-#~ msgstr "Video filters settings"
+#~ msgid "Native playlist import"
+#~ msgstr "&Shuffle Playlist"
 
 #, fuzzy
 #~ msgid "Podcast Copyright"
@@ -19522,16 +19462,64 @@ msgstr "Spectrum"
 #~ msgstr "Polarisation"
 
 #, fuzzy
-#~ msgid "Dummy video filter"
-#~ msgstr "ffmpeg demuxer"
-
-#, fuzzy
 #~ msgid "Mime type"
 #~ msgstr "Type"
 
 #, fuzzy
-#~ msgid "Listeners"
-#~ msgstr "Licence"
+#~ msgid "Enable skinned playlist"
+#~ msgstr "&Shuffle Playlist"
+
+#, fuzzy
+#~ msgid "Sorted by Artist"
+#~ msgstr "Reverse stereo"
+
+#, fuzzy
+#~ msgid "Sorted by Album"
+#~ msgstr "Reverse stereo"
+
+#, fuzzy
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr ""
+#~ "Allows you to modify the user name that will be used for the connection."
+
+#, fuzzy
+#~ msgid "Distort video filter"
+#~ msgstr "ffmpeg demuxer"
+
+#, fuzzy
+#~ msgid "Description file"
+#~ msgstr "Description"
+
+#, fuzzy
+#~ msgid "History parameter"
+#~ msgstr "visualiser"
+
+#, fuzzy
+#~ msgid "The umber of frames used for detection."
+#~ msgstr ""
+#~ "Allows you to modify the user name that will be used for the connection."
+
+#, fuzzy
+#~ msgid ""
+#~ "You can enforce the text position on the video (0=center, 1=left, "
+#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+#~ "e.g. 6 = top-right)."
+#~ msgstr ""
+#~ "You can enforce the video alignment in its window. By default (0) it will "
+#~ "be centred (0=centre, 1=left, 2=right, 4=top, 8=bottom, you can also use "
+#~ "combinations of these values)."
+
+#, fuzzy
+#~ msgid "Create"
+#~ msgstr "Sample rate"
+
+#, fuzzy
+#~ msgid "Number of streams"
+#~ msgstr "Number of threads"
+
+#, fuzzy
+#~ msgid "Image"
+#~ msgstr "Next file"
 
 #, fuzzy
 #~ msgid "Center-Center"
@@ -19560,42 +19548,6 @@ msgstr "Spectrum"
 #, fuzzy
 #~ msgid "Center-Bottom"
 #~ msgstr "Centre"
-
-#, fuzzy
-#~ msgid "Left-Bottom"
-#~ msgstr "Centre"
-
-#, fuzzy
-#~ msgid "Right-Bottom"
-#~ msgstr "Right"
-
-#, fuzzy
-#~ msgid "CDDB Artist"
-#~ msgstr "Artist"
-
-#, fuzzy
-#~ msgid "CDDB Genre"
-#~ msgstr "Genre"
-
-#, fuzzy
-#~ msgid "CDDB Title"
-#~ msgstr "Title"
-
-#, fuzzy
-#~ msgid "CD-Text Title"
-#~ msgstr "Next file"
-
-#, fuzzy
-#~ msgid "Sorted by Artist"
-#~ msgstr "Reverse stereo"
-
-#, fuzzy
-#~ msgid "Sorted by Album"
-#~ msgstr "Reverse stereo"
-
-#, fuzzy
-#~ msgid "Number of streams"
-#~ msgstr "Number of threads"
 
 #, fuzzy
 #~ msgid "Control interface settings"
@@ -19772,6 +19724,10 @@ msgstr "Spectrum"
 #~ msgstr "Skinnable Interface"
 
 #, fuzzy
+#~ msgid "Go To Position"
+#~ msgstr "Options"
+
+#, fuzzy
 #~ msgid "Use embedded video output"
 #~ msgstr "Greyscale video output"
 
@@ -19874,6 +19830,10 @@ msgstr "Spectrum"
 #~ "Allows you to modify the user name that will be used for the connection."
 
 #, fuzzy
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "Next file"
+
+#, fuzzy
 #~ msgid ""
 #~ "Allows you to specify the output destination used for the streaming "
 #~ "output."
@@ -19968,9 +19928,16 @@ msgstr "Spectrum"
 #~ msgid "Subpictures filter"
 #~ msgstr "Subtitles Track"
 
+#~ msgid "List of video output modules"
+#~ msgstr "List of video output modules"
+
 #, fuzzy
 #~ msgid "OSD menu configuration file"
 #~ msgstr "Advanced options..."
+
+#, fuzzy
+#~ msgid "Select effect"
+#~ msgstr "Next file"
 
 #, fuzzy
 #~ msgid "Allows you to select different visual effects."
@@ -20023,6 +19990,10 @@ msgstr "Spectrum"
 #~ msgid "Enable loop filter"
 #~ msgstr "ffmpeg demuxer"
 
+#, fuzzy
+#~ msgid "Analyse mode"
+#~ msgstr "Stereo"
+
 #~ msgid "Properties"
 #~ msgstr "Properties"
 
@@ -20072,6 +20043,10 @@ msgstr "Spectrum"
 #~ "and multicast, HTTP, …) mainly designed for high-bandwidth networks.\n"
 #~ "\n"
 #~ "For more information, have a look at the web site."
+
+#, fuzzy
+#~ msgid "Shout"
+#~ msgstr "Add Interface"
 
 #, fuzzy
 #~ msgid "Windows GAPI"
@@ -20130,10 +20105,6 @@ msgstr "Spectrum"
 #, fuzzy
 #~ msgid "Wizard..."
 #~ msgstr "&Wizard…\tCtrl-W"
-
-#, fuzzy
-#~ msgid "Random effect"
-#~ msgstr "Random Off"
 
 #~ msgid ""
 #~ "This string is a comma separated list of attribute identifiers to search "
@@ -20205,6 +20176,10 @@ msgstr "Spectrum"
 #~ msgstr "_Open File…"
 
 #, fuzzy
+#~ msgid "Open a file"
+#~ msgstr "Append to file"
+
+#, fuzzy
 #~ msgid "Open _Disc..."
 #~ msgstr "Open _Disc…"
 
@@ -20242,6 +20217,10 @@ msgstr "Spectrum"
 #, fuzzy
 #~ msgid "_Language"
 #~ msgstr "Language"
+
+#, fuzzy
+#~ msgid "Select audio channel"
+#~ msgstr "Audio channels"
 
 #, fuzzy
 #~ msgid "_Subtitles"
@@ -20394,6 +20373,9 @@ msgstr "Spectrum"
 #~ msgid "&Stop"
 #~ msgstr "Scope"
 
+#~ msgid "Stream info..."
+#~ msgstr "Stream info…"
+
 #, fuzzy
 #~ msgid "Enables/disables the toolbar"
 #~ msgstr "Enable/disable video rendering."
@@ -20419,6 +20401,10 @@ msgstr "Spectrum"
 #~ msgstr "Colour messages"
 
 #, fuzzy
+#~ msgid "Video Filters"
+#~ msgstr "Video title"
+
+#, fuzzy
 #~ msgid "Satellite default transponder frequency (kHz)"
 #~ msgstr "Satellite default transponder polarisation"
 
@@ -20436,6 +20422,10 @@ msgstr "Spectrum"
 #, fuzzy
 #~ msgid "< Back"
 #~ msgstr "Backwards"
+
+#, fuzzy
+#~ msgid "Next >"
+#~ msgstr "Next file"
 
 #, fuzzy
 #~ msgid "MPEG-1 Video codec"
@@ -20694,6 +20684,10 @@ msgstr "Spectrum"
 #~ msgstr "Reverse stereo"
 
 #, fuzzy
+#~ msgid "&Groups"
+#~ msgstr "Group packets"
+
+#, fuzzy
 #~ msgid "Disc Artist(s)"
 #~ msgstr "Artist"
 
@@ -20772,3 +20766,101 @@ msgstr "Spectrum"
 
 #~ msgid "&Program"
 #~ msgstr "&Programme"
+
+#, fuzzy
+#~ msgid "Interfaces"
+#~ msgstr "Add Interface"
+
+#~ msgid "&Shuffle Playlist"
+#~ msgstr "&Shuffle Playlist"
+
+#, fuzzy
+#~ msgid "Stop Stream"
+#~ msgstr "Codec setting"
+
+#~ msgid "_About..."
+#~ msgstr "_About…"
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "Choose file"
+
+#, fuzzy
+#~ msgid "Random effect"
+#~ msgstr "Random Off"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Type"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "Browse…"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Audio filters"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "Title"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "Next file"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Spectrum"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Rating"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Title"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "Codec"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Visualisations"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "Group packets"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "Disable"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "Disable"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Visualisations"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "Audio Device"
+
+#, fuzzy
+#~ msgid "Connecting..."
+#~ msgstr "Settings…"
+
+#, fuzzy
+#~ msgid "Dummy video filter"
+#~ msgstr "ffmpeg demuxer"
+
+#, fuzzy
+#~ msgid "Left-Bottom"
+#~ msgstr "Centre"
+
+#, fuzzy
+#~ msgid "Right-Bottom"
+#~ msgstr "Right"

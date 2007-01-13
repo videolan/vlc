@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.8.5-svn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2005-12-25 17:59+0100\n"
 "Last-Translator: laurent jonqueres <laurent_jonqueres@yahoo.fr>\n"
 "Language-Team: Occitan\n"
@@ -1156,7 +1156,7 @@ msgstr ""
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr ""
+msgstr "oc"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4463,7 +4463,7 @@ msgstr "Zhuang"
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Desconegut"
 
@@ -10015,8 +10015,9 @@ msgid "Shoutcast"
 msgstr "Shoutcast"
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Tibetan"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -18124,141 +18125,8 @@ msgstr "Veire filtre"
 msgid "Spectrum analyser"
 msgstr ""
 
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Tipe de Disc"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "Navegar..."
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Filtres audio"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "Fichièrs"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "Seguent"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Spectromètre"
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr "Amharic"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Caching"
-
-#, fuzzy
-#~ msgid "QPushButton"
-#~ msgstr "Pushto"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Georgian"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "Netejar"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Mai d'Opcions"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "activat"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "activat"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Danish"
-
-#~ msgid "Create"
-#~ msgstr "Crear"
-
-#~ msgid " to "
-#~ msgstr " cap a"
-
-#, fuzzy
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "..."
-
-#, fuzzy
-#~ msgid "Errors"
-#~ msgstr "Error"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Mai d'Opcions"
-
-#, fuzzy
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr "..."
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "Nom Dispositiu Audio"
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "Paramètres..."
-
-#, fuzzy
-#~ msgid "Filters (v2)"
-#~ msgstr "Filtres"
-
 #~ msgid "Video filters settings"
 #~ msgstr "Paramètres dels filtres video"
-
-#, fuzzy
-#~ msgid "Yes"
-#~ msgstr "Òc"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "Dobrir Finèstra Messatges"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "Tipe de Disc"
-
-#, fuzzy
-#~ msgid "Center-Center"
-#~ msgstr "Aval"
-
-#, fuzzy
-#~ msgid "Center-Top"
-#~ msgstr "Aval"
-
-#, fuzzy
-#~ msgid "Left-Top"
-#~ msgstr "Esquèrra"
-
-#, fuzzy
-#~ msgid "Right-Top"
-#~ msgstr "Dreita"
-
-#, fuzzy
-#~ msgid "Center-Bottom"
-#~ msgstr "Aval"
-
-#, fuzzy
-#~ msgid "Left-Bottom"
-#~ msgstr "Aval"
-
-#, fuzzy
-#~ msgid "Right-Bottom"
-#~ msgstr "Aval"
 
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB Artista"
@@ -18320,11 +18188,42 @@ msgstr ""
 #~ msgid "ISO-9660 Volume Set"
 #~ msgstr "ISO-9660 Volume Set"
 
+#, fuzzy
+#~ msgid "Errors"
+#~ msgstr "Error"
+
+#, fuzzy
+#~ msgid "Login"
+#~ msgstr "Georgian"
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "Tampar"
+
 #~ msgid "By category"
 #~ msgstr "Per categoria"
 
 #~ msgid "Manually added"
 #~ msgstr "Ajustat a la man"
+
+#, fuzzy
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "..."
+
+#, fuzzy
+#~ msgid "Mime type"
+#~ msgstr "Tipe de Disc"
+
+#, fuzzy
+#~ msgid "Yes"
+#~ msgstr "Òc"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Dobrir Finèstra Messatges"
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "Dobrir tièra de lectura"
 
 #, fuzzy
 #~ msgid "Sorted by Artist"
@@ -18334,8 +18233,38 @@ msgstr ""
 #~ msgstr "Ordenat per Album"
 
 #, fuzzy
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr "..."
+
+#~ msgid "Create"
+#~ msgstr "Crear"
+
+#~ msgid " to "
+#~ msgstr " cap a"
+
+#, fuzzy
 #~ msgid "Number of streams"
 #~ msgstr "Nombre de linhas"
+
+#, fuzzy
+#~ msgid "Left-Top"
+#~ msgstr "Esquèrra"
+
+#, fuzzy
+#~ msgid "Right-Top"
+#~ msgstr "Dreita"
+
+#, fuzzy
+#~ msgid "Center-Bottom"
+#~ msgstr "Aval"
+
+#, fuzzy
+#~ msgid "Left-Bottom"
+#~ msgstr "Aval"
+
+#, fuzzy
+#~ msgid "Right-Bottom"
+#~ msgstr "Aval"
 
 #~ msgid "Adjust Image"
 #~ msgstr "Ajustar l'imatge"
@@ -18398,3 +18327,91 @@ msgstr ""
 
 #~ msgid "Force options for separate subtitle files."
 #~ msgstr "Opcions pels fichièrs jostitols a despart"
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "Sautar cap al titol"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Tipe de Disc"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "Navegar..."
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Filtres audio"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "Fichièrs"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "Seguent"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Spectromètre"
+
+#, fuzzy
+#~ msgid "margin"
+#~ msgstr "Amharic"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Caching"
+
+#, fuzzy
+#~ msgid "QPushButton"
+#~ msgstr "Pushto"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Georgian"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "Netejar"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Mai d'Opcions"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "activat"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "activat"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "Danish"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Mai d'Opcions"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "Nom Dispositiu Audio"
+
+#, fuzzy
+#~ msgid "Connecting..."
+#~ msgstr "Paramètres..."
+
+#, fuzzy
+#~ msgid "Filters (v2)"
+#~ msgstr "Filtres"
+
+#, fuzzy
+#~ msgid "Center-Center"
+#~ msgstr "Aval"
+
+#, fuzzy
+#~ msgid "Center-Top"
+#~ msgstr "Aval"

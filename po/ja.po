@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2005-12-12 14:01+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -4735,7 +4735,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "不明"
 
@@ -9302,7 +9302,7 @@ msgstr ""
 #: modules/codec/x264.c:296
 #, fuzzy
 msgid "Quiet mode"
-msgstr "ネットワーク"
+msgstr "湾曲モード"
 
 #: modules/codec/x264.c:297
 #, fuzzy
@@ -10720,8 +10720,9 @@ msgid "Shoutcast"
 msgstr ""
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "タイムシフト"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -10895,7 +10896,7 @@ msgstr "ストリームの再生"
 #: modules/demux/ts.c:3148 modules/demux/ts.c:3182
 #, fuzzy
 msgid "clean effects"
-msgstr "エフェクトの選択"
+msgstr "スコープ効果"
 
 #: modules/demux/ts.c:3152 modules/demux/ts.c:3186
 msgid "hearing impaired"
@@ -11798,9 +11799,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "全画面表示の切替え"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 #, fuzzy
@@ -17136,7 +17136,7 @@ msgstr "送信先のアスペクト・レシオ"
 #: modules/stream_out/transcode.c:154
 #, fuzzy
 msgid "This is the subtitles codec that will be used."
-msgstr "DVDデバイスの既定値を設定します。"
+msgstr "VCDデバイスの既定値を指定します。"
 
 #: modules/stream_out/transcode.c:158
 msgid ""
@@ -18800,8 +18800,9 @@ msgid "Cylinder"
 msgstr "リニア"
 
 #: modules/video_output/opengl.c:123
+#, fuzzy
 msgid "Torus"
-msgstr ""
+msgstr "ハウス"
 
 #: modules/video_output/opengl.c:123
 #, fuzzy
@@ -19308,386 +19309,8 @@ msgstr "ビジュアライザーフィルター"
 msgid "Spectrum analyser"
 msgstr "スペクトラム解析"
 
-#~ msgid "Description file"
-#~ msgstr "説明ファイル"
-
-#~ msgid "History parameter"
-#~ msgstr "履歴パラメーター"
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32<->float32 conversion"
-#~ msgstr "fixed32<->float32変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32->s16 conversion"
-#~ msgstr "fixed32->s16変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s16 conversion"
-#~ msgstr "float32->s16変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s8 conversion"
-#~ msgstr "float32->s8変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u16 conversion"
-#~ msgstr "float32->u16変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u8 conversion"
-#~ msgstr "float32->u8変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->fixed32 conversion"
-#~ msgstr "s16->float32変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 conversion"
-#~ msgstr "s16->float32変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 with endianness conversion"
-#~ msgstr "s16->float32変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for s8->float32 conversion"
-#~ msgstr "s16->float32変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->fixed32 conversion"
-#~ msgstr "fixed32->s16変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->float32 conversion"
-#~ msgstr "s16->float32変換のためのオーディオ・フィルター"
-
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "ディスクタイプ"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "参照..."
-
-#, fuzzy
-#~ msgid "Big"
-#~ msgstr "ブリッジ"
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "モザイクの位置"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "オーディオフィルター"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "メディア"
-
-#, fuzzy
-#~ msgid "Never download"
-#~ msgstr "デバイス名"
-
-#, fuzzy
-#~ msgid "Download when asked"
-#~ msgstr "ダウンロード中..."
-
-#, fuzzy
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "IPv4ネットワーク抽象レイヤ"
-
-#, fuzzy
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "IPv6ネットワーク抽象レイヤ"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "次"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "幅"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "スペクトラム"
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr "文字列"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "評価"
-
-#, fuzzy
-#~ msgid "QPushButton"
-#~ msgstr "パシュト語"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "リニア"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "オリーブ"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "バージョン情報の印刷"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "グループ"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "有効"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "有効"
-
-#, fuzzy
-#~ msgid "horizontalLayout_3"
-#~ msgstr "水平"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "ディスク"
-
-#~ msgid "Create"
-#~ msgstr "作成"
-
-#, fuzzy
-#~ msgid "Playlist stress tests"
-#~ msgstr "再生一覧が空です"
-
-#~ msgid "DAAP shares"
-#~ msgstr "DAAP 共有"
-
-#~ msgid "DAAP access"
-#~ msgstr "DAAP アクセス"
-
-#~ msgid " to "
-#~ msgstr " 先 "
-
-#, fuzzy
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "VLCが選択するパケッタライザーの順序を選択します。"
-
-#, fuzzy
-#~ msgid "Errors"
-#~ msgstr "エラー"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "メタ情報"
-
-#, fuzzy
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr "VLCが選択するパケッタライザーの順序を選択します。"
-
-#, fuzzy
-#~ msgid "Justification"
-#~ msgstr "このアプリケーションについて"
-
-#, fuzzy
-#~ msgid "Growl"
-#~ msgstr "グループ"
-
-#~ msgid "MSN"
-#~ msgstr "MSN"
-
-#, fuzzy
-#~ msgid "Vertical border width"
-#~ msgstr "ピクセル指定の垂直境界線幅"
-
-#, fuzzy
-#~ msgid "Horizontal border width"
-#~ msgstr "ピクセル指定の水平境界線幅"
-
-#, fuzzy
-#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
-#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
-
-#, fuzzy
-#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
-#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
-
-#, fuzzy
-#~ msgid "| time-position #. . . . . . . . relative position"
-#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
-
-#, fuzzy
-#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
-#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
-
-#, fuzzy
-#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
-#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
-
-#, fuzzy
-#~ msgid "| time-size # . . . . . . . . font size, in pixels"
-#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "オーディオデバイス名"
-
-#, fuzzy
-#~ msgid "Audioscrobbler password"
-#~ msgstr "FTP パスワード"
-
-#~ msgid "Time overlay"
-#~ msgstr "時間のオーバーレイ"
-
-#, fuzzy
-#~ msgid "Corba control"
-#~ msgstr "コントロール"
-
-#, fuzzy
-#~ msgid "corba control module"
-#~ msgstr "字幕・デコーダ・モジュール"
-
-#, fuzzy
-#~ msgid "Crop borders in fullscreen"
-#~ msgstr "全画面表示の切替え"
-
-#~ msgid "Standard Play"
-#~ msgstr "標準再生"
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "設定..."
-
-#, fuzzy
-#~ msgid "Filters (v2)"
-#~ msgstr "フィルター"
-
 #~ msgid "Video filters settings"
 #~ msgstr "ビデオフィルター設定"
-
-#, fuzzy
-#~ msgid "Yes"
-#~ msgstr "はい"
-
-#, fuzzy
-#~ msgid "No"
-#~ msgstr "なし"
-
-#, fuzzy
-#~ msgid ""
-#~ "An error has occurred which probably prevented the proper execution of "
-#~ "the program:"
-#~ msgstr "要求された処理の実行でエラーが発生しました :"
-
-#, fuzzy
-#~ msgid "If you believe that it is a bug, please follow the instructions at:"
-#~ msgstr "もし、バグであると思われるなら、以下の手順にしたがってください :"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "メッセージウィンドウを表示"
-
-#~ msgid "Dismiss"
-#~ msgstr "やり直し"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "グルジア語"
-
-#~ msgid "Podcast Link"
-#~ msgstr "Podcast リンク"
-
-#~ msgid "Podcast Copyright"
-#~ msgstr "Podcast コピーライト"
-
-#~ msgid "Podcast Category"
-#~ msgstr "Podcast カテゴリ"
-
-#~ msgid "Podcast Keywords"
-#~ msgstr "Podcast キーワード"
-
-#~ msgid "Podcast Subtitle"
-#~ msgstr "Podcast 字幕"
-
-#, fuzzy
-#~ msgid "Podcast Publication Date"
-#~ msgstr "モジュレーションタイプ"
-
-#~ msgid "Podcast Author"
-#~ msgstr "Podcast 作成者"
-
-#~ msgid "Podcast Subcategory"
-#~ msgstr "Podcast サブカテゴリ"
-
-#~ msgid "Podcast Duration"
-#~ msgstr "Podcast 期間"
-
-#, fuzzy
-#~ msgid "Dummy video filter"
-#~ msgstr "ビデオ・フィルター・モジュール"
-
-#, fuzzy
-#~ msgid "Dummy VF"
-#~ msgstr "ダミー"
-
-#, fuzzy
-#~ msgid "Playlist metademux"
-#~ msgstr "再生一覧を開く"
-
-#, fuzzy
-#~ msgid "Native playlist import"
-#~ msgstr "再生一覧を開く"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "ディスクタイプ"
-
-#, fuzzy
-#~ msgid "Listeners"
-#~ msgstr "リニア"
-
-#, fuzzy
-#~ msgid "Center-Center"
-#~ msgstr "中央"
-
-#, fuzzy
-#~ msgid "Left-Center"
-#~ msgstr "中央"
-
-#, fuzzy
-#~ msgid "Right-Center"
-#~ msgstr "中央"
-
-#, fuzzy
-#~ msgid "Center-Top"
-#~ msgstr "中央"
-
-#, fuzzy
-#~ msgid "Left-Top"
-#~ msgstr "左"
-
-#, fuzzy
-#~ msgid "Right-Top"
-#~ msgstr "右"
-
-#, fuzzy
-#~ msgid "Center-Bottom"
-#~ msgstr "下"
-
-#, fuzzy
-#~ msgid "Left-Bottom"
-#~ msgstr "下"
-
-#, fuzzy
-#~ msgid "Right-Bottom"
-#~ msgstr "下"
-
-#~ msgid "M3U file"
-#~ msgstr "M3U ファイル"
 
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB アーティスト"
@@ -19752,8 +19375,115 @@ msgstr "スペクトラム解析"
 #~ msgstr "音量設定"
 
 #, fuzzy
+#~ msgid "Errors"
+#~ msgstr "エラー"
+
+#, fuzzy
+#~ msgid "Login"
+#~ msgstr "グルジア語"
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "制御"
+
+#, fuzzy
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "マルチキャスト出力インターフェース)"
+
+#, fuzzy
 #~ msgid "By category"
 #~ msgstr "CDDB カテゴリ"
+
+#, fuzzy
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "VLCが選択するパケッタライザーの順序を選択します。"
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32<->float32 conversion"
+#~ msgstr "fixed32<->float32変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32->s16 conversion"
+#~ msgstr "fixed32->s16変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s16 conversion"
+#~ msgstr "float32->s16変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s8 conversion"
+#~ msgstr "float32->s8変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u16 conversion"
+#~ msgstr "float32->u16変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u8 conversion"
+#~ msgstr "float32->u8変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->fixed32 conversion"
+#~ msgstr "s16->float32変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 conversion"
+#~ msgstr "s16->float32変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 with endianness conversion"
+#~ msgstr "s16->float32変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for s8->float32 conversion"
+#~ msgstr "s16->float32変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->fixed32 conversion"
+#~ msgstr "fixed32->s16変換のためのオーディオ・フィルター"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->float32 conversion"
+#~ msgstr "s16->float32変換のためのオーディオ・フィルター"
+
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Linux OSS オーディオ出力"
+
+#, fuzzy
+#~ msgid "Corba control"
+#~ msgstr "コントロール"
+
+#, fuzzy
+#~ msgid "corba control module"
+#~ msgstr "字幕・デコーダ・モジュール"
+
+#, fuzzy
+#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
+#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
+
+#, fuzzy
+#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
+#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
+
+#, fuzzy
+#~ msgid "| time-position #. . . . . . . . relative position"
+#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
+
+#, fuzzy
+#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
+#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
+
+#, fuzzy
+#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
+#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
+
+#, fuzzy
+#~ msgid "| time-size # . . . . . . . . font size, in pixels"
+#~ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
+
+#, fuzzy
+#~ msgid "Playlist metademux"
+#~ msgstr "再生一覧を開く"
 
 #~ msgid "Segment filename"
 #~ msgstr "分割ファイル名"
@@ -19767,8 +19497,83 @@ msgstr "スペクトラム解析"
 #~ msgstr "垂直方向位置"
 
 #, fuzzy
+#~ msgid "Listeners"
+#~ msgstr "リニア"
+
+#, fuzzy
+#~ msgid "Native playlist import"
+#~ msgstr "再生一覧を開く"
+
+#~ msgid "Podcast Link"
+#~ msgstr "Podcast リンク"
+
+#~ msgid "Podcast Copyright"
+#~ msgstr "Podcast コピーライト"
+
+#~ msgid "Podcast Category"
+#~ msgstr "Podcast カテゴリ"
+
+#~ msgid "Podcast Keywords"
+#~ msgstr "Podcast キーワード"
+
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Podcast 字幕"
+
+#, fuzzy
+#~ msgid "Podcast Publication Date"
+#~ msgstr "モジュレーションタイプ"
+
+#~ msgid "Podcast Author"
+#~ msgstr "Podcast 作成者"
+
+#~ msgid "Podcast Subcategory"
+#~ msgstr "Podcast サブカテゴリ"
+
+#~ msgid "Podcast Duration"
+#~ msgstr "Podcast 期間"
+
+#, fuzzy
+#~ msgid "Mime type"
+#~ msgstr "ディスクタイプ"
+
+#, fuzzy
+#~ msgid "Yes"
+#~ msgstr "はい"
+
+#, fuzzy
+#~ msgid "No"
+#~ msgstr "なし"
+
+#, fuzzy
+#~ msgid ""
+#~ "An error has occurred which probably prevented the proper execution of "
+#~ "the program:"
+#~ msgstr "要求された処理の実行でエラーが発生しました :"
+
+#, fuzzy
+#~ msgid "If you believe that it is a bug, please follow the instructions at:"
+#~ msgstr "もし、バグであると思われるなら、以下の手順にしたがってください :"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "メッセージウィンドウを表示"
+
+#~ msgid "Dismiss"
+#~ msgstr "やり直し"
+
+#, fuzzy
+#~ msgid "Crop borders in fullscreen"
+#~ msgstr "全画面表示の切替え"
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "デフォルトで再生一覧に追加"
+
+#, fuzzy
 #~ msgid "%i items in playlist (%i not shown)"
 #~ msgstr "デフォルトで再生一覧に追加"
+
+#~ msgid "M3U file"
+#~ msgstr "M3U ファイル"
 
 #, fuzzy
 #~ msgid "Sorted by Artist"
@@ -19779,8 +19584,80 @@ msgstr "スペクトラム解析"
 #~ msgstr "名前でソート"
 
 #, fuzzy
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "IPv4ネットワーク抽象レイヤ"
+
+#, fuzzy
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "IPv6ネットワーク抽象レイヤ"
+
+#, fuzzy
+#~ msgid "Playlist stress tests"
+#~ msgstr "再生一覧が空です"
+
+#~ msgid "DAAP shares"
+#~ msgstr "DAAP 共有"
+
+#~ msgid "DAAP access"
+#~ msgstr "DAAP アクセス"
+
+#, fuzzy
 #~ msgid "Session Announcements (SAP)"
 #~ msgstr "セッション・アナウンスメント・プロトコルをサポートする"
+
+#, fuzzy
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr "VLCが選択するパケッタライザーの順序を選択します。"
+
+#, fuzzy
+#~ msgid "Automatic black border cropping."
+#~ msgstr "黒縁を自動的にアクティブにする"
+
+#, fuzzy
+#~ msgid ""
+#~ "Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough"
+#~ "\" and \"psychedelic\"."
+#~ msgstr "湾曲モード(\"wave\", \"ripple\")"
+
+#, fuzzy
+#~ msgid "Distort video filter"
+#~ msgstr "ビデオ逆転モジュール"
+
+#~ msgid "Description file"
+#~ msgstr "説明ファイル"
+
+#~ msgid "History parameter"
+#~ msgstr "履歴パラメーター"
+
+#~ msgid "Motion detect"
+#~ msgstr "モーション検知"
+
+#~ msgid "Time overlay"
+#~ msgstr "時間のオーバーレイ"
+
+#~ msgid "Standard Play"
+#~ msgstr "標準再生"
+
+#, fuzzy
+#~ msgid "Growl"
+#~ msgstr "グループ"
+
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
+#, fuzzy
+#~ msgid "Vertical border width"
+#~ msgstr "ピクセル指定の垂直境界線幅"
+
+#, fuzzy
+#~ msgid "Horizontal border width"
+#~ msgstr "ピクセル指定の水平境界線幅"
+
+#~ msgid "Create"
+#~ msgstr "作成"
+
+#~ msgid " to "
+#~ msgstr " 先 "
 
 #, fuzzy
 #~ msgid "Number of streams"
@@ -19789,6 +19666,46 @@ msgstr "スペクトラム解析"
 #, fuzzy
 #~ msgid "Maximum number of Shoutcast radio streams which would be listed."
 #~ msgstr "ログ・ウィンドウの最大行数"
+
+#, fuzzy
+#~ msgid "Image"
+#~ msgstr "サイズ"
+
+#, fuzzy
+#~ msgid "Center-Center"
+#~ msgstr "中央"
+
+#, fuzzy
+#~ msgid "Left-Center"
+#~ msgstr "中央"
+
+#, fuzzy
+#~ msgid "Right-Center"
+#~ msgstr "中央"
+
+#, fuzzy
+#~ msgid "Center-Top"
+#~ msgstr "中央"
+
+#, fuzzy
+#~ msgid "Left-Top"
+#~ msgstr "左"
+
+#, fuzzy
+#~ msgid "Right-Top"
+#~ msgstr "右"
+
+#, fuzzy
+#~ msgid "Center-Bottom"
+#~ msgstr "下"
+
+#, fuzzy
+#~ msgid "Left-Bottom"
+#~ msgstr "下"
+
+#, fuzzy
+#~ msgid "Right-Bottom"
+#~ msgstr "下"
 
 #~ msgid "Adjust Image"
 #~ msgstr "画像調整"
@@ -19928,6 +19845,10 @@ msgstr "スペクトラム解析"
 #~ msgstr ""
 #~ "ファイルを見つけるときにオープンされるインタフェースの既定のパスを設定しま"
 #~ "す。"
+
+#, fuzzy
+#~ msgid "DTS"
+#~ msgstr "TS"
 
 #~ msgid "Output channels number"
 #~ msgstr "出力チャンネル数"
@@ -20103,6 +20024,10 @@ msgstr "スペクトラム解析"
 #~ msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #, fuzzy
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "出力デバイス"
+
+#, fuzzy
 #~ msgid ""
 #~ "Allows you to specify the output destination used for the streaming "
 #~ "output."
@@ -20145,6 +20070,10 @@ msgstr "スペクトラム解析"
 #~ msgid "Subpictures filter"
 #~ msgstr "字幕ファイル"
 
+#, fuzzy
+#~ msgid "List of video output modules"
+#~ msgstr "ビデオ出力モジュール"
+
 #~ msgid "Alpha blending"
 #~ msgstr "αブレンディング"
 
@@ -20181,6 +20110,9 @@ msgstr "スペクトラム解析"
 #, fuzzy
 #~ msgid "RSS/Atom feed max number of chars displayed"
 #~ msgstr "RSS フィードの表示する最大文字数"
+
+#~ msgid "Select effect"
+#~ msgstr "エフェクトの選択"
 
 #, fuzzy
 #~ msgid "Allows you to select different visual effects."
@@ -20391,6 +20323,9 @@ msgstr "スペクトラム解析"
 #~ msgid "Audio output volume"
 #~ msgstr "オーディオ出力ボリューム"
 
+#~ msgid "Network interface address"
+#~ msgstr "ネットワークインタフェースアドレス"
+
 #~ msgid ""
 #~ "If you have several interfaces on your machine and use the multicast "
 #~ "solution, you will probably have to indicate the IP address of your "
@@ -20492,6 +20427,9 @@ msgstr "スペクトラム解析"
 #~ msgid "Joystick control interface"
 #~ msgstr "リモート・コントロール・インタフェース・モジュール"
 
+#~ msgid "Show tooltips"
+#~ msgstr "ツールチップを表示"
+
 #~ msgid "Show tooltips for configuration options."
 #~ msgstr "コンフィグレーション・オプションにツールチップを表示"
 
@@ -20522,6 +20460,10 @@ msgstr "スペクトラム解析"
 
 #~ msgid "_Open File..."
 #~ msgstr "ファイルを開く(_O)..."
+
+#, fuzzy
+#~ msgid "Open a file"
+#~ msgstr "ファイルを開く"
 
 #~ msgid "Open _Disc..."
 #~ msgstr "ディスクを開く(_D)..."
@@ -20580,6 +20522,9 @@ msgstr "スペクトラム解析"
 #, fuzzy
 #~ msgid "_Language"
 #~ msgstr "言語"
+
+#~ msgid "Select audio channel"
+#~ msgstr "オーディオ・チャンネルの選択"
 
 #~ msgid "_Subtitles"
 #~ msgstr "字幕(_S)"
@@ -20689,6 +20634,9 @@ msgstr "スペクトラム解析"
 #~ msgid "Vertical"
 #~ msgstr "垂直"
 
+#~ msgid "Horizontal"
+#~ msgstr "水平"
+
 #~ msgid "Satellite"
 #~ msgstr "衛星"
 
@@ -20707,6 +20655,9 @@ msgstr "スペクトラム解析"
 
 #~ msgid "Item"
 #~ msgstr "項目"
+
+#~ msgid "Invert"
+#~ msgstr "逆転"
 
 #~ msgid "stream output (MRL)"
 #~ msgstr "ストリームの出力 (MRL)"
@@ -20730,6 +20681,9 @@ msgstr "スペクトラム解析"
 
 #~ msgid "_Close"
 #~ msgstr "閉じる(_C)"
+
+#~ msgid "Close the window"
+#~ msgstr "ウィンドウを閉じる"
 
 #~ msgid "E_xit"
 #~ msgstr "終了(_x)"
@@ -20962,6 +20916,10 @@ msgstr "スペクトラム解析"
 #~ msgstr "ポート "
 
 #, fuzzy
+#~ msgid "Video Filters"
+#~ msgstr "ビデオタイトル"
+
+#, fuzzy
 #~ msgid "Satellite default transponder frequency (kHz)"
 #~ msgstr "衛星 既定転送周波数"
 
@@ -21087,9 +21045,6 @@ msgstr "スペクトラム解析"
 #~ msgid "MPEG-TS"
 #~ msgstr "MPEG1"
 
-#~ msgid "Control"
-#~ msgstr "制御"
-
 #~ msgid "&Invert"
 #~ msgstr "逆転"
 
@@ -21189,6 +21144,10 @@ msgstr "スペクトラム解析"
 #~ msgid "vlc preferences"
 #~ msgstr "VLC 設定..."
 
+#, fuzzy
+#~ msgid "Repeat"
+#~ msgstr "ファイルの選択"
+
 #~ msgid "SAP interface"
 #~ msgstr "SAP インタフェース"
 
@@ -21234,6 +21193,9 @@ msgstr "スペクトラム解析"
 #, fuzzy
 #~ msgid "Stream output modules settings"
 #~ msgstr "オーディオ出力モジュール"
+
+#~ msgid "Text renderer settings"
+#~ msgstr "テキストレンダラー設定"
 
 #~ msgid "Video output modules settings"
 #~ msgstr "ビデオ出力モジュール設定"
@@ -21296,6 +21258,9 @@ msgstr "スペクトラム解析"
 
 #~ msgid "&Groups"
 #~ msgstr "グループ(&G)"
+
+#~ msgid "Enter a name for the new group:"
+#~ msgstr "新規グループ名前を入力:"
 
 #~ msgid "| no entries\n"
 #~ msgstr "| エントリがありません。\n"
@@ -21430,10 +21395,6 @@ msgstr "スペクトラム解析"
 #~ msgid "video rendering mode"
 #~ msgstr "ビデオレンダリングモード"
 
-#, fuzzy
-#~ msgid "OpenGL effect"
-#~ msgstr "スコープ効果"
-
 #~ msgid "Audio menu"
 #~ msgstr "オーディオメニュー"
 
@@ -21442,6 +21403,9 @@ msgstr "スペクトラム解析"
 
 #~ msgid "Input menu"
 #~ msgstr "入力メニュー"
+
+#~ msgid "Interface menu"
+#~ msgstr "インターフェースメニュー"
 
 #~ msgid "DVD (test)"
 #~ msgstr "DVD(test)"
@@ -21533,6 +21497,10 @@ msgstr "スペクトラム解析"
 #~ msgstr " (デフォルト：有効)"
 
 #, fuzzy
+#~ msgid "Welcome, streaming wizard"
+#~ msgstr "ビデオ・ストリームの出力を有効にする"
+
+#, fuzzy
 #~ msgid "Streaming/Transcoding wizard"
 #~ msgstr "ストリームの情報..."
 
@@ -21574,12 +21542,20 @@ msgstr "スペクトラム解析"
 #~ msgstr "デバイス名"
 
 #, fuzzy
+#~ msgid "Codec download"
+#~ msgstr "デバイス名"
+
+#, fuzzy
 #~ msgid "ftp://"
 #~ msgstr "ファイル"
 
 #, fuzzy
 #~ msgid "Open a skin file."
 #~ msgstr "ファイルを開く"
+
+#, fuzzy
+#~ msgid "Advanced open"
+#~ msgstr "ALSAオーディオ・モジュール"
 
 #, fuzzy
 #~ msgid "Open a network stream"
@@ -21850,6 +21826,10 @@ msgstr "スペクトラム解析"
 #, fuzzy
 #~ msgid "Speex"
 #~ msgstr "選択済み"
+
+#, fuzzy
+#~ msgid "tarkin"
+#~ msgstr "文字列"
 
 #~ msgid ""
 #~ "This allows you to select the order in which VLC will choose its codecs. "
@@ -22330,6 +22310,14 @@ msgstr "スペクトラム解析"
 #~ msgstr "ストリーム出力"
 
 #, fuzzy
+#~ msgid "All files"
+#~ msgstr "ファイル"
+
+#, fuzzy
+#~ msgid "Add file"
+#~ msgstr "字幕"
+
+#, fuzzy
 #~ msgid "Stream Output"
 #~ msgstr "ストリーム出力"
 
@@ -22349,6 +22337,10 @@ msgstr "スペクトラム解析"
 
 #~ msgid "Linux OSS /dev/dsp module"
 #~ msgstr "Linux OSS /dev/dspモジュール"
+
+#, fuzzy
+#~ msgid "libmpeg2 decoder module"
+#~ msgstr "字幕・デコーダ・モジュール"
 
 #~ msgid "QNX RTOS module"
 #~ msgstr "QNX RTOSモジュール"
@@ -22405,6 +22397,10 @@ msgstr "スペクトラム解析"
 #~ msgstr "オーディオ(_u)"
 
 #, fuzzy
+#~ msgid "Slowmotion"
+#~ msgstr "選択"
+
+#, fuzzy
 #~ msgid "Open disc..."
 #~ msgstr "ディスクを開く(_D)..."
 
@@ -22439,3 +22435,130 @@ msgstr "スペクトラム解析"
 #, fuzzy
 #~ msgid "Input Type"
 #~ msgstr "入力"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "ディスクタイプ"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "参照..."
+
+#, fuzzy
+#~ msgid "Big"
+#~ msgstr "ブリッジ"
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "モザイクの位置"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "オーディオフィルター"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "メディア"
+
+#, fuzzy
+#~ msgid "Never download"
+#~ msgstr "デバイス名"
+
+#, fuzzy
+#~ msgid "Download when asked"
+#~ msgstr "ダウンロード中..."
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "次"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "幅"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "スペクトラム"
+
+#, fuzzy
+#~ msgid "margin"
+#~ msgstr "文字列"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "評価"
+
+#, fuzzy
+#~ msgid "QPushButton"
+#~ msgstr "パシュト語"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "リニア"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "オリーブ"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "バージョン情報の印刷"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "グループ"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "有効"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "有効"
+
+#, fuzzy
+#~ msgid "horizontalLayout_3"
+#~ msgstr "水平"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "ディスク"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "メタ情報"
+
+#, fuzzy
+#~ msgid "Justification"
+#~ msgstr "このアプリケーションについて"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "オーディオデバイス名"
+
+#, fuzzy
+#~ msgid "Audioscrobbler password"
+#~ msgstr "FTP パスワード"
+
+#, fuzzy
+#~ msgid "Connecting..."
+#~ msgstr "設定..."
+
+#, fuzzy
+#~ msgid "Filters (v2)"
+#~ msgstr "フィルター"
+
+#, fuzzy
+#~ msgid "Dummy video filter"
+#~ msgstr "ビデオ・フィルター・モジュール"
+
+#, fuzzy
+#~ msgid "Dummy VF"
+#~ msgstr "ダミー"
+
+#~ msgid "Control"
+#~ msgstr "制御"
+
+#, fuzzy
+#~ msgid "OpenGL effect"
+#~ msgstr "スコープ効果"

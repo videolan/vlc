@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2006-05-18 19:31+0100\n"
 "Last-Translator: Miroslav Oujeský <oujesky@mail.muni.cz>\n"
 "Language-Team: \n"
@@ -1172,7 +1172,7 @@ msgstr "Gesta"
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "cs"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4591,7 +4591,7 @@ msgstr ""
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Neznámý"
 
@@ -9669,7 +9669,7 @@ msgstr "Nemohu nastavit zařízení zvuku \"%s\" na %d Hz."
 #: modules/control/rc.c:879
 #, fuzzy
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
-msgstr "Nemohu nastavit zařízení zvuku \"%s\" na %d Hz."
+msgstr "Nelze nastavit hlasitost zvuku"
 
 #: modules/control/rc.c:880
 #, fuzzy
@@ -10465,8 +10465,9 @@ msgid "Shoutcast"
 msgstr "Shoutcast"
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Časová značka"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -11528,9 +11529,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "Zamknout v režimu přes celou obrazovku"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 msgid "Remember wizard options"
@@ -18458,8 +18458,9 @@ msgid "Cylinder"
 msgstr "Bilineární"
 
 #: modules/video_output/opengl.c:123
+#, fuzzy
 msgid "Torus"
-msgstr ""
+msgstr "House"
 
 #: modules/video_output/opengl.c:123
 #, fuzzy
@@ -18952,8 +18953,240 @@ msgid "Spectrum analyser"
 msgstr "Analyzátor spektra"
 
 #, fuzzy
-#~ msgid "Password: "
-#~ msgstr "Heslo:"
+#~ msgid "Video filters settings"
+#~ msgstr "Zobrazit nastavení videa"
+
+#, fuzzy
+#~ msgid "CDDB Artist"
+#~ msgstr "Umělec"
+
+#, fuzzy
+#~ msgid "CDDB Category"
+#~ msgstr "port serveru CDDB"
+
+#, fuzzy
+#~ msgid "CDDB Extended Data"
+#~ msgstr "Rozšířené GUI"
+
+#, fuzzy
+#~ msgid "CDDB Genre"
+#~ msgstr "CDDB server"
+
+#, fuzzy
+#~ msgid "CDDB Year"
+#~ msgstr "CDDB server"
+
+#, fuzzy
+#~ msgid "CDDB Title"
+#~ msgstr "Titul"
+
+#, fuzzy
+#~ msgid "CD-Text Arranger"
+#~ msgstr "Vykreslovač textu"
+
+#, fuzzy
+#~ msgid "CD-Text Composer"
+#~ msgstr "Nečíst text"
+
+#, fuzzy
+#~ msgid "CD-Text Genre"
+#~ msgstr "Vykreslovač textu"
+
+#, fuzzy
+#~ msgid "CD-Text Message"
+#~ msgstr "Zprávy"
+
+#, fuzzy
+#~ msgid "CD-Text Performer"
+#~ msgstr "Vykreslovač textu"
+
+#, fuzzy
+#~ msgid "CD-Text Title"
+#~ msgstr "Následující titul"
+
+#, fuzzy
+#~ msgid "ISO-9660 Application ID"
+#~ msgstr "Aplikace"
+
+#, fuzzy
+#~ msgid "ISO-9660 Publisher"
+#~ msgstr "Vydavatel"
+
+#, fuzzy
+#~ msgid "ISO-9660 Volume Set"
+#~ msgstr "Nastavit úroveň hlasitosti"
+
+#~ msgid "Errors"
+#~ msgstr "Chyby"
+
+#, fuzzy
+#~ msgid "Login"
+#~ msgstr "Přihlašovací jméno: "
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "Ovladač"
+
+#, fuzzy
+#~ msgid "Linux OSS audio output"
+#~ msgstr "zpoždění zvukového výstupu OSS (upraví synchronizaci zvuku a videa)"
+
+#, fuzzy
+#~ msgid "Corba control"
+#~ msgstr "Téma ovládacích prvků"
+
+#, fuzzy
+#~ msgid "corba control module"
+#~ msgstr "nastavit název modulu"
+
+#, fuzzy
+#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
+#~ msgstr "Zleva doprava"
+
+#, fuzzy
+#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
+#~ msgstr "Vyberte čas ze seznamu"
+
+#, fuzzy
+#~ msgid "| time-position #. . . . . . . . relative position"
+#~ msgstr "s časem vztahujícím se k současnému času"
+
+#, fuzzy
+#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
+#~ msgstr "Implicitní barva písma"
+
+#, fuzzy
+#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
+#~ msgstr "Krytí vyplňování:"
+
+#, fuzzy
+#~ msgid "| time-size # . . . . . . . . font size, in pixels"
+#~ msgstr "Velikost písma v jednotkách Pango"
+
+#, fuzzy
+#~ msgid "Fixing AVI Index"
+#~ msgstr "demux_avi: index avi je porušen\n"
+
+#, fuzzy
+#~ msgid "Creating AVI Index ..."
+#~ msgstr "demux_avi: index avi je porušen\n"
+
+#, fuzzy
+#~ msgid "Playlist metademux"
+#~ msgstr "Seznam skladeb SHOUTcast"
+
+#, fuzzy
+#~ msgid "Segment filename"
+#~ msgstr "Název souboru se záznamem"
+
+#, fuzzy
+#~ msgid "Muxing application"
+#~ msgstr "Aplikace"
+
+#, fuzzy
+#~ msgid "Writing application"
+#~ msgstr "Aplikace"
+
+#, fuzzy
+#~ msgid "Native playlist import"
+#~ msgstr "import seznamu skladeb M3U"
+
+#, fuzzy
+#~ msgid "Podcast Link"
+#~ msgstr "Vybraný odkaz"
+
+#, fuzzy
+#~ msgid "Podcast Copyright"
+#~ msgstr "Poznámka o autorských právech"
+
+#, fuzzy
+#~ msgid "Podcast Category"
+#~ msgstr "Jakákoliv kategorie"
+
+#, fuzzy
+#~ msgid "Podcast Keywords"
+#~ msgstr "Žádné klíčové slovo."
+
+#, fuzzy
+#~ msgid "Podcast Subtitle"
+#~ msgstr "velikost titulků"
+
+#, fuzzy
+#~ msgid "Podcast Publication Date"
+#~ msgstr "datum nelze nastavit"
+
+#, fuzzy
+#~ msgid "Podcast Author"
+#~ msgstr "původní autor"
+
+#, fuzzy
+#~ msgid "Podcast Duration"
+#~ msgstr "Trvání souboru:"
+
+#, fuzzy
+#~ msgid "Podcast Type"
+#~ msgstr "Typ spojení"
+
+#~ msgid "Mime type"
+#~ msgstr "Typ MIME"
+
+#~ msgid "Yes"
+#~ msgstr "Ano"
+
+#~ msgid "No"
+#~ msgstr "Ne"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Otevřít okno zpráv"
+
+#~ msgid "Dismiss"
+#~ msgstr "Zavřít"
+
+#~ msgid "Do not display further errors"
+#~ msgstr "Nezobrazovat další chyby"
+
+#, fuzzy
+#~ msgid "Crop borders in fullscreen"
+#~ msgstr "Zamknout v režimu přes celou obrazovku"
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "Nelze najít seznam skladeb"
+
+#, fuzzy
+#~ msgid "%i items in playlist (%i not shown)"
+#~ msgstr "%i položek v seznamu skladeb"
+
+#~ msgid "M3U file"
+#~ msgstr "Soubor M3U"
+
+#, fuzzy
+#~ msgid "Sorted by Artist"
+#~ msgstr "Seřadit podle &titulu"
+
+#, fuzzy
+#~ msgid "Sorted by Album"
+#~ msgstr "Třídit podle názvu"
+
+#, fuzzy
+#~ msgid "Playlist stress tests"
+#~ msgstr "_Včetně vzdálených testů"
+
+#, fuzzy
+#~ msgid "DAAP shares"
+#~ msgstr "Sdílí soubory po internetu"
+
+#, fuzzy
+#~ msgid "DAAP access"
+#~ msgstr "nelze přistoupit k %s"
+
+#, fuzzy
+#~ msgid "Distort video filter"
+#~ msgstr "Horní propust"
+
+#, fuzzy
+#~ msgid "Marquee text to display."
+#~ msgstr "Zobrazený text v náhledu"
 
 #~ msgid "Description file"
 #~ msgstr "Soubor s popisem"
@@ -18964,6 +19197,82 @@ msgstr "Analyzátor spektra"
 #, fuzzy
 #~ msgid "History parameter"
 #~ msgstr "Data parametrů"
+
+#~ msgid "Motion detect"
+#~ msgstr "Detekce pohybu"
+
+#, fuzzy
+#~ msgid "Time format string (%Y%m%d %H%M%S)"
+#~ msgstr "ref_řetězec,formát"
+
+#, fuzzy
+#~ msgid "Y offset, down from the top"
+#~ msgstr "Odshora zleva dolů doprava"
+
+#, fuzzy
+#~ msgid "Time overlay"
+#~ msgstr "Vzorek (překrytí)"
+
+#, fuzzy
+#~ msgid "Time display sub filter"
+#~ msgstr "Filtr podle _předmětu"
+
+#, fuzzy
+#~ msgid "Standard Play"
+#~ msgstr "Zahrát si minové ^pole"
+
+#, fuzzy
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
+#~ msgid "Vertical border width"
+#~ msgstr "Šířka svislého okraje"
+
+#~ msgid "Horizontal border width"
+#~ msgstr "Šířka vodorovného okraje"
+
+#~ msgid "Create"
+#~ msgstr "Vytvořit"
+
+#~ msgid " to "
+#~ msgstr " do "
+
+#~ msgid "%s"
+#~ msgstr "%s"
+
+#~ msgid "Image"
+#~ msgstr "Obrázek"
+
+#~ msgid "Center-Center"
+#~ msgstr "Střed-Střed"
+
+#~ msgid "Left-Center"
+#~ msgstr "Vlevo-Střed"
+
+#~ msgid "Right-Center"
+#~ msgstr "Vpravo-Střed"
+
+#~ msgid "Center-Top"
+#~ msgstr "Střed-Nahoře"
+
+#~ msgid "Left-Top"
+#~ msgstr "Vlevo-Nahoře"
+
+#~ msgid "Right-Top"
+#~ msgstr "Vpravo-Nahoře"
+
+#~ msgid "Center-Bottom"
+#~ msgstr "Střed-Dole"
+
+#~ msgid "Left-Bottom"
+#~ msgstr "Vlevo-Dole"
+
+#~ msgid "Right-Bottom"
+#~ msgstr "Vpravo-Dole"
+
+#, fuzzy
+#~ msgid "Password: "
+#~ msgstr "Heslo:"
 
 #, fuzzy
 #~ msgid "Disc Type"
@@ -19041,64 +19350,9 @@ msgstr "Analyzátor spektra"
 #~ msgid "Disk"
 #~ msgstr "Disk"
 
-#~ msgid "Create"
-#~ msgstr "Vytvořit"
-
-#, fuzzy
-#~ msgid "Playlist stress tests"
-#~ msgstr "_Včetně vzdálených testů"
-
-#, fuzzy
-#~ msgid "DAAP shares"
-#~ msgstr "Sdílí soubory po internetu"
-
-#, fuzzy
-#~ msgid "DAAP access"
-#~ msgstr "nelze přistoupit k %s"
-
-#~ msgid " to "
-#~ msgstr " do "
-
-#~ msgid "Errors"
-#~ msgstr "Chyby"
-
 #, fuzzy
 #~ msgid "Stream information"
 #~ msgstr "Získat informace o uživateli"
-
-#, fuzzy
-#~ msgid "MSN"
-#~ msgstr "MSN"
-
-#~ msgid "Vertical border width"
-#~ msgstr "Šířka svislého okraje"
-
-#~ msgid "Horizontal border width"
-#~ msgstr "Šířka vodorovného okraje"
-
-#, fuzzy
-#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
-#~ msgstr "Zleva doprava"
-
-#, fuzzy
-#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
-#~ msgstr "Vyberte čas ze seznamu"
-
-#, fuzzy
-#~ msgid "| time-position #. . . . . . . . relative position"
-#~ msgstr "s časem vztahujícím se k současnému času"
-
-#, fuzzy
-#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
-#~ msgstr "Implicitní barva písma"
-
-#, fuzzy
-#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
-#~ msgstr "Krytí vyplňování:"
-
-#, fuzzy
-#~ msgid "| time-size # . . . . . . . . font size, in pixels"
-#~ msgstr "Velikost písma v jednotkách Pango"
 
 #, fuzzy
 #~ msgid "Audioscrobbler username"
@@ -19109,42 +19363,6 @@ msgstr "Analyzátor spektra"
 #~ msgstr "text hesla"
 
 #, fuzzy
-#~ msgid "Marquee text to display."
-#~ msgstr "Zobrazený text v náhledu"
-
-#, fuzzy
-#~ msgid "Time format string (%Y%m%d %H%M%S)"
-#~ msgstr "ref_řetězec,formát"
-
-#, fuzzy
-#~ msgid "Y offset, down from the top"
-#~ msgstr "Odshora zleva dolů doprava"
-
-#, fuzzy
-#~ msgid "Time overlay"
-#~ msgstr "Vzorek (překrytí)"
-
-#, fuzzy
-#~ msgid "Time display sub filter"
-#~ msgstr "Filtr podle _předmětu"
-
-#, fuzzy
-#~ msgid "Corba control"
-#~ msgstr "Téma ovládacích prvků"
-
-#, fuzzy
-#~ msgid "corba control module"
-#~ msgstr "nastavit název modulu"
-
-#, fuzzy
-#~ msgid "Crop borders in fullscreen"
-#~ msgstr "Zamknout v režimu přes celou obrazovku"
-
-#, fuzzy
-#~ msgid "Standard Play"
-#~ msgstr "Zahrát si minové ^pole"
-
-#, fuzzy
 #~ msgid "Connecting..."
 #~ msgstr "Nastavení..."
 
@@ -19153,113 +19371,9 @@ msgstr "Analyzátor spektra"
 #~ msgstr "Filtry"
 
 #, fuzzy
-#~ msgid "Video filters settings"
-#~ msgstr "Zobrazit nastavení videa"
-
-#~ msgid "Yes"
-#~ msgstr "Ano"
-
-#~ msgid "No"
-#~ msgstr "Ne"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "Otevřít okno zpráv"
-
-#~ msgid "Dismiss"
-#~ msgstr "Zavřít"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "Přihlašovací jméno: "
-
-#, fuzzy
-#~ msgid "Podcast Link"
-#~ msgstr "Vybraný odkaz"
-
-#, fuzzy
-#~ msgid "Podcast Copyright"
-#~ msgstr "Poznámka o autorských právech"
-
-#, fuzzy
-#~ msgid "Podcast Category"
-#~ msgstr "Jakákoliv kategorie"
-
-#, fuzzy
-#~ msgid "Podcast Keywords"
-#~ msgstr "Žádné klíčové slovo."
-
-#, fuzzy
-#~ msgid "Podcast Subtitle"
-#~ msgstr "velikost titulků"
-
-#, fuzzy
-#~ msgid "Podcast Publication Date"
-#~ msgstr "datum nelze nastavit"
-
-#, fuzzy
-#~ msgid "Podcast Author"
-#~ msgstr "původní autor"
-
-#, fuzzy
-#~ msgid "Podcast Duration"
-#~ msgstr "Trvání souboru:"
-
-#, fuzzy
-#~ msgid "Podcast Type"
-#~ msgstr "Typ spojení"
-
-#, fuzzy
 #~ msgid "Dummy video filter"
 #~ msgstr "Horní propust"
 
 #, fuzzy
 #~ msgid "Dummy VF"
 #~ msgstr "prázdné"
-
-#, fuzzy
-#~ msgid "Creating AVI Index ..."
-#~ msgstr "demux_avi: index avi je porušen\n"
-
-#, fuzzy
-#~ msgid "Playlist metademux"
-#~ msgstr "Seznam skladeb SHOUTcast"
-
-#, fuzzy
-#~ msgid "Native playlist import"
-#~ msgstr "import seznamu skladeb M3U"
-
-#~ msgid "Mime type"
-#~ msgstr "Typ MIME"
-
-#~ msgid "Center-Center"
-#~ msgstr "Střed-Střed"
-
-#~ msgid "Left-Center"
-#~ msgstr "Vlevo-Střed"
-
-#~ msgid "Right-Center"
-#~ msgstr "Vpravo-Střed"
-
-#~ msgid "Center-Top"
-#~ msgstr "Střed-Nahoře"
-
-#~ msgid "Left-Top"
-#~ msgstr "Vlevo-Nahoře"
-
-#~ msgid "Right-Top"
-#~ msgstr "Vpravo-Nahoře"
-
-#~ msgid "Center-Bottom"
-#~ msgstr "Střed-Dole"
-
-#~ msgid "Left-Bottom"
-#~ msgstr "Vlevo-Dole"
-
-#~ msgid "Right-Bottom"
-#~ msgstr "Vpravo-Dole"
-
-#~ msgid "M3U file"
-#~ msgstr "Soubor M3U"
-
-#~ msgid "%s"
-#~ msgstr "%s"

@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: da\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2005-06-23 21:55+0100\n"
 "Last-Translator: Jonas A. Larsen <jonas@vrt.dk>\n"
 "Language-Team: Danish <da@li.org>\n"
@@ -1208,7 +1208,7 @@ msgstr "Fagter"
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "da"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4746,7 +4746,7 @@ msgstr ""
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Ukendt"
 
@@ -8894,9 +8894,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/x264.c:106
-#, fuzzy
 msgid "H.264 level"
-msgstr "Surround niveau (0-100)"
+msgstr ""
 
 #: modules/codec/x264.c:107
 msgid ""
@@ -9874,7 +9873,7 @@ msgstr "| marq-y Y . . . . . . . . . . . . forskydelse fra venstre\n"
 #: modules/control/rc.c:879
 #, fuzzy
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
-msgstr "| marq-y Y . . . . . . . . . . . . forskydelse fra venstre\n"
+msgstr "| volup [X]  . . . . . forøg lydstyrken X-trin\n"
 
 #: modules/control/rc.c:880
 #, fuzzy
@@ -10675,8 +10674,9 @@ msgid "Shoutcast"
 msgstr "Shoutcast"
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Tidsforskydelse"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -10847,7 +10847,7 @@ msgstr "MPEG Transport Stream demuxer"
 #: modules/demux/ts.c:3148 modules/demux/ts.c:3182
 #, fuzzy
 msgid "clean effects"
-msgstr "Vælg effekt"
+msgstr "Tilfældig effekt"
 
 #: modules/demux/ts.c:3152 modules/demux/ts.c:3186
 msgid "hearing impaired"
@@ -13446,7 +13446,6 @@ msgid "Next track"
 msgstr "Næste"
 
 #: modules/gui/qt4/qt4.cpp:47
-#, fuzzy
 msgid "Qt interface"
 msgstr "Qt grænseflade"
 
@@ -17053,7 +17052,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:154
 #, fuzzy
 msgid "This is the subtitles codec that will be used."
-msgstr "Dette er standard DVD-enheden der skal bruges."
+msgstr "Dette er standard lyd-CD enheden der skal bruges."
 
 #: modules/stream_out/transcode.c:158
 msgid ""
@@ -18695,8 +18694,9 @@ msgid "Cylinder"
 msgstr "Ryd"
 
 #: modules/video_output/opengl.c:123
+#, fuzzy
 msgid "Torus"
-msgstr ""
+msgstr "House"
 
 #: modules/video_output/opengl.c:123
 #, fuzzy
@@ -19189,374 +19189,8 @@ msgstr "Visualiseringsfilter"
 msgid "Spectrum analyser"
 msgstr "Spektrum"
 
-#, fuzzy
-#~ msgid "Password: "
-#~ msgstr "Adgangskode"
-
-#~ msgid "Description file"
-#~ msgstr "Beskrivelses fil"
-
-#, fuzzy
-#~ msgid "The umber of frames used for detection."
-#~ msgstr "Historisk parameter, antal frames brug til opdagelse"
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32<->float32 conversion"
-#~ msgstr "lydfilter for fixed32<->float32 konvertering"
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32->s16 conversion"
-#~ msgstr "lydfilter for fixed32->s16 konvertering"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s16 conversion"
-#~ msgstr "lydfilter for float32->s16 konvertering"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s8 conversion"
-#~ msgstr "lydfilter for float32->s8 konvertering"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u16 conversion"
-#~ msgstr "lydfilter for float32->u16 konvertering"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u8 conversion"
-#~ msgstr "lydfilter for float32->u8 konvertering"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->fixed32 conversion"
-#~ msgstr "lydfilter for s16->fixed32 konvertering"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 conversion"
-#~ msgstr "lydfilter for s16->float32 konvertering"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 with endianness conversion"
-#~ msgstr ""
-#~ "lydfilter for s16->float32 konvertering med endiansk konvertering (Big "
-#~ "endian / little endian)"
-
-#, fuzzy
-#~ msgid "Audio filter for s8->float32 conversion"
-#~ msgstr "lydfilter for s8->float32 konvertering"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->fixed32 conversion"
-#~ msgstr "lydfilter for u8->fixed32 konvertering"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->float32 conversion"
-#~ msgstr "lydfilter for u8->float32 konvertering"
-
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Disk type"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "Gennemse..."
-
-#, fuzzy
-#~ msgid "Big"
-#~ msgstr "Bro"
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "Mosaic indstilling"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Lydfiltre"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "Meditativ"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "Næste"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "Bredde"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Spektrum"
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr "Amharisk"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Caching"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Lineær"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "Olivengrøn"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Flere oplysninger"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "Gruppe"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "aktiver"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "aktiver"
-
-#, fuzzy
-#~ msgid "horizontalLayout_3"
-#~ msgstr "Vend horisontalt"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Disk"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Framerate"
-
-#~ msgid "Playlist stress tests"
-#~ msgstr "Spilleliste stresstest"
-
-#~ msgid "DAAP access"
-#~ msgstr "DAAP adgang"
-
-#~ msgid " to "
-#~ msgstr " til "
-
-#, fuzzy
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "Lader dig skalere videoen før encoding"
-
-#, fuzzy
-#~ msgid "Errors"
-#~ msgstr "Fejl"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Meta-oplysninger"
-
-#, fuzzy
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr "Lader dig indstille video bitraten for streaming uddata."
-
-#, fuzzy
-#~ msgid "Justification"
-#~ msgstr "Forstærkning"
-
-#, fuzzy
-#~ msgid "Growl"
-#~ msgstr "Gruppe"
-
-#, fuzzy
-#~ msgid "MSN"
-#~ msgstr "MMS"
-
-#, fuzzy
-#~ msgid "Vertical border width"
-#~ msgstr "Vertikal forskydning"
-
-#, fuzzy
-#~ msgid "Horizontal border width"
-#~ msgstr "Horisontal"
-
-#, fuzzy
-#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
-#~ msgstr "| time-x X . . . . . . . . . . . .forskydelser fra venstre\n"
-
-#, fuzzy
-#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
-#~ msgstr "| time-x X . . . . . . . . . . . .forskydelser fra toppen\n"
-
-#, fuzzy
-#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
-#~ msgstr "| time-x X . . . . . . . . . . . .forskydelser fra venstre\n"
-
-#, fuzzy
-#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
-#~ msgstr "| time-x X . . . . . . . . . . . .forskydelser fra toppen\n"
-
-#, fuzzy
-#~ msgid "| time-size # . . . . . . . . font size, in pixels"
-#~ msgstr "| time-x X . . . . . . . . . . . .forskydelser fra toppen\n"
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "Lyd enhedsnavn"
-
-#, fuzzy
-#~ msgid "Audioscrobbler password"
-#~ msgstr "FTP kodeord"
-
-#, fuzzy
-#~ msgid "Marquee text to display."
-#~ msgstr "Markise tekst der skal vises"
-
-#, fuzzy
-#~ msgid ""
-#~ "You can enforce the text position on the video (0=center, 1=left, "
-#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-#~ "e.g. 6 = top-right)."
-#~ msgstr ""
-#~ "Du kan indstille positionen for tidsangivelse i videon. (0=centrer, "
-#~ "1=venstre, 2=højre, 4=top,8=bund) vil det blive centreret (0=center, "
-#~ "1=venstre, 2=højre, 4=top, 8=bottom). Du kan også bruge kombinationer af "
-#~ "værdierne."
-
-#~ msgid "Time overlay"
-#~ msgstr "Tidsoverlægning"
-
-#~ msgid "Corba control"
-#~ msgstr "Corba kontrol"
-
-#~ msgid "corba control module"
-#~ msgstr "corba kontrol modul"
-
-#~ msgid ""
-#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
-#~ "screen without black borders (OpenGL only)."
-#~ msgstr ""
-#~ "I fuldskærms-tilstand, beskær billedet hvis nødvendigt for at fylde "
-#~ "skærmen uden sorte ramme (kun OpenGL)."
-
-#~ msgid "Standard Play"
-#~ msgstr "Standardafspilning"
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "Indstillinger..."
-
-#, fuzzy
-#~ msgid "Filters (v2)"
-#~ msgstr "Filtre"
-
 #~ msgid "Video filters settings"
 #~ msgstr "Indstillinger for video filtre"
-
-#, fuzzy
-#~ msgid "Yes"
-#~ msgstr "Bytes"
-
-#, fuzzy
-#~ msgid "No"
-#~ msgstr "Type"
-
-#, fuzzy
-#~ msgid ""
-#~ "An error has occurred which probably prevented the proper execution of "
-#~ "the program:"
-#~ msgstr ""
-#~ "En fejl skete som sikkert forhindrede udførslen af din forespørgsel:"
-
-#~ msgid "If you believe that it is a bug, please follow the instructions at:"
-#~ msgstr "Hvis du mener det er en fejl, så følg instruktionerne på:"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "Åbn beskedvindue"
-
-#~ msgid "Dismiss"
-#~ msgstr "Fjern"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "Logning"
-
-#, fuzzy
-#~ msgid "Podcast Link"
-#~ msgstr "Position"
-
-#, fuzzy
-#~ msgid "Podcast Copyright"
-#~ msgstr "Copyright"
-
-#, fuzzy
-#~ msgid "Podcast Category"
-#~ msgstr "CDDB kategori"
-
-#, fuzzy
-#~ msgid "Podcast Subtitle"
-#~ msgstr "Undertekster"
-
-#, fuzzy
-#~ msgid "Podcast Author"
-#~ msgstr "Forfatter"
-
-#, fuzzy
-#~ msgid "Podcast Subcategory"
-#~ msgstr "Efter kategori"
-
-#, fuzzy
-#~ msgid "Podcast Duration"
-#~ msgstr "Mætning"
-
-#, fuzzy
-#~ msgid "Dummy video filter"
-#~ msgstr "Logo video filter"
-
-#, fuzzy
-#~ msgid "Dummy VF"
-#~ msgstr "Attrap"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "Disk type"
-
-#~ msgid "Listeners"
-#~ msgstr "Lyttere"
-
-#, fuzzy
-#~ msgid "Center-Center"
-#~ msgstr "Center"
-
-#, fuzzy
-#~ msgid "Left-Center"
-#~ msgstr "Center"
-
-#, fuzzy
-#~ msgid "Right-Center"
-#~ msgstr "Center"
-
-#, fuzzy
-#~ msgid "Center-Top"
-#~ msgstr "Center"
-
-#, fuzzy
-#~ msgid "Left-Top"
-#~ msgstr "Venstre"
-
-#, fuzzy
-#~ msgid "Right-Top"
-#~ msgstr "Højre"
-
-#, fuzzy
-#~ msgid "Center-Bottom"
-#~ msgstr "Center"
-
-#, fuzzy
-#~ msgid "Left-Bottom"
-#~ msgstr "Bund"
-
-#, fuzzy
-#~ msgid "Right-Bottom"
-#~ msgstr "Bund"
-
-#~ msgid "M3U file"
-#~ msgstr "M3U fil"
 
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB kunstner"
@@ -19618,6 +19252,22 @@ msgstr "Spektrum"
 #~ msgid "ISO-9660 Volume Set"
 #~ msgstr "ISO-9660 lydstyrkesæt"
 
+#, fuzzy
+#~ msgid "Errors"
+#~ msgstr "Fejl"
+
+#, fuzzy
+#~ msgid "Login"
+#~ msgstr "Logning"
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "Control"
+
+#, fuzzy
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "Joystick kontrol"
+
 #~ msgid "By category"
 #~ msgstr "Efter kategori"
 
@@ -19627,8 +19277,174 @@ msgstr "Spektrum"
 #~ msgid "All items, unsorted"
 #~ msgstr "Alle elementer, usorteret"
 
+#, fuzzy
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr "Video filtre bruges til at efter-bearbejde video streamen."
+
+#, fuzzy
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "Lader dig skalere videoen før encoding"
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32<->float32 conversion"
+#~ msgstr "lydfilter for fixed32<->float32 konvertering"
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32->s16 conversion"
+#~ msgstr "lydfilter for fixed32->s16 konvertering"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s16 conversion"
+#~ msgstr "lydfilter for float32->s16 konvertering"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s8 conversion"
+#~ msgstr "lydfilter for float32->s8 konvertering"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u16 conversion"
+#~ msgstr "lydfilter for float32->u16 konvertering"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u8 conversion"
+#~ msgstr "lydfilter for float32->u8 konvertering"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->fixed32 conversion"
+#~ msgstr "lydfilter for s16->fixed32 konvertering"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 conversion"
+#~ msgstr "lydfilter for s16->float32 konvertering"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 with endianness conversion"
+#~ msgstr ""
+#~ "lydfilter for s16->float32 konvertering med endiansk konvertering (Big "
+#~ "endian / little endian)"
+
+#, fuzzy
+#~ msgid "Audio filter for s8->float32 conversion"
+#~ msgstr "lydfilter for s8->float32 konvertering"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->fixed32 conversion"
+#~ msgstr "lydfilter for u8->fixed32 konvertering"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->float32 conversion"
+#~ msgstr "lydfilter for u8->float32 konvertering"
+
+#~ msgid "Corba control"
+#~ msgstr "Corba kontrol"
+
+#~ msgid "corba control module"
+#~ msgstr "corba kontrol modul"
+
+#, fuzzy
+#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
+#~ msgstr "| time-x X . . . . . . . . . . . .forskydelser fra venstre\n"
+
+#, fuzzy
+#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
+#~ msgstr "| time-x X . . . . . . . . . . . .forskydelser fra toppen\n"
+
+#, fuzzy
+#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
+#~ msgstr "| time-x X . . . . . . . . . . . .forskydelser fra venstre\n"
+
+#, fuzzy
+#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
+#~ msgstr "| time-x X . . . . . . . . . . . .forskydelser fra toppen\n"
+
+#, fuzzy
+#~ msgid "| time-size # . . . . . . . . font size, in pixels"
+#~ msgstr "| time-x X . . . . . . . . . . . .forskydelser fra toppen\n"
+
+#~ msgid "Listeners"
+#~ msgstr "Lyttere"
+
+#~ msgid "Native playlist import"
+#~ msgstr "Import af standard spilleliste"
+
+#, fuzzy
+#~ msgid "Podcast Link"
+#~ msgstr "Position"
+
+#, fuzzy
+#~ msgid "Podcast Copyright"
+#~ msgstr "Copyright"
+
+#, fuzzy
+#~ msgid "Podcast Category"
+#~ msgstr "CDDB kategori"
+
+#, fuzzy
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Undertekster"
+
+#, fuzzy
+#~ msgid "Podcast Author"
+#~ msgstr "Forfatter"
+
+#, fuzzy
+#~ msgid "Podcast Subcategory"
+#~ msgstr "Efter kategori"
+
+#, fuzzy
+#~ msgid "Podcast Duration"
+#~ msgstr "Mætning"
+
+#, fuzzy
+#~ msgid "Mime type"
+#~ msgstr "Disk type"
+
+#, fuzzy
+#~ msgid "Yes"
+#~ msgstr "Bytes"
+
+#, fuzzy
+#~ msgid "No"
+#~ msgstr "Type"
+
+#, fuzzy
+#~ msgid ""
+#~ "An error has occurred which probably prevented the proper execution of "
+#~ "the program:"
+#~ msgstr ""
+#~ "En fejl skete som sikkert forhindrede udførslen af din forespørgsel:"
+
+#~ msgid "If you believe that it is a bug, please follow the instructions at:"
+#~ msgstr "Hvis du mener det er en fejl, så følg instruktionerne på:"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Åbn beskedvindue"
+
+#~ msgid "Dismiss"
+#~ msgstr "Fjern"
+
+#, fuzzy
+#~ msgid "Do not display further errors"
+#~ msgstr "Udelad yderligere fejl"
+
+#~ msgid ""
+#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
+#~ "screen without black borders (OpenGL only)."
+#~ msgstr ""
+#~ "I fuldskærms-tilstand, beskær billedet hvis nødvendigt for at fylde "
+#~ "skærmen uden sorte ramme (kun OpenGL)."
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "Åh åh! Kunne ikke finde spilleliste!"
+
 #~ msgid "%i items in playlist (%i not shown)"
 #~ msgstr "%i elementer i spilleliste (%i ikke vist)"
+
+#~ msgid "M3U file"
+#~ msgstr "M3U fil"
 
 #, fuzzy
 #~ msgid "Sorted by Artist"
@@ -19638,9 +19454,113 @@ msgstr "Spektrum"
 #~ msgid "Sorted by Album"
 #~ msgstr "Sortér efter navn"
 
+#~ msgid "Playlist stress tests"
+#~ msgstr "Spilleliste stresstest"
+
+#~ msgid "DAAP access"
+#~ msgstr "DAAP adgang"
+
+#, fuzzy
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr "Lader dig indstille video bitraten for streaming uddata."
+
+#, fuzzy
+#~ msgid "Automatic black border cropping."
+#~ msgstr "Automatisk beskæring"
+
+#, fuzzy
+#~ msgid "Marquee text to display."
+#~ msgstr "Markise tekst der skal vises"
+
+#~ msgid "Description file"
+#~ msgstr "Beskrivelses fil"
+
+#, fuzzy
+#~ msgid "The umber of frames used for detection."
+#~ msgstr "Historisk parameter, antal frames brug til opdagelse"
+
+#, fuzzy
+#~ msgid ""
+#~ "You can enforce the text position on the video (0=center, 1=left, "
+#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+#~ "e.g. 6 = top-right)."
+#~ msgstr ""
+#~ "Du kan indstille positionen for tidsangivelse i videon. (0=centrer, "
+#~ "1=venstre, 2=højre, 4=top,8=bund) vil det blive centreret (0=center, "
+#~ "1=venstre, 2=højre, 4=top, 8=bottom). Du kan også bruge kombinationer af "
+#~ "værdierne."
+
+#~ msgid "Time overlay"
+#~ msgstr "Tidsoverlægning"
+
+#~ msgid "Standard Play"
+#~ msgstr "Standardafspilning"
+
+#, fuzzy
+#~ msgid "Growl"
+#~ msgstr "Gruppe"
+
+#, fuzzy
+#~ msgid "MSN"
+#~ msgstr "MMS"
+
+#, fuzzy
+#~ msgid "Vertical border width"
+#~ msgstr "Vertikal forskydning"
+
+#, fuzzy
+#~ msgid "Horizontal border width"
+#~ msgstr "Horisontal"
+
+#, fuzzy
+#~ msgid "Create"
+#~ msgstr "Framerate"
+
+#~ msgid " to "
+#~ msgstr " til "
+
 #, fuzzy
 #~ msgid "Number of streams"
 #~ msgstr "Antal tråde"
+
+#~ msgid "Image"
+#~ msgstr "Billede"
+
+#, fuzzy
+#~ msgid "Center-Center"
+#~ msgstr "Center"
+
+#, fuzzy
+#~ msgid "Left-Center"
+#~ msgstr "Center"
+
+#, fuzzy
+#~ msgid "Right-Center"
+#~ msgstr "Center"
+
+#, fuzzy
+#~ msgid "Center-Top"
+#~ msgstr "Center"
+
+#, fuzzy
+#~ msgid "Left-Top"
+#~ msgstr "Venstre"
+
+#, fuzzy
+#~ msgid "Right-Top"
+#~ msgstr "Højre"
+
+#, fuzzy
+#~ msgid "Center-Bottom"
+#~ msgstr "Center"
+
+#, fuzzy
+#~ msgid "Left-Bottom"
+#~ msgstr "Bund"
+
+#, fuzzy
+#~ msgid "Right-Bottom"
+#~ msgstr "Bund"
 
 #~ msgid "Adjust Image"
 #~ msgstr "Indstil billede"
@@ -19650,6 +19570,9 @@ msgstr "Spektrum"
 
 #~ msgid "Adds distorsion effects"
 #~ msgstr "Tilføjer forvrængelses effekt"
+
+#~ msgid "Inverts the image colors"
+#~ msgstr "Invertere/vender billedets farver"
 
 #, fuzzy
 #~ msgid ""
@@ -19797,6 +19720,9 @@ msgstr "Spektrum"
 
 #~ msgid "Allows growing the MTU if truncated packets are found"
 #~ msgstr "Tillader at MTU forhøjes hvis trunkerede pakker opdages"
+
+#~ msgid "DTS"
+#~ msgstr "DTS"
 
 #, fuzzy
 #~ msgid "Select how stereo streams will be handled"
@@ -19983,6 +19909,9 @@ msgstr "Spektrum"
 #, fuzzy
 #~ msgid "On Screen Display menu subfilter"
 #~ msgstr "On Screen Display"
+
+#~ msgid "Select effect"
+#~ msgstr "Vælg effekt"
 
 #~ msgid "Allows you to select different visual effects."
 #~ msgstr "Tillader at vælge forskellige visuelle effekter"
@@ -20201,6 +20130,9 @@ msgstr "Spektrum"
 #~ "Deaktiver denne indstillinger for at deaktivere overspring af frames i "
 #~ "MPEG-2 streams."
 
+#~ msgid "Network interface address"
+#~ msgstr "Netværk kortets adresse"
+
 #~ msgid "Choose program (SID)"
 #~ msgstr "Vælg program (SID)"
 
@@ -20259,9 +20191,6 @@ msgstr "Spektrum"
 #~ msgid "Controls"
 #~ msgstr "Styring"
 
-#~ msgid "Random effect"
-#~ msgstr "Tilfældig effekt"
-
 #~ msgid "SLP input"
 #~ msgstr "SLP inddata"
 
@@ -20285,6 +20214,9 @@ msgstr "Spektrum"
 
 #~ msgid "Joystick control interface"
 #~ msgstr "Joystick kontrol"
+
+#~ msgid "Show tooltips"
+#~ msgstr "Vis værktøjstips"
 
 #~ msgid "Show tooltips for configuration options."
 #~ msgstr "Vis værktøjstips for opsætningstilvalg."
@@ -20314,6 +20246,9 @@ msgstr "Spektrum"
 
 #~ msgid "_Open File..."
 #~ msgstr "_Åbn fil..."
+
+#~ msgid "Open a file"
+#~ msgstr "Åbn en fil"
 
 #~ msgid "Open _Disc..."
 #~ msgstr "Åbn _disk..."
@@ -20371,6 +20306,9 @@ msgstr "Spektrum"
 
 #~ msgid "_Language"
 #~ msgstr "_Sprog"
+
+#~ msgid "Select audio channel"
+#~ msgstr "Vælg lydkanal"
 
 #~ msgid "_Subtitles"
 #~ msgstr "_Undertekster"
@@ -20517,6 +20455,9 @@ msgstr "Spektrum"
 
 #~ msgid "_Close"
 #~ msgstr "_Luk"
+
+#~ msgid "Close the window"
+#~ msgstr "Luk vinduet"
 
 #~ msgid "E_xit"
 #~ msgstr "_Afslut"
@@ -20725,6 +20666,9 @@ msgstr "Spektrum"
 #~ msgid "Ready."
 #~ msgstr "Klar."
 
+#~ msgid "Opening file..."
+#~ msgstr "Åbner fil..."
+
 #~ msgid "Exiting..."
 #~ msgstr "Afslutter..."
 
@@ -20751,6 +20695,9 @@ msgstr "Spektrum"
 
 #~ msgid "Port "
 #~ msgstr "Port "
+
+#~ msgid "Video Filters"
+#~ msgstr "Video filtre"
 
 #~ msgid "Use diseqc with antenna"
 #~ msgstr "Brug diseqc med antenne"
@@ -20871,9 +20818,6 @@ msgstr "Spektrum"
 #~ msgid "Mac OS X OpenGL"
 #~ msgstr "Mac OS X OpenGL"
 
-#~ msgid "Control"
-#~ msgstr "Control"
-
 #~ msgid "Ncurses"
 #~ msgstr "Ncurses"
 
@@ -20909,6 +20853,9 @@ msgstr "Spektrum"
 
 #~ msgid "Picture"
 #~ msgstr "Billede"
+
+#~ msgid "VLC internal picture video output"
+#~ msgstr "VLC internbillede video uddata"
 
 #~ msgid "XVideo"
 #~ msgstr "XVideo"
@@ -20981,5 +20928,139 @@ msgstr "Spektrum"
 #~ msgid "Select file or directory"
 #~ msgstr "Vælg fil eller mappe"
 
+#~ msgid "Repeat"
+#~ msgstr "Gentag"
+
 #~ msgid "Win32 OpenGL provider"
 #~ msgstr "Win32 OpenGL provider"
+
+#~ msgid "Stop Stream"
+#~ msgstr "Stop stream"
+
+#~ msgid "_About..."
+#~ msgstr "_Om..."
+
+#~ msgid "Play stream"
+#~ msgstr "Afspil stream"
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "Logo filnavn"
+
+#~ msgid "Random effect"
+#~ msgstr "Tilfældig effekt"
+
+#, fuzzy
+#~ msgid "Password: "
+#~ msgstr "Adgangskode"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Disk type"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "Gennemse..."
+
+#, fuzzy
+#~ msgid "Big"
+#~ msgstr "Bro"
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "Mosaic indstilling"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Lydfiltre"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "Meditativ"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "Næste"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "Bredde"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Spektrum"
+
+#, fuzzy
+#~ msgid "margin"
+#~ msgstr "Amharisk"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Caching"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Lineær"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "Olivengrøn"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Flere oplysninger"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "Gruppe"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "aktiver"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "aktiver"
+
+#, fuzzy
+#~ msgid "horizontalLayout_3"
+#~ msgstr "Vend horisontalt"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "Disk"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Meta-oplysninger"
+
+#, fuzzy
+#~ msgid "Justification"
+#~ msgstr "Forstærkning"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "Lyd enhedsnavn"
+
+#, fuzzy
+#~ msgid "Audioscrobbler password"
+#~ msgstr "FTP kodeord"
+
+#, fuzzy
+#~ msgid "Connecting..."
+#~ msgstr "Indstillinger..."
+
+#, fuzzy
+#~ msgid "Filters (v2)"
+#~ msgstr "Filtre"
+
+#, fuzzy
+#~ msgid "Dummy video filter"
+#~ msgstr "Logo video filter"
+
+#, fuzzy
+#~ msgid "Dummy VF"
+#~ msgstr "Attrap"
+
+#~ msgid "Control"
+#~ msgstr "Control"

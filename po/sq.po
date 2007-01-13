@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the vlc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2005.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2005-12-12 16:05+0000\n"
 "Last-Translator: Kola <eltonkola@gmail.com>\n"
 "Language-Team: Albanian <sq@li.org>\n"
@@ -1106,7 +1105,7 @@ msgstr ""
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr ""
+msgstr "sq"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4370,7 +4369,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr ""
 
@@ -17772,10 +17771,6 @@ msgstr "Fitltri i treguesit"
 msgid "Spectrum analyser"
 msgstr "Analizatori i spektrit"
 
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Preferenca te pergjithsme mbi pamjen"
-
 #~ msgid "Control interface settings"
 #~ msgstr "Prefrencat e kontrollit te pamjes"
 
@@ -17785,3 +17780,7 @@ msgstr "Analizatori i spektrit"
 #~ msgstr ""
 #~ "Perdorni opcionet e modulit \"freetype\" qe te zgjidhni fontin qe doni te "
 #~ "perdorni ne titra me videolanin"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Preferenca te pergjithsme mbi pamjen"

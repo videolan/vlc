@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2006-08-26 15:56+0000\n"
 "Last-Translator: jogijs <e.blumbergs@gmail.com>\n"
 "Language-Team: Latvian <lv@li.org>\n"
@@ -1154,7 +1154,7 @@ msgstr ""
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "lv"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4431,7 +4431,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr ""
 
@@ -17853,30 +17853,6 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Tips"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Novērtējums"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Pieteikties"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "Iespējot audio"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Bitreits"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Meta-informācija"
-
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB Izpildītājs"
 
@@ -17900,3 +17876,30 @@ msgstr ""
 
 #~ msgid "CD-Text Arranger"
 #~ msgstr "CD-Text Kārtotājs"
+
+#~ msgid "Login"
+#~ msgstr "Pieteikties"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Tips"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Novērtējums"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Pieteikties"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "Iespējot audio"
+
+#, fuzzy
+#~ msgid "Create"
+#~ msgstr "Bitreits"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Meta-informācija"

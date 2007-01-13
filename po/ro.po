@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.8.3-svn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2005-07-12 09:55+0200\n"
 "Last-Translator: Circo Radu Sorin <Circo.RaduSorin@gmail.com>\n"
 "Language-Team: \n"
@@ -1204,7 +1204,7 @@ msgstr ""
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "ro"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -1584,13 +1584,12 @@ msgid "Audio output saved volume"
 msgstr "Volum salvat iesire audio"
 
 #: src/libvlc-module.c:166
-#, fuzzy
 msgid ""
 "This saves the audio output volume when you use the mute function. You "
 "should not change this option manually."
 msgstr ""
-"Aceasta salveaza valoarea volumului iesirii audio cand selectati optiunea "
-"mut."
+"Salveaza valoarea volumului iesirii audio cand selectati optiunea mut. Nu "
+"este recomandat sa modificati aceasta optiune manual."
 
 #: src/libvlc-module.c:169
 #, fuzzy
@@ -1663,9 +1662,8 @@ msgstr ""
 "hardware o suporta la fel de bine ca fluxul audio ce ruleaza)."
 
 #: src/libvlc-module.c:198
-#, fuzzy
 msgid "Use S/PDIF when available"
-msgstr "Foloseste iesirea audio S/PDIF cand posibil"
+msgstr "Foloseste iesirea audio S/PDIF cand este posibil"
 
 #: src/libvlc-module.c:200
 #, fuzzy
@@ -4935,7 +4933,7 @@ msgstr "Zhuang"
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Necunoscuta"
 
@@ -10804,8 +10802,9 @@ msgid "Shoutcast"
 msgstr ""
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Deplasare timp"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -11837,10 +11836,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
 msgstr ""
-"Selecteaza hotkey folosit pentru a schimba starea afisari pe intregul ecran"
 
 #: modules/gui/macosx/macosx.m:81
 #, fuzzy
@@ -16975,7 +16972,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:154
 #, fuzzy
 msgid "This is the subtitles codec that will be used."
-msgstr "Acesta este dispozitivul DVD implicit, pentru uz."
+msgstr "Acesta este dispozitivul CD audio implicit, pentru uz."
 
 #: modules/stream_out/transcode.c:158
 msgid ""
@@ -19047,247 +19044,8 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
-#, fuzzy
-#~ msgid "Audio filter for fixed32<->float32 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for fixed32->s16 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s16 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s8 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u16 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u8 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->fixed32 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 with endianness conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for s8->float32 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->fixed32 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->float32 conversion"
-#~ msgstr "fitru audio pentru conversie de format PCM"
-
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Type"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "Burmese"
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "Aliniament video."
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Filtre audio"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "Urmatorul"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "Latime"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Spectru"
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr "Amharic"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Nota"
-
-#, fuzzy
-#~ msgid "QPushButton"
-#~ msgstr "Pushto"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Liniar"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "Liniar"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Meta-informatie"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "Activeaza"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Disc"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Centru"
-
-#, fuzzy
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "Va permite sa specificati un  metadata \"data\" pentru o intrare"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Meta-informatie"
-
-#, fuzzy
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr ""
-#~ "Va permite sa specificati un  metadata \"descriere\" pentru o intrare"
-
-#, fuzzy
-#~ msgid "MSN"
-#~ msgstr "MMS"
-
-#, fuzzy
-#~ msgid "Vertical border width"
-#~ msgstr "Latime video"
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "Numele echipamentului audio"
-
-#, fuzzy
-#~ msgid "Audioscrobbler password"
-#~ msgstr "Parola FTP"
-
-#, fuzzy
-#~ msgid ""
-#~ "You can enforce the text position on the video (0=center, 1=left, "
-#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
-#~ "e.g. 6 = top-right)."
-#~ msgstr ""
-#~ "Puteti aplica aici aliniamentul video in propria fereastra. Implicit (0) "
-#~ "va fi centrat( 0=centru, 1=stanga, 2=dreapta, 4=varf, 8=jos, putand "
-#~ "folosi combinatii ale acestori valori)."
-
-#, fuzzy
-#~ msgid "Filters (v2)"
-#~ msgstr "Filtre"
-
 #~ msgid "Video filters settings"
 #~ msgstr "Setari filtre video"
-
-#, fuzzy
-#~ msgid "Yes"
-#~ msgstr "Persana"
-
-#, fuzzy
-#~ msgid "No"
-#~ msgstr "Norma"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "Georgiana"
-
-#, fuzzy
-#~ msgid "Podcast Link"
-#~ msgstr "Pozitie"
-
-#, fuzzy
-#~ msgid "Podcast Copyright"
-#~ msgstr "Copyright"
-
-#, fuzzy
-#~ msgid "Podcast Category"
-#~ msgstr "CDDB Categorie"
-
-#, fuzzy
-#~ msgid "Podcast Subtitle"
-#~ msgstr "Subtitrare"
-
-#, fuzzy
-#~ msgid "Podcast Author"
-#~ msgstr "Autor"
-
-#, fuzzy
-#~ msgid "Podcast Subcategory"
-#~ msgstr "Pe categorie"
-
-#, fuzzy
-#~ msgid "Podcast Duration"
-#~ msgstr "Durata"
-
-#, fuzzy
-#~ msgid "Dummy VF"
-#~ msgstr "Fals"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "tip"
-
-#, fuzzy
-#~ msgid "Center-Center"
-#~ msgstr "Centru"
-
-#, fuzzy
-#~ msgid "Left-Center"
-#~ msgstr "Centru"
-
-#, fuzzy
-#~ msgid "Right-Center"
-#~ msgstr "Centru"
-
-#, fuzzy
-#~ msgid "Center-Top"
-#~ msgstr "Centru"
-
-#, fuzzy
-#~ msgid "Left-Top"
-#~ msgstr "Stanga"
-
-#, fuzzy
-#~ msgid "Right-Top"
-#~ msgstr "Dreapta"
-
-#, fuzzy
-#~ msgid "Center-Bottom"
-#~ msgstr "Centru"
-
-#, fuzzy
-#~ msgid "Left-Bottom"
-#~ msgstr "Jos"
-
-#, fuzzy
-#~ msgid "Right-Bottom"
-#~ msgstr "Jos"
 
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB Artist"
@@ -19349,6 +19107,9 @@ msgstr ""
 #~ msgid "ISO-9660 Volume Set"
 #~ msgstr "ISO-9660 Set Volum"
 
+#~ msgid "Login"
+#~ msgstr "Autentificare"
+
 #~ msgid "By category"
 #~ msgstr "Pe categorie"
 
@@ -19359,8 +19120,176 @@ msgstr ""
 #~ msgstr "Toate elementele, nesortate"
 
 #, fuzzy
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr "Filtrele video sunt folosite pentru postprocesarea fluxului video"
+
+#, fuzzy
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "Va permite sa specificati un  metadata \"data\" pentru o intrare"
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32<->float32 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for fixed32->s16 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s16 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->s8 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u16 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for float32->u8 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->fixed32 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for s16->float32 with endianness conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for s8->float32 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->fixed32 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#, fuzzy
+#~ msgid "Audio filter for u8->float32 conversion"
+#~ msgstr "fitru audio pentru conversie de format PCM"
+
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Iesire audio Linux OSS"
+
+#, fuzzy
+#~ msgid "Podcast Link"
+#~ msgstr "Pozitie"
+
+#, fuzzy
+#~ msgid "Podcast Copyright"
+#~ msgstr "Copyright"
+
+#, fuzzy
+#~ msgid "Podcast Category"
+#~ msgstr "CDDB Categorie"
+
+#, fuzzy
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Subtitrare"
+
+#, fuzzy
+#~ msgid "Podcast Author"
+#~ msgstr "Autor"
+
+#, fuzzy
+#~ msgid "Podcast Subcategory"
+#~ msgstr "Pe categorie"
+
+#, fuzzy
+#~ msgid "Podcast Duration"
+#~ msgstr "Durata"
+
+#, fuzzy
+#~ msgid "Mime type"
+#~ msgstr "tip"
+
+#, fuzzy
+#~ msgid "Yes"
+#~ msgstr "Persana"
+
+#, fuzzy
+#~ msgid "No"
+#~ msgstr "Norma"
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "Lista de redare"
+
+#, fuzzy
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr ""
+#~ "Va permite sa specificati un  metadata \"descriere\" pentru o intrare"
+
+#, fuzzy
+#~ msgid ""
+#~ "You can enforce the text position on the video (0=center, 1=left, "
+#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+#~ "e.g. 6 = top-right)."
+#~ msgstr ""
+#~ "Puteti aplica aici aliniamentul video in propria fereastra. Implicit (0) "
+#~ "va fi centrat( 0=centru, 1=stanga, 2=dreapta, 4=varf, 8=jos, putand "
+#~ "folosi combinatii ale acestori valori)."
+
+#, fuzzy
+#~ msgid "MSN"
+#~ msgstr "MMS"
+
+#, fuzzy
+#~ msgid "Vertical border width"
+#~ msgstr "Latime video"
+
+#, fuzzy
+#~ msgid "Create"
+#~ msgstr "Centru"
+
+#, fuzzy
 #~ msgid "Number of streams"
 #~ msgstr "Minimizeaza numarul de fire de executie"
+
+#, fuzzy
+#~ msgid "Center-Center"
+#~ msgstr "Centru"
+
+#, fuzzy
+#~ msgid "Left-Center"
+#~ msgstr "Centru"
+
+#, fuzzy
+#~ msgid "Right-Center"
+#~ msgstr "Centru"
+
+#, fuzzy
+#~ msgid "Center-Top"
+#~ msgstr "Centru"
+
+#, fuzzy
+#~ msgid "Left-Top"
+#~ msgstr "Stanga"
+
+#, fuzzy
+#~ msgid "Right-Top"
+#~ msgstr "Dreapta"
+
+#, fuzzy
+#~ msgid "Center-Bottom"
+#~ msgstr "Centru"
+
+#, fuzzy
+#~ msgid "Left-Bottom"
+#~ msgstr "Jos"
+
+#, fuzzy
+#~ msgid "Right-Bottom"
+#~ msgstr "Jos"
 
 #, fuzzy
 #~ msgid ""
@@ -19474,6 +19403,9 @@ msgstr ""
 #~ msgstr ""
 #~ "Daca aceastea optiune e activata, fluxul audio va fi capturat stereo"
 
+#~ msgid "DTS"
+#~ msgstr "DTS"
+
 #~ msgid "Filter twice the audio"
 #~ msgstr "Filtreaza audio de doua ori"
 
@@ -19508,6 +19440,10 @@ msgstr ""
 #~ msgstr "Servicii de descoperire"
 
 #, fuzzy
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "Echipament de iesire"
+
+#, fuzzy
 #~ msgid "Allows you to specify a maximum output video width."
 #~ msgstr "Va permite sa specificati un  metadata \"URL\" pentru o intrare"
 
@@ -19540,6 +19476,9 @@ msgstr ""
 
 #~ msgid "Enable loop filter"
 #~ msgstr "Activeaza filtru bucla"
+
+#~ msgid "Analyse mode"
+#~ msgstr "Mod analiza"
 
 #~ msgid "This selects the analysing mode."
 #~ msgstr "Aceasta selecteaza modul analiza."
@@ -19732,3 +19671,94 @@ msgstr ""
 #~ msgstr ""
 #~ "Pachetele intarziate sunt aruncate. Aceasta va permite sa specificati "
 #~ "durata (in milisecunde) permisa unui pachet pentru intarziere."
+
+#~ msgid " "
+#~ msgstr " "
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "Activeaza filtru bucla"
+
+#, fuzzy
+#~ msgid "Deblocking loop filter (increases quality)."
+#~ msgstr "Foloseste filtru  de deblocare in bucla (creste calitatea)."
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Type"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "Burmese"
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "Aliniament video."
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Filtre audio"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "Urmatorul"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "Latime"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Spectru"
+
+#, fuzzy
+#~ msgid "margin"
+#~ msgstr "Amharic"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Nota"
+
+#, fuzzy
+#~ msgid "QPushButton"
+#~ msgstr "Pushto"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Liniar"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "Liniar"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Meta-informatie"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "Activeaza"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "Disc"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Meta-informatie"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "Numele echipamentului audio"
+
+#, fuzzy
+#~ msgid "Audioscrobbler password"
+#~ msgstr "Parola FTP"
+
+#, fuzzy
+#~ msgid "Filters (v2)"
+#~ msgstr "Filtre"
+
+#, fuzzy
+#~ msgid "Dummy VF"
+#~ msgstr "Fals"

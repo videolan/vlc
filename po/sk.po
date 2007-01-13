@@ -1,13 +1,13 @@
 # Copyright (C) 2006 the VideoLAN team
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the VLC package.
 # FIRST AUTHOR <PODNETY@MOJEPREKLADY.NET>, 2006.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Slovak translation for VLC Media Player\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
-"PO-Revision-Date: 2006-10-07 20:13+0100\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
+"PO-Revision-Date: 2006-11-26 14:32+0100\n"
 "Last-Translator: Marián Hikaník <podnety@mojepreklady.net>\n"
 "Language-Team: Marián Hikaník, translation controlled by: Pavel Kříž\n"
 "MIME-Version: 1.0\n"
@@ -876,7 +876,7 @@ msgstr "Stereo"
 #: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:181
 #: modules/video_filter/osdmenu.c:76 modules/video_filter/rss.c:160
 msgid "Left"
-msgstr "Doľava"
+msgstr "Vľavo"
 
 #: src/audio_output/output.c:108 src/audio_output/output.c:144
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
@@ -885,7 +885,7 @@ msgstr "Doľava"
 #: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:181
 #: modules/video_filter/osdmenu.c:76 modules/video_filter/rss.c:160
 msgid "Right"
-msgstr "Doprava"
+msgstr "Vpravo"
 
 #: src/audio_output/output.c:134
 msgid "Dolby Surround"
@@ -1171,29 +1171,25 @@ msgid "Add Interface"
 msgstr "Pridať rozhranie"
 
 #: src/interface/interface.c:373
-#, fuzzy
 msgid "Telnet Interface"
-msgstr "Rozhranie"
+msgstr "Rozhranie Telnet"
 
 #: src/interface/interface.c:376
-#, fuzzy
 msgid "Web Interface"
-msgstr "Rozhranie"
+msgstr "Webové rozhranie"
 
 #: src/interface/interface.c:379
-#, fuzzy
 msgid "Debug logging"
-msgstr "Zaznamenávanie do súboru"
+msgstr "Rozhranie pre záznam informácií pre ladenie"
 
 #: src/interface/interface.c:382
-#, fuzzy
 msgid "Mouse Gestures"
-msgstr "Gestá"
+msgstr "Rozhranie pre gestá pomocou myši"
 
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "sk"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -1810,42 +1806,42 @@ msgstr "Vycentrovať"
 #: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:160
 msgid "Top"
-msgstr "Nahor"
+msgstr "Hore"
 
 #: src/libvlc-module.c:277 modules/codec/dvbsub.c:70
 #: modules/video_filter/logo.c:97 modules/video_filter/marq.c:126
 #: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:160
 msgid "Bottom"
-msgstr "Nadol"
+msgstr "Dole"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
 #: modules/video_filter/mosaic.c:182 modules/video_filter/osdmenu.c:77
 #: modules/video_filter/rss.c:161
 msgid "Top-Left"
-msgstr "Doľava-nahor"
+msgstr "Vľavo hore"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
 #: modules/video_filter/mosaic.c:182 modules/video_filter/osdmenu.c:77
 #: modules/video_filter/rss.c:161
 msgid "Top-Right"
-msgstr "Doprava-nahor"
+msgstr "Vpravo hore"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
 #: modules/video_filter/mosaic.c:182 modules/video_filter/osdmenu.c:77
 #: modules/video_filter/rss.c:161
 msgid "Bottom-Left"
-msgstr "Doľava-nadol"
+msgstr "Vľavo dole"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
 #: modules/video_filter/mosaic.c:182 modules/video_filter/osdmenu.c:77
 #: modules/video_filter/rss.c:161
 msgid "Bottom-Right"
-msgstr "Doprava-nadol"
+msgstr "Vpravo dole"
 
 #: src/libvlc-module.c:280
 msgid "Zoom video"
@@ -3058,9 +3054,9 @@ msgid ""
 "You can use it to tune VLC priority against other programs, or against other "
 "VLC instances."
 msgstr ""
-"Táto voľba pridá offset (či už pozitívny alebo negatívny) k predvoleným "
-"prioritám programu VLC. Voľba sa používa vtedy, ak chcete upraviť prioritu "
-"programu voči iným spusteným programom"
+"Táto voľba pridá offset (či už kladný alebo záporný) k predvoleným prioritám "
+"programu VLC. Voľba sa používa vtedy, ak chcete upraviť prioritu programu "
+"voči iným spusteným programom"
 
 #: src/libvlc-module.c:851
 msgid "Minimize number of threads"
@@ -4015,14 +4011,12 @@ msgstr "Spustiť/zastaviť nahrávanie pomocou prístupového filtra."
 
 #: src/libvlc-module.c:1173 modules/access_filter/dump.c:51
 #: modules/access_filter/dump.c:52
-#, fuzzy
 msgid "Dump"
-msgstr "Fingovaný"
+msgstr "Analyzovať"
 
 #: src/libvlc-module.c:1174
-#, fuzzy
 msgid "Media dump access filter trigger."
-msgstr "Spustiť/zastaviť nahrávanie pomocou prístupového filtra."
+msgstr "Spúšťač prístupového filtra pre analyzáciu médií"
 
 #: src/libvlc-module.c:1176 src/libvlc-module.c:1177
 #: src/video_output/vout_intf.c:216
@@ -4879,7 +4873,7 @@ msgstr "Zhuang"
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Neznámy"
 
@@ -7937,7 +7931,7 @@ msgstr "Zvukový výstup Simple Direct Media Layer"
 
 #: modules/audio_output/waveout.c:143
 msgid "Win32 waveOut extension output"
-msgstr "Prípona výstupu Win32 waveOut"
+msgstr "Rozšírený výstup Win32 waveOut"
 
 #: modules/audio_output/waveout.c:385
 msgid "5.1"
@@ -8071,9 +8065,8 @@ msgid "AAC audio decoder (using libfaad2)"
 msgstr "AAC audio-dekodér (s použitím libfaad2)"
 
 #: modules/codec/faad.c:331
-#, fuzzy
 msgid "AAC extension"
-msgstr "Ignorované prípony"
+msgstr "Prípona AAC"
 
 #: modules/codec/fake.c:45 modules/video_output/image.c:80
 msgid "Image file"
@@ -8081,7 +8074,7 @@ msgstr "Súbor s obrázkom"
 
 #: modules/codec/fake.c:47
 msgid "Path of the image file for fake input."
-msgstr "Cesta k obrázkovému súboru, ktorý bude falošným vstupom."
+msgstr "Cesta k obrázkovému súboru, ktorý bude fingovaným vstupom."
 
 #: modules/codec/fake.c:50 modules/stream_out/mosaic_bridge.c:110
 #: modules/stream_out/transcode.c:75
@@ -8924,9 +8917,8 @@ msgstr ""
 "Pred otvorením súboru skúste manuálne nastaviť vhodnú znakovú sadu."
 
 #: modules/codec/svcdsub.c:42
-#, fuzzy
 msgid "Enable debug"
-msgstr "Zapnúť video"
+msgstr "Zapnúť analyzovanie"
 
 #: modules/codec/svcdsub.c:45
 msgid ""
@@ -8934,9 +8926,9 @@ msgid ""
 "calls                 1\n"
 "packet assembly info  2\n"
 msgstr ""
-"Táto hodnota (ak sa zobrazí binárne) môže byť aj maskou pre ladenie chýb\n"
-"volanie                 1\n"
-"kompletné informácie o pakete  2\n"
+"Táto hodnota (ak sa zobrazí binárne) môže byť aj maskou pre ladenie chýb:\n"
+"pre zobrazenie volaní zadajte hodnotu 1\n"
+"pre zobrazenie kompletných informácií o pakete zadajte hodnotu 2\n"
 
 #: modules/codec/svcdsub.c:50
 msgid "Philips OGT (SVCD subtitle) decoder"
@@ -9145,9 +9137,8 @@ msgstr ""
 "tie snímky, ktoré sa vyskytujú priamo pred I-snímkami."
 
 #: modules/codec/x264.c:78
-#, fuzzy
 msgid "Influence (bias) B-frames usage"
-msgstr "Použitie B-snímok"
+msgstr "Vplyv použitia B-snímok"
 
 #: modules/codec/x264.c:79
 msgid ""
@@ -9155,8 +9146,8 @@ msgid ""
 "negative values cause less B-frames."
 msgstr ""
 "Touto voľbou môžete ovplyvniť frekvenciu použitia B-snímok. Ak zadáte kladnú "
-"hodnotu, použije sa viac B-snímok, ak zadáte nejakú negatívnu hodnotu, počet "
-"B-snímok sa zníži."
+"hodnotu, použije sa viac B-snímok, ak zadáte nejakú zápornú hodnotu, počet B-"
+"snímok sa zníži."
 
 #: modules/codec/x264.c:82
 msgid "Keep some B-frames as references"
@@ -9220,9 +9211,8 @@ msgstr ""
 "-6 až 6. Hodnota -6 = jemné filtrovanie, 6 = dôkladné filtrovanie."
 
 #: modules/codec/x264.c:106
-#, fuzzy
 msgid "H.264 level"
-msgstr "Max. úroveň"
+msgstr "Úroveň H.264"
 
 #: modules/codec/x264.c:107
 msgid ""
@@ -9230,20 +9220,22 @@ msgid ""
 "enforced; it's up to the user to select a level compatible with the rest of "
 "the encoding options. Range 1 to 5.1 (10 to 51 is also allowed)."
 msgstr ""
+"Tu môžete špecifikovať úroveň kodeku H.264. Úroveň, ktorú zadáte, si nebude "
+"program vynucovať; je len na užívateľovi, aby vybral úroveň kompatibilnú s "
+"ostatnými nastaveniami kódovania. Hodnoty, ktoré zadáte, musia byť v rozsahu "
+"od 1 do 5.1 (hodnoty od 10 do 51 sú tiež povolené)."
 
 #: modules/codec/x264.c:116
-#, fuzzy
 msgid "Interlaced mode"
-msgstr "Modul rozhrania"
+msgstr "Rozkladový mód"
 
 #: modules/codec/x264.c:117
-#, fuzzy
 msgid "Pure-interlaced mode."
-msgstr "Mód rozkladania"
+msgstr "Čistý rozkladový mód"
 
 #: modules/codec/x264.c:122
 msgid "Set QP"
-msgstr "Nastaviť QP"
+msgstr "Nastaviť kvantizačný parameter"
 
 #: modules/codec/x264.c:123
 msgid ""
@@ -9286,7 +9278,7 @@ msgstr "Max. krok pre nastavenie parametrov kvantizéra"
 
 #: modules/codec/x264.c:138
 msgid "Max QP step between frames."
-msgstr "Maximálny krok QP medzi jednotlivými snímkami."
+msgstr "Maximálny krok medzi jednotlivými snímkami."
 
 #: modules/codec/x264.c:140
 msgid "Average bitrate tolerance"
@@ -9328,55 +9320,61 @@ msgstr ""
 
 #: modules/codec/x264.c:156
 msgid "QP factor between I and P"
-msgstr "QP faktor medzi snímkami I a P"
+msgstr "Kvantizačný faktor medzi snímkami I a P"
 
 #: modules/codec/x264.c:157
 msgid "QP factor between I and P. Range 1.0 to 2.0."
 msgstr ""
-"QP faktor medzi snímkami I a P. Môžete zadávať hodnoty v rozsahu 1.0 - 2.0."
+"Kvantizačný faktor medzi snímkami I a P. Môžete zadávať hodnoty v rozsahu "
+"1.0 - 2.0."
 
 #: modules/codec/x264.c:160
 msgid "QP factor between P and B"
-msgstr "QP faktor medzi snímkami P a B"
+msgstr "Kvantizačný faktor medzi snímkami P a B"
 
 #: modules/codec/x264.c:161
 msgid "QP factor between P and B. Range 1.0 to 2.0."
 msgstr ""
-"QP faktor medzi snímkami P a B. Môžete zadávať hodnoty v rozsahu 1.0 - 2.0."
+"Kvantizačný faktor medzi snímkami P a B. Môžete zadávať hodnoty v rozsahu "
+"1.0 - 2.0."
 
 #: modules/codec/x264.c:163
 msgid "QP difference between chroma and luma"
-msgstr "Rozdiel QP medzi režimami chroma a luma"
+msgstr "Rozdiel kvantizačných parametrov medzi režimami chroma a luma"
 
 #: modules/codec/x264.c:164
 msgid "QP difference between chroma and luma."
-msgstr "Rozdiel QP medzi režimami chroma a luma."
+msgstr "Rozdiel kvantizačných parametrov medzi režimami chroma a luma."
 
 #: modules/codec/x264.c:166
 msgid "QP curve compression"
-msgstr "Kompresia krivky QP"
+msgstr "Kompresia krivky kvantizačného parametra"
 
 #: modules/codec/x264.c:167
 msgid "QP curve compression. Range 0.0 (CBR) to 1.0 (QCP)."
 msgstr ""
-"Kompresia krivky QP. Môžete zadávať hodnoty v rozsahu 0.0 (CBR) -  1.0 (QCP)."
+"Kompresia krivky kvantizačného parametra. Môžete zadávať hodnoty v rozsahu "
+"0.0 (CBR) -  1.0 (QCP)."
 
 #: modules/codec/x264.c:169 modules/codec/x264.c:173
 msgid "Reduce fluctuations in QP"
-msgstr "Redukovať výkyvy v QP"
+msgstr "Redukovať výkyvy v kvantizačných parametroch"
 
 #: modules/codec/x264.c:170
 msgid ""
 "This reduces the fluctuations in QP before curve compression. Temporally "
 "blurs complexity."
 msgstr ""
-"Týmto môžete zredukovať výkyvy v QP ešte predtým, že sa skomprimuje krivka. "
+"Týmto môžete zredukovať výkyvy v kvantizačných parametroch ešte predtým, že "
+"sa skomprimuje krivka. "
 
 #: modules/codec/x264.c:174
 msgid ""
 "This reduces the fluctations in QP after curve compression. Temporally blurs "
 "quants."
-msgstr "Týmto môžete zredukovať výkyvy v QP po kompresií krivky."
+msgstr ""
+"Týmto môžete zredukovať výkyvy v kvantizačných parametroch po kompresií "
+"krivky."
 
 #: modules/codec/x264.c:179
 msgid "Partitions to consider"
@@ -9392,26 +9390,26 @@ msgid ""
 " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
 "(p4x4 requires p8x8. i8x8 requires 8x8dct)."
 msgstr ""
-"Partície, zahrnuté do analyzačného módu: \n"
-"- žiadne : \n"
-"- rýchlo : i4x4\n"
-"- normálne: i4x4,p8x8,(i8x8)\n"
-"- pomaly:  i4x4,p8x8,(i8x8),b8x8\n"
-"- všetky : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
+"Partície, zahrnuté do analyzačného módu. Príkaz zadávajte v angličtine, v "
+"zátvorke je len preklad príkazu!\n"
+" - none  : (žiadne)\n"
+" - fast  : i4x4 (rýchle)\n"
+" - normal: i4x4,p8x8,(i8x8)   (normálne)\n"
+" - slow  : i4x4,p8x8,(i8x8),b8x8   (pomalé)\n"
+" - all   : i4x4,p8x8,(i8x8),b8x8,p4x4   (všetky)\n"
 "(p4x4 vyžaduje p8x8. i8x8 vyžaduje 8x8dct)."
 
 #: modules/codec/x264.c:188
 msgid "Direct MV prediction mode"
-msgstr "Predpovedný mód Direct MV"
+msgstr "Mód predpovedania Direct MV"
 
 #: modules/codec/x264.c:189
 msgid "Direct MV prediction mode."
-msgstr "Predpovedný mód Direct MV."
+msgstr "Mód predpovedania Direct MV."
 
 #: modules/codec/x264.c:192
-#, fuzzy
 msgid "Direct prediction size"
-msgstr "Predpovedný mód Direct MV"
+msgstr "Veľkosť priamej predpovede"
 
 #: modules/codec/x264.c:193
 msgid ""
@@ -9419,14 +9417,17 @@ msgid ""
 " -  1: 8x8\n"
 " - -1: smallest possible according to level\n"
 msgstr ""
+"Veľkosť priamej predpovede: - 0: 4x4\n"
+" -  1: 8x8\n"
+" - -1: najmenšia možná hodnota zodpovedajúca nastavenej úrovni\n"
 
 #: modules/codec/x264.c:199
 msgid "Weighted prediction for B-frames"
-msgstr "Posudzovanie a predpoveď výskytu B-snímok"
+msgstr "Vážená predpoveď výskytu B-snímok"
 
 #: modules/codec/x264.c:200
 msgid "Weighted prediction for B-frames."
-msgstr "Posudzovanie a predpoveď výskytu B-snímok."
+msgstr "Vážená predpoveď výskytu B-snímok."
 
 #: modules/codec/x264.c:202
 msgid "Integer pixel motion estimation method"
@@ -9509,7 +9510,7 @@ msgstr ""
 
 #: modules/codec/x264.c:238
 msgid "Decide references on a per partition basis"
-msgstr "O ref. snímkach rozhodovať na základe partície"
+msgstr "O referenčných snímkach rozhodovať na základe partície"
 
 #: modules/codec/x264.c:239
 msgid ""
@@ -9520,9 +9521,8 @@ msgstr ""
 "16x8. "
 
 #: modules/codec/x264.c:243
-#, fuzzy
 msgid "Chroma in motion estimation"
-msgstr "Ignorovať efekt chroma pri odhadovaní pohybu"
+msgstr "Aplikovať efekt chroma aj pri odhadovaní pohybu"
 
 #: modules/codec/x264.c:244
 msgid "Chroma ME for subpel and mode decision in P-frames."
@@ -9592,22 +9592,24 @@ msgstr ""
 "Redukcia šumu na Dct-doméne. Sem môžete zadávať hodnoty v rozsahu 10 - 1000."
 
 #: modules/codec/x264.c:274
-#, fuzzy
 msgid "Inter luma quantization deadzone"
-msgstr "Kvantizačný faktor pre I-snímky"
+msgstr "Neaktívna zóna pri kvantizácií typu Inter luma"
 
 #: modules/codec/x264.c:275
 msgid "Set the size of the inter luma quantization deadzone. Range 0 to 32."
 msgstr ""
+"Tu môžete nastaviť veľkosť neaktívnej zóny, ktorá sa bude používať pri "
+"kvantizácií typu Inter luma. Zadajte hodnotu v rozsahu od 0 do 32."
 
 #: modules/codec/x264.c:278
-#, fuzzy
 msgid "Intra luma quantization deadzone"
-msgstr "Kvantizačný faktor pre I-snímky"
+msgstr "Neaktívna zóna pri kvantizácií typu Inter luma"
 
 #: modules/codec/x264.c:279
 msgid "Set the size of the intra luma quantization deadzone. Range 0 to 32."
 msgstr ""
+"Tu môžete nastaviť veľkosť neaktívnej zóny, ktorá sa bude používať pri "
+"kvantizácií typu Inter luma. Zadajte hodnotu v rozsahu od 0 do 32."
 
 #: modules/codec/x264.c:285
 msgid "CPU optimizations"
@@ -9631,7 +9633,7 @@ msgstr ""
 
 #: modules/codec/x264.c:292
 msgid "SSIM computation"
-msgstr "Vykalkulovanie SMB"
+msgstr "Vykalkulovať SMB"
 
 #: modules/codec/x264.c:293
 msgid ""
@@ -9660,22 +9662,23 @@ msgstr "Zobrazovať štatistiky pre každú snímku."
 
 #: modules/codec/x264.c:303
 msgid "SPS and PPS id numbers"
-msgstr ""
+msgstr "Identifikačné čísla SPS a PPS"
 
 #: modules/codec/x264.c:304
 msgid ""
 "Set SPS and PPS id numbers to allow concatenating streams with different "
 "settings."
 msgstr ""
+"Nastaviť identifikačné čísla SPS a PPS - tieto čísla umožňujú zreťazenie "
+"streamov s rozdielnymi nastaveniami."
 
 #: modules/codec/x264.c:308
-#, fuzzy
 msgid "Access unit delimiters"
-msgstr "Prístupové filtre"
+msgstr "Oddeľovače prístupových bodov"
 
 #: modules/codec/x264.c:309
 msgid "Generate access unit delimiter NAL units."
-msgstr ""
+msgstr "Generovať oddeľovače prístupových bodov pre NAL jednotky."
 
 #: modules/codec/x264.c:315
 msgid "dia"
@@ -11019,9 +11022,10 @@ msgstr "Demuxér Real"
 #: modules/demux/subtitle.c:50
 msgid "Apply a delay to all subtitles (in 1/10s, eg 100 means 10s)."
 msgstr ""
+"Aplikovať oneskorenie na všetky titulky (oneskorenie sa udáva v desatinách "
+"sekundy, hodnota 100 teda napríklad znamená oneskorenie 10s)."
 
 #: modules/demux/subtitle.c:52
-#, fuzzy
 msgid ""
 "Override the normal frames per second settings. This will only work with "
 "MicroDVD and SubRIP (SRT) subtitles."
@@ -11035,6 +11039,10 @@ msgid ""
 "\"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" \"sami\", \"dvdsubtitle\" and "
 "\"auto\" (meaning autodetection, this should always work)."
 msgstr ""
+"Vynútiť si formát titulkov. Platné hodnoty sú: \"microdvd\", \"subrip\",  "
+"\"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" \"sami\", \"dvdsubtitle\" a \"auto"
+"\" (Hodnota auto = automaticky detekovať formát titulkov. Táto voľba by mala "
+"fungovať vždy.)."
 
 #: modules/demux/subtitle.c:67
 msgid "Text subtitles parser"
@@ -11178,9 +11186,8 @@ msgid "visual impaired commentary"
 msgstr "vizuálne poškodený komentár"
 
 #: modules/demux/tta.c:40
-#, fuzzy
 msgid "TTA demuxer"
-msgstr "Demuxér formátu AU"
+msgstr "Demuxér formátu TTA"
 
 #: modules/demux/ty.c:70
 msgid "TY Stream audio/video demux"
@@ -12053,9 +12060,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "Obrazovka pre celoobrazovkový režim."
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 msgid "Remember wizard options"
@@ -14902,14 +14908,15 @@ msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:485
 msgid "Smooth :"
-msgstr ""
+msgstr "Plynulosť:"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:516
-#, fuzzy
 msgid ""
 "Preamp\n"
 "12.0dB"
-msgstr "Predzosilnenie"
+msgstr ""
+"Predzosilnenie\n"
+"12.0dB"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:999
 msgid ""
@@ -15309,7 +15316,7 @@ msgstr "Modul rozhrania wxWidgets"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:165
 msgid "last config"
-msgstr ""
+msgstr "Posledná konfigurácia"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:171
 msgid "wxWidgets dialogs provider"
@@ -17726,7 +17733,7 @@ msgstr "Prah"
 
 #: modules/video_filter/crop.c:70
 msgid "Crop geometry (pixels)"
-msgstr "Veľkosť písma, v pixeloch"
+msgstr "Rozmery zóny (v pixeloch)"
 
 #: modules/video_filter/crop.c:71
 msgid ""
@@ -18143,26 +18150,20 @@ msgid "Y Coordinate of the top-left corner of the mosaic."
 msgstr "Súradnica Y, v ktorej sa začína ľavý horný roh mozaiky"
 
 #: modules/video_filter/mosaic.c:108
-#, fuzzy
 msgid "Border width"
-msgstr "Šírka videa"
+msgstr "Šírka okraja"
 
 #: modules/video_filter/mosaic.c:109
-#, fuzzy
 msgid "Width in pixels of the border between miniatures."
-msgstr ""
-"Šírka (v pixeloch) okraja, ktorý sa vykreslí horizontálne okolo mozaiky."
+msgstr "Šírka okraja (v pixeloch), ktorý sa vykreslí medzi miniatúrami."
 
 #: modules/video_filter/mosaic.c:110
-#, fuzzy
 msgid "Border height"
-msgstr "Výška videa"
+msgstr "Výška okraja"
 
 #: modules/video_filter/mosaic.c:111
-#, fuzzy
 msgid "Height in pixels of the border between miniatures."
-msgstr ""
-"Šírka (v pixeloch) okraja, ktorý sa vykreslí horizontálne okolo mozaiky."
+msgstr "Výška okraja (v pixeloch), ktorý sa vykreslí medzi miniatúrami."
 
 #: modules/video_filter/mosaic.c:113
 msgid "Mosaic alignment"
@@ -18991,7 +18992,7 @@ msgstr "Video-filter pre zobrazovanie na stene"
 
 #: modules/video_filter/wall.c:71
 msgid "Image wall"
-msgstr "Obrázková stena"
+msgstr "Obrazová stena"
 
 #: modules/video_filter/wave.c:50
 msgid "Wave video filter"
@@ -19730,190 +19731,6 @@ msgstr "Filter vizualizátora"
 msgid "Spectrum analyser"
 msgstr "Spektrálny analyzátor"
 
-#~ msgid "Description file"
-#~ msgstr "Súbor s poznámkou"
-
-#~ msgid "A file containing a simple playlist"
-#~ msgstr "Súbor obsahujúci jednoduchý playlist"
-
-#~ msgid "History parameter"
-#~ msgstr "Počet detekčných snímok"
-
-#~ msgid "The umber of frames used for detection."
-#~ msgstr "Počet snímok používaných na účely detekcie."
-
-#~ msgid "Audio filter for fixed32<->float32 conversion"
-#~ msgstr "Zvukový filter pre konverziu fixed <-> float32"
-
-#~ msgid "Audio filter for fixed32->s16 conversion"
-#~ msgstr "Zvukový filter pre konverziu fixed32->s16"
-
-#~ msgid "Audio filter for float32->s16 conversion"
-#~ msgstr "Zvukový filter pre konverziu float32->s16"
-
-#~ msgid "Audio filter for float32->s8 conversion"
-#~ msgstr "Zvukový filter pre konverziu float32->s8 "
-
-#~ msgid "Audio filter for float32->u16 conversion"
-#~ msgstr "Zvukový filter pre konverziu float32->u16"
-
-#~ msgid "Audio filter for float32->u8 conversion"
-#~ msgstr "Zvukový filter pre konverziu float32->u8"
-
-#~ msgid "Audio filter for s16->fixed32 conversion"
-#~ msgstr "Zvukový filter pre konverziu s16->fixed32 "
-
-#~ msgid "Audio filter for s16->float32 conversion"
-#~ msgstr "Zvukový filter pre konverziu s16->float32"
-
-#~ msgid "Audio filter for s16->float32 with endianness conversion"
-#~ msgstr "Zvukový filter pre konverziu s16->float32"
-
-#~ msgid "Audio filter for s8->float32 conversion"
-#~ msgstr "Zvukový filter pre konverziu s8->float32"
-
-#~ msgid "Audio filter for u8->fixed32 conversion"
-#~ msgstr "Zvukový filter pre konverziu u8->fixed32"
-
-#~ msgid "Audio filter for u8->float32 conversion"
-#~ msgstr "Zvukový filter pre konverziu u8->float32"
-
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Typ disku"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "Prehľadávať..."
-
-#, fuzzy
-#~ msgid "Big"
-#~ msgstr "Bridge"
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "Zrovnanie dát"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Filtre zvuku"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "Médium: %s"
-
-#, fuzzy
-#~ msgid "Download when asked"
-#~ msgstr "Stiahnuť teraz"
-
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "Abstraktná vrstva siete UDP/IPv4"
-
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "Abstraktná vrstva siete UDP/IPv6"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "Ďalej"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "Šírka"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Spectrometer"
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr " Amharic"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Ukladať do vyrovnávacej pamäte"
-
-#, fuzzy
-#~ msgid "QPushButton"
-#~ msgstr " Pushto"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Lineárne rozkladanie"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "Podčiarknuté"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Viac informácií"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "Skupina"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "zapnúť"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "zapnúť"
-
-#, fuzzy
-#~ msgid "horizontalLayout_3"
-#~ msgstr "Preklopiť horizontálne"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Disk"
-
-#~ msgid "|Video Files (*.avi, *.mpg, etc.)|"
-#~ msgstr "|Video súbory (*.avi, *.mpg, atď.)|"
-
-#~ msgid "|Playlist Files (*.m3u, *.pls, etc.)|"
-#~ msgstr "|Playlisty (*.m3u, *.pls, atď.)|"
-
-#~ msgid "|Subtitle Files (*.srt, *.sub, etc.)|"
-#~ msgstr "|Súbory s titulkami (*.srt, *.sub, atď.)|"
-
-#~ msgid "Create"
-#~ msgstr "Vytvoriť"
-
-#~ msgid "Playlist stress tests"
-#~ msgstr "Záťažové testy s playlistom"
-
-#~ msgid "DAAP shares"
-#~ msgstr "Diely DAAP"
-
-#~ msgid "DAAP access"
-#~ msgstr "Prístup DAAP"
-
-#~ msgid " to "
-#~ msgstr "na"
-
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "Maximálny počet preskočení výstupných streamov."
-
-#~ msgid "Errors"
-#~ msgstr "Chyby"
-
-#~ msgid "Stream information"
-#~ msgstr "Informácia o streame"
-
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr "Tu môžete zadať hodnotu parametra Time-To-Live pre výstupný stream."
-
-#, fuzzy
-#~ msgid "Justification"
-#~ msgstr "Zosilnenie"
-
-#~ msgid "Growl"
-#~ msgstr "Growl"
-
-#~ msgid "MSN"
-#~ msgstr "MSN"
-
 #~ msgid "Video filters settings"
 #~ msgstr "Nastavenia filtrov videa"
 
@@ -19977,6 +19794,23 @@ msgstr "Spektrálny analyzátor"
 #~ msgid "ISO-9660 Volume Set"
 #~ msgstr "Menovka podľa ISO-9660"
 
+#~ msgid "Errors"
+#~ msgstr "Chyby"
+
+#~ msgid "Login"
+#~ msgstr "Prihlásiť"
+
+#~ msgid "Console"
+#~ msgstr "Konzola"
+
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "Výstupné rozhranie IPv6 multicast"
+
+#~ msgid "Default IPv6 multicast interface. This overrides the routing table."
+#~ msgstr ""
+#~ "Predvolené rozhranie IPv6 multicast. Pri tomto nastavení sa neberie ohľad "
+#~ "na smerovaciu tabuľku."
+
 #~ msgid "By category"
 #~ msgstr "Podľa kategórie"
 
@@ -19985,6 +19819,79 @@ msgstr "Spektrálny analyzátor"
 
 #~ msgid "All items, unsorted"
 #~ msgstr "Všetky položky, nezoradené"
+
+#~ msgid ""
+#~ "Select the video input source, such as composite, s-video, or tuner. "
+#~ "Since these settings are hardware-specfic, you should find good settings "
+#~ "in the \"Device config\" area, and use those numbers here. -1 means that "
+#~ "settings will not be changed."
+#~ msgstr ""
+#~ "Zvoľte si zdroj pre vstup videa, napríklad to môže byť kompozitný vstup, "
+#~ "s-video, alebo vstup z tunera. Ak máte nejaký špecifický hardvér, vhodné "
+#~ "nastavenia nájdete aj v sekcií \"Konfigurácia zariadenia\". Použite "
+#~ "hodnoty, ktoré sú nastavené v tejto sekcii. Hodnota -1 znamená, že "
+#~ "nastavenia nebudú zmenené."
+
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr ""
+#~ "Toto je veľkosť dočasných súborov, do ktorých sa budú ukladať časovo "
+#~ "posunuté streamy."
+
+#~ msgid "Name to give to this stream/channel on the icecast server."
+#~ msgstr "Názov streamu/kanála, ktorý chcete zadať na server icecast."
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the icecast server."
+#~ msgstr ""
+#~ "Za normálnych okolností sa pri streamovaní vysielajú väčšinou Ogg-"
+#~ "streamy. V prípade potreba sa však dajú tieto streamy previesť do formátu "
+#~ "MP3 a vo formáte MP3 ich potom môžete odosielať na server icecast."
+
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "Maximálny počet preskočení výstupných streamov."
+
+#~ msgid "Audio filter for fixed32<->float32 conversion"
+#~ msgstr "Zvukový filter pre konverziu fixed <-> float32"
+
+#~ msgid "Audio filter for fixed32->s16 conversion"
+#~ msgstr "Zvukový filter pre konverziu fixed32->s16"
+
+#~ msgid "Audio filter for float32->s16 conversion"
+#~ msgstr "Zvukový filter pre konverziu float32->s16"
+
+#~ msgid "Audio filter for float32->s8 conversion"
+#~ msgstr "Zvukový filter pre konverziu float32->s8 "
+
+#~ msgid "Audio filter for float32->u16 conversion"
+#~ msgstr "Zvukový filter pre konverziu float32->u16"
+
+#~ msgid "Audio filter for float32->u8 conversion"
+#~ msgstr "Zvukový filter pre konverziu float32->u8"
+
+#~ msgid "Audio filter for s16->fixed32 conversion"
+#~ msgstr "Zvukový filter pre konverziu s16->fixed32 "
+
+#~ msgid "Audio filter for s16->float32 conversion"
+#~ msgstr "Zvukový filter pre konverziu s16->float32"
+
+#~ msgid "Audio filter for s16->float32 with endianness conversion"
+#~ msgstr "Zvukový filter pre konverziu s16->float32"
+
+#~ msgid "Audio filter for s8->float32 conversion"
+#~ msgstr "Zvukový filter pre konverziu s8->float32"
+
+#~ msgid "Audio filter for u8->fixed32 conversion"
+#~ msgstr "Zvukový filter pre konverziu u8->fixed32"
+
+#~ msgid "Audio filter for u8->float32 conversion"
+#~ msgstr "Zvukový filter pre konverziu u8->float32"
+
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Zvukový výstup Linux OSS"
 
 #~ msgid "Corba control"
 #~ msgstr "kontrolný modul corba"
@@ -20022,6 +19929,9 @@ msgstr "Spektrálny analyzátor"
 
 #~ msgid "| time-size # . . . . . . . . font size, in pixels"
 #~ msgstr "| time-size # . . . . . . . . velkost pisma v pixeloch"
+
+#~ msgid "Fixing AVI Index"
+#~ msgstr "Opravuje sa index súboru AVI"
 
 #~ msgid "Creating AVI Index ..."
 #~ msgstr "Vytvára sa index súboru AVI..."
@@ -20077,6 +19987,20 @@ msgstr "Spektrálny analyzátor"
 #~ msgid "Mime type"
 #~ msgstr "Mime-typ"
 
+#~ msgid ""
+#~ "This panel allows to select video effects filters to apply.\n"
+#~ "The filters can be configured indivudually in the Preferences, in the "
+#~ "subsections of Video/Filters\n"
+#~ ".To choose the order in which the filter are applied, a filter option "
+#~ "string can be set in the Preferences, Video / Filters section."
+#~ msgstr ""
+#~ "V tomto paneli si môžete vybrať, ktoré efekty sa použijú pri prehrávaní "
+#~ "videa.\n"
+#~ "Filtre je možné individuálne nakonfigurovať v Nastaveniach, v podsekciách "
+#~ "Video/Filtre.\n"
+#~ "Ak chcete zmeniť poradie, v ktorom budú filtre aplikované, toto poradie "
+#~ "môžete zmeniť taktiež v Nastaveniach, v sekcii Video / Filtre."
+
 #~ msgid "Yes"
 #~ msgstr "Áno"
 
@@ -20113,8 +20037,9 @@ msgstr "Spektrálny analyzátor"
 #~ "V celoobrazovkovom režime je možné obstrihnúť čierne okraje tak, aby "
 #~ "obraz vypĺňal celú plochu okna (len pri použití OpenGL)."
 
-#~ msgid "Standard Play"
-#~ msgstr "Štandardné prehrávanie"
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "Nemožno nájsť playlist!"
 
 #~ msgid "%i items in playlist (%i not shown)"
 #~ msgstr "%i položiek v playliste (%i nie je zobrazených)"
@@ -20128,23 +20053,70 @@ msgstr "Spektrálny analyzátor"
 #~ msgid "Sorted by Album"
 #~ msgstr "Zoradené podľa albumu"
 
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "Abstraktná vrstva siete UDP/IPv4"
+
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "Abstraktná vrstva siete UDP/IPv6"
+
+#~ msgid "Playlist stress tests"
+#~ msgstr "Záťažové testy s playlistom"
+
+#~ msgid "DAAP shares"
+#~ msgstr "Diely DAAP"
+
+#~ msgid "DAAP access"
+#~ msgstr "Prístup DAAP"
+
 #~ msgid "Session Announcements (SAP)"
 #~ msgstr "Oznamovanie relácie (cez SAP)"
+
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr "Tu môžete zadať hodnotu parametra Time-To-Live pre výstupný stream."
+
+#~ msgid "Automatic black border cropping."
+#~ msgstr "Automatické odstrihnutie čiernych okrajov."
+
+#~ msgid ""
+#~ "Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough"
+#~ "\" and \"psychedelic\"."
+#~ msgstr ""
+#~ "Mód skreslenia, môžete si vybrať z týchto módov: \"wave\", \"ripple\", "
+#~ "\"gradient\", \"edge\", \"hough\" a \"psychedelic\"."
+
+#~ msgid "Distort video filter"
+#~ msgstr "Skresľujúci video-filter"
+
+#~ msgid "Number of loops for the logo animation.1 = continuous, 0 = disabled"
+#~ msgstr ""
+#~ "Počet opakovaní animácie loga. 1 = opakovať kontinuálne, 0 = zablokované."
 
 #~ msgid "Marquee text to display."
 #~ msgstr "Zadajte text, ktorý chcete zobraziť."
 
-#~ msgid "Vertical border width"
-#~ msgstr "Šírka vertikálneho okraja"
-
 #~ msgid ""
-#~ "Width in pixels of the border than can be drawn vertically around the "
-#~ "mosaic."
+#~ "Positioning method for the mosaic. auto: automatically choose the best "
+#~ "number of rows and columns. fixed: use the user-defined number of rows "
+#~ "and columns."
 #~ msgstr ""
-#~ "Šírka (v pixeloch) okraja, ktorý sa vykreslí vertikálne okolo mozaiky."
+#~ "Spôsob pozicovania v mozaike. Možnosť autom. = automatický výber "
+#~ "najlepšieho počtu stĺpcov a riadkov. Možnosť fixne = použiť len zadaný "
+#~ "počet stĺpcov a riadkov."
 
-#~ msgid "Horizontal border width"
-#~ msgstr "Šírka horizontálneho okraja"
+#~ msgid "Description file"
+#~ msgstr "Súbor s poznámkou"
+
+#~ msgid "A file containing a simple playlist"
+#~ msgstr "Súbor obsahujúci jednoduchý playlist"
+
+#~ msgid "History parameter"
+#~ msgstr "Počet detekčných snímok"
+
+#~ msgid "The umber of frames used for detection."
+#~ msgstr "Počet snímok používaných na účely detekcie."
+
+#~ msgid "Motion detect"
+#~ msgstr "Detekcia pohybu"
 
 #~ msgid "Time format string (%Y%m%d %H%M%S)"
 #~ msgstr "Formát príkazu: Čas (%Y%m%d %H%M%S)"
@@ -20177,9 +20149,45 @@ msgstr "Spektrálny analyzátor"
 #~ msgid "Time display sub filter"
 #~ msgstr "Sub-filter pre zobrazenie času"
 
+#~ msgid "Standard Play"
+#~ msgstr "Štandardné prehrávanie"
+
+#~ msgid "Vertical border width"
+#~ msgstr "Šírka vertikálneho okraja"
+
+#~ msgid ""
+#~ "Width in pixels of the border than can be drawn vertically around the "
+#~ "mosaic."
+#~ msgstr ""
+#~ "Šírka (v pixeloch) okraja, ktorý sa vykreslí vertikálne okolo mozaiky."
+
+#~ msgid "Horizontal border width"
+#~ msgstr "Šírka horizontálneho okraja"
+
+#~ msgid "Growl"
+#~ msgstr "Growl"
+
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
 #, fuzzy
 #~ msgid "Slovack"
 #~ msgstr "Slovensky"
+
+#~ msgid "Stream information"
+#~ msgstr "Informácia o streame"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "Prehľadávať..."
+
+#, fuzzy
+#~ msgid "Justification"
+#~ msgstr "Zosilnenie"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "Názov audio-zariadenia"
 
 #, fuzzy
 #~ msgid "Audioscrobbler password"
@@ -20196,3 +20204,98 @@ msgstr "Spektrálny analyzátor"
 #~ "This has no effect on actual encoding quality, it just prevents the stats "
 #~ "from being calculated (for speed)."
 #~ msgstr "Táto voľba momentálne nemá žiaden vplyv na proces kódovania."
+
+#~ msgid "|Video Files (*.avi, *.mpg, etc.)|"
+#~ msgstr "|Video súbory (*.avi, *.mpg, atď.)|"
+
+#~ msgid "|Playlist Files (*.m3u, *.pls, etc.)|"
+#~ msgstr "|Playlisty (*.m3u, *.pls, atď.)|"
+
+#~ msgid "|Subtitle Files (*.srt, *.sub, etc.)|"
+#~ msgstr "|Súbory s titulkami (*.srt, *.sub, atď.)|"
+
+#~ msgid "Create"
+#~ msgstr "Vytvoriť"
+
+#~ msgid " to "
+#~ msgstr "na"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Typ disku"
+
+#, fuzzy
+#~ msgid "Big"
+#~ msgstr "Bridge"
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "Zrovnanie dát"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Filtre zvuku"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "Médium: %s"
+
+#, fuzzy
+#~ msgid "Download when asked"
+#~ msgstr "Stiahnuť teraz"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "Ďalej"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "Šírka"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Spectrometer"
+
+#, fuzzy
+#~ msgid "margin"
+#~ msgstr " Amharic"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Ukladať do vyrovnávacej pamäte"
+
+#, fuzzy
+#~ msgid "QPushButton"
+#~ msgstr " Pushto"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Lineárne rozkladanie"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "Podčiarknuté"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Viac informácií"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "Skupina"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "zapnúť"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "zapnúť"
+
+#, fuzzy
+#~ msgid "horizontalLayout_3"
+#~ msgstr "Preklopiť horizontálne"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "Disk"

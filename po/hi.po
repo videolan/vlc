@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc-translate\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2006-02-24 06:09+0000\n"
 "Last-Translator: viyyer <viyyer@sarai.net>\n"
 "Language-Team: Hindi\n"
@@ -4391,7 +4391,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr ""
 
@@ -17860,6 +17860,138 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "CDDB Artist"
+#~ msgstr "सी डि डि बि कलाकार्"
+
+#~ msgid "CDDB Category"
+#~ msgstr "सी डि डि बी श्रेणियाँ"
+
+#~ msgid "CDDB Disc ID"
+#~ msgstr "सी डि डि बी डिस्क अंक"
+
+#~ msgid "CDDB Extended Data"
+#~ msgstr "सी डि डि बी"
+
+#~ msgid "CDDB Genre"
+#~ msgstr "सी डि डि बी"
+
+#~ msgid "CDDB Year"
+#~ msgstr "सी डि डि बी साल"
+
+#~ msgid "CDDB Title"
+#~ msgstr "सी डि डि बी ख़िताब"
+
+#~ msgid "CD-Text Composer"
+#~ msgstr "सी डि पाठ संपादक"
+
+#~ msgid "CD-Text Disc ID"
+#~ msgstr "सी डि पाठ डिस्क ऐ डी"
+
+#~ msgid "CD-Text Message"
+#~ msgstr "सी डि पाठ सूचना"
+
+#~ msgid "CD-Text Songwriter"
+#~ msgstr "सी डि पाठ गीतकार"
+
+#~ msgid "CD-Text Performer"
+#~ msgstr "सी डि पाठ कलाकार"
+
+#~ msgid "CD-Text Title"
+#~ msgstr "सी डि पाठ ख़िताब"
+
+#~ msgid "ISO-9660 Application ID"
+#~ msgstr "ऐ एस ओ-९६६० अनुप्रयोग अंक"
+
+#~ msgid "ISO-9660 Preparer"
+#~ msgstr "ऐ एस ओ-९६६० प्रइपरेर"
+
+#~ msgid "ISO-9660 Publisher"
+#~ msgstr "ऐ एस ओ-९६६० पब्लिशर"
+
+#~ msgid "ISO-9660 Volume"
+#~ msgstr "ऐ एस ओ-९६६० वाल्यूम"
+
+#~ msgid "ISO-9660 Volume Set"
+#~ msgstr "ऐ एस ओ-९६६० वाल्यूम सेट"
+
+#, fuzzy
+#~ msgid "Muxing application"
+#~ msgstr "साफ्टवेयर के बारेे में..."
+
+#, fuzzy
+#~ msgid "Writing application"
+#~ msgstr "साफ्टवेयर के बारेे में..."
+
+#, fuzzy
+#~ msgid "Listeners"
+#~ msgstr "फैल"
+
+#~ msgid " "
+#~ msgstr " "
+
+#, fuzzy
+#~ msgid "Choose programs"
+#~ msgstr "बाहर िनकलो"
+
+#, fuzzy
+#~ msgid "Choose audio track"
+#~ msgstr "बाहर िनकलो"
+
+#, fuzzy
+#~ msgid "_Title"
+#~ msgstr "फैल"
+
+#~ msgid "_Audio"
+#~ msgstr "आवाज़"
+
+#~ msgid "_Video"
+#~ msgstr "िवडीयो"
+
+#~ msgid "_File"
+#~ msgstr "फैल"
+
+#~ msgid "Exit the program"
+#~ msgstr "बाहर िनकलो"
+
+#~ msgid "_View"
+#~ msgstr "िदखावो"
+
+#~ msgid "_Help"
+#~ msgstr "मदत"
+
+#~ msgid "_About..."
+#~ msgstr "के बारेे में..."
+
+#~ msgid "About this application"
+#~ msgstr "साफ्टवेयर के बारेे में..."
+
+#~ msgid "Settings for VLC interfaces"
+#~ msgstr "वी एल सी इंटरफ़ेस विन्यास"
+
+#, fuzzy
+#~ msgid "Choose the program"
+#~ msgstr "बाहर िनकलो"
+
+#, fuzzy
+#~ msgid "_Modules..."
+#~ msgstr "के बारेे में..."
+
+#, fuzzy
+#~ msgid "Switch program"
+#~ msgstr "बाहर िनकलो"
+
+#, fuzzy
+#~ msgid "Configure the application"
+#~ msgstr "साफ्टवेयर के बारेे में..."
+
+#, fuzzy
+#~ msgid "Quits the application"
+#~ msgstr "साफ्टवेयर के बारेे में..."
+
+#, fuzzy
+#~ msgid "XVideo"
+#~ msgstr "िवडीयो"
+
 #, fuzzy
 #~ msgid "Disc Type"
 #~ msgstr "क़िस्म"
@@ -17935,128 +18067,3 @@ msgstr ""
 #, fuzzy
 #~ msgid "Right-Bottom"
 #~ msgstr "नीचे"
-
-#~ msgid "CDDB Artist"
-#~ msgstr "सी डि डि बि कलाकार्"
-
-#~ msgid "CDDB Category"
-#~ msgstr "सी डि डि बी श्रेणियाँ"
-
-#~ msgid "CDDB Disc ID"
-#~ msgstr "सी डि डि बी डिस्क अंक"
-
-#~ msgid "CDDB Extended Data"
-#~ msgstr "सी डि डि बी"
-
-#~ msgid "CDDB Genre"
-#~ msgstr "सी डि डि बी"
-
-#~ msgid "CDDB Year"
-#~ msgstr "सी डि डि बी साल"
-
-#~ msgid "CDDB Title"
-#~ msgstr "सी डि डि बी ख़िताब"
-
-#~ msgid "CD-Text Composer"
-#~ msgstr "सी डि पाठ संपादक"
-
-#~ msgid "CD-Text Disc ID"
-#~ msgstr "सी डि पाठ डिस्क ऐ डी"
-
-#~ msgid "CD-Text Message"
-#~ msgstr "सी डि पाठ सूचना"
-
-#~ msgid "CD-Text Songwriter"
-#~ msgstr "सी डि पाठ गीतकार"
-
-#~ msgid "CD-Text Performer"
-#~ msgstr "सी डि पाठ कलाकार"
-
-#~ msgid "CD-Text Title"
-#~ msgstr "सी डि पाठ ख़िताब"
-
-#~ msgid "ISO-9660 Application ID"
-#~ msgstr "ऐ एस ओ-९६६० अनुप्रयोग अंक"
-
-#~ msgid "ISO-9660 Preparer"
-#~ msgstr "ऐ एस ओ-९६६० प्रइपरेर"
-
-#~ msgid "ISO-9660 Publisher"
-#~ msgstr "ऐ एस ओ-९६६० पब्लिशर"
-
-#~ msgid "ISO-9660 Volume"
-#~ msgstr "ऐ एस ओ-९६६० वाल्यूम"
-
-#~ msgid "ISO-9660 Volume Set"
-#~ msgstr "ऐ एस ओ-९६६० वाल्यूम सेट"
-
-#, fuzzy
-#~ msgid "Muxing application"
-#~ msgstr "साफ्टवेयर के बारेे में..."
-
-#, fuzzy
-#~ msgid "Writing application"
-#~ msgstr "साफ्टवेयर के बारेे में..."
-
-#~ msgid " "
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "Choose programs"
-#~ msgstr "बाहर िनकलो"
-
-#, fuzzy
-#~ msgid "Choose audio track"
-#~ msgstr "बाहर िनकलो"
-
-#, fuzzy
-#~ msgid "_Title"
-#~ msgstr "फैल"
-
-#~ msgid "_Audio"
-#~ msgstr "आवाज़"
-
-#~ msgid "_Video"
-#~ msgstr "िवडीयो"
-
-#~ msgid "_File"
-#~ msgstr "फैल"
-
-#~ msgid "Exit the program"
-#~ msgstr "बाहर िनकलो"
-
-#~ msgid "_View"
-#~ msgstr "िदखावो"
-
-#~ msgid "_Help"
-#~ msgstr "मदत"
-
-#~ msgid "_About..."
-#~ msgstr "के बारेे में..."
-
-#~ msgid "About this application"
-#~ msgstr "साफ्टवेयर के बारेे में..."
-
-#, fuzzy
-#~ msgid "Choose the program"
-#~ msgstr "बाहर िनकलो"
-
-#, fuzzy
-#~ msgid "_Modules..."
-#~ msgstr "के बारेे में..."
-
-#, fuzzy
-#~ msgid "Switch program"
-#~ msgstr "बाहर िनकलो"
-
-#, fuzzy
-#~ msgid "Configure the application"
-#~ msgstr "साफ्टवेयर के बारेे में..."
-
-#, fuzzy
-#~ msgid "Quits the application"
-#~ msgstr "साफ्टवेयर के बारेे में..."
-
-#, fuzzy
-#~ msgid "XVideo"
-#~ msgstr "िवडीयो"

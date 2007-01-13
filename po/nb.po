@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2006-06-12 22:01+0000\n"
 "Last-Translator: Jonas Riise Hamre <jonas.riise.hamre@gmail.com>\n"
 "Language-Team: Norwegian Bokmål <nb@li.org>\n"
@@ -1128,7 +1128,7 @@ msgstr ""
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr ""
+msgstr "nb"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4394,7 +4394,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr ""
 
@@ -17807,9 +17807,8 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Metainformasjon"
+#~ msgid "Video filters settings"
+#~ msgstr "Videofilterinstillinger"
 
 #, fuzzy
 #~ msgid "Console"
@@ -17821,8 +17820,14 @@ msgstr ""
 #~ msgid " "
 #~ msgstr " "
 
+#~ msgid "Advanced open options"
+#~ msgstr "Avanserte åpneinstillinger"
+
 #~ msgid "subtitles"
 #~ msgstr "undertekster"
+
+#~ msgid "osd text filter"
+#~ msgstr "osd tekstfilter"
 
 #~ msgid "&Chapter:"
 #~ msgstr "&Kapittel"
@@ -17836,17 +17841,29 @@ msgstr ""
 #~ msgid "&Hide interface"
 #~ msgstr "&Skjul grensesnitt"
 
+#~ msgid "&Add interface"
+#~ msgstr "&Legg til grensesnitt"
+
 #~ msgid "Sc&reen"
 #~ msgstr "Sk&jerm"
 
 #~ msgid "&Chapter"
 #~ msgstr "&Kapittel"
 
+#~ msgid "Select angle"
+#~ msgstr "Velg vinkel"
+
 #~ msgid "&Language"
 #~ msgstr "&Språk"
 
+#~ msgid "&Subtitles"
+#~ msgstr "&Undertekster"
+
 #~ msgid "Next file"
 #~ msgstr "Neste fil"
+
+#~ msgid "&Add subtitles..."
+#~ msgstr "&Legg til undertekster..."
 
 #~ msgid "Exit"
 #~ msgstr "Avslutt"
@@ -17859,6 +17876,9 @@ msgstr ""
 
 #~ msgid "&Mute"
 #~ msgstr "&Demp"
+
+#~ msgid "Open network"
+#~ msgstr "Åpne nettverk"
 
 #~ msgid "&Disc..."
 #~ msgstr "&Disk..."
@@ -17878,5 +17898,12 @@ msgstr ""
 #~ msgid "Open skin"
 #~ msgstr "Åpne drakt"
 
+#~ msgid "Skin files"
+#~ msgstr "Drakt-filer"
+
 #~ msgid "Open disc..."
 #~ msgstr "Åpne disk..."
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Metainformasjon"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2006-09-28 13:13+0000\n"
 "Last-Translator: julen <julen.ugalde@gmail.com>\n"
 "Language-Team: Basque <eu@li.org>\n"
@@ -1169,7 +1169,7 @@ msgstr ""
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "eu"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4562,7 +4562,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr ""
 
@@ -11044,9 +11044,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "Hasi bideoa pantaila osoan"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 msgid "Remember wizard options"
@@ -18029,52 +18028,8 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Mota"
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "Bideo-lerrokatzea"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Audio iragazkiak"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Espektrometroa"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Puntuazioa"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Login"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Iraupena"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "Gaitu"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Danieraz"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Erdi"
-
-#~ msgid "Errors"
-#~ msgstr "Erroreak"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Meta-informazioa"
+#~ msgid "Video filters settings"
+#~ msgstr "Bideo iragazkien ezarpenak"
 
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB Egilea"
@@ -18135,3 +18090,61 @@ msgstr ""
 
 #~ msgid "ISO-9660 Volume Set"
 #~ msgstr "ISO-9660 Bolumen Jokoa"
+
+#~ msgid "Errors"
+#~ msgstr "Erroreak"
+
+#~ msgid "Login"
+#~ msgstr "Login"
+
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "IPv6 multicast irteera interfazea"
+
+#~ msgid "Default IPv6 multicast interface. This overrides the routing table."
+#~ msgstr ""
+#~ "IPv6 multicast irteera interfaze lehentsia. Bideratze taulari ez zaio "
+#~ "jaramonik egingo."
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Mota"
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "Bideo-lerrokatzea"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Audio iragazkiak"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Espektrometroa"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Puntuazioa"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Login"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Iraupena"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "Gaitu"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "Danieraz"
+
+#, fuzzy
+#~ msgid "Create"
+#~ msgstr "Erdi"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "Meta-informazioa"

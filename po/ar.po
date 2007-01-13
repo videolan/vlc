@@ -1,16 +1,15 @@
 # Arabic translation for vlc
 # Copyright (c) (c) 2006 Canonical Ltd, and Rosetta Contributors 2006
 # This file is distributed under the same license as the vlc package.
-# Rouis Khalifa <rouis.k@sa7li.net>, 2006.
-# Zayed Al-Saidi <zayed.alsaidi@gmail.com>, 2006.
-# Mohammed Adnène Trojette <adn+deb@diwi.org>, 2006
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2006.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
-"PO-Revision-Date: 2006-06-25 14:07+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
+"PO-Revision-Date: 2006-04-10 14:07+0000\n"
 "Last-Translator: ROUIS Khalifa <rouis.k@sa7li.net>\n"
 "Language-Team: Arabic <ar@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1144,7 +1143,7 @@ msgstr ""
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "ar"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -1815,18 +1814,16 @@ msgstr ""
 "التجانس أو تشويه نافذة الفيديو.  "
 
 #: src/libvlc-module.c:326
-#, fuzzy
 msgid "Video snapshot directory (or filename)"
-msgstr "مسار لقطات الفيديو"
+msgstr ""
 
 #: src/libvlc-module.c:328
 msgid "Directory where the video snapshots will be stored."
 msgstr ""
 
 #: src/libvlc-module.c:330 src/libvlc-module.c:332
-#, fuzzy
 msgid "Video snapshot file prefix"
-msgstr "صيغة لقطة الفيديو"
+msgstr ""
 
 #: src/libvlc-module.c:334
 msgid "Video snapshot format"
@@ -1886,9 +1883,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:366
-#, fuzzy
 msgid "Custom aspect ratios list"
-msgstr "نسية الترميز المصدرية"
+msgstr ""
 
 #: src/libvlc-module.c:368
 msgid ""
@@ -2229,9 +2225,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:557
-#, fuzzy
 msgid "Text rendering module"
-msgstr "اعادة النص"
+msgstr ""
 
 #: src/libvlc-module.c:559
 msgid ""
@@ -3615,9 +3610,8 @@ msgid "Dump"
 msgstr ""
 
 #: src/libvlc-module.c:1174
-#, fuzzy
 msgid "Media dump access filter trigger."
-msgstr "فلتر بداية التسجيل  بدء/ايقاف"
+msgstr ""
 
 #: src/libvlc-module.c:1176 src/libvlc-module.c:1177
 #: src/video_output/vout_intf.c:216
@@ -3625,9 +3619,8 @@ msgid "Zoom"
 msgstr "تكبير"
 
 #: src/libvlc-module.c:1179 src/libvlc-module.c:1180
-#, fuzzy
 msgid "Un-Zoom"
-msgstr "تكبير"
+msgstr ""
 
 #: src/libvlc-module.c:1182 src/libvlc-module.c:1183
 msgid "Crop one pixel from the top of the video"
@@ -4434,7 +4427,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "غير معرف"
 
@@ -4808,9 +4801,8 @@ msgid "Track Number"
 msgstr "رقم المقطع"
 
 #: modules/access/dc1394.c:65
-#, fuzzy
 msgid "dc1394 input"
-msgstr "لا مدخلات"
+msgstr ""
 
 #: modules/access/directory.c:72
 msgid "Subdirectory behavior"
@@ -5508,9 +5500,8 @@ msgid "VLC could not open file \"%s\" (%s)."
 msgstr ""
 
 #: modules/access_filter/dump.c:39
-#, fuzzy
 msgid "Force use of dump module"
-msgstr "الدليل المستخدم لتخزين ملفات التخزين المؤقت."
+msgstr ""
 
 #: modules/access_filter/dump.c:40
 msgid "Activate the dump module even for media with fast seeking."
@@ -5563,9 +5554,8 @@ msgid "Directory used to store the timeshift temporary files."
 msgstr "الدليل المستخدم لتخزين ملفات التخزين المؤقت."
 
 #: modules/access_filter/timeshift.c:53
-#, fuzzy
 msgid "Force use of the timeshift module"
-msgstr "الدليل المستخدم لتخزين ملفات التخزين المؤقت."
+msgstr ""
 
 #: modules/access_filter/timeshift.c:54
 msgid ""
@@ -7482,9 +7472,8 @@ msgid "FFmpeg demuxer"
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:194
-#, fuzzy
 msgid "FFmpeg muxer"
-msgstr "Demuxers"
+msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:201 modules/video_filter/scale.c:53
 msgid "Video scaling filter"
@@ -8033,7 +8022,7 @@ msgstr ""
 #: modules/codec/svcdsub.c:42
 #, fuzzy
 msgid "Enable debug"
-msgstr "تمكين الفيديو"
+msgstr "تشغيل الصورة"
 
 #: modules/codec/svcdsub.c:45
 msgid ""
@@ -8284,9 +8273,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/x264.c:106
-#, fuzzy
 msgid "H.264 level"
-msgstr "أعلى مستوى"
+msgstr ""
 
 #: modules/codec/x264.c:107
 msgid ""
@@ -8298,12 +8286,11 @@ msgstr ""
 #: modules/codec/x264.c:116
 #, fuzzy
 msgid "Interlaced mode"
-msgstr "وحدة الواجهة"
+msgstr "الواجهة"
 
 #: modules/codec/x264.c:117
-#, fuzzy
 msgid "Pure-interlaced mode."
-msgstr "نمط الغاء التشويش"
+msgstr ""
 
 #: modules/codec/x264.c:122
 msgid "Set QP"
@@ -8644,14 +8631,12 @@ msgid ""
 msgstr ""
 
 #: modules/codec/x264.c:296
-#, fuzzy
 msgid "Quiet mode"
-msgstr "نمط التشويش"
+msgstr ""
 
 #: modules/codec/x264.c:297
-#, fuzzy
 msgid "Quiet mode."
-msgstr "نمط التشويش"
+msgstr ""
 
 #: modules/codec/x264.c:299 modules/gui/macosx/playlistinfo.m:64
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:85
@@ -8673,9 +8658,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/x264.c:308
-#, fuzzy
 msgid "Access unit delimiters"
-msgstr "فلاتر الدخول"
+msgstr ""
 
 #: modules/codec/x264.c:309
 msgid "Generate access unit delimiter NAL units."
@@ -9054,9 +9038,8 @@ msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
 msgstr ""
 
 #: modules/control/rc.c:840
-#, fuzzy
 msgid "| enqueue XYZ  . . . . . . . queue XYZ to playlist"
-msgstr "| التالي. . . . . . . . . . . .  العنصر التالي"
+msgstr ""
 
 #: modules/control/rc.c:841
 msgid "| playlist . . .  show items currently in playlist"
@@ -9167,14 +9150,12 @@ msgid "| is_playing . .  1 if a stream plays, 0 otherwise"
 msgstr ""
 
 #: modules/control/rc.c:869
-#, fuzzy
 msgid "| get_title . . .  the title of the current stream"
-msgstr "| title [X]  . . . . set/get title in current item"
+msgstr ""
 
 #: modules/control/rc.c:870
-#, fuzzy
 msgid "| get_length . .  the length of the current stream"
-msgstr "| title [X]  . . . . set/get title in current item"
+msgstr ""
 
 #: modules/control/rc.c:872
 msgid "| volume [X] . . . . . . . .  set/get audio volume"
@@ -9197,34 +9178,28 @@ msgid "| achan [X]. . . . . . . .  set/get audio channels"
 msgstr ""
 
 #: modules/control/rc.c:877
-#, fuzzy
 msgid "| atrack [X] . . . . . . . . . set/get audio track"
-msgstr "| تصفية . . . . . . . . . . .   تصفية قائمة الشغيل"
+msgstr ""
 
 #: modules/control/rc.c:878
-#, fuzzy
 msgid "| vtrack [X] . . . . . . . . . set/get video track"
-msgstr "| ايقاف . . . . . . . . . . . . . . . . ايقاف التيار"
+msgstr ""
 
 #: modules/control/rc.c:879
-#, fuzzy
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
-msgstr "| title [X]  . . . . set/get title in current item"
+msgstr ""
 
 #: modules/control/rc.c:880
-#, fuzzy
 msgid "| vcrop [X]  . . . . . . . . .  set/get video crop"
-msgstr "| ذهاب إلى . . . . . . . . . . . .  الذهاب إلى العنصر"
+msgstr ""
 
 #: modules/control/rc.c:881
-#, fuzzy
 msgid "| vzoom [X]  . . . . . . . . .  set/get video zoom"
-msgstr "| ذهاب إلى . . . . . . . . . . . .  الذهاب إلى العنصر"
+msgstr ""
 
 #: modules/control/rc.c:882
-#, fuzzy
 msgid "| strack [X] . . . . . . . set/get subtitles track"
-msgstr "| title [X]  . . . . set/get title in current item"
+msgstr ""
 
 #: modules/control/rc.c:883
 msgid "| menu [on|off|up|down|left|right|select] use menu"
@@ -9491,9 +9466,8 @@ msgid "Ask"
 msgstr ""
 
 #: modules/demux/avi/avi.c:56
-#, fuzzy
 msgid "Always fix"
-msgstr "دائما في المقدمة"
+msgstr ""
 
 #: modules/demux/avi/avi.c:57
 msgid "Never fix"
@@ -9579,11 +9553,10 @@ msgid "RTSP user name"
 msgstr ""
 
 #: modules/demux/live555.cpp:75
-#, fuzzy
 msgid ""
 "Allows you to modify the user name that will be used for authenticating the "
 "connection."
-msgstr "السماح بتحديد طريقة وصول المخرج المستعملة لمخرج التيار."
+msgstr ""
 
 #: modules/demux/live555.cpp:77
 #, fuzzy
@@ -10101,9 +10074,8 @@ msgid "visual impaired commentary"
 msgstr ""
 
 #: modules/demux/tta.c:40
-#, fuzzy
 msgid "TTA demuxer"
-msgstr "Demuxers"
+msgstr ""
 
 #: modules/demux/ty.c:70
 msgid "TY Stream audio/video demux"
@@ -10356,9 +10328,9 @@ msgid "Compiled by %s, based on SVN revision %s"
 msgstr "تأليف بواسطة%s, مستند on SVN نسخة %s"
 
 #: modules/gui/macosx/about.m:85
-#, fuzzy, c-format
+#, c-format
 msgid "Compiled by %s"
-msgstr "تكوين بواسطة"
+msgstr ""
 
 #: modules/gui/macosx/bookmarks.m:92 modules/gui/macosx/intf.m:601
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:139
@@ -10680,9 +10652,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/fspanel.m:383
-#, fuzzy
 msgid "(no item is being played)"
-msgstr "لا توجد عناصر في قائمة التشغيل"
+msgstr ""
 
 #: modules/gui/macosx/interaction.m:130
 #, fuzzy
@@ -11281,9 +11252,8 @@ msgid "File Format:"
 msgstr ""
 
 #: modules/gui/macosx/playlist.m:445
-#, fuzzy
 msgid "Extended M3U"
-msgstr "GUI موسع\tCtrl-G"
+msgstr ""
 
 #: modules/gui/macosx/playlist.m:446
 msgid "XML Shareable Playlist Format (XSPF)"
@@ -12785,9 +12755,8 @@ msgstr "بايتات"
 #: modules/gui/wxwidgets/dialogs/open.cpp:488
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:195
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:239
-#, fuzzy
 msgid "&OK"
-msgstr "نعم"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:108
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:179
@@ -12797,30 +12766,26 @@ msgstr "نعم"
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:211
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:198
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:242
-#, fuzzy
 msgid "&Cancel"
-msgstr "الغاء"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:161
-#, fuzzy
 msgid "&Delete"
-msgstr "حذف"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:163
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:190
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:411
-#, fuzzy
 msgid "&Clear"
-msgstr "مسح"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:169
 msgid "Adds a bookmark at the current position in the stream"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:170
-#, fuzzy
 msgid "Removes the selected bookmarks"
-msgstr "عليك اختيار قائمتين"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:171
 msgid "Removes all the bookmarks for that stream"
@@ -12890,14 +12855,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:175
-#, fuzzy
 msgid "&Yes"
-msgstr "نعم"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:177
-#, fuzzy
 msgid "&No"
-msgstr "لا"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:187
 msgid "Don't show further errors"
@@ -12908,9 +12871,8 @@ msgid "Playlist item info"
 msgstr "معلومات عنصر الفائمة"
 
 #: modules/gui/wxwidgets/dialogs/messages.cpp:81
-#, fuzzy
 msgid "Save &As..."
-msgstr "حفظ باسم..."
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/messages.cpp:199
 msgid "Save Messages As..."
@@ -13208,9 +13170,8 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:208
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:79
-#, fuzzy
 msgid "&Save"
-msgstr "حفظ"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:294
 msgid ""
@@ -14658,9 +14619,8 @@ msgid "MSN Now-Playing"
 msgstr ""
 
 #: modules/misc/notify/notify.c:59
-#, fuzzy
 msgid "Timeout (ms)"
-msgstr "الوقت المنقضي"
+msgstr ""
 
 #: modules/misc/notify/notify.c:60
 msgid "How long the notification will be displayed "
@@ -15302,9 +15262,8 @@ msgid "Shoutcast radio listings"
 msgstr "النتائج الإذاعية"
 
 #: modules/services_discovery/shout.c:77
-#, fuzzy
 msgid "Shoutcast TV listings"
-msgstr "النتائج الإذاعية"
+msgstr ""
 
 #: modules/services_discovery/shout.c:128
 msgid "Shoutcast TV"
@@ -16531,18 +16490,16 @@ msgid "Y Coordinate of the top-left corner of the mosaic."
 msgstr ""
 
 #: modules/video_filter/mosaic.c:108
-#, fuzzy
 msgid "Border width"
-msgstr "عرض الفيديو"
+msgstr ""
 
 #: modules/video_filter/mosaic.c:109
 msgid "Width in pixels of the border between miniatures."
 msgstr ""
 
 #: modules/video_filter/mosaic.c:110
-#, fuzzy
 msgid "Border height"
-msgstr "ارتفاع الفيديو"
+msgstr ""
 
 #: modules/video_filter/mosaic.c:111
 msgid "Height in pixels of the border between miniatures."
@@ -17330,9 +17287,8 @@ msgid "DirectFB video output http://www.directfb.org/"
 msgstr ""
 
 #: modules/video_output/directx/direct3d.c:106
-#, fuzzy
 msgid "DirectX 3D video output"
-msgstr "فيديو تدرج رمادي "
+msgstr ""
 
 #: modules/video_output/directx/directx.c:128
 msgid "Use hardware YUV->RGB conversions"
@@ -17440,9 +17396,8 @@ msgid "Format of the output images (png or jpg)."
 msgstr ""
 
 #: modules/video_output/image.c:52
-#, fuzzy
 msgid "Image width"
-msgstr "تعديل الصورة"
+msgstr ""
 
 #: modules/video_output/image.c:53
 msgid ""
@@ -17451,9 +17406,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/image.c:57
-#, fuzzy
 msgid "Image height"
-msgstr "ارتفاع الفيديو"
+msgstr ""
 
 #: modules/video_output/image.c:58
 msgid ""
@@ -17507,18 +17461,16 @@ msgid "Transparent Cube"
 msgstr ""
 
 #: modules/video_output/opengl.c:123
-#, fuzzy
 msgid "Cylinder"
-msgstr "مسح"
+msgstr ""
 
 #: modules/video_output/opengl.c:123
 msgid "Torus"
 msgstr ""
 
 #: modules/video_output/opengl.c:123
-#, fuzzy
 msgid "Sphere"
-msgstr "سريع"
+msgstr ""
 
 #: modules/video_output/opengl.c:123
 msgid "SQUAREXY"
@@ -17967,6 +17919,76 @@ msgid "Spectrum analyser"
 msgstr ""
 
 #, fuzzy
+#~ msgid "Login"
+#~ msgstr "إسم المستخدم"
+
+#~ msgid "CDDB Artist"
+#~ msgstr " CDDB كاتب "
+
+#~ msgid "CDDB Category"
+#~ msgstr "CDDB تصنيف"
+
+#~ msgid "CDDB Year"
+#~ msgstr "CDDB سنة"
+
+#~ msgid "CDDB Title"
+#~ msgstr "CDDB عنوان"
+
+#~ msgid "ISO-9660 Preparer"
+#~ msgstr "مهيئ ISO-9660 "
+
+#~ msgid "ISO-9660 Publisher"
+#~ msgstr "ناشر ISO-9660"
+
+#~ msgid "ISO-9660 Volume"
+#~ msgstr "صوت ISO-9660 "
+
+#~ msgid "ISO-9660 Volume Set"
+#~ msgstr "حجم صوت Volume Set"
+
+#~ msgid "Errors"
+#~ msgstr "الاخطاء"
+
+#~ msgid "By category"
+#~ msgstr "حسب الصنف"
+
+#~ msgid "Manually added"
+#~ msgstr "اضافة يدويا"
+
+#~ msgid "All items, unsorted"
+#~ msgstr "كل المواد غير مصنفة"
+
+#~ msgid "Podcast Subtitle"
+#~ msgstr "ترجمة Podcast"
+
+#~ msgid "Yes"
+#~ msgstr "نعم"
+
+#~ msgid "No"
+#~ msgstr "لا"
+
+#~ msgid "If you believe that it is a bug, please follow the instructions at:"
+#~ msgstr "اذا تعتقد انه خطأ، فالرجاء اتباع التعليمات في : "
+
+#~ msgid "Open Messages Window"
+#~ msgstr "فتح نافذة الرسائل"
+
+#~ msgid "Dismiss"
+#~ msgstr "تجاهل"
+
+#~ msgid "Sorted by Album"
+#~ msgstr "ترتيب حسب الألبوم"
+
+#~ msgid "DAAP shares"
+#~ msgstr "اشتراك DAAP"
+
+#~ msgid "DAAP access"
+#~ msgstr "DAAP دخول"
+
+#~ msgid "General interface setttings"
+#~ msgstr "إعدادات الواجهة العامة"
+
+#, fuzzy
 #~ msgid "Password: "
 #~ msgstr "كلمة السڒ"
 
@@ -18041,43 +18063,12 @@ msgstr ""
 #~ msgid "Create"
 #~ msgstr "انشاء"
 
-#~ msgid "DAAP shares"
-#~ msgstr "اشتراك DAAP"
-
-#~ msgid "DAAP access"
-#~ msgstr "DAAP دخول"
-
 #~ msgid " to "
 #~ msgstr "إلى"
-
-#~ msgid "Errors"
-#~ msgstr "الاخطاء"
 
 #, fuzzy
 #~ msgid "Stream information"
 #~ msgstr "المزيد من المعلومات"
-
-#~ msgid "Podcast Subtitle"
-#~ msgstr "ترجمة Podcast"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "نوع"
-
-#~ msgid "Yes"
-#~ msgstr "نعم"
-
-#~ msgid "No"
-#~ msgstr "لا"
-
-#~ msgid "If you believe that it is a bug, please follow the instructions at:"
-#~ msgstr "اذا تعتقد انه خطأ، فالرجاء اتباع التعليمات في : "
-
-#~ msgid "Open Messages Window"
-#~ msgstr "فتح نافذة الرسائل"
-
-#~ msgid "Dismiss"
-#~ msgstr "تجاهل"
 
 #~ msgid "Standard Play"
 #~ msgstr "التشغيل القياسي"
@@ -18108,42 +18099,6 @@ msgstr ""
 
 #~ msgid "Right-Bottom"
 #~ msgstr "أسفل يمين"
-
-#~ msgid "CDDB Artist"
-#~ msgstr " CDDB كاتب "
-
-#~ msgid "CDDB Category"
-#~ msgstr "CDDB تصنيف"
-
-#~ msgid "CDDB Year"
-#~ msgstr "CDDB سنة"
-
-#~ msgid "CDDB Title"
-#~ msgstr "CDDB عنوان"
-
-#~ msgid "ISO-9660 Preparer"
-#~ msgstr "مهيئ ISO-9660 "
-
-#~ msgid "ISO-9660 Publisher"
-#~ msgstr "ناشر ISO-9660"
-
-#~ msgid "ISO-9660 Volume"
-#~ msgstr "صوت ISO-9660 "
-
-#~ msgid "ISO-9660 Volume Set"
-#~ msgstr "حجم صوت Volume Set"
-
-#~ msgid "By category"
-#~ msgstr "حسب الصنف"
-
-#~ msgid "Manually added"
-#~ msgstr "اضافة يدويا"
-
-#~ msgid "All items, unsorted"
-#~ msgstr "كل المواد غير مصنفة"
-
-#~ msgid "Sorted by Album"
-#~ msgstr "ترتيب حسب الألبوم"
 
 #~ msgid "Adjust Image"
 #~ msgstr "تعديل الصورة"

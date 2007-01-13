@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2006-10-22 20:42+0000\n"
 "Last-Translator: A. Decorte <klenje@adriacom.it>\n"
 "Language-Team: Friulian <fur@li.org>\n"
@@ -1127,7 +1127,7 @@ msgstr ""
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr ""
+msgstr "fur"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4405,7 +4405,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr ""
 
@@ -10895,9 +10895,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "Sielç la scurte di doprâ par passâ ae modalitât a dut il visôr"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 msgid "Remember wizard options"
@@ -17892,6 +17891,105 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "CDDB Artist"
+#~ msgstr "Artist CDDB"
+
+#~ msgid "CDDB Category"
+#~ msgstr "Categorie CDDB"
+
+#~ msgid "CDDB Disc ID"
+#~ msgstr "ID disc CDDB"
+
+#~ msgid "CDDB Genre"
+#~ msgstr "Gjenar CDDB"
+
+#~ msgid "CDDB Year"
+#~ msgstr "An CDDB"
+
+#~ msgid "CDDB Title"
+#~ msgstr "Titul CDDB"
+
+#~ msgid "CD-Text Composer"
+#~ msgstr "Compositôr CD-Text"
+
+#~ msgid "CD-Text Disc ID"
+#~ msgstr "ID disc CD-Text"
+
+#~ msgid "CD-Text Genre"
+#~ msgstr "Gjenar CD-Text"
+
+#~ msgid "CD-Text Message"
+#~ msgstr "Messaç CD-Text"
+
+#~ msgid "CD-Text Songwriter"
+#~ msgstr "Autôr dai tescj CD-Text"
+
+#~ msgid "CD-Text Performer"
+#~ msgstr "Esecutôr CD-Text"
+
+#~ msgid "CD-Text Title"
+#~ msgstr "Titul CD-Text"
+
+#~ msgid "ISO-9660 Application ID"
+#~ msgstr "ID aplicazion ISO-9660"
+
+#~ msgid "ISO-9660 Preparer"
+#~ msgstr "Preparacôr ISO-9660"
+
+#~ msgid "ISO-9660 Publisher"
+#~ msgstr "Publicadôr ISO-9660"
+
+#~ msgid "Errors"
+#~ msgstr "Erôrs"
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "Siere"
+
+#~ msgid "Fixing AVI Index"
+#~ msgstr "Daûr a comedâ indis AVI"
+
+#~ msgid "Creating AVI Index ..."
+#~ msgstr "Daûr a creâ indis AVI"
+
+#, fuzzy
+#~ msgid "Mime type"
+#~ msgstr "MIME"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Vierç il barcon dai messaçs"
+
+#~ msgid "Do not display further errors"
+#~ msgstr "No sta mostrâ altris erôrs"
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "1 element inte liste di riproduzion"
+
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
+#~ msgid "Number of streams"
+#~ msgstr "Numar di flus"
+
+#~ msgid "All files"
+#~ msgstr "Ducj i files"
+
+#~ msgid "Add file"
+#~ msgstr "Zonte un file"
+
+#~ msgid "Open a File"
+#~ msgstr "Vierç un file"
+
+#~ msgid "Open file..."
+#~ msgstr "Vierç un file..."
+
+#~ msgid "Open disc..."
+#~ msgstr "Vierç un disc..."
+
+#~ msgid "Network stream..."
+#~ msgstr "Flus di rêt..."
+
 #, fuzzy
 #~ msgid "Disc Type"
 #~ msgstr "Tip"
@@ -17952,83 +18050,6 @@ msgstr ""
 #~ msgid "Create"
 #~ msgstr "Frecuence fotograms"
 
-#~ msgid "Errors"
-#~ msgstr "Erôrs"
-
 #, fuzzy
 #~ msgid "Stream information"
 #~ msgstr "Altris informazions"
-
-#~ msgid "CDDB Artist"
-#~ msgstr "Artist CDDB"
-
-#~ msgid "CDDB Category"
-#~ msgstr "Categorie CDDB"
-
-#~ msgid "CDDB Disc ID"
-#~ msgstr "ID disc CDDB"
-
-#~ msgid "CDDB Genre"
-#~ msgstr "Gjenar CDDB"
-
-#~ msgid "CDDB Year"
-#~ msgstr "An CDDB"
-
-#~ msgid "CDDB Title"
-#~ msgstr "Titul CDDB"
-
-#~ msgid "CD-Text Composer"
-#~ msgstr "Compositôr CD-Text"
-
-#~ msgid "CD-Text Disc ID"
-#~ msgstr "ID disc CD-Text"
-
-#~ msgid "CD-Text Genre"
-#~ msgstr "Gjenar CD-Text"
-
-#~ msgid "CD-Text Message"
-#~ msgstr "Messaç CD-Text"
-
-#~ msgid "CD-Text Songwriter"
-#~ msgstr "Autôr dai tescj CD-Text"
-
-#~ msgid "CD-Text Performer"
-#~ msgstr "Esecutôr CD-Text"
-
-#~ msgid "CD-Text Title"
-#~ msgstr "Titul CD-Text"
-
-#~ msgid "ISO-9660 Application ID"
-#~ msgstr "ID aplicazion ISO-9660"
-
-#~ msgid "ISO-9660 Preparer"
-#~ msgstr "Preparacôr ISO-9660"
-
-#~ msgid "ISO-9660 Publisher"
-#~ msgstr "Publicadôr ISO-9660"
-
-#, fuzzy
-#~ msgid "Console"
-#~ msgstr "Siere"
-
-#~ msgid "Creating AVI Index ..."
-#~ msgstr "Daûr a creâ indis AVI"
-
-#, fuzzy
-#~ msgid "Mime type"
-#~ msgstr "MIME"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "Vierç il barcon dai messaçs"
-
-#~ msgid "MSN"
-#~ msgstr "MSN"
-
-#~ msgid "Open file..."
-#~ msgstr "Vierç un file..."
-
-#~ msgid "Open disc..."
-#~ msgstr "Vierç un disc..."
-
-#~ msgid "Network stream..."
-#~ msgstr "Flus di rêt..."

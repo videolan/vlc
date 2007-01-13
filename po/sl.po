@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
-"PO-Revision-Date: 2006-11-14 14:19+0100\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
+"PO-Revision-Date: 2006-11-15 12:46+0100\n"
 "Last-Translator: Matej Urbančič <matej.urban@gmail.com>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1184,7 +1184,7 @@ msgstr "Gibi miške"
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr "C"
+msgstr "sl"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -3902,8 +3902,9 @@ msgid "Dump"
 msgstr "Izmet"
 
 #: src/libvlc-module.c:1174
+#, fuzzy
 msgid "Media dump access filter trigger."
-msgstr ""
+msgstr "Filter snemanja začetek/zaustavitev."
 
 #: src/libvlc-module.c:1176 src/libvlc-module.c:1177
 #: src/video_output/vout_intf.c:216
@@ -4754,7 +4755,7 @@ msgstr "džangščina"
 msgid "Zulu"
 msgstr "zulujščina"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Neznano"
 
@@ -5953,23 +5954,24 @@ msgid "VLC could not open file \"%s\" (%s)."
 msgstr "Datoteke \"%s\" (%s) ni mogoče odpreti."
 
 #: modules/access_filter/dump.c:39
-#, fuzzy
 msgid "Force use of dump module"
-msgstr "Uporaba enote časovnega zamika"
+msgstr "Zahteva uporabe enote izmeta"
 
 #: modules/access_filter/dump.c:40
 msgid "Activate the dump module even for media with fast seeking."
-msgstr ""
+msgstr "Zagon enote izmeta tudi za medije s hitrim iskanjem."
 
 #: modules/access_filter/dump.c:43
 msgid "Maximum size of temporary file (Mb)"
-msgstr ""
+msgstr "Največja velikost začesne datoteke (MB)"
 
 #: modules/access_filter/dump.c:44
 msgid ""
 "The dump module will abort dumping of the media if more than this much "
 "megabyte were performed."
 msgstr ""
+"Enota izmeta bo prekinila izmetanjanje, če izvaja več kot je določena "
+"potreba v MB."
 
 #: modules/access_filter/record.c:45
 msgid "Record directory"
@@ -6894,12 +6896,11 @@ msgstr "[vcd:][naprava][@[naslov][,[poglavje]]]"
 
 #: modules/access/vcdx/access.c:105
 msgid "The above message had unknown log level"
-msgstr "Zgornje sporočilo je imelo neznano stopnjo beleženja dnevnika."
+msgstr "Zgornje sporočilo je imelo neznano izravnavo beleženja."
 
 #: modules/access/vcdx/access.c:131
 msgid "The above message had unknown vcdimager log level"
-msgstr ""
-"Zgornje sporočilo je imelo neznano vcdimager stopnjo beleženja dnevnika."
+msgstr "Zgornje sporočilo je imelo neznano vcdimager izravnavo beleženja."
 
 #: modules/access/vcdx/access.c:281 modules/access/vcdx/access.c:364
 #: modules/access/vcdx/access.c:690 modules/access/vcdx/info.c:290
@@ -9254,7 +9255,7 @@ msgstr ""
 
 #: modules/codec/x264.c:243
 msgid "Chroma in motion estimation"
-msgstr "Barve v predvidevanju gibanja"
+msgstr "Barve med predvidevanju gibanja"
 
 #: modules/codec/x264.c:244
 msgid "Chroma ME for subpel and mode decision in P-frames."
@@ -10875,9 +10876,8 @@ msgid "visual impaired commentary"
 msgstr "vidno omejeni"
 
 #: modules/demux/tta.c:40
-#, fuzzy
 msgid "TTA demuxer"
-msgstr "AU razvijalec"
+msgstr "TTA razvijalec"
 
 #: modules/demux/ty.c:70
 msgid "TY Stream audio/video demux"
@@ -11506,7 +11506,7 @@ msgstr "Predvajalnik VLC"
 
 #: modules/gui/macosx/intf.m:508
 msgid "Open CrashLog"
-msgstr "Odpri dnevnik napak"
+msgstr "Odpri beležko napak"
 
 #: modules/gui/macosx/intf.m:513
 msgid "Check for Update..."
@@ -11662,7 +11662,7 @@ msgstr "Glasnost: %d%%"
 
 #: modules/gui/macosx/intf.m:1857
 msgid "No CrashLog found"
-msgstr "Ne najdem dnevnika napak."
+msgstr "Ne najdem beležke napak."
 
 #: modules/gui/macosx/intf.m:1857
 msgid "Couldn't find any trace of a previous crash."
@@ -11735,9 +11735,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "Zaslon za celozaslonski način."
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 msgid "Remember wizard options"
@@ -15519,14 +15518,14 @@ msgstr "Besedilo"
 
 #: modules/misc/logger.c:119
 msgid "Log format"
-msgstr "Format dnevnika"
+msgstr "Format beleženja"
 
 #: modules/misc/logger.c:121
 msgid ""
 "Specify the log format. Available choices are \"text\" (default), \"html\", "
 "and \"syslog\" (special mode to send to syslog instead of file."
 msgstr ""
-"Določitev formata dnevnika. Možnosti so \"besedilo\" (privzeto), \"html\", "
+"Določitev formata beleženja. Možnosti so \"besedilo\" (privzeto), \"html\", "
 "in \"syslog\"."
 
 #: modules/misc/logger.c:125
@@ -15534,8 +15533,7 @@ msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html"
 "\"."
 msgstr ""
-"Določitev formata beleženja dnevnika. Možnosti so \"besedilo\" (privzeto), "
-"\"html\"."
+"Določitev formata beleženja. Možnosti so \"besedilo\" (privzeto), \"html\"."
 
 #: modules/misc/logger.c:130
 msgid "Logging"
@@ -15547,11 +15545,11 @@ msgstr "Beleženje datotek"
 
 #: modules/misc/logger.c:137
 msgid "Log filename"
-msgstr "Ime dnevniške datoteke"
+msgstr "Ime datoteke za beleženje"
 
 #: modules/misc/logger.c:137
 msgid "Specify the log filename."
-msgstr "Določitev dnevniške datoteke."
+msgstr "Določitev datoteke za beleženje."
 
 #: modules/misc/logger.c:142
 msgid "RRD output file"
@@ -19219,17 +19217,126 @@ msgstr "Filter vizualizacije"
 msgid "Spectrum analyser"
 msgstr "Spektralna analiza"
 
-#~ msgid "Description file"
-#~ msgstr "Datoteka opisov"
+#~ msgid "Video filters settings"
+#~ msgstr "Nastavitve slikovnih filtrov"
 
-#~ msgid "A file containing a simple playlist"
-#~ msgstr "Datoteka, ki vsebuje enostavni zapis predvajalne liste"
+#~ msgid "CDDB Artist"
+#~ msgstr "CDDB igralec"
 
-#~ msgid "History parameter"
-#~ msgstr "Parameter zgodovine"
+#~ msgid "CDDB Category"
+#~ msgstr "CDDB kategorija"
 
-#~ msgid "The umber of frames used for detection."
-#~ msgstr "Število sličic za zaznavanje."
+#~ msgid "CDDB Disc ID"
+#~ msgstr "CDDB disk ID"
+
+#~ msgid "CDDB Extended Data"
+#~ msgstr "CDDB razširjeno"
+
+#~ msgid "CDDB Genre"
+#~ msgstr "CDDB žanr"
+
+#~ msgid "CDDB Year"
+#~ msgstr "CDDB leto"
+
+#~ msgid "CDDB Title"
+#~ msgstr "CDDB naslov"
+
+#~ msgid "CD-Text Arranger"
+#~ msgstr "CD-tekst aranžer"
+
+#~ msgid "CD-Text Composer"
+#~ msgstr "CD-tekst skladatelj"
+
+#~ msgid "CD-Text Disc ID"
+#~ msgstr "CD-teks disk ID"
+
+#~ msgid "CD-Text Genre"
+#~ msgstr "CD-tekst žanr"
+
+#~ msgid "CD-Text Message"
+#~ msgstr "CD-tekst sporočilo"
+
+#~ msgid "CD-Text Songwriter"
+#~ msgstr "CD-Tekst Pisec pesmi"
+
+#~ msgid "CD-Text Performer"
+#~ msgstr "CD-Tekst predvajanje"
+
+#~ msgid "CD-Text Title"
+#~ msgstr "CD-tekst naslov"
+
+#~ msgid "ISO-9660 Application ID"
+#~ msgstr "ISO-9660 ID aplikacija"
+
+#~ msgid "ISO-9660 Preparer"
+#~ msgstr "ISO-9660 Pripravljalec"
+
+#~ msgid "ISO-9660 Publisher"
+#~ msgstr "ISO-9660 Izdajatelj"
+
+#~ msgid "ISO-9660 Volume"
+#~ msgstr "ISO-9660 jakost"
+
+#~ msgid "ISO-9660 Volume Set"
+#~ msgstr "ISO-9660 Nabor jakosti"
+
+#~ msgid "Errors"
+#~ msgstr "Napake"
+
+#~ msgid "Login"
+#~ msgstr "Prijava"
+
+#~ msgid "Console"
+#~ msgstr "Konzola"
+
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "Vmesnik IPv6 skupinskega pošiljanja odvoda"
+
+#~ msgid "Default IPv6 multicast interface. This overrides the routing table."
+#~ msgstr ""
+#~ "Privzeti IPv6 vmesnik skupinskega pošiljanja. Nastavitev prepiše "
+#~ "usmerjevalno tabelo."
+
+#~ msgid "By category"
+#~ msgstr "Po kategoriji"
+
+#~ msgid "Manually added"
+#~ msgstr "Dodano ročno"
+
+#~ msgid "All items, unsorted"
+#~ msgstr "Vsi predmeti, nesortirano"
+
+#~ msgid ""
+#~ "Select the video input source, such as composite, s-video, or tuner. "
+#~ "Since these settings are hardware-specfic, you should find good settings "
+#~ "in the \"Device config\" area, and use those numbers here. -1 means that "
+#~ "settings will not be changed."
+#~ msgstr ""
+#~ "Izberite dovodni slikovni vir, kot na primer s-video ali uglaševanje. Ker "
+#~ "so nastavitve odvisne od stroje opreme, morate pravilno določiti "
+#~ "vrednosti \"Nastavitve naprav\" in uporabiti tiste vrednosti tu. Vrednost "
+#~ "(-1) predstavlja privzete vrednosti."
+
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr ""
+#~ "Velikost začasnih datotek, ki bodo shranjevale pretoke s časovnim zamikom."
+
+#~ msgid "Name to give to this stream/channel on the icecast server."
+#~ msgstr "Ime, ki določa pretok/kanal na icecast strežniku."
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the icecast server."
+#~ msgstr ""
+#~ "Privzeto morate polniti shoutcast element z OGG pretokom. Možno je "
+#~ "uporabiti MP3 za dostavljanje pretoka s prenašanjem MP3 datotek na "
+#~ "icecast strežnik."
+
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "Čas ohranjevanja za odhodni pretok."
 
 #~ msgid "Audio filter for fixed32<->float32 conversion"
 #~ msgstr "Zvočni filter za fixed32<->float32 pretvarjanje"
@@ -19266,6 +19373,267 @@ msgstr "Spektralna analiza"
 
 #~ msgid "Audio filter for u8->float32 conversion"
 #~ msgstr "Zvočni filter za u8->float32 pretvarjanje"
+
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Linux OSS odvod zvoka"
+
+#~ msgid "Corba control"
+#~ msgstr "Corba nadzor"
+
+#~ msgid "Reactivity"
+#~ msgstr "Reaktivnost"
+
+#~ msgid ""
+#~ "The corba interface will handle events every 50ms/Reactivity. 5000 "
+#~ "appears to be a sensible value."
+#~ msgstr ""
+#~ "Corba vmesnik bo preveril dogodke vsakih 50ms/reaktivnost. Vrednost 5000 "
+#~ "je videti smiselna."
+
+#~ msgid "corba control module"
+#~ msgstr "Enota corba nadzora"
+
+#~ msgid "| time-format STRING . . . overlay STRING in video"
+#~ msgstr "| time-marquee NIZ  . . NIZ prekrivanja oznak"
+
+#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
+#~ msgstr "| time-x X . . . . . . . . . . . .odmik z leve"
+
+#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
+#~ msgstr "| time-y Y . . . . . . . . . . . . odmik z vrha"
+
+#~ msgid "| time-position #. . . . . . . . relative position"
+#~ msgstr "| time-position #. . . . . . . . relativni položaj"
+
+#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
+#~ msgstr "| time-color # . . . . . . . . . . barva pisave v RGB"
+
+#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
+#~ msgstr "| time-opacity # . . . . . . . . . . . . . motnost"
+
+#~ msgid "| time-size # . . . . . . . . font size, in pixels"
+#~ msgstr "| time-size # . . . . . . . .velikost pisave v točkah"
+
+#~ msgid "Fixing AVI Index"
+#~ msgstr "Popravljam AVI indeks"
+
+#~ msgid "Creating AVI Index ..."
+#~ msgstr "Ustvarjam AVI indeks ..."
+
+#~ msgid "Playlist metademux"
+#~ msgstr "Metarazvijanje predvajalne liste"
+
+#~ msgid "Segment filename"
+#~ msgstr "Ime delne datoteke"
+
+#~ msgid "Muxing application"
+#~ msgstr "Program za zvijanje"
+
+#~ msgid "Writing application"
+#~ msgstr "Program za pisanje"
+
+#~ msgid "Listeners"
+#~ msgstr "Poslušalci"
+
+#~ msgid "Native playlist import"
+#~ msgstr "Uvoz osnovne liste"
+
+#~ msgid "Podcast Link"
+#~ msgstr "Podcast povezava"
+
+#~ msgid "Podcast Copyright"
+#~ msgstr "Podcast avtorske pravice"
+
+#~ msgid "Podcast Category"
+#~ msgstr "Podcast kategorija"
+
+#~ msgid "Podcast Keywords"
+#~ msgstr "Podcast ključne besede"
+
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Podcast podnapisi"
+
+#~ msgid "Podcast Publication Date"
+#~ msgstr "Podcast datum objave"
+
+#~ msgid "Podcast Author"
+#~ msgstr "Podcast avtor"
+
+#~ msgid "Podcast Subcategory"
+#~ msgstr "Podcast podkategorije"
+
+#~ msgid "Podcast Duration"
+#~ msgstr "Podcast trajanje"
+
+#~ msgid "Podcast Type"
+#~ msgstr "Podcast tip"
+
+#~ msgid "Mime type"
+#~ msgstr "Mime tip"
+
+#~ msgid ""
+#~ "This panel allows to select video effects filters to apply.\n"
+#~ "The filters can be configured indivudually in the Preferences, in the "
+#~ "subsections of Video/Filters\n"
+#~ ".To choose the order in which the filter are applied, a filter option "
+#~ "string can be set in the Preferences, Video / Filters section."
+#~ msgstr ""
+#~ "V oknu lahko izberete slikovne učinke.\n"
+#~ "Filtre lahko nastavite posamič med nastavitvami Slika/Filtri.\n"
+#~ "Izbor vrstnega reda izvajanja filtrov lahko prav tako določite med "
+#~ "nastavitvami."
+
+#~ msgid "Yes"
+#~ msgstr "Da"
+
+#~ msgid "No"
+#~ msgstr "Ne"
+
+#~ msgid ""
+#~ "An error has occurred which probably prevented the proper execution of "
+#~ "the program:"
+#~ msgstr "Prišlo je do napake, ki je preprečila pravilen zagon programa:"
+
+#~ msgid "If you believe that it is a bug, please follow the instructions at:"
+#~ msgstr ""
+#~ "Če verjamete, da ste naleteli na programskega hrošča, sledite navodilom "
+#~ "na:"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Odpri okno sporočil"
+
+#~ msgid "Dismiss"
+#~ msgstr "Razveljavi"
+
+#~ msgid "Do not display further errors"
+#~ msgstr "Ne prikaži nadaljnjih napak"
+
+#~ msgid "Crop borders in fullscreen"
+#~ msgstr "Obrezovanje robov v celozaslonskem načinu."
+
+#~ msgid ""
+#~ "In fullscreen mode, crop the picture if necessary in order to fill the "
+#~ "screen without black borders (OpenGL only)."
+#~ msgstr ""
+#~ "V celozaslonskem načinu, po potrebi obreži sliko za prikaz slike brez "
+#~ "črnega robu. (Samo OpenGL)"
+
+#, fuzzy
+#~ msgid "Enable skinned playlist"
+#~ msgstr "Ne najdem predvajalne liste"
+
+#~ msgid "%i items in playlist (%i not shown)"
+#~ msgstr "%i predmetov na predvajalni listi (%i ni prikazanih)"
+
+#~ msgid "M3U file"
+#~ msgstr "M3U datoteka"
+
+#~ msgid "Sorted by Artist"
+#~ msgstr "Sortiraj po izvajalcu"
+
+#~ msgid "Sorted by Album"
+#~ msgstr "Sortiraj po albumu"
+
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "UDP/IPv4 omrežni odvzem"
+
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "UDP/IPv6 omrežni odvzem"
+
+#~ msgid "Playlist stress tests"
+#~ msgstr "Testi pritiskov predvajalne liste"
+
+#~ msgid "DAAP shares"
+#~ msgstr "DAAP skupna raba"
+
+#~ msgid "DAAP access"
+#~ msgstr "DAAP dostop"
+
+#~ msgid "Session Announcements (SAP)"
+#~ msgstr "Objave seje SAP"
+
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr "Možnost dovoljuje določitev čas ohranjevanja za odvodni pretok."
+
+#~ msgid "Automatic black border cropping."
+#~ msgstr "Samodejno obrezovanje črnega robu."
+
+#~ msgid ""
+#~ "Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough"
+#~ "\" and \"psychedelic\"."
+#~ msgstr ""
+#~ "Način popačenja \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough\" "
+#~ "in \"psychedelic\"."
+
+#~ msgid "Distort video filter"
+#~ msgstr "Filtri popačenja slike"
+
+#~ msgid "Number of loops for the logo animation.1 = continuous, 0 = disabled"
+#~ msgstr ""
+#~ "Število kroženj pri animiranju logotipa.  Vrednosti 1 je neprestano "
+#~ "kroženje, 0 je onemogočeno."
+
+#~ msgid "Marquee text to display."
+#~ msgstr "Prikaz oznak besedila"
+
+#~ msgid ""
+#~ "Positioning method for the mosaic. auto: automatically choose the best "
+#~ "number of rows and columns. fixed: use the user-defined number of rows "
+#~ "and columns."
+#~ msgstr ""
+#~ "Metoda postavitve za mozaik. Samodejno: samodejno izberi najprimernejšo "
+#~ "vrednost stolpcev in vrstic. določeno: uporabi uporabniško nastavitev "
+#~ "stolpcev in vrstic."
+
+#~ msgid "Description file"
+#~ msgstr "Datoteka opisov"
+
+#~ msgid "A file containing a simple playlist"
+#~ msgstr "Datoteka, ki vsebuje enostavni zapis predvajalne liste"
+
+#~ msgid "History parameter"
+#~ msgstr "Parameter zgodovine"
+
+#~ msgid "The umber of frames used for detection."
+#~ msgstr "Število sličic za zaznavanje."
+
+#~ msgid "Motion detect"
+#~ msgstr "Zaznavanje gibanja"
+
+#~ msgid "Time format string (%Y%m%d %H%M%S)"
+#~ msgstr "Oblika izpisa časa (%d%m%Y %H%M%S)"
+
+#~ msgid ""
+#~ "Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = "
+#~ "minute, %S = second)."
+#~ msgstr ""
+#~ "Oblika izpisa časa (%d = dan, %m = mesec, %Y = leto, %H = ure, %M = "
+#~ "minute, %S = sekunde)."
+
+#~ msgid "X offset, from the left screen edge"
+#~ msgstr "Odmik X z levega roba zaslona."
+
+#~ msgid "Y offset, down from the top"
+#~ msgstr "Odmik Y z zgornjega roba zaslona."
+
+#~ msgid ""
+#~ "You can enforce the text position on the video (0=center, 1=left, "
+#~ "2=right, 4=top, 8=bottom, you can also use combinations of these values, "
+#~ "e.g. 6 = top-right)."
+#~ msgstr ""
+#~ "Določite lahko položaj besedila na sliki (0=sredinsko, 1=levo, 2=desno, "
+#~ "4=zhoraj, 8=spodaj). Vrednosti lahko tudi seštevate: primer 6 =zgoraj "
+#~ "desno)."
+
+#~ msgid "Time overlay"
+#~ msgstr "Časovno prekrivanje"
+
+#~ msgid "Time display sub filter"
+#~ msgstr "Filter zaslonskega časa"
+
+#, fuzzy
+#~ msgid "Standard Play"
+#~ msgstr "Standardna"
 
 #~ msgid "Disc Type"
 #~ msgstr "Tip diska"
@@ -19311,12 +19679,6 @@ msgstr "Spektralna analiza"
 
 #~ msgid "Download everything ASAP"
 #~ msgstr "Takojšnji prenos"
-
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "UDP/IPv4 omrežni odvzem"
-
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "UDP/IPv6 omrežni odvzem"
 
 #, fuzzy
 #~ msgid "text"
@@ -19384,12 +19746,3 @@ msgstr "Spektralna analiza"
 #, fuzzy
 #~ msgid "Create"
 #~ msgstr "Sredinsko"
-
-#~ msgid "Playlist stress tests"
-#~ msgstr "Testi pritiskov predvajalne liste"
-
-#~ msgid "DAAP shares"
-#~ msgstr "DAAP skupna raba"
-
-#~ msgid "DAAP access"
-#~ msgstr "DAAP dostop"

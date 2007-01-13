@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2006-08-29 20:10+0700\n"
 "Last-Translator: Vladimir Yermolayev <init@siptelecom.ru>\n"
 "Language-Team: Russian\n"
@@ -4789,7 +4789,7 @@ msgstr "Чжуань"
 msgid "Zulu"
 msgstr "Зулусский"
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -11780,9 +11780,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "Экран для полноэкранного режима."
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 msgid "Remember wizard options"
@@ -19305,159 +19304,6 @@ msgstr "Фильтр визуализатора"
 msgid "Spectrum analyser"
 msgstr "Анализатор спектра"
 
-#~ msgid "Description file"
-#~ msgstr "Файл описания"
-
-#~ msgid "A file containing a simple playlist"
-#~ msgstr "Файл с простым плейлистом"
-
-#~ msgid "History parameter"
-#~ msgstr "История кадров"
-
-#~ msgid "The umber of frames used for detection."
-#~ msgstr "Количество кадров, используемое для определения движения."
-
-#~ msgid "Audio filter for fixed32<->float32 conversion"
-#~ msgstr "Аудио фильтр для преобразования fixed32<->float32"
-
-#~ msgid "Audio filter for fixed32->s16 conversion"
-#~ msgstr "Аудио фильтр для преобразования fixed32->s16"
-
-#~ msgid "Audio filter for float32->s16 conversion"
-#~ msgstr "Аудио фильтр для преобразования float32->s16"
-
-#~ msgid "Audio filter for float32->s8 conversion"
-#~ msgstr "Аудио фильтр для преобразования float32->s8"
-
-#~ msgid "Audio filter for float32->u16 conversion"
-#~ msgstr "Аудио фильтр для преобразования float32->u168"
-
-#~ msgid "Audio filter for float32->u8 conversion"
-#~ msgstr "Аудио фильтр для преобразования float32->u8"
-
-#~ msgid "Audio filter for s16->fixed32 conversion"
-#~ msgstr "Аудио фильтр для преобразования s16->fixed32"
-
-#~ msgid "Audio filter for s16->float32 conversion"
-#~ msgstr "Аудио фильтр для преобразования s16->float32"
-
-#~ msgid "Audio filter for s16->float32 with endianness conversion"
-#~ msgstr "Аудио фильтр для преобразования s16->float32 с учетом порядка байт"
-
-#~ msgid "Audio filter for s8->float32 conversion"
-#~ msgstr "Аудио фильтр для преобразования s8->float32"
-
-#~ msgid "Audio filter for u8->fixed32 conversion"
-#~ msgstr "Аудио фильтр для преобразования u8->fixed32"
-
-#~ msgid "Audio filter for u8->float32 conversion"
-#~ msgstr "Аудио фильтр для преобразования u8->float32"
-
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "Тип диска"
-
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "Обзор..."
-
-#, fuzzy
-#~ msgid "Big"
-#~ msgstr "Мост"
-
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "Выравнивание данных"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Аудио фильтры"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "Медитация"
-
-#, fuzzy
-#~ msgid "Download when asked"
-#~ msgstr "Скачать сейчас"
-
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "Слой абстракции UDP/IPv4"
-
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "Слой абстракции UDP/IPv6"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "Следующий"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "Ширина"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "Спектрометр"
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr "Амхарский"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "Кэширование"
-
-#, fuzzy
-#~ msgid "QPushButton"
-#~ msgstr "Пушту"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Linear"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "Обвести"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Больше информации"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "Группа"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "включить"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "включить"
-
-#, fuzzy
-#~ msgid "horizontalLayout_3"
-#~ msgstr "Повернуть по-горизонтали"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Диск"
-
-#~ msgid "Create"
-#~ msgstr "Создать"
-
-#~ msgid "Playlist stress tests"
-#~ msgstr "Стресс-тест плейлиста"
-
-#~ msgid "DAAP shares"
-#~ msgstr "Общие ресурсы DAAP"
-
-#~ msgid "DAAP access"
-#~ msgstr "Доступ к DAAP"
-
-#~ msgid " to "
-#~ msgstr " в "
-
 #~ msgid "Video filters settings"
 #~ msgstr "Настройки видео фильтров"
 
@@ -19524,9 +19370,20 @@ msgstr "Анализатор спектра"
 #~ msgid "Errors"
 #~ msgstr "Ошибки"
 
+#~ msgid "Login"
+#~ msgstr "Имя пользователя"
+
 #, fuzzy
 #~ msgid "Console"
 #~ msgstr "Открыть окно списка для воспроизведения"
+
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "Интерфейс вывода IPv6 multicast"
+
+#~ msgid "Default IPv6 multicast interface. This overrides the routing table."
+#~ msgstr ""
+#~ "Интерфейс IPv6 multicast по-умолчанию. Значение подменяет указанное в "
+#~ "таблице роутинга ОС."
 
 #~ msgid "By category"
 #~ msgstr "По категории"
@@ -19537,8 +19394,77 @@ msgstr "Анализатор спектра"
 #~ msgid "All items, unsorted"
 #~ msgstr "Все элементы, без сортировки"
 
+#~ msgid ""
+#~ "Select the video input source, such as composite, s-video, or tuner. "
+#~ "Since these settings are hardware-specfic, you should find good settings "
+#~ "in the \"Device config\" area, and use those numbers here. -1 means that "
+#~ "settings will not be changed."
+#~ msgstr ""
+#~ "Выберите источник видео потока (композитный вход, s-video или тюнер).Так "
+#~ "как эти настройки отличаются для каждого устройства, вам необходимо найти "
+#~ "их в разделе \"Настройка устройства\" и использовать полученные там "
+#~ "цифры. -1 означает, что настройки останутся прежние."
+
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr ""
+#~ "Размер временных файлов, которые будут содержать сдвинутые по времени "
+#~ "потоки."
+
+#~ msgid "Name to give to this stream/channel on the icecast server."
+#~ msgstr "Имя потока или канала на сервере icecast."
+
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the icecast server."
+#~ msgstr ""
+#~ "Обычно вы должны передавать модулю shoutcast потоки Ogg. Но также "
+#~ "возможно вместо этого вещать MP3, так что вы можете передавать потоки MP3 "
+#~ "на сервер icecast."
+
 #~ msgid "Time-To-Live of the outgoing stream."
 #~ msgstr "\"Время жизни\" (TTL) исходящего потока."
+
+#~ msgid "Audio filter for fixed32<->float32 conversion"
+#~ msgstr "Аудио фильтр для преобразования fixed32<->float32"
+
+#~ msgid "Audio filter for fixed32->s16 conversion"
+#~ msgstr "Аудио фильтр для преобразования fixed32->s16"
+
+#~ msgid "Audio filter for float32->s16 conversion"
+#~ msgstr "Аудио фильтр для преобразования float32->s16"
+
+#~ msgid "Audio filter for float32->s8 conversion"
+#~ msgstr "Аудио фильтр для преобразования float32->s8"
+
+#~ msgid "Audio filter for float32->u16 conversion"
+#~ msgstr "Аудио фильтр для преобразования float32->u168"
+
+#~ msgid "Audio filter for float32->u8 conversion"
+#~ msgstr "Аудио фильтр для преобразования float32->u8"
+
+#~ msgid "Audio filter for s16->fixed32 conversion"
+#~ msgstr "Аудио фильтр для преобразования s16->fixed32"
+
+#~ msgid "Audio filter for s16->float32 conversion"
+#~ msgstr "Аудио фильтр для преобразования s16->float32"
+
+#~ msgid "Audio filter for s16->float32 with endianness conversion"
+#~ msgstr "Аудио фильтр для преобразования s16->float32 с учетом порядка байт"
+
+#~ msgid "Audio filter for s8->float32 conversion"
+#~ msgstr "Аудио фильтр для преобразования s8->float32"
+
+#~ msgid "Audio filter for u8->fixed32 conversion"
+#~ msgstr "Аудио фильтр для преобразования u8->fixed32"
+
+#~ msgid "Audio filter for u8->float32 conversion"
+#~ msgstr "Аудио фильтр для преобразования u8->float32"
+
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Вывод звука через Linux OSS"
 
 #~ msgid "Corba control"
 #~ msgstr "Управление Corba"
@@ -19576,6 +19502,9 @@ msgstr "Анализатор спектра"
 
 #~ msgid "| time-size # . . . . . . . . font size, in pixels"
 #~ msgstr "| time-size # . . . . . . . . размер шрифта, в пикселях"
+
+#~ msgid "Fixing AVI Index"
+#~ msgstr "Исправление индекса AVI"
 
 #~ msgid "Creating AVI Index ..."
 #~ msgstr "Создавние индексов ..."
@@ -19631,6 +19560,18 @@ msgstr "Анализатор спектра"
 #~ msgid "Mime type"
 #~ msgstr "MIME тип"
 
+#~ msgid ""
+#~ "This panel allows to select video effects filters to apply.\n"
+#~ "The filters can be configured indivudually in the Preferences, in the "
+#~ "subsections of Video/Filters\n"
+#~ ".To choose the order in which the filter are applied, a filter option "
+#~ "string can be set in the Preferences, Video / Filters section."
+#~ msgstr ""
+#~ "Эта панель позволяет выбирать и применять видео-фильтры.\n"
+#~ "Фильтры могут быть настроены по-одному в Настройках, в разделе Видео/"
+#~ "Фильтры.Выбрать порядок применения фильтров можно также в Настройках, в "
+#~ "разделе Видео/Фильтры."
+
 #, fuzzy
 #~ msgid "Yes"
 #~ msgstr "Да"
@@ -19649,8 +19590,8 @@ msgstr "Анализатор спектра"
 #~ msgstr "Обрезать края в полноэкранном режиме"
 
 #, fuzzy
-#~ msgid "Standard Play"
-#~ msgstr "Стандартный"
+#~ msgid "Enable skinned playlist"
+#~ msgstr "Невозможно найти плейлист"
 
 #~ msgid "%i items in playlist (%i not shown)"
 #~ msgstr "%i элемент(ов) в плейлисте (скрыто %i)"
@@ -19664,14 +19605,69 @@ msgstr "Анализатор спектра"
 #~ msgid "Sorted by Album"
 #~ msgstr "Сортировка по альбому"
 
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "Слой абстракции UDP/IPv4"
+
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "Слой абстракции UDP/IPv6"
+
+#~ msgid "Playlist stress tests"
+#~ msgstr "Стресс-тест плейлиста"
+
+#~ msgid "DAAP shares"
+#~ msgstr "Общие ресурсы DAAP"
+
+#~ msgid "DAAP access"
+#~ msgstr "Доступ к DAAP"
+
 #~ msgid "Session Announcements (SAP)"
 #~ msgstr "Оповещения о сессиях (SAP)"
 
 #~ msgid "This allows you to specify the Time-To-Live for the output stream."
 #~ msgstr "Time-To-Live (время жизни) выходного потока."
 
+#~ msgid "Automatic black border cropping."
+#~ msgstr "Автоматичеси обрезать черные края."
+
+#~ msgid ""
+#~ "Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough"
+#~ "\" and \"psychedelic\"."
+#~ msgstr ""
+#~ "Режим шума, допустимые значения: \"волна\", \"рябь\", \"градиент\", "
+#~ "\"граница\", \"сухожилие\" и \"психоделия\""
+
+#~ msgid "Distort video filter"
+#~ msgstr "Видео фильтр расширения"
+
+#~ msgid "Number of loops for the logo animation.1 = continuous, 0 = disabled"
+#~ msgstr "Количество циклов анимации логотипа. 1 = постоянно, 0 = выключено"
+
 #~ msgid "Marquee text to display."
 #~ msgstr "Бегущая строка"
+
+#~ msgid ""
+#~ "Positioning method for the mosaic. auto: automatically choose the best "
+#~ "number of rows and columns. fixed: use the user-defined number of rows "
+#~ "and columns."
+#~ msgstr ""
+#~ "Метод позиционирования мозаики. автоматический: автоматически выбрать "
+#~ "наилучшее количество строк и столбцов. фиксированный: использовать "
+#~ "предустановленное количество строк и столбцов."
+
+#~ msgid "Description file"
+#~ msgstr "Файл описания"
+
+#~ msgid "A file containing a simple playlist"
+#~ msgstr "Файл с простым плейлистом"
+
+#~ msgid "History parameter"
+#~ msgstr "История кадров"
+
+#~ msgid "The umber of frames used for detection."
+#~ msgstr "Количество кадров, используемое для определения движения."
+
+#~ msgid "Motion detect"
+#~ msgstr "Детектор движения"
 
 #~ msgid "Time format string (%Y%m%d %H%M%S)"
 #~ msgstr "Формат времени (%Y%m%d %H%M%S)"
@@ -19704,6 +19700,10 @@ msgstr "Анализатор спектра"
 #~ msgid "Time display sub filter"
 #~ msgstr "Наложение времени"
 
+#, fuzzy
+#~ msgid "Standard Play"
+#~ msgstr "Стандартный"
+
 #~ msgid "Growl"
 #~ msgstr "Growl"
 
@@ -19720,6 +19720,12 @@ msgstr "Анализатор спектра"
 
 #~ msgid "Horizontal border width"
 #~ msgstr "Ширина горизонтальной границы"
+
+#~ msgid "Create"
+#~ msgstr "Создать"
+
+#~ msgid " to "
+#~ msgstr " в "
 
 #, fuzzy
 #~ msgid "Stream information"
@@ -20291,6 +20297,10 @@ msgstr "Анализатор спектра"
 #~ msgstr "Открыть окно списка для воспроизведения"
 
 #, fuzzy
+#~ msgid "All files"
+#~ msgstr "Следующий файл"
+
+#, fuzzy
 #~ msgid "Open disc..."
 #~ msgstr "Открыть файл..."
 
@@ -20625,6 +20635,10 @@ msgstr "Анализатор спектра"
 #~ msgstr "Открыть окно сообщений"
 
 #, fuzzy
+#~ msgid "Select audio channel"
+#~ msgstr "Следующий файл"
+
+#, fuzzy
 #~ msgid "Select subtitles channel"
 #~ msgstr "Следующий файл"
 
@@ -20694,6 +20708,10 @@ msgstr "Анализатор спектра"
 #, fuzzy
 #~ msgid "Destination Target: "
 #~ msgstr "Остановить поток "
+
+#, fuzzy
+#~ msgid "Close the window"
+#~ msgstr "Открыть окно списка для воспроизведения"
 
 #, fuzzy
 #~ msgid "Hide the main interface window"
@@ -20857,6 +20875,9 @@ msgstr "Анализатор спектра"
 
 #~ msgid "If your stream has video and you want to transcode it, enable this"
 #~ msgstr "Если ваш поток имеет видео, и Вы хотите transcode это, включите это"
+
+#~ msgid "Video Filters"
+#~ msgstr "Видео фильтры"
 
 #~ msgid "MPEG-1 Video codec"
 #~ msgstr "MPEG-1 видео кодек"
@@ -21042,6 +21063,10 @@ msgstr "Анализатор спектра"
 #~ "воспроизвести MPEG и MPEG-2 файлы из файла или с источника в сети."
 
 #, fuzzy
+#~ msgid "Welcome, streaming wizard"
+#~ msgstr "Остановить поток"
+
+#, fuzzy
 #~ msgid "Open a skin file."
 #~ msgstr "Открыть файл"
 
@@ -21115,6 +21140,9 @@ msgstr "Анализатор спектра"
 #~ msgid "Analyse mode"
 #~ msgstr "Следующий файл"
 
+#~ msgid "Save As..."
+#~ msgstr "Сохранить как..."
+
 #~ msgid "Open a file"
 #~ msgstr "Открыть файл"
 
@@ -21136,6 +21164,10 @@ msgstr "Анализатор спектра"
 #~ msgstr "Готово."
 
 #, fuzzy
+#~ msgid "Repeat"
+#~ msgstr "Следующий файл"
+
+#, fuzzy
 #~ msgid "New Group"
 #~ msgstr "Следующий файл"
 
@@ -21150,3 +21182,87 @@ msgstr "Анализатор спектра"
 #, fuzzy
 #~ msgid "Stream Output"
 #~ msgstr "Остановить поток"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "Тип диска"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "Обзор..."
+
+#, fuzzy
+#~ msgid "Big"
+#~ msgstr "Мост"
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "Выравнивание данных"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "Аудио фильтры"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "Медитация"
+
+#, fuzzy
+#~ msgid "Download when asked"
+#~ msgstr "Скачать сейчас"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "Следующий"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "Ширина"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "Спектрометр"
+
+#, fuzzy
+#~ msgid "margin"
+#~ msgstr "Амхарский"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "Кэширование"
+
+#, fuzzy
+#~ msgid "QPushButton"
+#~ msgstr "Пушту"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "Linear"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "Обвести"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "Больше информации"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "Группа"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "включить"
+
+#, fuzzy
+#~ msgid "checkable"
+#~ msgstr "включить"
+
+#, fuzzy
+#~ msgid "horizontalLayout_3"
+#~ msgstr "Повернуть по-горизонтали"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "Диск"

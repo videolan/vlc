@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2006-08-29 14:42+0000\n"
 "Last-Translator: Tor Egil Hoftun Kvæstad <toregilhk@hotmail.com>\n"
 "Language-Team: Norwegian Nynorsk <nn@li.org>\n"
@@ -1126,7 +1126,7 @@ msgstr ""
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr ""
+msgstr "nn"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4409,7 +4409,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr ""
 
@@ -17850,6 +17850,30 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "Video filters settings"
+#~ msgstr "Videfilterinnstillingar"
+
+#~ msgid "CDDB Artist"
+#~ msgstr "CDDB-artist"
+
+#~ msgid "CDDB Category"
+#~ msgstr "CDDB-kategori"
+
+#~ msgid "CDDB Extended Data"
+#~ msgstr "Utvida CDDB-data"
+
+#~ msgid "CDDB Genre"
+#~ msgstr "CDDB-sjanger"
+
+#~ msgid "CDDB Year"
+#~ msgstr "CDDB-år"
+
+#~ msgid "CDDB Title"
+#~ msgstr "CDDB-tittel"
+
+#~ msgid "Errors"
+#~ msgstr "Feil"
+
 #, fuzzy
 #~ msgid "Disc Type"
 #~ msgstr "Type"
@@ -17878,27 +17902,6 @@ msgstr ""
 #~ msgid "Create"
 #~ msgstr "Senter"
 
-#~ msgid "Errors"
-#~ msgstr "Feil"
-
 #, fuzzy
 #~ msgid "Stream information"
 #~ msgstr "Metainformasjon"
-
-#~ msgid "CDDB Artist"
-#~ msgstr "CDDB-artist"
-
-#~ msgid "CDDB Category"
-#~ msgstr "CDDB-kategori"
-
-#~ msgid "CDDB Extended Data"
-#~ msgstr "Utvida CDDB-data"
-
-#~ msgid "CDDB Genre"
-#~ msgstr "CDDB-sjanger"
-
-#~ msgid "CDDB Year"
-#~ msgstr "CDDB-år"
-
-#~ msgid "CDDB Title"
-#~ msgstr "CDDB-tittel"

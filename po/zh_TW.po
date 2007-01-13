@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-06 01:51+0000\n"
+"POT-Creation-Date: 2007-01-11 17:18+0100\n"
 "PO-Revision-Date: 2005-02-12 12:14+0100\n"
 "Last-Translator: Frank Chao <frank0624@gmail.com>\n"
 "Language-Team: zh_TW\n"
@@ -1154,7 +1154,7 @@ msgstr "類型"
 #: src/libvlc-common.c:278 src/libvlc-common.c:446 src/misc/modules.c:1670
 #: src/misc/modules.c:1993
 msgid "C"
-msgstr ""
+msgstr "zh_TW"
 
 #: src/libvlc-common.c:294
 msgid "Help options"
@@ -4534,7 +4534,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:979
+#: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
 msgstr "未知"
 
@@ -10182,8 +10182,9 @@ msgid "Shoutcast"
 msgstr ""
 
 #: modules/demux/ps.c:39
+#, fuzzy
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "時間"
 
 #: modules/demux/ps.c:40
 msgid ""
@@ -10349,7 +10350,7 @@ msgstr "MP4串流解多工器"
 #: modules/demux/ts.c:3148 modules/demux/ts.c:3182
 #, fuzzy
 msgid "clean effects"
-msgstr "選擇效果"
+msgstr "隨機效果"
 
 #: modules/demux/ts.c:3152 modules/demux/ts.c:3186
 msgid "hearing impaired"
@@ -11229,9 +11230,8 @@ msgid "Show Fullscreen controller"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:78
-#, fuzzy
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
-msgstr "選擇熱鍵以切換全螢幕狀態"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
 #, fuzzy
@@ -12915,7 +12915,6 @@ msgid "Next track"
 msgstr "下一軌"
 
 #: modules/gui/qt4/qt4.cpp:47
-#, fuzzy
 msgid "Qt interface"
 msgstr "Qt介面"
 
@@ -16448,7 +16447,7 @@ msgstr "目的字幕編碼器"
 #: modules/stream_out/transcode.c:154
 #, fuzzy
 msgid "This is the subtitles codec that will be used."
-msgstr "預設的DVD裝置"
+msgstr "預設的音樂CD裝置"
 
 #: modules/stream_out/transcode.c:158
 msgid ""
@@ -18540,148 +18539,53 @@ msgstr "視覺化過濾器"
 msgid "Spectrum analyser"
 msgstr "頻譜分析器"
 
-#~ msgid "History parameter"
-#~ msgstr "歷史參數"
+#~ msgid "Video filters settings"
+#~ msgstr "視訊濾波器設定"
 
-#, fuzzy
-#~ msgid "Disc Type"
-#~ msgstr "光碟類型"
+#~ msgid "CDDB Category"
+#~ msgstr "CDDB分類"
 
-#, fuzzy
-#~ msgid "Browse"
-#~ msgstr "瀏覽..."
+#~ msgid "CDDB Disc ID"
+#~ msgstr "CDDB光碟ID"
 
-#, fuzzy
-#~ msgid "Big"
-#~ msgstr "亮度"
+#~ msgid "CDDB Year"
+#~ msgstr "CDDB年份"
 
-#, fuzzy
-#~ msgid "Alignment"
-#~ msgstr "視訊對齊"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "音訊濾波器"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "檔案"
-
-#, fuzzy
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "IPv4網路抽象層"
-
-#, fuzzy
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "IPv6網路抽象層"
-
-#, fuzzy
-#~ msgid "text"
-#~ msgstr "下一項"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "寬度"
-
-#, fuzzy
-#~ msgid "geometry"
-#~ msgstr "頻譜"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "快取"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "時間"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "清除"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "更多資訊"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "群組"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "啟動"
-
-#, fuzzy
-#~ msgid "horizontalLayout_3"
-#~ msgstr "水平翻轉"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "光碟"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "置中"
-
-#~ msgid "DAAP access"
-#~ msgstr "DAAP存取"
-
-#, fuzzy
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "允許你指定該輸出串流的有效時間"
+#~ msgid "CDDB Title"
+#~ msgstr "CDDB標題"
 
 #, fuzzy
 #~ msgid "Errors"
 #~ msgstr "錯誤"
 
 #, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "更多資訊"
-
-#, fuzzy
-#~ msgid "This allows you to specify the Time-To-Live for the output stream."
-#~ msgstr "允許你指定該輸出串流的有效時間"
-
-#, fuzzy
-#~ msgid "Growl"
-#~ msgstr "群組"
-
-#, fuzzy
-#~ msgid "Vertical border width"
-#~ msgstr "垂直補償"
-
-#, fuzzy
-#~ msgid "Horizontal border width"
-#~ msgstr "水平"
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "音訊裝置名稱"
-
-#, fuzzy
-#~ msgid "Audioscrobbler password"
-#~ msgstr "SOCKS密碼"
-
-#~ msgid "Standard Play"
-#~ msgstr "標準播放"
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "設定..."
-
-#, fuzzy
-#~ msgid "Filters (v2)"
-#~ msgstr "濾波器"
-
-#~ msgid "Video filters settings"
-#~ msgstr "視訊濾波器設定"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "開啟訊息視窗"
-
-#, fuzzy
 #~ msgid "Login"
 #~ msgstr "循環"
+
+#, fuzzy
+#~ msgid "Console"
+#~ msgstr "控制"
+
+#, fuzzy
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "搖桿控制介面"
+
+#~ msgid "Manually added"
+#~ msgstr "手動增加"
+
+#~ msgid "All items, unsorted"
+#~ msgstr "所有項目(未排序)"
+
+#, fuzzy
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "允許你指定該輸出串流的有效時間"
+
+#~ msgid "Linux OSS audio output"
+#~ msgstr "Linux OSS音訊輸出"
+
+#, fuzzy
+#~ msgid "Listeners"
+#~ msgstr "濾波器"
 
 #, fuzzy
 #~ msgid "Podcast Link"
@@ -18712,20 +18616,80 @@ msgstr "頻譜分析器"
 #~ msgstr "編碼器描述"
 
 #, fuzzy
-#~ msgid "Dummy video filter"
-#~ msgstr "ffmpeg視訊過濾器"
-
-#, fuzzy
-#~ msgid "Dummy VF"
-#~ msgstr "虛擬"
-
-#, fuzzy
 #~ msgid "Mime type"
 #~ msgstr "光碟類型"
 
+#~ msgid "Open Messages Window"
+#~ msgstr "開啟訊息視窗"
+
 #, fuzzy
-#~ msgid "Listeners"
-#~ msgstr "濾波器"
+#~ msgid "Enable skinned playlist"
+#~ msgstr "喔喔!無法找到播放清單 !"
+
+#~ msgid "%i items in playlist (%i not shown)"
+#~ msgstr "%i個項目在播放清單中(%i未顯示)"
+
+#~ msgid "M3U file"
+#~ msgstr "M3U檔案"
+
+#, fuzzy
+#~ msgid "Sorted by Artist"
+#~ msgstr "依製作人排序"
+
+#, fuzzy
+#~ msgid "Sorted by Album"
+#~ msgstr "依名稱排序"
+
+#, fuzzy
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "IPv4網路抽象層"
+
+#, fuzzy
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "IPv6網路抽象層"
+
+#~ msgid "DAAP access"
+#~ msgstr "DAAP存取"
+
+#, fuzzy
+#~ msgid "This allows you to specify the Time-To-Live for the output stream."
+#~ msgstr "允許你指定該輸出串流的有效時間"
+
+#, fuzzy
+#~ msgid "Automatic black border cropping."
+#~ msgstr "自動修整"
+
+#~ msgid "History parameter"
+#~ msgstr "歷史參數"
+
+#~ msgid "Motion detect"
+#~ msgstr "動作偵測"
+
+#~ msgid "Standard Play"
+#~ msgstr "標準播放"
+
+#, fuzzy
+#~ msgid "Growl"
+#~ msgstr "群組"
+
+#, fuzzy
+#~ msgid "Vertical border width"
+#~ msgstr "垂直補償"
+
+#, fuzzy
+#~ msgid "Horizontal border width"
+#~ msgstr "水平"
+
+#, fuzzy
+#~ msgid "Create"
+#~ msgstr "置中"
+
+#, fuzzy
+#~ msgid "Number of streams"
+#~ msgstr "執行緒數量"
+
+#~ msgid "Image"
+#~ msgstr "影像"
 
 #, fuzzy
 #~ msgid "Center-Center"
@@ -18762,39 +18726,6 @@ msgstr "頻譜分析器"
 #, fuzzy
 #~ msgid "Right-Bottom"
 #~ msgstr "底部"
-
-#~ msgid "M3U file"
-#~ msgstr "M3U檔案"
-
-#~ msgid "CDDB Category"
-#~ msgstr "CDDB分類"
-
-#~ msgid "CDDB Disc ID"
-#~ msgstr "CDDB光碟ID"
-
-#~ msgid "CDDB Year"
-#~ msgstr "CDDB年份"
-
-#~ msgid "CDDB Title"
-#~ msgstr "CDDB標題"
-
-#~ msgid "All items, unsorted"
-#~ msgstr "所有項目(未排序)"
-
-#~ msgid "%i items in playlist (%i not shown)"
-#~ msgstr "%i個項目在播放清單中(%i未顯示)"
-
-#, fuzzy
-#~ msgid "Sorted by Artist"
-#~ msgstr "依製作人排序"
-
-#, fuzzy
-#~ msgid "Sorted by Album"
-#~ msgstr "依名稱排序"
-
-#, fuzzy
-#~ msgid "Number of streams"
-#~ msgstr "執行緒數量"
 
 #~ msgid "Adjust Image"
 #~ msgstr "調整影像"
@@ -18964,6 +18895,10 @@ msgstr "頻譜分析器"
 #~ msgstr "允許你指定串流輸出的輸出多工器"
 
 #, fuzzy
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "輸出裝置"
+
+#, fuzzy
 #~ msgid ""
 #~ "Allows you to specify the output destination used for the streaming "
 #~ "output."
@@ -19009,6 +18944,9 @@ msgstr "頻譜分析器"
 #~ "streaming output."
 #~ msgstr "允許你指定串流輸出的目的字幕編碼器"
 
+#~ msgid "List of video output modules"
+#~ msgstr "視訊輸出模組清單"
+
 #, fuzzy
 #~ msgid "Top left corner y coordinate"
 #~ msgstr "視訊y座標"
@@ -19020,6 +18958,9 @@ msgstr "頻譜分析器"
 #, fuzzy
 #~ msgid "On Screen Display menu subfilter"
 #~ msgstr "畫面上顯示(OSD)"
+
+#~ msgid "Select effect"
+#~ msgstr "選擇效果"
 
 #~ msgid "Allows you to select different visual effects."
 #~ msgstr "允許你選擇不同的視覺效果"
@@ -19063,6 +19004,9 @@ msgstr "頻譜分析器"
 
 #~ msgid "Enable loop filter"
 #~ msgstr "開啟迴圈過濾器"
+
+#~ msgid "Analyse mode"
+#~ msgstr "分析模式"
 
 #~ msgid "Item Info"
 #~ msgstr "項目資訊"
@@ -19145,6 +19089,9 @@ msgstr "頻譜分析器"
 #~ msgid "Audio output volume"
 #~ msgstr "輸出音量"
 
+#~ msgid "Network interface address"
+#~ msgstr "網路介面位置"
+
 #~ msgid "Choose program (SID)"
 #~ msgstr "選擇程式(SID)"
 
@@ -19187,9 +19134,6 @@ msgstr "頻譜分析器"
 #~ msgid "Controls"
 #~ msgstr "控制"
 
-#~ msgid "Random effect"
-#~ msgstr "隨機效果"
-
 #~ msgid "SLP LDAP filter"
 #~ msgstr "SLP LDAP過濾器"
 
@@ -19213,6 +19157,9 @@ msgstr "頻譜分析器"
 
 #~ msgid "Joystick control interface"
 #~ msgstr "搖桿控制介面"
+
+#~ msgid "Show tooltips"
+#~ msgstr "顯示工具提示"
 
 #~ msgid "Show tooltips for configuration options."
 #~ msgstr "顯示組態選項的工具提示"
@@ -19243,6 +19190,9 @@ msgstr "頻譜分析器"
 
 #~ msgid "Open the messages window"
 #~ msgstr "開啟訊息視窗"
+
+#~ msgid "Select audio channel"
+#~ msgstr "選擇音訊頻道"
 
 #~ msgid "Select subtitles channel"
 #~ msgstr "選擇字幕頻道"
@@ -19283,6 +19233,9 @@ msgstr "頻譜分析器"
 #~ msgid "Playlist..."
 #~ msgstr "播放清單..."
 
+#~ msgid "Open Stream"
+#~ msgstr "開啟串流"
+
 #~ msgid "Vertical"
 #~ msgstr "垂直"
 
@@ -19303,6 +19256,9 @@ msgstr "頻譜分析器"
 
 #~ msgid "Gtk+ interface"
 #~ msgstr "Gtk+ 介面"
+
+#~ msgid "Close the window"
+#~ msgstr "關閉視窗"
 
 #~ msgid "Exit the program"
 #~ msgstr "離開程式"
@@ -19433,6 +19389,9 @@ msgstr "頻譜分析器"
 #~ msgid "Starts playback"
 #~ msgstr "開始重播"
 
+#~ msgid "Opening file..."
+#~ msgstr "開啟檔案中..."
+
 #~ msgid "Exiting..."
 #~ msgstr "離開..."
 
@@ -19450,6 +19409,9 @@ msgstr "頻譜分析器"
 
 #~ msgid "Port "
 #~ msgstr "埠 "
+
+#~ msgid "Video Filters"
+#~ msgstr "視訊過濾器"
 
 #~ msgid "Demux number"
 #~ msgstr "解多工器數量"
@@ -19510,9 +19472,6 @@ msgstr "頻譜分析器"
 #~ msgid "Telnet"
 #~ msgstr "選擇"
 
-#~ msgid "Control"
-#~ msgstr "控制"
-
 #~ msgid "&Invert"
 #~ msgstr "反向(&I)"
 
@@ -19560,5 +19519,123 @@ msgstr "頻譜分析器"
 #~ msgid "Select file or directory"
 #~ msgstr "選擇檔案或目錄"
 
+#~ msgid "Repeat"
+#~ msgstr "重複"
+
 #~ msgid "SAP interface"
 #~ msgstr "SAP介面"
+
+#~ msgid "&Shuffle Playlist"
+#~ msgstr "亂化播放清單"
+
+#~ msgid "Stop Stream"
+#~ msgstr "停止串流"
+
+#~ msgid "Play stream"
+#~ msgstr "播放串流"
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "Logo檔名"
+
+#~ msgid "Random effect"
+#~ msgstr "隨機效果"
+
+#, fuzzy
+#~ msgid "Disc Type"
+#~ msgstr "光碟類型"
+
+#, fuzzy
+#~ msgid "Browse"
+#~ msgstr "瀏覽..."
+
+#, fuzzy
+#~ msgid "Big"
+#~ msgstr "亮度"
+
+#, fuzzy
+#~ msgid "Alignment"
+#~ msgstr "視訊對齊"
+
+#, fuzzy
+#~ msgid "Extra Audio File"
+#~ msgstr "音訊濾波器"
+
+#, fuzzy
+#~ msgid "Media File"
+#~ msgstr "檔案"
+
+#, fuzzy
+#~ msgid "text"
+#~ msgstr "下一項"
+
+#, fuzzy
+#~ msgid "QWidget"
+#~ msgstr "寬度"
+
+#, fuzzy
+#~ msgid "geometry"
+#~ msgstr "頻譜"
+
+#, fuzzy
+#~ msgid "spacing"
+#~ msgstr "快取"
+
+#, fuzzy
+#~ msgid "Line"
+#~ msgstr "時間"
+
+#, fuzzy
+#~ msgid "line"
+#~ msgstr "清除"
+
+#, fuzzy
+#~ msgid "orientation"
+#~ msgstr "更多資訊"
+
+#, fuzzy
+#~ msgid "QGroupBox"
+#~ msgstr "群組"
+
+#, fuzzy
+#~ msgid "enabled"
+#~ msgstr "啟動"
+
+#, fuzzy
+#~ msgid "horizontalLayout_3"
+#~ msgstr "水平翻轉"
+
+#, fuzzy
+#~ msgid "Disk"
+#~ msgstr "光碟"
+
+#, fuzzy
+#~ msgid "Stream information"
+#~ msgstr "更多資訊"
+
+#, fuzzy
+#~ msgid "Audioscrobbler username"
+#~ msgstr "音訊裝置名稱"
+
+#, fuzzy
+#~ msgid "Audioscrobbler password"
+#~ msgstr "SOCKS密碼"
+
+#, fuzzy
+#~ msgid "Connecting..."
+#~ msgstr "設定..."
+
+#, fuzzy
+#~ msgid "Filters (v2)"
+#~ msgstr "濾波器"
+
+#, fuzzy
+#~ msgid "Dummy video filter"
+#~ msgstr "ffmpeg視訊過濾器"
+
+#, fuzzy
+#~ msgid "Dummy VF"
+#~ msgstr "虛擬"
+
+#~ msgid "Control"
+#~ msgstr "控制"
