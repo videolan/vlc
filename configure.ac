@@ -5312,28 +5312,20 @@ then
   if test "${with_mozilla_sdk_path}" = "" -o "${with_mozilla_sdk_path}" = "no"
   then
     dnl New firefox-1.5 SDK api
-    PKG_CHECK_MODULES([firefox], [firefox-plugin],
+    PKG_CHECK_MODULES([FIREFOX], [firefox-plugin],
       [
-        firefox_libs=`pkg-config --libs firefox-plugin`
-        firefox_cflags=`pkg-config --cflags firefox-plugin`
-        PKG_CHECK_MODULES([mozilla-nspr], [mozilla-nspr],
+        PKG_CHECK_MODULES([MOZILLA_NSPR], [mozilla-nspr],
+          [],
           [
-            nspr_libs=`pkg-config --libs mozilla-nspr`
-            npsr_cflags=`pkg-config --cflags mozilla-nspr`
-          ],
-          [
-            PKG_CHECK_MODULES([nspr], [nspr],
-              [
-                nspr_libs=`pkg-config --libs nspr`
-                npsr_cflags=`pkg-config --cflags nspr`
-              ],
+            PKG_CHECK_MODULES([NSPR], [nspr],
+              [],
               [
                 AC_MSG_ERROR([Please install the nspr development tools.])
               ]
             )
           ]
         )
-        CPPFLAGS="${CPPFLAGS_save} ${firefox_cflags} ${nspr_cflags} ${MOZILLA_CPPFLAGS}"
+        CPPFLAGS="${CPPFLAGS_save} ${FIREFOX_CFLAGS} ${MOZILLA_NSPR_CFLAGS} ${NSPR_CFLAGS} ${MOZILLA_CPPFLAGS}"
         MOZILLA_REQUIRED_HEADERS=1
         AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
         AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
@@ -5342,7 +5334,6 @@ then
            # include <npapi.h>
            #endif
           ])
-        CPPFLAGS="${CPPFLAGS_save}"
         if test "${MOZILLA_CONFIG_HEADERS}" = "0"; then
             AC_MSG_ERROR([Please install the Firefox development tools; mozilla-config.h, plugin/npapi.h and plugin/npruntime.h were not found.])
         fi
@@ -5353,10 +5344,11 @@ then
         if grep '^#define MOZ_X11 1' ${MOZILLA_CONFIG_H} 2>&1 > /dev/null ; then
             VLC_ADD_LDFLAGS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt])
         fi
-        VLC_ADD_CPPFLAGS([mozilla],[${firefox_cflags} ${nspr_cflags} ${MOZILLA_CPPFLAGS}])
-        VLC_ADD_LDFLAGS([mozilla],[${firefox_libs} ${nspr_libs} ${MOZILLA_LDFLAGS}])
+        VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS}])
+        VLC_ADD_LDFLAGS([mozilla],[${FIREFOX_LIBS} ${MOZILLA_NSPR_LIS} ${NSPR_LIBS} ${MOZILLA_LDFLAGS}])
         VLC_ADD_PLUGINS([mozilla])
         MOZILLA_CONFIG=
+        CPPFLAGS="${CPPFLAGS_save}"
       ],
       [
         AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
